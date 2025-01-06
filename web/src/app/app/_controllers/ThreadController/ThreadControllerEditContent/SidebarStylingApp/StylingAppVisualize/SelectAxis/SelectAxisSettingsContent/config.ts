@@ -4,6 +4,7 @@ import { CategoryAxisSettingContent } from './CategoryAxisSettingContent';
 import { XAxisSettingContent } from './XAxisSettingContent';
 import { YAxisSettingContent } from './YAxisSettingContent';
 import { Y2AxisSettingContent } from './Y2AxisSettingContent';
+import { TooltipAxisSettingContent } from './TooltipAxisSettingContent';
 
 export const zoneIdToAxisSettingContent: Record<
   SelectAxisContainerId,
@@ -15,8 +16,8 @@ export const zoneIdToAxisSettingContent: Record<
   yAxis: YAxisSettingContent,
   categoryAxis: CategoryAxisSettingContent,
   y2Axis: Y2AxisSettingContent,
+  tooltip: TooltipAxisSettingContent,
   sizeAxis: null,
   available: null,
-  tooltip: null,
   metric: null
 };

@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 import { BusterChartProps, ChartEncodes, ChartType, ViewType } from './interfaces';
 import isEmpty from 'lodash/isEmpty';
 import { doesChartHaveValidAxis } from './helpers';
-import { useMemoizedFn, useMount } from 'ahooks';
+import { useMemoizedFn } from 'ahooks';
 import {
   NoChartData,
   PreparingYourRequestLoader

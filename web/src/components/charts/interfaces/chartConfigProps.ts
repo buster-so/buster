@@ -24,6 +24,7 @@ export type BusterChartConfigProps = {
   showLegendHeadline?: ShowLegendHeadline; //OPTIONAL
   goalLines?: GoalLine[]; //OPTIONAL: default is no goal lines
   trendlines?: Trendline[]; //OPTIONAL: default is no trendlines
+  disableTooltip?: boolean; //OPTIONAL: default is false
 } & YAxisConfig &
   XAxisConfig &
   CategoryAxisStyleConfig &

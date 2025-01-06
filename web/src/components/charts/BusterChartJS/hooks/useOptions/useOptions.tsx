@@ -12,7 +12,7 @@ import { useYAxis } from './useYAxis';
 import { DeepPartial } from 'utility-types';
 import type { PluginChartOptions } from 'chart.js';
 import { useTooltipOptions } from './useTooltipOptions.ts/useTooltipOptions';
-import { DatasetOption, TrendlineDataset } from '@/components/charts/chartHooks';
+import { DatasetOption } from '@/components/charts/chartHooks';
 import { useY2Axis } from './useY2Axis';
 import { AnnotationPluginOptions } from 'chartjs-plugin-annotation';
 import { BusterChartTypeComponentProps } from '@/components/charts/interfaces/chartComponentInterfaces';
@@ -53,6 +53,7 @@ interface UseOptionsProps {
   animate: boolean;
   goalLinesAnnotations: AnnotationPluginOptions['annotations'];
   trendlineAnnotations: AnnotationPluginOptions['annotations'];
+  disableTooltip: boolean;
 }
 
 export const useOptions = ({
@@ -90,7 +91,8 @@ export const useOptions = ({
   yAxisScaleType,
   animate,
   goalLinesAnnotations,
-  trendlineAnnotations
+  trendlineAnnotations,
+  disableTooltip
 }: UseOptionsProps) => {
   const xAxis = useXAxis({
     columnLabelFormats,
@@ -166,7 +168,8 @@ export const useOptions = ({
     selectedAxis,
     columnSettings,
     datasetOptions,
-    hasMismatchedTooltipsAndMeasures
+    hasMismatchedTooltipsAndMeasures,
+    disableTooltip
   });
 
   const options: ChartProps<ChartJSChartType>['options'] = useMemo(() => {

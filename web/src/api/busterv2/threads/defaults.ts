@@ -30,6 +30,7 @@ export const DEFAULT_CHART_CONFIG: IBusterThreadMessageChartConfig = {
   goalLines: [],
   trendlines: [],
   showLegendHeadline: false,
+  disableTooltip: false,
   barAndLineAxis: {
     x: [],
     y: [],

@@ -69,7 +69,8 @@ export const SidebarStylingApp: React.FC<{
     xAxisShowAxisTitle,
     yAxisShowAxisTitle,
     y2AxisShowAxisTitle,
-    scatterDotSize
+    scatterDotSize,
+    disableTooltip
   } = chartConfig;
 
   const selectedAxis: ChartEncodes | null = getSelectedAxis(
@@ -131,6 +132,7 @@ export const SidebarStylingApp: React.FC<{
             yAxisShowAxisTitle={yAxisShowAxisTitle}
             xAxisShowAxisTitle={xAxisShowAxisTitle}
             y2AxisShowAxisTitle={y2AxisShowAxisTitle}
+            disableTooltip={disableTooltip}
           />
         )}
 

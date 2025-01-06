@@ -63,7 +63,7 @@ export const BusterChartJSComponent = React.memo(
         gridLines,
         goalLines,
         lineGroupType,
-
+        disableTooltip,
         //TODO
         xAxisDataZoom,
         useRapidResizeObserver = false,
@@ -157,7 +157,8 @@ export const BusterChartJSComponent = React.memo(
         y2AxisScaleType,
         y2AxisStartAxisAtZero,
         yAxisScaleType,
-        animate
+        animate,
+        disableTooltip
       });
 
       const type = useMemo(() => {

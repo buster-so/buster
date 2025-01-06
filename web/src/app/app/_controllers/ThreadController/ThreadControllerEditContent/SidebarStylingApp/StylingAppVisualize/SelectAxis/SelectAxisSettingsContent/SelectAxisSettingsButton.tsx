@@ -1,6 +1,6 @@
 import { AppMaterialIcons, AppPopover } from '@/components';
 import { Button } from 'antd';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { SelectAxisContainerId } from '../config';
 import { SelectAxisSettingContent } from './SelectAxisSettingContent';
 import { useSelectAxisContextSelector } from '../useSelectAxisContext';
@@ -11,7 +11,13 @@ export const SelectAxisSettingsButton: React.FC<{
 }> = React.memo(({ zoneId }) => {
   const selectedChartType = useSelectAxisContextSelector((x) => x.selectedChartType);
 
-  if (selectedChartType === 'pie' || zoneIdToAxisSettingContent[zoneId] === null) return null;
+  const canUseAxisSetting = useMemo(() => {
+    if (zoneIdToAxisSettingContent[zoneId] === null) return false;
+    if (selectedChartType === 'pie' && zoneId !== 'tooltip') return false;
+    return true;
+  }, [selectedChartType, zoneId]);
+
+  if (!canUseAxisSetting) return null;
 
   return (
     <AppPopover

@@ -21,10 +21,11 @@ export const pieTooltipHelper = (
   );
 
   if (!dataPointIsInTooltip) {
-    return [];
+    //  console.warn('TODO: handle data point not in tooltip');
+    //I removed the early return because if tooltip only had non plotted values it would not show
   }
 
-  return tooltipDatasets.map<ITooltipItem>((tooltipDataset) => {
+  const tooltipItems = tooltipDatasets.map<ITooltipItem>((tooltipDataset) => {
     const isActiveDataset = tooltipDataset.label === dataPointDataset.label;
     const color = isActiveDataset
       ? (dataPointDataset.backgroundColor as string[])[dataPointDataIndex]
@@ -62,6 +63,8 @@ export const pieTooltipHelper = (
       values: [{ formattedValue, formattedLabel, formattedPercentage }]
     };
   });
+
+  return tooltipItems;
 };
 
 export const getPiePercentage = (

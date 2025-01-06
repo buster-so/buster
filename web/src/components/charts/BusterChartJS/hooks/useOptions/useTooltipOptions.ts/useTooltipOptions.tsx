@@ -31,6 +31,7 @@ interface UseTooltipOptionsProps {
   selectedAxis: ChartEncodes;
   datasetOptions: DatasetOption[];
   hasMismatchedTooltipsAndMeasures: boolean;
+  disableTooltip: boolean;
 }
 
 export const useTooltipOptions = ({
@@ -42,7 +43,8 @@ export const useTooltipOptions = ({
   pieDisplayLabelAs,
   columnSettings,
   selectedAxis,
-  datasetOptions
+  datasetOptions,
+  disableTooltip
 }: UseTooltipOptionsProps): DeepPartial<TooltipOptions> => {
   const tooltipCache = useRef<Record<string, string>>({});
 
@@ -127,9 +129,9 @@ export const useTooltipOptions = ({
     () => ({
       enabled: false,
       mode,
-      external: memoizedExternal
+      external: disableTooltip ? undefined : memoizedExternal
     }),
-    [mode, memoizedExternal, selectedChartType]
+    [mode, disableTooltip, memoizedExternal, selectedChartType]
   );
 
   useEffect(() => {

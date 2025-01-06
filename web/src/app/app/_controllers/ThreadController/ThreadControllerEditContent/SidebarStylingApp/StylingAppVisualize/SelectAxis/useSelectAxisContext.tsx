@@ -32,6 +32,7 @@ export interface ISelectAxisContext
   goalLines: IBusterThreadMessageChartConfig['goalLines'];
   trendlines: IBusterThreadMessageChartConfig['trendlines'];
   barShowTotalAtTop: IBusterThreadMessageChartConfig['barShowTotalAtTop'];
+  disableTooltip: IBusterThreadMessageChartConfig['disableTooltip'];
 }
 
 const SelectAxisContext = createContext<ISelectAxisContext>({} as ISelectAxisContext);

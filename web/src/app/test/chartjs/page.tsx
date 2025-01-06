@@ -161,8 +161,8 @@ export default function ChartJS() {
     return {
       axis: {
         x: ['name'],
-        y: ['sales', 'expenses']
-        //  tooltip: ['sales', 'name']
+        y: ['sales', 'expenses'],
+        tooltip: ['employee_count']
       },
       minimumPiePercentage: 5
     };

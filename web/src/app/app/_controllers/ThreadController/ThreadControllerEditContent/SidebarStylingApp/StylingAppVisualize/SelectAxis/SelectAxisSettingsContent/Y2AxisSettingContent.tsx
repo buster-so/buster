@@ -2,11 +2,7 @@ import React, { useMemo } from 'react';
 import { useSelectAxisContextSelector } from '../useSelectAxisContext';
 import { SelectAxisContainerId } from '../config';
 import { EditShowAxisTitle } from './EditShowAxisTitle';
-import type {
-  ColumnLabelFormat,
-  ComboChartAxis,
-  Y2AxisConfig
-} from '@/components/charts/interfaces';
+import type { ColumnLabelFormat, ComboChartAxis } from '@/components/charts/interfaces';
 import { AXIS_TITLE_SEPARATOR } from '@/components/charts/commonHelpers';
 import { formatLabel } from '@/utils';
 import { useMemoizedFn } from 'ahooks';
