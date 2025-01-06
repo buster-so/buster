@@ -45,7 +45,7 @@ export const useFavoriteProvider = () => {
       name: string;
       index?: number;
     }) => {
-      setUserFavorites((v) => [...v, { id, type: asset_type, name }]);
+      setUserFavorites((v) => [{ id, type: asset_type, name }, ...v]);
 
       await busterSocket.emitAndOnce({
         emitEvent: {

@@ -2,6 +2,7 @@ import { formatLabel } from '@/utils';
 import { useMemo } from 'react';
 import { AXIS_TITLE_SEPARATOR } from '@/components/charts/commonHelpers/axisHelper';
 import { BusterChartConfigProps } from '../interfaces';
+import { truncateWithEllipsis } from './titleHelpers';
 
 export const useY2AxisTitle = ({
   y2Axis,
@@ -22,9 +23,9 @@ export const useY2AxisTitle = ({
 
   const y2AxisTitle = useMemo(() => {
     if (!isSupportedChartForAxisTitles || !y2AxisShowAxisTitle) return '';
-    return (
+    return truncateWithEllipsis(
       y2AxisAxisTitle ||
-      y2Axis.map((y) => formatLabel(y, columnLabelFormats[y], true)).join(AXIS_TITLE_SEPARATOR)
+        y2Axis.map((y) => formatLabel(y, columnLabelFormats[y], true)).join(AXIS_TITLE_SEPARATOR)
     );
   }, [
     y2AxisAxisTitle,

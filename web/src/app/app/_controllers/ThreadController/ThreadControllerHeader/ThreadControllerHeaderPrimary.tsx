@@ -327,53 +327,55 @@ const ThreeDotDropdown: React.FC<{
     const { styles, cx } = useStyles();
 
     const items: MenuProps['items'] = useMemo(
-      () => [
-        {
-          key: 'edit',
-          label: 'Edit name',
-          icon: <AppMaterialIcons icon="edit" />,
-          onClick: () => {
-            setEditingThreadTitle(true);
-          }
-        },
-        {
-          key: 'delete',
-          label: 'Delete metric',
-          icon: <AppMaterialIcons icon="delete" />,
-          onClick: async () => {
-            await deleteThread({
-              threadIds: [threadId]
-            });
-            onChangePage({ route: BusterRoutes.APP_THREAD });
-          }
-        },
-        {
-          key: 'export',
-          label: 'Export data as CSV',
-          icon: <AppMaterialIcons icon="download" />,
-          onClick: () => {
-            const name = messageTitle || 'export';
-            exportJSONToCSV(messageData || [], name);
+      () =>
+        [
+          {
+            key: 'edit',
+            label: 'Edit name',
+            icon: <AppMaterialIcons icon="edit" />,
+            onClick: () => {
+              setEditingThreadTitle(true);
+            }
           },
-          disabled: !messageData
-        },
-        // {
-        //   key: 'export-pdf',
-        //   label: 'Export data as PDF',
-        //   icon: <AppMaterialIcons icon="picture_as_pdf" />,
-        //   onClick: () => {
-        //     const name = messageTitle || 'export';
-        //     exportJSONToPDF(messageData || [], `${name}.pdf`);
-        //   }
-        // },
-        {
-          key: 'download-chart',
-          label: 'Download chart',
-          icon: <AppMaterialIcons icon="download" />,
-          onClick: onDownloadChartClick,
-          disabled: !messageData || isTable
-        }
-      ],
+          {
+            key: 'delete',
+            label: 'Delete metric',
+            icon: <AppMaterialIcons icon="delete" />,
+            onClick: async () => {
+              await deleteThread({
+                threadIds: [threadId]
+              });
+              onChangePage({ route: BusterRoutes.APP_THREAD });
+            }
+          },
+          {
+            key: 'export',
+            label: 'Export data as CSV',
+            icon: <AppMaterialIcons icon="download" />,
+            onClick: () => {
+              const name = messageTitle || 'export';
+              exportJSONToCSV(messageData || [], name);
+            },
+            disabled: !messageData
+          },
+          // {
+          //   key: 'export-pdf',
+          //   label: 'Export data as PDF',
+          //   icon: <AppMaterialIcons icon="picture_as_pdf" />,
+          //   onClick: () => {
+          //     const name = messageTitle || 'export';
+          //     exportJSONToPDF(messageData || [], `${name}.pdf`);
+          //   }
+          // },
+          {
+            key: 'download-chart',
+            label: 'Download chart',
+            icon: <AppMaterialIcons icon="download" />,
+            onClick: onDownloadChartClick,
+            disabled: !messageData,
+            hidden: isTable
+          }
+        ].filter((item) => !item.hidden),
       [messageTitle, onDownloadChartClick, messageData, messageId]
     );
 

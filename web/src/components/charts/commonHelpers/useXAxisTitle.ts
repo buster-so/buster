@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { BusterChartConfigProps, ChartEncodes } from '../interfaces';
 import { formatLabel } from '@/utils/columnFormatter';
 import { AXIS_TITLE_SEPARATOR } from './axisHelper';
+import { truncateWithEllipsis } from './titleHelpers';
 
 interface UseXAxisTitleProps {
   xAxis: string[];
@@ -26,12 +27,14 @@ export const useXAxisTitle = ({
 
   const xAxisTitle = useMemo(() => {
     if (!isSupportedChartForAxisTitles || xAxisAxisTitle === '' || !xAxisShowAxisTitle) return '';
-    return (
+
+    const title =
       xAxisAxisTitle ||
       selectedAxis.x
         .map((x) => formatLabel(x, columnLabelFormats[x], true))
-        .join(AXIS_TITLE_SEPARATOR)
-    );
+        .join(AXIS_TITLE_SEPARATOR);
+
+    return truncateWithEllipsis(title);
   }, [
     xAxisAxisTitle,
     isSupportedChartForAxisTitles,
