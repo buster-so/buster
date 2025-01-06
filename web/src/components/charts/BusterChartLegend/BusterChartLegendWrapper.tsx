@@ -3,7 +3,10 @@ import React, { useRef } from 'react';
 import { BusterChartLegend, BusterChartLegendItem } from '.';
 import { useSize } from 'ahooks';
 import { ShowLegendHeadline } from '../interfaces';
-import { ChartWrapperProvider } from '../chartHooks/useChartWrapperProvider';
+import {
+  ChartLegendWrapperProvider,
+  useChartWrapperContextSelector
+} from '../chartHooks/useChartWrapperProvider';
 
 export type BusterChartLegendWrapper = {
   children: React.ReactNode;
@@ -34,13 +37,11 @@ export const BusterChartLegendWrapper: React.FC<BusterChartLegendWrapper> = Reac
     onLegendItemFocus
   }) => {
     const { cx } = useStyles();
-    const ref = useRef<HTMLDivElement>(null);
-    const size = useSize(ref);
-    const width = size?.width ?? 400;
+    const width = useChartWrapperContextSelector(({ width }) => width);
 
     return (
-      <ChartWrapperProvider width={width} inactiveDatasets={inactiveDatasets}>
-        <div ref={ref} className={cx(className, 'flex h-full w-full flex-col overflow-hidden')}>
+      <ChartLegendWrapperProvider inactiveDatasets={inactiveDatasets}>
+        <div className={cx(className, 'flex h-full w-full flex-col overflow-hidden')}>
           {renderLegend && (
             <BusterChartLegend
               show={showLegend}
@@ -56,7 +57,7 @@ export const BusterChartLegendWrapper: React.FC<BusterChartLegendWrapper> = Reac
 
           <div className="h-full w-full overflow-hidden">{children}</div>
         </div>
-      </ChartWrapperProvider>
+      </ChartLegendWrapperProvider>
     );
   }
 );

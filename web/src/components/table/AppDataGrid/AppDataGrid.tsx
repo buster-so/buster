@@ -18,7 +18,14 @@ import { ErrorBoundary } from '@/components/error';
 //https://www.npmjs.com/package/react-spreadsheet-grid#live-playground
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createStyles } from 'antd-style';
-import { useDebounce, useDebounceFn, useMemoizedFn, useMount, useSize } from 'ahooks';
+import {
+  useDebounce,
+  useDebounceEffect,
+  useDebounceFn,
+  useMemoizedFn,
+  useMount,
+  useSize
+} from 'ahooks';
 import sampleSize from 'lodash/sampleSize';
 import { AppMaterialIcons } from '../../icons';
 import isEmpty from 'lodash/isEmpty';
@@ -313,6 +320,14 @@ export const AppDataGrid: React.FC<AppDataGridProps> = React.memo(
         if (isDifferentColumnsOrder) setColumnsOrder(newColumnsOrder);
       }
     }, [rows, fields]);
+
+    useDebounceEffect(
+      () => {
+        onColumnResizeOverflowCheck();
+      },
+      [widthOfContainer],
+      { wait: 100 }
+    );
 
     useMount(() => {
       requestAnimationFrame(() => {

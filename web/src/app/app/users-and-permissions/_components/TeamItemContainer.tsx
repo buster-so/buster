@@ -13,7 +13,7 @@ export const TeamItemContainer: React.FC<{
 }> = ({ teams, setOpenModal, permissionGroupId, userId }) => {
   return (
     <ItemContainer
-      className="mt-10"
+      className="mt-10 overflow-hidden"
       bodyClass="!p-0"
       title={
         <div className="flex w-full items-center justify-between">

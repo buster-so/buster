@@ -42,6 +42,6 @@ export const ChartHoverLinePlugin: Plugin<ChartType, ChartHoverLinePluginOptions
   defaults: {
     lineWidth: 1,
     lineColor: 'rgba(0,0,0,0.22)',
-    lineDash: [5, 1]
+    lineDash: [5, 3]
   }
 };

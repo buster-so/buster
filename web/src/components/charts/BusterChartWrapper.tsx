@@ -1,21 +1,23 @@
 import { createStyles } from 'antd-style';
-import React from 'react';
+import React, { useRef } from 'react';
+import { ChartWrapperProvider } from './chartHooks';
+import { useSize } from 'ahooks';
 
-export const BusterChartWrapper = React.memo(
-  React.forwardRef<
-    HTMLDivElement,
-    {
-      children: React.ReactNode;
-      id: string | undefined;
-      className: string | undefined;
-      bordered: boolean;
-      loading: boolean;
-      useTableSizing: boolean;
-    }
-  >(({ children, id, className, bordered, loading, useTableSizing }, ref) => {
-    const { styles, cx } = useStyles();
+export const BusterChartWrapper = React.memo<{
+  children: React.ReactNode;
+  id: string | undefined;
+  className: string | undefined;
+  bordered: boolean;
+  loading: boolean;
+  useTableSizing: boolean;
+}>(({ children, id, className, bordered, loading, useTableSizing }) => {
+  const { styles, cx } = useStyles();
+  const ref = useRef<HTMLDivElement>(null);
+  const size = useSize(ref);
+  const width = size?.width ?? 400;
 
-    return (
+  return (
+    <ChartWrapperProvider width={width}>
       <div
         ref={ref}
         id={id}
@@ -31,9 +33,9 @@ export const BusterChartWrapper = React.memo(
         )}>
         {children}
       </div>
-    );
-  })
-);
+    </ChartWrapperProvider>
+  );
+});
 
 BusterChartWrapper.displayName = 'BusterChartWrapper';
 

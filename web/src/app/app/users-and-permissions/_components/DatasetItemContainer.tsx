@@ -11,7 +11,7 @@ export const DatasetItemContainer: React.FC<{
 }> = ({ datasets, setOpenModal }) => {
   return (
     <ItemContainer
-      className="mt-10"
+      className="mt-10 overflow-hidden"
       bodyClass="!p-0"
       title={
         <div className="flex w-full items-center justify-between">

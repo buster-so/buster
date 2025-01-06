@@ -5,25 +5,38 @@ import {
 } from '@fluentui/react-context-selector';
 import React, { PropsWithChildren } from 'react';
 
-interface IChartWrapperContext {
+const ChartWrapperContext = createContext<{
   width: number;
-  inactiveDatasets: Record<string, boolean>;
-}
+}>({} as { width: number });
 
-const ChartWrapperContext = createContext<IChartWrapperContext>({} as IChartWrapperContext);
-
-export const ChartWrapperProvider: React.FC<PropsWithChildren<IChartWrapperContext>> = ({
-  children,
-  width,
-  inactiveDatasets
-}) => {
-  return (
-    <ChartWrapperContext.Provider value={{ inactiveDatasets, width }}>
-      {children}
-    </ChartWrapperContext.Provider>
-  );
+export const ChartWrapperProvider: React.FC<
+  PropsWithChildren<{
+    width: number;
+  }>
+> = ({ children, width }) => {
+  return <ChartWrapperContext.Provider value={{ width }}>{children}</ChartWrapperContext.Provider>;
 };
 
 export const useChartWrapperContextSelector = <T,>(
-  selector: ContextSelector<IChartWrapperContext, T>
+  selector: ContextSelector<{ width: number }, T>
 ) => useContextSelector(ChartWrapperContext, selector);
+
+const ChartLegendWrapperContext = createContext<{
+  inactiveDatasets: Record<string, boolean>;
+}>({} as { inactiveDatasets: Record<string, boolean> });
+
+export const ChartLegendWrapperProvider: React.FC<
+  PropsWithChildren<{
+    inactiveDatasets: Record<string, boolean>;
+  }>
+> = ({ children, inactiveDatasets }) => {
+  return (
+    <ChartLegendWrapperContext.Provider value={{ inactiveDatasets }}>
+      {children}
+    </ChartLegendWrapperContext.Provider>
+  );
+};
+
+export const useChartLegendWrapperContextSelector = <T,>(
+  selector: ContextSelector<{ inactiveDatasets: Record<string, boolean> }, T>
+) => useContextSelector(ChartLegendWrapperContext, selector);

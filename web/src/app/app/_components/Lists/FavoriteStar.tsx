@@ -44,7 +44,9 @@ export const FavoriteStar: React.FC<{
     return userFavorites.some((favorite) => favorite.id === id || favorite.collection_id === id);
   }, [userFavorites, id]);
 
-  const onFavoriteClick = useMemoizedFn(async () => {
+  const onFavoriteClick = useMemoizedFn(async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
     if (!isFavorited)
       return await addItemToFavorite({
         asset_type: type,

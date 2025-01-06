@@ -6,7 +6,7 @@ import isEqual from 'lodash/isEqual';
 import { BusterChartPropsBase } from '../interfaces';
 import { IBusterThreadMessageChartConfig } from '@/api/busterv2/threads/threadConfigInterfaces';
 import { DEFAULT_CHART_CONFIG } from '@/api/busterv2/threads/defaults';
-import { useMemoizedFn, useSize } from 'ahooks';
+import { useMemoizedFn } from 'ahooks';
 import AppDataGrid from '@/components/table/AppDataGrid/AppDataGrid';
 import { useChartWrapperContextSelector } from '../chartHooks/useChartWrapperProvider';
 
