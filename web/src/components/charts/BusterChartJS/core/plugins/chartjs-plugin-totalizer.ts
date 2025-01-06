@@ -34,7 +34,7 @@ export const ChartTotalizerPlugin: Plugin<ChartType, ChartTotalizerPluginOptions
     const seriesTotals: number[] = [];
 
     chart.data.datasets
-      .filter((dataset) => !dataset.hidden && !dataset.isTrendline)
+      //  .filter((dataset) => !dataset.hidden && !dataset.isTrendline)
       .forEach((dataset, datasetIndex) => {
         (chart.data.labels as string[])?.forEach((label, labelIndex) => {
           const value = dataset.data[labelIndex];

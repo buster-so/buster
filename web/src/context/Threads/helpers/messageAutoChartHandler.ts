@@ -121,14 +121,14 @@ const keySpecificHandlers: Partial<
     dataMetadata,
     pieChartAxis
   ) => {
-    if (isEmpty(pieLabelPosition)) {
-      const firstPieColumn = pieChartAxis?.x?.[0];
-      const firstPieColumnMetaData = dataMetadata?.column_metadata?.find(
-        ({ name }) => name === firstPieColumn
-      );
-      const hasMoreThanXRows = (firstPieColumnMetaData?.unique_values || 0) > 6;
-      return !hasMoreThanXRows ? 'inside' : 'none';
-    }
+    // if (isEmpty(pieLabelPosition)) {
+    //   const firstPieColumn = pieChartAxis?.x?.[0];
+    //   const firstPieColumnMetaData = dataMetadata?.column_metadata?.find(
+    //     ({ name }) => name === firstPieColumn
+    //   );
+    //   const hasMoreThanXRows = (firstPieColumnMetaData?.unique_values || 0) > 6;
+    //   return !hasMoreThanXRows ? 'none' : 'none';
+    // }
     return pieLabelPosition;
   }
 };

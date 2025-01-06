@@ -72,9 +72,12 @@ export const getPiePercentage = (
   columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>,
   chart: Chart
 ): string => {
-  const compareValue = datasetData[dataPointDataIndex] as number;
   const totalizer = chart.$totalizer;
+  // const numberOfTotalizerSeries = totalizer.seriesTotals.length;
+  //  const index = numberOfTotalizerSeries - datasetIndex;
   const total = totalizer.seriesTotals[datasetIndex];
+  const compareValue = datasetData[dataPointDataIndex] as number;
   const percentage = (compareValue / total) * 100;
+
   return percentageFormatter(percentage, label, columnLabelFormats);
 };
