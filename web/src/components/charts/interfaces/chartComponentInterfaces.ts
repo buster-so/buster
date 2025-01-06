@@ -12,7 +12,6 @@ export interface BusterChartTypeComponentProps
     | 'showLegendHeadline'
     | 'trendlines'
     | 'barSortBy'
-    | 'pieMinimumSlicePercentage'
     | 'onChartMounted'
   > {
   onChartReady: () => void;
@@ -21,12 +20,7 @@ export interface BusterChartTypeComponentProps
 export interface BusterChartComponentProps
   extends Omit<
       Required<BusterChartRenderComponentProps>,
-      | 'renderType'
-      | 'selectedAxis'
-      | 'barSortBy'
-      | 'pieMinimumSlicePercentage'
-      | 'trendlines'
-      | 'data'
+      'renderType' | 'selectedAxis' | 'barSortBy' | 'trendlines' | 'data'
     >,
     ReturnType<typeof useDatasetOptions> {
   selectedAxis: ChartEncodes;

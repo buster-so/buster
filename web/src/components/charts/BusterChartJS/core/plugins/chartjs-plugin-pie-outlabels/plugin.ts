@@ -205,7 +205,7 @@ export const OutLabelsPlugin: OutLabelsPlugin = {
   },
 
   defaults: {
-    shrinkPercentage: 0.715,
+    shrinkPercentage: 0.68,
     animateInDuration: 350,
     display: false,
     length: 18,

@@ -38,6 +38,7 @@ export const BusterChartJSTooltip: React.FC<{
   const title = useMemo(() => {
     if (isScatter) return undefined;
 
+    const isTimeAxis = chart.scales.x.type === 'time';
     const dataIndex = dataPoints[0].dataIndex;
     const value = chart.data.labels?.[dataIndex!];
     if (typeof value === 'string') return String(value);
@@ -48,6 +49,15 @@ export const BusterChartJSTooltip: React.FC<{
     const xAxisKeys = (dataset as any).xAxisKeys as string[]; //hacky... TODO look into this
     const key = xAxisKeys.at(0)!;
     const columnLabelFormat = columnLabelFormats[key!];
+
+    // if (columnLabelFormat.dateFormat === 'auto') {
+    //   const parsedXValue = dataPoints[0]?.parsed?.x;
+    //   const assosciatedTick = chart.scales.x.ticks.find((tick) => tick.value === parsedXValue);
+    //   if (assosciatedTick) {
+    //     return assosciatedTick.label as string;
+    //   }
+    // }
+
     return formatLabel(value as number | Date, columnLabelFormat);
   }, [dataPoints, chart]);
 

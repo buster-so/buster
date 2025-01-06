@@ -19,13 +19,13 @@ export const barAndLineTooltipHelper = (
   const dataPointDataset = dataPoint.dataset;
   const dataPointDataIndex = dataPoint.dataIndex;
   const tooltipDatasets = datasets.filter((dataset) => dataset.hidden);
-  const datapointIsInTooltip = tooltipDatasets.some(
-    (dataset) => dataset.label === dataPointDataset.label
-  );
 
-  if (!datapointIsInTooltip) {
-    return [];
-  }
+  // if (!datapointIsInTooltip) {
+  // const datapointIsInTooltip = tooltipDatasets.some(
+  //   (dataset) => dataset.label === dataPointDataset.label
+  // );
+  //   return [];   //I removed the early return because if tooltip only had non plotted values it would not show
+  // }
 
   const tooltipItems = tooltipDatasets.map<ITooltipItem>((tooltipDataset) => {
     const usePercentage = keyToUsePercentage.includes(tooltipDataset.label as string);
@@ -76,52 +76,4 @@ export const barAndLineTooltipHelper = (
   });
 
   return tooltipItems;
-
-  return datasets
-    .map<ITooltipItem>((dataset, datasetIndex) => {
-      const dataPointDataIndex = dataPoints[0]!.dataIndex;
-      const isHiddenViaLegend = chart.getDatasetMeta(datasetIndex).hidden;
-
-      const formattedLabel = formatChartLabel(
-        dataset.label as string,
-        columnLabelFormats,
-        hasMultipleMeasures,
-        hasCategoryAxis
-      );
-      const rawValue = dataset.data[dataPointDataIndex] as number;
-      const formattedValue = formatChartValueDelimiter(
-        rawValue,
-        dataset.label as string,
-        columnLabelFormats
-      );
-
-      const usePercentage = keyToUsePercentage.includes(dataset.label as string);
-      const formattedPercentage = usePercentage
-        ? getPercentage(
-            rawValue,
-            dataPointDataIndex,
-            datasetIndex,
-            dataset.label as string,
-            columnLabelFormats,
-            chart,
-            hasMultipleShownDatasets
-          )
-        : undefined;
-
-      //the line chart fill has a function and we fallback onto border color
-      const color: string =
-        typeof dataset.backgroundColor === 'function'
-          ? (dataset.borderColor as string)
-          : (dataset.backgroundColor as string);
-
-      return {
-        hidden: isHiddenViaLegend,
-        seriesType: 'bar',
-        usePercentage,
-        color,
-        formattedLabel,
-        values: [{ formattedValue, formattedLabel, formattedPercentage }]
-      };
-    })
-    .filter((v) => !v.hidden);
 };

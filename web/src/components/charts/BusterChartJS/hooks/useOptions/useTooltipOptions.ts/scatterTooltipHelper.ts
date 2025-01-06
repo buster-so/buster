@@ -32,9 +32,9 @@ export const scatterTooltipHelper = (
     (dataset) => dataset.label === dataPointDataset.label
   );
 
-  if (!datapointIsInTooltip) {
-    return [];
-  }
+  // if (!datapointIsInTooltip) {
+  //   return [];   //I removed the early return because if tooltip only had non plotted values it would not show
+  // }
 
   const values = tooltipDatasets.map((dataset) => {
     const label = dataset.label!;

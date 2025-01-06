@@ -27,7 +27,7 @@ export const BusterChartJS: React.FC<BusterChartComponentProps> = ({
   const chartRef = useRef<ChartJSOrUndefined>(null);
   const [chartMounted, setChartMounted] = useState(false);
 
-  const { lineGroupType, barGroupType, datasetOptions } = props;
+  const { lineGroupType, pieMinimumSlicePercentage, barGroupType, datasetOptions } = props;
 
   const onChartReady = useMemoizedFn(() => {
     setChartMounted(true);
@@ -55,7 +55,8 @@ export const BusterChartJS: React.FC<BusterChartComponentProps> = ({
       barGroupType={barGroupType}
       colors={colors}
       chartRef={chartRef}
-      datasetOptions={datasetOptions}>
+      datasetOptions={datasetOptions}
+      pieMinimumSlicePercentage={pieMinimumSlicePercentage}>
       <BusterChartJSComponent
         ref={chartRef}
         selectedChartType={selectedChartType}

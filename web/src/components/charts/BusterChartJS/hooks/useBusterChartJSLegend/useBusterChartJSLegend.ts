@@ -32,6 +32,7 @@ interface UseBusterChartJSLegendProps {
   datasetOptions: DatasetOption[];
   columnSettings: NonNullable<BusterChartProps['columnSettings']>;
   columnMetadata: NonNullable<BusterChartProps['columnMetadata']>;
+  pieMinimumSlicePercentage: NonNullable<BusterChartProps['pieMinimumSlicePercentage']>;
 }
 
 export const useBusterChartJSLegend = ({
@@ -45,6 +46,7 @@ export const useBusterChartJSLegend = ({
   columnLabelFormats,
   loading,
   lineGroupType,
+  pieMinimumSlicePercentage,
   barGroupType,
   datasetOptions,
   columnMetadata,
@@ -166,7 +168,8 @@ export const useBusterChartJSLegend = ({
     showLegendHeadline,
     columnLabelFormats,
     allYAxisColumnNames,
-    columnSettings
+    columnSettings,
+    pieMinimumSlicePercentage
   ]);
 
   return {

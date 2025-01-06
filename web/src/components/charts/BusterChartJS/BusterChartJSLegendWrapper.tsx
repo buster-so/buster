@@ -23,6 +23,7 @@ interface BusterChartJSLegendWrapperProps {
   colors: NonNullable<BusterChartProps['colors']>;
   chartRef: React.RefObject<ChartJSOrUndefined>;
   datasetOptions: DatasetOption[];
+  pieMinimumSlicePercentage: NonNullable<BusterChartProps['pieMinimumSlicePercentage']>;
 }
 
 export const BusterChartJSLegendWrapper = React.memo<BusterChartJSLegendWrapperProps>(
@@ -43,7 +44,8 @@ export const BusterChartJSLegendWrapper = React.memo<BusterChartJSLegendWrapperP
     lineGroupType,
     barGroupType,
     colors,
-    datasetOptions
+    datasetOptions,
+    pieMinimumSlicePercentage
   }) => {
     const {
       renderLegend,
@@ -67,7 +69,8 @@ export const BusterChartJSLegendWrapper = React.memo<BusterChartJSLegendWrapperP
       barGroupType,
       colors,
       loading,
-      datasetOptions
+      datasetOptions,
+      pieMinimumSlicePercentage
     });
 
     return (
