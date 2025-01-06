@@ -84,7 +84,9 @@ pub async fn get_message_with_permission(
         }
     };
 
-    let final_permission = if permission.is_none() && !is_public_thread {
+    let final_permission = if permission.is_some() {
+        permission.unwrap()
+    } else if !is_public_thread {
         return Err(anyhow!("No message found with permissions"));
     } else {
         AssetPermissionRole::Viewer
