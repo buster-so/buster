@@ -18,6 +18,7 @@ import { ChartMountedPlugin } from './core/plugins';
 import ChartDeferred from 'chartjs-plugin-deferred';
 import ChartJsAnnotationPlugin from 'chartjs-plugin-annotation';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+
 import 'chartjs-adapter-dayjs-4';
 
 import { busterAppStyleConfig } from '@/styles/busterAntDStyleConfig';

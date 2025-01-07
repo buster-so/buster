@@ -1,7 +1,6 @@
 import { ITooltipItem } from '@/components/charts/BusterChartTooltip/interfaces';
 import { BusterChartConfigProps } from '@/components/charts/interfaces';
 import type { ChartDataset, TooltipItem, ChartTypeRegistry } from 'chart.js';
-import { formatChartLabelDelimiter } from '../../../../commonHelpers';
 import { appendToKeyValueChain, extractFieldsFromChain } from '@/components/charts/chartHooks';
 import { formatChartLabel } from '../../../helpers';
 import { formatLabel } from '@/utils';
@@ -28,15 +27,7 @@ export const scatterTooltipHelper = (
   const tooltipDatasets = datasets.filter((dataset) => dataset.hidden && !dataset.isTrendline);
   const dataPointDataIndex = dataPoint.dataIndex;
 
-  // const datapointIsInTooltip = tooltipDatasets.some(
-  //   (dataset) => dataset.label === dataPointDataset.label
-  // );
-  // if (!datapointIsInTooltip) {
-  //   return []; //I removed the early return because if tooltip only had non plotted values it would not show
-  // }
-
   let relevantDatasets: ChartDataset[] = [];
-  console.log(hasCategoryAxis);
 
   if (hasCategoryAxis) {
     const dataPointCategory = extractFieldsFromChain(dataPointDataset.label!).at(0)?.value!;
@@ -44,11 +35,8 @@ export const scatterTooltipHelper = (
       const datasetCategory = extractFieldsFromChain(dataset.label!).at(0)?.value!;
       return datasetCategory === dataPointCategory;
     });
-    console.log(relevantDatasets);
   } else {
-    relevantDatasets = tooltipDatasets.filter(
-      (dataset) => dataset.label === dataPointDataset.label
-    );
+    relevantDatasets = tooltipDatasets;
   }
 
   const values = relevantDatasets.map((dataset) => {

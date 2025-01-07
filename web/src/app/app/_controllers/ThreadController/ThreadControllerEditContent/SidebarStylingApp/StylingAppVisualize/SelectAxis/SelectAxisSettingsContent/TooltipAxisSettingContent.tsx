@@ -31,3 +31,5 @@ export const TooltipAxisSettingContent: React.FC<{
     </div>
   );
 });
+
+TooltipAxisSettingContent.displayName = 'TooltipAxisSettingContent';

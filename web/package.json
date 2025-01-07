@@ -33,6 +33,7 @@
     "antd-style": "^3.7.1",
     "axios": "^1.7.9",
     "canvas-confetti": "^1.9.3",
+    "chart.js": "^4.4.7",
     "chartjs": "^0.3.24",
     "chartjs-adapter-dayjs-4": "^1.0.4",
     "chartjs-chart-geo": "^4.3.4",
