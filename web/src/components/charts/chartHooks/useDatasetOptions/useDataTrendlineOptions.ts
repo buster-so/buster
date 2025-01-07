@@ -12,7 +12,7 @@ import {
   calculateLogarithmicRegression,
   calculatePolynomialRegression,
   calculateLinearRegression,
-  isDateType,
+  isDateColumnType,
   isNumericColumnType,
   createDayjsDate,
   DataFrameOperations,
@@ -220,7 +220,7 @@ const trendlineDatasetCreator: Record<
       ];
     }
 
-    const isXAxisDate = isDateType(columnLabelFormats[xAxisColumn]?.columnType);
+    const isXAxisDate = isDateColumnType(columnLabelFormats[xAxisColumn]?.columnType);
     const indexOfTrendlineColumn = selectedDataset.dimensions!.findIndex(
       (dimensionUnDeliminated) => {
         const { key } = extractFieldsFromChain(dimensionUnDeliminated as string)[0];
@@ -378,7 +378,7 @@ const polyExpoRegressionDataMapper = (
   const source = rawDataset.source as Array<[string | number, ...number[]]>;
   const dimensions = rawDataset.dimensions as string[];
   const xAxisColumn = dimensions[0];
-  const xAxisIsADate = isDateType(columnLabelFormats[xAxisColumn]?.columnType);
+  const xAxisIsADate = isDateColumnType(columnLabelFormats[xAxisColumn]?.columnType);
   const indexOfTrendlineColumn = rawDataset.dimensions?.findIndex((dimensionUnDeliminated) => {
     const extracted = extractFieldsFromChain(dimensionUnDeliminated as string)[0];
     const key = extracted?.key || dimensionUnDeliminated; //if there is not category, then we use the dimensionUnDeliminated

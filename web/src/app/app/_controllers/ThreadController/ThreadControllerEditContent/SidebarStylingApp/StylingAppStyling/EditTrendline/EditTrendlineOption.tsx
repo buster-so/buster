@@ -5,7 +5,7 @@ import { LoopTrendline } from './EditTrendline';
 import React, { useMemo } from 'react';
 import type { ChartType, Trendline } from '@/components/charts';
 import { IBusterThreadMessageChartConfig } from '@/api/busterv2';
-import { isDateType, isNumericColumnType } from '@/utils';
+import { isDateColumnType, isNumericColumnType } from '@/utils';
 import { AppMaterialIcons, AppTooltip } from '@/components';
 
 export const EditTrendlineOption = React.memo(
@@ -48,7 +48,8 @@ export const EditTrendlineOption = React.memo(
 
     const xIsSingleDate = useMemo(() => {
       return (
-        xAxisEncodes.length === 1 && isDateType(columnLabelFormats[xAxisEncodes[0]].columnType)
+        xAxisEncodes.length === 1 &&
+        isDateColumnType(columnLabelFormats[xAxisEncodes[0]].columnType)
       );
     }, [xAxisEncodes, columnLabelFormats]);
 

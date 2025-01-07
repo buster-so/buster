@@ -43,11 +43,12 @@ export const useXAxis = ({
   columnSettings: BusterChartProps['columnSettings'];
 }): DeepPartial<ScaleChartOptions<'bar'>['scales']['x']> | undefined => {
   const isScatterChart = selectedChartType === ChartType.Scatter;
+  const isPieChart = selectedChartType === ChartType.Pie;
   const useGrid = isScatterChart;
 
   const isSupportedType = useMemo(() => {
-    return selectedChartType !== ChartType.Pie;
-  }, [selectedChartType]);
+    return !isPieChart;
+  }, [isPieChart]);
 
   const xAxisColumnFormats: Record<string, IColumnLabelFormat> = useMemo(() => {
     if (!isSupportedType) return {};
@@ -75,7 +76,10 @@ export const useXAxis = ({
     if (xAxisKeysLength === 1) {
       const xIsDate = xAxisColumnFormats[firstXKey].columnType === 'date';
 
-      if (selectedChartType === ChartType.Line && xIsDate) {
+      if (
+        (selectedChartType === ChartType.Line || selectedChartType === ChartType.Scatter) &&
+        xIsDate
+      ) {
         return 'time';
       }
 
@@ -91,13 +95,13 @@ export const useXAxis = ({
       }
     }
 
-    if (selectedChartType === ChartType.Scatter && xAxisKeysLength === 1) {
+    if (isScatterChart && xAxisKeysLength === 1) {
       const isNumeric = isNumericColumnType(xAxisColumnFormats[firstXKey]?.columnType);
       if (isNumeric) return 'linear';
     }
 
     return 'category';
-  }, [selectedChartType, columnSettings, xAxisColumnFormats]);
+  }, [isScatterChart, columnSettings, xAxisColumnFormats]);
 
   const title = useXAxisTitle({
     xAxis: selectedAxis.x,
@@ -114,7 +118,6 @@ export const useXAxis = ({
       const columnLabelFormat = xAxisColumnFormats[selectedAxis.x[0]];
       const isDate = columnLabelFormat?.columnType === 'date';
       const isAutoDate = columnLabelFormat?.dateFormat === 'auto' || !columnLabelFormat?.dateFormat;
-
       return !(isSingleXAxis && isDate && isAutoDate);
     }
     return true;
@@ -143,7 +146,7 @@ export const useXAxis = ({
 
   const memoizedXAxisOptions: DeepPartial<ScaleChartOptions<'bar'>['scales']['x']> | undefined =
     useMemo(() => {
-      if (selectedChartType === ChartType.Pie) return undefined;
+      if (isPieChart) return undefined;
 
       return {
         type,
@@ -166,12 +169,19 @@ export const useXAxis = ({
           display: true
         },
         grid
-        //TODO look into this for the combo chart?
-        // time: {
-        //   unit: 'year'
-        // }
       } as DeepPartial<ScaleChartOptions<'bar'>['scales']['x']>;
-    }, [title, isScatterChart, xAxisShowAxisLabel, stacked, type, grid, rotation, tickCallback]);
+    }, [
+      title,
+      isScatterChart,
+      isPieChart,
+      useTicketCallback,
+      xAxisShowAxisLabel,
+      stacked,
+      type,
+      grid,
+      rotation,
+      tickCallback
+    ]);
 
   return memoizedXAxisOptions;
 };

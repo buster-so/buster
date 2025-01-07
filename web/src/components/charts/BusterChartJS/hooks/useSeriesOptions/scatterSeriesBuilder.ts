@@ -4,6 +4,9 @@ import { SeriesBuilderProps } from './interfaces';
 import { ScriptableContext } from 'chart.js';
 import { DEFAULT_CHART_CONFIG } from '@/api/busterv2';
 import { addOpacityToColor } from '@/utils/colors';
+import { ColumnLabelFormat } from '@/components/charts/interfaces';
+import { isDateColumnType } from '@/utils/messages';
+import { createDayjsDate } from '@/utils/date';
 
 export const scatterSeriesBuilder_data = ({
   selectedDataset,
@@ -12,8 +15,13 @@ export const scatterSeriesBuilder_data = ({
   sizeKeyIndex,
   scatterDotSize,
   categoryKeys,
-  columnLabelFormats
+  columnLabelFormats,
+  xAxisKeys
 }: SeriesBuilderProps): ChartProps<'bubble'>['data']['datasets'] => {
+  const xAxisKey = xAxisKeys[0];
+  const xAxisColumnLabelFormat = columnLabelFormats[xAxisKey];
+  const isXAxisDate = isDateColumnType(xAxisColumnLabelFormat.columnType);
+
   return allYAxisKeysIndexes.map((yKeyIndex, index) => {
     const { index: yIndex, name } = yKeyIndex;
     const color = colors[index % colors.length];
@@ -34,12 +42,26 @@ export const scatterSeriesBuilder_data = ({
       label: name,
       data: selectedDataset.source.map((item) => ({
         label: name,
-        x: item[0] as number,
+        x: getScatterXValue({ isXAxisDate, xValue: item[0] }) as number,
         y: item[yIndex] as number,
         originalR: sizeKeyIndex ? (item[sizeKeyIndex.index] as number) : undefined
       }))
     };
   });
+};
+
+const getScatterXValue = ({
+  isXAxisDate,
+  xValue
+}: {
+  isXAxisDate: boolean;
+  xValue: number | string | Date | null;
+}): number | Date => {
+  if (isXAxisDate && xValue) {
+    return createDayjsDate(xValue as string).toDate();
+  }
+
+  return xValue as number;
 };
 
 const radiusMethod = (

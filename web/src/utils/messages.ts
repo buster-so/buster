@@ -47,6 +47,6 @@ export const isNumericColumnStyle = (style: ColumnLabelFormat['style']) => {
   return style === 'number' || style === 'percent' || style === 'currency';
 };
 
-export const isDateType = (columnType: SimplifiedColumnType) => {
+export const isDateColumnType = (columnType: SimplifiedColumnType) => {
   return columnType === 'date';
 };

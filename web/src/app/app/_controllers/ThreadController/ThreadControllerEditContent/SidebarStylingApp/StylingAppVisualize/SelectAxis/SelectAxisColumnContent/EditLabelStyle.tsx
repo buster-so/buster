@@ -5,6 +5,7 @@ import { AppSegmented, AppTooltip } from '@/components';
 import { ColumnTypeIcon } from '../config';
 import { useEditAppSegmented } from './useEditAppSegmented';
 import { createStyles } from 'antd-style';
+import { isDateColumnType, isNumericColumnType } from '@/utils';
 
 export const EditLabelStyle: React.FC<{
   onUpdateColumnConfig: (columnLabelFormat: Partial<IColumnLabelFormat>) => void;
@@ -15,11 +16,11 @@ export const EditLabelStyle: React.FC<{
   const { styles, cx } = useStyles();
 
   const enabledOptions: IColumnLabelFormat['style'][] = useMemo(() => {
-    if (columnType === 'number')
+    if (isNumericColumnType(columnType))
       return ['number', 'percent', 'currency', convertNumberTo ? 'date' : undefined].filter(
         Boolean
       ) as IColumnLabelFormat['style'][];
-    if (columnType === 'date') return ['date'];
+    if (isDateColumnType(columnType)) return ['date'];
     return [] as IColumnLabelFormat['style'][];
   }, [columnType]);
 

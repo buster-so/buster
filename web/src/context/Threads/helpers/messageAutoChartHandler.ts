@@ -16,7 +16,12 @@ import {
   PieChartAxis,
   ScatterAxis
 } from '@/components/charts';
-import { SimplifiedColumnType, simplifyColumnType } from '@/utils';
+import {
+  isDateColumnType,
+  isNumericColumnType,
+  SimplifiedColumnType,
+  simplifyColumnType
+} from '@/utils';
 import { produce } from 'immer';
 import isEmpty from 'lodash/isEmpty';
 
@@ -237,8 +242,8 @@ const createDefaulColumnLabel = (
 const createDefaultColumnLabelStyle = (
   columnType: SimplifiedColumnType
 ): IColumnLabelFormat['style'] => {
-  if (columnType === 'date') return 'date';
-  if (columnType === 'number') return 'number';
+  if (isDateColumnType(columnType)) return 'date';
+  if (isNumericColumnType(columnType)) return 'number';
   return 'string';
 };
 
