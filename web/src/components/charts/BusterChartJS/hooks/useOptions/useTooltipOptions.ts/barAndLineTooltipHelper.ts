@@ -18,7 +18,7 @@ export const barAndLineTooltipHelper = (
   const dataPoint = dataPoints[0];
   const dataPointDataset = dataPoint.dataset;
   const dataPointDataIndex = dataPoint.dataIndex;
-  const tooltipDatasets = datasets.filter((dataset) => dataset.hidden);
+  const tooltipDatasets = datasets.filter((dataset) => dataset.hidden && !dataset.isTrendline);
 
   // if (!datapointIsInTooltip) {
   // const datapointIsInTooltip = tooltipDatasets.some(

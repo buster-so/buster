@@ -2,7 +2,7 @@ import { ITooltipItem } from '@/components/charts/BusterChartTooltip/interfaces'
 import { BusterChartConfigProps } from '@/components/charts/interfaces';
 import type { ChartDataset, TooltipItem, ChartTypeRegistry } from 'chart.js';
 import { formatChartLabelDelimiter } from '../../../../commonHelpers';
-import { extractFieldsFromChain } from '@/components/charts/chartHooks';
+import { appendToKeyValueChain, extractFieldsFromChain } from '@/components/charts/chartHooks';
 import { formatChartLabel } from '../../../helpers';
 import { formatLabel } from '@/utils';
 
@@ -25,23 +25,43 @@ export const scatterTooltipHelper = (
     hasCategoryAxis
   );
 
-  const tooltipDatasets = datasets.filter((dataset) => dataset.hidden);
+  const tooltipDatasets = datasets.filter((dataset) => dataset.hidden && !dataset.isTrendline);
   const dataPointDataIndex = dataPoint.dataIndex;
 
-  const datapointIsInTooltip = tooltipDatasets.some(
-    (dataset) => dataset.label === dataPointDataset.label
-  );
-
+  // const datapointIsInTooltip = tooltipDatasets.some(
+  //   (dataset) => dataset.label === dataPointDataset.label
+  // );
   // if (!datapointIsInTooltip) {
-  //   return [];   //I removed the early return because if tooltip only had non plotted values it would not show
+  //   return []; //I removed the early return because if tooltip only had non plotted values it would not show
   // }
 
-  const values = tooltipDatasets.map((dataset) => {
-    const label = dataset.label!;
+  let relevantDatasets: ChartDataset[] = [];
+  console.log(hasCategoryAxis);
+
+  if (hasCategoryAxis) {
+    const dataPointCategory = extractFieldsFromChain(dataPointDataset.label!).at(0)?.value!;
+    relevantDatasets = tooltipDatasets.filter((dataset) => {
+      const datasetCategory = extractFieldsFromChain(dataset.label!).at(0)?.value!;
+      return datasetCategory === dataPointCategory;
+    });
+    console.log(relevantDatasets);
+  } else {
+    relevantDatasets = tooltipDatasets.filter(
+      (dataset) => dataset.label === dataPointDataset.label
+    );
+  }
+
+  const values = relevantDatasets.map((dataset) => {
+    const label = appendToKeyValueChain(extractFieldsFromChain(dataset.label!).at(-1)!);
     const rawValue = dataset.data[dataPointDataIndex] as number;
     const key = extractFieldsFromChain(label).at(-1)?.key!;
     const formattedValue = formatLabel(rawValue, columnLabelFormats[key]);
-    const formattedLabel = formatChartLabelDelimiter(label, columnLabelFormats);
+    const formattedLabel = formatChartLabel(
+      label,
+      columnLabelFormats,
+      hasMultipleMeasures,
+      hasCategoryAxis
+    );
 
     return {
       formattedValue,

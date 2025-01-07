@@ -4,8 +4,6 @@ import { SeriesBuilderProps } from './interfaces';
 import { ScriptableContext } from 'chart.js';
 import { DEFAULT_CHART_CONFIG } from '@/api/busterv2';
 import { addOpacityToColor } from '@/utils/colors';
-import type { ChartType as ChartJSChartType } from 'chart.js';
-import { DatasetOption } from '@/components/charts/chartHooks';
 
 export const scatterSeriesBuilder_data = ({
   selectedDataset,

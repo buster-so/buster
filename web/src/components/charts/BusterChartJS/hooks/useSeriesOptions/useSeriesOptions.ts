@@ -15,7 +15,7 @@ import { barSeriesBuilder, barSeriesBuilder_labels } from './barSeriesBuilder';
 import { SeriesBuilderProps } from './interfaces';
 import { lineSeriesBuilder, lineSeriesBuilder_labels } from './lineSeriesBuilder';
 import { scatterSeriesBuilder_data, scatterSeriesBuilder_labels } from './scatterSeriesBuilder';
-import { defaultTooltipSeriesBuilder } from './tooltipSeriesBuilder';
+import { defaultTooltipSeriesBuilder, scatterTooltipSeriesBuilder } from './tooltipSeriesBuilder';
 import { comboSeriesBuilder_data, comboSeriesBuilder_labels } from './comboSeriesBuilder';
 
 export interface UseSeriesOptionsProps {
@@ -152,12 +152,20 @@ export const useSeriesOptions = ({
     selectedChartType
   ]);
 
+  const isScatter = selectedChartType === 'scatter';
   const tooltipSeries: ChartProps<ChartJSChartType>['data']['datasets'] = useMemo(() => {
-    return defaultTooltipSeriesBuilder({
+    if (isScatter) {
+      return scatterTooltipSeriesBuilder({
+        datasetOptions,
+        tooltipKeys
+      });
+    }
+    const series = defaultTooltipSeriesBuilder({
       datasetOptions,
       tooltipKeys
     });
-  }, [tooltipKeys, datasetOptions]);
+    return series;
+  }, [tooltipKeys, datasetOptions, isScatter]);
 
   const datasets: ChartProps<ChartJSChartType>['data']['datasets'] = useMemo(() => {
     return [...datasetSeries, ...tooltipSeries, ...trendlineSeries];

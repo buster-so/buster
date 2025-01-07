@@ -14,7 +14,7 @@ export const pieTooltipHelper = (
   const dataPointDataIndex = dataPoints[0]!.dataIndex;
   const dataPointDatasetIndex = dataPoints[0]!.datasetIndex;
   const dataPointDataset = datasets[dataPointDatasetIndex!];
-  const tooltipDatasets = datasets.filter((dataset) => dataset.hidden);
+  const tooltipDatasets = datasets.filter((dataset) => dataset.hidden && !dataset.isTrendline);
 
   const dataPointIsInTooltip = tooltipDatasets.some(
     (dataset) => dataset.label === dataPointDataset.label
