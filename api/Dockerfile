@@ -6,9 +6,17 @@ COPY . .
 RUN cargo chef prepare --recipe-path recipe.json
 
 FROM chef AS builder 
+# Set environment variables to reduce memory usage during compilation
+ENV RUSTFLAGS="-C target-cpu=native -C opt-level=3"
+ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
+# Limit parallel jobs to reduce memory usage
+ENV CARGO_BUILD_JOBS=2
+
 COPY --from=planner /app/recipe.json recipe.json
+# Cook dependencies first
 RUN cargo chef cook --release --recipe-path recipe.json
 COPY . .
+# Build with reduced parallel jobs
 RUN cargo build --release --bin bi_api
 
 FROM debian:bookworm-slim AS runtime

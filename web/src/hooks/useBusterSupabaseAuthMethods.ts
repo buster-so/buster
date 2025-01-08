@@ -114,6 +114,7 @@ export const useBusterSupabaseAuthMethods = () => {
     });
 
     if (error) {
+      console.error(error);
       return { error: error.message };
     }
 
