@@ -3,22 +3,39 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
+# Add build arguments for any environment variables needed during build
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_URL
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG NEXT_PRIVATE_SUPABASE_SERVICE_ROLE_KEY
+ARG NEXT_PRIVATE_SUPABASE_CONNECT_CLIENT_ID
+ARG NEXT_PRIVATE_SUPABASE_CONNECT_CLIENT_SECRET
+
+# Set build arguments as environment variables
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_URL=$NEXT_PUBLIC_URL
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+ENV NEXT_PRIVATE_SUPABASE_SERVICE_ROLE_KEY=$NEXT_PRIVATE_SUPABASE_SERVICE_ROLE_KEY
+ENV NEXT_PRIVATE_SUPABASE_CONNECT_CLIENT_ID=$NEXT_PRIVATE_SUPABASE_CONNECT_CLIENT_ID
+ENV NEXT_PRIVATE_SUPABASE_CONNECT_CLIENT_SECRET=$NEXT_PRIVATE_SUPABASE_CONNECT_CLIENT_SECRET
+
+# Copy all necessary files first
 COPY package*.json ./
-
 COPY next.config.mjs ./
-
-# Install dependencies
-RUN npm ci
-
-# Copy source code
+COPY tsconfig*.json ./
+COPY public ./public
 COPY . .
 
-# Build the Next.js application
-RUN npm run build
+# Install dependencies with verbose logging
+# RUN npm ci
+
+# Build with verbose output
+RUN npm run build --verbose
 
 # Production stage
-FROM node:20-alpine AS runner
+FROM node:20-alpine
 
 WORKDIR /app
 

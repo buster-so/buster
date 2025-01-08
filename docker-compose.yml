@@ -14,11 +14,38 @@ services:
       retries: 30
 
   api:
-    build: ./api
+    build: 
+      context: ./api
+      args:
+        - DATABASE_URL=${DATABASE_URL}
+        - REDIS_URL=${REDIS_URL}
+        - OPENAI_API_KEY=${OPENAI_API_KEY}
+        - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+        - JWT_SECRET=${JWT_SECRET}
+        - SUPABASE_URL=${SUPABASE_URL}
+        - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+        - POOLER_URL=${POOLER_URL}
+        - LANGFUSE_API_URL=${LANGFUSE_API_URL}
+        - LANGFUSE_PUBLIC_API_KEY=${LANGFUSE_PUBLIC_API_KEY}
+        - LANGFUSE_PRIVATE_API_KEY=${LANGFUSE_PRIVATE_API_KEY}
+        - EMBED_VEC_LENGTH=${EMBED_VEC_LENGTH}
+        - POSTHOG_API_KEY=${POSTHOG_API_KEY}
+        - RESEND_API_KEY=${RESEND_API_KEY}
+        - BUSTER_URL=${BUSTER_URL}
+        - BUSTER_WH_TOKEN=${BUSTER_WH_TOKEN}
+        - EMBEDDING_PROVIDER=${EMBEDDING_PROVIDER}
+        - EMBEDDING_MODEL=${EMBEDDING_MODEL}
+        - COHERE_API_KEY=${COHERE_API_KEY}
     env_file:
       - .env
     ports:
       - "3001:3001"
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
       interval: 30s
@@ -31,7 +58,16 @@ services:
         condition: service_healthy
       
   web:
-    build: ./web
+    build: 
+      context: ./web
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+        - NEXT_PUBLIC_URL=${NEXT_PUBLIC_URL}
+        - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+        - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+        - NEXT_PRIVATE_SUPABASE_SERVICE_ROLE_KEY=${NEXT_PRIVATE_SUPABASE_SERVICE_ROLE_KEY}
+        - NEXT_PRIVATE_SUPABASE_CONNECT_CLIENT_ID=${NEXT_PRIVATE_SUPABASE_CONNECT_CLIENT_ID}
+        - NEXT_PRIVATE_SUPABASE_CONNECT_CLIENT_SECRET=${NEXT_PRIVATE_SUPABASE_CONNECT_CLIENT_SECRET}
     env_file:
       - .env
     ports:
