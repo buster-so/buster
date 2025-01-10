@@ -1,7 +1,8 @@
 'use server';
 
-import { useSupabaseServerContext } from '@/context/Supabase/useSupabaseContext';
+import { createClient } from '@/context/Supabase/server'
 import { BASE_URL } from './buster/instances';
+import type { RequestInit } from 'next/dist/server/web/spec-extension/request';
 
 export interface FetchConfig extends RequestInit {
   baseURL?: string;
@@ -9,7 +10,9 @@ export interface FetchConfig extends RequestInit {
 }
 
 export const serverFetch = async <T>(url: string, config: FetchConfig = {}): Promise<T> => {
-  const { accessToken } = await useSupabaseServerContext();
+  const supabase = await createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+  const accessToken = session?.access_token;
 
   const { baseURL = BASE_URL, params, headers = {}, method = 'GET', ...restConfig } = config;
 

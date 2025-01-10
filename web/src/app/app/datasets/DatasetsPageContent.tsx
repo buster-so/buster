@@ -6,7 +6,7 @@ import { useMemo, useState } from 'react';
 import { DatasetListContent } from './_DatasetListContent';
 import { DatasetHeader } from './_DatasetsHeader';
 
-export const DatasetsPageContent: React.FC<{}> = ({}) => {
+export const DatasetsPageContent = ({}: {}) => {
   const isAdmin = useUserConfigContextSelector((state) => state.isAdmin);
   const [datasetFilter, setDatasetFilter] = useState<'all' | 'published' | 'drafts'>('all');
 
