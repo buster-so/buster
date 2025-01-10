@@ -106,7 +106,8 @@ CREATE TYPE team_role_enum AS ENUM ('manager', 'member');
 ALTER TABLE teams_to_users ALTER COLUMN role TYPE team_role_enum USING 
   CASE 
     WHEN role::text = 'owner' THEN 'manager'::team_role_enum
-    ELSE role::text::team_role_enum
+    WHEN role::text = 'admin' THEN 'manager'::team_role_enum
+    ELSE 'member'::team_role_enum
   END;
 
 -- Set new default
