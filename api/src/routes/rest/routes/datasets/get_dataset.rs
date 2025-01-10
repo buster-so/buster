@@ -36,9 +36,6 @@ pub struct GetDatasetResponse {
     pub name: String,
     pub sql: Option<String>,
     pub yml_file: Option<String>,
-    pub data_source_name: String,
-    pub data_source_type: String,
-    pub data_source_id: Uuid,
 }
 
 pub async fn get_dataset(
@@ -91,18 +88,7 @@ async fn get_dataset_handler(dataset_id: &Uuid, user: &User) -> Result<GetDatase
         ));
     }
 
-    // TODO: DATASOURCE INFO, name, type, id, etc.
-    let (
-        dataset_id,
-        name,
-        sql,
-        when_to_use,
-        yml_file,
-        data_source_name,
-        data_source_type,
-        data_source_id,
-    ) = match datasets::table
-        .inner_join(data_sources::table.on(datasets::data_source_id.eq(data_sources::id)))
+    let (dataset_id, name, sql, when_to_use, yml_file) = match datasets::table
         .filter(datasets::id.eq(dataset_id))
         .filter(datasets::deleted_at.is_null())
         .select((
@@ -111,20 +97,8 @@ async fn get_dataset_handler(dataset_id: &Uuid, user: &User) -> Result<GetDatase
             datasets::definition,
             datasets::when_to_use,
             datasets::yml_file,
-            data_sources::name,
-            data_sources::type_,
-            data_sources::id,
         ))
-        .first::<(
-            Uuid,
-            String,
-            String,
-            Option<String>,
-            Option<String>,
-            String,
-            String,
-            Uuid,
-        )>(&mut conn)
+        .first::<(Uuid, String, String, Option<String>, Option<String>)>(&mut conn)
         .await
     {
         Ok(result) => result,
@@ -137,8 +111,5 @@ async fn get_dataset_handler(dataset_id: &Uuid, user: &User) -> Result<GetDatase
         sql: Some(sql),
         when_to_use,
         yml_file,
-        data_source_name,
-        data_source_type,
-        data_source_id,
     })
 }
