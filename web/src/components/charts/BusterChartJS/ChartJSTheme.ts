@@ -12,7 +12,15 @@ import {
   Colors,
   LogarithmicScale,
   TimeScale,
-  TimeSeriesScale
+  TimeSeriesScale,
+  LineController,
+  BarController,
+  RadarController,
+  DoughnutController,
+  PolarAreaController,
+  BubbleController,
+  PieController,
+  ScatterController
 } from 'chart.js';
 import { ChartMountedPlugin } from './core/plugins';
 import ChartDeferred from 'chartjs-plugin-deferred';
@@ -32,6 +40,14 @@ ChartJS.register(
   BarElement,
   PointElement,
   LineElement,
+  LineController,
+  BarController,
+  RadarController,
+  DoughnutController,
+  PolarAreaController,
+  BubbleController,
+  PieController,
+  ScatterController,
   Title,
   Tooltip,
   Colors,
