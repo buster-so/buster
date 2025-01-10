@@ -14,12 +14,12 @@ export const useDatasetPageContext = ({ datasetId }: { datasetId: string }) => {
   const segments = useSelectedLayoutSegment() as DatasetApps;
   const datasetResult = useIndividualDataset({ datasetId });
   const datasetSQL = datasetResult.dataset.data?.sql;
-  const [sql, setSQL] = useState<string>(datasetSQL);
+  const [sql, setSQL] = useState<string>(datasetSQL ?? '');
 
   const selectedApp = segments;
 
   useLayoutEffect(() => {
-    setSQL(datasetSQL || '');
+    setSQL(datasetSQL ?? '');
   }, [datasetSQL]);
 
   return { sql, selectedApp, setSQL, ...datasetResult };
