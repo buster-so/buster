@@ -1,6 +1,8 @@
 import { useCreateReactMutation, useCreateReactQuery } from '@/api/createReactQuery';
-import { getUser } from './requests';
+import { getUser, getUser_server } from './requests';
 import { useMemoizedFn } from 'ahooks';
+import { QueryClient } from '@tanstack/react-query';
+import * as config from './config';
 
 export const useGetUser = (params: Parameters<typeof getUser>[0]) => {
   const queryFn = useMemoizedFn(() => {
@@ -8,8 +10,9 @@ export const useGetUser = (params: Parameters<typeof getUser>[0]) => {
   });
 
   return useCreateReactQuery<ReturnType<typeof getUser>>({
-    queryKey: ['users', params.userId],
-    queryFn
+    queryKey: config.USER_QUERY_KEY_ID(params.userId),
+    queryFn,
+    staleTime: 1000 * 3
   });
 };
 
@@ -21,4 +24,13 @@ export const useUpdateUser = () => {
   return useCreateReactMutation({
     mutationFn: mutationFn
   });
+};
+
+export const prefetchGetUser = async (userId: string, queryClientProp?: QueryClient) => {
+  const queryClient = queryClientProp || new QueryClient();
+  await queryClient.prefetchQuery({
+    queryKey: config.USER_QUERY_KEY_ID(userId),
+    queryFn: () => getUser_server({ userId })
+  });
+  return queryClient;
 };

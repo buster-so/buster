@@ -1,41 +1,34 @@
-import { ListDatasetGroupsResponse, useUpdateUser } from '@/api/buster-rest';
+import { useUpdateUser } from '@/api/buster-rest';
 import { OrganizationUser } from '@/api/buster-rest/organizations/responseInterfaces';
 import { BusterInfiniteList, BusterListColumn, BusterListRowItem } from '@/components/list';
-import { useMemoizedFn } from 'ahooks';
-import { Card, Select } from 'antd';
-import { createStyles } from 'antd-style';
-import React, { useMemo, useState } from 'react';
+import { Card } from 'antd';
+import React, { useMemo } from 'react';
 import { Text } from '@/components/text';
 import { OrganizationUserRoleText } from './config';
+import { BusterRoutes, createBusterRoute } from '@/routes';
 
 export const ListUsersComponent: React.FC<{
   users: OrganizationUser[];
   isFetched: boolean;
 }> = ({ users, isFetched }) => {
   const { mutateAsync: updateUser } = useUpdateUser();
-  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
-  const numberOfUsers = users.length;
-
-  const onSelectAssigned = useMemoizedFn(async (params: { id: string; assigned: boolean }) => {
-    await updateUser(params);
-  });
+  // const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
+  // const onSelectAssigned = useMemoizedFn(async (params: { id: string; assigned: boolean }) => {
+  //   await updateUser(params);
+  // });
 
   const columns: BusterListColumn[] = useMemo(
     () => [
       {
         title: 'Name',
-        dataIndex: 'name',
-        width: 270
+        dataIndex: 'name'
       },
       {
         title: 'Default access',
         dataIndex: 'role',
+        width: 165,
         render: (role: OrganizationUser['role']) => {
-          return (
-            <div className="flex justify-end">
-              <Text type="secondary">{OrganizationUserRoleText[role]}</Text>
-            </div>
-          );
+          return <Text type="secondary">{OrganizationUserRoleText[role]}</Text>;
         }
       }
     ],
@@ -50,7 +43,11 @@ export const ListUsersComponent: React.FC<{
       (acc, user) => {
         const rowItem: BusterListRowItem = {
           id: user.id,
-          data: user
+          data: user,
+          link: createBusterRoute({
+            route: BusterRoutes.APP_SETTINGS_USERS_ID,
+            userId: user.id
+          })
         };
 
         if (user.status === 'active') {
@@ -73,7 +70,7 @@ export const ListUsersComponent: React.FC<{
           data: {},
           hidden: users.length === 0,
           rowSection: {
-            title: 'Assigned',
+            title: 'Active',
             secondaryTitle: activeUsers.length.toString()
           }
         },
@@ -83,7 +80,7 @@ export const ListUsersComponent: React.FC<{
           data: {},
           hidden: inactiveUsers.length === 0,
           rowSection: {
-            title: 'Not Assigned',
+            title: 'Inactive',
             secondaryTitle: inactiveUsers.length.toString()
           }
         },
