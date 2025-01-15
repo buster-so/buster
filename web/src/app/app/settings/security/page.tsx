@@ -8,8 +8,8 @@ export default function Page() {
   return (
     <div>
       <SettingsPageHeader
-        title="Dataset Management"
-        description="Configure and manage your datasets and their settings"
+        title="Security Settings"
+        description="Configure security settings and access controls"
       />
       <SettingsEmptyState />
     </div>
