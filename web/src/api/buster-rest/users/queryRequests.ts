@@ -1,15 +1,16 @@
 import { useCreateReactMutation, useCreateReactQuery } from '@/api/createReactQuery';
-import { getUser, getUser_server } from './requests';
+import { getUser, getUser_server, updateOrganizationUser } from './requests';
 import { useMemoizedFn } from 'ahooks';
-import { QueryClient } from '@tanstack/react-query';
+import { QueryClient, useQueryClient } from '@tanstack/react-query';
 import * as config from './config';
+import { OrganizationUser } from '../organizations';
 
 export const useGetUser = (params: Parameters<typeof getUser>[0]) => {
   const queryFn = useMemoizedFn(() => {
     return getUser(params);
   });
 
-  return useCreateReactQuery<ReturnType<typeof getUser>>({
+  return useCreateReactQuery({
     queryKey: config.USER_QUERY_KEY_ID(params.userId),
     queryFn,
     staleTime: 1000 * 3
@@ -17,8 +18,19 @@ export const useGetUser = (params: Parameters<typeof getUser>[0]) => {
 };
 
 export const useUpdateUser = () => {
-  const mutationFn = useMemoizedFn(async () => {
-    //
+  const queryClient = useQueryClient();
+  const mutationFn = useMemoizedFn(async (params: Parameters<typeof updateOrganizationUser>[0]) => {
+    queryClient.setQueryData(
+      config.USER_QUERY_KEY_ID(params.userId),
+      (oldData: OrganizationUser) => {
+        return {
+          ...oldData,
+          ...params
+        };
+      }
+    );
+    const res = await updateOrganizationUser(params);
+    return res;
   });
 
   return useCreateReactMutation({

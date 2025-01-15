@@ -9,5 +9,6 @@ export const OrganizationUserRoleText: Record<OrganizationUser['role'], string> 
   dataAdmin: 'Data Admin',
   workspaceAdmin: 'Workspace Admin',
   querier: 'Querier',
-  restrictedQuerier: 'Restricted Querier'
+  restrictedQuerier: 'Restricted Querier',
+  viewer: 'Viewer'
 };

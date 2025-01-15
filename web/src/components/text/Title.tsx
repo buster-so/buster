@@ -10,13 +10,14 @@ const { Title: AntTitle } = Typography;
 
 interface TitleProps extends Omit<AntDTextProps, 'type'> {
   type?: 'secondary' | 'tertiary' | 'default';
+  clickable?: boolean;
 }
 
 export const Title = React.memo<
   {
     children: React.ReactNode | string;
   } & TitleProps
->(({ children, type = 'default', ...props }) => {
+>(({ children, type = 'default', clickable = false, ...props }) => {
   const { cx, styles } = useFontStyles();
 
   return (
@@ -29,7 +30,8 @@ export const Title = React.memo<
         type === 'default' && styles.default,
         type === 'secondary' && styles.secondary,
         type === 'tertiary' && styles.tertiary,
-        props.className
+        props.className,
+        clickable && 'clickable'
       )}>
       {children}
     </AntTitle>

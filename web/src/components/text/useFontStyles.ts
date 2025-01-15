@@ -5,9 +5,15 @@ export const useFontStyles = createStyles(({ token, css }) => {
     default: {
       color: `${token.colorText} !important`
     },
-    secondary: {
-      color: `${token.colorTextSecondary} !important`
-    },
+    secondary: css`
+      color: ${token.colorTextSecondary} !important;
+
+      &.clickable {
+        &:hover {
+          color: ${token.colorText} !important;
+        }
+      }
+    `,
     tertiary: {
       color: `${token.colorTextTertiary} !important`
     },

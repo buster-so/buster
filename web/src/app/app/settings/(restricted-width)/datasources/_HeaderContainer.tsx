@@ -1,6 +1,6 @@
 'use client';
 
-import { AppMaterialIcons } from '@/components';
+import { AppMaterialIcons, BackButton } from '@/components';
 import React from 'react';
 
 import { createStyles } from 'antd-style';
@@ -21,11 +21,17 @@ export const HeaderContainer: React.FC<{
   const { styles, cx } = useStyles();
 
   return (
-    <Link href={linkUrl} className="mb-3" onClick={onClick}>
-      <div className={cx('flex cursor-pointer items-center space-x-2', styles.icon)}>
-        <AppMaterialIcons icon="chevron_left" />
-        <Text type="secondary">{buttonText}</Text>
-      </div>
-    </Link>
+    <div className="mb-3">
+      <BackButton type="secondary" linkUrl={linkUrl} onClick={onClick} text={buttonText} />
+    </div>
   );
+
+  // return (
+  //   <Link href={linkUrl} className="mb-3" onClick={onClick}>
+  //     <div className={cx('flex cursor-pointer items-center space-x-2', styles.icon)}>
+  //       <AppMaterialIcons icon="chevron_left" />
+  //       <Text type="secondary">{buttonText}</Text>
+  //     </div>
+  //   </Link>
+  // );
 };

@@ -2,6 +2,7 @@ import { BASE_URL } from '@/api/buster-rest/instances';
 import { BusterUserResponse } from './interfaces';
 import { mainApi } from '../instances';
 import { serverFetch } from '../../createServerInstance';
+import { OrganizationUser } from '../organizations';
 
 export const getUserInfo = async ({
   jwtToken
@@ -32,13 +33,22 @@ export const getUserInfo = async ({
 };
 
 export const getUser = async ({ userId }: { userId: string }) => {
-  return mainApi.get<BusterUserResponse>(`/users/${userId}`).then((response) => response.data);
+  return mainApi.get<OrganizationUser>(`/users/${userId}`).then((response) => response.data);
 };
 
-export const getUser_server = async ({
-  userId
+export const getUser_server = async ({ userId }: { userId: string }) => {
+  return serverFetch<BusterUserResponse>(`/users/${userId}`);
+};
+
+export const updateOrganizationUser = async ({
+  userId,
+  ...params
 }: {
   userId: string;
-}): Promise<BusterUserResponse> => {
-  return serverFetch<BusterUserResponse>(`/users/${userId}`);
+  name?: string;
+  role: OrganizationUser['role'];
+}) => {
+  return mainApi
+    .put<OrganizationUser>(`/users/${userId}`, params)
+    .then((response) => response.data);
 };
