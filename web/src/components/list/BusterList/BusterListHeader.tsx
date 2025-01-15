@@ -23,18 +23,20 @@ export const BusterListHeader: React.FC<{
         {showCheckboxColumn && (
           <CheckboxColumn
             checkStatus={globalCheckStatus}
-            onChange={(v) => onGlobalSelectChange?.(v)}
+            onChange={onGlobalSelectChange}
             className={cx({
               'opacity-100': showGlobalCheckbox,
               '!invisible': rowsLength === 0,
-              'pointer-events-none !invisible !opacity-0': !showSelectAll
+              'pointer-events-none !invisible': !showSelectAll
             })}
           />
         )}
 
         {columns.map((column, index) => (
           <div
-            className="header-cell flex items-center"
+            className={cx('header-cell flex items-center', {
+              '!pl-[14px]': !onGlobalSelectChange
+            })}
             key={column.dataIndex}
             style={{
               width: column.width || '100%',

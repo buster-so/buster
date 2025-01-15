@@ -36,6 +36,7 @@ export const useCreateReactQuery = <T>({
   refetchOnWindowFocus = false,
   refetchOnMount = true,
   useErrorNotification = true,
+  staleTime = 0,
   ...rest
 }: CreateQueryProps<T> & BaseCreateQueryProps) => {
   const { openErrorNotification } = useBusterNotifications();
@@ -50,6 +51,7 @@ export const useCreateReactQuery = <T>({
     retry: 1,
     refetchOnWindowFocus,
     refetchOnMount,
+    staleTime,
     ...rest
   });
 

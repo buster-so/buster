@@ -34,7 +34,3 @@ export const getUserInfo = async ({
 export const getUser = async ({ userId }: { userId: string }): Promise<BusterUserResponse> => {
   return mainApi.get(`/users/${userId}`).then((response) => response.data);
 };
-
-export const getUsers = async (): Promise<BusterUserResponse[]> => {
-  return mainApi.get(`/users`).then((response) => response.data);
-};

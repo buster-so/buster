@@ -10,3 +10,4 @@ export * from './sql';
 export * from './datasets';
 export * from './dataset_groups';
 export * from './permission_groups';
+export * from './organizations';

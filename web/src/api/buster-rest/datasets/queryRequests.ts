@@ -49,8 +49,7 @@ export const useGetDatasetData = (datasetId: string) => {
     queryKey: ['datasetData', datasetId],
     queryFn,
     enabled: !!datasetId,
-    refetchOnMount: false,
-    staleTime: 1000 * 60 * 10 // 10 minutes
+    refetchOnMount: false
   });
 };
 
@@ -59,7 +58,8 @@ export const useGetDatasetMetadata = (datasetId: string) => {
   const res = useCreateReactQuery<BusterDataset>({
     queryKey: ['datasetMetadata', datasetId],
     queryFn,
-    enabled: !!datasetId
+    enabled: !!datasetId,
+    staleTime: 1000 * 10
   });
   return res;
 };

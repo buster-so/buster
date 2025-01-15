@@ -1,5 +1,5 @@
-import { useCreateReactQuery } from '@/api/createReactQuery';
-import { getUser, getUsers } from './requests';
+import { useCreateReactMutation, useCreateReactQuery } from '@/api/createReactQuery';
+import { getUser } from './requests';
 import { useMemoizedFn } from 'ahooks';
 
 export const useGetUser = (params: Parameters<typeof getUser>[0]) => {
@@ -13,14 +13,12 @@ export const useGetUser = (params: Parameters<typeof getUser>[0]) => {
   });
 };
 
-export const useGetUsers = () => {
-  const queryFn = useMemoizedFn(() => {
-    return getUsers();
+export const useUpdateUser = () => {
+  const mutationFn = useMemoizedFn(async () => {
+    //
   });
 
-  return useCreateReactQuery({
-    queryKey: ['users'],
-    queryFn,
-    initialData: []
+  return useCreateReactMutation({
+    mutationFn: mutationFn
   });
 };

@@ -28,7 +28,10 @@ export const BusterInfiniteList: React.FC<BusterInfiniteListProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const showEmptyState = (!rows || rows.length === 0) && !!emptyState;
+  const showEmptyState = useMemo(
+    () => (!rows || rows.length === 0 || !rows.some((row) => !row.rowSection)) && !!emptyState,
+    [rows, emptyState]
+  );
 
   const onGlobalSelectChange = useMemoizedFn((v: boolean) => {
     onSelectChange?.(v ? rows.map((row) => row.id) : []);
@@ -109,7 +112,7 @@ export const BusterInfiniteList: React.FC<BusterInfiniteListProps> = ({
       {showHeader && !showEmptyState && (
         <BusterListHeader
           columns={columns}
-          onGlobalSelectChange={onGlobalSelectChange}
+          onGlobalSelectChange={onSelectChange ? onGlobalSelectChange : undefined}
           globalCheckStatus={globalCheckStatus}
           rowsLength={rows.length}
           showSelectAll={showSelectAll}

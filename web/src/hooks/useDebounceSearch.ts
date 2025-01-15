@@ -4,9 +4,14 @@ import { useEffect, useState, useTransition } from 'react';
 interface UseDebounceSearchProps<T> {
   items: T[];
   searchPredicate: (item: T, searchText: string) => boolean;
+  debounceTime?: number;
 }
 
-export const useDebounceSearch = <T>({ items, searchPredicate }: UseDebounceSearchProps<T>) => {
+export const useDebounceSearch = <T>({
+  items,
+  searchPredicate,
+  debounceTime = 180
+}: UseDebounceSearchProps<T>) => {
   const [isPending, startTransition] = useTransition();
   const [searchText, setSearchText] = useState('');
   const [filteredItems, setFilteredItems] = useState<T[]>(items);
@@ -27,7 +32,7 @@ export const useDebounceSearch = <T>({ items, searchPredicate }: UseDebounceSear
     (text: string) => {
       updateFilteredItems(text);
     },
-    { wait: 200 }
+    { wait: debounceTime }
   );
 
   const handleSearchChange = useMemoizedFn((text: string) => {

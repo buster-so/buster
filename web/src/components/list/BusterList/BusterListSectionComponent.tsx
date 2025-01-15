@@ -58,8 +58,9 @@ export const BusterListSectionComponent = React.memo(
 
         <div
           className={cx(
-            'flex items-center space-x-2 pl-[4px] leading-none',
-            !onSelectSectionChange && 'ml-3.5'
+            'flex items-center space-x-2 leading-none',
+            !onSelectSectionChange && 'ml-3.5',
+            onSelectSectionChange && 'pl-[4px]'
           )}>
           <Text size="sm">{rowSection.title}</Text>
           <Text size="sm" type="tertiary">

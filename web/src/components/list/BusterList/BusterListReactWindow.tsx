@@ -145,7 +145,7 @@ export const BusterList: React.FC<BusterListProps> = ({
       {showHeader && !showEmptyState && (
         <BusterListHeader
           columns={columns}
-          onGlobalSelectChange={onGlobalSelectChange}
+          onGlobalSelectChange={onSelectChange ? onGlobalSelectChange : undefined}
           globalCheckStatus={globalCheckStatus}
           rowsLength={rows.length}
           showSelectAll={showSelectAll}
