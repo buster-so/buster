@@ -3,6 +3,7 @@ mod assets;
 mod data_sources;
 mod dataset_groups;
 mod datasets;
+mod organizations;
 mod permission_groups;
 mod sql;
 mod users;
@@ -21,6 +22,7 @@ pub fn router() -> Router {
             .nest("/permission_groups", permission_groups::router())
             .nest("/dataset_groups", dataset_groups::router())
             .nest("/sql", sql::router())
+            .nest("/organizations", organizations::router())
             .route_layer(middleware::from_fn(auth)),
     )
 }
