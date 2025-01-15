@@ -1,4 +1,4 @@
-import { BusterUserTeam } from '@/api/busterv2';
+import { BusterUserTeam } from '@/api/buster-rest';
 
 export enum TeamResponses {
   '/teams/list:listTeams' = '/teams/list:listTeams'

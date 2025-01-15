@@ -1,4 +1,4 @@
-import { DataSource, DataSourceListItem } from '@/api/busterv2';
+import { DataSource, DataSourceListItem } from '@/api/buster-rest';
 
 export enum DatasourceResponses {
   '/data_sources/list:listDataSources' = '/data_sources/list:listDataSources',

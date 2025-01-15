@@ -11,7 +11,7 @@ import { BusterRoutes } from '@/routes';
 import { useBusterThreadsContextSelector } from '@/context/Threads';
 import { FavoriteStar } from '../../_components/Lists/FavoriteStar';
 import { AppMaterialIcons } from '@/components';
-import { BusterDashboard, BusterDashboardResponse, BusterShareAssetType } from '@/api/busterv2';
+import { BusterDashboard, BusterDashboardResponse, BusterShareAssetType } from '@/api/buster-rest';
 import { ShareMenu } from '../../_components/ShareMenu';
 import { timeout } from '@/utils';
 import { AddTypeModal } from '../../_components/AddTypeModal';

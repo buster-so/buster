@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useMemo } from 'react';
 import { ColorAppSegments, COLORFUL_THEMES, MONOCHROME_THEMES } from './config';
-import type { IBusterThreadMessageChartConfig } from '@/api/busterv2/threads';
+import type { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads';
 import { Segmented } from 'antd';
 
 const options = [

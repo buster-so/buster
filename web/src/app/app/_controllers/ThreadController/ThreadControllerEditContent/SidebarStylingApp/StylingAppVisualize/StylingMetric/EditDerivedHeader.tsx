@@ -1,4 +1,4 @@
-import type { IBusterThreadMessageChartConfig, ColumnMetaData } from '@/api/busterv2';
+import type { IBusterThreadMessageChartConfig, ColumnMetaData } from '@/api/buster-rest';
 import { AppPopover, AppMaterialIcons } from '@/components';
 import type { IColumnLabelFormat, DerivedMetricTitle } from '@/components/charts';
 import { formatLabel, isNumericColumnType, isNumericColumnStyle } from '@/utils';

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { LabelAndInput } from '../../../Common/LabelAndInput';
 import type { IColumnLabelFormat } from '@/components/charts/interfaces/columnLabelInterfaces';
 import { Select } from 'antd';
-import { useGetCurrencies } from '@/api/busterv2/nextjs/currency';
+import { useGetCurrencies } from '@/api/buster-rest/nextjs/currency';
 import { useMemoizedFn } from 'ahooks';
 import { Text } from '@/components/text';
 

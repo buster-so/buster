@@ -7,7 +7,7 @@ import { PolicyCheck } from '../login/_components/PolicyCheck';
 import { useMemoizedFn } from 'ahooks';
 import { BusterAppRoutes } from '@/routes/busterRoutes/busterAppRoutes';
 import type { User } from '@supabase/supabase-js';
-import type { BusterUserResponse } from '@/api/busterv2';
+import type { BusterUserResponse } from '@/api/buster-rest';
 import { useRouter } from 'next/navigation';
 import { createBusterRoute } from '@/routes';
 import { Result } from 'antd';

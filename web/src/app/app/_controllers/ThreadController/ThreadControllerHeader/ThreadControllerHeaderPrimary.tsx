@@ -22,7 +22,7 @@ import {
   PreventNavigation
 } from '@/components';
 import { useUserConfigContextSelector } from '@/context/Users';
-import { BusterShareAssetType } from '@/api/busterv2';
+import { BusterShareAssetType } from '@/api/buster-rest';
 import { useMemoizedFn, useMount } from 'ahooks';
 import { BusterMessageData, IBusterThreadMessage } from '@/context/Threads/interfaces';
 import { useDisableSaveChanges } from './useDisableSaveChanges';

@@ -3,7 +3,7 @@ import {
   BusterDashboardListItem,
   BusterDashboardResponse,
   BusterMetricDataResponse
-} from '@/api/busterv2';
+} from '@/api/buster-rest';
 
 export enum DashboardResponses {
   '/dashboards/get:getDashboardState' = '/dashboards/get:getDashboardState',

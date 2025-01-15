@@ -4,7 +4,7 @@ import { useSelectAxisContextSelector } from '../useSelectAxisContext';
 import { ColumnLabelFormat } from '@/components/charts';
 import { formatLabel } from '@/utils';
 import { useMemoizedFn } from 'ahooks';
-import { IBusterThreadMessageChartConfig } from '@/api/busterv2/threads/threadConfigInterfaces';
+import { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads/threadConfigInterfaces';
 import { EditShowAxisTitle } from './EditShowAxisTitle';
 import { EditShowAxisLabel } from './EditShowAxisLabel';
 import { EditAxisLabelRotation } from './EditAxisLabelRotation';

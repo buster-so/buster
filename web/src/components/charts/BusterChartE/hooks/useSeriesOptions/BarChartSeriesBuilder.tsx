@@ -7,7 +7,7 @@ import {
   ColumnLabelFormat
 } from '../../../interfaces';
 import { getYAxisColumnNames, seriesNameGenerator } from './helpers';
-import { DEFAULT_BAR_ROUNDNESS } from '@/api/busterv2';
+import { DEFAULT_BAR_ROUNDNESS } from '@/api/buster-rest';
 import { formatLabel } from '@/utils';
 import { labelContrastFormatter } from '../useEChartsTheme/buster_light_theme';
 import { yAxisSimilar } from '@/components/charts/commonHelpers';

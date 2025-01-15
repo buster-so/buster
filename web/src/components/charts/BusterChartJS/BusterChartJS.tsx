@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import './ChartJSTheme';
-import { DEFAULT_CHART_CONFIG, DEFAULT_COLUMN_METADATA } from '@/api/busterv2';
+import { DEFAULT_CHART_CONFIG, DEFAULT_COLUMN_METADATA } from '@/api/buster-rest';
 import { BusterChartJSLegendWrapper } from './BusterChartJSLegendWrapper';
 import { ChartJSOrUndefined } from './core/types';
 import { useMemoizedFn } from 'ahooks';

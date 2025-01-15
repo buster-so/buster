@@ -1,5 +1,9 @@
 import { DashboardUpdate } from '@/api/buster-socket/dashboards';
-import { BusterDashboard, BusterDashboardResponse, BusterVerificationStatus } from '@/api/busterv2';
+import {
+  BusterDashboard,
+  BusterDashboardResponse,
+  BusterVerificationStatus
+} from '@/api/buster-rest';
 import { useMemoizedFn } from 'ahooks';
 import { useRouter } from 'next/navigation';
 import React, { useRef, useState } from 'react';

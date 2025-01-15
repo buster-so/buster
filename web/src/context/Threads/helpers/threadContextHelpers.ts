@@ -1,4 +1,4 @@
-import { BusterThreadMessage, BusterThread } from '@/api/busterv2';
+import { BusterThreadMessage, BusterThread } from '@/api/buster-rest';
 import { BusterMessageData, IBusterThread, IBusterThreadMessage } from '../interfaces';
 import { createDefaultChartConfig } from './messageAutoChartHandler';
 

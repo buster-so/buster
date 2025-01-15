@@ -6,7 +6,7 @@ import { ComboChartBuilder } from './ComboChartBuilder';
 import { LineChartSeriesBuilder } from './LineChartSeriesBuilder';
 import { PieChartBuilder } from './PieChartSeriesBuilder';
 import { ScatterChartSeriesBuilder } from './ScatterChartSeriesBuilder';
-import { ColumnMetaData, IBusterThreadMessageChartConfig } from '@/api/busterv2';
+import { ColumnMetaData, IBusterThreadMessageChartConfig } from '@/api/buster-rest';
 import { useGoalLines } from './useGoalLines';
 import { useTrendlines } from './useTrendlines';
 import { TrendlineDataset } from '../../../chartHooks';

@@ -4,7 +4,7 @@ import { DataFrameOperations } from '@/utils/math';
 import { formatLabel } from '@/utils/columnFormatter';
 import { DatasetOption, extractFieldsFromChain } from '../chartHooks';
 import { createDayjsDate, getBestDateFormat } from '@/utils/date';
-import { IBusterThreadMessageChartConfig } from '@/api/busterv2';
+import { IBusterThreadMessageChartConfig } from '@/api/buster-rest';
 
 export const addLegendHeadlines = (
   legendItems: BusterChartLegendItem[],

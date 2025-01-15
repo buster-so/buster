@@ -1,9 +1,9 @@
-import type { IBusterThreadMessageChartConfig } from '@/api/busterv2/threads/threadConfigInterfaces';
+import type { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads/threadConfigInterfaces';
 import React, { useMemo } from 'react';
 import { LabelAndInput } from '../Common';
 import { Switch } from 'antd';
 import { useMemoizedFn } from 'ahooks';
-import { ENABLED_DOTS_ON_LINE } from '@/api/busterv2';
+import { ENABLED_DOTS_ON_LINE } from '@/api/buster-rest';
 
 export const EditDotsOnLineGlobal: React.FC<{
   columnSettings: IBusterThreadMessageChartConfig['columnSettings'];

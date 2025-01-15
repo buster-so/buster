@@ -1,7 +1,7 @@
-import { BusterThreadMessageConfig } from '@/api/busterv2/threads/threadConfigInterfaces';
+import { BusterThreadMessageConfig } from '@/api/buster-rest/threads/threadConfigInterfaces';
 import { BusterSocketRequestBase } from '../baseInterfaces';
 import { ShareRequest } from '../dashboards';
-import { BusterVerificationStatus } from '@/api/busterv2';
+import { BusterVerificationStatus } from '@/api/buster-rest';
 
 export type ThreadListEmitPayload = BusterSocketRequestBase<
   '/threads/list',

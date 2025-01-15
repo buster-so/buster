@@ -2,7 +2,7 @@ import {
   BusterShareAssetType,
   BusterThreadListItem,
   BusterVerificationStatus
-} from '@/api/busterv2';
+} from '@/api/buster-rest';
 import {
   getNow,
   isDateSame,

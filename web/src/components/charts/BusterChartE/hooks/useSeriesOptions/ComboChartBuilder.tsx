@@ -9,7 +9,7 @@ import { BusterChartProps, ChartType } from '../../../interfaces';
 import { BarAndLineAxis, ChartEncodes, ComboChartAxis } from '../../../interfaces/axisInterfaces';
 import { ColumnSettings } from '../../../interfaces';
 import { getYAxisColumnNames, seriesNameGenerator } from './helpers';
-import { DEFAULT_COLUMN_SETTINGS } from '@/api/busterv2';
+import { DEFAULT_COLUMN_SETTINGS } from '@/api/buster-rest';
 import { formatLabel } from '@/utils';
 import { createGradient } from './LineChartSeriesBuilder';
 

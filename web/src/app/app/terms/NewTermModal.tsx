@@ -4,7 +4,7 @@ import { useTermsContextSelector } from '@/context/Terms';
 import { useDatasetContextSelector } from '@/context/Datasets';
 import { AppModal, AppSelectMultiple, Text } from '@/components';
 import { useMemoizedFn } from 'ahooks';
-import { useGetDatasets } from '@/api/busterv2/datasets';
+import { useGetDatasets } from '@/api/buster-rest/datasets';
 
 export const NewTermModal: React.FC<{
   open: boolean;

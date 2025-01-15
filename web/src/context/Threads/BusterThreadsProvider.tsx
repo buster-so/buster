@@ -9,10 +9,10 @@ import { BusterThreadsListProvider } from './BusterThreadsListProvider';
 import { defaultIBusterThread } from './config';
 import { useDebounceFn, useMemoizedFn, useMount, useWhyDidYouUpdate } from 'ahooks';
 import type { IBusterThread, IBusterThreadMessage } from './interfaces';
-import type { BusterThread, BusterThreadUser, BusterVerificationStatus } from '@/api/busterv2';
+import type { BusterThread, BusterThreadUser, BusterVerificationStatus } from '@/api/buster-rest';
 import { useBusterWebSocket } from '../BusterWebSocket';
 import { useParams } from 'next/navigation';
-import { IBusterThreadMessageChartConfig } from '@/api/busterv2/threads/threadConfigInterfaces';
+import { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads/threadConfigInterfaces';
 import { ShareRole, ThreadUpdateMessage, ThreadUpdateThread } from '@/api/buster-socket/threads';
 import { resolveEmptyThread, upgradeThreadToIThread, prepareThreadUpdateMessage } from './helpers';
 import { useUserConfigContextSelector } from '../Users';
@@ -25,7 +25,7 @@ import { useTransition } from 'react';
 import type { IColumnLabelFormat } from '@/components/charts/interfaces/columnLabelInterfaces';
 import type { ColumnSettings } from '@/components/charts/interfaces/columnInterfaces';
 import { useBusterMessageDataContextSelector } from '../MessageData';
-import { RustApiError } from '@/api/buster/errors';
+import { RustApiError } from '@/api/buster-rest/errors';
 
 export const useBusterThreads = () => {
   const [isPending, startTransition] = useTransition();

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { LabelAndInput } from '../Common';
-import { IBusterThreadMessageChartConfig } from '@/api/busterv2/threads/threadConfigInterfaces';
+import { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads/threadConfigInterfaces';
 import { Switch } from 'antd';
 import { AppMaterialIcons, AppTooltip } from '@/components';
 import { createStyles } from 'antd-style';

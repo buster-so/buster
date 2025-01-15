@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import { useMemoizedFn } from 'ahooks';
 import { BusterEChartComponent } from './BusterEChartComponent';
 import type { EChartsInstance } from 'echarts-for-react/lib/types';
-import { DEFAULT_CHART_CONFIG, DEFAULT_COLUMN_METADATA } from '@/api/busterv2/threads/defaults';
+import { DEFAULT_CHART_CONFIG, DEFAULT_COLUMN_METADATA } from '@/api/buster-rest/threads/defaults';
 import { BusterEChartLegendWrapper } from './BusterEChartLegendWrapper';
 import { BusterChartComponentProps } from '../interfaces/chartComponentInterfaces';
 

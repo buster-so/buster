@@ -1,6 +1,6 @@
 'use client';
 
-import { BusterThreadListItem, BusterVerificationStatus } from '@/api/busterv2';
+import { BusterThreadListItem, BusterVerificationStatus } from '@/api/buster-rest';
 import { AppMaterialIcons, AppPopoverMenu, AppTooltip } from '@/components';
 import { useDashboardContextSelector } from '@/context/Dashboards';
 import { useUserConfigContextSelector } from '@/context/Users';

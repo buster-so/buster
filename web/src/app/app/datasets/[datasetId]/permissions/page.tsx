@@ -1,6 +1,6 @@
 import React from 'react';
 import { PermissionTitleCard } from './PermissionTitleCard';
-import { prefetchGetDatasetPermissionsOverview } from '@/api/busterv2/datasets/permissions/queryRequests';
+import { prefetchGetDatasetPermissionsOverview } from '@/api/buster-rest/datasets/permissions/queryRequests';
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import { PermissionsAppContainer } from './PermissionsAppContainer';
 

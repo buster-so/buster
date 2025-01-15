@@ -1,4 +1,4 @@
-import { ColumnMetaData } from '@/api/busterv2';
+import { ColumnMetaData } from '@/api/buster-rest';
 import { DatasetOption } from '../../../chartHooks';
 import {
   BusterChartConfigProps,

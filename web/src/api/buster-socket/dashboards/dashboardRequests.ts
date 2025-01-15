@@ -1,4 +1,4 @@
-import { BusterVerificationStatus } from '@/api/busterv2';
+import { BusterVerificationStatus } from '@/api/buster-rest';
 import { BusterSocketRequestBase } from '../baseInterfaces';
 import { ShareRole } from '../threads';
 import { DashboardConfig } from './dashboardConfigInterfaces';

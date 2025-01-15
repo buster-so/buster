@@ -1,7 +1,7 @@
 import React from 'react';
 import { StylingLabel } from '../Common';
 import { SelectChartType } from './SelectChartType';
-import { IBusterThreadMessageChartConfig } from '@/api/busterv2/threads/threadConfigInterfaces';
+import { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads/threadConfigInterfaces';
 import { SelectAxis } from './SelectAxis';
 import {
   YAxisConfig,

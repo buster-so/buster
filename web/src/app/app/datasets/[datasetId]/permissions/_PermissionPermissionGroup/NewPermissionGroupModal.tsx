@@ -1,4 +1,4 @@
-import { useCreatePermissionGroup } from '@/api/busterv2/permission_groups';
+import { useCreatePermissionGroup } from '@/api/buster-rest/permission_groups';
 import { AppModal } from '@/components/modal';
 import { useMemoizedFn } from 'ahooks';
 import React, { useEffect, useMemo, useRef } from 'react';

@@ -1,10 +1,10 @@
-import { BusterShareAssetType } from "@/api/busterv2";
-import { AppMaterialIcons } from "@/components";
+import { BusterShareAssetType } from '@/api/buster-rest';
+import { AppMaterialIcons } from '@/components';
 
 const iconRecord: Record<BusterShareAssetType, string> = {
-  [BusterShareAssetType.COLLECTION]: "note_stack",
-  [BusterShareAssetType.DASHBOARD]: "grid_view",
-  [BusterShareAssetType.THREAD]: "monitoring",
+  [BusterShareAssetType.COLLECTION]: 'note_stack',
+  [BusterShareAssetType.DASHBOARD]: 'grid_view',
+  [BusterShareAssetType.THREAD]: 'monitoring'
 };
 
 export const asset_typeToIcon = (
@@ -13,14 +13,14 @@ export const asset_typeToIcon = (
 ) => {
   const { open, size } = props || {};
   const iconString = iconRecord[type];
-  return <AppMaterialIcons icon={iconString as "grid_view"} size={size} />;
+  return <AppMaterialIcons icon={iconString as 'grid_view'} size={size} />;
 };
 
 export const asset_typeToTranslation = (type: BusterShareAssetType) => {
   const asset_typeTranslation: Record<BusterShareAssetType, string> = {
-    [BusterShareAssetType.COLLECTION]: "collection",
-    [BusterShareAssetType.DASHBOARD]: "dashboard",
-    [BusterShareAssetType.THREAD]: "thread",
+    [BusterShareAssetType.COLLECTION]: 'collection',
+    [BusterShareAssetType.DASHBOARD]: 'dashboard',
+    [BusterShareAssetType.THREAD]: 'thread'
   };
   return asset_typeTranslation[type];
 };

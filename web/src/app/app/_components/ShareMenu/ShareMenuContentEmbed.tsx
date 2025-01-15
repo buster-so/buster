@@ -1,4 +1,4 @@
-import { BusterShareAssetType } from '@/api/busterv2';
+import { BusterShareAssetType } from '@/api/buster-rest';
 import { AppMaterialIcons } from '@/components';
 import { useCollectionsContextSelector } from '@/context/Collections';
 import { useDashboardContextSelector } from '@/context/Dashboards';

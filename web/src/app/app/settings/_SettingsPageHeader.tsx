@@ -7,7 +7,8 @@ import { Divider } from 'antd';
 export const SettingsPageHeader: React.FC<{
   title: string;
   description: string;
-}> = ({ title, description }) => {
+  type?: 'default' | 'alternate';
+}> = ({ title, description, type = 'default' }) => {
   return (
     <div className="flex flex-col">
       <div className="flex flex-col space-y-1.5">

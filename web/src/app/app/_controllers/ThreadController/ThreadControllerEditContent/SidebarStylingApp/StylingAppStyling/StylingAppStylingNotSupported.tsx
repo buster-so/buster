@@ -1,4 +1,4 @@
-import { IBusterThreadMessageChartConfig } from '@/api/busterv2';
+import { IBusterThreadMessageChartConfig } from '@/api/buster-rest';
 import { ChartType } from '@/components/charts';
 import React, { useMemo } from 'react';
 import { Text } from '@/components/text';

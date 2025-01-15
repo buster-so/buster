@@ -1,4 +1,4 @@
-import { BusterSearchResult } from '@/api/busterv2/search';
+import { BusterSearchResult } from '@/api/buster-rest/search';
 
 export enum SearchResponses {
   '/search:search' = '/search:search'

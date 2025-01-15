@@ -4,7 +4,7 @@ import { BusterChartConfigProps, ColumnSettings } from '@/components/charts';
 import { AppMaterialIcons, AppSegmented } from '@/components';
 import { SegmentedProps } from 'antd';
 import { useEditAppSegmented } from './useEditAppSegmented';
-import { ENABLED_DOTS_ON_LINE_SIZE } from '@/api/busterv2';
+import { ENABLED_DOTS_ON_LINE_SIZE } from '@/api/buster-rest';
 import { useMemoizedFn } from 'ahooks';
 import { SegmentedValue } from 'antd/es/segmented';
 

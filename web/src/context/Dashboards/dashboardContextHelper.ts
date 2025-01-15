@@ -1,4 +1,4 @@
-import { BusterDashboardMetric, IBusterDashboardMetric } from '@/api/busterv2';
+import { BusterDashboardMetric, IBusterDashboardMetric } from '@/api/buster-rest';
 import { createDefaultChartConfig } from '../Threads/helpers/messageAutoChartHandler';
 
 export const upgradeDashboardMetric = (

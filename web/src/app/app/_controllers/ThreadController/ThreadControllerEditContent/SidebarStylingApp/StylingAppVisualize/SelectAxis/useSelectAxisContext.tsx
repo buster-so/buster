@@ -1,4 +1,4 @@
-import { ColumnMetaData, IBusterThreadMessageChartConfig } from '@/api/busterv2';
+import { ColumnMetaData, IBusterThreadMessageChartConfig } from '@/api/buster-rest';
 import type {
   ChartEncodes,
   YAxisConfig,

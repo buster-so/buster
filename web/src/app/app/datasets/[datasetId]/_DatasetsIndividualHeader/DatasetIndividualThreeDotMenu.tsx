@@ -1,4 +1,4 @@
-import { useDeleteDataset } from '@/api/busterv2';
+import { useDeleteDataset } from '@/api/buster-rest';
 import { AppMaterialIcons } from '@/components';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { BusterRoutes } from '@/routes';

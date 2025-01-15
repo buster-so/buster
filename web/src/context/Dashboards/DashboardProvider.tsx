@@ -5,7 +5,7 @@ import {
   BusterMetricDataResponse,
   BusterVerificationStatus,
   IBusterDashboardMetric
-} from '@/api/busterv2';
+} from '@/api/buster-rest';
 import { useParams, useRouter } from 'next/navigation';
 import React, {
   PropsWithChildren,

@@ -1,4 +1,4 @@
-import { BusterTerm, BusterTermListItem } from '@/api/busterv2';
+import { BusterTerm, BusterTermListItem } from '@/api/buster-rest';
 
 export enum TermsResponses {
   '/terms/list:ListTerms' = '/terms/list:ListTerms',

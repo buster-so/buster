@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { EditAxisScale } from '../StylingAppVisualize/SelectAxis/SelectAxisSettingsContent/EditAxisScale';
-import type { IBusterThreadMessageChartConfig } from '@/api/busterv2/threads';
+import type { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads';
 import { useMemoizedFn } from 'ahooks';
 
 export const EditYAxisScaleGlobal: React.FC<{

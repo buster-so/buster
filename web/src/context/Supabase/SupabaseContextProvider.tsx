@@ -10,7 +10,7 @@ import {
   useContextSelector,
   ContextSelector
 } from '@fluentui/react-context-selector';
-import { checkTokenValidityFromServer as checkTokenValidityFromServerApiCall } from '@/api/busterv2/nextjs/auth';
+import { checkTokenValidityFromServer as checkTokenValidityFromServerApiCall } from '@/api/buster-rest/nextjs/auth';
 import { jwtDecode } from 'jwt-decode';
 
 const STAGING_DEBUGGER = process.env.NODE_ENV === 'production';

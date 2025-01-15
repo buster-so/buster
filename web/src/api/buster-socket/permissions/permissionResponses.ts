@@ -5,7 +5,7 @@ import {
   BusterPermissionListUser,
   BusterPermissionTeam,
   BusterPermissionUser
-} from '@/api/busterv2/permissions';
+} from '@/api/buster-rest/permissions';
 
 export enum PermissionsResponses {
   '/permissions/users/list:listUserPermissions' = '/permissions/users/list:listUserPermissions',

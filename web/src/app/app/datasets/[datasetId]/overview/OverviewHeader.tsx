@@ -1,7 +1,7 @@
 import { EditableTitle, Text } from '@/components';
 import React from 'react';
 import { useMemoizedFn } from 'ahooks';
-import { useUpdateDataset } from '@/api/busterv2';
+import { useUpdateDataset } from '@/api/buster-rest';
 
 export const OverviewHeader: React.FC<{ datasetId: string; description: string; name: string }> =
   React.memo(({ datasetId, description, name }) => {

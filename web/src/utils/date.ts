@@ -17,7 +17,7 @@ import {
   DEFAULT_DATE_FORMAT_MONTH_OF_YEAR,
   DEFAULT_DATE_FORMAT_QUARTER,
   DEFAULT_DAY_OF_WEEK_FORMAT
-} from '@/api/busterv2/threads';
+} from '@/api/buster-rest/threads';
 
 dayjs.extend(relativeTime);
 dayjs.extend(customParseFormat);

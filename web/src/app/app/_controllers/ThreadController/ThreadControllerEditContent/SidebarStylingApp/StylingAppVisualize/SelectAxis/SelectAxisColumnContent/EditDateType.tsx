@@ -6,7 +6,7 @@ import { useMemoizedFn } from 'ahooks';
 import last from 'lodash/last';
 import first from 'lodash/first';
 import { getDefaultQuarterOptions } from './dateConfig';
-import { DEFAULT_DAY_OF_WEEK_FORMAT } from '@/api/busterv2/threads/defaults';
+import { DEFAULT_DAY_OF_WEEK_FORMAT } from '@/api/buster-rest/threads/defaults';
 
 const options: {
   label: string;

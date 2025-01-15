@@ -8,7 +8,7 @@ import {
   useDashboardContextSelector,
   useIndividualDashboard
 } from '@/context/Dashboards';
-import { BusterDashboardResponse } from '@/api/busterv2';
+import { BusterDashboardResponse } from '@/api/buster-rest';
 import { DashboardIndividualDashboard } from './_DashboardIndividualDashboard';
 import { EditableTitle } from '@/components';
 import { useUserConfigContextSelector } from '@/context/Users';

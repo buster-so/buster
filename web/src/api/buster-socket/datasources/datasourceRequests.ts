@@ -1,4 +1,4 @@
-import { DataSourceTypes } from '@/api/busterv2';
+import { DataSourceTypes } from '@/api/buster-rest';
 import { BusterSocketRequestBase } from '../baseInterfaces';
 import { DatasourceCreateCredentials } from './interface';
 

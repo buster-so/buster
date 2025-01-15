@@ -21,7 +21,7 @@ import { BusterTermsProvider } from './Terms/BusterTermsProvider';
 import { BusterPermissionsProvider } from './Permissions';
 import { BusterSearchProvider } from './Search';
 import { BusterAssetsProvider } from './Assets/BusterAssetsProvider';
-import { BusterUserResponse } from '@/api/busterv2/users';
+import { BusterUserResponse } from '@/api/buster-rest/users';
 import { BusterPosthogProvider } from './Posthog/usePosthog';
 import { BusterNotificationsProvider } from './BusterNotifications';
 import { RoutePrefetcher } from './RoutePrefetcher';

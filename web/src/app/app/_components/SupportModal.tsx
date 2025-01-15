@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useMemo, useState } from 'react';
 import { Text } from '@/components/text';
 import { Input } from 'antd';
 import { useMemoizedFn } from 'ahooks';
-import { submitAppSupportRequest } from '@/api/busterv2/nextjs/support';
+import { submitAppSupportRequest } from '@/api/buster-rest/nextjs/support';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { AppModal } from '@/components';

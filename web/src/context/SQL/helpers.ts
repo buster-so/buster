@@ -1,4 +1,4 @@
-import type { ColumnMetaData, IBusterThreadMessageChartConfig } from '@/api/busterv2';
+import type { ColumnMetaData, IBusterThreadMessageChartConfig } from '@/api/buster-rest';
 import type { IBusterThreadMessage } from '../Threads';
 import { createDefaultChartConfig } from '../Threads/helpers/messageAutoChartHandler';
 import type {

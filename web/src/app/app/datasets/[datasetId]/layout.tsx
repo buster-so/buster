@@ -1,6 +1,6 @@
 import React from 'react';
 import { DatasetPageLayout } from './DatasetPageLayout';
-import { prefetchGetDatasetMetadata } from '@/api/busterv2/datasets';
+import { prefetchGetDatasetMetadata } from '@/api/buster-rest/datasets';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
 export default async function Layout({

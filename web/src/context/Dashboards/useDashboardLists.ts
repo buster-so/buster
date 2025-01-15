@@ -1,5 +1,5 @@
 import type { DashboardsListEmitPayload, DashboardUpdate } from '@/api/buster-socket/dashboards';
-import type { BusterDashboardListItem } from '@/api/busterv2';
+import type { BusterDashboardListItem } from '@/api/buster-rest';
 import { useMemoizedFn } from 'ahooks';
 import React, { PropsWithChildren, useRef, useState } from 'react';
 import { useBusterWebSocket } from '../BusterWebSocket';

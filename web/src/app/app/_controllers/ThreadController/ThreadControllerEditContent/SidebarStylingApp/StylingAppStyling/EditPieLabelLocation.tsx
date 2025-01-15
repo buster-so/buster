@@ -1,7 +1,10 @@
 import React, { useMemo } from 'react';
 import { LabelAndInput } from '../Common';
 import { Select, Switch } from 'antd';
-import { DEFAULT_CHART_CONFIG, type IBusterThreadMessageChartConfig } from '@/api/busterv2/threads';
+import {
+  DEFAULT_CHART_CONFIG,
+  type IBusterThreadMessageChartConfig
+} from '@/api/buster-rest/threads';
 import { useMemoizedFn } from 'ahooks';
 
 const options: { label: string; value: IBusterThreadMessageChartConfig['pieLabelPosition'] }[] = [

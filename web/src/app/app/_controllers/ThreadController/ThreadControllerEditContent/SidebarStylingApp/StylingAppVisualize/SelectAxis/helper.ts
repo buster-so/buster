@@ -1,4 +1,4 @@
-import type { IBusterThreadMessageChartConfig } from '@/api/busterv2/threads/threadConfigInterfaces';
+import type { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads/threadConfigInterfaces';
 import type { DropZone } from './SelectAxisDragContainer/interfaces';
 import { ChartType } from '@/components/charts';
 import { SelectAxisContainerId } from './config';

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { LabelAndInput } from '../Common';
 import { Segmented } from 'antd';
 import { useMemoizedFn } from 'ahooks';
-import type { IBusterThreadMessageChartConfig } from '@/api/busterv2';
+import type { IBusterThreadMessageChartConfig } from '@/api/buster-rest';
 
 const options: { label: string; value: IBusterThreadMessageChartConfig['pieDisplayLabelAs'] }[] = [
   { label: '%', value: 'percent' },

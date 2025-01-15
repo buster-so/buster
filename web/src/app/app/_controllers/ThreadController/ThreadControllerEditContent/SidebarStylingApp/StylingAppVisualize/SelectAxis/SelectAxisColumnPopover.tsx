@@ -2,7 +2,7 @@ import React from 'react';
 import { AppPopover } from '@/components';
 import { ChartEncodes, IColumnLabelFormat } from '@/components/charts';
 import { SelectAxisDropdownContent } from './SelectAxisColumnContent';
-import { IBusterThreadMessageChartConfig } from '@/api/busterv2';
+import { IBusterThreadMessageChartConfig } from '@/api/buster-rest';
 import { SelectAxisContainerId } from './config';
 
 interface SelectAxisColumnPopoverProps {

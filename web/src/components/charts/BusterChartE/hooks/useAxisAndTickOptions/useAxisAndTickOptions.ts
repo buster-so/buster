@@ -7,7 +7,7 @@ import {
   Y2AxisConfig,
   YAxisConfig
 } from '../../../interfaces';
-import { DEFAULT_CHART_CONFIG } from '@/api/busterv2';
+import { DEFAULT_CHART_CONFIG } from '@/api/buster-rest';
 import { useYAxisTickOptions } from './useYAxisTickOptions';
 import { useXAxisTickOptions } from './useXAxisTickOptions';
 

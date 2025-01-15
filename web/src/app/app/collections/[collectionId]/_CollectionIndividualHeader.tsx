@@ -16,8 +16,8 @@ import { useBusterThreadsContextSelector } from '@/context/Threads';
 import { AppMaterialIcons, EditableTitle } from '@/components';
 import { FavoriteStar } from '../../_components/Lists/FavoriteStar';
 import { ShareMenu } from '../../_components/ShareMenu';
-import { BusterCollection } from '@/api/busterv2/collection';
-import { BusterShareAssetType } from '@/api/busterv2';
+import { BusterCollection } from '@/api/buster-rest/collection';
+import { BusterShareAssetType } from '@/api/buster-rest';
 import { Text } from '@/components';
 
 import { useAntToken } from '@/styles/useAntToken';

@@ -1,8 +1,8 @@
 import React from 'react';
 import { HeaderExplanation } from '../HeaderExplanation';
 import { PermissionSearch } from '../PermissionSearch';
-import { useDatasetListPermissionUsers } from '@/api/busterv2';
-import { useDebounceSearch } from '../useDebounceSearch';
+import { useDatasetListPermissionUsers } from '@/api/buster-rest';
+import { useDebounceSearch } from '@/hooks';
 import { Button } from 'antd';
 import { AppMaterialIcons } from '@/components/icons';
 import { useMemoizedFn } from 'ahooks';

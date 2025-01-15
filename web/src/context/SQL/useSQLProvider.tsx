@@ -11,13 +11,13 @@ import {
   useContextSelector,
   ContextSelector
 } from '@fluentui/react-context-selector';
-import type { IBusterThreadMessageChartConfig } from '@/api/busterv2/threads';
+import type { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads';
 import { useBusterMessageDataContextSelector } from '../MessageData';
 import { useBusterNotifications } from '../BusterNotifications';
 import { didColumnDataChange, simplifyChratConfigForSQLChange } from './helpers';
 import { ThreadUpdateMessage } from '@/api/buster-socket/threads';
 import { timeout } from '@/utils';
-import { RunSQLResponse } from '@/api/busterv2/sql/responseInterfaces';
+import { RunSQLResponse } from '@/api/buster-rest/sql/responseInterfaces';
 
 export const useSQLProvider = () => {
   const busterSocket = useBusterWebSocket();

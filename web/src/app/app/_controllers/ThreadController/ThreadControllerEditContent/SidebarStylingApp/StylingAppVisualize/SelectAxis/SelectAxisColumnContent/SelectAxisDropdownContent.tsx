@@ -1,4 +1,4 @@
-import type { IBusterThreadMessageChartConfig } from '@/api/busterv2/threads/threadConfigInterfaces';
+import type { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads/threadConfigInterfaces';
 import type { IColumnLabelFormat } from '@/components/charts/interfaces/columnLabelInterfaces';
 import { useMemoizedFn } from 'ahooks';
 import React, { useMemo } from 'react';
@@ -25,7 +25,7 @@ import { SelectAxisContainerId } from '../config';
 import { EditReplaceMissingData } from './EditReplaceMissingData';
 import { EditLineStyle } from './EditLineStyle';
 import isEmpty from 'lodash/isEmpty';
-import { useGetCurrencies } from '@/api/busterv2/nextjs/currency';
+import { useGetCurrencies } from '@/api/buster-rest/nextjs/currency';
 
 export const SelectAxisDropdownContent: React.FC<{
   columnSetting: IBusterThreadMessageChartConfig['columnSettings'][string];

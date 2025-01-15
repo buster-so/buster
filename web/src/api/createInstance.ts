@@ -1,6 +1,6 @@
 import { BusterRoutes } from '@/routes/busterRoutes/busterRoutes';
 import axios, { AxiosError } from 'axios';
-import { rustErrorHandler } from './buster/errors';
+import { rustErrorHandler } from './buster-rest/errors';
 import { AxiosRequestHeaders } from 'axios';
 import { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 

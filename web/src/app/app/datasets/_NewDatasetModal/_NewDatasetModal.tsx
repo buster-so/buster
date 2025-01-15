@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useMemo, useState } from 'react';
 import { Input, Select, SelectProps } from 'antd';
 import { useMemoizedFn, useMount } from 'ahooks';
 import { useDataSourceContextSelector } from '@/context/DataSources';
-import { useCreateDataset } from '@/api/busterv2/datasets';
+import { useCreateDataset } from '@/api/buster-rest/datasets';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { useRouter } from 'next/navigation';

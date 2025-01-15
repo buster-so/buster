@@ -1,7 +1,7 @@
 import React from 'react';
 import { LabelAndInput } from '../Common';
 import { Switch } from 'antd';
-import type { IBusterThreadMessageChartConfig } from '@/api/busterv2/threads/threadConfigInterfaces';
+import type { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads/threadConfigInterfaces';
 
 export const EditGridLines: React.FC<{
   gridLines: IBusterThreadMessageChartConfig['gridLines'];

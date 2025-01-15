@@ -2,7 +2,7 @@ import { formatLabel } from '@/utils/columnFormatter';
 import pick from 'lodash/pick';
 import isEqual from 'lodash/isEqual';
 import isNumber from 'lodash/isNumber';
-import type { ColumnMetaData } from '@/api/busterv2';
+import type { ColumnMetaData } from '@/api/buster-rest';
 import { formatChartLabelDelimiter } from './labelHelpers';
 import type { ChartEncodes, BusterChartProps, BarAndLineAxis, ScatterAxis } from '../interfaces';
 import { ChartType } from '../interfaces';

@@ -1,4 +1,4 @@
-import { prefetchGetDatasets } from '@/api/busterv2/datasets';
+import { prefetchGetDatasets } from '@/api/buster-rest/datasets';
 import { DatasetsPageContent } from './DatasetsPageContent';
 
 export default async function DashboardPage() {

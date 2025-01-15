@@ -10,7 +10,7 @@ import { useDashboardContextSelector } from '@/context/Dashboards';
 import { useBusterThreadsContextSelector } from '@/context/Threads';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { useCollectionsContextSelector } from '@/context/Collections';
-import { BusterShareAssetType } from '@/api/busterv2';
+import { BusterShareAssetType } from '@/api/buster-rest';
 import { Text } from '@/components';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { Dayjs } from 'dayjs';

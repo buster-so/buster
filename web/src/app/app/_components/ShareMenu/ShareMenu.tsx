@@ -16,12 +16,12 @@ import { ShareMenuContentPublish } from './ShareMenuContentPublish';
 import { ShareMenuContentEmbed } from './ShareMenuContentEmbed';
 import { IBusterThread } from '@/context/Threads/interfaces';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import { BusterDashboardResponse, BusterShare, BusterShareAssetType } from '@/api/busterv2';
+import { BusterDashboardResponse, BusterShare, BusterShareAssetType } from '@/api/buster-rest';
 import { useBusterThreadsContextSelector } from '@/context/Threads';
 import { AccessDropdown } from './AccessDropdown';
 import { ShareRole } from '@/api/buster-socket/threads';
 import { ShareRequest } from '@/api/buster-socket/dashboards';
-import { BusterCollection } from '@/api/busterv2/collection';
+import { BusterCollection } from '@/api/buster-rest/collection';
 import { useCollectionsContextSelector } from '@/context/Collections';
 import { Text } from '@/components';
 import { useDashboardContextSelector } from '@/context/Dashboards';
@@ -262,8 +262,6 @@ const ShareMenuContentShare: React.FC<{
     const disableSubmit = !inputHasText(inputValue) || !validate(inputValue);
     const id = threadId || dashboardId || collectionId || '';
     const hasUserTeams = userTeams.length > 0;
-
-
 
     const onSubmitNewEmail = useMemoizedFn(async () => {
       const isValidEmail = validate(inputValue);

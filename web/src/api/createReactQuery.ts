@@ -11,7 +11,7 @@ import {
 } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useBusterNotifications } from '@/context/BusterNotifications';
-import { RustApiError } from './buster/errors';
+import { RustApiError } from './buster-rest/errors';
 import { useMemoizedFn } from 'ahooks';
 
 export interface BaseCreateQueryProps {

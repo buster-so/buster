@@ -5,7 +5,7 @@ import { EditGridLines } from './EditGridLines';
 import { EditHideYAxis } from './EditHideYAxis';
 import { EditShowDataLabels } from './EditShowDataLabels';
 import { useMemoizedFn } from 'ahooks';
-import type { IBusterThreadMessageChartConfig } from '@/api/busterv2/threads/threadConfigInterfaces';
+import type { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads/threadConfigInterfaces';
 import { useBusterThreadsContextSelector } from '@/context/Threads';
 import { EditBarSorting } from './EditBarAxisSorting';
 import { EditGrouping } from '../StylingAppVisualize/SelectAxis/SelectAxisSettingsContent/EditGrouping';
@@ -26,7 +26,7 @@ import { EditPieShowInnerLabel } from './EditPieShowInnerLabel';
 import { BarAndLineAxis, ChartEncodes, ChartType, ScatterAxis } from '@/components/charts';
 import { StylingAppStylingNotSupported } from './StylingAppStylingNotSupported';
 import { EditScatterDotSize } from './EditScatterDotSize';
-import { ColumnMetaData } from '@/api/busterv2';
+import { ColumnMetaData } from '@/api/buster-rest';
 
 const sectionClass = 'flex w-full flex-col space-y-3 my-3 ';
 const UNSUPPORTED_CHART_TYPES: ChartType[] = [ChartType.Table, ChartType.Metric];

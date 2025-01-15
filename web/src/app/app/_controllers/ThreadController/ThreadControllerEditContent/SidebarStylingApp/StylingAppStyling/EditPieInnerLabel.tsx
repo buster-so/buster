@@ -1,4 +1,4 @@
-import type { IBusterThreadMessageChartConfig } from '@/api/busterv2/threads/threadConfigInterfaces';
+import type { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads/threadConfigInterfaces';
 import React, { useMemo } from 'react';
 import { LabelAndInput } from '../Common';
 import { Input, Select } from 'antd';

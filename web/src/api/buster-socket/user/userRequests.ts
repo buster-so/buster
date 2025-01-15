@@ -1,4 +1,4 @@
-import { BusterShareAssetType } from '@/api/busterv2';
+import { BusterShareAssetType } from '@/api/buster-rest';
 import { BusterSocketRequestBase } from '../baseInterfaces';
 
 export type UserColorsList = BusterSocketRequestBase<'/users/colors/list', {}>;

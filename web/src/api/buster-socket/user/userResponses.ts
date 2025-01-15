@@ -4,7 +4,7 @@ import {
   BusterUserPalette,
   BusterUserResponse,
   BusterUserTeamListItem
-} from '@/api/busterv2';
+} from '@/api/buster-rest';
 
 export enum UserResponses {
   '/users/colors/list:listUserColorPalettes' = '/users/colors/list:listUserColorPalettes',

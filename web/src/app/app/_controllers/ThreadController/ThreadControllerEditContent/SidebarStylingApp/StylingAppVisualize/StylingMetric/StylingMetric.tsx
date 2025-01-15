@@ -2,7 +2,7 @@ import {
   ColumnMetaData,
   DEFAULT_COLUMN_SETTINGS,
   IBusterThreadMessageChartConfig
-} from '@/api/busterv2';
+} from '@/api/buster-rest';
 import React, { useMemo } from 'react';
 import { EditMetricField } from './EditMetricField';
 import { useBusterThreadsContextSelector } from '@/context/Threads';

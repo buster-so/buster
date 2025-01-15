@@ -1,4 +1,4 @@
-import { BusterSearchResult } from '@/api/busterv2';
+import { BusterSearchResult } from '@/api/buster-rest';
 import { CircleSpinnerLoader } from '@/components';
 import { boldHighlights } from '@/utils/element';
 import { createStyles } from 'antd-style';

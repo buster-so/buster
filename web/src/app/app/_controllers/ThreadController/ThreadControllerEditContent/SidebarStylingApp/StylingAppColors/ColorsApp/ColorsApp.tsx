@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { ColorStyleSegments } from './ColorStyleSegments';
-import type { IBusterThreadMessageChartConfig } from '@/api/busterv2/threads';
+import type { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads';
 import { ColorAppSegments, COLORFUL_THEMES, MONOCHROME_THEMES } from './config';
 import isEqual from 'lodash/isEqual';
 import { ThemeCarousel, IColorTheme } from '../Common';

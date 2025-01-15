@@ -9,7 +9,7 @@ import { useMemoizedFn } from 'ahooks';
 import { useBusterThreadsContextSelector } from '@/context/Threads';
 import { EditShowAxisLabel } from './EditShowAxisLabel';
 import { EditAxisScale } from './EditAxisScale';
-import type { IBusterThreadMessageChartConfig } from '@/api/busterv2/threads/threadConfigInterfaces';
+import type { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads/threadConfigInterfaces';
 
 export const Y2AxisSettingContent: React.FC<{
   zoneId: SelectAxisContainerId;

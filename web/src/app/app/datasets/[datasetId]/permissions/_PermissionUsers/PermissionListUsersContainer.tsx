@@ -2,7 +2,7 @@ import {
   ListPermissionGroupsResponse,
   ListPermissionUsersResponse,
   useDatasetUpdatePermissionUsers
-} from '@/api/busterv2/datasets';
+} from '@/api/buster-rest/datasets';
 import { BusterUserAvatar } from '@/components';
 import { BusterListColumn, BusterListRowItem } from '@/components/list';
 import { BusterInfiniteList } from '@/components/list/BusterInfiniteList';

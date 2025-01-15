@@ -2,7 +2,7 @@ import type { ChartProps } from '../../core';
 import { LabelBuilderProps } from './useSeriesOptions';
 import { SeriesBuilderProps } from './interfaces';
 import { extractFieldsFromChain } from '@/components/charts/chartHooks';
-import { DEFAULT_COLUMN_SETTINGS } from '@/api/busterv2';
+import { DEFAULT_COLUMN_SETTINGS } from '@/api/buster-rest';
 import { barBuilder } from './barSeriesBuilder';
 import { createDayjsDate } from '@/utils/date';
 import { formatChartLabelDelimiter } from '@/components/charts/commonHelpers';

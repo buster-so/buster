@@ -10,7 +10,7 @@ import { SupabaseIcon } from './customIcons/supabase';
 import { RedUsersIcons } from './customIcons/redUsers';
 import { AthenaIcon } from './customIcons/athena';
 import React from 'react';
-import { DataSourceTypes } from '@/api/busterv2';
+import { DataSourceTypes } from '@/api/buster-rest';
 import { AppMaterialIcons } from './AppMaterialIcons';
 
 const IconRecord: Record<DataSourceTypes, any> = {

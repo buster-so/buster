@@ -4,7 +4,7 @@ import { SegmentedOptions, SegmentedValue } from 'antd/es/segmented';
 import { useMemoizedFn } from 'ahooks';
 import { Segmented } from 'antd';
 import { createStyles } from 'antd-style';
-import { IBusterThreadMessageChartConfig } from '@/api/busterv2';
+import { IBusterThreadMessageChartConfig } from '@/api/buster-rest';
 
 const useStyles = createStyles(({ css, token }) => ({
   container: css`

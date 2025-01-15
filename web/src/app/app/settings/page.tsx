@@ -1,6 +1,5 @@
 'use client';
 
-import React, { useContext } from 'react';
 import { permanentRedirect } from 'next/navigation';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 

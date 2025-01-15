@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Select } from 'antd';
-import type { IBusterThreadMessageChartConfig } from '@/api/busterv2/threads/threadConfigInterfaces';
+import type { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads/threadConfigInterfaces';
 import { LabelAndInput } from '../Common';
 import { useMemoizedFn } from 'ahooks';
 import first from 'lodash/first';

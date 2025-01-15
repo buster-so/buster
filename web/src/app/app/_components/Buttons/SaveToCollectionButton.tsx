@@ -1,4 +1,4 @@
-import { BusterCollectionListItem } from '@/api/busterv2/collection';
+import { BusterCollectionListItem } from '@/api/buster-rest/collection';
 import { NewCollectionModal } from '@/app/app/collections/_NewCollectionModal';
 import { AppMaterialIcons, AppTooltip } from '@/components';
 import { AppDropdownSelect } from '@/components/dropdown';

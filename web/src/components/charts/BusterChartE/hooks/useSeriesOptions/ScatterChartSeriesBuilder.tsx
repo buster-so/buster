@@ -5,7 +5,7 @@ import type {
 } from 'echarts/types/dist/echarts';
 import { BusterChartProps } from '../../../interfaces';
 import { ChartEncodes, ScatterAxis } from '../../../interfaces';
-import { DEFAULT_CHART_CONFIG } from '@/api/busterv2/threads';
+import { DEFAULT_CHART_CONFIG } from '@/api/buster-rest/threads';
 import isEmpty from 'lodash/isEmpty';
 import { appendToKeyValueChain } from '../../../chartHooks';
 

@@ -14,11 +14,11 @@ import {
   BusterThreadStepEvent_Thought,
   BusterThreadStepEvent_FetchingData,
   BusterThreadStepEvent_SqlEvaluation
-} from '@/api/busterv2/threads';
+} from '@/api/buster-rest/threads';
 import { IBusterThreadMessage } from './interfaces';
 import { timeout } from '@/utils';
 import { upgradeMessageToIMessage, upgradeThreadToIThread } from './helpers';
-import { BusterDatasetListItem } from '@/api/busterv2/datasets';
+import { BusterDatasetListItem } from '@/api/buster-rest/datasets';
 import { ThreadDuplicate } from '@/api/buster-socket/threads';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { isDev } from '@/config';

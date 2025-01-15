@@ -1,7 +1,7 @@
 import { ChartType, ViewType } from '@/components/charts';
 import { ChartIconType } from './config';
 import { SelectChartTypeProps } from './SelectChartType';
-import type { IBusterThreadMessageChartConfig } from '@/api/busterv2';
+import type { IBusterThreadMessageChartConfig } from '@/api/buster-rest';
 import omit from 'lodash/omit';
 
 export const DetermineSelectedChartType: Record<

@@ -5,7 +5,7 @@ import { AppMaterialIcons } from '@/components/icons';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Text, Title } from '@/components/text';
 import { useAntToken } from '@/styles/useAntToken';
-import { BusterThought, BusterThoughtCode, BusterThoughtText } from '@/api/busterv2';
+import { BusterThought, BusterThoughtCode, BusterThoughtText } from '@/api/buster-rest';
 import { createStyles } from 'antd-style';
 import { Collapse, CollapseProps, ConfigProvider } from 'antd';
 import { useDebounce, useMemoizedFn } from 'ahooks';

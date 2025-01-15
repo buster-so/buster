@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { LabelAndInput } from '../Common';
 import { InputNumber, Slider } from 'antd';
-import type { IBusterThreadMessageChartConfig } from '@/api/busterv2';
+import type { IBusterThreadMessageChartConfig } from '@/api/buster-rest';
 import { useMemoizedFn } from 'ahooks';
 
 export const EditPieMinimumSlicePercentage = React.memo(

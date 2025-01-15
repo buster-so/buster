@@ -1,4 +1,4 @@
-import { IBusterThreadMessageChartConfig } from '@/api/busterv2/threads/threadConfigInterfaces';
+import { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads/threadConfigInterfaces';
 import React, { useMemo, useState } from 'react';
 import type { ChartEncodes, Trendline } from '@/components/charts';
 import { v4 as uuidv4 } from 'uuid';
@@ -9,7 +9,7 @@ import { AppMaterialIcons } from '@/components';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CollapseDelete } from '../../Common/CollapseDelete';
 import { formatLabel } from '@/utils';
-import { ColumnMetaData } from '@/api/busterv2';
+import { ColumnMetaData } from '@/api/buster-rest';
 import { TrendlineColumnId } from './EditTrendlineColumnId';
 import { TrendlineColorPicker } from './EditTrendlineColorPicker';
 import { TrendlineLabel } from './EditTrendlineLabel';

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { LabelAndInput } from '../../../Common/LabelAndInput';
-import { IBusterThreadMessageChartConfig } from '@/api/busterv2';
+import { IBusterThreadMessageChartConfig } from '@/api/buster-rest';
 import { Segmented } from 'antd';
 
 const options: { label: string; value: IBusterThreadMessageChartConfig['xAxisLabelRotation'] }[] = [

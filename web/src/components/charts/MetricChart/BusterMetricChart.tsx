@@ -4,7 +4,7 @@ import { formatLabel, JsonDataFrameOperationsSingle, timeout } from '@/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Title } from '@/components';
 import { ColumnLabelFormat, MetricChartProps } from '../interfaces';
-import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/busterv2';
+import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/buster-rest';
 import type { BusterMetricChartProps } from './interfaces';
 
 export const BusterMetricChart: React.FC<BusterMetricChartProps> = React.memo(

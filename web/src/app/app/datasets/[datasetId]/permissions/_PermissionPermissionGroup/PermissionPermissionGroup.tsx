@@ -6,8 +6,8 @@ import { Button } from 'antd';
 import { AppMaterialIcons } from '@/components';
 import { PermissionListPermissionGroupContainer } from './PermissionListPermissionGroupContainer';
 import { NewPermissionGroupModal } from './NewPermissionGroupModal';
-import { useDebounceSearch } from '../useDebounceSearch';
-import { useDatasetListPermissionGroups } from '@/api/busterv2';
+import { useDebounceSearch } from '@/hooks';
+import { useDatasetListPermissionGroups } from '@/api/buster-rest';
 
 export const PermissionPermissionGroup: React.FC<{
   datasetId: string;

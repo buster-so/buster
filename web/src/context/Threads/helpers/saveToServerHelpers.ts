@@ -4,7 +4,7 @@ import {
   DEFAULT_COLUMN_LABEL_FORMAT,
   DEFAULT_COLUMN_SETTINGS,
   IBusterThreadMessageChartConfig
-} from '@/api/busterv2';
+} from '@/api/buster-rest';
 import { getChangedValues } from '@/utils/objects';
 import { IBusterThreadMessage } from '../interfaces';
 import isEqual from 'lodash/isEqual';

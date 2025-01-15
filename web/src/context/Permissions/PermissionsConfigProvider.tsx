@@ -5,7 +5,7 @@ import {
   BusterPermissionGroup,
   BusterPermissionTeam,
   BusterPermissionUser
-} from '@/api/busterv2/permissions';
+} from '@/api/buster-rest/permissions';
 import {
   PermissionGroupUpdateRequest,
   PermissionTeamUpdateRequest,

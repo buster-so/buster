@@ -1,4 +1,4 @@
-import { BusterTerm, BusterTermListItem } from '@/api/busterv2';
+import { BusterTerm, BusterTermListItem } from '@/api/buster-rest';
 import React, { useEffect } from 'react';
 import { useBusterWebSocket } from '../BusterWebSocket';
 import { useMemoizedFn, useMount, useUnmount } from 'ahooks';

@@ -1,9 +1,9 @@
-import type { IBusterThreadMessageChartConfig } from '@/api/busterv2/threads/threadConfigInterfaces';
+import type { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads/threadConfigInterfaces';
 import { isNumericColumnStyle, isNumericColumnType } from '@/utils';
 import React, { useMemo } from 'react';
 import { LabelAndInput } from '../../Common';
 import { Button, Select } from 'antd';
-import { DEFAULT_COLUMN_SETTINGS, type ColumnMetaData } from '@/api/busterv2';
+import { DEFAULT_COLUMN_SETTINGS, type ColumnMetaData } from '@/api/buster-rest';
 import { useMemoizedFn } from 'ahooks';
 import { createColumnFieldOptions } from './helpers';
 import { AppMaterialIcons, AppPopover } from '@/components';

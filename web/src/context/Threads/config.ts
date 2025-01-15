@@ -1,4 +1,4 @@
-import { BusterThreadListItem, BusterVerificationStatus } from '@/api/busterv2';
+import { BusterThreadListItem, BusterVerificationStatus } from '@/api/buster-rest';
 import { IBusterThread } from './interfaces';
 import { ShareRole } from '@/api/buster-socket/threads';
 

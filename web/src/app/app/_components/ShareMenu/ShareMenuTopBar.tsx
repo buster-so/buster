@@ -1,7 +1,7 @@
 import { AppSegmented, AppSegmentedProps } from '@/components';
 import React, { useMemo } from 'react';
 import { CopyLinkButton } from './CopyLinkButton';
-import { BusterShareAssetType } from '@/api/busterv2';
+import { BusterShareAssetType } from '@/api/buster-rest';
 import { ShareRole } from '@/api/buster-socket/threads';
 import { useMemoizedFn } from 'ahooks';
 import { SegmentedValue } from 'antd/es/segmented';

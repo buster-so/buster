@@ -1,4 +1,4 @@
-import { ColumnMetaData, IBusterThreadMessageChartConfig } from '@/api/busterv2';
+import { ColumnMetaData, IBusterThreadMessageChartConfig } from '@/api/buster-rest';
 import { formatLabel } from '@/utils';
 import { ColumnTypeIcon } from '../SelectAxis/config';
 

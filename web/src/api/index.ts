@@ -1,1 +1,1 @@
-export * from './buster';
+export * from './buster-rest';

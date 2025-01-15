@@ -1,4 +1,4 @@
-import { BusterShareAssetType } from '@/api/busterv2';
+import { BusterShareAssetType } from '@/api/buster-rest';
 import { AppMaterialIcons, AppTooltip } from '@/components';
 import { useUserConfigContextSelector } from '@/context/Users';
 import React, { useCallback, useMemo } from 'react';

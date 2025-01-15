@@ -11,7 +11,7 @@ import {
   BusterThreadStepEvent_Thought,
   BusterThreadStepEvent_SqlEvaluation,
   BusterThreadUser
-} from '@/api/busterv2';
+} from '@/api/buster-rest';
 
 export enum ThreadResponses {
   '/threads/list:getThreadsList' = '/threads/list:getThreadsList',

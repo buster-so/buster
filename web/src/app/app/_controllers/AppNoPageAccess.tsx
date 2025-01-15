@@ -1,6 +1,6 @@
 'use client';
 
-import { BusterShareAssetType } from '@/api/busterv2';
+import { BusterShareAssetType } from '@/api/buster-rest';
 import { asset_typeToTranslation } from '@/app/_helpers';
 import { BusterLogo } from '@/assets/svg/BusterLogo';
 import { Title } from '@/components/text';

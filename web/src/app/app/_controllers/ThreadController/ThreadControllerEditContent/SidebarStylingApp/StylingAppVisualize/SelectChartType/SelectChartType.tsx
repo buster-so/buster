@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { createStyles } from 'antd-style';
 import { ChartEncodes, ChartType, ViewType } from '@/components/charts';
-import { IBusterThreadMessageChartConfig } from '@/api/busterv2/threads/threadConfigInterfaces';
+import { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads/threadConfigInterfaces';
 import { AppTooltip } from '@/components';
 import { CHART_ICON_LIST, ChartIconType, DETERMINE_SELECTED_CHART_TYPE_ORDER } from './config';
 import {
@@ -11,7 +11,7 @@ import {
 } from './SelectedChartTypeMethod';
 import { useBusterThreadsContextSelector } from '@/context/Threads';
 import { useMemoizedFn } from 'ahooks';
-import { ColumnMetaData } from '@/api/busterv2';
+import { ColumnMetaData } from '@/api/buster-rest';
 import { addOpacityToColor, NUMBER_TYPES } from '@/utils';
 
 export interface SelectChartTypeProps {

@@ -1,9 +1,9 @@
-import { BusterOrganizationRole, BusterUserPalette, BusterUserResponse } from '@/api/busterv2';
+import { BusterOrganizationRole, BusterUserPalette, BusterUserResponse } from '@/api/buster-rest';
 import React, { PropsWithChildren, useRef, useState } from 'react';
 import { useBusterWebSocket } from '../BusterWebSocket';
 import { useMemoizedFn } from 'ahooks';
 import { useFavoriteProvider } from './useFavoriteProvider';
-import { getUserInfo } from '@/api/busterv2/users/requests';
+import { getUserInfo } from '@/api/buster-rest/users/requests';
 import { useSupabaseContext } from '../Supabase';
 import {
   ContextSelector,

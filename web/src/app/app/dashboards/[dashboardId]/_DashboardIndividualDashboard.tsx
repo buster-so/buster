@@ -1,4 +1,4 @@
-import { BusterDashboardMetric, BusterDashboardResponse } from '@/api/busterv2';
+import { BusterDashboardMetric, BusterDashboardResponse } from '@/api/buster-rest';
 import React, { useEffect, useMemo, useRef } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import { Button } from 'antd';

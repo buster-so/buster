@@ -9,7 +9,7 @@ import { initialFilterOptionKey, useCollectionsContextSelector } from '@/context
 import { BusterList, BusterListColumn, BusterListRow } from '@/components/list';
 import { useMemoizedFn, useMount, useSize, useUnmount } from 'ahooks';
 import { NewCollectionModal } from './_NewCollectionModal';
-import { BusterCollectionListItem } from '@/api/busterv2/collection';
+import { BusterCollectionListItem } from '@/api/buster-rest/collection';
 import { ListEmptyState } from '../_components/Lists/ListEmptyState';
 import { CollectionSelectedPopup } from './_CollectionSelectedPopup';
 

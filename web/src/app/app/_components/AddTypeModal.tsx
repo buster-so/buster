@@ -4,10 +4,14 @@ import { AppMaterialIcons, AppSegmented, Text } from '@/components';
 import { BusterList, BusterListColumn, BusterListRow } from '@/components/list';
 import { useMemoizedFn, useThrottleFn } from 'ahooks';
 import { boldHighlights, formatDate } from '@/utils';
-import { BusterDashboardResponse, BusterSearchResult, BusterShareAssetType } from '@/api/busterv2';
+import {
+  BusterDashboardResponse,
+  BusterSearchResult,
+  BusterShareAssetType
+} from '@/api/buster-rest';
 import { asset_typeToIcon } from '@/app/_helpers';
 import { CircleSpinnerLoaderContainer } from '@/components/loaders';
-import { BusterCollection } from '@/api/busterv2/collection';
+import { BusterCollection } from '@/api/buster-rest/collection';
 import { useBusterSearchContextSelector } from '@/context/Search';
 import isEmpty from 'lodash/isEmpty';
 import { useDashboardContextSelector } from '@/context/Dashboards';

@@ -1,4 +1,4 @@
-import { ListDatasetGroupsResponse, useDatasetUpdateDatasetGroups } from '@/api/busterv2';
+import { ListDatasetGroupsResponse, useDatasetUpdateDatasetGroups } from '@/api/buster-rest';
 import { BusterListColumn, BusterListRowItem } from '@/components/list';
 import { BusterInfiniteList } from '@/components/list/BusterInfiniteList';
 import { useMemoizedFn } from 'ahooks';
