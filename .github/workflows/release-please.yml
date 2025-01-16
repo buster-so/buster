@@ -1,0 +1,27 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run Release Please
+        uses: googleapis/release-please-action@v4
+        with:
+          release-type: simple
+          package-name: buster
+          path: .
+          changelog-path: CHANGELOG.md
+          version-file: version.txt
+          bump-minor-pre-major: true
+          skip-github-release: true
+          skip-pull-requests: true
+          token: ${{ secrets.MY_RELEASE_PLEASE_TOKEN }}
