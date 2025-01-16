@@ -1,10 +1,10 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { createStyles } from 'antd-style';
 import type { AppMessageContainerMessage } from './AppMessagesContainer';
-import { useMemoizedFn, useScroll } from 'ahooks';
+import { useScroll } from 'ahooks';
 import last from 'lodash/last';
 import { AppHistoryMessage } from './AppHistoryMessage';
-import useSmoothScroller from '@/hooks/react/useSmoothScroll';
+import { useSmoothScroller } from '@/hooks';
 
 const useStyles = createStyles(({ css }) => ({
   container: css`

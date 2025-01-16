@@ -1,7 +1,7 @@
 'use client';
 
-import { Alert, Button } from 'antd';
-import { Component, ErrorInfo, ReactNode, useEffect } from 'react';
+import { Button } from 'antd';
+import { Component, ErrorInfo, ReactNode } from 'react';
 import { Title } from '@/components/text';
 
 interface Props {

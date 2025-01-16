@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 import { CopyLinkButton } from './CopyLinkButton';
 import { Button, Divider } from 'antd';
 import { AppMaterialIcons, BackButton } from '@/components';
-import { CircleButton } from './CircleButton';
 import { useStyles } from './useStyles';
 import { AccessDropdown } from './AccessDropdown';
 import { useUserConfigContextSelector } from '@/context/Users';
@@ -149,9 +148,7 @@ const ShareOption: React.FC<{
         //   styles.hoverListItem
       )}>
       <div className="flex items-center space-x-2">
-        <CircleButton>
-          <AppMaterialIcons icon={'groups_2'} size={14} />
-        </CircleButton>
+        <Button shape="circle" icon={<AppMaterialIcons icon={'groups_2'} size={14} />} />
 
         <Text>{title}</Text>
       </div>

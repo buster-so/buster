@@ -1,4 +1,4 @@
-export * from './charts/interfaces/chartBaseInterfaces';
+export type * from './charts/interfaces/chartBaseInterfaces';
 export * from './icons';
 export * from './loaders';
 export * from './buttons';
@@ -11,3 +11,4 @@ export * from './card';
 export * from './text';
 export * from './layout';
 export * from './modal';
+export * from './breadcrumb';

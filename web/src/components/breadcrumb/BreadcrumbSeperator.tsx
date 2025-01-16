@@ -1,5 +1,5 @@
-import { AppMaterialIcons } from '@/components';
 import React from 'react';
+import { AppMaterialIcons } from '../icons';
 
 export const BreadcrumbSeperator: React.FC<{
   style?: React.CSSProperties;

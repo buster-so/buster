@@ -5,7 +5,7 @@ import { BusterSocketResponseBase } from '@/api/buster-socket/baseInterfaces';
 import { createBusterResponse } from './helpers';
 import { Priority, getPriorityFromRoute } from './messagePriority';
 import { DeviceCapabilities, getDeviceCapabilities } from './deviceCapabilities';
-import useWindowFocus from '@/hooks/useWindowFocus';
+import { useWindowFocus } from '@/hooks';
 import { SupabaseContextReturnType } from '../Supabase';
 
 type WebSocketHookProps = {

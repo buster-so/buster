@@ -7,7 +7,7 @@ import { PostHogConfig } from 'posthog-js';
 import { isDev } from '@/config';
 import posthog from 'posthog-js';
 import { useUserConfigContextSelector } from '../Users';
-
+import { isServer } from '@tanstack/react-query';
 const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY!;
 
 export const BusterPosthogProvider: React.FC<PropsWithChildren> = React.memo(({ children }) => {
@@ -38,7 +38,7 @@ const PosthogWrapper: React.FC<PropsWithChildren<{}>> = ({ children }) => {
   const team = userTeams[0];
 
   useEffect(() => {
-    if (POSTHOG_KEY && typeof window !== 'undefined' && user && posthog && team) {
+    if (POSTHOG_KEY && !isServer && user && posthog && team) {
       posthog.init(POSTHOG_KEY, options);
 
       const email = user.email;

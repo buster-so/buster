@@ -120,8 +120,8 @@ export const AppCodeEditor = forwardRef<AppCodeEditorHandle, AppCodeEditorProps>
     const onMountCodeEditor = useMemoizedFn(
       async (editor: editor.IStandaloneCodeEditor, monaco: typeof import('monaco-editor')) => {
         const [GithubLightTheme, NightOwlTheme] = await Promise.all([
-          (await import('./Github_light')).default,
-          (await import('./Tomorrow-Night')).default
+          (await import('./themes/github_light_theme')).default,
+          (await import('./themes/tomorrow_night_theme')).default
         ]);
 
         if (language === 'yaml') {

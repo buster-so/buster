@@ -1,0 +1,15 @@
+{
+  "name": "buster",
+  "version": "0.0.1",
+  "private": true,
+  "workspaces": [
+    "web",
+    "api",
+    "cli"
+  ],
+  "scripts": {
+    "version:patch": "npm version patch -m \"chore: bump version to %s\"",
+    "version:minor": "npm version minor -m \"chore: bump version to %s\"",
+    "version:major": "npm version major -m \"chore: bump version to %s\""
+  }
+}

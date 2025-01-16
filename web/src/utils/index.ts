@@ -13,3 +13,4 @@ export * from './math';
 export * from './columnFormatter';
 export * from './colors';
 export * from './regression';
+export * from './canvas';

@@ -7,7 +7,7 @@ import { useUserConfigContextSelector } from '@/context/Users';
 import { useBusterThreadsContextSelector } from '@/context/Threads';
 import { useMemoizedFn } from 'ahooks';
 import { Button } from 'antd';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { StatusNotRequestedIcon } from '@/assets';
 
 export const StatusBadgeButton: React.FC<{

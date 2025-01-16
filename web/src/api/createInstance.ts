@@ -2,6 +2,7 @@ import { BusterRoutes } from '@/routes/busterRoutes/busterRoutes';
 import axios, { AxiosError } from 'axios';
 import { rustErrorHandler } from './buster-rest/errors';
 import { AxiosRequestHeaders } from 'axios';
+import { isServer } from '@tanstack/react-query';
 import { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 
 const AXIOS_TIMEOUT = 120000; // 2 minutes
@@ -22,7 +23,7 @@ export const createInstance = (baseURL: string) => {
     (error: AxiosError) => {
       // console.error(error);
       //Redirect to login if 401 unauthorized error
-      if (error.status === 401 && typeof window !== 'undefined') {
+      if (error.status === 401 && !isServer) {
         window.location.href = BusterRoutes.AUTH_LOGIN;
       }
       return Promise.reject(rustErrorHandler(error));
@@ -40,7 +41,6 @@ export const defaultRequestHandler = async (
   }
 ) => {
   let token = '';
-  const isServer = typeof window === 'undefined';
   if (isServer) {
     const { cookies } = require('next/headers');
     const cookiesManager = cookies() as ReadonlyRequestCookies;

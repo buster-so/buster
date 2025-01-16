@@ -1,13 +1,13 @@
 'use client';
 
-import React, { PropsWithChildren, useEffect } from 'react';
+import React, { PropsWithChildren } from 'react';
 
 import { Layout } from 'antd';
 import { createStyles } from 'antd-style';
 import { appContentHeaderHeight } from './AppContentHeader';
 const { Content } = Layout;
 
-const useStyles = createStyles(({ token, css }) => {
+const useStyles = createStyles(({ css }) => {
   return {
     scrollableContainer: css`
       max-height: calc(100% - ${appContentHeaderHeight}px);

@@ -5,7 +5,6 @@ import { useMemoizedFn, useMount, useThrottleFn } from 'ahooks';
 import { useAntToken } from '@/styles/useAntToken';
 import { useBusterNewThreadsContextSelector } from '@/context/Threads';
 import { inputHasText } from '@/utils';
-import { useDatasetContextSelector } from '@/context/Datasets';
 import { useBusterSearchContextSelector } from '@/context/Search';
 import { BusterSearchResult } from '@/api/buster-rest';
 import { useBusterNotifications } from '@/context/BusterNotifications';

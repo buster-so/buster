@@ -6,7 +6,7 @@ import { createStyles } from 'antd-style';
 
 export const appContentHeaderHeight = 38;
 
-const useStyles = createStyles(({ token, isDarkMode }) => ({
+const useStyles = createStyles(({ token }) => ({
   header: {
     borderBottom: `0.5px solid${token.colorBorder}`,
     height: appContentHeaderHeight

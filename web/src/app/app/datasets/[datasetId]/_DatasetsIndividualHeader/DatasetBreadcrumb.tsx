@@ -1,5 +1,5 @@
 import { createBusterRoute, BusterRoutes } from '@/routes';
-import { BreadcrumbSeperator } from '@/styles/context/useBreadcrumbStyles';
+import { BreadcrumbSeperator } from '@/components';
 import { Breadcrumb } from 'antd';
 import Link from 'next/link';
 import React, { useMemo } from 'react';

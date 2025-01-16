@@ -6,7 +6,7 @@ import isFunction from 'lodash/isFunction';
  *
  * @param {Function} callback - The function to be called when the window gains focus.
  */
-const useWindowFocus = (callback: () => void, offFocusCallback?: () => void) => {
+export const useWindowFocus = (callback: () => void, offFocusCallback?: () => void) => {
   useEffect(() => {
     if (!isFunction(callback)) {
       return;

@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 import { AppContentHeader } from '../../_components/AppContentHeader';
 import { useDashboardContextSelector, useIndividualDashboard } from '@/context/Dashboards';
 import { Breadcrumb, Button, Checkbox, Dropdown, MenuProps } from 'antd';
-import { BreadcrumbSeperator } from '@/styles/context/useBreadcrumbStyles';
+import { BreadcrumbSeperator } from '@/components';
 import Link from 'next/link';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { BusterRoutes } from '@/routes';

@@ -1,4 +1,4 @@
-import tailwind from '../../../../tailwind.config';
+import tailwind from '../../../../../tailwind.config';
 import type { editor } from 'monaco-editor';
 const colors = tailwind.theme.extend.colors;
 

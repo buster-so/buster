@@ -57,3 +57,6 @@ Cargo.lock
 
 *.env
 .DS_Store
+
+# Node.js dependencies
+node_modules/

@@ -8,7 +8,7 @@ import { useMemoizedFn, useMouse } from 'ahooks';
 import { BusterDragColumnMarkers } from './_BusterDragColumnMarkers';
 import { calculateColumnSpan, columnSpansToPercent } from './config';
 import { createStyles } from 'antd-style';
-import SplitPane, { Pane } from '../layout/SplitPane';
+import SplitPane, { Pane } from '../layout/AppSplitter/SplitPane';
 import { useDropzoneStyles } from './BusterResizeRows';
 
 type ContainerProps = {

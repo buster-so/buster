@@ -12,7 +12,7 @@ import { BigQueryForm } from './_forms/BigQueryForm';
 import { SnowflakeForm } from './_forms/SnowflakeForm';
 import { RedshiftForm } from './_forms/RedshiftForm';
 import { DataBricksForm } from './_forms/DataBricksForm';
-import { useConfetti } from '@/hooks/useConfetti';
+import { useConfetti } from '@/hooks/dom/useConfetti';
 import { SqlServerForm } from './_forms/SqlServerForm';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 

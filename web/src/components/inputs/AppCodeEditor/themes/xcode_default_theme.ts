@@ -1,4 +1,4 @@
-import tailwind from '../../../../tailwind.config';
+import tailwind from '../../../../../tailwind.config';
 const colors = tailwind.theme.extend.colors;
 
 const theme = {

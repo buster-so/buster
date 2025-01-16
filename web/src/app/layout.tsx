@@ -3,7 +3,7 @@ import React from 'react';
 import '../styles/styles.scss';
 
 import { BusterStyleProvider } from '@/context/BusterStyles/BusterStyles';
-import { GlobalErrorComponent } from './app/_components/GlobalErrorComponent';
+import { GlobalErrorComponent } from '../components/error/GlobalErrorComponent';
 
 export const metadata: Metadata = {
   title: 'Buster',

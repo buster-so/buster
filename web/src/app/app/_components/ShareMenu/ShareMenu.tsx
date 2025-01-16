@@ -9,7 +9,6 @@ import { inputHasText } from '@/utils';
 import { validate } from 'email-validator';
 import { ShareWithGroupAndTeam } from './ShareWithTeamAndGroup';
 import { ShareMenuTopBar, ShareMenuTopBarOptions } from './ShareMenuTopBar';
-import { CircleButton } from './CircleButton';
 import { useStyles } from './useStyles';
 import { IndividualSharePerson } from './IndividualSharePerson';
 import { ShareMenuContentPublish } from './ShareMenuContentPublish';
@@ -389,9 +388,7 @@ const ShareWithGroupAndTeamOption: React.FC<{
         'flex cursor-pointer items-center space-x-1.5 px-3 py-2',
         styles.hoverListItem
       )}>
-      <CircleButton>
-        <AppMaterialIcons icon="groups_2" size={14} />
-      </CircleButton>
+      <Button shape="circle" icon={<AppMaterialIcons icon="groups_2" size={14} />} />
       <div className={cx('flex w-full items-center justify-between space-x-1.5')}>
         <Text>Share with groups & teams</Text>
         <AppMaterialIcons icon="chevron_right" />

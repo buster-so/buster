@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useMemoizedFn, useThrottleFn, useUpdateEffect } from 'ahooks';
 
 export function useSmoothScroller({

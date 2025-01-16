@@ -1,4 +1,3 @@
-import { headers } from 'next/headers';
 import { createClient } from '@/context/Supabase/server';
 import { redirect } from 'next/navigation';
 import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes/busterRoutes';

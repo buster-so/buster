@@ -1,9 +1,9 @@
 import { ThreadContentController } from '@/app/app/_controllers/ThreadController';
 import { AppAssetCheckLayout } from '@/app/app/_layouts';
-import { getAppSplitterLayout } from '@/components/layout/splitContentHelper';
+import { getAppSplitterLayout } from '@/components/layout';
 import React from 'react';
 
-export default function CollectionThreadPage({
+export default async function CollectionThreadPage({
   params: { threadId, collectionId }
 }: {
   params: {
@@ -11,7 +11,7 @@ export default function CollectionThreadPage({
     collectionId: string;
   };
 }) {
-  const threadLayout = getAppSplitterLayout('thread', ['auto', '360px']);
+  const threadLayout = await getAppSplitterLayout('thread', ['auto', '360px']);
 
   return (
     <AppAssetCheckLayout threadId={threadId} type="thread">

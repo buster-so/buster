@@ -1,14 +1,8 @@
-import { useAntToken } from '@/styles/useAntToken';
+'use client';
+
 import { useMemoizedFn } from 'ahooks';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  forwardRef,
-  useImperativeHandle
-} from 'react';
-import SplitPane, { Pane } from '@/components/layout/SplitPane';
+import React, { useEffect, useMemo, useState, forwardRef, useImperativeHandle } from 'react';
+import SplitPane, { Pane } from './SplitPane';
 import { createAutoSaveId } from './helper';
 import Cookies from 'js-cookie';
 import { createStyles } from 'antd-style';

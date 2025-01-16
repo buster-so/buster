@@ -1,11 +1,9 @@
 'use server';
 
-import { AppProviders } from '@/context/AppProviders';
 import { useSupabaseServerContext } from '@/context/Supabase/useSupabaseContext';
 import React from 'react';
-import { AppLayout } from './_controllers/AppLayout';
-import { getAppSplitterLayout } from '@/components/layout/splitContentHelper';
 import { getUserInfo } from '@/api/buster-rest/users/requests';
+import { getAppSplitterLayout } from '@/components/layout/AppSplitter';
 import { useBusterSupabaseAuthMethods } from '@/hooks/useBusterSupabaseAuthMethods';
 import { createBusterRoute } from '@/routes';
 import { BusterAppRoutes } from '@/routes/busterRoutes/busterAppRoutes';
@@ -22,7 +20,7 @@ export default async function Layout({
   const headersList = headers();
   const supabaseContext = await useSupabaseServerContext();
   const userInfo = await getUserInfo({ jwtToken: supabaseContext.accessToken });
-  const defaultLayout = getAppSplitterLayout('app-layout', ['230px', 'auto']);
+  const defaultLayout = await getAppSplitterLayout('app-layout', ['230px', 'auto']);
   const { signOut } = useBusterSupabaseAuthMethods();
   const pathname = headersList.get('x-next-pathname') as string;
   const cookiePathname = cookies().get('x-next-pathname')?.value;

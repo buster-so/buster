@@ -4,10 +4,11 @@ import React from 'react';
 
 export const CopyLinkButton: React.FC<{
   onCopyLink: () => void;
-}> = React.memo(({ onCopyLink }) => {
+  text?: string;
+}> = React.memo(({ onCopyLink, text = 'Copy link' }) => {
   return (
     <Button type="text" onClick={onCopyLink} icon={<AppMaterialIcons icon="link" size={16} />}>
-      Copy link
+      {text}
     </Button>
   );
 });

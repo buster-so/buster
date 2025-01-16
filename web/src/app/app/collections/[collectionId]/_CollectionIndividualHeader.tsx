@@ -8,7 +8,7 @@ import {
   useIndividualCollection
 } from '@/context/Collections';
 import { Breadcrumb, Button, Dropdown, MenuProps } from 'antd';
-import { BreadcrumbSeperator } from '@/styles/context/useBreadcrumbStyles';
+import { BreadcrumbSeperator } from '@/components';
 import Link from 'next/link';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { BusterRoutes } from '@/routes';

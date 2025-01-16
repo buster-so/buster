@@ -17,17 +17,18 @@ export const getPredictableItemBasedOnText = <T>(array: T[], input: string): T =
   return array[index] as T;
 };
 
-export const getPredictableTailwindColor = (input: string): string => {
-  const twentyTailwindColors = [
-      'bg-red-300',
-      'bg-orange-300',
-      'bg-amber-300',
-      'bg-yellow-300',
-      'bg-lime-300',
-      'bg-green-300',
-      'bg-blue-300',
-      'bg-gray-300'
-    ],
-    predictableIndex = getPredictableItemBasedOnText(twentyTailwindColors, input);
-  return predictableIndex;
+export const getPredictableTailwindColor = (
+  input: string,
+  classColors: string[] = [
+    'bg-red-300',
+    'bg-orange-300',
+    'bg-amber-300',
+    'bg-yellow-300',
+    'bg-lime-300',
+    'bg-green-300',
+    'bg-blue-300',
+    'bg-gray-300'
+  ]
+): string => {
+  return getPredictableItemBasedOnText(classColors, input);
 };

@@ -2,11 +2,11 @@ import {
   ThreadContentController,
   ThreadControllerHeader
 } from '../../_controllers/ThreadController';
-import { getAppSplitterLayout } from '@/components/layout/splitContentHelper';
+import { getAppSplitterLayout } from '@/components/layout';
 import { AppAssetCheckLayout } from '../../_layouts/AppAssetCheckLayout';
 import { AppContentHeader } from '../../_components/AppContentHeader';
 
-export default function ThreadsPage({
+export default async function ThreadsPage({
   params: { threadId },
   searchParams
 }: {
@@ -15,7 +15,7 @@ export default function ThreadsPage({
   };
   searchParams: { embed?: string };
 }) {
-  const threadLayout = getAppSplitterLayout('thread', ['auto', '360px']);
+  const threadLayout = await getAppSplitterLayout('thread', ['auto', '360px']);
   const embedView = searchParams.embed === 'true';
 
   return (

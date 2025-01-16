@@ -11,7 +11,7 @@ import {
   useBusterThreads,
   useBusterThreadsContextSelector
 } from '@/context/Threads';
-import { BreadcrumbSeperator } from '@/styles/context/useBreadcrumbStyles';
+import { BreadcrumbSeperator } from '@/components';
 import { useDashboardContextSelector } from '@/context/Dashboards';
 import { SaveToDashboardButton } from './SaveToDashboardButton';
 import {

@@ -4,17 +4,6 @@ import max from 'lodash/max';
 import isString from 'lodash/isString';
 import isDate from 'lodash/isDate';
 
-const DO_NOT_FORMAT_NUMERICAL_KEYS = ['year', '_years', '_id', 'id_'];
-const DO_NOT_FORMAT_NUMERICAL_KEY_STRICT = ['id'];
-
-export const shouldRoundNumber = (value: string | number | undefined, key?: string) => {
-  return (
-    isNumber(value) &&
-    (!DO_NOT_FORMAT_NUMERICAL_KEYS.some((k) => key?.includes(k)) ||
-      (key && DO_NOT_FORMAT_NUMERICAL_KEY_STRICT.includes(key)))
-  );
-};
-
 export const roundNumber = (
   input: string | number | undefined,
   minDecimals = 0,

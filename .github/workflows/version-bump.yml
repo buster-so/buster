@@ -1,0 +1,73 @@
+name: Version Bump
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  version-bump:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+      - name: Determine Version Bump
+        id: bump
+        run: |
+          if [[ ${{ contains(github.event.pull_request.labels.*.name, 'bug') }} == 'true' ]]; then
+            echo "bump=patch" >> $GITHUB_OUTPUT
+          elif [[ ${{ contains(github.event.pull_request.labels.*.name, 'enhancement') }} == 'true' ]]; then
+            echo "bump=minor" >> $GITHUB_OUTPUT
+          elif [[ ${{ contains(github.event.pull_request.labels.*.name, 'breaking') }} == 'true' ]]; then
+            echo "bump=major" >> $GITHUB_OUTPUT
+          else
+            echo "bump=none" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Bump Version
+        if: steps.bump.outputs.bump != 'none'
+        id: version
+        run: |
+          NEW_VERSION=$(npm run version:${{ steps.bump.outputs.bump }} --silent)
+          echo "new_version=${NEW_VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Push changes
+        if: steps.bump.outputs.bump != 'none'
+        run: |
+          git push
+          git push --tags
+
+      - name: Create GitHub Release
+        if: steps.bump.outputs.bump != 'none'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.new_version }}
+          name: Release ${{ steps.version.outputs.new_version }}
+          body: |
+            Changes in this release:
+            ${{ github.event.pull_request.title }}
+            
+            ${{ github.event.pull_request.body }}
+            
+            PR: #${{ github.event.pull_request.number }}
+          draft: false
+          prerelease: false 

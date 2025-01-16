@@ -1,11 +1,10 @@
 'use client';
 
 import { useMemoizedFn, useMount } from 'ahooks';
-import { Modal } from 'antd';
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect, useMemo } from 'react';
 import React from 'react';
-import { AppModal } from '@/components';
+import { AppModal } from '../modal/AppModal';
 
 type PreventNavigationProps = {
   isDirty: boolean;
@@ -39,8 +38,6 @@ export const PreventNavigation: React.FC<PreventNavigationProps> = React.memo(
 
     // Used to make popstate event trigger when back button is clicked.
     // Without this, the popstate event will not fire because it needs there to be a href to return.
-    if (typeof window !== 'undefined') {
-    }
 
     /**
      * Used to prevent navigation when use click in navigation `<Link />` or `<a />`.
