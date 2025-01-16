@@ -1,0 +1,19 @@
+{
+  "packages": {
+    "api": {
+      "release-type": "rust",
+      "draft": false,
+      "changelog-path": "api/CHANGELOG.md",
+      "package-name": "api",
+      "include-component-in-tag": true
+    },
+    "web": {
+      "release-type": "node",
+      "draft": false,
+      "changelog-path": "web/CHANGELOG.md",
+      "package-name": "web",
+      "include-component-in-tag": true
+    }
+  },
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
+}
