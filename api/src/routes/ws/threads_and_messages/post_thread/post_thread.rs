@@ -1,12 +1,13 @@
 use crate::{
     database::{
-        enums::{AssetPermissionRole, AssetType, IdentityType},
+        enums::{AssetPermissionRole, AssetType, IdentityType, UserOrganizationRole},
         lib::{get_pg_pool, get_sqlx_pool, ContextJsonBody, MessageResponses},
-        models::{AssetPermission, DataSource, Dataset, DatasetColumn},
+        models::{AssetPermission, DataSource, Dataset, DatasetColumn, UserToOrganization},
         schema::{
-            asset_permissions, data_sources, dataset_columns, datasets,
+            asset_permissions, data_sources, dataset_columns, dataset_permissions, datasets,
             datasets_to_permission_groups, messages, permission_groups_to_identities,
-            teams_to_users, terms, terms_to_datasets, threads,
+            permission_groups_to_users, teams_to_users, terms, terms_to_datasets, threads,
+            users_to_organizations,
         },
     },
     routes::ws::{
@@ -674,31 +675,46 @@ pub async fn get_user_datasets_with_metadata(user_id: &Uuid) -> Result<Vec<Datas
         Err(e) => return Err(anyhow!("Unable to get connection from pool: {}", e)),
     };
 
+    // Get user's organization and role
+    let user_organization_record = match users_to_organizations::table
+        .filter(users_to_organizations::user_id.eq(user_id))
+        .filter(users_to_organizations::deleted_at.is_null())
+        .select(users_to_organizations::all_columns)
+        .first::<UserToOrganization>(&mut conn)
+        .await
+    {
+        Ok(organization_id) => organization_id,
+        Err(e) => return Err(anyhow!("Unable to get organization from database: {}", e)),
+    };
+
+    let datasets_with_metadata = match &user_organization_record.role {
+        UserOrganizationRole::WorkspaceAdmin
+        | UserOrganizationRole::DataAdmin
+        | UserOrganizationRole::Querier => {
+            get_org_datasets_with_metadata(&user_organization_record.organization_id).await?
+        }
+        UserOrganizationRole::RestrictedQuerier => {
+            get_restricted_user_datasets_with_metadata(user_id).await?
+        }
+        UserOrganizationRole::Viewer => Vec::new(),
+    };
+
+    Ok(datasets_with_metadata)
+}
+
+async fn get_org_datasets_with_metadata(
+    organization_id: &Uuid,
+) -> Result<Vec<DatasetWithMetadata>> {
+    let mut conn = match get_pg_pool().get().await {
+        Ok(conn) => conn,
+        Err(e) => return Err(anyhow!("Unable to get connection from pool: {}", e)),
+    };
+
     let dataset_records = match datasets::table
         .inner_join(data_sources::table.on(datasets::data_source_id.eq(data_sources::id)))
-        .inner_join(
-            datasets_to_permission_groups::table.on(datasets::id
-                .eq(datasets_to_permission_groups::dataset_id)
-                .and(datasets_to_permission_groups::deleted_at.is_null())),
-        )
-        .inner_join(
-            permission_groups_to_identities::table.on(
-                datasets_to_permission_groups::permission_group_id
-                    .eq(permission_groups_to_identities::permission_group_id)
-                    .and(permission_groups_to_identities::deleted_at.is_null()),
-            ),
-        )
-        .left_join(
-            teams_to_users::table.on(permission_groups_to_identities::identity_id
-                .eq(teams_to_users::team_id)
-                .and(teams_to_users::deleted_at.is_null())),
-        )
+        .filter(datasets::organization_id.eq(organization_id))
         .filter(datasets::deleted_at.is_null())
-        .filter(
-            permission_groups_to_identities::identity_id
-                .eq(user_id)
-                .or(teams_to_users::user_id.eq(user_id)),
-        )
+        .filter(datasets::enabled.eq(true))
         .select((Dataset::as_select(), DataSource::as_select()))
         .load::<(Dataset, DataSource)>(&mut conn)
         .await
@@ -707,6 +723,103 @@ pub async fn get_user_datasets_with_metadata(user_id: &Uuid) -> Result<Vec<Datas
         Err(e) => return Err(anyhow!("Unable to get datasets from database: {}", e)),
     };
 
+    process_dataset_records(dataset_records).await
+}
+
+async fn get_restricted_user_datasets_with_metadata(
+    user_id: &Uuid,
+) -> Result<Vec<DatasetWithMetadata>> {
+    let direct_user_permissioned_datasets_handle = {
+        let user_id = user_id.clone();
+        tokio::spawn(async move {
+            let mut conn = match get_pg_pool().get().await {
+                Ok(conn) => conn,
+                Err(e) => return Err(anyhow!("Unable to get connection from pool: {}", e)),
+            };
+
+            let result = match datasets::table
+                .inner_join(data_sources::table.on(datasets::data_source_id.eq(data_sources::id)))
+                .inner_join(
+                    dataset_permissions::table.on(dataset_permissions::dataset_id.eq(datasets::id)),
+                )
+                .filter(dataset_permissions::permission_id.eq(user_id))
+                .filter(dataset_permissions::permission_type.eq("user"))
+                .filter(datasets::deleted_at.is_null())
+                .filter(datasets::enabled.eq(true))
+                .select((Dataset::as_select(), DataSource::as_select()))
+                .load::<(Dataset, DataSource)>(&mut conn)
+                .await
+            {
+                Ok(datasets) => datasets,
+                Err(e) => return Err(anyhow!("Unable to get datasets from database: {}", e)),
+            };
+
+            Ok(result)
+        })
+    };
+
+    let permission_group_datasets_handle = {
+        let user_id = user_id.clone();
+        tokio::spawn(async move {
+            let mut conn = match get_pg_pool().get().await {
+                Ok(conn) => conn,
+                Err(e) => return Err(anyhow!("Unable to get connection from pool: {}", e)),
+            };
+
+            let result = match datasets::table
+                .inner_join(data_sources::table.on(datasets::data_source_id.eq(data_sources::id)))
+                .inner_join(
+                    dataset_permissions::table.on(dataset_permissions::dataset_id.eq(datasets::id)),
+                )
+                .inner_join(
+                    permission_groups_to_users::table
+                        .on(permission_groups_to_users::user_id.eq(user_id)),
+                )
+                .filter(
+                    dataset_permissions::permission_id
+                        .eq(permission_groups_to_users::permission_group_id),
+                )
+                .filter(dataset_permissions::permission_type.eq("permission_group"))
+                .filter(datasets::deleted_at.is_null())
+                .filter(datasets::enabled.eq(true))
+                .select((Dataset::as_select(), DataSource::as_select()))
+                .load::<(Dataset, DataSource)>(&mut conn)
+                .await
+            {
+                Ok(datasets) => datasets,
+                Err(e) => return Err(anyhow!("Unable to get datasets from database: {}", e)),
+            };
+
+            Ok(result)
+        })
+    };
+
+    let mut all_datasets = Vec::new();
+
+    match direct_user_permissioned_datasets_handle.await {
+        Ok(Ok(direct_user_permissioned_datasets)) => {
+            all_datasets.extend(direct_user_permissioned_datasets)
+        }
+        Ok(Err(e)) => return Err(anyhow!("Unable to get datasets from database: {}", e)),
+        Err(e) => return Err(anyhow!("Unable to get datasets from database: {}", e)),
+    }
+
+    match permission_group_datasets_handle.await {
+        Ok(Ok(permission_group_datasets)) => all_datasets.extend(permission_group_datasets),
+        Ok(Err(e)) => return Err(anyhow!("Unable to get datasets from database: {}", e)),
+        Err(e) => return Err(anyhow!("Unable to get datasets from database: {}", e)),
+    }
+
+    // Deduplicate based on dataset id
+    all_datasets.sort_by_key(|k| k.0.id);
+    all_datasets.dedup_by_key(|k| k.0.id);
+
+    process_dataset_records(all_datasets).await
+}
+
+async fn process_dataset_records(
+    dataset_records: Vec<(Dataset, DataSource)>,
+) -> Result<Vec<DatasetWithMetadata>> {
     let mut datasets_with_metadata = Vec::new();
     let mut column_fetch_tasks = Vec::new();
 
@@ -1514,7 +1627,7 @@ async fn update_thread_and_message(
              ON CONFLICT (asset_id, asset_type) 
              DO UPDATE SET
                  content = EXCLUDED.content,
-                 updated_at = NOW()"
+                 updated_at = NOW()",
         )
         .bind::<diesel::sql_types::Uuid, _>(thread_id)
         .bind::<diesel::sql_types::Text, _>(summary_question.unwrap_or(title))

@@ -2,6 +2,7 @@ use anyhow::{anyhow, Result};
 use axum::{extract::Json, Extension};
 use diesel::{ExpressionMethods, JoinOnDsl, QueryDsl};
 use diesel_async::RunQueryDsl;
+use reqwest::StatusCode;
 use serde::Deserialize;
 use uuid::Uuid;
 
@@ -13,7 +14,10 @@ use crate::{
         schema::{data_sources, datasets, users_to_organizations},
     },
     routes::rest::ApiResponse,
-    utils::user::user_info::get_user_organization_id,
+    utils::{
+        security::checks::is_user_workspace_admin_or_data_admin,
+        user::user_info::get_user_organization_id,
+    },
 };
 
 #[derive(Debug, Deserialize)]
@@ -26,12 +30,32 @@ pub async fn post_dataset(
     Extension(user): Extension<User>,
     Json(request): Json<PostDatasetReq>,
 ) -> Result<ApiResponse<Dataset>, (axum::http::StatusCode, String)> {
+    match is_user_workspace_admin_or_data_admin(&user.id).await {
+        Ok(true) => (),
+        Ok(false) => {
+            return Err((
+                StatusCode::FORBIDDEN,
+                "Insufficient permissions".to_string(),
+            ))
+        }
+        Err(e) => {
+            tracing::error!("Error checking user permissions: {:?}", e);
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Error checking user permissions".to_string(),
+            ));
+        }
+    }
+
     let dataset = match post_dataset_handler(&user.id, &request.data_source_id, &request.name).await
     {
         Ok(dataset) => dataset,
         Err(e) => {
             tracing::error!("Error creating dataset: {:?}", e);
-            return Err((axum::http::StatusCode::INTERNAL_SERVER_ERROR, e.to_string()));
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Error creating dataset".to_string(),
+            ));
         }
     };
 
