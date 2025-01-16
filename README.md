@@ -19,7 +19,7 @@
    </div>
 
    <div>
-      <a href="https://github.com/buster-so/warehouse/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-red.svg?style=flat-square" alt="MIT License"></a>
+      <a href="https://github.com/buster-so/warehouse/blob/main/LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-red.svg?style=flat-square" ></a>
       <a href="https://www.ycombinator.com/companies/buster"><img src="https://img.shields.io/badge/Y%20Combinator-W24-orange?style=flat-square" alt="Y Combinator W24"></a>
    </div>
 </div>

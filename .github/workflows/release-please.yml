@@ -18,7 +18,7 @@ jobs:
         with:
           token: ${{ secrets.MY_RELEASE_PLEASE_TOKEN }}
           config-file: release-please-config.json
-          skip-github-pull-request: true
+          skip-github-pull-request: false
       
       - uses: actions/checkout@v4
         if: ${{ steps.release.outputs.release_created }}
