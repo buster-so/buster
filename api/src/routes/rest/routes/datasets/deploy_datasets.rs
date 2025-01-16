@@ -21,8 +21,7 @@ use crate::{
             credentials::get_data_source_credentials,
             import_dataset_columns::retrieve_dataset_columns,
             write_query_engine::write_query_engine,
-        },
-        user::user_info::get_user_organization_id,
+        }, security::checks::is_user_workspace_admin_or_data_admin, user::user_info::get_user_organization_id
     },
 };
 
@@ -124,6 +123,20 @@ pub async fn deploy_datasets(
     Extension(user): Extension<User>,
     Json(request): Json<DeployDatasetsRequest>,
 ) -> Result<ApiResponse<DeployDatasetsResponse>, (axum::http::StatusCode, String)> {
+    match is_user_workspace_admin_or_data_admin(&user.id).await {
+        Ok(true) => (),
+        Ok(false) => {
+            return Err((
+                axum::http::StatusCode::FORBIDDEN,
+                "Insufficient permissions".to_string(),
+            ))
+        }
+        Err(e) => {
+            tracing::error!("Error checking user permissions: {:?}", e);
+            return Err((axum::http::StatusCode::INTERNAL_SERVER_ERROR, e.to_string()));
+        }
+    }
+
     let is_simple = match request {
         DeployDatasetsRequest::Full(_) => false,
         DeployDatasetsRequest::Simple { .. } => true,

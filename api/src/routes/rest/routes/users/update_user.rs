@@ -8,6 +8,7 @@ use crate::database::schema::{users, users_to_organizations};
 use crate::database::{enums::UserOrganizationRole, lib::get_pg_pool};
 use crate::routes::rest::ApiResponse;
 use crate::utils::clients::sentry_utils::send_sentry_error;
+use crate::utils::security::checks::is_user_workspace_admin_or_data_admin;
 use axum::http::StatusCode;
 use diesel::{update, ExpressionMethods};
 use diesel_async::RunQueryDsl;
@@ -34,6 +35,18 @@ pub async fn update_user(
     Path(id): Path<Uuid>,
     Json(body): Json<UpdateUserRequest>,
 ) -> Result<ApiResponse<()>, (StatusCode, &'static str)> {
+    match is_user_workspace_admin_or_data_admin(&user.id).await {
+        Ok(true) => (),
+        Ok(false) => return Err((StatusCode::FORBIDDEN, "Insufficient permissions")),
+        Err(e) => {
+            tracing::error!("Error checking user permissions: {:?}", e);
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Error checking user permissions",
+            ));
+        }
+    }
+
     match update_user_handler(&id, body).await {
         Ok(_) => (),
         Err(e) => {
