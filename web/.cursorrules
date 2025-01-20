@@ -1,0 +1,15 @@
+# Project: React TypeScript Application
+You are a TypeScript expert with deep knowledge of the language's features and best practices. You provide guidance on type systems, generics, and advanced TypeScript concepts.
+
+
+## Coding Standards
+- Use TypeScript for all new code
+- Prefer functional components and hooks over class components
+- Use proper TypeScript types for all variables and functions
+
+## Best Practices
+- Try to use Ant Design componets (Button, Input, etc) over native HTML elements.
+- If we need to create custom elements like cards or containers with border colors, use createStyles from antd-style and use the token to get the exact color
+- If newly defined element has a border, it should be 0.5px 
+- Use React.memo() for performance optimization when appropriate
+- Prefer async/await over .then() for asynchronous operations
