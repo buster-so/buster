@@ -4,14 +4,16 @@ import { Text, Title } from '@/components/text';
 import { Card, Select } from 'antd';
 import { useMemoizedFn } from 'ahooks';
 
-export const UserDefaultAccess: React.FC<{ user: OrganizationUser; isAdmin: boolean }> = ({
-  user,
-  isAdmin
-}) => {
+export const UserDefaultAccess: React.FC<{
+  user: OrganizationUser;
+  isAdmin: boolean;
+  refetchUser: () => void;
+}> = ({ user, isAdmin, refetchUser }) => {
   const { mutateAsync, isPending } = useUpdateUser();
 
-  const onChange = useMemoizedFn((value: string) => {
-    mutateAsync({ userId: user.id, role: value as OrganizationUser['role'] });
+  const onChange = useMemoizedFn(async (value: string) => {
+    await mutateAsync({ userId: user.id, role: value as OrganizationUser['role'] });
+    refetchUser();
   });
 
   return (
