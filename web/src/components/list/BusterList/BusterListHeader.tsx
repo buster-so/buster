@@ -28,7 +28,7 @@ export const BusterListHeader: React.FC<{
 
     return (
       <div
-        className={cx(styles.header, 'group', rowClassName, 'pr-[24px]', {
+        className={cx(styles.header, 'group', rowClassName, 'pr-6', {
           'pl-3.5': !onGlobalSelectChange
         })}>
         {showCheckboxColumn && (

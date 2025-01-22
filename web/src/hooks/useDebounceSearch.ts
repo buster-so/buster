@@ -34,7 +34,7 @@ export const useDebounceSearch = <T>({
     (text: string) => {
       updateFilteredItems(text);
     },
-    { wait: debounceTime, leading: true }
+    { wait: debounceTime }
   );
 
   const handleSearchChange = useMemoizedFn((text: string) => {
