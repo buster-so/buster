@@ -7,104 +7,13 @@ import { BusterRoutes, createBusterRoute } from '@/routes';
 import { Menu, MenuProps } from 'antd';
 import { createStyles } from 'antd-style';
 import Link from 'next/link';
-import React, { useContext, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Text } from '@/components';
 import { SignOutButton } from './SignOutButton';
 import { useMemoizedFn } from 'ahooks';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 
 type MenuItem = Required<MenuProps>['items'][number];
-
-const workSpaceItems: MenuItem[] = [
-  {
-    key: BusterRoutes.SETTINGS_GENERAL,
-    label: (
-      <Link
-        href={createBusterRoute({
-          route: BusterRoutes.SETTINGS_GENERAL
-        })}>
-        General
-      </Link>
-    )
-  },
-  {
-    key: BusterRoutes.SETTINGS_PERMISSIONS,
-    label: (
-      <Link
-        href={createBusterRoute({
-          route: BusterRoutes.SETTINGS_PERMISSIONS
-        })}>
-        Permissions
-      </Link>
-    )
-  },
-  {
-    key: BusterRoutes.SETTINGS_STORAGE,
-    label: (
-      <Link
-        href={createBusterRoute({
-          route: BusterRoutes.SETTINGS_STORAGE
-        })}>
-        Storage
-      </Link>
-    )
-  },
-  {
-    key: BusterRoutes.SETTINGS_DATASOURCES,
-    label: (
-      <Link
-        href={createBusterRoute({
-          route: BusterRoutes.SETTINGS_DATASOURCES
-        })}>
-        Data Sources
-      </Link>
-    )
-  },
-  {
-    key: BusterRoutes.SETTINGS_INTEGRATIONS,
-    label: (
-      <Link
-        href={createBusterRoute({
-          route: BusterRoutes.SETTINGS_INTEGRATIONS
-        })}>
-        Integrations
-      </Link>
-    )
-  },
-  {
-    key: BusterRoutes.SETTINGS_API_KEYS,
-    label: (
-      <Link
-        href={createBusterRoute({
-          route: BusterRoutes.SETTINGS_API_KEYS
-        })}>
-        API Keys
-      </Link>
-    )
-  },
-  {
-    key: BusterRoutes.SETTINGS_EMBEDS,
-    label: (
-      <Link
-        href={createBusterRoute({
-          route: BusterRoutes.SETTINGS_EMBEDS
-        })}>
-        Embedded Analytics
-      </Link>
-    )
-  },
-  {
-    key: BusterRoutes.SETTINGS_BILLING,
-    label: (
-      <Link
-        href={createBusterRoute({
-          route: BusterRoutes.SETTINGS_BILLING
-        })}>
-        Billing
-      </Link>
-    )
-  }
-];
 
 const accountItems: MenuItem[] = [
   {
@@ -233,6 +142,7 @@ export const AppSidebarSettings: React.FC<{
   const { openInfoMessage } = useBusterNotifications();
   const currentRoute = useAppLayoutContextSelector((s) => s.currentRoute);
   const userTeams = useUserConfigContextSelector((state) => state.userTeams);
+  const isAdmin = useUserConfigContextSelector((state) => state.isAdmin);
 
   const onAddTeam = useMemoizedFn(() => {
     openInfoMessage('Adding team is not currently supported');
@@ -268,6 +178,101 @@ export const AppSidebarSettings: React.FC<{
     [userTeams, onAddTeam, styles.addButton, cx]
   );
 
+  const workSpaceItems: MenuItem[] = useMemo(
+    () => [
+      {
+        key: BusterRoutes.SETTINGS_GENERAL,
+        label: (
+          <Link
+            href={createBusterRoute({
+              route: BusterRoutes.SETTINGS_GENERAL
+            })}>
+            General
+          </Link>
+        )
+      },
+      {
+        key: BusterRoutes.SETTINGS_PERMISSIONS,
+        label: (
+          <Link
+            href={createBusterRoute({
+              route: BusterRoutes.SETTINGS_PERMISSIONS
+            })}>
+            Permissions
+          </Link>
+        )
+      },
+      {
+        key: BusterRoutes.SETTINGS_STORAGE,
+        label: (
+          <Link
+            href={createBusterRoute({
+              route: BusterRoutes.SETTINGS_STORAGE
+            })}>
+            Storage
+          </Link>
+        )
+      },
+      {
+        key: BusterRoutes.SETTINGS_DATASOURCES,
+        label: (
+          <Link
+            href={createBusterRoute({
+              route: BusterRoutes.SETTINGS_DATASOURCES
+            })}>
+            Data Sources
+          </Link>
+        )
+      },
+      {
+        key: BusterRoutes.SETTINGS_INTEGRATIONS,
+        label: (
+          <Link
+            href={createBusterRoute({
+              route: BusterRoutes.SETTINGS_INTEGRATIONS
+            })}>
+            Integrations
+          </Link>
+        )
+      },
+      {
+        key: BusterRoutes.SETTINGS_API_KEYS,
+        label: (
+          <Link
+            href={createBusterRoute({
+              route: BusterRoutes.SETTINGS_API_KEYS
+            })}>
+            API Keys
+          </Link>
+        ),
+        hidden: !isAdmin
+      },
+      {
+        key: BusterRoutes.SETTINGS_EMBEDS,
+        label: (
+          <Link
+            href={createBusterRoute({
+              route: BusterRoutes.SETTINGS_EMBEDS
+            })}>
+            Embedded Analytics
+          </Link>
+        )
+      },
+      {
+        key: BusterRoutes.SETTINGS_BILLING,
+        label: (
+          <Link
+            href={createBusterRoute({
+              route: BusterRoutes.SETTINGS_BILLING
+            })}>
+            Billing
+          </Link>
+        )
+      }
+    ],
+    [isAdmin]
+  );
+
   const menus = useMemo(
     () => [
       {
@@ -300,6 +305,10 @@ export const AppSidebarSettings: React.FC<{
 
   const allKeys = menus.map((menu) => menu.key);
 
+  const selectedKeys = useMemo(() => {
+    return currentRoute ? [currentRoute] : [];
+  }, [currentRoute]);
+
   return (
     <div className="flex h-full flex-col justify-between space-y-5">
       <div className="flex h-full flex-col space-y-5">
@@ -312,7 +321,7 @@ export const AppSidebarSettings: React.FC<{
 
             <Menu
               mode="inline"
-              selectedKeys={currentRoute ? [currentRoute] : []}
+              selectedKeys={selectedKeys}
               defaultOpenKeys={allKeys}
               items={menu.children}
             />

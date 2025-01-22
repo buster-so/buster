@@ -1,15 +1,12 @@
-import { getMyUserInfo, prefetchGetUserPermissionGroups } from '@/api/buster-rest/users';
+import { prefetchGetUserPermissionGroups } from '@/api/buster-rest/users';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { UserPermissionGroupsController } from './UserPermissionGroupsController';
-import { useSupabaseServerContext } from '@/context/Supabase/useSupabaseContext';
-import { checkIfUserIsAdmin } from '../../../../../../context/Users/helpers';
+import { useCheckIfUserIsAdmin_server } from '../../../../../../server_context/user';
 import { redirect } from 'next/navigation';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 
 export default async function Page({ params }: { params: { userId: string } }) {
-  const supabaseContext = await useSupabaseServerContext();
-  const userInfo = await getMyUserInfo({ jwtToken: supabaseContext.accessToken });
-  const isAdmin = checkIfUserIsAdmin(userInfo);
+  const isAdmin = await useCheckIfUserIsAdmin_server();
 
   if (!isAdmin) {
     return redirect(
