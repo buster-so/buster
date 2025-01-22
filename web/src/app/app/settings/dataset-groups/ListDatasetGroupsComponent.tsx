@@ -23,8 +23,6 @@ export const ListDatasetGroupsComponent: React.FC<{
     []
   );
 
-  console.log('datasetGroups', datasetGroups);
-
   const datasetGroupsRows: BusterListRowItem[] = useMemo(() => {
     return datasetGroups.reduce<BusterListRowItem[]>((acc, datasetGroup) => {
       const rowItem: BusterListRowItem = {

@@ -8,7 +8,7 @@ import { formatDate } from '@/utils';
 import { BusterList, BusterListColumn, BusterListRow } from '@/components/list';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { getShareStatus } from '../_components/Lists';
-import { ListEmptyState } from '../_components/Lists/ListEmptyState';
+import { ListEmptyStateWithButton } from '../../../components/list';
 import { useMemoizedFn, useUnmount } from 'ahooks';
 import { DashboardSelectedOptionPopup } from './_DashboardSelectedPopup';
 
@@ -91,7 +91,7 @@ export const DashboardListContent: React.FC<{}> = () => {
             onSelectChange={setSelectedDashboardIds}
             emptyState={
               loadedDashboards ? (
-                <ListEmptyState
+                <ListEmptyStateWithButton
                   title={`You don’t have any dashboards yet.`}
                   buttonText="New dashboard"
                   description={`You don’t have any dashboards. As soon as you do, they will start to  appear here.`}

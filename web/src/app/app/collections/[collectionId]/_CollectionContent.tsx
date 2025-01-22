@@ -1,7 +1,7 @@
 'use client';
 
 import { useCollectionsContextSelector, useIndividualCollection } from '@/context/Collections';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { AppMaterialIcons, BusterUserAvatar } from '@/components';
 import { createBusterRoute, BusterRoutes } from '@/routes';
 import { formatDate } from '@/utils';
@@ -11,17 +11,14 @@ import {
   BusterCollectionListItem
 } from '@/api/buster_rest/collection';
 import { Text } from '@/components';
-import { ListEmptyState } from '../../_components/Lists/ListEmptyState';
+import { ListEmptyStateWithButton } from '../../../../components/list';
 import { AddTypeModal } from '../../_components/AddTypeModal';
 import { BusterShareAssetType } from '@/api/buster_rest';
-import { useMemoizedFn, useSize, useUnmount } from 'ahooks';
+import { useMemoizedFn } from 'ahooks';
 import { BusterList, BusterListColumn, BusterListRow } from '@/components/list';
 import { CollectionIndividualSelectedPopup } from './_CollectionsIndividualPopup';
 
 export const CollectionContent: React.FC<{}> = () => {
-  const unsubscribeToGetCollection = useCollectionsContextSelector(
-    (x) => x.unsubscribeToGetCollection
-  );
   const openedCollectionId = useCollectionsContextSelector((x) => x.openedCollectionId);
   const openAddTypeModal = useCollectionsContextSelector((x) => x.openAddTypeModal);
   const setOpenAddTypeModal = useCollectionsContextSelector((x) => x.setOpenAddTypeModal);
@@ -144,6 +141,10 @@ const CollectionList: React.FC<{
     setSelectedRowKeys([]);
   });
 
+  const onOpenAddTypeModal = useMemoizedFn(() => {
+    setOpenAddTypeModal(true);
+  });
+
   return (
     <div className="relative flex h-full flex-col items-center">
       <BusterList
@@ -153,13 +154,11 @@ const CollectionList: React.FC<{
         selectedRowKeys={selectedRowKeys}
         emptyState={
           loadedAsset ? (
-            <ListEmptyState
+            <ListEmptyStateWithButton
               title="You haven’t saved anything to your collection yet."
               buttonText="Add to collection"
               description="As soon as you add metrics and dashboards to your collection, they will appear here."
-              onClick={() => {
-                setOpenAddTypeModal(true);
-              }}
+              onClick={onOpenAddTypeModal}
             />
           ) : (
             <></>

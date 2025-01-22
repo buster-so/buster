@@ -7,7 +7,7 @@ import { formatDate } from '@/utils';
 import { BusterList, BusterListColumn, BusterListRow } from '@/components/list';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { BusterDatasetListItem } from '@/api/buster_rest/datasets';
-import { ListEmptyState } from '../_components/Lists/ListEmptyState';
+import { ListEmptyStateWithButton } from '../../../components/list';
 import { useDatasetContextSelector } from '@/context/Datasets';
 import { useMemoizedFn } from 'ahooks';
 import { DatasetSelectedOptionPopup } from './_DatasetSelectedPopup';
@@ -94,7 +94,7 @@ export const DatasetListContent: React.FC<{
             !isFetchedDatasets ? (
               <></>
             ) : (
-              <ListEmptyState
+              <ListEmptyStateWithButton
                 isAdmin={isAdmin}
                 title="You don't have any datasets yet."
                 buttonText="New dataset"

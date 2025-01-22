@@ -3,6 +3,7 @@ import {
   BusterInfiniteList,
   BusterListColumn,
   BusterListRowItem,
+  EmptyStateList,
   InfiniteListContainer
 } from '@/components/list';
 import { Card } from 'antd';
@@ -11,7 +12,6 @@ import { Text } from '@/components/text';
 import { OrganizationUserRoleText } from './config';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { ListUserItem } from '../../_components/ListContent';
-import { UserListPopupContainer } from './UserListPopupContainer';
 
 export const ListUsersComponent: React.FC<{
   users: OrganizationUser[];
@@ -95,39 +95,20 @@ export const ListUsersComponent: React.FC<{
   );
 
   return (
-    <InfiniteListContainer
-      showContainerBorder={false}
-      popupNode={
-        <UserListPopupContainer
-          selectedRowKeys={selectedRowKeys}
-          onSelectChange={setSelectedRowKeys}
-        />
-      }>
+    <InfiniteListContainer showContainerBorder={false}>
       <BusterInfiniteList
         columns={columns}
         rows={rows}
         showHeader={true}
         showSelectAll={false}
-        onSelectChange={setSelectedRowKeys}
-        selectedRowKeys={selectedRowKeys}
+        rowClassName="!pl-[30px]"
+        // onSelectChange={setSelectedRowKeys}
+        // selectedRowKeys={selectedRowKeys}
         columnRowVariant="default"
-        emptyState={<EmptyState isFetched={isFetched} />}
+        emptyState={<EmptyStateList text="No users found" variant="card" show={isFetched} />}
       />
     </InfiniteListContainer>
   );
 });
 
 ListUsersComponent.displayName = 'ListUsersComponent';
-
-const EmptyState = React.memo(({ isFetched }: { isFetched: boolean }) => {
-  if (!isFetched) return <></>;
-  return (
-    <div className="mx-[30px] flex w-full items-center justify-center">
-      <Card className="w-full py-24 text-center">
-        <Text type="tertiary">No users found</Text>
-      </Card>
-    </div>
-  );
-});
-
-EmptyState.displayName = 'EmptyState';

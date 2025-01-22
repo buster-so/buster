@@ -2,14 +2,14 @@ import React from 'react';
 import { AppMaterialIcons, Text, Title } from '@/components';
 import { Button } from 'antd';
 
-export const ListEmptyState: React.FC<{
+export const ListEmptyStateWithButton: React.FC<{
   isAdmin?: boolean;
   title: string;
   description: string;
   onClick: () => void;
   buttonText: string;
   loading?: boolean;
-}> = ({ isAdmin = true, title, buttonText, description, onClick, loading = false }) => {
+}> = React.memo(({ isAdmin = true, title, buttonText, description, onClick, loading = false }) => {
   return (
     <div className="flex h-full w-full flex-col">
       <div
@@ -37,4 +37,6 @@ export const ListEmptyState: React.FC<{
       </div>
     </div>
   );
-};
+});
+
+ListEmptyStateWithButton.displayName = 'ListEmptyStateWithButton';

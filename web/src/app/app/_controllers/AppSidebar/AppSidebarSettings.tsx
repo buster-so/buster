@@ -179,128 +179,131 @@ export const AppSidebarSettings: React.FC<{
   );
 
   const workSpaceItems: MenuItem[] = useMemo(
-    () => [
-      {
-        key: BusterRoutes.SETTINGS_GENERAL,
-        label: (
-          <Link
-            href={createBusterRoute({
-              route: BusterRoutes.SETTINGS_GENERAL
-            })}>
-            General
-          </Link>
-        )
-      },
-      {
-        key: BusterRoutes.SETTINGS_PERMISSIONS,
-        label: (
-          <Link
-            href={createBusterRoute({
-              route: BusterRoutes.SETTINGS_PERMISSIONS
-            })}>
-            Permissions
-          </Link>
-        )
-      },
-      {
-        key: BusterRoutes.SETTINGS_STORAGE,
-        label: (
-          <Link
-            href={createBusterRoute({
-              route: BusterRoutes.SETTINGS_STORAGE
-            })}>
-            Storage
-          </Link>
-        )
-      },
-      {
-        key: BusterRoutes.SETTINGS_DATASOURCES,
-        label: (
-          <Link
-            href={createBusterRoute({
-              route: BusterRoutes.SETTINGS_DATASOURCES
-            })}>
-            Data Sources
-          </Link>
-        )
-      },
-      {
-        key: BusterRoutes.SETTINGS_INTEGRATIONS,
-        label: (
-          <Link
-            href={createBusterRoute({
-              route: BusterRoutes.SETTINGS_INTEGRATIONS
-            })}>
-            Integrations
-          </Link>
-        )
-      },
-      {
-        key: BusterRoutes.SETTINGS_API_KEYS,
-        label: (
-          <Link
-            href={createBusterRoute({
-              route: BusterRoutes.SETTINGS_API_KEYS
-            })}>
-            API Keys
-          </Link>
-        ),
-        hidden: !isAdmin
-      },
-      {
-        key: BusterRoutes.SETTINGS_EMBEDS,
-        label: (
-          <Link
-            href={createBusterRoute({
-              route: BusterRoutes.SETTINGS_EMBEDS
-            })}>
-            Embedded Analytics
-          </Link>
-        )
-      },
-      {
-        key: BusterRoutes.SETTINGS_BILLING,
-        label: (
-          <Link
-            href={createBusterRoute({
-              route: BusterRoutes.SETTINGS_BILLING
-            })}>
-            Billing
-          </Link>
-        )
-      }
-    ],
+    () =>
+      [
+        {
+          key: BusterRoutes.SETTINGS_GENERAL,
+          label: (
+            <Link
+              href={createBusterRoute({
+                route: BusterRoutes.SETTINGS_GENERAL
+              })}>
+              General
+            </Link>
+          )
+        },
+        {
+          key: BusterRoutes.SETTINGS_PERMISSIONS,
+          label: (
+            <Link
+              href={createBusterRoute({
+                route: BusterRoutes.SETTINGS_PERMISSIONS
+              })}>
+              Permissions
+            </Link>
+          )
+        },
+        {
+          key: BusterRoutes.SETTINGS_STORAGE,
+          label: (
+            <Link
+              href={createBusterRoute({
+                route: BusterRoutes.SETTINGS_STORAGE
+              })}>
+              Storage
+            </Link>
+          )
+        },
+        {
+          key: BusterRoutes.SETTINGS_DATASOURCES,
+          label: (
+            <Link
+              href={createBusterRoute({
+                route: BusterRoutes.SETTINGS_DATASOURCES
+              })}>
+              Data Sources
+            </Link>
+          )
+        },
+        {
+          key: BusterRoutes.SETTINGS_INTEGRATIONS,
+          label: (
+            <Link
+              href={createBusterRoute({
+                route: BusterRoutes.SETTINGS_INTEGRATIONS
+              })}>
+              Integrations
+            </Link>
+          )
+        },
+        {
+          key: BusterRoutes.SETTINGS_API_KEYS,
+          label: (
+            <Link
+              href={createBusterRoute({
+                route: BusterRoutes.SETTINGS_API_KEYS
+              })}>
+              API Keys
+            </Link>
+          ),
+          hidden: !isAdmin
+        },
+        {
+          key: BusterRoutes.SETTINGS_EMBEDS,
+          label: (
+            <Link
+              href={createBusterRoute({
+                route: BusterRoutes.SETTINGS_EMBEDS
+              })}>
+              Embedded Analytics
+            </Link>
+          )
+        },
+        {
+          key: BusterRoutes.SETTINGS_BILLING,
+          label: (
+            <Link
+              href={createBusterRoute({
+                route: BusterRoutes.SETTINGS_BILLING
+              })}>
+              Billing
+            </Link>
+          )
+        }
+      ].filter((item) => !item.hidden),
     [isAdmin]
   );
 
   const menus = useMemo(
-    () => [
-      {
-        key: 'myaccount',
-        label: 'Account',
-        icon: <AppMaterialIcons icon="account_circle" fill />,
-        children: accountItems
-      },
-      {
-        key: 'workspace',
-        label: 'Workspace',
-        icon: <AppMaterialIcons size={16} icon="apartment" />,
-        children: workSpaceItems
-      },
-      {
-        key: 'permissionsandsecurity',
-        label: 'Permissions & Security',
-        icon: <AppMaterialIcons size={16} icon="lock" />,
-        children: permissionsAndSecurityItems
-      }
-      // {
-      //   key: 'teams',
-      //   label: 'Teams',
-      //   icon: <AppMaterialIcons icon="groups" />,
-      //   children: teamsList
-      // }
-    ],
-    [workSpaceItems, permissionsAndSecurityItems, accountItems, teamsList]
+    () =>
+      [
+        {
+          key: 'myaccount',
+          label: 'Account',
+          icon: <AppMaterialIcons icon="account_circle" fill />,
+          children: accountItems
+        },
+        {
+          key: 'workspace',
+          label: 'Workspace',
+          icon: <AppMaterialIcons size={16} icon="apartment" />,
+          children: workSpaceItems
+        },
+        {
+          key: 'permissionsandsecurity',
+          label: 'Permissions & Security',
+          icon: <AppMaterialIcons size={16} icon="lock" />,
+          children: permissionsAndSecurityItems,
+          hidden: !isAdmin
+        }
+        // {
+        //   key: 'teams',
+        //   label: 'Teams',
+        //   icon: <AppMaterialIcons icon="groups" />,
+        //   children: teamsList
+        // }
+      ].filter((item) => !item.hidden),
+    [workSpaceItems, isAdmin, permissionsAndSecurityItems, accountItems, teamsList]
   );
 
   const allKeys = menus.map((menu) => menu.key);
