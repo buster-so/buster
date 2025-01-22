@@ -1,4 +1,4 @@
-import { BusterSearchRequest } from '@/api/buster-socket/search';
+import { BusterSearchRequest } from '@/api/buster_socket/search';
 
 export const allBusterSearchRequestKeys = [
   // 'query',

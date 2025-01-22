@@ -5,8 +5,8 @@ import {
   DEFAULT_CHART_CONFIG_ENTRIES,
   DEFAULT_COLUMN_LABEL_FORMAT,
   DEFAULT_COLUMN_SETTINGS
-} from '@/api/buster-rest';
-import { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads/threadConfigInterfaces';
+} from '@/api/buster_rest';
+import { IBusterThreadMessageChartConfig } from '@/api/buster_rest/threads/threadConfigInterfaces';
 import {
   BarAndLineAxis,
   BusterChartConfigProps,

@@ -7,7 +7,7 @@ import { ThreadItemsContainer } from './_ThreadItemsContainer';
 import { ThreadSidebarHeader } from './_ThreadSidebarHeader';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useMemoizedFn, useMount } from 'ahooks';
-import { BusterVerificationStatus } from '@/api/buster-rest';
+import { BusterVerificationStatus } from '@/api/buster_rest';
 
 export const ThreadListContainer: React.FC<{
   className?: string;

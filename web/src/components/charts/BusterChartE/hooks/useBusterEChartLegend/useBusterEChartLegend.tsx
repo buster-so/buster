@@ -16,7 +16,7 @@ import {
   ShowLegendHeadline
 } from '../../../interfaces';
 import { useDebounceFn, useMemoizedFn } from 'ahooks';
-import { DEFAULT_CHART_CONFIG } from '@/api/buster-rest';
+import { DEFAULT_CHART_CONFIG } from '@/api/buster_rest';
 import { DatasetOption, TRENDLINE_DELIMETER } from '../../../chartHooks';
 import { GOAL_LINE_DELIMETER } from '../useSeriesOptions/useGoalLines';
 

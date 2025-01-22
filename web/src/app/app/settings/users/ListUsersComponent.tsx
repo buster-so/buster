@@ -1,4 +1,4 @@
-import { OrganizationUser } from '@/api/buster-rest/organizations/responseInterfaces';
+import { OrganizationUser } from '@/api/buster_rest/organizations/responseInterfaces';
 import {
   BusterInfiniteList,
   BusterListColumn,

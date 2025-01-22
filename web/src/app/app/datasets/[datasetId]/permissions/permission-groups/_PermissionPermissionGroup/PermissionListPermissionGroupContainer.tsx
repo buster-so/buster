@@ -1,7 +1,7 @@
 import {
   ListPermissionGroupsResponse,
   useDatasetUpdatePermissionGroups
-} from '@/api/buster-rest/datasets';
+} from '@/api/buster_rest/datasets';
 import { BusterListColumn, BusterListRowItem } from '@/components/list';
 import { useMemoizedFn } from 'ahooks';
 import React, { useMemo, useState } from 'react';

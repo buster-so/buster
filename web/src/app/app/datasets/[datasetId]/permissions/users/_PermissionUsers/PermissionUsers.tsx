@@ -6,7 +6,7 @@ import {
   PermissionSearchAndListWrapper,
   HeaderExplanation
 } from '@/app/app/_components/PermissionComponents';
-import { useDatasetListPermissionUsers } from '@/api/buster-rest';
+import { useDatasetListPermissionUsers } from '@/api/buster_rest';
 import { useDebounceSearch } from '@/hooks';
 import { Button } from 'antd';
 import { AppMaterialIcons } from '@/components/icons';

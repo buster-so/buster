@@ -3,7 +3,7 @@
 import {
   useGetDatasetGroupPermissionGroups,
   useGetPermissionGroupDatasetGroups
-} from '@/api/buster-rest';
+} from '@/api/buster_rest';
 import { useDebounceSearch } from '@/hooks/useDebounceSearch';
 import {
   NewDatasetGroupModal,

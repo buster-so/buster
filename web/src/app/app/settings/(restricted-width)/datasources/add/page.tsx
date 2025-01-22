@@ -4,7 +4,7 @@ import React from 'react';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { HeaderContainer } from '../_HeaderContainer';
 import { useContext, useState } from 'react';
-import { DatabaseNames, DataSourceTypes, SUPPORTED_DATASOURCES } from '@/api/buster-rest';
+import { DatabaseNames, DataSourceTypes, SUPPORTED_DATASOURCES } from '@/api/buster_rest';
 
 import { AppDataSourceIcon } from '@/components/icons/AppDataSourceIcons';
 import { useAntToken } from '@/styles/useAntToken';

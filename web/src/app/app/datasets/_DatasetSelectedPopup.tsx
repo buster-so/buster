@@ -4,7 +4,7 @@ import { Button } from 'antd';
 import { useMemoizedFn } from 'ahooks';
 import { useDatasetContextSelector } from '@/context/Datasets';
 import { useBusterNotifications } from '@/context/BusterNotifications';
-import { useDeleteDataset } from '@/api/buster-rest';
+import { useDeleteDataset } from '@/api/buster_rest';
 
 export const DatasetSelectedOptionPopup: React.FC<{
   selectedRowKeys: string[];

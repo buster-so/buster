@@ -3,7 +3,7 @@ import { AppMaterialIcons } from '@/components';
 import { BusterListSelectedOptionPopupContainer } from '@/components/list';
 import { Button, Dropdown, DropdownProps } from 'antd';
 import { StatusBadgeButton } from '../../_components/Lists';
-import { BusterVerificationStatus } from '@/api/buster-rest';
+import { BusterVerificationStatus } from '@/api/buster_rest';
 import { useBusterThreadsContextSelector } from '@/context/Threads';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { useCollectionsContextSelector } from '@/context/Collections';

@@ -6,13 +6,13 @@ import { AppSplitter, AppSplitterRef } from '@/components';
 import { SQLContainer } from './SQLContainer';
 import { DataContainer } from './DataContainer';
 import { useMemoizedFn, useRequest } from 'ahooks';
-import { BusterDatasetData } from '@/api/buster-rest/datasets';
+import { BusterDatasetData } from '@/api/buster_rest/datasets';
 import { timeout } from '@/utils';
 import { EditorApps, EditorContainerSubHeader } from './EditorContainerSubHeader';
 import { createStyles } from 'antd-style';
 import { MetadataContainer } from './MetadataContainer';
-import { runSQL } from '@/api/buster-rest';
-import { RustApiError } from '@/api/buster-rest/errors';
+import { runSQL } from '@/api/buster_rest';
+import { RustApiError } from '@/api/buster_rest/errors';
 import isEmpty from 'lodash/isEmpty';
 
 export const EditorContent: React.FC<{

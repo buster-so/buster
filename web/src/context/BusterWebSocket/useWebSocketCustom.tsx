@@ -1,7 +1,7 @@
 import { useMemoizedFn, useMount, useNetwork, useThrottleFn } from 'ahooks';
 import { useEffect, useRef, useState } from 'react';
 import { ReadyState } from './useBusterWebSocket';
-import { BusterSocketResponseBase } from '@/api/buster-socket/baseInterfaces';
+import { BusterSocketResponseBase } from '@/api/buster_socket/baseInterfaces';
 import { createBusterResponse } from './helpers';
 import { Priority, getPriorityFromRoute } from './messagePriority';
 import { DeviceCapabilities, getDeviceCapabilities } from './deviceCapabilities';

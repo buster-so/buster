@@ -1,6 +1,6 @@
 import React from 'react';
 import { PermissionGroupTitleAndDescription } from './PermissionGroupTitleAndDescription';
-import { prefetchPermissionGroup } from '@/api/buster-rest';
+import { prefetchPermissionGroup } from '@/api/buster_rest';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { UsersBackButton } from './PermissionBackButton';
 import { PermissionAppSegments } from './PermissionAppSegments';

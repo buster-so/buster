@@ -3,8 +3,8 @@ import {
   MySqlCreateCredentials,
   PostgresCreateCredentials,
   RedshiftCreateCredentials
-} from '@/api/buster-socket/datasources/interface';
-import { DataSource } from '@/api/buster-rest';
+} from '@/api/buster_socket/datasources/interface';
+import { DataSource } from '@/api/buster_rest';
 import { AppSelectTagInput } from '@/components/select/AppSelectTagInput';
 import { Form, Input, InputNumber } from 'antd';
 

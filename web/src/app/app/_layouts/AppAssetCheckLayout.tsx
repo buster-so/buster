@@ -1,9 +1,9 @@
 import React from 'react';
-import { getAssetCheck } from '@/api/buster-rest/assets/requests';
+import { getAssetCheck } from '@/api/buster_rest/assets/requests';
 import { useSupabaseServerContext } from '@/context/Supabase/useSupabaseContext';
 import { AppPasswordAccess } from '../_controllers/AppPasswordAccess';
 import { AppNoPageAccess } from '../_controllers/AppNoPageAccess';
-import { BusterShareAssetType } from '@/api/buster-rest';
+import { BusterShareAssetType } from '@/api/buster_rest';
 import { useBusterSupabaseAuthMethods } from '@/hooks/useBusterSupabaseAuthMethods';
 import { ClientSideAnonCheck } from './ClientSideAnonCheck';
 import { redirect } from 'next/navigation';

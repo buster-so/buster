@@ -1,4 +1,4 @@
-import { useUpdateDatasetGroupDatasets } from '@/api/buster-rest';
+import { useUpdateDatasetGroupDatasets } from '@/api/buster_rest';
 import { PermissionAssignedButton } from '@/app/app/_components/PermissionComponents';
 import { BusterListSelectedOptionPopupContainer } from '@/components/list';
 import { useMemoizedFn } from 'ahooks';

@@ -4,8 +4,8 @@ import React, { useEffect, useRef } from 'react';
 import { useBusterWebSocket } from '../BusterWebSocket';
 import { useDebounceFn, useMemoizedFn } from 'ahooks';
 import { useParams } from 'next/navigation';
-import { BusterCollection, BusterCollectionListItem } from '@/api/buster-rest/collection';
-import { CollectionsListEmit, CollectionUpdateCollection } from '@/api/buster-socket/collections';
+import { BusterCollection, BusterCollectionListItem } from '@/api/buster_rest/collection';
+import { CollectionsListEmit, CollectionUpdateCollection } from '@/api/buster_socket/collections';
 import { useAppLayoutContextSelector } from '../BusterAppLayout';
 import { useBusterNotifications } from '../BusterNotifications';
 import {

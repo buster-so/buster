@@ -1,6 +1,6 @@
 'use client';
 
-import { useGetDatasetGroupDatasets, useGetPermissionGroupDatasets } from '@/api/buster-rest';
+import { useGetDatasetGroupDatasets, useGetPermissionGroupDatasets } from '@/api/buster_rest';
 import { useDebounceSearch } from '@/hooks/useDebounceSearch';
 import { PermissionSearchAndListWrapper } from '@appComponents/PermissionComponents';
 import React, { useMemo, useState } from 'react';

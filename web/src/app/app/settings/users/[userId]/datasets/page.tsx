@@ -1,4 +1,4 @@
-import { prefetchGetUserDatasets } from '@/api/buster-rest/users';
+import { prefetchGetUserDatasets } from '@/api/buster_rest/users';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { UserDatasetsController } from './UserDatasetsController';
 

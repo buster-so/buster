@@ -4,7 +4,7 @@ import { trendlineOptions } from './config';
 import { LoopTrendline } from './EditTrendline';
 import React, { useMemo } from 'react';
 import type { ChartType, Trendline } from '@/components/charts';
-import { IBusterThreadMessageChartConfig } from '@/api/buster-rest';
+import { IBusterThreadMessageChartConfig } from '@/api/buster_rest';
 import { isDateColumnType, isNumericColumnType } from '@/utils';
 import { AppMaterialIcons, AppTooltip } from '@/components';
 

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { SettingsPageHeader } from '../_SettingsPageHeader';
 import { PermissionSearch, NewPermissionGroupModal } from '@appComponents/PermissionComponents';
 import { useDebounceSearch } from '@/hooks/useDebounceSearch';
-import { useListAllPermissionGroups } from '@/api/buster-rest';
+import { useListAllPermissionGroups } from '@/api/buster_rest';
 import { ListPermissionGroupsComponent } from './ListPermissionGroupsComponent';
 import { useMemoizedFn } from 'ahooks';
 import { Button } from 'antd';

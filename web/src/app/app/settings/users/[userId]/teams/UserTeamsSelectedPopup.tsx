@@ -1,4 +1,4 @@
-import { TeamRole, useUpdateUserTeams } from '@/api/buster-rest';
+import { TeamRole, useUpdateUserTeams } from '@/api/buster_rest';
 import { PermissionAssignTeamRoleButton } from '@/app/app/_components/PermissionComponents/PermissionAsssignTeamRoleButton';
 import { BusterListSelectedOptionPopupContainer } from '@/components/list';
 import { useMemoizedFn } from 'ahooks';

@@ -2,8 +2,8 @@ import {
   DatasourceCreateCredentials,
   MySqlCreateCredentials,
   PostgresCreateCredentials
-} from '@/api/buster-socket/datasources/interface';
-import { DataSource } from '@/api/buster-rest';
+} from '@/api/buster_socket/datasources/interface';
+import { DataSource } from '@/api/buster_rest';
 import { AppSelectTagInput } from '@/components/select/AppSelectTagInput';
 import { Form, Select, Input, InputNumber } from 'antd';
 import React, { useEffect, useLayoutEffect, useRef } from 'react';

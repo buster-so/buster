@@ -1,4 +1,4 @@
-import { IBusterThreadMessageChartConfig } from '@/api/buster-rest';
+import { IBusterThreadMessageChartConfig } from '@/api/buster_rest';
 import { useMemoizedFn } from 'ahooks';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useBusterThreadsContextSelector } from './BusterThreadsProvider';

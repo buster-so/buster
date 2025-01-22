@@ -1,4 +1,4 @@
-import { prefetchPermissionGroupUsers } from '@/api/buster-rest';
+import { prefetchPermissionGroupUsers } from '@/api/buster_rest';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { PermissionGroupUsersController } from './PermissionGroupUsersController';
 

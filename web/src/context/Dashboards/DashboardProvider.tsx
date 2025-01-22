@@ -5,7 +5,7 @@ import {
   BusterMetricDataResponse,
   BusterVerificationStatus,
   IBusterDashboardMetric
-} from '@/api/buster-rest';
+} from '@/api/buster_rest';
 import { useParams, useRouter } from 'next/navigation';
 import React, {
   PropsWithChildren,
@@ -18,7 +18,7 @@ import React, {
 import { useBusterWebSocket } from '../BusterWebSocket';
 import { useAppLayoutContextSelector } from '../BusterAppLayout';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import { DashboardUpdate, DashboardsListEmitPayload } from '@/api/buster-socket/dashboards';
+import { DashboardUpdate, DashboardsListEmitPayload } from '@/api/buster_socket/dashboards';
 import isEqual from 'lodash/isEqual';
 import { useMemoizedFn, useMount, useUnmount } from 'ahooks';
 import { useBusterAssetsContextSelector } from '@/context/Assets/BusterAssetsProvider';

@@ -4,7 +4,7 @@ import {
   DEFAULT_CHART_CONFIG,
   IBusterThreadMessageChartConfig,
   MIN_DONUT_WIDTH
-} from '@/api/buster-rest';
+} from '@/api/buster_rest';
 import { InputNumber, Segmented, Slider } from 'antd';
 import { useMemoizedFn } from 'ahooks';
 import { ChartEncodes } from '@/components/charts';

@@ -2,7 +2,7 @@ import type { ChartProps } from '../../core';
 import { LabelBuilderProps } from './useSeriesOptions';
 import { SeriesBuilderProps } from './interfaces';
 import { ScriptableContext } from 'chart.js';
-import { DEFAULT_CHART_CONFIG } from '@/api/buster-rest';
+import { DEFAULT_CHART_CONFIG } from '@/api/buster_rest';
 import { addOpacityToColor } from '@/utils/colors';
 import { ColumnLabelFormat } from '@/components/charts/interfaces';
 import { isDateColumnType } from '@/utils/messages';

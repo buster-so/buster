@@ -1,4 +1,4 @@
-import { IBusterThreadMessageChartConfig } from '@/api/buster-rest';
+import { IBusterThreadMessageChartConfig } from '@/api/buster_rest';
 import { ChartEncodes, ScatterAxis } from '@/components/charts';
 import { Slider } from 'antd';
 import React from 'react';

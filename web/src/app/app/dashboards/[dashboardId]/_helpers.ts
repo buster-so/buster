@@ -1,5 +1,5 @@
-import { DashboardConfig } from '@/api/buster-socket/dashboards/dashboardConfigInterfaces';
-import { BusterDashboardMetric } from '@/api/buster-rest';
+import { DashboardConfig } from '@/api/buster_socket/dashboards/dashboardConfigInterfaces';
+import { BusterDashboardMetric } from '@/api/buster_rest';
 import { BusterResizeableGridRow } from '@/components/grid';
 import {
   NUMBER_OF_COLUMNS,

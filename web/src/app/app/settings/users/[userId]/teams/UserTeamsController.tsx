@@ -1,6 +1,6 @@
 'use client';
 
-import { useGetUserTeams } from '@/api/buster-rest';
+import { useGetUserTeams } from '@/api/buster_rest';
 import { useDebounceSearch } from '@/hooks';
 import { PermissionSearchAndListWrapper } from '@appComponents/PermissionComponents';
 import React, { useMemo, useState } from 'react';

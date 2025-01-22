@@ -2,7 +2,7 @@
 
 import { useSupabaseServerContext } from '@/context/Supabase/useSupabaseContext';
 import React from 'react';
-import { getMyUserInfo } from '@/api/buster-rest/users/requests';
+import { getMyUserInfo } from '@/api/buster_rest/users/requests';
 import { getAppSplitterLayout } from '@/components/layout/AppSplitter';
 import { useBusterSupabaseAuthMethods } from '@/hooks/useBusterSupabaseAuthMethods';
 import { createBusterRoute } from '@/routes';

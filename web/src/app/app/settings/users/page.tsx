@@ -3,7 +3,7 @@
 import React from 'react';
 import { SettingsPageHeader } from '../_SettingsPageHeader';
 import { useDebounceSearch } from '@/hooks/useDebounceSearch';
-import { useGetOrganizationUsers } from '@/api/buster-rest';
+import { useGetOrganizationUsers } from '@/api/buster_rest';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { ListUsersComponent } from './ListUsersComponent';
 import { PermissionSearch } from '../../_components/PermissionComponents';

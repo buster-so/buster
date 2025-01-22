@@ -3,8 +3,8 @@ import { Button, Form, FormInstance, Input } from 'antd';
 import { createStyles } from 'antd-style';
 import React, { useImperativeHandle, useLayoutEffect } from 'react';
 import { WhiteListBlock } from '../WhiteListBlock';
-import { DatasourceCreateCredentials } from '@/api/buster-socket/datasources/interface';
-import { DataSource } from '@/api/buster-rest';
+import { DatasourceCreateCredentials } from '@/api/buster_socket/datasources/interface';
+import { DataSource } from '@/api/buster_rest';
 import { NewDatasetModal } from '@appComponents/NewDatasetModal';
 
 const layout = {

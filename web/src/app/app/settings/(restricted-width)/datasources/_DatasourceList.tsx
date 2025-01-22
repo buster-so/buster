@@ -6,7 +6,7 @@ import { Button, Dropdown, Skeleton } from 'antd';
 import { AppMaterialIcons } from '@/components';
 import { useAntToken } from '@/styles/useAntToken';
 import { AppDataSourceIcon } from '@/components/icons/AppDataSourceIcons';
-import { DataSourceListItem } from '@/api/buster-rest';
+import { DataSourceListItem } from '@/api/buster_rest';
 import { createStyles } from 'antd-style';
 import { MenuProps } from 'antd/lib';
 import Link from 'next/link';

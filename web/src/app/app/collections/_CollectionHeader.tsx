@@ -14,7 +14,7 @@ import {
 import { AppMaterialIcons, AppSegmented, AppTooltip } from '@/components';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { SegmentedLabeledOption, SegmentedValue } from 'antd/es/segmented';
-import { CollectionsListEmit } from '@/api/buster-socket/collections';
+import { CollectionsListEmit } from '@/api/buster_socket/collections';
 import isEmpty from 'lodash/isEmpty';
 import omit from 'lodash/omit';
 

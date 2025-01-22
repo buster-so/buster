@@ -1,4 +1,4 @@
-import { BusterDashboardListItem } from '@/api/buster-rest';
+import { BusterDashboardListItem } from '@/api/buster_rest';
 import { AppMaterialIcons, AppTooltip } from '@/components';
 import { AppDropdownSelect } from '@/components/dropdown';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';

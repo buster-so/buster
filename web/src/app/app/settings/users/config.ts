@@ -1,4 +1,4 @@
-import { OrganizationUser } from '@/api/buster-rest';
+import { OrganizationUser } from '@/api/buster_rest';
 
 export const OrganizationUserStatusText: Record<OrganizationUser['status'], string> = {
   active: 'Active',

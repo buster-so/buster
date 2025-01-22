@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import type { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads/threadConfigInterfaces';
+import type { IBusterThreadMessageChartConfig } from '@/api/buster_rest/threads/threadConfigInterfaces';
 import { IColumnLabelFormat } from '@/components/charts';
 import { useMemoizedFn } from 'ahooks';
 import { EditReplaceMissingData } from '../StylingAppVisualize/SelectAxis/SelectAxisColumnContent/EditReplaceMissingData';

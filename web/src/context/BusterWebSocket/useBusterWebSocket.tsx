@@ -7,9 +7,9 @@ import {
   BusterSocketRequest,
   BusterSocketResponse,
   BusterSocketResponseRoute
-} from '@/api/buster-socket';
+} from '@/api/buster_socket';
 import { useWebSocket } from './useWebSocketCustom';
-import { BusterSocketResponseBase } from '@/api/buster-socket/baseInterfaces';
+import { BusterSocketResponseBase } from '@/api/buster_socket/baseInterfaces';
 import { useSupabaseContext } from '../Supabase';
 import {
   ContextSelector,

@@ -5,7 +5,7 @@ import {
   BusterListRowItem,
   InfiniteListContainer
 } from '@/components/list';
-import { OrganizationUserDataset } from '@/api/buster-rest';
+import { OrganizationUserDataset } from '@/api/buster_rest';
 import { Text } from '@/components/text';
 import { PermissionLineageBreadcrumb } from '@appComponents/PermissionComponents';
 

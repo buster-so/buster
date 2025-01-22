@@ -1,4 +1,4 @@
-import { ListDatasetGroupsResponse, useDatasetUpdateDatasetGroups } from '@/api/buster-rest';
+import { ListDatasetGroupsResponse, useDatasetUpdateDatasetGroups } from '@/api/buster_rest';
 import {
   BusterListColumn,
   BusterListRowItem,

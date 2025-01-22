@@ -1,4 +1,4 @@
-import { BusterUserDatasetGroup, useUpdateUserDatasetGroups } from '@/api/buster-rest';
+import { BusterUserDatasetGroup, useUpdateUserDatasetGroups } from '@/api/buster_rest';
 import { PermissionAssignedCell } from '@/app/app/_components/PermissionComponents';
 import {
   BusterInfiniteList,

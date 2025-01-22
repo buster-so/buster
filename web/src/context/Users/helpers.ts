@@ -1,4 +1,4 @@
-import { BusterOrganizationRole, BusterUserResponse } from '@/api/buster-rest';
+import { BusterOrganizationRole, BusterUserResponse } from '@/api/buster_rest';
 
 export const checkIfUserIsAdmin = (userInfo?: BusterUserResponse | null) => {
   return (

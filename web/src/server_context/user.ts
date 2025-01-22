@@ -1,4 +1,4 @@
-import { getMyUserInfo } from '@/api/buster-rest/users/requests';
+import { getMyUserInfo } from '@/api/buster_rest/users/requests';
 import { useSupabaseServerContext } from '@/context/Supabase/useSupabaseContext';
 import { checkIfUserIsAdmin } from '@/context/Users/helpers';
 

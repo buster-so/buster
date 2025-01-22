@@ -1,4 +1,4 @@
-import { prefetchDatasetGroupDatasets } from '@/api/buster-rest';
+import { prefetchDatasetGroupDatasets } from '@/api/buster_rest';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { DatasetGroupDatasetsController } from './DatasetGroupDatasetsController';
 

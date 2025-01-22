@@ -3,7 +3,7 @@ import { EditGrouping } from './EditGrouping';
 import { useBusterThreadsContextSelector } from '@/context/Threads/BusterThreadsProvider';
 import { useSelectAxisContextSelector } from '../useSelectAxisContext';
 import { useMemoizedFn } from 'ahooks';
-import { IBusterThreadMessageChartConfig } from '@/api/buster-rest';
+import { IBusterThreadMessageChartConfig } from '@/api/buster_rest';
 import { EditAxisTitle } from './EditShowAxisTitle';
 
 export const CategoryAxisSettingContent: React.FC<{}> = React.memo(({}) => {

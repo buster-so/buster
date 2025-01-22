@@ -1,4 +1,4 @@
-import { IBusterThreadMessageChartConfig } from '@/api/buster-rest';
+import { IBusterThreadMessageChartConfig } from '@/api/buster_rest';
 import React, { useMemo } from 'react';
 import { LabelAndInput } from '../Common';
 import { Segmented } from 'antd';

@@ -3,7 +3,7 @@ import {
   DEFAULT_DATE_FORMAT_DAY_OF_WEEK,
   DEFAULT_DATE_FORMAT_MONTH_OF_YEAR,
   DEFAULT_DATE_FORMAT_QUARTER
-} from '@/api/buster-rest';
+} from '@/api/buster_rest';
 import { ColumnLabelFormat, IColumnLabelFormat } from '@/components/charts';
 import { formatDate, makeHumanReadble, formatNumber, roundNumber } from '@/utils';
 

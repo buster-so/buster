@@ -1,6 +1,6 @@
 import React from 'react';
 import { DatasetGroupTitleAndDescription } from './DatasetGroupTitleAndDescription';
-import { prefetchDatasetGroup } from '@/api/buster-rest';
+import { prefetchDatasetGroup } from '@/api/buster_rest';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { DatasetGroupBackButton } from './DatasetGroupBackButton';
 import { DatasetGroupAppSegments } from './DatasetGroupAppSegments';

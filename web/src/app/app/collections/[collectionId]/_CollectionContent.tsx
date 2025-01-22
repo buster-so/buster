@@ -9,11 +9,11 @@ import {
   BusterCollection,
   BusterCollectionItemAsset,
   BusterCollectionListItem
-} from '@/api/buster-rest/collection';
+} from '@/api/buster_rest/collection';
 import { Text } from '@/components';
 import { ListEmptyState } from '../../_components/Lists/ListEmptyState';
 import { AddTypeModal } from '../../_components/AddTypeModal';
-import { BusterShareAssetType } from '@/api/buster-rest';
+import { BusterShareAssetType } from '@/api/buster_rest';
 import { useMemoizedFn, useSize, useUnmount } from 'ahooks';
 import { BusterList, BusterListColumn, BusterListRow } from '@/components/list';
 import { CollectionIndividualSelectedPopup } from './_CollectionsIndividualPopup';

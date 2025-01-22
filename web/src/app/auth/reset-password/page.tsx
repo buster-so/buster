@@ -4,7 +4,7 @@ import { useBusterSupabaseAuthMethods } from '@/hooks/useBusterSupabaseAuthMetho
 import { redirect } from 'next/navigation';
 import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
 import { useSupabaseServerContext } from '@/context/Supabase/useSupabaseContext';
-import { getMyUserInfo } from '@/api/buster-rest';
+import { getMyUserInfo } from '@/api/buster_rest';
 
 export default async function ResetPassword() {
   const supabaseContext = await useSupabaseServerContext();

@@ -3,7 +3,7 @@ import {
   BusterThread,
   BusterThreadMessage,
   IBusterThreadMessageChartConfig
-} from '@/api/buster-rest';
+} from '@/api/buster_rest';
 
 export interface IBusterThread extends Omit<BusterThread, 'messages'> {
   isNewThread: boolean; //used when the thread is first created and it is streaming in, will toggle to false when the thread is done loading

@@ -6,7 +6,7 @@ import { Breadcrumb, Button, Skeleton } from 'antd';
 import Link from 'next/link';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { useDashboardContextSelector, useIndividualDashboard } from '@/context/Dashboards';
-import { DashboardsListEmitPayload } from '@/api/buster-socket/dashboards';
+import { DashboardsListEmitPayload } from '@/api/buster_socket/dashboards';
 import { AppMaterialIcons, AppSegmented, AppTooltip } from '@/components';
 import isEmpty from 'lodash/isEmpty';
 import { useMemoizedFn } from 'ahooks';

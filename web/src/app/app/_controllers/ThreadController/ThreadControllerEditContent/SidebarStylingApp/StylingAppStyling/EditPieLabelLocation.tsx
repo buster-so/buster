@@ -4,7 +4,7 @@ import { Select, Switch } from 'antd';
 import {
   DEFAULT_CHART_CONFIG,
   type IBusterThreadMessageChartConfig
-} from '@/api/buster-rest/threads';
+} from '@/api/buster_rest/threads';
 import { useMemoizedFn } from 'ahooks';
 
 const options: { label: string; value: IBusterThreadMessageChartConfig['pieLabelPosition'] }[] = [

@@ -6,7 +6,7 @@ import { BusterUserAvatar } from '@/components';
 import { formatDate } from '@/utils';
 import { BusterList, BusterListColumn, BusterListRow } from '@/components/list';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import { BusterTermListItem } from '@/api/buster-rest';
+import { BusterTermListItem } from '@/api/buster_rest';
 import { useMount } from 'ahooks';
 import { ListEmptyState } from '../_components/Lists/ListEmptyState';
 import { useUserConfigContextSelector } from '@/context/Users';

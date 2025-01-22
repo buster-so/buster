@@ -6,7 +6,7 @@ import {
   useGetUserDatasetGroups,
   useGetUserDatasets,
   useGetUserPermissionGroups
-} from '@/api/buster-rest';
+} from '@/api/buster_rest';
 import { useDebounceSearch } from '@/hooks';
 import {
   NewPermissionGroupModal,

@@ -1,4 +1,4 @@
-import type { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads/threadConfigInterfaces';
+import type { IBusterThreadMessageChartConfig } from '@/api/buster_rest/threads/threadConfigInterfaces';
 import React, { useState } from 'react';
 import { LabelAndInput } from '../Common';
 import { CollapseDelete } from '../Common/CollapseDelete';
@@ -8,7 +8,7 @@ import { AppMaterialIcons } from '@/components';
 import { ChartEncodes, GoalLine } from '@/components/charts';
 import { v4 as uuidv4 } from 'uuid';
 import { useMemoizedFn, useSet } from 'ahooks';
-import { ColumnMetaData } from '@/api/buster-rest';
+import { ColumnMetaData } from '@/api/buster_rest';
 
 interface LoopGoalLine extends GoalLine {
   id: string;

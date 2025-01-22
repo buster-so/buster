@@ -3,7 +3,7 @@ import { useMemoizedFn } from 'ahooks';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Input, InputRef } from 'antd';
 import { useBusterNotifications } from '@/context/BusterNotifications';
-import { useCreateDatasetGroup } from '@/api/buster-rest/dataset_groups';
+import { useCreateDatasetGroup } from '@/api/buster_rest/dataset_groups';
 import { SelectedDatasetInput } from './SelectDatasetInput';
 
 interface NewDatasetGroupModalProps {

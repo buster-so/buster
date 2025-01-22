@@ -3,7 +3,7 @@ import {
   TeamRole,
   useUpdateUserTeams,
   type BusterUserPermissionGroup
-} from '@/api/buster-rest';
+} from '@/api/buster_rest';
 import { PermissionAssignTeamRole } from '@appComponents/PermissionComponents';
 import {
   BusterInfiniteList,

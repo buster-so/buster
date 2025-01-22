@@ -1,6 +1,6 @@
 'use client';
 
-import { useGetUserPermissionGroups } from '@/api/buster-rest';
+import { useGetUserPermissionGroups } from '@/api/buster_rest';
 import { useDebounceSearch } from '@/hooks';
 import {
   NewPermissionGroupModal,

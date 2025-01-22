@@ -1,4 +1,4 @@
-import { BusterThreadListItem } from '@/api/buster-rest';
+import { BusterThreadListItem } from '@/api/buster_rest';
 import isEmpty from 'lodash/isEmpty';
 import { BusterMessageData, IBusterThread, IBusterThreadMessage } from '../interfaces';
 import { isNumericColumnType } from '@/utils';

@@ -1,4 +1,4 @@
-import { DataSource } from '@/api/buster-rest';
+import { DataSource } from '@/api/buster_rest';
 import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import { Form, Input, InputNumber, Select } from 'antd';
 import { useKeyPress } from 'ahooks';
@@ -8,7 +8,7 @@ import { formatDate } from '@/utils';
 import {
   DatasourceCreateCredentials,
   PostgresCreateCredentials
-} from '@/api/buster-socket/datasources/interface';
+} from '@/api/buster_socket/datasources/interface';
 
 const sshModeOptions = ['Do not use SSH credentials', 'Use SSH credentials'].map((item, index) => ({
   label: item,

@@ -1,5 +1,5 @@
 import { UserTeamsController } from './UserTeamsController';
-import { prefetchGetUserTeams } from '@/api/buster-rest/users';
+import { prefetchGetUserTeams } from '@/api/buster_rest/users';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
 export default async function Page({ params }: { params: { userId: string } }) {

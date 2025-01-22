@@ -11,7 +11,7 @@ import {
   NewPermissionGroupModal
 } from '@appComponents/PermissionComponents';
 import { useDebounceSearch } from '@/hooks';
-import { useDatasetListPermissionGroups } from '@/api/buster-rest';
+import { useDatasetListPermissionGroups } from '@/api/buster_rest';
 
 export const PermissionPermissionGroup: React.FC<{
   datasetId: string;

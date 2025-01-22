@@ -11,8 +11,8 @@ import {
 } from './hooks';
 import { useColors } from '../chartHooks';
 import { DEFAULT_CHART_THEME } from '../configColors';
-import { DEFAULT_CHART_CONFIG } from '@/api/buster-rest/threads/defaults';
-import type { ColumnMetaData } from '@/api/buster-rest';
+import { DEFAULT_CHART_CONFIG } from '@/api/buster_rest/threads/defaults';
+import type { ColumnMetaData } from '@/api/buster_rest';
 import { useAxisTitles } from '../commonHelpers/useAxisTitles';
 import { BusterEChartWrapper } from './BusterEChartWrapper';
 //import ReactECharts, { type EChartsInstance } from 'echarts-for-react';

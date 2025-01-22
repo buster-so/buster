@@ -1,6 +1,6 @@
-import { BusterThreadListItem, BusterVerificationStatus } from '@/api/buster-rest';
+import { BusterThreadListItem, BusterVerificationStatus } from '@/api/buster_rest';
 import { IBusterThread } from './interfaces';
-import { ShareRole } from '@/api/buster-socket/threads';
+import { ShareRole } from '@/api/buster_socket/threads';
 
 export const defaultIBusterThread: IBusterThread = {
   created_at: '',

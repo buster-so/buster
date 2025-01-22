@@ -1,4 +1,4 @@
-import { BusterShareAssetType } from '@/api/buster-rest';
+import { BusterShareAssetType } from '@/api/buster_rest';
 import { AppMaterialIcons } from '@/components';
 
 const iconRecord: Record<BusterShareAssetType, string> = {

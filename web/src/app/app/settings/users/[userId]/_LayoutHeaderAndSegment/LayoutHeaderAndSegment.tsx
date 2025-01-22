@@ -3,7 +3,7 @@
 import React, { useLayoutEffect, useState } from 'react';
 import { UserHeader } from './UserHeader';
 import { SegmentToApp, UserSegments, UserSegmentsApps } from './UserSegments';
-import { useGetUser } from '@/api/buster-rest';
+import { useGetUser } from '@/api/buster_rest';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useUserConfigContextSelector } from '@/context/Users';
 

@@ -1,7 +1,7 @@
 import {
   GetPermissionGroupDatasetGroupsResponse,
   useUpdatePermissionGroupDatasetGroups
-} from '@/api/buster-rest';
+} from '@/api/buster_rest';
 import { PermissionAssignedCell } from '@appComponents/PermissionComponents';
 import {
   BusterInfiniteList,

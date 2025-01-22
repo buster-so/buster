@@ -6,7 +6,7 @@ import {
 } from '@fluentui/react-context-selector';
 import { useMemoizedFn, useMount } from 'ahooks';
 import { useBusterWebSocket } from '../BusterWebSocket';
-import type { BusterThreadStepEvent_FetchingData } from '@/api/buster-rest';
+import type { BusterThreadStepEvent_FetchingData } from '@/api/buster_rest';
 import type { BusterMessageData } from '../Threads';
 
 const DEFAULT_MESSAGE_DATA: BusterMessageData = {

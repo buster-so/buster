@@ -1,4 +1,4 @@
-import { BusterCollectionItemAsset } from '@/api/buster-rest/collection';
+import { BusterCollectionItemAsset } from '@/api/buster_rest/collection';
 import { AppMaterialIcons } from '@/components';
 import { BusterListSelectedOptionPopupContainer } from '@/components/list';
 import { useCollectionsContextSelector } from '@/context/Collections';

@@ -7,7 +7,7 @@ import {
 } from '@/components/list';
 import React, { useMemo } from 'react';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import { GetPermissionGroupResponse } from '@/api/buster-rest';
+import { GetPermissionGroupResponse } from '@/api/buster_rest';
 
 export const ListPermissionGroupsComponent: React.FC<{
   permissionGroups: GetPermissionGroupResponse[];

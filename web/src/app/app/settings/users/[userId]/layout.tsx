@@ -1,6 +1,6 @@
 import React from 'react';
 import { UsersBackButton } from './_LayoutHeaderAndSegment';
-import { prefetchGetUser } from '@/api/buster-rest';
+import { prefetchGetUser } from '@/api/buster_rest';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { LayoutHeaderAndSegment } from './_LayoutHeaderAndSegment';
 

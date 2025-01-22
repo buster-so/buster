@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { FormWrapper, FormWrapperHandle } from './FormWrapper';
-import { DataSource } from '@/api/buster-rest';
+import { DataSource } from '@/api/buster_rest';
 import {
   BigQueryCreateCredentials,
   DatasourceCreateCredentials
-} from '@/api/buster-socket/datasources/interface';
+} from '@/api/buster_socket/datasources/interface';
 import { Form, Input } from 'antd';
 import { AppTooltip } from '@/components';
 import { AppCodeEditor } from '@/components/inputs/AppCodeEditor';

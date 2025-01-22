@@ -1,10 +1,10 @@
-import { ThreadUpdateMessage } from '@/api/buster-socket/threads';
+import { ThreadUpdateMessage } from '@/api/buster_socket/threads';
 import {
   DEFAULT_CHART_CONFIG_ENTRIES,
   DEFAULT_COLUMN_LABEL_FORMAT,
   DEFAULT_COLUMN_SETTINGS,
   IBusterThreadMessageChartConfig
-} from '@/api/buster-rest';
+} from '@/api/buster_rest';
 import { getChangedValues } from '@/utils/objects';
 import { IBusterThreadMessage } from '../interfaces';
 import isEqual from 'lodash/isEqual';

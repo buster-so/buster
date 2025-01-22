@@ -1,8 +1,8 @@
 import {
   DatasourceCreateCredentials,
   SqlServerCreateCredentials
-} from '@/api/buster-socket/datasources/interface';
-import { DataSource } from '@/api/buster-rest';
+} from '@/api/buster_socket/datasources/interface';
+import { DataSource } from '@/api/buster_rest';
 import React from 'react';
 import { FormWrapper } from './FormWrapper';
 import { Form, Input, InputNumber } from 'antd';

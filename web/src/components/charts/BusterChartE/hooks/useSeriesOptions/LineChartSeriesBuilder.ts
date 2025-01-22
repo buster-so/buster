@@ -15,7 +15,7 @@ import { formatLabel } from '@/utils';
 import { graphic } from 'echarts';
 import set from 'lodash/set';
 import { getYAxisColumnNames, seriesNameGenerator } from './helpers';
-import { DEFAULT_COLUMN_SETTINGS } from '@/api/buster-rest';
+import { DEFAULT_COLUMN_SETTINGS } from '@/api/buster_rest';
 import { yAxisSimilar } from '@/components/charts/commonHelpers';
 
 type MarkPointOption = LineSeriesOption['markPoint'];
