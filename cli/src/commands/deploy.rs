@@ -9,7 +9,7 @@ use crate::utils::{
 
 use super::auth;
 
-pub async fn deploy() -> Result<()> {
+pub async fn deploy(skip_dbt: bool) -> Result<()> {
     if let Err(e) = check_dbt_installation().await {
         print_error("Error: Failed to check dbt installation");
         return Err(anyhow::anyhow!("Failed to check dbt installation: {}", e));
@@ -43,12 +43,13 @@ pub async fn deploy() -> Result<()> {
         }
     };
 
-    if let Err(e) = dbt_command("run").await {
-        print_error("Error: Failed to run dbt project");
-        return Err(anyhow::anyhow!("Failed to run dbt project: {}", e));
+    if !skip_dbt {
+        if let Err(e) = dbt_command("run").await {
+            print_error("Error: Failed to run dbt project");
+            return Err(anyhow::anyhow!("Failed to run dbt project: {}", e));
+        }
+        println!("Successfully deployed dbt project");
     }
-
-    println!("Successfully deployed dbt project");
 
     let model_objects = get_model_files().await?;
 

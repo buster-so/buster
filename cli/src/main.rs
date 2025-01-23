@@ -15,7 +15,11 @@ pub enum Commands {
     Auth,
     Generate,
     Import,
-    Deploy,
+    #[command(arg_required_else_help = true)]
+    Deploy {
+        #[arg(long)]
+        skip_dbt: bool,
+    },
 }
 
 #[derive(Parser)]
@@ -34,7 +38,7 @@ async fn main() {
         Commands::Auth => auth().await,
         Commands::Generate => generate().await,
         Commands::Import => import().await,
-        Commands::Deploy => deploy().await,
+        Commands::Deploy { skip_dbt } => deploy(skip_dbt).await,
     };
 
     if let Err(e) = result {
