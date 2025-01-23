@@ -271,15 +271,8 @@ pub async fn get_user_dashboard_permission(
     };
 
     let permissions = match asset_permissions::table
-        .left_join(
-            teams_to_users::table.on(asset_permissions::identity_id.eq(teams_to_users::team_id)),
-        )
         .select(asset_permissions::role)
-        .filter(
-            asset_permissions::identity_id
-                .eq(&user_id)
-                .or(teams_to_users::user_id.eq(&user_id)),
-        )
+        .filter(asset_permissions::identity_id.eq(&user_id))
         .filter(asset_permissions::asset_id.eq(&dashboard_id))
         .filter(asset_permissions::deleted_at.is_null())
         .load::<AssetPermissionRole>(&mut conn)
@@ -322,15 +315,8 @@ pub async fn get_bulk_user_dashboard_permission(
     };
 
     let permissions = match asset_permissions::table
-        .left_join(
-            teams_to_users::table.on(asset_permissions::identity_id.eq(teams_to_users::team_id)),
-        )
         .select((asset_permissions::asset_id, asset_permissions::role))
-        .filter(
-            asset_permissions::identity_id
-                .eq(&user_id)
-                .or(teams_to_users::user_id.eq(&user_id)),
-        )
+        .filter(asset_permissions::identity_id.eq(&user_id))
         .filter(asset_permissions::asset_id.eq_any(dashboard_ids))
         .filter(asset_permissions::deleted_at.is_null())
         .load::<(Uuid, AssetPermissionRole)>(&mut conn)
