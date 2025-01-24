@@ -65,7 +65,7 @@ export const BusterListRowComponent = React.memo(
             className={cx(
               styles.row,
               rowClassName,
-              'group flex items-center',
+              'group flex items-center pr-6',
               checked ? 'checked' : '',
               columnRowVariant,
               isLastChild ? 'last-child' : '',
@@ -113,8 +113,7 @@ const BusterListCellComponent: React.FC<{
   const memoizedStyle = useMemo(() => {
     return {
       width: width || '100%',
-      flex: width ? 'none' : 1,
-      marginRight: isLastCell ? (!!onSelectChange ? '24px' : '12px') : undefined
+      flex: width ? 'none' : 1
     };
   }, [width, isLastCell, onSelectChange]);
 

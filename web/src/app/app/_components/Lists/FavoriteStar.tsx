@@ -1,4 +1,4 @@
-import { BusterShareAssetType } from '@/api/buster-rest';
+import { BusterShareAssetType } from '@/api/buster_rest';
 import { AppMaterialIcons, AppTooltip } from '@/components';
 import { useUserConfigContextSelector } from '@/context/Users';
 import React, { useCallback, useMemo } from 'react';
@@ -68,7 +68,9 @@ export const FavoriteStar: React.FC<{
         classNames={{
           icon: '!text-inherit !mt-[-2px]'
         }}
-        className={cx(className, 'flex', styles.icon, iconStyle, { 'is-favorited': isFavorited })}
+        className={cx(className, 'flex', styles.icon, iconStyle, {
+          'is-favorited opacity-100': isFavorited
+        })}
         onClick={onFavoriteClick}
         type="text"
         icon={<AppMaterialIcons icon="star" fill={isFavorited} />}

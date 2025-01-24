@@ -1,5 +1,5 @@
-import { ShareRole } from '@/api/buster-socket/threads';
-import { BusterDashboard, BusterVerificationStatus } from '@/api/buster-rest';
+import { ShareRole } from '@/api/buster_socket/threads';
+import { BusterDashboard, BusterVerificationStatus } from '@/api/buster_rest';
 
 export const defaultBusterDashboard: BusterDashboard = {
   id: '',

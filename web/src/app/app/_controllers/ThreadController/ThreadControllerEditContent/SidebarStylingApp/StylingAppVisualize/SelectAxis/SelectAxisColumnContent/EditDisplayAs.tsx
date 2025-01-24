@@ -1,4 +1,4 @@
-import { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads/threadConfigInterfaces';
+import { IBusterThreadMessageChartConfig } from '@/api/buster_rest/threads/threadConfigInterfaces';
 import React, { MouseEventHandler, useMemo } from 'react';
 import { LabelAndInput } from '../../../Common/LabelAndInput';
 import { AppMaterialIcons, AppSegmented, AppTooltip } from '@/components';

@@ -1,7 +1,6 @@
 use anyhow::Result;
 use axum::{extract::Path, Extension};
 use diesel_async::RunQueryDsl;
-use futures::future::try_join_all;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -92,6 +91,7 @@ pub async fn get_user_information(user_id: &Uuid) -> Result<UserResponse> {
                     users_to_organizations::organization_id,
         ))
         .filter(users::id.eq(user_id))
+        .filter(users_to_organizations::deleted_at.is_null())
         .first::<(
             (Uuid, String, Option<String>),
             (UserOrganizationRole, UserOrganizationStatus),
@@ -170,6 +170,7 @@ pub async fn get_user_information(user_id: &Uuid) -> Result<UserResponse> {
                 .filter(dataset_permissions::deleted_at.is_null())
                 .filter(permission_groups::deleted_at.is_null())
                 .filter(datasets::deleted_at.is_null())
+                .filter(permission_groups_to_identities::deleted_at.is_null())
                 .select((
                     datasets::id,
                     datasets::name,
@@ -209,6 +210,7 @@ pub async fn get_user_information(user_id: &Uuid) -> Result<UserResponse> {
                 )
                 .filter(users_to_organizations::user_id.eq(user_id))
                 .filter(datasets::deleted_at.is_null())
+                .filter(users_to_organizations::deleted_at.is_null())
                 .select((datasets::id, datasets::name))
                 .load::<(Uuid, String)>(&mut conn)
                 .await

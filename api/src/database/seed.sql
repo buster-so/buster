@@ -982,25 +982,25 @@ INSERT INTO public.terms (id, name, definition, sql_snippet, organization_id, cr
 --
 
 INSERT INTO public.users_to_organizations (
-    user_id, 
-    organization_id, 
-    role, 
+    user_id,
+    organization_id,
+    role,
     status,
-    sharing_setting, 
-    edit_sql, 
-    upload_csv, 
-    export_assets, 
-    email_slack_enabled, 
-    created_at, 
-    updated_at, 
-    deleted_at, 
-    created_by, 
-    updated_by, 
+    sharing_setting,
+    edit_sql,
+    upload_csv,
+    export_assets,
+    email_slack_enabled,
+    created_at,
+    updated_at,
+    deleted_at,
+    created_by,
+    updated_by,
     deleted_by
 ) VALUES 
-('c2dd64cd-f7f3-4884-bc91-d46ae431901e', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce', 'workspace_admin', 'active', 'public', false, false, false, false, '2024-11-05 15:41:13.958254+00', '2024-11-05 15:41:13.958254+00', NULL, 'c2dd64cd-f7f3-4884-bc91-d46ae431901e', 'c2dd64cd-f7f3-4884-bc91-d46ae431901e', NULL),
-('1fe85021-e799-471b-8837-953e9ae06e4c', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce', 'querier', 'active', 'team', false, false, false, false, '2024-11-05 15:41:13.958255+00', '2024-11-05 15:41:13.958255+00', NULL, '1fe85021-e799-471b-8837-953e9ae06e4c', '1fe85021-e799-471b-8837-953e9ae06e4c', NULL),
-('6840fa04-c0d7-4e0e-8d3d-ea9190d93874', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce', 'data_admin', 'active', 'public', false, false, false, false, '2024-11-05 15:41:13.958256+00', '2024-11-05 15:41:13.958256+00', NULL, '6840fa04-c0d7-4e0e-8d3d-ea9190d93874', '6840fa04-c0d7-4e0e-8d3d-ea9190d93874', NULL);
+('c2dd64cd-f7f3-4884-bc91-d46ae431901e', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce', 'workspace_admin', 'active', 'none', false, false, false, false, '2024-11-05 15:41:13.958254+00', '2024-11-05 15:41:13.958254+00', NULL, 'c2dd64cd-f7f3-4884-bc91-d46ae431901e', 'c2dd64cd-f7f3-4884-bc91-d46ae431901e', NULL),
+('1fe85021-e799-471b-8837-953e9ae06e4c', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce', 'querier', 'active', 'none', false, false, false, false, '2024-11-05 15:41:13.958255+00', '2024-11-05 15:41:13.958255+00', NULL, '1fe85021-e799-471b-8837-953e9ae06e4c', '1fe85021-e799-471b-8837-953e9ae06e4c', NULL),
+('6840fa04-c0d7-4e0e-8d3d-ea9190d93874', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce', 'data_admin', 'active', 'none', false, false, false, false, '2024-11-05 15:41:13.958256+00', '2024-11-05 15:41:13.958256+00', NULL, '6840fa04-c0d7-4e0e-8d3d-ea9190d93874', '6840fa04-c0d7-4e0e-8d3d-ea9190d93874', NULL);
 
 
 

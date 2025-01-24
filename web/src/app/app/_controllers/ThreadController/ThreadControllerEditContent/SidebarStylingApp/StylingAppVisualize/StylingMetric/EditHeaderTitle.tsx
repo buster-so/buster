@@ -1,4 +1,4 @@
-import { IBusterThreadMessageChartConfig } from '@/api/buster-rest';
+import { IBusterThreadMessageChartConfig } from '@/api/buster_rest';
 import React, { useRef } from 'react';
 import { LabelAndInput } from '../../Common';
 import { Input, InputRef } from 'antd';

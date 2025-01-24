@@ -2,7 +2,7 @@
 
 import { QueryClientProvider } from '@tanstack/react-query';
 import React, { useLayoutEffect } from 'react';
-import mainApi from '@/api/buster-rest/instances';
+import mainApi from '@/api/buster_rest/instances';
 import { defaultRequestHandler } from '@/api/createInstance';
 import nextApi from '@/api/next/instances';
 import { useSupabaseContext } from '../Supabase/SupabaseContextProvider';

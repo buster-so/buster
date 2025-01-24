@@ -1,16 +1,20 @@
 'use client';
 
-import React, { useContext, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { AppContent } from '../_components/AppContent';
 import { BusterUserAvatar } from '@/components';
 import { formatDate, makeHumanReadble } from '@/utils';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { initialFilterOptionKey, useCollectionsContextSelector } from '@/context/Collections';
-import { BusterList, BusterListColumn, BusterListRow } from '@/components/list';
-import { useMemoizedFn, useMount, useSize, useUnmount } from 'ahooks';
+import {
+  BusterList,
+  BusterListColumn,
+  BusterListRow,
+  ListEmptyStateWithButton
+} from '@/components/list';
+import { useMemoizedFn, useMount, useUnmount } from 'ahooks';
 import { NewCollectionModal } from './_NewCollectionModal';
-import { BusterCollectionListItem } from '@/api/buster-rest/collection';
-import { ListEmptyState } from '../_components/Lists/ListEmptyState';
+import { BusterCollectionListItem } from '@/api/buster_rest/collection';
 import { CollectionSelectedPopup } from './_CollectionSelectedPopup';
 
 export const CollectionsListContent: React.FC<{}> = () => {
@@ -120,6 +124,10 @@ const CollectionList: React.FC<{
     setSelectedRowKeys(selectedRowKeys);
   });
 
+  const onOpenNewCollectionModal = useMemoizedFn(() => {
+    setOpenNewCollectionModal(true);
+  });
+
   return (
     <div className="relative flex h-full flex-col items-center">
       <BusterList
@@ -129,13 +137,11 @@ const CollectionList: React.FC<{
         selectedRowKeys={selectedRowKeys}
         emptyState={
           loadedCollections ? (
-            <ListEmptyState
+            <ListEmptyStateWithButton
               title="You don’t have any collections yet."
               buttonText="Create a collection"
               description="Collections help you organize your metrics and dashboards. Collections will appear here."
-              onClick={() => {
-                setOpenNewCollectionModal(true);
-              }}
+              onClick={onOpenNewCollectionModal}
             />
           ) : (
             <></>

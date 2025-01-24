@@ -1,11 +1,9 @@
 use anyhow::Result;
-use axum::{
-    extract::Path,
-    http::StatusCode,
-    Extension,
-};
+use axum::{extract::Path, http::StatusCode, Extension};
+use chrono::{DateTime, Utc};
 use diesel::prelude::*;
 use diesel_async::RunQueryDsl;
+use serde::Serialize;
 use uuid::Uuid;
 
 use crate::database::lib::get_pg_pool;
@@ -13,7 +11,17 @@ use crate::database::models::{PermissionGroup, User};
 use crate::database::schema::permission_groups;
 use crate::routes::rest::ApiResponse;
 use crate::utils::user::user_info::get_user_organization_id;
-use super::list_permission_groups::PermissionGroupInfo;
+
+#[derive(Debug, Serialize)]
+pub struct PermissionGroupInfo {
+    pub id: Uuid,
+    pub name: String,
+    pub organization_id: Uuid,
+    pub created_by: Uuid,
+    pub updated_by: Uuid,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
 
 pub async fn get_permission_group(
     Extension(user): Extension<User>,
@@ -23,14 +31,20 @@ pub async fn get_permission_group(
         Ok(group) => group,
         Err(e) => {
             tracing::error!("Error getting permission group: {:?}", e);
-            return Err((StatusCode::INTERNAL_SERVER_ERROR, "Error getting permission group"));
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Error getting permission group",
+            ));
         }
     };
 
     Ok(ApiResponse::JsonData(permission_group))
 }
 
-async fn get_permission_group_handler(user: User, permission_group_id: Uuid) -> Result<PermissionGroupInfo> {
+async fn get_permission_group_handler(
+    user: User,
+    permission_group_id: Uuid,
+) -> Result<PermissionGroupInfo> {
     let mut conn = get_pg_pool().get().await?;
     let organization_id = get_user_organization_id(&user.id).await?;
 
@@ -51,4 +65,4 @@ async fn get_permission_group_handler(user: User, permission_group_id: Uuid) -> 
         created_at: permission_group.created_at,
         updated_at: permission_group.updated_at,
     })
-} 
+}

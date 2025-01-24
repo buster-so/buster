@@ -1,11 +1,12 @@
 import { useDebounceFn, useMemoizedFn } from 'ahooks';
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useLayoutEffect, useState, useTransition } from 'react';
 import isEqual from 'lodash/isEqual';
 
 interface UseDebounceSearchProps<T> {
   items: T[];
   searchPredicate: (item: T, searchText: string) => boolean;
   debounceTime?: number;
+  isFetched?: boolean;
 }
 
 export const useDebounceSearch = <T>({
@@ -45,7 +46,7 @@ export const useDebounceSearch = <T>({
     }
   });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isEqual(items, filteredItems)) {
       setFilteredItems(items);
     }

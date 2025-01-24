@@ -11,7 +11,7 @@ import {
 } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useBusterNotifications } from '@/context/BusterNotifications';
-import { RustApiError } from './buster-rest/errors';
+import { RustApiError } from './buster_rest/errors';
 import { useMemoizedFn } from 'ahooks';
 
 export interface BaseCreateQueryProps {
@@ -50,7 +50,7 @@ export const useCreateReactQuery = <T>({
     queryFn,
     enabled: baseEnabled && !!enabled,
     initialData,
-    retry: 1,
+    retry: 0,
     refetchOnWindowFocus,
     refetchOnMount,
     staleTime,
@@ -133,7 +133,7 @@ export const useCreateReactQueryPaginated = <T>({
     queryFn,
     enabled: baseEnabled && !!enabled,
     initialData,
-    retry: 1,
+    retry: 0,
     refetchOnWindowFocus,
     refetchOnMount,
     placeholderData: keepPreviousData,

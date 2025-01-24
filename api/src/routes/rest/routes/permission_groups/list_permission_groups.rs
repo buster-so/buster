@@ -9,7 +9,8 @@ use uuid::Uuid;
 
 use crate::database::lib::get_pg_pool;
 use crate::database::models::{PermissionGroup, User};
-use crate::database::schema::permission_groups;
+use crate::database::schema::{permission_groups, permission_groups_to_identities, dataset_permissions, dataset_groups_permissions};
+use crate::database::enums::IdentityType;
 use crate::routes::rest::ApiResponse;
 use crate::utils::user::user_info::get_user_organization_id;
 
@@ -22,6 +23,9 @@ pub struct PermissionGroupInfo {
     pub updated_by: Uuid,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+    pub user_count: i64,
+    pub dataset_count: i64,
+    pub dataset_group_count: i64,
 }
 
 pub async fn list_permission_groups(
@@ -45,23 +49,79 @@ async fn list_permission_groups_handler(user: User) -> Result<Vec<PermissionGrou
     let mut conn = get_pg_pool().get().await?;
     let organization_id = get_user_organization_id(&user.id).await?;
 
-    let permission_groups: Vec<PermissionGroup> = permission_groups::table
+    let permission_groups = permission_groups::table
+        .left_join(
+            permission_groups_to_identities::table.on(
+                permission_groups_to_identities::permission_group_id
+                    .eq(permission_groups::id)
+                    .and(permission_groups_to_identities::deleted_at.is_null())
+                    .and(permission_groups_to_identities::identity_type.eq(IdentityType::User))
+            ),
+        )
+        .left_join(
+            dataset_permissions::table.on(
+                dataset_permissions::permission_id
+                    .eq(permission_groups::id)
+                    .and(dataset_permissions::permission_type.eq("permission_group"))
+                    .and(dataset_permissions::deleted_at.is_null())
+            ),
+        )
+        .left_join(
+            dataset_groups_permissions::table.on(
+                dataset_groups_permissions::permission_id
+                    .eq(permission_groups::id)
+                    .and(dataset_groups_permissions::permission_type.eq("permission_group"))
+                    .and(dataset_groups_permissions::deleted_at.is_null())
+            ),
+        )
+        .group_by((
+            permission_groups::id,
+            permission_groups::name,
+            permission_groups::organization_id,
+            permission_groups::created_by,
+            permission_groups::updated_by,
+            permission_groups::created_at,
+            permission_groups::updated_at,
+        ))
+        .select((
+            permission_groups::id,
+            permission_groups::name,
+            permission_groups::organization_id,
+            permission_groups::created_by,
+            permission_groups::updated_by,
+            permission_groups::created_at,
+            permission_groups::updated_at,
+            diesel::dsl::sql::<diesel::sql_types::BigInt>(
+                "COUNT(DISTINCT permission_groups_to_identities.identity_id)",
+            ),
+            diesel::dsl::sql::<diesel::sql_types::BigInt>(
+                "COUNT(DISTINCT dataset_permissions.dataset_id)",
+            ),
+            diesel::dsl::sql::<diesel::sql_types::BigInt>(
+                "COUNT(DISTINCT dataset_groups_permissions.dataset_group_id)",
+            ),
+        ))
         .filter(permission_groups::organization_id.eq(organization_id))
         .filter(permission_groups::deleted_at.is_null())
         .order_by(permission_groups::created_at.desc())
-        .load(&mut *conn)
+        .load::<(Uuid, String, Uuid, Uuid, Uuid, DateTime<Utc>, DateTime<Utc>, i64, i64, i64)>(&mut *conn)
         .await?;
 
     Ok(permission_groups
         .into_iter()
-        .map(|group| PermissionGroupInfo {
-            id: group.id,
-            name: group.name,
-            organization_id: group.organization_id,
-            created_by: group.created_by,
-            updated_by: group.updated_by,
-            created_at: group.created_at,
-            updated_at: group.updated_at,
+        .map(|(id, name, organization_id, created_by, updated_by, created_at, updated_at, user_count, dataset_count, dataset_group_count)| {
+            PermissionGroupInfo {
+                id,
+                name,
+                organization_id,
+                created_by,
+                updated_by,
+                created_at,
+                updated_at,
+                user_count,
+                dataset_count,
+                dataset_group_count,
+            }
         })
         .collect())
 }

@@ -1,4 +1,4 @@
-import { useGetDatasetData, useGetDatasetMetadata } from '@/api/buster-rest/datasets';
+import { useGetDatasetData, useGetDatasetMetadata } from '@/api/buster_rest/datasets';
 
 export const useIndividualDataset = ({ datasetId }: { datasetId: string }) => {
   const dataset = useGetDatasetMetadata(datasetId);

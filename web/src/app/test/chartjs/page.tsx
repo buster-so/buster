@@ -1,6 +1,6 @@
 'use client';
 
-import { ColumnMetaData, DEFAULT_COLUMN_SETTINGS } from '@/api/buster-rest';
+import { ColumnMetaData, DEFAULT_COLUMN_SETTINGS } from '@/api/buster_rest';
 import {
   BusterChart,
   BusterChartProps,

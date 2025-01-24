@@ -1,4 +1,4 @@
-import { BusterDashboardMetric } from '@/api/buster-rest';
+import { BusterDashboardMetric } from '@/api/buster_rest';
 import { useStyles } from '@/app/app/_components/ShareMenu/useStyles';
 import { AppMaterialIcons, Title, Text } from '@/components';
 import { SortableItemContext } from '@/components/grid/_BusterSortableItemDragContainer';

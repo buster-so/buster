@@ -2,7 +2,7 @@
 
 import { useSupabaseServerContext } from '@/context/Supabase/useSupabaseContext';
 import React from 'react';
-import { getMyUserInfo } from '@/api/buster-rest/users/requests';
+import { getMyUserInfo } from '@/api/buster_rest/users/requests';
 import { getAppSplitterLayout } from '@/components/layout/AppSplitter';
 import { useBusterSupabaseAuthMethods } from '@/hooks/useBusterSupabaseAuthMethods';
 import { createBusterRoute } from '@/routes';
@@ -26,7 +26,7 @@ export default async function Layout({
   const newUserRoute = createBusterRoute({ route: BusterAppRoutes.NEW_USER });
 
   if (
-    (!userInfo?.organizations[0]?.id || !userInfo?.user?.name) &&
+    (!userInfo?.organizations?.[0]?.id || !userInfo?.user?.name) &&
     !cookiePathname?.includes(newUserRoute) &&
     pathname !== newUserRoute &&
     supabaseContext.accessToken //added to avoid bug with anon user

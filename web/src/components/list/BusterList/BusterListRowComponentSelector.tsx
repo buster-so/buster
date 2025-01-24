@@ -38,6 +38,8 @@ export const BusterListRowComponentSelector = React.forwardRef<
     },
     ref
   ) => {
+    if (row.hidden) return null;
+
     if (row.rowSection) {
       return (
         <BusterListSectionComponent

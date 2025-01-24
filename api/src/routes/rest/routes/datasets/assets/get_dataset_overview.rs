@@ -220,52 +220,63 @@ pub async fn get_dataset_overview(
 
             let mut lineage = vec![];
 
-            // Always add default access lineage first
-            let mut default_lineage = vec![UserPermissionLineage {
-                id: Some(id),
-                type_: String::from("user"),
-                name: Some(String::from("Default Access")),
-            }];
+            // Only add default access lineage if they don't have other access paths or aren't a restricted querier
+            let has_other_access = if matches!(role, UserOrganizationRole::RestrictedQuerier) {
+                datasets_query.iter().any(|(_, _, user_id)| *user_id == id) ||
+                permission_groups_query.iter().any(|(_, _, user_id)| *user_id == id) ||
+                dataset_groups_query.iter().any(|(_, _, user_id)| *user_id == id) ||
+                permission_group_dataset_groups_query.iter().any(|(_, _, _, _, user_id)| *user_id == id)
+            } else {
+                false
+            };
 
-            match role {
-                UserOrganizationRole::WorkspaceAdmin => {
-                    default_lineage.push(UserPermissionLineage {
-                        id: Some(id),
-                        type_: String::from("user"),
-                        name: Some(String::from("Workspace Admin")),
-                    });
+            if !has_other_access {
+                let mut default_lineage = vec![UserPermissionLineage {
+                    id: Some(id),
+                    type_: String::from("user"),
+                    name: Some(String::from("Default Access")),
+                }];
+
+                match role {
+                    UserOrganizationRole::WorkspaceAdmin => {
+                        default_lineage.push(UserPermissionLineage {
+                            id: Some(id),
+                            type_: String::from("user"),
+                            name: Some(String::from("Workspace Admin")),
+                        });
+                    }
+                    UserOrganizationRole::DataAdmin => {
+                        default_lineage.push(UserPermissionLineage {
+                            id: Some(id),
+                            type_: String::from("user"),
+                            name: Some(String::from("Data Admin")),
+                        });
+                    }
+                    UserOrganizationRole::Querier => {
+                        default_lineage.push(UserPermissionLineage {
+                            id: Some(id),
+                            type_: String::from("user"),
+                            name: Some(String::from("Querier")),
+                        });
+                    }
+                    UserOrganizationRole::RestrictedQuerier => {
+                        default_lineage.push(UserPermissionLineage {
+                            id: Some(id),
+                            type_: String::from("user"),
+                            name: Some(String::from("Restricted Querier")),
+                        });
+                    }
+                    UserOrganizationRole::Viewer => {
+                        default_lineage.push(UserPermissionLineage {
+                            id: Some(id),
+                            type_: String::from("user"),
+                            name: Some(String::from("Viewer")),
+                        });
+                    }
                 }
-                UserOrganizationRole::DataAdmin => {
-                    default_lineage.push(UserPermissionLineage {
-                        id: Some(id),
-                        type_: String::from("user"),
-                        name: Some(String::from("Data Admin")),
-                    });
-                }
-                UserOrganizationRole::Querier => {
-                    default_lineage.push(UserPermissionLineage {
-                        id: Some(id),
-                        type_: String::from("user"),
-                        name: Some(String::from("Querier")),
-                    });
-                }
-                UserOrganizationRole::RestrictedQuerier => {
-                    default_lineage.push(UserPermissionLineage {
-                        id: Some(id),
-                        type_: String::from("user"),
-                        name: Some(String::from("Restricted Querier")),
-                    });
-                }
-                UserOrganizationRole::Viewer => {
-                    default_lineage.push(UserPermissionLineage {
-                        id: Some(id),
-                        type_: String::from("user"),
-                        name: Some(String::from("Viewer")),
-                    });
-                }
+
+                lineage.push(default_lineage);
             }
-
-            lineage.push(default_lineage);
 
             // Only add additional lineages for RestrictedQuerier if they have access
             if matches!(role, UserOrganizationRole::RestrictedQuerier) {

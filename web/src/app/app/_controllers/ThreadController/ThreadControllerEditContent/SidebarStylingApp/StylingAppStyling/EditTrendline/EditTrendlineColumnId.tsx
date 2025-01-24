@@ -1,4 +1,4 @@
-import { ColumnMetaData, IBusterThreadMessageChartConfig } from '@/api/buster-rest';
+import { ColumnMetaData, IBusterThreadMessageChartConfig } from '@/api/buster_rest';
 import { formatLabel } from '@/utils';
 import { Select } from 'antd';
 import React, { useMemo } from 'react';

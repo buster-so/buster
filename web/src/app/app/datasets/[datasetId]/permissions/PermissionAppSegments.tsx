@@ -10,7 +10,7 @@ import {
   useDatasetListDatasetGroups,
   useDatasetListPermissionGroups,
   useDatasetListPermissionUsers
-} from '@/api/buster-rest';
+} from '@/api/buster_rest';
 import Link from 'next/link';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { useRouter } from 'next/navigation';

@@ -1,4 +1,4 @@
-import { BusterDatasetListItem } from '@/api/buster-rest/datasets';
+import { BusterDatasetListItem } from '@/api/buster_rest/datasets';
 import { AppMaterialIcons } from '@/components';
 import { SelectProps, Select } from 'antd';
 import isEmpty from 'lodash/isEmpty';

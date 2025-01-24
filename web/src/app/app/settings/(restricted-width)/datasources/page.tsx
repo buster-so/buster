@@ -1,7 +1,6 @@
 import React from 'react';
-import { Divider } from 'antd';
 import { DatasourceList } from './_DatasourceList';
-import { SettingsPageHeader } from '../../_SettingsPageHeader';
+import { SettingsPageHeader } from '../../_components/SettingsPageHeader';
 
 export default function Page() {
   return (

@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from 'antd';
 import { Text, Title } from '@/components/text';
 import { AppMaterialIcons } from '@/components/icons';
-import { NewDatasetModal } from '@appComponents/NewDatasetModal';
 
-export const NoDatasets: React.FC<{ onClose: () => void }> = React.memo(({ onClose }) => {
-  const [openNewDatasetModal, setOpenNewDatasetModal] = useState(false);
-
+export const NoDatasets: React.FC<{
+  onClose: () => void;
+  setOpenNewDatasetModal: (open: boolean) => void;
+}> = React.memo(({ onClose, setOpenNewDatasetModal }) => {
   return (
     <>
       <div className="flex flex-col items-center space-y-3 p-3">
@@ -17,6 +17,7 @@ export const NoDatasets: React.FC<{ onClose: () => void }> = React.memo(({ onClo
           <Button
             onClick={() => {
               setOpenNewDatasetModal(true);
+              onClose();
             }}
             type="default"
             icon={<AppMaterialIcons icon="table_view" />}>
@@ -24,12 +25,6 @@ export const NoDatasets: React.FC<{ onClose: () => void }> = React.memo(({ onClo
           </Button>
         </div>
       </div>
-
-      <NewDatasetModal
-        open={openNewDatasetModal}
-        onClose={() => setOpenNewDatasetModal(false)}
-        afterCreate={onClose}
-      />
     </>
   );
 });

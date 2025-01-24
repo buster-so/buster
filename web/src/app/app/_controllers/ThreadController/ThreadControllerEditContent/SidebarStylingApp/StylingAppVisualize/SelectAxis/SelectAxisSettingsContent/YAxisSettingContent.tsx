@@ -8,7 +8,7 @@ import { useMemoizedFn } from 'ahooks';
 import { useBusterThreadsContextSelector } from '@/context/Threads';
 import { EditShowAxisLabel } from './EditShowAxisLabel';
 import { EditAxisScale } from './EditAxisScale';
-import type { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads/threadConfigInterfaces';
+import type { IBusterThreadMessageChartConfig } from '@/api/buster_rest/threads/threadConfigInterfaces';
 import { AXIS_TITLE_SEPARATOR } from '@/components/charts/commonHelpers';
 
 export const YAxisSettingContent: React.FC<{

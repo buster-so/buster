@@ -2,7 +2,7 @@
 
 import React, { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
-import { BusterThreadListItem, BusterVerificationStatus } from '@/api/buster-rest';
+import { BusterThreadListItem, BusterVerificationStatus } from '@/api/buster_rest';
 import isEmpty from 'lodash/isEmpty';
 import { useBusterWebSocket } from '../BusterWebSocket';
 import { useParams } from 'next/navigation';

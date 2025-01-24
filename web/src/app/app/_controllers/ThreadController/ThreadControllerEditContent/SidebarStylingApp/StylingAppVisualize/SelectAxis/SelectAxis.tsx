@@ -1,7 +1,7 @@
 import { IBusterThreadMessage } from '@/context/Threads/interfaces';
 import React, { useMemo } from 'react';
 import { DropZone, SelectAxisDropzones, SelectAxisItem } from './SelectAxisDragContainer';
-import { IBusterThreadMessageChartConfig } from '@/api/buster-rest';
+import { IBusterThreadMessageChartConfig } from '@/api/buster_rest';
 import { getChartTypeDropZones } from './helper';
 import { ISelectAxisContext, SelectAxisProvider } from './useSelectAxisContext';
 import { useMemoizedFn, useWhyDidYouUpdate } from 'ahooks';

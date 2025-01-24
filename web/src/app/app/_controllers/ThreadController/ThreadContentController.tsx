@@ -13,7 +13,7 @@ import {
   useBusterThreadsContextSelector
 } from '@/context/Threads';
 import { canEditChart } from '@/context/Threads/helpers';
-import { ShareRole } from '@/api/buster-socket/threads';
+import { ShareRole } from '@/api/buster_socket/threads';
 import { useBusterMessageDataContextSelector } from '@/context/MessageData';
 import { useUserConfigContextSelector } from '@/context/Users';
 

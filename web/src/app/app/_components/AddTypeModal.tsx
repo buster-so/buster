@@ -8,16 +8,16 @@ import {
   BusterDashboardResponse,
   BusterSearchResult,
   BusterShareAssetType
-} from '@/api/buster-rest';
+} from '@/api/buster_rest';
 import { asset_typeToIcon } from '@/app/_helpers';
 import { CircleSpinnerLoaderContainer } from '@/components/loaders';
-import { BusterCollection } from '@/api/buster-rest/collection';
+import { BusterCollection } from '@/api/buster_rest/collection';
 import { useBusterSearchContextSelector } from '@/context/Search';
 import isEmpty from 'lodash/isEmpty';
 import { useDashboardContextSelector } from '@/context/Dashboards';
 import { useCollectionsContextSelector } from '@/context/Collections';
 import { SegmentedValue } from 'antd/es/segmented';
-import { BusterSearchRequest } from '@/api/buster-socket/search';
+import { BusterSearchRequest } from '@/api/buster_socket/search';
 import { busterAppStyleConfig } from '@/styles/busterAntDStyleConfig';
 
 const token = busterAppStyleConfig.token!;

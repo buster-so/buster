@@ -1,4 +1,4 @@
-import { useDatasetUpdatePermissionUsers } from '@/api/buster-rest';
+import { useDatasetUpdatePermissionUsers } from '@/api/buster_rest';
 import { AppMaterialIcons } from '@/components';
 import { BusterListSelectedOptionPopupContainer } from '@/components/list';
 import { useMemoizedFn } from 'ahooks';

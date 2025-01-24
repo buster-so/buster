@@ -1,6 +1,6 @@
 'use client';
 
-import { useGetDatasetPermissionsOverview } from '@/api/buster-rest/datasets';
+import { useGetDatasetPermissionsOverview } from '@/api/buster_rest/datasets';
 import React from 'react';
 import {
   PermissionSearchAndListWrapper,

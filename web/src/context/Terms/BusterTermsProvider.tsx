@@ -1,8 +1,8 @@
-import { BusterTerm, BusterTermListItem } from '@/api/buster-rest';
+import { BusterTerm, BusterTermListItem } from '@/api/buster_rest';
 import React, { useEffect } from 'react';
 import { useBusterWebSocket } from '../BusterWebSocket';
 import { useMemoizedFn, useMount, useUnmount } from 'ahooks';
-import { TermPostRequest, TermUpdateRequest } from '@/api/buster-socket/terms';
+import { TermPostRequest, TermUpdateRequest } from '@/api/buster_socket/terms';
 import { useBusterNotifications } from '../BusterNotifications/BusterNotifications';
 import {
   createContext,

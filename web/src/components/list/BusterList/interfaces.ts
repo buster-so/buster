@@ -11,7 +11,7 @@ export interface BusterListProps {
   columnRowVariant?: 'default' | 'containerized';
   rows: BusterListRow[];
   onSelectChange?: (selectedRowKeys: string[]) => void;
-  emptyState?: undefined | React.ReactNode;
+  emptyState?: undefined | React.ReactNode | string;
   showHeader?: boolean;
   selectedRowKeys?: string[];
   contextMenu?: BusterListContextMenu;
@@ -39,6 +39,7 @@ export interface BusterListRowItem {
   link?: string;
   onSelect?: () => void;
   rowSection?: BusterListSectionRow;
+  hidden?: boolean;
 }
 
 export interface BusterListSectionRow {

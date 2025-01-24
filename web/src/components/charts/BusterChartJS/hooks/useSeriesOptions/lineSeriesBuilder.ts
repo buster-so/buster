@@ -6,7 +6,7 @@ import { LabelBuilderProps } from './useSeriesOptions';
 import { formatChartLabelDelimiter } from '../../../commonHelpers';
 import { addOpacityToColor, createDayjsDate } from '@/utils';
 import { defaultLabelOptionConfig } from '../useChartSpecificOptions/labelOptionConfig';
-import { DEFAULT_COLUMN_SETTINGS } from '@/api/buster-rest';
+import { DEFAULT_COLUMN_SETTINGS } from '@/api/buster_rest';
 import type { ColumnSettings } from '@/components/charts/interfaces';
 import { formatBarAndLineDataLabel } from '../../helpers';
 

@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useBusterWebSocket } from '../BusterWebSocket';
-import { BusterPermissionListTeam } from '@/api/buster-rest/permissions';
+import { BusterPermissionListTeam } from '@/api/buster_rest/permissions';
 import { useMemoizedFn } from 'ahooks';
-import { PermissionListTeamRequest } from '@/api/buster-socket/permissions';
+import { PermissionListTeamRequest } from '@/api/buster_socket/permissions';
 import { useBusterNotifications } from '../BusterNotifications';
 import { usePermissionsContextSelector } from './PermissionsConfigProvider';
 

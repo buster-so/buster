@@ -3,7 +3,7 @@
 import { useMemoizedFn } from 'ahooks';
 import React, { useEffect, useMemo, useState, forwardRef, useImperativeHandle } from 'react';
 import SplitPane, { Pane } from './SplitPane';
-import { createAutoSaveId } from './helper';
+import { createAutoSaveId, setAppSplitterCookie } from './helper';
 import Cookies from 'js-cookie';
 import { createStyles } from 'antd-style';
 
@@ -101,7 +101,7 @@ export const AppSplitter = forwardRef<
       setSizes(sizes);
       const key = createAutoSaveId(autoSaveId);
       const sizesString = preserveSide === 'left' ? [sizes[0], 'auto'] : ['auto', sizes[1]];
-      Cookies.set(key, JSON.stringify(sizesString), { expires: 365 });
+      setAppSplitterCookie(key, sizesString);
     });
 
     const onPreserveSide = useMemoizedFn(() => {
@@ -130,7 +130,7 @@ export const AppSplitter = forwardRef<
           const key = createAutoSaveId(autoSaveId);
           const sizesString =
             preserveSide === 'left' ? [newSizes[0], 'auto'] : ['auto', newSizes[1]];
-          Cookies.set(key, JSON.stringify(sizesString), { expires: 365 });
+          setAppSplitterCookie(key, sizesString);
         }
       }
     }));

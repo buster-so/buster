@@ -1,21 +1,21 @@
-import { BusterSocketResponseRoute } from '@/api/buster-socket';
+import { BusterSocketResponseRoute } from '@/api/buster_socket';
 import {
   BusterSocketResponseBase,
   BusterSocketResponseMessage
-} from '@/api/buster-socket/baseInterfaces';
-import { ThreadResponses } from '@/api/buster-socket/threads';
-import { DashboardResponses } from '@/api/buster-socket/dashboards';
+} from '@/api/buster_socket/baseInterfaces';
+import { ThreadResponses } from '@/api/buster_socket/threads';
+import { DashboardResponses } from '@/api/buster_socket/dashboards';
 import { isDev } from '@/config';
-import { DatasetResponses } from '@/api/buster-socket/datasets';
-import { UserResponses } from '@/api/buster-socket/user';
-import { CollectionResponses } from '@/api/buster-socket/collections';
-import { DatasourceResponses } from '@/api/buster-socket/datasources/datasourceResponses';
-import { TermsResponses } from '@/api/buster-socket/terms/termsResponses';
-import { PermissionsResponses } from '@/api/buster-socket/permissions';
-import { TeamResponses } from '@/api/buster-socket/user/teamResponses';
-import { SearchResponses } from '@/api/buster-socket/search';
-import { OrganizationResponses } from '@/api/buster-socket/organizations';
-import { SQLResponses } from '@/api/buster-socket/sql';
+import { DatasetResponses } from '@/api/buster_socket/datasets';
+import { UserResponses } from '@/api/buster_socket/user';
+import { CollectionResponses } from '@/api/buster_socket/collections';
+import { DatasourceResponses } from '@/api/buster_socket/datasources/datasourceResponses';
+import { TermsResponses } from '@/api/buster_socket/terms/termsResponses';
+import { PermissionsResponses } from '@/api/buster_socket/permissions';
+import { TeamResponses } from '@/api/buster_socket/user/teamResponses';
+import { SearchResponses } from '@/api/buster_socket/search';
+import { OrganizationResponses } from '@/api/buster_socket/organizations';
+import { SQLResponses } from '@/api/buster_socket/sql';
 
 export const createBusterResponse = (
   message: BusterSocketResponseMessage

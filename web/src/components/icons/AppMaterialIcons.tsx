@@ -31,15 +31,17 @@ type AppMaterialIconProps = Omit<MaterialSymbolProps, 'icon'> & {
   icon: MaterialSymbolProps['icon'] | keyof typeof CustomIcons;
 };
 
-export const AppMaterialIcons: React.FC<AppMaterialIconProps> = ({
-  size = 16,
-  weight = 400,
-  ...props
-}) => {
-  if (props.icon in CustomIcons) {
-    const IconComponent = CustomIcons[props.icon as keyof typeof CustomIcons];
-    return <IconComponent size={size} {...(props as any)} />;
-  }
+export const AppMaterialIcons: React.FC<AppMaterialIconProps> = React.memo(
+  ({ size = 16, weight = 400, ...props }) => {
+    if (props.icon in CustomIcons) {
+      const IconComponent = CustomIcons[props.icon as keyof typeof CustomIcons];
+      return <IconComponent size={size} {...(props as any)} />;
+    }
 
-  return <MaterialSymbol size={size} {...props} icon={props.icon as MaterialSymbolProps['icon']} />;
-};
+    return (
+      <MaterialSymbol size={size} {...props} icon={props.icon as MaterialSymbolProps['icon']} />
+    );
+  }
+);
+
+AppMaterialIcons.displayName = 'AppMaterialIcons';

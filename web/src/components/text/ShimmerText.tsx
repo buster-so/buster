@@ -1,62 +1,57 @@
-import { createStyles } from 'antd-style';
+'use client';
+
+import { motion } from 'framer-motion';
 import React from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { busterAppStyleConfig } from '@/styles/busterAntDStyleConfig';
 
-export const ShimmerText: React.FC<{
-  className?: string;
+const token = busterAppStyleConfig.token!;
+
+interface ShimmerText2Props {
   text: string;
-  size?: number;
-  onClick?: () => void;
-}> = ({ className = '', text, size = 12, onClick }) => {
-  const { cx, styles } = useStyles();
+  colors?: string[];
+  duration?: number;
+  fontSize?: number;
+}
 
-  return (
-    <AnimatePresence mode="wait" initial={false}>
+const animate = {
+  backgroundPosition: ['200% 50%', '0% 50%']
+};
+
+export const ShimmerText: React.FC<ShimmerText2Props> = React.memo(
+  ({
+    text,
+    colors = [token.colorTextBase, token.colorTextPlaceholder],
+    duration = 1.5,
+    fontSize = 13
+  }) => {
+    if (colors.length < 2) {
+      throw new Error('ShimmerText requires at least 2 colors');
+    }
+
+    const gradientColors = [...colors, colors[0]].join(', ');
+
+    return (
       <motion.div
-        onClick={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-          onClick?.();
-        }}
-        transition={{ duration: 0.375 }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        key={text}
-        className={cx(styles.shimmer, className)}
         style={{
-          fontSize: `${size}px`
+          position: 'relative',
+          display: 'inline-block',
+          background: `linear-gradient(90deg, ${gradientColors})`,
+          backgroundSize: '200% 100%',
+          backgroundClip: 'text',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontSize: fontSize
+        }}
+        animate={animate}
+        transition={{
+          duration,
+          repeat: Infinity,
+          ease: 'linear'
         }}>
         {text}
       </motion.div>
-    </AnimatePresence>
-  );
-};
+    );
+  }
+);
 
-const useStyles = createStyles(({ css, token }) => {
-  return {
-    shimmer: css`
-      animation: shimmer 3s linear infinite;
-      color: ${token.colorTextPlaceholder};
-      background: linear-gradient(
-        90deg,
-        ${token.colorTextPlaceholder} 33%,
-        ${token.colorText} 50%,
-        ${token.colorTextPlaceholder} 67%
-      );
-      background-size: 300% 100%;
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-
-      @keyframes shimmer {
-        0% {
-          background-position: right;
-        }
-        100% {
-          background-position: left;
-        }
-      }
-    `
-  };
-});
+ShimmerText.displayName = 'ShimmerText';

@@ -1,4 +1,4 @@
-import { ColumnDataType } from '@/api/buster-rest';
+import { ColumnDataType } from '@/api/buster_rest';
 import { ColumnLabelFormat } from '@/components/charts';
 
 export const NUMBER_TYPES: (ColumnDataType | string)[] = [

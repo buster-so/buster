@@ -73,6 +73,10 @@ pub async fn update_user_handler(
         }
     };
 
+    if &auth_user.id == user_id {
+        return Err(anyhow::anyhow!("Cannot update self"));
+    };
+
     match is_user_workspace_admin_or_data_admin(auth_user, &user_organization_id).await {
         Ok(true) => (),
         Ok(false) => return Err(anyhow::anyhow!("Insufficient permissions")),

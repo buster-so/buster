@@ -1,12 +1,12 @@
 import React, { PropsWithChildren, useEffect, useRef, useState } from 'react';
 import { useBusterWebSocket } from '../BusterWebSocket';
-import { DataSource, DataSourceListItem } from '@/api/buster-rest/datasources';
+import { DataSource, DataSourceListItem } from '@/api/buster_rest/datasources';
 import { useSelectedLayoutSegments } from 'next/navigation';
 import { useMemoizedFn, useMount } from 'ahooks';
-import { DatasourceCreateCredentials } from '@/api/buster-socket/datasources/interface';
+import { DatasourceCreateCredentials } from '@/api/buster_socket/datasources/interface';
 import { useAppLayoutContextSelector } from '../BusterAppLayout';
 import { BusterRoutes } from '@/routes';
-import { DatasourceUpdateRequest } from '@/api/buster-socket/datasources/datasourceRequests';
+import { DatasourceUpdateRequest } from '@/api/buster_socket/datasources/datasourceRequests';
 import { useBusterNotifications } from '../BusterNotifications';
 import {
   ContextSelector,

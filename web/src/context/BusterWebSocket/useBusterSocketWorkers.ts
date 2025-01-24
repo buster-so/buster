@@ -2,7 +2,7 @@ import { useMemoizedFn } from 'ahooks';
 import { useContext, useEffect, useRef } from 'react';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import { createBusterResponse } from './helpers';
-import { BusterSocketResponse, BusterSocketResponseRoute } from '@/api/buster-socket';
+import { BusterSocketResponse, BusterSocketResponseRoute } from '@/api/buster_socket';
 import { useBusterNotifications } from '../BusterNotifications/BusterNotifications';
 import { BusterOnCallback } from './useBusterWebSocket';
 

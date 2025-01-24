@@ -6,17 +6,19 @@ import { Button, Dropdown, Skeleton } from 'antd';
 import { AppMaterialIcons } from '@/components';
 import { useAntToken } from '@/styles/useAntToken';
 import { AppDataSourceIcon } from '@/components/icons/AppDataSourceIcons';
-import { DataSourceListItem } from '@/api/buster-rest';
+import { DataSourceListItem } from '@/api/buster_rest';
 import { createStyles } from 'antd-style';
 import { MenuProps } from 'antd/lib';
 import Link from 'next/link';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { useMount } from 'ahooks';
 import { Text } from '@/components';
-import { SettingsEmptyState } from '../../_SettingsEmptyState';
+import { SettingsEmptyState } from '../../_components/SettingsEmptyState';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
+import { useUserConfigContextSelector } from '@/context/Users';
 
 export const DatasourceList: React.FC = () => {
+  const isAdmin = useUserConfigContextSelector((state) => state.isAdmin);
   const dataSourcesList = useDataSourceContextSelector((state) => state.dataSourcesList);
   const loadingDatasources = useDataSourceContextSelector((state) => state.loadingDatasources);
   const initDataSourceList = useDataSourceContextSelector((state) => state.initDataSourceList);
@@ -29,7 +31,7 @@ export const DatasourceList: React.FC = () => {
 
   return (
     <div className="flex flex-col space-y-4">
-      <AddSourceHeader />
+      <AddSourceHeader isAdmin={isAdmin} />
 
       {loadingDatasources ? (
         <SkeletonLoader />
@@ -37,6 +39,7 @@ export const DatasourceList: React.FC = () => {
         <DataSourceItems sources={dataSourcesList} />
       ) : (
         <SettingsEmptyState
+          showButton={isAdmin}
           title={`You don't have any data sources yet.`}
           description={`You don’t have any datasources. As soon as you do, they will start to  appear here.`}
           buttonText="New datasource"
@@ -52,7 +55,7 @@ export const DatasourceList: React.FC = () => {
   );
 };
 
-const AddSourceHeader: React.FC<{}> = () => {
+const AddSourceHeader: React.FC<{ isAdmin: boolean }> = ({ isAdmin }) => {
   return (
     <div className="flex w-full justify-between">
       <Text>Your data sources</Text>
@@ -60,9 +63,11 @@ const AddSourceHeader: React.FC<{}> = () => {
         href={createBusterRoute({
           route: BusterRoutes.SETTINGS_DATASOURCES_ADD
         })}>
-        <Button type="text" icon={<AppMaterialIcons icon="add" />}>
-          New datasource
-        </Button>
+        {isAdmin && (
+          <Button type="text" icon={<AppMaterialIcons icon="add" />}>
+            New datasource
+          </Button>
+        )}
       </Link>
     </div>
   );

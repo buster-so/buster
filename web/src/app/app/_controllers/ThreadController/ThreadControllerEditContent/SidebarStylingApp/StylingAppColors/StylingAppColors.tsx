@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { CustomApp } from './CustomApp';
 import { PaletteApp } from './PaletteApp';
 import { ColorsApp } from './ColorsApp';
-import { IBusterThreadMessageChartConfig } from '@/api/buster-rest';
+import { IBusterThreadMessageChartConfig } from '@/api/buster_rest';
 import { useBusterThreadsContextSelector } from '@/context/Threads';
 import { useMemoizedFn } from 'ahooks';
 

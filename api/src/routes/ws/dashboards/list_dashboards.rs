@@ -115,13 +115,6 @@ async fn list_dashboards_handler(
                 .and(asset_permissions::asset_type.eq(AssetType::Dashboard))
                 .and(asset_permissions::deleted_at.is_null())),
         )
-        .left_join(
-            teams_to_users::table.on(asset_permissions::identity_id
-                .eq(teams_to_users::user_id)
-                .and(asset_permissions::identity_type.eq(IdentityType::Team))
-                .and(teams_to_users::deleted_at.is_null())
-                .and(asset_permissions::deleted_at.is_null())),
-        )
         .inner_join(users::table.on(users::id.eq(dashboards::created_by)))
         .select((
             dashboards::id,
@@ -133,11 +126,7 @@ async fn list_dashboards_handler(
             users::name.nullable(),
         ))
         .filter(dashboards::deleted_at.is_null())
-        .filter(
-            asset_permissions::identity_id
-                .eq(user_id)
-                .or(teams_to_users::user_id.eq(user_id)),
-        )
+        .filter(asset_permissions::identity_id.eq(user_id))
         .distinct()
         .order((dashboards::updated_at.desc(), dashboards::id.asc()))
         .offset(page * page_size)

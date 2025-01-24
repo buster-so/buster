@@ -11,7 +11,7 @@ import type { ScaleChartOptions, Scale } from 'chart.js';
 import { useMemo } from 'react';
 import { yAxisSimilar, formatYAxisLabel } from '@/components/charts/commonHelpers';
 import { useY2AxisTitle } from '@/components/charts/commonHelpers/useY2AxisTitle';
-import { DEFAULT_CHART_CONFIG } from '@/api/buster-rest';
+import { DEFAULT_CHART_CONFIG } from '@/api/buster_rest';
 
 export const useY2Axis = ({
   columnLabelFormats,

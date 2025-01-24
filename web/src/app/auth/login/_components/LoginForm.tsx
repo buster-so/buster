@@ -14,7 +14,7 @@ import { Title } from '@/components/text/Title';
 import Cookies from 'js-cookie';
 import { useBusterSupabaseAuthMethods } from '@/hooks/useBusterSupabaseAuthMethods';
 import { PolicyCheck } from './PolicyCheck';
-import { rustErrorHandler } from '@/api/buster-rest/errors';
+import { rustErrorHandler } from '@/api/buster_rest/errors';
 
 const DEFAULT_CREDENTIALS = {
   email: process.env.NEXT_PUBLIC_USER!,

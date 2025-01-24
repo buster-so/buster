@@ -6,7 +6,7 @@ import { useAntToken } from '@/styles/useAntToken';
 import { useBusterNewThreadsContextSelector } from '@/context/Threads';
 import { inputHasText } from '@/utils';
 import { useBusterSearchContextSelector } from '@/context/Search';
-import { BusterSearchResult } from '@/api/buster-rest';
+import { BusterSearchResult } from '@/api/buster_rest';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { NewThreadModalDataSourceSelect } from './NewThreadModalDatasourceSelect';
 import { SuggestedPromptsContainer } from './SuggestedPromptsContainer';
@@ -14,7 +14,8 @@ import { NoDatasets } from './NoDatasets';
 import { useParams } from 'next/navigation';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { BusterRoutes } from '@/routes';
-import { useGetDatasets } from '@/api/buster-rest/datasets';
+import { useGetDatasets } from '@/api/buster_rest/datasets';
+import { NewDatasetModal } from '../NewDatasetModal';
 
 const themeConfig: ThemeConfig = {
   components: {
@@ -49,6 +50,7 @@ export const NewThreadModal = React.memo<{
   const prompt = useBusterNewThreadsContextSelector((x) => x.prompt);
   const onBusterSearch = useBusterSearchContextSelector((x) => x.onBusterSearch);
   const token = useAntToken();
+  const [openNewDatasetModal, setOpenNewDatasetModal] = useState(false);
   const [suggestedPrompts, setSuggestedPrompts] = useState<BusterSearchResult[]>([]);
   const [activeItem, setActiveItem] = useState<number | null>(null);
   const [defaultSuggestedPrompts, setDefaultSuggestedPrompts] = useState<BusterSearchResult[]>([]);
@@ -163,7 +165,9 @@ export const NewThreadModal = React.memo<{
           </div>
         )}
 
-        {!hasDatasets && <NoDatasets onClose={onClose} />}
+        {!hasDatasets && (
+          <NoDatasets onClose={onClose} setOpenNewDatasetModal={setOpenNewDatasetModal} />
+        )}
 
         {hasDatasets && showSuggested && <Divider className="!m-0" />}
 
@@ -178,6 +182,14 @@ export const NewThreadModal = React.memo<{
           />
         )}
       </Modal>
+
+      {!hasDatasets && (
+        <NewDatasetModal
+          open={openNewDatasetModal}
+          onClose={() => setOpenNewDatasetModal(false)}
+          afterCreate={onClose}
+        />
+      )}
     </ConfigProvider>
   );
 });

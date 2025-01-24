@@ -1,4 +1,4 @@
-import { BusterTerm } from '@/api/buster-rest';
+import { BusterTerm } from '@/api/buster_rest';
 import { AppTooltip, AppMaterialIcons } from '@/components';
 import { AppDropdownSelectProps, AppDropdownSelect } from '@/components/dropdown';
 import { useDatasetContextSelector } from '@/context/Datasets';
@@ -7,7 +7,7 @@ import { createStyles } from 'antd-style';
 import React, { useContext, useMemo } from 'react';
 import { Button } from 'antd';
 import { Text } from '@/components';
-import { useGetDatasets } from '@/api/buster-rest/datasets';
+import { useGetDatasets } from '@/api/buster_rest/datasets';
 
 const useStyles = createStyles(({ token, css }) => ({
   datasetItem: css`

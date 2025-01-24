@@ -1,14 +1,18 @@
 'use client';
 
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { AppContent } from '../_components/AppContent';
 import { BusterUserAvatar } from '@/components';
 import { formatDate } from '@/utils';
-import { BusterList, BusterListColumn, BusterListRow } from '@/components/list';
+import {
+  ListEmptyStateWithButton,
+  BusterList,
+  BusterListColumn,
+  BusterListRow
+} from '@/components/list';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import { BusterTermListItem } from '@/api/buster-rest';
-import { useMount } from 'ahooks';
-import { ListEmptyState } from '../_components/Lists/ListEmptyState';
+import { BusterTermListItem } from '@/api/buster_rest';
+import { useMemoizedFn, useMount } from 'ahooks';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { useTermsContextSelector } from '@/context/Terms';
 import { TermListSelectedOptionPopup } from './_TermListSelectedPopup';
@@ -60,6 +64,10 @@ export const TermsContent: React.FC = () => {
     }));
   }, [termsList]);
 
+  const onOpenNewTermModal = useMemoizedFn(() => {
+    onSetOpenNewTermsModal(true);
+  });
+
   useMount(() => {
     getInitialTerms();
   });
@@ -73,13 +81,11 @@ export const TermsContent: React.FC = () => {
         onSelectChange={setSelectedTermIds}
         emptyState={
           loadedTermsList ? (
-            <ListEmptyState
+            <ListEmptyStateWithButton
               isAdmin={isAdmin}
               title="You don’t have any terms yet."
               description="You don’t have any terms. As soon as you do, they will start to  appear here."
-              onClick={() => {
-                onSetOpenNewTermsModal(true);
-              }}
+              onClick={onOpenNewTermModal}
               buttonText="New term"
             />
           ) : (

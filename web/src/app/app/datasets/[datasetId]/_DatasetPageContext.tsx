@@ -10,7 +10,7 @@ import {
   useContextSelector
 } from '@fluentui/react-context-selector';
 import { useDebounce, useMemoizedFn } from 'ahooks';
-import { useDeployDataset } from '@/api/buster-rest';
+import { useDeployDataset } from '@/api/buster_rest';
 
 export const useDatasetPageContext = ({ datasetId }: { datasetId: string }) => {
   const segments = useSelectedLayoutSegment() as DatasetApps;

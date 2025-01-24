@@ -1,7 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import { DatasetPermissionOverviewUser } from '@/api/buster-rest/datasets';
-import { BusterUserAvatar, Text } from '@/components';
-import { BusterListColumn, BusterListRowItem, InfiniteListContainer } from '@/components/list';
+import { DatasetPermissionOverviewUser } from '@/api/buster_rest/datasets';
+import {
+  BusterListColumn,
+  BusterListRowItem,
+  EmptyStateList,
+  InfiniteListContainer
+} from '@/components/list';
 import { BusterInfiniteList } from '@/components/list';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { PermissionLineageBreadcrumb } from '../../../../../_components/PermissionComponents';
@@ -73,29 +77,28 @@ export const PermissionListUserContainer: React.FC<{
   }, [filteredUsers]);
 
   const rows: BusterListRowItem[] = useMemo(
-    () =>
-      [
-        {
-          id: 'header-assigned',
-          data: {},
-          hidden: canQueryUsers.length === 0,
-          rowSection: {
-            title: 'Assigned',
-            secondaryTitle: numberOfUsers.toString()
-          }
-        },
-        ...canQueryUsers,
-        {
-          id: 'header-not-assigned',
-          data: {},
-          hidden: cannotQueryUsers.length === 0,
-          rowSection: {
-            title: 'Not Assigned',
-            secondaryTitle: cannotQueryUsers.length.toString()
-          }
-        },
-        ...cannotQueryUsers
-      ].filter((row) => !(row as any).hidden),
+    () => [
+      {
+        id: 'header-assigned',
+        data: {},
+        hidden: canQueryUsers.length === 0,
+        rowSection: {
+          title: 'Assigned',
+          secondaryTitle: numberOfUsers.toString()
+        }
+      },
+      ...canQueryUsers,
+      {
+        id: 'header-not-assigned',
+        data: {},
+        hidden: cannotQueryUsers.length === 0,
+        rowSection: {
+          title: 'Not Assigned',
+          secondaryTitle: cannotQueryUsers.length.toString()
+        }
+      },
+      ...cannotQueryUsers
+    ],
     [canQueryUsers, cannotQueryUsers, numberOfUsers]
   );
 
@@ -107,7 +110,7 @@ export const PermissionListUserContainer: React.FC<{
           rows={rows}
           showHeader={false}
           showSelectAll={false}
-          emptyState={<EmptyState />}
+          emptyState={<EmptyStateList text="No users found" />}
         />
       </InfiniteListContainer>
     </>
@@ -128,12 +131,3 @@ const UserLineageCell = React.memo(({ user }: { user: DatasetPermissionOverviewU
   );
 });
 UserLineageCell.displayName = 'UserLineageCell';
-
-const EmptyState = React.memo(() => {
-  return (
-    <div className="py-12">
-      <Text type="tertiary">No users found</Text>
-    </div>
-  );
-});
-EmptyState.displayName = 'EmptyState';

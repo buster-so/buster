@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useGetApiKeys, useCreateApiKey, useDeleteApiKey } from '@/api/buster-rest/api_keys';
+import { useGetApiKeys, useCreateApiKey, useDeleteApiKey } from '@/api/buster_rest/api_keys';
 import { Button } from 'antd';
 import { ApiKeyListItem } from './ApiKeyListItem';
 import { AppMaterialIcons } from '@/components';

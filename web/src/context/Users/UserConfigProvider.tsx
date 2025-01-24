@@ -1,11 +1,11 @@
 'use client';
 
-import { BusterUserResponse } from '@/api/buster-rest';
+import { BusterUserResponse } from '@/api/buster_rest';
 import React, { PropsWithChildren, useState } from 'react';
 import { useBusterWebSocket } from '../BusterWebSocket';
 import { useMemoizedFn } from 'ahooks';
 import { useFavoriteProvider } from './useFavoriteProvider';
-import { getMyUserInfo } from '@/api/buster-rest/users';
+import { getMyUserInfo } from '@/api/buster_rest/users';
 import { useSupabaseContext } from '../Supabase';
 import {
   ContextSelector,
@@ -26,7 +26,7 @@ export const useUserConfigProvider = ({ userInfo }: { userInfo: BusterUserRespon
 
   const user = userResponse?.user;
   const userTeams = userResponse?.teams || [];
-  const userOrganizations = userResponse?.organizations[0];
+  const userOrganizations = userResponse?.organizations?.[0];
   const userRole = userOrganizations?.role;
   const isUserRegistered =
     !!userResponse && !!userResponse?.organizations?.[0]?.id && !!userResponse?.user?.name;

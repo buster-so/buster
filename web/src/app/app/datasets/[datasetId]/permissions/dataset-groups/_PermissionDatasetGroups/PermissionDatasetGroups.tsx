@@ -1,6 +1,6 @@
 'use client';
 
-import { useDatasetListDatasetGroups } from '@/api/buster-rest';
+import { useDatasetListDatasetGroups } from '@/api/buster_rest';
 import React, { useState } from 'react';
 import { useDebounceSearch } from '@/hooks';
 import { useMemoizedFn } from 'ahooks';

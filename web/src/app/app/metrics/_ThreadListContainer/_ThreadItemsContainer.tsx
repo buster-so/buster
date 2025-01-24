@@ -2,7 +2,7 @@ import {
   BusterShareAssetType,
   BusterThreadListItem,
   BusterVerificationStatus
-} from '@/api/buster-rest';
+} from '@/api/buster_rest';
 import {
   getNow,
   isDateSame,
@@ -11,15 +11,14 @@ import {
   makeHumanReadble,
   formatDate
 } from '@/utils';
-import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
+import React, { memo, useMemo, useRef, useState } from 'react';
 import { StatusBadgeIndicator, getShareStatus } from '../../_components/Lists';
 import { BusterUserAvatar, Text } from '@/components';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import { ListEmptyState } from '../../_components/Lists/ListEmptyState';
-import { useHover, useMemoizedFn, useSize, useWhyDidYouUpdate } from 'ahooks';
+import { useMemoizedFn } from 'ahooks';
 import { BusterListColumn, BusterListRow } from '@/components/list';
 import { ThreadSelectedOptionPopup } from './_ThreadItemsSelectedPopup';
-import { BusterList } from '@/components/list/BusterList';
+import { BusterList, ListEmptyStateWithButton } from '@/components/list';
 import { FavoriteStar } from '../../_components/Lists';
 
 const createLogRecord = (
@@ -211,7 +210,7 @@ const MetricsEmptyState: React.FC<{
 }> = ({ openNewCollectionModal, type }) => {
   if (type === 'logs') {
     return (
-      <ListEmptyState
+      <ListEmptyStateWithButton
         title="You don’t have any logs yet."
         description="You don’t have any logs. As soon as you do, they will start to appear here."
         buttonText="New metric"
@@ -221,7 +220,7 @@ const MetricsEmptyState: React.FC<{
   }
 
   return (
-    <ListEmptyState
+    <ListEmptyStateWithButton
       title="You don’t have any metrics yet."
       description="You don’t have any metrics. As soon as you do, they will start to  appear here."
       buttonText="New metric"
@@ -242,14 +241,13 @@ const TitleCell = React.memo<{ title: string; status: BusterVerificationStatus; 
           <StatusBadgeIndicator status={status} />
         </div>
         <Text ellipsis={true}>{title}</Text>
-        <div
-          className="flex items-center opacity-0 group-hover:opacity-100"
-          onClick={onFavoriteDivClick}>
+        <div className="flex items-center" onClick={onFavoriteDivClick}>
           <FavoriteStar
             id={threadId}
             type={BusterShareAssetType.THREAD}
             iconStyle="tertiary"
             name={title}
+            className="opacity-0 group-hover:opacity-100"
           />
         </div>
       </div>

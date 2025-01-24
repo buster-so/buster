@@ -5,12 +5,12 @@ import {
   BusterPermissionGroup,
   BusterPermissionTeam,
   BusterPermissionUser
-} from '@/api/buster-rest/permissions';
+} from '@/api/buster_rest/permissions';
 import {
   PermissionGroupUpdateRequest,
   PermissionTeamUpdateRequest,
   PermissionUserUpdateRequest
-} from '@/api/buster-socket/permissions';
+} from '@/api/buster_socket/permissions';
 import { usePermissionUsers } from './usePermissionsUsers';
 import { usePermissionsTeams } from './usePermissionsTeams';
 import { usePermissionsGroups } from './usePermissionsGroups';

@@ -1,4 +1,4 @@
-import { ListDatasetGroupsResponse, useDatasetUpdateDatasetGroups } from '@/api/buster-rest';
+import { ListDatasetGroupsResponse, useDatasetUpdateDatasetGroups } from '@/api/buster_rest';
 import {
   BusterListColumn,
   BusterListRowItem,
@@ -81,29 +81,28 @@ export const PermissionListDatasetGroupContainer: React.FC<{
   }, [filteredDatasetGroups]);
 
   const rows = useMemo(
-    () =>
-      [
-        {
-          id: 'header-assigned',
-          data: {},
-          hidden: canQueryPermissionGroups.length === 0,
-          rowSection: {
-            title: 'Assigned',
-            secondaryTitle: canQueryPermissionGroups.length.toString()
-          }
-        },
-        ...canQueryPermissionGroups,
-        {
-          id: 'header-not-assigned',
-          data: {},
-          hidden: cannotQueryPermissionGroups.length === 0,
-          rowSection: {
-            title: 'Not Assigned',
-            secondaryTitle: cannotQueryPermissionGroups.length.toString()
-          }
-        },
-        ...cannotQueryPermissionGroups
-      ].filter((row) => !(row as any).hidden),
+    () => [
+      {
+        id: 'header-assigned',
+        data: {},
+        hidden: canQueryPermissionGroups.length === 0,
+        rowSection: {
+          title: 'Assigned',
+          secondaryTitle: canQueryPermissionGroups.length.toString()
+        }
+      },
+      ...canQueryPermissionGroups,
+      {
+        id: 'header-not-assigned',
+        data: {},
+        hidden: cannotQueryPermissionGroups.length === 0,
+        rowSection: {
+          title: 'Not Assigned',
+          secondaryTitle: cannotQueryPermissionGroups.length.toString()
+        }
+      },
+      ...cannotQueryPermissionGroups
+    ],
     [canQueryPermissionGroups, cannotQueryPermissionGroups, numberOfDatasetGroups]
   );
 

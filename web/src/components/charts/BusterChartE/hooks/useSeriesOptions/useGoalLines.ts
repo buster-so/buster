@@ -3,8 +3,8 @@ import { formatLabel } from '@/utils';
 import type { SeriesOption, MarkLineComponentOption } from 'echarts';
 import { useMemo } from 'react';
 import { extractFieldsFromChain } from '../../../chartHooks';
-import type { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads/threadConfigInterfaces';
-import { ColumnMetaData } from '@/api/buster-rest';
+import type { IBusterThreadMessageChartConfig } from '@/api/buster_rest/threads/threadConfigInterfaces';
+import { ColumnMetaData } from '@/api/buster_rest';
 import { yAxisSimilar } from '@/components/charts/commonHelpers';
 
 export const GOAL_LINE_DELIMETER = '_🫷🥸🫸goal_';

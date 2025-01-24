@@ -1,6 +1,7 @@
 use anyhow::Result;
 use std::{collections::HashSet, env};
 use uuid::Uuid;
+use html_escape::encode_text as escape_html;
 
 use resend_rs::{types::CreateEmailBaseOptions, Resend};
 
@@ -69,9 +70,9 @@ pub async fn send_email(to_addresses: HashSet<String>, email_type: EmailType) ->
     };
 
     let email_html = EMAIL_TEMPLATE
-        .replace("{{message}}", &email_params.message)
+        .replace("{{message}}", &escape_html(&email_params.message))
         .replace("{{button_link}}", &email_params.button_link)
-        .replace("{{button_text}}", email_params.button_text);
+        .replace("{{button_text}}", &escape_html(email_params.button_text));
 
     let from = "Buster <buster@mail.buster.so>";
 
@@ -253,18 +254,20 @@ mod tests {
         dotenv().ok();
         let to_addresses = HashSet::from([
             "dallin@buster.so".to_string(),
-            "blake@buster.so".to_string(),
         ]);
         let email_type = EmailType::CollectionInvite(CollectionInvite {
-            collection_name: "Test Collection".to_string(),
+            collection_name: "Test Collection <script>alert('xss')</script>".to_string(),
             collection_id: Uuid::new_v4(),
-            inviter_name: "Dallin Bentley".to_string(),
+            inviter_name: "Dallin Bentley <b>test</b>".to_string(),
             new_user: false,
         });
 
         match send_email(to_addresses, email_type).await {
             Ok(_) => assert!(true),
-            Err(_) => assert!(false),
+            Err(e) => {
+                println!("Error sending email: {e}");
+                assert!(false)
+            }
         }
     }
 
@@ -273,7 +276,6 @@ mod tests {
         dotenv().ok();
         let to_addresses = HashSet::from([
             "dallin@buster.so".to_string(),
-            "blake@buster.so".to_string(),
         ]);
         let email_type = EmailType::CollectionInvite(CollectionInvite {
             collection_name: "Test Collection".to_string(),

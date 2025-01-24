@@ -14,7 +14,7 @@ import { useBusterMessageDataContextSelector } from '@/context/MessageData';
 import { AppMaterialIcons } from '@/components/icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Text } from '@/components/text';
-import { RustApiError } from '@/api/buster-rest/errors';
+import { RustApiError } from '@/api/buster_rest/errors';
 import { createStyles } from 'antd-style';
 import { PreventNavigation } from '@/components';
 

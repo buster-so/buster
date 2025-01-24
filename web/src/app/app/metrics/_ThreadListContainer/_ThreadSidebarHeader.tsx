@@ -7,7 +7,7 @@ import { AppMaterialIcons, AppPopoverMenu, AppSegmented, AppTooltip } from '@/co
 import { AppTooltipShortcutPill } from '@/components/tooltip/AppTooltipShortcutPill';
 import { useHotkeys } from 'react-hotkeys-hook';
 import type { InputRef } from 'antd';
-import { BusterVerificationStatus } from '@/api/buster-rest';
+import { BusterVerificationStatus } from '@/api/buster_rest';
 import { Text } from '@/components';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useMemoizedFn } from 'ahooks';

@@ -1,5 +1,5 @@
-import { SettingsEmptyState } from '../../_SettingsEmptyState';
-import { SettingsPageHeader } from '../../_SettingsPageHeader';
+import { SettingsEmptyState } from '../../_components/SettingsEmptyState';
+import { SettingsPageHeader } from '../../_components/SettingsPageHeader';
 
 export default function Page() {
   return (

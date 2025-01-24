@@ -1,6 +1,6 @@
 import React from 'react';
 import { LabelAndInput } from '../../../Common/LabelAndInput';
-import { IBusterThreadMessageChartConfig } from '@/api/buster-rest';
+import { IBusterThreadMessageChartConfig } from '@/api/buster_rest';
 import { Select } from 'antd';
 
 const options: { label: string; value: IBusterThreadMessageChartConfig['yAxisScaleType'] }[] = [

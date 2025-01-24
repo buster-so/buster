@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useGetDatasets } from '@/api/buster-rest/datasets';
+import { useGetDatasets } from '@/api/buster_rest/datasets';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { useMemo, useState } from 'react';
 import { DatasetListContent } from './_DatasetListContent';

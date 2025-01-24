@@ -1,3 +1,4 @@
+import { COOKIE_OPTIONS } from '@/context/Supabase/server';
 import { createServerClient } from '@supabase/ssr';
 import { User } from '@supabase/supabase-js';
 import { NextResponse, type NextRequest } from 'next/server';
@@ -23,7 +24,7 @@ export async function updateSession(request: NextRequest) {
             request
           });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            supabaseResponse.cookies.set(name, value, { ...options, ...COOKIE_OPTIONS })
           );
         }
       }

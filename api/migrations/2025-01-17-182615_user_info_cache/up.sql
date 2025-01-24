@@ -23,7 +23,7 @@ CREATE TRIGGER sync_user_org_attributes
     EXECUTE FUNCTION update_user_org_attributes();
 
     -- Update existing records
-    UPDATE users u
+    UPDATE public.users u
     SET attributes = jsonb_set(
         jsonb_set(
             COALESCE(attributes, '{}'::jsonb),

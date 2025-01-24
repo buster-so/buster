@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 import { Text } from '@/components/text';
 import { createStyles } from 'antd-style';
 import { ColumnTypeIcon } from './config';
-import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/buster-rest';
+import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/buster_rest';
 
 export const SelectAxisItemLabel = React.memo(
   ({

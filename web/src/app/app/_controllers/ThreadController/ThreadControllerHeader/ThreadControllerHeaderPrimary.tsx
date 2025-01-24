@@ -22,13 +22,13 @@ import {
   PreventNavigation
 } from '@/components';
 import { useUserConfigContextSelector } from '@/context/Users';
-import { BusterShareAssetType } from '@/api/buster-rest';
+import { BusterShareAssetType } from '@/api/buster_rest';
 import { useMemoizedFn, useMount } from 'ahooks';
 import { BusterMessageData, IBusterThreadMessage } from '@/context/Threads/interfaces';
 import { useDisableSaveChanges } from './useDisableSaveChanges';
 import { useCollectionsContextSelector } from '@/context/Collections';
 import { exportJSONToCSV } from '@/utils/exportUtils';
-import { ShareRole } from '@/api/buster-socket/threads';
+import { ShareRole } from '@/api/buster_socket/threads';
 import { ShareMenu } from '@/app/app/_components/ShareMenu';
 import { FavoriteStar } from '@/app/app/_components/Lists/FavoriteStar';
 import { StatusBadgeButton } from '@/app/app/_components/Lists';

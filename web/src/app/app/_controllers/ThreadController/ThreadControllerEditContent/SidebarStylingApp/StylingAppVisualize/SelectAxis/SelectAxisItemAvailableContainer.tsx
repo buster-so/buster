@@ -9,7 +9,7 @@ import { Button } from 'antd';
 import { useMemoizedFn } from 'ahooks';
 import { SelectAxisColumnPopover } from './SelectAxisColumnPopover';
 import { ChartEncodes, IColumnLabelFormat } from '@/components/charts';
-import { IBusterThreadMessageChartConfig } from '@/api/buster-rest/threads/threadConfigInterfaces';
+import { IBusterThreadMessageChartConfig } from '@/api/buster_rest/threads/threadConfigInterfaces';
 import { SelectAxisContainerId } from './config';
 
 export const SelectAxisItemAvailableContainer = React.memo(

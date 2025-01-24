@@ -5,6 +5,7 @@ import { getAllIdsInSection } from '../BusterList/helpers';
 import { useEffect, useMemo } from 'react';
 import { BusterListHeader } from '../BusterList/BusterListHeader';
 import { BusterListRowComponentSelector } from '../BusterList/BusterListRowComponentSelector';
+import { EmptyStateList } from '../EmptyStateList';
 
 export interface BusterInfiniteListProps extends BusterListProps {
   onScrollEnd?: () => void;
@@ -152,7 +153,9 @@ export const BusterInfiniteList: React.FC<BusterInfiniteListProps> = ({
         ))}
 
       {showEmptyState && (
-        <div className="flex h-full items-center justify-center">{emptyState}</div>
+        <div className="flex h-full items-center justify-center">
+          {typeof emptyState === 'string' ? <EmptyStateList text={emptyState} /> : emptyState}
+        </div>
       )}
 
       {loadingNewContent && (

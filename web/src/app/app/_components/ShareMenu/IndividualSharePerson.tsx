@@ -2,7 +2,7 @@ import { BusterUserAvatar } from '@/components';
 import { AccessDropdown } from './AccessDropdown';
 
 import React from 'react';
-import { ShareRole } from '@/api/buster-socket/threads';
+import { ShareRole } from '@/api/buster_socket/threads';
 import { Text } from '@/components';
 import { useMemoizedFn } from 'ahooks';
 

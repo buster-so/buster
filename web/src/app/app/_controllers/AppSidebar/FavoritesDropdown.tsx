@@ -1,4 +1,4 @@
-import { BusterShareAssetType, BusterUserFavorite } from '@/api/buster-rest';
+import { BusterShareAssetType, BusterUserFavorite } from '@/api/buster_rest';
 import { AppMenuGroupSingleSortable } from '@/components/menu';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useUserConfigContextSelector } from '@/context/Users';

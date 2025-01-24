@@ -166,7 +166,8 @@ export const AppSidebarPrimary: React.FC<
         icon: <AppMaterialIcons icon="add" />,
         onClick: () => {
           onToggleInviteModal();
-        }
+        },
+        show: isAdmin
       },
       {
         key: 'support',
@@ -184,8 +185,8 @@ export const AppSidebarPrimary: React.FC<
           onToggleSupportModal();
         }
       }
-    ];
-  }, []);
+    ].filter((item) => item.show !== false);
+  }, [isAdmin]);
 
   return (
     <div className="flex w-full flex-col space-y-2.5">

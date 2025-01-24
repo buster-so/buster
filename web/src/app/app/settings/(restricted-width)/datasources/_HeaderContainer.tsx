@@ -1,11 +1,8 @@
 'use client';
 
-import { AppMaterialIcons, BackButton } from '@/components';
+import { BackButton } from '@/components';
 import React from 'react';
-
 import { createStyles } from 'antd-style';
-import Link from 'next/link';
-import { Text } from '@/components';
 
 const useStyles = createStyles(({ css, token }) => ({
   icon: {

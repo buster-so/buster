@@ -1,8 +1,8 @@
 import { useMemoizedFn } from 'ahooks';
 import React from 'react';
 import { useBusterWebSocket } from '../BusterWebSocket';
-import { BusterSearchResult } from '@/api/buster-rest';
-import { BusterSearchRequest } from '@/api/buster-socket/search';
+import { BusterSearchResult } from '@/api/buster_rest';
+import { BusterSearchRequest } from '@/api/buster_socket/search';
 import { allBusterSearchRequestKeys } from './config';
 import {
   createContext,

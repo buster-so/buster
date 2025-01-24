@@ -1,7 +1,7 @@
 import { BusterListSelectedOptionPopupContainer } from '@/components/list';
 import React from 'react';
 import { PermissionAssignedButton } from '@appComponents/PermissionComponents';
-import { useDatasetUpdateDatasetGroups } from '@/api/buster-rest';
+import { useDatasetUpdateDatasetGroups } from '@/api/buster_rest';
 
 export const PermissionDatasetGroupSelectedPopup: React.FC<{
   selectedRowKeys: string[];

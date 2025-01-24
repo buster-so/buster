@@ -1,4 +1,4 @@
-import { BusterDashboardMetric, BusterDashboardResponse } from '@/api/buster-rest';
+import { BusterDashboardMetric, BusterDashboardResponse } from '@/api/buster_rest';
 import React, { useEffect, useMemo, useRef } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import { Button } from 'antd';
@@ -6,7 +6,7 @@ import { BusterResizeableGrid, BusterResizeableGridRow } from '@/components/grid
 import { useDebounceFn, useMemoizedFn } from 'ahooks';
 import { hasRemovedThreads, hasUnmappedThreads, normalizeNewMetricsIntoGrid } from './_helpers';
 import { DashboardMetricItem } from './_DashboardMetricItem';
-import { DashboardConfig } from '@/api/buster-socket/dashboards/dashboardConfigInterfaces';
+import { DashboardConfig } from '@/api/buster_socket/dashboards/dashboardConfigInterfaces';
 import { useDashboards } from '@/context/Dashboards';
 import { AppMaterialIcons } from '@/components';
 import { DashboardIndividualProvider, useDashboardIndividual } from './_DashboardInvididualContext';

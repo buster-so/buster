@@ -2,14 +2,17 @@ import {
   ListPermissionGroupsResponse,
   ListPermissionUsersResponse,
   useDatasetUpdatePermissionUsers
-} from '@/api/buster-rest/datasets';
-import { BusterUserAvatar } from '@/components';
-import { BusterListColumn, BusterListRowItem, InfiniteListContainer } from '@/components/list';
+} from '@/api/buster_rest/datasets';
+import {
+  BusterListColumn,
+  BusterListRowItem,
+  EmptyStateList,
+  InfiniteListContainer
+} from '@/components/list';
 import { BusterInfiniteList } from '@/components/list/BusterInfiniteList';
 import { useMemoizedFn } from 'ahooks';
 import { Select } from 'antd';
 import React, { useMemo, useState } from 'react';
-import { Text } from '@/components/text';
 import { PermissionUsersSelectedPopup } from './PermissionUsersSelectedPopup';
 import { PERMISSION_USERS_OPTIONS } from './config';
 import { BusterRoutes, createBusterRoute } from '@/routes';
@@ -90,29 +93,28 @@ export const PermissionListUsersContainer: React.FC<{
   }, [filteredPermissionUsers]);
 
   const rows = useMemo(
-    () =>
-      [
-        {
-          id: 'header-assigned',
-          data: {},
-          hidden: canQueryPermissionUsers.length === 0,
-          rowSection: {
-            title: 'Assigned',
-            secondaryTitle: canQueryPermissionUsers.length.toString()
-          }
-        },
-        ...canQueryPermissionUsers,
-        {
-          id: 'header-not-assigned',
-          data: {},
-          hidden: cannotQueryPermissionUsers.length === 0,
-          rowSection: {
-            title: 'Not Assigned',
-            secondaryTitle: cannotQueryPermissionUsers.length.toString()
-          }
-        },
-        ...cannotQueryPermissionUsers
-      ].filter((row) => !(row as any).hidden),
+    () => [
+      {
+        id: 'header-assigned',
+        data: {},
+        hidden: canQueryPermissionUsers.length === 0,
+        rowSection: {
+          title: 'Assigned',
+          secondaryTitle: canQueryPermissionUsers.length.toString()
+        }
+      },
+      ...canQueryPermissionUsers,
+      {
+        id: 'header-not-assigned',
+        data: {},
+        hidden: cannotQueryPermissionUsers.length === 0,
+        rowSection: {
+          title: 'Not Assigned',
+          secondaryTitle: cannotQueryPermissionUsers.length.toString()
+        }
+      },
+      ...cannotQueryPermissionUsers
+    ],
     [canQueryPermissionUsers, cannotQueryPermissionUsers, numberOfPermissionUsers]
   );
 
@@ -133,7 +135,7 @@ export const PermissionListUsersContainer: React.FC<{
         selectedRowKeys={selectedRowKeys}
         onSelectChange={setSelectedRowKeys}
         useRowClickSelectChange={false}
-        emptyState={<EmptyState />}
+        emptyState={<EmptyStateList text="No users found" />}
       />
     </InfiniteListContainer>
   );
@@ -161,13 +163,3 @@ const PermissionGroupAssignedCell: React.FC<{
     />
   );
 };
-
-const EmptyState = React.memo(() => {
-  return (
-    <div className="py-12">
-      <Text type="tertiary">No users found</Text>
-    </div>
-  );
-});
-
-EmptyState.displayName = 'EmptyState';

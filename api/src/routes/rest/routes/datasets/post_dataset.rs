@@ -59,7 +59,13 @@ pub async fn post_dataset(
         }
     }
 
-    let dataset = match post_dataset_handler(&user.id, &request.data_source_id, &request.name).await
+    let dataset = match post_dataset_handler(
+        &user.id,
+        &request.data_source_id,
+        &organization_id,
+        &request.name,
+    )
+    .await
     {
         Ok(dataset) => dataset,
         Err(e) => {
@@ -77,42 +83,13 @@ pub async fn post_dataset(
 async fn post_dataset_handler(
     user_id: &Uuid,
     data_source_id: &Uuid,
+    organization_id: &Uuid,
     name: &str,
 ) -> Result<Dataset> {
-    // Get the user organization id.
-    let organization_id = get_user_organization_id(&user_id).await?;
-
     let mut conn = match get_pg_pool().get().await {
         Ok(conn) => conn,
         Err(e) => return Err(anyhow!("Unable to get connection from pool: {}", e)),
     };
-
-    // First check if user has admin access through their organization role
-    let user_role = match users_to_organizations::table
-        .inner_join(
-            datasets::table
-                .on(users_to_organizations::organization_id.eq(datasets::organization_id)),
-        )
-        .select(users_to_organizations::role)
-        .filter(users_to_organizations::user_id.eq(user_id))
-        .filter(users_to_organizations::deleted_at.is_null())
-        .first::<UserOrganizationRole>(&mut conn)
-        .await
-    {
-        Ok(role) => role,
-        Err(e) => return Err(anyhow!("Unable to get user role: {}", e)),
-    };
-
-    let has_admin_access = matches!(
-        user_role,
-        UserOrganizationRole::WorkspaceAdmin | UserOrganizationRole::DataAdmin
-    );
-
-    if !has_admin_access {
-        return Err(anyhow!(
-            "User does not have permission to access this dataset"
-        ));
-    }
 
     // Verify data source exists and belongs to organization
     match data_sources::table

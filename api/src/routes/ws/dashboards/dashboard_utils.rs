@@ -14,7 +14,7 @@ use crate::{
         enums::{AssetPermissionRole, AssetType},
         lib::get_pg_pool,
         models::{Dashboard, Message},
-        schema::{asset_permissions, dashboards, messages, teams_to_users, threads_to_dashboards},
+        schema::{asset_permissions, dashboards, messages, teams_to_users, threads_to_dashboards, users_to_organizations},
     },
     utils::{
         clients::{sentry_utils::send_sentry_error, supabase_vault::read_secret},
@@ -270,16 +270,43 @@ pub async fn get_user_dashboard_permission(
         }
     };
 
+    // First get the dashboard's organization
+    let dashboard_org = match dashboards::table
+        .select(dashboards::organization_id)
+        .filter(dashboards::id.eq(dashboard_id))
+        .filter(dashboards::deleted_at.is_null())
+        .first::<Uuid>(&mut conn)
+        .await {
+            Ok(org_id) => org_id,
+            Err(diesel::result::Error::NotFound) => return Ok(None),
+            Err(e) => {
+                tracing::error!("Error querying dashboard organization: {}", e);
+                return Err(anyhow!("Error querying dashboard organization: {}", e));
+            }
+        };
+
+    // Then get the user's organization
+    let user_org = match users_to_organizations::table
+        .select(users_to_organizations::organization_id)
+        .filter(users_to_organizations::user_id.eq(user_id))
+        .first::<Uuid>(&mut conn)
+        .await {
+            Ok(org_id) => org_id,
+            Err(diesel::result::Error::NotFound) => return Ok(None),
+            Err(e) => {
+                tracing::error!("Error querying user organization: {}", e);
+                return Err(anyhow!("Error querying user organization: {}", e));
+            }
+        };
+
+    // If organizations don't match, deny access
+    if dashboard_org != user_org {
+        return Ok(None);
+    }
+
     let permissions = match asset_permissions::table
-        .left_join(
-            teams_to_users::table.on(asset_permissions::identity_id.eq(teams_to_users::team_id)),
-        )
         .select(asset_permissions::role)
-        .filter(
-            asset_permissions::identity_id
-                .eq(&user_id)
-                .or(teams_to_users::user_id.eq(&user_id)),
-        )
+        .filter(asset_permissions::identity_id.eq(&user_id))
         .filter(asset_permissions::asset_id.eq(&dashboard_id))
         .filter(asset_permissions::deleted_at.is_null())
         .load::<AssetPermissionRole>(&mut conn)
@@ -321,18 +348,27 @@ pub async fn get_bulk_user_dashboard_permission(
         }
     };
 
+    // Get user's organization
+    let user_org = match users_to_organizations::table
+        .select(users_to_organizations::organization_id)
+        .filter(users_to_organizations::user_id.eq(user_id))
+        .first::<Uuid>(&mut conn)
+        .await {
+            Ok(org_id) => org_id,
+            Err(diesel::result::Error::NotFound) => return Ok(HashMap::new()),
+            Err(e) => {
+                tracing::error!("Error querying user organization: {}", e);
+                return Err(anyhow!("Error querying user organization: {}", e));
+            }
+        };
+
     let permissions = match asset_permissions::table
-        .left_join(
-            teams_to_users::table.on(asset_permissions::identity_id.eq(teams_to_users::team_id)),
-        )
+        .inner_join(dashboards::table.on(asset_permissions::asset_id.eq(dashboards::id)))
         .select((asset_permissions::asset_id, asset_permissions::role))
-        .filter(
-            asset_permissions::identity_id
-                .eq(&user_id)
-                .or(teams_to_users::user_id.eq(&user_id)),
-        )
+        .filter(asset_permissions::identity_id.eq(&user_id))
         .filter(asset_permissions::asset_id.eq_any(dashboard_ids))
         .filter(asset_permissions::deleted_at.is_null())
+        .filter(dashboards::organization_id.eq(user_org))
         .load::<(Uuid, AssetPermissionRole)>(&mut conn)
         .await
     {

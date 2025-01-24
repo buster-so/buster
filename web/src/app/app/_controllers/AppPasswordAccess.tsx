@@ -5,7 +5,7 @@ import React, { useRef } from 'react';
 import { Title } from '@/components/text';
 import { Button, Input, InputRef, Typography } from 'antd';
 import { LoginConfigProvider } from '@/app/auth/login/_components/LoginConfigProvider';
-import type { BusterShareAssetType } from '@/api/buster-rest';
+import type { BusterShareAssetType } from '@/api/buster_rest';
 import { useBusterAssetsContextSelector } from '@/context/Assets/BusterAssetsProvider';
 import { useMemoizedFn } from 'ahooks';
 

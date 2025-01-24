@@ -7,7 +7,7 @@ import {
   ComboChartAxis
 } from '@/components/charts/interfaces';
 import { useDebounceFn, useMemoizedFn, useWhyDidYouUpdate } from 'ahooks';
-import { IBusterThreadMessageChartConfig } from '@/api/buster-rest';
+import { IBusterThreadMessageChartConfig } from '@/api/buster_rest';
 import {
   addLegendHeadlines,
   BusterChartLegendItem,

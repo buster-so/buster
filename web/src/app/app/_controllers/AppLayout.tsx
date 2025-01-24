@@ -81,6 +81,7 @@ const AppLayoutContent: React.FC<
   const openThreadsModal = useAppLayoutContextSelector((s) => s.openThreadsModal);
   const onToggleSupportModal = useAppLayoutContextSelector((s) => s.onToggleSupportModal);
   const openSupportModal = useAppLayoutContextSelector((s) => s.openSupportModal);
+  const userOrganizations = useUserConfigContextSelector((x) => x.userOrganizations);
   const colorBgContainerDisabled = useBusterStylesContext(
     (s) => s.theme.token?.colorBgContainerDisabled
   );
@@ -88,6 +89,8 @@ const AppLayoutContent: React.FC<
   const onCloseThreadsModal = useMemoizedFn(() => onToggleThreadsModal(false));
   const onCloseInviteModal = useMemoizedFn(() => onToggleInviteModal(false));
   const onCloseSupportModal = useMemoizedFn(() => onToggleSupportModal(false));
+
+  const hasOrganization = !!userOrganizations;
 
   const themeConfig = useMemo<ThemeConfig>(
     () => ({
@@ -114,7 +117,7 @@ const AppLayoutContent: React.FC<
     <ConfigProvider theme={themeConfig}>
       <Layout className={layoutClassName}>{children}</Layout>
 
-      {!isAnonymousUser && (
+      {!isAnonymousUser && hasOrganization && (
         <>
           <NewThreadModal open={openThreadsModal} onClose={onCloseThreadsModal} />
           <InvitePeopleModal open={openInviteModal} onClose={onCloseInviteModal} />

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { LabelAndInput } from '../../../Common/LabelAndInput';
-import { IBusterThreadMessageChartConfig } from '@/api/buster-rest';
+import { IBusterThreadMessageChartConfig } from '@/api/buster_rest';
 import { Input, Switch } from 'antd';
 import { useMemoizedFn } from 'ahooks';
 

@@ -1,4 +1,4 @@
-import type { ColumnMetaData } from '@/api/buster-rest';
+import type { ColumnMetaData } from '@/api/buster_rest';
 import type { BusterChartConfigProps } from './chartConfigProps';
 
 export type BusterChartProps = {

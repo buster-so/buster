@@ -1,8 +1,8 @@
 import {
   ListPermissionGroupsResponse,
   useDatasetUpdatePermissionGroups
-} from '@/api/buster-rest/datasets';
-import { BusterListColumn, BusterListRowItem } from '@/components/list';
+} from '@/api/buster_rest/datasets';
+import { BusterListColumn, BusterListRowItem, EmptyStateList } from '@/components/list';
 import { useMemoizedFn } from 'ahooks';
 import React, { useMemo, useState } from 'react';
 import { Text } from '@/components/text';
@@ -82,29 +82,28 @@ export const PermissionListPermissionGroupContainer: React.FC<{
   }, [filteredPermissionGroups]);
 
   const rows = useMemo(
-    () =>
-      [
-        {
-          id: 'header-assigned',
-          data: {},
-          hidden: canQueryPermissionGroups.length === 0,
-          rowSection: {
-            title: 'Assigned',
-            secondaryTitle: canQueryPermissionGroups.length.toString()
-          }
-        },
-        ...canQueryPermissionGroups,
-        {
-          id: 'header-not-assigned',
-          data: {},
-          hidden: cannotQueryPermissionGroups.length === 0,
-          rowSection: {
-            title: 'Not Assigned',
-            secondaryTitle: cannotQueryPermissionGroups.length.toString()
-          }
-        },
-        ...cannotQueryPermissionGroups
-      ].filter((row) => !(row as any).hidden),
+    () => [
+      {
+        id: 'header-assigned',
+        data: {},
+        hidden: canQueryPermissionGroups.length === 0,
+        rowSection: {
+          title: 'Assigned',
+          secondaryTitle: canQueryPermissionGroups.length.toString()
+        }
+      },
+      ...canQueryPermissionGroups,
+      {
+        id: 'header-not-assigned',
+        data: {},
+        hidden: cannotQueryPermissionGroups.length === 0,
+        rowSection: {
+          title: 'Not Assigned',
+          secondaryTitle: cannotQueryPermissionGroups.length.toString()
+        }
+      },
+      ...cannotQueryPermissionGroups
+    ],
     [canQueryPermissionGroups, cannotQueryPermissionGroups, numberOfPermissionGroups]
   );
 
@@ -124,7 +123,7 @@ export const PermissionListPermissionGroupContainer: React.FC<{
         showSelectAll={false}
         selectedRowKeys={selectedRowKeys}
         onSelectChange={setSelectedRowKeys}
-        emptyState={<EmptyState />}
+        emptyState={<EmptyStateList text="No permission groups found" />}
         useRowClickSelectChange={true}
       />
     </InfiniteListContainer>
@@ -132,13 +131,3 @@ export const PermissionListPermissionGroupContainer: React.FC<{
 });
 
 PermissionListPermissionGroupContainer.displayName = 'PermissionListTeamContainer';
-
-const EmptyState = React.memo(() => {
-  return (
-    <div className="py-12">
-      <Text type="tertiary">No permission groups found</Text>
-    </div>
-  );
-});
-
-EmptyState.displayName = 'EmptyState';

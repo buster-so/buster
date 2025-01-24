@@ -9,7 +9,11 @@ export async function middleware(request: NextRequest) {
 
     const performUserCheck = !isPublicPage(request);
     supabaseResponse.headers.set('x-next-pathname', request.nextUrl.pathname);
-    supabaseResponse.cookies.set('x-next-pathname', request.nextUrl.pathname);
+    supabaseResponse.cookies.set('x-next-pathname', request.nextUrl.pathname, {
+      secure: true,
+      httpOnly: true,
+      sameSite: 'lax'
+    });
 
     if (performUserCheck && !user && !request.nextUrl.pathname.includes('/test/')) {
       return NextResponse.redirect(
