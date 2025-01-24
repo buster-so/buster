@@ -429,7 +429,7 @@ pub async fn generate_sql_agent(options: GenerateSqlAgentOptions) -> Result<Valu
 
     let dataset_ddls = datasets
         .iter()
-        .map(|(dataset, _)| dataset.dataset_ddl.clone())
+        .map(|(dataset, _)| format!("{}\n{}", dataset.dataset_ddl.clone(), dataset.dataset.yml_file.clone().unwrap_or("".to_string())))
         .collect::<Vec<String>>()
         .join("\n\n");
 
