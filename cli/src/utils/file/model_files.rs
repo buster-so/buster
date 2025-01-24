@@ -31,6 +31,7 @@ pub struct Model {
     pub name: String,
     pub description: String,
     pub model: Option<String>,
+    pub schema: Option<String>,
     pub entities: Vec<Entity>,
     pub dimensions: Vec<Dimension>,
     pub measures: Vec<Measure>,
@@ -61,9 +62,18 @@ pub struct Measure {
     pub description: String,
 }
 
-pub async fn get_model_files() -> Result<Vec<BusterModelObject>> {
+pub async fn get_model_files(dir_path: Option<&str>) -> Result<Vec<BusterModelObject>> {
     let mut model_objects = Vec::new();
-    process_directory(std::path::Path::new("models"), &mut model_objects).await?;
+    let path = match dir_path {
+        Some(p) => std::path::Path::new("models").join(p),
+        None => std::path::Path::new("models").to_path_buf(),
+    };
+    
+    if !path.exists() {
+        return Err(anyhow::anyhow!("Directory not found: {}", path.display()));
+    }
+    
+    process_directory(&path, &mut model_objects).await?;
     Ok(model_objects)
 }
 
@@ -71,6 +81,7 @@ async fn process_directory(
     dir_path: &std::path::Path,
     model_objects: &mut Vec<BusterModelObject>,
 ) -> Result<()> {
+    println!("📂 Processing directory: {}", dir_path.display());
     let mut dir = tokio::fs::read_dir(dir_path).await?;
 
     while let Some(entry) = dir.next_entry().await? {
@@ -83,35 +94,71 @@ async fn process_directory(
 
         if let Some(ext) = path.extension() {
             if ext == "yml" {
+                println!("📄 Found YAML file: {}", path.display());
                 let sql_path = path.with_extension("sql");
-                if sql_path.exists() {
-                    let sql_definition = tokio::fs::read_to_string(&sql_path).await?;
-                    let yaml_content = fs::read_to_string(&path).await?;
-                    let model: BusterModel = serde_yaml::from_str(&yaml_content)?;
-
-                    model_objects.push(BusterModelObject {
-                        sql_definition,
-                        model_file: model,
-                        yml_content: yaml_content,
-                    });
+                
+                if !sql_path.exists() {
+                    println!("⚠️  Skipping {} - No matching SQL file found at {}", path.display(), sql_path.display());
+                    continue;
                 }
+
+                let sql_definition = match tokio::fs::read_to_string(&sql_path).await {
+                    Ok(content) => content,
+                    Err(e) => {
+                        println!("❌ Failed to read SQL file {}: {}", sql_path.display(), e);
+                        continue;
+                    }
+                };
+                    
+                let yaml_content = match fs::read_to_string(&path).await {
+                    Ok(content) => content,
+                    Err(e) => {
+                        println!("❌ Failed to read YAML file {}: {}", path.display(), e);
+                        continue;
+                    }
+                };
+                    
+                let model: BusterModel = match serde_yaml::from_str(&yaml_content) {
+                    Ok(model) => model,
+                    Err(e) => {
+                        println!("❌ Failed to parse YAML file {}: {}", path.display(), e);
+                        continue;
+                    }
+                };
+
+                println!("✅ Successfully processed model file: {}", path.display());
+                model_objects.push(BusterModelObject {
+                    sql_definition,
+                    model_file: model,
+                    yml_content: yaml_content,
+                });
             }
         }
     }
+    println!("✨ Finished processing directory: {}", dir_path.display());
     Ok(())
 }
 
 pub async fn upload_model_files(
     model_objects: Vec<BusterModelObject>,
     buster_creds: BusterCredentials,
+    dir_path: Option<&str>,
+    data_source_name: Option<&str>,
+    schema: Option<&str>,
+    env: Option<&str>,
 ) -> Result<()> {
     println!("Uploading model files to Buster");
+    if let Some(path) = dir_path {
+        println!("📂 Only uploading models from: {}", path);
+    }
 
-    // First, get the project profile so we can know where the models were written
-    let (profile_name, profile) = get_project_profile().await?;
-
-    // Need to get the schema. TODO: Allow for target-specific commands
-    let schema = get_schema_name(&profile)?;
+    // Get profile info only if no data_source_name is provided
+    let (profile_name, schema_name) = if let Some(ds_name) = data_source_name {
+        (ds_name.to_string(), schema.unwrap_or_default().to_string())
+    } else {
+        let (name, profile) = get_project_profile().await?;
+        (name, get_schema_name(&profile)?)
+    };
 
     let mut post_datasets_req_body = Vec::new();
 
@@ -154,10 +201,10 @@ pub async fn upload_model_files(
 
             let dataset = DeployDatasetsRequest {
                 data_source_name: profile_name.clone(),
-                env: profile.target.clone(),
+                env: env.map(String::from).unwrap_or_else(|| semantic_model.schema.unwrap_or_else(|| "default".to_string())),
                 name: semantic_model.name,
                 model: semantic_model.model,
-                schema: schema.clone(),
+                schema: schema_name.clone(),
                 description: semantic_model.description,
                 sql_definition: Some(model.sql_definition.clone()),
                 entity_relationships: Some(entity_relationships),

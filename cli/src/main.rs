@@ -9,16 +9,23 @@ use commands::{auth, deploy, generate, import, init};
 pub const APP_NAME: &str = "buster";
 
 #[derive(Subcommand)]
-#[clap(rename_all = "lowercase")]
+#[clap(rename_all = "kebab-case")]
 pub enum Commands {
     Init,
     Auth,
     Generate,
     Import,
-    #[command(arg_required_else_help = true)]
     Deploy {
         #[arg(long)]
         skip_dbt: bool,
+        #[arg(long)]
+        path: Option<String>,
+        #[arg(long)]
+        data_source_name: Option<String>,
+        #[arg(long)]
+        schema: Option<String>,
+        #[arg(long)]
+        env: Option<String>,
     },
 }
 
@@ -38,7 +45,13 @@ async fn main() {
         Commands::Auth => auth().await,
         Commands::Generate => generate().await,
         Commands::Import => import().await,
-        Commands::Deploy { skip_dbt } => deploy(skip_dbt).await,
+        Commands::Deploy {
+            skip_dbt,
+            path,
+            data_source_name,
+            schema,
+            env,
+        } => deploy(skip_dbt, path.as_deref(), data_source_name.as_deref(), schema.as_deref(), env.as_deref()).await,
     };
 
     if let Err(e) = result {

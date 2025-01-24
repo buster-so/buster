@@ -9,7 +9,7 @@ pub async fn get_snowflake_client(
     let snowflake_client = match SnowflakeApi::with_password_auth(
         &credentials.account_id,
         None,
-        None,
+        Some(credentials.database_id.as_str()),
         None,
         &credentials.username,
         credentials.role.as_deref(),

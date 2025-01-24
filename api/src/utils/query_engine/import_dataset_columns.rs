@@ -263,17 +263,23 @@ async fn get_bigquery_columns(
     if let Some(rows) = result.rows {
         for row in rows {
             if let Some(cols) = row.columns {
-                let name = cols[0].value.as_ref()
+                let name = cols[0]
+                    .value
+                    .as_ref()
                     .and_then(|v| v.as_str())
                     .ok_or_else(|| anyhow!("Missing column name"))?
                     .to_string();
 
-                let type_ = cols[1].value.as_ref()
+                let type_ = cols[1]
+                    .value
+                    .as_ref()
                     .and_then(|v| v.as_str())
                     .ok_or_else(|| anyhow!("Missing column type"))?
                     .to_string();
 
-                let nullable = cols[2].value.as_ref()
+                let nullable = cols[2]
+                    .value
+                    .as_ref()
                     .and_then(|v| v.as_str())
                     .ok_or_else(|| anyhow!("Missing nullable value"))?
                     .parse::<bool>()?;
@@ -297,6 +303,8 @@ async fn get_snowflake_columns(
 ) -> Result<Vec<DatasetColumnRecord>> {
     let snowflake_client = get_snowflake_client(credentials).await?;
 
+    let uppercase_dataset_name = dataset_name.to_uppercase();
+
     let sql = format!(
         "SELECT
             COLUMN_NAME AS name,
@@ -309,7 +317,7 @@ async fn get_snowflake_columns(
             TABLE_NAME = '{}'
         ORDER BY
             ORDINAL_POSITION;",
-        dataset_name
+        uppercase_dataset_name
     );
 
     // Execute the query using the Snowflake client

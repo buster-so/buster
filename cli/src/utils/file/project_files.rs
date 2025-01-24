@@ -23,7 +23,7 @@ pub struct BusterProjectConfig {
     pub snapshot_paths: Vec<String>,
     #[serde(rename = "clean-targets")]
     pub clean_targets: Vec<String>,
-    pub models: HashMap<String, HashMap<String, ModelConfig>>,
+    pub models: HashMap<String, HashMap<String, String>>,
 }
 
 #[derive(Serialize, Deserialize)]
