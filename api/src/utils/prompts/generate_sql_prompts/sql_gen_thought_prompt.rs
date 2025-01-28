@@ -3,6 +3,7 @@ pub fn sql_gen_thought_system_prompt(
     explanation: &String,
     terms: &String,
     relevant_values: &String,
+    data_source_type: &String,
 ) -> String {
     format!(
         r#"### MODEL/VIEW INFORMATION
@@ -15,6 +16,9 @@ pub fn sql_gen_thought_system_prompt(
 {}
 
 ### RELEVANT VALUES
+{}
+
+### DATA SOURCE TYPE
 {}
 
 ### TASK
@@ -51,7 +55,7 @@ Always output each step as <Number>. **<Thought Title>**:<Thought Content>
 <Number>. **Final Decision**: is the final decision of the thought process.
 
 #"#,
-        dataset, explanation, terms, relevant_values
+        dataset, explanation, terms, relevant_values, data_source_type
     )
 }
 
