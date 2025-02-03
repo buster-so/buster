@@ -60,3 +60,6 @@ Cargo.lock
 
 # Node.js dependencies
 node_modules/
+
+prds/
+docs/

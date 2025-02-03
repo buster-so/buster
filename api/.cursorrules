@@ -1,1 +1,3 @@
 this is an axum web server
+
+always update the prds/{prd_name}.md file while writing code.

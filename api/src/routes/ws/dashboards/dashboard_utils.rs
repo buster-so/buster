@@ -14,7 +14,10 @@ use crate::{
         enums::{AssetPermissionRole, AssetType},
         lib::get_pg_pool,
         models::{Dashboard, Message},
-        schema::{asset_permissions, dashboards, messages, teams_to_users, threads_to_dashboards, users_to_organizations},
+        schema::{
+            asset_permissions, dashboards, messages, teams_to_users, threads_to_dashboards,
+            users_to_organizations,
+        },
     },
     utils::{
         clients::{sentry_utils::send_sentry_error, supabase_vault::read_secret},
@@ -23,6 +26,7 @@ use crate::{
             get_asset_collections, get_asset_sharing_info, CollectionNameAndId,
             IndividualPermission, TeamPermissions,
         },
+        user::user_info::get_user_organization_id,
     },
 };
 
@@ -119,131 +123,86 @@ pub async fn get_dashboard_state_by_id(
         Ok((dashboard, permission)) => (dashboard, permission),
         Err(e) => {
             tracing::error!("Error getting dashboard and permission: {}", e);
-            send_sentry_error(
-                &format!("Error getting dashboard and permission: {}", e),
-                None,
-            );
             return Err(anyhow!("Error getting dashboard and permission: {}", e));
         }
     };
 
-    let public_password = if let Some(password_secret_id) = dashboard.password_secret_id {
-        if dashboard.publicly_accessible && permission == Some(AssetPermissionRole::Owner) {
-            let public_password = match read_secret(&password_secret_id).await {
-                Ok(public_password) => public_password,
-                Err(e) => {
-                    tracing::error!("Error getting public password: {}", e);
-                    send_sentry_error(&format!("Error getting public password: {}", e), None);
-                    return Err(anyhow!("Error getting public password: {}", e));
-                }
-            };
-
-            Some(public_password)
-        } else {
-            None
-        }
-    } else {
-        None
-    };
-
     let dashboard_sharing_info = match dashboard_sharing_info_result {
-        Ok(mut dashboard_sharing_info) => {
-            // Filter out the current user from individual permissions
-            if let Some(ref mut individual_permissions) =
-                dashboard_sharing_info.individual_permissions
-            {
-                individual_permissions.retain(|permission| permission.id != *user_id);
-                if individual_permissions.is_empty() {
-                    dashboard_sharing_info.individual_permissions = None;
-                }
-            }
-
-            // Filter out the current user from team permissions
-            if let Some(ref mut team_permissions) = dashboard_sharing_info.team_permissions {
-                for team_permission in team_permissions.iter_mut() {
-                    team_permission
-                        .user_permissions
-                        .retain(|user_permission| user_permission.id != *user_id);
-                }
-                // Remove teams with no remaining user permissions
-                // team_permissions
-                //     .retain(|team_permission| !team_permission.user_permissions.is_empty());
-                // if team_permissions.is_empty() {
-                //     dashboard_sharing_info.team_permissions = None;
-                // }
-            }
-
-            // Create a map of team permissions for quick lookup
-            let team_permissions_map: HashMap<Uuid, AssetPermissionRole> = dashboard_sharing_info
-                .team_permissions
-                .as_ref()
-                .map(|perms| {
-                    perms
-                        .iter()
-                        .flat_map(|p| p.user_permissions.iter().map(|up| (p.id, up.role.clone())))
-                        .collect()
-                })
-                .unwrap_or_default();
-
-            // Update individual permissions
-            if let Some(ref mut individual_permissions) =
-                dashboard_sharing_info.individual_permissions
-            {
-                for permission in individual_permissions.iter_mut() {
-                    if let Some(team_role) = team_permissions_map.get(&permission.id) {
-                        permission.role =
-                            AssetPermissionRole::max(permission.role.clone(), team_role.clone());
-                    }
-                }
-            }
-
-            // Update team permissions
-            if let Some(ref mut team_permissions) = dashboard_sharing_info.team_permissions {
-                for team_permission in team_permissions.iter_mut() {
-                    if let Some(individual_permissions) =
-                        &dashboard_sharing_info.individual_permissions
-                    {
-                        if let Some(individual_role) = individual_permissions
-                            .iter()
-                            .find(|p| p.id == team_permission.id)
-                            .map(|p| &p.role)
-                        {
-                            for user_permission in &mut team_permission.user_permissions {
-                                user_permission.role = AssetPermissionRole::max(
-                                    user_permission.role.clone(),
-                                    individual_role.clone(),
-                                );
-                            }
-                        }
-                    }
-                }
-            }
-
-            dashboard_sharing_info
-        }
+        Ok(info) => info,
         Err(e) => {
-            tracing::error!("Error getting thread sharing info: {}", e);
-            send_sentry_error(&format!("Error getting thread sharing info: {}", e), None);
-            return Err(anyhow!("Error getting thread sharing info: {}", e));
+            tracing::error!("Error getting dashboard sharing info: {}", e);
+            return Err(anyhow!("Error getting dashboard sharing info: {}", e));
         }
     };
 
     let dashboard_metrics = match dashboard_metrics_result {
-        Ok(dashboard_metrics) => dashboard_metrics,
+        Ok(metrics) => metrics,
         Err(e) => {
             tracing::error!("Error getting dashboard metrics: {}", e);
-            send_sentry_error(&format!("Error getting dashboard metrics: {}", e), None);
             return Err(anyhow!("Error getting dashboard metrics: {}", e));
         }
     };
 
     let dashboard_collections = match dashboard_collections_result {
-        Ok(dashboard_collections) => dashboard_collections,
+        Ok(collections) => collections,
         Err(e) => {
             tracing::error!("Error getting dashboard collections: {}", e);
-            send_sentry_error(&format!("Error getting dashboard collections: {}", e), None);
             return Err(anyhow!("Error getting dashboard collections: {}", e));
         }
+    };
+
+    // Get user's organization
+    let user_org = match get_user_organization_id(&user_id).await {
+        Ok(org_id) => org_id,
+        Err(e) => {
+            tracing::error!("Error getting user organization: {}", e);
+            return Err(anyhow!("Error getting user organization: {}", e));
+        }
+    };
+
+    // If user has no explicit permission and is not in the same organization
+    if permission.is_none() && user_org != dashboard.organization_id {
+        // Check if the dashboard is directly shared with the user
+        let has_direct_access = dashboard_sharing_info
+            .individual_permissions
+            .as_ref()
+            .map(|perms| perms.iter().any(|p| p.id == *user_id))
+            .unwrap_or(false);
+
+        // Check if the dashboard is shared with any of user's teams
+        let has_team_access = dashboard_sharing_info
+            .team_permissions
+            .as_ref()
+            .map(|perms| {
+                perms.iter().any(|team_perm| {
+                    team_perm
+                        .user_permissions
+                        .iter()
+                        .any(|team_user| team_user.id == *user_id)
+                })
+            })
+            .unwrap_or(false);
+
+        // If no direct or team access, return unauthorized
+        if !has_direct_access && !has_team_access && !dashboard.publicly_accessible {
+            return Err(anyhow!("Unauthorized access to dashboard"));
+        }
+    }
+
+    let public_password = if dashboard.publicly_accessible {
+        if let Some(secret_id) = dashboard.password_secret_id {
+            match read_secret(&secret_id).await {
+                Ok(password) => Some(password),
+                Err(e) => {
+                tracing::error!("Error getting dashboard password: {}", e);
+                    None
+                }
+            }
+        } else {
+            None
+        }
+    } else {
+        None
     };
 
     Ok(DashboardState {
@@ -276,28 +235,30 @@ pub async fn get_user_dashboard_permission(
         .filter(dashboards::id.eq(dashboard_id))
         .filter(dashboards::deleted_at.is_null())
         .first::<Uuid>(&mut conn)
-        .await {
-            Ok(org_id) => org_id,
-            Err(diesel::result::Error::NotFound) => return Ok(None),
-            Err(e) => {
-                tracing::error!("Error querying dashboard organization: {}", e);
-                return Err(anyhow!("Error querying dashboard organization: {}", e));
-            }
-        };
+        .await
+    {
+        Ok(org_id) => org_id,
+        Err(diesel::result::Error::NotFound) => return Ok(None),
+        Err(e) => {
+            tracing::error!("Error querying dashboard organization: {}", e);
+            return Err(anyhow!("Error querying dashboard organization: {}", e));
+        }
+    };
 
     // Then get the user's organization
     let user_org = match users_to_organizations::table
         .select(users_to_organizations::organization_id)
         .filter(users_to_organizations::user_id.eq(user_id))
         .first::<Uuid>(&mut conn)
-        .await {
-            Ok(org_id) => org_id,
-            Err(diesel::result::Error::NotFound) => return Ok(None),
-            Err(e) => {
-                tracing::error!("Error querying user organization: {}", e);
-                return Err(anyhow!("Error querying user organization: {}", e));
-            }
-        };
+        .await
+    {
+        Ok(org_id) => org_id,
+        Err(diesel::result::Error::NotFound) => return Ok(None),
+        Err(e) => {
+            tracing::error!("Error querying user organization: {}", e);
+            return Err(anyhow!("Error querying user organization: {}", e));
+        }
+    };
 
     // If organizations don't match, deny access
     if dashboard_org != user_org {
@@ -353,14 +314,15 @@ pub async fn get_bulk_user_dashboard_permission(
         .select(users_to_organizations::organization_id)
         .filter(users_to_organizations::user_id.eq(user_id))
         .first::<Uuid>(&mut conn)
-        .await {
-            Ok(org_id) => org_id,
-            Err(diesel::result::Error::NotFound) => return Ok(HashMap::new()),
-            Err(e) => {
-                tracing::error!("Error querying user organization: {}", e);
-                return Err(anyhow!("Error querying user organization: {}", e));
-            }
-        };
+        .await
+    {
+        Ok(org_id) => org_id,
+        Err(diesel::result::Error::NotFound) => return Ok(HashMap::new()),
+        Err(e) => {
+            tracing::error!("Error querying user organization: {}", e);
+            return Err(anyhow!("Error querying user organization: {}", e));
+        }
+    };
 
     let permissions = match asset_permissions::table
         .inner_join(dashboards::table.on(asset_permissions::asset_id.eq(dashboards::id)))

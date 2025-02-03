@@ -46,7 +46,6 @@ pub async fn get_dashboard(
     req: GetDashboardRequest,
 ) -> Result<()> {
     let dashboard_id = req.id.clone();
-
     let dashboard_subscription = format!("dashboard:{}", req.id);
 
     match subscribe_to_stream(subscriptions, &dashboard_subscription, user_group, &user.id).await {
@@ -54,7 +53,6 @@ pub async fn get_dashboard(
         Err(e) => return Err(anyhow!("Error subscribing to dashboard: {}", e)),
     };
 
-    // Get skeleton of metrics with no data, we will kick off data fetching jobs below.
     let mut dashboard_with_metrics = match get_dashboard_state_by_id(&user.id, &req.id).await {
         Ok(dashboard_with_metrics) => dashboard_with_metrics,
         Err(e) => {
@@ -73,44 +71,77 @@ pub async fn get_dashboard(
         }
     };
 
-    if dashboard_with_metrics.permission.is_none() {
-        if let Some(password) = &dashboard_with_metrics.public_password {
-            if dashboard_with_metrics.dashboard.publicly_accessible
-                && (dashboard_with_metrics
-                    .dashboard
-                    .public_expiry_date
-                    .is_none()
-                    || dashboard_with_metrics.dashboard.public_expiry_date
-                        > Some(chrono::Utc::now()))
-            {
-                if let Some(submitted_password) = &req.password {
-                    if password != submitted_password {
+    // Check permissions and handle public access
+    match dashboard_with_metrics.permission {
+        Some(_) => {
+            // User has explicit permission, proceed
+        }
+        None => {
+            // No explicit permission, check if public access is allowed
+            if !dashboard_with_metrics.dashboard.publicly_accessible {
+                send_error_message(
+                    &user.id.to_string(),
+                    WsRoutes::Dashboards(DashboardRoute::Get),
+                    WsEvent::Dashboards(DashboardEvent::GetDashboardState),
+                    WsErrorCode::Unauthorized,
+                    "You don't have permission to access this dashboard".to_string(),
+                    user,
+                )
+                .await?;
+                return Ok(());
+            }
+
+            // Check public access expiry
+            if let Some(expiry) = dashboard_with_metrics.dashboard.public_expiry_date {
+                if expiry <= chrono::Utc::now() {
+                    send_error_message(
+                        &user.id.to_string(),
+                        WsRoutes::Dashboards(DashboardRoute::Get),
+                        WsEvent::Dashboards(DashboardEvent::GetDashboardState),
+                        WsErrorCode::Unauthorized,
+                        "Public access to this dashboard has expired".to_string(),
+                        user,
+                    )
+                    .await?;
+                    return Ok(());
+                }
+            }
+
+            // Check password if required
+            if let Some(password) = &dashboard_with_metrics.public_password {
+                match &req.password {
+                    Some(submitted_password) if submitted_password == password => {
+                        // Password matches, proceed with viewer access
+                        dashboard_with_metrics.permission = Some(AssetPermissionRole::Viewer);
+                    }
+                    _ => {
                         send_error_message(
                             &user.id.to_string(),
                             WsRoutes::Dashboards(DashboardRoute::Get),
                             WsEvent::Dashboards(DashboardEvent::GetDashboardState),
                             WsErrorCode::Unauthorized,
-                            "Invalid password".to_string(),
+                            "Invalid or missing password".to_string(),
                             user,
                         )
                         .await?;
                         return Ok(());
                     }
                 }
+            } else {
+                // No password required for public access
+                dashboard_with_metrics.permission = Some(AssetPermissionRole::Viewer);
             }
+
+            // Clear sensitive data for public access
+            dashboard_with_metrics.public_password = None;
+            dashboard_with_metrics.organization_permissions = false;
+            dashboard_with_metrics.individual_permissions = None;
+            dashboard_with_metrics.team_permissions = None;
+            dashboard_with_metrics.collections = vec![];
         }
+    }
 
-        dashboard_with_metrics.permission = Some(AssetPermissionRole::Viewer);
-        dashboard_with_metrics.public_password = None;
-        dashboard_with_metrics.organization_permissions = false;
-        dashboard_with_metrics.individual_permissions = None;
-        dashboard_with_metrics.team_permissions = None;
-        dashboard_with_metrics.collections = vec![];
-    };
-
-    match send_dashboard_skeleton_message(user, &dashboard_subscription, &dashboard_with_metrics)
-        .await
-    {
+    match send_dashboard_skeleton_message(user, &dashboard_subscription, &dashboard_with_metrics).await {
         Ok(_) => (),
         Err(e) => return Err(anyhow!("Error sending dashboard skeleton message: {}", e)),
     };
