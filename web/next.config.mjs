@@ -17,6 +17,36 @@ const nextConfig = {
   reactStrictMode: false,
   sassOptions: {
     includePaths: [path.join(__dirname, 'styles')]
+  },
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://*.vercel.app",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "img-src 'self' blob: data: https://*.vercel.app https://*.supabase.co",
+              "font-src 'self' https://fonts.gstatic.com",
+              "frame-ancestors 'none'",
+              "connect-src 'self' https://*.vercel.app https://*.supabase.co wss://*.supabase.co",
+              "media-src 'self'",
+              "object-src 'none'",
+              "form-action 'self'",
+              "base-uri 'self'",
+              "manifest-src 'self'"
+            ].join('; ')
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN'
+          }
+        ]
+      }
+    ];
   }
 };
 
