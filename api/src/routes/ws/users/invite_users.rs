@@ -80,8 +80,7 @@ async fn invite_users_handler(user: &User, req: InviteUsersRequest) -> Result<()
 
             let new_user_id = Uuid::new_v4();
 
-            // TODO: Reevaluate the role assigned here.
-            let new_user = User {
+            User {
                 name: None,
                 email: email.clone(),
                 id: new_user_id.clone(),
@@ -94,35 +93,28 @@ async fn invite_users_handler(user: &User, req: InviteUsersRequest) -> Result<()
                     "user_email": email,
                     "organization_role": "viewer".to_string(),
                 }),
-            };
-
-            new_user
+            }
         })
         .collect::<Vec<User>>();
 
     let user_organization = users_to_add
         .iter()
-        .map(|new_user| {
-            let user_to_organization = UserToOrganization {
-                user_id: new_user.id,
-                organization_id: organization.id,
-                role: UserOrganizationRole::Querier,
-                status: UserOrganizationStatus::Active,
-                created_at: Utc::now(),
-                updated_at: Utc::now(),
-                sharing_setting: SharingSetting::Public,
-                edit_sql: true,
-                upload_csv: true,
-                export_assets: true,
-                email_slack_enabled: true,
-                deleted_at: None,
-                created_by: user.id,
-                updated_by: user.id,
-                deleted_by: None,
-            };
-            let user_organization = user_to_organization;
-
-            user_organization
+        .map(|new_user| UserToOrganization {
+            user_id: new_user.id,
+            organization_id: organization.id,
+            role: UserOrganizationRole::Querier,
+            status: UserOrganizationStatus::Active,
+            created_at: Utc::now(),
+            updated_at: Utc::now(),
+            sharing_setting: SharingSetting::Public,
+            edit_sql: true,
+            upload_csv: true,
+            export_assets: true,
+            email_slack_enabled: true,
+            deleted_at: None,
+            created_by: user.id,
+            updated_by: user.id,
+            deleted_by: None,
         })
         .collect::<Vec<UserToOrganization>>();
 
@@ -133,6 +125,7 @@ async fn invite_users_handler(user: &User, req: InviteUsersRequest) -> Result<()
 
     let emails_to_invite: HashSet<String> = req.emails.clone().into_iter().collect();
 
+    // Send emails in background
     tokio::spawn(async move {
         match send_email(emails_to_invite, EmailType::InviteToBuster(invite_body)).await {
             Ok(_) => (),
@@ -145,6 +138,7 @@ async fn invite_users_handler(user: &User, req: InviteUsersRequest) -> Result<()
 
     let mut conn = get_pg_pool().get().await?;
 
+    // Insert users
     match insert_into(users::table)
         .values(&users_to_add)
         .on_conflict(users::id)
@@ -160,116 +154,64 @@ async fn invite_users_handler(user: &User, req: InviteUsersRequest) -> Result<()
         }
     };
 
-    drop(conn);
-
-    let users_to_organization_handle = {
-        let mut conn = get_pg_pool().get().await?;
-        tokio::spawn(async move {
-            match insert_into(users_to_organizations::table)
-                .values(user_organization)
-                .on_conflict((
-                    users_to_organizations::user_id,
-                    users_to_organizations::organization_id,
-                ))
-                .do_update()
-                .set((
-                    users_to_organizations::updated_at.eq(chrono::Utc::now()),
-                    users_to_organizations::role.eq(excluded(users_to_organizations::role)),
-                    users_to_organizations::sharing_setting
-                        .eq(excluded(users_to_organizations::sharing_setting)),
-                    users_to_organizations::edit_sql.eq(excluded(users_to_organizations::edit_sql)),
-                    users_to_organizations::upload_csv
-                        .eq(excluded(users_to_organizations::upload_csv)),
-                    users_to_organizations::export_assets
-                        .eq(excluded(users_to_organizations::export_assets)),
-                    users_to_organizations::email_slack_enabled
-                        .eq(excluded(users_to_organizations::email_slack_enabled)),
-                    users_to_organizations::deleted_at
-                        .eq(excluded(users_to_organizations::deleted_at)),
-                    users_to_organizations::created_by
-                        .eq(excluded(users_to_organizations::created_by)),
-                    users_to_organizations::updated_by
-                        .eq(excluded(users_to_organizations::updated_by)),
-                    users_to_organizations::deleted_by
-                        .eq(excluded(users_to_organizations::deleted_by)),
-                ))
-                .execute(&mut conn)
-                .await
-            {
-                Ok(_) => (),
-                Err(e) => {
-                    tracing::error!("Error inserting users to organizations: {}", e);
-                    return Err(anyhow!("Error inserting users to organizations: {}", e));
-                }
-            };
-
-            Ok(())
-        })
+    // Insert user-organization relationships
+    match insert_into(users_to_organizations::table)
+        .values(user_organization)
+        .on_conflict((users_to_organizations::user_id, users_to_organizations::organization_id))
+        .do_update()
+        .set((
+            users_to_organizations::updated_at.eq(chrono::Utc::now()),
+            users_to_organizations::role.eq(excluded(users_to_organizations::role)),
+            users_to_organizations::sharing_setting.eq(excluded(users_to_organizations::sharing_setting)),
+            users_to_organizations::edit_sql.eq(excluded(users_to_organizations::edit_sql)),
+            users_to_organizations::upload_csv.eq(excluded(users_to_organizations::upload_csv)),
+            users_to_organizations::export_assets.eq(excluded(users_to_organizations::export_assets)),
+            users_to_organizations::email_slack_enabled.eq(excluded(users_to_organizations::email_slack_enabled)),
+            users_to_organizations::deleted_at.eq(excluded(users_to_organizations::deleted_at)),
+            users_to_organizations::created_by.eq(excluded(users_to_organizations::created_by)),
+            users_to_organizations::updated_by.eq(excluded(users_to_organizations::updated_by)),
+            users_to_organizations::deleted_by.eq(excluded(users_to_organizations::deleted_by)),
+        ))
+        .execute(&mut conn)
+        .await
+    {
+        Ok(_) => (),
+        Err(e) => {
+            tracing::error!("Error inserting users to organizations: {}", e);
+            return Err(anyhow!("Error inserting users to organizations: {}", e));
+        }
     };
 
-    let team_to_users_handle = if let Some(team_ids) = req.team_ids {
-        let mut conn = get_pg_pool().get().await?;
-
+    // If team_ids are provided, add team relationships
+    if let Some(team_ids) = req.team_ids {
         let mut team_to_users = Vec::new();
 
         for team_id in team_ids {
             for new_user in &users_to_add {
-                let team_to_user = TeamToUser {
+                team_to_users.push(TeamToUser {
                     team_id,
                     user_id: new_user.id,
                     role: TeamToUserRole::Member,
                     created_at: Utc::now(),
                     updated_at: Utc::now(),
                     deleted_at: None,
-                };
-
-                team_to_users.push(team_to_user);
+                });
             }
         }
 
-        Some(tokio::spawn(async move {
-            match insert_into(teams_to_users::table)
-                .values(team_to_users)
-                .on_conflict((teams_to_users::team_id, teams_to_users::user_id))
-                .do_update()
-                .set((
-                    teams_to_users::updated_at.eq(chrono::Utc::now()),
-                    teams_to_users::role.eq(excluded(teams_to_users::role)),
-                    teams_to_users::deleted_at.eq(excluded(teams_to_users::deleted_at)),
-                ))
-                .execute(&mut conn)
-                .await
-            {
-                Ok(_) => Ok(()),
-                Err(e) => {
-                    tracing::error!("Error inserting team to users: {}", e);
-                    Err(anyhow!("Error inserting team to users: {}", e))
-                }
-            }
-        }))
-    } else {
-        None
-    };
-
-    match users_to_organization_handle.await {
-        Ok(Ok(_)) => (),
-        Ok(Err(e)) => {
-            tracing::error!("Error inserting users to organizations: {}", e);
-            return Err(anyhow!("Error inserting users to organizations: {}", e));
-        }
-        Err(e) => {
-            tracing::error!("Error inserting users to organizations: {}", e);
-            return Err(anyhow!("Error inserting users to organizations: {}", e));
-        }
-    }
-
-    if let Some(handle) = team_to_users_handle {
-        match handle.await {
-            Ok(Ok(_)) => (),
-            Ok(Err(e)) => {
-                tracing::error!("Error inserting team to users: {}", e);
-                return Err(anyhow!("Error inserting team to users: {}", e));
-            }
+        match insert_into(teams_to_users::table)
+            .values(team_to_users)
+            .on_conflict((teams_to_users::team_id, teams_to_users::user_id))
+            .do_update()
+            .set((
+                teams_to_users::updated_at.eq(chrono::Utc::now()),
+                teams_to_users::role.eq(excluded(teams_to_users::role)),
+                teams_to_users::deleted_at.eq(excluded(teams_to_users::deleted_at)),
+            ))
+            .execute(&mut conn)
+            .await
+        {
+            Ok(_) => (),
             Err(e) => {
                 tracing::error!("Error inserting team to users: {}", e);
                 return Err(anyhow!("Error inserting team to users: {}", e));
