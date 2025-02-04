@@ -279,20 +279,23 @@ pub async fn generate_sql_agent(options: GenerateSqlAgentOptions) -> Result<Valu
     // Search for relevant stored values
     let mut stored_values = Vec::new();
     for dataset_id in &dataset_ids {
-        match search_values_for_dataset(
-            &options.organization_id,
-            dataset_id,
-            input.to_string(),
-        ).await {
+        match search_values_for_dataset(&options.organization_id, dataset_id, input.to_string())
+            .await
+        {
             Ok(values) => stored_values.extend(values),
             Err(e) => {
-                tracing::error!("Error searching stored values for dataset {}: {:?}", dataset_id, e);
+                tracing::error!(
+                    "Error searching stored values for dataset {}: {:?}",
+                    dataset_id,
+                    e
+                );
             }
         }
     }
 
     if !stored_values.is_empty() {
-        let values_str = stored_values.iter()
+        let values_str = stored_values
+            .iter()
             .map(|v| format!("{}: {}", v.column_name, v.value))
             .collect::<Vec<_>>()
             .join("\n");
@@ -369,10 +372,6 @@ pub async fn generate_sql_agent(options: GenerateSqlAgentOptions) -> Result<Valu
             for j in (i + 1)..datasets.len() {
                 let (dataset1, _) = &datasets[i];
                 let (dataset2, _) = &datasets[j];
-
-                println!("dataset1: {:?}", dataset1.dataset.id);
-                println!("dataset2: {:?}", dataset2.dataset.id);
-                println!("entity_relationships: {:?}", entity_relationships);
 
                 // Check if there's a relationship in either direction
                 let has_relationship = entity_relationships.iter().any(|er| {
@@ -457,30 +456,30 @@ pub async fn generate_sql_agent(options: GenerateSqlAgentOptions) -> Result<Valu
     }
 
     let mut relevant_values_string = String::new();
-    let mut column_values: HashMap<Uuid, Vec<String>> = HashMap::new();
+    let mut column_values: HashMap<String, Vec<String>> = HashMap::new();
 
     // First collect values by column_id
-    for value in &options.relevant_values {
+    for value in &stored_values {
         for (dataset, _) in &datasets {
             if value.dataset_id == dataset.dataset.id {
                 column_values
-                    .entry(value.column_id.clone())
+                    .entry(value.column_name.clone())
                     .or_default()
                     .push(value.value.clone());
             }
         }
     }
 
-    // Then format using the actual column names from dataset
-    for (column_id, values) in column_values {
+    // Format stored values by column name within each dataset
+    for (column_name, values) in column_values {
+        // Find all datasets that have this column name
         for (dataset, _) in &datasets {
-            if let Some(column_name) = dataset.get_column_name(&column_id) {
-                relevant_values_string.push_str(&format!(
-                    "{}: {}\n",
-                    column_name,
-                    values.join(", ")
-                ));
-            }
+            relevant_values_string.push_str(&format!("\nDataset: {}\n", dataset.dataset.name));
+            relevant_values_string.push_str(&format!(
+                "  {}: {}\n",
+                column_name,
+                values.join(", ")
+            ));
         }
     }
 
@@ -887,7 +886,13 @@ fn create_sql_gen_messages(
 ) -> Vec<PromptNodeMessage> {
     let mut messages = vec![PromptNodeMessage {
         role: "system".to_string(),
-        content: sql_gen_system_prompt(dataset, explanation, terms, relevant_values, data_source_type),
+        content: sql_gen_system_prompt(
+            dataset,
+            explanation,
+            terms,
+            relevant_values,
+            data_source_type,
+        ),
     }];
 
     // Add message history

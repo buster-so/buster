@@ -15,11 +15,11 @@ pub fn sql_gen_system_prompt(
 ### RELEVANT BUSINESS TERMS/DOMAIN SPECIFIC LANGUAGE
 {}
 
-### RELEVANT VALUES
+### RELEVANT VALUES FROM DATASET
 {}
 
 ### TASK
-Your task is to generate a **single** {} query  based on the thoughts that are provided to you.
+Your task is to generate a **single** {} query based on the thoughts that are provided to you.
 
 Format the SQL for the visualization/report that is specified.
 

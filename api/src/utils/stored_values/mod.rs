@@ -11,6 +11,8 @@ use crate::database::lib::get_pg_pool;
 use crate::utils::clients::ai::embedding_router::embedding_router;
 use diesel::sql_types::{Text, Uuid as SqlUuid, Array, Float4, Timestamptz, Integer};
 
+use super::query_engine::{data_types::DataType, query_engine::query_engine};
+
 #[derive(Debug, QueryableByName)]
 pub struct StoredValueRow {
     #[diesel(sql_type = Text)]
@@ -25,8 +27,6 @@ pub struct StoredValueWithDistance {
     pub column_name: String,
     #[diesel(sql_type = SqlUuid)]
     pub column_id: Uuid,
-    #[diesel(sql_type = Float4)]
-    pub distance: f32,
 }
 
 const BATCH_SIZE: usize = 10_000;
@@ -38,9 +38,10 @@ pub async fn ensure_stored_values_schema(organization_id: &Uuid) -> Result<()> {
     let mut conn = pool.get().await?;
 
     // Create schema and table using raw SQL
+    let schema_name = organization_id.to_string().replace("-", "_");
     let create_schema_sql = format!(
         "CREATE SCHEMA IF NOT EXISTS {}_values",
-        organization_id
+        schema_name
     );
 
     let create_table_sql = format!(
@@ -48,18 +49,19 @@ pub async fn ensure_stored_values_schema(organization_id: &Uuid) -> Result<()> {
             value text NOT NULL,
             dataset_id uuid NOT NULL,
             column_name text NOT NULL,
+            column_id uuid NOT NULL,
             embedding vector(1024),
             created_at timestamp with time zone NOT NULL DEFAULT now(),
             UNIQUE(dataset_id, column_name, value)
         )",
-        organization_id
+        schema_name
     );
 
     let create_index_sql = format!(
         "CREATE INDEX IF NOT EXISTS values_v1_embedding_idx 
          ON {}_values.values_v1 
          USING ivfflat (embedding vector_cosine_ops)",
-        organization_id
+        schema_name
     );
 
     diesel::sql_query(create_schema_sql).execute(&mut conn).await?;
@@ -73,6 +75,7 @@ pub async fn store_column_values(
     organization_id: &Uuid,
     dataset_id: &Uuid,
     column_name: &str,
+    column_id: &Uuid,
     data_source_id: &Uuid,
     schema: &str,
     table_name: &str,
@@ -87,43 +90,64 @@ pub async fn store_column_values(
     let mut offset = 0;
     loop {
         let query = format!(
-            "SELECT DISTINCT {} as value 
+            "SELECT DISTINCT \"{}\" as value 
              FROM {}.{} 
-             WHERE {} IS NOT NULL 
-             AND length({}) <= {} 
-             ORDER BY {} 
+             WHERE \"{}\" IS NOT NULL 
+             AND length(\"{}\") <= {} 
+             ORDER BY \"{}\" 
              LIMIT {} OFFSET {}",
             column_name, schema, table_name, column_name, column_name, 
             MAX_VALUE_LENGTH, column_name, BATCH_SIZE, offset
         );
 
-        let results: Vec<StoredValueRow> = diesel::sql_query(query)
-            .load(&mut conn)
-            .await?;
-
+        let results = match query_engine(dataset_id, &query).await {
+            Ok(results) => results,
+            Err(e) => {
+                tracing::error!("Error querying stored values: {:?}", e);
+                vec![]
+            }
+        };
+        
         if results.is_empty() {
             break;
         }
 
+        // Extract values from the query results
+        let values: Vec<String> = results
+            .into_iter()
+            .filter_map(|row| {
+                if let Some(DataType::Text(Some(value))) = row.get("value") {
+                    Some(value.clone())
+                } else {
+                    None
+                }
+            })
+            .collect();
+
+        if values.is_empty() {
+            break;
+        }
+
         // Create embeddings for the batch
-        let values: Vec<String> = results.into_iter().map(|r| r.value).collect();
         let embeddings = create_embeddings_batch(&values).await?;
 
+        let schema_name = organization_id.to_string().replace("-", "_");
         // Insert values and embeddings
         for (value, embedding) in values.iter().zip(embeddings.iter()) {
             let insert_sql = format!(
                 "INSERT INTO {}_values.values_v1 
-                 (value, dataset_id, column_name, embedding, created_at)
-                 VALUES ($1::text, $2::uuid, $3::text, $4::vector, $5::timestamptz)
+                 (value, dataset_id, column_name, column_id, embedding, created_at)
+                 VALUES ($1::text, $2::uuid, $3::text, $4::uuid, $5::vector, $6::timestamptz)
                  ON CONFLICT (dataset_id, column_name, value) 
                  DO UPDATE SET created_at = EXCLUDED.created_at",
-                organization_id
+                schema_name
             );
 
             diesel::sql_query(insert_sql)
                 .bind::<Text, _>(value)
                 .bind::<SqlUuid, _>(dataset_id)
                 .bind::<Text, _>(column_name)
+                .bind::<SqlUuid, _>(column_id)
                 .bind::<Array<Float4>, _>(embedding)
                 .bind::<Timestamptz, _>(Utc::now())
                 .execute(&mut conn)
@@ -152,13 +176,14 @@ pub async fn search_stored_values(
 
     let limit = limit.unwrap_or(10);
 
+    let schema_name = organization_id.to_string().replace("-", "_");
     let query = format!(
-        "SELECT value, column_name, column_id, (embedding <=> $1::vector) as distance
+        "SELECT value, column_name, column_id
          FROM {}_values.values_v1
          WHERE dataset_id = $2::uuid
          ORDER BY embedding <=> $1::vector
          LIMIT $3::integer",
-        organization_id
+        schema_name
     );
 
     let results: Vec<StoredValueWithDistance> = diesel::sql_query(query)

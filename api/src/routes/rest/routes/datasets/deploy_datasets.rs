@@ -618,10 +618,17 @@ async fn deploy_datasets_handler(
         // Process columns that have stored_values enabled
         for col in &req.columns {
             if col.stored_values {
+                // Find the column ID from inserted_columns
+                let column = inserted_columns
+                    .iter()
+                    .find(|c| c.dataset_id == dataset.id && c.name == col.name)
+                    .ok_or(anyhow!("Column not found"))?;
+
                 match crate::utils::stored_values::store_column_values(
                     &organization_id,
                     &dataset.id,
                     &col.name,
+                    &column.id,  // Pass the column ID
                     &data_source.id,
                     &dataset.schema,
                     &dataset.database_name,
