@@ -64,9 +64,15 @@ impl fmt::Display for PromptNodeError {
 }
 
 pub async fn prompt_node(settings: PromptNodeSettings) -> Result<Value, ErrorNode> {
+    let model = match settings.model.as_str() {
+        "gpt-4o" => LlmModel::OpenAi(OpenAiChatModel::Gpt4o),
+        "gpt-3.5-turbo" => LlmModel::OpenAi(OpenAiChatModel::Gpt35Turbo),
+        _ => LlmModel::OpenAi(OpenAiChatModel::O3Mini),
+    };
+
     let llm_response = if let Some(stream) = settings.stream {
         let (mut llm_stream, response_future) = match llm_chat_stream(
-            LlmModel::OpenAi(OpenAiChatModel::Gpt4o),
+            model,
             settings
                 .messages
                 .into_iter()
@@ -137,7 +143,7 @@ pub async fn prompt_node(settings: PromptNodeSettings) -> Result<Value, ErrorNod
         }
     } else {
         let response = match llm_chat(
-            LlmModel::OpenAi(OpenAiChatModel::Gpt4o),
+            model,
             &settings
                 .messages
                 .into_iter()

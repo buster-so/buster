@@ -27,7 +27,7 @@ impl LlmModel {
         let output_token = bpe.encode_with_special_tokens(&output);
 
         match self {
-            LlmModel::OpenAi(OpenAiChatModel::Gpt4o) => Usage {
+            LlmModel::OpenAi(OpenAiChatModel::O3Mini) => Usage {
                 input: input_token.len() as u32,
                 output: output_token.len() as u32,
                 unit: "TOKENS".to_string(),
@@ -45,7 +45,7 @@ impl LlmModel {
                 total_cost: (input_token.len() as f64 / 1_000_000.0) * 0.5
                     + (output_token.len() as f64 / 1_000_000.0) * 1.5,
             },
-            LlmModel::OpenAi(OpenAiChatModel::Gpt4oMini) => Usage {
+            LlmModel::OpenAi(OpenAiChatModel::Gpt4o) => Usage {
                 input: input_token.len() as u32,
                 output: output_token.len() as u32,
                 unit: "TOKENS".to_string(),

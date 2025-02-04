@@ -551,7 +551,7 @@ Output in json with each key being the column name and the value being the descr
     );
 
     let col_descriptions = match llm_chat(
-        LlmModel::OpenAi(OpenAiChatModel::Gpt4o),
+        LlmModel::OpenAi(OpenAiChatModel::O3Mini),
         &vec![LlmMessage {
             role: LlmRole::User,
             content: user_message.clone(),
@@ -606,7 +606,7 @@ Output the description in JSON with 'when_to_use' and 'when_not_to_use' as the k
     );
 
     let select_term_response = match llm_chat(
-        LlmModel::OpenAi(OpenAiChatModel::Gpt4o),
+        LlmModel::OpenAi(OpenAiChatModel::O3Mini),
         &vec![LlmMessage {
             role: LlmRole::User,
             content: user_message.clone(),

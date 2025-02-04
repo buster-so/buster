@@ -160,6 +160,7 @@ pub async fn configure_charts_agent(
         ],
         prompt_name: "bar_line_chart".to_string(),
         json_mode: true,
+        model: "gpt-4o".to_string(),
         ..Default::default()
     };
     let bar_line_future = tokio::spawn(async move { prompt_node(bar_line_chart_settings).await });
@@ -184,6 +185,7 @@ pub async fn configure_charts_agent(
         ],
         prompt_name: "scatter_chart".to_string(),
         json_mode: true,
+        model: "gpt-4o".to_string(),
         ..Default::default()
     };
     let scatter_future = tokio::spawn(async move { prompt_node(scatter_chart_settings).await });
@@ -208,6 +210,7 @@ pub async fn configure_charts_agent(
         ],
         prompt_name: "pie_chart".to_string(),
         json_mode: true,
+        model: "gpt-4o".to_string(),
         ..Default::default()
     };
     let pie_future = tokio::spawn(async move { prompt_node(pie_chart_settings).await });
@@ -232,6 +235,7 @@ pub async fn configure_charts_agent(
         ],
         prompt_name: "metric_chart".to_string(),
         json_mode: true,
+        model: "gpt-4o".to_string(),
         ..Default::default()
     };
     let metric_future = tokio::spawn(async move { prompt_node(metric_chart_settings).await });
@@ -257,6 +261,7 @@ pub async fn configure_charts_agent(
         messages,
         prompt_name: "combo_chart".to_string(),
         json_mode: true,
+        model: "gpt-4o".to_string(),
         ..Default::default()
     };
     let combo_future = tokio::spawn(async move { prompt_node(combo_chart_settings).await });

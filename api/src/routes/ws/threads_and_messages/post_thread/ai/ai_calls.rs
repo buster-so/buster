@@ -86,7 +86,7 @@ Output in json with the key of 'dataset' and the value of the dataset name. Your
     ];
 
     let response = match llm_chat(
-        LlmModel::OpenAi(OpenAiChatModel::Gpt4o),
+        LlmModel::OpenAi(OpenAiChatModel::O3Mini),
         &messages_to_be_sent,
         0.0,
         50,
@@ -175,7 +175,7 @@ Output in markdown (```sql```) format. Make sure to close the SQL statement with
     }
 
     let stream_response = match llm_chat_stream(
-        LlmModel::OpenAi(OpenAiChatModel::Gpt4o),
+        LlmModel::OpenAi(OpenAiChatModel::O3Mini),
         messages_to_be_sent,
         0.0,
         1000,
@@ -248,7 +248,7 @@ SQL should be escaped with backticks (```sql```) like in markdown format.",
     ];
 
     let stream_response = match llm_chat_stream(
-        LlmModel::OpenAi(OpenAiChatModel::Gpt4o),
+        LlmModel::OpenAi(OpenAiChatModel::O3Mini),
         messages_to_be_sent,
         0.0,
         1000,
@@ -332,7 +332,7 @@ No longer than 2 sentences.",
     }];
 
     let response = match llm_chat_stream(
-        LlmModel::OpenAi(OpenAiChatModel::Gpt4o),
+        LlmModel::OpenAi(OpenAiChatModel::O3Mini),
         messages_to_be_sent,
         0.0,
         250,
@@ -383,7 +383,7 @@ No longer than 2 sentences.",
     }];
 
     let stream_response = match llm_chat_stream(
-        LlmModel::OpenAi(OpenAiChatModel::Gpt4o),
+        LlmModel::OpenAi(OpenAiChatModel::O3Mini),
         messages_to_be_sent,
         0.0,
         250,
@@ -435,7 +435,7 @@ Speak casually.
     }];
 
     let stream_response = match llm_chat_stream(
-        LlmModel::OpenAi(OpenAiChatModel::Gpt4o),
+        LlmModel::OpenAi(OpenAiChatModel::O3Mini),
         messages_to_be_sent,
         0.0,
         250,
@@ -485,7 +485,7 @@ The title should contain no special characters.",
     }];
 
     let stream_response = match llm_chat_stream(
-        LlmModel::OpenAi(OpenAiChatModel::Gpt4o),
+        LlmModel::OpenAi(OpenAiChatModel::O3Mini),
         messages_to_be_sent,
         0.0,
         50,
@@ -535,7 +535,7 @@ The question should contain no special characters.",
     }];
 
     let stream_response = match llm_chat_stream(
-        LlmModel::OpenAi(OpenAiChatModel::Gpt4o),
+        LlmModel::OpenAi(OpenAiChatModel::O3Mini),
         messages_to_be_sent,
         0.0,
         50,
@@ -602,7 +602,7 @@ Just output the time frame in the format I mentioned above. Do not wrap in any s
     ];
 
     let stream_response = match llm_chat_stream(
-        LlmModel::OpenAi(OpenAiChatModel::Gpt4o),
+        LlmModel::OpenAi(OpenAiChatModel::O3Mini),
         messages_to_be_sent,
         0.0,
         100,
@@ -666,7 +666,7 @@ Output the results in a json object with 'terms' as the key and an array contain
     );
 
     let select_term_response = match llm_chat(
-        LlmModel::OpenAi(OpenAiChatModel::Gpt4o),
+        LlmModel::OpenAi(OpenAiChatModel::O3Mini),
         &vec![LlmMessage {
             role: LlmRole::User,
             content: user_message.clone(),

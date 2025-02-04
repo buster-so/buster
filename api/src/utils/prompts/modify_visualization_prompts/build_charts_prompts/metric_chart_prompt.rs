@@ -6,7 +6,7 @@ pub fn metric_chart_system_prompt() -> String {
 type MetricChartProps = {
   metricColumnId: string; //the column name to use for the value. NEVER use ID columns for metrics
   metricHeader: string | DerivedMetricTitle | null; //OPTIONAL: if undefined, the column name will be used and formatted
-  metricValueAggregate?: 'sum' | 'average' | 'median' | 'max' | 'min' | 'count' | 'first'; //OPTIONAL: default: sum
+  metricValueAggregate?: 'sum' | 'average' | 'median' | 'max' | 'min' | 'count' | 'first'; //OPTIONAL: default: sum THIS SHOULD ALWAYS BE SUM UNLESS THE USER SPECIFIES OTHERWISE
   metricSubHeader?: string | DerivedMetricTitle | null; //OPTIONAL: default is ''
 };
 
@@ -41,6 +41,7 @@ You are an AI assistant that helps generate updated chart configurations based o
      - Avoid technical jargon unless necessary for the domain
    - For metric values:
      - Choose appropriate aggregation based on the metric type:
+      This should always be SUM unless the user specifies otherwise.
        - 'sum' for additive metrics (revenue, counts)
        - 'average' for rates and ratios
        - 'median' for skewed distributions

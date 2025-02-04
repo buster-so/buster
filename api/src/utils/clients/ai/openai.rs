@@ -21,8 +21,8 @@ lazy_static::lazy_static! {
 pub enum OpenAiChatModel {
     #[serde(rename = "gpt-4o-2024-11-20")]
     Gpt4o,
-    #[serde(rename = "gpt-4o-mini")]
-    Gpt4oMini,
+    #[serde(rename = "o3-mini")]
+    O3Mini,
     #[serde(rename = "gpt-3.5-turbo")]
     Gpt35Turbo,
 }
@@ -31,9 +31,19 @@ pub enum OpenAiChatModel {
 #[serde(rename_all = "lowercase")]
 pub enum OpenAiChatRole {
     System,
+    Developer,
     User,
     Assistant,
 }
+
+#[derive(Serialize, Clone)]
+#[serde(rename_all = "lowercase")]
+pub enum ReasoningEffort {
+    Low,
+    Medium,
+    High,
+}
+
 #[derive(Serialize, Clone)]
 pub struct OpenAiChatContent {
     #[serde(rename = "type")]
@@ -47,13 +57,39 @@ pub struct OpenAiChatMessage {
     pub content: Vec<OpenAiChatContent>,
 }
 
+// Helper functions for conditional serialization
+fn is_o3_model(model: &OpenAiChatModel) -> bool {
+    matches!(model, OpenAiChatModel::O3Mini)
+}
+
+fn should_skip_temperature(val: &(&f32, &OpenAiChatModel)) -> bool {
+    is_o3_model(val.1)
+}
+
+fn should_skip_max_tokens(val: &(&u32, &OpenAiChatModel)) -> bool {
+    is_o3_model(val.1)
+}
+
+fn should_skip_top_p(val: &(&f32, &OpenAiChatModel)) -> bool {
+    is_o3_model(val.1)
+}
+
+fn should_skip_reasoning_effort(val: &(&Option<ReasoningEffort>, &OpenAiChatModel)) -> bool {
+    !is_o3_model(val.1)
+}
+
 #[derive(Serialize, Clone)]
 pub struct OpenAiChatRequest {
     model: OpenAiChatModel,
     messages: Vec<OpenAiChatMessage>,
-    temperature: f32,
-    max_tokens: u32,
-    top_p: f32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    temperature: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    max_tokens: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    top_p: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    reasoning_effort: Option<ReasoningEffort>,
     frequency_penalty: f32,
     presence_penalty: f32,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -61,6 +97,38 @@ pub struct OpenAiChatRequest {
     stream: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     response_format: Option<Value>,
+}
+
+impl OpenAiChatRequest {
+    pub fn new(
+        model: OpenAiChatModel,
+        messages: Vec<OpenAiChatMessage>,
+        temperature: f32,
+        max_tokens: u32,
+        stop: Option<Vec<String>>,
+        stream: bool,
+        response_format: Option<Value>,
+    ) -> Self {
+        let (temperature, max_tokens, top_p, reasoning_effort) = if is_o3_model(&model) {
+            (None, None, None, Some(ReasoningEffort::Low))
+        } else {
+            (Some(temperature), Some(max_tokens), Some(1.0), None)
+        };
+
+        Self {
+            model,
+            messages,
+            temperature,
+            max_tokens,
+            top_p,
+            reasoning_effort,
+            frequency_penalty: 0.0,
+            presence_penalty: 0.0,
+            stop,
+            stream,
+            response_format,
+        }
+    }
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -98,18 +166,15 @@ pub async fn openai_chat(
         None => response_format,
     };
 
-    let chat_request = OpenAiChatRequest {
-        model: model.clone(),
+    let chat_request = OpenAiChatRequest::new(
+        model.clone(),
         messages,
         temperature,
         max_tokens,
-        stream: false,
         stop,
+        false,
         response_format,
-        top_p: 1.0,
-        frequency_penalty: 0.0,
-        presence_penalty: 0.0,
-    };
+    );
 
     let client = reqwest::Client::new();
 
@@ -195,18 +260,15 @@ pub async fn openai_chat_stream(
     timeout: u64,
     stop: Option<Vec<String>>,
 ) -> Result<ReceiverStream<String>> {
-    let chat_request = OpenAiChatRequest {
-        model: model.clone(),
-        messages: messages.clone(),
+    let chat_request = OpenAiChatRequest::new(
+        model.clone(),
+        messages.clone(),
         temperature,
-        max_tokens: 7048,
-        stream: true,
+        max_tokens,
         stop,
-        response_format: None,
-        top_p: 1.0,
-        frequency_penalty: 0.0,
-        presence_penalty: 0.0,
-    };
+        true,
+        None,
+    );
 
     let client = reqwest::Client::new();
 
