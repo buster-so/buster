@@ -11,12 +11,38 @@ use arrow::array::{
 use arrow::datatypes::TimeUnit;
 
 use anyhow::{anyhow, Error};
-use chrono::{LocalResult, TimeZone, Utc, NaiveTime};
+use chrono::{DateTime, LocalResult, NaiveTime, TimeZone, Utc};
 use snowflake_api::SnowflakeApi;
 
 use serde_json::Value;
 
 use crate::utils::query_engine::data_types::DataType;
+
+// Add helper functions at the top level
+fn process_string_value(value: String) -> String {
+    value.to_lowercase()
+}
+
+fn process_json_value(value: Value) -> Value {
+    match value {
+        Value::String(s) => Value::String(s.to_lowercase()),
+        Value::Array(arr) => Value::Array(arr.into_iter().map(process_json_value).collect()),
+        Value::Object(map) => {
+            let new_map = map.into_iter()
+                .map(|(k, v)| (k.to_lowercase(), process_json_value(v)))
+                .collect();
+            Value::Object(new_map)
+        }
+        _ => value,
+    }
+}
+
+fn parse_snowflake_timestamp(epoch_data: i64, subsec_nanos: u32) -> Result<DateTime<Utc>, Error> {
+    match Utc.timestamp_opt(epoch_data, subsec_nanos) {
+        LocalResult::Single(dt) => Ok(dt),
+        _ => Err(anyhow!("Invalid timestamp value"))
+    }
+}
 
 pub async fn snowflake_query(
     mut snowflake_client: SnowflakeApi,
@@ -100,12 +126,12 @@ pub async fn snowflake_query(
                                         arrow::datatypes::DataType::Utf8 => {
                                             let array = column.as_any().downcast_ref::<StringArray>().unwrap();
                                             if array.is_null(row_idx) { DataType::Null }
-                                            else { DataType::Text(Some(array.value(row_idx).to_string())) }
+                                            else { DataType::Text(Some(process_string_value(array.value(row_idx).to_string()))) }
                                         }
                                         arrow::datatypes::DataType::LargeUtf8 => {
                                             let array = column.as_any().downcast_ref::<LargeStringArray>().unwrap();
                                             if array.is_null(row_idx) { DataType::Null }
-                                            else { DataType::Text(Some(array.value(row_idx).to_string())) }
+                                            else { DataType::Text(Some(process_string_value(array.value(row_idx).to_string()))) }
                                         }
                                         arrow::datatypes::DataType::Binary => {
                                             let array = column.as_any().downcast_ref::<BinaryArray>().unwrap();
@@ -144,8 +170,9 @@ pub async fn snowflake_query(
                                         }
                                         arrow::datatypes::DataType::Timestamp(unit, tz) => {
                                             let array = column.as_any().downcast_ref::<TimestampNanosecondArray>().unwrap();
-                                            if array.is_null(row_idx) { DataType::Null }
-                                            else {
+                                            if array.is_null(row_idx) { 
+                                                DataType::Null 
+                                            } else {
                                                 let nanos = array.value(row_idx);
                                                 let (secs, subsec_nanos) = match unit {
                                                     TimeUnit::Second => (nanos, 0),
@@ -153,12 +180,16 @@ pub async fn snowflake_query(
                                                     TimeUnit::Microsecond => (nanos / 1_000_000, (nanos % 1_000_000) * 1000),
                                                     TimeUnit::Nanosecond => (nanos / 1_000_000_000, nanos % 1_000_000_000),
                                                 };
-                                                match Utc.timestamp_opt(secs as i64, subsec_nanos as u32) {
-                                                    LocalResult::Single(dt) => match tz {
+                                                
+                                                match parse_snowflake_timestamp(secs as i64, subsec_nanos as u32) {
+                                                    Ok(dt) => match tz {
                                                         Some(_) => DataType::Timestamptz(Some(dt)),
                                                         None => DataType::Timestamp(Some(dt.naive_utc())),
                                                     },
-                                                    _ => DataType::Null,
+                                                    Err(e) => {
+                                                        tracing::error!("Failed to parse timestamp: {}", e);
+                                                        DataType::Null
+                                                    }
                                                 }
                                             }
                                         }
@@ -281,14 +312,14 @@ pub async fn snowflake_query(
                                                             } else if let Some(num) = values.as_any().downcast_ref::<Int64Array>() {
                                                                 Some(Value::Number(num.value(i).into()))
                                                             } else if let Some(str) = values.as_any().downcast_ref::<StringArray>() {
-                                                                Some(Value::String(str.value(i).to_string()))
+                                                                Some(Value::String(process_string_value(str.value(i).to_string())))
                                                             } else {
                                                                 None
                                                             }
                                                         })
                                                         .collect()
                                                 );
-                                                DataType::Json(Some(json_array))
+                                                DataType::Json(Some(process_json_value(json_array)))
                                             }
                                         }
                                         arrow::datatypes::DataType::Struct(fields) => {
@@ -309,7 +340,7 @@ pub async fn snowflake_query(
                                                     };
                                                     map.insert(field_name.to_string(), value);
                                                 }
-                                                DataType::Json(Some(Value::Object(map)))
+                                                DataType::Json(Some(process_json_value(Value::Object(map))))
                                             }
                                         }
                                         arrow::datatypes::DataType::Union(_, _) => {
@@ -347,7 +378,7 @@ pub async fn snowflake_query(
                                                         json_map.insert(key.to_string(), Value::Number(value.into()));
                                                     }
                                                 }
-                                                DataType::Json(Some(Value::Object(json_map)))
+                                                DataType::Json(Some(process_json_value(Value::Object(json_map))))
                                             }
                                         }
                                         arrow::datatypes::DataType::RunEndEncoded(_, _) => {
