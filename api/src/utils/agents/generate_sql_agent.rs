@@ -27,6 +27,7 @@ use crate::{
             sql_gen_prompt::{sql_gen_system_prompt, sql_gen_user_prompt},
             sql_gen_thought_prompt::{sql_gen_thought_system_prompt, sql_gen_thought_user_prompt},
         },
+        stored_values::search::{search_values_for_dataset, StoredValue},
     },
 };
 
@@ -59,15 +60,17 @@ impl fmt::Display for GenerateSqlAgentError {
     }
 }
 
+#[derive(Clone)]
 pub struct GenerateSqlAgentOptions {
     pub sql_gen_action: Value,
-    pub message_history: Vec<Value>,
     pub datasets: Vec<DatasetWithMetadata>,
     pub thoughts: Thoughts,
     pub terms: Vec<RelevantTerm>,
-    pub relevant_values: Vec<StoredValueDocument>,
-    pub start_time: Instant,
     pub output_sender: mpsc::Sender<Value>,
+    pub message_history: Vec<Value>,
+    pub start_time: Instant,
+    pub organization_id: Uuid,
+    pub relevant_values: Vec<StoredValue>,
 }
 
 pub async fn generate_sql_agent(options: GenerateSqlAgentOptions) -> Result<Value, ErrorNode> {
@@ -273,6 +276,43 @@ pub async fn generate_sql_agent(options: GenerateSqlAgentOptions) -> Result<Valu
         .map(|(dataset, _)| dataset.dataset.id)
         .collect::<Vec<Uuid>>();
 
+    // Search for relevant stored values
+    let mut stored_values = Vec::new();
+    for dataset_id in &dataset_ids {
+        match search_values_for_dataset(
+            &options.organization_id,
+            dataset_id,
+            input.to_string(),
+        ).await {
+            Ok(values) => stored_values.extend(values),
+            Err(e) => {
+                tracing::error!("Error searching stored values for dataset {}: {:?}", dataset_id, e);
+            }
+        }
+    }
+
+    if !stored_values.is_empty() {
+        let values_str = stored_values.iter()
+            .map(|v| format!("{}: {}", v.column_name, v.value))
+            .collect::<Vec<_>>()
+            .join("\n");
+
+        thoughts.thoughts.push(Thought {
+            type_: "thoughtBlock".to_string(),
+            title: "Found relevant values".to_string(),
+            content: Some(values_str),
+            code: None,
+            error: None,
+        });
+
+        send_message(
+            "thought".to_string(),
+            serde_json::to_value(&thoughts).unwrap(),
+            options.output_sender.clone(),
+        )
+        .await?;
+    }
+
     let data_source_ids = datasets
         .iter()
         .map(|(dataset, _)| dataset.dataset.data_source_id)
@@ -424,7 +464,7 @@ pub async fn generate_sql_agent(options: GenerateSqlAgentOptions) -> Result<Valu
         for (dataset, _) in &datasets {
             if value.dataset_id == dataset.dataset.id {
                 column_values
-                    .entry(value.dataset_column_id.clone())
+                    .entry(value.column_id.clone())
                     .or_default()
                     .push(value.value.clone());
             }
@@ -747,7 +787,7 @@ fn create_dataset_selector_messages(
     input: &String,
     datasets: &Vec<DatasetWithMetadata>,
     terms: &Vec<RelevantTerm>,
-    relevant_values: &Vec<StoredValueDocument>,
+    relevant_values: &Vec<StoredValue>,
     message_history: &Vec<Value>,
 ) -> Vec<PromptNodeMessage> {
     let mut terms_string = String::new();

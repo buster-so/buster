@@ -1,3 +1,3 @@
 this is an axum web server
 
-always update the prds/{prd_name}.md file while writing code.
+as you are following the prds/{prd_name}.md file while writing the corresponding code, you should make updates to the prd file for reference to what you've done and accomplished.

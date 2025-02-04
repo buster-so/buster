@@ -37,6 +37,8 @@ use crate::{
         prompts::analyst_chat_prompts::orchestrator_prompt::{
             orchestrator_prompt_schema, orchestrator_system_prompt,
         },
+        stored_values::search::{search_values_for_dataset, StoredValue},
+        user::user_info::get_user_organization_id,
     },
 };
 
@@ -81,9 +83,10 @@ pub struct DataAnalystAgentOptions {
     pub output_sender: mpsc::Sender<Value>,
     pub datasets: Vec<DatasetWithMetadata>,
     pub terms: Vec<RelevantTerm>,
-    pub relevant_values: Vec<StoredValueDocument>,
+    pub relevant_values: Vec<StoredValue>,
     pub thread_id: Uuid,
     pub message_id: Uuid,
+    pub user_id: Uuid,
 }
 
 pub enum DataAnalystAgentError {
@@ -531,6 +534,16 @@ pub async fn data_analyst_agent(options: DataAnalystAgentOptions) -> Result<Valu
 
     // Get generate_sql action if it exists
     if let Some(generate_sql_action) = &generate_sql_action {
+        let organization_id = match get_user_organization_id(&options.user_id).await {
+            Ok(id) => id,
+            Err(e) => {
+                return Err(ErrorNode::new(
+                    DataAnalystAgentError::GenericError.to_string(),
+                    format!("Error getting organization id: {}", e),
+                ));
+            }
+        };
+
         let generate_sql_options = GenerateSqlAgentOptions {
             sql_gen_action: generate_sql_action.clone(),
             datasets: options.datasets.clone(),
@@ -539,7 +552,8 @@ pub async fn data_analyst_agent(options: DataAnalystAgentOptions) -> Result<Valu
             output_sender: options.output_sender.clone(),
             message_history: options.message_history.clone(),
             start_time,
-            relevant_values: options.relevant_values.clone(),
+            organization_id,
+            relevant_values: vec![], // We'll get these in generate_sql_agent
         };
 
         let future = tokio::spawn(async move { generate_sql_agent(generate_sql_options).await });

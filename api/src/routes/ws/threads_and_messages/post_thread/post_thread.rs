@@ -28,7 +28,7 @@ use crate::{
         clients::{
             ai::embedding_router::embedding_router,
             sentry_utils::send_sentry_error,
-            typesense::{self, CollectionName, SearchRequestObject, StoredValueDocument},
+            typesense::{self, CollectionName, SearchRequestObject},
         },
         user::user_info::get_user_organization_id,
     },
@@ -216,16 +216,7 @@ pub async fn post_thread(
         })
     };
 
-    let values_handle = {
-        let dataset_ids = dataset_ids.clone();
-        let prompt = req.prompt.clone();
-
-        tokio::spawn(async move { get_relevant_values(&dataset_ids, &prompt).await })
-    };
-
-    let (terms_result, values_result) = tokio::join!(terms_handle, values_handle);
-
-    let terms = match terms_result {
+    let terms = match terms_handle.await {
         Ok(Ok(terms)) => terms,
         Ok(Err(e)) => {
             tracing::error!("Unable to search for relevant terms: {:?}", e);
@@ -237,27 +228,16 @@ pub async fn post_thread(
         }
     };
 
-    let relevant_values = match values_result {
-        Ok(Ok(values)) => values,
-        Ok(Err(e)) => {
-            tracing::error!("Unable to get relevant values: {:?}", e);
-            vec![]
-        }
-        Err(e) => {
-            tracing::error!("Task join error for values search: {:?}", e);
-            vec![]
-        }
-    };
-
     let data_analyst_options = DataAnalystAgentOptions {
         input: req.prompt.clone(),
         message_history: assemble_message_history(&thread),
         output_sender: thread_tx.clone(),
         datasets: reranked_datasets_with_metadata,
         terms,
-        relevant_values,
+        relevant_values: vec![], // We'll get these in generate_sql_agent
         thread_id: thread.thread.id,
         message_id: message.id,
+        user_id: user.id,
     };
 
     let result = match data_analyst_agent(data_analyst_options).await {
@@ -359,49 +339,6 @@ fn assemble_message_history(thread: &ThreadState) -> Vec<Value> {
     }
 
     message_history
-}
-
-pub async fn get_relevant_values(
-    dataset_ids: &Vec<Uuid>,
-    prompt: &String,
-) -> Result<Vec<StoredValueDocument>> {
-    let mut search_reqs = vec![];
-
-    for dataset_id in dataset_ids {
-        let search_req = SearchRequestObject {
-            collection: CollectionName::StoredValues(format!("dataset_index_{}", dataset_id)),
-            q: prompt.to_string(),
-            query_by: "value,value_embedding".to_string(),
-            prefix: true,
-            exclude_fields: "value_embedding".to_string(),
-            highlight_fields: "value".to_string(),
-            use_cache: true,
-            filter_by: "".to_string(),
-            vector_query: String::from("value_embedding:([], alpha: 0.7)"),
-            limit: Some(10),
-        };
-
-        search_reqs.push(search_req);
-    }
-
-    let search_results = match typesense::search_documents(search_reqs).await {
-        Ok(search_results) => search_results,
-        Err(e) => return Err(anyhow!("Error searching for relevant values: {e}")),
-    };
-
-    let search_results = search_results
-        .results
-        .iter()
-        .flat_map(|result| {
-            result
-                .hits
-                .iter()
-                .map(|hit| hit.document.into_stored_value_document().clone())
-                .collect::<Vec<StoredValueDocument>>()
-        })
-        .collect::<Vec<StoredValueDocument>>();
-
-    Ok(search_results)
 }
 
 #[derive(Serialize)]
