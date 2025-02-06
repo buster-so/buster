@@ -401,21 +401,25 @@ pub async fn modify_visualization_agent(
     );
 
     let time_unit = match configure_charts_result.clone() {
-        Some(result) => match result.bar_line_chart.get("x_axis_time_unit") {
-            Some(Value::String(time_unit)) => time_unit.to_string(),
-            _ => match result.combo_chart.get("x_axis_time_unit") {
-                Some(Value::String(time_unit)) => time_unit.to_string(),
-                _ => String::new(),
-            },
+        Some(mut result) => {
+            // Try to get and remove from bar_line_chart first
+            if let Some(Value::String(time_unit)) = result.bar_line_chart.as_object_mut().and_then(|obj| obj.remove("x_axis_time_unit")) {
+                time_unit
+            } else {
+                // If not found in bar_line_chart, try combo_chart
+                if let Some(Value::String(time_unit)) = result.combo_chart.as_object_mut().and_then(|obj| obj.remove("x_axis_time_unit")) {
+                    time_unit
+                } else {
+                    String::new()
+                }
+            }
         },
         None => String::new(),
     };
 
     if !time_unit.is_empty() {
         global_styling_result = Some(json!({
-            "xAxisConfig": {
-                "xAxisTimeInterval": time_unit
-            }
+            "xAxisTimeInterval": time_unit
         }));
     }
 

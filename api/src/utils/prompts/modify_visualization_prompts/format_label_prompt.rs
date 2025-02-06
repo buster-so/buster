@@ -22,7 +22,7 @@ type BusterChartLabelFormatCurrency = {
 } & ColumnLabelFormatBase;
 
 type BusterChartLabelFormatDate = {
-  dateFormat?: 'auto' | string; //OPTIONAL: default is 'LL'. This will only apply if the format is set to 'date'. This will convert the date to the specified format. This MUST BE IN dayjs format. If you determine that a column type is a date column, you should specify it's date format here.
+  dateFormat?: 'auto' | string; //OPTIONAL: The default to 'auto'. Only specify the day.js string format if the user asks for it.
   useRelativeTime?: boolean;
   isUTC?: boolean;
   // This is useful if a date column is actually returned as a number. For example, if the column is the day of the week (1-7) or month of the year (1-12), then you should set this to 'day_of_week' or 'month_of_year'.
