@@ -17,7 +17,7 @@ import React from 'react';
 export interface ISelectAxisContext
   extends Required<YAxisConfig>,
     Required<Y2AxisConfig>,
-    Required<XAxisConfig>,
+    Required<Omit<XAxisConfig, 'xAxisTimeInterval'>>,
     Required<CategoryAxisStyleConfig> {
   selectedAxis: ChartEncodes | null;
   columnLabelFormats: IBusterThreadMessageChartConfig['columnLabelFormats'];

@@ -1,4 +1,3 @@
-import { IBusterThreadMessage } from '@/context/Threads/interfaces';
 import React, { useMemo } from 'react';
 import { DropZone, SelectAxisDropzones, SelectAxisItem } from './SelectAxisDragContainer';
 import { IBusterThreadMessageChartConfig } from '@/api/buster_rest';
@@ -19,7 +18,7 @@ import { SelectAxisEmptyState } from './SelectAxisEmptyState';
 
 export const SelectAxis: React.FC<
   Required<YAxisConfig> &
-    Required<XAxisConfig> &
+    Required<Omit<XAxisConfig, 'xAxisTimeInterval'>> &
     Required<CategoryAxisStyleConfig> &
     Required<Y2AxisConfig> &
     ISelectAxisContext

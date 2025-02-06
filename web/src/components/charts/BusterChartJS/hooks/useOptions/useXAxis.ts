@@ -19,7 +19,6 @@ export const useXAxis = ({
   columnLabelFormats,
   selectedAxis,
   selectedChartType,
-  columnMetadata,
   columnSettings,
   xAxisLabelRotation,
   xAxisShowAxisLabel,
@@ -27,12 +26,12 @@ export const useXAxis = ({
   xAxisShowAxisTitle,
   gridLines,
   lineGroupType,
-  barGroupType
+  barGroupType,
+  xAxisTimeInterval
 }: {
   columnLabelFormats: NonNullable<BusterChartConfigProps['columnLabelFormats']>;
   selectedAxis: ChartEncodes;
   selectedChartType: ChartType;
-  columnMetadata: NonNullable<BusterChartProps['columnMetadata']>;
   xAxisLabelRotation: NonNullable<BusterChartProps['xAxisLabelRotation']>;
   xAxisShowAxisLabel: NonNullable<BusterChartProps['xAxisShowAxisLabel']>;
   gridLines: NonNullable<BusterChartProps['gridLines']>;
@@ -41,6 +40,7 @@ export const useXAxis = ({
   lineGroupType: BusterChartProps['lineGroupType'];
   barGroupType: BusterChartProps['barGroupType'];
   columnSettings: BusterChartProps['columnSettings'];
+  xAxisTimeInterval: BusterChartProps['xAxisTimeInterval'];
 }): DeepPartial<ScaleChartOptions<'bar'>['scales']['x']> | undefined => {
   const isScatterChart = selectedChartType === ChartType.Scatter;
   const isPieChart = selectedChartType === ChartType.Pie;
@@ -112,7 +112,7 @@ export const useXAxis = ({
     isSupportedChartForAxisTitles: isSupportedType
   });
 
-  const useTicketCallback = useMemo(() => {
+  const useTickCallback = useMemo(() => {
     if (type === 'time') {
       const isSingleXAxis = selectedAxis.x.length === 1;
       const columnLabelFormat = xAxisColumnFormats[selectedAxis.x[0]];
@@ -147,7 +147,6 @@ export const useXAxis = ({
   const memoizedXAxisOptions: DeepPartial<ScaleChartOptions<'bar'>['scales']['x']> | undefined =
     useMemo(() => {
       if (isPieChart) return undefined;
-
       return {
         type,
         offset: !isScatterChart,
@@ -156,13 +155,19 @@ export const useXAxis = ({
           text: title
         },
         stacked,
+        time: {
+          unit: xAxisTimeInterval ? xAxisTimeInterval : false
+        },
         ticks: {
           ...rotation,
+          sampleSize: type === 'time' ? 24 : undefined,
           display: xAxisShowAxisLabel,
-          callback: useTicketCallback ? tickCallback : null,
           autoSkip: true,
-          autoSkipPadding: 3,
-          align: 'center'
+          align: 'center',
+          autoSkipPadding: 5, // 17,
+          includeBounds: true,
+          callback: useTickCallback ? tickCallback : null,
+          source: 'auto'
         },
         display: true,
         border: {
@@ -171,10 +176,11 @@ export const useXAxis = ({
         grid
       } as DeepPartial<ScaleChartOptions<'bar'>['scales']['x']>;
     }, [
+      xAxisTimeInterval,
       title,
       isScatterChart,
       isPieChart,
-      useTicketCallback,
+      useTickCallback,
       xAxisShowAxisLabel,
       stacked,
       type,

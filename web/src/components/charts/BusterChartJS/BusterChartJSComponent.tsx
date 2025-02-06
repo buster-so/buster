@@ -64,6 +64,7 @@ export const BusterChartJSComponent = React.memo(
         goalLines,
         lineGroupType,
         disableTooltip,
+        xAxisTimeInterval,
         //TODO
         xAxisDataZoom,
         useRapidResizeObserver = false,
@@ -158,7 +159,8 @@ export const BusterChartJSComponent = React.memo(
         y2AxisStartAxisAtZero,
         yAxisScaleType,
         animate,
-        disableTooltip
+        disableTooltip,
+        xAxisTimeInterval
       });
 
       const type = useMemo(() => {

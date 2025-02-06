@@ -16,6 +16,7 @@ export type Y2AxisConfig = {
 };
 
 export type XAxisConfig = {
+  xAxisTimeInterval?: 'day' | 'week' | 'month' | 'quarter' | 'year' | null; //OPTIONAL: default is null. Will only apply to combo and line charts
   xAxisShowAxisLabel?: boolean; //OPTIONAL: default is true.
   xAxisShowAxisTitle?: boolean; //OPTIONAL: default is true.
   xAxisAxisTitle?: string | null; //OPTIONAL: default is null. If null the axis title will be a concatenation of all the x columns applied to the axis.

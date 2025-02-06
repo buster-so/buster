@@ -24,7 +24,6 @@ export const StylingAppVisualize: React.FC<
     colors: string[];
     disableTooltip: IBusterThreadMessageChartConfig['disableTooltip'];
   } & Required<YAxisConfig> &
-    Required<XAxisConfig> &
     Required<CategoryAxisStyleConfig> &
     Required<Y2AxisConfig> &
     Omit<ISelectAxisContext, 'selectedAxis'> &
