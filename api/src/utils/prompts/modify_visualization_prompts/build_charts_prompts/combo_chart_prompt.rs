@@ -9,6 +9,7 @@ type ComboChartAxis = {
   x: string[]; //the column names to use for the x axis. If multiple columns are provided, they will be grouped together and summed. The LLM should NEVER set multiple x axis columns. Only the user can set this.
   y: string[]; //the column names to use for the y axis. These columns MUST be numerical column type and should NEVER be ID columns. If there is not matching, then this can be empty. If multiple columns are provided, they will be grouped together and summed. The LLM should NEVER set multiple y axis columns. Only the user can set this.
   y2?: string[]; //the column names to use for the second y axis. These columns MUST be numerical column type and should NEVER be ID columns. The y2 axis is often called the "right axes". The y2 is also what makes this a dual axes chart.
+  x_axis_time_unit?: 'day' | 'week' | 'month' | 'quarter' | 'year' | null; // OPTIONAL: default is null if not selected.  If the sql query is grouping by a specific interval, you MUST match the interval to the x_axis_time_unit.
   category?: string[] | null; //the column names to use for the category axis. This is optional and should only be used if the user needs to group or stack their data. This should likely not be the same as the x axis column. The category is ALMOST ALWAYS a string type column.
   tooltip?: string[] | null; //if null the y axis will automatically be used
 };
