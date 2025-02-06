@@ -4,7 +4,8 @@ import {
   ChartType,
   BusterChartProps,
   IColumnLabelFormat,
-  ComboChartAxis
+  ComboChartAxis,
+  XAxisConfig
 } from '@/components/charts/interfaces';
 import { useMemoizedFn } from 'ahooks';
 import { useMemo } from 'react';
@@ -144,6 +145,21 @@ export const useXAxis = ({
     };
   }, [xAxisLabelRotation]);
 
+  const timeUnit = useMemo(() => {
+    if (type === 'time' && xAxisTimeInterval) {
+      const arrayOfValidTimeUnits: XAxisConfig['xAxisTimeInterval'][] = [
+        'day',
+        'week',
+        'month',
+        'quarter',
+        'year'
+      ];
+      const isValidTimeUnit = arrayOfValidTimeUnits.includes(xAxisTimeInterval);
+      return isValidTimeUnit ? xAxisTimeInterval : false;
+    }
+    return false;
+  }, [type, xAxisTimeInterval]);
+
   const memoizedXAxisOptions: DeepPartial<ScaleChartOptions<'bar'>['scales']['x']> | undefined =
     useMemo(() => {
       if (isPieChart) return undefined;
@@ -176,7 +192,7 @@ export const useXAxis = ({
         grid
       } as DeepPartial<ScaleChartOptions<'bar'>['scales']['x']>;
     }, [
-      xAxisTimeInterval,
+      timeUnit,
       title,
       isScatterChart,
       isPieChart,
