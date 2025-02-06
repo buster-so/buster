@@ -367,7 +367,7 @@ pub async fn modify_visualization_agent(
     let (
         format_labels_result,
         configure_charts_result,
-        global_styling_result,
+        mut global_styling_result,
         stylize_columns_result,
     ) = tokio::join!(
         async {
@@ -399,6 +399,25 @@ pub async fn modify_visualization_agent(
             }
         }
     );
+
+    let time_unit = match configure_charts_result.clone() {
+        Some(result) => match result.bar_line_chart.get("x_axis_time_unit") {
+            Some(Value::String(time_unit)) => time_unit.to_string(),
+            _ => match result.combo_chart.get("x_axis_time_unit") {
+                Some(Value::String(time_unit)) => time_unit.to_string(),
+                _ => String::new(),
+            },
+        },
+        None => String::new(),
+    };
+
+    if !time_unit.is_empty() {
+        global_styling_result = Some(json!({
+            "xAxisConfig": {
+                "xAxisTimeInterval": time_unit
+            }
+        }));
+    }
 
     // Transform format_labels_result into columnLabelFormats
     let column_label_formats = match format_labels_result {
