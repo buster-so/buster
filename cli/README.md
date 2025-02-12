@@ -8,17 +8,17 @@ Choose the installation command for your operating system:
 
 ### macOS (x86_64)
 ```bash
-mkdir -p ~/.local/bin && curl -L https://github.com/buster-so/buster/releases/download/v0.0.1/buster-cli-darwin-x86_64.tar.gz | tar xz && mv buster-cli ~/.local/bin/buster && chmod +x ~/.local/bin/buster
+mkdir -p ~/.local/bin && curl -L https://github.com/buster-so/buster/releases/latest/download/buster-cli-darwin-x86_64.tar.gz | tar xz && mv buster-cli ~/.local/bin/buster && chmod +x ~/.local/bin/buster
 ```
 
 ### macOS (ARM/Apple Silicon)
 ```bash
-mkdir -p ~/.local/bin && curl -L https://github.com/buster-so/buster/releases/download/v0.0.1/buster-cli-darwin-arm64.tar.gz | tar xz && mv buster-cli ~/.local/bin/buster && chmod +x ~/.local/bin/buster
+mkdir -p ~/.local/bin && curl -L https://github.com/buster-so/buster/releases/latest/download/buster-cli-darwin-arm64.tar.gz | tar xz && mv buster-cli ~/.local/bin/buster && chmod +x ~/.local/bin/buster
 ```
 
 ### Linux (x86_64)
 ```bash
-mkdir -p ~/.local/bin && curl -L https://github.com/buster-so/buster/releases/download/v0.0.1/buster-cli-linux-x86_64.tar.gz | tar xz && mv buster-cli ~/.local/bin/buster && chmod +x ~/.local/bin/buster
+mkdir -p ~/.local/bin && curl -L https://github.com/buster-so/buster/releases/latest/download/buster-cli-linux-x86_64.tar.gz | tar xz && mv buster-cli ~/.local/bin/buster && chmod +x ~/.local/bin/buster
 ```
 
 > **Note**: After installation, make sure `~/.local/bin` is in your PATH. Add this to your shell's config file (`.bashrc`, `.zshrc`, etc.):
@@ -29,7 +29,7 @@ mkdir -p ~/.local/bin && curl -L https://github.com/buster-so/buster/releases/do
 ### Windows (x86_64)
 1. Download the Windows binary:
 ```powershell
-Invoke-WebRequest -Uri https://github.com/buster-so/buster/releases/download/v0.0.1/buster-cli-windows-x86_64.zip -OutFile buster.zip
+Invoke-WebRequest -Uri https://github.com/buster-so/buster/releases/latest/download/buster-cli-windows-x86_64.zip -OutFile buster.zip
 ```
 
 2. Extract and install:
