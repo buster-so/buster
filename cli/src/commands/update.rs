@@ -38,11 +38,20 @@ impl UpdateCommand {
         println!("Current version: {}", current_version);
         println!("Latest version: {}", latest_version);
 
-        let update_available = super::version::is_update_available(current_version, &latest_version);
+        if env::var("BUSTER_DEBUG").is_ok() {
+            println!("Debug: Checking GitHub API URL: {}", GITHUB_RELEASES_URL);
+        }
 
-        if !update_available && !self.force {
-            println!("\n{}", "You are using the latest version".green());
-            return Ok(());
+        let update_available = super::version::is_update_available(current_version, &latest_version);
+        
+        if !update_available {
+            if self.force {
+                println!("\n⚠️  Warning: The latest version ({}) is older than your current version ({})", latest_version, current_version);
+                println!("   Continuing due to --force flag...");
+            } else {
+                println!("\n{}", "You are using the latest version".green());
+                return Ok(());
+            }
         }
 
         if self.check_only {
