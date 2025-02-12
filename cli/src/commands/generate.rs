@@ -13,6 +13,7 @@ use crate::utils::{
     BusterClient, GenerateApiRequest, GenerateApiResponse,
     yaml_diff_merger::YamlDiffMerger,
 };
+use glob;
 
 #[derive(Debug)]
 pub struct GenerateCommand {
@@ -21,6 +22,7 @@ pub struct GenerateCommand {
     data_source_name: Option<String>,
     schema: Option<String>,
     database: Option<String>,
+    config: BusterConfig,
 }
 
 #[derive(Debug)]
@@ -74,11 +76,27 @@ pub struct BusterConfig {
     pub data_source_name: Option<String>,
     pub schema: Option<String>,
     pub database: Option<String>,
+    pub exclude_files: Option<Vec<String>>,
+}
+
+impl BusterConfig {
+    fn validate_exclude_patterns(&self) -> Result<()> {
+        if let Some(patterns) = &self.exclude_files {
+            for pattern in patterns {
+                match glob::Pattern::new(pattern) {
+                    Ok(_) => continue,
+                    Err(e) => return Err(anyhow::anyhow!("Invalid glob pattern '{}': {}", pattern, e)),
+                }
+            }
+        }
+        Ok(())
+    }
 }
 
 struct GenerateProgress {
     total_files: usize,
     processed: usize,
+    excluded: usize,
     current_file: String,
     status: String,
 }
@@ -88,6 +106,7 @@ impl GenerateProgress {
         Self {
             total_files,
             processed: 0,
+            excluded: 0,
             current_file: String::new(),
             status: String::new(),
         }
@@ -116,6 +135,11 @@ impl GenerateProgress {
     fn log_info(&self, info: &str) {
         println!("ℹ️  {}: {}", self.current_file, info);
     }
+
+    fn log_excluded(&mut self, file: &str, pattern: &str) {
+        self.excluded += 1;
+        println!("⚠️  Skipping {} (matched exclude pattern: {})", file, pattern);
+    }
 }
 
 impl GenerateCommand {
@@ -126,12 +150,20 @@ impl GenerateCommand {
         schema: Option<String>,
         database: Option<String>,
     ) -> Self {
+        let config = BusterConfig {
+            data_source_name: data_source_name.clone(),
+            schema: schema.clone(),
+            database: database.clone(),
+            exclude_files: None,
+        };
+
         Self {
             source_path,
             destination_path,
             data_source_name,
             schema,
             database,
+            config,
         }
     }
 
@@ -147,7 +179,17 @@ impl GenerateCommand {
         progress.status = "Scanning source directory...".to_string();
         progress.log_progress();
 
-        let model_names = self.process_sql_files(&mut progress).await?;
+        // Create a new command with the loaded config
+        let cmd = GenerateCommand {
+            source_path: self.source_path.clone(),
+            destination_path: self.destination_path.clone(),
+            data_source_name: self.data_source_name.clone(),
+            schema: self.schema.clone(),
+            database: self.database.clone(),
+            config,  // Use the loaded config
+        };
+
+        let model_names = cmd.process_sql_files(&mut progress).await?;
         
         // Print results
         println!("\n✅ Successfully processed all files");
@@ -166,9 +208,9 @@ impl GenerateCommand {
 
         // Prepare API request
         let request = GenerateApiRequest {
-            data_source_name: config.data_source_name.expect("data_source_name is required"),
-            schema: config.schema.expect("schema is required"),
-            database: config.database,
+            data_source_name: cmd.config.data_source_name.expect("data_source_name is required"),
+            schema: cmd.config.schema.expect("schema is required"),
+            database: cmd.config.database,
             model_names: model_names.iter().map(|m| m.name.clone()).collect(),
         };
 
@@ -244,7 +286,7 @@ impl GenerateCommand {
         if buster_yml_path.exists() {
             println!("✅ Found existing buster.yml");
             let content = fs::read_to_string(&buster_yml_path)?;
-            let config: BusterConfig = serde_yaml::from_str(&content)?;
+            let mut config: BusterConfig = serde_yaml::from_str(&content)?;
             
             // Validate required fields
             let mut missing_fields = Vec::new();
@@ -260,6 +302,19 @@ impl GenerateCommand {
                     "Existing buster.yml is missing required fields: {}",
                     missing_fields.join(", ")
                 ));
+            }
+
+            // Validate exclude patterns if present
+            if let Err(e) = config.validate_exclude_patterns() {
+                return Err(anyhow::anyhow!("Invalid exclude_files configuration: {}", e));
+            }
+
+            // Log exclude patterns if present
+            if let Some(patterns) = &config.exclude_files {
+                println!("ℹ️  Found {} exclude pattern(s):", patterns.len());
+                for pattern in patterns {
+                    println!("   - {}", pattern);
+                }
             }
 
             Ok(config)
@@ -292,6 +347,7 @@ impl GenerateCommand {
                 data_source_name: Some(data_source_name),
                 schema: Some(schema),
                 database,
+                exclude_files: None,
             };
 
             // Write the config to file
@@ -307,6 +363,26 @@ impl GenerateCommand {
         let mut names = Vec::new();
         let mut seen_names: HashMap<String, PathBuf> = HashMap::new();
         let mut errors = Vec::new();
+
+        // Compile glob patterns once
+        let exclude_patterns: Vec<glob::Pattern> = if let Some(patterns) = &self.config.exclude_files {
+            println!("🔍 Found exclude patterns: {:?}", patterns);
+            patterns.iter()
+                .filter_map(|p| match glob::Pattern::new(p) {
+                    Ok(pattern) => {
+                        println!("✅ Compiled pattern: {}", p);
+                        Some(pattern)
+                    }
+                    Err(e) => {
+                        progress.log_warning(&format!("Invalid exclude pattern '{}': {}", p, e));
+                        None
+                    }
+                })
+                .collect()
+        } else {
+            println!("ℹ️  No exclude patterns found");
+            Vec::new()
+        };
 
         // Get list of SQL files first to set total
         let sql_files: Vec<_> = fs::read_dir(&self.source_path)?
@@ -325,17 +401,37 @@ impl GenerateCommand {
 
         for entry in sql_files {
             progress.processed += 1;
-            progress.current_file = entry
-                .file_name()
-                .to_str()
-                .unwrap_or("unknown")
-                .to_string();
+            let file_path = entry.path();
+            
+            // Get the relative path from the source directory
+            let relative_path = file_path.strip_prefix(&self.source_path)
+                .unwrap_or(&file_path)
+                .to_string_lossy()
+                .into_owned();
+            
+            progress.current_file = relative_path.clone();
+            progress.status = "Checking exclusions...".to_string();
+            progress.log_progress();
+
+            println!("🔍 Checking file: {}", relative_path);
+            // Check if file matches any exclude pattern
+            if let Some(matching_pattern) = exclude_patterns.iter()
+                .find(|p| {
+                    let matches = p.matches(&relative_path);
+                    println!("  - Testing pattern '{}' against '{}': {}", p.as_str(), relative_path, matches);
+                    matches
+                }) {
+                println!("⛔ Excluding file: {} (matched pattern: {})", relative_path, matching_pattern.as_str());
+                progress.log_excluded(&relative_path, matching_pattern.as_str());
+                continue;
+            }
+
             progress.status = "Processing file...".to_string();
             progress.log_progress();
 
-            match self.process_single_sql_file(&entry.path()).await {
+            match self.process_single_sql_file(&file_path).await {
                 Ok(model_name) => {
-                    // Check for duplicates
+                    println!("📝 Processing model: {} from file: {}", model_name.name, relative_path);
                     if let Some(existing) = seen_names.get(&model_name.name) {
                         errors.push(GenerateError::DuplicateModelName {
                             name: model_name.name,
@@ -357,6 +453,17 @@ impl GenerateCommand {
                     errors.push(e);
                 }
             }
+        }
+
+        // Print final model list for debugging
+        println!("\n📋 Final model list:");
+        for model in &names {
+            println!("  - {} (from {})", model.name, model.source_file.display());
+        }
+
+        // Update final summary with exclusion information
+        if progress.excluded > 0 {
+            println!("\nℹ️  Excluded {} files based on patterns", progress.excluded);
         }
 
         if !errors.is_empty() {

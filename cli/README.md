@@ -8,13 +8,23 @@ Choose the installation command for your operating system:
 
 ### macOS (x86_64)
 ```bash
-curl -L https://github.com/buster-so/buster/releases/download/v0.0.1/buster-cli-darwin-x86_64.tar.gz | tar xz && sudo mv buster-cli /usr/local/bin/buster && sudo chmod +x /usr/local/bin/buster
+mkdir -p ~/.local/bin && curl -L https://github.com/buster-so/buster/releases/download/v0.0.1/buster-cli-darwin-x86_64.tar.gz | tar xz && mv buster-cli ~/.local/bin/buster && chmod +x ~/.local/bin/buster
+```
+
+### macOS (ARM/Apple Silicon)
+```bash
+mkdir -p ~/.local/bin && curl -L https://github.com/buster-so/buster/releases/download/v0.0.1/buster-cli-darwin-arm64.tar.gz | tar xz && mv buster-cli ~/.local/bin/buster && chmod +x ~/.local/bin/buster
 ```
 
 ### Linux (x86_64)
 ```bash
-curl -L https://github.com/buster-so/buster/releases/download/v0.0.1/buster-cli-linux-x86_64.tar.gz | tar xz && sudo mv buster-cli /usr/local/bin/buster && sudo chmod +x /usr/local/bin/buster
+mkdir -p ~/.local/bin && curl -L https://github.com/buster-so/buster/releases/download/v0.0.1/buster-cli-linux-x86_64.tar.gz | tar xz && mv buster-cli ~/.local/bin/buster && chmod +x ~/.local/bin/buster
 ```
+
+> **Note**: After installation, make sure `~/.local/bin` is in your PATH. Add this to your shell's config file (`.bashrc`, `.zshrc`, etc.):
+> ```bash
+> export PATH="$HOME/.local/bin:$PATH"
+> ```
 
 ### Windows (x86_64)
 1. Download the Windows binary:
@@ -41,6 +51,25 @@ buster auth
 This will prompt you for:
 - API Key (required) - Get this from the Buster Platform
 - Host (optional) - Defaults to production if not specified
+
+You can also configure authentication using environment variables:
+```bash
+# Set API key via environment variable
+export BUSTER_API_KEY=your_api_key_here
+
+# Optional: Set custom host. For self-hosted instances.
+export BUSTER_HOST=your_custom_host
+```
+
+The CLI will check for these environment variables in the following order:
+1. Command line arguments
+2. Environment variables
+3. Interactive prompt
+
+This is particularly useful for:
+- CI/CD environments
+- Automated scripts
+- Development workflows where you don't want to enter credentials repeatedly
 
 ### 2. Generate Models
 
@@ -120,7 +149,25 @@ your-project/
 # buster.yml
 data_source_name: "my_warehouse"  # Your default data source
 schema: "analytics"               # Default schema for models
+database: "prod"                  # Optional database name
+exclude_files:                    # Optional list of files to exclude from generation
+  - "temp_*.sql"                 # Exclude all SQL files starting with temp_
+  - "test/**/*.sql"             # Exclude all SQL files in test directories
+  - "customers.sql"         # Exclude a specific file
 ```
+
+The configuration supports the following fields:
+- `data_source_name`: (Required) Default data source for your models
+- `schema`: (Required) Default schema for your models
+- `database`: (Optional) Default database name
+- `exclude_files`: (Optional) List of glob patterns for files to exclude from generation
+  - Supports standard glob patterns (*, **, ?, etc.)
+  - Matches against relative paths from source directory
+  - Common use cases:
+    - Excluding temporary files: `temp_*.sql`
+    - Excluding test files: `test/**/*.sql`
+    - Excluding specific files: `customers.sql`
+    - Excluding files in directories: `archive/**/*.sql`
 
 ### Model Definition Example
 
