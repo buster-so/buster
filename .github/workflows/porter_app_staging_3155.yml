@@ -7,7 +7,7 @@
 name: Deploy to staging
 jobs:
   database-deploy:
-    runs-on: blacksmith-16vcpu-ubuntu-2204
+    runs-on: blacksmith-32vcpu-ubuntu-2204	 
     environment: staging
     steps:
       - name: Checkout code
