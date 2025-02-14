@@ -95,7 +95,7 @@ pub async fn test_data_source_connection(
                 _ => return Err(anyhow!("Invalid credential type")),
             };
 
-            match get_snowflake_client(&credential, None).await {
+            match get_snowflake_client(&credential).await {
                 Ok(client) => client,
                 Err(e) => return Err(anyhow!("Error getting snowflake client: {:?}", e)),
             };

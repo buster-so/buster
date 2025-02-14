@@ -63,3 +63,5 @@ node_modules/
 
 prds/
 docs/
+
+.cargo/

@@ -6,61 +6,66 @@ pub fn sql_gen_system_prompt(
     data_source_type: &String,
 ) -> String {
     format!(
-        r#"### MODEL/VIEW INFORMATION
+        r#"# OBJECTIVE
+Generate a **single** {} query based on the provided analysis plan.
+
+# CONSTRAINTS
+- Output only the SQL query wrapped in ```sql tags
+- Do not include explanations or commentary
+- Do not suggest using other platforms or tools
+- Only join tables with explicit entity relationships
+- Stay within the provided dataset
+
+# SQL REQUIREMENTS
+- Use schema-qualified table names (<SCHEMA_NAME>.<TABLE_NAME>)
+- Select specific columns (no SELECT * or COUNT(*))
+- Use CTEs instead of subqueries with snake_case names
+- Use DISTINCT (not DISTINCT ON) with matching GROUP BY/SORT BY
+- Show entity names, not just IDs
+- Handle date conversions appropriately
+- Order dates ascending
+- Include date fields for time series
+- Reference database identifiers for cross-database queries
+- Format output for the specified visualization type
+- Maintain consistent data structure across requests unless changes required
+- Use explicit ordering for custom buckets/categories
+
+# TIME AND NAMING CONVENTIONS
+- Default to last 1 year if no timeframe specified
+- Maintain user-specified time ranges until changed
+- Include units in column names for time values
+- Concatenate first/last names by default
+- Use numerical weekday format (1-7)
+- Only use specific dates when explicitly requested
+
+# CONTEXT
+## Dataset Information
 {}
 
-### MODEL/VIEW REASONING
 {}
 
-### RELEVANT BUSINESS TERMS/DOMAIN SPECIFIC LANGUAGE
+## Domain Terms
 {}
 
-### RELEVANT VALUES FROM DATASET
+## Dataset Values
 {}
 
-### TASK
-Your task is to generate a **single** {} query based on the thoughts that are provided to you.
-
-Format the SQL for the visualization/report that is specified.
-
-Do not respond to the user telling them to use predictive modeling tooling in another platform.  This is a SQL generation tool.
-
-Do not respond with an explanation of the SQL you are generating. Generate just the SQL.
-
-Do not join datasets together that don't have explicit entity relationships defined.
-
-Please output the SQL delimited in ```sql tags.
-
-### GENERAL SQL REQUIREMENTS
-- Never use placeholder values or comments suggesting value replacement (e.g. `WHERE id = <ID>` or `-- Replace with actual value`)
-- specific days, months, years etc  shouldnt be included in your queries unless the user explicitly specifies dates to filter for. don't mention that you're assuming anything please and just reference the filter the same way the user asked for it.
-- Use CTEs instead of subqueries and name them with snake_case.
-- Do not use `DISTINCT ON` only DISTINCT and remember to use distinct columns in `GROUP BY` and `SORT BY` clauses.
-- When displaying entities with names, show the name, not just the id.
-- When performing operations on dates, remember to convert to the appropriate types.
-- Always order dates in ascending order.
-- When working with time series data, always return a date field.
-- You must use the schema when referencing tables. Like this pattern <SCHEMA_NAME>.<TABLE_NAME>
-- Pay attention to the database identifier. It may be used to reference across multiple databases. 
-- Never use the 'SELECT *'  or 'SELECT COUNT(*)' command.  You must select the columns you want to see/use.
-- Users may mention formatting or charting.  Although this task is specific to SQL generation, the user is referring to future steps for visualization.
-- A request for a line chart should default to using a date-related field unless the user specifies otherwise or it is not available.
-- Try to keep the data format (columns selected, aggregation, ordering, etc.) consistent from request to request unless the user request absolutely requires you to change it.
-- If data is missing from the datasets, explain that to the user and try to deliver the best results you can.
-- Never ask the user for datasets, columns, etc.
-- If returning time units like day, hours, seconds, etc. please make sure column names say so.
-- Concatenate first and last names when possible, unless the user specifies otherwise.
-- If the user does not specify a time frame, default to the last 1 year.
-- If the user specifies a time range during the conversation, maintain that time frame perpetually until specified otherwise
-- If returning weekdays, please return them in numerical format (e.g. 1 for Monday, 2 for Tuesday, etc.) In your explanation, don't mention that you're returning the day of the week in numerical format.
-- If you make custom buckets/categories, make sure to explicitly order them."#,
-        datasets_string, explanation, terms, relevant_values, data_source_type
+## Data Source
+{}"#,
+        data_source_type, datasets_string, explanation, terms, relevant_values, data_source_type
     )
 }
 
-pub fn sql_gen_user_prompt(request: String, thought_process: String) -> String {
+pub fn sql_gen_user_prompt(request: String, analysis_plan: String) -> String {
     format!(
-        "## USER REQUEST\n{}\n\n## THOUGHT PROCESS\n{}",
-        request, thought_process
+        r#"# TASK
+Generate SQL based on this request and analysis plan.
+
+# USER REQUEST
+{}
+
+# ANALYSIS PLAN
+{}"#,
+        request, analysis_plan
     )
 }

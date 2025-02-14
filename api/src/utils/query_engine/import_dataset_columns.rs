@@ -222,7 +222,7 @@ async fn get_snowflake_columns_batch(
     credentials: &SnowflakeCredentials,
     database: Option<String>,
 ) -> Result<Vec<DatasetColumnRecord>> {
-    let snowflake_client = get_snowflake_client(credentials, database).await?;
+    let snowflake_client = get_snowflake_client(credentials).await?;
 
     // Build the IN clause for (schema, table) pairs
     let table_pairs: Vec<String> = datasets
@@ -647,7 +647,7 @@ async fn get_snowflake_columns(
     schema_name: &String,
     credentials: &SnowflakeCredentials,
 ) -> Result<Vec<DatasetColumnRecord>> {
-    let snowflake_client = get_snowflake_client(credentials, None).await?;
+    let snowflake_client = get_snowflake_client(credentials).await?;
 
     let uppercase_dataset_name = dataset_name.to_uppercase();
     let uppercase_schema_name = schema_name.to_uppercase();

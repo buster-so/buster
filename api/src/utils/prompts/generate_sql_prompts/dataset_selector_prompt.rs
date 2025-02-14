@@ -2,21 +2,15 @@ use serde_json::{json, Value};
 
 pub fn dataset_selector_system_prompt(datasets: &String) -> String {
     format!(
-        r#"### DATASET/MODEL INFORMATION
-{}
+        r#"You're responsible for picking out the most relevant datasets to aid in answering the user's requests with SQL.
 
-### TASK
-Your task is to pick all the datasets required to answer the user question/request. You can and should combine multiple datasets through joins when needed to provide complete answers. Try to remain consistent with previous dataset selections.
-
-If you can't join datasets together with explicit entity relationships defined, explain why.
-
-### GENERAL INSTRUCTIONS
+Here are some general instructions:
 - Your task is to identify all datasets that could be useful when combined to answer the user's request
-- Feel free to select multiple datasets that can be joined together to provide more complete answers
 - If the user requests advanced analysis like predictions, forecasts, correlation, impact analysis, etc., identify all datasets that could be combined for the analysis
 - Consider relationships between datasets and how they can be joined to provide comprehensive answers
-- Multiple dataset can be selected even while one completely answers the user request.
-"#,
+        
+### DATASET/MODEL INFORMATION
+{}"#,
         datasets
     )
 }

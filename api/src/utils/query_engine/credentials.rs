@@ -97,7 +97,7 @@ pub struct RedshiftCredentials {
 pub struct SnowflakeCredentials {
     pub account_id: String,
     pub warehouse_id: String,
-    pub database_id: String,
+    pub database_id: Option<String>,
     pub username: String,
     pub password: String,
     pub role: Option<String>,

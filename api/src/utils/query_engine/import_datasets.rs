@@ -345,7 +345,7 @@ async fn get_bigquery_tables_and_views(
 async fn get_snowflake_tables_and_views(
     credentials: &SnowflakeCredentials,
 ) -> Result<Vec<DatasetRecord>> {
-    let snowflake_client = get_snowflake_client(credentials, None).await?;
+    let snowflake_client = get_snowflake_client(credentials).await?;
 
     let schema_list = credentials.schemas.clone().unwrap_or_else(|| vec![]);
     let schema_string = if !schema_list.is_empty() {

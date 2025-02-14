@@ -229,7 +229,7 @@ async fn route_to_query(
         DataSourceType::Snowflake => {
             let credentials: SnowflakeCredentials = serde_json::from_str(&credentials_string)?;
 
-            let mut snowflake_client = match get_snowflake_client(&credentials, None).await {
+            let mut snowflake_client = match get_snowflake_client(&credentials).await {
                 Ok(snowflake_client) => snowflake_client,
                 Err(e) => {
                     tracing::error!("There was an issue while establishing a connection to the parent data source: {}", e);
