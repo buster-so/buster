@@ -13,6 +13,8 @@ jobs:
             - name: Set Github tag
               id: vars
               run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+            - name: Cache Rust dependencies
+              uses: useblacksmith/rust-cache@v3
             - name: Setup porter
               uses: porter-dev/setup-porter@v0.1.0
             - name: Build and deploy preview environment

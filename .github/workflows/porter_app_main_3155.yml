@@ -21,7 +21,7 @@ jobs:
           override: true
 
       - name: Cache Rust dependencies
-        uses: Swatinem/rust-cache@v2
+        uses: useblacksmith/rust-cache@v3
 
       - name: Install Diesel CLI
         run: cargo install diesel_cli --no-default-features --features postgres
@@ -60,6 +60,8 @@ jobs:
           - name: Download SSL certificate from S3
             run: |
               aws s3 cp ${{ secrets.CERT_S3_URL }} ./api/cert.pem
+          - name: Cache Rust dependencies
+            uses: useblacksmith/rust-cache@v3
           - name: Set Github tag
             id: vars
             run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
