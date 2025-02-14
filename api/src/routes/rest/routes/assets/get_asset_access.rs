@@ -331,7 +331,6 @@ async fn is_organization_admin_or_owner(
     let user_organization_id = match get_user_organization_id(&user_id).await {
         Ok(organization_id) => organization_id,
         Err(e) => {
-            tracing::error!("Error getting user organization ID: {}", e);
             return Ok(false);
         }
     };
