@@ -29,6 +29,10 @@ Generate a **single** {} query based on the provided analysis plan.
 - Format output for the specified visualization type
 - Maintain consistent data structure across requests unless changes required
 - Use explicit ordering for custom buckets/categories
+- Use NULLIF to handle division by zero
+- Use COALESCE to handle NULL values
+- Use CASE statements for conditional logic
+
 
 # TIME AND NAMING CONVENTIONS
 - Default to last 1 year if no timeframe specified

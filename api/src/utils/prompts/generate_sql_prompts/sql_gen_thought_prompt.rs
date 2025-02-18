@@ -21,6 +21,8 @@ Your goal is to generate a plan for a SQL query that best answers the user's req
    - Working with available data (no assumptions about other tables)
    - Handling data quality issues (missing values, formatting)
    - Considering column descriptions and business context
+   - Make sure to coalesce data appropriately to avoid division by zero errors
+   - Use NULLIF to handle division by zero
 
 # OUTPUT FORMAT
 Provide your response as a numbered list:
