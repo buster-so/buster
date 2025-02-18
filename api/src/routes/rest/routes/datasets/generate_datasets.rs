@@ -94,25 +94,25 @@ fn map_snowflake_type(type_str: &str) -> ColumnMappingType {
     match type_upper.as_str() {
         // Numeric types that should be measures
         "NUMBER" | "DECIMAL" | "NUMERIC" | "FLOAT" | "REAL" | "DOUBLE" | "INT" | "INTEGER" | 
-        "BIGINT" | "SMALLINT" | "TINYINT" | "BYTEINT" => ColumnMappingType::Measure("number".to_string()),
+        "BIGINT" | "SMALLINT" | "TINYINT" | "BYTEINT" => ColumnMappingType::Measure(type_str.to_string()),
         
         // Date/Time types
         "DATE" | "DATETIME" | "TIME" | "TIMESTAMP" | "TIMESTAMP_LTZ" | 
-        "TIMESTAMP_NTZ" | "TIMESTAMP_TZ" => ColumnMappingType::Dimension("timestamp".to_string()),
+        "TIMESTAMP_NTZ" | "TIMESTAMP_TZ" => ColumnMappingType::Dimension(type_str.to_string()),
         
         // String types
-        "TEXT" | "STRING" | "VARCHAR" | "CHAR" | "CHARACTER" => ColumnMappingType::Dimension("string".to_string()),
+        "TEXT" | "STRING" | "VARCHAR" | "CHAR" | "CHARACTER" => ColumnMappingType::Dimension(type_str.to_string()),
         
         // Boolean type
-        "BOOLEAN" | "BOOL" => ColumnMappingType::Dimension("boolean".to_string()),
+        "BOOLEAN" | "BOOL" => ColumnMappingType::Dimension(type_str.to_string()),
         
         // Unsupported types
         "ARRAY" | "OBJECT" | "VARIANT" => ColumnMappingType::Unsupported,
         
         // Default to dimension for unknown types
         _ => {
-            tracing::warn!("Unknown Snowflake type: {}, defaulting to string dimension", type_str);
-            ColumnMappingType::Dimension("string".to_string())
+            tracing::warn!("Unknown Snowflake type: {}, defaulting to dimension", type_str);
+            ColumnMappingType::Dimension(type_str.to_string())
         }
     }
 }

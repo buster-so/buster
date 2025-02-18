@@ -222,7 +222,13 @@ async fn get_snowflake_columns_batch(
     credentials: &SnowflakeCredentials,
     database: Option<String>,
 ) -> Result<Vec<DatasetColumnRecord>> {
-    let snowflake_client = get_snowflake_client(credentials).await?;
+    let mut credentials = credentials.clone();
+
+    if let Some(database) = database {
+        credentials.database_id = Some(database);
+    }
+
+    let snowflake_client = get_snowflake_client(&credentials).await?;
 
     // Build the IN clause for (schema, table) pairs
     let table_pairs: Vec<String> = datasets

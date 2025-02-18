@@ -70,6 +70,8 @@ pub struct Measure {
     expr: String,
     agg: String,
     description: String,
+    #[serde(rename = "type")]
+    measure_type: Option<String>,
 }
 
 #[derive(Debug)]
@@ -477,9 +479,9 @@ impl ModelFile {
                 description: measure.description.clone(),
                 semantic_type: Some("measure".to_string()),
                 expr: Some(measure.expr.clone()),
-                type_: None,
+                type_: measure.measure_type.clone(),
                 agg: Some(measure.agg.clone()),
-                searchable: false, // Measures don't have stored values
+                searchable: false,
             });
         }
 
