@@ -541,27 +541,46 @@ async fn deploy_datasets_handler(
                     }
                 };
 
+                // Create a map of column name to type from ds_columns for easier lookup
+                let ds_column_types: HashMap<String, String> = dataset_columns_map
+                    .get(&req.name)
+                    .map(|cols| {
+                        cols.iter()
+                            .map(|col| (col.name.to_lowercase(), col.type_.clone()))
+                            .collect()
+                    })
+                    .unwrap_or_default();
+
                 let columns: Vec<DatasetColumn> = req
                     .columns
                     .iter()
-                    .map(|col| DatasetColumn {
-                        id: Uuid::new_v4(),
-                        dataset_id,
-                        name: col.name.clone(),
-                        type_: col.type_.clone().unwrap_or_else(|| "text".to_string()),
-                        description: Some(col.description.clone()),
-                        nullable: true,
-                        created_at: now,
-                        updated_at: now,
-                        deleted_at: None,
-                        stored_values: None,
-                        stored_values_status: None,
-                        stored_values_error: None,
-                        stored_values_count: None,
-                        stored_values_last_synced: None,
-                        semantic_type: col.semantic_type.clone(),
-                        dim_type: col.type_.clone(),
-                        expr: col.expr.clone(),
+                    .map(|col| {
+                        // Look up the type from ds_columns, fallback to request type or "text"
+                        let column_type = ds_column_types
+                            .get(&col.name.to_lowercase())
+                            .cloned()
+                            .or_else(|| col.type_.clone())
+                            .unwrap_or_else(|| "text".to_string());
+
+                        DatasetColumn {
+                            id: Uuid::new_v4(),
+                            dataset_id,
+                            name: col.name.clone(),
+                            type_: column_type,  // Use the type from ds_columns
+                            description: Some(col.description.clone()),
+                            nullable: true,
+                            created_at: now,
+                            updated_at: now,
+                            deleted_at: None,
+                            stored_values: None,
+                            stored_values_status: None,
+                            stored_values_error: None,
+                            stored_values_count: None,
+                            stored_values_last_synced: None,
+                            semantic_type: col.semantic_type.clone(),
+                            dim_type: col.type_.clone(),
+                            expr: col.expr.clone(),
+                        }
                     })
                     .collect();
 
