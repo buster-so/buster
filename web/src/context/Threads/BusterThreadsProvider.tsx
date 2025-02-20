@@ -603,7 +603,7 @@ export const useBusterThreads = () => {
 
   const _onJoinedThread = useMemoizedFn((users: BusterThreadUser[]) => {
     users.forEach((user) => {
-      openInfoMessage(`${user.name} has joined the thread`);
+      if (user.name) openInfoMessage(`${user.name} has joined the thread`);
     });
   });
 

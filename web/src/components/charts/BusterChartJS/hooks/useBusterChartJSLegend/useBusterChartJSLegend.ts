@@ -104,7 +104,7 @@ export const useBusterChartJSLegend = ({
       });
     },
     {
-      wait: 100
+      wait: 125
     }
   );
 
@@ -113,14 +113,27 @@ export const useBusterChartJSLegend = ({
     if (!chartjs) return;
 
     const data = chartjs.data;
-    const index = data.labels?.indexOf(item.id) || 0;
+    const hasMultipleDatasets = data.datasets?.length > 1;
+    const assosciatedDatasetIndex = data.datasets?.findIndex(
+      (dataset) => dataset.label === item.id
+    );
+    const index = !hasMultipleDatasets ? data.labels?.indexOf(item.id) || -1 : 0;
 
     if (isHover && index !== -1) {
-      chartjs.setActiveElements([{ datasetIndex: 0, index }]);
+      const allElementsAssociatedWithDataset = chartjs.getDatasetMeta(assosciatedDatasetIndex).data;
+      const activeElements = allElementsAssociatedWithDataset.map((item, index) => {
+        return {
+          datasetIndex: assosciatedDatasetIndex,
+          index
+        };
+      });
+      chartjs.setActiveElements(activeElements);
     } else if (index !== -1) {
       const filteredActiveElements = chartjs
         .getActiveElements()
-        .filter((element) => element.datasetIndex === 0 && element.index === index);
+        .filter(
+          (element) => element.datasetIndex === assosciatedDatasetIndex && element.index === index
+        );
       chartjs.setActiveElements(filteredActiveElements);
     }
 
@@ -152,7 +165,37 @@ export const useBusterChartJSLegend = ({
   });
 
   const onLegendItemFocus = useMemoizedFn((item: BusterChartLegendItem) => {
-    alert('TODO');
+    const chartjs = chartRef.current;
+    if (!chartjs) return;
+
+    const datasets = chartjs.data.datasets;
+    const hasMultipleDatasets = datasets?.length > 1;
+    const assosciatedDatasetIndex = datasets?.findIndex((dataset) => dataset.label === item.id);
+
+    if (hasMultipleDatasets) {
+      const hasOtherDatasetsVisible = datasets?.some(
+        (dataset, index) => dataset.label !== item.id && chartjs.isDatasetVisible(index)
+      );
+      const inactiveDatasetsRecord: Record<string, boolean> = {};
+      if (hasOtherDatasetsVisible) {
+        datasets?.forEach((dataset, index) => {
+          const value = index === assosciatedDatasetIndex;
+          chartjs.setDatasetVisibility(index, value);
+          inactiveDatasetsRecord[dataset.label!] = !value;
+        });
+      } else {
+        datasets?.forEach((dataset, index) => {
+          chartjs.setDatasetVisibility(index, true);
+          inactiveDatasetsRecord[dataset.label!] = false;
+        });
+      }
+      setInactiveDatasets((prev) => ({
+        ...prev,
+        ...inactiveDatasetsRecord
+      }));
+    }
+
+    chartjs.update();
   });
 
   useEffect(() => {

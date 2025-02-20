@@ -44,6 +44,12 @@ export const useDropzonesInternal = ({
 
   const { errorZone, setErrorZone, onDragOverCheckErrorZone } = useErrorZones();
 
+  const availableDropZone: DropZoneInternal = {
+    id: SelectAxisContainerId.Available,
+    title: 'Available',
+    items: [] //empty array because we don't need to show items in the available zone
+  };
+
   const setDropZones = useMemo(() => {
     return (
       newDropZones: (prev: DropZoneInternal[]) => DropZoneInternal[],
@@ -242,8 +248,8 @@ export const useDropzonesInternal = ({
     return null;
   });
 
-  const findZoneById = useMemoizedFn((zoneId: string): DropZoneInternal | null => {
-    return dropZones.find((zone) => zone.id === zoneId) || null;
+  const findZoneById = useMemoizedFn((zoneId: string): DropZoneInternal => {
+    return dropZones.find((zone) => zone.id === zoneId) || availableDropZone;
   });
 
   const findZoneByOver = useMemoizedFn((over: Over): SelectAxisContainerId | null => {
