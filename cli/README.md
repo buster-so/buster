@@ -85,6 +85,7 @@ Key flags for generation:
 - `--data-source-name`: Name of the data source to use in the models
 - `--schema`: Database schema name
 - `--database`: Database name
+- `--flat-structure`: Output YML files in a flat structure instead of maintaining directory hierarchy
 
 The generate command will:
 - Scan the source directory for SQL files
@@ -113,6 +114,7 @@ buster deploy
 Deploy options:
 - `--path`: Specific path to deploy (defaults to current directory)
 - `--dry-run`: Validate the deployment without actually deploying (defaults to false)
+- `--recursive`: Recursively search for model files in subdirectories (defaults to true)
 
 Examples:
 ```bash
@@ -124,7 +126,18 @@ buster deploy --path ./models/customers.yml
 
 # Validate deployment without applying changes
 buster deploy --dry-run
+
+# Deploy only models in the specified directory (not recursively)
+buster deploy --path ./models --recursive=false
 ```
+
+The deploy command will:
+1. Discover all YAML model files in the specified path
+2. Load and validate the models
+3. Check for excluded models based on tags
+4. Validate cross-project references
+5. Deploy the models to Buster
+6. Provide detailed validation feedback and error messages
 
 ## Project Structure
 
@@ -153,7 +166,10 @@ database: "prod"                  # Optional database name
 exclude_files:                    # Optional list of files to exclude from generation
   - "temp_*.sql"                 # Exclude all SQL files starting with temp_
   - "test/**/*.sql"             # Exclude all SQL files in test directories
-  - "customers.sql"         # Exclude a specific file
+  - "customers.sql"             # Exclude a specific file
+exclude_tags:                     # Optional list of tags to exclude from deployment
+  - "staging"                    # Exclude models with the 'staging' tag
+  - "test"                       # Exclude models with the 'test' tag
 ```
 
 The configuration supports the following fields:
@@ -168,6 +184,10 @@ The configuration supports the following fields:
     - Excluding test files: `test/**/*.sql`
     - Excluding specific files: `customers.sql`
     - Excluding files in directories: `archive/**/*.sql`
+- `exclude_tags`: (Optional) List of tags to exclude from deployment
+  - Looks for tags in SQL files in dbt format: `{{ config(tags=['tag1', 'tag2']) }}`
+  - Useful for excluding staging models, test models, etc.
+  - Case-insensitive matching
 
 ### Model Definition Example
 
@@ -177,27 +197,84 @@ version: 1
 models:
   - name: customers
     description: "Core customer data model"
-    data_source_name: "my_warehouse"
-    schema: "analytics"
+    data_source_name: "my_warehouse"  # Overrides buster.yml
+    schema: "analytics"               # Overrides buster.yml
+    database: "prod"                  # Overrides buster.yml
     
     entities:
       - name: customer_id
         expr: "id"
         type: "primary"
         description: "Primary customer identifier"
+      - name: order
+        expr: "order_id"
+        type: "foreign"
+        description: "Reference to order model"
+        # Optional: reference to another model in a different project
+        project_path: "path/to/other/project"
+        # Optional: specify a different name for the referenced model
+        ref: "orders"
     
     dimensions:
       - name: email
         expr: "email"
         type: "string"
         description: "Customer email address"
+        searchable: true  # Optional: make this dimension searchable
     
     measures:
       - name: total_customers
         expr: "customer_id"
         agg: "count_distinct"
         description: "Total number of unique customers"
+        type: "integer"  # Optional: specify the data type
 ```
+
+## Cross-Project References
+
+Buster CLI supports referencing models across different projects, enabling you to build complex data relationships:
+
+```yaml
+entities:
+  - name: user_model
+    expr: "user_id"
+    type: "foreign"
+    description: "Reference to user model in another project"
+    project_path: "path/to/user/project"
+    ref: "users"  # Optional: specify a different name for the referenced model
+```
+
+When using cross-project references, the CLI will:
+1. Validate that the referenced project exists
+2. Check for a valid buster.yml in the referenced project
+3. Verify that the data sources match between projects
+4. Confirm that the referenced model exists in the target project
+
+This enables you to organize your models into logical projects while maintaining relationships between them.
+
+## Tag-Based Exclusion
+
+You can exclude models from deployment based on tags in your SQL files. This is useful for excluding staging models, test models, or any other models you don't want to deploy.
+
+In your SQL files, add tags using the dbt format:
+
+```sql
+{{ config(
+    tags=['staging', 'test']
+) }}
+
+SELECT * FROM source_table
+```
+
+Then in your buster.yml, specify which tags to exclude:
+
+```yaml
+exclude_tags:
+  - "staging"
+  - "test"
+```
+
+During deployment, any model with matching tags will be automatically excluded.
 
 ## Best Practices
 
@@ -205,16 +282,25 @@ models:
    - Keep YAML files in `models/`
    - Keep SQL files in `sql/`
    - Use `buster.yml` for shared settings
+   - Group related models into subdirectories
 
 2. **Model Generation**
    - Start with clean SQL files
    - Generate models first before customizing
    - Review generated models before deployment
+   - Use tags to organize and filter models
 
 3. **Deployment**
    - Use `--dry-run` to validate changes
    - Deploy frequently to catch issues early
    - Keep model and SQL files in sync
+   - Use cross-project references for complex relationships
+
+4. **Validation**
+   - Ensure all models have descriptions
+   - Validate cross-project references before deployment
+   - Check for missing dependencies
+   - Review validation errors carefully
 
 ## Troubleshooting
 
@@ -229,11 +315,20 @@ Common issues and solutions:
    - Verify SQL files are in the correct location
    - Check file permissions
    - Ensure SQL syntax is valid
+   - Check for excluded files or tags
 
 3. **Deployment Issues**
    - Validate YAML syntax
    - Check for missing dependencies
    - Verify data source connectivity
+   - Look for cross-project reference errors
+   - Check for tag-based exclusions
+
+4. **Cross-Project Reference Issues**
+   - Ensure the referenced project exists
+   - Verify the referenced project has a valid buster.yml
+   - Check that data sources match between projects
+   - Confirm the referenced model exists in the target project
 
 ## License
 

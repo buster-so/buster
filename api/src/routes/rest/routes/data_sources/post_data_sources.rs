@@ -24,6 +24,7 @@ use crate::database::schema::users_to_organizations;
 use crate::routes::rest::ApiResponse;
 use crate::utils::clients::supabase_vault::create_secrets;
 use crate::utils::query_engine::credentials::Credential;
+use crate::utils::query_engine::credentials::PostgresCredentials;
 
 #[derive(Debug, Deserialize)]
 pub struct CreateDataSourceRequest {
@@ -91,9 +92,41 @@ async fn post_data_sources_handler(
     let secret_values = requests
         .iter()
         .map(|request| {
+            // Special handling for Redshift credentials
+            let credential = if let Credential::Redshift(redshift_creds) = &request.credential {
+                tracing::info!("Redshift credentials before conversion - database: {:?}, host: {}, port: {}", 
+                    redshift_creds.database, redshift_creds.host, redshift_creds.port);
+                
+                // Convert RedshiftCredentials to PostgresCredentials
+                // This is necessary because Redshift uses PostgresCredentials internally
+                // but the database field is required in PostgresCredentials while optional in RedshiftCredentials
+                let postgres_creds = PostgresCredentials {
+                    host: redshift_creds.host.clone(),
+                    port: redshift_creds.port,
+                    username: redshift_creds.username.clone(),
+                    password: redshift_creds.password.clone(),
+                    // Use the database value if provided, otherwise use "dev" as default
+                    database: redshift_creds.database.clone().unwrap_or_else(|| "dev".to_string()),
+                    schema: None,
+                    jump_host: None,
+                    ssh_username: None,
+                    ssh_private_key: None,
+                };
+                
+                Credential::Postgres(postgres_creds)
+            } else {
+                request.credential.clone()
+            };
+            
+            let serialized = serde_json::to_string(&credential).unwrap();
+            
+            if let Credential::Redshift(_) = &request.credential {
+                tracing::info!("Serialized Redshift credentials (converted to Postgres): {}", serialized);
+            }
+            
             (
                 request.name.clone(),
-                serde_json::to_string(&request.credential).unwrap(),
+                serialized,
             )
         })
         .collect::<HashMap<String, String>>();

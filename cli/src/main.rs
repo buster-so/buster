@@ -5,8 +5,7 @@ mod utils;
 
 use clap::{Parser, Subcommand};
 use colored::*;
-use commands::{auth::AuthArgs, deploy, deploy_v2, import, init, GenerateCommand};
-use std::path::PathBuf;
+use commands::{auth::AuthArgs, deploy_v2, import, init};
 
 pub const APP_NAME: &str = "buster";
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -56,6 +55,9 @@ pub enum Commands {
         schema: Option<String>,
         #[arg(long)]
         database: Option<String>,
+        /// Output YML files in a flat structure instead of maintaining directory hierarchy
+        #[arg(long, default_value_t = false)]
+        flat_structure: bool,
     },
     Import,
     Deploy {
@@ -63,6 +65,9 @@ pub enum Commands {
         path: Option<String>,
         #[arg(long, default_value_t = false)]
         dry_run: bool,
+        /// Recursively search for model files in subdirectories
+        #[arg(long, default_value_t = true)]
+        recursive: bool,
     },
 }
 
@@ -126,18 +131,24 @@ async fn main() {
             data_source_name,
             schema,
             database,
+            flat_structure,
         } => {
-            let source = source_path
-                .map(PathBuf::from)
-                .unwrap_or_else(|| PathBuf::from("."));
-            let dest = destination_path
-                .map(PathBuf::from)
-                .unwrap_or_else(|| PathBuf::from("."));
-            let cmd = GenerateCommand::new(source, dest, data_source_name, schema, database);
-            cmd.execute().await
+            commands::generate(
+                source_path.as_deref(),
+                destination_path.as_deref(),
+                data_source_name,
+                schema,
+                database,
+                flat_structure,
+            )
+            .await
         }
         Commands::Import => import().await,
-        Commands::Deploy { path, dry_run } => deploy_v2(path.as_deref(), dry_run).await,
+        Commands::Deploy {
+            path,
+            dry_run,
+            recursive,
+        } => deploy_v2(path.as_deref(), dry_run, recursive).await,
     };
 
     if let Err(e) = result {

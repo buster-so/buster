@@ -40,11 +40,9 @@ impl BusterClient {
     }
 
     pub async fn validate_api_key(&self) -> Result<bool> {
-        println!("Debug: Starting API key validation");
         let request = ValidateApiKeyRequest {
             api_key: self.api_key.clone(),
         };
-        println!("Debug: Created request object");
 
         let mut headers = HeaderMap::new();
         headers.insert(
@@ -59,43 +57,25 @@ impl BusterClient {
             reqwest::header::USER_AGENT,
             HeaderValue::from_static("buster-cli"),
         );
-        println!("Debug: Set up headers: {:?}", headers);
 
         let url = format!("{}/api/v1/api_keys/validate", self.base_url);
-        println!("Debug: Making request to URL: {}", url);
 
         let request = self
             .client
             .post(&url)
             .headers(headers)
             .json(&request);
-        println!("Debug: Built request: {:?}", request);
 
         let response = match request.send().await {
             Ok(resp) => resp,
             Err(e) => {
-                println!("Debug: Request failed with error: {:?}", e);
-                if let Some(source) = e.source() {
-                    println!("Debug: Error source: {:?}", source);
-                }
-                if e.is_timeout() {
-                    println!("Debug: Error was a timeout");
-                }
-                if e.is_connect() {
-                    println!("Debug: Error was a connection error");
-                }
-                if e.is_request() {
-                    println!("Debug: Error was a request error");
-                }
                 return Err(anyhow::anyhow!("Request failed: {}", e));
             }
         };
-        println!("Debug: Got response: {:?}", response);
 
         if !response.status().is_success() {
             let status = response.status();
             let text = response.text().await?;
-            println!("Debug: Error response - Status: {}, Body: {}", status, text);
             return Err(anyhow::anyhow!(
                 "Failed to validate API key. Status: {}, Response: {}",
                 status,
@@ -105,11 +85,9 @@ impl BusterClient {
 
         match response.json::<ValidateApiKeyResponse>().await {
             Ok(validate_response) => {
-                println!("Debug: Successfully parsed response: {:?}", validate_response);
                 Ok(validate_response.valid)
             }
             Err(e) => {
-                println!("Debug: Failed to parse response: {:?}", e);
                 Err(anyhow::anyhow!(
                     "Failed to parse validate API key response: {}",
                     e

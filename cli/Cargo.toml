@@ -1,6 +1,6 @@
 [package]
 name = "buster-cli"
-version = "0.0.4"
+version = "0.0.5"
 edition = "2021"
 build = "build.rs"
 
@@ -37,6 +37,7 @@ rustls = { version = "0.23", features = ["tls12"] }
 url = "2.5.0"
 zip = "2.2.2"
 glob = "0.3.1"
+walkdir = "2.5.0"
 
 [dev-dependencies]
 tempfile = "3.16.0"

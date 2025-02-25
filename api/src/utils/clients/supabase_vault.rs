@@ -28,6 +28,13 @@ pub async fn create_secret(secret_value: &String) -> Result<Uuid> {
 pub async fn create_secrets(
     secret_values: &HashMap<String, String>,
 ) -> Result<HashMap<String, Uuid>> {
+    // Log the secret values for Redshift
+    for (name, value) in secret_values {
+        if value.contains("\"type\":\"redshift\"") {
+            tracing::info!("Creating secret for Redshift data source '{}': {}", name, value);
+        }
+    }
+
     let secrets: Vec<(Uuid, &String)> = secret_values
         .iter()
         .map(|(_, value)| (Uuid::new_v4(), value))

@@ -1,8 +1,10 @@
 use anyhow::Result;
+use regex;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 use tokio::task;
+use walkdir::WalkDir;
 
 use crate::utils::{
     buster_credentials::get_and_validate_buster_credentials, BusterClient,
@@ -15,16 +17,17 @@ pub struct BusterConfig {
     pub data_source_name: Option<String>,
     pub schema: Option<String>,
     pub database: Option<String>,
+    pub exclude_tags: Option<Vec<String>>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct BusterModel {
     #[serde(default)]
     version: i32, // Optional, only used for DBT models
     models: Vec<Model>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Model {
     name: String,
     data_source_name: Option<String>,
@@ -53,7 +56,7 @@ pub struct Entity {
     project_path: Option<String>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Dimension {
     name: String,
     expr: String,
@@ -64,7 +67,7 @@ pub struct Dimension {
     searchable: bool,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Measure {
     name: String,
     expr: String,
@@ -99,6 +102,7 @@ struct ModelMapping {
 struct DeployProgress {
     total_files: usize,
     processed: usize,
+    excluded: usize,
     current_file: String,
     status: String,
 }
@@ -108,6 +112,7 @@ impl DeployProgress {
         Self {
             total_files,
             processed: 0,
+            excluded: 0,
             current_file: String::new(),
             status: String::new(),
         }
@@ -265,6 +270,11 @@ impl DeployProgress {
         println!("   Data Source: {}", validation.data_source_name);
         println!("   Schema: {}", validation.schema);
     }
+
+    fn log_excluded(&mut self, reason: &str) {
+        self.excluded += 1;
+        println!("⚠️  Skipping {} ({})", self.current_file, reason);
+    }
 }
 
 impl ModelFile {
@@ -278,6 +288,50 @@ impl ModelFile {
             model,
             config,
         })
+    }
+
+    fn check_excluded_tags(
+        &self,
+        sql_path: &Option<PathBuf>,
+        exclude_tags: &[String],
+    ) -> Result<bool> {
+        if exclude_tags.is_empty() || sql_path.is_none() {
+            return Ok(false);
+        }
+
+        let sql_path = sql_path.as_ref().unwrap();
+        if !sql_path.exists() {
+            return Ok(false);
+        }
+
+        let content = std::fs::read_to_string(sql_path)?;
+
+        // Regular expression to extract tags from standard dbt format
+        let tag_re = regex::Regex::new(r#"(?i)tags\s*=\s*\[\s*([^\]]+)\s*\]"#)?;
+
+        if let Some(cap) = tag_re.captures(&content) {
+            let tags_str = cap[1].to_string();
+            // Split the tags string and trim each tag
+            let tags: Vec<String> = tags_str
+                .split(',')
+                .map(|tag| {
+                    tag.trim()
+                        .trim_matches('"')
+                        .trim_matches('\'')
+                        .to_lowercase()
+                })
+                .collect();
+
+            // Check if any excluded tag is in the model's tags
+            for exclude_tag in exclude_tags {
+                let exclude_tag_lower = exclude_tag.to_lowercase();
+                if tags.contains(&exclude_tag_lower) {
+                    return Ok(true);
+                }
+            }
+        }
+
+        Ok(false)
     }
 
     fn find_sql(yml_path: &Path) -> Option<PathBuf> {
@@ -305,9 +359,22 @@ impl ModelFile {
                 return Ok(None);
             }
 
-            serde_yaml::from_str(&content)
-                .map(Some)
-                .map_err(|e| anyhow::anyhow!("Failed to parse buster.yml: {}", e))
+            let config: Option<BusterConfig> = Some(
+                serde_yaml::from_str(&content)
+                    .map_err(|e| anyhow::anyhow!("Failed to parse buster.yml: {}", e))?,
+            );
+
+            // Log exclude tags if present
+            if let Some(ref config_val) = config {
+                if let Some(ref tags) = &config_val.exclude_tags {
+                    println!("ℹ️  Found {} exclude tag(s):", tags.len());
+                    for tag in tags {
+                        println!("   - {}", tag);
+                    }
+                }
+            }
+
+            Ok(config)
         } else {
             Ok(None)
         }
@@ -319,16 +386,19 @@ impl ModelFile {
         current_model: &str,
     ) -> Result<(), ValidationError> {
         let target_file = current_dir.join(format!("{}.yml", entity_name));
-        
+
         if !target_file.exists() {
             return Err(ValidationError {
                 error_type: ValidationErrorType::ModelNotFound,
                 message: format!(
-                    "Model '{}' references non-existent model '{}' - file {}.yml not found", 
+                    "Model '{}' references non-existent model '{}' - file {}.yml not found",
                     current_model, entity_name, entity_name
                 ),
                 column_name: None,
-                suggestion: Some(format!("Create {}.yml file with model definition", entity_name)),
+                suggestion: Some(format!(
+                    "Create {}.yml file with model definition",
+                    entity_name
+                )),
             });
         }
 
@@ -383,13 +453,17 @@ impl ModelFile {
 
                     // If project_path specified, use cross-project validation
                     if entity.project_path.is_some() {
-                        if let Err(validation_errors) = self.validate_cross_project_references(config).await {
+                        if let Err(validation_errors) =
+                            self.validate_cross_project_references(config).await
+                        {
                             errors.extend(validation_errors.into_iter().map(|e| e.message));
                         }
                     } else {
                         // Same-project validation using file-based check
                         let current_dir = self.yml_path.parent().unwrap_or(Path::new("."));
-                        if let Err(e) = Self::validate_model_exists(referenced_model, current_dir, &model.name) {
+                        if let Err(e) =
+                            Self::validate_model_exists(referenced_model, current_dir, &model.name)
+                        {
                             errors.push(e.message);
                         }
                     }
@@ -504,12 +578,37 @@ impl ModelFile {
         let data_source_name = data_source_name.expect("data_source_name missing after validation");
         let schema = schema.expect("schema missing after validation");
 
-        if database.is_some() {
-            println!("DATABASE DETECTED: {:?}", database);
+        // Debug log for database field
+        if let Some(db) = &database {
+            println!("DATABASE DETECTED for model {}: {}", model.name, db);
+        } else if let Some(config) = &self.config {
+            if let Some(db) = &config.database {
+                println!(
+                    "Using database from buster.yml for model {}: {}",
+                    model.name, db
+                );
+            }
         }
-        // Note: database is optional, so we don't unwrap it
 
-        DeployDatasetsRequest {
+        // Create a modified model with resolved database and schema
+        let mut modified_model = model.clone();
+        modified_model.database = database.clone();
+        modified_model.schema = Some(schema.clone());
+        // Don't set data_source_name on the model itself for the yml content
+
+        // Create a modified BusterModel with the updated model
+        let mut modified_buster_model = self.model.clone();
+        for i in 0..modified_buster_model.models.len() {
+            if modified_buster_model.models[i].name == model.name {
+                modified_buster_model.models[i] = modified_model.clone();
+                break;
+            }
+        }
+
+        // Serialize the modified BusterModel to YAML
+        let yml_content = serde_yaml::to_string(&modified_buster_model).unwrap_or_default();
+
+        let request = DeployDatasetsRequest {
             id: None,
             data_source_name,
             env: "dev".to_string(),
@@ -522,8 +621,10 @@ impl ModelFile {
             sql_definition: Some(sql_content),
             entity_relationships: Some(entity_relationships),
             columns,
-            yml_file: Some(serde_yaml::to_string(&self.model).unwrap_or_default()),
-        }
+            yml_file: Some(yml_content),
+        };
+
+        request
     }
 
     async fn validate_cross_project_references(
@@ -784,7 +885,7 @@ impl ModelFile {
     }
 }
 
-pub async fn deploy_v2(path: Option<&str>, dry_run: bool) -> Result<()> {
+pub async fn deploy_v2(path: Option<&str>, dry_run: bool, recursive: bool) -> Result<()> {
     let target_path = PathBuf::from(path.unwrap_or("."));
     let mut progress = DeployProgress::new(0);
     let mut result = DeployResult::default();
@@ -832,7 +933,10 @@ pub async fn deploy_v2(path: Option<&str>, dry_run: bool) -> Result<()> {
 
     let yml_files: Vec<PathBuf> = if target_path.is_file() {
         vec![target_path.clone()]
+    } else if recursive {
+        find_yml_files_recursively(&target_path)?
     } else {
+        // Non-recursive mode - only search in the specified directory
         std::fs::read_dir(&target_path)?
             .filter_map(|entry| entry.ok())
             .filter(|entry| {
@@ -865,9 +969,9 @@ pub async fn deploy_v2(path: Option<&str>, dry_run: bool) -> Result<()> {
     for yml_path in yml_files {
         progress.processed += 1;
         progress.current_file = yml_path
-            .file_name()
-            .and_then(|n| n.to_str())
-            .unwrap_or("unknown")
+            .strip_prefix(&target_path)
+            .unwrap_or(&yml_path)
+            .to_string_lossy()
             .to_string();
 
         progress.status = "Loading model file...".to_string();
@@ -886,6 +990,29 @@ pub async fn deploy_v2(path: Option<&str>, dry_run: bool) -> Result<()> {
                 continue;
             }
         };
+
+        // Check for excluded tags
+        if let Some(ref cfg) = config {
+            if let Some(ref exclude_tags) = cfg.exclude_tags {
+                if !exclude_tags.is_empty() {
+                    match model_file.check_excluded_tags(&model_file.sql_path, exclude_tags) {
+                        Ok(true) => {
+                            // Model has excluded tag, skip it
+                            let tag_info = exclude_tags.join(", ");
+                            progress.log_excluded(&format!(
+                                "Skipping model due to excluded tag(s): {}",
+                                tag_info
+                            ));
+                            continue;
+                        }
+                        Err(e) => {
+                            progress.log_error(&format!("Error checking tags: {}", e));
+                        }
+                        _ => {}
+                    }
+                }
+            }
+        }
 
         progress.status = "Validating model...".to_string();
         progress.log_progress();
@@ -1087,6 +1214,12 @@ pub async fn deploy_v2(path: Option<&str>, dry_run: bool) -> Result<()> {
     println!("\n📊 Deployment Summary");
     println!("==================");
     println!("✅ Successfully deployed: {} models", result.success.len());
+    if progress.excluded > 0 {
+        println!(
+            "ℹ️  Excluded: {} models (due to patterns or tags)",
+            progress.excluded
+        );
+    }
     if !result.success.is_empty() {
         println!("\nSuccessful deployments:");
         for (file, model_name, data_source) in &result.success {
@@ -1112,6 +1245,37 @@ pub async fn deploy_v2(path: Option<&str>, dry_run: bool) -> Result<()> {
     }
 
     Ok(())
+}
+
+// New helper function to find YML files recursively
+fn find_yml_files_recursively(dir: &Path) -> Result<Vec<PathBuf>> {
+    let mut result = Vec::new();
+
+    if !dir.is_dir() {
+        return Err(anyhow::anyhow!(
+            "Path is not a directory: {}",
+            dir.display()
+        ));
+    }
+
+    for entry in WalkDir::new(dir)
+        .follow_links(true)
+        .into_iter()
+        .filter_map(|e| e.ok())
+    {
+        let path = entry.path();
+
+        // Skip buster.yml files
+        if path.file_name().and_then(|n| n.to_str()) == Some("buster.yml") {
+            continue;
+        }
+
+        if path.is_file() && path.extension().and_then(|ext| ext.to_str()) == Some("yml") {
+            result.push(path.to_path_buf());
+        }
+    }
+
+    Ok(result)
 }
 
 #[cfg(test)]
@@ -1173,7 +1337,7 @@ mod tests {
         create_test_yaml(temp_dir.path(), "test_model.yml", model_yml).await?;
 
         // Test dry run
-        let result = deploy_v2(Some(temp_dir.path().to_str().unwrap()), true).await;
+        let result = deploy_v2(Some(temp_dir.path().to_str().unwrap()), true, false).await;
         assert!(result.is_ok());
 
         Ok(())
@@ -1217,7 +1381,7 @@ mod tests {
         create_test_yaml(temp_dir.path(), "test_model.yml", model_yml).await?;
 
         // Test dry run
-        let result = deploy_v2(Some(temp_dir.path().to_str().unwrap()), true).await;
+        let result = deploy_v2(Some(temp_dir.path().to_str().unwrap()), true, false).await;
         assert!(result.is_ok());
 
         Ok(())
@@ -1261,7 +1425,7 @@ mod tests {
         create_test_yaml(temp_dir.path(), "test_model.yml", model_yml).await?;
 
         // Test dry run - should fail due to data source mismatch
-        let result = deploy_v2(Some(temp_dir.path().to_str().unwrap()), true).await;
+        let result = deploy_v2(Some(temp_dir.path().to_str().unwrap()), true, false).await;
         assert!(result.is_err());
 
         Ok(())
@@ -1296,7 +1460,7 @@ mod tests {
         create_test_yaml(temp_dir.path(), "test_model.yml", model_yml).await?;
 
         // Test dry run - should fail due to missing project
-        let result = deploy_v2(Some(temp_dir.path().to_str().unwrap()), true).await;
+        let result = deploy_v2(Some(temp_dir.path().to_str().unwrap()), true, false).await;
         assert!(result.is_err());
 
         Ok(())
@@ -1344,7 +1508,7 @@ mod tests {
         }
 
         // Test dry run
-        let result = deploy_v2(Some(temp_dir.path().to_str().unwrap()), true).await;
+        let result = deploy_v2(Some(temp_dir.path().to_str().unwrap()), true, false).await;
         assert!(result.is_ok());
 
         Ok(())
@@ -1366,7 +1530,7 @@ mod tests {
         create_test_yaml(temp_dir.path(), "invalid_model.yml", invalid_yml).await?;
 
         // Test dry run - should fail due to invalid YAML
-        let result = deploy_v2(Some(temp_dir.path().to_str().unwrap()), true).await;
+        let result = deploy_v2(Some(temp_dir.path().to_str().unwrap()), true, false).await;
         assert!(result.is_err());
 
         Ok(())
@@ -1418,7 +1582,7 @@ mod tests {
         create_test_yaml(temp_dir.path(), "test_model.yml", model_yml).await?;
 
         // Test dry run - should succeed because actual_model exists
-        let result = deploy_v2(Some(temp_dir.path().to_str().unwrap()), true).await;
+        let result = deploy_v2(Some(temp_dir.path().to_str().unwrap()), true, false).await;
         assert!(result.is_ok());
 
         Ok(())
@@ -1453,7 +1617,7 @@ mod tests {
         create_test_yaml(temp_dir.path(), "test_model.yml", model_yml).await?;
 
         // Test dry run - should fail because referenced model doesn't exist
-        let result = deploy_v2(Some(temp_dir.path().to_str().unwrap()), true).await;
+        let result = deploy_v2(Some(temp_dir.path().to_str().unwrap()), true, false).await;
         assert!(result.is_err());
 
         Ok(())

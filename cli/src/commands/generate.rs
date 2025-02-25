@@ -1,5 +1,5 @@
 use anyhow::Result;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::collections::HashMap;
 use regex::Regex;
 use lazy_static::lazy_static;
@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use std::fmt;
 use inquire::{Text, required};
+use walkdir::WalkDir;
 use crate::utils::{
     buster_credentials::get_and_validate_buster_credentials,
     BusterClient, GenerateApiRequest, GenerateApiResponse,
@@ -23,6 +24,7 @@ pub struct GenerateCommand {
     schema: Option<String>,
     database: Option<String>,
     config: BusterConfig,
+    maintain_directory_structure: bool,
 }
 
 #[derive(Debug)]
@@ -77,6 +79,7 @@ pub struct BusterConfig {
     pub schema: Option<String>,
     pub database: Option<String>,
     pub exclude_files: Option<Vec<String>>,
+    pub exclude_tags: Option<Vec<String>>,
 }
 
 impl BusterConfig {
@@ -155,6 +158,7 @@ impl GenerateCommand {
             schema: schema.clone(),
             database: database.clone(),
             exclude_files: None,
+            exclude_tags: None,
         };
 
         Self {
@@ -164,7 +168,35 @@ impl GenerateCommand {
             schema,
             database,
             config,
+            maintain_directory_structure: true, // Default to maintaining directory structure
         }
+    }
+
+    fn check_excluded_tags(&self, content: &str, exclude_tags: &[String]) -> Option<String> {
+        lazy_static! {
+            static ref TAG_RE: Regex = Regex::new(
+                r#"(?i)tags\s*=\s*\[\s*([^\]]+)\s*\]"#
+            ).unwrap();
+        }
+        
+        if let Some(cap) = TAG_RE.captures(content) {
+            let tags_str = cap[1].to_string();
+            // Split the tags string and trim each tag
+            let tags: Vec<String> = tags_str
+                .split(',')
+                .map(|tag| tag.trim().trim_matches('"').trim_matches('\'').to_lowercase())
+                .collect();
+            
+            // Check if any excluded tag is in the model's tags
+            for exclude_tag in exclude_tags {
+                let exclude_tag_lower = exclude_tag.to_lowercase();
+                if tags.contains(&exclude_tag_lower) {
+                    return Some(exclude_tag.clone());
+                }
+            }
+        }
+        
+        None
     }
 
     pub async fn execute(&self) -> Result<()> {
@@ -187,6 +219,7 @@ impl GenerateCommand {
             schema: self.schema.clone(),
             database: self.database.clone(),
             config,  // Use the loaded config
+            maintain_directory_structure: self.maintain_directory_structure,
         };
 
         let model_names = cmd.process_sql_files(&mut progress).await?;
@@ -222,7 +255,19 @@ impl GenerateCommand {
             Ok(response) => {
                 // Process each model's YAML
                 for (model_name, yml_content) in response.yml_contents {
-                    let file_path = self.destination_path.join(format!("{}.yml", model_name));
+                    // Find the source file for this model
+                    let source_file = model_names.iter()
+                        .find(|m| m.name == model_name)
+                        .map(|m| m.source_file.clone())
+                        .unwrap_or_else(|| self.destination_path.join(format!("{}.sql", model_name)));
+                    
+                    // Determine output path based on source file
+                    let file_path = self.get_output_path(&model_name, &source_file);
+                    
+                    // Create parent directories if they don't exist
+                    if let Some(parent) = file_path.parent() {
+                        fs::create_dir_all(parent)?;
+                    }
                     
                     if file_path.exists() {
                         // Use YAML diff merger for existing files
@@ -238,15 +283,15 @@ impl GenerateCommand {
                                 match merger.apply_changes(&diff_result) {
                                     Ok(_) => {
                                         progress.log_success();
-                                        println!("✅ Updated {}.yml", model_name);
+                                        println!("✅ Updated {}", file_path.display());
                                     }
                                     Err(e) => {
-                                        progress.log_error(&format!("Failed to update {}.yml: {}", model_name, e));
+                                        progress.log_error(&format!("Failed to update {}: {}", file_path.display(), e));
                                     }
                                 }
                             }
                             Err(e) => {
-                                progress.log_error(&format!("Failed to compute diff for {}.yml: {}", model_name, e));
+                                progress.log_error(&format!("Failed to compute diff for {}: {}", file_path.display(), e));
                             }
                         }
                     } else {
@@ -254,10 +299,10 @@ impl GenerateCommand {
                         match fs::write(&file_path, yml_content) {
                             Ok(_) => {
                                 progress.log_success();
-                                println!("✅ Created new file {}.yml", model_name);
+                                println!("✅ Created new file {}", file_path.display());
                             }
                             Err(e) => {
-                                progress.log_error(&format!("Failed to write {}.yml: {}", model_name, e));
+                                progress.log_error(&format!("Failed to write {}: {}", file_path.display(), e));
                             }
                         }
                     }
@@ -317,6 +362,14 @@ impl GenerateCommand {
                 }
             }
 
+            // Log exclude tags if present
+            if let Some(tags) = &config.exclude_tags {
+                println!("ℹ️  Found {} exclude tag(s):", tags.len());
+                for tag in tags {
+                    println!("   - {}", tag);
+                }
+            }
+
             Ok(config)
         } else {
             println!("ℹ️  No buster.yml found, creating new configuration");
@@ -348,6 +401,7 @@ impl GenerateCommand {
                 schema: Some(schema),
                 database,
                 exclude_files: None,
+                exclude_tags: None,
             };
 
             // Write the config to file
@@ -384,24 +438,21 @@ impl GenerateCommand {
             Vec::new()
         };
 
-        // Get list of SQL files first to set total
-        let sql_files: Vec<_> = fs::read_dir(&self.source_path)?
-            .filter_map(|entry| entry.ok())
-            .filter(|entry| {
-                entry.path().extension()
-                    .and_then(|ext| ext.to_str())
-                    .map(|ext| ext.to_lowercase() == "sql")
-                    .unwrap_or(false)
-            })
-            .collect();
+        // Get exclude tags if any
+        let exclude_tags = self.config.exclude_tags.clone().unwrap_or_default();
+        if !exclude_tags.is_empty() {
+            println!("🔍 Found exclude tags: {:?}", exclude_tags);
+        }
+
+        // Get list of SQL files recursively
+        let sql_files = find_sql_files_recursively(&self.source_path)?;
 
         progress.total_files = sql_files.len();
         progress.status = format!("Found {} SQL files to process", sql_files.len());
         progress.log_progress();
 
-        for entry in sql_files {
+        for file_path in sql_files {
             progress.processed += 1;
-            let file_path = entry.path();
             
             // Get the relative path from the source directory
             let relative_path = file_path.strip_prefix(&self.source_path)
@@ -426,6 +477,22 @@ impl GenerateCommand {
                 continue;
             }
 
+            // Check for excluded tags if we have any
+            if !exclude_tags.is_empty() {
+                match fs::read_to_string(&file_path) {
+                    Ok(content) => {
+                        if let Some(tag) = self.check_excluded_tags(&content, &exclude_tags) {
+                            println!("⛔ Excluding file: {} (matched excluded tag: {})", relative_path, tag);
+                            progress.log_excluded(&relative_path, &format!("tag: {}", tag));
+                            continue;
+                        }
+                    },
+                    Err(e) => {
+                        progress.log_error(&format!("Failed to read file for tag checking: {}", e));
+                    }
+                }
+            }
+
             progress.status = "Processing file...".to_string();
             progress.log_progress();
 
@@ -436,7 +503,7 @@ impl GenerateCommand {
                         errors.push(GenerateError::DuplicateModelName {
                             name: model_name.name,
                             first_occurrence: existing.clone(),
-                            duplicate_occurrence: entry.path(),
+                            duplicate_occurrence: file_path.clone(),
                         });
                     } else {
                         progress.log_info(&format!(
@@ -444,7 +511,7 @@ impl GenerateCommand {
                             model_name.name,
                             if model_name.is_from_alias { "from alias" } else { "from filename" }
                         ));
-                        seen_names.insert(model_name.name.clone(), entry.path());
+                        seen_names.insert(model_name.name.clone(), file_path.clone());
                         names.push(model_name);
                     }
                 }
@@ -463,7 +530,7 @@ impl GenerateCommand {
 
         // Update final summary with exclusion information
         if progress.excluded > 0 {
-            println!("\nℹ️  Excluded {} files based on patterns", progress.excluded);
+            println!("\nℹ️  Excluded {} files based on patterns and tags", progress.excluded);
         }
 
         if !errors.is_empty() {
@@ -537,8 +604,73 @@ impl GenerateCommand {
         ALIAS_RE.captures(content)
             .map(|cap| cap[1].to_string())
     }
+
+    // Add a method to determine the output path for a model
+    fn get_output_path(&self, model_name: &str, source_file: &Path) -> PathBuf {
+        // If destination_path is specified, use it
+        if self.destination_path != self.source_path {
+            // Use destination path with flat or mirrored structure
+            if self.maintain_directory_structure {
+                let relative = source_file.strip_prefix(&self.source_path).unwrap_or(Path::new(""));
+                let parent = relative.parent().unwrap_or(Path::new(""));
+                self.destination_path.join(parent).join(format!("{}.yml", model_name))
+            } else {
+                // Flat structure
+                self.destination_path.join(format!("{}.yml", model_name))
+            }
+        } else {
+            // Write alongside the SQL file
+            let parent = source_file.parent().unwrap_or(Path::new("."));
+            parent.join(format!("{}.yml", model_name))
+        }
+    }
 }
 
-pub async fn generate() -> Result<()> {
-    Ok(())
+// New helper function to find SQL files recursively
+fn find_sql_files_recursively(dir: &Path) -> Result<Vec<PathBuf>> {
+    let mut result = Vec::new();
+    
+    if !dir.is_dir() {
+        return Err(anyhow::anyhow!("Path is not a directory: {}", dir.display()));
+    }
+    
+    for entry in WalkDir::new(dir)
+        .follow_links(true)
+        .into_iter()
+        .filter_map(|e| e.ok())
+    {
+        let path = entry.path();
+        
+        if path.is_file() && 
+           path.extension().and_then(|ext| ext.to_str()) == Some("sql") {
+            result.push(path.to_path_buf());
+        }
+    }
+    
+    Ok(result)
+}
+
+pub async fn generate(
+    source_path: Option<&str>,
+    destination_path: Option<&str>,
+    data_source_name: Option<String>,
+    schema: Option<String>,
+    database: Option<String>,
+    flat_structure: bool,
+) -> Result<()> {
+    let source = PathBuf::from(source_path.unwrap_or("."));
+    let destination = PathBuf::from(destination_path.unwrap_or("."));
+
+    let mut cmd = GenerateCommand::new(
+        source,
+        destination,
+        data_source_name,
+        schema,
+        database,
+    );
+    
+    // Set directory structure preference
+    cmd.maintain_directory_structure = !flat_structure;
+
+    cmd.execute().await
 }

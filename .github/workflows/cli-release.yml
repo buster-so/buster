@@ -107,7 +107,7 @@ jobs:
       - name: Get version
         id: get_version
         run: |
-          VERSION=0.0.4
+          VERSION=0.0.5
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Create Release

@@ -470,6 +470,36 @@ async fn deploy_datasets_handler(
                 .into_iter()
                 .collect();
 
+            // Get new dataset names from the request
+            let new_dataset_names: HashSet<String> = valid_datasets
+                .iter()
+                .map(|req| req.name.clone())
+                .collect();
+
+            // Find datasets that exist but aren't in the request
+            let datasets_to_delete: Vec<String> = existing_datasets
+                .difference(&new_dataset_names)
+                .cloned()
+                .collect();
+
+            // Mark datasets as deleted if they're not in the request
+            if !datasets_to_delete.is_empty() {
+                tracing::info!(
+                    "Marking {} datasets as deleted for data source '{}': {:?}",
+                    datasets_to_delete.len(),
+                    data_source_name,
+                    datasets_to_delete
+                );
+                
+                diesel::update(datasets::table)
+                    .filter(datasets::data_source_id.eq(&data_source.id))
+                    .filter(datasets::name.eq_any(&datasets_to_delete))
+                    .filter(datasets::deleted_at.is_null())
+                    .set(datasets::deleted_at.eq(now))
+                    .execute(&mut conn)
+                    .await?;
+            }
+
             // Prepare datasets for upsert
             let datasets_to_upsert: Vec<Dataset> = valid_datasets
                 .iter()
