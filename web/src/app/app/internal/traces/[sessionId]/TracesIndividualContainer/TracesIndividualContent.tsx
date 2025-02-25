@@ -1,8 +1,5 @@
 import { ApiSessionWithTraces } from 'langfuse';
 import React, { useMemo } from 'react';
-import 'react-json-view-lite/dist/index.css';
-import { Card, Typography, Collapse, theme } from 'antd';
-import { createStyles } from 'antd-style';
 import { DownOutlined } from '@ant-design/icons';
 
 type LangfuseUserMessage = {
@@ -60,42 +57,7 @@ type LangfuseTool = {
   };
 };
 
-const useStyles = createStyles(({ token }) => ({
-  functionCall: {
-    marginBottom: token.marginMD,
-    '&:last-child': {
-      marginBottom: 0
-    }
-  },
-  functionName: {
-    color: token.colorPrimary,
-    fontSize: token.fontSizeLG,
-    fontWeight: token.fontWeightStrong,
-    marginBottom: token.marginXS
-  },
-  argumentsLabel: {
-    color: token.colorTextSecondary,
-    fontWeight: token.fontWeightStrong,
-    marginBottom: token.marginXS
-  },
-  codeBlock: {
-    background: token.colorFillTertiary,
-    borderRadius: token.borderRadiusLG,
-    padding: token.padding,
-    fontSize: token.fontSize,
-    fontFamily: token.fontFamilyCode,
-    border: `0.5px solid ${token.colorBorder}`,
-    maxHeight: '400px',
-    overflow: 'auto'
-  },
-  simpleArgument: {
-    marginLeft: token.marginSM,
-    color: token.colorText,
-    fontSize: token.fontSize
-  }
-}));
-
-export const TracesIndividualContent = React.memo(({ trace }: { trace: ApiSessionWithTraces }) => {
+export const TracesIndividualContent = ({ trace }: { trace: ApiSessionWithTraces }) => {
   const traces = trace.traces;
 
   return (
@@ -135,7 +97,7 @@ export const TracesIndividualContent = React.memo(({ trace }: { trace: ApiSessio
       })}
     </div>
   );
-});
+};
 
 const MessageCard: React.FC<{
   title: string;
