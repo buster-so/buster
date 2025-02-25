@@ -1,7 +1,6 @@
 'use server';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/context/Supabase/server';
 import { codeToFlag } from './_codeToFlag';
 import { useSupabaseServerContext } from '@/context/Supabase/useSupabaseContext';
 
