@@ -700,12 +700,31 @@ fn create_buster_config_file(
     database: Option<&str>,
     schema: Option<&str>,
 ) -> Result<()> {
+    // Prompt for model paths (optional)
+    let model_paths_input = Text::new("Enter paths to your SQL models (optional, comma-separated):")
+        .with_help_message("Leave blank to use current directory, or specify paths like './models,./analytics/models'")
+        .prompt()?;
+    
+    // Process the comma-separated input into a vector if not empty
+    let model_paths = if model_paths_input.trim().is_empty() {
+        None
+    } else {
+        Some(
+            model_paths_input
+                .split(',')
+                .map(|s| s.trim().to_string())
+                .filter(|s| !s.is_empty())
+                .collect::<Vec<String>>()
+        )
+    };
+
     let config = BusterConfig {
         data_source_name: Some(data_source_name.to_string()),
         schema: schema.map(String::from),
         database: database.map(String::from),
         exclude_files: None,
         exclude_tags: None,
+        model_paths,
     };
 
     let yaml = serde_yaml::to_string(&config)?;

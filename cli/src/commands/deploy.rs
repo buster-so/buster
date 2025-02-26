@@ -269,6 +269,7 @@ impl ModelFile {
             database: None,
             exclude_files: None,
             exclude_tags: Some(exclude_tags.to_vec()),
+            model_paths: None,
         };
         
         let manager = ExclusionManager::new(&temp_config)?;
@@ -848,10 +849,27 @@ pub async fn deploy(path: Option<&str>, dry_run: bool, recursive: bool) -> Resul
     progress.status = "Discovering model files...".to_string();
     progress.log_progress();
 
-    let yml_files: Vec<PathBuf> = if target_path.is_file() {
-        vec![target_path.clone()]
-    } else if recursive {
-        find_yml_files_recursively(&target_path, config.as_ref(), Some(&mut progress))?
+    let exclusion_manager = if let Some(cfg) = &config {
+        ExclusionManager::new(cfg)?
+    } else {
+        ExclusionManager::empty()
+    };
+    
+    let yml_files = if recursive {
+        println!("Recursively searching for model files...");
+        // Use the config's model_paths if available, otherwise use the target path
+        if let Some(config) = &config {
+            let model_paths = config.resolve_model_paths(&target_path);
+            if !model_paths.is_empty() {
+                println!("Using model_paths from buster.yml: {:?}", model_paths);
+                find_yml_files_recursively(&target_path, Some(config), Some(&mut progress))?
+            } else {
+                println!("No model_paths specified in buster.yml, using target path");
+                find_yml_files_recursively(&target_path, Some(config), Some(&mut progress))?
+            }
+        } else {
+            find_yml_files_recursively(&target_path, None, Some(&mut progress))?
+        }
     } else {
         // Non-recursive mode - only search in the specified directory
         std::fs::read_dir(&target_path)?
@@ -1145,7 +1163,58 @@ fn find_yml_files_recursively(dir: &Path, config: Option<&BusterConfig>, progres
         ExclusionManager::empty()
     };
     
-    // Use our new unified file discovery function
+    // Check if we have model_paths in the config
+    if let Some(cfg) = config {
+        if let Some(model_paths) = &cfg.model_paths {
+            println!("ℹ️  Using model paths from buster.yml:");
+            for path in model_paths {
+                println!("   - {}", path);
+            }
+            
+            // Use the resolve_model_paths method
+            let resolved_paths = cfg.resolve_model_paths(dir);
+            let mut all_files = Vec::new();
+            
+            // Process each resolved path
+            for path in resolved_paths {
+                if path.exists() {
+                    if path.is_file() && path.extension().and_then(|ext| ext.to_str()) == Some("yml") {
+                        // Single YML file
+                        all_files.push(path.clone());
+                        println!("     Found YML file: {}", path.display());
+                    } else if path.is_dir() {
+                        // Process directory
+                        println!("     Scanning directory: {}", path.display());
+                        let dir_files = find_yml_files(&path, true, &exclusion_manager, None::<&mut DeployProgress>)?;
+                        println!("     Found {} YML files in directory", dir_files.len());
+                        all_files.extend(dir_files);
+                    } else {
+                        println!("     Skipping invalid path type: {}", path.display());
+                    }
+                } else {
+                    println!("     Path not found: {}", path.display());
+                }
+            }
+            
+            // If we have a progress tracker, update it with our findings
+            if let Some(tracker) = progress {
+                for file in &all_files {
+                    if let Some(file_name) = file.file_name() {
+                        if let Some(name_str) = file_name.to_str() {
+                            tracker.current_file = name_str.to_string();
+                            tracker.status = "Found via model_paths".to_string();
+                            tracker.log_progress();
+                        }
+                    }
+                }
+            }
+            
+            println!("Found {} total YML files in model paths", all_files.len());
+            return Ok(all_files);
+        }
+    }
+    
+    // Fall back to the original behavior if no model_paths specified
     find_yml_files(dir, true, &exclusion_manager, progress)
 }
 

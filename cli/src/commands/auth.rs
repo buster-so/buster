@@ -72,6 +72,9 @@ pub async fn auth_with_args(args: AuthArgs) -> Result<()> {
         buster_creds.url = host;
     }
 
+    // Check if API key was provided via args or environment
+    let api_key_from_env = args.api_key.is_some();
+    
     // Apply API key from args or environment
     if let Some(api_key) = args.api_key {
         buster_creds.api_key = api_key;
@@ -92,8 +95,13 @@ pub async fn auth_with_args(args: AuthArgs) -> Result<()> {
         }
     }
 
-    if buster_creds.api_key.is_empty() {
-        let obfuscated_api_key = String::from("None");
+    // Always prompt for API key if it wasn't found in environment variables
+    if !api_key_from_env || buster_creds.api_key.is_empty() {
+        let obfuscated_api_key = if buster_creds.api_key.is_empty() {
+            String::from("None")
+        } else {
+            format!("{}...", &buster_creds.api_key[0..4])
+        };
 
         let api_key_input = Password::new(&format!("Enter your API key [{obfuscated_api_key}]:"))
             .without_confirmation()

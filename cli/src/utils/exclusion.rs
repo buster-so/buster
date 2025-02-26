@@ -16,6 +16,7 @@ pub struct BusterConfig {
     pub database: Option<String>,      // For SQL DBs: database, For BigQuery: project ID
     pub exclude_files: Option<Vec<String>>,
     pub exclude_tags: Option<Vec<String>>,
+    pub model_paths: Option<Vec<String>>,  // Paths to SQL model files/directories
 }
 
 impl BusterConfig {
@@ -30,6 +31,36 @@ impl BusterConfig {
             }
         }
         Ok(())
+    }
+
+    /// Resolves model paths relative to the base directory
+    /// If model_paths is specified, resolves each path (absolute or relative)
+    /// If model_paths is not specified, returns the base directory as the only path
+    pub fn resolve_model_paths(&self, base_dir: &Path) -> Vec<PathBuf> {
+        if let Some(model_paths) = &self.model_paths {
+            let resolved_paths: Vec<PathBuf> = model_paths.iter()
+                .map(|path| {
+                    if Path::new(path).is_absolute() {
+                        PathBuf::from(path)
+                    } else {
+                        base_dir.join(path)
+                    }
+                })
+                .collect();
+            
+            // Log the resolved paths
+            println!("ℹ️  Using model paths from buster.yml:");
+            for (i, path) in resolved_paths.iter().enumerate() {
+                println!("   - {} (resolved to: {})", 
+                    model_paths[i], path.display());
+            }
+            
+            resolved_paths
+        } else {
+            // If no model_paths specified, use the base directory
+            println!("ℹ️  No model_paths specified, using current directory: {}", base_dir.display());
+            vec![base_dir.to_path_buf()]
+        }
     }
 
     /// Load configuration from the specified directory
@@ -73,6 +104,14 @@ impl BusterConfig {
                 println!("ℹ️  Found {} exclude tag(s):", tags.len());
                 for tag in tags {
                     println!("   - {}", tag);
+                }
+            }
+            
+            // Log model paths if present
+            if let Some(ref paths) = config.model_paths {
+                println!("ℹ️  Found {} model path(s):", paths.len());
+                for path in paths {
+                    println!("   - {}", path);
                 }
             }
 

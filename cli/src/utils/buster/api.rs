@@ -167,12 +167,10 @@ impl BusterClient {
                 }
                 
                 let response_text = res.text().await?;
-                println!("DEBUG: Raw API Response: {}", response_text);
                 
                 match serde_json::from_str::<GenerateApiResponse>(&response_text) {
                     Ok(parsed) => Ok(parsed),
                     Err(e) => {
-                        println!("DEBUG: JSON Parse Error: {}", e);
                         Err(anyhow::anyhow!("Failed to parse API response: {}", e))
                     }
                 }
