@@ -53,7 +53,10 @@ export enum BusterAppRoutes {
   APP_SETTINGS_DATASET_GROUPS_ID_USERS = '/app/settings/dataset-groups/:datasetGroupId/users',
   APP_SETTINGS_ATTRIBUTES = '/app/settings/attributes',
   APP_SETTINGS_SECURITY = '/app/settings/security',
-  NEW_USER = '/app/new-user'
+  NEW_USER = '/app/new-user',
+  APP_INTERNAL = '/app/internal',
+  APP_INTERNAL_TRACES = '/app/internal/traces',
+  APP_INTERNAL_TRACES_ID = '/app/internal/traces/:sessionId'
 }
 
 export type BusterAppRoutesWithArgs = {
@@ -193,4 +196,10 @@ export type BusterAppRoutesWithArgs = {
   };
   [BusterAppRoutes.APP_SETTINGS_ATTRIBUTES]: { route: BusterAppRoutes.APP_SETTINGS_ATTRIBUTES };
   [BusterAppRoutes.APP_SETTINGS_SECURITY]: { route: BusterAppRoutes.APP_SETTINGS_SECURITY };
+  [BusterAppRoutes.APP_INTERNAL]: { route: BusterAppRoutes.APP_INTERNAL };
+  [BusterAppRoutes.APP_INTERNAL_TRACES]: { route: BusterAppRoutes.APP_INTERNAL_TRACES };
+  [BusterAppRoutes.APP_INTERNAL_TRACES_ID]: {
+    route: BusterAppRoutes.APP_INTERNAL_TRACES_ID;
+    sessionId: string;
+  };
 };

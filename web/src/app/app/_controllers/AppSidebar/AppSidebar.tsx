@@ -6,15 +6,19 @@ import { useMemoizedFn, useScroll } from 'ahooks';
 import { AppSidebarTopSettings } from './AppSidebarTopSettings';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
+import { AppSidebarInternal } from './AppSidebarInternal';
 import { BusterRoutes } from '@/routes';
+import { AppSidebarTopInternal } from './AppSidebarTopInternal';
 
 const SidebarRecord = {
   [BusterRoutes.SETTINGS]: AppSidebarSettings,
+  [BusterRoutes.APP_INTERNAL]: AppSidebarInternal,
   DEFAULT: AppSidebarPrimary
 };
 
 const SidebarTopRecord = {
   [BusterRoutes.SETTINGS]: AppSidebarTopSettings,
+  [BusterRoutes.APP_INTERNAL]: AppSidebarTopInternal,
   DEFAULT: AppSidebarTopItems
 };
 
@@ -38,14 +42,26 @@ export const AppSidebar: React.FC<{
   const isScrolledSidebar = (useScroll(sidebarRef)?.top || 0) > 0;
 
   const isSettings = currentSegment === 'settings';
-  const ChosenSidebar = useMemo(
-    () => SidebarRecord[isSettings ? BusterRoutes.SETTINGS : 'DEFAULT'],
-    [isSettings]
-  );
-  const ChosenTopBar = useMemo(
-    () => SidebarTopRecord[isSettings ? BusterRoutes.SETTINGS : 'DEFAULT'],
-    [isSettings]
-  );
+  const isInternal = currentSegment === 'internal';
+  const ChosenSidebar = useMemo(() => {
+    if (isInternal) {
+      return SidebarRecord[BusterRoutes.APP_INTERNAL];
+    }
+    if (isSettings) {
+      return SidebarRecord[BusterRoutes.SETTINGS];
+    }
+    return SidebarRecord['DEFAULT'];
+  }, [isSettings, isInternal]);
+
+  const ChosenTopBar = useMemo(() => {
+    if (isInternal) {
+      return SidebarTopRecord[BusterRoutes.APP_INTERNAL];
+    }
+    if (isSettings) {
+      return SidebarTopRecord[BusterRoutes.SETTINGS];
+    }
+    return SidebarTopRecord['DEFAULT'];
+  }, [isSettings, isInternal]);
 
   const onGoToSettingPage = useMemoizedFn(() => {
     onChangePage({
@@ -66,27 +82,25 @@ export const AppSidebar: React.FC<{
   }, [isScrolledSidebar]);
 
   return (
-    <>
-      <div className={`${className} flex h-full flex-col overflow-hidden`}>
-        <ChosenTopBar
-          onOpenSettings={onGoToSettingPage}
-          onGoToHomePage={onGoToHomePage}
-          onOpenThreadsModal={onToggleThreadsModal}
-          createPageLink={createPageLink}
-          threadModalOpen={openThreadsModal}
-          isUserRegistered={isUserRegistered}
-          className="mb-5 px-3.5"
-          style={memoizedStyle}
-        />
+    <div className={`${className} flex h-full flex-col overflow-hidden`}>
+      <ChosenTopBar
+        onOpenSettings={onGoToSettingPage}
+        onGoToHomePage={onGoToHomePage}
+        onOpenThreadsModal={onToggleThreadsModal}
+        createPageLink={createPageLink}
+        threadModalOpen={openThreadsModal}
+        isUserRegistered={isUserRegistered}
+        className="mb-5 px-3.5"
+        style={memoizedStyle}
+      />
 
-        <div
-          className="h-full overflow-y-auto px-3.5 pb-4"
-          ref={sidebarRef}
-          style={memoizedSidebarStyle}>
-          <ChosenSidebar signOut={signOut} />
-        </div>
+      <div
+        className="h-full overflow-y-auto px-3.5 pb-4"
+        ref={sidebarRef}
+        style={memoizedSidebarStyle}>
+        <ChosenSidebar signOut={signOut} />
       </div>
-    </>
+    </div>
   );
 });
 AppSidebar.displayName = 'AppSidebar';

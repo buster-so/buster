@@ -1,8 +1,3 @@
-//GENERATED CODE: DO NOT EDIT
-//USE make-types  in the database repo to regenerate
-
-export type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
-
 export type Database = {
   public: {
     Tables: {
