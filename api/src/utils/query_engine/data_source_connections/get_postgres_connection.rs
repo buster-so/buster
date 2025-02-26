@@ -56,7 +56,7 @@ pub async fn get_postgres_connection(
             url_encode(&credentials.username),
             url_encode(&credentials.password),
             local_port,
-            url_encode(&credentials.database)
+            url_encode(&credentials.database.clone().unwrap_or_default())
         );
     } else {
         connection_string = format!(
@@ -65,7 +65,7 @@ pub async fn get_postgres_connection(
             url_encode(&credentials.password),
             url_encode(&credentials.host),
             credentials.port,
-            url_encode(&credentials.database)
+            url_encode(&credentials.database.clone().unwrap_or_default())
         )
     }
 

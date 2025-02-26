@@ -14,7 +14,7 @@ pub async fn get_redshift_connection(credentials: &PostgresCredentials) -> Resul
         .port(credentials.port)
         .username(credentials.username.as_str())
         .password(credentials.password.as_str())
-        .database(credentials.database.as_str())
+        .database(credentials.database.clone().unwrap_or_default().as_str())
         .extra_float_digits(2);
 
     let redshift_pool = match PgPoolOptions::new()

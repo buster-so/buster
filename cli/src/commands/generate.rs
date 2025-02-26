@@ -12,7 +12,8 @@ use walkdir::WalkDir;
 use crate::utils::{
     buster_credentials::get_and_validate_buster_credentials,
     BusterClient, GenerateApiRequest, GenerateApiResponse,
-    yaml_diff_merger::YamlDiffMerger,
+    yaml_diff_merger::YamlDiffMerger, BusterConfig, ExclusionManager,
+    find_sql_files, ProgressTracker,
 };
 use glob;
 
@@ -73,33 +74,11 @@ impl fmt::Display for GenerateError {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-pub struct BusterConfig {
-    pub data_source_name: Option<String>,
-    pub schema: Option<String>,
-    pub database: Option<String>,
-    pub exclude_files: Option<Vec<String>>,
-    pub exclude_tags: Option<Vec<String>>,
-}
-
-impl BusterConfig {
-    fn validate_exclude_patterns(&self) -> Result<()> {
-        if let Some(patterns) = &self.exclude_files {
-            for pattern in patterns {
-                match glob::Pattern::new(pattern) {
-                    Ok(_) => continue,
-                    Err(e) => return Err(anyhow::anyhow!("Invalid glob pattern '{}': {}", pattern, e)),
-                }
-            }
-        }
-        Ok(())
-    }
-}
-
 struct GenerateProgress {
     total_files: usize,
     processed: usize,
-    excluded: usize,
+    excluded_files: usize,
+    excluded_tags: usize,
     current_file: String,
     status: String,
 }
@@ -109,7 +88,8 @@ impl GenerateProgress {
         Self {
             total_files,
             processed: 0,
-            excluded: 0,
+            excluded_files: 0,
+            excluded_tags: 0,
             current_file: String::new(),
             status: String::new(),
         }
@@ -139,9 +119,44 @@ impl GenerateProgress {
         println!("ℹ️  {}: {}", self.current_file, info);
     }
 
-    fn log_excluded(&mut self, file: &str, pattern: &str) {
-        self.excluded += 1;
-        println!("⚠️  Skipping {} (matched exclude pattern: {})", file, pattern);
+    fn log_excluded_file(&mut self, file: &str, pattern: &str) {
+        self.excluded_files += 1;
+        println!("⛔ Excluding file: {} (matched pattern: {})", file, pattern);
+    }
+
+    fn log_excluded_tag(&mut self, file: &str, tag: &str) {
+        self.excluded_tags += 1;
+        println!("⛔ Excluding file: {} (matched excluded tag: {})", file, tag);
+    }
+    
+    fn log_summary(&self) {
+        println!("\n📊 Processing Summary");
+        println!("==================");
+        println!("✅ Successfully processed: {} files", self.processed - self.excluded_files - self.excluded_tags);
+        
+        // Only show exclusion details if files were excluded
+        if self.excluded_files > 0 || self.excluded_tags > 0 {
+            println!("\n⛔ Excluded files: {} total", self.excluded_files + self.excluded_tags);
+            if self.excluded_files > 0 {
+                println!("  - {} files excluded by pattern", self.excluded_files);
+            }
+            if self.excluded_tags > 0 {
+                println!("  - {} files excluded by tag", self.excluded_tags);
+            }
+        }
+    }
+}
+
+// Implement ProgressTracker trait for GenerateProgress
+impl ProgressTracker for GenerateProgress {
+    fn log_excluded_file(&mut self, path: &str, pattern: &str) {
+        self.excluded_files += 1;
+        println!("⛔ Excluding file: {} (matched pattern: {})", path, pattern);
+    }
+
+    fn log_excluded_tag(&mut self, path: &str, tag: &str) {
+        self.excluded_tags += 1;
+        println!("⛔ Excluding file: {} (matched excluded tag: {})", path, tag);
     }
 }
 
@@ -170,33 +185,6 @@ impl GenerateCommand {
             config,
             maintain_directory_structure: true, // Default to maintaining directory structure
         }
-    }
-
-    fn check_excluded_tags(&self, content: &str, exclude_tags: &[String]) -> Option<String> {
-        lazy_static! {
-            static ref TAG_RE: Regex = Regex::new(
-                r#"(?i)tags\s*=\s*\[\s*([^\]]+)\s*\]"#
-            ).unwrap();
-        }
-        
-        if let Some(cap) = TAG_RE.captures(content) {
-            let tags_str = cap[1].to_string();
-            // Split the tags string and trim each tag
-            let tags: Vec<String> = tags_str
-                .split(',')
-                .map(|tag| tag.trim().trim_matches('"').trim_matches('\'').to_lowercase())
-                .collect();
-            
-            // Check if any excluded tag is in the model's tags
-            for exclude_tag in exclude_tags {
-                let exclude_tag_lower = exclude_tag.to_lowercase();
-                if tags.contains(&exclude_tag_lower) {
-                    return Some(exclude_tag.clone());
-                }
-            }
-        }
-        
-        None
     }
 
     pub async fn execute(&self) -> Result<()> {
@@ -312,7 +300,13 @@ impl GenerateCommand {
                 if !response.errors.is_empty() {
                     println!("\n⚠️  Some models had errors:");
                     for (model_name, error) in response.errors {
-                        println!("❌ {}: {}", model_name, error);
+                        println!("❌ {}: {}", model_name, error.message);
+                        if let Some(error_type) = error.error_type {
+                            println!("   Error type: {}", error_type);
+                        }
+                        if let Some(context) = error.context {
+                            println!("   Context: {}", context);
+                        }
                     }
                 }
             }
@@ -330,8 +324,10 @@ impl GenerateCommand {
 
         if buster_yml_path.exists() {
             println!("✅ Found existing buster.yml");
-            let content = fs::read_to_string(&buster_yml_path)?;
-            let mut config: BusterConfig = serde_yaml::from_str(&content)?;
+            
+            // Use our unified config loader
+            let config = BusterConfig::load_from_dir(&self.destination_path)?
+                .ok_or_else(|| anyhow::anyhow!("Failed to load buster.yml"))?;
             
             // Validate required fields
             let mut missing_fields = Vec::new();
@@ -347,27 +343,6 @@ impl GenerateCommand {
                     "Existing buster.yml is missing required fields: {}",
                     missing_fields.join(", ")
                 ));
-            }
-
-            // Validate exclude patterns if present
-            if let Err(e) = config.validate_exclude_patterns() {
-                return Err(anyhow::anyhow!("Invalid exclude_files configuration: {}", e));
-            }
-
-            // Log exclude patterns if present
-            if let Some(patterns) = &config.exclude_files {
-                println!("ℹ️  Found {} exclude pattern(s):", patterns.len());
-                for pattern in patterns {
-                    println!("   - {}", pattern);
-                }
-            }
-
-            // Log exclude tags if present
-            if let Some(tags) = &config.exclude_tags {
-                println!("ℹ️  Found {} exclude tag(s):", tags.len());
-                for tag in tags {
-                    println!("   - {}", tag);
-                }
             }
 
             Ok(config)
@@ -418,34 +393,14 @@ impl GenerateCommand {
         let mut seen_names: HashMap<String, PathBuf> = HashMap::new();
         let mut errors = Vec::new();
 
-        // Compile glob patterns once
-        let exclude_patterns: Vec<glob::Pattern> = if let Some(patterns) = &self.config.exclude_files {
-            println!("🔍 Found exclude patterns: {:?}", patterns);
-            patterns.iter()
-                .filter_map(|p| match glob::Pattern::new(p) {
-                    Ok(pattern) => {
-                        println!("✅ Compiled pattern: {}", p);
-                        Some(pattern)
-                    }
-                    Err(e) => {
-                        progress.log_warning(&format!("Invalid exclude pattern '{}': {}", p, e));
-                        None
-                    }
-                })
-                .collect()
-        } else {
-            println!("ℹ️  No exclude patterns found");
-            Vec::new()
-        };
+        // Create exclusion manager from config
+        let exclusion_manager = ExclusionManager::new(&self.config)?;
 
-        // Get exclude tags if any
-        let exclude_tags = self.config.exclude_tags.clone().unwrap_or_default();
-        if !exclude_tags.is_empty() {
-            println!("🔍 Found exclude tags: {:?}", exclude_tags);
-        }
+        progress.status = format!("Initializing exclusion manager...");
+        progress.log_progress();
 
-        // Get list of SQL files recursively
-        let sql_files = find_sql_files_recursively(&self.source_path)?;
+        // Get list of SQL files recursively with progress reporting
+        let sql_files = find_sql_files(&self.source_path, true, &exclusion_manager, Some(progress))?;
 
         progress.total_files = sql_files.len();
         progress.status = format!("Found {} SQL files to process", sql_files.len());
@@ -461,38 +416,6 @@ impl GenerateCommand {
                 .into_owned();
             
             progress.current_file = relative_path.clone();
-            progress.status = "Checking exclusions...".to_string();
-            progress.log_progress();
-
-            println!("🔍 Checking file: {}", relative_path);
-            // Check if file matches any exclude pattern
-            if let Some(matching_pattern) = exclude_patterns.iter()
-                .find(|p| {
-                    let matches = p.matches(&relative_path);
-                    println!("  - Testing pattern '{}' against '{}': {}", p.as_str(), relative_path, matches);
-                    matches
-                }) {
-                println!("⛔ Excluding file: {} (matched pattern: {})", relative_path, matching_pattern.as_str());
-                progress.log_excluded(&relative_path, matching_pattern.as_str());
-                continue;
-            }
-
-            // Check for excluded tags if we have any
-            if !exclude_tags.is_empty() {
-                match fs::read_to_string(&file_path) {
-                    Ok(content) => {
-                        if let Some(tag) = self.check_excluded_tags(&content, &exclude_tags) {
-                            println!("⛔ Excluding file: {} (matched excluded tag: {})", relative_path, tag);
-                            progress.log_excluded(&relative_path, &format!("tag: {}", tag));
-                            continue;
-                        }
-                    },
-                    Err(e) => {
-                        progress.log_error(&format!("Failed to read file for tag checking: {}", e));
-                    }
-                }
-            }
-
             progress.status = "Processing file...".to_string();
             progress.log_progress();
 
@@ -528,10 +451,8 @@ impl GenerateCommand {
             println!("  - {} (from {})", model.name, model.source_file.display());
         }
 
-        // Update final summary with exclusion information
-        if progress.excluded > 0 {
-            println!("\nℹ️  Excluded {} files based on patterns and tags", progress.excluded);
-        }
+        // Print processing summary including exclusions
+        progress.log_summary();
 
         if !errors.is_empty() {
             // Log all errors
@@ -624,30 +545,6 @@ impl GenerateCommand {
             parent.join(format!("{}.yml", model_name))
         }
     }
-}
-
-// New helper function to find SQL files recursively
-fn find_sql_files_recursively(dir: &Path) -> Result<Vec<PathBuf>> {
-    let mut result = Vec::new();
-    
-    if !dir.is_dir() {
-        return Err(anyhow::anyhow!("Path is not a directory: {}", dir.display()));
-    }
-    
-    for entry in WalkDir::new(dir)
-        .follow_links(true)
-        .into_iter()
-        .filter_map(|e| e.ok())
-    {
-        let path = entry.path();
-        
-        if path.is_file() && 
-           path.extension().and_then(|ext| ext.to_str()) == Some("sql") {
-            result.push(path.to_path_buf());
-        }
-    }
-    
-    Ok(result)
 }
 
 pub async fn generate(

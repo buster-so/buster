@@ -1,0 +1,140 @@
+---
+description: These are global rules and recommendations for the rust server.
+globs: *
+---
+
+# Global Rules and Project Structure
+
+## Project Overview
+This is a Rust web server project built with Axum, focusing on high performance, safety, and maintainability.
+
+## Project Structure
+- `src/`
+  - `routes/`
+    - `rest/` - REST API endpoints using Axum
+      - `routes/` - Individual route modules
+    - `ws/` - WebSocket handlers and related functionality
+  - `database/` - Database models, schema, and connection management
+  - `main.rs` - Application entry point and server setup
+
+## Implementation
+When working with prds, you should always mark your progress off in them as you build.
+
+## Database Connectivity
+- The primary database connection is managed through `get_pg_pool()`, which returns a lazy static `PgPool`
+- Always use this pool for database connections to ensure proper connection management
+- Example usage:
+```rust
+let mut conn = get_pg_pool().get().await?;
+```
+
+## Code Style and Best Practices
+
+### References and Memory Management
+- Prefer references over owned values when possible
+- Avoid unnecessary `.clone()` calls
+- Use `&str` instead of `String` for function parameters when the string doesn't need to be owned
+
+### Database Operations
+- Use Diesel for database migrations and query building
+- Migrations are stored in the `migrations/` directory
+
+### Concurrency Guidelines
+- Prioritize concurrent operations, especially for:
+  - API requests
+  - Database transactions
+  - File operations
+- Optimize database connection usage:
+  - Batch operations where possible
+  - Build queries/parameters before executing database operations
+  - Use bulk inserts/updates instead of individual operations
+```rust
+// Preferred: Bulk operation
+let items: Vec<_> = prepare_items();
+diesel::insert_into(table)
+    .values(&items)
+    .execute(conn)?;
+
+// Avoid: Individual operations in a loop
+for item in items {
+    diesel::insert_into(table)
+        .values(&item)
+        .execute(conn)?;
+}
+```
+
+### Error Handling
+- Never use `.unwrap()` or `.expect()` in production code
+- Always handle errors appropriately using:
+  - The `?` operator for error propagation
+  - `match` statements when specific error cases need different handling
+- Use `anyhow` for error handling:
+  - Prefer `anyhow::Result<T>` as the return type for functions that can fail
+  - Use `anyhow::Error` for error types
+  - Use `anyhow!` macro for creating custom errors
+```rust
+use anyhow::{Result, anyhow};
+
+// Example of proper error handling
+pub async fn process_data(input: &str) -> Result<Data> {
+    // Use ? for error propagation
+    let parsed = parse_input(input)?;
+    
+    // Use match when specific error cases need different handling
+    match validate_data(&parsed) {
+        Ok(valid_data) => Ok(valid_data),
+        Err(e) => Err(anyhow!("Data validation failed: {}", e))
+    }
+}
+
+// Avoid this:
+// let data = parse_input(input).unwrap(); // ❌ Never use unwrap
+```
+
+### API Design
+- REST endpoints should be in `routes/rest/routes/`
+- WebSocket handlers should be in `routes/ws/`
+- Use proper HTTP status codes
+- Implement proper validation for incoming requests
+
+### Testing
+- Write unit tests for critical functionality
+- Use integration tests for API endpoints
+- Mock external dependencies when appropriate
+
+## Common Patterns
+
+### Database Queries
+```rust
+use diesel::prelude::*;
+
+// Example of a typical database query
+pub async fn get_item(id: i32) -> Result<Item> {
+    let pool = get_pg_pool();
+    let conn = pool.get().await?;
+    
+    items::table
+        .filter(items::id.eq(id))
+        .first(&conn)
+        .map_err(Into::into)
+}
+```
+
+### Concurrent Operations
+```rust
+use futures::future::try_join_all;
+
+// Example of concurrent processing
+let futures: Vec<_> = items
+    .into_iter()
+    .map(|item| process_item(item))
+    .collect();
+let results = try_join_all(futures).await?;
+```
+
+Remember to always consider:
+1. Connection pool limits when designing concurrent operations
+2. Transaction boundaries for data consistency
+3. Error propagation and cleanup
+4. Memory usage and ownership
+5. Please use comments to help document your code and make it more readable.

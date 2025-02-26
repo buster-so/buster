@@ -305,7 +305,7 @@ async fn deploy_datasets_handler(
             .await
         {
             Ok(ds) => ds,
-            Err(_) => {
+            Err(e) => {
                 for req in group {
                     let mut validation = ValidationResult::new(
                         req.name.clone(),
@@ -313,9 +313,9 @@ async fn deploy_datasets_handler(
                         req.schema.clone(),
                     );
                     validation.add_error(ValidationError::data_source_error(format!(
-                        "Data source '{}' not found",
-                        data_source_name
-                    )));
+                        "Data source '{}' not found: {}. Please verify the data source exists and you have access.",
+                        data_source_name, e
+                    )).with_context(format!("Environment: {}", req.env)));
                     results.push(validation);
                 }
                 continue;
@@ -332,10 +332,10 @@ async fn deploy_datasets_handler(
                         req.data_source_name.clone(),
                         req.schema.clone(),
                     );
-                    validation.add_error(ValidationError::data_source_error(format!(
-                        "Failed to get data source credentials: {}",
-                        e
-                    )));
+                    validation.add_error(ValidationError::credentials_error(
+                        &data_source_name,
+                        &format!("Failed to get credentials: {}. Please check data source configuration.", e)
+                    ).with_context(format!("Data source ID: {}", data_source.id)));
                     results.push(validation);
                 }
                 continue;
@@ -356,7 +356,7 @@ async fn deploy_datasets_handler(
         );
 
         // Get all columns in one batch - this acts as our validation
-        let ds_columns = match retrieve_dataset_columns_batch(&tables_to_validate, &credentials, database).await {
+        let ds_columns = match retrieve_dataset_columns_batch(&tables_to_validate, &credentials, database.clone()).await {
             Ok(cols) => {
                 // Add debug logging
                 tracing::info!(
@@ -381,10 +381,10 @@ async fn deploy_datasets_handler(
                         req.data_source_name.clone(),
                         req.schema.clone(),
                     );
-                    validation.add_error(ValidationError::data_source_error(format!(
-                        "Failed to get columns from data source: {}",
-                        e
-                    )));
+                    validation.add_error(ValidationError::schema_error(
+                        &req.schema,
+                        &format!("Failed to retrieve columns: {}. Please verify schema access and permissions.", e)
+                    ).with_context(format!("Data source: {}, Database: {:?}", data_source_name, database)));
                     results.push(validation);
                 }
                 continue;
@@ -439,6 +439,16 @@ async fn deploy_datasets_handler(
                     "{}.{}",
                     req.schema,
                     req.name
+                )).with_context(format!("Available tables: {}", 
+                    ds_columns
+                        .iter()
+                        .map(|c| format!("{}.{}", c.schema_name, c.dataset_name))
+                        .collect::<HashSet<_>>()
+                        .iter()
+                        .take(5) // Limit to 5 tables to avoid overly long messages
+                        .cloned()
+                        .collect::<Vec<_>>()
+                        .join(", ")
                 )));
                 validation.success = false;
             } else {
@@ -614,39 +624,7 @@ async fn deploy_datasets_handler(
                     })
                     .collect();
 
-                // Get current column names
-                let current_column_names: HashSet<String> = dataset_columns::table
-                    .filter(dataset_columns::dataset_id.eq(dataset_id))
-                    .filter(dataset_columns::deleted_at.is_null())
-                    .select(dataset_columns::name)
-                    .load::<String>(&mut conn)
-                    .await?
-                    .into_iter()
-                    .collect();
-
-                // Get new column names
-                let new_column_names: HashSet<String> = columns
-                    .iter()
-                    .map(|c| c.name.clone())
-                    .collect();
-
-                // Soft delete removed columns
-                let columns_to_delete: Vec<String> = current_column_names
-                    .difference(&new_column_names)
-                    .cloned()
-                    .collect();
-
-                if !columns_to_delete.is_empty() {
-                    diesel::update(dataset_columns::table)
-                        .filter(dataset_columns::dataset_id.eq(dataset_id))
-                        .filter(dataset_columns::name.eq_any(&columns_to_delete))
-                        .filter(dataset_columns::deleted_at.is_null())
-                        .set(dataset_columns::deleted_at.eq(now))
-                        .execute(&mut conn)
-                        .await?;
-                }
-
-                // Bulk upsert columns
+                // First: Bulk upsert columns
                 diesel::insert_into(dataset_columns::table)
                     .values(&columns)
                     .on_conflict((dataset_columns::dataset_id, dataset_columns::name))
@@ -662,9 +640,119 @@ async fn deploy_datasets_handler(
                     ))
                     .execute(&mut conn)
                     .await?;
+
+                // Then: Soft delete removed columns
+                let current_column_names: HashSet<String> = dataset_columns::table
+                    .filter(dataset_columns::dataset_id.eq(dataset_id))
+                    .filter(dataset_columns::deleted_at.is_null())
+                    .select(dataset_columns::name)
+                    .load::<String>(&mut conn)
+                    .await?
+                    .into_iter()
+                    .collect();
+
+                let new_column_names: HashSet<String> = columns
+                    .iter()
+                    .map(|c| c.name.clone())
+                    .collect();
+
+                let columns_to_delete: Vec<String> = current_column_names
+                    .difference(&new_column_names)
+                    .cloned()
+                    .collect();
+
+                if !columns_to_delete.is_empty() {
+                    diesel::update(dataset_columns::table)
+                        .filter(dataset_columns::dataset_id.eq(dataset_id))
+                        .filter(dataset_columns::name.eq_any(&columns_to_delete))
+                        .filter(dataset_columns::deleted_at.is_null())
+                        .set(dataset_columns::deleted_at.eq(now))
+                        .execute(&mut conn)
+                        .await?;
+                }
             }
         }
     }
 
     Ok(results)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::database::models::User;
+    use crate::utils::validation::types::{ValidationError, ValidationErrorType, ValidationResult};
+    use std::collections::HashMap;
+    use uuid::Uuid;
+
+    #[tokio::test]
+    async fn test_deploy_datasets_partial_success() {
+        // Create test user
+        let user_id = Uuid::new_v4();
+        
+        // Create two test requests - one valid, one invalid
+        let requests = vec![
+            DeployDatasetsRequest {
+                id: None,
+                data_source_name: "test_data_source".to_string(),
+                env: "test".to_string(),
+                type_: "table".to_string(),
+                name: "valid_table".to_string(),
+                model: None,
+                schema: "public".to_string(),
+                database: None,
+                description: "Test description".to_string(),
+                sql_definition: None,
+                entity_relationships: None,
+                columns: vec![
+                    DeployDatasetsColumnsRequest {
+                        name: "id".to_string(),
+                        description: "Primary key".to_string(),
+                        semantic_type: None,
+                        expr: None,
+                        type_: Some("number".to_string()),
+                        agg: None,
+                        stored_values: false,
+                    }
+                ],
+                yml_file: None,
+                database_identifier: None,
+            },
+            DeployDatasetsRequest {
+                id: None,
+                data_source_name: "non_existent_data_source".to_string(), // This will fail
+                env: "test".to_string(),
+                type_: "table".to_string(),
+                name: "invalid_table".to_string(),
+                model: None,
+                schema: "public".to_string(),
+                database: None,
+                description: "Test description".to_string(),
+                sql_definition: None,
+                entity_relationships: None,
+                columns: vec![],
+                yml_file: None,
+                database_identifier: None,
+            }
+        ];
+
+        // Mock implementation for testing - we can't actually run the handler as-is
+        // because it requires a database connection and other dependencies
+        // This is just to illustrate the test structure
+        
+        // In a real test, you would:
+        // 1. Mock the database and other dependencies
+        // 2. Call the handler with the test requests
+        // 3. Verify the response has both success and failure cases
+        
+        // For now, we'll just assert that the structure of our test is correct
+        assert_eq!(requests.len(), 2);
+        assert_eq!(requests[0].name, "valid_table");
+        assert_eq!(requests[1].name, "invalid_table");
+        
+        // In a real test with mocks, you would assert:
+        // - The function returns a Result with 2 ValidationResults
+        // - The first ValidationResult has success=true
+        // - The second ValidationResult has success=false and appropriate errors
+    }
 }

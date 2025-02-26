@@ -1,7 +1,6 @@
 use anyhow::{Context, Result};
 use clap::Parser;
 use inquire::{Password, Text};
-use std::env;
 use thiserror::Error;
 
 use crate::utils::{

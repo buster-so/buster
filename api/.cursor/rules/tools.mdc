@@ -1,0 +1,184 @@
+---
+description: Helpful for working with and building tools
+globs: */tools/*
+---
+# Tools Documentation and Guidelines
+
+## Overview
+This document outlines the architecture, patterns, and best practices for building tools in our system. Tools are modular, reusable components that provide specific functionality to our AI agents and application.
+
+## Core Architecture
+
+### ToolExecutor Trait
+The foundation of our tools system is the `ToolExecutor` trait. Any struct that wants to be used as a tool must implement this trait:
+
+```rust
+#[async_trait]
+pub trait ToolExecutor: Send + Sync {
+    type Output: Serialize + Send;
+    async fn execute(&self, tool_call: &ToolCall) -> Result<Self::Output>;
+    fn get_schema(&self) -> serde_json::Value;
+    fn get_name(&self) -> String;
+}
+```
+
+Key components:
+- `Output`: The return type of your tool (must be serializable)
+- `execute()`: The main function that implements your tool's logic
+- `get_schema()`: Returns the JSON schema describing the tool's interface
+- `get_name()`: Returns the tool's unique identifier
+
+## Tool Categories
+
+### 1. File Tools
+Our file tools provide a robust example of well-structured tool implementation. They handle:
+- File creation and modification
+- File searching and cataloging
+- File type-specific operations
+- User interaction with files
+
+Key patterns from file tools:
+- Modular organization by functionality
+- Clear separation of concerns
+- Type-safe file operations
+- Consistent error handling
+
+### 2. Interaction Tools
+Tools that manage user and system interactions.
+
+## Best Practices
+
+### 1. Tool Structure
+- Create a new module for each tool category
+- Implement the `ToolExecutor` trait
+- Use meaningful types for `Output`
+- Provide comprehensive error handling
+
+### 2. Schema Design
+- Document all parameters clearly
+- Use descriptive names for properties
+- Include example values where helpful
+- Validate input parameters
+
+### 3. Error Handling
+- Use `anyhow::Result` for flexible error handling
+- Provide meaningful error messages
+- Handle edge cases gracefully
+- Implement proper error propagation
+
+### 4. Testing
+- Write unit tests for each tool
+- Test edge cases and error conditions
+- Mock external dependencies
+- Ensure thread safety for async operations
+
+## Creating New Tools
+
+### Step 1: Define Your Tool
+```rust
+pub struct MyNewTool {
+    // Tool-specific fields
+}
+
+#[async_trait]
+impl ToolExecutor for MyNewTool {
+    type Output = YourOutputType;
+    
+    async fn execute(&self, tool_call: &ToolCall) -> Result<Self::Output> {
+        // Implementation
+    }
+    
+    fn get_schema(&self) -> Value {
+        // Schema definition
+    }
+    
+    fn get_name(&self) -> String {
+        "my_new_tool".to_string()
+    }
+}
+```
+
+### Step 2: Schema Definition
+```json
+{
+    "name": "my_new_tool",
+    "description": "Clear description of what the tool does",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            // Tool parameters
+        },
+        "required": ["param1", "param2"]
+    }
+}
+```
+
+### Step 3: Integration
+1. Add your tool to the appropriate module
+2. Register it in the tool registry
+3. Add necessary tests
+4. Document usage examples
+
+## Common Patterns
+
+### Value Conversion
+Use `IntoValueTool` trait when you need to convert tool output to generic JSON:
+```rust
+my_tool.into_value_tool()
+```
+
+### File Operations
+For tools that modify files:
+- Implement `FileModificationTool` trait
+- Use `add_line_numbers` for better output formatting
+- Handle file permissions appropriately
+
+## Security Considerations
+1. Validate all input parameters
+2. Check file permissions before operations
+3. Sanitize file paths
+4. Handle sensitive data appropriately
+
+## Examples
+
+### File Tool Example
+```rust
+pub struct ReadFileTool {
+    base_path: PathBuf,
+}
+
+#[async_trait]
+impl ToolExecutor for ReadFileTool {
+    type Output = String;
+    
+    async fn execute(&self, tool_call: &ToolCall) -> Result<Self::Output> {
+        // Implementation
+    }
+}
+```
+
+### Interaction Tool Example
+```rust
+pub struct UserPromptTool;
+
+#[async_trait]
+impl ToolExecutor for UserPromptTool {
+    type Output = UserResponse;
+    
+    async fn execute(&self, tool_call: &ToolCall) -> Result<Self::Output> {
+        // Implementation
+    }
+}
+```
+
+## Troubleshooting
+1. Check tool registration
+2. Verify schema correctness
+3. Ensure proper error handling
+4. Validate async operations
+
+## Future Considerations
+1. Tool versioning
+2. Performance optimization
+3. Enhanced type safety
+4. Extended testing frameworks

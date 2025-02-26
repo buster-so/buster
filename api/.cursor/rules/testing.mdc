@@ -1,0 +1,332 @@
+---
+description: This is designed to help understand how to do testing in this project.
+globs: */tests/*
+---
+# Testing Rules and Best Practices
+
+## General Testing Guidelines
+- All tests must be async and use tokio test framework
+- Tests should be well-documented with clear test case descriptions and expected outputs
+- Each test should focus on testing a single piece of functionality
+- Tests should be independent and not rely on the state of other tests
+- Use meaningful test names that describe what is being tested
+
+## Unit Tests
+- Unit tests should be inline with the code they are testing using `#[cfg(test)]` modules
+- Each public function should have corresponding unit tests
+- Mock external dependencies using mockito for HTTP calls
+- Use `mockito::Server::new_async()` instead of `mockito::Server::new()`
+- Test both success and error cases
+- Test edge cases and boundary conditions
+
+## Integration Tests
+- Integration tests should be placed in the `/tests` directory
+- Organize integration tests to mirror the main codebase structure
+- Each major feature/resource should have its own test file
+- Test the interaction between multiple components
+- Use real dependencies when possible, mock only what's necessary
+- Include end-to-end workflow tests
+
+### Integration Test Setup Requirements
+- All integration tests must import and utilize the application's schema from [schema.rs](mdc:src/database/schema.rs)
+- Database models from [models.rs](mdc:src/database/models.rs) should be used for test data setup and verification
+- Environment setup must use `dotenv` for configuration:
+  ```rust
+  use dotenv::dotenv;
+  
+  #[tokio::test]
+  async fn setup_test_environment() {
+      dotenv().ok(); // Load environment variables
+      // Test environment setup
+  }
+  ```
+- Service configurations should be derived from environment variables:
+  ```rust
+  // Example of service configuration using env vars
+  let database_url = std::env::var("DATABASE_URL")
+      .expect("DATABASE_URL must be set for integration tests");
+  let test_api_key = std::env::var("TEST_API_KEY")
+      .expect("TEST_API_KEY must be set for integration tests");
+  ```
+- Test database setup should include:
+  ```rust
+  use crate::database::{schema, models};
+  
+  async fn setup_test_db() -> PgPool {
+      let pool = PgPoolOptions::new()
+          .max_connections(5)
+          .connect(&std::env::var("TEST_DATABASE_URL")?)
+          .await?;
+      
+      // Run migrations or setup test data
+      // Use schema and models for consistency
+      Ok(pool)
+  }
+  ```
+
+### Required Environment Variables
+Create a `.env.test` file with necessary test configurations:
+```env
+TEST_DATABASE_URL=postgres://user:pass@localhost/test_db
+TEST_API_KEY=test-key
+TEST_ENV=test
+# Add other required test environment variables
+```
+
+## Test Structure
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use mockito;
+    use tokio;
+
+    // Optional: Setup function for common test initialization
+    async fn setup() -> TestContext {
+        // Setup code here
+    }
+
+    #[tokio::test]
+    async fn test_name() {
+        // Test case description in comments
+        // Expected output in comments
+        
+        // Arrange
+        // Setup test data and dependencies
+        
+        // Act
+        // Execute the function being tested
+        
+        // Assert
+        // Verify the results
+    }
+}
+```
+
+## Mocking Guidelines
+- Use mockito for HTTP service mocks
+- Create mock responses that match real API responses
+- Include both successful and error responses in mocks
+- Clean up mocks after tests complete
+
+## Error Testing
+- Test error conditions and error handling
+- Verify error messages and error types
+- Test timeout scenarios
+- Test connection failures
+- Test invalid input handling
+
+## Database Testing
+- Use a separate test database for integration tests
+- Clean up test data after tests complete
+- Test database transactions and rollbacks
+- Test database connection error handling
+
+## Test Output
+- Tests should provide clear error messages
+- Use descriptive assert messages
+- Print relevant debug information in test failures
+- Log test execution progress for long-running tests
+
+## CI/CD Considerations
+- All tests must pass in CI environment
+- Tests should be reproducible
+- Tests should not have external dependencies that could fail CI
+- Test execution time should be reasonable
+
+## Example Test
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use mockito;
+    use tokio;
+
+    #[tokio::test]
+    async fn test_api_call_success() {
+        // Test case: Successful API call returns expected response
+        // Expected: Response contains user data with status 200
+        
+        let mut server = mockito::Server::new_async().await;
+        
+        let mock = server
+            .mock("GET", "/api/user")
+            .match_header("authorization", "Bearer test-token")
+            .with_status(200)
+            .with_body(r#"{"id": "123", "name": "Test User"}"#)
+            .create();
+
+        let client = ApiClient::new(server.url());
+        let response = client.get_user().await.unwrap();
+        
+        assert_eq!(response.id, "123");
+        assert_eq!(response.name, "Test User");
+        
+        mock.assert();
+    }
+}
+```
+
+## Example Integration Test
+```rust
+use crate::database::{models, schema};
+use dotenv::dotenv;
+
+#[tokio::test]
+async fn test_user_creation_flow() {
+    // Load test environment
+    dotenv().ok();
+    
+    // Setup test database connection
+    let pool = setup_test_db().await.expect("Failed to setup test database");
+    
+    // Create test user using models
+    let test_user = models::User {
+        id: Uuid::new_v4(),
+        email: "test@example.com".to_string(),
+        name: Some("Test User".to_string()),
+        config: serde_json::Value::Null,
+        created_at: Utc::now(),
+        updated_at: Utc::now(),
+        attributes: serde_json::Value::Null,
+    };
+    
+    // Use schema for database operations
+    diesel::insert_into(schema::users::table)
+        .values(&test_user)
+        .execute(&mut pool.get().await?)
+        .expect("Failed to insert test user");
+    
+    // Test application logic
+    let response = create_test_client()
+        .get("/api/users")
+        .send()
+        .await?;
+    
+    assert_eq!(response.status(), 200);
+    // Additional assertions...
+}
+```
+
+## Common Test Utilities
+- All shared test utilities should be placed in `tests/common/mod.rs`
+- Common database setup and teardown functions should be in `tests/common/db.rs`
+- Environment setup utilities should be in `tests/common/env.rs`
+- Shared test fixtures should be in `tests/common/fixtures/`
+
+### Common Test Module Structure
+```
+tests/
+├── common/
+│   ├── mod.rs           # Main module file that re-exports all common utilities
+│   ├── db.rs            # Database setup/teardown utilities
+│   ├── env.rs           # Environment configuration utilities
+│   ├── fixtures/        # Test data fixtures
+│   │   ├── mod.rs       # Exports all fixtures
+│   │   ├── users.rs     # User-related test data
+│   │   └── threads.rs   # Thread-related test data
+│   └── helpers.rs       # General test helper functions
+└── integration/         # Integration test files
+```
+
+### Common Database Setup
+```rust
+// tests/common/db.rs
+use diesel::PgConnection;
+use diesel::r2d2::{ConnectionManager, Pool};
+use crate::database::{models, schema};
+use dotenv::dotenv;
+
+pub struct TestDb {
+    pub pool: Pool<ConnectionManager<PgConnection>>,
+}
+
+impl TestDb {
+    pub async fn new() -> anyhow::Result<Self> {
+        dotenv().ok();
+        
+        let database_url = std::env::var("TEST_DATABASE_URL")
+            .expect("TEST_DATABASE_URL must be set");
+            
+        let manager = ConnectionManager::<PgConnection>::new(database_url);
+        let pool = Pool::builder()
+            .max_size(5)
+            .build(manager)?;
+            
+        Ok(Self { pool })
+    }
+    
+    pub async fn setup_test_data(&self) -> anyhow::Result<()> {
+        // Add common test data setup here
+        Ok(())
+    }
+    
+    pub async fn cleanup(&self) -> anyhow::Result<()> {
+        // Cleanup test data
+        Ok(())
+    }
+}
+```
+
+### Common Environment Setup
+```rust
+// tests/common/env.rs
+use std::sync::Once;
+use dotenv::dotenv;
+
+static ENV_SETUP: Once = Once::new();
+
+pub fn setup_test_env() {
+    ENV_SETUP.call_once(|| {
+        dotenv().ok();
+        // Set any default environment variables for tests
+        std::env::set_var("TEST_ENV", "test");
+    });
+}
+```
+
+### Example Test Fixtures
+```rust
+// tests/common/fixtures/users.rs
+use crate::database::models::User;
+use chrono::Utc;
+use uuid::Uuid;
+
+pub fn create_test_user() -> User {
+    User {
+        id: Uuid::new_v4(),
+        email: "test@example.com".to_string(),
+        name: Some("Test User".to_string()),
+        config: serde_json::Value::Null,
+        created_at: Utc::now(),
+        updated_at: Utc::now(),
+        attributes: serde_json::Value::Null,
+    }
+}
+```
+
+### Using Common Test Utilities
+```rust
+// Example integration test using common utilities
+use crate::tests::common::{db::TestDb, env::setup_test_env, fixtures};
+
+#[tokio::test]
+async fn test_user_creation() {
+    // Setup test environment
+    setup_test_env();
+    
+    // Initialize test database
+    let test_db = TestDb::new().await.expect("Failed to setup test database");
+    
+    // Get test user fixture
+    let test_user = fixtures::users::create_test_user();
+    
+    // Run test
+    let result = create_user(&test_db.pool, &test_user).await?;
+    
+    // Cleanup
+    test_db.cleanup().await?;
+    
+    assert!(result.is_ok());
+}
+```

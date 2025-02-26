@@ -124,12 +124,12 @@ async fn route_to_query(
                 }
             };
             
-            tracing::info!("Redshift query using credentials - database: {}, host: {}, port: {}", 
+            tracing::info!("Redshift query using credentials - database: {:?}, host: {}, port: {}", 
                 credentials.database, credentials.host, credentials.port);
 
             let redshift_client = get_redshift_connection(&credentials).await?;
 
-            let results = match redshift_query(redshift_client, sql.clone()).await {
+            let results = match redshift_query(redshift_client, sql.clone(), limit).await {
                 Ok(results) => results,
                 Err(e) => {
                     tracing::error!("There was an issue while fetching the tables: {}", e);

@@ -75,8 +75,9 @@ pub struct PostgresCredentials {
     pub port: u16,
     pub username: String,
     pub password: String,
-    pub database: String,
-    pub schema: Option<String>,
+    #[serde(alias = "dbname")]
+    pub database: Option<String>,
+    pub schemas: Option<Vec<String>>,
     pub jump_host: Option<String>,
     pub ssh_username: Option<String>,
     pub ssh_private_key: Option<String>,
@@ -227,8 +228,8 @@ pub async fn get_data_source_credentials(
                         port: credential.port,
                         username: credential.username,
                         password: credential.password,
-                        database: Some(credential.database),
-                        schemas: credential.schema.map(|s| vec![s]),
+                        database: credential.database.clone(),
+                        schemas: credential.schemas.clone(),
                     };
                     Credential::Redshift(redshift_creds)
                 }

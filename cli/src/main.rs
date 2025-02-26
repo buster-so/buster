@@ -5,7 +5,7 @@ mod utils;
 
 use clap::{Parser, Subcommand};
 use colored::*;
-use commands::{auth::AuthArgs, deploy_v2, import, init};
+use commands::{auth::AuthArgs, deploy, init};
 
 pub const APP_NAME: &str = "buster";
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -15,7 +15,11 @@ pub const GIT_HASH: &str = env!("GIT_HASH");
 #[derive(Subcommand)]
 #[clap(rename_all = "kebab-case")]
 pub enum Commands {
-    Init,
+    Init {
+        /// Path to create the buster.yml file (defaults to current directory)
+        #[arg(long)]
+        destination_path: Option<String>,
+    },
     /// Authenticate with Buster API
     Auth {
         /// The Buster API host URL
@@ -59,7 +63,6 @@ pub enum Commands {
         #[arg(long, default_value_t = false)]
         flat_structure: bool,
     },
-    Import,
     Deploy {
         #[arg(long)]
         path: Option<String>,
@@ -83,7 +86,7 @@ async fn main() {
 
     // TODO: All commands should check for an update.
     let result = match args.cmd {
-        Commands::Init => init().await,
+        Commands::Init { destination_path } => init(destination_path.as_deref()).await,
         Commands::Auth {
             host,
             api_key,
@@ -143,12 +146,11 @@ async fn main() {
             )
             .await
         }
-        Commands::Import => import().await,
         Commands::Deploy {
             path,
             dry_run,
             recursive,
-        } => deploy_v2(path.as_deref(), dry_run, recursive).await,
+        } => deploy(path.as_deref(), dry_run, recursive).await,
     };
 
     if let Err(e) = result {

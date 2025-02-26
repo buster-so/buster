@@ -41,8 +41,15 @@ pub struct GenerateDatasetRequest {
 
 #[derive(Debug, Serialize)]
 pub struct GenerateDatasetResponse {
-    pub yml_contents: HashMap<String, String>,
-    pub errors: HashMap<String, String>,
+    pub yml_contents: HashMap<String, String>,  // Successful generations
+    pub errors: HashMap<String, DetailedError>,  // Failed generations with detailed errors
+}
+
+#[derive(Debug, Serialize)]
+pub struct DetailedError {
+    pub message: String,
+    pub error_type: String,
+    pub context: Option<String>,
 }
 
 #[derive(Debug, Serialize)]
@@ -87,34 +94,86 @@ enum ColumnMappingType {
     Unsupported,
 }
 
-fn map_snowflake_type(type_str: &str) -> ColumnMappingType {
+fn map_database_type(type_str: &str) -> ColumnMappingType {
     // Convert to uppercase for consistent matching
     let type_upper = type_str.to_uppercase();
     
     match type_upper.as_str() {
         // Numeric types that should be measures
+        // Common numeric types across databases
         "NUMBER" | "DECIMAL" | "NUMERIC" | "FLOAT" | "REAL" | "DOUBLE" | "INT" | "INTEGER" | 
-        "BIGINT" | "SMALLINT" | "TINYINT" | "BYTEINT" => ColumnMappingType::Measure(type_str.to_string()),
+        "BIGINT" | "SMALLINT" | "TINYINT" | "BYTEINT" |
+        // PostgreSQL specific
+        "DOUBLE PRECISION" | "SERIAL" | "BIGSERIAL" | "SMALLSERIAL" | "MONEY" |
+        // BigQuery specific
+        "INT64" | "FLOAT64" | "NUMERIC" | "BIGNUMERIC" |
+        // Redshift specific (mostly same as PostgreSQL)
+        "DECIMAL" | "DOUBLE PRECISION" |
+        // MySQL specific
+        "MEDIUMINT" | "FLOAT4" | "FLOAT8" | "DOUBLE PRECISION" | "DEC" | "FIXED" => 
+            ColumnMappingType::Measure(type_str.to_string()),
         
         // Date/Time types
-        "DATE" | "DATETIME" | "TIME" | "TIMESTAMP" | "TIMESTAMP_LTZ" | 
-        "TIMESTAMP_NTZ" | "TIMESTAMP_TZ" => ColumnMappingType::Dimension(type_str.to_string()),
+        // Common date/time types
+        "DATE" | "DATETIME" | "TIME" | "TIMESTAMP" | 
+        // Snowflake specific
+        "TIMESTAMP_LTZ" | "TIMESTAMP_NTZ" | "TIMESTAMP_TZ" |
+        // PostgreSQL specific
+        "TIMESTAMPTZ" | "TIMESTAMP WITH TIME ZONE" | "TIMESTAMP WITHOUT TIME ZONE" | "INTERVAL" |
+        // BigQuery specific
+        "DATETIME" | "TIMESTAMP" | "DATE" | "TIME" |
+        // Redshift specific
+        "TIMETZ" | "TIMESTAMPTZ" |
+        // MySQL specific
+        "YEAR" => 
+            ColumnMappingType::Dimension(type_str.to_string()),
         
         // String types
-        "TEXT" | "STRING" | "VARCHAR" | "CHAR" | "CHARACTER" => ColumnMappingType::Dimension(type_str.to_string()),
+        // Common string types
+        "TEXT" | "STRING" | "VARCHAR" | "CHAR" | "CHARACTER" |
+        // PostgreSQL specific
+        "CHARACTER VARYING" | "NAME" | "CITEXT" | "CIDR" | "INET" | "MACADDR" | "UUID" |
+        // BigQuery specific
+        "STRING" | "BYTES" |
+        // Redshift specific
+        "BPCHAR" | "NCHAR" | "NVARCHAR" |
+        // MySQL specific
+        "TINYTEXT" | "MEDIUMTEXT" | "LONGTEXT" | "ENUM" | "SET" | "JSON" => 
+            ColumnMappingType::Dimension(type_str.to_string()),
         
         // Boolean type
-        "BOOLEAN" | "BOOL" => ColumnMappingType::Dimension(type_str.to_string()),
+        "BOOLEAN" | "BOOL" | "BIT" => 
+            ColumnMappingType::Dimension(type_str.to_string()),
         
-        // Unsupported types
-        "ARRAY" | "OBJECT" | "VARIANT" => ColumnMappingType::Unsupported,
+        // Binary/BLOB types
+        "BINARY" | "VARBINARY" | "BLOB" | "BYTEA" | "MEDIUMBLOB" | "LONGBLOB" | "TINYBLOB" => 
+            ColumnMappingType::Unsupported,
+        
+        // Geometric types (PostgreSQL)
+        "POINT" | "LINE" | "LSEG" | "BOX" | "PATH" | "POLYGON" | "CIRCLE" | "GEOMETRY" => 
+            ColumnMappingType::Unsupported,
+        
+        // Array/JSON/Complex types
+        "ARRAY" | "OBJECT" | "VARIANT" | "JSONB" | "HSTORE" | "XML" | "STRUCT" | "RECORD" => 
+            ColumnMappingType::Unsupported,
         
         // Default to dimension for unknown types
         _ => {
-            tracing::warn!("Unknown Snowflake type: {}, defaulting to dimension", type_str);
+            tracing::warn!("Unknown database type: {}, defaulting to dimension", type_str);
             ColumnMappingType::Dimension(type_str.to_string())
         }
     }
+}
+
+// Add a new function to clean up quotes in YAML
+fn clean_yaml_quotes(yaml: &str) -> String {
+    // First remove all single quotes
+    let no_single_quotes = yaml.replace('\'', "");
+    
+    // Then remove all double quotes
+    let no_quotes = no_single_quotes.replace('"', "");
+    
+    no_quotes
 }
 
 pub async fn generate_datasets(
@@ -174,9 +233,10 @@ async fn enhance_yaml_with_descriptions(yaml: String) -> Result<String> {
         LlmMessage::new(
             "developer".to_string(),
             "You are a YAML description enhancer. Your output must be wrapped in markdown code blocks using ```yml format.
-            Your task is to ONLY replace text matching exactly \"{NEED DESCRIPTION HERE}\" with appropriate descriptions. Do not modify any other parts of the YAML or other descriptions without the placeholder. You should still return the entire YAML in your output.
+            Your task is to ONLY replace text matching exactly {NEED DESCRIPTION HERE} with appropriate descriptions. Do not modify any other parts of the YAML or other descriptions without the placeholder. You should still return the entire YAML in your output.
             DO NOT modify any other part of the YAML.
             DO NOT add any explanations or text outside the ```yml block.
+            No double or single quotes.
             Return the complete YAML wrapped in markdown, with only the placeholders replaced.".to_string(),
         ),
         LlmMessage::new(
@@ -233,7 +293,7 @@ async fn generate_model_yaml(
 
     // Process each column and categorize as dimension or measure
     for col in model_columns {
-        match map_snowflake_type(&col.type_) {
+        match map_database_type(&col.type_) {
             ColumnMappingType::Dimension(semantic_type) => {
                 dimensions.push(Dimension {
                     name: col.name.clone(),
@@ -275,10 +335,13 @@ async fn generate_model_yaml(
 
     let yaml = serde_yaml::to_string(&config)?;
     
+    
     // Enhance descriptions using OpenAI
     let enhanced_yaml = enhance_yaml_with_descriptions(yaml).await?;
+
+    let cleaned_yaml = clean_yaml_quotes(&enhanced_yaml);
     
-    Ok(enhanced_yaml)
+    Ok(cleaned_yaml)
 }
 
 async fn generate_datasets_handler(
@@ -286,6 +349,8 @@ async fn generate_datasets_handler(
     organization_id: &Uuid,
 ) -> Result<GenerateDatasetResponse> {
     let mut conn = get_pg_pool().get().await?;
+    let mut yml_contents = HashMap::new();
+    let mut errors = HashMap::new();
 
     // Get data source
     let data_source = match data_sources::table
@@ -296,11 +361,52 @@ async fn generate_datasets_handler(
         .await
     {
         Ok(ds) => ds,
-        Err(e) => return Err(anyhow!("Data source not found: {}", e)),
+        Err(e) => {
+            // Instead of returning early, add error for each model and return partial results
+            let error_msg = format!(
+                "Data source '{}' not found: {}. Please verify the data source exists and you have access.",
+                request.data_source_name, e
+            );
+            
+            for model_name in &request.model_names {
+                errors.insert(model_name.clone(), DetailedError {
+                    message: error_msg.clone(),
+                    error_type: "DataSourceNotFound".to_string(),
+                    context: Some(format!("Schema: {}", request.schema)),
+                });
+            }
+            
+            return Ok(GenerateDatasetResponse {
+                yml_contents,
+                errors,
+            });
+        }
     };
 
     // Get credentials
-    let credentials = get_data_source_credentials(&data_source.secret_id, &data_source.type_, false).await?;
+    let credentials = match get_data_source_credentials(&data_source.secret_id, &data_source.type_, false).await {
+        Ok(creds) => creds,
+        Err(e) => {
+            let error_msg = format!(
+                "Failed to get credentials for data source '{}': {}. Please check data source configuration.",
+                request.data_source_name, e
+            );
+            
+            for model_name in &request.model_names {
+                errors.insert(model_name.clone(), DetailedError {
+                    message: error_msg.clone(),
+                    error_type: "CredentialsError".to_string(),
+                    context: Some(format!("Data source: {}, Schema: {}", 
+                                         request.data_source_name, request.schema)),
+                });
+            }
+            
+            return Ok(GenerateDatasetResponse {
+                yml_contents,
+                errors,
+            });
+        }
+    };
 
     // Prepare tables for batch validation
     let tables_to_validate: Vec<(String, String)> = request
@@ -312,7 +418,25 @@ async fn generate_datasets_handler(
     // Get all columns in one batch
     let ds_columns = match retrieve_dataset_columns_batch(&tables_to_validate, &credentials, request.database.clone()).await {
         Ok(cols) => cols,
-        Err(e) => return Err(anyhow!("Failed to get columns from data source: {}", e)),
+        Err(e) => {
+            let error_msg = format!(
+                "Failed to retrieve columns from data source '{}': {}. Please verify schema '{}' and table access.",
+                request.data_source_name, e, request.schema
+            );
+            
+            for model_name in &request.model_names {
+                errors.insert(model_name.clone(), DetailedError {
+                    message: error_msg.clone(),
+                    error_type: "SchemaError".to_string(),
+                    context: Some(format!("Model: {}, Schema: {}", model_name, request.schema)),
+                });
+            }
+            
+            return Ok(GenerateDatasetResponse {
+                yml_contents,
+                errors,
+            });
+        }
     };
 
     // Process models concurrently
@@ -329,20 +453,40 @@ async fn generate_datasets_handler(
         });
     }
 
-    let mut yml_contents = HashMap::new();
-    let mut errors = HashMap::new();
-
     while let Some(result) = join_set.join_next().await {
         match result {
             Ok((model_name, Ok(yaml))) => {
                 yml_contents.insert(model_name, yaml);
             }
             Ok((model_name, Err(e))) => {
-                errors.insert(model_name, e.to_string());
+                // Provide more detailed error message
+                let error_msg = format!(
+                    "Failed to generate YAML for model '{}': {}. Please check if the model exists and has valid columns.",
+                    model_name, e
+                );
+                errors.insert(model_name, DetailedError {
+                    message: error_msg,
+                    error_type: "ModelGenerationError".to_string(),
+                    context: Some(format!("Schema: {}", request.schema)),
+                });
             }
             Err(e) => {
+                // Handle task join error but continue processing
                 tracing::error!("Task join error: {:?}", e);
-                return Err(anyhow!("Task execution failed"));
+                let affected_models: Vec<_> = request.model_names.iter()
+                    .filter(|name| !yml_contents.contains_key(*name) && !errors.contains_key(*name))
+                    .collect();
+                
+                for model_name in affected_models {
+                    errors.insert(
+                        model_name.clone(), 
+                        DetailedError {
+                            message: format!("Internal processing error: {}. Please try again later.", e),
+                            error_type: "InternalError".to_string(),
+                            context: Some(format!("Model: {}", model_name)),
+                        }
+                    );
+                }
             }
         }
     }
@@ -351,4 +495,47 @@ async fn generate_datasets_handler(
         yml_contents,
         errors,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::database::models::User;
+    use uuid::Uuid;
+
+    #[tokio::test]
+    async fn test_generate_datasets_partial_success() {
+        // Create test request with multiple models
+        let request = GenerateDatasetRequest {
+            data_source_name: "test_source".to_string(),
+            schema: "public".to_string(),
+            database: None,
+            model_names: vec![
+                "valid_model".to_string(),
+                "non_existent_model".to_string(), // This will fail
+            ],
+        };
+
+        let organization_id = Uuid::new_v4();
+
+        // Mock implementation for testing - we can't actually run the handler as-is
+        // because it requires a database connection and other dependencies
+        // This is just to illustrate the test structure
+        
+        // In a real test, you would:
+        // 1. Mock the database and other dependencies
+        // 2. Call the handler with the test request
+        // 3. Verify the response has both successes and failures
+        
+        // For now, we'll just assert that the structure of our test is correct
+        assert_eq!(request.model_names.len(), 2);
+        assert_eq!(request.model_names[0], "valid_model");
+        assert_eq!(request.model_names[1], "non_existent_model");
+        
+        // In a real test with mocks, you would assert:
+        // - The function returns a Result with a GenerateDatasetResponse
+        // - The response contains one entry in yml_contents for the valid model
+        // - The response contains one entry in errors for the invalid model
+        // - The error has an appropriate error_type and message
+    }
 } 

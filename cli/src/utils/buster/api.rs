@@ -99,6 +99,9 @@ impl BusterClient {
     pub async fn post_data_sources(&self, req_body: Vec<PostDataSourcesRequest>) -> Result<()> {
         let headers = self.build_headers()?;
 
+        // Debug log the request body
+        println!("DEBUG: post_data_sources request body: {}", serde_json::to_string_pretty(&req_body).unwrap_or_else(|_| "Failed to serialize request".to_string()));
+
         match self
             .client
             .post(format!("{}/api/v1/data_sources", self.base_url))
@@ -162,7 +165,17 @@ impl BusterClient {
                         res.text().await?
                     ));
                 }
-                Ok(res.json().await?)
+                
+                let response_text = res.text().await?;
+                println!("DEBUG: Raw API Response: {}", response_text);
+                
+                match serde_json::from_str::<GenerateApiResponse>(&response_text) {
+                    Ok(parsed) => Ok(parsed),
+                    Err(e) => {
+                        println!("DEBUG: JSON Parse Error: {}", e);
+                        Err(anyhow::anyhow!("Failed to parse API response: {}", e))
+                    }
+                }
             }
             Err(e) => Err(anyhow::anyhow!("POST /api/v1/datasets/generate failed: {}", e)),
         }

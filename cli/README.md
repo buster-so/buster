@@ -276,6 +276,41 @@ exclude_tags:
 
 During deployment, any model with matching tags will be automatically excluded.
 
+## File and Tag Exclusions
+
+Buster CLI provides a unified way to exclude files from processing across all commands. You can specify exclusions in your `buster.yml` file:
+
+```yaml
+data_source_name: "my_data_source"
+schema: "my_schema"
+database: "my_database"
+exclude_files:
+  - "**/*_temp.sql"
+  - "staging/**/*.sql"
+  - "tests/**/*.yml"
+exclude_tags:
+  - "test"
+  - "deprecated"
+  - "wip"
+```
+
+### Exclude Files
+
+The `exclude_files` section allows you to specify glob patterns for files that should be excluded from processing. This works for any command that processes files.
+
+Common patterns:
+- `"**/*_temp.sql"` - Exclude any SQL file ending with _temp.sql in any directory
+- `"staging/**/*.sql"` - Exclude all SQL files in the staging directory and its subdirectories
+- `"test_*.yml"` - Exclude all YAML files starting with test_
+
+### Exclude Tags
+
+The `exclude_tags` section allows you to exclude files based on tags specified in the file content. This is useful for excluding files that are marked as test, deprecated, etc.
+
+Tags are specified in the SQL files using the format: `-- tags = ['tag1', 'tag2']`
+
+When a file contains any of the excluded tags, it will be skipped by all commands.
+
 ## Best Practices
 
 1. **Organization**

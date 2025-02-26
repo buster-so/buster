@@ -1,0 +1,131 @@
+---
+description: This is helpful for building libs for our web server to interact with.
+globs: libs/*
+---
+
+# Library Construction Guide
+
+## Directory Structure
+```
+libs/
+├── my_lib/
+│   ├── Cargo.toml       # Library-specific manifest
+│   ├── src/
+│   │   ├── lib.rs       # Library root
+│   │   ├── models/      # Data structures and types
+│   │   ├── utils/       # Utility functions
+│   │   └── errors.rs    # Custom error types
+│   └── tests/           # Integration tests
+```
+
+## Cargo.toml Template
+```toml
+[package]
+name = "my_lib"
+version = "0.1.0"
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+# Inherit workspace dependencies
+# This ensures consistent versions across the project
+[dependencies]
+serde.workspace = true      # If defined in workspace
+tokio.workspace = true      # If defined in workspace
+thiserror.workspace = true  # If defined in workspace
+
+# Library-specific dependencies (not in workspace)
+some-specific-dep = "1.0"
+
+# Development dependencies
+[dev-dependencies]
+tokio-test.workspace = true     # If defined in workspace
+assert_matches.workspace = true  # If defined in workspace
+
+# Feature flags - can inherit from workspace or be lib-specific
+[features]
+default = []
+async = ["tokio"]  # Example of a library-specific feature
+```
+
+## Best Practices
+
+### 1. Workspace Integration
+- Use `.workspace = true` for common fields and dependencies
+- Only specify library-specific versions for unique dependencies
+- Inherit common development dependencies from workspace
+- Keep feature flags modular and specific to the library's needs
+
+### 2. Library Structure
+- Keep the library focused on a single responsibility
+- Use clear module hierarchies
+- Export public API through `lib.rs`
+- Follow the workspace's common patterns
+
+Example `lib.rs`:
+```rust
+//! My Library documentation
+//! 
+//! This library provides...
+
+// Re-export common workspace types if needed
+pub use common_types::{Result, Error};
+
+pub mod models;
+pub mod utils;
+mod errors;
+
+// Re-exports
+pub use errors::Error;
+pub use models::{ImportantType, AnotherType};
+```
+
+### 3. Error Handling
+- Use the workspace's common error types where appropriate
+- Define library-specific errors only when needed
+- Implement conversions to/from workspace error types
+
+Example `errors.rs`:
+```rust
+use thiserror::Error;
+use common_types::Error as WorkspaceError;
+
+#[derive(Error, Debug)]
+pub enum Error {
+    #[error("library specific error: {0}")]
+    LibrarySpecific(String),
+    
+    #[error(transparent)]
+    Workspace(#[from] WorkspaceError),
+}
+```
+
+### 4. Testing
+- Follow workspace testing conventions
+- Use shared test utilities from workspace when available
+- Keep library-specific test helpers in the library
+- Use workspace-defined test macros if available
+
+### 5. Documentation
+- Follow workspace documentation style
+- Link to related workspace documentation
+- Document workspace integration points
+- Include examples showing workspace type usage
+
+### 6. Integration Points
+- Define clear boundaries with other workspace crates
+- Use workspace traits and interfaces
+- Share common utilities through workspace-level crates
+- Consider cross-crate testing
+
+### 7. Development Workflow
+- Run workspace-level tests when making changes
+- Update workspace documentation if needed
+- Follow workspace versioning strategy
+- Use workspace-level CI/CD pipelines
+
+### 8. Dependencies
+- Prefer workspace-level dependencies
+- Only add library-specific dependencies when necessary
+- Keep dependencies minimal and focused
+- Document any deviations from workspace versions

@@ -1,7 +1,0 @@
-# These fields need to be set in the buster.yml, but if they are set on the model level, it will override the global settings.
-
-data_source_name: "buster_data_source" # Required: The id of the data source to associate the models with. This
-schema: "buster" # Required: The schema to associate the models with.
-
-database: "postgres" # Optional: Only required in situations where the database is not specified in the data source.
-

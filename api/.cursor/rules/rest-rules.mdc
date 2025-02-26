@@ -1,0 +1,112 @@
+---
+description: This rule is helpful for understanding how to build our rest functions. Structure, common patterns, where to look for types, etc.
+globs: src/routes/rest/*
+---
+
+# REST API Formatting Rules
+
+## Directory Structure
+- All REST routes should be located under `src/routes/rest/routes/`
+- Each resource should have its own directory (e.g., `api_keys`, `datasets`)
+- Resource directories should contain individual files for each operation
+- Each resource directory should have a `mod.rs` that exports and configures the routes
+
+Example folder structure:
+```
+src/routes/rest/
+├── routes/
+│   ├── api_keys/
+│   │   ├── mod.rs                 # Router configuration and exports
+│   │   ├── list_api_keys.rs       # GET / - Contains ApiKeyInfo type definition
+│   │   ├── get_api_key.rs         # GET /:id
+│   │   ├── post_api_key.rs        # POST /
+│   │   └── delete_api_key.rs      # DELETE /:id
+│   │
+│   ├── datasets/
+│   │   ├── mod.rs
+│   │   ├── list_datasets.rs       # GET /
+│   │   ├── get_dataset.rs         # GET /:id
+│   │   ├── post_dataset.rs        # POST /
+│   │   ├── update_dataset.rs      # PUT /:id
+│   │   ├── patch_dataset.rs       # PATCH /:id
+│   │   ├── delete_dataset.rs      # DELETE /:id
+│   │   └── deploy_dataset.rs      # POST /:id/deploy (action endpoint)
+│   │
+│   └── users/
+│       ├── mod.rs
+│       ├── list_users.rs
+│       ├── get_user.rs
+│       ├── post_user.rs
+│       ├── update_user.rs
+│       └── api_keys/              # Sub-resource example
+│           ├── mod.rs
+│           ├── list_user_api_keys.rs
+│           └── post_user_api_key.rs
+```
+
+Note: File names should be descriptive and match their HTTP operation (list_, get_, post_, update_, patch_, delete_). For action endpoints, use a descriptive verb (deploy_, publish_, etc.).
+
+## Route Handler Pattern
+- Each REST endpoint should follow a two-function pattern:
+  1. Main route handler (e.g., `get_api_key`) that:
+     - Handles HTTP-specific concerns (status codes, request/response types)
+     - Calls the business logic handler
+     - Wraps responses in `ApiResponse`
+     - Handles error conversion to HTTP responses
+  2. Business logic handler (e.g., `get_api_key_handler`) that:
+     - Contains pure business logic
+     - Returns `Result<T>` where T is your data type
+     - Can be reused across different routes (REST/WebSocket)
+     - Handles database operations and core functionality
+
+## Type Definitions
+- Response types should be defined in the corresponding list operation file (e.g., `ApiKeyInfo` in `list_api_keys.rs`)
+- These types can be reused across different operations on the same resource
+- Use strong typing with Rust structs for request/response bodies
+
+## Router Configuration
+- Each resource module should have a `mod.rs` that defines its router
+- Use axum's `Router::new()` to define routes
+- Group related routes with `.merge()`
+- Apply middleware (like auth) at the router level where appropriate
+- Follow RESTful patterns for endpoints:
+  - Collection endpoints (no ID):
+    - GET / - List resources
+    - POST / - Create resources (accepts single item or array)
+    - PUT / - Bulk update resources by criteria
+    - DELETE / - Bulk delete resources by criteria
+  - Single resource endpoints (with ID):
+    - GET /:id - Get single resource
+    - PUT /:id - Full update of resource (accepts single item or array of updates)
+    - PATCH /:id - Partial update of resource (accepts single item or array of patches)
+    - DELETE /:id - Delete resources (accepts single id or array of ids)
+  - Sub-resource endpoints:
+    - GET /:id/sub_resource - List sub-resources
+    - POST /:id/sub_resource - Create sub-resources (accepts single item or array)
+  - Action endpoints (for operations that don't fit CRUD):
+    - POST /:id/action_name - Perform specific action
+    - Example: POST /datasets/:id/deploy
+  - Query/Filter endpoints:
+    - GET /search - Complex search with query params
+    - GET /filter - Filtered list with specific criteria
+
+Note: All mutation endpoints (POST, PUT, PATCH, DELETE) should accept both single items and arrays by default. The handler should handle both cases seamlessly. This eliminates the need for separate /bulk endpoints.
+
+## Example Implementation
+See @src/routes/rest/routes/api_keys/get_api_key.rs for a reference implementation that demonstrates:
+- Separation of HTTP and business logic
+- Error handling pattern
+- Type usage and database operations
+- Clean abstraction of business logic for potential reuse
+
+## Error Handling
+- Business logic handlers should return `Result<T>`
+- REST handlers should convert errors to appropriate HTTP status codes
+- Use `ApiResponse` enum for consistent response formatting
+- Include appropriate error logging using `tracing`
+
+## Middleware
+- Most the time, every new route should be authenticated, unless specified differently by the user.
+- Apply authentication and other middleware at the router level
+- Use `route_layer` to apply middleware to groups of routes
+- Keep middleware configuration in the resource's `mod.rs`

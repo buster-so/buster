@@ -108,5 +108,12 @@ pub struct GenerateApiRequest {
 #[derive(Debug, Deserialize)]
 pub struct GenerateApiResponse {
     pub yml_contents: HashMap<String, String>,
-    pub errors: HashMap<String, String>,
+    pub errors: HashMap<String, GenerateApiError>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct GenerateApiError {
+    pub message: String,
+    pub error_type: Option<String>,
+    pub context: Option<String>,
 }

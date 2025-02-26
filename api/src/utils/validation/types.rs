@@ -15,6 +15,7 @@ pub struct ValidationError {
     pub column_name: Option<String>,
     pub message: String,
     pub suggestion: Option<String>,
+    pub context: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
@@ -31,6 +32,11 @@ pub enum ValidationErrorType {
     DataSourceMismatch,
     RequiredFieldMissing,
     DataSourceNotFound,
+    SchemaError,
+    CredentialsError,
+    DatabaseError,
+    ValidationError,
+    InternalError,
 }
 
 impl ValidationResult {
@@ -62,7 +68,13 @@ impl ValidationError {
             column_name,
             message,
             suggestion,
+            context: None,
         }
+    }
+
+    pub fn with_context(mut self, context: String) -> Self {
+        self.context = Some(context);
+        self
     }
 
     pub fn table_not_found(table_name: &str) -> Self {
@@ -127,6 +139,43 @@ impl ValidationError {
             ValidationErrorType::ExpressionError,
             Some(column_name.to_string()),
             format!("Invalid expression '{}' for column '{}': {}", expr, column_name, reason),
+            None,
+        )
+    }
+
+    // New factory methods for enhanced error types
+    pub fn schema_error(schema_name: &str, reason: &str) -> Self {
+        Self::new(
+            ValidationErrorType::SchemaError,
+            None,
+            format!("Schema '{}' error: {}", schema_name, reason),
+            None,
+        )
+    }
+
+    pub fn credentials_error(data_source: &str, reason: &str) -> Self {
+        Self::new(
+            ValidationErrorType::CredentialsError,
+            None,
+            format!("Credentials error for data source '{}': {}", data_source, reason),
+            None,
+        )
+    }
+
+    pub fn database_error(message: String) -> Self {
+        Self::new(
+            ValidationErrorType::DatabaseError,
+            None,
+            message,
+            None,
+        )
+    }
+
+    pub fn internal_error(message: String) -> Self {
+        Self::new(
+            ValidationErrorType::InternalError,
+            None,
+            message,
             None,
         )
     }
