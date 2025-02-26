@@ -31,7 +31,6 @@ pub struct AthenaCredentials {
 pub struct BigqueryCredentials {
     pub credentials_json: Value,
     pub project_id: String,
-    pub dataset_ids: Option<Vec<String>>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]

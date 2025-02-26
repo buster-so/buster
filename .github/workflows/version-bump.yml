@@ -1,0 +1,63 @@
+name: Version Bump
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+    paths:
+      - 'cli/**'
+
+jobs:
+  bump-version:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Determine version bump type
+        id: bump_type
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_BODY="${{ github.event.pull_request.body }}"
+          PR_LABELS="${{ toJson(github.event.pull_request.labels.*.name) }}"
+          
+          if [[ "$PR_TITLE" == *"BREAKING CHANGE"* || "$PR_TITLE" == *"major"* || "$PR_BODY" == *"BREAKING CHANGE"* || "$PR_LABELS" == *"major"* ]]; then
+            echo "type=major" >> $GITHUB_OUTPUT
+            echo "Detected major version bump"
+          elif [[ "$PR_TITLE" == *"feat"* || "$PR_TITLE" == *"feature"* || "$PR_TITLE" == *"minor"* || "$PR_LABELS" == *"minor"* || "$PR_LABELS" == *"feature"* ]]; then
+            echo "type=minor" >> $GITHUB_OUTPUT
+            echo "Detected minor version bump"
+          else
+            echo "type=patch" >> $GITHUB_OUTPUT
+            echo "Detected patch version bump"
+          fi
+
+      - name: Install cargo-bump
+        run: cargo install cargo-bump
+
+      - name: Bump version
+        working-directory: ./cli
+        run: |
+          BUMP_TYPE="${{ steps.bump_type.outputs.type }}"
+          cargo bump $BUMP_TYPE
+          NEW_VERSION=$(grep '^version =' Cargo.toml | sed 's/version = "\(.*\)"/\1/')
+          echo "New version: $NEW_VERSION"
+          echo "new_version=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Commit and push version bump
+        run: |
+          git add cli/Cargo.toml
+          git commit -m "Bump version to ${{ env.new_version }} [skip ci]"
+          git push 

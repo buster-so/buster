@@ -101,14 +101,20 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Download all artifacts
         uses: actions/download-artifact@v4
 
-      - name: Get version
+      - name: Extract version from Cargo.toml
         id: get_version
         run: |
-          VERSION=0.0.6
+          VERSION=$(grep '^version =' cli/Cargo.toml | sed 's/version = "\(.*\)"/\1/')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION"
 
       - name: Create Release
         uses: softprops/action-gh-release@v1

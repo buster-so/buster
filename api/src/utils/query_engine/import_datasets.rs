@@ -233,18 +233,7 @@ async fn get_bigquery_tables_and_views(
         Err(e) => return Err(e),
     };
 
-    let schema_string = if let Some(datasets) = &credentials.dataset_ids {
-        format!(
-            "IN ({})",
-            datasets
-                .iter()
-                .map(|s| format!("'{}'", s))
-                .collect::<Vec<String>>()
-                .join(", ")
-        )
-    } else {
-        "NOT IN ('INFORMATION_SCHEMA')".to_string()
-    };
+    let schema_string = "NOT IN ('INFORMATION_SCHEMA')".to_string();
 
     let tables_and_views_query = format!(
         "

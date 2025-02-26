@@ -10,8 +10,10 @@ use walkdir::WalkDir;
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct BusterConfig {
     pub data_source_name: Option<String>,
-    pub schema: Option<String>,
-    pub database: Option<String>,
+    #[serde(alias = "dataset_id")]     // BigQuery alias for schema
+    pub schema: Option<String>,        // For SQL DBs: schema, For BigQuery: dataset ID
+    #[serde(alias = "project_id")]     // BigQuery alias for database
+    pub database: Option<String>,      // For SQL DBs: database, For BigQuery: project ID
     pub exclude_files: Option<Vec<String>>,
     pub exclude_tags: Option<Vec<String>>,
 }
