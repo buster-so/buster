@@ -8,12 +8,12 @@ default-run = "bi_api"
 
 [dependencies]
 anyhow = "1.0.86"
-arrow = { version = "54.0.0", features = ["json"] }
+arrow = { version = "54.2.0", features = ["json"] }
 async-compression = { version = "0.4.11", features = ["tokio"] }
 axum = { version = "0.7.5", features = ["ws"] }
 base64 = "0.21"
 bb8-redis = "0.18.0"
-chrono = { version = "0.4.38", features = ["serde"] }
+chrono = { version = "=0.4.38", features = ["serde"] }
 cohere-rust = "0.6.0"
 diesel = { version = "2", features = [
     "uuid",
