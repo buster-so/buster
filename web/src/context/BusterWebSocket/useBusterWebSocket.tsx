@@ -3,7 +3,7 @@
 import { useMemoizedFn } from 'ahooks';
 import React, { useMemo, useRef } from 'react';
 import { useBusterNotifications } from '../BusterNotifications/BusterNotifications';
-import {
+import type {
   BusterSocketRequest,
   BusterSocketResponse,
   BusterSocketResponseRoute
@@ -18,7 +18,7 @@ import {
 } from '@fluentui/react-context-selector';
 import { SupabaseContextReturnType } from '../Supabase';
 
-const BUSTER_WS_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/ws`;
+const BUSTER_WS_URL = `${process.env.NEXT_PUBLIC_WEB_SOCKET_URL}/api/v1/ws`;
 
 export type BusterOnCallback = {
   callback: BusterSocketResponse['callback'];

@@ -1,3 +1,5 @@
+'use client';
+
 import { useMemoizedFn, useMount, useNetwork, useThrottleFn } from 'ahooks';
 import { useEffect, useRef, useState } from 'react';
 import { ReadyState } from './useBusterWebSocket';
