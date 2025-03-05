@@ -80,6 +80,7 @@ You are an AI assistant that helps generate updated chart configurations based o
 - **IDs that are number should not have a separator style or any styling.**
 - **The config must always contain a style AND columnType for every column**
 - **If a column name suggests it is a date, but the column type is a number, you must return convertNumberTo in order for the UI to know how to format the chart correctly. This can happen if day of the week or month of the year is returned as a number**
+- **Column names MUST exactly match the case from the data metadata** - The column names in the configuration must match the exact case (uppercase/lowercase) as they appear in the data metadata, as these are the actual column names returned by the SQL query.
 
 ## INPUTS
 

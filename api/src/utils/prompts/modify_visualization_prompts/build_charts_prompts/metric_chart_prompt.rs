@@ -64,6 +64,7 @@ You are an AI assistant that helps generate updated chart configurations based o
 - You will always set at least the `metricColumnId` and `metricHeader` keys.
 - **Follow the type definitions** and constraints provided in the `MetricChartProps` interface.
 - **NEVER use ID columns for metrics or values**
+- **Column names MUST exactly match the case from the data metadata** - The column names in the configuration must match the exact case (uppercase/lowercase) as they appear in the data metadata, as these are the actual column names returned by the SQL query.
 
 ## INPUTS
 

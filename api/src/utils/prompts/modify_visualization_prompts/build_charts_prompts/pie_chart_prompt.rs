@@ -68,6 +68,7 @@ You are an AI assistant that helps generate updated chart configurations based o
 - **Never set multiple columns** for `x`, `y`, or `category` axes unless explicitly instructed by the user.
 - **Follow the type definitions** and constraints provided in the `BusterChartConfigProps` interface.
 - **NEVER use ID columns for Y axes or metrics**
+- **Column names MUST exactly match the case from the data metadata** - The column names in the configuration must match the exact case (uppercase/lowercase) as they appear in the data metadata, as these are the actual column names returned by the SQL query.
 
 ## INPUTS
 
