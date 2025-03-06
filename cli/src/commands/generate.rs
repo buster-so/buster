@@ -9,6 +9,7 @@ use std::fs;
 use std::fmt;
 use inquire::{Text, required};
 use walkdir::WalkDir;
+use colored::*;
 use crate::utils::{
     buster_credentials::get_and_validate_buster_credentials,
     BusterClient, GenerateApiRequest, GenerateApiResponse,
@@ -629,6 +630,20 @@ impl GenerateCommand {
     }
 }
 
+// Add this function before the generate function
+fn find_nearest_buster_yml(start_dir: &Path) -> Option<PathBuf> {
+    let mut current_dir = start_dir.to_path_buf();
+    loop {
+        let buster_yml = current_dir.join("buster.yml");
+        if buster_yml.exists() {
+            return Some(buster_yml);
+        }
+        if !current_dir.pop() {
+            return None;
+        }
+    }
+}
+
 pub async fn generate(
     source_path: Option<&str>,
     destination_path: Option<&str>,
@@ -639,6 +654,22 @@ pub async fn generate(
 ) -> Result<()> {
     let source = PathBuf::from(source_path.unwrap_or("."));
     let destination = PathBuf::from(destination_path.unwrap_or("."));
+
+    // Check for buster.yml in current or parent directories
+    let buster_yml_path = find_nearest_buster_yml(&std::env::current_dir()?);
+    if buster_yml_path.is_none() {
+        println!("❌ No buster.yml found in the current directory or any parent directories.");
+        println!("This command must be run from within a Buster project (a directory containing or under a directory with buster.yml).");
+        println!("To create a new Buster project, run: {}", "buster init".cyan());
+        return Err(anyhow::anyhow!("No buster.yml found. Run 'buster init' to create a new project."));
+    }
+
+    // If destination_path wasn't specified, use the directory containing buster.yml
+    let destination = if destination_path.is_none() {
+        buster_yml_path.as_ref().unwrap().parent().unwrap().to_path_buf()
+    } else {
+        destination
+    };
 
     let mut cmd = GenerateCommand::new(
         source,

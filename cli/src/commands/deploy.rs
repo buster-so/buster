@@ -5,6 +5,7 @@ use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 use tokio::task;
 use walkdir::WalkDir;
+use colored::*;
 
 use crate::utils::{
     buster_credentials::get_and_validate_buster_credentials, BusterClient,
@@ -803,10 +804,40 @@ impl ModelFile {
     }
 }
 
+// Add this function before the deploy function
+fn find_nearest_buster_yml(start_dir: &Path) -> Option<PathBuf> {
+    let mut current_dir = start_dir.to_path_buf();
+    loop {
+        let buster_yml = current_dir.join("buster.yml");
+        if buster_yml.exists() {
+            return Some(buster_yml);
+        }
+        if !current_dir.pop() {
+            return None;
+        }
+    }
+}
+
 pub async fn deploy(path: Option<&str>, dry_run: bool, recursive: bool) -> Result<()> {
     let target_path = PathBuf::from(path.unwrap_or("."));
     let mut progress = DeployProgress::new(0);
     let mut result = DeployResult::default();
+
+    // Check for buster.yml in current or parent directories
+    let buster_yml_path = find_nearest_buster_yml(&std::env::current_dir()?);
+    if buster_yml_path.is_none() {
+        println!("❌ No buster.yml found in the current directory or any parent directories.");
+        println!("This command must be run from within a Buster project (a directory containing or under a directory with buster.yml).");
+        println!("To create a new Buster project, run: {}", "buster init".cyan());
+        return Err(anyhow::anyhow!("No buster.yml found. Run 'buster init' to create a new project."));
+    }
+
+    // If path wasn't specified, use the directory containing buster.yml
+    let target_path = if path.is_none() {
+        buster_yml_path.as_ref().unwrap().parent().unwrap().to_path_buf()
+    } else {
+        target_path
+    };
 
     // Only create client if not in dry-run mode
     let client = if !dry_run {
