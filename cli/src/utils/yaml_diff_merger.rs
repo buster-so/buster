@@ -85,18 +85,25 @@ pub struct ModelDiff {
     removed_measures: Vec<String>,
     preserved_dimensions: Vec<Dimension>,
     preserved_measures: Vec<Measure>,
+    added_entities: Vec<Entity>,
+    removed_entities: Vec<String>,
+    preserved_entities: Vec<Entity>,
 }
 
 #[derive(Debug)]
 pub struct DiffStats {
     total_dimensions: usize,
     total_measures: usize,
+    total_entities: usize,
     added_dimensions: usize,
     added_measures: usize,
+    added_entities: usize,
     removed_dimensions: usize,
     removed_measures: usize,
+    removed_entities: usize,
     preserved_dimensions: usize,
     preserved_measures: usize,
+    preserved_entities: usize,
 }
 
 #[derive(Debug)]
@@ -172,6 +179,38 @@ impl YamlDiffMerger {
                     *measures = new_measures;
                 }
             }
+
+            // Update entities while preserving style
+            if let Some(existing_entities) = map.get_mut("entities") {
+                if let Value::Sequence(entities) = existing_entities {
+                    // Create a map of existing entities by name (case insensitive)
+                    let mut entity_map: HashMap<String, &Value> = HashMap::new();
+                    for entity in entities.iter() {
+                        if let Some(name) = entity.get("name").and_then(|n| n.as_str()) {
+                            entity_map.insert(name.to_lowercase(), entity);
+                        }
+                    }
+
+                    // Update entities while preserving order and style
+                    let mut new_entities = Vec::new();
+                    for entity in &new_model.entities {
+                        if let Some(&existing_entity) = entity_map.get(&entity.name.to_lowercase()) {
+                            // Preserve existing entity's style and casing
+                            new_entities.push(existing_entity.clone());
+                        } else {
+                            // Add new entity
+                            new_entities.push(serde_yaml::to_value(entity)?);
+                        }
+                    }
+                    *entities = new_entities;
+                }
+            } else if !new_model.entities.is_empty() {
+                // If there's no entities section but we have new entities, add them
+                map.insert(
+                    Value::String("entities".to_string()),
+                    serde_yaml::to_value(&new_model.entities)?,
+                );
+            }
         }
         Ok(())
     }
@@ -236,10 +275,14 @@ impl YamlDiffMerger {
             .map(|d| (d.name.to_lowercase(), d)).collect();
         let existing_measures: HashMap<_, _> = existing_model.measures.iter()
             .map(|m| (m.name.to_lowercase(), m)).collect();
+        let existing_entities: HashMap<_, _> = existing_model.entities.iter()
+            .map(|e| (e.name.to_lowercase(), e)).collect();
         let new_dims: HashMap<_, _> = new_model.dimensions.iter()
             .map(|d| (d.name.to_lowercase(), d)).collect();
         let new_measures: HashMap<_, _> = new_model.measures.iter()
             .map(|m| (m.name.to_lowercase(), m)).collect();
+        let new_entities: HashMap<_, _> = new_model.entities.iter()
+            .map(|e| (e.name.to_lowercase(), e)).collect();
 
         let mut changes = ModelDiff {
             added_dimensions: Vec::new(),
@@ -248,6 +291,9 @@ impl YamlDiffMerger {
             removed_measures: Vec::new(),
             preserved_dimensions: Vec::new(),
             preserved_measures: Vec::new(),
+            added_entities: Vec::new(),
+            removed_entities: Vec::new(),
+            preserved_entities: Vec::new(),
         };
 
         // Process dimensions
@@ -278,15 +324,33 @@ impl YamlDiffMerger {
             }
         }
 
+        // Process entities
+        for (name, entity) in &new_entities {
+            if existing_entities.contains_key(name) {
+                changes.preserved_entities.push(existing_entities[name].clone());
+            } else {
+                changes.added_entities.push((*entity).clone());
+            }
+        }
+        for (name, entity) in existing_entities.iter() {
+            if !new_entities.contains_key(name) {
+                changes.removed_entities.push(entity.name.clone());
+            }
+        }
+
         let statistics = DiffStats {
             total_dimensions: existing_dims.len(),
             total_measures: existing_measures.len(),
+            total_entities: existing_model.entities.len(),
             added_dimensions: changes.added_dimensions.len(),
             added_measures: changes.added_measures.len(),
+            added_entities: changes.added_entities.len(),
             removed_dimensions: changes.removed_dimensions.len(),
             removed_measures: changes.removed_measures.len(),
+            removed_entities: changes.removed_entities.len(),
             preserved_dimensions: changes.preserved_dimensions.len(),
             preserved_measures: changes.preserved_measures.len(),
+            preserved_entities: changes.preserved_entities.len(),
         };
 
         Ok(DiffResult { changes, statistics })
@@ -310,6 +374,13 @@ impl YamlDiffMerger {
             }
         }
 
+        if !diff_result.changes.added_entities.is_empty() {
+            println!("\nNew entities to be added:");
+            for entity in &diff_result.changes.added_entities {
+                println!("  + {}", entity.name.green());
+            }
+        }
+
         if !diff_result.changes.removed_dimensions.is_empty() {
             println!("\nDimensions to be removed:");
             for name in &diff_result.changes.removed_dimensions {
@@ -320,6 +391,13 @@ impl YamlDiffMerger {
         if !diff_result.changes.removed_measures.is_empty() {
             println!("\nMeasures to be removed:");
             for name in &diff_result.changes.removed_measures {
+                println!("  - {}", name.red());
+            }
+        }
+
+        if !diff_result.changes.removed_entities.is_empty() {
+            println!("\nEntities to be removed:");
+            for name in &diff_result.changes.removed_entities {
                 println!("  - {}", name.red());
             }
         }
@@ -338,6 +416,13 @@ impl YamlDiffMerger {
             }
         }
 
+        if !diff_result.changes.preserved_entities.is_empty() {
+            println!("\nPreserved entities (keeping existing configuration):");
+            for entity in &diff_result.changes.preserved_entities {
+                println!("  • {}", entity.name.yellow());
+            }
+        }
+
         println!("\nStatistics:");
         println!("  Dimensions:");
         println!("    Total: {}", diff_result.statistics.total_dimensions);
@@ -349,6 +434,11 @@ impl YamlDiffMerger {
         println!("    Added: {}", diff_result.statistics.added_measures);
         println!("    Removed: {}", diff_result.statistics.removed_measures);
         println!("    Preserved: {}", diff_result.statistics.preserved_measures);
+        println!("  Entities:");
+        println!("    Total: {}", diff_result.statistics.total_entities);
+        println!("    Added: {}", diff_result.statistics.added_entities);
+        println!("    Removed: {}", diff_result.statistics.removed_entities);
+        println!("    Preserved: {}", diff_result.statistics.preserved_entities);
     }
 
     pub fn apply_changes(&self, diff_result: &DiffResult) -> Result<()> {

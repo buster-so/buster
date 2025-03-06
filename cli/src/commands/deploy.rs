@@ -321,24 +321,57 @@ impl ModelFile {
         current_dir: &Path,
         current_model: &str,
     ) -> Result<(), ValidationError> {
+        // First check in the current directory
         let target_file = current_dir.join(format!("{}.yml", entity_name));
-
+        
+        // If not in current directory, search from project root
         if !target_file.exists() {
-            return Err(ValidationError {
-                error_type: ValidationErrorType::ModelNotFound,
-                message: format!(
-                    "Model '{}' references non-existent model '{}' - file {}.yml not found",
-                    current_model, entity_name, entity_name
-                ),
-                column_name: None,
-                suggestion: Some(format!(
-                    "Create {}.yml file with model definition",
-                    entity_name
-                )),
-            });
+            let mut found = false;
+            
+            // Find project root (where buster.yml is)
+            let project_root = current_dir.ancestors()
+                .find(|p| p.join("buster.yml").exists())
+                .unwrap_or(current_dir);
+
+            let entries = walkdir::WalkDir::new(project_root)
+                .follow_links(true)
+                .into_iter()
+                .filter_map(|e| e.ok())
+                .filter(|e| {
+                    e.file_type().is_file() && 
+                    e.path().extension().and_then(|ext| ext.to_str()) == Some("yml") &&
+                    e.path().file_stem().and_then(|name| name.to_str()) == Some(entity_name)
+                });
+                
+            for entry in entries {
+                if let Ok(content) = std::fs::read_to_string(entry.path()) {
+                    if let Ok(model_def) = serde_yaml::from_str::<BusterModel>(&content) {
+                        if model_def.models.iter().any(|m| m.name == entity_name) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if !found {
+                return Err(ValidationError {
+                    error_type: ValidationErrorType::ModelNotFound,
+                    message: format!(
+                        "Model '{}' references non-existent model '{}' - file {}.yml not found in project",
+                        current_model, entity_name, entity_name
+                    ),
+                    column_name: None,
+                    suggestion: Some(format!(
+                        "Create {}.yml file with model definition or check the model reference",
+                        entity_name
+                    )),
+                });
+            }
+            return Ok(());
         }
 
-        // Quick verification that model exists in file
+        // Verify model exists in file if found in current directory
         if let Ok(content) = std::fs::read_to_string(&target_file) {
             if let Ok(model_def) = serde_yaml::from_str::<BusterModel>(&content) {
                 if !model_def.models.iter().any(|m| m.name == entity_name) {
@@ -870,6 +903,8 @@ pub async fn deploy(path: Option<&str>, dry_run: bool, recursive: bool) -> Resul
     let buster_yml_path = find_nearest_buster_yml(&std::env::current_dir()?);
     if buster_yml_path.is_none() {
         println!("❌ No buster.yml found in the current directory or any parent directories.");
+        println!("This command must be run from within a Buster project (a directory containing or under a directory with buster.yml).");
+        println!("To create a new Buster project, run: {}", "buster init".cyan());
         println!("This command must be run from within a Buster project (a directory containing or under a directory with buster.yml).");
         println!("To create a new Buster project, run: {}", "buster init".cyan());
         return Err(anyhow::anyhow!("No buster.yml found. Run 'buster init' to create a new project."));

@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::fs;
+    use std::{fs, path::PathBuf};
     use tempfile::TempDir;
 
     // Helper function to create a temporary directory with test files
