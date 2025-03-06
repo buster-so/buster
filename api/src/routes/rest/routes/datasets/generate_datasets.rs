@@ -9,6 +9,8 @@ use std::collections::HashMap;
 use uuid::Uuid;
 use regex::Regex;
 use tokio::task::JoinSet;
+use futures::future::try_join_all;
+use itertools::Itertools;
 
 use crate::{
     database::{
@@ -344,6 +346,250 @@ async fn generate_model_yaml(
     Ok(cleaned_yaml)
 }
 
+async fn extract_keys_from_models(
+    models: &[DatasetColumnRecord],
+    schema: &str,
+) -> Result<String> {
+    // Group models by dataset name, cloning the data
+    let grouped_models: HashMap<String, Vec<DatasetColumnRecord>> = models
+        .iter()
+        .filter(|col| col.schema_name.to_lowercase() == schema.to_lowercase())
+        .map(|col| (col.dataset_name.clone(), col.clone()))
+        .into_group_map();
+
+    // Process models in batches
+    let batches: Vec<Vec<(String, Vec<DatasetColumnRecord>)>> = grouped_models
+        .into_iter()
+        .collect::<Vec<_>>()
+        .chunks(BATCH_SIZE)
+        .map(|chunk| chunk.to_vec())
+        .collect();
+
+    let mut join_set = JoinSet::new();
+    let mut all_docs = String::new();
+    let mut errors = Vec::new();
+
+    // Process each batch concurrently
+    for batch in batches {
+        let batch_models = batch;
+        let schema = schema.to_string();
+        
+        join_set.spawn(async move {
+            let models_str = batch_models
+                .iter()
+                .map(|(table_name, columns)| {
+                    let columns_str = columns
+                        .iter()
+                        .map(|col| format!("Column: {} (Type: {})", col.name, col.type_))
+                        .collect::<Vec<_>>()
+                        .join("\n");
+                    
+                    format!("Table: {}\n{}", table_name, columns_str)
+                })
+                .collect::<Vec<_>>()
+                .join("\n\n");
+
+            let messages = vec![
+                LlmMessage::new(
+                    "system".to_string(),
+                    "You are a database schema analyzer. For each table, identify the primary key and likely foreign keys based on column names and types. Output in markdown format.".to_string(),
+                ),
+                LlmMessage::new(
+                    "user".to_string(),
+                    format!("Analyze these tables and output in markdown format with primary and foreign keys:\n\n{}", models_str),
+                ),
+            ];
+
+            let response = llm_chat(
+                LlmModel::OpenAi(OpenAiChatModel::O3Mini),
+                &messages,
+                0.1,
+                2048,
+                120,
+                None,
+                false,
+                None,
+                &Uuid::new_v4(),
+                &Uuid::new_v4(),
+                crate::utils::clients::ai::langfuse::PromptName::CustomPrompt("analyze_table_keys".to_string()),
+            )
+            .await
+            .map_err(|e| (batch_models.clone(), e))?;
+
+            Ok::<_, (Vec<(String, Vec<DatasetColumnRecord>)>, anyhow::Error)>((batch_models, response))
+        });
+    }
+
+    // Collect results
+    while let Some(result) = join_set.join_next().await {
+        match result {
+            Ok(Ok((_, markdown))) => {
+                all_docs.push_str(&markdown);
+                all_docs.push_str("\n\n");
+            }
+            Ok(Err((batch_models, e))) => {
+                let affected_tables = batch_models.iter()
+                    .map(|(name, _)| name.clone())
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                errors.push(format!("Error processing tables {}: {}", affected_tables, e));
+                tracing::error!("Error processing batch: {}", e);
+            }
+            Err(e) => {
+                errors.push(format!("Task join error: {}", e));
+                tracing::error!("Task join error: {}", e);
+            }
+        }
+    }
+
+    if !errors.is_empty() {
+        tracing::warn!("Encountered errors while processing some tables: {:?}", errors);
+    }
+
+    Ok(all_docs)
+}
+
+async fn identify_entity_relationships(
+    markdown_docs: &str,
+    model_names: &[String],
+) -> Result<HashMap<String, Vec<EntityRelationship>>> {
+    let batches: Vec<Vec<String>> = model_names
+        .chunks(BATCH_SIZE)
+        .map(|chunk| chunk.to_vec())
+        .collect();
+
+    let mut join_set = JoinSet::new();
+    let mut relationships: HashMap<String, Vec<EntityRelationship>> = HashMap::new();
+    let mut errors = Vec::new();
+
+    // Process each batch concurrently
+    for batch in batches {
+        let batch_models = batch.clone();
+        let docs = markdown_docs.to_string();
+        
+        join_set.spawn(async move {
+            let messages = vec![
+                LlmMessage::new(
+                    "system".to_string(),
+                    "You are a database relationship analyzer. Your task is to identify relationships between tables and output them in a specific YAML format. Only include tables that have relationships with other tables. Skip any tables that don't have relationships.
+
+IMPORTANT OUTPUT RULES:
+1. Your response must ONLY contain the YAML content wrapped in ```yml code blocks
+2. Do not include any explanations, notes, or other text outside the code blocks
+3. If no relationships exist, output an empty YAML wrapped in code blocks
+
+Example output format:
+```yml
+# If table_name1 has relationships:
+table_name1:
+  - name: related_table1
+    expr: foreign_key_column
+    type: foreign
+    description: Description of the relationship
+  - name: related_table2
+    expr: another_foreign_key
+    type: foreign
+    description: Another relationship description
+```
+
+Rules for relationships:
+- Only include tables that have relationships
+- Omit tables with no relationships
+- Always wrap output in ```yml code blocks
+- Output only the YAML, no other text".to_string(),
+                ),
+                LlmMessage::new(
+                    "user".to_string(),
+                    format!(
+                        "For these tables: {}\n\nAnalyze this schema documentation and output YAML entities showing relationships in the exact format shown above. Remember to only include tables that have relationships:\n\n{}",
+                        batch_models.join(", "),
+                        docs
+                    ),
+                ),
+            ];
+
+            let response = llm_chat(
+                LlmModel::OpenAi(OpenAiChatModel::O3Mini),
+                &messages,
+                0.1,
+                2048,
+                120,
+                None,
+                false,
+                None,
+                &Uuid::new_v4(),
+                &Uuid::new_v4(),
+                crate::utils::clients::ai::langfuse::PromptName::CustomPrompt("identify_relationships".to_string()),
+            )
+            .await
+            .map_err(|e| (batch_models.clone(), e))?;
+
+            // Log the raw response for debugging
+            tracing::debug!("Raw LLM response:\n{}", response);
+
+            // Extract YAML from markdown code blocks if present
+            let yaml_str = if response.contains("```") {
+                let re = Regex::new(r"```(?:ya?ml)?\n([\s\S]*?)\n```").unwrap();
+                re.captures(&response)
+                    .map(|caps| caps.get(1).unwrap().as_str().to_string())
+                    .unwrap_or(response)
+            } else {
+                response
+            };
+
+            // If the YAML is empty or just whitespace, return an empty map
+            if yaml_str.trim().is_empty() {
+                return Ok::<_, (Vec<String>, anyhow::Error)>((batch_models, HashMap::new()));
+            }
+
+            // Parse YAML response into EntityRelationship structs
+            let yaml_docs: HashMap<String, Vec<EntityRelationship>> = serde_yaml::from_str(&yaml_str)
+                .map_err(|e| {
+                    tracing::error!("YAML parsing error. Content:\n{}", yaml_str);
+                    (batch_models.clone(), anyhow!("Failed to parse YAML response: {}", e))
+                })?;
+
+            // Filter out any empty relationship arrays
+            let filtered_docs: HashMap<String, Vec<EntityRelationship>> = yaml_docs
+                .into_iter()
+                .filter(|(_, relationships)| !relationships.is_empty())
+                .collect();
+
+            Ok::<_, (Vec<String>, anyhow::Error)>((batch_models, filtered_docs))
+        });
+    }
+
+    // Collect results
+    while let Some(result) = join_set.join_next().await {
+        match result {
+            Ok(Ok((tables, yaml_relationships))) => {
+                for table in tables {
+                    if let Some(entities) = yaml_relationships.get(&table) {
+                        if !entities.is_empty() {
+                            relationships.insert(table, entities.clone());
+                        }
+                    }
+                }
+            }
+            Ok(Err((tables, e))) => {
+                let affected_tables = tables.join(", ");
+                errors.push(format!("Error processing relationships for tables {}: {}", affected_tables, e));
+                tracing::error!("Error processing batch relationships: {}", e);
+            }
+            Err(e) => {
+                errors.push(format!("Task join error: {}", e));
+                tracing::error!("Task join error: {}", e);
+            }
+        }
+    }
+
+    if !errors.is_empty() {
+        tracing::warn!("Encountered errors while processing some relationships: {:?}", errors);
+    }
+
+    Ok(relationships)
+}
+
 async fn generate_datasets_handler(
     request: &GenerateDatasetRequest,
     organization_id: &Uuid,
@@ -362,7 +608,6 @@ async fn generate_datasets_handler(
     {
         Ok(ds) => ds,
         Err(e) => {
-            // Instead of returning early, add error for each model and return partial results
             let error_msg = format!(
                 "Data source '{}' not found: {}. Please verify the data source exists and you have access.",
                 request.data_source_name, e
@@ -439,6 +684,26 @@ async fn generate_datasets_handler(
         }
     };
 
+    // Step 1: Extract primary and foreign keys
+    let markdown_docs = match extract_keys_from_models(&ds_columns, &request.schema).await {
+        Ok(docs) => docs,
+        Err(e) => {
+            tracing::error!("Error extracting keys from models: {}", e);
+            // Continue with empty docs - we can still try to generate basic YAMLs
+            String::new()
+        }
+    };
+
+    // Step 2: Identify entity relationships
+    let entity_relationships = match identify_entity_relationships(&markdown_docs, &request.model_names).await {
+        Ok(relationships) => relationships,
+        Err(e) => {
+            tracing::error!("Error identifying entity relationships: {}", e);
+            // Continue with empty relationships - we can still generate basic YAMLs
+            HashMap::new()
+        }
+    };
+
     // Process models concurrently
     let mut join_set = JoinSet::new();
     
@@ -446,32 +711,39 @@ async fn generate_datasets_handler(
         let model_name = model_name.clone();
         let schema = request.schema.clone();
         let ds_columns = ds_columns.clone();
+        let entities = entity_relationships.get(&model_name).cloned().unwrap_or_default();
         
         join_set.spawn(async move {
-            let result = generate_model_yaml(&model_name, &ds_columns, &schema).await;
-            (model_name, result)
+            let mut yaml = generate_model_yaml(&model_name, &ds_columns, &schema).await
+                .map_err(|e| (model_name.clone(), e))?;
+            
+            // If we have entity relationships, append them to the YAML
+            if !entities.is_empty() {
+                let entities_yaml = serde_yaml::to_string(&entities)
+                    .map_err(|e| (model_name.clone(), anyhow!("Failed to serialize entities: {}", e)))?;
+                yaml.push_str("\n  entities:\n");
+                for line in entities_yaml.lines() {
+                    yaml.push_str(&format!("    {}\n", line));
+                }
+            }
+            
+            Ok::<_, (String, anyhow::Error)>((model_name, yaml))
         });
     }
 
     while let Some(result) = join_set.join_next().await {
         match result {
-            Ok((model_name, Ok(yaml))) => {
+            Ok(Ok((model_name, yaml))) => {
                 yml_contents.insert(model_name, yaml);
             }
-            Ok((model_name, Err(e))) => {
-                // Provide more detailed error message
-                let error_msg = format!(
-                    "Failed to generate YAML for model '{}': {}. Please check if the model exists and has valid columns.",
-                    model_name, e
-                );
+            Ok(Err((model_name, e))) => {
                 errors.insert(model_name, DetailedError {
-                    message: error_msg,
+                    message: format!("Failed to generate YAML: {}", e),
                     error_type: "ModelGenerationError".to_string(),
                     context: Some(format!("Schema: {}", request.schema)),
                 });
             }
             Err(e) => {
-                // Handle task join error but continue processing
                 tracing::error!("Task join error: {:?}", e);
                 let affected_models: Vec<_> = request.model_names.iter()
                     .filter(|name| !yml_contents.contains_key(*name) && !errors.contains_key(*name))
@@ -491,11 +763,32 @@ async fn generate_datasets_handler(
         }
     }
 
+    // Log the generated YMLs
+    for (model_name, yaml) in &yml_contents {
+        tracing::info!("Generated YAML for model '{}':\n{}", model_name, yaml);
+    }
+
+    // Log any errors
+    if !errors.is_empty() {
+        tracing::warn!("Encountered errors while generating YAMLs: {:#?}", errors);
+    }
+
     Ok(GenerateDatasetResponse {
         yml_contents,
         errors,
     })
 }
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+struct EntityRelationship {
+    name: String,
+    expr: String,
+    #[serde(rename = "type")]
+    type_: String,
+    description: String,
+}
+
+const BATCH_SIZE: usize = 10;
 
 #[cfg(test)]
 mod tests {
