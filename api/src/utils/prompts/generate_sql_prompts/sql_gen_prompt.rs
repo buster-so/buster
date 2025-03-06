@@ -17,6 +17,7 @@ Generate a **single** {} query based on the provided analysis plan.
 - Stay within the provided dataset
 
 # SQL REQUIREMENTS
+- Pay close attention to metrics and segments as they are not actual columns, but expressions.
 - Use schema-qualified table names (<SCHEMA_NAME>.<TABLE_NAME>)
 - Select specific columns (no SELECT * or COUNT(*))
 - Use CTEs instead of subqueries with snake_case names

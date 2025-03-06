@@ -471,12 +471,37 @@ async fn identify_entity_relationships(
             let messages = vec![
                 LlmMessage::new(
                     "system".to_string(),
-                    "You are a database relationship analyzer. Using the provided markdown documentation of table schemas, identify entity relationships between tables. Output YAML format entities for each table.".to_string(),
+                    "You are a database relationship analyzer. Your task is to identify relationships between tables and output them in a specific YAML format. Only include tables that have relationships with other tables. Skip any tables that don't have relationships.
+
+IMPORTANT OUTPUT RULES:
+1. Your response must ONLY contain the YAML content wrapped in ```yml code blocks
+2. Do not include any explanations, notes, or other text outside the code blocks
+3. If no relationships exist, output an empty YAML wrapped in code blocks
+
+Example output format:
+```yml
+# If table_name1 has relationships:
+table_name1:
+  - name: related_table1
+    expr: foreign_key_column
+    type: foreign
+    description: Description of the relationship
+  - name: related_table2
+    expr: another_foreign_key
+    type: foreign
+    description: Another relationship description
+```
+
+Rules for relationships:
+- Only include tables that have relationships
+- Omit tables with no relationships
+- Always wrap output in ```yml code blocks
+- Output only the YAML, no other text".to_string(),
                 ),
                 LlmMessage::new(
                     "user".to_string(),
                     format!(
-                        "For these tables: {}\n\nAnalyze this schema documentation and output YAML entities showing relationships:\n\n{}",
+                        "For these tables: {}\n\nAnalyze this schema documentation and output YAML entities showing relationships in the exact format shown above. Remember to only include tables that have relationships:\n\n{}",
                         batch_models.join(", "),
                         docs
                     ),
@@ -499,11 +524,38 @@ async fn identify_entity_relationships(
             .await
             .map_err(|e| (batch_models.clone(), e))?;
 
-            // Parse YAML response into EntityRelationship structs
-            let yaml_docs = serde_yaml::from_str::<HashMap<String, Vec<EntityRelationship>>>(&response)
-                .map_err(|e| (batch_models.clone(), anyhow!("Failed to parse YAML response: {}", e)))?;
+            // Log the raw response for debugging
+            tracing::debug!("Raw LLM response:\n{}", response);
 
-            Ok::<_, (Vec<String>, anyhow::Error)>((batch_models, yaml_docs))
+            // Extract YAML from markdown code blocks if present
+            let yaml_str = if response.contains("```") {
+                let re = Regex::new(r"```(?:ya?ml)?\n([\s\S]*?)\n```").unwrap();
+                re.captures(&response)
+                    .map(|caps| caps.get(1).unwrap().as_str().to_string())
+                    .unwrap_or(response)
+            } else {
+                response
+            };
+
+            // If the YAML is empty or just whitespace, return an empty map
+            if yaml_str.trim().is_empty() {
+                return Ok::<_, (Vec<String>, anyhow::Error)>((batch_models, HashMap::new()));
+            }
+
+            // Parse YAML response into EntityRelationship structs
+            let yaml_docs: HashMap<String, Vec<EntityRelationship>> = serde_yaml::from_str(&yaml_str)
+                .map_err(|e| {
+                    tracing::error!("YAML parsing error. Content:\n{}", yaml_str);
+                    (batch_models.clone(), anyhow!("Failed to parse YAML response: {}", e))
+                })?;
+
+            // Filter out any empty relationship arrays
+            let filtered_docs: HashMap<String, Vec<EntityRelationship>> = yaml_docs
+                .into_iter()
+                .filter(|(_, relationships)| !relationships.is_empty())
+                .collect();
+
+            Ok::<_, (Vec<String>, anyhow::Error)>((batch_models, filtered_docs))
         });
     }
 
@@ -513,7 +565,9 @@ async fn identify_entity_relationships(
             Ok(Ok((tables, yaml_relationships))) => {
                 for table in tables {
                     if let Some(entities) = yaml_relationships.get(&table) {
-                        relationships.insert(table, entities.clone());
+                        if !entities.is_empty() {
+                            relationships.insert(table, entities.clone());
+                        }
                     }
                 }
             }
@@ -707,6 +761,16 @@ async fn generate_datasets_handler(
                 }
             }
         }
+    }
+
+    // Log the generated YMLs
+    for (model_name, yaml) in &yml_contents {
+        tracing::info!("Generated YAML for model '{}':\n{}", model_name, yaml);
+    }
+
+    // Log any errors
+    if !errors.is_empty() {
+        tracing::warn!("Encountered errors while generating YAMLs: {:#?}", errors);
     }
 
     Ok(GenerateDatasetResponse {
