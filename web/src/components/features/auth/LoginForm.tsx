@@ -21,7 +21,6 @@ import {
   signInWithGoogle,
   signUp
 } from '@/server_context/supabaseAuthMethods';
-import { StatusCard } from '@/components/ui/card/StatusCard';
 import { SuccessCard } from '@/components/ui/card/SuccessCard';
 
 const DEFAULT_CREDENTIALS = {

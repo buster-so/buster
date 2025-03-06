@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppCodeEditor } from '../inputs/AppCodeEditor';
+import { AppCodeEditor } from '@/components/ui/inputs/AppCodeEditor';
 import { useMemoizedFn } from 'ahooks';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { cn } from '@/lib/classMerge';

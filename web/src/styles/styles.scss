@@ -1,10 +1,10 @@
-@import './fonts';
-@import './buster';
-@import './tailwind';
-@import './sql';
-@import './monaco';
-@import 'react-data-grid/lib/styles.css';
-@import '../components/ui/layouts/AppSplitter/SplitPane/themes/default'; //TODO check if we can remove this
+@use './fonts';
+@use './buster';
+@use './tailwind';
+@use './sql';
+@use './monaco';
+@use 'pkg:react-data-grid/lib/styles.css' as *;
+@use '../components/ui/layouts/AppSplitter/SplitPane/themes/default'; //TODO check if we can remove this in favor of a css module or something?
 
 input {
   font-family:
