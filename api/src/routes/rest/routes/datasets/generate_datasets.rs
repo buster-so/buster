@@ -11,6 +11,7 @@ use regex::Regex;
 use tokio::task::JoinSet;
 use futures::future::try_join_all;
 use itertools::Itertools;
+use serde_json;
 
 use crate::{
     database::{
@@ -276,6 +277,7 @@ async fn generate_model_yaml(
     model_name: &str,
     ds_columns: &[DatasetColumnRecord],
     schema: &str,
+    entities: Option<&Vec<EntityRelationship>>,
 ) -> Result<String> {
     // Filter columns for this model
     let model_columns: Vec<_> = ds_columns
@@ -324,19 +326,35 @@ async fn generate_model_yaml(
         }
     }
 
-    let model = Model {
+    // Create a temporary struct that matches our desired YAML structure
+    #[derive(Serialize)]
+    struct ModelWithEntities {
+        name: String,
+        description: String,
+        dimensions: Vec<Dimension>,
+        measures: Vec<Measure>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        entities: Option<Vec<EntityRelationship>>,
+    }
+
+    #[derive(Serialize)]
+    struct ConfigWithEntities {
+        models: Vec<ModelWithEntities>,
+    }
+
+    let model = ModelWithEntities {
         name: model_name.to_string(),
         description: format!("Generated model for {}", model_name),
         dimensions,
         measures,
+        entities: entities.cloned(),
     };
 
-    let config = ModelConfig {
+    let config = ConfigWithEntities {
         models: vec![model],
     };
 
     let yaml = serde_yaml::to_string(&config)?;
-    
     
     // Enhance descriptions using OpenAI
     let enhanced_yaml = enhance_yaml_with_descriptions(yaml).await?;
@@ -471,37 +489,49 @@ async fn identify_entity_relationships(
             let messages = vec![
                 LlmMessage::new(
                     "system".to_string(),
-                    "You are a database relationship analyzer. Your task is to identify relationships between tables and output them in a specific YAML format. Only include tables that have relationships with other tables. Skip any tables that don't have relationships.
+                    r#"You are a database relationship analyzer. Your task is to identify relationships between tables and output them in a specific JSON format. Only include tables that have relationships with other tables. Skip any tables that don't have relationships.
 
 IMPORTANT OUTPUT RULES:
-1. Your response must ONLY contain the YAML content wrapped in ```yml code blocks
+1. Your response must ONLY contain the JSON content wrapped in ```json code blocks
 2. Do not include any explanations, notes, or other text outside the code blocks
-3. If no relationships exist, output an empty YAML wrapped in code blocks
+3. If no relationships exist, output an empty JSON object wrapped in code blocks
+4. Each relationship must have exactly these fields: name, expr, type, description
+5. All values must be strings
+6. No multi-line values are allowed
+7. No special characters that could break JSON parsing
+8. The JSON must be properly formatted with no trailing commas
 
 Example output format:
-```yml
-# If table_name1 has relationships:
-table_name1:
-  - name: related_table1
-    expr: foreign_key_column
-    type: foreign
-    description: Description of the relationship
-  - name: related_table2
-    expr: another_foreign_key
-    type: foreign
-    description: Another relationship description
-```
-
-Rules for relationships:
-- Only include tables that have relationships
-- Omit tables with no relationships
-- Always wrap output in ```yml code blocks
-- Output only the YAML, no other text".to_string(),
+```json
+{
+  "table_name1": [
+    {
+      "name": "related_table1",
+      "expr": "foreign_key_column",
+      "type": "foreign",
+      "description": "Simple description of the relationship"
+    },
+    {
+      "name": "related_table2",
+      "expr": "another_foreign_key",
+      "type": "foreign",
+      "description": "Another simple description"
+    }
+  ],
+  "table_name2": [
+    {
+      "name": "related_table3",
+      "expr": "foreign_key_column",
+      "type": "foreign",
+      "description": "Simple description of another relationship"
+    }
+  ]
+}"#.to_string(),
                 ),
                 LlmMessage::new(
                     "user".to_string(),
                     format!(
-                        "For these tables: {}\n\nAnalyze this schema documentation and output YAML entities showing relationships in the exact format shown above. Remember to only include tables that have relationships:\n\n{}",
+                        "For these tables: {}\n\nAnalyze this schema documentation and output JSON showing relationships in the exact format shown above. Remember to only include tables that have relationships:\n\n{}",
                         batch_models.join(", "),
                         docs
                     ),
@@ -524,47 +554,79 @@ Rules for relationships:
             .await
             .map_err(|e| (batch_models.clone(), e))?;
 
-            // Log the raw response for debugging
-            tracing::debug!("Raw LLM response:\n{}", response);
-
-            // Extract YAML from markdown code blocks if present
-            let yaml_str = if response.contains("```") {
-                let re = Regex::new(r"```(?:ya?ml)?\n([\s\S]*?)\n```").unwrap();
-                re.captures(&response)
-                    .map(|caps| caps.get(1).unwrap().as_str().to_string())
-                    .unwrap_or(response)
+            // Extract JSON from code blocks
+            let json_str = if response.contains("```") {
+                let re = Regex::new(r"```(?:json)?\n([\s\S]*?)\n```").unwrap();
+                match re.captures(&response) {
+                    Some(caps) => caps.get(1).unwrap().as_str().to_string(),
+                    None => {
+                        return Err((batch_models, anyhow!("Failed to extract JSON from response")));
+                    }
+                }
             } else {
                 response
             };
 
-            // If the YAML is empty or just whitespace, return an empty map
-            if yaml_str.trim().is_empty() {
+            // If the JSON is empty or just whitespace, return an empty map
+            if json_str.trim().is_empty() {
                 return Ok::<_, (Vec<String>, anyhow::Error)>((batch_models, HashMap::new()));
             }
 
-            // Parse YAML response into EntityRelationship structs
-            let yaml_docs: HashMap<String, Vec<EntityRelationship>> = serde_yaml::from_str(&yaml_str)
-                .map_err(|e| {
-                    tracing::error!("YAML parsing error. Content:\n{}", yaml_str);
-                    (batch_models.clone(), anyhow!("Failed to parse YAML response: {}", e))
-                })?;
+            // Parse JSON into a temporary Value to validate structure
+            let json_value: serde_json::Value = match serde_json::from_str(&json_str) {
+                Ok(v) => v,
+                Err(e) => {
+                    tracing::error!("JSON parsing error. Content:\n{}", json_str);
+                    return Err((batch_models, anyhow!("Failed to parse JSON: {}", e)));
+                }
+            };
 
-            // Filter out any empty relationship arrays
-            let filtered_docs: HashMap<String, Vec<EntityRelationship>> = yaml_docs
-                .into_iter()
-                .filter(|(_, relationships)| !relationships.is_empty())
-                .collect();
+            // Validate JSON structure and convert to our target format
+            let mut validated_relationships: HashMap<String, Vec<EntityRelationship>> = HashMap::new();
 
-            Ok::<_, (Vec<String>, anyhow::Error)>((batch_models, filtered_docs))
+            if let serde_json::Value::Object(tables) = json_value {
+                for (table_name, relationships_value) in tables {
+                    if let serde_json::Value::Array(relationships) = relationships_value {
+                        let mut valid_relationships = Vec::new();
+
+                        for rel in relationships {
+                            if let serde_json::Value::Object(rel_obj) = rel {
+                                // Extract and validate required fields
+                                let name = rel_obj.get("name").and_then(|v| v.as_str()).unwrap_or("");
+                                let expr = rel_obj.get("expr").and_then(|v| v.as_str()).unwrap_or("");
+                                let type_ = rel_obj.get("type").and_then(|v| v.as_str()).unwrap_or("");
+                                let description = rel_obj.get("description").and_then(|v| v.as_str()).unwrap_or("");
+
+                                // Only include if all required fields are present and non-empty
+                                if !name.is_empty() && !expr.is_empty() && !type_.is_empty() && !description.is_empty() {
+                                    valid_relationships.push(EntityRelationship {
+                                        name: name.to_string(),
+                                        expr: expr.to_string(),
+                                        type_: type_.to_string(),
+                                        description: description.to_string(),
+                                    });
+                                }
+                            }
+                        }
+
+                        // Only include tables with valid relationships
+                        if !valid_relationships.is_empty() {
+                            validated_relationships.insert(table_name, valid_relationships);
+                        }
+                    }
+                }
+            }
+
+            Ok((batch_models, validated_relationships))
         });
     }
 
     // Collect results
     while let Some(result) = join_set.join_next().await {
         match result {
-            Ok(Ok((tables, yaml_relationships))) => {
+            Ok(Ok((tables, json_relationships))) => {
                 for table in tables {
-                    if let Some(entities) = yaml_relationships.get(&table) {
+                    if let Some(entities) = json_relationships.get(&table) {
                         if !entities.is_empty() {
                             relationships.insert(table, entities.clone());
                         }
@@ -711,21 +773,16 @@ async fn generate_datasets_handler(
         let model_name = model_name.clone();
         let schema = request.schema.clone();
         let ds_columns = ds_columns.clone();
-        let entities = entity_relationships.get(&model_name).cloned().unwrap_or_default();
+        let entities = entity_relationships.get(&model_name).cloned();
         
         join_set.spawn(async move {
-            let mut yaml = generate_model_yaml(&model_name, &ds_columns, &schema).await
+            let yaml = generate_model_yaml(
+                &model_name,
+                &ds_columns,
+                &schema,
+                entities.as_ref()
+            ).await
                 .map_err(|e| (model_name.clone(), e))?;
-            
-            // If we have entity relationships, append them to the YAML
-            if !entities.is_empty() {
-                let entities_yaml = serde_yaml::to_string(&entities)
-                    .map_err(|e| (model_name.clone(), anyhow!("Failed to serialize entities: {}", e)))?;
-                yaml.push_str("\n  entities:\n");
-                for line in entities_yaml.lines() {
-                    yaml.push_str(&format!("    {}\n", line));
-                }
-            }
             
             Ok::<_, (String, anyhow::Error)>((model_name, yaml))
         });
