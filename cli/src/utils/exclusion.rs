@@ -5,6 +5,7 @@ use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
+use globwalk;
 
 /// Unified BusterConfig structure for configuration across all commands
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -38,27 +39,71 @@ impl BusterConfig {
     /// If model_paths is not specified, returns the base directory as the only path
     pub fn resolve_model_paths(&self, base_dir: &Path) -> Vec<PathBuf> {
         if let Some(model_paths) = &self.model_paths {
-            let resolved_paths: Vec<PathBuf> = model_paths.iter()
-                .map(|path| {
-                    if Path::new(path).is_absolute() {
-                        PathBuf::from(path)
-                    } else {
-                        base_dir.join(path)
-                    }
-                })
-                .collect();
+            println!("\n🔍 Resolving model paths:");
+            println!("   Base directory: {}", base_dir.display());
             
-            // Log the resolved paths
-            println!("ℹ️  Using model paths from buster.yml:");
-            for (i, path) in resolved_paths.iter().enumerate() {
-                println!("   - {} (resolved to: {})", 
-                    model_paths[i], path.display());
+            let mut resolved_paths = Vec::new();
+            
+            for path in model_paths {
+                println!("\n   Processing path pattern: {}", path);
+                
+                // Convert relative path to absolute if needed
+                let absolute_pattern = if Path::new(path).is_absolute() {
+                    path.clone()
+                } else {
+                    // Handle parent directory traversal by getting absolute path
+                    let mut full_path = base_dir.to_path_buf();
+                    for component in Path::new(path).components() {
+                        full_path.push(component);
+                    }
+                    full_path.to_string_lossy().to_string()
+                };
+                
+                println!("   Absolute pattern: {}", absolute_pattern);
+                
+                // Use globwalk to find matching files
+                match globwalk::GlobWalkerBuilder::from_patterns(
+                    base_dir,
+                    &[&absolute_pattern]
+                )
+                .follow_links(true)
+                .build() {
+                    Ok(walker) => {
+                        let mut found = false;
+                        for entry in walker {
+                            match entry {
+                                Ok(file) => {
+                                    found = true;
+                                    let path = file.path().to_path_buf();
+                                    println!("   ✓ Found match: {}", path.display());
+                                    resolved_paths.push(path);
+                                }
+                                Err(e) => {
+                                    println!("   ⚠️  Error processing entry: {}", e);
+                                }
+                            }
+                        }
+                        if !found {
+                            println!("   ⚠️  No matches found for pattern: {}", absolute_pattern);
+                        }
+                    }
+                    Err(e) => {
+                        println!("   ⚠️  Invalid glob pattern '{}': {}", absolute_pattern, e);
+                    }
+                }
             }
             
-            resolved_paths
+            if resolved_paths.is_empty() {
+                println!("\n⚠️  Warning: No valid paths were resolved!");
+                println!("   Falling back to base directory: {}", base_dir.display());
+                vec![base_dir.to_path_buf()]
+            } else {
+                println!("\n✓ Successfully resolved {} path(s)", resolved_paths.len());
+                resolved_paths
+            }
         } else {
-            // If no model_paths specified, use the base directory
-            println!("ℹ️  No model_paths specified, using current directory: {}", base_dir.display());
+            println!("\nℹ️  No model_paths specified in config");
+            println!("   Using base directory: {}", base_dir.display());
             vec![base_dir.to_path_buf()]
         }
     }

@@ -13,9 +13,10 @@ use crate::utils::{
     buster_credentials::get_and_validate_buster_credentials,
     BusterClient, GenerateApiRequest, GenerateApiResponse,
     yaml_diff_merger::YamlDiffMerger, BusterConfig, ExclusionManager,
-    find_sql_files, ProgressTracker,
+    file_finder::find_sql_files, ProgressTracker,
 };
 use glob;
+use globwalk;
 
 #[derive(Debug)]
 pub struct GenerateCommand {
@@ -428,38 +429,57 @@ impl GenerateCommand {
         progress.status = format!("Initializing exclusion manager...");
         progress.log_progress();
 
-        // Use the new resolve_model_paths helper method
-        let resolved_paths = self.config.resolve_model_paths(&self.destination_path);
-        let has_model_paths = !resolved_paths.is_empty();
+        // Use the model_paths from config if specified
         let mut all_files = Vec::new();
-        
-        // Process each resolved path
-        for path in resolved_paths {
-            progress.status = format!("Scanning path: {}", path.display());
+        let has_model_paths = self.config.model_paths.is_some();
+
+        if let Some(ref model_paths) = self.config.model_paths {
+            progress.status = "Using model paths from config...".to_string();
             progress.log_progress();
-            
-            if path.exists() {
-                if path.is_file() && path.extension().and_then(|ext| ext.to_str()) == Some("sql") {
-                    // Single SQL file
-                    all_files.push(path);
-                } else if path.is_dir() {
-                    // Directory - find all SQL files recursively
-                    let mut dir_files = find_sql_files(&path, true, &exclusion_manager, Some(progress))?;
-                    all_files.append(&mut dir_files);
+
+            // Process each model path
+            for path_pattern in model_paths {
+                progress.status = format!("Processing directory: {}", path_pattern);
+                progress.log_progress();
+
+                // Get the absolute base directory (where buster.yml is)
+                let base_dir = self.destination_path.canonicalize()?;
+                
+                // Resolve the directory path relative to the base directory
+                let search_dir = if path_pattern.starts_with("../") {
+                    base_dir.join(path_pattern)
                 } else {
-                    progress.log_warning(&format!("Skipping invalid path: {}", path.display()));
+                    PathBuf::from(path_pattern)
+                };
+
+                println!("🔍 Looking for SQL files in directory: {}", search_dir.display());
+
+                // Ensure the search directory exists
+                if !search_dir.exists() {
+                    progress.log_warning(&format!("Directory does not exist: {}", search_dir.display()));
+                    continue;
                 }
-            } else {
-                progress.log_warning(&format!("Path not found: {}", path.display()));
+
+                // Walk the directory and find all SQL files
+                for entry in walkdir::WalkDir::new(&search_dir)
+                    .follow_links(true)
+                    .into_iter()
+                    .filter_map(|e| e.ok()) {
+                    if entry.path().extension().and_then(|ext| ext.to_str()) == Some("sql") {
+                        let path = entry.path().to_path_buf();
+                        println!("   Found SQL file: {}", path.display());
+                        all_files.push(path);
+                    }
+                }
             }
         }
-        
-        // If no files found through model_paths, fall back to source_path
+
+        // Only fall back to source_path if no files found through model_paths
         if all_files.is_empty() && has_model_paths {
-            progress.log_warning("No SQL files found in specified model paths, falling back to source path");
-            all_files = find_sql_files(&self.source_path, true, &exclusion_manager, Some(progress))?;
+            progress.log_warning("No SQL files found in specified model paths");
+            return Ok(names);
         } else if all_files.is_empty() {
-            // No model_paths specified and no files found, use source_path
+            // No model_paths specified, use source_path
             all_files = find_sql_files(&self.source_path, true, &exclusion_manager, Some(progress))?;
         }
 
