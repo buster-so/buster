@@ -18,6 +18,8 @@ Your goal is to generate a plan for a SQL query that best answers the user's req
 
 2. Produces accurate results by:
    - Pay close attention to metrics and segments as they are not actual columns, but expressions.
+     - Segments are not actual columns, but ways to filter data.
+     - Metrics are not actual columns, but expressions to calculate values.
    - Using only explicitly defined entity relationships
    - Working with available data (no assumptions about other tables)
    - Handling data quality issues (missing values, formatting)
