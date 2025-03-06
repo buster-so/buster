@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  createContext,
-  ContextSelector,
-  useContextSelector
-} from '@fluentui/react-context-selector';
+import { createContext, useContextSelector } from 'use-context-selector';
 import type { BusterChat } from '@/api/asset_interfaces';
 import { useChatAssosciations } from './useChatAssosciations';
 import { useChatSelectors } from './useChatSelectors';
@@ -36,5 +32,5 @@ export const ChatProvider: React.FC<{
 };
 
 export const useBusterChatContextSelector = <T,>(
-  selector: ContextSelector<ReturnType<typeof useBusterChat>, T>
+  selector: (state: ReturnType<typeof useBusterChat>) => T
 ) => useContextSelector(BusterChat, selector);

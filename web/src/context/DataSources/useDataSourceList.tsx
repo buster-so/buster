@@ -1,11 +1,7 @@
 import React from 'react';
 import { useSocketQueryEmitOn } from '@/api/buster_socket_query';
 import { queryKeys } from '@/api/query_keys';
-import {
-  ContextSelector,
-  createContext,
-  useContextSelector
-} from '@fluentui/react-context-selector';
+import { createContext, useContextSelector } from 'use-context-selector';
 
 export const useDataSourceList = () => {
   const {
@@ -47,5 +43,5 @@ export const DataSourceListProvider = ({ children }: { children: React.ReactNode
 };
 
 export const useDataSourceListContextSelector = <T,>(
-  selector: ContextSelector<ReturnType<typeof useDataSourceList>, T>
+  selector: (state: ReturnType<typeof useDataSourceList>) => T
 ) => useContextSelector(DataSourceListContext, selector);

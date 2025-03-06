@@ -1,10 +1,6 @@
 'use client';
 
-import {
-  ContextSelector,
-  createContext,
-  useContextSelector
-} from '@fluentui/react-context-selector';
+import { createContext, useContextSelector } from 'use-context-selector';
 import React, { PropsWithChildren, useTransition } from 'react';
 import { useMemoizedFn } from 'ahooks';
 import type { AppSplitterRef } from '@/components/ui/layouts';
@@ -89,5 +85,5 @@ export const ChatLayoutContextProvider: React.FC<
 ChatLayoutContextProvider.displayName = 'ChatLayoutContextProvider';
 
 export const useChatLayoutContextSelector = <T,>(
-  selector: ContextSelector<ReturnType<typeof useChatLayout>, T>
+  selector: (state: ReturnType<typeof useChatLayout>) => T
 ) => useContextSelector(ChatLayoutContext, selector);

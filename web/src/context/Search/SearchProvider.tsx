@@ -4,11 +4,7 @@ import { useBusterWebSocket } from '../BusterWebSocket';
 import { BusterSearchResult } from '@/api/asset_interfaces';
 import { BusterSearchRequest } from '@/api/buster_socket/search';
 import { allBusterSearchRequestKeys } from './config';
-import {
-  createContext,
-  ContextSelector,
-  useContextSelector
-} from '@fluentui/react-context-selector';
+import { createContext, useContextSelector } from 'use-context-selector';
 
 export const useBusterSearch = () => {
   const onBusterSearch = useMemoizedFn(async ({ query }: { query: string }) => {
@@ -35,5 +31,5 @@ export const BusterSearchProvider: React.FC<{
 };
 
 export const useBusterSearchContextSelector = <T,>(
-  selector: ContextSelector<ReturnType<typeof useBusterSearch>, T>
+  selector: (state: ReturnType<typeof useBusterSearch>) => T
 ) => useContextSelector(BusterSearch, selector);

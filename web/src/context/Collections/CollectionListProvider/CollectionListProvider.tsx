@@ -1,11 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useSocketQueryEmitOn } from '@/api/buster_socket_query';
 import type { CollectionsListEmit } from '@/api/buster_socket/collections';
-import {
-  ContextSelector,
-  useContextSelector,
-  createContext
-} from '@fluentui/react-context-selector';
+import { createContext, useContextSelector } from 'use-context-selector';
 import { queryKeys } from '@/api/query_keys';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 
@@ -57,5 +53,5 @@ export const BusterCollectionListsProvider = React.memo<{
 BusterCollectionListsProvider.displayName = 'BusterCollectionListsProvider';
 
 export const useBusterCollectionListContextSelector = <T,>(
-  selector: ContextSelector<ReturnType<typeof useCollectionLists>, T>
+  selector: (state: ReturnType<typeof useCollectionLists>) => T
 ) => useContextSelector(BusterCollectionLists, selector);

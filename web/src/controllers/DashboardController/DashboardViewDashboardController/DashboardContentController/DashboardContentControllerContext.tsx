@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import { useMemoizedFn } from 'ahooks';
 
-import {
-  createContext,
-  ContextSelector,
-  useContextSelector
-} from '@fluentui/react-context-selector';
+import { createContext, useContextSelector } from 'use-context-selector';
 import { BusterDashboard } from '@/api/asset_interfaces';
 
 interface DashboardMetricMetadata {
@@ -65,5 +61,5 @@ export const DashboardContentControllerProvider = ({
 };
 
 export const useDashboardContentControllerContextSelector = <T,>(
-  selector: ContextSelector<ReturnType<typeof useDashboardContent>, T>
+  selector: (state: ReturnType<typeof useDashboardContent>) => T
 ) => useContextSelector(DashboardContentControllerContext, selector);

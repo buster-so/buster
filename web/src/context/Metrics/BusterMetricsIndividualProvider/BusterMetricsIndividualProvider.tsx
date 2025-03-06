@@ -1,9 +1,5 @@
 import React, { PropsWithChildren } from 'react';
-import {
-  createContext,
-  ContextSelector,
-  useContextSelector
-} from '@fluentui/react-context-selector';
+import { createContext, useContextSelector } from 'use-context-selector';
 import { useMemoizedFn } from 'ahooks';
 import type { IBusterMetric } from '../interfaces';
 import { resolveEmptyMetric } from '../helpers';
@@ -75,7 +71,7 @@ export const BusterMetricsIndividualProvider: React.FC<PropsWithChildren> = Reac
 BusterMetricsIndividualProvider.displayName = 'BusterMetricsIndividualProvider';
 
 export const useBusterMetricsIndividualContextSelector = <T,>(
-  selector: ContextSelector<ReturnType<typeof useBusterMetricsIndividual>, T>
+  selector: (state: ReturnType<typeof useBusterMetricsIndividual>) => T
 ) => {
   return useContextSelector(BusterMetricsIndividual, selector);
 };

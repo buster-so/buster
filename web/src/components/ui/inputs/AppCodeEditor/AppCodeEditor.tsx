@@ -4,11 +4,10 @@
 //https://dtstack.github.io/monaco-sql-languages/
 
 import React, { forwardRef, useMemo } from 'react';
-import type { editor } from 'monaco-editor/esm/vs/editor/editor.api';
 import { CircleSpinnerLoaderContainer } from '../../loaders/CircleSpinnerLoaderContainer';
 import { useMemoizedFn } from 'ahooks';
 import { cn } from '@/lib/classMerge';
-
+import type { editor } from 'monaco-editor/esm/vs/editor/editor.api';
 import './MonacoWebWorker';
 import { configureMonacoToUseYaml } from './yamlHelper';
 

@@ -1,9 +1,5 @@
 import React, { PropsWithChildren } from 'react';
-import {
-  ContextSelector,
-  createContext,
-  useContextSelector
-} from '@fluentui/react-context-selector';
+import { createContext, useContextSelector } from 'use-context-selector';
 
 export const useDatasets = () => {
   return {};
@@ -20,5 +16,5 @@ export const DatasetProviders: React.FC<PropsWithChildren> = ({ children }) => {
 };
 
 export const useDatasetContextSelector = <T,>(
-  selector: ContextSelector<ReturnType<typeof useDatasets>, T>
+  selector: (state: ReturnType<typeof useDatasets>) => T
 ) => useContextSelector(BusterDatasets, selector);

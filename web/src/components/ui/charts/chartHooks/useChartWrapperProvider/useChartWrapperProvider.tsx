@@ -1,8 +1,4 @@
-import {
-  createContext,
-  ContextSelector,
-  useContextSelector
-} from '@fluentui/react-context-selector';
+import { createContext, useContextSelector } from 'use-context-selector';
 import React, { PropsWithChildren } from 'react';
 
 const ChartWrapperContext = createContext<{
@@ -17,9 +13,8 @@ export const ChartWrapperProvider: React.FC<
   return <ChartWrapperContext.Provider value={{ width }}>{children}</ChartWrapperContext.Provider>;
 };
 
-export const useChartWrapperContextSelector = <T,>(
-  selector: ContextSelector<{ width: number }, T>
-) => useContextSelector(ChartWrapperContext, selector);
+export const useChartWrapperContextSelector = <T,>(selector: (state: { width: number }) => T) =>
+  useContextSelector(ChartWrapperContext, selector);
 
 const ChartLegendWrapperContext = createContext<{
   inactiveDatasets: Record<string, boolean>;
@@ -38,5 +33,5 @@ export const ChartLegendWrapperProvider: React.FC<
 };
 
 export const useChartLegendWrapperContextSelector = <T,>(
-  selector: ContextSelector<{ inactiveDatasets: Record<string, boolean> }, T>
+  selector: (state: { inactiveDatasets: Record<string, boolean> }) => T
 ) => useContextSelector(ChartLegendWrapperContext, selector);

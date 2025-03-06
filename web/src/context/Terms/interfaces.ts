@@ -1,7 +1,6 @@
 import { BusterTerm, BusterTermListItem } from '@/api/buster_rest';
-import { ContextSelector } from '@fluentui/react-context-selector';
 
-export type UseTermsContextSelector = <T>(selector: ContextSelector<UseTermsHookReturn, T>) => T;
+export type UseTermsContextSelector = <T>(selector: (state: UseTermsHookReturn) => T) => T;
 
 export interface UseTermsHookReturn {
   getTermFromList: (termId: string) => BusterTermListItem | undefined;

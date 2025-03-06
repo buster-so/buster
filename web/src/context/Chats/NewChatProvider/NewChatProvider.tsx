@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  createContext,
-  ContextSelector,
-  useContextSelector
-} from '@fluentui/react-context-selector';
+import { createContext, useContextSelector } from 'use-context-selector';
 import { useMemoizedFn } from 'ahooks';
 import type { BusterSearchResult, FileType } from '@/api/asset_interfaces';
 import { useBusterWebSocket } from '@/context/BusterWebSocket';
@@ -160,5 +156,5 @@ export const BusterNewChatProvider: React.FC<{
 };
 
 export const useBusterNewChatContextSelector = <T,>(
-  selector: ContextSelector<ReturnType<typeof useBusterNewChat>, T>
+  selector: (state: ReturnType<typeof useBusterNewChat>) => T
 ) => useContextSelector(BusterNewChatContext, selector);

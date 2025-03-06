@@ -1,9 +1,5 @@
 import React from 'react';
-import {
-  ContextSelector,
-  useContextSelector,
-  createContext
-} from '@fluentui/react-context-selector';
+import { createContext, useContextSelector } from 'use-context-selector';
 import { useCollectionAssociations } from './useCollectionAssosciations';
 import { useCollectionCreate } from './useCollectionCreate';
 import { useCollectionUpdate } from './useCollectionUpdate';
@@ -38,5 +34,5 @@ export const BusterCollectionIndividualProvider = React.memo<{
 BusterCollectionIndividualProvider.displayName = 'BusterCollectionIndividualProvider';
 
 export const useBusterCollectionIndividualContextSelector = <T,>(
-  selector: ContextSelector<ReturnType<typeof useCollectionIndividualMethods>, T>
+  selector: (state: ReturnType<typeof useCollectionIndividualMethods>) => T
 ) => useContextSelector(BusterCollectionIndividual, selector);

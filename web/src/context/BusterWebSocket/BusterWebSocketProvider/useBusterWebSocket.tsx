@@ -10,11 +10,7 @@ import type {
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { BusterSocketResponseBase } from '@/api/buster_socket/base_interfaces';
 import { useSupabaseContext } from '../../Supabase';
-import {
-  ContextSelector,
-  createContext,
-  useContextSelector
-} from '@fluentui/react-context-selector';
+import { createContext, useContextSelector } from 'use-context-selector';
 import { SupabaseContextReturnType } from '../../Supabase';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 
@@ -209,7 +205,7 @@ export const BusterWebSocketProvider: React.FC<{
 BusterWebSocketProvider.displayName = 'BusterWebSocketProvider';
 
 const useBusterWebSocketSelector = <T,>(
-  selector: ContextSelector<ReturnType<typeof useBusterWebSocketHook>, T>
+  selector: (state: ReturnType<typeof useBusterWebSocketHook>) => T
 ) => useContextSelector(BusterWebSocket, selector);
 
 export const useBusterWebSocket = () => {

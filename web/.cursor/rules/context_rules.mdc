@@ -1,11 +1,12 @@
 ---
 description: Rules for the context directory
 globs: src/context/**/*
+alwaysApply: false
 ---
 
 # Context Creation Pattern
 
-When creating new contexts in this project, we use the `@fluentui/react-context-selector` library for optimized context consumption. Follow this pattern:
+When creating new contexts in this project, we use the `use-context-selector` library for optimized context consumption. Follow this pattern:
 
 1. Create the context using `createContext`:
 ```typescript
@@ -27,8 +28,7 @@ MyContextProvider.displayName = 'MyContextProvider';
 3. Create a selector hook for consuming the context:
 ```typescript
 export const useMyContextSelector = <T,>(
-  selector: ContextSelector<ReturnType<typeof useMyHook>, T>
-) => {
+selector: (state: ReturnType<typeof useChatLayout>) => T) => {
   return useContextSelector(MyContext, selector);
 };
 ```

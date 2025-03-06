@@ -1,8 +1,4 @@
-import {
-  ContextSelector,
-  useContextSelector,
-  createContext
-} from '@fluentui/react-context-selector';
+import { createContext, useContextSelector } from 'use-context-selector';
 import React from 'react';
 import { useDatasourceCreate } from './useDatasourceCreate';
 import { useDatasourceUpdate } from './useDatasourceUpdate';
@@ -33,5 +29,5 @@ const DataSourceIndividualProvider = ({ children }: { children: React.ReactNode 
 export { DataSourceIndividualProvider };
 
 export const useDataSourceIndividualContextSelector = <T,>(
-  selector: ContextSelector<ReturnType<typeof useDataSourceIndividualProvider>, T>
+  selector: (state: ReturnType<typeof useDataSourceIndividualProvider>) => T
 ) => useContextSelector(DataSourceIndividualContext, selector);

@@ -1,9 +1,5 @@
 import React, { PropsWithChildren } from 'react';
-import {
-  ContextSelector,
-  createContext,
-  useContextSelector
-} from '@fluentui/react-context-selector';
+import { createContext, useContextSelector } from 'use-context-selector';
 import type { SelectedFile } from '../interfaces';
 import { useAutoChangeLayout } from './useAutoChangeLayout';
 import { useGetChat } from '@/api/buster_rest/chats';
@@ -97,5 +93,5 @@ export const ChatContextProvider = React.memo(
 ChatContextProvider.displayName = 'ChatContextProvider';
 
 export const useChatIndividualContextSelector = <T,>(
-  selector: ContextSelector<ReturnType<typeof useChatIndividualContext>, T>
+  selector: (state: ReturnType<typeof useChatIndividualContext>) => T
 ) => useContextSelector(IndividualChatContext, selector);

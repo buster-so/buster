@@ -6,11 +6,7 @@ import type {
   CategoryAxisStyleConfig,
   Y2AxisConfig
 } from '@/components/ui/charts/interfaces';
-import {
-  createContext,
-  ContextSelector,
-  useContextSelector
-} from '@fluentui/react-context-selector';
+import { createContext, useContextSelector } from 'use-context-selector';
 import { PropsWithChildren } from 'react';
 import React from 'react';
 
@@ -45,6 +41,5 @@ export const SelectAxisProvider: React.FC<PropsWithChildren<ISelectAxisContext>>
   return <SelectAxisContext.Provider value={props}>{children}</SelectAxisContext.Provider>;
 };
 
-export const useSelectAxisContextSelector = <T,>(
-  selector: ContextSelector<ISelectAxisContext, T>
-) => useContextSelector(SelectAxisContext, selector);
+export const useSelectAxisContextSelector = <T,>(selector: (state: ISelectAxisContext) => T) =>
+  useContextSelector(SelectAxisContext, selector);

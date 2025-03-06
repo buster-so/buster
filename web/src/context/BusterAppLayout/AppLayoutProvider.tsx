@@ -4,12 +4,8 @@ import { BusterRoutesWithArgsRoute, createBusterRoute } from '@/routes/busterRou
 import { pathNameToRoute } from '@/routes/helpers';
 import { useMemoizedFn, usePrevious } from 'ahooks';
 import { useRouter, usePathname, useSelectedLayoutSegment, useParams } from 'next/navigation';
-import React, { PropsWithChildren, useLayoutEffect, useRef } from 'react';
-import {
-  createContext,
-  ContextSelector,
-  useContextSelector
-} from '@fluentui/react-context-selector';
+import React, { PropsWithChildren } from 'react';
+import { createContext, useContextSelector } from 'use-context-selector';
 
 export const useAppLayout = () => {
   const { push } = useRouter();
@@ -94,5 +90,5 @@ export const AppLayoutProvider = React.memo<PropsWithChildren>(({ children }) =>
 AppLayoutProvider.displayName = 'AppLayoutProvider';
 
 export const useAppLayoutContextSelector = <T,>(
-  selector: ContextSelector<ReturnType<typeof useAppLayout>, T>
+  selector: (state: ReturnType<typeof useAppLayout>) => T
 ) => useContextSelector(AppLayoutContext, selector);

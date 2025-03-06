@@ -1,11 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { useMemoizedFn } from 'ahooks';
 import { useBusterMetricsIndividualContextSelector } from '../Metrics';
-import {
-  createContext,
-  useContextSelector,
-  ContextSelector
-} from '@fluentui/react-context-selector';
+import { createContext, useContextSelector } from 'use-context-selector';
 import { useBusterNotifications } from '../BusterNotifications';
 import { didColumnDataChange, simplifyChatConfigForSQLChange } from './helpers';
 import { type IBusterMetricChartConfig, type RunSQLResponse } from '@/api/asset_interfaces';
@@ -239,5 +235,5 @@ export const BusterSQLProvider: React.FC<{
 };
 
 export const useSQLContextSelector = <T,>(
-  selector: ContextSelector<ReturnType<typeof useSQLProvider>, T>
+  selector: (state: ReturnType<typeof useSQLProvider>) => T
 ) => useContextSelector(BusterSQL, selector);

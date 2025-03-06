@@ -53,11 +53,7 @@ import { ThemeProvider } from 'antd-style';
 import { ThemeProvider as NextThemeProvider, useTheme as useNextTheme } from 'next-themes';
 import StyleRegistry from './StyleRegistry';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
-import {
-  useContextSelector,
-  createContext,
-  ContextSelector
-} from '@fluentui/react-context-selector';
+import { createContext, useContextSelector } from 'use-context-selector';
 import { BusterNotificationsProvider } from '../BusterNotifications';
 
 const { defaultAlgorithm, darkAlgorithm } = theme;
@@ -139,13 +135,12 @@ const BusterStyles = createContext<{ theme: ThemeConfig }>({
   theme: busterAppStyleConfig
 });
 
-export const useBusterStylesContext = <T,>(
-  selector: ContextSelector<
-    {
-      theme: ThemeConfig;
-    },
-    T
-  >
-) => {
+type ContextSelector<T> = (value: { theme: ThemeConfig }) => T;
+
+export const useBusterStylesContext = <T,>(selector: ContextSelector<T>) => {
   return useContextSelector(BusterStyles, selector);
 };
+
+// Example usage:
+// const theme = useBusterStylesContext(state => state.theme);
+// const specificToken = useBusterStylesContext(state => state.theme.token?.colorPrimary);
