@@ -1,6 +1,6 @@
 import React, { PropsWithChildren } from 'react';
 import { ThemeProvider as NextThemeProvider } from 'next-themes';
-import { BusterNotificationsProvider } from '../BusterNotifications';
+import { BusterNotificationsProvider } from '../BusterNotifications/BusterNotifications';
 import 'react-material-symbols/rounded';
 
 const ENABLE_DARK_MODE = false;

@@ -3,7 +3,7 @@
 import React from 'react';
 import { useTheme } from 'next-themes';
 import { Toaster as ToasterSonner } from 'sonner';
-import { CircleCheck, CircleXmark, CircleWarning } from '@/components/ui/icons';
+import { CircleCheck, CircleXmark, CircleWarning } from '@/components/ui/icons/NucleoIconOutlined';
 
 type ToasterProps = React.ComponentProps<typeof ToasterSonner>;
 
