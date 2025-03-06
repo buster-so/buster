@@ -94,7 +94,7 @@ const gliderVariants = cva('absolute border-border rounded border', {
 // Create a type for the forwardRef component that includes displayName
 type AppSegmentedComponent = (<T extends string = string>(
   props: AppSegmentedProps<T> & { ref?: React.ForwardedRef<HTMLDivElement> }
-) => React.ReactElement) & {
+) => React.ReactElement<any>) & {
   displayName?: string;
 };
 

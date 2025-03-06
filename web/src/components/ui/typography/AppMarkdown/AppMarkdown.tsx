@@ -14,7 +14,7 @@ import { useMemoizedFn } from 'ahooks';
 import { cn } from '@/lib/classMerge';
 import styles from './AppMarkdown.module.css';
 
-const _AppMarkdown: React.FC<{
+const AppMarkdownBase: React.FC<{
   markdown: string | null;
   showLoader?: boolean;
   className?: string;
@@ -78,6 +78,6 @@ const _AppMarkdown: React.FC<{
   );
 };
 
-export const AppMarkdown = memo(_AppMarkdown);
+export const AppMarkdown = memo(AppMarkdownBase);
 
 export default AppMarkdown;

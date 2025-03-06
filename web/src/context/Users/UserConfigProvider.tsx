@@ -13,7 +13,6 @@ import {
 import { checkIfUserIsAdmin } from './helpers';
 import { useUserOrganization } from './useUserOrganization';
 import { useInviteUser } from './useInviteUser';
-import { useWhyDidYouUpdate } from 'ahooks';
 
 export const useUserConfigProvider = ({ userInfo }: { userInfo: BusterUserResponse | null }) => {
   const isAnonymousUser = useSupabaseContext((state) => state.isAnonymousUser);

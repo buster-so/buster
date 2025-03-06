@@ -48,7 +48,7 @@ export const InputTextAreaButton = forwardRef<HTMLTextAreaElement, InputTextArea
   ) => {
     const onSubmitPreflight = useMemoizedFn(() => {
       if (disabled) return;
-      const text = (textRef as React.RefObject<HTMLTextAreaElement>).current?.value || '';
+      const text = (textRef as React.RefObject<HTMLTextAreaElement | null>).current?.value || '';
       onSubmit(text);
     });
 

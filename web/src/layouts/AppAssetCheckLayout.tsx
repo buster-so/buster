@@ -1,6 +1,6 @@
 import React from 'react';
 import { getAssetCheck } from '@/api/buster_rest/assets/requests';
-import { useSupabaseServerContext } from '@/context/Supabase/useSupabaseContext';
+import { getSupabaseServerContext } from '@/context/Supabase/getSupabaseServerContext';
 import { ShareAssetType } from '@/api/asset_interfaces';
 import { ClientSideAnonCheck } from './ClientSideAnonCheck';
 import { redirect } from 'next/navigation';
@@ -20,7 +20,7 @@ export const AppAssetCheckLayout: React.FC<
     children: React.ReactNode;
   } & AppAssetCheckLayoutProps
 > = async ({ children, type, ...props }) => {
-  const { accessToken, user } = await useSupabaseServerContext();
+  const { accessToken, user } = await getSupabaseServerContext();
   const isMetric = type === 'metric';
 
   let jwtToken = accessToken;

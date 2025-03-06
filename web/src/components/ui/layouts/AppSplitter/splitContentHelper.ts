@@ -10,7 +10,7 @@ export async function getAppSplitterLayout(
   defaultLayout: string[] = DEFAULT_LAYOUT
 ): Promise<[string, string]> {
   const key = createAutoSaveId(id);
-  const layout = cookies().get(key);
+  const layout = (await cookies()).get(key);
   if (layout) {
     return JSON.parse(layout.value) as [string, string];
   }

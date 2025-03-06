@@ -98,7 +98,7 @@ const ThreeDotsMenu: React.FC<{ dataSource: DataSource }> = ({ dataSource }) => 
             <Text>Connection status</Text>
           </div>
           <Divider style={{ margin: 0 }} />
-          {React.cloneElement(menu as React.ReactElement, { style: menuStyle })}
+          {React.cloneElement(menu as React.ReactElement<any>, { style: menuStyle })}
         </div>
       )}>
       <Button type="text" icon={<AppMaterialIcons icon="more_horiz" />}></Button>

@@ -84,12 +84,11 @@ export const AccessDropdown: React.FC<{
           boxShadow: token.boxShadowSecondary,
           maxWidth: '235px'
         }}>
-        {React.cloneElement(menu as React.ReactElement, {
+        {React.cloneElement(menu as React.ReactElement<any>, {
           style: {
             boxShadow: 'none'
           }
         })}
-
         <Divider />
         <div
           className="flex justify-center overflow-hidden p-2 px-2.5"

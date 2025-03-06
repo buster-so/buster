@@ -4,13 +4,18 @@ import { prefetchGetUser } from '@/api/buster_rest';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { LayoutHeaderAndSegment } from './_LayoutHeaderAndSegment';
 
-export default async function Layout({
-  children,
-  params
-}: {
-  children: React.ReactNode;
-  params: { userId: string };
-}) {
+export default async function Layout(
+  props: {
+    children: React.ReactNode;
+    params: Promise<{ userId: string }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    children
+  } = props;
+
   const queryClient = await prefetchGetUser(params.userId);
 
   return (

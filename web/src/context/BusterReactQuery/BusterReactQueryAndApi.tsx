@@ -9,7 +9,7 @@ import { useSupabaseContext } from '../Supabase/SupabaseContextProvider';
 import { getQueryClient } from './getQueryClient';
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
 
-export const BusterReactQueryProvider = ({ children }: { children: React.ReactElement }) => {
+export const BusterReactQueryProvider = ({ children }: { children: React.ReactElement<any> }) => {
   const accessToken = useSupabaseContext((state) => state.accessToken);
   const queryClient = getQueryClient(accessToken);
 

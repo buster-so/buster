@@ -18,7 +18,7 @@ export const getLegendItems = ({
 }: {
   colors: string[];
   columnSettings: NonNullable<BusterChartProps['columnSettings']>;
-  chartRef: React.RefObject<ChartJSOrUndefined>;
+  chartRef: React.RefObject<ChartJSOrUndefined | null>;
   inactiveDatasets: Record<string, boolean>;
   columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>;
   selectedChartType: ChartType;

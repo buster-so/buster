@@ -13,7 +13,7 @@ import { useLayoutCollapse, useSelectedFileAndLayout } from '../hooks';
 import { useChatFileLayout } from './useChatFileLayout';
 
 interface UseChatSplitterProps {
-  appSplitterRef: React.RefObject<AppSplitterRef>;
+  appSplitterRef: React.RefObject<AppSplitterRef | null>;
 }
 
 export const useChatLayout = ({ appSplitterRef }: UseChatSplitterProps) => {

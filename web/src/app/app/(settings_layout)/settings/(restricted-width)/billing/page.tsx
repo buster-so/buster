@@ -2,10 +2,10 @@ import { SettingsEmptyState } from '../../_components/SettingsEmptyState';
 import { SettingsPageHeader } from '../../_components/SettingsPageHeader';
 import { redirect } from 'next/navigation';
 import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
-import { useCheckIfUserIsAdmin_server } from '@/server_context/user';
+import { checkIfUserIsAdmin_server } from '@/server_context/user';
 
 export default async function Page() {
-  const isAdmin = await useCheckIfUserIsAdmin_server();
+  const isAdmin = await checkIfUserIsAdmin_server();
 
   if (!isAdmin) {
     return redirect(

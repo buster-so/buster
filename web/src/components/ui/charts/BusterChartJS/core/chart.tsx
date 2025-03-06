@@ -23,7 +23,7 @@ function ChartComponent<
     ...canvasProps
   } = props as ChartProps;
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const chartRef = useRef<ChartJS | null>();
+  const chartRef = useRef<ChartJS | null>(undefined);
 
   const renderChart = () => {
     if (!canvasRef.current) return;

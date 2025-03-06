@@ -7,7 +7,7 @@ import { MetricTitle } from './MetricTitle';
 import { createBusterRoute, BusterRoutes } from '@/routes';
 import { useMemoizedFn } from 'ahooks';
 
-const _DashboardMetricItem: React.FC<{
+const DashboardMetricItemBase: React.FC<{
   metricId: string;
   dashboardId: string;
   numberOfMetrics: number;
@@ -115,7 +115,7 @@ const _DashboardMetricItem: React.FC<{
   );
 };
 
-export const DashboardMetricItem = React.memo(_DashboardMetricItem, (prev, next) => {
+export const DashboardMetricItem = React.memo(DashboardMetricItemBase, (prev, next) => {
   return prev.metricId === next.metricId && prev.dashboardId === next.dashboardId;
 });
 

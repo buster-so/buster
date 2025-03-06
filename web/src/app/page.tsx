@@ -1,9 +1,9 @@
-import { useSupabaseServerContext } from '@/context/Supabase/useSupabaseContext';
+import { getSupabaseServerContext } from '@/context/Supabase/getSupabaseServerContext';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { redirect } from 'next/navigation';
 
 export default async function Index() {
-  const { user } = await useSupabaseServerContext();
+  const { user } = await getSupabaseServerContext();
 
   if (!user) {
     return redirect(

@@ -3,11 +3,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/context/Supabase/server';
 import { codeToFlag } from './_codeToFlag';
-import { useSupabaseServerContext } from '@/context/Supabase/useSupabaseContext';
+import { getSupabaseServerContext } from '@/context/Supabase/getSupabaseServerContext';
 
 export async function GET(request: NextRequest) {
   // Check if user is authenticated
-  const { user } = await useSupabaseServerContext();
+  const { user } = await getSupabaseServerContext();
 
   if (user) {
     return NextResponse.json(currencies);

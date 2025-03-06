@@ -326,8 +326,8 @@ const ModalContent: React.FC<{
   onSetSelectedFilter: (value: string) => void;
   inputValue: string;
   onChangeSearchInput: (value: React.ChangeEvent<HTMLInputElement>) => void;
-  inputRef: React.RefObject<InputRef>;
-  scrollContainerRef: React.RefObject<HTMLDivElement>;
+  inputRef: React.RefObject<InputRef | null>;
+  scrollContainerRef: React.RefObject<HTMLDivElement | null>;
   rows: BusterListRow[];
   columns: BusterListColumn[];
   loadedInitialSearchItems: boolean;

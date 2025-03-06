@@ -18,7 +18,7 @@ import { getLegendItems } from './helper';
 import { DatasetOption } from '@/components/ui/charts/chartHooks';
 
 interface UseBusterChartJSLegendProps {
-  chartRef: React.RefObject<ChartJSOrUndefined>;
+  chartRef: React.RefObject<ChartJSOrUndefined | null>;
   colors: NonNullable<BusterChartProps['colors']>;
   showLegend: boolean | null | undefined;
   selectedChartType: ChartType;

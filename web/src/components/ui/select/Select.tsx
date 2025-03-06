@@ -36,7 +36,7 @@ export interface SelectProps<T> {
   className?: string;
 }
 
-const _Select = <T extends string>({
+export const Select = <T extends string>({
   items,
   showIndex,
   disabled,
@@ -67,8 +67,7 @@ const _Select = <T extends string>({
     </SelectBase>
   );
 };
-_Select.displayName = 'Select';
-export const Select = _Select;
+Select.displayName = 'Select';
 
 const SelectItemSelector = <T,>({
   item,

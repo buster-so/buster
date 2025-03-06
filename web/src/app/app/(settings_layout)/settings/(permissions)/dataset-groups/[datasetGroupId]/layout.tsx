@@ -5,13 +5,22 @@ import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { DatasetGroupBackButton } from './DatasetGroupBackButton';
 import { DatasetGroupAppSegments } from './DatasetGroupAppSegments';
 
-export default async function Layout({
-  children,
-  params: { datasetGroupId }
-}: {
-  children: React.ReactNode;
-  params: { datasetGroupId: string };
-}) {
+export default async function Layout(
+  props: {
+    children: React.ReactNode;
+    params: Promise<{ datasetGroupId: string }>;
+  }
+) {
+  const params = await props.params;
+
+  const {
+    datasetGroupId
+  } = params;
+
+  const {
+    children
+  } = props;
+
   const queryClient = await prefetchDatasetGroup(datasetGroupId);
 
   return (

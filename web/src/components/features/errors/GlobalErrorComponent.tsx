@@ -4,6 +4,7 @@ import React, { ReactNode } from 'react';
 import { Button } from '@/components/ui/buttons/Button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card/CardBase';
 import { ErrorBoundary } from '@/components/ui/error';
+import Link from 'next/link';
 
 interface Props {
   children: ReactNode;
@@ -29,11 +30,11 @@ const ErrorCard = () => {
         </CardContent>
 
         <CardFooter className="w-full pt-0">
-          <a href="/" className="w-full">
+          <Link href="/" className="w-full">
             <Button variant="black" block size="tall">
               Take Me Home 🏠
             </Button>
-          </a>
+          </Link>
         </CardFooter>
       </Card>
     </div>

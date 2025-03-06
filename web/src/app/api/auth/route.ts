@@ -1,10 +1,10 @@
 'use server';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { useSupabaseServerContext } from '@/context/Supabase/useSupabaseContext';
+import { getSupabaseServerContext } from '@/context/Supabase/getSupabaseServerContext';
 
 export async function POST(request: NextRequest) {
-  const { accessToken, refreshToken, expiresAt } = await useSupabaseServerContext();
+  const { accessToken, refreshToken, expiresAt } = await getSupabaseServerContext();
 
   let response = NextResponse.json({
     access_token: accessToken,

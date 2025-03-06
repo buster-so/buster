@@ -104,7 +104,7 @@ export const Disabled: Story = {
 export const AsChild: Story = {
   args: {
     asChild: true,
-    children: <a href="/">Link Button</a>
+    children: <a href="www.google.com">Link Button</a>
   }
 };
 

@@ -3,7 +3,7 @@
 import React, { useMemo } from 'react';
 
 export const useIsShowingEllipsis = (
-  textRef: React.RefObject<HTMLDivElement>,
+  textRef: React.RefObject<HTMLDivElement | null>,
   text: string,
   maxLength = 25,
   width?: number

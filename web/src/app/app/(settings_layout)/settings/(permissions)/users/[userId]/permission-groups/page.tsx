@@ -3,10 +3,11 @@ import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { UserPermissionGroupsController } from './UserPermissionGroupsController';
 import { redirect } from 'next/navigation';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import { useCheckIfUserIsAdmin_server } from '@/server_context/user';
+import { checkIfUserIsAdmin_server } from '@/server_context/user';
 
-export default async function Page({ params }: { params: { userId: string } }) {
-  const isAdmin = await useCheckIfUserIsAdmin_server();
+export default async function Page(props: { params: Promise<{ userId: string }> }) {
+  const params = await props.params;
+  const isAdmin = await checkIfUserIsAdmin_server();
 
   if (!isAdmin) {
     return redirect(

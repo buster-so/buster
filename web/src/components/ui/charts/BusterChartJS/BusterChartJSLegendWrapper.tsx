@@ -21,7 +21,7 @@ interface BusterChartJSLegendWrapperProps {
   lineGroupType: BusterChartProps['lineGroupType'];
   barGroupType: BusterChartProps['barGroupType'];
   colors: NonNullable<BusterChartProps['colors']>;
-  chartRef: React.RefObject<ChartJSOrUndefined>;
+  chartRef: React.RefObject<ChartJSOrUndefined | null>;
   datasetOptions: DatasetOption[];
   pieMinimumSlicePercentage: NonNullable<BusterChartProps['pieMinimumSlicePercentage']>;
 }

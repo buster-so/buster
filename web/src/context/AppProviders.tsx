@@ -4,7 +4,7 @@
 import React, { PropsWithChildren } from 'react';
 import { BusterWebSocketProvider } from './BusterWebSocket';
 import { SupabaseContextProvider } from './Supabase/SupabaseContextProvider';
-import { UseSupabaseContextType } from './Supabase/useSupabaseContext';
+import { UseSupabaseContextType } from './Supabase/getSupabaseServerContext';
 import { BusterReactQueryProvider } from './BusterReactQuery/BusterReactQueryAndApi';
 import { useMount } from 'ahooks';
 import { DatasetProviders } from './Datasets';

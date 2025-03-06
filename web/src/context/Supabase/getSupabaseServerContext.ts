@@ -1,9 +1,9 @@
 import { createClient } from './server';
 
 type PromiseType<T extends Promise<any>> = T extends Promise<infer U> ? U : never;
-export type UseSupabaseContextType = PromiseType<ReturnType<typeof useSupabaseServerContext>>;
+export type UseSupabaseContextType = PromiseType<ReturnType<typeof getSupabaseServerContext>>;
 
-export const useSupabaseServerContext = async () => {
+export const getSupabaseServerContext = async () => {
   const supabase = await createClient();
   const [userData, sessionData] = await Promise.all([
     supabase.auth.getUser(),

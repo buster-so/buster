@@ -7,7 +7,7 @@ import { ChatInput } from './ChatInput';
 
 const autoClass = 'mx-auto max-w-[600px] w-full';
 
-export const ChatContent: React.FC<{ chatContentRef: React.RefObject<HTMLDivElement> }> =
+export const ChatContent: React.FC<{ chatContentRef: React.RefObject<HTMLDivElement | null> }> =
   React.memo(({ chatContentRef }) => {
     const chatMessageIds = useChatIndividualContextSelector((state) => state.chatMessageIds);
 

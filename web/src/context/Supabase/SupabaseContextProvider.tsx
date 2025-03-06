@@ -1,7 +1,7 @@
 'use client';
 
 import React, { PropsWithChildren, useLayoutEffect, useRef, useState } from 'react';
-import { UseSupabaseContextType } from './useSupabaseContext';
+import { UseSupabaseContextType } from './getSupabaseServerContext';
 import { useMemoizedFn } from 'ahooks';
 import { User } from '@supabase/supabase-js';
 import { millisecondsFromUnixTimestamp } from '@/lib';
@@ -28,7 +28,7 @@ const useSupabaseContextInternal = ({
 }: {
   supabaseContext: UseSupabaseContextType;
 }) => {
-  const refreshTimerRef = useRef<any>();
+  const refreshTimerRef = useRef<any>(undefined);
   const refreshToken = useRef(supabaseContext.refreshToken || '');
   const expiresAt = useRef(supabaseContext.expiresAt || 5000);
   const isRefreshing = useRef(false);

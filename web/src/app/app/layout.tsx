@@ -1,6 +1,6 @@
 'use server';
 
-import { useSupabaseServerContext } from '@/context/Supabase/useSupabaseContext';
+import { getSupabaseServerContext } from '@/context/Supabase/getSupabaseServerContext';
 import React from 'react';
 import { createBusterRoute } from '@/routes';
 import { BusterRoutes } from '@/routes/busterRoutes';
@@ -15,15 +15,15 @@ export default async function Layout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const headersList = headers();
-  const supabaseContext = await useSupabaseServerContext();
+  const headersList = await headers();
+  const supabaseContext = await getSupabaseServerContext();
   const { accessToken } = supabaseContext;
   const { initialData: userInfo, queryClient } = await prefetchGetMyUserInfo({
     jwtToken: accessToken
   });
 
   const pathname = headersList.get('x-next-pathname') as string;
-  const cookiePathname = cookies().get('x-next-pathname')?.value;
+  const cookiePathname = (await cookies()).get('x-next-pathname')?.value;
   const newUserRoute = createBusterRoute({ route: BusterRoutes.NEW_USER });
 
   if (

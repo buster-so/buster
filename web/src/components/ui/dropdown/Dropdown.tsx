@@ -68,7 +68,7 @@ const dropdownItemKey = <T,>(item: DropdownItems<T>[number], index: number): str
   return `item-${index}`;
 };
 
-export const _Dropdown = <T,>({
+export const DropdownBase = <T,>({
   items,
   selectType = 'none',
   menuHeader,
@@ -231,8 +231,8 @@ export const _Dropdown = <T,>({
     </DropdownMenu>
   );
 };
-_Dropdown.displayName = 'Dropdown';
-export const Dropdown = React.memo(_Dropdown) as unknown as typeof _Dropdown;
+DropdownBase.displayName = 'Dropdown';
+export const Dropdown = React.memo(DropdownBase) as unknown as typeof DropdownBase;
 
 const DropdownItemSelector = React.memo(
   <T,>({

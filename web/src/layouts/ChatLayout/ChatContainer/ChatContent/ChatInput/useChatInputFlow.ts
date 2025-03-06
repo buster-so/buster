@@ -15,7 +15,7 @@ export const useChatInputFlow = ({
   disableSubmit: boolean;
   inputValue: string;
   setInputValue: (value: string) => void;
-  textAreaRef: React.RefObject<HTMLTextAreaElement>;
+  textAreaRef: React.RefObject<HTMLTextAreaElement | null>;
   loading: boolean;
 }) => {
   const hasChat = useChatIndividualContextSelector((x) => x.hasChat);

@@ -17,7 +17,7 @@ export const useMetricLayout = ({
   type
 }: {
   selectedFileViewSecondary: null | string;
-  appSplitterRef: React.RefObject<AppSplitterRef>;
+  appSplitterRef: React.RefObject<AppSplitterRef | null>;
   autoSaveId: string;
   type: 'chart' | 'sql';
 }) => {
