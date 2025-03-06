@@ -91,6 +91,7 @@ rayon = "1.10.0"
 diesel_migrations = "2.0.0"
 serde_yaml = "0.9.34"
 html-escape = "0.2.13"
+itertools = "0.14.0"
 
 [profile.release]
 debug = false
