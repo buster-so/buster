@@ -591,8 +591,16 @@ async fn deploy_datasets_handler(
                     })
                     .unwrap_or_default();
 
-                let columns: Vec<DatasetColumn> = req
-                    .columns
+                // Filter out metrics and segments fields as they don't exist as actual columns
+                let filtered_columns: Vec<&DeployDatasetsColumnsRequest> = req.columns
+                    .iter()
+                    .filter(|col| {
+                        // Check if this is a real column that exists in the database
+                        ds_column_types.contains_key(&col.name.to_lowercase())
+                    })
+                    .collect();
+
+                let columns: Vec<DatasetColumn> = filtered_columns
                     .iter()
                     .map(|col| {
                         // Look up the type from ds_columns, fallback to request type or "text"

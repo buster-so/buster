@@ -45,6 +45,10 @@ pub struct Model {
     dimensions: Vec<Dimension>,
     #[serde(default)]
     measures: Vec<Measure>,
+    #[serde(default)]
+    metrics: Vec<Metric>,
+    #[serde(default)]
+    segments: Vec<Segment>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, Eq, PartialEq, Hash)]
@@ -79,6 +83,19 @@ pub struct Measure {
     description: String,
     #[serde(rename = "type")]
     measure_type: Option<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct Metric {
+    name: String,
+    expr: String,
+    description: String,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct Segment {
+    name: String,
+    expr: String,
 }
 
 #[derive(Debug)]
@@ -474,6 +491,32 @@ impl ModelFile {
                 expr: Some(measure.expr.clone()),
                 type_: measure.measure_type.clone(),
                 agg: Some(measure.agg.clone()),
+                searchable: false,
+            });
+        }
+
+        // Convert metrics to columns
+        for metric in &model.metrics {
+            columns.push(DeployDatasetsColumnsRequest {
+                name: metric.name.clone(),
+                description: metric.description.clone(),
+                semantic_type: Some("metric".to_string()),
+                expr: Some(metric.expr.clone()),
+                type_: None,
+                agg: None,
+                searchable: false,
+            });
+        }
+
+        // Convert segments to columns
+        for segment in &model.segments {
+            columns.push(DeployDatasetsColumnsRequest {
+                name: segment.name.clone(),
+                description: format!("Segment: {}", segment.name),
+                semantic_type: Some("segment".to_string()),
+                expr: Some(segment.expr.clone()),
+                type_: None,
+                agg: None,
                 searchable: false,
             });
         }
