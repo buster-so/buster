@@ -6,6 +6,8 @@ import { getSupabaseServerContext } from '@/context/Supabase/getSupabaseServerCo
 import { getMyUserInfo_server } from '@/api/buster_rest';
 import { ResetPasswordForm } from '@/components/features/auth/ResetPasswordForm';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ResetPassword() {
   const supabaseContext = await getSupabaseServerContext();
 
