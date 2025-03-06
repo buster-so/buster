@@ -61,7 +61,8 @@ pub async fn init(destination_path: Option<&str>) -> Result<()> {
 
     let config_path = dest_path.join("buster.yml");
 
-    if config_path.exists() {
+    // Check if buster.yml exists and if we should overwrite it
+    let should_create_config = if config_path.exists() {
         let overwrite = Confirm::new(&format!(
             "A buster.yml file already exists at {}. Do you want to overwrite it?",
             config_path.display().to_string().cyan()
@@ -72,11 +73,13 @@ pub async fn init(destination_path: Option<&str>) -> Result<()> {
         if !overwrite {
             println!(
                 "{}",
-                "Keeping existing buster.yml file. Configuration will be skipped.".yellow()
+                "Keeping existing buster.yml file. Will only add the data source.".yellow()
             );
-            return Ok(());
         }
-    }
+        overwrite
+    } else {
+        true // No config exists, so we should create one
+    };
 
     // Check for Buster credentials with progress indicator
     let spinner = ProgressBar::new_spinner();
@@ -115,13 +118,13 @@ pub async fn init(destination_path: Option<&str>) -> Result<()> {
 
     match db_type {
         DatabaseType::Redshift => {
-            setup_redshift(buster_creds.url, buster_creds.api_key, &config_path).await
+            setup_redshift(buster_creds.url, buster_creds.api_key, &config_path, should_create_config).await
         }
         DatabaseType::Postgres => {
-            setup_postgres(buster_creds.url, buster_creds.api_key, &config_path).await
+            setup_postgres(buster_creds.url, buster_creds.api_key, &config_path, should_create_config).await
         }
         DatabaseType::BigQuery => {
-            setup_bigquery(buster_creds.url, buster_creds.api_key, &config_path).await
+            setup_bigquery(buster_creds.url, buster_creds.api_key, &config_path, should_create_config).await
         }
         _ => {
             println!(
@@ -138,6 +141,7 @@ async fn setup_redshift(
     buster_url: String,
     buster_api_key: String,
     config_path: &Path,
+    should_create_config: bool,
 ) -> Result<()> {
     println!("{}", "Setting up Redshift connection...".bold().green());
 
@@ -314,17 +318,20 @@ async fn setup_redshift(
                 name.cyan()
             );
 
-            // Create a copy of the values we need for the config file
-            let db_copy = database.clone();
-            let schema_copy = schema.clone();
+            // Only create buster.yml if we should create/overwrite the config
+            if should_create_config {
+                // Create a copy of the values we need for the config file
+                let db_copy = database.clone();
+                let schema_copy = schema.clone();
 
-            // Create buster.yml file
-            create_buster_config_file(
-                config_path,
-                &name,
-                db_copy.as_deref(),
-                schema_copy.as_deref(),
-            )?;
+                // Create buster.yml file
+                create_buster_config_file(
+                    config_path,
+                    &name,
+                    db_copy.as_deref(),
+                    schema_copy.as_deref(),
+                )?;
+            }
 
             println!("You can now use this data source with other Buster commands.");
             Ok(())
@@ -342,6 +349,7 @@ async fn setup_postgres(
     buster_url: String,
     buster_api_key: String,
     config_path: &Path,
+    should_create_config: bool,
 ) -> Result<()> {
     println!("{}", "Setting up PostgreSQL connection...".bold().green());
 
@@ -503,17 +511,20 @@ async fn setup_postgres(
                 name.cyan()
             );
 
-            // Create a copy of the values we need for the config file
-            let db_copy = database.clone();
-            let schema_copy = schema.clone();
+            // Only create buster.yml if we should create/overwrite the config
+            if should_create_config {
+                // Create a copy of the values we need for the config file
+                let db_copy = database.clone();
+                let schema_copy = schema.clone();
 
-            // Create buster.yml file
-            create_buster_config_file(
-                config_path,
-                &name,
-                db_copy.as_deref(),
-                schema_copy.as_deref(),
-            )?;
+                // Create buster.yml file
+                create_buster_config_file(
+                    config_path,
+                    &name,
+                    db_copy.as_deref(),
+                    schema_copy.as_deref(),
+                )?;
+            }
 
             println!("You can now use this data source with other Buster commands.");
             Ok(())
@@ -531,6 +542,7 @@ async fn setup_bigquery(
     buster_url: String,
     buster_api_key: String,
     config_path: &Path,
+    should_create_config: bool,
 ) -> Result<()> {
     println!("{}", "Setting up BigQuery connection...".bold().green());
 
@@ -673,13 +685,16 @@ async fn setup_bigquery(
                 name.cyan()
             );
 
-            // Create buster.yml file
-            create_buster_config_file(
-                config_path,
-                &name,
-                Some(&project_id),     // Project ID maps to database
-                dataset_id.as_deref(), // Dataset ID maps to schema
-            )?;
+            // Only create buster.yml if we should create/overwrite the config
+            if should_create_config {
+                // Create buster.yml file
+                create_buster_config_file(
+                    config_path,
+                    &name,
+                    Some(&project_id),     // Project ID maps to database
+                    dataset_id.as_deref(), // Dataset ID maps to schema
+                )?;
+            }
 
             println!("You can now use this data source with other Buster commands.");
             Ok(())
