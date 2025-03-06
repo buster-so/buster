@@ -38,6 +38,7 @@ url = "2.5.0"
 zip = "2.2.2"
 glob = "0.3.1"
 walkdir = "2.5.0"
+globwalk = "0.9.1"
 
 [dev-dependencies]
 tempfile = "3.16.0"
