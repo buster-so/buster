@@ -190,7 +190,7 @@ pub async fn generate_datasets(
             tracing::error!("Error getting user organization id: {:?}", e);
             return Err((
                 StatusCode::INTERNAL_SERVER_ERROR,
-                "Error getting user organization id".to_string(),
+                format!("Failed to get user organization: {}", e),
             ));
         }
     };
@@ -200,31 +200,61 @@ pub async fn generate_datasets(
         Ok(false) => {
             return Err((
                 StatusCode::FORBIDDEN,
-                "Insufficient permissions".to_string(),
+                "User does not have sufficient permissions to generate datasets".to_string(),
             ))
         }
         Err(e) => {
             tracing::error!("Error checking user permissions: {:?}", e);
             return Err((
                 StatusCode::INTERNAL_SERVER_ERROR,
-                "Error checking user permissions".to_string(),
+                format!("Failed to verify user permissions: {}", e),
             ));
         }
     }
 
+    // Validate request
+    if request.model_names.is_empty() {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            "No model names provided in request".to_string(),
+        ));
+    }
+
+    if request.schema.is_empty() {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            "Schema name cannot be empty".to_string(),
+        ));
+    }
+
     match generate_datasets_handler(&request, &organization_id).await {
-        Ok(response) => Ok(ApiResponse::JsonData(response)),
+        Ok(response) => {
+            // Log summary of generation results
+            let success_count = response.yml_contents.len();
+            let error_count = response.errors.len();
+            tracing::info!(
+                "Dataset generation completed. Successful: {}, Failed: {}",
+                success_count,
+                error_count
+            );
+            
+            if error_count > 0 {
+                tracing::warn!("Errors encountered during generation: {:#?}", response.errors);
+            }
+            
+            Ok(ApiResponse::JsonData(response))
+        },
         Err(e) => {
             tracing::error!("Error generating datasets: {:?}", e);
             Err((
                 StatusCode::INTERNAL_SERVER_ERROR,
-                "Error generating datasets".to_string(),
+                format!("Failed to generate datasets: {}", e),
             ))
         }
     }
 }
 
-async fn enhance_yaml_with_descriptions(yaml: String) -> Result<String> {
+async fn enhance_yaml_with_descriptions(yaml: String, model_name: &str) -> Result<String> {
     const DESCRIPTION_PLACEHOLDER: &str = "{NEED DESCRIPTION HERE}";
     
     // Skip OpenAI call if no placeholders exist
@@ -244,11 +274,11 @@ async fn enhance_yaml_with_descriptions(yaml: String) -> Result<String> {
         ),
         LlmMessage::new(
             "user".to_string(),
-            yaml,
+            yaml.clone(),
         ),
     ];
 
-    let response = llm_chat(
+    let response = match llm_chat(
         LlmModel::OpenAi(OpenAiChatModel::O3Mini),
         &messages,
         0.1,
@@ -261,13 +291,30 @@ async fn enhance_yaml_with_descriptions(yaml: String) -> Result<String> {
         &Uuid::new_v4(),
         crate::utils::clients::ai::langfuse::PromptName::CustomPrompt("enhance_yaml_descriptions".to_string()),
     )
-    .await?;
+    .await {
+        Ok(response) => response,
+        Err(e) => {
+            tracing::error!(
+                error = %e,
+                model = %model_name,
+                "Failed to enhance YAML descriptions"
+            );
+            return Err(anyhow!("Failed to enhance descriptions for model '{}': {}", model_name, e));
+        }
+    };
 
     // Extract YAML from markdown code blocks
     let re = Regex::new(r"```yml\n([\s\S]*?)\n```").unwrap();
     let yaml = match re.captures(&response) {
         Some(caps) => caps.get(1).unwrap().as_str().to_string(),
-        None => return Err(anyhow!("Failed to extract YAML from response")),
+        None => {
+            tracing::error!(
+                model = %model_name,
+                response = %response,
+                "Failed to extract YAML from LLM response"
+            );
+            return Err(anyhow!("Failed to extract enhanced YAML from response for model '{}'. Response did not contain properly formatted YAML.", model_name));
+        }
     };
 
     Ok(yaml)
@@ -289,7 +336,7 @@ async fn generate_model_yaml(
         .collect();
 
     if model_columns.is_empty() {
-        return Err(anyhow!("No columns found for model"));
+        return Err(anyhow!("No columns found for model '{}' in schema '{}'", model_name, schema));
     }
 
     let mut dimensions = Vec::new();
@@ -354,10 +401,11 @@ async fn generate_model_yaml(
         models: vec![model],
     };
 
-    let yaml = serde_yaml::to_string(&config)?;
+    let yaml = serde_yaml::to_string(&config)
+        .map_err(|e| anyhow!("Failed to serialize YAML for model '{}': {}", model_name, e))?;
     
     // Enhance descriptions using OpenAI
-    let enhanced_yaml = enhance_yaml_with_descriptions(yaml).await?;
+    let enhanced_yaml = enhance_yaml_with_descriptions(yaml, model_name).await?;
 
     let cleaned_yaml = clean_yaml_quotes(&enhanced_yaml);
     
@@ -730,6 +778,12 @@ async fn generate_datasets_handler(
                 "Failed to retrieve columns from data source '{}': {}. Please verify schema '{}' and table access.",
                 request.data_source_name, e, request.schema
             );
+            tracing::error!(
+                error = %e,
+                data_source = %request.data_source_name,
+                schema = %request.schema,
+                "Failed to retrieve columns from data source"
+            );
             
             for model_name in &request.model_names {
                 errors.insert(model_name.clone(), DetailedError {
@@ -750,9 +804,21 @@ async fn generate_datasets_handler(
     let markdown_docs = match extract_keys_from_models(&ds_columns, &request.schema).await {
         Ok(docs) => docs,
         Err(e) => {
-            tracing::error!("Error extracting keys from models: {}", e);
-            // Continue with empty docs - we can still try to generate basic YAMLs
-            String::new()
+            tracing::error!(
+                error = %e,
+                schema = %request.schema,
+                model_count = %request.model_names.len(),
+                "Failed to extract keys from models"
+            );
+            // Add error to all models since this affects all of them
+            for model_name in &request.model_names {
+                errors.insert(model_name.clone(), DetailedError {
+                    message: format!("Failed to extract keys from model: {}", e),
+                    error_type: "KeyExtractionError".to_string(),
+                    context: Some(format!("Schema: {}", request.schema)),
+                });
+            }
+            String::new()  // Continue with empty docs but errors are now tracked
         }
     };
 
@@ -760,9 +826,21 @@ async fn generate_datasets_handler(
     let entity_relationships = match identify_entity_relationships(&markdown_docs, &request.model_names).await {
         Ok(relationships) => relationships,
         Err(e) => {
-            tracing::error!("Error identifying entity relationships: {}", e);
-            // Continue with empty relationships - we can still generate basic YAMLs
-            HashMap::new()
+            tracing::error!(
+                error = %e,
+                schema = %request.schema,
+                model_count = %request.model_names.len(),
+                "Failed to identify entity relationships"
+            );
+            // Add error to all models since this affects all of them
+            for model_name in &request.model_names {
+                errors.insert(model_name.clone(), DetailedError {
+                    message: format!("Failed to identify entity relationships: {}", e),
+                    error_type: "RelationshipError".to_string(),
+                    context: Some(format!("Schema: {}, Model: {}", request.schema, model_name)),
+                });
+            }
+            HashMap::new()  // Continue with empty relationships but errors are now tracked
         }
     };
 
@@ -794,6 +872,12 @@ async fn generate_datasets_handler(
                 yml_contents.insert(model_name, yaml);
             }
             Ok(Err((model_name, e))) => {
+                tracing::error!(
+                    error = %e,
+                    model = %model_name,
+                    schema = %request.schema,
+                    "Failed to generate YAML for model"
+                );
                 errors.insert(model_name, DetailedError {
                     message: format!("Failed to generate YAML: {}", e),
                     error_type: "ModelGenerationError".to_string(),
@@ -801,7 +885,11 @@ async fn generate_datasets_handler(
                 });
             }
             Err(e) => {
-                tracing::error!("Task join error: {:?}", e);
+                tracing::error!(
+                    error = %e,
+                    schema = %request.schema,
+                    "Task join error in YAML generation"
+                );
                 let affected_models: Vec<_> = request.model_names.iter()
                     .filter(|name| !yml_contents.contains_key(*name) && !errors.contains_key(*name))
                     .collect();
@@ -822,12 +910,21 @@ async fn generate_datasets_handler(
 
     // Log the generated YMLs
     for (model_name, yaml) in &yml_contents {
-        tracing::info!("Generated YAML for model '{}':\n{}", model_name, yaml);
+        tracing::info!(
+            model = %model_name,
+            yaml_length = %yaml.len(),
+            "Generated YAML for model"
+        );
     }
 
     // Log any errors
     if !errors.is_empty() {
-        tracing::warn!("Encountered errors while generating YAMLs: {:#?}", errors);
+        tracing::warn!(
+            error_count = %errors.len(),
+            total_models = %request.model_names.len(),
+            failed_models = ?errors.keys().collect::<Vec<_>>(),
+            "Encountered errors while generating YAMLs"
+        );
     }
 
     Ok(GenerateDatasetResponse {
