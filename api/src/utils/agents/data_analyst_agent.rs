@@ -977,7 +977,7 @@ pub async fn data_analyst_agent(options: DataAnalystAgentOptions) -> Result<Valu
         let datasets_string = options
             .datasets
             .iter()
-            .map(|dataset| dataset.dataset_ddl.clone())
+            .map(|dataset| dataset.dataset.yml_file.clone().unwrap_or(dataset.dataset_ddl.clone()))
             .collect::<Vec<String>>()
             .join("\n\n");
 
