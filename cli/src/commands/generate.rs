@@ -17,7 +17,7 @@ use crate::utils::{
     file_finder::find_sql_files, ProgressTracker,
 };
 use glob;
-use globwalk;
+use pathdiff;
 
 #[derive(Debug)]
 pub struct GenerateCommand {
@@ -611,21 +611,26 @@ impl GenerateCommand {
 
     // Add a method to determine the output path for a model
     fn get_output_path(&self, model_name: &str, source_file: &Path) -> PathBuf {
-        // If destination_path is specified, use it
-        if self.destination_path != self.source_path {
-            // Use destination path with flat or mirrored structure
-            if self.maintain_directory_structure {
-                let relative = source_file.strip_prefix(&self.source_path).unwrap_or(Path::new(""));
-                let parent = relative.parent().unwrap_or(Path::new(""));
-                self.destination_path.join(parent).join(format!("{}.yml", model_name))
+        if self.maintain_directory_structure {
+            // Always try to get the full relative path structure from the source
+            let source_str = source_file.to_string_lossy();
+            
+            // Look for "models/semantic" in the path and keep everything after it
+            if let Some(idx) = source_str.find("models/semantic") {
+                let relative_path = Path::new(&source_str[idx..])
+                    .parent() // Get the directory part
+                    .unwrap_or(Path::new("")); // Fallback to empty path if no parent
+                
+                // Join with destination and add the yml filename
+                self.destination_path.join(relative_path).join(format!("{}.yml", model_name))
             } else {
-                // Flat structure
-                self.destination_path.join(format!("{}.yml", model_name))
+                // If we can't find the expected structure, fall back to just the immediate parent
+                let parent = source_file.parent().unwrap_or(Path::new(""));
+                self.destination_path.join(parent.file_name().unwrap_or_default()).join(format!("{}.yml", model_name))
             }
         } else {
-            // Write alongside the SQL file
-            let parent = source_file.parent().unwrap_or(Path::new("."));
-            parent.join(format!("{}.yml", model_name))
+            // Flat structure - all files in the destination directory
+            self.destination_path.join(format!("{}.yml", model_name))
         }
     }
 }
