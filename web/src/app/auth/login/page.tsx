@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { getSupabaseServerContext } from '@/context/Supabase/getSupabaseServerContext';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Login() {
   const supabase = await getSupabaseServerContext();
   const { user } = supabase;

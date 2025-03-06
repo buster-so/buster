@@ -5,8 +5,7 @@ import { BusterRoutes, createBusterRoute } from '@/routes';
 import { HeaderContainer } from '../../_HeaderContainer';
 import { useState } from 'react';
 import { DatabaseNames, DataSourceTypes, SUPPORTED_DATASOURCES } from '@/api/asset_interfaces';
-
-import { AppDataSourceIcon } from '@/components/ui';
+import { AppDataSourceIcon } from '@/components/ui/icons';
 import { useAntToken } from '@/styles/useAntToken';
 import { createStyles } from 'antd-style';
 import { DataSourceFormContent } from '../[datasourceId]/_DatasourceFormContent';

@@ -1,5 +1,3 @@
-'use server';
-
 import { getSupabaseServerContext } from '@/context/Supabase/getSupabaseServerContext';
 import React from 'react';
 import { createBusterRoute } from '@/routes';
@@ -9,6 +7,8 @@ import { ClientRedirect } from '../../components/ui/layouts/ClientRedirect';
 import { LayoutClient } from './layoutClient';
 import { prefetchGetMyUserInfo } from '@/api/buster_rest';
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
+
+export const dynamic = 'force-dynamic';
 
 export default async function Layout({
   children

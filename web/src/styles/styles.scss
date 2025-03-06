@@ -1,10 +1,10 @@
+@use './tailwind';
 @use './fonts';
 @use './buster';
-@use './tailwind';
 @use './sql';
 @use './monaco';
-@use 'pkg:react-data-grid/lib/styles.css' as *;
 @use '../components/ui/layouts/AppSplitter/SplitPane/themes/default'; //TODO check if we can remove this in favor of a css module or something?
+@use 'pkg:react-data-grid/lib/styles.css' as *;
 
 input {
   font-family:
@@ -46,5 +46,5 @@ body {
 }
 
 p {
-  @apply text-base leading-[1.2];
+  //  @apply text-base leading-[1.2];
 }

@@ -4,11 +4,7 @@ import { useIndividualDataset } from '@/context/Datasets';
 import { useSelectedLayoutSegment } from 'next/navigation';
 import React, { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import { DatasetApps } from './config';
-import {
-  createContext,
-  ContextSelector,
-  useContextSelector
-} from '@fluentui/react-context-selector';
+import { createContext, useContextSelector } from 'use-context-selector';
 import { useDebounce, useMemoizedFn } from 'ahooks';
 import { useDeployDataset } from '@/api/buster_rest';
 
@@ -92,5 +88,5 @@ export const DatasetPageProvider: React.FC<
 };
 
 export const useDatasetPageContextSelector = <T,>(
-  selector: ContextSelector<ReturnType<typeof useDatasetPageContext>, T>
+  selector: (value: ReturnType<typeof useDatasetPageContext>) => T
 ) => useContextSelector(DatasetPageContext, selector);

@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "next dev --turbopack --debug",
+    "build": "next build --debug",
     "start": "next start",
     "lint": "next lint",
     "cy:run": "npx cypress run --browser chrome",
