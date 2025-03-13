@@ -7,9 +7,13 @@ import { useGetOrganizationUsers } from '@/api/buster_rest';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { ListUsersComponent } from './ListUsersComponent';
 import { PermissionSearch } from '../../../_components/PermissionComponents';
+import { Button } from 'antd';
+import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
+import {} from '@/components/icons';
 
 export default function Page() {
   const userOrganization = useUserConfigContextSelector((x) => x.userOrganizations);
+  const onToggleInviteModal = useAppLayoutContextSelector((x) => x.onToggleInviteModal);
   const firstOrganizationId = userOrganization?.id! || '';
   const { data: users, isFetched } = useGetOrganizationUsers(firstOrganizationId);
 
@@ -27,11 +31,17 @@ export default function Page() {
           description="Manage your organization's users and their permissions"
           type="alternate"
         />
-        <PermissionSearch
-          placeholder="Search users name or email..."
-          searchText={searchText}
-          setSearchText={handleSearchChange}
-        />
+        <div className="flex space-x-3">
+          <PermissionSearch
+            placeholder="Search users name or email..."
+            searchText={searchText}
+            setSearchText={handleSearchChange}
+          />
+
+          <Button type="default" onClick={() => onToggleInviteModal()}>
+            Invite User
+          </Button>
+        </div>
       </div>
 
       <ListUsersComponent users={filteredItems} isFetched={isFetched} />
