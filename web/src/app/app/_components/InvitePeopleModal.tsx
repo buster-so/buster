@@ -4,6 +4,7 @@ import { AppModal } from '@/components';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { AppSelectTagInput } from '@/components/select/AppSelectTagInput';
 import { Tag } from 'antd';
+import { useGetOrganizationUsers } from '@/api/buster_rest/organizations';
 
 export const InvitePeopleModal: React.FC<{
   open: boolean;
@@ -14,10 +15,14 @@ export const InvitePeopleModal: React.FC<{
   const inviteUsers = useUserConfigContextSelector((state) => state.inviteUsers);
   const isAdmin = useUserConfigContextSelector((state) => state.isAdmin);
   const userTeams = useUserConfigContextSelector((state) => state.userTeams);
+  const userOrganizations = useUserConfigContextSelector((state) => state.userOrganizations);
+  const firstOrganizationId = userOrganizations?.id || '';
+  const { refetch } = useGetOrganizationUsers(firstOrganizationId);
 
   const handleInvite = useMemoizedFn(async () => {
     setInviting(true);
     await inviteUsers(emails);
+    refetch();
     setInviting(false);
     onClose();
   });

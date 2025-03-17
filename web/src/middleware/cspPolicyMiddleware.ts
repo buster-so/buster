@@ -34,7 +34,6 @@ export const cspPolicyMiddleware = (request: NextRequest) => {
   request.headers.set('Content-Security-Policy', cspHeader['Content-Security-Policy']);
 
   // Add additional security headers
-  request.headers.set('X-Frame-Options', 'SAMEORIGIN');
   request.headers.set('X-Content-Type-Options', 'nosniff');
   request.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
