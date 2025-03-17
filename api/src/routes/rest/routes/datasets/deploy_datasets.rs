@@ -511,7 +511,7 @@ async fn deploy_datasets_handler(
             }
 
             // Prepare datasets for upsert
-            let datasets_to_upsert: Vec<Dataset> = valid_datasets
+            let mut datasets_to_upsert: Vec<Dataset> = valid_datasets
                 .iter()
                 .map(|req| Dataset {
                     id: req.id.unwrap_or_else(Uuid::new_v4),
@@ -536,6 +536,13 @@ async fn deploy_datasets_handler(
                     database_identifier: req.database.clone(),
                 })
                 .collect();
+
+            // Deduplicate datasets by database_name and data_source_id to prevent ON CONFLICT errors
+            let mut unique_datasets = HashMap::new();
+            for dataset in datasets_to_upsert {
+                unique_datasets.insert((dataset.database_name.clone(), dataset.data_source_id), dataset);
+            }
+            datasets_to_upsert = unique_datasets.into_values().collect();
 
             // Bulk upsert datasets
             diesel::insert_into(datasets::table)
@@ -600,7 +607,7 @@ async fn deploy_datasets_handler(
                     })
                     .collect();
 
-                let columns: Vec<DatasetColumn> = filtered_columns
+                let mut columns: Vec<DatasetColumn> = filtered_columns
                     .iter()
                     .map(|col| {
                         // Look up the type from ds_columns, fallback to request type or "text"
@@ -631,6 +638,13 @@ async fn deploy_datasets_handler(
                         }
                     })
                     .collect();
+                
+                // Deduplicate columns by dataset_id and name to prevent ON CONFLICT errors
+                let mut unique_columns = HashMap::new();
+                for column in columns {
+                    unique_columns.insert((column.dataset_id, column.name.clone()), column);
+                }
+                columns = unique_columns.into_values().collect();
 
                 // First: Bulk upsert columns
                 diesel::insert_into(dataset_columns::table)
