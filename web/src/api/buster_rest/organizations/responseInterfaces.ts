@@ -1,7 +1,7 @@
 export interface OrganizationUser {
   id: string;
   email: string;
-  name: string;
+  name: string | null;
   status: 'active' | 'inactive';
   role: 'dataAdmin' | 'workspaceAdmin' | 'querier' | 'restrictedQuerier' | 'viewer';
   datasets: OrganizationUserDataset[];

@@ -5,11 +5,12 @@ export const InfiniteListContainer: React.FC<{
   children: React.ReactNode;
   popupNode?: React.ReactNode;
   showContainerBorder?: boolean;
-}> = React.memo(({ children, popupNode, showContainerBorder = true }) => {
+  className?: string;
+}> = React.memo(({ children, popupNode, showContainerBorder = true, className }) => {
   const { styles, cx } = useStyles();
 
   return (
-    <div className={cx('overflow-hidden', showContainerBorder && styles.container)}>
+    <div className={cx('overflow-auto', showContainerBorder && styles.container, className)}>
       {children}
 
       {popupNode && (
