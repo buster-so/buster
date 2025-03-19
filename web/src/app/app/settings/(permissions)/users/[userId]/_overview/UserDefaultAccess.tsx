@@ -22,7 +22,7 @@ export const UserDefaultAccess: React.FC<{
 
   return (
     <div className="flex flex-col space-y-5">
-      <DefaultAccessDescription name={user.name} />
+      <DefaultAccessDescription name={user?.name || user?.email} />
 
       <DefaultAccessCard
         role={user.role}

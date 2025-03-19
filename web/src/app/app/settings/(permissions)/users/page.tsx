@@ -9,7 +9,7 @@ import { ListUsersComponent } from './ListUsersComponent';
 import { PermissionSearch } from '../../../_components/PermissionComponents';
 import { Button } from 'antd';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
-import {} from '@/components/icons';
+import { AppMaterialIcons } from '@/components/icons';
 
 export default function Page() {
   const userOrganization = useUserConfigContextSelector((x) => x.userOrganizations);
@@ -20,11 +20,11 @@ export default function Page() {
   const { filteredItems, handleSearchChange, searchText } = useDebounceSearch({
     items: users || [],
     searchPredicate: (item, searchText) =>
-      item.email.includes(searchText) || item.name.includes(searchText)
+      item.email.includes(searchText) || item.name?.includes(searchText) || false
   });
 
   return (
-    <div className="flex flex-col space-y-4">
+    <div className="flex flex-col space-y-4 overflow-hidden">
       <div className="px-[30px] pt-[46px]">
         <SettingsPageHeader
           title="User Management"
@@ -38,7 +38,10 @@ export default function Page() {
             setSearchText={handleSearchChange}
           />
 
-          <Button type="default" onClick={() => onToggleInviteModal()}>
+          <Button
+            icon={<AppMaterialIcons icon={'add'} />}
+            type="default"
+            onClick={() => onToggleInviteModal()}>
             Invite User
           </Button>
         </div>
