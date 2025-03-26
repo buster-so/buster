@@ -20,7 +20,7 @@ impl BusterClient {
     pub fn new(base_url: String, api_key: String) -> Result<Self> {
         let client = Client::builder()
             .use_rustls_tls()
-            .timeout(std::time::Duration::from_secs(30))
+            .timeout(std::time::Duration::from_secs(120))  // Increase timeout to 2 minutes for larger operations
             .build()?;
 
         Ok(Self {
@@ -150,6 +150,12 @@ impl BusterClient {
     pub async fn generate_datasets(&self, req_body: GenerateApiRequest) -> Result<GenerateApiResponse> {
         let headers = self.build_headers()?;
 
+        println!("🔄 Sending request to generate {} models from data source '{}' in schema '{}'",
+            req_body.model_names.len(),
+            req_body.data_source_name,
+            req_body.schema
+        );
+
         match self
             .client
             .post(format!("{}/api/v1/datasets/generate", self.base_url))
@@ -159,23 +165,51 @@ impl BusterClient {
             .await
         {
             Ok(res) => {
-                if !res.status().is_success() {
+                let status = res.status();
+                if !status.is_success() {
+                    let error_text = res.text().await?;
+                    println!("❌ API request failed with status {}: {}", status, error_text);
                     return Err(anyhow::anyhow!(
-                        "POST /api/v1/datasets/generate failed: {}",
-                        res.text().await?
+                        "POST /api/v1/datasets/generate failed with status {}: {}",
+                        status,
+                        error_text
                     ));
                 }
                 
                 let response_text = res.text().await?;
                 
                 match serde_json::from_str::<GenerateApiResponse>(&response_text) {
-                    Ok(parsed) => Ok(parsed),
+                    Ok(parsed) => {
+                        // Log error summary if there are errors
+                        if !parsed.errors.is_empty() {
+                            println!("⚠️ API returned errors for {} out of {} models:", 
+                                parsed.errors.len(), 
+                                req_body.model_names.len()
+                            );
+                        }
+                        Ok(parsed)
+                    },
                     Err(e) => {
-                        Err(anyhow::anyhow!("Failed to parse API response: {}", e))
+                        println!("❌ Failed to parse API response: {}", e);
+                        println!("📄 Raw API response (first 1000 chars): {}", 
+                            if response_text.len() > 1000 {
+                                format!("{}... (truncated)", &response_text[..1000])
+                            } else {
+                                response_text.clone()
+                            }
+                        );
+                        Err(anyhow::anyhow!(
+                            "Failed to parse API response: {}. Please check your server logs.",
+                            e
+                        ))
                     }
                 }
             }
-            Err(e) => Err(anyhow::anyhow!("POST /api/v1/datasets/generate failed: {}", e)),
+            Err(e) => {
+                println!("❌ API request failed: {}", e);
+                println!("🔍 Check network connectivity and API server status");
+                Err(anyhow::anyhow!("POST /api/v1/datasets/generate failed: {}", e))
+            },
         }
     }
 }
