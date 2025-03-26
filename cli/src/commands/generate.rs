@@ -264,9 +264,10 @@ impl GenerateCommand {
             data_source_name: cmd
                 .config
                 .data_source_name
+                .clone()
                 .expect("data_source_name is required"),
-            schema: cmd.config.schema.expect("schema is required"),
-            database: cmd.config.database,
+            schema: cmd.config.schema.clone().expect("schema is required"),
+            database: cmd.config.database.clone(),
             model_names: model_names.iter().map(|m| m.name.clone()).collect(),
         };
 
@@ -346,22 +347,76 @@ impl GenerateCommand {
                     }
                 }
 
-                // Report any errors
+                // Report any errors with enhanced diagnostics
                 if !response.errors.is_empty() {
                     println!("\n⚠️  Some models had errors:");
                     for (model_name, error) in response.errors {
-                        println!("❌ {}: {}", model_name, error.message);
-                        if let Some(error_type) = error.error_type {
-                            println!("   Error type: {}", error_type);
-                        }
+                        println!("\n❌ Error for model '{}':", model_name);
+                        println!("   Message: {}", error.message);
+                        println!("   Error type: {}", error.error_type);
                         if let Some(context) = error.context {
                             println!("   Context: {}", context);
+                        }
+                        
+                        // Add diagnostic info based on error type
+                        println!("   Troubleshooting:");
+                        match error.error_type.as_str() {
+                            "DatabaseConnectionError" => {
+                                println!("   - Check database credentials and connectivity");
+                                println!("   - Verify network access to the data source");
+                            },
+                            "SchemaError" | "TableNotFound" => {
+                                println!("   - Confirm schema exists and is accessible");
+                                println!("   - Verify model '{}' exists in this schema", model_name);
+                            },
+                            "NoColumnsFoundError" => {
+                                println!("   - Check if table '{}' exists and has columns", model_name);
+                            },
+                            "DataSourceNotFound" => {
+                                println!("   - Verify data source exists and is accessible");
+                                println!("   - Check your Buster API credentials");
+                            },
+                            "CredentialsError" => {
+                                println!("   - Check data source credentials");
+                                println!("   - Verify database connectivity");
+                            },
+                            "RelationshipError" => {
+                                println!("   - Check foreign key relationships in the database");
+                            },
+                            "KeyExtractionError" => {
+                                println!("   - Check primary and foreign key definitions");
+                            },
+                            _ => {
+                                println!("   - Check model definition and permissions");
+                                println!("   - Check server logs for more details");
+                            }
                         }
                     }
                 }
             }
             Err(e) => {
                 progress.log_error(&format!("API call failed: {}", e));
+                
+                // Enhanced diagnostics
+                println!("\n🔍 Diagnostic information:");
+                println!("  - Check network connectivity to the API server");
+                println!("  - Verify your API key is valid");
+                println!("  - Ensure your data source exists and is accessible");
+                println!("  - Confirm your schema is accessible");
+                println!("  - Check server logs for more details");
+                
+                if e.to_string().contains("timed out") {
+                    println!("\n⏱️ Request timed out - this may happen with large datasets or slow connections.");
+                    println!("  - Try reducing the number of models processed at once");
+                    println!("  - Ensure your database connection is responsive");
+                }
+                
+                if e.to_string().contains("Failed to parse API response") {
+                    println!("\n🔄 The API returned a response that couldn't be parsed.");
+                    println!("  - Check server logs for potential errors");
+                    println!("  - Verify the API server version is compatible with this CLI version");
+                }
+                
                 return Err(anyhow::anyhow!("Failed to generate YAML files: {}", e));
             }
         }

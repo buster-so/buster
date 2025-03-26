@@ -114,6 +114,6 @@ pub struct GenerateApiResponse {
 #[derive(Debug, Deserialize)]
 pub struct GenerateApiError {
     pub message: String,
-    pub error_type: Option<String>,
+    pub error_type: String,
     pub context: Option<String>,
 }

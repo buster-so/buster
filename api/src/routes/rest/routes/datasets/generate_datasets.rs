@@ -51,7 +51,7 @@ pub struct GenerateDatasetResponse {
 #[derive(Debug, Serialize)]
 pub struct DetailedError {
     pub message: String,
-    pub error_type: String,
+    pub error_type: String,  // Ensured to be a required field to match CLI type
     pub context: Option<String>,
 }
 
