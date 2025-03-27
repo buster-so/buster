@@ -1,1 +1,1 @@
-export * from './getUserContext';
+export * from './getSupabaseUserContext';
