@@ -49,20 +49,19 @@ export const prefetchGetDatasets = async (
   return queryClient;
 };
 
-export const useGetDatasetData = (datasetId: string) => {
-  const queryFn = useMemoizedFn(() => getDatasetDataSample(datasetId));
+export const useGetDatasetData = (datasetId: string | undefined) => {
+  const queryFn = useMemoizedFn(() => getDatasetDataSample(datasetId!));
   return useQuery({
-    ...queryKeys.datasetData(datasetId),
+    ...queryKeys.datasetData(datasetId!),
     queryFn,
-    enabled: !!datasetId,
-    refetchOnMount: false
+    enabled: !!datasetId
   });
 };
 
-export const useGetDatasetMetadata = (datasetId: string) => {
-  const queryFn = useMemoizedFn(() => getDatasetMetadata(datasetId));
+export const useGetDatasetMetadata = (datasetId: string | undefined) => {
+  const queryFn = useMemoizedFn(() => getDatasetMetadata(datasetId!));
   const res = useQuery({
-    ...queryKeys.datasetMetadata(datasetId),
+    ...queryKeys.datasetMetadata(datasetId!),
     queryFn,
     enabled: !!datasetId
   });
@@ -125,7 +124,7 @@ export const useDeleteDataset = () => {
   });
 };
 
-export const useIndividualDataset = ({ datasetId }: { datasetId: string }) => {
+export const useIndividualDataset = ({ datasetId }: { datasetId: string | undefined }) => {
   const dataset = useGetDatasetMetadata(datasetId);
   const datasetData = useGetDatasetData(datasetId);
   return { dataset, datasetData };

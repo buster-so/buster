@@ -4,7 +4,7 @@ import { getAppSplitterLayout } from '@/components/ui/layouts/AppSplitter';
 import { SidebarSettings } from '@/components/features/sidebars/SidebarSettings';
 
 export default async function Layout({ children }: { children: React.ReactNode }) {
-  const defaultLayout = await getAppSplitterLayout('app-layout', ['230px', 'auto']);
+  const defaultLayout = getAppSplitterLayout('app-layout');
 
   return (
     <AppLayout defaultLayout={defaultLayout} sidebar={<SidebarSettings />}>

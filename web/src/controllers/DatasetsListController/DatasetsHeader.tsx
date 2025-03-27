@@ -22,7 +22,7 @@ export const DatasetHeader: React.FC<{
 }> = React.memo(
   ({ datasetFilter, setDatasetFilter, datasetId, setOpenNewDatasetModal, openNewDatasetModal }) => {
     const isAdmin = useUserConfigContextSelector((state) => state.isAdmin);
-    const { dataset } = useIndividualDataset({ datasetId: datasetId || '' });
+    const { dataset } = useIndividualDataset({ datasetId });
     const datasetTitle = dataset?.data?.name || 'Datasets';
 
     const breadcrumbItems: BreadcrumbItem[] = useMemo(

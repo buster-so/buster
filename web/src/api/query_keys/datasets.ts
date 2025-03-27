@@ -10,7 +10,8 @@ const datasetsListQueryOptions = (params?: Parameters<typeof getDatasets>[0]) =>
 
 const datasetData = (datasetId: string) =>
   queryOptions<IDataResult>({
-    queryKey: ['datasetData', datasetId]
+    queryKey: ['datasetData', datasetId],
+    staleTime: 60 * 1000 * 10 //10 minute
   });
 
 const datasetMetadata = (datasetId: string) =>
