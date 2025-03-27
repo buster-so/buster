@@ -1,4 +1,4 @@
-import { createClient } from '@/context/Supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { type EmailOtpType } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 // The client you created from the Server-Side Auth instructions

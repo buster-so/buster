@@ -4,13 +4,13 @@ import { isPublicPage, BusterRoutes, createBusterRoute } from './routes';
 
 export async function middleware(request: NextRequest) {
   try {
-    // const { supabaseResponse, user } = await updateSession(request);
+    const [supabaseResponse, user] = await updateSession(request);
 
-    // if ((!user.data?.user || user.error) && !isPublicPage(request)) {
-    //   return NextResponse.redirect(
-    //     new URL(createBusterRoute({ route: BusterRoutes.AUTH_LOGIN }), request.url)
-    //   );
-    // }
+    if ((!user || !user.id) && !isPublicPage(request)) {
+      return NextResponse.redirect(
+        new URL(createBusterRoute({ route: BusterRoutes.AUTH_LOGIN }), request.url)
+      );
+    }
 
     return NextResponse.next();
   } catch (error) {
