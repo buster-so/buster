@@ -9,7 +9,8 @@ const __dirname = dirname(__filename);
 const nextConfig = {
   reactStrictMode: false,
   sassOptions: {
-    includePaths: [path.join(__dirname, 'styles')]
+    includePaths: [path.join(__dirname, 'styles')],
+    silenceDeprecations: ['legacy-js-api']
   },
   async headers() {
     return [
