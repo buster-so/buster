@@ -18,7 +18,7 @@ export const CollectionListController: React.FC = () => {
 
   return (
     <AppPageLayout
-      className="swagswagswag"
+      headerSizeVariant="list"
       scrollable={false}
       header={
         <CollectionListHeader

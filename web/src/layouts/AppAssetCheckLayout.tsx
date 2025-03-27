@@ -19,7 +19,7 @@ export const AppAssetCheckLayout: React.FC<
   {
     children: React.ReactNode;
   } & AppAssetCheckLayoutProps
-> = async ({ children, type, assetId }) => {
+> = ({ children, type, assetId }) => {
   return <div>TODO</div>;
 
   // if (!jwtToken) {

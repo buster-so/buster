@@ -16,6 +16,7 @@ export const DashboardListController: React.FC = () => {
 
   return (
     <AppPageLayout
+      headerSizeVariant="list"
       header={
         <DashboardHeader
           dashboardFilters={dashboardListFilters}

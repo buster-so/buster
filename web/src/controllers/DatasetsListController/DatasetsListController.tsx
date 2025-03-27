@@ -38,6 +38,7 @@ export const DatasetsListController: React.FC<{}> = ({}) => {
 
   return (
     <AppPageLayout
+      headerSizeVariant="list"
       header={
         <DatasetHeader
           datasetFilter={datasetFilter}

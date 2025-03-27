@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { VerificationStatus } from '@/api/asset_interfaces';
 import { MetricListHeader } from './MetricListHeader';
 import { MetricItemsContainer } from './MetricItemsContainer';
@@ -12,7 +12,14 @@ export const MetricListContainer: React.FC<{}> = ({}) => {
   const { data: metricList, isFetched } = useGetMetricsList({ status: filters });
 
   return (
-    <AppPageLayout header={<MetricListHeader filters={filters} onSetFilters={setFilters} />}>
+    <AppPageLayout
+      headerSizeVariant="list"
+      header={useMemo(
+        () => (
+          <MetricListHeader filters={filters} onSetFilters={setFilters} />
+        ),
+        [filters]
+      )}>
       <MetricItemsContainer
         metrics={metricList}
         loading={!isFetched}
