@@ -1,4 +1,4 @@
-import { createBusterRoute } from './busterRoutes';
+import { createBusterRoute, createPathnameToBusterRoute } from './createRouteHelpers';
 import { BusterAuthRoutes } from './busterAuthRoutes';
 import { BusterAppRoutes } from './busterAppRoutes';
 import { BusterSettingsRoutes } from './busterSettingsRoutes';
@@ -35,11 +35,11 @@ describe('createBusterRoute', () => {
       chatId: '123',
       metricId: 'metric456',
       dashboardId: 'dash789',
-      reasoningId: 'reason101'
+      messageId: 'reason101'
     } as const;
     const result = createBusterRoute(input);
     expect(result).toBe(
-      '/app/chats/123?metricId=metric456&dashboardId=dash789&reasoningId=reason101'
+      '/app/chats/123?metricId=metric456&dashboardId=dash789&messageId=reason101'
     );
 
     // Test with some undefined parameters
@@ -61,5 +61,37 @@ describe('createBusterRoute', () => {
     };
     const result3 = createBusterRoute(minimalInput);
     expect(result3).toBe('/app/chats/123');
+  });
+});
+
+describe('createPathnameToBusterRoute', () => {
+  test('should convert simple auth route pathname', () => {
+    const pathname = '/auth/login';
+    const result = createPathnameToBusterRoute(pathname);
+    expect(result).toEqual(BusterAuthRoutes.AUTH_LOGIN);
+  });
+
+  test('should convert chat route with dynamic chatId', () => {
+    const pathname = '/app/chats/123';
+    const result = createPathnameToBusterRoute(pathname);
+    expect(result).toEqual(BusterAppRoutes.APP_CHAT_ID);
+  });
+
+  test('should convert settings route with permission group id', () => {
+    const pathname = '/app/settings/permission-groups/group123/datasets';
+    const result = createPathnameToBusterRoute(pathname);
+    expect(result).toEqual(BusterSettingsRoutes.SETTINGS_PERMISSION_GROUPS_ID_DATASETS);
+  });
+
+  test('should convert chat route with query parameters', () => {
+    const pathname = '/app/chats/123?metricId=metric456&dashboardId=dash789&messageId=msg101';
+    const result = createPathnameToBusterRoute(pathname);
+    expect(result).toEqual(BusterAppRoutes.APP_CHAT_ID_QUERY);
+  });
+
+  test('should handle partial query parameters', () => {
+    const pathname = '/app/chats/123?metricId=metric456';
+    const result = createPathnameToBusterRoute(pathname);
+    expect(result).toEqual(BusterAppRoutes.APP_CHAT_ID_QUERY);
   });
 });

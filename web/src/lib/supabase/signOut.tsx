@@ -2,7 +2,7 @@
 
 import { createClient } from './server';
 import { redirect } from 'next/navigation';
-import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes/busterRoutes';
+import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
 
 export const signOut = async () => {
   'use server';

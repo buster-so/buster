@@ -1,6 +1,6 @@
 import { BusterAuthRoutes } from '@/routes/busterRoutes/busterAuthRoutes';
 import { BusterEmbedRoutes } from '@/routes/busterRoutes/busterEmbedRoutes';
-import { BusterRoutes, createPathnameToBusterRoute } from '@/routes/busterRoutes/busterRoutes';
+import { BusterRoutes, createPathnameToBusterRoute } from '@/routes/busterRoutes';
 import { NextRequest } from 'next/server';
 
 const assetCheckPages: BusterRoutes[] = [
