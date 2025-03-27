@@ -24,13 +24,14 @@ const useSupabaseContextInternal = ({
       const decoded = jwtDecode(accessToken);
       const expiresAtDecoded = decoded?.exp || 0;
       const ms = millisecondsFromUnixTimestamp(expiresAtDecoded);
-      const isTokenExpired = ms < 5 * 60 * 1000; // 5 minutes
+      const minutesUntilExpiration = ms / 60000;
+      const isTokenExpired = minutesUntilExpiration < 5; //5 minutes
 
       if (isAnonymousUser) {
         return {
           access_token: accessToken,
           expires_at: expiresAt.current,
-          isTokenValid: true
+          isTokenValid: isTokenExpired
         };
       }
 

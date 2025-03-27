@@ -7,7 +7,6 @@ import { BusterUserConfigProvider } from './Users/BusterUserConfigProvider';
 import { BusterAssetsProvider } from './Assets/BusterAssetsProvider';
 import { BusterPosthogProvider } from './Posthog';
 import { BusterNewChatProvider } from './Chats';
-import type { BusterUserResponse } from '@/api/asset_interfaces';
 import type { UseSupabaseUserContextType } from '@/lib/supabase';
 import { dehydrate, HydrationBoundary, type QueryClient } from '@tanstack/react-query';
 
