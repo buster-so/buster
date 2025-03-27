@@ -6,7 +6,7 @@ export async function middleware(request: NextRequest) {
   try {
     const { supabaseResponse, user } = await updateSession(request);
 
-    if ((!user.data || user.error) && !isPublicPage(request)) {
+    if ((!user.data?.user || user.error) && !isPublicPage(request)) {
       return NextResponse.redirect(
         new URL(createBusterRoute({ route: BusterRoutes.AUTH_LOGIN }), request.url)
       );
