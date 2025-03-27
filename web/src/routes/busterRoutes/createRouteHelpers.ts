@@ -31,16 +31,32 @@ export const createBusterRoute = ({ route, ...args }: BusterRoutesWithArgsRoute)
 };
 
 const routeToRegex = (route: string): RegExp => {
-  const dynamicParts = /:[^/]+/g;
-  const regexPattern = route.replace(dynamicParts, '[^/]+');
-  return new RegExp(`^${regexPattern}$`);
+  const [basePath] = route.split('?');
+  const pattern = basePath.replace(/:[^/]+/g, '([^/]+)');
+  return new RegExp(`^${pattern}$`);
 };
 
 const routes = Object.values(BusterRoutes) as string[];
+const queryRoutes = routes.filter((route) => route.includes('?'));
+const routeRegexCache = new Map<string, RegExp>();
+
+const getRouteRegex = (route: string): RegExp => {
+  const cached = routeRegexCache.get(route);
+  if (cached) return cached;
+
+  const regex = routeToRegex(route);
+  routeRegexCache.set(route, regex);
+  return regex;
+};
+
 const matchDynamicUrlToRoute = (pathname: string): BusterAppRoutes | null => {
-  for (const route of routes) {
-    const regex = routeToRegex(route);
-    if (regex.test(pathname)) {
+  const hasQuery = pathname.includes('?');
+  const basePath = hasQuery ? pathname.split('?')[0] : pathname;
+  const routesToCheck = hasQuery ? queryRoutes : routes;
+
+  for (const route of routesToCheck) {
+    const routeBasePath = hasQuery ? route.split('?')[0] : route;
+    if (getRouteRegex(routeBasePath).test(basePath)) {
       return route as BusterAppRoutes;
     }
   }
@@ -48,6 +64,9 @@ const matchDynamicUrlToRoute = (pathname: string): BusterAppRoutes | null => {
 };
 
 export const createPathnameToBusterRoute = (pathname: string): BusterRoutes => {
-  const foundRoute = Object.values(BusterRoutes).find((route) => route === pathname);
-  return foundRoute || (matchDynamicUrlToRoute(pathname) as BusterRoutes);
+  return (
+    (routes.find((route) => route === pathname) as BusterRoutes) ||
+    matchDynamicUrlToRoute(pathname) ||
+    BusterRoutes.ROOT
+  );
 };
