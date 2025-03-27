@@ -1,10 +1,10 @@
 'use client';
 
-import React, { PropsWithChildren, useLayoutEffect, useRef, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useMemoizedFn } from '@/hooks';
-import { millisecondsFromUnixTimestamp } from '@/lib';
+import { millisecondsFromUnixTimestamp } from '@/lib/date';
 import { createContext, useContextSelector } from 'use-context-selector';
-import { checkTokenValidityFromServer as checkTokenValidityFromServerApiCall } from '@/api/buster_rest/nextjs/auth';
+import { checkTokenValidityFromServer } from '@/api/buster_rest/nextjs/auth';
 import { jwtDecode } from 'jwt-decode';
 import type { UseSupabaseUserContextType } from '@/lib/supabase';
 
@@ -14,9 +14,7 @@ const useSupabaseContextInternal = ({
   supabaseContext: UseSupabaseUserContextType;
 }) => {
   const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const refreshToken = useRef(supabaseContext.refreshToken || '');
   const expiresAt = useRef(supabaseContext.expiresAt || 5000);
-  const isRefreshing = useRef(false);
   const [accessToken, setAccessToken] = useState(supabaseContext.accessToken || '');
 
   const isAnonymousUser = !supabaseContext.user?.id || supabaseContext.user?.is_anonymous === true;
@@ -27,21 +25,16 @@ const useSupabaseContextInternal = ({
         return {
           access_token: accessToken,
           expires_at: expiresAt.current,
-          isTokenValid: true,
-          refresh_token: refreshToken.current
+          isTokenValid: true
         };
       }
-      isRefreshing.current = true;
       const decoded = jwtDecode(accessToken);
       const expiresAtDecoded = decoded?.exp || 0;
       const ms = millisecondsFromUnixTimestamp(expiresAtDecoded);
       const isTokenExpired = ms < 5 * 60 * 1000; // 5 minutes
 
       if (isTokenExpired) {
-        const res = await checkTokenValidityFromServerApiCall({
-          accessToken
-        });
-
+        const res = await checkTokenValidityFromServer({ accessToken });
         onUpdateToken({ accessToken: res.access_token, expiresAt: res.expires_at });
         return res;
       }
@@ -49,14 +42,11 @@ const useSupabaseContextInternal = ({
       return {
         access_token: accessToken,
         expires_at: expiresAtDecoded,
-        isTokenValid: true,
-        refresh_token: refreshToken.current
+        isTokenValid: true
       };
     } catch (e) {
       console.error(e);
       throw e;
-    } finally {
-      isRefreshing.current = false;
     }
   });
 
@@ -73,7 +63,7 @@ const useSupabaseContextInternal = ({
     }
   }, [supabaseContext.accessToken]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const setupRefreshTimer = () => {
       const expiresInMs = millisecondsFromUnixTimestamp(expiresAt.current);
       const refreshBuffer = 60000; // Refresh 1 minute before expiration

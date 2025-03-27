@@ -40,7 +40,6 @@ export const defaultRequestHandler = async (
     token = await getSupabaseTokenFromCookies();
   } else {
     token = (await options?.checkTokenValidity()?.then((res) => res?.access_token || '')) || '';
-    console.log('token', token?.length);
   }
 
   (config.headers as AxiosRequestHeaders)['Authorization'] = 'Bearer ' + token;

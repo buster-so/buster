@@ -19,8 +19,8 @@ export const getSupabaseUserContext = async () => {
     return {
       user: anonSession?.user || null,
       accessToken: anonSession?.access_token,
-      refreshToken: anonSession?.refresh_token,
-      expiresAt: anonSession?.expires_at
+      expiresAt: anonSession?.expires_at,
+      refreshToken: anonSession?.refresh_token
     };
   }
 
@@ -28,6 +28,5 @@ export const getSupabaseUserContext = async () => {
   const accessToken = sessionData.data?.session?.access_token;
   const expiresAt = sessionData.data?.session?.expires_at;
   const refreshToken = sessionData.data?.session?.refresh_token;
-
-  return { user, accessToken, refreshToken, expiresAt };
+  return { user, accessToken, expiresAt, refreshToken };
 };
