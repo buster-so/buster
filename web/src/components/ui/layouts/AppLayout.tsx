@@ -1,7 +1,8 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { AppSplitter } from './AppSplitter/AppSplitter';
-import { DEFAULT_LAYOUT } from './AppSplitter/splitContentHelper';
+
+const DEFAULT_LAYOUT = ['230px', 'auto'];
 
 /**
  * @param floating - Applies floating styles with padding and border (default: true)

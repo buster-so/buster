@@ -1,12 +1,14 @@
+'use server';
+
 import { cookies } from 'next/headers';
 import { createAutoSaveId } from './helper';
 
-export const DEFAULT_LAYOUT = ['230px', 'auto'];
+const DEFAULT_LAYOUT = ['230px', 'auto'];
 
-export function getAppSplitterLayout(
+export async function getAppSplitterLayout(
   id: string = '',
   defaultLayout: string[] = DEFAULT_LAYOUT
-): [string, string] {
+): Promise<[string, string]> {
   const key = createAutoSaveId(id);
   const layout = cookies().get(key);
   if (layout) {

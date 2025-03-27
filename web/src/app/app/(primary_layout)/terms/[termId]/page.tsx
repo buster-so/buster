@@ -7,7 +7,7 @@ export default async function TermIdPage(props: { params: Promise<{ termId: stri
 
   const { termId } = params;
 
-  const termPageIdLayout = getAppSplitterLayout('term-page', ['auto', '300px']);
+  const termPageIdLayout = await getAppSplitterLayout('term-page', ['auto', '300px']);
 
   return <TermIndividualController termPageIdLayout={termPageIdLayout} termId={termId} />;
 }
