@@ -32,8 +32,23 @@ export async function updateSession(request: NextRequest) {
   // supabase.auth.getUser(). A simple mistake could make it very hard to debug
   // issues with users being randomly logged out.
 
-  // IMPORTANT: DO NOT REMOVE auth.getUser()
+  // Get the session data first
+  // const { data: sessionData } = await supabase.auth.getSession();
 
+  // // Check if session needs refresh (less than 50 minutes until expiry)
+  // if (sessionData.session?.expires_at) {
+  //   const expiresAtTimestamp = sessionData.session.expires_at * 1000; // Convert to ms
+  //   const now = Date.now();
+  //   const timeUntilExpiry = expiresAtTimestamp - now;
+  //   const fiftyMinutesInMs = 50 * 60 * 1000;
+
+  //   if (timeUntilExpiry < fiftyMinutesInMs) {
+  //     // Refresh the session
+  //     await supabase.auth.refreshSession();
+  //   }
+  // }
+
+  // Get the user (this will use the refreshed session if we refreshed it)
   const {
     data: { user }
   } = await supabase.auth.getUser();

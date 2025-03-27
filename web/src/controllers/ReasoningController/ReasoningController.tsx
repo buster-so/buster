@@ -1,10 +1,9 @@
 'use client';
 
 import React from 'react';
-import { useGetChatMessage } from '@/api/buster_rest/chats';
+import { useGetChat, useGetChatMessage } from '@/api/buster_rest/chats';
 import { ReasoningMessageSelector } from './ReasoningMessages';
 import { BlackBoxMessage } from './ReasoningMessages/ReasoningBlackBoxMessage';
-import { useGetChat } from '@/api/buster_rest/chats';
 import { FileIndeterminateLoader } from '@/components/features/FileIndeterminateLoader';
 
 interface ReasoningControllerProps {

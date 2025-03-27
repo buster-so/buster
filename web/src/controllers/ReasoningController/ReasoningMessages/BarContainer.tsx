@@ -1,4 +1,4 @@
-import { BusterChatMessageReasoning_status } from '@/api/asset_interfaces';
+import type { BusterChatMessageReasoning_status } from '@/api/asset_interfaces';
 import { StatusIndicator } from '@/components/ui/indicators';
 import { motion } from 'framer-motion';
 import { AnimatePresence } from 'framer-motion';

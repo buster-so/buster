@@ -1,4 +1,4 @@
-import type { BusterChatMessageReasoning_pill } from '@/api/asset_interfaces';
+import type { BusterChatMessageReasoning_pill } from '@/api/asset_interfaces/chat';
 import React, { useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useMemoizedFn } from '@/hooks';

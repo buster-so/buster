@@ -1,4 +1,4 @@
-import { type BusterChatMessageReasoning_pillContainer } from '@/api/asset_interfaces';
+import { type BusterChatMessageReasoning_pillContainer } from '@/api/asset_interfaces/chat';
 import React from 'react';
 import { Text } from '@/components/ui/typography';
 import { ReasoningMessagePills } from './ReasoningMessagePills';

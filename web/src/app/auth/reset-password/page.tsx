@@ -7,9 +7,7 @@ import { resetPassword } from '@/lib/supabase/resetPassword';
 import { getSupabaseUserContext } from '@/lib/supabase';
 
 export default async function ResetPassword() {
-  const supabaseContext = await getSupabaseUserContext();
-
-  const { user } = supabaseContext;
+  const { user, accessToken } = await getSupabaseUserContext();
 
   if (!user?.id) {
     return redirect(
@@ -19,7 +17,7 @@ export default async function ResetPassword() {
     );
   }
 
-  const busterUser = await getMyUserInfo_server({ jwtToken: supabaseContext.accessToken });
+  const busterUser = await getMyUserInfo_server({ jwtToken: accessToken });
 
   if (!busterUser?.user?.email) {
     return redirect(
