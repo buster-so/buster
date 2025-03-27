@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { updateSession } from './middleware/supabaseMiddleware';
+import { updateSession } from '@/middleware/supabaseMiddleware';
 import { isPublicPage, BusterRoutes, createBusterRoute } from './routes';
 
 export async function middleware(request: NextRequest) {
@@ -12,7 +12,7 @@ export async function middleware(request: NextRequest) {
       );
     }
 
-    return NextResponse.next();
+    return supabaseResponse;
   } catch (error) {
     console.error('Error in middleware:', error);
     return NextResponse.next();
@@ -20,5 +20,14 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)']
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * Feel free to modify this pattern to include more paths.
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'
+  ]
 };

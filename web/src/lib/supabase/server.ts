@@ -1,7 +1,7 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { CookieOptions, createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
-const COOKIE_OPTIONS: CookieOptions = {
+export const COOKIE_OPTIONS: CookieOptions = {
   path: '/',
   secure: process.env.NODE_ENV === 'production', // Only use secure in production
   sameSite: 'lax', // Type assertion to fix the error
@@ -9,7 +9,7 @@ const COOKIE_OPTIONS: CookieOptions = {
   maxAge: 60 * 60 * 24 * 7 // 1 week
 };
 
-export const createClient = async () => {
+export async function createClient() {
   const cookieStore = await cookies();
 
   return createServerClient(
@@ -34,4 +34,4 @@ export const createClient = async () => {
       }
     }
   );
-};
+}

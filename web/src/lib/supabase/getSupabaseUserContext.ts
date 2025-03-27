@@ -12,8 +12,6 @@ export const getSupabaseUserContext = async () => {
     supabase.auth.getSession()
   ]);
 
-  console.log('userData', userData);
-
   if (!userData.data?.user) {
     const { session: anonSession } = await signInWithAnonymousUser();
     return {

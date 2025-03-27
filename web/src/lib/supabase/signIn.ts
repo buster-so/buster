@@ -3,6 +3,7 @@
 import { createClient } from './server';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 
 const authURLFull = `${process.env.NEXT_PUBLIC_URL}${createBusterRoute({
   route: BusterRoutes.AUTH_CALLBACK
@@ -28,6 +29,7 @@ export const signInWithEmailAndPassword = async ({
     return { error: error.message };
   }
 
+  revalidatePath('/', 'layout');
   return redirect(
     createBusterRoute({
       route: BusterRoutes.APP_HOME
@@ -51,6 +53,7 @@ export const signInWithGoogle = async () => {
     return { error: error.message };
   }
 
+  revalidatePath('/', 'layout');
   return redirect(data.url);
 };
 
@@ -70,6 +73,7 @@ export const signInWithGithub = async () => {
     return { error: error.message };
   }
 
+  revalidatePath('/', 'layout');
   return redirect(data.url);
 };
 
@@ -89,7 +93,7 @@ export const signInWithAzure = async () => {
   if (error) {
     return { error: error.message };
   }
-
+  revalidatePath('/', 'layout');
   return redirect(data.url);
 };
 
@@ -114,6 +118,7 @@ export const signUp = async ({ email, password }: { email: string; password: str
     return { error: error.message };
   }
 
+  revalidatePath('/', 'layout');
   return redirect(
     createBusterRoute({
       route: BusterRoutes.APP_HOME
@@ -131,6 +136,8 @@ export const signInWithAnonymousUser = async () => {
   if (error) {
     throw error;
   }
+
+  revalidatePath('/', 'layout');
 
   return data;
 };

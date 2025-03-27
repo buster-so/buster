@@ -271,9 +271,11 @@ const LoginOptions: React.FC<{
             placeholder="Password"
             autoComplete="new-password"
           />
-          <div className="absolute top-0 right-1.5 flex h-full items-center">
-            <PolicyCheck password={password} show={signUpFlow} onCheckChange={setPasswordCheck} />
-          </div>
+          {signUpFlow && (
+            <div className="absolute top-0 right-1.5 flex h-full items-center">
+              <PolicyCheck password={password} show={signUpFlow} onCheckChange={setPasswordCheck} />
+            </div>
+          )}
         </div>
         {signUpFlow && (
           <Input
@@ -305,7 +307,7 @@ const LoginOptions: React.FC<{
             type="submit"
             loading={loading === 'email'}
             variant="black"
-            disabled={signUpFlow ? false : disableSubmitButton}>
+            disabled={!signUpFlow ? false : disableSubmitButton}>
             {!signUpFlow ? `Sign in` : `Sign up`}
           </Button>
         </PolicyCheck>

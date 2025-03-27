@@ -113,9 +113,10 @@ export const PolicyCheck: React.FC<{
     }
   }, [placement]);
 
+  if (!show) return children;
+
   return (
     <Popover
-      open={show === false ? false : undefined}
       side={sideMemo}
       align={alignMemo}
       content={

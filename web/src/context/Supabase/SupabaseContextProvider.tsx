@@ -26,11 +26,7 @@ const useSupabaseContextInternal = ({
       const ms = millisecondsFromUnixTimestamp(expiresAtDecoded);
       const isTokenExpired = ms < 5 * 60 * 1000; // 5 minutes
 
-      console.log('isAnonymousUser', isAnonymousUser);
-      console.log('isTokenExpired', isTokenExpired);
-      console.log(decoded);
       if (isAnonymousUser) {
-        console.log(supabaseContext);
         return {
           access_token: accessToken,
           expires_at: expiresAt.current,
