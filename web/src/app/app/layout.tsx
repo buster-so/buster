@@ -3,7 +3,6 @@ import { createBusterRoute } from '@/routes';
 import { BusterRoutes } from '@/routes/busterRoutes';
 import { ClientRedirect } from '../../components/ui/layouts/ClientRedirect';
 import { prefetchGetMyUserInfo } from '@/api/buster_rest';
-import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import { getSupabaseUserContext } from '@/lib/supabase';
 import { AppProviders } from '@/context/AppProviders';
 
@@ -28,10 +27,8 @@ export default async function Layout({
   }
 
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <AppProviders userInfo={userInfo} supabaseContext={supabaseContext}>
-        {children}
-      </AppProviders>
-    </HydrationBoundary>
+    <AppProviders queryClient={queryClient} supabaseContext={supabaseContext}>
+      {children}
+    </AppProviders>
   );
 }

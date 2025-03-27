@@ -9,6 +9,7 @@ import { BusterPosthogProvider } from './Posthog';
 import { BusterNewChatProvider } from './Chats';
 import type { BusterUserResponse } from '@/api/asset_interfaces';
 import type { UseSupabaseUserContextType } from '@/lib/supabase';
+import { dehydrate, HydrationBoundary, type QueryClient } from '@tanstack/react-query';
 
 // scan({
 //   enabled: true,
@@ -19,23 +20,25 @@ import type { UseSupabaseUserContextType } from '@/lib/supabase';
 export const AppProviders: React.FC<
   PropsWithChildren<{
     supabaseContext: UseSupabaseUserContextType;
-    userInfo: BusterUserResponse | undefined;
+    queryClient: QueryClient;
   }>
-> = ({ children, supabaseContext, userInfo }) => {
+> = ({ children, queryClient, supabaseContext }) => {
   return (
     <SupabaseContextProvider supabaseContext={supabaseContext}>
       <BusterReactQueryProvider>
-        <BusterWebSocketProvider>
-          <AppLayoutProvider>
-            <BusterUserConfigProvider userInfo={userInfo}>
-              <BusterAssetsProvider>
-                <BusterNewChatProvider>
-                  <BusterPosthogProvider>{children}</BusterPosthogProvider>
-                </BusterNewChatProvider>
-              </BusterAssetsProvider>
-            </BusterUserConfigProvider>
-          </AppLayoutProvider>
-        </BusterWebSocketProvider>
+        <HydrationBoundary state={dehydrate(queryClient)}>
+          <BusterWebSocketProvider>
+            <AppLayoutProvider>
+              <BusterUserConfigProvider>
+                <BusterAssetsProvider>
+                  <BusterNewChatProvider>
+                    <BusterPosthogProvider>{children}</BusterPosthogProvider>
+                  </BusterNewChatProvider>
+                </BusterAssetsProvider>
+              </BusterUserConfigProvider>
+            </AppLayoutProvider>
+          </BusterWebSocketProvider>
+        </HydrationBoundary>
       </BusterReactQueryProvider>
     </SupabaseContextProvider>
   );

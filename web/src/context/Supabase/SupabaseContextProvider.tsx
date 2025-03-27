@@ -2,22 +2,11 @@
 
 import React, { PropsWithChildren, useLayoutEffect, useRef, useState } from 'react';
 import { useMemoizedFn } from '@/hooks';
-import { User } from '@supabase/supabase-js';
 import { millisecondsFromUnixTimestamp } from '@/lib';
 import { createContext, useContextSelector } from 'use-context-selector';
 import { checkTokenValidityFromServer as checkTokenValidityFromServerApiCall } from '@/api/buster_rest/nextjs/auth';
 import { jwtDecode } from 'jwt-decode';
 import type { UseSupabaseUserContextType } from '@/lib/supabase';
-
-export type SupabaseContextType = {
-  accessToken: string;
-  expiresAt: number;
-  user: User | null;
-  refreshToken: () => Promise<{
-    accessToken: string;
-    expiresAt: number;
-  } | null>;
-};
 
 const useSupabaseContextInternal = ({
   supabaseContext

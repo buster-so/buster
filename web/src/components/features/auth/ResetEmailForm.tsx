@@ -74,8 +74,7 @@ export const ResetEmailForm: React.FC<{
 
       <Link
         className={cn(
-          'flex w-full cursor-pointer justify-center text-center font-normal',
-          'text-primary'
+          'text-primary flex w-full cursor-pointer justify-center text-center font-normal'
         )}
         href={createBusterRoute({
           route: BusterRoutes.AUTH_LOGIN

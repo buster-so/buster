@@ -51,7 +51,7 @@ const defaultCspHeader = [
   // Frame ancestors - no embedding for non-embed routes
   "frame-ancestors 'none'",
   // Connect sources for API calls
-  "connect-src 'self' https://*.vercel.app https://*.supabase.co wss://*.supabase.co",
+  "connect-src 'self' http://127.0.0.1:* ws://127.0.0.1:* https://*.vercel.app https://*.supabase.co wss://*.supabase.co",
   // Media
   "media-src 'self'",
   // Object
@@ -78,7 +78,7 @@ const embedCspHeader = [
   // Frame ancestors - allow embedding from any domain for /embed routes
   `frame-ancestors 'self' *`,
   // Connect sources for API calls
-  "connect-src 'self' https://*.vercel.app https://*.supabase.co wss://*.supabase.co",
+  "connect-src 'self' http://127.0.0.1:* ws://127.0.0.1:* https://*.vercel.app https://*.supabase.co wss://*.supabase.co",
   // Media
   "media-src 'self'",
   // Object
