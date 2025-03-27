@@ -36,10 +36,31 @@ export type BusterRoutesWithArgsRoute = BusterRoutesWithArgs[BusterRoutes];
 
 export const createBusterRoute = ({ route, ...args }: BusterRoutesWithArgsRoute) => {
   if (!args) return route;
-  return Object.entries(args).reduce<string>((acc, [key, value]) => {
-    acc.replace(`[${key}]`, value as string);
-    return acc.replace(`:${key}`, value as string);
-  }, route || '');
+
+  // Split the route into base path and query template if it exists
+  const [basePath, queryTemplate] = route.split('?');
+
+  // Replace path parameters
+  const resultPath = Object.entries(args).reduce<string>((acc, [key, value]) => {
+    return acc.replace(`:${key}`, value as string).replace(`[${key}]`, value as string);
+  }, basePath);
+
+  // If there's no query template, return just the path
+  if (!queryTemplate) return resultPath;
+
+  // Handle query parameters
+  const queryParams = queryTemplate
+    .split('&')
+    .map((param) => {
+      const [key] = param.split('=');
+      const paramName = key.replace(':', '');
+      const value = (args as Record<string, string | undefined>)[paramName];
+      return value != null ? `${key.replace(':', '')}=${value}` : null;
+    })
+    .filter(Boolean);
+
+  // Return path with query string if there are valid query params
+  return queryParams.length > 0 ? `${resultPath}?${queryParams.join('&')}` : resultPath;
 };
 
 const routeToRegex = (route: string): RegExp => {

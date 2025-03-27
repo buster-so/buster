@@ -1,0 +1,65 @@
+import { createBusterRoute } from './busterRoutes';
+import { BusterAuthRoutes } from './busterAuthRoutes';
+import { BusterAppRoutes } from './busterAppRoutes';
+import { BusterSettingsRoutes } from './busterSettingsRoutes';
+
+describe('createBusterRoute', () => {
+  test('should return route as is when no parameters are provided', () => {
+    const input = { route: BusterAuthRoutes.AUTH_LOGIN };
+    const result = createBusterRoute(input);
+    expect(result).toBe('/auth/login');
+  });
+
+  test('should replace single dynamic parameter in route', () => {
+    const input = {
+      route: BusterAppRoutes.APP_CHAT_ID,
+      chatId: '123'
+    } as const;
+    const result = createBusterRoute(input);
+    expect(result).toBe('/app/chats/123');
+  });
+
+  test('should replace multiple dynamic parameters in route', () => {
+    const input = {
+      route: BusterSettingsRoutes.SETTINGS_PERMISSION_GROUPS_ID_DATASETS,
+      permissionGroupId: 'group123'
+    } as const;
+    const result = createBusterRoute(input);
+    expect(result).toBe('/app/settings/permission-groups/group123/datasets');
+  });
+
+  test('should handle query parameters in route', () => {
+    // Test with all query parameters
+    const input = {
+      route: BusterAppRoutes.APP_CHAT_ID_QUERY,
+      chatId: '123',
+      metricId: 'metric456',
+      dashboardId: 'dash789',
+      reasoningId: 'reason101'
+    } as const;
+    const result = createBusterRoute(input);
+    expect(result).toBe(
+      '/app/chats/123?metricId=metric456&dashboardId=dash789&reasoningId=reason101'
+    );
+
+    // Test with some undefined parameters
+    const partialInput: any = {
+      route: BusterAppRoutes.APP_CHAT_ID_QUERY,
+      chatId: '123',
+      metricId: 'metric456',
+      dashboardId: undefined,
+      reasoningId: null,
+      yourMom: 'yourMom'
+    };
+    const result2 = createBusterRoute(partialInput);
+    expect(result2).toBe('/app/chats/123?metricId=metric456');
+
+    // Test with all query parameters undefined
+    const minimalInput: any = {
+      route: BusterAppRoutes.APP_CHAT_ID_QUERY,
+      chatId: '123'
+    };
+    const result3 = createBusterRoute(minimalInput);
+    expect(result3).toBe('/app/chats/123');
+  });
+});

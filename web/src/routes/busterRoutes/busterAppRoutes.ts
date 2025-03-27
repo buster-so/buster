@@ -25,6 +25,7 @@ export enum BusterAppRoutes {
   //NEW CHAT
   APP_CHAT = '/app/chats',
   APP_CHAT_ID = '/app/chats/:chatId',
+  APP_CHAT_ID_QUERY = '/app/chats/:chatId?metricId=:metricId&dashboardId=:dashboardId&reasoningId=:reasoningId',
   APP_CHAT_ID_REASONING_ID = '/app/chats/:chatId/reasoning/:messageId',
   APP_CHAT_ID_METRIC_ID = '/app/chats/:chatId/metrics/:metricId',
   APP_CHAT_ID_COLLECTION_ID = '/app/chats/:chatId/collections/:collectionId',
@@ -96,6 +97,13 @@ export type BusterAppRoutesWithArgs = {
   [BusterAppRoutes.NEW_USER]: { route: BusterAppRoutes.NEW_USER };
   [BusterAppRoutes.APP_CHAT]: { route: BusterAppRoutes.APP_CHAT };
   [BusterAppRoutes.APP_CHAT_ID]: { route: BusterAppRoutes.APP_CHAT_ID; chatId: string };
+  [BusterAppRoutes.APP_CHAT_ID_QUERY]: {
+    route: BusterAppRoutes.APP_CHAT_ID_QUERY;
+    chatId: string;
+    metricId?: string;
+    dashboardId?: string;
+    reasoningId?: string;
+  };
   [BusterAppRoutes.APP_CHAT_ID_REASONING_ID]: {
     route: BusterAppRoutes.APP_CHAT_ID_REASONING_ID;
     chatId: string;
