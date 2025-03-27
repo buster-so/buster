@@ -2,7 +2,7 @@
 
 import { BASE_URL } from './buster_rest/config';
 import type { RequestInit } from 'next/dist/server/web/spec-extension/request';
-import { createClient } from '../context/Supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 
 export interface FetchConfig extends RequestInit {

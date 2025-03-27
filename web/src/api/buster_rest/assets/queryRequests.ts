@@ -39,7 +39,7 @@ export const useAssetCheck = <TData = PublicAssetResponse>(
   return useQuery({
     ...queryKeys.assetCheck(assetId || '', fileType || 'metric'),
     queryFn: () => getAssetCheck({ type: fileType!, id: assetId! }),
-    enabled: false, //false because it will be from the page level server layout
+    enabled: true,
     select
   });
 };

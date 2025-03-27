@@ -139,7 +139,7 @@ const LinkWrapper: React.FC<{
 }> = ({ href, children }) => {
   if (!href) return <>{children}</>;
   return (
-    <Link href={href} prefetch={true}>
+    <Link href={href} prefetch={false}>
       {children}
     </Link>
   );

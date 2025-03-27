@@ -21,17 +21,22 @@ const useSupabaseContextInternal = ({
 
   const checkTokenValidity = useMemoizedFn(async () => {
     try {
+      const decoded = jwtDecode(accessToken);
+      const expiresAtDecoded = decoded?.exp || 0;
+      const ms = millisecondsFromUnixTimestamp(expiresAtDecoded);
+      const isTokenExpired = ms < 5 * 60 * 1000; // 5 minutes
+
+      console.log('isAnonymousUser', isAnonymousUser);
+      console.log('isTokenExpired', isTokenExpired);
+      console.log(decoded);
       if (isAnonymousUser) {
+        console.log(supabaseContext);
         return {
           access_token: accessToken,
           expires_at: expiresAt.current,
           isTokenValid: true
         };
       }
-      const decoded = jwtDecode(accessToken);
-      const expiresAtDecoded = decoded?.exp || 0;
-      const ms = millisecondsFromUnixTimestamp(expiresAtDecoded);
-      const isTokenExpired = ms < 5 * 60 * 1000; // 5 minutes
 
       if (isTokenExpired) {
         const res = await checkTokenValidityFromServer({ accessToken });
@@ -97,11 +102,6 @@ const useSupabaseContextInternal = ({
 const SupabaseContext = createContext<ReturnType<typeof useSupabaseContextInternal>>(
   {} as ReturnType<typeof useSupabaseContextInternal>
 );
-export type SupabaseContextReturnType = ReturnType<typeof useSupabaseContextInternal>;
-
-export const useSupabaseContext = <T,>(selector: (state: SupabaseContextReturnType) => T) => {
-  return useContextSelector(SupabaseContext, selector);
-};
 
 export const SupabaseContextProvider: React.FC<
   PropsWithChildren<{
@@ -113,3 +113,9 @@ export const SupabaseContextProvider: React.FC<
   return <SupabaseContext.Provider value={value}>{children}</SupabaseContext.Provider>;
 });
 SupabaseContextProvider.displayName = 'SupabaseContextProvider';
+
+export type SupabaseContextReturnType = ReturnType<typeof useSupabaseContextInternal>;
+
+export const useSupabaseContext = <T,>(selector: (state: SupabaseContextReturnType) => T) => {
+  return useContextSelector(SupabaseContext, selector);
+};

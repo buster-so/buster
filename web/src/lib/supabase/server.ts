@@ -1,5 +1,13 @@
-import { createServerClient } from '@supabase/ssr';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+
+const COOKIE_OPTIONS: CookieOptions = {
+  path: '/',
+  secure: process.env.NODE_ENV === 'production', // Only use secure in production
+  sameSite: 'lax', // Type assertion to fix the error
+  httpOnly: true, // Make cookies HttpOnly
+  maxAge: 60 * 60 * 24 * 7 // 1 week
+};
 
 export async function createClient() {
   const cookieStore = await cookies();
@@ -17,7 +25,7 @@ export async function createClient() {
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
+              cookieStore.set(name, value, { ...options, ...COOKIE_OPTIONS })
             );
           } catch {
             // The `setAll` method was called from a Server Component.

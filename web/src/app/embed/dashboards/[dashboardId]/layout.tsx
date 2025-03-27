@@ -8,7 +8,7 @@ export default async function EmbedMetricsLayout({
   params: { dashboardId: string };
 }) {
   return (
-    <AppAssetCheckLayout type="dashboard" assetId={dashboardId}>
+    <AppAssetCheckLayout assetId={dashboardId} type="dashboard">
       {children}
     </AppAssetCheckLayout>
   );

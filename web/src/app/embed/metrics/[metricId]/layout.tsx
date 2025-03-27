@@ -10,7 +10,7 @@ export default async function EmbedMetricsLayout({
   const { metricId } = await params;
 
   return (
-    <AppAssetCheckLayout type="metric" assetId={metricId}>
+    <AppAssetCheckLayout assetId={metricId} type="metric">
       {children}
     </AppAssetCheckLayout>
   );

@@ -114,12 +114,6 @@ describe('createPathnameToBusterRoute', () => {
     expect(result).toEqual(BusterSettingsRoutes.SETTINGS_USERS_ID_PERMISSION_GROUPS);
   });
 
-  test('should convert dashboard metrics route with multiple IDs', () => {
-    const pathname = '/app/dashboards/dash123/metrics/metric456';
-    const result = createPathnameToBusterRoute(pathname);
-    expect(result).toEqual(BusterRoutes.APP_DASHBOARD_METRICS_ID);
-  });
-
   test('should fallback to ROOT for unmatched routes', () => {
     const pathname = '/invalid/route/path';
     const result = createPathnameToBusterRoute(pathname);

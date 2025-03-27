@@ -29,8 +29,7 @@ const DashboardMetricItemBase: React.FC<{
     metricData,
     initialAnimationEnded,
     setInitialAnimationEnded,
-    isFetchedMetricData,
-    isMetricFetched
+    isFetchedMetricData
   } = useDashboardMetric({ metricId });
 
   const loadingMetricData = !!metric && !isFetchedMetricData;
@@ -52,11 +51,10 @@ const DashboardMetricItemBase: React.FC<{
 
   const metricLink = useMemo(() => {
     return createBusterRoute({
-      route: BusterRoutes.APP_DASHBOARD_METRICS_ID,
-      metricId: metricId,
-      dashboardId: dashboardId
+      route: BusterRoutes.APP_METRIC_ID,
+      metricId: metricId
     });
-  }, [metricId, dashboardId]);
+  }, [metricId]);
 
   const onInitialAnimationEndPreflight = useMemoizedFn(() => {
     setInitialAnimationEnded(metricId);

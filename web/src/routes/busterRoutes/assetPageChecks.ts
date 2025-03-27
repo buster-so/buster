@@ -1,19 +1,18 @@
-import { BusterAuthRoutes } from '@/routes/busterRoutes/busterAuthRoutes';
-import { BusterEmbedRoutes } from '@/routes/busterRoutes/busterEmbedRoutes';
-import { BusterRoutes, createPathnameToBusterRoute } from '@/routes/busterRoutes';
+import { BusterAuthRoutes } from './busterAuthRoutes';
+import { BusterEmbedRoutes } from './busterEmbedRoutes';
+import { BusterRoutes } from './busterRoutes';
 import { NextRequest } from 'next/server';
+import { createPathnameToBusterRoute } from './createRouteHelpers';
 
 const assetCheckPages: BusterRoutes[] = [
   BusterRoutes.APP_METRIC_ID,
   BusterRoutes.APP_DASHBOARD_ID,
-  BusterRoutes.APP_DASHBOARD_METRICS_ID,
   BusterRoutes.APP_CHAT
 ];
 
 const publicPages: BusterRoutes[] = [
   BusterRoutes.APP_METRIC_ID,
   BusterRoutes.APP_DASHBOARD_ID,
-  BusterRoutes.APP_DASHBOARD_METRICS_ID,
   ...Object.values(BusterEmbedRoutes),
   ...Object.values(BusterAuthRoutes)
 ];

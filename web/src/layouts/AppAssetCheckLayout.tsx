@@ -7,7 +7,7 @@ import { redirect } from 'next/navigation';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { AppPasswordAccess } from '@/controllers/AppPasswordAccess';
 import { AppNoPageAccess } from '@/controllers/AppNoPageAccess';
-import { prefetchAssetCheck } from '@/api/buster_rest/assets/queryRequests';
+import { prefetchAssetCheck, useAssetCheck } from '@/api/buster_rest/assets';
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 
 export type AppAssetCheckLayoutProps = {
@@ -20,6 +20,11 @@ export const AppAssetCheckLayout: React.FC<
     children: React.ReactNode;
   } & AppAssetCheckLayoutProps
 > = ({ children, type, assetId }) => {
+  const { data: hasAccess } = useAssetCheck(
+    { assetId: assetId, fileType: type },
+    (x) => x.has_access
+  );
+
   return <div>TODO</div>;
 
   // if (!jwtToken) {

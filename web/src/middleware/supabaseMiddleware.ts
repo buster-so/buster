@@ -30,5 +30,7 @@ export async function updateSession(request: NextRequest) {
   // refreshing the auth token
   const user = await supabase.auth.getUser();
 
+  console.log('user middleware', user);
+
   return { supabaseResponse, user };
 }
