@@ -20,10 +20,10 @@ export default function ProfilePage() {
     <div>
       <SettingsPageHeader title="Profile" description="Manage your profile & information" />
 
-      <div className="bg-background border-border/30 rounded-lg border shadow">
+      <div className="bg-background rounded-lg border shadow">
         {/* Header Section */}
         <div className="border-border/30 flex flex-col items-center gap-4 border-b p-6 sm:flex-row sm:items-start">
-          <Avatar name={name} className="h-12 w-12" />
+          <Avatar name={name} className="h-12 w-12" fallbackClassName="text-2xl" />
           <div className="flex flex-col justify-center gap-1">
             <Title as="h3" className="text-foreground">
               {name}
