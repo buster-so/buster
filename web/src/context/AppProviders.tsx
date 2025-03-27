@@ -1,15 +1,14 @@
 import React, { PropsWithChildren } from 'react';
 import { BusterWebSocketProvider } from './BusterWebSocket';
 import { SupabaseContextProvider } from './Supabase/SupabaseContextProvider';
-import { UseSupabaseContextType } from './Supabase/getSupabaseServerContext';
 import { BusterReactQueryProvider } from './BusterReactQuery/BusterReactQueryAndApi';
 import { AppLayoutProvider } from './BusterAppLayout';
 import { BusterUserConfigProvider } from './Users/BusterUserConfigProvider';
 import { BusterAssetsProvider } from './Assets/BusterAssetsProvider';
 import { BusterPosthogProvider } from './Posthog';
 import { BusterNewChatProvider } from './Chats';
-import { RoutePrefetcher } from './RoutePrefetcher';
 import type { BusterUserResponse } from '@/api/asset_interfaces';
+import type { UseSupabaseUserContextType } from '@/lib/supabase';
 
 // scan({
 //   enabled: true,
@@ -19,7 +18,7 @@ import type { BusterUserResponse } from '@/api/asset_interfaces';
 
 export const AppProviders: React.FC<
   PropsWithChildren<{
-    supabaseContext: UseSupabaseContextType;
+    supabaseContext: UseSupabaseUserContextType;
     userInfo: BusterUserResponse | undefined;
   }>
 > = ({ children, supabaseContext, userInfo }) => {
@@ -31,10 +30,7 @@ export const AppProviders: React.FC<
             <BusterUserConfigProvider userInfo={userInfo}>
               <BusterAssetsProvider>
                 <BusterNewChatProvider>
-                  <BusterPosthogProvider>
-                    {children}
-                    <RoutePrefetcher />
-                  </BusterPosthogProvider>
+                  <BusterPosthogProvider>{children}</BusterPosthogProvider>
                 </BusterNewChatProvider>
               </BusterAssetsProvider>
             </BusterUserConfigProvider>

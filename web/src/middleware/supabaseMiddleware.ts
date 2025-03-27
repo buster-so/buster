@@ -1,6 +1,4 @@
-import { COOKIE_OPTIONS } from '@/context/Supabase/server';
 import { createServerClient } from '@supabase/ssr';
-import { User } from '@supabase/supabase-js';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export async function updateSession(request: NextRequest) {
@@ -22,20 +20,15 @@ export async function updateSession(request: NextRequest) {
             request
           });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, { ...options, ...COOKIE_OPTIONS })
+            supabaseResponse.cookies.set(name, value, options)
           );
         }
       }
     }
   );
 
-  // IMPORTANT: Avoid writing any logic between createServerClient and
-  // supabase.auth.getUser(). A simple mistake could make it very hard to debug
-  // issues with users being randomly logged out.
+  // refreshing the auth token
+  const user = await supabase.auth.getUser();
 
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-
-  return [supabaseResponse, user] as [NextResponse, User | null];
+  return { supabaseResponse, user };
 }

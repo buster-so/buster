@@ -1,6 +1,6 @@
 'use server';
 
-import { createClient } from '@/context/Supabase/server';
+import { createClient } from './server';
 import { redirect } from 'next/navigation';
 import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes/busterRoutes';
 

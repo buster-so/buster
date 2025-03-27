@@ -1,13 +1,13 @@
 'use client';
 
 import React, { PropsWithChildren, useLayoutEffect, useRef, useState } from 'react';
-import { UseSupabaseContextType } from './getSupabaseServerContext';
 import { useMemoizedFn } from '@/hooks';
 import { User } from '@supabase/supabase-js';
 import { millisecondsFromUnixTimestamp } from '@/lib';
 import { createContext, useContextSelector } from 'use-context-selector';
 import { checkTokenValidityFromServer as checkTokenValidityFromServerApiCall } from '@/api/buster_rest/nextjs/auth';
 import { jwtDecode } from 'jwt-decode';
+import type { UseSupabaseUserContextType } from '@/lib/supabase';
 
 export type SupabaseContextType = {
   accessToken: string;
@@ -22,7 +22,7 @@ export type SupabaseContextType = {
 const useSupabaseContextInternal = ({
   supabaseContext
 }: {
-  supabaseContext: UseSupabaseContextType;
+  supabaseContext: UseSupabaseUserContextType;
 }) => {
   const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const refreshToken = useRef(supabaseContext.refreshToken || '');
@@ -126,7 +126,7 @@ export const useSupabaseContext = <T,>(selector: (state: SupabaseContextReturnTy
 
 export const SupabaseContextProvider: React.FC<
   PropsWithChildren<{
-    supabaseContext: UseSupabaseContextType;
+    supabaseContext: UseSupabaseUserContextType;
   }>
 > = React.memo(({ supabaseContext, children }) => {
   const value = useSupabaseContextInternal({ supabaseContext });

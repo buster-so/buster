@@ -1,6 +1,6 @@
 'use server';
 
-import { createClient } from '@/context/Supabase/server';
+import { createClient } from './server';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 
 const authURLFull = `${process.env.NEXT_PUBLIC_URL}${createBusterRoute({

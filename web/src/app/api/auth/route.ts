@@ -1,10 +1,10 @@
 'use server';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getSupabaseServerContext } from '@/context/Supabase/getSupabaseServerContext';
+import { getSupabaseUserContext } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
-  const { accessToken, refreshToken, expiresAt } = await getSupabaseServerContext();
+  const { accessToken, refreshToken, expiresAt } = await getSupabaseUserContext();
 
   const response = NextResponse.json({
     access_token: accessToken,
@@ -17,6 +17,7 @@ export async function POST(request: NextRequest) {
     secure: true,
     sameSite: 'lax'
   });
+
   response.cookies.set('access_token', accessToken || '', {
     httpOnly: true,
     secure: true,

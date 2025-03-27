@@ -1,10 +1,13 @@
-import { signInWithAnonymousUser } from '@/server_context/supabaseAuthMethods';
+'use server';
+
 import { createClient } from './server';
+import { signInWithAnonymousUser } from './signIn';
 
 type PromiseType<T extends Promise<any>> = T extends Promise<infer U> ? U : never;
-export type UseSupabaseContextType = PromiseType<ReturnType<typeof getSupabaseServerContext>>;
 
-export const getSupabaseServerContext = async () => {
+export type UseSupabaseUserContextType = PromiseType<ReturnType<typeof getSupabaseUserContext>>;
+
+export const getSupabaseUserContext = async () => {
   const supabase = await createClient();
   const [userData, sessionData] = await Promise.all([
     supabase.auth.getUser(),

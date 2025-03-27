@@ -3,10 +3,10 @@ import { BusterAssetsProvider } from '@/context/Assets/BusterAssetsProvider';
 import { BusterReactQueryProvider } from '@/context/BusterReactQuery/BusterReactQueryAndApi';
 import { BusterPosthogProvider } from '@/context/Posthog';
 import { SupabaseContextProvider } from '@/context/Supabase';
-import { getSupabaseServerContext } from '@/context/Supabase/getSupabaseServerContext';
+import { getSupabaseUserContext } from '@/lib/supabase';
 
 export default async function EmbedLayout({ children }: { children: React.ReactNode }) {
-  const supabaseContext = await getSupabaseServerContext();
+  const supabaseContext = await getSupabaseUserContext();
 
   return (
     <GlobalErrorComponent>

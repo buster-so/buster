@@ -1,12 +1,13 @@
-import { ResetEmailForm } from '@/components/features/auth/ResetEmailForm';
-import { resetPasswordEmailSend } from '@/server_context/supabaseAuthMethods';
+'use client';
+
 import React from 'react';
+import { ResetEmailForm } from '@/components/features/auth/ResetEmailForm';
+import { resetPasswordEmailSend } from '@/lib/supabase/resetPassword';
+import { useSearchParams } from 'next/navigation';
 
-export const dynamic = 'force-dynamic';
-
-export default async function ResetPassword(p: { searchParams: Promise<{ email: string }> }) {
-  const params = await p.searchParams;
-  const queryEmail = params.email;
+export default function ResetPassword() {
+  const searchParams = useSearchParams();
+  const queryEmail = searchParams.get('email') || '';
 
   return <ResetEmailForm queryEmail={queryEmail} resetPasswordEmailSend={resetPasswordEmailSend} />;
 }

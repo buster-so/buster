@@ -2,11 +2,11 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { codeToFlag } from './_codeToFlag';
-import { getSupabaseServerContext } from '@/context/Supabase/getSupabaseServerContext';
+import { getSupabaseUserContext } from '@/lib/supabase';
 
 export async function GET(request: NextRequest) {
   // Check if user is authenticated
-  const { user } = await getSupabaseServerContext();
+  const { user } = await getSupabaseUserContext();
 
   if (user && !user?.is_anonymous) {
     return NextResponse.json(currencies);

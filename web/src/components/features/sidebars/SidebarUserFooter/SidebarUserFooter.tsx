@@ -15,40 +15,24 @@ import { BUSTER_DOCS_URL } from '@/routes/externalRoutes';
 import { type DropdownProps, Dropdown } from '@/components/ui/dropdown/Dropdown';
 import { AvatarUserButton } from '@/components/ui/avatar/AvatarUserButton';
 import { useUserConfigContextSelector } from '@/context/Users';
-import { signOut } from '@/server_context/supabaseAuthMethods';
+import { signOut as signOutServer } from '@/lib/supabase/signOut';
 
 export const SidebarUserFooter: React.FC<{}> = () => {
   const user = useUserConfigContextSelector((x) => x.user);
   if (!user) return null;
 
-  const signOutServer = signOut;
-  return (
-    <SidebarUserFooterComponent
-      signOut={signOutServer}
-      name={user?.name}
-      avatarUrl={''}
-      email={user?.email}
-    />
-  );
-};
+  const { name, email } = user;
 
-export const SidebarUserFooterComponent: React.FC<{
-  name: string;
-  avatarUrl?: string;
-  email: string;
-  signOut: () => Promise<{ error: string }>;
-}> = React.memo(({ name, avatarUrl, email, signOut }) => {
   if (!name || !email) return null;
+
   return (
-    <SidebarUserDropdown signOut={signOut}>
+    <SidebarUserDropdown signOut={signOutServer}>
       <div className="flex w-full">
-        <AvatarUserButton username={name} avatarUrl={avatarUrl} email={email} />
+        <AvatarUserButton username={name} email={email} />
       </div>
     </SidebarUserDropdown>
   );
-});
-
-SidebarUserFooterComponent.displayName = 'SidebarUserFooterComponent';
+};
 
 const topItems: DropdownProps['items'] = [
   {

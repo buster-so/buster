@@ -1,5 +1,6 @@
+'use client';
+
 import React from 'react';
-import { getSupabaseServerContext } from '@/context/Supabase/getSupabaseServerContext';
 import { ShareAssetType } from '@/api/asset_interfaces';
 import { ClientSideAnonCheck } from './ClientSideAnonCheck';
 import { redirect } from 'next/navigation';
@@ -19,57 +20,57 @@ export const AppAssetCheckLayout: React.FC<
     children: React.ReactNode;
   } & AppAssetCheckLayoutProps
 > = async ({ children, type, assetId }) => {
-  const { accessToken: jwtToken, user } = await getSupabaseServerContext();
+  return <div>TODO</div>;
 
-  if (!jwtToken) {
-    return redirect(
-      createBusterRoute({
-        route: BusterRoutes.AUTH_LOGIN
-      })
-    );
-  }
+  // if (!jwtToken) {
+  //   return redirect(
+  //     createBusterRoute({
+  //       route: BusterRoutes.AUTH_LOGIN
+  //     })
+  //   );
+  // }
 
-  let { res, queryClient } = await prefetchAssetCheck({
-    fileType: type,
-    assetId: assetId,
-    jwtToken
-  });
+  // let { res, queryClient } = await prefetchAssetCheck({
+  //   fileType: type,
+  //   assetId: assetId,
+  //   jwtToken
+  // });
 
-  if (!res) {
-    return redirect(
-      createBusterRoute({
-        route: BusterRoutes.APP_HOME
-      })
-    );
-  }
+  // if (!res) {
+  //   return redirect(
+  //     createBusterRoute({
+  //       route: BusterRoutes.APP_HOME
+  //     })
+  //   );
+  // }
 
-  const { has_access, password_required, public: pagePublic } = res;
+  // const { has_access, password_required, public: pagePublic } = res;
 
-  const Component = (() => {
-    if (has_access || (pagePublic && !password_required)) {
-      return <ClientSideAnonCheck jwtToken={jwtToken}>{children}</ClientSideAnonCheck>;
-    }
+  // const Component = (() => {
+  //   if (has_access || (pagePublic && !password_required)) {
+  //     return <ClientSideAnonCheck jwtToken={jwtToken}>{children}</ClientSideAnonCheck>;
+  //   }
 
-    if (pagePublic && password_required) {
-      return (
-        <ClientSideAnonCheck jwtToken={jwtToken}>
-          <AppPasswordAccess assetId={assetId} type={type as ShareAssetType}>
-            {children}
-          </AppPasswordAccess>
-        </ClientSideAnonCheck>
-      );
-    }
+  //   if (pagePublic && password_required) {
+  //     return (
+  //       <ClientSideAnonCheck jwtToken={jwtToken}>
+  //         <AppPasswordAccess assetId={assetId} type={type as ShareAssetType}>
+  //           {children}
+  //         </AppPasswordAccess>
+  //       </ClientSideAnonCheck>
+  //     );
+  //   }
 
-    if (!has_access && !pagePublic) {
-      return (
-        <ClientSideAnonCheck jwtToken={jwtToken}>
-          <AppNoPageAccess assetId={assetId} />
-        </ClientSideAnonCheck>
-      );
-    }
+  //   if (!has_access && !pagePublic) {
+  //     return (
+  //       <ClientSideAnonCheck jwtToken={jwtToken}>
+  //         <AppNoPageAccess assetId={assetId} />
+  //       </ClientSideAnonCheck>
+  //     );
+  //   }
 
-    return <>{children}</>;
-  })();
+  //   return <>{children}</>;
+  // })();
 
-  return <HydrationBoundary state={dehydrate(queryClient)}>{Component}</HydrationBoundary>;
+  // return <HydrationBoundary state={dehydrate(queryClient)}>{Component}</HydrationBoundary>;
 };

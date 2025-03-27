@@ -1,6 +1,6 @@
 import React from 'react';
 import { DatasourceList } from './_DatasourceList';
-import { SettingsPageHeader } from '../../_components/SettingsPageHeader';
+import { SettingsPageHeader } from '../../../_components/SettingsPageHeader';
 
 export default function Page() {
   return (
