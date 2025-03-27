@@ -8,6 +8,8 @@ import { useUserConfigContextSelector } from '@/context/Users';
 import { ListUsersComponent } from './ListUsersComponent';
 import { PermissionSearch } from '@/components/features/PermissionComponents';
 
+export const dynamic = 'force-static';
+
 export default function Page() {
   const userOrganization = useUserConfigContextSelector((x) => x.userOrganizations);
   const firstOrganizationId = userOrganization?.id! || '';

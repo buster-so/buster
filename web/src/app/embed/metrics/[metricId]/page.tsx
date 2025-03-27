@@ -13,7 +13,7 @@ export default function EmbedMetricsPage({
 }) {
   const { metricId } = params;
   const { version_number } = searchParams;
-  const { isFetched, error, ...rest } = useGetMetric({
+  const { isFetched, error } = useGetMetric({
     id: metricId,
     version_number: version_number ? parseInt(version_number) : undefined
   });

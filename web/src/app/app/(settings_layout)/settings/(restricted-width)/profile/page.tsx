@@ -7,6 +7,8 @@ import { formatDate } from '@/lib/date';
 import { Title, Text } from '@/components/ui/typography';
 import { Avatar } from '@/components/ui/avatar';
 
+export const dynamic = 'force-static';
+
 export default function ProfilePage() {
   const user = useUserConfigContextSelector((state) => state.user);
 

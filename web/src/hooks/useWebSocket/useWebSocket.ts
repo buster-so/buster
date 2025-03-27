@@ -154,7 +154,7 @@ const useWebSocket = ({ url, checkTokenValidity, canConnect, onMessage }: WebSoc
 
       // Use fetch to check connection first and get headers
       checkTokenValidity()
-        .then(({ access_token, expires_at, refresh_token, isTokenValid }) => {
+        .then(({ access_token, isTokenValid }) => {
           if (!isTokenValid) return;
           // If fetch succeeds, establish WebSocket connection
           const socketURLWithAuth = url + `?authentication=${access_token}`;

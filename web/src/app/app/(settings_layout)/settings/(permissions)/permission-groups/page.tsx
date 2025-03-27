@@ -13,6 +13,8 @@ import { useMemoizedFn } from '@/hooks';
 import { Button } from '@/components/ui/buttons';
 import { Plus } from '@/components/ui/icons';
 
+export const dynamic = 'force-static';
+
 export default function Page() {
   const { data: permissionGroups, isFetched, refetch } = useListAllPermissionGroups();
   const [isNewPermissionGroupModalOpen, setIsNewPermissionGroupModalOpen] = useState(false);
