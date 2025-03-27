@@ -12,6 +12,13 @@ const nextConfig = {
     includePaths: [path.join(__dirname, 'styles')],
     silenceDeprecations: ['legacy-js-api']
   },
+  experimental: {
+    serverComponentsExternalPackages: [],
+    instrumentationHook: false,
+    serverActions: {
+      bodySizeLimit: '2mb'
+    }
+  },
   async headers() {
     return [
       {
