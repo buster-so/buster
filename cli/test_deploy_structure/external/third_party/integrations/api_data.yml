@@ -1,0 +1,24 @@
+version: 1
+models:
+  - name: api_data
+    description: "External API data with product references"
+    entities:
+      - name: product
+        expr: "product_id"
+        type: "foreign"
+        description: "Reference to product in core models"
+        project_path: "../../../core/models"
+    dimensions:
+      - name: api_id
+        expr: "id"
+        type: "string"
+        description: "API data ID"
+      - name: timestamp
+        expr: "created_at"
+        type: "timestamp"
+        description: "API data timestamp"
+    measures:
+      - name: count
+        expr: "1"
+        agg: "count"
+        description: "Count of API records"

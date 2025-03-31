@@ -1,0 +1,19 @@
+version: 1
+models:
+  - name: product
+    description: "Core product information"
+    entities: []
+    dimensions:
+      - name: product_id
+        expr: "id"
+        type: "string"
+        description: "Unique product ID"
+      - name: product_name
+        expr: "name"
+        type: "string"
+        description: "Product name"
+    measures:
+      - name: count
+        expr: "1"
+        agg: "count"
+        description: "Count of products"

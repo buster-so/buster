@@ -1,0 +1,5 @@
+data_source_name: "test_source"
+schema: "sales"
+database: "test_db"
+model_paths:
+  - "../"

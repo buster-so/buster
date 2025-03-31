@@ -1,0 +1,34 @@
+version: 1
+models:
+  - name: dashboard_data
+    description: "Dashboard data combining orders and external API data"
+    entities:
+      - name: orders
+        expr: "order_id"
+        type: "foreign"
+        description: "Reference to sales orders"
+        project_path: "../reporting/sales"
+      - name: api_data
+        expr: "api_id"
+        type: "foreign"
+        description: "Reference to external API data"
+        project_path: "../external/third_party/integrations"
+      - name: customer
+        expr: "customer_id"
+        type: "foreign"
+        description: "Direct reference to customer model"
+        project_path: "../core/models"
+    dimensions:
+      - name: dashboard_id
+        expr: "id"
+        type: "string"
+        description: "Unique dashboard ID"
+      - name: view_date
+        expr: "view_date"
+        type: "date"
+        description: "Dashboard view date"
+    measures:
+      - name: view_count
+        expr: "views"
+        agg: "sum"
+        description: "Total views"

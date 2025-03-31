@@ -47,48 +47,129 @@ impl BusterConfig {
             for path in model_paths {
                 println!("\n   Processing path pattern: {}", path);
                 
-                // Convert relative path to absolute if needed
-                let absolute_pattern = if Path::new(path).is_absolute() {
-                    path.clone()
-                } else {
-                    // Handle parent directory traversal by getting absolute path
-                    let mut full_path = base_dir.to_path_buf();
-                    for component in Path::new(path).components() {
-                        full_path.push(component);
+                // Handle each path type differently
+                if path == "../" || path == ".." {
+                    // Special handling for parent directory reference
+                    if let Some(parent_dir) = base_dir.parent() {
+                        println!("   Parent directory: {}", parent_dir.display());
+                        resolved_paths.push(parent_dir.to_path_buf());
+                    } else {
+                        println!("   ⚠️  Cannot resolve parent directory for: {}", base_dir.display());
                     }
-                    full_path.to_string_lossy().to_string()
-                };
-                
-                println!("   Absolute pattern: {}", absolute_pattern);
-                
-                // Use globwalk to find matching files
-                match globwalk::GlobWalkerBuilder::from_patterns(
-                    base_dir,
-                    &[&absolute_pattern]
-                )
-                .follow_links(true)
-                .build() {
-                    Ok(walker) => {
-                        let mut found = false;
-                        for entry in walker {
-                            match entry {
-                                Ok(file) => {
-                                    found = true;
-                                    let path = file.path().to_path_buf();
-                                    println!("   ✓ Found match: {}", path.display());
-                                    resolved_paths.push(path);
-                                }
-                                Err(e) => {
-                                    println!("   ⚠️  Error processing entry: {}", e);
+                } else if Path::new(path).is_absolute() {
+                    // Simply use absolute paths as is
+                    let abs_path = PathBuf::from(path);
+                    println!("   Using absolute path: {}", abs_path.display());
+                    
+                    if abs_path.exists() {
+                        resolved_paths.push(abs_path);
+                    } else {
+                        println!("   ⚠️  Path does not exist: {}", abs_path.display());
+                    }
+                } else if path.contains("*") {
+                    // Use globwalk for patterns with wildcards, but be careful with relative paths
+                    println!("   Glob pattern detected: {}", path);
+                    
+                    // Determine if the path has parent traversal components
+                    let has_parent_traversal = path.starts_with("../") || path.starts_with("..\\") || path.contains("/../") || path.contains("\\..\\");
+                    
+                    if has_parent_traversal {
+                        println!("   ⚠️  Parent traversal in glob pattern, using canonical resolution");
+                        
+                        // For paths with parent traversal, first canonicalize the base dir
+                        if let Ok(canon_base) = base_dir.canonicalize() {
+                            // Now try to resolve the relative path components without the glob parts
+                            let parts: Vec<&str> = path.split('*').collect();
+                            let prefix = parts.first().unwrap_or(&"").trim_end_matches('/').trim_end_matches('\\');
+                            
+                            let mut search_base = canon_base.clone();
+                            if !prefix.is_empty() {
+                                for component in Path::new(prefix).components() {
+                                    match component {
+                                        std::path::Component::ParentDir => {
+                                            search_base = search_base.parent()
+                                                .unwrap_or(&search_base)
+                                                .to_path_buf();
+                                        },
+                                        _ => {
+                                            search_base.push(component);
+                                        }
+                                    }
                                 }
                             }
+                            
+                            // Use simplified glob pattern with resolved base
+                            let pattern = path.replace("../", "").replace("..\\", "");
+                            println!("   Using search base: {}", search_base.display());
+                            println!("   Simplified pattern: {}", pattern);
+                            
+                            match globwalk::GlobWalkerBuilder::new(&search_base, &pattern)
+                                .follow_links(true)
+                                .build() {
+                                Ok(walker) => {
+                                    let mut found = false;
+                                    for entry in walker {
+                                        match entry {
+                                            Ok(file) => {
+                                                found = true;
+                                                let path = file.path().to_path_buf();
+                                                println!("   ✓ Found match: {}", path.display());
+                                                resolved_paths.push(path);
+                                            }
+                                            Err(e) => {
+                                                println!("   ⚠️  Error processing entry: {}", e);
+                                            }
+                                        }
+                                    }
+                                    if !found {
+                                        println!("   ⚠️  No matches found for pattern in: {}", search_base.display());
+                                    }
+                                },
+                                Err(e) => {
+                                    println!("   ⚠️  Invalid glob pattern '{}': {}", pattern, e);
+                                }
+                            }
+                        } else {
+                            println!("   ⚠️  Could not canonicalize base directory: {}", base_dir.display());
                         }
-                        if !found {
-                            println!("   ⚠️  No matches found for pattern: {}", absolute_pattern);
+                    } else {
+                        // Handle normal glob patterns without parent traversal
+                        match globwalk::GlobWalkerBuilder::new(base_dir, path)
+                            .follow_links(true)
+                            .build() {
+                            Ok(walker) => {
+                                let mut found = false;
+                                for entry in walker {
+                                    match entry {
+                                        Ok(file) => {
+                                            found = true;
+                                            let path = file.path().to_path_buf();
+                                            println!("   ✓ Found match: {}", path.display());
+                                            resolved_paths.push(path);
+                                        }
+                                        Err(e) => {
+                                            println!("   ⚠️  Error processing entry: {}", e);
+                                        }
+                                    }
+                                }
+                                if !found {
+                                    println!("   ⚠️  No matches found for pattern: {}", path);
+                                }
+                            },
+                            Err(e) => {
+                                println!("   ⚠️  Invalid glob pattern '{}': {}", path, e);
+                            }
                         }
                     }
-                    Err(e) => {
-                        println!("   ⚠️  Invalid glob pattern '{}': {}", absolute_pattern, e);
+                } else {
+                    // Handle regular relative paths
+                    let rel_path = base_dir.join(path);
+                    println!("   Resolved relative path: {}", rel_path.display());
+                    
+                    if rel_path.exists() {
+                        resolved_paths.push(rel_path);
+                    } else {
+                        println!("   ⚠️  Path does not exist: {}", rel_path.display());
                     }
                 }
             }

@@ -1,0 +1,33 @@
+version: 1
+models:
+  - name: orders
+    description: "Sales order information with customer and product details"
+    entities:
+      - name: customer
+        expr: "customer_id"
+        type: "foreign"
+        description: "Reference to customer model"
+        project_path: "../../core/models"
+      - name: product
+        expr: "product_id"
+        type: "foreign"
+        description: "Reference to product model"
+        project_path: "../../core/models"
+    dimensions:
+      - name: order_id
+        expr: "id"
+        type: "string"
+        description: "Unique order ID"
+      - name: order_date
+        expr: "date"
+        type: "date"
+        description: "Order date"
+    measures:
+      - name: order_count
+        expr: "1"
+        agg: "count"
+        description: "Count of orders"
+      - name: revenue
+        expr: "amount"
+        agg: "sum"
+        description: "Total revenue"
