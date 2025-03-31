@@ -881,41 +881,52 @@ impl ModelFile {
 }
 
 // Add this function before the deploy function
-fn find_nearest_buster_yml(start_dir: &Path) -> Option<PathBuf> {
-    let mut current_dir = start_dir.to_path_buf();
-    loop {
-        let buster_yml = current_dir.join("buster.yml");
-        if buster_yml.exists() {
-            return Some(buster_yml);
-        }
-        if !current_dir.pop() {
-            return None;
+fn find_all_buster_configs(start_dir: &Path) -> Result<Vec<(PathBuf, BusterConfig)>> {
+    let mut configs = Vec::new();
+    println!("🔍 Scanning for Buster projects in: {}", start_dir.display());
+    
+    for entry in WalkDir::new(start_dir)
+        .follow_links(true)
+        .into_iter()
+        .filter_map(|e| e.ok())
+    {
+        let path = entry.path();
+        if path.is_file() && path.file_name().and_then(|n| n.to_str()) == Some("buster.yml") {
+            println!("   Found buster.yml at: {}", path.display());
+            if let Ok(Some(config)) = BusterConfig::load_from_dir(path.parent().unwrap()) {
+                configs.push((path.to_path_buf(), config));
+            }
         }
     }
+    
+    println!("✅ Found {} Buster projects", configs.len());
+    Ok(configs)
 }
 
 pub async fn deploy(path: Option<&str>, dry_run: bool, recursive: bool) -> Result<()> {
+    use std::collections::HashMap;
+
     let target_path = PathBuf::from(path.unwrap_or("."));
     let mut progress = DeployProgress::new(0);
     let mut result = DeployResult::default();
 
-    // Check for buster.yml in current or parent directories
-    let buster_yml_path = find_nearest_buster_yml(&std::env::current_dir()?);
-    if buster_yml_path.is_none() {
-        println!("❌ No buster.yml found in the current directory or any parent directories.");
-        println!("This command must be run from within a Buster project (a directory containing or under a directory with buster.yml).");
-        println!("To create a new Buster project, run: {}", "buster init".cyan());
-        println!("This command must be run from within a Buster project (a directory containing or under a directory with buster.yml).");
+    // Find all buster.yml files in subdirectories
+    let config_map = find_all_buster_configs(&target_path)?;
+    
+    if config_map.is_empty() {
+        println!("❌ No buster.yml found in the current directory or any subdirectories.");
         println!("To create a new Buster project, run: {}", "buster init".cyan());
         return Err(anyhow::anyhow!("No buster.yml found. Run 'buster init' to create a new project."));
     }
-
-    // If path wasn't specified, use the directory containing buster.yml
-    let target_path = if path.is_none() {
-        buster_yml_path.as_ref().unwrap().parent().unwrap().to_path_buf()
-    } else {
-        target_path
-    };
+    
+    println!("📁 Found {} Buster projects:", config_map.len());
+    for (path, config) in &config_map {
+        let not_specified = "not specified".to_string();
+        let ds_name = config.data_source_name.as_ref().unwrap_or(&not_specified);
+        println!("   - {} (data source: {})", 
+            path.parent().unwrap().display(), 
+            ds_name);
+    }
 
     // Only create client if not in dry-run mode
     let client = if !dry_run {
@@ -926,102 +937,63 @@ pub async fn deploy(path: Option<&str>, dry_run: bool, recursive: bool) -> Resul
         None
     };
 
-    // Try to load buster.yml first
-    progress.status = "Looking for buster.yml configuration...".to_string();
-    progress.log_progress();
-
-    let config = match ModelFile::get_config(&target_path) {
-        Ok(Some(config)) => {
-            println!("✅ Found buster.yml configuration");
-            if let Some(ds) = &config.data_source_name {
-                println!("   - Default data source: {}", ds);
-            }
-            if let Some(schema) = &config.schema {
-                println!("   - Default schema: {}", schema);
-            }
-            if let Some(database) = &config.database {
-                println!("   - Default database: {}", database);
-            }
-            Some(config)
-        }
-        Ok(None) => {
-            println!("ℹ️  No buster.yml found, will require configuration in model files");
-            None
-        }
-        Err(e) => {
-            println!("⚠️  Error reading buster.yml: {}", e);
-            None
-        }
-    };
-
-    // Find all .yml files
-    progress.status = "Discovering model files...".to_string();
-    progress.log_progress();
-
-    let exclusion_manager = if let Some(cfg) = &config {
-        ExclusionManager::new(cfg)?
-    } else {
-        ExclusionManager::empty()
-    };
+    // STEP 1: COLLECT ALL MODEL FILES FROM ALL PROJECTS
+    let mut all_yml_files = Vec::new();
+    let mut yml_project_map = HashMap::new(); // Map file paths to their project config
     
-    let yml_files = if recursive {
-        println!("Recursively searching for model files...");
-        // Use the config's model_paths if available, otherwise use the target path
-        if let Some(config) = &config {
-            let model_paths = config.resolve_model_paths(&target_path);
-            if !model_paths.is_empty() {
-                println!("Using model_paths from buster.yml: {:?}", model_paths);
-                find_yml_files_recursively(&target_path, Some(config), Some(&mut progress))?
-            } else {
-                println!("No model_paths specified in buster.yml, using target path");
-                find_yml_files_recursively(&target_path, Some(config), Some(&mut progress))?
+    for (config_path, config) in &config_map {
+        let project_dir = config_path.parent().unwrap();
+        println!("\n🔍 Finding models in project: {}", project_dir.display());
+        
+        // Find model files for this project
+        let exclusion_manager = ExclusionManager::new(config)?;
+        let project_yml_files = if let Some(model_paths) = &config.model_paths {
+            // Use model_paths if specified
+            let resolved_paths = config.resolve_model_paths(project_dir);
+            let mut files = Vec::new();
+            
+            for path in &resolved_paths {
+                if path.is_dir() {
+                    let mut dir_files = find_yml_files(path, true, &exclusion_manager, Some(&mut progress))?;
+                    files.append(&mut dir_files);
+                } else if path.is_file() && path.extension().and_then(|ext| ext.to_str()) == Some("yml") {
+                    files.push(path.clone());
+                }
             }
+            files
         } else {
-            find_yml_files_recursively(&target_path, None, Some(&mut progress))?
+            // Otherwise search whole project directory
+            find_yml_files(project_dir, true, &exclusion_manager, Some(&mut progress))?
+        };
+        
+        println!("   Found {} model files", project_yml_files.len());
+        
+        // Remember which config each model belongs to
+        for file in &project_yml_files {
+            yml_project_map.insert(file.clone(), config.clone());
         }
-    } else {
-        // Non-recursive mode - only search in the specified directory
-        std::fs::read_dir(&target_path)?
-            .filter_map(|entry| entry.ok())
-            .filter(|entry| {
-                let path = entry.path();
-                path.extension()
-                    .and_then(|ext| ext.to_str())
-                    .map(|ext| ext == "yml")
-                    .unwrap_or(false)
-                    && path
-                        .file_name()
-                        .and_then(|name| name.to_str())
-                        .map(|name| name != "buster.yml")
-                        .unwrap_or(false)
-            })
-            .map(|entry| entry.path())
-            .collect()
-    };
-
-    println!(
-        "Found {} model files in {}",
-        yml_files.len(),
-        target_path.display()
-    );
-    progress.total_files = yml_files.len();
-
+        
+        all_yml_files.extend(project_yml_files);
+    }
+    
+    // Update progress tracker total
+    progress.total_files = all_yml_files.len();
+    println!("\n📋 Found {} total model files across all projects", all_yml_files.len());
+    
+    // STEP 2: PROCESS ALL MODELS TOGETHER
     let mut deploy_requests = Vec::new();
     let mut model_mappings = Vec::new();
-
-    // Process each file
-    for yml_path in yml_files {
+    
+    for yml_path in all_yml_files {
         progress.processed += 1;
-        progress.current_file = yml_path
-            .strip_prefix(&target_path)
-            .unwrap_or(&yml_path)
-            .to_string_lossy()
-            .to_string();
-
+        progress.current_file = yml_path.to_string_lossy().to_string();
         progress.status = "Loading model file...".to_string();
         progress.log_progress();
-
-        // Load and validate model
+        
+        // Get the config for this file
+        let config = yml_project_map.get(&yml_path).cloned();
+        
+        // Load and validate model with the associated config
         let model_file = match ModelFile::new(yml_path.clone(), config.clone()) {
             Ok(mf) => mf,
             Err(e) => {
@@ -1034,10 +1006,10 @@ pub async fn deploy(path: Option<&str>, dry_run: bool, recursive: bool) -> Resul
                 continue;
             }
         };
-
+        
         // Check for excluded tags
-        if let Some(ref cfg) = config {
-            if let Some(ref exclude_tags) = cfg.exclude_tags {
+        if let Some(ref config) = config {
+            if let Some(ref exclude_tags) = config.exclude_tags {
                 if !exclude_tags.is_empty() {
                     match model_file.check_excluded_tags(&model_file.sql_path, exclude_tags) {
                         Ok(true) => {
@@ -1061,6 +1033,8 @@ pub async fn deploy(path: Option<&str>, dry_run: bool, recursive: bool) -> Resul
         progress.status = "Validating model...".to_string();
         progress.log_progress();
 
+        // For now, we'll use the existing validation logic, but in a full implementation
+        // this should be updated to use the multi-project context
         if let Err(errors) = model_file.validate(config.as_ref()).await {
             for error in &errors {
                 progress.log_error(error);
@@ -1129,7 +1103,22 @@ pub async fn deploy(path: Option<&str>, dry_run: bool, recursive: bool) -> Resul
         progress.log_success();
     }
 
-    // Deploy to API if we have valid models and not in dry-run mode
+    // Group models by data source for a clear summary
+    let mut data_source_models: HashMap<String, Vec<String>> = HashMap::new();
+    for request in &deploy_requests {
+        data_source_models
+            .entry(request.data_source_name.clone())
+            .or_default()
+            .push(request.name.clone());
+    }
+    
+    // Print summary by data source
+    println!("\n📊 Model Summary by Data Source:");
+    for (ds, models) in &data_source_models {
+        println!("   - {}: {} models", ds, models.len());
+    }
+
+    // STEP 3: DEPLOY ALL MODELS TOGETHER
     if !deploy_requests.is_empty() {
         if dry_run {
             println!("\n🔍 Dry run mode - validation successful!");
@@ -1156,9 +1145,6 @@ pub async fn deploy(path: Option<&str>, dry_run: bool, recursive: bool) -> Resul
             client.expect("BusterClient should be initialized for non-dry-run deployments");
         progress.status = "Deploying models to Buster...".to_string();
         progress.log_progress();
-
-        // Store data source name for error messages
-        let data_source_name = deploy_requests[0].data_source_name.clone();
 
         // Log what we're trying to deploy
         println!("\n📦 Deploying {} models:", deploy_requests.len());
@@ -1218,10 +1204,11 @@ pub async fn deploy(path: Option<&str>, dry_run: bool, recursive: bool) -> Resul
                 if has_validation_errors {
                     println!("\n❌ Deployment failed due to validation errors!");
                     println!("\n💡 Troubleshooting:");
-                    println!("1. Check data source:");
-                    println!("   - Verify '{}' exists in Buster", data_source_name);
-                    println!("   - Confirm it has env='dev'");
-                    println!("   - Check your access permissions");
+                    println!("1. Check your data sources (we found {})", data_source_models.len());
+                    for ds in data_source_models.keys() {
+                        println!("   - Verify '{}' exists in Buster", ds);
+                        println!("   - Confirm it has env='dev'");
+                    }
                     println!("2. Check model definitions:");
                     println!("   - Validate SQL syntax");
                     println!("   - Verify column names match");
@@ -1239,10 +1226,11 @@ pub async fn deploy(path: Option<&str>, dry_run: bool, recursive: bool) -> Resul
                 println!("\n❌ Deployment failed!");
                 println!("Error: {}", e);
                 println!("\n💡 Troubleshooting:");
-                println!("1. Check data source:");
-                println!("   - Verify '{}' exists in Buster", data_source_name);
-                println!("   - Confirm it has env='dev'");
-                println!("   - Check your access permissions");
+                println!("1. Check your data sources (we found {})", data_source_models.len());
+                for ds in data_source_models.keys() {
+                    println!("   - Verify '{}' exists in Buster", ds);
+                    println!("   - Confirm it has env='dev'");
+                }
                 println!("2. Check model definitions:");
                 println!("   - Validate SQL syntax");
                 println!("   - Verify column names match");
@@ -1352,6 +1340,85 @@ mod tests {
         let path = dir.join(name);
         fs::write(&path, content)?;
         Ok(path)
+    }
+    
+    // Test for the new multi-project support
+    #[tokio::test]
+    async fn test_deploy_multi_project() -> Result<()> {
+        let temp_dir = setup_test_dir().await?;
+        
+        // Create parent directory
+        let parent_dir = temp_dir.path();
+        
+        // Create first project
+        let project1_dir = parent_dir.join("project1");
+        fs::create_dir(&project1_dir)?;
+        
+        // Create buster.yml for first project
+        let project1_yml = r#"
+            data_source_name: "source1"
+            schema: "schema1"
+        "#;
+        create_test_yaml(&project1_dir, "buster.yml", project1_yml).await?;
+        
+        // Create model for first project
+        let model1_yml = r#"
+            version: 1
+            models:
+              - name: model1
+                description: "Model from project 1"
+                entities: []
+                dimensions:
+                  - name: dim1
+                    expr: "col1"
+                    type: "string"
+                    description: "Dimension from project 1"
+                measures:
+                  - name: measure1
+                    expr: "col2"
+                    agg: "sum"
+                    description: "Measure from project 1"
+        "#;
+        create_test_yaml(&project1_dir, "model1.yml", model1_yml).await?;
+        
+        // Create second project
+        let project2_dir = parent_dir.join("project2");
+        fs::create_dir(&project2_dir)?;
+        
+        // Create buster.yml for second project
+        let project2_yml = r#"
+            data_source_name: "source2"
+            schema: "schema2"
+        "#;
+        create_test_yaml(&project2_dir, "buster.yml", project2_yml).await?;
+        
+        // Create model for second project
+        let model2_yml = r#"
+            version: 1
+            models:
+              - name: model2
+                description: "Model from project 2"
+                entities: []
+                dimensions:
+                  - name: dim2
+                    expr: "col1"
+                    type: "string"
+                    description: "Dimension from project 2"
+                measures:
+                  - name: measure2
+                    expr: "col2"
+                    agg: "sum"
+                    description: "Measure from project 2"
+        "#;
+        create_test_yaml(&project2_dir, "model2.yml", model2_yml).await?;
+        
+        // Test dry run from parent directory
+        let result = deploy(Some(parent_dir.to_str().unwrap()), true, false).await;
+        
+        // Should succeed and find both projects
+        assert!(result.is_ok());
+        
+        Ok(())
     }
 
     #[tokio::test]
@@ -1526,25 +1593,25 @@ mod tests {
         "#;
         create_test_yaml(temp_dir.path(), "buster.yml", buster_yml).await?;
 
-        // Create multiple model files
+        // Create multiple model files - fixed indentation
         for i in 1..=3 {
             let model_yml = format!(
                 r#"
-            version: 1
-            models:
-                  - name: test_model_{}
-                    description: "Test model {}"
-                entities: []
-                dimensions:
-                  - name: dim1
-                    expr: "col1"
-                    type: "string"
-                    description: "First dimension"
-                measures:
-                  - name: measure1
-                    expr: "col2"
-                    agg: "sum"
-                    description: "First measure"
+version: 1
+models:
+  - name: test_model_{}
+    description: "Test model {}"
+    entities: []
+    dimensions:
+      - name: dim1
+        expr: "col1"
+        type: "string"
+        description: "First dimension"
+    measures:
+      - name: measure1
+        expr: "col2"
+        agg: "sum"
+        description: "First measure"
             "#,
                 i, i
             );
@@ -1669,6 +1736,85 @@ mod tests {
         let result = deploy(Some(temp_dir.path().to_str().unwrap()), true, false).await;
         assert!(result.is_err());
 
+        Ok(())
+    }
+    
+    // Test for different data sources
+    #[tokio::test]
+    async fn test_deploy_multi_project_different_data_sources() -> Result<()> {
+        let temp_dir = setup_test_dir().await?;
+        
+        // Create parent directory
+        let parent_dir = temp_dir.path();
+        
+        // Create first project
+        let project1_dir = parent_dir.join("project1");
+        fs::create_dir(&project1_dir)?;
+        
+        // Create buster.yml for first project
+        let project1_yml = r#"
+            data_source_name: "source1"
+            schema: "schema1"
+        "#;
+        create_test_yaml(&project1_dir, "buster.yml", project1_yml).await?;
+        
+        // Create model for first project
+        let model1_yml = r#"
+            version: 1
+            models:
+              - name: same_model_name  # intentionally same name to test handling
+                description: "Model from project 1"
+                entities: []
+                dimensions:
+                  - name: dim1
+                    expr: "col1"
+                    type: "string"
+                    description: "Dimension from project 1"
+                measures:
+                  - name: measure1
+                    expr: "col2"
+                    agg: "sum"
+                    description: "Measure from project 1"
+        "#;
+        create_test_yaml(&project1_dir, "model1.yml", model1_yml).await?;
+        
+        // Create second project
+        let project2_dir = parent_dir.join("project2");
+        fs::create_dir(&project2_dir)?;
+        
+        // Create buster.yml for second project with different data source
+        let project2_yml = r#"
+            data_source_name: "source2"
+            schema: "schema2"
+        "#;
+        create_test_yaml(&project2_dir, "buster.yml", project2_yml).await?;
+        
+        // Create model for second project with same model name but different data source
+        let model2_yml = r#"
+            version: 1
+            models:
+              - name: same_model_name  # intentionally same name to test handling
+                description: "Model from project 2"
+                entities: []
+                dimensions:
+                  - name: dim2
+                    expr: "col1"
+                    type: "string"
+                    description: "Dimension from project 2"
+                measures:
+                  - name: measure2
+                    expr: "col2"
+                    agg: "sum"
+                    description: "Measure from project 2"
+        "#;
+        create_test_yaml(&project2_dir, "model2.yml", model2_yml).await?;
+        
+        // Test dry run from parent directory
+        let result = deploy(Some(parent_dir.to_str().unwrap()), true, false).await;
+        
+        // Should succeed with different data sources
+        assert!(result.is_ok());
+        
         Ok(())
     }
 }
