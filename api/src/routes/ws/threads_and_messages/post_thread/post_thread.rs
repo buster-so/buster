@@ -1251,7 +1251,8 @@ semantic as (
 select
   terms_search.term_id,
   terms_search.content,
-  terms_search.definition,
+  terms.definition,
+  terms.sql_snippet,
   terms_to_datasets.dataset_id
 from
   full_text
@@ -1261,6 +1262,10 @@ from
     on coalesce(full_text.id, semantic.id) = terms_search.id
   inner join terms_to_datasets
     on terms_search.term_id = terms_to_datasets.term_id
+  inner join terms
+    on terms_search.term_id = terms.id
+where
+  terms.deleted_at is null
 order by
   coalesce(1.0 / (50 + full_text.rank_ix), 0.0) * 1 +
   coalesce(1.0 / (50 + semantic.rank_ix), 0.0) * 1 
@@ -1287,6 +1292,15 @@ limit
             Ok(definition) => definition,
             Err(e) => return Err(anyhow!("Error getting definition: {:?}", e)),
         };
+        
+        // Add sql_snippet retrieval
+        let sql_snippet: Option<String> = match row.try_get("sql_snippet") {
+            Ok(sql_snippet) => sql_snippet,
+            Err(e) => {
+                tracing::warn!("Error getting sql_snippet (it may be null): {:?}", e);
+                None
+            }
+        };
 
         let dataset_id: Uuid = match row.try_get("dataset_id") {
             Ok(dataset_id) => dataset_id,
@@ -1297,7 +1311,7 @@ limit
             id,
             name,
             definition,
-            sql_snippet: None,
+            sql_snippet,
             dataset_id,
         });
     }
