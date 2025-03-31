@@ -29,6 +29,7 @@ Your goal is to generate a plan for a SQL query that best answers the user's req
    - Make sure to coalesce data appropriately to avoid division by zero errors
    - Use NULLIF to handle division by zero
    - Do not make assumptions about the data structure or relationships
+   - Do not make assumptions about the data contained in the columns of the datasets any data could be present
 
 # OUTPUT FORMAT
 Provide your response as a numbered list:
