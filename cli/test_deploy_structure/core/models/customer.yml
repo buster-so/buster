@@ -1,0 +1,19 @@
+version: 1
+models:
+  - name: customer
+    description: "Core customer information"
+    entities: []
+    dimensions:
+      - name: customer_id
+        expr: "id"
+        type: "string"
+        description: "Unique customer ID"
+      - name: customer_name
+        expr: "name"
+        type: "string"
+        description: "Customer name"
+    measures:
+      - name: count
+        expr: "1"
+        agg: "count"
+        description: "Count of customers"

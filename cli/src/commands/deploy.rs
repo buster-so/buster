@@ -645,6 +645,54 @@ impl ModelFile {
             let project_path = entity.project_path.as_ref().unwrap();
             let current_dir = self.yml_path.parent().unwrap().to_path_buf();
             let target_path = current_dir.join(project_path);
+            
+            println!("🔍 Resolving cross-project reference path: {} (from {})",
+                project_path, current_dir.display());
+            println!("   Target path before canonicalization: {}", target_path.display());
+            
+            // Canonicalize the path to handle .. components properly if path exists
+            let canonical_target_path = if target_path.exists() {
+                match target_path.canonicalize() {
+                    Ok(path) => {
+                        println!("   Canonicalized path: {}", path.display());
+                        path
+                    },
+                    Err(e) => {
+                        println!("   ⚠️ Failed to canonicalize path: {}", e);
+                        // Add error and skip this validation
+                        errors.push(ValidationError {
+                            error_type: ValidationErrorType::ProjectNotFound,
+                            message: format!(
+                                "Failed to resolve project path '{}' referenced by model '{}': {}",
+                                project_path, model_name, e
+                            ),
+                            column_name: None,
+                            suggestion: Some(format!(
+                                "Verify the project_path '{}' is correct and accessible",
+                                project_path
+                            )),
+                        });
+                        continue;
+                    }
+                }
+            } else {
+                // Path doesn't exist, can't canonicalize
+                println!("   ⚠️ Target path doesn't exist");
+                errors.push(ValidationError {
+                    error_type: ValidationErrorType::ProjectNotFound,
+                    message: format!(
+                        "Project not found at '{}' referenced by model '{}'",
+                        project_path, model_name
+                    ),
+                    column_name: None,
+                    suggestion: Some(format!(
+                        "Verify the project_path '{}' is correct",
+                        project_path
+                    )),
+                });
+                continue;
+            };
+            
             let project_path_display = project_path.clone();
 
             // Spawn validation task
@@ -652,8 +700,9 @@ impl ModelFile {
             let validation_task = task::spawn(async move {
                 let mut validation_errors = Vec::new();
 
-                // Check if project exists
-                if !target_path.exists() {
+                // Check if project exists - already done above with canonicalization,
+                // but double-check here within the task
+                if !canonical_target_path.exists() {
                     validation_errors.push(ValidationError {
                         error_type: ValidationErrorType::ProjectNotFound,
                         message: format!(
@@ -669,9 +718,37 @@ impl ModelFile {
                     return (model_name, validation_errors);
                 }
 
-                // Check for buster.yml
-                let buster_yml_path = target_path.join("buster.yml");
-                if !buster_yml_path.exists() {
+                // First search for buster.yml directly in the target directory
+                let direct_buster_yml_path = canonical_target_path.join("buster.yml");
+                let mut buster_yml_path = direct_buster_yml_path.clone();
+                let mut found_buster_yml = direct_buster_yml_path.exists();
+                let mut buster_yml_dir = canonical_target_path.clone();
+                
+                // If not found directly, search in subdirectories
+                if !found_buster_yml {
+                    println!("   buster.yml not found at {}, searching subdirectories", 
+                             direct_buster_yml_path.display());
+                    
+                    for entry in walkdir::WalkDir::new(&canonical_target_path)
+                        .follow_links(true)
+                        .max_depth(3) // Limit depth to avoid excessive search
+                        .into_iter()
+                        .filter_map(|e| e.ok())
+                        .filter(|e| e.file_type().is_file())
+                    {
+                        if entry.file_name().to_string_lossy() == "buster.yml" {
+                            buster_yml_path = entry.path().to_path_buf();
+                            buster_yml_dir = buster_yml_path.parent().unwrap().to_path_buf();
+                            found_buster_yml = true;
+                            println!("   ✅ Found buster.yml at: {}", buster_yml_path.display());
+                            break;
+                        }
+                    }
+                } else {
+                    println!("   ✅ Found buster.yml directly at: {}", buster_yml_path.display());
+                }
+                
+                if !found_buster_yml {
                     validation_errors.push(ValidationError {
                         error_type: ValidationErrorType::InvalidBusterYml,
                         message: format!(
@@ -692,8 +769,8 @@ impl ModelFile {
                         match serde_yaml::from_str::<BusterConfig>(&content) {
                             Ok(project_config) => {
                                 // Check data source match
-                                if let Some(project_ds) = project_config.data_source_name {
-                                    if project_ds != current_data_source {
+                                if let Some(project_ds) = project_config.data_source_name.as_ref() {
+                                    if project_ds != &current_data_source {
                                         validation_errors.push(ValidationError {
                                             error_type: ValidationErrorType::DataSourceMismatch,
                                             message: format!(
@@ -705,35 +782,59 @@ impl ModelFile {
                                         });
                                     }
 
-                                    // Validate referenced model exists
-                                    let model_files = std::fs::read_dir(&target_path)
-                                        .ok()
-                                        .into_iter()
-                                        .flatten()
-                                        .filter_map(|entry| entry.ok())
-                                        .filter(|entry| {
-                                            let path = entry.path();
-                                            path.extension()
-                                                .and_then(|ext| ext.to_str())
-                                                .map(|ext| ext == "yml")
-                                                .unwrap_or(false)
-                                                && path
-                                                    .file_name()
-                                                    .and_then(|name| name.to_str())
-                                                    .map(|name| name != "buster.yml")
-                                                    .unwrap_or(false)
-                                        })
-                                        .collect::<Vec<_>>();
+                                    // First get all model search paths from the project's config
+                                    let model_search_paths = if let Some(model_paths) = &project_config.model_paths {
+                                        // Resolve model paths relative to the buster.yml location
+                                        model_paths.iter().map(|mp| {
+                                            if mp == "../" || mp == ".." {
+                                                // Special case for parent directory
+                                                if let Some(parent) = buster_yml_dir.parent() {
+                                                    parent.to_path_buf()
+                                                } else {
+                                                    buster_yml_dir.clone()
+                                                }
+                                            } else {
+                                                buster_yml_dir.join(mp)
+                                            }
+                                        }).collect::<Vec<_>>()
+                                    } else {
+                                        // Default to the directory containing buster.yml
+                                        vec![buster_yml_dir.clone()]
+                                    };
+                                    
+                                    println!("   Model search paths in referenced project:");
+                                    for path in &model_search_paths {
+                                        println!("     - {}", path.display());
+                                    }
+
+                                    // Search for YML files in all model search paths
+                                    let mut all_model_files = Vec::new();
+                                    for search_path in &model_search_paths {
+                                        if search_path.exists() {
+                                            for entry in walkdir::WalkDir::new(search_path)
+                                                .follow_links(true)
+                                                .max_depth(2) // Limit depth to avoid excessive search
+                                                .into_iter()
+                                                .filter_map(|e| e.ok())
+                                                .filter(|e| e.file_type().is_file())
+                                            {
+                                                let path = entry.path();
+                                                if path.extension().and_then(|ext| ext.to_str()) == Some("yml") &&
+                                                   path.file_name().and_then(|name| name.to_str()) != Some("buster.yml") {
+                                                    all_model_files.push(entry);
+                                                }
+                                            }
+                                        }
+                                    }
 
                                     println!(
-                                        "🔍 Searching for model '{}' in directory: {}",
+                                        "🔍 Searching for model '{}' in referenced project",
                                         entity.ref_.as_ref().unwrap_or(&entity.name),
-                                        target_path.display()
                                     );
-                                    println!("   Found {} YAML files to search", model_files.len());
+                                    println!("   Found {} YAML files to search", all_model_files.len());
 
                                     let mut found_model = false;
-                                    for model_file in model_files {
+                                    for model_file in all_model_files {
                                         println!(
                                             "   Checking file: {}",
                                             model_file.path().display()
@@ -773,7 +874,6 @@ impl ModelFile {
                                                         "     ⚠️  Failed to parse YAML content: {}",
                                                         e
                                                     );
-                                                    println!("     Content:\n{}", content);
                                                 }
                                             }
                                         } else {
@@ -1814,6 +1914,104 @@ models:
         
         // Should succeed with different data sources
         assert!(result.is_ok());
+        
+        Ok(())
+    }
+    
+    #[tokio::test]
+    async fn test_deploy_cross_project_relative_paths() -> Result<()> {
+        let temp_dir = setup_test_dir().await?;
+        
+        // Create parent directory structure for multiple projects
+        let parent_dir = temp_dir.path();
+        
+        // Create directory structure:
+        // - parent_dir/
+        //   - staging/mongodb/buster_ymls/  (Project 1)
+        //   - general/buster_ymls/          (Project 2)
+        let staging_dir = parent_dir.join("staging").join("mongodb").join("buster_ymls");
+        let general_dir = parent_dir.join("general").join("buster_ymls");
+        
+        fs::create_dir_all(&staging_dir)?;
+        fs::create_dir_all(&general_dir)?;
+        
+        // Create buster.yml for staging/mongodb project
+        let staging_yml = r#"
+            data_source_name: "redo"
+            schema: "mongodb"
+            database: "staging"
+            model_paths:
+              - "../"
+        "#;
+        create_test_yaml(&staging_dir, "buster.yml", staging_yml).await?;
+        
+        // Create example mongodb model in parent directory of buster.yml
+        let mongodb_sql = "SELECT * FROM mongodb.users";
+        create_test_sql(&staging_dir.parent().unwrap(), "users.sql", mongodb_sql).await?;
+        
+        let mongodb_model_yml = r#"
+            version: 1
+            models:
+              - name: users
+                description: "MongoDB users table"
+                entities: []
+                dimensions:
+                  - name: user_id
+                    expr: "id"
+                    type: "string"
+                    description: "User ID"
+                measures:
+                  - name: count
+                    expr: "1"
+                    agg: "count"
+                    description: "Count of users"
+        "#;
+        create_test_yaml(&staging_dir.parent().unwrap(), "users.yml", mongodb_model_yml).await?;
+        
+        // Create buster.yml for general project
+        let general_yml = r#"
+            data_source_name: "redo"
+            schema: "general"
+            database: "dbt"
+            model_paths:
+              - "../"
+        "#;
+        create_test_yaml(&general_dir, "buster.yml", general_yml).await?;
+        
+        // Create example general model with cross-project reference
+        let general_sql = "SELECT g.*, u.user_id FROM general.activity g JOIN mongodb.users u ON g.user_id = u.id";
+        create_test_sql(&general_dir.parent().unwrap(), "activity.sql", general_sql).await?;
+        
+        let general_model_yml = r#"
+            version: 1
+            models:
+              - name: activity
+                description: "General activity with user reference"
+                entities:
+                  - name: users
+                    expr: "user_id"
+                    type: "foreign"
+                    description: "Reference to users in mongodb project"
+                    project_path: "../../staging/mongodb"
+                dimensions:
+                  - name: activity_id
+                    expr: "id"
+                    type: "string"
+                    description: "Activity ID"
+                measures:
+                  - name: activity_count
+                    expr: "1"
+                    agg: "count"
+                    description: "Count of activities"
+        "#;
+        create_test_yaml(&general_dir.parent().unwrap(), "activity.yml", general_model_yml).await?;
+        
+        // Test dry run from parent directory
+        println!("Running deploy from parent directory: {}", parent_dir.display());
+        let result = deploy(Some(parent_dir.to_str().unwrap()), true, false).await;
+        
+        // This should now succeed with our improved path resolution
+        assert!(result.is_ok(), "Deploy failed with error: {:?}", result.err());
         
         Ok(())
     }
