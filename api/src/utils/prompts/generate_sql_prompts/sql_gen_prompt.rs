@@ -16,6 +16,7 @@ Generate a **single** {} query based on the provided analysis plan.
 - Only join tables with explicit entity relationships
 - Stay within the provided dataset
 - Do not make assumptions about the data structure or relationships they must be defined in the dataset models
+- Do not make assumptions about the data contained in the columns of the datasets any data could be present
 
 # SQL REQUIREMENTS
 - IMPORTANT: Only use columns, metrics, and segments explicitly defined in the dataset models
