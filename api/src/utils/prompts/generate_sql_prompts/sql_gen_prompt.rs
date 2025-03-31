@@ -15,11 +15,14 @@ Generate a **single** {} query based on the provided analysis plan.
 - Do not suggest using other platforms or tools
 - Only join tables with explicit entity relationships
 - Stay within the provided dataset
+- Do not make assumptions about the data structure or relationships they must be defined in the dataset models
 
 # SQL REQUIREMENTS
-- Pay close attention to metrics and segments as they are not actual columns, but expressions.
-     - Segments are not actual columns, but ways to filter data.
-     - Metrics are not actual columns, but expressions to calculate values.
+- IMPORTANT: Only use columns, metrics, and segments explicitly defined in the dataset models
+- Always refer to the Dataset Information first to identify available columns
+- Metrics and segments are predefined columns
+     - Use the exact predefined metrics and segments columns provided
+     - Do not create new metrics or segments unless explicitly requested
 - Use schema-qualified table names (<SCHEMA_NAME>.<TABLE_NAME>)
 - Select specific columns (no SELECT * or COUNT(*))
 - Use CTEs instead of subqueries with snake_case names
@@ -35,7 +38,6 @@ Generate a **single** {} query based on the provided analysis plan.
 - Use NULLIF to handle division by zero
 - Use COALESCE to handle NULL values
 - Use CASE statements for conditional logic
-
 
 # TIME AND NAMING CONVENTIONS
 - Default to last 1 year if no timeframe specified
