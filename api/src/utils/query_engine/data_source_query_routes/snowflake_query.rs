@@ -361,33 +361,72 @@ pub async fn snowflake_query(
                                         }
                                     }
                                     arrow::datatypes::DataType::Decimal128(precision, scale) => {
-                                        let array = column
-                                            .as_any()
-                                            .downcast_ref::<Decimal128Array>()
-                                            .unwrap();
+                                        let array = column.as_any().downcast_ref::<Decimal128Array>().unwrap();
                                         if array.is_null(row_idx) {
                                             DataType::Null
                                         } else {
                                             let val = array.value(row_idx);
-                                            let scale_factor = 10_f64.powi(-(*scale as i32));
-                                            let float_val = val as f64 * scale_factor;
-                                            DataType::Float8(Some(float_val))
+                                            
+                                            // Convert to string to handle the full precision
+                                            let val_str = val.to_string();
+                                            let val_len = val_str.len();
+                                            
+                                            // Determine significant digits based on precision
+                                            let sig_digits = (*precision as usize).min(val_len);
+                                            
+                                            // Extract the significant digits
+                                            let significant_part = if val_len > sig_digits {
+                                                val_str[..sig_digits].to_string()
+                                            } else {
+                                                val_str
+                                            };
+                                            
+                                            // Parse to f64 after applying precision
+                                            if let Ok(precise_val) = significant_part.parse::<f64>() {
+                                                // Apply scale
+                                                let scale_adjustment = if *scale >= 0 {
+                                                    10_f64.powi(-(*scale as i32))
+                                                } else {
+                                                    10_f64.powi((*scale as i32).abs())
+                                                };
+                                                
+                                                let float_val = precise_val * scale_adjustment;
+                                                DataType::Float8(Some(float_val))
+                                            } else {
+                                                DataType::Null
+                                            }
                                         }
                                     }
                                     arrow::datatypes::DataType::Decimal256(precision, scale) => {
-                                        let array = column
-                                            .as_any()
-                                            .downcast_ref::<Decimal256Array>()
-                                            .unwrap();
+                                        let array = column.as_any().downcast_ref::<Decimal256Array>().unwrap();
                                         if array.is_null(row_idx) {
                                             DataType::Null
                                         } else {
                                             let val = array.value(row_idx);
-                                            // Convert the i256 to string first to handle large numbers
                                             let val_str = val.to_string();
-                                            if let Ok(float_val) = val_str.parse::<f64>() {
-                                                let scale_factor = 10_f64.powi(-(*scale as i32));
-                                                DataType::Float8(Some(float_val * scale_factor))
+                                            let val_len = val_str.len();
+                                            
+                                            // Determine significant digits based on precision
+                                            let sig_digits = (*precision as usize).min(val_len);
+                                            
+                                            // Extract the significant digits
+                                            let significant_part = if val_len > sig_digits {
+                                                val_str[..sig_digits].to_string()
+                                            } else {
+                                                val_str
+                                            };
+                                            
+                                            // Parse to f64 after applying precision
+                                            if let Ok(precise_val) = significant_part.parse::<f64>() {
+                                                // Apply scale
+                                                let scale_adjustment = if *scale >= 0 {
+                                                    10_f64.powi(-(*scale as i32))
+                                                } else {
+                                                    10_f64.powi((*scale as i32).abs())
+                                                };
+                                                
+                                                let float_val = precise_val * scale_adjustment;
+                                                DataType::Float8(Some(float_val))
                                             } else {
                                                 DataType::Null
                                             }
