@@ -466,9 +466,10 @@ async fn deploy_datasets_handler(
             let now = Utc::now();
             
             // Use a composite key of name, schema, and database_identifier for more precise identification
+            // IMPORTANT: Don't filter by deleted_at.is_null() so we can find ALL datasets including deleted ones
             let existing_dataset_identifiers: HashSet<(String, String, Option<String>)> = datasets::table
                 .filter(datasets::data_source_id.eq(&data_source.id))
-                .filter(datasets::deleted_at.is_null())
+                // No filter for deleted_at here - we want to find ALL datasets including deleted ones
                 .select((datasets::name, datasets::schema, datasets::database_identifier))
                 .load::<(String, String, Option<String>)>(&mut conn)
                 .await?
@@ -598,8 +599,8 @@ async fn deploy_datasets_handler(
                 let query = datasets::table
                     .filter(datasets::data_source_id.eq(&data_source.id))
                     .filter(datasets::name.eq(&name))
-                    .filter(datasets::schema.eq(&schema))
-                    .filter(datasets::deleted_at.is_null());
+                    .filter(datasets::schema.eq(&schema));
+                    // Don't filter by deleted_at.is_null() - we need to find datasets even if they were deleted
                 
                 // Apply the database filter conditionally
                 let dataset_id = if let Some(db) = &database {
