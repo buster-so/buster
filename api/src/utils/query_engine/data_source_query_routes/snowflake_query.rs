@@ -367,34 +367,27 @@ pub async fn snowflake_query(
                                         } else {
                                             let val = array.value(row_idx);
                                             
-                                            // Convert to string to handle the full precision
-                                            let val_str = val.to_string();
-                                            let val_len = val_str.len();
-                                            
-                                            // Determine significant digits based on precision
-                                            let sig_digits = (*precision as usize).min(val_len);
-                                            
-                                            // Extract the significant digits
-                                            let significant_part = if val_len > sig_digits {
-                                                val_str[..sig_digits].to_string()
+                                            // Apply scale correctly
+                                            // For a decimal value with scale 2, the value 12345 represents 123.45
+                                            let decimal_val = val as f64;
+                                            let scaled_val = if *scale > 0 {
+                                                // Positive scale - divide by 10^scale
+                                                decimal_val / 10_f64.powi(*scale as i32)
+                                            } else if *scale < 0 {
+                                                // Negative scale - multiply by 10^|scale|
+                                                decimal_val * 10_f64.powi((-*scale) as i32)
                                             } else {
-                                                val_str
+                                                decimal_val
                                             };
                                             
-                                            // Parse to f64 after applying precision
-                                            if let Ok(precise_val) = significant_part.parse::<f64>() {
-                                                // Apply scale
-                                                let scale_adjustment = if *scale >= 0 {
-                                                    10_f64.powi(-(*scale as i32))
-                                                } else {
-                                                    10_f64.powi((*scale as i32).abs())
-                                                };
-                                                
-                                                let float_val = precise_val * scale_adjustment;
-                                                DataType::Float8(Some(float_val))
-                                            } else {
-                                                DataType::Null
-                                            }
+                                            // Create a decimal value with the correct precision and scale
+                                            // This approach maintains full precision as a float
+                                            DataType::Float8(Some(scaled_val))
+                                            
+                                            // If we need a Decimal type instead, we would use:
+                                            // Use the Decimal crate to create a decimal value
+                                            // let decimal = Decimal::from_i128_with_scale(val, *scale as u32);
+                                            // DataType::Decimal(Some(decimal))
                                         }
                                     }
                                     arrow::datatypes::DataType::Decimal256(precision, scale) => {
@@ -403,32 +396,64 @@ pub async fn snowflake_query(
                                             DataType::Null
                                         } else {
                                             let val = array.value(row_idx);
+                                            
+                                            // For Decimal256, we need to convert through string as it's too large for f64
+                                            // But we'll do it more carefully to maintain the correct scale
                                             let val_str = val.to_string();
-                                            let val_len = val_str.len();
                                             
-                                            // Determine significant digits based on precision
-                                            let sig_digits = (*precision as usize).min(val_len);
-                                            
-                                            // Extract the significant digits
-                                            let significant_part = if val_len > sig_digits {
-                                                val_str[..sig_digits].to_string()
-                                            } else {
-                                                val_str
-                                            };
-                                            
-                                            // Parse to f64 after applying precision
-                                            if let Ok(precise_val) = significant_part.parse::<f64>() {
-                                                // Apply scale
-                                                let scale_adjustment = if *scale >= 0 {
-                                                    10_f64.powi(-(*scale as i32))
+                                            // Parse to f64 with proper handling for large values
+                                            if let Ok(unscaled_val) = val_str.parse::<f64>() {
+                                                // Apply scale correctly
+                                                let scaled_val = if *scale > 0 {
+                                                    // Positive scale - divide by 10^scale
+                                                    unscaled_val / 10_f64.powi(*scale as i32)
+                                                } else if *scale < 0 {
+                                                    // Negative scale - multiply by 10^|scale|
+                                                    unscaled_val * 10_f64.powi((-*scale) as i32)
                                                 } else {
-                                                    10_f64.powi((*scale as i32).abs())
+                                                    unscaled_val
                                                 };
                                                 
-                                                let float_val = precise_val * scale_adjustment;
-                                                DataType::Float8(Some(float_val))
+                                                DataType::Float8(Some(scaled_val))
                                             } else {
-                                                DataType::Null
+                                                // For values too large for f64, create a proper string representation
+                                                // with the decimal point inserted at the right position
+                                                let is_negative = val_str.starts_with('-');
+                                                let abs_val_str = if is_negative { &val_str[1..] } else { &val_str };
+                                                
+                                                let decimal_str = if *scale > 0 {
+                                                    if abs_val_str.len() <= *scale as usize {
+                                                        // Need to pad with zeros
+                                                        let padding = *scale as usize - abs_val_str.len();
+                                                        let mut result = String::from("0.");
+                                                        for _ in 0..padding {
+                                                            result.push('0');
+                                                        }
+                                                        result.push_str(abs_val_str);
+                                                        if is_negative { format!("-{}", result) } else { result }
+                                                    } else {
+                                                        // Insert decimal point
+                                                        let decimal_pos = abs_val_str.len() - *scale as usize;
+                                                        let (int_part, frac_part) = abs_val_str.split_at(decimal_pos);
+                                                        if is_negative {
+                                                            format!("-{}.{}", int_part, frac_part)
+                                                        } else {
+                                                            format!("{}.{}", int_part, frac_part)
+                                                        }
+                                                    }
+                                                } else if *scale < 0 {
+                                                    // Add zeros to the end
+                                                    let mut result = abs_val_str.to_string();
+                                                    for _ in 0..(-*scale as usize) {
+                                                        result.push('0');
+                                                    }
+                                                    if is_negative { format!("-{}", result) } else { result }
+                                                } else {
+                                                    val_str.clone()
+                                                };
+                                                
+                                                // Return as text since it's too large for numeric types
+                                                DataType::Text(Some(decimal_str))
                                             }
                                         }
                                     }

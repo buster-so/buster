@@ -1,11 +1,10 @@
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use axum::{extract::Json, Extension};
 use chrono::{DateTime, Utc};
-use diesel::{upsert::excluded, ExpressionMethods, QueryDsl, SelectableHelper};
+use diesel::{upsert::excluded, ExpressionMethods, QueryDsl};
 use diesel_async::RunQueryDsl;
 use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
-use serde_yaml;
 use std::collections::{HashMap, HashSet};
 use uuid::Uuid;
 
@@ -13,22 +12,18 @@ use crate::{
     database::{
         enums::DatasetType,
         lib::get_pg_pool,
-        models::{DataSource, Dataset, DatasetColumn, EntityRelationship, User},
-        schema::{data_sources, dataset_columns, datasets, entity_relationship},
+        models::{DataSource, Dataset, DatasetColumn, User},
+        schema::{data_sources, dataset_columns, datasets},
     },
     routes::rest::ApiResponse,
     utils::{
-        dataset::column_management::{get_column_types, update_dataset_columns},
         query_engine::{
             credentials::get_data_source_credentials,
-            import_dataset_columns::{retrieve_dataset_columns, retrieve_dataset_columns_batch},
-            write_query_engine::write_query_engine,
+            import_dataset_columns::{retrieve_dataset_columns_batch},
         },
         security::checks::is_user_workspace_admin_or_data_admin,
-        stored_values::{process_stored_values_background, store_column_values, StoredValueColumn},
         user::user_info::get_user_organization_id,
-        validation::{dataset_validation::validate_model, ValidationError, ValidationResult},
-        ColumnUpdate, ValidationErrorType,
+        validation::{ValidationError, ValidationResult},
     },
 };
 
@@ -470,25 +465,25 @@ async fn deploy_datasets_handler(
         if !valid_datasets.is_empty() {
             let now = Utc::now();
             
-            // Get existing dataset IDs for this data source
-            let existing_datasets: HashSet<String> = datasets::table
+            // Use a composite key of name, schema, and database_identifier for more precise identification
+            let existing_dataset_identifiers: HashSet<(String, String, Option<String>)> = datasets::table
                 .filter(datasets::data_source_id.eq(&data_source.id))
                 .filter(datasets::deleted_at.is_null())
-                .select(datasets::name)
-                .load::<String>(&mut conn)
+                .select((datasets::name, datasets::schema, datasets::database_identifier))
+                .load::<(String, String, Option<String>)>(&mut conn)
                 .await?
                 .into_iter()
                 .collect();
 
-            // Get new dataset names from the request
-            let new_dataset_names: HashSet<String> = valid_datasets
+            // Get new dataset identifiers from the request
+            let new_dataset_identifiers: HashSet<(String, String, Option<String>)> = valid_datasets
                 .iter()
-                .map(|req| req.name.clone())
+                .map(|req| (req.name.clone(), req.schema.clone(), req.database.clone()))
                 .collect();
 
-            // Find datasets that exist but aren't in the request
-            let datasets_to_delete: Vec<String> = existing_datasets
-                .difference(&new_dataset_names)
+            // Find datasets that exist but aren't in the request - using the composite identifier
+            let datasets_to_delete: Vec<(String, String, Option<String>)> = existing_dataset_identifiers
+                .difference(&new_dataset_identifiers)
                 .cloned()
                 .collect();
 
@@ -501,13 +496,25 @@ async fn deploy_datasets_handler(
                     datasets_to_delete
                 );
                 
-                diesel::update(datasets::table)
-                    .filter(datasets::data_source_id.eq(&data_source.id))
-                    .filter(datasets::name.eq_any(&datasets_to_delete))
-                    .filter(datasets::deleted_at.is_null())
-                    .set(datasets::deleted_at.eq(now))
-                    .execute(&mut conn)
-                    .await?;
+                for (name, schema, database) in &datasets_to_delete {
+                    let mut query = diesel::update(datasets::table)
+                        .filter(datasets::data_source_id.eq(&data_source.id))
+                        .filter(datasets::name.eq(name))
+                        .filter(datasets::schema.eq(schema))
+                        .filter(datasets::deleted_at.is_null())
+                        .into_boxed();
+                    
+                    // Add database_identifier filter conditionally
+                    if let Some(db_id) = database {
+                        query = query.filter(datasets::database_identifier.eq(db_id));
+                    } else {
+                        query = query.filter(datasets::database_identifier.is_null());
+                    }
+                    
+                    query.set(datasets::deleted_at.eq(now))
+                        .execute(&mut conn)
+                        .await?;
+                }
             }
 
             // Prepare datasets for upsert
@@ -537,42 +544,87 @@ async fn deploy_datasets_handler(
                 })
                 .collect();
 
-            // Deduplicate datasets by database_name and data_source_id to prevent ON CONFLICT errors
+            // Deduplicate datasets by composite key to prevent ON CONFLICT errors
+            // Use (name, schema, database_identifier, data_source_id) as a composite key
             let mut unique_datasets = HashMap::new();
             for dataset in datasets_to_upsert {
-                unique_datasets.insert((dataset.database_name.clone(), dataset.data_source_id), dataset);
+                unique_datasets.insert(
+                    (
+                        dataset.name.clone(), 
+                        dataset.schema.clone(), 
+                        dataset.database_identifier.clone(),
+                        dataset.data_source_id
+                    ), 
+                    dataset
+                );
             }
             datasets_to_upsert = unique_datasets.into_values().collect();
 
-            // Bulk upsert datasets
-            diesel::insert_into(datasets::table)
-                .values(&datasets_to_upsert)
-                .on_conflict((datasets::database_name, datasets::data_source_id))
-                .do_update()
-                .set((
-                    datasets::updated_at.eq(excluded(datasets::updated_at)),
-                    datasets::updated_by.eq(excluded(datasets::updated_by)),
-                    datasets::definition.eq(excluded(datasets::definition)),
-                    datasets::when_to_use.eq(excluded(datasets::when_to_use)),
-                    datasets::model.eq(excluded(datasets::model)),
-                    datasets::yml_file.eq(excluded(datasets::yml_file)),
-                    datasets::schema.eq(excluded(datasets::schema)),
-                    datasets::name.eq(excluded(datasets::name)),
-                    datasets::deleted_at.eq(None::<DateTime<Utc>>),
-                ))
-                .execute(&mut conn)
-                .await?;
+            // Bulk upsert datasets with more precise identification
+            for dataset in &datasets_to_upsert {
+                // Use individual inserts with composite key conflict handling
+                // This handles the database_identifier which can be null
+                diesel::insert_into(datasets::table)
+                    .values(dataset)
+                    .on_conflict((datasets::name, datasets::schema, datasets::data_source_id))
+                    .do_update()
+                    .set((
+                        datasets::updated_at.eq(excluded(datasets::updated_at)),
+                        datasets::updated_by.eq(excluded(datasets::updated_by)),
+                        datasets::definition.eq(excluded(datasets::definition)),
+                        datasets::when_to_use.eq(excluded(datasets::when_to_use)),
+                        datasets::model.eq(excluded(datasets::model)),
+                        datasets::yml_file.eq(excluded(datasets::yml_file)),
+                        datasets::database_identifier.eq(excluded(datasets::database_identifier)),
+                        datasets::name.eq(excluded(datasets::name)),
+                        datasets::deleted_at.eq(None::<DateTime<Utc>>),
+                    ))
+                    .execute(&mut conn)
+                    .await?;
+            }
 
-            // Get the dataset IDs after upsert for column operations
-            let dataset_ids: HashMap<String, Uuid> = datasets::table
-                .filter(datasets::data_source_id.eq(&data_source.id))
-                .filter(datasets::database_name.eq_any(valid_datasets.iter().map(|req| &req.name)))
-                .filter(datasets::deleted_at.is_null())
-                .select((datasets::database_name, datasets::id))
-                .load::<(String, Uuid)>(&mut conn)
-                .await?
-                .into_iter()
-                .collect();
+            // Get the dataset IDs after upsert for column operations using the composite key
+            let mut dataset_ids = HashMap::new();
+            
+            // Create a clone of the valid_datasets for the lookup
+            let datasets_to_lookup: Vec<_> = valid_datasets.iter().map(|req| (
+                req.name.clone(), 
+                req.schema.clone(), 
+                req.database.clone()
+            )).collect();
+            
+            // For each valid dataset, get the ID using the precise composite key
+            for (name, schema, database) in datasets_to_lookup {
+                let query = datasets::table
+                    .filter(datasets::data_source_id.eq(&data_source.id))
+                    .filter(datasets::name.eq(&name))
+                    .filter(datasets::schema.eq(&schema))
+                    .filter(datasets::deleted_at.is_null());
+                
+                // Apply the database filter conditionally
+                let dataset_id = if let Some(db) = &database {
+                    query.filter(datasets::database_identifier.eq(db))
+                        .select(datasets::id)
+                        .first::<Uuid>(&mut conn)
+                        .await
+                } else {
+                    query.filter(datasets::database_identifier.is_null())
+                        .select(datasets::id)
+                        .first::<Uuid>(&mut conn)
+                        .await
+                };
+                
+                // Store ID if found
+                if let Ok(id) = dataset_id {
+                    dataset_ids.insert(name.clone(), id);
+                } else {
+                    tracing::warn!(
+                        "Could not find dataset ID for {}.{}",
+                        schema,
+                        name
+                    );
+                }
+            }
 
             // Bulk upsert columns for each dataset
             for req in valid_datasets {
