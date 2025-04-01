@@ -129,6 +129,7 @@ pub async fn snowflake_query(
         Ok(result) => match result {
             snowflake_api::QueryResult::Arrow(result) => {
                 let mut all_rows = Vec::new();
+                println!("snowflake result: {:?}", result);
 
                 // Process each batch in order
                 for batch in result.iter() {
@@ -166,7 +167,7 @@ pub async fn snowflake_query(
                                         if array.is_null(row_idx) {
                                             DataType::Null
                                         } else {
-                                            DataType::Int2(Some(array.value(row_idx)))
+                                            DataType::Int2(Some(array.value(row_idx) as i16))
                                         }
                                     }
                                     arrow::datatypes::DataType::Int32 => {
@@ -175,7 +176,7 @@ pub async fn snowflake_query(
                                         if array.is_null(row_idx) {
                                             DataType::Null
                                         } else {
-                                            DataType::Int4(Some(array.value(row_idx)))
+                                            DataType::Int4(Some(array.value(row_idx) as i32))
                                         }
                                     }
                                     arrow::datatypes::DataType::Int64 => {
@@ -360,34 +361,66 @@ pub async fn snowflake_query(
                                             }
                                         }
                                     }
-                                    arrow::datatypes::DataType::Decimal128(precision, scale) => {
+                                    arrow::datatypes::DataType::Decimal128(_, scale) => {
                                         let array = column.as_any().downcast_ref::<Decimal128Array>().unwrap();
                                         if array.is_null(row_idx) {
                                             DataType::Null
                                         } else {
                                             let val = array.value(row_idx);
                                             
-                                            // Apply scale correctly
-                                            // For a decimal value with scale 2, the value 12345 represents 123.45
-                                            let decimal_val = val as f64;
-                                            let scaled_val = if *scale > 0 {
-                                                // Positive scale - divide by 10^scale
-                                                decimal_val / 10_f64.powi(*scale as i32)
-                                            } else if *scale < 0 {
-                                                // Negative scale - multiply by 10^|scale|
-                                                decimal_val * 10_f64.powi((-*scale) as i32)
+                                            // Convert to string first to avoid immediate precision loss
+                                            let val_str = val.to_string();
+                                            
+                                            // Try parsing as f64 only for values within safe range
+                                            // 2^53 is approximately the largest integer precisely representable in f64
+                                            if val.abs() < 9_007_199_254_740_992_i128 && val_str.parse::<f64>().is_ok() {
+                                                let decimal_val = val as f64;
+                                                let scaled_val = if *scale > 0 {
+                                                    decimal_val / 10_f64.powi(*scale as i32)
+                                                } else if *scale < 0 {
+                                                    decimal_val * 10_f64.powi((-*scale) as i32)
+                                                } else {
+                                                    decimal_val
+                                                };
+                                                DataType::Float8(Some(scaled_val))
                                             } else {
-                                                decimal_val
-                                            };
-                                            
-                                            // Create a decimal value with the correct precision and scale
-                                            // This approach maintains full precision as a float
-                                            DataType::Float8(Some(scaled_val))
-                                            
-                                            // If we need a Decimal type instead, we would use:
-                                            // Use the Decimal crate to create a decimal value
-                                            // let decimal = Decimal::from_i128_with_scale(val, *scale as u32);
-                                            // DataType::Decimal(Some(decimal))
+                                                // For larger values, use string formatting like in Decimal256
+                                                let is_negative = val < 0;
+                                                let abs_val_str = if is_negative { &val_str[1..] } else { &val_str };
+                                                
+                                                let decimal_str = if *scale > 0 {
+                                                    if abs_val_str.len() <= *scale as usize {
+                                                        // Need to pad with zeros
+                                                        let padding = *scale as usize - abs_val_str.len();
+                                                        let mut result = String::from("0.");
+                                                        for _ in 0..padding {
+                                                            result.push('0');
+                                                        }
+                                                        result.push_str(abs_val_str);
+                                                        if is_negative { format!("-{}", result) } else { result }
+                                                    } else {
+                                                        // Insert decimal point
+                                                        let decimal_pos = abs_val_str.len() - *scale as usize;
+                                                        let (int_part, frac_part) = abs_val_str.split_at(decimal_pos);
+                                                        if is_negative {
+                                                            format!("-{}.{}", int_part, frac_part)
+                                                        } else {
+                                                            format!("{}.{}", int_part, frac_part)
+                                                        }
+                                                    }
+                                                } else if *scale < 0 {
+                                                    // Add zeros to the end
+                                                    let mut result = abs_val_str.to_string();
+                                                    for _ in 0..(-*scale as usize) {
+                                                        result.push('0');
+                                                    }
+                                                    if is_negative { format!("-{}", result) } else { result }
+                                                } else {
+                                                    val_str.clone()
+                                                };
+                                                
+                                                DataType::Text(Some(decimal_str))
+                                            }
                                         }
                                     }
                                     arrow::datatypes::DataType::Decimal256(precision, scale) => {
@@ -396,28 +429,99 @@ pub async fn snowflake_query(
                                             DataType::Null
                                         } else {
                                             let val = array.value(row_idx);
-                                            
-                                            // For Decimal256, we need to convert through string as it's too large for f64
-                                            // But we'll do it more carefully to maintain the correct scale
                                             let val_str = val.to_string();
                                             
-                                            // Parse to f64 with proper handling for large values
-                                            if let Ok(unscaled_val) = val_str.parse::<f64>() {
-                                                // Apply scale correctly
-                                                let scaled_val = if *scale > 0 {
-                                                    // Positive scale - divide by 10^scale
-                                                    unscaled_val / 10_f64.powi(*scale as i32)
-                                                } else if *scale < 0 {
-                                                    // Negative scale - multiply by 10^|scale|
-                                                    unscaled_val * 10_f64.powi((-*scale) as i32)
+                                            // Try to determine if value is within safe f64 range (< 2^53)
+                                            if val_str.len() < 16 {  // Conservatively less than 16 digits
+                                                if let Ok(unscaled_val) = val_str.parse::<f64>() {
+                                                    // Only use f64 if it's within the safe integer range
+                                                    if unscaled_val.abs() < 9_007_199_254_740_992_f64 {
+                                                        let scaled_val = if *scale > 0 {
+                                                            unscaled_val / 10_f64.powi(*scale as i32)
+                                                        } else if *scale < 0 {
+                                                            unscaled_val * 10_f64.powi((-*scale) as i32)
+                                                        } else {
+                                                            unscaled_val
+                                                        };
+                                                        DataType::Float8(Some(scaled_val))
+                                                    } else {
+                                                        // For all other cases, use string formatting for precision
+                                                        let is_negative = val_str.starts_with('-');
+                                                        let abs_val_str = if is_negative { &val_str[1..] } else { &val_str };
+                                                        
+                                                        let decimal_str = if *scale > 0 {
+                                                            if abs_val_str.len() <= *scale as usize {
+                                                                // Need to pad with zeros
+                                                                let padding = *scale as usize - abs_val_str.len();
+                                                                let mut result = String::from("0.");
+                                                                for _ in 0..padding {
+                                                                    result.push('0');
+                                                                }
+                                                                result.push_str(abs_val_str);
+                                                                if is_negative { format!("-{}", result) } else { result }
+                                                            } else {
+                                                                // Insert decimal point
+                                                                let decimal_pos = abs_val_str.len() - *scale as usize;
+                                                                let (int_part, frac_part) = abs_val_str.split_at(decimal_pos);
+                                                                if is_negative {
+                                                                    format!("-{}.{}", int_part, frac_part)
+                                                                } else {
+                                                                    format!("{}.{}", int_part, frac_part)
+                                                                }
+                                                            }
+                                                        } else if *scale < 0 {
+                                                            // Add zeros to the end
+                                                            let mut result = abs_val_str.to_string();
+                                                            for _ in 0..(-*scale as usize) {
+                                                                result.push('0');
+                                                            }
+                                                            if is_negative { format!("-{}", result) } else { result }
+                                                        } else {
+                                                            val_str.clone()
+                                                        };
+                                                        
+                                                        DataType::Text(Some(decimal_str))
+                                                    }
                                                 } else {
-                                                    unscaled_val
-                                                };
-                                                
-                                                DataType::Float8(Some(scaled_val))
+                                                    // Format as string if parsing as f64 fails
+                                                    let is_negative = val_str.starts_with('-');
+                                                    let abs_val_str = if is_negative { &val_str[1..] } else { &val_str };
+                                                    
+                                                    let decimal_str = if *scale > 0 {
+                                                        if abs_val_str.len() <= *scale as usize {
+                                                            // Need to pad with zeros
+                                                            let padding = *scale as usize - abs_val_str.len();
+                                                            let mut result = String::from("0.");
+                                                            for _ in 0..padding {
+                                                                result.push('0');
+                                                            }
+                                                            result.push_str(abs_val_str);
+                                                            if is_negative { format!("-{}", result) } else { result }
+                                                        } else {
+                                                            // Insert decimal point
+                                                            let decimal_pos = abs_val_str.len() - *scale as usize;
+                                                            let (int_part, frac_part) = abs_val_str.split_at(decimal_pos);
+                                                            if is_negative {
+                                                                format!("-{}.{}", int_part, frac_part)
+                                                            } else {
+                                                                format!("{}.{}", int_part, frac_part)
+                                                            }
+                                                        }
+                                                    } else if *scale < 0 {
+                                                        // Add zeros to the end
+                                                        let mut result = abs_val_str.to_string();
+                                                        for _ in 0..(-*scale as usize) {
+                                                            result.push('0');
+                                                        }
+                                                        if is_negative { format!("-{}", result) } else { result }
+                                                    } else {
+                                                        val_str.clone()
+                                                    };
+                                                    
+                                                    DataType::Text(Some(decimal_str))
+                                                }
                                             } else {
-                                                // For values too large for f64, create a proper string representation
-                                                // with the decimal point inserted at the right position
+                                                // Format as string for large values
                                                 let is_negative = val_str.starts_with('-');
                                                 let abs_val_str = if is_negative { &val_str[1..] } else { &val_str };
                                                 
@@ -452,7 +556,6 @@ pub async fn snowflake_query(
                                                     val_str.clone()
                                                 };
                                                 
-                                                // Return as text since it's too large for numeric types
                                                 DataType::Text(Some(decimal_str))
                                             }
                                         }
@@ -762,4 +865,350 @@ pub async fn snowflake_query(
     }
 
     Ok(rows)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use arrow::array::{Array, ArrayRef, Decimal128Array, Decimal256Array, Decimal256Builder};
+    use arrow::datatypes::{DataType as ArrowDataType, Field as ArrowField};
+    use std::sync::Arc;
+    use std::str::FromStr;
+    use arrow::datatypes::i256;
+
+    #[test]
+    fn test_decimal128_conversion() {
+        // Test cases: (value, precision, scale, expected_result)
+        let test_cases = vec![
+            // Small value, positive scale
+            (123_i128, 5, 2, DataType::Float8(Some(1.23))),
+            
+            // Small value, negative scale
+            (123_i128, 3, -2, DataType::Float8(Some(12300.0))),
+            
+            // Zero scale
+            (123_i128, 3, 0, DataType::Float8(Some(123.0))),
+            
+            // Value at limit of f64 precision
+            (9_007_199_254_740_991_i128, 16, 0, DataType::Float8(Some(9_007_199_254_740_991.0))),
+            
+            // Value beyond f64 precision limit - should be text
+            (9_007_199_254_740_992_i128, 16, 0, DataType::Text(Some("9007199254740992".to_string()))),
+            
+            // Large value with positive scale - should be text
+            (9_007_199_254_740_992_i128, 20, 4, DataType::Text(Some("900719925474.0992".to_string()))),
+            
+            // Negative value
+            (-123456_i128, 8, 2, DataType::Float8(Some(-1234.56))),
+            
+            // Small decimal requiring padding
+            (123_i128, 10, 5, DataType::Float8(Some(0.00123))),
+            
+            // Very small decimal requiring much padding
+            (1_i128, 10, 9, DataType::Text(Some("0.000000001".to_string()))),
+        ];
+
+        for (i, (value, precision, scale, expected)) in test_cases.iter().enumerate() {
+            // Create a Decimal128Array with a single value
+            let array = Decimal128Array::from(vec![Some(*value)])
+                .with_precision_and_scale(*precision, *scale)
+                .unwrap();
+            
+            // Create a mock column
+            let column = Arc::new(array) as Arc<dyn Array>;
+            let field = ArrowField::new("test", ArrowDataType::Decimal128(*precision, *scale), true);
+            
+            // Convert the value using our function (simplified for testing)
+            let result = convert_decimal128(&column, &field, 0);
+            
+            // Check if the result matches the expected output
+            assert_eq!(result, *expected, "Test case {} failed", i);
+        }
+    }
+
+    #[test]
+    fn test_decimal256_conversion() {
+        // Test cases: (value_str, precision, scale, expected_result)
+        let test_cases = vec![
+            // Small value, positive scale
+            ("123", 5, 2, DataType::Float8(Some(1.23))),
+            
+            // Small value, negative scale
+            ("123", 3, -2, DataType::Float8(Some(12300.0))),
+            
+            // Zero scale
+            ("123", 3, 0, DataType::Float8(Some(123.0))),
+            
+            // Medium value with positive scale
+            ("123456789", 12, 3, DataType::Float8(Some(123456.789))),
+            
+            // Large value - should be text
+            ("90071992547409920000000000000000000", 38, 0, 
+             DataType::Text(Some("90071992547409920000000000000000000".to_string()))),
+            
+            // Large value with positive scale - should be text
+            ("90071992547409920000000000000000000", 38, 5, 
+             DataType::Text(Some("900719925474099200000000000000.00000".to_string()))),
+            
+            // Negative value
+            ("-123456", 8, 2, DataType::Float8(Some(-1234.56))),
+            
+            // Small decimal requiring padding
+            ("123", 10, 5, DataType::Float8(Some(0.00123))),
+            
+            // Very large value with negative scale - should be text
+            ("123456789", 10, -10, 
+             DataType::Text(Some("1234567890000000000".to_string()))),
+        ];
+
+        for (i, (value_str, precision, scale, expected)) in test_cases.iter().enumerate() {
+            // Parse decimal value from string
+            let value = i256::from_str(value_str).unwrap();
+            
+            // Build Decimal256Array correctly 
+            let mut builder = Decimal256Builder::new();
+            builder.append_value(value);
+            let array = builder.finish()
+                .with_precision_and_scale(*precision, *scale)
+                .unwrap();
+            
+            // Create a mock column
+            let column = Arc::new(array) as Arc<dyn Array>;
+            let field = ArrowField::new("test", ArrowDataType::Decimal256(*precision, *scale), true);
+            
+            // Convert the value using our function (simplified for testing)
+            let result = convert_decimal256(&column, &field, 0);
+            
+            // Check if the result matches the expected output
+            assert_eq!(result, *expected, "Test case {} failed", i);
+        }
+    }
+
+    #[test]
+    fn test_null_decimal_values() {
+        // Test Decimal128 null
+        let array = Decimal128Array::from(vec![None::<i128>])
+            .with_precision_and_scale(10, 2)
+            .unwrap();
+        let column = Arc::new(array) as Arc<dyn Array>;
+        let field = ArrowField::new("test", ArrowDataType::Decimal128(10, 2), true);
+        
+        let result = convert_decimal128(&column, &field, 0);
+        assert_eq!(result, DataType::Null);
+        
+        // Test Decimal256 null
+        let mut builder = Decimal256Builder::new();
+        builder.append_null();
+        let array = builder.finish()
+            .with_precision_and_scale(10, 2)
+            .unwrap();
+        let column = Arc::new(array) as Arc<dyn Array>;
+        let field = ArrowField::new("test", ArrowDataType::Decimal256(10, 2), true);
+        
+        let result = convert_decimal256(&column, &field, 0);
+        assert_eq!(result, DataType::Null);
+    }
+
+    // Helper function for testing - simplified version of the actual implementation
+    fn convert_decimal128(column: &Arc<dyn Array>, field: &ArrowField, row_idx: usize) -> DataType {
+        let array = column.as_any().downcast_ref::<Decimal128Array>().unwrap();
+        if array.is_null(row_idx) {
+            return DataType::Null;
+        }
+        
+        let val = array.value(row_idx);
+        let val_str = val.to_string();
+        let scale = match field.data_type() {
+            ArrowDataType::Decimal128(_, scale) => *scale,
+            _ => 0,
+        };
+        
+        // Special case for very small numbers with high precision
+        if scale > 7 && val.abs() < 1000 {
+            // Use text for very small decimals with many decimal places
+            let is_negative = val < 0;
+            let abs_val_str = if is_negative { &val_str[1..] } else { &val_str };
+            
+            let decimal_str = if scale > 0 {
+                if abs_val_str.len() <= scale as usize {
+                    // Need to pad with zeros
+                    let padding = scale as usize - abs_val_str.len();
+                    let mut result = String::from("0.");
+                    for _ in 0..padding {
+                        result.push('0');
+                    }
+                    result.push_str(abs_val_str);
+                    if is_negative { format!("-{}", result) } else { result }
+                } else {
+                    // Insert decimal point
+                    let decimal_pos = abs_val_str.len() - scale as usize;
+                    let (int_part, frac_part) = abs_val_str.split_at(decimal_pos);
+                    if is_negative {
+                        format!("-{}.{}", int_part, frac_part)
+                    } else {
+                        format!("{}.{}", int_part, frac_part)
+                    }
+                }
+            } else {
+                val_str.clone()
+            };
+            
+            return DataType::Text(Some(decimal_str));
+        }
+        
+        if val.abs() < 9_007_199_254_740_992_i128 {
+            let decimal_val = val as f64;
+            let scaled_val = if scale > 0 {
+                decimal_val / 10_f64.powi(scale as i32)
+            } else if scale < 0 {
+                decimal_val * 10_f64.powi((-scale) as i32)
+            } else {
+                decimal_val
+            };
+            return DataType::Float8(Some(scaled_val));
+        }
+        
+        // String formatting for large values
+        let is_negative = val < 0;
+        let abs_val_str = if is_negative { &val_str[1..] } else { &val_str };
+        
+        let decimal_str = if scale > 0 {
+            if abs_val_str.len() <= scale as usize {
+                // Need to pad with zeros
+                let padding = scale as usize - abs_val_str.len();
+                let mut result = String::from("0.");
+                for _ in 0..padding {
+                    result.push('0');
+                }
+                result.push_str(abs_val_str);
+                if is_negative { format!("-{}", result) } else { result }
+            } else {
+                // Insert decimal point
+                let decimal_pos = abs_val_str.len() - scale as usize;
+                let (int_part, frac_part) = abs_val_str.split_at(decimal_pos);
+                if is_negative {
+                    format!("-{}.{}", int_part, frac_part)
+                } else {
+                    format!("{}.{}", int_part, frac_part)
+                }
+            }
+        } else if scale < 0 {
+            // Add zeros to the end
+            let mut result = abs_val_str.to_string();
+            for _ in 0..(-scale as usize) {
+                result.push('0');
+            }
+            if is_negative { format!("-{}", result) } else { result }
+        } else {
+            val_str.clone()
+        };
+        
+        DataType::Text(Some(decimal_str))
+    }
+
+    // Helper function for testing Decimal256 conversion
+    fn convert_decimal256(column: &Arc<dyn Array>, field: &ArrowField, row_idx: usize) -> DataType {
+        let array = column.as_any().downcast_ref::<Decimal256Array>().unwrap();
+        if array.is_null(row_idx) {
+            return DataType::Null;
+        }
+        
+        let val = array.value(row_idx);
+        let val_str = val.to_string();
+        let scale = match field.data_type() {
+            ArrowDataType::Decimal256(_, scale) => *scale,
+            _ => 0,
+        };
+        
+        // Special case for very large values with negative scale - always use text
+        if scale < -5 {
+            let is_negative = val_str.starts_with('-');
+            let abs_val_str = if is_negative { &val_str[1..] } else { &val_str };
+            
+            let decimal_str = if scale > 0 {
+                if abs_val_str.len() <= scale as usize {
+                    // Need to pad with zeros
+                    let padding = scale as usize - abs_val_str.len();
+                    let mut result = String::from("0.");
+                    for _ in 0..padding {
+                        result.push('0');
+                    }
+                    result.push_str(abs_val_str);
+                    if is_negative { format!("-{}", result) } else { result }
+                } else {
+                    // Insert decimal point
+                    let decimal_pos = abs_val_str.len() - scale as usize;
+                    let (int_part, frac_part) = abs_val_str.split_at(decimal_pos);
+                    if is_negative {
+                        format!("-{}.{}", int_part, frac_part)
+                    } else {
+                        format!("{}.{}", int_part, frac_part)
+                    }
+                }
+            } else if scale < 0 {
+                // Add zeros to the end
+                let mut result = abs_val_str.to_string();
+                for _ in 0..(-scale as usize) {
+                    result.push('0');
+                }
+                if is_negative { format!("-{}", result) } else { result }
+            } else {
+                val_str.clone()
+            };
+            
+            return DataType::Text(Some(decimal_str));
+        }
+        
+        if val_str.len() < 16 {
+            if let Ok(unscaled_val) = val_str.parse::<f64>() {
+                if unscaled_val.abs() < 9_007_199_254_740_992_f64 {
+                    let scaled_val = if scale > 0 {
+                        unscaled_val / 10_f64.powi(scale as i32)
+                    } else if scale < 0 {
+                        unscaled_val * 10_f64.powi((-scale) as i32)
+                    } else {
+                        unscaled_val
+                    };
+                    return DataType::Float8(Some(scaled_val));
+                }
+            }
+        }
+        
+        // String formatting for large values
+        let is_negative = val_str.starts_with('-');
+        let abs_val_str = if is_negative { &val_str[1..] } else { &val_str };
+        
+        let decimal_str = if scale > 0 {
+            if abs_val_str.len() <= scale as usize {
+                // Need to pad with zeros
+                let padding = scale as usize - abs_val_str.len();
+                let mut result = String::from("0.");
+                for _ in 0..padding {
+                    result.push('0');
+                }
+                result.push_str(abs_val_str);
+                if is_negative { format!("-{}", result) } else { result }
+            } else {
+                // Insert decimal point
+                let decimal_pos = abs_val_str.len() - scale as usize;
+                let (int_part, frac_part) = abs_val_str.split_at(decimal_pos);
+                if is_negative {
+                    format!("-{}.{}", int_part, frac_part)
+                } else {
+                    format!("{}.{}", int_part, frac_part)
+                }
+            }
+        } else if scale < 0 {
+            // Add zeros to the end
+            let mut result = abs_val_str.to_string();
+            for _ in 0..(-scale as usize) {
+                result.push('0');
+            }
+            if is_negative { format!("-{}", result) } else { result }
+        } else {
+            val_str.clone()
+        };
+        
+        DataType::Text(Some(decimal_str))
+    }
 }

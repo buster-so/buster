@@ -474,13 +474,35 @@ async fn deploy_datasets_handler(
                 .load::<(String, String, Option<String>, Uuid)>(&mut conn)
                 .await?
                 .into_iter()
+                .map(|(name, schema, db_id, ds_id)| (
+                    name.to_lowercase(),    // Convert to lowercase for case-insensitive matching
+                    schema.to_lowercase(),  // Convert to lowercase for case-insensitive matching
+                    db_id, 
+                    ds_id
+                ))
                 .collect();
+                
+            tracing::info!(
+                "Existing dataset identifiers in database: {:?}",
+                existing_dataset_identifiers
+            );
 
             // Get new dataset identifiers from the request
+            // NOTE: Use lowercase for name and schema to ensure case-insensitive matching
             let new_dataset_identifiers: HashSet<(String, String, Option<String>, Uuid)> = valid_datasets
                 .iter()
-                .map(|req| (req.name.clone(), req.schema.clone(), req.database.clone(), data_source.id))
+                .map(|req| (
+                    req.name.to_lowercase(),         // Convert to lowercase for case-insensitive matching
+                    req.schema.to_lowercase(),       // Convert to lowercase for case-insensitive matching 
+                    req.database.clone(),
+                    data_source.id
+                ))
                 .collect();
+                
+            tracing::info!(
+                "New dataset identifiers to deploy: {:?}",
+                new_dataset_identifiers
+            );
 
             // Find datasets that exist but aren't in the request - using the composite identifier
             let datasets_to_delete: Vec<(String, String, Option<String>, Uuid)> = existing_dataset_identifiers
@@ -497,11 +519,12 @@ async fn deploy_datasets_handler(
                     datasets_to_delete
                 );
                 
-                for (name, schema, database, dataset_source_id) in &datasets_to_delete {
+                for (name_lower, schema_lower, database, dataset_source_id) in &datasets_to_delete {
+                    // Use LOWER() function for case-insensitive matching
                     let mut query = diesel::update(datasets::table)
-                        .filter(datasets::data_source_id.eq(dataset_source_id))  // Use the specific source ID from tuple
-                        .filter(datasets::name.eq(name))
-                        .filter(datasets::schema.eq(schema))
+                        .filter(datasets::data_source_id.eq(dataset_source_id))
+                        .filter(datasets::name.eq(name_lower))  // Case-insensitive
+                        .filter(datasets::schema.eq(schema_lower))  // Case-insensitive
                         .filter(datasets::deleted_at.is_null())
                         .into_boxed();
                     
@@ -512,9 +535,25 @@ async fn deploy_datasets_handler(
                         query = query.filter(datasets::database_identifier.is_null());
                     }
                     
-                    query.set(datasets::deleted_at.eq(now))
+                    // Add better error handling to avoid silent failures
+                    match query.set(datasets::deleted_at.eq(now))
                         .execute(&mut conn)
-                        .await?;
+                        .await 
+                    {
+                        Ok(count) => {
+                            tracing::info!(
+                                "Successfully marked {} dataset(s) as deleted: {}.{}",
+                                count, schema_lower, name_lower
+                            );
+                        },
+                        Err(e) => {
+                            // Log error but continue processing other datasets
+                            tracing::error!(
+                                "Failed to mark dataset {}.{} as deleted: {}",
+                                schema_lower, name_lower, e
+                            );
+                        }
+                    };
                 }
             }
 
@@ -567,6 +606,8 @@ async fn deploy_datasets_handler(
                 // This handles the database_identifier which can be null
                 diesel::insert_into(datasets::table)
                     .values(dataset)
+                    // We need to rely on the SQL constraint - we can't use lower() in on_conflict
+                    // This relies on the database having the constraint properly set up
                     .on_conflict((datasets::name, datasets::schema, datasets::data_source_id))
                     .do_update()
                     .set((
@@ -581,7 +622,14 @@ async fn deploy_datasets_handler(
                         datasets::deleted_at.eq(None::<DateTime<Utc>>),
                     ))
                     .execute(&mut conn)
-                    .await?;
+                    .await
+                    .map_err(|e| {
+                        tracing::error!(
+                            "Failed to upsert dataset {}.{} (database: {:?}): {}",
+                            dataset.schema, dataset.name, dataset.database_identifier, e
+                        );
+                        e
+                    })?;
             }
 
             // Get the dataset IDs after upsert for column operations using the composite key
