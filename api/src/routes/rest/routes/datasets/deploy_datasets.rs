@@ -362,54 +362,96 @@ async fn deploy_datasets_handler(
             }
         };
 
-        // Prepare tables for batch validation
-        let tables_to_validate: Vec<(String, String)> = group
-            .iter()
-            .map(|req| (req.name.clone(), req.schema.clone()))
-            .collect();
-
+        // Group tables by database explicitly for multi-database support
+        let mut database_table_groups: HashMap<Option<String>, Vec<(String, String)>> = HashMap::new();
+        
+        // Collect tables for each database
+        for req in group.clone() {
+            database_table_groups
+                .entry(req.database.clone())
+                .or_default()
+                .push((req.name.clone(), req.schema.clone()));
+        }
+        
         tracing::info!(
-            "Validating tables for data source '{:?}.{:?}': {:?}",
+            "Validating tables for data source '{}' across {} database groups",
             data_source_name,
-            database,
-            tables_to_validate
+            database_table_groups.len()
         );
-
-        // Get all columns in one batch - this acts as our validation
-        let ds_columns = match retrieve_dataset_columns_batch(&tables_to_validate, &credentials, database.clone()).await {
-            Ok(cols) => {
-                // Add debug logging
-                tracing::info!(
-                    "Retrieved {} columns for data source '{}'. Tables found: {:?}",
-                    cols.len(),
-                    data_source_name,
-                    cols.iter()
-                        .map(|c| format!("{}.{}", c.schema_name, c.dataset_name))
-                        .collect::<HashSet<_>>()
-                );
-                cols
-            },
-            Err(e) => {
-                tracing::error!(
-                    "Error retrieving columns for data source '{}': {:?}",
-                    data_source_name,
-                    e
-                );
-                for req in group {
-                    let mut validation = ValidationResult::new(
-                        req.name.clone(),
-                        req.data_source_name.clone(),
-                        req.schema.clone(),
+        
+        // Process each database group separately and combine results
+        let mut ds_columns = Vec::new();
+        
+        for (db, tables) in &database_table_groups {
+            tracing::info!(
+                "Processing database group '{:?}' with {} tables: {:?}",
+                db,
+                tables.len(),
+                tables
+            );
+            
+            // Get columns for this database
+            let db_columns = match retrieve_dataset_columns_batch(&tables, &credentials, db.clone()).await {
+                Ok(cols) => {
+                    // Add debug logging
+                    tracing::info!(
+                        "Retrieved {} columns for database '{:?}' in data source '{}'. Tables found: {:?}",
+                        cols.len(),
+                        db,
+                        data_source_name,
+                        cols.iter()
+                            .map(|c| format!("{}.{}", c.schema_name, c.dataset_name))
+                            .collect::<HashSet<_>>()
                     );
-                    validation.add_error(ValidationError::schema_error(
-                        &req.schema,
-                        &format!("Failed to retrieve columns: {}. Please verify schema access and permissions.", e)
-                    ).with_context(format!("Data source: {}, Database: {:?}", data_source_name, database)));
-                    results.push(validation);
+                    // Add these columns to our combined results
+                    ds_columns.extend(cols);
+                    Ok(())
+                },
+                Err(e) => {
+                    tracing::error!(
+                        "Error retrieving columns for database '{:?}' in data source '{}': {:?}",
+                        db,
+                        data_source_name,
+                        e
+                    );
+                    
+                    // Find which requests were affected by this database error
+                    let affected_requests: Vec<_> = group.iter()
+                        .filter(|req| req.database == *db)
+                        .collect();
+                    
+                    // Create validation errors for the affected requests
+                    for req in affected_requests {
+                        let mut validation = ValidationResult::new(
+                            req.name.clone(),
+                            req.data_source_name.clone(),
+                            req.schema.clone(),
+                        );
+                        validation.add_error(ValidationError::schema_error(
+                            &req.schema,
+                            &format!("Failed to retrieve columns: {}. Please verify schema access and permissions.", e)
+                        ).with_context(format!("Data source: {}, Database: {:?}", data_source_name, db)));
+                        results.push(validation);
+                    }
+                    
+                    Err(e)
                 }
-                continue;
+            };
+            
+            // If we had an error with this database group, continue to the next one
+            if db_columns.is_err() {
+                continue; 
             }
-        };
+        }
+        
+        // If we have no columns after processing all database groups, continue to next data source group
+        if ds_columns.is_empty() {
+            tracing::warn!(
+                "No columns found for data source '{}' after processing all database groups",
+                data_source_name
+            );
+            continue;
+        }
 
         // Create a map of valid datasets and their columns
         let mut valid_datasets = Vec::new();
