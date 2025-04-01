@@ -350,9 +350,9 @@ async fn get_snowflake_columns_batch(
                 };
 
                 columns.push(DatasetColumnRecord {
-                    dataset_name,
-                    schema_name,
-                    name,
+                    dataset_name: dataset_name.to_lowercase(), // Convert to lowercase for consistent comparison
+                    schema_name: schema_name.to_lowercase(),   // Convert to lowercase for consistent comparison
+                    name,                                      // Keep column name as is
                     type_,
                     nullable,
                     comment,
@@ -712,9 +712,9 @@ async fn get_bigquery_columns_batch(
                     .to_string();
 
                 columns.push(DatasetColumnRecord {
-                    dataset_name,
-                    schema_name,
-                    name,
+                    dataset_name: dataset_name.to_lowercase(), // Convert to lowercase for consistent comparison
+                    schema_name: schema_name.to_lowercase(),   // Convert to lowercase for consistent comparison
+                    name,                                      // Keep column name as is
                     type_,
                     nullable,
                     comment,
@@ -831,9 +831,9 @@ async fn get_snowflake_columns(
                 };
 
                 columns.push(DatasetColumnRecord {
-                    dataset_name: dataset_name.clone(),
-                    schema_name: schema_name.clone(),
-                    name,
+                    dataset_name: dataset_name.clone().to_lowercase(), // Convert to lowercase for consistent comparison
+                    schema_name: schema_name.clone().to_lowercase(),   // Convert to lowercase for consistent comparison
+                    name,                                              // Keep column name as is
                     type_,
                     nullable,
                     comment,
