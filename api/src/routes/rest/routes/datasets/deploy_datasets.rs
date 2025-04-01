@@ -193,6 +193,8 @@ pub async fn deploy_datasets(
     Extension(user): Extension<User>,
     Json(request): Json<Vec<DeployDatasetsRequest>>,
 ) -> Result<ApiResponse<DeployDatasetsResponse>, (StatusCode, String)> {
+    // Log the number of datasets to be deployed
+    tracing::info!("Received deploy request for {} datasets", request.len());
     let organization_id = match get_user_organization_id(&user.id).await {
         Ok(id) => id,
         Err(e) => {
@@ -234,6 +236,21 @@ async fn handle_deploy_datasets(
     user_id: &Uuid,
     requests: Vec<DeployDatasetsRequest>,
 ) -> Result<DeployDatasetsResponse> {
+    tracing::info!("Starting deployment of {} datasets", requests.len());
+    
+    // For debugging, log details of each dataset
+    for (i, req) in requests.iter().enumerate() {
+        tracing::info!(
+            "Dataset {}/{}: {}.{} (DB: {:?}, Source: {})",
+            i+1, 
+            requests.len(),
+            req.schema,
+            req.name,
+            req.database,
+            req.data_source_name
+        );
+    }
+    
     let results = deploy_datasets_handler(user_id, requests, false).await?;
 
     let successful_models = results.iter().filter(|r| r.success).count();
@@ -285,9 +302,17 @@ async fn deploy_datasets_handler(
             .or_default()
             .push(req);
     }
+    
+    tracing::info!("Grouped requests into {} data source groups", data_source_groups.len());
 
     // Process each data source group
     for ((data_source_name, database), group) in data_source_groups {
+        tracing::info!(
+            "Processing data source group: {} (database: {:?}) with {} models", 
+            data_source_name, 
+            database, 
+            group.len()
+        );
 
         // Get data source
         let data_source = match data_sources::table
@@ -504,11 +529,45 @@ async fn deploy_datasets_handler(
                 new_dataset_identifiers
             );
 
-            // Find datasets that exist but aren't in the request - using the composite identifier
+            // Find datasets that exist but aren't in the request - using improved matching logic
             let datasets_to_delete: Vec<(String, String, Option<String>, Uuid)> = existing_dataset_identifiers
-                .difference(&new_dataset_identifiers)
+                .iter()
+                .filter(|(name, schema, db_id, ds_id)| {
+                    // A dataset should be deleted if there's no matching entry in new_dataset_identifiers
+                    !new_dataset_identifiers.iter().any(|(new_name, new_schema, new_db_id, new_ds_id)| {
+                        // Match by name, schema, data_source_id
+                        name == new_name && 
+                        schema == new_schema && 
+                        ds_id == new_ds_id &&
+                        // Special handling for database_identifier
+                        match (db_id, new_db_id) {
+                            (Some(a), Some(b)) => a == b,  // Both have values, must match
+                            (None, None) => true,          // Both are NULL, considered matching
+                            _ => false                     // One NULL, one with value, not matching
+                        }
+                    })
+                })
                 .cloned()
                 .collect();
+                
+            tracing::info!(
+                "Found {} existing datasets, {} new datasets, and {} datasets to delete for data source '{}'",
+                existing_dataset_identifiers.len(),
+                new_dataset_identifiers.len(),
+                datasets_to_delete.len(),
+                data_source_name
+            );
+            
+            if !datasets_to_delete.is_empty() {
+                tracing::info!(
+                    "Datasets to delete: {:?}",
+                    datasets_to_delete.iter()
+                        .map(|(name, schema, db, _)| 
+                            format!("{}.{} (DB: {:?})", schema, name, db)
+                        )
+                        .collect::<Vec<_>>()
+                );
+            }
 
             // Mark datasets as deleted if they're not in the request
             if !datasets_to_delete.is_empty() {
@@ -520,37 +579,64 @@ async fn deploy_datasets_handler(
                 );
                 
                 for (name_lower, schema_lower, database, dataset_source_id) in &datasets_to_delete {
-                    // Use LOWER() function for case-insensitive matching
-                    let mut query = diesel::update(datasets::table)
-                        .filter(datasets::data_source_id.eq(dataset_source_id))
-                        .filter(datasets::name.eq(name_lower))  // Case-insensitive
-                        .filter(datasets::schema.eq(schema_lower))  // Case-insensitive
-                        .filter(datasets::deleted_at.is_null())
-                        .into_boxed();
-                    
-                    // Add database_identifier filter conditionally
-                    if let Some(db_id) = database {
-                        query = query.filter(datasets::database_identifier.eq(db_id));
+                    // Use prepared statement for more precise deletion
+                    let sql_query = if let Some(db_id) = database {
+                        format!(
+                            "UPDATE datasets SET deleted_at = $1
+                             WHERE data_source_id = $2
+                             AND LOWER(name) = LOWER($3)
+                             AND LOWER(schema) = LOWER($4)
+                             AND database_identifier = $5
+                             AND deleted_at IS NULL"
+                        )
                     } else {
-                        query = query.filter(datasets::database_identifier.is_null());
-                    }
+                        format!(
+                            "UPDATE datasets SET deleted_at = $1
+                             WHERE data_source_id = $2
+                             AND LOWER(name) = LOWER($3)
+                             AND LOWER(schema) = LOWER($4)
+                             AND database_identifier IS NULL
+                             AND deleted_at IS NULL"
+                        )
+                    };
                     
-                    // Add better error handling to avoid silent failures
-                    match query.set(datasets::deleted_at.eq(now))
-                        .execute(&mut conn)
-                        .await 
-                    {
+                    tracing::info!(
+                        "Executing delete query for dataset {}.{} (DB: {:?})", 
+                        schema_lower, name_lower, database
+                    );
+                    
+                    // Execute with proper parameters
+                    let result = if let Some(db_id) = database {
+                        diesel::sql_query(&sql_query)
+                            .bind::<diesel::sql_types::Timestamptz, _>(now)
+                            .bind::<diesel::sql_types::Uuid, _>(*dataset_source_id)
+                            .bind::<diesel::sql_types::Text, _>(name_lower)
+                            .bind::<diesel::sql_types::Text, _>(schema_lower)
+                            .bind::<diesel::sql_types::Text, _>(db_id)
+                            .execute(&mut conn)
+                            .await
+                    } else {
+                        diesel::sql_query(&sql_query)
+                            .bind::<diesel::sql_types::Timestamptz, _>(now)
+                            .bind::<diesel::sql_types::Uuid, _>(*dataset_source_id)
+                            .bind::<diesel::sql_types::Text, _>(name_lower)
+                            .bind::<diesel::sql_types::Text, _>(schema_lower)
+                            .execute(&mut conn)
+                            .await
+                    };
+                    
+                    match result {
                         Ok(count) => {
                             tracing::info!(
-                                "Successfully marked {} dataset(s) as deleted: {}.{}",
-                                count, schema_lower, name_lower
+                                "Successfully marked {} dataset(s) as deleted: {}.{} (DB: {:?})",
+                                count, schema_lower, name_lower, database
                             );
                         },
                         Err(e) => {
                             // Log error but continue processing other datasets
                             tracing::error!(
-                                "Failed to mark dataset {}.{} as deleted: {}",
-                                schema_lower, name_lower, e
+                                "Failed to mark dataset {}.{} (DB: {:?}) as deleted: {}",
+                                schema_lower, name_lower, database, e
                             );
                         }
                     };
@@ -602,34 +688,143 @@ async fn deploy_datasets_handler(
 
             // Bulk upsert datasets with more precise identification
             for dataset in &datasets_to_upsert {
-                // Use individual inserts with composite key conflict handling
-                // This handles the database_identifier which can be null
-                diesel::insert_into(datasets::table)
-                    .values(dataset)
-                    // We need to rely on the SQL constraint - we can't use lower() in on_conflict
-                    // This relies on the database having the constraint properly set up
-                    .on_conflict((datasets::name, datasets::schema, datasets::data_source_id))
-                    .do_update()
-                    .set((
-                        datasets::updated_at.eq(excluded(datasets::updated_at)),
-                        datasets::updated_by.eq(excluded(datasets::updated_by)),
-                        datasets::definition.eq(excluded(datasets::definition)),
-                        datasets::when_to_use.eq(excluded(datasets::when_to_use)),
-                        datasets::model.eq(excluded(datasets::model)),
-                        datasets::yml_file.eq(excluded(datasets::yml_file)),
-                        datasets::database_identifier.eq(excluded(datasets::database_identifier)),
-                        datasets::name.eq(excluded(datasets::name)),
-                        datasets::deleted_at.eq(None::<DateTime<Utc>>),
-                    ))
-                    .execute(&mut conn)
-                    .await
-                    .map_err(|e| {
-                        tracing::error!(
-                            "Failed to upsert dataset {}.{} (database: {:?}): {}",
-                            dataset.schema, dataset.name, dataset.database_identifier, e
-                        );
-                        e
-                    })?;
+                // Enhanced logging for upsert operation
+                tracing::info!(
+                    "Upserting dataset {}.{} (DB: {:?}, ID: {})",
+                    dataset.schema, dataset.name, dataset.database_identifier, dataset.id
+                );
+                
+                // First, try to handle each dataset with database_identifier separately
+                // to prevent conflicts
+                if dataset.database_identifier.is_some() {
+                    // For datasets with database_identifier, first check if a matching record exists
+                    // with the exact same composite key (name, schema, data_source_id, database_identifier)
+                    let existing_id = datasets::table
+                        .filter(datasets::name.eq(&dataset.name))
+                        .filter(datasets::schema.eq(&dataset.schema))
+                        .filter(datasets::data_source_id.eq(dataset.data_source_id))
+                        .filter(datasets::database_identifier.eq(&dataset.database_identifier))
+                        .select(datasets::id)
+                        .first::<Uuid>(&mut conn)
+                        .await;
+                        
+                    match existing_id {
+                        Ok(id) => {
+                            // Found an existing dataset with the exact same composite key
+                            tracing::info!(
+                                "Found existing dataset with ID {} matching {}.{} with DB: {:?}",
+                                id, dataset.schema, dataset.name, dataset.database_identifier
+                            );
+                            
+                            // Update the existing record
+                            let update_result = diesel::update(datasets::table)
+                                .filter(datasets::id.eq(id))
+                                .set((
+                                    datasets::updated_at.eq(dataset.updated_at),
+                                    datasets::updated_by.eq(dataset.updated_by),
+                                    datasets::definition.eq(&dataset.definition),
+                                    datasets::when_to_use.eq(&dataset.when_to_use),
+                                    datasets::model.eq(&dataset.model),
+                                    datasets::yml_file.eq(&dataset.yml_file),
+                                    datasets::deleted_at.eq(None::<DateTime<Utc>>),
+                                ))
+                                .execute(&mut conn)
+                                .await;
+                                
+                            match update_result {
+                                Ok(_) => {
+                                    tracing::info!(
+                                        "Successfully updated dataset {}.{} (DB: {:?})",
+                                        dataset.schema, dataset.name, dataset.database_identifier
+                                    );
+                                },
+                                Err(e) => {
+                                    tracing::error!(
+                                        "Failed to update dataset {}.{} (DB: {:?}): {}",
+                                        dataset.schema, dataset.name, dataset.database_identifier, e
+                                    );
+                                    return Err(e.into());
+                                }
+                            }
+                        },
+                        Err(_) => {
+                            // No existing dataset with this exact composite key found,
+                            // try inserting it
+                            tracing::info!(
+                                "No existing dataset found for {}.{} (DB: {:?}), inserting new",
+                                dataset.schema, dataset.name, dataset.database_identifier
+                            );
+                            
+                            let insert_result = diesel::insert_into(datasets::table)
+                                .values(dataset)
+                                .on_conflict((datasets::name, datasets::schema, datasets::data_source_id))
+                                .do_update()
+                                .set((
+                                    datasets::updated_at.eq(excluded(datasets::updated_at)),
+                                    datasets::updated_by.eq(excluded(datasets::updated_by)),
+                                    datasets::definition.eq(excluded(datasets::definition)),
+                                    datasets::when_to_use.eq(excluded(datasets::when_to_use)),
+                                    datasets::model.eq(excluded(datasets::model)),
+                                    datasets::yml_file.eq(excluded(datasets::yml_file)),
+                                    datasets::database_identifier.eq(excluded(datasets::database_identifier)),
+                                    datasets::deleted_at.eq(None::<DateTime<Utc>>),
+                                ))
+                                .execute(&mut conn)
+                                .await;
+                                
+                            match insert_result {
+                                Ok(_) => {
+                                    tracing::info!(
+                                        "Successfully inserted dataset {}.{} (DB: {:?})",
+                                        dataset.schema, dataset.name, dataset.database_identifier
+                                    );
+                                },
+                                Err(e) => {
+                                    tracing::error!(
+                                        "Failed to insert dataset {}.{} (DB: {:?}): {}",
+                                        dataset.schema, dataset.name, dataset.database_identifier, e
+                                    );
+                                    return Err(e.into());
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    // For datasets without database_identifier, use the standard upsert approach
+                    let result = diesel::insert_into(datasets::table)
+                        .values(dataset)
+                        .on_conflict((datasets::name, datasets::schema, datasets::data_source_id))
+                        .do_update()
+                        .set((
+                            datasets::updated_at.eq(excluded(datasets::updated_at)),
+                            datasets::updated_by.eq(excluded(datasets::updated_by)),
+                            datasets::definition.eq(excluded(datasets::definition)),
+                            datasets::when_to_use.eq(excluded(datasets::when_to_use)),
+                            datasets::model.eq(excluded(datasets::model)),
+                            datasets::yml_file.eq(excluded(datasets::yml_file)),
+                            datasets::database_identifier.eq(excluded(datasets::database_identifier)),
+                            datasets::deleted_at.eq(None::<DateTime<Utc>>),
+                        ))
+                        .execute(&mut conn)
+                        .await;
+                        
+                    // Handle the result
+                    match result {
+                        Ok(_) => {
+                            tracing::info!(
+                                "Successfully upserted dataset {}.{} (no DB identifier)",
+                                dataset.schema, dataset.name
+                            );
+                        },
+                        Err(e) => {
+                            tracing::error!(
+                                "Failed to upsert dataset {}.{}: {}",
+                                dataset.schema, dataset.name, e
+                            );
+                            return Err(e.into());
+                        }
+                    }
+                }
             }
 
             // Get the dataset IDs after upsert for column operations using the composite key
@@ -644,34 +839,48 @@ async fn deploy_datasets_handler(
             
             // For each valid dataset, get the ID using the precise composite key
             for (name, schema, database) in datasets_to_lookup {
-                let query = datasets::table
-                    .filter(datasets::data_source_id.eq(&data_source.id))
-                    .filter(datasets::name.eq(&name))
-                    .filter(datasets::schema.eq(&schema));
-                    // Don't filter by deleted_at.is_null() - we need to find datasets even if they were deleted
+                tracing::info!(
+                    "Looking up dataset ID for {}.{} (DB: {:?})", 
+                    schema, name, database
+                );
                 
-                // Apply the database filter conditionally
-                let dataset_id = if let Some(db) = &database {
-                    query.filter(datasets::database_identifier.eq(db))
-                        .select(datasets::id)
-                        .first::<Uuid>(&mut conn)
-                        .await
+                // Build a query using Diesel ORM
+                let name_lower = name.to_lowercase();
+                let schema_lower = schema.to_lowercase();
+                
+                let mut query = datasets::table
+                    .filter(datasets::data_source_id.eq(data_source.id))
+                    .filter(datasets::name.eq(&name_lower))
+                    .filter(datasets::schema.eq(&schema_lower))
+                    .filter(datasets::deleted_at.is_null())
+                    .select(datasets::id)
+                    .into_boxed();
+                
+                // Add database_identifier condition
+                if let Some(db) = &database {
+                    query = query.filter(datasets::database_identifier.eq(db));
                 } else {
-                    query.filter(datasets::database_identifier.is_null())
-                        .select(datasets::id)
-                        .first::<Uuid>(&mut conn)
-                        .await
-                };
+                    query = query.filter(datasets::database_identifier.is_null());
+                }
+                
+                // Execute the query
+                let dataset_id = query.first::<Uuid>(&mut conn).await;
                 
                 // Store ID if found
-                if let Ok(id) = dataset_id {
-                    dataset_ids.insert(name.clone(), id);
-                } else {
-                    tracing::warn!(
-                        "Could not find dataset ID for {}.{}",
-                        schema,
-                        name
-                    );
+                match dataset_id {
+                    Ok(id) => {
+                        tracing::info!(
+                            "Found dataset ID {} for {}.{} (DB: {:?})",
+                            id, schema, name, database
+                        );
+                        dataset_ids.insert(name.clone(), id);
+                    },
+                    Err(e) => {
+                        tracing::error!(
+                            "Error looking up dataset ID for {}.{} (DB: {:?}): {}",
+                            schema, name, database, e
+                        );
+                    }
                 }
             }
 
@@ -778,6 +987,15 @@ async fn deploy_datasets_handler(
                     .iter()
                     .map(|c| c.name.clone())
                     .collect();
+                    
+                tracing::info!(
+                    "Dataset {}.{} (DB: {:?}): Found {} current columns and {} new columns",
+                    req.schema,
+                    req.name,
+                    req.database,
+                    current_column_names.len(),
+                    new_column_names.len()
+                );
 
                 let columns_to_delete: Vec<String> = current_column_names
                     .difference(&new_column_names)
@@ -785,6 +1003,16 @@ async fn deploy_datasets_handler(
                     .collect();
 
                 if !columns_to_delete.is_empty() {
+                    tracing::info!(
+                        "Dataset {}.{} (DB: {:?}): Deleting {} columns: {:?}",
+                        req.schema,
+                        req.name,
+                        req.database,
+                        columns_to_delete.len(),
+                        columns_to_delete
+                    );
+                    
+                    // Use Diesel query builder for column deletion
                     diesel::update(dataset_columns::table)
                         .filter(dataset_columns::dataset_id.eq(dataset_id))
                         .filter(dataset_columns::name.eq_any(&columns_to_delete))
