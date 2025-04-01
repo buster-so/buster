@@ -465,25 +465,25 @@ async fn deploy_datasets_handler(
         if !valid_datasets.is_empty() {
             let now = Utc::now();
             
-            // Use a composite key of name, schema, and database_identifier for more precise identification
+            // Use a composite key of name, schema, database_identifier AND data_source_id for more precise identification
             // IMPORTANT: Don't filter by deleted_at.is_null() so we can find ALL datasets including deleted ones
-            let existing_dataset_identifiers: HashSet<(String, String, Option<String>)> = datasets::table
+            let existing_dataset_identifiers: HashSet<(String, String, Option<String>, Uuid)> = datasets::table
                 .filter(datasets::data_source_id.eq(&data_source.id))
                 // No filter for deleted_at here - we want to find ALL datasets including deleted ones
-                .select((datasets::name, datasets::schema, datasets::database_identifier))
-                .load::<(String, String, Option<String>)>(&mut conn)
+                .select((datasets::name, datasets::schema, datasets::database_identifier, datasets::data_source_id))
+                .load::<(String, String, Option<String>, Uuid)>(&mut conn)
                 .await?
                 .into_iter()
                 .collect();
 
             // Get new dataset identifiers from the request
-            let new_dataset_identifiers: HashSet<(String, String, Option<String>)> = valid_datasets
+            let new_dataset_identifiers: HashSet<(String, String, Option<String>, Uuid)> = valid_datasets
                 .iter()
-                .map(|req| (req.name.clone(), req.schema.clone(), req.database.clone()))
+                .map(|req| (req.name.clone(), req.schema.clone(), req.database.clone(), data_source.id))
                 .collect();
 
             // Find datasets that exist but aren't in the request - using the composite identifier
-            let datasets_to_delete: Vec<(String, String, Option<String>)> = existing_dataset_identifiers
+            let datasets_to_delete: Vec<(String, String, Option<String>, Uuid)> = existing_dataset_identifiers
                 .difference(&new_dataset_identifiers)
                 .cloned()
                 .collect();
@@ -497,9 +497,9 @@ async fn deploy_datasets_handler(
                     datasets_to_delete
                 );
                 
-                for (name, schema, database) in &datasets_to_delete {
+                for (name, schema, database, dataset_source_id) in &datasets_to_delete {
                     let mut query = diesel::update(datasets::table)
-                        .filter(datasets::data_source_id.eq(&data_source.id))
+                        .filter(datasets::data_source_id.eq(dataset_source_id))  // Use the specific source ID from tuple
                         .filter(datasets::name.eq(name))
                         .filter(datasets::schema.eq(schema))
                         .filter(datasets::deleted_at.is_null())
