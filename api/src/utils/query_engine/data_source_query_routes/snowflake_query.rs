@@ -1569,7 +1569,7 @@ mod tests {
         TimestampNanosecondArray, TimestampSecondArray,
     };
     use arrow::datatypes::{DataType as ArrowDataType, Field, Fields, TimeUnit};
-    use chrono::{Datelike, NaiveDate, Timelike};
+    use chrono::{Datelike, NaiveDate, NaiveDateTime, Timelike};
     use std::str::FromStr;
     use std::sync::Arc;
     use arrow::datatypes::i256;
@@ -2231,5 +2231,85 @@ mod tests {
                 }
             }
         }
+    }
+
+    /// Tests processing of multiple Int64 columns with TIMESTAMP_NTZ metadata and scale 3.
+    #[test]
+    fn test_int64_timestamp_ntz_processing() {
+        println!("\n=== Testing Int64 TIMESTAMP_NTZ(3) processing ===");
+
+        // Sample data (milliseconds since epoch)
+        let timestamp_a_millis = vec![
+            Some(1678886400000), // 2023-03-15 13:20:00.000 UTC
+            Some(1700000000000), // 2023-11-14 22:13:20.000 UTC
+            None, // Null value
+        ];
+        let timestamp_b_millis = vec![
+            Some(1678890000000), // 2023-03-15 14:20:00.000 UTC
+            None, // Null value
+            Some(1700000012345), // 2023-11-14 22:13:32.345 UTC
+        ];
+
+        // Create Arrow arrays
+        let array_a = Int64Array::from(timestamp_a_millis);
+        let array_b = Int64Array::from(timestamp_b_millis);
+
+        // Create metadata common to both fields
+        let mut timestamp_metadata = std::collections::HashMap::new();
+        timestamp_metadata.insert("logicalType".to_string(), "TIMESTAMP_NTZ".to_string());
+        timestamp_metadata.insert("scale".to_string(), "3".to_string());
+
+        // Create fields
+        let field_a = Field::new(
+            "TIMESTAMP_A",
+            ArrowDataType::Int64,
+            true, // Nullable
+        ).with_metadata(timestamp_metadata.clone());
+
+        let field_b = Field::new(
+            "TIMESTAMP_B",
+            ArrowDataType::Int64,
+            true, // Nullable
+        ).with_metadata(timestamp_metadata.clone());
+
+        // Create schema
+        let schema = Arc::new(arrow::datatypes::Schema::new(vec![field_a, field_b]));
+
+        // Create record batch
+        let batch = RecordBatch::try_new(
+            schema.clone(),
+            vec![Arc::new(array_a) as ArrayRef, Arc::new(array_b) as ArrayRef],
+        ).unwrap();
+
+        println!("Input RecordBatch schema: {:?}", batch.schema());
+        println!("Input RecordBatch columns: [Column 0: {:?}, Column 1: {:?}]", batch.column(0), batch.column(1));
+
+        // Process the batch
+        let processed_rows = process_record_batch(&batch);
+
+        println!("Processed Rows: {:?}", processed_rows);
+
+        // --- Assertions ---
+        assert_eq!(processed_rows.len(), 3, "Expected 3 rows processed");
+
+        // Expected NaiveDateTime values
+        let expected_dt_a1 = NaiveDateTime::parse_from_str("2023-03-15 13:20:00.000", "%Y-%m-%d %H:%M:%S%.3f").unwrap();
+        let expected_dt_a2 = NaiveDateTime::parse_from_str("2023-11-14 22:13:20.000", "%Y-%m-%d %H:%M:%S%.3f").unwrap();
+        let expected_dt_b1 = NaiveDateTime::parse_from_str("2023-03-15 14:20:00.000", "%Y-%m-%d %H:%M:%S%.3f").unwrap();
+        let expected_dt_b3 = NaiveDateTime::parse_from_str("2023-11-14 22:13:32.345", "%Y-%m-%d %H:%M:%S%.3f").unwrap();
+
+        // Row 1
+        assert_eq!(processed_rows[0]["TIMESTAMP_A"], DataType::Timestamp(Some(expected_dt_a1)));
+        assert_eq!(processed_rows[0]["TIMESTAMP_B"], DataType::Timestamp(Some(expected_dt_b1)));
+
+        // Row 2
+        assert_eq!(processed_rows[1]["TIMESTAMP_A"], DataType::Timestamp(Some(expected_dt_a2)));
+        assert_eq!(processed_rows[1]["TIMESTAMP_B"], DataType::Null);
+
+        // Row 3
+        assert_eq!(processed_rows[2]["TIMESTAMP_A"], DataType::Null);
+        assert_eq!(processed_rows[2]["TIMESTAMP_B"], DataType::Timestamp(Some(expected_dt_b3)));
+        
+        println!("✓ Verified Int64 TIMESTAMP_NTZ(3) processing");
     }
 }
