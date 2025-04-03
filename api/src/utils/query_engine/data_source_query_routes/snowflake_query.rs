@@ -16,6 +16,7 @@ use snowflake_api::{QueryResult, SnowflakeApi};
 use serde_json::{Map as JsonMap, Value};
 
 use crate::utils::query_engine::data_types::DataType;
+use std::sync::Arc;
 
 // -------------------------
 // String & JSON Processing 
@@ -966,41 +967,86 @@ fn handle_date64_array(array: &Date64Array, row_idx: usize) -> DataType {
 }
 
 fn handle_timestamp_array(
-    array: &TimestampNanosecondArray,
+    array: &arrow::array::ArrayRef,
     row_idx: usize,
     unit: &TimeUnit,
-    tz: Option<&String>,
+    tz: Option<&std::sync::Arc<String>>,
 ) -> DataType {
-    if array.is_null(row_idx) {
-        DataType::Null
-    } else {
-        let nanos = array.value(row_idx);
-        
-        // DEBUG - print the raw nanosecond value
-        let debug_nanos = nanos;
-        
-        let (secs, subsec_nanos) = match unit {
-            TimeUnit::Second => (nanos, 0),
-            TimeUnit::Millisecond => (nanos / 1000, (nanos % 1000) * 1_000_000),
-            TimeUnit::Microsecond => (nanos / 1_000_000, (nanos % 1_000_000) * 1000),
-            TimeUnit::Nanosecond => (nanos / 1_000_000_000, nanos % 1_000_000_000),
-        };
-
-        // Create a timestamp from the seconds and nanoseconds
-        match Utc.timestamp_opt(secs as i64, subsec_nanos as u32) {
-            LocalResult::Single(dt) => {
-                // Check if timezone is present
-                if tz.is_some() {
-                    DataType::Timestamptz(Some(dt))
-                } else {
-                    // Without timezone, use NaiveDateTime
-                    DataType::Timestamp(Some(dt.naive_utc()))
+    // println!("Debug: handle_timestamp_array called with tz: {:?}", tz);
+    
+    // Try to downcast to various timestamp array types based on time unit
+    let value = match array.data_type() {
+        ArrowDataType::Timestamp(TimeUnit::Second, _) => {
+            if let Some(array) = array.as_any().downcast_ref::<TimestampSecondArray>() {
+                if array.is_null(row_idx) {
+                    return DataType::Null;
                 }
-            },
-            _ => {
-                tracing::error!("Failed to create DateTime from timestamp: {} {}", secs, subsec_nanos);
-                DataType::Null
+                array.value(row_idx)
+            } else {
+                return DataType::Null;
             }
+        },
+        ArrowDataType::Timestamp(TimeUnit::Millisecond, _) => {
+            if let Some(array) = array.as_any().downcast_ref::<TimestampMillisecondArray>() {
+                if array.is_null(row_idx) {
+                    return DataType::Null;
+                }
+                array.value(row_idx)
+            } else {
+                return DataType::Null;
+            }
+        },
+        ArrowDataType::Timestamp(TimeUnit::Microsecond, _) => {
+            if let Some(array) = array.as_any().downcast_ref::<TimestampMicrosecondArray>() {
+                if array.is_null(row_idx) {
+                    return DataType::Null;
+                }
+                array.value(row_idx)
+            } else {
+                return DataType::Null;
+            }
+        },
+        ArrowDataType::Timestamp(TimeUnit::Nanosecond, _) => {
+            if let Some(array) = array.as_any().downcast_ref::<TimestampNanosecondArray>() {
+                if array.is_null(row_idx) {
+                    return DataType::Null;
+                }
+                array.value(row_idx)
+            } else {
+                return DataType::Null;
+            }
+        },
+        _ => return DataType::Null,
+    };
+    
+    // Convert the value to the appropriate seconds and nanoseconds
+    let (secs, subsec_nanos) = match unit {
+        TimeUnit::Second => (value, 0),
+        TimeUnit::Millisecond => (value / 1000, (value % 1000) * 1_000_000),
+        TimeUnit::Microsecond => (value / 1_000_000, (value % 1_000_000) * 1000),
+        TimeUnit::Nanosecond => (value / 1_000_000_000, value % 1_000_000_000),
+    };
+
+    // Create a timestamp from the seconds and nanoseconds
+    match Utc.timestamp_opt(secs as i64, subsec_nanos as u32) {
+        LocalResult::Single(dt) => {
+            // Check if timezone is present
+            // println!("Debug: Timezone check - tz is_some: {}", tz.is_some());
+            if let Some(_tz_val) = tz { // Use _tz_val as it's not needed
+                // println!("Debug: Timezone value: {}", _tz_val);
+                let result = DataType::Timestamptz(Some(dt));
+                // println!("Debug: Returning Timestamptz: {:?}", result);
+                result
+            } else {
+                // Without timezone, use NaiveDateTime
+                let result = DataType::Timestamp(Some(dt.naive_utc()));
+                // println!("Debug: Returning Timestamp: {:?}", result);
+                result
+            }
+        },
+        _ => {
+            tracing::error!("Failed to create DateTime from timestamp: {} {}", secs, subsec_nanos);
+            DataType::Null
         }
     }
 }
@@ -1202,8 +1248,88 @@ fn convert_array_to_datatype(column: &arrow::array::ArrayRef, field: &Field, row
             handle_int32_array(array, row_idx, scale_str.map(|s| s.as_str()), field)
         },
         ArrowDataType::Int64 => {
-            let array = column.as_any().downcast_ref::<Int64Array>().unwrap();
-            handle_int64_array(array, row_idx, scale_str.map(|s| s.as_str()), field)
+            let field_name = field.name(); // Get field name for logging
+            // println!("Debug: Processing Int64 field: {}", field_name);
+
+            // Check if this is actually a timestamp in disguise
+            let logical_type = field.metadata().get("logicalType");
+            let scale_str = field.metadata().get("scale"); // Get scale_str here as well
+            // println!("Debug [{}]: logicalType={:?}, scale={:?}", field_name, logical_type, scale_str);
+
+            if logical_type.map_or(false, |t| t.contains("TIMESTAMP")) {
+                // println!("Debug [{}]: Detected as timestamp.", field_name);
+                // If it has a timestamp logical type, determine the time unit based on scale
+                let unit = match scale_str.map(|s| s.parse::<i32>().unwrap_or(3)) { // Default parse to 3 (ms)
+                    Some(0) => TimeUnit::Second,
+                    Some(6) => TimeUnit::Microsecond,
+                    Some(9) => TimeUnit::Nanosecond,
+                    Some(3) | None | Some(_) => TimeUnit::Millisecond, // Default to millisecond
+                };
+                // println!("Debug [{}]: Determined unit: {:?}", field_name, unit);
+                
+                // Check if there's timezone info
+                let has_tz = logical_type.map_or(false, |t| t.contains("_TZ"));
+                // println!("Debug [{}]: has_tz: {}", field_name, has_tz);
+                let _tz: Option<std::sync::Arc<String>> = if has_tz {
+                    Some(Arc::new(String::from("UTC")))
+                } else {
+                    None
+                };
+                
+                // Process as timestamp
+                if let Some(array) = column.as_any().downcast_ref::<Int64Array>() {
+                    if array.is_null(row_idx) {
+                        // println!("Debug [{}]: Value is null at row_idx {}.", field_name, row_idx);
+                        return DataType::Null;
+                    }
+                    
+                    let value = array.value(row_idx);
+                    // println!("Debug [{}]: Raw value at row_idx {}: {}", field_name, row_idx, value);
+                    let (secs, subsec_nanos) = match unit {
+                        TimeUnit::Second => (value, 0),
+                        TimeUnit::Millisecond => (value / 1000, (value % 1000) * 1_000_000),
+                        TimeUnit::Microsecond => (value / 1_000_000, (value % 1_000_000) * 1000),
+                        TimeUnit::Nanosecond => (value / 1_000_000_000, value % 1_000_000_000),
+                    };
+                    // println!("Debug [{}]: Calculated secs={}, nanos={}", field_name, secs, subsec_nanos);
+                    
+                    match Utc.timestamp_opt(secs, subsec_nanos as u32) {
+                        LocalResult::Single(dt) => {
+                            // println!("Debug [{}]: Successfully created DateTime: {}", field_name, dt);
+                            if has_tz {
+                                // println!("Debug [{}]: Returning Timestamptz.", field_name);
+                                DataType::Timestamptz(Some(dt))
+                            } else {
+                                // println!("Debug [{}]: Returning Timestamp.", field_name);
+                                DataType::Timestamp(Some(dt.naive_utc()))
+                            }
+                        },
+                        LocalResult::None | LocalResult::Ambiguous(_, _) => { // Handle None and Ambiguous explicitly
+                            tracing::error!("Failed to create DateTime (None or Ambiguous) from timestamp: secs={}, nanos={}", secs, subsec_nanos);
+                            // println!("Debug [{}]: Failed to create DateTime (None or Ambiguous) from timestamp: secs={}, nanos={}", field_name, secs, subsec_nanos);
+                            DataType::Null
+                        }
+                    }
+                } else {
+                    // println!("Debug [{}]: Failed to downcast to Int64Array.", field_name);
+                    DataType::Null
+                }
+            } else {
+                // println!("Debug [{}]: Detected as regular Int64.", field_name);
+                // Regular Int64 processing
+                if let Some(array) = column.as_any().downcast_ref::<Int64Array>() {
+                    if array.is_null(row_idx) {
+                        // println!("Debug [{}]: Regular Int64 is null at row_idx {}.", field_name, row_idx);
+                        return DataType::Null;
+                    }
+                    let value = array.value(row_idx);
+                    // println!("Debug [{}]: Returning Int8 with value {}.", field_name, value);
+                    DataType::Int8(Some(value))
+                } else {
+                    // println!("Debug [{}]: Failed to downcast regular Int64 to Int64Array.", field_name);
+                    DataType::Null
+                }
+            }
         },
         ArrowDataType::UInt8 => {
             let array = column.as_any().downcast_ref::<UInt8Array>().unwrap();
@@ -1253,67 +1379,26 @@ fn convert_array_to_datatype(column: &arrow::array::ArrayRef, field: &Field, row
             let array = column.as_any().downcast_ref::<Date64Array>().unwrap();
             handle_date64_array(array, row_idx)
         },
-        ArrowDataType::Timestamp(unit, tz) => {
-            // Handle different timestamp array types based on time unit
-            let value = match unit {
-                TimeUnit::Second => {
-                    if let Some(array) = column.as_any().downcast_ref::<TimestampSecondArray>() {
-                        array.value(row_idx)
-                    } else if let Some(array) = column.as_any().downcast_ref::<TimestampNanosecondArray>() {
-                        array.value(row_idx)
-                    } else {
-                        return DataType::Null;
-                    }
-                },
-                TimeUnit::Millisecond => {
-                    if let Some(array) = column.as_any().downcast_ref::<TimestampMillisecondArray>() {
-                        array.value(row_idx)
-                    } else if let Some(array) = column.as_any().downcast_ref::<TimestampNanosecondArray>() {
-                        array.value(row_idx)
-                    } else {
-                        return DataType::Null;
-                    }
-                },
-                TimeUnit::Microsecond => {
-                    if let Some(array) = column.as_any().downcast_ref::<TimestampMicrosecondArray>() {
-                        array.value(row_idx)
-                    } else if let Some(array) = column.as_any().downcast_ref::<TimestampNanosecondArray>() {
-                        array.value(row_idx)
-                    } else {
-                        return DataType::Null;
-                    }
-                },
-                TimeUnit::Nanosecond => {
-                    if let Some(array) = column.as_any().downcast_ref::<TimestampNanosecondArray>() {
-                        array.value(row_idx)
-                    } else {
-                        return DataType::Null;
-                    }
-                },
-            };
+        ArrowDataType::Timestamp(unit, _) => { // Ignore tz from pattern match
+            // println!("Debug: convert_array_to_datatype Timestamp branch for unit {:?}", unit);
             
-            // Convert the value to the appropriate seconds and nanoseconds
-            let (secs, subsec_nanos) = match unit {
-                TimeUnit::Second => (value, 0),
-                TimeUnit::Millisecond => (value / 1000, (value % 1000) * 1_000_000),
-                TimeUnit::Microsecond => (value / 1_000_000, (value % 1_000_000) * 1000),
-                TimeUnit::Nanosecond => (value / 1_000_000_000, value % 1_000_000_000),
+            // Re-extract timezone directly from the field's data_type
+            let field_tz = match field.data_type() {
+                ArrowDataType::Timestamp(_, tz_option) => tz_option.as_ref(),
+                _ => None, // Should not happen if we are in this branch
             };
+            // println!("Debug: Extracted field_tz: {:?}", field_tz);
             
-            // Apply the timestamp conversion directly here rather than using handle_timestamp_array
-            match Utc.timestamp_opt(secs as i64, subsec_nanos as u32) {
-                LocalResult::Single(dt) => {
-                    // Key change: Check if the field has timezone information and return appropriate type
-                    match tz {
-                        Some(_) => DataType::Timestamptz(Some(dt)),
-                        None => DataType::Timestamp(Some(dt.naive_utc())),
-                    }
-                },
-                _ => {
-                    tracing::error!("Failed to create DateTime from timestamp: {} {}", secs, subsec_nanos);
-                    DataType::Null
-                }
-            }
+            // Convert tz from Option<&Arc<str>> to Option<Arc<String>> for the handler function
+            let string_tz_owned = field_tz.map(|t| {
+                let str_val = t.as_ref();
+                // println!("Debug: Converting field timezone '{}' to Arc<String>", str_val);
+                std::sync::Arc::new(str_val.to_string())
+            });
+            
+            let tz_ref = string_tz_owned.as_ref(); // Get Option<&Arc<String>>
+            // println!("Debug: Using tz_ref for handle_timestamp_array: {:?}", tz_ref);
+            handle_timestamp_array(column, row_idx, unit, tz_ref)
         },
         ArrowDataType::Decimal128(_, scale) => {
             let array = column.as_any().downcast_ref::<Decimal128Array>().unwrap();
@@ -1753,7 +1838,7 @@ mod tests {
     /// Tests different Arrow timestamp formats/scales for handling Snowflake TimestampNtz columns
     #[test]
     fn test_timestamp_array_formats() {
-        println!("\n=== Testing timestamp array formats with different time units ===");
+        // println!("\n=== Testing timestamp array formats with different time units ===");
 
         // Test cases organized by time unit
         let test_cases = vec![
@@ -1769,7 +1854,7 @@ mod tests {
         ];
 
         for (i, (epoch, time_unit, has_tz, year, month, day, hour, minute, second, millisecond)) in test_cases.iter().enumerate() {
-            println!("\nTest case {}: {:?} with{} timezone", i, time_unit, if *has_tz { "" } else { "out" });
+            // println!("\nTest case {}: {:?} with{} timezone", i, time_unit, if *has_tz { "" } else { "out" });
             
             // Create appropriate array based on time unit
             let array_ref: ArrayRef = match time_unit {
@@ -1789,24 +1874,30 @@ mod tests {
             
             // Create field with appropriate metadata
             let tz_option = if *has_tz { 
+                // println!("Debug: Test creating timezone option with UTC");
                 Some(Arc::from("UTC")) 
             } else { 
+                // println!("Debug: Test creating no timezone option");
                 None 
             };
 
+            // println!("Debug: Using tz_option: {:?}", tz_option);
             let field = Field::new(
                 "TIMESTAMP_COLUMN",
                 ArrowDataType::Timestamp(*time_unit, tz_option),
                 false,
             );
+            // println!("Debug: Created field: {:?}", field);
             
             // Process the timestamp
             let result = convert_array_to_datatype(&array_ref, &field, 0);
-            println!("Result: {:?}", result);
+            // println!("Result: {:?}", result);
             
             // Verify result based on whether it has timezone or not
             if *has_tz {
                 if let DataType::Timestamptz(Some(dt)) = result {
+                    // ... assertions ...
+                    // println!("✓ Verified Timestamptz: {}", dt);
                     assert_eq!(dt.year(), *year);
                     assert_eq!(dt.month(), *month);
                     assert_eq!(dt.day(), *day);
@@ -1814,12 +1905,14 @@ mod tests {
                     assert_eq!(dt.minute(), *minute);
                     assert_eq!(dt.second(), *second);
                     assert_eq!(dt.timestamp_subsec_millis(), *millisecond);
-                    println!("✓ Verified Timestamptz: {}", dt);
+                    // println!("✓ Verified Timestamptz: {}", dt);
                 } else {
                     panic!("Expected Timestamptz, got: {:?}", result);
                 }
             } else {
                 if let DataType::Timestamp(Some(dt)) = result {
+                    // ... assertions ...
+                    // println!("✓ Verified Timestamp: {}", dt);
                     assert_eq!(dt.year(), *year);
                     assert_eq!(dt.month(), *month);
                     assert_eq!(dt.day(), *day);
@@ -1827,7 +1920,7 @@ mod tests {
                     assert_eq!(dt.minute(), *minute);
                     assert_eq!(dt.second(), *second);
                     assert_eq!(dt.timestamp_subsec_millis(), *millisecond);
-                    println!("✓ Verified Timestamp: {}", dt);
+                    // println!("✓ Verified Timestamp: {}", dt);
                 } else {
                     panic!("Expected Timestamp, got: {:?}", result);
                 }
