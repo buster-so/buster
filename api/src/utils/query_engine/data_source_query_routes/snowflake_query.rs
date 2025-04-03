@@ -1,4 +1,4 @@
-use arrow::array::{Array, AsArray};
+use arrow::array::{Array, AsArray, TimestampMicrosecondArray, TimestampMillisecondArray, TimestampSecondArray};
 use arrow::array::{
     BinaryArray, BooleanArray, Date32Array, Date64Array, Decimal128Array, Decimal256Array,
     FixedSizeBinaryArray, Float32Array, Float64Array, Int16Array, Int32Array, Int64Array,
@@ -266,12 +266,48 @@ fn handle_boolean_array(array: &BooleanArray, row_idx: usize) -> DataType {
     }
 }
 
-fn handle_int8_array(array: &Int8Array, row_idx: usize, scale_str: Option<&str>) -> DataType {
+fn handle_int8_array(array: &Int8Array, row_idx: usize, scale_str: Option<&str>, field: &Field) -> DataType {
     if array.is_null(row_idx) {
         return DataType::Null;
     }
     
     let val = array.value(row_idx);
+    
+    // Check if this is actually a timestamp based on metadata
+    if let Some(logical_type) = field.metadata().get("logicalType") {
+        if logical_type.contains("TIMESTAMP") {
+            // Convert to i64 and handle as timestamp
+            let val_i64 = val as i64;
+            // Determine scale factor
+            let scale = if let Some(scale_str) = scale_str {
+                scale_str.parse::<i32>().unwrap_or(0)
+            } else {
+                0
+            };
+            
+            // Convert based on scale
+            let (secs, nanos) = match scale {
+                3 => (val_i64 / 1000, ((val_i64 % 1000) * 1_000_000) as u32), // milliseconds
+                6 => (val_i64 / 1_000_000, ((val_i64 % 1_000_000) * 1000) as u32), // microseconds
+                9 => (val_i64 / 1_000_000_000, (val_i64 % 1_000_000_000) as u32), // nanoseconds
+                _ => (val_i64, 0), // seconds or unknown
+            };
+            
+            match Utc.timestamp_opt(secs, nanos) {
+                LocalResult::Single(dt) => {
+                    if logical_type.contains("_TZ") {
+                        return DataType::Timestamptz(Some(dt));
+                    } else {
+                        return DataType::Timestamp(Some(dt.naive_utc()));
+                    }
+                },
+                _ => {
+                    tracing::error!("Failed to create DateTime from timestamp: {} {}", secs, nanos);
+                    return DataType::Null;
+                }
+            }
+        }
+    }
     
     // Check if this is actually a decimal with scale
     if let Some(scale_str) = scale_str {
@@ -293,12 +329,48 @@ fn handle_int8_array(array: &Int8Array, row_idx: usize, scale_str: Option<&str>)
     DataType::Int2(Some(val as i16))
 }
 
-fn handle_int16_array(array: &Int16Array, row_idx: usize, scale_str: Option<&str>) -> DataType {
+fn handle_int16_array(array: &Int16Array, row_idx: usize, scale_str: Option<&str>, field: &Field) -> DataType {
     if array.is_null(row_idx) {
         return DataType::Null;
     }
     
     let val = array.value(row_idx);
+    
+    // Check if this is actually a timestamp based on metadata
+    if let Some(logical_type) = field.metadata().get("logicalType") {
+        if logical_type.contains("TIMESTAMP") {
+            // Convert to i64 and handle as timestamp
+            let val_i64 = val as i64;
+            // Determine scale factor
+            let scale = if let Some(scale_str) = scale_str {
+                scale_str.parse::<i32>().unwrap_or(0)
+            } else {
+                0
+            };
+            
+            // Convert based on scale
+            let (secs, nanos) = match scale {
+                3 => (val_i64 / 1000, ((val_i64 % 1000) * 1_000_000) as u32), // milliseconds
+                6 => (val_i64 / 1_000_000, ((val_i64 % 1_000_000) * 1000) as u32), // microseconds
+                9 => (val_i64 / 1_000_000_000, (val_i64 % 1_000_000_000) as u32), // nanoseconds
+                _ => (val_i64, 0), // seconds or unknown
+            };
+            
+            match Utc.timestamp_opt(secs, nanos) {
+                LocalResult::Single(dt) => {
+                    if logical_type.contains("_TZ") {
+                        return DataType::Timestamptz(Some(dt));
+                    } else {
+                        return DataType::Timestamp(Some(dt.naive_utc()));
+                    }
+                },
+                _ => {
+                    tracing::error!("Failed to create DateTime from timestamp: {} {}", secs, nanos);
+                    return DataType::Null;
+                }
+            }
+        }
+    }
     
     // Check if this is actually a decimal with scale
     if let Some(scale_str) = scale_str {
@@ -320,12 +392,48 @@ fn handle_int16_array(array: &Int16Array, row_idx: usize, scale_str: Option<&str
     DataType::Int2(Some(val))
 }
 
-fn handle_int32_array(array: &Int32Array, row_idx: usize, scale_str: Option<&str>) -> DataType {
+fn handle_int32_array(array: &Int32Array, row_idx: usize, scale_str: Option<&str>, field: &Field) -> DataType {
     if array.is_null(row_idx) {
         return DataType::Null;
     }
     
     let val = array.value(row_idx);
+    
+    // Check if this is actually a timestamp based on metadata
+    if let Some(logical_type) = field.metadata().get("logicalType") {
+        if logical_type.contains("TIMESTAMP") {
+            // Convert to i64 and handle as timestamp
+            let val_i64 = val as i64;
+            // Determine scale factor
+            let scale = if let Some(scale_str) = scale_str {
+                scale_str.parse::<i32>().unwrap_or(0)
+            } else {
+                0
+            };
+            
+            // Convert based on scale
+            let (secs, nanos) = match scale {
+                3 => (val_i64 / 1000, ((val_i64 % 1000) * 1_000_000) as u32), // milliseconds
+                6 => (val_i64 / 1_000_000, ((val_i64 % 1_000_000) * 1000) as u32), // microseconds
+                9 => (val_i64 / 1_000_000_000, (val_i64 % 1_000_000_000) as u32), // nanoseconds
+                _ => (val_i64, 0), // seconds or unknown
+            };
+            
+            match Utc.timestamp_opt(secs, nanos) {
+                LocalResult::Single(dt) => {
+                    if logical_type.contains("_TZ") {
+                        return DataType::Timestamptz(Some(dt));
+                    } else {
+                        return DataType::Timestamp(Some(dt.naive_utc()));
+                    }
+                },
+                _ => {
+                    tracing::error!("Failed to create DateTime from timestamp: {} {}", secs, nanos);
+                    return DataType::Null;
+                }
+            }
+        }
+    }
     
     // Check if this is actually a decimal with scale
     if let Some(scale_str) = scale_str {
@@ -347,12 +455,48 @@ fn handle_int32_array(array: &Int32Array, row_idx: usize, scale_str: Option<&str
     DataType::Int4(Some(val))
 }
 
-fn handle_int64_array(array: &Int64Array, row_idx: usize, scale_str: Option<&str>) -> DataType {
+fn handle_int64_array(array: &Int64Array, row_idx: usize, scale_str: Option<&str>, field: &Field) -> DataType {
     if array.is_null(row_idx) {
         return DataType::Null;
     }
     
     let val = array.value(row_idx);
+    
+    // Check if this is actually a timestamp based on metadata
+    if let Some(logical_type) = field.metadata().get("logicalType") {
+        if logical_type.contains("TIMESTAMP") {
+            // This is a timestamp value - determine scale factor
+            let scale = if let Some(scale_str) = scale_str {
+                scale_str.parse::<i32>().unwrap_or(0)
+            } else {
+                0
+            };
+            
+            // Convert the value based on scale (usually 3 for milliseconds)
+            let (secs, nanos) = match scale {
+                3 => (val / 1000, ((val % 1000) * 1_000_000) as u32), // milliseconds
+                6 => (val / 1_000_000, ((val % 1_000_000) * 1000) as u32), // microseconds
+                9 => (val / 1_000_000_000, (val % 1_000_000_000) as u32), // nanoseconds
+                _ => (val, 0), // seconds or unknown
+            };
+            
+            // Create the timestamp
+            match Utc.timestamp_opt(secs, nanos) {
+                LocalResult::Single(dt) => {
+                    // Check if it should have timezone
+                    if logical_type.contains("_TZ") {
+                        return DataType::Timestamptz(Some(dt));
+                    } else {
+                        return DataType::Timestamp(Some(dt.naive_utc()));
+                    }
+                },
+                _ => {
+                    tracing::error!("Failed to create DateTime from timestamp: {} {}", secs, nanos);
+                    return DataType::Null;
+                }
+            }
+        }
+    }
     
     // Check if this is actually a decimal with scale
     if let Some(scale_str) = scale_str {
@@ -374,12 +518,48 @@ fn handle_int64_array(array: &Int64Array, row_idx: usize, scale_str: Option<&str
     DataType::Int8(Some(val))
 }
 
-fn handle_uint8_array(array: &UInt8Array, row_idx: usize, scale_str: Option<&str>) -> DataType {
+fn handle_uint8_array(array: &UInt8Array, row_idx: usize, scale_str: Option<&str>, field: &Field) -> DataType {
     if array.is_null(row_idx) {
         return DataType::Null;
     }
     
     let val = array.value(row_idx);
+    
+    // Check if this is actually a timestamp based on metadata
+    if let Some(logical_type) = field.metadata().get("logicalType") {
+        if logical_type.contains("TIMESTAMP") {
+            // Convert to i64 and handle as timestamp
+            let val_i64 = val as i64;
+            // Determine scale factor
+            let scale = if let Some(scale_str) = scale_str {
+                scale_str.parse::<i32>().unwrap_or(0)
+            } else {
+                0
+            };
+            
+            // Convert based on scale
+            let (secs, nanos) = match scale {
+                3 => (val_i64 / 1000, ((val_i64 % 1000) * 1_000_000) as u32), // milliseconds
+                6 => (val_i64 / 1_000_000, ((val_i64 % 1_000_000) * 1000) as u32), // microseconds
+                9 => (val_i64 / 1_000_000_000, (val_i64 % 1_000_000_000) as u32), // nanoseconds
+                _ => (val_i64, 0), // seconds or unknown
+            };
+            
+            match Utc.timestamp_opt(secs, nanos) {
+                LocalResult::Single(dt) => {
+                    if logical_type.contains("_TZ") {
+                        return DataType::Timestamptz(Some(dt));
+                    } else {
+                        return DataType::Timestamp(Some(dt.naive_utc()));
+                    }
+                },
+                _ => {
+                    tracing::error!("Failed to create DateTime from timestamp: {} {}", secs, nanos);
+                    return DataType::Null;
+                }
+            }
+        }
+    }
     
     // Check if this is actually a decimal with scale
     if let Some(scale_str) = scale_str {
@@ -401,12 +581,48 @@ fn handle_uint8_array(array: &UInt8Array, row_idx: usize, scale_str: Option<&str
     DataType::Int2(Some(val as i16))
 }
 
-fn handle_uint16_array(array: &UInt16Array, row_idx: usize, scale_str: Option<&str>) -> DataType {
+fn handle_uint16_array(array: &UInt16Array, row_idx: usize, scale_str: Option<&str>, field: &Field) -> DataType {
     if array.is_null(row_idx) {
         return DataType::Null;
     }
     
     let val = array.value(row_idx);
+    
+    // Check if this is actually a timestamp based on metadata
+    if let Some(logical_type) = field.metadata().get("logicalType") {
+        if logical_type.contains("TIMESTAMP") {
+            // Convert to i64 and handle as timestamp
+            let val_i64 = val as i64;
+            // Determine scale factor
+            let scale = if let Some(scale_str) = scale_str {
+                scale_str.parse::<i32>().unwrap_or(0)
+            } else {
+                0
+            };
+            
+            // Convert based on scale
+            let (secs, nanos) = match scale {
+                3 => (val_i64 / 1000, ((val_i64 % 1000) * 1_000_000) as u32), // milliseconds
+                6 => (val_i64 / 1_000_000, ((val_i64 % 1_000_000) * 1000) as u32), // microseconds
+                9 => (val_i64 / 1_000_000_000, (val_i64 % 1_000_000_000) as u32), // nanoseconds
+                _ => (val_i64, 0), // seconds or unknown
+            };
+            
+            match Utc.timestamp_opt(secs, nanos) {
+                LocalResult::Single(dt) => {
+                    if logical_type.contains("_TZ") {
+                        return DataType::Timestamptz(Some(dt));
+                    } else {
+                        return DataType::Timestamp(Some(dt.naive_utc()));
+                    }
+                },
+                _ => {
+                    tracing::error!("Failed to create DateTime from timestamp: {} {}", secs, nanos);
+                    return DataType::Null;
+                }
+            }
+        }
+    }
     
     // Check if this is actually a decimal with scale
     if let Some(scale_str) = scale_str {
@@ -428,12 +644,48 @@ fn handle_uint16_array(array: &UInt16Array, row_idx: usize, scale_str: Option<&s
     DataType::Int4(Some(val as i32))
 }
 
-fn handle_uint32_array(array: &UInt32Array, row_idx: usize, scale_str: Option<&str>) -> DataType {
+fn handle_uint32_array(array: &UInt32Array, row_idx: usize, scale_str: Option<&str>, field: &Field) -> DataType {
     if array.is_null(row_idx) {
         return DataType::Null;
     }
     
     let val = array.value(row_idx);
+    
+    // Check if this is actually a timestamp based on metadata
+    if let Some(logical_type) = field.metadata().get("logicalType") {
+        if logical_type.contains("TIMESTAMP") {
+            // Convert to i64 and handle as timestamp
+            let val_i64 = val as i64;
+            // Determine scale factor
+            let scale = if let Some(scale_str) = scale_str {
+                scale_str.parse::<i32>().unwrap_or(0)
+            } else {
+                0
+            };
+            
+            // Convert based on scale
+            let (secs, nanos) = match scale {
+                3 => (val_i64 / 1000, ((val_i64 % 1000) * 1_000_000) as u32), // milliseconds
+                6 => (val_i64 / 1_000_000, ((val_i64 % 1_000_000) * 1000) as u32), // microseconds
+                9 => (val_i64 / 1_000_000_000, (val_i64 % 1_000_000_000) as u32), // nanoseconds
+                _ => (val_i64, 0), // seconds or unknown
+            };
+            
+            match Utc.timestamp_opt(secs, nanos) {
+                LocalResult::Single(dt) => {
+                    if logical_type.contains("_TZ") {
+                        return DataType::Timestamptz(Some(dt));
+                    } else {
+                        return DataType::Timestamp(Some(dt.naive_utc()));
+                    }
+                },
+                _ => {
+                    tracing::error!("Failed to create DateTime from timestamp: {} {}", secs, nanos);
+                    return DataType::Null;
+                }
+            }
+        }
+    }
     
     // Check if this is actually a decimal with scale
     if let Some(scale_str) = scale_str {
@@ -455,12 +707,48 @@ fn handle_uint32_array(array: &UInt32Array, row_idx: usize, scale_str: Option<&s
     DataType::Int8(Some(val as i64))
 }
 
-fn handle_uint64_array(array: &UInt64Array, row_idx: usize, scale_str: Option<&str>) -> DataType {
+fn handle_uint64_array(array: &UInt64Array, row_idx: usize, scale_str: Option<&str>, field: &Field) -> DataType {
     if array.is_null(row_idx) {
         return DataType::Null;
     }
     
     let val = array.value(row_idx);
+    
+    // Check if this is actually a timestamp based on metadata
+    if let Some(logical_type) = field.metadata().get("logicalType") {
+        if logical_type.contains("TIMESTAMP") {
+            // Convert to i64 and handle as timestamp (with potential truncation for very large values)
+            let val_i64 = val as i64;
+            // Determine scale factor
+            let scale = if let Some(scale_str) = scale_str {
+                scale_str.parse::<i32>().unwrap_or(0)
+            } else {
+                0
+            };
+            
+            // Convert based on scale
+            let (secs, nanos) = match scale {
+                3 => (val_i64 / 1000, ((val_i64 % 1000) * 1_000_000) as u32), // milliseconds
+                6 => (val_i64 / 1_000_000, ((val_i64 % 1_000_000) * 1000) as u32), // microseconds
+                9 => (val_i64 / 1_000_000_000, (val_i64 % 1_000_000_000) as u32), // nanoseconds
+                _ => (val_i64, 0), // seconds or unknown
+            };
+            
+            match Utc.timestamp_opt(secs, nanos) {
+                LocalResult::Single(dt) => {
+                    if logical_type.contains("_TZ") {
+                        return DataType::Timestamptz(Some(dt));
+                    } else {
+                        return DataType::Timestamp(Some(dt.naive_utc()));
+                    }
+                },
+                _ => {
+                    tracing::error!("Failed to create DateTime from timestamp: {} {}", secs, nanos);
+                    return DataType::Null;
+                }
+            }
+        }
+    }
     
     // Check if this is actually a decimal with scale
     if let Some(scale_str) = scale_str {
@@ -482,12 +770,48 @@ fn handle_uint64_array(array: &UInt64Array, row_idx: usize, scale_str: Option<&s
     DataType::Int8(Some(val as i64))
 }
 
-fn handle_float32_array(array: &Float32Array, row_idx: usize, scale_str: Option<&str>) -> DataType {
+fn handle_float32_array(array: &Float32Array, row_idx: usize, scale_str: Option<&str>, field: &Field) -> DataType {
     if array.is_null(row_idx) {
         return DataType::Null;
     }
     
     let val = array.value(row_idx);
+    
+    // Check if this is actually a timestamp based on metadata
+    if let Some(logical_type) = field.metadata().get("logicalType") {
+        if logical_type.contains("TIMESTAMP") {
+            // Convert to i64 and handle as timestamp
+            let val_i64 = val as i64;
+            // Determine scale factor
+            let scale = if let Some(scale_str) = scale_str {
+                scale_str.parse::<i32>().unwrap_or(0)
+            } else {
+                0
+            };
+            
+            // Convert based on scale
+            let (secs, nanos) = match scale {
+                3 => (val_i64 / 1000, ((val_i64 % 1000) * 1_000_000) as u32), // milliseconds
+                6 => (val_i64 / 1_000_000, ((val_i64 % 1_000_000) * 1000) as u32), // microseconds
+                9 => (val_i64 / 1_000_000_000, (val_i64 % 1_000_000_000) as u32), // nanoseconds
+                _ => (val_i64, 0), // seconds or unknown
+            };
+            
+            match Utc.timestamp_opt(secs, nanos) {
+                LocalResult::Single(dt) => {
+                    if logical_type.contains("_TZ") {
+                        return DataType::Timestamptz(Some(dt));
+                    } else {
+                        return DataType::Timestamp(Some(dt.naive_utc()));
+                    }
+                },
+                _ => {
+                    tracing::error!("Failed to create DateTime from timestamp: {} {}", secs, nanos);
+                    return DataType::Null;
+                }
+            }
+        }
+    }
     
     // Check if this is actually a decimal with scale
     if let Some(scale_str) = scale_str {
@@ -508,12 +832,48 @@ fn handle_float32_array(array: &Float32Array, row_idx: usize, scale_str: Option<
     DataType::Float4(Some(val))
 }
 
-fn handle_float64_array(array: &Float64Array, row_idx: usize, scale_str: Option<&str>) -> DataType {
+fn handle_float64_array(array: &Float64Array, row_idx: usize, scale_str: Option<&str>, field: &Field) -> DataType {
     if array.is_null(row_idx) {
         return DataType::Null;
     }
     
     let val = array.value(row_idx);
+    
+    // Check if this is actually a timestamp based on metadata
+    if let Some(logical_type) = field.metadata().get("logicalType") {
+        if logical_type.contains("TIMESTAMP") {
+            // Convert to i64 and handle as timestamp
+            let val_i64 = val as i64;
+            // Determine scale factor
+            let scale = if let Some(scale_str) = scale_str {
+                scale_str.parse::<i32>().unwrap_or(0)
+            } else {
+                0
+            };
+            
+            // Convert based on scale
+            let (secs, nanos) = match scale {
+                3 => (val_i64 / 1000, ((val_i64 % 1000) * 1_000_000) as u32), // milliseconds
+                6 => (val_i64 / 1_000_000, ((val_i64 % 1_000_000) * 1000) as u32), // microseconds
+                9 => (val_i64 / 1_000_000_000, (val_i64 % 1_000_000_000) as u32), // nanoseconds
+                _ => (val_i64, 0), // seconds or unknown
+            };
+            
+            match Utc.timestamp_opt(secs, nanos) {
+                LocalResult::Single(dt) => {
+                    if logical_type.contains("_TZ") {
+                        return DataType::Timestamptz(Some(dt));
+                    } else {
+                        return DataType::Timestamp(Some(dt.naive_utc()));
+                    }
+                },
+                _ => {
+                    tracing::error!("Failed to create DateTime from timestamp: {} {}", secs, nanos);
+                    return DataType::Null;
+                }
+            }
+        }
+    }
     
     // Check if this is actually a decimal with scale
     if let Some(scale_str) = scale_str {
@@ -626,45 +986,22 @@ fn handle_timestamp_array(
             TimeUnit::Nanosecond => (nanos / 1_000_000_000, nanos % 1_000_000_000),
         };
 
-        // The issue appears to be a timezone offset. For TimestampNtz we need to
-        // ensure the exact seconds value is used without any adjustments
-        let result = if let Some(_) = tz {
-            // With timezone - use normal timestamp parsing
-            match parse_snowflake_timestamp(secs as i64, subsec_nanos as u32) {
-                Ok(dt) => DataType::Timestamptz(Some(dt)),
-                Err(e) => {
-                    tracing::error!("Failed to parse timestamp: {}", e);
-                    DataType::Null
+        // Create a timestamp from the seconds and nanoseconds
+        match Utc.timestamp_opt(secs as i64, subsec_nanos as u32) {
+            LocalResult::Single(dt) => {
+                // Check if timezone is present
+                if tz.is_some() {
+                    DataType::Timestamptz(Some(dt))
+                } else {
+                    // Without timezone, use NaiveDateTime
+                    DataType::Timestamp(Some(dt.naive_utc()))
                 }
+            },
+            _ => {
+                tracing::error!("Failed to create DateTime from timestamp: {} {}", secs, subsec_nanos);
+                DataType::Null
             }
-        } else {
-            // Without timezone - we need to avoid UTC adjustments
-            // Convert directly to NaiveDateTime using the raw timestamp value
-            // This is likely the case for RETURN_CREATED_AT and EXPIRATION_DATE
-            
-            // We know from testing that there is exactly a 20 minute difference,
-            // which suggests a timezone offset issue.
-            
-            // Directly create the timestamp from epoch seconds accounting for the timezone
-            match Utc.timestamp_opt(secs as i64, subsec_nanos as u32) {
-                LocalResult::Single(dt) => {
-                    let dt_naive = dt.naive_utc();
-                    DataType::Timestamp(Some(dt_naive))
-                },
-                _ => {
-                    tracing::error!("Failed to create NaiveDateTime from timestamp: {} {}", secs, subsec_nanos);
-                    DataType::Null
-                }
-            }
-        };
-        
-        // For debugging
-        if let DataType::Timestamp(Some(dt)) = &result {
-            tracing::debug!("Timestamp conversion: raw_nanos={}, secs={}, nanos={}, result={}",
-                debug_nanos, secs, subsec_nanos, dt);
         }
-        
-        result
     }
 }
 
@@ -854,43 +1191,43 @@ fn convert_array_to_datatype(column: &arrow::array::ArrayRef, field: &Field, row
         },
         ArrowDataType::Int8 => {
             let array = column.as_any().downcast_ref::<Int8Array>().unwrap();
-            handle_int8_array(array, row_idx, scale_str.map(|s| s.as_str()))
+            handle_int8_array(array, row_idx, scale_str.map(|s| s.as_str()), field)
         },
         ArrowDataType::Int16 => {
             let array = column.as_any().downcast_ref::<Int16Array>().unwrap();
-            handle_int16_array(array, row_idx, scale_str.map(|s| s.as_str()))
+            handle_int16_array(array, row_idx, scale_str.map(|s| s.as_str()), field)
         },
         ArrowDataType::Int32 => {
             let array = column.as_any().downcast_ref::<Int32Array>().unwrap();
-            handle_int32_array(array, row_idx, scale_str.map(|s| s.as_str()))
+            handle_int32_array(array, row_idx, scale_str.map(|s| s.as_str()), field)
         },
         ArrowDataType::Int64 => {
             let array = column.as_any().downcast_ref::<Int64Array>().unwrap();
-            handle_int64_array(array, row_idx, scale_str.map(|s| s.as_str()))
+            handle_int64_array(array, row_idx, scale_str.map(|s| s.as_str()), field)
         },
         ArrowDataType::UInt8 => {
             let array = column.as_any().downcast_ref::<UInt8Array>().unwrap();
-            handle_uint8_array(array, row_idx, scale_str.map(|s| s.as_str()))
+            handle_uint8_array(array, row_idx, scale_str.map(|s| s.as_str()), field)
         },
         ArrowDataType::UInt16 => {
             let array = column.as_any().downcast_ref::<UInt16Array>().unwrap();
-            handle_uint16_array(array, row_idx, scale_str.map(|s| s.as_str()))
+            handle_uint16_array(array, row_idx, scale_str.map(|s| s.as_str()), field)
         },
         ArrowDataType::UInt32 => {
             let array = column.as_any().downcast_ref::<UInt32Array>().unwrap();
-            handle_uint32_array(array, row_idx, scale_str.map(|s| s.as_str()))
+            handle_uint32_array(array, row_idx, scale_str.map(|s| s.as_str()), field)
         },
         ArrowDataType::UInt64 => {
             let array = column.as_any().downcast_ref::<UInt64Array>().unwrap();
-            handle_uint64_array(array, row_idx, scale_str.map(|s| s.as_str()))
+            handle_uint64_array(array, row_idx, scale_str.map(|s| s.as_str()), field)
         },
         ArrowDataType::Float32 => {
             let array = column.as_any().downcast_ref::<Float32Array>().unwrap();
-            handle_float32_array(array, row_idx, scale_str.map(|s| s.as_str()))
+            handle_float32_array(array, row_idx, scale_str.map(|s| s.as_str()), field)
         },
         ArrowDataType::Float64 => {
             let array = column.as_any().downcast_ref::<Float64Array>().unwrap();
-            handle_float64_array(array, row_idx, scale_str.map(|s| s.as_str()))
+            handle_float64_array(array, row_idx, scale_str.map(|s| s.as_str()), field)
         },
         ArrowDataType::Utf8 => {
             let array = column.as_any().downcast_ref::<StringArray>().unwrap();
@@ -917,9 +1254,66 @@ fn convert_array_to_datatype(column: &arrow::array::ArrayRef, field: &Field, row
             handle_date64_array(array, row_idx)
         },
         ArrowDataType::Timestamp(unit, tz) => {
-            let array = column.as_any().downcast_ref::<TimestampNanosecondArray>().unwrap();
-            let tz_string = tz.as_ref().map(|tz_str| tz_str.to_string());
-            handle_timestamp_array(array, row_idx, unit, tz_string.as_ref())
+            // Handle different timestamp array types based on time unit
+            let value = match unit {
+                TimeUnit::Second => {
+                    if let Some(array) = column.as_any().downcast_ref::<TimestampSecondArray>() {
+                        array.value(row_idx)
+                    } else if let Some(array) = column.as_any().downcast_ref::<TimestampNanosecondArray>() {
+                        array.value(row_idx)
+                    } else {
+                        return DataType::Null;
+                    }
+                },
+                TimeUnit::Millisecond => {
+                    if let Some(array) = column.as_any().downcast_ref::<TimestampMillisecondArray>() {
+                        array.value(row_idx)
+                    } else if let Some(array) = column.as_any().downcast_ref::<TimestampNanosecondArray>() {
+                        array.value(row_idx)
+                    } else {
+                        return DataType::Null;
+                    }
+                },
+                TimeUnit::Microsecond => {
+                    if let Some(array) = column.as_any().downcast_ref::<TimestampMicrosecondArray>() {
+                        array.value(row_idx)
+                    } else if let Some(array) = column.as_any().downcast_ref::<TimestampNanosecondArray>() {
+                        array.value(row_idx)
+                    } else {
+                        return DataType::Null;
+                    }
+                },
+                TimeUnit::Nanosecond => {
+                    if let Some(array) = column.as_any().downcast_ref::<TimestampNanosecondArray>() {
+                        array.value(row_idx)
+                    } else {
+                        return DataType::Null;
+                    }
+                },
+            };
+            
+            // Convert the value to the appropriate seconds and nanoseconds
+            let (secs, subsec_nanos) = match unit {
+                TimeUnit::Second => (value, 0),
+                TimeUnit::Millisecond => (value / 1000, (value % 1000) * 1_000_000),
+                TimeUnit::Microsecond => (value / 1_000_000, (value % 1_000_000) * 1000),
+                TimeUnit::Nanosecond => (value / 1_000_000_000, value % 1_000_000_000),
+            };
+            
+            // Apply the timestamp conversion directly here rather than using handle_timestamp_array
+            match Utc.timestamp_opt(secs as i64, subsec_nanos as u32) {
+                LocalResult::Single(dt) => {
+                    // Key change: Check if the field has timezone information and return appropriate type
+                    match tz {
+                        Some(_) => DataType::Timestamptz(Some(dt)),
+                        None => DataType::Timestamp(Some(dt.naive_utc())),
+                    }
+                },
+                _ => {
+                    tracing::error!("Failed to create DateTime from timestamp: {} {}", secs, subsec_nanos);
+                    DataType::Null
+                }
+            }
         },
         ArrowDataType::Decimal128(_, scale) => {
             let array = column.as_any().downcast_ref::<Decimal128Array>().unwrap();
@@ -1394,12 +1788,15 @@ mod tests {
             };
             
             // Create field with appropriate metadata
-            let tz_option = if *has_tz { Some("UTC".to_string()) } else { None };
-            let arrow_tz = tz_option.as_ref().map(|s| s.as_str().into());
+            let tz_option = if *has_tz { 
+                Some(Arc::from("UTC")) 
+            } else { 
+                None 
+            };
 
             let field = Field::new(
                 "TIMESTAMP_COLUMN",
-                ArrowDataType::Timestamp(*time_unit, arrow_tz),
+                ArrowDataType::Timestamp(*time_unit, tz_option),
                 false,
             );
             
