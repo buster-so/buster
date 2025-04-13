@@ -7,6 +7,7 @@ import { sharedMeta } from './BusterChartShared';
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { useDebounceFn } from '@/hooks';
+import dayjs from 'dayjs';
 
 type ScatterChartData = ReturnType<typeof generateScatterChartData>;
 
@@ -184,6 +185,249 @@ export const ScatterWithTrendline_NumericalXAxisPolynomialRegression: Story = {
       index: {
         columnType: 'number',
         style: 'number'
+      },
+      revenue: {
+        columnType: 'number',
+        style: 'currency',
+        currency: 'USD'
+      }
+    }
+  }
+};
+
+export const ScatterWithTrendline_DateXAxisPolynomialRegression: Story = {
+  args: {
+    selectedChartType: ChartType.Scatter,
+    data: Array.from({ length: 30 }, (_, i) => {
+      // Generate polynomial-like data with random noise
+      const x = i / 5; // Scale x to make the curve more visible
+      const noise = Math.round((Math.random() - 0.5) * 400);
+      const value = Math.round(
+        100 * Math.pow(x, 2) - // quadratic term
+          50 * x + // linear term
+          1000 + // constant term
+          noise // random variation
+      );
+      return {
+        date: dayjs('2020-01-01').add(i, 'day').toDate(),
+        revenue: value
+      };
+    }),
+    scatterAxis: {
+      x: ['date'],
+      y: ['revenue'],
+      category: []
+    },
+    className: 'w-[800px] h-[400px]',
+    trendlines: [
+      {
+        type: 'polynomial_regression',
+        show: true,
+        showTrendlineLabel: true,
+        trendlineLabel: 'Polynomial Growth Pattern',
+        trendLineColor: 'red',
+        columnId: 'revenue'
+      }
+    ],
+    columnLabelFormats: {
+      date: {
+        columnType: 'date',
+        style: 'date',
+        dateFormat: 'auto'
+      },
+      revenue: {
+        columnType: 'number',
+        style: 'currency',
+        currency: 'USD'
+      }
+    }
+  }
+};
+
+export const ScatterWithTrendline_NumericalXAxisLinearRegression: Story = {
+  args: {
+    selectedChartType: ChartType.Scatter,
+    data: Array.from({ length: 30 }, (_, i) => {
+      // Generate polynomial-like data with random noise
+      const x = i / 5; // Scale x to make the curve more visible
+      const noise = Math.round((Math.random() - 0.5) * 400);
+      const value = Math.round(
+        100 * Math.pow(x, 2) - // quadratic term
+          50 * x + // linear term
+          1000 + // constant term
+          noise // random variation
+      );
+      return {
+        index: i + 1,
+        revenue: value
+      };
+    }),
+    scatterAxis: {
+      x: ['index'],
+      y: ['revenue'],
+      category: []
+    },
+    className: 'w-[800px] h-[400px]',
+    trendlines: [
+      {
+        type: 'linear_regression',
+        show: true,
+        showTrendlineLabel: true,
+        trendlineLabel: 'Linear Growth Pattern',
+        trendLineColor: 'red',
+        columnId: 'revenue'
+      }
+    ],
+    columnLabelFormats: {
+      index: {
+        columnType: 'number',
+        style: 'number'
+      },
+      revenue: {
+        columnType: 'number',
+        style: 'currency',
+        currency: 'USD'
+      }
+    }
+  }
+};
+
+export const ScatterWithTrendline_DateXAxisLinearRegression: Story = {
+  args: {
+    selectedChartType: ChartType.Scatter,
+    data: Array.from({ length: 30 }, (_, i) => {
+      // Generate polynomial-like data with random noise
+      const x = i / 5; // Scale x to make the curve more visible
+      const noise = Math.round((Math.random() - 0.5) * 400);
+      const value = Math.round(
+        100 * Math.pow(x, 2) - // quadratic term
+          50 * x + // linear term
+          1000 + // constant term
+          noise // random variation
+      );
+      return {
+        date: dayjs('2020-01-01').add(i, 'day').toDate(),
+        revenue: value
+      };
+    }),
+    scatterAxis: {
+      x: ['date'],
+      y: ['revenue'],
+      category: []
+    },
+    className: 'w-[800px] h-[400px]',
+    trendlines: [
+      {
+        type: 'linear_regression',
+        show: true,
+        showTrendlineLabel: true,
+        trendlineLabel: 'Linear Growth Pattern',
+        trendLineColor: 'red',
+        columnId: 'revenue'
+      }
+    ],
+    columnLabelFormats: {
+      date: {
+        columnType: 'date',
+        style: 'date',
+        dateFormat: 'auto'
+      },
+      revenue: {
+        columnType: 'number',
+        style: 'currency',
+        currency: 'USD'
+      }
+    }
+  }
+};
+
+export const ScatterWithTrendline_NumericalXAxisLogarithmicRegression: Story = {
+  args: {
+    selectedChartType: ChartType.Scatter,
+    data: Array.from({ length: 30 }, (_, i) => {
+      // Generate polynomial-like data with random noise
+      const x = i / 5; // Scale x to make the curve more visible
+      const noise = Math.round((Math.random() - 0.5) * 400);
+      const value = Math.round(
+        100 * Math.pow(x, 2) - // quadratic term
+          50 * x + // linear term
+          1000 + // constant term
+          noise // random variation
+      );
+      return {
+        index: i + 1,
+        revenue: value
+      };
+    }),
+    scatterAxis: {
+      x: ['index'],
+      y: ['revenue'],
+      category: []
+    },
+    className: 'w-[800px] h-[400px]',
+    trendlines: [
+      {
+        type: 'logarithmic_regression',
+        show: true,
+        showTrendlineLabel: true,
+        trendlineLabel: 'Logarithmic Growth Pattern',
+        trendLineColor: 'red',
+        columnId: 'revenue'
+      }
+    ],
+    columnLabelFormats: {
+      index: {
+        columnType: 'number',
+        style: 'number'
+      },
+      revenue: {
+        columnType: 'number',
+        style: 'currency',
+        currency: 'USD'
+      }
+    }
+  }
+};
+
+export const ScatterWithTrendline_DateXAxisLogarithmicRegression: Story = {
+  args: {
+    selectedChartType: ChartType.Scatter,
+    data: Array.from({ length: 30 }, (_, i) => {
+      // Generate polynomial-like data with random noise
+      const x = i / 5; // Scale x to make the curve more visible
+      const noise = Math.round((Math.random() - 0.5) * 400);
+      const value = Math.round(
+        100 * Math.pow(x, 2) - // quadratic term
+          50 * x + // linear term
+          1000 + // constant term
+          noise // random variation
+      );
+      return {
+        date: dayjs('2020-01-01').add(i, 'day').toDate(),
+        revenue: value
+      };
+    }),
+    scatterAxis: {
+      x: ['date'],
+      y: ['revenue'],
+      category: []
+    },
+    className: 'w-[800px] h-[400px]',
+    trendlines: [
+      {
+        type: 'logarithmic_regression',
+        show: true,
+        showTrendlineLabel: true,
+        trendlineLabel: 'Logarithmic Growth Pattern',
+        trendLineColor: 'red',
+        columnId: 'revenue'
+      }
+    ],
+    columnLabelFormats: {
+      date: {
+        columnType: 'date',
+        style: 'date',
+        dateFormat: 'auto'
       },
       revenue: {
         columnType: 'number',
