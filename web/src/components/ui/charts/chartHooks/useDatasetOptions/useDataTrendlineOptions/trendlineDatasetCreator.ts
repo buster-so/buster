@@ -1,3 +1,5 @@
+// Also consider modifying this package to make it work with chartjs 4 https://pomgui.github.io/chartjs-plugin-regression/demo/
+
 import type { BusterChartProps, Trendline } from '@/api/asset_interfaces/metric/charts';
 import type { DatasetOption } from '../interfaces';
 import type { TrendlineDataset } from './trendlineDataset.types';

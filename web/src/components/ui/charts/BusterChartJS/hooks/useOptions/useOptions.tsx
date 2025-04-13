@@ -17,8 +17,6 @@ import { useY2Axis } from './useY2Axis';
 import { AnnotationPluginOptions } from 'chartjs-plugin-annotation';
 import type { BusterChartTypeComponentProps } from '../../../interfaces';
 import {
-  ANIMATION_DURATION,
-  ANIMATION_THRESHOLD,
   LINE_DECIMATION_SAMPLES,
   LINE_DECIMATION_THRESHOLD,
   TOOLTIP_THRESHOLD

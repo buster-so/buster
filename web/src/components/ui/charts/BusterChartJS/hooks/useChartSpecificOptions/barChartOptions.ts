@@ -13,11 +13,7 @@ export const barOptionsHandler = (
 export const barPluginsHandler = ({
   barShowTotalAtTop,
   barGroupType,
-  columnLabelFormats,
-  selectedAxis,
-  columnSettings,
-  data,
-  ...rest
+  columnSettings
 }: ChartSpecificOptionsProps): DeepPartial<PluginChartOptions<ChartJSChartType>>['plugins'] => {
   const hasShowLabelAsPercentage = Object.entries(columnSettings || {}).some(
     ([key, columnSetting]) => columnSetting?.showDataLabelsAsPercentage
@@ -26,9 +22,6 @@ export const barPluginsHandler = ({
   return {
     totalizer: {
       enabled: (barShowTotalAtTop && barGroupType === 'stack') || hasShowLabelAsPercentage
-    },
-    annotation: {
-      annotations: barShowTotalAtTop ? undefined : undefined
     }
   };
 };

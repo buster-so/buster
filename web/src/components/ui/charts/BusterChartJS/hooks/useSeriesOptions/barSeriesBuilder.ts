@@ -57,7 +57,7 @@ export const barSeriesBuilder = ({
           });
           hasBeenDrawn = true;
         }
-        return canDisplay;
+        return canDisplay ? 'auto' : false;
       },
       formatter: function (_, context) {
         const canUseSameYFormatter = yAxisSimilar(yAxis, columnLabelFormats);
@@ -75,7 +75,7 @@ export const barSeriesBuilder = ({
       align: 'end',
       clamp: true,
       clip: false,
-      z: 1000,
+      z: 999,
       ...defaultLabelOptionConfig
     } as NonNullable<Options['labels']>['stackTotal'];
   }
