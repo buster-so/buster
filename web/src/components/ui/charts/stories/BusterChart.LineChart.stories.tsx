@@ -835,7 +835,7 @@ export const WithTrendline_MaxMinAverageMedian: Story = {
   }
 };
 
-export const WithTrendline_LinearRegression: Story = {
+export const WithTrendline_DateXAxisLinearRegression: Story = {
   args: {
     selectedChartType: ChartType.Line,
     data: Array.from({ length: 12 }, (_, i) => ({
@@ -873,7 +873,81 @@ export const WithTrendline_LinearRegression: Story = {
   }
 };
 
-export const WithTrendline_LogarithmicRegression: Story = {
+export const WithTrendline_NumericalXAxisLinearRegression: Story = {
+  args: {
+    selectedChartType: ChartType.Line,
+    data: Array.from({ length: 12 }, (_, i) => ({
+      index: i + 1,
+      revenue: Math.round(100 * Math.pow(1.5, i)) // Using exponential growth with base 1.5
+    })),
+    barAndLineAxis: {
+      x: ['index'],
+      y: ['revenue'],
+      category: []
+    },
+    className: 'w-[800px] h-[400px]',
+    trendlines: [
+      {
+        type: 'linear_regression',
+        show: true,
+        showTrendlineLabel: true,
+        trendlineLabel: 'Testing Linear Regression',
+        trendLineColor: 'red',
+        columnId: 'revenue'
+      }
+    ],
+    columnLabelFormats: {
+      index: {
+        columnType: 'number',
+        style: 'number'
+      },
+      revenue: {
+        columnType: 'number',
+        style: 'currency',
+        currency: 'USD'
+      }
+    }
+  }
+};
+
+export const WithTrendline_StringXAxisLinearRegression: Story = {
+  args: {
+    selectedChartType: ChartType.Line,
+    data: Array.from({ length: 12 }, (_, i) => ({
+      index: `Product ${i + 1}`,
+      revenue: Math.round(100 * Math.pow(1.5, i)) // Using exponential growth with base 1.5
+    })),
+    barAndLineAxis: {
+      x: ['index'],
+      y: ['revenue'],
+      category: []
+    },
+    className: 'w-[800px] h-[400px]',
+    trendlines: [
+      {
+        type: 'linear_regression',
+        show: true,
+        showTrendlineLabel: true,
+        trendlineLabel: 'Testing Linear Regression',
+        trendLineColor: 'red',
+        columnId: 'revenue'
+      }
+    ],
+    columnLabelFormats: {
+      index: {
+        columnType: 'text',
+        style: 'string'
+      },
+      revenue: {
+        columnType: 'number',
+        style: 'currency',
+        currency: 'USD'
+      }
+    }
+  }
+};
+
+export const WithTrendline_DateXAxisLogarithmicRegression: Story = {
   args: {
     selectedChartType: ChartType.Line,
     data: Array.from({ length: 30 }, (_, i) => {
@@ -912,6 +986,54 @@ export const WithTrendline_LogarithmicRegression: Story = {
         columnType: 'date',
         style: 'date',
         dateFormat: 'auto'
+      },
+      revenue: {
+        columnType: 'number',
+        style: 'currency',
+        currency: 'USD'
+      }
+    }
+  }
+};
+
+export const WithTrendline_NumericalXAxisLogarithmicRegression: Story = {
+  args: {
+    selectedChartType: ChartType.Line,
+    data: Array.from({ length: 30 }, (_, i) => {
+      // Add random noise between -200 and 200
+      const noise = Math.round((Math.random() - 0.5) * 400);
+      // Less steep logarithmic curve with linear component and noise
+      const value = Math.round(
+        800 * Math.log(i + 1) + // logarithmic component
+          i * 30 + // linear component
+          500 + // base value
+          noise // random variation
+      );
+      return {
+        index: i + 1,
+        revenue: value
+      };
+    }),
+    barAndLineAxis: {
+      x: ['index'],
+      y: ['revenue'],
+      category: []
+    },
+    className: 'w-[800px] h-[400px]',
+    trendlines: [
+      {
+        type: 'logarithmic_regression',
+        show: true,
+        showTrendlineLabel: true,
+        trendlineLabel: 'Logarithmic Growth Pattern',
+        trendLineColor: 'red',
+        columnId: 'revenue'
+      }
+    ],
+    columnLabelFormats: {
+      index: {
+        columnType: 'number',
+        style: 'number'
       },
       revenue: {
         columnType: 'number',

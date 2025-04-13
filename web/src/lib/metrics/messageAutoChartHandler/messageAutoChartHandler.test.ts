@@ -68,6 +68,7 @@ describe('createDefaultChartConfig', () => {
       pieDonutWidth: 40,
       pieMinimumSlicePercentage: 0,
       pieDisplayLabelAs: 'number',
+      pieSortBy: 'value',
       metricColumnId: 'test',
       metricValueAggregate: 'sum',
       metricHeader: null,
