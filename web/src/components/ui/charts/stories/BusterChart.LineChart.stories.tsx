@@ -1237,86 +1237,6 @@ export const WithTrendline_StringXAxisLogarithmicRegression: Story = {
   }
 };
 
-// export const WithTrendline_PolynomialRegression: Story = {
-//   args: {
-//     selectedChartType: ChartType.Line,
-//     data: Array.from({ length: 12 }, (_, i) => ({
-//       date: new Date(2024, 0, i + 1).toISOString(),
-//       revenue: Math.round(100 * Math.pow(1.5, i)) // Using exponential growth with base 1.5
-//     })),
-//     barAndLineAxis: {
-//       x: ['date'],
-//       y: ['revenue'],
-//       category: []
-//     },
-//     className: 'w-[800px] h-[400px]',
-//     trendlines: [
-//       {
-//         type: 'polynomial_regression',
-//         show: true,
-//         showTrendlineLabel: true,
-//         trendlineLabel: 'Testing Polynomial Regression',
-//         trendLineColor: 'red',
-//         columnId: 'revenue'
-//       }
-//     ],
-//     columnLabelFormats: {
-//       date: {
-//         columnType: 'date',
-//         style: 'date',
-//         dateFormat: 'auto'
-//       },
-//       revenue: {
-//         columnType: 'number',
-//         style: 'currency',
-//         currency: 'USD'
-//       }
-//     }
-//   }
-// };
-
-// export const WithTrendline_PolynomialRegression_Scatter: Story = {
-//   args: {
-//     selectedChartType: ChartType.Scatter,
-//     data: Array.from({ length: 3 }).flatMap((_, productIndex) =>
-//       Array.from({ length: 12 }, (_, i) => ({
-//         expenses: i,
-//         revenue: faker.number.int({ min: 150 + i, max: 150 * (i + 1.2) })
-//       }))
-//     ),
-//     scatterAxis: {
-//       x: ['expenses'],
-//       y: ['revenue'],
-//       category: []
-//     },
-//     className: 'w-[800px] h-[400px]',
-//     trendlines: [
-//       {
-//         type: 'polynomial_regression',
-//         show: true,
-//         showTrendlineLabel: true,
-//         trendlineLabel: 'Testing Polynomial Regression',
-//         trendLineColor: 'red',
-//         columnId: 'revenue'
-//       }
-//     ],
-//     columnLabelFormats: {
-//       expenses: {
-//         columnType: 'number',
-//         style: 'number',
-//         minimumFractionDigits: 0,
-//         maximumFractionDigits: 0
-//       } satisfies IColumnLabelFormat,
-//       revenue: {
-//         columnType: 'number',
-//         style: 'number',
-//         minimumFractionDigits: 0,
-//         maximumFractionDigits: 0
-//       } satisfies IColumnLabelFormat
-//     }
-//   }
-// };
-
 export const ExponentialDecreaseWithTrendline: Story = {
   args: {
     selectedChartType: ChartType.Line,
@@ -1361,5 +1281,150 @@ export const ExponentialDecreaseWithTrendline: Story = {
         trendlineLabel: 'Exponential Trend'
       }
     ]
+  }
+};
+
+export const WithTrendline_DateXAxisPolynomialRegression: Story = {
+  args: {
+    selectedChartType: ChartType.Line,
+    data: Array.from({ length: 30 }, (_, i) => {
+      // Generate polynomial-like data with random noise
+      const x = i / 5; // Scale x to make the curve more visible
+      const noise = Math.round((Math.random() - 0.5) * 400);
+      const value = Math.round(
+        100 * Math.pow(x, 2) - // quadratic term
+          50 * x + // linear term
+          1000 + // constant term
+          noise // random variation
+      );
+      return {
+        date: dayjs('2024-01-01').add(i, 'day').toISOString(),
+        revenue: value
+      };
+    }),
+    barAndLineAxis: {
+      x: ['date'],
+      y: ['revenue'],
+      category: []
+    },
+    className: 'w-[800px] h-[400px]',
+    trendlines: [
+      {
+        type: 'polynomial_regression',
+        show: true,
+        showTrendlineLabel: true,
+        trendlineLabel: 'Polynomial Growth Pattern',
+        trendLineColor: 'red',
+        columnId: 'revenue'
+      }
+    ],
+    columnLabelFormats: {
+      date: {
+        columnType: 'date',
+        style: 'date',
+        dateFormat: 'auto'
+      },
+      revenue: {
+        columnType: 'number',
+        style: 'currency',
+        currency: 'USD'
+      }
+    }
+  }
+};
+
+export const WithTrendline_NumericalXAxisPolynomialRegression: Story = {
+  args: {
+    selectedChartType: ChartType.Line,
+    data: Array.from({ length: 30 }, (_, i) => {
+      // Generate polynomial-like data with random noise
+      const x = i / 5; // Scale x to make the curve more visible
+      const noise = Math.round((Math.random() - 0.5) * 400);
+      const value = Math.round(
+        100 * Math.pow(x, 2) - // quadratic term
+          50 * x + // linear term
+          1000 + // constant term
+          noise // random variation
+      );
+      return {
+        index: i + 1,
+        revenue: value
+      };
+    }),
+    barAndLineAxis: {
+      x: ['index'],
+      y: ['revenue'],
+      category: []
+    },
+    className: 'w-[800px] h-[400px]',
+    trendlines: [
+      {
+        type: 'polynomial_regression',
+        show: true,
+        showTrendlineLabel: true,
+        trendlineLabel: 'Polynomial Growth Pattern',
+        trendLineColor: 'red',
+        columnId: 'revenue'
+      }
+    ],
+    columnLabelFormats: {
+      index: {
+        columnType: 'number',
+        style: 'number'
+      },
+      revenue: {
+        columnType: 'number',
+        style: 'currency',
+        currency: 'USD'
+      }
+    }
+  }
+};
+
+export const WithTrendline_StringXAxisPolynomialRegression: Story = {
+  args: {
+    selectedChartType: ChartType.Line,
+    data: Array.from({ length: 30 }, (_, i) => {
+      // Generate polynomial-like data with random noise
+      const x = i / 5; // Scale x to make the curve more visible
+      const noise = Math.round((Math.random() - 0.5) * 400);
+      const value = Math.round(
+        100 * Math.pow(x, 2) - // quadratic term
+          50 * x + // linear term
+          1000 + // constant term
+          noise // random variation
+      );
+      return {
+        index: `Product ${i + 1}`,
+        revenue: value
+      };
+    }),
+    barAndLineAxis: {
+      x: ['index'],
+      y: ['revenue'],
+      category: []
+    },
+    className: 'w-[800px] h-[400px]',
+    trendlines: [
+      {
+        type: 'polynomial_regression',
+        show: true,
+        showTrendlineLabel: true,
+        trendlineLabel: 'Polynomial Growth Pattern',
+        trendLineColor: 'red',
+        columnId: 'revenue'
+      }
+    ],
+    columnLabelFormats: {
+      index: {
+        columnType: 'text',
+        style: 'string'
+      },
+      revenue: {
+        columnType: 'number',
+        style: 'currency',
+        currency: 'USD'
+      }
+    }
   }
 };

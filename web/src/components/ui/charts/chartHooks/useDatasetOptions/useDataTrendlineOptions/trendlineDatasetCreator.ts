@@ -25,19 +25,78 @@ export const trendlineDatasetCreator: Record<
   ) => TrendlineDataset[]
 > = {
   polynomial_regression: (trendline, selectedDataset, columnLabelFormats) => {
-    const source = selectedDataset.source as Array<[string, ...number[]]>;
     const dimensions = selectedDataset.dimensions as string[];
-    const { mappedData, indexOfTrendlineColumn } = polyExpoRegressionDataMapper(
+    const xAxisColumn = dimensions[0];
+    const isXAxisNumeric = isNumericColumnType(
+      columnLabelFormats[xAxisColumn]?.columnType || DEFAULT_COLUMN_LABEL_FORMAT.columnType
+    );
+    const isXAxisDate = isDateColumnType(columnLabelFormats[xAxisColumn]?.columnType);
+    const { mappedData, indexOfTrendlineColumn } = dataMapper(
       trendline,
       selectedDataset,
-      columnLabelFormats
+      columnLabelFormats,
+      isXAxisNumeric ? 'number' : isXAxisDate ? 'date' : 'string'
     );
 
     if (indexOfTrendlineColumn === undefined) return [];
-    const { equation, slopeData } = calculatePolynomialRegression(mappedData);
-    const mappedSource = [...source].map((item, index) => {
+
+    if (isXAxisNumeric) {
+      const regressionResult = regression.polynomial(mappedData, { order: 2, precision: 2 });
+      const data = mappedData.map((item) => {
+        const newItem = [...item];
+        newItem[indexOfTrendlineColumn] = regressionResult.predict(item[0])[1];
+        return newItem;
+      });
+
+      return [
+        {
+          ...trendline,
+          id: DATASET_IDS.polynomialRegression(trendline.columnId),
+          source: data,
+          dimensions: dimensions,
+          equation: regressionResult.string
+        }
+      ];
+    }
+
+    if (isXAxisDate) {
+      const firstTimestamp = mappedData[0][0];
+      // Convert timestamps to days since first timestamp for better numerical stability
+      const regressionResult = regression.polynomial(
+        mappedData.map(([timestamp, value]) => [
+          (timestamp - firstTimestamp) / (1000 * 60 * 60 * 24),
+          value
+        ]),
+        { order: 2, precision: 2 }
+      );
+
+      const data = mappedData.map((item) => {
+        const newItem = [...item];
+        const days = (item[0] - firstTimestamp) / (1000 * 60 * 60 * 24);
+        newItem[indexOfTrendlineColumn] = regressionResult.predict(days)[1];
+        return newItem;
+      });
+
+      return [
+        {
+          ...trendline,
+          id: DATASET_IDS.polynomialRegression(trendline.columnId),
+          source: data,
+          dimensions: dimensions,
+          equation: regressionResult.string
+        }
+      ];
+    }
+
+    // For non-numeric, non-date x-axis, use indices
+    const regressionResult = regression.polynomial(
+      mappedData.map((item, index) => [index, item[1]]),
+      { order: 2, precision: 2 }
+    );
+
+    const data = mappedData.map((item, index) => {
       const newItem = [...item];
-      newItem[indexOfTrendlineColumn] = slopeData![index];
+      newItem[indexOfTrendlineColumn] = regressionResult.predict(index)[1];
       return newItem;
     });
 
@@ -45,9 +104,9 @@ export const trendlineDatasetCreator: Record<
       {
         ...trendline,
         id: DATASET_IDS.polynomialRegression(trendline.columnId),
-        source: mappedSource,
+        source: data,
         dimensions: dimensions,
-        equation
+        equation: regressionResult.string
       }
     ];
   },
@@ -147,7 +206,7 @@ export const trendlineDatasetCreator: Record<
       }
     ];
   },
-
+  //done
   exponential_regression: (trendline, selectedDataset, columnLabelFormats) => {
     const dimensions = selectedDataset.dimensions as string[];
     const xAxisColumn = dimensions[0];
