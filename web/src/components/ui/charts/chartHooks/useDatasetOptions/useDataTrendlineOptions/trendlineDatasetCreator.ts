@@ -148,19 +148,92 @@ export const trendlineDatasetCreator: Record<
     ];
   },
 
-  exponential_regression: (trendline, rawDataset, columnLabelFormats) => {
-    const source = rawDataset.source as Array<[string, ...number[]]>;
-    const dimensions = rawDataset.dimensions as string[];
-    const { mappedData, indexOfTrendlineColumn } = polyExpoRegressionDataMapper(
-      trendline,
-      rawDataset,
-      columnLabelFormats
+  exponential_regression: (trendline, selectedDataset, columnLabelFormats) => {
+    const dimensions = selectedDataset.dimensions as string[];
+    const xAxisColumn = dimensions[0];
+    const isXAxisNumeric = isNumericColumnType(
+      columnLabelFormats[xAxisColumn]?.columnType || DEFAULT_COLUMN_LABEL_FORMAT.columnType
     );
-    if (indexOfTrendlineColumn === undefined || indexOfTrendlineColumn === -1) return [];
-    const { equation, slopeData } = calculateExponentialRegression(mappedData);
-    const mappedSource = [...source].map((item, index) => {
+    const isXAxisDate = isDateColumnType(columnLabelFormats[xAxisColumn]?.columnType);
+    const { mappedData, indexOfTrendlineColumn } = dataMapper(
+      trendline,
+      selectedDataset,
+      columnLabelFormats,
+      isXAxisNumeric ? 'number' : isXAxisDate ? 'date' : 'string'
+    );
+
+    if (indexOfTrendlineColumn === undefined) return [];
+
+    // Ensure all y values are positive for exponential regression
+    const minY = Math.min(...mappedData.map(([_, y]) => y));
+    if (minY <= 0) {
+      // If we have zero or negative values, shift all y values up by |minY| + 1
+      const shift = Math.abs(minY) + 1;
+      mappedData.forEach((item) => (item[1] += shift));
+    }
+
+    if (isXAxisNumeric) {
+      // For numeric x-axis, normalize x values to start from 1 to enhance exponential fit
+      const minX = Math.min(...mappedData.map(([x]) => x));
+      const normalizedData: [number, number][] = mappedData.map(([x, y]) => [x - minX + 1, y]);
+
+      const regressionResult = regression.exponential(normalizedData, { precision: 6 });
+
+      const data = mappedData.map((item, index) => {
+        const newItem = [...item];
+        newItem[indexOfTrendlineColumn] = regressionResult.predict(normalizedData[index][0])[1];
+        return newItem;
+      });
+
+      return [
+        {
+          ...trendline,
+          id: DATASET_IDS.exponentialRegression(trendline.columnId),
+          source: data,
+          dimensions: dimensions,
+          equation: regressionResult.string
+        }
+      ];
+    }
+
+    if (isXAxisDate) {
+      const firstTimestamp = mappedData[0][0];
+      // Convert to days and ensure we start from day 1 (not day 0)
+      const normalizedData: [number, number][] = mappedData.map(([timestamp, value]) => [
+        (timestamp - firstTimestamp) / (1000 * 60 * 60 * 24) + 1,
+        value
+      ]);
+
+      const regressionResult = regression.exponential(normalizedData, { precision: 6 });
+
+      const data = mappedData.map((item) => {
+        const newItem = [...item];
+        const days = (item[0] - firstTimestamp) / (1000 * 60 * 60 * 24) + 1;
+        newItem[indexOfTrendlineColumn] = regressionResult.predict(days)[1];
+        return newItem;
+      });
+
+      return [
+        {
+          ...trendline,
+          id: DATASET_IDS.exponentialRegression(trendline.columnId),
+          source: data,
+          dimensions: dimensions,
+          equation: regressionResult.string
+        }
+      ];
+    }
+
+    // For non-numeric, non-date x-axis, use indices starting from 1
+    const normalizedData: [number, number][] = mappedData.map((item, index) => [
+      index + 1,
+      item[1]
+    ]);
+    const regressionResult = regression.exponential(normalizedData, { precision: 6 });
+
+    const data = mappedData.map((item, index) => {
       const newItem = [...item];
-      newItem[indexOfTrendlineColumn] = slopeData[index];
+      newItem[indexOfTrendlineColumn] = regressionResult.predict(index + 1)[1];
       return newItem;
     });
 
@@ -168,9 +241,9 @@ export const trendlineDatasetCreator: Record<
       {
         ...trendline,
         id: DATASET_IDS.exponentialRegression(trendline.columnId),
-        source: mappedSource,
-        dimensions: dimensions,
-        equation
+        source: data,
+        dimensions,
+        equation: regressionResult.string
       }
     ];
   },
