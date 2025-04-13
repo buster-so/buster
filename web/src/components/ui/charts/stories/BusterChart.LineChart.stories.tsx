@@ -1316,3 +1316,50 @@ export const WithTrendline_StringXAxisLogarithmicRegression: Story = {
 //     }
 //   }
 // };
+
+export const ExponentialDecreaseWithTrendline: Story = {
+  args: {
+    selectedChartType: ChartType.Line,
+    data: [
+      { date: dayjs('2024-01-01').add(1, 'day').toISOString(), value: 10000 },
+      { date: dayjs('2024-01-02').add(2, 'day').toISOString(), value: 7500 },
+      { date: dayjs('2024-01-03').add(3, 'day').toISOString(), value: 6600 },
+      { date: dayjs('2024-01-04').add(4, 'day').toISOString(), value: 4200 },
+      { date: dayjs('2024-01-05').add(5, 'day').toISOString(), value: 4750 },
+      { date: dayjs('2024-01-06').add(6, 'day').toISOString(), value: 2360 },
+      { date: dayjs('2024-01-07').add(7, 'day').toISOString(), value: 1770 },
+      { date: dayjs('2024-01-08').add(8, 'day').toISOString(), value: 1330 },
+      { date: dayjs('2024-01-09').add(9, 'day').toISOString(), value: 1000 },
+      { date: dayjs('2024-01-10').add(10, 'day').toISOString(), value: 750 }
+    ],
+    barAndLineAxis: {
+      x: ['date'],
+      y: ['value'],
+      category: []
+    },
+    className: 'w-[800px] h-[400px]',
+    columnLabelFormats: {
+      date: {
+        columnType: 'date',
+        style: 'date',
+        dateFormat: 'MMM DD'
+      } satisfies IColumnLabelFormat,
+      value: {
+        columnType: 'number',
+        style: 'number',
+        numberSeparatorStyle: ',',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      } satisfies IColumnLabelFormat
+    },
+    trendlines: [
+      {
+        type: 'exponential_regression',
+        columnId: 'value',
+        show: true,
+        showTrendlineLabel: true,
+        trendlineLabel: 'Exponential Trend'
+      }
+    ]
+  }
+};

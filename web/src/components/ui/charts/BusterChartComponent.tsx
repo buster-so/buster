@@ -22,7 +22,6 @@ export const BusterChartComponent: React.FC<BusterChartRenderComponentProps> = (
     selectedChartType,
     selectedAxis
   } = props;
-
   const {
     datasetOptions,
     dataTrendlineOptions,

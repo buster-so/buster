@@ -50,7 +50,6 @@ export const BusterChart: React.FC<BusterChartProps> = React.memo(
     const [isMounted, setIsMounted] = useState(false); //there is a responsive bug where we need to wait for the chart to mount before we can animate it
     const isTable = selectedChartType === ChartType.Table;
     const showNoData = !loading && (isEmpty(data) || data === null);
-
     const selectedAxis: ChartEncodes | undefined = useMemo(() => {
       const { pieChartAxis, comboChartAxis, scatterAxis, barAndLineAxis } = props;
       if (selectedChartType === ChartType.Pie) return pieChartAxis;
