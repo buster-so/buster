@@ -6,6 +6,7 @@ import { DEFAULT_CHART_CONFIG, DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_i
 import { addOpacityToColor } from '@/lib/colors';
 import { isDateColumnType } from '@/lib/messages';
 import { createDayjsDate } from '@/lib/date';
+import { lineSeriesBuilder_labels } from './lineSeriesBuilder';
 
 export const scatterSeriesBuilder_data = ({
   selectedDataset,
@@ -103,6 +104,12 @@ const computeSizeRatio = (
   return computedSize;
 };
 
-export const scatterSeriesBuilder_labels = ({}: LabelBuilderProps) => {
+export const scatterSeriesBuilder_labels = (props: LabelBuilderProps) => {
+  const { trendlineSeries } = props;
+
+  if (trendlineSeries.length > 0) {
+    return lineSeriesBuilder_labels(props);
+  }
+
   return undefined;
 };

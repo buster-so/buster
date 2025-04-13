@@ -1,13 +1,6 @@
 import type { BusterChartProps, Trendline } from '@/api/asset_interfaces/metric/charts';
 import type { DatasetOption } from '../interfaces';
 import type { TrendlineDataset } from './trendlineDataset.types';
-import { polyExpoRegressionDataMapper } from './polyExpoRegressionDataMapper';
-import {
-  calculateExponentialRegression,
-  calculateLinearSlope,
-  calculateLogarithmicRegression,
-  calculatePolynomialRegression
-} from '@/lib/regression';
 import { DATASET_IDS } from '../config';
 import { isDateColumnType, isNumericColumnType } from '@/lib/messages';
 import { extractFieldsFromChain } from '../groupingHelpers';
@@ -110,7 +103,7 @@ export const trendlineDatasetCreator: Record<
       }
     ];
   },
-  //done
+
   logarithmic_regression: (trendline, selectedDataset, columnLabelFormats) => {
     const dimensions = selectedDataset.dimensions as string[];
     const xAxisColumn = dimensions[0];
@@ -206,7 +199,7 @@ export const trendlineDatasetCreator: Record<
       }
     ];
   },
-  //done
+
   exponential_regression: (trendline, selectedDataset, columnLabelFormats) => {
     const dimensions = selectedDataset.dimensions as string[];
     const xAxisColumn = dimensions[0];
@@ -306,7 +299,7 @@ export const trendlineDatasetCreator: Record<
       }
     ];
   },
-  //done
+
   linear_regression: (trendline, selectedDataset, columnLabelFormats) => {
     const dimensions = selectedDataset.dimensions as string[];
     const xAxisColumn = dimensions[0];

@@ -145,3 +145,51 @@ export const WithSize: Story = {
     ]
   }
 };
+
+export const ScatterWithTrendline_NumericalXAxisPolynomialRegression: Story = {
+  args: {
+    selectedChartType: ChartType.Scatter,
+    data: Array.from({ length: 30 }, (_, i) => {
+      // Generate polynomial-like data with random noise
+      const x = i / 5; // Scale x to make the curve more visible
+      const noise = Math.round((Math.random() - 0.5) * 400);
+      const value = Math.round(
+        100 * Math.pow(x, 2) - // quadratic term
+          50 * x + // linear term
+          1000 + // constant term
+          noise // random variation
+      );
+      return {
+        index: i + 1,
+        revenue: value
+      };
+    }),
+    scatterAxis: {
+      x: ['index'],
+      y: ['revenue'],
+      category: []
+    },
+    className: 'w-[800px] h-[400px]',
+    trendlines: [
+      {
+        type: 'polynomial_regression',
+        show: true,
+        showTrendlineLabel: true,
+        trendlineLabel: 'Polynomial Growth Pattern',
+        trendLineColor: 'red',
+        columnId: 'revenue'
+      }
+    ],
+    columnLabelFormats: {
+      index: {
+        columnType: 'number',
+        style: 'number'
+      },
+      revenue: {
+        columnType: 'number',
+        style: 'currency',
+        currency: 'USD'
+      }
+    }
+  }
+};

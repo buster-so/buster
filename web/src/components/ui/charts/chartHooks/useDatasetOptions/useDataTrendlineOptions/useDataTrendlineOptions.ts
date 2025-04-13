@@ -43,6 +43,7 @@ export const useDataTrendlineOptions = ({
     if (!datasetOptions || !canSupportTrendlines) return undefined;
     return last(datasetOptions);
   }, [datasetOptions, canSupportTrendlines]);
+
   const selectedDataset = useMemo(() => {
     if (!lastDataset) return undefined;
     const newDataset = { ...lastDataset };
@@ -69,6 +70,7 @@ export const useDataTrendlineOptions = ({
     });
     return { ...newDataset, source: sorted };
   }, [lastDataset]);
+
   const datasetTrendlineOptions: TrendlineDataset[] = useMemo(() => {
     if (!hasTrendlines || !datasetOptions || !selectedDataset) return [] as TrendlineDataset[];
 

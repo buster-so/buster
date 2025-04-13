@@ -57,6 +57,8 @@ export const useSeriesOptions = ({
   barShowTotalAtTop,
   barGroupType
 }: UseSeriesOptionsProps): ChartProps<ChartJSChartType>['data'] => {
+  const isScatter = selectedChartType === 'scatter';
+
   const selectedDataset = useMemo(() => {
     return datasetOptions[datasetOptions.length - 1];
   }, [datasetOptions, selectedChartType]);
@@ -122,7 +124,8 @@ export const useSeriesOptions = ({
       columnLabelFormats,
       xAxisKeys,
       sizeKey,
-      columnSettings
+      columnSettings,
+      trendlineSeries
     });
   }, [
     selectedDataset,
@@ -166,7 +169,6 @@ export const useSeriesOptions = ({
     selectedChartType
   ]);
 
-  const isScatter = selectedChartType === 'scatter';
   const tooltipSeries: ChartProps<ChartJSChartType>['data']['datasets'] = useMemo(() => {
     if (isScatter) {
       return scatterTooltipSeriesBuilder({
@@ -205,6 +207,7 @@ export type LabelBuilderProps = {
   xAxisKeys: ChartEncodes['x'];
   sizeKey: ScatterAxis['size'];
   columnSettings: NonNullable<BusterChartProps['columnSettings']>;
+  trendlineSeries: ChartProps<'line'>['data']['datasets'][number][];
 };
 
 const labelsBuilderRecord: Record<
