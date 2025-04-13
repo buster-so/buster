@@ -67,7 +67,6 @@ export const useDataTrendlineOptions = ({
       }
       return 0;
     });
-    console.log(sorted);
     return { ...newDataset, source: sorted };
   }, [lastDataset]);
   const datasetTrendlineOptions: TrendlineDataset[] = useMemo(() => {

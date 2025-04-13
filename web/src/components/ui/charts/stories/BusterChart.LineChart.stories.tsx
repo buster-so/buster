@@ -961,7 +961,7 @@ export const WithTrendline_DateXAxisLogarithmicRegression: Story = {
           noise // random variation
       );
       return {
-        date: dayjs().add(i, 'day').toISOString(),
+        date: dayjs('2024-01-01').add(i, 'day').toISOString(),
         revenue: value
       };
     }),
@@ -1034,6 +1034,54 @@ export const WithTrendline_NumericalXAxisLogarithmicRegression: Story = {
       index: {
         columnType: 'number',
         style: 'number'
+      },
+      revenue: {
+        columnType: 'number',
+        style: 'currency',
+        currency: 'USD'
+      }
+    }
+  }
+};
+
+export const WithTrendline_StringXAxisLogarithmicRegression: Story = {
+  args: {
+    selectedChartType: ChartType.Line,
+    data: Array.from({ length: 30 }, (_, i) => {
+      // Add random noise between -200 and 200
+      const noise = Math.round((Math.random() - 0.5) * 400);
+      // Less steep logarithmic curve with linear component and noise
+      const value = Math.round(
+        800 * Math.log(i + 1) + // logarithmic component
+          i * 30 + // linear component
+          500 + // base value
+          noise // random variation
+      );
+      return {
+        index: `Product ${i + 1}`,
+        revenue: value
+      };
+    }),
+    barAndLineAxis: {
+      x: ['index'],
+      y: ['revenue'],
+      category: []
+    },
+    className: 'w-[800px] h-[400px]',
+    trendlines: [
+      {
+        type: 'logarithmic_regression',
+        show: true,
+        showTrendlineLabel: true,
+        trendlineLabel: 'Logarithmic Growth Pattern',
+        trendLineColor: 'red',
+        columnId: 'revenue'
+      }
+    ],
+    columnLabelFormats: {
+      index: {
+        columnType: 'text',
+        style: 'string'
       },
       revenue: {
         columnType: 'number',

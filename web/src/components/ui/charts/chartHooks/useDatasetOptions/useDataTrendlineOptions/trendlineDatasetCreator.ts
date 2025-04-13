@@ -51,6 +51,7 @@ export const trendlineDatasetCreator: Record<
       }
     ];
   },
+  //done
   logarithmic_regression: (trendline, selectedDataset, columnLabelFormats) => {
     const dimensions = selectedDataset.dimensions as string[];
     const xAxisColumn = dimensions[0];
@@ -68,34 +69,20 @@ export const trendlineDatasetCreator: Record<
     if (indexOfTrendlineColumn === undefined) return [];
 
     if (isXAxisNumeric) {
-      return [];
-    }
+      // For numeric x-axis, ensure all x values are positive
+      const minX = Math.min(...mappedData.map(([x]) => x));
+      if (minX <= 0) {
+        // Shift all x values to be positive
+        const shift = Math.abs(minX) + 1;
+        mappedData.forEach((item) => (item[0] += shift));
+      }
 
-    if (isXAxisDate) {
-      const firstTimestamp = mappedData[0][0];
-      console.log(
-        mappedData.map(([timestamp, value]) => [
-          // Convert timestamp to days since first timestamp
-          (timestamp - firstTimestamp) / (1000 * 60 * 60 * 24),
-          value
-        ])
-      );
-      const regressionResult = regression.logarithmic(
-        mappedData.map(([timestamp, value]) => [
-          // Convert timestamp to days since first timestamp
-          (timestamp - firstTimestamp) / (1000 * 60 * 60 * 24),
-          value
-        ]),
-        { precision: 2 }
-      );
-      console.log(regressionResult);
+      const regressionResult = regression.logarithmic(mappedData, { precision: 2 });
       const data = mappedData.map((item) => {
         const newItem = [...item];
         newItem[indexOfTrendlineColumn] = regressionResult.predict(item[0])[1];
         return newItem;
       });
-
-      console.log(data);
 
       return [
         {
@@ -107,16 +94,60 @@ export const trendlineDatasetCreator: Record<
         }
       ];
     }
+
+    if (isXAxisDate) {
+      const firstTimestamp = mappedData[0][0];
+      // Start from day 1 instead of day 0 to avoid log(0)
+      const regressionResult = regression.logarithmic(
+        mappedData.map(([timestamp, value]) => [
+          // Convert timestamp to days since first timestamp, starting from 1
+          (timestamp - firstTimestamp) / (1000 * 60 * 60 * 24) + 1,
+          value
+        ]),
+        { precision: 2 }
+      );
+
+      const data = mappedData.map((item) => {
+        const newItem = [...item];
+        const days = (item[0] - firstTimestamp) / (1000 * 60 * 60 * 24) + 1;
+        newItem[indexOfTrendlineColumn] = regressionResult.predict(days)[1];
+        return newItem;
+      });
+
+      return [
+        {
+          ...trendline,
+          id: DATASET_IDS.logarithmicRegression(trendline.columnId),
+          source: data,
+          dimensions: dimensions,
+          equation: regressionResult.string
+        }
+      ];
+    }
+
+    const regressionResult = regression.logarithmic(
+      mappedData.map(([x, y]) => [x + 1, y]),
+      {
+        precision: 2
+      }
+    );
+    const data = mappedData.map((item) => {
+      const newItem = [...item];
+      newItem[indexOfTrendlineColumn] = regressionResult.predict(item[0] + 1)[1];
+      return newItem;
+    });
+
     return [
-      // {
-      //   ...trendline,
-      //   id: DATASET_IDS.logarithmicRegression(trendline.columnId),
-      //   source: mappedSource,
-      //   dimensions: dimensions,
-      //   equation
-      // }
+      {
+        ...trendline,
+        id: DATASET_IDS.logarithmicRegression(trendline.columnId),
+        source: data,
+        dimensions: dimensions,
+        equation: regressionResult.string
+      }
     ];
   },
+
   exponential_regression: (trendline, rawDataset, columnLabelFormats) => {
     const source = rawDataset.source as Array<[string, ...number[]]>;
     const dimensions = rawDataset.dimensions as string[];
@@ -143,6 +174,7 @@ export const trendlineDatasetCreator: Record<
       }
     ];
   },
+  //done
   linear_regression: (trendline, selectedDataset, columnLabelFormats) => {
     const dimensions = selectedDataset.dimensions as string[];
     const xAxisColumn = dimensions[0];
@@ -209,8 +241,6 @@ export const trendlineDatasetCreator: Record<
         }
       ];
     }
-
-    if (indexOfTrendlineColumn === undefined) return [];
 
     const regressionResult = regression.linear(mappedData, { precision: 2 });
     const data = mappedData.map((item) => {
