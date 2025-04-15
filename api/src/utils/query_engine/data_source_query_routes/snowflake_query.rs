@@ -1564,12 +1564,12 @@ pub async fn snowflake_query(
 mod tests {
     use super::*;
     use arrow::array::{
-        ArrayRef, Date32Array, Date64Array, Decimal128Array, Decimal256Array, Int32Array, Int64Array,
-        StringArray, StructArray, TimestampMicrosecondArray, TimestampMillisecondArray,
-        TimestampNanosecondArray, TimestampSecondArray,
+        ArrayRef, Date32Array, Date64Array, Decimal128Array, Int32Array, Int64Array,
+        StructArray, TimestampMicrosecondArray, TimestampMillisecondArray,
+        TimestampNanosecondArray, TimestampSecondArray, StringArray // Replace Utf8Array with StringArray
     };
-    use arrow::datatypes::{DataType as ArrowDataType, Field, Fields, TimeUnit};
-    use chrono::{Datelike, NaiveDate, Timelike};
+    use arrow::datatypes::{DataType as ArrowDataType, Field, Fields, Schema, TimeUnit};
+    use chrono::{Datelike, NaiveDate, NaiveDateTime, Timelike};
     use std::str::FromStr;
     use std::sync::Arc;
     use arrow::datatypes::i256;
@@ -2231,5 +2231,227 @@ mod tests {
                 }
             }
         }
+    }
+
+    /// Tests processing of multiple Int64 columns with TIMESTAMP_NTZ metadata and scale 3.
+    #[test]
+    fn test_int64_timestamp_ntz_processing() {
+        println!("\n=== Testing Int64 TIMESTAMP_NTZ(3) processing ===");
+
+        // Sample data (milliseconds since epoch)
+        let timestamp_a_millis = vec![
+            Some(1678886400000), // 2023-03-15 13:20:00.000 UTC
+            Some(1700000000000), // 2023-11-14 22:13:20.000 UTC
+            None, // Null value
+        ];
+        let timestamp_b_millis = vec![
+            Some(1678890000000), // 2023-03-15 14:20:00.000 UTC
+            None, // Null value
+            Some(1700000012345), // 2023-11-14 22:13:32.345 UTC
+        ];
+
+        // Create Arrow arrays
+        let array_a = Int64Array::from(timestamp_a_millis);
+        let array_b = Int64Array::from(timestamp_b_millis);
+
+        // Create metadata common to both fields
+        let mut timestamp_metadata = std::collections::HashMap::new();
+        timestamp_metadata.insert("logicalType".to_string(), "TIMESTAMP_NTZ".to_string());
+        timestamp_metadata.insert("scale".to_string(), "3".to_string());
+
+        // Create fields
+        let field_a = Field::new(
+            "TIMESTAMP_A",
+            ArrowDataType::Int64,
+            true, // Nullable
+        ).with_metadata(timestamp_metadata.clone());
+
+        let field_b = Field::new(
+            "TIMESTAMP_B",
+            ArrowDataType::Int64,
+            true, // Nullable
+        ).with_metadata(timestamp_metadata.clone());
+
+        // Create schema
+        let schema = Arc::new(Schema::new(vec![field_a, field_b]));
+
+        // Create record batch
+        let batch = RecordBatch::try_new(
+            schema.clone(),
+            vec![Arc::new(array_a) as ArrayRef, Arc::new(array_b) as ArrayRef],
+        ).unwrap();
+
+        println!("Input RecordBatch schema: {:?}", batch.schema());
+        println!("Input RecordBatch columns: [Column 0: {:?}, Column 1: {:?}]", batch.column(0), batch.column(1));
+
+        // Process the batch
+        let processed_rows = process_record_batch(&batch);
+
+        println!("Processed Rows: {:?}", processed_rows);
+
+        // --- Assertions ---
+        assert_eq!(processed_rows.len(), 3, "Expected 3 rows processed");
+
+        // Expected NaiveDateTime values
+        let expected_dt_a1 = NaiveDateTime::parse_from_str("2023-03-15 13:20:00.000", "%Y-%m-%d %H:%M:%S%.3f").unwrap();
+        let expected_dt_a2 = NaiveDateTime::parse_from_str("2023-11-14 22:13:20.000", "%Y-%m-%d %H:%M:%S%.3f").unwrap();
+        let expected_dt_b1 = NaiveDateTime::parse_from_str("2023-03-15 14:20:00.000", "%Y-%m-%d %H:%M:%S%.3f").unwrap();
+        let expected_dt_b3 = NaiveDateTime::parse_from_str("2023-11-14 22:13:32.345", "%Y-%m-%d %H:%M:%S%.3f").unwrap();
+
+        // Row 1
+        assert_eq!(processed_rows[0]["TIMESTAMP_A"], DataType::Timestamp(Some(expected_dt_a1)));
+        assert_eq!(processed_rows[0]["TIMESTAMP_B"], DataType::Timestamp(Some(expected_dt_b1)));
+
+        // Row 2
+        assert_eq!(processed_rows[1]["TIMESTAMP_A"], DataType::Timestamp(Some(expected_dt_a2)));
+        assert_eq!(processed_rows[1]["TIMESTAMP_B"], DataType::Null);
+
+        // Row 3
+        assert_eq!(processed_rows[2]["TIMESTAMP_A"], DataType::Null);
+        assert_eq!(processed_rows[2]["TIMESTAMP_B"], DataType::Timestamp(Some(expected_dt_b3)));
+        
+        println!("✓ Verified Int64 TIMESTAMP_NTZ(3) processing");
+    }
+
+    /// Tests processing a RecordBatch mirroring the real-world example provided by the user.
+    #[test]
+    fn test_real_world_record_batch_processing() {
+        println!("\n=== Testing Real-World RecordBatch Processing ===");
+
+        // --- Data Setup (Anonymized) ---
+        let order_date_data = vec![Some(1738684590000i64), Some(1739547875000i64), None];
+        let return_created_at_data = vec![Some(1741101088253i64), None, Some(1741104132474i64)];
+        let expiration_date_data = vec![Some(1743520288247i64), Some(1743521739792i64), Some(1743523332467i64)];
+        let order_number_data = vec![Some("ORD-A001"), Some("ORD-B002"), Some("ORD-C003")]; // Anonymized
+        let customer_name_data = vec![Some("Customer One"), Some("Customer Two"), Some("Customer Three")]; // Anonymized
+        let return_value_data = vec![Some(10000i32), None, Some(50000i32)]; // Anonymized (Represents 100.00, NULL, 500.00)
+        let return_type_data = vec![Some("Type X"), Some("Type Y"), Some("Type Z")]; // Anonymized
+
+        // --- Array Creation ---
+        let order_date_array = Int64Array::from(order_date_data);
+        let return_created_at_array = Int64Array::from(return_created_at_data);
+        let expiration_date_array = Int64Array::from(expiration_date_data);
+        let order_number_array = StringArray::from_iter_values(order_number_data.iter().map(|s| s.unwrap()));
+        let customer_name_array = StringArray::from_iter_values(customer_name_data.iter().map(|s| s.unwrap()));
+        let return_value_array = Int32Array::from(return_value_data); // Use the correct data vector
+        let return_type_array = StringArray::from_iter_values(return_type_data.iter().map(|s| s.unwrap()));
+
+        // --- Metadata Setup ---
+        let mut ts_metadata = std::collections::HashMap::new();
+        ts_metadata.insert("logicalType".to_string(), "TIMESTAMP_NTZ".to_string());
+        ts_metadata.insert("scale".to_string(), "3".to_string());
+        // Add other common metadata if necessary, like precision, charLength, finalType, byteLength
+
+        let mut text_metadata = std::collections::HashMap::new();
+        text_metadata.insert("logicalType".to_string(), "TEXT".to_string());
+
+        let mut fixed_metadata = std::collections::HashMap::new();
+        fixed_metadata.insert("logicalType".to_string(), "FIXED".to_string());
+        fixed_metadata.insert("scale".to_string(), "2".to_string());
+        fixed_metadata.insert("precision".to_string(), "32".to_string()); // Example precision
+
+        // --- Field Creation ---
+        let field_order_date = Field::new("ORDER_DATE", ArrowDataType::Int64, true).with_metadata(ts_metadata.clone());
+        let field_return_created_at = Field::new("RETURN_CREATED_AT", ArrowDataType::Int64, true).with_metadata(ts_metadata.clone());
+        let field_expiration_date = Field::new("EXPIRATION_DATE", ArrowDataType::Int64, true).with_metadata(ts_metadata.clone());
+        let field_order_number = Field::new("ORDER_NUMBER", ArrowDataType::Utf8, true).with_metadata(text_metadata.clone());
+        let field_customer_name = Field::new("CUSTOMER_NAME", ArrowDataType::Utf8, true).with_metadata(text_metadata.clone());
+        let field_return_value = Field::new("RETURN_VALUE", ArrowDataType::Int32, true).with_metadata(fixed_metadata.clone());
+        let field_return_type = Field::new("RETURN_TYPE", ArrowDataType::Utf8, true).with_metadata(text_metadata.clone());
+
+        // --- Schema Creation ---
+        let schema = Arc::new(Schema::new(vec![
+            field_order_date,
+            field_return_created_at,
+            field_expiration_date,
+            field_order_number,
+            field_customer_name,
+            field_return_value,
+            field_return_type,
+        ]));
+
+        // --- RecordBatch Creation ---
+        let batch = RecordBatch::try_new(
+            schema.clone(),
+            vec![
+                Arc::new(order_date_array) as ArrayRef,
+                Arc::new(return_created_at_array) as ArrayRef,
+                Arc::new(expiration_date_array) as ArrayRef,
+                Arc::new(order_number_array) as ArrayRef,
+                Arc::new(customer_name_array) as ArrayRef,
+                Arc::new(return_value_array) as ArrayRef,
+                Arc::new(return_type_array) as ArrayRef,
+            ],
+        ).unwrap();
+
+        println!("Simulated Input RecordBatch schema: {:?}", batch.schema());
+
+        // --- Process Batch ---
+        let processed_rows = process_record_batch(&batch);
+
+        println!("Processed Rows (Real World Sim): {:?}", processed_rows);
+
+        // --- Assertions ---
+        assert_eq!(processed_rows.len(), 3, "Expected 3 rows processed");
+
+        // Helper to create expected NaiveDateTime from millis
+        let dt_from_millis = |millis: i64| {
+            let secs = millis / 1000;
+            let nanos = ((millis % 1000) * 1_000_000) as u32;
+            Utc.timestamp_opt(secs, nanos).unwrap().naive_utc()
+        };
+
+        // Row 0 Assertions
+        assert!(matches!(processed_rows[0]["ORDER_DATE"], DataType::Timestamp(_)), "Row 0 ORDER_DATE type mismatch");
+        if let DataType::Timestamp(Some(dt)) = processed_rows[0]["ORDER_DATE"] {
+             assert_eq!(dt, dt_from_millis(1738684590000));
+        } else { panic!("Incorrect value for Row 0 ORDER_DATE"); }
+
+        assert!(matches!(processed_rows[0]["RETURN_CREATED_AT"], DataType::Timestamp(_)), "Row 0 RETURN_CREATED_AT type mismatch");
+         if let DataType::Timestamp(Some(dt)) = processed_rows[0]["RETURN_CREATED_AT"] {
+             assert_eq!(dt, dt_from_millis(1741101088253));
+        } else { panic!("Incorrect value for Row 0 RETURN_CREATED_AT"); }
+
+        assert!(matches!(processed_rows[0]["EXPIRATION_DATE"], DataType::Timestamp(_)), "Row 0 EXPIRATION_DATE type mismatch");
+         if let DataType::Timestamp(Some(dt)) = processed_rows[0]["EXPIRATION_DATE"] {
+             assert_eq!(dt, dt_from_millis(1743520288247));
+        } else { panic!("Incorrect value for Row 0 EXPIRATION_DATE"); }
+
+        assert_eq!(processed_rows[0]["ORDER_NUMBER"], DataType::Text(Some("ord-a001".to_string()))); // Anonymized & Lowercase
+        assert_eq!(processed_rows[0]["CUSTOMER_NAME"], DataType::Text(Some("customer one".to_string()))); // Anonymized & Lowercase
+        assert_eq!(processed_rows[0]["RETURN_VALUE"], DataType::Float8(Some(100.00))); // Anonymized
+        assert_eq!(processed_rows[0]["RETURN_TYPE"], DataType::Text(Some("type x".to_string()))); // Anonymized & Lowercase
+
+        // Row 1 Assertions
+        assert!(matches!(processed_rows[1]["ORDER_DATE"], DataType::Timestamp(_)), "Row 1 ORDER_DATE type mismatch");
+        if let DataType::Timestamp(Some(dt)) = processed_rows[1]["ORDER_DATE"] {
+             assert_eq!(dt, dt_from_millis(1739547875000));
+        } else { panic!("Incorrect value for Row 1 ORDER_DATE"); }
+        assert_eq!(processed_rows[1]["RETURN_CREATED_AT"], DataType::Null);
+        assert!(matches!(processed_rows[1]["EXPIRATION_DATE"], DataType::Timestamp(_)), "Row 1 EXPIRATION_DATE type mismatch");
+         if let DataType::Timestamp(Some(dt)) = processed_rows[1]["EXPIRATION_DATE"] {
+             assert_eq!(dt, dt_from_millis(1743521739792));
+        } else { panic!("Incorrect value for Row 1 EXPIRATION_DATE"); }
+        assert_eq!(processed_rows[1]["ORDER_NUMBER"], DataType::Text(Some("ord-b002".to_string()))); // Anonymized & Lowercase
+        assert_eq!(processed_rows[1]["CUSTOMER_NAME"], DataType::Text(Some("customer two".to_string()))); // Anonymized & Lowercase
+        assert_eq!(processed_rows[1]["RETURN_VALUE"], DataType::Null); // Remains Null
+        assert_eq!(processed_rows[1]["RETURN_TYPE"], DataType::Text(Some("type y".to_string()))); // Anonymized & Lowercase
+
+        // Row 2 Assertions
+        assert_eq!(processed_rows[2]["ORDER_DATE"], DataType::Null);
+        assert!(matches!(processed_rows[2]["RETURN_CREATED_AT"], DataType::Timestamp(_)), "Row 2 RETURN_CREATED_AT type mismatch");
+        if let DataType::Timestamp(Some(dt)) = processed_rows[2]["RETURN_CREATED_AT"] {
+             assert_eq!(dt, dt_from_millis(1741104132474));
+        } else { panic!("Incorrect value for Row 2 RETURN_CREATED_AT"); }
+        assert!(matches!(processed_rows[2]["EXPIRATION_DATE"], DataType::Timestamp(_)), "Row 2 EXPIRATION_DATE type mismatch");
+        if let DataType::Timestamp(Some(dt)) = processed_rows[2]["EXPIRATION_DATE"] {
+             assert_eq!(dt, dt_from_millis(1743523332467));
+        } else { panic!("Incorrect value for Row 2 EXPIRATION_DATE"); }
+        assert_eq!(processed_rows[2]["ORDER_NUMBER"], DataType::Text(Some("ord-c003".to_string()))); // Anonymized & Lowercase
+        assert_eq!(processed_rows[2]["CUSTOMER_NAME"], DataType::Text(Some("customer three".to_string()))); // Anonymized & Lowercase
+        assert_eq!(processed_rows[2]["RETURN_VALUE"], DataType::Float8(Some(500.00))); // Anonymized
+        assert_eq!(processed_rows[2]["RETURN_TYPE"], DataType::Text(Some("type z".to_string()))); // Anonymized & Lowercase
+
+        println!("✓ Verified Real-World RecordBatch Processing (Anonymized)");
     }
 }

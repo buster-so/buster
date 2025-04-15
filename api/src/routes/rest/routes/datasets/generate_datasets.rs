@@ -6,6 +6,7 @@ use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 use serde_yaml;
 use std::collections::HashMap;
+use std::time::Instant;
 use uuid::Uuid;
 use regex::Regex;
 use tokio::task::JoinSet;
@@ -397,7 +398,7 @@ async fn enhance_yaml_with_descriptions(yaml: String, model_name: &str) -> Resul
     ];
 
     // Set a reasonable timeout for LLM calls
-    let timeout_seconds = 120;
+    let timeout_seconds = 600;
     
     let response = match tokio::time::timeout(
         std::time::Duration::from_secs(timeout_seconds),
@@ -756,7 +757,7 @@ async fn extract_keys_from_models(
         let batch_models = batch.clone();
         
         // Use a timeout to prevent hanging on LLM calls
-        let timeout_seconds = 120;
+        let timeout_seconds = 240;
         let llm_result = match tokio::time::timeout(
             std::time::Duration::from_secs(timeout_seconds),
             async {
@@ -948,7 +949,7 @@ Example output format:
                 &messages,
                 0.1,
                 2048,
-                120,
+                240,
                 None,
                 false,
                 None,
@@ -1061,6 +1062,9 @@ async fn generate_datasets_handler(
     request: &GenerateDatasetRequest,
     organization_id: &Uuid,
 ) -> Result<GenerateDatasetResponse> {
+    let handler_start_time = Instant::now();
+    tracing::info!(data_source = %request.data_source_name, schema = %request.schema, "Starting generate_datasets_handler");
+
     let mut conn = match get_pg_pool().get().await {
         Ok(conn) => conn,
         Err(e) => {
@@ -1079,6 +1083,7 @@ async fn generate_datasets_handler(
         }
     };
     
+    let op_start_time = Instant::now();
     let mut yml_contents = HashMap::new();
     let mut errors = HashMap::new();
 
@@ -1119,6 +1124,8 @@ async fn generate_datasets_handler(
         }
     };
 
+    tracing::info!(duration_ms = %op_start_time.elapsed().as_millis(), "Retrieved data source");
+
     // Get credentials
     let credentials = match get_data_source_credentials(&data_source.secret_id, &data_source.type_, false).await {
         Ok(creds) => creds,
@@ -1151,6 +1158,8 @@ async fn generate_datasets_handler(
         }
     };
 
+    tracing::info!(duration_ms = %op_start_time.elapsed().as_millis(), "Retrieved credentials");
+
     // Prepare tables for batch validation
     let tables_to_validate: Vec<(String, String)> = request
         .model_names
@@ -1158,6 +1167,7 @@ async fn generate_datasets_handler(
         .map(|name| (name.clone(), request.schema.clone()))
         .collect();
 
+    let op_start_time = Instant::now();
     // Get all columns in one batch
     let ds_columns = match retrieve_dataset_columns_batch(&tables_to_validate, &credentials, request.database.clone()).await {
         Ok(cols) => cols,
@@ -1188,6 +1198,9 @@ async fn generate_datasets_handler(
         }
     };
 
+    tracing::info!(duration_ms = %op_start_time.elapsed().as_millis(), column_count = %ds_columns.len(), "Retrieved columns");
+
+    let op_start_time = Instant::now();
     // Step 1: Extract primary and foreign keys
     let markdown_docs = match extract_keys_from_models(&ds_columns, &request.schema).await {
         Ok(docs) => docs,
@@ -1210,6 +1223,9 @@ async fn generate_datasets_handler(
         }
     };
 
+    tracing::info!(duration_ms = %op_start_time.elapsed().as_millis(), doc_length = %markdown_docs.len(), "Extracted keys");
+
+    let op_start_time = Instant::now();
     // Step 2: Identify entity relationships
     let entity_relationships = match identify_entity_relationships(&markdown_docs, &request.model_names).await {
         Ok(relationships) => relationships,
@@ -1235,6 +1251,8 @@ async fn generate_datasets_handler(
         }
     };
 
+    tracing::info!(duration_ms = %op_start_time.elapsed().as_millis(), relationship_count = %entity_relationships.len(), "Identified relationships");
+
     // Process models concurrently
     let mut join_set = JoinSet::new();
     
@@ -1243,6 +1261,7 @@ async fn generate_datasets_handler(
         .filter(|name| !errors.contains_key(*name))
         .collect();
     
+    let generation_start_time = Instant::now();
     tracing::info!(
         total_models = %request.model_names.len(),
         models_to_process = %models_to_process.len(),
@@ -1339,6 +1358,8 @@ async fn generate_datasets_handler(
         }
     }
 
+    tracing::info!(duration_ms = %generation_start_time.elapsed().as_millis(), "Finished processing all models");
+
     // Log the generated YMLs
     for (model_name, yaml) in &yml_contents {
         tracing::info!(
@@ -1357,6 +1378,9 @@ async fn generate_datasets_handler(
             "Encountered errors while generating YAMLs"
         );
     }
+
+    let handler_duration = handler_start_time.elapsed();
+    tracing::info!(duration_ms = %handler_duration.as_millis(), yml_count = %yml_contents.len(), error_count = %errors.len(), "Finished generate_datasets_handler");
 
     Ok(GenerateDatasetResponse {
         yml_contents,
