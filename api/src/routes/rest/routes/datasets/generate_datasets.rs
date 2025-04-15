@@ -407,7 +407,7 @@ async fn enhance_yaml_with_descriptions(yaml: String, model_name: &str) -> Resul
             &messages,
             0.1,
             2048,
-            timeout_seconds,
+            600,
             None,
             false,
             None,
@@ -757,7 +757,7 @@ async fn extract_keys_from_models(
         let batch_models = batch.clone();
         
         // Use a timeout to prevent hanging on LLM calls
-        let timeout_seconds = 240;
+        let timeout_seconds = 600;
         let llm_result = match tokio::time::timeout(
             std::time::Duration::from_secs(timeout_seconds),
             async {
@@ -801,7 +801,7 @@ async fn extract_keys_from_models(
                     &messages,
                     0.1,
                     2048,
-                    timeout_seconds,
+                    600,
                     None,
                     false,
                     None,
@@ -949,7 +949,7 @@ Example output format:
                 &messages,
                 0.1,
                 2048,
-                240,
+                600,
                 None,
                 false,
                 None,
