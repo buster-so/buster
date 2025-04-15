@@ -23,12 +23,12 @@ use std::sync::Arc;
 // -------------------------
 
 fn process_string_value(value: String) -> String {
-    value.to_lowercase()
+    value // Return the original string without lowercasing
 }
 
 fn process_json_value(value: Value) -> Value {
     match value {
-        Value::String(s) => Value::String(s.to_lowercase()),
+        Value::String(s) => Value::String(s), // Return original string
         Value::Array(arr) => Value::Array(arr.into_iter().map(process_json_value).collect()),
         Value::Object(map) => {
             // First check if this object might be a Snowflake timestamp
@@ -38,7 +38,7 @@ fn process_json_value(value: Value) -> Value {
                 // Otherwise process it as a normal object
                 let new_map = map
                     .into_iter()
-                    .map(|(k, v)| (k.to_lowercase(), process_json_value(v)))
+                    .map(|(k, v)| (k, process_json_value(v))) // Keep original key case
                     .collect();
                 Value::Object(new_map)
             }
