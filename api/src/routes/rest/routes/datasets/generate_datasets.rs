@@ -877,6 +877,9 @@ async fn identify_entity_relationships(
     markdown_docs: &str,
     model_names: &[String],
 ) -> Result<HashMap<String, Vec<EntityRelationship>>> {
+    let start_time = Instant::now(); // Add start time log
+    tracing::info!("Starting entity relationship identification..."); // Add start log
+
     let batches: Vec<Vec<String>> = model_names
         .chunks(BATCH_SIZE)
         .map(|chunk| chunk.to_vec())
@@ -892,6 +895,10 @@ async fn identify_entity_relationships(
         let docs = markdown_docs.to_string();
         
         join_set.spawn(async move {
+            let task_start_time = Instant::now(); // Add task start time
+            let batch_model_names = batch_models.join(", ");
+            tracing::info!(models = %batch_model_names, "Starting relationship identification task for batch"); // Add task start log
+
             let messages = vec![
                 LlmMessage::new(
                     "system".to_string(),
@@ -958,19 +965,37 @@ Example output format:
                 crate::utils::clients::ai::langfuse::PromptName::CustomPrompt("identify_relationships".to_string()),
             )
             .await
-            .map_err(|e| (batch_models.clone(), e))?;
+            .map_err(|e| (batch_models.clone(), e));
+
+            let llm_duration = task_start_time.elapsed();
+            let result = match response {
+                Ok(resp) => {
+                    tracing::info!(models = %batch_model_names, duration_ms = %llm_duration.as_millis(), "LLM call successful for relationship identification");
+                    Ok(resp)
+                },
+                Err(e) => {
+                    tracing::error!(models = %batch_model_names, duration_ms = %llm_duration.as_millis(), error = %e.1, "LLM call failed for relationship identification");
+                    return Err(e); // Propagate the original error tuple
+                }
+            }?; // Use ? operator on the result of the match
 
             // Extract JSON from code blocks
-            let json_str = if response.contains("```") {
-                let re = Regex::new(r"```(?:json)?\n([\s\S]*?)\n```").unwrap();
-                match re.captures(&response) {
-                    Some(caps) => caps.get(1).unwrap().as_str().to_string(),
+            let response_str = result; // result is now confirmed Ok(String)
+            let json_str = if response_str.contains("```") {
+                let re = Regex::new(r"```(?:json)?\n([\s\S]*?)\n```").map_err(|e| (batch_models.clone(), anyhow!("Regex compile error: {}", e)))?; // Map regex error
+                match re.captures(&response_str) {
+                    Some(caps) => caps.get(1).map_or_else(|| {
+                        tracing::error!(models=%batch_model_names, "Regex captured but group 1 is missing");
+                        Err((batch_models.clone(), anyhow!("Failed to extract JSON from response: regex group missing")))
+                    }, |m| Ok(m.as_str().to_string()))?,
                     None => {
-                        return Err((batch_models, anyhow!("Failed to extract JSON from response")));
+                        tracing::error!(models=%batch_model_names, response=%response_str, "Failed to extract JSON content using regex");
+                        return Err((batch_models, anyhow!("Failed to extract JSON from LLM response: no regex match")));
                     }
                 }
             } else {
-                response
+                // Assume the whole response is JSON if no markdown block found
+                response_str
             };
 
             // If the JSON is empty or just whitespace, return an empty map
@@ -978,19 +1003,11 @@ Example output format:
                 return Ok::<_, (Vec<String>, anyhow::Error)>((batch_models, HashMap::new()));
             }
 
-            // Parse JSON into a temporary Value to validate structure
-            let json_value: serde_json::Value = match serde_json::from_str(&json_str) {
-                Ok(v) => v,
-                Err(e) => {
-                    tracing::error!("JSON parsing error. Content:\n{}", json_str);
-                    return Err((batch_models, anyhow!("Failed to parse JSON: {}", e)));
-                }
-            };
-
+            let parsing_validation_duration = task_start_time.elapsed() - llm_duration;
             // Validate JSON structure and convert to our target format
             let mut validated_relationships: HashMap<String, Vec<EntityRelationship>> = HashMap::new();
 
-            if let serde_json::Value::Object(tables) = json_value {
+            if let serde_json::Value::Object(tables) = serde_json::from_str(&json_str).map_err(|e| (batch_models.clone(), anyhow!("Failed to parse JSON: {}. Content: '{}'", e, json_str)))? {
                 for (table_name, relationships_value) in tables {
                     if let serde_json::Value::Array(relationships) = relationships_value {
                         let mut valid_relationships = Vec::new();
@@ -1023,6 +1040,11 @@ Example output format:
                 }
             }
 
+            tracing::info!(
+                models = %batch_model_names, 
+                duration_ms = %task_start_time.elapsed().as_millis(), 
+                "Finished relationship identification task (LLM: {}ms, Parsing/Validation: {}ms)", llm_duration.as_millis(), parsing_validation_duration.as_millis()
+            ); // Add task end log
             Ok((batch_models, validated_relationships))
         });
     }
@@ -1055,6 +1077,7 @@ Example output format:
         tracing::warn!("Encountered errors while processing some relationships: {:?}", errors);
     }
 
+    tracing::info!(duration_ms = %start_time.elapsed().as_millis(), relationship_count = %relationships.len(), "Finished entity relationship identification"); // Add end log
     Ok(relationships)
 }
 
