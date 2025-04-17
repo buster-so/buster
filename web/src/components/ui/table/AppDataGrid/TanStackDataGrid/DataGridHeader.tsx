@@ -7,6 +7,7 @@ import { CaretDown, CaretUp } from '../../../icons/NucleoIconFilled';
 import { HEADER_HEIGHT } from './constants';
 import { useSortColumnContext } from './SortColumnWrapper';
 import { Virtualizer } from '@tanstack/react-virtual';
+import { Text } from '@/components/ui/typography';
 
 interface DraggableHeaderProps {
   header: Header<Record<string, string | number | Date | null>, unknown>;
@@ -65,15 +66,15 @@ const DraggableHeader: React.FC<DraggableHeaderProps> = ({
       onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}>
       <span
         className={cn(
-          'flex h-full flex-1 items-center space-x-1.5 p-2',
+          'flex h-full flex-1 items-center space-x-1.5 overflow-hidden p-2',
           draggable && 'cursor-grab'
         )}
         ref={draggable ? setDragNodeRef : undefined}
         {...attributes}
         {...listeners}>
-        <span className="text-gray-dark text-base font-normal">
+        <Text variant={'secondary'} truncate>
           {flexRender(header.column.columnDef.header, header.getContext())}
-        </span>
+        </Text>
 
         {sortable && (
           <>
