@@ -42,7 +42,7 @@ pub fn get_configuration(agent_data: &ModeAgentData) -> ModeConfiguration {
         .replace("{TODAYS_DATE}", &agent_data.todays_date);
 
     // 2. Define the model for this mode (Using a default, adjust if needed)
-    let model = "o3-mini".to_string(); // Assuming default based on original MODEL = None
+    let model = "o4-mini".to_string(); // Assuming default based on original MODEL = None
 
     // 3. Define the tool loader closure
     let tool_loader: Box<dyn Fn(&Arc<Agent>) -> Pin<Box<dyn Future<Output = Result<()>> + Send>> + Send + Sync> = 

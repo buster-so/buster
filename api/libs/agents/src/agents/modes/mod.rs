@@ -31,7 +31,7 @@ pub struct ModeAgentData {
 pub struct ModeConfiguration {
     /// The system prompt to use for the LLM call in this mode.
     pub prompt: String,
-    /// The specific LLM model identifier (e.g., "o3-mini") to use for this mode.
+    /// The specific LLM model identifier (e.g., "o4-mini") to use for this mode.
     pub model: String,
     /// An async function/closure responsible for clearing existing tools
     /// and loading the specific tools required for this mode onto the agent.

@@ -2087,69 +2087,71 @@ fn transform_assistant_tool_message(
                  // Determine file type based on tool name
                 let file_type = if tool_name.contains("metric") { "metric" } else { "dashboard" };
 
-                // Process the chunk using the appropriate parser method
-                let parse_result = if file_type == "metric" {
-                    parser.process_metric_chunk(tool_id.clone(), &tool_call.function.arguments)
-                } else {
-                    parser.process_dashboard_chunk(tool_id.clone(), &tool_call.function.arguments)
-                };
+                // --- START: Process InProgress Chunks ---
+                if progress == MessageProgress::InProgress {
+                    // Process the chunk using the appropriate parser method
+                    let parse_result = if file_type == "metric" {
+                        parser.process_metric_chunk(tool_id.clone(), &tool_call.function.arguments)
+                    } else {
+                        parser.process_dashboard_chunk(tool_id.clone(), &tool_call.function.arguments)
+                    };
 
-                // If parser returns a reasoning message (File type expected)
-                if let Ok(Some(BusterReasoningMessage::File(mut file_reasoning))) = parse_result {
-                    // Added missing variable initializations
-                    let mut has_updates = false;
-                    let mut updated_files_map = std::collections::HashMap::new();
+                    // If parser returns a reasoning message (File type expected)
+                    if let Ok(Some(BusterReasoningMessage::File(mut file_reasoning))) = parse_result {
+                        // Added missing variable initializations
+                        let mut has_updates = false;
+                        let mut updated_files_map = std::collections::HashMap::new();
 
-                    // Iterate through the files parsed so far
-                    for (file_map_id, mut file_detail) in file_reasoning.files.iter_mut() { // Use iter_mut
-                         // Ensure text_chunk has content
-                         if let Some(yml_chunk) = &file_detail.file.text_chunk {
-                            // Define unique chunk ID for this file
-                            let chunk_id = format!("{}_{}", tool_id, file_detail.id);
-                            // Calculate delta using the tracker
-                            let delta = tracker.add_chunk(chunk_id.clone(), yml_chunk.clone());
+                        // Iterate through the files parsed so far
+                        for (file_map_id, mut file_detail) in file_reasoning.files.iter_mut() { // Use iter_mut
+                            // Ensure text_chunk has content
+                            if let Some(yml_chunk) = &file_detail.file.text_chunk {
+                                // Define unique chunk ID for this file
+                                let chunk_id = format!("{}_{}", tool_id, file_detail.id);
+                                // Calculate delta using the tracker
+                                let delta = tracker.add_chunk(chunk_id.clone(), yml_chunk.clone());
 
-                            if !delta.is_empty() { // Now delta is defined
-                                // Update file detail with delta
-                                file_detail.file.text_chunk = Some(delta);
-                                file_detail.file.text = None; // Ensure full text is cleared when chunking
-                                file_detail.status = "In Progress".to_string(); // Set status to in progress
-                                has_updates = true;
-                                updated_files_map.insert(file_map_id.clone(), file_detail.clone()); // Clone file_detail
-                            } else {
-                                // If delta is empty, it means this chunk is identical to the last seen content
-                                // We might still want to include it in the update map if its status needs setting,
-                                // but primarily we track changes.
-                                // Consider if we need to update status even without content change.
-                                // For now, we only add to updated_files_map if there's a delta.
+                                if !delta.is_empty() { // Now delta is defined
+                                    // Update file detail with delta
+                                    file_detail.file.text_chunk = Some(delta);
+                                    file_detail.file.text = None; // Ensure full text is cleared when chunking
+                                    file_detail.status = "In Progress".to_string(); // Set status to in progress
+                                    has_updates = true;
+                                    updated_files_map.insert(file_map_id.clone(), file_detail.clone()); // Clone file_detail
+                                } else {
+                                    // If delta is empty, it means this chunk is identical to the last seen content
+                                    // We might still want to include it in the update map if its status needs setting,
+                                    // but primarily we track changes.
+                                    // Consider if we need to update status even without content change.
+                                    // For now, we only add to updated_files_map if there's a delta.
+                                }
                             }
                         }
-                    }
 
-                    // Update only the files that had changes
-                    if has_updates {
-                        file_reasoning.files = updated_files_map; // Replace with updated files
+                        // Update only the files that had changes
+                        if has_updates {
+                            file_reasoning.files = updated_files_map; // Replace with updated files
+                            all_results.push(ToolTransformResult::Reasoning(
+                                BusterReasoningMessage::File(file_reasoning),
+                            ));
+                        }
+                    } else if let Ok(Some(BusterReasoningMessage::Text(text_reasoning))) = parse_result {
                         all_results.push(ToolTransformResult::Reasoning(
-                            BusterReasoningMessage::File(file_reasoning),
-                        ));
+                                BusterReasoningMessage::Text(text_reasoning),
+                            ));
                     }
-                } else if let Ok(Some(BusterReasoningMessage::Text(text_reasoning))) = parse_result {
-                     all_results.push(ToolTransformResult::Reasoning(
-                            BusterReasoningMessage::Text(text_reasoning),
-                        ));
                 }
+                // --- END: Process InProgress Chunks ---
+
                 // Handle complete progress for file tools if needed
                 if progress == MessageProgress::Complete {
-                    // Removed finalize_file_processing call as it caused a linter error
-                    // if let Ok(parsed_content) = serde_json::from_str::<Value>(&tool_call.function.arguments) {
-                    //      // Optionally use parsed_content for final processing if needed
-                    //      if let Ok(Some(reasoning_messages)) = parser.finalize_file_processing(tool_id.clone(), file_type, parsed_content, last_reasoning_completion_time.elapsed()) {
-                    //          all_results.extend(reasoning_messages.into_iter().map(ToolTransformResult::Reasoning));
-                    //      }
-                    // }
+                    // The actual tool result processing (parsing ModifyFilesOutput/Create...Output)
+                    // happens in `transform_tool_message`. Here, we just need to clean up the tracker.
                     tracker.clear_chunk(tool_id.clone()); // Clear tracker for the main tool ID
-                    // Consider clearing file-specific chunk IDs too if necessary
-                    // parser.clear_related_chunks(tool_id.clone()); // Example hypothetical parser method
+                    // Clear any potential file-specific chunks managed by the tracker
+                    // Note: The current tracker implementation doesn't explicitly track sub-chunks,
+                    // but this is where you would add logic if it did.
+                    // For example: parser.clear_related_chunks(tool_id.clone(), tracker);
                 }
             }
             "no_search_needed" | "review_plan" => {

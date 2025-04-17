@@ -673,7 +673,7 @@ mod tests {
     fn test_tool_parameter_validation() {
         let tool = FilterDashboardsTool {
             agent: Arc::new(Agent::new(
-                "o3-mini".to_string(),
+                "o4-mini".to_string(),
                 HashMap::new(),
                 Uuid::new_v4(),
                 Uuid::new_v4(),

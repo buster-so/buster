@@ -28,7 +28,7 @@ pub fn get_configuration(agent_data: &ModeAgentData) -> ModeConfiguration {
         .replace("{DATASETS}", &agent_data.dataset_names.join(", "));
 
     // 2. Define the model for this mode (Using default based on original MODEL = None)
-    let model = "o3-mini".to_string();
+    let model = "o4-mini".to_string();
 
     // 3. Define the tool loader closure
     let tool_loader: Box<

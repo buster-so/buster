@@ -11,6 +11,35 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::io::Write;
 use uuid::Uuid;
+use regex::Regex;
+use lazy_static::lazy_static;
+
+// Helper function to sanitize string values for YAML
+fn sanitize_yaml_string(value: &str) -> String {
+    value
+        .replace(':', "") // Remove colons
+        .replace('\'', "") // Remove single quotes
+        .replace('\"', "") // Remove double quotes
+        .replace('\n', " ") // Replace newlines with spaces
+        .replace('\t', " ") // Replace tabs with spaces
+        .trim() // Trim leading/trailing whitespace
+        .to_string()
+}
+
+lazy_static! {
+    // Combined regex for keys whose string values need sanitization
+    static ref SANITIZE_KEYS_RE: Regex = Regex::new(
+        r#"^(?P<indent>\s*)(?P<key>name|description|timeFrame|displayName|prefix|suffix|goalLineLabel|trendlineLabel|pieInnerLabelTitle|metricValueLabel):\s*(?P<value>.*)$"#
+    ).unwrap();
+    // Regex to find the start of the colors block and capture indentation
+    static ref COLORS_START_RE: Regex = Regex::new(r#"^(\s*)colors:\s*$"#).unwrap();
+    // Regex to find unquoted hex color list items and capture indent/marker and color value
+    static ref COLOR_LINE_RE: Regex = Regex::new(r#"^(\s*-\s+)(#[0-9a-fA-F]+)\s*$"#).unwrap();
+    // Regex to capture the indentation of a line (used for colors block and timeFrame insertion)
+    static ref INDENT_RE: Regex = Regex::new(r#"^(\s*)\S"#).unwrap();
+    // Regex to find the sql key to determine insertion point for timeFrame
+    static ref SQL_KEY_RE: Regex = Regex::new(r#"^(\s*)sql:\s*.*$"#).unwrap();
+}
 
 #[derive(Debug, Serialize, Deserialize, Clone, FromSqlRow, AsExpression)]
 #[diesel(sql_type = Jsonb)]
@@ -489,13 +518,97 @@ pub struct TableChartConfig {
 
 impl MetricYml {
     pub fn new(yml_content: String) -> Result<Self> {
-        let file: MetricYml = match serde_yaml::from_str(&yml_content) {
+        let mut processed_lines = Vec::new();
+        let mut in_colors_block = false;
+        let mut colors_indent: Option<usize> = None;
+        let mut time_frame_found = false;
+        let mut sql_line_index: Option<usize> = None;
+        let mut sql_line_indent: Option<String> = None;
+
+        for (index, line) in yml_content.lines().enumerate() {
+            // Store SQL line info for potential timeFrame insertion
+            if sql_line_index.is_none() {
+                 if let Some(caps) = SQL_KEY_RE.captures(line) {
+                    sql_line_index = Some(index);
+                    sql_line_indent = Some(caps.get(1).map_or("", |m| m.as_str()).to_string());
+                }
+            }
+
+            let current_indent = INDENT_RE.captures(line).map_or(0, |caps| {
+                caps.get(1).map_or(0, |m| m.as_str().len())
+            });
+
+            // --- Colors Block Logic ---
+            if in_colors_block && colors_indent.map_or(false, |indent| current_indent <= indent) {
+                in_colors_block = false;
+                colors_indent = None;
+            }
+            if !in_colors_block { // Only check for start if not already in block
+                if let Some(caps) = COLORS_START_RE.captures(line) {
+                    in_colors_block = true;
+                    colors_indent = Some(caps.get(1).map_or(0, |m| m.as_str().len()));
+                    processed_lines.push(line.to_string());
+                    continue;
+                }
+            }
+            if in_colors_block {
+                if let Some(caps) = COLOR_LINE_RE.captures(line) {
+                    let marker_part = caps.get(1).map_or("", |m| m.as_str());
+                    let color_part = caps.get(2).map_or("", |m| m.as_str());
+                    processed_lines.push(format!("{}'{}'", marker_part, color_part));
+                    continue;
+                } else {
+                     processed_lines.push(line.to_string()); // Add line within color block as is if not a hex item
+                     continue;
+                }
+            }
+            // --- End Colors Block Logic ---
+
+            // --- String Sanitization & timeFrame Check ---
+             if let Some(caps) = SANITIZE_KEYS_RE.captures(line) {
+                let indent = caps.name("indent").map_or("", |m| m.as_str());
+                let key = caps.name("key").map_or("", |m| m.as_str());
+                let value = caps.name("value").map_or("", |m| m.as_str());
+
+                if key == "timeFrame" {
+                    time_frame_found = true;
+                }
+
+                let sanitized_value = sanitize_yaml_string(value);
+                // Reconstruct line, potentially quoting if value was empty after sanitizing?
+                // For now, just place the sanitized value. YAML might handle empty strings okay.
+                // If the value needs quotes (e.g., contains special chars AFTER sanitization, though unlikely now)
+                // we might need more complex logic. Let's assume simple value placement is fine.
+                processed_lines.push(format!("{}{}: {}", indent, key, sanitized_value));
+            } else {
+                // Add lines that don't match any processing rules
+                processed_lines.push(line.to_string());
+            }
+        }
+
+        // Insert default timeFrame if not found
+        if !time_frame_found {
+            if let Some(index) = sql_line_index {
+                 // Use the indent captured from the sql line
+                let indent = sql_line_indent.unwrap_or_else(|| "  ".to_string()); // Default indent if sql indent capture failed
+                processed_lines.insert(index, format!("{}timeFrame: 'all_time'", indent));
+            } else {
+                // Fallback: append if sql key wasn't found (shouldn't happen for valid metric)
+                // Or maybe error out?
+                 eprintln!("Warning: sql key not found in metric YAML, cannot insert default timeFrame correctly.");
+                 // Append at end with default indent - might break YAML structure
+                 processed_lines.push("  timeFrame: 'all_time'".to_string()); 
+            }
+        }
+
+        let processed_yml_content = processed_lines.join("\n");
+
+        // Parse the processed YAML content
+        let file: MetricYml = match serde_yaml::from_str(&processed_yml_content) {
             Ok(file) => file,
             Err(e) => {
-                // Extract field information from error message if possible
                 let error_message = format!("Error parsing YAML: {}", e);
 
-                // Try to extract field path from YAML error
                 let yaml_error_str = e.to_string();
                 let detailed_error =
                     if yaml_error_str.contains("at line") && yaml_error_str.contains("column") {
@@ -514,7 +627,6 @@ impl MetricYml {
         }
     }
 
-    //TODO: Need to validate a metric deeply.
     pub fn validate(&self) -> Result<()> {
         Ok(())
     }
@@ -529,7 +641,7 @@ impl FromSql<Jsonb, Pg> for MetricYml {
 
 impl ToSql<Jsonb, Pg> for MetricYml {
     fn to_sql<'b>(&'b self, out: &mut Output<'b, '_, Pg>) -> diesel::serialize::Result {
-        out.write_all(&[1])?; // JSONB version 1 header
+        out.write_all(&[1])?;
         out.write_all(&serde_json::to_vec(self)?)?;
         Ok(IsNull::No)
     }
@@ -553,15 +665,12 @@ mod tests {
 
         let metric = MetricYml::new(yml_content.to_string())?;
 
-        // Verify the basic fields
         assert_eq!(metric.name, "Average Time to Close by Rep");
 
-        // Compare SQL with normalized whitespace
         let expected_sql = normalize_whitespace("SELECT rep_id, AVG(time_to_close) AS average_time_to_close FROM deal_metrics GROUP BY rep_id ORDER BY average_time_to_close DESC");
         let actual_sql = normalize_whitespace(&metric.sql);
         assert_eq!(actual_sql, expected_sql);
 
-        // Verify chart config
         match metric.chart_config {
             ChartConfig::Bar(config) => {
                 assert!(config.base.column_label_formats.is_empty());
@@ -591,7 +700,6 @@ mod tests {
 
     #[test]
     fn test_column_label_format_constructors() {
-        // Test number format
         let number_format = ColumnLabelFormat::new_number();
         assert_eq!(number_format.column_type, "number");
         assert_eq!(number_format.style, "number");
@@ -599,20 +707,16 @@ mod tests {
         assert_eq!(number_format.minimum_fraction_digits, Some(0));
         assert_eq!(number_format.maximum_fraction_digits, Some(2));
 
-        // Test string format
         let string_format = ColumnLabelFormat::new_string();
         assert_eq!(string_format.column_type, "string");
         assert_eq!(string_format.style, "string");
-        assert_eq!(string_format.number_separator_style, None);
 
-        // Test date format
         let date_format = ColumnLabelFormat::new_date();
         assert_eq!(date_format.column_type, "date");
         assert_eq!(date_format.style, "date");
         assert_eq!(date_format.date_format, Some("auto".to_string()));
         assert_eq!(date_format.is_utc, Some(false));
 
-        // Test boolean format - should be same as string
         let boolean_format = ColumnLabelFormat::new_boolean();
         assert_eq!(boolean_format.column_type, "string");
         assert_eq!(boolean_format.style, "string");
@@ -620,7 +724,6 @@ mod tests {
 
     #[test]
     fn test_generate_formats_from_metadata() {
-        // Create test metadata
         let metadata = DataMetadata {
             column_count: 3,
             row_count: 10,
@@ -652,13 +755,10 @@ mod tests {
             ],
         };
 
-        // Generate formats
         let formats = ColumnLabelFormat::generate_formats_from_metadata(&metadata);
 
-        // Check we have formats for all columns
         assert_eq!(formats.len(), 3);
 
-        // Check individual formats
         let id_format = formats.get("id").unwrap();
         assert_eq!(id_format.column_type, "number");
 

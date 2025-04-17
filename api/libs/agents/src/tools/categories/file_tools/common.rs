@@ -137,7 +137,7 @@ pub const METRIC_YML_SCHEMA: &str = r##"
 # --- GENERAL YAML RULES ---
 # 1. Use standard YAML syntax (indentation, colons for key-value, `-` for arrays).
 # 2. Quoting: Generally avoid quotes for simple strings. Use double quotes (`"...") ONLY if a string contains special characters (like :, {, }, [, ], ,, &, *, #, ?, |, -, <, >, =, !, %, @, `) or needs to preserve leading/trailing whitespace. 
-# 3. Metric name should not contain `:`
+# 3. Metric name or description should not contain `:`
 # -------------------------------------
 
 # --- FORMAL SCHEMA --- (Used for validation, reflects rules above)
@@ -276,8 +276,10 @@ definitions:
       style:
         type: string
         enum:
-          - currency
-          - percent
+          -
+            currency # Note: The "$" sign is automatically prepended.
+          -
+            percent # Note: The value is automatically multiplied by 100 and the "%" sign is appended.
           - number
           - date
           - string
@@ -310,7 +312,7 @@ definitions:
         description: Currency code for currency formatting (e.g., USD, EUR)
       dateFormat:
         type: string
-        description: Format string for date display
+        description: Format string for date display (must be compatible with Day.js format strings).
       useRelativeTime:
         type: boolean
         description: Whether to display dates as relative time (e.g., 2 days ago)

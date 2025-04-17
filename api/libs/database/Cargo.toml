@@ -9,13 +9,17 @@ anyhow = { workspace = true }
 chrono = { workspace = true }
 diesel = { workspace = true }
 diesel-async = { workspace = true }
+diesel_migrations = { workspace = true }
+futures-util = { workspace = true }
+indexmap = { workspace = true }
+regex = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+serde_yaml = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
 uuid = { workspace = true }
 futures = { workspace = true }
-indexmap = { workspace = true }
 once_cell = { workspace = true }
 rustls = { workspace = true }
 rustls-native-certs = { workspace = true }
@@ -23,12 +27,11 @@ sqlx = { workspace = true }
 tokio-postgres = { workspace = true }
 tokio-postgres-rustls = { workspace = true }
 bb8-redis = { workspace = true }
-serde_yaml = { workspace = true }
 dotenv = { workspace = true }
 reqwest = { workspace = true }
+lazy_static = { workspace = true }
 
 
 [dev-dependencies]
 tokio-test = { workspace = true } 
-lazy_static = { workspace = true }
 ctor = "0.4.1" 

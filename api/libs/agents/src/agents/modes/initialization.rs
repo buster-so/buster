@@ -26,8 +26,8 @@ pub fn get_configuration(agent_data: &ModeAgentData) -> ModeConfiguration {
 
     // 2. Define the model for this mode (Using a default, adjust if needed)
     //    Since the original MODEL was None, we might use the agent's default
-    //    or specify a standard one like "o3-mini". Let's use "o3-mini".
-    let model = "o3-mini".to_string();
+    //    or specify a standard one like "o4-mini". Let's use "o4-mini".
+    let model = "o4-mini".to_string();
 
     // 3. Define the tool loader closure
     let tool_loader: Box<
