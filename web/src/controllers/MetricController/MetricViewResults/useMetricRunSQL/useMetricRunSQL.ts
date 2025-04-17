@@ -56,8 +56,8 @@ export const useMetricRunSQL = () => {
     isDataFromRerun: boolean;
   }) => {
     const latestVersionNumber = getLatestMetricVersion(metricId);
-    const options = queryKeys.metricsGetData(metricId, latestVersionNumber);
-    const currentData = getMetricDataMemoized(metricId, latestVersionNumber);
+    const options = queryKeys.metricsGetData(metricId, latestVersionNumber as number);
+    const currentData = getMetricDataMemoized(metricId, latestVersionNumber as number);
     if (!currentData) return;
     const setter = isDataFromRerun ? 'dataFromRerun' : 'data';
 
@@ -178,7 +178,7 @@ export const useMetricRunSQL = () => {
       await timeout(50);
 
       const latestVersionNumber = getLatestMetricVersion(metricId);
-      const currentData = getMetricDataMemoized(metricId, latestVersionNumber);
+      const currentData = getMetricDataMemoized(metricId, latestVersionNumber as number);
 
       if (currentData?.data_metadata && currentData?.dataFromRerun) {
         onSetDataForMetric({

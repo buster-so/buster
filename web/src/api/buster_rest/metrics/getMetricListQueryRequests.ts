@@ -9,7 +9,7 @@ export const useGetMetricsList = (
   params: Omit<Parameters<typeof listMetrics>[0], 'page_token' | 'page_size'>,
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof listMetrics>>, RustApiError>,
-    'queryKey' | 'queryFn'
+    'queryKey' | 'queryFn' | 'initialData'
   >
 ) => {
   const compiledParams: Parameters<typeof listMetrics>[0] = useMemo(

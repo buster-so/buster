@@ -616,7 +616,7 @@ export const useGetDashboardsList = (
   params: Omit<Parameters<typeof dashboardsGetList>[0], 'page_token' | 'page_size'>,
   options?: Omit<
     UseQueryOptions<Awaited<ReturnType<typeof dashboardsGetList>>, RustApiError>,
-    'queryKey' | 'queryFn'
+    'queryKey' | 'queryFn' | 'initialData'
   >
 ) => {
   const filters = useMemo(() => {
