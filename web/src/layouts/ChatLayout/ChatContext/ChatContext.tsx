@@ -7,6 +7,7 @@ import { useQueries } from '@tanstack/react-query';
 import { queryKeys } from '@/api/query_keys';
 import { IBusterChatMessage } from '@/api/asset_interfaces/chat';
 import { useChatLayoutContextSelector } from '..';
+import { MetricVersionProvider } from '@/api/buster_rest/metrics/metricQueryHelpers';
 
 const useChatIndividualContext = ({
   chatId,
@@ -94,9 +95,11 @@ export const ChatContextProvider = React.memo(({ children }: PropsWithChildren<{
   });
 
   return (
-    <IndividualChatContext.Provider value={useChatContextValue}>
-      {children}
-    </IndividualChatContext.Provider>
+    <MetricVersionProvider>
+      <IndividualChatContext.Provider value={useChatContextValue}>
+        {children}
+      </IndividualChatContext.Provider>
+    </MetricVersionProvider>
   );
 });
 

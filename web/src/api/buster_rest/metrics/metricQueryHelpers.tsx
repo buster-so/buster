@@ -1,43 +1,78 @@
-'use client';
-
 import { useParams, useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { Query, QueryCacheNotifyEvent, useQueryClient } from '@tanstack/react-query';
+import React, { useEffect, useMemo, useState, PropsWithChildren } from 'react';
+import { Query, useQueryClient } from '@tanstack/react-query';
 import { IBusterMetric } from '@/api/asset_interfaces/metric';
 import { metricsQueryKeys } from '@/api/query_keys/metric';
 import last from 'lodash/last';
 import { useMemoizedFn } from '@/hooks';
 import { RustApiError } from '../errors';
+import { createContext, useContextSelector } from 'use-context-selector';
 
-export const useGetMetricVersionNumber = (props?: { versionNumber?: number | null }) => {
-  const { versionNumber: versionNumberProp } = props || {};
-  const { metricId: metricIdPathParam } = useParams() as {
+interface MetricVersionContextType {
+  selectedVersionNumber: number | null;
+  paramVersionNumber?: number;
+  latestVersionNumber: number | null;
+}
+
+const MetricVersionContext = createContext<MetricVersionContextType>({
+  selectedVersionNumber: null,
+  latestVersionNumber: null
+});
+
+export const useMetricVersionSelector = <T,>(selector: (state: MetricVersionContextType) => T) =>
+  useContextSelector(MetricVersionContext, selector);
+
+const useMetricVersionContext = () => {
+  const { metricId } = useParams() as {
     metricId: string | undefined;
   };
+  const latestVersionNumber = useGetLatestMetricVersion({ metricId: metricId! });
   const versionNumberQueryParam = useSearchParams().get('metric_version_number');
-  const versionNumberFromParams = metricIdPathParam ? versionNumberQueryParam : undefined;
+  const versionNumberFromParams = metricId ? versionNumberQueryParam : undefined;
 
   const paramVersionNumber = useMemo(() => {
-    return (
-      versionNumberProp ??
-      (versionNumberFromParams ? parseInt(versionNumberFromParams!) : undefined)
-    );
-  }, [versionNumberProp, versionNumberFromParams]);
-
-  const latestVersionNumber = useGetLatestMetricVersion({ metricId: metricIdPathParam! });
+    return versionNumberFromParams ? parseInt(versionNumberFromParams) : undefined;
+  }, [versionNumberFromParams]);
 
   const selectedVersionNumber: number | null = useMemo(() => {
-    if (versionNumberProp === null) return null;
     return paramVersionNumber || latestVersionNumber || 0;
   }, [paramVersionNumber, latestVersionNumber]);
 
   return useMemo(() => {
     return { selectedVersionNumber, paramVersionNumber, latestVersionNumber };
-  }, [selectedVersionNumber, selectedVersionNumber, latestVersionNumber]);
+  }, [selectedVersionNumber, paramVersionNumber, latestVersionNumber]);
+};
+
+export const MetricVersionProvider = React.memo(({ children }: PropsWithChildren) => {
+  const contextValue = useMetricVersionContext();
+  return (
+    <MetricVersionContext.Provider value={contextValue}>{children}</MetricVersionContext.Provider>
+  );
+});
+
+MetricVersionProvider.displayName = 'MetricVersionProvider';
+
+export const useGetMetricVersionNumber = (props?: { versionNumber?: number | null }) => {
+  const { versionNumber: versionNumberProp } = props || {};
+  const { selectedVersionNumber, paramVersionNumber, latestVersionNumber } =
+    useMetricVersionSelector((state) => state);
+
+  const effectiveVersionNumber = useMemo(() => {
+    if (versionNumberProp === null) return null;
+    return versionNumberProp ?? selectedVersionNumber;
+  }, [versionNumberProp, selectedVersionNumber]);
+
+  return useMemo(() => {
+    return {
+      selectedVersionNumber: effectiveVersionNumber,
+      paramVersionNumber,
+      latestVersionNumber
+    };
+  }, [effectiveVersionNumber, paramVersionNumber, latestVersionNumber]);
 };
 
 type PredicateType = (query: Query<IBusterMetric, RustApiError>) => boolean;
-const filterMetricPredicate = <PredicateType>((query) => {
+const filterMetricPredicate: PredicateType = (query) => {
   const lastKey = last(query.queryKey);
   return (
     typeof lastKey === 'number' &&
@@ -47,7 +82,7 @@ const filterMetricPredicate = <PredicateType>((query) => {
     query.state.data !== null &&
     'versions' in query.state.data
   );
-});
+};
 
 const getLatestVersionNumber = (queries: [readonly unknown[], IBusterMetric | undefined][]) => {
   let latestVersion = -Infinity;
