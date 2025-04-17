@@ -46,7 +46,7 @@ export const VersionHistoryHeaderButtons: React.FC<{}> = React.memo(({}) => {
         disabled={isSelectedVersionCurrent || !currentVersion}
         onClick={onClickRestoreVersionPreflight}
         loading={isRestoringVersion}>
-        Restore version {restoringVersion}
+        Restore version
       </Button>
     </div>
   );
