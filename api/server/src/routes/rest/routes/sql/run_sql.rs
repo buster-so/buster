@@ -4,7 +4,6 @@ use diesel::{BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl};
 use indexmap::IndexMap;
 use query_engine::data_source_query_routes::query_engine::query_engine;
 use query_engine::data_types::DataType;
-use rayon::iter::ParallelIterator;
 use reqwest::StatusCode;
 use uuid::Uuid;
 
@@ -18,8 +17,10 @@ use database::{
     types::DataMetadata,
 };
 
-use crate::{routes::rest::ApiResponse, utils::dataset_security::has_dataset_access};
+use dataset_security::has_dataset_access;
 use middleware::AuthenticatedUser;
+
+use crate::routes::rest::ApiResponse;
 
 const MAX_UNIQUE_VALUES: usize = 100;
 

@@ -15,17 +15,10 @@ type PreventNavigationProps = {
   onOk: (() => Promise<void>) | (() => void);
   onCancel: (() => Promise<void>) | (() => void);
   onClose?: (() => Promise<void>) | (() => void);
-  doNotLeavePageOnOkay?: boolean;
 };
 
 export const PreventNavigation: React.FC<PreventNavigationProps> = React.memo(
-  ({
-    isDirty,
-    cancelText = 'Discard changes',
-    okText = 'Save changes',
-    doNotLeavePageOnOkay,
-    ...props
-  }) => {
+  ({ isDirty, cancelText = 'Discard changes', okText = 'Save changes', ...props }) => {
     const [canceling, setCanceling] = useState(false);
     const [okaying, setOkaying] = useState(false);
     const [leavingPage, setLeavingPage] = useState(false);
@@ -113,7 +106,7 @@ export const PreventNavigation: React.FC<PreventNavigationProps> = React.memo(
             document.querySelectorAll('a').forEach((link) => {
               link.addEventListener('click', handleClick);
             });
-          }, 5);
+          }, 50);
         };
 
         setLeavingPage(true);
@@ -173,24 +166,28 @@ export const PreventNavigation: React.FC<PreventNavigationProps> = React.memo(
     });
 
     const noCallback = useMemoizedFn(async () => {
+      setCanceling(true);
       setLeavingPage(false);
       await props.onCancel?.();
       confirmationFn.current();
       confirmationFn.current = () => {};
+      setCanceling(false);
     });
 
     const yesCallback = useMemoizedFn(async () => {
-      await props.onOk?.();
-      if (!doNotLeavePageOnOkay) confirmationFn.current();
+      setOkaying(true);
       setLeavingPage(false);
+      await props.onOk?.();
+      confirmationFn.current();
       confirmationFn.current = () => {};
+      setOkaying(false);
     });
 
     useMount(() => {
       window.history.pushState(null, document.title, window.location.href);
     });
 
-    if (!isDirty) return null;
+    if (!isDirty) return <div className="bg-green-500 p-10" />;
 
     return (
       <LeavingDialog
@@ -258,11 +255,10 @@ const LeavingDialog: React.FC<{
     }, [okaying, canceling, disableButtons, noCallback, yesCallback, cancelText, okText]);
 
     return (
-      <AppModal
-        open={isOpen}
-        onClose={onClose}
-        header={memoizedHeader}
-        footer={memoizedFooter}></AppModal>
+      <>
+        <div className="bg-red-500 p-10" />
+        <AppModal open={isOpen} onClose={onClose} header={memoizedHeader} footer={memoizedFooter} />
+      </>
     );
   }
 );

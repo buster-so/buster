@@ -21,96 +21,72 @@ export const useAppLayout = () => {
     ): Promise<void> => {
       const targetPath = typeof params === 'string' ? params : createBusterRoute(params);
 
-      // Extract the pathname without query parameters
-      const targetPathname = new URL(targetPath, window.location.origin).pathname;
-      const currentPathname = new URL(window.location.href).pathname;
+      // Check if the target URL is exactly the same as current URL (including search params)
+      const targetUrl = new URL(targetPath, window.location.origin);
+      const currentUrl = new URL(window.location.href);
 
-      if (options?.shallow) {
-        const isSamePathname = targetPathname === currentPathname;
-
-        if (isSamePathname) {
-          return new Promise((resolve) => {
-            const params = getQueryParamsFromPath(targetPath);
-            onChangeQueryParams(params, false);
-            resolve();
-          });
-        }
+      // Early return if URLs are identical
+      if (targetUrl.toString() === currentUrl.toString()) {
+        return Promise.resolve();
       }
 
-      return new Promise((resolve) => {
-        // If we're already on the target pathname, but query params might differ
-        if (currentPathname === targetPathname && targetPath.indexOf('?') === -1) {
-          // Clear query params by using the pathname only
-          window.history.pushState({}, '', targetPathname);
+      // Extract the pathname without query parameters
+      const targetPathname = targetUrl.pathname;
+      const currentPathname = currentUrl.pathname;
+      const hasQueryParams = targetPath.indexOf('?') !== -1;
+
+      // Handle shallow routing (only updating query params)
+      if (options?.shallow && targetPathname === currentPathname) {
+        console.log('shallow routing', targetPathname, currentPathname);
+        return new Promise((resolve) => {
+          const params = getQueryParamsFromPath(targetPath);
+          onChangeQueryParams(params, false);
           resolve();
-          return;
-        }
-
-        // If target and current pathnames are the same but target includes query params
-        if (currentPathname === targetPathname && targetPath.indexOf('?') !== -1) {
-          push(targetPath);
-          // Set up an effect to watch for pathname changes
-          const checkPathChange = (waitTime: number = 25, iteration: number = 0) => {
-            if (window.location.href.includes(targetPath)) {
-              resolve();
-            } else if (iteration >= 10) {
-              resolve();
-            } else {
-              const newWaitTime = waitTime * 1.25;
-              setTimeout(() => checkPathChange(newWaitTime, iteration + 1), newWaitTime);
-            }
-          };
-          checkPathChange();
-          return;
-        }
-
-        // Default case - different pathnames
-        const checkPathChange = (waitTime: number = 25, iteration: number = 0) => {
-          if (window.location.pathname !== currentPathname) {
-            resolve();
-          } else if (iteration >= 10) {
-            resolve();
-          } else {
-            const newWaitTime = waitTime * 1.25;
-            setTimeout(() => checkPathChange(newWaitTime, iteration + 1), newWaitTime);
-          }
-        };
-
-        push(targetPath);
-        checkPathChange();
-      });
-    }
-  );
-
-  const createQueryParams = useMemoizedFn(
-    (params: Record<string, string | null>, preserveExisting: boolean) => {
-      const url = new URL(window.location.href);
-      const searchParams = url.searchParams;
-
-      if (!preserveExisting) {
-        searchParams.forEach((value, key) => {
-          searchParams.delete(key);
         });
       }
 
-      Object.entries(params).forEach(([key, value]) => {
-        if (value) {
-          searchParams.set(key, value);
-        } else {
-          searchParams.delete(key);
-        }
-      });
+      return new Promise((resolve) => {
+        // Same pathname cases
+        if (targetPathname === currentPathname) {
+          // Case 1: Remove all query parameters
+          if (!hasQueryParams) {
+            window.history.pushState({}, '', targetPathname);
+            resolve();
+            return;
+          }
 
-      url.search = searchParams.toString();
-      return url;
+          // Case 2: Update query parameters
+          const currentParams = Object.fromEntries(currentUrl.searchParams.entries());
+          const targetParams = Object.fromEntries(targetUrl.searchParams.entries());
+
+          // Skip if params are identical
+          if (JSON.stringify(currentParams) === JSON.stringify(targetParams)) {
+            resolve();
+            return;
+          }
+
+          push(targetPath);
+          waitForUrlChange(() => window.location.href.includes(targetPath), resolve);
+          return;
+        }
+
+        // Case 3: Different pathname - navigate to new route
+        push(targetPath);
+        waitForUrlChange(() => window.location.pathname !== currentPathname, resolve);
+      });
     }
   );
 
   //TODO: make this typesafe...
   const onChangeQueryParams = useMemoizedFn(
     (params: Record<string, string | null>, preserveExisting: boolean) => {
+      const isRemovingANonExistentParam = Object.entries(params).every(([key, value]) => {
+        return !value ? !window.location.href.includes(key) : false;
+      });
+      if (isRemovingANonExistentParam) return; //we don't need to do anything if we're removing a non-existent param
       const url = createQueryParams(params, preserveExisting);
-      window.history.pushState({}, '', url); //we used window.history instead of replace for true shallow routing
+
+      if (url) window.history.pushState({}, '', url); //we used window.history instead of replace for true shallow routing
     }
   );
 
@@ -118,9 +94,28 @@ export const useAppLayout = () => {
     currentRoute,
     onChangePage,
     currentParentRoute,
-    onChangeQueryParams,
-    createQueryParams
+    onChangeQueryParams
   };
+};
+
+const createQueryParams = (params: Record<string, string | null>, preserveExisting: boolean) => {
+  const url = new URL(window.location.href);
+
+  if (!preserveExisting) {
+    // Clear all existing search parameters
+    url.search = '';
+  }
+
+  // Add new parameters
+  Object.entries(params).forEach(([key, value]) => {
+    if (value) {
+      url.searchParams.set(key, value);
+    } else {
+      url.searchParams.delete(key);
+    }
+  });
+
+  return url;
 };
 
 const getQueryParamsFromPath = (path: string): Record<string, string> => {
@@ -130,6 +125,26 @@ const getQueryParamsFromPath = (path: string): Record<string, string> => {
     params[key] = value;
   });
   return params;
+};
+
+// Helper function to wait for URL changes
+const waitForUrlChange = (
+  condition: () => boolean,
+  callback: () => void,
+  waitTime: number = 25,
+  iteration: number = 0
+) => {
+  if (condition()) {
+    callback();
+  } else if (iteration >= 10) {
+    callback(); // Resolve anyway after max attempts
+  } else {
+    const newWaitTime = waitTime * 1.25;
+    setTimeout(
+      () => waitForUrlChange(condition, callback, newWaitTime, iteration + 1),
+      newWaitTime
+    );
+  }
 };
 
 const AppLayoutContext = createContext<ReturnType<typeof useAppLayout>>(

@@ -6,6 +6,7 @@ import { ChatMessageBlock } from './ChatMessageBlock';
 import { ChatInput } from './ChatInput';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { ChatScrollToBottom } from './ChatScrollToBottom';
+import { cn } from '@/lib/utils';
 
 const autoClass = 'mx-auto max-w-[600px] w-full';
 
@@ -30,7 +31,7 @@ export const ChatContent: React.FC<{}> = React.memo(() => {
 
   return (
     <>
-      <div className="mb-40 flex h-full w-full flex-col overflow-hidden">
+      <div className="mb-40 flex h-full w-full flex-col">
         {chatMessageIds?.map((messageId, index) => (
           <div key={messageId} className={autoClass}>
             <ChatMessageBlock
@@ -59,13 +60,12 @@ const ChatInputWrapper: React.FC<{
   children?: React.ReactNode;
 }> = React.memo(({ children }) => {
   return (
-    <div className="bg-page-background absolute bottom-0 w-full">
+    <div className="bg-page-background absolute bottom-0 w-full overflow-visible">
       <div className="from-page-background pointer-events-none absolute -top-16 h-16 w-full bg-gradient-to-t to-transparent" />
-      <div className={autoClass}>
+      <div className={cn(autoClass, 'relative')}>
         <ChatInput />
+        {children}
       </div>
-
-      {children}
     </div>
   );
 });

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronRight, Trash } from '@/components/ui/icons';
 import { useMemoizedFn } from '@/hooks';
@@ -135,15 +135,15 @@ const DropdownIcon: React.FC<{
   onClickDelete?: () => void;
   isDragging?: boolean;
 }> = React.memo(({ open, onToggleDropdown, onClickDelete, isDragging }) => {
-  const memoizedAnimation = useMemo(() => {
-    return {
-      initial: { rotate: 0 },
-      animate: { rotate: open ? 90 : 0 },
-      transition: { duration: ANIMATION_DURATION }
-    };
-  }, [open]);
+  // const memoizedAnimation = useMemo(() => {
+  //   return {
+  //     initial: { rotate: 0 },
+  //     animate: { rotate: open ? 90 : 0 },
+  //     transition: { duration: ANIMATION_DURATION }
+  //   };
+  // }, [open]);
 
-  const onClickToggleDropdown = useMemoizedFn((e: React.MouseEvent<HTMLDivElement>) => {
+  const onClickToggleDropdown = useMemoizedFn((e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
     onToggleDropdown();
   });
@@ -182,13 +182,16 @@ const DropdownIcon: React.FC<{
         size="small"
         className="flex"
         variant="ghost"
+        onClick={onClickToggleDropdown}
         prefix={
-          <motion.div
-            className={cn('flex items-center justify-center', isDragging && 'hidden!')}
-            {...memoizedAnimation}
-            onClick={onClickToggleDropdown}>
+          <div
+            className={cn(
+              'flex items-center justify-center transition-transform duration-200',
+              isDragging && 'hidden!',
+              open && 'rotate-90'
+            )}>
             <ChevronRight />
-          </motion.div>
+          </div>
         }></Button>
     </div>
   );

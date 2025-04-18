@@ -62,19 +62,19 @@ export const PermissionGroupDatasetGroupsListContainer: React.FC<{
       cannotQueryPermissionDatasetGroups: BusterListRowItem[];
       canQueryPermissionDatasetGroups: BusterListRowItem[];
     }>(
-      (acc, datasetGroup) => {
-        const datasetGroupItem: BusterListRowItem = {
-          id: datasetGroup.id,
-          data: datasetGroup,
+      (acc, permissionGroupDatasetGroup) => {
+        const permissionGroupDatasetGroupItem: BusterListRowItem = {
+          id: permissionGroupDatasetGroup.id,
+          data: permissionGroupDatasetGroup,
           link: createBusterRoute({
-            route: BusterRoutes.SETTINGS_DATASET_GROUPS_ID_DATASETS,
-            datasetGroupId: datasetGroup.id
+            route: BusterRoutes.SETTINGS_PERMISSION_GROUPS_ID_USERS,
+            permissionGroupId: permissionGroupId
           })
         };
-        if (datasetGroup.assigned) {
-          acc.canQueryPermissionDatasetGroups.push(datasetGroupItem);
+        if (permissionGroupDatasetGroup.assigned) {
+          acc.canQueryPermissionDatasetGroups.push(permissionGroupDatasetGroupItem);
         } else {
-          acc.cannotQueryPermissionDatasetGroups.push(datasetGroupItem);
+          acc.cannotQueryPermissionDatasetGroups.push(permissionGroupDatasetGroupItem);
         }
         return acc;
       },

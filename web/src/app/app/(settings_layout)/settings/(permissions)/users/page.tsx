@@ -11,6 +11,7 @@ import { useInviteModalStore } from '@/context/BusterAppLayout';
 import { InvitePeopleModal } from '@/components/features/modal/InvitePeopleModal';
 import { useMemoizedFn } from '@/hooks';
 import { Button } from '@/components/ui/buttons';
+import { Plus } from '@/components/ui/icons';
 
 export default function Page() {
   const userOrganization = useUserConfigContextSelector((x) => x.userOrganizations);
@@ -43,7 +44,9 @@ export default function Page() {
               setSearchText={handleSearchChange}
             />
 
-            <Button onClick={() => onToggleInviteModal(true)}>Invite people</Button>
+            <Button prefix={<Plus />} onClick={() => onToggleInviteModal(true)}>
+              Invite people
+            </Button>
           </div>
         </div>
 

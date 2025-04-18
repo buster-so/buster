@@ -11,11 +11,11 @@ import {
 } from '@/components/features/PermissionComponents';
 import React, { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/buttons';
-import { DatasetGroupDatasetGroupsListContainer } from './DatasetGroupDatasetsListContainer';
+import { DatasetGroupPermissionGroupsListContainer } from './DatasetGroupPermissionGroupsListContainer';
 import { useMemoizedFn } from '@/hooks';
 import { Plus } from '@/components/ui/icons';
 
-export const DatasetGroupDatasetGroupsController: React.FC<{
+export const DatasetGroupPermissionGroupsController: React.FC<{
   datasetGroupId: string;
 }> = ({ datasetGroupId }) => {
   const { data } = useGetDatasetGroupPermissionGroups(datasetGroupId);
@@ -50,7 +50,7 @@ export const DatasetGroupDatasetGroupsController: React.FC<{
         handleSearchChange={handleSearchChange}
         searchPlaceholder="Search by dataset group name..."
         searchChildren={NewDatasetGroupButton}>
-        <DatasetGroupDatasetGroupsListContainer
+        <DatasetGroupPermissionGroupsListContainer
           filteredDatasetGroups={filteredItems}
           datasetGroupId={datasetGroupId}
         />

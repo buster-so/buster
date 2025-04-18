@@ -321,7 +321,7 @@ definitions:
         description: Whether to interpret dates as UTC
       convertNumberTo:
         type: string
-        description: Convert number to a different format
+        description:  this is useful for converting numberic 1-12 into month names
     required:
       - columnType
       - style

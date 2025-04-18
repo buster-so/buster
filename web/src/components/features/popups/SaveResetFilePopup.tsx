@@ -16,15 +16,25 @@ export const SaveResetFilePopup: React.FC<{
 }> = React.memo(
   ({ open, onReset, onSave, isSaving = false, className = '', showHotsKeys = false }) => {
     return (
-      <PopupContainer show={open} className={className}>
-        <SplitterContent
-          onReset={onReset}
-          onSave={onSave}
-          isSaving={isSaving}
-          open={open}
-          showHotsKeys={showHotsKeys}
-        />
-      </PopupContainer>
+      <>
+        <PopupContainer show={open} className={className}>
+          <SplitterContent
+            onReset={onReset}
+            onSave={onSave}
+            isSaving={isSaving}
+            open={open}
+            showHotsKeys={showHotsKeys}
+          />
+
+          <PreventNavigation
+            title="Unsaved changes"
+            isDirty={open}
+            description="Are you sure you want to leave this page?"
+            onOk={onSave}
+            onCancel={onReset}
+          />
+        </PopupContainer>
+      </>
     );
   }
 );
@@ -70,14 +80,6 @@ const SplitterContent: React.FC<{
           </Button>
         </div>
       </div>
-
-      <PreventNavigation
-        title="Unsaved changes"
-        isDirty={open}
-        description="Are you sure you want to leave this page?"
-        onOk={onSave}
-        onCancel={onReset}
-      />
     </React.Fragment>
   );
 });

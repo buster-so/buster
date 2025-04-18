@@ -4,19 +4,17 @@ import React, { useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AppTooltip } from '@/components/ui/tooltip';
 
+const animation = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 }
+};
+
 export const CollapseFileButton: React.FC<{
   showCollapseButton: boolean;
   onCollapseFileClick: () => void;
 }> = React.memo(({ showCollapseButton, onCollapseFileClick }) => {
   const icon = <DoubleChevronRight />;
-
-  const animation = useMemo(() => {
-    return {
-      initial: { opacity: 0 },
-      animate: { opacity: 1 },
-      exit: { opacity: 0 }
-    };
-  }, []);
 
   return (
     <AnimatePresence mode="wait" initial={false}>

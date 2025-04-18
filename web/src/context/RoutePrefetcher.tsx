@@ -13,6 +13,7 @@ const PRIORITY_ROUTES = [
   BusterRoutes.APP_CHAT_ID,
   BusterRoutes.APP_CHAT_ID_METRIC_ID_CHART,
   BusterRoutes.APP_HOME,
+  BusterRoutes.APP_LOGS,
   BusterRoutes.APP_DATASETS,
   BusterRoutes.SETTINGS,
   BusterRoutes.APP_DASHBOARD_ID,

@@ -4,7 +4,7 @@ import { BusterListSelectedOptionPopupContainer } from '@/components/ui/list';
 import { useMemoizedFn } from '@/hooks';
 import React from 'react';
 
-export const DatasetGroupDatasetGroupSelectedPopup: React.FC<{
+export const DatasetGroupPermissionGroupSelectedPopup: React.FC<{
   selectedRowKeys: string[];
   onSelectChange: (selectedRowKeys: string[]) => void;
   datasetGroupId: string;
@@ -35,4 +35,4 @@ export const DatasetGroupDatasetGroupSelectedPopup: React.FC<{
   );
 });
 
-DatasetGroupDatasetGroupSelectedPopup.displayName = 'DatasetGroupDatasetGroupSelectedPopup';
+DatasetGroupPermissionGroupSelectedPopup.displayName = 'DatasetGroupPermissionGroupSelectedPopup';

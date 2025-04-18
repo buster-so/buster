@@ -683,7 +683,7 @@ impl Agent {
                 session_id: thread_ref.id.to_string(),
                 trace_id: Uuid::new_v4().to_string(),
             }),
-            reasoning_effort: Some("low".to_string()),
+            reasoning_effort: Some("medium".to_string()),
             ..Default::default()
         };
 

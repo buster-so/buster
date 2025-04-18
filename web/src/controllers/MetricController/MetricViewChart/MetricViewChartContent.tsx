@@ -4,6 +4,7 @@ import { BusterChart } from '@/components/ui/charts';
 import { cn } from '@/lib/classMerge';
 import React, { useMemo } from 'react';
 import { METRIC_CHART_CONTAINER_ID } from './config';
+import { useMount } from '@/hooks';
 
 interface MetricViewChartContentProps {
   className?: string;
@@ -34,6 +35,10 @@ export const MetricViewChartContent: React.FC<MetricViewChartContentProps> = Rea
       if (isTable || !fetchedData) return '';
       return 'p-4';
     }, [isTable, fetchedData]);
+
+    useMount(() => {
+      console.log('metricData');
+    });
 
     return (
       <div className={cn('flex h-full flex-col overflow-hidden', cardClassName, className)}>

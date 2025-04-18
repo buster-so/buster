@@ -30,7 +30,11 @@ export const useEnsureDashboardConfig = (prefetchData: boolean = true) => {
         return null;
       });
       if (res) {
-        queryClient.setQueryData(options.queryKey, res);
+        queryClient.setQueryData(
+          dashboardQueryKeys.dashboardGetDashboard(res.dashboard.id, res.dashboard.version_number)
+            .queryKey,
+          res
+        );
         dashboardResponse = res;
       }
     }
@@ -76,9 +80,10 @@ export const useGetDashboardAndInitializeMetrics = (prefetchData: boolean = true
       initializeMetrics(data.metrics);
       setOriginalDashboards(data.dashboard);
 
-      if (!version_number && data.dashboard.version_number) {
+      if (data.dashboard.version_number) {
         queryClient.setQueryData(
-          dashboardQueryKeys.dashboardGetDashboard(id, data.dashboard.version_number).queryKey,
+          dashboardQueryKeys.dashboardGetDashboard(data.dashboard.id, data.dashboard.version_number)
+            .queryKey,
           data
         );
       }
@@ -118,13 +123,12 @@ export const useGetDashboardVersionNumber = (props?: {
 };
 
 type PredicateType = (query: Query<BusterDashboardResponse, RustApiError>) => boolean;
-const filterMetricPredicate = <PredicateType>((query) => {
+const filterDashboardPredicate = <PredicateType>((query) => {
   const lastKey = last(query.queryKey);
   return (
     typeof lastKey === 'number' &&
     !!lastKey &&
     query.state.data !== undefined &&
-    typeof query.state.data === 'object' &&
     query.state.data !== null &&
     'versions' in query.state.data
   );
@@ -158,7 +162,7 @@ const useGetLatestDashboardVersion = ({ dashboardId }: { dashboardId: string }) 
   const updateLatestVersion = useMemoizedFn(() => {
     const queries = queryClient.getQueriesData<BusterDashboardResponse, any>({
       queryKey: memoizedKey,
-      predicate: filterMetricPredicate
+      predicate: filterDashboardPredicate
     });
     const newVersion = getLatestVersionNumber(queries);
     setLatestVersion(newVersion);
@@ -192,7 +196,7 @@ export const useGetLatestDashboardVersionNumber = () => {
   const method = useMemoizedFn((dashboardId: string) => {
     const queries = queryClient.getQueriesData<BusterDashboardResponse, any>({
       queryKey: dashboardQueryKeys.dashboardGetDashboard(dashboardId, null).queryKey.slice(0, -1),
-      predicate: filterMetricPredicate
+      predicate: filterDashboardPredicate
     });
 
     return getLatestVersionNumber(queries);

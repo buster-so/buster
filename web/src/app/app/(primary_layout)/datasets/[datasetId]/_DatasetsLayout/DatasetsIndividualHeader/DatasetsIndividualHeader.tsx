@@ -83,7 +83,6 @@ export const DatasetsIndividualHeader: React.FC<{}> = React.memo(({}) => {
         cancelText="Discard changes"
         onOk={onPublishDataset}
         onCancel={onCancelPreventNavigation}
-        doNotLeavePageOnOkay
       />
     </>
   );

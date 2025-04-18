@@ -105,8 +105,6 @@ export const useBusterNewChat = () => {
         (messageId) => messageId === messageId
       );
 
-      console.log('messageIndex', messageIndex);
-
       if (messageIndex && messageIndex !== -1) {
         console.log('oldMessageIds', currentChat?.message_ids);
         const updatedMessageIds = currentChat?.message_ids.slice(0, messageIndex + 1);

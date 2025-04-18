@@ -72,7 +72,7 @@ Example `lib.rs`:
 //! This library provides...
 
 // Re-export common workspace types if needed
-pub use common_types::{Result, Error};
+pub use anyhow::{Result, Error};
 
 pub mod models;
 pub mod utils;
@@ -91,7 +91,7 @@ pub use models::{ImportantType, AnotherType};
 Example `errors.rs`:
 ```rust
 use thiserror::Error;
-use common_types::Error as WorkspaceError;
+use anyhow::Error as WorkspaceError;
 
 #[derive(Error, Debug)]
 pub enum Error {

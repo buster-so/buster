@@ -61,10 +61,10 @@ export const MetricContainerHeaderButtons: React.FC<FileContainerButtonsProps> =
 MetricContainerHeaderButtons.displayName = 'MetricContainerHeaderButtons';
 
 const EditChartButton = React.memo(({ metricId }: { metricId: string }) => {
+  const onChangePage = useAppLayoutContextSelector((x) => x.onChangePage);
   const selectedFileViewSecondary = useChatLayoutContextSelector(
     (x) => x.selectedFileViewSecondary
   );
-  const onChangePage = useAppLayoutContextSelector((x) => x.onChangePage);
   const chatId = useChatIndividualContextSelector((x) => x.chatId);
   const metricVersionNumber = useChatLayoutContextSelector((x) => x.metricVersionNumber);
   const editableSecondaryView: MetricFileViewSecondary = 'chart-edit';
@@ -125,6 +125,16 @@ const EditSQLButton = React.memo(({ metricId }: { metricId: string }) => {
   const isSelectedView = selectedFileViewSecondary === editableSecondaryView;
 
   const href = useMemo(() => {
+    if (isSelectedView) {
+      return assetParamsToRoute({
+        chatId,
+        assetId: metricId,
+        type: 'metric',
+        secondaryView: null,
+        versionNumber: metricVersionNumber
+      });
+    }
+
     return assetParamsToRoute({
       chatId,
       assetId: metricId,
@@ -140,7 +150,12 @@ const EditSQLButton = React.memo(({ metricId }: { metricId: string }) => {
   });
 
   return (
-    <Link href={href}>
+    <Link
+      href={href}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}>
       <SelectableButton
         tooltipText="SQL editor"
         icon={<SquareCode />}

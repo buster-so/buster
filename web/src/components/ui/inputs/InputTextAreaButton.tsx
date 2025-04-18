@@ -8,12 +8,12 @@ import { ShapeSquare } from '../icons/NucleoIconFilled';
 import { useMemoizedFn } from '@/hooks';
 
 const inputTextAreaButtonVariants = cva(
-  'relative flex w-full items-center overflow-visible rounded-xl border border-border transition-all duration-200',
+  'relative flex flex-col w-full items-center overflow-visible rounded-xl cursor-text border border-border transition-all duration-200',
   {
     variants: {
       variant: {
         default:
-          'has-[textarea:hover]:border-foreground shadow bg-background has-[textarea:focus]:border-foreground has-[textarea:disabled]:border-border'
+          'hover:border-foreground shadow bg-background has-[textarea:focus]:border-foreground has-[textarea:disabled]:border-border'
       }
     }
   }
@@ -52,10 +52,19 @@ export const InputTextAreaButton = forwardRef<HTMLTextAreaElement, InputTextArea
       onSubmit(text);
     });
 
+    const onClickBox = useMemoizedFn(() => {
+      if (disabled) return;
+      if (typeof textRef === 'object' && textRef?.current) {
+        textRef.current.focus();
+      }
+    });
+
     return (
       <div
+        onClick={onClickBox}
         className={cn(
           inputTextAreaButtonVariants({ variant }),
+          'transition-all duration-500 hover:shadow-md focus:shadow-lg',
           loading && 'border-border!',
           className
         )}>
@@ -64,8 +73,7 @@ export const InputTextAreaButton = forwardRef<HTMLTextAreaElement, InputTextArea
           disabled={disabled || loading}
           variant="ghost"
           className={cn(
-            'leading-1.3 w-full px-5! py-4! pr-10 align-middle transition-all duration-500',
-            'hover:shadow-md focus:shadow-lg',
+            'leading-1.3 w-full px-5! pt-4! pr-10 align-middle',
             loading && 'cursor-not-allowed! opacity-70'
           )}
           autoResize={autoResize}
@@ -75,7 +83,7 @@ export const InputTextAreaButton = forwardRef<HTMLTextAreaElement, InputTextArea
           {...props}
         />
 
-        <div className="absolute right-2 bottom-2">
+        <div className="flex w-full justify-end p-2 pt-0">
           <SubmitButton
             disabled={disabledSubmit}
             loading={loading}

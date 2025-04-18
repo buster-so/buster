@@ -5,6 +5,7 @@ import { InputTagInput } from '@/components/ui/inputs/InputTagInput';
 import { useInviteUser } from '@/api/buster_rest/users';
 import { validate } from 'email-validator';
 import { useBusterNotifications } from '@/context/BusterNotifications';
+import uniq from 'lodash/uniq';
 
 export const InvitePeopleModal: React.FC<{
   open: boolean;
@@ -12,10 +13,12 @@ export const InvitePeopleModal: React.FC<{
 }> = React.memo(({ open, onClose }) => {
   const [emails, setEmails] = React.useState<string[]>([]);
   const { mutateAsync: inviteUsers, isPending: inviting } = useInviteUser();
+  const [inputText, setInputText] = React.useState<string>('');
   const { openErrorMessage } = useBusterNotifications();
 
   const handleInvite = useMemoizedFn(async () => {
-    await inviteUsers({ emails });
+    const allEmails = uniq([...emails, inputText].filter((email) => !!email && validate(email)));
+    await inviteUsers({ emails: allEmails });
     onClose();
   });
 
@@ -26,22 +29,27 @@ export const InvitePeopleModal: React.FC<{
     };
   }, []);
 
+  const isInputTextValidEmail = useMemo(() => {
+    return validate(inputText);
+  }, [inputText]);
+
   const memoizedFooter = useMemo(() => {
     return {
       primaryButton: {
         text: 'Send invites',
         onClick: handleInvite,
         loading: inviting,
-        disabled: emails.length === 0
+        disabled: inputText.length ? !isInputTextValidEmail : emails.length === 0
       }
     };
-  }, [inviting, emails.length]);
+  }, [inviting, isInputTextValidEmail, emails.length, inputText.length]);
 
   return (
     <AppModal open={open} onClose={onClose} header={memoizedHeader} footer={memoizedFooter}>
       <div className="flex flex-col">
         <InputTagInput
           tags={emails}
+          onChangeText={setInputText}
           onTagAdd={(v) => {
             if (validate(v)) {
               setEmails([...emails, v]);

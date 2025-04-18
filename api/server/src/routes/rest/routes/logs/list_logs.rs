@@ -36,7 +36,7 @@ pub async fn list_logs_route(
     };
 
     match list_logs_handler(request, organization_id).await {
-        Ok(response) => Ok(ApiResponse::JsonData(response)),
+        Ok(response) => Ok(ApiResponse::JsonData(response.items)),
         Err(e) => {
             tracing::error!("Error listing logs: {}", e);
             Err((StatusCode::INTERNAL_SERVER_ERROR, "Failed to list logs"))

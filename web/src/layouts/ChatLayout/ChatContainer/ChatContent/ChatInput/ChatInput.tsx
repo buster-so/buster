@@ -7,7 +7,7 @@ import { useChatIndividualContextSelector } from '../../../ChatContext';
 import { InputTextAreaButton } from '@/components/ui/inputs/InputTextAreaButton';
 import { cn } from '@/lib/classMerge';
 
-const autoResizeConfig = { minRows: 3, maxRows: 16 };
+const autoResizeConfig = { minRows: 2, maxRows: 16 };
 
 export const ChatInput: React.FC<{}> = React.memo(({}) => {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -33,8 +33,7 @@ export const ChatInput: React.FC<{}> = React.memo(({}) => {
   return (
     <div
       className={cn(
-        'flex flex-col space-y-1.5',
-        'z-10 mx-3 mt-0.5 mb-2 flex min-h-fit flex-col items-center overflow-visible'
+        'z-10 mx-3 mt-0.5 mb-2 flex min-h-fit flex-col items-center space-y-1.5 overflow-visible'
       )}>
       <InputTextAreaButton
         placeholder="Ask Buster a question..."

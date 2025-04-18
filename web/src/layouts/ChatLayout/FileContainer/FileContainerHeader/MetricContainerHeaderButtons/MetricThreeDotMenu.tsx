@@ -22,7 +22,6 @@ import {
   SquareChartPen,
   Star,
   ShareRight,
-  FullScreen,
   ArrowUpRight,
   Table
 } from '@/components/ui/icons';
@@ -489,21 +488,28 @@ const useRenameMetricSelectMenu = ({ metricId }: { metricId: string }) => {
 };
 
 export const useShareMenuSelectMenu = ({ metricId }: { metricId: string }) => {
-  const { data: metric } = useGetMetric({ id: metricId }, { select: getShareAssetConfig });
+  const { data: shareAssetConfig } = useGetMetric(
+    { id: metricId },
+    { select: getShareAssetConfig }
+  );
+  const isOwner = getIsOwner(shareAssetConfig?.permission);
 
   return useMemo(
     () => ({
       label: 'Share metric',
       value: 'share-metric',
       icon: <ShareRight />,
-      items: (
-        <ShareMenuContent
-          key={metricId}
-          shareAssetConfig={metric!}
-          assetId={metricId}
-          assetType={ShareAssetType.METRIC}
-        />
-      )
+      disabled: !isOwner,
+      items: isOwner
+        ? [
+            <ShareMenuContent
+              key={metricId}
+              shareAssetConfig={shareAssetConfig!}
+              assetId={metricId}
+              assetType={ShareAssetType.METRIC}
+            />
+          ]
+        : undefined
     }),
     [metricId]
   );

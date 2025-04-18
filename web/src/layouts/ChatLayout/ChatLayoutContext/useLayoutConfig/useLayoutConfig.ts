@@ -145,12 +145,7 @@ export const useLayoutConfig = ({
         draft[selectedFileId].fileViewConfig[selectedFileView].secondaryView = null;
       });
     });
-    onChangeQueryParams(
-      {
-        secondary_view: null
-      },
-      true
-    );
+    onChangeQueryParams({ secondary_view: null }, true);
     await timeout(250); //wait for the panel to close
   });
 

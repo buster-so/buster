@@ -16,9 +16,9 @@ import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { useMemoizedFn } from '@/hooks';
 import React, { useMemo, useState } from 'react';
-import { DatasetGroupDatasetGroupSelectedPopup } from './DatasetGroupDatasetSelectedPopup';
+import { DatasetGroupPermissionGroupSelectedPopup } from './DatasetGroupPermissionGroupSelectedPopup';
 
-export const DatasetGroupDatasetGroupsListContainer: React.FC<{
+export const DatasetGroupPermissionGroupsListContainer: React.FC<{
   filteredDatasetGroups: GetDatasetGroupPermissionGroupsResponse[];
   datasetGroupId: string;
 }> = React.memo(({ filteredDatasetGroups, datasetGroupId }) => {
@@ -72,8 +72,8 @@ export const DatasetGroupDatasetGroupsListContainer: React.FC<{
           id: datasetGroup.id,
           data: datasetGroup,
           link: createBusterRoute({
-            route: BusterRoutes.SETTINGS_DATASET_GROUPS_ID_DATASETS,
-            datasetGroupId: datasetGroup.id
+            route: BusterRoutes.SETTINGS_PERMISSION_GROUPS_ID_DATASETS,
+            permissionGroupId: datasetGroup.id
           })
         };
         if (datasetGroup.assigned) {
@@ -120,7 +120,7 @@ export const DatasetGroupDatasetGroupsListContainer: React.FC<{
   return (
     <InfiniteListContainer
       popupNode={
-        <DatasetGroupDatasetGroupSelectedPopup
+        <DatasetGroupPermissionGroupSelectedPopup
           selectedRowKeys={selectedRowKeys}
           onSelectChange={setSelectedRowKeys}
           datasetGroupId={datasetGroupId}
@@ -136,7 +136,7 @@ export const DatasetGroupDatasetGroupsListContainer: React.FC<{
         onSelectChange={setSelectedRowKeys}
         emptyState={useMemo(
           () => (
-            <EmptyStateList text="No dataset groups found" />
+            <EmptyStateList text="No permission groups found" />
           ),
           []
         )}
@@ -145,4 +145,4 @@ export const DatasetGroupDatasetGroupsListContainer: React.FC<{
   );
 });
 
-DatasetGroupDatasetGroupsListContainer.displayName = 'DatasetGroupDatasetGroupsListContainer';
+DatasetGroupPermissionGroupSelectedPopup.displayName = 'DatasetGroupPermissionGroupSelectedPopup';

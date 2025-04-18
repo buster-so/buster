@@ -1,3 +1,5 @@
+//! Library for handling dataset security and permissions.
+
 use anyhow::{anyhow, Result};
 use diesel::{BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl};
 use diesel_async::RunQueryDsl;
@@ -7,8 +9,11 @@ use database::{
     pool::{get_pg_pool, PgPool},
     models::Dataset,
     schema::{
-        datasets, datasets_to_permission_groups, permission_groups,
-        permission_groups_to_identities, teams_to_users,
+        datasets,
+        datasets_to_permission_groups,
+        permission_groups,
+        permission_groups_to_identities,
+        teams_to_users,
     },
 };
 
@@ -22,6 +27,8 @@ pub async fn get_permissioned_datasets(
         Ok(conn) => conn,
         Err(e) => return Err(anyhow!("Unable to get connection from pool: {}", e)),
     };
+
+    // TODO: Add logic to check if user is admin, if so, return all datasets
 
     let datasets = match datasets::table
         .select(datasets::all_columns)
@@ -106,4 +113,4 @@ pub async fn has_dataset_access(user_id: &Uuid, dataset_id: &Uuid) -> Result<boo
     };
 
     Ok(has_dataset_access)
-}
+} 

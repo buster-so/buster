@@ -2879,7 +2879,7 @@ fn generate_file_response_values(filtered_files: &[CompletedFileInfo]) -> Vec<Va
             filter_version_id: None,
             metadata: Some(vec![BusterChatResponseFileMetadata {
                 status: "completed".to_string(),
-                message: format!("Created new {} file.", file_info.file_type),
+                message: format!("Created new {} file", file_info.file_type),
                 timestamp: Some(Utc::now().timestamp()),
             }]),
         };

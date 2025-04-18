@@ -67,7 +67,7 @@ export const LoginForm: React.FC<{}> = ({}) => {
     } catch (error: any) {
       errorFallback(error);
     }
-    setLoading('google');
+    setLoading(null);
   });
 
   const onSignInWithGithub = useMemoizedFn(async () => {
@@ -78,7 +78,7 @@ export const LoginForm: React.FC<{}> = ({}) => {
     } catch (error: any) {
       errorFallback(error);
     }
-    setLoading('github');
+    setLoading(null);
   });
 
   const onSignInWithAzure = useMemoizedFn(async () => {
@@ -182,6 +182,10 @@ const LoginOptions: React.FC<{
     Object.keys(Cookies.get()).forEach((cookieName) => {
       Cookies.remove(cookieName);
     });
+
+    //also clear local storage
+    localStorage.clear();
+    sessionStorage.clear();
   });
 
   const onSubmitClickPreflight = useMemoizedFn(async (d: { email: string; password: string }) => {
@@ -218,6 +222,7 @@ const LoginOptions: React.FC<{
         }}>
         <Button
           prefix={<Google />}
+          size={'tall'}
           onClick={() => {
             clearAllCookies();
             onSignInWithGoogle();
@@ -228,6 +233,7 @@ const LoginOptions: React.FC<{
         </Button>
         <Button
           prefix={<Github />}
+          size={'tall'}
           onClick={() => {
             clearAllCookies();
             onSignInWithGithub();
@@ -238,6 +244,7 @@ const LoginOptions: React.FC<{
         </Button>
         <Button
           prefix={<Microsoft />}
+          size={'tall'}
           onClick={() => {
             clearAllCookies();
             onSignInWithAzure();
@@ -307,6 +314,7 @@ const LoginOptions: React.FC<{
           show={signUpFlow && disableSubmitButton && !!password}
           placement="top">
           <Button
+            size={'tall'}
             block={true}
             type="submit"
             loading={loading === 'email'}
@@ -343,6 +351,7 @@ const SignUpSuccess: React.FC<{
         <Button
           key="login"
           variant="black"
+          size={'tall'}
           onClick={() => {
             setSignUpSuccess(false);
             setSignUpFlow(true);

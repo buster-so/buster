@@ -17,6 +17,7 @@ import {
 import { Tooltip } from '../tooltip/Tooltip';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 
 export interface SegmentedItem<T extends string | number = string> {
   value: T;
@@ -228,6 +229,7 @@ function SegmentedTriggerComponent<T extends string = string>(props: SegmentedTr
   const { item, selectedValue, size, block, tabRefs, handleTabClick } = props;
   const { tooltip, label, icon, disabled, value, link } = item;
   const router = useRouter();
+  const onChangePage = useAppLayoutContextSelector((x) => x.onChangePage);
 
   const LinkDiv = link ? Link : 'div';
 
@@ -237,7 +239,7 @@ function SegmentedTriggerComponent<T extends string = string>(props: SegmentedTr
       handleTabClick(value);
       // Wait for a short duration to allow the animation to complete
       await new Promise((resolve) => setTimeout(resolve, 1));
-      router.push(link);
+      onChangePage(link);
     } else {
       handleTabClick(value);
     }

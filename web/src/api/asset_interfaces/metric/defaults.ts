@@ -1,9 +1,8 @@
 import type { IBusterMetric, IBusterMetricChartConfig } from './requireInterfaces';
 import type { ColumnMetaData } from './interfaces';
-import { ChartType, ColumnLabelFormat, ColumnSettings } from './charts';
+import { ChartType, type ColumnLabelFormat, type ColumnSettings } from './charts';
 import { DEFAULT_CHART_THEME } from './charts/configColors';
 import { VerificationStatus } from '../share/verificationInterfaces';
-import { BusterMetricListItem } from './listInterfaces';
 import { ShareRole } from '../share/shareInterfaces';
 
 export const DEFAULT_CHART_CONFIG: IBusterMetricChartConfig = {

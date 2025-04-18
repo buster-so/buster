@@ -115,9 +115,9 @@ pub async fn list_chats_handler(
         );
     }
     
-    // Order by creation date descending and apply pagination
+    // Order by updated date descending and apply pagination
     query = query
-        .order_by(chats::created_at.desc())
+        .order_by(chats::updated_at.desc())
         .offset(offset as i64)
         .limit((request.page_size + 1) as i64);
     

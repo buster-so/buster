@@ -50,7 +50,13 @@ middleware = { path = "../libs/middleware" }
 sharing = { path = "../libs/sharing" }
 search = { path = "../libs/search" }
 
+# Workspace Libraries
+dataset_security = { path = "../libs/dataset_security" }
+
 [dev-dependencies]
 mockito = { workspace = true }
 tokio-test = { workspace = true }
-async-trait = { workspace = true } 
+async-trait = { workspace = true }
+
+# Add the new dependency
+# dataset_security = { path = "../libs/dataset_security" } 

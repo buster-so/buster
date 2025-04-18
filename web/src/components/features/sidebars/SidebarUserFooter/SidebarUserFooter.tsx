@@ -15,8 +15,8 @@ import { BUSTER_DOCS_URL } from '@/routes/externalRoutes';
 import { type DropdownProps, Dropdown } from '@/components/ui/dropdown/Dropdown';
 import { AvatarUserButton } from '@/components/ui/avatar/AvatarUserButton';
 import { useUserConfigContextSelector } from '@/context/Users';
-import { signOut as signOutServer } from '@/lib/supabase/signOut';
 import { useContactSupportModalStore } from '@/context/BusterAppLayout';
+import { useSignOut } from '@/components/features/auth/SignOutHandler';
 
 export const SidebarUserFooter: React.FC<{}> = () => {
   const user = useUserConfigContextSelector((x) => x.user);
@@ -26,8 +26,10 @@ export const SidebarUserFooter: React.FC<{}> = () => {
 
   if (!name || !email) return null;
 
+  const handleSignOut = useSignOut();
+
   return (
-    <SidebarUserDropdown signOut={signOutServer}>
+    <SidebarUserDropdown signOut={handleSignOut}>
       <div className="flex w-full">
         <AvatarUserButton username={name} email={email} />
       </div>

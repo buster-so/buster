@@ -24,6 +24,9 @@ pub struct LogListItem {
     pub created_by_name: String,
     pub created_by_avatar: Option<String>,
     pub last_edited: String,
+    pub most_recent_file_id: Option<String>,
+    pub most_recent_file_type: Option<String>,
+    pub most_recent_version_number: Option<i32>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -47,6 +50,9 @@ struct ChatWithUser {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub created_by: Uuid,
+    pub most_recent_file_id: Option<Uuid>,
+    pub most_recent_file_type: Option<String>,
+    pub most_recent_version_number: Option<i32>,
     // User fields
     pub user_name: Option<String>,
     pub user_attributes: Value,
@@ -62,7 +68,7 @@ struct ChatWithUser {
 pub async fn list_logs_handler(
     request: ListLogsRequest,
     organization_id: Uuid,
-) -> Result<Vec<LogListItem>, anyhow::Error> {
+) -> Result<ListLogsResponse, anyhow::Error> {
     use database::schema::{chats, users};
 
     let mut conn = get_pg_pool().get().await?;
@@ -78,9 +84,9 @@ pub async fn list_logs_handler(
     let page = request.page.unwrap_or(1);
     let offset = (page - 1) * request.page_size;
 
-    // Order by creation date descending and apply pagination
+    // Order by updated date descending and apply pagination
     query = query
-        .order_by(chats::created_at.desc())
+        .order_by(chats::updated_at.desc())
         .offset(offset as i64)
         .limit((request.page_size + 1) as i64);
 
@@ -92,6 +98,9 @@ pub async fn list_logs_handler(
             chats::created_at,
             chats::updated_at,
             chats::created_by,
+            chats::most_recent_file_id,
+            chats::most_recent_file_type,
+            chats::most_recent_version_number,
             users::name.nullable(),
             users::attributes,
         ))
@@ -120,16 +129,19 @@ pub async fn list_logs_handler(
                 created_by_name: chat.user_name.unwrap_or_else(|| "Unknown".to_string()),
                 created_by_avatar,
                 last_edited: chat.updated_at.to_rfc3339(),
+                most_recent_file_id: chat.most_recent_file_id.map(|id| id.to_string()),
+                most_recent_file_type: chat.most_recent_file_type,
+                most_recent_version_number: chat.most_recent_version_number,
             }
         })
         .collect();
 
     // Create pagination info
-    let _pagination = PaginationInfo {
+    let pagination = PaginationInfo {
         has_more,
         next_page: if has_more { Some(page + 1) } else { None },
         total_items: items.len() as i32,
     };
 
-    Ok(items)
+    Ok(ListLogsResponse { items, pagination })
 }

@@ -45,7 +45,7 @@ export const PermissionGroupDatasetGroupsController: React.FC<{
       <PermissionSearchAndListWrapper
         searchText={searchText}
         handleSearchChange={handleSearchChange}
-        searchPlaceholder="Search by dataset group name..."
+        searchPlaceholder="Search by permission group name..."
         searchChildren={NewDatasetGroupButton}>
         <PermissionGroupDatasetGroupsListContainer
           filteredDatasetGroups={filteredItems}

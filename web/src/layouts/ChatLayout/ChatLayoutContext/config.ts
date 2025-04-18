@@ -1,1 +1,1 @@
-export const DEFAULT_CHAT_OPTION_SIDEBAR_SIZE = '295px';
+export const DEFAULT_CHAT_OPTION_SIDEBAR_SIZE = '380px';

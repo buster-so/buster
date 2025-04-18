@@ -11,6 +11,7 @@ export interface TagInputProps extends VariantProps<typeof inputVariants> {
   tags: string[];
   onTagAdd?: (tag: string) => void;
   onTagRemove?: (index: number) => void;
+  onChangeText?: (text: string) => void;
   placeholder?: string;
   disabled?: boolean;
   maxTags?: number;
@@ -26,6 +27,7 @@ const InputTagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
       tags = [],
       onTagAdd,
       onTagRemove,
+      onChangeText,
       placeholder,
       disabled = false,
       maxTags,
@@ -72,6 +74,7 @@ const InputTagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
       } else {
         setInputValue(value);
       }
+      onChangeText?.(value);
     });
 
     // Focus the container when clicked
