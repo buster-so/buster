@@ -37,8 +37,8 @@ export const updatePermissionGroups = async (
   return await mainApi.put(`/permission_groups`, data).then((res) => res.data);
 };
 
-export const deletePermissionGroup = async ({ id }: { id: string }): Promise<void> => {
-  return await mainApi.delete(`/permission_groups/${id}`).then((res) => res.data);
+export const deletePermissionGroup = async (data: { ids: string }[]): Promise<void> => {
+  return await mainApi.delete(`/permission_groups`, { data }).then((res) => res.data);
 };
 
 export const createPermissionGroup = async ({
@@ -102,31 +102,37 @@ export const getPermissionGroupDatasetGroups_server = async ({
 };
 
 export const updatePermissionGroupUsers = async ({
-  id,
+  id: permissionGroupId,
   data
 }: {
   id: string;
   data: { id: string; assigned: boolean }[];
 }): Promise<void> => {
-  return await mainApi.put(`/permission_groups/${id}/users`, data).then((res) => res.data);
+  return await mainApi
+    .put(`/permission_groups/${permissionGroupId}/users`, data)
+    .then((res) => res.data);
 };
 
 export const updatePermissionGroupDatasets = async ({
-  id,
+  id: permissionGroupId,
   data
 }: {
   id: string;
   data: { id: string; assigned: boolean }[];
 }): Promise<void> => {
-  return await mainApi.put(`/permission_groups/${id}/datasets`, data).then((res) => res.data);
+  return await mainApi
+    .put(`/permission_groups/${permissionGroupId}/datasets`, data)
+    .then((res) => res.data);
 };
 
 export const updatePermissionGroupDatasetGroups = async ({
-  id,
+  id: permissionGroupId,
   data
 }: {
   id: string;
   data: { id: string; assigned: boolean }[];
 }): Promise<void> => {
-  return await mainApi.put(`/permission_groups/${id}/dataset_groups`, data).then((res) => res.data);
+  return await mainApi
+    .put(`/permission_groups/${permissionGroupId}/dataset_groups`, data)
+    .then((res) => res.data);
 };

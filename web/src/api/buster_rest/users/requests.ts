@@ -57,17 +57,14 @@ export const getUser_server = async ({ userId }: { userId: string }) => {
   return serverFetch<OrganizationUser>(`/users/${userId}`);
 };
 
-export const updateOrganizationUser = async ({
-  userId,
-  ...params
-}: {
-  userId: string;
-  name?: string;
-  role?: OrganizationUser['role'];
-}) => {
-  return mainApi
-    .put<OrganizationUser>(`/users/${userId}`, params)
-    .then((response) => response.data);
+export const updateOrganizationUser = async (
+  params: {
+    userId: string;
+    name?: string;
+    role?: OrganizationUser['role'];
+  }[]
+) => {
+  return mainApi.put<OrganizationUser>(`/users`, params).then((response) => response.data);
 };
 
 export const inviteUser = async ({

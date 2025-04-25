@@ -53,19 +53,21 @@ export const useGetUser = (params: Parameters<typeof getUser>[0]) => {
 export const useUpdateUser = () => {
   const queryClient = useQueryClient();
   const mutationFn = useMemoizedFn(async (params: Parameters<typeof updateOrganizationUser>[0]) => {
-    const options = queryKeys.userGetUser(params.userId);
-    queryClient.setQueryData(options.queryKey, (oldData) => {
-      return {
-        ...oldData!,
-        ...params
-      };
-    });
-    const res = await updateOrganizationUser(params);
-    return res;
+    return await updateOrganizationUser(params);
   });
 
   return useMutation({
-    mutationFn: mutationFn
+    mutationFn: mutationFn,
+    onMutate: (params) => {
+      params.forEach((data) => {
+        queryClient.setQueryData(queryKeys.userGetUser(data.userId).queryKey, (oldData) => {
+          return {
+            ...oldData!,
+            ...data
+          };
+        });
+      });
+    }
   });
 };
 
@@ -195,10 +197,12 @@ export const useCreateUserOrganization = () => {
 
       if (!alreadyHasOrganization) await createOrganization({ name: company });
       if (userResponse)
-        await updateUserInfo({
-          userId: userResponse.user.id,
-          name
-        });
+        await updateUserInfo([
+          {
+            userId: userResponse.user.id,
+            name
+          }
+        ]);
 
       await refetchUserResponse();
     }
