@@ -15,5 +15,5 @@ export default async function Layout({ children }: { children: React.ReactNode }
     );
   }
 
-  return <AppPageLayout scrollable>{children}</AppPageLayout>;
+  return <AppPageLayout scrollable={true}>{children}</AppPageLayout>;
 }

@@ -2,6 +2,7 @@
 
 import type { OrganizationUser } from '@/api/asset_interfaces/users';
 import {
+  BusterList,
   BusterListColumn,
   BusterListRowItem,
   EmptyStateList,
@@ -9,7 +10,7 @@ import {
 } from '@/components/ui/list';
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
 import { ListUserItem } from '@/components/features/list/ListUserItem';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Text } from '@/components/ui/typography';
 import { OrganizationUserRoleText } from './config';
 import { BusterRoutes, createBusterRoute } from '@/routes';
@@ -18,6 +19,8 @@ export const ListUsersComponent: React.FC<{
   users: OrganizationUser[];
   isFetched: boolean;
 }> = React.memo(({ users, isFetched }) => {
+  const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
+
   const columns: BusterListColumn[] = useMemo(
     () => [
       {
@@ -103,8 +106,9 @@ export const ListUsersComponent: React.FC<{
         columns={columns}
         rows={rows}
         showHeader={true}
-        showSelectAll={false}
-        rowClassName="pl-[30px]!"
+        showSelectAll={true}
+        selectedRowKeys={selectedRowKeys}
+        onSelectChange={setSelectedRowKeys}
         emptyState={emptyStateComponent}
       />
     </InfiniteListContainer>

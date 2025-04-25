@@ -29,7 +29,7 @@ export const UserDefaultAccess: React.FC<{
   const userIsMe = user.id === myUser.id;
 
   const onChange = useMemoizedFn(async (value: string) => {
-    await mutateAsync({ userId: user.id, role: value as OrganizationUser['role'] });
+    await mutateAsync([{ userId: user.id, role: value as OrganizationUser['role'] }]);
     refetchUser();
   });
 

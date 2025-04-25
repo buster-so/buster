@@ -8,6 +8,7 @@ import { useEffect, useMemo } from 'react';
 import { BusterListHeader } from '../BusterList/BusterListHeader';
 import { BusterListRowComponentSelector } from '../BusterList/BusterListRowComponentSelector';
 import { EmptyStateList } from '../EmptyStateList';
+import { useVirtualizer } from '@tanstack/react-virtual';
 
 export interface BusterInfiniteListProps extends BusterListProps {
   onScrollEnd?: () => void;
@@ -18,7 +19,7 @@ export interface BusterInfiniteListProps extends BusterListProps {
 export const BusterInfiniteList: React.FC<BusterInfiniteListProps> = React.memo(
   ({
     columns,
-    rows,
+    rows: rowsProp,
     selectedRowKeys,
     onSelectChange,
     emptyState,
@@ -34,6 +35,9 @@ export const BusterInfiniteList: React.FC<BusterInfiniteListProps> = React.memo(
   }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const scrollRef = useRef<HTMLDivElement | null>(null);
+
+    const rows = useMemo(() => rowsProp.filter((row) => row.hidden !== true), [rowsProp]);
+
     const lastChildIndex = useMemo(() => {
       const notHiddenRows = rows.filter((row) => !row.hidden);
       return notHiddenRows.length - 1;
@@ -135,42 +139,70 @@ export const BusterInfiniteList: React.FC<BusterInfiniteListProps> = React.memo(
       return () => scrollableParent.removeEventListener('scroll', handleScroll);
     }, [onScrollEnd, scrollEndThreshold]);
 
+    const virtualizer = useVirtualizer({
+      count: itemData.rows.length,
+      getScrollElement: () => document.getElementById('scroll-area-viewport'),
+      estimateSize: () => 48,
+      overscan: 3,
+      scrollMargin: containerRef.current?.offsetTop ?? 0
+    });
+
     return (
-      <div ref={containerRef} className="infinite-list-container relative">
-        {showHeader && !showEmptyState && (
-          <BusterListHeader
-            columns={columns}
-            onGlobalSelectChange={onSelectChange ? onGlobalSelectChange : undefined}
-            globalCheckStatus={globalCheckStatus}
-            rowsLength={rows.length}
-            showSelectAll={showSelectAll}
-            rowClassName={rowClassName}
-          />
-        )}
+      <>
+        <div ref={containerRef} className="infinite-list-container relative">
+          {showHeader && !showEmptyState && (
+            <BusterListHeader
+              columns={columns}
+              onGlobalSelectChange={onSelectChange ? onGlobalSelectChange : undefined}
+              globalCheckStatus={globalCheckStatus}
+              rowsLength={rows.length}
+              showSelectAll={showSelectAll}
+              rowClassName={rowClassName}
+            />
+          )}
 
-        {!showEmptyState &&
-          rows
-            .filter((row) => !row.hidden)
-            .map((row, index) => (
-              <BusterListRowComponentSelector
-                key={row.id}
-                row={row}
-                id={row.id}
-                isLastChild={index === lastChildIndex}
-                {...itemData}
-              />
-            ))}
+          <div
+            style={{
+              height: `${virtualizer.getTotalSize()}px`,
+              width: '100%',
+              position: 'relative'
+            }}>
+            {!showEmptyState &&
+              virtualizer.getVirtualItems().map((item) => {
+                const row = itemData.rows[item.index];
+                return (
+                  <div
+                    key={row.id}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      height: `${item.size}px`,
+                      transform: `translateY(${item.start - virtualizer.options.scrollMargin}px)`
+                    }}>
+                    <BusterListRowComponentSelector
+                      row={row}
+                      isLastChild={item.index === lastChildIndex}
+                      {...row}
+                      {...itemData}
+                    />
+                  </div>
+                );
+              })}
 
-        {showEmptyState && (
-          <div className="flex h-full items-center justify-center">
-            {typeof emptyState === 'string' ? <EmptyStateList text={emptyState} /> : emptyState}
+            {showEmptyState && (
+              <div className="flex h-full items-center justify-center">
+                {typeof emptyState === 'string' ? <EmptyStateList text={emptyState} /> : emptyState}
+              </div>
+            )}
+
+            {loadingNewContent && (
+              <div className="flex h-full items-center justify-center">{loadingNewContent}</div>
+            )}
           </div>
-        )}
-
-        {loadingNewContent && (
-          <div className="flex h-full items-center justify-center">{loadingNewContent}</div>
-        )}
-      </div>
+        </div>
+      </>
     );
   }
 );

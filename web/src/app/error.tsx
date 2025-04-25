@@ -28,7 +28,7 @@ const ErrorCard = () => {
       <Card className="-mt-10">
         <CardContent>
           <div className="flex flex-col gap-4">
-            <h1 className="animate-fade-in text-2xl font-medium">Looks like we hit an error! 😅</h1>
+            <h1 className="text-2xl font-medium">Looks like we hit an error! 😅</h1>
 
             <h5 className="animate-slide-up m-0 text-base font-medium text-gray-600">
               Don&apos;t worry, it&apos;s not you - it&apos;s us!
