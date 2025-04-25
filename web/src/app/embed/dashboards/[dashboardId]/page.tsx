@@ -1,7 +1,7 @@
 import { DashboardViewDashboardController } from '@/controllers/DashboardController/DashboardViewDashboardController';
 
-export default function EmbedDashboardsPage(props: { params: { dashboardId: string } }) {
-  const { dashboardId } = props.params;
+export default async function EmbedDashboardsPage(props: { params: Promise<{ dashboardId: string }> }) {
+  const { dashboardId } = (await props.params);
 
   return (
     <DashboardViewDashboardController

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbo",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -73,18 +73,18 @@
     "monaco-sql-languages": "^0.13.1",
     "monaco-yaml": "^5.3.1",
     "mutative": "^1.1.0",
-    "next": "14.2.28",
+    "next": "15.3.1",
     "next-themes": "^0.4.6",
     "papaparse": "^5.5.2",
     "pluralize": "^8.0.0",
     "posthog-js": "^1.236.6",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
-    "react": "^18",
+    "react": "19.1.0",
     "react-color": "^2.19.3",
     "react-colorful": "^5.6.1",
-    "react-day-picker": "8.10.1",
-    "react-dom": "^18",
+    "react-day-picker": "^9.6.7",
+    "react-dom": "19.1.0",
     "react-hotkeys-hook": "^5.0.1",
     "react-markdown": "^10.1.0",
     "react-syntax-highlighter": "^15.6.1",
@@ -102,7 +102,7 @@
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.6",
     "@eslint/eslintrc": "^3",
-    "@next/bundle-analyzer": "^15.3.1",
+    "@next/bundle-analyzer": "15.3.1",
     "@storybook/addon-controls": "^8.6.12",
     "@storybook/addon-essentials": "^8.6.12",
     "@storybook/addon-interactions": "^8.6.12",
@@ -119,8 +119,8 @@
     "@types/node": "^20",
     "@types/papaparse": "^5.3.15",
     "@types/pluralize": "^0.0.33",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react": "19.1.2",
+    "@types/react-dom": "19.1.2",
     "@types/react-scroll-to-bottom": "^4.2.5",
     "@types/react-syntax-highlighter": "^15.5.13",
     "eslint": "^9",
@@ -138,5 +138,9 @@
     "workerDirectory": [
       "public"
     ]
+  },
+  "overrides": {
+    "@types/react": "19.1.2",
+    "@types/react-dom": "19.1.2"
   }
 }

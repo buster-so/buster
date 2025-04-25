@@ -15,7 +15,7 @@ export default async function Layout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const headersList = headers();
+  const headersList = await headers();
   const pathname = headersList.get('x-pathname');
   const supabaseContext = await getSupabaseUserContext();
   const { accessToken } = supabaseContext;

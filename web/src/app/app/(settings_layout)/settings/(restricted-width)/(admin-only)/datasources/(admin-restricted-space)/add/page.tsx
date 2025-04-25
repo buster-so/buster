@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, use } from 'react';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { HeaderContainer } from '../../_HeaderContainer';
 import { useState } from 'react';
@@ -14,11 +14,17 @@ import { useMemoizedFn } from '@/hooks';
 import Link from 'next/link';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 
-export default function Page({
-  searchParams: { type }
-}: {
-  searchParams: { type?: DataSourceTypes };
-}) {
+export default function Page(
+  props: {
+    searchParams: Promise<{ type?: DataSourceTypes }>;
+  }
+) {
+  const searchParams = use(props.searchParams);
+
+  const {
+    type
+  } = searchParams;
+
   const onChangePage = useAppLayoutContextSelector((s) => s.onChangePage);
   const [selectedDataSource, setSelectedDataSource] = useState<DataSourceTypes | null>(
     getValidType(type)

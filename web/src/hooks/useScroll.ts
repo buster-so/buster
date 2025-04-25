@@ -10,7 +10,7 @@ interface ScrollState {
 }
 
 export const useScroll = (
-  element?: HTMLElement | RefObject<HTMLDivElement> | null | RefObject<HTMLDivElement | null>,
+  element?: HTMLElement | RefObject<HTMLDivElement | null> | null | RefObject<HTMLDivElement | null>,
   shouldUpdate?: () => boolean
 ): ScrollState => {
   const [scrollState, setScrollState] = useState<ScrollState>({

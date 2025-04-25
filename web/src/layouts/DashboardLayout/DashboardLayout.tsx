@@ -7,7 +7,7 @@ import { DashboardLayoutContainer } from './DashboardLayoutContainer';
 export const DashboardLayout: React.FC<{
   dashboardId: string;
   children: React.ReactNode;
-}> = ({ dashboardId, children }) => {
+}> = async ({ dashboardId, children }) => {
   return (
     <AppAssetCheckLayout assetId={dashboardId} type="dashboard">
       <DashboardLayoutContainer dashboardId={dashboardId}>{children}</DashboardLayoutContainer>

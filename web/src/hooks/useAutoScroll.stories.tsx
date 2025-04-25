@@ -15,7 +15,7 @@ const AutoScrollDemo = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isAutoAddEnabled, setIsAutoAddEnabled] = useState(false);
   const [enabled, setEnabled] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout>();
+  const intervalRef = useRef<NodeJS.Timeout>(undefined);
   const { isAutoScrollEnabled, scrollToBottom, scrollToTop, enableAutoScroll, disableAutoScroll } =
     useAutoScroll(containerRef, { enabled, observeSubTree: true });
 
@@ -211,7 +211,7 @@ export const ScrollAreaComponentWithAutoScroll: Story = {
       Array.from({ length: 9 }, (_, i) => generateCard(i + 1))
     );
     const [isAutoAddEnabled, setIsAutoAddEnabled] = useState(false);
-    const intervalRef = useRef<NodeJS.Timeout>();
+    const intervalRef = useRef<NodeJS.Timeout>(undefined);
     const {
       isAutoScrollEnabled,
       scrollToBottom,
@@ -314,7 +314,7 @@ export const RapidTextAppend: Story = {
     const containerRef = useRef<HTMLDivElement>(null);
     const [text, setText] = useState<string>('');
     const [isRunning, setIsRunning] = useState(false);
-    const intervalRef = useRef<NodeJS.Timeout>();
+    const intervalRef = useRef<NodeJS.Timeout>(undefined);
     const { isAutoScrollEnabled, enableAutoScroll, disableAutoScroll } = useAutoScroll(
       containerRef,
       { observeSubTree: true, observeCharacterData: true, observeAttributes: false }

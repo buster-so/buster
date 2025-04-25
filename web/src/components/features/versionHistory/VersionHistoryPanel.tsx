@@ -101,7 +101,7 @@ const ListItem = React.memo(
     onPrefetchAsset: (versionNumber: number, link: string) => Promise<void>;
     link: string;
   }) => {
-    const routePrefetchTimeoutRef = useRef<NodeJS.Timeout>();
+    const routePrefetchTimeoutRef = useRef<NodeJS.Timeout>(undefined);
 
     const onHoverLink = useMemoizedFn(() => {
       // Prefetch route after 50ms

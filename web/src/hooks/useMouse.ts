@@ -17,7 +17,7 @@ interface MouseState {
 }
 
 interface UseMouseOptions {
-  target?: React.RefObject<HTMLElement>;
+  target?: React.RefObject<HTMLElement | null>;
   moveThrottleMs?: number;
   disabled?: boolean;
 }

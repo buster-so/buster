@@ -8,7 +8,7 @@ import { cookies } from 'next/headers';
 export const signOut = async () => {
   'use server';
   const supabase = await createClient();
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
 
   // Clear all cookies
   const allCookies = cookieStore.getAll();

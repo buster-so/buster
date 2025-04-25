@@ -1,6 +1,7 @@
 import { MetricViewChart } from '@/controllers/MetricController/MetricViewChart/MetricViewChart';
 
-export default function EmbedMetricsPage({ params }: { params: { metricId: string } }) {
+export default async function EmbedMetricsPage(props: { params: Promise<{ metricId: string }> }) {
+  const params = await props.params;
   const { metricId } = params;
 
   return (

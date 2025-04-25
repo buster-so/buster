@@ -61,12 +61,11 @@ const nextConfig = {
     silenceDeprecations: ['legacy-js-api']
   },
   experimental: {
-    serverComponentsExternalPackages: [],
-    instrumentationHook: false,
     serverActions: {
       bodySizeLimit: '2mb'
     }
   },
+  serverExternalPackages: [],
   async headers() {
     return [
       {
