@@ -2,6 +2,7 @@ import dynamic from 'next/dynamic';
 import { loading } from './loading';
 import type { MetricFileViewSecondary } from '@/layouts/ChatLayout/ChatLayoutContext/useLayoutConfig/interfaces';
 import type { FileContainerSecondaryProps } from '../interfaces';
+import React from 'react';
 
 const MetricEditController = dynamic(
   () =>

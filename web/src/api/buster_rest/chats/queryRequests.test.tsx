@@ -49,7 +49,6 @@ const createWrapper = () => {
       }
     }
   });
-  // eslint-disable-next-line react/display-name
   return function TestWrapper({ children }: { children: React.ReactNode }) {
     return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
   };

@@ -38,7 +38,7 @@ const LOW_PRIORITY_PREFETCH: ((queryClient: QueryClient) => Promise<QueryClient>
 export const RoutePrefetcher: React.FC<{}> = React.memo(() => {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isPreFetchedHighPriorityRef = useRef(false);
   const isPreFetchedLowPriorityRef = useRef(false);
 
@@ -82,7 +82,7 @@ export const RoutePrefetcher: React.FC<{}> = React.memo(() => {
     }
 
     // Setup network activity monitoring
-    let fallbackTimer: NodeJS.Timeout;
+    let fallbackTimer: ReturnType<typeof setTimeout>;
     const observer = new PerformanceObserver((list) => {
       // Clear any existing debounce timer
       if (debounceTimerRef.current) {

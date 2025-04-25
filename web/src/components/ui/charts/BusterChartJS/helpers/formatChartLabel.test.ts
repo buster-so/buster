@@ -231,7 +231,7 @@ describe('formatChartLabel', () => {
       }
     } satisfies NonNullable<BusterChartProps['columnLabelFormats']>;
 
-    let result = formatChartLabel(
+    const result = formatChartLabel(
       'text_field__🔑__high_priority_item',
       columnLabelFormats,
       false,

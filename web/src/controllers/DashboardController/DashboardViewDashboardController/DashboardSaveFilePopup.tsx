@@ -39,3 +39,5 @@ export const DashboardSaveFilePopup: React.FC<{ dashboardId: string }> = React.m
     );
   }
 );
+
+DashboardSaveFilePopup.displayName = 'DashboardSaveFilePopup';

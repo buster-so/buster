@@ -1,3 +1,4 @@
+import React from 'react';
 import { AppAssetCheckLayout } from '@/layouts/AppAssetCheckLayout';
 
 export default async function MetricLayout({

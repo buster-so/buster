@@ -145,4 +145,6 @@ export const DatasetGroupPermissionGroupsListContainer: React.FC<{
   );
 });
 
+DatasetGroupPermissionGroupsListContainer.displayName = 'DatasetGroupPermissionGroupsListContainer';
+
 DatasetGroupPermissionGroupSelectedPopup.displayName = 'DatasetGroupPermissionGroupSelectedPopup';

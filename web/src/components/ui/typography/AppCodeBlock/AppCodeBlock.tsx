@@ -2,7 +2,6 @@
 
 import React from 'react';
 import lightTheme from './light';
-import { cn } from '../../../../lib/classMerge';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { FileCard } from '../../card/FileCard';
@@ -54,15 +53,13 @@ export const AppCodeBlock: React.FC<{
     <FileCard
       fileName={title || language}
       className={wrapperClassName}
-      headerButtons={React.useMemo(() => {
-        return (
-          showCopyButton && (
-            <Button variant="ghost" onClick={copyCode} prefix={<Copy />}>
-              Copy
-            </Button>
-          )
-        );
-      }, [showCopyButton, copyCode])}>
+      headerButtons={
+        showCopyButton && (
+          <Button variant="ghost" onClick={copyCode} prefix={<Copy />}>
+            Copy
+          </Button>
+        )
+      }>
       <div className="w-full overflow-x-auto">
         <div className="code-wrapper">
           {language ? (

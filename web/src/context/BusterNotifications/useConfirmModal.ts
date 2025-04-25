@@ -2,7 +2,7 @@ import {
   ConfirmModalProps,
   ConfirmProps as BaseConfirmProps
 } from '@/components/ui/modal/ConfirmModal';
-import { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 
 interface ConfirmProps<T = unknown> extends Omit<BaseConfirmProps, 'onOk'> {
   title: string | React.ReactNode;

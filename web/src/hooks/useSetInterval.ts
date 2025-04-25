@@ -20,7 +20,7 @@ import { useMemoizedFn } from './useMemoizedFn';
  * ```
  */
 export function useSetInterval(callback: () => void, delay: number | null) {
-  const intervalRef = useRef<NodeJS.Timeout>(undefined);
+  const intervalRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const savedCallback = useMemoizedFn(callback);
   const [isActive, setIsActive] = useState(false);
 

@@ -139,6 +139,8 @@ export const BorderedModal = React.memo(
   }
 );
 
+BorderedModal.displayName = 'BorderedModal';
+
 const isHeaderTitleObject = (
   header:
     | {

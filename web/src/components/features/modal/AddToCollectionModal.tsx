@@ -212,3 +212,5 @@ export const AddToCollectionModal: React.FC<{
     />
   );
 });
+
+AddToCollectionModal.displayName = 'AddToCollectionModal';

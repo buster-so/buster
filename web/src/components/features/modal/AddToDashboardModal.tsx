@@ -207,3 +207,5 @@ export const AddToDashboardModal: React.FC<{
     />
   );
 });
+
+AddToDashboardModal.displayName = 'AddToDashboardModal';

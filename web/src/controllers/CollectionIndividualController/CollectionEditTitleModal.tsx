@@ -52,3 +52,5 @@ export const CollectionEditTitleModal: React.FC<{
     </AppModal>
   );
 });
+
+CollectionEditTitleModal.displayName = 'CollectionEditTitleModal';

@@ -445,7 +445,7 @@ export const useAddAndRemoveMetricsFromDashboard = () => {
             ...metricsToActuallyAdd.map((metric) => metric.id)
           ];
 
-          let newConfig = addAndRemoveMetricsToDashboard(
+          const newConfig = addAndRemoveMetricsToDashboard(
             finalMetricIds,
             dashboardResponse.dashboard.config
           );

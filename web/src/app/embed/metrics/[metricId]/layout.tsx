@@ -1,5 +1,5 @@
 import { AppAssetCheckLayout } from '@/layouts/AppAssetCheckLayout';
-
+import React from 'react';
 export default async function EmbedMetricsLayout({
   children,
   params

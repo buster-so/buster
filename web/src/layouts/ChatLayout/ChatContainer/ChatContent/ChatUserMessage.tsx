@@ -170,3 +170,5 @@ const EditMessage: React.FC<{
     </div>
   );
 });
+
+EditMessage.displayName = 'EditMessage';

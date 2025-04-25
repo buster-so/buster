@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import type { SelectedFile } from '../../interfaces';
 import { useMemoizedFn } from '@/hooks';
 import { createSelectedFile } from './createSelectedFile';

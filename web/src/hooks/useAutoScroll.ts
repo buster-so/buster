@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 interface UseAutoScrollOptions {
   /** Whether auto-scroll is enabled at start */
@@ -83,7 +83,7 @@ export const useAutoScroll = (
   const [isAutoScrollEnabled, setIsAutoScrollEnabled] = useState(enabled);
   const observerRef = useRef<MutationObserver | null>(null);
   const rAFIdRef = useRef<number | null>(null);
-  const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const animationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastMutationTimeRef = useRef<number>(0);
   const isAnimatingRef = useRef(false);
 

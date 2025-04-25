@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { BusterDashboardResponse } from '@/api/asset_interfaces/dashboard';
 import { IBusterMetric } from '@/api/asset_interfaces/metric';
 import { HydrationBoundaryMetricStore } from '../Metrics/useOriginalMetricStore';

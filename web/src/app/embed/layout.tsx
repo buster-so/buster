@@ -3,7 +3,7 @@ import { BusterReactQueryProvider } from '@/context/BusterReactQuery/BusterReact
 import { BusterPosthogProvider } from '@/context/Posthog';
 import { SupabaseContextProvider } from '@/context/Supabase';
 import { getSupabaseUserContext } from '@/lib/supabase';
-
+import React from 'react';
 export default async function EmbedLayout({ children }: { children: React.ReactNode }) {
   const supabaseContext = await getSupabaseUserContext();
 

@@ -49,18 +49,21 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         day_hidden: 'invisible',
         ...classNames
       }}
-      components={{
-        IconLeft: ({ className, ...props }) => (
-          <div className={cn(className)} {...props}>
-            <ChevronLeft />
-          </div>
-        ),
-        IconRight: ({ className, ...props }) => (
-          <div className={cn(className)} {...props}>
-            <ChevronRight />
-          </div>
-        )
-      }}
+      components={
+        {
+          //   IconLeft: ({ className, ...props }) => (
+          //     <div className={cn(className)} {...props}>
+          //       <ChevronLeft />
+          //     </div>
+          //   ),
+          //   IconRight: ({ className, ...props }) => (
+          //     <div className={cn(className)} {...props}>
+          //       <ChevronRight />
+          //     </div>
+          //   )
+          //
+        }
+      }
       {...props}
     />
   );

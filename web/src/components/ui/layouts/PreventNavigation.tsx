@@ -37,8 +37,8 @@ export const PreventNavigation: React.FC<PreventNavigationProps> = React.memo(
      * @param e The triggered event.
      */
     const handleClick = useMemoizedFn((event: MouseEvent) => {
-      let originalTarget = event.target as HTMLElement;
-      let originalEvent = event;
+      const originalTarget = event.target as HTMLElement;
+      const originalEvent = event;
 
       const newEvent = new MouseEvent('click', {
         bubbles: true,
