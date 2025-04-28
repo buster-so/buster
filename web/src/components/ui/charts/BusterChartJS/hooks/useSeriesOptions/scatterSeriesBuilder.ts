@@ -21,6 +21,16 @@ export const scatterSeriesBuilder_data = ({
   const xAxisColumnLabelFormat = columnLabelFormats[xAxisKey] || DEFAULT_COLUMN_LABEL_FORMAT;
   const isXAxisDate = isDateColumnType(xAxisColumnLabelFormat.columnType);
 
+  const hasSizeKeyIndex = sizeKeyIndex !== null;
+  const scatterElementConfig = hasSizeKeyIndex
+    ? {
+        point: {
+          radius: (context: ScriptableContext<'bubble'>) =>
+            radiusMethod(context, sizeKeyIndex, scatterDotSize)
+        }
+      }
+    : undefined;
+
   return allYAxisKeysIndexes.map((yKeyIndex, index) => {
     const { index: yIndex, name } = yKeyIndex;
     const color = colors[index % colors.length];
@@ -28,13 +38,8 @@ export const scatterSeriesBuilder_data = ({
     const hoverBackgroundColor = addOpacityToColor(color, 0.9);
 
     return {
-      type: 'bubble',
-      elements: {
-        point: {
-          radius: (context: ScriptableContext<'bubble'>) =>
-            radiusMethod(context, sizeKeyIndex, scatterDotSize)
-        }
-      },
+      //  type: 'bubble',
+      elements: scatterElementConfig,
       backgroundColor,
       hoverBackgroundColor,
       borderColor: color,

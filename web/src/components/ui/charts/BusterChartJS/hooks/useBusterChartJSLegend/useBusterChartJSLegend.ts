@@ -18,7 +18,7 @@ import {
 } from '../../../BusterChartLegend';
 import { getLegendItems } from './helper';
 import { DatasetOption } from '../../../chartHooks';
-import { ANIMATION_THRESHOLD, LEGEND_ANIMATION_THRESHOLD } from '../../../config';
+import { LEGEND_ANIMATION_THRESHOLD } from '../../../config';
 import { timeout } from '@/lib';
 
 interface UseBusterChartJSLegendProps {
