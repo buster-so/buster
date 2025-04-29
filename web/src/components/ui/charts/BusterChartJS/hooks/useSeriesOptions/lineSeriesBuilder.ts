@@ -138,7 +138,7 @@ export const lineBuilder = (
         color: 'white'
       })
     } satisfies ChartProps<'line'>['data']['datasets'][number]['datalabels']
-  } as ChartProps<'line'>['data']['datasets'][number] & { xAxisKeys: string[] };
+  } as ChartProps<'line'>['data']['datasets'][number];
 };
 
 const getLabelPosition = (
