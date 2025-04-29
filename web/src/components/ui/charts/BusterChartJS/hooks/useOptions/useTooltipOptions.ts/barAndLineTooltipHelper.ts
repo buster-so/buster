@@ -1,12 +1,10 @@
 import type { ITooltipItem } from '../../../../BusterChartTooltip/interfaces';
-import type { Chart, ChartDataset, TooltipItem, ChartTypeRegistry } from 'chart.js';
-import { formatChartLabel } from '../../../helpers';
+import type { Chart, TooltipItem, ChartTypeRegistry } from 'chart.js';
 import { getPercentage } from './helper';
 import type { BusterChartConfigProps } from '@/api/asset_interfaces/metric/charts';
 import { formatChartValueDelimiter } from '@/components/ui/charts/commonHelpers';
 
 export const barAndLineTooltipHelper = (
-  datasets: ChartDataset[],
   dataPoints: TooltipItem<keyof ChartTypeRegistry>[],
   chart: Chart,
   columnLabelFormats: NonNullable<BusterChartConfigProps['columnLabelFormats']>,
@@ -16,9 +14,6 @@ export const barAndLineTooltipHelper = (
   hasMultipleShownDatasets: boolean,
   percentageMode: undefined | 'stacked'
 ): ITooltipItem[] => {
-  const dataPoint = dataPoints[0];
-  const dataPointDataset = dataPoint.dataset;
-
   const tooltipItems = dataPoints.flatMap<ITooltipItem>((dataPoint) => {
     const tooltipDataset = dataPoint.dataset;
     const dataPointDataIndex = dataPoint.dataIndex;
@@ -38,12 +33,7 @@ export const barAndLineTooltipHelper = (
         seriesType: 'bar',
         color,
         usePercentage,
-        formattedLabel: formatChartLabel(
-          tooltipDataset.label as string,
-          columnLabelFormats,
-          hasMultipleMeasures,
-          hasCategoryAxis
-        ),
+        formattedLabel: tooltipDataset.label as string,
         values: [
           {
             formattedValue: formatChartValueDelimiter(

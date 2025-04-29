@@ -13,14 +13,12 @@ export const pieSeriesBuilder_data = ({
   colors,
   columnLabelFormats
 }: SeriesBuilderProps): PieSerieType[] => {
-  console.log(datasetOptions);
   return datasetOptions.datasets.map<PieSerieType>((dataset) => {
     return {
-      xAxisKeys: [],
       label: formatLabelForDataset(dataset, columnLabelFormats),
       backgroundColor: colors,
       //pie will only have one dataset
-      data: dataset.data,
+      data: dataset.data as number[],
       borderColor: 'white', //I tried to set this globally in the theme but it didn't work
       tooltipData: dataset.tooltipData
     };
@@ -29,7 +27,6 @@ export const pieSeriesBuilder_data = ({
 
 export const pieSeriesBuilder_labels = ({
   datasetOptions,
-  xAxisKeys,
   columnLabelFormats
 }: LabelBuilderProps) => {
   const { ticks, ticksKey } = datasetOptions;

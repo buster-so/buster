@@ -4,66 +4,49 @@ import type {
   BusterChartProps
 } from '@/api/asset_interfaces/metric/charts';
 import type { Chart, ChartDataset, TooltipItem, ChartTypeRegistry } from 'chart.js';
-import { formatChartLabelDelimiter, formatChartValueDelimiter } from '../../../../commonHelpers';
 import { percentageFormatter } from './helper';
+import { formatLabel } from '@/lib';
 
 export const pieTooltipHelper = (
-  datasets: ChartDataset[],
   dataPoints: TooltipItem<keyof ChartTypeRegistry>[],
   chart: Chart,
   columnLabelFormats: NonNullable<BusterChartConfigProps['columnLabelFormats']>,
   keyToUsePercentage: string[]
 ): ITooltipItem[] => {
-  const dataPointDataIndex = dataPoints[0]!.dataIndex;
-  const dataPointDatasetIndex = dataPoints[0]!.datasetIndex;
-  const dataPointDataset = datasets[dataPointDatasetIndex!];
-  const tooltipDatasets = datasets.filter((dataset) => dataset.hidden && !dataset.isTrendline);
-  const dataPointIsInTooltip = tooltipDatasets.some(
-    (dataset) => dataset.label === dataPointDataset.label
-  );
+  const tooltipItems = dataPoints.flatMap<ITooltipItem>((dataPoint) => {
+    const tooltipDataset = dataPoint.dataset;
+    const datasetIndex = dataPoint.datasetIndex;
+    const dataPointDataIndex = dataPoint.dataIndex;
+    const tooltipData = tooltipDataset.tooltipData;
+    const selectedToolTipData = tooltipData[dataPointDataIndex];
 
-  if (!dataPointIsInTooltip) {
-    //  console.warn('TODO: handle data point not in tooltip');
-    //I removed the early return because if tooltip only had non plotted values it would not show
-  }
+    const items = selectedToolTipData.map<ITooltipItem>((item) => {
+      const { key, value } = item;
+      const usePercentage = keyToUsePercentage.includes(key);
+      const color = (tooltipDataset.backgroundColor as string[])[dataPointDataIndex];
+      const formattedLabel = tooltipDataset.label as string;
+      const formattedValue = formatLabel(value as number, columnLabelFormats[key as string]);
+      const formattedPercentage = usePercentage
+        ? getPiePercentage(
+            dataPointDataIndex,
+            datasetIndex,
+            tooltipDataset.data,
+            tooltipDataset.label as string,
+            columnLabelFormats,
+            chart
+          )
+        : undefined;
 
-  const tooltipItems = tooltipDatasets.map<ITooltipItem>((tooltipDataset) => {
-    const isActiveDataset = tooltipDataset.label === dataPointDataset.label;
-    const color = isActiveDataset
-      ? (dataPointDataset.backgroundColor as string[])[dataPointDataIndex]
-      : undefined;
+      return {
+        seriesType: 'pie',
+        color,
+        usePercentage,
+        formattedLabel,
+        values: [{ formattedValue, formattedLabel, formattedPercentage }]
+      };
+    });
 
-    const formattedLabel = formatChartLabelDelimiter(
-      tooltipDataset.label as string,
-      columnLabelFormats
-    );
-    const rawValue = tooltipDataset.data[dataPointDataIndex] as number;
-    const formattedValue = formatChartValueDelimiter(
-      rawValue,
-      tooltipDataset.label as string,
-      columnLabelFormats
-    );
-
-    const usePercentage = keyToUsePercentage.includes(tooltipDataset.label as string);
-
-    const formattedPercentage = usePercentage
-      ? getPiePercentage(
-          dataPointDataIndex,
-          datasets.findIndex((dataset) => dataset.label === tooltipDataset.label),
-          tooltipDataset.data,
-          tooltipDataset.label as string,
-          columnLabelFormats,
-          chart
-        )
-      : undefined;
-
-    return {
-      usePercentage,
-      color,
-      seriesType: 'pie',
-      formattedLabel,
-      values: [{ formattedValue, formattedLabel, formattedPercentage }]
-    };
+    return items;
   });
 
   return tooltipItems;

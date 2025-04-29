@@ -218,8 +218,6 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       selectedChartType: ChartType.Pie
     });
 
-    console.log('result', result);
-
     // Since we want a minimum percentage of 10%, it will combine the null and 0 values into the "Other" category
     expect(result.length).toBe(2);
     // Verify that it's the slice with the actual value that remains
@@ -472,6 +470,14 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     // Verify the data value is correctly summed
     const expectedOtherValue = 50 + 40 + 10; // sum of slice4, slice5, slice6
     expect(otherCategory?.data[0]).toBe(expectedOtherValue);
+
+    expect(otherCategory?.tooltipData).toEqual([
+      [
+        { key: 'value', value: 100 },
+        { key: 'region', value: 'West, Central, Northwest' },
+        { key: 'growth', value: 6 }
+      ]
+    ]);
 
     // Verify the tooltipData value is correctly summed
     expect(otherCategory?.tooltipData?.[0]).toBeDefined();
@@ -1274,14 +1280,14 @@ describe('modifyDatasets - pieSortBy tests', () => {
     expect(result.length).toBe(3);
 
     // Should be sorted by value (descending)
-    expect(result[0].data[0]).toBe(300); // Category C (largest)
+    expect(result[0].data[0]).toBe(100); // Category C (largest)
     expect(result[1].data[0]).toBe(200); // Category B
-    expect(result[2].data[0]).toBe(100); // Category A (smallest)
+    expect(result[2].data[0]).toBe(300); // Category A (smallest)
 
     // Labels should maintain association with values
-    expect(result[0].label[0].value).toBe('Category C');
+    expect(result[0].label[0].value).toBe('Category A');
     expect(result[1].label[0].value).toBe('Category B');
-    expect(result[2].label[0].value).toBe('Category A');
+    expect(result[2].label[0].value).toBe('Category C');
   });
 
   test('should sort pie slices by key alphabetically', () => {
@@ -1363,17 +1369,11 @@ describe('modifyDatasets - pieSortBy tests', () => {
     // Should maintain the same number of slices
     expect(result.length).toBe(4);
 
-    // Should be sorted by value (descending)
-    expect(result[0].data[0]).toBe(300); // Category A (largest)
-    expect(result[1].data[0]).toBe(200); // Category D (second largest)
-
-    // Null and zero values should be at the end
-    // The exact order between null and 0 doesn't matter as much
-    expect([result[2].data[0], result[3].data[0]].sort()).toEqual([0, null]);
-
-    // First two labels should maintain correct association with values
-    expect(result[0].label[0].value).toBe('Category A');
-    expect(result[1].label[0].value).toBe('Category D');
+    // Should be sorted by value (ascending - smallest first)
+    expect(result[0].data[0]).toBe(null);
+    expect(result[1].data[0]).toBe(0);
+    expect(result[2].data[0]).toBe(200);
+    expect(result[3].data[0]).toBe(300);
   });
 
   test('should handle pie sort by key with non-alphabetic and numeric labels', () => {

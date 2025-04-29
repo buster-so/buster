@@ -18,7 +18,6 @@ type ComboSeries = Array<
 >;
 
 export const comboSeriesBuilder_data = (props: SeriesBuilderProps): ComboSeries => {
-  console.log(props);
   const { datasetOptions } = props;
 
   return datasetOptions.datasets.map((dataset, index) => {

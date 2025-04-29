@@ -534,8 +534,6 @@ describe('trendlineDatasetCreator', () => {
       const data = result[0].data;
       expect(data).toHaveLength(5);
 
-      console.log('data', data);
-
       // Since we used perfect linear data (y = 2x + 2),
       // the regression line should be very close to the original data
       data.forEach((value, index) => {
@@ -735,7 +733,6 @@ describe('trendlineDatasetCreator', () => {
       });
 
       const data = result[0].data;
-      console.log('data', data);
       expect(data).toHaveLength(6);
 
       // Verify the trend is generally upward
@@ -1012,8 +1009,6 @@ describe('trendlineDatasetCreator', () => {
         datasetsWithTicks,
         columnLabelFormats
       );
-
-      console.log('result', result);
 
       // Assert
       expect(result).toHaveLength(1);

@@ -12,7 +12,6 @@ import { useMemoizedFn, useUnmount } from '@/hooks';
 import type { ChartJSOrUndefined } from '../../../core/types';
 import { renderToString } from 'react-dom/server';
 import { BusterChartJSTooltip } from './BusterChartJSTooltip';
-import { DatasetOptionsWithTicks, extractFieldsFromChain } from '../../../../chartHooks';
 import React from 'react';
 import { isNumericColumnType } from '@/lib/messages';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
@@ -88,21 +87,19 @@ export const useTooltipOptions = ({
   }, [lineGroupType, pieDisplayLabelAs, selectedChartType, barGroupType]);
 
   const keyToUsePercentage: string[] = useMemo(() => {
+    console.log(useGlobalPercentage, selectedChartType, tooltipKeys);
     if (useGlobalPercentage)
       return tooltipKeys.filter((key) => {
-        const extractedKey = extractFieldsFromChain(key).at(-1)?.key!;
-        const selectedColumnLabelFormat =
-          columnLabelFormats[extractedKey] || DEFAULT_COLUMN_LABEL_FORMAT;
+        const selectedColumnLabelFormat = columnLabelFormats[key] || DEFAULT_COLUMN_LABEL_FORMAT;
+        console.log(key, selectedColumnLabelFormat);
         return isNumericColumnType(selectedColumnLabelFormat.columnType);
       });
 
     if (selectedChartType === 'bar') {
       return tooltipKeys.filter((key) => {
-        const extractedKey = extractFieldsFromChain(key).at(-1)?.key!;
-        const selectedColumnLabelFormat =
-          columnLabelFormats[extractedKey] || DEFAULT_COLUMN_LABEL_FORMAT;
+        const selectedColumnLabelFormat = columnLabelFormats[key] || DEFAULT_COLUMN_LABEL_FORMAT;
         return (
-          columnSettings[extractedKey]?.showDataLabelsAsPercentage &&
+          columnSettings[key]?.showDataLabelsAsPercentage &&
           isNumericColumnType(selectedColumnLabelFormat.columnType)
         );
       });

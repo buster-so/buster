@@ -54,7 +54,6 @@ export const BusterChartJSTooltip: React.FC<{
         datasets.filter((dataset) => !dataset.hidden && !dataset.isTrendline).length > 1;
 
       return barAndLineTooltipHelper(
-        datasets,
         dataPoints,
         chart,
         columnLabelFormats,
@@ -67,7 +66,7 @@ export const BusterChartJSTooltip: React.FC<{
     }
 
     if (isPieChart) {
-      return pieTooltipHelper(datasets, dataPoints, chart, columnLabelFormats, keyToUsePercentage);
+      return pieTooltipHelper(dataPoints, chart, columnLabelFormats, keyToUsePercentage);
     }
 
     if (isScatter) {

@@ -57,13 +57,13 @@ function ChartComponent<
 
   useEffect(() => {
     if (!redraw && chartRef.current) {
-      setLabels(chartRef.current.config.data, data.labels);
+      setLabels(chartRef.current.config.data as any, data.labels);
     }
   }, [redraw, data.labels]);
 
   useEffect(() => {
     if (!redraw && chartRef.current && data.datasets) {
-      setDatasets(chartRef.current.config.data, data.datasets, datasetIdKey);
+      setDatasets(chartRef.current.config.data as any, data.datasets, datasetIdKey);
     }
   }, [redraw, data.datasets]);
 

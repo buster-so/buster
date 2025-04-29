@@ -22,6 +22,7 @@ import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import { DOWNSIZE_SAMPLE_THRESHOLD } from '../../config';
 import { aggregateAndCreateDatasets } from './aggregateAndCreateDatasets';
 import { modifyDatasets } from './modifyDatasets';
+import isEmpty from 'lodash/isEmpty';
 
 type DatasetHookResult = {
   datasetOptions: DatasetOptionsWithTicks;
@@ -64,6 +65,7 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
     pieSortBy,
     columnMetadata
   } = params;
+  console.log('pieSortBy', pieSortBy);
   const {
     x: xFields,
     y: yAxisFields,
@@ -79,7 +81,6 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
   const isBarChart = selectedChartType === 'bar';
   const isScatter = selectedChartType === 'scatter';
   const isComboChart = selectedChartType === 'combo';
-  const xAxisField = xFields[0];
 
   const xFieldsString = useMemo(() => xFields.join(','), [xFields]);
   const yAxisFieldsString = useMemo(() => yAxisFields.join(','), [yAxisFields]);
@@ -145,8 +146,10 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
   }, [y2AxisFieldsString, isComboChart]);
 
   const tooltipKeys = useMemo(() => {
+    if (isEmpty(tooltipFields)) return [...measureFields];
+
     return tooltipFields;
-  }, [tooltipFieldsString]);
+  }, [tooltipFieldsString, measureFields]);
 
   const hasMismatchedTooltipsAndMeasures = useMemo(() => {
     const allYAxis = [...yAxisFields, ...y2AxisFields];
@@ -205,6 +208,8 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
     lineGroupType,
     selectedChartType
   ]);
+
+  console.log('datasetOptions', datasetOptions);
 
   const dataTrendlineOptions = useDataTrendlineOptions({
     datasetOptions,

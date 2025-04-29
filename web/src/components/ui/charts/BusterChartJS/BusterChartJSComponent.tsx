@@ -137,6 +137,8 @@ export const BusterChartJSComponent = React.memo(
         barGroupType
       });
 
+      console.log(tooltipKeys);
+
       const options: ChartOptions<ChartJSChartType> = useOptions({
         goalLinesAnnotations,
         trendlineAnnotations,

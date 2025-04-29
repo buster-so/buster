@@ -5,7 +5,6 @@ import { ChartType } from '../../../../api/asset_interfaces/metric/charts/enum';
 import { IColumnLabelFormat } from '../../../../api/asset_interfaces/metric/charts/columnLabelInterfaces';
 import { generatePieChartData } from '../../../../mocks/chart/chartMocks';
 import { sharedMeta } from './BusterChartShared';
-import { faker } from '@faker-js/faker';
 
 type PieChartData = ReturnType<typeof generatePieChartData>;
 
@@ -71,7 +70,7 @@ export const MultipleValues: Story = {
       } satisfies IColumnLabelFormat
     },
     pieDisplayLabelAs: 'number',
-    pieDonutWidth: 50,
+    pieDonutWidth: 20,
     className: 'w-[500px] h-[500px]'
   }
 };
@@ -174,15 +173,28 @@ export const ResizableContainer: Story = {
   }
 };
 
+const names = ['Zack', 'Peter', 'Mary', 'John', 'William', 'David', 'Thomas', 'Alice'];
+const numbers = [42, 8, 73, 19, 56, 3, 91, 27, 64, 12, 38, 85];
+const numbers2 = [17, 94, 32, 61, 8, 75, 43, 29, 52, 88, 13, 67];
+const dates = [
+  '2021-01-05',
+  '2021-01-02',
+  '2021-01-09',
+  '2021-01-01',
+  '2021-01-07',
+  '2021-01-10',
+  '2021-01-03',
+  '2021-01-08',
+  '2021-01-04',
+  '2021-01-06'
+];
+
 export const WithSortingByKey: Story = {
   args: {
     selectedChartType: ChartType.Pie,
     data: Array.from({ length: 8 }, (_, index) => ({
-      segment: faker.word.adjective(),
-      value:
-        index === 1 || index === 5
-          ? faker.number.int({ min: 10, max: 25 })
-          : faker.number.int({ min: 50, max: 150 })
+      segment: names[index],
+      value: numbers[index]
     })),
     pieChartAxis: {
       x: ['segment'],
@@ -214,11 +226,8 @@ export const WithSortingByKeyWithDates: Story = {
   args: {
     selectedChartType: ChartType.Pie,
     data: Array.from({ length: 8 }, (_, index) => ({
-      date: faker.date.recent({ days: 180 }).toISOString(),
-      value:
-        index === 1 || index === 5
-          ? faker.number.int({ min: 10, max: 25 })
-          : faker.number.int({ min: 50, max: 150 })
+      date: dates[index],
+      value: numbers[index]
     })),
     pieChartAxis: {
       x: ['date'],
@@ -267,11 +276,12 @@ export const ShowLabelAsPercent: Story = {
   ),
   args: {
     selectedChartType: ChartType.Pie,
-    data: Array.from({ length: 5 }, () => ({
-      segment: faker.word.adjective(),
-      value: faker.number.int({ min: 10, max: 100 }),
-      value2: faker.number.int({ min: 10, max: 100 })
+    data: Array.from({ length: 5 }, (_, index) => ({
+      segment: names[index],
+      value: numbers[index],
+      value2: numbers2[index]
     })),
+    pieSortBy: 'value',
     pieChartAxis: {
       x: ['segment'],
       y: ['value', 'value2']
@@ -317,9 +327,9 @@ export const ManyValuesWithDataLabels: Story = {
         numberSeparatorStyle: ','
       } satisfies IColumnLabelFormat
     },
-    data: Array.from({ length: 50 }, () => ({
-      segment: faker.word.adjective(),
-      value: faker.number.int({ min: 10, max: 100 })
+    data: Array.from({ length: 50 }, (_, index) => ({
+      segment: names[index],
+      value: numbers[index]
     })),
     pieChartAxis: {
       x: ['segment'],
@@ -334,9 +344,9 @@ export const ManyValuesWithDataLabels: Story = {
 export const DataLabelsOutside: Story = {
   args: {
     selectedChartType: ChartType.Pie,
-    data: Array.from({ length: 5 }, () => ({
-      segment: faker.word.adjective(),
-      value: faker.number.int({ min: 10, max: 100 })
+    data: Array.from({ length: 5 }, (_, index) => ({
+      segment: names[index],
+      value: numbers[index]
     })),
     pieChartAxis: {
       x: ['segment'],
@@ -360,5 +370,49 @@ export const DataLabelsOutside: Story = {
       } satisfies IColumnLabelFormat
     } satisfies Record<keyof PieChartData, IColumnLabelFormat>,
     pieLabelPosition: 'outside'
+  }
+};
+
+export const MinimumSlicePercentage: Story = {
+  args: {
+    selectedChartType: ChartType.Pie,
+    data: [
+      { segment: 'Major Segment', sales: 60 },
+      { segment: 'Medium Segment', sales: 20 },
+      { segment: 'Small Segment 1', sales: 8 },
+      { segment: 'Small Segment 2', sales: 6 },
+      { segment: 'Tiny Segment 1', sales: 3 },
+      { segment: 'Tiny Segment 2', sales: 2 },
+      { segment: 'Tiny Segment 3', sales: 1 }
+    ],
+    pieChartAxis: {
+      x: ['segment'],
+      y: ['sales']
+    },
+    columnLabelFormats: {
+      segment: {
+        columnType: 'text',
+        style: 'string',
+        prefix: 'PREFIX TEST: '
+      } satisfies IColumnLabelFormat,
+      sales: {
+        columnType: 'number',
+        style: 'currency',
+        currency: 'USD',
+        displayName: 'HUH?',
+        prefix: 'PREFIX TEST2: '
+      } satisfies IColumnLabelFormat
+    },
+    pieDisplayLabelAs: 'percent',
+    pieMinimumSlicePercentage: 25,
+    className: 'w-[500px] h-[500px]'
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'This story demonstrates the minimum slice percentage feature, which groups slices smaller than the specified percentage into an "Other" category.'
+      }
+    }
   }
 };
