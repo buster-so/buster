@@ -8,7 +8,7 @@ import type { Context } from 'chartjs-plugin-datalabels';
 import { defaultLabelOptionConfig } from '../useChartSpecificOptions/labelOptionConfig';
 import type { Options } from 'chartjs-plugin-datalabels/types/options';
 import { DEFAULT_CHART_LAYOUT } from '../../ChartJSTheme';
-import { DatasetOption } from '../../../chartHooks';
+import type { DatasetOption } from '../../../chartHooks';
 import {
   type BusterChartProps,
   DEFAULT_COLUMN_LABEL_FORMAT,
@@ -86,8 +86,7 @@ export const barSeriesBuilder = ({
         index,
         xAxisKeys,
         dataLabelOptions,
-        barGroupType,
-        datasetOptions
+        barGroupType
       });
     }
   );
@@ -120,10 +119,7 @@ export const barBuilder = ({
   xAxisKeys,
   dataLabelOptions,
   barGroupType
-}: Pick<
-  SeriesBuilderProps,
-  'colors' | 'columnSettings' | 'columnLabelFormats' | 'datasetOptions'
-> & {
+}: Pick<SeriesBuilderProps, 'colors' | 'columnSettings' | 'columnLabelFormats'> & {
   dataset: DatasetOption;
   index: number;
   yAxisID?: string;
@@ -152,6 +148,7 @@ export const barBuilder = ({
     data: dataset.data,
     backgroundColor: colors[index % colors.length],
     borderRadius: (columnSetting?.barRoundness || 0) / 2,
+    tooltipData: dataset.tooltipData,
     xAxisKeys,
     datalabels: {
       clamp: false,
@@ -221,7 +218,7 @@ export const barBuilder = ({
         ...dataLabelOptions
       }
     } as ChartProps<'bar'>['data']['datasets'][number]['datalabels']
-  } as ChartProps<'bar'>['data']['datasets'][number];
+  } satisfies ChartProps<'bar'>['data']['datasets'][number];
 };
 
 const setBarDataLabelsManager = (
@@ -328,8 +325,10 @@ const getFormattedValue = (
   return formattedValue;
 };
 
-export const barSeriesBuilder_labels = (props: LabelBuilderProps) => {
-  const { datasetOptions, columnLabelFormats } = props;
+export const barSeriesBuilder_labels = ({
+  datasetOptions,
+  columnLabelFormats
+}: LabelBuilderProps) => {
   const ticksKey = datasetOptions.ticksKey;
 
   const labels = datasetOptions.ticks.flatMap((item) => {

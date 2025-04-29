@@ -5,11 +5,7 @@ import type {
   ChartType,
   ScatterAxis
 } from '@/api/asset_interfaces/metric/charts';
-import {
-  DatasetOption,
-  DatasetOptionsWithTicks,
-  extractFieldsFromChain
-} from '../../../chartHooks';
+import { DatasetOptionsWithTicks } from '../../../chartHooks';
 import { ChartProps } from '../../core';
 import type { ChartType as ChartJSChartType } from 'chart.js';
 import { useMemo } from 'react';
@@ -18,7 +14,6 @@ import { barSeriesBuilder, barSeriesBuilder_labels } from './barSeriesBuilder';
 import type { SeriesBuilderProps } from './interfaces';
 import { lineSeriesBuilder, lineSeriesBuilder_labels } from './lineSeriesBuilder';
 import { scatterSeriesBuilder_data, scatterSeriesBuilder_labels } from './scatterSeriesBuilder';
-import { defaultTooltipSeriesBuilder, scatterTooltipSeriesBuilder } from './tooltipSeriesBuilder';
 import { comboSeriesBuilder_data, comboSeriesBuilder_labels } from './comboSeriesBuilder';
 import type { ColumnMetaData } from '@/api/asset_interfaces/metric/interfaces';
 

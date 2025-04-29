@@ -1,55 +1,61 @@
 import { ChartType } from '@/api/asset_interfaces/metric';
 import { modifyDatasets } from './modifyDatasets';
-import { DatasetOption } from './interfaces';
+import { DatasetOption, DatasetOptionsWithTicks } from './interfaces';
 
 describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
   // Basic dataset setup
-  const createBasicDatasets = (): DatasetOption[] => [
-    {
-      id: 'slice1',
-      label: [[{ key: 'category', value: 'Category A' }]],
-      data: [500], // 50%
-      dataKey: 'slice1',
-      axisType: 'y',
-      tooltipData: [[{ key: 'value', value: 500 }]]
-    },
-    {
-      id: 'slice2',
-      label: [[{ key: 'category', value: 'Category B' }]],
-      data: [300], // 30%
-      dataKey: 'slice2',
-      axisType: 'y',
-      tooltipData: [[{ key: 'value', value: 300 }]]
-    },
-    {
-      id: 'slice3',
-      label: [[{ key: 'category', value: 'Category C' }]],
-      data: [100], // 10%
-      dataKey: 'slice3',
-      axisType: 'y',
-      tooltipData: [[{ key: 'value', value: 100 }]]
-    },
-    {
-      id: 'slice4',
-      label: [[{ key: 'category', value: 'Category D' }]],
-      data: [80], // 8%
-      dataKey: 'slice4',
-      axisType: 'y',
-      tooltipData: [[{ key: 'value', value: 80 }]]
-    },
-    {
-      id: 'slice5',
-      label: [[{ key: 'category', value: 'Category E' }]],
-      data: [20], // 2%
-      dataKey: 'slice5',
-      axisType: 'y',
-      tooltipData: []
-    }
-  ];
+  const createBasicDatasets = (): DatasetOptionsWithTicks => {
+    return {
+      datasets: [
+        {
+          id: 'slice1',
+          label: [{ key: 'category', value: 'Category A' }],
+          data: [500], // 50%
+          dataKey: 'slice1',
+          axisType: 'y',
+          tooltipData: [[{ key: 'value', value: 500 }]]
+        },
+        {
+          id: 'slice2',
+          label: [{ key: 'category', value: 'Category B' }],
+          data: [300], // 30%
+          dataKey: 'slice2',
+          axisType: 'y',
+          tooltipData: [[{ key: 'value', value: 300 }]]
+        },
+        {
+          id: 'slice3',
+          label: [{ key: 'category', value: 'Category C' }],
+          data: [100], // 10%
+          dataKey: 'slice3',
+          axisType: 'y',
+          tooltipData: [[{ key: 'value', value: 100 }]]
+        },
+        {
+          id: 'slice4',
+          label: [{ key: 'category', value: 'Category D' }],
+          data: [80], // 8%
+          dataKey: 'slice4',
+          axisType: 'y',
+          tooltipData: [[{ key: 'value', value: 80 }]]
+        },
+        {
+          id: 'slice5',
+          label: [{ key: 'category', value: 'Category E' }],
+          data: [20], // 2%
+          dataKey: 'slice5',
+          axisType: 'y',
+          tooltipData: []
+        }
+      ],
+      ticks: [],
+      ticksKey: []
+    };
+  };
 
   test('should not modify datasets if chart type is not pie', () => {
     const datasets = createBasicDatasets();
-    const result = modifyDatasets({
+    const { datasets: result } = modifyDatasets({
       datasets,
       pieMinimumSlicePercentage: 5,
       barSortBy: undefined,
@@ -59,13 +65,13 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       selectedChartType: ChartType.Bar
     });
 
-    expect(result).toEqual(datasets);
+    expect(result).toEqual(datasets.datasets);
     expect(result.length).toBe(5);
   });
 
   test('should not modify datasets if pieMinimumSlicePercentage is undefined', () => {
     const datasets = createBasicDatasets();
-    const result = modifyDatasets({
+    const { datasets: result } = modifyDatasets({
       datasets,
       pieMinimumSlicePercentage: undefined,
       barSortBy: undefined,
@@ -75,7 +81,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       selectedChartType: ChartType.Pie
     });
 
-    expect(result).toEqual(datasets);
+    expect(result).toEqual(datasets.datasets);
     expect(result.length).toBe(5);
   });
 
@@ -83,7 +89,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     const datasets = createBasicDatasets();
     const minimumPercentage = 10;
 
-    const result = modifyDatasets({
+    const { datasets: result } = modifyDatasets({
       datasets,
       pieMinimumSlicePercentage: minimumPercentage,
       barSortBy: undefined,
@@ -110,14 +116,14 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     const otherCategory = result.find((dataset) => dataset.id === 'other');
     expect(otherCategory).toBeDefined();
     expect(otherCategory?.data[0]).toBe(100); // Combined value of slice4 (80) and slice5 (20)
-    expect(otherCategory?.label[0][0].value).toBe('Other');
+    expect(otherCategory?.label[0].value).toBe('Other');
   });
 
   test('should handle case when no slices are below the minimum percentage', () => {
     const datasets = createBasicDatasets();
     const minimumPercentage = 1; // All slices are above 1%
 
-    const result = modifyDatasets({
+    const { datasets: result } = modifyDatasets({
       datasets,
       pieMinimumSlicePercentage: minimumPercentage,
       barSortBy: undefined,
@@ -136,7 +142,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     const datasets = createBasicDatasets();
     const minimumPercentage = 60; // All slices are below 60%
 
-    const result = modifyDatasets({
+    const { datasets: result } = modifyDatasets({
       datasets,
       pieMinimumSlicePercentage: minimumPercentage,
       barSortBy: undefined,
@@ -153,8 +159,12 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
   });
 
   test('should handle empty datasets array', () => {
-    const result = modifyDatasets({
-      datasets: [],
+    const { datasets: result } = modifyDatasets({
+      datasets: {
+        datasets: [],
+        ticks: [],
+        ticksKey: []
+      },
       pieMinimumSlicePercentage: 10,
       barSortBy: undefined,
       pieSortBy: undefined,
@@ -170,7 +180,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     const datasets: DatasetOption[] = [
       {
         id: 'slice1',
-        label: [[{ key: 'category', value: 'Category A' }]],
+        label: [{ key: 'category', value: 'Category A' }],
         data: [null], // Null value
         dataKey: 'slice1',
         axisType: 'y',
@@ -178,7 +188,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice2',
-        label: [[{ key: 'category', value: 'Category B' }]],
+        label: [{ key: 'category', value: 'Category B' }],
         data: [0], // Zero value
         dataKey: 'slice2',
         axisType: 'y',
@@ -186,7 +196,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice3',
-        label: [[{ key: 'category', value: 'Category C' }]],
+        label: [{ key: 'category', value: 'Category C' }],
         data: [100], // The only actual value
         dataKey: 'slice3',
         axisType: 'y',
@@ -194,8 +204,12 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       }
     ];
 
-    const result = modifyDatasets({
-      datasets,
+    const { datasets: result } = modifyDatasets({
+      datasets: {
+        datasets,
+        ticks: [],
+        ticksKey: []
+      },
       pieMinimumSlicePercentage: 10,
       barSortBy: undefined,
       pieSortBy: undefined,
@@ -219,7 +233,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     const datasets: DatasetOption[] = [
       {
         id: 'slice1',
-        label: [[{ key: 'category', value: 'Category A' }]],
+        label: [{ key: 'category', value: 'Category A' }],
         data: [null],
         dataKey: 'slice1',
         axisType: 'y',
@@ -227,7 +241,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice2',
-        label: [[{ key: 'category', value: 'Category B' }]],
+        label: [{ key: 'category', value: 'Category B' }],
         data: [0],
         dataKey: 'slice2',
         axisType: 'y',
@@ -235,8 +249,12 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       }
     ];
 
-    const result = modifyDatasets({
-      datasets,
+    const { datasets: result } = modifyDatasets({
+      datasets: {
+        datasets,
+        ticks: [],
+        ticksKey: []
+      },
       pieMinimumSlicePercentage: 10,
       barSortBy: undefined,
       pieSortBy: undefined,
@@ -253,7 +271,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     const datasets = createBasicDatasets();
     const minimumPercentage = 8.5; // Between slice4 (8%) and slice3 (10%)
 
-    const result = modifyDatasets({
+    const { datasets: result } = modifyDatasets({
       datasets,
       pieMinimumSlicePercentage: minimumPercentage,
       barSortBy: undefined,
@@ -279,7 +297,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     const datasets = createBasicDatasets();
     const minimumPercentage = 10;
 
-    const result = modifyDatasets({
+    const { datasets: result } = modifyDatasets({
       datasets,
       pieMinimumSlicePercentage: minimumPercentage,
       barSortBy: undefined,
@@ -304,7 +322,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     const datasets = createBasicDatasets();
     const minimumPercentage = 8; // Exactly equal to slice4's percentage
 
-    const result = modifyDatasets({
+    const { datasets: result } = modifyDatasets({
       datasets,
       pieMinimumSlicePercentage: minimumPercentage,
       barSortBy: undefined,
@@ -332,7 +350,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     const datasetsWithDetailedTooltips: DatasetOption[] = [
       {
         id: 'slice1',
-        label: [[{ key: 'category', value: 'Category A' }]],
+        label: [{ key: 'category', value: 'Category A' }],
         data: [500], // 50%
         dataKey: 'slice1',
         axisType: 'y',
@@ -346,7 +364,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice2',
-        label: [[{ key: 'category', value: 'Category B' }]],
+        label: [{ key: 'category', value: 'Category B' }],
         data: [300], // 30%
         dataKey: 'slice2',
         axisType: 'y',
@@ -360,7 +378,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice3',
-        label: [[{ key: 'category', value: 'Category C' }]],
+        label: [{ key: 'category', value: 'Category C' }],
         data: [100], // 10%
         dataKey: 'slice3',
         axisType: 'y',
@@ -374,7 +392,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice4',
-        label: [[{ key: 'category', value: 'Category D' }]],
+        label: [{ key: 'category', value: 'Category D' }],
         data: [50], // 5%
         dataKey: 'slice4',
         axisType: 'y',
@@ -388,7 +406,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice5',
-        label: [[{ key: 'category', value: 'Category E' }]],
+        label: [{ key: 'category', value: 'Category E' }],
         data: [40], // 4%
         dataKey: 'slice5',
         axisType: 'y',
@@ -402,7 +420,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice6',
-        label: [[{ key: 'category', value: 'Category F' }]],
+        label: [{ key: 'category', value: 'Category F' }],
         data: [10], // 1%
         dataKey: 'slice6',
         axisType: 'y',
@@ -418,8 +436,12 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
 
     const minimumPercentage = 10;
 
-    const result = modifyDatasets({
-      datasets: datasetsWithDetailedTooltips,
+    const { datasets: result } = modifyDatasets({
+      datasets: {
+        datasets: datasetsWithDetailedTooltips,
+        ticks: [],
+        ticksKey: []
+      },
       pieMinimumSlicePercentage: minimumPercentage,
       barSortBy: undefined,
       pieSortBy: undefined,
@@ -453,21 +475,20 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
 
     // Verify the tooltipData value is correctly summed
     expect(otherCategory?.tooltipData?.[0]).toBeDefined();
-    console.log('otherCategory?.tooltipData?.[0]', otherCategory?.tooltipData);
     const valueTooltip = otherCategory?.tooltipData?.[0].find((item) => item.key === 'value');
     expect(valueTooltip).toBeDefined();
     expect(valueTooltip?.value).toBe(expectedOtherValue);
 
     // Verify the label is set to "Other"
-    expect(otherCategory?.label[0][0].key).toBe('category');
-    expect(otherCategory?.label[0][0].value).toBe('Other');
+    expect(otherCategory?.label[0].key).toBe('category');
+    expect(otherCategory?.label[0].value).toBe('Other');
   });
 
   test('should accurately reflect the sum of combined values in tooltip when creating Other category', () => {
     const datasets = createBasicDatasets();
     const minimumPercentage = 15; // This will cause slices 3, 4, and 5 to be combined
 
-    const result = modifyDatasets({
+    const { datasets: result } = modifyDatasets({
       datasets,
       pieMinimumSlicePercentage: minimumPercentage,
       barSortBy: undefined,
@@ -503,7 +524,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     const datasetsWithVariedTooltips: DatasetOption[] = [
       {
         id: 'slice1',
-        label: [[{ key: 'category', value: 'Category A' }]],
+        label: [{ key: 'category', value: 'Category A' }],
         data: [500], // 50%
         dataKey: 'slice1',
         axisType: 'y',
@@ -516,7 +537,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice2',
-        label: [[{ key: 'category', value: 'Category B' }]],
+        label: [{ key: 'category', value: 'Category B' }],
         data: [200], // 20%
         dataKey: 'slice2',
         axisType: 'y',
@@ -529,7 +550,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice3',
-        label: [[{ key: 'category', value: 'Category C' }]],
+        label: [{ key: 'category', value: 'Category C' }],
         data: [100], // 10%
         dataKey: 'slice3',
         axisType: 'y',
@@ -543,7 +564,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice4',
-        label: [[{ key: 'category', value: 'Category D' }]],
+        label: [{ key: 'category', value: 'Category D' }],
         data: [80], // 8%
         dataKey: 'slice4',
         axisType: 'y',
@@ -556,7 +577,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice5',
-        label: [[{ key: 'category', value: 'Category E' }]],
+        label: [{ key: 'category', value: 'Category E' }],
         data: [70], // 7%
         dataKey: 'slice5',
         axisType: 'y',
@@ -570,7 +591,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice6',
-        label: [[{ key: 'category', value: 'Category F' }]],
+        label: [{ key: 'category', value: 'Category F' }],
         data: [50], // 5%
         dataKey: 'slice6',
         axisType: 'y',
@@ -585,8 +606,12 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
 
     const minimumPercentage = 10;
 
-    const result = modifyDatasets({
-      datasets: datasetsWithVariedTooltips,
+    const { datasets: result } = modifyDatasets({
+      datasets: {
+        datasets: datasetsWithVariedTooltips,
+        ticks: [],
+        ticksKey: []
+      },
       pieMinimumSlicePercentage: minimumPercentage,
       barSortBy: undefined,
       pieSortBy: undefined,
@@ -610,7 +635,6 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
 
     // Verify the tooltipData is correct
     expect(otherCategory?.tooltipData?.[0]).toBeDefined();
-    console.log('otherCategory?.tooltipData?.[0]', otherCategory?.tooltipData);
     const valueTooltip = otherCategory?.tooltipData?.[0].find((item) => item.key === 'value');
     expect(valueTooltip).toBeDefined();
     expect(valueTooltip?.value).toBe(expectedOtherValue);
@@ -632,7 +656,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     const datasetsWithNumericTooltips: DatasetOption[] = [
       {
         id: 'slice1',
-        label: [[{ key: 'category', value: 'Category A' }]],
+        label: [{ key: 'category', value: 'Category A' }],
         data: [500], // 50%
         dataKey: 'slice1',
         axisType: 'y',
@@ -645,7 +669,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice2',
-        label: [[{ key: 'category', value: 'Category B' }]],
+        label: [{ key: 'category', value: 'Category B' }],
         data: [300], // 30%
         dataKey: 'slice2',
         axisType: 'y',
@@ -658,7 +682,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice3',
-        label: [[{ key: 'category', value: 'Category C' }]],
+        label: [{ key: 'category', value: 'Category C' }],
         data: [40], // 4%
         dataKey: 'slice3',
         axisType: 'y',
@@ -671,7 +695,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice4',
-        label: [[{ key: 'category', value: 'Category D' }]],
+        label: [{ key: 'category', value: 'Category D' }],
         data: [60], // 6%
         dataKey: 'slice4',
         axisType: 'y',
@@ -686,8 +710,12 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
 
     const minimumPercentage = 10;
 
-    const result = modifyDatasets({
-      datasets: datasetsWithNumericTooltips,
+    const { datasets: result } = modifyDatasets({
+      datasets: {
+        datasets: datasetsWithNumericTooltips,
+        ticks: [],
+        ticksKey: []
+      },
       pieMinimumSlicePercentage: minimumPercentage,
       barSortBy: undefined,
       pieSortBy: undefined,
@@ -726,7 +754,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     const datasetsWithStringTooltips: DatasetOption[] = [
       {
         id: 'slice1',
-        label: [[{ key: 'category', value: 'Category A' }]],
+        label: [{ key: 'category', value: 'Category A' }],
         data: [500], // 50%
         dataKey: 'slice1',
         axisType: 'y',
@@ -739,7 +767,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice2',
-        label: [[{ key: 'category', value: 'Category B' }]],
+        label: [{ key: 'category', value: 'Category B' }],
         data: [300], // 30%
         dataKey: 'slice2',
         axisType: 'y',
@@ -752,7 +780,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice3',
-        label: [[{ key: 'category', value: 'Category C' }]],
+        label: [{ key: 'category', value: 'Category C' }],
         data: [40], // 4%
         dataKey: 'slice3',
         axisType: 'y',
@@ -765,7 +793,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice4',
-        label: [[{ key: 'category', value: 'Category D' }]],
+        label: [{ key: 'category', value: 'Category D' }],
         data: [60], // 6%
         dataKey: 'slice4',
         axisType: 'y',
@@ -780,8 +808,12 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
 
     const minimumPercentage = 10;
 
-    const result = modifyDatasets({
-      datasets: datasetsWithStringTooltips,
+    const { datasets: result } = modifyDatasets({
+      datasets: {
+        datasets: datasetsWithStringTooltips,
+        ticks: [],
+        ticksKey: []
+      },
       pieMinimumSlicePercentage: minimumPercentage,
       barSortBy: undefined,
       pieSortBy: undefined,
@@ -819,7 +851,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     const datasetsWithMixedTooltips: DatasetOption[] = [
       {
         id: 'slice1',
-        label: [[{ key: 'category', value: 'Category A' }]],
+        label: [{ key: 'category', value: 'Category A' }],
         data: [500], // 50%
         dataKey: 'slice1',
         axisType: 'y',
@@ -833,7 +865,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice2',
-        label: [[{ key: 'category', value: 'Category B' }]],
+        label: [{ key: 'category', value: 'Category B' }],
         data: [300], // 30%
         dataKey: 'slice2',
         axisType: 'y',
@@ -847,7 +879,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice3',
-        label: [[{ key: 'category', value: 'Category C' }]],
+        label: [{ key: 'category', value: 'Category C' }],
         data: [40], // 4%
         dataKey: 'slice3',
         axisType: 'y',
@@ -861,7 +893,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice4',
-        label: [[{ key: 'category', value: 'Category D' }]],
+        label: [{ key: 'category', value: 'Category D' }],
         data: [60], // 6%
         dataKey: 'slice4',
         axisType: 'y',
@@ -875,7 +907,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice5',
-        label: [[{ key: 'category', value: 'Category E' }]],
+        label: [{ key: 'category', value: 'Category E' }],
         data: [30], // 3%
         dataKey: 'slice5',
         axisType: 'y',
@@ -891,8 +923,12 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
 
     const minimumPercentage = 10;
 
-    const result = modifyDatasets({
-      datasets: datasetsWithMixedTooltips,
+    const { datasets: result } = modifyDatasets({
+      datasets: {
+        datasets: datasetsWithMixedTooltips,
+        ticks: [],
+        ticksKey: []
+      },
       pieMinimumSlicePercentage: minimumPercentage,
       barSortBy: undefined,
       pieSortBy: undefined,
@@ -935,7 +971,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     const datasetsWithMissingTooltips: DatasetOption[] = [
       {
         id: 'slice1',
-        label: [[{ key: 'category', value: 'Category A' }]],
+        label: [{ key: 'category', value: 'Category A' }],
         data: [500], // 50%
         dataKey: 'slice1',
         axisType: 'y',
@@ -949,7 +985,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice2',
-        label: [[{ key: 'category', value: 'Category B' }]],
+        label: [{ key: 'category', value: 'Category B' }],
         data: [300], // 30%
         dataKey: 'slice2',
         axisType: 'y',
@@ -963,7 +999,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice3',
-        label: [[{ key: 'category', value: 'Category C' }]],
+        label: [{ key: 'category', value: 'Category C' }],
         data: [50], // 5%
         dataKey: 'slice3',
         axisType: 'y',
@@ -977,7 +1013,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice4',
-        label: [[{ key: 'category', value: 'Category D' }]],
+        label: [{ key: 'category', value: 'Category D' }],
         data: [30], // 3%
         dataKey: 'slice4',
         axisType: 'y',
@@ -992,7 +1028,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice5',
-        label: [[{ key: 'category', value: 'Category E' }]],
+        label: [{ key: 'category', value: 'Category E' }],
         data: [20], // 2%
         dataKey: 'slice5',
         axisType: 'y',
@@ -1003,8 +1039,12 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
 
     const minimumPercentage = 10;
 
-    const result = modifyDatasets({
-      datasets: datasetsWithMissingTooltips,
+    const { datasets: result } = modifyDatasets({
+      datasets: {
+        datasets: datasetsWithMissingTooltips,
+        ticks: [],
+        ticksKey: []
+      },
       pieMinimumSlicePercentage: minimumPercentage,
       barSortBy: undefined,
       pieSortBy: undefined,
@@ -1054,7 +1094,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     const datasetsWithNegativeValues: DatasetOption[] = [
       {
         id: 'slice1',
-        label: [[{ key: 'category', value: 'Category A' }]],
+        label: [{ key: 'category', value: 'Category A' }],
         data: [500], // 50%
         dataKey: 'slice1',
         axisType: 'y',
@@ -1062,7 +1102,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice2',
-        label: [[{ key: 'category', value: 'Category B' }]],
+        label: [{ key: 'category', value: 'Category B' }],
         data: [300], // 30%
         dataKey: 'slice2',
         axisType: 'y',
@@ -1070,7 +1110,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice3',
-        label: [[{ key: 'category', value: 'Category C' }]],
+        label: [{ key: 'category', value: 'Category C' }],
         data: [-100], // Negative value
         dataKey: 'slice3',
         axisType: 'y',
@@ -1078,8 +1118,12 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       }
     ];
 
-    const result = modifyDatasets({
-      datasets: datasetsWithNegativeValues,
+    const { datasets: result } = modifyDatasets({
+      datasets: {
+        datasets: datasetsWithNegativeValues,
+        ticks: [],
+        ticksKey: []
+      },
       pieMinimumSlicePercentage: 10,
       barSortBy: undefined,
       pieSortBy: undefined,
@@ -1098,15 +1142,13 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
 
     // No "Other" category should be created
     expect(result.some((dataset) => dataset.id === 'other')).toBe(true);
-
-    console.log('result', result);
   });
 
   test('should handle pieMinimumSlicePercentage with datasets having different label structures', () => {
     const datasetsWithDifferentLabels: DatasetOption[] = [
       {
         id: 'slice1',
-        label: [[{ key: 'category', value: 'Category A' }]], // Simple label
+        label: [{ key: 'category', value: 'Category A' }], // Simple label
         data: [500], // 50%
         dataKey: 'slice1',
         axisType: 'y',
@@ -1115,10 +1157,8 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       {
         id: 'slice2',
         label: [
-          [
-            { key: 'category', value: 'Category B' },
-            { key: 'subcategory', value: 'Subcategory 1' } // Complex label with subcategory
-          ]
+          { key: 'category', value: 'Category B' },
+          { key: 'subcategory', value: 'Subcategory 1' } // Complex label with subcategory
         ],
         data: [300], // 30%
         dataKey: 'slice2',
@@ -1127,7 +1167,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice3',
-        label: [[{ key: 'custom_key', value: 'Category C' }]], // Different key
+        label: [{ key: 'custom_key', value: 'Category C' }], // Different key
         data: [80], // 8%
         dataKey: 'slice3',
         axisType: 'y',
@@ -1135,7 +1175,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       },
       {
         id: 'slice4',
-        label: [[{ key: 'category', value: 'Category D' }]],
+        label: [{ key: 'category', value: 'Category D' }],
         data: [70], // 7%
         dataKey: 'slice4',
         axisType: 'y',
@@ -1151,8 +1191,12 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       }
     ];
 
-    const result = modifyDatasets({
-      datasets: datasetsWithDifferentLabels,
+    const { datasets: result } = modifyDatasets({
+      datasets: {
+        datasets: datasetsWithDifferentLabels,
+        ticks: [],
+        ticksKey: []
+      },
       pieMinimumSlicePercentage: 10,
       barSortBy: undefined,
       pieSortBy: undefined,
@@ -1178,41 +1222,45 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     const otherCategory = result.find((dataset) => dataset.id === 'other');
     expect(otherCategory).toBeDefined();
     expect(otherCategory?.data[0]).toBe(200); // Sum of slice3 (80), slice4 (70), and slice5 (50)
-    expect(otherCategory?.label[0][0].value).toBe('Other');
+    expect(otherCategory?.label[0].value).toBe('Other');
   });
 });
 
 describe('modifyDatasets - pieSortBy tests', () => {
-  const createPieDatasets = (): DatasetOption[] => [
-    {
-      id: 'slice1',
-      label: [[{ key: 'category', value: 'Category C' }]],
-      data: [300],
-      dataKey: 'slice1',
-      axisType: 'y',
-      tooltipData: [[{ key: 'value', value: 300 }]]
-    },
-    {
-      id: 'slice2',
-      label: [[{ key: 'category', value: 'Category A' }]],
-      data: [100],
-      dataKey: 'slice2',
-      axisType: 'y',
-      tooltipData: [[{ key: 'value', value: 100 }]]
-    },
-    {
-      id: 'slice3',
-      label: [[{ key: 'category', value: 'Category B' }]],
-      data: [200],
-      dataKey: 'slice3',
-      axisType: 'y',
-      tooltipData: [[{ key: 'value', value: 200 }]]
-    }
-  ];
+  const createPieDatasets = (): DatasetOptionsWithTicks => ({
+    datasets: [
+      {
+        id: 'slice1',
+        label: [{ key: 'category', value: 'Category C' }],
+        data: [300],
+        dataKey: 'slice1',
+        axisType: 'y',
+        tooltipData: [[{ key: 'value', value: 300 }]]
+      },
+      {
+        id: 'slice2',
+        label: [{ key: 'category', value: 'Category A' }],
+        data: [100],
+        dataKey: 'slice2',
+        axisType: 'y',
+        tooltipData: [[{ key: 'value', value: 100 }]]
+      },
+      {
+        id: 'slice3',
+        label: [{ key: 'category', value: 'Category B' }],
+        data: [200],
+        dataKey: 'slice3',
+        axisType: 'y',
+        tooltipData: [[{ key: 'value', value: 200 }]]
+      }
+    ],
+    ticks: [],
+    ticksKey: []
+  });
 
   test('should sort pie slices by value in descending order', () => {
     const datasets = createPieDatasets();
-    const result = modifyDatasets({
+    const { datasets: result } = modifyDatasets({
       datasets,
       pieMinimumSlicePercentage: undefined,
       barSortBy: undefined,
@@ -1231,14 +1279,14 @@ describe('modifyDatasets - pieSortBy tests', () => {
     expect(result[2].data[0]).toBe(100); // Category A (smallest)
 
     // Labels should maintain association with values
-    expect(result[0].label[0][0].value).toBe('Category C');
-    expect(result[1].label[0][0].value).toBe('Category B');
-    expect(result[2].label[0][0].value).toBe('Category A');
+    expect(result[0].label[0].value).toBe('Category C');
+    expect(result[1].label[0].value).toBe('Category B');
+    expect(result[2].label[0].value).toBe('Category A');
   });
 
   test('should sort pie slices by key alphabetically', () => {
     const datasets = createPieDatasets();
-    const result = modifyDatasets({
+    const { datasets: result } = modifyDatasets({
       datasets,
       pieMinimumSlicePercentage: undefined,
       barSortBy: undefined,
@@ -1252,9 +1300,9 @@ describe('modifyDatasets - pieSortBy tests', () => {
     expect(result.length).toBe(3);
 
     // Should be sorted by key (alphabetically)
-    expect(result[0].label[0][0].value).toBe('Category A');
-    expect(result[1].label[0][0].value).toBe('Category B');
-    expect(result[2].label[0][0].value).toBe('Category C');
+    expect(result[0].label[0].value).toBe('Category A');
+    expect(result[1].label[0].value).toBe('Category B');
+    expect(result[2].label[0].value).toBe('Category C');
 
     // Values should maintain association with labels
     expect(result[0].data[0]).toBe(100); // Category A
@@ -1266,7 +1314,7 @@ describe('modifyDatasets - pieSortBy tests', () => {
     const datasetsWithNullValues: DatasetOption[] = [
       {
         id: 'slice1',
-        label: [[{ key: 'category', value: 'Category A' }]],
+        label: [{ key: 'category', value: 'Category A' }],
         data: [300],
         dataKey: 'slice1',
         axisType: 'y',
@@ -1274,7 +1322,7 @@ describe('modifyDatasets - pieSortBy tests', () => {
       },
       {
         id: 'slice2',
-        label: [[{ key: 'category', value: 'Category B' }]],
+        label: [{ key: 'category', value: 'Category B' }],
         data: [null], // Null value
         dataKey: 'slice2',
         axisType: 'y',
@@ -1282,7 +1330,7 @@ describe('modifyDatasets - pieSortBy tests', () => {
       },
       {
         id: 'slice3',
-        label: [[{ key: 'category', value: 'Category C' }]],
+        label: [{ key: 'category', value: 'Category C' }],
         data: [0], // Zero value
         dataKey: 'slice3',
         axisType: 'y',
@@ -1290,7 +1338,7 @@ describe('modifyDatasets - pieSortBy tests', () => {
       },
       {
         id: 'slice4',
-        label: [[{ key: 'category', value: 'Category D' }]],
+        label: [{ key: 'category', value: 'Category D' }],
         data: [200],
         dataKey: 'slice4',
         axisType: 'y',
@@ -1298,8 +1346,12 @@ describe('modifyDatasets - pieSortBy tests', () => {
       }
     ];
 
-    const result = modifyDatasets({
-      datasets: datasetsWithNullValues,
+    const { datasets: result } = modifyDatasets({
+      datasets: {
+        datasets: datasetsWithNullValues,
+        ticks: [],
+        ticksKey: []
+      },
       pieMinimumSlicePercentage: undefined,
       barSortBy: undefined,
       pieSortBy: 'value',
@@ -1320,15 +1372,15 @@ describe('modifyDatasets - pieSortBy tests', () => {
     expect([result[2].data[0], result[3].data[0]].sort()).toEqual([0, null]);
 
     // First two labels should maintain correct association with values
-    expect(result[0].label[0][0].value).toBe('Category A');
-    expect(result[1].label[0][0].value).toBe('Category D');
+    expect(result[0].label[0].value).toBe('Category A');
+    expect(result[1].label[0].value).toBe('Category D');
   });
 
   test('should handle pie sort by key with non-alphabetic and numeric labels', () => {
     const datasetsWithMixedLabels: DatasetOption[] = [
       {
         id: 'slice1',
-        label: [[{ key: 'category', value: '123' }]], // Numeric string
+        label: [{ key: 'category', value: '123' }], // Numeric string
         data: [300],
         dataKey: 'slice1',
         axisType: 'y',
@@ -1336,7 +1388,7 @@ describe('modifyDatasets - pieSortBy tests', () => {
       },
       {
         id: 'slice2',
-        label: [[{ key: 'category', value: 'abc' }]], // Lowercase letters
+        label: [{ key: 'category', value: 'abc' }], // Lowercase letters
         data: [100],
         dataKey: 'slice2',
         axisType: 'y',
@@ -1344,7 +1396,7 @@ describe('modifyDatasets - pieSortBy tests', () => {
       },
       {
         id: 'slice3',
-        label: [[{ key: 'category', value: 'XYZ' }]], // Uppercase letters
+        label: [{ key: 'category', value: 'XYZ' }], // Uppercase letters
         data: [200],
         dataKey: 'slice3',
         axisType: 'y',
@@ -1352,7 +1404,7 @@ describe('modifyDatasets - pieSortBy tests', () => {
       },
       {
         id: 'slice4',
-        label: [[{ key: 'category', value: '!@#' }]], // Special characters
+        label: [{ key: 'category', value: '!@#' }], // Special characters
         data: [150],
         dataKey: 'slice4',
         axisType: 'y',
@@ -1360,8 +1412,12 @@ describe('modifyDatasets - pieSortBy tests', () => {
       }
     ];
 
-    const result = modifyDatasets({
-      datasets: datasetsWithMixedLabels,
+    const { datasets: result } = modifyDatasets({
+      datasets: {
+        datasets: datasetsWithMixedLabels,
+        ticks: [],
+        ticksKey: []
+      },
       pieMinimumSlicePercentage: undefined,
       barSortBy: undefined,
       pieSortBy: 'key',
@@ -1374,14 +1430,14 @@ describe('modifyDatasets - pieSortBy tests', () => {
     expect(result.length).toBe(4);
 
     // Special characters typically come before numbers and letters in ASCII/Unicode sorting
-    expect(result[0].label[0][0].value).toBe('!@#');
+    expect(result[0].label[0].value).toBe('!@#');
 
     // Numbers typically come before letters
-    expect(result[1].label[0][0].value).toBe('123');
+    expect(result[1].label[0].value).toBe('123');
 
     // Lowercase and uppercase might be sorted differently depending on implementation
     // But both should come after numbers
-    const letters = [result[2].label[0][0].value, result[3].label[0][0].value].sort();
+    const letters = [result[2].label[0].value, result[3].label[0].value].sort();
     expect(letters).toEqual(['XYZ', 'abc']); // Case-insensitive sort results
 
     // Check that values maintain association with correct labels
@@ -1391,36 +1447,40 @@ describe('modifyDatasets - pieSortBy tests', () => {
 });
 
 describe('modifyDatasets - percentage stack tests', () => {
-  const createBarDatasets = (): DatasetOption[] => [
-    {
-      id: 'dataset1',
-      label: [[{ key: 'category', value: 'Series 1' }]],
-      data: [100, 200, 300],
-      dataKey: 'dataset1',
-      axisType: 'y',
-      tooltipData: [
-        [{ key: 'value', value: 100 }],
-        [{ key: 'value', value: 200 }],
-        [{ key: 'value', value: 300 }]
-      ]
-    },
-    {
-      id: 'dataset2',
-      label: [[{ key: 'category', value: 'Series 2' }]],
-      data: [50, 150, 250],
-      dataKey: 'dataset2',
-      axisType: 'y',
-      tooltipData: [
-        [{ key: 'value', value: 50 }],
-        [{ key: 'value', value: 150 }],
-        [{ key: 'value', value: 250 }]
-      ]
-    }
-  ];
+  const createBarDatasets = (): DatasetOptionsWithTicks => ({
+    datasets: [
+      {
+        id: 'dataset1',
+        label: [{ key: 'category', value: 'Series 1' }],
+        data: [100, 200, 300],
+        dataKey: 'dataset1',
+        axisType: 'y',
+        tooltipData: [
+          [{ key: 'value', value: 100 }],
+          [{ key: 'value', value: 200 }],
+          [{ key: 'value', value: 300 }]
+        ]
+      },
+      {
+        id: 'dataset2',
+        label: [{ key: 'category', value: 'Series 2' }],
+        data: [50, 150, 250],
+        dataKey: 'dataset2',
+        axisType: 'y',
+        tooltipData: [
+          [{ key: 'value', value: 50 }],
+          [{ key: 'value', value: 150 }],
+          [{ key: 'value', value: 250 }]
+        ]
+      }
+    ],
+    ticks: [],
+    ticksKey: []
+  });
 
   test('should convert bar chart values to percentages for percentage-stack mode', () => {
     const datasets = createBarDatasets();
-    const result = modifyDatasets({
+    const { datasets: result } = modifyDatasets({
       datasets,
       pieMinimumSlicePercentage: undefined,
       barSortBy: undefined,
@@ -1435,7 +1495,6 @@ describe('modifyDatasets - percentage stack tests', () => {
 
     // First point: 100 + 50 = 150 total
     // 100/150 = 66.67%, 50/150 = 33.33%
-    console.log('result', result[0]);
     expect(result[0].data[0]).toBeCloseTo(66.67, 1);
     expect(result[1].data[0]).toBeCloseTo(33.33, 1);
 
@@ -1452,7 +1511,7 @@ describe('modifyDatasets - percentage stack tests', () => {
 
   test('should sort bar chart data by value in ascending order', () => {
     const datasets = createBarDatasets();
-    const result = modifyDatasets({
+    const { datasets: result } = modifyDatasets({
       datasets,
       pieMinimumSlicePercentage: undefined,
       barSortBy: ['asc'],
@@ -1484,7 +1543,7 @@ describe('modifyDatasets - percentage stack tests', () => {
 
   test('should handle percentage-stack for line charts', () => {
     const datasets = createBarDatasets();
-    const result = modifyDatasets({
+    const { datasets: result } = modifyDatasets({
       datasets,
       pieMinimumSlicePercentage: undefined,
       barSortBy: undefined,
@@ -1517,7 +1576,7 @@ describe('modifyDatasets - percentage stack tests', () => {
     const datasetsWithZeros: DatasetOption[] = [
       {
         id: 'dataset1',
-        label: [[{ key: 'category', value: 'Series 1' }]],
+        label: [{ key: 'category', value: 'Series 1' }],
         data: [100, 0, 300],
         dataKey: 'dataset1',
         axisType: 'y',
@@ -1529,7 +1588,7 @@ describe('modifyDatasets - percentage stack tests', () => {
       },
       {
         id: 'dataset2',
-        label: [[{ key: 'category', value: 'Series 2' }]],
+        label: [{ key: 'category', value: 'Series 2' }],
         data: [50, 150, 0],
         dataKey: 'dataset2',
         axisType: 'y',
@@ -1541,8 +1600,12 @@ describe('modifyDatasets - percentage stack tests', () => {
       }
     ];
 
-    const result = modifyDatasets({
-      datasets: datasetsWithZeros,
+    const { datasets: result } = modifyDatasets({
+      datasets: {
+        datasets: datasetsWithZeros,
+        ticks: [],
+        ticksKey: []
+      },
       pieMinimumSlicePercentage: undefined,
       barSortBy: undefined,
       pieSortBy: undefined,
@@ -1574,7 +1637,7 @@ describe('modifyDatasets - percentage stack tests', () => {
     const datasetsWithNulls: DatasetOption[] = [
       {
         id: 'dataset1',
-        label: [[{ key: 'category', value: 'Series 1' }]],
+        label: [{ key: 'category', value: 'Series 1' }],
         data: [100, null, 300],
         dataKey: 'dataset1',
         axisType: 'y',
@@ -1586,7 +1649,7 @@ describe('modifyDatasets - percentage stack tests', () => {
       },
       {
         id: 'dataset2',
-        label: [[{ key: 'category', value: 'Series 2' }]],
+        label: [{ key: 'category', value: 'Series 2' }],
         data: [50, 150, 0],
         dataKey: 'dataset2',
         axisType: 'y',
@@ -1598,7 +1661,7 @@ describe('modifyDatasets - percentage stack tests', () => {
       },
       {
         id: 'dataset3',
-        label: [[{ key: 'category', value: 'Series 3' }]],
+        label: [{ key: 'category', value: 'Series 3' }],
         data: [0, 0, 200],
         dataKey: 'dataset3',
         axisType: 'y',
@@ -1610,8 +1673,12 @@ describe('modifyDatasets - percentage stack tests', () => {
       }
     ];
 
-    const result = modifyDatasets({
-      datasets: datasetsWithNulls,
+    const { datasets: result } = modifyDatasets({
+      datasets: {
+        datasets: datasetsWithNulls,
+        ticks: [],
+        ticksKey: []
+      },
       pieMinimumSlicePercentage: undefined,
       barSortBy: undefined,
       pieSortBy: undefined,
@@ -1646,7 +1713,7 @@ describe('modifyDatasets - percentage stack tests', () => {
     const datasetsWithUnevenLengths: DatasetOption[] = [
       {
         id: 'dataset1',
-        label: [[{ key: 'category', value: 'Series 1' }]],
+        label: [{ key: 'category', value: 'Series 1' }],
         data: [100, 200, 300, 400], // 4 data points
         dataKey: 'dataset1',
         axisType: 'y',
@@ -1659,7 +1726,7 @@ describe('modifyDatasets - percentage stack tests', () => {
       },
       {
         id: 'dataset2',
-        label: [[{ key: 'category', value: 'Series 2' }]],
+        label: [{ key: 'category', value: 'Series 2' }],
         data: [50, 150], // Only 2 data points
         dataKey: 'dataset2',
         axisType: 'y',
@@ -1667,8 +1734,12 @@ describe('modifyDatasets - percentage stack tests', () => {
       }
     ];
 
-    const result = modifyDatasets({
-      datasets: datasetsWithUnevenLengths,
+    const { datasets: result } = modifyDatasets({
+      datasets: {
+        datasets: datasetsWithUnevenLengths,
+        ticks: [],
+        ticksKey: []
+      },
       pieMinimumSlicePercentage: undefined,
       barSortBy: undefined,
       pieSortBy: undefined,
@@ -1701,7 +1772,7 @@ describe('modifyDatasets - percentage stack tests', () => {
     const datasetsWithNegativeValues: DatasetOption[] = [
       {
         id: 'dataset1',
-        label: [[{ key: 'category', value: 'Series 1' }]],
+        label: [{ key: 'category', value: 'Series 1' }],
         data: [100, -50, 200],
         dataKey: 'dataset1',
         axisType: 'y',
@@ -1713,7 +1784,7 @@ describe('modifyDatasets - percentage stack tests', () => {
       },
       {
         id: 'dataset2',
-        label: [[{ key: 'category', value: 'Series 2' }]],
+        label: [{ key: 'category', value: 'Series 2' }],
         data: [50, 150, -100],
         dataKey: 'dataset2',
         axisType: 'y',
@@ -1725,8 +1796,12 @@ describe('modifyDatasets - percentage stack tests', () => {
       }
     ];
 
-    const result = modifyDatasets({
-      datasets: datasetsWithNegativeValues,
+    const { datasets: result } = modifyDatasets({
+      datasets: {
+        datasets: datasetsWithNegativeValues,
+        ticks: [],
+        ticksKey: []
+      },
       pieMinimumSlicePercentage: undefined,
       barSortBy: undefined,
       pieSortBy: undefined,
@@ -1765,36 +1840,40 @@ describe('modifyDatasets - percentage stack tests', () => {
 });
 
 describe('modifyDatasets - barSortBy tests', () => {
-  const createBarDatasets = (): DatasetOption[] => [
-    {
-      id: 'dataset1',
-      label: [[{ key: 'category', value: 'Series 1' }]],
-      data: [300, 100, 200],
-      dataKey: 'dataset1',
-      axisType: 'y',
-      tooltipData: [
-        [{ key: 'value', value: 300 }],
-        [{ key: 'value', value: 100 }],
-        [{ key: 'value', value: 200 }]
-      ]
-    },
-    {
-      id: 'dataset2',
-      label: [[{ key: 'category', value: 'Series 2' }]],
-      data: [200, 150, 50],
-      dataKey: 'dataset2',
-      axisType: 'y',
-      tooltipData: [
-        [{ key: 'value', value: 200 }],
-        [{ key: 'value', value: 150 }],
-        [{ key: 'value', value: 50 }]
-      ]
-    }
-  ];
+  const createBarDatasets = (): DatasetOptionsWithTicks => ({
+    datasets: [
+      {
+        id: 'dataset1',
+        label: [{ key: 'category', value: 'Series 1' }],
+        data: [300, 100, 200],
+        dataKey: 'dataset1',
+        axisType: 'y',
+        tooltipData: [
+          [{ key: 'value', value: 300 }],
+          [{ key: 'value', value: 100 }],
+          [{ key: 'value', value: 200 }]
+        ]
+      },
+      {
+        id: 'dataset2',
+        label: [{ key: 'category', value: 'Series 2' }],
+        data: [200, 150, 50],
+        dataKey: 'dataset2',
+        axisType: 'y',
+        tooltipData: [
+          [{ key: 'value', value: 200 }],
+          [{ key: 'value', value: 150 }],
+          [{ key: 'value', value: 50 }]
+        ]
+      }
+    ],
+    ticks: [],
+    ticksKey: []
+  });
 
   test('should sort bar chart data by descending values', () => {
     const datasets = createBarDatasets();
-    const result = modifyDatasets({
+    const { datasets: result } = modifyDatasets({
       datasets,
       pieMinimumSlicePercentage: undefined,
       barSortBy: ['desc', 'desc'],
@@ -1833,7 +1912,7 @@ describe('modifyDatasets - barSortBy tests', () => {
     const datasetsNotInOrder: DatasetOption[] = [
       {
         id: 'dataset1',
-        label: [[{ key: 'category', value: 'Series 1' }]],
+        label: [{ key: 'category', value: 'Series 1' }],
         data: [300, 100, 200],
         dataKey: 'dataset1',
         axisType: 'y',
@@ -1845,7 +1924,7 @@ describe('modifyDatasets - barSortBy tests', () => {
       },
       {
         id: 'dataset2',
-        label: [[{ key: 'category', value: 'Series 2' }]],
+        label: [{ key: 'category', value: 'Series 2' }],
         data: [200, 50, 150],
         dataKey: 'dataset2',
         axisType: 'y',
@@ -1857,8 +1936,12 @@ describe('modifyDatasets - barSortBy tests', () => {
       }
     ];
 
-    const result = modifyDatasets({
-      datasets: datasetsNotInOrder,
+    const { datasets: result } = modifyDatasets({
+      datasets: {
+        datasets: datasetsNotInOrder,
+        ticks: [],
+        ticksKey: []
+      },
       pieMinimumSlicePercentage: undefined,
       barSortBy: ['asc'],
       pieSortBy: undefined,
@@ -1895,7 +1978,7 @@ describe('modifyDatasets - barSortBy tests', () => {
   test('should handle bar sort with multiple options but use first valid option', () => {
     const datasets = createBarDatasets();
 
-    const result = modifyDatasets({
+    const { datasets: result } = modifyDatasets({
       datasets,
       pieMinimumSlicePercentage: undefined,
       barSortBy: ['none', 'desc'], // First one is 'none', should use 'desc'
@@ -1924,7 +2007,7 @@ describe('modifyDatasets - barSortBy tests', () => {
     expect(result[1].data[2]).toBe(50);
 
     // Test with a different order of options
-    const result2 = modifyDatasets({
+    const { datasets: result2 } = modifyDatasets({
       datasets,
       pieMinimumSlicePercentage: undefined,
       barSortBy: ['desc', 'none'], // First one is 'desc', should use that
@@ -1949,7 +2032,7 @@ describe('modifyDatasets - barSortBy tests', () => {
     const datasetsWithNegatives: DatasetOption[] = [
       {
         id: 'dataset1',
-        label: [[{ key: 'category', value: 'Series 1' }]],
+        label: [{ key: 'category', value: 'Series 1' }],
         data: [-100, 200, -300],
         dataKey: 'dataset1',
         axisType: 'y',
@@ -1961,7 +2044,7 @@ describe('modifyDatasets - barSortBy tests', () => {
       },
       {
         id: 'dataset2',
-        label: [[{ key: 'category', value: 'Series 2' }]],
+        label: [{ key: 'category', value: 'Series 2' }],
         data: [-50, 150, -100],
         dataKey: 'dataset2',
         axisType: 'y',
@@ -1973,8 +2056,12 @@ describe('modifyDatasets - barSortBy tests', () => {
       }
     ];
 
-    const result = modifyDatasets({
-      datasets: datasetsWithNegatives,
+    const { datasets: result } = modifyDatasets({
+      datasets: {
+        datasets: datasetsWithNegatives,
+        ticks: [],
+        ticksKey: []
+      },
       pieMinimumSlicePercentage: undefined,
       barSortBy: ['asc'],
       pieSortBy: undefined,
@@ -2011,7 +2098,7 @@ describe('modifyDatasets - barSortBy tests', () => {
     const datasetsWithNulls: DatasetOption[] = [
       {
         id: 'dataset1',
-        label: [[{ key: 'category', value: 'Series 1' }]],
+        label: [{ key: 'category', value: 'Series 1' }],
         data: [null, 200, 100],
         dataKey: 'dataset1',
         axisType: 'y',
@@ -2023,7 +2110,7 @@ describe('modifyDatasets - barSortBy tests', () => {
       },
       {
         id: 'dataset2',
-        label: [[{ key: 'category', value: 'Series 2' }]],
+        label: [{ key: 'category', value: 'Series 2' }],
         data: [50, null, 150],
         dataKey: 'dataset2',
         axisType: 'y',
@@ -2035,8 +2122,12 @@ describe('modifyDatasets - barSortBy tests', () => {
       }
     ];
 
-    const result = modifyDatasets({
-      datasets: datasetsWithNulls,
+    const { datasets: result } = modifyDatasets({
+      datasets: {
+        datasets: datasetsWithNulls,
+        ticks: [],
+        ticksKey: []
+      },
       pieMinimumSlicePercentage: undefined,
       barSortBy: ['desc'],
       pieSortBy: undefined,
@@ -2073,7 +2164,7 @@ describe('modifyDatasets - barSortBy tests', () => {
     const datasets: DatasetOption[] = [
       {
         id: 'dataset1',
-        label: [[{ key: 'category', value: 'Series 1' }]],
+        label: [{ key: 'category', value: 'Series 1' }],
         data: [300, 100, 200],
         dataKey: 'dataset1',
         axisType: 'y',
@@ -2085,8 +2176,12 @@ describe('modifyDatasets - barSortBy tests', () => {
       }
     ];
 
-    const result = modifyDatasets({
-      datasets,
+    const { datasets: result } = modifyDatasets({
+      datasets: {
+        datasets,
+        ticks: [],
+        ticksKey: []
+      },
       pieMinimumSlicePercentage: undefined,
       barSortBy: ['asc'],
       pieSortBy: undefined,
@@ -2105,7 +2200,7 @@ describe('modifyDatasets - barSortBy tests', () => {
     const datasets: DatasetOption[] = [
       {
         id: 'dataset1',
-        label: [[{ key: 'category', value: 'Series 1' }]],
+        label: [{ key: 'category', value: 'Series 1' }],
         data: [300, 100, 200],
         dataKey: 'dataset1',
         axisType: 'y',
@@ -2117,8 +2212,12 @@ describe('modifyDatasets - barSortBy tests', () => {
       }
     ];
 
-    const result = modifyDatasets({
-      datasets,
+    const { datasets: result } = modifyDatasets({
+      datasets: {
+        datasets,
+        ticks: [],
+        ticksKey: []
+      },
       pieMinimumSlicePercentage: undefined,
       barSortBy: ['desc'],
       pieSortBy: undefined,
@@ -2137,7 +2236,7 @@ describe('modifyDatasets - barSortBy tests', () => {
     const datasets: DatasetOption[] = [
       {
         id: 'dataset1',
-        label: [[{ key: 'category', value: 'Series 1' }]],
+        label: [{ key: 'category', value: 'Series 1' }],
         data: [300, null, 200, 150, null],
         dataKey: 'dataset1',
         axisType: 'y',
@@ -2151,8 +2250,12 @@ describe('modifyDatasets - barSortBy tests', () => {
       }
     ];
 
-    const result = modifyDatasets({
-      datasets,
+    const { datasets: result } = modifyDatasets({
+      datasets: {
+        datasets,
+        ticks: [],
+        ticksKey: []
+      },
       pieMinimumSlicePercentage: undefined,
       barSortBy: ['desc'],
       pieSortBy: undefined,

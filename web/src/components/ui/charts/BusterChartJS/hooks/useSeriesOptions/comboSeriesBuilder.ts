@@ -1,7 +1,7 @@
 import type { ChartProps } from '../../core';
 import { LabelBuilderProps } from './useSeriesOptions';
 import { SeriesBuilderProps } from './interfaces';
-import { extractFieldsFromChain } from '../../../chartHooks';
+import { DatasetOption, extractFieldsFromChain } from '../../../chartHooks';
 import {
   DEFAULT_COLUMN_LABEL_FORMAT,
   DEFAULT_COLUMN_SETTINGS,
@@ -9,72 +9,34 @@ import {
 } from '@/api/asset_interfaces/metric';
 import { barBuilder } from './barSeriesBuilder';
 import { createDayjsDate } from '@/lib/date';
-import { formatChartLabelDelimiter } from '../../../commonHelpers';
-import { lineBuilder } from './lineSeriesBuilder';
+import { lineBuilder, lineSeriesBuilder_labels } from './lineSeriesBuilder';
 import { ColumnSettings } from '@/api/asset_interfaces/metric/charts';
+import { formatLabel } from '@/lib/columnFormatter';
 
 type ComboSeries = Array<
   ChartProps<'bar'>['data']['datasets'][number] | ChartProps<'line'>['data']['datasets'][number]
 >;
 
 export const comboSeriesBuilder_data = (props: SeriesBuilderProps): ComboSeries => {
-  const { allYAxisKeysIndexes, allY2AxisKeysIndexes } = props;
+  console.log(props);
+  const { datasetOptions } = props;
 
-  const comboSeries: ComboSeries = [];
-
-  const makeYAxisKeyLoop = (items: SeriesBuilderProps['allYAxisKeysIndexes'], isY2: boolean) => {
-    return items.map((item) => {
-      return {
-        ...item,
-        isY2: isY2
-      };
-    });
-  };
-
-  const yAxisKeys = [
-    ...makeYAxisKeyLoop(allYAxisKeysIndexes, false),
-    ...makeYAxisKeyLoop(allY2AxisKeysIndexes, true)
-  ];
-  yAxisKeys.forEach(({ isY2, ...yAxisItem }, index) => {
+  return datasetOptions.datasets.map((dataset, index) => {
     const renderResult = comboBuilder({
       ...props,
-      yAxisItem,
-      index,
-      isY2
+      dataset,
+      index
     });
-    comboSeries.push(renderResult);
+    return renderResult;
   });
-
-  return comboSeries;
 };
 
-export const comboSeriesBuilder_labels = ({
-  columnLabelFormats,
-  xAxisKeys,
-  dataset,
-  allY2AxisKeysIndexes,
-  allYAxisKeysIndexes,
-  columnSettings
-}: LabelBuilderProps): (string | Date)[] => {
-  const xColumnLabelFormat = columnLabelFormats[xAxisKeys[0]] || DEFAULT_COLUMN_LABEL_FORMAT;
-  const useDateLabels =
-    xAxisKeys.length === 1 &&
-    xColumnLabelFormat.columnType === 'date' &&
-    xColumnLabelFormat.style === 'date';
-
-  return dataset.source.map<string | Date>((item) => {
-    if (useDateLabels) {
-      const date = createDayjsDate(item[0] as string).toDate();
-      return date;
-    }
-
-    return formatChartLabelDelimiter(item[0] as string, columnLabelFormats);
-  });
+export const comboSeriesBuilder_labels = (props: LabelBuilderProps): (string | Date)[] => {
+  return lineSeriesBuilder_labels(props);
 };
 
 type RenderBuilderProps = Pick<
   SeriesBuilderProps,
-  | 'selectedDataset'
   | 'colors'
   | 'columnSettings'
   | 'columnLabelFormats'
@@ -82,27 +44,25 @@ type RenderBuilderProps = Pick<
   | 'lineGroupType'
   | 'barGroupType'
 > & {
-  yAxisItem: SeriesBuilderProps['allYAxisKeysIndexes'][number];
   index: number;
+  dataset: DatasetOption;
 };
 
 const comboBuilder = (
   props: RenderBuilderProps & {
-    yAxisItem: SeriesBuilderProps['allYAxisKeysIndexes'][number];
     index: number;
-    isY2: boolean;
   }
 ): ComboSeries[number] => {
-  const { yAxisItem, index, columnSettings, isY2 } = props;
-  const yKey = extractFieldsFromChain(yAxisItem.name).at(-1)?.key!;
+  const { index, columnSettings, dataset } = props;
+  const { axisType } = dataset;
+  const yKey = dataset.dataKey;
   const columnSetting = columnSettings[yKey];
   const columnVisualization =
     columnSetting?.columnVisualization || DEFAULT_COLUMN_SETTINGS.columnVisualization;
   const renderProps = {
     ...props,
-    yAxisItem,
     index,
-    yAxisID: isY2 ? 'y2' : 'y'
+    yAxisID: axisType
   };
 
   const renderResult = renderBuilder[columnVisualization](renderProps);
@@ -113,10 +73,11 @@ const comboBuilder = (
 const dotSeriesBuilder = (
   props: RenderBuilderProps
 ): ChartProps<'line'>['data']['datasets'][number] => {
-  const { yAxisItem, columnSettings, index } = props;
-  const yKey = extractFieldsFromChain(yAxisItem.name).at(-1)?.key!;
+  const { columnSettings, index } = props;
+  const { dataset } = props;
+  const { dataKey } = dataset;
   const uniqueColumnSetting = { ...columnSettings };
-  const columnSetting = uniqueColumnSetting[yKey] || DEFAULT_COLUMN_SETTINGS;
+  const columnSetting = uniqueColumnSetting[dataKey] || DEFAULT_COLUMN_SETTINGS;
   columnSetting.lineWidth = 0;
   columnSetting.lineSymbolSize = ENABLED_DOTS_ON_LINE_SIZE;
 

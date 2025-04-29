@@ -1,17 +1,7 @@
 import { BarSortBy, BusterChartProps, ChartType, PieSortBy } from '@/api/asset_interfaces/metric';
-import { DatasetOption, KV } from './interfaces';
+import { DatasetOption, DatasetOptionsWithTicks, KV } from './interfaces';
 import cloneDeep from 'lodash/cloneDeep';
 import { sum as lodashSum } from 'lodash';
-
-type ModifyDatasetsParams = {
-  datasets: DatasetOption[];
-  pieMinimumSlicePercentage?: number;
-  barSortBy?: BarSortBy;
-  pieSortBy?: PieSortBy;
-  barGroupType?: BusterChartProps['barGroupType'];
-  lineGroupType: BusterChartProps['lineGroupType'];
-  selectedChartType: ChartType;
-};
 
 // Helper: ensure pie slices meet minimum percentage
 function handlePieThreshold(datasets: DatasetOption[], minPercent: number): DatasetOption[] {
@@ -62,7 +52,7 @@ function handlePieThreshold(datasets: DatasetOption[], minPercent: number): Data
     ...above,
     {
       id: 'other',
-      label: [[{ key: 'category', value: 'Other' }]],
+      label: [{ key: 'category', value: 'Other' }],
       data: [otherValue],
       dataKey: 'other',
       axisType: 'y',
@@ -78,8 +68,8 @@ function sortPie(datasets: DatasetOption[], sortBy: PieSortBy): DatasetOption[] 
     return items.sort((a, b) => (b.data[0] || 0) - (a.data[0] || 0));
   }
   return items.sort((a, b) => {
-    const aKey = a.label?.[0]?.[0]?.value?.toString().toLowerCase() || '';
-    const bKey = b.label?.[0]?.[0]?.value?.toString().toLowerCase() || '';
+    const aKey = a.label?.[0]?.value?.toString().toLowerCase() || '';
+    const bKey = b.label?.[0]?.value?.toString().toLowerCase() || '';
     return aKey.localeCompare(bKey);
   });
 }
@@ -133,6 +123,16 @@ function sortBarLine(datasets: DatasetOption[], barSortBy: BarSortBy): DatasetOp
   return clone;
 }
 
+type ModifyDatasetsParams = {
+  datasets: DatasetOptionsWithTicks;
+  pieMinimumSlicePercentage?: number;
+  barSortBy?: BarSortBy;
+  pieSortBy?: PieSortBy;
+  barGroupType?: BusterChartProps['barGroupType'];
+  lineGroupType: BusterChartProps['lineGroupType'];
+  selectedChartType: ChartType;
+};
+
 export function modifyDatasets({
   datasets,
   pieMinimumSlicePercentage,
@@ -141,18 +141,25 @@ export function modifyDatasets({
   barGroupType,
   lineGroupType,
   selectedChartType
-}: ModifyDatasetsParams): DatasetOption[] {
-  if (!datasets.length) return datasets;
+}: ModifyDatasetsParams): DatasetOptionsWithTicks {
+  if (!datasets.datasets.length) return datasets;
 
   // Pie chart handling
   if (selectedChartType === ChartType.Pie) {
     if (pieMinimumSlicePercentage != null) {
-      return handlePieThreshold(datasets, pieMinimumSlicePercentage);
+      const modifiedDatasets = handlePieThreshold(datasets.datasets, pieMinimumSlicePercentage);
+      return {
+        ...datasets,
+        datasets: modifiedDatasets
+      };
     }
     if (pieSortBy) {
-      return sortPie(datasets, pieSortBy);
+      const modifiedDatasets = sortPie(datasets.datasets, pieSortBy);
+      return {
+        ...datasets,
+        datasets: modifiedDatasets
+      };
     }
-    return datasets;
   }
 
   // Percentage-stack for bar or line
@@ -160,12 +167,20 @@ export function modifyDatasets({
     (selectedChartType === ChartType.Bar && barGroupType === 'percentage-stack') ||
     (selectedChartType === ChartType.Line && lineGroupType === 'percentage-stack')
   ) {
-    return applyPercentageStack(datasets);
+    const modifiedDatasets = applyPercentageStack(datasets.datasets);
+    return {
+      ...datasets,
+      datasets: modifiedDatasets
+    };
   }
 
   // Bar sorting
   if (selectedChartType === ChartType.Bar && barSortBy && barSortBy.some((o) => o !== 'none')) {
-    return sortBarLine(datasets, barSortBy);
+    const modifiedDatasets = sortBarLine(datasets.datasets, barSortBy);
+    return {
+      ...datasets,
+      datasets: modifiedDatasets
+    };
   }
 
   return datasets;

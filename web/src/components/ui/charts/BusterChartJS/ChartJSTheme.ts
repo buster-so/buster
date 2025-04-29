@@ -20,7 +20,10 @@ import {
   BubbleController,
   PieController,
   ScatterController,
-  DoughnutController
+  DoughnutController,
+  ChartDataset,
+  ChartDatasetProperties,
+  ChartType
 } from 'chart.js';
 import { ChartMountedPlugin } from './core/plugins';
 import ChartDeferred from 'chartjs-plugin-deferred';
@@ -205,3 +208,13 @@ ChartJS.overrides.line = {
     }
   }
 };
+
+declare module 'chart.js' {
+  interface ChartDatasetProperties<TType extends ChartType, TData> {
+    tooltipData: {
+      key: string;
+      value: string | number | boolean | null;
+    }[][];
+    xAxisKeys: string[];
+  }
+}

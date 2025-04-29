@@ -1,10 +1,10 @@
-import { extractFieldsFromChain } from '../../../chartHooks';
+import { DatasetOption, extractFieldsFromChain } from '../../../chartHooks';
 import { Chart, Filler, ScriptableContext } from 'chart.js';
 import type { ChartProps } from '../../core';
 import { SeriesBuilderProps } from './interfaces';
 import { LabelBuilderProps } from './useSeriesOptions';
-import { formatChartLabelDelimiter } from '../../../commonHelpers';
-import { addOpacityToColor, createDayjsDate } from '@/lib';
+import { formatChartLabelDelimiter, formatLabelForDataset } from '../../../commonHelpers';
+import { addOpacityToColor, createDayjsDate, formatLabel } from '@/lib';
 import { defaultLabelOptionConfig } from '../useChartSpecificOptions/labelOptionConfig';
 import {
   DEFAULT_COLUMN_LABEL_FORMAT,
@@ -18,60 +18,60 @@ Chart.register(Filler);
 const HOVER_RADIUS_MULTIPLIER = 1;
 
 export const lineSeriesBuilder = ({
-  selectedDataset,
-  allYAxisKeysIndexes,
   colors,
   columnSettings,
   columnLabelFormats,
   xAxisKeys,
-  lineGroupType
+  lineGroupType,
+  datasetOptions
 }: SeriesBuilderProps): ChartProps<'line'>['data']['datasets'][number][] => {
-  return allYAxisKeysIndexes.map<ChartProps<'line'>['data']['datasets'][number]>(
-    (yAxisItem, index) => {
-      return lineBuilder({
-        lineGroupType,
-        selectedDataset,
-        colors,
-        columnSettings,
-        columnLabelFormats,
-        yAxisItem,
-        index,
-        xAxisKeys
-      });
-    }
-  );
+  return [];
+  // return allYAxisKeysIndexes.map<ChartProps<'line'>['data']['datasets'][number]>(
+  //   (yAxisItem, index) => {
+  //     return lineBuilder({
+  //       lineGroupType,
+  //       selectedDataset,
+  //       colors,
+  //       columnSettings,
+  //       columnLabelFormats,
+  //       yAxisItem,
+  //       index,
+  //       xAxisKeys
+  //     });
+  //   }
+  // );
 };
 
 export const lineBuilder = (
   props: Pick<
     SeriesBuilderProps,
-    | 'selectedDataset'
     | 'colors'
     | 'columnSettings'
     | 'columnLabelFormats'
-    | 'lineGroupType'
     | 'xAxisKeys'
+    | 'lineGroupType'
+    | 'barGroupType'
   > & {
-    yAxisItem: SeriesBuilderProps['allYAxisKeysIndexes'][number];
     index: number;
     yAxisID?: string;
     order?: number;
+    dataset: DatasetOption;
   }
 ): ChartProps<'line'>['data']['datasets'][number] => {
   const {
     lineGroupType,
-    selectedDataset,
     colors,
     columnSettings,
     columnLabelFormats,
-    yAxisItem,
     index,
     xAxisKeys,
     yAxisID,
-    order
+    order,
+    dataset
   } = props;
-  const yKey = extractFieldsFromChain(yAxisItem.name).at(-1)?.key!;
-  const columnSetting = columnSettings[yKey] || DEFAULT_COLUMN_SETTINGS;
+  const { dataKey } = dataset;
+  const yKey = dataKey;
+  const columnSetting = columnSettings[dataKey] || DEFAULT_COLUMN_SETTINGS;
   const columnLabelFormat = columnLabelFormats[yKey] || DEFAULT_COLUMN_LABEL_FORMAT;
   const {
     showDataLabels,
@@ -99,7 +99,7 @@ export const lineBuilder = (
     type: 'line',
     yAxisID: yAxisID || 'y',
     xAxisKeys,
-    label: yAxisItem.name,
+    label: formatLabelForDataset(dataset, columnLabelFormats),
     fill,
     tension: getLineTension(lineType),
     stepped: lineType === 'step',
@@ -107,7 +107,7 @@ export const lineBuilder = (
     borderWidth: lineWidth,
     order: order || 0,
     //line will only have one dataset
-    data: selectedDataset.source.map((item) => item[yAxisItem.index] as number),
+    data: dataset.data,
     backgroundColor: createFillColor(color, isArea, isStackedArea),
     borderColor: color,
     pointBackgroundColor: addOpacityToColor(color, 0.85),
@@ -196,7 +196,7 @@ const createFillColor = (color: string, isArea: boolean, isStackedArea: boolean)
 };
 
 export const lineSeriesBuilder_labels = ({
-  dataset,
+  datasetOptions,
   xAxisKeys,
   columnLabelFormats
 }: LabelBuilderProps): (string | Date)[] => {
@@ -205,13 +205,21 @@ export const lineSeriesBuilder_labels = ({
     xAxisKeys.length === 1 &&
     xColumnLabelFormat.columnType === 'date' &&
     xColumnLabelFormat.style === 'date';
+  const ticksKey = datasetOptions.ticksKey;
 
-  return dataset.source.map<string | Date>((item) => {
-    if (useDateLabels) {
-      const date = createDayjsDate(item[0] as string).toDate();
-      return date;
-    }
+  if (useDateLabels) {
+    return datasetOptions.ticks.flatMap((item) => {
+      return item.map<Date>((item, index) => {
+        return createDayjsDate(item[0] as string).toDate();
+      });
+    });
+  }
 
-    return formatChartLabelDelimiter(item[0] as string, columnLabelFormats);
+  return datasetOptions.ticks.flatMap((item) => {
+    return item.map<string>((item, index) => {
+      const key = ticksKey[index]?.key;
+      const columnLabelFormat = columnLabelFormats[key];
+      return formatLabel(item, columnLabelFormat);
+    });
   });
 };

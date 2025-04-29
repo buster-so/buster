@@ -1,6 +1,6 @@
-import { AnimationOptions, AnimationSpec } from 'chart.js';
+import { AnimationOptions } from 'chart.js';
 
-const MAX_DELAY = 1200;
+const MAX_DELAY = 1000;
 
 export const barDelayAnimation = (props?: { maxDelay?: number }) => {
   const { maxDelay = MAX_DELAY } = props || {};

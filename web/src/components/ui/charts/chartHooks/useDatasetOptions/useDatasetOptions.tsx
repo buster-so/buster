@@ -21,6 +21,7 @@ import type { DatasetOptionsWithTicks } from './interfaces';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import { DOWNSIZE_SAMPLE_THRESHOLD } from '../../config';
 import { aggregateAndCreateDatasets } from './aggregateAndCreateDatasets';
+import { modifyDatasets } from './modifyDatasets';
 
 type DatasetHookResult = {
   datasetOptions: DatasetOptionsWithTicks;
@@ -181,9 +182,29 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
     isScatter
   ]);
 
-  const datasetOptions = useMemo(() => {
+  const datasetOptionsRaw = useMemo(() => {
     return aggregatedDatasets;
   }, [aggregatedDatasets]);
+
+  const datasetOptions = useMemo(() => {
+    return modifyDatasets({
+      datasets: datasetOptionsRaw,
+      pieMinimumSlicePercentage,
+      pieSortBy,
+      barSortBy,
+      barGroupType,
+      lineGroupType,
+      selectedChartType
+    });
+  }, [
+    datasetOptionsRaw,
+    pieMinimumSlicePercentage,
+    pieSortBy,
+    barSortBy,
+    barGroupType,
+    lineGroupType,
+    selectedChartType
+  ]);
 
   const dataTrendlineOptions = useDataTrendlineOptions({
     datasetOptions,

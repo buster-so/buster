@@ -28,13 +28,12 @@ interface UseTooltipOptionsProps {
   lineGroupType: BusterChartProps['lineGroupType'];
   pieDisplayLabelAs: BusterChartProps['pieDisplayLabelAs'];
   selectedAxis: ChartEncodes;
-  datasetOptions: DatasetOptionsWithTicks;
   hasMismatchedTooltipsAndMeasures: boolean;
   disableTooltip: boolean;
   colors: string[];
 }
 
-const MAX_TOOLTIP_CACHE_SIZE = 30;
+const MAX_TOOLTIP_CACHE_SIZE = 25;
 
 export const useTooltipOptions = ({
   columnLabelFormats,
@@ -45,7 +44,6 @@ export const useTooltipOptions = ({
   pieDisplayLabelAs,
   columnSettings,
   selectedAxis,
-  datasetOptions,
   disableTooltip,
   colors
 }: UseTooltipOptionsProps): DeepPartial<TooltipOptions> => {

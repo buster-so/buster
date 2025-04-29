@@ -186,7 +186,6 @@ export const useOptions = ({
     pieDisplayLabelAs,
     selectedAxis,
     columnSettings,
-    datasetOptions,
     hasMismatchedTooltipsAndMeasures,
     disableTooltip,
     colors
