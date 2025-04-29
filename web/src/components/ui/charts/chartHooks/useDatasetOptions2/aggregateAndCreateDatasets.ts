@@ -1,44 +1,29 @@
-type KV = { key: string; value: string | number | null };
+import type { ColumnLabelFormat } from '@/api/asset_interfaces/metric';
+import type { DatasetOption, KV } from './interfaces';
 
-type ColumnLabelFormatBase = {
-  replaceMissingDataWith?: 0 | null | string;
-};
+type ColumnLabelFormatBase = Pick<ColumnLabelFormat, 'replaceMissingDataWith'>;
 
-type Dataset = {
-  /** One array of KV pairs per data point (here always length 1 in non-scatter mode) */
-  label: KV[][];
-  data: (number | null)[];
-  dataKey: string;
-  axisType: 'y' | 'y2';
-  /** One array of KV pairs per data point */
-  tooltipData: KV[][];
-  /** If you passed `axis.size`, one size value per data point */
-  sizeData?: (number | null)[];
-};
-
-type CreateDatasetsFromAggregatesReturn = {
-  datasets: Dataset[];
-};
-
-export function createDatasetsFromAggregates<T extends Record<string, any>>(
+export function aggregateAndCreateDatasets<
+  T extends Record<string, string | number | null | Date | undefined>
+>(
   data: T[],
   axis: {
     x: (keyof T)[];
     y: (keyof T)[];
     y2?: (keyof T)[];
-    size?: (keyof T)[];
-    tooltips?: (keyof T)[] | null;
+    size?: [] | [string] | undefined;
+    tooltip?: (keyof T)[] | null;
     category?: (keyof T)[];
   },
-  columnLabelFormats: Record<string, ColumnLabelFormatBase>,
-  scatterPlot = false
-): CreateDatasetsFromAggregatesReturn {
+  columnLabelFormats: Record<string, ColumnLabelFormatBase | undefined>,
+  isScatterPlot = false
+): DatasetOption[] {
   // Normalize axis keys to strings
   const xKeys = axis.x.map(String);
   const yKeys = axis.y.map(String);
   const y2Keys = axis.y2?.map(String) ?? [];
   const sizeKey = axis.size?.[0] ? String(axis.size[0]) : null;
-  const tooltipKeys = axis.tooltips?.map(String) ?? [];
+  const tooltipKeys = axis.tooltip?.map(String) ?? [];
   const catKeys = axis.category?.map(String) ?? [];
 
   // Prepare column formats with defaults
@@ -108,11 +93,11 @@ export function createDatasetsFromAggregates<T extends Record<string, any>>(
     ...y2Keys.map((k) => ({ key: k, axisType: 'y2' as const }))
   ];
 
-  const datasets: Dataset[] = [];
+  const datasets: DatasetOption[] = [];
 
-  if (scatterPlot) {
+  if (isScatterPlot) {
     // SCATTER: for each category group and each yKey
-    catGroups.forEach(({ rows }) => {
+    catGroups.forEach(({ rec: catRec, rows }) => {
       yKeys.forEach((yKey) => {
         const fmtY = colFormats[yKey];
         const axisType = 'y';
@@ -146,13 +131,20 @@ export function createDatasetsFromAggregates<T extends Record<string, any>>(
           return pts;
         });
 
+        // Generate ID for scatter plot dataset
+        const id = createDatasetId(
+          yKey,
+          catKeys.length ? { keys: catKeys, record: catRec } : undefined
+        );
+
         datasets.push({
+          id,
           label: labelArr,
           data: dataArr,
           dataKey: yKey,
           axisType,
           tooltipData: tooltipArr,
-          ...(sizeArr && { sizeData: sizeArr })
+          ...(sizeArr && { sizeData: sizeArr, sizeDataKey: sizeKey ?? undefined })
         });
       });
     });
@@ -162,7 +154,7 @@ export function createDatasetsFromAggregates<T extends Record<string, any>>(
       // With categories
       seriesMeta.forEach(({ key: metric, axisType }) => {
         const fmt = colFormats[metric];
-        catGroups.forEach(({ rows: catRows }) => {
+        catGroups.forEach(({ rec: catRec, rows: catRows }) => {
           const xSub = groupRows(xKeys, catRows);
           const xMap = new Map(xSub.map((g) => [g.id, g.rows]));
 
@@ -197,7 +189,11 @@ export function createDatasetsFromAggregates<T extends Record<string, any>>(
             return pts;
           });
 
+          // Generate ID for category dataset
+          const id = createDatasetId(metric, { keys: catKeys, record: catRec });
+
           datasets.push({
+            id,
             label: labelArr,
             data: dataArr,
             dataKey: metric,
@@ -232,7 +228,11 @@ export function createDatasetsFromAggregates<T extends Record<string, any>>(
             ]
           ];
 
+          // Generate ID for x-axis dataset
+          const id = createDatasetId(metric, undefined, { keys: xKeys, record: rec });
+
           datasets.push({
+            id,
             label: labelArr,
             data: [value],
             dataKey: metric,
@@ -244,5 +244,26 @@ export function createDatasetsFromAggregates<T extends Record<string, any>>(
     }
   }
 
-  return { datasets };
+  return datasets;
+}
+
+/**
+ * Creates a consistent dataset ID by combining the measure field with category or x-axis information
+ */
+function createDatasetId(
+  measureKey: string,
+  categoryInfo?: { keys: string[]; record: Record<string, string> },
+  xAxisInfo?: { keys: string[]; record: Record<string, string> }
+): string {
+  if (categoryInfo && categoryInfo.keys.length > 0) {
+    const catPart = categoryInfo.keys.map((k) => `${k}:${categoryInfo.record[k]}`).join('_');
+    return `${measureKey}_${catPart}`;
+  }
+
+  if (xAxisInfo) {
+    const xPart = xAxisInfo.keys.map((k) => `${k}:${xAxisInfo.record[k]}`).join('_');
+    return `${measureKey}_${xPart}`;
+  }
+
+  return measureKey;
 }

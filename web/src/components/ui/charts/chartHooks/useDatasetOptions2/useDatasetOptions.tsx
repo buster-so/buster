@@ -14,29 +14,14 @@ import type {
   PieSortBy
 } from '@/api/asset_interfaces/metric/charts';
 import uniq from 'lodash/uniq';
-import {
-  getLineBarPieDatasetOptions,
-  getLineBarPieDimensions,
-  getLineBarPieTooltipKeys,
-  getLineBarPieYAxisKeys,
-  mapLineBarPieData,
-  processLineBarData,
-  sortLineBarData
-} from './datasetHelpers_BarLinePie';
-import {
-  downsampleScatterData,
-  getScatterDatasetOptions,
-  getScatterDimensions,
-  getScatterTooltipKeys,
-  mapScatterData,
-  processScatterData
-} from './datasetHelpers_Scatter';
+import { sortLineBarData } from './datasetHelpers_BarLinePie';
+import { downsampleScatterData } from './datasetHelpers_Scatter';
 import { type TrendlineDataset, useDataTrendlineOptions } from './useDataTrendlineOptions';
 import type { DatasetOption } from './interfaces';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import { DOWNSIZE_SAMPLE_THRESHOLD } from '../../config';
 import { appendToKeyValueChain } from './groupingHelpers';
-import { aggregateBasedOnXAndCategory } from './aggregateBasedOnXAndCategory';
+import { aggregateAndCreateDatasets } from './aggregateAndCreateDatasets';
 
 type DatasetHookResult = {
   datasetOptions: DatasetOption[];
@@ -150,91 +135,26 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
       .join(',');
   }, [measureFields.join(''), columnLabelFormats]);
 
-  //DONE UP TO HERE
-
-  const combinedData = useMemo(() => {
-    return aggregateBasedOnXAndCategory(
-      sortedAndLimitedData,
-      xFields,
-      measureFields,
-      categoryFields,
-      isScatter,
-      columnLabelFormats
-    );
-  }, [
-    sortedAndLimitedData,
-    xFieldsString,
-    categoryFieldsString,
-    yAxisFieldsString,
-    y2AxisFieldsString,
-    isScatter,
-    measureFieldsReplaceDataWithKey
-  ]);
-
-  console.log('combinedData', combinedData);
-
-  const processedData = useMemo(() => {
-    if (isScatter) {
-      return processScatterData(
-        sortedAndLimitedData,
-        xAxisField,
-        measureFields,
-        categoryFields,
-        sizeField,
-        tooltipFields,
-        columnLabelFormats
-      );
-    }
-
-    return processLineBarData(
-      categoriesSet,
-      xValuesSet,
-      dataMap,
-      measureFields,
-      columnLabelFormats
-    );
-  }, [
-    tooltipFields,
-    sortedAndLimitedData,
-    xFieldSortsString,
-    xFieldsString,
-    isScatter,
-    categoriesSet,
-    xValuesSet,
-    dataMap,
-    measureFields,
-    sizeFieldString,
-    dimensions,
-    measureFieldsReplaceDataWithKey //use this instead of columnLabelFormats
-  ]);
-
-  console.log('processedData', processedData);
+  const xFieldDateSorts = useMemo(() => {
+    if (isScatter) return [];
+    if (isComboChart) return [];
+    if (isBarChart) return [];
+    if (isPieChart) return [];
+    return xFieldSorts;
+  }, [xFieldSorts, isScatter, isComboChart, isBarChart, isPieChart]);
 
   const yAxisKeys = useMemo(() => {
-    if (isScatter)
-      return yAxisFields.map((field) => appendToKeyValueChain([{ key: field, value: null }])); //not a typo. I want to use the same function for both scatter and bar/line/pie
-    return getLineBarPieYAxisKeys(categoriesSet, yAxisFields);
-  }, [categoriesSet, yAxisFieldsString, isScatter]);
-
-  console.log('yAxisKeys', yAxisKeys);
+    return yAxisFields;
+  }, [yAxisFieldsString]);
 
   const y2AxisKeys = useMemo(() => {
     if (!isComboChart) return defaultYAxis2;
-    return getLineBarPieYAxisKeys(categoriesSet, y2AxisFields);
-  }, [categoriesSet, y2AxisFieldsString, isComboChart]);
+    return y2AxisFields || defaultYAxis2;
+  }, [y2AxisFieldsString, isComboChart]);
 
   const tooltipKeys = useMemo(() => {
-    if (isScatter) {
-      return getScatterTooltipKeys(
-        tooltipFields,
-        xAxisField,
-        categoryFields,
-        measureFields,
-        sizeField
-      );
-    }
-    return getLineBarPieTooltipKeys(categoriesSet, tooltipFields, measureFields);
-  }, [categoryFieldsString, tooltipFieldsString, xAxisField, sizeFieldString, isScatter]);
+    return tooltipFields;
+  }, [tooltipFieldsString]);
 
   const hasMismatchedTooltipsAndMeasures = useMemo(() => {
     const allYAxis = [...yAxisFields, ...y2AxisFields];
@@ -242,38 +162,39 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
     return tooltipFields.some((yAxis) => {
       return !allYAxis.includes(yAxis);
     });
-  }, [yAxisFields, y2AxisFields, tooltipFieldsString]);
+  }, [yAxisFieldsString, y2AxisFieldsString, tooltipFieldsString]);
 
-  const datasetOptions = useMemo(() => {
-    if (isScatter) {
-      return getScatterDatasetOptions(processedData, dimensions);
-    }
-
-    return getLineBarPieDatasetOptions(
-      dimensions,
-      processedData as (string | number | Date | null)[][],
-      selectedChartType,
-      pieMinimumSlicePercentage,
-      barSortBy,
-      pieSortBy,
-      yAxisKeys,
-      xFieldSorts,
-      barGroupType,
-      lineGroupType
+  const aggregatedDatasets = useMemo(() => {
+    return aggregateAndCreateDatasets(
+      sortedAndLimitedData,
+      {
+        x: xFields,
+        y: yAxisFields,
+        y2: y2AxisFields,
+        category: categoryFields,
+        size: sizeField,
+        tooltip: tooltipFields
+      },
+      columnLabelFormats,
+      isScatter
     );
   }, [
-    lineGroupType,
-    barGroupType,
-    processedData,
-    dimensions,
-    yAxisKeys,
-    barSortBy,
-    pieSortBy,
-    pieMinimumSlicePercentage,
-    measureFields,
-    isScatter,
-    selectedChartType
+    sortedAndLimitedData,
+    xFieldsString,
+    yAxisFieldsString,
+    y2AxisFieldsString,
+    categoryFieldsString,
+    sizeFieldString,
+    tooltipFieldsString,
+    measureFieldsReplaceDataWithKey,
+    isScatter
   ]);
+
+  const datasetOptions = useMemo(() => {
+    return aggregatedDatasets;
+  }, [aggregatedDatasets]);
+
+  //DONE UP TO HERE
 
   const dataTrendlineOptions = useDataTrendlineOptions({
     datasetOptions,
@@ -284,7 +205,7 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
   });
 
   return {
-    datasetOptions, //this is a matrix of dimensions x measures
+    datasetOptions,
     dataTrendlineOptions,
     yAxisKeys,
     y2AxisKeys,

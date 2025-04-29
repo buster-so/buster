@@ -1,5 +1,5 @@
 import { DEFAULT_COLUMN_LABEL_FORMAT, IColumnLabelFormat } from '@/api/asset_interfaces/metric';
-import { aggregateBasedOnXAndCategory } from './aggregateBasedOnXAndCategory';
+import { aggregateBasedOnXAndCategory } from './OLD_aggregateBasedOnXAndCategory';
 import { appendToKeyValueChain } from './groupingHelpers';
 
 describe('aggregateBasedOnXAndCategory', () => {
