@@ -1,56 +1,170 @@
 import { BarSortBy, BusterChartProps, ChartType, PieSortBy } from '@/api/asset_interfaces/metric';
-import { DatasetOption } from './interfaces';
+import { DatasetOption, KV } from './interfaces';
+import cloneDeep from 'lodash/cloneDeep';
+import { sum as lodashSum } from 'lodash';
 
 type ModifyDatasetsParams = {
   datasets: DatasetOption[];
-  pieMinimumSlicePercentage: number | undefined;
-  barSortBy: BarSortBy | undefined;
-  pieSortBy: PieSortBy | undefined;
-  barGroupType: BusterChartProps['barGroupType'] | undefined;
+  pieMinimumSlicePercentage?: number;
+  barSortBy?: BarSortBy;
+  pieSortBy?: PieSortBy;
+  barGroupType?: BusterChartProps['barGroupType'];
   lineGroupType: BusterChartProps['lineGroupType'];
   selectedChartType: ChartType;
 };
 
-export const modifyDatasets = ({
+// Helper: ensure pie slices meet minimum percentage
+function handlePieThreshold(datasets: DatasetOption[], minPercent: number): DatasetOption[] {
+  const total = lodashSum(datasets.map((ds) => ds.data[0] || 0));
+  if (total <= 0) return datasets;
+
+  const above: DatasetOption[] = [];
+  const below: DatasetOption[] = [];
+
+  datasets.forEach((ds) => {
+    const value = ds.data[0] || 0;
+    const pct = (value / total) * 100;
+    (pct >= minPercent ? above : below).push(ds);
+  });
+
+  if (!below.length) return above;
+
+  // Combine 'below' into "Other"
+  const otherValue = lodashSum(below.map((ds) => ds.data[0] || 0));
+  const tooltipMap = new Map<string, string | number | null>([['value', otherValue]]);
+
+  below.forEach((ds) => {
+    const items = ds.tooltipData?.[0] || [];
+    items.forEach(({ key, value }) => {
+      if (key === 'value') return;
+
+      const existing = tooltipMap.get(key);
+      if (existing != null) {
+        if (typeof existing === 'number' && typeof value === 'number') {
+          // Sum numeric values
+          tooltipMap.set(key, existing + value);
+        } else if (typeof existing === 'string' && typeof value === 'string') {
+          // Concatenate string values
+          tooltipMap.set(key, `${existing}, ${value}`);
+        }
+      } else {
+        // Set the initial value
+        tooltipMap.set(key, value);
+      }
+    });
+  });
+
+  const otherTooltip = Array.from(tooltipMap.entries()).map(([key, value]) => ({ key, value }));
+
+  return [
+    ...above,
+    {
+      id: 'other',
+      label: [[{ key: 'category', value: 'Other' }]],
+      data: [otherValue],
+      dataKey: 'other',
+      axisType: 'y',
+      tooltipData: [otherTooltip]
+    }
+  ];
+}
+
+// Helper: sort pie slices
+function sortPie(datasets: DatasetOption[], sortBy: PieSortBy): DatasetOption[] {
+  const items = [...datasets];
+  if (sortBy === 'value') {
+    return items.sort((a, b) => (b.data[0] || 0) - (a.data[0] || 0));
+  }
+  return items.sort((a, b) => {
+    const aKey = a.label?.[0]?.[0]?.value?.toString().toLowerCase() || '';
+    const bKey = b.label?.[0]?.[0]?.value?.toString().toLowerCase() || '';
+    return aKey.localeCompare(bKey);
+  });
+}
+
+// Helper: convert to percentage-stack
+function applyPercentageStack(datasets: DatasetOption[]): DatasetOption[] {
+  const clone = cloneDeep(datasets);
+  const length = clone[0]?.data.length || 0;
+  const sums = new Array<number>(length).fill(0);
+
+  clone.forEach((ds) =>
+    ds.data.forEach((v, i) => {
+      sums[i] += v || 0;
+    })
+  );
+
+  clone.forEach((ds) => {
+    ds.data = ds.data.map((v, i) => (sums[i] ? ((v || 0) / sums[i]) * 100 : 0));
+  });
+
+  return clone;
+}
+
+// Helper: sort bar/line datasets by sum per index
+function sortBarLine(datasets: DatasetOption[], barSortBy: BarSortBy): DatasetOption[] {
+  const clone = cloneDeep(datasets);
+  const sortKey = barSortBy.find((o) => o !== 'none');
+  if (!sortKey) return datasets;
+
+  const dataLen = clone[0]?.data.length || 0;
+  // compute sums
+  const sums = new Array<number>(dataLen).fill(0);
+  clone.forEach((ds) =>
+    ds.data.forEach((v, i) => {
+      sums[i] += v === null ? 0 : v || 0;
+    })
+  );
+
+  // generate sorted indices
+  const indices = sums.map((sum, idx) => idx);
+  indices.sort((a, b) => (sortKey === 'asc' ? sums[a] - sums[b] : sums[b] - sums[a]));
+
+  // reorder each dataset
+  clone.forEach((ds) => {
+    ds.data = indices.map((i) => ds.data[i]);
+    if (ds.tooltipData) {
+      ds.tooltipData = indices.map((i) => ds.tooltipData![i] || []);
+    }
+  });
+
+  return clone;
+}
+
+export function modifyDatasets({
   datasets,
   pieMinimumSlicePercentage,
-  barSortBy,
   pieSortBy,
+  barSortBy,
   barGroupType,
   lineGroupType,
   selectedChartType
-}: ModifyDatasetsParams) => {
-  if (selectedChartType === ChartType.Pie && pieMinimumSlicePercentage) {
-    //I need to modify the datasets to ensure that the pie slices are at least the size of the pieMinimumSlicePercentage
-    //We should do this by ensuring that the smallest slice is at least the size of the pieMinimumSlicePercentage
-    //if it is not, we should combine slices until it is
-    //Remove the datasets that are below the pieMinimumSlicePercentage and add them to this new dataset. The label should be "Other"
+}: ModifyDatasetsParams): DatasetOption[] {
+  if (!datasets.length) return datasets;
+
+  // Pie chart handling
+  if (selectedChartType === ChartType.Pie) {
+    if (pieMinimumSlicePercentage != null) {
+      return handlePieThreshold(datasets, pieMinimumSlicePercentage);
+    }
+    if (pieSortBy) {
+      return sortPie(datasets, pieSortBy);
+    }
+    return datasets;
   }
 
-  if (selectedChartType === ChartType.Pie && pieSortBy === 'value') {
-    //I need to modify the datasets to ensure that the pie slices are sorted by value
-    //We should do this by sorting the datasets (and their assosciated labels) by the value of the data
-    //This makes sure that the largest slices are at the top
-  }
-
-  if (selectedChartType === ChartType.Pie && pieSortBy === 'key') {
-    //I need to modify the datasets to ensure that the pie slices are sorted by key (which is the label)
-    //We should do this by sorting the datasets (and their assosciated labels) by the key of the data
-    //This makes sure that the slices are always in the same order
-  }
-
+  // Percentage-stack for bar or line
   if (
-    (selectedChartType === 'bar' && barGroupType === 'percentage-stack') ||
-    (selectedChartType === 'line' && lineGroupType === 'percentage-stack')
+    (selectedChartType === ChartType.Bar && barGroupType === 'percentage-stack') ||
+    (selectedChartType === ChartType.Line && lineGroupType === 'percentage-stack')
   ) {
-    //If we are using a percentage stack, we need to modify the datasets to ensure that the sum of the slices is 100%
-    //We should do this by ensuring that all of the values are divided by the sum of the values
-    //This makes sure that the slices are always 100%
+    return applyPercentageStack(datasets);
   }
 
-  if (selectedChartType === 'bar' && barSortBy && barSortBy?.some((y) => y !== 'none')) {
-    //If we are using a bar sort by, we need to modify the datasets to ensure that the bars are sorted by the barSortBy
-    //We should do this by sorting the datasets by the barSortBy
-    //This makes sure that the bars are always in the same order
+  // Bar sorting
+  if (selectedChartType === ChartType.Bar && barSortBy && barSortBy.some((o) => o !== 'none')) {
+    return sortBarLine(datasets, barSortBy);
   }
-};
+
+  return datasets;
+}

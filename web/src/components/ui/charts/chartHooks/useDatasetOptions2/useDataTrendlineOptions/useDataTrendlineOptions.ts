@@ -37,13 +37,8 @@ export const useDataTrendlineOptions = ({
     return isValidChartType;
   }, [selectedChartType, hasTrendlines, selectedAxis, trendlines?.length]);
 
-  const lastDataset = useMemo(() => {
-    if (!datasetOptions || !canSupportTrendlines) return undefined;
-    return last(datasetOptions);
-  }, [datasetOptions, canSupportTrendlines]);
-
   const datasetTrendlineOptions: TrendlineDataset[] = useMemo(() => {
-    if (!hasTrendlines || !datasetOptions || !datasetOptions.length)
+    if (!canSupportTrendlines || !hasTrendlines || !datasetOptions || !datasetOptions.length)
       return [] as TrendlineDataset[];
 
     const trendlineDatasets: TrendlineDataset[] = [];
@@ -64,7 +59,7 @@ export const useDataTrendlineOptions = ({
     });
 
     return trendlineDatasets;
-  }, [datasetOptions, trendlines, hasTrendlines]);
+  }, [datasetOptions, canSupportTrendlines, trendlines, hasTrendlines]);
 
   return datasetTrendlineOptions;
 };

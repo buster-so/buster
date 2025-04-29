@@ -135,14 +135,6 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
       .join(',');
   }, [measureFields.join(''), columnLabelFormats]);
 
-  const xFieldDateSorts = useMemo(() => {
-    if (isScatter) return [];
-    if (isComboChart) return [];
-    if (isBarChart) return [];
-    if (isPieChart) return [];
-    return xFieldSorts;
-  }, [xFieldSorts, isScatter, isComboChart, isBarChart, isPieChart]);
-
   const yAxisKeys = useMemo(() => {
     return yAxisFields;
   }, [yAxisFieldsString]);

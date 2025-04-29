@@ -305,7 +305,14 @@ export const trendlineDatasetCreator: Record<
     // ];
   },
 
-  linear_regression: (trendline, selectedDataset, columnLabelFormats) => {
+  linear_regression: (trendline, datasets, columnLabelFormats) => {
+    const selectedDataset = datasets.find((dataset) => dataset.id === trendline.columnId);
+
+    if (!selectedDataset?.data || selectedDataset.data.length === 0) return [];
+
+    const validData = selectedDataset.data.filter((value) => value !== null && value !== undefined);
+    if (validData.length === 0) return [];
+
     return [];
     // const dimensions = selectedDataset.dimensions as string[];
     // const xAxisColumn = dimensions[0];
@@ -390,89 +397,123 @@ export const trendlineDatasetCreator: Record<
     //   }
     // ];
   },
-  average: (trendline, selectedDataset) => {
-    // const source = selectedDataset.source as Array<[string, ...number[]]>;
-    // const indexOfTrendlineColumn = selectedDataset.dimensions!.findIndex(
-    //   (dimensionUnDeliminated) => {
-    //     const { key } = extractFieldsFromChain(dimensionUnDeliminated as string)[0];
-    //     return key === trendline.columnId;
-    //   }
-    // );
-    // const dataFrame = new DataFrameOperations(source, indexOfTrendlineColumn);
-    // const average = dataFrame.average();
-    // return [
-    //   {
-    //     ...trendline,
-    //     id: DATASET_IDS.average(trendline.columnId),
-    //     source: [[average]],
-    //     dimensions: []
-    //   }
-    // ];
 
-    return [];
+  average: (trendline, datasets) => {
+    const selectedDataset = datasets.find((dataset) => dataset.id === trendline.columnId);
+
+    if (!selectedDataset?.data || selectedDataset.data.length === 0) return [];
+
+    // Filter out null/undefined values
+    const validData = selectedDataset.data.filter((value) => value !== null && value !== undefined);
+    if (validData.length === 0) return [];
+
+    // Sum all valid values and divide by the count
+    const sum = validData.reduce<number>((acc, datapoint) => {
+      return acc + (datapoint as number);
+    }, 0);
+
+    const average = sum / validData.length;
+
+    return [
+      {
+        ...trendline,
+        id: DATASET_IDS.average(trendline.columnId),
+        label: [[{ key: 'value', value: average }]],
+        data: [average],
+        dataKey: trendline.columnId,
+        axisType: 'y',
+        tooltipData: [[{ key: 'value', value: average }]]
+      }
+    ];
   },
-  min: (trendline, selectedDataset) => {
-    // const source = selectedDataset.source as Array<[string, ...number[]]>;
-    // const indexOfTrendlineColumn = selectedDataset.dimensions!.findIndex(
-    //   (dimensionUnDeliminated) => {
-    //     const { key } = extractFieldsFromChain(dimensionUnDeliminated as string)[0];
-    //     return key === trendline.columnId;
-    //   }
-    // );
-    // const dataFrame = new DataFrameOperations(source, indexOfTrendlineColumn);
-    // const min = dataFrame.min();
 
-    // return [
-    //   {
-    //     ...trendline,
-    //     id: DATASET_IDS.min(trendline.columnId),
-    //     source: [[min]],
-    //     dimensions: []
-    //   }
-    // ];
+  min: (trendline, datasets) => {
+    const selectedDataset = datasets.find((dataset) => dataset.id === trendline.columnId);
 
-    return [];
+    if (!selectedDataset?.data || selectedDataset.data.length === 0) return [];
+
+    // Filter out null/undefined values
+    const validData = selectedDataset.data.filter((value) => value !== null && value !== undefined);
+    if (validData.length === 0) return [];
+
+    // Use the first valid value as initial accumulator
+    const min = validData.reduce<number>((acc, datapoint) => {
+      return Math.min(acc, datapoint as number);
+    }, validData[0] as number);
+
+    return [
+      {
+        ...trendline,
+        id: DATASET_IDS.min(trendline.columnId),
+        label: [[{ key: 'value', value: min }]],
+        data: [min],
+        dataKey: trendline.columnId,
+        axisType: 'y',
+        tooltipData: [[{ key: 'value', value: min }]]
+      }
+    ];
   },
-  max: (trendline, selectedDataset) => {
-    // const source = selectedDataset.source as Array<[string, ...number[]]>;
-    // const indexOfTrendlineColumn = selectedDataset.dimensions!.findIndex(
-    //   (dimensionUnDeliminated) => {
-    //     const { key } = extractFieldsFromChain(dimensionUnDeliminated as string)[0];
-    //     return key === trendline.columnId;
-    //   }
-    // );
-    // const dataFrame = new DataFrameOperations(source, indexOfTrendlineColumn);
-    // const max = dataFrame.max();
-    // return [
-    //   {
-    //     ...trendline,
-    //     id: DATASET_IDS.max(trendline.columnId),
-    //     source: [[max]],
-    //     dimensions: []
-    //   }
-    // ];
 
-    return [];
+  max: (trendline, datasets) => {
+    const selectedDataset = datasets.find((dataset) => dataset.id === trendline.columnId);
+
+    if (!selectedDataset?.data || selectedDataset.data.length === 0) return [];
+
+    // Filter out null/undefined values
+    const validData = selectedDataset.data.filter((value) => value !== null && value !== undefined);
+    if (validData.length === 0) return [];
+
+    // Use the first valid value as initial accumulator
+    const max = validData.reduce<number>((acc, datapoint) => {
+      return Math.max(acc, datapoint as number);
+    }, validData[0] as number);
+
+    return [
+      {
+        ...trendline,
+        id: DATASET_IDS.max(trendline.columnId),
+        label: [[{ key: 'value', value: max }]],
+        data: [max],
+        dataKey: trendline.columnId,
+        axisType: 'y',
+        tooltipData: [[{ key: 'value', value: max }]]
+      }
+    ];
   },
-  median: (trendline, selectedDataset) => {
-    // const source = selectedDataset.source as Array<[string, ...number[]]>;
-    // const indexOfTrendlineColumn = selectedDataset.dimensions!.findIndex(
-    //   (dimensionUnDeliminated) => {
-    //     const { key } = extractFieldsFromChain(dimensionUnDeliminated as string)[0];
-    //     return key === trendline.columnId;
-    //   }
-    // );
-    // const dataFrame = new DataFrameOperations(source, indexOfTrendlineColumn);
-    // const median = dataFrame.median();
-    // return [
-    //   {
-    //     ...trendline,
-    //     id: DATASET_IDS.median(trendline.columnId),
-    //     source: [[median]],
-    //     dimensions: []
-    //   }
-    // ];
 
-    return [];
+  median: (trendline, datasets) => {
+    const selectedDataset = datasets.find((dataset) => dataset.id === trendline.columnId);
+
+    if (!selectedDataset?.data || selectedDataset.data.length === 0) return [];
+
+    // Sort the data and get the middle value
+    const sortedData = [...selectedDataset.data]
+      .filter((value) => value !== null && value !== undefined)
+      .sort((a, b) => (a as number) - (b as number));
+
+    let median: number;
+    const midIndex = Math.floor(sortedData.length / 2);
+
+    if (sortedData.length % 2 === 0) {
+      // Even number of elements - average the two middle values
+      median = ((sortedData[midIndex - 1] as number) + (sortedData[midIndex] as number)) / 2;
+    } else {
+      // Odd number of elements - take the middle value
+      median = sortedData[midIndex] as number;
+    }
+
+    if (median === undefined) return [];
+
+    return [
+      {
+        ...trendline,
+        id: DATASET_IDS.median(trendline.columnId),
+        label: [[{ key: 'value', value: median }]],
+        data: [median],
+        dataKey: trendline.columnId,
+        axisType: 'y',
+        tooltipData: [[{ key: 'value', value: median }]]
+      }
+    ];
   }
 };
