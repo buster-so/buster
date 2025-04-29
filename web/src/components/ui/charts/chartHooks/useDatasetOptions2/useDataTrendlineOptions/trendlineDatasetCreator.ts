@@ -319,141 +319,55 @@ export const trendlineDatasetCreator: Record<
     );
     const isXAxisDate = isDateColumnType(columnLabelFormats[xAxisColumn]?.columnType);
 
-    const { mappedData } = dataMapper(selectedDataset, columnLabelFormats);
+    // Get mapped data points using the updated dataMapper
+    const mappedPoints = dataMapper(
+      selectedDataset,
+      {
+        ticks: datasetsWithTicks.ticks,
+        ticksKey: datasetsWithTicks.ticksKey
+      },
+      columnLabelFormats
+    );
 
-    if (isXAxisNumeric) {
-      const regressionResult = regression.linear(mappedData, { precision: 2 });
+    if (mappedPoints.length === 0) return [];
 
-      const data = mappedData.map((item) => {
-        const newItem = [...item];
-        newItem[1] = regressionResult.predict(item[0])[1];
-        return newItem[1];
-      });
+    // For date x-axis, normalize to days since first date
+    const points: [number, number][] = isXAxisDate
+      ? mappedPoints.map(([x, y]): [number, number] => {
+          const firstTimestamp = mappedPoints[0][0];
+          return [(x - firstTimestamp) / (1000 * 60 * 60 * 24), y];
+        })
+      : mappedPoints;
 
-      return [
-        {
-          ...trendline,
-          id: DATASET_IDS.linearRegression(trendline.columnId),
-          data: data,
-          dataKey: trendline.columnId,
-          axisType: 'y',
-          tooltipData: [],
-          label: [[{ key: 'value', value: 'Linear Regression (Numeric)' }]]
-        }
-      ];
-    }
+    // Calculate linear regression
+    const regressionResult = regression.linear(points, { precision: 2 });
 
-    if (isXAxisDate) {
-      const firstTimestamp = mappedData[0][0];
-      const normalizedData: [number, number][] = mappedData.map(([timestamp, value]) => [
-        (timestamp - firstTimestamp) / (1000 * 60 * 60 * 24),
-        value
-      ]);
+    // Map back to original x values but with predicted y values
+    const data = mappedPoints.map(([x]) => {
+      const predictedY = isXAxisDate
+        ? regressionResult.predict((x - mappedPoints[0][0]) / (1000 * 60 * 60 * 24))[1]
+        : regressionResult.predict(x)[1];
+      return predictedY;
+    });
 
-      const regressionResult = regression.linear(normalizedData, { precision: 2 });
-
-      const data = mappedData.map((item) => {
-        const newItem = [...item];
-        newItem[1] = regressionResult.predict(item[0])[1];
-        return newItem[1];
-      });
-
-      return [
-        {
-          ...trendline,
-          id: DATASET_IDS.linearRegression(trendline.columnId),
-          data: data,
-          dataKey: trendline.columnId,
-          axisType: 'y',
-          tooltipData: [],
-          label: [[{ key: 'value', value: 'Linear Regression (Date)' }]]
-        }
-      ];
-    }
-
-    return [];
-    // const dimensions = selectedDataset.dimensions as string[];
-    // const xAxisColumn = dimensions[0];
-    // const isXAxisNumeric = isNumericColumnType(
-    //   columnLabelFormats[xAxisColumn]?.columnType || DEFAULT_COLUMN_LABEL_FORMAT.columnType
-    // );
-    // const isXAxisDate = isDateColumnType(columnLabelFormats[xAxisColumn]?.columnType);
-    // const { mappedData, indexOfTrendlineColumn } = dataMapper(
-    //   trendline,
-    //   selectedDataset,
-    //   columnLabelFormats,
-    //   isXAxisNumeric ? 'number' : isXAxisDate ? 'date' : 'string'
-    // );
-
-    // if (indexOfTrendlineColumn === undefined) return [];
-
-    // if (isXAxisNumeric) {
-    //   if (indexOfTrendlineColumn === undefined) return [];
-
-    //   const regressionResult = regression.linear(mappedData, { precision: 2 });
-
-    //   const data = mappedData.map((item) => {
-    //     const newItem = [...item];
-    //     newItem[indexOfTrendlineColumn] = regressionResult.predict(item[0])[1];
-    //     return newItem;
-    //   });
-
-    //   return [
-    //     {
-    //       ...trendline,
-    //       id: DATASET_IDS.linearRegression(trendline.columnId),
-    //       source: data,
-    //       dimensions: dimensions,
-    //       equation: regressionResult.string
-    //     }
-    //   ];
-    // }
-
-    // if (isXAxisDate) {
-    //   const firstTimestamp = mappedData[0][0];
-    //   const regressionResult = regression.linear(
-    //     mappedData.map(([timestamp, value]) => [
-    //       // Convert timestamp to days since first timestamp
-    //       (timestamp - firstTimestamp) / (1000 * 60 * 60 * 24),
-    //       value
-    //     ]),
-    //     { precision: 2 }
-    //   );
-    //   const data = mappedData.map((item) => {
-    //     const newItem = [...item];
-    //     newItem[indexOfTrendlineColumn] = regressionResult.predict(
-    //       (item[0] - firstTimestamp) / (1000 * 60 * 60 * 24)
-    //     )[1];
-    //     return newItem;
-    //   });
-
-    //   return [
-    //     {
-    //       ...trendline,
-    //       id: DATASET_IDS.linearSlope(trendline.columnId),
-    //       source: data,
-    //       dimensions: dimensions,
-    //       equation: regressionResult.string
-    //     }
-    //   ];
-    // }
-
-    // const regressionResult = regression.linear(mappedData, { precision: 2 });
-    // const data = mappedData.map((item) => {
-    //   const newItem = [...item];
-    //   newItem[indexOfTrendlineColumn] = regressionResult.predict(item[0])[1];
-    //   return newItem;
-    // });
-
-    // return [
-    //   {
-    //     ...trendline,
-    //     id: DATASET_IDS.linearSlope(trendline.columnId),
-    //     source: data,
-    //     dimensions,
-    //     equation: regressionResult.string
-    //   }
-    // ];
+    return [
+      {
+        ...trendline,
+        id: DATASET_IDS.linearRegression(trendline.columnId),
+        data,
+        dataKey: trendline.columnId,
+        axisType: 'y' as const,
+        tooltipData: [],
+        label: [
+          [
+            {
+              key: 'value',
+              value: `Linear Regression (${isXAxisDate ? 'Date' : isXAxisNumeric ? 'Numeric' : 'Categorical'})`
+            }
+          ]
+        ]
+      }
+    ];
   },
 
   average: (trendline, datasetsWithTicks) => {
