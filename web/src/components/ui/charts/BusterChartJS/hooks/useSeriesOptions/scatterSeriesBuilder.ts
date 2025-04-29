@@ -7,6 +7,7 @@ import { addOpacityToColor } from '@/lib/colors';
 import { isDateColumnType } from '@/lib/messages';
 import { createDayjsDate } from '@/lib/date';
 import { lineSeriesBuilder_labels } from './lineSeriesBuilder';
+import { extractFieldsFromChain } from '../../../chartHooks';
 
 export const scatterSeriesBuilder_data = ({
   selectedDataset,
@@ -15,11 +16,33 @@ export const scatterSeriesBuilder_data = ({
   sizeKeyIndex,
   scatterDotSize,
   columnLabelFormats,
-  xAxisKeys
+  xAxisKeys,
+  categoryKeys
 }: SeriesBuilderProps): ChartProps<'bubble'>['data']['datasets'] => {
+  console.log('scatterSeriesBuilder_data', {
+    selectedDataset,
+    allYAxisKeysIndexes,
+    colors,
+    sizeKeyIndex,
+    scatterDotSize
+  });
   const xAxisKey = xAxisKeys[0];
   const xAxisColumnLabelFormat = columnLabelFormats[xAxisKey] || DEFAULT_COLUMN_LABEL_FORMAT;
   const isXAxisDate = isDateColumnType(xAxisColumnLabelFormat.columnType);
+  const categoryIndex = selectedDataset.dimensions.findIndex(
+    (dimension) => extractFieldsFromChain(dimension)?.[0].key === categoryKeys?.[0]
+  );
+  console.log(selectedDataset.dimensions, categoryKeys);
+
+  const assignedColors: Record<
+    string,
+    {
+      color: string;
+      backgroundColor: string;
+      hoverBackgroundColor: string;
+      borderColor: string;
+    }
+  > = {};
 
   const hasSizeKeyIndex = sizeKeyIndex !== null;
   const scatterElementConfig = hasSizeKeyIndex
@@ -31,28 +54,36 @@ export const scatterSeriesBuilder_data = ({
       }
     : undefined;
 
-  return allYAxisKeysIndexes.map((yKeyIndex, index) => {
-    const { index: yIndex, name } = yKeyIndex;
-    const color = colors[index % colors.length];
-    const backgroundColor = addOpacityToColor(color, 0.6);
-    const hoverBackgroundColor = addOpacityToColor(color, 0.9);
+  return allYAxisKeysIndexes.flatMap((yKeyIndex, index) => {
+    const { index: yIndex, name: yName } = yKeyIndex;
+    return selectedDataset.source.map((item, itemIndex) => {
+      const name = categoryIndex !== -1 ? String(item[categoryIndex]) : yName;
+      console.log(categoryIndex, name);
 
-    return {
-      //  type: 'bubble',
-      elements: scatterElementConfig,
-      backgroundColor,
-      hoverBackgroundColor,
-      borderColor: color,
-      label: name,
-      data: selectedDataset.source
-        .map((item) => ({
-          label: name,
-          x: getScatterXValue({ isXAxisDate, xValue: item[0] }) as number,
-          y: item[yIndex] as number,
-          originalR: sizeKeyIndex ? (item[sizeKeyIndex.index] as number) : undefined
-        }))
-        .filter((item) => item.y !== null)
-    };
+      let chosenColors = assignedColors[name];
+      if (!chosenColors) {
+        const color =
+          categoryIndex !== -1 ? colors[itemIndex % colors.length] : colors[index % colors.length];
+        const backgroundColor = addOpacityToColor(color, 0.6);
+        const hoverBackgroundColor = addOpacityToColor(color, 0.9);
+        assignedColors[name] = { color, backgroundColor, hoverBackgroundColor, borderColor: color };
+        chosenColors = assignedColors[name];
+      }
+
+      return {
+        label: name,
+        data: [
+          {
+            x: selectedDataset.source[itemIndex][0] as number,
+            y: selectedDataset.source[itemIndex][yIndex] as number
+          }
+        ],
+        elements: scatterElementConfig,
+        backgroundColor: chosenColors.backgroundColor,
+        hoverBackgroundColor: chosenColors.hoverBackgroundColor,
+        borderColor: chosenColors.borderColor
+      };
+    });
   });
 };
 

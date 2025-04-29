@@ -74,6 +74,8 @@ export const useSeriesOptions = ({
       .filter((item) => item.index !== -1);
   }, [yAxisKeys.join(','), selectedDataset.dimensions]);
 
+  console.log('allYAxisKeysIndexes', allYAxisKeysIndexes, yAxisKeys);
+
   const allY2AxisKeysIndexes = useMemo(() => {
     return y2AxisKeys
       .map((key) => {
@@ -168,6 +170,8 @@ export const useSeriesOptions = ({
     categoryKeys,
     selectedChartType
   ]);
+
+  console.log('datasetSeries', datasetSeries);
 
   const tooltipSeries: ChartProps<ChartJSChartType>['data']['datasets'] = useMemo(() => {
     if (isScatter) {

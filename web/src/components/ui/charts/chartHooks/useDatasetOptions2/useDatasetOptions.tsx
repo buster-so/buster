@@ -36,6 +36,7 @@ import type { DatasetOption } from './interfaces';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import { DOWNSIZE_SAMPLE_THRESHOLD } from '../../config';
 import { appendToKeyValueChain } from './groupingHelpers';
+import { aggregateBasedOnXAndCategory } from './aggregateBasedOnXAndCategory';
 
 type DatasetHookResult = {
   datasetOptions: DatasetOption[];
@@ -137,15 +138,6 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
     return sortLineBarData(data, columnMetadata, xFieldSorts, xFields);
   }, [data, xFieldSortsString, xFieldsString, isScatter]);
 
-  const { dataMap, xValuesSet, categoriesSet } = useMemo(() => {
-    if (isScatter) return mapScatterData(sortedAndLimitedData, categoryFields);
-    return mapLineBarPieData(sortedAndLimitedData, xFields, categoryFields, measureFields);
-  }, [sortedAndLimitedData, xFieldsString, categoryFieldsString, measureFields, isScatter]);
-
-  console.log('dataMap', dataMap);
-  console.log('xValuesSet', xValuesSet);
-  console.log('categoriesSet', categoriesSet);
-
   const measureFieldsReplaceDataWithKey = useMemo(() => {
     return measureFields
       .map((field) => {
@@ -158,21 +150,28 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
       .join(',');
   }, [measureFields.join(''), columnLabelFormats]);
 
-  const dimensions: string[] = useMemo(() => {
-    if (isScatter) {
-      return getScatterDimensions(categoryFields, xAxisField, measureFields, sizeField);
-    }
-    return getLineBarPieDimensions(categoriesSet, measureFields, xFields);
+  //DONE UP TO HERE
+
+  const combinedData = useMemo(() => {
+    return aggregateBasedOnXAndCategory(
+      sortedAndLimitedData,
+      xFields,
+      measureFields,
+      categoryFields,
+      isScatter,
+      columnLabelFormats
+    );
   }, [
-    categoriesSet,
-    categoryFieldsString,
-    measureFields,
+    sortedAndLimitedData,
     xFieldsString,
-    sizeFieldString,
-    isScatter
+    categoryFieldsString,
+    yAxisFieldsString,
+    y2AxisFieldsString,
+    isScatter,
+    measureFieldsReplaceDataWithKey
   ]);
 
-  console.log('dimensions', dimensions);
+  console.log('combinedData', combinedData);
 
   const processedData = useMemo(() => {
     if (isScatter) {
