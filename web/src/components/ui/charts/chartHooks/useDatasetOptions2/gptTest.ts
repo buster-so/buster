@@ -99,7 +99,10 @@ export function createDatasetsFromAggregates<T extends Record<string, any>>(
         : data.slice();
 
       const fmt = columnLabelFormats[yKey] || {};
-      const missing = fmt.replaceMissingDataWith ?? 0;
+      const missing =
+        fmt.replaceMissingDataWith === null ? null : (fmt.replaceMissingDataWith ?? 0);
+
+      console.log('missing', fmt, missing);
 
       // Build data & size arrays
       const dataArr = rows.map((r) => {
@@ -132,11 +135,20 @@ export function createDatasetsFromAggregates<T extends Record<string, any>>(
       const labelArr = rows.map((r) => xKeys.map((k) => ({ key: k, value: r[k] })));
       const tooltipArr = rows.map((r, i) => {
         const pts: KV[] = [];
-        if (categoryRec) {
-          catKeys.forEach((k) => pts.push({ key: k, value: categoryRec[k]! }));
-        }
+
         if (tooltipKeys) {
           tooltipKeys.forEach((k) => {
+            const raw = r[k];
+            const num = Number(raw);
+            pts.push({
+              key: k,
+              value: raw == null || raw === '' ? '' : Number.isNaN(num) ? raw : num
+            });
+          });
+        } else {
+          // Always include x, y, and size values in scatter chart tooltips when tooltipKeys is null
+          // Add x value(s)
+          xKeys.forEach((k) => {
             const raw = r[k],
               num = Number(raw);
             pts.push({
@@ -144,9 +156,20 @@ export function createDatasetsFromAggregates<T extends Record<string, any>>(
               value: raw == null || raw === '' || Number.isNaN(num) ? '' : num
             });
           });
-        } else {
+
+          // Add y value
           pts.push({ key: yKey, value: dataArr[i] == null ? '' : dataArr[i]! });
+
+          // Add size value if available
+          if (sizeKeys.length && sizeArr) {
+            const szKey = sizeKeys[0];
+            pts.push({ key: szKey, value: sizeArr[i] == null ? '' : sizeArr[i]! });
+          }
         }
+
+        // if (categoryRec) {
+        //   catKeys.forEach((k) => pts.push({ key: k, value: categoryRec[k]! }));
+        // }
         return pts;
       });
 
@@ -210,15 +233,23 @@ export function createDatasetsFromAggregates<T extends Record<string, any>>(
           );
 
           // Build tooltip data
-          const tooltipArr = dataPoints.map((value) => {
+          const tooltipArr = dataPoints.map((value, idx) => {
             const tooltipKV: KV[] = [];
             if (tooltipKeys) {
+              // For categorical data, we need to find the right row that matches this x value
+              const matchingRow =
+                categoryRows.find((r) =>
+                  xKeys.every((xk) => String(r[xk]) === String(xAxisValues[idx][xk]))
+                ) ||
+                categoryRows[0] ||
+                {};
+
               tooltipKeys.forEach((k) => {
-                const raw = categoryRows[0]?.[k],
-                  num = Number(raw);
+                const raw = matchingRow[k];
+                const num = Number(raw);
                 tooltipKV.push({
                   key: k,
-                  value: raw == null || raw === '' || Number.isNaN(num) ? '' : num
+                  value: raw == null || raw === '' ? '' : Number.isNaN(num) ? raw : num
                 });
               });
             } else {
@@ -277,11 +308,11 @@ export function createDatasetsFromAggregates<T extends Record<string, any>>(
             // pick from first row of this group
             const first = rows[0] || ({} as any);
             tooltipKeys.forEach((k) => {
-              const raw = first[k],
-                num = Number(raw);
+              const raw = first[k];
+              const num = Number(raw);
               tooltipKV.push({
                 key: k,
-                value: raw == null || raw === '' || Number.isNaN(num) ? '' : num
+                value: raw == null || raw === '' ? '' : Number.isNaN(num) ? raw : num
               });
             });
           } else {
