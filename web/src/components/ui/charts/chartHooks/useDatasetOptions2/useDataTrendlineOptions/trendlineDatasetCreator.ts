@@ -1,21 +1,19 @@
 // Also consider modifying this package to make it work with chartjs 4 https://pomgui.github.io/chartjs-plugin-regression/demo/
 
 import type { BusterChartProps, Trendline } from '@/api/asset_interfaces/metric/charts';
-import type { DatasetOption } from '../interfaces';
+import type { DatasetOption, DatasetOptionsWithTicks } from '../interfaces';
 import type { TrendlineDataset } from './trendlineDataset.types';
 import { DATASET_IDS } from '../config';
 import { isDateColumnType, isNumericColumnType } from '@/lib/messages';
-import { extractFieldsFromChain } from '../groupingHelpers';
-import { DataFrameOperations } from '@/lib/math';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
-import { dataMapper } from './dataMapper';
 import { regression } from '@/lib/regression/regression';
+import { dataMapper } from './dataMapper';
 
 export const trendlineDatasetCreator: Record<
   Trendline['type'],
   (
     trendline: Trendline,
-    rawDataset: DatasetOption[],
+    rawDataset: DatasetOptionsWithTicks,
     columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>
   ) => TrendlineDataset[]
 > = {
@@ -305,13 +303,73 @@ export const trendlineDatasetCreator: Record<
     // ];
   },
 
-  linear_regression: (trendline, datasets, columnLabelFormats) => {
+  linear_regression: (trendline, datasetsWithTicks, columnLabelFormats) => {
+    const datasets = datasetsWithTicks.datasets;
     const selectedDataset = datasets.find((dataset) => dataset.id === trendline.columnId);
 
     if (!selectedDataset?.data || selectedDataset.data.length === 0) return [];
 
     const validData = selectedDataset.data.filter((value) => value !== null && value !== undefined);
     if (validData.length === 0) return [];
+
+    const xAxisColumn = selectedDataset.dataKey;
+
+    const isXAxisNumeric = isNumericColumnType(
+      columnLabelFormats[xAxisColumn]?.columnType || DEFAULT_COLUMN_LABEL_FORMAT.columnType
+    );
+    const isXAxisDate = isDateColumnType(columnLabelFormats[xAxisColumn]?.columnType);
+
+    const { mappedData } = dataMapper(selectedDataset, columnLabelFormats);
+
+    if (isXAxisNumeric) {
+      const regressionResult = regression.linear(mappedData, { precision: 2 });
+
+      const data = mappedData.map((item) => {
+        const newItem = [...item];
+        newItem[1] = regressionResult.predict(item[0])[1];
+        return newItem[1];
+      });
+
+      return [
+        {
+          ...trendline,
+          id: DATASET_IDS.linearRegression(trendline.columnId),
+          data: data,
+          dataKey: trendline.columnId,
+          axisType: 'y',
+          tooltipData: [],
+          label: [[{ key: 'value', value: 'Linear Regression (Numeric)' }]]
+        }
+      ];
+    }
+
+    if (isXAxisDate) {
+      const firstTimestamp = mappedData[0][0];
+      const normalizedData: [number, number][] = mappedData.map(([timestamp, value]) => [
+        (timestamp - firstTimestamp) / (1000 * 60 * 60 * 24),
+        value
+      ]);
+
+      const regressionResult = regression.linear(normalizedData, { precision: 2 });
+
+      const data = mappedData.map((item) => {
+        const newItem = [...item];
+        newItem[1] = regressionResult.predict(item[0])[1];
+        return newItem[1];
+      });
+
+      return [
+        {
+          ...trendline,
+          id: DATASET_IDS.linearRegression(trendline.columnId),
+          data: data,
+          dataKey: trendline.columnId,
+          axisType: 'y',
+          tooltipData: [],
+          label: [[{ key: 'value', value: 'Linear Regression (Date)' }]]
+        }
+      ];
+    }
 
     return [];
     // const dimensions = selectedDataset.dimensions as string[];
@@ -398,7 +456,8 @@ export const trendlineDatasetCreator: Record<
     // ];
   },
 
-  average: (trendline, datasets) => {
+  average: (trendline, datasetsWithTicks) => {
+    const datasets = datasetsWithTicks.datasets;
     const selectedDataset = datasets.find((dataset) => dataset.id === trendline.columnId);
 
     if (!selectedDataset?.data || selectedDataset.data.length === 0) return [];
@@ -427,7 +486,8 @@ export const trendlineDatasetCreator: Record<
     ];
   },
 
-  min: (trendline, datasets) => {
+  min: (trendline, datasetsWithTicks) => {
+    const datasets = datasetsWithTicks.datasets;
     const selectedDataset = datasets.find((dataset) => dataset.id === trendline.columnId);
 
     if (!selectedDataset?.data || selectedDataset.data.length === 0) return [];
@@ -454,7 +514,8 @@ export const trendlineDatasetCreator: Record<
     ];
   },
 
-  max: (trendline, datasets) => {
+  max: (trendline, datasetsWithTicks) => {
+    const datasets = datasetsWithTicks.datasets;
     const selectedDataset = datasets.find((dataset) => dataset.id === trendline.columnId);
 
     if (!selectedDataset?.data || selectedDataset.data.length === 0) return [];
@@ -481,7 +542,8 @@ export const trendlineDatasetCreator: Record<
     ];
   },
 
-  median: (trendline, datasets) => {
+  median: (trendline, datasetsWithTicks) => {
+    const datasets = datasetsWithTicks.datasets;
     const selectedDataset = datasets.find((dataset) => dataset.id === trendline.columnId);
 
     if (!selectedDataset?.data || selectedDataset.data.length === 0) return [];

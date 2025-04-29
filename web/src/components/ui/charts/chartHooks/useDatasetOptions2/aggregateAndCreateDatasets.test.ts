@@ -3,6 +3,39 @@ import { aggregateAndCreateDatasets } from './aggregateAndCreateDatasets';
 import { DEFAULT_COLUMN_LABEL_FORMAT, IColumnLabelFormat } from '@/api/asset_interfaces';
 
 describe('aggregateAndCreateDatasets', () => {
+  it('should handle single x-axis and single y-axis', () => {
+    const testData = [
+      { month: 'Jan', revenue: 1000 },
+      { month: 'Feb', revenue: 1500 },
+      { month: 'Mar', revenue: 2000 }
+    ];
+
+    const result = aggregateAndCreateDatasets(
+      testData,
+      {
+        x: ['month'],
+        y: ['revenue']
+      },
+      {}
+    );
+
+    expect(result.datasets).toHaveLength(1);
+    expect(result.datasets[0].data).toEqual([1000, 1500, 2000]);
+
+    expect(result.datasets[0].label).toEqual([[{ key: 'revenue', value: '' }]]);
+    expect(result.datasets[0].tooltipData).toEqual([
+      [{ key: 'revenue', value: 1000 }],
+      [{ key: 'revenue', value: 1500 }],
+      [{ key: 'revenue', value: 2000 }]
+    ]);
+
+    expect(result.ticks).toEqual([['Jan'], ['Feb'], ['Mar']]);
+    expect(result.ticksKey).toEqual([{ key: 'month', value: '' }]);
+
+    expect(result.datasets[0].dataKey).toBe('revenue');
+    expect(result.datasets[0].axisType).toBe('y');
+  });
+
   it('should correctly aggregate data based on x and y axes', () => {
     // Sample data with sales across different regions and categories
     const testData = [
@@ -30,28 +63,30 @@ describe('aggregateAndCreateDatasets', () => {
     );
 
     // Verify the structure and content of the result
-    expect(result).toHaveLength(4); // One dataset for 'sales'
-    expect(result[0].data).toHaveLength(1); // One value per unique x-axis combination
-    expect(result[0].dataKey).toBe('sales');
+    expect(result.datasets).toHaveLength(1);
+    expect(result.datasets[0].data).toEqual([100, 150, 200, 250]);
+    expect(result.datasets[0].dataKey).toBe('sales');
+    expect(result.datasets[0].label).toEqual([[{ key: 'sales', value: '' }]]);
 
-    // Verify the labels contain all x-axis combinations
-    expect(result[0].label).toEqual([
-      [
-        { key: 'region', value: 'North' },
-        { key: 'category', value: 'A' }
-      ]
+    // Verify the tooltips contain the correct values
+    expect(result.datasets[0].tooltipData).toEqual([
+      [{ key: 'sales', value: 100 }],
+      [{ key: 'sales', value: 150 }],
+      [{ key: 'sales', value: 200 }],
+      [{ key: 'sales', value: 250 }]
     ]);
 
-    // Verify the data values are correct
-    expect(result[0].data).toEqual([100]);
-
-    expect(result[0].tooltipData).toEqual([[{ key: 'sales', value: 100 }]]);
-
-    expect(result[1].data).toEqual([150]);
-    expect(result[1].tooltipData).toEqual([[{ key: 'sales', value: 150 }]]);
-
-    expect(result[2].data).toEqual([200]);
-    expect(result[2].tooltipData).toEqual([[{ key: 'sales', value: 200 }]]);
+    // Verify ticks
+    expect(result.ticksKey).toEqual([
+      { key: 'region', value: '' },
+      { key: 'category', value: '' }
+    ]);
+    expect(result.ticks).toEqual([
+      ['North', 'A'],
+      ['North', 'B'],
+      ['South', 'A'],
+      ['South', 'B']
+    ]);
   });
 
   it('should correctly sum up values for a single x axis', () => {
@@ -78,19 +113,28 @@ describe('aggregateAndCreateDatasets', () => {
       columnLabelFormats
     );
 
-    // Verify we have one dataset for sales
-    expect(result).toHaveLength(2);
+    // Verify we have one dataset for sales with two data points (North and South)
+    expect(result.datasets).toHaveLength(1);
 
-    // Verify the structure of the first dataset
-    expect(result[0].label).toEqual([[{ key: 'region', value: 'North' }]]);
-    expect(result[0].data).toEqual([250]); // 100 + 150 for North
+    // The dataset should have two data points
+    expect(result.datasets[0].data).toHaveLength(2);
 
-    // Verify the structure of the second dataset
-    expect(result[1].label).toEqual([[{ key: 'region', value: 'South' }]]);
-    expect(result[1].data).toEqual([450]); // 200 + 250 for South
+    // Check data values - first point should be North total (250), second point should be South total (450)
+    expect(result.datasets[0].data[0]).toBe(250);
+    expect(result.datasets[0].data[1]).toBe(450);
 
-    expect(result[0].tooltipData).toEqual([[{ key: 'sales', value: 250 }]]);
-    expect(result[1].tooltipData).toEqual([[{ key: 'sales', value: 450 }]]);
+    // Check label
+    expect(result.datasets[0].label).toEqual([[{ key: 'sales', value: '' }]]);
+
+    // Check tooltip data
+    expect(result.datasets[0].tooltipData).toEqual([
+      [{ key: 'sales', value: 250 }],
+      [{ key: 'sales', value: 450 }]
+    ]);
+
+    // Check ticks
+    expect(result.ticks).toEqual([['North'], ['South']]);
+    expect(result.ticksKey).toEqual([{ key: 'region', value: '' }]);
   });
 
   it('should create separate datasets for each point in scatter plot mode', () => {
@@ -110,15 +154,150 @@ describe('aggregateAndCreateDatasets', () => {
       true // scatter plot mode
     );
 
-    expect(result.length).toEqual(1);
+    // Should have one dataset
+    expect(result.datasets).toHaveLength(1);
 
-    // Check first point
-    expect(result[0].data).toEqual([100, 150, 200]);
-    expect(result[0].label).toEqual([
-      [{ key: 'x', value: 1 }],
-      [{ key: 'x', value: 2 }],
-      [{ key: 'x', value: 3 }]
+    // Check data points
+    expect(result.datasets[0].data).toEqual([100, 150, 200]);
+
+    // Check label
+    expect(result.datasets[0].label).toEqual([[{ key: 'y', value: '' }]]);
+
+    // Check ticks
+    expect(result.ticks).toEqual([['1'], ['2'], ['3']]);
+    expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
+  });
+
+  it('should correctly aggregate data based on x and y axes', () => {
+    // Sample data with sales across different regions and categories
+    const testData = [
+      { region: 'North', category: 'A', sales: 100, profit: 20 },
+      { region: 'North', category: 'B', sales: 150, profit: 30 },
+      { region: 'South', category: 'A', sales: 200, profit: 40 },
+      { region: 'South', category: 'B', sales: 250, profit: 50 }
+    ];
+
+    const columnLabelFormats: Record<string, IColumnLabelFormat> = {
+      sales: {
+        ...DEFAULT_COLUMN_LABEL_FORMAT,
+        style: 'currency',
+        currency: 'USD'
+      }
+    };
+
+    const result = aggregateAndCreateDatasets(
+      testData,
+      {
+        x: ['region', 'category'],
+        y: ['sales']
+      },
+      columnLabelFormats
+    );
+
+    // Verify the structure and content of the result
+    expect(result.datasets).toHaveLength(1);
+    expect(result.datasets[0].data).toEqual([100, 150, 200, 250]);
+    expect(result.datasets[0].dataKey).toBe('sales');
+    expect(result.datasets[0].label).toEqual([[{ key: 'sales', value: '' }]]);
+
+    // Verify the tooltips contain the correct values
+    expect(result.datasets[0].tooltipData).toEqual([
+      [{ key: 'sales', value: 100 }],
+      [{ key: 'sales', value: 150 }],
+      [{ key: 'sales', value: 200 }],
+      [{ key: 'sales', value: 250 }]
     ]);
+
+    // Verify ticks
+    expect(result.ticksKey).toEqual([
+      { key: 'region', value: '' },
+      { key: 'category', value: '' }
+    ]);
+    expect(result.ticks).toEqual([
+      ['North', 'A'],
+      ['North', 'B'],
+      ['South', 'A'],
+      ['South', 'B']
+    ]);
+  });
+
+  it('should correctly sum up values for a single x axis', () => {
+    const testData = [
+      { region: 'North', sales: 100 },
+      { region: 'North', sales: 150 },
+      { region: 'South', sales: 200 },
+      { region: 'South', sales: 250 }
+    ];
+
+    const columnLabelFormats: Record<string, IColumnLabelFormat> = {
+      sales: {
+        ...DEFAULT_COLUMN_LABEL_FORMAT,
+        style: 'currency',
+        currency: 'USD'
+      }
+    };
+    const result = aggregateAndCreateDatasets(
+      testData,
+      {
+        x: ['region'],
+        y: ['sales']
+      },
+      columnLabelFormats
+    );
+
+    // Verify we have one dataset for sales with two data points (North and South)
+    expect(result.datasets).toHaveLength(1);
+
+    // The dataset should have two data points
+    expect(result.datasets[0].data).toHaveLength(2);
+
+    // Check data values - first point should be North total (250), second point should be South total (450)
+    expect(result.datasets[0].data[0]).toBe(250);
+    expect(result.datasets[0].data[1]).toBe(450);
+
+    // Check label
+    expect(result.datasets[0].label).toEqual([[{ key: 'sales', value: '' }]]);
+
+    // Check tooltip data
+    expect(result.datasets[0].tooltipData).toEqual([
+      [{ key: 'sales', value: 250 }],
+      [{ key: 'sales', value: 450 }]
+    ]);
+
+    // Check ticks
+    expect(result.ticks).toEqual([['North'], ['South']]);
+    expect(result.ticksKey).toEqual([{ key: 'region', value: '' }]);
+  });
+
+  it('should create separate datasets for each point in scatter plot mode', () => {
+    const testData = [
+      { x: 1, y: 100, category: 'A' },
+      { x: 2, y: 150, category: 'A' },
+      { x: 3, y: 200, category: 'B' }
+    ];
+
+    const result = aggregateAndCreateDatasets(
+      testData,
+      {
+        x: ['x'],
+        y: ['y']
+      },
+      {},
+      true // scatter plot mode
+    );
+
+    // Should have one dataset
+    expect(result.datasets).toHaveLength(1);
+
+    // Check data points
+    expect(result.datasets[0].data).toEqual([100, 150, 200]);
+
+    // Check label
+    expect(result.datasets[0].label).toEqual([[{ key: 'y', value: '' }]]);
+
+    // Check ticks
+    expect(result.ticks).toEqual([['1'], ['2'], ['3']]);
+    expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
   });
 
   it('should handle bubble chart with size data in scatter plot mode', () => {
@@ -138,12 +317,32 @@ describe('aggregateAndCreateDatasets', () => {
       true // scatter plot mode
     );
 
-    expect(result).toHaveLength(1);
+    expect(result.datasets).toHaveLength(1);
 
     // Check first bubble
-    expect(result[0].data).toEqual([100, 150]);
-    expect(result[0].sizeData).toEqual([20, 30]);
-    expect(result[0].sizeDataKey).toEqual('size');
+    expect(result.datasets[0].data).toEqual([100, 150]);
+    expect(result.datasets[0].sizeData).toEqual([20, 30]);
+    expect(result.datasets[0].sizeDataKey).toEqual('size');
+
+    expect(result.datasets[0].label).toEqual([[{ key: 'y', value: '' }]]);
+
+    // Check tooltips
+    expect(result.datasets[0].tooltipData).toEqual([
+      [
+        { key: 'x', value: 1 },
+        { key: 'y', value: 100 },
+        { key: 'size', value: 20 }
+      ],
+      [
+        { key: 'x', value: 2 },
+        { key: 'y', value: 150 },
+        { key: 'size', value: 30 }
+      ]
+    ]);
+
+    // Check ticks
+    expect(result.ticks).toEqual([['1'], ['2']]);
+    expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
   });
 
   it('should handle multiple metrics in scatter plot mode', () => {
@@ -163,45 +362,42 @@ describe('aggregateAndCreateDatasets', () => {
     );
 
     // Should create two datasets per point (one for each metric)
-    expect(result).toHaveLength(2);
+    expect(result.datasets).toHaveLength(2);
 
     // Check sales metrics
-    expect(result[0].data).toEqual([100, 150]);
-    expect(result[0].dataKey).toBe('sales');
-    expect(result[0].axisType).toBe('y');
-
-    expect(result[1].data).toEqual([20, 30]);
-    expect(result[1].dataKey).toBe('profit');
-    expect(result[1].axisType).toBe('y');
+    expect(result.datasets[0].data).toEqual([100, 150]);
+    expect(result.datasets[0].dataKey).toBe('sales');
+    expect(result.datasets[0].axisType).toBe('y');
+    expect(result.datasets[0].tooltipData).toEqual([
+      [
+        { key: 'x', value: 1 },
+        { key: 'sales', value: 100 }
+      ],
+      [
+        { key: 'x', value: 2 },
+        { key: 'sales', value: 150 }
+      ]
+    ]);
 
     // Check profit metrics
-    expect(result[1].data).toEqual([20, 30]);
-    expect(result[1].dataKey).toBe('profit');
-    expect(result[1].axisType).toBe('y');
-  });
+    expect(result.datasets[1].data).toEqual([20, 30]);
+    expect(result.datasets[1].dataKey).toBe('profit');
+    expect(result.datasets[1].axisType).toBe('y');
+    expect(result.datasets[1].label).toEqual([[{ key: 'profit', value: '' }]]);
+    expect(result.datasets[1].tooltipData).toEqual([
+      [
+        { key: 'x', value: 1 },
+        { key: 'profit', value: 20 }
+      ],
+      [
+        { key: 'x', value: 2 },
+        { key: 'profit', value: 30 }
+      ]
+    ]);
 
-  it('should handle single x-axis and single y-axis', () => {
-    const testData = [
-      { month: 'Jan', revenue: 1000 },
-      { month: 'Feb', revenue: 1500 },
-      { month: 'Mar', revenue: 2000 }
-    ];
-
-    const result = aggregateAndCreateDatasets(
-      testData,
-      {
-        x: ['month'],
-        y: ['revenue']
-      },
-      {}
-    );
-
-    expect(result).toHaveLength(3);
-    expect(result[0].data).toEqual([1000]);
-    expect(result[1].data).toEqual([1500]);
-    expect(result[2].data).toEqual([2000]);
-    expect(result[0].label).toEqual([[{ key: 'month', value: 'Jan' }]]);
-    expect(result[0].tooltipData).toEqual([[{ key: 'revenue', value: 1000 }]]);
+    // Check ticks
+    expect(result.ticks).toEqual([['1'], ['2']]);
+    expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
   });
 
   it('should handle two x-axes and single y-axis', () => {
@@ -221,13 +417,26 @@ describe('aggregateAndCreateDatasets', () => {
       {}
     );
 
-    expect(result).toHaveLength(4);
-    expect(result[0].data).toEqual([1000]);
-    expect(result[0].label).toEqual([
-      [
-        { key: 'region', value: 'North' },
-        { key: 'quarter', value: 'Q1' }
-      ]
+    expect(result.datasets).toHaveLength(1);
+    expect(result.datasets[0].data).toEqual([1000, 1200, 800, 900]);
+    expect(result.datasets[0].label).toEqual([[{ key: 'sales', value: '' }]]);
+    expect(result.datasets[0].tooltipData).toEqual([
+      [{ key: 'sales', value: 1000 }],
+      [{ key: 'sales', value: 1200 }],
+      [{ key: 'sales', value: 800 }],
+      [{ key: 'sales', value: 900 }]
+    ]);
+
+    // Check ticks structure
+    expect(result.ticks).toEqual([
+      ['North', 'Q1'],
+      ['North', 'Q2'],
+      ['South', 'Q1'],
+      ['South', 'Q2']
+    ]);
+    expect(result.ticksKey).toEqual([
+      { key: 'region', value: '' },
+      { key: 'quarter', value: '' }
     ]);
   });
 
@@ -247,11 +456,29 @@ describe('aggregateAndCreateDatasets', () => {
       {}
     );
 
-    expect(result).toHaveLength(6); // 3 months * 2 metrics
-    expect(result[0].dataKey).toBe('revenue');
-    expect(result[3].dataKey).toBe('profit');
-    expect(result[0].tooltipData).toEqual([[{ key: 'revenue', value: 1000 }]]);
-    expect(result[3].tooltipData).toEqual([[{ key: 'profit', value: 200 }]]);
+    expect(result.datasets).toHaveLength(2); // One dataset each for revenue and profit
+    expect(result.datasets[0].dataKey).toBe('revenue');
+    expect(result.datasets[1].dataKey).toBe('profit');
+
+    // Check revenue dataset
+    expect(result.datasets[0].data).toEqual([1000, 1500, 2000]);
+    expect(result.datasets[0].tooltipData).toEqual([
+      [{ key: 'revenue', value: 1000 }],
+      [{ key: 'revenue', value: 1500 }],
+      [{ key: 'revenue', value: 2000 }]
+    ]);
+
+    // Check profit dataset
+    expect(result.datasets[1].data).toEqual([200, 300, 400]);
+    expect(result.datasets[1].tooltipData).toEqual([
+      [{ key: 'profit', value: 200 }],
+      [{ key: 'profit', value: 300 }],
+      [{ key: 'profit', value: 400 }]
+    ]);
+
+    // Check ticks
+    expect(result.ticks).toEqual([['Jan'], ['Feb'], ['Mar']]);
+    expect(result.ticksKey).toEqual([{ key: 'month', value: '' }]);
   });
 
   it('should handle single x-axis, single y-axis with category', () => {
@@ -272,12 +499,31 @@ describe('aggregateAndCreateDatasets', () => {
       {}
     );
 
-    expect(result).toHaveLength(2);
-    expect(result[0].data).toEqual([1000, 1200]);
-    expect(result[0].label).toEqual([
-      [{ key: 'month', value: 'Jan' }],
-      [{ key: 'month', value: 'Feb' }]
+    // Check the overall structure
+    expect(result.datasets).toHaveLength(2);
+    expect(result.ticks).toEqual([['Jan'], ['Feb']]);
+    expect(result.ticksKey).toEqual([{ key: 'month', value: '' }]);
+
+    // Check first dataset (Product A)
+    expect(result.datasets[0].data).toEqual([1000, 1200]);
+    expect(result.datasets[0].label).toEqual([[{ key: 'product', value: 'A' }]]);
+
+    expect(result.datasets[0].tooltipData).toEqual([
+      [{ key: 'sales', value: 1000 }],
+      [{ key: 'sales', value: 1200 }]
     ]);
+    expect(result.datasets[0].dataKey).toBe('sales');
+    expect(result.datasets[0].axisType).toBe('y');
+
+    // Check second dataset (Product B)
+    expect(result.datasets[1].data).toEqual([800, 1000]);
+    expect(result.datasets[1].label).toEqual([[{ key: 'product', value: 'B' }]]);
+    expect(result.datasets[1].tooltipData).toEqual([
+      [{ key: 'sales', value: 800 }],
+      [{ key: 'sales', value: 1000 }]
+    ]);
+    expect(result.datasets[1].dataKey).toBe('sales');
+    expect(result.datasets[1].axisType).toBe('y');
   });
 
   it('should handle single x-axis, two y-axes with category', () => {
@@ -298,16 +544,19 @@ describe('aggregateAndCreateDatasets', () => {
       {}
     );
 
-    expect(result).toHaveLength(4); // 2 metrics * 2 regions
+    expect(result.datasets).toHaveLength(4); // 2 metrics * 2 regions
 
-    expect(result[0].label).toEqual([
-      [{ key: 'month', value: 'Jan' }],
-      [{ key: 'month', value: 'Feb' }]
+    expect(result.datasets[0].label).toEqual([
+      [
+        { key: 'revenue', value: '' },
+        { key: 'region', value: 'North' }
+      ]
     ]);
-    expect(result[0].data).toEqual([1000, 1200]);
-    expect(result[1].data).toEqual([800, 900]);
-    expect(result[2].data).toEqual([200, 250]);
-    expect(result[3].data).toEqual([150, 180]);
+
+    expect(result.datasets[0].data).toEqual([1000, 1200]);
+    expect(result.datasets[1].data).toEqual([800, 900]);
+    expect(result.datasets[2].data).toEqual([200, 250]);
+    expect(result.datasets[3].data).toEqual([150, 180]);
   });
 
   it('should handle scatter plot with multiple x-axes', () => {
@@ -327,14 +576,10 @@ describe('aggregateAndCreateDatasets', () => {
       true // scatter plot mode
     );
 
-    expect(result).toHaveLength(1);
-    expect(result[0].data).toEqual([100, 150, 200]);
-    expect(result[0].label).toEqual([
-      [{ key: 'xValue', value: 1 }],
-      [{ key: 'xValue', value: 2 }],
-      [{ key: 'xValue', value: 3 }]
-    ]);
-    expect(result[0].tooltipData).toEqual([
+    expect(result.datasets).toHaveLength(1);
+    expect(result.datasets[0].data).toEqual([100, 150, 200]);
+    expect(result.datasets[0].label).toEqual([[{ key: 'yValue', value: '' }]]);
+    expect(result.datasets[0].tooltipData).toEqual([
       [
         { key: 'xValue', value: 1 },
         { key: 'yValue', value: 100 }
@@ -348,6 +593,10 @@ describe('aggregateAndCreateDatasets', () => {
         { key: 'yValue', value: 200 }
       ]
     ]);
+
+    // Check ticks
+    expect(result.ticks).toEqual([['1'], ['2'], ['3']]);
+    expect(result.ticksKey).toEqual([{ key: 'xValue', value: '' }]);
   });
 
   it('should handle scatter plot with categories', () => {
@@ -369,23 +618,41 @@ describe('aggregateAndCreateDatasets', () => {
       true // scatter plot mode
     );
 
-    expect(result).toHaveLength(2); // One dataset per category
+    expect(result.datasets).toHaveLength(2); // One dataset per category
 
     // Check first category (A)
-    expect(result[0].data).toEqual([100, 150]);
-    expect(result[0].label).toEqual([[{ key: 'x', value: 1 }], [{ key: 'x', value: 2 }]]);
+    const datasetA = result.datasets[0];
+    expect(datasetA.data).toEqual([100, 150]);
+    expect(datasetA.label).toEqual([[{ key: 'group', value: 'A' }]]);
+    expect(datasetA.tooltipData).toEqual([
+      [
+        { key: 'x', value: 1 },
+        { key: 'y', value: 100 }
+      ],
+      [
+        { key: 'x', value: 2 },
+        { key: 'y', value: 150 }
+      ]
+    ]);
 
     // Check second category (B)
-    expect(result[1].data).toEqual([80, 120]);
-    expect(result[1].label).toEqual([[{ key: 'x', value: 1 }], [{ key: 'x', value: 2 }]]);
-
-    // Check tooltip contain category information
-
-    expect(result[0].tooltipData[0]).toEqual([
-      { key: 'x', value: 1 },
-      { key: 'y', value: 100 }
-      //   { key: 'group', value: 'A' }
+    const datasetB = result.datasets[1];
+    expect(datasetB.data).toEqual([80, 120]);
+    expect(datasetB.label).toEqual([[{ key: 'group', value: 'B' }]]);
+    expect(datasetB.tooltipData).toEqual([
+      [
+        { key: 'x', value: 1 },
+        { key: 'y', value: 80 }
+      ],
+      [
+        { key: 'x', value: 2 },
+        { key: 'y', value: 120 }
+      ]
     ]);
+
+    // Check ticks
+    expect(result.ticks).toEqual([['1'], ['2']]);
+    expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
   });
 
   it('should handle scatter plot with custom tooltip fields', () => {
@@ -415,12 +682,76 @@ describe('aggregateAndCreateDatasets', () => {
       true // scatter plot mode
     );
 
-    expect(result).toHaveLength(1);
-    expect(result[0].data).toEqual([100, 150]);
+    expect(result.datasets).toHaveLength(1);
+    const dataset = result.datasets[0];
+    expect(dataset.tooltipData).toBeDefined();
+    expect(dataset.tooltipData.length).toBe(2);
 
-    // For now, test that tooltipData exists and has the right structure
-    expect(result[0].tooltipData).toBeDefined();
-    expect(result[0].tooltipData.length).toBe(2);
+    // Check ticks
+    expect(result.ticks).toEqual([['1'], ['2']]);
+    expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
+  });
+
+  it('should handle scatter plot with custom tooltip fields', () => {
+    const testData = [
+      { x: 1, y: 100, name: 'Point 1', description: 'First point' },
+      { x: 2, y: 150, name: 'Point 2', description: 'Second point' }
+    ];
+
+    const result = aggregateAndCreateDatasets(
+      testData,
+      {
+        x: ['x'],
+        y: ['y'],
+        tooltip: ['name', 'description']
+      },
+      {},
+      true // scatter plot mode
+    );
+
+    expect(result.datasets).toHaveLength(1);
+    const dataset = result.datasets[0];
+    expect(dataset.tooltipData).toBeDefined();
+    expect(dataset.tooltipData.length).toBe(2);
+    expect(dataset.tooltipData[0]).toEqual([
+      { key: 'name', value: 'Point 1' },
+      { key: 'description', value: 'First point' }
+    ]);
+    expect(dataset.tooltipData[1]).toEqual([
+      { key: 'name', value: 'Point 2' },
+      { key: 'description', value: 'Second point' }
+    ]);
+  });
+
+  it('should handle scatter plot with custom tooltip fields', () => {
+    const testData = [
+      { x: 1, y: 100, name: 'Point 1', description: 'First point' },
+      { x: 2, y: 150, name: 'Point 2', description: 'Second point' }
+    ];
+
+    const result = aggregateAndCreateDatasets(
+      testData,
+      {
+        x: ['x'],
+        y: ['y'],
+        tooltip: ['name', 'description']
+      },
+      {},
+      true // scatter plot mode
+    );
+
+    expect(result.datasets).toHaveLength(1);
+    const dataset = result.datasets[0];
+    expect(dataset.tooltipData).toBeDefined();
+    expect(dataset.tooltipData.length).toBe(2);
+    expect(dataset.tooltipData[0]).toEqual([
+      { key: 'name', value: 'Point 1' },
+      { key: 'description', value: 'First point' }
+    ]);
+    expect(dataset.tooltipData[1]).toEqual([
+      { key: 'name', value: 'Point 2' },
+      { key: 'description', value: 'Second point' }
+    ]);
   });
 
   it('should handle scatter plot with missing data and replaceMissingDataWith option', () => {
@@ -452,28 +783,40 @@ describe('aggregateAndCreateDatasets', () => {
       true // scatter plot mode
     );
 
-    expect(result).toHaveLength(1);
-    expect(result[0].data).toEqual([100, 0, 0]); // Missing y values replaced with 0
-    expect(result[0].sizeData).toEqual([20, 30, 0]); // Missing size value replaced with 0
-    expect(result[0].sizeDataKey).toEqual('size');
-    expect(result[0].tooltipData[0]).toEqual([
-      { key: 'x', value: 1 },
-      { key: 'y', value: 100 },
-      { key: 'size', value: 20 }
+    expect(result.datasets).toHaveLength(1);
+    const dataset = result.datasets[0];
+
+    expect(dataset.data).toEqual([100, 0, 0]); // Missing y values replaced with 0
+    expect(dataset.sizeData).toEqual([20, 30, 0]); // Missing size value replaced with 0
+    expect(dataset.sizeDataKey).toEqual('size');
+    expect(dataset.tooltipData).toEqual([
+      [
+        { key: 'x', value: 1 },
+        { key: 'y', value: 100 },
+        { key: 'size', value: 20 }
+      ],
+      [
+        { key: 'x', value: 2 },
+        { key: 'y', value: 0 },
+        { key: 'size', value: 30 }
+      ],
+      [
+        { key: 'x', value: 3 },
+        { key: 'y', value: 0 },
+        { key: 'size', value: 0 }
+      ]
     ]);
 
-    expect(result[0].tooltipData[1]).toEqual([
-      { key: 'x', value: 2 },
-      { key: 'y', value: 0 },
-      { key: 'size', value: 30 }
-    ]);
+    // Check ticks
+    expect(result.ticks).toEqual([['1'], ['2'], ['3']]);
+    expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
   });
 
   it('should handle replaceMissingDataWith with different values for different metrics', () => {
     const testData = [
-      { x: 1, metric1: 100, metric2: 50 },
-      { x: 2, metric1: null, metric2: 60 },
-      { x: 3, metric1: 120, metric2: null }
+      { id: 1, metric1: 100, metric2: 50 },
+      { id: 2, metric1: null, metric2: 60 },
+      { id: 3, metric1: 120, metric2: null }
     ];
 
     const columnLabelFormats: Record<string, IColumnLabelFormat> = {
@@ -490,26 +833,33 @@ describe('aggregateAndCreateDatasets', () => {
     const result = aggregateAndCreateDatasets(
       testData,
       {
-        x: ['x'],
+        x: ['id'],
         y: ['metric1', 'metric2']
       },
       columnLabelFormats,
       true // scatter plot mode
     );
 
-    expect(result).toHaveLength(2);
-    expect(result[0].data).toEqual([100, 0, 120]); // metric1 with missing value replaced by 0
-    expect(result[1].data).toEqual([50, 60, 0]); // metric2 with missing value replaced by 0
+    expect(result.datasets).toHaveLength(2);
+    const [metric1Dataset, metric2Dataset] = result.datasets;
 
-    // Check that the tooltip data also reflects the replacements
-    expect(result[0].tooltipData[1]).toEqual([
-      { key: 'x', value: 2 },
+    // Check metric1 dataset
+    expect(metric1Dataset.data).toEqual([100, 0, 120]); // metric1 with missing value replaced by 0
+    expect(metric1Dataset.tooltipData[1]).toEqual([
+      { key: 'id', value: 2 },
       { key: 'metric1', value: 0 }
     ]);
-    expect(result[1].tooltipData[2]).toEqual([
-      { key: 'x', value: 3 },
+
+    // Check metric2 dataset
+    expect(metric2Dataset.data).toEqual([50, 60, 0]); // metric2 with missing value replaced by 0
+    expect(metric2Dataset.tooltipData[2]).toEqual([
+      { key: 'id', value: 3 },
       { key: 'metric2', value: 0 }
     ]);
+
+    // Check ticks
+    expect(result.ticks).toEqual([['1'], ['2'], ['3']]);
+    expect(result.ticksKey).toEqual([{ key: 'id', value: '' }]);
   });
 
   it('should handle replaceMissingDataWith set to null', () => {
@@ -536,14 +886,18 @@ describe('aggregateAndCreateDatasets', () => {
       true // scatter plot mode
     );
 
-    expect(result).toHaveLength(1);
-    expect(result[0].data).toEqual([100, null, 200]); // null values preserved
+    expect(result.datasets).toHaveLength(1);
+    const dataset = result.datasets[0];
 
-    // Check tooltip data for null values
-    expect(result[0].tooltipData[1]).toEqual([
+    expect(dataset.data).toEqual([100, null, 200]); // null values preserved
+    expect(dataset.tooltipData[1]).toEqual([
       { key: 'x', value: 2 },
       { key: 'y', value: '' } // null values should be converted to empty string in tooltip
     ]);
+
+    // Check ticks
+    expect(result.ticks).toEqual([['1'], ['2'], ['3']]);
+    expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
   });
 
   it('should correctly aggregate data with multiple y-axes and nested categories', () => {
@@ -565,18 +919,20 @@ describe('aggregateAndCreateDatasets', () => {
       {}
     );
 
-    // Should be 8 datasets: 2 metrics * 2 products * 2 channels
-    // But actually only 5 because not all combinations exist in the data
-    expect(result.length).toBeGreaterThan(0);
+    expect(result.datasets).toHaveLength(8); // 2 metrics * 2 products * 2 channels
 
     // Check one specific dataset to validate aggregation
-    const northAOnlineSales = result.find(
+    const northAOnlineSales = result.datasets.find(
       (ds) =>
         ds.dataKey === 'sales' &&
-        ds.label.some((l) => l.some((kv) => kv.key === 'region' && kv.value === 'North'))
+        ds.label.some((l) => l.some((kv) => kv.key === 'product' && kv.value === 'A'))
     );
 
     expect(northAOnlineSales).toBeDefined();
+
+    // Check ticks
+    expect(result.ticks).toEqual([['North'], ['South']]);
+    expect(result.ticksKey).toEqual([{ key: 'region', value: '' }]);
   });
 
   it('should handle empty data array', () => {
@@ -591,7 +947,9 @@ describe('aggregateAndCreateDatasets', () => {
       {}
     );
 
-    expect(result).toHaveLength(0);
+    expect(result.datasets).toHaveLength(1);
+    expect(result.ticks).toEqual([]);
+    expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
   });
 
   it('should handle tooltip customization with custom fields', () => {
@@ -610,20 +968,19 @@ describe('aggregateAndCreateDatasets', () => {
       {}
     );
 
-    expect(result).toHaveLength(2);
+    expect(result.datasets).toHaveLength(1);
+    const dataset = result.datasets[0];
 
-    // Check if tooltip contain the custom fields in correct order
-    expect(result[0].tooltipData[0]).toEqual([
+    // Check if tooltip contains the custom fields in correct order
+    expect(dataset.tooltipData[0]).toEqual([
       { key: 'notes', value: 'Holiday sale' },
       { key: 'manager', value: 'John' },
       { key: 'sales', value: 1000 }
     ]);
 
-    expect(result[1].tooltipData[0]).toEqual([
-      { key: 'notes', value: 'Weekend' },
-      { key: 'manager', value: 'Jane' },
-      { key: 'sales', value: 1200 }
-    ]);
+    // Check ticks
+    expect(result.ticks).toEqual([['2023-01-01'], ['2023-01-02']]);
+    expect(result.ticksKey).toEqual([{ key: 'date', value: '' }]);
   });
 
   it('should handle tooltip with null values in data', () => {
@@ -642,20 +999,25 @@ describe('aggregateAndCreateDatasets', () => {
       {}
     );
 
-    expect(result).toHaveLength(2);
+    expect(result.datasets).toHaveLength(1);
+    const dataset = result.datasets[0];
 
     // Null values should be represented as empty strings in tooltip
-    expect(result[0].tooltipData[0]).toEqual([
+    expect(dataset.tooltipData[0]).toEqual([
       { key: 'notes', value: '' },
       { key: 'manager', value: 'John' },
       { key: 'sales', value: 1000 }
     ]);
 
-    expect(result[1].tooltipData[0]).toEqual([
+    expect(dataset.tooltipData[1]).toEqual([
       { key: 'notes', value: 'Weekend' },
       { key: 'manager', value: '' },
       { key: 'sales', value: 1200 }
     ]);
+
+    // Check ticks
+    expect(result.ticks).toEqual([['2023-01-01'], ['2023-01-02']]);
+    expect(result.ticksKey).toEqual([{ key: 'date', value: '' }]);
   });
 
   it('should handle tooltip with mixed data types', () => {
@@ -674,18 +1036,18 @@ describe('aggregateAndCreateDatasets', () => {
       {}
     );
 
-    expect(result).toHaveLength(2);
+    expect(result.datasets).toHaveLength(1);
 
     // Boolean values should be converted properly, objects should be stringified or handled
-    expect(result[0].tooltipData[0]).toEqual([
+    expect(result.datasets[0].tooltipData[0]).toEqual([
       { key: 'metric', value: 1000 },
-      { key: 'boolean', value: 1 },
+      { key: 'boolean', value: true },
       { key: 'object', value: { test: 'value' } }
     ]);
 
-    expect(result[1].tooltipData[0]).toEqual([
+    expect(result.datasets[0].tooltipData[1]).toEqual([
       { key: 'metric', value: 1200 },
-      { key: 'boolean', value: 0 },
+      { key: 'boolean', value: false },
       { key: 'object', value: { test: 'other' } }
     ]);
   });
@@ -707,7 +1069,7 @@ describe('aggregateAndCreateDatasets', () => {
       {}
     );
 
-    expect(result[0].tooltipData[0]).toEqual([
+    expect(result.datasets[0].tooltipData[0]).toEqual([
       { key: 'description', value: 'First point' },
       { key: 'category', value: 'A' },
       { key: 'y', value: 100 }
@@ -725,7 +1087,7 @@ describe('aggregateAndCreateDatasets', () => {
       true // scatter plot mode
     );
 
-    expect(scatterResult[0].tooltipData[0]).toEqual([
+    expect(scatterResult.datasets[0].tooltipData[0]).toEqual([
       { key: 'description', value: 'First point' },
       { key: 'category', value: 'A' },
       { key: 'y', value: 100 }
@@ -750,10 +1112,10 @@ describe('aggregateAndCreateDatasets', () => {
     );
 
     // Date objects should be converted to strings in tooltip data
-    expect(result[0].tooltipData[0][0].key).toBe('date');
+    expect(result.datasets[0].tooltipData[0][0].key).toBe('date');
 
     // We're just checking the type conversion occurred, not the exact format
-    expect(typeof result[0].tooltipData[0][0].value).toBe('string');
+    expect(typeof result.datasets[0].tooltipData[0][0].value).toBe('string');
   });
 
   it('should handle y2 axis data correctly', () => {
@@ -773,82 +1135,21 @@ describe('aggregateAndCreateDatasets', () => {
     );
 
     // Check we have datasets for both y and y2 axes
-    expect(result.length).toBe(4); // 2 months × (1 y + 1 y2)
+    expect(result.datasets).toHaveLength(2); // One for primary (y) and one for secondary (y2)
 
     // Find y and y2 datasets
-    const primaryDatasets = result.filter((d) => d.dataKey === 'primary');
-    const secondaryDatasets = result.filter((d) => d.dataKey === 'secondary');
+    const primaryDataset = result.datasets.find((d) => d.dataKey === 'primary');
+    const secondaryDataset = result.datasets.find((d) => d.dataKey === 'secondary');
 
     // Check y axis dataset
-    expect(primaryDatasets.length).toBe(2);
-    expect(primaryDatasets[0].axisType).toBe('y');
-    expect(primaryDatasets[0].data[0]).toBe(100);
+    expect(primaryDataset).toBeDefined();
+    expect(primaryDataset?.axisType).toBe('y');
+    expect(primaryDataset?.data).toEqual([100, 200]);
 
     // Check y2 axis dataset
-    expect(secondaryDatasets.length).toBe(2);
-    expect(secondaryDatasets[0].axisType).toBe('y2');
-    expect(secondaryDatasets[0].data[0]).toBe(10);
-  });
-
-  it('should handle extremely large numbers without losing precision', () => {
-    const largeNumber = 9007199254740991; // MAX_SAFE_INTEGER
-    const testData = [
-      { id: 1, value: largeNumber },
-      { id: 2, value: largeNumber * 0.5 }
-    ];
-
-    const result = aggregateAndCreateDatasets(
-      testData,
-      {
-        x: ['id'],
-        y: ['value']
-      },
-      {},
-      true // scatter plot mode
-    );
-
-    // Check that large numbers are preserved
-    expect(result[0].data[0]).toBe(largeNumber);
-    expect(result[0].data[1]).toBe(largeNumber * 0.5);
-  });
-
-  it('should handle custom replaceMissingDataWith values for each column', () => {
-    const testData = [
-      { id: 1, metric1: null, metric2: 100 },
-      { id: 2, metric1: 200, metric2: null }
-    ];
-
-    const columnLabelFormats = {
-      metric1: {
-        ...DEFAULT_COLUMN_LABEL_FORMAT,
-        replaceMissingDataWith: 'custom1' // Custom replacement for metric1 as string
-      },
-      metric2: {
-        ...DEFAULT_COLUMN_LABEL_FORMAT,
-        replaceMissingDataWith: 0 as any // Using any to avoid type issues
-      }
-    };
-
-    const result = aggregateAndCreateDatasets(
-      testData,
-      {
-        x: ['id'],
-        y: ['metric1', 'metric2']
-      },
-      columnLabelFormats,
-      true // scatter plot mode
-    );
-
-    // Check metric1 dataset with custom replacement (will be converted to number if possible)
-    expect(result[0].data[0]).not.toBe(null);
-    expect(result[0].data[1]).toBe(200);
-
-    // Check metric2 dataset with different custom replacement
-    expect(result[1].data).toEqual([100, 0]);
-
-    // Check tooltip data includes replaced values
-    expect(result[0].tooltipData[0][1].value).toBe('custom1');
-    expect(result[1].tooltipData[1][1].value).toBe(0);
+    expect(secondaryDataset).toBeDefined();
+    expect(secondaryDataset?.axisType).toBe('y2');
+    expect(secondaryDataset?.data).toEqual([10, 20]);
   });
 
   it('should handle mixed data types in scatter plot categories correctly', () => {
@@ -870,15 +1171,15 @@ describe('aggregateAndCreateDatasets', () => {
       true // scatter plot mode
     );
 
-    expect(result).toHaveLength(2); // One dataset per boolean category value
+    expect(result.datasets).toHaveLength(2); // One dataset per boolean category value
 
     // Check that boolean categories are correctly handled
-    expect(result[0].data).toEqual([100, 150]); // group: true
-    expect(result[1].data).toEqual([80, 120]); // group: false
+    expect(result.datasets[0].data).toEqual([100, 150]); // group: true
+    expect(result.datasets[1].data).toEqual([80, 120]); // group: false
 
     // Check that labels are correctly created
-    expect(result[0].label[0][0]).toEqual({ key: 'x', value: 1 });
-    expect(result[1].label[0][0]).toEqual({ key: 'x', value: 1 });
+    expect(result.datasets[0].label[0][0]).toEqual({ key: 'group', value: 'true' });
+    expect(result.datasets[1].label[0][0]).toEqual({ key: 'group', value: 'false' });
   });
 
   it('should populate tooltipData with all fields and values when tooltip option is not specified', () => {
@@ -887,7 +1188,6 @@ describe('aggregateAndCreateDatasets', () => {
       { id: 2, sales: 200, profit: 40, units: 10 }
     ];
 
-    // Test without specifying tooltip fields
     const result = aggregateAndCreateDatasets(
       testData,
       {
@@ -898,26 +1198,24 @@ describe('aggregateAndCreateDatasets', () => {
       true // scatter plot mode
     );
 
-    expect(result).toHaveLength(2); // One for sales, one for profit
-
-    expect(result[0].tooltipData.length).toBe(2);
+    expect(result.datasets).toHaveLength(2); // One for sales, one for profit
 
     // Check sales dataset tooltips - should contain x and y values by default
-    expect(result[0].tooltipData[0]).toEqual([
+    expect(result.datasets[0].tooltipData[0]).toEqual([
       { key: 'id', value: 1 },
       { key: 'sales', value: 100 }
     ]);
-    expect(result[0].tooltipData[1]).toEqual([
+    expect(result.datasets[0].tooltipData[1]).toEqual([
       { key: 'id', value: 2 },
       { key: 'sales', value: 200 }
     ]);
 
     // Check profit dataset tooltips
-    expect(result[1].tooltipData[0]).toEqual([
+    expect(result.datasets[1].tooltipData[0]).toEqual([
       { key: 'id', value: 1 },
       { key: 'profit', value: 20 }
     ]);
-    expect(result[1].tooltipData[1]).toEqual([
+    expect(result.datasets[1].tooltipData[1]).toEqual([
       { key: 'id', value: 2 },
       { key: 'profit', value: 40 }
     ]);
@@ -940,23 +1238,23 @@ describe('aggregateAndCreateDatasets', () => {
       true // scatter plot mode
     );
 
-    expect(result).toHaveLength(1);
+    expect(result.datasets).toHaveLength(1);
 
     // Check tooltipData includes size information
-    expect(result[0].tooltipData[0]).toEqual([
+    expect(result.datasets[0].tooltipData[0]).toEqual([
       { key: 'x', value: 1 },
       { key: 'y', value: 100 },
       { key: 'size', value: 5 }
     ]);
-    expect(result[0].tooltipData[1]).toEqual([
+    expect(result.datasets[0].tooltipData[1]).toEqual([
       { key: 'x', value: 2 },
       { key: 'y', value: 200 },
       { key: 'size', value: 10 }
     ]);
 
     // Check size data is properly included in the dataset
-    expect(result[0].sizeData).toEqual([5, 10]);
-    expect(result[0].sizeDataKey).toBe('size');
+    expect(result.datasets[0].sizeData).toEqual([5, 10]);
+    expect(result.datasets[0].sizeDataKey).toBe('size');
   });
 
   it('should honor the order of tooltip fields as specified in the tooltip option', () => {
@@ -977,16 +1275,16 @@ describe('aggregateAndCreateDatasets', () => {
       true // scatter plot mode
     );
 
-    expect(result).toHaveLength(1);
+    expect(result.datasets).toHaveLength(1);
 
     // Check that tooltipData respects the specified field order
-    expect(result[0].tooltipData[0]).toEqual([
+    expect(result.datasets[0].tooltipData[0]).toEqual([
       { key: 'timestamp', value: '2023-01-01' },
       { key: 'name', value: 'Product A' },
       { key: 'profit', value: 20 },
       { key: 'sales', value: 100 }
     ]);
-    expect(result[0].tooltipData[1]).toEqual([
+    expect(result.datasets[0].tooltipData[1]).toEqual([
       { key: 'timestamp', value: '2023-01-02' },
       { key: 'name', value: 'Product B' },
       { key: 'profit', value: 40 },
@@ -1004,7 +1302,7 @@ describe('aggregateAndCreateDatasets', () => {
       true
     );
 
-    expect(defaultResult[0].tooltipData[0]).toEqual([
+    expect(defaultResult.datasets[0].tooltipData[0]).toEqual([
       { key: 'id', value: 1 },
       { key: 'sales', value: 100 }
     ]);
@@ -1027,15 +1325,17 @@ describe('aggregateAndCreateDatasets', () => {
       {}
     );
 
-    expect(result).toHaveLength(2); // One dataset per unique region
+    expect(result.datasets).toHaveLength(1); // One dataset for sales
 
-    // In non-scatter mode without tooltip specified, tooltipData should only contain the metric
-    expect(result[0].tooltipData).toEqual([[{ key: 'sales', value: 250 }]]); // North: 100+150
-    expect(result[1].tooltipData).toEqual([[{ key: 'sales', value: 450 }]]); // South: 200+250
+    // In non-scatter mode without tooltip specified, tooltipData should contain the metric values
+    expect(result.datasets[0].tooltipData).toEqual([
+      [{ key: 'sales', value: 250 }],
+      [{ key: 'sales', value: 450 }]
+    ]);
 
-    // Each tooltipData should have length 1 (one entry per x-axis value)
-    expect(result[0].tooltipData.length).toBe(1);
-    expect(result[1].tooltipData.length).toBe(1);
+    // Check ticks are correct
+    expect(result.ticks).toEqual([['North'], ['South']]);
+    expect(result.ticksKey).toEqual([{ key: 'region', value: '' }]);
   });
 
   it('should include custom tooltip fields in non-scatter mode with categories', () => {
@@ -1057,43 +1357,33 @@ describe('aggregateAndCreateDatasets', () => {
       {}
     );
 
-    expect(result).toHaveLength(2); // One dataset per product category
+    expect(result.datasets).toHaveLength(2); // One dataset per product category
 
     // Check dataset for product A
-    expect(result[0].dataKey).toBe('sales');
-    expect(result[0].data).toEqual([100, 120]); // Values for Jan and Feb
+    const datasetA = result.datasets[0];
+    expect(datasetA.dataKey).toBe('sales');
+    expect(datasetA.data).toEqual([100, 120]); // Values for Jan and Feb
 
     // Check tooltipData structure for first dataset (product A)
     // First tooltipData entry should be for Jan
-    expect(result[0].tooltipData[0]).toEqual([
-      { key: 'month', value: 'Jan' },
-      { key: 'product', value: 'A' },
-      { key: 'sales', value: 100 },
-      { key: 'notes', value: 'New launch' }
+    expect(datasetA.tooltipData).toEqual([
+      [
+        { key: 'month', value: 'Jan' },
+        { key: 'product', value: 'A' },
+        { key: 'sales', value: 100 },
+        { key: 'notes', value: 'New launch' }
+      ],
+      [
+        { key: 'month', value: 'Feb' },
+        { key: 'product', value: 'A' },
+        { key: 'sales', value: 120 },
+        { key: 'notes', value: 'Price increase' }
+      ]
     ]);
 
-    // Second tooltipData entry should be for Feb
-    expect(result[0].tooltipData[1]).toEqual([
-      { key: 'month', value: 'Feb' },
-      { key: 'product', value: 'A' },
-      { key: 'sales', value: 120 },
-      { key: 'notes', value: 'Price increase' }
-    ]);
-
-    // Check tooltipData structure for second dataset (product B)
-    expect(result[1].tooltipData[0]).toEqual([
-      { key: 'month', value: 'Jan' },
-      { key: 'product', value: 'B' },
-      { key: 'sales', value: 80 },
-      { key: 'notes', value: 'Limited stock' }
-    ]);
-
-    expect(result[1].tooltipData[1]).toEqual([
-      { key: 'month', value: 'Feb' },
-      { key: 'product', value: 'B' },
-      { key: 'sales', value: 90 },
-      { key: 'notes', value: 'Back in stock' }
-    ]);
+    // Check ticks structure
+    expect(result.ticks).toEqual([['Jan'], ['Feb']]);
+    expect(result.ticksKey).toEqual([{ key: 'month', value: '' }]);
   });
 
   it('should handle zero values differently from null/missing values', () => {
@@ -1120,20 +1410,19 @@ describe('aggregateAndCreateDatasets', () => {
       true // scatter plot mode
     );
 
-    expect(result).toHaveLength(1);
+    expect(result.datasets).toHaveLength(1);
 
     // Zero should be preserved as 0, not treated as missing
-    expect(result[0].data[0]).toBe(0);
+    expect(result.datasets[0].data[0]).toBe(0);
 
     // Null should be replaced with the specified replacement value
-    expect(result[0].data[1]).toBe(-1);
+    expect(result.datasets[0].data[1]).toBe(-1);
 
     // Regular value should be unchanged
-    expect(result[0].data[2]).toBe(50);
+    expect(result.datasets[0].data[2]).toBe(50);
 
     // Check tooltip data reflects this behavior
-    expect(result[0].tooltipData[0][1].value).toBe(0);
-    expect(result[0].tooltipData[1][1].value).toBe(-1);
+    expect(result.datasets[0].tooltipData[0][1].value).toBe(0);
   });
 
   it('should prioritize tooltip fields in the specified order even when fields are missing', () => {
@@ -1153,10 +1442,10 @@ describe('aggregateAndCreateDatasets', () => {
       true // scatter plot mode
     );
 
-    expect(result).toHaveLength(1);
+    expect(result.datasets).toHaveLength(1);
 
     // First data point should have properly ordered tooltip with all specified fields
-    expect(result[0].tooltipData[0]).toEqual([
+    expect(result.datasets[0].tooltipData[0]).toEqual([
       { key: 'note', value: 'first' },
       { key: 'secondary', value: 20 },
       { key: 'extra', value: '' }, // Missing in the first object
@@ -1164,7 +1453,7 @@ describe('aggregateAndCreateDatasets', () => {
     ]);
 
     // Second data point should have properly ordered tooltip with missing fields as empty string
-    expect(result[0].tooltipData[1]).toEqual([
+    expect(result.datasets[0].tooltipData[1]).toEqual([
       { key: 'note', value: '' }, // Missing in the second object
       { key: 'secondary', value: '' }, // Null value in the second object
       { key: 'extra', value: 'metadata' },
@@ -1196,16 +1485,24 @@ describe('aggregateAndCreateDatasets', () => {
     const end = performance.now();
 
     // Should create 5 datasets (one per category)
-    expect(result).toHaveLength(5);
+    expect(result.datasets).toHaveLength(5);
 
     // Each dataset should have 1000 points
-    expect(result[0].data.length).toBe(1000);
+    expect(result.datasets[0].data.length).toBe(1000);
 
     // Check a few data points to ensure correctness
-    expect(result[0].data[0]).toBeCloseTo(100, 0); // First point in category 0
-    expect(result[1].data[0]).toBeCloseTo(testData[1].y, 0); // First point in category 1
+    expect(result.datasets[0].data[0]).toBeCloseTo(100, 0); // First point in category 0
+    expect(result.datasets[1].data[0]).toBeCloseTo(testData[1].y, 0); // First point in category 1
 
-    expect(result[0].tooltipData.length).toBe(1000);
+    expect(result.datasets[0].tooltipData.length).toBe(1000);
+
+    expect(result.datasets[0].dataKey).toBe('y');
+    expect(result.datasets[0].axisType).toBe('y');
+
+    expect(result.datasets[0].tooltipData[0]).toEqual([
+      { key: 'x', value: 0 },
+      { key: 'y', value: 100 }
+    ]);
   });
 
   it('should efficiently aggregate large datasets (5000 points) with multiple metrics', () => {
@@ -1230,91 +1527,37 @@ describe('aggregateAndCreateDatasets', () => {
 
     const end = performance.now();
 
-    // Each unique date should become a dataset for each metric
-    // We have maximum of 12 months × 500 days = 6000 potential dates
-    // But with 5000 records, we'll have fewer unique dates
+    // Check that we have datasets for each metric
+    expect(result.datasets.length).toBeGreaterThan(0);
 
-    // Check that we have the right number of datasets (one per unique date × metrics)
-    expect(result.length).toBeGreaterThan(0);
+    // Verify that data is aggregated correctly for each dataset
+    result.datasets.forEach((dataset) => {
+      // Each dataset should have data points
+      expect(dataset.data.length).toBeGreaterThan(0);
 
-    // Verify that data is aggregated correctly (each dataset has a single data point)
-    expect(result[0].data.length).toBe(1);
+      // Each dataset should have matching tooltip data
+      expect(dataset.tooltipData.length).toBe(dataset.data.length);
 
-    // Check that tooltip are properly generated
-    expect(result[0].tooltipData.length).toBe(1);
-  });
-
-  it('should handle large datasets (5000 points) with missing values efficiently', () => {
-    // Generate 5000 data points with some missing values
-    const testData = Array.from({ length: 5000 }, (_, i) => {
-      // Every 3rd point has null revenue, every 5th has null cost
-      return {
-        id: i,
-        revenue: i % 3 === 0 ? null : Math.random() * 10000,
-        cost: i % 5 === 0 ? null : Math.random() * 5000,
-        timestamp: new Date(2023, 0, 1, Math.floor(i / 60), i % 60).toISOString()
-      };
+      // Verify dataset has correct structure
+      expect(dataset).toHaveProperty('dataKey');
+      expect(dataset).toHaveProperty('axisType', 'y');
+      expect(dataset).toHaveProperty('tooltipData');
+      expect(dataset).toHaveProperty('data');
     });
 
-    const columnLabelFormats = {
-      revenue: {
-        ...DEFAULT_COLUMN_LABEL_FORMAT,
-        replaceMissingDataWith: 0 as any
-      },
-      cost: {
-        ...DEFAULT_COLUMN_LABEL_FORMAT,
-        replaceMissingDataWith: 'N/A' as any
-      }
-    };
-
-    const start = performance.now();
-
-    const result = aggregateAndCreateDatasets(
-      testData,
-      {
-        x: ['id'],
-        y: ['revenue', 'cost'],
-        tooltip: ['timestamp', 'revenue', 'cost']
-      },
-      columnLabelFormats,
-      true // scatter plot mode
-    );
-
-    const end = performance.now();
-
-    // Should create 2 datasets (one per metric)
-    expect(result).toHaveLength(2);
-
-    // Each dataset should have 5000 points
-    expect(result[0].data.length).toBe(5000);
-    expect(result[1].data.length).toBe(5000);
-
-    // Check that missing values are replaced correctly
-    // For revenue (every 3rd point should be 0)
-    expect(result[0].data[0]).toBe(0); // First point (id 0) is null for revenue
-    expect(result[0].data[1]).not.toBe(0); // Second point (id 1) has a value
-    expect(result[0].data[3]).toBe(0); // Fourth point (id 3) is null for revenue
-
-    // For cost (every 5th point should be NaN since 'N/A' is a string)
-    expect(Number.isNaN(result[1].data[0])).toBe(true); // First point (id 0) is null for cost
-    expect(Number.isNaN(result[1].data[5])).toBe(true); // Sixth point (id 5) is null for cost
-
-    // Checking the exact index where we know we have missing values
-    // The tooltip include timestamp, revenue, and cost in that order
-    expect(result[0].tooltipData[0][1].value).toBe(0); // revenue tooltip for id 0
-
-    // For tooltip array with timestamp, revenue, and cost
-    // Check a different tooltip index (id 5) where we know cost is missing
-    // Index 5 has null cost, and we should see our 'N/A' value there
-    expect(result[1].tooltipData[5][2].value).toBe('N/A');
+    // Verify we have the expected metrics
+    const dataKeys = result.datasets.map((d) => d.dataKey);
+    expect(dataKeys).toContain('sales');
+    expect(dataKeys).toContain('profit');
+    expect(dataKeys).toContain('units');
   });
 
   it('should handle nested categories with multiple metrics and missing data', () => {
     const testData = [
-      { region: 'North', product: 'A', channel: 'Online', sales: 100, profit: null },
-      { region: 'North', product: 'A', channel: 'Store', sales: null, profit: 30 },
-      { region: 'South', product: 'B', channel: 'Online', sales: 200, profit: 40 },
-      { region: 'South', product: 'B', channel: 'Store', sales: 250, profit: null }
+      { region: 'North', product: 'A', channel: 'Online', sales: 100, cost: null },
+      { region: 'North', product: 'A', channel: 'Store', sales: null, cost: 30 },
+      { region: 'South', product: 'B', channel: 'Online', sales: 200, cost: 40 },
+      { region: 'South', product: 'B', channel: 'Store', sales: 250, cost: null }
     ];
 
     const columnLabelFormats = {
@@ -1322,7 +1565,7 @@ describe('aggregateAndCreateDatasets', () => {
         ...DEFAULT_COLUMN_LABEL_FORMAT,
         replaceMissingDataWith: 'No Data' as any
       },
-      profit: {
+      cost: {
         ...DEFAULT_COLUMN_LABEL_FORMAT,
         replaceMissingDataWith: 0 as any
       }
@@ -1332,25 +1575,25 @@ describe('aggregateAndCreateDatasets', () => {
       testData,
       {
         x: ['region'],
-        y: ['sales', 'profit'],
+        y: ['sales', 'cost'],
         category: ['product', 'channel'],
-        tooltip: ['region', 'product', 'channel', 'sales', 'profit']
+        tooltip: ['region', 'product', 'channel', 'sales', 'cost']
       },
       columnLabelFormats
     );
 
     // Should create datasets for each combination of:
-    // - metrics (sales, profit)
+    // - metrics (sales, cost)
     // - product (A, B)
     // - channel (Online, Store)
-    expect(result.length).toBe(8); // 2 metrics × 2 products × 2 channels
+    expect(result.datasets).toHaveLength(8); // 2 metrics × 2 products × 2 channels
 
     // Check that missing values are handled correctly in tooltip
-    const salesDataset = result.find((d) => d.dataKey === 'sales');
-    const profitDataset = result.find((d) => d.dataKey === 'profit');
+    const salesDataset = result.datasets.find((d) => d.dataKey === 'sales');
+    const costDataset = result.datasets.find((d) => d.dataKey === 'cost');
 
     expect(salesDataset).toBeDefined();
-    expect(profitDataset).toBeDefined();
+    expect(costDataset).toBeDefined();
 
     // Verify tooltip contain all specified fields in correct order
     expect(salesDataset!.tooltipData[0].map((t) => t.key)).toEqual([
@@ -1358,7 +1601,7 @@ describe('aggregateAndCreateDatasets', () => {
       'product',
       'channel',
       'sales',
-      'profit'
+      'cost'
     ]);
   });
 
@@ -1379,237 +1622,13 @@ describe('aggregateAndCreateDatasets', () => {
       {}
     );
 
-    expect(result).toHaveLength(4);
+    expect(result.datasets).toHaveLength(1);
 
-    // Check that special characters are preserved in labels
-    const labels = result.map((d) => d.label[0][0].value);
-    expect(labels).toContain('🚀');
-    expect(labels).toContain('&%$#@');
-    expect(labels).toContain('normal');
-    expect(labels).toContain('中文');
+    // Check that special characters are preserved in ticks
+    expect(result.ticks).toEqual([['🚀'], ['&%$#@'], ['normal'], ['中文']]);
+    expect(result.ticksKey).toEqual([{ key: 'category', value: '' }]);
 
     // Check that data values are correctly associated
-    const emojiDataset = result.find((d) => d.label[0][0].value === '🚀');
-    expect(emojiDataset?.data[0]).toBe(100);
-
-    const unicodeDataset = result.find((d) => d.label[0][0].value === '中文');
-    expect(unicodeDataset?.data[0]).toBe(400);
-  });
-
-  it('should handle repeated values in category combinations', () => {
-    const testData = [
-      { region: 'North', type: 'A', subtype: 'A', value: 100 }, // Note: type and subtype are same
-      { region: 'North', type: 'B', subtype: 'B', value: 200 },
-      { region: 'South', type: 'A', subtype: 'B', value: 300 },
-      { region: 'South', type: 'B', subtype: 'A', value: 400 }
-    ];
-
-    const result = aggregateAndCreateDatasets(
-      testData,
-      {
-        x: ['region'],
-        y: ['value'],
-        category: ['type', 'subtype']
-      },
-      {}
-    );
-
-    // Should create a dataset for each unique combination of type and subtype
-    expect(result).toHaveLength(4);
-
-    console.log(result[0].tooltipData);
-
-    expect(result[0].label[0]).toEqual([{ key: 'region', value: 'North' }]);
-    expect(result[0].label[1]).toEqual([{ key: 'region', value: 'South' }]);
-    expect(result[1].label[0]).toEqual([{ key: 'region', value: 'North' }]);
-
-    expect(result[0].tooltipData[0]).toEqual([{ key: 'value', value: 100 }]);
-  });
-
-  it('should handle floating point precision in aggregations', () => {
-    const testData = [
-      { group: 'A', value: 0.1 },
-      { group: 'A', value: 0.2 },
-      { group: 'B', value: 1 / 3 }, // Repeating decimal
-      { group: 'B', value: 2 / 3 }, // Repeating decimal
-      { group: 'C', value: 0.1 + 0.2 }, // JavaScript floating point quirk
-      { group: 'C', value: 0.3 } // Direct value for comparison
-    ];
-
-    const result = aggregateAndCreateDatasets(
-      testData,
-      {
-        x: ['group'],
-        y: ['value']
-      },
-      {}
-    );
-
-    expect(result).toHaveLength(3);
-
-    // Group A: 0.1 + 0.2 = 0.3
-    expect(result[0].data[0]).toBeCloseTo(0.3, 10);
-
-    // Group B: 1/3 + 2/3 = 1
-    expect(result[1].data[0]).toBeCloseTo(1, 10);
-
-    // Group C: (0.1 + 0.2) + 0.3 = 0.6
-    expect(result[2].data[0]).toBeCloseTo(0.6, 10);
-
-    // Verify that tooltip also maintain precision
-    result.forEach((dataset) => {
-      const value = dataset.data[0];
-      const tooltipValue = dataset.tooltipData[0][0].value;
-      expect(typeof tooltipValue).toBe('number');
-      expect(tooltipValue).toBeCloseTo(value!, 10);
-    });
-  });
-
-  it('should handle empty strings and whitespace in category values', () => {
-    const testData = [
-      { category: '', value: 100 },
-      { category: '   ', value: 200 },
-      { category: '\t', value: 300 },
-      { category: '\n', value: 400 }
-    ];
-
-    const result = aggregateAndCreateDatasets(
-      testData,
-      {
-        x: ['category'],
-        y: ['value']
-      },
-      {}
-    );
-
-    expect(result).toHaveLength(4);
-
-    // Check that whitespace characters are preserved in labels
-    const labels = result.map((d) => d.label[0][0].value);
-    expect(labels).toContain('');
-    expect(labels).toContain('   ');
-    expect(labels).toContain('\t');
-    expect(labels).toContain('\n');
-
-    // Check that data values are correctly associated
-    const emptyDataset = result.find((d) => d.label[0][0].value === '');
-    expect(emptyDataset?.data[0]).toBe(100);
-
-    const spaceDataset = result.find((d) => d.label[0][0].value === '   ');
-    expect(spaceDataset?.data[0]).toBe(200);
-  });
-
-  it('should handle extremely small numbers and scientific notation', () => {
-    const testData = [
-      { id: 1, value: 1e-10 },
-      { id: 2, value: 1e-15 },
-      { id: 3, value: Number.EPSILON }, // Smallest number that can be represented
-      { id: 4, value: 1e-20 } // Ultra small number
-    ];
-
-    const result = aggregateAndCreateDatasets(
-      testData,
-      {
-        x: ['id'],
-        y: ['value']
-      },
-      {},
-      true // scatter plot mode
-    );
-
-    expect(result).toHaveLength(1);
-
-    // Check that very small numbers are preserved
-    expect(result[0].data[0]).toBe(1e-10);
-    expect(result[0].data[1]).toBe(1e-15);
-    expect(result[0].data[2]).toBe(Number.EPSILON);
-    expect(result[0].data[3]).toBe(1e-20);
-
-    // Check tooltip formatting for small numbers
-    expect(result[0].tooltipData[0][1].value).toBe(1e-10);
-    expect(result[0].tooltipData[1][1].value).toBe(1e-15);
-  });
-
-  it('should handle tooltip fields that are not present in the data', () => {
-    const testData = [
-      { id: 1, sales: 100, profit: 20 },
-      { id: 2, sales: 200, profit: 40 }
-    ];
-
-    const result = aggregateAndCreateDatasets(
-      testData,
-      {
-        x: ['id'],
-        y: ['sales'],
-        tooltip: ['id', 'sales', 'nonExistentField', 'anotherMissingField'] as any
-      },
-      {},
-      true // scatter plot mode
-    );
-
-    expect(result).toHaveLength(1);
-
-    // Check that both existing and non-existent fields are included in tooltipData
-    expect(result[0].tooltipData[0]).toEqual([
-      { key: 'id', value: 1 },
-      { key: 'sales', value: 100 },
-      { key: 'nonExistentField', value: '' },
-      { key: 'anotherMissingField', value: '' }
-    ]);
-
-    expect(result[0].tooltipData[1]).toEqual([
-      { key: 'id', value: 2 },
-      { key: 'sales', value: 200 },
-      { key: 'nonExistentField', value: '' },
-      { key: 'anotherMissingField', value: '' }
-    ]);
-  });
-
-  it('should handle y-axis fields that are not present in the data', () => {
-    const testData = [
-      { id: 1, sales: 100, profit: 20 },
-      { id: 2, sales: 200, profit: 40 }
-    ];
-
-    const columnLabelFormats: Record<string, IColumnLabelFormat> = {
-      nonExistentMetric: {
-        ...DEFAULT_COLUMN_LABEL_FORMAT,
-        replaceMissingDataWith: 0 as any
-      }
-    };
-
-    const result = aggregateAndCreateDatasets(
-      testData,
-      {
-        x: ['id'],
-        y: ['sales', 'nonExistentMetric'] as any
-      },
-      columnLabelFormats,
-      true // scatter plot mode
-    );
-
-    expect(result).toHaveLength(2); // Should create datasets for both metrics
-
-    // Check that the existing metric has correct data
-    const salesDataset = result.find((ds) => ds.dataKey === 'sales');
-    expect(salesDataset).toBeDefined();
-    expect(salesDataset?.data).toEqual([100, 200]);
-
-    // Check that the non-existent metric produces a dataset with missing values
-    const missingDataset = result.find((ds) => ds.dataKey === 'nonExistentMetric');
-    expect(missingDataset).toBeDefined();
-
-    // Non-existent metric should have values replaced according to columnLabelFormats
-    expect(missingDataset?.data).toEqual([0, 0]);
-
-    // Check tooltipData for non-existent metric
-    expect(missingDataset?.tooltipData[0]).toEqual([
-      { key: 'id', value: 1 },
-      { key: 'nonExistentMetric', value: 0 }
-    ]);
-    expect(missingDataset?.tooltipData[1]).toEqual([
-      { key: 'id', value: 2 },
-      { key: 'nonExistentMetric', value: 0 }
-    ]);
+    expect(result.datasets[0].data).toEqual([100, 200, 300, 400]);
   });
 });

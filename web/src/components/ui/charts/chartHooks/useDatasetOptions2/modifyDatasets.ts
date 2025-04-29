@@ -49,7 +49,9 @@ function handlePieThreshold(datasets: DatasetOption[], minPercent: number): Data
         }
       } else {
         // Set the initial value
-        tooltipMap.set(key, value);
+        if (typeof value === 'string' || typeof value === 'number' || value === null) {
+          tooltipMap.set(key, value);
+        }
       }
     });
   });
