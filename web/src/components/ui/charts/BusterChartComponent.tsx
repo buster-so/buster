@@ -84,5 +84,7 @@ export const BusterChartComponent: React.FC<BusterChartRenderComponentProps> = (
 
   console.log('chartProps', chartProps);
 
+  return <div>NOT IN CHARTJS</div>;
+
   return <BusterChartJS {...chartProps} />;
 };

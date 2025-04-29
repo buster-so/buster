@@ -1,59 +1,52 @@
-import type { BusterChartProps, Trendline } from '@/api/asset_interfaces/metric';
-import type { DatasetOption } from '../interfaces';
+import type { BusterChartProps } from '@/api/asset_interfaces/metric';
+import type { DatasetOption, DatasetOptionsWithTicks } from '../interfaces';
 import { isDateColumnType } from '@/lib/messages';
-import { extractFieldsFromChain } from '../groupingHelpers';
 import { createDayjsDate } from '@/lib/date';
 
+type MappedDataResult = [number, number][]; // [x, y] pairs for regression
+
+/**
+ * Maps raw dataset values into [x, y] pairs suitable for regression analysis
+ * Uses ticks for x-axis values and handles different data types appropriately
+ */
 export const dataMapper = (
-  trendline: Trendline,
-  rawDataset: DatasetOption,
-  columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>,
-  convertFrom: 'date' | 'number' | 'string' = 'number'
-): {
-  mappedData: [number, number][];
-  indexOfTrendlineColumn: number | undefined;
-} => {
-  const source = rawDataset.source as Array<[string | number, ...number[]]>;
-  const dimensions = rawDataset.dimensions as string[];
-  const xAxisColumn = dimensions[0];
-  const xAxisIsADate = isDateColumnType(columnLabelFormats[xAxisColumn]?.columnType);
-  const indexOfTrendlineColumn = rawDataset.dimensions?.findIndex((dimensionUnDeliminated) => {
-    const extracted = extractFieldsFromChain(dimensionUnDeliminated as string)[0];
-    const key = extracted?.key || dimensionUnDeliminated; //if there is not category, then we use the dimensionUnDeliminated
-    return key === trendline.columnId;
-  });
+  dataset: DatasetOption,
+  ticks: Pick<DatasetOptionsWithTicks, 'ticks' | 'ticksKey'>,
+  columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>
+): MappedDataResult => {
+  const xAxisColumn = dataset.dataKey;
+  const xAxisIsDate = isDateColumnType(columnLabelFormats[xAxisColumn]?.columnType);
 
-  const indexOfXAxisColumn = 0;
+  // Filter out null/undefined values
+  const validDataPoints = dataset.data
+    .map((value, index) => ({
+      value: Number(value || 0),
+      tick: ticks.ticks[index]?.[0] // Use first tick value as x-axis value
+    }))
+    .filter(
+      (point) => point.value !== null && point.value !== undefined && point.tick !== undefined
+    );
 
-  if (indexOfTrendlineColumn === undefined || indexOfTrendlineColumn === -1) {
-    return {
-      mappedData: [],
-      indexOfTrendlineColumn: undefined
-    };
+  if (validDataPoints.length === 0) {
+    return [];
   }
 
-  const xAxisTransformer = (x: string | number, index: number): number => {
-    if (typeof x === 'number') return x; //if there is no category this will be raw?
-    const { key, value } = extractFieldsFromChain(x)[0];
-    if (xAxisIsADate || convertFrom === 'date') {
-      return createDayjsDate(value || (x as string)).valueOf();
-    }
-    if (convertFrom === 'number') {
-      return parseFloat(value);
-    }
-    if (convertFrom === 'string') {
-      return index;
-    }
-    return parseInt(value);
-  };
+  const mappedData: [number, number][] = validDataPoints.map((point, index) => {
+    const xValue = point.tick;
 
-  return {
-    mappedData: source.map<[number, number]>((item, index) => {
-      return [
-        xAxisTransformer(item[indexOfXAxisColumn], index),
-        Number(item[indexOfTrendlineColumn])
-      ];
-    }),
-    indexOfTrendlineColumn
-  };
+    // Handle different x-axis types
+    let x: number;
+    if (typeof xValue === 'number') {
+      x = xValue;
+    } else if (xAxisIsDate && xValue) {
+      x = createDayjsDate(xValue).valueOf();
+    } else {
+      // For categorical data, use the index
+      x = index;
+    }
+
+    return [x, point.value];
+  });
+
+  return mappedData;
 };

@@ -1,465 +1,407 @@
 // Also consider modifying this package to make it work with chartjs 4 https://pomgui.github.io/chartjs-plugin-regression/demo/
 
 import type { BusterChartProps, Trendline } from '@/api/asset_interfaces/metric/charts';
-import type { DatasetOption } from '../interfaces';
+import type { DatasetOptionsWithTicks } from '../interfaces';
 import type { TrendlineDataset } from './trendlineDataset.types';
 import { DATASET_IDS } from '../config';
 import { isDateColumnType, isNumericColumnType } from '@/lib/messages';
-import { extractFieldsFromChain } from '../groupingHelpers';
-import { DataFrameOperations } from '@/lib/math';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
-import { dataMapper } from './dataMapper';
 import { regression } from '@/lib/regression/regression';
+import { dataMapper } from './dataMapper';
 
 export const trendlineDatasetCreator: Record<
   Trendline['type'],
   (
     trendline: Trendline,
-    rawDataset: DatasetOption,
+    rawDataset: DatasetOptionsWithTicks,
     columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>
   ) => TrendlineDataset[]
 > = {
-  polynomial_regression: (trendline, selectedDataset, columnLabelFormats) => {
-    const dimensions = selectedDataset.dimensions as string[];
-    const xAxisColumn = dimensions[0];
+  polynomial_regression: (trendline, datasetsWithTicks, columnLabelFormats) => {
+    const datasets = datasetsWithTicks.datasets;
+    const selectedDataset = datasets.find((dataset) => dataset.id === trendline.columnId);
+
+    if (!selectedDataset?.data || selectedDataset.data.length === 0) return [];
+
+    const xAxisColumn = selectedDataset.dataKey;
+
     const isXAxisNumeric = isNumericColumnType(
       columnLabelFormats[xAxisColumn]?.columnType || DEFAULT_COLUMN_LABEL_FORMAT.columnType
     );
     const isXAxisDate = isDateColumnType(columnLabelFormats[xAxisColumn]?.columnType);
-    const { mappedData, indexOfTrendlineColumn } = dataMapper(
-      trendline,
+
+    // Get mapped data points using the dataMapper
+    const mappedPoints = dataMapper(
       selectedDataset,
-      columnLabelFormats,
-      isXAxisNumeric ? 'number' : isXAxisDate ? 'date' : 'string'
+      {
+        ticks: datasetsWithTicks.ticks,
+        ticksKey: datasetsWithTicks.ticksKey
+      },
+      columnLabelFormats
     );
 
-    if (indexOfTrendlineColumn === undefined) return [];
+    if (mappedPoints.length === 0) return [];
 
-    if (isXAxisNumeric) {
-      const regressionResult = regression.polynomial(mappedData, { order: 2, precision: 2 });
-      const data = mappedData.map((item) => {
-        const newItem = [...item];
-        newItem[indexOfTrendlineColumn] = regressionResult.predict(item[0])[1];
-        return newItem;
-      });
+    // For date x-axis, normalize to days since first date
+    const points: [number, number][] = isXAxisDate
+      ? mappedPoints.map(([x, y]): [number, number] => {
+          const firstTimestamp = mappedPoints[0][0];
+          return [(x - firstTimestamp) / (1000 * 60 * 60 * 24), y];
+        })
+      : mappedPoints;
 
-      return [
-        {
-          ...trendline,
-          id: DATASET_IDS.polynomialRegression(trendline.columnId),
-          source: data,
-          dimensions: dimensions,
-          equation: regressionResult.string
-        }
-      ];
-    }
+    // Calculate polynomial regression with order 2 (quadratic)
+    const regressionResult = regression.polynomial(points, { order: 2, precision: 4 });
 
-    if (isXAxisDate) {
-      const firstTimestamp = mappedData[0][0];
-      // Convert timestamps to days since first timestamp for better numerical stability
-      const regressionResult = regression.polynomial(
-        mappedData.map(([timestamp, value]) => [
-          (timestamp - firstTimestamp) / (1000 * 60 * 60 * 24),
-          value
-        ]),
-        { order: 2, precision: 2 }
-      );
-
-      const data = mappedData.map((item) => {
-        const newItem = [...item];
-        const days = (item[0] - firstTimestamp) / (1000 * 60 * 60 * 24);
-        newItem[indexOfTrendlineColumn] = regressionResult.predict(days)[1];
-        return newItem;
-      });
-
-      return [
-        {
-          ...trendline,
-          id: DATASET_IDS.polynomialRegression(trendline.columnId),
-          source: data,
-          dimensions: dimensions,
-          equation: regressionResult.string
-        }
-      ];
-    }
-
-    // For non-numeric, non-date x-axis, use indices
-    const regressionResult = regression.polynomial(
-      mappedData.map((item, index) => [index, item[1]]),
-      { order: 2, precision: 2 }
-    );
-
-    const data = mappedData.map((item, index) => {
-      const newItem = [...item];
-      newItem[indexOfTrendlineColumn] = regressionResult.predict(index)[1];
-      return newItem;
+    // Map back to original x values but with predicted y values
+    const data = mappedPoints.map(([x]) => {
+      const predictedY = isXAxisDate
+        ? regressionResult.predict((x - mappedPoints[0][0]) / (1000 * 60 * 60 * 24))[1]
+        : regressionResult.predict(x)[1];
+      return predictedY;
     });
 
     return [
       {
         ...trendline,
         id: DATASET_IDS.polynomialRegression(trendline.columnId),
-        source: data,
-        dimensions: dimensions,
-        equation: regressionResult.string
+        data,
+        dataKey: trendline.columnId,
+        axisType: 'y' as const,
+        tooltipData: [],
+        label: [
+          [
+            {
+              key: 'value',
+              value: `Polynomial Regression (${isXAxisDate ? 'Date' : isXAxisNumeric ? 'Numeric' : 'Categorical'})`
+            }
+          ]
+        ]
       }
     ];
   },
 
-  logarithmic_regression: (trendline, selectedDataset, columnLabelFormats) => {
-    const dimensions = selectedDataset.dimensions as string[];
-    const xAxisColumn = dimensions[0];
+  logarithmic_regression: (trendline, datasetsWithTicks, columnLabelFormats) => {
+    const datasets = datasetsWithTicks.datasets;
+    const selectedDataset = datasets.find((dataset) => dataset.id === trendline.columnId);
+
+    if (!selectedDataset?.data || selectedDataset.data.length === 0) return [];
+
+    const xAxisColumn = selectedDataset.dataKey;
+
     const isXAxisNumeric = isNumericColumnType(
       columnLabelFormats[xAxisColumn]?.columnType || DEFAULT_COLUMN_LABEL_FORMAT.columnType
     );
     const isXAxisDate = isDateColumnType(columnLabelFormats[xAxisColumn]?.columnType);
-    const { mappedData, indexOfTrendlineColumn } = dataMapper(
-      trendline,
+
+    // Get mapped data points using the dataMapper
+    const mappedPoints = dataMapper(
       selectedDataset,
-      columnLabelFormats,
-      isXAxisNumeric ? 'number' : isXAxisDate ? 'date' : 'string'
-    );
-
-    if (indexOfTrendlineColumn === undefined) return [];
-
-    if (isXAxisNumeric) {
-      // For numeric x-axis, ensure all x values are positive
-      const minX = Math.min(...mappedData.map(([x]) => x));
-      if (minX <= 0) {
-        // Shift all x values to be positive
-        const shift = Math.abs(minX) + 1;
-        mappedData.forEach((item) => (item[0] += shift));
-      }
-
-      const regressionResult = regression.logarithmic(mappedData, { precision: 2 });
-      const data = mappedData.map((item) => {
-        const newItem = [...item];
-        newItem[indexOfTrendlineColumn] = regressionResult.predict(item[0])[1];
-        return newItem;
-      });
-
-      return [
-        {
-          ...trendline,
-          id: DATASET_IDS.logarithmicRegression(trendline.columnId),
-          source: data,
-          dimensions: dimensions,
-          equation: regressionResult.string
-        }
-      ];
-    }
-
-    if (isXAxisDate) {
-      const firstTimestamp = mappedData[0][0];
-      // Start from day 1 instead of day 0 to avoid log(0)
-      const regressionResult = regression.logarithmic(
-        mappedData.map(([timestamp, value]) => [
-          // Convert timestamp to days since first timestamp, starting from 1
-          (timestamp - firstTimestamp) / (1000 * 60 * 60 * 24) + 1,
-          value
-        ]),
-        { precision: 2 }
-      );
-
-      const data = mappedData.map((item) => {
-        const newItem = [...item];
-        const days = (item[0] - firstTimestamp) / (1000 * 60 * 60 * 24) + 1;
-        newItem[indexOfTrendlineColumn] = regressionResult.predict(days)[1];
-        return newItem;
-      });
-
-      return [
-        {
-          ...trendline,
-          id: DATASET_IDS.logarithmicRegression(trendline.columnId),
-          source: data,
-          dimensions: dimensions,
-          equation: regressionResult.string
-        }
-      ];
-    }
-
-    const regressionResult = regression.logarithmic(
-      mappedData.map(([x, y]) => [x + 1, y]),
       {
-        precision: 2
-      }
+        ticks: datasetsWithTicks.ticks,
+        ticksKey: datasetsWithTicks.ticksKey
+      },
+      columnLabelFormats
     );
-    const data = mappedData.map((item) => {
-      const newItem = [...item];
-      newItem[indexOfTrendlineColumn] = regressionResult.predict(item[0] + 1)[1];
-      return newItem;
+
+    if (mappedPoints.length === 0) return [];
+
+    // For date x-axis, normalize to days since first date and ensure all values are positive
+    const normalizedPoints: [number, number][] = isXAxisDate
+      ? mappedPoints.map(([x, y]): [number, number] => {
+          const firstTimestamp = mappedPoints[0][0];
+          // Add 1 to avoid log(0), convert to days
+          return [(x - firstTimestamp) / (1000 * 60 * 60 * 24) + 1, y];
+        })
+      : mappedPoints;
+
+    // Filter out points with non-positive x values since log(x) is only defined for x > 0
+    const validPoints = normalizedPoints.filter(([x]) => x > 0);
+    if (validPoints.length < 2) return []; // Need at least 2 points for regression
+
+    // Calculate logarithmic regression with higher precision
+    const regressionResult = regression.logarithmic(validPoints, { precision: 4 });
+
+    // Map back to original x values but with predicted y values
+    const data = normalizedPoints.map(([x]) => {
+      if (x === 0) return 0;
+      return regressionResult.predict(x)[1];
     });
 
     return [
       {
         ...trendline,
         id: DATASET_IDS.logarithmicRegression(trendline.columnId),
-        source: data,
-        dimensions: dimensions,
-        equation: regressionResult.string
+        data,
+        dataKey: trendline.columnId,
+        axisType: 'y' as const,
+        tooltipData: [],
+        label: [
+          [
+            {
+              key: 'value',
+              value: `Logarithmic Regression (${isXAxisDate ? 'Date' : isXAxisNumeric ? 'Numeric' : 'Categorical'})`
+            }
+          ]
+        ]
       }
     ];
   },
 
-  exponential_regression: (trendline, selectedDataset, columnLabelFormats) => {
-    const dimensions = selectedDataset.dimensions as string[];
-    const xAxisColumn = dimensions[0];
+  exponential_regression: (trendline, datasetsWithTicks, columnLabelFormats) => {
+    const datasets = datasetsWithTicks.datasets;
+    const selectedDataset = datasets.find((dataset) => dataset.id === trendline.columnId);
+
+    if (!selectedDataset?.data || selectedDataset.data.length === 0) return [];
+
+    const xAxisColumn = selectedDataset.dataKey;
+
     const isXAxisNumeric = isNumericColumnType(
       columnLabelFormats[xAxisColumn]?.columnType || DEFAULT_COLUMN_LABEL_FORMAT.columnType
     );
     const isXAxisDate = isDateColumnType(columnLabelFormats[xAxisColumn]?.columnType);
-    const { mappedData, indexOfTrendlineColumn } = dataMapper(
-      trendline,
+
+    // Get mapped data points using the dataMapper
+    const mappedPoints = dataMapper(
       selectedDataset,
-      columnLabelFormats,
-      isXAxisNumeric ? 'number' : isXAxisDate ? 'date' : 'string'
+      {
+        ticks: datasetsWithTicks.ticks,
+        ticksKey: datasetsWithTicks.ticksKey
+      },
+      columnLabelFormats
     );
 
-    if (indexOfTrendlineColumn === undefined) return [];
+    if (mappedPoints.length === 0) return [];
 
-    // Ensure all y values are positive for exponential regression
-    const minY = Math.min(...mappedData.map(([_, y]) => y));
-    if (minY <= 0) {
-      // If we have zero or negative values, shift all y values up by |minY| + 1
-      const shift = Math.abs(minY) + 1;
-      mappedData.forEach((item) => (item[1] += shift));
-    }
+    // Filter out points with non-positive y values before regression
+    const validPoints = mappedPoints.filter(([_, y]) => y > 0);
+    if (validPoints.length < 2) return []; // Need at least 2 points for regression
 
-    if (isXAxisNumeric) {
-      // For numeric x-axis, normalize x values to start from 1 to enhance exponential fit
-      const minX = Math.min(...mappedData.map(([x]) => x));
-      const normalizedData: [number, number][] = mappedData.map(([x, y]) => [x - minX + 1, y]);
+    // For date x-axis, normalize to days since first date
+    const points: [number, number][] = isXAxisDate
+      ? validPoints.map(([x, y]): [number, number] => {
+          const firstTimestamp = mappedPoints[0][0];
+          return [(x - firstTimestamp) / (1000 * 60 * 60 * 24), y];
+        })
+      : validPoints;
 
-      const regressionResult = regression.exponential(normalizedData, { precision: 6 });
+    // Calculate exponential regression with higher precision for exponential values
+    const regressionResult = regression.exponential(points, { precision: 6 });
 
-      const data = mappedData.map((item, index) => {
-        const newItem = [...item];
-        newItem[indexOfTrendlineColumn] = regressionResult.predict(normalizedData[index][0])[1];
-        return newItem;
-      });
-
-      return [
-        {
-          ...trendline,
-          id: DATASET_IDS.exponentialRegression(trendline.columnId),
-          source: data,
-          dimensions: dimensions,
-          equation: regressionResult.string
-        }
-      ];
-    }
-
-    if (isXAxisDate) {
-      const firstTimestamp = mappedData[0][0];
-      // Convert to days and ensure we start from day 1 (not day 0)
-      const normalizedData: [number, number][] = mappedData.map(([timestamp, value]) => [
-        (timestamp - firstTimestamp) / (1000 * 60 * 60 * 24) + 1,
-        value
-      ]);
-
-      const regressionResult = regression.exponential(normalizedData, { precision: 6 });
-
-      const data = mappedData.map((item) => {
-        const newItem = [...item];
-        const days = (item[0] - firstTimestamp) / (1000 * 60 * 60 * 24) + 1;
-        newItem[indexOfTrendlineColumn] = regressionResult.predict(days)[1];
-        return newItem;
-      });
-
-      return [
-        {
-          ...trendline,
-          id: DATASET_IDS.exponentialRegression(trendline.columnId),
-          source: data,
-          dimensions: dimensions,
-          equation: regressionResult.string
-        }
-      ];
-    }
-
-    // For non-numeric, non-date x-axis, use indices starting from 1
-    const normalizedData: [number, number][] = mappedData.map((item, index) => [
-      index + 1,
-      item[1]
-    ]);
-    const regressionResult = regression.exponential(normalizedData, { precision: 6 });
-
-    const data = mappedData.map((item, index) => {
-      const newItem = [...item];
-      newItem[indexOfTrendlineColumn] = regressionResult.predict(index + 1)[1];
-      return newItem;
+    // Map back to original x values but with predicted y values
+    const data = mappedPoints.map(([x]) => {
+      const predictedY = isXAxisDate
+        ? regressionResult.predict((x - mappedPoints[0][0]) / (1000 * 60 * 60 * 24))[1]
+        : regressionResult.predict(x)[1];
+      return predictedY;
     });
 
     return [
       {
         ...trendline,
         id: DATASET_IDS.exponentialRegression(trendline.columnId),
-        source: data,
-        dimensions,
-        equation: regressionResult.string
+        data,
+        dataKey: trendline.columnId,
+        axisType: 'y' as const,
+        tooltipData: [],
+        label: [
+          [
+            {
+              key: 'value',
+              value: `Exponential Regression (${isXAxisDate ? 'Date' : isXAxisNumeric ? 'Numeric' : 'Categorical'})`
+            }
+          ]
+        ]
       }
     ];
   },
 
-  linear_regression: (trendline, selectedDataset, columnLabelFormats) => {
-    const dimensions = selectedDataset.dimensions as string[];
-    const xAxisColumn = dimensions[0];
+  linear_regression: (trendline, datasetsWithTicks, columnLabelFormats) => {
+    const datasets = datasetsWithTicks.datasets;
+    const selectedDataset = datasets.find((dataset) => dataset.id === trendline.columnId);
+
+    if (!selectedDataset?.data || selectedDataset.data.length === 0) return [];
+
+    const validData = selectedDataset.data.filter((value) => value !== null && value !== undefined);
+    if (validData.length === 0) return [];
+
+    const xAxisColumn = selectedDataset.dataKey;
+
     const isXAxisNumeric = isNumericColumnType(
       columnLabelFormats[xAxisColumn]?.columnType || DEFAULT_COLUMN_LABEL_FORMAT.columnType
     );
     const isXAxisDate = isDateColumnType(columnLabelFormats[xAxisColumn]?.columnType);
-    const { mappedData, indexOfTrendlineColumn } = dataMapper(
-      trendline,
+
+    // Get mapped data points using the updated dataMapper
+    const mappedPoints = dataMapper(
       selectedDataset,
-      columnLabelFormats,
-      isXAxisNumeric ? 'number' : isXAxisDate ? 'date' : 'string'
+      {
+        ticks: datasetsWithTicks.ticks,
+        ticksKey: datasetsWithTicks.ticksKey
+      },
+      columnLabelFormats
     );
 
-    if (indexOfTrendlineColumn === undefined) return [];
+    if (mappedPoints.length === 0) return [];
 
-    if (isXAxisNumeric) {
-      if (indexOfTrendlineColumn === undefined) return [];
+    // For date x-axis, normalize to days since first date
+    const points: [number, number][] = isXAxisDate
+      ? mappedPoints.map(([x, y]): [number, number] => {
+          const firstTimestamp = mappedPoints[0][0];
+          return [(x - firstTimestamp) / (1000 * 60 * 60 * 24), y];
+        })
+      : mappedPoints;
 
-      const regressionResult = regression.linear(mappedData, { precision: 2 });
+    // Calculate linear regression
+    const regressionResult = regression.linear(points, { precision: 2 });
 
-      const data = mappedData.map((item) => {
-        const newItem = [...item];
-        newItem[indexOfTrendlineColumn] = regressionResult.predict(item[0])[1];
-        return newItem;
-      });
-
-      return [
-        {
-          ...trendline,
-          id: DATASET_IDS.linearRegression(trendline.columnId),
-          source: data,
-          dimensions: dimensions,
-          equation: regressionResult.string
-        }
-      ];
-    }
-
-    if (isXAxisDate) {
-      const firstTimestamp = mappedData[0][0];
-      const regressionResult = regression.linear(
-        mappedData.map(([timestamp, value]) => [
-          // Convert timestamp to days since first timestamp
-          (timestamp - firstTimestamp) / (1000 * 60 * 60 * 24),
-          value
-        ]),
-        { precision: 2 }
-      );
-      const data = mappedData.map((item) => {
-        const newItem = [...item];
-        newItem[indexOfTrendlineColumn] = regressionResult.predict(
-          (item[0] - firstTimestamp) / (1000 * 60 * 60 * 24)
-        )[1];
-        return newItem;
-      });
-
-      return [
-        {
-          ...trendline,
-          id: DATASET_IDS.linearSlope(trendline.columnId),
-          source: data,
-          dimensions: dimensions,
-          equation: regressionResult.string
-        }
-      ];
-    }
-
-    const regressionResult = regression.linear(mappedData, { precision: 2 });
-    const data = mappedData.map((item) => {
-      const newItem = [...item];
-      newItem[indexOfTrendlineColumn] = regressionResult.predict(item[0])[1];
-      return newItem;
+    // Map back to original x values but with predicted y values
+    const data = mappedPoints.map(([x]) => {
+      const predictedY = isXAxisDate
+        ? regressionResult.predict((x - mappedPoints[0][0]) / (1000 * 60 * 60 * 24))[1]
+        : regressionResult.predict(x)[1];
+      return predictedY;
     });
 
     return [
       {
         ...trendline,
-        id: DATASET_IDS.linearSlope(trendline.columnId),
-        source: data,
-        dimensions,
-        equation: regressionResult.string
+        id: DATASET_IDS.linearRegression(trendline.columnId),
+        data,
+        dataKey: trendline.columnId,
+        axisType: 'y' as const,
+        tooltipData: [],
+        label: [
+          [
+            {
+              key: 'value',
+              value: `Linear Regression (${isXAxisDate ? 'Date' : isXAxisNumeric ? 'Numeric' : 'Categorical'})`
+            }
+          ]
+        ]
       }
     ];
   },
-  average: (trendline, selectedDataset) => {
-    const source = selectedDataset.source as Array<[string, ...number[]]>;
-    const indexOfTrendlineColumn = selectedDataset.dimensions!.findIndex(
-      (dimensionUnDeliminated) => {
-        const { key } = extractFieldsFromChain(dimensionUnDeliminated as string)[0];
-        return key === trendline.columnId;
-      }
-    );
-    const dataFrame = new DataFrameOperations(source, indexOfTrendlineColumn);
-    const average = dataFrame.average();
+
+  average: (trendline, datasetsWithTicks) => {
+    const datasets = datasetsWithTicks.datasets;
+    const selectedDataset = datasets.find((dataset) => dataset.id === trendline.columnId);
+
+    if (!selectedDataset?.data || selectedDataset.data.length === 0) return [];
+
+    // Filter out null/undefined values
+    const validData = selectedDataset.data.filter((value) => value !== null && value !== undefined);
+    if (validData.length === 0) return [];
+
+    // Sum all valid values and divide by the count
+    const sum = validData.reduce<number>((acc, datapoint) => {
+      return acc + (datapoint as number);
+    }, 0);
+
+    const average = sum / validData.length;
+
     return [
       {
         ...trendline,
         id: DATASET_IDS.average(trendline.columnId),
-        source: [[average]],
-        dimensions: []
+        label: [[{ key: 'value', value: average }]],
+        data: [average],
+        dataKey: trendline.columnId,
+        axisType: 'y',
+        tooltipData: [[{ key: 'value', value: average }]]
       }
     ];
   },
-  min: (trendline, selectedDataset) => {
-    const source = selectedDataset.source as Array<[string, ...number[]]>;
-    const indexOfTrendlineColumn = selectedDataset.dimensions!.findIndex(
-      (dimensionUnDeliminated) => {
-        const { key } = extractFieldsFromChain(dimensionUnDeliminated as string)[0];
-        return key === trendline.columnId;
-      }
-    );
-    const dataFrame = new DataFrameOperations(source, indexOfTrendlineColumn);
-    const min = dataFrame.min();
+
+  min: (trendline, datasetsWithTicks) => {
+    const datasets = datasetsWithTicks.datasets;
+    const selectedDataset = datasets.find((dataset) => dataset.id === trendline.columnId);
+
+    if (!selectedDataset?.data || selectedDataset.data.length === 0) return [];
+
+    // Filter out null/undefined values
+    const validData = selectedDataset.data.filter((value) => value !== null && value !== undefined);
+    if (validData.length === 0) return [];
+
+    // Use the first valid value as initial accumulator
+    const min = validData.reduce<number>((acc, datapoint) => {
+      return Math.min(acc, datapoint as number);
+    }, validData[0] as number);
 
     return [
       {
         ...trendline,
         id: DATASET_IDS.min(trendline.columnId),
-        source: [[min]],
-        dimensions: []
+        label: [[{ key: 'value', value: min }]],
+        data: [min],
+        dataKey: trendline.columnId,
+        axisType: 'y',
+        tooltipData: [[{ key: 'value', value: min }]]
       }
     ];
   },
-  max: (trendline, selectedDataset) => {
-    const source = selectedDataset.source as Array<[string, ...number[]]>;
-    const indexOfTrendlineColumn = selectedDataset.dimensions!.findIndex(
-      (dimensionUnDeliminated) => {
-        const { key } = extractFieldsFromChain(dimensionUnDeliminated as string)[0];
-        return key === trendline.columnId;
-      }
-    );
-    const dataFrame = new DataFrameOperations(source, indexOfTrendlineColumn);
-    const max = dataFrame.max();
+
+  max: (trendline, datasetsWithTicks) => {
+    const datasets = datasetsWithTicks.datasets;
+    const selectedDataset = datasets.find((dataset) => dataset.id === trendline.columnId);
+
+    if (!selectedDataset?.data || selectedDataset.data.length === 0) return [];
+
+    // Filter out null/undefined values
+    const validData = selectedDataset.data.filter((value) => value !== null && value !== undefined);
+    if (validData.length === 0) return [];
+
+    // Use the first valid value as initial accumulator
+    const max = validData.reduce<number>((acc, datapoint) => {
+      return Math.max(acc, datapoint as number);
+    }, validData[0] as number);
+
     return [
       {
         ...trendline,
         id: DATASET_IDS.max(trendline.columnId),
-        source: [[max]],
-        dimensions: []
+        label: [[{ key: 'value', value: max }]],
+        data: [max],
+        dataKey: trendline.columnId,
+        axisType: 'y',
+        tooltipData: [[{ key: 'value', value: max }]]
       }
     ];
   },
-  median: (trendline, selectedDataset) => {
-    const source = selectedDataset.source as Array<[string, ...number[]]>;
-    const indexOfTrendlineColumn = selectedDataset.dimensions!.findIndex(
-      (dimensionUnDeliminated) => {
-        const { key } = extractFieldsFromChain(dimensionUnDeliminated as string)[0];
-        return key === trendline.columnId;
-      }
-    );
-    const dataFrame = new DataFrameOperations(source, indexOfTrendlineColumn);
-    const median = dataFrame.median();
+
+  median: (trendline, datasetsWithTicks) => {
+    const datasets = datasetsWithTicks.datasets;
+    const selectedDataset = datasets.find((dataset) => dataset.id === trendline.columnId);
+
+    if (!selectedDataset?.data || selectedDataset.data.length === 0) return [];
+
+    // Sort the data and get the middle value
+    const sortedData = [...selectedDataset.data]
+      .filter((value) => value !== null && value !== undefined)
+      .sort((a, b) => (a as number) - (b as number));
+
+    let median: number;
+    const midIndex = Math.floor(sortedData.length / 2);
+
+    if (sortedData.length % 2 === 0) {
+      // Even number of elements - average the two middle values
+      median = ((sortedData[midIndex - 1] as number) + (sortedData[midIndex] as number)) / 2;
+    } else {
+      // Odd number of elements - take the middle value
+      median = sortedData[midIndex] as number;
+    }
+
+    if (median === undefined) return [];
+
     return [
       {
         ...trendline,
         id: DATASET_IDS.median(trendline.columnId),
-        source: [[median]],
-        dimensions: []
+        label: [[{ key: 'value', value: median }]],
+        data: [median],
+        dataKey: trendline.columnId,
+        axisType: 'y',
+        tooltipData: [[{ key: 'value', value: median }]]
       }
     ];
   }

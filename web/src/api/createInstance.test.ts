@@ -1,8 +1,6 @@
 import axios, { AxiosError, InternalAxiosRequestConfig, AxiosHeaders } from 'axios';
 import { createInstance, defaultRequestHandler } from './createInstance';
 import { rustErrorHandler } from './buster_rest/errors';
-import * as tanstackQuery from '@tanstack/react-query';
-import { getSupabaseTokenFromCookies } from './createServerInstance';
 
 // Mock dependencies
 jest.mock('axios');
