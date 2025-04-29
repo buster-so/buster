@@ -1,8 +1,9 @@
 import { trendlineDatasetCreator } from './trendlineDatasetCreator';
 import { DATASET_IDS } from '../config';
-import type { DatasetOption } from '../interfaces';
-import type { IColumnLabelFormat, Trendline } from '@/api/asset_interfaces/metric/charts';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
+import type { DatasetOption, DatasetOptionsWithTicks } from '../interfaces';
+import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import type { Trendline } from '@/api/asset_interfaces/metric/charts';
 
 describe('trendlineDatasetCreator', () => {
   describe('max operation', () => {
@@ -751,6 +752,221 @@ describe('trendlineDatasetCreator', () => {
       expect(data[data.length - 1] as number).toBeCloseTo(155, 0);
 
       expect(result[0].columnId).toEqual('test-column-id');
+    });
+  });
+
+  describe('exponential_regression', () => {
+    it('should correctly calculate exponential regression for perfect exponential data', () => {
+      // Arrange
+      const trendline: Trendline = {
+        type: 'exponential_regression',
+        columnId: 'test-column-id',
+        show: true,
+        showTrendlineLabel: true,
+        trendlineLabel: 'Exponential Regression'
+      };
+
+      const datasets: DatasetOption[] = [
+        {
+          id: 'test-column-id',
+          data: [2, 4, 8, 16, 32], // Perfect exponential data (y = 2^(x+1))
+          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          dataKey: 'x-axis',
+          axisType: 'y',
+          tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
+        }
+      ];
+
+      const datasetsWithTicks = {
+        datasets,
+        ticks: [['0'], ['1'], ['2'], ['3'], ['4']], // X-axis values as strings
+        ticksKey: [{ key: 'x-axis', value: '' }]
+      };
+
+      const columnLabelFormats: Record<string, IColumnLabelFormat> = {
+        'x-axis': {
+          ...DEFAULT_COLUMN_LABEL_FORMAT,
+          columnType: 'number'
+        }
+      };
+
+      // Act
+      const result = trendlineDatasetCreator.exponential_regression(
+        trendline,
+        datasetsWithTicks,
+        columnLabelFormats
+      );
+
+      // Assert
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        id: DATASET_IDS.exponentialRegression('test-column-id'),
+        dataKey: 'test-column-id',
+        axisType: 'y'
+      });
+
+      const data = result[0].data;
+      expect(data).toHaveLength(5);
+
+      // The regression should closely match our exponential data
+      data.forEach((value, index) => {
+        expect(value).toBeCloseTo(Math.pow(2, index + 1), 1);
+      });
+    });
+
+    it('should handle date-based x-axis values', () => {
+      // Arrange
+      const trendline: Trendline = {
+        type: 'exponential_regression',
+        columnId: 'test-column-id',
+        show: true,
+        showTrendlineLabel: true,
+        trendlineLabel: 'Exponential Regression'
+      };
+
+      const baseDate = new Date('2024-01-01').getTime();
+      const dayInMs = 24 * 60 * 60 * 1000;
+
+      const datasets: DatasetOption[] = [
+        {
+          id: 'test-column-id',
+          data: [2, 4, 8, 16, 32], // Exponential growth
+          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          dataKey: 'x-axis',
+          axisType: 'y',
+          tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
+        }
+      ];
+
+      const datasetsWithTicks = {
+        datasets,
+        ticks: [0, 1, 2, 3, 4].map((days) => [new Date(baseDate + days * dayInMs).toISOString()]),
+        ticksKey: [{ key: 'x-axis', value: '' }]
+      };
+
+      const columnLabelFormats: Record<string, IColumnLabelFormat> = {
+        'x-axis': {
+          ...DEFAULT_COLUMN_LABEL_FORMAT,
+          columnType: 'date'
+        }
+      };
+
+      // Act
+      const result = trendlineDatasetCreator.exponential_regression(
+        trendline,
+        datasetsWithTicks,
+        columnLabelFormats
+      );
+
+      // Assert
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        id: DATASET_IDS.exponentialRegression('test-column-id'),
+        dataKey: 'test-column-id',
+        axisType: 'y'
+      });
+
+      const data = result[0].data;
+      expect(data).toHaveLength(5);
+      expect(data.every((value) => typeof value === 'number' && !isNaN(value))).toBe(true);
+    });
+
+    it('should filter out non-positive values', () => {
+      // Arrange
+      const trendline: Trendline = {
+        type: 'exponential_regression',
+        columnId: 'test-column-id',
+        show: true,
+        showTrendlineLabel: true,
+        trendlineLabel: 'Exponential Regression'
+      };
+
+      const datasets: DatasetOption[] = [
+        {
+          id: 'test-column-id',
+          data: [1, 0.5, 4, 8, 16], // Mix of valid and invalid values
+          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          dataKey: 'x-axis',
+          axisType: 'y',
+          tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
+        }
+      ];
+
+      const datasetsWithTicks = {
+        datasets,
+        ticks: [['0'], ['1'], ['2'], ['3'], ['4']],
+        ticksKey: [{ key: 'x-axis', value: '' }]
+      };
+
+      const columnLabelFormats: Record<string, IColumnLabelFormat> = {
+        'x-axis': {
+          ...DEFAULT_COLUMN_LABEL_FORMAT,
+          columnType: 'number'
+        }
+      };
+
+      // Act
+      const result = trendlineDatasetCreator.exponential_regression(
+        trendline,
+        datasetsWithTicks,
+        columnLabelFormats
+      );
+
+      // Assert
+      expect(result).toHaveLength(1);
+      const data = result[0].data;
+      expect(data).toHaveLength(5);
+      // Verify the regression produces valid numeric output
+      expect(
+        data.every(
+          (value): value is number => typeof value === 'number' && !isNaN(value) && isFinite(value)
+        )
+      ).toBe(true);
+    });
+
+    it('should return empty array when no valid data points exist', () => {
+      // Arrange
+      const trendline: Trendline = {
+        type: 'exponential_regression',
+        columnId: 'test-column-id',
+        show: true,
+        showTrendlineLabel: true,
+        trendlineLabel: 'Exponential Regression'
+      };
+
+      const datasets: DatasetOption[] = [
+        {
+          id: 'test-column-id',
+          data: [-2, -1, 0, null, null] as (number | null)[], // Fixed typing for null values
+          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          dataKey: 'x-axis',
+          axisType: 'y',
+          tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
+        }
+      ];
+
+      const datasetsWithTicks = {
+        datasets,
+        ticks: [['0'], ['1'], ['2'], ['3'], ['4']],
+        ticksKey: [{ key: 'x-axis', value: '' }]
+      };
+
+      const columnLabelFormats: Record<string, IColumnLabelFormat> = {
+        'x-axis': {
+          ...DEFAULT_COLUMN_LABEL_FORMAT,
+          columnType: 'number'
+        }
+      };
+
+      // Act
+      const result = trendlineDatasetCreator.exponential_regression(
+        trendline,
+        datasetsWithTicks,
+        columnLabelFormats
+      );
+
+      // Assert
+      expect(result).toHaveLength(0);
     });
   });
 });
