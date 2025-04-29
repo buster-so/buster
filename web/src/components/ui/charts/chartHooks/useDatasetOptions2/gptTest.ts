@@ -33,7 +33,7 @@ export function createDatasetsFromAggregates<T extends Record<string, any>>(
   columnLabelFormats: Record<string, ColumnLabelFormatBase>,
   scatterPlot = false
 ): CreateDatasetsFromAggregatesReturn {
-  // KEY NORMALIZATION
+  // Normalize axis keys to strings
   const xKeys = axis.x.map(String);
   const yKeys = axis.y.map(String);
   const y2Keys = axis.y2?.map(String) ?? [];
@@ -41,18 +41,19 @@ export function createDatasetsFromAggregates<T extends Record<string, any>>(
   const tooltipKeys = axis.tooltips?.map(String) ?? [];
   const catKeys = axis.category?.map(String) ?? [];
 
-  // HELPERS
-  function buildCombos(keys: string[]) {
-    const map = new Map<string, Record<string, string>>();
-    data.forEach((row) => {
-      const rec: Record<string, string> = {};
-      keys.forEach((k) => (rec[k] = String(row[k])));
-      const id = keys.map((k) => rec[k]).join('|');
-      if (!map.has(id)) map.set(id, rec);
-    });
-    return Array.from(map.values());
-  }
+  // Prepare column formats with defaults
+  const allKeys = new Set<string>([
+    ...yKeys,
+    ...y2Keys,
+    ...(sizeKey ? [sizeKey] : []),
+    ...tooltipKeys
+  ]);
+  const colFormats: Record<string, ColumnLabelFormatBase> = {};
+  allKeys.forEach((k) => {
+    colFormats[k] = columnLabelFormats[k] || {};
+  });
 
+  // Parse numeric values with replaceMissingDataWith
   function parseNumeric(raw: any, fmt: ColumnLabelFormatBase): number | null {
     const rep = fmt.replaceMissingDataWith === null ? null : (fmt.replaceMissingDataWith ?? 0);
     const n = Number(raw);
@@ -64,9 +65,8 @@ export function createDatasetsFromAggregates<T extends Record<string, any>>(
     return n;
   }
 
-  function formatTooltip(raw: any, fmt: ColumnLabelFormatBase, fallback: any): string | number {
-    // Convert null/undefined/empty raw to tooltip values,
-    // treating replaceMissingDataWith === null as empty string
+  // Format tooltip values, treating missing as empty or replacement
+  function formatTooltip(raw: any, fmt: ColumnLabelFormatBase): string | number {
     if (raw == null || raw === '') {
       if (fmt.replaceMissingDataWith !== undefined) {
         const rep = fmt.replaceMissingDataWith;
@@ -78,9 +78,32 @@ export function createDatasetsFromAggregates<T extends Record<string, any>>(
     return Number.isNaN(num) ? raw : num;
   }
 
-  // SERIES META
-  type Meta = { key: string; axisType: 'y' | 'y2' };
-  const seriesMeta: Meta[] = [
+  // Utility to group rows by a set of keys
+  function groupRows(
+    keys: string[],
+    rows: T[]
+  ): Array<{ id: string; rec: Record<string, string>; rows: T[] }> {
+    const map = new Map<string, { rec: Record<string, string>; rows: T[] }>();
+    rows.forEach((row) => {
+      const rec: Record<string, string> = {};
+      keys.forEach((k) => {
+        rec[k] = String((row as any)[k]);
+      });
+      const id = keys.map((k) => rec[k]).join('|');
+      if (!map.has(id)) {
+        map.set(id, { rec, rows: [] });
+      }
+      map.get(id)!.rows.push(row);
+    });
+    return Array.from(map.entries()).map(([id, g]) => ({ id, rec: g.rec, rows: g.rows }));
+  }
+
+  // Precompute grouping by categories and by x-axis combos
+  const catGroups = catKeys.length ? groupRows(catKeys, data) : [{ id: '', rec: {}, rows: data }];
+  const xGroups = groupRows(xKeys, data);
+
+  // Series metadata for non-scatter
+  const seriesMeta = [
     ...yKeys.map((k) => ({ key: k, axisType: 'y' as const })),
     ...y2Keys.map((k) => ({ key: k, axisType: 'y2' as const }))
   ];
@@ -88,78 +111,66 @@ export function createDatasetsFromAggregates<T extends Record<string, any>>(
   const datasets: Dataset[] = [];
 
   if (scatterPlot) {
-    // SCATTER: Cartesian product of yKeys and category combos
-    const cats = catKeys.length ? buildCombos(catKeys) : [{} as Record<string, string>];
-    cats.forEach((catRec) => {
-      seriesMeta
-        .filter((m) => yKeys.includes(m.key))
-        .forEach(({ key: yKey, axisType }) => {
-          const rows = data.filter((r) => catKeys.every((k) => String(r[k]) === catRec[k]));
-          const fmtY = columnLabelFormats[yKey] || {};
-          const dataArr = rows.map((r) => parseNumeric(r[yKey], fmtY));
+    // SCATTER: for each category group and each yKey
+    catGroups.forEach(({ rows }) => {
+      yKeys.forEach((yKey) => {
+        const fmtY = colFormats[yKey];
+        const axisType = 'y';
 
-          // sizeData
-          let sizeArr: (number | null)[] | undefined;
-          let fmtSize: ColumnLabelFormatBase = {};
-          if (sizeKey) {
-            fmtSize = columnLabelFormats[sizeKey] || {};
-            sizeArr = rows.map((r) => parseNumeric(r[sizeKey], fmtSize));
-          }
+        const dataArr = rows.map((r) => parseNumeric(r[yKey], fmtY));
+        let sizeArr: (number | null)[] | undefined;
+        if (sizeKey) {
+          const fmtSize = colFormats[sizeKey];
+          sizeArr = rows.map((r) => parseNumeric(r[sizeKey], fmtSize));
+        }
 
-          // labels
-          const labelArr = rows.map((r) => xKeys.map((k) => ({ key: k, value: r[k] }) as KV));
-
-          // tooltips
-          const tooltipArr = rows.map((r, i) => {
-            const pts: KV[] = [];
-            if (tooltipKeys.length) {
-              tooltipKeys.forEach((k) =>
-                pts.push({
-                  key: k,
-                  value: formatTooltip(r[k], columnLabelFormats[k] || {}, dataArr[i])
-                })
-              );
-            } else {
-              // default for scatter: x, y, size – respecting replaceMissingDataWith
-              xKeys.forEach((k) =>
-                pts.push({ key: k, value: parseNumeric(r[k], columnLabelFormats[k] || {}) })
-              );
-              // y value
-              pts.push({ key: yKey, value: formatTooltip(r[yKey], fmtY, dataArr[i]) });
-              // size value
-              if (sizeArr) {
-                pts.push({ key: sizeKey!, value: formatTooltip(r[sizeKey!], fmtSize, sizeArr[i]) });
-              }
+        const labelArr = rows.map((r) => xKeys.map((k) => ({ key: k, value: r[k] }) as KV));
+        const tooltipArr = rows.map((r, i) => {
+          const pts: KV[] = [];
+          if (tooltipKeys.length) {
+            tooltipKeys.forEach((k) =>
+              pts.push({ key: k, value: formatTooltip(r[k], colFormats[k] || {}) })
+            );
+          } else {
+            xKeys.forEach((k) =>
+              pts.push({ key: k, value: formatTooltip(r[k], colFormats[k] || {}) })
+            );
+            pts.push({ key: yKey, value: formatTooltip(r[yKey], fmtY) });
+            if (sizeArr) {
+              pts.push({
+                key: sizeKey!,
+                value: formatTooltip(r[sizeKey!], colFormats[sizeKey!] || {})
+              });
             }
-            return pts;
-          });
-
-          datasets.push({
-            label: labelArr,
-            data: dataArr,
-            dataKey: yKey,
-            axisType,
-            tooltipData: tooltipArr,
-            ...(sizeArr && { sizeData: sizeArr as (number | null)[] })
-          });
+          }
+          return pts;
         });
+
+        datasets.push({
+          label: labelArr,
+          data: dataArr,
+          dataKey: yKey,
+          axisType,
+          tooltipData: tooltipArr,
+          ...(sizeArr && { sizeData: sizeArr })
+        });
+      });
     });
   } else {
     // NON-SCATTER
-    const xCombos = buildCombos(xKeys);
-
     if (catKeys.length) {
-      // with categories
-      const cats = buildCombos(catKeys);
+      // With categories
       seriesMeta.forEach(({ key: metric, axisType }) => {
-        const fmt = columnLabelFormats[metric] || {};
-        cats.forEach((catRec) => {
-          const rows = data.filter((r) => catKeys.every((k) => String(r[k]) === catRec[k]));
-          const dataArr = xCombos.map((xRec) => {
-            const sub = rows.filter((r) => xKeys.every((k) => String(r[k]) === xRec[k]));
+        const fmt = colFormats[metric];
+        catGroups.forEach(({ rows: catRows }) => {
+          const xSub = groupRows(xKeys, catRows);
+          const xMap = new Map(xSub.map((g) => [g.id, g.rows]));
+
+          const dataArr = xGroups.map((g) => {
+            const grp = xMap.get(g.id) || [];
             let sum = 0;
             let sawNull = false;
-            sub.forEach((r) => {
+            grp.forEach((r) => {
               const v = parseNumeric(r[metric], fmt);
               if (v === null) sawNull = true;
               else if (!Number.isNaN(v)) sum += v;
@@ -167,24 +178,21 @@ export function createDatasetsFromAggregates<T extends Record<string, any>>(
             return sawNull ? null : sum;
           });
 
-          const labelArr = xCombos.map((xRec) =>
-            xKeys.map((k) => ({ key: k, value: xRec[k] }) as KV)
+          const labelArr = xGroups.map((g) =>
+            xKeys.map((k) => ({ key: k, value: g.rec[k] }) as KV)
           );
-
-          const tooltipArr = dataArr.map((_, i) => {
+          const tooltipArr = dataArr.map((val, i) => {
             const pts: KV[] = [];
             if (tooltipKeys.length) {
-              const match =
-                rows.find((r) => xKeys.every((k) => String(r[k]) === xCombos[i][k])) ||
-                ({} as Record<string, any>);
+              const matchRow = (xMap.get(xGroups[i].id) || [])[0] || {};
               tooltipKeys.forEach((k) =>
                 pts.push({
                   key: k,
-                  value: formatTooltip(match[k], columnLabelFormats[k] || {}, null)
+                  value: formatTooltip((matchRow as any)[k], colFormats[k] || {})
                 })
               );
             } else {
-              pts.push({ key: metric, value: dataArr[i] === null ? '' : dataArr[i]! });
+              pts.push({ key: metric, value: val === null ? '' : val });
             }
             return pts;
           });
@@ -199,28 +207,26 @@ export function createDatasetsFromAggregates<T extends Record<string, any>>(
         });
       });
     } else {
-      // no categories
+      // Without categories
       seriesMeta.forEach(({ key: metric, axisType }) => {
-        const fmt = columnLabelFormats[metric] || {};
-        xCombos.forEach((xRec) => {
-          const rows = data.filter((r) => xKeys.every((k) => String(r[k]) === xRec[k]));
+        const fmt = colFormats[metric];
+        xGroups.forEach(({ rec, rows: grpRows }) => {
           let sum = 0;
           let sawNull = false;
-          rows.forEach((r) => {
+          grpRows.forEach((r) => {
             const v = parseNumeric(r[metric], fmt);
             if (v === null) sawNull = true;
             else if (!Number.isNaN(v)) sum += v;
           });
           const value = sawNull ? null : sum;
 
-          const labelArr = [xKeys.map((k) => ({ key: k, value: xRec[k] }) as KV)];
-
+          const labelArr = [xKeys.map((k) => ({ key: k, value: rec[k] }) as KV)];
           const tooltipArr = [
             [
               ...(tooltipKeys.length
                 ? tooltipKeys.map((k) => ({
                     key: k,
-                    value: formatTooltip(rows[0]?.[k], columnLabelFormats[k] || {}, null)
+                    value: formatTooltip((grpRows[0] || {})[k], colFormats[k] || {})
                   }))
                 : [{ key: metric, value: value === null ? '' : value }])
             ]
