@@ -504,7 +504,7 @@ describe('trendlineDatasetCreator', () => {
 
       const datasetsWithTicks = {
         datasets,
-        ticks: [['0'], ['1'], ['2'], ['3'], ['4']], // X-axis values as strings
+        ticks: [['1'], ['2'], ['3'], ['4'], ['5']], // Start from 1 to ensure positive x values
         ticksKey: [{ key: 'x-axis', value: '' }]
       };
 
@@ -568,7 +568,7 @@ describe('trendlineDatasetCreator', () => {
 
       const datasetsWithTicks = {
         datasets,
-        ticks: [['0'], ['1'], ['2'], ['3'], ['4']], // X-axis values as strings
+        ticks: [['1'], ['2'], ['3'], ['4'], ['5']], // Start from 1 to ensure positive x values
         ticksKey: [{ key: 'x-axis', value: '' }]
       };
 
@@ -629,7 +629,7 @@ describe('trendlineDatasetCreator', () => {
 
       const datasetsWithTicks = {
         datasets,
-        ticks: [['0'], ['1'], ['2'], ['3'], ['4'], ['5'], ['6']], // X-axis values as strings
+        ticks: [['1'], ['2'], ['3'], ['4'], ['5'], ['6'], ['7']], // Start from 1 to ensure positive x values
         ticksKey: [{ key: 'x-axis', value: '' }]
       };
 
@@ -779,7 +779,7 @@ describe('trendlineDatasetCreator', () => {
 
       const datasetsWithTicks = {
         datasets,
-        ticks: [['0'], ['1'], ['2'], ['3'], ['4']], // X-axis values as strings
+        ticks: [['1'], ['2'], ['3'], ['4'], ['5']], // Start from 1 to ensure positive x values
         ticksKey: [{ key: 'x-axis', value: '' }]
       };
 
@@ -840,7 +840,7 @@ describe('trendlineDatasetCreator', () => {
 
       const datasetsWithTicks = {
         datasets,
-        ticks: [0, 1, 2, 3, 4].map((days) => [new Date(baseDate + days * dayInMs).toISOString()]),
+        ticks: [1, 2, 3, 4, 5].map((days) => [new Date(baseDate + days * dayInMs).toISOString()]),
         ticksKey: [{ key: 'x-axis', value: '' }]
       };
 
@@ -894,7 +894,7 @@ describe('trendlineDatasetCreator', () => {
 
       const datasetsWithTicks = {
         datasets,
-        ticks: [['0'], ['1'], ['2'], ['3'], ['4']],
+        ticks: [['1'], ['2'], ['3'], ['4'], ['5']], // Start from 1 to ensure positive x values
         ticksKey: [{ key: 'x-axis', value: '' }]
       };
 
@@ -947,7 +947,7 @@ describe('trendlineDatasetCreator', () => {
 
       const datasetsWithTicks = {
         datasets,
-        ticks: [['0'], ['1'], ['2'], ['3'], ['4']],
+        ticks: [['1'], ['2'], ['3'], ['4'], ['5']], // Start from 1 to ensure positive x values
         ticksKey: [{ key: 'x-axis', value: '' }]
       };
 
@@ -967,6 +967,66 @@ describe('trendlineDatasetCreator', () => {
 
       // Assert
       expect(result).toHaveLength(0);
+    });
+  });
+
+  describe('logarithmic_regression', () => {
+    it('should correctly calculate logarithmic regression for perfect logarithmic data', () => {
+      // Arrange
+      const trendline: Trendline = {
+        type: 'logarithmic_regression',
+        columnId: 'test-column-id',
+        show: true,
+        showTrendlineLabel: true,
+        trendlineLabel: 'Logarithmic Regression'
+      };
+
+      // Using simple data points that follow a clear logarithmic pattern
+      const datasets: DatasetOption[] = [
+        {
+          id: 'test-column-id',
+          data: [0, 0.301, 0.477, 0.602, 0.699], // log10(x) values
+          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          dataKey: 'x-axis',
+          axisType: 'y',
+          tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
+        }
+      ];
+
+      const datasetsWithTicks = {
+        datasets,
+        ticks: [['1'], ['2'], ['3'], ['4'], ['5']], // x values
+        ticksKey: [{ key: 'x-axis', value: '' }]
+      };
+
+      const columnLabelFormats: Record<string, IColumnLabelFormat> = {
+        'x-axis': {
+          ...DEFAULT_COLUMN_LABEL_FORMAT,
+          columnType: 'number'
+        }
+      };
+
+      // Act
+      const result = trendlineDatasetCreator.logarithmic_regression(
+        trendline,
+        datasetsWithTicks,
+        columnLabelFormats
+      );
+
+      console.log('result', result);
+
+      // Assert
+      expect(result).toHaveLength(1);
+      expect(result[0]).toMatchObject({
+        id: DATASET_IDS.logarithmicRegression('test-column-id'),
+        dataKey: 'test-column-id',
+        axisType: 'y'
+      });
+
+      const data = result[0].data;
+      expect(data).toHaveLength(5);
+
+      expect(data[1]).toBeCloseTo(0.2932, 3);
     });
   });
 });

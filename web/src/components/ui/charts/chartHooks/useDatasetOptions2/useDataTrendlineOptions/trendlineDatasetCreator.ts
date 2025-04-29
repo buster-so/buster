@@ -17,92 +17,68 @@ export const trendlineDatasetCreator: Record<
     columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>
   ) => TrendlineDataset[]
 > = {
-  polynomial_regression: (trendline, selectedDataset, columnLabelFormats) => {
-    return [];
-    // const dimensions = selectedDataset.dimensions as string[];
-    // const xAxisColumn = dimensions[0];
-    // const isXAxisNumeric = isNumericColumnType(
-    //   columnLabelFormats[xAxisColumn]?.columnType || DEFAULT_COLUMN_LABEL_FORMAT.columnType
-    // );
-    // const isXAxisDate = isDateColumnType(columnLabelFormats[xAxisColumn]?.columnType);
-    // const { mappedData, indexOfTrendlineColumn } = dataMapper(
-    //   trendline,
-    //   selectedDataset,
-    //   columnLabelFormats,
-    //   isXAxisNumeric ? 'number' : isXAxisDate ? 'date' : 'string'
-    // );
+  polynomial_regression: (trendline, datasetsWithTicks, columnLabelFormats) => {
+    const datasets = datasetsWithTicks.datasets;
+    const selectedDataset = datasets.find((dataset) => dataset.id === trendline.columnId);
 
-    // if (indexOfTrendlineColumn === undefined) return [];
+    if (!selectedDataset?.data || selectedDataset.data.length === 0) return [];
 
-    // if (isXAxisNumeric) {
-    //   const regressionResult = regression.polynomial(mappedData, { order: 2, precision: 2 });
-    //   const data = mappedData.map((item) => {
-    //     const newItem = [...item];
-    //     newItem[indexOfTrendlineColumn] = regressionResult.predict(item[0])[1];
-    //     return newItem;
-    //   });
+    const xAxisColumn = selectedDataset.dataKey;
 
-    //   return [
-    //     {
-    //       ...trendline,
-    //       id: DATASET_IDS.polynomialRegression(trendline.columnId),
-    //       source: data,
-    //       dimensions: dimensions,
-    //       equation: regressionResult.string
-    //     }
-    //   ];
-    // }
+    const isXAxisNumeric = isNumericColumnType(
+      columnLabelFormats[xAxisColumn]?.columnType || DEFAULT_COLUMN_LABEL_FORMAT.columnType
+    );
+    const isXAxisDate = isDateColumnType(columnLabelFormats[xAxisColumn]?.columnType);
 
-    // if (isXAxisDate) {
-    //   const firstTimestamp = mappedData[0][0];
-    //   // Convert timestamps to days since first timestamp for better numerical stability
-    //   const regressionResult = regression.polynomial(
-    //     mappedData.map(([timestamp, value]) => [
-    //       (timestamp - firstTimestamp) / (1000 * 60 * 60 * 24),
-    //       value
-    //     ]),
-    //     { order: 2, precision: 2 }
-    //   );
+    // Get mapped data points using the dataMapper
+    const mappedPoints = dataMapper(
+      selectedDataset,
+      {
+        ticks: datasetsWithTicks.ticks,
+        ticksKey: datasetsWithTicks.ticksKey
+      },
+      columnLabelFormats
+    );
 
-    //   const data = mappedData.map((item) => {
-    //     const newItem = [...item];
-    //     const days = (item[0] - firstTimestamp) / (1000 * 60 * 60 * 24);
-    //     newItem[indexOfTrendlineColumn] = regressionResult.predict(days)[1];
-    //     return newItem;
-    //   });
+    if (mappedPoints.length === 0) return [];
 
-    //   return [
-    //     {
-    //       ...trendline,
-    //       id: DATASET_IDS.polynomialRegression(trendline.columnId),
-    //       source: data,
-    //       dimensions: dimensions,
-    //       equation: regressionResult.string
-    //     }
-    //   ];
-    // }
+    // For date x-axis, normalize to days since first date
+    const points: [number, number][] = isXAxisDate
+      ? mappedPoints.map(([x, y]): [number, number] => {
+          const firstTimestamp = mappedPoints[0][0];
+          return [(x - firstTimestamp) / (1000 * 60 * 60 * 24), y];
+        })
+      : mappedPoints;
 
-    // // For non-numeric, non-date x-axis, use indices
-    // const regressionResult = regression.polynomial(
-    //   mappedData.map((item, index) => [index, item[1]]),
-    //   { order: 2, precision: 2 }
-    // );
+    // Calculate polynomial regression with order 2 (quadratic)
+    const regressionResult = regression.polynomial(points, { order: 2, precision: 4 });
 
-    // const data = mappedData.map((item, index) => {
-    //   const newItem = [...item];
-    //   newItem[indexOfTrendlineColumn] = regressionResult.predict(index)[1];
-    //   return newItem;
-    // });
+    // Map back to original x values but with predicted y values
+    const data = mappedPoints.map(([x]) => {
+      const predictedY = isXAxisDate
+        ? regressionResult.predict((x - mappedPoints[0][0]) / (1000 * 60 * 60 * 24))[1]
+        : regressionResult.predict(x)[1];
+      return predictedY;
+    });
 
-    // return [
-    //   {
-    //     ...trendline,
-    //     id: DATASET_IDS.polynomialRegression(trendline.columnId),
-    //     source: data,
-    //     dimensions: dimensions,
-    //     equation: regressionResult.string
-    //   }
-    // ];
+    return [
+      {
+        ...trendline,
+        id: DATASET_IDS.polynomialRegression(trendline.columnId),
+        data,
+        dataKey: trendline.columnId,
+        axisType: 'y' as const,
+        tooltipData: [],
+        label: [
+          [
+            {
+              key: 'value',
+              value: `Polynomial Regression (${isXAxisDate ? 'Date' : isXAxisNumeric ? 'Numeric' : 'Categorical'})`
+            }
+          ]
+        ]
+      }
+    ];
   },
 
   logarithmic_regression: (trendline, datasetsWithTicks, columnLabelFormats) => {
@@ -148,8 +124,8 @@ export const trendlineDatasetCreator: Record<
 
     // Map back to original x values but with predicted y values
     const data = normalizedPoints.map(([x]) => {
-      // Only predict for positive x values, otherwise return null
-      return x > 0 ? regressionResult.predict(x)[1] : null;
+      if (x === 0) return 0;
+      return regressionResult.predict(x)[1];
     });
 
     return [

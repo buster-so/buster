@@ -6,19 +6,19 @@ import {
 } from '@/api/asset_interfaces/metric/charts';
 import { useMemo } from 'react';
 import last from 'lodash/last';
-import { DatasetOption } from '../interfaces';
+import { DatasetOption, DatasetOptionsWithTicks } from '../interfaces';
 import { TrendlineDataset } from './trendlineDataset.types';
 import { canSupportTrendlineRecord } from './canSupportTrendline';
 import { trendlineDatasetCreator } from './trendlineDatasetCreator';
 
 export const useDataTrendlineOptions = ({
-  datasetOptions,
+  datasetOptionsWithTicks,
   trendlines,
   selectedAxis,
   selectedChartType,
   columnLabelFormats
 }: {
-  datasetOptions: DatasetOption[] | undefined;
+  datasetOptionsWithTicks: DatasetOptionsWithTicks | undefined;
   trendlines: Trendline[] | undefined;
   selectedChartType: ChartType;
   selectedAxis: ChartEncodes;
@@ -38,7 +38,12 @@ export const useDataTrendlineOptions = ({
   }, [selectedChartType, hasTrendlines, selectedAxis, trendlines?.length]);
 
   const datasetTrendlineOptions: TrendlineDataset[] = useMemo(() => {
-    if (!canSupportTrendlines || !hasTrendlines || !datasetOptions || !datasetOptions.length)
+    if (
+      !canSupportTrendlines ||
+      !hasTrendlines ||
+      !datasetOptionsWithTicks ||
+      !datasetOptionsWithTicks.datasets.length
+    )
       return [] as TrendlineDataset[];
 
     const trendlineDatasets: TrendlineDataset[] = [];
@@ -48,7 +53,7 @@ export const useDataTrendlineOptions = ({
         if (!canSupportTrendlineRecord[trendline.type](columnLabelFormats, trendline)) return;
         const trendlineDataset = trendlineDatasetCreator[trendline.type](
           trendline,
-          datasetOptions,
+          datasetOptionsWithTicks,
           columnLabelFormats
         );
 
@@ -59,7 +64,7 @@ export const useDataTrendlineOptions = ({
     });
 
     return trendlineDatasets;
-  }, [datasetOptions, canSupportTrendlines, trendlines, hasTrendlines]);
+  }, [datasetOptionsWithTicks, canSupportTrendlines, trendlines, hasTrendlines]);
 
   return datasetTrendlineOptions;
 };

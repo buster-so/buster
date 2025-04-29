@@ -17,14 +17,13 @@ import uniq from 'lodash/uniq';
 import { sortLineBarData } from './datasetHelpers_BarLinePie';
 import { downsampleScatterData } from './datasetHelpers_Scatter';
 import { type TrendlineDataset, useDataTrendlineOptions } from './useDataTrendlineOptions';
-import type { DatasetOption } from './interfaces';
+import type { DatasetOptionsWithTicks } from './interfaces';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import { DOWNSIZE_SAMPLE_THRESHOLD } from '../../config';
-import { appendToKeyValueChain } from './groupingHelpers';
 import { aggregateAndCreateDatasets } from './aggregateAndCreateDatasets';
 
 type DatasetHookResult = {
-  datasetOptions: DatasetOption[];
+  datasetOptionsWithTicks: DatasetOptionsWithTicks;
   dataTrendlineOptions: TrendlineDataset[];
   yAxisKeys: string[];
   y2AxisKeys: string[];
@@ -182,14 +181,12 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
     isScatter
   ]);
 
-  const datasetOptions = useMemo(() => {
+  const datasetOptionsWithTicks = useMemo(() => {
     return aggregatedDatasets;
   }, [aggregatedDatasets]);
 
-  //DONE UP TO HERE
-
   const dataTrendlineOptions = useDataTrendlineOptions({
-    datasetOptions,
+    datasetOptionsWithTicks,
     trendlines,
     selectedAxis,
     selectedChartType,
@@ -197,7 +194,7 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
   });
 
   return {
-    datasetOptions,
+    datasetOptionsWithTicks,
     dataTrendlineOptions,
     yAxisKeys,
     y2AxisKeys,
