@@ -1,19 +1,48 @@
 export interface KV {
   key: string;
-  value: string | number | boolean | object | null;
+  value: string | number | boolean | null;
 }
 
+/**
+ * Configuration options for a dataset to be displayed in a chart
+ */
 export type DatasetOption = {
+  /** Unique identifier for the dataset */
   id: string;
-  /** One array of KV pairs per data point (here always length 1 in non-scatter mode) */
-  label: KV[][]; //the label is the category (or the y-axis value) of the data point. If there is only the y axis value, the "value" will be an empty string
+  /**
+   * Label information for each data point in the dataset
+   * Contains an array of KV pairs
+   * In non-scatter mode, each inner array will have only one element
+   * The label represents the category or y-axis value of the data point
+   */
+  label: KV[];
+  /**
+   * The actual numerical values to be plotted in the chart
+   * Can contain null for missing data points
+   */
   data: (number | null)[];
+  /**
+   * The key used to reference this dataset (typically matches a property name in source data)
+   */
   dataKey: string;
+  /**
+   * Determines which axis this dataset should be plotted against
+   * 'y' for primary y-axis, 'y2' for secondary y-axis
+   */
   axisType: 'y' | 'y2';
-  /** One array of KV pairs per data point */
+  /**
+   * Additional information to display in tooltips when hovering over data points
+   * Contains an array of KV pairs for each data point
+   */
   tooltipData: KV[][];
+  /**
+   * Optional key to determine the size of data points (used in scatter/bubble charts)
+   */
   sizeDataKey?: string | undefined;
-  /** If you passed `axis.size`, one size value per data point */
+  /**
+   * Optional array of size values corresponding to each data point
+   * Used when 'axis.size' is provided to determine point dimensions
+   */
   sizeData?: (number | null)[];
 };
 

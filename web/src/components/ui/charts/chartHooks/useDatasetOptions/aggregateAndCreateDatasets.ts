@@ -86,7 +86,7 @@ export function aggregateAndCreateDatasets<
   }
 
   // Helper function to generate labels based on the rules
-  function generateLabels(metric: string, catRec?: Record<string, string>, isY2 = false): KV[][] {
+  function generateLabels(metric: string, catRec?: Record<string, string>, isY2 = false): KV[] {
     const labels: KV[] = [];
 
     // If there are multiple y-axes (y and y2), include the metric
@@ -104,7 +104,7 @@ export function aggregateAndCreateDatasets<
       labels.push({ key: metric, value: '' });
     }
 
-    return [labels];
+    return labels;
   }
 
   // Precompute grouping by categories and by x-axis combos

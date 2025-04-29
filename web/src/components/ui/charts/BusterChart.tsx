@@ -47,6 +47,7 @@ export const BusterChart: React.FC<BusterChartProps> = React.memo(
     columnSettings = DEFAULT_CHART_CONFIG.columnSettings,
     ...props
   }) => {
+    console.clear();
     const [isMounted, setIsMounted] = useState(false); //there is a responsive bug where we need to wait for the chart to mount before we can animate it
     const isTable = selectedChartType === ChartType.Table;
     const showNoData = !loading && (isEmpty(data) || data === null);

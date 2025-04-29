@@ -22,7 +22,7 @@ describe('aggregateAndCreateDatasets', () => {
     expect(result.datasets).toHaveLength(1);
     expect(result.datasets[0].data).toEqual([1000, 1500, 2000]);
 
-    expect(result.datasets[0].label).toEqual([[{ key: 'revenue', value: '' }]]);
+    expect(result.datasets[0].label).toEqual([{ key: 'revenue', value: '' }]);
     expect(result.datasets[0].tooltipData).toEqual([
       [{ key: 'revenue', value: 1000 }],
       [{ key: 'revenue', value: 1500 }],
@@ -66,7 +66,7 @@ describe('aggregateAndCreateDatasets', () => {
     expect(result.datasets).toHaveLength(1);
     expect(result.datasets[0].data).toEqual([100, 150, 200, 250]);
     expect(result.datasets[0].dataKey).toBe('sales');
-    expect(result.datasets[0].label).toEqual([[{ key: 'sales', value: '' }]]);
+    expect(result.datasets[0].label).toEqual([{ key: 'sales', value: '' }]);
 
     // Verify the tooltips contain the correct values
     expect(result.datasets[0].tooltipData).toEqual([
@@ -124,7 +124,7 @@ describe('aggregateAndCreateDatasets', () => {
     expect(result.datasets[0].data[1]).toBe(450);
 
     // Check label
-    expect(result.datasets[0].label).toEqual([[{ key: 'sales', value: '' }]]);
+    expect(result.datasets[0].label).toEqual([{ key: 'sales', value: '' }]);
 
     // Check tooltip data
     expect(result.datasets[0].tooltipData).toEqual([
@@ -161,7 +161,7 @@ describe('aggregateAndCreateDatasets', () => {
     expect(result.datasets[0].data).toEqual([100, 150, 200]);
 
     // Check label
-    expect(result.datasets[0].label).toEqual([[{ key: 'y', value: '' }]]);
+    expect(result.datasets[0].label).toEqual([{ key: 'y', value: '' }]);
 
     // Check ticks
     expect(result.ticks).toEqual([['1'], ['2'], ['3']]);
@@ -198,7 +198,7 @@ describe('aggregateAndCreateDatasets', () => {
     expect(result.datasets).toHaveLength(1);
     expect(result.datasets[0].data).toEqual([100, 150, 200, 250]);
     expect(result.datasets[0].dataKey).toBe('sales');
-    expect(result.datasets[0].label).toEqual([[{ key: 'sales', value: '' }]]);
+    expect(result.datasets[0].label).toEqual([{ key: 'sales', value: '' }]);
 
     // Verify the tooltips contain the correct values
     expect(result.datasets[0].tooltipData).toEqual([
@@ -256,7 +256,7 @@ describe('aggregateAndCreateDatasets', () => {
     expect(result.datasets[0].data[1]).toBe(450);
 
     // Check label
-    expect(result.datasets[0].label).toEqual([[{ key: 'sales', value: '' }]]);
+    expect(result.datasets[0].label).toEqual([{ key: 'sales', value: '' }]);
 
     // Check tooltip data
     expect(result.datasets[0].tooltipData).toEqual([
@@ -293,7 +293,7 @@ describe('aggregateAndCreateDatasets', () => {
     expect(result.datasets[0].data).toEqual([100, 150, 200]);
 
     // Check label
-    expect(result.datasets[0].label).toEqual([[{ key: 'y', value: '' }]]);
+    expect(result.datasets[0].label).toEqual([{ key: 'y', value: '' }]);
 
     // Check ticks
     expect(result.ticks).toEqual([['1'], ['2'], ['3']]);
@@ -324,7 +324,7 @@ describe('aggregateAndCreateDatasets', () => {
     expect(result.datasets[0].sizeData).toEqual([20, 30]);
     expect(result.datasets[0].sizeDataKey).toEqual('size');
 
-    expect(result.datasets[0].label).toEqual([[{ key: 'y', value: '' }]]);
+    expect(result.datasets[0].label).toEqual([{ key: 'y', value: '' }]);
 
     // Check tooltips
     expect(result.datasets[0].tooltipData).toEqual([
@@ -383,7 +383,7 @@ describe('aggregateAndCreateDatasets', () => {
     expect(result.datasets[1].data).toEqual([20, 30]);
     expect(result.datasets[1].dataKey).toBe('profit');
     expect(result.datasets[1].axisType).toBe('y');
-    expect(result.datasets[1].label).toEqual([[{ key: 'profit', value: '' }]]);
+    expect(result.datasets[1].label).toEqual([{ key: 'profit', value: '' }]);
     expect(result.datasets[1].tooltipData).toEqual([
       [
         { key: 'x', value: 1 },
@@ -419,7 +419,7 @@ describe('aggregateAndCreateDatasets', () => {
 
     expect(result.datasets).toHaveLength(1);
     expect(result.datasets[0].data).toEqual([1000, 1200, 800, 900]);
-    expect(result.datasets[0].label).toEqual([[{ key: 'sales', value: '' }]]);
+    expect(result.datasets[0].label).toEqual([{ key: 'sales', value: '' }]);
     expect(result.datasets[0].tooltipData).toEqual([
       [{ key: 'sales', value: 1000 }],
       [{ key: 'sales', value: 1200 }],
@@ -459,6 +459,9 @@ describe('aggregateAndCreateDatasets', () => {
     expect(result.datasets).toHaveLength(2); // One dataset each for revenue and profit
     expect(result.datasets[0].dataKey).toBe('revenue');
     expect(result.datasets[1].dataKey).toBe('profit');
+
+    expect(result.datasets[0].label).toEqual([{ key: 'revenue', value: '' }]);
+    expect(result.datasets[1].label).toEqual([{ key: 'profit', value: '' }]);
 
     // Check revenue dataset
     expect(result.datasets[0].data).toEqual([1000, 1500, 2000]);
@@ -506,7 +509,7 @@ describe('aggregateAndCreateDatasets', () => {
 
     // Check first dataset (Product A)
     expect(result.datasets[0].data).toEqual([1000, 1200]);
-    expect(result.datasets[0].label).toEqual([[{ key: 'product', value: 'A' }]]);
+    expect(result.datasets[0].label).toEqual([{ key: 'product', value: 'A' }]);
 
     expect(result.datasets[0].tooltipData).toEqual([
       [{ key: 'sales', value: 1000 }],
@@ -517,7 +520,7 @@ describe('aggregateAndCreateDatasets', () => {
 
     // Check second dataset (Product B)
     expect(result.datasets[1].data).toEqual([800, 1000]);
-    expect(result.datasets[1].label).toEqual([[{ key: 'product', value: 'B' }]]);
+    expect(result.datasets[1].label).toEqual([{ key: 'product', value: 'B' }]);
     expect(result.datasets[1].tooltipData).toEqual([
       [{ key: 'sales', value: 800 }],
       [{ key: 'sales', value: 1000 }]
@@ -547,10 +550,8 @@ describe('aggregateAndCreateDatasets', () => {
     expect(result.datasets).toHaveLength(4); // 2 metrics * 2 regions
 
     expect(result.datasets[0].label).toEqual([
-      [
-        { key: 'revenue', value: '' },
-        { key: 'region', value: 'North' }
-      ]
+      { key: 'revenue', value: '' },
+      { key: 'region', value: 'North' }
     ]);
 
     expect(result.datasets[0].data).toEqual([1000, 1200]);
@@ -578,7 +579,7 @@ describe('aggregateAndCreateDatasets', () => {
 
     expect(result.datasets).toHaveLength(1);
     expect(result.datasets[0].data).toEqual([100, 150, 200]);
-    expect(result.datasets[0].label).toEqual([[{ key: 'yValue', value: '' }]]);
+    expect(result.datasets[0].label).toEqual([{ key: 'yValue', value: '' }]);
     expect(result.datasets[0].tooltipData).toEqual([
       [
         { key: 'xValue', value: 1 },
@@ -623,7 +624,7 @@ describe('aggregateAndCreateDatasets', () => {
     // Check first category (A)
     const datasetA = result.datasets[0];
     expect(datasetA.data).toEqual([100, 150]);
-    expect(datasetA.label).toEqual([[{ key: 'group', value: 'A' }]]);
+    expect(datasetA.label).toEqual([{ key: 'group', value: 'A' }]);
     expect(datasetA.tooltipData).toEqual([
       [
         { key: 'x', value: 1 },
@@ -638,7 +639,7 @@ describe('aggregateAndCreateDatasets', () => {
     // Check second category (B)
     const datasetB = result.datasets[1];
     expect(datasetB.data).toEqual([80, 120]);
-    expect(datasetB.label).toEqual([[{ key: 'group', value: 'B' }]]);
+    expect(datasetB.label).toEqual([{ key: 'group', value: 'B' }]);
     expect(datasetB.tooltipData).toEqual([
       [
         { key: 'x', value: 1 },
@@ -923,9 +924,7 @@ describe('aggregateAndCreateDatasets', () => {
 
     // Check one specific dataset to validate aggregation
     const northAOnlineSales = result.datasets.find(
-      (ds) =>
-        ds.dataKey === 'sales' &&
-        ds.label.some((l) => l.some((kv) => kv.key === 'product' && kv.value === 'A'))
+      (ds) => ds.dataKey === 'sales' && ds.label.some((l) => l.key === 'product' && l.value === 'A')
     );
 
     expect(northAOnlineSales).toBeDefined();
@@ -1178,8 +1177,8 @@ describe('aggregateAndCreateDatasets', () => {
     expect(result.datasets[1].data).toEqual([80, 120]); // group: false
 
     // Check that labels are correctly created
-    expect(result.datasets[0].label[0][0]).toEqual({ key: 'group', value: 'true' });
-    expect(result.datasets[1].label[0][0]).toEqual({ key: 'group', value: 'false' });
+    expect(result.datasets[0].label).toEqual([{ key: 'group', value: 'true' }]);
+    expect(result.datasets[1].label).toEqual([{ key: 'group', value: 'false' }]);
   });
 
   it('should populate tooltipData with all fields and values when tooltip option is not specified', () => {

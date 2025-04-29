@@ -12,7 +12,7 @@ import { useYAxis } from './useYAxis';
 import { DeepPartial } from 'utility-types';
 import type { PluginChartOptions } from 'chart.js';
 import { useTooltipOptions } from './useTooltipOptions.ts/useTooltipOptions';
-import { DatasetOption } from '../../../chartHooks';
+import { DatasetOption, DatasetOptionsWithTicks } from '../../../chartHooks';
 import { useY2Axis } from './useY2Axis';
 import { AnnotationPluginOptions } from 'chartjs-plugin-annotation';
 import type { BusterChartTypeComponentProps } from '../../../interfaces';
@@ -48,7 +48,7 @@ interface UseOptionsProps {
   pieDisplayLabelAs: NonNullable<BusterChartProps['pieDisplayLabelAs']>;
   columnSettings: NonNullable<BusterChartProps['columnSettings']>;
   tooltipKeys: string[];
-  datasetOptions: DatasetOption[];
+  datasetOptions: DatasetOptionsWithTicks;
   hasMismatchedTooltipsAndMeasures: boolean;
   yAxisShowAxisLabel: NonNullable<BusterChartProps['yAxisShowAxisLabel']>;
   yAxisStartAxisAtZero: BusterChartProps['yAxisStartAxisAtZero'];
@@ -167,8 +167,8 @@ export const useOptions = ({
   const interaction = useInteractions({ selectedChartType, barLayout });
 
   const numberOfSources = useMemo(() => {
-    const lastDataset = datasetOptions[datasetOptions.length - 1];
-    return lastDataset?.source?.length || 0;
+    const datasets = datasetOptions.datasets;
+    return datasets.reduce((acc, dataset) => acc + dataset.data.length, 0);
   }, [datasetOptions]);
 
   const animation = useAnimations({ animate, numberOfSources, chartType: selectedChartType });
@@ -194,7 +194,7 @@ export const useOptions = ({
 
   const options: ChartProps<ChartJSChartType>['options'] = useMemo(() => {
     const chartAnnotations = chartPlugins?.annotation?.annotations;
-    const isLargeDataset = datasetOptions[0].source.length > LINE_DECIMATION_THRESHOLD;
+    const isLargeDataset = numberOfSources > LINE_DECIMATION_THRESHOLD;
 
     return {
       indexAxis: isHorizontalBar ? 'y' : 'x',

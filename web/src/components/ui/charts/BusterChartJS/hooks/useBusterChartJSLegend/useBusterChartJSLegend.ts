@@ -17,7 +17,7 @@ import {
   UseChartLengendReturnValues
 } from '../../../BusterChartLegend';
 import { getLegendItems } from './helper';
-import { DatasetOption } from '../../../chartHooks';
+import { DatasetOption, DatasetOptionsWithTicks } from '../../../chartHooks';
 import { LEGEND_ANIMATION_THRESHOLD } from '../../../config';
 import { timeout } from '@/lib';
 
@@ -33,7 +33,7 @@ interface UseBusterChartJSLegendProps {
   loading: boolean;
   lineGroupType: BusterChartProps['lineGroupType'];
   barGroupType: BusterChartProps['barGroupType'];
-  datasetOptions: DatasetOption[];
+  datasetOptions: DatasetOptionsWithTicks;
   columnSettings: NonNullable<BusterChartProps['columnSettings']>;
   columnMetadata: NonNullable<BusterChartProps['columnMetadata']>;
   pieMinimumSlicePercentage: NonNullable<BusterChartProps['pieMinimumSlicePercentage']>;
@@ -99,14 +99,14 @@ export const useBusterChartJSLegend = ({
       });
 
       if (!isStackPercentage && showLegendHeadline) {
-        addLegendHeadlines(
-          items,
-          datasetOptions,
-          showLegendHeadline,
-          columnMetadata,
-          columnLabelFormats,
-          selectedChartType
-        );
+        // addLegendHeadlines(
+        //   items,
+        //   datasetOptions,
+        //   showLegendHeadline,
+        //   columnMetadata,
+        //   columnLabelFormats,
+        //   selectedChartType
+        // );
       }
 
       const numberOfPoints =

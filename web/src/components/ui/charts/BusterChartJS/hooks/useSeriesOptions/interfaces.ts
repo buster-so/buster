@@ -3,26 +3,17 @@ import type {
   ChartEncodes,
   ScatterAxis
 } from '@/api/asset_interfaces/metric/charts';
-import type { DatasetOption } from '../../../chartHooks';
+import type { DatasetOption, DatasetOptionsWithTicks } from '../../../chartHooks';
 
 export interface SeriesBuilderProps {
-  selectedDataset: DatasetOption;
-  allYAxisKeysIndexes: {
-    name: string;
-    index: number;
-  }[];
-  allY2AxisKeysIndexes: {
-    name: string;
-    index: number;
-  }[];
+  datasetOptions: DatasetOptionsWithTicks;
   columnSettings: NonNullable<BusterChartProps['columnSettings']>;
   colors: string[];
   columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>;
   xAxisKeys: ChartEncodes['x'];
   categoryKeys: ScatterAxis['category'];
-  sizeKeyIndex: {
-    name: string;
-    index: number;
+  sizeOptions: {
+    key: string;
     minValue: number;
     maxValue: number;
   } | null;
@@ -31,4 +22,6 @@ export interface SeriesBuilderProps {
   selectedChartType: BusterChartProps['selectedChartType'];
   barShowTotalAtTop: BusterChartProps['barShowTotalAtTop'];
   barGroupType: BusterChartProps['barGroupType'];
+  yAxisKeys: string[];
+  y2AxisKeys: string[];
 }

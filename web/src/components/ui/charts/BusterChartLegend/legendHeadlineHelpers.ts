@@ -2,13 +2,13 @@ import { BusterChartLegendItem } from './interfaces';
 import { BusterChartProps, ShowLegendHeadline } from '@/api/asset_interfaces/metric/charts';
 import { DataFrameOperations } from '@/lib/math';
 import { formatLabel } from '@/lib/columnFormatter';
-import { DatasetOption, extractFieldsFromChain } from '../chartHooks';
+import { DatasetOptionsWithTicks, extractFieldsFromChain } from '../chartHooks';
 import { createDayjsDate, getBestDateFormat } from '@/lib/date';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces/metric';
 
 export const addLegendHeadlines = (
   legendItems: BusterChartLegendItem[],
-  datasets: DatasetOption[],
+  { datasets }: DatasetOptionsWithTicks,
   showLegendHeadline: ShowLegendHeadline,
   columnMetadata: NonNullable<BusterChartProps['columnMetadata']>,
   columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>,

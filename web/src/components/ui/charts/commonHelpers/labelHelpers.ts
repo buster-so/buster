@@ -1,7 +1,7 @@
 import { formatLabel } from '@/lib';
 import isEmpty from 'lodash/isEmpty';
 import type { BusterChartProps, ColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
-import { extractFieldsFromChain } from '../chartHooks';
+import { DatasetOption, extractFieldsFromChain } from '../chartHooks';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 
 export const JOIN_CHARACTER = ' | ';
@@ -53,4 +53,19 @@ const formatValueField = (
     columnLabelFormats[columnName] || DEFAULT_COLUMN_LABEL_FORMAT,
     false
   );
+};
+
+//NEW LABEL HELPERS
+
+export const formatLabelForDataset = (
+  dataset: DatasetOption,
+  columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>
+): string => {
+  return dataset.label
+    .map<string>((item) => {
+      const { key, value } = item;
+      const columnLabelFormat = columnLabelFormats[key];
+      return formatLabel(value || key, columnLabelFormat, !value);
+    })
+    .join(JOIN_CHARACTER);
 };

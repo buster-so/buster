@@ -77,7 +77,7 @@ export const BusterChartJSComponent = React.memo(
         colors: colorsProp,
         yAxisKeys,
         y2AxisKeys,
-        datasetOptions,
+        datasetOptions: datasetOptions.datasets,
         selectedChartType
       });
 
@@ -195,24 +195,12 @@ export const BusterChartJSComponent = React.memo(
         return [];
       }, [selectedChartType]);
 
-      const filteredData = useMemo(() => {
-        return {
-          ...data,
-          datasets: data.datasets.filter((dataset) => dataset.data.length > 0 && !dataset.hidden)
-        };
-      }, [data]);
-
-      console.log('options', options);
-      console.log('filteredData', filteredData);
-
-      //return <div>Hello</div>;
-
       return (
         <Chart
           className={className}
           ref={ref}
           options={options}
-          data={filteredData}
+          data={data}
           type={type}
           plugins={chartSpecificPlugins}
         />

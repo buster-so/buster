@@ -1,40 +1,36 @@
 import type { ChartProps } from '../../core';
 import type { SeriesBuilderProps } from './interfaces';
 import type { LabelBuilderProps } from './useSeriesOptions';
-import { formatChartLabelDelimiter, formatYAxisLabel, yAxisSimilar } from '../../../commonHelpers';
+import { formatLabelForDataset, formatYAxisLabel, yAxisSimilar } from '../../../commonHelpers';
 import { dataLabelFontColorContrast, formatBarAndLineDataLabel } from '../../helpers';
 import type { BarElement } from 'chart.js';
 import type { Context } from 'chartjs-plugin-datalabels';
 import { defaultLabelOptionConfig } from '../useChartSpecificOptions/labelOptionConfig';
 import type { Options } from 'chartjs-plugin-datalabels/types/options';
 import { DEFAULT_CHART_LAYOUT } from '../../ChartJSTheme';
-import { extractFieldsFromChain } from '../../../chartHooks';
+import { DatasetOption } from '../../../chartHooks';
 import {
   type BusterChartProps,
   DEFAULT_COLUMN_LABEL_FORMAT,
   type IColumnLabelFormat
 } from '@/api/asset_interfaces/metric';
+import { formatLabel } from '@/lib';
 
 export const barSeriesBuilder = ({
-  selectedDataset,
-  allYAxisKeysIndexes,
+  datasetOptions,
   colors,
   columnSettings,
   columnLabelFormats,
   xAxisKeys,
   barShowTotalAtTop,
-  allY2AxisKeysIndexes,
   barGroupType,
+  yAxisKeys,
+  y2AxisKeys,
   ...rest
 }: SeriesBuilderProps): ChartProps<'bar'>['data']['datasets'] => {
   const dataLabelOptions: Options['labels'] = {};
 
-  if (barShowTotalAtTop && (allYAxisKeysIndexes.length > 1 || allY2AxisKeysIndexes?.length > 0)) {
-    const yAxis = allYAxisKeysIndexes.map((yAxis) => {
-      const key = extractFieldsFromChain(yAxis.name).at(-1)?.key!;
-      return key;
-    });
-
+  if (barShowTotalAtTop && (yAxisKeys.length > 1 || y2AxisKeys?.length > 0)) {
     let hasBeenDrawn = false;
 
     dataLabelOptions.stackTotal = {
@@ -60,11 +56,11 @@ export const barSeriesBuilder = ({
         return canDisplay ? 'auto' : false;
       },
       formatter: function (_, context) {
-        const canUseSameYFormatter = yAxisSimilar(yAxis, columnLabelFormats);
+        const canUseSameYFormatter = yAxisSimilar(yAxisKeys, columnLabelFormats);
         const value = context.chart.$totalizer.stackTotals[context.dataIndex];
         return formatYAxisLabel(
           value,
-          yAxis,
+          yAxisKeys,
           canUseSameYFormatter,
           columnLabelFormats,
           false,
@@ -80,18 +76,18 @@ export const barSeriesBuilder = ({
     } as NonNullable<Options['labels']>['stackTotal'];
   }
 
-  return allYAxisKeysIndexes.map<ChartProps<'bar'>['data']['datasets'][number]>(
-    (yAxisItem, index) => {
+  return datasetOptions.datasets.map<ChartProps<'bar'>['data']['datasets'][number]>(
+    (dataset, index) => {
       return barBuilder({
-        selectedDataset,
+        dataset,
         colors,
         columnSettings,
         columnLabelFormats,
-        yAxisItem,
         index,
         xAxisKeys,
         dataLabelOptions,
-        barGroupType
+        barGroupType,
+        datasetOptions
       });
     }
   );
@@ -114,11 +110,10 @@ const FULL_ROTATION_ANGLE = -90;
 const ROTATION_CHECK_THROTTLE = 225; // ms
 
 export const barBuilder = ({
-  selectedDataset,
+  dataset,
   colors,
   columnSettings,
   columnLabelFormats,
-  yAxisItem,
   index,
   yAxisID,
   order,
@@ -127,9 +122,9 @@ export const barBuilder = ({
   barGroupType
 }: Pick<
   SeriesBuilderProps,
-  'selectedDataset' | 'colors' | 'columnSettings' | 'columnLabelFormats'
+  'colors' | 'columnSettings' | 'columnLabelFormats' | 'datasetOptions'
 > & {
-  yAxisItem: SeriesBuilderProps['allYAxisKeysIndexes'][number];
+  dataset: DatasetOption;
   index: number;
   yAxisID?: string;
   order?: number;
@@ -137,7 +132,7 @@ export const barBuilder = ({
   dataLabelOptions?: Options['labels'];
   barGroupType: BusterChartProps['barGroupType'];
 }): ChartProps<'bar'>['data']['datasets'][number] => {
-  const yKey = extractFieldsFromChain(yAxisItem.name).at(-1)?.key!;
+  const yKey = dataset.dataKey;
   const columnSetting = columnSettings[yKey];
   const columnLabelFormat = columnLabelFormats[yKey];
   const showLabels = !!columnSetting?.showDataLabels;
@@ -151,10 +146,10 @@ export const barBuilder = ({
 
   return {
     type: 'bar',
-    label: yAxisItem.name,
+    label: formatLabelForDataset(dataset, columnLabelFormats),
     yAxisID: yAxisID || 'y',
     order,
-    data: selectedDataset.source.map((item) => item[yAxisItem.index] as number),
+    data: dataset.data,
     backgroundColor: colors[index % colors.length],
     borderRadius: (columnSetting?.barRoundness || 0) / 2,
     xAxisKeys,
@@ -334,9 +329,20 @@ const getFormattedValue = (
 };
 
 export const barSeriesBuilder_labels = (props: LabelBuilderProps) => {
-  const { dataset, columnLabelFormats } = props;
+  const { datasetOptions, columnLabelFormats } = props;
+  const ticksKey = datasetOptions.ticksKey;
 
-  return dataset.source.map<string>((item) => {
-    return formatChartLabelDelimiter(item[0] as string, columnLabelFormats);
+  const labels = datasetOptions.ticks.flatMap((item) => {
+    return item.map<string>((item, index) => {
+      const key = ticksKey[index]?.key;
+      const columnLabelFormat = columnLabelFormats[key];
+      return formatLabel(item, columnLabelFormat);
+    });
   });
+
+  return labels;
+
+  // return datasetOptions.datasets[0].label.map<string>((item) => {
+  //   return formatChartLabelDelimiter(item[0] as string, columnLabelFormats);
+  // });
 };

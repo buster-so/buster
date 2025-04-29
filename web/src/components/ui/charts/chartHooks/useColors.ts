@@ -18,8 +18,7 @@ export const useColors = ({
   const numberOfYAxisKeys = yAxisKeys.length;
   const numberOfY2AxisKeys = y2AxisKeys.length;
   const totalNumberOfKeys = numberOfYAxisKeys + numberOfY2AxisKeys;
-  const lastDatasetOption = datasetOptions[datasetOptions.length - 1];
-  const sourceLength = lastDatasetOption.source.length || 1;
+  const sourceLength = datasetOptions[0].data.length;
   const isScatter = selectedChartType === ChartType.Scatter;
 
   const colors: string[] = useMemo(() => {

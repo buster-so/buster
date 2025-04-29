@@ -14,7 +14,6 @@ export const BusterChartComponent: React.FC<BusterChartRenderComponentProps> = (
   trendlines,
   ...props
 }) => {
-  console.clear();
   const {
     barGroupType,
     columnMetadata,
@@ -23,6 +22,8 @@ export const BusterChartComponent: React.FC<BusterChartRenderComponentProps> = (
     selectedChartType,
     selectedAxis
   } = props;
+
+  console.log('raw data', dataProp, props.selectedAxis);
 
   const {
     datasetOptions,
@@ -83,8 +84,6 @@ export const BusterChartComponent: React.FC<BusterChartRenderComponentProps> = (
   );
 
   console.log('chartProps', chartProps);
-
-  return <div>NOT IN CHARTJS</div>;
 
   return <BusterChartJS {...chartProps} />;
 };

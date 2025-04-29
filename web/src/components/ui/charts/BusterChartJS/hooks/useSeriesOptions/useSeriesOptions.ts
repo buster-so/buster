@@ -5,7 +5,11 @@ import type {
   ChartType,
   ScatterAxis
 } from '@/api/asset_interfaces/metric/charts';
-import { DatasetOption, extractFieldsFromChain } from '../../../chartHooks';
+import {
+  DatasetOption,
+  DatasetOptionsWithTicks,
+  extractFieldsFromChain
+} from '../../../chartHooks';
 import { ChartProps } from '../../core';
 import type { ChartType as ChartJSChartType } from 'chart.js';
 import { useMemo } from 'react';
@@ -29,7 +33,7 @@ export interface UseSeriesOptionsProps {
   columnSettings: NonNullable<BusterChartConfigProps['columnSettings']>;
   columnLabelFormats: NonNullable<BusterChartConfigProps['columnLabelFormats']>;
   colors: string[];
-  datasetOptions: DatasetOption[];
+  datasetOptions: DatasetOptionsWithTicks;
   scatterDotSize: BusterChartProps['scatterDotSize'];
   columnMetadata: ColumnMetaData[];
   lineGroupType: BusterChartProps['lineGroupType'];
@@ -59,137 +63,62 @@ export const useSeriesOptions = ({
 }: UseSeriesOptionsProps): ChartProps<ChartJSChartType>['data'] => {
   const isScatter = selectedChartType === 'scatter';
 
-  const selectedDataset = useMemo(() => {
-    return datasetOptions[datasetOptions.length - 1];
-  }, [datasetOptions, selectedChartType]);
-
-  const allYAxisKeysIndexes = useMemo(() => {
-    return yAxisKeys
-      .map((key) => {
-        return {
-          name: key,
-          index: selectedDataset.dimensions.findIndex((dimension) => dimension === key)
-        };
-      })
-      .filter((item) => item.index !== -1);
-  }, [yAxisKeys.join(','), selectedDataset.dimensions]);
-
-  console.log('allYAxisKeysIndexes', allYAxisKeysIndexes, yAxisKeys);
-
-  const allY2AxisKeysIndexes = useMemo(() => {
-    return y2AxisKeys
-      .map((key) => {
-        return {
-          name: key,
-          index: selectedDataset.dimensions.findIndex((dimension) => dimension === key)
-        };
-      })
-      .filter((item) => item.index !== -1);
-  }, [y2AxisKeys.join(','), selectedDataset.dimensions]);
-
-  const sizeKeyIndex = useMemo(() => {
-    if (!sizeKey || sizeKey.length === 0) {
-      return null;
-    }
-    const size = sizeKey[0];
-    const index = selectedDataset.dimensions.findIndex((dimension) => {
-      const chain = extractFieldsFromChain(dimension);
-      return chain.some((item) => item.key === size);
-    });
-    if (index === -1) return null;
-
-    const assosciatedColumnMetadata = columnMetadata.find((item) => item.name === size);
-
-    if (!assosciatedColumnMetadata) {
-      console.warn(`Column metadata not found for size key: ${size}`);
-      return {
-        name: size,
-        index,
-        minValue: 0,
-        maxValue: 10
-      };
-    }
-
-    return {
-      name: size,
-      index,
-      minValue: assosciatedColumnMetadata.min_value as number,
-      maxValue: assosciatedColumnMetadata.max_value as number
-    };
-  }, [sizeKey?.join(','), selectedDataset.dimensions]);
-
   const labels: (string | Date)[] | undefined = useMemo(() => {
     return labelsBuilderRecord[selectedChartType]({
-      dataset: selectedDataset,
-      allYAxisKeysIndexes,
-      allY2AxisKeysIndexes,
+      datasetOptions,
       columnLabelFormats,
       xAxisKeys,
       sizeKey,
       columnSettings,
       trendlineSeries
     });
-  }, [
-    selectedDataset,
-    columnSettings,
-    allYAxisKeysIndexes,
-    columnLabelFormats,
-    xAxisKeys,
-    sizeKey
-  ]);
+  }, [datasetOptions, columnSettings, columnLabelFormats, xAxisKeys, sizeKey]);
+
+  const sizeOptions = useMemo(() => {
+    if (!sizeKey || sizeKey.length === 0) {
+      return null;
+    }
+
+    return null;
+  }, [sizeKey]);
 
   const datasetSeries: ChartProps<ChartJSChartType>['data']['datasets'] = useMemo(() => {
     return dataBuilderRecord[selectedChartType]({
-      selectedDataset,
-      allYAxisKeysIndexes,
-      allY2AxisKeysIndexes,
+      datasetOptions,
       columnSettings,
       colors,
-      barShowTotalAtTop,
       columnLabelFormats,
       xAxisKeys,
-      sizeKeyIndex,
       scatterDotSize,
+      sizeOptions,
       lineGroupType,
       categoryKeys,
       selectedChartType,
-      barGroupType
+      barGroupType,
+      barShowTotalAtTop,
+      yAxisKeys,
+      y2AxisKeys
     });
   }, [
-    selectedDataset,
-    allYAxisKeysIndexes,
-    allY2AxisKeysIndexes,
+    datasetOptions,
     columnSettings,
+    yAxisKeys,
+    y2AxisKeys,
     colors,
-    barShowTotalAtTop,
     columnLabelFormats,
     xAxisKeys,
-    sizeKeyIndex,
     scatterDotSize,
+    sizeOptions,
     lineGroupType,
     categoryKeys,
-    selectedChartType
+    selectedChartType,
+    barGroupType,
+    barShowTotalAtTop
   ]);
 
-  console.log('datasetSeries', datasetSeries);
-
-  const tooltipSeries: ChartProps<ChartJSChartType>['data']['datasets'] = useMemo(() => {
-    if (isScatter) {
-      return scatterTooltipSeriesBuilder({
-        datasetOptions,
-        tooltipKeys
-      });
-    }
-    const series = defaultTooltipSeriesBuilder({
-      datasetOptions,
-      tooltipKeys
-    });
-    return series;
-  }, [tooltipKeys, datasetOptions, isScatter]);
-
   const datasets: ChartProps<ChartJSChartType>['data']['datasets'] = useMemo(() => {
-    return [...datasetSeries, ...tooltipSeries, ...trendlineSeries];
-  }, [datasetSeries, tooltipSeries, trendlineSeries]);
+    return [...datasetSeries, ...trendlineSeries];
+  }, [datasetSeries, trendlineSeries]);
 
   return {
     labels,
@@ -198,15 +127,7 @@ export const useSeriesOptions = ({
 };
 
 export type LabelBuilderProps = {
-  dataset: DatasetOption;
-  allYAxisKeysIndexes: {
-    name: string;
-    index: number;
-  }[];
-  allY2AxisKeysIndexes: {
-    name: string;
-    index: number;
-  }[];
+  datasetOptions: DatasetOptionsWithTicks;
   columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>;
   xAxisKeys: ChartEncodes['x'];
   sizeKey: ScatterAxis['size'];

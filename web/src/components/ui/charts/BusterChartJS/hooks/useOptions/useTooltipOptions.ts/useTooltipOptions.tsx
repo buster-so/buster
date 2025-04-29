@@ -12,7 +12,7 @@ import { useMemoizedFn, useUnmount } from '@/hooks';
 import type { ChartJSOrUndefined } from '../../../core/types';
 import { renderToString } from 'react-dom/server';
 import { BusterChartJSTooltip } from './BusterChartJSTooltip';
-import { DatasetOption, extractFieldsFromChain } from '../../../../chartHooks';
+import { DatasetOptionsWithTicks, extractFieldsFromChain } from '../../../../chartHooks';
 import React from 'react';
 import { isNumericColumnType } from '@/lib/messages';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
@@ -28,7 +28,7 @@ interface UseTooltipOptionsProps {
   lineGroupType: BusterChartProps['lineGroupType'];
   pieDisplayLabelAs: BusterChartProps['pieDisplayLabelAs'];
   selectedAxis: ChartEncodes;
-  datasetOptions: DatasetOption[];
+  datasetOptions: DatasetOptionsWithTicks;
   hasMismatchedTooltipsAndMeasures: boolean;
   disableTooltip: boolean;
   colors: string[];
@@ -71,10 +71,6 @@ export const useTooltipOptions = ({
 
     return 'index';
   }, [selectedChartType]);
-
-  const selectedDataset = useMemo(() => {
-    return datasetOptions[datasetOptions.length - 1];
-  }, [datasetOptions, tooltipKeys]);
 
   const { hasCategoryAxis, hasMultipleMeasures } = useMemo(() => {
     const categoryAxis = (selectedAxis as ComboChartAxis).category;
@@ -156,7 +152,7 @@ export const useTooltipOptions = ({
 
   useEffect(() => {
     tooltipCache.current = {};
-  }, [selectedDataset, disableTooltip]);
+  }, [selectedAxis, selectedChartType, disableTooltip]);
 
   useUnmount(() => {
     const tooltipEl = document.getElementById('buster-chartjs-tooltip');

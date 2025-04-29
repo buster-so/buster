@@ -13,7 +13,7 @@ import { makeHumanReadble } from './text';
 const DEFAULT_DATE_FORMAT = 'll';
 
 export const formatLabel = (
-  textProp: string | number | Date | null | undefined,
+  textProp: string | number | Date | null | undefined | boolean,
   props: ColumnLabelFormat = DEFAULT_COLUMN_LABEL_FORMAT,
   useKeyFormatter: boolean = false
 ): string => {
@@ -62,7 +62,7 @@ export const formatLabel = (
       formattedText = String(replaceMissingDataWith);
     } else formattedText = String('null');
   } else if (style === 'date' && !useKeyFormatter) {
-    formattedText = formatLabelDate(text, {
+    formattedText = formatLabelDate(text as string | number | Date, {
       dateFormat,
       convertNumberTo,
       isUTC,
