@@ -29,8 +29,6 @@ describe('createDatasetsFromAggregates', () => {
       columnLabelFormats
     );
 
-    console.log(result.datasets[0]);
-
     // Verify the structure and content of the result
     expect(result.datasets).toHaveLength(4); // One dataset for 'sales'
     expect(result.datasets[0].data).toHaveLength(1); // One value per unique x-axis combination
@@ -111,7 +109,6 @@ describe('createDatasetsFromAggregates', () => {
       {},
       true // scatter plot mode
     );
-    console.log(result.datasets[0]);
 
     expect(result.datasets.length).toEqual(1);
 
@@ -274,8 +271,6 @@ describe('createDatasetsFromAggregates', () => {
       {}
     );
 
-    console.log(result.datasets[0]);
-
     expect(result.datasets).toHaveLength(2);
     expect(result.datasets[0].data).toEqual([1000, 1200]);
     expect(result.datasets[0].label).toEqual([
@@ -408,11 +403,6 @@ describe('createDatasetsFromAggregates', () => {
       true // scatter plot mode
     );
 
-    console.log(
-      'Default tooltip data:',
-      JSON.stringify(resultWithoutTooltips.datasets[0].tooltipData)
-    );
-
     const result = createDatasetsFromAggregates(
       testData,
       {
@@ -424,13 +414,10 @@ describe('createDatasetsFromAggregates', () => {
       true // scatter plot mode
     );
 
-    console.log('Custom tooltip data:', JSON.stringify(result.datasets[0].tooltipData));
-
     expect(result.datasets).toHaveLength(1);
     expect(result.datasets[0].data).toEqual([100, 150]);
 
     // For now, test that tooltipData exists and has the right structure
-    // We'll print the actual content to console to analyze
     expect(result.datasets[0].tooltipData).toBeDefined();
     expect(result.datasets[0].tooltipData.length).toBe(2);
   });
@@ -763,7 +750,7 @@ describe('createDatasetsFromAggregates', () => {
 
     // Date objects should be converted to strings in tooltip data
     expect(result.datasets[0].tooltipData[0][0].key).toBe('date');
-    console.log(result.datasets[0].tooltipData[0]);
+
     // We're just checking the type conversion occurred, not the exact format
     expect(typeof result.datasets[0].tooltipData[0][0].value).toBe('string');
   });
@@ -837,7 +824,7 @@ describe('createDatasetsFromAggregates', () => {
       },
       metric2: {
         ...DEFAULT_COLUMN_LABEL_FORMAT,
-        replaceMissingDataWith: 0 as 0 // Using 0 which is allowed
+        replaceMissingDataWith: 0 as any // Using any to avoid type issues
       }
     };
 
@@ -859,8 +846,406 @@ describe('createDatasetsFromAggregates', () => {
     expect(result.datasets[1].data).toEqual([100, 0]);
 
     // Check tooltip data includes replaced values
-    console.log(result.datasets[0].tooltipData);
     expect(result.datasets[0].tooltipData[0][1].value).toBe('custom1');
     expect(result.datasets[1].tooltipData[1][1].value).toBe(0);
+  });
+
+  it('should handle mixed data types in scatter plot categories correctly', () => {
+    const testData = [
+      { x: 1, y: 100, group: true },
+      { x: 2, y: 150, group: true },
+      { x: 1, y: 80, group: false },
+      { x: 2, y: 120, group: false }
+    ];
+
+    const result = createDatasetsFromAggregates(
+      testData,
+      {
+        x: ['x'],
+        y: ['y'],
+        category: ['group']
+      },
+      {},
+      true // scatter plot mode
+    );
+
+    expect(result.datasets).toHaveLength(2); // One dataset per boolean category value
+
+    // Check that boolean categories are correctly handled
+    expect(result.datasets[0].data).toEqual([100, 150]); // group: true
+    expect(result.datasets[1].data).toEqual([80, 120]); // group: false
+
+    // Check that labels are correctly created
+    expect(result.datasets[0].label[0][0]).toEqual({ key: 'x', value: 1 });
+    expect(result.datasets[1].label[0][0]).toEqual({ key: 'x', value: 1 });
+  });
+
+  it('should handle zero values differently from null/missing values', () => {
+    const testData = [
+      { id: 1, value: 0 },
+      { id: 2, value: null },
+      { id: 3, value: 50 }
+    ];
+
+    const columnLabelFormats = {
+      value: {
+        ...DEFAULT_COLUMN_LABEL_FORMAT,
+        replaceMissingDataWith: -1 as any // Using any to avoid type issues
+      }
+    };
+
+    const result = createDatasetsFromAggregates(
+      testData,
+      {
+        x: ['id'],
+        y: ['value']
+      },
+      columnLabelFormats,
+      true // scatter plot mode
+    );
+
+    expect(result.datasets).toHaveLength(1);
+
+    // Zero should be preserved as 0, not treated as missing
+    expect(result.datasets[0].data[0]).toBe(0);
+
+    // Null should be replaced with the specified replacement value
+    expect(result.datasets[0].data[1]).toBe(-1);
+
+    // Regular value should be unchanged
+    expect(result.datasets[0].data[2]).toBe(50);
+
+    // Check tooltip data reflects this behavior
+    expect(result.datasets[0].tooltipData[0][1].value).toBe(0);
+    expect(result.datasets[0].tooltipData[1][1].value).toBe(-1);
+  });
+
+  it('should prioritize tooltip fields in the specified order even when fields are missing', () => {
+    const testData = [
+      { id: 1, primary: 100, secondary: 20, note: 'first' },
+      { id: 2, primary: 150, secondary: null, extra: 'metadata' }
+    ];
+
+    const result = createDatasetsFromAggregates(
+      testData,
+      {
+        x: ['id'],
+        y: ['primary'],
+        tooltips: ['note', 'secondary', 'extra', 'primary']
+      },
+      {},
+      true // scatter plot mode
+    );
+
+    expect(result.datasets).toHaveLength(1);
+
+    // First data point should have properly ordered tooltips with all specified fields
+    expect(result.datasets[0].tooltipData[0]).toEqual([
+      { key: 'note', value: 'first' },
+      { key: 'secondary', value: 20 },
+      { key: 'extra', value: '' }, // Missing in the first object
+      { key: 'primary', value: 100 }
+    ]);
+
+    // Second data point should have properly ordered tooltips with missing fields as empty string
+    expect(result.datasets[0].tooltipData[1]).toEqual([
+      { key: 'note', value: '' }, // Missing in the second object
+      { key: 'secondary', value: '' }, // Null value in the second object
+      { key: 'extra', value: 'metadata' },
+      { key: 'primary', value: 150 }
+    ]);
+  });
+
+  it('should handle large datasets (5000 points) efficiently in scatter plot mode', () => {
+    // Generate 5000 data points
+    const testData = Array.from({ length: 5000 }, (_, i) => ({
+      x: i % 100, // Creates cycle of x values
+      y: Math.sin(i * 0.01) * 100 + 100, // Sine wave pattern
+      category: i % 5 // 5 different categories
+    }));
+
+    const start = performance.now();
+
+    const result = createDatasetsFromAggregates(
+      testData,
+      {
+        x: ['x'],
+        y: ['y'],
+        category: ['category']
+      },
+      {},
+      true // scatter plot mode
+    );
+
+    const end = performance.now();
+
+    // Should create 5 datasets (one per category)
+    expect(result.datasets).toHaveLength(5);
+
+    // Each dataset should have 1000 points
+    expect(result.datasets[0].data.length).toBe(1000);
+
+    // Check a few data points to ensure correctness
+    expect(result.datasets[0].data[0]).toBeCloseTo(100, 0); // First point in category 0
+    expect(result.datasets[1].data[0]).toBeCloseTo(testData[1].y, 0); // First point in category 1
+
+    expect(result.datasets[0].tooltipData.length).toBe(1000);
+  });
+
+  it('should efficiently aggregate large datasets (5000 points) with multiple metrics', () => {
+    // Generate 5000 data points with multiple metrics
+    const testData = Array.from({ length: 5000 }, (_, i) => ({
+      date: `2023-${Math.floor(i / 500) + 1}-${(i % 500) + 1}`, // Spread across months
+      sales: Math.random() * 1000,
+      profit: Math.random() * 200,
+      units: Math.floor(Math.random() * 50)
+    }));
+
+    const start = performance.now();
+
+    const result = createDatasetsFromAggregates(
+      testData,
+      {
+        x: ['date'],
+        y: ['sales', 'profit', 'units']
+      },
+      {}
+    );
+
+    const end = performance.now();
+
+    // Each unique date should become a dataset for each metric
+    // We have maximum of 12 months × 500 days = 6000 potential dates
+    // But with 5000 records, we'll have fewer unique dates
+
+    // Check that we have the right number of datasets (one per unique date × metrics)
+    expect(result.datasets.length).toBeGreaterThan(0);
+
+    // Verify that data is aggregated correctly (each dataset has a single data point)
+    expect(result.datasets[0].data.length).toBe(1);
+
+    // Check that tooltips are properly generated
+    expect(result.datasets[0].tooltipData.length).toBe(1);
+  });
+
+  it('should handle large datasets (5000 points) with missing values efficiently', () => {
+    // Generate 5000 data points with some missing values
+    const testData = Array.from({ length: 5000 }, (_, i) => {
+      // Every 3rd point has null revenue, every 5th has null cost
+      return {
+        id: i,
+        revenue: i % 3 === 0 ? null : Math.random() * 10000,
+        cost: i % 5 === 0 ? null : Math.random() * 5000,
+        timestamp: new Date(2023, 0, 1, Math.floor(i / 60), i % 60).toISOString()
+      };
+    });
+
+    const columnLabelFormats = {
+      revenue: {
+        ...DEFAULT_COLUMN_LABEL_FORMAT,
+        replaceMissingDataWith: 0 as any
+      },
+      cost: {
+        ...DEFAULT_COLUMN_LABEL_FORMAT,
+        replaceMissingDataWith: 'N/A' as any
+      }
+    };
+
+    const start = performance.now();
+
+    const result = createDatasetsFromAggregates(
+      testData,
+      {
+        x: ['id'],
+        y: ['revenue', 'cost'],
+        tooltips: ['timestamp', 'revenue', 'cost']
+      },
+      columnLabelFormats,
+      true // scatter plot mode
+    );
+
+    const end = performance.now();
+
+    // Should create 2 datasets (one per metric)
+    expect(result.datasets).toHaveLength(2);
+
+    // Each dataset should have 5000 points
+    expect(result.datasets[0].data.length).toBe(5000);
+    expect(result.datasets[1].data.length).toBe(5000);
+
+    // Check that missing values are replaced correctly
+    // For revenue (every 3rd point should be 0)
+    expect(result.datasets[0].data[0]).toBe(0); // First point (id 0) is null for revenue
+    expect(result.datasets[0].data[1]).not.toBe(0); // Second point (id 1) has a value
+    expect(result.datasets[0].data[3]).toBe(0); // Fourth point (id 3) is null for revenue
+
+    // For cost (every 5th point should be NaN since 'N/A' is a string)
+    expect(Number.isNaN(result.datasets[1].data[0])).toBe(true); // First point (id 0) is null for cost
+    expect(Number.isNaN(result.datasets[1].data[5])).toBe(true); // Sixth point (id 5) is null for cost
+
+    // Checking the exact index where we know we have missing values
+    // The tooltips include timestamp, revenue, and cost in that order
+    expect(result.datasets[0].tooltipData[0][1].value).toBe(0); // revenue tooltip for id 0
+
+    // For tooltip array with timestamp, revenue, and cost
+    // Check a different tooltip index (id 5) where we know cost is missing
+    // Index 5 has null cost, and we should see our 'N/A' value there
+    expect(result.datasets[1].tooltipData[5][2].value).toBe('N/A');
+  });
+
+  it('should handle nested categories with multiple metrics and missing data', () => {
+    const testData = [
+      { region: 'North', product: 'A', channel: 'Online', sales: 100, profit: null },
+      { region: 'North', product: 'A', channel: 'Store', sales: null, profit: 30 },
+      { region: 'South', product: 'B', channel: 'Online', sales: 200, profit: 40 },
+      { region: 'South', product: 'B', channel: 'Store', sales: 250, profit: null }
+    ];
+
+    const columnLabelFormats = {
+      sales: {
+        ...DEFAULT_COLUMN_LABEL_FORMAT,
+        replaceMissingDataWith: 'No Data' as any
+      },
+      profit: {
+        ...DEFAULT_COLUMN_LABEL_FORMAT,
+        replaceMissingDataWith: 0 as any
+      }
+    };
+
+    const result = createDatasetsFromAggregates(
+      testData,
+      {
+        x: ['region'],
+        y: ['sales', 'profit'],
+        category: ['product', 'channel'],
+        tooltips: ['region', 'product', 'channel', 'sales', 'profit']
+      },
+      columnLabelFormats
+    );
+
+    // Should create datasets for each combination of:
+    // - metrics (sales, profit)
+    // - product (A, B)
+    // - channel (Online, Store)
+    expect(result.datasets.length).toBe(8); // 2 metrics × 2 products × 2 channels
+
+    // Check that missing values are handled correctly in tooltips
+    const salesDataset = result.datasets.find((d) => d.dataKey === 'sales');
+    const profitDataset = result.datasets.find((d) => d.dataKey === 'profit');
+
+    expect(salesDataset).toBeDefined();
+    expect(profitDataset).toBeDefined();
+
+    // Verify tooltips contain all specified fields in correct order
+    expect(salesDataset!.tooltipData[0].map((t) => t.key)).toEqual([
+      'region',
+      'product',
+      'channel',
+      'sales',
+      'profit'
+    ]);
+  });
+
+  it('should handle special characters and unicode in category values', () => {
+    const testData = [
+      { category: '🚀', value: 100 },
+      { category: '&%$#@', value: 200 },
+      { category: 'normal', value: 300 },
+      { category: '中文', value: 400 }
+    ];
+
+    const result = createDatasetsFromAggregates(
+      testData,
+      {
+        x: ['category'],
+        y: ['value']
+      },
+      {}
+    );
+
+    expect(result.datasets).toHaveLength(4);
+
+    // Check that special characters are preserved in labels
+    const labels = result.datasets.map((d) => d.label[0][0].value);
+    expect(labels).toContain('🚀');
+    expect(labels).toContain('&%$#@');
+    expect(labels).toContain('normal');
+    expect(labels).toContain('中文');
+
+    // Check that data values are correctly associated
+    const emojiDataset = result.datasets.find((d) => d.label[0][0].value === '🚀');
+    expect(emojiDataset?.data[0]).toBe(100);
+
+    const unicodeDataset = result.datasets.find((d) => d.label[0][0].value === '中文');
+    expect(unicodeDataset?.data[0]).toBe(400);
+  });
+
+  it('should handle repeated values in category combinations', () => {
+    const testData = [
+      { region: 'North', type: 'A', subtype: 'A', value: 100 }, // Note: type and subtype are same
+      { region: 'North', type: 'B', subtype: 'B', value: 200 },
+      { region: 'South', type: 'A', subtype: 'B', value: 300 },
+      { region: 'South', type: 'B', subtype: 'A', value: 400 }
+    ];
+
+    const result = createDatasetsFromAggregates(
+      testData,
+      {
+        x: ['region'],
+        y: ['value'],
+        category: ['type', 'subtype']
+      },
+      {}
+    );
+
+    // Should create a dataset for each unique combination of type and subtype
+    expect(result.datasets).toHaveLength(4);
+
+    console.log(result.datasets[0].tooltipData);
+
+    expect(result.datasets[0].label[0]).toEqual([{ key: 'region', value: 'North' }]);
+    expect(result.datasets[0].label[1]).toEqual([{ key: 'region', value: 'South' }]);
+    expect(result.datasets[1].label[0]).toEqual([{ key: 'region', value: 'North' }]);
+
+    expect(result.datasets[0].tooltipData[0]).toEqual([{ key: 'value', value: 100 }]);
+  });
+
+  it('should handle floating point precision in aggregations', () => {
+    const testData = [
+      { group: 'A', value: 0.1 },
+      { group: 'A', value: 0.2 },
+      { group: 'B', value: 1 / 3 }, // Repeating decimal
+      { group: 'B', value: 2 / 3 }, // Repeating decimal
+      { group: 'C', value: 0.1 + 0.2 }, // JavaScript floating point quirk
+      { group: 'C', value: 0.3 } // Direct value for comparison
+    ];
+
+    const result = createDatasetsFromAggregates(
+      testData,
+      {
+        x: ['group'],
+        y: ['value']
+      },
+      {}
+    );
+
+    expect(result.datasets).toHaveLength(3);
+
+    // Group A: 0.1 + 0.2 = 0.3
+    expect(result.datasets[0].data[0]).toBeCloseTo(0.3, 10);
+
+    // Group B: 1/3 + 2/3 = 1
+    expect(result.datasets[1].data[0]).toBeCloseTo(1, 10);
+
+    // Group C: (0.1 + 0.2) + 0.3 = 0.6
+    expect(result.datasets[2].data[0]).toBeCloseTo(0.6, 10);
+
+    // Verify that tooltips also maintain precision
+    result.datasets.forEach((dataset) => {
+      const value = dataset.data[0];
+      const tooltipValue = dataset.tooltipData[0][0].value;
+      expect(typeof tooltipValue).toBe('number');
+      expect(tooltipValue).toBeCloseTo(value!, 10);
+    });
   });
 });
