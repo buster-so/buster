@@ -1,4 +1,4 @@
-export const DOWNSIZE_SAMPLE_THRESHOLD = 1000;
+export const DOWNSIZE_SAMPLE_THRESHOLD = 5000;
 export const LINE_DECIMATION_THRESHOLD = 300;
 export const LINE_DECIMATION_SAMPLES = 450;
 export const LEGEND_ANIMATION_THRESHOLD = 200; //we use this when there is a large dataset and need to show a loading animation

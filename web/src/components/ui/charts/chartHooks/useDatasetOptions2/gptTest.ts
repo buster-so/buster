@@ -160,86 +160,148 @@ export function createDatasetsFromAggregates<T extends Record<string, any>>(
       });
     });
   } else {
-    // NON-SCATTER: series = Cartesian product of seriesMeta × dimCombos
-    seriesMeta.forEach(({ key: metric, axisType }) => {
-      const fmt = columnLabelFormats[metric] || {};
-      const missing = fmt.replaceMissingDataWith ?? 0;
+    // NON-SCATTER: If we have categories, create a dataset per category
+    if (catKeys.length > 0) {
+      const categoryValues = buildCombos(catKeys);
 
-      dimCombos.forEach((comboRec) => {
-        // Filter rows matching this combo
-        const rows = data.filter(
-          (r) =>
-            groupKeysSet.map((k) => String(r[k])).join('|') ===
-            groupKeysSet.map((k) => comboRec[k]).join('|')
-        );
+      seriesMeta.forEach(({ key: metric, axisType }) => {
+        const fmt = columnLabelFormats[metric] || {};
+        const missing = fmt.replaceMissingDataWith ?? 0;
 
-        // Sum values
-        let sum = 0,
-          sawNull = false;
-        rows.forEach((r) => {
-          const raw = r[metric],
-            n = Number(raw);
-          if (raw == null || raw === '' || Number.isNaN(n)) {
-            if (missing === null) sawNull = true;
-            else sum += Number(missing);
-          } else sum += n;
-        });
-        const value = sawNull ? null : sum;
+        // Create a dataset for each category value
+        categoryValues.forEach((catValue) => {
+          // Get all rows for this category
+          const categoryRows = data.filter(
+            (r) =>
+              catKeys.map((k) => String(r[k])).join('|') ===
+              catKeys.map((k) => catValue[k]).join('|')
+          );
 
-        // Build label/tooltip for this single point
-        const labelKV: KV[] = groupKeysSet.map((k) => ({
-          key: k,
-          value: comboRec[k]
-        }));
-        const labelArr = [labelKV];
+          // Get unique x-axis values
+          const xAxisValues = buildCombos(xKeys);
 
-        const tooltipKV: KV[] = [];
-        if (tooltipKeys) {
-          // pick from first row of this group
-          const first = rows[0] || ({} as any);
-          tooltipKeys.forEach((k) => {
-            const raw = first[k],
-              num = Number(raw);
-            tooltipKV.push({
-              key: k,
-              value: raw == null || raw === '' || Number.isNaN(num) ? '' : num
+          // Build data points for each x-axis value
+          const dataPoints = xAxisValues.map((xValue) => {
+            const rows = categoryRows.filter(
+              (r) =>
+                xKeys.map((k) => String(r[k])).join('|') === xKeys.map((k) => xValue[k]).join('|')
+            );
+
+            // Sum values for this x-axis point
+            let sum = 0,
+              sawNull = false;
+            rows.forEach((r) => {
+              const raw = r[metric],
+                n = Number(raw);
+              if (raw == null || raw === '' || Number.isNaN(n)) {
+                if (missing === null) sawNull = true;
+                else sum += Number(missing);
+              } else sum += n;
             });
+            return sawNull ? null : sum;
           });
-        } else {
-          tooltipKV.push({
-            key: metric,
-            value: value === null ? '' : value
+
+          // Build labels for x-axis points
+          const labelArr = xAxisValues.map((xValue) =>
+            xKeys.map((k) => ({
+              key: k,
+              value: xValue[k]
+            }))
+          );
+
+          // Build tooltip data
+          const tooltipArr = dataPoints.map((value) => {
+            const tooltipKV: KV[] = [];
+            if (tooltipKeys) {
+              tooltipKeys.forEach((k) => {
+                const raw = categoryRows[0]?.[k],
+                  num = Number(raw);
+                tooltipKV.push({
+                  key: k,
+                  value: raw == null || raw === '' || Number.isNaN(num) ? '' : num
+                });
+              });
+            } else {
+              tooltipKV.push({
+                key: metric,
+                value: value === null ? '' : value
+              });
+            }
+            return tooltipKV;
           });
-        }
-        const tooltipArr = [tooltipKV];
 
-        let sizeArr: (number | null)[] | undefined;
-        if (sizeKeys.length) {
-          const szKey = sizeKeys[0];
-          const first = rows[0] || ({} as any);
-          const raw = first[szKey],
-            n = Number(raw);
-          const szFmt = columnLabelFormats[szKey] || {};
-          const szMiss = szFmt.replaceMissingDataWith ?? 0;
-          const v =
-            raw == null || raw === '' || Number.isNaN(n)
-              ? szMiss === null
-                ? null
-                : Number(szMiss)
-              : n;
-          sizeArr = [v];
-        }
-
-        datasets.push({
-          label: labelArr,
-          data: [value],
-          dataKey: metric,
-          axisType,
-          tooltipData: tooltipArr,
-          ...(sizeArr && { sizeData: sizeArr })
+          datasets.push({
+            label: labelArr,
+            data: dataPoints,
+            dataKey: metric,
+            axisType,
+            tooltipData: tooltipArr
+          });
         });
       });
-    });
+    } else {
+      // Original logic for when there are no categories
+      seriesMeta.forEach(({ key: metric, axisType }) => {
+        const fmt = columnLabelFormats[metric] || {};
+        const missing = fmt.replaceMissingDataWith ?? 0;
+
+        dimCombos.forEach((comboRec) => {
+          // Filter rows matching this combo
+          const rows = data.filter(
+            (r) =>
+              xKeys.map((k) => String(r[k])).join('|') === xKeys.map((k) => comboRec[k]).join('|')
+          );
+
+          // Sum values
+          let sum = 0,
+            sawNull = false;
+          rows.forEach((r) => {
+            const raw = r[metric],
+              n = Number(raw);
+            if (raw == null || raw === '' || Number.isNaN(n)) {
+              if (missing === null) sawNull = true;
+              else sum += Number(missing);
+            } else sum += n;
+          });
+          const value = sawNull ? null : sum;
+
+          // Build label/tooltip for this single point
+          const labelKV: KV[] = xKeys.map((k) => ({
+            key: k,
+            value: comboRec[k]
+          }));
+          const labelArr = [labelKV];
+
+          const tooltipKV: KV[] = [];
+          if (tooltipKeys) {
+            // pick from first row of this group
+            const first = rows[0] || ({} as any);
+            tooltipKeys.forEach((k) => {
+              const raw = first[k],
+                num = Number(raw);
+              tooltipKV.push({
+                key: k,
+                value: raw == null || raw === '' || Number.isNaN(num) ? '' : num
+              });
+            });
+          } else {
+            tooltipKV.push({
+              key: metric,
+              value: value === null ? '' : value
+            });
+          }
+          const tooltipArr = [tooltipKV];
+
+          datasets.push({
+            label: labelArr,
+            data: [value],
+            dataKey: metric,
+            axisType,
+            tooltipData: tooltipArr
+          });
+        });
+      });
+    }
   }
 
   return { datasets };

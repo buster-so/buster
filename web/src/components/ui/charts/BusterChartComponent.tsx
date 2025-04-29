@@ -14,6 +14,7 @@ export const BusterChartComponent: React.FC<BusterChartRenderComponentProps> = (
   trendlines,
   ...props
 }) => {
+  console.clear();
   const {
     barGroupType,
     columnMetadata,
@@ -45,6 +46,17 @@ export const BusterChartComponent: React.FC<BusterChartRenderComponentProps> = (
     columnMetadata
   });
 
+  console.log('datasetOptions', datasetOptions);
+
+  console.log('others', {
+    tooltipKeys,
+    yAxisKeys,
+    y2AxisKeys,
+    dataTrendlineOptions,
+    hasMismatchedTooltipsAndMeasures,
+    isDownsampled
+  });
+
   const chartProps: BusterChartComponentProps = useMemo(
     () => ({
       ...props,
@@ -69,6 +81,8 @@ export const BusterChartComponent: React.FC<BusterChartRenderComponentProps> = (
       isDownsampled
     ]
   );
+
+  console.log('chartProps', chartProps);
 
   return <BusterChartJS {...chartProps} />;
 };

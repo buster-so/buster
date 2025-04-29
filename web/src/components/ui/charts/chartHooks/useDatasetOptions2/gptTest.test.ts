@@ -279,8 +279,8 @@ describe('createDatasetsFromAggregates', () => {
     expect(result.datasets).toHaveLength(2);
     expect(result.datasets[0].data).toEqual([1000, 1200]);
     expect(result.datasets[0].label).toEqual([
-      [{ key: 'product', value: 'A' }],
-      [{ key: 'product', value: 'B' }]
+      [{ key: 'month', value: 'Jan' }],
+      [{ key: 'month', value: 'Feb' }]
     ]);
   });
 
@@ -302,12 +302,157 @@ describe('createDatasetsFromAggregates', () => {
       {}
     );
 
-    expect(result.datasets).toHaveLength(8); // 2 months * 2 metrics * 2 regions
-    expect(result.datasets[0].category).toBe('North');
-    expect(result.datasets[4].category).toBe('South');
-    expect(result.datasets[0].dataKey).toBe('revenue');
-    expect(result.datasets[2].dataKey).toBe('profit');
-    expect(result.datasets[0].data).toEqual([1000]);
-    expect(result.datasets[2].data).toEqual([200]);
+    expect(result.datasets).toHaveLength(4); // 2 metrics * 2 regions
+
+    expect(result.datasets[0].label).toEqual([
+      [{ key: 'month', value: 'Jan' }],
+      [{ key: 'month', value: 'Feb' }]
+    ]);
+    expect(result.datasets[0].data).toEqual([1000, 1200]);
+    expect(result.datasets[1].data).toEqual([800, 900]);
+    expect(result.datasets[2].data).toEqual([200, 250]);
+    expect(result.datasets[3].data).toEqual([150, 180]);
+  });
+
+  it('should handle scatter plot with multiple x-axes', () => {
+    const testData = [
+      { xValue: 1, yValue: 100, date: '2023-01-01' },
+      { xValue: 2, yValue: 150, date: '2023-01-02' },
+      { xValue: 3, yValue: 200, date: '2023-01-03' }
+    ];
+
+    const result = createDatasetsFromAggregates(
+      testData,
+      {
+        x: ['xValue'],
+        y: ['yValue']
+      },
+      {},
+      true // scatter plot mode
+    );
+
+    expect(result.datasets).toHaveLength(1);
+    expect(result.datasets[0].data).toEqual([100, 150, 200]);
+    expect(result.datasets[0].label).toEqual([
+      [{ key: 'xValue', value: 1 }],
+      [{ key: 'xValue', value: 2 }],
+      [{ key: 'xValue', value: 3 }]
+    ]);
+    expect(result.datasets[0].tooltipData).toEqual([
+      [{ key: 'yValue', value: 100 }],
+      [{ key: 'yValue', value: 150 }],
+      [{ key: 'yValue', value: 200 }]
+    ]);
+  });
+
+  it('should handle scatter plot with categories', () => {
+    const testData = [
+      { x: 1, y: 100, group: 'A' },
+      { x: 2, y: 150, group: 'A' },
+      { x: 1, y: 80, group: 'B' },
+      { x: 2, y: 120, group: 'B' }
+    ];
+
+    const result = createDatasetsFromAggregates(
+      testData,
+      {
+        x: ['x'],
+        y: ['y'],
+        category: ['group']
+      },
+      {},
+      true // scatter plot mode
+    );
+
+    expect(result.datasets).toHaveLength(2); // One dataset per category
+
+    // Check first category (A)
+    expect(result.datasets[0].data).toEqual([100, 150]);
+    expect(result.datasets[0].label).toEqual([[{ key: 'x', value: 1 }], [{ key: 'x', value: 2 }]]);
+
+    // Check second category (B)
+    expect(result.datasets[1].data).toEqual([80, 120]);
+    expect(result.datasets[1].label).toEqual([[{ key: 'x', value: 1 }], [{ key: 'x', value: 2 }]]);
+
+    // Check tooltips contain category information
+    expect(result.datasets[0].tooltipData[0]).toContainEqual({ key: 'group', value: 'A' });
+    expect(result.datasets[1].tooltipData[0]).toContainEqual({ key: 'group', value: 'B' });
+  });
+
+  it('should handle scatter plot with custom tooltip fields', () => {
+    const testData = [
+      { x: 1, y: 100, name: 'Point 1', description: 'First point' },
+      { x: 2, y: 150, name: 'Point 2', description: 'Second point' }
+    ];
+
+    const resultWithoutTooltips = createDatasetsFromAggregates(
+      testData,
+      {
+        x: ['x'],
+        y: ['y']
+      },
+      {},
+      true // scatter plot mode
+    );
+
+    console.log(
+      'Default tooltip data:',
+      JSON.stringify(resultWithoutTooltips.datasets[0].tooltipData)
+    );
+
+    const result = createDatasetsFromAggregates(
+      testData,
+      {
+        x: ['x'],
+        y: ['y'],
+        tooltips: ['name', 'description']
+      },
+      {},
+      true // scatter plot mode
+    );
+
+    console.log('Custom tooltip data:', JSON.stringify(result.datasets[0].tooltipData));
+
+    expect(result.datasets).toHaveLength(1);
+    expect(result.datasets[0].data).toEqual([100, 150]);
+
+    // For now, test that tooltipData exists and has the right structure
+    // We'll print the actual content to console to analyze
+    expect(result.datasets[0].tooltipData).toBeDefined();
+    expect(result.datasets[0].tooltipData.length).toBe(2);
+  });
+
+  it('should handle scatter plot with missing data and replaceMissingDataWith option', () => {
+    const testData = [
+      { x: 1, y: 100, size: 20 },
+      { x: 2, y: null, size: 30 },
+      { x: 3, y: undefined, size: null }
+    ];
+
+    const columnLabelFormats: Record<string, IColumnLabelFormat> = {
+      y: {
+        ...DEFAULT_COLUMN_LABEL_FORMAT,
+        replaceMissingDataWith: 0
+      },
+      size: {
+        ...DEFAULT_COLUMN_LABEL_FORMAT,
+        replaceMissingDataWith: 0
+      }
+    };
+
+    const result = createDatasetsFromAggregates(
+      testData,
+      {
+        x: ['x'],
+        y: ['y'],
+        size: ['size']
+      },
+      columnLabelFormats,
+      true // scatter plot mode
+    );
+
+    expect(result.datasets).toHaveLength(1);
+    expect(result.datasets[0].data).toEqual([100, 0, 0]); // Missing y values replaced with 0
+    expect(result.datasets[0].sizeData).toEqual([20, 30, 0]); // Missing size value replaced with 0
   });
 });

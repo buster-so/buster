@@ -9046,3 +9046,25069 @@ export const scatterConfig_problematic1 = {
     tooltip: ['merchant', 'eligible_orders', 'attach_rate']
   }
 };
+
+export const scatterData_problematic2 = {
+  metric_id: '885623d1-ca04-5c16-8949-193d4b68c6a3',
+  data: [
+    {
+      customer_name: 'Aaron Adams',
+      num_orders: 1,
+      lifetime_value: 2381.94
+    },
+    {
+      customer_name: 'Aaron Allen',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Aaron Baker',
+      num_orders: 1,
+      lifetime_value: 15.23
+    },
+    {
+      customer_name: 'Aaron Campbell',
+      num_orders: 2,
+      lifetime_value: 102.57
+    },
+    {
+      customer_name: 'Aaron Carter',
+      num_orders: 2,
+      lifetime_value: 2959.0025
+    },
+    {
+      customer_name: 'Aaron Collins',
+      num_orders: 4,
+      lifetime_value: 196.4
+    },
+    {
+      customer_name: 'Aaron Edwards',
+      num_orders: 3,
+      lifetime_value: 6904.6025
+    },
+    {
+      customer_name: 'Aaron Evans',
+      num_orders: 3,
+      lifetime_value: 7029.0725
+    },
+    {
+      customer_name: 'Aaron Gonzalez',
+      num_orders: 2,
+      lifetime_value: 3021.0425
+    },
+    {
+      customer_name: 'Aaron Green',
+      num_orders: 1,
+      lifetime_value: 64.47
+    },
+    {
+      customer_name: 'Aaron Hall',
+      num_orders: 1,
+      lifetime_value: 2297.28
+    },
+    {
+      customer_name: 'Aaron Hernandez',
+      num_orders: 2,
+      lifetime_value: 123.96
+    },
+    {
+      customer_name: 'Aaron Hill',
+      num_orders: 2,
+      lifetime_value: 4377.75
+    },
+    {
+      customer_name: 'Aaron King',
+      num_orders: 2,
+      lifetime_value: 2769.3975
+    },
+    {
+      customer_name: 'Aaron McDonald',
+      num_orders: 1,
+      lifetime_value: 1764.96
+    },
+    {
+      customer_name: 'Aaron Mitchell',
+      num_orders: 2,
+      lifetime_value: 3258.79
+    },
+    {
+      customer_name: 'Aaron Nelson',
+      num_orders: 1,
+      lifetime_value: 2294.99
+    },
+    {
+      customer_name: 'Aaron Perez',
+      num_orders: 1,
+      lifetime_value: 89.95
+    },
+    {
+      customer_name: 'Aaron Phillips',
+      num_orders: 3,
+      lifetime_value: 212.01
+    },
+    {
+      customer_name: 'Aaron Roberts',
+      num_orders: 2,
+      lifetime_value: 3117.96
+    },
+    {
+      customer_name: 'Aaron Scott',
+      num_orders: 2,
+      lifetime_value: 137.96
+    },
+    {
+      customer_name: 'Aaron Wright',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Aaron Young',
+      num_orders: 1,
+      lifetime_value: 59.98
+    },
+    {
+      customer_name: 'Abby Arthur',
+      num_orders: 2,
+      lifetime_value: 4144.34
+    },
+    {
+      customer_name: 'Abby Fernandez',
+      num_orders: 2,
+      lifetime_value: 3001.0425
+    },
+    {
+      customer_name: 'Abby Garcia',
+      num_orders: 1,
+      lifetime_value: 38.98
+    },
+    {
+      customer_name: 'Abby Gonzalez',
+      num_orders: 1,
+      lifetime_value: 1764.96
+    },
+    {
+      customer_name: 'Abby Kovár',
+      num_orders: 2,
+      lifetime_value: 4179.33
+    },
+    {
+      customer_name: 'Abby Lopez',
+      num_orders: 2,
+      lifetime_value: 2736.4175
+    },
+    {
+      customer_name: 'Abby Madan',
+      num_orders: 2,
+      lifetime_value: 176.93
+    },
+    {
+      customer_name: 'Abby Martinez',
+      num_orders: 1,
+      lifetime_value: 63.97
+    },
+    {
+      customer_name: 'Abby Mehta',
+      num_orders: 2,
+      lifetime_value: 2778.5225
+    },
+    {
+      customer_name: 'Abby Perez',
+      num_orders: 2,
+      lifetime_value: 50.23
+    },
+    {
+      customer_name: 'Abby Raman',
+      num_orders: 2,
+      lifetime_value: 2732.6975
+    },
+    {
+      customer_name: 'Abby Rana',
+      num_orders: 1,
+      lifetime_value: 63.97
+    },
+    {
+      customer_name: 'Abby Sai',
+      num_orders: 2,
+      lifetime_value: 87.94
+    },
+    {
+      customer_name: 'Abby Sanchez',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Abby Sandberg',
+      num_orders: 2,
+      lifetime_value: 4733.75
+    },
+    {
+      customer_name: 'Abby Subram',
+      num_orders: 2,
+      lifetime_value: 2791.5325
+    },
+    {
+      customer_name: 'Abhijit Thakur',
+      num_orders: 2,
+      lifetime_value: 43.99
+    },
+    {
+      customer_name: 'Abigail Anderson',
+      num_orders: 2,
+      lifetime_value: 43.99
+    },
+    {
+      customer_name: 'Abigail Barnes',
+      num_orders: 4,
+      lifetime_value: 228.52
+    },
+    {
+      customer_name: 'Abigail Clark',
+      num_orders: 2,
+      lifetime_value: 84.99
+    },
+    {
+      customer_name: 'Abigail Coleman',
+      num_orders: 1,
+      lifetime_value: 14.98
+    },
+    {
+      customer_name: 'Abigail Diaz',
+      num_orders: 2,
+      lifetime_value: 4419.0582
+    },
+    {
+      customer_name: 'Abigail Foster',
+      num_orders: 2,
+      lifetime_value: 194.98
+    },
+    {
+      customer_name: 'Abigail Garcia',
+      num_orders: 4,
+      lifetime_value: 140.17
+    },
+    {
+      customer_name: 'Abigail Gonzales',
+      num_orders: 4,
+      lifetime_value: 171.47
+    },
+    {
+      customer_name: 'Abigail Harris',
+      num_orders: 5,
+      lifetime_value: 402.53
+    },
+    {
+      customer_name: 'Abigail Henderson',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Abigail Hughes',
+      num_orders: 2,
+      lifetime_value: 4833.03
+    },
+    {
+      customer_name: 'Abigail Johnson',
+      num_orders: 3,
+      lifetime_value: 74.54
+    },
+    {
+      customer_name: 'Abigail Jones',
+      num_orders: 3,
+      lifetime_value: 91.75
+    },
+    {
+      customer_name: 'Abigail Lewis',
+      num_orders: 2,
+      lifetime_value: 93.98
+    },
+    {
+      customer_name: 'Abigail Long',
+      num_orders: 2,
+      lifetime_value: 5890.53
+    },
+    {
+      customer_name: 'Abigail Martin',
+      num_orders: 4,
+      lifetime_value: 104.19
+    },
+    {
+      customer_name: 'Abigail Martinez',
+      num_orders: 2,
+      lifetime_value: 87.28
+    },
+    {
+      customer_name: 'Abigail Miller',
+      num_orders: 2,
+      lifetime_value: 51.27
+    },
+    {
+      customer_name: 'Abigail Patterson',
+      num_orders: 2,
+      lifetime_value: 245.47
+    },
+    {
+      customer_name: 'Abigail Perry',
+      num_orders: 1,
+      lifetime_value: 29.48
+    },
+    {
+      customer_name: 'Abigail Robinson',
+      num_orders: 2,
+      lifetime_value: 122.42
+    },
+    {
+      customer_name: 'Abigail Rodriguez',
+      num_orders: 2,
+      lifetime_value: 133.96
+    },
+    {
+      customer_name: 'Abigail Ross',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Abigail Simmons',
+      num_orders: 2,
+      lifetime_value: 5969.7
+    },
+    {
+      customer_name: 'Abigail Smith',
+      num_orders: 1,
+      lifetime_value: 614.96
+    },
+    {
+      customer_name: 'Abigail Thompson',
+      num_orders: 2,
+      lifetime_value: 87.28
+    },
+    {
+      customer_name: 'Abigail Walker',
+      num_orders: 2,
+      lifetime_value: 133.96
+    },
+    {
+      customer_name: 'Abigail White',
+      num_orders: 2,
+      lifetime_value: 5973.24
+    },
+    {
+      customer_name: 'Abigail Williams',
+      num_orders: 3,
+      lifetime_value: 81.24
+    },
+    {
+      customer_name: 'Adam Adams',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Adam Allen',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Adam Baker',
+      num_orders: 1,
+      lifetime_value: 588.96
+    },
+    {
+      customer_name: 'Adam Campbell',
+      num_orders: 2,
+      lifetime_value: 72.16
+    },
+    {
+      customer_name: 'Adam Collins',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Adam Edwards',
+      num_orders: 3,
+      lifetime_value: 6917.5425
+    },
+    {
+      customer_name: 'Adam Evans',
+      num_orders: 2,
+      lifetime_value: 61.96
+    },
+    {
+      customer_name: 'Adam Gonzalez',
+      num_orders: 2,
+      lifetime_value: 2768.5325
+    },
+    {
+      customer_name: 'Adam Green',
+      num_orders: 1,
+      lifetime_value: 54.98
+    },
+    {
+      customer_name: 'Adam Hall',
+      num_orders: 2,
+      lifetime_value: 4362.74
+    },
+    {
+      customer_name: 'Adam Hernandez',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Adam Hill',
+      num_orders: 2,
+      lifetime_value: 68.87
+    },
+    {
+      customer_name: 'Adam King',
+      num_orders: 1,
+      lifetime_value: 2297.28
+    },
+    {
+      customer_name: 'Adam Lopez',
+      num_orders: 1,
+      lifetime_value: 42.28
+    },
+    {
+      customer_name: 'Adam Mitchell',
+      num_orders: 2,
+      lifetime_value: 3262.83
+    },
+    {
+      customer_name: 'Adam Nelson',
+      num_orders: 4,
+      lifetime_value: 87.95
+    },
+    {
+      customer_name: 'Adam Parker',
+      num_orders: 3,
+      lifetime_value: 101.85
+    },
+    {
+      customer_name: 'Adam Perez',
+      num_orders: 2,
+      lifetime_value: 1372.95
+    },
+    {
+      customer_name: 'Adam Phillips',
+      num_orders: 1,
+      lifetime_value: 633.96
+    },
+    {
+      customer_name: 'Adam Roberts',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Adam Scott',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Adam Turner',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Adam Wright',
+      num_orders: 1,
+      lifetime_value: 2439.99
+    },
+    {
+      customer_name: 'Adam Young',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Adrian Bailey',
+      num_orders: 2,
+      lifetime_value: 2919.8896
+    },
+    {
+      customer_name: 'Adrian Bell',
+      num_orders: 2,
+      lifetime_value: 3800.0782
+    },
+    {
+      customer_name: 'Adrian Brooks',
+      num_orders: 1,
+      lifetime_value: 24.27
+    },
+    {
+      customer_name: 'Adrian Cook',
+      num_orders: 2,
+      lifetime_value: 1622.47
+    },
+    {
+      customer_name: 'Adrian Cooper',
+      num_orders: 3,
+      lifetime_value: 5295.4082
+    },
+    {
+      customer_name: 'Adrian Cox',
+      num_orders: 2,
+      lifetime_value: 4355.71
+    },
+    {
+      customer_name: 'Adrian Gray',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Adrian Howard',
+      num_orders: 2,
+      lifetime_value: 1597.5582
+    },
+    {
+      customer_name: 'Adrian James',
+      num_orders: 3,
+      lifetime_value: 6831.7596
+    },
+    {
+      customer_name: 'Adrian Morgan',
+      num_orders: 2,
+      lifetime_value: 2753.8225
+    },
+    {
+      customer_name: 'Adrian Morris',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Adrian Peterson',
+      num_orders: 2,
+      lifetime_value: 3352.3975
+    },
+    {
+      customer_name: 'Adrian Ramirez',
+      num_orders: 1,
+      lifetime_value: 54.96
+    },
+    {
+      customer_name: 'Adrian Richardson',
+      num_orders: 2,
+      lifetime_value: 2435.0782
+    },
+    {
+      customer_name: 'Adrian Rivera',
+      num_orders: 2,
+      lifetime_value: 4391.4096
+    },
+    {
+      customer_name: 'Adrian Sanchez',
+      num_orders: 1,
+      lifetime_value: 64.47
+    },
+    {
+      customer_name: 'Adrian Sanders',
+      num_orders: 2,
+      lifetime_value: 3342.4075
+    },
+    {
+      customer_name: 'Adrian Stewart',
+      num_orders: 2,
+      lifetime_value: 3105.27
+    },
+    {
+      customer_name: 'Adrian Torres',
+      num_orders: 2,
+      lifetime_value: 3352.3975
+    },
+    {
+      customer_name: 'Adrian Ward',
+      num_orders: 2,
+      lifetime_value: 3365.6675
+    },
+    {
+      customer_name: 'Adrian Watson',
+      num_orders: 2,
+      lifetime_value: 1893.9075
+    },
+    {
+      customer_name: 'Aidan Alexander',
+      num_orders: 2,
+      lifetime_value: 108.46
+    },
+    {
+      customer_name: 'Aidan Barnes',
+      num_orders: 2,
+      lifetime_value: 5917.24
+    },
+    {
+      customer_name: 'Aidan Bennett',
+      num_orders: 2,
+      lifetime_value: 48.98
+    },
+    {
+      customer_name: 'Aidan Bryant',
+      num_orders: 2,
+      lifetime_value: 4795.31
+    },
+    {
+      customer_name: 'Aidan Butler',
+      num_orders: 2,
+      lifetime_value: 4763.34
+    },
+    {
+      customer_name: 'Aidan Coleman',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Aidan Diaz',
+      num_orders: 2,
+      lifetime_value: 4551.5325
+    },
+    {
+      customer_name: 'Aidan Flores',
+      num_orders: 4,
+      lifetime_value: 261.22
+    },
+    {
+      customer_name: 'Aidan Foster',
+      num_orders: 2,
+      lifetime_value: 4486.5425
+    },
+    {
+      customer_name: 'Aidan Gonzales',
+      num_orders: 1,
+      lifetime_value: 90.95
+    },
+    {
+      customer_name: 'Aidan Griffin',
+      num_orders: 2,
+      lifetime_value: 142.95
+    },
+    {
+      customer_name: 'Aidan Hayes',
+      num_orders: 4,
+      lifetime_value: 265.22
+    },
+    {
+      customer_name: 'Aidan Henderson',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Aidan Hughes',
+      num_orders: 1,
+      lifetime_value: 2329.98
+    },
+    {
+      customer_name: 'Aidan Jenkins',
+      num_orders: 1,
+      lifetime_value: 141.98
+    },
+    {
+      customer_name: 'Aidan Long',
+      num_orders: 2,
+      lifetime_value: 5898.26
+    },
+    {
+      customer_name: 'Aidan Patterson',
+      num_orders: 2,
+      lifetime_value: 5922.53
+    },
+    {
+      customer_name: 'Aidan Perry',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Aidan Powell',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Aidan Ross',
+      num_orders: 1,
+      lifetime_value: 2329.98
+    },
+    {
+      customer_name: 'Aidan Russell',
+      num_orders: 2,
+      lifetime_value: 4513.8425
+    },
+    {
+      customer_name: 'Aidan Simmons',
+      num_orders: 2,
+      lifetime_value: 4513.5125
+    },
+    {
+      customer_name: 'Aidan Washington',
+      num_orders: 2,
+      lifetime_value: 5898.26
+    },
+    {
+      customer_name: 'Aidan Wood',
+      num_orders: 1,
+      lifetime_value: 44.91
+    },
+    {
+      customer_name: 'Alan Cai',
+      num_orders: 1,
+      lifetime_value: 29.26
+    },
+    {
+      customer_name: 'Alan Chen',
+      num_orders: 2,
+      lifetime_value: 4382.75
+    },
+    {
+      customer_name: 'Alan Gao',
+      num_orders: 2,
+      lifetime_value: 84.96
+    },
+    {
+      customer_name: 'Alan Guo',
+      num_orders: 2,
+      lifetime_value: 40.96
+    },
+    {
+      customer_name: 'Alan He',
+      num_orders: 2,
+      lifetime_value: 4347.76
+    },
+    {
+      customer_name: 'Alan Hu',
+      num_orders: 3,
+      lifetime_value: 92.16
+    },
+    {
+      customer_name: 'Alan Huang',
+      num_orders: 2,
+      lifetime_value: 117.96
+    },
+    {
+      customer_name: 'Alan Li',
+      num_orders: 2,
+      lifetime_value: 74.98
+    },
+    {
+      customer_name: 'Alan Liang',
+      num_orders: 2,
+      lifetime_value: 99.94
+    },
+    {
+      customer_name: 'Alan Lin',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Alan Liu',
+      num_orders: 2,
+      lifetime_value: 62.27
+    },
+    {
+      customer_name: 'Alan Lu',
+      num_orders: 2,
+      lifetime_value: 6030.61
+    },
+    {
+      customer_name: 'Alan Ma',
+      num_orders: 2,
+      lifetime_value: 54.94
+    },
+    {
+      customer_name: 'Alan She',
+      num_orders: 2,
+      lifetime_value: 81.46
+    },
+    {
+      customer_name: 'Alan Sun',
+      num_orders: 2,
+      lifetime_value: 4391.74
+    },
+    {
+      customer_name: 'Alan Wang',
+      num_orders: 1,
+      lifetime_value: 27.77
+    },
+    {
+      customer_name: 'Alan Xu',
+      num_orders: 2,
+      lifetime_value: 128.95
+    },
+    {
+      customer_name: 'Alan Yang',
+      num_orders: 2,
+      lifetime_value: 231.96
+    },
+    {
+      customer_name: 'Alan Ye',
+      num_orders: 2,
+      lifetime_value: 51.92
+    },
+    {
+      customer_name: 'Alan Zeng',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Alan Zhang',
+      num_orders: 2,
+      lifetime_value: 4752.75
+    },
+    {
+      customer_name: 'Alan Zheng',
+      num_orders: 3,
+      lifetime_value: 123.91
+    },
+    {
+      customer_name: 'Alan Zhou',
+      num_orders: 2,
+      lifetime_value: 6029.57
+    },
+    {
+      customer_name: 'Alan Zhu',
+      num_orders: 2,
+      lifetime_value: 142.46
+    },
+    {
+      customer_name: 'Albert Alonso',
+      num_orders: 1,
+      lifetime_value: 163.99
+    },
+    {
+      customer_name: 'Albert Alvarez',
+      num_orders: 3,
+      lifetime_value: 196.27
+    },
+    {
+      customer_name: 'Albert Blanco',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Albert Castro',
+      num_orders: 3,
+      lifetime_value: 6646.58
+    },
+    {
+      customer_name: 'Albert Diaz',
+      num_orders: 2,
+      lifetime_value: 1468.5882
+    },
+    {
+      customer_name: 'Albert Dominguez',
+      num_orders: 1,
+      lifetime_value: 26.97
+    },
+    {
+      customer_name: 'Albert Gomez',
+      num_orders: 2,
+      lifetime_value: 1498.5782
+    },
+    {
+      customer_name: 'Albert Hernandez',
+      num_orders: 2,
+      lifetime_value: 1503.5782
+    },
+    {
+      customer_name: 'Albert Jiménez',
+      num_orders: 1,
+      lifetime_value: 41.95
+    },
+    {
+      customer_name: 'Albert Martin',
+      num_orders: 1,
+      lifetime_value: 539.99
+    },
+    {
+      customer_name: 'Albert Moreno',
+      num_orders: 1,
+      lifetime_value: 839.48
+    },
+    {
+      customer_name: 'Albert Navarro',
+      num_orders: 1,
+      lifetime_value: 867.97
+    },
+    {
+      customer_name: 'Albert Ortega',
+      num_orders: 2,
+      lifetime_value: 178.45
+    },
+    {
+      customer_name: 'Albert Ramos',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Albert Romero',
+      num_orders: 1,
+      lifetime_value: 839.48
+    },
+    {
+      customer_name: 'Albert Rubio',
+      num_orders: 1,
+      lifetime_value: 36.96
+    },
+    {
+      customer_name: 'Albert Sanz',
+      num_orders: 3,
+      lifetime_value: 6980.8525
+    },
+    {
+      customer_name: 'Albert Serrano',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Albert Suarez',
+      num_orders: 2,
+      lifetime_value: 2721.5525
+    },
+    {
+      customer_name: 'Albert Vazquez',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Alejandro Anand',
+      num_orders: 2,
+      lifetime_value: 67.46
+    },
+    {
+      customer_name: 'Alejandro Andersen',
+      num_orders: 2,
+      lifetime_value: 4368.0582
+    },
+    {
+      customer_name: 'Alejandro Beck',
+      num_orders: 1,
+      lifetime_value: 93.46
+    },
+    {
+      customer_name: 'Alejandro Cai',
+      num_orders: 1,
+      lifetime_value: 8.99
+    },
+    {
+      customer_name: 'Alejandro Chander',
+      num_orders: 2,
+      lifetime_value: 87.97
+    },
+    {
+      customer_name: 'Alejandro Chavez',
+      num_orders: 1,
+      lifetime_value: 9.99
+    },
+    {
+      customer_name: 'Alejandro Chen',
+      num_orders: 2,
+      lifetime_value: 5875.55
+    },
+    {
+      customer_name: 'Alejandro Deng',
+      num_orders: 2,
+      lifetime_value: 4438.3796
+    },
+    {
+      customer_name: 'Alejandro Gao',
+      num_orders: 2,
+      lifetime_value: 4416.3796
+    },
+    {
+      customer_name: 'Alejandro Goel',
+      num_orders: 2,
+      lifetime_value: 110.75
+    },
+    {
+      customer_name: 'Alejandro Guo',
+      num_orders: 1,
+      lifetime_value: 8.99
+    },
+    {
+      customer_name: 'Alejandro Hu',
+      num_orders: 2,
+      lifetime_value: 241.76
+    },
+    {
+      customer_name: 'Alejandro Huang',
+      num_orders: 1,
+      lifetime_value: 8.99
+    },
+    {
+      customer_name: 'Alejandro Kumar',
+      num_orders: 1,
+      lifetime_value: 8.99
+    },
+    {
+      customer_name: 'Alejandro Lal',
+      num_orders: 1,
+      lifetime_value: 8.99
+    },
+    {
+      customer_name: 'Alejandro Li',
+      num_orders: 1,
+      lifetime_value: 49.99
+    },
+    {
+      customer_name: 'Alejandro Liang',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Alejandro Lin',
+      num_orders: 1,
+      lifetime_value: 8.99
+    },
+    {
+      customer_name: 'Alejandro Liu',
+      num_orders: 1,
+      lifetime_value: 49.99
+    },
+    {
+      customer_name: 'Alejandro Lu',
+      num_orders: 3,
+      lifetime_value: 5166.4082
+    },
+    {
+      customer_name: 'Alejandro Luo',
+      num_orders: 4,
+      lifetime_value: 235.72
+    },
+    {
+      customer_name: 'Alejandro Ma',
+      num_orders: 1,
+      lifetime_value: 61.08
+    },
+    {
+      customer_name: 'Alejandro Nara',
+      num_orders: 1,
+      lifetime_value: 49.97
+    },
+    {
+      customer_name: 'Alejandro Nath',
+      num_orders: 3,
+      lifetime_value: 5636.8982
+    },
+    {
+      customer_name: 'Alejandro Rai',
+      num_orders: 3,
+      lifetime_value: 5633.9082
+    },
+    {
+      customer_name: 'Alejandro Raji',
+      num_orders: 2,
+      lifetime_value: 42.97
+    },
+    {
+      customer_name: 'Alejandro Shan',
+      num_orders: 1,
+      lifetime_value: 8.99
+    },
+    {
+      customer_name: 'Alejandro Sharma',
+      num_orders: 2,
+      lifetime_value: 75.47
+    },
+    {
+      customer_name: 'Alejandro She',
+      num_orders: 2,
+      lifetime_value: 5919.73
+    },
+    {
+      customer_name: 'Alejandro Shen',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Alejandro Sun',
+      num_orders: 1,
+      lifetime_value: 42.28
+    },
+    {
+      customer_name: 'Alejandro Tang',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Alejandro Wang',
+      num_orders: 1,
+      lifetime_value: 58.98
+    },
+    {
+      customer_name: 'Alejandro Wu',
+      num_orders: 2,
+      lifetime_value: 4401.4096
+    },
+    {
+      customer_name: 'Alejandro Xie',
+      num_orders: 1,
+      lifetime_value: 86.96
+    },
+    {
+      customer_name: 'Alejandro Xu',
+      num_orders: 4,
+      lifetime_value: 337.9
+    },
+    {
+      customer_name: 'Alejandro Xu',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Alejandro Yang',
+      num_orders: 1,
+      lifetime_value: 49.99
+    },
+    {
+      customer_name: 'Alejandro Ye',
+      num_orders: 2,
+      lifetime_value: 4401.3996
+    },
+    {
+      customer_name: 'Alejandro Yuan',
+      num_orders: 1,
+      lifetime_value: 8.99
+    },
+    {
+      customer_name: 'Alejandro Zeng',
+      num_orders: 1,
+      lifetime_value: 8.99
+    },
+    {
+      customer_name: 'Alejandro Zhang',
+      num_orders: 2,
+      lifetime_value: 5898.26
+    },
+    {
+      customer_name: 'Alejandro Zhao',
+      num_orders: 1,
+      lifetime_value: 8.99
+    },
+    {
+      customer_name: 'Alejandro Zheng',
+      num_orders: 1,
+      lifetime_value: 8.99
+    },
+    {
+      customer_name: 'Alejandro Zhou',
+      num_orders: 2,
+      lifetime_value: 5923.49
+    },
+    {
+      customer_name: 'Alejandro Zhu',
+      num_orders: 1,
+      lifetime_value: 39.99
+    },
+    {
+      customer_name: 'Alex Adams',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Alex Allen',
+      num_orders: 2,
+      lifetime_value: 126.96
+    },
+    {
+      customer_name: 'Alex Bailey',
+      num_orders: 2,
+      lifetime_value: 4381.3896
+    },
+    {
+      customer_name: 'Alex Baker',
+      num_orders: 1,
+      lifetime_value: 2475.95
+    },
+    {
+      customer_name: 'Alex Bell',
+      num_orders: 2,
+      lifetime_value: 4143.25
+    },
+    {
+      customer_name: 'Alex Brooks',
+      num_orders: 1,
+      lifetime_value: 85.48
+    },
+    {
+      customer_name: 'Alex Campbell',
+      num_orders: 2,
+      lifetime_value: 96.95
+    },
+    {
+      customer_name: 'Alex Carter',
+      num_orders: 2,
+      lifetime_value: 4632.8625
+    },
+    {
+      customer_name: 'Alex Collins',
+      num_orders: 2,
+      lifetime_value: 167.93
+    },
+    {
+      customer_name: 'Alex Cook',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Alex Cooper',
+      num_orders: 1,
+      lifetime_value: 37.21
+    },
+    {
+      customer_name: 'Alex Cox',
+      num_orders: 1,
+      lifetime_value: 106.96
+    },
+    {
+      customer_name: 'Alex Edwards',
+      num_orders: 2,
+      lifetime_value: 4411.3682
+    },
+    {
+      customer_name: 'Alex Evans',
+      num_orders: 2,
+      lifetime_value: 3048.31
+    },
+    {
+      customer_name: 'Alex Gonzalez',
+      num_orders: 1,
+      lifetime_value: 72.96
+    },
+    {
+      customer_name: 'Alex Gray',
+      num_orders: 1,
+      lifetime_value: 64.47
+    },
+    {
+      customer_name: 'Alex Green',
+      num_orders: 1,
+      lifetime_value: 1768.96
+    },
+    {
+      customer_name: 'Alex Hernandez',
+      num_orders: 1,
+      lifetime_value: 1760.47
+    },
+    {
+      customer_name: 'Alex Hill',
+      num_orders: 2,
+      lifetime_value: 64.88
+    },
+    {
+      customer_name: 'Alex Howard',
+      num_orders: 3,
+      lifetime_value: 8346.28
+    },
+    {
+      customer_name: 'Alex James',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Alex Kelly',
+      num_orders: 2,
+      lifetime_value: 75.74
+    },
+    {
+      customer_name: 'Alex King',
+      num_orders: 1,
+      lifetime_value: 1759.97
+    },
+    {
+      customer_name: 'Alex Lopez',
+      num_orders: 3,
+      lifetime_value: 7000.5525
+    },
+    {
+      customer_name: 'Alex Mitchell',
+      num_orders: 2,
+      lifetime_value: 4752.75
+    },
+    {
+      customer_name: 'Alex Morgan',
+      num_orders: 2,
+      lifetime_value: 107.97
+    },
+    {
+      customer_name: 'Alex Morris',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Alex Murphy',
+      num_orders: 2,
+      lifetime_value: 2746.5525
+    },
+    {
+      customer_name: 'Alex Nelson',
+      num_orders: 3,
+      lifetime_value: 132.5
+    },
+    {
+      customer_name: 'Alex Parker',
+      num_orders: 2,
+      lifetime_value: 66.26
+    },
+    {
+      customer_name: 'Alex Perez',
+      num_orders: 2,
+      lifetime_value: 3102.98
+    },
+    {
+      customer_name: 'Alex Peterson',
+      num_orders: 1,
+      lifetime_value: 96.46
+    },
+    {
+      customer_name: 'Alex Phillips',
+      num_orders: 1,
+      lifetime_value: 539.99
+    },
+    {
+      customer_name: 'Alex Ramirez',
+      num_orders: 1,
+      lifetime_value: 36.96
+    },
+    {
+      customer_name: 'Alex Reed',
+      num_orders: 3,
+      lifetime_value: 232.23
+    },
+    {
+      customer_name: 'Alex Richardson',
+      num_orders: 3,
+      lifetime_value: 6684.58
+    },
+    {
+      customer_name: 'Alex Roberts',
+      num_orders: 2,
+      lifetime_value: 3194.93
+    },
+    {
+      customer_name: 'Alex Rogers',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Alex Sanchez',
+      num_orders: 2,
+      lifetime_value: 190.89
+    },
+    {
+      customer_name: 'Alex Sanders',
+      num_orders: 2,
+      lifetime_value: 114.96
+    },
+    {
+      customer_name: 'Alex Scott',
+      num_orders: 1,
+      lifetime_value: 64.47
+    },
+    {
+      customer_name: 'Alex Stewart',
+      num_orders: 2,
+      lifetime_value: 102.85
+    },
+    {
+      customer_name: 'Alex Torres',
+      num_orders: 3,
+      lifetime_value: 5121.4282
+    },
+    {
+      customer_name: 'Alex Turner',
+      num_orders: 2,
+      lifetime_value: 76.94
+    },
+    {
+      customer_name: 'Alex Ward',
+      num_orders: 2,
+      lifetime_value: 1503.5782
+    },
+    {
+      customer_name: 'Alex Watson',
+      num_orders: 3,
+      lifetime_value: 280.76
+    },
+    {
+      customer_name: 'Alex Wright',
+      num_orders: 3,
+      lifetime_value: 6895.6125
+    },
+    {
+      customer_name: 'Alex Young',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Alexander Anderson',
+      num_orders: 2,
+      lifetime_value: 126.56
+    },
+    {
+      customer_name: 'Alexander Brown',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Alexander Davis',
+      num_orders: 2,
+      lifetime_value: 4118.26
+    },
+    {
+      customer_name: 'Alexander Garcia',
+      num_orders: 2,
+      lifetime_value: 87.77
+    },
+    {
+      customer_name: 'Alexander Harris',
+      num_orders: 2,
+      lifetime_value: 6029.57
+    },
+    {
+      customer_name: 'Alexander Jackson',
+      num_orders: 2,
+      lifetime_value: 24.27
+    },
+    {
+      customer_name: 'Alexander Johnson',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Alexander Jones',
+      num_orders: 3,
+      lifetime_value: 5743.9675
+    },
+    {
+      customer_name: 'Alexander Lee',
+      num_orders: 2,
+      lifetime_value: 65.96
+    },
+    {
+      customer_name: 'Alexander Martin',
+      num_orders: 2,
+      lifetime_value: 26.56
+    },
+    {
+      customer_name: 'Alexander Martinez',
+      num_orders: 2,
+      lifetime_value: 6090.59
+    },
+    {
+      customer_name: 'Alexander Miller',
+      num_orders: 2,
+      lifetime_value: 6102.19
+    },
+    {
+      customer_name: 'Alexander Robinson',
+      num_orders: 1,
+      lifetime_value: 21.49
+    },
+    {
+      customer_name: 'Alexander Rodriguez',
+      num_orders: 2,
+      lifetime_value: 30.97
+    },
+    {
+      customer_name: 'Alexander Smith',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Alexander Taylor',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Alexander Thompson',
+      num_orders: 2,
+      lifetime_value: 160.55
+    },
+    {
+      customer_name: 'Alexander Walker',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Alexander White',
+      num_orders: 2,
+      lifetime_value: 6056.61
+    },
+    {
+      customer_name: 'Alexander Williams',
+      num_orders: 1,
+      lifetime_value: 58.98
+    },
+    {
+      customer_name: 'Alexander Wilson',
+      num_orders: 2,
+      lifetime_value: 94.47
+    },
+    {
+      customer_name: 'Alexandra Smith',
+      num_orders: 2,
+      lifetime_value: 42.28
+    },
+    {
+      customer_name: 'Alexis Alexander',
+      num_orders: 1,
+      lifetime_value: 45.95
+    },
+    {
+      customer_name: 'Alexis Ashe',
+      num_orders: 3,
+      lifetime_value: 80.25
+    },
+    {
+      customer_name: 'Alexis Barnes',
+      num_orders: 2,
+      lifetime_value: 105.24
+    },
+    {
+      customer_name: 'Alexis Bennett',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Alexis Brown',
+      num_orders: 3,
+      lifetime_value: 7029.78
+    },
+    {
+      customer_name: 'Alexis Bryant',
+      num_orders: 2,
+      lifetime_value: 5900.55
+    },
+    {
+      customer_name: 'Alexis Butler',
+      num_orders: 2,
+      lifetime_value: 5948.24
+    },
+    {
+      customer_name: 'Alexis Clark',
+      num_orders: 1,
+      lifetime_value: 804.47
+    },
+    {
+      customer_name: 'Alexis Coleman',
+      num_orders: 1,
+      lifetime_value: 83.97
+    },
+    {
+      customer_name: 'Alexis Diaz',
+      num_orders: 1,
+      lifetime_value: 2420.46
+    },
+    {
+      customer_name: 'Alexis Flores',
+      num_orders: 2,
+      lifetime_value: 4347.76
+    },
+    {
+      customer_name: 'Alexis Foster',
+      num_orders: 2,
+      lifetime_value: 5913.24
+    },
+    {
+      customer_name: 'Alexis Gonzales',
+      num_orders: 2,
+      lifetime_value: 5943.23
+    },
+    {
+      customer_name: 'Alexis Griffin',
+      num_orders: 1,
+      lifetime_value: 2400.95
+    },
+    {
+      customer_name: 'Alexis Hall',
+      num_orders: 2,
+      lifetime_value: 5970.23
+    },
+    {
+      customer_name: 'Alexis Harris',
+      num_orders: 3,
+      lifetime_value: 73.96
+    },
+    {
+      customer_name: 'Alexis Hayes',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Alexis Henderson',
+      num_orders: 2,
+      lifetime_value: 5915.54
+    },
+    {
+      customer_name: 'Alexis Hughes',
+      num_orders: 1,
+      lifetime_value: 589.96
+    },
+    {
+      customer_name: 'Alexis Jenkins',
+      num_orders: 3,
+      lifetime_value: 6503.2
+    },
+    {
+      customer_name: 'Alexis Johnson',
+      num_orders: 3,
+      lifetime_value: 8128.02
+    },
+    {
+      customer_name: 'Alexis Jones',
+      num_orders: 3,
+      lifetime_value: 8249.01
+    },
+    {
+      customer_name: 'Alexis Lee',
+      num_orders: 2,
+      lifetime_value: 83.97
+    },
+    {
+      customer_name: 'Alexis Lewis',
+      num_orders: 2,
+      lifetime_value: 5933.26
+    },
+    {
+      customer_name: 'Alexis Long',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Alexis Martinez',
+      num_orders: 1,
+      lifetime_value: 2339.97
+    },
+    {
+      customer_name: 'Alexis Miller',
+      num_orders: 3,
+      lifetime_value: 8145.33
+    },
+    {
+      customer_name: 'Alexis Moore',
+      num_orders: 3,
+      lifetime_value: 144.74
+    },
+    {
+      customer_name: 'Alexis Patterson',
+      num_orders: 2,
+      lifetime_value: 5933.26
+    },
+    {
+      customer_name: 'Alexis Perry',
+      num_orders: 2,
+      lifetime_value: 5908.25
+    },
+    {
+      customer_name: 'Alexis Powell',
+      num_orders: 1,
+      lifetime_value: 106.96
+    },
+    {
+      customer_name: 'Alexis Price',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Alexis Robinson',
+      num_orders: 1,
+      lifetime_value: 74.98
+    },
+    {
+      customer_name: 'Alexis Rodriguez',
+      num_orders: 2,
+      lifetime_value: 136.25
+    },
+    {
+      customer_name: 'Alexis Ross',
+      num_orders: 1,
+      lifetime_value: 49.97
+    },
+    {
+      customer_name: 'Alexis Russell',
+      num_orders: 2,
+      lifetime_value: 5940.54
+    },
+    {
+      customer_name: 'Alexis Simmons',
+      num_orders: 2,
+      lifetime_value: 5943.5
+    },
+    {
+      customer_name: 'Alexis Smith',
+      num_orders: 3,
+      lifetime_value: 8164.01
+    },
+    {
+      customer_name: 'Alexis Taylor',
+      num_orders: 3,
+      lifetime_value: 7023.78
+    },
+    {
+      customer_name: 'Alexis Thomas',
+      num_orders: 3,
+      lifetime_value: 8195.5
+    },
+    {
+      customer_name: 'Alexis Thompson',
+      num_orders: 1,
+      lifetime_value: 61.97
+    },
+    {
+      customer_name: 'Alexis Walker',
+      num_orders: 2,
+      lifetime_value: 5976.74
+    },
+    {
+      customer_name: 'Alexis Washington',
+      num_orders: 2,
+      lifetime_value: 4417.73
+    },
+    {
+      customer_name: 'Alexis White',
+      num_orders: 3,
+      lifetime_value: 8203.5
+    },
+    {
+      customer_name: 'Alexis Williams',
+      num_orders: 3,
+      lifetime_value: 8123.03
+    },
+    {
+      customer_name: 'Alexis Wilson',
+      num_orders: 3,
+      lifetime_value: 6984.81
+    },
+    {
+      customer_name: 'Alexis Wood',
+      num_orders: 3,
+      lifetime_value: 5199.7196
+    },
+    {
+      customer_name: 'Alicia Andersen',
+      num_orders: 2,
+      lifetime_value: 6044.59
+    },
+    {
+      customer_name: 'Alicia Beck',
+      num_orders: 2,
+      lifetime_value: 35.47
+    },
+    {
+      customer_name: 'Alicia Chapman',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Alicia Goel',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Alicia Jai',
+      num_orders: 2,
+      lifetime_value: 6056.61
+    },
+    {
+      customer_name: 'Alicia Lal',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Alicia Luo',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Alicia Pal',
+      num_orders: 2,
+      lifetime_value: 6056.61
+    },
+    {
+      customer_name: 'Alicia Rai',
+      num_orders: 1,
+      lifetime_value: 123.98
+    },
+    {
+      customer_name: 'Alicia Raje',
+      num_orders: 2,
+      lifetime_value: 128.44
+    },
+    {
+      customer_name: 'Alicia Raji',
+      num_orders: 1,
+      lifetime_value: 589.98
+    },
+    {
+      customer_name: 'Alicia Shan',
+      num_orders: 2,
+      lifetime_value: 6058.21
+    },
+    {
+      customer_name: 'Alicia Sharma',
+      num_orders: 2,
+      lifetime_value: 6054.22
+    },
+    {
+      customer_name: 'Alicia She',
+      num_orders: 1,
+      lifetime_value: 94.48
+    },
+    {
+      customer_name: 'Alicia Shen',
+      num_orders: 1,
+      lifetime_value: 539.99
+    },
+    {
+      customer_name: 'Alicia Xie',
+      num_orders: 2,
+      lifetime_value: 6030.61
+    },
+    {
+      customer_name: 'Alicia Xu',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Alicia Yuan',
+      num_orders: 2,
+      lifetime_value: 6089.59
+    },
+    {
+      customer_name: 'Alisha Alan',
+      num_orders: 2,
+      lifetime_value: 5998.23
+    },
+    {
+      customer_name: 'Alisha Andersen',
+      num_orders: 2,
+      lifetime_value: 6011.74
+    },
+    {
+      customer_name: 'Alisha Beck',
+      num_orders: 3,
+      lifetime_value: 7107.1
+    },
+    {
+      customer_name: 'Alisha Cai',
+      num_orders: 2,
+      lifetime_value: 105.26
+    },
+    {
+      customer_name: 'Alisha Chande',
+      num_orders: 2,
+      lifetime_value: 5910.55
+    },
+    {
+      customer_name: 'Alisha Chander',
+      num_orders: 2,
+      lifetime_value: 5913.24
+    },
+    {
+      customer_name: 'Alisha Chen',
+      num_orders: 2,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Alisha Deng',
+      num_orders: 3,
+      lifetime_value: 8139.53
+    },
+    {
+      customer_name: 'Alisha Gao',
+      num_orders: 3,
+      lifetime_value: 8153.02
+    },
+    {
+      customer_name: 'Alisha Goel',
+      num_orders: 2,
+      lifetime_value: 5949.23
+    },
+    {
+      customer_name: 'Alisha Guo',
+      num_orders: 2,
+      lifetime_value: 208.96
+    },
+    {
+      customer_name: 'Alisha He',
+      num_orders: 3,
+      lifetime_value: 8087.31
+    },
+    {
+      customer_name: 'Alisha Holt',
+      num_orders: 2,
+      lifetime_value: 3949.97
+    },
+    {
+      customer_name: 'Alisha Hu',
+      num_orders: 2,
+      lifetime_value: 119.76
+    },
+    {
+      customer_name: 'Alisha Huang',
+      num_orders: 2,
+      lifetime_value: 82.26
+    },
+    {
+      customer_name: 'Alisha Kumar',
+      num_orders: 3,
+      lifetime_value: 8256.5
+    },
+    {
+      customer_name: 'Alisha Lal',
+      num_orders: 3,
+      lifetime_value: 8114.04
+    },
+    {
+      customer_name: 'Alisha Li',
+      num_orders: 2,
+      lifetime_value: 108.96
+    },
+    {
+      customer_name: 'Alisha Liang',
+      num_orders: 2,
+      lifetime_value: 88.96
+    },
+    {
+      customer_name: 'Alisha Lin',
+      num_orders: 2,
+      lifetime_value: 65.25
+    },
+    {
+      customer_name: 'Alisha Liu',
+      num_orders: 2,
+      lifetime_value: 5910.55
+    },
+    {
+      customer_name: 'Alisha Lu',
+      num_orders: 2,
+      lifetime_value: 159.96
+    },
+    {
+      customer_name: 'Alisha Luo',
+      num_orders: 3,
+      lifetime_value: 8183
+    },
+    {
+      customer_name: 'Alisha Ma',
+      num_orders: 2,
+      lifetime_value: 109.97
+    },
+    {
+      customer_name: 'Alisha Nara',
+      num_orders: 1,
+      lifetime_value: 39.99
+    },
+    {
+      customer_name: 'Alisha Nath',
+      num_orders: 1,
+      lifetime_value: 769.49
+    },
+    {
+      customer_name: 'Alisha Oliver',
+      num_orders: 2,
+      lifetime_value: 5913.24
+    },
+    {
+      customer_name: 'Alisha Rai',
+      num_orders: 1,
+      lifetime_value: 54.97
+    },
+    {
+      customer_name: 'Alisha Raje',
+      num_orders: 2,
+      lifetime_value: 4043.46
+    },
+    {
+      customer_name: 'Alisha Raji',
+      num_orders: 3,
+      lifetime_value: 8213
+    },
+    {
+      customer_name: 'Alisha Shan',
+      num_orders: 3,
+      lifetime_value: 4735.81
+    },
+    {
+      customer_name: 'Alisha She',
+      num_orders: 2,
+      lifetime_value: 89.98
+    },
+    {
+      customer_name: 'Alisha Shen',
+      num_orders: 3,
+      lifetime_value: 8169.03
+    },
+    {
+      customer_name: 'Alisha Sun',
+      num_orders: 2,
+      lifetime_value: 74.98
+    },
+    {
+      customer_name: 'Alisha Tang',
+      num_orders: 3,
+      lifetime_value: 6962.1
+    },
+    {
+      customer_name: 'Alisha Wang',
+      num_orders: 2,
+      lifetime_value: 42.95
+    },
+    {
+      customer_name: 'Alisha Wu',
+      num_orders: 2,
+      lifetime_value: 109.97
+    },
+    {
+      customer_name: 'Alisha Xie',
+      num_orders: 3,
+      lifetime_value: 7058.7
+    },
+    {
+      customer_name: 'Alisha Xu',
+      num_orders: 3,
+      lifetime_value: 7043.27
+    },
+    {
+      customer_name: 'Alisha Xu',
+      num_orders: 2,
+      lifetime_value: 138.48
+    },
+    {
+      customer_name: 'Alisha Yang',
+      num_orders: 3,
+      lifetime_value: 4747.3
+    },
+    {
+      customer_name: 'Alisha Ye',
+      num_orders: 2,
+      lifetime_value: 5953.25
+    },
+    {
+      customer_name: 'Alisha Yuan',
+      num_orders: 3,
+      lifetime_value: 8113.01
+    },
+    {
+      customer_name: 'Alisha Zeng',
+      num_orders: 2,
+      lifetime_value: 4730.32
+    },
+    {
+      customer_name: 'Alisha Zhang',
+      num_orders: 2,
+      lifetime_value: 5888.24
+    },
+    {
+      customer_name: 'Alisha Zhao',
+      num_orders: 2,
+      lifetime_value: 5873.26
+    },
+    {
+      customer_name: 'Alisha Zheng',
+      num_orders: 2,
+      lifetime_value: 4813.76
+    },
+    {
+      customer_name: 'Alisha Zhu',
+      num_orders: 3,
+      lifetime_value: 8173.53
+    },
+    {
+      customer_name: 'Alison Anand',
+      num_orders: 2,
+      lifetime_value: 4385.03
+    },
+    {
+      customer_name: 'Alison Andersen',
+      num_orders: 2,
+      lifetime_value: 5900.55
+    },
+    {
+      customer_name: 'Alison Beck',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Alison Chande',
+      num_orders: 2,
+      lifetime_value: 5908.25
+    },
+    {
+      customer_name: 'Alison Chander',
+      num_orders: 2,
+      lifetime_value: 4471.74
+    },
+    {
+      customer_name: 'Alison Deng',
+      num_orders: 2,
+      lifetime_value: 101.57
+    },
+    {
+      customer_name: 'Alison Goel',
+      num_orders: 1,
+      lifetime_value: 2478.34
+    },
+    {
+      customer_name: 'Alison Jai',
+      num_orders: 1,
+      lifetime_value: 2411.95
+    },
+    {
+      customer_name: 'Alison Kumar',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Alison Lal',
+      num_orders: 2,
+      lifetime_value: 115.94
+    },
+    {
+      customer_name: 'Alison Luo',
+      num_orders: 2,
+      lifetime_value: 126.96
+    },
+    {
+      customer_name: 'Alison Nara',
+      num_orders: 2,
+      lifetime_value: 205.44
+    },
+    {
+      customer_name: 'Alison Nath',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Alison Pal',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Alison Rai',
+      num_orders: 1,
+      lifetime_value: 607.96
+    },
+    {
+      customer_name: 'Alison Raje',
+      num_orders: 2,
+      lifetime_value: 5898.26
+    },
+    {
+      customer_name: 'Alison Raji',
+      num_orders: 2,
+      lifetime_value: 76.15
+    },
+    {
+      customer_name: 'Alison Shan',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Alison Sharma',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Alison Shen',
+      num_orders: 2,
+      lifetime_value: 5932.74
+    },
+    {
+      customer_name: 'Alison Tang',
+      num_orders: 2,
+      lifetime_value: 102.57
+    },
+    {
+      customer_name: 'Alison Xie',
+      num_orders: 2,
+      lifetime_value: 5908.25
+    },
+    {
+      customer_name: 'Alison Xu',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Alison Yuan',
+      num_orders: 1,
+      lifetime_value: 2357.28
+    },
+    {
+      customer_name: 'Allen Arthur',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Allen Chandra',
+      num_orders: 1,
+      lifetime_value: 93.97
+    },
+    {
+      customer_name: 'Allen Fernandez',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Allen Garcia',
+      num_orders: 3,
+      lifetime_value: 103.55
+    },
+    {
+      customer_name: 'Allen Gonzalez',
+      num_orders: 3,
+      lifetime_value: 235.54
+    },
+    {
+      customer_name: 'Allen Kapoor',
+      num_orders: 2,
+      lifetime_value: 2611.4096
+    },
+    {
+      customer_name: 'Allen Lopez',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Allen Malhotra',
+      num_orders: 2,
+      lifetime_value: 3134.95
+    },
+    {
+      customer_name: 'Allen Martinez',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Allen Mehta',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Allen Patel',
+      num_orders: 1,
+      lifetime_value: 24.27
+    },
+    {
+      customer_name: 'Allen Perez',
+      num_orders: 3,
+      lifetime_value: 196.93
+    },
+    {
+      customer_name: 'Allen Raman',
+      num_orders: 3,
+      lifetime_value: 74.14
+    },
+    {
+      customer_name: 'Allen Rana',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Allen Rodriguez',
+      num_orders: 3,
+      lifetime_value: 225.44
+    },
+    {
+      customer_name: 'Allen Sai',
+      num_orders: 2,
+      lifetime_value: 4943.32
+    },
+    {
+      customer_name: 'Allen Schmidt',
+      num_orders: 3,
+      lifetime_value: 153.21
+    },
+    {
+      customer_name: 'Allen Smith',
+      num_orders: 1,
+      lifetime_value: 41.95
+    },
+    {
+      customer_name: 'Allen Subram',
+      num_orders: 2,
+      lifetime_value: 1322.98
+    },
+    {
+      customer_name: 'Allen Suri',
+      num_orders: 2,
+      lifetime_value: 2611.4096
+    },
+    {
+      customer_name: 'Alyssa Alexander',
+      num_orders: 2,
+      lifetime_value: 5338.74
+    },
+    {
+      customer_name: 'Alyssa Ashe',
+      num_orders: 2,
+      lifetime_value: 5919.21
+    },
+    {
+      customer_name: 'Alyssa Bailey',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Alyssa Barnes',
+      num_orders: 1,
+      lifetime_value: 2487.89
+    },
+    {
+      customer_name: 'Alyssa Bradley',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Alyssa Brooks',
+      num_orders: 1,
+      lifetime_value: 38.98
+    },
+    {
+      customer_name: 'Alyssa Brown',
+      num_orders: 2,
+      lifetime_value: 5935.55
+    },
+    {
+      customer_name: 'Alyssa Bryant',
+      num_orders: 2,
+      lifetime_value: 5304.25
+    },
+    {
+      customer_name: 'Alyssa Butler',
+      num_orders: 1,
+      lifetime_value: 1184.46
+    },
+    {
+      customer_name: 'Alyssa Clark',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Alyssa Coleman',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Alyssa Cook',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Alyssa Cooper',
+      num_orders: 1,
+      lifetime_value: 69.97
+    },
+    {
+      customer_name: 'Alyssa Cox',
+      num_orders: 1,
+      lifetime_value: 69.97
+    },
+    {
+      customer_name: 'Alyssa Davis',
+      num_orders: 1,
+      lifetime_value: 2376.96
+    },
+    {
+      customer_name: 'Alyssa Diaz',
+      num_orders: 2,
+      lifetime_value: 74.45
+    },
+    {
+      customer_name: 'Alyssa Flores',
+      num_orders: 1,
+      lifetime_value: 45.95
+    },
+    {
+      customer_name: 'Alyssa Foster',
+      num_orders: 1,
+      lifetime_value: 1134.47
+    },
+    {
+      customer_name: 'Alyssa Garcia',
+      num_orders: 3,
+      lifetime_value: 7023.77
+    },
+    {
+      customer_name: 'Alyssa Gonzales',
+      num_orders: 2,
+      lifetime_value: 3268.5482
+    },
+    {
+      customer_name: 'Alyssa Gray',
+      num_orders: 1,
+      lifetime_value: 37.97
+    },
+    {
+      customer_name: 'Alyssa Hall',
+      num_orders: 1,
+      lifetime_value: 53.99
+    },
+    {
+      customer_name: 'Alyssa Harris',
+      num_orders: 1,
+      lifetime_value: 34.47
+    },
+    {
+      customer_name: 'Alyssa Henderson',
+      num_orders: 1,
+      lifetime_value: 1179.97
+    },
+    {
+      customer_name: 'Alyssa Howard',
+      num_orders: 1,
+      lifetime_value: 27.28
+    },
+    {
+      customer_name: 'Alyssa Hughes',
+      num_orders: 1,
+      lifetime_value: 133.49
+    },
+    {
+      customer_name: 'Alyssa Jackson',
+      num_orders: 2,
+      lifetime_value: 5958.18
+    },
+    {
+      customer_name: 'Alyssa James',
+      num_orders: 2,
+      lifetime_value: 4153.25
+    },
+    {
+      customer_name: 'Alyssa Jenkins',
+      num_orders: 1,
+      lifetime_value: 1204.46
+    },
+    {
+      customer_name: 'Alyssa Johnson',
+      num_orders: 1,
+      lifetime_value: 2376.96
+    },
+    {
+      customer_name: 'Alyssa Jones',
+      num_orders: 2,
+      lifetime_value: 42.28
+    },
+    {
+      customer_name: 'Alyssa Kelly',
+      num_orders: 2,
+      lifetime_value: 3142.4482
+    },
+    {
+      customer_name: 'Alyssa Lee',
+      num_orders: 2,
+      lifetime_value: 4344.0882
+    },
+    {
+      customer_name: 'Alyssa Lewis',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Alyssa Martin',
+      num_orders: 1,
+      lifetime_value: 53.99
+    },
+    {
+      customer_name: 'Alyssa Martinez',
+      num_orders: 1,
+      lifetime_value: 53.99
+    },
+    {
+      customer_name: 'Alyssa Miller',
+      num_orders: 2,
+      lifetime_value: 5959.71
+    },
+    {
+      customer_name: 'Alyssa Moore',
+      num_orders: 2,
+      lifetime_value: 44.57
+    },
+    {
+      customer_name: 'Alyssa Morgan',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Alyssa Morris',
+      num_orders: 1,
+      lifetime_value: 1169.46
+    },
+    {
+      customer_name: 'Alyssa Murphy',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Alyssa Patterson',
+      num_orders: 1,
+      lifetime_value: 1174.48
+    },
+    {
+      customer_name: 'Alyssa Perry',
+      num_orders: 1,
+      lifetime_value: 1143.46
+    },
+    {
+      customer_name: 'Alyssa Powell',
+      num_orders: 1,
+      lifetime_value: 1120.49
+    },
+    {
+      customer_name: 'Alyssa Price',
+      num_orders: 2,
+      lifetime_value: 1938.47
+    },
+    {
+      customer_name: 'Alyssa Ramirez',
+      num_orders: 2,
+      lifetime_value: 4142.75
+    },
+    {
+      customer_name: 'Alyssa Reed',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Alyssa Richardson',
+      num_orders: 1,
+      lifetime_value: 28.98
+    },
+    {
+      customer_name: 'Alyssa Rivera',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Alyssa Robinson',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Alyssa Rodriguez',
+      num_orders: 1,
+      lifetime_value: 21.49
+    },
+    {
+      customer_name: 'Alyssa Rogers',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Alyssa Ross',
+      num_orders: 2,
+      lifetime_value: 5749.97
+    },
+    {
+      customer_name: 'Alyssa Russell',
+      num_orders: 2,
+      lifetime_value: 104.69
+    },
+    {
+      customer_name: 'Alyssa Sanchez',
+      num_orders: 1,
+      lifetime_value: 1120.49
+    },
+    {
+      customer_name: 'Alyssa Sanders',
+      num_orders: 1,
+      lifetime_value: 78.96
+    },
+    {
+      customer_name: 'Alyssa Smith',
+      num_orders: 2,
+      lifetime_value: 44.57
+    },
+    {
+      customer_name: 'Alyssa Stewart',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Alyssa Taylor',
+      num_orders: 2,
+      lifetime_value: 37.29
+    },
+    {
+      customer_name: 'Alyssa Thomas',
+      num_orders: 2,
+      lifetime_value: 5997.73
+    },
+    {
+      customer_name: 'Alyssa Thompson',
+      num_orders: 1,
+      lifetime_value: 53.99
+    },
+    {
+      customer_name: 'Alyssa Ward',
+      num_orders: 1,
+      lifetime_value: 119.96
+    },
+    {
+      customer_name: 'Alyssa Watson',
+      num_orders: 2,
+      lifetime_value: 4139.75
+    },
+    {
+      customer_name: 'Alyssa West',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Alyssa White',
+      num_orders: 2,
+      lifetime_value: 5973.24
+    },
+    {
+      customer_name: 'Alyssa Wilson',
+      num_orders: 2,
+      lifetime_value: 5944.21
+    },
+    {
+      customer_name: 'Alyssa Wood',
+      num_orders: 1,
+      lifetime_value: 1214.46
+    },
+    {
+      customer_name: 'Alícia Anand',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Amber Young',
+      num_orders: 3,
+      lifetime_value: 6383.88
+    },
+    {
+      customer_name: 'Amy Cai',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Amy Chow',
+      num_orders: 1,
+      lifetime_value: 1243.44
+    },
+    {
+      customer_name: 'Amy Gao',
+      num_orders: 2,
+      lifetime_value: 1938.47
+    },
+    {
+      customer_name: 'Amy Guo',
+      num_orders: 1,
+      lifetime_value: 24.99
+    },
+    {
+      customer_name: 'Amy He',
+      num_orders: 1,
+      lifetime_value: 63.97
+    },
+    {
+      customer_name: 'Amy Hu',
+      num_orders: 1,
+      lifetime_value: 9.99
+    },
+    {
+      customer_name: 'Amy Huang',
+      num_orders: 1,
+      lifetime_value: 1750.98
+    },
+    {
+      customer_name: 'Amy Li',
+      num_orders: 1,
+      lifetime_value: 1750.98
+    },
+    {
+      customer_name: 'Amy Liang',
+      num_orders: 3,
+      lifetime_value: 2378.8
+    },
+    {
+      customer_name: 'Amy Lin',
+      num_orders: 2,
+      lifetime_value: 3240.32
+    },
+    {
+      customer_name: 'Amy Lu',
+      num_orders: 3,
+      lifetime_value: 3911.29
+    },
+    {
+      customer_name: 'Amy Ma',
+      num_orders: 1,
+      lifetime_value: 24.99
+    },
+    {
+      customer_name: 'Amy Sun',
+      num_orders: 2,
+      lifetime_value: 3283.43
+    },
+    {
+      customer_name: 'Amy Wu',
+      num_orders: 2,
+      lifetime_value: 4406.3996
+    },
+    {
+      customer_name: 'Amy Yang',
+      num_orders: 1,
+      lifetime_value: 77.96
+    },
+    {
+      customer_name: 'Amy Ye',
+      num_orders: 2,
+      lifetime_value: 3261.33
+    },
+    {
+      customer_name: 'Amy Zeng',
+      num_orders: 1,
+      lifetime_value: 1120.49
+    },
+    {
+      customer_name: 'Amy Zhang',
+      num_orders: 1,
+      lifetime_value: 1155.48
+    },
+    {
+      customer_name: 'Amy Zhao',
+      num_orders: 1,
+      lifetime_value: 196.27
+    },
+    {
+      customer_name: 'Amy Zheng',
+      num_orders: 1,
+      lifetime_value: 77.96
+    },
+    {
+      customer_name: 'Amy Zhu',
+      num_orders: 2,
+      lifetime_value: 1947.46
+    },
+    {
+      customer_name: 'Andre Arun',
+      num_orders: 1,
+      lifetime_value: 66.44
+    },
+    {
+      customer_name: 'Andre Chandra',
+      num_orders: 1,
+      lifetime_value: 68.49
+    },
+    {
+      customer_name: 'Andre Garcia',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Andre Gonzalez',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Andre Kapoor',
+      num_orders: 1,
+      lifetime_value: 24.99
+    },
+    {
+      customer_name: 'Andre Kovár',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Andre Lopez',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Andre Madan',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Andre Martinez',
+      num_orders: 1,
+      lifetime_value: 567.27
+    },
+    {
+      customer_name: 'Andre Mehta',
+      num_orders: 1,
+      lifetime_value: 166.28
+    },
+    {
+      customer_name: 'Andre Patel',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Andre Perez',
+      num_orders: 1,
+      lifetime_value: 2369.97
+    },
+    {
+      customer_name: 'Andre Prasad',
+      num_orders: 1,
+      lifetime_value: 592.27
+    },
+    {
+      customer_name: 'Andre Raman',
+      num_orders: 1,
+      lifetime_value: 611.94
+    },
+    {
+      customer_name: 'Andre Rana',
+      num_orders: 1,
+      lifetime_value: 572.26
+    },
+    {
+      customer_name: 'Andre Sai',
+      num_orders: 2,
+      lifetime_value: 2731.5425
+    },
+    {
+      customer_name: 'Andre Sanchez',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Andre Sara',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Andre Smith',
+      num_orders: 2,
+      lifetime_value: 38.25
+    },
+    {
+      customer_name: 'Andre Subram',
+      num_orders: 1,
+      lifetime_value: 563.96
+    },
+    {
+      customer_name: 'Andre Suri',
+      num_orders: 2,
+      lifetime_value: 84.25
+    },
+    {
+      customer_name: 'Andrew Anderson',
+      num_orders: 1,
+      lifetime_value: 110.46
+    },
+    {
+      customer_name: 'Andrew Brown',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Andrew Clark',
+      num_orders: 1,
+      lifetime_value: 74.98
+    },
+    {
+      customer_name: 'Andrew Davis',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Andrew Garcia',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Andrew Jackson',
+      num_orders: 1,
+      lifetime_value: 133.49
+    },
+    {
+      customer_name: 'Andrew Johnson',
+      num_orders: 1,
+      lifetime_value: 1750.98
+    },
+    {
+      customer_name: 'Andrew Jones',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Andrew Lee',
+      num_orders: 2,
+      lifetime_value: 4143.74
+    },
+    {
+      customer_name: 'Andrew Lewis',
+      num_orders: 1,
+      lifetime_value: 35
+    },
+    {
+      customer_name: 'Andrew Martinez',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Andrew Miller',
+      num_orders: 1,
+      lifetime_value: 2329.98
+    },
+    {
+      customer_name: 'Andrew Moore',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Andrew Robinson',
+      num_orders: 1,
+      lifetime_value: 2316.97
+    },
+    {
+      customer_name: 'Andrew Rodriguez',
+      num_orders: 1,
+      lifetime_value: 74.98
+    },
+    {
+      customer_name: 'Andrew Smith',
+      num_orders: 1,
+      lifetime_value: 2414.97
+    },
+    {
+      customer_name: 'Andrew Taylor',
+      num_orders: 1,
+      lifetime_value: 2322.28
+    },
+    {
+      customer_name: 'Andrew Thomas',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Andrew Walker',
+      num_orders: 2,
+      lifetime_value: 4217.22
+    },
+    {
+      customer_name: 'Andrew Wedge',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Andrew Williams',
+      num_orders: 1,
+      lifetime_value: 1759.97
+    },
+    {
+      customer_name: 'Andrew Wilson',
+      num_orders: 1,
+      lifetime_value: 2390.95
+    },
+    {
+      customer_name: 'Angel Adams',
+      num_orders: 2,
+      lifetime_value: 67.58
+    },
+    {
+      customer_name: 'Angel Allen',
+      num_orders: 1,
+      lifetime_value: 54.98
+    },
+    {
+      customer_name: 'Angel Bailey',
+      num_orders: 2,
+      lifetime_value: 151.94
+    },
+    {
+      customer_name: 'Angel Baker',
+      num_orders: 1,
+      lifetime_value: 569.97
+    },
+    {
+      customer_name: 'Angel Brooks',
+      num_orders: 1,
+      lifetime_value: 76.97
+    },
+    {
+      customer_name: 'Angel Campbell',
+      num_orders: 2,
+      lifetime_value: 28.98
+    },
+    {
+      customer_name: 'Angel Carter',
+      num_orders: 2,
+      lifetime_value: 3001.0225
+    },
+    {
+      customer_name: 'Angel Cook',
+      num_orders: 2,
+      lifetime_value: 1676.46
+    },
+    {
+      customer_name: 'Angel Cooper',
+      num_orders: 3,
+      lifetime_value: 242.5
+    },
+    {
+      customer_name: 'Angel Cox',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Angel Edwards',
+      num_orders: 1,
+      lifetime_value: 94.98
+    },
+    {
+      customer_name: 'Angel Evans',
+      num_orders: 2,
+      lifetime_value: 3764.0682
+    },
+    {
+      customer_name: 'Angel Gonzalez',
+      num_orders: 1,
+      lifetime_value: 122.95
+    },
+    {
+      customer_name: 'Angel Gray',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Angel Hall',
+      num_orders: 2,
+      lifetime_value: 4260.24
+    },
+    {
+      customer_name: 'Angel Hill',
+      num_orders: 1,
+      lifetime_value: 103.49
+    },
+    {
+      customer_name: 'Angel Howard',
+      num_orders: 2,
+      lifetime_value: 4467.74
+    },
+    {
+      customer_name: 'Angel James',
+      num_orders: 2,
+      lifetime_value: 1468.5882
+    },
+    {
+      customer_name: 'Angel Kelly',
+      num_orders: 2,
+      lifetime_value: 3291.82
+    },
+    {
+      customer_name: 'Angel King',
+      num_orders: 1,
+      lifetime_value: 1754.98
+    },
+    {
+      customer_name: 'Angel Lopez',
+      num_orders: 2,
+      lifetime_value: 4486.5425
+    },
+    {
+      customer_name: 'Angel Mitchell',
+      num_orders: 2,
+      lifetime_value: 4698.76
+    },
+    {
+      customer_name: 'Angel Morgan',
+      num_orders: 1,
+      lifetime_value: 29.93
+    },
+    {
+      customer_name: 'Angel Morris',
+      num_orders: 1,
+      lifetime_value: 59.98
+    },
+    {
+      customer_name: 'Angel Murphy',
+      num_orders: 2,
+      lifetime_value: 2803.5225
+    },
+    {
+      customer_name: 'Angel Nelson',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Angel Parker',
+      num_orders: 2,
+      lifetime_value: 34.98
+    },
+    {
+      customer_name: 'Angel Perez',
+      num_orders: 1,
+      lifetime_value: 93.97
+    },
+    {
+      customer_name: 'Angel Peterson',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Angel Phillips',
+      num_orders: 1,
+      lifetime_value: 629.97
+    },
+    {
+      customer_name: 'Angel Ramirez',
+      num_orders: 2,
+      lifetime_value: 254.06
+    },
+    {
+      customer_name: 'Angel Reed',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Angel Richardson',
+      num_orders: 1,
+      lifetime_value: 89.97
+    },
+    {
+      customer_name: 'Angel Rivera',
+      num_orders: 2,
+      lifetime_value: 3209.93
+    },
+    {
+      customer_name: 'Angel Roberts',
+      num_orders: 2,
+      lifetime_value: 1404.95
+    },
+    {
+      customer_name: 'Angel Rogers',
+      num_orders: 3,
+      lifetime_value: 8297.29
+    },
+    {
+      customer_name: 'Angel Sanders',
+      num_orders: 2,
+      lifetime_value: 155.94
+    },
+    {
+      customer_name: 'Angel Scott',
+      num_orders: 1,
+      lifetime_value: 2443.35
+    },
+    {
+      customer_name: 'Angel Stewart',
+      num_orders: 2,
+      lifetime_value: 4444.0682
+    },
+    {
+      customer_name: 'Angel Torres',
+      num_orders: 2,
+      lifetime_value: 77.27
+    },
+    {
+      customer_name: 'Angel Turner',
+      num_orders: 3,
+      lifetime_value: 3963.14
+    },
+    {
+      customer_name: 'Angel Ward',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Angel Wright',
+      num_orders: 2,
+      lifetime_value: 77.27
+    },
+    {
+      customer_name: 'Angel Young',
+      num_orders: 3,
+      lifetime_value: 135.35
+    },
+    {
+      customer_name: 'Anna Anderson',
+      num_orders: 2,
+      lifetime_value: 5908.25
+    },
+    {
+      customer_name: 'Anna Brown',
+      num_orders: 2,
+      lifetime_value: 162.28
+    },
+    {
+      customer_name: 'Anna Clark',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Anna Davis',
+      num_orders: 2,
+      lifetime_value: 5933.25
+    },
+    {
+      customer_name: 'Anna Garcia',
+      num_orders: 3,
+      lifetime_value: 6786.1182
+    },
+    {
+      customer_name: 'Anna Hall',
+      num_orders: 3,
+      lifetime_value: 5253.6496
+    },
+    {
+      customer_name: 'Anna Harris',
+      num_orders: 2,
+      lifetime_value: 5957.22
+    },
+    {
+      customer_name: 'Anna Jackson',
+      num_orders: 1,
+      lifetime_value: 49.97
+    },
+    {
+      customer_name: 'Anna Johnson',
+      num_orders: 2,
+      lifetime_value: 5929.23
+    },
+    {
+      customer_name: 'Anna Jones',
+      num_orders: 2,
+      lifetime_value: 155
+    },
+    {
+      customer_name: 'Anna Lee',
+      num_orders: 2,
+      lifetime_value: 4381.3896
+    },
+    {
+      customer_name: 'Anna Lewis',
+      num_orders: 2,
+      lifetime_value: 5873.26
+    },
+    {
+      customer_name: 'Anna Martin',
+      num_orders: 2,
+      lifetime_value: 5932.22
+    },
+    {
+      customer_name: 'Anna Martinez',
+      num_orders: 2,
+      lifetime_value: 4344.0882
+    },
+    {
+      customer_name: 'Anna Miller',
+      num_orders: 2,
+      lifetime_value: 5913.24
+    },
+    {
+      customer_name: 'Anna Moore',
+      num_orders: 2,
+      lifetime_value: 5958.74
+    },
+    {
+      customer_name: 'Anna Robinson',
+      num_orders: 2,
+      lifetime_value: 5922.23
+    },
+    {
+      customer_name: 'Anna Rodriguez',
+      num_orders: 3,
+      lifetime_value: 6872.1082
+    },
+    {
+      customer_name: 'Anna Taylor',
+      num_orders: 4,
+      lifetime_value: 228.42
+    },
+    {
+      customer_name: 'Anna Thomas',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Anna Thompson',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Anna White',
+      num_orders: 2,
+      lifetime_value: 4548.6996
+    },
+    {
+      customer_name: 'Anna Williams',
+      num_orders: 2,
+      lifetime_value: 5873.26
+    },
+    {
+      customer_name: 'Anne Alonso',
+      num_orders: 1,
+      lifetime_value: 85.48
+    },
+    {
+      customer_name: 'Anne Alvarez',
+      num_orders: 1,
+      lifetime_value: 85.48
+    },
+    {
+      customer_name: 'Anne Blanco',
+      num_orders: 2,
+      lifetime_value: 3330.4275
+    },
+    {
+      customer_name: 'Anne Carlson',
+      num_orders: 1,
+      lifetime_value: 81.46
+    },
+    {
+      customer_name: 'Anne Dominguez',
+      num_orders: 2,
+      lifetime_value: 3362.7075
+    },
+    {
+      customer_name: 'Anne Gill',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Anne Gomez',
+      num_orders: 2,
+      lifetime_value: 1804.9175
+    },
+    {
+      customer_name: 'Anne Gutierrez',
+      num_orders: 1,
+      lifetime_value: 24.27
+    },
+    {
+      customer_name: 'Anne Hernandez',
+      num_orders: 3,
+      lifetime_value: 256.24
+    },
+    {
+      customer_name: 'Anne Jiménez',
+      num_orders: 2,
+      lifetime_value: 1845.8975
+    },
+    {
+      customer_name: 'Anne Martin',
+      num_orders: 3,
+      lifetime_value: 128.84
+    },
+    {
+      customer_name: 'Anne Moreno',
+      num_orders: 2,
+      lifetime_value: 1804.9175
+    },
+    {
+      customer_name: 'Anne Munoz',
+      num_orders: 2,
+      lifetime_value: 1897.8775
+    },
+    {
+      customer_name: 'Anne Navarro',
+      num_orders: 3,
+      lifetime_value: 119.86
+    },
+    {
+      customer_name: 'Anne Ortega',
+      num_orders: 2,
+      lifetime_value: 3344.6975
+    },
+    {
+      customer_name: 'Anne Ramos',
+      num_orders: 1,
+      lifetime_value: 93.97
+    },
+    {
+      customer_name: 'Anne Romero',
+      num_orders: 3,
+      lifetime_value: 122.56
+    },
+    {
+      customer_name: 'Anne Rubio',
+      num_orders: 1,
+      lifetime_value: 31.97
+    },
+    {
+      customer_name: 'Anne Ruiz',
+      num_orders: 2,
+      lifetime_value: 3337.7075
+    },
+    {
+      customer_name: 'Anne Serrano',
+      num_orders: 2,
+      lifetime_value: 3373.9075
+    },
+    {
+      customer_name: 'Anne Torres',
+      num_orders: 1,
+      lifetime_value: 75.97
+    },
+    {
+      customer_name: 'Anne Vazquez',
+      num_orders: 2,
+      lifetime_value: 1809.3975
+    },
+    {
+      customer_name: 'Anthony Anderson',
+      num_orders: 1,
+      lifetime_value: 38.98
+    },
+    {
+      customer_name: 'Anthony Brown',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Anthony Clark',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Anthony Davis',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Anthony Garcia',
+      num_orders: 3,
+      lifetime_value: 148.89
+    },
+    {
+      customer_name: 'Anthony Harris',
+      num_orders: 2,
+      lifetime_value: 3027.32
+    },
+    {
+      customer_name: 'Anthony Johnson',
+      num_orders: 2,
+      lifetime_value: 155.45
+    },
+    {
+      customer_name: 'Anthony Jones',
+      num_orders: 1,
+      lifetime_value: 2329.99
+    },
+    {
+      customer_name: 'Anthony Lee',
+      num_orders: 1,
+      lifetime_value: 2341.97
+    },
+    {
+      customer_name: 'Anthony Lewis',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Anthony Martinez',
+      num_orders: 1,
+      lifetime_value: 2394.97
+    },
+    {
+      customer_name: 'Anthony Miller',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Anthony Moore',
+      num_orders: 1,
+      lifetime_value: 1714.97
+    },
+    {
+      customer_name: 'Anthony Robinson',
+      num_orders: 1,
+      lifetime_value: 2362.27
+    },
+    {
+      customer_name: 'Anthony Rodriguez',
+      num_orders: 1,
+      lifetime_value: 2294.99
+    },
+    {
+      customer_name: 'Anthony Taylor',
+      num_orders: 1,
+      lifetime_value: 2319.99
+    },
+    {
+      customer_name: 'Anthony Thompson',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Anthony Walker',
+      num_orders: 1,
+      lifetime_value: 2294.99
+    },
+    {
+      customer_name: 'Anthony White',
+      num_orders: 3,
+      lifetime_value: 4644.7475
+    },
+    {
+      customer_name: 'Anthony Williams',
+      num_orders: 1,
+      lifetime_value: 2379.48
+    },
+    {
+      customer_name: 'Anthony Wilson',
+      num_orders: 1,
+      lifetime_value: 1750.98
+    },
+    {
+      customer_name: 'Antonio Alexander',
+      num_orders: 2,
+      lifetime_value: 4682.5325
+    },
+    {
+      customer_name: 'Antonio Barnes',
+      num_orders: 1,
+      lifetime_value: 29.93
+    },
+    {
+      customer_name: 'Antonio Bennett',
+      num_orders: 2,
+      lifetime_value: 165.95
+    },
+    {
+      customer_name: 'Antonio Bryant',
+      num_orders: 1,
+      lifetime_value: 85.48
+    },
+    {
+      customer_name: 'Antonio Butler',
+      num_orders: 2,
+      lifetime_value: 4564.4925
+    },
+    {
+      customer_name: 'Antonio Diaz',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Antonio Flores',
+      num_orders: 2,
+      lifetime_value: 4813.32
+    },
+    {
+      customer_name: 'Antonio Foster',
+      num_orders: 1,
+      lifetime_value: 71.95
+    },
+    {
+      customer_name: 'Antonio Gonzales',
+      num_orders: 1,
+      lifetime_value: 96.46
+    },
+    {
+      customer_name: 'Antonio Griffin',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Antonio Hayes',
+      num_orders: 2,
+      lifetime_value: 4905.32
+    },
+    {
+      customer_name: 'Antonio Henderson',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Antonio Hughes',
+      num_orders: 1,
+      lifetime_value: 85.48
+    },
+    {
+      customer_name: 'Antonio Jenkins',
+      num_orders: 3,
+      lifetime_value: 114.95
+    },
+    {
+      customer_name: 'Antonio Long',
+      num_orders: 2,
+      lifetime_value: 4491.5325
+    },
+    {
+      customer_name: 'Antonio Patterson',
+      num_orders: 3,
+      lifetime_value: 163.19
+    },
+    {
+      customer_name: 'Antonio Perry',
+      num_orders: 3,
+      lifetime_value: 73.16
+    },
+    {
+      customer_name: 'Antonio Powell',
+      num_orders: 2,
+      lifetime_value: 4558.5225
+    },
+    {
+      customer_name: 'Antonio Price',
+      num_orders: 2,
+      lifetime_value: 185.96
+    },
+    {
+      customer_name: 'Antonio Ross',
+      num_orders: 2,
+      lifetime_value: 4501.5525
+    },
+    {
+      customer_name: 'Antonio Russell',
+      num_orders: 2,
+      lifetime_value: 4564.4925
+    },
+    {
+      customer_name: 'Antonio Simmons',
+      num_orders: 2,
+      lifetime_value: 4501.5525
+    },
+    {
+      customer_name: 'Antonio Washington',
+      num_orders: 2,
+      lifetime_value: 4501.5525
+    },
+    {
+      customer_name: 'Antonio Wood',
+      num_orders: 2,
+      lifetime_value: 220.46
+    },
+    {
+      customer_name: 'April Anand',
+      num_orders: 2,
+      lifetime_value: 3059.0782
+    },
+    {
+      customer_name: 'April Andersen',
+      num_orders: 2,
+      lifetime_value: 3131.95
+    },
+    {
+      customer_name: 'April Beck',
+      num_orders: 2,
+      lifetime_value: 3161.94
+    },
+    {
+      customer_name: 'April Deng',
+      num_orders: 1,
+      lifetime_value: 1170.48
+    },
+    {
+      customer_name: 'April Goel',
+      num_orders: 1,
+      lifetime_value: 74.98
+    },
+    {
+      customer_name: 'April Jai',
+      num_orders: 1,
+      lifetime_value: 2457.33
+    },
+    {
+      customer_name: 'April Kumar',
+      num_orders: 1,
+      lifetime_value: 23.97
+    },
+    {
+      customer_name: 'April Luo',
+      num_orders: 1,
+      lifetime_value: 23.97
+    },
+    {
+      customer_name: 'April Nara',
+      num_orders: 1,
+      lifetime_value: 34.98
+    },
+    {
+      customer_name: 'April Nath',
+      num_orders: 2,
+      lifetime_value: 3124.96
+    },
+    {
+      customer_name: 'April Pal',
+      num_orders: 2,
+      lifetime_value: 3246.5482
+    },
+    {
+      customer_name: 'April Raje',
+      num_orders: 2,
+      lifetime_value: 3105.27
+    },
+    {
+      customer_name: 'April Raji',
+      num_orders: 1,
+      lifetime_value: 34.98
+    },
+    {
+      customer_name: 'April Shan',
+      num_orders: 1,
+      lifetime_value: 93.46
+    },
+    {
+      customer_name: 'April Sharma',
+      num_orders: 1,
+      lifetime_value: 9.99
+    },
+    {
+      customer_name: 'April She',
+      num_orders: 1,
+      lifetime_value: 1155.48
+    },
+    {
+      customer_name: 'April Shen',
+      num_orders: 1,
+      lifetime_value: 2478.34
+    },
+    {
+      customer_name: 'April Tang',
+      num_orders: 1,
+      lifetime_value: 64.97
+    },
+    {
+      customer_name: 'April Xie',
+      num_orders: 1,
+      lifetime_value: 1174.48
+    },
+    {
+      customer_name: 'Arthur Washington',
+      num_orders: 2,
+      lifetime_value: 124.41
+    },
+    {
+      customer_name: 'Arthur Wilson',
+      num_orders: 2,
+      lifetime_value: 103.97
+    },
+    {
+      customer_name: 'Ashley Alexander',
+      num_orders: 2,
+      lifetime_value: 53.21
+    },
+    {
+      customer_name: 'Ashley Anderson',
+      num_orders: 2,
+      lifetime_value: 5908.25
+    },
+    {
+      customer_name: 'Ashley Barnes',
+      num_orders: 2,
+      lifetime_value: 118.96
+    },
+    {
+      customer_name: 'Ashley Bennett',
+      num_orders: 2,
+      lifetime_value: 5888.24
+    },
+    {
+      customer_name: 'Ashley Brown',
+      num_orders: 2,
+      lifetime_value: 162.28
+    },
+    {
+      customer_name: 'Ashley Bryant',
+      num_orders: 2,
+      lifetime_value: 77.96
+    },
+    {
+      customer_name: 'Ashley Butler',
+      num_orders: 2,
+      lifetime_value: 67.46
+    },
+    {
+      customer_name: 'Ashley Clark',
+      num_orders: 4,
+      lifetime_value: 293.4
+    },
+    {
+      customer_name: 'Ashley Coleman',
+      num_orders: 2,
+      lifetime_value: 2611.4096
+    },
+    {
+      customer_name: 'Ashley Davis',
+      num_orders: 2,
+      lifetime_value: 157.29
+    },
+    {
+      customer_name: 'Ashley Diaz',
+      num_orders: 1,
+      lifetime_value: 23.97
+    },
+    {
+      customer_name: 'Ashley Flores',
+      num_orders: 2,
+      lifetime_value: 2629.0682
+    },
+    {
+      customer_name: 'Ashley Foster',
+      num_orders: 2,
+      lifetime_value: 42.97
+    },
+    {
+      customer_name: 'Ashley Garcia',
+      num_orders: 2,
+      lifetime_value: 5913.25
+    },
+    {
+      customer_name: 'Ashley Gonzales',
+      num_orders: 2,
+      lifetime_value: 37.98
+    },
+    {
+      customer_name: 'Ashley Griffin',
+      num_orders: 2,
+      lifetime_value: 117.45
+    },
+    {
+      customer_name: 'Ashley Hall',
+      num_orders: 1,
+      lifetime_value: 71.95
+    },
+    {
+      customer_name: 'Ashley Harris',
+      num_orders: 4,
+      lifetime_value: 224.53
+    },
+    {
+      customer_name: 'Ashley Hayes',
+      num_orders: 3,
+      lifetime_value: 333.3
+    },
+    {
+      customer_name: 'Ashley Henderson',
+      num_orders: 1,
+      lifetime_value: 74.98
+    },
+    {
+      customer_name: 'Ashley Hughes',
+      num_orders: 2,
+      lifetime_value: 2633.3896
+    },
+    {
+      customer_name: 'Ashley Jackson',
+      num_orders: 1,
+      lifetime_value: 39.99
+    },
+    {
+      customer_name: 'Ashley Jenkins',
+      num_orders: 2,
+      lifetime_value: 2668.0782
+    },
+    {
+      customer_name: 'Ashley Johnson',
+      num_orders: 1,
+      lifetime_value: 42.28
+    },
+    {
+      customer_name: 'Ashley Jones',
+      num_orders: 2,
+      lifetime_value: 258.48
+    },
+    {
+      customer_name: 'Ashley Lee',
+      num_orders: 1,
+      lifetime_value: 2351.96
+    },
+    {
+      customer_name: 'Ashley Lewis',
+      num_orders: 1,
+      lifetime_value: 2331.95
+    },
+    {
+      customer_name: 'Ashley Long',
+      num_orders: 2,
+      lifetime_value: 2646.3996
+    },
+    {
+      customer_name: 'Ashley Martin',
+      num_orders: 1,
+      lifetime_value: 74.98
+    },
+    {
+      customer_name: 'Ashley Martinez',
+      num_orders: 2,
+      lifetime_value: 5875.55
+    },
+    {
+      customer_name: 'Ashley Miller',
+      num_orders: 1,
+      lifetime_value: 74.98
+    },
+    {
+      customer_name: 'Ashley Moore',
+      num_orders: 1,
+      lifetime_value: 35
+    },
+    {
+      customer_name: 'Ashley Patterson',
+      num_orders: 2,
+      lifetime_value: 83.97
+    },
+    {
+      customer_name: 'Ashley Perry',
+      num_orders: 2,
+      lifetime_value: 2626.3896
+    },
+    {
+      customer_name: 'Ashley Powell',
+      num_orders: 2,
+      lifetime_value: 2589.0882
+    },
+    {
+      customer_name: 'Ashley Price',
+      num_orders: 1,
+      lifetime_value: 8.99
+    },
+    {
+      customer_name: 'Ashley Robinson',
+      num_orders: 2,
+      lifetime_value: 5900.55
+    },
+    {
+      customer_name: 'Ashley Rodriguez',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Ashley Ross',
+      num_orders: 2,
+      lifetime_value: 147.95
+    },
+    {
+      customer_name: 'Ashley Russell',
+      num_orders: 3,
+      lifetime_value: 5649.2096
+    },
+    {
+      customer_name: 'Ashley Simmons',
+      num_orders: 1,
+      lifetime_value: 49.97
+    },
+    {
+      customer_name: 'Ashley Smith',
+      num_orders: 1,
+      lifetime_value: 35
+    },
+    {
+      customer_name: 'Ashley Taylor',
+      num_orders: 1,
+      lifetime_value: 74.98
+    },
+    {
+      customer_name: 'Ashley Thomas',
+      num_orders: 1,
+      lifetime_value: 89.98
+    },
+    {
+      customer_name: 'Ashley Thompson',
+      num_orders: 1,
+      lifetime_value: 42.28
+    },
+    {
+      customer_name: 'Ashley Walker',
+      num_orders: 2,
+      lifetime_value: 5955.23
+    },
+    {
+      customer_name: 'Ashley Washington',
+      num_orders: 2,
+      lifetime_value: 77.27
+    },
+    {
+      customer_name: 'Ashley White',
+      num_orders: 1,
+      lifetime_value: 74.98
+    },
+    {
+      customer_name: 'Ashley Williams',
+      num_orders: 2,
+      lifetime_value: 155
+    },
+    {
+      customer_name: 'Ashley Wilson',
+      num_orders: 1,
+      lifetime_value: 59.27
+    },
+    {
+      customer_name: 'Ashley Wood',
+      num_orders: 1,
+      lifetime_value: 58.96
+    },
+    {
+      customer_name: 'Austin Anderson',
+      num_orders: 1,
+      lifetime_value: 1754.98
+    },
+    {
+      customer_name: 'Austin Brown',
+      num_orders: 2,
+      lifetime_value: 6029.57
+    },
+    {
+      customer_name: 'Austin Davis',
+      num_orders: 2,
+      lifetime_value: 38.92
+    },
+    {
+      customer_name: 'Austin Garcia',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Austin Harris',
+      num_orders: 2,
+      lifetime_value: 6098.58
+    },
+    {
+      customer_name: 'Austin Johnson',
+      num_orders: 1,
+      lifetime_value: 2439.99
+    },
+    {
+      customer_name: 'Austin Jones',
+      num_orders: 2,
+      lifetime_value: 77.27
+    },
+    {
+      customer_name: 'Austin Lee',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Austin Lewis',
+      num_orders: 1,
+      lifetime_value: 1775.47
+    },
+    {
+      customer_name: 'Austin Martin',
+      num_orders: 3,
+      lifetime_value: 148.19
+    },
+    {
+      customer_name: 'Austin Martinez',
+      num_orders: 1,
+      lifetime_value: 2357.28
+    },
+    {
+      customer_name: 'Austin Moore',
+      num_orders: 1,
+      lifetime_value: 2414.99
+    },
+    {
+      customer_name: 'Austin Robinson',
+      num_orders: 1,
+      lifetime_value: 1750.98
+    },
+    {
+      customer_name: 'Austin Rodriguez',
+      num_orders: 1,
+      lifetime_value: 2376.96
+    },
+    {
+      customer_name: 'Austin Smith',
+      num_orders: 1,
+      lifetime_value: 1750.98
+    },
+    {
+      customer_name: 'Austin Taylor',
+      num_orders: 1,
+      lifetime_value: 1732.26
+    },
+    {
+      customer_name: 'Austin Thompson',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Austin Walker',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Austin White',
+      num_orders: 2,
+      lifetime_value: 6030.61
+    },
+    {
+      customer_name: 'Austin Williams',
+      num_orders: 2,
+      lifetime_value: 82.26
+    },
+    {
+      customer_name: 'Barbara Andersen',
+      num_orders: 3,
+      lifetime_value: 6786.4396
+    },
+    {
+      customer_name: 'Barbara Ashe',
+      num_orders: 2,
+      lifetime_value: 5933.26
+    },
+    {
+      customer_name: 'Barbara Beck',
+      num_orders: 2,
+      lifetime_value: 5875.55
+    },
+    {
+      customer_name: 'Barbara Cai',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Barbara Chande',
+      num_orders: 2,
+      lifetime_value: 4438.0582
+    },
+    {
+      customer_name: 'Barbara Chen',
+      num_orders: 2,
+      lifetime_value: 5873.26
+    },
+    {
+      customer_name: 'Barbara Deng',
+      num_orders: 1,
+      lifetime_value: 49.99
+    },
+    {
+      customer_name: 'Barbara Gao',
+      num_orders: 3,
+      lifetime_value: 6789.4596
+    },
+    {
+      customer_name: 'Barbara Goel',
+      num_orders: 2,
+      lifetime_value: 5958.74
+    },
+    {
+      customer_name: 'Barbara He',
+      num_orders: 3,
+      lifetime_value: 6806.1182
+    },
+    {
+      customer_name: 'Barbara Hu',
+      num_orders: 1,
+      lifetime_value: 43.98
+    },
+    {
+      customer_name: 'Barbara Huang',
+      num_orders: 2,
+      lifetime_value: 4460.3796
+    },
+    {
+      customer_name: 'Barbara Jai',
+      num_orders: 2,
+      lifetime_value: 5913.24
+    },
+    {
+      customer_name: 'Barbara Kumar',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Barbara Lal',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Barbara Li',
+      num_orders: 2,
+      lifetime_value: 5895.24
+    },
+    {
+      customer_name: 'Barbara Liang',
+      num_orders: 2,
+      lifetime_value: 4450.3696
+    },
+    {
+      customer_name: 'Barbara Lin',
+      num_orders: 3,
+      lifetime_value: 7068.27
+    },
+    {
+      customer_name: 'Barbara Liu',
+      num_orders: 1,
+      lifetime_value: 88.98
+    },
+    {
+      customer_name: 'Barbara Lu',
+      num_orders: 1,
+      lifetime_value: 21.49
+    },
+    {
+      customer_name: 'Barbara Luo',
+      num_orders: 2,
+      lifetime_value: 5875.55
+    },
+    {
+      customer_name: 'Barbara Ma',
+      num_orders: 2,
+      lifetime_value: 4391.4096
+    },
+    {
+      customer_name: 'Barbara Nara',
+      num_orders: 2,
+      lifetime_value: 123.24
+    },
+    {
+      customer_name: 'Barbara Rai',
+      num_orders: 2,
+      lifetime_value: 133.75
+    },
+    {
+      customer_name: 'Barbara Raji',
+      num_orders: 2,
+      lifetime_value: 5930.23
+    },
+    {
+      customer_name: 'Barbara Sharma',
+      num_orders: 3,
+      lifetime_value: 6767.1382
+    },
+    {
+      customer_name: 'Barbara Shen',
+      num_orders: 1,
+      lifetime_value: 8.99
+    },
+    {
+      customer_name: 'Barbara Tang',
+      num_orders: 1,
+      lifetime_value: 14.98
+    },
+    {
+      customer_name: 'Barbara Wang',
+      num_orders: 2,
+      lifetime_value: 5915.54
+    },
+    {
+      customer_name: 'Barbara Wu',
+      num_orders: 3,
+      lifetime_value: 4976.3796
+    },
+    {
+      customer_name: 'Barbara Xie',
+      num_orders: 2,
+      lifetime_value: 4540.3782
+    },
+    {
+      customer_name: 'Barbara Xu',
+      num_orders: 2,
+      lifetime_value: 5895.24
+    },
+    {
+      customer_name: 'Barbara Xu',
+      num_orders: 1,
+      lifetime_value: 53.99
+    },
+    {
+      customer_name: 'Barbara Ye',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Barbara Yuan',
+      num_orders: 2,
+      lifetime_value: 5908.25
+    },
+    {
+      customer_name: 'Barbara Zeng',
+      num_orders: 5,
+      lifetime_value: 237.19
+    },
+    {
+      customer_name: 'Barbara Zhang',
+      num_orders: 2,
+      lifetime_value: 5919.73
+    },
+    {
+      customer_name: 'Barbara Zhao',
+      num_orders: 1,
+      lifetime_value: 21.49
+    },
+    {
+      customer_name: 'Barbara Zheng',
+      num_orders: 2,
+      lifetime_value: 4406.3896
+    },
+    {
+      customer_name: 'Barbara Zhou',
+      num_orders: 3,
+      lifetime_value: 5241.4282
+    },
+    {
+      customer_name: 'Barbara Zhu',
+      num_orders: 25,
+      lifetime_value: 1006.83
+    },
+    {
+      customer_name: 'Begoña Hurtado',
+      num_orders: 1,
+      lifetime_value: 2325.96
+    },
+    {
+      customer_name: 'Benjamin Anderson',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Benjamin Brown',
+      num_orders: 2,
+      lifetime_value: 4752.75
+    },
+    {
+      customer_name: 'Benjamin Clark',
+      num_orders: 2,
+      lifetime_value: 4157.73
+    },
+    {
+      customer_name: 'Benjamin Davis',
+      num_orders: 2,
+      lifetime_value: 3103.31
+    },
+    {
+      customer_name: 'Benjamin Garcia',
+      num_orders: 2,
+      lifetime_value: 4145.54
+    },
+    {
+      customer_name: 'Benjamin Harris',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Benjamin Jackson',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Benjamin Johnson',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Benjamin Jones',
+      num_orders: 1,
+      lifetime_value: 21.49
+    },
+    {
+      customer_name: 'Benjamin Lee',
+      num_orders: 2,
+      lifetime_value: 3896.5325
+    },
+    {
+      customer_name: 'Benjamin Lewis',
+      num_orders: 2,
+      lifetime_value: 4133.24
+    },
+    {
+      customer_name: 'Benjamin Martin',
+      num_orders: 1,
+      lifetime_value: 12.94
+    },
+    {
+      customer_name: 'Benjamin Martinez',
+      num_orders: 2,
+      lifetime_value: 94.47
+    },
+    {
+      customer_name: 'Benjamin Miller',
+      num_orders: 2,
+      lifetime_value: 3941.5325
+    },
+    {
+      customer_name: 'Benjamin Moore',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Benjamin Robinson',
+      num_orders: 2,
+      lifetime_value: 4133.24
+    },
+    {
+      customer_name: 'Benjamin Rodriguez',
+      num_orders: 2,
+      lifetime_value: 4143.26
+    },
+    {
+      customer_name: 'Benjamin Smith',
+      num_orders: 1,
+      lifetime_value: 76.97
+    },
+    {
+      customer_name: 'Benjamin Taylor',
+      num_orders: 2,
+      lifetime_value: 2450.0782
+    },
+    {
+      customer_name: 'Benjamin Thomas',
+      num_orders: 2,
+      lifetime_value: 160.44
+    },
+    {
+      customer_name: 'Benjamin Thompson',
+      num_orders: 2,
+      lifetime_value: 3343.3575
+    },
+    {
+      customer_name: 'Benjamin Walker',
+      num_orders: 1,
+      lifetime_value: 69.97
+    },
+    {
+      customer_name: 'Benjamin Wilson',
+      num_orders: 2,
+      lifetime_value: 2983.34
+    },
+    {
+      customer_name: 'Benjamin Winter',
+      num_orders: 2,
+      lifetime_value: 3319.3975
+    },
+    {
+      customer_name: 'Bernard Thames',
+      num_orders: 2,
+      lifetime_value: 84.96
+    },
+    {
+      customer_name: 'Beth Srini',
+      num_orders: 1,
+      lifetime_value: 2329.99
+    },
+    {
+      customer_name: 'Bethany Andersen',
+      num_orders: 2,
+      lifetime_value: 95.26
+    },
+    {
+      customer_name: 'Bethany Ashe',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Bethany Beck',
+      num_orders: 2,
+      lifetime_value: 2803.5225
+    },
+    {
+      customer_name: 'Bethany Chande',
+      num_orders: 2,
+      lifetime_value: 86.27
+    },
+    {
+      customer_name: 'Bethany Chander',
+      num_orders: 2,
+      lifetime_value: 4417.75
+    },
+    {
+      customer_name: 'Bethany Deng',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Bethany Goel',
+      num_orders: 2,
+      lifetime_value: 3014.31
+    },
+    {
+      customer_name: 'Bethany Jai',
+      num_orders: 2,
+      lifetime_value: 6089.59
+    },
+    {
+      customer_name: 'Bethany Kumar',
+      num_orders: 1,
+      lifetime_value: 67.97
+    },
+    {
+      customer_name: 'Bethany Lal',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Bethany Luo',
+      num_orders: 1,
+      lifetime_value: 1725.98
+    },
+    {
+      customer_name: 'Bethany Nara',
+      num_orders: 2,
+      lifetime_value: 4392.74
+    },
+    {
+      customer_name: 'Bethany Nath',
+      num_orders: 2,
+      lifetime_value: 100.25
+    },
+    {
+      customer_name: 'Bethany Pal',
+      num_orders: 2,
+      lifetime_value: 6093.2
+    },
+    {
+      customer_name: 'Bethany Raheem',
+      num_orders: 2,
+      lifetime_value: 113.96
+    },
+    {
+      customer_name: 'Bethany Raje',
+      num_orders: 2,
+      lifetime_value: 106.95
+    },
+    {
+      customer_name: 'Bethany Raji',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Bethany Shan',
+      num_orders: 2,
+      lifetime_value: 4426.74
+    },
+    {
+      customer_name: 'Bethany She',
+      num_orders: 2,
+      lifetime_value: 4347.76
+    },
+    {
+      customer_name: 'Bethany Shen',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Bethany Tang',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Bethany Xu',
+      num_orders: 1,
+      lifetime_value: 1728.27
+    },
+    {
+      customer_name: 'Bethany Yuan',
+      num_orders: 1,
+      lifetime_value: 1714.97
+    },
+    {
+      customer_name: 'Billy Alonso',
+      num_orders: 1,
+      lifetime_value: 12.94
+    },
+    {
+      customer_name: 'Billy Alvarez',
+      num_orders: 2,
+      lifetime_value: 116.25
+    },
+    {
+      customer_name: 'Billy Blanco',
+      num_orders: 1,
+      lifetime_value: 564.48
+    },
+    {
+      customer_name: 'Billy Carlson',
+      num_orders: 2,
+      lifetime_value: 62.27
+    },
+    {
+      customer_name: 'Billy Diaz',
+      num_orders: 2,
+      lifetime_value: 59.98
+    },
+    {
+      customer_name: 'Billy Dominguez',
+      num_orders: 2,
+      lifetime_value: 4441.3896
+    },
+    {
+      customer_name: 'Billy Gill',
+      num_orders: 2,
+      lifetime_value: 98.96
+    },
+    {
+      customer_name: 'Billy Gomez',
+      num_orders: 2,
+      lifetime_value: 4416.3796
+    },
+    {
+      customer_name: 'Billy Gutierrez',
+      num_orders: 2,
+      lifetime_value: 4399.0782
+    },
+    {
+      customer_name: 'Billy Hernandez',
+      num_orders: 2,
+      lifetime_value: 4376.3996
+    },
+    {
+      customer_name: 'Billy Jiménez',
+      num_orders: 2,
+      lifetime_value: 3117.23
+    },
+    {
+      customer_name: 'Billy Martin',
+      num_orders: 2,
+      lifetime_value: 4359.0682
+    },
+    {
+      customer_name: 'Billy Moreno',
+      num_orders: 2,
+      lifetime_value: 3140.27
+    },
+    {
+      customer_name: 'Billy Munoz',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Billy Ortega',
+      num_orders: 1,
+      lifetime_value: 64.47
+    },
+    {
+      customer_name: 'Billy Romero',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Billy Rubio',
+      num_orders: 2,
+      lifetime_value: 3174.95
+    },
+    {
+      customer_name: 'Billy Ruiz',
+      num_orders: 2,
+      lifetime_value: 63.97
+    },
+    {
+      customer_name: 'Billy Schmidt',
+      num_orders: 2,
+      lifetime_value: 3159.95
+    },
+    {
+      customer_name: 'Billy Serrano',
+      num_orders: 2,
+      lifetime_value: 1387.95
+    },
+    {
+      customer_name: 'Billy Suarez',
+      num_orders: 2,
+      lifetime_value: 4379.0882
+    },
+    {
+      customer_name: 'Billy Torres',
+      num_orders: 2,
+      lifetime_value: 4404.0782
+    },
+    {
+      customer_name: 'Blake Barnes',
+      num_orders: 2,
+      lifetime_value: 97.96
+    },
+    {
+      customer_name: 'Blake Bennett',
+      num_orders: 3,
+      lifetime_value: 8361.29
+    },
+    {
+      customer_name: 'Blake Bryant',
+      num_orders: 3,
+      lifetime_value: 105.22
+    },
+    {
+      customer_name: 'Blake Butler',
+      num_orders: 4,
+      lifetime_value: 7195.58
+    },
+    {
+      customer_name: 'Blake Coleman',
+      num_orders: 1,
+      lifetime_value: 49.97
+    },
+    {
+      customer_name: 'Blake Diaz',
+      num_orders: 3,
+      lifetime_value: 6962.1382
+    },
+    {
+      customer_name: 'Blake Flores',
+      num_orders: 2,
+      lifetime_value: 177.92
+    },
+    {
+      customer_name: 'Blake Foster',
+      num_orders: 1,
+      lifetime_value: 44.98
+    },
+    {
+      customer_name: 'Blake Gonzales',
+      num_orders: 1,
+      lifetime_value: 38.88
+    },
+    {
+      customer_name: 'Blake Griffin',
+      num_orders: 3,
+      lifetime_value: 167.4
+    },
+    {
+      customer_name: 'Blake Hayes',
+      num_orders: 3,
+      lifetime_value: 6909.0882
+    },
+    {
+      customer_name: 'Blake Henderson',
+      num_orders: 1,
+      lifetime_value: 78.48
+    },
+    {
+      customer_name: 'Blake Hughes',
+      num_orders: 3,
+      lifetime_value: 8376.28
+    },
+    {
+      customer_name: 'Blake Jenkins',
+      num_orders: 1,
+      lifetime_value: 44.98
+    },
+    {
+      customer_name: 'Blake Long',
+      num_orders: 3,
+      lifetime_value: 8460.25
+    },
+    {
+      customer_name: 'Blake Patterson',
+      num_orders: 1,
+      lifetime_value: 44.98
+    },
+    {
+      customer_name: 'Blake Perry',
+      num_orders: 1,
+      lifetime_value: 9.99
+    },
+    {
+      customer_name: 'Blake Powell',
+      num_orders: 1,
+      lifetime_value: 58.96
+    },
+    {
+      customer_name: 'Blake Price',
+      num_orders: 3,
+      lifetime_value: 8374.79
+    },
+    {
+      customer_name: 'Blake Ross',
+      num_orders: 1,
+      lifetime_value: 78.48
+    },
+    {
+      customer_name: 'Blake Russell',
+      num_orders: 3,
+      lifetime_value: 6763.1482
+    },
+    {
+      customer_name: 'Blake Simmons',
+      num_orders: 1,
+      lifetime_value: 71.58
+    },
+    {
+      customer_name: 'Blake Washington',
+      num_orders: 4,
+      lifetime_value: 9614.73
+    },
+    {
+      customer_name: 'Bob Alan',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Bob Chapman',
+      num_orders: 2,
+      lifetime_value: 4746.34
+    },
+    {
+      customer_name: 'Bob Fernandez',
+      num_orders: 2,
+      lifetime_value: 166.89
+    },
+    {
+      customer_name: 'Bob Garcia',
+      num_orders: 1,
+      lifetime_value: 595.96
+    },
+    {
+      customer_name: 'Bob Gonzalez',
+      num_orders: 2,
+      lifetime_value: 3807.3996
+    },
+    {
+      customer_name: 'Bob Kapoor',
+      num_orders: 1,
+      lifetime_value: 564.99
+    },
+    {
+      customer_name: 'Bob Lopez',
+      num_orders: 2,
+      lifetime_value: 3831.8896
+    },
+    {
+      customer_name: 'Bobby Mehta',
+      num_orders: 1,
+      lifetime_value: 89.97
+    },
+    {
+      customer_name: 'Bobby Perez',
+      num_orders: 2,
+      lifetime_value: 61.96
+    },
+    {
+      customer_name: 'Bobby Prasad',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Bobby Raman',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Bobby Ray',
+      num_orders: 2,
+      lifetime_value: 94.26
+    },
+    {
+      customer_name: 'Bobby Rodriguez',
+      num_orders: 2,
+      lifetime_value: 73.54
+    },
+    {
+      customer_name: 'Bobby Sai',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Bobby Sanchez',
+      num_orders: 3,
+      lifetime_value: 3743.3925
+    },
+    {
+      customer_name: 'Bobby Saunders',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Bobby Subram',
+      num_orders: 2,
+      lifetime_value: 117.93
+    },
+    {
+      customer_name: 'Bobby Suri',
+      num_orders: 1,
+      lifetime_value: 608.96
+    },
+    {
+      customer_name: 'Bobby Van',
+      num_orders: 2,
+      lifetime_value: 4813.95
+    },
+    {
+      customer_name: 'Brad Pritchett',
+      num_orders: 2,
+      lifetime_value: 245.25
+    },
+    {
+      customer_name: 'Bradley Anand',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Bradley Andersen',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Bradley Beck',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Bradley Carson',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Bradley Chande',
+      num_orders: 1,
+      lifetime_value: 1170.48
+    },
+    {
+      customer_name: 'Bradley Goel',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Bradley Jai',
+      num_orders: 1,
+      lifetime_value: 1145.48
+    },
+    {
+      customer_name: 'Bradley Kumar',
+      num_orders: 1,
+      lifetime_value: 123.98
+    },
+    {
+      customer_name: 'Bradley Lal',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Bradley Luo',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Bradley Nara',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Bradley Pal',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Bradley Rai',
+      num_orders: 1,
+      lifetime_value: 68.49
+    },
+    {
+      customer_name: 'Bradley Raje',
+      num_orders: 1,
+      lifetime_value: 2512.32
+    },
+    {
+      customer_name: 'Bradley Raji',
+      num_orders: 1,
+      lifetime_value: 67.93
+    },
+    {
+      customer_name: 'Bradley Sharma',
+      num_orders: 1,
+      lifetime_value: 1174.48
+    },
+    {
+      customer_name: 'Bradley She',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Bradley Shen',
+      num_orders: 1,
+      lifetime_value: 144.47
+    },
+    {
+      customer_name: 'Bradley Tang',
+      num_orders: 2,
+      lifetime_value: 5314.25
+    },
+    {
+      customer_name: 'Bradley Xie',
+      num_orders: 1,
+      lifetime_value: 37.27
+    },
+    {
+      customer_name: 'Bradley Xu',
+      num_orders: 2,
+      lifetime_value: 5328.23
+    },
+    {
+      customer_name: 'Bradley Yuan',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Brandi Alonso',
+      num_orders: 1,
+      lifetime_value: 2380.47
+    },
+    {
+      customer_name: 'Brandi Ashe',
+      num_orders: 1,
+      lifetime_value: 127.28
+    },
+    {
+      customer_name: 'Brandi Blanco',
+      num_orders: 2,
+      lifetime_value: 6029.57
+    },
+    {
+      customer_name: 'Brandi Carlson',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Brandi Diaz',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Brandi Dominguez',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Brandi Gill',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Brandi Gomez',
+      num_orders: 2,
+      lifetime_value: 5333.25
+    },
+    {
+      customer_name: 'Brandi Gutierrez',
+      num_orders: 2,
+      lifetime_value: 6056.61
+    },
+    {
+      customer_name: 'Brandi Hernandez',
+      num_orders: 1,
+      lifetime_value: 539.99
+    },
+    {
+      customer_name: 'Brandi Jiménez',
+      num_orders: 1,
+      lifetime_value: 616.91
+    },
+    {
+      customer_name: 'Brandi Martin',
+      num_orders: 2,
+      lifetime_value: 97.96
+    },
+    {
+      customer_name: 'Brandi Munoz',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Brandi Navarro',
+      num_orders: 1,
+      lifetime_value: 2318.96
+    },
+    {
+      customer_name: 'Brandi Ortega',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Brandi Romero',
+      num_orders: 1,
+      lifetime_value: 2351.96
+    },
+    {
+      customer_name: 'Brandi Rubio',
+      num_orders: 1,
+      lifetime_value: 128.97
+    },
+    {
+      customer_name: 'Brandi Ruiz',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Brandi Sanz',
+      num_orders: 1,
+      lifetime_value: 123.98
+    },
+    {
+      customer_name: 'Brandi Serrano',
+      num_orders: 2,
+      lifetime_value: 6121.71
+    },
+    {
+      customer_name: 'Brandi Suarez',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Brandi Vazquez',
+      num_orders: 2,
+      lifetime_value: 6029.57
+    },
+    {
+      customer_name: 'Brandon Anderson',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Brandon Brown',
+      num_orders: 1,
+      lifetime_value: 2359.98
+    },
+    {
+      customer_name: 'Brandon Clark',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Brandon Davis',
+      num_orders: 1,
+      lifetime_value: 1709.98
+    },
+    {
+      customer_name: 'Brandon Garcia',
+      num_orders: 1,
+      lifetime_value: 1775.47
+    },
+    {
+      customer_name: 'Brandon Harris',
+      num_orders: 1,
+      lifetime_value: 12.94
+    },
+    {
+      customer_name: 'Brandon Jackson',
+      num_orders: 2,
+      lifetime_value: 6093.2
+    },
+    {
+      customer_name: 'Brandon Johnson',
+      num_orders: 1,
+      lifetime_value: 2334.46
+    },
+    {
+      customer_name: 'Brandon Jones',
+      num_orders: 1,
+      lifetime_value: 2329.98
+    },
+    {
+      customer_name: 'Brandon Lee',
+      num_orders: 2,
+      lifetime_value: 4698.76
+    },
+    {
+      customer_name: 'Brandon Lewis',
+      num_orders: 2,
+      lifetime_value: 4748.24
+    },
+    {
+      customer_name: 'Brandon Martin',
+      num_orders: 1,
+      lifetime_value: 1750.98
+    },
+    {
+      customer_name: 'Brandon Martinez',
+      num_orders: 1,
+      lifetime_value: 2380.47
+    },
+    {
+      customer_name: 'Brandon Miller',
+      num_orders: 1,
+      lifetime_value: 2312.26
+    },
+    {
+      customer_name: 'Brandon Moore',
+      num_orders: 1,
+      lifetime_value: 21.49
+    },
+    {
+      customer_name: 'Brandon Robinson',
+      num_orders: 1,
+      lifetime_value: 25.48
+    },
+    {
+      customer_name: 'Brandon Rodriguez',
+      num_orders: 1,
+      lifetime_value: 68.49
+    },
+    {
+      customer_name: 'Brandon Smith',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Brandon Taylor',
+      num_orders: 2,
+      lifetime_value: 45.95
+    },
+    {
+      customer_name: 'Brandon Thomas',
+      num_orders: 2,
+      lifetime_value: 158.95
+    },
+    {
+      customer_name: 'Brandon Thompson',
+      num_orders: 2,
+      lifetime_value: 100.96
+    },
+    {
+      customer_name: 'Brandon Walker',
+      num_orders: 2,
+      lifetime_value: 5279.26
+    },
+    {
+      customer_name: 'Brandon White',
+      num_orders: 2,
+      lifetime_value: 64.88
+    },
+    {
+      customer_name: 'Brandon Williams',
+      num_orders: 1,
+      lifetime_value: 1754.98
+    },
+    {
+      customer_name: 'Brandon Wilson',
+      num_orders: 1,
+      lifetime_value: 25.48
+    },
+    {
+      customer_name: 'Brandy Arun',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Brandy Chandra',
+      num_orders: 1,
+      lifetime_value: 48.97
+    },
+    {
+      customer_name: 'Brandy Fernandez',
+      num_orders: 1,
+      lifetime_value: 2331.95
+    },
+    {
+      customer_name: 'Brandy Garcia',
+      num_orders: 1,
+      lifetime_value: 2394.97
+    },
+    {
+      customer_name: 'Brandy Gonzalez',
+      num_orders: 2,
+      lifetime_value: 86.96
+    },
+    {
+      customer_name: 'Brandy Kapoor',
+      num_orders: 1,
+      lifetime_value: 67.93
+    },
+    {
+      customer_name: 'Brandy Lopez',
+      num_orders: 1,
+      lifetime_value: 1779.47
+    },
+    {
+      customer_name: 'Brandy Madan',
+      num_orders: 1,
+      lifetime_value: 2496.27
+    },
+    {
+      customer_name: 'Brandy Malhotra',
+      num_orders: 1,
+      lifetime_value: 2376.96
+    },
+    {
+      customer_name: 'Brandy Martinez',
+      num_orders: 1,
+      lifetime_value: 1700.99
+    },
+    {
+      customer_name: 'Brandy Mehta',
+      num_orders: 1,
+      lifetime_value: 1810.46
+    },
+    {
+      customer_name: 'Brandy Patel',
+      num_orders: 2,
+      lifetime_value: 4167.23
+    },
+    {
+      customer_name: 'Brandy Perez',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Brandy Prasad',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Brandy Raman',
+      num_orders: 1,
+      lifetime_value: 1155.48
+    },
+    {
+      customer_name: 'Brandy Rana',
+      num_orders: 1,
+      lifetime_value: 1754.98
+    },
+    {
+      customer_name: 'Brandy Sai',
+      num_orders: 1,
+      lifetime_value: 1155.48
+    },
+    {
+      customer_name: 'Brandy Sanchez',
+      num_orders: 1,
+      lifetime_value: 128.97
+    },
+    {
+      customer_name: 'Brandy Saunders',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Brandy Srini',
+      num_orders: 1,
+      lifetime_value: 2376.45
+    },
+    {
+      customer_name: 'Brandy Subram',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Brandy Suri',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Brenda Arun',
+      num_orders: 1,
+      lifetime_value: 51.46
+    },
+    {
+      customer_name: 'Brenda Chandra',
+      num_orders: 2,
+      lifetime_value: 3114.94
+    },
+    {
+      customer_name: 'Brenda Fernandez',
+      num_orders: 3,
+      lifetime_value: 167.9
+    },
+    {
+      customer_name: 'Brenda Garcia',
+      num_orders: 3,
+      lifetime_value: 136.24
+    },
+    {
+      customer_name: 'Brenda Gonzalez',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Brenda Kapoor',
+      num_orders: 2,
+      lifetime_value: 1631.46
+    },
+    {
+      customer_name: 'Brenda Lopez',
+      num_orders: 2,
+      lifetime_value: 3145.26
+    },
+    {
+      customer_name: 'Brenda Madan',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Brenda Malhotra',
+      num_orders: 1,
+      lifetime_value: 35
+    },
+    {
+      customer_name: 'Brenda Martinez',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Brenda Mehta',
+      num_orders: 1,
+      lifetime_value: 67.93
+    },
+    {
+      customer_name: 'Brenda Perez',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Brenda Prasad',
+      num_orders: 2,
+      lifetime_value: 3183.94
+    },
+    {
+      customer_name: 'Brenda Rana',
+      num_orders: 2,
+      lifetime_value: 3178.95
+    },
+    {
+      customer_name: 'Brenda Rodriguez',
+      num_orders: 2,
+      lifetime_value: 3127.95
+    },
+    {
+      customer_name: 'Brenda Sai',
+      num_orders: 3,
+      lifetime_value: 7232.37
+    },
+    {
+      customer_name: 'Brenda Sanchez',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Brenda Saunders',
+      num_orders: 1,
+      lifetime_value: 59.98
+    },
+    {
+      customer_name: 'Brenda Stone',
+      num_orders: 2,
+      lifetime_value: 4745.02
+    },
+    {
+      customer_name: 'Brenda Subram',
+      num_orders: 2,
+      lifetime_value: 3177.96
+    },
+    {
+      customer_name: 'Brenda Suri',
+      num_orders: 2,
+      lifetime_value: 3247.25
+    },
+    {
+      customer_name: 'Brenda Van',
+      num_orders: 2,
+      lifetime_value: 325.83
+    },
+    {
+      customer_name: 'Brent Chen',
+      num_orders: 2,
+      lifetime_value: 2450.0782
+    },
+    {
+      customer_name: 'Brent Gao',
+      num_orders: 1,
+      lifetime_value: 27.77
+    },
+    {
+      customer_name: 'Brent Guo',
+      num_orders: 1,
+      lifetime_value: 39.22
+    },
+    {
+      customer_name: 'Brent He',
+      num_orders: 1,
+      lifetime_value: 187.98
+    },
+    {
+      customer_name: 'Brent Huang',
+      num_orders: 1,
+      lifetime_value: 69.97
+    },
+    {
+      customer_name: 'Brent Li',
+      num_orders: 2,
+      lifetime_value: 3932.5425
+    },
+    {
+      customer_name: 'Brent Lin',
+      num_orders: 1,
+      lifetime_value: 31.27
+    },
+    {
+      customer_name: 'Brent Lu',
+      num_orders: 1,
+      lifetime_value: 38.98
+    },
+    {
+      customer_name: 'Brent Ma',
+      num_orders: 1,
+      lifetime_value: 37.27
+    },
+    {
+      customer_name: 'Brent McDonald',
+      num_orders: 1,
+      lifetime_value: 24.99
+    },
+    {
+      customer_name: 'Brent Stone',
+      num_orders: 1,
+      lifetime_value: 64.97
+    },
+    {
+      customer_name: 'Brent Sun',
+      num_orders: 2,
+      lifetime_value: 2459.0682
+    },
+    {
+      customer_name: 'Brent Wang',
+      num_orders: 3,
+      lifetime_value: 5790.8625
+    },
+    {
+      customer_name: 'Brent Wu',
+      num_orders: 2,
+      lifetime_value: 2454.0782
+    },
+    {
+      customer_name: 'Brent Yang',
+      num_orders: 1,
+      lifetime_value: 27.28
+    },
+    {
+      customer_name: 'Brent Ye',
+      num_orders: 2,
+      lifetime_value: 1518.5782
+    },
+    {
+      customer_name: 'Brent Zeng',
+      num_orders: 1,
+      lifetime_value: 82.97
+    },
+    {
+      customer_name: 'Brent Zhang',
+      num_orders: 3,
+      lifetime_value: 6083.17
+    },
+    {
+      customer_name: 'Brent Zhao',
+      num_orders: 3,
+      lifetime_value: 5804.8725
+    },
+    {
+      customer_name: 'Brent Zheng',
+      num_orders: 2,
+      lifetime_value: 2988.3225
+    },
+    {
+      customer_name: 'Brent Zhou',
+      num_orders: 1,
+      lifetime_value: 27.28
+    },
+    {
+      customer_name: 'Brent Zhu',
+      num_orders: 2,
+      lifetime_value: 2590.3582
+    },
+    {
+      customer_name: 'Brett Arun',
+      num_orders: 2,
+      lifetime_value: 3565.3575
+    },
+    {
+      customer_name: 'Brett Chandra',
+      num_orders: 1,
+      lifetime_value: 38.98
+    },
+    {
+      customer_name: 'Brett Fernandez',
+      num_orders: 1,
+      lifetime_value: 53.98
+    },
+    {
+      customer_name: 'Brett Garcia',
+      num_orders: 2,
+      lifetime_value: 1894.0682
+    },
+    {
+      customer_name: 'Brett Gonzalez',
+      num_orders: 1,
+      lifetime_value: 1179.47
+    },
+    {
+      customer_name: 'Brett Kapoor',
+      num_orders: 1,
+      lifetime_value: 47.97
+    },
+    {
+      customer_name: 'Brett Lopez',
+      num_orders: 1,
+      lifetime_value: 31.27
+    },
+    {
+      customer_name: 'Brett Madan',
+      num_orders: 2,
+      lifetime_value: 1391.95
+    },
+    {
+      customer_name: 'Brett Malhotra',
+      num_orders: 1,
+      lifetime_value: 38.98
+    },
+    {
+      customer_name: 'Brett Martinez',
+      num_orders: 2,
+      lifetime_value: 80.21
+    },
+    {
+      customer_name: 'Brett Mehta',
+      num_orders: 1,
+      lifetime_value: 78.96
+    },
+    {
+      customer_name: 'Brett Patel',
+      num_orders: 1,
+      lifetime_value: 62.97
+    },
+    {
+      customer_name: 'Brett Perez',
+      num_orders: 1,
+      lifetime_value: 1205.47
+    },
+    {
+      customer_name: 'Brett Prasad',
+      num_orders: 1,
+      lifetime_value: 6.28
+    },
+    {
+      customer_name: 'Brett Raman',
+      num_orders: 2,
+      lifetime_value: 3524.3575
+    },
+    {
+      customer_name: 'Brett Rana',
+      num_orders: 2,
+      lifetime_value: 3451.7375
+    },
+    {
+      customer_name: 'Brett Rodriguez',
+      num_orders: 1,
+      lifetime_value: 1169.46
+    },
+    {
+      customer_name: 'Brett Sai',
+      num_orders: 1,
+      lifetime_value: 31.27
+    },
+    {
+      customer_name: 'Brett Sanchez',
+      num_orders: 1,
+      lifetime_value: 1179.97
+    },
+    {
+      customer_name: 'Brett Srini',
+      num_orders: 2,
+      lifetime_value: 3480.3775
+    },
+    {
+      customer_name: 'Brett Subram',
+      num_orders: 1,
+      lifetime_value: 86.26
+    },
+    {
+      customer_name: 'Brett Van',
+      num_orders: 2,
+      lifetime_value: 3515.3675
+    },
+    {
+      customer_name: 'Brian Albrecht',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Brian Bailey',
+      num_orders: 2,
+      lifetime_value: 90.75
+    },
+    {
+      customer_name: 'Brian Bell',
+      num_orders: 1,
+      lifetime_value: 26.97
+    },
+    {
+      customer_name: 'Brian Brooks',
+      num_orders: 2,
+      lifetime_value: 3750.0882
+    },
+    {
+      customer_name: 'Brian Cook',
+      num_orders: 2,
+      lifetime_value: 3153.95
+    },
+    {
+      customer_name: 'Brian Cooper',
+      num_orders: 2,
+      lifetime_value: 1601.5582
+    },
+    {
+      customer_name: 'Brian Cox',
+      num_orders: 1,
+      lifetime_value: 48.97
+    },
+    {
+      customer_name: 'Brian Gray',
+      num_orders: 1,
+      lifetime_value: 67.93
+    },
+    {
+      customer_name: 'Brian Howard',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Brian James',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Brian Kelly',
+      num_orders: 3,
+      lifetime_value: 8321.31
+    },
+    {
+      customer_name: 'Brian Lauer',
+      num_orders: 1,
+      lifetime_value: 2405.47
+    },
+    {
+      customer_name: 'Brian Morgan',
+      num_orders: 3,
+      lifetime_value: 6795.6
+    },
+    {
+      customer_name: 'Brian Morris',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Brian Murphy',
+      num_orders: 2,
+      lifetime_value: 5917.24
+    },
+    {
+      customer_name: 'Brian Peterson',
+      num_orders: 2,
+      lifetime_value: 1848.9075
+    },
+    {
+      customer_name: 'Brian Ramirez',
+      num_orders: 1,
+      lifetime_value: 48.97
+    },
+    {
+      customer_name: 'Brian Reed',
+      num_orders: 2,
+      lifetime_value: 32.28
+    },
+    {
+      customer_name: 'Brian Richardson',
+      num_orders: 1,
+      lifetime_value: 39.99
+    },
+    {
+      customer_name: 'Brian Rivera',
+      num_orders: 2,
+      lifetime_value: 4446.3996
+    },
+    {
+      customer_name: 'Brian Rogers',
+      num_orders: 2,
+      lifetime_value: 3105.27
+    },
+    {
+      customer_name: 'Brian Sanchez',
+      num_orders: 2,
+      lifetime_value: 78.96
+    },
+    {
+      customer_name: 'Brian Sanders',
+      num_orders: 1,
+      lifetime_value: 84.92
+    },
+    {
+      customer_name: 'Brian Stewart',
+      num_orders: 2,
+      lifetime_value: 43.21
+    },
+    {
+      customer_name: 'Brian Torres',
+      num_orders: 2,
+      lifetime_value: 1848.9075
+    },
+    {
+      customer_name: 'Brian Watson',
+      num_orders: 2,
+      lifetime_value: 114.96
+    },
+    {
+      customer_name: 'Briana Alonso',
+      num_orders: 2,
+      lifetime_value: 4607.2296
+    },
+    {
+      customer_name: 'Briana Ashe',
+      num_orders: 1,
+      lifetime_value: 75.97
+    },
+    {
+      customer_name: 'Briana Carlson',
+      num_orders: 1,
+      lifetime_value: 100.46
+    },
+    {
+      customer_name: 'Briana Diaz',
+      num_orders: 4,
+      lifetime_value: 7300.55
+    },
+    {
+      customer_name: 'Briana Dominguez',
+      num_orders: 3,
+      lifetime_value: 6824.7296
+    },
+    {
+      customer_name: 'Briana Gill',
+      num_orders: 2,
+      lifetime_value: 4546.7925
+    },
+    {
+      customer_name: 'Briana Gomez',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Briana Gutierrez',
+      num_orders: 3,
+      lifetime_value: 8306.3
+    },
+    {
+      customer_name: 'Briana Jiménez',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Briana Martin',
+      num_orders: 2,
+      lifetime_value: 4476.5525
+    },
+    {
+      customer_name: 'Briana Moreno',
+      num_orders: 2,
+      lifetime_value: 4740.63
+    },
+    {
+      customer_name: 'Briana Munoz',
+      num_orders: 2,
+      lifetime_value: 5923.23
+    },
+    {
+      customer_name: 'Briana Ortega',
+      num_orders: 2,
+      lifetime_value: 3242.83
+    },
+    {
+      customer_name: 'Briana Ramos',
+      num_orders: 2,
+      lifetime_value: 3282.81
+    },
+    {
+      customer_name: 'Briana Romero',
+      num_orders: 1,
+      lifetime_value: 94.48
+    },
+    {
+      customer_name: 'Briana Ruiz',
+      num_orders: 2,
+      lifetime_value: 4548.5025
+    },
+    {
+      customer_name: 'Briana Sandoval',
+      num_orders: 2,
+      lifetime_value: 3262.83
+    },
+    {
+      customer_name: 'Briana Suarez',
+      num_orders: 2,
+      lifetime_value: 3063.0025
+    },
+    {
+      customer_name: 'Briana Torres',
+      num_orders: 3,
+      lifetime_value: 114.21
+    },
+    {
+      customer_name: 'Brianna Alexander',
+      num_orders: 2,
+      lifetime_value: 2547.95
+    },
+    {
+      customer_name: 'Brianna Anderson',
+      num_orders: 2,
+      lifetime_value: 117.95
+    },
+    {
+      customer_name: 'Brianna Bailey',
+      num_orders: 1,
+      lifetime_value: 1120.49
+    },
+    {
+      customer_name: 'Brianna Bell',
+      num_orders: 1,
+      lifetime_value: 1155.48
+    },
+    {
+      customer_name: 'Brianna Brooks',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Brianna Bryant',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Brianna Butler',
+      num_orders: 1,
+      lifetime_value: 42.28
+    },
+    {
+      customer_name: 'Brianna Clark',
+      num_orders: 2,
+      lifetime_value: 109.97
+    },
+    {
+      customer_name: 'Brianna Cook',
+      num_orders: 2,
+      lifetime_value: 1589.75
+    },
+    {
+      customer_name: 'Brianna Cooper',
+      num_orders: 1,
+      lifetime_value: 1249.84
+    },
+    {
+      customer_name: 'Brianna Cox',
+      num_orders: 1,
+      lifetime_value: 574.98
+    },
+    {
+      customer_name: 'Brianna Davis',
+      num_orders: 2,
+      lifetime_value: 191.95
+    },
+    {
+      customer_name: 'Brianna Diaz',
+      num_orders: 2,
+      lifetime_value: 2520.91
+    },
+    {
+      customer_name: 'Brianna Flores',
+      num_orders: 1,
+      lifetime_value: 82.97
+    },
+    {
+      customer_name: 'Brianna Foster',
+      num_orders: 2,
+      lifetime_value: 4153.25
+    },
+    {
+      customer_name: 'Brianna Garcia',
+      num_orders: 2,
+      lifetime_value: 134.46
+    },
+    {
+      customer_name: 'Brianna Gonzales',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Brianna Gray',
+      num_orders: 3,
+      lifetime_value: 97.62
+    },
+    {
+      customer_name: 'Brianna Griffin',
+      num_orders: 2,
+      lifetime_value: 2537.97
+    },
+    {
+      customer_name: 'Brianna Hall',
+      num_orders: 2,
+      lifetime_value: 72.28
+    },
+    {
+      customer_name: 'Brianna Harris',
+      num_orders: 2,
+      lifetime_value: 123.91
+    },
+    {
+      customer_name: 'Brianna Henderson',
+      num_orders: 1,
+      lifetime_value: 133.49
+    },
+    {
+      customer_name: 'Brianna Howard',
+      num_orders: 1,
+      lifetime_value: 1120.49
+    },
+    {
+      customer_name: 'Brianna Hughes',
+      num_orders: 1,
+      lifetime_value: 28.98
+    },
+    {
+      customer_name: 'Brianna Jackson',
+      num_orders: 5,
+      lifetime_value: 192.53
+    },
+    {
+      customer_name: 'Brianna James',
+      num_orders: 3,
+      lifetime_value: 84.64
+    },
+    {
+      customer_name: 'Brianna Jenkins',
+      num_orders: 1,
+      lifetime_value: 147.28
+    },
+    {
+      customer_name: 'Brianna Johnson',
+      num_orders: 2,
+      lifetime_value: 5908.5
+    },
+    {
+      customer_name: 'Brianna Jones',
+      num_orders: 27,
+      lifetime_value: 1103.78
+    },
+    {
+      customer_name: 'Brianna Kelly',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Brianna Lee',
+      num_orders: 5,
+      lifetime_value: 384.09
+    },
+    {
+      customer_name: 'Brianna Lewis',
+      num_orders: 2,
+      lifetime_value: 4758.03
+    },
+    {
+      customer_name: 'Brianna Martin',
+      num_orders: 2,
+      lifetime_value: 5962.24
+    },
+    {
+      customer_name: 'Brianna Martinez',
+      num_orders: 2,
+      lifetime_value: 173.47
+    },
+    {
+      customer_name: 'Brianna McDonald',
+      num_orders: 2,
+      lifetime_value: 2518.97
+    },
+    {
+      customer_name: 'Brianna Miller',
+      num_orders: 2,
+      lifetime_value: 96.27
+    },
+    {
+      customer_name: 'Brianna Moore',
+      num_orders: 2,
+      lifetime_value: 192.47
+    },
+    {
+      customer_name: 'Brianna Morgan',
+      num_orders: 3,
+      lifetime_value: 4657.7375
+    },
+    {
+      customer_name: 'Brianna Morris',
+      num_orders: 1,
+      lifetime_value: 147.28
+    },
+    {
+      customer_name: 'Brianna Murphy',
+      num_orders: 2,
+      lifetime_value: 109.24
+    },
+    {
+      customer_name: 'Brianna Patterson',
+      num_orders: 2,
+      lifetime_value: 2739.8975
+    },
+    {
+      customer_name: 'Brianna Perry',
+      num_orders: 1,
+      lifetime_value: 27.28
+    },
+    {
+      customer_name: 'Brianna Peterson',
+      num_orders: 1,
+      lifetime_value: 132.97
+    },
+    {
+      customer_name: 'Brianna Powell',
+      num_orders: 2,
+      lifetime_value: 2701.4275
+    },
+    {
+      customer_name: 'Brianna Price',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Brianna Reed',
+      num_orders: 2,
+      lifetime_value: 1609.3975
+    },
+    {
+      customer_name: 'Brianna Richardson',
+      num_orders: 1,
+      lifetime_value: 98.96
+    },
+    {
+      customer_name: 'Brianna Rivera',
+      num_orders: 1,
+      lifetime_value: 539.99
+    },
+    {
+      customer_name: 'Brianna Robinson',
+      num_orders: 2,
+      lifetime_value: 194.98
+    },
+    {
+      customer_name: 'Brianna Rodriguez',
+      num_orders: 2,
+      lifetime_value: 77.27
+    },
+    {
+      customer_name: 'Brianna Rogers',
+      num_orders: 1,
+      lifetime_value: 74.98
+    },
+    {
+      customer_name: 'Brianna Ross',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Brianna Russell',
+      num_orders: 2,
+      lifetime_value: 1575.4175
+    },
+    {
+      customer_name: 'Brianna Sanchez',
+      num_orders: 1,
+      lifetime_value: 48.97
+    },
+    {
+      customer_name: 'Brianna Sandberg',
+      num_orders: 2,
+      lifetime_value: 60.96
+    },
+    {
+      customer_name: 'Brianna Simmons',
+      num_orders: 2,
+      lifetime_value: 4118.26
+    },
+    {
+      customer_name: 'Brianna Smith',
+      num_orders: 2,
+      lifetime_value: 6025.22
+    },
+    {
+      customer_name: 'Brianna Stewart',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Brianna Taylor',
+      num_orders: 5,
+      lifetime_value: 287.2
+    },
+    {
+      customer_name: 'Brianna Thomas',
+      num_orders: 2,
+      lifetime_value: 153.46
+    },
+    {
+      customer_name: 'Brianna Thompson',
+      num_orders: 2,
+      lifetime_value: 159.96
+    },
+    {
+      customer_name: 'Brianna Torres',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Brianna Walker',
+      num_orders: 2,
+      lifetime_value: 6079.24
+    },
+    {
+      customer_name: 'Brianna Ward',
+      num_orders: 1,
+      lifetime_value: 1174.48
+    },
+    {
+      customer_name: 'Brianna Watson',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Brianna White',
+      num_orders: 5,
+      lifetime_value: 210.09
+    },
+    {
+      customer_name: 'Brianna Williams',
+      num_orders: 5,
+      lifetime_value: 325.89
+    },
+    {
+      customer_name: 'Brianna Wood',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Brittney Cai',
+      num_orders: 2,
+      lifetime_value: 151.43
+    },
+    {
+      customer_name: 'Brittney Chen',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Brittney Guo',
+      num_orders: 1,
+      lifetime_value: 1714.97
+    },
+    {
+      customer_name: 'Brittney He',
+      num_orders: 1,
+      lifetime_value: 1763.97
+    },
+    {
+      customer_name: 'Brittney Holt',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Brittney Hu',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Brittney Liang',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Brittney Lin',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Brittney Liu',
+      num_orders: 1,
+      lifetime_value: 2405.47
+    },
+    {
+      customer_name: 'Brittney Lu',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Brittney Ma',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Brittney She',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Brittney Sun',
+      num_orders: 1,
+      lifetime_value: 539.99
+    },
+    {
+      customer_name: 'Brittney West',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Brittney Wu',
+      num_orders: 2,
+      lifetime_value: 205.92
+    },
+    {
+      customer_name: 'Brittney Xu',
+      num_orders: 1,
+      lifetime_value: 2423.48
+    },
+    {
+      customer_name: 'Brittney Ye',
+      num_orders: 1,
+      lifetime_value: 2359.98
+    },
+    {
+      customer_name: 'Brittney Zeng',
+      num_orders: 1,
+      lifetime_value: 2398.47
+    },
+    {
+      customer_name: 'Brittney Zhang',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Brittney Zhao',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Brittney Zheng',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Brittney Zhou',
+      num_orders: 1,
+      lifetime_value: 2341.97
+    },
+    {
+      customer_name: 'Brittney Zhu',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Bruce Ward',
+      num_orders: 1,
+      lifetime_value: 127.28
+    },
+    {
+      customer_name: 'Bryan Bailey',
+      num_orders: 3,
+      lifetime_value: 154.96
+    },
+    {
+      customer_name: 'Bryan Bell',
+      num_orders: 2,
+      lifetime_value: 3826.3996
+    },
+    {
+      customer_name: 'Bryan Cooper',
+      num_orders: 2,
+      lifetime_value: 1602.0782
+    },
+    {
+      customer_name: 'Bryan Cox',
+      num_orders: 2,
+      lifetime_value: 3001.0425
+    },
+    {
+      customer_name: 'Bryan Gray',
+      num_orders: 2,
+      lifetime_value: 2994.0882
+    },
+    {
+      customer_name: 'Bryan Howard',
+      num_orders: 1,
+      lifetime_value: 32.28
+    },
+    {
+      customer_name: 'Bryan James',
+      num_orders: 2,
+      lifetime_value: 59.98
+    },
+    {
+      customer_name: 'Bryan Kelly',
+      num_orders: 2,
+      lifetime_value: 137.94
+    },
+    {
+      customer_name: 'Bryan Morgan',
+      num_orders: 2,
+      lifetime_value: 2803.5225
+    },
+    {
+      customer_name: 'Bryan Morris',
+      num_orders: 1,
+      lifetime_value: 172.98
+    },
+    {
+      customer_name: 'Bryan Murphy',
+      num_orders: 3,
+      lifetime_value: 8421.28
+    },
+    {
+      customer_name: 'Bryan Ramirez',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Bryan Reed',
+      num_orders: 2,
+      lifetime_value: 138.95
+    },
+    {
+      customer_name: 'Bryan Rivera',
+      num_orders: 2,
+      lifetime_value: 4384.0782
+    },
+    {
+      customer_name: 'Bryan Rogers',
+      num_orders: 2,
+      lifetime_value: 3152.96
+    },
+    {
+      customer_name: 'Bryan Sanchez',
+      num_orders: 2,
+      lifetime_value: 2853.5782
+    },
+    {
+      customer_name: 'Bryan Sanders',
+      num_orders: 1,
+      lifetime_value: 96.46
+    },
+    {
+      customer_name: 'Bryan Stewart',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Bryan Townsend',
+      num_orders: 1,
+      lifetime_value: 71.95
+    },
+    {
+      customer_name: 'Bryce Bailey',
+      num_orders: 2,
+      lifetime_value: 4379.0782
+    },
+    {
+      customer_name: 'Bryce Bell',
+      num_orders: 2,
+      lifetime_value: 3804.0782
+    },
+    {
+      customer_name: 'Bryce Brooks',
+      num_orders: 2,
+      lifetime_value: 3814.0582
+    },
+    {
+      customer_name: 'Bryce Cook',
+      num_orders: 2,
+      lifetime_value: 3197.98
+    },
+    {
+      customer_name: 'Bryce Cooper',
+      num_orders: 2,
+      lifetime_value: 1528.0682
+    },
+    {
+      customer_name: 'Bryce Cox',
+      num_orders: 1,
+      lifetime_value: 66.96
+    },
+    {
+      customer_name: 'Bryce Howard',
+      num_orders: 2,
+      lifetime_value: 2746.5525
+    },
+    {
+      customer_name: 'Bryce James',
+      num_orders: 2,
+      lifetime_value: 3319.3975
+    },
+    {
+      customer_name: 'Bryce Morgan',
+      num_orders: 3,
+      lifetime_value: 6709.59
+    },
+    {
+      customer_name: 'Bryce Morris',
+      num_orders: 1,
+      lifetime_value: 54.98
+    },
+    {
+      customer_name: 'Bryce Murphy',
+      num_orders: 2,
+      lifetime_value: 5895.24
+    },
+    {
+      customer_name: 'Bryce Peterson',
+      num_orders: 2,
+      lifetime_value: 1928.9275
+    },
+    {
+      customer_name: 'Bryce Ramirez',
+      num_orders: 2,
+      lifetime_value: 147.95
+    },
+    {
+      customer_name: 'Bryce Reed',
+      num_orders: 2,
+      lifetime_value: 3801.3896
+    },
+    {
+      customer_name: 'Bryce Richardson',
+      num_orders: 3,
+      lifetime_value: 6461.71
+    },
+    {
+      customer_name: 'Bryce Rivera',
+      num_orders: 2,
+      lifetime_value: 2916.5582
+    },
+    {
+      customer_name: 'Bryce Rogers',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Bryce Sanders',
+      num_orders: 2,
+      lifetime_value: 3351.3975
+    },
+    {
+      customer_name: 'Bryce Stewart',
+      num_orders: 2,
+      lifetime_value: 67.96
+    },
+    {
+      customer_name: 'Bryce Torres',
+      num_orders: 2,
+      lifetime_value: 1804.9175
+    },
+    {
+      customer_name: 'Bryce Ward',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Bryce Watson',
+      num_orders: 2,
+      lifetime_value: 173.94
+    },
+    {
+      customer_name: 'Byron Carlson',
+      num_orders: 1,
+      lifetime_value: 597.26
+    },
+    {
+      customer_name: 'Byron Diaz',
+      num_orders: 1,
+      lifetime_value: 31.97
+    },
+    {
+      customer_name: 'Byron Gill',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Byron Gomez',
+      num_orders: 1,
+      lifetime_value: 87.97
+    },
+    {
+      customer_name: 'Byron Gutierrez',
+      num_orders: 1,
+      lifetime_value: 680.94
+    },
+    {
+      customer_name: 'Byron Hernandez',
+      num_orders: 2,
+      lifetime_value: 164.91
+    },
+    {
+      customer_name: 'Byron Jiménez',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Byron Martin',
+      num_orders: 2,
+      lifetime_value: 1819.5882
+    },
+    {
+      customer_name: 'Byron Navarro',
+      num_orders: 1,
+      lifetime_value: 1120.49
+    },
+    {
+      customer_name: 'Byron Ortega',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Byron Ramos',
+      num_orders: 1,
+      lifetime_value: 3374.99
+    },
+    {
+      customer_name: 'Byron Romero',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Byron Rubio',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Byron Sanz',
+      num_orders: 1,
+      lifetime_value: 554.97
+    },
+    {
+      customer_name: 'Byron Serrano',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Byron Suarez',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Byron Vazquez',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Caleb Allen',
+      num_orders: 1,
+      lifetime_value: 2397.91
+    },
+    {
+      customer_name: 'Caleb Baker',
+      num_orders: 1,
+      lifetime_value: 614.47
+    },
+    {
+      customer_name: 'Caleb Campbell',
+      num_orders: 2,
+      lifetime_value: 188.87
+    },
+    {
+      customer_name: 'Caleb Carter',
+      num_orders: 3,
+      lifetime_value: 5738.3825
+    },
+    {
+      customer_name: 'Caleb Collins',
+      num_orders: 2,
+      lifetime_value: 4413.3896
+    },
+    {
+      customer_name: 'Caleb Edwards',
+      num_orders: 2,
+      lifetime_value: 107.37
+    },
+    {
+      customer_name: 'Caleb Evans',
+      num_orders: 3,
+      lifetime_value: 6943.5825
+    },
+    {
+      customer_name: 'Caleb Gonzalez',
+      num_orders: 2,
+      lifetime_value: 3282.83
+    },
+    {
+      customer_name: 'Caleb Green',
+      num_orders: 1,
+      lifetime_value: 2492.32
+    },
+    {
+      customer_name: 'Caleb Hall',
+      num_orders: 1,
+      lifetime_value: 2341.97
+    },
+    {
+      customer_name: 'Caleb Hernandez',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Caleb Hill',
+      num_orders: 2,
+      lifetime_value: 81.81
+    },
+    {
+      customer_name: 'Caleb King',
+      num_orders: 2,
+      lifetime_value: 47.26
+    },
+    {
+      customer_name: 'Caleb Lopez',
+      num_orders: 1,
+      lifetime_value: 2319.99
+    },
+    {
+      customer_name: 'Caleb Mitchell',
+      num_orders: 2,
+      lifetime_value: 4698.76
+    },
+    {
+      customer_name: 'Caleb Nelson',
+      num_orders: 2,
+      lifetime_value: 4173.24
+    },
+    {
+      customer_name: 'Caleb Parker',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Caleb Perez',
+      num_orders: 2,
+      lifetime_value: 1401.46
+    },
+    {
+      customer_name: 'Caleb Phillips',
+      num_orders: 1,
+      lifetime_value: 2369.96
+    },
+    {
+      customer_name: 'Caleb Roberts',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Caleb Scott',
+      num_orders: 2,
+      lifetime_value: 5900.55
+    },
+    {
+      customer_name: 'Caleb Turner',
+      num_orders: 2,
+      lifetime_value: 3750.0882
+    },
+    {
+      customer_name: 'Caleb Wright',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Caleb Young',
+      num_orders: 2,
+      lifetime_value: 4698.76
+    },
+    {
+      customer_name: 'Cameron Anderson',
+      num_orders: 2,
+      lifetime_value: 113.24
+    },
+    {
+      customer_name: 'Cameron Brown',
+      num_orders: 2,
+      lifetime_value: 3001.0225
+    },
+    {
+      customer_name: 'Cameron Clark',
+      num_orders: 1,
+      lifetime_value: 2414.99
+    },
+    {
+      customer_name: 'Cameron Garcia',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Cameron Harris',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Cameron Jackson',
+      num_orders: 1,
+      lifetime_value: 1773.95
+    },
+    {
+      customer_name: 'Cameron Johnson',
+      num_orders: 1,
+      lifetime_value: 1754.98
+    },
+    {
+      customer_name: 'Cameron Jones',
+      num_orders: 2,
+      lifetime_value: 163.92
+    },
+    {
+      customer_name: 'Cameron Lee',
+      num_orders: 1,
+      lifetime_value: 2342.92
+    },
+    {
+      customer_name: 'Cameron Lewis',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Cameron McDonald',
+      num_orders: 1,
+      lifetime_value: 54.98
+    },
+    {
+      customer_name: 'Cameron Miller',
+      num_orders: 2,
+      lifetime_value: 2751.4175
+    },
+    {
+      customer_name: 'Cameron Moore',
+      num_orders: 3,
+      lifetime_value: 4180.2275
+    },
+    {
+      customer_name: 'Cameron Robinson',
+      num_orders: 1,
+      lifetime_value: 79.47
+    },
+    {
+      customer_name: 'Cameron Rodriguez',
+      num_orders: 1,
+      lifetime_value: 2341.97
+    },
+    {
+      customer_name: 'Cameron Smith',
+      num_orders: 1,
+      lifetime_value: 2351.96
+    },
+    {
+      customer_name: 'Cameron Taylor',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Cameron Thomas',
+      num_orders: 1,
+      lifetime_value: 2384.96
+    },
+    {
+      customer_name: 'Cameron Thompson',
+      num_orders: 2,
+      lifetime_value: 4143.26
+    },
+    {
+      customer_name: 'Cameron Walker',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Cameron White',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Cameron Wilson',
+      num_orders: 1,
+      lifetime_value: 38.98
+    },
+    {
+      customer_name: 'Candace Arun',
+      num_orders: 2,
+      lifetime_value: 1567.46
+    },
+    {
+      customer_name: 'Candace Chapman',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Candace Fernandez',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Candace Gonzalez',
+      num_orders: 2,
+      lifetime_value: 1622.47
+    },
+    {
+      customer_name: 'Candace Kapoor',
+      num_orders: 2,
+      lifetime_value: 3134.95
+    },
+    {
+      customer_name: 'Candace Madan',
+      num_orders: 3,
+      lifetime_value: 318.92
+    },
+    {
+      customer_name: 'Candace Malhotra',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Candace Martinez',
+      num_orders: 2,
+      lifetime_value: 1587.47
+    },
+    {
+      customer_name: 'Candace Mehta',
+      num_orders: 2,
+      lifetime_value: 1574.46
+    },
+    {
+      customer_name: 'Candace Patel',
+      num_orders: 2,
+      lifetime_value: 3132.97
+    },
+    {
+      customer_name: 'Candace Perez',
+      num_orders: 2,
+      lifetime_value: 3788.6796
+    },
+    {
+      customer_name: 'Candace Prasad',
+      num_orders: 2,
+      lifetime_value: 3120.26
+    },
+    {
+      customer_name: 'Candace Raman',
+      num_orders: 1,
+      lifetime_value: 30.97
+    },
+    {
+      customer_name: 'Candace Rana',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Candace Sai',
+      num_orders: 1,
+      lifetime_value: 15.23
+    },
+    {
+      customer_name: 'Candace Sanchez',
+      num_orders: 2,
+      lifetime_value: 37.27
+    },
+    {
+      customer_name: 'Candace Sara',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Candace Srini',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Candace Subram',
+      num_orders: 2,
+      lifetime_value: 3772.4096
+    },
+    {
+      customer_name: 'Candace Van',
+      num_orders: 2,
+      lifetime_value: 3148.22
+    },
+    {
+      customer_name: 'Candice Cai',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Candice Chow',
+      num_orders: 1,
+      lifetime_value: 64.97
+    },
+    {
+      customer_name: 'Candice Gao',
+      num_orders: 1,
+      lifetime_value: 37.27
+    },
+    {
+      customer_name: 'Candice Guo',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Candice He',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Candice Hu',
+      num_orders: 3,
+      lifetime_value: 158.53
+    },
+    {
+      customer_name: 'Candice Huang',
+      num_orders: 2,
+      lifetime_value: 3058.31
+    },
+    {
+      customer_name: 'Candice Liang',
+      num_orders: 1,
+      lifetime_value: 2479.94
+    },
+    {
+      customer_name: 'Candice Lin',
+      num_orders: 1,
+      lifetime_value: 37.27
+    },
+    {
+      customer_name: 'Candice Liu',
+      num_orders: 2,
+      lifetime_value: 2745.8225
+    },
+    {
+      customer_name: 'Candice Lu',
+      num_orders: 1,
+      lifetime_value: 32.28
+    },
+    {
+      customer_name: 'Candice Ma',
+      num_orders: 1,
+      lifetime_value: 3.99
+    },
+    {
+      customer_name: 'Candice She',
+      num_orders: 1,
+      lifetime_value: 124.99
+    },
+    {
+      customer_name: 'Candice Sun',
+      num_orders: 3,
+      lifetime_value: 6989.5825
+    },
+    {
+      customer_name: 'Candice Wang',
+      num_orders: 2,
+      lifetime_value: 3936.5425
+    },
+    {
+      customer_name: 'Candice Xu',
+      num_orders: 1,
+      lifetime_value: 64.97
+    },
+    {
+      customer_name: 'Candice Ye',
+      num_orders: 1,
+      lifetime_value: 86.95
+    },
+    {
+      customer_name: 'Candice Zeng',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Candice Zhang',
+      num_orders: 1,
+      lifetime_value: 64.97
+    },
+    {
+      customer_name: 'Candice Zhao',
+      num_orders: 1,
+      lifetime_value: 73.96
+    },
+    {
+      customer_name: 'Candice Zhou',
+      num_orders: 1,
+      lifetime_value: 125.93
+    },
+    {
+      customer_name: 'Candice Zhu',
+      num_orders: 2,
+      lifetime_value: 3020.3
+    },
+    {
+      customer_name: 'Candice Zimmerman',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Carl Anand',
+      num_orders: 1,
+      lifetime_value: 2317.92
+    },
+    {
+      customer_name: 'Carl Andersen',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Carl Beck',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Carl Chande',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Carl Chander',
+      num_orders: 1,
+      lifetime_value: 2316.97
+    },
+    {
+      customer_name: 'Carl Deng',
+      num_orders: 2,
+      lifetime_value: 94.96
+    },
+    {
+      customer_name: 'Carl Goel',
+      num_orders: 1,
+      lifetime_value: 1785.97
+    },
+    {
+      customer_name: 'Carl Jai',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Carl Kumar',
+      num_orders: 3,
+      lifetime_value: 211.01
+    },
+    {
+      customer_name: 'Carl Lal',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Carl Luo',
+      num_orders: 2,
+      lifetime_value: 3262.83
+    },
+    {
+      customer_name: 'Carl Nara',
+      num_orders: 1,
+      lifetime_value: 1754.98
+    },
+    {
+      customer_name: 'Carl Nath',
+      num_orders: 1,
+      lifetime_value: 1857.92
+    },
+    {
+      customer_name: 'Carl Raje',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Carl Raji',
+      num_orders: 1,
+      lifetime_value: 2322.28
+    },
+    {
+      customer_name: 'Carl Shan',
+      num_orders: 3,
+      lifetime_value: 168.02
+    },
+    {
+      customer_name: 'Carl Sharma',
+      num_orders: 1,
+      lifetime_value: 67.97
+    },
+    {
+      customer_name: 'Carl She',
+      num_orders: 2,
+      lifetime_value: 86.95
+    },
+    {
+      customer_name: 'Carl Shen',
+      num_orders: 2,
+      lifetime_value: 3110.0525
+    },
+    {
+      customer_name: 'Carl Tang',
+      num_orders: 2,
+      lifetime_value: 2751.4175
+    },
+    {
+      customer_name: 'Carl Xie',
+      num_orders: 1,
+      lifetime_value: 29.98
+    },
+    {
+      customer_name: 'Carl Yuan',
+      num_orders: 2,
+      lifetime_value: 3071.0325
+    },
+    {
+      customer_name: 'Carlos Adams',
+      num_orders: 2,
+      lifetime_value: 4471.74
+    },
+    {
+      customer_name: 'Carlos Allen',
+      num_orders: 1,
+      lifetime_value: 1728.27
+    },
+    {
+      customer_name: 'Carlos Bailey',
+      num_orders: 2,
+      lifetime_value: 81.26
+    },
+    {
+      customer_name: 'Carlos Baker',
+      num_orders: 1,
+      lifetime_value: 80.96
+    },
+    {
+      customer_name: 'Carlos Bell',
+      num_orders: 3,
+      lifetime_value: 6706.57
+    },
+    {
+      customer_name: 'Carlos Brooks',
+      num_orders: 1,
+      lifetime_value: 819.46
+    },
+    {
+      customer_name: 'Carlos Campbell',
+      num_orders: 2,
+      lifetime_value: 31.27
+    },
+    {
+      customer_name: 'Carlos Carter',
+      num_orders: 2,
+      lifetime_value: 3242.83
+    },
+    {
+      customer_name: 'Carlos Collins',
+      num_orders: 2,
+      lifetime_value: 98.96
+    },
+    {
+      customer_name: 'Carlos Cook',
+      num_orders: 2,
+      lifetime_value: 1552.48
+    },
+    {
+      customer_name: 'Carlos Cooper',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Carlos Cox',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Carlos Edwards',
+      num_orders: 1,
+      lifetime_value: 35
+    },
+    {
+      customer_name: 'Carlos Evans',
+      num_orders: 2,
+      lifetime_value: 3807.3996
+    },
+    {
+      customer_name: 'Carlos Gonzalez',
+      num_orders: 1,
+      lifetime_value: 138.45
+    },
+    {
+      customer_name: 'Carlos Gray',
+      num_orders: 1,
+      lifetime_value: 67.93
+    },
+    {
+      customer_name: 'Carlos Green',
+      num_orders: 1,
+      lifetime_value: 2443.35
+    },
+    {
+      customer_name: 'Carlos Hall',
+      num_orders: 2,
+      lifetime_value: 4170.54
+    },
+    {
+      customer_name: 'Carlos Hernandez',
+      num_orders: 1,
+      lifetime_value: 2319.99
+    },
+    {
+      customer_name: 'Carlos Hill',
+      num_orders: 2,
+      lifetime_value: 4698.76
+    },
+    {
+      customer_name: 'Carlos Howard',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Carlos James',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Carlos Kelly',
+      num_orders: 2,
+      lifetime_value: 3262.83
+    },
+    {
+      customer_name: 'Carlos King',
+      num_orders: 1,
+      lifetime_value: 2325.96
+    },
+    {
+      customer_name: 'Carlos Lopez',
+      num_orders: 3,
+      lifetime_value: 7231.37
+    },
+    {
+      customer_name: 'Carlos Mitchell',
+      num_orders: 2,
+      lifetime_value: 4698.76
+    },
+    {
+      customer_name: 'Carlos Morgan',
+      num_orders: 1,
+      lifetime_value: 98.96
+    },
+    {
+      customer_name: 'Carlos Morris',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Carlos Murphy',
+      num_orders: 1,
+      lifetime_value: 24.99
+    },
+    {
+      customer_name: 'Carlos Nelson',
+      num_orders: 1,
+      lifetime_value: 2482.23
+    },
+    {
+      customer_name: 'Carlos Parker',
+      num_orders: 2,
+      lifetime_value: 4509.8996
+    },
+    {
+      customer_name: 'Carlos Perez',
+      num_orders: 1,
+      lifetime_value: 26.97
+    },
+    {
+      customer_name: 'Carlos Peterson',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Carlos Phillips',
+      num_orders: 1,
+      lifetime_value: 2563.91
+    },
+    {
+      customer_name: 'Carlos Ramirez',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Carlos Reed',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Carlos Richardson',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Carlos Rivera',
+      num_orders: 2,
+      lifetime_value: 4384.0782
+    },
+    {
+      customer_name: 'Carlos Roberts',
+      num_orders: 2,
+      lifetime_value: 3124.96
+    },
+    {
+      customer_name: 'Carlos Rogers',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Carlos Sanchez',
+      num_orders: 2,
+      lifetime_value: 90.75
+    },
+    {
+      customer_name: 'Carlos Sanders',
+      num_orders: 2,
+      lifetime_value: 82.26
+    },
+    {
+      customer_name: 'Carlos Scott',
+      num_orders: 1,
+      lifetime_value: 2478.34
+    },
+    {
+      customer_name: 'Carlos Stewart',
+      num_orders: 2,
+      lifetime_value: 4423.3796
+    },
+    {
+      customer_name: 'Carlos Turner',
+      num_orders: 3,
+      lifetime_value: 3802.3725
+    },
+    {
+      customer_name: 'Carlos Ward',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Carlos Watson',
+      num_orders: 3,
+      lifetime_value: 5123.7396
+    },
+    {
+      customer_name: 'Carlos Wright',
+      num_orders: 3,
+      lifetime_value: 6950.6025
+    },
+    {
+      customer_name: 'Carlos Young',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Carol Brooks',
+      num_orders: 1,
+      lifetime_value: 1219.45
+    },
+    {
+      customer_name: 'Carol Cooper',
+      num_orders: 2,
+      lifetime_value: 6035.6
+    },
+    {
+      customer_name: 'Carol Martinez',
+      num_orders: 16,
+      lifetime_value: 748.6
+    },
+    {
+      customer_name: 'Carol Patterson',
+      num_orders: 2,
+      lifetime_value: 63.15
+    },
+    {
+      customer_name: 'Carol Perry',
+      num_orders: 2,
+      lifetime_value: 2677.0682
+    },
+    {
+      customer_name: 'Carol Robinson',
+      num_orders: 1,
+      lifetime_value: 196.29
+    },
+    {
+      customer_name: 'Carol Saunders',
+      num_orders: 3,
+      lifetime_value: 5140.7296
+    },
+    {
+      customer_name: 'Carol Simmons',
+      num_orders: 1,
+      lifetime_value: 30.97
+    },
+    {
+      customer_name: 'Carol Washington',
+      num_orders: 2,
+      lifetime_value: 83.97
+    },
+    {
+      customer_name: 'Carol White',
+      num_orders: 3,
+      lifetime_value: 5645.8582
+    },
+    {
+      customer_name: 'Carol Xu',
+      num_orders: 1,
+      lifetime_value: 1155.48
+    },
+    {
+      customer_name: 'Carol Zhou',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Carrie Alonso',
+      num_orders: 1,
+      lifetime_value: 1750.98
+    },
+    {
+      customer_name: 'Carrie Alvarez',
+      num_orders: 2,
+      lifetime_value: 189.96
+    },
+    {
+      customer_name: 'Carrie Browning',
+      num_orders: 2,
+      lifetime_value: 4203.32
+    },
+    {
+      customer_name: 'Carrie Carlson',
+      num_orders: 1,
+      lifetime_value: 24.99
+    },
+    {
+      customer_name: 'Carrie Diaz',
+      num_orders: 1,
+      lifetime_value: 86.95
+    },
+    {
+      customer_name: 'Carrie Gill',
+      num_orders: 1,
+      lifetime_value: 1700.99
+    },
+    {
+      customer_name: 'Carrie Gomez',
+      num_orders: 2,
+      lifetime_value: 3917.5425
+    },
+    {
+      customer_name: 'Carrie Gutierrez',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Carrie Hernandez',
+      num_orders: 1,
+      lifetime_value: 64.97
+    },
+    {
+      customer_name: 'Carrie Jiménez',
+      num_orders: 1,
+      lifetime_value: 24.99
+    },
+    {
+      customer_name: 'Carrie Moreno',
+      num_orders: 1,
+      lifetime_value: 1700.99
+    },
+    {
+      customer_name: 'Carrie Munoz',
+      num_orders: 1,
+      lifetime_value: 1777.95
+    },
+    {
+      customer_name: 'Carrie Ortega',
+      num_orders: 1,
+      lifetime_value: 29.98
+    },
+    {
+      customer_name: 'Carrie Romero',
+      num_orders: 1,
+      lifetime_value: 1750.98
+    },
+    {
+      customer_name: 'Carrie Rubio',
+      num_orders: 1,
+      lifetime_value: 32.27
+    },
+    {
+      customer_name: 'Carrie Ruiz',
+      num_orders: 2,
+      lifetime_value: 3025.5325
+    },
+    {
+      customer_name: 'Carrie Schmidt',
+      num_orders: 2,
+      lifetime_value: 92.25
+    },
+    {
+      customer_name: 'Carrie Serrano',
+      num_orders: 1,
+      lifetime_value: 34.98
+    },
+    {
+      customer_name: 'Carrie Torres',
+      num_orders: 1,
+      lifetime_value: 1760.47
+    },
+    {
+      customer_name: 'Carrie Vazquez',
+      num_orders: 1,
+      lifetime_value: 1729.97
+    },
+    {
+      customer_name: 'Carson Alexander',
+      num_orders: 4,
+      lifetime_value: 289.7
+    },
+    {
+      customer_name: 'Carson Barnes',
+      num_orders: 2,
+      lifetime_value: 4516.5325
+    },
+    {
+      customer_name: 'Carson Bryant',
+      num_orders: 4,
+      lifetime_value: 7259.56
+    },
+    {
+      customer_name: 'Carson Butler',
+      num_orders: 4,
+      lifetime_value: 8941.28
+    },
+    {
+      customer_name: 'Carson Coleman',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Carson Diaz',
+      num_orders: 1,
+      lifetime_value: 81.46
+    },
+    {
+      customer_name: 'Carson Flores',
+      num_orders: 4,
+      lifetime_value: 7393.0582
+    },
+    {
+      customer_name: 'Carson Foster',
+      num_orders: 2,
+      lifetime_value: 86.95
+    },
+    {
+      customer_name: 'Carson Gonzales',
+      num_orders: 4,
+      lifetime_value: 10872.06
+    },
+    {
+      customer_name: 'Carson Griffin',
+      num_orders: 1,
+      lifetime_value: 2319.99
+    },
+    {
+      customer_name: 'Carson Hayes',
+      num_orders: 2,
+      lifetime_value: 4657.5325
+    },
+    {
+      customer_name: 'Carson Henderson',
+      num_orders: 4,
+      lifetime_value: 185.7
+    },
+    {
+      customer_name: 'Carson Hughes',
+      num_orders: 3,
+      lifetime_value: 6774.4496
+    },
+    {
+      customer_name: 'Carson Jenkins',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Carson Long',
+      num_orders: 2,
+      lifetime_value: 4795.34
+    },
+    {
+      customer_name: 'Carson Patterson',
+      num_orders: 3,
+      lifetime_value: 6820.4596
+    },
+    {
+      customer_name: 'Carson Perry',
+      num_orders: 2,
+      lifetime_value: 4511.5425
+    },
+    {
+      customer_name: 'Carson Powell',
+      num_orders: 1,
+      lifetime_value: 46.47
+    },
+    {
+      customer_name: 'Carson Price',
+      num_orders: 2,
+      lifetime_value: 4587.5125
+    },
+    {
+      customer_name: 'Carson Russell',
+      num_orders: 1,
+      lifetime_value: 2394.95
+    },
+    {
+      customer_name: 'Carson Simmons',
+      num_orders: 4,
+      lifetime_value: 7200.58
+    },
+    {
+      customer_name: 'Carson Washington',
+      num_orders: 4,
+      lifetime_value: 7494.8796
+    },
+    {
+      customer_name: 'Carson Wood',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Casey Alonso',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Casey Alvarez',
+      num_orders: 1,
+      lifetime_value: 133.49
+    },
+    {
+      customer_name: 'Casey Anand',
+      num_orders: 2,
+      lifetime_value: 3282.81
+    },
+    {
+      customer_name: 'Casey Andersen',
+      num_orders: 1,
+      lifetime_value: 49.48
+    },
+    {
+      customer_name: 'Casey Browning',
+      num_orders: 1,
+      lifetime_value: 539.99
+    },
+    {
+      customer_name: 'Casey Carlson',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Casey Chande',
+      num_orders: 2,
+      lifetime_value: 29.26
+    },
+    {
+      customer_name: 'Casey Chander',
+      num_orders: 3,
+      lifetime_value: 6910.5925
+    },
+    {
+      customer_name: 'Casey Deng',
+      num_orders: 2,
+      lifetime_value: 2992.33
+    },
+    {
+      customer_name: 'Casey Diaz',
+      num_orders: 1,
+      lifetime_value: 618.98
+    },
+    {
+      customer_name: 'Casey Dominguez',
+      num_orders: 1,
+      lifetime_value: 1183.47
+    },
+    {
+      customer_name: 'Casey Gill',
+      num_orders: 1,
+      lifetime_value: 584.9
+    },
+    {
+      customer_name: 'Casey Gomez',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Casey Gutierrez',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Casey Hernandez',
+      num_orders: 1,
+      lifetime_value: 605.21
+    },
+    {
+      customer_name: 'Casey Jai',
+      num_orders: 3,
+      lifetime_value: 6889.6125
+    },
+    {
+      customer_name: 'Casey Jiménez',
+      num_orders: 1,
+      lifetime_value: 1764.96
+    },
+    {
+      customer_name: 'Casey Kumar',
+      num_orders: 2,
+      lifetime_value: 2778.5225
+    },
+    {
+      customer_name: 'Casey Lal',
+      num_orders: 2,
+      lifetime_value: 2822.0125
+    },
+    {
+      customer_name: 'Casey Luo',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Casey Martin',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Casey Moreno',
+      num_orders: 1,
+      lifetime_value: 123.98
+    },
+    {
+      customer_name: 'Casey Munoz',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Casey Nara',
+      num_orders: 3,
+      lifetime_value: 6010.16
+    },
+    {
+      customer_name: 'Casey Nath',
+      num_orders: 1,
+      lifetime_value: 28.98
+    },
+    {
+      customer_name: 'Casey Navarro',
+      num_orders: 1,
+      lifetime_value: 1700.99
+    },
+    {
+      customer_name: 'Casey Ortega',
+      num_orders: 2,
+      lifetime_value: 2483.98
+    },
+    {
+      customer_name: 'Casey Pal',
+      num_orders: 2,
+      lifetime_value: 111.95
+    },
+    {
+      customer_name: 'Casey Rai',
+      num_orders: 1,
+      lifetime_value: 63.97
+    },
+    {
+      customer_name: 'Casey Raje',
+      num_orders: 2,
+      lifetime_value: 2983.34
+    },
+    {
+      customer_name: 'Casey Raji',
+      num_orders: 1,
+      lifetime_value: 28.98
+    },
+    {
+      customer_name: 'Casey Ramos',
+      num_orders: 1,
+      lifetime_value: 1120.49
+    },
+    {
+      customer_name: 'Casey Rowe',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Casey Rubio',
+      num_orders: 2,
+      lifetime_value: 1594.4175
+    },
+    {
+      customer_name: 'Casey Sanz',
+      num_orders: 1,
+      lifetime_value: 1174.48
+    },
+    {
+      customer_name: 'Casey Serrano',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Casey Shan',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Casey Sharma',
+      num_orders: 2,
+      lifetime_value: 4921.69
+    },
+    {
+      customer_name: 'Casey She',
+      num_orders: 2,
+      lifetime_value: 3010.0325
+    },
+    {
+      customer_name: 'Casey Shen',
+      num_orders: 1,
+      lifetime_value: 48.97
+    },
+    {
+      customer_name: 'Casey Suarez',
+      num_orders: 1,
+      lifetime_value: 1170.48
+    },
+    {
+      customer_name: 'Casey Tang',
+      num_orders: 1,
+      lifetime_value: 63.97
+    },
+    {
+      customer_name: 'Casey Torres',
+      num_orders: 1,
+      lifetime_value: 1120.49
+    },
+    {
+      customer_name: 'Casey Vazquez',
+      num_orders: 1,
+      lifetime_value: 563.96
+    },
+    {
+      customer_name: 'Casey Xie',
+      num_orders: 1,
+      lifetime_value: 12.94
+    },
+    {
+      customer_name: 'Casey Xu',
+      num_orders: 2,
+      lifetime_value: 64.25
+    },
+    {
+      customer_name: 'Casey Yuan',
+      num_orders: 2,
+      lifetime_value: 4538.8425
+    },
+    {
+      customer_name: 'Cassandra Arthur',
+      num_orders: 2,
+      lifetime_value: 61.75
+    },
+    {
+      customer_name: 'Cassandra Chandra',
+      num_orders: 2,
+      lifetime_value: 6054.22
+    },
+    {
+      customer_name: 'Cassandra Fernandez',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Cassandra Garcia',
+      num_orders: 1,
+      lifetime_value: 94.48
+    },
+    {
+      customer_name: 'Cassandra Gonzalez',
+      num_orders: 2,
+      lifetime_value: 134.44
+    },
+    {
+      customer_name: 'Cassandra Kapoor',
+      num_orders: 1,
+      lifetime_value: 83.97
+    },
+    {
+      customer_name: 'Cassandra Lopez',
+      num_orders: 1,
+      lifetime_value: 68.49
+    },
+    {
+      customer_name: 'Cassandra Madan',
+      num_orders: 2,
+      lifetime_value: 112.75
+    },
+    {
+      customer_name: 'Cassandra Malhotra',
+      num_orders: 2,
+      lifetime_value: 6054.22
+    },
+    {
+      customer_name: 'Cassandra Martinez',
+      num_orders: 1,
+      lifetime_value: 123.98
+    },
+    {
+      customer_name: 'Cassandra Mehta',
+      num_orders: 1,
+      lifetime_value: 59.98
+    },
+    {
+      customer_name: 'Cassandra Patel',
+      num_orders: 2,
+      lifetime_value: 68.45
+    },
+    {
+      customer_name: 'Cassandra Perez',
+      num_orders: 1,
+      lifetime_value: 42.28
+    },
+    {
+      customer_name: 'Cassandra Prasad',
+      num_orders: 2,
+      lifetime_value: 112.75
+    },
+    {
+      customer_name: 'Cassandra Raman',
+      num_orders: 2,
+      lifetime_value: 74.45
+    },
+    {
+      customer_name: 'Cassandra Rana',
+      num_orders: 2,
+      lifetime_value: 6035.6
+    },
+    {
+      customer_name: 'Cassandra Sai',
+      num_orders: 2,
+      lifetime_value: 6093.2
+    },
+    {
+      customer_name: 'Cassandra Sanchez',
+      num_orders: 3,
+      lifetime_value: 100.84
+    },
+    {
+      customer_name: 'Cassandra Sara',
+      num_orders: 2,
+      lifetime_value: 52.77
+    },
+    {
+      customer_name: 'Cassandra Srini',
+      num_orders: 2,
+      lifetime_value: 61.75
+    },
+    {
+      customer_name: 'Cassandra Subram',
+      num_orders: 1,
+      lifetime_value: 56.98
+    },
+    {
+      customer_name: 'Cassandra Suri',
+      num_orders: 2,
+      lifetime_value: 5314.25
+    },
+    {
+      customer_name: 'Cassandra Van',
+      num_orders: 2,
+      lifetime_value: 118.94
+    },
+    {
+      customer_name: 'Chad Anand',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Chad Andersen',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Chad Deng',
+      num_orders: 1,
+      lifetime_value: 1155.48
+    },
+    {
+      customer_name: 'Chad Goel',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Chad Jai',
+      num_orders: 1,
+      lifetime_value: 2443.35
+    },
+    {
+      customer_name: 'Chad Kumar',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Chad Lal',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Chad Luo',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Chad Nara',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Chad Nath',
+      num_orders: 1,
+      lifetime_value: 32.22
+    },
+    {
+      customer_name: 'Chad Pal',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Chad Rai',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Chad Raje',
+      num_orders: 1,
+      lifetime_value: 2520.83
+    },
+    {
+      customer_name: 'Chad Raji',
+      num_orders: 1,
+      lifetime_value: 123.98
+    },
+    {
+      customer_name: 'Chad Shan',
+      num_orders: 1,
+      lifetime_value: 2452.34
+    },
+    {
+      customer_name: 'Chad Sharma',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Chad Shen',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Chad Tang',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Chad Xie',
+      num_orders: 1,
+      lifetime_value: 2543.44
+    },
+    {
+      customer_name: 'Chad Xu',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Chad Yuan',
+      num_orders: 1,
+      lifetime_value: 71.95
+    },
+    {
+      customer_name: 'Charles Bailey',
+      num_orders: 4,
+      lifetime_value: 215.45
+    },
+    {
+      customer_name: 'Charles Bell',
+      num_orders: 2,
+      lifetime_value: 3772.4096
+    },
+    {
+      customer_name: 'Charles Brooks',
+      num_orders: 2,
+      lifetime_value: 4397.75
+    },
+    {
+      customer_name: 'Charles Cook',
+      num_orders: 2,
+      lifetime_value: 1622.47
+    },
+    {
+      customer_name: 'Charles Cooper',
+      num_orders: 2,
+      lifetime_value: 2919.8896
+    },
+    {
+      customer_name: 'Charles Cox',
+      num_orders: 2,
+      lifetime_value: 242.94
+    },
+    {
+      customer_name: 'Charles Gray',
+      num_orders: 1,
+      lifetime_value: 54.98
+    },
+    {
+      customer_name: 'Charles Howard',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Charles James',
+      num_orders: 2,
+      lifetime_value: 1586.3775
+    },
+    {
+      customer_name: 'Charles Kelly',
+      num_orders: 1,
+      lifetime_value: 71.58
+    },
+    {
+      customer_name: 'Charles Morgan',
+      num_orders: 1,
+      lifetime_value: 48.97
+    },
+    {
+      customer_name: 'Charles Morris',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Charles Murphy',
+      num_orders: 1,
+      lifetime_value: 94.48
+    },
+    {
+      customer_name: 'Charles Peterson',
+      num_orders: 1,
+      lifetime_value: 141.98
+    },
+    {
+      customer_name: 'Charles Ramirez',
+      num_orders: 1,
+      lifetime_value: 89.97
+    },
+    {
+      customer_name: 'Charles Reed',
+      num_orders: 2,
+      lifetime_value: 3099.29
+    },
+    {
+      customer_name: 'Charles Richardson',
+      num_orders: 2,
+      lifetime_value: 1503.5782
+    },
+    {
+      customer_name: 'Charles Rivera',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Charles Rogers',
+      num_orders: 2,
+      lifetime_value: 3147.95
+    },
+    {
+      customer_name: 'Charles Sanchez',
+      num_orders: 1,
+      lifetime_value: 114.46
+    },
+    {
+      customer_name: 'Charles Sanders',
+      num_orders: 3,
+      lifetime_value: 3716.2296
+    },
+    {
+      customer_name: 'Charles Stewart',
+      num_orders: 2,
+      lifetime_value: 3142.97
+    },
+    {
+      customer_name: 'Charles Torres',
+      num_orders: 1,
+      lifetime_value: 106.96
+    },
+    {
+      customer_name: 'Charles Ward',
+      num_orders: 3,
+      lifetime_value: 5142.7496
+    },
+    {
+      customer_name: 'Charles Watson',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Chase Bailey',
+      num_orders: 2,
+      lifetime_value: 113.97
+    },
+    {
+      customer_name: 'Chase Bell',
+      num_orders: 2,
+      lifetime_value: 112.46
+    },
+    {
+      customer_name: 'Chase Brooks',
+      num_orders: 2,
+      lifetime_value: 3804.0782
+    },
+    {
+      customer_name: 'Chase Cook',
+      num_orders: 3,
+      lifetime_value: 267.84
+    },
+    {
+      customer_name: 'Chase Cooper',
+      num_orders: 2,
+      lifetime_value: 3084.0582
+    },
+    {
+      customer_name: 'Chase Cox',
+      num_orders: 2,
+      lifetime_value: 5913.24
+    },
+    {
+      customer_name: 'Chase Gray',
+      num_orders: 1,
+      lifetime_value: 127.28
+    },
+    {
+      customer_name: 'Chase Howard',
+      num_orders: 2,
+      lifetime_value: 37.97
+    },
+    {
+      customer_name: 'Chase James',
+      num_orders: 2,
+      lifetime_value: 63.97
+    },
+    {
+      customer_name: 'Chase Kelly',
+      num_orders: 4,
+      lifetime_value: 9523.0025
+    },
+    {
+      customer_name: 'Chase Morgan',
+      num_orders: 1,
+      lifetime_value: 70.95
+    },
+    {
+      customer_name: 'Chase Morris',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Chase Murphy',
+      num_orders: 3,
+      lifetime_value: 7108.8725
+    },
+    {
+      customer_name: 'Chase Peterson',
+      num_orders: 3,
+      lifetime_value: 6998.8625
+    },
+    {
+      customer_name: 'Chase Ramirez',
+      num_orders: 2,
+      lifetime_value: 117.96
+    },
+    {
+      customer_name: 'Chase Reed',
+      num_orders: 2,
+      lifetime_value: 3772.4096
+    },
+    {
+      customer_name: 'Chase Richardson',
+      num_orders: 1,
+      lifetime_value: 63.97
+    },
+    {
+      customer_name: 'Chase Rivera',
+      num_orders: 2,
+      lifetime_value: 2910.8996
+    },
+    {
+      customer_name: 'Chase Rogers',
+      num_orders: 2,
+      lifetime_value: 3184.44
+    },
+    {
+      customer_name: 'Chase Sanchez',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Chase Sandberg',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Chase Stewart',
+      num_orders: 1,
+      lifetime_value: 75.97
+    },
+    {
+      customer_name: 'Chase Ward',
+      num_orders: 2,
+      lifetime_value: 1533.5582
+    },
+    {
+      customer_name: 'Chase Watson',
+      num_orders: 2,
+      lifetime_value: 156.84
+    },
+    {
+      customer_name: 'Chelsea Arun',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Chelsea Chandra',
+      num_orders: 2,
+      lifetime_value: 6035.6
+    },
+    {
+      customer_name: 'Chelsea Fernandez',
+      num_orders: 1,
+      lifetime_value: 777.44
+    },
+    {
+      customer_name: 'Chelsea Garcia',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Chelsea Gonzalez',
+      num_orders: 1,
+      lifetime_value: 618.98
+    },
+    {
+      customer_name: 'Chelsea Jordan',
+      num_orders: 2,
+      lifetime_value: 6095.08
+    },
+    {
+      customer_name: 'Chelsea Lopez',
+      num_orders: 1,
+      lifetime_value: 893.47
+    },
+    {
+      customer_name: 'Chelsea Madan',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Chelsea Martinez',
+      num_orders: 1,
+      lifetime_value: 565.21
+    },
+    {
+      customer_name: 'Chelsea McDonald',
+      num_orders: 1,
+      lifetime_value: 59.98
+    },
+    {
+      customer_name: 'Chelsea Mehta',
+      num_orders: 1,
+      lifetime_value: 801.77
+    },
+    {
+      customer_name: 'Chelsea Patel',
+      num_orders: 2,
+      lifetime_value: 6060.5
+    },
+    {
+      customer_name: 'Chelsea Perez',
+      num_orders: 1,
+      lifetime_value: 123.98
+    },
+    {
+      customer_name: 'Chelsea Prasad',
+      num_orders: 1,
+      lifetime_value: 123.98
+    },
+    {
+      customer_name: 'Chelsea Raman',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Chelsea Ray',
+      num_orders: 1,
+      lifetime_value: 902.98
+    },
+    {
+      customer_name: 'Chelsea Rodriguez',
+      num_orders: 1,
+      lifetime_value: 2369.96
+    },
+    {
+      customer_name: 'Chelsea Sai',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Chelsea Sanchez',
+      num_orders: 1,
+      lifetime_value: 589.98
+    },
+    {
+      customer_name: 'Chelsea Sara',
+      num_orders: 1,
+      lifetime_value: 889.39
+    },
+    {
+      customer_name: 'Chelsea Srini',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Chelsea Subram',
+      num_orders: 1,
+      lifetime_value: 804.48
+    },
+    {
+      customer_name: 'Chelsea Suri',
+      num_orders: 2,
+      lifetime_value: 89.25
+    },
+    {
+      customer_name: 'Chelsea Weber',
+      num_orders: 2,
+      lifetime_value: 59.26
+    },
+    {
+      customer_name: 'Chloe Alexander',
+      num_orders: 1,
+      lifetime_value: 2492.32
+    },
+    {
+      customer_name: 'Chloe Anderson',
+      num_orders: 1,
+      lifetime_value: 8.99
+    },
+    {
+      customer_name: 'Chloe Bailey',
+      num_orders: 1,
+      lifetime_value: 37.27
+    },
+    {
+      customer_name: 'Chloe Bell',
+      num_orders: 2,
+      lifetime_value: 6085.59
+    },
+    {
+      customer_name: 'Chloe Bennett',
+      num_orders: 2,
+      lifetime_value: 95.94
+    },
+    {
+      customer_name: 'Chloe Bradley',
+      num_orders: 1,
+      lifetime_value: 94.48
+    },
+    {
+      customer_name: 'Chloe Brooks',
+      num_orders: 1,
+      lifetime_value: 133.49
+    },
+    {
+      customer_name: 'Chloe Brown',
+      num_orders: 2,
+      lifetime_value: 4390.6796
+    },
+    {
+      customer_name: 'Chloe Bryant',
+      num_orders: 1,
+      lifetime_value: 1155.48
+    },
+    {
+      customer_name: 'Chloe Butler',
+      num_orders: 1,
+      lifetime_value: 58.98
+    },
+    {
+      customer_name: 'Chloe Clark',
+      num_orders: 3,
+      lifetime_value: 6434.31
+    },
+    {
+      customer_name: 'Chloe Coleman',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Chloe Cook',
+      num_orders: 1,
+      lifetime_value: 60.47
+    },
+    {
+      customer_name: 'Chloe Cox',
+      num_orders: 2,
+      lifetime_value: 6029.57
+    },
+    {
+      customer_name: 'Chloe Diaz',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Chloe Flores',
+      num_orders: 1,
+      lifetime_value: 1149.47
+    },
+    {
+      customer_name: 'Chloe Garcia',
+      num_orders: 2,
+      lifetime_value: 138.45
+    },
+    {
+      customer_name: 'Chloe Gonzales',
+      num_orders: 1,
+      lifetime_value: 1155.48
+    },
+    {
+      customer_name: 'Chloe Griffin',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Chloe Hall',
+      num_orders: 3,
+      lifetime_value: 6591.57
+    },
+    {
+      customer_name: 'Chloe Harris',
+      num_orders: 3,
+      lifetime_value: 8196.01
+    },
+    {
+      customer_name: 'Chloe Henderson',
+      num_orders: 1,
+      lifetime_value: 1151.76
+    },
+    {
+      customer_name: 'Chloe Howard',
+      num_orders: 2,
+      lifetime_value: 6029.57
+    },
+    {
+      customer_name: 'Chloe Hughes',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Chloe Jackson',
+      num_orders: 2,
+      lifetime_value: 4369.0882
+    },
+    {
+      customer_name: 'Chloe Jenkins',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Chloe Johnson',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Chloe Jones',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Chloe Kelly',
+      num_orders: 1,
+      lifetime_value: 128.97
+    },
+    {
+      customer_name: 'Chloe Lee',
+      num_orders: 2,
+      lifetime_value: 122.24
+    },
+    {
+      customer_name: 'Chloe Long',
+      num_orders: 1,
+      lifetime_value: 2451.3
+    },
+    {
+      customer_name: 'Chloe Martin',
+      num_orders: 3,
+      lifetime_value: 8119.03
+    },
+    {
+      customer_name: 'Chloe Miller',
+      num_orders: 2,
+      lifetime_value: 4486.4096
+    },
+    {
+      customer_name: 'Chloe Moore',
+      num_orders: 2,
+      lifetime_value: 4379.0782
+    },
+    {
+      customer_name: 'Chloe Morgan',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Chloe Morris',
+      num_orders: 1,
+      lifetime_value: 60.47
+    },
+    {
+      customer_name: 'Chloe Patterson',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Chloe Perry',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Chloe Peterson',
+      num_orders: 1,
+      lifetime_value: 27.77
+    },
+    {
+      customer_name: 'Chloe Powell',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Chloe Price',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Chloe Ramirez',
+      num_orders: 2,
+      lifetime_value: 5333.25
+    },
+    {
+      customer_name: 'Chloe Reed',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Chloe Richardson',
+      num_orders: 1,
+      lifetime_value: 60.47
+    },
+    {
+      customer_name: 'Chloe Rivera',
+      num_orders: 1,
+      lifetime_value: 59.47
+    },
+    {
+      customer_name: 'Chloe Robinson',
+      num_orders: 1,
+      lifetime_value: 2332.28
+    },
+    {
+      customer_name: 'Chloe Rodriguez',
+      num_orders: 1,
+      lifetime_value: 2316.97
+    },
+    {
+      customer_name: 'Chloe Rogers',
+      num_orders: 2,
+      lifetime_value: 5279.26
+    },
+    {
+      customer_name: 'Chloe Ross',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Chloe Russell',
+      num_orders: 1,
+      lifetime_value: 128.97
+    },
+    {
+      customer_name: 'Chloe Sanchez',
+      num_orders: 2,
+      lifetime_value: 6093.2
+    },
+    {
+      customer_name: 'Chloe Sanders',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Chloe Smith',
+      num_orders: 2,
+      lifetime_value: 4369.0882
+    },
+    {
+      customer_name: 'Chloe Taylor',
+      num_orders: 2,
+      lifetime_value: 4381.3896
+    },
+    {
+      customer_name: 'Chloe Thompson',
+      num_orders: 2,
+      lifetime_value: 81.26
+    },
+    {
+      customer_name: 'Chloe Torres',
+      num_orders: 2,
+      lifetime_value: 5314.25
+    },
+    {
+      customer_name: 'Chloe Walker',
+      num_orders: 2,
+      lifetime_value: 56.51
+    },
+    {
+      customer_name: 'Chloe Ward',
+      num_orders: 2,
+      lifetime_value: 5314.25
+    },
+    {
+      customer_name: 'Chloe Washington',
+      num_orders: 1,
+      lifetime_value: 132.97
+    },
+    {
+      customer_name: 'Chloe Watson',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Chloe White',
+      num_orders: 1,
+      lifetime_value: 88.98
+    },
+    {
+      customer_name: 'Chloe Williams',
+      num_orders: 1,
+      lifetime_value: 53.99
+    },
+    {
+      customer_name: 'Chloe Wilson',
+      num_orders: 2,
+      lifetime_value: 4344.0882
+    },
+    {
+      customer_name: 'Chloe Wood',
+      num_orders: 1,
+      lifetime_value: 144.47
+    },
+    {
+      customer_name: 'Christian Anderson',
+      num_orders: 1,
+      lifetime_value: 96.46
+    },
+    {
+      customer_name: 'Christian Brown',
+      num_orders: 1,
+      lifetime_value: 34.98
+    },
+    {
+      customer_name: 'Christian Clark',
+      num_orders: 1,
+      lifetime_value: 1785.97
+    },
+    {
+      customer_name: 'Christian Davis',
+      num_orders: 2,
+      lifetime_value: 3917.5425
+    },
+    {
+      customer_name: 'Christian Garcia',
+      num_orders: 2,
+      lifetime_value: 65.96
+    },
+    {
+      customer_name: 'Christian Harris',
+      num_orders: 3,
+      lifetime_value: 7200.37
+    },
+    {
+      customer_name: 'Christian Jackson',
+      num_orders: 1,
+      lifetime_value: 66.44
+    },
+    {
+      customer_name: 'Christian Johnson',
+      num_orders: 3,
+      lifetime_value: 5750.3625
+    },
+    {
+      customer_name: 'Christian Jones',
+      num_orders: 1,
+      lifetime_value: 73.96
+    },
+    {
+      customer_name: 'Christian Lee',
+      num_orders: 1,
+      lifetime_value: 58.98
+    },
+    {
+      customer_name: 'Christian Lewis',
+      num_orders: 2,
+      lifetime_value: 51.97
+    },
+    {
+      customer_name: 'Christian Martin',
+      num_orders: 1,
+      lifetime_value: 44.91
+    },
+    {
+      customer_name: 'Christian Martinez',
+      num_orders: 2,
+      lifetime_value: 6093.2
+    },
+    {
+      customer_name: 'Christian Moore',
+      num_orders: 1,
+      lifetime_value: 67.97
+    },
+    {
+      customer_name: 'Christian Robinson',
+      num_orders: 3,
+      lifetime_value: 5784.3625
+    },
+    {
+      customer_name: 'Christian Rodriguez',
+      num_orders: 1,
+      lifetime_value: 1700.99
+    },
+    {
+      customer_name: 'Christian Smith',
+      num_orders: 2,
+      lifetime_value: 2431.3582
+    },
+    {
+      customer_name: 'Christian Taylor',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Christian Thomas',
+      num_orders: 3,
+      lifetime_value: 5732.4675
+    },
+    {
+      customer_name: 'Christian Thompson',
+      num_orders: 2,
+      lifetime_value: 63.97
+    },
+    {
+      customer_name: 'Christian Walker',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Christian White',
+      num_orders: 2,
+      lifetime_value: 3044.0582
+    },
+    {
+      customer_name: 'Christian Williams',
+      num_orders: 2,
+      lifetime_value: 3040.31
+    },
+    {
+      customer_name: 'Christian Wilson',
+      num_orders: 1,
+      lifetime_value: 193.98
+    },
+    {
+      customer_name: 'Christine Andersen',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Christine Beck',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Christine Chande',
+      num_orders: 2,
+      lifetime_value: 4588.45
+    },
+    {
+      customer_name: 'Christine Chander',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Christine Goel',
+      num_orders: 1,
+      lifetime_value: 128.97
+    },
+    {
+      customer_name: 'Christine Jai',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Christine Luo',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Christine Nara',
+      num_orders: 1,
+      lifetime_value: 539.99
+    },
+    {
+      customer_name: 'Christine Nath',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Christine Pal',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Christine Raje',
+      num_orders: 1,
+      lifetime_value: 548.98
+    },
+    {
+      customer_name: 'Christine Raji',
+      num_orders: 1,
+      lifetime_value: 27.28
+    },
+    {
+      customer_name: 'Christine Shan',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Christine She',
+      num_orders: 1,
+      lifetime_value: 132.97
+    },
+    {
+      customer_name: 'Christine Stone',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Christine Sutton',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Christine Yuan',
+      num_orders: 2,
+      lifetime_value: 77.25
+    },
+    {
+      customer_name: 'Christopher Anderson',
+      num_orders: 1,
+      lifetime_value: 2391.96
+    },
+    {
+      customer_name: 'Christopher Brown',
+      num_orders: 3,
+      lifetime_value: 5706.3825
+    },
+    {
+      customer_name: 'Christopher Clark',
+      num_orders: 2,
+      lifetime_value: 6067.2
+    },
+    {
+      customer_name: 'Christopher Davis',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Christopher Garcia',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Christopher Harris',
+      num_orders: 3,
+      lifetime_value: 6907.5525
+    },
+    {
+      customer_name: 'Christopher Jackson',
+      num_orders: 1,
+      lifetime_value: 24.27
+    },
+    {
+      customer_name: 'Christopher Johnson',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Christopher Jones',
+      num_orders: 1,
+      lifetime_value: 1723.96
+    },
+    {
+      customer_name: 'Christopher Lee',
+      num_orders: 2,
+      lifetime_value: 142.45
+    },
+    {
+      customer_name: 'Christopher Lewis',
+      num_orders: 2,
+      lifetime_value: 115.95
+    },
+    {
+      customer_name: 'Christopher Martin',
+      num_orders: 2,
+      lifetime_value: 4150.53
+    },
+    {
+      customer_name: 'Christopher Martinez',
+      num_orders: 2,
+      lifetime_value: 6030.61
+    },
+    {
+      customer_name: 'Christopher Miller',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Christopher Moore',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Christopher Robinson',
+      num_orders: 2,
+      lifetime_value: 45.95
+    },
+    {
+      customer_name: 'Christopher Rodriguez',
+      num_orders: 2,
+      lifetime_value: 98.96
+    },
+    {
+      customer_name: 'Christopher Smith',
+      num_orders: 1,
+      lifetime_value: 607.96
+    },
+    {
+      customer_name: 'Christopher Taylor',
+      num_orders: 1,
+      lifetime_value: 123.48
+    },
+    {
+      customer_name: 'Christopher Thomas',
+      num_orders: 2,
+      lifetime_value: 3043.0582
+    },
+    {
+      customer_name: 'Christopher Walker',
+      num_orders: 2,
+      lifetime_value: 72.26
+    },
+    {
+      customer_name: 'Christopher White',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Christopher Wilson',
+      num_orders: 1,
+      lifetime_value: 1750.98
+    },
+    {
+      customer_name: 'Christopher Winston',
+      num_orders: 1,
+      lifetime_value: 58.98
+    },
+    {
+      customer_name: 'Christy Andersen',
+      num_orders: 1,
+      lifetime_value: 34.47
+    },
+    {
+      customer_name: 'Christy Beck',
+      num_orders: 1,
+      lifetime_value: 43.98
+    },
+    {
+      customer_name: 'Christy Cai',
+      num_orders: 1,
+      lifetime_value: 78.48
+    },
+    {
+      customer_name: 'Christy Chande',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Christy Chander',
+      num_orders: 3,
+      lifetime_value: 4928.0582
+    },
+    {
+      customer_name: 'Christy Chow',
+      num_orders: 2,
+      lifetime_value: 5898.26
+    },
+    {
+      customer_name: 'Christy Deng',
+      num_orders: 2,
+      lifetime_value: 4344.0882
+    },
+    {
+      customer_name: 'Christy Gao',
+      num_orders: 3,
+      lifetime_value: 4960.07
+    },
+    {
+      customer_name: 'Christy Goel',
+      num_orders: 4,
+      lifetime_value: 7075.27
+    },
+    {
+      customer_name: 'Christy Guo',
+      num_orders: 3,
+      lifetime_value: 5106.24
+    },
+    {
+      customer_name: 'Christy Hu',
+      num_orders: 1,
+      lifetime_value: 68.97
+    },
+    {
+      customer_name: 'Christy Huang',
+      num_orders: 2,
+      lifetime_value: 4413.0582
+    },
+    {
+      customer_name: 'Christy Jai',
+      num_orders: 1,
+      lifetime_value: 33.98
+    },
+    {
+      customer_name: 'Christy Kumar',
+      num_orders: 1,
+      lifetime_value: 38.47
+    },
+    {
+      customer_name: 'Christy Lal',
+      num_orders: 3,
+      lifetime_value: 8114.04
+    },
+    {
+      customer_name: 'Christy Li',
+      num_orders: 3,
+      lifetime_value: 8154.02
+    },
+    {
+      customer_name: 'Christy Liang',
+      num_orders: 3,
+      lifetime_value: 4921.82
+    },
+    {
+      customer_name: 'Christy Liu',
+      num_orders: 3,
+      lifetime_value: 8162
+    },
+    {
+      customer_name: 'Christy Lu',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Christy Luo',
+      num_orders: 1,
+      lifetime_value: 28.99
+    },
+    {
+      customer_name: 'Christy Ma',
+      num_orders: 2,
+      lifetime_value: 114.96
+    },
+    {
+      customer_name: 'Christy McDonald',
+      num_orders: 1,
+      lifetime_value: 67.97
+    },
+    {
+      customer_name: 'Christy Nara',
+      num_orders: 2,
+      lifetime_value: 231.75
+    },
+    {
+      customer_name: 'Christy Nath',
+      num_orders: 4,
+      lifetime_value: 9780.04
+    },
+    {
+      customer_name: 'Christy Pal',
+      num_orders: 1,
+      lifetime_value: 53.99
+    },
+    {
+      customer_name: 'Christy Rai',
+      num_orders: 7,
+      lifetime_value: 11200.7696
+    },
+    {
+      customer_name: 'Christy Raje',
+      num_orders: 4,
+      lifetime_value: 9879.96
+    },
+    {
+      customer_name: 'Christy Raji',
+      num_orders: 4,
+      lifetime_value: 9954.26
+    },
+    {
+      customer_name: 'Christy Shan',
+      num_orders: 3,
+      lifetime_value: 5033.1396
+    },
+    {
+      customer_name: 'Christy Sun',
+      num_orders: 3,
+      lifetime_value: 4943.8
+    },
+    {
+      customer_name: 'Christy Tang',
+      num_orders: 1,
+      lifetime_value: 48.97
+    },
+    {
+      customer_name: 'Christy Wang',
+      num_orders: 2,
+      lifetime_value: 5915.54
+    },
+    {
+      customer_name: 'Christy Wu',
+      num_orders: 1,
+      lifetime_value: 48.97
+    },
+    {
+      customer_name: 'Christy Xie',
+      num_orders: 1,
+      lifetime_value: 68.97
+    },
+    {
+      customer_name: 'Christy Ye',
+      num_orders: 1,
+      lifetime_value: 22.97
+    },
+    {
+      customer_name: 'Christy Zeng',
+      num_orders: 1,
+      lifetime_value: 83.97
+    },
+    {
+      customer_name: 'Christy Zheng',
+      num_orders: 3,
+      lifetime_value: 4965.81
+    },
+    {
+      customer_name: 'Christy Zhou',
+      num_orders: 1,
+      lifetime_value: 38.47
+    },
+    {
+      customer_name: 'Christy Zhu',
+      num_orders: 3,
+      lifetime_value: 5034.78
+    },
+    {
+      customer_name: 'Christy Zimmerman',
+      num_orders: 2,
+      lifetime_value: 6044.2
+    },
+    {
+      customer_name: 'Cindy Foster',
+      num_orders: 2,
+      lifetime_value: 3241.8996
+    },
+    {
+      customer_name: 'Cindy Gray',
+      num_orders: 1,
+      lifetime_value: 21.49
+    },
+    {
+      customer_name: 'Cindy James',
+      num_orders: 1,
+      lifetime_value: 21.49
+    },
+    {
+      customer_name: 'Cindy Lewis',
+      num_orders: 1,
+      lifetime_value: 2371.96
+    },
+    {
+      customer_name: 'Cindy Murphy',
+      num_orders: 1,
+      lifetime_value: 69.97
+    },
+    {
+      customer_name: 'Cindy Ramos',
+      num_orders: 1,
+      lifetime_value: 54.98
+    },
+    {
+      customer_name: 'Cindy Stewart',
+      num_orders: 2,
+      lifetime_value: 44.46
+    },
+    {
+      customer_name: 'Clarence Chen',
+      num_orders: 2,
+      lifetime_value: 56.76
+    },
+    {
+      customer_name: 'Clarence Li',
+      num_orders: 1,
+      lifetime_value: 36.96
+    },
+    {
+      customer_name: 'Clarence Liu',
+      num_orders: 1,
+      lifetime_value: 38.98
+    },
+    {
+      customer_name: 'Clarence Yang',
+      num_orders: 2,
+      lifetime_value: 2715.4075
+    },
+    {
+      customer_name: 'Clarence Zhang',
+      num_orders: 1,
+      lifetime_value: 1709.98
+    },
+    {
+      customer_name: 'Clayton Anand',
+      num_orders: 3,
+      lifetime_value: 381.97
+    },
+    {
+      customer_name: 'Clayton Andersen',
+      num_orders: 1,
+      lifetime_value: 8.99
+    },
+    {
+      customer_name: 'Clayton Beck',
+      num_orders: 3,
+      lifetime_value: 6791.0982
+    },
+    {
+      customer_name: 'Clayton Cai',
+      num_orders: 3,
+      lifetime_value: 5200.4082
+    },
+    {
+      customer_name: 'Clayton Chavez',
+      num_orders: 2,
+      lifetime_value: 45.26
+    },
+    {
+      customer_name: 'Clayton Chen',
+      num_orders: 2,
+      lifetime_value: 2668.0782
+    },
+    {
+      customer_name: 'Clayton Deng',
+      num_orders: 2,
+      lifetime_value: 77.96
+    },
+    {
+      customer_name: 'Clayton Gao',
+      num_orders: 3,
+      lifetime_value: 6489.51
+    },
+    {
+      customer_name: 'Clayton Goel',
+      num_orders: 3,
+      lifetime_value: 34.56
+    },
+    {
+      customer_name: 'Clayton Guo',
+      num_orders: 2,
+      lifetime_value: 67.46
+    },
+    {
+      customer_name: 'Clayton He',
+      num_orders: 2,
+      lifetime_value: 5983.74
+    },
+    {
+      customer_name: 'Clayton Jai',
+      num_orders: 2,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Clayton Kumar',
+      num_orders: 1,
+      lifetime_value: 49.99
+    },
+    {
+      customer_name: 'Clayton Li',
+      num_orders: 2,
+      lifetime_value: 2653.0682
+    },
+    {
+      customer_name: 'Clayton Liang',
+      num_orders: 2,
+      lifetime_value: 101.95
+    },
+    {
+      customer_name: 'Clayton Lin',
+      num_orders: 2,
+      lifetime_value: 2636.4096
+    },
+    {
+      customer_name: 'Clayton Liu',
+      num_orders: 2,
+      lifetime_value: 2668.0782
+    },
+    {
+      customer_name: 'Clayton Lu',
+      num_orders: 2,
+      lifetime_value: 40.27
+    },
+    {
+      customer_name: 'Clayton Nara',
+      num_orders: 1,
+      lifetime_value: 73.97
+    },
+    {
+      customer_name: 'Clayton Nath',
+      num_orders: 1,
+      lifetime_value: 68.97
+    },
+    {
+      customer_name: 'Clayton Pal',
+      num_orders: 3,
+      lifetime_value: 6817.5982
+    },
+    {
+      customer_name: 'Clayton Rai',
+      num_orders: 1,
+      lifetime_value: 14.98
+    },
+    {
+      customer_name: 'Clayton Raje',
+      num_orders: 3,
+      lifetime_value: 6860.0882
+    },
+    {
+      customer_name: 'Clayton Raji',
+      num_orders: 3,
+      lifetime_value: 6802.1282
+    },
+    {
+      customer_name: 'Clayton Shan',
+      num_orders: 3,
+      lifetime_value: 6847.7596
+    },
+    {
+      customer_name: 'Clayton Sharma',
+      num_orders: 2,
+      lifetime_value: 102.96
+    },
+    {
+      customer_name: 'Clayton She',
+      num_orders: 2,
+      lifetime_value: 4379.0782
+    },
+    {
+      customer_name: 'Clayton Stone',
+      num_orders: 1,
+      lifetime_value: 14.98
+    },
+    {
+      customer_name: 'Clayton Sun',
+      num_orders: 2,
+      lifetime_value: 45.26
+    },
+    {
+      customer_name: 'Clayton Tang',
+      num_orders: 4,
+      lifetime_value: 10793.27
+    },
+    {
+      customer_name: 'Clayton Wagner',
+      num_orders: 2,
+      lifetime_value: 2641.3896
+    },
+    {
+      customer_name: 'Clayton Xie',
+      num_orders: 3,
+      lifetime_value: 6825.4596
+    },
+    {
+      customer_name: 'Clayton Xu',
+      num_orders: 2,
+      lifetime_value: 86.26
+    },
+    {
+      customer_name: 'Clayton Xu',
+      num_orders: 2,
+      lifetime_value: 42.97
+    },
+    {
+      customer_name: 'Clayton Yang',
+      num_orders: 2,
+      lifetime_value: 2589.0882
+    },
+    {
+      customer_name: 'Clayton Ye',
+      num_orders: 2,
+      lifetime_value: 2665.0582
+    },
+    {
+      customer_name: 'Clayton Zeng',
+      num_orders: 3,
+      lifetime_value: 5135.4082
+    },
+    {
+      customer_name: 'Clayton Zhang',
+      num_orders: 2,
+      lifetime_value: 2654.0582
+    },
+    {
+      customer_name: 'Clayton Zhao',
+      num_orders: 2,
+      lifetime_value: 51.96
+    },
+    {
+      customer_name: 'Clayton Zhou',
+      num_orders: 2,
+      lifetime_value: 2639.0782
+    },
+    {
+      customer_name: 'Clayton Zhu',
+      num_orders: 1,
+      lifetime_value: 9.99
+    },
+    {
+      customer_name: 'Clinton Alonso',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Clinton Alvarez',
+      num_orders: 2,
+      lifetime_value: 1468.5882
+    },
+    {
+      customer_name: 'Clinton Blanco',
+      num_orders: 2,
+      lifetime_value: 1538.5782
+    },
+    {
+      customer_name: 'Clinton Carlson',
+      num_orders: 1,
+      lifetime_value: 26.97
+    },
+    {
+      customer_name: 'Clinton Dominguez',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Clinton Gill',
+      num_orders: 1,
+      lifetime_value: 848.47
+    },
+    {
+      customer_name: 'Clinton Gutierrez',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Clinton Hernandez',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Clinton Jiménez',
+      num_orders: 3,
+      lifetime_value: 304.55
+    },
+    {
+      customer_name: 'Clinton Moreno',
+      num_orders: 2,
+      lifetime_value: 1601.5582
+    },
+    {
+      customer_name: 'Clinton Munoz',
+      num_orders: 2,
+      lifetime_value: 1538.5582
+    },
+    {
+      customer_name: 'Clinton Navarro',
+      num_orders: 1,
+      lifetime_value: 64.47
+    },
+    {
+      customer_name: 'Clinton Romero',
+      num_orders: 1,
+      lifetime_value: 103.48
+    },
+    {
+      customer_name: 'Clinton Rubio',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Clinton Sandberg',
+      num_orders: 3,
+      lifetime_value: 119.86
+    },
+    {
+      customer_name: 'Clinton Serrano',
+      num_orders: 2,
+      lifetime_value: 1538.5782
+    },
+    {
+      customer_name: 'Clinton Suarez',
+      num_orders: 1,
+      lifetime_value: 812.42
+    },
+    {
+      customer_name: 'Clinton Vazquez',
+      num_orders: 3,
+      lifetime_value: 156.55
+    },
+    {
+      customer_name: 'Cody Bailey',
+      num_orders: 2,
+      lifetime_value: 4391.4096
+    },
+    {
+      customer_name: 'Cody Bell',
+      num_orders: 2,
+      lifetime_value: 103.45
+    },
+    {
+      customer_name: 'Cody Cook',
+      num_orders: 2,
+      lifetime_value: 1676.46
+    },
+    {
+      customer_name: 'Cody Cooper',
+      num_orders: 2,
+      lifetime_value: 90.25
+    },
+    {
+      customer_name: 'Cody Cox',
+      num_orders: 2,
+      lifetime_value: 138.96
+    },
+    {
+      customer_name: 'Cody Gray',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Cody Howard',
+      num_orders: 1,
+      lifetime_value: 54.96
+    },
+    {
+      customer_name: 'Cody James',
+      num_orders: 2,
+      lifetime_value: 1668.8975
+    },
+    {
+      customer_name: 'Cody Kelly',
+      num_orders: 3,
+      lifetime_value: 7081.4625
+    },
+    {
+      customer_name: 'Cody Morgan',
+      num_orders: 2,
+      lifetime_value: 2746.5525
+    },
+    {
+      customer_name: 'Cody Morris',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Cody Murphy',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Cody Ramirez',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Cody Reed',
+      num_orders: 2,
+      lifetime_value: 2746.5525
+    },
+    {
+      customer_name: 'Cody Richardson',
+      num_orders: 2,
+      lifetime_value: 1854.5782
+    },
+    {
+      customer_name: 'Cody Rivera',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Cody Rogers',
+      num_orders: 2,
+      lifetime_value: 4780.02
+    },
+    {
+      customer_name: 'Cody Sanchez',
+      num_orders: 1,
+      lifetime_value: 103.48
+    },
+    {
+      customer_name: 'Cody Sanders',
+      num_orders: 1,
+      lifetime_value: 80.96
+    },
+    {
+      customer_name: 'Cody Stewart',
+      num_orders: 2,
+      lifetime_value: 3152.96
+    },
+    {
+      customer_name: 'Cody Torres',
+      num_orders: 1,
+      lifetime_value: 45.95
+    },
+    {
+      customer_name: 'Cody Ward',
+      num_orders: 3,
+      lifetime_value: 5322.7296
+    },
+    {
+      customer_name: 'Cody West',
+      num_orders: 5,
+      lifetime_value: 251.2
+    },
+    {
+      customer_name: 'Cole Bailey',
+      num_orders: 3,
+      lifetime_value: 213.94
+    },
+    {
+      customer_name: 'Cole Bell',
+      num_orders: 2,
+      lifetime_value: 29.98
+    },
+    {
+      customer_name: 'Cole Brooks',
+      num_orders: 2,
+      lifetime_value: 4397.75
+    },
+    {
+      customer_name: 'Cole Cook',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Cole Cooper',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Cole Cox',
+      num_orders: 2,
+      lifetime_value: 4380.04
+    },
+    {
+      customer_name: 'Cole Gray',
+      num_orders: 1,
+      lifetime_value: 804.48
+    },
+    {
+      customer_name: 'Cole James',
+      num_orders: 2,
+      lifetime_value: 138.45
+    },
+    {
+      customer_name: 'Cole Kelly',
+      num_orders: 4,
+      lifetime_value: 9451.9125
+    },
+    {
+      customer_name: 'Cole Morgan',
+      num_orders: 2,
+      lifetime_value: 2807.0325
+    },
+    {
+      customer_name: 'Cole Morris',
+      num_orders: 2,
+      lifetime_value: 3112.98
+    },
+    {
+      customer_name: 'Cole Murphy',
+      num_orders: 3,
+      lifetime_value: 6943.5525
+    },
+    {
+      customer_name: 'Cole Peterson',
+      num_orders: 1,
+      lifetime_value: 30.97
+    },
+    {
+      customer_name: 'Cole Ramirez',
+      num_orders: 3,
+      lifetime_value: 158.84
+    },
+    {
+      customer_name: 'Cole Reed',
+      num_orders: 2,
+      lifetime_value: 77.27
+    },
+    {
+      customer_name: 'Cole Richardson',
+      num_orders: 3,
+      lifetime_value: 87.57
+    },
+    {
+      customer_name: 'Cole Rivera',
+      num_orders: 2,
+      lifetime_value: 4468.5582
+    },
+    {
+      customer_name: 'Cole Rogers',
+      num_orders: 1,
+      lifetime_value: 114.46
+    },
+    {
+      customer_name: 'Cole Sanchez',
+      num_orders: 2,
+      lifetime_value: 3772.4096
+    },
+    {
+      customer_name: 'Cole Sanders',
+      num_orders: 1,
+      lifetime_value: 30.97
+    },
+    {
+      customer_name: 'Cole Stewart',
+      num_orders: 2,
+      lifetime_value: 1322.98
+    },
+    {
+      customer_name: 'Cole Torres',
+      num_orders: 3,
+      lifetime_value: 3639.9182
+    },
+    {
+      customer_name: 'Cole Ward',
+      num_orders: 2,
+      lifetime_value: 3377.3975
+    },
+    {
+      customer_name: 'Cole Watson',
+      num_orders: 1,
+      lifetime_value: 839.48
+    },
+    {
+      customer_name: 'Colin Anand',
+      num_orders: 2,
+      lifetime_value: 5973.24
+    },
+    {
+      customer_name: 'Colin Andersen',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Colin Beck',
+      num_orders: 1,
+      lifetime_value: 94.48
+    },
+    {
+      customer_name: 'Colin Cai',
+      num_orders: 1,
+      lifetime_value: 2518.98
+    },
+    {
+      customer_name: 'Colin Chander',
+      num_orders: 2,
+      lifetime_value: 127.93
+    },
+    {
+      customer_name: 'Colin Chavez',
+      num_orders: 2,
+      lifetime_value: 101.25
+    },
+    {
+      customer_name: 'Colin Chen',
+      num_orders: 1,
+      lifetime_value: 81.46
+    },
+    {
+      customer_name: 'Colin Deng',
+      num_orders: 1,
+      lifetime_value: 81.46
+    },
+    {
+      customer_name: 'Colin Gao',
+      num_orders: 2,
+      lifetime_value: 4582.5125
+    },
+    {
+      customer_name: 'Colin Goel',
+      num_orders: 1,
+      lifetime_value: 128.97
+    },
+    {
+      customer_name: 'Colin He',
+      num_orders: 2,
+      lifetime_value: 4501.5525
+    },
+    {
+      customer_name: 'Colin Huang',
+      num_orders: 2,
+      lifetime_value: 4592.5025
+    },
+    {
+      customer_name: 'Colin Jai',
+      num_orders: 1,
+      lifetime_value: 36.59
+    },
+    {
+      customer_name: 'Colin Kumar',
+      num_orders: 3,
+      lifetime_value: 176.41
+    },
+    {
+      customer_name: 'Colin Lal',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Colin Li',
+      num_orders: 2,
+      lifetime_value: 4810.31
+    },
+    {
+      customer_name: 'Colin Liang',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Colin Lin',
+      num_orders: 2,
+      lifetime_value: 4498.5325
+    },
+    {
+      customer_name: 'Colin Liu',
+      num_orders: 2,
+      lifetime_value: 4587.0325
+    },
+    {
+      customer_name: 'Colin Lu',
+      num_orders: 2,
+      lifetime_value: 4536.5525
+    },
+    {
+      customer_name: 'Colin Luo',
+      num_orders: 1,
+      lifetime_value: 141.98
+    },
+    {
+      customer_name: 'Colin Ma',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Colin Nath',
+      num_orders: 2,
+      lifetime_value: 43.97
+    },
+    {
+      customer_name: 'Colin Pal',
+      num_orders: 1,
+      lifetime_value: 133.49
+    },
+    {
+      customer_name: 'Colin Rai',
+      num_orders: 1,
+      lifetime_value: 123.98
+    },
+    {
+      customer_name: 'Colin Raje',
+      num_orders: 1,
+      lifetime_value: 54.98
+    },
+    {
+      customer_name: 'Colin Raji',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Colin Shan',
+      num_orders: 2,
+      lifetime_value: 57.95
+    },
+    {
+      customer_name: 'Colin She',
+      num_orders: 2,
+      lifetime_value: 4511.5425
+    },
+    {
+      customer_name: 'Colin Stone',
+      num_orders: 1,
+      lifetime_value: 30.97
+    },
+    {
+      customer_name: 'Colin Sun',
+      num_orders: 2,
+      lifetime_value: 4800.3
+    },
+    {
+      customer_name: 'Colin Tang',
+      num_orders: 2,
+      lifetime_value: 4813.32
+    },
+    {
+      customer_name: 'Colin Wang',
+      num_orders: 2,
+      lifetime_value: 4798.33
+    },
+    {
+      customer_name: 'Colin Wu',
+      num_orders: 2,
+      lifetime_value: 4838.32
+    },
+    {
+      customer_name: 'Colin Xie',
+      num_orders: 2,
+      lifetime_value: 4500.8225
+    },
+    {
+      customer_name: 'Colin Xu',
+      num_orders: 3,
+      lifetime_value: 225.44
+    },
+    {
+      customer_name: 'Colin Xu',
+      num_orders: 2,
+      lifetime_value: 4526.5225
+    },
+    {
+      customer_name: 'Colin Yang',
+      num_orders: 1,
+      lifetime_value: 30.97
+    },
+    {
+      customer_name: 'Colin Ye',
+      num_orders: 1,
+      lifetime_value: 46.47
+    },
+    {
+      customer_name: 'Colin Yuan',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Colin Zeng',
+      num_orders: 4,
+      lifetime_value: 339.48
+    },
+    {
+      customer_name: 'Colin Zhao',
+      num_orders: 2,
+      lifetime_value: 4500.8225
+    },
+    {
+      customer_name: 'Colin Zheng',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Colin Zhou',
+      num_orders: 2,
+      lifetime_value: 4818.53
+    },
+    {
+      customer_name: 'Colin Zhu',
+      num_orders: 1,
+      lifetime_value: 2344.26
+    },
+    {
+      customer_name: 'Colleen Anand',
+      num_orders: 3,
+      lifetime_value: 274.24
+    },
+    {
+      customer_name: 'Colleen Andersen',
+      num_orders: 4,
+      lifetime_value: 10829.22
+    },
+    {
+      customer_name: 'Colleen Beck',
+      num_orders: 3,
+      lifetime_value: 6906.0882
+    },
+    {
+      customer_name: 'Colleen Cai',
+      num_orders: 4,
+      lifetime_value: 174.17
+    },
+    {
+      customer_name: 'Colleen Chavez',
+      num_orders: 3,
+      lifetime_value: 6912.5982
+    },
+    {
+      customer_name: 'Colleen Chen',
+      num_orders: 2,
+      lifetime_value: 5968.23
+    },
+    {
+      customer_name: 'Colleen Deng',
+      num_orders: 4,
+      lifetime_value: 8091.8896
+    },
+    {
+      customer_name: 'Colleen Gao',
+      num_orders: 3,
+      lifetime_value: 5169.3582
+    },
+    {
+      customer_name: 'Colleen Goel',
+      num_orders: 3,
+      lifetime_value: 68.7
+    },
+    {
+      customer_name: 'Colleen Guo',
+      num_orders: 2,
+      lifetime_value: 5968.25
+    },
+    {
+      customer_name: 'Colleen Harrison',
+      num_orders: 2,
+      lifetime_value: 5873.26
+    },
+    {
+      customer_name: 'Colleen Hu',
+      num_orders: 2,
+      lifetime_value: 86.76
+    },
+    {
+      customer_name: 'Colleen Huang',
+      num_orders: 2,
+      lifetime_value: 241.76
+    },
+    {
+      customer_name: 'Colleen Jai',
+      num_orders: 2,
+      lifetime_value: 118.96
+    },
+    {
+      customer_name: 'Colleen Kumar',
+      num_orders: 2,
+      lifetime_value: 79.47
+    },
+    {
+      customer_name: 'Colleen Li',
+      num_orders: 2,
+      lifetime_value: 5953.25
+    },
+    {
+      customer_name: 'Colleen Liang',
+      num_orders: 3,
+      lifetime_value: 5625.2496
+    },
+    {
+      customer_name: 'Colleen Lin',
+      num_orders: 2,
+      lifetime_value: 4401.3996
+    },
+    {
+      customer_name: 'Colleen Liu',
+      num_orders: 1,
+      lifetime_value: 49.99
+    },
+    {
+      customer_name: 'Colleen Lu',
+      num_orders: 2,
+      lifetime_value: 4435.3796
+    },
+    {
+      customer_name: 'Colleen Luo',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Colleen Ma',
+      num_orders: 3,
+      lifetime_value: 5582.9082
+    },
+    {
+      customer_name: 'Colleen Nara',
+      num_orders: 3,
+      lifetime_value: 6865.4596
+    },
+    {
+      customer_name: 'Colleen Nath',
+      num_orders: 3,
+      lifetime_value: 6840.6182
+    },
+    {
+      customer_name: 'Colleen Rai',
+      num_orders: 3,
+      lifetime_value: 6752.1282
+    },
+    {
+      customer_name: 'Colleen Raje',
+      num_orders: 2,
+      lifetime_value: 94.21
+    },
+    {
+      customer_name: 'Colleen Raji',
+      num_orders: 3,
+      lifetime_value: 185.94
+    },
+    {
+      customer_name: 'Colleen Shan',
+      num_orders: 2,
+      lifetime_value: 66.26
+    },
+    {
+      customer_name: 'Colleen Sharma',
+      num_orders: 4,
+      lifetime_value: 10836.9
+    },
+    {
+      customer_name: 'Colleen She',
+      num_orders: 5,
+      lifetime_value: 13242.7
+    },
+    {
+      customer_name: 'Colleen Shen',
+      num_orders: 3,
+      lifetime_value: 4940.3896
+    },
+    {
+      customer_name: 'Colleen Sun',
+      num_orders: 3,
+      lifetime_value: 5666.5196
+    },
+    {
+      customer_name: 'Colleen Tang',
+      num_orders: 5,
+      lifetime_value: 13173.19
+    },
+    {
+      customer_name: 'Colleen West',
+      num_orders: 2,
+      lifetime_value: 3964.98
+    },
+    {
+      customer_name: 'Colleen Wu',
+      num_orders: 2,
+      lifetime_value: 5964.22
+    },
+    {
+      customer_name: 'Colleen Xie',
+      num_orders: 2,
+      lifetime_value: 74.97
+    },
+    {
+      customer_name: 'Colleen Xu',
+      num_orders: 2,
+      lifetime_value: 102.26
+    },
+    {
+      customer_name: 'Colleen Xu',
+      num_orders: 2,
+      lifetime_value: 4416.3796
+    },
+    {
+      customer_name: 'Colleen Yang',
+      num_orders: 1,
+      lifetime_value: 49.99
+    },
+    {
+      customer_name: 'Colleen Yuan',
+      num_orders: 3,
+      lifetime_value: 6799.4496
+    },
+    {
+      customer_name: 'Colleen Zeng',
+      num_orders: 3,
+      lifetime_value: 4977.3596
+    },
+    {
+      customer_name: 'Colleen Zhang',
+      num_orders: 2,
+      lifetime_value: 77.27
+    },
+    {
+      customer_name: 'Colleen Zhao',
+      num_orders: 3,
+      lifetime_value: 5683.1796
+    },
+    {
+      customer_name: 'Colleen Zheng',
+      num_orders: 4,
+      lifetime_value: 8067.8996
+    },
+    {
+      customer_name: 'Colleen Zhou',
+      num_orders: 1,
+      lifetime_value: 49.99
+    },
+    {
+      customer_name: 'Colleen Zhu',
+      num_orders: 2,
+      lifetime_value: 5974.23
+    },
+    {
+      customer_name: 'Connie Rai',
+      num_orders: 1,
+      lifetime_value: 1174.48
+    },
+    {
+      customer_name: 'Connor Adams',
+      num_orders: 1,
+      lifetime_value: 2359.24
+    },
+    {
+      customer_name: 'Connor Allen',
+      num_orders: 1,
+      lifetime_value: 1750.98
+    },
+    {
+      customer_name: 'Connor Baker',
+      num_orders: 1,
+      lifetime_value: 124.99
+    },
+    {
+      customer_name: 'Connor Campbell',
+      num_orders: 2,
+      lifetime_value: 186.04
+    },
+    {
+      customer_name: 'Connor Collins',
+      num_orders: 2,
+      lifetime_value: 4369.0882
+    },
+    {
+      customer_name: 'Connor Edwards',
+      num_orders: 3,
+      lifetime_value: 8324.24
+    },
+    {
+      customer_name: 'Connor Evans',
+      num_orders: 1,
+      lifetime_value: 63.97
+    },
+    {
+      customer_name: 'Connor Green',
+      num_orders: 2,
+      lifetime_value: 3936.5425
+    },
+    {
+      customer_name: 'Connor Hall',
+      num_orders: 3,
+      lifetime_value: 319.88
+    },
+    {
+      customer_name: 'Connor Hernandez',
+      num_orders: 1,
+      lifetime_value: 2361.95
+    },
+    {
+      customer_name: 'Connor Hill',
+      num_orders: 4,
+      lifetime_value: 65.99
+    },
+    {
+      customer_name: 'Connor King',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Connor Lopez',
+      num_orders: 1,
+      lifetime_value: 588.96
+    },
+    {
+      customer_name: 'Connor Mitchell',
+      num_orders: 2,
+      lifetime_value: 112.73
+    },
+    {
+      customer_name: 'Connor Nelson',
+      num_orders: 2,
+      lifetime_value: 5918.24
+    },
+    {
+      customer_name: 'Connor Parker',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Connor Perez',
+      num_orders: 1,
+      lifetime_value: 61.96
+    },
+    {
+      customer_name: 'Connor Phillips',
+      num_orders: 1,
+      lifetime_value: 563.96
+    },
+    {
+      customer_name: 'Connor Roberts',
+      num_orders: 2,
+      lifetime_value: 3099.96
+    },
+    {
+      customer_name: 'Connor Scott',
+      num_orders: 1,
+      lifetime_value: 48.97
+    },
+    {
+      customer_name: 'Connor Turner',
+      num_orders: 2,
+      lifetime_value: 90.95
+    },
+    {
+      customer_name: 'Connor Wright',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Connor Young',
+      num_orders: 2,
+      lifetime_value: 94.96
+    },
+    {
+      customer_name: 'Corey Anand',
+      num_orders: 1,
+      lifetime_value: 2443.35
+    },
+    {
+      customer_name: 'Corey Andersen',
+      num_orders: 1,
+      lifetime_value: 14.98
+    },
+    {
+      customer_name: 'Corey Beck',
+      num_orders: 1,
+      lifetime_value: 96.46
+    },
+    {
+      customer_name: 'Corey Chander',
+      num_orders: 1,
+      lifetime_value: 2482.23
+    },
+    {
+      customer_name: 'Corey Chavez',
+      num_orders: 2,
+      lifetime_value: 4408.6896
+    },
+    {
+      customer_name: 'Corey Deng',
+      num_orders: 2,
+      lifetime_value: 6085.59
+    },
+    {
+      customer_name: 'Corey Goel',
+      num_orders: 1,
+      lifetime_value: 68.97
+    },
+    {
+      customer_name: 'Corey Kumar',
+      num_orders: 1,
+      lifetime_value: 21.49
+    },
+    {
+      customer_name: 'Corey Lal',
+      num_orders: 1,
+      lifetime_value: 2492.32
+    },
+    {
+      customer_name: 'Corey Luo',
+      num_orders: 1,
+      lifetime_value: 49.97
+    },
+    {
+      customer_name: 'Corey Nara',
+      num_orders: 1,
+      lifetime_value: 49.97
+    },
+    {
+      customer_name: 'Corey Pal',
+      num_orders: 1,
+      lifetime_value: 2514.93
+    },
+    {
+      customer_name: 'Corey Raje',
+      num_orders: 1,
+      lifetime_value: 49.97
+    },
+    {
+      customer_name: 'Corey Raji',
+      num_orders: 1,
+      lifetime_value: 1170.48
+    },
+    {
+      customer_name: 'Corey Sharma',
+      num_orders: 1,
+      lifetime_value: 2512.32
+    },
+    {
+      customer_name: 'Corey She',
+      num_orders: 1,
+      lifetime_value: 39.47
+    },
+    {
+      customer_name: 'Corey Shen',
+      num_orders: 2,
+      lifetime_value: 6035.6
+    },
+    {
+      customer_name: 'Corey Tang',
+      num_orders: 1,
+      lifetime_value: 23.78
+    },
+    {
+      customer_name: 'Corey Xie',
+      num_orders: 2,
+      lifetime_value: 6156.7
+    },
+    {
+      customer_name: 'Corey Yuan',
+      num_orders: 1,
+      lifetime_value: 1155.48
+    },
+    {
+      customer_name: 'Cory Arun',
+      num_orders: 1,
+      lifetime_value: 27.28
+    },
+    {
+      customer_name: 'Cory Chandra',
+      num_orders: 2,
+      lifetime_value: 6054.22
+    },
+    {
+      customer_name: 'Cory Fernandez',
+      num_orders: 1,
+      lifetime_value: 27.77
+    },
+    {
+      customer_name: 'Cory Garcia',
+      num_orders: 1,
+      lifetime_value: 186.28
+    },
+    {
+      customer_name: 'Cory Kapoor',
+      num_orders: 2,
+      lifetime_value: 6067.2
+    },
+    {
+      customer_name: 'Cory Madan',
+      num_orders: 2,
+      lifetime_value: 2459.0682
+    },
+    {
+      customer_name: 'Cory Malhotra',
+      num_orders: 2,
+      lifetime_value: 1584.76
+    },
+    {
+      customer_name: 'Cory Martinez',
+      num_orders: 1,
+      lifetime_value: 69.97
+    },
+    {
+      customer_name: 'Cory Mehta',
+      num_orders: 2,
+      lifetime_value: 1952.45
+    },
+    {
+      customer_name: 'Cory Patel',
+      num_orders: 2,
+      lifetime_value: 1981.96
+    },
+    {
+      customer_name: 'Cory Perez',
+      num_orders: 2,
+      lifetime_value: 3478.7775
+    },
+    {
+      customer_name: 'Cory Prasad',
+      num_orders: 2,
+      lifetime_value: 1957.47
+    },
+    {
+      customer_name: 'Cory Raman',
+      num_orders: 3,
+      lifetime_value: 4313.8882
+    },
+    {
+      customer_name: 'Cory Rana',
+      num_orders: 2,
+      lifetime_value: 1583.45
+    },
+    {
+      customer_name: 'Cory Rodriguez',
+      num_orders: 1,
+      lifetime_value: 78.96
+    },
+    {
+      customer_name: 'Cory Sai',
+      num_orders: 2,
+      lifetime_value: 1903.48
+    },
+    {
+      customer_name: 'Cory Sara',
+      num_orders: 2,
+      lifetime_value: 1957.47
+    },
+    {
+      customer_name: 'Cory Subram',
+      num_orders: 1,
+      lifetime_value: 31.27
+    },
+    {
+      customer_name: 'Cory Suri',
+      num_orders: 2,
+      lifetime_value: 6056.61
+    },
+    {
+      customer_name: 'Cory Weber',
+      num_orders: 2,
+      lifetime_value: 1565.4275
+    },
+    {
+      customer_name: 'Courtney Young',
+      num_orders: 3,
+      lifetime_value: 8114.04
+    },
+    {
+      customer_name: 'Craig Alonso',
+      num_orders: 1,
+      lifetime_value: 79.95
+    },
+    {
+      customer_name: 'Craig Blanco',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Craig Carlson',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Craig Diaz',
+      num_orders: 2,
+      lifetime_value: 3322.7175
+    },
+    {
+      customer_name: 'Craig Gill',
+      num_orders: 2,
+      lifetime_value: 4760.32
+    },
+    {
+      customer_name: 'Craig Gomez',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Craig Gutierrez',
+      num_orders: 1,
+      lifetime_value: 64.97
+    },
+    {
+      customer_name: 'Craig Jiménez',
+      num_orders: 2,
+      lifetime_value: 4524.4825
+    },
+    {
+      customer_name: 'Craig Martin',
+      num_orders: 2,
+      lifetime_value: 3140.27
+    },
+    {
+      customer_name: 'Craig Moreno',
+      num_orders: 1,
+      lifetime_value: 85.48
+    },
+    {
+      customer_name: 'Craig Munoz',
+      num_orders: 1,
+      lifetime_value: 29.93
+    },
+    {
+      customer_name: 'Craig Navarro',
+      num_orders: 1,
+      lifetime_value: 84.96
+    },
+    {
+      customer_name: 'Craig Ortega',
+      num_orders: 2,
+      lifetime_value: 6035.6
+    },
+    {
+      customer_name: 'Craig Ramos',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Craig Romero',
+      num_orders: 2,
+      lifetime_value: 3295.4275
+    },
+    {
+      customer_name: 'Craig Rubio',
+      num_orders: 2,
+      lifetime_value: 6093.2
+    },
+    {
+      customer_name: 'Craig Ruiz',
+      num_orders: 1,
+      lifetime_value: 37.93
+    },
+    {
+      customer_name: 'Craig Sanz',
+      num_orders: 2,
+      lifetime_value: 24.27
+    },
+    {
+      customer_name: 'Craig Suarez',
+      num_orders: 2,
+      lifetime_value: 78.26
+    },
+    {
+      customer_name: 'Craig Vazquez',
+      num_orders: 2,
+      lifetime_value: 3177.96
+    },
+    {
+      customer_name: 'Crystal Chen',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Crystal Gao',
+      num_orders: 1,
+      lifetime_value: 49.97
+    },
+    {
+      customer_name: 'Crystal Guo',
+      num_orders: 1,
+      lifetime_value: 30.97
+    },
+    {
+      customer_name: 'Crystal He',
+      num_orders: 1,
+      lifetime_value: 9.99
+    },
+    {
+      customer_name: 'Crystal Hu',
+      num_orders: 1,
+      lifetime_value: 9.99
+    },
+    {
+      customer_name: 'Crystal Huang',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Crystal Li',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Crystal Liang',
+      num_orders: 1,
+      lifetime_value: 72.93
+    },
+    {
+      customer_name: 'Crystal Lin',
+      num_orders: 2,
+      lifetime_value: 34.56
+    },
+    {
+      customer_name: 'Crystal Liu',
+      num_orders: 1,
+      lifetime_value: 624.97
+    },
+    {
+      customer_name: 'Crystal Lu',
+      num_orders: 2,
+      lifetime_value: 56.76
+    },
+    {
+      customer_name: 'Crystal Sun',
+      num_orders: 1,
+      lifetime_value: 1120.49
+    },
+    {
+      customer_name: 'Crystal Wang',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Crystal Wu',
+      num_orders: 1,
+      lifetime_value: 1164.47
+    },
+    {
+      customer_name: 'Crystal Xu',
+      num_orders: 1,
+      lifetime_value: 14.98
+    },
+    {
+      customer_name: 'Crystal Yang',
+      num_orders: 1,
+      lifetime_value: 574.98
+    },
+    {
+      customer_name: 'Crystal Zhang',
+      num_orders: 1,
+      lifetime_value: 128.97
+    },
+    {
+      customer_name: 'Crystal Zhao',
+      num_orders: 1,
+      lifetime_value: 123.98
+    },
+    {
+      customer_name: 'Crystal Zheng',
+      num_orders: 1,
+      lifetime_value: 22.93
+    },
+    {
+      customer_name: 'Crystal Zhu',
+      num_orders: 1,
+      lifetime_value: 25.22
+    },
+    {
+      customer_name: 'Curtis Cai',
+      num_orders: 2,
+      lifetime_value: 30.97
+    },
+    {
+      customer_name: 'Curtis Gao',
+      num_orders: 2,
+      lifetime_value: 69.97
+    },
+    {
+      customer_name: 'Curtis Guo',
+      num_orders: 2,
+      lifetime_value: 6113.2
+    },
+    {
+      customer_name: 'Curtis He',
+      num_orders: 2,
+      lifetime_value: 119.95
+    },
+    {
+      customer_name: 'Curtis Hu',
+      num_orders: 2,
+      lifetime_value: 6104.21
+    },
+    {
+      customer_name: 'Curtis Li',
+      num_orders: 2,
+      lifetime_value: 6121.71
+    },
+    {
+      customer_name: 'Curtis Liang',
+      num_orders: 2,
+      lifetime_value: 64.98
+    },
+    {
+      customer_name: 'Curtis Lin',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Curtis Liu',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Curtis Lu',
+      num_orders: 2,
+      lifetime_value: 45.95
+    },
+    {
+      customer_name: 'Curtis Ma',
+      num_orders: 2,
+      lifetime_value: 64.98
+    },
+    {
+      customer_name: 'Curtis She',
+      num_orders: 2,
+      lifetime_value: 162.02
+    },
+    {
+      customer_name: 'Curtis Wang',
+      num_orders: 2,
+      lifetime_value: 6030.61
+    },
+    {
+      customer_name: 'Curtis Wu',
+      num_orders: 2,
+      lifetime_value: 6037.89
+    },
+    {
+      customer_name: 'Curtis Xu',
+      num_orders: 2,
+      lifetime_value: 85.96
+    },
+    {
+      customer_name: 'Curtis Yang',
+      num_orders: 2,
+      lifetime_value: 84.96
+    },
+    {
+      customer_name: 'Curtis Zeng',
+      num_orders: 2,
+      lifetime_value: 6070.59
+    },
+    {
+      customer_name: 'Curtis Zheng',
+      num_orders: 2,
+      lifetime_value: 6056.61
+    },
+    {
+      customer_name: 'Curtis Zhou',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Curtis Zimmerman',
+      num_orders: 1,
+      lifetime_value: 2318.96
+    },
+    {
+      customer_name: 'Cynthia Arun',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Cynthia Chandra',
+      num_orders: 1,
+      lifetime_value: 574.98
+    },
+    {
+      customer_name: 'Cynthia Fernandez',
+      num_orders: 1,
+      lifetime_value: 682.92
+    },
+    {
+      customer_name: 'Cynthia Garcia',
+      num_orders: 1,
+      lifetime_value: 148.47
+    },
+    {
+      customer_name: 'Cynthia Gonzalez',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Cynthia Kapoor',
+      num_orders: 1,
+      lifetime_value: 586.46
+    },
+    {
+      customer_name: 'Cynthia Lopez',
+      num_orders: 2,
+      lifetime_value: 77.25
+    },
+    {
+      customer_name: 'Cynthia Madan',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Cynthia Malhotra',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Cynthia Martinez',
+      num_orders: 1,
+      lifetime_value: 58.98
+    },
+    {
+      customer_name: 'Cynthia Mehta',
+      num_orders: 1,
+      lifetime_value: 1174.48
+    },
+    {
+      customer_name: 'Cynthia Patel',
+      num_orders: 1,
+      lifetime_value: 1179.97
+    },
+    {
+      customer_name: 'Cynthia Perez',
+      num_orders: 2,
+      lifetime_value: 37.27
+    },
+    {
+      customer_name: 'Cynthia Prasad',
+      num_orders: 1,
+      lifetime_value: 663.95
+    },
+    {
+      customer_name: 'Cynthia Raman',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Cynthia Rana',
+      num_orders: 1,
+      lifetime_value: 589.96
+    },
+    {
+      customer_name: 'Cynthia Rodriguez',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Cynthia Sai',
+      num_orders: 2,
+      lifetime_value: 37.27
+    },
+    {
+      customer_name: 'Cynthia Sanchez',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Cynthia Saunders',
+      num_orders: 1,
+      lifetime_value: 604.96
+    },
+    {
+      customer_name: 'Cynthia Srini',
+      num_orders: 1,
+      lifetime_value: 572.26
+    },
+    {
+      customer_name: 'Cynthia Subram',
+      num_orders: 1,
+      lifetime_value: 1194.97
+    },
+    {
+      customer_name: 'Cynthia Suri',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Cynthia Weber',
+      num_orders: 2,
+      lifetime_value: 64.24
+    },
+    {
+      customer_name: 'Dakota Alexander',
+      num_orders: 4,
+      lifetime_value: 175.71
+    },
+    {
+      customer_name: 'Dakota Barnes',
+      num_orders: 2,
+      lifetime_value: 105.95
+    },
+    {
+      customer_name: 'Dakota Bradley',
+      num_orders: 2,
+      lifetime_value: 108.46
+    },
+    {
+      customer_name: 'Dakota Bryant',
+      num_orders: 4,
+      lifetime_value: 180.79
+    },
+    {
+      customer_name: 'Dakota Butler',
+      num_orders: 2,
+      lifetime_value: 83.97
+    },
+    {
+      customer_name: 'Dakota Diaz',
+      num_orders: 1,
+      lifetime_value: 50.23
+    },
+    {
+      customer_name: 'Dakota Flores',
+      num_orders: 2,
+      lifetime_value: 207.98
+    },
+    {
+      customer_name: 'Dakota Gonzales',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Dakota Griffin',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Dakota Henderson',
+      num_orders: 1,
+      lifetime_value: 81.46
+    },
+    {
+      customer_name: 'Dakota Jenkins',
+      num_orders: 1,
+      lifetime_value: 76.97
+    },
+    {
+      customer_name: 'Dakota Long',
+      num_orders: 1,
+      lifetime_value: 81.46
+    },
+    {
+      customer_name: 'Dakota Patterson',
+      num_orders: 2,
+      lifetime_value: 51.27
+    },
+    {
+      customer_name: 'Dakota Perry',
+      num_orders: 2,
+      lifetime_value: 4760.32
+    },
+    {
+      customer_name: 'Dakota Powell',
+      num_orders: 1,
+      lifetime_value: 30.97
+    },
+    {
+      customer_name: 'Dakota Ross',
+      num_orders: 4,
+      lifetime_value: 164.21
+    },
+    {
+      customer_name: 'Dakota Russell',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Dakota Simmons',
+      num_orders: 4,
+      lifetime_value: 119.95
+    },
+    {
+      customer_name: 'Dakota Wood',
+      num_orders: 2,
+      lifetime_value: 4818.33
+    },
+    {
+      customer_name: 'Dalton Alexander',
+      num_orders: 2,
+      lifetime_value: 4898.32
+    },
+    {
+      customer_name: 'Dalton Bailey',
+      num_orders: 2,
+      lifetime_value: 1631.46
+    },
+    {
+      customer_name: 'Dalton Barnes',
+      num_orders: 2,
+      lifetime_value: 4773.33
+    },
+    {
+      customer_name: 'Dalton Bell',
+      num_orders: 3,
+      lifetime_value: 6793.54
+    },
+    {
+      customer_name: 'Dalton Bennett',
+      num_orders: 2,
+      lifetime_value: 4533.5225
+    },
+    {
+      customer_name: 'Dalton Brooks',
+      num_orders: 2,
+      lifetime_value: 5910.55
+    },
+    {
+      customer_name: 'Dalton Bryant',
+      num_orders: 1,
+      lifetime_value: 75.97
+    },
+    {
+      customer_name: 'Dalton Butler',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Dalton Coleman',
+      num_orders: 1,
+      lifetime_value: 2349.92
+    },
+    {
+      customer_name: 'Dalton Cook',
+      num_orders: 2,
+      lifetime_value: 3058.31
+    },
+    {
+      customer_name: 'Dalton Cooper',
+      num_orders: 3,
+      lifetime_value: 146.74
+    },
+    {
+      customer_name: 'Dalton Cox',
+      num_orders: 2,
+      lifetime_value: 4397.75
+    },
+    {
+      customer_name: 'Dalton Diaz',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Dalton Flores',
+      num_orders: 3,
+      lifetime_value: 133.45
+    },
+    {
+      customer_name: 'Dalton Foster',
+      num_orders: 1,
+      lifetime_value: 2318.96
+    },
+    {
+      customer_name: 'Dalton Gonzales',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Dalton Gray',
+      num_orders: 2,
+      lifetime_value: 3001.0425
+    },
+    {
+      customer_name: 'Dalton Hayes',
+      num_orders: 1,
+      lifetime_value: 36.96
+    },
+    {
+      customer_name: 'Dalton Henderson',
+      num_orders: 2,
+      lifetime_value: 4576.5325
+    },
+    {
+      customer_name: 'Dalton Howard',
+      num_orders: 1,
+      lifetime_value: 86.95
+    },
+    {
+      customer_name: 'Dalton Hughes',
+      num_orders: 1,
+      lifetime_value: 75.97
+    },
+    {
+      customer_name: 'Dalton James',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Dalton Jenkins',
+      num_orders: 1,
+      lifetime_value: 44.91
+    },
+    {
+      customer_name: 'Dalton Kelly',
+      num_orders: 3,
+      lifetime_value: 5696.1896
+    },
+    {
+      customer_name: 'Dalton Long',
+      num_orders: 2,
+      lifetime_value: 4558.0125
+    },
+    {
+      customer_name: 'Dalton Morgan',
+      num_orders: 2,
+      lifetime_value: 4173.19
+    },
+    {
+      customer_name: 'Dalton Morris',
+      num_orders: 2,
+      lifetime_value: 3198.45
+    },
+    {
+      customer_name: 'Dalton Murphy',
+      num_orders: 2,
+      lifetime_value: 77.27
+    },
+    {
+      customer_name: 'Dalton Patterson',
+      num_orders: 1,
+      lifetime_value: 106.96
+    },
+    {
+      customer_name: 'Dalton Perry',
+      num_orders: 2,
+      lifetime_value: 4693.04
+    },
+    {
+      customer_name: 'Dalton Powell',
+      num_orders: 2,
+      lifetime_value: 4476.5525
+    },
+    {
+      customer_name: 'Dalton Ramirez',
+      num_orders: 2,
+      lifetime_value: 3040.0382
+    },
+    {
+      customer_name: 'Dalton Reed',
+      num_orders: 3,
+      lifetime_value: 436.35
+    },
+    {
+      customer_name: 'Dalton Richardson',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Dalton Rivera',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Dalton Rogers',
+      num_orders: 2,
+      lifetime_value: 1619.9
+    },
+    {
+      customer_name: 'Dalton Ross',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Dalton Russell',
+      num_orders: 1,
+      lifetime_value: 75.97
+    },
+    {
+      customer_name: 'Dalton Sanchez',
+      num_orders: 2,
+      lifetime_value: 1676.46
+    },
+    {
+      customer_name: 'Dalton Sanders',
+      num_orders: 3,
+      lifetime_value: 5196.7396
+    },
+    {
+      customer_name: 'Dalton Simmons',
+      num_orders: 1,
+      lifetime_value: 30.97
+    },
+    {
+      customer_name: 'Dalton Stewart',
+      num_orders: 2,
+      lifetime_value: 4375.0582
+    },
+    {
+      customer_name: 'Dalton Torres',
+      num_orders: 2,
+      lifetime_value: 1918.3975
+    },
+    {
+      customer_name: 'Dalton Ward',
+      num_orders: 2,
+      lifetime_value: 81.26
+    },
+    {
+      customer_name: 'Dalton Washington',
+      num_orders: 2,
+      lifetime_value: 4626.5225
+    },
+    {
+      customer_name: 'Dalton Watson',
+      num_orders: 1,
+      lifetime_value: 819.46
+    },
+    {
+      customer_name: 'Dalton Wood',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Damien Anand',
+      num_orders: 3,
+      lifetime_value: 7246.87
+    },
+    {
+      customer_name: 'Damien Andersen',
+      num_orders: 1,
+      lifetime_value: 30.97
+    },
+    {
+      customer_name: 'Damien Beck',
+      num_orders: 2,
+      lifetime_value: 51.91
+    },
+    {
+      customer_name: 'Damien Chande',
+      num_orders: 3,
+      lifetime_value: 5652.5196
+    },
+    {
+      customer_name: 'Damien Chander',
+      num_orders: 2,
+      lifetime_value: 2736.4175
+    },
+    {
+      customer_name: 'Damien Jai',
+      num_orders: 2,
+      lifetime_value: 4813.31
+    },
+    {
+      customer_name: 'Damien Lal',
+      num_orders: 1,
+      lifetime_value: 49.97
+    },
+    {
+      customer_name: 'Damien Luo',
+      num_orders: 3,
+      lifetime_value: 8079.05
+    },
+    {
+      customer_name: 'Damien Nara',
+      num_orders: 3,
+      lifetime_value: 218.93
+    },
+    {
+      customer_name: 'Damien Pal',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Damien Rai',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Damien Raje',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Damien Raji',
+      num_orders: 1,
+      lifetime_value: 24.99
+    },
+    {
+      customer_name: 'Damien Shan',
+      num_orders: 2,
+      lifetime_value: 3282.83
+    },
+    {
+      customer_name: 'Damien Shen',
+      num_orders: 1,
+      lifetime_value: 2294.99
+    },
+    {
+      customer_name: 'Damien Tang',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Damien Xie',
+      num_orders: 2,
+      lifetime_value: 79.97
+    },
+    {
+      customer_name: 'Damien Xu',
+      num_orders: 2,
+      lifetime_value: 5973.24
+    },
+    {
+      customer_name: 'Damien Yuan',
+      num_orders: 2,
+      lifetime_value: 5875.55
+    },
+    {
+      customer_name: 'Dana Alonso',
+      num_orders: 1,
+      lifetime_value: 94.48
+    },
+    {
+      customer_name: 'Dana Alvarez',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Dana Blanco',
+      num_orders: 2,
+      lifetime_value: 2983.3325
+    },
+    {
+      customer_name: 'Dana Carlson',
+      num_orders: 1,
+      lifetime_value: 24.99
+    },
+    {
+      customer_name: 'Dana Diaz',
+      num_orders: 1,
+      lifetime_value: 2354.98
+    },
+    {
+      customer_name: 'Dana Dominguez',
+      num_orders: 3,
+      lifetime_value: 7015.5525
+    },
+    {
+      customer_name: 'Dana Gill',
+      num_orders: 2,
+      lifetime_value: 2755.4175
+    },
+    {
+      customer_name: 'Dana Gomez',
+      num_orders: 2,
+      lifetime_value: 166.43
+    },
+    {
+      customer_name: 'Dana Gutierrez',
+      num_orders: 1,
+      lifetime_value: 6.28
+    },
+    {
+      customer_name: 'Dana Jiménez',
+      num_orders: 1,
+      lifetime_value: 2419.46
+    },
+    {
+      customer_name: 'Dana Martin',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Dana Moreno',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Dana Muñoz',
+      num_orders: 1,
+      lifetime_value: 128.97
+    },
+    {
+      customer_name: 'Dana Navarro',
+      num_orders: 1,
+      lifetime_value: 3.99
+    },
+    {
+      customer_name: 'Dana Ortega',
+      num_orders: 1,
+      lifetime_value: 37.27
+    },
+    {
+      customer_name: 'Dana Ramos',
+      num_orders: 2,
+      lifetime_value: 2750.3975
+    },
+    {
+      customer_name: 'Dana Romero',
+      num_orders: 1,
+      lifetime_value: 3.99
+    },
+    {
+      customer_name: 'Dana Rubio',
+      num_orders: 2,
+      lifetime_value: 34.97
+    },
+    {
+      customer_name: 'Dana Ruiz',
+      num_orders: 1,
+      lifetime_value: 2329.98
+    },
+    {
+      customer_name: 'Dana Schmidt',
+      num_orders: 1,
+      lifetime_value: 32.28
+    },
+    {
+      customer_name: 'Dana Serrano',
+      num_orders: 2,
+      lifetime_value: 2751.4175
+    },
+    {
+      customer_name: 'Dana Suarez',
+      num_orders: 2,
+      lifetime_value: 69.96
+    },
+    {
+      customer_name: 'Dana Torres',
+      num_orders: 2,
+      lifetime_value: 4334.61
+    },
+    {
+      customer_name: 'Dana Vazquez',
+      num_orders: 2,
+      lifetime_value: 3262.83
+    },
+    {
+      customer_name: 'Daniel Anderson',
+      num_orders: 1,
+      lifetime_value: 113.97
+    },
+    {
+      customer_name: 'Daniel Brown',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Daniel Clark',
+      num_orders: 1,
+      lifetime_value: 2351.96
+    },
+    {
+      customer_name: 'Daniel Davis',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Daniel Garcia',
+      num_orders: 1,
+      lifetime_value: 1170.48
+    },
+    {
+      customer_name: 'Daniel Harris',
+      num_orders: 1,
+      lifetime_value: 1775.47
+    },
+    {
+      customer_name: 'Daniel Jackson',
+      num_orders: 1,
+      lifetime_value: 556.93
+    },
+    {
+      customer_name: 'Daniel Johnson',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Daniel Jones',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Daniel Lee',
+      num_orders: 2,
+      lifetime_value: 2427.3682
+    },
+    {
+      customer_name: 'Daniel Lewis',
+      num_orders: 1,
+      lifetime_value: 24.99
+    },
+    {
+      customer_name: 'Daniel Martin',
+      num_orders: 1,
+      lifetime_value: 553.97
+    },
+    {
+      customer_name: 'Daniel Martinez',
+      num_orders: 2,
+      lifetime_value: 216.4
+    },
+    {
+      customer_name: 'Daniel Miller',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Daniel Moore',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Daniel Rodriguez',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Daniel Taylor',
+      num_orders: 2,
+      lifetime_value: 6081.1
+    },
+    {
+      customer_name: 'Daniel Thomas',
+      num_orders: 1,
+      lifetime_value: 29.99
+    },
+    {
+      customer_name: 'Daniel Thompson',
+      num_orders: 2,
+      lifetime_value: 6056.61
+    },
+    {
+      customer_name: 'Daniel Walker',
+      num_orders: 1,
+      lifetime_value: 1760.47
+    },
+    {
+      customer_name: 'Daniel Weisman',
+      num_orders: 2,
+      lifetime_value: 4752.75
+    },
+    {
+      customer_name: 'Daniel Williams',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Daniel Wilson',
+      num_orders: 1,
+      lifetime_value: 128.97
+    },
+    {
+      customer_name: 'Danny Alonso',
+      num_orders: 2,
+      lifetime_value: 1592.5682
+    },
+    {
+      customer_name: 'Danny Alvarez',
+      num_orders: 2,
+      lifetime_value: 1613.0582
+    },
+    {
+      customer_name: 'Danny Blanco',
+      num_orders: 3,
+      lifetime_value: 6679.59
+    },
+    {
+      customer_name: 'Danny Carlson',
+      num_orders: 3,
+      lifetime_value: 8404.28
+    },
+    {
+      customer_name: 'Danny Diaz',
+      num_orders: 2,
+      lifetime_value: 1588.5682
+    },
+    {
+      customer_name: 'Danny Gill',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Danny Gomez',
+      num_orders: 1,
+      lifetime_value: 64.47
+    },
+    {
+      customer_name: 'Danny Gutierrez',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Danny Hernandez',
+      num_orders: 2,
+      lifetime_value: 1503.5782
+    },
+    {
+      customer_name: 'Danny Jiménez',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Danny Martin',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Danny Moreno',
+      num_orders: 2,
+      lifetime_value: 1528.0682
+    },
+    {
+      customer_name: 'Danny Munoz',
+      num_orders: 2,
+      lifetime_value: 1500.8682
+    },
+    {
+      customer_name: 'Danny Navarro',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Danny Ortega',
+      num_orders: 1,
+      lifetime_value: 66.96
+    },
+    {
+      customer_name: 'Danny Ramos',
+      num_orders: 3,
+      lifetime_value: 6434.74
+    },
+    {
+      customer_name: 'Danny Romero',
+      num_orders: 2,
+      lifetime_value: 1588.5682
+    },
+    {
+      customer_name: 'Danny Rubio',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Danny Ruiz',
+      num_orders: 1,
+      lifetime_value: 902.46
+    },
+    {
+      customer_name: 'Danny Schmidt',
+      num_orders: 2,
+      lifetime_value: 3262.83
+    },
+    {
+      customer_name: 'Danny Serrano',
+      num_orders: 2,
+      lifetime_value: 4380.04
+    },
+    {
+      customer_name: 'Danny Suarez',
+      num_orders: 2,
+      lifetime_value: 5908.25
+    },
+    {
+      customer_name: 'Danny Travers',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Danny Vazquez',
+      num_orders: 2,
+      lifetime_value: 4397.75
+    },
+    {
+      customer_name: 'Dave Natsuhara',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'David Anderson',
+      num_orders: 2,
+      lifetime_value: 2765.3975
+    },
+    {
+      customer_name: 'David Brown',
+      num_orders: 2,
+      lifetime_value: 3021.3782
+    },
+    {
+      customer_name: 'David Clark',
+      num_orders: 3,
+      lifetime_value: 6972.8625
+    },
+    {
+      customer_name: 'David Davis',
+      num_orders: 2,
+      lifetime_value: 3034.0682
+    },
+    {
+      customer_name: 'David Garcia',
+      num_orders: 3,
+      lifetime_value: 6921.5825
+    },
+    {
+      customer_name: 'David Harris',
+      num_orders: 1,
+      lifetime_value: 32.27
+    },
+    {
+      customer_name: 'David Jackson',
+      num_orders: 2,
+      lifetime_value: 2435.0782
+    },
+    {
+      customer_name: 'David Johnson',
+      num_orders: 1,
+      lifetime_value: 1725.98
+    },
+    {
+      customer_name: 'David Jones',
+      num_orders: 1,
+      lifetime_value: 85.48
+    },
+    {
+      customer_name: 'David Lee',
+      num_orders: 1,
+      lifetime_value: 31.97
+    },
+    {
+      customer_name: 'David Lewis',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'David Martin',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'David Martinez',
+      num_orders: 1,
+      lifetime_value: 75.97
+    },
+    {
+      customer_name: 'David Miller',
+      num_orders: 1,
+      lifetime_value: 187.98
+    },
+    {
+      customer_name: 'David Moore',
+      num_orders: 2,
+      lifetime_value: 4792.73
+    },
+    {
+      customer_name: 'David Robinson',
+      num_orders: 3,
+      lifetime_value: 5741.4075
+    },
+    {
+      customer_name: 'David Rodriguez',
+      num_orders: 2,
+      lifetime_value: 3063.0582
+    },
+    {
+      customer_name: 'David Taylor',
+      num_orders: 2,
+      lifetime_value: 4715.7
+    },
+    {
+      customer_name: 'David Thomas',
+      num_orders: 1,
+      lifetime_value: 37.27
+    },
+    {
+      customer_name: 'David Walker',
+      num_orders: 2,
+      lifetime_value: 1518.5782
+    },
+    {
+      customer_name: 'David White',
+      num_orders: 1,
+      lifetime_value: 63.97
+    },
+    {
+      customer_name: 'David Williams',
+      num_orders: 3,
+      lifetime_value: 5739.4975
+    },
+    {
+      customer_name: 'David Wilson',
+      num_orders: 2,
+      lifetime_value: 39.55
+    },
+    {
+      customer_name: 'Dawn Andersen',
+      num_orders: 1,
+      lifetime_value: 43.98
+    },
+    {
+      customer_name: 'Dawn Beck',
+      num_orders: 2,
+      lifetime_value: 3989.46
+    },
+    {
+      customer_name: 'Dawn Chande',
+      num_orders: 2,
+      lifetime_value: 4376.3996
+    },
+    {
+      customer_name: 'Dawn Chander',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Dawn Chen',
+      num_orders: 2,
+      lifetime_value: 5937.73
+    },
+    {
+      customer_name: 'Dawn Deng',
+      num_orders: 4,
+      lifetime_value: 200.19
+    },
+    {
+      customer_name: 'Dawn Gao',
+      num_orders: 4,
+      lifetime_value: 87.25
+    },
+    {
+      customer_name: 'Dawn Goel',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Dawn Guo',
+      num_orders: 2,
+      lifetime_value: 5950.23
+    },
+    {
+      customer_name: 'Dawn He',
+      num_orders: 2,
+      lifetime_value: 159.99
+    },
+    {
+      customer_name: 'Dawn Hu',
+      num_orders: 2,
+      lifetime_value: 47.94
+    },
+    {
+      customer_name: 'Dawn Huang',
+      num_orders: 2,
+      lifetime_value: 5945.23
+    },
+    {
+      customer_name: 'Dawn Jai',
+      num_orders: 1,
+      lifetime_value: 84.98
+    },
+    {
+      customer_name: 'Dawn Kumar',
+      num_orders: 3,
+      lifetime_value: 6890.7296
+    },
+    {
+      customer_name: 'Dawn Lal',
+      num_orders: 2,
+      lifetime_value: 5873.26
+    },
+    {
+      customer_name: 'Dawn Li',
+      num_orders: 2,
+      lifetime_value: 4798.53
+    },
+    {
+      customer_name: 'Dawn Lin',
+      num_orders: 2,
+      lifetime_value: 5913.24
+    },
+    {
+      customer_name: 'Dawn Liu',
+      num_orders: 2,
+      lifetime_value: 5920.24
+    },
+    {
+      customer_name: 'Dawn Lu',
+      num_orders: 2,
+      lifetime_value: 5983.74
+    },
+    {
+      customer_name: 'Dawn Luo',
+      num_orders: 2,
+      lifetime_value: 5908.25
+    },
+    {
+      customer_name: 'Dawn Ma',
+      num_orders: 2,
+      lifetime_value: 5913.24
+    },
+    {
+      customer_name: 'Dawn Nara',
+      num_orders: 2,
+      lifetime_value: 62.76
+    },
+    {
+      customer_name: 'Dawn Nath',
+      num_orders: 2,
+      lifetime_value: 4470.3896
+    },
+    {
+      customer_name: 'Dawn Pal',
+      num_orders: 2,
+      lifetime_value: 4368.0582
+    },
+    {
+      customer_name: 'Dawn Raje',
+      num_orders: 2,
+      lifetime_value: 4401.3996
+    },
+    {
+      customer_name: 'Dawn Raji',
+      num_orders: 2,
+      lifetime_value: 114.96
+    },
+    {
+      customer_name: 'Dawn Shan',
+      num_orders: 2,
+      lifetime_value: 5950.23
+    },
+    {
+      customer_name: 'Dawn Sharma',
+      num_orders: 2,
+      lifetime_value: 4472.3696
+    },
+    {
+      customer_name: 'Dawn Shen',
+      num_orders: 2,
+      lifetime_value: 51.27
+    },
+    {
+      customer_name: 'Dawn Stone',
+      num_orders: 2,
+      lifetime_value: 58.18
+    },
+    {
+      customer_name: 'Dawn Sun',
+      num_orders: 2,
+      lifetime_value: 4811.5
+    },
+    {
+      customer_name: 'Dawn Tang',
+      num_orders: 2,
+      lifetime_value: 5875.55
+    },
+    {
+      customer_name: 'Dawn Wang',
+      num_orders: 2,
+      lifetime_value: 42.95
+    },
+    {
+      customer_name: 'Dawn Wu',
+      num_orders: 2,
+      lifetime_value: 206.94
+    },
+    {
+      customer_name: 'Dawn Xie',
+      num_orders: 2,
+      lifetime_value: 5908.25
+    },
+    {
+      customer_name: 'Dawn Xu',
+      num_orders: 2,
+      lifetime_value: 5930.23
+    },
+    {
+      customer_name: 'Dawn Yang',
+      num_orders: 4,
+      lifetime_value: 202.2
+    },
+    {
+      customer_name: 'Dawn Ye',
+      num_orders: 4,
+      lifetime_value: 280.64
+    },
+    {
+      customer_name: 'Dawn Yuan',
+      num_orders: 2,
+      lifetime_value: 5908.25
+    },
+    {
+      customer_name: 'Dawn Zeng',
+      num_orders: 2,
+      lifetime_value: 5935.55
+    },
+    {
+      customer_name: 'Dawn Zhang',
+      num_orders: 4,
+      lifetime_value: 271.45
+    },
+    {
+      customer_name: 'Dawn Zhao',
+      num_orders: 2,
+      lifetime_value: 5948.24
+    },
+    {
+      customer_name: 'Dawn Zheng',
+      num_orders: 2,
+      lifetime_value: 82.93
+    },
+    {
+      customer_name: 'Dawn Zhou',
+      num_orders: 2,
+      lifetime_value: 5944.73
+    },
+    {
+      customer_name: 'Dawn Zhu',
+      num_orders: 2,
+      lifetime_value: 5930.23
+    },
+    {
+      customer_name: 'Deb Foster',
+      num_orders: 1,
+      lifetime_value: 106.96
+    },
+    {
+      customer_name: 'Deb Hughes',
+      num_orders: 2,
+      lifetime_value: 43.99
+    },
+    {
+      customer_name: 'Deb Price',
+      num_orders: 1,
+      lifetime_value: 81.46
+    },
+    {
+      customer_name: 'Deb Wagner',
+      num_orders: 3,
+      lifetime_value: 5205.7096
+    },
+    {
+      customer_name: 'Denise Arun',
+      num_orders: 1,
+      lifetime_value: 12.94
+    },
+    {
+      customer_name: 'Denise Fernandez',
+      num_orders: 1,
+      lifetime_value: 63.97
+    },
+    {
+      customer_name: 'Denise Gonzalez',
+      num_orders: 3,
+      lifetime_value: 7243.36
+    },
+    {
+      customer_name: 'Denise Kapoor',
+      num_orders: 1,
+      lifetime_value: 572.26
+    },
+    {
+      customer_name: 'Denise Lopez',
+      num_orders: 2,
+      lifetime_value: 2756.5425
+    },
+    {
+      customer_name: 'Denise Madan',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Denise Malhotra',
+      num_orders: 1,
+      lifetime_value: 2443.35
+    },
+    {
+      customer_name: 'Denise Martinez',
+      num_orders: 2,
+      lifetime_value: 3001.0225
+    },
+    {
+      customer_name: 'Denise Mehta',
+      num_orders: 2,
+      lifetime_value: 2781.5425
+    },
+    {
+      customer_name: 'Denise Patel',
+      num_orders: 1,
+      lifetime_value: 114.46
+    },
+    {
+      customer_name: 'Denise Perez',
+      num_orders: 2,
+      lifetime_value: 2771.5225
+    },
+    {
+      customer_name: 'Denise Prasad',
+      num_orders: 2,
+      lifetime_value: 126.96
+    },
+    {
+      customer_name: 'Denise Raman',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Denise Rana',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Denise Rodriguez',
+      num_orders: 1,
+      lifetime_value: 63.97
+    },
+    {
+      customer_name: 'Denise Sanchez',
+      num_orders: 2,
+      lifetime_value: 2778.8225
+    },
+    {
+      customer_name: 'Denise Stone',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Denise Subram',
+      num_orders: 2,
+      lifetime_value: 26.97
+    },
+    {
+      customer_name: 'Denise Suri',
+      num_orders: 1,
+      lifetime_value: 553.97
+    },
+    {
+      customer_name: 'Denise Vance',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Dennis Cai',
+      num_orders: 2,
+      lifetime_value: 3917.5425
+    },
+    {
+      customer_name: 'Dennis Chen',
+      num_orders: 1,
+      lifetime_value: 29.98
+    },
+    {
+      customer_name: 'Dennis Gao',
+      num_orders: 2,
+      lifetime_value: 4698.76
+    },
+    {
+      customer_name: 'Dennis Guo',
+      num_orders: 2,
+      lifetime_value: 4733.75
+    },
+    {
+      customer_name: 'Dennis He',
+      num_orders: 2,
+      lifetime_value: 4733.75
+    },
+    {
+      customer_name: 'Dennis Hu',
+      num_orders: 2,
+      lifetime_value: 4698.76
+    },
+    {
+      customer_name: 'Dennis Huang',
+      num_orders: 2,
+      lifetime_value: 2710.4175
+    },
+    {
+      customer_name: 'Dennis Li',
+      num_orders: 2,
+      lifetime_value: 3043.33
+    },
+    {
+      customer_name: 'Dennis Liang',
+      num_orders: 2,
+      lifetime_value: 4733.75
+    },
+    {
+      customer_name: 'Dennis Lin',
+      num_orders: 2,
+      lifetime_value: 2751.4175
+    },
+    {
+      customer_name: 'Dennis Liu',
+      num_orders: 2,
+      lifetime_value: 2736.4175
+    },
+    {
+      customer_name: 'Dennis Ma',
+      num_orders: 2,
+      lifetime_value: 4787.74
+    },
+    {
+      customer_name: 'Dennis She',
+      num_orders: 2,
+      lifetime_value: 3907.0425
+    },
+    {
+      customer_name: 'Dennis Sun',
+      num_orders: 2,
+      lifetime_value: 4698.76
+    },
+    {
+      customer_name: 'Dennis Wang',
+      num_orders: 1,
+      lifetime_value: 64.97
+    },
+    {
+      customer_name: 'Dennis Ware',
+      num_orders: 2,
+      lifetime_value: 109.71
+    },
+    {
+      customer_name: 'Dennis Wu',
+      num_orders: 2,
+      lifetime_value: 3044.79
+    },
+    {
+      customer_name: 'Dennis Xu',
+      num_orders: 1,
+      lifetime_value: 35.72
+    },
+    {
+      customer_name: 'Dennis Yang',
+      num_orders: 2,
+      lifetime_value: 3882.5525
+    },
+    {
+      customer_name: 'Dennis Ye',
+      num_orders: 2,
+      lifetime_value: 4733.75
+    },
+    {
+      customer_name: 'Dennis Zeng',
+      num_orders: 1,
+      lifetime_value: 29.99
+    },
+    {
+      customer_name: 'Dennis Zhang',
+      num_orders: 2,
+      lifetime_value: 2701.4275
+    },
+    {
+      customer_name: 'Dennis Zhao',
+      num_orders: 1,
+      lifetime_value: 25.48
+    },
+    {
+      customer_name: 'Dennis Zheng',
+      num_orders: 2,
+      lifetime_value: 4733.75
+    },
+    {
+      customer_name: 'Dennis Zhou',
+      num_orders: 1,
+      lifetime_value: 32.27
+    },
+    {
+      customer_name: 'Dennis Zhu',
+      num_orders: 2,
+      lifetime_value: 4752.75
+    },
+    {
+      customer_name: 'Derek Anand',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Derek Beck',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Derek Chande',
+      num_orders: 1,
+      lifetime_value: 21.49
+    },
+    {
+      customer_name: 'Derek Chander',
+      num_orders: 2,
+      lifetime_value: 6029.57
+    },
+    {
+      customer_name: 'Derek Goel',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Derek Jai',
+      num_orders: 2,
+      lifetime_value: 5333.25
+    },
+    {
+      customer_name: 'Derek Kumar',
+      num_orders: 2,
+      lifetime_value: 5347.23
+    },
+    {
+      customer_name: 'Derek Nara',
+      num_orders: 1,
+      lifetime_value: 60.47
+    },
+    {
+      customer_name: 'Derek Nath',
+      num_orders: 1,
+      lifetime_value: 49.97
+    },
+    {
+      customer_name: 'Derek Pal',
+      num_orders: 1,
+      lifetime_value: 69.97
+    },
+    {
+      customer_name: 'Derek Raje',
+      num_orders: 1,
+      lifetime_value: 75.48
+    },
+    {
+      customer_name: 'Derek Raji',
+      num_orders: 1,
+      lifetime_value: 94.48
+    },
+    {
+      customer_name: 'Derek Shan',
+      num_orders: 2,
+      lifetime_value: 6056.61
+    },
+    {
+      customer_name: 'Derek Sharma',
+      num_orders: 2,
+      lifetime_value: 6035.6
+    },
+    {
+      customer_name: 'Derek She',
+      num_orders: 1,
+      lifetime_value: 91.95
+    },
+    {
+      customer_name: 'Derek Shen',
+      num_orders: 1,
+      lifetime_value: 69.97
+    },
+    {
+      customer_name: 'Derek Tang',
+      num_orders: 1,
+      lifetime_value: 34.98
+    },
+    {
+      customer_name: 'Derek Xie',
+      num_orders: 1,
+      lifetime_value: 32.28
+    },
+    {
+      customer_name: 'Derek Xu',
+      num_orders: 1,
+      lifetime_value: 21.49
+    },
+    {
+      customer_name: 'Derek Yuan',
+      num_orders: 2,
+      lifetime_value: 6093.2
+    },
+    {
+      customer_name: 'Derrick Alonso',
+      num_orders: 1,
+      lifetime_value: 1700.99
+    },
+    {
+      customer_name: 'Derrick Bradley',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Derrick Carlson',
+      num_orders: 1,
+      lifetime_value: 639.45
+    },
+    {
+      customer_name: 'Derrick Diaz',
+      num_orders: 2,
+      lifetime_value: 24.27
+    },
+    {
+      customer_name: 'Derrick Dominguez',
+      num_orders: 1,
+      lifetime_value: 1183.47
+    },
+    {
+      customer_name: 'Derrick Gomez',
+      num_orders: 2,
+      lifetime_value: 6056.61
+    },
+    {
+      customer_name: 'Derrick Hernandez',
+      num_orders: 2,
+      lifetime_value: 122.24
+    },
+    {
+      customer_name: 'Derrick Jiménez',
+      num_orders: 2,
+      lifetime_value: 104.42
+    },
+    {
+      customer_name: 'Derrick Martin',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Derrick Moreno',
+      num_orders: 2,
+      lifetime_value: 63.91
+    },
+    {
+      customer_name: 'Derrick Munoz',
+      num_orders: 2,
+      lifetime_value: 6056.61
+    },
+    {
+      customer_name: 'Derrick Navarro',
+      num_orders: 1,
+      lifetime_value: 1184.46
+    },
+    {
+      customer_name: 'Derrick Ramos',
+      num_orders: 1,
+      lifetime_value: 579.97
+    },
+    {
+      customer_name: 'Derrick Romero',
+      num_orders: 1,
+      lifetime_value: 609.95
+    },
+    {
+      customer_name: 'Derrick Rubio',
+      num_orders: 1,
+      lifetime_value: 1700.99
+    },
+    {
+      customer_name: 'Derrick Ruiz',
+      num_orders: 2,
+      lifetime_value: 6090.59
+    },
+    {
+      customer_name: 'Derrick Schmidt',
+      num_orders: 1,
+      lifetime_value: 1725.48
+    },
+    {
+      customer_name: 'Derrick Serrano',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Derrick Torres',
+      num_orders: 1,
+      lifetime_value: 148.47
+    },
+    {
+      customer_name: 'Derrick Vazquez',
+      num_orders: 1,
+      lifetime_value: 1729.97
+    },
+    {
+      customer_name: 'Desiree Alonso',
+      num_orders: 1,
+      lifetime_value: 61.45
+    },
+    {
+      customer_name: 'Desiree Alvarez',
+      num_orders: 2,
+      lifetime_value: 4404.73
+    },
+    {
+      customer_name: 'Desiree Bradley',
+      num_orders: 2,
+      lifetime_value: 3282.83
+    },
+    {
+      customer_name: 'Desiree Carlson',
+      num_orders: 1,
+      lifetime_value: 24.27
+    },
+    {
+      customer_name: 'Desiree Dominguez',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Desiree Gill',
+      num_orders: 2,
+      lifetime_value: 4639.5125
+    },
+    {
+      customer_name: 'Desiree Gutierrez',
+      num_orders: 2,
+      lifetime_value: 3095.5225
+    },
+    {
+      customer_name: 'Desiree Jimenez',
+      num_orders: 2,
+      lifetime_value: 4355.71
+    },
+    {
+      customer_name: 'Desiree Munoz',
+      num_orders: 2,
+      lifetime_value: 5888.24
+    },
+    {
+      customer_name: 'Desiree Navarro',
+      num_orders: 2,
+      lifetime_value: 3247.82
+    },
+    {
+      customer_name: 'Desiree Ortega',
+      num_orders: 2,
+      lifetime_value: 4536.5425
+    },
+    {
+      customer_name: 'Desiree Romero',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Desiree Rubio',
+      num_orders: 2,
+      lifetime_value: 3021.0425
+    },
+    {
+      customer_name: 'Desiree Sanz',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Desiree Serrano',
+      num_orders: 2,
+      lifetime_value: 3060.5225
+    },
+    {
+      customer_name: 'Desiree Suarez',
+      num_orders: 2,
+      lifetime_value: 3030.0325
+    },
+    {
+      customer_name: 'Desiree Torres',
+      num_orders: 1,
+      lifetime_value: 71.95
+    },
+    {
+      customer_name: 'Desiree Vazquez',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Desirée Moreno',
+      num_orders: 2,
+      lifetime_value: 5917.24
+    },
+    {
+      customer_name: 'Destiny Alexander',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Destiny Anderson',
+      num_orders: 3,
+      lifetime_value: 6973.81
+    },
+    {
+      customer_name: 'Destiny Bailey',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Destiny Barnes',
+      num_orders: 1,
+      lifetime_value: 38.98
+    },
+    {
+      customer_name: 'Destiny Bell',
+      num_orders: 1,
+      lifetime_value: 539.99
+    },
+    {
+      customer_name: 'Destiny Bennett',
+      num_orders: 1,
+      lifetime_value: 47.97
+    },
+    {
+      customer_name: 'Destiny Brooks',
+      num_orders: 2,
+      lifetime_value: 3150.3982
+    },
+    {
+      customer_name: 'Destiny Brown',
+      num_orders: 3,
+      lifetime_value: 8143.03
+    },
+    {
+      customer_name: 'Destiny Bryant',
+      num_orders: 1,
+      lifetime_value: 1120.49
+    },
+    {
+      customer_name: 'Destiny Butler',
+      num_orders: 1,
+      lifetime_value: 1149.47
+    },
+    {
+      customer_name: 'Destiny Clark',
+      num_orders: 5,
+      lifetime_value: 258.15
+    },
+    {
+      customer_name: 'Destiny Coleman',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Destiny Cook',
+      num_orders: 1,
+      lifetime_value: 1155.48
+    },
+    {
+      customer_name: 'Destiny Cooper',
+      num_orders: 1,
+      lifetime_value: 80.96
+    },
+    {
+      customer_name: 'Destiny Cox',
+      num_orders: 1,
+      lifetime_value: 1155.48
+    },
+    {
+      customer_name: 'Destiny Davis',
+      num_orders: 3,
+      lifetime_value: 4985.3796
+    },
+    {
+      customer_name: 'Destiny Diaz',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Destiny Flores',
+      num_orders: 1,
+      lifetime_value: 548.98
+    },
+    {
+      customer_name: 'Destiny Foster',
+      num_orders: 1,
+      lifetime_value: 59.98
+    },
+    {
+      customer_name: 'Destiny Garcia',
+      num_orders: 16,
+      lifetime_value: 846.77
+    },
+    {
+      customer_name: 'Destiny Gray',
+      num_orders: 1,
+      lifetime_value: 12.98
+    },
+    {
+      customer_name: 'Destiny Griffin',
+      num_orders: 1,
+      lifetime_value: 67.93
+    },
+    {
+      customer_name: 'Destiny Hall',
+      num_orders: 16,
+      lifetime_value: 822.97
+    },
+    {
+      customer_name: 'Destiny Harris',
+      num_orders: 16,
+      lifetime_value: 654.27
+    },
+    {
+      customer_name: 'Destiny Henderson',
+      num_orders: 1,
+      lifetime_value: 574.98
+    },
+    {
+      customer_name: 'Destiny Howard',
+      num_orders: 1,
+      lifetime_value: 1155.48
+    },
+    {
+      customer_name: 'Destiny Hughes',
+      num_orders: 2,
+      lifetime_value: 112.76
+    },
+    {
+      customer_name: 'Destiny Jackson',
+      num_orders: 3,
+      lifetime_value: 7013.79
+    },
+    {
+      customer_name: 'Destiny James',
+      num_orders: 1,
+      lifetime_value: 596.96
+    },
+    {
+      customer_name: 'Destiny Jenkins',
+      num_orders: 1,
+      lifetime_value: 1155.48
+    },
+    {
+      customer_name: 'Destiny Johnson',
+      num_orders: 3,
+      lifetime_value: 4970.6096
+    },
+    {
+      customer_name: 'Destiny Jones',
+      num_orders: 3,
+      lifetime_value: 4978.0482
+    },
+    {
+      customer_name: 'Destiny Kelly',
+      num_orders: 1,
+      lifetime_value: 58.98
+    },
+    {
+      customer_name: 'Destiny Lee',
+      num_orders: 2,
+      lifetime_value: 101.76
+    },
+    {
+      customer_name: 'Destiny Lewis',
+      num_orders: 2,
+      lifetime_value: 5930.23
+    },
+    {
+      customer_name: 'Destiny Long',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Destiny Martin',
+      num_orders: 16,
+      lifetime_value: 872.25
+    },
+    {
+      customer_name: 'Destiny Miller',
+      num_orders: 3,
+      lifetime_value: 7048.3
+    },
+    {
+      customer_name: 'Destiny Moore',
+      num_orders: 1,
+      lifetime_value: 53.99
+    },
+    {
+      customer_name: 'Destiny Morgan',
+      num_orders: 1,
+      lifetime_value: 1184.46
+    },
+    {
+      customer_name: 'Destiny Morris',
+      num_orders: 1,
+      lifetime_value: 589.96
+    },
+    {
+      customer_name: 'Destiny Murphy',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Destiny Perry',
+      num_orders: 1,
+      lifetime_value: 553.97
+    },
+    {
+      customer_name: 'Destiny Peterson',
+      num_orders: 1,
+      lifetime_value: 2457.33
+    },
+    {
+      customer_name: 'Destiny Powell',
+      num_orders: 1,
+      lifetime_value: 628.97
+    },
+    {
+      customer_name: 'Destiny Price',
+      num_orders: 2,
+      lifetime_value: 3338.0382
+    },
+    {
+      customer_name: 'Destiny Ramirez',
+      num_orders: 1,
+      lifetime_value: 32.28
+    },
+    {
+      customer_name: 'Destiny Reed',
+      num_orders: 1,
+      lifetime_value: 1143.46
+    },
+    {
+      customer_name: 'Destiny Richardson',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Destiny Rivera',
+      num_orders: 1,
+      lifetime_value: 128.97
+    },
+    {
+      customer_name: 'Destiny Rodriguez',
+      num_orders: 1,
+      lifetime_value: 2319.99
+    },
+    {
+      customer_name: 'Destiny Rogers',
+      num_orders: 1,
+      lifetime_value: 589.96
+    },
+    {
+      customer_name: 'Destiny Ross',
+      num_orders: 1,
+      lifetime_value: 21.49
+    },
+    {
+      customer_name: 'Destiny Sanchez',
+      num_orders: 1,
+      lifetime_value: 1147.77
+    },
+    {
+      customer_name: 'Destiny Sanders',
+      num_orders: 1,
+      lifetime_value: 36.27
+    },
+    {
+      customer_name: 'Destiny Simmons',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Destiny Smith',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Destiny Stewart',
+      num_orders: 2,
+      lifetime_value: 5814.98
+    },
+    {
+      customer_name: 'Destiny Taylor',
+      num_orders: 2,
+      lifetime_value: 4404.0782
+    },
+    {
+      customer_name: 'Destiny Thompson',
+      num_orders: 2,
+      lifetime_value: 61.78
+    },
+    {
+      customer_name: 'Destiny Torres',
+      num_orders: 1,
+      lifetime_value: 2595.95
+    },
+    {
+      customer_name: 'Destiny Walker',
+      num_orders: 2,
+      lifetime_value: 82.2
+    },
+    {
+      customer_name: 'Destiny Ward',
+      num_orders: 1,
+      lifetime_value: 2618.62
+    },
+    {
+      customer_name: 'Destiny Washington',
+      num_orders: 1,
+      lifetime_value: 562.96
+    },
+    {
+      customer_name: 'Destiny Watson',
+      num_orders: 1,
+      lifetime_value: 614.98
+    },
+    {
+      customer_name: 'Destiny White',
+      num_orders: 2,
+      lifetime_value: 192.21
+    },
+    {
+      customer_name: 'Destiny Williams',
+      num_orders: 3,
+      lifetime_value: 4935.3596
+    },
+    {
+      customer_name: 'Destiny Wilson',
+      num_orders: 3,
+      lifetime_value: 8127.51
+    },
+    {
+      customer_name: 'Destiny Wood',
+      num_orders: 2,
+      lifetime_value: 1997.45
+    },
+    {
+      customer_name: 'Devin Alexander',
+      num_orders: 2,
+      lifetime_value: 3062.33
+    },
+    {
+      customer_name: 'Devin Bell',
+      num_orders: 2,
+      lifetime_value: 3750.0882
+    },
+    {
+      customer_name: 'Devin Bennett',
+      num_orders: 2,
+      lifetime_value: 1799.9175
+    },
+    {
+      customer_name: 'Devin Brooks',
+      num_orders: 1,
+      lifetime_value: 85.48
+    },
+    {
+      customer_name: 'Devin Bryant',
+      num_orders: 1,
+      lifetime_value: 74.98
+    },
+    {
+      customer_name: 'Devin Butler',
+      num_orders: 2,
+      lifetime_value: 4828.31
+    },
+    {
+      customer_name: 'Devin Coleman',
+      num_orders: 3,
+      lifetime_value: 6485.67
+    },
+    {
+      customer_name: 'Devin Cooper',
+      num_orders: 2,
+      lifetime_value: 237.97
+    },
+    {
+      customer_name: 'Devin Cox',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Devin Diaz',
+      num_orders: 1,
+      lifetime_value: 74.98
+    },
+    {
+      customer_name: 'Devin Flores',
+      num_orders: 1,
+      lifetime_value: 2332.28
+    },
+    {
+      customer_name: 'Devin Foster',
+      num_orders: 2,
+      lifetime_value: 3078.31
+    },
+    {
+      customer_name: 'Devin Gray',
+      num_orders: 1,
+      lifetime_value: 89.97
+    },
+    {
+      customer_name: 'Devin Griffin',
+      num_orders: 2,
+      lifetime_value: 2786.5225
+    },
+    {
+      customer_name: 'Devin Hayes',
+      num_orders: 2,
+      lifetime_value: 4476.5525
+    },
+    {
+      customer_name: 'Devin Henderson',
+      num_orders: 1,
+      lifetime_value: 48.97
+    },
+    {
+      customer_name: 'Devin Howard',
+      num_orders: 1,
+      lifetime_value: 839.48
+    },
+    {
+      customer_name: 'Devin Hughes',
+      num_orders: 1,
+      lifetime_value: 2337.27
+    },
+    {
+      customer_name: 'Devin James',
+      num_orders: 2,
+      lifetime_value: 1589.6975
+    },
+    {
+      customer_name: 'Devin Jenkins',
+      num_orders: 1,
+      lifetime_value: 75.97
+    },
+    {
+      customer_name: 'Devin Kelly',
+      num_orders: 1,
+      lifetime_value: 156.59
+    },
+    {
+      customer_name: 'Devin Long',
+      num_orders: 2,
+      lifetime_value: 2736.5325
+    },
+    {
+      customer_name: 'Devin Morgan',
+      num_orders: 2,
+      lifetime_value: 4118.26
+    },
+    {
+      customer_name: 'Devin Morris',
+      num_orders: 1,
+      lifetime_value: 848.47
+    },
+    {
+      customer_name: 'Devin Murphy',
+      num_orders: 3,
+      lifetime_value: 7212.86
+    },
+    {
+      customer_name: 'Devin Patterson',
+      num_orders: 2,
+      lifetime_value: 3018.33
+    },
+    {
+      customer_name: 'Devin Perry',
+      num_orders: 2,
+      lifetime_value: 4525.8225
+    },
+    {
+      customer_name: 'Devin Peterson',
+      num_orders: 2,
+      lifetime_value: 3370.4075
+    },
+    {
+      customer_name: 'Devin Powell',
+      num_orders: 1,
+      lifetime_value: 74.98
+    },
+    {
+      customer_name: 'Devin Price',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Devin Ramirez',
+      num_orders: 2,
+      lifetime_value: 3016.0682
+    },
+    {
+      customer_name: 'Devin Reed',
+      num_orders: 2,
+      lifetime_value: 2781.5425
+    },
+    {
+      customer_name: 'Devin Richardson',
+      num_orders: 2,
+      lifetime_value: 1500.8682
+    },
+    {
+      customer_name: 'Devin Rivera',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Devin Ross',
+      num_orders: 3,
+      lifetime_value: 5141.4282
+    },
+    {
+      customer_name: 'Devin Russell',
+      num_orders: 1,
+      lifetime_value: 1129.48
+    },
+    {
+      customer_name: 'Devin Sanchez',
+      num_orders: 1,
+      lifetime_value: 96.44
+    },
+    {
+      customer_name: 'Devin Sanders',
+      num_orders: 3,
+      lifetime_value: 5647.9282
+    },
+    {
+      customer_name: 'Devin Simmons',
+      num_orders: 2,
+      lifetime_value: 3033.31
+    },
+    {
+      customer_name: 'Devin Stewart',
+      num_orders: 2,
+      lifetime_value: 3244.96
+    },
+    {
+      customer_name: 'Devin Torres',
+      num_orders: 3,
+      lifetime_value: 192.34
+    },
+    {
+      customer_name: 'Devin Ward',
+      num_orders: 3,
+      lifetime_value: 3595.9282
+    },
+    {
+      customer_name: 'Devin Watson',
+      num_orders: 1,
+      lifetime_value: 30.97
+    },
+    {
+      customer_name: 'Devin Wood',
+      num_orders: 2,
+      lifetime_value: 1769.9275
+    },
+    {
+      customer_name: 'Diana Alonso',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Diana Alvarez',
+      num_orders: 1,
+      lifetime_value: 1700.99
+    },
+    {
+      customer_name: 'Diana Carlson',
+      num_orders: 2,
+      lifetime_value: 60.96
+    },
+    {
+      customer_name: 'Diana Dominguez',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Diana Gill',
+      num_orders: 1,
+      lifetime_value: 67.93
+    },
+    {
+      customer_name: 'Diana Gutierrez',
+      num_orders: 1,
+      lifetime_value: 58.98
+    },
+    {
+      customer_name: 'Diana Hernandez',
+      num_orders: 1,
+      lifetime_value: 2319.99
+    },
+    {
+      customer_name: 'Diana Jimenez',
+      num_orders: 1,
+      lifetime_value: 599.47
+    },
+    {
+      customer_name: 'Diana Martin',
+      num_orders: 1,
+      lifetime_value: 58.98
+    },
+    {
+      customer_name: 'Diana Moreno',
+      num_orders: 1,
+      lifetime_value: 603.49
+    },
+    {
+      customer_name: 'Diana Munoz',
+      num_orders: 1,
+      lifetime_value: 561.48
+    },
+    {
+      customer_name: 'Diana Navarro',
+      num_orders: 1,
+      lifetime_value: 564.48
+    },
+    {
+      customer_name: 'Diana Ortega',
+      num_orders: 1,
+      lifetime_value: 1754.98
+    },
+    {
+      customer_name: 'Diana Ramos',
+      num_orders: 2,
+      lifetime_value: 145.96
+    },
+    {
+      customer_name: 'Diana Romero',
+      num_orders: 1,
+      lifetime_value: 1775.97
+    },
+    {
+      customer_name: 'Diana Rubio',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Diana Ruiz',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Diana Sanz',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Diana Serrano',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Diana Suarez',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Diana Torres',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Diana Vazquez',
+      num_orders: 1,
+      lifetime_value: 12.94
+    },
+    {
+      customer_name: 'Diane Alonso',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Diane Alvarez',
+      num_orders: 2,
+      lifetime_value: 52.93
+    },
+    {
+      customer_name: 'Diane Bradley',
+      num_orders: 1,
+      lifetime_value: 114.96
+    },
+    {
+      customer_name: 'Diane Carlson',
+      num_orders: 2,
+      lifetime_value: 134.46
+    },
+    {
+      customer_name: 'Diane Dominguez',
+      num_orders: 2,
+      lifetime_value: 66.75
+    },
+    {
+      customer_name: 'Diane Gill',
+      num_orders: 3,
+      lifetime_value: 6989.5825
+    },
+    {
+      customer_name: 'Diane Hernandez',
+      num_orders: 2,
+      lifetime_value: 3170.2
+    },
+    {
+      customer_name: 'Diane Jimenez',
+      num_orders: 2,
+      lifetime_value: 1587.47
+    },
+    {
+      customer_name: 'Diane Martin',
+      num_orders: 2,
+      lifetime_value: 3145.26
+    },
+    {
+      customer_name: 'Diane Moreno',
+      num_orders: 2,
+      lifetime_value: 3124.45
+    },
+    {
+      customer_name: 'Diane Munoz',
+      num_orders: 2,
+      lifetime_value: 1622.47
+    },
+    {
+      customer_name: 'Diane Navarro',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Diane Ramos',
+      num_orders: 2,
+      lifetime_value: 126.56
+    },
+    {
+      customer_name: 'Diane Romero',
+      num_orders: 2,
+      lifetime_value: 1587.47
+    },
+    {
+      customer_name: 'Diane Rubio',
+      num_orders: 2,
+      lifetime_value: 4443.3796
+    },
+    {
+      customer_name: 'Diane Ruiz',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Diane Sanz',
+      num_orders: 2,
+      lifetime_value: 3124.96
+    },
+    {
+      customer_name: 'Diane Serrano',
+      num_orders: 3,
+      lifetime_value: 6221.5225
+    },
+    {
+      customer_name: 'Diane Suarez',
+      num_orders: 2,
+      lifetime_value: 4408.6896
+    },
+    {
+      customer_name: 'Diane Torres',
+      num_orders: 2,
+      lifetime_value: 4367.0182
+    },
+    {
+      customer_name: 'Diane Vazquez',
+      num_orders: 2,
+      lifetime_value: 3785.0782
+    },
+    {
+      customer_name: 'Don Lal',
+      num_orders: 2,
+      lifetime_value: 6068.45
+    },
+    {
+      customer_name: 'Don Roessler',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Donald Arun',
+      num_orders: 1,
+      lifetime_value: 567.27
+    },
+    {
+      customer_name: 'Donald Chandra',
+      num_orders: 1,
+      lifetime_value: 94.48
+    },
+    {
+      customer_name: 'Donald Fernandez',
+      num_orders: 2,
+      lifetime_value: 3214.0282
+    },
+    {
+      customer_name: 'Donald Garcia',
+      num_orders: 2,
+      lifetime_value: 3142.4482
+    },
+    {
+      customer_name: 'Donald Gonzalez',
+      num_orders: 1,
+      lifetime_value: 31.27
+    },
+    {
+      customer_name: 'Donald Kapoor',
+      num_orders: 1,
+      lifetime_value: 1155.48
+    },
+    {
+      customer_name: 'Donald Kovár',
+      num_orders: 1,
+      lifetime_value: 1174.48
+    },
+    {
+      customer_name: 'Donald Lopez',
+      num_orders: 1,
+      lifetime_value: 82.97
+    },
+    {
+      customer_name: 'Donald Madan',
+      num_orders: 2,
+      lifetime_value: 5769.96
+    },
+    {
+      customer_name: 'Donald Martinez',
+      num_orders: 1,
+      lifetime_value: 144.45
+    },
+    {
+      customer_name: 'Donald McDonald',
+      num_orders: 1,
+      lifetime_value: 1129.48
+    },
+    {
+      customer_name: 'Donald Mehta',
+      num_orders: 1,
+      lifetime_value: 691.91
+    },
+    {
+      customer_name: 'Donald Patel',
+      num_orders: 1,
+      lifetime_value: 1212.97
+    },
+    {
+      customer_name: 'Donald Perez',
+      num_orders: 1,
+      lifetime_value: 1174.48
+    },
+    {
+      customer_name: 'Donald Prasad',
+      num_orders: 1,
+      lifetime_value: 2443.35
+    },
+    {
+      customer_name: 'Donald Raman',
+      num_orders: 2,
+      lifetime_value: 3150.3982
+    },
+    {
+      customer_name: 'Donald Rodriguez',
+      num_orders: 1,
+      lifetime_value: 1170.48
+    },
+    {
+      customer_name: 'Donald Sanchez',
+      num_orders: 2,
+      lifetime_value: 3142.4482
+    },
+    {
+      customer_name: 'Donald Sara',
+      num_orders: 1,
+      lifetime_value: 1155.48
+    },
+    {
+      customer_name: 'Donald Srini',
+      num_orders: 2,
+      lifetime_value: 5694.98
+    },
+    {
+      customer_name: 'Donald Subram',
+      num_orders: 1,
+      lifetime_value: 1155.48
+    },
+    {
+      customer_name: 'Donald Suri',
+      num_orders: 2,
+      lifetime_value: 4530.47
+    },
+    {
+      customer_name: 'Douglas Arun',
+      num_orders: 3,
+      lifetime_value: 4314.8782
+    },
+    {
+      customer_name: 'Douglas Fernandez',
+      num_orders: 3,
+      lifetime_value: 4337.8982
+    },
+    {
+      customer_name: 'Douglas Garcia',
+      num_orders: 2,
+      lifetime_value: 1942.7
+    },
+    {
+      customer_name: 'Douglas Gonzalez',
+      num_orders: 2,
+      lifetime_value: 1567.46
+    },
+    {
+      customer_name: 'Douglas Kapoor',
+      num_orders: 1,
+      lifetime_value: 1183.47
+    },
+    {
+      customer_name: 'Douglas Madan',
+      num_orders: 2,
+      lifetime_value: 1930.76
+    },
+    {
+      customer_name: 'Douglas Malhotra',
+      num_orders: 1,
+      lifetime_value: 1145.48
+    },
+    {
+      customer_name: 'Douglas Martinez',
+      num_orders: 3,
+      lifetime_value: 4349.8882
+    },
+    {
+      customer_name: 'Douglas Mehta',
+      num_orders: 2,
+      lifetime_value: 1934.75
+    },
+    {
+      customer_name: 'Douglas Patel',
+      num_orders: 1,
+      lifetime_value: 1120.49
+    },
+    {
+      customer_name: 'Douglas Perez',
+      num_orders: 2,
+      lifetime_value: 1560.43
+    },
+    {
+      customer_name: 'Douglas Prasad',
+      num_orders: 2,
+      lifetime_value: 3511.7575
+    },
+    {
+      customer_name: 'Douglas Raman',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Douglas Rana',
+      num_orders: 2,
+      lifetime_value: 1878.5682
+    },
+    {
+      customer_name: 'Douglas Rodriguez',
+      num_orders: 2,
+      lifetime_value: 1863.5682
+    },
+    {
+      customer_name: 'Douglas Sai',
+      num_orders: 2,
+      lifetime_value: 3476.3875
+    },
+    {
+      customer_name: 'Douglas Sanchez',
+      num_orders: 1,
+      lifetime_value: 58.98
+    },
+    {
+      customer_name: 'Douglas Sara',
+      num_orders: 2,
+      lifetime_value: 1938.47
+    },
+    {
+      customer_name: 'Douglas Srini',
+      num_orders: 2,
+      lifetime_value: 1938.47
+    },
+    {
+      customer_name: 'Douglas Subram',
+      num_orders: 2,
+      lifetime_value: 1869.5782
+    },
+    {
+      customer_name: 'Douglas Suri',
+      num_orders: 1,
+      lifetime_value: 1155.48
+    },
+    {
+      customer_name: 'Douglas Vance',
+      num_orders: 2,
+      lifetime_value: 69.97
+    },
+    {
+      customer_name: 'Dwayne Alonso',
+      num_orders: 1,
+      lifetime_value: 22.93
+    },
+    {
+      customer_name: 'Dwayne Alvarez',
+      num_orders: 1,
+      lifetime_value: 1184.46
+    },
+    {
+      customer_name: 'Dwayne Dominguez',
+      num_orders: 1,
+      lifetime_value: 2542.31
+    },
+    {
+      customer_name: 'Dwayne Gill',
+      num_orders: 2,
+      lifetime_value: 2994.0882
+    },
+    {
+      customer_name: 'Dwayne Gomez',
+      num_orders: 1,
+      lifetime_value: 133.49
+    },
+    {
+      customer_name: 'Dwayne Gutierrez',
+      num_orders: 1,
+      lifetime_value: 74.46
+    },
+    {
+      customer_name: 'Dwayne Hernandez',
+      num_orders: 1,
+      lifetime_value: 128.97
+    },
+    {
+      customer_name: 'Dwayne Martin',
+      num_orders: 1,
+      lifetime_value: 94.48
+    },
+    {
+      customer_name: 'Dwayne Moreno',
+      num_orders: 1,
+      lifetime_value: 29.99
+    },
+    {
+      customer_name: 'Dwayne Munoz',
+      num_orders: 2,
+      lifetime_value: 6054.22
+    },
+    {
+      customer_name: 'Dwayne Navarro',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Dwayne Ortega',
+      num_orders: 1,
+      lifetime_value: 1729.97
+    },
+    {
+      customer_name: 'Dwayne Ramos',
+      num_orders: 1,
+      lifetime_value: 74.98
+    },
+    {
+      customer_name: 'Dwayne Romero',
+      num_orders: 1,
+      lifetime_value: 1155.48
+    },
+    {
+      customer_name: 'Dwayne Rubio',
+      num_orders: 1,
+      lifetime_value: 78.48
+    },
+    {
+      customer_name: 'Dwayne Ruiz',
+      num_orders: 2,
+      lifetime_value: 3226.8996
+    },
+    {
+      customer_name: 'Dwayne Sanz',
+      num_orders: 1,
+      lifetime_value: 1754.98
+    },
+    {
+      customer_name: 'Dwayne Serrano',
+      num_orders: 1,
+      lifetime_value: 23.78
+    },
+    {
+      customer_name: 'Dwayne Suarez',
+      num_orders: 1,
+      lifetime_value: 2466.32
+    },
+    {
+      customer_name: 'Dwayne Torres',
+      num_orders: 1,
+      lifetime_value: 64.47
+    },
+    {
+      customer_name: 'Dwayne Vazquez',
+      num_orders: 2,
+      lifetime_value: 3080.27
+    },
+    {
+      customer_name: 'Dylan Anderson',
+      num_orders: 2,
+      lifetime_value: 6056.61
+    },
+    {
+      customer_name: 'Dylan Brown',
+      num_orders: 2,
+      lifetime_value: 6063.21
+    },
+    {
+      customer_name: 'Dylan Clark',
+      num_orders: 1,
+      lifetime_value: 2319.99
+    },
+    {
+      customer_name: 'Dylan Davis',
+      num_orders: 2,
+      lifetime_value: 30.97
+    },
+    {
+      customer_name: 'Dylan Garcia',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Dylan Harris',
+      num_orders: 1,
+      lifetime_value: 2359.96
+    },
+    {
+      customer_name: 'Dylan Jackson',
+      num_orders: 1,
+      lifetime_value: 1750.98
+    },
+    {
+      customer_name: 'Dylan Jones',
+      num_orders: 2,
+      lifetime_value: 6093.2
+    },
+    {
+      customer_name: 'Dylan Lee',
+      num_orders: 1,
+      lifetime_value: 1169.46
+    },
+    {
+      customer_name: 'Dylan Lewis',
+      num_orders: 1,
+      lifetime_value: 123.98
+    },
+    {
+      customer_name: 'Dylan Martin',
+      num_orders: 1,
+      lifetime_value: 2465.93
+    },
+    {
+      customer_name: 'Dylan Martinez',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Dylan Miller',
+      num_orders: 2,
+      lifetime_value: 6037.89
+    },
+    {
+      customer_name: 'Dylan Moore',
+      num_orders: 1,
+      lifetime_value: 79.47
+    },
+    {
+      customer_name: 'Dylan Robinson',
+      num_orders: 1,
+      lifetime_value: 2317.92
+    },
+    {
+      customer_name: 'Dylan Rodriguez',
+      num_orders: 1,
+      lifetime_value: 2356.95
+    },
+    {
+      customer_name: 'Dylan Taylor',
+      num_orders: 1,
+      lifetime_value: 616.91
+    },
+    {
+      customer_name: 'Dylan Thomas',
+      num_orders: 1,
+      lifetime_value: 2329.98
+    },
+    {
+      customer_name: 'Dylan Thompson',
+      num_orders: 1,
+      lifetime_value: 2349.98
+    },
+    {
+      customer_name: 'Dylan Walker',
+      num_orders: 1,
+      lifetime_value: 64.47
+    },
+    {
+      customer_name: 'Dylan Williams',
+      num_orders: 1,
+      lifetime_value: 2329.99
+    },
+    {
+      customer_name: 'Dylan Wilson',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Eduardo Alexander',
+      num_orders: 1,
+      lifetime_value: 86.96
+    },
+    {
+      customer_name: 'Eduardo Bailey',
+      num_orders: 1,
+      lifetime_value: 99.9
+    },
+    {
+      customer_name: 'Eduardo Barnes',
+      num_orders: 2,
+      lifetime_value: 4883.82
+    },
+    {
+      customer_name: 'Eduardo Bell',
+      num_orders: 2,
+      lifetime_value: 3807.3996
+    },
+    {
+      customer_name: 'Eduardo Bennett',
+      num_orders: 2,
+      lifetime_value: 4500.8225
+    },
+    {
+      customer_name: 'Eduardo Brooks',
+      num_orders: 1,
+      lifetime_value: 48.97
+    },
+    {
+      customer_name: 'Eduardo Butler',
+      num_orders: 2,
+      lifetime_value: 3045.5325
+    },
+    {
+      customer_name: 'Eduardo Coleman',
+      num_orders: 2,
+      lifetime_value: 4553.5225
+    },
+    {
+      customer_name: 'Eduardo Cook',
+      num_orders: 2,
+      lifetime_value: 3199.44
+    },
+    {
+      customer_name: 'Eduardo Cooper',
+      num_orders: 3,
+      lifetime_value: 5188.4082
+    },
+    {
+      customer_name: 'Eduardo Cox',
+      num_orders: 2,
+      lifetime_value: 164.2
+    },
+    {
+      customer_name: 'Eduardo Diaz',
+      num_orders: 1,
+      lifetime_value: 30.97
+    },
+    {
+      customer_name: 'Eduardo Flores',
+      num_orders: 2,
+      lifetime_value: 2959.0025
+    },
+    {
+      customer_name: 'Eduardo Foster',
+      num_orders: 3,
+      lifetime_value: 224.91
+    },
+    {
+      customer_name: 'Eduardo Gonzales',
+      num_orders: 1,
+      lifetime_value: 24.27
+    },
+    {
+      customer_name: 'Eduardo Gray',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Eduardo Griffin',
+      num_orders: 4,
+      lifetime_value: 229
+    },
+    {
+      customer_name: 'Eduardo Henderson',
+      num_orders: 3,
+      lifetime_value: 108.96
+    },
+    {
+      customer_name: 'Eduardo Hughes',
+      num_orders: 1,
+      lifetime_value: 2349.98
+    },
+    {
+      customer_name: 'Eduardo James',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Eduardo Jenkins',
+      num_orders: 2,
+      lifetime_value: 4522.5025
+    },
+    {
+      customer_name: 'Eduardo Kelly',
+      num_orders: 3,
+      lifetime_value: 8361.3
+    },
+    {
+      customer_name: 'Eduardo Long',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Eduardo Morgan',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Eduardo Morris',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Eduardo Murphy',
+      num_orders: 2,
+      lifetime_value: 68.87
+    },
+    {
+      customer_name: 'Eduardo Patterson',
+      num_orders: 2,
+      lifetime_value: 2988.3225
+    },
+    {
+      customer_name: 'Eduardo Perry',
+      num_orders: 2,
+      lifetime_value: 4478.8425
+    },
+    {
+      customer_name: 'Eduardo Peterson',
+      num_orders: 1,
+      lifetime_value: 30.97
+    },
+    {
+      customer_name: 'Eduardo Powell',
+      num_orders: 1,
+      lifetime_value: 39.25
+    },
+    {
+      customer_name: 'Eduardo Price',
+      num_orders: 2,
+      lifetime_value: 4532.5225
+    },
+    {
+      customer_name: 'Eduardo Ramirez',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Eduardo Reed',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Eduardo Richardson',
+      num_orders: 2,
+      lifetime_value: 1588.5682
+    },
+    {
+      customer_name: 'Eduardo Rivera',
+      num_orders: 2,
+      lifetime_value: 1645.5482
+    },
+    {
+      customer_name: 'Eduardo Rogers',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Eduardo Ross',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Eduardo Russell',
+      num_orders: 4,
+      lifetime_value: 284.13
+    },
+    {
+      customer_name: 'Eduardo Sanchez',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Eduardo Sanders',
+      num_orders: 3,
+      lifetime_value: 5217.7296
+    },
+    {
+      customer_name: 'Eduardo Simmons',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Eduardo Stewart',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Eduardo Torres',
+      num_orders: 2,
+      lifetime_value: 1839.9175
+    },
+    {
+      customer_name: 'Eduardo Ward',
+      num_orders: 3,
+      lifetime_value: 3653.2296
+    },
+    {
+      customer_name: 'Eduardo Watson',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Eduardo Wood',
+      num_orders: 2,
+      lifetime_value: 4879.8
+    },
+    {
+      customer_name: 'Edward Alexander',
+      num_orders: 2,
+      lifetime_value: 4787.61
+    },
+    {
+      customer_name: 'Edward Barnes',
+      num_orders: 3,
+      lifetime_value: 6817.1182
+    },
+    {
+      customer_name: 'Edward Bryant',
+      num_orders: 2,
+      lifetime_value: 4819.3
+    },
+    {
+      customer_name: 'Edward Butler',
+      num_orders: 3,
+      lifetime_value: 6812.1182
+    },
+    {
+      customer_name: 'Edward Coleman',
+      num_orders: 3,
+      lifetime_value: 6831.7596
+    },
+    {
+      customer_name: 'Edward Diaz',
+      num_orders: 1,
+      lifetime_value: 15.23
+    },
+    {
+      customer_name: 'Edward Flores',
+      num_orders: 3,
+      lifetime_value: 6793.1482
+    },
+    {
+      customer_name: 'Edward Foster',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Edward Gonzales',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Edward Griffin',
+      num_orders: 2,
+      lifetime_value: 5913.24
+    },
+    {
+      customer_name: 'Edward Hayes',
+      num_orders: 2,
+      lifetime_value: 83.95
+    },
+    {
+      customer_name: 'Edward Henderson',
+      num_orders: 3,
+      lifetime_value: 6803.1382
+    },
+    {
+      customer_name: 'Edward Hughes',
+      num_orders: 3,
+      lifetime_value: 6843.5982
+    },
+    {
+      customer_name: 'Edward Jenkins',
+      num_orders: 3,
+      lifetime_value: 6777.1282
+    },
+    {
+      customer_name: 'Edward Long',
+      num_orders: 3,
+      lifetime_value: 6799.4496
+    },
+    {
+      customer_name: 'Edward Patterson',
+      num_orders: 3,
+      lifetime_value: 6864.4596
+    },
+    {
+      customer_name: 'Edward Perry',
+      num_orders: 3,
+      lifetime_value: 6832.1182
+    },
+    {
+      customer_name: 'Edward Powell',
+      num_orders: 2,
+      lifetime_value: 71.25
+    },
+    {
+      customer_name: 'Edward Price',
+      num_orders: 3,
+      lifetime_value: 214.25
+    },
+    {
+      customer_name: 'Edward Ross',
+      num_orders: 3,
+      lifetime_value: 6838.4596
+    },
+    {
+      customer_name: 'Edward Russell',
+      num_orders: 2,
+      lifetime_value: 4750.01
+    },
+    {
+      customer_name: 'Edward Washington',
+      num_orders: 3,
+      lifetime_value: 6812.1282
+    },
+    {
+      customer_name: 'Edward Wood',
+      num_orders: 3,
+      lifetime_value: 191.25
+    },
+    {
+      customer_name: 'Edwin Bhat',
+      num_orders: 1,
+      lifetime_value: 2351.96
+    },
+    {
+      customer_name: 'Edwin Chande',
+      num_orders: 1,
+      lifetime_value: 24.27
+    },
+    {
+      customer_name: 'Edwin Chander',
+      num_orders: 1,
+      lifetime_value: 141.98
+    },
+    {
+      customer_name: 'Edwin Chen',
+      num_orders: 3,
+      lifetime_value: 6765.4382
+    },
+    {
+      customer_name: 'Edwin Deng',
+      num_orders: 4,
+      lifetime_value: 286.88
+    },
+    {
+      customer_name: 'Edwin Ferrier',
+      num_orders: 2,
+      lifetime_value: 4795.31
+    },
+    {
+      customer_name: 'Edwin Gao',
+      num_orders: 2,
+      lifetime_value: 4523.5325
+    },
+    {
+      customer_name: 'Edwin Goel',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Edwin Guo',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Edwin He',
+      num_orders: 1,
+      lifetime_value: 42.28
+    },
+    {
+      customer_name: 'Edwin Hu',
+      num_orders: 2,
+      lifetime_value: 144.27
+    },
+    {
+      customer_name: 'Edwin Huang',
+      num_orders: 3,
+      lifetime_value: 6737.1482
+    },
+    {
+      customer_name: 'Edwin Jai',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Edwin Kumar',
+      num_orders: 1,
+      lifetime_value: 46.47
+    },
+    {
+      customer_name: 'Edwin Lal',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Edwin Li',
+      num_orders: 3,
+      lifetime_value: 91.92
+    },
+    {
+      customer_name: 'Edwin Liang',
+      num_orders: 1,
+      lifetime_value: 100.46
+    },
+    {
+      customer_name: 'Edwin Lin',
+      num_orders: 3,
+      lifetime_value: 83.97
+    },
+    {
+      customer_name: 'Edwin Liu',
+      num_orders: 3,
+      lifetime_value: 6815.0782
+    },
+    {
+      customer_name: 'Edwin Lu',
+      num_orders: 1,
+      lifetime_value: 91.95
+    },
+    {
+      customer_name: 'Edwin Luo',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Edwin Nara',
+      num_orders: 2,
+      lifetime_value: 4803.32
+    },
+    {
+      customer_name: 'Edwin Nath',
+      num_orders: 1,
+      lifetime_value: 30.97
+    },
+    {
+      customer_name: 'Edwin Pal',
+      num_orders: 3,
+      lifetime_value: 105.19
+    },
+    {
+      customer_name: 'Edwin Rai',
+      num_orders: 1,
+      lifetime_value: 2319.99
+    },
+    {
+      customer_name: 'Edwin Raje',
+      num_orders: 3,
+      lifetime_value: 105.19
+    },
+    {
+      customer_name: 'Edwin Raji',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Edwin Shan',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Edwin Sharma',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Edwin She',
+      num_orders: 2,
+      lifetime_value: 4558.5225
+    },
+    {
+      customer_name: 'Edwin Shen',
+      num_orders: 2,
+      lifetime_value: 4498.5325
+    },
+    {
+      customer_name: 'Edwin Sun',
+      num_orders: 3,
+      lifetime_value: 208.18
+    },
+    {
+      customer_name: 'Edwin Tang',
+      num_orders: 2,
+      lifetime_value: 195.97
+    },
+    {
+      customer_name: 'Edwin West',
+      num_orders: 3,
+      lifetime_value: 205.39
+    },
+    {
+      customer_name: 'Edwin Wu',
+      num_orders: 3,
+      lifetime_value: 6773.1382
+    },
+    {
+      customer_name: 'Edwin Xie',
+      num_orders: 2,
+      lifetime_value: 201.46
+    },
+    {
+      customer_name: 'Edwin Xu',
+      num_orders: 4,
+      lifetime_value: 149.84
+    },
+    {
+      customer_name: 'Edwin Xu',
+      num_orders: 1,
+      lifetime_value: 2309.97
+    },
+    {
+      customer_name: 'Edwin Yang',
+      num_orders: 3,
+      lifetime_value: 86.26
+    },
+    {
+      customer_name: 'Edwin Ye',
+      num_orders: 4,
+      lifetime_value: 281.47
+    },
+    {
+      customer_name: 'Edwin Yuan',
+      num_orders: 2,
+      lifetime_value: 4765.63
+    },
+    {
+      customer_name: 'Edwin Zhang',
+      num_orders: 3,
+      lifetime_value: 5669.8982
+    },
+    {
+      customer_name: 'Edwin Zhao',
+      num_orders: 1,
+      lifetime_value: 30.97
+    },
+    {
+      customer_name: 'Edwin Zheng',
+      num_orders: 2,
+      lifetime_value: 191.97
+    },
+    {
+      customer_name: 'Edwin Zhou',
+      num_orders: 2,
+      lifetime_value: 4798.34
+    },
+    {
+      customer_name: 'Edwin Zhu',
+      num_orders: 3,
+      lifetime_value: 6839.4596
+    },
+    {
+      customer_name: 'Elena Velez Amezaga',
+      num_orders: 1,
+      lifetime_value: 24.27
+    },
+    {
+      customer_name: 'Elijah Adams',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Elijah Allen',
+      num_orders: 1,
+      lifetime_value: 2319.99
+    },
+    {
+      customer_name: 'Elijah Baker',
+      num_orders: 1,
+      lifetime_value: 119.96
+    },
+    {
+      customer_name: 'Elijah Campbell',
+      num_orders: 2,
+      lifetime_value: 2700.0482
+    },
+    {
+      customer_name: 'Elijah Carter',
+      num_orders: 2,
+      lifetime_value: 4930.68
+    },
+    {
+      customer_name: 'Elijah Collins',
+      num_orders: 2,
+      lifetime_value: 4366.4096
+    },
+    {
+      customer_name: 'Elijah Edwards',
+      num_orders: 3,
+      lifetime_value: 6973.8725
+    },
+    {
+      customer_name: 'Elijah Evans',
+      num_orders: 2,
+      lifetime_value: 5908.25
+    },
+    {
+      customer_name: 'Elijah Hall',
+      num_orders: 2,
+      lifetime_value: 130.96
+    },
+    {
+      customer_name: 'Elijah Hernandez',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Elijah Hill',
+      num_orders: 2,
+      lifetime_value: 250.91
+    },
+    {
+      customer_name: 'Elijah King',
+      num_orders: 2,
+      lifetime_value: 4144.34
+    },
+    {
+      customer_name: 'Elijah McDonald',
+      num_orders: 2,
+      lifetime_value: 92.97
+    },
+    {
+      customer_name: 'Elijah Mitchell',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Elijah Nelson',
+      num_orders: 1,
+      lifetime_value: 64.47
+    },
+    {
+      customer_name: 'Elijah Parker',
+      num_orders: 2,
+      lifetime_value: 1371.95
+    },
+    {
+      customer_name: 'Elijah Perez',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Elijah Phillips',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Elijah Roberts',
+      num_orders: 2,
+      lifetime_value: 3117.97
+    },
+    {
+      customer_name: 'Elijah Scott',
+      num_orders: 2,
+      lifetime_value: 3028.0225
+    },
+    {
+      customer_name: 'Elijah Wright',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Elijah Young',
+      num_orders: 1,
+      lifetime_value: 54.98
+    },
+    {
+      customer_name: 'Elizabeth Alexander',
+      num_orders: 3,
+      lifetime_value: 197.55
+    },
+    {
+      customer_name: 'Elizabeth Barnes',
+      num_orders: 4,
+      lifetime_value: 7384.0982
+    },
+    {
+      customer_name: 'Elizabeth Bradley',
+      num_orders: 4,
+      lifetime_value: 10899.62
+    },
+    {
+      customer_name: 'Elizabeth Brown',
+      num_orders: 3,
+      lifetime_value: 8079.05
+    },
+    {
+      customer_name: 'Elizabeth Bryant',
+      num_orders: 3,
+      lifetime_value: 6846.9196
+    },
+    {
+      customer_name: 'Elizabeth Butler',
+      num_orders: 3,
+      lifetime_value: 6801.4496
+    },
+    {
+      customer_name: 'Elizabeth Clark',
+      num_orders: 2,
+      lifetime_value: 234.44
+    },
+    {
+      customer_name: 'Elizabeth Coleman',
+      num_orders: 2,
+      lifetime_value: 77.96
+    },
+    {
+      customer_name: 'Elizabeth Davis',
+      num_orders: 3,
+      lifetime_value: 8105.31
+    },
+    {
+      customer_name: 'Elizabeth Diaz',
+      num_orders: 3,
+      lifetime_value: 192.97
+    },
+    {
+      customer_name: 'Elizabeth Garcia',
+      num_orders: 2,
+      lifetime_value: 47.94
+    },
+    {
+      customer_name: 'Elizabeth Gonzales',
+      num_orders: 3,
+      lifetime_value: 6805.4696
+    },
+    {
+      customer_name: 'Elizabeth Griffin',
+      num_orders: 3,
+      lifetime_value: 6785.1282
+    },
+    {
+      customer_name: 'Elizabeth Hall',
+      num_orders: 2,
+      lifetime_value: 5976.74
+    },
+    {
+      customer_name: 'Elizabeth Harris',
+      num_orders: 5,
+      lifetime_value: 275.5
+    },
+    {
+      customer_name: 'Elizabeth Hayes',
+      num_orders: 3,
+      lifetime_value: 296.19
+    },
+    {
+      customer_name: 'Elizabeth Henderson',
+      num_orders: 1,
+      lifetime_value: 44.98
+    },
+    {
+      customer_name: 'Elizabeth Hughes',
+      num_orders: 3,
+      lifetime_value: 6859.4596
+    },
+    {
+      customer_name: 'Elizabeth Jackson',
+      num_orders: 3,
+      lifetime_value: 8171.52
+    },
+    {
+      customer_name: 'Elizabeth Jenkins',
+      num_orders: 3,
+      lifetime_value: 74.54
+    },
+    {
+      customer_name: 'Elizabeth Johnson',
+      num_orders: 3,
+      lifetime_value: 8248.01
+    },
+    {
+      customer_name: 'Elizabeth Jones',
+      num_orders: 3,
+      lifetime_value: 8155.98
+    },
+    {
+      customer_name: 'Elizabeth Lee',
+      num_orders: 2,
+      lifetime_value: 5994.72
+    },
+    {
+      customer_name: 'Elizabeth Lewis',
+      num_orders: 2,
+      lifetime_value: 5933.26
+    },
+    {
+      customer_name: 'Elizabeth Long',
+      num_orders: 3,
+      lifetime_value: 6785.1282
+    },
+    {
+      customer_name: 'Elizabeth Martin',
+      num_orders: 2,
+      lifetime_value: 42.95
+    },
+    {
+      customer_name: 'Elizabeth Martinez',
+      num_orders: 2,
+      lifetime_value: 51.94
+    },
+    {
+      customer_name: 'Elizabeth Miller',
+      num_orders: 3,
+      lifetime_value: 8113.03
+    },
+    {
+      customer_name: 'Elizabeth Moore',
+      num_orders: 3,
+      lifetime_value: 41.26
+    },
+    {
+      customer_name: 'Elizabeth Patterson',
+      num_orders: 3,
+      lifetime_value: 6829.4696
+    },
+    {
+      customer_name: 'Elizabeth Perry',
+      num_orders: 3,
+      lifetime_value: 6813.1182
+    },
+    {
+      customer_name: 'Elizabeth Powell',
+      num_orders: 3,
+      lifetime_value: 6839.4596
+    },
+    {
+      customer_name: 'Elizabeth Price',
+      num_orders: 2,
+      lifetime_value: 182.94
+    },
+    {
+      customer_name: 'Elizabeth Robinson',
+      num_orders: 3,
+      lifetime_value: 5035.81
+    },
+    {
+      customer_name: 'Elizabeth Rodriguez',
+      num_orders: 2,
+      lifetime_value: 136.25
+    },
+    {
+      customer_name: 'Elizabeth Ross',
+      num_orders: 3,
+      lifetime_value: 6863.4396
+    },
+    {
+      customer_name: 'Elizabeth Russell',
+      num_orders: 3,
+      lifetime_value: 315.26
+    },
+    {
+      customer_name: 'Elizabeth Simmons',
+      num_orders: 3,
+      lifetime_value: 6893.0782
+    },
+    {
+      customer_name: 'Elizabeth Taylor',
+      num_orders: 3,
+      lifetime_value: 8165.96
+    },
+    {
+      customer_name: 'Elizabeth Thomas',
+      num_orders: 3,
+      lifetime_value: 8204.99
+    },
+    {
+      customer_name: 'Elizabeth Thompson',
+      num_orders: 2,
+      lifetime_value: 5897.23
+    },
+    {
+      customer_name: 'Elizabeth Walker',
+      num_orders: 1,
+      lifetime_value: 42.28
+    },
+    {
+      customer_name: 'Elizabeth Weisman',
+      num_orders: 3,
+      lifetime_value: 63.04
+    },
+    {
+      customer_name: 'Elizabeth West',
+      num_orders: 3,
+      lifetime_value: 187.98
+    },
+    {
+      customer_name: 'Elizabeth White',
+      num_orders: 3,
+      lifetime_value: 63.24
+    },
+    {
+      customer_name: 'Elizabeth Wilson',
+      num_orders: 3,
+      lifetime_value: 8095.32
+    },
+    {
+      customer_name: 'Elizabeth Wood',
+      num_orders: 1,
+      lifetime_value: 8.99
+    },
+    {
+      customer_name: 'Emily Alexander',
+      num_orders: 3,
+      lifetime_value: 6819.1082
+    },
+    {
+      customer_name: 'Emily Anderson',
+      num_orders: 3,
+      lifetime_value: 6901.4196
+    },
+    {
+      customer_name: 'Emily Barnes',
+      num_orders: 2,
+      lifetime_value: 4823.01
+    },
+    {
+      customer_name: 'Emily Bennett',
+      num_orders: 4,
+      lifetime_value: 200.2
+    },
+    {
+      customer_name: 'Emily Brown',
+      num_orders: 2,
+      lifetime_value: 4381.3896
+    },
+    {
+      customer_name: 'Emily Bryant',
+      num_orders: 3,
+      lifetime_value: 5716.5196
+    },
+    {
+      customer_name: 'Emily Butler',
+      num_orders: 3,
+      lifetime_value: 386.96
+    },
+    {
+      customer_name: 'Emily Clark',
+      num_orders: 2,
+      lifetime_value: 5883.25
+    },
+    {
+      customer_name: 'Emily Coleman',
+      num_orders: 3,
+      lifetime_value: 5641.8982
+    },
+    {
+      customer_name: 'Emily Davis',
+      num_orders: 2,
+      lifetime_value: 4415.6796
+    },
+    {
+      customer_name: 'Emily Diaz',
+      num_orders: 2,
+      lifetime_value: 4813.32
+    },
+    {
+      customer_name: 'Emily Flores',
+      num_orders: 3,
+      lifetime_value: 230.25
+    },
+    {
+      customer_name: 'Emily Foster',
+      num_orders: 3,
+      lifetime_value: 125.51
+    },
+    {
+      customer_name: 'Emily Garcia',
+      num_orders: 2,
+      lifetime_value: 3924.97
+    },
+    {
+      customer_name: 'Emily Gonzales',
+      num_orders: 3,
+      lifetime_value: 168.67
+    },
+    {
+      customer_name: 'Emily Griffin',
+      num_orders: 2,
+      lifetime_value: 155
+    },
+    {
+      customer_name: 'Emily Hall',
+      num_orders: 3,
+      lifetime_value: 6829.3796
+    },
+    {
+      customer_name: 'Emily Harris',
+      num_orders: 2,
+      lifetime_value: 3947.25
+    },
+    {
+      customer_name: 'Emily Hayes',
+      num_orders: 1,
+      lifetime_value: 42.28
+    },
+    {
+      customer_name: 'Emily Hughes',
+      num_orders: 3,
+      lifetime_value: 6799.4282
+    },
+    {
+      customer_name: 'Emily Jackson',
+      num_orders: 2,
+      lifetime_value: 3914.98
+    },
+    {
+      customer_name: 'Emily Jenkins',
+      num_orders: 3,
+      lifetime_value: 6855.4396
+    },
+    {
+      customer_name: 'Emily Johnson',
+      num_orders: 2,
+      lifetime_value: 5967.23
+    },
+    {
+      customer_name: 'Emily Jones',
+      num_orders: 3,
+      lifetime_value: 6909.0982
+    },
+    {
+      customer_name: 'Emily Lee',
+      num_orders: 2,
+      lifetime_value: 5973.24
+    },
+    {
+      customer_name: 'Emily Long',
+      num_orders: 3,
+      lifetime_value: 5694.8982
+    },
+    {
+      customer_name: 'Emily Martin',
+      num_orders: 2,
+      lifetime_value: 3939.98
+    },
+    {
+      customer_name: 'Emily Martinez',
+      num_orders: 2,
+      lifetime_value: 3938.95
+    },
+    {
+      customer_name: 'Emily Miller',
+      num_orders: 2,
+      lifetime_value: 4401.0582
+    },
+    {
+      customer_name: 'Emily Moore',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Emily Patterson',
+      num_orders: 3,
+      lifetime_value: 6799.4496
+    },
+    {
+      customer_name: 'Emily Perry',
+      num_orders: 3,
+      lifetime_value: 6850.5782
+    },
+    {
+      customer_name: 'Emily Powell',
+      num_orders: 3,
+      lifetime_value: 6808.1482
+    },
+    {
+      customer_name: 'Emily Price',
+      num_orders: 2,
+      lifetime_value: 4552.5225
+    },
+    {
+      customer_name: 'Emily Robinson',
+      num_orders: 2,
+      lifetime_value: 4066.93
+    },
+    {
+      customer_name: 'Emily Rodriguez',
+      num_orders: 2,
+      lifetime_value: 86.75
+    },
+    {
+      customer_name: 'Emily Ross',
+      num_orders: 3,
+      lifetime_value: 6915.4382
+    },
+    {
+      customer_name: 'Emily Russell',
+      num_orders: 3,
+      lifetime_value: 256.24
+    },
+    {
+      customer_name: 'Emily Simmons',
+      num_orders: 3,
+      lifetime_value: 6762.1482
+    },
+    {
+      customer_name: 'Emily Smith',
+      num_orders: 3,
+      lifetime_value: 6955.4096
+    },
+    {
+      customer_name: 'Emily Taylor',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Emily Thomas',
+      num_orders: 2,
+      lifetime_value: 3948.97
+    },
+    {
+      customer_name: 'Emily Thompson',
+      num_orders: 2,
+      lifetime_value: 114.96
+    },
+    {
+      customer_name: 'Emily Walker',
+      num_orders: 2,
+      lifetime_value: 119.45
+    },
+    {
+      customer_name: 'Emily Washington',
+      num_orders: 3,
+      lifetime_value: 190.27
+    },
+    {
+      customer_name: 'Emily White',
+      num_orders: 2,
+      lifetime_value: 3967.26
+    },
+    {
+      customer_name: 'Emily Williams',
+      num_orders: 2,
+      lifetime_value: 5968.25
+    },
+    {
+      customer_name: 'Emily Wilson',
+      num_orders: 2,
+      lifetime_value: 4354.0782
+    },
+    {
+      customer_name: 'Emily Wood',
+      num_orders: 2,
+      lifetime_value: 43.99
+    },
+    {
+      customer_name: 'Emma Anderson',
+      num_orders: 2,
+      lifetime_value: 209.23
+    },
+    {
+      customer_name: 'Emma Bailey',
+      num_orders: 2,
+      lifetime_value: 3492.7575
+    },
+    {
+      customer_name: 'Emma Bennett',
+      num_orders: 1,
+      lifetime_value: 1179.47
+    },
+    {
+      customer_name: 'Emma Bradley',
+      num_orders: 2,
+      lifetime_value: 1854.5782
+    },
+    {
+      customer_name: 'Emma Brown',
+      num_orders: 2,
+      lifetime_value: 89.98
+    },
+    {
+      customer_name: 'Emma Bryant',
+      num_orders: 2,
+      lifetime_value: 96.74
+    },
+    {
+      customer_name: 'Emma Butler',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Emma Clark',
+      num_orders: 2,
+      lifetime_value: 109.97
+    },
+    {
+      customer_name: 'Emma Coleman',
+      num_orders: 1,
+      lifetime_value: 1179.97
+    },
+    {
+      customer_name: 'Emma Cook',
+      num_orders: 1,
+      lifetime_value: 6.28
+    },
+    {
+      customer_name: 'Emma Cooper',
+      num_orders: 2,
+      lifetime_value: 1382.97
+    },
+    {
+      customer_name: 'Emma Cox',
+      num_orders: 1,
+      lifetime_value: 6.28
+    },
+    {
+      customer_name: 'Emma Davis',
+      num_orders: 2,
+      lifetime_value: 89.98
+    },
+    {
+      customer_name: 'Emma Diaz',
+      num_orders: 2,
+      lifetime_value: 61.75
+    },
+    {
+      customer_name: 'Emma Flores',
+      num_orders: 2,
+      lifetime_value: 5358.24
+    },
+    {
+      customer_name: 'Emma Foster',
+      num_orders: 2,
+      lifetime_value: 90.95
+    },
+    {
+      customer_name: 'Emma Garcia',
+      num_orders: 2,
+      lifetime_value: 42.95
+    },
+    {
+      customer_name: 'Emma Gonzales',
+      num_orders: 2,
+      lifetime_value: 57.76
+    },
+    {
+      customer_name: 'Emma Gray',
+      num_orders: 2,
+      lifetime_value: 1938.47
+    },
+    {
+      customer_name: 'Emma Griffin',
+      num_orders: 2,
+      lifetime_value: 173.93
+    },
+    {
+      customer_name: 'Emma Hall',
+      num_orders: 3,
+      lifetime_value: 8149.04
+    },
+    {
+      customer_name: 'Emma Harris',
+      num_orders: 2,
+      lifetime_value: 5948.24
+    },
+    {
+      customer_name: 'Emma Henderson',
+      num_orders: 1,
+      lifetime_value: 579.97
+    },
+    {
+      customer_name: 'Emma Howard',
+      num_orders: 1,
+      lifetime_value: 43.97
+    },
+    {
+      customer_name: 'Emma Hughes',
+      num_orders: 2,
+      lifetime_value: 6110.6
+    },
+    {
+      customer_name: 'Emma Jackson',
+      num_orders: 2,
+      lifetime_value: 114.92
+    },
+    {
+      customer_name: 'Emma James',
+      num_orders: 1,
+      lifetime_value: 63.97
+    },
+    {
+      customer_name: 'Emma Jenkins',
+      num_orders: 1,
+      lifetime_value: 1183.47
+    },
+    {
+      customer_name: 'Emma Johnson',
+      num_orders: 2,
+      lifetime_value: 124.97
+    },
+    {
+      customer_name: 'Emma Jones',
+      num_orders: 2,
+      lifetime_value: 124.97
+    },
+    {
+      customer_name: 'Emma Kelly',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Emma Lee',
+      num_orders: 1,
+      lifetime_value: 2376.96
+    },
+    {
+      customer_name: 'Emma Lewis',
+      num_orders: 2,
+      lifetime_value: 82.93
+    },
+    {
+      customer_name: 'Emma Long',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Emma Martinez',
+      num_orders: 2,
+      lifetime_value: 82.93
+    },
+    {
+      customer_name: 'Emma Miller',
+      num_orders: 2,
+      lifetime_value: 133.96
+    },
+    {
+      customer_name: 'Emma Moore',
+      num_orders: 2,
+      lifetime_value: 84.99
+    },
+    {
+      customer_name: 'Emma Morgan',
+      num_orders: 1,
+      lifetime_value: 6.28
+    },
+    {
+      customer_name: 'Emma Morris',
+      num_orders: 1,
+      lifetime_value: 3.99
+    },
+    {
+      customer_name: 'Emma Murphy',
+      num_orders: 1,
+      lifetime_value: 28.98
+    },
+    {
+      customer_name: 'Emma Patterson',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Emma Perry',
+      num_orders: 1,
+      lifetime_value: 1183.47
+    },
+    {
+      customer_name: 'Emma Peterson',
+      num_orders: 1,
+      lifetime_value: 3.99
+    },
+    {
+      customer_name: 'Emma Price',
+      num_orders: 1,
+      lifetime_value: 1155.48
+    },
+    {
+      customer_name: 'Emma Ramirez',
+      num_orders: 1,
+      lifetime_value: 38.98
+    },
+    {
+      customer_name: 'Emma Reed',
+      num_orders: 1,
+      lifetime_value: 6.28
+    },
+    {
+      customer_name: 'Emma Richardson',
+      num_orders: 1,
+      lifetime_value: 53.47
+    },
+    {
+      customer_name: 'Emma Rivera',
+      num_orders: 2,
+      lifetime_value: 3478.7775
+    },
+    {
+      customer_name: 'Emma Robinson',
+      num_orders: 2,
+      lifetime_value: 77.27
+    },
+    {
+      customer_name: 'Emma Rodriguez',
+      num_orders: 2,
+      lifetime_value: 5897.53
+    },
+    {
+      customer_name: 'Emma Rogers',
+      num_orders: 1,
+      lifetime_value: 6.28
+    },
+    {
+      customer_name: 'Emma Ross',
+      num_orders: 1,
+      lifetime_value: 1120.49
+    },
+    {
+      customer_name: 'Emma Russell',
+      num_orders: 2,
+      lifetime_value: 83.98
+    },
+    {
+      customer_name: 'Emma Sanchez',
+      num_orders: 2,
+      lifetime_value: 1934.75
+    },
+    {
+      customer_name: 'Emma Sandberg',
+      num_orders: 1,
+      lifetime_value: 1120.49
+    },
+    {
+      customer_name: 'Emma Simmons',
+      num_orders: 2,
+      lifetime_value: 112.24
+    },
+    {
+      customer_name: 'Emma Stewart',
+      num_orders: 1,
+      lifetime_value: 23.78
+    },
+    {
+      customer_name: 'Emma Taylor',
+      num_orders: 2,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Emma Thomas',
+      num_orders: 2,
+      lifetime_value: 47.94
+    },
+    {
+      customer_name: 'Emma Thompson',
+      num_orders: 2,
+      lifetime_value: 72.21
+    },
+    {
+      customer_name: 'Emma Torres',
+      num_orders: 1,
+      lifetime_value: 6.28
+    },
+    {
+      customer_name: 'Emma Walker',
+      num_orders: 2,
+      lifetime_value: 130.44
+    },
+    {
+      customer_name: 'Emma Ward',
+      num_orders: 1,
+      lifetime_value: 24.99
+    },
+    {
+      customer_name: 'Emma Washington',
+      num_orders: 2,
+      lifetime_value: 6056.61
+    },
+    {
+      customer_name: 'Emma Watson',
+      num_orders: 1,
+      lifetime_value: 23.22
+    },
+    {
+      customer_name: 'Emma White',
+      num_orders: 5,
+      lifetime_value: 247.01
+    },
+    {
+      customer_name: 'Emma Williams',
+      num_orders: 2,
+      lifetime_value: 149.46
+    },
+    {
+      customer_name: 'Emma Wilson',
+      num_orders: 2,
+      lifetime_value: 124.97
+    },
+    {
+      customer_name: 'Eric Adams',
+      num_orders: 2,
+      lifetime_value: 211.97
+    },
+    {
+      customer_name: 'Eric Allen',
+      num_orders: 1,
+      lifetime_value: 1709.98
+    },
+    {
+      customer_name: 'Eric Baker',
+      num_orders: 1,
+      lifetime_value: 562.96
+    },
+    {
+      customer_name: 'Eric Campbell',
+      num_orders: 2,
+      lifetime_value: 4386.3682
+    },
+    {
+      customer_name: 'Eric Carter',
+      num_orders: 1,
+      lifetime_value: 24.99
+    },
+    {
+      customer_name: 'Eric Collins',
+      num_orders: 1,
+      lifetime_value: 90.47
+    },
+    {
+      customer_name: 'Eric Edwards',
+      num_orders: 1,
+      lifetime_value: 35
+    },
+    {
+      customer_name: 'Eric Evans',
+      num_orders: 1,
+      lifetime_value: 78.96
+    },
+    {
+      customer_name: 'Eric Gonzalez',
+      num_orders: 1,
+      lifetime_value: 32.28
+    },
+    {
+      customer_name: 'Eric Green',
+      num_orders: 1,
+      lifetime_value: 2541.32
+    },
+    {
+      customer_name: 'Eric Hall',
+      num_orders: 1,
+      lifetime_value: 12.94
+    },
+    {
+      customer_name: 'Eric Hill',
+      num_orders: 2,
+      lifetime_value: 66.58
+    },
+    {
+      customer_name: 'Eric King',
+      num_orders: 1,
+      lifetime_value: 2309.97
+    },
+    {
+      customer_name: 'Eric Lopez',
+      num_orders: 3,
+      lifetime_value: 7192.39
+    },
+    {
+      customer_name: 'Eric Parker',
+      num_orders: 1,
+      lifetime_value: 127.28
+    },
+    {
+      customer_name: 'Eric Perez',
+      num_orders: 2,
+      lifetime_value: 4761.03
+    },
+    {
+      customer_name: 'Eric Phillips',
+      num_orders: 1,
+      lifetime_value: 650.47
+    },
+    {
+      customer_name: 'Eric Roberts',
+      num_orders: 1,
+      lifetime_value: 124.99
+    },
+    {
+      customer_name: 'Eric Scott',
+      num_orders: 1,
+      lifetime_value: 1700.99
+    },
+    {
+      customer_name: 'Eric Turner',
+      num_orders: 1,
+      lifetime_value: 64.97
+    },
+    {
+      customer_name: 'Eric Wright',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Eric Young',
+      num_orders: 1,
+      lifetime_value: 1760.47
+    },
+    {
+      customer_name: 'Erik Alvarez',
+      num_orders: 2,
+      lifetime_value: 4127.25
+    },
+    {
+      customer_name: 'Erik Blanco',
+      num_orders: 1,
+      lifetime_value: 28.98
+    },
+    {
+      customer_name: 'Erik Diaz',
+      num_orders: 1,
+      lifetime_value: 42.28
+    },
+    {
+      customer_name: 'Erik Dominguez',
+      num_orders: 2,
+      lifetime_value: 2755.4175
+    },
+    {
+      customer_name: 'Erik Gill',
+      num_orders: 2,
+      lifetime_value: 2508.97
+    },
+    {
+      customer_name: 'Erik Gomez',
+      num_orders: 2,
+      lifetime_value: 4132.24
+    },
+    {
+      customer_name: 'Erik Gutierrez',
+      num_orders: 2,
+      lifetime_value: 2736.4175
+    },
+    {
+      customer_name: 'Erik Hernandez',
+      num_orders: 1,
+      lifetime_value: 39.99
+    },
+    {
+      customer_name: 'Erik Jimenez',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Erik Martin',
+      num_orders: 2,
+      lifetime_value: 1587.4075
+    },
+    {
+      customer_name: 'Erik Munoz',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Erik Navarro',
+      num_orders: 1,
+      lifetime_value: 67.97
+    },
+    {
+      customer_name: 'Erik Ortega',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Erik Ramos',
+      num_orders: 2,
+      lifetime_value: 2483.98
+    },
+    {
+      customer_name: 'Erik Romero',
+      num_orders: 1,
+      lifetime_value: 63.97
+    },
+    {
+      customer_name: 'Erik Rubio',
+      num_orders: 2,
+      lifetime_value: 1577.3875
+    },
+    {
+      customer_name: 'Erik Ruiz',
+      num_orders: 1,
+      lifetime_value: 42.28
+    },
+    {
+      customer_name: 'Erik Sanz',
+      num_orders: 2,
+      lifetime_value: 1590.4175
+    },
+    {
+      customer_name: 'Erik Serrano',
+      num_orders: 2,
+      lifetime_value: 2533.97
+    },
+    {
+      customer_name: 'Erik Suarez',
+      num_orders: 3,
+      lifetime_value: 4535.2775
+    },
+    {
+      customer_name: 'Erik Torres',
+      num_orders: 2,
+      lifetime_value: 2751.4175
+    },
+    {
+      customer_name: 'Erik Vazquez',
+      num_orders: 2,
+      lifetime_value: 2736.4175
+    },
+    {
+      customer_name: 'Erika Alvarez',
+      num_orders: 2,
+      lifetime_value: 6029.57
+    },
+    {
+      customer_name: 'Erika Blanco',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Erika Carlson',
+      num_orders: 2,
+      lifetime_value: 5333.25
+    },
+    {
+      customer_name: 'Erika Diaz',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Erika Dominguez',
+      num_orders: 2,
+      lifetime_value: 122.76
+    },
+    {
+      customer_name: 'Erika Gill',
+      num_orders: 2,
+      lifetime_value: 6098.58
+    },
+    {
+      customer_name: 'Erika Gomez',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Erika Gutierrez',
+      num_orders: 2,
+      lifetime_value: 5333.25
+    },
+    {
+      customer_name: 'Erika Hernandez',
+      num_orders: 2,
+      lifetime_value: 6035.6
+    },
+    {
+      customer_name: 'Erika Munoz',
+      num_orders: 2,
+      lifetime_value: 5308.24
+    },
+    {
+      customer_name: 'Erika Navarro',
+      num_orders: 2,
+      lifetime_value: 5357.74
+    },
+    {
+      customer_name: 'Erika Ortega',
+      num_orders: 2,
+      lifetime_value: 5333.25
+    },
+    {
+      customer_name: 'Erika Romero',
+      num_orders: 2,
+      lifetime_value: 5328.23
+    },
+    {
+      customer_name: 'Erika Rubio',
+      num_orders: 2,
+      lifetime_value: 86.27
+    },
+    {
+      customer_name: 'Erika Ruiz',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Erika Sanz',
+      num_orders: 2,
+      lifetime_value: 5314.25
+    },
+    {
+      customer_name: 'Erika Serrano',
+      num_orders: 2,
+      lifetime_value: 6035.6
+    },
+    {
+      customer_name: 'Erika Suarez',
+      num_orders: 2,
+      lifetime_value: 6056.51
+    },
+    {
+      customer_name: 'Erika Torres',
+      num_orders: 2,
+      lifetime_value: 59.26
+    },
+    {
+      customer_name: 'Erika Vazquez',
+      num_orders: 2,
+      lifetime_value: 237.26
+    },
+    {
+      customer_name: 'Ethan Anderson',
+      num_orders: 2,
+      lifetime_value: 4821.72
+    },
+    {
+      customer_name: 'Ethan Brown',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Ethan Clark',
+      num_orders: 1,
+      lifetime_value: 1749.96
+    },
+    {
+      customer_name: 'Ethan Davis',
+      num_orders: 1,
+      lifetime_value: 67.93
+    },
+    {
+      customer_name: 'Ethan Garcia',
+      num_orders: 2,
+      lifetime_value: 3001.0425
+    },
+    {
+      customer_name: 'Ethan Harris',
+      num_orders: 2,
+      lifetime_value: 3961.0325
+    },
+    {
+      customer_name: 'Ethan Jackson',
+      num_orders: 2,
+      lifetime_value: 3882.5525
+    },
+    {
+      customer_name: 'Ethan Johnson',
+      num_orders: 2,
+      lifetime_value: 3921.0225
+    },
+    {
+      customer_name: 'Ethan Jones',
+      num_orders: 3,
+      lifetime_value: 4158.7175
+    },
+    {
+      customer_name: 'Ethan Lee',
+      num_orders: 2,
+      lifetime_value: 2811.5225
+    },
+    {
+      customer_name: 'Ethan Lewis',
+      num_orders: 2,
+      lifetime_value: 2753.5225
+    },
+    {
+      customer_name: 'Ethan Martin',
+      num_orders: 2,
+      lifetime_value: 3045.3
+    },
+    {
+      customer_name: 'Ethan Martinez',
+      num_orders: 2,
+      lifetime_value: 159.94
+    },
+    {
+      customer_name: 'Ethan Moore',
+      num_orders: 2,
+      lifetime_value: 4733.75
+    },
+    {
+      customer_name: 'Ethan Robinson',
+      num_orders: 1,
+      lifetime_value: 49.48
+    },
+    {
+      customer_name: 'Ethan Rodriguez',
+      num_orders: 1,
+      lifetime_value: 28.98
+    },
+    {
+      customer_name: 'Ethan Smith',
+      num_orders: 2,
+      lifetime_value: 2726.4175
+    },
+    {
+      customer_name: 'Ethan Taylor',
+      num_orders: 2,
+      lifetime_value: 4698.76
+    },
+    {
+      customer_name: 'Ethan Thomas',
+      num_orders: 1,
+      lifetime_value: 37.27
+    },
+    {
+      customer_name: 'Ethan Thompson',
+      num_orders: 2,
+      lifetime_value: 2435.0782
+    },
+    {
+      customer_name: 'Ethan Walker',
+      num_orders: 2,
+      lifetime_value: 3932.5425
+    },
+    {
+      customer_name: 'Ethan White',
+      num_orders: 2,
+      lifetime_value: 2781.5425
+    },
+    {
+      customer_name: 'Ethan Williams',
+      num_orders: 1,
+      lifetime_value: 40.23
+    },
+    {
+      customer_name: 'Ethan Wilson',
+      num_orders: 2,
+      lifetime_value: 4761.74
+    },
+    {
+      customer_name: 'Evan Adams',
+      num_orders: 2,
+      lifetime_value: 140.94
+    },
+    {
+      customer_name: 'Evan Allen',
+      num_orders: 1,
+      lifetime_value: 2369.96
+    },
+    {
+      customer_name: 'Evan Bailey',
+      num_orders: 2,
+      lifetime_value: 59.98
+    },
+    {
+      customer_name: 'Evan Baker',
+      num_orders: 1,
+      lifetime_value: 98.96
+    },
+    {
+      customer_name: 'Evan Bradley',
+      num_orders: 2,
+      lifetime_value: 3058.31
+    },
+    {
+      customer_name: 'Evan Brooks',
+      num_orders: 2,
+      lifetime_value: 3297.7175
+    },
+    {
+      customer_name: 'Evan Campbell',
+      num_orders: 2,
+      lifetime_value: 79.25
+    },
+    {
+      customer_name: 'Evan Carter',
+      num_orders: 2,
+      lifetime_value: 14.56
+    },
+    {
+      customer_name: 'Evan Collins',
+      num_orders: 2,
+      lifetime_value: 2668.3796
+    },
+    {
+      customer_name: 'Evan Cook',
+      num_orders: 2,
+      lifetime_value: 3120.26
+    },
+    {
+      customer_name: 'Evan Cooper',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Evan Cox',
+      num_orders: 3,
+      lifetime_value: 6689.58
+    },
+    {
+      customer_name: 'Evan Edwards',
+      num_orders: 2,
+      lifetime_value: 63.97
+    },
+    {
+      customer_name: 'Evan Evans',
+      num_orders: 1,
+      lifetime_value: 114.96
+    },
+    {
+      customer_name: 'Evan Gonzalez',
+      num_orders: 1,
+      lifetime_value: 24.99
+    },
+    {
+      customer_name: 'Evan Gray',
+      num_orders: 2,
+      lifetime_value: 3355.4275
+    },
+    {
+      customer_name: 'Evan Green',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Evan Hall',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Evan Hernandez',
+      num_orders: 2,
+      lifetime_value: 4467.74
+    },
+    {
+      customer_name: 'Evan Hill',
+      num_orders: 1,
+      lifetime_value: 2391.43
+    },
+    {
+      customer_name: 'Evan Howard',
+      num_orders: 2,
+      lifetime_value: 5912.73
+    },
+    {
+      customer_name: 'Evan James',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Evan Kelly',
+      num_orders: 1,
+      lifetime_value: 38.88
+    },
+    {
+      customer_name: 'Evan King',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Evan Lopez',
+      num_orders: 2,
+      lifetime_value: 66.26
+    },
+    {
+      customer_name: 'Evan Mitchell',
+      num_orders: 2,
+      lifetime_value: 4921.69
+    },
+    {
+      customer_name: 'Evan Morgan',
+      num_orders: 3,
+      lifetime_value: 8367.3
+    },
+    {
+      customer_name: 'Evan Murphy',
+      num_orders: 2,
+      lifetime_value: 4143.26
+    },
+    {
+      customer_name: 'Evan Nelson',
+      num_orders: 1,
+      lifetime_value: 54.98
+    },
+    {
+      customer_name: 'Evan Parker',
+      num_orders: 2,
+      lifetime_value: 62.27
+    },
+    {
+      customer_name: 'Evan Perez',
+      num_orders: 2,
+      lifetime_value: 4679.06
+    },
+    {
+      customer_name: 'Evan Peterson',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Evan Phillips',
+      num_orders: 1,
+      lifetime_value: 166.28
+    },
+    {
+      customer_name: 'Evan Ramirez',
+      num_orders: 1,
+      lifetime_value: 42.28
+    },
+    {
+      customer_name: 'Evan Reed',
+      num_orders: 2,
+      lifetime_value: 3102.98
+    },
+    {
+      customer_name: 'Evan Richardson',
+      num_orders: 1,
+      lifetime_value: 60.95
+    },
+    {
+      customer_name: 'Evan Rivera',
+      num_orders: 2,
+      lifetime_value: 3159.44
+    },
+    {
+      customer_name: 'Evan Rogers',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Evan Sanchez',
+      num_orders: 2,
+      lifetime_value: 126.95
+    },
+    {
+      customer_name: 'Evan Sanders',
+      num_orders: 2,
+      lifetime_value: 74.98
+    },
+    {
+      customer_name: 'Evan Scott',
+      num_orders: 1,
+      lifetime_value: 2457.33
+    },
+    {
+      customer_name: 'Evan Stewart',
+      num_orders: 2,
+      lifetime_value: 4424.0782
+    },
+    {
+      customer_name: 'Evan Torres',
+      num_orders: 3,
+      lifetime_value: 5152.6982
+    },
+    {
+      customer_name: 'Evan Turner',
+      num_orders: 2,
+      lifetime_value: 2746.5525
+    },
+    {
+      customer_name: 'Evan Ward',
+      num_orders: 2,
+      lifetime_value: 1588.5682
+    },
+    {
+      customer_name: 'Evan Watson',
+      num_orders: 3,
+      lifetime_value: 128.46
+    },
+    {
+      customer_name: 'Evan Wright',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Evan Young',
+      num_orders: 1,
+      lifetime_value: 64.47
+    },
+    {
+      customer_name: 'Felicia Alonso',
+      num_orders: 3,
+      lifetime_value: 121.56
+    },
+    {
+      customer_name: 'Felicia Blanco',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Felicia Carlson',
+      num_orders: 2,
+      lifetime_value: 3335.4175
+    },
+    {
+      customer_name: 'Felicia Diaz',
+      num_orders: 3,
+      lifetime_value: 5652.5396
+    },
+    {
+      customer_name: 'Felicia Dominguez',
+      num_orders: 3,
+      lifetime_value: 5234.3982
+    },
+    {
+      customer_name: 'Felicia Gill',
+      num_orders: 2,
+      lifetime_value: 3351.3975
+    },
+    {
+      customer_name: 'Felicia Gomez',
+      num_orders: 3,
+      lifetime_value: 3630.9282
+    },
+    {
+      customer_name: 'Felicia Gutierrez',
+      num_orders: 5,
+      lifetime_value: 195.22
+    },
+    {
+      customer_name: 'Felicia Jimenez',
+      num_orders: 2,
+      lifetime_value: 2786.4075
+    },
+    {
+      customer_name: 'Felicia Martin',
+      num_orders: 1,
+      lifetime_value: 85.48
+    },
+    {
+      customer_name: 'Felicia Moreno',
+      num_orders: 2,
+      lifetime_value: 1794.1975
+    },
+    {
+      customer_name: 'Felicia Moyer',
+      num_orders: 2,
+      lifetime_value: 4746.3
+    },
+    {
+      customer_name: 'Felicia Munoz',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Felicia Ortega',
+      num_orders: 3,
+      lifetime_value: 3652.1982
+    },
+    {
+      customer_name: 'Felicia Ramos',
+      num_orders: 1,
+      lifetime_value: 45.95
+    },
+    {
+      customer_name: 'Felicia Romero',
+      num_orders: 3,
+      lifetime_value: 5137.7082
+    },
+    {
+      customer_name: 'Felicia Rubio',
+      num_orders: 3,
+      lifetime_value: 3636.9082
+    },
+    {
+      customer_name: 'Felicia Ruiz',
+      num_orders: 3,
+      lifetime_value: 5653.9182
+    },
+    {
+      customer_name: 'Felicia Suarez',
+      num_orders: 3,
+      lifetime_value: 5108.7596
+    },
+    {
+      customer_name: 'Felicia Townsend',
+      num_orders: 2,
+      lifetime_value: 1804.9175
+    },
+    {
+      customer_name: 'Felicia Vazquez',
+      num_orders: 2,
+      lifetime_value: 3319.6975
+    },
+    {
+      customer_name: 'Fernando Alexander',
+      num_orders: 3,
+      lifetime_value: 6823.1482
+    },
+    {
+      customer_name: 'Fernando Barnes',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Fernando Bennett',
+      num_orders: 4,
+      lifetime_value: 230.68
+    },
+    {
+      customer_name: 'Fernando Bryant',
+      num_orders: 3,
+      lifetime_value: 6817.1382
+    },
+    {
+      customer_name: 'Fernando Butler',
+      num_orders: 3,
+      lifetime_value: 121.25
+    },
+    {
+      customer_name: 'Fernando Coleman',
+      num_orders: 3,
+      lifetime_value: 6842.5982
+    },
+    {
+      customer_name: 'Fernando Diaz',
+      num_orders: 3,
+      lifetime_value: 6813.1182
+    },
+    {
+      customer_name: 'Fernando Flores',
+      num_orders: 3,
+      lifetime_value: 6831.4182
+    },
+    {
+      customer_name: 'Fernando Gonzales',
+      num_orders: 3,
+      lifetime_value: 138.54
+    },
+    {
+      customer_name: 'Fernando Griffin',
+      num_orders: 3,
+      lifetime_value: 6880.6182
+    },
+    {
+      customer_name: 'Fernando Hayes',
+      num_orders: 3,
+      lifetime_value: 5648.9182
+    },
+    {
+      customer_name: 'Fernando Hughes',
+      num_orders: 3,
+      lifetime_value: 6779.4182
+    },
+    {
+      customer_name: 'Fernando Jenkins',
+      num_orders: 3,
+      lifetime_value: 5650.8982
+    },
+    {
+      customer_name: 'Fernando Long',
+      num_orders: 3,
+      lifetime_value: 6832.4096
+    },
+    {
+      customer_name: 'Fernando Patterson',
+      num_orders: 3,
+      lifetime_value: 6807.4496
+    },
+    {
+      customer_name: 'Fernando Perry',
+      num_orders: 3,
+      lifetime_value: 5583.9382
+    },
+    {
+      customer_name: 'Fernando Price',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Fernando Ross',
+      num_orders: 1,
+      lifetime_value: 2376.96
+    },
+    {
+      customer_name: 'Fernando Russell',
+      num_orders: 3,
+      lifetime_value: 6797.1482
+    },
+    {
+      customer_name: 'Fernando Washington',
+      num_orders: 3,
+      lifetime_value: 6829.4496
+    },
+    {
+      customer_name: 'Fernando Wood',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Florian Stiller',
+      num_orders: 2,
+      lifetime_value: 3204.5782
+    },
+    {
+      customer_name: 'Francis Gomez',
+      num_orders: 2,
+      lifetime_value: 119.95
+    },
+    {
+      customer_name: 'Francis Ruiz',
+      num_orders: 1,
+      lifetime_value: 1179.97
+    },
+    {
+      customer_name: 'Francisco Ashe',
+      num_orders: 2,
+      lifetime_value: 76.15
+    },
+    {
+      customer_name: 'Francisco Chandra',
+      num_orders: 2,
+      lifetime_value: 4158.24
+    },
+    {
+      customer_name: 'Francisco Fernandez',
+      num_orders: 2,
+      lifetime_value: 4417.75
+    },
+    {
+      customer_name: 'Francisco Garcia',
+      num_orders: 2,
+      lifetime_value: 4377.75
+    },
+    {
+      customer_name: 'Francisco Gonzalez',
+      num_orders: 3,
+      lifetime_value: 233.81
+    },
+    {
+      customer_name: 'Francisco Javier Castrejón',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Francisco Kapoor',
+      num_orders: 2,
+      lifetime_value: 104.86
+    },
+    {
+      customer_name: 'Francisco Lopez',
+      num_orders: 1,
+      lifetime_value: 64.47
+    },
+    {
+      customer_name: 'Francisco Madan',
+      num_orders: 2,
+      lifetime_value: 4506.76
+    },
+    {
+      customer_name: 'Francisco Martinez',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Francisco Mehta',
+      num_orders: 2,
+      lifetime_value: 92.97
+    },
+    {
+      customer_name: 'Francisco Patel',
+      num_orders: 2,
+      lifetime_value: 4157.73
+    },
+    {
+      customer_name: 'Francisco Perez',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Francisco Prasad',
+      num_orders: 2,
+      lifetime_value: 92.97
+    },
+    {
+      customer_name: 'Francisco Raman',
+      num_orders: 2,
+      lifetime_value: 91.26
+    },
+    {
+      customer_name: 'Francisco Rana',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Francisco Rodriguez',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Francisco Sai',
+      num_orders: 2,
+      lifetime_value: 165.07
+    },
+    {
+      customer_name: 'Francisco Sanchez',
+      num_orders: 3,
+      lifetime_value: 180.71
+    },
+    {
+      customer_name: 'Francisco Sara',
+      num_orders: 2,
+      lifetime_value: 4426.74
+    },
+    {
+      customer_name: 'Francisco Srini',
+      num_orders: 2,
+      lifetime_value: 87.08
+    },
+    {
+      customer_name: 'Francisco Subram',
+      num_orders: 2,
+      lifetime_value: 97.96
+    },
+    {
+      customer_name: 'Francisco Suri',
+      num_orders: 2,
+      lifetime_value: 3162.31
+    },
+    {
+      customer_name: 'Francisco Vance',
+      num_orders: 2,
+      lifetime_value: 6070.59
+    },
+    {
+      customer_name: 'Frank Alvarez',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Frank Blanco',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Frank Carlson',
+      num_orders: 1,
+      lifetime_value: 2316.97
+    },
+    {
+      customer_name: 'Frank Diaz',
+      num_orders: 3,
+      lifetime_value: 4640.2575
+    },
+    {
+      customer_name: 'Frank Dominguez',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Frank Gill',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Frank Gomez',
+      num_orders: 2,
+      lifetime_value: 1622.3975
+    },
+    {
+      customer_name: 'Frank Gutierrez',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Frank Hernandez',
+      num_orders: 2,
+      lifetime_value: 2537.97
+    },
+    {
+      customer_name: 'Frank Jimenez',
+      num_orders: 2,
+      lifetime_value: 2537.97
+    },
+    {
+      customer_name: 'Frank Martin',
+      num_orders: 1,
+      lifetime_value: 83.97
+    },
+    {
+      customer_name: 'Frank Moreno',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Frank Munoz',
+      num_orders: 2,
+      lifetime_value: 6124.58
+    },
+    {
+      customer_name: 'Frank Navarro',
+      num_orders: 1,
+      lifetime_value: 67.93
+    },
+    {
+      customer_name: 'Frank Ramos',
+      num_orders: 1,
+      lifetime_value: 2319.99
+    },
+    {
+      customer_name: 'Frank Romero',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Frank Rubio',
+      num_orders: 1,
+      lifetime_value: 1750.98
+    },
+    {
+      customer_name: 'Frank Ruiz',
+      num_orders: 2,
+      lifetime_value: 1549.4175
+    },
+    {
+      customer_name: 'Frank Sanz',
+      num_orders: 2,
+      lifetime_value: 149.91
+    },
+    {
+      customer_name: 'Frank Serrano',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Frank Suarez',
+      num_orders: 1,
+      lifetime_value: 132.94
+    },
+    {
+      customer_name: 'Frank Torres',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Frank Vazquez',
+      num_orders: 1,
+      lifetime_value: 29.48
+    },
+    {
+      customer_name: 'Gabriel Adams',
+      num_orders: 1,
+      lifetime_value: 2354.98
+    },
+    {
+      customer_name: 'Gabriel Allen',
+      num_orders: 2,
+      lifetime_value: 4369.74
+    },
+    {
+      customer_name: 'Gabriel Baker',
+      num_orders: 3,
+      lifetime_value: 7203.35
+    },
+    {
+      customer_name: 'Gabriel Campbell',
+      num_orders: 2,
+      lifetime_value: 4411.6496
+    },
+    {
+      customer_name: 'Gabriel Carter',
+      num_orders: 1,
+      lifetime_value: 37.93
+    },
+    {
+      customer_name: 'Gabriel Collins',
+      num_orders: 2,
+      lifetime_value: 4416.3796
+    },
+    {
+      customer_name: 'Gabriel Evans',
+      num_orders: 1,
+      lifetime_value: 24.99
+    },
+    {
+      customer_name: 'Gabriel Gonzalez',
+      num_orders: 2,
+      lifetime_value: 61.96
+    },
+    {
+      customer_name: 'Gabriel Green',
+      num_orders: 1,
+      lifetime_value: 58.98
+    },
+    {
+      customer_name: 'Gabriel Hall',
+      num_orders: 1,
+      lifetime_value: 84.47
+    },
+    {
+      customer_name: 'Gabriel Hernandez',
+      num_orders: 1,
+      lifetime_value: 1799.48
+    },
+    {
+      customer_name: 'Gabriel Hill',
+      num_orders: 2,
+      lifetime_value: 5900.55
+    },
+    {
+      customer_name: 'Gabriel King',
+      num_orders: 1,
+      lifetime_value: 64.97
+    },
+    {
+      customer_name: 'Gabriel Lopez',
+      num_orders: 2,
+      lifetime_value: 97.96
+    },
+    {
+      customer_name: 'Gabriel Mitchell',
+      num_orders: 2,
+      lifetime_value: 5960.23
+    },
+    {
+      customer_name: 'Gabriel Nelson',
+      num_orders: 1,
+      lifetime_value: 84.92
+    },
+    {
+      customer_name: 'Gabriel Parker',
+      num_orders: 2,
+      lifetime_value: 1357.97
+    },
+    {
+      customer_name: 'Gabriel Perez',
+      num_orders: 2,
+      lifetime_value: 4789.02
+    },
+    {
+      customer_name: 'Gabriel Phillips',
+      num_orders: 1,
+      lifetime_value: 2406.95
+    },
+    {
+      customer_name: 'Gabriel Roberts',
+      num_orders: 2,
+      lifetime_value: 3117.96
+    },
+    {
+      customer_name: 'Gabriel Scott',
+      num_orders: 1,
+      lifetime_value: 24.99
+    },
+    {
+      customer_name: 'Gabriel Turner',
+      num_orders: 2,
+      lifetime_value: 3826.3996
+    },
+    {
+      customer_name: 'Gabriel Wright',
+      num_orders: 1,
+      lifetime_value: 2401.45
+    },
+    {
+      customer_name: 'Gabriel Young',
+      num_orders: 3,
+      lifetime_value: 75.84
+    },
+    {
+      customer_name: 'Gail Alexander',
+      num_orders: 2,
+      lifetime_value: 5954.22
+    },
+    {
+      customer_name: 'Gail Butler',
+      num_orders: 4,
+      lifetime_value: 159.93
+    },
+    {
+      customer_name: 'Gail Griffin',
+      num_orders: 2,
+      lifetime_value: 5898.26
+    },
+    {
+      customer_name: 'Gail Moore',
+      num_orders: 2,
+      lifetime_value: 105.95
+    },
+    {
+      customer_name: 'Gail Russell',
+      num_orders: 3,
+      lifetime_value: 6825.4496
+    },
+    {
+      customer_name: 'Garrett Bailey',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Garrett Bell',
+      num_orders: 2,
+      lifetime_value: 3786.3896
+    },
+    {
+      customer_name: 'Garrett Brooks',
+      num_orders: 1,
+      lifetime_value: 29.48
+    },
+    {
+      customer_name: 'Garrett Cook',
+      num_orders: 2,
+      lifetime_value: 3112.98
+    },
+    {
+      customer_name: 'Garrett Cooper',
+      num_orders: 1,
+      lifetime_value: 104.95
+    },
+    {
+      customer_name: 'Garrett Cox',
+      num_orders: 2,
+      lifetime_value: 162.95
+    },
+    {
+      customer_name: 'Garrett Gray',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Garrett Howard',
+      num_orders: 1,
+      lifetime_value: 29.99
+    },
+    {
+      customer_name: 'Garrett James',
+      num_orders: 2,
+      lifetime_value: 121.06
+    },
+    {
+      customer_name: 'Garrett Kelly',
+      num_orders: 1,
+      lifetime_value: 107.08
+    },
+    {
+      customer_name: 'Garrett Morgan',
+      num_orders: 1,
+      lifetime_value: 151.27
+    },
+    {
+      customer_name: 'Garrett Morris',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Garrett Murphy',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Garrett Peterson',
+      num_orders: 2,
+      lifetime_value: 3342.4075
+    },
+    {
+      customer_name: 'Garrett Ramirez',
+      num_orders: 1,
+      lifetime_value: 124.99
+    },
+    {
+      customer_name: 'Garrett Reed',
+      num_orders: 1,
+      lifetime_value: 32.27
+    },
+    {
+      customer_name: 'Garrett Richardson',
+      num_orders: 2,
+      lifetime_value: 1563.0682
+    },
+    {
+      customer_name: 'Garrett Rivera',
+      num_orders: 2,
+      lifetime_value: 123.45
+    },
+    {
+      customer_name: 'Garrett Rogers',
+      num_orders: 2,
+      lifetime_value: 4828.01
+    },
+    {
+      customer_name: 'Garrett Sanchez',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Garrett Sanders',
+      num_orders: 2,
+      lifetime_value: 3394.8975
+    },
+    {
+      customer_name: 'Garrett Stewart',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Garrett Travers',
+      num_orders: 1,
+      lifetime_value: 85.48
+    },
+    {
+      customer_name: 'Garrett Ward',
+      num_orders: 1,
+      lifetime_value: 46.47
+    },
+    {
+      customer_name: 'Garrett Watson',
+      num_orders: 4,
+      lifetime_value: 138.68
+    },
+    {
+      customer_name: 'Gary Alonso',
+      num_orders: 2,
+      lifetime_value: 3029.0782
+    },
+    {
+      customer_name: 'Gary Alvarez',
+      num_orders: 1,
+      lifetime_value: 614.96
+    },
+    {
+      customer_name: 'Gary Blanco',
+      num_orders: 2,
+      lifetime_value: 3318.3575
+    },
+    {
+      customer_name: 'Gary Carlson',
+      num_orders: 1,
+      lifetime_value: 48.97
+    },
+    {
+      customer_name: 'Gary Diaz',
+      num_orders: 1,
+      lifetime_value: 1750.98
+    },
+    {
+      customer_name: 'Gary Dominguez',
+      num_orders: 3,
+      lifetime_value: 6938.5825
+    },
+    {
+      customer_name: 'Gary Gill',
+      num_orders: 2,
+      lifetime_value: 3139.0682
+    },
+    {
+      customer_name: 'Gary Gomez',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Gary Gutierrez',
+      num_orders: 3,
+      lifetime_value: 7226.38
+    },
+    {
+      customer_name: 'Gary Hernandez',
+      num_orders: 1,
+      lifetime_value: 133.49
+    },
+    {
+      customer_name: 'Gary Jimenez',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Gary Martin',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Gary Moreno',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Gary Munoz',
+      num_orders: 2,
+      lifetime_value: 113.24
+    },
+    {
+      customer_name: 'Gary Navarro',
+      num_orders: 2,
+      lifetime_value: 3310.4075
+    },
+    {
+      customer_name: 'Gary Ortega',
+      num_orders: 2,
+      lifetime_value: 3104.5682
+    },
+    {
+      customer_name: 'Gary Ramos',
+      num_orders: 1,
+      lifetime_value: 24.99
+    },
+    {
+      customer_name: 'Gary Romero',
+      num_orders: 2,
+      lifetime_value: 3063.0582
+    },
+    {
+      customer_name: 'Gary Rubio',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Gary Ruiz',
+      num_orders: 1,
+      lifetime_value: 636.45
+    },
+    {
+      customer_name: 'Gary Serrano',
+      num_orders: 1,
+      lifetime_value: 64.97
+    },
+    {
+      customer_name: 'Gary Vazquez',
+      num_orders: 2,
+      lifetime_value: 4763.34
+    },
+    {
+      customer_name: 'Gavin Alexander',
+      num_orders: 1,
+      lifetime_value: 29.93
+    },
+    {
+      customer_name: 'Gavin Bennett',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Gavin Bryant',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Gavin Butler',
+      num_orders: 1,
+      lifetime_value: 66.96
+    },
+    {
+      customer_name: 'Gavin Coleman',
+      num_orders: 2,
+      lifetime_value: 4516.5325
+    },
+    {
+      customer_name: 'Gavin Diaz',
+      num_orders: 1,
+      lifetime_value: 76.97
+    },
+    {
+      customer_name: 'Gavin Gonzales',
+      num_orders: 2,
+      lifetime_value: 4612.5125
+    },
+    {
+      customer_name: 'Gavin Griffin',
+      num_orders: 1,
+      lifetime_value: 29.93
+    },
+    {
+      customer_name: 'Gavin Hayes',
+      num_orders: 2,
+      lifetime_value: 4576.5325
+    },
+    {
+      customer_name: 'Gavin Henderson',
+      num_orders: 2,
+      lifetime_value: 4498.5325
+    },
+    {
+      customer_name: 'Gavin Hughes',
+      num_orders: 2,
+      lifetime_value: 4511.5425
+    },
+    {
+      customer_name: 'Gavin Jenkins',
+      num_orders: 2,
+      lifetime_value: 4763.34
+    },
+    {
+      customer_name: 'Gavin Long',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Gavin Patterson',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Gavin Perry',
+      num_orders: 2,
+      lifetime_value: 4573.5025
+    },
+    {
+      customer_name: 'Gavin Powell',
+      num_orders: 3,
+      lifetime_value: 111.89
+    },
+    {
+      customer_name: 'Gavin Price',
+      num_orders: 2,
+      lifetime_value: 4837.81
+    },
+    {
+      customer_name: 'Gavin Ross',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Gavin Russell',
+      num_orders: 1,
+      lifetime_value: 29.93
+    },
+    {
+      customer_name: 'Gavin Stone',
+      num_orders: 3,
+      lifetime_value: 66.25
+    },
+    {
+      customer_name: 'Gavin Washington',
+      num_orders: 2,
+      lifetime_value: 4835.3
+    },
+    {
+      customer_name: 'Gavin Wood',
+      num_orders: 2,
+      lifetime_value: 4498.5325
+    },
+    {
+      customer_name: 'George Arun',
+      num_orders: 1,
+      lifetime_value: 1174.48
+    },
+    {
+      customer_name: 'George Chandra',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'George Fernandez',
+      num_orders: 2,
+      lifetime_value: 6029.57
+    },
+    {
+      customer_name: 'George Garcia',
+      num_orders: 2,
+      lifetime_value: 100.74
+    },
+    {
+      customer_name: 'George Gonzalez',
+      num_orders: 2,
+      lifetime_value: 6044.59
+    },
+    {
+      customer_name: 'George Kapoor',
+      num_orders: 1,
+      lifetime_value: 123.98
+    },
+    {
+      customer_name: 'George Lopez',
+      num_orders: 2,
+      lifetime_value: 5279.26
+    },
+    {
+      customer_name: 'George Martinez',
+      num_orders: 2,
+      lifetime_value: 6089.59
+    },
+    {
+      customer_name: 'George McDonald',
+      num_orders: 1,
+      lifetime_value: 1120.49
+    },
+    {
+      customer_name: 'George Mehta',
+      num_orders: 2,
+      lifetime_value: 5333.25
+    },
+    {
+      customer_name: 'George Patel',
+      num_orders: 2,
+      lifetime_value: 3191.9096
+    },
+    {
+      customer_name: 'George Perez',
+      num_orders: 2,
+      lifetime_value: 187.38
+    },
+    {
+      customer_name: 'George Prasad',
+      num_orders: 1,
+      lifetime_value: 2502.83
+    },
+    {
+      customer_name: 'George Raman',
+      num_orders: 2,
+      lifetime_value: 3219.5782
+    },
+    {
+      customer_name: 'George Rana',
+      num_orders: 1,
+      lifetime_value: 2475.95
+    },
+    {
+      customer_name: 'George Rodriguez',
+      num_orders: 2,
+      lifetime_value: 6060.5
+    },
+    {
+      customer_name: 'George Sai',
+      num_orders: 1,
+      lifetime_value: 1155.48
+    },
+    {
+      customer_name: 'George Sanchez',
+      num_orders: 2,
+      lifetime_value: 6035.6
+    },
+    {
+      customer_name: 'George Sara',
+      num_orders: 1,
+      lifetime_value: 2479.94
+    },
+    {
+      customer_name: 'George Srini',
+      num_orders: 1,
+      lifetime_value: 1145.48
+    },
+    {
+      customer_name: 'George Subram',
+      num_orders: 1,
+      lifetime_value: 2478.34
+    },
+    {
+      customer_name: 'George Suri',
+      num_orders: 1,
+      lifetime_value: 2451.3
+    },
+    {
+      customer_name: 'George Vance',
+      num_orders: 2,
+      lifetime_value: 3226.8996
+    },
+    {
+      customer_name: 'Gerald Arun',
+      num_orders: 5,
+      lifetime_value: 307.97
+    },
+    {
+      customer_name: 'Gerald Chandra',
+      num_orders: 2,
+      lifetime_value: 124.97
+    },
+    {
+      customer_name: 'Gerald Jordan',
+      num_orders: 2,
+      lifetime_value: 5930.23
+    },
+    {
+      customer_name: 'Gerald Madan',
+      num_orders: 2,
+      lifetime_value: 98.97
+    },
+    {
+      customer_name: 'Gerald Malhotra',
+      num_orders: 2,
+      lifetime_value: 135.21
+    },
+    {
+      customer_name: 'Gerald Patel',
+      num_orders: 2,
+      lifetime_value: 5908.25
+    },
+    {
+      customer_name: 'Gerald Prasad',
+      num_orders: 2,
+      lifetime_value: 84.99
+    },
+    {
+      customer_name: 'Gerald Raman',
+      num_orders: 2,
+      lifetime_value: 5985.2
+    },
+    {
+      customer_name: 'Gerald Rana',
+      num_orders: 2,
+      lifetime_value: 84.99
+    },
+    {
+      customer_name: 'Gerald Sai',
+      num_orders: 2,
+      lifetime_value: 5955.23
+    },
+    {
+      customer_name: 'Gerald Sara',
+      num_orders: 2,
+      lifetime_value: 257.97
+    },
+    {
+      customer_name: 'Gerald Srini',
+      num_orders: 2,
+      lifetime_value: 116.76
+    },
+    {
+      customer_name: 'Gerald Subram',
+      num_orders: 2,
+      lifetime_value: 72.28
+    },
+    {
+      customer_name: 'Gerald Suri',
+      num_orders: 2,
+      lifetime_value: 130.94
+    },
+    {
+      customer_name: 'Gerald Vance',
+      num_orders: 2,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Gerrit Straatsma',
+      num_orders: 2,
+      lifetime_value: 4194.33
+    },
+    {
+      customer_name: 'Gina Alonso',
+      num_orders: 2,
+      lifetime_value: 44.57
+    },
+    {
+      customer_name: 'Gina Alvarez',
+      num_orders: 3,
+      lifetime_value: 6690.58
+    },
+    {
+      customer_name: 'Gina Blanco',
+      num_orders: 1,
+      lifetime_value: 24.27
+    },
+    {
+      customer_name: 'Gina Carlson',
+      num_orders: 2,
+      lifetime_value: 2770.8225
+    },
+    {
+      customer_name: 'Gina Diaz',
+      num_orders: 2,
+      lifetime_value: 3846.8896
+    },
+    {
+      customer_name: 'Gina Dominguez',
+      num_orders: 1,
+      lifetime_value: 24.99
+    },
+    {
+      customer_name: 'Gina Gill',
+      num_orders: 3,
+      lifetime_value: 6684.59
+    },
+    {
+      customer_name: 'Gina Gutierrez',
+      num_orders: 2,
+      lifetime_value: 114.96
+    },
+    {
+      customer_name: 'Gina Hernandez',
+      num_orders: 2,
+      lifetime_value: 3803.5582
+    },
+    {
+      customer_name: 'Gina Jiménez',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Gina Martin',
+      num_orders: 2,
+      lifetime_value: 78.96
+    },
+    {
+      customer_name: 'Gina Moreno',
+      num_orders: 3,
+      lifetime_value: 6650.6
+    },
+    {
+      customer_name: 'Gina Navarro',
+      num_orders: 2,
+      lifetime_value: 4178.25
+    },
+    {
+      customer_name: 'Gina Romero',
+      num_orders: 1,
+      lifetime_value: 93.48
+    },
+    {
+      customer_name: 'Gina Ruiz',
+      num_orders: 2,
+      lifetime_value: 3826.3996
+    },
+    {
+      customer_name: 'Gina Schmidt',
+      num_orders: 1,
+      lifetime_value: 85.48
+    },
+    {
+      customer_name: 'Gina Serrano',
+      num_orders: 1,
+      lifetime_value: 80.94
+    },
+    {
+      customer_name: 'Gina Suarez',
+      num_orders: 2,
+      lifetime_value: 2755.5425
+    },
+    {
+      customer_name: 'Gina Torres',
+      num_orders: 3,
+      lifetime_value: 6639.58
+    },
+    {
+      customer_name: 'Gina Vazquez',
+      num_orders: 2,
+      lifetime_value: 4133.24
+    },
+    {
+      customer_name: 'Giorgio Veronesi',
+      num_orders: 2,
+      lifetime_value: 191.97
+    },
+    {
+      customer_name: 'Giraldo Sandoval',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Gloria Alonso',
+      num_orders: 1,
+      lifetime_value: 27.28
+    },
+    {
+      customer_name: 'Gloria Alvarez',
+      num_orders: 1,
+      lifetime_value: 574.98
+    },
+    {
+      customer_name: 'Gloria Bradley',
+      num_orders: 2,
+      lifetime_value: 62.95
+    },
+    {
+      customer_name: 'Gloria Carlson',
+      num_orders: 2,
+      lifetime_value: 5915.54
+    },
+    {
+      customer_name: 'Gloria Diaz',
+      num_orders: 2,
+      lifetime_value: 97.25
+    },
+    {
+      customer_name: 'Gloria Dominguez',
+      num_orders: 1,
+      lifetime_value: 35.23
+    },
+    {
+      customer_name: 'Gloria Gill',
+      num_orders: 2,
+      lifetime_value: 4733.75
+    },
+    {
+      customer_name: 'Gloria Gonzales',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Gloria Gutierrez',
+      num_orders: 2,
+      lifetime_value: 3021.0425
+    },
+    {
+      customer_name: 'Gloria Martin',
+      num_orders: 1,
+      lifetime_value: 27.28
+    },
+    {
+      customer_name: 'Gloria Munoz',
+      num_orders: 2,
+      lifetime_value: 3250.11
+    },
+    {
+      customer_name: 'Gloria Navarro',
+      num_orders: 2,
+      lifetime_value: 47.26
+    },
+    {
+      customer_name: 'Gloria Ortega',
+      num_orders: 2,
+      lifetime_value: 78.2
+    },
+    {
+      customer_name: 'Gloria Ramos',
+      num_orders: 2,
+      lifetime_value: 149.46
+    },
+    {
+      customer_name: 'Gloria Reed',
+      num_orders: 2,
+      lifetime_value: 95.26
+    },
+    {
+      customer_name: 'Gloria Romero',
+      num_orders: 2,
+      lifetime_value: 4696.4925
+    },
+    {
+      customer_name: 'Gloria Rubio',
+      num_orders: 1,
+      lifetime_value: 2466.32
+    },
+    {
+      customer_name: 'Gloria Ruiz',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Gloria Sanz',
+      num_orders: 2,
+      lifetime_value: 3056.32
+    },
+    {
+      customer_name: 'Gloria Serrano',
+      num_orders: 1,
+      lifetime_value: 74.98
+    },
+    {
+      customer_name: 'Gloria Torres',
+      num_orders: 2,
+      lifetime_value: 73.24
+    },
+    {
+      customer_name: 'Gloria Vazquez',
+      num_orders: 2,
+      lifetime_value: 53.96
+    },
+    {
+      customer_name: 'Grace Alexander',
+      num_orders: 1,
+      lifetime_value: 74.98
+    },
+    {
+      customer_name: 'Grace Anderson',
+      num_orders: 2,
+      lifetime_value: 42.28
+    },
+    {
+      customer_name: 'Grace Bailey',
+      num_orders: 2,
+      lifetime_value: 5279.26
+    },
+    {
+      customer_name: 'Grace Barnes',
+      num_orders: 1,
+      lifetime_value: 64.47
+    },
+    {
+      customer_name: 'Grace Bell',
+      num_orders: 2,
+      lifetime_value: 6056.61
+    },
+    {
+      customer_name: 'Grace Bennett',
+      num_orders: 1,
+      lifetime_value: 133.49
+    },
+    {
+      customer_name: 'Grace Brooks',
+      num_orders: 2,
+      lifetime_value: 109.44
+    },
+    {
+      customer_name: 'Grace Brown',
+      num_orders: 2,
+      lifetime_value: 5938.19
+    },
+    {
+      customer_name: 'Grace Bryant',
+      num_orders: 1,
+      lifetime_value: 1134.47
+    },
+    {
+      customer_name: 'Grace Butler',
+      num_orders: 1,
+      lifetime_value: 75.97
+    },
+    {
+      customer_name: 'Grace Clark',
+      num_orders: 2,
+      lifetime_value: 5948.24
+    },
+    {
+      customer_name: 'Grace Coleman',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Grace Cook',
+      num_orders: 2,
+      lifetime_value: 63.42
+    },
+    {
+      customer_name: 'Grace Cooper',
+      num_orders: 2,
+      lifetime_value: 171.73
+    },
+    {
+      customer_name: 'Grace Cox',
+      num_orders: 2,
+      lifetime_value: 6029.57
+    },
+    {
+      customer_name: 'Grace Davis',
+      num_orders: 2,
+      lifetime_value: 5875.55
+    },
+    {
+      customer_name: 'Grace Diaz',
+      num_orders: 1,
+      lifetime_value: 1155.48
+    },
+    {
+      customer_name: 'Grace Flores',
+      num_orders: 1,
+      lifetime_value: 539.99
+    },
+    {
+      customer_name: 'Grace Garcia',
+      num_orders: 2,
+      lifetime_value: 37.29
+    },
+    {
+      customer_name: 'Grace Gray',
+      num_orders: 2,
+      lifetime_value: 5279.26
+    },
+    {
+      customer_name: 'Grace Griffin',
+      num_orders: 1,
+      lifetime_value: 58.98
+    },
+    {
+      customer_name: 'Grace Hall',
+      num_orders: 3,
+      lifetime_value: 8163.31
+    },
+    {
+      customer_name: 'Grace Harris',
+      num_orders: 2,
+      lifetime_value: 42.28
+    },
+    {
+      customer_name: 'Grace Henderson',
+      num_orders: 3,
+      lifetime_value: 133.54
+    },
+    {
+      customer_name: 'Grace Howard',
+      num_orders: 2,
+      lifetime_value: 6217.21
+    },
+    {
+      customer_name: 'Grace Hughes',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Grace Jackson',
+      num_orders: 2,
+      lifetime_value: 42.28
+    },
+    {
+      customer_name: 'Grace James',
+      num_orders: 2,
+      lifetime_value: 153.93
+    },
+    {
+      customer_name: 'Grace Jenkins',
+      num_orders: 3,
+      lifetime_value: 197.04
+    },
+    {
+      customer_name: 'Grace Johnson',
+      num_orders: 2,
+      lifetime_value: 6058.25
+    },
+    {
+      customer_name: 'Grace Jones',
+      num_orders: 2,
+      lifetime_value: 6015.24
+    },
+    {
+      customer_name: 'Grace Kelly',
+      num_orders: 2,
+      lifetime_value: 5279.26
+    },
+    {
+      customer_name: 'Grace Lee',
+      num_orders: 27,
+      lifetime_value: 1329.31
+    },
+    {
+      customer_name: 'Grace Lewis',
+      num_orders: 27,
+      lifetime_value: 1136.35
+    },
+    {
+      customer_name: 'Grace Long',
+      num_orders: 2,
+      lifetime_value: 5314.25
+    },
+    {
+      customer_name: 'Grace Martin',
+      num_orders: 2,
+      lifetime_value: 5873.26
+    },
+    {
+      customer_name: 'Grace Martinez',
+      num_orders: 2,
+      lifetime_value: 6074.54
+    },
+    {
+      customer_name: 'Grace Miller',
+      num_orders: 2,
+      lifetime_value: 77.27
+    },
+    {
+      customer_name: 'Grace Moore',
+      num_orders: 2,
+      lifetime_value: 5964.22
+    },
+    {
+      customer_name: 'Grace Morgan',
+      num_orders: 2,
+      lifetime_value: 5306.54
+    },
+    {
+      customer_name: 'Grace Morris',
+      num_orders: 2,
+      lifetime_value: 6056.61
+    },
+    {
+      customer_name: 'Grace Murphy',
+      num_orders: 2,
+      lifetime_value: 5310.53
+    },
+    {
+      customer_name: 'Grace Patterson',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Grace Perry',
+      num_orders: 3,
+      lifetime_value: 282.04
+    },
+    {
+      customer_name: 'Grace Peterson',
+      num_orders: 2,
+      lifetime_value: 119.45
+    },
+    {
+      customer_name: 'Grace Powell',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Grace Price',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Grace Ramirez',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Grace Richardson',
+      num_orders: 2,
+      lifetime_value: 6093.2
+    },
+    {
+      customer_name: 'Grace Rivera',
+      num_orders: 2,
+      lifetime_value: 59.46
+    },
+    {
+      customer_name: 'Grace Rodriguez',
+      num_orders: 2,
+      lifetime_value: 4718.04
+    },
+    {
+      customer_name: 'Grace Ross',
+      num_orders: 3,
+      lifetime_value: 252.32
+    },
+    {
+      customer_name: 'Grace Russell',
+      num_orders: 1,
+      lifetime_value: 67.97
+    },
+    {
+      customer_name: 'Grace Sanchez',
+      num_orders: 2,
+      lifetime_value: 89.46
+    },
+    {
+      customer_name: 'Grace Simmons',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Grace Smith',
+      num_orders: 3,
+      lifetime_value: 8203.02
+    },
+    {
+      customer_name: 'Grace Stewart',
+      num_orders: 2,
+      lifetime_value: 119.45
+    },
+    {
+      customer_name: 'Grace Taylor',
+      num_orders: 2,
+      lifetime_value: 94.26
+    },
+    {
+      customer_name: 'Grace Thomas',
+      num_orders: 2,
+      lifetime_value: 77.27
+    },
+    {
+      customer_name: 'Grace Thompson',
+      num_orders: 2,
+      lifetime_value: 72.21
+    },
+    {
+      customer_name: 'Grace Torres',
+      num_orders: 2,
+      lifetime_value: 5279.26
+    },
+    {
+      customer_name: 'Grace Walker',
+      num_orders: 2,
+      lifetime_value: 5754.97
+    },
+    {
+      customer_name: 'Grace Ward',
+      num_orders: 2,
+      lifetime_value: 5279.26
+    },
+    {
+      customer_name: 'Grace Washington',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Grace Watson',
+      num_orders: 2,
+      lifetime_value: 39.46
+    },
+    {
+      customer_name: 'Grace White',
+      num_orders: 2,
+      lifetime_value: 44.57
+    },
+    {
+      customer_name: 'Grace Williams',
+      num_orders: 2,
+      lifetime_value: 5948.24
+    },
+    {
+      customer_name: 'Grace Wilson',
+      num_orders: 2,
+      lifetime_value: 42.28
+    },
+    {
+      customer_name: 'Grace Wood',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Greg Carter',
+      num_orders: 3,
+      lifetime_value: 5786.3825
+    },
+    {
+      customer_name: 'Greg Taylor',
+      num_orders: 2,
+      lifetime_value: 4158.32
+    },
+    {
+      customer_name: 'Greg White',
+      num_orders: 3,
+      lifetime_value: 6917.5925
+    },
+    {
+      customer_name: 'Gregory Winston',
+      num_orders: 1,
+      lifetime_value: 76.97
+    },
+    {
+      customer_name: 'Hannah Alexander',
+      num_orders: 1,
+      lifetime_value: 46.47
+    },
+    {
+      customer_name: 'Hannah Anderson',
+      num_orders: 3,
+      lifetime_value: 5254.8782
+    },
+    {
+      customer_name: 'Hannah Barnes',
+      num_orders: 2,
+      lifetime_value: 2665.0582
+    },
+    {
+      customer_name: 'Hannah Bennett',
+      num_orders: 2,
+      lifetime_value: 2589.0882
+    },
+    {
+      customer_name: 'Hannah Brown',
+      num_orders: 1,
+      lifetime_value: 49.99
+    },
+    {
+      customer_name: 'Hannah Bryant',
+      num_orders: 2,
+      lifetime_value: 3032.31
+    },
+    {
+      customer_name: 'Hannah Butler',
+      num_orders: 3,
+      lifetime_value: 5651.2496
+    },
+    {
+      customer_name: 'Hannah Clark',
+      num_orders: 5,
+      lifetime_value: 13295.38
+    },
+    {
+      customer_name: 'Hannah Coleman',
+      num_orders: 2,
+      lifetime_value: 2961.0425
+    },
+    {
+      customer_name: 'Hannah Davis',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Hannah Diaz',
+      num_orders: 2,
+      lifetime_value: 4579.4725
+    },
+    {
+      customer_name: 'Hannah Flores',
+      num_orders: 2,
+      lifetime_value: 64.97
+    },
+    {
+      customer_name: 'Hannah Foster',
+      num_orders: 1,
+      lifetime_value: 75.97
+    },
+    {
+      customer_name: 'Hannah Garcia',
+      num_orders: 5,
+      lifetime_value: 13164.64
+    },
+    {
+      customer_name: 'Hannah Gonzales',
+      num_orders: 2,
+      lifetime_value: 3084.0225
+    },
+    {
+      customer_name: 'Hannah Griffin',
+      num_orders: 2,
+      lifetime_value: 4773.33
+    },
+    {
+      customer_name: 'Hannah Hall',
+      num_orders: 2,
+      lifetime_value: 116.43
+    },
+    {
+      customer_name: 'Hannah Harris',
+      num_orders: 3,
+      lifetime_value: 5027.8582
+    },
+    {
+      customer_name: 'Hannah Hayes',
+      num_orders: 2,
+      lifetime_value: 3033.31
+    },
+    {
+      customer_name: 'Hannah Henderson',
+      num_orders: 1,
+      lifetime_value: 48.98
+    },
+    {
+      customer_name: 'Hannah Jackson',
+      num_orders: 2,
+      lifetime_value: 147.96
+    },
+    {
+      customer_name: 'Hannah Jenkins',
+      num_orders: 2,
+      lifetime_value: 94.71
+    },
+    {
+      customer_name: 'Hannah Johnson',
+      num_orders: 1,
+      lifetime_value: 43.98
+    },
+    {
+      customer_name: 'Hannah Jones',
+      num_orders: 3,
+      lifetime_value: 5139.7296
+    },
+    {
+      customer_name: 'Hannah Lee',
+      num_orders: 5,
+      lifetime_value: 13269.27
+    },
+    {
+      customer_name: 'Hannah Lewis',
+      num_orders: 2,
+      lifetime_value: 123.45
+    },
+    {
+      customer_name: 'Hannah Long',
+      num_orders: 3,
+      lifetime_value: 5581.2596
+    },
+    {
+      customer_name: 'Hannah Martinez',
+      num_orders: 4,
+      lifetime_value: 8022.5782
+    },
+    {
+      customer_name: 'Hannah Moore',
+      num_orders: 2,
+      lifetime_value: 5923.23
+    },
+    {
+      customer_name: 'Hannah Patterson',
+      num_orders: 2,
+      lifetime_value: 175.93
+    },
+    {
+      customer_name: 'Hannah Powell',
+      num_orders: 2,
+      lifetime_value: 59.98
+    },
+    {
+      customer_name: 'Hannah Price',
+      num_orders: 2,
+      lifetime_value: 4835.29
+    },
+    {
+      customer_name: 'Hannah Robinson',
+      num_orders: 4,
+      lifetime_value: 8053.4096
+    },
+    {
+      customer_name: 'Hannah Rodriguez',
+      num_orders: 2,
+      lifetime_value: 84.47
+    },
+    {
+      customer_name: 'Hannah Ross',
+      num_orders: 1,
+      lifetime_value: 2319.26
+    },
+    {
+      customer_name: 'Hannah Russell',
+      num_orders: 2,
+      lifetime_value: 4500.5225
+    },
+    {
+      customer_name: 'Hannah Smith',
+      num_orders: 2,
+      lifetime_value: 5873.26
+    },
+    {
+      customer_name: 'Hannah Thomas',
+      num_orders: 3,
+      lifetime_value: 5720.3682
+    },
+    {
+      customer_name: 'Hannah Thompson',
+      num_orders: 2,
+      lifetime_value: 75.48
+    },
+    {
+      customer_name: 'Hannah Walker',
+      num_orders: 2,
+      lifetime_value: 103.96
+    },
+    {
+      customer_name: 'Hannah Washington',
+      num_orders: 3,
+      lifetime_value: 241.93
+    },
+    {
+      customer_name: 'Hannah Williams',
+      num_orders: 2,
+      lifetime_value: 4454.5682
+    },
+    {
+      customer_name: 'Hannah Wilson',
+      num_orders: 1,
+      lifetime_value: 49.99
+    },
+    {
+      customer_name: 'Hannah Wood',
+      num_orders: 2,
+      lifetime_value: 2668.3796
+    },
+    {
+      customer_name: 'Hector Alonso',
+      num_orders: 3,
+      lifetime_value: 6660.59
+    },
+    {
+      customer_name: 'Hector Blanco',
+      num_orders: 2,
+      lifetime_value: 1563.0682
+    },
+    {
+      customer_name: 'Hector Carlson',
+      num_orders: 2,
+      lifetime_value: 1854.5782
+    },
+    {
+      customer_name: 'Hector Diaz',
+      num_orders: 3,
+      lifetime_value: 6729.57
+    },
+    {
+      customer_name: 'Hector Gill',
+      num_orders: 3,
+      lifetime_value: 318.83
+    },
+    {
+      customer_name: 'Hector Gomez',
+      num_orders: 1,
+      lifetime_value: 15.23
+    },
+    {
+      customer_name: 'Hector Gutierrez',
+      num_orders: 2,
+      lifetime_value: 5900.55
+    },
+    {
+      customer_name: 'Hector Hernandez',
+      num_orders: 1,
+      lifetime_value: 42.28
+    },
+    {
+      customer_name: 'Hector Jimenez',
+      num_orders: 1,
+      lifetime_value: 37.29
+    },
+    {
+      customer_name: 'Hector Martin',
+      num_orders: 1,
+      lifetime_value: 124.99
+    },
+    {
+      customer_name: 'Hector Moreno',
+      num_orders: 2,
+      lifetime_value: 4397.75
+    },
+    {
+      customer_name: 'Hector Muñoz',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Hector Navarro',
+      num_orders: 2,
+      lifetime_value: 113.96
+    },
+    {
+      customer_name: 'Hector Ortega',
+      num_orders: 2,
+      lifetime_value: 1533.5582
+    },
+    {
+      customer_name: 'Hector Ramos',
+      num_orders: 2,
+      lifetime_value: 2450.0782
+    },
+    {
+      customer_name: 'Hector Romero',
+      num_orders: 1,
+      lifetime_value: 31.27
+    },
+    {
+      customer_name: 'Hector Ruiz',
+      num_orders: 2,
+      lifetime_value: 3001.0225
+    },
+    {
+      customer_name: 'Hector Sanz',
+      num_orders: 2,
+      lifetime_value: 1873.5782
+    },
+    {
+      customer_name: 'Hector Serrano',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Hector Suarez',
+      num_orders: 1,
+      lifetime_value: 85.48
+    },
+    {
+      customer_name: 'Hector Torres',
+      num_orders: 2,
+      lifetime_value: 1468.5882
+    },
+    {
+      customer_name: 'Hector Vazquez',
+      num_orders: 2,
+      lifetime_value: 1483.5682
+    },
+    {
+      customer_name: 'Heidi Arun',
+      num_orders: 2,
+      lifetime_value: 1624.45
+    },
+    {
+      customer_name: 'Heidi Chandra',
+      num_orders: 1,
+      lifetime_value: 36.96
+    },
+    {
+      customer_name: 'Heidi Fernandez',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Heidi Garcia',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Heidi Gonzalez',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Heidi Kapoor',
+      num_orders: 2,
+      lifetime_value: 123.45
+    },
+    {
+      customer_name: 'Heidi Lopez',
+      num_orders: 2,
+      lifetime_value: 1346.76
+    },
+    {
+      customer_name: 'Heidi Malhotra',
+      num_orders: 1,
+      lifetime_value: 46.47
+    },
+    {
+      customer_name: 'Heidi Martinez',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Heidi Mehta',
+      num_orders: 2,
+      lifetime_value: 2840.9096
+    },
+    {
+      customer_name: 'Heidi Patel',
+      num_orders: 4,
+      lifetime_value: 179.19
+    },
+    {
+      customer_name: 'Heidi Perez',
+      num_orders: 2,
+      lifetime_value: 1574.46
+    },
+    {
+      customer_name: 'Heidi Prasad',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Heidi Raman',
+      num_orders: 2,
+      lifetime_value: 38.98
+    },
+    {
+      customer_name: 'Heidi Rana',
+      num_orders: 2,
+      lifetime_value: 78.96
+    },
+    {
+      customer_name: 'Heidi Rodriguez',
+      num_orders: 2,
+      lifetime_value: 1683.93
+    },
+    {
+      customer_name: 'Heidi Sai',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Heidi Sanchez',
+      num_orders: 2,
+      lifetime_value: 1681.45
+    },
+    {
+      customer_name: 'Heidi Sara',
+      num_orders: 2,
+      lifetime_value: 70.74
+    },
+    {
+      customer_name: 'Heidi Srini',
+      num_orders: 2,
+      lifetime_value: 1587.47
+    },
+    {
+      customer_name: 'Heidi Subram',
+      num_orders: 2,
+      lifetime_value: 2897.5682
+    },
+    {
+      customer_name: 'Heidi Suri',
+      num_orders: 2,
+      lifetime_value: 98.96
+    },
+    {
+      customer_name: 'Heidi Vance',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Henry Arun',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Henry Chapman',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Henry Fernandez',
+      num_orders: 2,
+      lifetime_value: 3077.98
+    },
+    {
+      customer_name: 'Henry Garcia',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Henry Gonzalez',
+      num_orders: 2,
+      lifetime_value: 1422.94
+    },
+    {
+      customer_name: 'Henry Kapoor',
+      num_orders: 2,
+      lifetime_value: 3174.95
+    },
+    {
+      customer_name: 'Henry Lopez',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Henry Madan',
+      num_orders: 1,
+      lifetime_value: 61.96
+    },
+    {
+      customer_name: 'Henry Martinez',
+      num_orders: 2,
+      lifetime_value: 3179.95
+    },
+    {
+      customer_name: 'Henry Mehta',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Henry Nelson',
+      num_orders: 1,
+      lifetime_value: 49.48
+    },
+    {
+      customer_name: 'Henry Patel',
+      num_orders: 1,
+      lifetime_value: 163.99
+    },
+    {
+      customer_name: 'Henry Perez',
+      num_orders: 1,
+      lifetime_value: 597.26
+    },
+    {
+      customer_name: 'Henry Prasad',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Henry Raman',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Henry Rana',
+      num_orders: 2,
+      lifetime_value: 3148.94
+    },
+    {
+      customer_name: 'Henry Sanchez',
+      num_orders: 2,
+      lifetime_value: 3099.96
+    },
+    {
+      customer_name: 'Henry Sara',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Henry Stone',
+      num_orders: 2,
+      lifetime_value: 3108.95
+    },
+    {
+      customer_name: 'Henry Sullivan',
+      num_orders: 1,
+      lifetime_value: 166.28
+    },
+    {
+      customer_name: 'Henry Suri',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Henry Vance',
+      num_orders: 1,
+      lifetime_value: 68.49
+    },
+    {
+      customer_name: 'Henry Young',
+      num_orders: 2,
+      lifetime_value: 4767.73
+    },
+    {
+      customer_name: 'Holly Arun',
+      num_orders: 2,
+      lifetime_value: 91.26
+    },
+    {
+      customer_name: 'Holly Chandra',
+      num_orders: 2,
+      lifetime_value: 82.25
+    },
+    {
+      customer_name: 'Holly Fernandez',
+      num_orders: 2,
+      lifetime_value: 6095.08
+    },
+    {
+      customer_name: 'Holly Garcia',
+      num_orders: 2,
+      lifetime_value: 5377.23
+    },
+    {
+      customer_name: 'Holly Lopez',
+      num_orders: 2,
+      lifetime_value: 59.46
+    },
+    {
+      customer_name: 'Holly Malhotra',
+      num_orders: 2,
+      lifetime_value: 6058.21
+    },
+    {
+      customer_name: 'Holly Martinez',
+      num_orders: 1,
+      lifetime_value: 94.46
+    },
+    {
+      customer_name: 'Holly Mehta',
+      num_orders: 1,
+      lifetime_value: 32.28
+    },
+    {
+      customer_name: 'Holly Perez',
+      num_orders: 2,
+      lifetime_value: 6093.2
+    },
+    {
+      customer_name: 'Holly Raman',
+      num_orders: 2,
+      lifetime_value: 114.95
+    },
+    {
+      customer_name: 'Holly Rana',
+      num_orders: 2,
+      lifetime_value: 116.74
+    },
+    {
+      customer_name: 'Holly Sai',
+      num_orders: 2,
+      lifetime_value: 6037.89
+    },
+    {
+      customer_name: 'Holly Sanchez',
+      num_orders: 2,
+      lifetime_value: 5314.25
+    },
+    {
+      customer_name: 'Holly Srini',
+      num_orders: 2,
+      lifetime_value: 109.46
+    },
+    {
+      customer_name: 'Holly Subram',
+      num_orders: 2,
+      lifetime_value: 6056.61
+    },
+    {
+      customer_name: 'Holly Suri',
+      num_orders: 2,
+      lifetime_value: 74.94
+    },
+    {
+      customer_name: 'Holly Vance',
+      num_orders: 2,
+      lifetime_value: 60.05
+    },
+    {
+      customer_name: 'Hunter Adams',
+      num_orders: 2,
+      lifetime_value: 5930.23
+    },
+    {
+      customer_name: 'Hunter Allen',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Hunter Anderson',
+      num_orders: 1,
+      lifetime_value: 27.77
+    },
+    {
+      customer_name: 'Hunter Baker',
+      num_orders: 1,
+      lifetime_value: 2369.96
+    },
+    {
+      customer_name: 'Hunter Brown',
+      num_orders: 1,
+      lifetime_value: 29.98
+    },
+    {
+      customer_name: 'Hunter Campbell',
+      num_orders: 1,
+      lifetime_value: 629.97
+    },
+    {
+      customer_name: 'Hunter Clark',
+      num_orders: 3,
+      lifetime_value: 6914.8525
+    },
+    {
+      customer_name: 'Hunter Collins',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Hunter Davis',
+      num_orders: 2,
+      lifetime_value: 2779.9075
+    },
+    {
+      customer_name: 'Hunter Edwards',
+      num_orders: 2,
+      lifetime_value: 3053.32
+    },
+    {
+      customer_name: 'Hunter Evans',
+      num_orders: 2,
+      lifetime_value: 88.46
+    },
+    {
+      customer_name: 'Hunter Garcia',
+      num_orders: 3,
+      lifetime_value: 7233.36
+    },
+    {
+      customer_name: 'Hunter Gonzalez',
+      num_orders: 2,
+      lifetime_value: 2721.5525
+    },
+    {
+      customer_name: 'Hunter Hall',
+      num_orders: 1,
+      lifetime_value: 68.49
+    },
+    {
+      customer_name: 'Hunter Hernandez',
+      num_orders: 1,
+      lifetime_value: 2294.99
+    },
+    {
+      customer_name: 'Hunter Hill',
+      num_orders: 2,
+      lifetime_value: 3001.0425
+    },
+    {
+      customer_name: 'Hunter Jackson',
+      num_orders: 2,
+      lifetime_value: 113.96
+    },
+    {
+      customer_name: 'Hunter Johnson',
+      num_orders: 1,
+      lifetime_value: 78.96
+    },
+    {
+      customer_name: 'Hunter Jones',
+      num_orders: 2,
+      lifetime_value: 2787.5125
+    },
+    {
+      customer_name: 'Hunter King',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Hunter Lee',
+      num_orders: 2,
+      lifetime_value: 123.96
+    },
+    {
+      customer_name: 'Hunter Lewis',
+      num_orders: 2,
+      lifetime_value: 4426.74
+    },
+    {
+      customer_name: 'Hunter Lopez',
+      num_orders: 3,
+      lifetime_value: 7292.31
+    },
+    {
+      customer_name: 'Hunter Martinez',
+      num_orders: 3,
+      lifetime_value: 6952.5325
+    },
+    {
+      customer_name: 'Hunter Miller',
+      num_orders: 2,
+      lifetime_value: 4208.31
+    },
+    {
+      customer_name: 'Hunter Mitchell',
+      num_orders: 1,
+      lifetime_value: 24.99
+    },
+    {
+      customer_name: 'Hunter Moore',
+      num_orders: 1,
+      lifetime_value: 31.27
+    },
+    {
+      customer_name: 'Hunter Parker',
+      num_orders: 2,
+      lifetime_value: 3124.96
+    },
+    {
+      customer_name: 'Hunter Perez',
+      num_orders: 2,
+      lifetime_value: 1379.95
+    },
+    {
+      customer_name: 'Hunter Phillips',
+      num_orders: 1,
+      lifetime_value: 64.47
+    },
+    {
+      customer_name: 'Hunter Roberts',
+      num_orders: 2,
+      lifetime_value: 3105.27
+    },
+    {
+      customer_name: 'Hunter Robinson',
+      num_orders: 1,
+      lifetime_value: 47.94
+    },
+    {
+      customer_name: 'Hunter Rodriguez',
+      num_orders: 2,
+      lifetime_value: 4347.76
+    },
+    {
+      customer_name: 'Hunter Scott',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Hunter Smith',
+      num_orders: 2,
+      lifetime_value: 119.95
+    },
+    {
+      customer_name: 'Hunter Thomas',
+      num_orders: 2,
+      lifetime_value: 4698.76
+    },
+    {
+      customer_name: 'Hunter Thompson',
+      num_orders: 1,
+      lifetime_value: 1764.96
+    },
+    {
+      customer_name: 'Hunter Turner',
+      num_orders: 1,
+      lifetime_value: 89.97
+    },
+    {
+      customer_name: 'Hunter Walker',
+      num_orders: 2,
+      lifetime_value: 147.48
+    },
+    {
+      customer_name: 'Hunter Williams',
+      num_orders: 1,
+      lifetime_value: 38.97
+    },
+    {
+      customer_name: 'Hunter Wilson',
+      num_orders: 1,
+      lifetime_value: 29.99
+    },
+    {
+      customer_name: 'Hunter Wright',
+      num_orders: 1,
+      lifetime_value: 1763.97
+    },
+    {
+      customer_name: 'Ian Alexander',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Ian Bailey',
+      num_orders: 2,
+      lifetime_value: 4444.8896
+    },
+    {
+      customer_name: 'Ian Barnes',
+      num_orders: 2,
+      lifetime_value: 4533.5225
+    },
+    {
+      customer_name: 'Ian Bell',
+      num_orders: 2,
+      lifetime_value: 5943.25
+    },
+    {
+      customer_name: 'Ian Bennett',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Ian Brooks',
+      num_orders: 2,
+      lifetime_value: 5976.74
+    },
+    {
+      customer_name: 'Ian Bryant',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Ian Coleman',
+      num_orders: 1,
+      lifetime_value: 180.98
+    },
+    {
+      customer_name: 'Ian Cook',
+      num_orders: 1,
+      lifetime_value: 12.94
+    },
+    {
+      customer_name: 'Ian Cooper',
+      num_orders: 2,
+      lifetime_value: 163.95
+    },
+    {
+      customer_name: 'Ian Cox',
+      num_orders: 2,
+      lifetime_value: 2973.9825
+    },
+    {
+      customer_name: 'Ian Diaz',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Ian Flores',
+      num_orders: 2,
+      lifetime_value: 3282.81
+    },
+    {
+      customer_name: 'Ian Foster',
+      num_orders: 2,
+      lifetime_value: 3084.0225
+    },
+    {
+      customer_name: 'Ian Gonzales',
+      num_orders: 2,
+      lifetime_value: 3021.0425
+    },
+    {
+      customer_name: 'Ian Gray',
+      num_orders: 1,
+      lifetime_value: 80.96
+    },
+    {
+      customer_name: 'Ian Griffin',
+      num_orders: 1,
+      lifetime_value: 66.96
+    },
+    {
+      customer_name: 'Ian Hayes',
+      num_orders: 2,
+      lifetime_value: 3021.0425
+    },
+    {
+      customer_name: 'Ian Henderson',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Ian Howard',
+      num_orders: 2,
+      lifetime_value: 1613.0582
+    },
+    {
+      customer_name: 'Ian Hughes',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Ian James',
+      num_orders: 2,
+      lifetime_value: 104.24
+    },
+    {
+      customer_name: 'Ian Jenkins',
+      num_orders: 2,
+      lifetime_value: 4765.63
+    },
+    {
+      customer_name: 'Ian Kelly',
+      num_orders: 3,
+      lifetime_value: 5662.8982
+    },
+    {
+      customer_name: 'Ian Long',
+      num_orders: 1,
+      lifetime_value: 2366.96
+    },
+    {
+      customer_name: 'Ian Morgan',
+      num_orders: 2,
+      lifetime_value: 71.27
+    },
+    {
+      customer_name: 'Ian Morris',
+      num_orders: 2,
+      lifetime_value: 1622.47
+    },
+    {
+      customer_name: 'Ian Murphy',
+      num_orders: 2,
+      lifetime_value: 81.26
+    },
+    {
+      customer_name: 'Ian Patterson',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Ian Perry',
+      num_orders: 1,
+      lifetime_value: 76.97
+    },
+    {
+      customer_name: 'Ian Peterson',
+      num_orders: 2,
+      lifetime_value: 3370.4075
+    },
+    {
+      customer_name: 'Ian Powell',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Ian Price',
+      num_orders: 2,
+      lifetime_value: 2986.0425
+    },
+    {
+      customer_name: 'Ian Ramirez',
+      num_orders: 2,
+      lifetime_value: 1476.5382
+    },
+    {
+      customer_name: 'Ian Reed',
+      num_orders: 2,
+      lifetime_value: 3086.82
+    },
+    {
+      customer_name: 'Ian Richardson',
+      num_orders: 1,
+      lifetime_value: 98.96
+    },
+    {
+      customer_name: 'Ian Rivera',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Ian Rogers',
+      num_orders: 2,
+      lifetime_value: 3114.94
+    },
+    {
+      customer_name: 'Ian Ross',
+      num_orders: 1,
+      lifetime_value: 30.97
+    },
+    {
+      customer_name: 'Ian Russell',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Ian Sanchez',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Ian Sanders',
+      num_orders: 2,
+      lifetime_value: 2765.3975
+    },
+    {
+      customer_name: 'Ian Simmons',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Ian Stewart',
+      num_orders: 1,
+      lifetime_value: 59.98
+    },
+    {
+      customer_name: 'Ian Torres',
+      num_orders: 2,
+      lifetime_value: 3320.4275
+    },
+    {
+      customer_name: 'Ian Ward',
+      num_orders: 3,
+      lifetime_value: 191.27
+    },
+    {
+      customer_name: 'Ian Washington',
+      num_orders: 2,
+      lifetime_value: 3043.0025
+    },
+    {
+      customer_name: 'Ian Watson',
+      num_orders: 3,
+      lifetime_value: 200.26
+    },
+    {
+      customer_name: 'Ian Wood',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Ioannis Xylaras',
+      num_orders: 1,
+      lifetime_value: 639.45
+    },
+    {
+      customer_name: 'Isaac Adams',
+      num_orders: 1,
+      lifetime_value: 2479.94
+    },
+    {
+      customer_name: 'Isaac Allen',
+      num_orders: 1,
+      lifetime_value: 1763.97
+    },
+    {
+      customer_name: 'Isaac Bailey',
+      num_orders: 2,
+      lifetime_value: 63.97
+    },
+    {
+      customer_name: 'Isaac Brooks',
+      num_orders: 3,
+      lifetime_value: 148.94
+    },
+    {
+      customer_name: 'Isaac Campbell',
+      num_orders: 2,
+      lifetime_value: 90.47
+    },
+    {
+      customer_name: 'Isaac Carter',
+      num_orders: 1,
+      lifetime_value: 149.98
+    },
+    {
+      customer_name: 'Isaac Collins',
+      num_orders: 2,
+      lifetime_value: 132.44
+    },
+    {
+      customer_name: 'Isaac Cook',
+      num_orders: 3,
+      lifetime_value: 165.3
+    },
+    {
+      customer_name: 'Isaac Cooper',
+      num_orders: 2,
+      lifetime_value: 1547.5682
+    },
+    {
+      customer_name: 'Isaac Cox',
+      num_orders: 3,
+      lifetime_value: 7015.6125
+    },
+    {
+      customer_name: 'Isaac Edwards',
+      num_orders: 2,
+      lifetime_value: 4393.3582
+    },
+    {
+      customer_name: 'Isaac Evans',
+      num_orders: 2,
+      lifetime_value: 2753.8225
+    },
+    {
+      customer_name: 'Isaac Gonzalez',
+      num_orders: 3,
+      lifetime_value: 6917.5925
+    },
+    {
+      customer_name: 'Isaac Gray',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Isaac Green',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Isaac Hernandez',
+      num_orders: 2,
+      lifetime_value: 96.92
+    },
+    {
+      customer_name: 'Isaac Hill',
+      num_orders: 2,
+      lifetime_value: 290.46
+    },
+    {
+      customer_name: 'Isaac Howard',
+      num_orders: 1,
+      lifetime_value: 80.96
+    },
+    {
+      customer_name: 'Isaac James',
+      num_orders: 2,
+      lifetime_value: 4839
+    },
+    {
+      customer_name: 'Isaac Kelly',
+      num_orders: 1,
+      lifetime_value: 121.57
+    },
+    {
+      customer_name: 'Isaac King',
+      num_orders: 1,
+      lifetime_value: 2334.97
+    },
+    {
+      customer_name: 'Isaac Lopez',
+      num_orders: 2,
+      lifetime_value: 67.58
+    },
+    {
+      customer_name: 'Isaac Mitchell',
+      num_orders: 2,
+      lifetime_value: 4659.9025
+    },
+    {
+      customer_name: 'Isaac Morgan',
+      num_orders: 3,
+      lifetime_value: 6865.57
+    },
+    {
+      customer_name: 'Isaac Morris',
+      num_orders: 2,
+      lifetime_value: 4843
+    },
+    {
+      customer_name: 'Isaac Murphy',
+      num_orders: 3,
+      lifetime_value: 6675.6
+    },
+    {
+      customer_name: 'Isaac Oliver',
+      num_orders: 1,
+      lifetime_value: 15.23
+    },
+    {
+      customer_name: 'Isaac Parker',
+      num_orders: 2,
+      lifetime_value: 4416.3796
+    },
+    {
+      customer_name: 'Isaac Perez',
+      num_orders: 2,
+      lifetime_value: 83.97
+    },
+    {
+      customer_name: 'Isaac Peterson',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Isaac Phillips',
+      num_orders: 1,
+      lifetime_value: 564.99
+    },
+    {
+      customer_name: 'Isaac Ramirez',
+      num_orders: 2,
+      lifetime_value: 115.25
+    },
+    {
+      customer_name: 'Isaac Reed',
+      num_orders: 2,
+      lifetime_value: 1633.94
+    },
+    {
+      customer_name: 'Isaac Richardson',
+      num_orders: 1,
+      lifetime_value: 95.94
+    },
+    {
+      customer_name: 'Isaac Rivera',
+      num_orders: 2,
+      lifetime_value: 3080.27
+    },
+    {
+      customer_name: 'Isaac Rogers',
+      num_orders: 2,
+      lifetime_value: 3142.23
+    },
+    {
+      customer_name: 'Isaac Sanchez',
+      num_orders: 1,
+      lifetime_value: 30.97
+    },
+    {
+      customer_name: 'Isaac Sandberg',
+      num_orders: 2,
+      lifetime_value: 83.97
+    },
+    {
+      customer_name: 'Isaac Scott',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Isaac Turner',
+      num_orders: 3,
+      lifetime_value: 3759.3625
+    },
+    {
+      customer_name: 'Isaac Ward',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Isaac Watson',
+      num_orders: 2,
+      lifetime_value: 82.26
+    },
+    {
+      customer_name: 'Isaac Wright',
+      num_orders: 3,
+      lifetime_value: 6974.0625
+    },
+    {
+      customer_name: 'Isaac Young',
+      num_orders: 2,
+      lifetime_value: 189.94
+    },
+    {
+      customer_name: 'Isabella Anderson',
+      num_orders: 2,
+      lifetime_value: 73.25
+    },
+    {
+      customer_name: 'Isabella Bailey',
+      num_orders: 1,
+      lifetime_value: 46.47
+    },
+    {
+      customer_name: 'Isabella Bell',
+      num_orders: 1,
+      lifetime_value: 123.98
+    },
+    {
+      customer_name: 'Isabella Brown',
+      num_orders: 17,
+      lifetime_value: 1155.52
+    },
+    {
+      customer_name: 'Isabella Clark',
+      num_orders: 7,
+      lifetime_value: 11469.1882
+    },
+    {
+      customer_name: 'Isabella Cook',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Isabella Davis',
+      num_orders: 2,
+      lifetime_value: 5948.24
+    },
+    {
+      customer_name: 'Isabella Garcia',
+      num_orders: 4,
+      lifetime_value: 10566.38
+    },
+    {
+      customer_name: 'Isabella Hall',
+      num_orders: 1,
+      lifetime_value: 38.47
+    },
+    {
+      customer_name: 'Isabella Harris',
+      num_orders: 2,
+      lifetime_value: 179.43
+    },
+    {
+      customer_name: 'Isabella Jackson',
+      num_orders: 2,
+      lifetime_value: 54.22
+    },
+    {
+      customer_name: 'Isabella Johnson',
+      num_orders: 2,
+      lifetime_value: 134.23
+    },
+    {
+      customer_name: 'Isabella Jones',
+      num_orders: 2,
+      lifetime_value: 70.76
+    },
+    {
+      customer_name: 'Isabella Lee',
+      num_orders: 4,
+      lifetime_value: 10575.33
+    },
+    {
+      customer_name: 'Isabella Lewis',
+      num_orders: 4,
+      lifetime_value: 7175.75
+    },
+    {
+      customer_name: 'Isabella Martin',
+      num_orders: 2,
+      lifetime_value: 138.45
+    },
+    {
+      customer_name: 'Isabella Martinez',
+      num_orders: 4,
+      lifetime_value: 7511.55
+    },
+    {
+      customer_name: 'Isabella Moore',
+      num_orders: 27,
+      lifetime_value: 1205.38
+    },
+    {
+      customer_name: 'Isabella Morgan',
+      num_orders: 1,
+      lifetime_value: 22.93
+    },
+    {
+      customer_name: 'Isabella Morris',
+      num_orders: 1,
+      lifetime_value: 539.99
+    },
+    {
+      customer_name: 'Isabella Murphy',
+      num_orders: 1,
+      lifetime_value: 1170.48
+    },
+    {
+      customer_name: 'Isabella Reed',
+      num_orders: 1,
+      lifetime_value: 77.96
+    },
+    {
+      customer_name: 'Isabella Richardson',
+      num_orders: 1,
+      lifetime_value: 22.93
+    },
+    {
+      customer_name: 'Isabella Robinson',
+      num_orders: 4,
+      lifetime_value: 7586.23
+    },
+    {
+      customer_name: 'Isabella Rodriguez',
+      num_orders: 4,
+      lifetime_value: 7164.25
+    },
+    {
+      customer_name: 'Isabella Rogers',
+      num_orders: 1,
+      lifetime_value: 128.97
+    },
+    {
+      customer_name: 'Isabella Sanchez',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Isabella Smith',
+      num_orders: 2,
+      lifetime_value: 77.27
+    },
+    {
+      customer_name: 'Isabella Stewart',
+      num_orders: 1,
+      lifetime_value: 1184.46
+    },
+    {
+      customer_name: 'Isabella Taylor',
+      num_orders: 3,
+      lifetime_value: 6685.59
+    },
+    {
+      customer_name: 'Isabella Thomas',
+      num_orders: 2,
+      lifetime_value: 5910.22
+    },
+    {
+      customer_name: 'Isabella Thompson',
+      num_orders: 2,
+      lifetime_value: 113.96
+    },
+    {
+      customer_name: 'Isabella Walker',
+      num_orders: 4,
+      lifetime_value: 7131.51
+    },
+    {
+      customer_name: 'Isabella White',
+      num_orders: 2,
+      lifetime_value: 39.58
+    },
+    {
+      customer_name: 'Isabella Williams',
+      num_orders: 2,
+      lifetime_value: 37.29
+    },
+    {
+      customer_name: 'Isaiah Adams',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Isaiah Allen',
+      num_orders: 1,
+      lifetime_value: 61.45
+    },
+    {
+      customer_name: 'Isaiah Bailey',
+      num_orders: 3,
+      lifetime_value: 5151.7096
+    },
+    {
+      customer_name: 'Isaiah Baker',
+      num_orders: 1,
+      lifetime_value: 618.98
+    },
+    {
+      customer_name: 'Isaiah Bell',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Isaiah Brooks',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Isaiah Campbell',
+      num_orders: 1,
+      lifetime_value: 64.97
+    },
+    {
+      customer_name: 'Isaiah Carter',
+      num_orders: 3,
+      lifetime_value: 6906.8925
+    },
+    {
+      customer_name: 'Isaiah Collins',
+      num_orders: 2,
+      lifetime_value: 4366.0682
+    },
+    {
+      customer_name: 'Isaiah Cox',
+      num_orders: 1,
+      lifetime_value: 29.93
+    },
+    {
+      customer_name: 'Isaiah Edwards',
+      num_orders: 1,
+      lifetime_value: 83.97
+    },
+    {
+      customer_name: 'Isaiah Evans',
+      num_orders: 2,
+      lifetime_value: 3807.3996
+    },
+    {
+      customer_name: 'Isaiah Gonzalez',
+      num_orders: 3,
+      lifetime_value: 7000.8725
+    },
+    {
+      customer_name: 'Isaiah Gray',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Isaiah Green',
+      num_orders: 1,
+      lifetime_value: 1700.99
+    },
+    {
+      customer_name: 'Isaiah Hall',
+      num_orders: 1,
+      lifetime_value: 1750.98
+    },
+    {
+      customer_name: 'Isaiah Hernandez',
+      num_orders: 3,
+      lifetime_value: 261.39
+    },
+    {
+      customer_name: 'Isaiah Hill',
+      num_orders: 2,
+      lifetime_value: 86.26
+    },
+    {
+      customer_name: 'Isaiah Howard',
+      num_orders: 1,
+      lifetime_value: 90.47
+    },
+    {
+      customer_name: 'Isaiah James',
+      num_orders: 2,
+      lifetime_value: 1597.5582
+    },
+    {
+      customer_name: 'Isaiah King',
+      num_orders: 1,
+      lifetime_value: 1729.97
+    },
+    {
+      customer_name: 'Isaiah Lopez',
+      num_orders: 3,
+      lifetime_value: 7131.4
+    },
+    {
+      customer_name: 'Isaiah Mitchell',
+      num_orders: 2,
+      lifetime_value: 4758.24
+    },
+    {
+      customer_name: 'Isaiah Morgan',
+      num_orders: 1,
+      lifetime_value: 95.94
+    },
+    {
+      customer_name: 'Isaiah Morris',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Isaiah Murphy',
+      num_orders: 1,
+      lifetime_value: 71.95
+    },
+    {
+      customer_name: 'Isaiah Nelson',
+      num_orders: 1,
+      lifetime_value: 26.97
+    },
+    {
+      customer_name: 'Isaiah Parker',
+      num_orders: 2,
+      lifetime_value: 113.94
+    },
+    {
+      customer_name: 'Isaiah Perez',
+      num_orders: 2,
+      lifetime_value: 3080.27
+    },
+    {
+      customer_name: 'Isaiah Peterson',
+      num_orders: 2,
+      lifetime_value: 3295.4275
+    },
+    {
+      customer_name: 'Isaiah Phillips',
+      num_orders: 1,
+      lifetime_value: 579.97
+    },
+    {
+      customer_name: 'Isaiah Ramirez',
+      num_orders: 2,
+      lifetime_value: 160.55
+    },
+    {
+      customer_name: 'Isaiah Reed',
+      num_orders: 1,
+      lifetime_value: 89.97
+    },
+    {
+      customer_name: 'Isaiah Richardson',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Isaiah Rivera',
+      num_orders: 2,
+      lifetime_value: 3173.94
+    },
+    {
+      customer_name: 'Isaiah Roberts',
+      num_orders: 2,
+      lifetime_value: 3127.25
+    },
+    {
+      customer_name: 'Isaiah Rogers',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Isaiah Sanchez',
+      num_orders: 2,
+      lifetime_value: 59.98
+    },
+    {
+      customer_name: 'Isaiah Sanders',
+      num_orders: 3,
+      lifetime_value: 5621.2182
+    },
+    {
+      customer_name: 'Isaiah Scott',
+      num_orders: 1,
+      lifetime_value: 2297.28
+    },
+    {
+      customer_name: 'Isaiah Stewart',
+      num_orders: 2,
+      lifetime_value: 98.96
+    },
+    {
+      customer_name: 'Isaiah Torres',
+      num_orders: 3,
+      lifetime_value: 5222.0196
+    },
+    {
+      customer_name: 'Isaiah Turner',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Isaiah Ward',
+      num_orders: 1,
+      lifetime_value: 839.48
+    },
+    {
+      customer_name: 'Isaiah Watson',
+      num_orders: 3,
+      lifetime_value: 5650.2396
+    },
+    {
+      customer_name: 'Isaiah Wright',
+      num_orders: 1,
+      lifetime_value: 46.47
+    },
+    {
+      customer_name: 'Isaiah Young',
+      num_orders: 3,
+      lifetime_value: 108.54
+    },
+    {
+      customer_name: 'Jack Adams',
+      num_orders: 1,
+      lifetime_value: 1763.97
+    },
+    {
+      customer_name: 'Jack Allen',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Jack Baker',
+      num_orders: 1,
+      lifetime_value: 553.97
+    },
+    {
+      customer_name: 'Jack Campbell',
+      num_orders: 2,
+      lifetime_value: 133.34
+    },
+    {
+      customer_name: 'Jack Carter',
+      num_orders: 2,
+      lifetime_value: 4696.4925
+    },
+    {
+      customer_name: 'Jack Collins',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Jack Edwards',
+      num_orders: 2,
+      lifetime_value: 78.86
+    },
+    {
+      customer_name: 'Jack Evans',
+      num_orders: 1,
+      lifetime_value: 68.49
+    },
+    {
+      customer_name: 'Jack Gonzalez',
+      num_orders: 3,
+      lifetime_value: 6920.6125
+    },
+    {
+      customer_name: 'Jack Green',
+      num_orders: 3,
+      lifetime_value: 104.55
+    },
+    {
+      customer_name: 'Jack Hall',
+      num_orders: 2,
+      lifetime_value: 98.96
+    },
+    {
+      customer_name: 'Jack Hernandez',
+      num_orders: 1,
+      lifetime_value: 64.97
+    },
+    {
+      customer_name: 'Jack Hill',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Jack King',
+      num_orders: 1,
+      lifetime_value: 2379.47
+    },
+    {
+      customer_name: 'Jack Lopez',
+      num_orders: 3,
+      lifetime_value: 5429.76
+    },
+    {
+      customer_name: 'Jack Mitchell',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Jack Nelson',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Jack Parker',
+      num_orders: 2,
+      lifetime_value: 1344.96
+    },
+    {
+      customer_name: 'Jack Perez',
+      num_orders: 2,
+      lifetime_value: 1376.97
+    },
+    {
+      customer_name: 'Jack Phillips',
+      num_orders: 3,
+      lifetime_value: 157.51
+    },
+    {
+      customer_name: 'Jack Roberts',
+      num_orders: 2,
+      lifetime_value: 3157.97
+    },
+    {
+      customer_name: 'Jack Scott',
+      num_orders: 2,
+      lifetime_value: 6099.1
+    },
+    {
+      customer_name: 'Jack Turner',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Jack Wright',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Jack Young',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Jackson Adams',
+      num_orders: 2,
+      lifetime_value: 141.96
+    },
+    {
+      customer_name: 'Jackson Allen',
+      num_orders: 1,
+      lifetime_value: 1785.97
+    },
+    {
+      customer_name: 'Jackson Campbell',
+      num_orders: 2,
+      lifetime_value: 170.06
+    },
+    {
+      customer_name: 'Jackson Carter',
+      num_orders: 2,
+      lifetime_value: 66.95
+    },
+    {
+      customer_name: 'Jackson Collins',
+      num_orders: 2,
+      lifetime_value: 3209.94
+    },
+    {
+      customer_name: 'Jackson Edwards',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Jackson Evans',
+      num_orders: 2,
+      lifetime_value: 96.75
+    },
+    {
+      customer_name: 'Jackson Gonzalez',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Jackson Green',
+      num_orders: 1,
+      lifetime_value: 2482.23
+    },
+    {
+      customer_name: 'Jackson Hall',
+      num_orders: 1,
+      lifetime_value: 2324.92
+    },
+    {
+      customer_name: 'Jackson Hernandez',
+      num_orders: 1,
+      lifetime_value: 1709.98
+    },
+    {
+      customer_name: 'Jackson Hill',
+      num_orders: 2,
+      lifetime_value: 69.87
+    },
+    {
+      customer_name: 'Jackson King',
+      num_orders: 1,
+      lifetime_value: 2318.96
+    },
+    {
+      customer_name: 'Jackson Lopez',
+      num_orders: 3,
+      lifetime_value: 6994.5825
+    },
+    {
+      customer_name: 'Jackson Mitchell',
+      num_orders: 2,
+      lifetime_value: 4752.75
+    },
+    {
+      customer_name: 'Jackson Nelson',
+      num_orders: 1,
+      lifetime_value: 2481.82
+    },
+    {
+      customer_name: 'Jackson Parker',
+      num_orders: 2,
+      lifetime_value: 4344.0882
+    },
+    {
+      customer_name: 'Jackson Perez',
+      num_orders: 2,
+      lifetime_value: 1413.93
+    },
+    {
+      customer_name: 'Jackson Phillips',
+      num_orders: 1,
+      lifetime_value: 2373.47
+    },
+    {
+      customer_name: 'Jackson Roberts',
+      num_orders: 2,
+      lifetime_value: 3134.95
+    },
+    {
+      customer_name: 'Jackson Scott',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Jackson Turner',
+      num_orders: 1,
+      lifetime_value: 64.97
+    },
+    {
+      customer_name: 'Jackson Wright',
+      num_orders: 1,
+      lifetime_value: 2334.98
+    },
+    {
+      customer_name: 'Jackson Young',
+      num_orders: 1,
+      lifetime_value: 1700.99
+    },
+    {
+      customer_name: 'Jaclyn Andersen',
+      num_orders: 1,
+      lifetime_value: 100.46
+    },
+    {
+      customer_name: 'Jaclyn Becker',
+      num_orders: 3,
+      lifetime_value: 118.18
+    },
+    {
+      customer_name: 'Jaclyn Cai',
+      num_orders: 1,
+      lifetime_value: 36.96
+    },
+    {
+      customer_name: 'Jaclyn Chande',
+      num_orders: 3,
+      lifetime_value: 6759.4696
+    },
+    {
+      customer_name: 'Jaclyn Chander',
+      num_orders: 3,
+      lifetime_value: 6817.1182
+    },
+    {
+      customer_name: 'Jaclyn Chen',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Jaclyn Ferrier',
+      num_orders: 3,
+      lifetime_value: 294.94
+    },
+    {
+      customer_name: 'Jaclyn Gao',
+      num_orders: 1,
+      lifetime_value: 75.97
+    },
+    {
+      customer_name: 'Jaclyn Guo',
+      num_orders: 4,
+      lifetime_value: 321.39
+    },
+    {
+      customer_name: 'Jaclyn He',
+      num_orders: 2,
+      lifetime_value: 4507.5225
+    },
+    {
+      customer_name: 'Jaclyn Huang',
+      num_orders: 1,
+      lifetime_value: 30.97
+    },
+    {
+      customer_name: 'Jaclyn Jai',
+      num_orders: 2,
+      lifetime_value: 4809.81
+    },
+    {
+      customer_name: 'Jaclyn Kumar',
+      num_orders: 2,
+      lifetime_value: 83.97
+    },
+    {
+      customer_name: 'Jaclyn Lal',
+      num_orders: 2,
+      lifetime_value: 4618.5325
+    },
+    {
+      customer_name: 'Jaclyn Li',
+      num_orders: 1,
+      lifetime_value: 2332.28
+    },
+    {
+      customer_name: 'Jaclyn Liang',
+      num_orders: 2,
+      lifetime_value: 4501.5525
+    },
+    {
+      customer_name: 'Jaclyn Lin',
+      num_orders: 4,
+      lifetime_value: 257.88
+    },
+    {
+      customer_name: 'Jaclyn Liu',
+      num_orders: 2,
+      lifetime_value: 5915.53
+    },
+    {
+      customer_name: 'Jaclyn Lu',
+      num_orders: 4,
+      lifetime_value: 247.41
+    },
+    {
+      customer_name: 'Jaclyn Luo',
+      num_orders: 4,
+      lifetime_value: 471.11
+    },
+    {
+      customer_name: 'Jaclyn Ma',
+      num_orders: 4,
+      lifetime_value: 237.91
+    },
+    {
+      customer_name: 'Jaclyn Nara',
+      num_orders: 3,
+      lifetime_value: 6829.4696
+    },
+    {
+      customer_name: 'Jaclyn Pal',
+      num_orders: 2,
+      lifetime_value: 57.97
+    },
+    {
+      customer_name: 'Jaclyn Rai',
+      num_orders: 3,
+      lifetime_value: 96.25
+    },
+    {
+      customer_name: 'Jaclyn Raji',
+      num_orders: 3,
+      lifetime_value: 6840.4596
+    },
+    {
+      customer_name: 'Jaclyn Shan',
+      num_orders: 1,
+      lifetime_value: 180.98
+    },
+    {
+      customer_name: 'Jaclyn Sharma',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Jaclyn She',
+      num_orders: 4,
+      lifetime_value: 203.92
+    },
+    {
+      customer_name: 'Jaclyn Shen',
+      num_orders: 2,
+      lifetime_value: 51.27
+    },
+    {
+      customer_name: 'Jaclyn Sun',
+      num_orders: 2,
+      lifetime_value: 48.98
+    },
+    {
+      customer_name: 'Jaclyn Tang',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Jaclyn Wang',
+      num_orders: 1,
+      lifetime_value: 96.46
+    },
+    {
+      customer_name: 'Jaclyn Wu',
+      num_orders: 2,
+      lifetime_value: 5896.19
+    },
+    {
+      customer_name: 'Jaclyn Xie',
+      num_orders: 2,
+      lifetime_value: 108.46
+    },
+    {
+      customer_name: 'Jaclyn Xu',
+      num_orders: 2,
+      lifetime_value: 4820.31
+    },
+    {
+      customer_name: 'Jaclyn Xu',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Jaclyn Yang',
+      num_orders: 1,
+      lifetime_value: 85.48
+    },
+    {
+      customer_name: 'Jaclyn Ye',
+      num_orders: 2,
+      lifetime_value: 4803.33
+    },
+    {
+      customer_name: 'Jaclyn Yuan',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Jaclyn Zeng',
+      num_orders: 2,
+      lifetime_value: 108.46
+    },
+    {
+      customer_name: 'Jaclyn Zhang',
+      num_orders: 2,
+      lifetime_value: 5958.74
+    },
+    {
+      customer_name: 'Jaclyn Zhao',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Jaclyn Zheng',
+      num_orders: 2,
+      lifetime_value: 4558.5225
+    },
+    {
+      customer_name: 'Jaclyn Zhou',
+      num_orders: 2,
+      lifetime_value: 105.95
+    },
+    {
+      customer_name: 'Jaclyn Zhu',
+      num_orders: 2,
+      lifetime_value: 4794.31
+    },
+    {
+      customer_name: 'Jacob Anderson',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Jacob Brown',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Jacob Clark',
+      num_orders: 2,
+      lifetime_value: 6060.5
+    },
+    {
+      customer_name: 'Jacob Davis',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Jacob Harris',
+      num_orders: 2,
+      lifetime_value: 5279.26
+    },
+    {
+      customer_name: 'Jacob Johnson',
+      num_orders: 1,
+      lifetime_value: 128.97
+    },
+    {
+      customer_name: 'Jacob Lee',
+      num_orders: 2,
+      lifetime_value: 86.21
+    },
+    {
+      customer_name: 'Jacob Lewis',
+      num_orders: 2,
+      lifetime_value: 6098.54
+    },
+    {
+      customer_name: 'Jacob Martinez',
+      num_orders: 2,
+      lifetime_value: 5314.25
+    },
+    {
+      customer_name: 'Jacob Miller',
+      num_orders: 2,
+      lifetime_value: 124.46
+    },
+    {
+      customer_name: 'Jacob Robinson',
+      num_orders: 2,
+      lifetime_value: 33.26
+    },
+    {
+      customer_name: 'Jacob Rodriguez',
+      num_orders: 2,
+      lifetime_value: 6056.51
+    },
+    {
+      customer_name: 'Jacob Smith',
+      num_orders: 1,
+      lifetime_value: 128.97
+    },
+    {
+      customer_name: 'Jacob Taylor',
+      num_orders: 2,
+      lifetime_value: 6070.59
+    },
+    {
+      customer_name: 'Jacob Thomas',
+      num_orders: 2,
+      lifetime_value: 6035.6
+    },
+    {
+      customer_name: 'Jacob Walker',
+      num_orders: 2,
+      lifetime_value: 24.27
+    },
+    {
+      customer_name: 'Jacob White',
+      num_orders: 2,
+      lifetime_value: 6149.57
+    },
+    {
+      customer_name: 'Jacob Williams',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Jacob Wilson',
+      num_orders: 1,
+      lifetime_value: 94.48
+    },
+    {
+      customer_name: 'Jaime Gutierrez',
+      num_orders: 1,
+      lifetime_value: 8.99
+    },
+    {
+      customer_name: 'Jaime Hernandez',
+      num_orders: 2,
+      lifetime_value: 53.97
+    },
+    {
+      customer_name: 'Jaime Jimenez',
+      num_orders: 2,
+      lifetime_value: 159.99
+    },
+    {
+      customer_name: 'Jaime Moreno',
+      num_orders: 1,
+      lifetime_value: 35
+    },
+    {
+      customer_name: 'Jake Zukowski',
+      num_orders: 2,
+      lifetime_value: 6008.2
+    },
+    {
+      customer_name: 'James Adams',
+      num_orders: 3,
+      lifetime_value: 7182.66
+    },
+    {
+      customer_name: 'James Allen',
+      num_orders: 2,
+      lifetime_value: 160.92
+    },
+    {
+      customer_name: 'James Anderson',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'James Baker',
+      num_orders: 1,
+      lifetime_value: 1729.97
+    },
+    {
+      customer_name: 'James Brown',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'James Campbell',
+      num_orders: 1,
+      lifetime_value: 589.96
+    },
+    {
+      customer_name: 'James Carter',
+      num_orders: 1,
+      lifetime_value: 58.98
+    },
+    {
+      customer_name: 'James Clark',
+      num_orders: 2,
+      lifetime_value: 3075.0325
+    },
+    {
+      customer_name: 'James Collins',
+      num_orders: 2,
+      lifetime_value: 4426.4096
+    },
+    {
+      customer_name: 'James Davis',
+      num_orders: 1,
+      lifetime_value: 2369.97
+    },
+    {
+      customer_name: 'James Edwards',
+      num_orders: 3,
+      lifetime_value: 5253.07
+    },
+    {
+      customer_name: 'James Evans',
+      num_orders: 2,
+      lifetime_value: 4391.4096
+    },
+    {
+      customer_name: 'James Garcia',
+      num_orders: 2,
+      lifetime_value: 2736.4175
+    },
+    {
+      customer_name: 'James Gonzalez',
+      num_orders: 3,
+      lifetime_value: 95.82
+    },
+    {
+      customer_name: 'James Green',
+      num_orders: 3,
+      lifetime_value: 7159.7
+    },
+    {
+      customer_name: 'James Hall',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'James Harris',
+      num_orders: 1,
+      lifetime_value: 2357.28
+    },
+    {
+      customer_name: 'James Hernandez',
+      num_orders: 1,
+      lifetime_value: 2414.99
+    },
+    {
+      customer_name: 'James Hill',
+      num_orders: 2,
+      lifetime_value: 106.56
+    },
+    {
+      customer_name: 'James Jackson',
+      num_orders: 1,
+      lifetime_value: 1763.97
+    },
+    {
+      customer_name: 'James Johnson',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'James Jones',
+      num_orders: 1,
+      lifetime_value: 1750.98
+    },
+    {
+      customer_name: 'James Lee',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'James Lewis',
+      num_orders: 1,
+      lifetime_value: 1750.98
+    },
+    {
+      customer_name: 'James Lopez',
+      num_orders: 2,
+      lifetime_value: 77.27
+    },
+    {
+      customer_name: 'James Martin',
+      num_orders: 2,
+      lifetime_value: 3001.0425
+    },
+    {
+      customer_name: 'James Martinez',
+      num_orders: 1,
+      lifetime_value: 73.96
+    },
+    {
+      customer_name: 'James Miller',
+      num_orders: 1,
+      lifetime_value: 54.98
+    },
+    {
+      customer_name: 'James Mitchell',
+      num_orders: 1,
+      lifetime_value: 59.91
+    },
+    {
+      customer_name: 'James Moore',
+      num_orders: 1,
+      lifetime_value: 2318.96
+    },
+    {
+      customer_name: 'James Nelson',
+      num_orders: 2,
+      lifetime_value: 111.95
+    },
+    {
+      customer_name: 'James Parker',
+      num_orders: 1,
+      lifetime_value: 31.27
+    },
+    {
+      customer_name: 'James Perez',
+      num_orders: 2,
+      lifetime_value: 4900.68
+    },
+    {
+      customer_name: 'James Phillips',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'James Ptaszynski',
+      num_orders: 1,
+      lifetime_value: 8.99
+    },
+    {
+      customer_name: 'James Roberts',
+      num_orders: 3,
+      lifetime_value: 6932.9025
+    },
+    {
+      customer_name: 'James Robinson',
+      num_orders: 1,
+      lifetime_value: 149.98
+    },
+    {
+      customer_name: 'James Rodriguez',
+      num_orders: 2,
+      lifetime_value: 3017.33
+    },
+    {
+      customer_name: 'James Smith',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'James Thomas',
+      num_orders: 1,
+      lifetime_value: 1700.99
+    },
+    {
+      customer_name: 'James Thompson',
+      num_orders: 2,
+      lifetime_value: 106.24
+    },
+    {
+      customer_name: 'James Turner',
+      num_orders: 1,
+      lifetime_value: 2518.25
+    },
+    {
+      customer_name: 'James Walker',
+      num_orders: 1,
+      lifetime_value: 624.95
+    },
+    {
+      customer_name: 'James White',
+      num_orders: 1,
+      lifetime_value: 1732.26
+    },
+    {
+      customer_name: 'James Williams',
+      num_orders: 2,
+      lifetime_value: 164.46
+    },
+    {
+      customer_name: 'James Wilson',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'James Wright',
+      num_orders: 1,
+      lifetime_value: 562.96
+    },
+    {
+      customer_name: 'James Young',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Jamie Alan',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jamie Ashe',
+      num_orders: 2,
+      lifetime_value: 1588.5682
+    },
+    {
+      customer_name: 'Jamie Blanco',
+      num_orders: 3,
+      lifetime_value: 5216.6896
+    },
+    {
+      customer_name: 'Jamie Carlson',
+      num_orders: 2,
+      lifetime_value: 142.47
+    },
+    {
+      customer_name: 'Jamie Dominguez',
+      num_orders: 2,
+      lifetime_value: 3100.5482
+    },
+    {
+      customer_name: 'Jamie Gutierrez',
+      num_orders: 2,
+      lifetime_value: 1588.5682
+    },
+    {
+      customer_name: 'Jamie Hernandez',
+      num_orders: 2,
+      lifetime_value: 1613.0582
+    },
+    {
+      customer_name: 'Jamie Jimenez',
+      num_orders: 2,
+      lifetime_value: 1538.5582
+    },
+    {
+      customer_name: 'Jamie Moreno',
+      num_orders: 2,
+      lifetime_value: 3024.0182
+    },
+    {
+      customer_name: 'Jamie Muñoz',
+      num_orders: 2,
+      lifetime_value: 1538.5782
+    },
+    {
+      customer_name: 'Jamie Ortega',
+      num_orders: 3,
+      lifetime_value: 93.54
+    },
+    {
+      customer_name: 'Jamie Ramos',
+      num_orders: 3,
+      lifetime_value: 5237.7196
+    },
+    {
+      customer_name: 'Jamie Rubio',
+      num_orders: 3,
+      lifetime_value: 98.95
+    },
+    {
+      customer_name: 'Jamie Sanz',
+      num_orders: 3,
+      lifetime_value: 5178.3982
+    },
+    {
+      customer_name: 'Jamie Serrano',
+      num_orders: 2,
+      lifetime_value: 2934.3696
+    },
+    {
+      customer_name: 'Jamie Suarez',
+      num_orders: 2,
+      lifetime_value: 81.26
+    },
+    {
+      customer_name: 'Jamie Torres',
+      num_orders: 3,
+      lifetime_value: 195.02
+    },
+    {
+      customer_name: 'Jamie Vazquez',
+      num_orders: 3,
+      lifetime_value: 5199.9182
+    },
+    {
+      customer_name: 'Janelle Arthur',
+      num_orders: 1,
+      lifetime_value: 1760.47
+    },
+    {
+      customer_name: 'Janelle Chandra',
+      num_orders: 2,
+      lifetime_value: 6035.6
+    },
+    {
+      customer_name: 'Janelle Fernandez',
+      num_orders: 1,
+      lifetime_value: 1760.47
+    },
+    {
+      customer_name: 'Janelle Garcia',
+      num_orders: 2,
+      lifetime_value: 6030.61
+    },
+    {
+      customer_name: 'Janelle Gonzalez',
+      num_orders: 1,
+      lifetime_value: 1754.98
+    },
+    {
+      customer_name: 'Janelle Kapoor',
+      num_orders: 2,
+      lifetime_value: 3332.3875
+    },
+    {
+      customer_name: 'Janelle Lopez',
+      num_orders: 1,
+      lifetime_value: 2379.95
+    },
+    {
+      customer_name: 'Janelle Madan',
+      num_orders: 2,
+      lifetime_value: 6145.07
+    },
+    {
+      customer_name: 'Janelle Malhotra',
+      num_orders: 2,
+      lifetime_value: 126.94
+    },
+    {
+      customer_name: 'Janelle Martinez',
+      num_orders: 1,
+      lifetime_value: 2345.22
+    },
+    {
+      customer_name: 'Janelle Patel',
+      num_orders: 1,
+      lifetime_value: 1709.98
+    },
+    {
+      customer_name: 'Janelle Perez',
+      num_orders: 1,
+      lifetime_value: 1785.97
+    },
+    {
+      customer_name: 'Janelle Prasad',
+      num_orders: 1,
+      lifetime_value: 1725.98
+    },
+    {
+      customer_name: 'Janelle Raman',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Janelle Rodriguez',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Janelle Sai',
+      num_orders: 2,
+      lifetime_value: 6106.6
+    },
+    {
+      customer_name: 'Janelle Sanchez',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Janelle Subram',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Janelle Suri',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Janice Bennett',
+      num_orders: 2,
+      lifetime_value: 5980.22
+    },
+    {
+      customer_name: 'Jared Bailey',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Jared Bell',
+      num_orders: 2,
+      lifetime_value: 2853.5682
+    },
+    {
+      customer_name: 'Jared Brooks',
+      num_orders: 2,
+      lifetime_value: 4397.75
+    },
+    {
+      customer_name: 'Jared Cook',
+      num_orders: 1,
+      lifetime_value: 124.99
+    },
+    {
+      customer_name: 'Jared Cox',
+      num_orders: 2,
+      lifetime_value: 4397.75
+    },
+    {
+      customer_name: 'Jared Gray',
+      num_orders: 2,
+      lifetime_value: 3394.3875
+    },
+    {
+      customer_name: 'Jared Howard',
+      num_orders: 2,
+      lifetime_value: 5976.74
+    },
+    {
+      customer_name: 'Jared James',
+      num_orders: 2,
+      lifetime_value: 62.27
+    },
+    {
+      customer_name: 'Jared Kelly',
+      num_orders: 2,
+      lifetime_value: 168.93
+    },
+    {
+      customer_name: 'Jared Morgan',
+      num_orders: 1,
+      lifetime_value: 29.48
+    },
+    {
+      customer_name: 'Jared Morris',
+      num_orders: 1,
+      lifetime_value: 804.47
+    },
+    {
+      customer_name: 'Jared Moyer',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Jared Peterson',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Jared Ramirez',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jared Reed',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jared Richardson',
+      num_orders: 3,
+      lifetime_value: 120.41
+    },
+    {
+      customer_name: 'Jared Rivera',
+      num_orders: 2,
+      lifetime_value: 4399.0782
+    },
+    {
+      customer_name: 'Jared Rogers',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jared Sanchez',
+      num_orders: 2,
+      lifetime_value: 2935.3696
+    },
+    {
+      customer_name: 'Jared Sanders',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Jared Stewart',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jared Torres',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Jared Ward',
+      num_orders: 3,
+      lifetime_value: 258.44
+    },
+    {
+      customer_name: 'Jared Watson',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Jarred Gill',
+      num_orders: 2,
+      lifetime_value: 64.9
+    },
+    {
+      customer_name: 'Jasmine Alexander',
+      num_orders: 2,
+      lifetime_value: 4544.45
+    },
+    {
+      customer_name: 'Jasmine Anderson',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Jasmine Bailey',
+      num_orders: 1,
+      lifetime_value: 574.98
+    },
+    {
+      customer_name: 'Jasmine Barnes',
+      num_orders: 2,
+      lifetime_value: 5807.93
+    },
+    {
+      customer_name: 'Jasmine Bell',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Jasmine Brooks',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Jasmine Brown',
+      num_orders: 3,
+      lifetime_value: 6986.75
+    },
+    {
+      customer_name: 'Jasmine Bryant',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jasmine Butler',
+      num_orders: 1,
+      lifetime_value: 1155.48
+    },
+    {
+      customer_name: 'Jasmine Clark',
+      num_orders: 7,
+      lifetime_value: 11248.4582
+    },
+    {
+      customer_name: 'Jasmine Coleman',
+      num_orders: 1,
+      lifetime_value: 123.98
+    },
+    {
+      customer_name: 'Jasmine Cook',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Jasmine Cox',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Jasmine Davis',
+      num_orders: 1,
+      lifetime_value: 68.97
+    },
+    {
+      customer_name: 'Jasmine Diaz',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Jasmine Flores',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Jasmine Foster',
+      num_orders: 1,
+      lifetime_value: 608.96
+    },
+    {
+      customer_name: 'Jasmine Garcia',
+      num_orders: 2,
+      lifetime_value: 4464.0682
+    },
+    {
+      customer_name: 'Jasmine Gonzales',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Jasmine Gray',
+      num_orders: 1,
+      lifetime_value: 46.47
+    },
+    {
+      customer_name: 'Jasmine Griffin',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Jasmine Hall',
+      num_orders: 4,
+      lifetime_value: 9917.99
+    },
+    {
+      customer_name: 'Jasmine Harris',
+      num_orders: 2,
+      lifetime_value: 4415.0382
+    },
+    {
+      customer_name: 'Jasmine Henderson',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Jasmine Hughes',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Jasmine Jackson',
+      num_orders: 3,
+      lifetime_value: 5020.8696
+    },
+    {
+      customer_name: 'Jasmine James',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Jasmine Jenkins',
+      num_orders: 1,
+      lifetime_value: 1147.77
+    },
+    {
+      customer_name: 'Jasmine Johnson',
+      num_orders: 1,
+      lifetime_value: 48.97
+    },
+    {
+      customer_name: 'Jasmine Jones',
+      num_orders: 3,
+      lifetime_value: 6958.8
+    },
+    {
+      customer_name: 'Jasmine Kelly',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Jasmine Lee',
+      num_orders: 6,
+      lifetime_value: 10528.6282
+    },
+    {
+      customer_name: 'Jasmine Lewis',
+      num_orders: 4,
+      lifetime_value: 9904.97
+    },
+    {
+      customer_name: 'Jasmine Long',
+      num_orders: 1,
+      lifetime_value: 144.47
+    },
+    {
+      customer_name: 'Jasmine Peterson',
+      num_orders: 1,
+      lifetime_value: 564.99
+    },
+    {
+      customer_name: 'Jasmine Powell',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Jasmine Price',
+      num_orders: 1,
+      lifetime_value: 604.96
+    },
+    {
+      customer_name: 'Jasmine Ramirez',
+      num_orders: 1,
+      lifetime_value: 629.45
+    },
+    {
+      customer_name: 'Jasmine Reed',
+      num_orders: 2,
+      lifetime_value: 98.94
+    },
+    {
+      customer_name: 'Jasmine Richardson',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Jasmine Rivera',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Jasmine Robinson',
+      num_orders: 4,
+      lifetime_value: 7191.77
+    },
+    {
+      customer_name: 'Jasmine Rodriguez',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Jasmine Rogers',
+      num_orders: 2,
+      lifetime_value: 6098.58
+    },
+    {
+      customer_name: 'Jasmine Ross',
+      num_orders: 1,
+      lifetime_value: 639.95
+    },
+    {
+      customer_name: 'Jasmine Russell',
+      num_orders: 1,
+      lifetime_value: 1199.46
+    },
+    {
+      customer_name: 'Jasmine Sanders',
+      num_orders: 1,
+      lifetime_value: 589.98
+    },
+    {
+      customer_name: 'Jasmine Simmons',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Jasmine Smith',
+      num_orders: 1,
+      lifetime_value: 48.97
+    },
+    {
+      customer_name: 'Jasmine Stewart',
+      num_orders: 2,
+      lifetime_value: 6058.21
+    },
+    {
+      customer_name: 'Jasmine Taylor',
+      num_orders: 2,
+      lifetime_value: 5729.97
+    },
+    {
+      customer_name: 'Jasmine Thomas',
+      num_orders: 3,
+      lifetime_value: 6967.78
+    },
+    {
+      customer_name: 'Jasmine Thompson',
+      num_orders: 2,
+      lifetime_value: 4444.0682
+    },
+    {
+      customer_name: 'Jasmine Torres',
+      num_orders: 1,
+      lifetime_value: 1155.48
+    },
+    {
+      customer_name: 'Jasmine Walker',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Jasmine Ward',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Jasmine Washington',
+      num_orders: 2,
+      lifetime_value: 98.48
+    },
+    {
+      customer_name: 'Jasmine West',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Jasmine White',
+      num_orders: 3,
+      lifetime_value: 5059.3296
+    },
+    {
+      customer_name: 'Jasmine Williams',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Jasmine Wilson',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Jasmine Wood',
+      num_orders: 1,
+      lifetime_value: 604.46
+    },
+    {
+      customer_name: 'Jason Adams',
+      num_orders: 1,
+      lifetime_value: 2380.47
+    },
+    {
+      customer_name: 'Jason Allen',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Jason Campbell',
+      num_orders: 2,
+      lifetime_value: 81.81
+    },
+    {
+      customer_name: 'Jason Carter',
+      num_orders: 2,
+      lifetime_value: 3001.0425
+    },
+    {
+      customer_name: 'Jason Collins',
+      num_orders: 1,
+      lifetime_value: 89.97
+    },
+    {
+      customer_name: 'Jason Edwards',
+      num_orders: 2,
+      lifetime_value: 76.57
+    },
+    {
+      customer_name: 'Jason Evans',
+      num_orders: 2,
+      lifetime_value: 5977.74
+    },
+    {
+      customer_name: 'Jason Gonzalez',
+      num_orders: 2,
+      lifetime_value: 3037.33
+    },
+    {
+      customer_name: 'Jason Green',
+      num_orders: 2,
+      lifetime_value: 81.26
+    },
+    {
+      customer_name: 'Jason Hall',
+      num_orders: 2,
+      lifetime_value: 119.91
+    },
+    {
+      customer_name: 'Jason Hill',
+      num_orders: 1,
+      lifetime_value: 54.98
+    },
+    {
+      customer_name: 'Jason King',
+      num_orders: 2,
+      lifetime_value: 163.94
+    },
+    {
+      customer_name: 'Jason Lopez',
+      num_orders: 2,
+      lifetime_value: 4442.24
+    },
+    {
+      customer_name: 'Jason Mitchell',
+      num_orders: 1,
+      lifetime_value: 588.96
+    },
+    {
+      customer_name: 'Jason Nelson',
+      num_orders: 2,
+      lifetime_value: 169.43
+    },
+    {
+      customer_name: 'Jason Parker',
+      num_orders: 2,
+      lifetime_value: 1337.96
+    },
+    {
+      customer_name: 'Jason Perez',
+      num_orders: 3,
+      lifetime_value: 225.92
+    },
+    {
+      customer_name: 'Jason Phillips',
+      num_orders: 1,
+      lifetime_value: 567.27
+    },
+    {
+      customer_name: 'Jason Roberts',
+      num_orders: 2,
+      lifetime_value: 3127.25
+    },
+    {
+      customer_name: 'Jason Scott',
+      num_orders: 1,
+      lifetime_value: 24.99
+    },
+    {
+      customer_name: 'Jason Wright',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Jason Young',
+      num_orders: 1,
+      lifetime_value: 1714.97
+    },
+    {
+      customer_name: 'Javier Alvarez',
+      num_orders: 3,
+      lifetime_value: 99.2
+    },
+    {
+      customer_name: 'Javier Browning',
+      num_orders: 3,
+      lifetime_value: 6765.4382
+    },
+    {
+      customer_name: 'Javier Dominguez',
+      num_orders: 2,
+      lifetime_value: 144.74
+    },
+    {
+      customer_name: 'Javier Gill',
+      num_orders: 2,
+      lifetime_value: 79.97
+    },
+    {
+      customer_name: 'Javier Gutierrez',
+      num_orders: 3,
+      lifetime_value: 215.74
+    },
+    {
+      customer_name: 'Javier Hernandez',
+      num_orders: 3,
+      lifetime_value: 6841.4296
+    },
+    {
+      customer_name: 'Javier Jiménez',
+      num_orders: 3,
+      lifetime_value: 118.96
+    },
+    {
+      customer_name: 'Javier Muñoz',
+      num_orders: 3,
+      lifetime_value: 6889.1082
+    },
+    {
+      customer_name: 'Javier Navarro',
+      num_orders: 3,
+      lifetime_value: 234.93
+    },
+    {
+      customer_name: 'Javier Ortega',
+      num_orders: 2,
+      lifetime_value: 210.25
+    },
+    {
+      customer_name: 'Javier Ramos',
+      num_orders: 1,
+      lifetime_value: 56.97
+    },
+    {
+      customer_name: 'Javier Rubio',
+      num_orders: 2,
+      lifetime_value: 3021.0425
+    },
+    {
+      customer_name: 'Javier Sanz',
+      num_orders: 1,
+      lifetime_value: 65.96
+    },
+    {
+      customer_name: 'Javier Serrano',
+      num_orders: 3,
+      lifetime_value: 6768.1382
+    },
+    {
+      customer_name: 'Javier Torres',
+      num_orders: 3,
+      lifetime_value: 188.96
+    },
+    {
+      customer_name: 'Javier Vazquez',
+      num_orders: 3,
+      lifetime_value: 6817.1182
+    },
+    {
+      customer_name: 'Jeffery Cai',
+      num_orders: 1,
+      lifetime_value: 2394.97
+    },
+    {
+      customer_name: 'Jeffery Chen',
+      num_orders: 1,
+      lifetime_value: 24.99
+    },
+    {
+      customer_name: 'Jeffery Guo',
+      num_orders: 2,
+      lifetime_value: 155.47
+    },
+    {
+      customer_name: 'Jeffery He',
+      num_orders: 1,
+      lifetime_value: 2439.99
+    },
+    {
+      customer_name: 'Jeffery Hu',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Jeffery Huang',
+      num_orders: 2,
+      lifetime_value: 3941.5325
+    },
+    {
+      customer_name: 'Jeffery Li',
+      num_orders: 2,
+      lifetime_value: 2435.0782
+    },
+    {
+      customer_name: 'Jeffery Liang',
+      num_orders: 1,
+      lifetime_value: 54.98
+    },
+    {
+      customer_name: 'Jeffery Lin',
+      num_orders: 1,
+      lifetime_value: 64.97
+    },
+    {
+      customer_name: 'Jeffery Liu',
+      num_orders: 1,
+      lifetime_value: 29.98
+    },
+    {
+      customer_name: 'Jeffery Lu',
+      num_orders: 1,
+      lifetime_value: 1725.98
+    },
+    {
+      customer_name: 'Jeffery Ma',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Jeffery She',
+      num_orders: 1,
+      lifetime_value: 1700.99
+    },
+    {
+      customer_name: 'Jeffery Sun',
+      num_orders: 1,
+      lifetime_value: 1700.99
+    },
+    {
+      customer_name: 'Jeffery Wang',
+      num_orders: 1,
+      lifetime_value: 63.97
+    },
+    {
+      customer_name: 'Jeffery Wu',
+      num_orders: 2,
+      lifetime_value: 2435.0782
+    },
+    {
+      customer_name: 'Jeffery Yang',
+      num_orders: 1,
+      lifetime_value: 34.98
+    },
+    {
+      customer_name: 'Jeffery Ye',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Jeffery Zeng',
+      num_orders: 2,
+      lifetime_value: 200.94
+    },
+    {
+      customer_name: 'Jeffery Zhang',
+      num_orders: 1,
+      lifetime_value: 144.45
+    },
+    {
+      customer_name: 'Jeffery Zhao',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jeffery Zheng',
+      num_orders: 1,
+      lifetime_value: 68.49
+    },
+    {
+      customer_name: 'Jeffery Zhou',
+      num_orders: 1,
+      lifetime_value: 1750.98
+    },
+    {
+      customer_name: 'Jeffery Zhu',
+      num_orders: 1,
+      lifetime_value: 1714.97
+    },
+    {
+      customer_name: 'Jenna Young',
+      num_orders: 3,
+      lifetime_value: 8139.29
+    },
+    {
+      customer_name: 'Jennifer Alexander',
+      num_orders: 1,
+      lifetime_value: 68.97
+    },
+    {
+      customer_name: 'Jennifer Anderson',
+      num_orders: 3,
+      lifetime_value: 8180
+    },
+    {
+      customer_name: 'Jennifer Bailey',
+      num_orders: 1,
+      lifetime_value: 23.78
+    },
+    {
+      customer_name: 'Jennifer Barnes',
+      num_orders: 1,
+      lifetime_value: 64.98
+    },
+    {
+      customer_name: 'Jennifer Bell',
+      num_orders: 1,
+      lifetime_value: 9.99
+    },
+    {
+      customer_name: 'Jennifer Bennett',
+      num_orders: 1,
+      lifetime_value: 23.97
+    },
+    {
+      customer_name: 'Jennifer Brooks',
+      num_orders: 2,
+      lifetime_value: 4400.0582
+    },
+    {
+      customer_name: 'Jennifer Brown',
+      num_orders: 2,
+      lifetime_value: 128.96
+    },
+    {
+      customer_name: 'Jennifer Bryant',
+      num_orders: 1,
+      lifetime_value: 23.97
+    },
+    {
+      customer_name: 'Jennifer Butler',
+      num_orders: 1,
+      lifetime_value: 103.96
+    },
+    {
+      customer_name: 'Jennifer Clark',
+      num_orders: 3,
+      lifetime_value: 8095.99
+    },
+    {
+      customer_name: 'Jennifer Coleman',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Jennifer Cook',
+      num_orders: 2,
+      lifetime_value: 6029.57
+    },
+    {
+      customer_name: 'Jennifer Cooper',
+      num_orders: 1,
+      lifetime_value: 73.96
+    },
+    {
+      customer_name: 'Jennifer Cox',
+      num_orders: 1,
+      lifetime_value: 1147.77
+    },
+    {
+      customer_name: 'Jennifer Davis',
+      num_orders: 2,
+      lifetime_value: 200.28
+    },
+    {
+      customer_name: 'Jennifer Diaz',
+      num_orders: 1,
+      lifetime_value: 2492.32
+    },
+    {
+      customer_name: 'Jennifer Foster',
+      num_orders: 1,
+      lifetime_value: 31.92
+    },
+    {
+      customer_name: 'Jennifer Garcia',
+      num_orders: 3,
+      lifetime_value: 102.91
+    },
+    {
+      customer_name: 'Jennifer Gonzales',
+      num_orders: 1,
+      lifetime_value: 14.98
+    },
+    {
+      customer_name: 'Jennifer Griffin',
+      num_orders: 1,
+      lifetime_value: 1174.48
+    },
+    {
+      customer_name: 'Jennifer Hall',
+      num_orders: 3,
+      lifetime_value: 122.89
+    },
+    {
+      customer_name: 'Jennifer Harris',
+      num_orders: 3,
+      lifetime_value: 8215.99
+    },
+    {
+      customer_name: 'Jennifer Howard',
+      num_orders: 1,
+      lifetime_value: 17.27
+    },
+    {
+      customer_name: 'Jennifer Hughes',
+      num_orders: 1,
+      lifetime_value: 25.22
+    },
+    {
+      customer_name: 'Jennifer Jackson',
+      num_orders: 3,
+      lifetime_value: 8063.04
+    },
+    {
+      customer_name: 'Jennifer James',
+      num_orders: 1,
+      lifetime_value: 2521.31
+    },
+    {
+      customer_name: 'Jennifer Jenkins',
+      num_orders: 1,
+      lifetime_value: 9.99
+    },
+    {
+      customer_name: 'Jennifer Johnson',
+      num_orders: 3,
+      lifetime_value: 57.95
+    },
+    {
+      customer_name: 'Jennifer Jones',
+      num_orders: 2,
+      lifetime_value: 3137.32
+    },
+    {
+      customer_name: 'Jennifer Kelly',
+      num_orders: 1,
+      lifetime_value: 1151.76
+    },
+    {
+      customer_name: 'Jennifer Lee',
+      num_orders: 3,
+      lifetime_value: 8093.03
+    },
+    {
+      customer_name: 'Jennifer Lewis',
+      num_orders: 3,
+      lifetime_value: 8124.04
+    },
+    {
+      customer_name: 'Jennifer Long',
+      num_orders: 1,
+      lifetime_value: 74.46
+    },
+    {
+      customer_name: 'Jennifer Miller',
+      num_orders: 2,
+      lifetime_value: 3176.78
+    },
+    {
+      customer_name: 'Jennifer Moore',
+      num_orders: 3,
+      lifetime_value: 6704.08
+    },
+    {
+      customer_name: 'Jennifer Morgan',
+      num_orders: 2,
+      lifetime_value: 6044.59
+    },
+    {
+      customer_name: 'Jennifer Morris',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Jennifer Murphy',
+      num_orders: 1,
+      lifetime_value: 21.49
+    },
+    {
+      customer_name: 'Jennifer Patterson',
+      num_orders: 1,
+      lifetime_value: 54.96
+    },
+    {
+      customer_name: 'Jennifer Perry',
+      num_orders: 1,
+      lifetime_value: 72.93
+    },
+    {
+      customer_name: 'Jennifer Peterson',
+      num_orders: 1,
+      lifetime_value: 14.98
+    },
+    {
+      customer_name: 'Jennifer Price',
+      num_orders: 1,
+      lifetime_value: 9.99
+    },
+    {
+      customer_name: 'Jennifer Ramirez',
+      num_orders: 1,
+      lifetime_value: 14.98
+    },
+    {
+      customer_name: 'Jennifer Reed',
+      num_orders: 2,
+      lifetime_value: 6078.71
+    },
+    {
+      customer_name: 'Jennifer Rivera',
+      num_orders: 2,
+      lifetime_value: 6029.57
+    },
+    {
+      customer_name: 'Jennifer Robinson',
+      num_orders: 3,
+      lifetime_value: 8173.03
+    },
+    {
+      customer_name: 'Jennifer Rodriguez',
+      num_orders: 3,
+      lifetime_value: 8079.05
+    },
+    {
+      customer_name: 'Jennifer Rogers',
+      num_orders: 1,
+      lifetime_value: 2482.23
+    },
+    {
+      customer_name: 'Jennifer Ross',
+      num_orders: 1,
+      lifetime_value: 119.96
+    },
+    {
+      customer_name: 'Jennifer Russell',
+      num_orders: 1,
+      lifetime_value: 14.98
+    },
+    {
+      customer_name: 'Jennifer Sanchez',
+      num_orders: 1,
+      lifetime_value: 9.99
+    },
+    {
+      customer_name: 'Jennifer Sanders',
+      num_orders: 1,
+      lifetime_value: 49.97
+    },
+    {
+      customer_name: 'Jennifer Simmons',
+      num_orders: 1,
+      lifetime_value: 93.46
+    },
+    {
+      customer_name: 'Jennifer Smith',
+      num_orders: 3,
+      lifetime_value: 8169.03
+    },
+    {
+      customer_name: 'Jennifer Stewart',
+      num_orders: 1,
+      lifetime_value: 69.97
+    },
+    {
+      customer_name: 'Jennifer Taylor',
+      num_orders: 28,
+      lifetime_value: 1189.33
+    },
+    {
+      customer_name: 'Jennifer Thomas',
+      num_orders: 3,
+      lifetime_value: 235.89
+    },
+    {
+      customer_name: 'Jennifer Thompson',
+      num_orders: 3,
+      lifetime_value: 8262.52
+    },
+    {
+      customer_name: 'Jennifer Torres',
+      num_orders: 1,
+      lifetime_value: 73.97
+    },
+    {
+      customer_name: 'Jennifer Walker',
+      num_orders: 3,
+      lifetime_value: 8137
+    },
+    {
+      customer_name: 'Jennifer Ward',
+      num_orders: 2,
+      lifetime_value: 3169.5882
+    },
+    {
+      customer_name: 'Jennifer Washington',
+      num_orders: 1,
+      lifetime_value: 14.98
+    },
+    {
+      customer_name: 'Jennifer Watson',
+      num_orders: 1,
+      lifetime_value: 85.48
+    },
+    {
+      customer_name: 'Jennifer White',
+      num_orders: 3,
+      lifetime_value: 88.96
+    },
+    {
+      customer_name: 'Jennifer Williams',
+      num_orders: 2,
+      lifetime_value: 104.26
+    },
+    {
+      customer_name: 'Jennifer Wilson',
+      num_orders: 2,
+      lifetime_value: 3188.28
+    },
+    {
+      customer_name: 'Jennifer Wood',
+      num_orders: 1,
+      lifetime_value: 2482.23
+    },
+    {
+      customer_name: 'Jenny Andersen',
+      num_orders: 2,
+      lifetime_value: 44.57
+    },
+    {
+      customer_name: 'Jenny Becker',
+      num_orders: 2,
+      lifetime_value: 39.58
+    },
+    {
+      customer_name: 'Jenny Cai',
+      num_orders: 1,
+      lifetime_value: 62.98
+    },
+    {
+      customer_name: 'Jenny Chande',
+      num_orders: 1,
+      lifetime_value: 35
+    },
+    {
+      customer_name: 'Jenny Chander',
+      num_orders: 1,
+      lifetime_value: 863.95
+    },
+    {
+      customer_name: 'Jenny Chen',
+      num_orders: 6,
+      lifetime_value: 12909.6682
+    },
+    {
+      customer_name: 'Jenny Ferrier',
+      num_orders: 2,
+      lifetime_value: 5875.55
+    },
+    {
+      customer_name: 'Jenny Goel',
+      num_orders: 2,
+      lifetime_value: 5888.24
+    },
+    {
+      customer_name: 'Jenny Guo',
+      num_orders: 3,
+      lifetime_value: 8128.51
+    },
+    {
+      customer_name: 'Jenny He',
+      num_orders: 3,
+      lifetime_value: 6959.82
+    },
+    {
+      customer_name: 'Jenny Hu',
+      num_orders: 3,
+      lifetime_value: 8165.82
+    },
+    {
+      customer_name: 'Jenny Huang',
+      num_orders: 3,
+      lifetime_value: 8136.02
+    },
+    {
+      customer_name: 'Jenny Kumar',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Jenny Lal',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Jenny Li',
+      num_orders: 2,
+      lifetime_value: 81.76
+    },
+    {
+      customer_name: 'Jenny Liang',
+      num_orders: 3,
+      lifetime_value: 8116.33
+    },
+    {
+      customer_name: 'Jenny Lin',
+      num_orders: 3,
+      lifetime_value: 8078.02
+    },
+    {
+      customer_name: 'Jenny Liu',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Jenny Lu',
+      num_orders: 3,
+      lifetime_value: 8142.03
+    },
+    {
+      customer_name: 'Jenny Luo',
+      num_orders: 3,
+      lifetime_value: 8158.01
+    },
+    {
+      customer_name: 'Jenny McDonald',
+      num_orders: 3,
+      lifetime_value: 8089.04
+    },
+    {
+      customer_name: 'Jenny Nara',
+      num_orders: 1,
+      lifetime_value: 39.99
+    },
+    {
+      customer_name: 'Jenny Nath',
+      num_orders: 16,
+      lifetime_value: 757.27
+    },
+    {
+      customer_name: 'Jenny Pal',
+      num_orders: 16,
+      lifetime_value: 1026.29
+    },
+    {
+      customer_name: 'Jenny Rai',
+      num_orders: 2,
+      lifetime_value: 5915.54
+    },
+    {
+      customer_name: 'Jenny Raje',
+      num_orders: 2,
+      lifetime_value: 77.27
+    },
+    {
+      customer_name: 'Jenny Raji',
+      num_orders: 16,
+      lifetime_value: 573.8
+    },
+    {
+      customer_name: 'Jenny Shan',
+      num_orders: 16,
+      lifetime_value: 561.53
+    },
+    {
+      customer_name: 'Jenny She',
+      num_orders: 1,
+      lifetime_value: 53.99
+    },
+    {
+      customer_name: 'Jenny Shen',
+      num_orders: 3,
+      lifetime_value: 4966.3896
+    },
+    {
+      customer_name: 'Jenny Sun',
+      num_orders: 3,
+      lifetime_value: 8211.48
+    },
+    {
+      customer_name: 'Jenny Tang',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Jenny Wagner',
+      num_orders: 4,
+      lifetime_value: 9912.98
+    },
+    {
+      customer_name: 'Jenny Wu',
+      num_orders: 3,
+      lifetime_value: 8237.01
+    },
+    {
+      customer_name: 'Jenny Xu',
+      num_orders: 3,
+      lifetime_value: 8224.46
+    },
+    {
+      customer_name: 'Jenny Xu',
+      num_orders: 3,
+      lifetime_value: 8090.33
+    },
+    {
+      customer_name: 'Jenny Yang',
+      num_orders: 6,
+      lifetime_value: 12489.1696
+    },
+    {
+      customer_name: 'Jenny Ye',
+      num_orders: 3,
+      lifetime_value: 8249.49
+    },
+    {
+      customer_name: 'Jenny Zeng',
+      num_orders: 1,
+      lifetime_value: 53.99
+    },
+    {
+      customer_name: 'Jenny Zhang',
+      num_orders: 1,
+      lifetime_value: 84.98
+    },
+    {
+      customer_name: 'Jenny Zheng',
+      num_orders: 2,
+      lifetime_value: 4344.0882
+    },
+    {
+      customer_name: 'Jenny Zhou',
+      num_orders: 3,
+      lifetime_value: 8130.32
+    },
+    {
+      customer_name: 'Jenny Zhu',
+      num_orders: 3,
+      lifetime_value: 8141.33
+    },
+    {
+      customer_name: 'Jenny Zimmerman',
+      num_orders: 3,
+      lifetime_value: 6958.8
+    },
+    {
+      customer_name: 'Jeremiah Diaz',
+      num_orders: 2,
+      lifetime_value: 86.24
+    },
+    {
+      customer_name: 'Jeremiah Flores',
+      num_orders: 2,
+      lifetime_value: 4492.4482
+    },
+    {
+      customer_name: 'Jeremiah Gonzales',
+      num_orders: 2,
+      lifetime_value: 4528.7496
+    },
+    {
+      customer_name: 'Jeremiah Gray',
+      num_orders: 1,
+      lifetime_value: 29.48
+    },
+    {
+      customer_name: 'Jeremiah Griffin',
+      num_orders: 2,
+      lifetime_value: 137.94
+    },
+    {
+      customer_name: 'Jeremiah Hayes',
+      num_orders: 2,
+      lifetime_value: 5973.24
+    },
+    {
+      customer_name: 'Jeremiah Henderson',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Jeremiah Howard',
+      num_orders: 2,
+      lifetime_value: 1898.0682
+    },
+    {
+      customer_name: 'Jeremiah Hughes',
+      num_orders: 2,
+      lifetime_value: 2638.3582
+    },
+    {
+      customer_name: 'Jeremiah James',
+      num_orders: 3,
+      lifetime_value: 5643.5396
+    },
+    {
+      customer_name: 'Jeremiah Jenkins',
+      num_orders: 2,
+      lifetime_value: 48.96
+    },
+    {
+      customer_name: 'Jeremiah Long',
+      num_orders: 2,
+      lifetime_value: 5948.24
+    },
+    {
+      customer_name: 'Jeremiah Morris',
+      num_orders: 2,
+      lifetime_value: 3139.94
+    },
+    {
+      customer_name: 'Jeremiah Ross',
+      num_orders: 1,
+      lifetime_value: 100.09
+    },
+    {
+      customer_name: 'Jeremiah Russell',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jeremiah Sanchez',
+      num_orders: 1,
+      lifetime_value: 54.96
+    },
+    {
+      customer_name: 'Jeremiah Sanders',
+      num_orders: 2,
+      lifetime_value: 177.46
+    },
+    {
+      customer_name: 'Jeremiah Simmons',
+      num_orders: 2,
+      lifetime_value: 67.26
+    },
+    {
+      customer_name: 'Jeremiah Stewart',
+      num_orders: 2,
+      lifetime_value: 2833.5682
+    },
+    {
+      customer_name: 'Jeremiah Townsend',
+      num_orders: 1,
+      lifetime_value: 898.46
+    },
+    {
+      customer_name: 'Jeremy Alexander',
+      num_orders: 1,
+      lifetime_value: 186.28
+    },
+    {
+      customer_name: 'Jeremy Bailey',
+      num_orders: 1,
+      lifetime_value: 98.96
+    },
+    {
+      customer_name: 'Jeremy Barnes',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Jeremy Bell',
+      num_orders: 2,
+      lifetime_value: 2992.33
+    },
+    {
+      customer_name: 'Jeremy Bennett',
+      num_orders: 2,
+      lifetime_value: 4500.5225
+    },
+    {
+      customer_name: 'Jeremy Brooks',
+      num_orders: 1,
+      lifetime_value: 71.97
+    },
+    {
+      customer_name: 'Jeremy Bryant',
+      num_orders: 2,
+      lifetime_value: 4614.8596
+    },
+    {
+      customer_name: 'Jeremy Butler',
+      num_orders: 2,
+      lifetime_value: 4514.7696
+    },
+    {
+      customer_name: 'Jeremy Cook',
+      num_orders: 2,
+      lifetime_value: 4190.23
+    },
+    {
+      customer_name: 'Jeremy Cooper',
+      num_orders: 1,
+      lifetime_value: 80.96
+    },
+    {
+      customer_name: 'Jeremy Cox',
+      num_orders: 2,
+      lifetime_value: 4392.74
+    },
+    {
+      customer_name: 'Jeremy Murphy',
+      num_orders: 3,
+      lifetime_value: 5215.3982
+    },
+    {
+      customer_name: 'Jeremy Patterson',
+      num_orders: 2,
+      lifetime_value: 43.97
+    },
+    {
+      customer_name: 'Jeremy Perry',
+      num_orders: 2,
+      lifetime_value: 6012.23
+    },
+    {
+      customer_name: 'Jeremy Peterson',
+      num_orders: 1,
+      lifetime_value: 96.46
+    },
+    {
+      customer_name: 'Jeremy Powell',
+      num_orders: 2,
+      lifetime_value: 5918.24
+    },
+    {
+      customer_name: 'Jeremy Price',
+      num_orders: 2,
+      lifetime_value: 4533.5225
+    },
+    {
+      customer_name: 'Jeremy Ramirez',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jeremy Reed',
+      num_orders: 1,
+      lifetime_value: 76.96
+    },
+    {
+      customer_name: 'Jeremy Richardson',
+      num_orders: 3,
+      lifetime_value: 167.26
+    },
+    {
+      customer_name: 'Jeremy Rivera',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Jeremy Rogers',
+      num_orders: 2,
+      lifetime_value: 3127.95
+    },
+    {
+      customer_name: 'Jeremy Ward',
+      num_orders: 2,
+      lifetime_value: 138.45
+    },
+    {
+      customer_name: 'Jeremy Washington',
+      num_orders: 2,
+      lifetime_value: 4551.3596
+    },
+    {
+      customer_name: 'Jeremy Watson',
+      num_orders: 1,
+      lifetime_value: 839.48
+    },
+    {
+      customer_name: 'Jeremy Wood',
+      num_orders: 2,
+      lifetime_value: 48.96
+    },
+    {
+      customer_name: 'Jerry Andersen',
+      num_orders: 1,
+      lifetime_value: 2341.97
+    },
+    {
+      customer_name: 'Jerry Becker',
+      num_orders: 1,
+      lifetime_value: 1775.47
+    },
+    {
+      customer_name: 'Jerry Chande',
+      num_orders: 1,
+      lifetime_value: 2376.96
+    },
+    {
+      customer_name: 'Jerry Chander',
+      num_orders: 1,
+      lifetime_value: 58.98
+    },
+    {
+      customer_name: 'Jerry Deng',
+      num_orders: 1,
+      lifetime_value: 2294.99
+    },
+    {
+      customer_name: 'Jerry Ferrier',
+      num_orders: 2,
+      lifetime_value: 54.42
+    },
+    {
+      customer_name: 'Jerry Johnsen',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jerry Kumar',
+      num_orders: 1,
+      lifetime_value: 2341.97
+    },
+    {
+      customer_name: 'Jerry Lal',
+      num_orders: 1,
+      lifetime_value: 2325.96
+    },
+    {
+      customer_name: 'Jerry Luo',
+      num_orders: 1,
+      lifetime_value: 1754.98
+    },
+    {
+      customer_name: 'Jerry Nara',
+      num_orders: 1,
+      lifetime_value: 2434.92
+    },
+    {
+      customer_name: 'Jerry Nath',
+      num_orders: 1,
+      lifetime_value: 1754.98
+    },
+    {
+      customer_name: 'Jerry Pal',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Jerry Rai',
+      num_orders: 1,
+      lifetime_value: 64.47
+    },
+    {
+      customer_name: 'Jerry Raje',
+      num_orders: 1,
+      lifetime_value: 2366.96
+    },
+    {
+      customer_name: 'Jerry Shan',
+      num_orders: 1,
+      lifetime_value: 1750.98
+    },
+    {
+      customer_name: 'Jerry Sharma',
+      num_orders: 1,
+      lifetime_value: 1760.47
+    },
+    {
+      customer_name: 'Jerry She',
+      num_orders: 1,
+      lifetime_value: 2319.99
+    },
+    {
+      customer_name: 'Jerry Shen',
+      num_orders: 1,
+      lifetime_value: 48.97
+    },
+    {
+      customer_name: 'Jerry Tang',
+      num_orders: 1,
+      lifetime_value: 1729.97
+    },
+    {
+      customer_name: 'Jerry Xie',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Jerry Xu',
+      num_orders: 1,
+      lifetime_value: 1769.96
+    },
+    {
+      customer_name: 'Jerry Yuan',
+      num_orders: 1,
+      lifetime_value: 59.98
+    },
+    {
+      customer_name: 'Jesse Adams',
+      num_orders: 2,
+      lifetime_value: 3118.6
+    },
+    {
+      customer_name: 'Jesse Allen',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Jesse Bailey',
+      num_orders: 2,
+      lifetime_value: 4366.4096
+    },
+    {
+      customer_name: 'Jesse Baker',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jesse Bell',
+      num_orders: 3,
+      lifetime_value: 170.53
+    },
+    {
+      customer_name: 'Jesse Brooks',
+      num_orders: 2,
+      lifetime_value: 3319.6975
+    },
+    {
+      customer_name: 'Jesse Campbell',
+      num_orders: 1,
+      lifetime_value: 92.48
+    },
+    {
+      customer_name: 'Jesse Carter',
+      num_orders: 1,
+      lifetime_value: 24.99
+    },
+    {
+      customer_name: 'Jesse Cook',
+      num_orders: 2,
+      lifetime_value: 1685.45
+    },
+    {
+      customer_name: 'Jesse Cox',
+      num_orders: 2,
+      lifetime_value: 5923.23
+    },
+    {
+      customer_name: 'Jesse Edwards',
+      num_orders: 2,
+      lifetime_value: 4393.6996
+    },
+    {
+      customer_name: 'Jesse Evans',
+      num_orders: 2,
+      lifetime_value: 2992.33
+    },
+    {
+      customer_name: 'Jesse Gonzalez',
+      num_orders: 2,
+      lifetime_value: 4551.5225
+    },
+    {
+      customer_name: 'Jesse Gray',
+      num_orders: 2,
+      lifetime_value: 4795.01
+    },
+    {
+      customer_name: 'Jesse Green',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Jesse Hall',
+      num_orders: 1,
+      lifetime_value: 2376.96
+    },
+    {
+      customer_name: 'Jesse Hernandez',
+      num_orders: 2,
+      lifetime_value: 123.96
+    },
+    {
+      customer_name: 'Jesse Howard',
+      num_orders: 2,
+      lifetime_value: 115.25
+    },
+    {
+      customer_name: 'Jesse James',
+      num_orders: 3,
+      lifetime_value: 137.95
+    },
+    {
+      customer_name: 'Jesse Kelly',
+      num_orders: 1,
+      lifetime_value: 46.83
+    },
+    {
+      customer_name: 'Jesse King',
+      num_orders: 2,
+      lifetime_value: 4347.76
+    },
+    {
+      customer_name: 'Jesse Lopez',
+      num_orders: 2,
+      lifetime_value: 5898.26
+    },
+    {
+      customer_name: 'Jesse Mitchell',
+      num_orders: 1,
+      lifetime_value: 83.97
+    },
+    {
+      customer_name: 'Jesse Morgan',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Jesse Morris',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Jesse Murphy',
+      num_orders: 3,
+      lifetime_value: 8305.3
+    },
+    {
+      customer_name: 'Jesse Nelson',
+      num_orders: 1,
+      lifetime_value: 2478.34
+    },
+    {
+      customer_name: 'Jesse Parker',
+      num_orders: 2,
+      lifetime_value: 4346.3782
+    },
+    {
+      customer_name: 'Jesse Perez',
+      num_orders: 3,
+      lifetime_value: 6549.29
+    },
+    {
+      customer_name: 'Jesse Peterson',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jesse Phillips',
+      num_orders: 1,
+      lifetime_value: 554.97
+    },
+    {
+      customer_name: 'Jesse Ramirez',
+      num_orders: 1,
+      lifetime_value: 42.28
+    },
+    {
+      customer_name: 'Jesse Reed',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Jesse Richardson',
+      num_orders: 2,
+      lifetime_value: 5875.55
+    },
+    {
+      customer_name: 'Jesse Rivera',
+      num_orders: 2,
+      lifetime_value: 3142.97
+    },
+    {
+      customer_name: 'Jesse Roberts',
+      num_orders: 1,
+      lifetime_value: 2371.96
+    },
+    {
+      customer_name: 'Jesse Rogers',
+      num_orders: 2,
+      lifetime_value: 3177.96
+    },
+    {
+      customer_name: 'Jesse Sanchez',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jesse Sanders',
+      num_orders: 2,
+      lifetime_value: 78.97
+    },
+    {
+      customer_name: 'Jesse Scott',
+      num_orders: 2,
+      lifetime_value: 4930.68
+    },
+    {
+      customer_name: 'Jesse Stewart',
+      num_orders: 2,
+      lifetime_value: 81.25
+    },
+    {
+      customer_name: 'Jesse Torres',
+      num_orders: 5,
+      lifetime_value: 308.66
+    },
+    {
+      customer_name: 'Jesse Turner',
+      num_orders: 1,
+      lifetime_value: 27.28
+    },
+    {
+      customer_name: 'Jesse Ward',
+      num_orders: 2,
+      lifetime_value: 1538.5782
+    },
+    {
+      customer_name: 'Jesse Watson',
+      num_orders: 3,
+      lifetime_value: 5647.9182
+    },
+    {
+      customer_name: 'Jesse Wright',
+      num_orders: 2,
+      lifetime_value: 4506.76
+    },
+    {
+      customer_name: 'Jesse Young',
+      num_orders: 1,
+      lifetime_value: 64.47
+    },
+    {
+      customer_name: 'Jessica Anderson',
+      num_orders: 2,
+      lifetime_value: 5900.55
+    },
+    {
+      customer_name: 'Jessica Brown',
+      num_orders: 2,
+      lifetime_value: 108.46
+    },
+    {
+      customer_name: 'Jessica Clark',
+      num_orders: 2,
+      lifetime_value: 5930.23
+    },
+    {
+      customer_name: 'Jessica Davis',
+      num_orders: 1,
+      lifetime_value: 2294.99
+    },
+    {
+      customer_name: 'Jessica Garcia',
+      num_orders: 2,
+      lifetime_value: 5930.23
+    },
+    {
+      customer_name: 'Jessica Hall',
+      num_orders: 2,
+      lifetime_value: 5946.2
+    },
+    {
+      customer_name: 'Jessica Harris',
+      num_orders: 2,
+      lifetime_value: 5997.73
+    },
+    {
+      customer_name: 'Jessica Jackson',
+      num_orders: 2,
+      lifetime_value: 129.47
+    },
+    {
+      customer_name: 'Jessica Johnson',
+      num_orders: 2,
+      lifetime_value: 5975.23
+    },
+    {
+      customer_name: 'Jessica Jones',
+      num_orders: 2,
+      lifetime_value: 5993.26
+    },
+    {
+      customer_name: 'Jessica Lee',
+      num_orders: 2,
+      lifetime_value: 159.99
+    },
+    {
+      customer_name: 'Jessica Lewis',
+      num_orders: 2,
+      lifetime_value: 5933.25
+    },
+    {
+      customer_name: 'Jessica Martin',
+      num_orders: 2,
+      lifetime_value: 5993.26
+    },
+    {
+      customer_name: 'Jessica Martinez',
+      num_orders: 2,
+      lifetime_value: 5888.24
+    },
+    {
+      customer_name: 'Jessica Miller',
+      num_orders: 2,
+      lifetime_value: 4710.03
+    },
+    {
+      customer_name: 'Jessica Moore',
+      num_orders: 2,
+      lifetime_value: 46.28
+    },
+    {
+      customer_name: 'Jessica Robinson',
+      num_orders: 2,
+      lifetime_value: 194.98
+    },
+    {
+      customer_name: 'Jessica Rodriguez',
+      num_orders: 2,
+      lifetime_value: 89.98
+    },
+    {
+      customer_name: 'Jessica Smith',
+      num_orders: 2,
+      lifetime_value: 5873.26
+    },
+    {
+      customer_name: 'Jessica Taylor',
+      num_orders: 2,
+      lifetime_value: 56.93
+    },
+    {
+      customer_name: 'Jessica Thomas',
+      num_orders: 2,
+      lifetime_value: 43.99
+    },
+    {
+      customer_name: 'Jessica Thompson',
+      num_orders: 4,
+      lifetime_value: 222.23
+    },
+    {
+      customer_name: 'Jessica Walker',
+      num_orders: 2,
+      lifetime_value: 162.28
+    },
+    {
+      customer_name: 'Jessica White',
+      num_orders: 2,
+      lifetime_value: 92.27
+    },
+    {
+      customer_name: 'Jessica Williams',
+      num_orders: 1,
+      lifetime_value: 2366.96
+    },
+    {
+      customer_name: 'Jessica Wilson',
+      num_orders: 1,
+      lifetime_value: 2350.96
+    },
+    {
+      customer_name: 'Jill Alonso',
+      num_orders: 3,
+      lifetime_value: 7265.65
+    },
+    {
+      customer_name: 'Jill Ashe',
+      num_orders: 3,
+      lifetime_value: 7229.37
+    },
+    {
+      customer_name: 'Jill Blanco',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Jill Carlson',
+      num_orders: 1,
+      lifetime_value: 94.48
+    },
+    {
+      customer_name: 'Jill Diaz',
+      num_orders: 2,
+      lifetime_value: 5900.55
+    },
+    {
+      customer_name: 'Jill Dominguez',
+      num_orders: 3,
+      lifetime_value: 6952.5825
+    },
+    {
+      customer_name: 'Jill Gill',
+      num_orders: 2,
+      lifetime_value: 97.35
+    },
+    {
+      customer_name: 'Jill Gomez',
+      num_orders: 3,
+      lifetime_value: 6673.53
+    },
+    {
+      customer_name: 'Jill Gutierrez',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Jill Hernandez',
+      num_orders: 3,
+      lifetime_value: 7068.0825
+    },
+    {
+      customer_name: 'Jill Jimenez',
+      num_orders: 2,
+      lifetime_value: 5896.19
+    },
+    {
+      customer_name: 'Jill Martin',
+      num_orders: 1,
+      lifetime_value: 53.99
+    },
+    {
+      customer_name: 'Jill Martinez',
+      num_orders: 4,
+      lifetime_value: 7189.75
+    },
+    {
+      customer_name: 'Jill Miller',
+      num_orders: 1,
+      lifetime_value: 33.98
+    },
+    {
+      customer_name: 'Jill Moore',
+      num_orders: 3,
+      lifetime_value: 8161.97
+    },
+    {
+      customer_name: 'Jill Moreno',
+      num_orders: 1,
+      lifetime_value: 163.99
+    },
+    {
+      customer_name: 'Jill Munoz',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Jill Murphy',
+      num_orders: 3,
+      lifetime_value: 193.01
+    },
+    {
+      customer_name: 'Jill Navarro',
+      num_orders: 3,
+      lifetime_value: 7255.66
+    },
+    {
+      customer_name: 'Jill Ortega',
+      num_orders: 3,
+      lifetime_value: 5217.6982
+    },
+    {
+      customer_name: 'Jill Patterson',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Jill Perry',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Jill Ramos',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Jill Rubio',
+      num_orders: 3,
+      lifetime_value: 8301.31
+    },
+    {
+      customer_name: 'Jill Ruiz',
+      num_orders: 2,
+      lifetime_value: 2731.5425
+    },
+    {
+      customer_name: 'Jill Sandoval',
+      num_orders: 3,
+      lifetime_value: 6974.5625
+    },
+    {
+      customer_name: 'Jill Serrano',
+      num_orders: 2,
+      lifetime_value: 210.54
+    },
+    {
+      customer_name: 'Jill Suarez',
+      num_orders: 3,
+      lifetime_value: 6918.8725
+    },
+    {
+      customer_name: 'Jill Travers',
+      num_orders: 3,
+      lifetime_value: 8377.09
+    },
+    {
+      customer_name: 'Jill Vazquez',
+      num_orders: 2,
+      lifetime_value: 107.85
+    },
+    {
+      customer_name: 'Jillian Arthur',
+      num_orders: 1,
+      lifetime_value: 15.23
+    },
+    {
+      customer_name: 'Jillian Fernandez',
+      num_orders: 2,
+      lifetime_value: 3199.44
+    },
+    {
+      customer_name: 'Jillian Garcia',
+      num_orders: 2,
+      lifetime_value: 1584.76
+    },
+    {
+      customer_name: 'Jillian Gonzalez',
+      num_orders: 3,
+      lifetime_value: 156.04
+    },
+    {
+      customer_name: 'Jillian Kapoor',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jillian Lopez',
+      num_orders: 2,
+      lifetime_value: 1631.46
+    },
+    {
+      customer_name: 'Jillian Madan',
+      num_orders: 1,
+      lifetime_value: 89.97
+    },
+    {
+      customer_name: 'Jillian Malhotra',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Jillian Martinez',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jillian Mehta',
+      num_orders: 2,
+      lifetime_value: 3152.95
+    },
+    {
+      customer_name: 'Jillian Patel',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jillian Perez',
+      num_orders: 2,
+      lifetime_value: 3101.95
+    },
+    {
+      customer_name: 'Jillian Prasad',
+      num_orders: 3,
+      lifetime_value: 94.44
+    },
+    {
+      customer_name: 'Jillian Raman',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jillian Rana',
+      num_orders: 2,
+      lifetime_value: 1576.45
+    },
+    {
+      customer_name: 'Jillian Rodriguez',
+      num_orders: 2,
+      lifetime_value: 1622.47
+    },
+    {
+      customer_name: 'Jillian Sai',
+      num_orders: 1,
+      lifetime_value: 15.23
+    },
+    {
+      customer_name: 'Jillian Saunders',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jillian Srini',
+      num_orders: 2,
+      lifetime_value: 1622.47
+    },
+    {
+      customer_name: 'Jillian Suri',
+      num_orders: 1,
+      lifetime_value: 889.47
+    },
+    {
+      customer_name: 'Jillian Vance',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jimmy Alonso',
+      num_orders: 2,
+      lifetime_value: 34.57
+    },
+    {
+      customer_name: 'Jimmy Ashe',
+      num_orders: 2,
+      lifetime_value: 116.95
+    },
+    {
+      customer_name: 'Jimmy Blanco',
+      num_orders: 2,
+      lifetime_value: 3047.81
+    },
+    {
+      customer_name: 'Jimmy Carlson',
+      num_orders: 2,
+      lifetime_value: 3089.3
+    },
+    {
+      customer_name: 'Jimmy Diaz',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Jimmy Dominguez',
+      num_orders: 3,
+      lifetime_value: 5160.08
+    },
+    {
+      customer_name: 'Jimmy Gill',
+      num_orders: 1,
+      lifetime_value: 24.99
+    },
+    {
+      customer_name: 'Jimmy Gomez',
+      num_orders: 2,
+      lifetime_value: 3027.32
+    },
+    {
+      customer_name: 'Jimmy Gutierrez',
+      num_orders: 2,
+      lifetime_value: 3804.0782
+    },
+    {
+      customer_name: 'Jimmy Hernandez',
+      num_orders: 3,
+      lifetime_value: 5122.39
+    },
+    {
+      customer_name: 'Jimmy Jimenez',
+      num_orders: 3,
+      lifetime_value: 6999.5725
+    },
+    {
+      customer_name: 'Jimmy Martin',
+      num_orders: 2,
+      lifetime_value: 5959.72
+    },
+    {
+      customer_name: 'Jimmy Moreno',
+      num_orders: 3,
+      lifetime_value: 5162.37
+    },
+    {
+      customer_name: 'Jimmy Munoz',
+      num_orders: 2,
+      lifetime_value: 34.57
+    },
+    {
+      customer_name: 'Jimmy Navarro',
+      num_orders: 2,
+      lifetime_value: 3803.6796
+    },
+    {
+      customer_name: 'Jimmy Ortega',
+      num_orders: 1,
+      lifetime_value: 64.97
+    },
+    {
+      customer_name: 'Jimmy Ramos',
+      num_orders: 2,
+      lifetime_value: 2770.5225
+    },
+    {
+      customer_name: 'Jimmy Romero',
+      num_orders: 2,
+      lifetime_value: 3772.4096
+    },
+    {
+      customer_name: 'Jimmy Rubio',
+      num_orders: 1,
+      lifetime_value: 89.97
+    },
+    {
+      customer_name: 'Jimmy Ruiz',
+      num_orders: 3,
+      lifetime_value: 7169.39
+    },
+    {
+      customer_name: 'Jimmy Sanz',
+      num_orders: 2,
+      lifetime_value: 31.55
+    },
+    {
+      customer_name: 'Jimmy Serrano',
+      num_orders: 3,
+      lifetime_value: 5208.04
+    },
+    {
+      customer_name: 'Jimmy Suarez',
+      num_orders: 2,
+      lifetime_value: 5898.26
+    },
+    {
+      customer_name: 'Jimmy Travers',
+      num_orders: 2,
+      lifetime_value: 2746.5525
+    },
+    {
+      customer_name: 'Jimmy Vazquez',
+      num_orders: 3,
+      lifetime_value: 5251.34
+    },
+    {
+      customer_name: 'Joan Coleman',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Joan Gao',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Joan Hernandez',
+      num_orders: 1,
+      lifetime_value: 24.27
+    },
+    {
+      customer_name: 'Joan Martin',
+      num_orders: 2,
+      lifetime_value: 91.95
+    },
+    {
+      customer_name: 'Joan Navarro',
+      num_orders: 2,
+      lifetime_value: 5935.55
+    },
+    {
+      customer_name: 'Joan Vazquez',
+      num_orders: 2,
+      lifetime_value: 68.87
+    },
+    {
+      customer_name: 'Joanna Alonso',
+      num_orders: 2,
+      lifetime_value: 4788.57
+    },
+    {
+      customer_name: 'Joanna Ashe',
+      num_orders: 3,
+      lifetime_value: 6843.1382
+    },
+    {
+      customer_name: 'Joanna Blanco',
+      num_orders: 2,
+      lifetime_value: 1804.9175
+    },
+    {
+      customer_name: 'Joanna Carlson',
+      num_orders: 2,
+      lifetime_value: 4586.3496
+    },
+    {
+      customer_name: 'Joanna Dominguez',
+      num_orders: 2,
+      lifetime_value: 1893.9075
+    },
+    {
+      customer_name: 'Joanna Gill',
+      num_orders: 4,
+      lifetime_value: 195.52
+    },
+    {
+      customer_name: 'Joanna Gutierrez',
+      num_orders: 2,
+      lifetime_value: 59.98
+    },
+    {
+      customer_name: 'Joanna Hernandez',
+      num_orders: 3,
+      lifetime_value: 5721.9082
+    },
+    {
+      customer_name: 'Joanna Johnston',
+      num_orders: 2,
+      lifetime_value: 77.27
+    },
+    {
+      customer_name: 'Joanna Moreno',
+      num_orders: 3,
+      lifetime_value: 5237.7296
+    },
+    {
+      customer_name: 'Joanna Munoz',
+      num_orders: 3,
+      lifetime_value: 5138.7182
+    },
+    {
+      customer_name: 'Joanna Ortega',
+      num_orders: 2,
+      lifetime_value: 3295.4275
+    },
+    {
+      customer_name: 'Joanna Ramos',
+      num_orders: 2,
+      lifetime_value: 66.26
+    },
+    {
+      customer_name: 'Joanna Romero',
+      num_orders: 2,
+      lifetime_value: 4775.3
+    },
+    {
+      customer_name: 'Joanna Sanz',
+      num_orders: 1,
+      lifetime_value: 85.48
+    },
+    {
+      customer_name: 'Joanna Serrano',
+      num_orders: 2,
+      lifetime_value: 4528.7496
+    },
+    {
+      customer_name: 'Joanna Suarez',
+      num_orders: 1,
+      lifetime_value: 106.96
+    },
+    {
+      customer_name: 'Joanna Torres',
+      num_orders: 2,
+      lifetime_value: 3282.83
+    },
+    {
+      customer_name: 'Joanna Vazquez',
+      num_orders: 1,
+      lifetime_value: 85.48
+    },
+    {
+      customer_name: 'Joe Alonso',
+      num_orders: 2,
+      lifetime_value: 123.95
+    },
+    {
+      customer_name: 'Joe Alvarez',
+      num_orders: 1,
+      lifetime_value: 34.99
+    },
+    {
+      customer_name: 'Joe Ashe',
+      num_orders: 2,
+      lifetime_value: 3112.33
+    },
+    {
+      customer_name: 'Joe Belson',
+      num_orders: 17,
+      lifetime_value: 882.7
+    },
+    {
+      customer_name: 'Joe Blanco',
+      num_orders: 3,
+      lifetime_value: 113.36
+    },
+    {
+      customer_name: 'Joe Carlson',
+      num_orders: 3,
+      lifetime_value: 94.19
+    },
+    {
+      customer_name: 'Joe Diaz',
+      num_orders: 3,
+      lifetime_value: 6437.33
+    },
+    {
+      customer_name: 'Joe Dominguez',
+      num_orders: 1,
+      lifetime_value: 2351.96
+    },
+    {
+      customer_name: 'Joe Gill',
+      num_orders: 2,
+      lifetime_value: 202.57
+    },
+    {
+      customer_name: 'Joe Gomez',
+      num_orders: 1,
+      lifetime_value: 2374.23
+    },
+    {
+      customer_name: 'Joe Gonzalez',
+      num_orders: 3,
+      lifetime_value: 6565.29
+    },
+    {
+      customer_name: 'Joe Gutierrez',
+      num_orders: 3,
+      lifetime_value: 8248.02
+    },
+    {
+      customer_name: 'Joe Hernandez',
+      num_orders: 1,
+      lifetime_value: 2350.96
+    },
+    {
+      customer_name: 'Joe Jimenez',
+      num_orders: 2,
+      lifetime_value: 47.98
+    },
+    {
+      customer_name: 'Joe Lopez',
+      num_orders: 1,
+      lifetime_value: 2322.28
+    },
+    {
+      customer_name: 'Joe Madan',
+      num_orders: 3,
+      lifetime_value: 8121.33
+    },
+    {
+      customer_name: 'Joe Martin',
+      num_orders: 1,
+      lifetime_value: 2354.98
+    },
+    {
+      customer_name: 'Joe Martinez',
+      num_orders: 3,
+      lifetime_value: 6575.79
+    },
+    {
+      customer_name: 'Joe Mehta',
+      num_orders: 3,
+      lifetime_value: 6533.28
+    },
+    {
+      customer_name: 'Joe Moreno',
+      num_orders: 3,
+      lifetime_value: 6515.3
+    },
+    {
+      customer_name: 'Joe Navarro',
+      num_orders: 1,
+      lifetime_value: 2329.98
+    },
+    {
+      customer_name: 'Joe Perez',
+      num_orders: 3,
+      lifetime_value: 6491.32
+    },
+    {
+      customer_name: 'Joe Prasad',
+      num_orders: 3,
+      lifetime_value: 8091.33
+    },
+    {
+      customer_name: 'Joe Raman',
+      num_orders: 2,
+      lifetime_value: 113.96
+    },
+    {
+      customer_name: 'Joe Ramos',
+      num_orders: 3,
+      lifetime_value: 191.9
+    },
+    {
+      customer_name: 'Joe Rana',
+      num_orders: 3,
+      lifetime_value: 8133.04
+    },
+    {
+      customer_name: 'Joe Romero',
+      num_orders: 3,
+      lifetime_value: 8131.32
+    },
+    {
+      customer_name: 'Joe Rubio',
+      num_orders: 3,
+      lifetime_value: 8204.02
+    },
+    {
+      customer_name: 'Joe Sanchez',
+      num_orders: 3,
+      lifetime_value: 6525.56
+    },
+    {
+      customer_name: 'Joe Sanz',
+      num_orders: 17,
+      lifetime_value: 913.27
+    },
+    {
+      customer_name: 'Joe Schmidt',
+      num_orders: 3,
+      lifetime_value: 8088.04
+    },
+    {
+      customer_name: 'Joe Serrano',
+      num_orders: 3,
+      lifetime_value: 110.23
+    },
+    {
+      customer_name: 'Joe Srini',
+      num_orders: 3,
+      lifetime_value: 8106.31
+    },
+    {
+      customer_name: 'Joe Subram',
+      num_orders: 1,
+      lifetime_value: 2500.97
+    },
+    {
+      customer_name: 'Joe Torres',
+      num_orders: 3,
+      lifetime_value: 8129.02
+    },
+    {
+      customer_name: 'Joe Vazquez',
+      num_orders: 2,
+      lifetime_value: 105.75
+    },
+    {
+      customer_name: 'Joel Arthur',
+      num_orders: 1,
+      lifetime_value: 3399.99
+    },
+    {
+      customer_name: 'Joel Chapman',
+      num_orders: 1,
+      lifetime_value: 1170.48
+    },
+    {
+      customer_name: 'Joel Fernandez',
+      num_orders: 1,
+      lifetime_value: 1179.97
+    },
+    {
+      customer_name: 'Joel Garcia',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Joel Gonzalez',
+      num_orders: 1,
+      lifetime_value: 68.49
+    },
+    {
+      customer_name: 'Joel Jordan',
+      num_orders: 1,
+      lifetime_value: 64.97
+    },
+    {
+      customer_name: 'Joel Madan',
+      num_orders: 1,
+      lifetime_value: 633.45
+    },
+    {
+      customer_name: 'Joel Malhotra',
+      num_orders: 1,
+      lifetime_value: 1170.48
+    },
+    {
+      customer_name: 'Joel Martinez',
+      num_orders: 2,
+      lifetime_value: 71.46
+    },
+    {
+      customer_name: 'Joel Mehta',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Joel Patel',
+      num_orders: 1,
+      lifetime_value: 1120.49
+    },
+    {
+      customer_name: 'Joel Perez',
+      num_orders: 1,
+      lifetime_value: 68.97
+    },
+    {
+      customer_name: 'Joel Prasad',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Joel Raman',
+      num_orders: 2,
+      lifetime_value: 76.76
+    },
+    {
+      customer_name: 'Joel Rana',
+      num_orders: 2,
+      lifetime_value: 137.54
+    },
+    {
+      customer_name: 'Joel Rodriguez',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Joel Sai',
+      num_orders: 1,
+      lifetime_value: 588.96
+    },
+    {
+      customer_name: 'Joel Sanchez',
+      num_orders: 2,
+      lifetime_value: 66.53
+    },
+    {
+      customer_name: 'Joel Schmidt',
+      num_orders: 1,
+      lifetime_value: 548.98
+    },
+    {
+      customer_name: 'Joel Subram',
+      num_orders: 2,
+      lifetime_value: 128.55
+    },
+    {
+      customer_name: 'Joel Vance',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'John Anderson',
+      num_orders: 2,
+      lifetime_value: 4698.76
+    },
+    {
+      customer_name: 'John Brown',
+      num_orders: 2,
+      lifetime_value: 39.25
+    },
+    {
+      customer_name: 'John Clark',
+      num_orders: 1,
+      lifetime_value: 15.23
+    },
+    {
+      customer_name: 'John Davis',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'John Garcia',
+      num_orders: 2,
+      lifetime_value: 6056.61
+    },
+    {
+      customer_name: 'John Harris',
+      num_orders: 1,
+      lifetime_value: 2309.97
+    },
+    {
+      customer_name: 'John Jackson',
+      num_orders: 2,
+      lifetime_value: 115.47
+    },
+    {
+      customer_name: 'John Johnson',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'John Jones',
+      num_orders: 2,
+      lifetime_value: 6035.6
+    },
+    {
+      customer_name: 'John Lee',
+      num_orders: 1,
+      lifetime_value: 1700.99
+    },
+    {
+      customer_name: 'John Lewis',
+      num_orders: 1,
+      lifetime_value: 1775.47
+    },
+    {
+      customer_name: 'John Martin',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'John Martinez',
+      num_orders: 2,
+      lifetime_value: 6089.59
+    },
+    {
+      customer_name: 'John Moore',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'John Robinson',
+      num_orders: 2,
+      lifetime_value: 6058.21
+    },
+    {
+      customer_name: 'John Rodriguez',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'John Smith',
+      num_orders: 2,
+      lifetime_value: 6044.59
+    },
+    {
+      customer_name: 'John Taylor',
+      num_orders: 3,
+      lifetime_value: 146.53
+    },
+    {
+      customer_name: 'John Thomas',
+      num_orders: 1,
+      lifetime_value: 1759.97
+    },
+    {
+      customer_name: 'John Thompson',
+      num_orders: 1,
+      lifetime_value: 68.49
+    },
+    {
+      customer_name: 'John Walker',
+      num_orders: 1,
+      lifetime_value: 1754.98
+    },
+    {
+      customer_name: 'John White',
+      num_orders: 1,
+      lifetime_value: 2334.98
+    },
+    {
+      customer_name: 'John Williams',
+      num_orders: 1,
+      lifetime_value: 2369.97
+    },
+    {
+      customer_name: 'Johnathan Arthur',
+      num_orders: 2,
+      lifetime_value: 1375.26
+    },
+    {
+      customer_name: 'Johnathan Chapman',
+      num_orders: 2,
+      lifetime_value: 1397.95
+    },
+    {
+      customer_name: 'Johnathan Fernandez',
+      num_orders: 2,
+      lifetime_value: 1397.95
+    },
+    {
+      customer_name: 'Johnathan Gonzalez',
+      num_orders: 2,
+      lifetime_value: 4899.02
+    },
+    {
+      customer_name: 'Johnathan Kapoor',
+      num_orders: 2,
+      lifetime_value: 1372.46
+    },
+    {
+      customer_name: 'Johnathan Madan',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Johnathan Malhotra',
+      num_orders: 2,
+      lifetime_value: 3178.95
+    },
+    {
+      customer_name: 'Johnathan McDonald',
+      num_orders: 2,
+      lifetime_value: 1394.95
+    },
+    {
+      customer_name: 'Johnathan Patel',
+      num_orders: 2,
+      lifetime_value: 1422.46
+    },
+    {
+      customer_name: 'Johnathan Perez',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Johnathan Prasad',
+      num_orders: 1,
+      lifetime_value: 89.97
+    },
+    {
+      customer_name: 'Johnathan Raman',
+      num_orders: 2,
+      lifetime_value: 3133.95
+    },
+    {
+      customer_name: 'Johnathan Rana',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Johnathan Rodriguez',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Johnathan Sai',
+      num_orders: 2,
+      lifetime_value: 4848.03
+    },
+    {
+      customer_name: 'Johnathan Sanchez',
+      num_orders: 2,
+      lifetime_value: 1380.25
+    },
+    {
+      customer_name: 'Johnathan Schmidt',
+      num_orders: 2,
+      lifetime_value: 3114.94
+    },
+    {
+      customer_name: 'Johnathan Srini',
+      num_orders: 2,
+      lifetime_value: 1428.94
+    },
+    {
+      customer_name: 'Johnathan Suri',
+      num_orders: 1,
+      lifetime_value: 564.99
+    },
+    {
+      customer_name: 'Johnathan Vance',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Johnny Anand',
+      num_orders: 2,
+      lifetime_value: 138.45
+    },
+    {
+      customer_name: 'Johnny Andersen',
+      num_orders: 2,
+      lifetime_value: 86.27
+    },
+    {
+      customer_name: 'Johnny Chander',
+      num_orders: 2,
+      lifetime_value: 105.75
+    },
+    {
+      customer_name: 'Johnny Chavez',
+      num_orders: 2,
+      lifetime_value: 4417.75
+    },
+    {
+      customer_name: 'Johnny Deng',
+      num_orders: 2,
+      lifetime_value: 176.95
+    },
+    {
+      customer_name: 'Johnny Goel',
+      num_orders: 2,
+      lifetime_value: 90.25
+    },
+    {
+      customer_name: 'Johnny Jai',
+      num_orders: 2,
+      lifetime_value: 83.98
+    },
+    {
+      customer_name: 'Johnny Kumar',
+      num_orders: 2,
+      lifetime_value: 4382.75
+    },
+    {
+      customer_name: 'Johnny Lal',
+      num_orders: 2,
+      lifetime_value: 4496.23
+    },
+    {
+      customer_name: 'Johnny Luo',
+      num_orders: 1,
+      lifetime_value: 1760.47
+    },
+    {
+      customer_name: 'Johnny Moyer',
+      num_orders: 2,
+      lifetime_value: 78.97
+    },
+    {
+      customer_name: 'Johnny Nara',
+      num_orders: 2,
+      lifetime_value: 92.97
+    },
+    {
+      customer_name: 'Johnny Pal',
+      num_orders: 2,
+      lifetime_value: 123.96
+    },
+    {
+      customer_name: 'Johnny Rai',
+      num_orders: 2,
+      lifetime_value: 123.96
+    },
+    {
+      customer_name: 'Johnny Raje',
+      num_orders: 2,
+      lifetime_value: 100.25
+    },
+    {
+      customer_name: 'Johnny Raji',
+      num_orders: 2,
+      lifetime_value: 103.46
+    },
+    {
+      customer_name: 'Johnny Shan',
+      num_orders: 2,
+      lifetime_value: 4417.75
+    },
+    {
+      customer_name: 'Johnny Sharma',
+      num_orders: 2,
+      lifetime_value: 83.98
+    },
+    {
+      customer_name: 'Johnny She',
+      num_orders: 1,
+      lifetime_value: 58.98
+    },
+    {
+      customer_name: 'Johnny Shen',
+      num_orders: 1,
+      lifetime_value: 2442.28
+    },
+    {
+      customer_name: 'Johnny Tang',
+      num_orders: 1,
+      lifetime_value: 1700.99
+    },
+    {
+      customer_name: 'Johnny Xu',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Johnny Yuan',
+      num_orders: 2,
+      lifetime_value: 4480.73
+    },
+    {
+      customer_name: 'Jon Alonso',
+      num_orders: 1,
+      lifetime_value: 83.97
+    },
+    {
+      customer_name: 'Jon Andersen',
+      num_orders: 2,
+      lifetime_value: 5898.26
+    },
+    {
+      customer_name: 'Jon Becker',
+      num_orders: 1,
+      lifetime_value: 24.27
+    },
+    {
+      customer_name: 'Jon Cai',
+      num_orders: 1,
+      lifetime_value: 144.47
+    },
+    {
+      customer_name: 'Jon Chander',
+      num_orders: 2,
+      lifetime_value: 5944.73
+    },
+    {
+      customer_name: 'Jon Chavez',
+      num_orders: 1,
+      lifetime_value: 29.93
+    },
+    {
+      customer_name: 'Jon Chen',
+      num_orders: 2,
+      lifetime_value: 4549.7596
+    },
+    {
+      customer_name: 'Jon Gao',
+      num_orders: 3,
+      lifetime_value: 6508.71
+    },
+    {
+      customer_name: 'Jon Goel',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Jon Guo',
+      num_orders: 2,
+      lifetime_value: 4369.0882
+    },
+    {
+      customer_name: 'Jon He',
+      num_orders: 2,
+      lifetime_value: 5932.22
+    },
+    {
+      customer_name: 'Jon Hu',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Jon Huang',
+      num_orders: 2,
+      lifetime_value: 59.2
+    },
+    {
+      customer_name: 'Jon Jai',
+      num_orders: 2,
+      lifetime_value: 5920.24
+    },
+    {
+      customer_name: 'Jon Lal',
+      num_orders: 4,
+      lifetime_value: 288.9
+    },
+    {
+      customer_name: 'Jon Li',
+      num_orders: 2,
+      lifetime_value: 4529.0382
+    },
+    {
+      customer_name: 'Jon Liang',
+      num_orders: 2,
+      lifetime_value: 4393.3582
+    },
+    {
+      customer_name: 'Jon Lin',
+      num_orders: 2,
+      lifetime_value: 78.96
+    },
+    {
+      customer_name: 'Jon Liu',
+      num_orders: 2,
+      lifetime_value: 4531.0396
+    },
+    {
+      customer_name: 'Jon Lu',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Jon Luo',
+      num_orders: 1,
+      lifetime_value: 14.98
+    },
+    {
+      customer_name: 'Jon Ma',
+      num_orders: 3,
+      lifetime_value: 6453.23
+    },
+    {
+      customer_name: 'Jon Nara',
+      num_orders: 2,
+      lifetime_value: 5915.54
+    },
+    {
+      customer_name: 'Jon Nath',
+      num_orders: 1,
+      lifetime_value: 21.98
+    },
+    {
+      customer_name: 'Jon Pal',
+      num_orders: 2,
+      lifetime_value: 5983.22
+    },
+    {
+      customer_name: 'Jon Rai',
+      num_orders: 2,
+      lifetime_value: 5935.55
+    },
+    {
+      customer_name: 'Jon Raje',
+      num_orders: 1,
+      lifetime_value: 124.97
+    },
+    {
+      customer_name: 'Jon Shan',
+      num_orders: 1,
+      lifetime_value: 74.98
+    },
+    {
+      customer_name: 'Jon Sharma',
+      num_orders: 1,
+      lifetime_value: 91.97
+    },
+    {
+      customer_name: 'Jon Shen',
+      num_orders: 1,
+      lifetime_value: 44.98
+    },
+    {
+      customer_name: 'Jon Sun',
+      num_orders: 3,
+      lifetime_value: 6484.45
+    },
+    {
+      customer_name: 'Jon Tang',
+      num_orders: 2,
+      lifetime_value: 77.96
+    },
+    {
+      customer_name: 'Jon Wang',
+      num_orders: 2,
+      lifetime_value: 59.98
+    },
+    {
+      customer_name: 'Jon Wu',
+      num_orders: 2,
+      lifetime_value: 5908.25
+    },
+    {
+      customer_name: 'Jon Xu',
+      num_orders: 2,
+      lifetime_value: 5922.53
+    },
+    {
+      customer_name: 'Jon Xu',
+      num_orders: 3,
+      lifetime_value: 8375.29
+    },
+    {
+      customer_name: 'Jon Yang',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Jon Ye',
+      num_orders: 2,
+      lifetime_value: 108.44
+    },
+    {
+      customer_name: 'Jon Yuan',
+      num_orders: 3,
+      lifetime_value: 8355.27
+    },
+    {
+      customer_name: 'Jon Zeng',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Jon Zhang',
+      num_orders: 3,
+      lifetime_value: 5666.3782
+    },
+    {
+      customer_name: 'Jon Zhao',
+      num_orders: 2,
+      lifetime_value: 83.95
+    },
+    {
+      customer_name: 'Jon Zhou',
+      num_orders: 2,
+      lifetime_value: 5943.24
+    },
+    {
+      customer_name: 'Jon Zhu',
+      num_orders: 3,
+      lifetime_value: 6497.21
+    },
+    {
+      customer_name: 'Jonathan Adams',
+      num_orders: 3,
+      lifetime_value: 7206.37
+    },
+    {
+      customer_name: 'Jonathan Allen',
+      num_orders: 1,
+      lifetime_value: 1750.47
+    },
+    {
+      customer_name: 'Jonathan Anderson',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Jonathan Baker',
+      num_orders: 1,
+      lifetime_value: 1788.95
+    },
+    {
+      customer_name: 'Jonathan Brown',
+      num_orders: 1,
+      lifetime_value: 68.97
+    },
+    {
+      customer_name: 'Jonathan Campbell',
+      num_orders: 1,
+      lifetime_value: 563.96
+    },
+    {
+      customer_name: 'Jonathan Carter',
+      num_orders: 1,
+      lifetime_value: 64.47
+    },
+    {
+      customer_name: 'Jonathan Clark',
+      num_orders: 1,
+      lifetime_value: 69.97
+    },
+    {
+      customer_name: 'Jonathan Collins',
+      num_orders: 1,
+      lifetime_value: 76.94
+    },
+    {
+      customer_name: 'Jonathan Davis',
+      num_orders: 1,
+      lifetime_value: 2404.97
+    },
+    {
+      customer_name: 'Jonathan Edwards',
+      num_orders: 2,
+      lifetime_value: 2771.5425
+    },
+    {
+      customer_name: 'Jonathan Evans',
+      num_orders: 2,
+      lifetime_value: 167.93
+    },
+    {
+      customer_name: 'Jonathan Garcia',
+      num_orders: 2,
+      lifetime_value: 77.91
+    },
+    {
+      customer_name: 'Jonathan Green',
+      num_orders: 3,
+      lifetime_value: 6994.5725
+    },
+    {
+      customer_name: 'Jonathan Hall',
+      num_orders: 1,
+      lifetime_value: 54.98
+    },
+    {
+      customer_name: 'Jonathan Harris',
+      num_orders: 1,
+      lifetime_value: 67.93
+    },
+    {
+      customer_name: 'Jonathan Hernandez',
+      num_orders: 1,
+      lifetime_value: 124.99
+    },
+    {
+      customer_name: 'Jonathan Hill',
+      num_orders: 2,
+      lifetime_value: 5973.24
+    },
+    {
+      customer_name: 'Jonathan Jackson',
+      num_orders: 1,
+      lifetime_value: 1779.47
+    },
+    {
+      customer_name: 'Jonathan Johnson',
+      num_orders: 1,
+      lifetime_value: 565.47
+    },
+    {
+      customer_name: 'Jonathan King',
+      num_orders: 2,
+      lifetime_value: 3891.5425
+    },
+    {
+      customer_name: 'Jonathan Lee',
+      num_orders: 2,
+      lifetime_value: 83.94
+    },
+    {
+      customer_name: 'Jonathan Lewis',
+      num_orders: 2,
+      lifetime_value: 2790.5325
+    },
+    {
+      customer_name: 'Jonathan Lopez',
+      num_orders: 1,
+      lifetime_value: 31.27
+    },
+    {
+      customer_name: 'Jonathan Martin',
+      num_orders: 1,
+      lifetime_value: 67.93
+    },
+    {
+      customer_name: 'Jonathan Martinez',
+      num_orders: 1,
+      lifetime_value: 32.27
+    },
+    {
+      customer_name: 'Jonathan Miller',
+      num_orders: 1,
+      lifetime_value: 2374.98
+    },
+    {
+      customer_name: 'Jonathan Mitchell',
+      num_orders: 2,
+      lifetime_value: 44.97
+    },
+    {
+      customer_name: 'Jonathan Moore',
+      num_orders: 3,
+      lifetime_value: 4122.7375
+    },
+    {
+      customer_name: 'Jonathan Nelson',
+      num_orders: 2,
+      lifetime_value: 4659.8025
+    },
+    {
+      customer_name: 'Jonathan Parker',
+      num_orders: 3,
+      lifetime_value: 6939.8725
+    },
+    {
+      customer_name: 'Jonathan Perez',
+      num_orders: 2,
+      lifetime_value: 3001.0425
+    },
+    {
+      customer_name: 'Jonathan Phillips',
+      num_orders: 1,
+      lifetime_value: 664.89
+    },
+    {
+      customer_name: 'Jonathan Roberts',
+      num_orders: 3,
+      lifetime_value: 6944.5825
+    },
+    {
+      customer_name: 'Jonathan Robinson',
+      num_orders: 1,
+      lifetime_value: 56.96
+    },
+    {
+      customer_name: 'Jonathan Rodriguez',
+      num_orders: 2,
+      lifetime_value: 2840.0125
+    },
+    {
+      customer_name: 'Jonathan Scott',
+      num_orders: 2,
+      lifetime_value: 6090.59
+    },
+    {
+      customer_name: 'Jonathan Smith',
+      num_orders: 1,
+      lifetime_value: 539.99
+    },
+    {
+      customer_name: 'Jonathan Taylor',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jonathan Thomas',
+      num_orders: 2,
+      lifetime_value: 104.23
+    },
+    {
+      customer_name: 'Jonathan Thompson',
+      num_orders: 2,
+      lifetime_value: 2805.5325
+    },
+    {
+      customer_name: 'Jonathan Turner',
+      num_orders: 3,
+      lifetime_value: 198.73
+    },
+    {
+      customer_name: 'Jonathan Walker',
+      num_orders: 2,
+      lifetime_value: 4752.23
+    },
+    {
+      customer_name: 'Jonathan White',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Jonathan Williams',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Jonathan Wilson',
+      num_orders: 2,
+      lifetime_value: 32.95
+    },
+    {
+      customer_name: 'Jonathan Wright',
+      num_orders: 1,
+      lifetime_value: 58.98
+    },
+    {
+      customer_name: 'Jonathan Young',
+      num_orders: 2,
+      lifetime_value: 70.95
+    },
+    {
+      customer_name: 'Jonathon Alonso',
+      num_orders: 1,
+      lifetime_value: 89.97
+    },
+    {
+      customer_name: 'Jonathon Alvarez',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jonathon Carlson',
+      num_orders: 3,
+      lifetime_value: 122.26
+    },
+    {
+      customer_name: 'Jonathon Gill',
+      num_orders: 1,
+      lifetime_value: 54.96
+    },
+    {
+      customer_name: 'Jonathon Gutierrez',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Jonathon Hernandez',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jonathon Jimenez',
+      num_orders: 2,
+      lifetime_value: 3342.4075
+    },
+    {
+      customer_name: 'Jonathon Moreno',
+      num_orders: 3,
+      lifetime_value: 194.94
+    },
+    {
+      customer_name: 'Jonathon Munoz',
+      num_orders: 2,
+      lifetime_value: 3360.4175
+    },
+    {
+      customer_name: 'Jonathon Navarro',
+      num_orders: 2,
+      lifetime_value: 3310.4075
+    },
+    {
+      customer_name: 'Jonathon Ortega',
+      num_orders: 2,
+      lifetime_value: 3036.3682
+    },
+    {
+      customer_name: 'Jonathon Ramos',
+      num_orders: 1,
+      lifetime_value: 64.47
+    },
+    {
+      customer_name: 'Jonathon Romero',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Jonathon Serrano',
+      num_orders: 1,
+      lifetime_value: 15.23
+    },
+    {
+      customer_name: 'Jonathon Suarez',
+      num_orders: 3,
+      lifetime_value: 162.24
+    },
+    {
+      customer_name: 'Jonathon Torres',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Jonathon Vazquez',
+      num_orders: 2,
+      lifetime_value: 1769.9275
+    },
+    {
+      customer_name: 'Jordan Adams',
+      num_orders: 1,
+      lifetime_value: 1808.45
+    },
+    {
+      customer_name: 'Jordan Allen',
+      num_orders: 1,
+      lifetime_value: 64.47
+    },
+    {
+      customer_name: 'Jordan Campbell',
+      num_orders: 2,
+      lifetime_value: 70.25
+    },
+    {
+      customer_name: 'Jordan Carter',
+      num_orders: 2,
+      lifetime_value: 4769.4025
+    },
+    {
+      customer_name: 'Jordan Collins',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Jordan Edwards',
+      num_orders: 3,
+      lifetime_value: 6247.5325
+    },
+    {
+      customer_name: 'Jordan Evans',
+      num_orders: 3,
+      lifetime_value: 5245.06
+    },
+    {
+      customer_name: 'Jordan Gonzalez',
+      num_orders: 1,
+      lifetime_value: 76.94
+    },
+    {
+      customer_name: 'Jordan Green',
+      num_orders: 1,
+      lifetime_value: 2451.3
+    },
+    {
+      customer_name: 'Jordan Hall',
+      num_orders: 2,
+      lifetime_value: 6070.59
+    },
+    {
+      customer_name: 'Jordan Hernandez',
+      num_orders: 2,
+      lifetime_value: 5006.7
+    },
+    {
+      customer_name: 'Jordan Hill',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Jordan King',
+      num_orders: 1,
+      lifetime_value: 1735.98
+    },
+    {
+      customer_name: 'Jordan Lopez',
+      num_orders: 2,
+      lifetime_value: 52.92
+    },
+    {
+      customer_name: 'Jordan Mitchell',
+      num_orders: 2,
+      lifetime_value: 130.94
+    },
+    {
+      customer_name: 'Jordan Nelson',
+      num_orders: 2,
+      lifetime_value: 5948.49
+    },
+    {
+      customer_name: 'Jordan Parker',
+      num_orders: 2,
+      lifetime_value: 3112.97
+    },
+    {
+      customer_name: 'Jordan Perez',
+      num_orders: 1,
+      lifetime_value: 699.97
+    },
+    {
+      customer_name: 'Jordan Phillips',
+      num_orders: 1,
+      lifetime_value: 2361.95
+    },
+    {
+      customer_name: 'Jordan Roberts',
+      num_orders: 3,
+      lifetime_value: 208.41
+    },
+    {
+      customer_name: 'Jordan Scott',
+      num_orders: 1,
+      lifetime_value: 59.98
+    },
+    {
+      customer_name: 'Jordan Turner',
+      num_orders: 2,
+      lifetime_value: 51.46
+    },
+    {
+      customer_name: 'Jordan Wright',
+      num_orders: 1,
+      lifetime_value: 1732.26
+    },
+    {
+      customer_name: 'Jordan Young',
+      num_orders: 3,
+      lifetime_value: 248.01
+    },
+    {
+      customer_name: 'Jorge Cai',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jorge Chen',
+      num_orders: 2,
+      lifetime_value: 141.55
+    },
+    {
+      customer_name: 'Jorge Gao',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jorge Guo',
+      num_orders: 3,
+      lifetime_value: 223.19
+    },
+    {
+      customer_name: 'Jorge He',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Jorge Hu',
+      num_orders: 2,
+      lifetime_value: 97.96
+    },
+    {
+      customer_name: 'Jorge Huang',
+      num_orders: 2,
+      lifetime_value: 74.24
+    },
+    {
+      customer_name: 'Jorge Leitão',
+      num_orders: 2,
+      lifetime_value: 30.97
+    },
+    {
+      customer_name: 'Jorge Li',
+      num_orders: 2,
+      lifetime_value: 72.16
+    },
+    {
+      customer_name: 'Jorge Liang',
+      num_orders: 1,
+      lifetime_value: 60.47
+    },
+    {
+      customer_name: 'Jorge Lin',
+      num_orders: 2,
+      lifetime_value: 144.27
+    },
+    {
+      customer_name: 'Jorge Liu',
+      num_orders: 2,
+      lifetime_value: 94.47
+    },
+    {
+      customer_name: 'Jorge Lu',
+      num_orders: 2,
+      lifetime_value: 6030.61
+    },
+    {
+      customer_name: 'Jorge Ma',
+      num_orders: 3,
+      lifetime_value: 84.74
+    },
+    {
+      customer_name: 'Jorge She',
+      num_orders: 2,
+      lifetime_value: 88.97
+    },
+    {
+      customer_name: 'Jorge Sun',
+      num_orders: 1,
+      lifetime_value: 7.28
+    },
+    {
+      customer_name: 'Jorge Wang',
+      num_orders: 2,
+      lifetime_value: 6029.57
+    },
+    {
+      customer_name: 'Jorge Wu',
+      num_orders: 2,
+      lifetime_value: 78.26
+    },
+    {
+      customer_name: 'Jorge Xu',
+      num_orders: 2,
+      lifetime_value: 6021.62
+    },
+    {
+      customer_name: 'Jorge Yang',
+      num_orders: 2,
+      lifetime_value: 30.97
+    },
+    {
+      customer_name: 'Jorge Ye',
+      num_orders: 2,
+      lifetime_value: 6119.59
+    },
+    {
+      customer_name: 'Jorge Zhang',
+      num_orders: 2,
+      lifetime_value: 30.97
+    },
+    {
+      customer_name: 'Jorge Zhao',
+      num_orders: 2,
+      lifetime_value: 32.22
+    },
+    {
+      customer_name: 'Jorge Zheng',
+      num_orders: 2,
+      lifetime_value: 108.85
+    },
+    {
+      customer_name: 'Jorge Zhou',
+      num_orders: 2,
+      lifetime_value: 6117.69
+    },
+    {
+      customer_name: 'Jorge Zhu',
+      num_orders: 3,
+      lifetime_value: 115.73
+    },
+    {
+      customer_name: 'Jose Adams',
+      num_orders: 1,
+      lifetime_value: 2316.97
+    },
+    {
+      customer_name: 'Jose Allen',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Jose Anderson',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Jose Baker',
+      num_orders: 1,
+      lifetime_value: 2369.96
+    },
+    {
+      customer_name: 'Jose Brown',
+      num_orders: 1,
+      lifetime_value: 2325.96
+    },
+    {
+      customer_name: 'Jose Carlson',
+      num_orders: 3,
+      lifetime_value: 6868.4396
+    },
+    {
+      customer_name: 'Jose Carter',
+      num_orders: 1,
+      lifetime_value: 32.27
+    },
+    {
+      customer_name: 'Jose Clark',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Jose Collins',
+      num_orders: 3,
+      lifetime_value: 296.91
+    },
+    {
+      customer_name: 'Jose Davis',
+      num_orders: 1,
+      lifetime_value: 59.98
+    },
+    {
+      customer_name: 'Jose Edwards',
+      num_orders: 3,
+      lifetime_value: 7200.86
+    },
+    {
+      customer_name: 'Jose Evans',
+      num_orders: 2,
+      lifetime_value: 114.96
+    },
+    {
+      customer_name: 'Jose Garcia',
+      num_orders: 1,
+      lifetime_value: 13.98
+    },
+    {
+      customer_name: 'Jose Gonzalez',
+      num_orders: 2,
+      lifetime_value: 81.96
+    },
+    {
+      customer_name: 'Jose Green',
+      num_orders: 2,
+      lifetime_value: 6081.1
+    },
+    {
+      customer_name: 'Jose Hall',
+      num_orders: 2,
+      lifetime_value: 146.94
+    },
+    {
+      customer_name: 'Jose Harris',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Jose Hill',
+      num_orders: 2,
+      lifetime_value: 73.86
+    },
+    {
+      customer_name: 'Jose Johnson',
+      num_orders: 3,
+      lifetime_value: 6979.5625
+    },
+    {
+      customer_name: 'Jose Jones',
+      num_orders: 2,
+      lifetime_value: 77.27
+    },
+    {
+      customer_name: 'Jose King',
+      num_orders: 1,
+      lifetime_value: 93.97
+    },
+    {
+      customer_name: 'Jose Lee',
+      num_orders: 2,
+      lifetime_value: 147.44
+    },
+    {
+      customer_name: 'Jose Lewis',
+      num_orders: 2,
+      lifetime_value: 94.22
+    },
+    {
+      customer_name: 'Jose Martin',
+      num_orders: 2,
+      lifetime_value: 4742.74
+    },
+    {
+      customer_name: 'Jose Mitchell',
+      num_orders: 1,
+      lifetime_value: 2385.94
+    },
+    {
+      customer_name: 'Jose Moore',
+      num_orders: 2,
+      lifetime_value: 4471.74
+    },
+    {
+      customer_name: 'Jose Muñoz',
+      num_orders: 1,
+      lifetime_value: 2367.92
+    },
+    {
+      customer_name: 'Jose Nelson',
+      num_orders: 2,
+      lifetime_value: 171.27
+    },
+    {
+      customer_name: 'Jose Parker',
+      num_orders: 1,
+      lifetime_value: 39.98
+    },
+    {
+      customer_name: 'Jose Phillips',
+      num_orders: 1,
+      lifetime_value: 2383.95
+    },
+    {
+      customer_name: 'Jose Scott',
+      num_orders: 2,
+      lifetime_value: 6044.59
+    },
+    {
+      customer_name: 'Jose Smith',
+      num_orders: 1,
+      lifetime_value: 35.96
+    },
+    {
+      customer_name: 'Jose Taylor',
+      num_orders: 2,
+      lifetime_value: 94.47
+    },
+    {
+      customer_name: 'Jose Thomas',
+      num_orders: 1,
+      lifetime_value: 1764.96
+    },
+    {
+      customer_name: 'Jose Thompson',
+      num_orders: 1,
+      lifetime_value: 124.99
+    },
+    {
+      customer_name: 'Jose Turner',
+      num_orders: 1,
+      lifetime_value: 539.99
+    },
+    {
+      customer_name: 'Jose Walker',
+      num_orders: 2,
+      lifetime_value: 6030.61
+    },
+    {
+      customer_name: 'Jose White',
+      num_orders: 1,
+      lifetime_value: 68.49
+    },
+    {
+      customer_name: 'Jose Williams',
+      num_orders: 1,
+      lifetime_value: 66.96
+    },
+    {
+      customer_name: 'Jose Wilson',
+      num_orders: 2,
+      lifetime_value: 78.96
+    },
+    {
+      customer_name: 'Jose Wright',
+      num_orders: 1,
+      lifetime_value: 12.94
+    },
+    {
+      customer_name: 'Jose Young',
+      num_orders: 1,
+      lifetime_value: 37.93
+    },
+    {
+      customer_name: 'Joseph Anderson',
+      num_orders: 2,
+      lifetime_value: 244.23
+    },
+    {
+      customer_name: 'Joseph Brown',
+      num_orders: 1,
+      lifetime_value: 1725.98
+    },
+    {
+      customer_name: 'Joseph Clark',
+      num_orders: 1,
+      lifetime_value: 2341.46
+    },
+    {
+      customer_name: 'Joseph Davis',
+      num_orders: 1,
+      lifetime_value: 94.48
+    },
+    {
+      customer_name: 'Joseph Garcia',
+      num_orders: 1,
+      lifetime_value: 1754.98
+    },
+    {
+      customer_name: 'Joseph Harris',
+      num_orders: 2,
+      lifetime_value: 146.94
+    },
+    {
+      customer_name: 'Joseph Jackson',
+      num_orders: 1,
+      lifetime_value: 123.98
+    },
+    {
+      customer_name: 'Joseph Johnson',
+      num_orders: 2,
+      lifetime_value: 6035.6
+    },
+    {
+      customer_name: 'Joseph Jones',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Joseph Lee',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Joseph Lewis',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Joseph Martin',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Joseph Martinez',
+      num_orders: 1,
+      lifetime_value: 848.47
+    },
+    {
+      customer_name: 'Joseph Miller',
+      num_orders: 1,
+      lifetime_value: 607.96
+    },
+    {
+      customer_name: 'Joseph Moore',
+      num_orders: 1,
+      lifetime_value: 2326.96
+    },
+    {
+      customer_name: 'Joseph Robinson',
+      num_orders: 1,
+      lifetime_value: 589.26
+    },
+    {
+      customer_name: 'Joseph Rodriguez',
+      num_orders: 1,
+      lifetime_value: 567.27
+    },
+    {
+      customer_name: 'Joseph Smith',
+      num_orders: 2,
+      lifetime_value: 4167.23
+    },
+    {
+      customer_name: 'Joseph Taylor',
+      num_orders: 2,
+      lifetime_value: 82.18
+    },
+    {
+      customer_name: 'Joseph Thomas',
+      num_orders: 2,
+      lifetime_value: 6029.57
+    },
+    {
+      customer_name: 'Joseph Thompson',
+      num_orders: 1,
+      lifetime_value: 806.76
+    },
+    {
+      customer_name: 'Joseph Walker',
+      num_orders: 1,
+      lifetime_value: 69.99
+    },
+    {
+      customer_name: 'Joseph White',
+      num_orders: 1,
+      lifetime_value: 839.48
+    },
+    {
+      customer_name: 'Joseph Williams',
+      num_orders: 1,
+      lifetime_value: 64.47
+    },
+    {
+      customer_name: 'Joseph Wilson',
+      num_orders: 1,
+      lifetime_value: 78.98
+    },
+    {
+      customer_name: 'Joshua Anderson',
+      num_orders: 1,
+      lifetime_value: 4.99
+    },
+    {
+      customer_name: 'Joshua Brown',
+      num_orders: 1,
+      lifetime_value: 119.98
+    },
+    {
+      customer_name: 'Joshua Clark',
+      num_orders: 37,
+      lifetime_value: 1799.48
+    },
+    {
+      customer_name: 'Joshua Davis',
+      num_orders: 2,
+      lifetime_value: 4752.75
+    }
+  ],
+  data_metadata: {
+    column_count: 3,
+    row_count: 5000,
+    column_metadata: [
+      {
+        name: 'customer_name',
+        min_value: null,
+        max_value: null,
+        unique_values: 15,
+        simple_type: 'string',
+        type: 'text'
+      },
+      {
+        name: 'num_orders',
+        min_value: 1,
+        max_value: 4,
+        unique_values: 4,
+        simple_type: 'number',
+        type: 'int8'
+      },
+      {
+        name: 'lifetime_value',
+        min_value: 15.23,
+        max_value: 7029.0725,
+        unique_values: 15,
+        simple_type: 'number',
+        type: 'float8'
+      }
+    ]
+  }
+};
+
+export const scatterConfig_problematic2 = {
+  selectedChartType: 'scatter',
+  columnLabelFormats: {
+    num_orders: {
+      columnType: 'number' as const,
+      style: 'number' as const,
+      numberSeparatorStyle: ',',
+      replaceMissingDataWith: 0
+    },
+    customer_name: {
+      columnType: 'string' as const,
+      style: 'string' as const,
+      numberSeparatorStyle: null,
+      replaceMissingDataWith: null
+    },
+    lifetime_value: {
+      columnType: 'number' as const,
+      style: 'currency' as const,
+      numberSeparatorStyle: ',',
+      replaceMissingDataWith: 0,
+      currency: 'USD'
+    }
+  },
+  scatterAxis: {
+    x: ['num_orders'],
+    y: ['lifetime_value'],
+    category: ['customer_name']
+  }
+};

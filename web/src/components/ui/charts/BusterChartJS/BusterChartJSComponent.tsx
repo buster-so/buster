@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import {
   Chart,
   ChartHoverBarPlugin,
@@ -73,7 +73,13 @@ export const BusterChartJSComponent = React.memo(
       },
       ref
     ) => {
-      const colors = useColors({ colors: colorsProp, yAxisKeys, y2AxisKeys, datasetOptions });
+      const colors = useColors({
+        colors: colorsProp,
+        yAxisKeys,
+        y2AxisKeys,
+        datasetOptions,
+        selectedChartType
+      });
 
       const { trendlineAnnotations, trendlineSeries } = useTrendlines({
         trendlines: dataTrendlineOptions,
@@ -101,6 +107,8 @@ export const BusterChartJSComponent = React.memo(
         trendlineSeries,
         barGroupType
       });
+
+      console.log('data', data);
 
       const { chartPlugins, chartOptions } = useChartSpecificOptions({
         selectedChartType,
@@ -187,12 +195,24 @@ export const BusterChartJSComponent = React.memo(
         return [];
       }, [selectedChartType]);
 
+      const filteredData = useMemo(() => {
+        return {
+          ...data,
+          datasets: data.datasets.filter((dataset) => dataset.data.length > 0 && !dataset.hidden)
+        };
+      }, [data]);
+
+      console.log('options', options);
+      console.log('filteredData', filteredData);
+
+      //return <div>Hello</div>;
+
       return (
         <Chart
           className={className}
           ref={ref}
           options={options}
-          data={data}
+          data={filteredData}
           type={type}
           plugins={chartSpecificPlugins}
         />

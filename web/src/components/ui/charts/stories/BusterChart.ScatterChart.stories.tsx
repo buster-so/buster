@@ -8,7 +8,12 @@ import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { useDebounceFn } from '@/hooks';
 import dayjs from 'dayjs';
-import { scatterConfig_problematic1, scatterDataProblematic1 } from './scatterData_problematic1';
+import {
+  scatterConfig_problematic1,
+  scatterData_problematic2,
+  scatterDataProblematic1,
+  scatterConfig_problematic2
+} from './scatterData_problematic1';
 
 type ScatterChartData = ReturnType<typeof generateScatterChartData>;
 
@@ -451,5 +456,15 @@ export const ProblematicDataset: Story = {
       category: ['merchant']
     },
     selectedChartType: ChartType.Scatter
+  }
+};
+
+export const ProblematicDataset2: Story = {
+  args: {
+    ...Default.args,
+    ...(scatterData_problematic2 as any),
+    data: scatterData_problematic2.data,
+    columnMetadata: scatterData_problematic2.data_metadata.column_metadata,
+    ...(scatterConfig_problematic2 as any)
   }
 };
