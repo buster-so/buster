@@ -138,7 +138,8 @@ const LegendItemStandard = React.memo(
           <div
             className={cn(
               'items-center truncate text-base transition-all duration-100 select-none',
-              !inactive ? 'text-foreground' : 'text-text-secondary'
+              !inactive ? 'text-foreground' : 'text-text-secondary',
+              hasHeadline && 'flex'
             )}>
             <AnimatePresence mode="wait" initial={false}>
               {headlinePreText && (

@@ -5,6 +5,7 @@ import { type BusterChartProps, ChartType } from '@/api/asset_interfaces/metric/
 import { formatChartLabel } from '../../helpers';
 import type { ChartDataset } from 'chart.js';
 import { extractFieldsFromChain } from '../../../chartHooks';
+import { formatLabelForPieLegend } from '../../../commonHelpers';
 
 export const getLegendItems = ({
   chartRef,
@@ -35,13 +36,20 @@ export const getLegendItems = ({
 
   if (isPieChart) {
     const labels: string[] = data.labels as string[];
-    return labels?.map<BusterChartLegendItem>((label, index) => ({
-      color: colors[index % colors.length],
-      inactive: inactiveDatasets[label],
-      type: globalType,
-      formattedName: label,
-      id: label
-    }));
+    const hasMultipleYAxis = data.datasets.length > 1;
+
+    return data.datasets.flatMap((dataset) => {
+      return labels?.map<BusterChartLegendItem>((label, index) => ({
+        color: colors[index % colors.length],
+        inactive: inactiveDatasets[label],
+        type: globalType,
+        serieName: dataset.label,
+        formattedName: formatLabelForPieLegend(label, dataset.label || '', hasMultipleYAxis),
+        id: label,
+        data: dataset.data,
+        yAxisKey: dataset.yAxisKey
+      }));
+    });
   }
 
   const datasets =
@@ -59,7 +67,9 @@ export const getLegendItems = ({
       hasMultipleMeasures,
       hasCategoryAxis
     ),
-    id: dataset.label!
+    id: dataset.label!,
+    data: dataset.data,
+    yAxisKey: dataset.yAxisKey
   }));
 };
 

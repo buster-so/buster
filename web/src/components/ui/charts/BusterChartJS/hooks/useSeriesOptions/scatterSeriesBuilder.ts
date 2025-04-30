@@ -38,8 +38,6 @@ export const scatterSeriesBuilder_data = ({
   const xAxisColumnLabelFormat = columnLabelFormats[xAxisKey] || DEFAULT_COLUMN_LABEL_FORMAT;
   const isXAxisDate = isDateColumnType(xAxisColumnLabelFormat.columnType);
 
-  console.log(isXAxisDate, xAxisColumnLabelFormat);
-
   const hasSizeKeyIndex = sizeOptions !== null && !!sizeOptions.key;
   const scatterElementConfig = hasSizeKeyIndex
     ? {

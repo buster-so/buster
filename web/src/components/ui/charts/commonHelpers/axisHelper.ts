@@ -3,7 +3,7 @@ import pick from 'lodash/pick';
 import isEqual from 'lodash/isEqual';
 import isNumber from 'lodash/isNumber';
 import type { ColumnMetaData } from '@/api/asset_interfaces/metric';
-import { formatChartLabelDelimiter } from './labelHelpers';
+import { formatChartLabelDelimiter, JOIN_CHARACTER } from './labelHelpers';
 import {
   type ChartEncodes,
   type BusterChartProps,
@@ -12,7 +12,7 @@ import {
   ChartType
 } from '@/api/asset_interfaces/metric/charts';
 
-export const AXIS_TITLE_SEPARATOR = ' | ';
+export const AXIS_TITLE_SEPARATOR = JOIN_CHARACTER;
 
 export const formatXAxisLabel = (
   value: string | number,

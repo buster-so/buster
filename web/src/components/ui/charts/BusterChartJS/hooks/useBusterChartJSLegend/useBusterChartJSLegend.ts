@@ -16,7 +16,7 @@ import {
   useBusterChartLegend,
   UseChartLengendReturnValues
 } from '../../../BusterChartLegend';
-import { getLegendItems } from './helper';
+import { getLegendItems } from './getLegendItems';
 import { DatasetOptionsWithTicks } from '../../../chartHooks';
 import { LEGEND_ANIMATION_THRESHOLD } from '../../../config';
 import { timeout } from '@/lib';
@@ -108,14 +108,15 @@ export const useBusterChartJSLegend = ({
       });
 
       if (!isStackPercentage && showLegendHeadline) {
-        // addLegendHeadlines(
-        //   items,
-        //   datasetOptions,
-        //   showLegendHeadline,
-        //   columnMetadata,
-        //   columnLabelFormats,
-        //   selectedChartType
-        // );
+        addLegendHeadlines(
+          items,
+          datasetOptions,
+          showLegendHeadline,
+          columnMetadata,
+          columnLabelFormats,
+          selectedChartType,
+          selectedAxis?.x || []
+        );
       }
 
       startTransition(() => {
@@ -255,7 +256,7 @@ export const useBusterChartJSLegend = ({
       calculateLegendItems();
     },
     [selectedChartType],
-    { wait: 4 }
+    { wait: 5 }
   );
 
   //immediate items

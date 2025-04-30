@@ -1,6 +1,6 @@
 import { formatLabel } from '@/lib';
 import isEmpty from 'lodash/isEmpty';
-import type { BusterChartProps, ColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import type { BusterChartProps } from '@/api/asset_interfaces/metric/charts';
 import { DatasetOption, extractFieldsFromChain } from '../chartHooks';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 
@@ -68,4 +68,15 @@ export const formatLabelForDataset = (
       return formatLabel(value || key, columnLabelFormat, !value);
     })
     .join(JOIN_CHARACTER);
+};
+
+export const formatLabelForPieLegend = (
+  label: string,
+  datasetLabel: string,
+  isMultipleYAxis: boolean
+) => {
+  if (isMultipleYAxis) {
+    return [label, datasetLabel].join(JOIN_CHARACTER);
+  }
+  return label;
 };

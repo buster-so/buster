@@ -1,9 +1,11 @@
 import { BusterChartLegendItem } from './interfaces';
 import { BusterChartProps, ShowLegendHeadline } from '@/api/asset_interfaces/metric/charts';
-import { DataFrameOperations } from '@/lib/math';
+import { DataFrameOperations, ArrayOperations } from '@/lib/math';
 import { DatasetOptionsWithTicks } from '../chartHooks';
 import { createDayjsDate, getBestDateFormat } from '@/lib/date';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces/metric';
+import { isDateColumnType } from '@/lib/messages';
+import { formatLabel } from '@/lib/columnFormatter';
 
 export const addLegendHeadlines = (
   legendItems: BusterChartLegendItem[],
@@ -14,19 +16,22 @@ export const addLegendHeadlines = (
   selectedChartType: IBusterMetricChartConfig['selectedChartType'],
   xAxisKeys: string[]
 ) => {
-  if (!showLegendHeadline) return legendItems;
+  const isScatterChart = selectedChartType === 'scatter';
+
+  if (!showLegendHeadline || isScatterChart) return legendItems;
 
   const hasMultipleXAxisDimensions = xAxisKeys.length > 1;
   const firstXAxisDimensionName = xAxisKeys[0];
-  const firstXAxisDimensionMetadata = columnMetadata.find(
-    (metadata) => metadata.name === firstXAxisDimensionName
-  );
-  const canUseRange =
-    !hasMultipleXAxisDimensions && firstXAxisDimensionMetadata?.simple_type === 'date';
+  const xIsDate = isDateColumnType(columnLabelFormats[firstXAxisDimensionName]?.columnType);
+
+  const canUseRange = !hasMultipleXAxisDimensions && xIsDate;
 
   let range: string;
 
   if (canUseRange) {
+    const firstXAxisDimensionMetadata = columnMetadata.find(
+      (metadata) => metadata.name === firstXAxisDimensionName
+    );
     const { min_value, max_value } = firstXAxisDimensionMetadata!;
     const minDate = createDayjsDate((min_value as string) || new Date());
     const maxDate = createDayjsDate((max_value as string) || new Date());
@@ -35,50 +40,46 @@ export const addLegendHeadlines = (
     range = `${minDate.format(dateFormat)} - ${maxDate.format(dateFormat)}`;
   }
   const isPieChart = selectedChartType === 'pie';
-  const isScatterChart = selectedChartType === 'scatter';
 
   legendItems.forEach((item, index) => {
     if (isPieChart) {
-      // const columnLabelName = extractFieldsFromChain(dimensionNames[indexOfSeries])[0]?.key;
-      // const assosciatedRow = source[index];
-      // const result = assosciatedRow?.[indexOfSeries]!;
-      // const formattedResult = formatLabel(result, columnLabelFormats[columnLabelName]);
-      // const legendHeadlineOption = 'current';
-      // const headline: BusterChartLegendItem['headline'] = {
-      //   type: legendHeadlineOption,
-      //   titleAmount: formattedResult
-      // };
-      // item.headline = headline;
-
+      const result = item.data[index % item.data.length] as number;
+      const formattedResult = formatLabel(result, columnLabelFormats[item.yAxisKey]);
+      const headline: BusterChartLegendItem['headline'] = {
+        type: 'current',
+        titleAmount: formattedResult
+      };
+      item.headline = headline;
       return;
     }
 
-    if (isScatterChart) {
+    if (!item.data || !Array.isArray(item.data)) {
+      console.log('item', item);
+      item.headline = {
+        type: showLegendHeadline,
+        titleAmount: 0
+      };
+      return;
+    }
+    const arrayOperations = new ArrayOperations(item.data as number[]);
+
+    // Use the mapping to get the correct operation method
+    const operationMethod = legendHeadlineToOperation[showLegendHeadline];
+    if (!operationMethod) {
+      console.warn(`Unknown operation: ${showLegendHeadline}`);
+      item.headline = {
+        type: showLegendHeadline,
+        titleAmount: 0
+      };
       return;
     }
 
-    // const indexOfDimension = dimensionNames.findIndex((dimension) => dimension === item.id);
-
-    // if (indexOfDimension === -1) {
-    //   console.warn('TODO - fix this bug');
-    //   return;
-    // }
-
-    // const columnLabelName = extractFieldsFromChain(item.id).at(-1)?.key!;
-
-    // const arrayOperations = new DataFrameOperations(source, indexOfDimension);
-    // const operation = legendHeadlineToOperation[showLegendHeadline];
-    // const result = operation(arrayOperations);
-
-    // const formattedResult = formatLabel(result, columnLabelFormats[columnLabelName]);
-
-    // const headline: BusterChartLegendItem['headline'] = {
-    //   type: showLegendHeadline,
-    //   titleAmount: formattedResult,
-    //   range
-    // };
-
-    // item.headline = headline;
+    const result = operationMethod(arrayOperations);
+    const headline: BusterChartLegendItem['headline'] = {
+      type: showLegendHeadline,
+      titleAmount: result
+    };
+    item.headline = headline;
   });
 
   return legendItems;
@@ -86,7 +87,7 @@ export const addLegendHeadlines = (
 
 const legendHeadlineToOperation: Record<
   'current' | 'average' | 'total' | 'median' | 'min' | 'max',
-  (arrayOperations: DataFrameOperations) => number
+  (arrayOperations: ArrayOperations) => number
 > = {
   current: (arrayOperations) => arrayOperations.last(),
   average: (arrayOperations) => arrayOperations.average(),

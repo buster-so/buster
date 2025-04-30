@@ -1,4 +1,5 @@
 import { type ChartType, type ShowLegendHeadline } from '@/api/asset_interfaces/metric/charts';
+import { ChartDataset } from 'chart.js';
 
 export interface BusterChartLegendProps {
   animateLegend: boolean;
@@ -15,8 +16,10 @@ export interface BusterChartLegendItem {
   color: string;
   inactive: boolean;
   type: ChartType;
+  data: ChartDataset['data'];
   formattedName: string; //this is the formatted name
   id: string; //should be unique
+  yAxisKey: string;
   serieName?: string;
   headline?: {
     type: ShowLegendHeadline;

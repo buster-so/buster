@@ -52,11 +52,12 @@ const OverflowPopoverContent = React.memo(
     onHoverItem: BusterChartLegendProps['onHoverItem'];
   }) => {
     const parentRef = React.useRef<HTMLDivElement>(null);
+    const hasHeadline = legendItems.some((item) => item.headline);
 
     const rowVirtualizer = useVirtualizer({
       count: legendItems.length,
       getScrollElement: () => parentRef.current,
-      estimateSize: () => 24, // Estimated height of each row
+      estimateSize: () => (hasHeadline ? 44 : 24), // Estimated height of each row
       overscan: 15
     });
 

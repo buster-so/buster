@@ -17,6 +17,7 @@ import { TrendlineLabel } from './EditTrendlineLabel';
 import { EditTrendlineShowLine } from './EditTrendlineShowLine';
 import { EditTrendlineOption } from './EditTrendlineOption';
 import { TypeToLabel } from './config';
+import { JOIN_CHARACTER } from '@/components/ui/charts/commonHelpers';
 
 export interface LoopTrendline extends Trendline {
   id: string;
@@ -189,7 +190,7 @@ const EditTrendlineItem: React.FC<{
       const formattedLabel = formatLabel(trend.columnId || 'Trend', columnLabelFormat, true);
       labels.push(formattedLabel);
     }
-    return labels.join(' | ');
+    return labels.join(JOIN_CHARACTER);
   }, [trend.type, trend.trendlineLabel, trend.columnId, columnLabelFormats, yAxisEncodes]);
 
   return (

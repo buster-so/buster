@@ -3,7 +3,7 @@ import type {
   BusterChartConfigProps,
   BusterChartProps
 } from '@/api/asset_interfaces/metric/charts';
-import type { Chart, ChartDataset, TooltipItem, ChartTypeRegistry } from 'chart.js';
+import type { Chart, TooltipItem, ChartTypeRegistry } from 'chart.js';
 import { percentageFormatter } from './helper';
 import { formatLabel } from '@/lib';
 

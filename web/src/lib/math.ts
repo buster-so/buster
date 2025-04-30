@@ -166,6 +166,10 @@ export class ArrayOperations {
     }, 0);
   }
 
+  total(): number {
+    return this.sum();
+  }
+
   average(): number {
     const validEntries = this.data.filter((item) => !isNaN(item as number));
     return validEntries.length === 0 ? 0 : this.sum() / validEntries.length;

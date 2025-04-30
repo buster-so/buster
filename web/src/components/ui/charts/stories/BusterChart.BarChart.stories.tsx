@@ -123,7 +123,8 @@ export const MultipleYAxis: Story = {
     } satisfies Record<keyof BarChartData, IColumnLabelFormat>,
     y2AxisShowAxisLabel: true,
     y2AxisShowAxisTitle: true,
-    y2AxisAxisTitle: 'Returns'
+    y2AxisAxisTitle: 'Returns',
+    showLegendHeadline: 'average'
   },
   render: (args) => {
     return (
@@ -855,5 +856,14 @@ export const ManyUnPlottedTooltipItems: Story = {
     gridLines: true,
     showLegend: true,
     className: 'w-[600px] h-[400px]'
+  }
+};
+
+export const WithLegendHeadline: Story = {
+  args: {
+    ...Default.args,
+    pieDisplayLabelAs: 'number',
+    showLegend: true,
+    showLegendHeadline: 'average'
   }
 };

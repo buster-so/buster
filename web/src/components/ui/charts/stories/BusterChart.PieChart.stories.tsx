@@ -416,3 +416,21 @@ export const MinimumSlicePercentage: Story = {
     }
   }
 };
+
+export const WithLegendHeadline: Story = {
+  args: {
+    ...Default.args,
+    showLegend: true,
+    showLegendHeadline: 'average',
+    pieDisplayLabelAs: 'number'
+  }
+};
+
+export const MultipleValuesWithLegendHeadline: Story = {
+  args: {
+    ...MultipleValues.args,
+    showLegend: true,
+    showLegendHeadline: 'average',
+    pieDisplayLabelAs: 'number'
+  }
+};
