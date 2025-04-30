@@ -1,4 +1,5 @@
 import { ChartType } from '@/api/asset_interfaces';
+import { faker } from '@faker-js/faker';
 
 export const scatterDataProblematic1 = {
   metric_id: '7bbe91e5-7133-50f4-a9b2-5a4663f4848a',
@@ -9051,25002 +9052,25002 @@ export const scatterData_problematic2 = {
   metric_id: '885623d1-ca04-5c16-8949-193d4b68c6a3',
   data: [
     {
-      customer_name: 'Aaron Adams',
+      customer_name: 'Grant Koelpin (male)',
       num_orders: 1,
       lifetime_value: 2381.94
     },
     {
-      customer_name: 'Aaron Allen',
+      customer_name: "Alvin O'Conner II (female)",
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Aaron Baker',
+      customer_name: 'Johnnie Runte (male)',
       num_orders: 1,
       lifetime_value: 15.23
     },
     {
-      customer_name: 'Aaron Campbell',
+      customer_name: 'Noah Carter (female)',
       num_orders: 2,
       lifetime_value: 102.57
     },
     {
-      customer_name: 'Aaron Carter',
+      customer_name: 'Joey Morar (female)',
       num_orders: 2,
       lifetime_value: 2959.0025
     },
     {
-      customer_name: 'Aaron Collins',
+      customer_name: 'Rick Nader (female)',
       num_orders: 4,
       lifetime_value: 196.4
     },
     {
-      customer_name: 'Aaron Edwards',
+      customer_name: 'Fernando Wisoky (male)',
       num_orders: 3,
       lifetime_value: 6904.6025
     },
     {
-      customer_name: 'Aaron Evans',
+      customer_name: 'Alma Kohler (female)',
       num_orders: 3,
       lifetime_value: 7029.0725
     },
     {
-      customer_name: 'Aaron Gonzalez',
+      customer_name: 'Megan Labadie (male)',
       num_orders: 2,
       lifetime_value: 3021.0425
     },
     {
-      customer_name: 'Aaron Green',
+      customer_name: 'Lindsay Marquardt (female)',
       num_orders: 1,
       lifetime_value: 64.47
     },
     {
-      customer_name: 'Aaron Hall',
+      customer_name: 'Suzanne Heaney (female)',
       num_orders: 1,
       lifetime_value: 2297.28
     },
     {
-      customer_name: 'Aaron Hernandez',
+      customer_name: 'Jordan Lubowitz (male)',
       num_orders: 2,
       lifetime_value: 123.96
     },
     {
-      customer_name: 'Aaron Hill',
+      customer_name: 'Tracy Carroll (female)',
       num_orders: 2,
       lifetime_value: 4377.75
     },
     {
-      customer_name: 'Aaron King',
+      customer_name: 'Mabel Satterfield (female)',
       num_orders: 2,
       lifetime_value: 2769.3975
     },
     {
-      customer_name: 'Aaron McDonald',
+      customer_name: 'Delores Kuphal (female)',
       num_orders: 1,
       lifetime_value: 1764.96
     },
     {
-      customer_name: 'Aaron Mitchell',
+      customer_name: 'Mr. Benjamin Emmerich (female)',
       num_orders: 2,
       lifetime_value: 3258.79
     },
     {
-      customer_name: 'Aaron Nelson',
+      customer_name: 'Mr. Francis Kuhn (male)',
       num_orders: 1,
       lifetime_value: 2294.99
     },
     {
-      customer_name: 'Aaron Perez',
+      customer_name: 'Dana Murazik (female)',
       num_orders: 1,
       lifetime_value: 89.95
     },
     {
-      customer_name: 'Aaron Phillips',
+      customer_name: 'Mr. Garry Nolan (male)',
       num_orders: 3,
       lifetime_value: 212.01
     },
     {
-      customer_name: 'Aaron Roberts',
+      customer_name: 'Ethel Feest (male)',
       num_orders: 2,
       lifetime_value: 3117.96
     },
     {
-      customer_name: 'Aaron Scott',
+      customer_name: 'Lindsey Schimmel II (female)',
       num_orders: 2,
       lifetime_value: 137.96
     },
     {
-      customer_name: 'Aaron Wright',
+      customer_name: 'Ms. Dolores Gleason (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Aaron Young',
+      customer_name: 'Angel Blick MD (male)',
       num_orders: 1,
       lifetime_value: 59.98
     },
     {
-      customer_name: 'Abby Arthur',
+      customer_name: 'Alex Bahringer (male)',
       num_orders: 2,
       lifetime_value: 4144.34
     },
     {
-      customer_name: 'Abby Fernandez',
+      customer_name: 'Kathleen Kertzmann (male)',
       num_orders: 2,
       lifetime_value: 3001.0425
     },
     {
-      customer_name: 'Abby Garcia',
+      customer_name: 'Cameron Christiansen (female)',
       num_orders: 1,
       lifetime_value: 38.98
     },
     {
-      customer_name: 'Abby Gonzalez',
+      customer_name: 'Anne Hansen (female)',
       num_orders: 1,
       lifetime_value: 1764.96
     },
     {
-      customer_name: 'Abby Kovár',
+      customer_name: 'Harriet Gutmann (female)',
       num_orders: 2,
       lifetime_value: 4179.33
     },
     {
-      customer_name: 'Abby Lopez',
+      customer_name: 'Jermaine Larkin (female)',
       num_orders: 2,
       lifetime_value: 2736.4175
     },
     {
-      customer_name: 'Abby Madan',
+      customer_name: 'Kathryn Ortiz (male)',
       num_orders: 2,
       lifetime_value: 176.93
     },
     {
-      customer_name: 'Abby Martinez',
+      customer_name: 'Christy Prosacco (female)',
       num_orders: 1,
       lifetime_value: 63.97
     },
     {
-      customer_name: 'Abby Mehta',
+      customer_name: 'Tomas Heller (male)',
       num_orders: 2,
       lifetime_value: 2778.5225
     },
     {
-      customer_name: 'Abby Perez',
+      customer_name: 'Nora Kling (female)',
       num_orders: 2,
       lifetime_value: 50.23
     },
     {
-      customer_name: 'Abby Raman',
+      customer_name: 'Darlene Rogahn III (female)',
       num_orders: 2,
       lifetime_value: 2732.6975
     },
     {
-      customer_name: 'Abby Rana',
+      customer_name: 'Edmund Ernser (male)',
       num_orders: 1,
       lifetime_value: 63.97
     },
     {
-      customer_name: 'Abby Sai',
+      customer_name: 'Raquel Gleason (male)',
       num_orders: 2,
       lifetime_value: 87.94
     },
     {
-      customer_name: 'Abby Sanchez',
+      customer_name: 'Clifford Schoen-Mosciski (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Abby Sandberg',
+      customer_name: 'Judith Torp (female)',
       num_orders: 2,
       lifetime_value: 4733.75
     },
     {
-      customer_name: 'Abby Subram',
+      customer_name: 'Jim Bergnaum (female)',
       num_orders: 2,
       lifetime_value: 2791.5325
     },
     {
-      customer_name: 'Abhijit Thakur',
+      customer_name: 'Lynn Kuvalis IV (female)',
       num_orders: 2,
       lifetime_value: 43.99
     },
     {
-      customer_name: 'Abigail Anderson',
+      customer_name: 'Veronica Wuckert (female)',
       num_orders: 2,
       lifetime_value: 43.99
     },
     {
-      customer_name: 'Abigail Barnes',
+      customer_name: 'Ann Nitzsche (male)',
       num_orders: 4,
       lifetime_value: 228.52
     },
     {
-      customer_name: 'Abigail Clark',
+      customer_name: 'Irving Hirthe Jr. (male)',
       num_orders: 2,
       lifetime_value: 84.99
     },
     {
-      customer_name: 'Abigail Coleman',
+      customer_name: 'Winifred Pollich (male)',
       num_orders: 1,
       lifetime_value: 14.98
     },
     {
-      customer_name: 'Abigail Diaz',
+      customer_name: 'Henry Collier (male)',
       num_orders: 2,
       lifetime_value: 4419.0582
     },
     {
-      customer_name: 'Abigail Foster',
+      customer_name: 'Alberta Heidenreich (male)',
       num_orders: 2,
       lifetime_value: 194.98
     },
     {
-      customer_name: 'Abigail Garcia',
+      customer_name: 'Lucas Nitzsche-Bailey (male)',
       num_orders: 4,
       lifetime_value: 140.17
     },
     {
-      customer_name: 'Abigail Gonzales',
+      customer_name: 'Constance Little (female)',
       num_orders: 4,
       lifetime_value: 171.47
     },
     {
-      customer_name: 'Abigail Harris',
+      customer_name: 'Robin Barton (female)',
       num_orders: 5,
       lifetime_value: 402.53
     },
     {
-      customer_name: 'Abigail Henderson',
+      customer_name: 'Gustavo Mayert (male)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Abigail Hughes',
+      customer_name: 'Eleanor Abernathy (male)',
       num_orders: 2,
       lifetime_value: 4833.03
     },
     {
-      customer_name: 'Abigail Johnson',
+      customer_name: 'Daniel Dicki (female)',
       num_orders: 3,
       lifetime_value: 74.54
     },
     {
-      customer_name: 'Abigail Jones',
+      customer_name: 'Rosemarie Collins (female)',
       num_orders: 3,
       lifetime_value: 91.75
     },
     {
-      customer_name: 'Abigail Lewis',
+      customer_name: 'Kristina Hoeger (male)',
       num_orders: 2,
       lifetime_value: 93.98
     },
     {
-      customer_name: 'Abigail Long',
+      customer_name: 'Albert Crona-Considine PhD (female)',
       num_orders: 2,
       lifetime_value: 5890.53
     },
     {
-      customer_name: 'Abigail Martin',
+      customer_name: 'Clyde Rosenbaum (female)',
       num_orders: 4,
       lifetime_value: 104.19
     },
     {
-      customer_name: 'Abigail Martinez',
+      customer_name: 'Charles Nicolas (female)',
       num_orders: 2,
       lifetime_value: 87.28
     },
     {
-      customer_name: 'Abigail Miller',
+      customer_name: 'Jake Stamm (male)',
       num_orders: 2,
       lifetime_value: 51.27
     },
     {
-      customer_name: 'Abigail Patterson',
+      customer_name: 'Shannon Schmeler (male)',
       num_orders: 2,
       lifetime_value: 245.47
     },
     {
-      customer_name: 'Abigail Perry',
+      customer_name: 'Gregg Murazik (female)',
       num_orders: 1,
       lifetime_value: 29.48
     },
     {
-      customer_name: 'Abigail Robinson',
+      customer_name: 'Kay Rosenbaum (male)',
       num_orders: 2,
       lifetime_value: 122.42
     },
     {
-      customer_name: 'Abigail Rodriguez',
+      customer_name: 'Elaine Franey (female)',
       num_orders: 2,
       lifetime_value: 133.96
     },
     {
-      customer_name: 'Abigail Ross',
+      customer_name: 'Angelina Gerhold Jr. (female)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Abigail Simmons',
+      customer_name: 'Lula Streich II (female)',
       num_orders: 2,
       lifetime_value: 5969.7
     },
     {
-      customer_name: 'Abigail Smith',
+      customer_name: 'Dr. Joel Weimann (female)',
       num_orders: 1,
       lifetime_value: 614.96
     },
     {
-      customer_name: 'Abigail Thompson',
+      customer_name: 'Mrs. Laverne Leuschke (male)',
       num_orders: 2,
       lifetime_value: 87.28
     },
     {
-      customer_name: 'Abigail Walker',
+      customer_name: 'Dr. Sarah Heidenreich (female)',
       num_orders: 2,
       lifetime_value: 133.96
     },
     {
-      customer_name: 'Abigail White',
+      customer_name: 'James Fritsch (female)',
       num_orders: 2,
       lifetime_value: 5973.24
     },
     {
-      customer_name: 'Abigail Williams',
+      customer_name: 'Yvette Gulgowski (male)',
       num_orders: 3,
       lifetime_value: 81.24
     },
     {
-      customer_name: 'Adam Adams',
+      customer_name: 'Kate Shanahan-Fadel IV (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Adam Allen',
+      customer_name: 'Angela Klocko (female)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Adam Baker',
+      customer_name: 'Laurence Stokes (female)',
       num_orders: 1,
       lifetime_value: 588.96
     },
     {
-      customer_name: 'Adam Campbell',
+      customer_name: 'Tim Bahringer (female)',
       num_orders: 2,
       lifetime_value: 72.16
     },
     {
-      customer_name: 'Adam Collins',
+      customer_name: 'Terri Mosciski (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Adam Edwards',
+      customer_name: 'Harriet Hackett (female)',
       num_orders: 3,
       lifetime_value: 6917.5425
     },
     {
-      customer_name: 'Adam Evans',
+      customer_name: 'Katrina Cremin II (male)',
       num_orders: 2,
       lifetime_value: 61.96
     },
     {
-      customer_name: 'Adam Gonzalez',
+      customer_name: 'Colleen Hyatt (male)',
       num_orders: 2,
       lifetime_value: 2768.5325
     },
     {
-      customer_name: 'Adam Green',
+      customer_name: 'Neal Mueller (female)',
       num_orders: 1,
       lifetime_value: 54.98
     },
     {
-      customer_name: 'Adam Hall',
+      customer_name: 'Ralph Miller V (female)',
       num_orders: 2,
       lifetime_value: 4362.74
     },
     {
-      customer_name: 'Adam Hernandez',
+      customer_name: 'Jackie Borer (male)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Adam Hill',
+      customer_name: 'Jamie Hermiston (male)',
       num_orders: 2,
       lifetime_value: 68.87
     },
     {
-      customer_name: 'Adam King',
+      customer_name: 'Nancy Feest (female)',
       num_orders: 1,
       lifetime_value: 2297.28
     },
     {
-      customer_name: 'Adam Lopez',
+      customer_name: 'Max Welch (female)',
       num_orders: 1,
       lifetime_value: 42.28
     },
     {
-      customer_name: 'Adam Mitchell',
+      customer_name: 'Dr. Wm Fahey (male)',
       num_orders: 2,
       lifetime_value: 3262.83
     },
     {
-      customer_name: 'Adam Nelson',
+      customer_name: 'Louis Bogisich (male)',
       num_orders: 4,
       lifetime_value: 87.95
     },
     {
-      customer_name: 'Adam Parker',
+      customer_name: 'Opal Leffler IV (female)',
       num_orders: 3,
       lifetime_value: 101.85
     },
     {
-      customer_name: 'Adam Perez',
+      customer_name: 'Dewey Waters (female)',
       num_orders: 2,
       lifetime_value: 1372.95
     },
     {
-      customer_name: 'Adam Phillips',
+      customer_name: 'Brenda Spinka (male)',
       num_orders: 1,
       lifetime_value: 633.96
     },
     {
-      customer_name: 'Adam Roberts',
+      customer_name: 'Rolando Skiles (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Adam Scott',
+      customer_name: 'Scott Schimmel (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Adam Turner',
+      customer_name: 'Jimmy Rice-Kuhic (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Adam Wright',
+      customer_name: 'Alfredo Gibson I (male)',
       num_orders: 1,
       lifetime_value: 2439.99
     },
     {
-      customer_name: 'Adam Young',
+      customer_name: 'Eileen Rolfson (male)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Adrian Bailey',
+      customer_name: 'Penny Hand (female)',
       num_orders: 2,
       lifetime_value: 2919.8896
     },
     {
-      customer_name: 'Adrian Bell',
+      customer_name: 'Jaime Shields (female)',
       num_orders: 2,
       lifetime_value: 3800.0782
     },
     {
-      customer_name: 'Adrian Brooks',
+      customer_name: 'Mae Kozey (female)',
       num_orders: 1,
       lifetime_value: 24.27
     },
     {
-      customer_name: 'Adrian Cook',
+      customer_name: 'Clark Dickinson (male)',
       num_orders: 2,
       lifetime_value: 1622.47
     },
     {
-      customer_name: 'Adrian Cooper',
+      customer_name: 'Tom Raynor (female)',
       num_orders: 3,
       lifetime_value: 5295.4082
     },
     {
-      customer_name: 'Adrian Cox',
+      customer_name: 'Dallas Kunze (male)',
       num_orders: 2,
       lifetime_value: 4355.71
     },
     {
-      customer_name: 'Adrian Gray',
+      customer_name: 'Kristi Morissette MD (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Adrian Howard',
+      customer_name: 'Evan Rodriguez I (male)',
       num_orders: 2,
       lifetime_value: 1597.5582
     },
     {
-      customer_name: 'Adrian James',
+      customer_name: 'Mary Gleichner (male)',
       num_orders: 3,
       lifetime_value: 6831.7596
     },
     {
-      customer_name: 'Adrian Morgan',
+      customer_name: 'Dr. Rick Kerluke (male)',
       num_orders: 2,
       lifetime_value: 2753.8225
     },
     {
-      customer_name: 'Adrian Morris',
+      customer_name: 'Clara Treutel IV (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Adrian Peterson',
+      customer_name: 'Horace Lehner (female)',
       num_orders: 2,
       lifetime_value: 3352.3975
     },
     {
-      customer_name: 'Adrian Ramirez',
+      customer_name: 'Estelle Smitham (male)',
       num_orders: 1,
       lifetime_value: 54.96
     },
     {
-      customer_name: 'Adrian Richardson',
+      customer_name: 'Vanessa Hayes-Schmidt PhD (female)',
       num_orders: 2,
       lifetime_value: 2435.0782
     },
     {
-      customer_name: 'Adrian Rivera',
+      customer_name: 'Raquel Legros (female)',
       num_orders: 2,
       lifetime_value: 4391.4096
     },
     {
-      customer_name: 'Adrian Sanchez',
+      customer_name: 'Clayton Purdy (male)',
       num_orders: 1,
       lifetime_value: 64.47
     },
     {
-      customer_name: 'Adrian Sanders',
+      customer_name: 'Kristy Roberts (female)',
       num_orders: 2,
       lifetime_value: 3342.4075
     },
     {
-      customer_name: 'Adrian Stewart',
+      customer_name: 'Alfonso Farrell (female)',
       num_orders: 2,
       lifetime_value: 3105.27
     },
     {
-      customer_name: 'Adrian Torres',
+      customer_name: 'Eleanor Schuster (male)',
       num_orders: 2,
       lifetime_value: 3352.3975
     },
     {
-      customer_name: 'Adrian Ward',
+      customer_name: 'Leland Hane (male)',
       num_orders: 2,
       lifetime_value: 3365.6675
     },
     {
-      customer_name: 'Adrian Watson',
+      customer_name: 'Kristen Graham (male)',
       num_orders: 2,
       lifetime_value: 1893.9075
     },
     {
-      customer_name: 'Aidan Alexander',
+      customer_name: 'Shawn Kuphal (male)',
       num_orders: 2,
       lifetime_value: 108.46
     },
     {
-      customer_name: 'Aidan Barnes',
+      customer_name: 'Mandy Daugherty (male)',
       num_orders: 2,
       lifetime_value: 5917.24
     },
     {
-      customer_name: 'Aidan Bennett',
+      customer_name: 'Mrs. Thelma Welch (female)',
       num_orders: 2,
       lifetime_value: 48.98
     },
     {
-      customer_name: 'Aidan Bryant',
+      customer_name: 'Travis Schimmel (male)',
       num_orders: 2,
       lifetime_value: 4795.31
     },
     {
-      customer_name: 'Aidan Butler',
+      customer_name: 'Margie Casper IV (female)',
       num_orders: 2,
       lifetime_value: 4763.34
     },
     {
-      customer_name: 'Aidan Coleman',
+      customer_name: 'Winifred Runte (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Aidan Diaz',
+      customer_name: 'Mrs. Constance Lehner (female)',
       num_orders: 2,
       lifetime_value: 4551.5325
     },
     {
-      customer_name: 'Aidan Flores',
+      customer_name: 'Mercedes Smitham (female)',
       num_orders: 4,
       lifetime_value: 261.22
     },
     {
-      customer_name: 'Aidan Foster',
+      customer_name: 'Lindsay Luettgen (male)',
       num_orders: 2,
       lifetime_value: 4486.5425
     },
     {
-      customer_name: 'Aidan Gonzales',
+      customer_name: 'Stewart Runolfsson (male)',
       num_orders: 1,
       lifetime_value: 90.95
     },
     {
-      customer_name: 'Aidan Griffin',
+      customer_name: 'Keith Wiegand (female)',
       num_orders: 2,
       lifetime_value: 142.95
     },
     {
-      customer_name: 'Aidan Hayes',
+      customer_name: 'Anne Legros (male)',
       num_orders: 4,
       lifetime_value: 265.22
     },
     {
-      customer_name: 'Aidan Henderson',
+      customer_name: 'Toni Cummings (male)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Aidan Hughes',
+      customer_name: 'Leland Lesch V (female)',
       num_orders: 1,
       lifetime_value: 2329.98
     },
     {
-      customer_name: 'Aidan Jenkins',
+      customer_name: 'Brett Aufderhar (male)',
       num_orders: 1,
       lifetime_value: 141.98
     },
     {
-      customer_name: 'Aidan Long',
+      customer_name: 'Gertrude Bergnaum (female)',
       num_orders: 2,
       lifetime_value: 5898.26
     },
     {
-      customer_name: 'Aidan Patterson',
+      customer_name: 'Adrian Bauch (male)',
       num_orders: 2,
       lifetime_value: 5922.53
     },
     {
-      customer_name: 'Aidan Perry',
+      customer_name: 'Corey Hills (male)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Aidan Powell',
+      customer_name: 'Mr. Marshall Paucek (male)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Aidan Ross',
+      customer_name: 'Jerry Gerlach (female)',
       num_orders: 1,
       lifetime_value: 2329.98
     },
     {
-      customer_name: 'Aidan Russell',
+      customer_name: 'Elbert Roberts (male)',
       num_orders: 2,
       lifetime_value: 4513.8425
     },
     {
-      customer_name: 'Aidan Simmons',
+      customer_name: 'Johnnie VonRueden (female)',
       num_orders: 2,
       lifetime_value: 4513.5125
     },
     {
-      customer_name: 'Aidan Washington',
+      customer_name: 'Mr. Cory Funk (male)',
       num_orders: 2,
       lifetime_value: 5898.26
     },
     {
-      customer_name: 'Aidan Wood',
+      customer_name: 'Matthew Gorczany MD (male)',
       num_orders: 1,
       lifetime_value: 44.91
     },
     {
-      customer_name: 'Alan Cai',
+      customer_name: 'Natasha Hartmann (female)',
       num_orders: 1,
       lifetime_value: 29.26
     },
     {
-      customer_name: 'Alan Chen',
+      customer_name: 'Doris Purdy (female)',
       num_orders: 2,
       lifetime_value: 4382.75
     },
     {
-      customer_name: 'Alan Gao',
+      customer_name: 'Josefina Lakin (female)',
       num_orders: 2,
       lifetime_value: 84.96
     },
     {
-      customer_name: 'Alan Guo',
+      customer_name: 'Christian Lind-Osinski IV (male)',
       num_orders: 2,
       lifetime_value: 40.96
     },
     {
-      customer_name: 'Alan He',
+      customer_name: 'Gretchen VonRueden (male)',
       num_orders: 2,
       lifetime_value: 4347.76
     },
     {
-      customer_name: 'Alan Hu',
+      customer_name: 'Robyn Thiel (female)',
       num_orders: 3,
       lifetime_value: 92.16
     },
     {
-      customer_name: 'Alan Huang',
+      customer_name: 'Lee Ryan (female)',
       num_orders: 2,
       lifetime_value: 117.96
     },
     {
-      customer_name: 'Alan Li',
+      customer_name: 'Randal McKenzie (male)',
       num_orders: 2,
       lifetime_value: 74.98
     },
     {
-      customer_name: 'Alan Liang',
+      customer_name: 'Ricardo Heidenreich PhD (male)',
       num_orders: 2,
       lifetime_value: 99.94
     },
     {
-      customer_name: 'Alan Lin',
+      customer_name: 'Jamie Fay (male)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Alan Liu',
+      customer_name: 'Jeanette Koss (male)',
       num_orders: 2,
       lifetime_value: 62.27
     },
     {
-      customer_name: 'Alan Lu',
+      customer_name: 'Ken Kassulke (female)',
       num_orders: 2,
       lifetime_value: 6030.61
     },
     {
-      customer_name: 'Alan Ma',
+      customer_name: 'Jose Will (male)',
       num_orders: 2,
       lifetime_value: 54.94
     },
     {
-      customer_name: 'Alan She',
+      customer_name: 'Angela Kreiger (female)',
       num_orders: 2,
       lifetime_value: 81.46
     },
     {
-      customer_name: 'Alan Sun',
+      customer_name: 'Stephen Okuneva (female)',
       num_orders: 2,
       lifetime_value: 4391.74
     },
     {
-      customer_name: 'Alan Wang',
+      customer_name: 'Eugene Hoppe (male)',
       num_orders: 1,
       lifetime_value: 27.77
     },
     {
-      customer_name: 'Alan Xu',
+      customer_name: 'Dr. Latoya Padberg (female)',
       num_orders: 2,
       lifetime_value: 128.95
     },
     {
-      customer_name: 'Alan Yang',
+      customer_name: 'Florence Wiza (male)',
       num_orders: 2,
       lifetime_value: 231.96
     },
     {
-      customer_name: 'Alan Ye',
+      customer_name: 'Jonathon Mraz (male)',
       num_orders: 2,
       lifetime_value: 51.92
     },
     {
-      customer_name: 'Alan Zeng',
+      customer_name: 'Joanna Hilpert (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Alan Zhang',
+      customer_name: 'Shelly Strosin (female)',
       num_orders: 2,
       lifetime_value: 4752.75
     },
     {
-      customer_name: 'Alan Zheng',
+      customer_name: 'Mario Hilpert Sr. (male)',
       num_orders: 3,
       lifetime_value: 123.91
     },
     {
-      customer_name: 'Alan Zhou',
+      customer_name: 'Henry Hermiston (male)',
       num_orders: 2,
       lifetime_value: 6029.57
     },
     {
-      customer_name: 'Alan Zhu',
+      customer_name: 'Kyle Turner (female)',
       num_orders: 2,
       lifetime_value: 142.46
     },
     {
-      customer_name: 'Albert Alonso',
+      customer_name: 'Oliver Roberts (male)',
       num_orders: 1,
       lifetime_value: 163.99
     },
     {
-      customer_name: 'Albert Alvarez',
+      customer_name: 'Wade Kunze (male)',
       num_orders: 3,
       lifetime_value: 196.27
     },
     {
-      customer_name: 'Albert Blanco',
+      customer_name: 'Camille Bednar (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Albert Castro',
+      customer_name: 'Jessie Leffler (male)',
       num_orders: 3,
       lifetime_value: 6646.58
     },
     {
-      customer_name: 'Albert Diaz',
+      customer_name: 'Mrs. Yolanda Douglas-Reilly (female)',
       num_orders: 2,
       lifetime_value: 1468.5882
     },
     {
-      customer_name: 'Albert Dominguez',
+      customer_name: 'Kathryn Robel (female)',
       num_orders: 1,
       lifetime_value: 26.97
     },
     {
-      customer_name: 'Albert Gomez',
+      customer_name: 'Herbert Smitham (female)',
       num_orders: 2,
       lifetime_value: 1498.5782
     },
     {
-      customer_name: 'Albert Hernandez',
+      customer_name: 'Derek Swift-Hagenes (female)',
       num_orders: 2,
       lifetime_value: 1503.5782
     },
     {
-      customer_name: 'Albert Jiménez',
+      customer_name: 'Leigh Morissette (female)',
       num_orders: 1,
       lifetime_value: 41.95
     },
     {
-      customer_name: 'Albert Martin',
+      customer_name: 'Dr. Frankie Beier V (female)',
       num_orders: 1,
       lifetime_value: 539.99
     },
     {
-      customer_name: 'Albert Moreno',
+      customer_name: 'Mr. Willard Leffler (male)',
       num_orders: 1,
       lifetime_value: 839.48
     },
     {
-      customer_name: 'Albert Navarro',
+      customer_name: 'Allan Rath (female)',
       num_orders: 1,
       lifetime_value: 867.97
     },
     {
-      customer_name: 'Albert Ortega',
+      customer_name: 'Essie Dickens-Ferry (female)',
       num_orders: 2,
       lifetime_value: 178.45
     },
     {
-      customer_name: 'Albert Ramos',
+      customer_name: 'Joy Dickens V (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Albert Romero',
+      customer_name: 'Colin Renner (male)',
       num_orders: 1,
       lifetime_value: 839.48
     },
     {
-      customer_name: 'Albert Rubio',
+      customer_name: 'Max Torphy (female)',
       num_orders: 1,
       lifetime_value: 36.96
     },
     {
-      customer_name: 'Albert Sanz',
+      customer_name: 'Larry Schmitt (male)',
       num_orders: 3,
       lifetime_value: 6980.8525
     },
     {
-      customer_name: 'Albert Serrano',
+      customer_name: 'Virgil Boyer (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Albert Suarez',
+      customer_name: 'Orlando Beatty (male)',
       num_orders: 2,
       lifetime_value: 2721.5525
     },
     {
-      customer_name: 'Albert Vazquez',
+      customer_name: 'Kristina Auer (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Alejandro Anand',
+      customer_name: 'Ismael Boyle (male)',
       num_orders: 2,
       lifetime_value: 67.46
     },
     {
-      customer_name: 'Alejandro Andersen',
+      customer_name: 'Kari Lakin (male)',
       num_orders: 2,
       lifetime_value: 4368.0582
     },
     {
-      customer_name: 'Alejandro Beck',
+      customer_name: 'Thelma Quigley (female)',
       num_orders: 1,
       lifetime_value: 93.46
     },
     {
-      customer_name: 'Alejandro Cai',
+      customer_name: 'Constance Schinner (male)',
       num_orders: 1,
       lifetime_value: 8.99
     },
     {
-      customer_name: 'Alejandro Chander',
+      customer_name: 'Terry Beer (female)',
       num_orders: 2,
       lifetime_value: 87.97
     },
     {
-      customer_name: 'Alejandro Chavez',
+      customer_name: 'Pat Sanford (female)',
       num_orders: 1,
       lifetime_value: 9.99
     },
     {
-      customer_name: 'Alejandro Chen',
+      customer_name: 'Loren Quitzon (male)',
       num_orders: 2,
       lifetime_value: 5875.55
     },
     {
-      customer_name: 'Alejandro Deng',
+      customer_name: 'Inez Macejkovic (female)',
       num_orders: 2,
       lifetime_value: 4438.3796
     },
     {
-      customer_name: 'Alejandro Gao',
+      customer_name: 'Mr. Javier Kilback (male)',
       num_orders: 2,
       lifetime_value: 4416.3796
     },
     {
-      customer_name: 'Alejandro Goel',
+      customer_name: 'Lora Larkin (male)',
       num_orders: 2,
       lifetime_value: 110.75
     },
     {
-      customer_name: 'Alejandro Guo',
+      customer_name: 'Gabriel Witting (male)',
       num_orders: 1,
       lifetime_value: 8.99
     },
     {
-      customer_name: 'Alejandro Hu',
+      customer_name: 'Lyle Ward (male)',
       num_orders: 2,
       lifetime_value: 241.76
     },
     {
-      customer_name: 'Alejandro Huang',
+      customer_name: 'Gene Schneider (male)',
       num_orders: 1,
       lifetime_value: 8.99
     },
     {
-      customer_name: 'Alejandro Kumar',
+      customer_name: 'Max Rohan (female)',
       num_orders: 1,
       lifetime_value: 8.99
     },
     {
-      customer_name: 'Alejandro Lal',
+      customer_name: 'Delbert Hirthe (male)',
       num_orders: 1,
       lifetime_value: 8.99
     },
     {
-      customer_name: 'Alejandro Li',
+      customer_name: 'Jana Feeney (male)',
       num_orders: 1,
       lifetime_value: 49.99
     },
     {
-      customer_name: 'Alejandro Liang',
+      customer_name: 'Dr. Denise Rippin (male)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Alejandro Lin',
+      customer_name: 'Steven Boyle IV (male)',
       num_orders: 1,
       lifetime_value: 8.99
     },
     {
-      customer_name: 'Alejandro Liu',
+      customer_name: 'Bob Moen (male)',
       num_orders: 1,
       lifetime_value: 49.99
     },
     {
-      customer_name: 'Alejandro Lu',
+      customer_name: 'Mrs. Susan Schmidt (male)',
       num_orders: 3,
       lifetime_value: 5166.4082
     },
     {
-      customer_name: 'Alejandro Luo',
+      customer_name: 'Lewis Koelpin-Cronin DDS (female)',
       num_orders: 4,
       lifetime_value: 235.72
     },
     {
-      customer_name: 'Alejandro Ma',
+      customer_name: 'Dr. Jamie Nikolaus (female)',
       num_orders: 1,
       lifetime_value: 61.08
     },
     {
-      customer_name: 'Alejandro Nara',
+      customer_name: 'Santos Mueller (female)',
       num_orders: 1,
       lifetime_value: 49.97
     },
     {
-      customer_name: 'Alejandro Nath',
+      customer_name: 'Josh Kautzer DVM (male)',
       num_orders: 3,
       lifetime_value: 5636.8982
     },
     {
-      customer_name: 'Alejandro Rai',
+      customer_name: 'Lindsey Okuneva (male)',
       num_orders: 3,
       lifetime_value: 5633.9082
     },
     {
-      customer_name: 'Alejandro Raji',
+      customer_name: 'Nelson Lemke (male)',
       num_orders: 2,
       lifetime_value: 42.97
     },
     {
-      customer_name: 'Alejandro Shan',
+      customer_name: 'Kevin Pagac Sr. (female)',
       num_orders: 1,
       lifetime_value: 8.99
     },
     {
-      customer_name: 'Alejandro Sharma',
+      customer_name: 'Marshall Waters (male)',
       num_orders: 2,
       lifetime_value: 75.47
     },
     {
-      customer_name: 'Alejandro She',
+      customer_name: 'Cary Daniel (female)',
       num_orders: 2,
       lifetime_value: 5919.73
     },
     {
-      customer_name: 'Alejandro Shen',
+      customer_name: 'Sidney Leffler (female)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Alejandro Sun',
+      customer_name: 'Warren Bahringer (female)',
       num_orders: 1,
       lifetime_value: 42.28
     },
     {
-      customer_name: 'Alejandro Tang',
+      customer_name: 'Francisco Wiza (female)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Alejandro Wang',
+      customer_name: 'Lucy Altenwerth (male)',
       num_orders: 1,
       lifetime_value: 58.98
     },
     {
-      customer_name: 'Alejandro Wu',
+      customer_name: 'Victoria Vandervort-Flatley (male)',
       num_orders: 2,
       lifetime_value: 4401.4096
     },
     {
-      customer_name: 'Alejandro Xie',
+      customer_name: 'Whitney Heidenreich (male)',
       num_orders: 1,
       lifetime_value: 86.96
     },
     {
-      customer_name: 'Alejandro Xu',
+      customer_name: 'Marvin Breitenberg (female)',
       num_orders: 4,
       lifetime_value: 337.9
     },
     {
-      customer_name: 'Alejandro Xu',
+      customer_name: 'Dr. Nichole Stanton (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Alejandro Yang',
+      customer_name: 'Angela Rowe (male)',
       num_orders: 1,
       lifetime_value: 49.99
     },
     {
-      customer_name: 'Alejandro Ye',
+      customer_name: 'Shelly Batz (female)',
       num_orders: 2,
       lifetime_value: 4401.3996
     },
     {
-      customer_name: 'Alejandro Yuan',
+      customer_name: 'Jimmie Brown (male)',
       num_orders: 1,
       lifetime_value: 8.99
     },
     {
-      customer_name: 'Alejandro Zeng',
+      customer_name: 'Jody Schiller (female)',
       num_orders: 1,
       lifetime_value: 8.99
     },
     {
-      customer_name: 'Alejandro Zhang',
+      customer_name: 'Renee Kassulke (female)',
       num_orders: 2,
       lifetime_value: 5898.26
     },
     {
-      customer_name: 'Alejandro Zhao',
+      customer_name: 'Celia Kling (male)',
       num_orders: 1,
       lifetime_value: 8.99
     },
     {
-      customer_name: 'Alejandro Zheng',
+      customer_name: 'Domingo Bins (male)',
       num_orders: 1,
       lifetime_value: 8.99
     },
     {
-      customer_name: 'Alejandro Zhou',
+      customer_name: 'Amy Murphy (male)',
       num_orders: 2,
       lifetime_value: 5923.49
     },
     {
-      customer_name: 'Alejandro Zhu',
+      customer_name: "Fredrick D'Amore (female)",
       num_orders: 1,
       lifetime_value: 39.99
     },
     {
-      customer_name: 'Alex Adams',
+      customer_name: 'Tiffany Osinski (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Alex Allen',
+      customer_name: 'Miss Camille Purdy (female)',
       num_orders: 2,
       lifetime_value: 126.96
     },
     {
-      customer_name: 'Alex Bailey',
+      customer_name: 'Laverne McGlynn (female)',
       num_orders: 2,
       lifetime_value: 4381.3896
     },
     {
-      customer_name: 'Alex Baker',
+      customer_name: 'Kelly Ernser III (female)',
       num_orders: 1,
       lifetime_value: 2475.95
     },
     {
-      customer_name: 'Alex Bell',
+      customer_name: 'Wendell McKenzie (male)',
       num_orders: 2,
       lifetime_value: 4143.25
     },
     {
-      customer_name: 'Alex Brooks',
+      customer_name: 'Steven Breitenberg MD (male)',
       num_orders: 1,
       lifetime_value: 85.48
     },
     {
-      customer_name: 'Alex Campbell',
+      customer_name: 'Ms. Dana Ritchie (female)',
       num_orders: 2,
       lifetime_value: 96.95
     },
     {
-      customer_name: 'Alex Carter',
+      customer_name: 'Miss Michelle Olson (female)',
       num_orders: 2,
       lifetime_value: 4632.8625
     },
     {
-      customer_name: 'Alex Collins',
+      customer_name: 'Francis Lynch IV (male)',
       num_orders: 2,
       lifetime_value: 167.93
     },
     {
-      customer_name: 'Alex Cook',
+      customer_name: 'Julia Turner (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Alex Cooper',
+      customer_name: 'Isaac Dicki V (female)',
       num_orders: 1,
       lifetime_value: 37.21
     },
     {
-      customer_name: 'Alex Cox',
+      customer_name: 'Miss Kelley Bartell (male)',
       num_orders: 1,
       lifetime_value: 106.96
     },
     {
-      customer_name: 'Alex Edwards',
+      customer_name: 'Natasha Heathcote (male)',
       num_orders: 2,
       lifetime_value: 4411.3682
     },
     {
-      customer_name: 'Alex Evans',
+      customer_name: 'Debbie Roberts (female)',
       num_orders: 2,
       lifetime_value: 3048.31
     },
     {
-      customer_name: 'Alex Gonzalez',
+      customer_name: 'Clinton Considine V (female)',
       num_orders: 1,
       lifetime_value: 72.96
     },
     {
-      customer_name: 'Alex Gray',
+      customer_name: 'Raymond Schiller (female)',
       num_orders: 1,
       lifetime_value: 64.47
     },
     {
-      customer_name: 'Alex Green',
+      customer_name: 'Conrad Gibson (male)',
       num_orders: 1,
       lifetime_value: 1768.96
     },
     {
-      customer_name: 'Alex Hernandez',
+      customer_name: 'Colleen Wisoky (female)',
       num_orders: 1,
       lifetime_value: 1760.47
     },
     {
-      customer_name: 'Alex Hill',
+      customer_name: 'Paula Bailey MD (female)',
       num_orders: 2,
       lifetime_value: 64.88
     },
     {
-      customer_name: 'Alex Howard',
+      customer_name: 'Ramiro Kuhlman (female)',
       num_orders: 3,
       lifetime_value: 8346.28
     },
     {
-      customer_name: 'Alex James',
+      customer_name: 'Orlando Bashirian (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Alex Kelly',
+      customer_name: 'Tyler Labadie DDS (male)',
       num_orders: 2,
       lifetime_value: 75.74
     },
     {
-      customer_name: 'Alex King',
+      customer_name: 'Edward Schoen (male)',
       num_orders: 1,
       lifetime_value: 1759.97
     },
     {
-      customer_name: 'Alex Lopez',
+      customer_name: 'Margie Halvorson (male)',
       num_orders: 3,
       lifetime_value: 7000.5525
     },
     {
-      customer_name: 'Alex Mitchell',
+      customer_name: 'Carlos Dooley (female)',
       num_orders: 2,
       lifetime_value: 4752.75
     },
     {
-      customer_name: 'Alex Morgan',
+      customer_name: 'Melanie Berge (male)',
       num_orders: 2,
       lifetime_value: 107.97
     },
     {
-      customer_name: 'Alex Morris',
+      customer_name: 'Derrick Gutkowski (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Alex Murphy',
+      customer_name: 'Evelyn Cummerata (female)',
       num_orders: 2,
       lifetime_value: 2746.5525
     },
     {
-      customer_name: 'Alex Nelson',
+      customer_name: "Dr. Guadalupe O'Conner (male)",
       num_orders: 3,
       lifetime_value: 132.5
     },
     {
-      customer_name: 'Alex Parker',
+      customer_name: 'Ebony Corkery (male)',
       num_orders: 2,
       lifetime_value: 66.26
     },
     {
-      customer_name: 'Alex Perez',
+      customer_name: 'Emilio Schulist (female)',
       num_orders: 2,
       lifetime_value: 3102.98
     },
     {
-      customer_name: 'Alex Peterson',
+      customer_name: 'Rita Labadie MD (female)',
       num_orders: 1,
       lifetime_value: 96.46
     },
     {
-      customer_name: 'Alex Phillips',
+      customer_name: 'Laverne Daniel (male)',
       num_orders: 1,
       lifetime_value: 539.99
     },
     {
-      customer_name: 'Alex Ramirez',
+      customer_name: 'Darrel Quigley (female)',
       num_orders: 1,
       lifetime_value: 36.96
     },
     {
-      customer_name: 'Alex Reed',
+      customer_name: 'Marcella Padberg (female)',
       num_orders: 3,
       lifetime_value: 232.23
     },
     {
-      customer_name: 'Alex Richardson',
+      customer_name: 'Keith Mertz (female)',
       num_orders: 3,
       lifetime_value: 6684.58
     },
     {
-      customer_name: 'Alex Roberts',
+      customer_name: 'Cynthia Schroeder (female)',
       num_orders: 2,
       lifetime_value: 3194.93
     },
     {
-      customer_name: 'Alex Rogers',
+      customer_name: 'Elmer Heidenreich (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Alex Sanchez',
+      customer_name: 'Gerardo Raynor (female)',
       num_orders: 2,
       lifetime_value: 190.89
     },
     {
-      customer_name: 'Alex Sanders',
+      customer_name: 'Mr. Josh Waters (female)',
       num_orders: 2,
       lifetime_value: 114.96
     },
     {
-      customer_name: 'Alex Scott',
+      customer_name: 'Gerardo Parisian (male)',
       num_orders: 1,
       lifetime_value: 64.47
     },
     {
-      customer_name: 'Alex Stewart',
+      customer_name: "Craig O'Hara (male)",
       num_orders: 2,
       lifetime_value: 102.85
     },
     {
-      customer_name: 'Alex Torres',
+      customer_name: 'Ismael Zieme (female)',
       num_orders: 3,
       lifetime_value: 5121.4282
     },
     {
-      customer_name: 'Alex Turner',
+      customer_name: 'Kimberly Parker MD (female)',
       num_orders: 2,
       lifetime_value: 76.94
     },
     {
-      customer_name: 'Alex Ward',
+      customer_name: 'Sergio Hyatt (female)',
       num_orders: 2,
       lifetime_value: 1503.5782
     },
     {
-      customer_name: 'Alex Watson',
+      customer_name: 'Robin Morissette (male)',
       num_orders: 3,
       lifetime_value: 280.76
     },
     {
-      customer_name: 'Alex Wright',
+      customer_name: 'David Schmeler MD (male)',
       num_orders: 3,
       lifetime_value: 6895.6125
     },
     {
-      customer_name: 'Alex Young',
+      customer_name: 'Mario Hansen (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Alexander Anderson',
+      customer_name: "Mr. Gregory O'Reilly (female)",
       num_orders: 2,
       lifetime_value: 126.56
     },
     {
-      customer_name: 'Alexander Brown',
+      customer_name: 'Dianne Kiehn (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Alexander Davis',
+      customer_name: 'Cristina Torp (female)',
       num_orders: 2,
       lifetime_value: 4118.26
     },
     {
-      customer_name: 'Alexander Garcia',
+      customer_name: 'Eloise Kutch (female)',
       num_orders: 2,
       lifetime_value: 87.77
     },
     {
-      customer_name: 'Alexander Harris',
+      customer_name: 'Felipe Cartwright (male)',
       num_orders: 2,
       lifetime_value: 6029.57
     },
     {
-      customer_name: 'Alexander Jackson',
+      customer_name: 'Mr. Alvin Champlin (male)',
       num_orders: 2,
       lifetime_value: 24.27
     },
     {
-      customer_name: 'Alexander Johnson',
+      customer_name: 'Brooke Morar IV (female)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Alexander Jones',
+      customer_name: 'Jermaine Jenkins-Kovacek (female)',
       num_orders: 3,
       lifetime_value: 5743.9675
     },
     {
-      customer_name: 'Alexander Lee',
+      customer_name: 'Rudy Hoppe (female)',
       num_orders: 2,
       lifetime_value: 65.96
     },
     {
-      customer_name: 'Alexander Martin',
+      customer_name: 'Darrell Kiehn IV (female)',
       num_orders: 2,
       lifetime_value: 26.56
     },
     {
-      customer_name: 'Alexander Martinez',
+      customer_name: 'Randolph Dickens (female)',
       num_orders: 2,
       lifetime_value: 6090.59
     },
     {
-      customer_name: 'Alexander Miller',
+      customer_name: 'Steven Kunde (male)',
       num_orders: 2,
       lifetime_value: 6102.19
     },
     {
-      customer_name: 'Alexander Robinson',
+      customer_name: 'Brad Heller (male)',
       num_orders: 1,
       lifetime_value: 21.49
     },
     {
-      customer_name: 'Alexander Rodriguez',
+      customer_name: 'Stella Little (female)',
       num_orders: 2,
       lifetime_value: 30.97
     },
     {
-      customer_name: 'Alexander Smith',
+      customer_name: 'Sonya Jast (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Alexander Taylor',
+      customer_name: 'Herbert McClure (male)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Alexander Thompson',
+      customer_name: 'Shari Ledner MD (male)',
       num_orders: 2,
       lifetime_value: 160.55
     },
     {
-      customer_name: 'Alexander Walker',
+      customer_name: 'Dr. Sergio Jacobi (female)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Alexander White',
+      customer_name: 'Ivan Botsford PhD (male)',
       num_orders: 2,
       lifetime_value: 6056.61
     },
     {
-      customer_name: 'Alexander Williams',
+      customer_name: 'Fredrick Gleichner (female)',
       num_orders: 1,
       lifetime_value: 58.98
     },
     {
-      customer_name: 'Alexander Wilson',
+      customer_name: 'Catherine Bergstrom (male)',
       num_orders: 2,
       lifetime_value: 94.47
     },
     {
-      customer_name: 'Alexandra Smith',
+      customer_name: 'Carol Hyatt I (male)',
       num_orders: 2,
       lifetime_value: 42.28
     },
     {
-      customer_name: 'Alexis Alexander',
+      customer_name: 'Hilda Mills DDS (female)',
       num_orders: 1,
       lifetime_value: 45.95
     },
     {
-      customer_name: 'Alexis Ashe',
+      customer_name: 'Marsha Satterfield (female)',
       num_orders: 3,
       lifetime_value: 80.25
     },
     {
-      customer_name: 'Alexis Barnes',
+      customer_name: 'Terrell Mueller Sr. (male)',
       num_orders: 2,
       lifetime_value: 105.24
     },
     {
-      customer_name: 'Alexis Bennett',
+      customer_name: 'Johnny Mann (female)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Alexis Brown',
+      customer_name: 'Kay Johnston (female)',
       num_orders: 3,
       lifetime_value: 7029.78
     },
     {
-      customer_name: 'Alexis Bryant',
+      customer_name: 'Trevor Okuneva (female)',
       num_orders: 2,
       lifetime_value: 5900.55
     },
     {
-      customer_name: 'Alexis Butler',
+      customer_name: 'Vicki Emard (male)',
       num_orders: 2,
       lifetime_value: 5948.24
     },
     {
-      customer_name: 'Alexis Clark',
+      customer_name: 'Adrian Wuckert (male)',
       num_orders: 1,
       lifetime_value: 804.47
     },
     {
-      customer_name: 'Alexis Coleman',
+      customer_name: 'Alison Simonis (male)',
       num_orders: 1,
       lifetime_value: 83.97
     },
     {
-      customer_name: 'Alexis Diaz',
+      customer_name: 'Cory Tremblay Sr. (female)',
       num_orders: 1,
       lifetime_value: 2420.46
     },
     {
-      customer_name: 'Alexis Flores',
+      customer_name: 'Angie Bogan (male)',
       num_orders: 2,
       lifetime_value: 4347.76
     },
     {
-      customer_name: 'Alexis Foster',
+      customer_name: 'Patti Willms (male)',
       num_orders: 2,
       lifetime_value: 5913.24
     },
     {
-      customer_name: 'Alexis Gonzales',
+      customer_name: 'Lillian Price (female)',
       num_orders: 2,
       lifetime_value: 5943.23
     },
     {
-      customer_name: 'Alexis Griffin',
+      customer_name: "Van O'Keefe (female)",
       num_orders: 1,
       lifetime_value: 2400.95
     },
     {
-      customer_name: 'Alexis Hall',
+      customer_name: 'Frank Schinner (female)',
       num_orders: 2,
       lifetime_value: 5970.23
     },
     {
-      customer_name: 'Alexis Harris',
+      customer_name: 'Peggy Daniel (female)',
       num_orders: 3,
       lifetime_value: 73.96
     },
     {
-      customer_name: 'Alexis Hayes',
+      customer_name: 'Hazel Brekke (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Alexis Henderson',
+      customer_name: 'Dwayne Gutkowski-Cruickshank (female)',
       num_orders: 2,
       lifetime_value: 5915.54
     },
     {
-      customer_name: 'Alexis Hughes',
+      customer_name: 'Bernadette Stark (male)',
       num_orders: 1,
       lifetime_value: 589.96
     },
     {
-      customer_name: 'Alexis Jenkins',
+      customer_name: 'Terrell Barrows (female)',
       num_orders: 3,
       lifetime_value: 6503.2
     },
     {
-      customer_name: 'Alexis Johnson',
+      customer_name: 'Joe Beatty (female)',
       num_orders: 3,
       lifetime_value: 8128.02
     },
     {
-      customer_name: 'Alexis Jones',
+      customer_name: 'Lena Kuhic (male)',
       num_orders: 3,
       lifetime_value: 8249.01
     },
     {
-      customer_name: 'Alexis Lee',
+      customer_name: 'Roger Reinger (female)',
       num_orders: 2,
       lifetime_value: 83.97
     },
     {
-      customer_name: 'Alexis Lewis',
+      customer_name: 'Pat Bergstrom (female)',
       num_orders: 2,
       lifetime_value: 5933.26
     },
     {
-      customer_name: 'Alexis Long',
+      customer_name: 'Rafael Weber (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Alexis Martinez',
+      customer_name: 'Alyssa Runte (male)',
       num_orders: 1,
       lifetime_value: 2339.97
     },
     {
-      customer_name: 'Alexis Miller',
+      customer_name: 'Candice Beier (female)',
       num_orders: 3,
       lifetime_value: 8145.33
     },
     {
-      customer_name: 'Alexis Moore',
+      customer_name: 'Toni Hahn (female)',
       num_orders: 3,
       lifetime_value: 144.74
     },
     {
-      customer_name: 'Alexis Patterson',
+      customer_name: 'Olivia Halvorson (female)',
       num_orders: 2,
       lifetime_value: 5933.26
     },
     {
-      customer_name: 'Alexis Perry',
+      customer_name: 'Johnathan Sanford (female)',
       num_orders: 2,
       lifetime_value: 5908.25
     },
     {
-      customer_name: 'Alexis Powell',
+      customer_name: 'Ora Schmeler (male)',
       num_orders: 1,
       lifetime_value: 106.96
     },
     {
-      customer_name: 'Alexis Price',
+      customer_name: 'Miss Muriel Zboncak (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Alexis Robinson',
+      customer_name: 'Wm Parisian (male)',
       num_orders: 1,
       lifetime_value: 74.98
     },
     {
-      customer_name: 'Alexis Rodriguez',
+      customer_name: 'Krystal Moore (male)',
       num_orders: 2,
       lifetime_value: 136.25
     },
     {
-      customer_name: 'Alexis Ross',
+      customer_name: 'Todd Krajcik (female)',
       num_orders: 1,
       lifetime_value: 49.97
     },
     {
-      customer_name: 'Alexis Russell',
+      customer_name: 'Dr. Angelina Lebsack (male)',
       num_orders: 2,
       lifetime_value: 5940.54
     },
     {
-      customer_name: 'Alexis Simmons',
+      customer_name: 'Jose Crist (female)',
       num_orders: 2,
       lifetime_value: 5943.5
     },
     {
-      customer_name: 'Alexis Smith',
+      customer_name: 'Nina Kessler (male)',
       num_orders: 3,
       lifetime_value: 8164.01
     },
     {
-      customer_name: 'Alexis Taylor',
+      customer_name: 'Wilson Mante (male)',
       num_orders: 3,
       lifetime_value: 7023.78
     },
     {
-      customer_name: 'Alexis Thomas',
+      customer_name: 'Maria Schultz (female)',
       num_orders: 3,
       lifetime_value: 8195.5
     },
     {
-      customer_name: 'Alexis Thompson',
+      customer_name: 'Robin Ratke (male)',
       num_orders: 1,
       lifetime_value: 61.97
     },
     {
-      customer_name: 'Alexis Walker',
+      customer_name: 'Gayle Dibbert (male)',
       num_orders: 2,
       lifetime_value: 5976.74
     },
     {
-      customer_name: 'Alexis Washington',
+      customer_name: 'Vivian Bartell (male)',
       num_orders: 2,
       lifetime_value: 4417.73
     },
     {
-      customer_name: 'Alexis White',
+      customer_name: 'Yvonne Beatty (male)',
       num_orders: 3,
       lifetime_value: 8203.5
     },
     {
-      customer_name: 'Alexis Williams',
+      customer_name: 'Melvin Rau (female)',
       num_orders: 3,
       lifetime_value: 8123.03
     },
     {
-      customer_name: 'Alexis Wilson',
+      customer_name: 'Gregory Kunde (female)',
       num_orders: 3,
       lifetime_value: 6984.81
     },
     {
-      customer_name: 'Alexis Wood',
+      customer_name: 'Lucas Morissette (male)',
       num_orders: 3,
       lifetime_value: 5199.7196
     },
     {
-      customer_name: 'Alicia Andersen',
+      customer_name: 'Mr. Forrest Spencer (female)',
       num_orders: 2,
       lifetime_value: 6044.59
     },
     {
-      customer_name: 'Alicia Beck',
+      customer_name: 'Catherine Gutmann DDS (male)',
       num_orders: 2,
       lifetime_value: 35.47
     },
     {
-      customer_name: 'Alicia Chapman',
+      customer_name: 'Rita Satterfield (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Alicia Goel',
+      customer_name: 'Esther Reichel (female)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Alicia Jai',
+      customer_name: 'Mrs. Valerie Fritsch (male)',
       num_orders: 2,
       lifetime_value: 6056.61
     },
     {
-      customer_name: 'Alicia Lal',
+      customer_name: 'Brendan Smitham (male)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Alicia Luo',
+      customer_name: 'Sherry Will (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Alicia Pal',
+      customer_name: 'Stella Hickle Jr. (male)',
       num_orders: 2,
       lifetime_value: 6056.61
     },
     {
-      customer_name: 'Alicia Rai',
+      customer_name: 'Jeffery Streich (female)',
       num_orders: 1,
       lifetime_value: 123.98
     },
     {
-      customer_name: 'Alicia Raje',
+      customer_name: 'Rickey Orn (female)',
       num_orders: 2,
       lifetime_value: 128.44
     },
     {
-      customer_name: 'Alicia Raji',
+      customer_name: 'Veronica Goldner (male)',
       num_orders: 1,
       lifetime_value: 589.98
     },
     {
-      customer_name: 'Alicia Shan',
+      customer_name: 'Marty Spinka DVM (male)',
       num_orders: 2,
       lifetime_value: 6058.21
     },
     {
-      customer_name: 'Alicia Sharma',
+      customer_name: 'Bobbie Watsica (female)',
       num_orders: 2,
       lifetime_value: 6054.22
     },
     {
-      customer_name: 'Alicia She',
+      customer_name: 'Dr. Emanuel Hilll (female)',
       num_orders: 1,
       lifetime_value: 94.48
     },
     {
-      customer_name: 'Alicia Shen',
+      customer_name: 'Traci Ortiz (female)',
       num_orders: 1,
       lifetime_value: 539.99
     },
     {
-      customer_name: 'Alicia Xie',
+      customer_name: 'Isabel Adams (female)',
       num_orders: 2,
       lifetime_value: 6030.61
     },
     {
-      customer_name: 'Alicia Xu',
+      customer_name: 'Kate Mann (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Alicia Yuan',
+      customer_name: 'Leigh Lehner Jr. (female)',
       num_orders: 2,
       lifetime_value: 6089.59
     },
     {
-      customer_name: 'Alisha Alan',
+      customer_name: 'Jacqueline Rogahn DDS (female)',
       num_orders: 2,
       lifetime_value: 5998.23
     },
     {
-      customer_name: 'Alisha Andersen',
+      customer_name: 'Mrs. Christina Weissnat (female)',
       num_orders: 2,
       lifetime_value: 6011.74
     },
     {
-      customer_name: 'Alisha Beck',
+      customer_name: 'Alan Satterfield (female)',
       num_orders: 3,
       lifetime_value: 7107.1
     },
     {
-      customer_name: 'Alisha Cai',
+      customer_name: 'Darla Reichert (male)',
       num_orders: 2,
       lifetime_value: 105.26
     },
     {
-      customer_name: 'Alisha Chande',
+      customer_name: 'Sonya Lakin (female)',
       num_orders: 2,
       lifetime_value: 5910.55
     },
     {
-      customer_name: 'Alisha Chander',
+      customer_name: 'Darryl Brekke (female)',
       num_orders: 2,
       lifetime_value: 5913.24
     },
     {
-      customer_name: 'Alisha Chen',
+      customer_name: 'Wendy Streich (female)',
       num_orders: 2,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Alisha Deng',
+      customer_name: 'Jill Bartoletti (male)',
       num_orders: 3,
       lifetime_value: 8139.53
     },
     {
-      customer_name: 'Alisha Gao',
+      customer_name: 'Angel Veum (female)',
       num_orders: 3,
       lifetime_value: 8153.02
     },
     {
-      customer_name: 'Alisha Goel',
+      customer_name: 'Tommy Price I (male)',
       num_orders: 2,
       lifetime_value: 5949.23
     },
     {
-      customer_name: 'Alisha Guo',
+      customer_name: 'Eleanor Leuschke II (female)',
       num_orders: 2,
       lifetime_value: 208.96
     },
     {
-      customer_name: 'Alisha He',
+      customer_name: 'Ms. Tammy Waters (male)',
       num_orders: 3,
       lifetime_value: 8087.31
     },
     {
-      customer_name: 'Alisha Holt',
+      customer_name: 'Audrey Wunsch II (male)',
       num_orders: 2,
       lifetime_value: 3949.97
     },
     {
-      customer_name: 'Alisha Hu',
+      customer_name: 'Alexandra Bartoletti (male)',
       num_orders: 2,
       lifetime_value: 119.76
     },
     {
-      customer_name: 'Alisha Huang',
+      customer_name: 'Ron Heller (male)',
       num_orders: 2,
       lifetime_value: 82.26
     },
     {
-      customer_name: 'Alisha Kumar',
+      customer_name: 'Alexandra Sawayn (female)',
       num_orders: 3,
       lifetime_value: 8256.5
     },
     {
-      customer_name: 'Alisha Lal',
+      customer_name: 'Van Davis (female)',
       num_orders: 3,
       lifetime_value: 8114.04
     },
     {
-      customer_name: 'Alisha Li',
+      customer_name: 'Carlos Berge IV (male)',
       num_orders: 2,
       lifetime_value: 108.96
     },
     {
-      customer_name: 'Alisha Liang',
+      customer_name: 'Mr. Milton Friesen (male)',
       num_orders: 2,
       lifetime_value: 88.96
     },
     {
-      customer_name: 'Alisha Lin',
+      customer_name: 'Duane Brown (male)',
       num_orders: 2,
       lifetime_value: 65.25
     },
     {
-      customer_name: 'Alisha Liu',
+      customer_name: 'Katherine Christiansen IV (male)',
       num_orders: 2,
       lifetime_value: 5910.55
     },
     {
-      customer_name: 'Alisha Lu',
+      customer_name: 'Darlene Lockman (female)',
       num_orders: 2,
       lifetime_value: 159.96
     },
     {
-      customer_name: 'Alisha Luo',
+      customer_name: 'Bert Steuber (male)',
       num_orders: 3,
       lifetime_value: 8183
     },
     {
-      customer_name: 'Alisha Ma',
+      customer_name: 'Martin Hirthe I (male)',
       num_orders: 2,
       lifetime_value: 109.97
     },
     {
-      customer_name: 'Alisha Nara',
+      customer_name: 'Kara Doyle (male)',
       num_orders: 1,
       lifetime_value: 39.99
     },
     {
-      customer_name: 'Alisha Nath',
+      customer_name: 'Dolores Moen (male)',
       num_orders: 1,
       lifetime_value: 769.49
     },
     {
-      customer_name: 'Alisha Oliver',
+      customer_name: 'Nancy Rippin (male)',
       num_orders: 2,
       lifetime_value: 5913.24
     },
     {
-      customer_name: 'Alisha Rai',
+      customer_name: 'Myron McLaughlin-Nitzsche (male)',
       num_orders: 1,
       lifetime_value: 54.97
     },
     {
-      customer_name: 'Alisha Raje',
+      customer_name: 'Dr. April Gottlieb (female)',
       num_orders: 2,
       lifetime_value: 4043.46
     },
     {
-      customer_name: 'Alisha Raji',
+      customer_name: 'Erik Botsford (female)',
       num_orders: 3,
       lifetime_value: 8213
     },
     {
-      customer_name: 'Alisha Shan',
+      customer_name: 'Evelyn Beier (male)',
       num_orders: 3,
       lifetime_value: 4735.81
     },
     {
-      customer_name: 'Alisha She',
+      customer_name: 'Sidney VonRueden (male)',
       num_orders: 2,
       lifetime_value: 89.98
     },
     {
-      customer_name: 'Alisha Shen',
+      customer_name: 'Cecil Friesen (male)',
       num_orders: 3,
       lifetime_value: 8169.03
     },
     {
-      customer_name: 'Alisha Sun',
+      customer_name: 'Willie Lemke (female)',
       num_orders: 2,
       lifetime_value: 74.98
     },
     {
-      customer_name: 'Alisha Tang',
+      customer_name: 'Cory Hegmann (male)',
       num_orders: 3,
       lifetime_value: 6962.1
     },
     {
-      customer_name: 'Alisha Wang',
+      customer_name: 'Al Hermann (male)',
       num_orders: 2,
       lifetime_value: 42.95
     },
     {
-      customer_name: 'Alisha Wu',
+      customer_name: 'Ms. Marian Kutch (male)',
       num_orders: 2,
       lifetime_value: 109.97
     },
     {
-      customer_name: 'Alisha Xie',
+      customer_name: 'Miss Tabitha Leuschke (female)',
       num_orders: 3,
       lifetime_value: 7058.7
     },
     {
-      customer_name: 'Alisha Xu',
+      customer_name: 'Milton Kohler (female)',
       num_orders: 3,
       lifetime_value: 7043.27
     },
     {
-      customer_name: 'Alisha Xu',
+      customer_name: 'Jeanne Marquardt (male)',
       num_orders: 2,
       lifetime_value: 138.48
     },
     {
-      customer_name: 'Alisha Yang',
+      customer_name: 'Jenna McDermott (female)',
       num_orders: 3,
       lifetime_value: 4747.3
     },
     {
-      customer_name: 'Alisha Ye',
+      customer_name: 'Becky Rohan (male)',
       num_orders: 2,
       lifetime_value: 5953.25
     },
     {
-      customer_name: 'Alisha Yuan',
+      customer_name: 'Diana Cummerata (male)',
       num_orders: 3,
       lifetime_value: 8113.01
     },
     {
-      customer_name: 'Alisha Zeng',
+      customer_name: 'Jennifer McDermott (female)',
       num_orders: 2,
       lifetime_value: 4730.32
     },
     {
-      customer_name: 'Alisha Zhang',
+      customer_name: 'Rachael Wehner (female)',
       num_orders: 2,
       lifetime_value: 5888.24
     },
     {
-      customer_name: 'Alisha Zhao',
+      customer_name: 'Dr. Max Welch (female)',
       num_orders: 2,
       lifetime_value: 5873.26
     },
     {
-      customer_name: 'Alisha Zheng',
+      customer_name: 'Adam Ankunding I (female)',
       num_orders: 2,
       lifetime_value: 4813.76
     },
     {
-      customer_name: 'Alisha Zhu',
+      customer_name: 'Geneva Quigley (female)',
       num_orders: 3,
       lifetime_value: 8173.53
     },
     {
-      customer_name: 'Alison Anand',
+      customer_name: 'Ryan MacGyver (male)',
       num_orders: 2,
       lifetime_value: 4385.03
     },
     {
-      customer_name: 'Alison Andersen',
+      customer_name: 'Jasmine Stiedemann (female)',
       num_orders: 2,
       lifetime_value: 5900.55
     },
     {
-      customer_name: 'Alison Beck',
+      customer_name: 'Marian Hand (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Alison Chande',
+      customer_name: 'Bobbie Lemke (male)',
       num_orders: 2,
       lifetime_value: 5908.25
     },
     {
-      customer_name: 'Alison Chander',
+      customer_name: 'Traci Daniel III (female)',
       num_orders: 2,
       lifetime_value: 4471.74
     },
     {
-      customer_name: 'Alison Deng',
+      customer_name: 'Ellen Langosh-Aufderhar (male)',
       num_orders: 2,
       lifetime_value: 101.57
     },
     {
-      customer_name: 'Alison Goel',
+      customer_name: 'Lloyd Kirlin (male)',
       num_orders: 1,
       lifetime_value: 2478.34
     },
     {
-      customer_name: 'Alison Jai',
+      customer_name: 'Agnes Kris (female)',
       num_orders: 1,
       lifetime_value: 2411.95
     },
     {
-      customer_name: 'Alison Kumar',
+      customer_name: 'Wilson Kunze (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Alison Lal',
+      customer_name: 'Carmen Hartmann (male)',
       num_orders: 2,
       lifetime_value: 115.94
     },
     {
-      customer_name: 'Alison Luo',
+      customer_name: 'Lindsay Franecki IV (male)',
       num_orders: 2,
       lifetime_value: 126.96
     },
     {
-      customer_name: 'Alison Nara',
+      customer_name: 'Kevin Waelchi Jr. (female)',
       num_orders: 2,
       lifetime_value: 205.44
     },
     {
-      customer_name: 'Alison Nath',
+      customer_name: 'Eva Koch (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Alison Pal',
+      customer_name: 'Alyssa Paucek-Orn (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Alison Rai',
+      customer_name: 'Carmen Wilkinson-Stamm (female)',
       num_orders: 1,
       lifetime_value: 607.96
     },
     {
-      customer_name: 'Alison Raje',
+      customer_name: 'Elbert Harris (male)',
       num_orders: 2,
       lifetime_value: 5898.26
     },
     {
-      customer_name: 'Alison Raji',
+      customer_name: 'Thomas Larson (male)',
       num_orders: 2,
       lifetime_value: 76.15
     },
     {
-      customer_name: 'Alison Shan',
+      customer_name: 'Eugene Boehm (male)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Alison Sharma',
+      customer_name: 'Mr. Herbert Wunsch (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Alison Shen',
+      customer_name: 'Kelvin Howell (male)',
       num_orders: 2,
       lifetime_value: 5932.74
     },
     {
-      customer_name: 'Alison Tang',
+      customer_name: 'Kelley Runolfsson (female)',
       num_orders: 2,
       lifetime_value: 102.57
     },
     {
-      customer_name: 'Alison Xie',
+      customer_name: 'Toni Leannon (male)',
       num_orders: 2,
       lifetime_value: 5908.25
     },
     {
-      customer_name: 'Alison Xu',
+      customer_name: 'Gail Reynolds (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Alison Yuan',
+      customer_name: 'Mandy Reichert (female)',
       num_orders: 1,
       lifetime_value: 2357.28
     },
     {
-      customer_name: 'Allen Arthur',
+      customer_name: 'Bennie Schaden (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Allen Chandra',
+      customer_name: 'Earnest Satterfield Jr. (male)',
       num_orders: 1,
       lifetime_value: 93.97
     },
     {
-      customer_name: 'Allen Fernandez',
+      customer_name: 'Darla Hoeger (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Allen Garcia',
+      customer_name: 'Elsa Heathcote (male)',
       num_orders: 3,
       lifetime_value: 103.55
     },
     {
-      customer_name: 'Allen Gonzalez',
+      customer_name: 'Debbie Reichel (female)',
       num_orders: 3,
       lifetime_value: 235.54
     },
     {
-      customer_name: 'Allen Kapoor',
+      customer_name: 'Tricia Jacobs (female)',
       num_orders: 2,
       lifetime_value: 2611.4096
     },
     {
-      customer_name: 'Allen Lopez',
+      customer_name: 'Carlos Pacocha MD (male)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Allen Malhotra',
+      customer_name: 'Gertrude Crona-Mante V (female)',
       num_orders: 2,
       lifetime_value: 3134.95
     },
     {
-      customer_name: 'Allen Martinez',
+      customer_name: 'Tim Stracke (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Allen Mehta',
+      customer_name: 'Curtis Hyatt (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Allen Patel',
+      customer_name: 'Roberto Heidenreich DDS (female)',
       num_orders: 1,
       lifetime_value: 24.27
     },
     {
-      customer_name: 'Allen Perez',
+      customer_name: 'Angelina Mills (female)',
       num_orders: 3,
       lifetime_value: 196.93
     },
     {
-      customer_name: 'Allen Raman',
+      customer_name: 'Clifford Pfeffer (male)',
       num_orders: 3,
       lifetime_value: 74.14
     },
     {
-      customer_name: 'Allen Rana',
+      customer_name: 'Ollie Koepp (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Allen Rodriguez',
+      customer_name: 'Lorraine Reichel (female)',
       num_orders: 3,
       lifetime_value: 225.44
     },
     {
-      customer_name: 'Allen Sai',
+      customer_name: 'Robin West (female)',
       num_orders: 2,
       lifetime_value: 4943.32
     },
     {
-      customer_name: 'Allen Schmidt',
+      customer_name: 'Toby Sipes (female)',
       num_orders: 3,
       lifetime_value: 153.21
     },
     {
-      customer_name: 'Allen Smith',
+      customer_name: 'Alison Pacocha-Blanda (female)',
       num_orders: 1,
       lifetime_value: 41.95
     },
     {
-      customer_name: 'Allen Subram',
+      customer_name: 'Dr. David Thiel (female)',
       num_orders: 2,
       lifetime_value: 1322.98
     },
     {
-      customer_name: 'Allen Suri',
+      customer_name: 'Ms. Cynthia Walker (male)',
       num_orders: 2,
       lifetime_value: 2611.4096
     },
     {
-      customer_name: 'Alyssa Alexander',
+      customer_name: 'Dr. Ramona Spinka-Oberbrunner (male)',
       num_orders: 2,
       lifetime_value: 5338.74
     },
     {
-      customer_name: 'Alyssa Ashe',
+      customer_name: 'Shane Schmitt (female)',
       num_orders: 2,
       lifetime_value: 5919.21
     },
     {
-      customer_name: 'Alyssa Bailey',
+      customer_name: 'Mr. Elmer Price DDS (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Alyssa Barnes',
+      customer_name: 'Christian Lowe (male)',
       num_orders: 1,
       lifetime_value: 2487.89
     },
     {
-      customer_name: 'Alyssa Bradley',
+      customer_name: 'Devin Armstrong (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Alyssa Brooks',
+      customer_name: 'Toby Jones (female)',
       num_orders: 1,
       lifetime_value: 38.98
     },
     {
-      customer_name: 'Alyssa Brown',
+      customer_name: 'Steve Tillman (female)',
       num_orders: 2,
       lifetime_value: 5935.55
     },
     {
-      customer_name: 'Alyssa Bryant',
+      customer_name: 'Harold Bashirian (female)',
       num_orders: 2,
       lifetime_value: 5304.25
     },
     {
-      customer_name: 'Alyssa Butler',
+      customer_name: 'Curtis Doyle (male)',
       num_orders: 1,
       lifetime_value: 1184.46
     },
     {
-      customer_name: 'Alyssa Clark',
+      customer_name: 'Jeannie Collins (male)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Alyssa Coleman',
+      customer_name: 'Chester Dickinson (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Alyssa Cook',
+      customer_name: 'Scott Gusikowski (female)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Alyssa Cooper',
+      customer_name: 'Marsha Spinka (female)',
       num_orders: 1,
       lifetime_value: 69.97
     },
     {
-      customer_name: 'Alyssa Cox',
+      customer_name: 'Beatrice Kutch (female)',
       num_orders: 1,
       lifetime_value: 69.97
     },
     {
-      customer_name: 'Alyssa Davis',
+      customer_name: 'Margie Rowe (female)',
       num_orders: 1,
       lifetime_value: 2376.96
     },
     {
-      customer_name: 'Alyssa Diaz',
+      customer_name: 'Ginger Abernathy V (male)',
       num_orders: 2,
       lifetime_value: 74.45
     },
     {
-      customer_name: 'Alyssa Flores',
+      customer_name: 'Mable Beier (female)',
       num_orders: 1,
       lifetime_value: 45.95
     },
     {
-      customer_name: 'Alyssa Foster',
+      customer_name: 'Ronnie McLaughlin (male)',
       num_orders: 1,
       lifetime_value: 1134.47
     },
     {
-      customer_name: 'Alyssa Garcia',
+      customer_name: 'Everett Kling (male)',
       num_orders: 3,
       lifetime_value: 7023.77
     },
     {
-      customer_name: 'Alyssa Gonzales',
+      customer_name: 'Darren Herzog-Ward (female)',
       num_orders: 2,
       lifetime_value: 3268.5482
     },
     {
-      customer_name: 'Alyssa Gray',
+      customer_name: 'Janie Turner (female)',
       num_orders: 1,
       lifetime_value: 37.97
     },
     {
-      customer_name: 'Alyssa Hall',
+      customer_name: "Alex D'Amore (male)",
       num_orders: 1,
       lifetime_value: 53.99
     },
     {
-      customer_name: 'Alyssa Harris',
+      customer_name: 'Elaine Stamm DDS (female)',
       num_orders: 1,
       lifetime_value: 34.47
     },
     {
-      customer_name: 'Alyssa Henderson',
+      customer_name: 'Jay Doyle (female)',
       num_orders: 1,
       lifetime_value: 1179.97
     },
     {
-      customer_name: 'Alyssa Howard',
+      customer_name: 'Juan Feeney (male)',
       num_orders: 1,
       lifetime_value: 27.28
     },
     {
-      customer_name: 'Alyssa Hughes',
+      customer_name: 'Amber Hackett (male)',
       num_orders: 1,
       lifetime_value: 133.49
     },
     {
-      customer_name: 'Alyssa Jackson',
+      customer_name: 'Edmond Glover (male)',
       num_orders: 2,
       lifetime_value: 5958.18
     },
     {
-      customer_name: 'Alyssa James',
+      customer_name: 'Joan Labadie (male)',
       num_orders: 2,
       lifetime_value: 4153.25
     },
     {
-      customer_name: 'Alyssa Jenkins',
+      customer_name: 'Roxanne Lang (female)',
       num_orders: 1,
       lifetime_value: 1204.46
     },
     {
-      customer_name: 'Alyssa Johnson',
+      customer_name: 'Kurt Grant (female)',
       num_orders: 1,
       lifetime_value: 2376.96
     },
     {
-      customer_name: 'Alyssa Jones',
+      customer_name: 'Robyn Schumm (female)',
       num_orders: 2,
       lifetime_value: 42.28
     },
     {
-      customer_name: 'Alyssa Kelly',
+      customer_name: 'Jeannette Buckridge (female)',
       num_orders: 2,
       lifetime_value: 3142.4482
     },
     {
-      customer_name: 'Alyssa Lee',
+      customer_name: 'Stanley Hermiston DDS (male)',
       num_orders: 2,
       lifetime_value: 4344.0882
     },
     {
-      customer_name: 'Alyssa Lewis',
+      customer_name: 'Roberto Gusikowski Sr. (male)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Alyssa Martin',
+      customer_name: 'Gregory Reichel (female)',
       num_orders: 1,
       lifetime_value: 53.99
     },
     {
-      customer_name: 'Alyssa Martinez',
+      customer_name: 'Felipe Mayert (male)',
       num_orders: 1,
       lifetime_value: 53.99
     },
     {
-      customer_name: 'Alyssa Miller',
+      customer_name: 'Rosalie Zemlak (male)',
       num_orders: 2,
       lifetime_value: 5959.71
     },
     {
-      customer_name: 'Alyssa Moore',
+      customer_name: 'Rebecca Terry (female)',
       num_orders: 2,
       lifetime_value: 44.57
     },
     {
-      customer_name: 'Alyssa Morgan',
+      customer_name: 'Erin Ankunding (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Alyssa Morris',
+      customer_name: 'Ms. Rosemary Bruen (male)',
       num_orders: 1,
       lifetime_value: 1169.46
     },
     {
-      customer_name: 'Alyssa Murphy',
+      customer_name: 'Mr. Kelvin Waelchi (female)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Alyssa Patterson',
+      customer_name: 'Margarita Mosciski (female)',
       num_orders: 1,
       lifetime_value: 1174.48
     },
     {
-      customer_name: 'Alyssa Perry',
+      customer_name: 'Melinda Batz (female)',
       num_orders: 1,
       lifetime_value: 1143.46
     },
     {
-      customer_name: 'Alyssa Powell',
+      customer_name: 'Jason Murazik (female)',
       num_orders: 1,
       lifetime_value: 1120.49
     },
     {
-      customer_name: 'Alyssa Price',
+      customer_name: 'Robyn Becker (female)',
       num_orders: 2,
       lifetime_value: 1938.47
     },
     {
-      customer_name: 'Alyssa Ramirez',
+      customer_name: 'Candice West (male)',
       num_orders: 2,
       lifetime_value: 4142.75
     },
     {
-      customer_name: 'Alyssa Reed',
+      customer_name: 'Mark Macejkovic (male)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Alyssa Richardson',
+      customer_name: "Jon D'Amore (female)",
       num_orders: 1,
       lifetime_value: 28.98
     },
     {
-      customer_name: 'Alyssa Rivera',
+      customer_name: 'Lee Hilll (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Alyssa Robinson',
+      customer_name: 'Hannah Robel (male)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Alyssa Rodriguez',
+      customer_name: 'Jeremy Rodriguez (male)',
       num_orders: 1,
       lifetime_value: 21.49
     },
     {
-      customer_name: 'Alyssa Rogers',
+      customer_name: 'Claude Tromp (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Alyssa Ross',
+      customer_name: 'Charles Hahn (female)',
       num_orders: 2,
       lifetime_value: 5749.97
     },
     {
-      customer_name: 'Alyssa Russell',
+      customer_name: 'Mrs. Darla Legros (female)',
       num_orders: 2,
       lifetime_value: 104.69
     },
     {
-      customer_name: 'Alyssa Sanchez',
+      customer_name: 'Gregory Waelchi-Cummerata (male)',
       num_orders: 1,
       lifetime_value: 1120.49
     },
     {
-      customer_name: 'Alyssa Sanders',
+      customer_name: 'Rosalie Halvorson (female)',
       num_orders: 1,
       lifetime_value: 78.96
     },
     {
-      customer_name: 'Alyssa Smith',
+      customer_name: 'Dr. Lance Lockman (female)',
       num_orders: 2,
       lifetime_value: 44.57
     },
     {
-      customer_name: 'Alyssa Stewart',
+      customer_name: 'Beverly Feeney (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Alyssa Taylor',
+      customer_name: 'Chelsea Schaefer (female)',
       num_orders: 2,
       lifetime_value: 37.29
     },
     {
-      customer_name: 'Alyssa Thomas',
+      customer_name: 'Larry Lakin (female)',
       num_orders: 2,
       lifetime_value: 5997.73
     },
     {
-      customer_name: 'Alyssa Thompson',
+      customer_name: 'Debra West DDS (female)',
       num_orders: 1,
       lifetime_value: 53.99
     },
     {
-      customer_name: 'Alyssa Ward',
+      customer_name: 'Mr. Joshua Gleichner (female)',
       num_orders: 1,
       lifetime_value: 119.96
     },
     {
-      customer_name: 'Alyssa Watson',
+      customer_name: 'Wallace Lindgren (female)',
       num_orders: 2,
       lifetime_value: 4139.75
     },
     {
-      customer_name: 'Alyssa West',
+      customer_name: 'Marshall Schmidt (female)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Alyssa White',
+      customer_name: 'Ramona Miller (female)',
       num_orders: 2,
       lifetime_value: 5973.24
     },
     {
-      customer_name: 'Alyssa Wilson',
+      customer_name: 'Eva Turner (female)',
       num_orders: 2,
       lifetime_value: 5944.21
     },
     {
-      customer_name: 'Alyssa Wood',
+      customer_name: 'Steven Gibson (female)',
       num_orders: 1,
       lifetime_value: 1214.46
     },
     {
-      customer_name: 'Alícia Anand',
+      customer_name: 'Roxanne Kub III (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Amber Young',
+      customer_name: 'Shelley Leannon III (male)',
       num_orders: 3,
       lifetime_value: 6383.88
     },
     {
-      customer_name: 'Amy Cai',
+      customer_name: 'Pablo Little (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Amy Chow',
+      customer_name: 'Jorge Gutmann (female)',
       num_orders: 1,
       lifetime_value: 1243.44
     },
     {
-      customer_name: 'Amy Gao',
+      customer_name: 'Clay Upton (female)',
       num_orders: 2,
       lifetime_value: 1938.47
     },
     {
-      customer_name: 'Amy Guo',
+      customer_name: 'Edith Lesch (male)',
       num_orders: 1,
       lifetime_value: 24.99
     },
     {
-      customer_name: 'Amy He',
+      customer_name: 'Sue Bayer (male)',
       num_orders: 1,
       lifetime_value: 63.97
     },
     {
-      customer_name: 'Amy Hu',
+      customer_name: 'Amelia Kohler (female)',
       num_orders: 1,
       lifetime_value: 9.99
     },
     {
-      customer_name: 'Amy Huang',
+      customer_name: 'Cameron Stokes (male)',
       num_orders: 1,
       lifetime_value: 1750.98
     },
     {
-      customer_name: 'Amy Li',
+      customer_name: 'Samuel Koepp (male)',
       num_orders: 1,
       lifetime_value: 1750.98
     },
     {
-      customer_name: 'Amy Liang',
+      customer_name: 'Geraldine Ortiz (female)',
       num_orders: 3,
       lifetime_value: 2378.8
     },
     {
-      customer_name: 'Amy Lin',
+      customer_name: 'Sherman Erdman V (male)',
       num_orders: 2,
       lifetime_value: 3240.32
     },
     {
-      customer_name: 'Amy Lu',
+      customer_name: 'Edmond Franey (female)',
       num_orders: 3,
       lifetime_value: 3911.29
     },
     {
-      customer_name: 'Amy Ma',
+      customer_name: 'Leonard Gottlieb (male)',
       num_orders: 1,
       lifetime_value: 24.99
     },
     {
-      customer_name: 'Amy Sun',
+      customer_name: 'Erin Hartmann (male)',
       num_orders: 2,
       lifetime_value: 3283.43
     },
     {
-      customer_name: 'Amy Wu',
+      customer_name: "Leonard D'Amore (male)",
       num_orders: 2,
       lifetime_value: 4406.3996
     },
     {
-      customer_name: 'Amy Yang',
+      customer_name: 'Myron Littel (female)',
       num_orders: 1,
       lifetime_value: 77.96
     },
     {
-      customer_name: 'Amy Ye',
+      customer_name: 'Cecelia Ullrich IV (male)',
       num_orders: 2,
       lifetime_value: 3261.33
     },
     {
-      customer_name: 'Amy Zeng',
+      customer_name: 'Cesar Beier (female)',
       num_orders: 1,
       lifetime_value: 1120.49
     },
     {
-      customer_name: 'Amy Zhang',
+      customer_name: 'Verna Zulauf (male)',
       num_orders: 1,
       lifetime_value: 1155.48
     },
     {
-      customer_name: 'Amy Zhao',
+      customer_name: 'Dr. Leona Lesch PhD (female)',
       num_orders: 1,
       lifetime_value: 196.27
     },
     {
-      customer_name: 'Amy Zheng',
+      customer_name: 'Jamie Heaney (female)',
       num_orders: 1,
       lifetime_value: 77.96
     },
     {
-      customer_name: 'Amy Zhu',
+      customer_name: 'Gloria Dickens (male)',
       num_orders: 2,
       lifetime_value: 1947.46
     },
     {
-      customer_name: 'Andre Arun',
+      customer_name: 'Betty Hudson (female)',
       num_orders: 1,
       lifetime_value: 66.44
     },
     {
-      customer_name: 'Andre Chandra',
+      customer_name: 'Clifton Mueller (male)',
       num_orders: 1,
       lifetime_value: 68.49
     },
     {
-      customer_name: 'Andre Garcia',
+      customer_name: 'Ora Jacobson (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Andre Gonzalez',
+      customer_name: 'Clifton Johnston (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Andre Kapoor',
+      customer_name: 'Darin VonRueden (female)',
       num_orders: 1,
       lifetime_value: 24.99
     },
     {
-      customer_name: 'Andre Kovár',
+      customer_name: 'Cesar Dickens (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Andre Lopez',
+      customer_name: 'Dominic Larson (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Andre Madan',
+      customer_name: 'Eleanor Sipes (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Andre Martinez',
+      customer_name: 'Phillip Farrell (female)',
       num_orders: 1,
       lifetime_value: 567.27
     },
     {
-      customer_name: 'Andre Mehta',
+      customer_name: 'Randolph Reichel (female)',
       num_orders: 1,
       lifetime_value: 166.28
     },
     {
-      customer_name: 'Andre Patel',
+      customer_name: 'Jenna Lindgren (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Andre Perez',
+      customer_name: 'Dr. Amber Reichel (female)',
       num_orders: 1,
       lifetime_value: 2369.97
     },
     {
-      customer_name: 'Andre Prasad',
+      customer_name: 'Ora Gorczany (male)',
       num_orders: 1,
       lifetime_value: 592.27
     },
     {
-      customer_name: 'Andre Raman',
+      customer_name: 'Christina Sanford (male)',
       num_orders: 1,
       lifetime_value: 611.94
     },
     {
-      customer_name: 'Andre Rana',
+      customer_name: 'Sadie Cronin (female)',
       num_orders: 1,
       lifetime_value: 572.26
     },
     {
-      customer_name: 'Andre Sai',
+      customer_name: 'Brandi Hackett (female)',
       num_orders: 2,
       lifetime_value: 2731.5425
     },
     {
-      customer_name: 'Andre Sanchez',
+      customer_name: 'Catherine Russel IV (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Andre Sara',
+      customer_name: 'Winifred Stroman (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Andre Smith',
+      customer_name: 'Gene Denesik-Dach (male)',
       num_orders: 2,
       lifetime_value: 38.25
     },
     {
-      customer_name: 'Andre Subram',
+      customer_name: 'Micheal Douglas III (male)',
       num_orders: 1,
       lifetime_value: 563.96
     },
     {
-      customer_name: 'Andre Suri',
+      customer_name: 'Guadalupe Corkery (male)',
       num_orders: 2,
       lifetime_value: 84.25
     },
     {
-      customer_name: 'Andrew Anderson',
+      customer_name: 'Traci Lubowitz-Berge (female)',
       num_orders: 1,
       lifetime_value: 110.46
     },
     {
-      customer_name: 'Andrew Brown',
+      customer_name: 'Dr. Susie Collins (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Andrew Clark',
+      customer_name: 'Meghan Daniel (female)',
       num_orders: 1,
       lifetime_value: 74.98
     },
     {
-      customer_name: 'Andrew Davis',
+      customer_name: 'Christopher Rippin (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Andrew Garcia',
+      customer_name: 'Mr. Zachary Breitenberg-Robel (male)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Andrew Jackson',
+      customer_name: 'Sonja Zieme (male)',
       num_orders: 1,
       lifetime_value: 133.49
     },
     {
-      customer_name: 'Andrew Johnson',
+      customer_name: 'Gregg Wiegand (female)',
       num_orders: 1,
       lifetime_value: 1750.98
     },
     {
-      customer_name: 'Andrew Jones',
+      customer_name: 'Woodrow Herman (male)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Andrew Lee',
+      customer_name: 'Christine Witting (female)',
       num_orders: 2,
       lifetime_value: 4143.74
     },
     {
-      customer_name: 'Andrew Lewis',
+      customer_name: 'Jacqueline Bode (male)',
       num_orders: 1,
       lifetime_value: 35
     },
     {
-      customer_name: 'Andrew Martinez',
+      customer_name: 'Dr. Loren Pfeffer (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Andrew Miller',
+      customer_name: 'Johanna Maggio PhD (female)',
       num_orders: 1,
       lifetime_value: 2329.98
     },
     {
-      customer_name: 'Andrew Moore',
+      customer_name: 'Alison Runolfsdottir (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Andrew Robinson',
+      customer_name: 'Lamar Pagac (female)',
       num_orders: 1,
       lifetime_value: 2316.97
     },
     {
-      customer_name: 'Andrew Rodriguez',
+      customer_name: 'Anna Legros (male)',
       num_orders: 1,
       lifetime_value: 74.98
     },
     {
-      customer_name: 'Andrew Smith',
+      customer_name: 'Marc Hartmann (female)',
       num_orders: 1,
       lifetime_value: 2414.97
     },
     {
-      customer_name: 'Andrew Taylor',
+      customer_name: 'Christopher Botsford Sr. (male)',
       num_orders: 1,
       lifetime_value: 2322.28
     },
     {
-      customer_name: 'Andrew Thomas',
+      customer_name: 'Ernestine Kutch-Yost (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Andrew Walker',
+      customer_name: 'Margie Bradtke (male)',
       num_orders: 2,
       lifetime_value: 4217.22
     },
     {
-      customer_name: 'Andrew Wedge',
+      customer_name: 'Teresa Emard (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Andrew Williams',
+      customer_name: 'Phil Ryan (female)',
       num_orders: 1,
       lifetime_value: 1759.97
     },
     {
-      customer_name: 'Andrew Wilson',
+      customer_name: 'Gordon Harber (male)',
       num_orders: 1,
       lifetime_value: 2390.95
     },
     {
-      customer_name: 'Angel Adams',
+      customer_name: 'Barry Keebler (female)',
       num_orders: 2,
       lifetime_value: 67.58
     },
     {
-      customer_name: 'Angel Allen',
+      customer_name: 'Rosalie Hane-Wehner (female)',
       num_orders: 1,
       lifetime_value: 54.98
     },
     {
-      customer_name: 'Angel Bailey',
+      customer_name: 'Doug Sawayn (male)',
       num_orders: 2,
       lifetime_value: 151.94
     },
     {
-      customer_name: 'Angel Baker',
+      customer_name: 'Christian Schowalter (male)',
       num_orders: 1,
       lifetime_value: 569.97
     },
     {
-      customer_name: 'Angel Brooks',
+      customer_name: 'Mr. Preston Dooley V (female)',
       num_orders: 1,
       lifetime_value: 76.97
     },
     {
-      customer_name: 'Angel Campbell',
+      customer_name: 'Al Kuhic (male)',
       num_orders: 2,
       lifetime_value: 28.98
     },
     {
-      customer_name: 'Angel Carter',
+      customer_name: 'Mr. Ronnie Stehr (female)',
       num_orders: 2,
       lifetime_value: 3001.0225
     },
     {
-      customer_name: 'Angel Cook',
+      customer_name: 'Lorraine Turner (female)',
       num_orders: 2,
       lifetime_value: 1676.46
     },
     {
-      customer_name: 'Angel Cooper',
+      customer_name: 'Mr. Leroy Hansen (female)',
       num_orders: 3,
       lifetime_value: 242.5
     },
     {
-      customer_name: 'Angel Cox',
+      customer_name: 'Dr. Ian Johns (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Angel Edwards',
+      customer_name: 'Jessie Little (female)',
       num_orders: 1,
       lifetime_value: 94.98
     },
     {
-      customer_name: 'Angel Evans',
+      customer_name: "Evelyn D'Amore II (female)",
       num_orders: 2,
       lifetime_value: 3764.0682
     },
     {
-      customer_name: 'Angel Gonzalez',
+      customer_name: 'Becky Howell (male)',
       num_orders: 1,
       lifetime_value: 122.95
     },
     {
-      customer_name: 'Angel Gray',
+      customer_name: 'Mildred Willms (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Angel Hall',
+      customer_name: 'Harold Yost (female)',
       num_orders: 2,
       lifetime_value: 4260.24
     },
     {
-      customer_name: 'Angel Hill',
+      customer_name: 'Harry Satterfield (male)',
       num_orders: 1,
       lifetime_value: 103.49
     },
     {
-      customer_name: 'Angel Howard',
+      customer_name: 'Forrest Sporer (male)',
       num_orders: 2,
       lifetime_value: 4467.74
     },
     {
-      customer_name: 'Angel James',
+      customer_name: 'Dr. Dominic Feeney (male)',
       num_orders: 2,
       lifetime_value: 1468.5882
     },
     {
-      customer_name: 'Angel Kelly',
+      customer_name: 'Herman Ratke DVM (female)',
       num_orders: 2,
       lifetime_value: 3291.82
     },
     {
-      customer_name: 'Angel King',
+      customer_name: 'Rita Kassulke (female)',
       num_orders: 1,
       lifetime_value: 1754.98
     },
     {
-      customer_name: 'Angel Lopez',
+      customer_name: 'Laurence Mueller (male)',
       num_orders: 2,
       lifetime_value: 4486.5425
     },
     {
-      customer_name: 'Angel Mitchell',
+      customer_name: 'Geoffrey Beier (female)',
       num_orders: 2,
       lifetime_value: 4698.76
     },
     {
-      customer_name: 'Angel Morgan',
+      customer_name: 'Patti Heathcote (male)',
       num_orders: 1,
       lifetime_value: 29.93
     },
     {
-      customer_name: 'Angel Morris',
+      customer_name: 'Alberta Hermiston (male)',
       num_orders: 1,
       lifetime_value: 59.98
     },
     {
-      customer_name: 'Angel Murphy',
+      customer_name: 'Raul Farrell Sr. (female)',
       num_orders: 2,
       lifetime_value: 2803.5225
     },
     {
-      customer_name: 'Angel Nelson',
+      customer_name: 'Kate Rogahn (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Angel Parker',
+      customer_name: 'Jose Rice (male)',
       num_orders: 2,
       lifetime_value: 34.98
     },
     {
-      customer_name: 'Angel Perez',
+      customer_name: 'Joann Nikolaus (male)',
       num_orders: 1,
       lifetime_value: 93.97
     },
     {
-      customer_name: 'Angel Peterson',
+      customer_name: 'Cecelia Heller (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Angel Phillips',
+      customer_name: 'Yolanda Harvey (male)',
       num_orders: 1,
       lifetime_value: 629.97
     },
     {
-      customer_name: 'Angel Ramirez',
+      customer_name: 'Rebecca Deckow (female)',
       num_orders: 2,
       lifetime_value: 254.06
     },
     {
-      customer_name: 'Angel Reed',
+      customer_name: 'Ms. Vicki Dickens-Turcotte (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Angel Richardson',
+      customer_name: 'Teresa Leuschke PhD (female)',
       num_orders: 1,
       lifetime_value: 89.97
     },
     {
-      customer_name: 'Angel Rivera',
+      customer_name: 'Rudy Johns (female)',
       num_orders: 2,
       lifetime_value: 3209.93
     },
     {
-      customer_name: 'Angel Roberts',
+      customer_name: 'Margarita Lubowitz (male)',
       num_orders: 2,
       lifetime_value: 1404.95
     },
     {
-      customer_name: 'Angel Rogers',
+      customer_name: 'Kellie Jenkins (female)',
       num_orders: 3,
       lifetime_value: 8297.29
     },
     {
-      customer_name: 'Angel Sanders',
+      customer_name: 'Becky Beahan (male)',
       num_orders: 2,
       lifetime_value: 155.94
     },
     {
-      customer_name: 'Angel Scott',
+      customer_name: 'Christine Jacobson (female)',
       num_orders: 1,
       lifetime_value: 2443.35
     },
     {
-      customer_name: 'Angel Stewart',
+      customer_name: 'Mr. Sylvester Lesch DDS (male)',
       num_orders: 2,
       lifetime_value: 4444.0682
     },
     {
-      customer_name: 'Angel Torres',
+      customer_name: 'Glen Hudson (male)',
       num_orders: 2,
       lifetime_value: 77.27
     },
     {
-      customer_name: 'Angel Turner',
+      customer_name: 'Miss Irma Bechtelar MD (female)',
       num_orders: 3,
       lifetime_value: 3963.14
     },
     {
-      customer_name: 'Angel Ward',
+      customer_name: 'Clark Langworth V (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Angel Wright',
+      customer_name: 'Ellis Daniel (female)',
       num_orders: 2,
       lifetime_value: 77.27
     },
     {
-      customer_name: 'Angel Young',
+      customer_name: 'Emilio Kiehn (male)',
       num_orders: 3,
       lifetime_value: 135.35
     },
     {
-      customer_name: 'Anna Anderson',
+      customer_name: 'Johnathan Fahey (female)',
       num_orders: 2,
       lifetime_value: 5908.25
     },
     {
-      customer_name: 'Anna Brown',
+      customer_name: 'Flora Conn (female)',
       num_orders: 2,
       lifetime_value: 162.28
     },
     {
-      customer_name: 'Anna Clark',
+      customer_name: 'Olga Mohr (male)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Anna Davis',
+      customer_name: 'Jerry Cremin Jr. (male)',
       num_orders: 2,
       lifetime_value: 5933.25
     },
     {
-      customer_name: 'Anna Garcia',
+      customer_name: 'Eddie Walker (female)',
       num_orders: 3,
       lifetime_value: 6786.1182
     },
     {
-      customer_name: 'Anna Hall',
+      customer_name: 'Shawn Daugherty Jr. (female)',
       num_orders: 3,
       lifetime_value: 5253.6496
     },
     {
-      customer_name: 'Anna Harris',
+      customer_name: 'Dana Brown DDS (male)',
       num_orders: 2,
       lifetime_value: 5957.22
     },
     {
-      customer_name: 'Anna Jackson',
+      customer_name: 'Dr. Cristina Kiehn (female)',
       num_orders: 1,
       lifetime_value: 49.97
     },
     {
-      customer_name: 'Anna Johnson',
+      customer_name: 'Alicia Fritsch V (female)',
       num_orders: 2,
       lifetime_value: 5929.23
     },
     {
-      customer_name: 'Anna Jones',
+      customer_name: 'Dr. Norman Gorczany (male)',
       num_orders: 2,
       lifetime_value: 155
     },
     {
-      customer_name: 'Anna Lee',
+      customer_name: 'Luther Marvin (female)',
       num_orders: 2,
       lifetime_value: 4381.3896
     },
     {
-      customer_name: 'Anna Lewis',
+      customer_name: 'Samuel Windler (female)',
       num_orders: 2,
       lifetime_value: 5873.26
     },
     {
-      customer_name: 'Anna Martin',
+      customer_name: 'Elena Stiedemann (female)',
       num_orders: 2,
       lifetime_value: 5932.22
     },
     {
-      customer_name: 'Anna Martinez',
+      customer_name: 'Kristin Goldner (female)',
       num_orders: 2,
       lifetime_value: 4344.0882
     },
     {
-      customer_name: 'Anna Miller',
+      customer_name: 'Gordon Reilly (male)',
       num_orders: 2,
       lifetime_value: 5913.24
     },
     {
-      customer_name: 'Anna Moore',
+      customer_name: 'Orville Sanford (male)',
       num_orders: 2,
       lifetime_value: 5958.74
     },
     {
-      customer_name: 'Anna Robinson',
+      customer_name: 'Kristi Pfannerstill (female)',
       num_orders: 2,
       lifetime_value: 5922.23
     },
     {
-      customer_name: 'Anna Rodriguez',
+      customer_name: 'Alex Watsica (male)',
       num_orders: 3,
       lifetime_value: 6872.1082
     },
     {
-      customer_name: 'Anna Taylor',
+      customer_name: 'Kathleen Sporer (female)',
       num_orders: 4,
       lifetime_value: 228.42
     },
     {
-      customer_name: 'Anna Thomas',
+      customer_name: 'Shannon Sanford (male)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Anna Thompson',
+      customer_name: 'Ms. Connie Mann (male)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Anna White',
+      customer_name: 'Dr. Essie Ratke (male)',
       num_orders: 2,
       lifetime_value: 4548.6996
     },
     {
-      customer_name: 'Anna Williams',
+      customer_name: 'Yvette Haag Sr. (male)',
       num_orders: 2,
       lifetime_value: 5873.26
     },
     {
-      customer_name: 'Anne Alonso',
+      customer_name: 'Kendra Hagenes (male)',
       num_orders: 1,
       lifetime_value: 85.48
     },
     {
-      customer_name: 'Anne Alvarez',
+      customer_name: 'Ramon Pollich (female)',
       num_orders: 1,
       lifetime_value: 85.48
     },
     {
-      customer_name: 'Anne Blanco',
+      customer_name: 'Nicolas Kiehn (male)',
       num_orders: 2,
       lifetime_value: 3330.4275
     },
     {
-      customer_name: 'Anne Carlson',
+      customer_name: 'Emmett Monahan-Schaefer (female)',
       num_orders: 1,
       lifetime_value: 81.46
     },
     {
-      customer_name: 'Anne Dominguez',
+      customer_name: 'Arlene Feest (male)',
       num_orders: 2,
       lifetime_value: 3362.7075
     },
     {
-      customer_name: 'Anne Gill',
+      customer_name: 'Antoinette Schmidt (male)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Anne Gomez',
+      customer_name: 'Dr. Leah Kuvalis (male)',
       num_orders: 2,
       lifetime_value: 1804.9175
     },
     {
-      customer_name: 'Anne Gutierrez',
+      customer_name: 'Kenny Corwin (male)',
       num_orders: 1,
       lifetime_value: 24.27
     },
     {
-      customer_name: 'Anne Hernandez',
+      customer_name: 'Misty Kihn (female)',
       num_orders: 3,
       lifetime_value: 256.24
     },
     {
-      customer_name: 'Anne Jiménez',
+      customer_name: 'Mary Bruen (female)',
       num_orders: 2,
       lifetime_value: 1845.8975
     },
     {
-      customer_name: 'Anne Martin',
+      customer_name: 'Dora Flatley (female)',
       num_orders: 3,
       lifetime_value: 128.84
     },
     {
-      customer_name: 'Anne Moreno',
+      customer_name: 'Susan Rippin (female)',
       num_orders: 2,
       lifetime_value: 1804.9175
     },
     {
-      customer_name: 'Anne Munoz',
+      customer_name: 'Thelma Beer (male)',
       num_orders: 2,
       lifetime_value: 1897.8775
     },
     {
-      customer_name: 'Anne Navarro',
+      customer_name: 'Janice Wisoky (male)',
       num_orders: 3,
       lifetime_value: 119.86
     },
     {
-      customer_name: 'Anne Ortega',
+      customer_name: 'Michelle Gleichner (female)',
       num_orders: 2,
       lifetime_value: 3344.6975
     },
     {
-      customer_name: 'Anne Ramos',
+      customer_name: 'Kristina Sipes (female)',
       num_orders: 1,
       lifetime_value: 93.97
     },
     {
-      customer_name: 'Anne Romero',
+      customer_name: 'Tracey Stanton DVM (male)',
       num_orders: 3,
       lifetime_value: 122.56
     },
     {
-      customer_name: 'Anne Rubio',
+      customer_name: 'Tracy Paucek (male)',
       num_orders: 1,
       lifetime_value: 31.97
     },
     {
-      customer_name: 'Anne Ruiz',
+      customer_name: 'Roxanne Raynor (female)',
       num_orders: 2,
       lifetime_value: 3337.7075
     },
     {
-      customer_name: 'Anne Serrano',
+      customer_name: 'Priscilla McCullough (female)',
       num_orders: 2,
       lifetime_value: 3373.9075
     },
     {
-      customer_name: 'Anne Torres',
+      customer_name: 'Shannon Pollich (female)',
       num_orders: 1,
       lifetime_value: 75.97
     },
     {
-      customer_name: 'Anne Vazquez',
+      customer_name: 'Phillip Wilkinson (male)',
       num_orders: 2,
       lifetime_value: 1809.3975
     },
     {
-      customer_name: 'Anthony Anderson',
+      customer_name: 'Rhonda Bayer (male)',
       num_orders: 1,
       lifetime_value: 38.98
     },
     {
-      customer_name: 'Anthony Brown',
+      customer_name: 'Edmund Monahan PhD (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Anthony Clark',
+      customer_name: 'Mr. Micheal Harris (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Anthony Davis',
+      customer_name: 'Joey Beier-Lindgren (female)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Anthony Garcia',
+      customer_name: 'Pedro Labadie (female)',
       num_orders: 3,
       lifetime_value: 148.89
     },
     {
-      customer_name: 'Anthony Harris',
+      customer_name: 'Alfonso Johnston IV (female)',
       num_orders: 2,
       lifetime_value: 3027.32
     },
     {
-      customer_name: 'Anthony Johnson',
+      customer_name: 'Samuel Stroman (male)',
       num_orders: 2,
       lifetime_value: 155.45
     },
     {
-      customer_name: 'Anthony Jones',
+      customer_name: 'Kim Heaney V (female)',
       num_orders: 1,
       lifetime_value: 2329.99
     },
     {
-      customer_name: 'Anthony Lee',
+      customer_name: 'Emanuel Towne (male)',
       num_orders: 1,
       lifetime_value: 2341.97
     },
     {
-      customer_name: 'Anthony Lewis',
+      customer_name: 'Jody Marks (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Anthony Martinez',
+      customer_name: 'Cedric Altenwerth (male)',
       num_orders: 1,
       lifetime_value: 2394.97
     },
     {
-      customer_name: 'Anthony Miller',
+      customer_name: 'Clint Nicolas (male)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Anthony Moore',
+      customer_name: 'Ashley Lockman (male)',
       num_orders: 1,
       lifetime_value: 1714.97
     },
     {
-      customer_name: 'Anthony Robinson',
+      customer_name: 'Elijah Labadie (male)',
       num_orders: 1,
       lifetime_value: 2362.27
     },
     {
-      customer_name: 'Anthony Rodriguez',
+      customer_name: 'Todd Carroll (female)',
       num_orders: 1,
       lifetime_value: 2294.99
     },
     {
-      customer_name: 'Anthony Taylor',
+      customer_name: 'Kristi Johnson (male)',
       num_orders: 1,
       lifetime_value: 2319.99
     },
     {
-      customer_name: 'Anthony Thompson',
+      customer_name: 'Jason Waelchi (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Anthony Walker',
+      customer_name: 'Traci Koepp (male)',
       num_orders: 1,
       lifetime_value: 2294.99
     },
     {
-      customer_name: 'Anthony White',
+      customer_name: 'Calvin Collins (male)',
       num_orders: 3,
       lifetime_value: 4644.7475
     },
     {
-      customer_name: 'Anthony Williams',
+      customer_name: 'Benjamin Emard (female)',
       num_orders: 1,
       lifetime_value: 2379.48
     },
     {
-      customer_name: 'Anthony Wilson',
+      customer_name: 'Molly Graham-Jerde (female)',
       num_orders: 1,
       lifetime_value: 1750.98
     },
     {
-      customer_name: 'Antonio Alexander',
+      customer_name: 'Nelson Mohr (male)',
       num_orders: 2,
       lifetime_value: 4682.5325
     },
     {
-      customer_name: 'Antonio Barnes',
+      customer_name: 'Rose Hane (male)',
       num_orders: 1,
       lifetime_value: 29.93
     },
     {
-      customer_name: 'Antonio Bennett',
+      customer_name: 'Mr. Perry Bernhard (female)',
       num_orders: 2,
       lifetime_value: 165.95
     },
     {
-      customer_name: 'Antonio Bryant',
+      customer_name: 'Joy Walker (female)',
       num_orders: 1,
       lifetime_value: 85.48
     },
     {
-      customer_name: 'Antonio Butler',
+      customer_name: 'Dale McCullough (female)',
       num_orders: 2,
       lifetime_value: 4564.4925
     },
     {
-      customer_name: 'Antonio Diaz',
+      customer_name: 'Kenny Runte (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Antonio Flores',
+      customer_name: 'Peggy McCullough (male)',
       num_orders: 2,
       lifetime_value: 4813.32
     },
     {
-      customer_name: 'Antonio Foster',
+      customer_name: 'Suzanne Cremin (female)',
       num_orders: 1,
       lifetime_value: 71.95
     },
     {
-      customer_name: 'Antonio Gonzales',
+      customer_name: 'Lyle Hermiston (female)',
       num_orders: 1,
       lifetime_value: 96.46
     },
     {
-      customer_name: 'Antonio Griffin',
+      customer_name: 'Ruby Jacobi (male)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Antonio Hayes',
+      customer_name: 'Derrick Erdman (female)',
       num_orders: 2,
       lifetime_value: 4905.32
     },
     {
-      customer_name: 'Antonio Henderson',
+      customer_name: 'Mr. Alfredo Goldner (female)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Antonio Hughes',
+      customer_name: 'Fredrick Kuvalis (female)',
       num_orders: 1,
       lifetime_value: 85.48
     },
     {
-      customer_name: 'Antonio Jenkins',
+      customer_name: 'Ronnie Schmeler (male)',
       num_orders: 3,
       lifetime_value: 114.95
     },
     {
-      customer_name: 'Antonio Long',
+      customer_name: 'Mr. Garry Champlin (male)',
       num_orders: 2,
       lifetime_value: 4491.5325
     },
     {
-      customer_name: 'Antonio Patterson',
+      customer_name: 'Della Emard (male)',
       num_orders: 3,
       lifetime_value: 163.19
     },
     {
-      customer_name: 'Antonio Perry',
+      customer_name: 'Darryl Terry (female)',
       num_orders: 3,
       lifetime_value: 73.16
     },
     {
-      customer_name: 'Antonio Powell',
+      customer_name: 'Meghan Gerhold (male)',
       num_orders: 2,
       lifetime_value: 4558.5225
     },
     {
-      customer_name: 'Antonio Price',
+      customer_name: 'Jake Stark (female)',
       num_orders: 2,
       lifetime_value: 185.96
     },
     {
-      customer_name: 'Antonio Ross',
+      customer_name: 'Ana Haley (male)',
       num_orders: 2,
       lifetime_value: 4501.5525
     },
     {
-      customer_name: 'Antonio Russell',
+      customer_name: 'Alfonso Stiedemann (male)',
       num_orders: 2,
       lifetime_value: 4564.4925
     },
     {
-      customer_name: 'Antonio Simmons',
+      customer_name: 'Louis Hintz (male)',
       num_orders: 2,
       lifetime_value: 4501.5525
     },
     {
-      customer_name: 'Antonio Washington',
+      customer_name: 'Jordan Spinka (female)',
       num_orders: 2,
       lifetime_value: 4501.5525
     },
     {
-      customer_name: 'Antonio Wood',
+      customer_name: 'Edwin Rodriguez Sr. (female)',
       num_orders: 2,
       lifetime_value: 220.46
     },
     {
-      customer_name: 'April Anand',
+      customer_name: 'Caroline Lehner (female)',
       num_orders: 2,
       lifetime_value: 3059.0782
     },
     {
-      customer_name: 'April Andersen',
+      customer_name: 'Hugh Block (female)',
       num_orders: 2,
       lifetime_value: 3131.95
     },
     {
-      customer_name: 'April Beck',
+      customer_name: 'Charlie Hoeger (male)',
       num_orders: 2,
       lifetime_value: 3161.94
     },
     {
-      customer_name: 'April Deng',
+      customer_name: 'Dr. Delbert Jacobs I (female)',
       num_orders: 1,
       lifetime_value: 1170.48
     },
     {
-      customer_name: 'April Goel',
+      customer_name: 'Stephanie Blanda (female)',
       num_orders: 1,
       lifetime_value: 74.98
     },
     {
-      customer_name: 'April Jai',
+      customer_name: 'Geraldine Gulgowski (male)',
       num_orders: 1,
       lifetime_value: 2457.33
     },
     {
-      customer_name: 'April Kumar',
+      customer_name: 'Terrence Stark (male)',
       num_orders: 1,
       lifetime_value: 23.97
     },
     {
-      customer_name: 'April Luo',
+      customer_name: 'Belinda Donnelly (male)',
       num_orders: 1,
       lifetime_value: 23.97
     },
     {
-      customer_name: 'April Nara',
+      customer_name: 'Norman Considine DDS (male)',
       num_orders: 1,
       lifetime_value: 34.98
     },
     {
-      customer_name: 'April Nath',
+      customer_name: 'Janis Russel-Gleason (female)',
       num_orders: 2,
       lifetime_value: 3124.96
     },
     {
-      customer_name: 'April Pal',
+      customer_name: 'Jeanne Ebert (male)',
       num_orders: 2,
       lifetime_value: 3246.5482
     },
     {
-      customer_name: 'April Raje',
+      customer_name: 'Amelia Hayes (male)',
       num_orders: 2,
       lifetime_value: 3105.27
     },
     {
-      customer_name: 'April Raji',
+      customer_name: 'Hope Nader (female)',
       num_orders: 1,
       lifetime_value: 34.98
     },
     {
-      customer_name: 'April Shan',
+      customer_name: 'Duane Rice (male)',
       num_orders: 1,
       lifetime_value: 93.46
     },
     {
-      customer_name: 'April Sharma',
+      customer_name: 'Jerald Olson (female)',
       num_orders: 1,
       lifetime_value: 9.99
     },
     {
-      customer_name: 'April She',
+      customer_name: 'Kathleen Dach (female)',
       num_orders: 1,
       lifetime_value: 1155.48
     },
     {
-      customer_name: 'April Shen',
+      customer_name: 'Caroline Abbott (male)',
       num_orders: 1,
       lifetime_value: 2478.34
     },
     {
-      customer_name: 'April Tang',
+      customer_name: 'Jimmie Leffler (female)',
       num_orders: 1,
       lifetime_value: 64.97
     },
     {
-      customer_name: 'April Xie',
+      customer_name: 'Greg Mueller (female)',
       num_orders: 1,
       lifetime_value: 1174.48
     },
     {
-      customer_name: 'Arthur Washington',
+      customer_name: 'Francis Jerde (female)',
       num_orders: 2,
       lifetime_value: 124.41
     },
     {
-      customer_name: 'Arthur Wilson',
+      customer_name: 'Dominick Farrell (male)',
       num_orders: 2,
       lifetime_value: 103.97
     },
     {
-      customer_name: 'Ashley Alexander',
+      customer_name: 'Billie Wunsch (female)',
       num_orders: 2,
       lifetime_value: 53.21
     },
     {
-      customer_name: 'Ashley Anderson',
+      customer_name: 'Billy Haag (female)',
       num_orders: 2,
       lifetime_value: 5908.25
     },
     {
-      customer_name: 'Ashley Barnes',
+      customer_name: 'Angel Gusikowski (male)',
       num_orders: 2,
       lifetime_value: 118.96
     },
     {
-      customer_name: 'Ashley Bennett',
+      customer_name: 'Drew Pacocha (female)',
       num_orders: 2,
       lifetime_value: 5888.24
     },
     {
-      customer_name: 'Ashley Brown',
+      customer_name: 'Jessie Lowe (female)',
       num_orders: 2,
       lifetime_value: 162.28
     },
     {
-      customer_name: 'Ashley Bryant',
+      customer_name: 'Saul Veum (female)',
       num_orders: 2,
       lifetime_value: 77.96
     },
     {
-      customer_name: 'Ashley Butler',
+      customer_name: 'Mr. Archie Koss (male)',
       num_orders: 2,
       lifetime_value: 67.46
     },
     {
-      customer_name: 'Ashley Clark',
+      customer_name: 'Cristina Lesch (female)',
       num_orders: 4,
       lifetime_value: 293.4
     },
     {
-      customer_name: 'Ashley Coleman',
+      customer_name: 'Amber Kihn (male)',
       num_orders: 2,
       lifetime_value: 2611.4096
     },
     {
-      customer_name: 'Ashley Davis',
+      customer_name: 'Roger Carroll (female)',
       num_orders: 2,
       lifetime_value: 157.29
     },
     {
-      customer_name: 'Ashley Diaz',
+      customer_name: 'Felipe Conroy (female)',
       num_orders: 1,
       lifetime_value: 23.97
     },
     {
-      customer_name: 'Ashley Flores',
+      customer_name: 'Gretchen Miller (male)',
       num_orders: 2,
       lifetime_value: 2629.0682
     },
     {
-      customer_name: 'Ashley Foster',
+      customer_name: 'Julio Stroman I (female)',
       num_orders: 2,
       lifetime_value: 42.97
     },
     {
-      customer_name: 'Ashley Garcia',
+      customer_name: 'Casey Osinski (female)',
       num_orders: 2,
       lifetime_value: 5913.25
     },
     {
-      customer_name: 'Ashley Gonzales',
+      customer_name: 'Bert Wilderman MD (female)',
       num_orders: 2,
       lifetime_value: 37.98
     },
     {
-      customer_name: 'Ashley Griffin',
+      customer_name: 'Marsha Little (male)',
       num_orders: 2,
       lifetime_value: 117.45
     },
     {
-      customer_name: 'Ashley Hall',
+      customer_name: 'Douglas Schuppe (male)',
       num_orders: 1,
       lifetime_value: 71.95
     },
     {
-      customer_name: 'Ashley Harris',
+      customer_name: 'Mrs. Sophie Yost (male)',
       num_orders: 4,
       lifetime_value: 224.53
     },
     {
-      customer_name: 'Ashley Hayes',
+      customer_name: 'Johnny White (male)',
       num_orders: 3,
       lifetime_value: 333.3
     },
     {
-      customer_name: 'Ashley Henderson',
+      customer_name: 'Roberta Conn (female)',
       num_orders: 1,
       lifetime_value: 74.98
     },
     {
-      customer_name: 'Ashley Hughes',
+      customer_name: 'Ernesto Murazik (male)',
       num_orders: 2,
       lifetime_value: 2633.3896
     },
     {
-      customer_name: 'Ashley Jackson',
+      customer_name: 'Jay Cremin (male)',
       num_orders: 1,
       lifetime_value: 39.99
     },
     {
-      customer_name: 'Ashley Jenkins',
+      customer_name: 'Yvonne Rempel (male)',
       num_orders: 2,
       lifetime_value: 2668.0782
     },
     {
-      customer_name: 'Ashley Johnson',
+      customer_name: 'Tamara Aufderhar (male)',
       num_orders: 1,
       lifetime_value: 42.28
     },
     {
-      customer_name: 'Ashley Jones',
+      customer_name: 'Cory Johnson (female)',
       num_orders: 2,
       lifetime_value: 258.48
     },
     {
-      customer_name: 'Ashley Lee',
+      customer_name: 'Inez Doyle (female)',
       num_orders: 1,
       lifetime_value: 2351.96
     },
     {
-      customer_name: 'Ashley Lewis',
+      customer_name: 'Rufus Brekke (female)',
       num_orders: 1,
       lifetime_value: 2331.95
     },
     {
-      customer_name: 'Ashley Long',
+      customer_name: 'Dr. Meredith Reinger (male)',
       num_orders: 2,
       lifetime_value: 2646.3996
     },
     {
-      customer_name: 'Ashley Martin',
+      customer_name: 'Casey Leuschke (female)',
       num_orders: 1,
       lifetime_value: 74.98
     },
     {
-      customer_name: 'Ashley Martinez',
+      customer_name: 'Edith Jacobs (male)',
       num_orders: 2,
       lifetime_value: 5875.55
     },
     {
-      customer_name: 'Ashley Miller',
+      customer_name: 'Essie Franecki (male)',
       num_orders: 1,
       lifetime_value: 74.98
     },
     {
-      customer_name: 'Ashley Moore',
+      customer_name: 'Mr. Sidney Jerde (female)',
       num_orders: 1,
       lifetime_value: 35
     },
     {
-      customer_name: 'Ashley Patterson',
+      customer_name: 'Horace Hills (female)',
       num_orders: 2,
       lifetime_value: 83.97
     },
     {
-      customer_name: 'Ashley Perry',
+      customer_name: 'Megan Mosciski (male)',
       num_orders: 2,
       lifetime_value: 2626.3896
     },
     {
-      customer_name: 'Ashley Powell',
+      customer_name: 'Ginger Ankunding (female)',
       num_orders: 2,
       lifetime_value: 2589.0882
     },
     {
-      customer_name: 'Ashley Price',
+      customer_name: 'Kristine Walter (female)',
       num_orders: 1,
       lifetime_value: 8.99
     },
     {
-      customer_name: 'Ashley Robinson',
+      customer_name: 'Dr. Mathew Huels (female)',
       num_orders: 2,
       lifetime_value: 5900.55
     },
     {
-      customer_name: 'Ashley Rodriguez',
+      customer_name: 'Eduardo Kerluke (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Ashley Ross',
+      customer_name: 'Kirk Hettinger (female)',
       num_orders: 2,
       lifetime_value: 147.95
     },
     {
-      customer_name: 'Ashley Russell',
+      customer_name: 'Mr. Kristopher Okuneva (female)',
       num_orders: 3,
       lifetime_value: 5649.2096
     },
     {
-      customer_name: 'Ashley Simmons',
+      customer_name: 'Ervin Stiedemann (male)',
       num_orders: 1,
       lifetime_value: 49.97
     },
     {
-      customer_name: 'Ashley Smith',
+      customer_name: 'Joshua Lubowitz (female)',
       num_orders: 1,
       lifetime_value: 35
     },
     {
-      customer_name: 'Ashley Taylor',
+      customer_name: 'Margaret Rodriguez (female)',
       num_orders: 1,
       lifetime_value: 74.98
     },
     {
-      customer_name: 'Ashley Thomas',
+      customer_name: 'Andrea Donnelly (female)',
       num_orders: 1,
       lifetime_value: 89.98
     },
     {
-      customer_name: 'Ashley Thompson',
+      customer_name: 'Carla Ernser (female)',
       num_orders: 1,
       lifetime_value: 42.28
     },
     {
-      customer_name: 'Ashley Walker',
+      customer_name: 'Eileen Ryan (female)',
       num_orders: 2,
       lifetime_value: 5955.23
     },
     {
-      customer_name: 'Ashley Washington',
+      customer_name: 'Kelly Kirlin (female)',
       num_orders: 2,
       lifetime_value: 77.27
     },
     {
-      customer_name: 'Ashley White',
+      customer_name: 'Garrett Hermiston (female)',
       num_orders: 1,
       lifetime_value: 74.98
     },
     {
-      customer_name: 'Ashley Williams',
+      customer_name: 'Mr. Shawn Bashirian (male)',
       num_orders: 2,
       lifetime_value: 155
     },
     {
-      customer_name: 'Ashley Wilson',
+      customer_name: 'Kim Conn (male)',
       num_orders: 1,
       lifetime_value: 59.27
     },
     {
-      customer_name: 'Ashley Wood',
+      customer_name: 'Mercedes Fritsch (female)',
       num_orders: 1,
       lifetime_value: 58.96
     },
     {
-      customer_name: 'Austin Anderson',
+      customer_name: 'Andrea Schmeler (female)',
       num_orders: 1,
       lifetime_value: 1754.98
     },
     {
-      customer_name: 'Austin Brown',
+      customer_name: 'Everett Nader (female)',
       num_orders: 2,
       lifetime_value: 6029.57
     },
     {
-      customer_name: 'Austin Davis',
+      customer_name: "Jessie O'Keefe (male)",
       num_orders: 2,
       lifetime_value: 38.92
     },
     {
-      customer_name: 'Austin Garcia',
+      customer_name: 'Mr. Ron Yost (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Austin Harris',
+      customer_name: 'Alexis Kub MD (male)',
       num_orders: 2,
       lifetime_value: 6098.58
     },
     {
-      customer_name: 'Austin Johnson',
+      customer_name: 'Becky Hessel (male)',
       num_orders: 1,
       lifetime_value: 2439.99
     },
     {
-      customer_name: 'Austin Jones',
+      customer_name: 'Ms. Traci Hermiston (male)',
       num_orders: 2,
       lifetime_value: 77.27
     },
     {
-      customer_name: 'Austin Lee',
+      customer_name: 'Javier Kuvalis (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Austin Lewis',
+      customer_name: 'Gilbert Nikolaus (male)',
       num_orders: 1,
       lifetime_value: 1775.47
     },
     {
-      customer_name: 'Austin Martin',
+      customer_name: 'Rodney Thompson (male)',
       num_orders: 3,
       lifetime_value: 148.19
     },
     {
-      customer_name: 'Austin Martinez',
+      customer_name: 'Tom Smith (female)',
       num_orders: 1,
       lifetime_value: 2357.28
     },
     {
-      customer_name: 'Austin Moore',
+      customer_name: 'Jonathon Roberts (female)',
       num_orders: 1,
       lifetime_value: 2414.99
     },
     {
-      customer_name: 'Austin Robinson',
+      customer_name: 'Danny Tillman MD (female)',
       num_orders: 1,
       lifetime_value: 1750.98
     },
     {
-      customer_name: 'Austin Rodriguez',
+      customer_name: 'Dawn Bruen (female)',
       num_orders: 1,
       lifetime_value: 2376.96
     },
     {
-      customer_name: 'Austin Smith',
+      customer_name: "Olive O'Reilly (female)",
       num_orders: 1,
       lifetime_value: 1750.98
     },
     {
-      customer_name: 'Austin Taylor',
+      customer_name: 'Gertrude Green (female)',
       num_orders: 1,
       lifetime_value: 1732.26
     },
     {
-      customer_name: 'Austin Thompson',
+      customer_name: 'Henrietta Baumbach (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Austin Walker',
+      customer_name: 'Iris Cummerata III (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Austin White',
+      customer_name: 'Gretchen Ziemann (female)',
       num_orders: 2,
       lifetime_value: 6030.61
     },
     {
-      customer_name: 'Austin Williams',
+      customer_name: 'Lillian Hintz (male)',
       num_orders: 2,
       lifetime_value: 82.26
     },
     {
-      customer_name: 'Barbara Andersen',
+      customer_name: 'Deanna Spencer (female)',
       num_orders: 3,
       lifetime_value: 6786.4396
     },
     {
-      customer_name: 'Barbara Ashe',
+      customer_name: 'Kent Lebsack (female)',
       num_orders: 2,
       lifetime_value: 5933.26
     },
     {
-      customer_name: 'Barbara Beck',
+      customer_name: 'Ann Ziemann (female)',
       num_orders: 2,
       lifetime_value: 5875.55
     },
     {
-      customer_name: 'Barbara Cai',
+      customer_name: 'Eduardo Bergstrom (male)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Barbara Chande',
+      customer_name: 'Eric Miller (male)',
       num_orders: 2,
       lifetime_value: 4438.0582
     },
     {
-      customer_name: 'Barbara Chen',
+      customer_name: 'Marguerite Vandervort (male)',
       num_orders: 2,
       lifetime_value: 5873.26
     },
     {
-      customer_name: 'Barbara Deng',
+      customer_name: 'Marion Hills Jr. (male)',
       num_orders: 1,
       lifetime_value: 49.99
     },
     {
-      customer_name: 'Barbara Gao',
+      customer_name: 'Eric Greenfelder (female)',
       num_orders: 3,
       lifetime_value: 6789.4596
     },
     {
-      customer_name: 'Barbara Goel',
+      customer_name: 'Catherine Ernser (female)',
       num_orders: 2,
       lifetime_value: 5958.74
     },
     {
-      customer_name: 'Barbara He',
+      customer_name: 'Christina Brown (male)',
       num_orders: 3,
       lifetime_value: 6806.1182
     },
     {
-      customer_name: 'Barbara Hu',
+      customer_name: 'Mr. Evan Russel (male)',
       num_orders: 1,
       lifetime_value: 43.98
     },
     {
-      customer_name: 'Barbara Huang',
+      customer_name: 'Jean Predovic (female)',
       num_orders: 2,
       lifetime_value: 4460.3796
     },
     {
-      customer_name: 'Barbara Jai',
+      customer_name: 'Steve Lowe (male)',
       num_orders: 2,
       lifetime_value: 5913.24
     },
     {
-      customer_name: 'Barbara Kumar',
+      customer_name: 'Julian Mayer (male)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Barbara Lal',
+      customer_name: 'Arturo Satterfield (female)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Barbara Li',
+      customer_name: 'Carol McKenzie (male)',
       num_orders: 2,
       lifetime_value: 5895.24
     },
     {
-      customer_name: 'Barbara Liang',
+      customer_name: 'Ervin Wehner (male)',
       num_orders: 2,
       lifetime_value: 4450.3696
     },
     {
-      customer_name: 'Barbara Lin',
+      customer_name: 'Emilio Quigley (female)',
       num_orders: 3,
       lifetime_value: 7068.27
     },
     {
-      customer_name: 'Barbara Liu',
+      customer_name: 'Leo Kihn (female)',
       num_orders: 1,
       lifetime_value: 88.98
     },
     {
-      customer_name: 'Barbara Lu',
+      customer_name: 'Angel Ullrich (male)',
       num_orders: 1,
       lifetime_value: 21.49
     },
     {
-      customer_name: 'Barbara Luo',
+      customer_name: 'Kirk Fisher (female)',
       num_orders: 2,
       lifetime_value: 5875.55
     },
     {
-      customer_name: 'Barbara Ma',
+      customer_name: 'April McGlynn (female)',
       num_orders: 2,
       lifetime_value: 4391.4096
     },
     {
-      customer_name: 'Barbara Nara',
+      customer_name: 'Marc Becker (male)',
       num_orders: 2,
       lifetime_value: 123.24
     },
     {
-      customer_name: 'Barbara Rai',
+      customer_name: 'Karla Brown (female)',
       num_orders: 2,
       lifetime_value: 133.75
     },
     {
-      customer_name: 'Barbara Raji',
+      customer_name: 'Adrian Jacobs (male)',
       num_orders: 2,
       lifetime_value: 5930.23
     },
     {
-      customer_name: 'Barbara Sharma',
+      customer_name: 'Charlotte Purdy (male)',
       num_orders: 3,
       lifetime_value: 6767.1382
     },
     {
-      customer_name: 'Barbara Shen',
+      customer_name: 'Mr. Drew Considine (female)',
       num_orders: 1,
       lifetime_value: 8.99
     },
     {
-      customer_name: 'Barbara Tang',
+      customer_name: 'Brendan Weimann (female)',
       num_orders: 1,
       lifetime_value: 14.98
     },
     {
-      customer_name: 'Barbara Wang',
+      customer_name: 'Woodrow Crist (male)',
       num_orders: 2,
       lifetime_value: 5915.54
     },
     {
-      customer_name: 'Barbara Wu',
+      customer_name: 'Brenda Hodkiewicz (male)',
       num_orders: 3,
       lifetime_value: 4976.3796
     },
     {
-      customer_name: 'Barbara Xie',
+      customer_name: 'Judy Walsh (female)',
       num_orders: 2,
       lifetime_value: 4540.3782
     },
     {
-      customer_name: 'Barbara Xu',
+      customer_name: 'Tina Pollich (female)',
       num_orders: 2,
       lifetime_value: 5895.24
     },
     {
-      customer_name: 'Barbara Xu',
+      customer_name: 'Grant Hessel (male)',
       num_orders: 1,
       lifetime_value: 53.99
     },
     {
-      customer_name: 'Barbara Ye',
+      customer_name: 'Donald Kunde (male)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Barbara Yuan',
+      customer_name: 'Angelina Nitzsche Sr. (female)',
       num_orders: 2,
       lifetime_value: 5908.25
     },
     {
-      customer_name: 'Barbara Zeng',
+      customer_name: 'Israel Crooks (female)',
       num_orders: 5,
       lifetime_value: 237.19
     },
     {
-      customer_name: 'Barbara Zhang',
+      customer_name: 'Lela Christiansen (male)',
       num_orders: 2,
       lifetime_value: 5919.73
     },
     {
-      customer_name: 'Barbara Zhao',
+      customer_name: 'Elisa Dickinson (female)',
       num_orders: 1,
       lifetime_value: 21.49
     },
     {
-      customer_name: 'Barbara Zheng',
+      customer_name: 'Victor Wisozk (female)',
       num_orders: 2,
       lifetime_value: 4406.3896
     },
     {
-      customer_name: 'Barbara Zhou',
+      customer_name: 'Eddie Barrows (male)',
       num_orders: 3,
       lifetime_value: 5241.4282
     },
     {
-      customer_name: 'Barbara Zhu',
+      customer_name: 'Miguel Vandervort (male)',
       num_orders: 25,
       lifetime_value: 1006.83
     },
     {
-      customer_name: 'Begoña Hurtado',
+      customer_name: 'Cathy Cassin (male)',
       num_orders: 1,
       lifetime_value: 2325.96
     },
     {
-      customer_name: 'Benjamin Anderson',
+      customer_name: 'Velma Koepp (male)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Benjamin Brown',
+      customer_name: 'Miranda Goldner (female)',
       num_orders: 2,
       lifetime_value: 4752.75
     },
     {
-      customer_name: 'Benjamin Clark',
+      customer_name: 'Mathew Gleason (male)',
       num_orders: 2,
       lifetime_value: 4157.73
     },
     {
-      customer_name: 'Benjamin Davis',
+      customer_name: 'Barbara Bergnaum (male)',
       num_orders: 2,
       lifetime_value: 3103.31
     },
     {
-      customer_name: 'Benjamin Garcia',
+      customer_name: 'Darnell Kub (female)',
       num_orders: 2,
       lifetime_value: 4145.54
     },
     {
-      customer_name: 'Benjamin Harris',
+      customer_name: 'Pam Littel MD (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Benjamin Jackson',
+      customer_name: 'Alfonso Pacocha (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Benjamin Johnson',
+      customer_name: 'Mrs. Audrey Turner (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Benjamin Jones',
+      customer_name: 'Nathaniel Heidenreich (female)',
       num_orders: 1,
       lifetime_value: 21.49
     },
     {
-      customer_name: 'Benjamin Lee',
+      customer_name: 'Miss Lisa Corkery (female)',
       num_orders: 2,
       lifetime_value: 3896.5325
     },
     {
-      customer_name: 'Benjamin Lewis',
+      customer_name: 'Terry Douglas II (female)',
       num_orders: 2,
       lifetime_value: 4133.24
     },
     {
-      customer_name: 'Benjamin Martin',
+      customer_name: 'Veronica Collier (male)',
       num_orders: 1,
       lifetime_value: 12.94
     },
     {
-      customer_name: 'Benjamin Martinez',
+      customer_name: 'Mr. Dave Marvin (male)',
       num_orders: 2,
       lifetime_value: 94.47
     },
     {
-      customer_name: 'Benjamin Miller',
+      customer_name: 'Alberta Davis-Wyman (male)',
       num_orders: 2,
       lifetime_value: 3941.5325
     },
     {
-      customer_name: 'Benjamin Moore',
+      customer_name: 'Shane Cormier (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Benjamin Robinson',
+      customer_name: 'Miss Marcella Bradtke (male)',
       num_orders: 2,
       lifetime_value: 4133.24
     },
     {
-      customer_name: 'Benjamin Rodriguez',
+      customer_name: 'Dennis Pfeffer (male)',
       num_orders: 2,
       lifetime_value: 4143.26
     },
     {
-      customer_name: 'Benjamin Smith',
+      customer_name: 'Betsy Considine Sr. (female)',
       num_orders: 1,
       lifetime_value: 76.97
     },
     {
-      customer_name: 'Benjamin Taylor',
+      customer_name: 'Caleb Frami (male)',
       num_orders: 2,
       lifetime_value: 2450.0782
     },
     {
-      customer_name: 'Benjamin Thomas',
+      customer_name: 'Veronica Feest (male)',
       num_orders: 2,
       lifetime_value: 160.44
     },
     {
-      customer_name: 'Benjamin Thompson',
+      customer_name: 'Glenda Ryan (male)',
       num_orders: 2,
       lifetime_value: 3343.3575
     },
     {
-      customer_name: 'Benjamin Walker',
+      customer_name: 'Jamie Emmerich-Rath (female)',
       num_orders: 1,
       lifetime_value: 69.97
     },
     {
-      customer_name: 'Benjamin Wilson',
+      customer_name: 'Frankie Gottlieb (female)',
       num_orders: 2,
       lifetime_value: 2983.34
     },
     {
-      customer_name: 'Benjamin Winter',
+      customer_name: 'Joann White DVM (male)',
       num_orders: 2,
       lifetime_value: 3319.3975
     },
     {
-      customer_name: 'Bernard Thames',
+      customer_name: 'Sheldon Adams (female)',
       num_orders: 2,
       lifetime_value: 84.96
     },
     {
-      customer_name: 'Beth Srini',
+      customer_name: 'Evelyn Jaskolski (female)',
       num_orders: 1,
       lifetime_value: 2329.99
     },
     {
-      customer_name: 'Bethany Andersen',
+      customer_name: 'Dale Goldner (female)',
       num_orders: 2,
       lifetime_value: 95.26
     },
     {
-      customer_name: 'Bethany Ashe',
+      customer_name: 'Rudy Kshlerin (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Bethany Beck',
+      customer_name: 'Dr. Colin Goldner (female)',
       num_orders: 2,
       lifetime_value: 2803.5225
     },
     {
-      customer_name: 'Bethany Chande',
+      customer_name: 'Nina Stamm (male)',
       num_orders: 2,
       lifetime_value: 86.27
     },
     {
-      customer_name: 'Bethany Chander',
+      customer_name: 'Wendell Lehner (female)',
       num_orders: 2,
       lifetime_value: 4417.75
     },
     {
-      customer_name: 'Bethany Deng',
+      customer_name: 'Sheryl Marquardt (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Bethany Goel',
+      customer_name: 'Jerome Wisoky (male)',
       num_orders: 2,
       lifetime_value: 3014.31
     },
     {
-      customer_name: 'Bethany Jai',
+      customer_name: 'Lorraine Flatley (male)',
       num_orders: 2,
       lifetime_value: 6089.59
     },
     {
-      customer_name: 'Bethany Kumar',
+      customer_name: 'Emily Botsford (female)',
       num_orders: 1,
       lifetime_value: 67.97
     },
     {
-      customer_name: 'Bethany Lal',
+      customer_name: 'Jordan Vandervort (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Bethany Luo',
+      customer_name: 'Leslie Cruickshank (female)',
       num_orders: 1,
       lifetime_value: 1725.98
     },
     {
-      customer_name: 'Bethany Nara',
+      customer_name: 'Tanya Harris (male)',
       num_orders: 2,
       lifetime_value: 4392.74
     },
     {
-      customer_name: 'Bethany Nath',
+      customer_name: 'Ethel Brekke (female)',
       num_orders: 2,
       lifetime_value: 100.25
     },
     {
-      customer_name: 'Bethany Pal',
+      customer_name: 'Sammy Fisher IV (female)',
       num_orders: 2,
       lifetime_value: 6093.2
     },
     {
-      customer_name: 'Bethany Raheem',
+      customer_name: 'Delores Runte (female)',
       num_orders: 2,
       lifetime_value: 113.96
     },
     {
-      customer_name: 'Bethany Raje',
+      customer_name: 'Mitchell Monahan (female)',
       num_orders: 2,
       lifetime_value: 106.95
     },
     {
-      customer_name: 'Bethany Raji',
+      customer_name: 'Dr. Clara Cronin (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Bethany Shan',
+      customer_name: 'Teri Heathcote (male)',
       num_orders: 2,
       lifetime_value: 4426.74
     },
     {
-      customer_name: 'Bethany She',
+      customer_name: 'Wesley Kozey (male)',
       num_orders: 2,
       lifetime_value: 4347.76
     },
     {
-      customer_name: 'Bethany Shen',
+      customer_name: 'Chris Kris (female)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Bethany Tang',
+      customer_name: 'Oscar Schulist II (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Bethany Xu',
+      customer_name: 'Opal Thiel (female)',
       num_orders: 1,
       lifetime_value: 1728.27
     },
     {
-      customer_name: 'Bethany Yuan',
+      customer_name: "Dr. Jamie Kub-O'Connell (male)",
       num_orders: 1,
       lifetime_value: 1714.97
     },
     {
-      customer_name: 'Billy Alonso',
+      customer_name: 'Wanda Bradtke (male)',
       num_orders: 1,
       lifetime_value: 12.94
     },
     {
-      customer_name: 'Billy Alvarez',
+      customer_name: 'Dr. Marilyn Kutch (female)',
       num_orders: 2,
       lifetime_value: 116.25
     },
     {
-      customer_name: 'Billy Blanco',
+      customer_name: 'Bennie Crooks (female)',
       num_orders: 1,
       lifetime_value: 564.48
     },
     {
-      customer_name: 'Billy Carlson',
+      customer_name: 'Dr. Angel Kautzer (male)',
       num_orders: 2,
       lifetime_value: 62.27
     },
     {
-      customer_name: 'Billy Diaz',
+      customer_name: 'Mr. Aubrey Hackett (female)',
       num_orders: 2,
       lifetime_value: 59.98
     },
     {
-      customer_name: 'Billy Dominguez',
+      customer_name: 'Mr. Hubert Nicolas (male)',
       num_orders: 2,
       lifetime_value: 4441.3896
     },
     {
-      customer_name: 'Billy Gill',
+      customer_name: 'Larry Stamm (male)',
       num_orders: 2,
       lifetime_value: 98.96
     },
     {
-      customer_name: 'Billy Gomez',
+      customer_name: 'Jean Bayer (female)',
       num_orders: 2,
       lifetime_value: 4416.3796
     },
     {
-      customer_name: 'Billy Gutierrez',
+      customer_name: 'Rachael Rempel (female)',
       num_orders: 2,
       lifetime_value: 4399.0782
     },
     {
-      customer_name: 'Billy Hernandez',
+      customer_name: 'Julio Rohan (male)',
       num_orders: 2,
       lifetime_value: 4376.3996
     },
     {
-      customer_name: 'Billy Jiménez',
+      customer_name: 'Mrs. Geraldine Feil PhD (female)',
       num_orders: 2,
       lifetime_value: 3117.23
     },
     {
-      customer_name: 'Billy Martin',
+      customer_name: 'Ollie Krajcik (female)',
       num_orders: 2,
       lifetime_value: 4359.0682
     },
     {
-      customer_name: 'Billy Moreno',
+      customer_name: 'Sandy Emmerich (male)',
       num_orders: 2,
       lifetime_value: 3140.27
     },
     {
-      customer_name: 'Billy Munoz',
+      customer_name: 'Ken Schuppe (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Billy Ortega',
+      customer_name: "Bill O'Reilly (male)",
       num_orders: 1,
       lifetime_value: 64.47
     },
     {
-      customer_name: 'Billy Romero',
+      customer_name: 'Debbie Ernser (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Billy Rubio',
+      customer_name: 'Corey Keebler (male)',
       num_orders: 2,
       lifetime_value: 3174.95
     },
     {
-      customer_name: 'Billy Ruiz',
+      customer_name: 'Seth Conn (male)',
       num_orders: 2,
       lifetime_value: 63.97
     },
     {
-      customer_name: 'Billy Schmidt',
+      customer_name: 'Tracy Hansen (female)',
       num_orders: 2,
       lifetime_value: 3159.95
     },
     {
-      customer_name: 'Billy Serrano',
+      customer_name: 'Ron Purdy (male)',
       num_orders: 2,
       lifetime_value: 1387.95
     },
     {
-      customer_name: 'Billy Suarez',
+      customer_name: 'Grady Nolan (male)',
       num_orders: 2,
       lifetime_value: 4379.0882
     },
     {
-      customer_name: 'Billy Torres',
+      customer_name: 'Ellis Stokes (female)',
       num_orders: 2,
       lifetime_value: 4404.0782
     },
     {
-      customer_name: 'Blake Barnes',
+      customer_name: 'Kimberly Hermiston (male)',
       num_orders: 2,
       lifetime_value: 97.96
     },
     {
-      customer_name: 'Blake Bennett',
+      customer_name: 'Dr. Jaime Marquardt III (female)',
       num_orders: 3,
       lifetime_value: 8361.29
     },
     {
-      customer_name: 'Blake Bryant',
+      customer_name: 'Ana Turner (female)',
       num_orders: 3,
       lifetime_value: 105.22
     },
     {
-      customer_name: 'Blake Butler',
+      customer_name: 'Andy Mitchell (male)',
       num_orders: 4,
       lifetime_value: 7195.58
     },
     {
-      customer_name: 'Blake Coleman',
+      customer_name: 'Ms. Iris Bode III (female)',
       num_orders: 1,
       lifetime_value: 49.97
     },
     {
-      customer_name: 'Blake Diaz',
+      customer_name: 'Sheila Dickinson (male)',
       num_orders: 3,
       lifetime_value: 6962.1382
     },
     {
-      customer_name: 'Blake Flores',
+      customer_name: 'Nina Schmitt DVM (male)',
       num_orders: 2,
       lifetime_value: 177.92
     },
     {
-      customer_name: 'Blake Foster',
+      customer_name: 'Wilma Spinka (female)',
       num_orders: 1,
       lifetime_value: 44.98
     },
     {
-      customer_name: 'Blake Gonzales',
+      customer_name: 'Sadie Larson (female)',
       num_orders: 1,
       lifetime_value: 38.88
     },
     {
-      customer_name: 'Blake Griffin',
+      customer_name: 'Cassandra Muller (female)',
       num_orders: 3,
       lifetime_value: 167.4
     },
     {
-      customer_name: 'Blake Hayes',
+      customer_name: 'Nellie Kassulke (male)',
       num_orders: 3,
       lifetime_value: 6909.0882
     },
     {
-      customer_name: 'Blake Henderson',
+      customer_name: 'Joyce Dietrich (male)',
       num_orders: 1,
       lifetime_value: 78.48
     },
     {
-      customer_name: 'Blake Hughes',
+      customer_name: 'Hope Stark DDS (female)',
       num_orders: 3,
       lifetime_value: 8376.28
     },
     {
-      customer_name: 'Blake Jenkins',
+      customer_name: 'Maxine Wehner (female)',
       num_orders: 1,
       lifetime_value: 44.98
     },
     {
-      customer_name: 'Blake Long',
+      customer_name: 'Casey Kovacek (female)',
       num_orders: 3,
       lifetime_value: 8460.25
     },
     {
-      customer_name: 'Blake Patterson',
+      customer_name: 'Percy Boyle (female)',
       num_orders: 1,
       lifetime_value: 44.98
     },
     {
-      customer_name: 'Blake Perry',
+      customer_name: 'Dave Hermann (female)',
       num_orders: 1,
       lifetime_value: 9.99
     },
     {
-      customer_name: 'Blake Powell',
+      customer_name: 'Kimberly Rogahn (male)',
       num_orders: 1,
       lifetime_value: 58.96
     },
     {
-      customer_name: 'Blake Price',
+      customer_name: 'Jill Anderson (male)',
       num_orders: 3,
       lifetime_value: 8374.79
     },
     {
-      customer_name: 'Blake Ross',
+      customer_name: 'Angela Wehner (female)',
       num_orders: 1,
       lifetime_value: 78.48
     },
     {
-      customer_name: 'Blake Russell',
+      customer_name: 'Rosemarie Turner Jr. (male)',
       num_orders: 3,
       lifetime_value: 6763.1482
     },
     {
-      customer_name: 'Blake Simmons',
+      customer_name: 'Alfred Dach (female)',
       num_orders: 1,
       lifetime_value: 71.58
     },
     {
-      customer_name: 'Blake Washington',
+      customer_name: 'Heather Beahan (male)',
       num_orders: 4,
       lifetime_value: 9614.73
     },
     {
-      customer_name: 'Bob Alan',
+      customer_name: 'Peggy Will (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Bob Chapman',
+      customer_name: 'Renee Stamm (male)',
       num_orders: 2,
       lifetime_value: 4746.34
     },
     {
-      customer_name: 'Bob Fernandez',
+      customer_name: 'Fannie Schiller (male)',
       num_orders: 2,
       lifetime_value: 166.89
     },
     {
-      customer_name: 'Bob Garcia',
+      customer_name: 'Dr. Dave Reichert (female)',
       num_orders: 1,
       lifetime_value: 595.96
     },
     {
-      customer_name: 'Bob Gonzalez',
+      customer_name: 'Chester Auer Jr. (male)',
       num_orders: 2,
       lifetime_value: 3807.3996
     },
     {
-      customer_name: 'Bob Kapoor',
+      customer_name: 'Jorge Legros (female)',
       num_orders: 1,
       lifetime_value: 564.99
     },
     {
-      customer_name: 'Bob Lopez',
+      customer_name: 'Angelina Hartmann (female)',
       num_orders: 2,
       lifetime_value: 3831.8896
     },
     {
-      customer_name: 'Bobby Mehta',
+      customer_name: 'Ms. Ollie Von-Schamberger (male)',
       num_orders: 1,
       lifetime_value: 89.97
     },
     {
-      customer_name: 'Bobby Perez',
+      customer_name: 'Pat Altenwerth (male)',
       num_orders: 2,
       lifetime_value: 61.96
     },
     {
-      customer_name: 'Bobby Prasad',
+      customer_name: 'Cedric Bechtelar (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Bobby Raman',
+      customer_name: 'Dr. Daryl Weimann (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Bobby Ray',
+      customer_name: 'Rodney Franecki (female)',
       num_orders: 2,
       lifetime_value: 94.26
     },
     {
-      customer_name: 'Bobby Rodriguez',
+      customer_name: 'Kenneth Gibson (female)',
       num_orders: 2,
       lifetime_value: 73.54
     },
     {
-      customer_name: 'Bobby Sai',
+      customer_name: 'Casey Herman (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Bobby Sanchez',
+      customer_name: 'Sergio Swift (male)',
       num_orders: 3,
       lifetime_value: 3743.3925
     },
     {
-      customer_name: 'Bobby Saunders',
+      customer_name: 'Austin Rohan (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Bobby Subram',
+      customer_name: 'Bethany Bednar (male)',
       num_orders: 2,
       lifetime_value: 117.93
     },
     {
-      customer_name: 'Bobby Suri',
+      customer_name: 'Tanya Feeney MD (male)',
       num_orders: 1,
       lifetime_value: 608.96
     },
     {
-      customer_name: 'Bobby Van',
+      customer_name: 'Colleen McGlynn (female)',
       num_orders: 2,
       lifetime_value: 4813.95
     },
     {
-      customer_name: 'Brad Pritchett',
+      customer_name: 'Everett Lemke MD (male)',
       num_orders: 2,
       lifetime_value: 245.25
     },
     {
-      customer_name: 'Bradley Anand',
+      customer_name: 'Wm Veum (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Bradley Andersen',
+      customer_name: 'Pat Wisozk (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Bradley Beck',
+      customer_name: 'Vera Kohler (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Bradley Carson',
+      customer_name: 'Israel Beier (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Bradley Chande',
+      customer_name: 'Ms. Kristi Heller (female)',
       num_orders: 1,
       lifetime_value: 1170.48
     },
     {
-      customer_name: 'Bradley Goel',
+      customer_name: 'Dana Ritchie V (female)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Bradley Jai',
+      customer_name: 'Eula Powlowski II (male)',
       num_orders: 1,
       lifetime_value: 1145.48
     },
     {
-      customer_name: 'Bradley Kumar',
+      customer_name: 'Dr. Adam Kozey-Adams (female)',
       num_orders: 1,
       lifetime_value: 123.98
     },
     {
-      customer_name: 'Bradley Lal',
+      customer_name: 'Elaine Schneider-Schmidt (female)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Bradley Luo',
+      customer_name: 'Dr. Ada Bradtke (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Bradley Nara',
+      customer_name: 'Cecil Casper III (male)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Bradley Pal',
+      customer_name: 'Lowell Hayes (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Bradley Rai',
+      customer_name: 'Ms. Cecelia Crona (female)',
       num_orders: 1,
       lifetime_value: 68.49
     },
     {
-      customer_name: 'Bradley Raje',
+      customer_name: 'Michelle Feeney (female)',
       num_orders: 1,
       lifetime_value: 2512.32
     },
     {
-      customer_name: 'Bradley Raji',
+      customer_name: 'Roberta Gusikowski I (male)',
       num_orders: 1,
       lifetime_value: 67.93
     },
     {
-      customer_name: 'Bradley Sharma',
+      customer_name: 'Lindsey Nicolas (female)',
       num_orders: 1,
       lifetime_value: 1174.48
     },
     {
-      customer_name: 'Bradley She',
+      customer_name: 'Katrina Will-Koss (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Bradley Shen',
+      customer_name: 'Peter Greenholt (male)',
       num_orders: 1,
       lifetime_value: 144.47
     },
     {
-      customer_name: 'Bradley Tang',
+      customer_name: 'Ronald Hammes (male)',
       num_orders: 2,
       lifetime_value: 5314.25
     },
     {
-      customer_name: 'Bradley Xie',
+      customer_name: 'Dr. Edgar Beer (female)',
       num_orders: 1,
       lifetime_value: 37.27
     },
     {
-      customer_name: 'Bradley Xu',
+      customer_name: 'Sonia Brown (male)',
       num_orders: 2,
       lifetime_value: 5328.23
     },
     {
-      customer_name: 'Bradley Yuan',
+      customer_name: 'Dr. Charlotte Beahan II (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Brandi Alonso',
+      customer_name: 'Walter Bergstrom (male)',
       num_orders: 1,
       lifetime_value: 2380.47
     },
     {
-      customer_name: 'Brandi Ashe',
+      customer_name: 'Maurice Glover (female)',
       num_orders: 1,
       lifetime_value: 127.28
     },
     {
-      customer_name: 'Brandi Blanco',
+      customer_name: 'Bruce Walker-Gorczany (male)',
       num_orders: 2,
       lifetime_value: 6029.57
     },
     {
-      customer_name: 'Brandi Carlson',
+      customer_name: 'Joan Berge (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Brandi Diaz',
+      customer_name: 'Hattie Zemlak (male)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Brandi Dominguez',
+      customer_name: 'Dr. Michele Lubowitz (male)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Brandi Gill',
+      customer_name: 'Meredith Streich (female)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Brandi Gomez',
+      customer_name: 'Kendra Schowalter MD (female)',
       num_orders: 2,
       lifetime_value: 5333.25
     },
     {
-      customer_name: 'Brandi Gutierrez',
+      customer_name: 'Johnnie Purdy (male)',
       num_orders: 2,
       lifetime_value: 6056.61
     },
     {
-      customer_name: 'Brandi Hernandez',
+      customer_name: 'Jamie Rodriguez (male)',
       num_orders: 1,
       lifetime_value: 539.99
     },
     {
-      customer_name: 'Brandi Jiménez',
+      customer_name: 'Kathy Bergnaum DVM (male)',
       num_orders: 1,
       lifetime_value: 616.91
     },
     {
-      customer_name: 'Brandi Martin',
+      customer_name: 'Max Kuvalis (female)',
       num_orders: 2,
       lifetime_value: 97.96
     },
     {
-      customer_name: 'Brandi Munoz',
+      customer_name: 'Dr. Craig Beahan (male)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Brandi Navarro',
+      customer_name: 'Margie Rath (male)',
       num_orders: 1,
       lifetime_value: 2318.96
     },
     {
-      customer_name: 'Brandi Ortega',
+      customer_name: 'Misty Bernier (female)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Brandi Romero',
+      customer_name: 'Delbert Morissette (male)',
       num_orders: 1,
       lifetime_value: 2351.96
     },
     {
-      customer_name: 'Brandi Rubio',
+      customer_name: 'Juanita Zboncak (male)',
       num_orders: 1,
       lifetime_value: 128.97
     },
     {
-      customer_name: 'Brandi Ruiz',
+      customer_name: 'Miss Anita Johns (male)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Brandi Sanz',
+      customer_name: 'Willis Streich (male)',
       num_orders: 1,
       lifetime_value: 123.98
     },
     {
-      customer_name: 'Brandi Serrano',
+      customer_name: 'Harriet Huel (male)',
       num_orders: 2,
       lifetime_value: 6121.71
     },
     {
-      customer_name: 'Brandi Suarez',
+      customer_name: 'Colin Larkin (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Brandi Vazquez',
+      customer_name: 'Jeremy Gerhold (female)',
       num_orders: 2,
       lifetime_value: 6029.57
     },
     {
-      customer_name: 'Brandon Anderson',
+      customer_name: 'Rufus Schuster (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Brandon Brown',
+      customer_name: 'Alyssa Kovacek (female)',
       num_orders: 1,
       lifetime_value: 2359.98
     },
     {
-      customer_name: 'Brandon Clark',
+      customer_name: 'Laura Volkman (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Brandon Davis',
+      customer_name: 'Leonard Stracke (female)',
       num_orders: 1,
       lifetime_value: 1709.98
     },
     {
-      customer_name: 'Brandon Garcia',
+      customer_name: "Sidney O'Keefe (female)",
       num_orders: 1,
       lifetime_value: 1775.47
     },
     {
-      customer_name: 'Brandon Harris',
+      customer_name: 'Ellen Nader Sr. (male)',
       num_orders: 1,
       lifetime_value: 12.94
     },
     {
-      customer_name: 'Brandon Jackson',
+      customer_name: 'Rochelle Kozey (female)',
       num_orders: 2,
       lifetime_value: 6093.2
     },
     {
-      customer_name: 'Brandon Johnson',
+      customer_name: 'Jill Murazik (female)',
       num_orders: 1,
       lifetime_value: 2334.46
     },
     {
-      customer_name: 'Brandon Jones',
+      customer_name: 'Warren Doyle (male)',
       num_orders: 1,
       lifetime_value: 2329.98
     },
     {
-      customer_name: 'Brandon Lee',
+      customer_name: 'Paulette Doyle (male)',
       num_orders: 2,
       lifetime_value: 4698.76
     },
     {
-      customer_name: 'Brandon Lewis',
+      customer_name: 'Lola Rosenbaum (female)',
       num_orders: 2,
       lifetime_value: 4748.24
     },
     {
-      customer_name: 'Brandon Martin',
+      customer_name: 'Mark Lehner-Gorczany (female)',
       num_orders: 1,
       lifetime_value: 1750.98
     },
     {
-      customer_name: 'Brandon Martinez',
+      customer_name: 'David West (female)',
       num_orders: 1,
       lifetime_value: 2380.47
     },
     {
-      customer_name: 'Brandon Miller',
+      customer_name: 'Silvia Reichel (female)',
       num_orders: 1,
       lifetime_value: 2312.26
     },
     {
-      customer_name: 'Brandon Moore',
+      customer_name: 'Marlene Schumm III (female)',
       num_orders: 1,
       lifetime_value: 21.49
     },
     {
-      customer_name: 'Brandon Robinson',
+      customer_name: 'Raymond Stracke (male)',
       num_orders: 1,
       lifetime_value: 25.48
     },
     {
-      customer_name: 'Brandon Rodriguez',
+      customer_name: 'Dr. Kayla Hahn DVM (male)',
       num_orders: 1,
       lifetime_value: 68.49
     },
     {
-      customer_name: 'Brandon Smith',
+      customer_name: 'Francisco Huel (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Brandon Taylor',
+      customer_name: 'Dr. Rodolfo McKenzie (male)',
       num_orders: 2,
       lifetime_value: 45.95
     },
     {
-      customer_name: 'Brandon Thomas',
+      customer_name: 'Paul Koss (male)',
       num_orders: 2,
       lifetime_value: 158.95
     },
     {
-      customer_name: 'Brandon Thompson',
+      customer_name: 'Dr. Wilbert Haley (female)',
       num_orders: 2,
       lifetime_value: 100.96
     },
     {
-      customer_name: 'Brandon Walker',
+      customer_name: 'Nora Effertz (male)',
       num_orders: 2,
       lifetime_value: 5279.26
     },
     {
-      customer_name: 'Brandon White',
+      customer_name: 'Joanne Rath DVM (male)',
       num_orders: 2,
       lifetime_value: 64.88
     },
     {
-      customer_name: 'Brandon Williams',
+      customer_name: 'Diana Kris (female)',
       num_orders: 1,
       lifetime_value: 1754.98
     },
     {
-      customer_name: 'Brandon Wilson',
+      customer_name: 'Lynda Okuneva (female)',
       num_orders: 1,
       lifetime_value: 25.48
     },
     {
-      customer_name: 'Brandy Arun',
+      customer_name: 'Jill Pfannerstill (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Brandy Chandra',
+      customer_name: 'Jeremiah Schoen (male)',
       num_orders: 1,
       lifetime_value: 48.97
     },
     {
-      customer_name: 'Brandy Fernandez',
+      customer_name: 'Patty Lind (female)',
       num_orders: 1,
       lifetime_value: 2331.95
     },
     {
-      customer_name: 'Brandy Garcia',
+      customer_name: 'Laurence Kihn (male)',
       num_orders: 1,
       lifetime_value: 2394.97
     },
     {
-      customer_name: 'Brandy Gonzalez',
+      customer_name: 'Lena Blick (female)',
       num_orders: 2,
       lifetime_value: 86.96
     },
     {
-      customer_name: 'Brandy Kapoor',
+      customer_name: 'Garrett Tromp-Legros (male)',
       num_orders: 1,
       lifetime_value: 67.93
     },
     {
-      customer_name: 'Brandy Lopez',
+      customer_name: 'Anita McCullough (male)',
       num_orders: 1,
       lifetime_value: 1779.47
     },
     {
-      customer_name: 'Brandy Madan',
+      customer_name: 'Grant Crist IV (female)',
       num_orders: 1,
       lifetime_value: 2496.27
     },
     {
-      customer_name: 'Brandy Malhotra',
+      customer_name: 'Elmer Walsh (female)',
       num_orders: 1,
       lifetime_value: 2376.96
     },
     {
-      customer_name: 'Brandy Martinez',
+      customer_name: 'Mr. Roy Kub-Grimes (male)',
       num_orders: 1,
       lifetime_value: 1700.99
     },
     {
-      customer_name: 'Brandy Mehta',
+      customer_name: 'Elaine Crist PhD (female)',
       num_orders: 1,
       lifetime_value: 1810.46
     },
     {
-      customer_name: 'Brandy Patel',
+      customer_name: 'Vanessa Wiza (female)',
       num_orders: 2,
       lifetime_value: 4167.23
     },
     {
-      customer_name: 'Brandy Perez',
+      customer_name: 'Tony Daugherty (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Brandy Prasad',
+      customer_name: 'Catherine Macejkovic (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Brandy Raman',
+      customer_name: 'Dr. Roland Jacobi (female)',
       num_orders: 1,
       lifetime_value: 1155.48
     },
     {
-      customer_name: 'Brandy Rana',
+      customer_name: 'Desiree Kuhlman-Kshlerin (male)',
       num_orders: 1,
       lifetime_value: 1754.98
     },
     {
-      customer_name: 'Brandy Sai',
+      customer_name: 'Nancy Weissnat (female)',
       num_orders: 1,
       lifetime_value: 1155.48
     },
     {
-      customer_name: 'Brandy Sanchez',
+      customer_name: 'Miss Jaime Windler (male)',
       num_orders: 1,
       lifetime_value: 128.97
     },
     {
-      customer_name: 'Brandy Saunders',
+      customer_name: 'Owen White (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Brandy Srini',
+      customer_name: 'Ivan Swift (female)',
       num_orders: 1,
       lifetime_value: 2376.45
     },
     {
-      customer_name: 'Brandy Subram',
+      customer_name: 'Pamela Beier (male)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Brandy Suri',
+      customer_name: 'Rosalie Nitzsche (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Brenda Arun',
+      customer_name: 'Randolph King (male)',
       num_orders: 1,
       lifetime_value: 51.46
     },
     {
-      customer_name: 'Brenda Chandra',
+      customer_name: 'Elias Christiansen (female)',
       num_orders: 2,
       lifetime_value: 3114.94
     },
     {
-      customer_name: 'Brenda Fernandez',
+      customer_name: 'Phil Abbott (female)',
       num_orders: 3,
       lifetime_value: 167.9
     },
     {
-      customer_name: 'Brenda Garcia',
+      customer_name: 'Alexis Grant (male)',
       num_orders: 3,
       lifetime_value: 136.24
     },
     {
-      customer_name: 'Brenda Gonzalez',
+      customer_name: 'Ms. Tabitha Upton (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Brenda Kapoor',
+      customer_name: 'Dave Nienow (male)',
       num_orders: 2,
       lifetime_value: 1631.46
     },
     {
-      customer_name: 'Brenda Lopez',
+      customer_name: 'Milton Ziemann (female)',
       num_orders: 2,
       lifetime_value: 3145.26
     },
     {
-      customer_name: 'Brenda Madan',
+      customer_name: 'Elizabeth Wolff (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Brenda Malhotra',
+      customer_name: 'Dana Donnelly (male)',
       num_orders: 1,
       lifetime_value: 35
     },
     {
-      customer_name: 'Brenda Martinez',
+      customer_name: 'Joseph Collier (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Brenda Mehta',
+      customer_name: 'Miss Jeanne Wolff (female)',
       num_orders: 1,
       lifetime_value: 67.93
     },
     {
-      customer_name: 'Brenda Perez',
+      customer_name: 'Essie Sanford (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Brenda Prasad',
+      customer_name: 'Miss Regina Waters (female)',
       num_orders: 2,
       lifetime_value: 3183.94
     },
     {
-      customer_name: 'Brenda Rana',
+      customer_name: 'Wilson Armstrong IV (male)',
       num_orders: 2,
       lifetime_value: 3178.95
     },
     {
-      customer_name: 'Brenda Rodriguez',
+      customer_name: 'Chris Larson (female)',
       num_orders: 2,
       lifetime_value: 3127.95
     },
     {
-      customer_name: 'Brenda Sai',
+      customer_name: 'Mr. Russell Schinner (female)',
       num_orders: 3,
       lifetime_value: 7232.37
     },
     {
-      customer_name: 'Brenda Sanchez',
+      customer_name: 'Madeline Gulgowski (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Brenda Saunders',
+      customer_name: 'Jenny Treutel (female)',
       num_orders: 1,
       lifetime_value: 59.98
     },
     {
-      customer_name: 'Brenda Stone',
+      customer_name: 'Dr. Clinton Gusikowski PhD (female)',
       num_orders: 2,
       lifetime_value: 4745.02
     },
     {
-      customer_name: 'Brenda Subram',
+      customer_name: 'Geraldine Bednar (female)',
       num_orders: 2,
       lifetime_value: 3177.96
     },
     {
-      customer_name: 'Brenda Suri',
+      customer_name: 'Dominic Jones (male)',
       num_orders: 2,
       lifetime_value: 3247.25
     },
     {
-      customer_name: 'Brenda Van',
+      customer_name: 'Jill Bayer (female)',
       num_orders: 2,
       lifetime_value: 325.83
     },
     {
-      customer_name: 'Brent Chen',
+      customer_name: 'Kari Fahey (male)',
       num_orders: 2,
       lifetime_value: 2450.0782
     },
     {
-      customer_name: 'Brent Gao',
+      customer_name: 'Loretta Cummerata (female)',
       num_orders: 1,
       lifetime_value: 27.77
     },
     {
-      customer_name: 'Brent Guo',
+      customer_name: 'Mr. Sidney Streich (male)',
       num_orders: 1,
       lifetime_value: 39.22
     },
     {
-      customer_name: 'Brent He',
+      customer_name: 'Lorraine Windler (male)',
       num_orders: 1,
       lifetime_value: 187.98
     },
     {
-      customer_name: 'Brent Huang',
+      customer_name: 'Jennie Stoltenberg DVM (male)',
       num_orders: 1,
       lifetime_value: 69.97
     },
     {
-      customer_name: 'Brent Li',
+      customer_name: 'Mitchell Langworth (male)',
       num_orders: 2,
       lifetime_value: 3932.5425
     },
     {
-      customer_name: 'Brent Lin',
+      customer_name: 'Kristina Little (male)',
       num_orders: 1,
       lifetime_value: 31.27
     },
     {
-      customer_name: 'Brent Lu',
+      customer_name: 'Cassandra Bauch (female)',
       num_orders: 1,
       lifetime_value: 38.98
     },
     {
-      customer_name: 'Brent Ma',
+      customer_name: 'Taylor Schinner (female)',
       num_orders: 1,
       lifetime_value: 37.27
     },
     {
-      customer_name: 'Brent McDonald',
+      customer_name: 'Rosemary Marvin (male)',
       num_orders: 1,
       lifetime_value: 24.99
     },
     {
-      customer_name: 'Brent Stone',
+      customer_name: 'Sabrina Klocko (female)',
       num_orders: 1,
       lifetime_value: 64.97
     },
     {
-      customer_name: 'Brent Sun',
+      customer_name: 'Mae Bradtke-Fay (female)',
       num_orders: 2,
       lifetime_value: 2459.0682
     },
     {
-      customer_name: 'Brent Wang',
+      customer_name: 'Jana Ziemann (female)',
       num_orders: 3,
       lifetime_value: 5790.8625
     },
     {
-      customer_name: 'Brent Wu',
+      customer_name: 'Owen Crooks (female)',
       num_orders: 2,
       lifetime_value: 2454.0782
     },
     {
-      customer_name: 'Brent Yang',
+      customer_name: 'Gwendolyn Thompson (female)',
       num_orders: 1,
       lifetime_value: 27.28
     },
     {
-      customer_name: 'Brent Ye',
+      customer_name: 'Rodney Schultz (male)',
       num_orders: 2,
       lifetime_value: 1518.5782
     },
     {
-      customer_name: 'Brent Zeng',
+      customer_name: 'Naomi Grimes (female)',
       num_orders: 1,
       lifetime_value: 82.97
     },
     {
-      customer_name: 'Brent Zhang',
+      customer_name: 'Jeanette Mayert (male)',
       num_orders: 3,
       lifetime_value: 6083.17
     },
     {
-      customer_name: 'Brent Zhao',
+      customer_name: 'Edmond Denesik (female)',
       num_orders: 3,
       lifetime_value: 5804.8725
     },
     {
-      customer_name: 'Brent Zheng',
+      customer_name: 'Mr. Wilbur Gerlach (male)',
       num_orders: 2,
       lifetime_value: 2988.3225
     },
     {
-      customer_name: 'Brent Zhou',
+      customer_name: 'Clarence Heaney (female)',
       num_orders: 1,
       lifetime_value: 27.28
     },
     {
-      customer_name: 'Brent Zhu',
+      customer_name: 'April Howell (male)',
       num_orders: 2,
       lifetime_value: 2590.3582
     },
     {
-      customer_name: 'Brett Arun',
+      customer_name: 'Mrs. Tabitha Von V (female)',
       num_orders: 2,
       lifetime_value: 3565.3575
     },
     {
-      customer_name: 'Brett Chandra',
+      customer_name: 'Deanna Carroll (male)',
       num_orders: 1,
       lifetime_value: 38.98
     },
     {
-      customer_name: 'Brett Fernandez',
+      customer_name: 'Craig Nikolaus (female)',
       num_orders: 1,
       lifetime_value: 53.98
     },
     {
-      customer_name: 'Brett Garcia',
+      customer_name: 'Cynthia Hamill (female)',
       num_orders: 2,
       lifetime_value: 1894.0682
     },
     {
-      customer_name: 'Brett Gonzalez',
+      customer_name: 'Kevin Okuneva (female)',
       num_orders: 1,
       lifetime_value: 1179.47
     },
     {
-      customer_name: 'Brett Kapoor',
+      customer_name: 'Lydia Rutherford (male)',
       num_orders: 1,
       lifetime_value: 47.97
     },
     {
-      customer_name: 'Brett Lopez',
+      customer_name: 'Faye Schumm (male)',
       num_orders: 1,
       lifetime_value: 31.27
     },
     {
-      customer_name: 'Brett Madan',
+      customer_name: 'Elizabeth Hickle (female)',
       num_orders: 2,
       lifetime_value: 1391.95
     },
     {
-      customer_name: 'Brett Malhotra',
+      customer_name: 'Josephine Rempel (female)',
       num_orders: 1,
       lifetime_value: 38.98
     },
     {
-      customer_name: 'Brett Martinez',
+      customer_name: 'Aaron Lemke (female)',
       num_orders: 2,
       lifetime_value: 80.21
     },
     {
-      customer_name: 'Brett Mehta',
+      customer_name: 'Todd Rosenbaum (male)',
       num_orders: 1,
       lifetime_value: 78.96
     },
     {
-      customer_name: 'Brett Patel',
+      customer_name: 'Darnell Kuphal Sr. (male)',
       num_orders: 1,
       lifetime_value: 62.97
     },
     {
-      customer_name: 'Brett Perez',
+      customer_name: 'Kristi Carroll (male)',
       num_orders: 1,
       lifetime_value: 1205.47
     },
     {
-      customer_name: 'Brett Prasad',
+      customer_name: 'Cory Kautzer (female)',
       num_orders: 1,
       lifetime_value: 6.28
     },
     {
-      customer_name: 'Brett Raman',
+      customer_name: 'Frederick Tromp (male)',
       num_orders: 2,
       lifetime_value: 3524.3575
     },
     {
-      customer_name: 'Brett Rana',
+      customer_name: 'Mr. Jody Emard (male)',
       num_orders: 2,
       lifetime_value: 3451.7375
     },
     {
-      customer_name: 'Brett Rodriguez',
+      customer_name: 'Alexander Koss (male)',
       num_orders: 1,
       lifetime_value: 1169.46
     },
     {
-      customer_name: 'Brett Sai',
+      customer_name: 'Antoinette Tromp (female)',
       num_orders: 1,
       lifetime_value: 31.27
     },
     {
-      customer_name: 'Brett Sanchez',
+      customer_name: 'Carrie Bednar (female)',
       num_orders: 1,
       lifetime_value: 1179.97
     },
     {
-      customer_name: 'Brett Srini',
+      customer_name: 'Mrs. Luz Grimes (female)',
       num_orders: 2,
       lifetime_value: 3480.3775
     },
     {
-      customer_name: 'Brett Subram',
+      customer_name: 'Johnnie Abbott (female)',
       num_orders: 1,
       lifetime_value: 86.26
     },
     {
-      customer_name: 'Brett Van',
+      customer_name: 'Phillip Kunde Jr. (female)',
       num_orders: 2,
       lifetime_value: 3515.3675
     },
     {
-      customer_name: 'Brian Albrecht',
+      customer_name: 'Rafael Champlin (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Brian Bailey',
+      customer_name: 'Paula Dietrich (female)',
       num_orders: 2,
       lifetime_value: 90.75
     },
     {
-      customer_name: 'Brian Bell',
+      customer_name: 'Dr. Bob Casper (female)',
       num_orders: 1,
       lifetime_value: 26.97
     },
     {
-      customer_name: 'Brian Brooks',
+      customer_name: 'Brenda Schmitt (male)',
       num_orders: 2,
       lifetime_value: 3750.0882
     },
     {
-      customer_name: 'Brian Cook',
+      customer_name: 'Lee Crona (male)',
       num_orders: 2,
       lifetime_value: 3153.95
     },
     {
-      customer_name: 'Brian Cooper',
+      customer_name: 'Santiago Auer IV (female)',
       num_orders: 2,
       lifetime_value: 1601.5582
     },
     {
-      customer_name: 'Brian Cox',
+      customer_name: 'Nichole Casper (male)',
       num_orders: 1,
       lifetime_value: 48.97
     },
     {
-      customer_name: 'Brian Gray',
+      customer_name: 'Salvatore Boyer (female)',
       num_orders: 1,
       lifetime_value: 67.93
     },
     {
-      customer_name: 'Brian Howard',
+      customer_name: 'Flora Rosenbaum (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Brian James',
+      customer_name: 'Mr. Homer Langworth (female)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Brian Kelly',
+      customer_name: 'Ignacio Breitenberg (female)',
       num_orders: 3,
       lifetime_value: 8321.31
     },
     {
-      customer_name: 'Brian Lauer',
+      customer_name: 'Maggie Bins IV (male)',
       num_orders: 1,
       lifetime_value: 2405.47
     },
     {
-      customer_name: 'Brian Morgan',
+      customer_name: 'Eleanor Connelly (male)',
       num_orders: 3,
       lifetime_value: 6795.6
     },
     {
-      customer_name: 'Brian Morris',
+      customer_name: 'Percy Mills (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Brian Murphy',
+      customer_name: 'Kenny Beahan (female)',
       num_orders: 2,
       lifetime_value: 5917.24
     },
     {
-      customer_name: 'Brian Peterson',
+      customer_name: 'Karl Schoen (male)',
       num_orders: 2,
       lifetime_value: 1848.9075
     },
     {
-      customer_name: 'Brian Ramirez',
+      customer_name: 'Jeanne Lynch (female)',
       num_orders: 1,
       lifetime_value: 48.97
     },
     {
-      customer_name: 'Brian Reed',
+      customer_name: 'Harvey Daugherty (female)',
       num_orders: 2,
       lifetime_value: 32.28
     },
     {
-      customer_name: 'Brian Richardson',
+      customer_name: 'Domingo Treutel (female)',
       num_orders: 1,
       lifetime_value: 39.99
     },
     {
-      customer_name: 'Brian Rivera',
+      customer_name: 'Andrea Block (female)',
       num_orders: 2,
       lifetime_value: 4446.3996
     },
     {
-      customer_name: 'Brian Rogers',
+      customer_name: 'Arturo Stamm (male)',
       num_orders: 2,
       lifetime_value: 3105.27
     },
     {
-      customer_name: 'Brian Sanchez',
+      customer_name: 'Kelly Schmeler (female)',
       num_orders: 2,
       lifetime_value: 78.96
     },
     {
-      customer_name: 'Brian Sanders',
+      customer_name: "Cecilia D'Amore (female)",
       num_orders: 1,
       lifetime_value: 84.92
     },
     {
-      customer_name: 'Brian Stewart',
+      customer_name: 'Jenny Lebsack (male)',
       num_orders: 2,
       lifetime_value: 43.21
     },
     {
-      customer_name: 'Brian Torres',
+      customer_name: 'Dominic Lemke (female)',
       num_orders: 2,
       lifetime_value: 1848.9075
     },
     {
-      customer_name: 'Brian Watson',
+      customer_name: 'Wilma Shields (female)',
       num_orders: 2,
       lifetime_value: 114.96
     },
     {
-      customer_name: 'Briana Alonso',
+      customer_name: 'Ms. Jacqueline Gislason Sr. (female)',
       num_orders: 2,
       lifetime_value: 4607.2296
     },
     {
-      customer_name: 'Briana Ashe',
+      customer_name: 'Dolores Hintz (female)',
       num_orders: 1,
       lifetime_value: 75.97
     },
     {
-      customer_name: 'Briana Carlson',
+      customer_name: 'Georgia Batz (female)',
       num_orders: 1,
       lifetime_value: 100.46
     },
     {
-      customer_name: 'Briana Diaz',
+      customer_name: 'Mr. Walter Zulauf (female)',
       num_orders: 4,
       lifetime_value: 7300.55
     },
     {
-      customer_name: 'Briana Dominguez',
+      customer_name: 'Hattie Parker (male)',
       num_orders: 3,
       lifetime_value: 6824.7296
     },
     {
-      customer_name: 'Briana Gill',
+      customer_name: 'Sophie Hilpert (male)',
       num_orders: 2,
       lifetime_value: 4546.7925
     },
     {
-      customer_name: 'Briana Gomez',
+      customer_name: 'Wendell Muller (female)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Briana Gutierrez',
+      customer_name: 'Marco Thompson (male)',
       num_orders: 3,
       lifetime_value: 8306.3
     },
     {
-      customer_name: 'Briana Jiménez',
+      customer_name: 'Melanie Beier-Ortiz (male)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Briana Martin',
+      customer_name: 'Alejandro Ullrich (female)',
       num_orders: 2,
       lifetime_value: 4476.5525
     },
     {
-      customer_name: 'Briana Moreno',
+      customer_name: 'Gail Kuvalis (female)',
       num_orders: 2,
       lifetime_value: 4740.63
     },
     {
-      customer_name: 'Briana Munoz',
+      customer_name: 'Lynne Larson Sr. (female)',
       num_orders: 2,
       lifetime_value: 5923.23
     },
     {
-      customer_name: 'Briana Ortega',
+      customer_name: 'Edwin Rogahn (male)',
       num_orders: 2,
       lifetime_value: 3242.83
     },
     {
-      customer_name: 'Briana Ramos',
+      customer_name: 'Bertha Barton-Reilly (male)',
       num_orders: 2,
       lifetime_value: 3282.81
     },
     {
-      customer_name: 'Briana Romero',
+      customer_name: 'Donald Leffler (male)',
       num_orders: 1,
       lifetime_value: 94.48
     },
     {
-      customer_name: 'Briana Ruiz',
+      customer_name: 'Jaime Brakus (male)',
       num_orders: 2,
       lifetime_value: 4548.5025
     },
     {
-      customer_name: 'Briana Sandoval',
+      customer_name: 'Lola Parker (male)',
       num_orders: 2,
       lifetime_value: 3262.83
     },
     {
-      customer_name: 'Briana Suarez',
+      customer_name: 'Kay Bradtke (female)',
       num_orders: 2,
       lifetime_value: 3063.0025
     },
     {
-      customer_name: 'Briana Torres',
+      customer_name: 'Stella Wisozk (male)',
       num_orders: 3,
       lifetime_value: 114.21
     },
     {
-      customer_name: 'Brianna Alexander',
+      customer_name: 'Norman Labadie (female)',
       num_orders: 2,
       lifetime_value: 2547.95
     },
     {
-      customer_name: 'Brianna Anderson',
+      customer_name: 'Donna Larson (female)',
       num_orders: 2,
       lifetime_value: 117.95
     },
     {
-      customer_name: 'Brianna Bailey',
+      customer_name: 'Glenn Sawayn DDS (male)',
       num_orders: 1,
       lifetime_value: 1120.49
     },
     {
-      customer_name: 'Brianna Bell',
+      customer_name: 'Gabriel Reynolds V (female)',
       num_orders: 1,
       lifetime_value: 1155.48
     },
     {
-      customer_name: 'Brianna Brooks',
+      customer_name: 'Joshua Corkery (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Brianna Bryant',
+      customer_name: 'Gary Ortiz (female)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Brianna Butler',
+      customer_name: 'Shaun Rath I (male)',
       num_orders: 1,
       lifetime_value: 42.28
     },
     {
-      customer_name: 'Brianna Clark',
+      customer_name: 'Ethel Goldner (female)',
       num_orders: 2,
       lifetime_value: 109.97
     },
     {
-      customer_name: 'Brianna Cook',
+      customer_name: 'Harold Ebert (male)',
       num_orders: 2,
       lifetime_value: 1589.75
     },
     {
-      customer_name: 'Brianna Cooper',
+      customer_name: 'Patrick Jaskolski (male)',
       num_orders: 1,
       lifetime_value: 1249.84
     },
     {
-      customer_name: 'Brianna Cox',
+      customer_name: 'Cindy Kshlerin (male)',
       num_orders: 1,
       lifetime_value: 574.98
     },
     {
-      customer_name: 'Brianna Davis',
+      customer_name: 'Bruce Upton (male)',
       num_orders: 2,
       lifetime_value: 191.95
     },
     {
-      customer_name: 'Brianna Diaz',
+      customer_name: 'Rosie Bosco V (female)',
       num_orders: 2,
       lifetime_value: 2520.91
     },
     {
-      customer_name: 'Brianna Flores',
+      customer_name: 'Brendan Turcotte (female)',
       num_orders: 1,
       lifetime_value: 82.97
     },
     {
-      customer_name: 'Brianna Foster',
+      customer_name: 'Alvin Koelpin (male)',
       num_orders: 2,
       lifetime_value: 4153.25
     },
     {
-      customer_name: 'Brianna Garcia',
+      customer_name: 'Theodore Lockman (female)',
       num_orders: 2,
       lifetime_value: 134.46
     },
     {
-      customer_name: 'Brianna Gonzales',
+      customer_name: 'Christie Heidenreich (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Brianna Gray',
+      customer_name: 'Hubert Rempel (male)',
       num_orders: 3,
       lifetime_value: 97.62
     },
     {
-      customer_name: 'Brianna Griffin',
+      customer_name: 'Wayne Bruen (female)',
       num_orders: 2,
       lifetime_value: 2537.97
     },
     {
-      customer_name: 'Brianna Hall',
+      customer_name: 'Ray Schaefer (female)',
       num_orders: 2,
       lifetime_value: 72.28
     },
     {
-      customer_name: 'Brianna Harris',
+      customer_name: 'Loretta Abbott MD (female)',
       num_orders: 2,
       lifetime_value: 123.91
     },
     {
-      customer_name: 'Brianna Henderson',
+      customer_name: 'Brent Gerlach Jr. (male)',
       num_orders: 1,
       lifetime_value: 133.49
     },
     {
-      customer_name: 'Brianna Howard',
+      customer_name: 'Kevin Frami (male)',
       num_orders: 1,
       lifetime_value: 1120.49
     },
     {
-      customer_name: 'Brianna Hughes',
+      customer_name: 'Dr. Mathew Ratke (female)',
       num_orders: 1,
       lifetime_value: 28.98
     },
     {
-      customer_name: 'Brianna Jackson',
+      customer_name: 'Jeffrey Lindgren (male)',
       num_orders: 5,
       lifetime_value: 192.53
     },
     {
-      customer_name: 'Brianna James',
+      customer_name: 'Mr. Leon Crooks (male)',
       num_orders: 3,
       lifetime_value: 84.64
     },
     {
-      customer_name: 'Brianna Jenkins',
+      customer_name: 'Mamie Wintheiser (female)',
       num_orders: 1,
       lifetime_value: 147.28
     },
     {
-      customer_name: 'Brianna Johnson',
+      customer_name: 'Chelsea Lind (female)',
       num_orders: 2,
       lifetime_value: 5908.5
     },
     {
-      customer_name: 'Brianna Jones',
+      customer_name: 'Gloria Kutch (female)',
       num_orders: 27,
       lifetime_value: 1103.78
     },
     {
-      customer_name: 'Brianna Kelly',
+      customer_name: 'Gina Brakus (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Brianna Lee',
+      customer_name: 'Shane Frami (female)',
       num_orders: 5,
       lifetime_value: 384.09
     },
     {
-      customer_name: 'Brianna Lewis',
+      customer_name: 'Dr. Ella Upton (male)',
       num_orders: 2,
       lifetime_value: 4758.03
     },
     {
-      customer_name: 'Brianna Martin',
+      customer_name: 'Roy Gusikowski (male)',
       num_orders: 2,
       lifetime_value: 5962.24
     },
     {
-      customer_name: 'Brianna Martinez',
+      customer_name: 'Roy Hamill (female)',
       num_orders: 2,
       lifetime_value: 173.47
     },
     {
-      customer_name: 'Brianna McDonald',
+      customer_name: 'Mr. James Franecki (male)',
       num_orders: 2,
       lifetime_value: 2518.97
     },
     {
-      customer_name: 'Brianna Miller',
+      customer_name: 'Alma Dooley (male)',
       num_orders: 2,
       lifetime_value: 96.27
     },
     {
-      customer_name: 'Brianna Moore',
+      customer_name: 'Gretchen Pfeffer (male)',
       num_orders: 2,
       lifetime_value: 192.47
     },
     {
-      customer_name: 'Brianna Morgan',
+      customer_name: 'Dr. Kathy Balistreri Sr. (male)',
       num_orders: 3,
       lifetime_value: 4657.7375
     },
     {
-      customer_name: 'Brianna Morris',
+      customer_name: 'Essie Jacobs (female)',
       num_orders: 1,
       lifetime_value: 147.28
     },
     {
-      customer_name: 'Brianna Murphy',
+      customer_name: 'Luis Medhurst (male)',
       num_orders: 2,
       lifetime_value: 109.24
     },
     {
-      customer_name: 'Brianna Patterson',
+      customer_name: 'Tonya Schulist-Kiehn (male)',
       num_orders: 2,
       lifetime_value: 2739.8975
     },
     {
-      customer_name: 'Brianna Perry',
+      customer_name: 'Antonio Schulist (female)',
       num_orders: 1,
       lifetime_value: 27.28
     },
     {
-      customer_name: 'Brianna Peterson',
+      customer_name: 'Edgar Fisher (female)',
       num_orders: 1,
       lifetime_value: 132.97
     },
     {
-      customer_name: 'Brianna Powell',
+      customer_name: 'Kim Funk (male)',
       num_orders: 2,
       lifetime_value: 2701.4275
     },
     {
-      customer_name: 'Brianna Price',
+      customer_name: 'Dr. Omar Simonis (female)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Brianna Reed',
+      customer_name: 'Ernesto Daniel DDS (male)',
       num_orders: 2,
       lifetime_value: 1609.3975
     },
     {
-      customer_name: 'Brianna Richardson',
+      customer_name: 'Ellis Kling (male)',
       num_orders: 1,
       lifetime_value: 98.96
     },
     {
-      customer_name: 'Brianna Rivera',
+      customer_name: 'Christine Osinski (female)',
       num_orders: 1,
       lifetime_value: 539.99
     },
     {
-      customer_name: 'Brianna Robinson',
+      customer_name: 'Dana Batz (male)',
       num_orders: 2,
       lifetime_value: 194.98
     },
     {
-      customer_name: 'Brianna Rodriguez',
+      customer_name: 'Omar Beatty IV (male)',
       num_orders: 2,
       lifetime_value: 77.27
     },
     {
-      customer_name: 'Brianna Rogers',
+      customer_name: 'Carmen Hauck (male)',
       num_orders: 1,
       lifetime_value: 74.98
     },
     {
-      customer_name: 'Brianna Ross',
+      customer_name: 'Priscilla MacGyver (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Brianna Russell',
+      customer_name: 'Mr. Delbert Sauer (male)',
       num_orders: 2,
       lifetime_value: 1575.4175
     },
     {
-      customer_name: 'Brianna Sanchez',
+      customer_name: 'Jamie Littel (female)',
       num_orders: 1,
       lifetime_value: 48.97
     },
     {
-      customer_name: 'Brianna Sandberg',
+      customer_name: 'Mr. Peter Pfeffer (female)',
       num_orders: 2,
       lifetime_value: 60.96
     },
     {
-      customer_name: 'Brianna Simmons',
+      customer_name: 'Jill Kihn (male)',
       num_orders: 2,
       lifetime_value: 4118.26
     },
     {
-      customer_name: 'Brianna Smith',
+      customer_name: 'Dr. Vicki Kshlerin (female)',
       num_orders: 2,
       lifetime_value: 6025.22
     },
     {
-      customer_name: 'Brianna Stewart',
+      customer_name: 'Marion Stracke (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Brianna Taylor',
+      customer_name: 'Evan Kihn Sr. (female)',
       num_orders: 5,
       lifetime_value: 287.2
     },
     {
-      customer_name: 'Brianna Thomas',
+      customer_name: 'Agnes Padberg-Shields (male)',
       num_orders: 2,
       lifetime_value: 153.46
     },
     {
-      customer_name: 'Brianna Thompson',
+      customer_name: 'Candice Wiegand (male)',
       num_orders: 2,
       lifetime_value: 159.96
     },
     {
-      customer_name: 'Brianna Torres',
+      customer_name: 'Gregg Bruen (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Brianna Walker',
+      customer_name: 'Edith Kovacek (male)',
       num_orders: 2,
       lifetime_value: 6079.24
     },
     {
-      customer_name: 'Brianna Ward',
+      customer_name: 'Billie Hilll (male)',
       num_orders: 1,
       lifetime_value: 1174.48
     },
     {
-      customer_name: 'Brianna Watson',
+      customer_name: 'Juan Hermiston (male)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Brianna White',
+      customer_name: 'Bessie Kuvalis (female)',
       num_orders: 5,
       lifetime_value: 210.09
     },
     {
-      customer_name: 'Brianna Williams',
+      customer_name: 'Kelly Grant II (male)',
       num_orders: 5,
       lifetime_value: 325.89
     },
     {
-      customer_name: 'Brianna Wood',
+      customer_name: 'Ron Torp (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Brittney Cai',
+      customer_name: 'Tracey Fay (male)',
       num_orders: 2,
       lifetime_value: 151.43
     },
     {
-      customer_name: 'Brittney Chen',
+      customer_name: 'Kyle Gleichner (female)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Brittney Guo',
+      customer_name: 'Herbert Wisoky (female)',
       num_orders: 1,
       lifetime_value: 1714.97
     },
     {
-      customer_name: 'Brittney He',
+      customer_name: 'Nellie Miller Sr. (male)',
       num_orders: 1,
       lifetime_value: 1763.97
     },
     {
-      customer_name: 'Brittney Holt',
+      customer_name: 'Ramiro Steuber (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Brittney Hu',
+      customer_name: 'Stacey Keeling (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Brittney Liang',
+      customer_name: 'Nathaniel Skiles (male)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Brittney Lin',
+      customer_name: 'Omar Langosh (female)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Brittney Liu',
+      customer_name: 'Cynthia Veum (male)',
       num_orders: 1,
       lifetime_value: 2405.47
     },
     {
-      customer_name: 'Brittney Lu',
+      customer_name: 'Blanca Price-Crona (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Brittney Ma',
+      customer_name: 'Jenny Quigley (male)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Brittney She',
+      customer_name: 'Miss Susan Williamson (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Brittney Sun',
+      customer_name: 'Beth Sauer (female)',
       num_orders: 1,
       lifetime_value: 539.99
     },
     {
-      customer_name: 'Brittney West',
+      customer_name: 'Ms. Michele Cremin (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Brittney Wu',
+      customer_name: 'Rudolph Nicolas (male)',
       num_orders: 2,
       lifetime_value: 205.92
     },
     {
-      customer_name: 'Brittney Xu',
+      customer_name: 'Mike Larkin (female)',
       num_orders: 1,
       lifetime_value: 2423.48
     },
     {
-      customer_name: 'Brittney Ye',
+      customer_name: 'Violet Hilll (male)',
       num_orders: 1,
       lifetime_value: 2359.98
     },
     {
-      customer_name: 'Brittney Zeng',
+      customer_name: 'Garry Roberts (female)',
       num_orders: 1,
       lifetime_value: 2398.47
     },
     {
-      customer_name: 'Brittney Zhang',
+      customer_name: 'Jenny Cole (female)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Brittney Zhao',
+      customer_name: 'Mr. Lawrence Glover-Schinner (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Brittney Zheng',
+      customer_name: 'Rafael Hodkiewicz (female)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Brittney Zhou',
+      customer_name: 'Ms. Lorena Schamberger III (male)',
       num_orders: 1,
       lifetime_value: 2341.97
     },
     {
-      customer_name: 'Brittney Zhu',
+      customer_name: 'Elvira Fisher (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Bruce Ward',
+      customer_name: 'Alma Kutch (female)',
       num_orders: 1,
       lifetime_value: 127.28
     },
     {
-      customer_name: 'Bryan Bailey',
+      customer_name: 'Cody Wolf (female)',
       num_orders: 3,
       lifetime_value: 154.96
     },
     {
-      customer_name: 'Bryan Bell',
+      customer_name: 'Miss Sylvia Ondricka DVM (female)',
       num_orders: 2,
       lifetime_value: 3826.3996
     },
     {
-      customer_name: 'Bryan Cooper',
+      customer_name: 'Ella Stokes (male)',
       num_orders: 2,
       lifetime_value: 1602.0782
     },
     {
-      customer_name: 'Bryan Cox',
+      customer_name: 'Christine Marks-Kihn (male)',
       num_orders: 2,
       lifetime_value: 3001.0425
     },
     {
-      customer_name: 'Bryan Gray',
+      customer_name: 'Courtney Hegmann (female)',
       num_orders: 2,
       lifetime_value: 2994.0882
     },
     {
-      customer_name: 'Bryan Howard',
+      customer_name: 'Laverne Smitham (female)',
       num_orders: 1,
       lifetime_value: 32.28
     },
     {
-      customer_name: 'Bryan James',
+      customer_name: 'Tomas Swift (female)',
       num_orders: 2,
       lifetime_value: 59.98
     },
     {
-      customer_name: 'Bryan Kelly',
+      customer_name: 'Simon Prosacco (female)',
       num_orders: 2,
       lifetime_value: 137.94
     },
     {
-      customer_name: 'Bryan Morgan',
+      customer_name: 'Camille Murray (male)',
       num_orders: 2,
       lifetime_value: 2803.5225
     },
     {
-      customer_name: 'Bryan Morris',
+      customer_name: 'Connie White (female)',
       num_orders: 1,
       lifetime_value: 172.98
     },
     {
-      customer_name: 'Bryan Murphy',
+      customer_name: 'Alyssa Dare (male)',
       num_orders: 3,
       lifetime_value: 8421.28
     },
     {
-      customer_name: 'Bryan Ramirez',
+      customer_name: 'Helen Brown (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Bryan Reed',
+      customer_name: 'Leona Macejkovic (male)',
       num_orders: 2,
       lifetime_value: 138.95
     },
     {
-      customer_name: 'Bryan Rivera',
+      customer_name: 'Cary Collier (male)',
       num_orders: 2,
       lifetime_value: 4384.0782
     },
     {
-      customer_name: 'Bryan Rogers',
+      customer_name: 'Guadalupe Crist (female)',
       num_orders: 2,
       lifetime_value: 3152.96
     },
     {
-      customer_name: 'Bryan Sanchez',
+      customer_name: 'Delores Wolf (female)',
       num_orders: 2,
       lifetime_value: 2853.5782
     },
     {
-      customer_name: 'Bryan Sanders',
+      customer_name: 'Kristi Raynor-Schuppe (male)',
       num_orders: 1,
       lifetime_value: 96.46
     },
     {
-      customer_name: 'Bryan Stewart',
+      customer_name: 'Maryann Wisozk (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Bryan Townsend',
+      customer_name: 'Wendy Carroll III (male)',
       num_orders: 1,
       lifetime_value: 71.95
     },
     {
-      customer_name: 'Bryce Bailey',
+      customer_name: 'Pearl Quitzon (female)',
       num_orders: 2,
       lifetime_value: 4379.0782
     },
     {
-      customer_name: 'Bryce Bell',
+      customer_name: 'Douglas White (female)',
       num_orders: 2,
       lifetime_value: 3804.0782
     },
     {
-      customer_name: 'Bryce Brooks',
+      customer_name: 'Luz Heathcote (female)',
       num_orders: 2,
       lifetime_value: 3814.0582
     },
     {
-      customer_name: 'Bryce Cook',
+      customer_name: 'Van Zboncak (male)',
       num_orders: 2,
       lifetime_value: 3197.98
     },
     {
-      customer_name: 'Bryce Cooper',
+      customer_name: 'Glen Erdman (female)',
       num_orders: 2,
       lifetime_value: 1528.0682
     },
     {
-      customer_name: 'Bryce Cox',
+      customer_name: 'Kelley Harris-Schowalter Sr. (male)',
       num_orders: 1,
       lifetime_value: 66.96
     },
     {
-      customer_name: 'Bryce Howard',
+      customer_name: 'Kristie Mills (female)',
       num_orders: 2,
       lifetime_value: 2746.5525
     },
     {
-      customer_name: 'Bryce James',
+      customer_name: 'Kenneth Williamson (female)',
       num_orders: 2,
       lifetime_value: 3319.3975
     },
     {
-      customer_name: 'Bryce Morgan',
+      customer_name: 'Leon Stokes II (female)',
       num_orders: 3,
       lifetime_value: 6709.59
     },
     {
-      customer_name: 'Bryce Morris',
+      customer_name: 'Eduardo Tromp (female)',
       num_orders: 1,
       lifetime_value: 54.98
     },
     {
-      customer_name: 'Bryce Murphy',
+      customer_name: 'Tina Blanda (female)',
       num_orders: 2,
       lifetime_value: 5895.24
     },
     {
-      customer_name: 'Bryce Peterson',
+      customer_name: 'Dr. Olivia Jacobi (female)',
       num_orders: 2,
       lifetime_value: 1928.9275
     },
     {
-      customer_name: 'Bryce Ramirez',
+      customer_name: 'Mr. Jorge Hirthe (female)',
       num_orders: 2,
       lifetime_value: 147.95
     },
     {
-      customer_name: 'Bryce Reed',
+      customer_name: 'Karen Orn (male)',
       num_orders: 2,
       lifetime_value: 3801.3896
     },
     {
-      customer_name: 'Bryce Richardson',
+      customer_name: 'Dr. Jean Hodkiewicz (male)',
       num_orders: 3,
       lifetime_value: 6461.71
     },
     {
-      customer_name: 'Bryce Rivera',
+      customer_name: 'Brenda Pacocha (male)',
       num_orders: 2,
       lifetime_value: 2916.5582
     },
     {
-      customer_name: 'Bryce Rogers',
+      customer_name: 'Jesse Konopelski (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Bryce Sanders',
+      customer_name: 'Marcia Hilll (male)',
       num_orders: 2,
       lifetime_value: 3351.3975
     },
     {
-      customer_name: 'Bryce Stewart',
+      customer_name: 'Maxine Stamm (male)',
       num_orders: 2,
       lifetime_value: 67.96
     },
     {
-      customer_name: 'Bryce Torres',
+      customer_name: 'Eileen Weimann (male)',
       num_orders: 2,
       lifetime_value: 1804.9175
     },
     {
-      customer_name: 'Bryce Ward',
+      customer_name: 'Miss Erika Daugherty (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Bryce Watson',
+      customer_name: 'Gerard Gutkowski (male)',
       num_orders: 2,
       lifetime_value: 173.94
     },
     {
-      customer_name: 'Byron Carlson',
+      customer_name: 'Chelsea Lehner (male)',
       num_orders: 1,
       lifetime_value: 597.26
     },
     {
-      customer_name: 'Byron Diaz',
+      customer_name: 'Lena Kuhic (female)',
       num_orders: 1,
       lifetime_value: 31.97
     },
     {
-      customer_name: 'Byron Gill',
+      customer_name: 'Juanita Heaney (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Byron Gomez',
+      customer_name: 'Penny Wuckert (female)',
       num_orders: 1,
       lifetime_value: 87.97
     },
     {
-      customer_name: 'Byron Gutierrez',
+      customer_name: 'Jonathon Flatley (female)',
       num_orders: 1,
       lifetime_value: 680.94
     },
     {
-      customer_name: 'Byron Hernandez',
+      customer_name: 'Herman Renner (female)',
       num_orders: 2,
       lifetime_value: 164.91
     },
     {
-      customer_name: 'Byron Jiménez',
+      customer_name: 'Gregory Mitchell (female)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Byron Martin',
+      customer_name: 'Nick Stoltenberg (male)',
       num_orders: 2,
       lifetime_value: 1819.5882
     },
     {
-      customer_name: 'Byron Navarro',
+      customer_name: 'Kristen Balistreri II (female)',
       num_orders: 1,
       lifetime_value: 1120.49
     },
     {
-      customer_name: 'Byron Ortega',
+      customer_name: 'Marcella Cronin (male)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Byron Ramos',
+      customer_name: 'Ruben Senger (male)',
       num_orders: 1,
       lifetime_value: 3374.99
     },
     {
-      customer_name: 'Byron Romero',
+      customer_name: 'Nathan Veum-Feeney (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Byron Rubio',
+      customer_name: 'Jeannie Schmeler (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Byron Sanz',
+      customer_name: 'Terry Leannon (male)',
       num_orders: 1,
       lifetime_value: 554.97
     },
     {
-      customer_name: 'Byron Serrano',
+      customer_name: 'Amy Swift-Bosco (male)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Byron Suarez',
+      customer_name: 'Julius Kutch (female)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Byron Vazquez',
+      customer_name: 'John Will (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Caleb Allen',
+      customer_name: 'Gustavo Cassin (female)',
       num_orders: 1,
       lifetime_value: 2397.91
     },
     {
-      customer_name: 'Caleb Baker',
+      customer_name: 'Rolando Lowe-Rowe (male)',
       num_orders: 1,
       lifetime_value: 614.47
     },
     {
-      customer_name: 'Caleb Campbell',
+      customer_name: 'Aaron Schmidt (male)',
       num_orders: 2,
       lifetime_value: 188.87
     },
     {
-      customer_name: 'Caleb Carter',
+      customer_name: 'Mr. Darnell Lockman (female)',
       num_orders: 3,
       lifetime_value: 5738.3825
     },
     {
-      customer_name: 'Caleb Collins',
+      customer_name: 'Eunice Bashirian (male)',
       num_orders: 2,
       lifetime_value: 4413.3896
     },
     {
-      customer_name: 'Caleb Edwards',
+      customer_name: 'Greg Gibson (male)',
       num_orders: 2,
       lifetime_value: 107.37
     },
     {
-      customer_name: 'Caleb Evans',
+      customer_name: 'Jimmy Stoltenberg (female)',
       num_orders: 3,
       lifetime_value: 6943.5825
     },
     {
-      customer_name: 'Caleb Gonzalez',
+      customer_name: 'Alfred Carroll (female)',
       num_orders: 2,
       lifetime_value: 3282.83
     },
     {
-      customer_name: 'Caleb Green',
+      customer_name: 'Krystal Fisher (female)',
       num_orders: 1,
       lifetime_value: 2492.32
     },
     {
-      customer_name: 'Caleb Hall',
+      customer_name: 'Denise Schmidt (female)',
       num_orders: 1,
       lifetime_value: 2341.97
     },
     {
-      customer_name: 'Caleb Hernandez',
+      customer_name: 'Patty Glover (male)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Caleb Hill',
+      customer_name: 'Stella Stanton MD (male)',
       num_orders: 2,
       lifetime_value: 81.81
     },
     {
-      customer_name: 'Caleb King',
+      customer_name: 'Glenda Bins (male)',
       num_orders: 2,
       lifetime_value: 47.26
     },
     {
-      customer_name: 'Caleb Lopez',
+      customer_name: 'Pauline Waters Jr. (male)',
       num_orders: 1,
       lifetime_value: 2319.99
     },
     {
-      customer_name: 'Caleb Mitchell',
+      customer_name: 'Stacey Langosh (female)',
       num_orders: 2,
       lifetime_value: 4698.76
     },
     {
-      customer_name: 'Caleb Nelson',
+      customer_name: 'Anne Wilderman (female)',
       num_orders: 2,
       lifetime_value: 4173.24
     },
     {
-      customer_name: 'Caleb Parker',
+      customer_name: 'Rick Rosenbaum (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Caleb Perez',
+      customer_name: 'Miss Emily Buckridge (male)',
       num_orders: 2,
       lifetime_value: 1401.46
     },
     {
-      customer_name: 'Caleb Phillips',
+      customer_name: 'Rudolph Schaden (female)',
       num_orders: 1,
       lifetime_value: 2369.96
     },
     {
-      customer_name: 'Caleb Roberts',
+      customer_name: 'Carlton Roberts (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Caleb Scott',
+      customer_name: 'Ervin Muller II (male)',
       num_orders: 2,
       lifetime_value: 5900.55
     },
     {
-      customer_name: 'Caleb Turner',
+      customer_name: 'Leon Schmeler (female)',
       num_orders: 2,
       lifetime_value: 3750.0882
     },
     {
-      customer_name: 'Caleb Wright',
+      customer_name: 'Frances Marquardt (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Caleb Young',
+      customer_name: 'Jody Zieme (female)',
       num_orders: 2,
       lifetime_value: 4698.76
     },
     {
-      customer_name: 'Cameron Anderson',
+      customer_name: 'Frederick Flatley (male)',
       num_orders: 2,
       lifetime_value: 113.24
     },
     {
-      customer_name: 'Cameron Brown',
+      customer_name: 'Bryant Bergnaum (female)',
       num_orders: 2,
       lifetime_value: 3001.0225
     },
     {
-      customer_name: 'Cameron Clark',
+      customer_name: 'Angela Mueller (female)',
       num_orders: 1,
       lifetime_value: 2414.99
     },
     {
-      customer_name: 'Cameron Garcia',
+      customer_name: 'Paulette Morissette (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Cameron Harris',
+      customer_name: 'Erica Lueilwitz (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Cameron Jackson',
+      customer_name: 'Marion Schuppe IV (male)',
       num_orders: 1,
       lifetime_value: 1773.95
     },
     {
-      customer_name: 'Cameron Johnson',
+      customer_name: 'Tara Rutherford (female)',
       num_orders: 1,
       lifetime_value: 1754.98
     },
     {
-      customer_name: 'Cameron Jones',
+      customer_name: 'Norma Jones (female)',
       num_orders: 2,
       lifetime_value: 163.92
     },
     {
-      customer_name: 'Cameron Lee',
+      customer_name: 'Dean Mills (male)',
       num_orders: 1,
       lifetime_value: 2342.92
     },
     {
-      customer_name: 'Cameron Lewis',
+      customer_name: 'Juanita Langworth (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Cameron McDonald',
+      customer_name: 'Brandy Koelpin (female)',
       num_orders: 1,
       lifetime_value: 54.98
     },
     {
-      customer_name: 'Cameron Miller',
+      customer_name: "Mr. David D'Amore (female)",
       num_orders: 2,
       lifetime_value: 2751.4175
     },
     {
-      customer_name: 'Cameron Moore',
+      customer_name: 'Noah Cummings (female)',
       num_orders: 3,
       lifetime_value: 4180.2275
     },
     {
-      customer_name: 'Cameron Robinson',
+      customer_name: 'Ray Buckridge (female)',
       num_orders: 1,
       lifetime_value: 79.47
     },
     {
-      customer_name: 'Cameron Rodriguez',
+      customer_name: 'Jill Funk III (female)',
       num_orders: 1,
       lifetime_value: 2341.97
     },
     {
-      customer_name: 'Cameron Smith',
+      customer_name: 'Rick Konopelski (female)',
       num_orders: 1,
       lifetime_value: 2351.96
     },
     {
-      customer_name: 'Cameron Taylor',
+      customer_name: 'Brandy Huels (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Cameron Thomas',
+      customer_name: 'Otis Kassulke (female)',
       num_orders: 1,
       lifetime_value: 2384.96
     },
     {
-      customer_name: 'Cameron Thompson',
+      customer_name: 'Katrina Moen (female)',
       num_orders: 2,
       lifetime_value: 4143.26
     },
     {
-      customer_name: 'Cameron Walker',
+      customer_name: 'Ron Collier (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Cameron White',
+      customer_name: 'Laura Hayes (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Cameron Wilson',
+      customer_name: 'Wilbur Schuppe (male)',
       num_orders: 1,
       lifetime_value: 38.98
     },
     {
-      customer_name: 'Candace Arun',
+      customer_name: 'Linda Rolfson (female)',
       num_orders: 2,
       lifetime_value: 1567.46
     },
     {
-      customer_name: 'Candace Chapman',
+      customer_name: 'Eddie Harris (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Candace Fernandez',
+      customer_name: 'Larry Oberbrunner (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Candace Gonzalez',
+      customer_name: 'Blake Reichel (male)',
       num_orders: 2,
       lifetime_value: 1622.47
     },
     {
-      customer_name: 'Candace Kapoor',
+      customer_name: 'Kristopher Goodwin (female)',
       num_orders: 2,
       lifetime_value: 3134.95
     },
     {
-      customer_name: 'Candace Madan',
+      customer_name: 'Bertha Haley (male)',
       num_orders: 3,
       lifetime_value: 318.92
     },
     {
-      customer_name: 'Candace Malhotra',
+      customer_name: 'Eva Franecki (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Candace Martinez',
+      customer_name: 'Joanne Satterfield (female)',
       num_orders: 2,
       lifetime_value: 1587.47
     },
     {
-      customer_name: 'Candace Mehta',
+      customer_name: 'Sadie Heathcote Sr. (male)',
       num_orders: 2,
       lifetime_value: 1574.46
     },
     {
-      customer_name: 'Candace Patel',
+      customer_name: 'Angel Dickens (female)',
       num_orders: 2,
       lifetime_value: 3132.97
     },
     {
-      customer_name: 'Candace Perez',
+      customer_name: 'Penny Conn-McDermott (male)',
       num_orders: 2,
       lifetime_value: 3788.6796
     },
     {
-      customer_name: 'Candace Prasad',
+      customer_name: 'Nathan Cormier (male)',
       num_orders: 2,
       lifetime_value: 3120.26
     },
     {
-      customer_name: 'Candace Raman',
+      customer_name: 'Blake Gleason (male)',
       num_orders: 1,
       lifetime_value: 30.97
     },
     {
-      customer_name: 'Candace Rana',
+      customer_name: 'Victoria Schaefer PhD (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Candace Sai',
+      customer_name: 'Mike Boyer (male)',
       num_orders: 1,
       lifetime_value: 15.23
     },
     {
-      customer_name: 'Candace Sanchez',
+      customer_name: 'Maurice Predovic (male)',
       num_orders: 2,
       lifetime_value: 37.27
     },
     {
-      customer_name: 'Candace Sara',
+      customer_name: 'Marcia Orn PhD (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Candace Srini',
+      customer_name: 'Marlene Corkery (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Candace Subram',
+      customer_name: 'Perry Rippin IV (male)',
       num_orders: 2,
       lifetime_value: 3772.4096
     },
     {
-      customer_name: 'Candace Van',
+      customer_name: 'Peter Pfannerstill (male)',
       num_orders: 2,
       lifetime_value: 3148.22
     },
     {
-      customer_name: 'Candice Cai',
+      customer_name: 'Lester Morissette (female)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Candice Chow',
+      customer_name: 'Miranda Medhurst (female)',
       num_orders: 1,
       lifetime_value: 64.97
     },
     {
-      customer_name: 'Candice Gao',
+      customer_name: 'Drew Labadie (female)',
       num_orders: 1,
       lifetime_value: 37.27
     },
     {
-      customer_name: 'Candice Guo',
+      customer_name: 'Kirk Stanton (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Candice He',
+      customer_name: 'Jake Mayert (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Candice Hu',
+      customer_name: 'Caroline Hettinger (female)',
       num_orders: 3,
       lifetime_value: 158.53
     },
     {
-      customer_name: 'Candice Huang',
+      customer_name: 'Joey Mraz-Schaden MD (male)',
       num_orders: 2,
       lifetime_value: 3058.31
     },
     {
-      customer_name: 'Candice Liang',
+      customer_name: 'Charlie Lesch (female)',
       num_orders: 1,
       lifetime_value: 2479.94
     },
     {
-      customer_name: 'Candice Lin',
+      customer_name: 'Darlene Brekke (male)',
       num_orders: 1,
       lifetime_value: 37.27
     },
     {
-      customer_name: 'Candice Liu',
+      customer_name: 'Peter Jakubowski (male)',
       num_orders: 2,
       lifetime_value: 2745.8225
     },
     {
-      customer_name: 'Candice Lu',
+      customer_name: 'Milton Schowalter (female)',
       num_orders: 1,
       lifetime_value: 32.28
     },
     {
-      customer_name: 'Candice Ma',
+      customer_name: 'Ross Botsford (female)',
       num_orders: 1,
       lifetime_value: 3.99
     },
     {
-      customer_name: 'Candice She',
+      customer_name: 'Ms. Jeannette Marquardt (male)',
       num_orders: 1,
       lifetime_value: 124.99
     },
     {
-      customer_name: 'Candice Sun',
+      customer_name: 'Malcolm Bartoletti-Okuneva (male)',
       num_orders: 3,
       lifetime_value: 6989.5825
     },
     {
-      customer_name: 'Candice Wang',
+      customer_name: 'Cheryl Mohr PhD (male)',
       num_orders: 2,
       lifetime_value: 3936.5425
     },
     {
-      customer_name: 'Candice Xu',
+      customer_name: 'April Huel (female)',
       num_orders: 1,
       lifetime_value: 64.97
     },
     {
-      customer_name: 'Candice Ye',
+      customer_name: 'Sergio Howe (female)',
       num_orders: 1,
       lifetime_value: 86.95
     },
     {
-      customer_name: 'Candice Zeng',
+      customer_name: 'Jeremy Ryan IV (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Candice Zhang',
+      customer_name: 'Angelo Turcotte (male)',
       num_orders: 1,
       lifetime_value: 64.97
     },
     {
-      customer_name: 'Candice Zhao',
+      customer_name: 'Andre Kuhn (male)',
       num_orders: 1,
       lifetime_value: 73.96
     },
     {
-      customer_name: 'Candice Zhou',
+      customer_name: 'Shannon Mitchell (male)',
       num_orders: 1,
       lifetime_value: 125.93
     },
     {
-      customer_name: 'Candice Zhu',
+      customer_name: 'Gilbert Denesik (female)',
       num_orders: 2,
       lifetime_value: 3020.3
     },
     {
-      customer_name: 'Candice Zimmerman',
+      customer_name: 'Tricia Heller (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Carl Anand',
+      customer_name: 'Gregg Ziemann (female)',
       num_orders: 1,
       lifetime_value: 2317.92
     },
     {
-      customer_name: 'Carl Andersen',
+      customer_name: 'Homer Walsh (female)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Carl Beck',
+      customer_name: "Miss Constance D'Amore (female)",
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Carl Chande',
+      customer_name: 'Roxanne Gutmann II (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Carl Chander',
+      customer_name: 'Lonnie Erdman (female)',
       num_orders: 1,
       lifetime_value: 2316.97
     },
     {
-      customer_name: 'Carl Deng',
+      customer_name: 'Tara Balistreri (female)',
       num_orders: 2,
       lifetime_value: 94.96
     },
     {
-      customer_name: 'Carl Goel',
+      customer_name: 'Ollie Medhurst (male)',
       num_orders: 1,
       lifetime_value: 1785.97
     },
     {
-      customer_name: 'Carl Jai',
+      customer_name: 'Jake Wyman (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Carl Kumar',
+      customer_name: 'Mr. Levi Friesen V (female)',
       num_orders: 3,
       lifetime_value: 211.01
     },
     {
-      customer_name: 'Carl Lal',
+      customer_name: 'Jordan Rowe (male)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Carl Luo',
+      customer_name: 'Margie Glover (female)',
       num_orders: 2,
       lifetime_value: 3262.83
     },
     {
-      customer_name: 'Carl Nara',
+      customer_name: 'Earl Nitzsche Jr. (male)',
       num_orders: 1,
       lifetime_value: 1754.98
     },
     {
-      customer_name: 'Carl Nath',
+      customer_name: 'Morris Batz (male)',
       num_orders: 1,
       lifetime_value: 1857.92
     },
     {
-      customer_name: 'Carl Raje',
+      customer_name: 'Peggy Predovic (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Carl Raji',
+      customer_name: 'Damon Wehner (male)',
       num_orders: 1,
       lifetime_value: 2322.28
     },
     {
-      customer_name: 'Carl Shan',
+      customer_name: 'Gayle Roob (male)',
       num_orders: 3,
       lifetime_value: 168.02
     },
     {
-      customer_name: 'Carl Sharma',
+      customer_name: 'Miss Susan McCullough (female)',
       num_orders: 1,
       lifetime_value: 67.97
     },
     {
-      customer_name: 'Carl She',
+      customer_name: 'Tim Rowe (female)',
       num_orders: 2,
       lifetime_value: 86.95
     },
     {
-      customer_name: 'Carl Shen',
+      customer_name: 'Pedro Hansen (male)',
       num_orders: 2,
       lifetime_value: 3110.0525
     },
     {
-      customer_name: 'Carl Tang',
+      customer_name: 'Rosemarie Macejkovic (female)',
       num_orders: 2,
       lifetime_value: 2751.4175
     },
     {
-      customer_name: 'Carl Xie',
+      customer_name: 'Lee Cole I (female)',
       num_orders: 1,
       lifetime_value: 29.98
     },
     {
-      customer_name: 'Carl Yuan',
+      customer_name: 'Ms. Maureen Schulist (female)',
       num_orders: 2,
       lifetime_value: 3071.0325
     },
     {
-      customer_name: 'Carlos Adams',
+      customer_name: 'Irving Rogahn (male)',
       num_orders: 2,
       lifetime_value: 4471.74
     },
     {
-      customer_name: 'Carlos Allen',
+      customer_name: 'Dr. Keith Schmeler (male)',
       num_orders: 1,
       lifetime_value: 1728.27
     },
     {
-      customer_name: 'Carlos Bailey',
+      customer_name: 'Terence Trantow IV (male)',
       num_orders: 2,
       lifetime_value: 81.26
     },
     {
-      customer_name: 'Carlos Baker',
+      customer_name: 'Hubert Wolf (female)',
       num_orders: 1,
       lifetime_value: 80.96
     },
     {
-      customer_name: 'Carlos Bell',
+      customer_name: 'Dr. Beverly Reynolds (male)',
       num_orders: 3,
       lifetime_value: 6706.57
     },
     {
-      customer_name: 'Carlos Brooks',
+      customer_name: 'Angelina McCullough (female)',
       num_orders: 1,
       lifetime_value: 819.46
     },
     {
-      customer_name: 'Carlos Campbell',
+      customer_name: 'Carol Stehr I (male)',
       num_orders: 2,
       lifetime_value: 31.27
     },
     {
-      customer_name: 'Carlos Carter',
+      customer_name: 'Minnie Littel (female)',
       num_orders: 2,
       lifetime_value: 3242.83
     },
     {
-      customer_name: 'Carlos Collins',
+      customer_name: 'Alfonso Stark II (male)',
       num_orders: 2,
       lifetime_value: 98.96
     },
     {
-      customer_name: 'Carlos Cook',
+      customer_name: 'Dr. Jake Ullrich (female)',
       num_orders: 2,
       lifetime_value: 1552.48
     },
     {
-      customer_name: 'Carlos Cooper',
+      customer_name: 'Marilyn Wehner-Mueller (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Carlos Cox',
+      customer_name: 'Erica Howell (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Carlos Edwards',
+      customer_name: 'Marion Beatty (female)',
       num_orders: 1,
       lifetime_value: 35
     },
     {
-      customer_name: 'Carlos Evans',
+      customer_name: 'Arnold Morar (female)',
       num_orders: 2,
       lifetime_value: 3807.3996
     },
     {
-      customer_name: 'Carlos Gonzalez',
+      customer_name: 'Guillermo Thompson (female)',
       num_orders: 1,
       lifetime_value: 138.45
     },
     {
-      customer_name: 'Carlos Gray',
+      customer_name: 'Marsha Johnson (female)',
       num_orders: 1,
       lifetime_value: 67.93
     },
     {
-      customer_name: 'Carlos Green',
+      customer_name: 'Josephine Collins (male)',
       num_orders: 1,
       lifetime_value: 2443.35
     },
     {
-      customer_name: 'Carlos Hall',
+      customer_name: 'Robin Ryan (male)',
       num_orders: 2,
       lifetime_value: 4170.54
     },
     {
-      customer_name: 'Carlos Hernandez',
+      customer_name: 'Gustavo Nolan (female)',
       num_orders: 1,
       lifetime_value: 2319.99
     },
     {
-      customer_name: 'Carlos Hill',
+      customer_name: 'Michael Veum (male)',
       num_orders: 2,
       lifetime_value: 4698.76
     },
     {
-      customer_name: 'Carlos Howard',
+      customer_name: 'Clint Kovacek (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Carlos James',
+      customer_name: 'Pedro Wuckert (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Carlos Kelly',
+      customer_name: 'Harriet Kihn (male)',
       num_orders: 2,
       lifetime_value: 3262.83
     },
     {
-      customer_name: 'Carlos King',
+      customer_name: 'Hilda Watsica (male)',
       num_orders: 1,
       lifetime_value: 2325.96
     },
     {
-      customer_name: 'Carlos Lopez',
+      customer_name: "Lillie O'Conner (male)",
       num_orders: 3,
       lifetime_value: 7231.37
     },
     {
-      customer_name: 'Carlos Mitchell',
+      customer_name: 'Mrs. Delores Cassin (male)',
       num_orders: 2,
       lifetime_value: 4698.76
     },
     {
-      customer_name: 'Carlos Morgan',
+      customer_name: 'Alexander Schmitt (male)',
       num_orders: 1,
       lifetime_value: 98.96
     },
     {
-      customer_name: 'Carlos Morris',
+      customer_name: 'Lynne Bode (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Carlos Murphy',
+      customer_name: 'Lucille Herzog (female)',
       num_orders: 1,
       lifetime_value: 24.99
     },
     {
-      customer_name: 'Carlos Nelson',
+      customer_name: 'Elena Johnston MD (male)',
       num_orders: 1,
       lifetime_value: 2482.23
     },
     {
-      customer_name: 'Carlos Parker',
+      customer_name: 'Jackie Fisher (male)',
       num_orders: 2,
       lifetime_value: 4509.8996
     },
     {
-      customer_name: 'Carlos Perez',
+      customer_name: 'Dr. Jan Kling (male)',
       num_orders: 1,
       lifetime_value: 26.97
     },
     {
-      customer_name: 'Carlos Peterson',
+      customer_name: 'Jeannie Toy (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Carlos Phillips',
+      customer_name: 'Sarah Johnston (male)',
       num_orders: 1,
       lifetime_value: 2563.91
     },
     {
-      customer_name: 'Carlos Ramirez',
+      customer_name: 'Derrick Ebert (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Carlos Reed',
+      customer_name: 'Jean Weissnat (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Carlos Richardson',
+      customer_name: 'Garry Deckow (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Carlos Rivera',
+      customer_name: 'Joanna Brown-Jones (female)',
       num_orders: 2,
       lifetime_value: 4384.0782
     },
     {
-      customer_name: 'Carlos Roberts',
+      customer_name: 'Leticia Graham (female)',
       num_orders: 2,
       lifetime_value: 3124.96
     },
     {
-      customer_name: 'Carlos Rogers',
+      customer_name: 'Miss Vicki Cronin IV (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Carlos Sanchez',
+      customer_name: 'Gerald Schamberger (male)',
       num_orders: 2,
       lifetime_value: 90.75
     },
     {
-      customer_name: 'Carlos Sanders',
+      customer_name: 'Donnie Beatty (female)',
       num_orders: 2,
       lifetime_value: 82.26
     },
     {
-      customer_name: 'Carlos Scott',
+      customer_name: 'Sonja Kunde V (male)',
       num_orders: 1,
       lifetime_value: 2478.34
     },
     {
-      customer_name: 'Carlos Stewart',
+      customer_name: 'Jennifer Goyette (male)',
       num_orders: 2,
       lifetime_value: 4423.3796
     },
     {
-      customer_name: 'Carlos Turner',
+      customer_name: 'Chad Weber (male)',
       num_orders: 3,
       lifetime_value: 3802.3725
     },
     {
-      customer_name: 'Carlos Ward',
+      customer_name: 'Dr. Keith Toy (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Carlos Watson',
+      customer_name: 'Allan Johnson (female)',
       num_orders: 3,
       lifetime_value: 5123.7396
     },
     {
-      customer_name: 'Carlos Wright',
+      customer_name: 'Rosa Goodwin (female)',
       num_orders: 3,
       lifetime_value: 6950.6025
     },
     {
-      customer_name: 'Carlos Young',
+      customer_name: 'Ms. Donna Sporer (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Carol Brooks',
+      customer_name: 'Eula Conn (male)',
       num_orders: 1,
       lifetime_value: 1219.45
     },
     {
-      customer_name: 'Carol Cooper',
+      customer_name: 'Samantha White (male)',
       num_orders: 2,
       lifetime_value: 6035.6
     },
     {
-      customer_name: 'Carol Martinez',
+      customer_name: 'Mr. Forrest Crona (male)',
       num_orders: 16,
       lifetime_value: 748.6
     },
     {
-      customer_name: 'Carol Patterson',
+      customer_name: 'Renee Hamill (female)',
       num_orders: 2,
       lifetime_value: 63.15
     },
     {
-      customer_name: 'Carol Perry',
+      customer_name: 'Sue Emmerich (male)',
       num_orders: 2,
       lifetime_value: 2677.0682
     },
     {
-      customer_name: 'Carol Robinson',
+      customer_name: 'Clifton McClure (male)',
       num_orders: 1,
       lifetime_value: 196.29
     },
     {
-      customer_name: 'Carol Saunders',
+      customer_name: 'Pat Dooley (male)',
       num_orders: 3,
       lifetime_value: 5140.7296
     },
     {
-      customer_name: 'Carol Simmons',
+      customer_name: 'Herbert Ward (male)',
       num_orders: 1,
       lifetime_value: 30.97
     },
     {
-      customer_name: 'Carol Washington',
+      customer_name: 'Donnie McKenzie DVM (male)',
       num_orders: 2,
       lifetime_value: 83.97
     },
     {
-      customer_name: 'Carol White',
+      customer_name: 'Erma Daugherty (male)',
       num_orders: 3,
       lifetime_value: 5645.8582
     },
     {
-      customer_name: 'Carol Xu',
+      customer_name: 'Belinda Terry (male)',
       num_orders: 1,
       lifetime_value: 1155.48
     },
     {
-      customer_name: 'Carol Zhou',
+      customer_name: 'Benny Adams (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Carrie Alonso',
+      customer_name: 'Dr. Wade Hermann (female)',
       num_orders: 1,
       lifetime_value: 1750.98
     },
     {
-      customer_name: 'Carrie Alvarez',
+      customer_name: 'Melissa Rath IV (female)',
       num_orders: 2,
       lifetime_value: 189.96
     },
     {
-      customer_name: 'Carrie Browning',
+      customer_name: 'Tyrone Cassin (female)',
       num_orders: 2,
       lifetime_value: 4203.32
     },
     {
-      customer_name: 'Carrie Carlson',
+      customer_name: 'Mr. Nelson Raynor (female)',
       num_orders: 1,
       lifetime_value: 24.99
     },
     {
-      customer_name: 'Carrie Diaz',
+      customer_name: 'Peggy McKenzie (female)',
       num_orders: 1,
       lifetime_value: 86.95
     },
     {
-      customer_name: 'Carrie Gill',
+      customer_name: 'Devin Jaskolski (female)',
       num_orders: 1,
       lifetime_value: 1700.99
     },
     {
-      customer_name: 'Carrie Gomez',
+      customer_name: 'Rochelle Shanahan (female)',
       num_orders: 2,
       lifetime_value: 3917.5425
     },
     {
-      customer_name: 'Carrie Gutierrez',
+      customer_name: 'Margie Larson (female)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Carrie Hernandez',
+      customer_name: "Malcolm O'Keefe (female)",
       num_orders: 1,
       lifetime_value: 64.97
     },
     {
-      customer_name: 'Carrie Jiménez',
+      customer_name: 'Danielle Gottlieb (female)',
       num_orders: 1,
       lifetime_value: 24.99
     },
     {
-      customer_name: 'Carrie Moreno',
+      customer_name: 'Alex Langworth DDS (male)',
       num_orders: 1,
       lifetime_value: 1700.99
     },
     {
-      customer_name: 'Carrie Munoz',
+      customer_name: 'Darin Wisoky (male)',
       num_orders: 1,
       lifetime_value: 1777.95
     },
     {
-      customer_name: 'Carrie Ortega',
+      customer_name: 'Sheri Hartmann (female)',
       num_orders: 1,
       lifetime_value: 29.98
     },
     {
-      customer_name: 'Carrie Romero',
+      customer_name: 'Mr. Johnnie Dickinson (male)',
       num_orders: 1,
       lifetime_value: 1750.98
     },
     {
-      customer_name: 'Carrie Rubio',
+      customer_name: 'Shawna Welch (female)',
       num_orders: 1,
       lifetime_value: 32.27
     },
     {
-      customer_name: 'Carrie Ruiz',
+      customer_name: 'Earnest Christiansen-Lang (female)',
       num_orders: 2,
       lifetime_value: 3025.5325
     },
     {
-      customer_name: 'Carrie Schmidt',
+      customer_name: 'Juan Schinner (male)',
       num_orders: 2,
       lifetime_value: 92.25
     },
     {
-      customer_name: 'Carrie Serrano',
+      customer_name: 'Marco Smith (female)',
       num_orders: 1,
       lifetime_value: 34.98
     },
     {
-      customer_name: 'Carrie Torres',
+      customer_name: 'Nick Kuvalis (male)',
       num_orders: 1,
       lifetime_value: 1760.47
     },
     {
-      customer_name: 'Carrie Vazquez',
+      customer_name: 'Phyllis Mayer (male)',
       num_orders: 1,
       lifetime_value: 1729.97
     },
     {
-      customer_name: 'Carson Alexander',
+      customer_name: 'Jose McDermott (female)',
       num_orders: 4,
       lifetime_value: 289.7
     },
     {
-      customer_name: 'Carson Barnes',
+      customer_name: 'Minnie Stiedemann (female)',
       num_orders: 2,
       lifetime_value: 4516.5325
     },
     {
-      customer_name: 'Carson Bryant',
+      customer_name: 'Isaac Denesik (male)',
       num_orders: 4,
       lifetime_value: 7259.56
     },
     {
-      customer_name: 'Carson Butler',
+      customer_name: 'Darnell Breitenberg V (male)',
       num_orders: 4,
       lifetime_value: 8941.28
     },
     {
-      customer_name: 'Carson Coleman',
+      customer_name: 'Kara Johnston (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Carson Diaz',
+      customer_name: 'Clay McDermott (male)',
       num_orders: 1,
       lifetime_value: 81.46
     },
     {
-      customer_name: 'Carson Flores',
+      customer_name: 'Ida Kerluke V (female)',
       num_orders: 4,
       lifetime_value: 7393.0582
     },
     {
-      customer_name: 'Carson Foster',
+      customer_name: 'Pearl Lubowitz (male)',
       num_orders: 2,
       lifetime_value: 86.95
     },
     {
-      customer_name: 'Carson Gonzales',
+      customer_name: 'Jim Cole (female)',
       num_orders: 4,
       lifetime_value: 10872.06
     },
     {
-      customer_name: 'Carson Griffin',
+      customer_name: 'Lonnie Yundt (male)',
       num_orders: 1,
       lifetime_value: 2319.99
     },
     {
-      customer_name: 'Carson Hayes',
+      customer_name: 'Jonathon Kreiger (female)',
       num_orders: 2,
       lifetime_value: 4657.5325
     },
     {
-      customer_name: 'Carson Henderson',
+      customer_name: 'Miss Dorothy Rice (female)',
       num_orders: 4,
       lifetime_value: 185.7
     },
     {
-      customer_name: 'Carson Hughes',
+      customer_name: 'Darla Reinger (female)',
       num_orders: 3,
       lifetime_value: 6774.4496
     },
     {
-      customer_name: 'Carson Jenkins',
+      customer_name: 'Miguel Hermiston (male)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Carson Long',
+      customer_name: 'Kerry Witting MD (male)',
       num_orders: 2,
       lifetime_value: 4795.34
     },
     {
-      customer_name: 'Carson Patterson',
+      customer_name: 'David Leffler-Christiansen (male)',
       num_orders: 3,
       lifetime_value: 6820.4596
     },
     {
-      customer_name: 'Carson Perry',
+      customer_name: 'Ronnie Schoen (male)',
       num_orders: 2,
       lifetime_value: 4511.5425
     },
     {
-      customer_name: 'Carson Powell',
+      customer_name: 'Ollie Rutherford (female)',
       num_orders: 1,
       lifetime_value: 46.47
     },
     {
-      customer_name: 'Carson Price',
+      customer_name: 'Dr. Gustavo Windler (female)',
       num_orders: 2,
       lifetime_value: 4587.5125
     },
     {
-      customer_name: 'Carson Russell',
+      customer_name: 'Darnell Hills (female)',
       num_orders: 1,
       lifetime_value: 2394.95
     },
     {
-      customer_name: 'Carson Simmons',
+      customer_name: 'Ms. Tiffany Dach (female)',
       num_orders: 4,
       lifetime_value: 7200.58
     },
     {
-      customer_name: 'Carson Washington',
+      customer_name: 'Norma Beahan (male)',
       num_orders: 4,
       lifetime_value: 7494.8796
     },
     {
-      customer_name: 'Carson Wood',
+      customer_name: 'Jay Swaniawski V (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Casey Alonso',
+      customer_name: 'Carl Marquardt (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Casey Alvarez',
+      customer_name: 'Ernestine Lockman (male)',
       num_orders: 1,
       lifetime_value: 133.49
     },
     {
-      customer_name: 'Casey Anand',
+      customer_name: 'Olivia Howell (female)',
       num_orders: 2,
       lifetime_value: 3282.81
     },
     {
-      customer_name: 'Casey Andersen',
+      customer_name: "Lillian O'Reilly (male)",
       num_orders: 1,
       lifetime_value: 49.48
     },
     {
-      customer_name: 'Casey Browning',
+      customer_name: 'Ms. Christy Vandervort (male)',
       num_orders: 1,
       lifetime_value: 539.99
     },
     {
-      customer_name: 'Casey Carlson',
+      customer_name: 'Stacey Nienow (male)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Casey Chande',
+      customer_name: 'Della Stokes (male)',
       num_orders: 2,
       lifetime_value: 29.26
     },
     {
-      customer_name: 'Casey Chander',
+      customer_name: 'Shari Little (female)',
       num_orders: 3,
       lifetime_value: 6910.5925
     },
     {
-      customer_name: 'Casey Deng',
+      customer_name: 'Ella Marvin (female)',
       num_orders: 2,
       lifetime_value: 2992.33
     },
     {
-      customer_name: 'Casey Diaz',
+      customer_name: "Steven O'Connell DDS (male)",
       num_orders: 1,
       lifetime_value: 618.98
     },
     {
-      customer_name: 'Casey Dominguez',
+      customer_name: 'Tommie Roberts (male)',
       num_orders: 1,
       lifetime_value: 1183.47
     },
     {
-      customer_name: 'Casey Gill',
+      customer_name: 'Randall Trantow (female)',
       num_orders: 1,
       lifetime_value: 584.9
     },
     {
-      customer_name: 'Casey Gomez',
+      customer_name: 'Emily Simonis (male)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Casey Gutierrez',
+      customer_name: 'Gordon Kub (female)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Casey Hernandez',
+      customer_name: 'Eva Beier (female)',
       num_orders: 1,
       lifetime_value: 605.21
     },
     {
-      customer_name: 'Casey Jai',
+      customer_name: 'Frank Zboncak (female)',
       num_orders: 3,
       lifetime_value: 6889.6125
     },
     {
-      customer_name: 'Casey Jiménez',
+      customer_name: 'Cecilia Hettinger III (female)',
       num_orders: 1,
       lifetime_value: 1764.96
     },
     {
-      customer_name: 'Casey Kumar',
+      customer_name: 'Colin Williamson DDS (female)',
       num_orders: 2,
       lifetime_value: 2778.5225
     },
     {
-      customer_name: 'Casey Lal',
+      customer_name: 'Donna Murphy (female)',
       num_orders: 2,
       lifetime_value: 2822.0125
     },
     {
-      customer_name: 'Casey Luo',
+      customer_name: 'Elias Legros (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Casey Martin',
+      customer_name: 'Megan Swift PhD (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Casey Moreno',
+      customer_name: 'Dr. Emily Hackett (female)',
       num_orders: 1,
       lifetime_value: 123.98
     },
     {
-      customer_name: 'Casey Munoz',
+      customer_name: 'Anita Veum (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Casey Nara',
+      customer_name: 'Robin Spinka (male)',
       num_orders: 3,
       lifetime_value: 6010.16
     },
     {
-      customer_name: 'Casey Nath',
+      customer_name: 'Gustavo Fadel (female)',
       num_orders: 1,
       lifetime_value: 28.98
     },
     {
-      customer_name: 'Casey Navarro',
+      customer_name: 'Charlie Schiller (male)',
       num_orders: 1,
       lifetime_value: 1700.99
     },
     {
-      customer_name: 'Casey Ortega',
+      customer_name: 'Mrs. Bethany Hegmann (female)',
       num_orders: 2,
       lifetime_value: 2483.98
     },
     {
-      customer_name: 'Casey Pal',
+      customer_name: 'Allan Kunze (female)',
       num_orders: 2,
       lifetime_value: 111.95
     },
     {
-      customer_name: 'Casey Rai',
+      customer_name: 'Pamela Boyle (female)',
       num_orders: 1,
       lifetime_value: 63.97
     },
     {
-      customer_name: 'Casey Raje',
+      customer_name: 'Mr. Clayton Ziemann (female)',
       num_orders: 2,
       lifetime_value: 2983.34
     },
     {
-      customer_name: 'Casey Raji',
+      customer_name: 'Jeremiah Howell (female)',
       num_orders: 1,
       lifetime_value: 28.98
     },
     {
-      customer_name: 'Casey Ramos',
+      customer_name: 'Ms. Leona Roberts-Lowe (male)',
       num_orders: 1,
       lifetime_value: 1120.49
     },
     {
-      customer_name: 'Casey Rowe',
+      customer_name: 'Dr. Betsy Jaskolski (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Casey Rubio',
+      customer_name: 'Mr. Jacob Howell (female)',
       num_orders: 2,
       lifetime_value: 1594.4175
     },
     {
-      customer_name: 'Casey Sanz',
+      customer_name: 'Beverly Lowe (male)',
       num_orders: 1,
       lifetime_value: 1174.48
     },
     {
-      customer_name: 'Casey Serrano',
+      customer_name: 'Tyrone Fadel-Wuckert (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Casey Shan',
+      customer_name: 'Lora Gusikowski (male)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Casey Sharma',
+      customer_name: 'Chris Sanford (female)',
       num_orders: 2,
       lifetime_value: 4921.69
     },
     {
-      customer_name: 'Casey She',
+      customer_name: 'Peggy Schamberger (female)',
       num_orders: 2,
       lifetime_value: 3010.0325
     },
     {
-      customer_name: 'Casey Shen',
+      customer_name: 'Phil Kovacek Jr. (female)',
       num_orders: 1,
       lifetime_value: 48.97
     },
     {
-      customer_name: 'Casey Suarez',
+      customer_name: 'Wade Lebsack (female)',
       num_orders: 1,
       lifetime_value: 1170.48
     },
     {
-      customer_name: 'Casey Tang',
+      customer_name: 'Fannie Lehner (male)',
       num_orders: 1,
       lifetime_value: 63.97
     },
     {
-      customer_name: 'Casey Torres',
+      customer_name: 'Maryann Kemmer (male)',
       num_orders: 1,
       lifetime_value: 1120.49
     },
     {
-      customer_name: 'Casey Vazquez',
+      customer_name: 'Jeannie Bernier (female)',
       num_orders: 1,
       lifetime_value: 563.96
     },
     {
-      customer_name: 'Casey Xie',
+      customer_name: 'Susie Bode (male)',
       num_orders: 1,
       lifetime_value: 12.94
     },
     {
-      customer_name: 'Casey Xu',
+      customer_name: 'Mr. Bruce Rau (female)',
       num_orders: 2,
       lifetime_value: 64.25
     },
     {
-      customer_name: 'Casey Yuan',
+      customer_name: 'Mrs. Della Hayes (female)',
       num_orders: 2,
       lifetime_value: 4538.8425
     },
     {
-      customer_name: 'Cassandra Arthur',
+      customer_name: 'Miss Ella Rice (male)',
       num_orders: 2,
       lifetime_value: 61.75
     },
     {
-      customer_name: 'Cassandra Chandra',
+      customer_name: 'Dwayne Goodwin (male)',
       num_orders: 2,
       lifetime_value: 6054.22
     },
     {
-      customer_name: 'Cassandra Fernandez',
+      customer_name: 'Annette Hayes (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Cassandra Garcia',
+      customer_name: 'Patti Anderson (female)',
       num_orders: 1,
       lifetime_value: 94.48
     },
     {
-      customer_name: 'Cassandra Gonzalez',
+      customer_name: 'Kenny Stokes I (female)',
       num_orders: 2,
       lifetime_value: 134.44
     },
     {
-      customer_name: 'Cassandra Kapoor',
+      customer_name: 'Meredith Hermann (female)',
       num_orders: 1,
       lifetime_value: 83.97
     },
     {
-      customer_name: 'Cassandra Lopez',
+      customer_name: 'Ada Bogan (male)',
       num_orders: 1,
       lifetime_value: 68.49
     },
     {
-      customer_name: 'Cassandra Madan',
+      customer_name: 'Brendan McClure-Wolff (male)',
       num_orders: 2,
       lifetime_value: 112.75
     },
     {
-      customer_name: 'Cassandra Malhotra',
+      customer_name: 'Dr. Renee Walker (male)',
       num_orders: 2,
       lifetime_value: 6054.22
     },
     {
-      customer_name: 'Cassandra Martinez',
+      customer_name: 'Alison Bergstrom (male)',
       num_orders: 1,
       lifetime_value: 123.98
     },
     {
-      customer_name: 'Cassandra Mehta',
+      customer_name: 'Debbie Senger PhD (female)',
       num_orders: 1,
       lifetime_value: 59.98
     },
     {
-      customer_name: 'Cassandra Patel',
+      customer_name: 'Lula Marquardt (male)',
       num_orders: 2,
       lifetime_value: 68.45
     },
     {
-      customer_name: 'Cassandra Perez',
+      customer_name: 'Jeannette Runolfsdottir (female)',
       num_orders: 1,
       lifetime_value: 42.28
     },
     {
-      customer_name: 'Cassandra Prasad',
+      customer_name: 'Mark Robel (female)',
       num_orders: 2,
       lifetime_value: 112.75
     },
     {
-      customer_name: 'Cassandra Raman',
+      customer_name: 'Inez Funk (female)',
       num_orders: 2,
       lifetime_value: 74.45
     },
     {
-      customer_name: 'Cassandra Rana',
+      customer_name: 'Dr. Jeanne Greenholt (male)',
       num_orders: 2,
       lifetime_value: 6035.6
     },
     {
-      customer_name: 'Cassandra Sai',
+      customer_name: 'Anne Rippin (male)',
       num_orders: 2,
       lifetime_value: 6093.2
     },
     {
-      customer_name: 'Cassandra Sanchez',
+      customer_name: 'Lester Botsford (female)',
       num_orders: 3,
       lifetime_value: 100.84
     },
     {
-      customer_name: 'Cassandra Sara',
+      customer_name: 'Wilson Reichel (male)',
       num_orders: 2,
       lifetime_value: 52.77
     },
     {
-      customer_name: 'Cassandra Srini',
+      customer_name: 'Mr. Noel Maggio (male)',
       num_orders: 2,
       lifetime_value: 61.75
     },
     {
-      customer_name: 'Cassandra Subram',
+      customer_name: 'Anne Cartwright (male)',
       num_orders: 1,
       lifetime_value: 56.98
     },
     {
-      customer_name: 'Cassandra Suri',
+      customer_name: 'Lloyd Daugherty PhD (female)',
       num_orders: 2,
       lifetime_value: 5314.25
     },
     {
-      customer_name: 'Cassandra Van',
+      customer_name: 'Tracy Windler (female)',
       num_orders: 2,
       lifetime_value: 118.94
     },
     {
-      customer_name: 'Chad Anand',
+      customer_name: 'Lorenzo Hilll (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Chad Andersen',
+      customer_name: 'Denise Kunze-Parisian (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Chad Deng',
+      customer_name: 'Byron Powlowski III (male)',
       num_orders: 1,
       lifetime_value: 1155.48
     },
     {
-      customer_name: 'Chad Goel',
+      customer_name: 'Tina Collier (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Chad Jai',
+      customer_name: 'Santiago Lakin (male)',
       num_orders: 1,
       lifetime_value: 2443.35
     },
     {
-      customer_name: 'Chad Kumar',
+      customer_name: 'Lee Nolan (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Chad Lal',
+      customer_name: 'Tara Jacobi (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Chad Luo',
+      customer_name: 'Ms. Rosa Will Sr. (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Chad Nara',
+      customer_name: 'Corey Steuber (male)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Chad Nath',
+      customer_name: 'Luis Denesik DVM (female)',
       num_orders: 1,
       lifetime_value: 32.22
     },
     {
-      customer_name: 'Chad Pal',
+      customer_name: 'Sheila Terry (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Chad Rai',
+      customer_name: 'Lee Kemmer (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Chad Raje',
+      customer_name: 'Byron Pacocha (male)',
       num_orders: 1,
       lifetime_value: 2520.83
     },
     {
-      customer_name: 'Chad Raji',
+      customer_name: 'Oscar Collins (female)',
       num_orders: 1,
       lifetime_value: 123.98
     },
     {
-      customer_name: 'Chad Shan',
+      customer_name: 'Clyde Wuckert (female)',
       num_orders: 1,
       lifetime_value: 2452.34
     },
     {
-      customer_name: 'Chad Sharma',
+      customer_name: 'Guadalupe Goldner (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Chad Shen',
+      customer_name: 'Tony Glover (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Chad Tang',
+      customer_name: 'Delbert Rath (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Chad Xie',
+      customer_name: 'Rose Schneider (female)',
       num_orders: 1,
       lifetime_value: 2543.44
     },
     {
-      customer_name: 'Chad Xu',
+      customer_name: 'Theresa Hartmann (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Chad Yuan',
+      customer_name: 'Margie Powlowski III (female)',
       num_orders: 1,
       lifetime_value: 71.95
     },
     {
-      customer_name: 'Charles Bailey',
+      customer_name: 'Matt Schultz (female)',
       num_orders: 4,
       lifetime_value: 215.45
     },
     {
-      customer_name: 'Charles Bell',
+      customer_name: 'Taylor Kuphal V (female)',
       num_orders: 2,
       lifetime_value: 3772.4096
     },
     {
-      customer_name: 'Charles Brooks',
+      customer_name: 'Helen Crooks (female)',
       num_orders: 2,
       lifetime_value: 4397.75
     },
     {
-      customer_name: 'Charles Cook',
+      customer_name: 'Winston Johnson (male)',
       num_orders: 2,
       lifetime_value: 1622.47
     },
     {
-      customer_name: 'Charles Cooper',
+      customer_name: 'Angelina Russel (female)',
       num_orders: 2,
       lifetime_value: 2919.8896
     },
     {
-      customer_name: 'Charles Cox',
+      customer_name: 'Ian Weber (male)',
       num_orders: 2,
       lifetime_value: 242.94
     },
     {
-      customer_name: 'Charles Gray',
+      customer_name: 'Danielle Crooks (male)',
       num_orders: 1,
       lifetime_value: 54.98
     },
     {
-      customer_name: 'Charles Howard',
+      customer_name: 'Lonnie Murray (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Charles James',
+      customer_name: 'Dr. Chelsea Dickinson PhD (female)',
       num_orders: 2,
       lifetime_value: 1586.3775
     },
     {
-      customer_name: 'Charles Kelly',
+      customer_name: 'Anna Stracke (female)',
       num_orders: 1,
       lifetime_value: 71.58
     },
     {
-      customer_name: 'Charles Morgan',
+      customer_name: 'Joann Walker (male)',
       num_orders: 1,
       lifetime_value: 48.97
     },
     {
-      customer_name: 'Charles Morris',
+      customer_name: 'Frank Wehner (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Charles Murphy',
+      customer_name: 'Lillian Glover (male)',
       num_orders: 1,
       lifetime_value: 94.48
     },
     {
-      customer_name: 'Charles Peterson',
+      customer_name: 'Yvonne Windler (male)',
       num_orders: 1,
       lifetime_value: 141.98
     },
     {
-      customer_name: 'Charles Ramirez',
+      customer_name: 'Shaun Ebert (male)',
       num_orders: 1,
       lifetime_value: 89.97
     },
     {
-      customer_name: 'Charles Reed',
+      customer_name: 'Rhonda Swaniawski (female)',
       num_orders: 2,
       lifetime_value: 3099.29
     },
     {
-      customer_name: 'Charles Richardson',
+      customer_name: 'Lila Flatley (female)',
       num_orders: 2,
       lifetime_value: 1503.5782
     },
     {
-      customer_name: 'Charles Rivera',
+      customer_name: 'Jeremiah Feest (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Charles Rogers',
+      customer_name: 'Crystal Metz (female)',
       num_orders: 2,
       lifetime_value: 3147.95
     },
     {
-      customer_name: 'Charles Sanchez',
+      customer_name: 'Kay Windler (female)',
       num_orders: 1,
       lifetime_value: 114.46
     },
     {
-      customer_name: 'Charles Sanders',
+      customer_name: 'Joey Fay (female)',
       num_orders: 3,
       lifetime_value: 3716.2296
     },
     {
-      customer_name: 'Charles Stewart',
+      customer_name: 'Mr. Darrin Gusikowski (male)',
       num_orders: 2,
       lifetime_value: 3142.97
     },
     {
-      customer_name: 'Charles Torres',
+      customer_name: 'Fernando Schaden I (male)',
       num_orders: 1,
       lifetime_value: 106.96
     },
     {
-      customer_name: 'Charles Ward',
+      customer_name: 'Mable Wisoky (female)',
       num_orders: 3,
       lifetime_value: 5142.7496
     },
     {
-      customer_name: 'Charles Watson',
+      customer_name: 'Percy Leuschke (male)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Chase Bailey',
+      customer_name: 'Jeremy Wilderman (male)',
       num_orders: 2,
       lifetime_value: 113.97
     },
     {
-      customer_name: 'Chase Bell',
+      customer_name: 'Tiffany Kuhlman (female)',
       num_orders: 2,
       lifetime_value: 112.46
     },
     {
-      customer_name: 'Chase Brooks',
+      customer_name: 'Janet Schinner (male)',
       num_orders: 2,
       lifetime_value: 3804.0782
     },
     {
-      customer_name: 'Chase Cook',
+      customer_name: "Luis O'Conner (female)",
       num_orders: 3,
       lifetime_value: 267.84
     },
     {
-      customer_name: 'Chase Cooper',
+      customer_name: 'Laura Schulist (female)',
       num_orders: 2,
       lifetime_value: 3084.0582
     },
     {
-      customer_name: 'Chase Cox',
+      customer_name: 'Mandy Corwin-Hackett (male)',
       num_orders: 2,
       lifetime_value: 5913.24
     },
     {
-      customer_name: 'Chase Gray',
+      customer_name: 'Joe Conn (female)',
       num_orders: 1,
       lifetime_value: 127.28
     },
     {
-      customer_name: 'Chase Howard',
+      customer_name: 'Harry Klein (male)',
       num_orders: 2,
       lifetime_value: 37.97
     },
     {
-      customer_name: 'Chase James',
+      customer_name: 'Leland Kunde (female)',
       num_orders: 2,
       lifetime_value: 63.97
     },
     {
-      customer_name: 'Chase Kelly',
+      customer_name: 'Cedric Schneider-Tillman (male)',
       num_orders: 4,
       lifetime_value: 9523.0025
     },
     {
-      customer_name: 'Chase Morgan',
+      customer_name: 'Derek Thiel (male)',
       num_orders: 1,
       lifetime_value: 70.95
     },
     {
-      customer_name: 'Chase Morris',
+      customer_name: 'Lucille Jast (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Chase Murphy',
+      customer_name: 'Andre Durgan (female)',
       num_orders: 3,
       lifetime_value: 7108.8725
     },
     {
-      customer_name: 'Chase Peterson',
+      customer_name: 'Peter Krajcik (male)',
       num_orders: 3,
       lifetime_value: 6998.8625
     },
     {
-      customer_name: 'Chase Ramirez',
+      customer_name: 'Mrs. Willie Hartmann (male)',
       num_orders: 2,
       lifetime_value: 117.96
     },
     {
-      customer_name: 'Chase Reed',
+      customer_name: 'Harry Haag III (male)',
       num_orders: 2,
       lifetime_value: 3772.4096
     },
     {
-      customer_name: 'Chase Richardson',
+      customer_name: 'Bertha Brakus-Treutel (female)',
       num_orders: 1,
       lifetime_value: 63.97
     },
     {
-      customer_name: 'Chase Rivera',
+      customer_name: 'Ms. Shelley Fadel (female)',
       num_orders: 2,
       lifetime_value: 2910.8996
     },
     {
-      customer_name: 'Chase Rogers',
+      customer_name: 'Kristi Lakin (female)',
       num_orders: 2,
       lifetime_value: 3184.44
     },
     {
-      customer_name: 'Chase Sanchez',
+      customer_name: 'Jeanette Hoeger (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Chase Sandberg',
+      customer_name: 'Audrey Marquardt (female)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Chase Stewart',
+      customer_name: 'Miss Pamela Parker (female)',
       num_orders: 1,
       lifetime_value: 75.97
     },
     {
-      customer_name: 'Chase Ward',
+      customer_name: 'Michele McDermott PhD (female)',
       num_orders: 2,
       lifetime_value: 1533.5582
     },
     {
-      customer_name: 'Chase Watson',
+      customer_name: 'Dr. Rufus Stehr (male)',
       num_orders: 2,
       lifetime_value: 156.84
     },
     {
-      customer_name: 'Chelsea Arun',
+      customer_name: 'Gabriel Berge (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Chelsea Chandra',
+      customer_name: 'Marcella Schuppe (female)',
       num_orders: 2,
       lifetime_value: 6035.6
     },
     {
-      customer_name: 'Chelsea Fernandez',
+      customer_name: 'Oscar Champlin (female)',
       num_orders: 1,
       lifetime_value: 777.44
     },
     {
-      customer_name: 'Chelsea Garcia',
+      customer_name: 'Mr. Rogelio Pagac (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Chelsea Gonzalez',
+      customer_name: 'Nadine Cormier (male)',
       num_orders: 1,
       lifetime_value: 618.98
     },
     {
-      customer_name: 'Chelsea Jordan',
+      customer_name: 'Taylor Corwin-Toy (male)',
       num_orders: 2,
       lifetime_value: 6095.08
     },
     {
-      customer_name: 'Chelsea Lopez',
+      customer_name: 'Wilma Hoppe (female)',
       num_orders: 1,
       lifetime_value: 893.47
     },
     {
-      customer_name: 'Chelsea Madan',
+      customer_name: 'Bertha Ferry V (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Chelsea Martinez',
+      customer_name: 'Maryann Lemke (male)',
       num_orders: 1,
       lifetime_value: 565.21
     },
     {
-      customer_name: 'Chelsea McDonald',
+      customer_name: 'Randy Becker DVM (male)',
       num_orders: 1,
       lifetime_value: 59.98
     },
     {
-      customer_name: 'Chelsea Mehta',
+      customer_name: 'Bobby Kozey (female)',
       num_orders: 1,
       lifetime_value: 801.77
     },
     {
-      customer_name: 'Chelsea Patel',
+      customer_name: 'Lee Hirthe (male)',
       num_orders: 2,
       lifetime_value: 6060.5
     },
     {
-      customer_name: 'Chelsea Perez',
+      customer_name: 'Conrad Hermann (male)',
       num_orders: 1,
       lifetime_value: 123.98
     },
     {
-      customer_name: 'Chelsea Prasad',
+      customer_name: 'Alberto Bins (male)',
       num_orders: 1,
       lifetime_value: 123.98
     },
     {
-      customer_name: 'Chelsea Raman',
+      customer_name: 'Marianne Thompson (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Chelsea Ray',
+      customer_name: 'Carlton Donnelly (female)',
       num_orders: 1,
       lifetime_value: 902.98
     },
     {
-      customer_name: 'Chelsea Rodriguez',
+      customer_name: 'Jo Hessel (female)',
       num_orders: 1,
       lifetime_value: 2369.96
     },
     {
-      customer_name: 'Chelsea Sai',
+      customer_name: 'Clifford Greenholt-Price DVM (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Chelsea Sanchez',
+      customer_name: 'Elaine Krajcik (male)',
       num_orders: 1,
       lifetime_value: 589.98
     },
     {
-      customer_name: 'Chelsea Sara',
+      customer_name: 'Loren Lemke (female)',
       num_orders: 1,
       lifetime_value: 889.39
     },
     {
-      customer_name: 'Chelsea Srini',
+      customer_name: 'Heather Zieme-Schuppe (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Chelsea Subram',
+      customer_name: 'Myrtle Christiansen (female)',
       num_orders: 1,
       lifetime_value: 804.48
     },
     {
-      customer_name: 'Chelsea Suri',
+      customer_name: 'Marcella Mante (male)',
       num_orders: 2,
       lifetime_value: 89.25
     },
     {
-      customer_name: 'Chelsea Weber',
+      customer_name: 'Angel Russel (male)',
       num_orders: 2,
       lifetime_value: 59.26
     },
     {
-      customer_name: 'Chloe Alexander',
+      customer_name: 'Frederick Goldner PhD (female)',
       num_orders: 1,
       lifetime_value: 2492.32
     },
     {
-      customer_name: 'Chloe Anderson',
+      customer_name: "Edmond O'Keefe (female)",
       num_orders: 1,
       lifetime_value: 8.99
     },
     {
-      customer_name: 'Chloe Bailey',
+      customer_name: 'Thomas Littel (female)',
       num_orders: 1,
       lifetime_value: 37.27
     },
     {
-      customer_name: 'Chloe Bell',
+      customer_name: 'Josh Ziemann (female)',
       num_orders: 2,
       lifetime_value: 6085.59
     },
     {
-      customer_name: 'Chloe Bennett',
+      customer_name: 'Amy Monahan (female)',
       num_orders: 2,
       lifetime_value: 95.94
     },
     {
-      customer_name: 'Chloe Bradley',
+      customer_name: 'Audrey Bogan (female)',
       num_orders: 1,
       lifetime_value: 94.48
     },
     {
-      customer_name: 'Chloe Brooks',
+      customer_name: 'Sheila Gottlieb (female)',
       num_orders: 1,
       lifetime_value: 133.49
     },
     {
-      customer_name: 'Chloe Brown',
+      customer_name: 'Sadie Stoltenberg (female)',
       num_orders: 2,
       lifetime_value: 4390.6796
     },
     {
-      customer_name: 'Chloe Bryant',
+      customer_name: 'Derrick Kohler-Stokes (male)',
       num_orders: 1,
       lifetime_value: 1155.48
     },
     {
-      customer_name: 'Chloe Butler',
+      customer_name: 'Mable Kozey (female)',
       num_orders: 1,
       lifetime_value: 58.98
     },
     {
-      customer_name: 'Chloe Clark',
+      customer_name: 'Lonnie Schoen (male)',
       num_orders: 3,
       lifetime_value: 6434.31
     },
     {
-      customer_name: 'Chloe Coleman',
+      customer_name: 'Jonathan Rath (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Chloe Cook',
+      customer_name: 'Omar Crona I (male)',
       num_orders: 1,
       lifetime_value: 60.47
     },
     {
-      customer_name: 'Chloe Cox',
+      customer_name: 'Colin Cruickshank (male)',
       num_orders: 2,
       lifetime_value: 6029.57
     },
     {
-      customer_name: 'Chloe Diaz',
+      customer_name: 'Cheryl Gibson DVM (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Chloe Flores',
+      customer_name: 'Marianne Stark (female)',
       num_orders: 1,
       lifetime_value: 1149.47
     },
     {
-      customer_name: 'Chloe Garcia',
+      customer_name: 'Jamie Will (female)',
       num_orders: 2,
       lifetime_value: 138.45
     },
     {
-      customer_name: 'Chloe Gonzales',
+      customer_name: 'Corey Buckridge (male)',
       num_orders: 1,
       lifetime_value: 1155.48
     },
     {
-      customer_name: 'Chloe Griffin',
+      customer_name: 'Pamela Dach (male)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Chloe Hall',
+      customer_name: 'Colleen Medhurst Jr. (female)',
       num_orders: 3,
       lifetime_value: 6591.57
     },
     {
-      customer_name: 'Chloe Harris',
+      customer_name: 'Elizabeth Runte (male)',
       num_orders: 3,
       lifetime_value: 8196.01
     },
     {
-      customer_name: 'Chloe Henderson',
+      customer_name: 'Paul Rohan (female)',
       num_orders: 1,
       lifetime_value: 1151.76
     },
     {
-      customer_name: 'Chloe Howard',
+      customer_name: 'Lucy Schmidt (male)',
       num_orders: 2,
       lifetime_value: 6029.57
     },
     {
-      customer_name: 'Chloe Hughes',
+      customer_name: 'Ronnie Gerhold (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Chloe Jackson',
+      customer_name: 'Melissa Green (female)',
       num_orders: 2,
       lifetime_value: 4369.0882
     },
     {
-      customer_name: 'Chloe Jenkins',
+      customer_name: 'Jane Predovic (female)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Chloe Johnson',
+      customer_name: 'Jody Wolff (female)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Chloe Jones',
+      customer_name: 'Clark Schinner (male)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Chloe Kelly',
+      customer_name: 'Valerie Flatley (male)',
       num_orders: 1,
       lifetime_value: 128.97
     },
     {
-      customer_name: 'Chloe Lee',
+      customer_name: 'Adrienne Prohaska V (female)',
       num_orders: 2,
       lifetime_value: 122.24
     },
     {
-      customer_name: 'Chloe Long',
+      customer_name: 'Melissa Ullrich (female)',
       num_orders: 1,
       lifetime_value: 2451.3
     },
     {
-      customer_name: 'Chloe Martin',
+      customer_name: 'Miriam Fahey (female)',
       num_orders: 3,
       lifetime_value: 8119.03
     },
     {
-      customer_name: 'Chloe Miller',
+      customer_name: 'Ervin Erdman (male)',
       num_orders: 2,
       lifetime_value: 4486.4096
     },
     {
-      customer_name: 'Chloe Moore',
+      customer_name: 'Vicki Stamm (male)',
       num_orders: 2,
       lifetime_value: 4379.0782
     },
     {
-      customer_name: 'Chloe Morgan',
+      customer_name: 'Kendra Weissnat (female)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Chloe Morris',
+      customer_name: 'Sherry Renner (female)',
       num_orders: 1,
       lifetime_value: 60.47
     },
     {
-      customer_name: 'Chloe Patterson',
+      customer_name: "Richard O'Conner (female)",
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Chloe Perry',
+      customer_name: 'Owen Von (male)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Chloe Peterson',
+      customer_name: 'Lena Franey (male)',
       num_orders: 1,
       lifetime_value: 27.77
     },
     {
-      customer_name: 'Chloe Powell',
+      customer_name: 'Julia Becker Sr. (male)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Chloe Price',
+      customer_name: 'Alfonso Reichel (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Chloe Ramirez',
+      customer_name: 'Jennie Krajcik (male)',
       num_orders: 2,
       lifetime_value: 5333.25
     },
     {
-      customer_name: 'Chloe Reed',
+      customer_name: 'Miss Teri Schneider Sr. (female)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Chloe Richardson',
+      customer_name: 'Genevieve Rolfson Jr. (male)',
       num_orders: 1,
       lifetime_value: 60.47
     },
     {
-      customer_name: 'Chloe Rivera',
+      customer_name: 'Mae Beer IV (female)',
       num_orders: 1,
       lifetime_value: 59.47
     },
     {
-      customer_name: 'Chloe Robinson',
+      customer_name: 'Emilio Mohr (female)',
       num_orders: 1,
       lifetime_value: 2332.28
     },
     {
-      customer_name: 'Chloe Rodriguez',
+      customer_name: 'Danny McKenzie (male)',
       num_orders: 1,
       lifetime_value: 2316.97
     },
     {
-      customer_name: 'Chloe Rogers',
+      customer_name: 'Timmy Cronin (male)',
       num_orders: 2,
       lifetime_value: 5279.26
     },
     {
-      customer_name: 'Chloe Ross',
+      customer_name: 'Micheal Green (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Chloe Russell',
+      customer_name: 'Cedric Wyman (male)',
       num_orders: 1,
       lifetime_value: 128.97
     },
     {
-      customer_name: 'Chloe Sanchez',
+      customer_name: 'Jeanne Shanahan (male)',
       num_orders: 2,
       lifetime_value: 6093.2
     },
     {
-      customer_name: 'Chloe Sanders',
+      customer_name: 'Sylvester Hilll (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Chloe Smith',
+      customer_name: 'Dr. Herman Daugherty (female)',
       num_orders: 2,
       lifetime_value: 4369.0882
     },
     {
-      customer_name: 'Chloe Taylor',
+      customer_name: 'Jermaine Bartoletti (female)',
       num_orders: 2,
       lifetime_value: 4381.3896
     },
     {
-      customer_name: 'Chloe Thompson',
+      customer_name: 'Dr. Meghan Kuvalis (female)',
       num_orders: 2,
       lifetime_value: 81.26
     },
     {
-      customer_name: 'Chloe Torres',
+      customer_name: 'Mr. Cecil Langworth DVM (female)',
       num_orders: 2,
       lifetime_value: 5314.25
     },
     {
-      customer_name: 'Chloe Walker',
+      customer_name: 'Cary Goyette (male)',
       num_orders: 2,
       lifetime_value: 56.51
     },
     {
-      customer_name: 'Chloe Ward',
+      customer_name: 'Becky Wintheiser (male)',
       num_orders: 2,
       lifetime_value: 5314.25
     },
     {
-      customer_name: 'Chloe Washington',
+      customer_name: 'Miss Jodi Hamill (male)',
       num_orders: 1,
       lifetime_value: 132.97
     },
     {
-      customer_name: 'Chloe Watson',
+      customer_name: 'Rogelio Goyette (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Chloe White',
+      customer_name: 'Dr. Courtney Marvin (male)',
       num_orders: 1,
       lifetime_value: 88.98
     },
     {
-      customer_name: 'Chloe Williams',
+      customer_name: 'Mrs. Kathleen Konopelski (male)',
       num_orders: 1,
       lifetime_value: 53.99
     },
     {
-      customer_name: 'Chloe Wilson',
+      customer_name: 'Candace Parker (male)',
       num_orders: 2,
       lifetime_value: 4344.0882
     },
     {
-      customer_name: 'Chloe Wood',
+      customer_name: 'Julie Russel (female)',
       num_orders: 1,
       lifetime_value: 144.47
     },
     {
-      customer_name: 'Christian Anderson',
+      customer_name: 'Rex Langosh (male)',
       num_orders: 1,
       lifetime_value: 96.46
     },
     {
-      customer_name: 'Christian Brown',
+      customer_name: 'Marco Terry (male)',
       num_orders: 1,
       lifetime_value: 34.98
     },
     {
-      customer_name: 'Christian Clark',
+      customer_name: 'Christopher Jakubowski (female)',
       num_orders: 1,
       lifetime_value: 1785.97
     },
     {
-      customer_name: 'Christian Davis',
+      customer_name: 'Marty Wunsch (male)',
       num_orders: 2,
       lifetime_value: 3917.5425
     },
     {
-      customer_name: 'Christian Garcia',
+      customer_name: 'Connie Buckridge (male)',
       num_orders: 2,
       lifetime_value: 65.96
     },
     {
-      customer_name: 'Christian Harris',
+      customer_name: 'Israel Willms PhD (male)',
       num_orders: 3,
       lifetime_value: 7200.37
     },
     {
-      customer_name: 'Christian Jackson',
+      customer_name: 'Cory Murray (male)',
       num_orders: 1,
       lifetime_value: 66.44
     },
     {
-      customer_name: 'Christian Johnson',
+      customer_name: 'Toby Cruickshank (male)',
       num_orders: 3,
       lifetime_value: 5750.3625
     },
     {
-      customer_name: 'Christian Jones',
+      customer_name: 'Marion Wehner (female)',
       num_orders: 1,
       lifetime_value: 73.96
     },
     {
-      customer_name: 'Christian Lee',
+      customer_name: 'Andrew Dooley (female)',
       num_orders: 1,
       lifetime_value: 58.98
     },
     {
-      customer_name: 'Christian Lewis',
+      customer_name: 'Dr. Shirley Bahringer (male)',
       num_orders: 2,
       lifetime_value: 51.97
     },
     {
-      customer_name: 'Christian Martin',
+      customer_name: 'Erik Grimes (female)',
       num_orders: 1,
       lifetime_value: 44.91
     },
     {
-      customer_name: 'Christian Martinez',
+      customer_name: 'Penny Miller (female)',
       num_orders: 2,
       lifetime_value: 6093.2
     },
     {
-      customer_name: 'Christian Moore',
+      customer_name: 'Sheldon Luettgen (female)',
       num_orders: 1,
       lifetime_value: 67.97
     },
     {
-      customer_name: 'Christian Robinson',
+      customer_name: 'Ryan Crist (male)',
       num_orders: 3,
       lifetime_value: 5784.3625
     },
     {
-      customer_name: 'Christian Rodriguez',
+      customer_name: 'Miss Desiree Muller (male)',
       num_orders: 1,
       lifetime_value: 1700.99
     },
     {
-      customer_name: 'Christian Smith',
+      customer_name: 'Kate Mohr (female)',
       num_orders: 2,
       lifetime_value: 2431.3582
     },
     {
-      customer_name: 'Christian Taylor',
+      customer_name: 'Lydia Reynolds DVM (male)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Christian Thomas',
+      customer_name: 'Roosevelt Gulgowski (female)',
       num_orders: 3,
       lifetime_value: 5732.4675
     },
     {
-      customer_name: 'Christian Thompson',
+      customer_name: 'Blanca Turner (male)',
       num_orders: 2,
       lifetime_value: 63.97
     },
     {
-      customer_name: 'Christian Walker',
+      customer_name: 'Bob Rempel Sr. (female)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Christian White',
+      customer_name: 'Rita Ortiz (female)',
       num_orders: 2,
       lifetime_value: 3044.0582
     },
     {
-      customer_name: 'Christian Williams',
+      customer_name: 'Dr. Ed Lesch (male)',
       num_orders: 2,
       lifetime_value: 3040.31
     },
     {
-      customer_name: 'Christian Wilson',
+      customer_name: 'Vanessa West (female)',
       num_orders: 1,
       lifetime_value: 193.98
     },
     {
-      customer_name: 'Christine Andersen',
+      customer_name: 'Evelyn Hilpert (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Christine Beck',
+      customer_name: 'Kent Hills (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Christine Chande',
+      customer_name: 'Linda Balistreri (male)',
       num_orders: 2,
       lifetime_value: 4588.45
     },
     {
-      customer_name: 'Christine Chander',
+      customer_name: 'Monica Hermiston (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Christine Goel',
+      customer_name: 'Gloria McClure (male)',
       num_orders: 1,
       lifetime_value: 128.97
     },
     {
-      customer_name: 'Christine Jai',
+      customer_name: 'Ruben Connelly DVM (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Christine Luo',
+      customer_name: 'Clifford Reynolds (female)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Christine Nara',
+      customer_name: 'Jennifer Predovic V (male)',
       num_orders: 1,
       lifetime_value: 539.99
     },
     {
-      customer_name: 'Christine Nath',
+      customer_name: 'Vivian Wisozk (female)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Christine Pal',
+      customer_name: 'Kayla Gibson (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Christine Raje',
+      customer_name: 'Eileen Mayert (female)',
       num_orders: 1,
       lifetime_value: 548.98
     },
     {
-      customer_name: 'Christine Raji',
+      customer_name: 'Cody Maggio (male)',
       num_orders: 1,
       lifetime_value: 27.28
     },
     {
-      customer_name: 'Christine Shan',
+      customer_name: 'Carrie Barrows (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Christine She',
+      customer_name: 'Muriel Wisozk (male)',
       num_orders: 1,
       lifetime_value: 132.97
     },
     {
-      customer_name: 'Christine Stone',
+      customer_name: 'Devin Macejkovic (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Christine Sutton',
+      customer_name: 'Roberto Gerhold (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Christine Yuan',
+      customer_name: 'Rebecca Predovic (male)',
       num_orders: 2,
       lifetime_value: 77.25
     },
     {
-      customer_name: 'Christopher Anderson',
+      customer_name: 'Ross Beahan (female)',
       num_orders: 1,
       lifetime_value: 2391.96
     },
     {
-      customer_name: 'Christopher Brown',
+      customer_name: 'Regina Lockman (female)',
       num_orders: 3,
       lifetime_value: 5706.3825
     },
     {
-      customer_name: 'Christopher Clark',
+      customer_name: 'Elaine Berge (male)',
       num_orders: 2,
       lifetime_value: 6067.2
     },
     {
-      customer_name: 'Christopher Davis',
+      customer_name: 'Guillermo Kuvalis (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Christopher Garcia',
+      customer_name: 'Neil Kirlin DDS (female)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Christopher Harris',
+      customer_name: 'Nathaniel Pfannerstill (female)',
       num_orders: 3,
       lifetime_value: 6907.5525
     },
     {
-      customer_name: 'Christopher Jackson',
+      customer_name: 'Dr. Kerry Jacobson (female)',
       num_orders: 1,
       lifetime_value: 24.27
     },
     {
-      customer_name: 'Christopher Johnson',
+      customer_name: 'Charlene Kertzmann (male)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Christopher Jones',
+      customer_name: 'Diane Feest (male)',
       num_orders: 1,
       lifetime_value: 1723.96
     },
     {
-      customer_name: 'Christopher Lee',
+      customer_name: 'Tanya Weissnat (female)',
       num_orders: 2,
       lifetime_value: 142.45
     },
     {
-      customer_name: 'Christopher Lewis',
+      customer_name: 'Lucille Kuphal (female)',
       num_orders: 2,
       lifetime_value: 115.95
     },
     {
-      customer_name: 'Christopher Martin',
+      customer_name: 'Dr. Terence McClure (female)',
       num_orders: 2,
       lifetime_value: 4150.53
     },
     {
-      customer_name: 'Christopher Martinez',
+      customer_name: 'Alvin Baumbach (male)',
       num_orders: 2,
       lifetime_value: 6030.61
     },
     {
-      customer_name: 'Christopher Miller',
+      customer_name: 'Jeffrey Huel DDS (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Christopher Moore',
+      customer_name: 'Chad Koss PhD (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Christopher Robinson',
+      customer_name: 'Gary Wilkinson (male)',
       num_orders: 2,
       lifetime_value: 45.95
     },
     {
-      customer_name: 'Christopher Rodriguez',
+      customer_name: 'Antoinette Mraz-Herman (male)',
       num_orders: 2,
       lifetime_value: 98.96
     },
     {
-      customer_name: 'Christopher Smith',
+      customer_name: 'Bennie Prosacco (male)',
       num_orders: 1,
       lifetime_value: 607.96
     },
     {
-      customer_name: 'Christopher Taylor',
+      customer_name: 'Mr. Carlton Predovic (female)',
       num_orders: 1,
       lifetime_value: 123.48
     },
     {
-      customer_name: 'Christopher Thomas',
+      customer_name: 'Jessica Satterfield (female)',
       num_orders: 2,
       lifetime_value: 3043.0582
     },
     {
-      customer_name: 'Christopher Walker',
+      customer_name: 'Robert Murray (female)',
       num_orders: 2,
       lifetime_value: 72.26
     },
     {
-      customer_name: 'Christopher White',
+      customer_name: 'Stuart Brakus (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Christopher Wilson',
+      customer_name: 'Kelly Runolfsdottir (male)',
       num_orders: 1,
       lifetime_value: 1750.98
     },
     {
-      customer_name: 'Christopher Winston',
+      customer_name: 'Melba Batz-Bartoletti (male)',
       num_orders: 1,
       lifetime_value: 58.98
     },
     {
-      customer_name: 'Christy Andersen',
+      customer_name: 'Merle Harris (male)',
       num_orders: 1,
       lifetime_value: 34.47
     },
     {
-      customer_name: 'Christy Beck',
+      customer_name: 'Fernando Schaden DDS (female)',
       num_orders: 1,
       lifetime_value: 43.98
     },
     {
-      customer_name: 'Christy Cai',
+      customer_name: 'Stanley Kemmer (male)',
       num_orders: 1,
       lifetime_value: 78.48
     },
     {
-      customer_name: 'Christy Chande',
+      customer_name: 'Renee Borer (male)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Christy Chander',
+      customer_name: 'Sheri Homenick PhD (male)',
       num_orders: 3,
       lifetime_value: 4928.0582
     },
     {
-      customer_name: 'Christy Chow',
+      customer_name: 'Felipe Turner (female)',
       num_orders: 2,
       lifetime_value: 5898.26
     },
     {
-      customer_name: 'Christy Deng',
+      customer_name: 'Richard Hartmann DDS (female)',
       num_orders: 2,
       lifetime_value: 4344.0882
     },
     {
-      customer_name: 'Christy Gao',
+      customer_name: 'Violet Ferry DDS (female)',
       num_orders: 3,
       lifetime_value: 4960.07
     },
     {
-      customer_name: 'Christy Goel',
+      customer_name: 'Naomi Fahey (male)',
       num_orders: 4,
       lifetime_value: 7075.27
     },
     {
-      customer_name: 'Christy Guo',
+      customer_name: 'Patty Huels (male)',
       num_orders: 3,
       lifetime_value: 5106.24
     },
     {
-      customer_name: 'Christy Hu',
+      customer_name: 'Tina Sipes (female)',
       num_orders: 1,
       lifetime_value: 68.97
     },
     {
-      customer_name: 'Christy Huang',
+      customer_name: 'Angel Carroll (female)',
       num_orders: 2,
       lifetime_value: 4413.0582
     },
     {
-      customer_name: 'Christy Jai',
+      customer_name: 'Antonia Sanford (male)',
       num_orders: 1,
       lifetime_value: 33.98
     },
     {
-      customer_name: 'Christy Kumar',
+      customer_name: 'Virginia Sawayn DDS (female)',
       num_orders: 1,
       lifetime_value: 38.47
     },
     {
-      customer_name: 'Christy Lal',
+      customer_name: 'Ida Langworth Sr. (male)',
       num_orders: 3,
       lifetime_value: 8114.04
     },
     {
-      customer_name: 'Christy Li',
+      customer_name: 'Glenn Stanton (male)',
       num_orders: 3,
       lifetime_value: 8154.02
     },
     {
-      customer_name: 'Christy Liang',
+      customer_name: 'Mr. Emanuel Braun-Thompson (male)',
       num_orders: 3,
       lifetime_value: 4921.82
     },
     {
-      customer_name: 'Christy Liu',
+      customer_name: 'Carol Lubowitz (female)',
       num_orders: 3,
       lifetime_value: 8162
     },
     {
-      customer_name: 'Christy Lu',
+      customer_name: 'Ellen Hudson I (male)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Christy Luo',
+      customer_name: 'Dr. Marcos Murazik (male)',
       num_orders: 1,
       lifetime_value: 28.99
     },
     {
-      customer_name: 'Christy Ma',
+      customer_name: 'Mr. Clint Bode (male)',
       num_orders: 2,
       lifetime_value: 114.96
     },
     {
-      customer_name: 'Christy McDonald',
+      customer_name: 'Alan Kling (female)',
       num_orders: 1,
       lifetime_value: 67.97
     },
     {
-      customer_name: 'Christy Nara',
+      customer_name: 'Jermaine McCullough (male)',
       num_orders: 2,
       lifetime_value: 231.75
     },
     {
-      customer_name: 'Christy Nath',
+      customer_name: 'Mrs. Jeanne Bechtelar (male)',
       num_orders: 4,
       lifetime_value: 9780.04
     },
     {
-      customer_name: 'Christy Pal',
+      customer_name: 'Tammy Watsica (female)',
       num_orders: 1,
       lifetime_value: 53.99
     },
     {
-      customer_name: 'Christy Rai',
+      customer_name: 'Belinda Hodkiewicz (female)',
       num_orders: 7,
       lifetime_value: 11200.7696
     },
     {
-      customer_name: 'Christy Raje',
+      customer_name: 'Erick Spencer (male)',
       num_orders: 4,
       lifetime_value: 9879.96
     },
     {
-      customer_name: 'Christy Raji',
+      customer_name: 'Jackie Ankunding (male)',
       num_orders: 4,
       lifetime_value: 9954.26
     },
     {
-      customer_name: 'Christy Shan',
+      customer_name: 'Miss Jane Schaefer (male)',
       num_orders: 3,
       lifetime_value: 5033.1396
     },
     {
-      customer_name: 'Christy Sun',
+      customer_name: 'Elsa Gleichner (male)',
       num_orders: 3,
       lifetime_value: 4943.8
     },
     {
-      customer_name: 'Christy Tang',
+      customer_name: 'Ashley Denesik (male)',
       num_orders: 1,
       lifetime_value: 48.97
     },
     {
-      customer_name: 'Christy Wang',
+      customer_name: 'Miss Colleen Harris (male)',
       num_orders: 2,
       lifetime_value: 5915.54
     },
     {
-      customer_name: 'Christy Wu',
+      customer_name: 'Dr. Richard Bechtelar (male)',
       num_orders: 1,
       lifetime_value: 48.97
     },
     {
-      customer_name: 'Christy Xie',
+      customer_name: 'Isaac Macejkovic (male)',
       num_orders: 1,
       lifetime_value: 68.97
     },
     {
-      customer_name: 'Christy Ye',
+      customer_name: 'Rafael Waters (female)',
       num_orders: 1,
       lifetime_value: 22.97
     },
     {
-      customer_name: 'Christy Zeng',
+      customer_name: 'Darla Jacobs (female)',
       num_orders: 1,
       lifetime_value: 83.97
     },
     {
-      customer_name: 'Christy Zheng',
+      customer_name: 'Tammy Jast (female)',
       num_orders: 3,
       lifetime_value: 4965.81
     },
     {
-      customer_name: 'Christy Zhou',
+      customer_name: 'Erma Reinger (female)',
       num_orders: 1,
       lifetime_value: 38.47
     },
     {
-      customer_name: 'Christy Zhu',
+      customer_name: 'Melinda Gerhold (female)',
       num_orders: 3,
       lifetime_value: 5034.78
     },
     {
-      customer_name: 'Christy Zimmerman',
+      customer_name: 'Louis Mueller (female)',
       num_orders: 2,
       lifetime_value: 6044.2
     },
     {
-      customer_name: 'Cindy Foster',
+      customer_name: 'Jamie Friesen (female)',
       num_orders: 2,
       lifetime_value: 3241.8996
     },
     {
-      customer_name: 'Cindy Gray',
+      customer_name: 'Veronica Swift (male)',
       num_orders: 1,
       lifetime_value: 21.49
     },
     {
-      customer_name: 'Cindy James',
+      customer_name: 'Vincent Kshlerin IV (female)',
       num_orders: 1,
       lifetime_value: 21.49
     },
     {
-      customer_name: 'Cindy Lewis',
+      customer_name: 'Crystal Hilll (male)',
       num_orders: 1,
       lifetime_value: 2371.96
     },
     {
-      customer_name: 'Cindy Murphy',
+      customer_name: 'Bessie Murphy (male)',
       num_orders: 1,
       lifetime_value: 69.97
     },
     {
-      customer_name: 'Cindy Ramos',
+      customer_name: 'Kent Hodkiewicz (male)',
       num_orders: 1,
       lifetime_value: 54.98
     },
     {
-      customer_name: 'Cindy Stewart',
+      customer_name: 'Mr. Saul Pagac (male)',
       num_orders: 2,
       lifetime_value: 44.46
     },
     {
-      customer_name: 'Clarence Chen',
+      customer_name: 'Jeremy Gottlieb (male)',
       num_orders: 2,
       lifetime_value: 56.76
     },
     {
-      customer_name: 'Clarence Li',
+      customer_name: 'Estelle Kunde-Stanton (female)',
       num_orders: 1,
       lifetime_value: 36.96
     },
     {
-      customer_name: 'Clarence Liu',
+      customer_name: 'Felicia Sipes (male)',
       num_orders: 1,
       lifetime_value: 38.98
     },
     {
-      customer_name: 'Clarence Yang',
+      customer_name: 'Ms. Leona Schimmel (male)',
       num_orders: 2,
       lifetime_value: 2715.4075
     },
     {
-      customer_name: 'Clarence Zhang',
+      customer_name: 'Bob Schneider (female)',
       num_orders: 1,
       lifetime_value: 1709.98
     },
     {
-      customer_name: 'Clayton Anand',
+      customer_name: 'Mrs. Dora Herman (female)',
       num_orders: 3,
       lifetime_value: 381.97
     },
     {
-      customer_name: 'Clayton Andersen',
+      customer_name: 'Miss Marcia McKenzie (female)',
       num_orders: 1,
       lifetime_value: 8.99
     },
     {
-      customer_name: 'Clayton Beck',
+      customer_name: 'Jonathon Greenholt (male)',
       num_orders: 3,
       lifetime_value: 6791.0982
     },
     {
-      customer_name: 'Clayton Cai',
+      customer_name: 'Dr. Angie Ernser (female)',
       num_orders: 3,
       lifetime_value: 5200.4082
     },
     {
-      customer_name: 'Clayton Chavez',
+      customer_name: 'Miss Leah Connelly (female)',
       num_orders: 2,
       lifetime_value: 45.26
     },
     {
-      customer_name: 'Clayton Chen',
+      customer_name: 'Natasha Kemmer (female)',
       num_orders: 2,
       lifetime_value: 2668.0782
     },
     {
-      customer_name: 'Clayton Deng',
+      customer_name: 'Harriet Sporer (male)',
       num_orders: 2,
       lifetime_value: 77.96
     },
     {
-      customer_name: 'Clayton Gao',
+      customer_name: 'Tabitha Bradtke (male)',
       num_orders: 3,
       lifetime_value: 6489.51
     },
     {
-      customer_name: 'Clayton Goel',
+      customer_name: 'Theresa Lockman (male)',
       num_orders: 3,
       lifetime_value: 34.56
     },
     {
-      customer_name: 'Clayton Guo',
+      customer_name: 'Rudy Romaguera (male)',
       num_orders: 2,
       lifetime_value: 67.46
     },
     {
-      customer_name: 'Clayton He',
+      customer_name: 'Mack Marquardt (male)',
       num_orders: 2,
       lifetime_value: 5983.74
     },
     {
-      customer_name: 'Clayton Jai',
+      customer_name: 'Allison Stiedemann (male)',
       num_orders: 2,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Clayton Kumar',
+      customer_name: 'Andrea White (male)',
       num_orders: 1,
       lifetime_value: 49.99
     },
     {
-      customer_name: 'Clayton Li',
+      customer_name: 'Kate Waters (male)',
       num_orders: 2,
       lifetime_value: 2653.0682
     },
     {
-      customer_name: 'Clayton Liang',
+      customer_name: 'Eileen Bode (female)',
       num_orders: 2,
       lifetime_value: 101.95
     },
     {
-      customer_name: 'Clayton Lin',
+      customer_name: 'Joy Mertz Jr. (female)',
       num_orders: 2,
       lifetime_value: 2636.4096
     },
     {
-      customer_name: 'Clayton Liu',
+      customer_name: 'Doris Kuhlman (male)',
       num_orders: 2,
       lifetime_value: 2668.0782
     },
     {
-      customer_name: 'Clayton Lu',
+      customer_name: 'Leon Parisian (male)',
       num_orders: 2,
       lifetime_value: 40.27
     },
     {
-      customer_name: 'Clayton Nara',
+      customer_name: 'Billy Kerluke (male)',
       num_orders: 1,
       lifetime_value: 73.97
     },
     {
-      customer_name: 'Clayton Nath',
+      customer_name: 'Gary Hudson (male)',
       num_orders: 1,
       lifetime_value: 68.97
     },
     {
-      customer_name: 'Clayton Pal',
+      customer_name: 'Kent Durgan (female)',
       num_orders: 3,
       lifetime_value: 6817.5982
     },
     {
-      customer_name: 'Clayton Rai',
+      customer_name: 'Daisy Parisian (female)',
       num_orders: 1,
       lifetime_value: 14.98
     },
     {
-      customer_name: 'Clayton Raje',
+      customer_name: 'Horace Rau (male)',
       num_orders: 3,
       lifetime_value: 6860.0882
     },
     {
-      customer_name: 'Clayton Raji',
+      customer_name: 'Johnnie Bashirian (female)',
       num_orders: 3,
       lifetime_value: 6802.1282
     },
     {
-      customer_name: 'Clayton Shan',
+      customer_name: 'Mrs. Florence Crist (female)',
       num_orders: 3,
       lifetime_value: 6847.7596
     },
     {
-      customer_name: 'Clayton Sharma',
+      customer_name: 'Brandy Satterfield (female)',
       num_orders: 2,
       lifetime_value: 102.96
     },
     {
-      customer_name: 'Clayton She',
+      customer_name: 'Alicia McDermott (female)',
       num_orders: 2,
       lifetime_value: 4379.0782
     },
     {
-      customer_name: 'Clayton Stone',
+      customer_name: 'Tommy Emmerich (male)',
       num_orders: 1,
       lifetime_value: 14.98
     },
     {
-      customer_name: 'Clayton Sun',
+      customer_name: 'Dale Kozey (male)',
       num_orders: 2,
       lifetime_value: 45.26
     },
     {
-      customer_name: 'Clayton Tang',
+      customer_name: 'Whitney Hand (female)',
       num_orders: 4,
       lifetime_value: 10793.27
     },
     {
-      customer_name: 'Clayton Wagner',
+      customer_name: "Theresa O'Keefe (male)",
       num_orders: 2,
       lifetime_value: 2641.3896
     },
     {
-      customer_name: 'Clayton Xie',
+      customer_name: 'Everett Strosin (male)',
       num_orders: 3,
       lifetime_value: 6825.4596
     },
     {
-      customer_name: 'Clayton Xu',
+      customer_name: 'Audrey Pacocha (male)',
       num_orders: 2,
       lifetime_value: 86.26
     },
     {
-      customer_name: 'Clayton Xu',
+      customer_name: 'Shaun Bernier (female)',
       num_orders: 2,
       lifetime_value: 42.97
     },
     {
-      customer_name: 'Clayton Yang',
+      customer_name: 'Franklin Reinger (male)',
       num_orders: 2,
       lifetime_value: 2589.0882
     },
     {
-      customer_name: 'Clayton Ye',
+      customer_name: 'Constance Orn (female)',
       num_orders: 2,
       lifetime_value: 2665.0582
     },
     {
-      customer_name: 'Clayton Zeng',
+      customer_name: 'Myron Lowe (male)',
       num_orders: 3,
       lifetime_value: 5135.4082
     },
     {
-      customer_name: 'Clayton Zhang',
+      customer_name: 'Cassandra Rice (female)',
       num_orders: 2,
       lifetime_value: 2654.0582
     },
     {
-      customer_name: 'Clayton Zhao',
+      customer_name: 'Miss Carla Jerde (female)',
       num_orders: 2,
       lifetime_value: 51.96
     },
     {
-      customer_name: 'Clayton Zhou',
+      customer_name: 'Stella Veum (male)',
       num_orders: 2,
       lifetime_value: 2639.0782
     },
     {
-      customer_name: 'Clayton Zhu',
+      customer_name: 'Kate Cronin (female)',
       num_orders: 1,
       lifetime_value: 9.99
     },
     {
-      customer_name: 'Clinton Alonso',
+      customer_name: 'Elmer Upton DVM (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Clinton Alvarez',
+      customer_name: 'Nicholas Mosciski (male)',
       num_orders: 2,
       lifetime_value: 1468.5882
     },
     {
-      customer_name: 'Clinton Blanco',
+      customer_name: 'Daryl Yost (male)',
       num_orders: 2,
       lifetime_value: 1538.5782
     },
     {
-      customer_name: 'Clinton Carlson',
+      customer_name: 'Darryl Wilkinson (female)',
       num_orders: 1,
       lifetime_value: 26.97
     },
     {
-      customer_name: 'Clinton Dominguez',
+      customer_name: 'Pauline Kuhic I (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Clinton Gill',
+      customer_name: 'Elsa Sanford (female)',
       num_orders: 1,
       lifetime_value: 848.47
     },
     {
-      customer_name: 'Clinton Gutierrez',
+      customer_name: 'Rex Gibson (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Clinton Hernandez',
+      customer_name: 'Dean Braun (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Clinton Jiménez',
+      customer_name: 'Sean Weber (female)',
       num_orders: 3,
       lifetime_value: 304.55
     },
     {
-      customer_name: 'Clinton Moreno',
+      customer_name: 'Roderick Davis MD (female)',
       num_orders: 2,
       lifetime_value: 1601.5582
     },
     {
-      customer_name: 'Clinton Munoz',
+      customer_name: 'Dale McDermott (male)',
       num_orders: 2,
       lifetime_value: 1538.5582
     },
     {
-      customer_name: 'Clinton Navarro',
+      customer_name: 'Brittany Mertz (female)',
       num_orders: 1,
       lifetime_value: 64.47
     },
     {
-      customer_name: 'Clinton Romero',
+      customer_name: "Marion O'Hara (male)",
       num_orders: 1,
       lifetime_value: 103.48
     },
     {
-      customer_name: 'Clinton Rubio',
+      customer_name: 'Melvin Considine (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Clinton Sandberg',
+      customer_name: 'Rene Rowe DVM (female)',
       num_orders: 3,
       lifetime_value: 119.86
     },
     {
-      customer_name: 'Clinton Serrano',
+      customer_name: 'Kristie Schmeler Jr. (female)',
       num_orders: 2,
       lifetime_value: 1538.5782
     },
     {
-      customer_name: 'Clinton Suarez',
+      customer_name: 'Dr. Thelma Moen (female)',
       num_orders: 1,
       lifetime_value: 812.42
     },
     {
-      customer_name: 'Clinton Vazquez',
+      customer_name: 'Toby Jakubowski (male)',
       num_orders: 3,
       lifetime_value: 156.55
     },
     {
-      customer_name: 'Cody Bailey',
+      customer_name: 'Carroll Larkin (male)',
       num_orders: 2,
       lifetime_value: 4391.4096
     },
     {
-      customer_name: 'Cody Bell',
+      customer_name: 'Rose Hoppe (female)',
       num_orders: 2,
       lifetime_value: 103.45
     },
     {
-      customer_name: 'Cody Cook',
+      customer_name: 'Jim Schowalter (male)',
       num_orders: 2,
       lifetime_value: 1676.46
     },
     {
-      customer_name: 'Cody Cooper',
+      customer_name: 'Mrs. Myrtle Grimes (male)',
       num_orders: 2,
       lifetime_value: 90.25
     },
     {
-      customer_name: 'Cody Cox',
+      customer_name: 'Merle Bauch (female)',
       num_orders: 2,
       lifetime_value: 138.96
     },
     {
-      customer_name: 'Cody Gray',
+      customer_name: 'Desiree Runolfsson (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Cody Howard',
+      customer_name: 'Kristie Hamill (male)',
       num_orders: 1,
       lifetime_value: 54.96
     },
     {
-      customer_name: 'Cody James',
+      customer_name: 'Kathleen Moen (male)',
       num_orders: 2,
       lifetime_value: 1668.8975
     },
     {
-      customer_name: 'Cody Kelly',
+      customer_name: "Lora O'Keefe (male)",
       num_orders: 3,
       lifetime_value: 7081.4625
     },
     {
-      customer_name: 'Cody Morgan',
+      customer_name: 'Randy Cummerata (female)',
       num_orders: 2,
       lifetime_value: 2746.5525
     },
     {
-      customer_name: 'Cody Morris',
+      customer_name: 'Melvin Beahan (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Cody Murphy',
+      customer_name: 'Frank Conroy (female)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Cody Ramirez',
+      customer_name: 'Rhonda Nader (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Cody Reed',
+      customer_name: 'Courtney Williamson II (male)',
       num_orders: 2,
       lifetime_value: 2746.5525
     },
     {
-      customer_name: 'Cody Richardson',
+      customer_name: 'Omar Flatley (female)',
       num_orders: 2,
       lifetime_value: 1854.5782
     },
     {
-      customer_name: 'Cody Rivera',
+      customer_name: 'Gloria Quigley MD (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Cody Rogers',
+      customer_name: 'Rosemary Larson (female)',
       num_orders: 2,
       lifetime_value: 4780.02
     },
     {
-      customer_name: 'Cody Sanchez',
+      customer_name: 'Sarah Kuphal (male)',
       num_orders: 1,
       lifetime_value: 103.48
     },
     {
-      customer_name: 'Cody Sanders',
+      customer_name: 'Wilson Greenfelder (female)',
       num_orders: 1,
       lifetime_value: 80.96
     },
     {
-      customer_name: 'Cody Stewart',
+      customer_name: 'Annie Botsford (male)',
       num_orders: 2,
       lifetime_value: 3152.96
     },
     {
-      customer_name: 'Cody Torres',
+      customer_name: 'Vivian Wolff (male)',
       num_orders: 1,
       lifetime_value: 45.95
     },
     {
-      customer_name: 'Cody Ward',
+      customer_name: 'Doreen Larson (female)',
       num_orders: 3,
       lifetime_value: 5322.7296
     },
     {
-      customer_name: 'Cody West',
+      customer_name: 'Claudia Koepp-Leffler (male)',
       num_orders: 5,
       lifetime_value: 251.2
     },
     {
-      customer_name: 'Cole Bailey',
+      customer_name: 'Kate Mayer (male)',
       num_orders: 3,
       lifetime_value: 213.94
     },
     {
-      customer_name: 'Cole Bell',
+      customer_name: 'Cristina Mante DDS (female)',
       num_orders: 2,
       lifetime_value: 29.98
     },
     {
-      customer_name: 'Cole Brooks',
+      customer_name: 'Mrs. Willie Marvin (male)',
       num_orders: 2,
       lifetime_value: 4397.75
     },
     {
-      customer_name: 'Cole Cook',
+      customer_name: "Amber O'Connell (female)",
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Cole Cooper',
+      customer_name: 'Cesar Roob (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Cole Cox',
+      customer_name: 'Michelle Batz (female)',
       num_orders: 2,
       lifetime_value: 4380.04
     },
     {
-      customer_name: 'Cole Gray',
+      customer_name: 'Aubrey Hand (female)',
       num_orders: 1,
       lifetime_value: 804.48
     },
     {
-      customer_name: 'Cole James',
+      customer_name: 'Jim Yundt (male)',
       num_orders: 2,
       lifetime_value: 138.45
     },
     {
-      customer_name: 'Cole Kelly',
+      customer_name: 'Jeffrey Okuneva (female)',
       num_orders: 4,
       lifetime_value: 9451.9125
     },
     {
-      customer_name: 'Cole Morgan',
+      customer_name: 'Calvin Mitchell (female)',
       num_orders: 2,
       lifetime_value: 2807.0325
     },
     {
-      customer_name: 'Cole Morris',
+      customer_name: 'Rachael Boyle (female)',
       num_orders: 2,
       lifetime_value: 3112.98
     },
     {
-      customer_name: 'Cole Murphy',
+      customer_name: 'Joel Harvey (male)',
       num_orders: 3,
       lifetime_value: 6943.5525
     },
     {
-      customer_name: 'Cole Peterson',
+      customer_name: 'Susan Bayer (male)',
       num_orders: 1,
       lifetime_value: 30.97
     },
     {
-      customer_name: 'Cole Ramirez',
+      customer_name: 'Randolph Cruickshank (female)',
       num_orders: 3,
       lifetime_value: 158.84
     },
     {
-      customer_name: 'Cole Reed',
+      customer_name: 'Marshall Walker (male)',
       num_orders: 2,
       lifetime_value: 77.27
     },
     {
-      customer_name: 'Cole Richardson',
+      customer_name: 'Joy Mohr (male)',
       num_orders: 3,
       lifetime_value: 87.57
     },
     {
-      customer_name: 'Cole Rivera',
+      customer_name: 'Cody Klocko (female)',
       num_orders: 2,
       lifetime_value: 4468.5582
     },
     {
-      customer_name: 'Cole Rogers',
+      customer_name: 'Benny Schuppe (male)',
       num_orders: 1,
       lifetime_value: 114.46
     },
     {
-      customer_name: 'Cole Sanchez',
+      customer_name: 'Amanda Bednar (female)',
       num_orders: 2,
       lifetime_value: 3772.4096
     },
     {
-      customer_name: 'Cole Sanders',
+      customer_name: 'Mrs. Beth Bahringer-Goldner (female)',
       num_orders: 1,
       lifetime_value: 30.97
     },
     {
-      customer_name: 'Cole Stewart',
+      customer_name: 'Lisa Kunde (male)',
       num_orders: 2,
       lifetime_value: 1322.98
     },
     {
-      customer_name: 'Cole Torres',
+      customer_name: 'Mindy Skiles V (female)',
       num_orders: 3,
       lifetime_value: 3639.9182
     },
     {
-      customer_name: 'Cole Ward',
+      customer_name: 'Marcus Blick (female)',
       num_orders: 2,
       lifetime_value: 3377.3975
     },
     {
-      customer_name: 'Cole Watson',
+      customer_name: 'Ms. Mindy Waters (female)',
       num_orders: 1,
       lifetime_value: 839.48
     },
     {
-      customer_name: 'Colin Anand',
+      customer_name: 'Mrs. Sherry Morissette (male)',
       num_orders: 2,
       lifetime_value: 5973.24
     },
     {
-      customer_name: 'Colin Andersen',
+      customer_name: 'Luther Bailey (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Colin Beck',
+      customer_name: 'Melvin Kshlerin (female)',
       num_orders: 1,
       lifetime_value: 94.48
     },
     {
-      customer_name: 'Colin Cai',
+      customer_name: 'Vivian Muller (female)',
       num_orders: 1,
       lifetime_value: 2518.98
     },
     {
-      customer_name: 'Colin Chander',
+      customer_name: 'Kelli Johnson (male)',
       num_orders: 2,
       lifetime_value: 127.93
     },
     {
-      customer_name: 'Colin Chavez',
+      customer_name: 'Ian Considine II (male)',
       num_orders: 2,
       lifetime_value: 101.25
     },
     {
-      customer_name: 'Colin Chen',
+      customer_name: 'Stacy Boyle DDS (female)',
       num_orders: 1,
       lifetime_value: 81.46
     },
     {
-      customer_name: 'Colin Deng',
+      customer_name: 'Daniel Walsh (female)',
       num_orders: 1,
       lifetime_value: 81.46
     },
     {
-      customer_name: 'Colin Gao',
+      customer_name: 'Dominic Upton (male)',
       num_orders: 2,
       lifetime_value: 4582.5125
     },
     {
-      customer_name: 'Colin Goel',
+      customer_name: 'Archie Altenwerth (male)',
       num_orders: 1,
       lifetime_value: 128.97
     },
     {
-      customer_name: 'Colin He',
+      customer_name: 'Jesse Doyle (male)',
       num_orders: 2,
       lifetime_value: 4501.5525
     },
     {
-      customer_name: 'Colin Huang',
+      customer_name: 'Spencer Hammes Jr. (male)',
       num_orders: 2,
       lifetime_value: 4592.5025
     },
     {
-      customer_name: 'Colin Jai',
+      customer_name: 'Shawn Gorczany-Kohler (male)',
       num_orders: 1,
       lifetime_value: 36.59
     },
     {
-      customer_name: 'Colin Kumar',
+      customer_name: 'Don Harris (female)',
       num_orders: 3,
       lifetime_value: 176.41
     },
     {
-      customer_name: 'Colin Lal',
+      customer_name: 'Cedric Durgan (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Colin Li',
+      customer_name: 'Kimberly Jerde (female)',
       num_orders: 2,
       lifetime_value: 4810.31
     },
     {
-      customer_name: 'Colin Liang',
+      customer_name: 'Michael Bruen (male)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Colin Lin',
+      customer_name: 'Pete Koelpin Sr. (female)',
       num_orders: 2,
       lifetime_value: 4498.5325
     },
     {
-      customer_name: 'Colin Liu',
+      customer_name: 'Lance Bashirian (female)',
       num_orders: 2,
       lifetime_value: 4587.0325
     },
     {
-      customer_name: 'Colin Lu',
+      customer_name: 'Brenda Gerlach (male)',
       num_orders: 2,
       lifetime_value: 4536.5525
     },
     {
-      customer_name: 'Colin Luo',
+      customer_name: "Jaime O'Hara (female)",
       num_orders: 1,
       lifetime_value: 141.98
     },
     {
-      customer_name: 'Colin Ma',
+      customer_name: 'Johnnie Legros (female)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Colin Nath',
+      customer_name: 'Mrs. Blanche Braun (male)',
       num_orders: 2,
       lifetime_value: 43.97
     },
     {
-      customer_name: 'Colin Pal',
+      customer_name: 'Alfred Kling (male)',
       num_orders: 1,
       lifetime_value: 133.49
     },
     {
-      customer_name: 'Colin Rai',
+      customer_name: 'Mr. Otis MacGyver (female)',
       num_orders: 1,
       lifetime_value: 123.98
     },
     {
-      customer_name: 'Colin Raje',
+      customer_name: 'Traci Corwin (male)',
       num_orders: 1,
       lifetime_value: 54.98
     },
     {
-      customer_name: 'Colin Raji',
+      customer_name: 'Geraldine Cartwright (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Colin Shan',
+      customer_name: 'Essie Mosciski (male)',
       num_orders: 2,
       lifetime_value: 57.95
     },
     {
-      customer_name: 'Colin She',
+      customer_name: 'Erik Bode (female)',
       num_orders: 2,
       lifetime_value: 4511.5425
     },
     {
-      customer_name: 'Colin Stone',
+      customer_name: 'Ollie Spinka (female)',
       num_orders: 1,
       lifetime_value: 30.97
     },
     {
-      customer_name: 'Colin Sun',
+      customer_name: "Lynette D'Amore (male)",
       num_orders: 2,
       lifetime_value: 4800.3
     },
     {
-      customer_name: 'Colin Tang',
+      customer_name: 'Christina Cronin (male)',
       num_orders: 2,
       lifetime_value: 4813.32
     },
     {
-      customer_name: 'Colin Wang',
+      customer_name: 'Mr. Karl Borer (male)',
       num_orders: 2,
       lifetime_value: 4798.33
     },
     {
-      customer_name: 'Colin Wu',
+      customer_name: 'Marlene Roob (male)',
       num_orders: 2,
       lifetime_value: 4838.32
     },
     {
-      customer_name: 'Colin Xie',
+      customer_name: 'Sammy Lehner DVM (female)',
       num_orders: 2,
       lifetime_value: 4500.8225
     },
     {
-      customer_name: 'Colin Xu',
+      customer_name: 'Leona Reichert (female)',
       num_orders: 3,
       lifetime_value: 225.44
     },
     {
-      customer_name: 'Colin Xu',
+      customer_name: 'Dr. Evelyn Nicolas (female)',
       num_orders: 2,
       lifetime_value: 4526.5225
     },
     {
-      customer_name: 'Colin Yang',
+      customer_name: 'Jared Prosacco Sr. (female)',
       num_orders: 1,
       lifetime_value: 30.97
     },
     {
-      customer_name: 'Colin Ye',
+      customer_name: 'Philip Casper II (female)',
       num_orders: 1,
       lifetime_value: 46.47
     },
     {
-      customer_name: 'Colin Yuan',
+      customer_name: 'Terri Romaguera (female)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Colin Zeng',
+      customer_name: 'Ron Gorczany (female)',
       num_orders: 4,
       lifetime_value: 339.48
     },
     {
-      customer_name: 'Colin Zhao',
+      customer_name: 'Nicolas Runte (male)',
       num_orders: 2,
       lifetime_value: 4500.8225
     },
     {
-      customer_name: 'Colin Zheng',
+      customer_name: 'Rosa Will (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Colin Zhou',
+      customer_name: 'Zachary Bogisich (female)',
       num_orders: 2,
       lifetime_value: 4818.53
     },
     {
-      customer_name: 'Colin Zhu',
+      customer_name: 'Georgia Koss (female)',
       num_orders: 1,
       lifetime_value: 2344.26
     },
     {
-      customer_name: 'Colleen Anand',
+      customer_name: 'Dolores McKenzie (male)',
       num_orders: 3,
       lifetime_value: 274.24
     },
     {
-      customer_name: 'Colleen Andersen',
+      customer_name: 'Ernest Hilll DDS (female)',
       num_orders: 4,
       lifetime_value: 10829.22
     },
     {
-      customer_name: 'Colleen Beck',
+      customer_name: 'Carroll Pollich-McCullough (male)',
       num_orders: 3,
       lifetime_value: 6906.0882
     },
     {
-      customer_name: 'Colleen Cai',
+      customer_name: 'Ed Halvorson (male)',
       num_orders: 4,
       lifetime_value: 174.17
     },
     {
-      customer_name: 'Colleen Chavez',
+      customer_name: 'Pauline Lubowitz (male)',
       num_orders: 3,
       lifetime_value: 6912.5982
     },
     {
-      customer_name: 'Colleen Chen',
+      customer_name: 'Megan Barton (female)',
       num_orders: 2,
       lifetime_value: 5968.23
     },
     {
-      customer_name: 'Colleen Deng',
+      customer_name: 'Al Schumm (female)',
       num_orders: 4,
       lifetime_value: 8091.8896
     },
     {
-      customer_name: 'Colleen Gao',
+      customer_name: 'Sam Rogahn (male)',
       num_orders: 3,
       lifetime_value: 5169.3582
     },
     {
-      customer_name: 'Colleen Goel',
+      customer_name: 'Sidney Shields (female)',
       num_orders: 3,
       lifetime_value: 68.7
     },
     {
-      customer_name: 'Colleen Guo',
+      customer_name: 'Cristina Anderson (male)',
       num_orders: 2,
       lifetime_value: 5968.25
     },
     {
-      customer_name: 'Colleen Harrison',
+      customer_name: 'Tony Lynch (male)',
       num_orders: 2,
       lifetime_value: 5873.26
     },
     {
-      customer_name: 'Colleen Hu',
+      customer_name: 'Angela Doyle (female)',
       num_orders: 2,
       lifetime_value: 86.76
     },
     {
-      customer_name: 'Colleen Huang',
+      customer_name: 'Hilda Erdman (male)',
       num_orders: 2,
       lifetime_value: 241.76
     },
     {
-      customer_name: 'Colleen Jai',
+      customer_name: 'Miss Sue Krajcik (female)',
       num_orders: 2,
       lifetime_value: 118.96
     },
     {
-      customer_name: 'Colleen Kumar',
+      customer_name: 'Mr. Armando Hettinger (female)',
       num_orders: 2,
       lifetime_value: 79.47
     },
     {
-      customer_name: 'Colleen Li',
+      customer_name: 'Sylvester Roberts (female)',
       num_orders: 2,
       lifetime_value: 5953.25
     },
     {
-      customer_name: 'Colleen Liang',
+      customer_name: 'Karl Rath (female)',
       num_orders: 3,
       lifetime_value: 5625.2496
     },
     {
-      customer_name: 'Colleen Lin',
+      customer_name: 'Mr. Steven Lemke PhD (male)',
       num_orders: 2,
       lifetime_value: 4401.3996
     },
     {
-      customer_name: 'Colleen Liu',
+      customer_name: 'Antonio Sauer (female)',
       num_orders: 1,
       lifetime_value: 49.99
     },
     {
-      customer_name: 'Colleen Lu',
+      customer_name: 'Nora Huels (female)',
       num_orders: 2,
       lifetime_value: 4435.3796
     },
     {
-      customer_name: 'Colleen Luo',
+      customer_name: 'Phil Sipes (male)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Colleen Ma',
+      customer_name: "Donnie O'Kon (female)",
       num_orders: 3,
       lifetime_value: 5582.9082
     },
     {
-      customer_name: 'Colleen Nara',
+      customer_name: 'Wallace Hane (female)',
       num_orders: 3,
       lifetime_value: 6865.4596
     },
     {
-      customer_name: 'Colleen Nath',
+      customer_name: 'Jenny Hirthe (male)',
       num_orders: 3,
       lifetime_value: 6840.6182
     },
     {
-      customer_name: 'Colleen Rai',
+      customer_name: 'Marlene Kling (male)',
       num_orders: 3,
       lifetime_value: 6752.1282
     },
     {
-      customer_name: 'Colleen Raje',
+      customer_name: 'Sally Langworth (male)',
       num_orders: 2,
       lifetime_value: 94.21
     },
     {
-      customer_name: 'Colleen Raji',
+      customer_name: 'Viola Emard (female)',
       num_orders: 3,
       lifetime_value: 185.94
     },
     {
-      customer_name: 'Colleen Shan',
+      customer_name: 'Mrs. Samantha Hansen DVM (male)',
       num_orders: 2,
       lifetime_value: 66.26
     },
     {
-      customer_name: 'Colleen Sharma',
+      customer_name: 'Teresa Auer Sr. (female)',
       num_orders: 4,
       lifetime_value: 10836.9
     },
     {
-      customer_name: 'Colleen She',
+      customer_name: 'Isabel Feeney (female)',
       num_orders: 5,
       lifetime_value: 13242.7
     },
     {
-      customer_name: 'Colleen Shen',
+      customer_name: 'Pamela Zieme (female)',
       num_orders: 3,
       lifetime_value: 4940.3896
     },
     {
-      customer_name: 'Colleen Sun',
+      customer_name: 'Karl Zulauf (female)',
       num_orders: 3,
       lifetime_value: 5666.5196
     },
     {
-      customer_name: 'Colleen Tang',
+      customer_name: 'Dr. Casey Lindgren (female)',
       num_orders: 5,
       lifetime_value: 13173.19
     },
     {
-      customer_name: 'Colleen West',
+      customer_name: 'Bruce Monahan (male)',
       num_orders: 2,
       lifetime_value: 3964.98
     },
     {
-      customer_name: 'Colleen Wu',
+      customer_name: 'Yvonne Schimmel (female)',
       num_orders: 2,
       lifetime_value: 5964.22
     },
     {
-      customer_name: 'Colleen Xie',
+      customer_name: 'Corey Adams (male)',
       num_orders: 2,
       lifetime_value: 74.97
     },
     {
-      customer_name: 'Colleen Xu',
+      customer_name: 'Kristie Ankunding (male)',
       num_orders: 2,
       lifetime_value: 102.26
     },
     {
-      customer_name: 'Colleen Xu',
+      customer_name: 'Lula Lehner-Leffler (male)',
       num_orders: 2,
       lifetime_value: 4416.3796
     },
     {
-      customer_name: 'Colleen Yang',
+      customer_name: 'Erik Cummings (male)',
       num_orders: 1,
       lifetime_value: 49.99
     },
     {
-      customer_name: 'Colleen Yuan',
+      customer_name: 'Malcolm Rowe (female)',
       num_orders: 3,
       lifetime_value: 6799.4496
     },
     {
-      customer_name: 'Colleen Zeng',
+      customer_name: 'Arnold Nicolas (female)',
       num_orders: 3,
       lifetime_value: 4977.3596
     },
     {
-      customer_name: 'Colleen Zhang',
+      customer_name: 'Gerardo Trantow (male)',
       num_orders: 2,
       lifetime_value: 77.27
     },
     {
-      customer_name: 'Colleen Zhao',
+      customer_name: 'Alberta Larkin DDS (female)',
       num_orders: 3,
       lifetime_value: 5683.1796
     },
     {
-      customer_name: 'Colleen Zheng',
+      customer_name: 'Dr. Edna Farrell (female)',
       num_orders: 4,
       lifetime_value: 8067.8996
     },
     {
-      customer_name: 'Colleen Zhou',
+      customer_name: 'Walter Harber (male)',
       num_orders: 1,
       lifetime_value: 49.99
     },
     {
-      customer_name: 'Colleen Zhu',
+      customer_name: 'Elena Senger-Fisher (male)',
       num_orders: 2,
       lifetime_value: 5974.23
     },
     {
-      customer_name: 'Connie Rai',
+      customer_name: 'Wilbur Pfannerstill (female)',
       num_orders: 1,
       lifetime_value: 1174.48
     },
     {
-      customer_name: 'Connor Adams',
+      customer_name: "Anthony O'Reilly (male)",
       num_orders: 1,
       lifetime_value: 2359.24
     },
     {
-      customer_name: 'Connor Allen',
+      customer_name: 'Lorraine Haag (female)',
       num_orders: 1,
       lifetime_value: 1750.98
     },
     {
-      customer_name: 'Connor Baker',
+      customer_name: 'Dr. Gerald Will (male)',
       num_orders: 1,
       lifetime_value: 124.99
     },
     {
-      customer_name: 'Connor Campbell',
+      customer_name: 'Dr. Raymond McKenzie (female)',
       num_orders: 2,
       lifetime_value: 186.04
     },
     {
-      customer_name: 'Connor Collins',
+      customer_name: 'Vera Jacobs IV (female)',
       num_orders: 2,
       lifetime_value: 4369.0882
     },
     {
-      customer_name: 'Connor Edwards',
+      customer_name: 'Amelia Rohan PhD (female)',
       num_orders: 3,
       lifetime_value: 8324.24
     },
     {
-      customer_name: 'Connor Evans',
+      customer_name: 'Willis Parisian (male)',
       num_orders: 1,
       lifetime_value: 63.97
     },
     {
-      customer_name: 'Connor Green',
+      customer_name: 'Dr. Justin Franey (male)',
       num_orders: 2,
       lifetime_value: 3936.5425
     },
     {
-      customer_name: 'Connor Hall',
+      customer_name: 'Margie Schinner (male)',
       num_orders: 3,
       lifetime_value: 319.88
     },
     {
-      customer_name: 'Connor Hernandez',
+      customer_name: 'Mr. Steven Swaniawski (male)',
       num_orders: 1,
       lifetime_value: 2361.95
     },
     {
-      customer_name: 'Connor Hill',
+      customer_name: 'Lonnie Pacocha (female)',
       num_orders: 4,
       lifetime_value: 65.99
     },
     {
-      customer_name: 'Connor King',
+      customer_name: 'Alison Nicolas (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Connor Lopez',
+      customer_name: 'Theodore Russel (male)',
       num_orders: 1,
       lifetime_value: 588.96
     },
     {
-      customer_name: 'Connor Mitchell',
+      customer_name: 'Terry Lueilwitz (male)',
       num_orders: 2,
       lifetime_value: 112.73
     },
     {
-      customer_name: 'Connor Nelson',
+      customer_name: 'Alfred Dibbert (female)',
       num_orders: 2,
       lifetime_value: 5918.24
     },
     {
-      customer_name: 'Connor Parker',
+      customer_name: 'Janis Cremin (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Connor Perez',
+      customer_name: 'Salvador Lehner (female)',
       num_orders: 1,
       lifetime_value: 61.96
     },
     {
-      customer_name: 'Connor Phillips',
+      customer_name: 'Lewis Kertzmann (male)',
       num_orders: 1,
       lifetime_value: 563.96
     },
     {
-      customer_name: 'Connor Roberts',
+      customer_name: 'Isabel Wilderman (female)',
       num_orders: 2,
       lifetime_value: 3099.96
     },
     {
-      customer_name: 'Connor Scott',
+      customer_name: 'Malcolm Berge MD (female)',
       num_orders: 1,
       lifetime_value: 48.97
     },
     {
-      customer_name: 'Connor Turner',
+      customer_name: 'Connie Prosacco (female)',
       num_orders: 2,
       lifetime_value: 90.95
     },
     {
-      customer_name: 'Connor Wright',
+      customer_name: 'Alexander Deckow (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Connor Young',
+      customer_name: 'Mr. Perry Stroman (male)',
       num_orders: 2,
       lifetime_value: 94.96
     },
     {
-      customer_name: 'Corey Anand',
+      customer_name: 'Ms. Katie Beatty Sr. (female)',
       num_orders: 1,
       lifetime_value: 2443.35
     },
     {
-      customer_name: 'Corey Andersen',
+      customer_name: 'Saul Ryan (female)',
       num_orders: 1,
       lifetime_value: 14.98
     },
     {
-      customer_name: 'Corey Beck',
+      customer_name: 'Sean Balistreri (female)',
       num_orders: 1,
       lifetime_value: 96.46
     },
     {
-      customer_name: 'Corey Chander',
+      customer_name: 'George Hahn (female)',
       num_orders: 1,
       lifetime_value: 2482.23
     },
     {
-      customer_name: 'Corey Chavez',
+      customer_name: 'Janis Swaniawski IV (male)',
       num_orders: 2,
       lifetime_value: 4408.6896
     },
     {
-      customer_name: 'Corey Deng',
+      customer_name: 'Catherine Hamill (female)',
       num_orders: 2,
       lifetime_value: 6085.59
     },
     {
-      customer_name: 'Corey Goel',
+      customer_name: 'Ernestine Goldner (male)',
       num_orders: 1,
       lifetime_value: 68.97
     },
     {
-      customer_name: 'Corey Kumar',
+      customer_name: 'Dr. Pete White (male)',
       num_orders: 1,
       lifetime_value: 21.49
     },
     {
-      customer_name: 'Corey Lal',
+      customer_name: 'Charles Schuster (male)',
       num_orders: 1,
       lifetime_value: 2492.32
     },
     {
-      customer_name: 'Corey Luo',
+      customer_name: 'Edgar Kling (male)',
       num_orders: 1,
       lifetime_value: 49.97
     },
     {
-      customer_name: 'Corey Nara',
+      customer_name: 'Brandon Schuppe (female)',
       num_orders: 1,
       lifetime_value: 49.97
     },
     {
-      customer_name: 'Corey Pal',
+      customer_name: 'Sidney Feil (female)',
       num_orders: 1,
       lifetime_value: 2514.93
     },
     {
-      customer_name: 'Corey Raje',
+      customer_name: 'Kevin Brekke (female)',
       num_orders: 1,
       lifetime_value: 49.97
     },
     {
-      customer_name: 'Corey Raji',
+      customer_name: 'Betty Spinka (female)',
       num_orders: 1,
       lifetime_value: 1170.48
     },
     {
-      customer_name: 'Corey Sharma',
+      customer_name: 'Eddie Little (male)',
       num_orders: 1,
       lifetime_value: 2512.32
     },
     {
-      customer_name: 'Corey She',
+      customer_name: 'Minnie Nicolas (male)',
       num_orders: 1,
       lifetime_value: 39.47
     },
     {
-      customer_name: 'Corey Shen',
+      customer_name: "Geoffrey O'Conner (male)",
       num_orders: 2,
       lifetime_value: 6035.6
     },
     {
-      customer_name: 'Corey Tang',
+      customer_name: 'Caroline Kling (male)',
       num_orders: 1,
       lifetime_value: 23.78
     },
     {
-      customer_name: 'Corey Xie',
+      customer_name: 'Luz Hand-Mertz Jr. (male)',
       num_orders: 2,
       lifetime_value: 6156.7
     },
     {
-      customer_name: 'Corey Yuan',
+      customer_name: 'Ms. Elisa Champlin III (male)',
       num_orders: 1,
       lifetime_value: 1155.48
     },
     {
-      customer_name: 'Cory Arun',
+      customer_name: 'Toni Stark (female)',
       num_orders: 1,
       lifetime_value: 27.28
     },
     {
-      customer_name: 'Cory Chandra',
+      customer_name: 'Joanne Bartell (female)',
       num_orders: 2,
       lifetime_value: 6054.22
     },
     {
-      customer_name: 'Cory Fernandez',
+      customer_name: 'Dawn Nikolaus (male)',
       num_orders: 1,
       lifetime_value: 27.77
     },
     {
-      customer_name: 'Cory Garcia',
+      customer_name: 'Lisa Koelpin (female)',
       num_orders: 1,
       lifetime_value: 186.28
     },
     {
-      customer_name: 'Cory Kapoor',
+      customer_name: 'Roxanne Daugherty (male)',
       num_orders: 2,
       lifetime_value: 6067.2
     },
     {
-      customer_name: 'Cory Madan',
+      customer_name: 'Dr. Elaine Donnelly (male)',
       num_orders: 2,
       lifetime_value: 2459.0682
     },
     {
-      customer_name: 'Cory Malhotra',
+      customer_name: 'Gregg Brown I (male)',
       num_orders: 2,
       lifetime_value: 1584.76
     },
     {
-      customer_name: 'Cory Martinez',
+      customer_name: 'Melba Nicolas (male)',
       num_orders: 1,
       lifetime_value: 69.97
     },
     {
-      customer_name: 'Cory Mehta',
+      customer_name: 'Myrtle Roberts (female)',
       num_orders: 2,
       lifetime_value: 1952.45
     },
     {
-      customer_name: 'Cory Patel',
+      customer_name: 'Guadalupe Corwin (male)',
       num_orders: 2,
       lifetime_value: 1981.96
     },
     {
-      customer_name: 'Cory Perez',
+      customer_name: 'Wallace Torp (male)',
       num_orders: 2,
       lifetime_value: 3478.7775
     },
     {
-      customer_name: 'Cory Prasad',
+      customer_name: 'Lora Welch (male)',
       num_orders: 2,
       lifetime_value: 1957.47
     },
     {
-      customer_name: 'Cory Raman',
+      customer_name: 'Clifford Stracke (female)',
       num_orders: 3,
       lifetime_value: 4313.8882
     },
     {
-      customer_name: 'Cory Rana',
+      customer_name: 'Darrin Kris DDS (male)',
       num_orders: 2,
       lifetime_value: 1583.45
     },
     {
-      customer_name: 'Cory Rodriguez',
+      customer_name: 'Mrs. Olivia Stoltenberg (male)',
       num_orders: 1,
       lifetime_value: 78.96
     },
     {
-      customer_name: 'Cory Sai',
+      customer_name: 'Jean Hirthe Sr. (female)',
       num_orders: 2,
       lifetime_value: 1903.48
     },
     {
-      customer_name: 'Cory Sara',
+      customer_name: 'Dr. Raul Johnston (male)',
       num_orders: 2,
       lifetime_value: 1957.47
     },
     {
-      customer_name: 'Cory Subram',
+      customer_name: 'Sarah Davis IV (male)',
       num_orders: 1,
       lifetime_value: 31.27
     },
     {
-      customer_name: 'Cory Suri',
+      customer_name: 'Roy Hand (female)',
       num_orders: 2,
       lifetime_value: 6056.61
     },
     {
-      customer_name: 'Cory Weber',
+      customer_name: 'Mrs. Genevieve Kuphal (female)',
       num_orders: 2,
       lifetime_value: 1565.4275
     },
     {
-      customer_name: 'Courtney Young',
+      customer_name: 'Sandra Bailey (female)',
       num_orders: 3,
       lifetime_value: 8114.04
     },
     {
-      customer_name: 'Craig Alonso',
+      customer_name: 'Derek Homenick (male)',
       num_orders: 1,
       lifetime_value: 79.95
     },
     {
-      customer_name: 'Craig Blanco',
+      customer_name: 'Whitney Gutkowski (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Craig Carlson',
+      customer_name: 'Gilbert Windler (male)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Craig Diaz',
+      customer_name: 'Edward Pollich (female)',
       num_orders: 2,
       lifetime_value: 3322.7175
     },
     {
-      customer_name: 'Craig Gill',
+      customer_name: 'Dixie Wilkinson (male)',
       num_orders: 2,
       lifetime_value: 4760.32
     },
     {
-      customer_name: 'Craig Gomez',
+      customer_name: 'Mrs. Judith Towne (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Craig Gutierrez',
+      customer_name: 'Michael Rowe (female)',
       num_orders: 1,
       lifetime_value: 64.97
     },
     {
-      customer_name: 'Craig Jiménez',
+      customer_name: 'Marcella Kihn (male)',
       num_orders: 2,
       lifetime_value: 4524.4825
     },
     {
-      customer_name: 'Craig Martin',
+      customer_name: 'Ivan Mills (female)',
       num_orders: 2,
       lifetime_value: 3140.27
     },
     {
-      customer_name: 'Craig Moreno',
+      customer_name: 'Ernestine Mertz (male)',
       num_orders: 1,
       lifetime_value: 85.48
     },
     {
-      customer_name: 'Craig Munoz',
+      customer_name: 'Thomas Wyman (male)',
       num_orders: 1,
       lifetime_value: 29.93
     },
     {
-      customer_name: 'Craig Navarro',
+      customer_name: 'Dr. Andre Schowalter (male)',
       num_orders: 1,
       lifetime_value: 84.96
     },
     {
-      customer_name: 'Craig Ortega',
+      customer_name: 'Melanie Quigley (male)',
       num_orders: 2,
       lifetime_value: 6035.6
     },
     {
-      customer_name: 'Craig Ramos',
+      customer_name: 'Mona Skiles (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Craig Romero',
+      customer_name: 'Harold Smith (female)',
       num_orders: 2,
       lifetime_value: 3295.4275
     },
     {
-      customer_name: 'Craig Rubio',
+      customer_name: 'Mr. Andres Kuhlman (male)',
       num_orders: 2,
       lifetime_value: 6093.2
     },
     {
-      customer_name: 'Craig Ruiz',
+      customer_name: 'Kenneth Ward (female)',
       num_orders: 1,
       lifetime_value: 37.93
     },
     {
-      customer_name: 'Craig Sanz',
+      customer_name: 'Rex Emmerich (male)',
       num_orders: 2,
       lifetime_value: 24.27
     },
     {
-      customer_name: 'Craig Suarez',
+      customer_name: 'Pearl Rath (male)',
       num_orders: 2,
       lifetime_value: 78.26
     },
     {
-      customer_name: 'Craig Vazquez',
+      customer_name: 'Mr. Dennis Jones (female)',
       num_orders: 2,
       lifetime_value: 3177.96
     },
     {
-      customer_name: 'Crystal Chen',
+      customer_name: 'Marcella Schroeder-Wintheiser (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Crystal Gao',
+      customer_name: 'Belinda Dach DDS (male)',
       num_orders: 1,
       lifetime_value: 49.97
     },
     {
-      customer_name: 'Crystal Guo',
+      customer_name: 'Bert Torphy (female)',
       num_orders: 1,
       lifetime_value: 30.97
     },
     {
-      customer_name: 'Crystal He',
+      customer_name: 'Greg Corkery (male)',
       num_orders: 1,
       lifetime_value: 9.99
     },
     {
-      customer_name: 'Crystal Hu',
+      customer_name: 'Ms. Roberta Dach (female)',
       num_orders: 1,
       lifetime_value: 9.99
     },
     {
-      customer_name: 'Crystal Huang',
+      customer_name: 'Jose Ebert DVM (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Crystal Li',
+      customer_name: 'Billie Crooks DDS (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Crystal Liang',
+      customer_name: 'Nick Cole (female)',
       num_orders: 1,
       lifetime_value: 72.93
     },
     {
-      customer_name: 'Crystal Lin',
+      customer_name: 'Kay Bernhard (female)',
       num_orders: 2,
       lifetime_value: 34.56
     },
     {
-      customer_name: 'Crystal Liu',
+      customer_name: 'Bernadette Pfannerstill (male)',
       num_orders: 1,
       lifetime_value: 624.97
     },
     {
-      customer_name: 'Crystal Lu',
+      customer_name: 'Dr. Jessica Mohr (female)',
       num_orders: 2,
       lifetime_value: 56.76
     },
     {
-      customer_name: 'Crystal Sun',
+      customer_name: 'Rosa Schmidt V (male)',
       num_orders: 1,
       lifetime_value: 1120.49
     },
     {
-      customer_name: 'Crystal Wang',
+      customer_name: 'Nathan Leffler (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Crystal Wu',
+      customer_name: 'Theodore Ferry II (male)',
       num_orders: 1,
       lifetime_value: 1164.47
     },
     {
-      customer_name: 'Crystal Xu',
+      customer_name: 'Cameron Williamson (female)',
       num_orders: 1,
       lifetime_value: 14.98
     },
     {
-      customer_name: 'Crystal Yang',
+      customer_name: 'Ellen Torp I (male)',
       num_orders: 1,
       lifetime_value: 574.98
     },
     {
-      customer_name: 'Crystal Zhang',
+      customer_name: 'Sean Sporer (male)',
       num_orders: 1,
       lifetime_value: 128.97
     },
     {
-      customer_name: 'Crystal Zhao',
+      customer_name: 'Tara Kassulke (male)',
       num_orders: 1,
       lifetime_value: 123.98
     },
     {
-      customer_name: 'Crystal Zheng',
+      customer_name: 'Alma Boyer (male)',
       num_orders: 1,
       lifetime_value: 22.93
     },
     {
-      customer_name: 'Crystal Zhu',
+      customer_name: 'Susan Buckridge DVM (male)',
       num_orders: 1,
       lifetime_value: 25.22
     },
     {
-      customer_name: 'Curtis Cai',
+      customer_name: 'Francisco Larkin (female)',
       num_orders: 2,
       lifetime_value: 30.97
     },
     {
-      customer_name: 'Curtis Gao',
+      customer_name: 'Delbert Abernathy (male)',
       num_orders: 2,
       lifetime_value: 69.97
     },
     {
-      customer_name: 'Curtis Guo',
+      customer_name: 'Miss Mae Hegmann (female)',
       num_orders: 2,
       lifetime_value: 6113.2
     },
     {
-      customer_name: 'Curtis He',
+      customer_name: 'Ervin Weber (female)',
       num_orders: 2,
       lifetime_value: 119.95
     },
     {
-      customer_name: 'Curtis Hu',
+      customer_name: 'Ignacio Walker (female)',
       num_orders: 2,
       lifetime_value: 6104.21
     },
     {
-      customer_name: 'Curtis Li',
+      customer_name: 'Billie Veum (female)',
       num_orders: 2,
       lifetime_value: 6121.71
     },
     {
-      customer_name: 'Curtis Liang',
+      customer_name: 'Roderick Hermann (male)',
       num_orders: 2,
       lifetime_value: 64.98
     },
     {
-      customer_name: 'Curtis Lin',
+      customer_name: 'Jamie Weissnat (male)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Curtis Liu',
+      customer_name: 'Cassandra Ebert (male)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Curtis Lu',
+      customer_name: 'Dixie Conn (female)',
       num_orders: 2,
       lifetime_value: 45.95
     },
     {
-      customer_name: 'Curtis Ma',
+      customer_name: 'Eileen Jast (female)',
       num_orders: 2,
       lifetime_value: 64.98
     },
     {
-      customer_name: 'Curtis She',
+      customer_name: 'Richard Brown (male)',
       num_orders: 2,
       lifetime_value: 162.02
     },
     {
-      customer_name: 'Curtis Wang',
+      customer_name: 'Sidney Spinka (male)',
       num_orders: 2,
       lifetime_value: 6030.61
     },
     {
-      customer_name: 'Curtis Wu',
+      customer_name: 'Katrina Huel (female)',
       num_orders: 2,
       lifetime_value: 6037.89
     },
     {
-      customer_name: 'Curtis Xu',
+      customer_name: 'Angela Von (female)',
       num_orders: 2,
       lifetime_value: 85.96
     },
     {
-      customer_name: 'Curtis Yang',
+      customer_name: 'Richard Feeney IV (female)',
       num_orders: 2,
       lifetime_value: 84.96
     },
     {
-      customer_name: 'Curtis Zeng',
+      customer_name: 'Perry Reynolds (female)',
       num_orders: 2,
       lifetime_value: 6070.59
     },
     {
-      customer_name: 'Curtis Zheng',
+      customer_name: 'Joshua Ryan (male)',
       num_orders: 2,
       lifetime_value: 6056.61
     },
     {
-      customer_name: 'Curtis Zhou',
+      customer_name: 'Mr. Matt Batz (male)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Curtis Zimmerman',
+      customer_name: 'Yolanda Parisian (male)',
       num_orders: 1,
       lifetime_value: 2318.96
     },
     {
-      customer_name: 'Cynthia Arun',
+      customer_name: 'Priscilla Becker (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Cynthia Chandra',
+      customer_name: 'Rudolph Hand (female)',
       num_orders: 1,
       lifetime_value: 574.98
     },
     {
-      customer_name: 'Cynthia Fernandez',
+      customer_name: 'Eula Mohr-Hermiston (male)',
       num_orders: 1,
       lifetime_value: 682.92
     },
     {
-      customer_name: 'Cynthia Garcia',
+      customer_name: 'Jimmy McKenzie (male)',
       num_orders: 1,
       lifetime_value: 148.47
     },
     {
-      customer_name: 'Cynthia Gonzalez',
+      customer_name: 'Henrietta Cronin (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Cynthia Kapoor',
+      customer_name: 'Dr. Zachary Cormier (male)',
       num_orders: 1,
       lifetime_value: 586.46
     },
     {
-      customer_name: 'Cynthia Lopez',
+      customer_name: 'Blanche Hodkiewicz V (male)',
       num_orders: 2,
       lifetime_value: 77.25
     },
     {
-      customer_name: 'Cynthia Madan',
+      customer_name: 'Daniel McCullough (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Cynthia Malhotra',
+      customer_name: 'Mr. Alfred Pollich (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Cynthia Martinez',
+      customer_name: 'Tricia Hagenes (male)',
       num_orders: 1,
       lifetime_value: 58.98
     },
     {
-      customer_name: 'Cynthia Mehta',
+      customer_name: 'Hope Reichert I (male)',
       num_orders: 1,
       lifetime_value: 1174.48
     },
     {
-      customer_name: 'Cynthia Patel',
+      customer_name: 'Julian Buckridge DVM (female)',
       num_orders: 1,
       lifetime_value: 1179.97
     },
     {
-      customer_name: 'Cynthia Perez',
+      customer_name: 'Terence Witting (female)',
       num_orders: 2,
       lifetime_value: 37.27
     },
     {
-      customer_name: 'Cynthia Prasad',
+      customer_name: 'Stacy Stamm (male)',
       num_orders: 1,
       lifetime_value: 663.95
     },
     {
-      customer_name: 'Cynthia Raman',
+      customer_name: 'Christie Hessel V (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Cynthia Rana',
+      customer_name: 'Olive Mante (male)',
       num_orders: 1,
       lifetime_value: 589.96
     },
     {
-      customer_name: 'Cynthia Rodriguez',
+      customer_name: 'Salvador Keeling (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Cynthia Sai',
+      customer_name: 'Evelyn Murphy (male)',
       num_orders: 2,
       lifetime_value: 37.27
     },
     {
-      customer_name: 'Cynthia Sanchez',
+      customer_name: 'Francisco Zulauf MD (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Cynthia Saunders',
+      customer_name: 'Eunice Beier (male)',
       num_orders: 1,
       lifetime_value: 604.96
     },
     {
-      customer_name: 'Cynthia Srini',
+      customer_name: 'Billy Lynch PhD (female)',
       num_orders: 1,
       lifetime_value: 572.26
     },
     {
-      customer_name: 'Cynthia Subram',
+      customer_name: 'Helen Borer (male)',
       num_orders: 1,
       lifetime_value: 1194.97
     },
     {
-      customer_name: 'Cynthia Suri',
+      customer_name: 'Tonya Wunsch (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Cynthia Weber',
+      customer_name: 'Jeannette Larkin (male)',
       num_orders: 2,
       lifetime_value: 64.24
     },
     {
-      customer_name: 'Dakota Alexander',
+      customer_name: "Jeannette O'Hara II (female)",
       num_orders: 4,
       lifetime_value: 175.71
     },
     {
-      customer_name: 'Dakota Barnes',
+      customer_name: 'Leona Conn II (female)',
       num_orders: 2,
       lifetime_value: 105.95
     },
     {
-      customer_name: 'Dakota Bradley',
+      customer_name: 'Dora Little (male)',
       num_orders: 2,
       lifetime_value: 108.46
     },
     {
-      customer_name: 'Dakota Bryant',
+      customer_name: 'Kelli Walker (female)',
       num_orders: 4,
       lifetime_value: 180.79
     },
     {
-      customer_name: 'Dakota Butler',
+      customer_name: 'Denise Buckridge (female)',
       num_orders: 2,
       lifetime_value: 83.97
     },
     {
-      customer_name: 'Dakota Diaz',
+      customer_name: 'Tina Blick-Johnston DDS (female)',
       num_orders: 1,
       lifetime_value: 50.23
     },
     {
-      customer_name: 'Dakota Flores',
+      customer_name: 'Manuel Mante (male)',
       num_orders: 2,
       lifetime_value: 207.98
     },
     {
-      customer_name: 'Dakota Gonzales',
+      customer_name: 'Rose Bahringer (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Dakota Griffin',
+      customer_name: 'Wm Schmidt (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Dakota Henderson',
+      customer_name: 'Ross Veum-Baumbach (female)',
       num_orders: 1,
       lifetime_value: 81.46
     },
     {
-      customer_name: 'Dakota Jenkins',
+      customer_name: 'Lawrence Bernier (male)',
       num_orders: 1,
       lifetime_value: 76.97
     },
     {
-      customer_name: 'Dakota Long',
+      customer_name: 'Vanessa Armstrong (female)',
       num_orders: 1,
       lifetime_value: 81.46
     },
     {
-      customer_name: 'Dakota Patterson',
+      customer_name: 'Bruce Kautzer (male)',
       num_orders: 2,
       lifetime_value: 51.27
     },
     {
-      customer_name: 'Dakota Perry',
+      customer_name: 'Ms. Alberta Beer (male)',
       num_orders: 2,
       lifetime_value: 4760.32
     },
     {
-      customer_name: 'Dakota Powell',
+      customer_name: 'Levi Rowe (female)',
       num_orders: 1,
       lifetime_value: 30.97
     },
     {
-      customer_name: 'Dakota Ross',
+      customer_name: 'Dr. Harry Ortiz (female)',
       num_orders: 4,
       lifetime_value: 164.21
     },
     {
-      customer_name: 'Dakota Russell',
+      customer_name: 'Yvonne Wehner (male)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Dakota Simmons',
+      customer_name: 'Nicole Dickens (female)',
       num_orders: 4,
       lifetime_value: 119.95
     },
     {
-      customer_name: 'Dakota Wood',
+      customer_name: 'Michele Schowalter (male)',
       num_orders: 2,
       lifetime_value: 4818.33
     },
     {
-      customer_name: 'Dalton Alexander',
+      customer_name: 'Bryant Corwin (male)',
       num_orders: 2,
       lifetime_value: 4898.32
     },
     {
-      customer_name: 'Dalton Bailey',
+      customer_name: 'Brandon Howell (male)',
       num_orders: 2,
       lifetime_value: 1631.46
     },
     {
-      customer_name: 'Dalton Barnes',
+      customer_name: 'Robert Glover (female)',
       num_orders: 2,
       lifetime_value: 4773.33
     },
     {
-      customer_name: 'Dalton Bell',
+      customer_name: 'Priscilla Ziemann (female)',
       num_orders: 3,
       lifetime_value: 6793.54
     },
     {
-      customer_name: 'Dalton Bennett',
+      customer_name: 'Nina Grant (male)',
       num_orders: 2,
       lifetime_value: 4533.5225
     },
     {
-      customer_name: 'Dalton Brooks',
+      customer_name: 'Ernestine Stiedemann MD (female)',
       num_orders: 2,
       lifetime_value: 5910.55
     },
     {
-      customer_name: 'Dalton Bryant',
+      customer_name: "Guadalupe D'Amore V (male)",
       num_orders: 1,
       lifetime_value: 75.97
     },
     {
-      customer_name: 'Dalton Butler',
+      customer_name: 'Marcia Homenick (male)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Dalton Coleman',
+      customer_name: 'Florence Gusikowski (male)',
       num_orders: 1,
       lifetime_value: 2349.92
     },
     {
-      customer_name: 'Dalton Cook',
+      customer_name: 'Stella Hoeger MD (female)',
       num_orders: 2,
       lifetime_value: 3058.31
     },
     {
-      customer_name: 'Dalton Cooper',
+      customer_name: 'Robert Muller (female)',
       num_orders: 3,
       lifetime_value: 146.74
     },
     {
-      customer_name: 'Dalton Cox',
+      customer_name: 'Harold Hammes (male)',
       num_orders: 2,
       lifetime_value: 4397.75
     },
     {
-      customer_name: 'Dalton Diaz',
+      customer_name: 'Randal Witting (male)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Dalton Flores',
+      customer_name: 'Frank Huel V (female)',
       num_orders: 3,
       lifetime_value: 133.45
     },
     {
-      customer_name: 'Dalton Foster',
+      customer_name: 'Joanne Farrell (female)',
       num_orders: 1,
       lifetime_value: 2318.96
     },
     {
-      customer_name: 'Dalton Gonzales',
+      customer_name: 'Shannon Hayes (female)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Dalton Gray',
+      customer_name: 'Miss Angela Kerluke (male)',
       num_orders: 2,
       lifetime_value: 3001.0425
     },
     {
-      customer_name: 'Dalton Hayes',
+      customer_name: 'Kirk Schaden (male)',
       num_orders: 1,
       lifetime_value: 36.96
     },
     {
-      customer_name: 'Dalton Henderson',
+      customer_name: 'Mona Wiza DVM (male)',
       num_orders: 2,
       lifetime_value: 4576.5325
     },
     {
-      customer_name: 'Dalton Howard',
+      customer_name: 'Garry Runte (female)',
       num_orders: 1,
       lifetime_value: 86.95
     },
     {
-      customer_name: 'Dalton Hughes',
+      customer_name: 'Maggie Marvin (male)',
       num_orders: 1,
       lifetime_value: 75.97
     },
     {
-      customer_name: 'Dalton James',
+      customer_name: 'Erica Little (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Dalton Jenkins',
+      customer_name: 'Elbert Cronin (female)',
       num_orders: 1,
       lifetime_value: 44.91
     },
     {
-      customer_name: 'Dalton Kelly',
+      customer_name: 'Antoinette Bechtelar (female)',
       num_orders: 3,
       lifetime_value: 5696.1896
     },
     {
-      customer_name: 'Dalton Long',
+      customer_name: 'Mack Lind DDS (female)',
       num_orders: 2,
       lifetime_value: 4558.0125
     },
     {
-      customer_name: 'Dalton Morgan',
+      customer_name: 'Mr. Donnie Boehm (female)',
       num_orders: 2,
       lifetime_value: 4173.19
     },
     {
-      customer_name: 'Dalton Morris',
+      customer_name: 'Ms. Cathy White (male)',
       num_orders: 2,
       lifetime_value: 3198.45
     },
     {
-      customer_name: 'Dalton Murphy',
+      customer_name: 'Marjorie Hackett (male)',
       num_orders: 2,
       lifetime_value: 77.27
     },
     {
-      customer_name: 'Dalton Patterson',
+      customer_name: 'Dr. Olive Bartell (female)',
       num_orders: 1,
       lifetime_value: 106.96
     },
     {
-      customer_name: 'Dalton Perry',
+      customer_name: 'Felicia Leuschke (male)',
       num_orders: 2,
       lifetime_value: 4693.04
     },
     {
-      customer_name: 'Dalton Powell',
+      customer_name: 'Diane Bogisich (female)',
       num_orders: 2,
       lifetime_value: 4476.5525
     },
     {
-      customer_name: 'Dalton Ramirez',
+      customer_name: 'Alfredo Torphy-Baumbach II (male)',
       num_orders: 2,
       lifetime_value: 3040.0382
     },
     {
-      customer_name: 'Dalton Reed',
+      customer_name: 'Don Goodwin (female)',
       num_orders: 3,
       lifetime_value: 436.35
     },
     {
-      customer_name: 'Dalton Richardson',
+      customer_name: 'Lela Stracke (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Dalton Rivera',
+      customer_name: 'Della Schmeler (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Dalton Rogers',
+      customer_name: 'Henry Gerlach (male)',
       num_orders: 2,
       lifetime_value: 1619.9
     },
     {
-      customer_name: 'Dalton Ross',
+      customer_name: "Theresa O'Hara (male)",
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Dalton Russell',
+      customer_name: 'Pauline Volkman (male)',
       num_orders: 1,
       lifetime_value: 75.97
     },
     {
-      customer_name: 'Dalton Sanchez',
+      customer_name: 'Carla Skiles (male)',
       num_orders: 2,
       lifetime_value: 1676.46
     },
     {
-      customer_name: 'Dalton Sanders',
+      customer_name: 'Tommie Cummerata II (female)',
       num_orders: 3,
       lifetime_value: 5196.7396
     },
     {
-      customer_name: 'Dalton Simmons',
+      customer_name: 'Gustavo Bartoletti (male)',
       num_orders: 1,
       lifetime_value: 30.97
     },
     {
-      customer_name: 'Dalton Stewart',
+      customer_name: 'Karen Ziemann (female)',
       num_orders: 2,
       lifetime_value: 4375.0582
     },
     {
-      customer_name: 'Dalton Torres',
+      customer_name: 'Ray Zboncak (male)',
       num_orders: 2,
       lifetime_value: 1918.3975
     },
     {
-      customer_name: 'Dalton Ward',
+      customer_name: 'Clifton Kunze (male)',
       num_orders: 2,
       lifetime_value: 81.26
     },
     {
-      customer_name: 'Dalton Washington',
+      customer_name: 'Laurie Feest V (female)',
       num_orders: 2,
       lifetime_value: 4626.5225
     },
     {
-      customer_name: 'Dalton Watson',
+      customer_name: 'Norma Nitzsche (female)',
       num_orders: 1,
       lifetime_value: 819.46
     },
     {
-      customer_name: 'Dalton Wood',
+      customer_name: 'Agnes Jast (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Damien Anand',
+      customer_name: 'Leah Effertz (male)',
       num_orders: 3,
       lifetime_value: 7246.87
     },
     {
-      customer_name: 'Damien Andersen',
+      customer_name: 'Dr. Trevor Sauer-Dooley (female)',
       num_orders: 1,
       lifetime_value: 30.97
     },
     {
-      customer_name: 'Damien Beck',
+      customer_name: 'Felicia Swift II (female)',
       num_orders: 2,
       lifetime_value: 51.91
     },
     {
-      customer_name: 'Damien Chande',
+      customer_name: 'Jon Corwin (female)',
       num_orders: 3,
       lifetime_value: 5652.5196
     },
     {
-      customer_name: 'Damien Chander',
+      customer_name: 'Gertrude Mitchell-Schaefer (female)',
       num_orders: 2,
       lifetime_value: 2736.4175
     },
     {
-      customer_name: 'Damien Jai',
+      customer_name: 'Penny Koch (male)',
       num_orders: 2,
       lifetime_value: 4813.31
     },
     {
-      customer_name: 'Damien Lal',
+      customer_name: 'Florence Crist MD (female)',
       num_orders: 1,
       lifetime_value: 49.97
     },
     {
-      customer_name: 'Damien Luo',
+      customer_name: 'Elena Bode (female)',
       num_orders: 3,
       lifetime_value: 8079.05
     },
     {
-      customer_name: 'Damien Nara',
+      customer_name: 'Adam Schuppe (female)',
       num_orders: 3,
       lifetime_value: 218.93
     },
     {
-      customer_name: 'Damien Pal',
+      customer_name: 'Barbara Lesch (female)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Damien Rai',
+      customer_name: 'Mathew Lehner-Vandervort DVM (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Damien Raje',
+      customer_name: 'Raymond Franey PhD (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Damien Raji',
+      customer_name: 'Denise Beer (male)',
       num_orders: 1,
       lifetime_value: 24.99
     },
     {
-      customer_name: 'Damien Shan',
+      customer_name: 'Ellis Cummerata (female)',
       num_orders: 2,
       lifetime_value: 3282.83
     },
     {
-      customer_name: 'Damien Shen',
+      customer_name: 'Charlie Steuber (female)',
       num_orders: 1,
       lifetime_value: 2294.99
     },
     {
-      customer_name: 'Damien Tang',
+      customer_name: 'Beatrice Osinski (male)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Damien Xie',
+      customer_name: 'Cory Hills (male)',
       num_orders: 2,
       lifetime_value: 79.97
     },
     {
-      customer_name: 'Damien Xu',
+      customer_name: 'Lamar Strosin (male)',
       num_orders: 2,
       lifetime_value: 5973.24
     },
     {
-      customer_name: 'Damien Yuan',
+      customer_name: 'Melanie Quigley (female)',
       num_orders: 2,
       lifetime_value: 5875.55
     },
     {
-      customer_name: 'Dana Alonso',
+      customer_name: 'Denise Gleichner (male)',
       num_orders: 1,
       lifetime_value: 94.48
     },
     {
-      customer_name: 'Dana Alvarez',
+      customer_name: 'Eduardo Schulist (female)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Dana Blanco',
+      customer_name: 'Horace Yost (male)',
       num_orders: 2,
       lifetime_value: 2983.3325
     },
     {
-      customer_name: 'Dana Carlson',
+      customer_name: 'Lynda Littel (male)',
       num_orders: 1,
       lifetime_value: 24.99
     },
     {
-      customer_name: 'Dana Diaz',
+      customer_name: 'Mack McClure (male)',
       num_orders: 1,
       lifetime_value: 2354.98
     },
     {
-      customer_name: 'Dana Dominguez',
+      customer_name: 'Harold Wintheiser (male)',
       num_orders: 3,
       lifetime_value: 7015.5525
     },
     {
-      customer_name: 'Dana Gill',
+      customer_name: 'Francis Homenick V (male)',
       num_orders: 2,
       lifetime_value: 2755.4175
     },
     {
-      customer_name: 'Dana Gomez',
+      customer_name: 'Ray Dickinson (female)',
       num_orders: 2,
       lifetime_value: 166.43
     },
     {
-      customer_name: 'Dana Gutierrez',
+      customer_name: 'Ora Bednar (male)',
       num_orders: 1,
       lifetime_value: 6.28
     },
     {
-      customer_name: 'Dana Jiménez',
+      customer_name: 'Rhonda Harvey (female)',
       num_orders: 1,
       lifetime_value: 2419.46
     },
     {
-      customer_name: 'Dana Martin',
+      customer_name: 'Bert Zieme (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Dana Moreno',
+      customer_name: 'Mr. Billy Jones Sr. (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Dana Muñoz',
+      customer_name: 'Leo Pouros II (male)',
       num_orders: 1,
       lifetime_value: 128.97
     },
     {
-      customer_name: 'Dana Navarro',
+      customer_name: 'Karla Runolfsdottir (male)',
       num_orders: 1,
       lifetime_value: 3.99
     },
     {
-      customer_name: 'Dana Ortega',
+      customer_name: 'Bryant Gorczany (female)',
       num_orders: 1,
       lifetime_value: 37.27
     },
     {
-      customer_name: 'Dana Ramos',
+      customer_name: 'Shelly Dickens (female)',
       num_orders: 2,
       lifetime_value: 2750.3975
     },
     {
-      customer_name: 'Dana Romero',
+      customer_name: 'Belinda Gleason (female)',
       num_orders: 1,
       lifetime_value: 3.99
     },
     {
-      customer_name: 'Dana Rubio',
+      customer_name: 'Hilda Bailey (female)',
       num_orders: 2,
       lifetime_value: 34.97
     },
     {
-      customer_name: 'Dana Ruiz',
+      customer_name: 'Sonya Graham MD (male)',
       num_orders: 1,
       lifetime_value: 2329.98
     },
     {
-      customer_name: 'Dana Schmidt',
+      customer_name: 'Arnold Farrell (male)',
       num_orders: 1,
       lifetime_value: 32.28
     },
     {
-      customer_name: 'Dana Serrano',
+      customer_name: 'Claire Schmidt (male)',
       num_orders: 2,
       lifetime_value: 2751.4175
     },
     {
-      customer_name: 'Dana Suarez',
+      customer_name: 'Kyle Lubowitz (male)',
       num_orders: 2,
       lifetime_value: 69.96
     },
     {
-      customer_name: 'Dana Torres',
+      customer_name: 'Clayton Hand (female)',
       num_orders: 2,
       lifetime_value: 4334.61
     },
     {
-      customer_name: 'Dana Vazquez',
+      customer_name: "Guadalupe O'Kon (female)",
       num_orders: 2,
       lifetime_value: 3262.83
     },
     {
-      customer_name: 'Daniel Anderson',
+      customer_name: 'Mrs. Constance Nikolaus (female)',
       num_orders: 1,
       lifetime_value: 113.97
     },
     {
-      customer_name: 'Daniel Brown',
+      customer_name: 'Gwendolyn Homenick (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Daniel Clark',
+      customer_name: 'Phyllis Dibbert (male)',
       num_orders: 1,
       lifetime_value: 2351.96
     },
     {
-      customer_name: 'Daniel Davis',
+      customer_name: 'Dr. Daniel Mayer (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Daniel Garcia',
+      customer_name: 'Cesar Hilpert (female)',
       num_orders: 1,
       lifetime_value: 1170.48
     },
     {
-      customer_name: 'Daniel Harris',
+      customer_name: 'Sherry Dach (female)',
       num_orders: 1,
       lifetime_value: 1775.47
     },
     {
-      customer_name: 'Daniel Jackson',
+      customer_name: 'Alonzo Treutel (male)',
       num_orders: 1,
       lifetime_value: 556.93
     },
     {
-      customer_name: 'Daniel Johnson',
+      customer_name: 'Cesar Hintz (male)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Daniel Jones',
+      customer_name: 'Mark Baumbach-Hoppe (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Daniel Lee',
+      customer_name: 'Brent Jacobi (female)',
       num_orders: 2,
       lifetime_value: 2427.3682
     },
     {
-      customer_name: 'Daniel Lewis',
+      customer_name: 'Rosa Hammes (male)',
       num_orders: 1,
       lifetime_value: 24.99
     },
     {
-      customer_name: 'Daniel Martin',
+      customer_name: 'Kayla Schulist (female)',
       num_orders: 1,
       lifetime_value: 553.97
     },
     {
-      customer_name: 'Daniel Martinez',
+      customer_name: 'Maureen Kilback (male)',
       num_orders: 2,
       lifetime_value: 216.4
     },
     {
-      customer_name: 'Daniel Miller',
+      customer_name: 'Isaac Hirthe (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Daniel Moore',
+      customer_name: 'Ignacio Bahringer (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Daniel Rodriguez',
+      customer_name: 'Hugo Reynolds (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Daniel Taylor',
+      customer_name: 'Alan Ledner (male)',
       num_orders: 2,
       lifetime_value: 6081.1
     },
     {
-      customer_name: 'Daniel Thomas',
+      customer_name: 'Bernice Kihn (male)',
       num_orders: 1,
       lifetime_value: 29.99
     },
     {
-      customer_name: 'Daniel Thompson',
+      customer_name: 'Winston Jacobs (female)',
       num_orders: 2,
       lifetime_value: 6056.61
     },
     {
-      customer_name: 'Daniel Walker',
+      customer_name: 'Becky Satterfield (female)',
       num_orders: 1,
       lifetime_value: 1760.47
     },
     {
-      customer_name: 'Daniel Weisman',
+      customer_name: 'Monique Kulas (female)',
       num_orders: 2,
       lifetime_value: 4752.75
     },
     {
-      customer_name: 'Daniel Williams',
+      customer_name: 'Gary Schuppe (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Daniel Wilson',
+      customer_name: 'Leo Rippin (female)',
       num_orders: 1,
       lifetime_value: 128.97
     },
     {
-      customer_name: 'Danny Alonso',
+      customer_name: 'Conrad Ankunding (female)',
       num_orders: 2,
       lifetime_value: 1592.5682
     },
     {
-      customer_name: 'Danny Alvarez',
+      customer_name: 'Tracy Block (male)',
       num_orders: 2,
       lifetime_value: 1613.0582
     },
     {
-      customer_name: 'Danny Blanco',
+      customer_name: 'Brittany Effertz (female)',
       num_orders: 3,
       lifetime_value: 6679.59
     },
     {
-      customer_name: 'Danny Carlson',
+      customer_name: 'Mr. Jackie Sanford (male)',
       num_orders: 3,
       lifetime_value: 8404.28
     },
     {
-      customer_name: 'Danny Diaz',
+      customer_name: 'Cary McLaughlin (male)',
       num_orders: 2,
       lifetime_value: 1588.5682
     },
     {
-      customer_name: 'Danny Gill',
+      customer_name: 'Brandi Robel (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Danny Gomez',
+      customer_name: 'Wm Huel (male)',
       num_orders: 1,
       lifetime_value: 64.47
     },
     {
-      customer_name: 'Danny Gutierrez',
+      customer_name: 'Stuart DuBuque (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Danny Hernandez',
+      customer_name: 'Darryl Murray (male)',
       num_orders: 2,
       lifetime_value: 1503.5782
     },
     {
-      customer_name: 'Danny Jiménez',
+      customer_name: 'Tanya Lynch MD (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Danny Martin',
+      customer_name: 'Robin Dickinson (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Danny Moreno',
+      customer_name: 'Kara Macejkovic DVM (female)',
       num_orders: 2,
       lifetime_value: 1528.0682
     },
     {
-      customer_name: 'Danny Munoz',
+      customer_name: 'Audrey Ledner (male)',
       num_orders: 2,
       lifetime_value: 1500.8682
     },
     {
-      customer_name: 'Danny Navarro',
+      customer_name: 'Ellen Kuphal IV (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Danny Ortega',
+      customer_name: 'Ron Strosin (male)',
       num_orders: 1,
       lifetime_value: 66.96
     },
     {
-      customer_name: 'Danny Ramos',
+      customer_name: 'Teresa Skiles (female)',
       num_orders: 3,
       lifetime_value: 6434.74
     },
     {
-      customer_name: 'Danny Romero',
+      customer_name: 'Jonathon Volkman-Treutel PhD (male)',
       num_orders: 2,
       lifetime_value: 1588.5682
     },
     {
-      customer_name: 'Danny Rubio',
+      customer_name: 'Louise Herman (female)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Danny Ruiz',
+      customer_name: 'Thelma Keebler (female)',
       num_orders: 1,
       lifetime_value: 902.46
     },
     {
-      customer_name: 'Danny Schmidt',
+      customer_name: 'Gwendolyn VonRueden (female)',
       num_orders: 2,
       lifetime_value: 3262.83
     },
     {
-      customer_name: 'Danny Serrano',
+      customer_name: 'Carla Koelpin (male)',
       num_orders: 2,
       lifetime_value: 4380.04
     },
     {
-      customer_name: 'Danny Suarez',
+      customer_name: 'Drew Jakubowski (female)',
       num_orders: 2,
       lifetime_value: 5908.25
     },
     {
-      customer_name: 'Danny Travers',
+      customer_name: 'Doreen Stroman (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Danny Vazquez',
+      customer_name: 'Phyllis Gutkowski (male)',
       num_orders: 2,
       lifetime_value: 4397.75
     },
     {
-      customer_name: 'Dave Natsuhara',
+      customer_name: 'Paula Huel (male)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'David Anderson',
+      customer_name: 'Eduardo Walsh (female)',
       num_orders: 2,
       lifetime_value: 2765.3975
     },
     {
-      customer_name: 'David Brown',
+      customer_name: 'Wm Wilderman (female)',
       num_orders: 2,
       lifetime_value: 3021.3782
     },
     {
-      customer_name: 'David Clark',
+      customer_name: 'Shelly Barrows (male)',
       num_orders: 3,
       lifetime_value: 6972.8625
     },
     {
-      customer_name: 'David Davis',
+      customer_name: 'Anita Bogisich (male)',
       num_orders: 2,
       lifetime_value: 3034.0682
     },
     {
-      customer_name: 'David Garcia',
+      customer_name: 'Ivan Bayer (male)',
       num_orders: 3,
       lifetime_value: 6921.5825
     },
     {
-      customer_name: 'David Harris',
+      customer_name: 'Miss Janie Windler (female)',
       num_orders: 1,
       lifetime_value: 32.27
     },
     {
-      customer_name: 'David Jackson',
+      customer_name: 'Gene Ondricka (male)',
       num_orders: 2,
       lifetime_value: 2435.0782
     },
     {
-      customer_name: 'David Johnson',
+      customer_name: 'Vicky Wisoky (female)',
       num_orders: 1,
       lifetime_value: 1725.98
     },
     {
-      customer_name: 'David Jones',
+      customer_name: 'Rene Daugherty (male)',
       num_orders: 1,
       lifetime_value: 85.48
     },
     {
-      customer_name: 'David Lee',
+      customer_name: 'Randolph Deckow (female)',
       num_orders: 1,
       lifetime_value: 31.97
     },
     {
-      customer_name: 'David Lewis',
+      customer_name: 'Ryan Ebert (female)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'David Martin',
+      customer_name: 'Catherine Hoppe (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'David Martinez',
+      customer_name: 'Deanna Predovic (male)',
       num_orders: 1,
       lifetime_value: 75.97
     },
     {
-      customer_name: 'David Miller',
+      customer_name: 'Freddie Wisozk (female)',
       num_orders: 1,
       lifetime_value: 187.98
     },
     {
-      customer_name: 'David Moore',
+      customer_name: 'Leigh Kuhic (female)',
       num_orders: 2,
       lifetime_value: 4792.73
     },
     {
-      customer_name: 'David Robinson',
+      customer_name: 'Roxanne Strosin (female)',
       num_orders: 3,
       lifetime_value: 5741.4075
     },
     {
-      customer_name: 'David Rodriguez',
+      customer_name: 'Mrs. Chelsea Senger (female)',
       num_orders: 2,
       lifetime_value: 3063.0582
     },
     {
-      customer_name: 'David Taylor',
+      customer_name: 'Dianne Morissette (female)',
       num_orders: 2,
       lifetime_value: 4715.7
     },
     {
-      customer_name: 'David Thomas',
+      customer_name: 'Shelia Altenwerth (male)',
       num_orders: 1,
       lifetime_value: 37.27
     },
     {
-      customer_name: 'David Walker',
+      customer_name: 'Bertha Hamill (male)',
       num_orders: 2,
       lifetime_value: 1518.5782
     },
     {
-      customer_name: 'David White',
+      customer_name: 'Edmund Gutkowski (female)',
       num_orders: 1,
       lifetime_value: 63.97
     },
     {
-      customer_name: 'David Williams',
+      customer_name: 'Sam Jast (male)',
       num_orders: 3,
       lifetime_value: 5739.4975
     },
     {
-      customer_name: 'David Wilson',
+      customer_name: 'Jenna Davis (female)',
       num_orders: 2,
       lifetime_value: 39.55
     },
     {
-      customer_name: 'Dawn Andersen',
+      customer_name: 'Alicia Gusikowski (female)',
       num_orders: 1,
       lifetime_value: 43.98
     },
     {
-      customer_name: 'Dawn Beck',
+      customer_name: 'Arlene Koelpin (female)',
       num_orders: 2,
       lifetime_value: 3989.46
     },
     {
-      customer_name: 'Dawn Chande',
+      customer_name: 'Candace Crooks (male)',
       num_orders: 2,
       lifetime_value: 4376.3996
     },
     {
-      customer_name: 'Dawn Chander',
+      customer_name: 'Mr. Darren Keebler (female)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Dawn Chen',
+      customer_name: 'Tricia Jast (male)',
       num_orders: 2,
       lifetime_value: 5937.73
     },
     {
-      customer_name: 'Dawn Deng',
+      customer_name: 'Debra Kub (female)',
       num_orders: 4,
       lifetime_value: 200.19
     },
     {
-      customer_name: 'Dawn Gao',
+      customer_name: 'Jacquelyn Ernser (female)',
       num_orders: 4,
       lifetime_value: 87.25
     },
     {
-      customer_name: 'Dawn Goel',
+      customer_name: 'Glen Emard (female)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Dawn Guo',
+      customer_name: 'Stanley Pacocha (female)',
       num_orders: 2,
       lifetime_value: 5950.23
     },
     {
-      customer_name: 'Dawn He',
+      customer_name: 'Robert Haley (female)',
       num_orders: 2,
       lifetime_value: 159.99
     },
     {
-      customer_name: 'Dawn Hu',
+      customer_name: 'Toni Hauck (female)',
       num_orders: 2,
       lifetime_value: 47.94
     },
     {
-      customer_name: 'Dawn Huang',
+      customer_name: "Dr. Elmer O'Conner (male)",
       num_orders: 2,
       lifetime_value: 5945.23
     },
     {
-      customer_name: 'Dawn Jai',
+      customer_name: 'Dr. Bradford Tillman (male)',
       num_orders: 1,
       lifetime_value: 84.98
     },
     {
-      customer_name: 'Dawn Kumar',
+      customer_name: 'Benny Flatley (male)',
       num_orders: 3,
       lifetime_value: 6890.7296
     },
     {
-      customer_name: 'Dawn Lal',
+      customer_name: 'Mary Wunsch (female)',
       num_orders: 2,
       lifetime_value: 5873.26
     },
     {
-      customer_name: 'Dawn Li',
+      customer_name: 'Elizabeth Harvey DVM (male)',
       num_orders: 2,
       lifetime_value: 4798.53
     },
     {
-      customer_name: 'Dawn Lin',
+      customer_name: 'Helen Satterfield (female)',
       num_orders: 2,
       lifetime_value: 5913.24
     },
     {
-      customer_name: 'Dawn Liu',
+      customer_name: 'Rochelle Hand (male)',
       num_orders: 2,
       lifetime_value: 5920.24
     },
     {
-      customer_name: 'Dawn Lu',
+      customer_name: 'Jimmie Hayes-Bogisich (male)',
       num_orders: 2,
       lifetime_value: 5983.74
     },
     {
-      customer_name: 'Dawn Luo',
+      customer_name: 'Hilda Schultz (female)',
       num_orders: 2,
       lifetime_value: 5908.25
     },
     {
-      customer_name: 'Dawn Ma',
+      customer_name: 'Shannon Lueilwitz (male)',
       num_orders: 2,
       lifetime_value: 5913.24
     },
     {
-      customer_name: 'Dawn Nara',
+      customer_name: 'Nathaniel White (female)',
       num_orders: 2,
       lifetime_value: 62.76
     },
     {
-      customer_name: 'Dawn Nath',
+      customer_name: 'Dr. Zachary Klocko (male)',
       num_orders: 2,
       lifetime_value: 4470.3896
     },
     {
-      customer_name: 'Dawn Pal',
+      customer_name: 'Faye Quigley (male)',
       num_orders: 2,
       lifetime_value: 4368.0582
     },
     {
-      customer_name: 'Dawn Raje',
+      customer_name: 'Conrad Pouros-Schroeder V (male)',
       num_orders: 2,
       lifetime_value: 4401.3996
     },
     {
-      customer_name: 'Dawn Raji',
+      customer_name: 'Mr. Lorenzo McKenzie (male)',
       num_orders: 2,
       lifetime_value: 114.96
     },
     {
-      customer_name: 'Dawn Shan',
+      customer_name: 'Dr. Walter Kiehn (male)',
       num_orders: 2,
       lifetime_value: 5950.23
     },
     {
-      customer_name: 'Dawn Sharma',
+      customer_name: 'Johnny Swift (male)',
       num_orders: 2,
       lifetime_value: 4472.3696
     },
     {
-      customer_name: 'Dawn Shen',
+      customer_name: 'Danielle Schneider (female)',
       num_orders: 2,
       lifetime_value: 51.27
     },
     {
-      customer_name: 'Dawn Stone',
+      customer_name: 'Dana Konopelski (male)',
       num_orders: 2,
       lifetime_value: 58.18
     },
     {
-      customer_name: 'Dawn Sun',
+      customer_name: 'Melanie Hoeger (female)',
       num_orders: 2,
       lifetime_value: 4811.5
     },
     {
-      customer_name: 'Dawn Tang',
+      customer_name: 'Anthony Kuhic (male)',
       num_orders: 2,
       lifetime_value: 5875.55
     },
     {
-      customer_name: 'Dawn Wang',
+      customer_name: 'Janis Heaney (male)',
       num_orders: 2,
       lifetime_value: 42.95
     },
     {
-      customer_name: 'Dawn Wu',
+      customer_name: 'Milton Kuhic (female)',
       num_orders: 2,
       lifetime_value: 206.94
     },
     {
-      customer_name: 'Dawn Xie',
+      customer_name: 'Beth Johnson MD (female)',
       num_orders: 2,
       lifetime_value: 5908.25
     },
     {
-      customer_name: 'Dawn Xu',
+      customer_name: 'Jessica Ferry (male)',
       num_orders: 2,
       lifetime_value: 5930.23
     },
     {
-      customer_name: 'Dawn Yang',
+      customer_name: 'Donald Hand (male)',
       num_orders: 4,
       lifetime_value: 202.2
     },
     {
-      customer_name: 'Dawn Ye',
+      customer_name: 'Mr. Emanuel Collier II (female)',
       num_orders: 4,
       lifetime_value: 280.64
     },
     {
-      customer_name: 'Dawn Yuan',
+      customer_name: 'Angelina Casper (female)',
       num_orders: 2,
       lifetime_value: 5908.25
     },
     {
-      customer_name: 'Dawn Zeng',
+      customer_name: 'Mamie Kuhn (male)',
       num_orders: 2,
       lifetime_value: 5935.55
     },
     {
-      customer_name: 'Dawn Zhang',
+      customer_name: 'Candice Bergnaum (male)',
       num_orders: 4,
       lifetime_value: 271.45
     },
     {
-      customer_name: 'Dawn Zhao',
+      customer_name: 'Andrea Blick (male)',
       num_orders: 2,
       lifetime_value: 5948.24
     },
     {
-      customer_name: 'Dawn Zheng',
+      customer_name: 'Miss Ella Leffler Jr. (male)',
       num_orders: 2,
       lifetime_value: 82.93
     },
     {
-      customer_name: 'Dawn Zhou',
+      customer_name: 'Christian Quitzon III (female)',
       num_orders: 2,
       lifetime_value: 5944.73
     },
     {
-      customer_name: 'Dawn Zhu',
+      customer_name: 'Dora Hamill (female)',
       num_orders: 2,
       lifetime_value: 5930.23
     },
     {
-      customer_name: 'Deb Foster',
+      customer_name: 'Edwin Howell (male)',
       num_orders: 1,
       lifetime_value: 106.96
     },
     {
-      customer_name: 'Deb Hughes',
+      customer_name: 'Ed Lehner IV (male)',
       num_orders: 2,
       lifetime_value: 43.99
     },
     {
-      customer_name: 'Deb Price',
+      customer_name: 'Nicolas Kiehn DVM (male)',
       num_orders: 1,
       lifetime_value: 81.46
     },
     {
-      customer_name: 'Deb Wagner',
+      customer_name: 'Clark Metz (male)',
       num_orders: 3,
       lifetime_value: 5205.7096
     },
     {
-      customer_name: 'Denise Arun',
+      customer_name: 'Natasha Leannon (male)',
       num_orders: 1,
       lifetime_value: 12.94
     },
     {
-      customer_name: 'Denise Fernandez',
+      customer_name: 'Dr. Kyle Baumbach (male)',
       num_orders: 1,
       lifetime_value: 63.97
     },
     {
-      customer_name: 'Denise Gonzalez',
+      customer_name: 'Genevieve Grant (male)',
       num_orders: 3,
       lifetime_value: 7243.36
     },
     {
-      customer_name: 'Denise Kapoor',
+      customer_name: 'Andrea Bartoletti PhD (male)',
       num_orders: 1,
       lifetime_value: 572.26
     },
     {
-      customer_name: 'Denise Lopez',
+      customer_name: 'Marilyn Johnson (female)',
       num_orders: 2,
       lifetime_value: 2756.5425
     },
     {
-      customer_name: 'Denise Madan',
+      customer_name: 'Dennis Emard (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Denise Malhotra',
+      customer_name: 'Pablo Ankunding Sr. (female)',
       num_orders: 1,
       lifetime_value: 2443.35
     },
     {
-      customer_name: 'Denise Martinez',
+      customer_name: 'Lorenzo Abbott (male)',
       num_orders: 2,
       lifetime_value: 3001.0225
     },
     {
-      customer_name: 'Denise Mehta',
+      customer_name: 'Mandy Glover (female)',
       num_orders: 2,
       lifetime_value: 2781.5425
     },
     {
-      customer_name: 'Denise Patel',
+      customer_name: 'Al Jacobson (female)',
       num_orders: 1,
       lifetime_value: 114.46
     },
     {
-      customer_name: 'Denise Perez',
+      customer_name: 'Bertha Sporer (female)',
       num_orders: 2,
       lifetime_value: 2771.5225
     },
     {
-      customer_name: 'Denise Prasad',
+      customer_name: 'Jessie Keebler (male)',
       num_orders: 2,
       lifetime_value: 126.96
     },
     {
-      customer_name: 'Denise Raman',
+      customer_name: 'Jan Runolfsdottir (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Denise Rana',
+      customer_name: 'Iris Rosenbaum (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Denise Rodriguez',
+      customer_name: 'Dr. Blake Collier-Kessler (female)',
       num_orders: 1,
       lifetime_value: 63.97
     },
     {
-      customer_name: 'Denise Sanchez',
+      customer_name: 'Ms. Vera Kautzer (female)',
       num_orders: 2,
       lifetime_value: 2778.8225
     },
     {
-      customer_name: 'Denise Stone',
+      customer_name: 'Vanessa Batz (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Denise Subram',
+      customer_name: 'Percy Harris (male)',
       num_orders: 2,
       lifetime_value: 26.97
     },
     {
-      customer_name: 'Denise Suri',
+      customer_name: 'Kelly Sporer (male)',
       num_orders: 1,
       lifetime_value: 553.97
     },
     {
-      customer_name: 'Denise Vance',
+      customer_name: 'Carolyn Reichert (male)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Dennis Cai',
+      customer_name: 'Dr. Jack Ortiz (female)',
       num_orders: 2,
       lifetime_value: 3917.5425
     },
     {
-      customer_name: 'Dennis Chen',
+      customer_name: 'Roderick Gottlieb-Romaguera (male)',
       num_orders: 1,
       lifetime_value: 29.98
     },
     {
-      customer_name: 'Dennis Gao',
+      customer_name: 'Sonja Hahn PhD (female)',
       num_orders: 2,
       lifetime_value: 4698.76
     },
     {
-      customer_name: 'Dennis Guo',
+      customer_name: "Steve O'Kon (female)",
       num_orders: 2,
       lifetime_value: 4733.75
     },
     {
-      customer_name: 'Dennis He',
+      customer_name: 'Roberto Leannon (male)',
       num_orders: 2,
       lifetime_value: 4733.75
     },
     {
-      customer_name: 'Dennis Hu',
+      customer_name: 'Miss Desiree Robel-Franey (male)',
       num_orders: 2,
       lifetime_value: 4698.76
     },
     {
-      customer_name: 'Dennis Huang',
+      customer_name: 'Vernon Hills (female)',
       num_orders: 2,
       lifetime_value: 2710.4175
     },
     {
-      customer_name: 'Dennis Li',
+      customer_name: 'Susie Schmeler (male)',
       num_orders: 2,
       lifetime_value: 3043.33
     },
     {
-      customer_name: 'Dennis Liang',
+      customer_name: 'Luther Gislason (female)',
       num_orders: 2,
       lifetime_value: 4733.75
     },
     {
-      customer_name: 'Dennis Lin',
+      customer_name: 'Kenneth Lynch-Ernser (female)',
       num_orders: 2,
       lifetime_value: 2751.4175
     },
     {
-      customer_name: 'Dennis Liu',
+      customer_name: 'Irene Treutel (female)',
       num_orders: 2,
       lifetime_value: 2736.4175
     },
     {
-      customer_name: 'Dennis Ma',
+      customer_name: 'Erick Bosco (male)',
       num_orders: 2,
       lifetime_value: 4787.74
     },
     {
-      customer_name: 'Dennis She',
+      customer_name: 'Pat Quigley (female)',
       num_orders: 2,
       lifetime_value: 3907.0425
     },
     {
-      customer_name: 'Dennis Sun',
+      customer_name: 'Martin Langworth (male)',
       num_orders: 2,
       lifetime_value: 4698.76
     },
     {
-      customer_name: 'Dennis Wang',
+      customer_name: 'Ismael Gleason (female)',
       num_orders: 1,
       lifetime_value: 64.97
     },
     {
-      customer_name: 'Dennis Ware',
+      customer_name: 'Rene Schmeler (female)',
       num_orders: 2,
       lifetime_value: 109.71
     },
     {
-      customer_name: 'Dennis Wu',
+      customer_name: 'Muriel Howell (female)',
       num_orders: 2,
       lifetime_value: 3044.79
     },
     {
-      customer_name: 'Dennis Xu',
+      customer_name: 'Kellie Huel Jr. (male)',
       num_orders: 1,
       lifetime_value: 35.72
     },
     {
-      customer_name: 'Dennis Yang',
+      customer_name: 'Traci Crona (male)',
       num_orders: 2,
       lifetime_value: 3882.5525
     },
     {
-      customer_name: 'Dennis Ye',
+      customer_name: 'Herbert Braun (male)',
       num_orders: 2,
       lifetime_value: 4733.75
     },
     {
-      customer_name: 'Dennis Zeng',
+      customer_name: 'Dr. Rene Blanda (male)',
       num_orders: 1,
       lifetime_value: 29.99
     },
     {
-      customer_name: 'Dennis Zhang',
+      customer_name: 'Preston Kautzer (female)',
       num_orders: 2,
       lifetime_value: 2701.4275
     },
     {
-      customer_name: 'Dennis Zhao',
+      customer_name: 'Felicia Torphy (male)',
       num_orders: 1,
       lifetime_value: 25.48
     },
     {
-      customer_name: 'Dennis Zheng',
+      customer_name: 'Scott Kautzer Jr. (male)',
       num_orders: 2,
       lifetime_value: 4733.75
     },
     {
-      customer_name: 'Dennis Zhou',
+      customer_name: 'Nicole Bruen (male)',
       num_orders: 1,
       lifetime_value: 32.27
     },
     {
-      customer_name: 'Dennis Zhu',
+      customer_name: 'Tami Grimes (male)',
       num_orders: 2,
       lifetime_value: 4752.75
     },
     {
-      customer_name: 'Derek Anand',
+      customer_name: 'Patricia Robel (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Derek Beck',
+      customer_name: 'Terry Koch DDS (male)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Derek Chande',
+      customer_name: 'Dr. Henrietta Keebler (female)',
       num_orders: 1,
       lifetime_value: 21.49
     },
     {
-      customer_name: 'Derek Chander',
+      customer_name: 'Clara Purdy (male)',
       num_orders: 2,
       lifetime_value: 6029.57
     },
     {
-      customer_name: 'Derek Goel',
+      customer_name: 'Saul Fahey (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Derek Jai',
+      customer_name: 'Roosevelt Corwin (female)',
       num_orders: 2,
       lifetime_value: 5333.25
     },
     {
-      customer_name: 'Derek Kumar',
+      customer_name: 'Kendra Thiel V (male)',
       num_orders: 2,
       lifetime_value: 5347.23
     },
     {
-      customer_name: 'Derek Nara',
+      customer_name: 'Dr. Fernando Miller (female)',
       num_orders: 1,
       lifetime_value: 60.47
     },
     {
-      customer_name: 'Derek Nath',
+      customer_name: 'Freddie Blanda (male)',
       num_orders: 1,
       lifetime_value: 49.97
     },
     {
-      customer_name: 'Derek Pal',
+      customer_name: 'Olive Dickinson (female)',
       num_orders: 1,
       lifetime_value: 69.97
     },
     {
-      customer_name: 'Derek Raje',
+      customer_name: 'Kent Kub Sr. (male)',
       num_orders: 1,
       lifetime_value: 75.48
     },
     {
-      customer_name: 'Derek Raji',
+      customer_name: 'Christine Conroy (male)',
       num_orders: 1,
       lifetime_value: 94.48
     },
     {
-      customer_name: 'Derek Shan',
+      customer_name: 'Elena Nikolaus (female)',
       num_orders: 2,
       lifetime_value: 6056.61
     },
     {
-      customer_name: 'Derek Sharma',
+      customer_name: 'Lela Hermiston (female)',
       num_orders: 2,
       lifetime_value: 6035.6
     },
     {
-      customer_name: 'Derek She',
+      customer_name: 'William Bechtelar DVM (male)',
       num_orders: 1,
       lifetime_value: 91.95
     },
     {
-      customer_name: 'Derek Shen',
+      customer_name: 'Delbert Batz (female)',
       num_orders: 1,
       lifetime_value: 69.97
     },
     {
-      customer_name: 'Derek Tang',
+      customer_name: 'Lorraine DuBuque (male)',
       num_orders: 1,
       lifetime_value: 34.98
     },
     {
-      customer_name: 'Derek Xie',
+      customer_name: 'Clyde Hansen (female)',
       num_orders: 1,
       lifetime_value: 32.28
     },
     {
-      customer_name: 'Derek Xu',
+      customer_name: 'Chad Herzog (female)',
       num_orders: 1,
       lifetime_value: 21.49
     },
     {
-      customer_name: 'Derek Yuan',
+      customer_name: 'Santos Johnston (male)',
       num_orders: 2,
       lifetime_value: 6093.2
     },
     {
-      customer_name: 'Derrick Alonso',
+      customer_name: 'Wallace Mills (female)',
       num_orders: 1,
       lifetime_value: 1700.99
     },
     {
-      customer_name: 'Derrick Bradley',
+      customer_name: 'Darryl Nienow (male)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Derrick Carlson',
+      customer_name: 'Thomas Corwin DVM (male)',
       num_orders: 1,
       lifetime_value: 639.45
     },
     {
-      customer_name: 'Derrick Diaz',
+      customer_name: 'Elijah Beier (female)',
       num_orders: 2,
       lifetime_value: 24.27
     },
     {
-      customer_name: 'Derrick Dominguez',
+      customer_name: 'Grady Friesen (male)',
       num_orders: 1,
       lifetime_value: 1183.47
     },
     {
-      customer_name: 'Derrick Gomez',
+      customer_name: 'Kent Schaden II (male)',
       num_orders: 2,
       lifetime_value: 6056.61
     },
     {
-      customer_name: 'Derrick Hernandez',
+      customer_name: 'Kerry Thiel (female)',
       num_orders: 2,
       lifetime_value: 122.24
     },
     {
-      customer_name: 'Derrick Jiménez',
+      customer_name: 'Danny Senger-Boyer (female)',
       num_orders: 2,
       lifetime_value: 104.42
     },
     {
-      customer_name: 'Derrick Martin',
+      customer_name: 'Rafael Leuschke III (female)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Derrick Moreno',
+      customer_name: 'Cary Hills (male)',
       num_orders: 2,
       lifetime_value: 63.91
     },
     {
-      customer_name: 'Derrick Munoz',
+      customer_name: 'Lonnie Farrell (female)',
       num_orders: 2,
       lifetime_value: 6056.61
     },
     {
-      customer_name: 'Derrick Navarro',
+      customer_name: 'Terri Conn (female)',
       num_orders: 1,
       lifetime_value: 1184.46
     },
     {
-      customer_name: 'Derrick Ramos',
+      customer_name: 'Natasha Feest (female)',
       num_orders: 1,
       lifetime_value: 579.97
     },
     {
-      customer_name: 'Derrick Romero',
+      customer_name: 'Amos Bashirian (male)',
       num_orders: 1,
       lifetime_value: 609.95
     },
     {
-      customer_name: 'Derrick Rubio',
+      customer_name: 'Mr. Steve Abbott Jr. (male)',
       num_orders: 1,
       lifetime_value: 1700.99
     },
     {
-      customer_name: 'Derrick Ruiz',
+      customer_name: 'Carmen McCullough (male)',
       num_orders: 2,
       lifetime_value: 6090.59
     },
     {
-      customer_name: 'Derrick Schmidt',
+      customer_name: 'Mrs. Katie Kulas (female)',
       num_orders: 1,
       lifetime_value: 1725.48
     },
     {
-      customer_name: 'Derrick Serrano',
+      customer_name: 'Jeffery Metz (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Derrick Torres',
+      customer_name: 'Francisco Lynch (male)',
       num_orders: 1,
       lifetime_value: 148.47
     },
     {
-      customer_name: 'Derrick Vazquez',
+      customer_name: 'Keith Abshire (male)',
       num_orders: 1,
       lifetime_value: 1729.97
     },
     {
-      customer_name: 'Desiree Alonso',
+      customer_name: 'Bryan Johnston (male)',
       num_orders: 1,
       lifetime_value: 61.45
     },
     {
-      customer_name: 'Desiree Alvarez',
+      customer_name: 'Vanessa Kiehn (male)',
       num_orders: 2,
       lifetime_value: 4404.73
     },
     {
-      customer_name: 'Desiree Bradley',
+      customer_name: 'Cary Howe-Rosenbaum (female)',
       num_orders: 2,
       lifetime_value: 3282.83
     },
     {
-      customer_name: 'Desiree Carlson',
+      customer_name: "Phil O'Connell (female)",
       num_orders: 1,
       lifetime_value: 24.27
     },
     {
-      customer_name: 'Desiree Dominguez',
+      customer_name: 'Lee Gorczany (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Desiree Gill',
+      customer_name: 'Dr. Kent Mosciski (male)',
       num_orders: 2,
       lifetime_value: 4639.5125
     },
     {
-      customer_name: 'Desiree Gutierrez',
+      customer_name: 'Santiago Thompson (female)',
       num_orders: 2,
       lifetime_value: 3095.5225
     },
     {
-      customer_name: 'Desiree Jimenez',
+      customer_name: 'Dr. Daryl Berge V (male)',
       num_orders: 2,
       lifetime_value: 4355.71
     },
     {
-      customer_name: 'Desiree Munoz',
+      customer_name: 'Lloyd Larkin Jr. (male)',
       num_orders: 2,
       lifetime_value: 5888.24
     },
     {
-      customer_name: 'Desiree Navarro',
+      customer_name: 'Ora Batz (male)',
       num_orders: 2,
       lifetime_value: 3247.82
     },
     {
-      customer_name: 'Desiree Ortega',
+      customer_name: 'Mathew Spinka (female)',
       num_orders: 2,
       lifetime_value: 4536.5425
     },
     {
-      customer_name: 'Desiree Romero',
+      customer_name: 'Rosemary Schumm (male)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Desiree Rubio',
+      customer_name: 'Regina Mohr DVM (female)',
       num_orders: 2,
       lifetime_value: 3021.0425
     },
     {
-      customer_name: 'Desiree Sanz',
+      customer_name: 'Miss Claire Dibbert Sr. (male)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Desiree Serrano',
+      customer_name: 'Ted Willms (female)',
       num_orders: 2,
       lifetime_value: 3060.5225
     },
     {
-      customer_name: 'Desiree Suarez',
+      customer_name: 'Mark Runolfsdottir (female)',
       num_orders: 2,
       lifetime_value: 3030.0325
     },
     {
-      customer_name: 'Desiree Torres',
+      customer_name: 'Carmen Douglas (male)',
       num_orders: 1,
       lifetime_value: 71.95
     },
     {
-      customer_name: 'Desiree Vazquez',
+      customer_name: 'Armando Morissette (male)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Desirée Moreno',
+      customer_name: 'Helen Wiza (male)',
       num_orders: 2,
       lifetime_value: 5917.24
     },
     {
-      customer_name: 'Destiny Alexander',
+      customer_name: 'Cody Konopelski (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Destiny Anderson',
+      customer_name: 'Mrs. Pat Lakin (female)',
       num_orders: 3,
       lifetime_value: 6973.81
     },
     {
-      customer_name: 'Destiny Bailey',
+      customer_name: 'Matt Berge (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Destiny Barnes',
+      customer_name: 'Adam Zulauf (male)',
       num_orders: 1,
       lifetime_value: 38.98
     },
     {
-      customer_name: 'Destiny Bell',
+      customer_name: 'Gerardo Jones (male)',
       num_orders: 1,
       lifetime_value: 539.99
     },
     {
-      customer_name: 'Destiny Bennett',
+      customer_name: 'Guy Rolfson-Schultz (male)',
       num_orders: 1,
       lifetime_value: 47.97
     },
     {
-      customer_name: 'Destiny Brooks',
+      customer_name: 'Jeremiah Abbott (female)',
       num_orders: 2,
       lifetime_value: 3150.3982
     },
     {
-      customer_name: 'Destiny Brown',
+      customer_name: 'Rudolph Mills (female)',
       num_orders: 3,
       lifetime_value: 8143.03
     },
     {
-      customer_name: 'Destiny Bryant',
+      customer_name: 'Diana Hirthe (male)',
       num_orders: 1,
       lifetime_value: 1120.49
     },
     {
-      customer_name: 'Destiny Butler',
+      customer_name: 'Mandy Schmidt (female)',
       num_orders: 1,
       lifetime_value: 1149.47
     },
     {
-      customer_name: 'Destiny Clark',
+      customer_name: 'Annette Hermiston (male)',
       num_orders: 5,
       lifetime_value: 258.15
     },
     {
-      customer_name: 'Destiny Coleman',
+      customer_name: 'Leonard Carroll (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Destiny Cook',
+      customer_name: 'Esther Weissnat (male)',
       num_orders: 1,
       lifetime_value: 1155.48
     },
     {
-      customer_name: 'Destiny Cooper',
+      customer_name: 'Derrick Braun (female)',
       num_orders: 1,
       lifetime_value: 80.96
     },
     {
-      customer_name: 'Destiny Cox',
+      customer_name: 'Harriet Schroeder (female)',
       num_orders: 1,
       lifetime_value: 1155.48
     },
     {
-      customer_name: 'Destiny Davis',
+      customer_name: 'Emanuel Aufderhar (male)',
       num_orders: 3,
       lifetime_value: 4985.3796
     },
     {
-      customer_name: 'Destiny Diaz',
+      customer_name: 'May Yundt (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Destiny Flores',
+      customer_name: 'Rex Pagac (male)',
       num_orders: 1,
       lifetime_value: 548.98
     },
     {
-      customer_name: 'Destiny Foster',
+      customer_name: 'Wilfred Zboncak III (female)',
       num_orders: 1,
       lifetime_value: 59.98
     },
     {
-      customer_name: 'Destiny Garcia',
+      customer_name: 'Pearl Dickens (female)',
       num_orders: 16,
       lifetime_value: 846.77
     },
     {
-      customer_name: 'Destiny Gray',
+      customer_name: 'Wilma Block (female)',
       num_orders: 1,
       lifetime_value: 12.98
     },
     {
-      customer_name: 'Destiny Griffin',
+      customer_name: 'Jody Lueilwitz-Kub (female)',
       num_orders: 1,
       lifetime_value: 67.93
     },
     {
-      customer_name: 'Destiny Hall',
+      customer_name: 'Warren Bechtelar (female)',
       num_orders: 16,
       lifetime_value: 822.97
     },
     {
-      customer_name: 'Destiny Harris',
+      customer_name: 'Gene Bode PhD (female)',
       num_orders: 16,
       lifetime_value: 654.27
     },
     {
-      customer_name: 'Destiny Henderson',
+      customer_name: 'Oscar Heathcote (female)',
       num_orders: 1,
       lifetime_value: 574.98
     },
     {
-      customer_name: 'Destiny Howard',
+      customer_name: 'Ms. Gwendolyn Stoltenberg (male)',
       num_orders: 1,
       lifetime_value: 1155.48
     },
     {
-      customer_name: 'Destiny Hughes',
+      customer_name: 'Kelvin Kirlin (female)',
       num_orders: 2,
       lifetime_value: 112.76
     },
     {
-      customer_name: 'Destiny Jackson',
+      customer_name: 'Dr. Jimmie Kessler (female)',
       num_orders: 3,
       lifetime_value: 7013.79
     },
     {
-      customer_name: 'Destiny James',
+      customer_name: 'Ray Stanton (female)',
       num_orders: 1,
       lifetime_value: 596.96
     },
     {
-      customer_name: 'Destiny Jenkins',
+      customer_name: 'Preston Brekke (female)',
       num_orders: 1,
       lifetime_value: 1155.48
     },
     {
-      customer_name: 'Destiny Johnson',
+      customer_name: 'Winifred Feil (female)',
       num_orders: 3,
       lifetime_value: 4970.6096
     },
     {
-      customer_name: 'Destiny Jones',
+      customer_name: 'Greg Morissette-Quigley (male)',
       num_orders: 3,
       lifetime_value: 4978.0482
     },
     {
-      customer_name: 'Destiny Kelly',
+      customer_name: 'Andy Blanda (female)',
       num_orders: 1,
       lifetime_value: 58.98
     },
     {
-      customer_name: 'Destiny Lee',
+      customer_name: 'Vicky Cruickshank MD (male)',
       num_orders: 2,
       lifetime_value: 101.76
     },
     {
-      customer_name: 'Destiny Lewis',
+      customer_name: 'Phillip MacGyver DVM (male)',
       num_orders: 2,
       lifetime_value: 5930.23
     },
     {
-      customer_name: 'Destiny Long',
+      customer_name: 'Claire Steuber V (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Destiny Martin',
+      customer_name: 'Teri Flatley (male)',
       num_orders: 16,
       lifetime_value: 872.25
     },
     {
-      customer_name: 'Destiny Miller',
+      customer_name: 'Boyd Bartoletti (male)',
       num_orders: 3,
       lifetime_value: 7048.3
     },
     {
-      customer_name: 'Destiny Moore',
+      customer_name: 'Lonnie Dare (female)',
       num_orders: 1,
       lifetime_value: 53.99
     },
     {
-      customer_name: 'Destiny Morgan',
+      customer_name: 'Emmett Ullrich (female)',
       num_orders: 1,
       lifetime_value: 1184.46
     },
     {
-      customer_name: 'Destiny Morris',
+      customer_name: 'Geoffrey Bayer (female)',
       num_orders: 1,
       lifetime_value: 589.96
     },
     {
-      customer_name: 'Destiny Murphy',
+      customer_name: 'Tasha Abbott (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Destiny Perry',
+      customer_name: 'Lamar McDermott (male)',
       num_orders: 1,
       lifetime_value: 553.97
     },
     {
-      customer_name: 'Destiny Peterson',
+      customer_name: 'Marvin Huel (male)',
       num_orders: 1,
       lifetime_value: 2457.33
     },
     {
-      customer_name: 'Destiny Powell',
+      customer_name: 'Roderick Wilderman (male)',
       num_orders: 1,
       lifetime_value: 628.97
     },
     {
-      customer_name: 'Destiny Price',
+      customer_name: 'Lowell Keebler (female)',
       num_orders: 2,
       lifetime_value: 3338.0382
     },
     {
-      customer_name: 'Destiny Ramirez',
+      customer_name: 'Carlton Wunsch (female)',
       num_orders: 1,
       lifetime_value: 32.28
     },
     {
-      customer_name: 'Destiny Reed',
+      customer_name: 'Raymond Robel (male)',
       num_orders: 1,
       lifetime_value: 1143.46
     },
     {
-      customer_name: 'Destiny Richardson',
+      customer_name: 'Darrin Frami-Wisozk (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Destiny Rivera',
+      customer_name: 'Delores Hagenes (male)',
       num_orders: 1,
       lifetime_value: 128.97
     },
     {
-      customer_name: 'Destiny Rodriguez',
+      customer_name: 'Estelle Yundt (female)',
       num_orders: 1,
       lifetime_value: 2319.99
     },
     {
-      customer_name: 'Destiny Rogers',
+      customer_name: 'Miranda Feeney (male)',
       num_orders: 1,
       lifetime_value: 589.96
     },
     {
-      customer_name: 'Destiny Ross',
+      customer_name: 'Henry Metz (male)',
       num_orders: 1,
       lifetime_value: 21.49
     },
     {
-      customer_name: 'Destiny Sanchez',
+      customer_name: 'Alberta Goyette (female)',
       num_orders: 1,
       lifetime_value: 1147.77
     },
     {
-      customer_name: 'Destiny Sanders',
+      customer_name: 'Boyd Waelchi (female)',
       num_orders: 1,
       lifetime_value: 36.27
     },
     {
-      customer_name: 'Destiny Simmons',
+      customer_name: 'Grace Yost (male)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Destiny Smith',
+      customer_name: 'Oliver Kub (male)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Destiny Stewart',
+      customer_name: 'Dr. Virgil Gutkowski (male)',
       num_orders: 2,
       lifetime_value: 5814.98
     },
     {
-      customer_name: 'Destiny Taylor',
+      customer_name: 'Erin Stanton (male)',
       num_orders: 2,
       lifetime_value: 4404.0782
     },
     {
-      customer_name: 'Destiny Thompson',
+      customer_name: 'Joyce Schuppe (male)',
       num_orders: 2,
       lifetime_value: 61.78
     },
     {
-      customer_name: 'Destiny Torres',
+      customer_name: 'Omar Kub MD (male)',
       num_orders: 1,
       lifetime_value: 2595.95
     },
     {
-      customer_name: 'Destiny Walker',
+      customer_name: 'David Conroy (female)',
       num_orders: 2,
       lifetime_value: 82.2
     },
     {
-      customer_name: 'Destiny Ward',
+      customer_name: 'Dorothy Emmerich V (female)',
       num_orders: 1,
       lifetime_value: 2618.62
     },
     {
-      customer_name: 'Destiny Washington',
+      customer_name: 'Dr. Jean Koepp (female)',
       num_orders: 1,
       lifetime_value: 562.96
     },
     {
-      customer_name: 'Destiny Watson',
+      customer_name: 'Steve Walsh (male)',
       num_orders: 1,
       lifetime_value: 614.98
     },
     {
-      customer_name: 'Destiny White',
+      customer_name: 'Mrs. Sue Runolfsson (female)',
       num_orders: 2,
       lifetime_value: 192.21
     },
     {
-      customer_name: 'Destiny Williams',
+      customer_name: 'Estelle Kulas (male)',
       num_orders: 3,
       lifetime_value: 4935.3596
     },
     {
-      customer_name: 'Destiny Wilson',
+      customer_name: 'Robert Franecki (female)',
       num_orders: 3,
       lifetime_value: 8127.51
     },
     {
-      customer_name: 'Destiny Wood',
+      customer_name: 'Ben Hermann-Cummerata (female)',
       num_orders: 2,
       lifetime_value: 1997.45
     },
     {
-      customer_name: 'Devin Alexander',
+      customer_name: 'Kristin VonRueden (female)',
       num_orders: 2,
       lifetime_value: 3062.33
     },
     {
-      customer_name: 'Devin Bell',
+      customer_name: 'Pamela Cummings (female)',
       num_orders: 2,
       lifetime_value: 3750.0882
     },
     {
-      customer_name: 'Devin Bennett',
+      customer_name: 'Lucia Smitham (female)',
       num_orders: 2,
       lifetime_value: 1799.9175
     },
     {
-      customer_name: 'Devin Brooks',
+      customer_name: 'Jessie Bernier (female)',
       num_orders: 1,
       lifetime_value: 85.48
     },
     {
-      customer_name: 'Devin Bryant',
+      customer_name: 'Corey Moen (male)',
       num_orders: 1,
       lifetime_value: 74.98
     },
     {
-      customer_name: 'Devin Butler',
+      customer_name: 'Penny Durgan (male)',
       num_orders: 2,
       lifetime_value: 4828.31
     },
     {
-      customer_name: 'Devin Coleman',
+      customer_name: 'Rodney Sanford (male)',
       num_orders: 3,
       lifetime_value: 6485.67
     },
     {
-      customer_name: 'Devin Cooper',
+      customer_name: 'Jeffery Moen (male)',
       num_orders: 2,
       lifetime_value: 237.97
     },
     {
-      customer_name: 'Devin Cox',
+      customer_name: 'Marguerite Schroeder (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Devin Diaz',
+      customer_name: 'Woodrow Daugherty (female)',
       num_orders: 1,
       lifetime_value: 74.98
     },
     {
-      customer_name: 'Devin Flores',
+      customer_name: 'Kristen Reichert (female)',
       num_orders: 1,
       lifetime_value: 2332.28
     },
     {
-      customer_name: 'Devin Foster',
+      customer_name: 'Kathryn Hermiston (female)',
       num_orders: 2,
       lifetime_value: 3078.31
     },
     {
-      customer_name: 'Devin Gray',
+      customer_name: 'Edward Dooley (male)',
       num_orders: 1,
       lifetime_value: 89.97
     },
     {
-      customer_name: 'Devin Griffin',
+      customer_name: 'Dr. Wayne Maggio MD (male)',
       num_orders: 2,
       lifetime_value: 2786.5225
     },
     {
-      customer_name: 'Devin Hayes',
+      customer_name: 'Alejandro Gerlach (female)',
       num_orders: 2,
       lifetime_value: 4476.5525
     },
     {
-      customer_name: 'Devin Henderson',
+      customer_name: 'Willis Purdy (female)',
       num_orders: 1,
       lifetime_value: 48.97
     },
     {
-      customer_name: 'Devin Howard',
+      customer_name: 'Ms. Amanda Lowe (male)',
       num_orders: 1,
       lifetime_value: 839.48
     },
     {
-      customer_name: 'Devin Hughes',
+      customer_name: 'Ralph Lang (female)',
       num_orders: 1,
       lifetime_value: 2337.27
     },
     {
-      customer_name: 'Devin James',
+      customer_name: 'Betsy Botsford (female)',
       num_orders: 2,
       lifetime_value: 1589.6975
     },
     {
-      customer_name: 'Devin Jenkins',
+      customer_name: 'Kay Dickinson (female)',
       num_orders: 1,
       lifetime_value: 75.97
     },
     {
-      customer_name: 'Devin Kelly',
+      customer_name: 'Bethany Greenholt (female)',
       num_orders: 1,
       lifetime_value: 156.59
     },
     {
-      customer_name: 'Devin Long',
+      customer_name: 'Jerome Turcotte (male)',
       num_orders: 2,
       lifetime_value: 2736.5325
     },
     {
-      customer_name: 'Devin Morgan',
+      customer_name: 'Leroy Pfannerstill PhD (female)',
       num_orders: 2,
       lifetime_value: 4118.26
     },
     {
-      customer_name: 'Devin Morris',
+      customer_name: 'Ms. Carolyn Gutkowski (female)',
       num_orders: 1,
       lifetime_value: 848.47
     },
     {
-      customer_name: 'Devin Murphy',
+      customer_name: 'Katrina Hoeger V (male)',
       num_orders: 3,
       lifetime_value: 7212.86
     },
     {
-      customer_name: 'Devin Patterson',
+      customer_name: 'Mr. Ellis Mueller (male)',
       num_orders: 2,
       lifetime_value: 3018.33
     },
     {
-      customer_name: 'Devin Perry',
+      customer_name: 'Ramiro Berge (female)',
       num_orders: 2,
       lifetime_value: 4525.8225
     },
     {
-      customer_name: 'Devin Peterson',
+      customer_name: 'Ted Kulas (male)',
       num_orders: 2,
       lifetime_value: 3370.4075
     },
     {
-      customer_name: 'Devin Powell',
+      customer_name: 'Mr. Wilbur Sipes (male)',
       num_orders: 1,
       lifetime_value: 74.98
     },
     {
-      customer_name: 'Devin Price',
+      customer_name: 'Marjorie Gislason (female)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Devin Ramirez',
+      customer_name: 'Loretta Hand Jr. (female)',
       num_orders: 2,
       lifetime_value: 3016.0682
     },
     {
-      customer_name: 'Devin Reed',
+      customer_name: 'Terry Terry-Hegmann (female)',
       num_orders: 2,
       lifetime_value: 2781.5425
     },
     {
-      customer_name: 'Devin Richardson',
+      customer_name: 'Carroll Witting (female)',
       num_orders: 2,
       lifetime_value: 1500.8682
     },
     {
-      customer_name: 'Devin Rivera',
+      customer_name: 'Louise Ullrich-Howe (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Devin Ross',
+      customer_name: "Luis Hudson-O'Conner (male)",
       num_orders: 3,
       lifetime_value: 5141.4282
     },
     {
-      customer_name: 'Devin Russell',
+      customer_name: 'Pete Runolfsdottir (female)',
       num_orders: 1,
       lifetime_value: 1129.48
     },
     {
-      customer_name: 'Devin Sanchez',
+      customer_name: 'Holly Corwin (female)',
       num_orders: 1,
       lifetime_value: 96.44
     },
     {
-      customer_name: 'Devin Sanders',
+      customer_name: 'Vickie Ullrich (female)',
       num_orders: 3,
       lifetime_value: 5647.9282
     },
     {
-      customer_name: 'Devin Simmons',
+      customer_name: 'Wesley Gleichner (male)',
       num_orders: 2,
       lifetime_value: 3033.31
     },
     {
-      customer_name: 'Devin Stewart',
+      customer_name: 'Sophie Haag (female)',
       num_orders: 2,
       lifetime_value: 3244.96
     },
     {
-      customer_name: 'Devin Torres',
+      customer_name: 'Loren Kerluke (female)',
       num_orders: 3,
       lifetime_value: 192.34
     },
     {
-      customer_name: 'Devin Ward',
+      customer_name: 'Betsy Klocko (male)',
       num_orders: 3,
       lifetime_value: 3595.9282
     },
     {
-      customer_name: 'Devin Watson',
+      customer_name: 'Muriel Hermann (male)',
       num_orders: 1,
       lifetime_value: 30.97
     },
     {
-      customer_name: 'Devin Wood',
+      customer_name: 'Dr. Mary Jones (male)',
       num_orders: 2,
       lifetime_value: 1769.9275
     },
     {
-      customer_name: 'Diana Alonso',
+      customer_name: 'Lonnie Kirlin (female)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Diana Alvarez',
+      customer_name: 'Joanne Hickle (female)',
       num_orders: 1,
       lifetime_value: 1700.99
     },
     {
-      customer_name: 'Diana Carlson',
+      customer_name: 'Ms. Emily Kemmer (female)',
       num_orders: 2,
       lifetime_value: 60.96
     },
     {
-      customer_name: 'Diana Dominguez',
+      customer_name: 'Nicolas Schneider (female)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Diana Gill',
+      customer_name: 'Allen Wisozk (male)',
       num_orders: 1,
       lifetime_value: 67.93
     },
     {
-      customer_name: 'Diana Gutierrez',
+      customer_name: 'Pamela Cassin (female)',
       num_orders: 1,
       lifetime_value: 58.98
     },
     {
-      customer_name: 'Diana Hernandez',
+      customer_name: 'Jacob Mitchell (male)',
       num_orders: 1,
       lifetime_value: 2319.99
     },
     {
-      customer_name: 'Diana Jimenez',
+      customer_name: 'Christina Okuneva (male)',
       num_orders: 1,
       lifetime_value: 599.47
     },
     {
-      customer_name: 'Diana Martin',
+      customer_name: 'Ronald Graham (male)',
       num_orders: 1,
       lifetime_value: 58.98
     },
     {
-      customer_name: 'Diana Moreno',
+      customer_name: 'Bobbie Stokes (male)',
       num_orders: 1,
       lifetime_value: 603.49
     },
     {
-      customer_name: 'Diana Munoz',
+      customer_name: 'Hannah Collier (female)',
       num_orders: 1,
       lifetime_value: 561.48
     },
     {
-      customer_name: 'Diana Navarro',
+      customer_name: 'Mamie Keeling (male)',
       num_orders: 1,
       lifetime_value: 564.48
     },
     {
-      customer_name: 'Diana Ortega',
+      customer_name: 'Marta Monahan DVM (male)',
       num_orders: 1,
       lifetime_value: 1754.98
     },
     {
-      customer_name: 'Diana Ramos',
+      customer_name: 'Jimmy Jacobs (female)',
       num_orders: 2,
       lifetime_value: 145.96
     },
     {
-      customer_name: 'Diana Romero',
+      customer_name: 'Homer Kulas (male)',
       num_orders: 1,
       lifetime_value: 1775.97
     },
     {
-      customer_name: 'Diana Rubio',
+      customer_name: 'Mrs. Leslie Schaefer (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Diana Ruiz',
+      customer_name: 'Dr. Leo Dickens (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Diana Sanz',
+      customer_name: 'Dr. Heather Willms (female)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Diana Serrano',
+      customer_name: 'Brad Mayert (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Diana Suarez',
+      customer_name: 'Clifford Robel (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Diana Torres',
+      customer_name: 'Dallas Schmeler (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Diana Vazquez',
+      customer_name: 'Marsha Littel (female)',
       num_orders: 1,
       lifetime_value: 12.94
     },
     {
-      customer_name: 'Diane Alonso',
+      customer_name: 'Sally Price Sr. (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Diane Alvarez',
+      customer_name: 'Willard Daniel (female)',
       num_orders: 2,
       lifetime_value: 52.93
     },
     {
-      customer_name: 'Diane Bradley',
+      customer_name: 'Tanya Mayer (female)',
       num_orders: 1,
       lifetime_value: 114.96
     },
     {
-      customer_name: 'Diane Carlson',
+      customer_name: 'Kristopher Rodriguez (female)',
       num_orders: 2,
       lifetime_value: 134.46
     },
     {
-      customer_name: 'Diane Dominguez',
+      customer_name: 'Michelle Farrell (male)',
       num_orders: 2,
       lifetime_value: 66.75
     },
     {
-      customer_name: 'Diane Gill',
+      customer_name: 'Joan Pollich (male)',
       num_orders: 3,
       lifetime_value: 6989.5825
     },
     {
-      customer_name: 'Diane Hernandez',
+      customer_name: 'Shane Schneider (male)',
       num_orders: 2,
       lifetime_value: 3170.2
     },
     {
-      customer_name: 'Diane Jimenez',
+      customer_name: 'Dr. Jaime Raynor (female)',
       num_orders: 2,
       lifetime_value: 1587.47
     },
     {
-      customer_name: 'Diane Martin',
+      customer_name: 'Ernestine Kuhlman (male)',
       num_orders: 2,
       lifetime_value: 3145.26
     },
     {
-      customer_name: 'Diane Moreno',
+      customer_name: 'Miriam Zulauf (female)',
       num_orders: 2,
       lifetime_value: 3124.45
     },
     {
-      customer_name: 'Diane Munoz',
+      customer_name: 'Shirley Franey II (female)',
       num_orders: 2,
       lifetime_value: 1622.47
     },
     {
-      customer_name: 'Diane Navarro',
+      customer_name: 'Patricia Connelly (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Diane Ramos',
+      customer_name: 'Hope Altenwerth-Schamberger (female)',
       num_orders: 2,
       lifetime_value: 126.56
     },
     {
-      customer_name: 'Diane Romero',
+      customer_name: 'Elaine Lang (female)',
       num_orders: 2,
       lifetime_value: 1587.47
     },
     {
-      customer_name: 'Diane Rubio',
+      customer_name: 'Rene DuBuque (male)',
       num_orders: 2,
       lifetime_value: 4443.3796
     },
     {
-      customer_name: 'Diane Ruiz',
+      customer_name: 'Salvador Smith (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Diane Sanz',
+      customer_name: 'Angie Wiza (female)',
       num_orders: 2,
       lifetime_value: 3124.96
     },
     {
-      customer_name: 'Diane Serrano',
+      customer_name: 'Miss Anita Lockman (male)',
       num_orders: 3,
       lifetime_value: 6221.5225
     },
     {
-      customer_name: 'Diane Suarez',
+      customer_name: 'Marianne Bartell DVM (male)',
       num_orders: 2,
       lifetime_value: 4408.6896
     },
     {
-      customer_name: 'Diane Torres',
+      customer_name: 'Israel Glover (male)',
       num_orders: 2,
       lifetime_value: 4367.0182
     },
     {
-      customer_name: 'Diane Vazquez',
+      customer_name: 'Lorenzo Hudson (female)',
       num_orders: 2,
       lifetime_value: 3785.0782
     },
     {
-      customer_name: 'Don Lal',
+      customer_name: "Samuel O'Kon (male)",
       num_orders: 2,
       lifetime_value: 6068.45
     },
     {
-      customer_name: 'Don Roessler',
+      customer_name: 'Toni Tromp (female)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Donald Arun',
+      customer_name: 'Jean Roob (male)',
       num_orders: 1,
       lifetime_value: 567.27
     },
     {
-      customer_name: 'Donald Chandra',
+      customer_name: 'Kelvin Dickens (male)',
       num_orders: 1,
       lifetime_value: 94.48
     },
     {
-      customer_name: 'Donald Fernandez',
+      customer_name: 'Sheryl Renner (female)',
       num_orders: 2,
       lifetime_value: 3214.0282
     },
     {
-      customer_name: 'Donald Garcia',
+      customer_name: 'Misty Brakus (male)',
       num_orders: 2,
       lifetime_value: 3142.4482
     },
     {
-      customer_name: 'Donald Gonzalez',
+      customer_name: 'Dianna Stamm I (male)',
       num_orders: 1,
       lifetime_value: 31.27
     },
     {
-      customer_name: 'Donald Kapoor',
+      customer_name: 'Isabel Bauch (male)',
       num_orders: 1,
       lifetime_value: 1155.48
     },
     {
-      customer_name: 'Donald Kovár',
+      customer_name: 'Dr. Rene Oberbrunner (female)',
       num_orders: 1,
       lifetime_value: 1174.48
     },
     {
-      customer_name: 'Donald Lopez',
+      customer_name: 'Tonya Halvorson (male)',
       num_orders: 1,
       lifetime_value: 82.97
     },
     {
-      customer_name: 'Donald Madan',
+      customer_name: 'Domingo Abshire Jr. (male)',
       num_orders: 2,
       lifetime_value: 5769.96
     },
     {
-      customer_name: 'Donald Martinez',
+      customer_name: 'Kendra Grant (male)',
       num_orders: 1,
       lifetime_value: 144.45
     },
     {
-      customer_name: 'Donald McDonald',
+      customer_name: 'Rita Pfannerstill DVM (male)',
       num_orders: 1,
       lifetime_value: 1129.48
     },
     {
-      customer_name: 'Donald Mehta',
+      customer_name: 'Helen Weimann (female)',
       num_orders: 1,
       lifetime_value: 691.91
     },
     {
-      customer_name: 'Donald Patel',
+      customer_name: 'Elisa Schneider (male)',
       num_orders: 1,
       lifetime_value: 1212.97
     },
     {
-      customer_name: 'Donald Perez',
+      customer_name: 'Ethel Nolan (male)',
       num_orders: 1,
       lifetime_value: 1174.48
     },
     {
-      customer_name: 'Donald Prasad',
+      customer_name: 'Susan Kulas (female)',
       num_orders: 1,
       lifetime_value: 2443.35
     },
     {
-      customer_name: 'Donald Raman',
+      customer_name: 'Charlene Emmerich (male)',
       num_orders: 2,
       lifetime_value: 3150.3982
     },
     {
-      customer_name: 'Donald Rodriguez',
+      customer_name: 'Cathy Keebler (male)',
       num_orders: 1,
       lifetime_value: 1170.48
     },
     {
-      customer_name: 'Donald Sanchez',
+      customer_name: 'Ernesto Streich (female)',
       num_orders: 2,
       lifetime_value: 3142.4482
     },
     {
-      customer_name: 'Donald Sara',
+      customer_name: 'Inez Rutherford (male)',
       num_orders: 1,
       lifetime_value: 1155.48
     },
     {
-      customer_name: 'Donald Srini',
+      customer_name: 'Kate Jerde (female)',
       num_orders: 2,
       lifetime_value: 5694.98
     },
     {
-      customer_name: 'Donald Subram',
+      customer_name: 'Rolando Hegmann (female)',
       num_orders: 1,
       lifetime_value: 1155.48
     },
     {
-      customer_name: 'Donald Suri',
+      customer_name: 'Marlene Mayert (male)',
       num_orders: 2,
       lifetime_value: 4530.47
     },
     {
-      customer_name: 'Douglas Arun',
+      customer_name: 'Ricky Leuschke (male)',
       num_orders: 3,
       lifetime_value: 4314.8782
     },
     {
-      customer_name: 'Douglas Fernandez',
+      customer_name: 'Mrs. Thelma Abernathy (male)',
       num_orders: 3,
       lifetime_value: 4337.8982
     },
     {
-      customer_name: 'Douglas Garcia',
+      customer_name: 'Christina Durgan (female)',
       num_orders: 2,
       lifetime_value: 1942.7
     },
     {
-      customer_name: 'Douglas Gonzalez',
+      customer_name: 'Mandy Dach (male)',
       num_orders: 2,
       lifetime_value: 1567.46
     },
     {
-      customer_name: 'Douglas Kapoor',
+      customer_name: 'Mr. Frank Dickens (female)',
       num_orders: 1,
       lifetime_value: 1183.47
     },
     {
-      customer_name: 'Douglas Madan',
+      customer_name: 'Emily Treutel (male)',
       num_orders: 2,
       lifetime_value: 1930.76
     },
     {
-      customer_name: 'Douglas Malhotra',
+      customer_name: 'Raul Robel (male)',
       num_orders: 1,
       lifetime_value: 1145.48
     },
     {
-      customer_name: 'Douglas Martinez',
+      customer_name: 'Tami Oberbrunner MD (male)',
       num_orders: 3,
       lifetime_value: 4349.8882
     },
     {
-      customer_name: 'Douglas Mehta',
+      customer_name: 'Jack Funk-Stoltenberg (male)',
       num_orders: 2,
       lifetime_value: 1934.75
     },
     {
-      customer_name: 'Douglas Patel',
+      customer_name: 'Daniel VonRueden (male)',
       num_orders: 1,
       lifetime_value: 1120.49
     },
     {
-      customer_name: 'Douglas Perez',
+      customer_name: 'Terry Krajcik (female)',
       num_orders: 2,
       lifetime_value: 1560.43
     },
     {
-      customer_name: 'Douglas Prasad',
+      customer_name: 'Olga Hamill (female)',
       num_orders: 2,
       lifetime_value: 3511.7575
     },
     {
-      customer_name: 'Douglas Raman',
+      customer_name: 'Edward Bayer (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Douglas Rana',
+      customer_name: 'Phyllis Turner (male)',
       num_orders: 2,
       lifetime_value: 1878.5682
     },
     {
-      customer_name: 'Douglas Rodriguez',
+      customer_name: 'Lynn Wehner (female)',
       num_orders: 2,
       lifetime_value: 1863.5682
     },
     {
-      customer_name: 'Douglas Sai',
+      customer_name: 'Blanca Hessel (male)',
       num_orders: 2,
       lifetime_value: 3476.3875
     },
     {
-      customer_name: 'Douglas Sanchez',
+      customer_name: 'Adam Brown (male)',
       num_orders: 1,
       lifetime_value: 58.98
     },
     {
-      customer_name: 'Douglas Sara',
+      customer_name: 'Peggy Rolfson III (male)',
       num_orders: 2,
       lifetime_value: 1938.47
     },
     {
-      customer_name: 'Douglas Srini',
+      customer_name: 'Kurt Spinka Jr. (male)',
       num_orders: 2,
       lifetime_value: 1938.47
     },
     {
-      customer_name: 'Douglas Subram',
+      customer_name: 'Roland Runte (female)',
       num_orders: 2,
       lifetime_value: 1869.5782
     },
     {
-      customer_name: 'Douglas Suri',
+      customer_name: 'Dallas Grady (female)',
       num_orders: 1,
       lifetime_value: 1155.48
     },
     {
-      customer_name: 'Douglas Vance',
+      customer_name: 'Lucy Johnston (male)',
       num_orders: 2,
       lifetime_value: 69.97
     },
     {
-      customer_name: 'Dwayne Alonso',
+      customer_name: 'Alfredo Bahringer (female)',
       num_orders: 1,
       lifetime_value: 22.93
     },
     {
-      customer_name: 'Dwayne Alvarez',
+      customer_name: 'Dr. Garry Koss Sr. (female)',
       num_orders: 1,
       lifetime_value: 1184.46
     },
     {
-      customer_name: 'Dwayne Dominguez',
+      customer_name: 'Joan Anderson (male)',
       num_orders: 1,
       lifetime_value: 2542.31
     },
     {
-      customer_name: 'Dwayne Gill',
+      customer_name: 'Alan Prohaska (male)',
       num_orders: 2,
       lifetime_value: 2994.0882
     },
     {
-      customer_name: 'Dwayne Gomez',
+      customer_name: 'Miriam Goodwin (female)',
       num_orders: 1,
       lifetime_value: 133.49
     },
     {
-      customer_name: 'Dwayne Gutierrez',
+      customer_name: 'Ms. Vicki Farrell (male)',
       num_orders: 1,
       lifetime_value: 74.46
     },
     {
-      customer_name: 'Dwayne Hernandez',
+      customer_name: 'Dustin Cummings MD (male)',
       num_orders: 1,
       lifetime_value: 128.97
     },
     {
-      customer_name: 'Dwayne Martin',
+      customer_name: 'Raymond Kling (female)',
       num_orders: 1,
       lifetime_value: 94.48
     },
     {
-      customer_name: 'Dwayne Moreno',
+      customer_name: 'Harry Feeney (female)',
       num_orders: 1,
       lifetime_value: 29.99
     },
     {
-      customer_name: 'Dwayne Munoz',
+      customer_name: 'Cary Reinger (male)',
       num_orders: 2,
       lifetime_value: 6054.22
     },
     {
-      customer_name: 'Dwayne Navarro',
+      customer_name: 'Kathleen Kerluke (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Dwayne Ortega',
+      customer_name: 'Sally Schmeler (female)',
       num_orders: 1,
       lifetime_value: 1729.97
     },
     {
-      customer_name: 'Dwayne Ramos',
+      customer_name: 'Ben Becker (female)',
       num_orders: 1,
       lifetime_value: 74.98
     },
     {
-      customer_name: 'Dwayne Romero',
+      customer_name: 'Nancy Hartmann (female)',
       num_orders: 1,
       lifetime_value: 1155.48
     },
     {
-      customer_name: 'Dwayne Rubio',
+      customer_name: 'Tina Rempel DVM (male)',
       num_orders: 1,
       lifetime_value: 78.48
     },
     {
-      customer_name: 'Dwayne Ruiz',
+      customer_name: 'Wilbur Upton-Barrows (male)',
       num_orders: 2,
       lifetime_value: 3226.8996
     },
     {
-      customer_name: 'Dwayne Sanz',
+      customer_name: 'Wm Medhurst (male)',
       num_orders: 1,
       lifetime_value: 1754.98
     },
     {
-      customer_name: 'Dwayne Serrano',
+      customer_name: 'Loretta Kovacek (male)',
       num_orders: 1,
       lifetime_value: 23.78
     },
     {
-      customer_name: 'Dwayne Suarez',
+      customer_name: 'Abel Ruecker-Turcotte (male)',
       num_orders: 1,
       lifetime_value: 2466.32
     },
     {
-      customer_name: 'Dwayne Torres',
+      customer_name: 'Kent Koch (male)',
       num_orders: 1,
       lifetime_value: 64.47
     },
     {
-      customer_name: 'Dwayne Vazquez',
+      customer_name: 'Miss Nicole Mraz (male)',
       num_orders: 2,
       lifetime_value: 3080.27
     },
     {
-      customer_name: 'Dylan Anderson',
+      customer_name: 'Charles Romaguera V (male)',
       num_orders: 2,
       lifetime_value: 6056.61
     },
     {
-      customer_name: 'Dylan Brown',
+      customer_name: 'Angelo Johnston II (female)',
       num_orders: 2,
       lifetime_value: 6063.21
     },
     {
-      customer_name: 'Dylan Clark',
+      customer_name: 'Brent Baumbach (female)',
       num_orders: 1,
       lifetime_value: 2319.99
     },
     {
-      customer_name: 'Dylan Davis',
+      customer_name: 'Rogelio Cassin (female)',
       num_orders: 2,
       lifetime_value: 30.97
     },
     {
-      customer_name: 'Dylan Garcia',
+      customer_name: 'Audrey Grady (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Dylan Harris',
+      customer_name: 'Jaime Schaden (female)',
       num_orders: 1,
       lifetime_value: 2359.96
     },
     {
-      customer_name: 'Dylan Jackson',
+      customer_name: 'Lucia Thiel (female)',
       num_orders: 1,
       lifetime_value: 1750.98
     },
     {
-      customer_name: 'Dylan Jones',
+      customer_name: 'Duane Wuckert (male)',
       num_orders: 2,
       lifetime_value: 6093.2
     },
     {
-      customer_name: 'Dylan Lee',
+      customer_name: 'Natalie Bernier (male)',
       num_orders: 1,
       lifetime_value: 1169.46
     },
     {
-      customer_name: 'Dylan Lewis',
+      customer_name: 'Betty Monahan DVM (male)',
       num_orders: 1,
       lifetime_value: 123.98
     },
     {
-      customer_name: 'Dylan Martin',
+      customer_name: 'Martha Swift (male)',
       num_orders: 1,
       lifetime_value: 2465.93
     },
     {
-      customer_name: 'Dylan Martinez',
+      customer_name: 'Felix White (male)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Dylan Miller',
+      customer_name: 'Jesus Paucek (male)',
       num_orders: 2,
       lifetime_value: 6037.89
     },
     {
-      customer_name: 'Dylan Moore',
+      customer_name: 'Nellie Kihn (female)',
       num_orders: 1,
       lifetime_value: 79.47
     },
     {
-      customer_name: 'Dylan Robinson',
+      customer_name: 'Charlene Lakin (female)',
       num_orders: 1,
       lifetime_value: 2317.92
     },
     {
-      customer_name: 'Dylan Rodriguez',
+      customer_name: 'Lucas McDermott (male)',
       num_orders: 1,
       lifetime_value: 2356.95
     },
     {
-      customer_name: 'Dylan Taylor',
+      customer_name: 'Rogelio Hansen (male)',
       num_orders: 1,
       lifetime_value: 616.91
     },
     {
-      customer_name: 'Dylan Thomas',
+      customer_name: 'Kenny Hilpert (female)',
       num_orders: 1,
       lifetime_value: 2329.98
     },
     {
-      customer_name: 'Dylan Thompson',
+      customer_name: 'Dolores Weissnat (male)',
       num_orders: 1,
       lifetime_value: 2349.98
     },
     {
-      customer_name: 'Dylan Walker',
+      customer_name: 'Enrique Haley (female)',
       num_orders: 1,
       lifetime_value: 64.47
     },
     {
-      customer_name: 'Dylan Williams',
+      customer_name: 'Dr. Anna Bergstrom (female)',
       num_orders: 1,
       lifetime_value: 2329.99
     },
     {
-      customer_name: 'Dylan Wilson',
+      customer_name: 'Ervin Dare (female)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Eduardo Alexander',
+      customer_name: 'Dr. Teri Jerde Jr. (male)',
       num_orders: 1,
       lifetime_value: 86.96
     },
     {
-      customer_name: 'Eduardo Bailey',
+      customer_name: 'Dr. Steve Lind (female)',
       num_orders: 1,
       lifetime_value: 99.9
     },
     {
-      customer_name: 'Eduardo Barnes',
+      customer_name: 'Bridget Wyman (female)',
       num_orders: 2,
       lifetime_value: 4883.82
     },
     {
-      customer_name: 'Eduardo Bell',
+      customer_name: 'Brendan Rutherford (male)',
       num_orders: 2,
       lifetime_value: 3807.3996
     },
     {
-      customer_name: 'Eduardo Bennett',
+      customer_name: 'Elijah Bins (male)',
       num_orders: 2,
       lifetime_value: 4500.8225
     },
     {
-      customer_name: 'Eduardo Brooks',
+      customer_name: 'Wesley Braun (male)',
       num_orders: 1,
       lifetime_value: 48.97
     },
     {
-      customer_name: 'Eduardo Butler',
+      customer_name: 'Kristin Pollich (male)',
       num_orders: 2,
       lifetime_value: 3045.5325
     },
     {
-      customer_name: 'Eduardo Coleman',
+      customer_name: 'Mr. Nicolas Kassulke (female)',
       num_orders: 2,
       lifetime_value: 4553.5225
     },
     {
-      customer_name: 'Eduardo Cook',
+      customer_name: 'Ashley Parisian (male)',
       num_orders: 2,
       lifetime_value: 3199.44
     },
     {
-      customer_name: 'Eduardo Cooper',
+      customer_name: 'Cindy Rath (female)',
       num_orders: 3,
       lifetime_value: 5188.4082
     },
     {
-      customer_name: 'Eduardo Cox',
+      customer_name: 'Shirley Howell (male)',
       num_orders: 2,
       lifetime_value: 164.2
     },
     {
-      customer_name: 'Eduardo Diaz',
+      customer_name: 'Duane Rowe (female)',
       num_orders: 1,
       lifetime_value: 30.97
     },
     {
-      customer_name: 'Eduardo Flores',
+      customer_name: 'Myron Kulas (male)',
       num_orders: 2,
       lifetime_value: 2959.0025
     },
     {
-      customer_name: 'Eduardo Foster',
+      customer_name: 'Mario Zemlak Jr. (male)',
       num_orders: 3,
       lifetime_value: 224.91
     },
     {
-      customer_name: 'Eduardo Gonzales',
+      customer_name: 'Audrey Ziemann (male)',
       num_orders: 1,
       lifetime_value: 24.27
     },
     {
-      customer_name: 'Eduardo Gray',
+      customer_name: 'Mr. Pat Murphy (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Eduardo Griffin',
+      customer_name: 'Nora Skiles DDS (male)',
       num_orders: 4,
       lifetime_value: 229
     },
     {
-      customer_name: 'Eduardo Henderson',
+      customer_name: 'Eileen Windler (male)',
       num_orders: 3,
       lifetime_value: 108.96
     },
     {
-      customer_name: 'Eduardo Hughes',
+      customer_name: 'Wilson Bogisich (female)',
       num_orders: 1,
       lifetime_value: 2349.98
     },
     {
-      customer_name: 'Eduardo James',
+      customer_name: 'Bridget Weber (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Eduardo Jenkins',
+      customer_name: 'Walter Huels (female)',
       num_orders: 2,
       lifetime_value: 4522.5025
     },
     {
-      customer_name: 'Eduardo Kelly',
+      customer_name: 'Van Bernier (female)',
       num_orders: 3,
       lifetime_value: 8361.3
     },
     {
-      customer_name: 'Eduardo Long',
+      customer_name: 'Ms. Hazel Sipes (male)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Eduardo Morgan',
+      customer_name: 'Kelvin Murphy (male)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Eduardo Morris',
+      customer_name: 'Joel Nienow (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Eduardo Murphy',
+      customer_name: 'Nathaniel McLaughlin (female)',
       num_orders: 2,
       lifetime_value: 68.87
     },
     {
-      customer_name: 'Eduardo Patterson',
+      customer_name: 'Danny Blick (male)',
       num_orders: 2,
       lifetime_value: 2988.3225
     },
     {
-      customer_name: 'Eduardo Perry',
+      customer_name: 'Shannon Schmidt-Cremin MD (male)',
       num_orders: 2,
       lifetime_value: 4478.8425
     },
     {
-      customer_name: 'Eduardo Peterson',
+      customer_name: 'Bradford Von (female)',
       num_orders: 1,
       lifetime_value: 30.97
     },
     {
-      customer_name: 'Eduardo Powell',
+      customer_name: 'Santos Keebler (male)',
       num_orders: 1,
       lifetime_value: 39.25
     },
     {
-      customer_name: 'Eduardo Price',
+      customer_name: 'Russell Sipes (male)',
       num_orders: 2,
       lifetime_value: 4532.5225
     },
     {
-      customer_name: 'Eduardo Ramirez',
+      customer_name: 'Darrin Haag (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Eduardo Reed',
+      customer_name: 'Samuel Donnelly (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Eduardo Richardson',
+      customer_name: 'Dr. Bert Blick (female)',
       num_orders: 2,
       lifetime_value: 1588.5682
     },
     {
-      customer_name: 'Eduardo Rivera',
+      customer_name: 'Jamie Stracke (female)',
       num_orders: 2,
       lifetime_value: 1645.5482
     },
     {
-      customer_name: 'Eduardo Rogers',
+      customer_name: 'Aaron Ullrich (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Eduardo Ross',
+      customer_name: 'Jermaine Gutkowski (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Eduardo Russell',
+      customer_name: 'Leslie Balistreri (female)',
       num_orders: 4,
       lifetime_value: 284.13
     },
     {
-      customer_name: 'Eduardo Sanchez',
+      customer_name: 'Adrienne Olson PhD (female)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Eduardo Sanders',
+      customer_name: 'Rex Jerde (male)',
       num_orders: 3,
       lifetime_value: 5217.7296
     },
     {
-      customer_name: 'Eduardo Simmons',
+      customer_name: "Gwen D'Amore (female)",
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Eduardo Stewart',
+      customer_name: 'Rochelle West (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Eduardo Torres',
+      customer_name: "Percy O'Connell V (female)",
       num_orders: 2,
       lifetime_value: 1839.9175
     },
     {
-      customer_name: 'Eduardo Ward',
+      customer_name: 'Christina Champlin (male)',
       num_orders: 3,
       lifetime_value: 3653.2296
     },
     {
-      customer_name: 'Eduardo Watson',
+      customer_name: 'Dr. Jacqueline Lesch (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Eduardo Wood',
+      customer_name: 'Everett Johns (female)',
       num_orders: 2,
       lifetime_value: 4879.8
     },
     {
-      customer_name: 'Edward Alexander',
+      customer_name: 'Wendell McCullough (male)',
       num_orders: 2,
       lifetime_value: 4787.61
     },
     {
-      customer_name: 'Edward Barnes',
+      customer_name: 'Adrian Feest (male)',
       num_orders: 3,
       lifetime_value: 6817.1182
     },
     {
-      customer_name: 'Edward Bryant',
+      customer_name: 'Kathryn Ondricka (female)',
       num_orders: 2,
       lifetime_value: 4819.3
     },
     {
-      customer_name: 'Edward Butler',
+      customer_name: 'Jane Toy-Beahan (female)',
       num_orders: 3,
       lifetime_value: 6812.1182
     },
     {
-      customer_name: 'Edward Coleman',
+      customer_name: 'Denise Raynor (female)',
       num_orders: 3,
       lifetime_value: 6831.7596
     },
     {
-      customer_name: 'Edward Diaz',
+      customer_name: 'Albert Kovacek (female)',
       num_orders: 1,
       lifetime_value: 15.23
     },
     {
-      customer_name: 'Edward Flores',
+      customer_name: 'Bob Bauch (female)',
       num_orders: 3,
       lifetime_value: 6793.1482
     },
     {
-      customer_name: 'Edward Foster',
+      customer_name: 'Mr. Morris Kovacek IV (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Edward Gonzales',
+      customer_name: 'Josh Hirthe III (male)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Edward Griffin',
+      customer_name: 'Jeannie Gibson (male)',
       num_orders: 2,
       lifetime_value: 5913.24
     },
     {
-      customer_name: 'Edward Hayes',
+      customer_name: 'Bobbie Nader (female)',
       num_orders: 2,
       lifetime_value: 83.95
     },
     {
-      customer_name: 'Edward Henderson',
+      customer_name: 'Lewis Lueilwitz (female)',
       num_orders: 3,
       lifetime_value: 6803.1382
     },
     {
-      customer_name: 'Edward Hughes',
+      customer_name: 'Sherry Reichel (female)',
       num_orders: 3,
       lifetime_value: 6843.5982
     },
     {
-      customer_name: 'Edward Jenkins',
+      customer_name: 'Lynn Berge (male)',
       num_orders: 3,
       lifetime_value: 6777.1282
     },
     {
-      customer_name: 'Edward Long',
+      customer_name: 'Jonathon Haag (male)',
       num_orders: 3,
       lifetime_value: 6799.4496
     },
     {
-      customer_name: 'Edward Patterson',
+      customer_name: 'Henry Predovic (male)',
       num_orders: 3,
       lifetime_value: 6864.4596
     },
     {
-      customer_name: 'Edward Perry',
+      customer_name: 'Micheal Wisozk (female)',
       num_orders: 3,
       lifetime_value: 6832.1182
     },
     {
-      customer_name: 'Edward Powell',
+      customer_name: 'Gina Towne (female)',
       num_orders: 2,
       lifetime_value: 71.25
     },
     {
-      customer_name: 'Edward Price',
+      customer_name: 'Ken Muller (male)',
       num_orders: 3,
       lifetime_value: 214.25
     },
     {
-      customer_name: 'Edward Ross',
+      customer_name: 'Damon Luettgen IV (female)',
       num_orders: 3,
       lifetime_value: 6838.4596
     },
     {
-      customer_name: 'Edward Russell',
+      customer_name: 'Jay Walker (male)',
       num_orders: 2,
       lifetime_value: 4750.01
     },
     {
-      customer_name: 'Edward Washington',
+      customer_name: 'Miss Johanna Mueller (female)',
       num_orders: 3,
       lifetime_value: 6812.1282
     },
     {
-      customer_name: 'Edward Wood',
+      customer_name: 'Angie Wilkinson (male)',
       num_orders: 3,
       lifetime_value: 191.25
     },
     {
-      customer_name: 'Edwin Bhat',
+      customer_name: 'Dr. Trevor Streich (male)',
       num_orders: 1,
       lifetime_value: 2351.96
     },
     {
-      customer_name: 'Edwin Chande',
+      customer_name: 'Marilyn Lakin (female)',
       num_orders: 1,
       lifetime_value: 24.27
     },
     {
-      customer_name: 'Edwin Chander',
+      customer_name: 'Kirk Bahringer (male)',
       num_orders: 1,
       lifetime_value: 141.98
     },
     {
-      customer_name: 'Edwin Chen',
+      customer_name: 'Mr. Nathaniel Tromp (male)',
       num_orders: 3,
       lifetime_value: 6765.4382
     },
     {
-      customer_name: 'Edwin Deng',
+      customer_name: 'Garry Smith IV (female)',
       num_orders: 4,
       lifetime_value: 286.88
     },
     {
-      customer_name: 'Edwin Ferrier',
+      customer_name: 'Kelly Russel (male)',
       num_orders: 2,
       lifetime_value: 4795.31
     },
     {
-      customer_name: 'Edwin Gao',
+      customer_name: 'Cory Predovic (female)',
       num_orders: 2,
       lifetime_value: 4523.5325
     },
     {
-      customer_name: 'Edwin Goel',
+      customer_name: 'Archie Blick-Osinski MD (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Edwin Guo',
+      customer_name: 'Mrs. Marsha Douglas I (female)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Edwin He',
+      customer_name: 'Felicia Lehner (female)',
       num_orders: 1,
       lifetime_value: 42.28
     },
     {
-      customer_name: 'Edwin Hu',
+      customer_name: 'Tracey Johns (female)',
       num_orders: 2,
       lifetime_value: 144.27
     },
     {
-      customer_name: 'Edwin Huang',
+      customer_name: 'Hope Herzog (male)',
       num_orders: 3,
       lifetime_value: 6737.1482
     },
     {
-      customer_name: 'Edwin Jai',
+      customer_name: 'Cheryl McLaughlin (male)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Edwin Kumar',
+      customer_name: 'Curtis Johnson (female)',
       num_orders: 1,
       lifetime_value: 46.47
     },
     {
-      customer_name: 'Edwin Lal',
+      customer_name: 'Teri Collier (male)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Edwin Li',
+      customer_name: 'Shelley Cormier (female)',
       num_orders: 3,
       lifetime_value: 91.92
     },
     {
-      customer_name: 'Edwin Liang',
+      customer_name: 'Judith Tremblay (male)',
       num_orders: 1,
       lifetime_value: 100.46
     },
     {
-      customer_name: 'Edwin Lin',
+      customer_name: 'Roman Maggio (male)',
       num_orders: 3,
       lifetime_value: 83.97
     },
     {
-      customer_name: 'Edwin Liu',
+      customer_name: 'Essie Morissette (female)',
       num_orders: 3,
       lifetime_value: 6815.0782
     },
     {
-      customer_name: 'Edwin Lu',
+      customer_name: 'Lola Lindgren (female)',
       num_orders: 1,
       lifetime_value: 91.95
     },
     {
-      customer_name: 'Edwin Luo',
+      customer_name: 'Miss Marta Streich (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Edwin Nara',
+      customer_name: 'Vincent Hermann (male)',
       num_orders: 2,
       lifetime_value: 4803.32
     },
     {
-      customer_name: 'Edwin Nath',
+      customer_name: 'Dewey Schiller (male)',
       num_orders: 1,
       lifetime_value: 30.97
     },
     {
-      customer_name: 'Edwin Pal',
+      customer_name: 'Joan Lang (female)',
       num_orders: 3,
       lifetime_value: 105.19
     },
     {
-      customer_name: 'Edwin Rai',
+      customer_name: 'Chester Cronin V (male)',
       num_orders: 1,
       lifetime_value: 2319.99
     },
     {
-      customer_name: 'Edwin Raje',
+      customer_name: 'Karl Senger (male)',
       num_orders: 3,
       lifetime_value: 105.19
     },
     {
-      customer_name: 'Edwin Raji',
+      customer_name: 'Amelia Ondricka (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Edwin Shan',
+      customer_name: 'Garry Kihn III (female)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Edwin Sharma',
+      customer_name: 'Dr. Sonja Farrell (female)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Edwin She',
+      customer_name: 'Erika Reynolds (male)',
       num_orders: 2,
       lifetime_value: 4558.5225
     },
     {
-      customer_name: 'Edwin Shen',
+      customer_name: 'Carlton Schuppe (female)',
       num_orders: 2,
       lifetime_value: 4498.5325
     },
     {
-      customer_name: 'Edwin Sun',
+      customer_name: 'Christina Kuhic (female)',
       num_orders: 3,
       lifetime_value: 208.18
     },
     {
-      customer_name: 'Edwin Tang',
+      customer_name: 'Preston King (female)',
       num_orders: 2,
       lifetime_value: 195.97
     },
     {
-      customer_name: 'Edwin West',
+      customer_name: 'Bridget Satterfield (male)',
       num_orders: 3,
       lifetime_value: 205.39
     },
     {
-      customer_name: 'Edwin Wu',
+      customer_name: 'Ms. Kristine Franey (male)',
       num_orders: 3,
       lifetime_value: 6773.1382
     },
     {
-      customer_name: 'Edwin Xie',
+      customer_name: 'Glenda Vandervort III (male)',
       num_orders: 2,
       lifetime_value: 201.46
     },
     {
-      customer_name: 'Edwin Xu',
+      customer_name: 'Joy Bashirian (male)',
       num_orders: 4,
       lifetime_value: 149.84
     },
     {
-      customer_name: 'Edwin Xu',
+      customer_name: 'Theodore Langosh (male)',
       num_orders: 1,
       lifetime_value: 2309.97
     },
     {
-      customer_name: 'Edwin Yang',
+      customer_name: 'Miss Kristina Kautzer (male)',
       num_orders: 3,
       lifetime_value: 86.26
     },
     {
-      customer_name: 'Edwin Ye',
+      customer_name: 'Dustin Shields (female)',
       num_orders: 4,
       lifetime_value: 281.47
     },
     {
-      customer_name: 'Edwin Yuan',
+      customer_name: 'Lewis Leffler (male)',
       num_orders: 2,
       lifetime_value: 4765.63
     },
     {
-      customer_name: 'Edwin Zhang',
+      customer_name: 'Myrtle Toy (male)',
       num_orders: 3,
       lifetime_value: 5669.8982
     },
     {
-      customer_name: 'Edwin Zhao',
+      customer_name: 'Annette Terry (male)',
       num_orders: 1,
       lifetime_value: 30.97
     },
     {
-      customer_name: 'Edwin Zheng',
+      customer_name: 'Jane VonRueden (male)',
       num_orders: 2,
       lifetime_value: 191.97
     },
     {
-      customer_name: 'Edwin Zhou',
+      customer_name: 'Marcos Considine (female)',
       num_orders: 2,
       lifetime_value: 4798.34
     },
     {
-      customer_name: 'Edwin Zhu',
+      customer_name: 'Michelle Ward (female)',
       num_orders: 3,
       lifetime_value: 6839.4596
     },
     {
-      customer_name: 'Elena Velez Amezaga',
+      customer_name: 'Edmund McKenzie (male)',
       num_orders: 1,
       lifetime_value: 24.27
     },
     {
-      customer_name: 'Elijah Adams',
+      customer_name: 'Billy Ziemann (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Elijah Allen',
+      customer_name: 'Eddie Konopelski-Haley MD (female)',
       num_orders: 1,
       lifetime_value: 2319.99
     },
     {
-      customer_name: 'Elijah Baker',
+      customer_name: 'Phil Wyman Sr. (female)',
       num_orders: 1,
       lifetime_value: 119.96
     },
     {
-      customer_name: 'Elijah Campbell',
+      customer_name: 'Mr. Tracy Lakin (male)',
       num_orders: 2,
       lifetime_value: 2700.0482
     },
     {
-      customer_name: 'Elijah Carter',
+      customer_name: 'Carmen Rippin (male)',
       num_orders: 2,
       lifetime_value: 4930.68
     },
     {
-      customer_name: 'Elijah Collins',
+      customer_name: 'Jenna Rolfson (female)',
       num_orders: 2,
       lifetime_value: 4366.4096
     },
     {
-      customer_name: 'Elijah Edwards',
+      customer_name: 'Marty Murray IV (male)',
       num_orders: 3,
       lifetime_value: 6973.8725
     },
     {
-      customer_name: 'Elijah Evans',
+      customer_name: 'Ms. Sandra Medhurst (female)',
       num_orders: 2,
       lifetime_value: 5908.25
     },
     {
-      customer_name: 'Elijah Hall',
+      customer_name: 'Lynn Medhurst (male)',
       num_orders: 2,
       lifetime_value: 130.96
     },
     {
-      customer_name: 'Elijah Hernandez',
+      customer_name: 'Casey Nienow (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Elijah Hill',
+      customer_name: 'Fredrick Davis V (female)',
       num_orders: 2,
       lifetime_value: 250.91
     },
     {
-      customer_name: 'Elijah King',
+      customer_name: 'Mr. Bernard Smith (male)',
       num_orders: 2,
       lifetime_value: 4144.34
     },
     {
-      customer_name: 'Elijah McDonald',
+      customer_name: 'Pauline Runolfsson-Langworth (female)',
       num_orders: 2,
       lifetime_value: 92.97
     },
     {
-      customer_name: 'Elijah Mitchell',
+      customer_name: 'Carole Kihn (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Elijah Nelson',
+      customer_name: 'Gabriel Friesen (female)',
       num_orders: 1,
       lifetime_value: 64.47
     },
     {
-      customer_name: 'Elijah Parker',
+      customer_name: 'Howard Hodkiewicz (female)',
       num_orders: 2,
       lifetime_value: 1371.95
     },
     {
-      customer_name: 'Elijah Perez',
+      customer_name: 'Gustavo Bergnaum (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Elijah Phillips',
+      customer_name: 'Timmy Boehm (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Elijah Roberts',
+      customer_name: 'Roy Schmitt (male)',
       num_orders: 2,
       lifetime_value: 3117.97
     },
     {
-      customer_name: 'Elijah Scott',
+      customer_name: 'Anne Schmitt (male)',
       num_orders: 2,
       lifetime_value: 3028.0225
     },
     {
-      customer_name: 'Elijah Wright',
+      customer_name: 'Henry Gutkowski (female)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Elijah Young',
+      customer_name: 'Duane McGlynn (female)',
       num_orders: 1,
       lifetime_value: 54.98
     },
     {
-      customer_name: 'Elizabeth Alexander',
+      customer_name: 'Emma Emard (male)',
       num_orders: 3,
       lifetime_value: 197.55
     },
     {
-      customer_name: 'Elizabeth Barnes',
+      customer_name: 'Cynthia Dooley (female)',
       num_orders: 4,
       lifetime_value: 7384.0982
     },
     {
-      customer_name: 'Elizabeth Bradley',
+      customer_name: 'Jeanette Nader (female)',
       num_orders: 4,
       lifetime_value: 10899.62
     },
     {
-      customer_name: 'Elizabeth Brown',
+      customer_name: 'Clarence Kiehn (female)',
       num_orders: 3,
       lifetime_value: 8079.05
     },
     {
-      customer_name: 'Elizabeth Bryant',
+      customer_name: 'Glen Hermiston (female)',
       num_orders: 3,
       lifetime_value: 6846.9196
     },
     {
-      customer_name: 'Elizabeth Butler',
+      customer_name: 'Eloise Boehm (male)',
       num_orders: 3,
       lifetime_value: 6801.4496
     },
     {
-      customer_name: 'Elizabeth Clark',
+      customer_name: 'Johnathan Beer Sr. (female)',
       num_orders: 2,
       lifetime_value: 234.44
     },
     {
-      customer_name: 'Elizabeth Coleman',
+      customer_name: 'Dr. Jeremy Terry I (male)',
       num_orders: 2,
       lifetime_value: 77.96
     },
     {
-      customer_name: 'Elizabeth Davis',
+      customer_name: 'Jodi Stanton (male)',
       num_orders: 3,
       lifetime_value: 8105.31
     },
     {
-      customer_name: 'Elizabeth Diaz',
+      customer_name: 'Judy Kemmer Jr. (male)',
       num_orders: 3,
       lifetime_value: 192.97
     },
     {
-      customer_name: 'Elizabeth Garcia',
+      customer_name: 'Erik Lebsack (male)',
       num_orders: 2,
       lifetime_value: 47.94
     },
     {
-      customer_name: 'Elizabeth Gonzales',
+      customer_name: 'Whitney Bashirian (female)',
       num_orders: 3,
       lifetime_value: 6805.4696
     },
     {
-      customer_name: 'Elizabeth Griffin',
+      customer_name: 'Dan Schroeder (female)',
       num_orders: 3,
       lifetime_value: 6785.1282
     },
     {
-      customer_name: 'Elizabeth Hall',
+      customer_name: 'Edmund Hickle (female)',
       num_orders: 2,
       lifetime_value: 5976.74
     },
     {
-      customer_name: 'Elizabeth Harris',
+      customer_name: 'Dr. Dexter Batz (female)',
       num_orders: 5,
       lifetime_value: 275.5
     },
     {
-      customer_name: 'Elizabeth Hayes',
+      customer_name: 'Steven Lang DDS (male)',
       num_orders: 3,
       lifetime_value: 296.19
     },
     {
-      customer_name: 'Elizabeth Henderson',
+      customer_name: 'Tom Shanahan (male)',
       num_orders: 1,
       lifetime_value: 44.98
     },
     {
-      customer_name: 'Elizabeth Hughes',
+      customer_name: 'Dr. Agnes Ernser (female)',
       num_orders: 3,
       lifetime_value: 6859.4596
     },
     {
-      customer_name: 'Elizabeth Jackson',
+      customer_name: 'Jonathan Morar (female)',
       num_orders: 3,
       lifetime_value: 8171.52
     },
     {
-      customer_name: 'Elizabeth Jenkins',
+      customer_name: 'Pat Spencer (male)',
       num_orders: 3,
       lifetime_value: 74.54
     },
     {
-      customer_name: 'Elizabeth Johnson',
+      customer_name: 'Lorraine Sauer-Keebler (female)',
       num_orders: 3,
       lifetime_value: 8248.01
     },
     {
-      customer_name: 'Elizabeth Jones',
+      customer_name: 'Ms. Verna Rodriguez (male)',
       num_orders: 3,
       lifetime_value: 8155.98
     },
     {
-      customer_name: 'Elizabeth Lee',
+      customer_name: 'Mrs. Cassandra Gibson (female)',
       num_orders: 2,
       lifetime_value: 5994.72
     },
     {
-      customer_name: 'Elizabeth Lewis',
+      customer_name: 'Terry Runolfsdottir (female)',
       num_orders: 2,
       lifetime_value: 5933.26
     },
     {
-      customer_name: 'Elizabeth Long',
+      customer_name: 'Gregory Bergstrom (male)',
       num_orders: 3,
       lifetime_value: 6785.1282
     },
     {
-      customer_name: 'Elizabeth Martin',
+      customer_name: 'Mr. Ralph Jakubowski (male)',
       num_orders: 2,
       lifetime_value: 42.95
     },
     {
-      customer_name: 'Elizabeth Martinez',
+      customer_name: 'Eunice Rau (male)',
       num_orders: 2,
       lifetime_value: 51.94
     },
     {
-      customer_name: 'Elizabeth Miller',
+      customer_name: 'Freda Schultz (female)',
       num_orders: 3,
       lifetime_value: 8113.03
     },
     {
-      customer_name: 'Elizabeth Moore',
+      customer_name: 'Rosa Zieme DVM (female)',
       num_orders: 3,
       lifetime_value: 41.26
     },
     {
-      customer_name: 'Elizabeth Patterson',
+      customer_name: 'Henrietta Gusikowski (female)',
       num_orders: 3,
       lifetime_value: 6829.4696
     },
     {
-      customer_name: 'Elizabeth Perry',
+      customer_name: 'Kathryn Dach (male)',
       num_orders: 3,
       lifetime_value: 6813.1182
     },
     {
-      customer_name: 'Elizabeth Powell',
+      customer_name: 'Margie Conn (female)',
       num_orders: 3,
       lifetime_value: 6839.4596
     },
     {
-      customer_name: 'Elizabeth Price',
+      customer_name: 'Miss Patricia Cormier (female)',
       num_orders: 2,
       lifetime_value: 182.94
     },
     {
-      customer_name: 'Elizabeth Robinson',
+      customer_name: 'Rufus Rowe (male)',
       num_orders: 3,
       lifetime_value: 5035.81
     },
     {
-      customer_name: 'Elizabeth Rodriguez',
+      customer_name: 'Hugh Denesik (female)',
       num_orders: 2,
       lifetime_value: 136.25
     },
     {
-      customer_name: 'Elizabeth Ross',
+      customer_name: 'Luke Gleichner (male)',
       num_orders: 3,
       lifetime_value: 6863.4396
     },
     {
-      customer_name: 'Elizabeth Russell',
+      customer_name: 'Misty Hand (male)',
       num_orders: 3,
       lifetime_value: 315.26
     },
     {
-      customer_name: 'Elizabeth Simmons',
+      customer_name: 'Derek Russel (female)',
       num_orders: 3,
       lifetime_value: 6893.0782
     },
     {
-      customer_name: 'Elizabeth Taylor',
+      customer_name: 'Natalie Buckridge (female)',
       num_orders: 3,
       lifetime_value: 8165.96
     },
     {
-      customer_name: 'Elizabeth Thomas',
+      customer_name: 'Jamie Terry DVM (male)',
       num_orders: 3,
       lifetime_value: 8204.99
     },
     {
-      customer_name: 'Elizabeth Thompson',
+      customer_name: 'Chris Dietrich (male)',
       num_orders: 2,
       lifetime_value: 5897.23
     },
     {
-      customer_name: 'Elizabeth Walker',
+      customer_name: 'Eunice Heathcote (female)',
       num_orders: 1,
       lifetime_value: 42.28
     },
     {
-      customer_name: 'Elizabeth Weisman',
+      customer_name: 'Kim Sipes (female)',
       num_orders: 3,
       lifetime_value: 63.04
     },
     {
-      customer_name: 'Elizabeth West',
+      customer_name: 'Danielle Johnston (male)',
       num_orders: 3,
       lifetime_value: 187.98
     },
     {
-      customer_name: 'Elizabeth White',
+      customer_name: 'Dexter Abshire (male)',
       num_orders: 3,
       lifetime_value: 63.24
     },
     {
-      customer_name: 'Elizabeth Wilson',
+      customer_name: 'Mrs. Natalie Pollich-Ziemann (male)',
       num_orders: 3,
       lifetime_value: 8095.32
     },
     {
-      customer_name: 'Elizabeth Wood',
+      customer_name: 'Martha Hessel (female)',
       num_orders: 1,
       lifetime_value: 8.99
     },
     {
-      customer_name: 'Emily Alexander',
+      customer_name: 'Jared Adams (male)',
       num_orders: 3,
       lifetime_value: 6819.1082
     },
     {
-      customer_name: 'Emily Anderson',
+      customer_name: 'Matt Kling (male)',
       num_orders: 3,
       lifetime_value: 6901.4196
     },
     {
-      customer_name: 'Emily Barnes',
+      customer_name: 'Cheryl Olson (female)',
       num_orders: 2,
       lifetime_value: 4823.01
     },
     {
-      customer_name: 'Emily Bennett',
+      customer_name: 'Meghan Connelly (female)',
       num_orders: 4,
       lifetime_value: 200.2
     },
     {
-      customer_name: 'Emily Brown',
+      customer_name: 'Bobbie Quitzon (male)',
       num_orders: 2,
       lifetime_value: 4381.3896
     },
     {
-      customer_name: 'Emily Bryant',
+      customer_name: 'Kim Graham (female)',
       num_orders: 3,
       lifetime_value: 5716.5196
     },
     {
-      customer_name: 'Emily Butler',
+      customer_name: 'Noel Kertzmann (female)',
       num_orders: 3,
       lifetime_value: 386.96
     },
     {
-      customer_name: 'Emily Clark',
+      customer_name: 'Bridget Borer (female)',
       num_orders: 2,
       lifetime_value: 5883.25
     },
     {
-      customer_name: 'Emily Coleman',
+      customer_name: 'Antonia Reinger (female)',
       num_orders: 3,
       lifetime_value: 5641.8982
     },
     {
-      customer_name: 'Emily Davis',
+      customer_name: 'Adrian Torp (male)',
       num_orders: 2,
       lifetime_value: 4415.6796
     },
     {
-      customer_name: 'Emily Diaz',
+      customer_name: 'Oscar Rolfson III (male)',
       num_orders: 2,
       lifetime_value: 4813.32
     },
     {
-      customer_name: 'Emily Flores',
+      customer_name: 'Teri Johns (female)',
       num_orders: 3,
       lifetime_value: 230.25
     },
     {
-      customer_name: 'Emily Foster',
+      customer_name: 'Luz Reinger (male)',
       num_orders: 3,
       lifetime_value: 125.51
     },
     {
-      customer_name: 'Emily Garcia',
+      customer_name: 'Laurence Prohaska-Sipes (female)',
       num_orders: 2,
       lifetime_value: 3924.97
     },
     {
-      customer_name: 'Emily Gonzales',
+      customer_name: 'Angelo Kunze (female)',
       num_orders: 3,
       lifetime_value: 168.67
     },
     {
-      customer_name: 'Emily Griffin',
+      customer_name: 'Michelle Schmeler (male)',
       num_orders: 2,
       lifetime_value: 155
     },
     {
-      customer_name: 'Emily Hall',
+      customer_name: 'Clifford Sipes (male)',
       num_orders: 3,
       lifetime_value: 6829.3796
     },
     {
-      customer_name: 'Emily Harris',
+      customer_name: 'Veronica Ortiz (female)',
       num_orders: 2,
       lifetime_value: 3947.25
     },
     {
-      customer_name: 'Emily Hayes',
+      customer_name: 'Paul Witting (female)',
       num_orders: 1,
       lifetime_value: 42.28
     },
     {
-      customer_name: 'Emily Hughes',
+      customer_name: 'Phyllis Nienow (male)',
       num_orders: 3,
       lifetime_value: 6799.4282
     },
     {
-      customer_name: 'Emily Jackson',
+      customer_name: 'Michael Boehm (male)',
       num_orders: 2,
       lifetime_value: 3914.98
     },
     {
-      customer_name: 'Emily Jenkins',
+      customer_name: 'Paul Deckow (male)',
       num_orders: 3,
       lifetime_value: 6855.4396
     },
     {
-      customer_name: 'Emily Johnson',
+      customer_name: 'Marcus Schamberger (male)',
       num_orders: 2,
       lifetime_value: 5967.23
     },
     {
-      customer_name: 'Emily Jones',
+      customer_name: 'Joshua Klein DVM (female)',
       num_orders: 3,
       lifetime_value: 6909.0982
     },
     {
-      customer_name: 'Emily Lee',
+      customer_name: "Dr. Bobby O'Kon (female)",
       num_orders: 2,
       lifetime_value: 5973.24
     },
     {
-      customer_name: 'Emily Long',
+      customer_name: 'Edith Metz (female)',
       num_orders: 3,
       lifetime_value: 5694.8982
     },
     {
-      customer_name: 'Emily Martin',
+      customer_name: 'Blanca Lebsack (male)',
       num_orders: 2,
       lifetime_value: 3939.98
     },
     {
-      customer_name: 'Emily Martinez',
+      customer_name: 'Ismael Waelchi (female)',
       num_orders: 2,
       lifetime_value: 3938.95
     },
     {
-      customer_name: 'Emily Miller',
+      customer_name: 'Lonnie Franey (male)',
       num_orders: 2,
       lifetime_value: 4401.0582
     },
     {
-      customer_name: 'Emily Moore',
+      customer_name: 'Dr. Travis Braun V (male)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Emily Patterson',
+      customer_name: 'Ann Legros (female)',
       num_orders: 3,
       lifetime_value: 6799.4496
     },
     {
-      customer_name: 'Emily Perry',
+      customer_name: 'Silvia Little (male)',
       num_orders: 3,
       lifetime_value: 6850.5782
     },
     {
-      customer_name: 'Emily Powell',
+      customer_name: 'Hubert Morar (male)',
       num_orders: 3,
       lifetime_value: 6808.1482
     },
     {
-      customer_name: 'Emily Price',
+      customer_name: 'Lydia Considine (male)',
       num_orders: 2,
       lifetime_value: 4552.5225
     },
     {
-      customer_name: 'Emily Robinson',
+      customer_name: 'Cora Ledner (female)',
       num_orders: 2,
       lifetime_value: 4066.93
     },
     {
-      customer_name: 'Emily Rodriguez',
+      customer_name: 'Mrs. Janice Cummerata (male)',
       num_orders: 2,
       lifetime_value: 86.75
     },
     {
-      customer_name: 'Emily Ross',
+      customer_name: 'Marta Kris (female)',
       num_orders: 3,
       lifetime_value: 6915.4382
     },
     {
-      customer_name: 'Emily Russell',
+      customer_name: 'Shirley Cole (male)',
       num_orders: 3,
       lifetime_value: 256.24
     },
     {
-      customer_name: 'Emily Simmons',
+      customer_name: 'Dominic Lowe (female)',
       num_orders: 3,
       lifetime_value: 6762.1482
     },
     {
-      customer_name: 'Emily Smith',
+      customer_name: 'Nancy Stehr (female)',
       num_orders: 3,
       lifetime_value: 6955.4096
     },
     {
-      customer_name: 'Emily Taylor',
+      customer_name: 'Kenny Macejkovic (male)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Emily Thomas',
+      customer_name: 'Dr. Mike Jast (male)',
       num_orders: 2,
       lifetime_value: 3948.97
     },
     {
-      customer_name: 'Emily Thompson',
+      customer_name: 'Sherry McClure-Kutch (female)',
       num_orders: 2,
       lifetime_value: 114.96
     },
     {
-      customer_name: 'Emily Walker',
+      customer_name: 'Ms. Toni Swift (male)',
       num_orders: 2,
       lifetime_value: 119.45
     },
     {
-      customer_name: 'Emily Washington',
+      customer_name: 'Kristine Zieme (male)',
       num_orders: 3,
       lifetime_value: 190.27
     },
     {
-      customer_name: 'Emily White',
+      customer_name: "Ryan O'Conner (male)",
       num_orders: 2,
       lifetime_value: 3967.26
     },
     {
-      customer_name: 'Emily Williams',
+      customer_name: 'Wesley Fisher (male)',
       num_orders: 2,
       lifetime_value: 5968.25
     },
     {
-      customer_name: 'Emily Wilson',
+      customer_name: 'Bertha Zboncak (male)',
       num_orders: 2,
       lifetime_value: 4354.0782
     },
     {
-      customer_name: 'Emily Wood',
+      customer_name: 'Dr. Jessie Beahan (female)',
       num_orders: 2,
       lifetime_value: 43.99
     },
     {
-      customer_name: 'Emma Anderson',
+      customer_name: "Evan O'Keefe (male)",
       num_orders: 2,
       lifetime_value: 209.23
     },
     {
-      customer_name: 'Emma Bailey',
+      customer_name: 'Mr. Loren Quitzon (male)',
       num_orders: 2,
       lifetime_value: 3492.7575
     },
     {
-      customer_name: 'Emma Bennett',
+      customer_name: 'Terry Hermann (male)',
       num_orders: 1,
       lifetime_value: 1179.47
     },
     {
-      customer_name: 'Emma Bradley',
+      customer_name: 'Homer Mosciski (male)',
       num_orders: 2,
       lifetime_value: 1854.5782
     },
     {
-      customer_name: 'Emma Brown',
+      customer_name: 'Annette Shanahan (male)',
       num_orders: 2,
       lifetime_value: 89.98
     },
     {
-      customer_name: 'Emma Bryant',
+      customer_name: 'Rosie Crona (male)',
       num_orders: 2,
       lifetime_value: 96.74
     },
     {
-      customer_name: 'Emma Butler',
+      customer_name: 'Mrs. Sylvia Ledner DVM (female)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Emma Clark',
+      customer_name: 'Kimberly Gislason (male)',
       num_orders: 2,
       lifetime_value: 109.97
     },
     {
-      customer_name: 'Emma Coleman',
+      customer_name: 'Debbie Rodriguez II (male)',
       num_orders: 1,
       lifetime_value: 1179.97
     },
     {
-      customer_name: 'Emma Cook',
+      customer_name: 'Lewis Lubowitz (male)',
       num_orders: 1,
       lifetime_value: 6.28
     },
     {
-      customer_name: 'Emma Cooper',
+      customer_name: 'Laverne Cormier (female)',
       num_orders: 2,
       lifetime_value: 1382.97
     },
     {
-      customer_name: 'Emma Cox',
+      customer_name: 'Ethel Bernhard (male)',
       num_orders: 1,
       lifetime_value: 6.28
     },
     {
-      customer_name: 'Emma Davis',
+      customer_name: 'Mr. Ronald Daugherty (male)',
       num_orders: 2,
       lifetime_value: 89.98
     },
     {
-      customer_name: 'Emma Diaz',
+      customer_name: 'Estelle Marquardt (female)',
       num_orders: 2,
       lifetime_value: 61.75
     },
     {
-      customer_name: 'Emma Flores',
+      customer_name: 'Jesus Roob Sr. (male)',
       num_orders: 2,
       lifetime_value: 5358.24
     },
     {
-      customer_name: 'Emma Foster',
+      customer_name: 'Dexter Durgan (female)',
       num_orders: 2,
       lifetime_value: 90.95
     },
     {
-      customer_name: 'Emma Garcia',
+      customer_name: 'Myron Homenick (female)',
       num_orders: 2,
       lifetime_value: 42.95
     },
     {
-      customer_name: 'Emma Gonzales',
+      customer_name: 'Wanda Kiehn (male)',
       num_orders: 2,
       lifetime_value: 57.76
     },
     {
-      customer_name: 'Emma Gray',
+      customer_name: 'Tony Walsh (male)',
       num_orders: 2,
       lifetime_value: 1938.47
     },
     {
-      customer_name: 'Emma Griffin',
+      customer_name: 'Rene Jakubowski (male)',
       num_orders: 2,
       lifetime_value: 173.93
     },
     {
-      customer_name: 'Emma Hall',
+      customer_name: 'Jim Blanda (female)',
       num_orders: 3,
       lifetime_value: 8149.04
     },
     {
-      customer_name: 'Emma Harris',
+      customer_name: 'Flora Hickle (male)',
       num_orders: 2,
       lifetime_value: 5948.24
     },
     {
-      customer_name: 'Emma Henderson',
+      customer_name: 'Rhonda Cummerata (male)',
       num_orders: 1,
       lifetime_value: 579.97
     },
     {
-      customer_name: 'Emma Howard',
+      customer_name: 'Everett Will (male)',
       num_orders: 1,
       lifetime_value: 43.97
     },
     {
-      customer_name: 'Emma Hughes',
+      customer_name: 'Arlene Murray (male)',
       num_orders: 2,
       lifetime_value: 6110.6
     },
     {
-      customer_name: 'Emma Jackson',
+      customer_name: 'Paulette Gislason (female)',
       num_orders: 2,
       lifetime_value: 114.92
     },
     {
-      customer_name: 'Emma James',
+      customer_name: 'Sophia Schmeler (male)',
       num_orders: 1,
       lifetime_value: 63.97
     },
     {
-      customer_name: 'Emma Jenkins',
+      customer_name: 'Beverly Gerlach III (female)',
       num_orders: 1,
       lifetime_value: 1183.47
     },
     {
-      customer_name: 'Emma Johnson',
+      customer_name: 'Casey White (male)',
       num_orders: 2,
       lifetime_value: 124.97
     },
     {
-      customer_name: 'Emma Jones',
+      customer_name: 'Eddie Friesen (male)',
       num_orders: 2,
       lifetime_value: 124.97
     },
     {
-      customer_name: 'Emma Kelly',
+      customer_name: 'Jerry Franey-Becker (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Emma Lee',
+      customer_name: 'Ellis West (female)',
       num_orders: 1,
       lifetime_value: 2376.96
     },
     {
-      customer_name: 'Emma Lewis',
+      customer_name: 'Robin Stamm (female)',
       num_orders: 2,
       lifetime_value: 82.93
     },
     {
-      customer_name: 'Emma Long',
+      customer_name: 'Claire Aufderhar (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Emma Martinez',
+      customer_name: 'Erick Hagenes (male)',
       num_orders: 2,
       lifetime_value: 82.93
     },
     {
-      customer_name: 'Emma Miller',
+      customer_name: 'Randal Oberbrunner (female)',
       num_orders: 2,
       lifetime_value: 133.96
     },
     {
-      customer_name: 'Emma Moore',
+      customer_name: 'Ernesto Davis (male)',
       num_orders: 2,
       lifetime_value: 84.99
     },
     {
-      customer_name: 'Emma Morgan',
+      customer_name: 'Cora Brakus (female)',
       num_orders: 1,
       lifetime_value: 6.28
     },
     {
-      customer_name: 'Emma Morris',
+      customer_name: 'Allison Lubowitz (male)',
       num_orders: 1,
       lifetime_value: 3.99
     },
     {
-      customer_name: 'Emma Murphy',
+      customer_name: 'Herbert Casper (female)',
       num_orders: 1,
       lifetime_value: 28.98
     },
     {
-      customer_name: 'Emma Patterson',
+      customer_name: 'Marty Paucek (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Emma Perry',
+      customer_name: "Kelvin D'Amore (male)",
       num_orders: 1,
       lifetime_value: 1183.47
     },
     {
-      customer_name: 'Emma Peterson',
+      customer_name: 'Terence Aufderhar (male)',
       num_orders: 1,
       lifetime_value: 3.99
     },
     {
-      customer_name: 'Emma Price',
+      customer_name: 'Dr. Rosemary Schinner (male)',
       num_orders: 1,
       lifetime_value: 1155.48
     },
     {
-      customer_name: 'Emma Ramirez',
+      customer_name: 'Stacey Flatley (male)',
       num_orders: 1,
       lifetime_value: 38.98
     },
     {
-      customer_name: 'Emma Reed',
+      customer_name: 'Shari Farrell (male)',
       num_orders: 1,
       lifetime_value: 6.28
     },
     {
-      customer_name: 'Emma Richardson',
+      customer_name: 'Norman Romaguera III (male)',
       num_orders: 1,
       lifetime_value: 53.47
     },
     {
-      customer_name: 'Emma Rivera',
+      customer_name: 'Opal Crist (female)',
       num_orders: 2,
       lifetime_value: 3478.7775
     },
     {
-      customer_name: 'Emma Robinson',
+      customer_name: 'Laurie Funk (female)',
       num_orders: 2,
       lifetime_value: 77.27
     },
     {
-      customer_name: 'Emma Rodriguez',
+      customer_name: 'Jerome Dickinson-Strosin (male)',
       num_orders: 2,
       lifetime_value: 5897.53
     },
     {
-      customer_name: 'Emma Rogers',
+      customer_name: 'Johnnie Ondricka (male)',
       num_orders: 1,
       lifetime_value: 6.28
     },
     {
-      customer_name: 'Emma Ross',
+      customer_name: 'Mr. Randall Schaefer (female)',
       num_orders: 1,
       lifetime_value: 1120.49
     },
     {
-      customer_name: 'Emma Russell',
+      customer_name: 'Mr. Erik Runte (female)',
       num_orders: 2,
       lifetime_value: 83.98
     },
     {
-      customer_name: 'Emma Sanchez',
+      customer_name: 'Gilberto Jerde (male)',
       num_orders: 2,
       lifetime_value: 1934.75
     },
     {
-      customer_name: 'Emma Sandberg',
+      customer_name: 'Dr. Katie Murray (male)',
       num_orders: 1,
       lifetime_value: 1120.49
     },
     {
-      customer_name: 'Emma Simmons',
+      customer_name: 'Jenny Heller-Russel (female)',
       num_orders: 2,
       lifetime_value: 112.24
     },
     {
-      customer_name: 'Emma Stewart',
+      customer_name: 'Enrique Terry-Maggio (female)',
       num_orders: 1,
       lifetime_value: 23.78
     },
     {
-      customer_name: 'Emma Taylor',
+      customer_name: 'Norma Koss IV (female)',
       num_orders: 2,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Emma Thomas',
+      customer_name: 'Mr. Edmund Sipes DVM (female)',
       num_orders: 2,
       lifetime_value: 47.94
     },
     {
-      customer_name: 'Emma Thompson',
+      customer_name: 'Clay Kiehn (male)',
       num_orders: 2,
       lifetime_value: 72.21
     },
     {
-      customer_name: 'Emma Torres',
+      customer_name: 'Caleb Rowe (female)',
       num_orders: 1,
       lifetime_value: 6.28
     },
     {
-      customer_name: 'Emma Walker',
+      customer_name: 'Maryann Lynch (male)',
       num_orders: 2,
       lifetime_value: 130.44
     },
     {
-      customer_name: 'Emma Ward',
+      customer_name: 'Duane Champlin (male)',
       num_orders: 1,
       lifetime_value: 24.99
     },
     {
-      customer_name: 'Emma Washington',
+      customer_name: 'Kim Collier (male)',
       num_orders: 2,
       lifetime_value: 6056.61
     },
     {
-      customer_name: 'Emma Watson',
+      customer_name: 'Alfred Schimmel (female)',
       num_orders: 1,
       lifetime_value: 23.22
     },
     {
-      customer_name: 'Emma White',
+      customer_name: 'Dominick Gorczany (female)',
       num_orders: 5,
       lifetime_value: 247.01
     },
     {
-      customer_name: 'Emma Williams',
+      customer_name: 'Dr. Stella Farrell (female)',
       num_orders: 2,
       lifetime_value: 149.46
     },
     {
-      customer_name: 'Emma Wilson',
+      customer_name: 'Lola Bayer (male)',
       num_orders: 2,
       lifetime_value: 124.97
     },
     {
-      customer_name: 'Eric Adams',
+      customer_name: 'Eddie Schiller (female)',
       num_orders: 2,
       lifetime_value: 211.97
     },
     {
-      customer_name: 'Eric Allen',
+      customer_name: 'Edgar Smitham (male)',
       num_orders: 1,
       lifetime_value: 1709.98
     },
     {
-      customer_name: 'Eric Baker',
+      customer_name: 'Tim Borer (male)',
       num_orders: 1,
       lifetime_value: 562.96
     },
     {
-      customer_name: 'Eric Campbell',
+      customer_name: 'Calvin Schneider (male)',
       num_orders: 2,
       lifetime_value: 4386.3682
     },
     {
-      customer_name: 'Eric Carter',
+      customer_name: 'Laverne Cummings (male)',
       num_orders: 1,
       lifetime_value: 24.99
     },
     {
-      customer_name: 'Eric Collins',
+      customer_name: 'Myrtle Rolfson (female)',
       num_orders: 1,
       lifetime_value: 90.47
     },
     {
-      customer_name: 'Eric Edwards',
+      customer_name: 'Michelle Roob (male)',
       num_orders: 1,
       lifetime_value: 35
     },
     {
-      customer_name: 'Eric Evans',
+      customer_name: 'Brandon Satterfield (female)',
       num_orders: 1,
       lifetime_value: 78.96
     },
     {
-      customer_name: 'Eric Gonzalez',
+      customer_name: 'Nicholas Tromp (female)',
       num_orders: 1,
       lifetime_value: 32.28
     },
     {
-      customer_name: 'Eric Green',
+      customer_name: 'Sean Donnelly (female)',
       num_orders: 1,
       lifetime_value: 2541.32
     },
     {
-      customer_name: 'Eric Hall',
+      customer_name: 'Aaron Koss (female)',
       num_orders: 1,
       lifetime_value: 12.94
     },
     {
-      customer_name: 'Eric Hill',
+      customer_name: 'Dr. Dorothy Rohan (male)',
       num_orders: 2,
       lifetime_value: 66.58
     },
     {
-      customer_name: 'Eric King',
+      customer_name: 'Tasha Okuneva (female)',
       num_orders: 1,
       lifetime_value: 2309.97
     },
     {
-      customer_name: 'Eric Lopez',
+      customer_name: 'Regina Beahan (male)',
       num_orders: 3,
       lifetime_value: 7192.39
     },
     {
-      customer_name: 'Eric Parker',
+      customer_name: 'Dr. Ralph Tillman (female)',
       num_orders: 1,
       lifetime_value: 127.28
     },
     {
-      customer_name: 'Eric Perez',
+      customer_name: 'Alexis Koch III (female)',
       num_orders: 2,
       lifetime_value: 4761.03
     },
     {
-      customer_name: 'Eric Phillips',
+      customer_name: 'Randy Maggio (female)',
       num_orders: 1,
       lifetime_value: 650.47
     },
     {
-      customer_name: 'Eric Roberts',
+      customer_name: 'Derek Runte (male)',
       num_orders: 1,
       lifetime_value: 124.99
     },
     {
-      customer_name: 'Eric Scott',
+      customer_name: 'Cornelius Zboncak V (male)',
       num_orders: 1,
       lifetime_value: 1700.99
     },
     {
-      customer_name: 'Eric Turner',
+      customer_name: 'Dr. Doreen Homenick-Wilderman V (female)',
       num_orders: 1,
       lifetime_value: 64.97
     },
     {
-      customer_name: 'Eric Wright',
+      customer_name: 'Mrs. Hattie Homenick (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Eric Young',
+      customer_name: 'Jesse Skiles (male)',
       num_orders: 1,
       lifetime_value: 1760.47
     },
     {
-      customer_name: 'Erik Alvarez',
+      customer_name: 'Nelson Vandervort (male)',
       num_orders: 2,
       lifetime_value: 4127.25
     },
     {
-      customer_name: 'Erik Blanco',
+      customer_name: 'Valerie Bahringer (female)',
       num_orders: 1,
       lifetime_value: 28.98
     },
     {
-      customer_name: 'Erik Diaz',
+      customer_name: 'Darla Gislason (female)',
       num_orders: 1,
       lifetime_value: 42.28
     },
     {
-      customer_name: 'Erik Dominguez',
+      customer_name: 'Roderick Kilback (female)',
       num_orders: 2,
       lifetime_value: 2755.4175
     },
     {
-      customer_name: 'Erik Gill',
+      customer_name: 'Mr. Wesley Grimes V (female)',
       num_orders: 2,
       lifetime_value: 2508.97
     },
     {
-      customer_name: 'Erik Gomez',
+      customer_name: 'Joanne Quigley (female)',
       num_orders: 2,
       lifetime_value: 4132.24
     },
     {
-      customer_name: 'Erik Gutierrez',
+      customer_name: 'Gerardo Armstrong III (male)',
       num_orders: 2,
       lifetime_value: 2736.4175
     },
     {
-      customer_name: 'Erik Hernandez',
+      customer_name: 'Roosevelt Hane IV (female)',
       num_orders: 1,
       lifetime_value: 39.99
     },
     {
-      customer_name: 'Erik Jimenez',
+      customer_name: 'Lester Terry (female)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Erik Martin',
+      customer_name: 'Roger Shields (female)',
       num_orders: 2,
       lifetime_value: 1587.4075
     },
     {
-      customer_name: 'Erik Munoz',
+      customer_name: 'April Kovacek (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Erik Navarro',
+      customer_name: 'Mr. Robin Gulgowski IV (female)',
       num_orders: 1,
       lifetime_value: 67.97
     },
     {
-      customer_name: 'Erik Ortega',
+      customer_name: 'Francis Hartmann (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Erik Ramos',
+      customer_name: 'Dexter Lindgren (female)',
       num_orders: 2,
       lifetime_value: 2483.98
     },
     {
-      customer_name: 'Erik Romero',
+      customer_name: 'Dr. Jonathan Berge (male)',
       num_orders: 1,
       lifetime_value: 63.97
     },
     {
-      customer_name: 'Erik Rubio',
+      customer_name: 'Judith Luettgen-Wyman (female)',
       num_orders: 2,
       lifetime_value: 1577.3875
     },
     {
-      customer_name: 'Erik Ruiz',
+      customer_name: 'Donnie Lebsack (male)',
       num_orders: 1,
       lifetime_value: 42.28
     },
     {
-      customer_name: 'Erik Sanz',
+      customer_name: 'Emilio Lemke-Pouros (female)',
       num_orders: 2,
       lifetime_value: 1590.4175
     },
     {
-      customer_name: 'Erik Serrano',
+      customer_name: 'Nettie Haag (female)',
       num_orders: 2,
       lifetime_value: 2533.97
     },
     {
-      customer_name: 'Erik Suarez',
+      customer_name: 'John Wisoky (male)',
       num_orders: 3,
       lifetime_value: 4535.2775
     },
     {
-      customer_name: 'Erik Torres',
+      customer_name: 'Rickey Maggio (female)',
       num_orders: 2,
       lifetime_value: 2751.4175
     },
     {
-      customer_name: 'Erik Vazquez',
+      customer_name: 'Gregory Baumbach (female)',
       num_orders: 2,
       lifetime_value: 2736.4175
     },
     {
-      customer_name: 'Erika Alvarez',
+      customer_name: 'Darrel Sawayn II (female)',
       num_orders: 2,
       lifetime_value: 6029.57
     },
     {
-      customer_name: 'Erika Blanco',
+      customer_name: 'Elena Walker (male)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Erika Carlson',
+      customer_name: 'Virginia Moore (female)',
       num_orders: 2,
       lifetime_value: 5333.25
     },
     {
-      customer_name: 'Erika Diaz',
+      customer_name: 'Georgia Becker-Gutmann (female)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Erika Dominguez',
+      customer_name: 'Frederick Herman (female)',
       num_orders: 2,
       lifetime_value: 122.76
     },
     {
-      customer_name: 'Erika Gill',
+      customer_name: 'Sheryl Will (male)',
       num_orders: 2,
       lifetime_value: 6098.58
     },
     {
-      customer_name: 'Erika Gomez',
+      customer_name: 'Leslie Wisoky (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Erika Gutierrez',
+      customer_name: 'Pat Fritsch (male)',
       num_orders: 2,
       lifetime_value: 5333.25
     },
     {
-      customer_name: 'Erika Hernandez',
+      customer_name: 'Kelly Kihn (female)',
       num_orders: 2,
       lifetime_value: 6035.6
     },
     {
-      customer_name: 'Erika Munoz',
+      customer_name: 'Delbert Leffler (male)',
       num_orders: 2,
       lifetime_value: 5308.24
     },
     {
-      customer_name: 'Erika Navarro',
+      customer_name: 'Ken Lockman (female)',
       num_orders: 2,
       lifetime_value: 5357.74
     },
     {
-      customer_name: 'Erika Ortega',
+      customer_name: 'Pam Wolf (female)',
       num_orders: 2,
       lifetime_value: 5333.25
     },
     {
-      customer_name: 'Erika Romero',
+      customer_name: 'Tony Barrows MD (male)',
       num_orders: 2,
       lifetime_value: 5328.23
     },
     {
-      customer_name: 'Erika Rubio',
+      customer_name: 'Traci Langworth (male)',
       num_orders: 2,
       lifetime_value: 86.27
     },
     {
-      customer_name: 'Erika Ruiz',
+      customer_name: 'Ricardo Lebsack (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Erika Sanz',
+      customer_name: 'Ella Mohr (male)',
       num_orders: 2,
       lifetime_value: 5314.25
     },
     {
-      customer_name: 'Erika Serrano',
+      customer_name: 'Fredrick Stoltenberg (female)',
       num_orders: 2,
       lifetime_value: 6035.6
     },
     {
-      customer_name: 'Erika Suarez',
+      customer_name: 'Mr. Bernard Harvey DDS (female)',
       num_orders: 2,
       lifetime_value: 6056.51
     },
     {
-      customer_name: 'Erika Torres',
+      customer_name: 'Ms. Eleanor Von (female)',
       num_orders: 2,
       lifetime_value: 59.26
     },
     {
-      customer_name: 'Erika Vazquez',
+      customer_name: 'Mr. Drew Hand (female)',
       num_orders: 2,
       lifetime_value: 237.26
     },
     {
-      customer_name: 'Ethan Anderson',
+      customer_name: 'Ada Wisozk (male)',
       num_orders: 2,
       lifetime_value: 4821.72
     },
     {
-      customer_name: 'Ethan Brown',
+      customer_name: 'Carmen Nolan (female)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Ethan Clark',
+      customer_name: 'Al Rath (female)',
       num_orders: 1,
       lifetime_value: 1749.96
     },
     {
-      customer_name: 'Ethan Davis',
+      customer_name: 'Mrs. Anne Littel (male)',
       num_orders: 1,
       lifetime_value: 67.93
     },
     {
-      customer_name: 'Ethan Garcia',
+      customer_name: 'Jonathan Schumm (female)',
       num_orders: 2,
       lifetime_value: 3001.0425
     },
     {
-      customer_name: 'Ethan Harris',
+      customer_name: 'Marjorie Walsh (female)',
       num_orders: 2,
       lifetime_value: 3961.0325
     },
     {
-      customer_name: 'Ethan Jackson',
+      customer_name: 'Flora Windler (female)',
       num_orders: 2,
       lifetime_value: 3882.5525
     },
     {
-      customer_name: 'Ethan Johnson',
+      customer_name: 'Erika Spencer (female)',
       num_orders: 2,
       lifetime_value: 3921.0225
     },
     {
-      customer_name: 'Ethan Jones',
+      customer_name: 'Ruby Block (female)',
       num_orders: 3,
       lifetime_value: 4158.7175
     },
     {
-      customer_name: 'Ethan Lee',
+      customer_name: 'Mrs. Irma Wolff II (male)',
       num_orders: 2,
       lifetime_value: 2811.5225
     },
     {
-      customer_name: 'Ethan Lewis',
+      customer_name: 'Hope Thompson (male)',
       num_orders: 2,
       lifetime_value: 2753.5225
     },
     {
-      customer_name: 'Ethan Martin',
+      customer_name: 'Stella Thompson (male)',
       num_orders: 2,
       lifetime_value: 3045.3
     },
     {
-      customer_name: 'Ethan Martinez',
+      customer_name: 'Ruth Harvey (female)',
       num_orders: 2,
       lifetime_value: 159.94
     },
     {
-      customer_name: 'Ethan Moore',
+      customer_name: 'Victor Wilkinson (male)',
       num_orders: 2,
       lifetime_value: 4733.75
     },
     {
-      customer_name: 'Ethan Robinson',
+      customer_name: 'Lawrence Gibson (female)',
       num_orders: 1,
       lifetime_value: 49.48
     },
     {
-      customer_name: 'Ethan Rodriguez',
+      customer_name: 'Nicole Jenkins Jr. (male)',
       num_orders: 1,
       lifetime_value: 28.98
     },
     {
-      customer_name: 'Ethan Smith',
+      customer_name: 'Josephine Ebert (female)',
       num_orders: 2,
       lifetime_value: 2726.4175
     },
     {
-      customer_name: 'Ethan Taylor',
+      customer_name: 'Candace Hoppe DDS (male)',
       num_orders: 2,
       lifetime_value: 4698.76
     },
     {
-      customer_name: 'Ethan Thomas',
+      customer_name: 'Marcia Bernhard (male)',
       num_orders: 1,
       lifetime_value: 37.27
     },
     {
-      customer_name: 'Ethan Thompson',
+      customer_name: 'Faith Goldner (female)',
       num_orders: 2,
       lifetime_value: 2435.0782
     },
     {
-      customer_name: 'Ethan Walker',
+      customer_name: 'Kristen Feil (female)',
       num_orders: 2,
       lifetime_value: 3932.5425
     },
     {
-      customer_name: 'Ethan White',
+      customer_name: 'Faith Langworth (female)',
       num_orders: 2,
       lifetime_value: 2781.5425
     },
     {
-      customer_name: 'Ethan Williams',
+      customer_name: 'Mr. Randy Harber (male)',
       num_orders: 1,
       lifetime_value: 40.23
     },
     {
-      customer_name: 'Ethan Wilson',
+      customer_name: 'Mr. Alfred Roob III (female)',
       num_orders: 2,
       lifetime_value: 4761.74
     },
     {
-      customer_name: 'Evan Adams',
+      customer_name: 'Pat Jacobson (female)',
       num_orders: 2,
       lifetime_value: 140.94
     },
     {
-      customer_name: 'Evan Allen',
+      customer_name: 'Gilbert Kunde-Predovic (female)',
       num_orders: 1,
       lifetime_value: 2369.96
     },
     {
-      customer_name: 'Evan Bailey',
+      customer_name: 'Tami Krajcik (female)',
       num_orders: 2,
       lifetime_value: 59.98
     },
     {
-      customer_name: 'Evan Baker',
+      customer_name: 'Mrs. Marguerite Durgan Jr. (female)',
       num_orders: 1,
       lifetime_value: 98.96
     },
     {
-      customer_name: 'Evan Bradley',
+      customer_name: 'Margarita Howell (female)',
       num_orders: 2,
       lifetime_value: 3058.31
     },
     {
-      customer_name: 'Evan Brooks',
+      customer_name: 'David Miller (female)',
       num_orders: 2,
       lifetime_value: 3297.7175
     },
     {
-      customer_name: 'Evan Campbell',
+      customer_name: 'Kim Tremblay-Witting II (female)',
       num_orders: 2,
       lifetime_value: 79.25
     },
     {
-      customer_name: 'Evan Carter',
+      customer_name: 'Anna Harber (female)',
       num_orders: 2,
       lifetime_value: 14.56
     },
     {
-      customer_name: 'Evan Collins',
+      customer_name: 'Shannon Jacobson (female)',
       num_orders: 2,
       lifetime_value: 2668.3796
     },
     {
-      customer_name: 'Evan Cook',
+      customer_name: 'Charlotte Lakin (male)',
       num_orders: 2,
       lifetime_value: 3120.26
     },
     {
-      customer_name: 'Evan Cooper',
+      customer_name: 'Barbara Carter (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Evan Cox',
+      customer_name: 'Stuart Kshlerin (female)',
       num_orders: 3,
       lifetime_value: 6689.58
     },
     {
-      customer_name: 'Evan Edwards',
+      customer_name: 'Josefina Metz (male)',
       num_orders: 2,
       lifetime_value: 63.97
     },
     {
-      customer_name: 'Evan Evans',
+      customer_name: 'Mr. Guy Beier (female)',
       num_orders: 1,
       lifetime_value: 114.96
     },
     {
-      customer_name: 'Evan Gonzalez',
+      customer_name: 'Jody Hartmann (male)',
       num_orders: 1,
       lifetime_value: 24.99
     },
     {
-      customer_name: 'Evan Gray',
+      customer_name: 'Marie Breitenberg (male)',
       num_orders: 2,
       lifetime_value: 3355.4275
     },
     {
-      customer_name: 'Evan Green',
+      customer_name: 'Milton Dickinson (female)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Evan Hall',
+      customer_name: 'Gabriel Huels (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Evan Hernandez',
+      customer_name: 'Keith Batz (female)',
       num_orders: 2,
       lifetime_value: 4467.74
     },
     {
-      customer_name: 'Evan Hill',
+      customer_name: 'Julius Stark (male)',
       num_orders: 1,
       lifetime_value: 2391.43
     },
     {
-      customer_name: 'Evan Howard',
+      customer_name: 'Sandra Kutch (female)',
       num_orders: 2,
       lifetime_value: 5912.73
     },
     {
-      customer_name: 'Evan James',
+      customer_name: 'Danny Bradtke (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Evan Kelly',
+      customer_name: 'Jacquelyn Renner (male)',
       num_orders: 1,
       lifetime_value: 38.88
     },
     {
-      customer_name: 'Evan King',
+      customer_name: 'Mr. Louis Gerlach (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Evan Lopez',
+      customer_name: 'Wesley Beatty (male)',
       num_orders: 2,
       lifetime_value: 66.26
     },
     {
-      customer_name: 'Evan Mitchell',
+      customer_name: 'Miss Genevieve Dickens (female)',
       num_orders: 2,
       lifetime_value: 4921.69
     },
     {
-      customer_name: 'Evan Morgan',
+      customer_name: 'Mrs. Jennie Bernier (female)',
       num_orders: 3,
       lifetime_value: 8367.3
     },
     {
-      customer_name: 'Evan Murphy',
+      customer_name: 'Carmen Botsford (male)',
       num_orders: 2,
       lifetime_value: 4143.26
     },
     {
-      customer_name: 'Evan Nelson',
+      customer_name: 'May Effertz (male)',
       num_orders: 1,
       lifetime_value: 54.98
     },
     {
-      customer_name: 'Evan Parker',
+      customer_name: 'Dr. Theresa Gibson (female)',
       num_orders: 2,
       lifetime_value: 62.27
     },
     {
-      customer_name: 'Evan Perez',
+      customer_name: 'Dixie Douglas-Ledner (female)',
       num_orders: 2,
       lifetime_value: 4679.06
     },
     {
-      customer_name: 'Evan Peterson',
+      customer_name: 'Dr. Francis Lemke (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Evan Phillips',
+      customer_name: 'Dr. Walter Wilkinson (male)',
       num_orders: 1,
       lifetime_value: 166.28
     },
     {
-      customer_name: 'Evan Ramirez',
+      customer_name: 'Latoya Anderson (female)',
       num_orders: 1,
       lifetime_value: 42.28
     },
     {
-      customer_name: 'Evan Reed',
+      customer_name: 'Bessie Hudson (male)',
       num_orders: 2,
       lifetime_value: 3102.98
     },
     {
-      customer_name: 'Evan Richardson',
+      customer_name: 'Candace Kozey-Luettgen (male)',
       num_orders: 1,
       lifetime_value: 60.95
     },
     {
-      customer_name: 'Evan Rivera',
+      customer_name: 'Maria Macejkovic (male)',
       num_orders: 2,
       lifetime_value: 3159.44
     },
     {
-      customer_name: 'Evan Rogers',
+      customer_name: 'Sidney Toy (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Evan Sanchez',
+      customer_name: 'Miss Sarah Leuschke (male)',
       num_orders: 2,
       lifetime_value: 126.95
     },
     {
-      customer_name: 'Evan Sanders',
+      customer_name: 'Marcus Wiza (male)',
       num_orders: 2,
       lifetime_value: 74.98
     },
     {
-      customer_name: 'Evan Scott',
+      customer_name: 'Candace Zboncak (male)',
       num_orders: 1,
       lifetime_value: 2457.33
     },
     {
-      customer_name: 'Evan Stewart',
+      customer_name: 'Luz Homenick (male)',
       num_orders: 2,
       lifetime_value: 4424.0782
     },
     {
-      customer_name: 'Evan Torres',
+      customer_name: 'Gerard Hahn (female)',
       num_orders: 3,
       lifetime_value: 5152.6982
     },
     {
-      customer_name: 'Evan Turner',
+      customer_name: 'Mrs. Margarita Pfannerstill (female)',
       num_orders: 2,
       lifetime_value: 2746.5525
     },
     {
-      customer_name: 'Evan Ward',
+      customer_name: 'Kellie Terry (male)',
       num_orders: 2,
       lifetime_value: 1588.5682
     },
     {
-      customer_name: 'Evan Watson',
+      customer_name: 'Scott Herzog (female)',
       num_orders: 3,
       lifetime_value: 128.46
     },
     {
-      customer_name: 'Evan Wright',
+      customer_name: 'Blake Wisoky (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Evan Young',
+      customer_name: 'Allan Bode (male)',
       num_orders: 1,
       lifetime_value: 64.47
     },
     {
-      customer_name: 'Felicia Alonso',
+      customer_name: 'Jackie Marks (male)',
       num_orders: 3,
       lifetime_value: 121.56
     },
     {
-      customer_name: 'Felicia Blanco',
+      customer_name: 'Theresa MacGyver (male)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Felicia Carlson',
+      customer_name: 'Velma Hoppe (female)',
       num_orders: 2,
       lifetime_value: 3335.4175
     },
     {
-      customer_name: 'Felicia Diaz',
+      customer_name: 'Leland Schumm (female)',
       num_orders: 3,
       lifetime_value: 5652.5396
     },
     {
-      customer_name: 'Felicia Dominguez',
+      customer_name: 'Edwin Bergnaum (female)',
       num_orders: 3,
       lifetime_value: 5234.3982
     },
     {
-      customer_name: 'Felicia Gill',
+      customer_name: 'Ruth Bins (female)',
       num_orders: 2,
       lifetime_value: 3351.3975
     },
     {
-      customer_name: 'Felicia Gomez',
+      customer_name: 'Mr. Lucas Johns (female)',
       num_orders: 3,
       lifetime_value: 3630.9282
     },
     {
-      customer_name: 'Felicia Gutierrez',
+      customer_name: 'Johanna Rohan (female)',
       num_orders: 5,
       lifetime_value: 195.22
     },
     {
-      customer_name: 'Felicia Jimenez',
+      customer_name: 'Florence Doyle (male)',
       num_orders: 2,
       lifetime_value: 2786.4075
     },
     {
-      customer_name: 'Felicia Martin',
+      customer_name: 'Morris Kohler (female)',
       num_orders: 1,
       lifetime_value: 85.48
     },
     {
-      customer_name: 'Felicia Moreno',
+      customer_name: 'Dr. Juanita Kertzmann (female)',
       num_orders: 2,
       lifetime_value: 1794.1975
     },
     {
-      customer_name: 'Felicia Moyer',
+      customer_name: 'Jenna Johnson (male)',
       num_orders: 2,
       lifetime_value: 4746.3
     },
     {
-      customer_name: 'Felicia Munoz',
+      customer_name: 'Steve King (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Felicia Ortega',
+      customer_name: 'Mr. Louis Braun (female)',
       num_orders: 3,
       lifetime_value: 3652.1982
     },
     {
-      customer_name: 'Felicia Ramos',
+      customer_name: 'Timmy Nikolaus (male)',
       num_orders: 1,
       lifetime_value: 45.95
     },
     {
-      customer_name: 'Felicia Romero',
+      customer_name: 'Jake Grady (female)',
       num_orders: 3,
       lifetime_value: 5137.7082
     },
     {
-      customer_name: 'Felicia Rubio',
+      customer_name: 'Candace Emard (male)',
       num_orders: 3,
       lifetime_value: 3636.9082
     },
     {
-      customer_name: 'Felicia Ruiz',
+      customer_name: 'Mitchell Kunde (female)',
       num_orders: 3,
       lifetime_value: 5653.9182
     },
     {
-      customer_name: 'Felicia Suarez',
+      customer_name: 'Jermaine Steuber-Waters (female)',
       num_orders: 3,
       lifetime_value: 5108.7596
     },
     {
-      customer_name: 'Felicia Townsend',
+      customer_name: 'Diane Kerluke (male)',
       num_orders: 2,
       lifetime_value: 1804.9175
     },
     {
-      customer_name: 'Felicia Vazquez',
+      customer_name: 'Constance Legros (male)',
       num_orders: 2,
       lifetime_value: 3319.6975
     },
     {
-      customer_name: 'Fernando Alexander',
+      customer_name: 'Florence Weber (female)',
       num_orders: 3,
       lifetime_value: 6823.1482
     },
     {
-      customer_name: 'Fernando Barnes',
+      customer_name: 'Jeremy Wolf (female)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Fernando Bennett',
+      customer_name: 'Joel Gutmann (female)',
       num_orders: 4,
       lifetime_value: 230.68
     },
     {
-      customer_name: 'Fernando Bryant',
+      customer_name: 'Reginald Balistreri (female)',
       num_orders: 3,
       lifetime_value: 6817.1382
     },
     {
-      customer_name: 'Fernando Butler',
+      customer_name: 'Alonzo Reynolds (female)',
       num_orders: 3,
       lifetime_value: 121.25
     },
     {
-      customer_name: 'Fernando Coleman',
+      customer_name: 'Ms. Vivian Heller (male)',
       num_orders: 3,
       lifetime_value: 6842.5982
     },
     {
-      customer_name: 'Fernando Diaz',
+      customer_name: 'Brent Kuphal II (female)',
       num_orders: 3,
       lifetime_value: 6813.1182
     },
     {
-      customer_name: 'Fernando Flores',
+      customer_name: 'Jody Price (male)',
       num_orders: 3,
       lifetime_value: 6831.4182
     },
     {
-      customer_name: 'Fernando Gonzales',
+      customer_name: 'Miss Robyn Runolfsson (female)',
       num_orders: 3,
       lifetime_value: 138.54
     },
     {
-      customer_name: 'Fernando Griffin',
+      customer_name: 'Leslie Ferry (male)',
       num_orders: 3,
       lifetime_value: 6880.6182
     },
     {
-      customer_name: 'Fernando Hayes',
+      customer_name: 'Mr. David Treutel I (male)',
       num_orders: 3,
       lifetime_value: 5648.9182
     },
     {
-      customer_name: 'Fernando Hughes',
+      customer_name: 'Victoria Kihn (male)',
       num_orders: 3,
       lifetime_value: 6779.4182
     },
     {
-      customer_name: 'Fernando Jenkins',
+      customer_name: 'Devin Halvorson (female)',
       num_orders: 3,
       lifetime_value: 5650.8982
     },
     {
-      customer_name: 'Fernando Long',
+      customer_name: 'Christian Nader (male)',
       num_orders: 3,
       lifetime_value: 6832.4096
     },
     {
-      customer_name: 'Fernando Patterson',
+      customer_name: 'Bradley Shields (male)',
       num_orders: 3,
       lifetime_value: 6807.4496
     },
     {
-      customer_name: 'Fernando Perry',
+      customer_name: 'Hubert DuBuque (female)',
       num_orders: 3,
       lifetime_value: 5583.9382
     },
     {
-      customer_name: 'Fernando Price',
+      customer_name: 'Yolanda Adams (female)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Fernando Ross',
+      customer_name: 'Mr. Jerald Russel (female)',
       num_orders: 1,
       lifetime_value: 2376.96
     },
     {
-      customer_name: 'Fernando Russell',
+      customer_name: 'Henrietta Gulgowski (male)',
       num_orders: 3,
       lifetime_value: 6797.1482
     },
     {
-      customer_name: 'Fernando Washington',
+      customer_name: 'Lyle Donnelly (female)',
       num_orders: 3,
       lifetime_value: 6829.4496
     },
     {
-      customer_name: 'Fernando Wood',
+      customer_name: 'Dr. Jay Lang (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Florian Stiller',
+      customer_name: 'Wilfred Weimann Jr. (male)',
       num_orders: 2,
       lifetime_value: 3204.5782
     },
     {
-      customer_name: 'Francis Gomez',
+      customer_name: 'Lois Mosciski IV (female)',
       num_orders: 2,
       lifetime_value: 119.95
     },
     {
-      customer_name: 'Francis Ruiz',
+      customer_name: 'Faye Murphy (female)',
       num_orders: 1,
       lifetime_value: 1179.97
     },
     {
-      customer_name: 'Francisco Ashe',
+      customer_name: 'Christine Runolfsdottir (male)',
       num_orders: 2,
       lifetime_value: 76.15
     },
     {
-      customer_name: 'Francisco Chandra',
+      customer_name: "Amy O'Keefe V (male)",
       num_orders: 2,
       lifetime_value: 4158.24
     },
     {
-      customer_name: 'Francisco Fernandez',
+      customer_name: 'Justin Kirlin IV (male)',
       num_orders: 2,
       lifetime_value: 4417.75
     },
     {
-      customer_name: 'Francisco Garcia',
+      customer_name: 'Dorothy Reynolds (female)',
       num_orders: 2,
       lifetime_value: 4377.75
     },
     {
-      customer_name: 'Francisco Gonzalez',
+      customer_name: 'Juana Upton (male)',
       num_orders: 3,
       lifetime_value: 233.81
     },
     {
-      customer_name: 'Francisco Javier Castrejón',
+      customer_name: 'Gina Rohan (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Francisco Kapoor',
+      customer_name: 'Ronald Jacobson (female)',
       num_orders: 2,
       lifetime_value: 104.86
     },
     {
-      customer_name: 'Francisco Lopez',
+      customer_name: 'Mrs. Mae Bergstrom (male)',
       num_orders: 1,
       lifetime_value: 64.47
     },
     {
-      customer_name: 'Francisco Madan',
+      customer_name: "Jennie O'Hara (male)",
       num_orders: 2,
       lifetime_value: 4506.76
     },
     {
-      customer_name: 'Francisco Martinez',
+      customer_name: 'Terrence Daugherty (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Francisco Mehta',
+      customer_name: 'Wendy Gerhold (male)',
       num_orders: 2,
       lifetime_value: 92.97
     },
     {
-      customer_name: 'Francisco Patel',
+      customer_name: 'Shannon Little I (male)',
       num_orders: 2,
       lifetime_value: 4157.73
     },
     {
-      customer_name: 'Francisco Perez',
+      customer_name: 'Lonnie Borer (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Francisco Prasad',
+      customer_name: 'Daisy Kilback (female)',
       num_orders: 2,
       lifetime_value: 92.97
     },
     {
-      customer_name: 'Francisco Raman',
+      customer_name: 'Frank Kertzmann (female)',
       num_orders: 2,
       lifetime_value: 91.26
     },
     {
-      customer_name: 'Francisco Rana',
+      customer_name: 'Beulah Hermann DDS (female)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Francisco Rodriguez',
+      customer_name: 'Johnnie Zemlak (male)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Francisco Sai',
+      customer_name: 'Angela Abbott (male)',
       num_orders: 2,
       lifetime_value: 165.07
     },
     {
-      customer_name: 'Francisco Sanchez',
+      customer_name: 'Antoinette Stanton (male)',
       num_orders: 3,
       lifetime_value: 180.71
     },
     {
-      customer_name: 'Francisco Sara',
+      customer_name: 'Dr. Leonard Schumm (female)',
       num_orders: 2,
       lifetime_value: 4426.74
     },
     {
-      customer_name: 'Francisco Srini',
+      customer_name: 'Andrew Schamberger (male)',
       num_orders: 2,
       lifetime_value: 87.08
     },
     {
-      customer_name: 'Francisco Subram',
+      customer_name: 'Natasha Armstrong (male)',
       num_orders: 2,
       lifetime_value: 97.96
     },
     {
-      customer_name: 'Francisco Suri',
+      customer_name: 'Dr. Melba Turcotte (male)',
       num_orders: 2,
       lifetime_value: 3162.31
     },
     {
-      customer_name: 'Francisco Vance',
+      customer_name: 'Gretchen Moen (male)',
       num_orders: 2,
       lifetime_value: 6070.59
     },
     {
-      customer_name: 'Frank Alvarez',
+      customer_name: 'Mr. Clint Marvin (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Frank Blanco',
+      customer_name: 'Allison Bailey (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Frank Carlson',
+      customer_name: 'Eva Crona-Roberts (female)',
       num_orders: 1,
       lifetime_value: 2316.97
     },
     {
-      customer_name: 'Frank Diaz',
+      customer_name: 'Jana Bradtke Jr. (male)',
       num_orders: 3,
       lifetime_value: 4640.2575
     },
     {
-      customer_name: 'Frank Dominguez',
+      customer_name: 'Kristin Tromp IV (female)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Frank Gill',
+      customer_name: 'Bernard Marquardt-Rosenbaum (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Frank Gomez',
+      customer_name: 'Phillip Spinka (male)',
       num_orders: 2,
       lifetime_value: 1622.3975
     },
     {
-      customer_name: 'Frank Gutierrez',
+      customer_name: 'Dr. Willie Schultz-Frami (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Frank Hernandez',
+      customer_name: 'Roger Bins (male)',
       num_orders: 2,
       lifetime_value: 2537.97
     },
     {
-      customer_name: 'Frank Jimenez',
+      customer_name: 'Alfonso Hackett (female)',
       num_orders: 2,
       lifetime_value: 2537.97
     },
     {
-      customer_name: 'Frank Martin',
+      customer_name: 'Lucas Lakin (female)',
       num_orders: 1,
       lifetime_value: 83.97
     },
     {
-      customer_name: 'Frank Moreno',
+      customer_name: 'Lillian Schulist (male)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Frank Munoz',
+      customer_name: 'Gilberto Buckridge (female)',
       num_orders: 2,
       lifetime_value: 6124.58
     },
     {
-      customer_name: 'Frank Navarro',
+      customer_name: 'Mr. Andy Roob (female)',
       num_orders: 1,
       lifetime_value: 67.93
     },
     {
-      customer_name: 'Frank Ramos',
+      customer_name: 'Evan DuBuque (female)',
       num_orders: 1,
       lifetime_value: 2319.99
     },
     {
-      customer_name: 'Frank Romero',
+      customer_name: 'Kathryn Conn (female)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Frank Rubio',
+      customer_name: 'Ms. Mercedes Steuber V (male)',
       num_orders: 1,
       lifetime_value: 1750.98
     },
     {
-      customer_name: 'Frank Ruiz',
+      customer_name: 'Ricardo Russel (female)',
       num_orders: 2,
       lifetime_value: 1549.4175
     },
     {
-      customer_name: 'Frank Sanz',
+      customer_name: 'Christina Satterfield (male)',
       num_orders: 2,
       lifetime_value: 149.91
     },
     {
-      customer_name: 'Frank Serrano',
+      customer_name: 'Dominic Kessler (male)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Frank Suarez',
+      customer_name: 'Diane Gleichner DDS (male)',
       num_orders: 1,
       lifetime_value: 132.94
     },
     {
-      customer_name: 'Frank Torres',
+      customer_name: 'Bernard Grant (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Frank Vazquez',
+      customer_name: 'Phillip Roberts (female)',
       num_orders: 1,
       lifetime_value: 29.48
     },
     {
-      customer_name: 'Gabriel Adams',
+      customer_name: 'Violet Lang (male)',
       num_orders: 1,
       lifetime_value: 2354.98
     },
     {
-      customer_name: 'Gabriel Allen',
+      customer_name: 'Woodrow Dietrich (male)',
       num_orders: 2,
       lifetime_value: 4369.74
     },
     {
-      customer_name: 'Gabriel Baker',
+      customer_name: 'Mr. Terrence Osinski (female)',
       num_orders: 3,
       lifetime_value: 7203.35
     },
     {
-      customer_name: 'Gabriel Campbell',
+      customer_name: 'Lester Swift (male)',
       num_orders: 2,
       lifetime_value: 4411.6496
     },
     {
-      customer_name: 'Gabriel Carter',
+      customer_name: 'Elizabeth Hamill (female)',
       num_orders: 1,
       lifetime_value: 37.93
     },
     {
-      customer_name: 'Gabriel Collins',
+      customer_name: 'Alvin Braun (male)',
       num_orders: 2,
       lifetime_value: 4416.3796
     },
     {
-      customer_name: 'Gabriel Evans',
+      customer_name: 'Mr. Van Gibson (male)',
       num_orders: 1,
       lifetime_value: 24.99
     },
     {
-      customer_name: 'Gabriel Gonzalez',
+      customer_name: 'Dr. Emilio Gottlieb (female)',
       num_orders: 2,
       lifetime_value: 61.96
     },
     {
-      customer_name: 'Gabriel Green',
+      customer_name: 'Henry Dare (male)',
       num_orders: 1,
       lifetime_value: 58.98
     },
     {
-      customer_name: 'Gabriel Hall',
+      customer_name: 'Patrick Schoen (male)',
       num_orders: 1,
       lifetime_value: 84.47
     },
     {
-      customer_name: 'Gabriel Hernandez',
+      customer_name: 'Dr. Russell Boyer (male)',
       num_orders: 1,
       lifetime_value: 1799.48
     },
     {
-      customer_name: 'Gabriel Hill',
+      customer_name: 'Tasha Pacocha (female)',
       num_orders: 2,
       lifetime_value: 5900.55
     },
     {
-      customer_name: 'Gabriel King',
+      customer_name: 'Cedric Kunze MD (male)',
       num_orders: 1,
       lifetime_value: 64.97
     },
     {
-      customer_name: 'Gabriel Lopez',
+      customer_name: 'Christy Muller (female)',
       num_orders: 2,
       lifetime_value: 97.96
     },
     {
-      customer_name: 'Gabriel Mitchell',
+      customer_name: 'Gwendolyn Daniel MD (male)',
       num_orders: 2,
       lifetime_value: 5960.23
     },
     {
-      customer_name: 'Gabriel Nelson',
+      customer_name: 'Miss Valerie Corkery (female)',
       num_orders: 1,
       lifetime_value: 84.92
     },
     {
-      customer_name: 'Gabriel Parker',
+      customer_name: 'Megan Spinka (male)',
       num_orders: 2,
       lifetime_value: 1357.97
     },
     {
-      customer_name: 'Gabriel Perez',
+      customer_name: 'Miranda Hamill (female)',
       num_orders: 2,
       lifetime_value: 4789.02
     },
     {
-      customer_name: 'Gabriel Phillips',
+      customer_name: 'Dr. Ruben Cummings-Windler III (male)',
       num_orders: 1,
       lifetime_value: 2406.95
     },
     {
-      customer_name: 'Gabriel Roberts',
+      customer_name: 'Ms. Olivia Torphy (female)',
       num_orders: 2,
       lifetime_value: 3117.96
     },
     {
-      customer_name: 'Gabriel Scott',
+      customer_name: 'Alexander Crist (male)',
       num_orders: 1,
       lifetime_value: 24.99
     },
     {
-      customer_name: 'Gabriel Turner',
+      customer_name: 'Maureen Lakin (male)',
       num_orders: 2,
       lifetime_value: 3826.3996
     },
     {
-      customer_name: 'Gabriel Wright',
+      customer_name: 'Israel Lemke (female)',
       num_orders: 1,
       lifetime_value: 2401.45
     },
     {
-      customer_name: 'Gabriel Young',
+      customer_name: 'Doug McKenzie DVM (female)',
       num_orders: 3,
       lifetime_value: 75.84
     },
     {
-      customer_name: 'Gail Alexander',
+      customer_name: 'Kyle McClure II (male)',
       num_orders: 2,
       lifetime_value: 5954.22
     },
     {
-      customer_name: 'Gail Butler',
+      customer_name: 'Angela Emmerich (female)',
       num_orders: 4,
       lifetime_value: 159.93
     },
     {
-      customer_name: 'Gail Griffin',
+      customer_name: 'Edwin Emmerich (male)',
       num_orders: 2,
       lifetime_value: 5898.26
     },
     {
-      customer_name: 'Gail Moore',
+      customer_name: 'Stuart Roberts (male)',
       num_orders: 2,
       lifetime_value: 105.95
     },
     {
-      customer_name: 'Gail Russell',
+      customer_name: 'Jamie Sipes (female)',
       num_orders: 3,
       lifetime_value: 6825.4496
     },
     {
-      customer_name: 'Garrett Bailey',
+      customer_name: 'Martha Wyman (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Garrett Bell',
+      customer_name: 'Andrea Schulist (male)',
       num_orders: 2,
       lifetime_value: 3786.3896
     },
     {
-      customer_name: 'Garrett Brooks',
+      customer_name: 'Jeannette Ankunding V (male)',
       num_orders: 1,
       lifetime_value: 29.48
     },
     {
-      customer_name: 'Garrett Cook',
+      customer_name: 'Ellen Reichel (female)',
       num_orders: 2,
       lifetime_value: 3112.98
     },
     {
-      customer_name: 'Garrett Cooper',
+      customer_name: 'Tami Koepp (female)',
       num_orders: 1,
       lifetime_value: 104.95
     },
     {
-      customer_name: 'Garrett Cox',
+      customer_name: 'Erma Feest (male)',
       num_orders: 2,
       lifetime_value: 162.95
     },
     {
-      customer_name: 'Garrett Gray',
+      customer_name: 'Tracy Prosacco (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Garrett Howard',
+      customer_name: 'Thelma Keebler DVM (male)',
       num_orders: 1,
       lifetime_value: 29.99
     },
     {
-      customer_name: 'Garrett James',
+      customer_name: 'Lorraine Funk Sr. (female)',
       num_orders: 2,
       lifetime_value: 121.06
     },
     {
-      customer_name: 'Garrett Kelly',
+      customer_name: 'Nadine Hintz (male)',
       num_orders: 1,
       lifetime_value: 107.08
     },
     {
-      customer_name: 'Garrett Morgan',
+      customer_name: 'Maxine Stiedemann (male)',
       num_orders: 1,
       lifetime_value: 151.27
     },
     {
-      customer_name: 'Garrett Morris',
+      customer_name: 'Jodi Runolfsson (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Garrett Murphy',
+      customer_name: 'Charlie Beer-Frami (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Garrett Peterson',
+      customer_name: 'Mr. Lloyd Langworth (male)',
       num_orders: 2,
       lifetime_value: 3342.4075
     },
     {
-      customer_name: 'Garrett Ramirez',
+      customer_name: 'Barbara Reilly (male)',
       num_orders: 1,
       lifetime_value: 124.99
     },
     {
-      customer_name: 'Garrett Reed',
+      customer_name: 'Grace Greenholt (female)',
       num_orders: 1,
       lifetime_value: 32.27
     },
     {
-      customer_name: 'Garrett Richardson',
+      customer_name: 'Janis Shields (male)',
       num_orders: 2,
       lifetime_value: 1563.0682
     },
     {
-      customer_name: 'Garrett Rivera',
+      customer_name: 'Jordan Gulgowski (male)',
       num_orders: 2,
       lifetime_value: 123.45
     },
     {
-      customer_name: 'Garrett Rogers',
+      customer_name: 'Dawn Lehner (male)',
       num_orders: 2,
       lifetime_value: 4828.01
     },
     {
-      customer_name: 'Garrett Sanchez',
+      customer_name: 'Mrs. Erma Yost (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Garrett Sanders',
+      customer_name: 'Ross Zulauf (male)',
       num_orders: 2,
       lifetime_value: 3394.8975
     },
     {
-      customer_name: 'Garrett Stewart',
+      customer_name: 'Gertrude Watsica (female)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Garrett Travers',
+      customer_name: 'Alberto Armstrong (female)',
       num_orders: 1,
       lifetime_value: 85.48
     },
     {
-      customer_name: 'Garrett Ward',
+      customer_name: 'Austin Zulauf (male)',
       num_orders: 1,
       lifetime_value: 46.47
     },
     {
-      customer_name: 'Garrett Watson',
+      customer_name: 'Nichole Dibbert (female)',
       num_orders: 4,
       lifetime_value: 138.68
     },
     {
-      customer_name: 'Gary Alonso',
+      customer_name: 'Randall Cummerata PhD (male)',
       num_orders: 2,
       lifetime_value: 3029.0782
     },
     {
-      customer_name: 'Gary Alvarez',
+      customer_name: 'Stuart Schowalter (male)',
       num_orders: 1,
       lifetime_value: 614.96
     },
     {
-      customer_name: 'Gary Blanco',
+      customer_name: 'Ronald Miller (female)',
       num_orders: 2,
       lifetime_value: 3318.3575
     },
     {
-      customer_name: 'Gary Carlson',
+      customer_name: 'Frances Russel (female)',
       num_orders: 1,
       lifetime_value: 48.97
     },
     {
-      customer_name: 'Gary Diaz',
+      customer_name: 'Loren Buckridge (male)',
       num_orders: 1,
       lifetime_value: 1750.98
     },
     {
-      customer_name: 'Gary Dominguez',
+      customer_name: 'Julian Gorczany (male)',
       num_orders: 3,
       lifetime_value: 6938.5825
     },
     {
-      customer_name: 'Gary Gill',
+      customer_name: 'Cecil Lebsack (male)',
       num_orders: 2,
       lifetime_value: 3139.0682
     },
     {
-      customer_name: 'Gary Gomez',
+      customer_name: 'Christian Morissette (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Gary Gutierrez',
+      customer_name: 'Keith Turner (female)',
       num_orders: 3,
       lifetime_value: 7226.38
     },
     {
-      customer_name: 'Gary Hernandez',
+      customer_name: 'Randy Hauck III (female)',
       num_orders: 1,
       lifetime_value: 133.49
     },
     {
-      customer_name: 'Gary Jimenez',
+      customer_name: 'Lee Huel (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Gary Martin',
+      customer_name: 'Johnathan Hodkiewicz (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Gary Moreno',
+      customer_name: 'Lorraine Reynolds (male)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Gary Munoz',
+      customer_name: 'Scott Howell (male)',
       num_orders: 2,
       lifetime_value: 113.24
     },
     {
-      customer_name: 'Gary Navarro',
+      customer_name: 'Jan Boyer (female)',
       num_orders: 2,
       lifetime_value: 3310.4075
     },
     {
-      customer_name: 'Gary Ortega',
+      customer_name: 'Jerome Bradtke (female)',
       num_orders: 2,
       lifetime_value: 3104.5682
     },
     {
-      customer_name: 'Gary Ramos',
+      customer_name: 'Clint Blick (male)',
       num_orders: 1,
       lifetime_value: 24.99
     },
     {
-      customer_name: 'Gary Romero',
+      customer_name: 'Fernando Pagac IV (female)',
       num_orders: 2,
       lifetime_value: 3063.0582
     },
     {
-      customer_name: 'Gary Rubio',
+      customer_name: 'Iris Orn (female)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Gary Ruiz',
+      customer_name: 'Ruby Willms (female)',
       num_orders: 1,
       lifetime_value: 636.45
     },
     {
-      customer_name: 'Gary Serrano',
+      customer_name: 'Ora Kozey (female)',
       num_orders: 1,
       lifetime_value: 64.97
     },
     {
-      customer_name: 'Gary Vazquez',
+      customer_name: 'Jamie Lakin (female)',
       num_orders: 2,
       lifetime_value: 4763.34
     },
     {
-      customer_name: 'Gavin Alexander',
+      customer_name: 'Glenda Nienow (male)',
       num_orders: 1,
       lifetime_value: 29.93
     },
     {
-      customer_name: 'Gavin Bennett',
+      customer_name: 'Todd Walker (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Gavin Bryant',
+      customer_name: 'Darin Goldner (male)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Gavin Butler',
+      customer_name: 'Tami Champlin (male)',
       num_orders: 1,
       lifetime_value: 66.96
     },
     {
-      customer_name: 'Gavin Coleman',
+      customer_name: "Charlie D'Amore (female)",
       num_orders: 2,
       lifetime_value: 4516.5325
     },
     {
-      customer_name: 'Gavin Diaz',
+      customer_name: 'Dallas Auer I (female)',
       num_orders: 1,
       lifetime_value: 76.97
     },
     {
-      customer_name: 'Gavin Gonzales',
+      customer_name: 'Ernest Mohr (male)',
       num_orders: 2,
       lifetime_value: 4612.5125
     },
     {
-      customer_name: 'Gavin Griffin',
+      customer_name: 'Dr. Floyd Rohan (male)',
       num_orders: 1,
       lifetime_value: 29.93
     },
     {
-      customer_name: 'Gavin Hayes',
+      customer_name: 'Mrs. Lisa Friesen (female)',
       num_orders: 2,
       lifetime_value: 4576.5325
     },
     {
-      customer_name: 'Gavin Henderson',
+      customer_name: 'Hannah Hintz (female)',
       num_orders: 2,
       lifetime_value: 4498.5325
     },
     {
-      customer_name: 'Gavin Hughes',
+      customer_name: 'Ramon White (female)',
       num_orders: 2,
       lifetime_value: 4511.5425
     },
     {
-      customer_name: 'Gavin Jenkins',
+      customer_name: 'Alejandro Okuneva (male)',
       num_orders: 2,
       lifetime_value: 4763.34
     },
     {
-      customer_name: 'Gavin Long',
+      customer_name: 'Carroll Fahey (female)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Gavin Patterson',
+      customer_name: 'Sherman Cummings (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Gavin Perry',
+      customer_name: 'Jonathan Greenfelder (male)',
       num_orders: 2,
       lifetime_value: 4573.5025
     },
     {
-      customer_name: 'Gavin Powell',
+      customer_name: 'Garrett Murazik (male)',
       num_orders: 3,
       lifetime_value: 111.89
     },
     {
-      customer_name: 'Gavin Price',
+      customer_name: 'Cassandra Wisoky (male)',
       num_orders: 2,
       lifetime_value: 4837.81
     },
     {
-      customer_name: 'Gavin Ross',
+      customer_name: 'Ethel Hirthe (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Gavin Russell',
+      customer_name: 'Warren Hartmann (female)',
       num_orders: 1,
       lifetime_value: 29.93
     },
     {
-      customer_name: 'Gavin Stone',
+      customer_name: 'Shawn Fahey (male)',
       num_orders: 3,
       lifetime_value: 66.25
     },
     {
-      customer_name: 'Gavin Washington',
+      customer_name: 'Georgia Reynolds (female)',
       num_orders: 2,
       lifetime_value: 4835.3
     },
     {
-      customer_name: 'Gavin Wood',
+      customer_name: 'Lorena Sporer Jr. (female)',
       num_orders: 2,
       lifetime_value: 4498.5325
     },
     {
-      customer_name: 'George Arun',
+      customer_name: 'Duane Block (female)',
       num_orders: 1,
       lifetime_value: 1174.48
     },
     {
-      customer_name: 'George Chandra',
+      customer_name: 'Grace Feeney (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'George Fernandez',
+      customer_name: 'Randy Stamm (male)',
       num_orders: 2,
       lifetime_value: 6029.57
     },
     {
-      customer_name: 'George Garcia',
+      customer_name: 'Luis Okuneva (female)',
       num_orders: 2,
       lifetime_value: 100.74
     },
     {
-      customer_name: 'George Gonzalez',
+      customer_name: 'Franklin Terry (male)',
       num_orders: 2,
       lifetime_value: 6044.59
     },
     {
-      customer_name: 'George Kapoor',
+      customer_name: 'Mrs. Doreen Bartell-Kub (male)',
       num_orders: 1,
       lifetime_value: 123.98
     },
     {
-      customer_name: 'George Lopez',
+      customer_name: 'Susan Rolfson (female)',
       num_orders: 2,
       lifetime_value: 5279.26
     },
     {
-      customer_name: 'George Martinez',
+      customer_name: 'Mr. Justin Runte (male)',
       num_orders: 2,
       lifetime_value: 6089.59
     },
     {
-      customer_name: 'George McDonald',
+      customer_name: 'Robert Monahan (male)',
       num_orders: 1,
       lifetime_value: 1120.49
     },
     {
-      customer_name: 'George Mehta',
+      customer_name: 'Joann Keebler (male)',
       num_orders: 2,
       lifetime_value: 5333.25
     },
     {
-      customer_name: 'George Patel',
+      customer_name: 'April Legros (male)',
       num_orders: 2,
       lifetime_value: 3191.9096
     },
     {
-      customer_name: 'George Perez',
+      customer_name: 'Elijah Wisozk (male)',
       num_orders: 2,
       lifetime_value: 187.38
     },
     {
-      customer_name: 'George Prasad',
+      customer_name: 'Shelley Ebert (female)',
       num_orders: 1,
       lifetime_value: 2502.83
     },
     {
-      customer_name: 'George Raman',
+      customer_name: 'Phillip Kshlerin (male)',
       num_orders: 2,
       lifetime_value: 3219.5782
     },
     {
-      customer_name: 'George Rana',
+      customer_name: 'Dr. Margie Yost (male)',
       num_orders: 1,
       lifetime_value: 2475.95
     },
     {
-      customer_name: 'George Rodriguez',
+      customer_name: "Kay O'Keefe (female)",
       num_orders: 2,
       lifetime_value: 6060.5
     },
     {
-      customer_name: 'George Sai',
+      customer_name: 'Gertrude Keeling (female)',
       num_orders: 1,
       lifetime_value: 1155.48
     },
     {
-      customer_name: 'George Sanchez',
+      customer_name: 'Darin Green (male)',
       num_orders: 2,
       lifetime_value: 6035.6
     },
     {
-      customer_name: 'George Sara',
+      customer_name: 'Virgil Rodriguez (female)',
       num_orders: 1,
       lifetime_value: 2479.94
     },
     {
-      customer_name: 'George Srini',
+      customer_name: 'Dr. Alfonso Hegmann (male)',
       num_orders: 1,
       lifetime_value: 1145.48
     },
     {
-      customer_name: 'George Subram',
+      customer_name: 'Carmen Sauer (female)',
       num_orders: 1,
       lifetime_value: 2478.34
     },
     {
-      customer_name: 'George Suri',
+      customer_name: 'Maurice Moore (female)',
       num_orders: 1,
       lifetime_value: 2451.3
     },
     {
-      customer_name: 'George Vance',
+      customer_name: 'Felicia Klein (female)',
       num_orders: 2,
       lifetime_value: 3226.8996
     },
     {
-      customer_name: 'Gerald Arun',
+      customer_name: 'Shane Treutel (male)',
       num_orders: 5,
       lifetime_value: 307.97
     },
     {
-      customer_name: 'Gerald Chandra',
+      customer_name: 'Janet Fadel (female)',
       num_orders: 2,
       lifetime_value: 124.97
     },
     {
-      customer_name: 'Gerald Jordan',
+      customer_name: 'Donna Bruen (male)',
       num_orders: 2,
       lifetime_value: 5930.23
     },
     {
-      customer_name: 'Gerald Madan',
+      customer_name: 'Cathy Ondricka (female)',
       num_orders: 2,
       lifetime_value: 98.97
     },
     {
-      customer_name: 'Gerald Malhotra',
+      customer_name: 'Gertrude Paucek (male)',
       num_orders: 2,
       lifetime_value: 135.21
     },
     {
-      customer_name: 'Gerald Patel',
+      customer_name: 'Susie Hammes (male)',
       num_orders: 2,
       lifetime_value: 5908.25
     },
     {
-      customer_name: 'Gerald Prasad',
+      customer_name: 'Dr. Edward Weber V (male)',
       num_orders: 2,
       lifetime_value: 84.99
     },
     {
-      customer_name: 'Gerald Raman',
+      customer_name: 'Fernando Spinka (female)',
       num_orders: 2,
       lifetime_value: 5985.2
     },
     {
-      customer_name: 'Gerald Rana',
+      customer_name: 'Franklin Green (female)',
       num_orders: 2,
       lifetime_value: 84.99
     },
     {
-      customer_name: 'Gerald Sai',
+      customer_name: 'Mark Turner (female)',
       num_orders: 2,
       lifetime_value: 5955.23
     },
     {
-      customer_name: 'Gerald Sara',
+      customer_name: 'Silvia Okuneva (male)',
       num_orders: 2,
       lifetime_value: 257.97
     },
     {
-      customer_name: 'Gerald Srini',
+      customer_name: 'Elsie Steuber (male)',
       num_orders: 2,
       lifetime_value: 116.76
     },
     {
-      customer_name: 'Gerald Subram',
+      customer_name: 'Lorenzo Murray (female)',
       num_orders: 2,
       lifetime_value: 72.28
     },
     {
-      customer_name: 'Gerald Suri',
+      customer_name: 'Richard Kertzmann (male)',
       num_orders: 2,
       lifetime_value: 130.94
     },
     {
-      customer_name: 'Gerald Vance',
+      customer_name: 'Thelma Champlin Jr. (male)',
       num_orders: 2,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Gerrit Straatsma',
+      customer_name: 'Mrs. Rachel Kshlerin (female)',
       num_orders: 2,
       lifetime_value: 4194.33
     },
     {
-      customer_name: 'Gina Alonso',
+      customer_name: 'Woodrow Donnelly (male)',
       num_orders: 2,
       lifetime_value: 44.57
     },
     {
-      customer_name: 'Gina Alvarez',
+      customer_name: 'Emilio Lindgren (male)',
       num_orders: 3,
       lifetime_value: 6690.58
     },
     {
-      customer_name: 'Gina Blanco',
+      customer_name: 'Francis Crist-Pacocha IV (female)',
       num_orders: 1,
       lifetime_value: 24.27
     },
     {
-      customer_name: 'Gina Carlson',
+      customer_name: 'Nathan Grimes (female)',
       num_orders: 2,
       lifetime_value: 2770.8225
     },
     {
-      customer_name: 'Gina Diaz',
+      customer_name: 'Miss Kelli Labadie (male)',
       num_orders: 2,
       lifetime_value: 3846.8896
     },
     {
-      customer_name: 'Gina Dominguez',
+      customer_name: 'Elsie Schneider (male)',
       num_orders: 1,
       lifetime_value: 24.99
     },
     {
-      customer_name: 'Gina Gill',
+      customer_name: 'Angelina Powlowski (female)',
       num_orders: 3,
       lifetime_value: 6684.59
     },
     {
-      customer_name: 'Gina Gutierrez',
+      customer_name: 'Cecil Spinka (male)',
       num_orders: 2,
       lifetime_value: 114.96
     },
     {
-      customer_name: 'Gina Hernandez',
+      customer_name: 'Danielle Wolf (male)',
       num_orders: 2,
       lifetime_value: 3803.5582
     },
     {
-      customer_name: 'Gina Jiménez',
+      customer_name: 'Shawna Bayer (female)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Gina Martin',
+      customer_name: 'Alexis Bergstrom (male)',
       num_orders: 2,
       lifetime_value: 78.96
     },
     {
-      customer_name: 'Gina Moreno',
+      customer_name: 'Allan Fritsch (male)',
       num_orders: 3,
       lifetime_value: 6650.6
     },
     {
-      customer_name: 'Gina Navarro',
+      customer_name: 'Evelyn Grant (female)',
       num_orders: 2,
       lifetime_value: 4178.25
     },
     {
-      customer_name: 'Gina Romero',
+      customer_name: 'Amber Kuhn III (male)',
       num_orders: 1,
       lifetime_value: 93.48
     },
     {
-      customer_name: 'Gina Ruiz',
+      customer_name: 'Felicia Koch (female)',
       num_orders: 2,
       lifetime_value: 3826.3996
     },
     {
-      customer_name: 'Gina Schmidt',
+      customer_name: 'Glenda Dietrich (male)',
       num_orders: 1,
       lifetime_value: 85.48
     },
     {
-      customer_name: 'Gina Serrano',
+      customer_name: 'Teri Cummings (female)',
       num_orders: 1,
       lifetime_value: 80.94
     },
     {
-      customer_name: 'Gina Suarez',
+      customer_name: 'Jodi Welch (male)',
       num_orders: 2,
       lifetime_value: 2755.5425
     },
     {
-      customer_name: 'Gina Torres',
+      customer_name: 'Johnny Rolfson (male)',
       num_orders: 3,
       lifetime_value: 6639.58
     },
     {
-      customer_name: 'Gina Vazquez',
+      customer_name: 'Ethel Koelpin (female)',
       num_orders: 2,
       lifetime_value: 4133.24
     },
     {
-      customer_name: 'Giorgio Veronesi',
+      customer_name: 'Darryl Kutch (male)',
       num_orders: 2,
       lifetime_value: 191.97
     },
     {
-      customer_name: 'Giraldo Sandoval',
+      customer_name: 'Olivia Bailey (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Gloria Alonso',
+      customer_name: 'Janis Wilkinson (female)',
       num_orders: 1,
       lifetime_value: 27.28
     },
     {
-      customer_name: 'Gloria Alvarez',
+      customer_name: 'Bruce Leuschke (female)',
       num_orders: 1,
       lifetime_value: 574.98
     },
     {
-      customer_name: 'Gloria Bradley',
+      customer_name: 'Dr. Floyd Bosco (male)',
       num_orders: 2,
       lifetime_value: 62.95
     },
     {
-      customer_name: 'Gloria Carlson',
+      customer_name: 'Alton Kulas (female)',
       num_orders: 2,
       lifetime_value: 5915.54
     },
     {
-      customer_name: 'Gloria Diaz',
+      customer_name: 'Ron Greenholt (male)',
       num_orders: 2,
       lifetime_value: 97.25
     },
     {
-      customer_name: 'Gloria Dominguez',
+      customer_name: 'Rufus Connelly II (male)',
       num_orders: 1,
       lifetime_value: 35.23
     },
     {
-      customer_name: 'Gloria Gill',
+      customer_name: 'Joy Willms (female)',
       num_orders: 2,
       lifetime_value: 4733.75
     },
     {
-      customer_name: 'Gloria Gonzales',
+      customer_name: 'Nick Bahringer (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Gloria Gutierrez',
+      customer_name: 'Margarita Champlin (female)',
       num_orders: 2,
       lifetime_value: 3021.0425
     },
     {
-      customer_name: 'Gloria Martin',
+      customer_name: 'Dr. Max Reichert (male)',
       num_orders: 1,
       lifetime_value: 27.28
     },
     {
-      customer_name: 'Gloria Munoz',
+      customer_name: 'Edna Koch (female)',
       num_orders: 2,
       lifetime_value: 3250.11
     },
     {
-      customer_name: 'Gloria Navarro',
+      customer_name: 'Jo Ankunding IV (male)',
       num_orders: 2,
       lifetime_value: 47.26
     },
     {
-      customer_name: 'Gloria Ortega',
+      customer_name: 'Clarence Grimes (male)',
       num_orders: 2,
       lifetime_value: 78.2
     },
     {
-      customer_name: 'Gloria Ramos',
+      customer_name: 'Loretta Mitchell (male)',
       num_orders: 2,
       lifetime_value: 149.46
     },
     {
-      customer_name: 'Gloria Reed',
+      customer_name: 'Debra McClure (male)',
       num_orders: 2,
       lifetime_value: 95.26
     },
     {
-      customer_name: 'Gloria Romero',
+      customer_name: 'Shirley Flatley (male)',
       num_orders: 2,
       lifetime_value: 4696.4925
     },
     {
-      customer_name: 'Gloria Rubio',
+      customer_name: 'Hubert Medhurst (male)',
       num_orders: 1,
       lifetime_value: 2466.32
     },
     {
-      customer_name: 'Gloria Ruiz',
+      customer_name: 'Dr. Brendan Thiel (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Gloria Sanz',
+      customer_name: 'Yvonne Hoppe (female)',
       num_orders: 2,
       lifetime_value: 3056.32
     },
     {
-      customer_name: 'Gloria Serrano',
+      customer_name: 'Ana Hilll (female)',
       num_orders: 1,
       lifetime_value: 74.98
     },
     {
-      customer_name: 'Gloria Torres',
+      customer_name: 'Jeremiah Will DDS (male)',
       num_orders: 2,
       lifetime_value: 73.24
     },
     {
-      customer_name: 'Gloria Vazquez',
+      customer_name: 'Tim Becker (female)',
       num_orders: 2,
       lifetime_value: 53.96
     },
     {
-      customer_name: 'Grace Alexander',
+      customer_name: 'Dana Ernser (female)',
       num_orders: 1,
       lifetime_value: 74.98
     },
     {
-      customer_name: 'Grace Anderson',
+      customer_name: 'Meredith Boyer (male)',
       num_orders: 2,
       lifetime_value: 42.28
     },
     {
-      customer_name: 'Grace Bailey',
+      customer_name: 'Stephen Carroll (female)',
       num_orders: 2,
       lifetime_value: 5279.26
     },
     {
-      customer_name: 'Grace Barnes',
+      customer_name: 'Herman Marks (female)',
       num_orders: 1,
       lifetime_value: 64.47
     },
     {
-      customer_name: 'Grace Bell',
+      customer_name: 'Carolyn McGlynn (male)',
       num_orders: 2,
       lifetime_value: 6056.61
     },
     {
-      customer_name: 'Grace Bennett',
+      customer_name: 'Sylvia Braun (female)',
       num_orders: 1,
       lifetime_value: 133.49
     },
     {
-      customer_name: 'Grace Brooks',
+      customer_name: 'Amber Upton (female)',
       num_orders: 2,
       lifetime_value: 109.44
     },
     {
-      customer_name: 'Grace Brown',
+      customer_name: 'Jordan Smith (female)',
       num_orders: 2,
       lifetime_value: 5938.19
     },
     {
-      customer_name: 'Grace Bryant',
+      customer_name: 'Randal Runolfsson (male)',
       num_orders: 1,
       lifetime_value: 1134.47
     },
     {
-      customer_name: 'Grace Butler',
+      customer_name: 'Jeffery Price (female)',
       num_orders: 1,
       lifetime_value: 75.97
     },
     {
-      customer_name: 'Grace Clark',
+      customer_name: 'Ms. Connie Skiles (male)',
       num_orders: 2,
       lifetime_value: 5948.24
     },
     {
-      customer_name: 'Grace Coleman',
+      customer_name: 'Francis Bahringer-Goyette (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Grace Cook',
+      customer_name: 'Carlos Jacobson (female)',
       num_orders: 2,
       lifetime_value: 63.42
     },
     {
-      customer_name: 'Grace Cooper',
+      customer_name: 'Miss Virginia Bradtke (male)',
       num_orders: 2,
       lifetime_value: 171.73
     },
     {
-      customer_name: 'Grace Cox',
+      customer_name: 'Dr. Luther Dooley (male)',
       num_orders: 2,
       lifetime_value: 6029.57
     },
     {
-      customer_name: 'Grace Davis',
+      customer_name: 'Iris Kassulke (female)',
       num_orders: 2,
       lifetime_value: 5875.55
     },
     {
-      customer_name: 'Grace Diaz',
+      customer_name: 'Barry Kub (female)',
       num_orders: 1,
       lifetime_value: 1155.48
     },
     {
-      customer_name: 'Grace Flores',
+      customer_name: 'May Schultz (male)',
       num_orders: 1,
       lifetime_value: 539.99
     },
     {
-      customer_name: 'Grace Garcia',
+      customer_name: 'Brandi Hahn-Abernathy (male)',
       num_orders: 2,
       lifetime_value: 37.29
     },
     {
-      customer_name: 'Grace Gray',
+      customer_name: 'Nadine Doyle (male)',
       num_orders: 2,
       lifetime_value: 5279.26
     },
     {
-      customer_name: 'Grace Griffin',
+      customer_name: 'Tonya Jacobson (female)',
       num_orders: 1,
       lifetime_value: 58.98
     },
     {
-      customer_name: 'Grace Hall',
+      customer_name: 'Myra Greenholt (female)',
       num_orders: 3,
       lifetime_value: 8163.31
     },
     {
-      customer_name: 'Grace Harris',
+      customer_name: 'Lynette Von-Kling DVM (male)',
       num_orders: 2,
       lifetime_value: 42.28
     },
     {
-      customer_name: 'Grace Henderson',
+      customer_name: 'Leona Mayer (male)',
       num_orders: 3,
       lifetime_value: 133.54
     },
     {
-      customer_name: 'Grace Howard',
+      customer_name: 'Marcella Miller (male)',
       num_orders: 2,
       lifetime_value: 6217.21
     },
     {
-      customer_name: 'Grace Hughes',
+      customer_name: 'Clinton Romaguera (male)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Grace Jackson',
+      customer_name: 'Ted Koepp (female)',
       num_orders: 2,
       lifetime_value: 42.28
     },
     {
-      customer_name: 'Grace James',
+      customer_name: 'Patsy Runte (female)',
       num_orders: 2,
       lifetime_value: 153.93
     },
     {
-      customer_name: 'Grace Jenkins',
+      customer_name: 'Angelina Parker (female)',
       num_orders: 3,
       lifetime_value: 197.04
     },
     {
-      customer_name: 'Grace Johnson',
+      customer_name: 'Phil Hettinger (female)',
       num_orders: 2,
       lifetime_value: 6058.25
     },
     {
-      customer_name: 'Grace Jones',
+      customer_name: 'Kathy Corkery (female)',
       num_orders: 2,
       lifetime_value: 6015.24
     },
     {
-      customer_name: 'Grace Kelly',
+      customer_name: 'Antoinette Beier-Buckridge (male)',
       num_orders: 2,
       lifetime_value: 5279.26
     },
     {
-      customer_name: 'Grace Lee',
+      customer_name: 'Erma Nader (female)',
       num_orders: 27,
       lifetime_value: 1329.31
     },
     {
-      customer_name: 'Grace Lewis',
+      customer_name: 'Elbert Haley (male)',
       num_orders: 27,
       lifetime_value: 1136.35
     },
     {
-      customer_name: 'Grace Long',
+      customer_name: 'Miss Heidi Prohaska IV (male)',
       num_orders: 2,
       lifetime_value: 5314.25
     },
     {
-      customer_name: 'Grace Martin',
+      customer_name: 'Dr. Adam Daniel MD (female)',
       num_orders: 2,
       lifetime_value: 5873.26
     },
     {
-      customer_name: 'Grace Martinez',
+      customer_name: 'Ricky Hoppe (female)',
       num_orders: 2,
       lifetime_value: 6074.54
     },
     {
-      customer_name: 'Grace Miller',
+      customer_name: 'Deborah Streich (female)',
       num_orders: 2,
       lifetime_value: 77.27
     },
     {
-      customer_name: 'Grace Moore',
+      customer_name: 'Toni Romaguera (female)',
       num_orders: 2,
       lifetime_value: 5964.22
     },
     {
-      customer_name: 'Grace Morgan',
+      customer_name: 'Harold White (female)',
       num_orders: 2,
       lifetime_value: 5306.54
     },
     {
-      customer_name: 'Grace Morris',
+      customer_name: 'Dustin Hartmann (male)',
       num_orders: 2,
       lifetime_value: 6056.61
     },
     {
-      customer_name: 'Grace Murphy',
+      customer_name: "Vernon O'Conner (female)",
       num_orders: 2,
       lifetime_value: 5310.53
     },
     {
-      customer_name: 'Grace Patterson',
+      customer_name: 'Jackie Homenick V (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Grace Perry',
+      customer_name: 'Ashley Wilkinson (female)',
       num_orders: 3,
       lifetime_value: 282.04
     },
     {
-      customer_name: 'Grace Peterson',
+      customer_name: 'Fred Orn (female)',
       num_orders: 2,
       lifetime_value: 119.45
     },
     {
-      customer_name: 'Grace Powell',
+      customer_name: 'Sheila Parisian (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Grace Price',
+      customer_name: 'Ernestine Hayes (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Grace Ramirez',
+      customer_name: 'Ignacio Koch Sr. (male)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Grace Richardson',
+      customer_name: 'Gayle Mayer (male)',
       num_orders: 2,
       lifetime_value: 6093.2
     },
     {
-      customer_name: 'Grace Rivera',
+      customer_name: 'Patty Kozey (female)',
       num_orders: 2,
       lifetime_value: 59.46
     },
     {
-      customer_name: 'Grace Rodriguez',
+      customer_name: 'Calvin McKenzie (female)',
       num_orders: 2,
       lifetime_value: 4718.04
     },
     {
-      customer_name: 'Grace Ross',
+      customer_name: 'Dr. Kristina Maggio (female)',
       num_orders: 3,
       lifetime_value: 252.32
     },
     {
-      customer_name: 'Grace Russell',
+      customer_name: 'Fernando Purdy (female)',
       num_orders: 1,
       lifetime_value: 67.97
     },
     {
-      customer_name: 'Grace Sanchez',
+      customer_name: 'Tracy Olson (male)',
       num_orders: 2,
       lifetime_value: 89.46
     },
     {
-      customer_name: 'Grace Simmons',
+      customer_name: 'Lillie Schmitt (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Grace Smith',
+      customer_name: 'Willie Rowe (male)',
       num_orders: 3,
       lifetime_value: 8203.02
     },
     {
-      customer_name: 'Grace Stewart',
+      customer_name: 'Jon Daniel (male)',
       num_orders: 2,
       lifetime_value: 119.45
     },
     {
-      customer_name: 'Grace Taylor',
+      customer_name: 'Bill Mosciski DDS (male)',
       num_orders: 2,
       lifetime_value: 94.26
     },
     {
-      customer_name: 'Grace Thomas',
+      customer_name: 'Dana Labadie (male)',
       num_orders: 2,
       lifetime_value: 77.27
     },
     {
-      customer_name: 'Grace Thompson',
+      customer_name: 'Catherine Langworth (male)',
       num_orders: 2,
       lifetime_value: 72.21
     },
     {
-      customer_name: 'Grace Torres',
+      customer_name: 'Mr. Tommy Barrows (female)',
       num_orders: 2,
       lifetime_value: 5279.26
     },
     {
-      customer_name: 'Grace Walker',
+      customer_name: 'Juanita Grant (male)',
       num_orders: 2,
       lifetime_value: 5754.97
     },
     {
-      customer_name: 'Grace Ward',
+      customer_name: 'Leona Bayer (female)',
       num_orders: 2,
       lifetime_value: 5279.26
     },
     {
-      customer_name: 'Grace Washington',
+      customer_name: 'Ms. Pearl Hilpert (male)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Grace Watson',
+      customer_name: 'Bill Fritsch (female)',
       num_orders: 2,
       lifetime_value: 39.46
     },
     {
-      customer_name: 'Grace White',
+      customer_name: 'Natasha Roob (female)',
       num_orders: 2,
       lifetime_value: 44.57
     },
     {
-      customer_name: 'Grace Williams',
+      customer_name: 'Kim Ankunding (male)',
       num_orders: 2,
       lifetime_value: 5948.24
     },
     {
-      customer_name: 'Grace Wilson',
+      customer_name: 'Louise Dickinson (female)',
       num_orders: 2,
       lifetime_value: 42.28
     },
     {
-      customer_name: 'Grace Wood',
+      customer_name: 'Tommy Wolf (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Greg Carter',
+      customer_name: 'Sandra McGlynn (male)',
       num_orders: 3,
       lifetime_value: 5786.3825
     },
     {
-      customer_name: 'Greg Taylor',
+      customer_name: 'Dr. Ricky Willms (female)',
       num_orders: 2,
       lifetime_value: 4158.32
     },
     {
-      customer_name: 'Greg White',
+      customer_name: 'Sam Frami (female)',
       num_orders: 3,
       lifetime_value: 6917.5925
     },
     {
-      customer_name: 'Gregory Winston',
+      customer_name: 'Dr. Stuart Thiel (male)',
       num_orders: 1,
       lifetime_value: 76.97
     },
     {
-      customer_name: 'Hannah Alexander',
+      customer_name: 'Marianne Ebert (male)',
       num_orders: 1,
       lifetime_value: 46.47
     },
     {
-      customer_name: 'Hannah Anderson',
+      customer_name: 'Jamie Konopelski (male)',
       num_orders: 3,
       lifetime_value: 5254.8782
     },
     {
-      customer_name: 'Hannah Barnes',
+      customer_name: 'Connie Waters (male)',
       num_orders: 2,
       lifetime_value: 2665.0582
     },
     {
-      customer_name: 'Hannah Bennett',
+      customer_name: 'Jan Jacobi (female)',
       num_orders: 2,
       lifetime_value: 2589.0882
     },
     {
-      customer_name: 'Hannah Brown',
+      customer_name: 'Daisy Kuphal (female)',
       num_orders: 1,
       lifetime_value: 49.99
     },
     {
-      customer_name: 'Hannah Bryant',
+      customer_name: 'Bessie Thompson (male)',
       num_orders: 2,
       lifetime_value: 3032.31
     },
     {
-      customer_name: 'Hannah Butler',
+      customer_name: 'Yvonne Wilkinson (male)',
       num_orders: 3,
       lifetime_value: 5651.2496
     },
     {
-      customer_name: 'Hannah Clark',
+      customer_name: 'Nina Hagenes I (female)',
       num_orders: 5,
       lifetime_value: 13295.38
     },
     {
-      customer_name: 'Hannah Coleman',
+      customer_name: 'Emilio Raynor (female)',
       num_orders: 2,
       lifetime_value: 2961.0425
     },
     {
-      customer_name: 'Hannah Davis',
+      customer_name: 'Amanda Feeney (female)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Hannah Diaz',
+      customer_name: 'Leo Terry (female)',
       num_orders: 2,
       lifetime_value: 4579.4725
     },
     {
-      customer_name: 'Hannah Flores',
+      customer_name: 'Henrietta Johnson (male)',
       num_orders: 2,
       lifetime_value: 64.97
     },
     {
-      customer_name: 'Hannah Foster',
+      customer_name: 'Kristin Hettinger MD (female)',
       num_orders: 1,
       lifetime_value: 75.97
     },
     {
-      customer_name: 'Hannah Garcia',
+      customer_name: 'Dr. Kim Purdy (female)',
       num_orders: 5,
       lifetime_value: 13164.64
     },
     {
-      customer_name: 'Hannah Gonzales',
+      customer_name: 'Miss Marie Macejkovic (male)',
       num_orders: 2,
       lifetime_value: 3084.0225
     },
     {
-      customer_name: 'Hannah Griffin',
+      customer_name: 'Ms. Katherine Lind (female)',
       num_orders: 2,
       lifetime_value: 4773.33
     },
     {
-      customer_name: 'Hannah Hall',
+      customer_name: 'Lisa Bergnaum (male)',
       num_orders: 2,
       lifetime_value: 116.43
     },
     {
-      customer_name: 'Hannah Harris',
+      customer_name: 'Nathaniel Conn-Stokes (female)',
       num_orders: 3,
       lifetime_value: 5027.8582
     },
     {
-      customer_name: 'Hannah Hayes',
+      customer_name: 'Sylvester Bernhard MD (male)',
       num_orders: 2,
       lifetime_value: 3033.31
     },
     {
-      customer_name: 'Hannah Henderson',
+      customer_name: 'Priscilla Cronin-Shields (male)',
       num_orders: 1,
       lifetime_value: 48.98
     },
     {
-      customer_name: 'Hannah Jackson',
+      customer_name: 'Adam Kuphal (female)',
       num_orders: 2,
       lifetime_value: 147.96
     },
     {
-      customer_name: 'Hannah Jenkins',
+      customer_name: 'Miss Jessica Jacobi (male)',
       num_orders: 2,
       lifetime_value: 94.71
     },
     {
-      customer_name: 'Hannah Johnson',
+      customer_name: 'Ernesto Deckow (female)',
       num_orders: 1,
       lifetime_value: 43.98
     },
     {
-      customer_name: 'Hannah Jones',
+      customer_name: 'Ramona Bechtelar (male)',
       num_orders: 3,
       lifetime_value: 5139.7296
     },
     {
-      customer_name: 'Hannah Lee',
+      customer_name: 'Lynn Wisoky (male)',
       num_orders: 5,
       lifetime_value: 13269.27
     },
     {
-      customer_name: 'Hannah Lewis',
+      customer_name: 'Randall Herzog (female)',
       num_orders: 2,
       lifetime_value: 123.45
     },
     {
-      customer_name: 'Hannah Long',
+      customer_name: 'Isabel Reichert (female)',
       num_orders: 3,
       lifetime_value: 5581.2596
     },
     {
-      customer_name: 'Hannah Martinez',
+      customer_name: 'Blake Bruen (male)',
       num_orders: 4,
       lifetime_value: 8022.5782
     },
     {
-      customer_name: 'Hannah Moore',
+      customer_name: 'Celia Windler (male)',
       num_orders: 2,
       lifetime_value: 5923.23
     },
     {
-      customer_name: 'Hannah Patterson',
+      customer_name: 'Mrs. Gwendolyn Schneider (female)',
       num_orders: 2,
       lifetime_value: 175.93
     },
     {
-      customer_name: 'Hannah Powell',
+      customer_name: 'Ana Kerluke (female)',
       num_orders: 2,
       lifetime_value: 59.98
     },
     {
-      customer_name: 'Hannah Price',
+      customer_name: 'Shaun Bailey (male)',
       num_orders: 2,
       lifetime_value: 4835.29
     },
     {
-      customer_name: 'Hannah Robinson',
+      customer_name: 'Madeline Morar (male)',
       num_orders: 4,
       lifetime_value: 8053.4096
     },
     {
-      customer_name: 'Hannah Rodriguez',
+      customer_name: 'Bonnie Stokes (female)',
       num_orders: 2,
       lifetime_value: 84.47
     },
     {
-      customer_name: 'Hannah Ross',
+      customer_name: 'Monique Cormier (female)',
       num_orders: 1,
       lifetime_value: 2319.26
     },
     {
-      customer_name: 'Hannah Russell',
+      customer_name: 'Ramon Kassulke (female)',
       num_orders: 2,
       lifetime_value: 4500.5225
     },
     {
-      customer_name: 'Hannah Smith',
+      customer_name: 'Jamie Mante (male)',
       num_orders: 2,
       lifetime_value: 5873.26
     },
     {
-      customer_name: 'Hannah Thomas',
+      customer_name: 'Travis Kunze (male)',
       num_orders: 3,
       lifetime_value: 5720.3682
     },
     {
-      customer_name: 'Hannah Thompson',
+      customer_name: 'Christopher Stehr (female)',
       num_orders: 2,
       lifetime_value: 75.48
     },
     {
-      customer_name: 'Hannah Walker',
+      customer_name: 'Sonia Becker (male)',
       num_orders: 2,
       lifetime_value: 103.96
     },
     {
-      customer_name: 'Hannah Washington',
+      customer_name: 'Jason Deckow (male)',
       num_orders: 3,
       lifetime_value: 241.93
     },
     {
-      customer_name: 'Hannah Williams',
+      customer_name: 'Tricia Feeney (male)',
       num_orders: 2,
       lifetime_value: 4454.5682
     },
     {
-      customer_name: 'Hannah Wilson',
+      customer_name: 'Angelica Langworth-Hammes (female)',
       num_orders: 1,
       lifetime_value: 49.99
     },
     {
-      customer_name: 'Hannah Wood',
+      customer_name: 'Diana Bayer (male)',
       num_orders: 2,
       lifetime_value: 2668.3796
     },
     {
-      customer_name: 'Hector Alonso',
+      customer_name: 'Norma Farrell (male)',
       num_orders: 3,
       lifetime_value: 6660.59
     },
     {
-      customer_name: 'Hector Blanco',
+      customer_name: 'Cora Connelly (male)',
       num_orders: 2,
       lifetime_value: 1563.0682
     },
     {
-      customer_name: 'Hector Carlson',
+      customer_name: 'Christina Stehr (male)',
       num_orders: 2,
       lifetime_value: 1854.5782
     },
     {
-      customer_name: 'Hector Diaz',
+      customer_name: 'Dr. Winifred Mohr (female)',
       num_orders: 3,
       lifetime_value: 6729.57
     },
     {
-      customer_name: 'Hector Gill',
+      customer_name: 'Jenny Romaguera (female)',
       num_orders: 3,
       lifetime_value: 318.83
     },
     {
-      customer_name: 'Hector Gomez',
+      customer_name: 'Kimberly Thompson-Towne (female)',
       num_orders: 1,
       lifetime_value: 15.23
     },
     {
-      customer_name: 'Hector Gutierrez',
+      customer_name: 'Laurie Price (male)',
       num_orders: 2,
       lifetime_value: 5900.55
     },
     {
-      customer_name: 'Hector Hernandez',
+      customer_name: 'Shaun Conroy (male)',
       num_orders: 1,
       lifetime_value: 42.28
     },
     {
-      customer_name: 'Hector Jimenez',
+      customer_name: 'Cornelius Roob (male)',
       num_orders: 1,
       lifetime_value: 37.29
     },
     {
-      customer_name: 'Hector Martin',
+      customer_name: 'Carolyn McGlynn (female)',
       num_orders: 1,
       lifetime_value: 124.99
     },
     {
-      customer_name: 'Hector Moreno',
+      customer_name: 'Cody Rowe (female)',
       num_orders: 2,
       lifetime_value: 4397.75
     },
     {
-      customer_name: 'Hector Muñoz',
+      customer_name: 'Dr. Kim Hane Jr. (male)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Hector Navarro',
+      customer_name: 'Bethany Goyette (female)',
       num_orders: 2,
       lifetime_value: 113.96
     },
     {
-      customer_name: 'Hector Ortega',
+      customer_name: 'Ms. Maria Barrows (male)',
       num_orders: 2,
       lifetime_value: 1533.5582
     },
     {
-      customer_name: 'Hector Ramos',
+      customer_name: 'Darrel Schroeder (female)',
       num_orders: 2,
       lifetime_value: 2450.0782
     },
     {
-      customer_name: 'Hector Romero',
+      customer_name: 'Gerardo MacGyver (female)',
       num_orders: 1,
       lifetime_value: 31.27
     },
     {
-      customer_name: 'Hector Ruiz',
+      customer_name: 'Jon Armstrong (male)',
       num_orders: 2,
       lifetime_value: 3001.0225
     },
     {
-      customer_name: 'Hector Sanz',
+      customer_name: 'Ms. Tamara Howe (female)',
       num_orders: 2,
       lifetime_value: 1873.5782
     },
     {
-      customer_name: 'Hector Serrano',
+      customer_name: 'Laurence Murray-Schulist (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Hector Suarez',
+      customer_name: 'Lee Abbott (male)',
       num_orders: 1,
       lifetime_value: 85.48
     },
     {
-      customer_name: 'Hector Torres',
+      customer_name: 'Carla Pacocha (female)',
       num_orders: 2,
       lifetime_value: 1468.5882
     },
     {
-      customer_name: 'Hector Vazquez',
+      customer_name: 'Leroy Fisher (female)',
       num_orders: 2,
       lifetime_value: 1483.5682
     },
     {
-      customer_name: 'Heidi Arun',
+      customer_name: 'Alfred Kemmer (male)',
       num_orders: 2,
       lifetime_value: 1624.45
     },
     {
-      customer_name: 'Heidi Chandra',
+      customer_name: 'Lillian Friesen (male)',
       num_orders: 1,
       lifetime_value: 36.96
     },
     {
-      customer_name: 'Heidi Fernandez',
+      customer_name: 'Regina Cormier (male)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Heidi Garcia',
+      customer_name: 'Miriam Wyman (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Heidi Gonzalez',
+      customer_name: 'Wesley Goodwin (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Heidi Kapoor',
+      customer_name: 'Wendy Shanahan (male)',
       num_orders: 2,
       lifetime_value: 123.45
     },
     {
-      customer_name: 'Heidi Lopez',
+      customer_name: 'Janet Witting (female)',
       num_orders: 2,
       lifetime_value: 1346.76
     },
     {
-      customer_name: 'Heidi Malhotra',
+      customer_name: 'Mr. Merle Mertz (female)',
       num_orders: 1,
       lifetime_value: 46.47
     },
     {
-      customer_name: 'Heidi Martinez',
+      customer_name: 'Lynda Emmerich (female)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Heidi Mehta',
+      customer_name: 'Erick Ledner MD (male)',
       num_orders: 2,
       lifetime_value: 2840.9096
     },
     {
-      customer_name: 'Heidi Patel',
+      customer_name: 'Ginger Heaney (female)',
       num_orders: 4,
       lifetime_value: 179.19
     },
     {
-      customer_name: 'Heidi Perez',
+      customer_name: 'Alfred Jacobs (male)',
       num_orders: 2,
       lifetime_value: 1574.46
     },
     {
-      customer_name: 'Heidi Prasad',
+      customer_name: 'Tracy Schowalter (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Heidi Raman',
+      customer_name: 'Dianna Bartoletti V (male)',
       num_orders: 2,
       lifetime_value: 38.98
     },
     {
-      customer_name: 'Heidi Rana',
+      customer_name: 'Jody Mayert (male)',
       num_orders: 2,
       lifetime_value: 78.96
     },
     {
-      customer_name: 'Heidi Rodriguez',
+      customer_name: 'Wade McKenzie (male)',
       num_orders: 2,
       lifetime_value: 1683.93
     },
     {
-      customer_name: 'Heidi Sai',
+      customer_name: 'Glenn Kunze (male)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Heidi Sanchez',
+      customer_name: 'Jennifer Sauer DDS (female)',
       num_orders: 2,
       lifetime_value: 1681.45
     },
     {
-      customer_name: 'Heidi Sara',
+      customer_name: 'Sonia Senger (female)',
       num_orders: 2,
       lifetime_value: 70.74
     },
     {
-      customer_name: 'Heidi Srini',
+      customer_name: 'Karla Mante (female)',
       num_orders: 2,
       lifetime_value: 1587.47
     },
     {
-      customer_name: 'Heidi Subram',
+      customer_name: 'Elsie Kirlin (male)',
       num_orders: 2,
       lifetime_value: 2897.5682
     },
     {
-      customer_name: 'Heidi Suri',
+      customer_name: 'Kristine Rolfson III (female)',
       num_orders: 2,
       lifetime_value: 98.96
     },
     {
-      customer_name: 'Heidi Vance',
+      customer_name: 'Desiree Predovic (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Henry Arun',
+      customer_name: "Paul O'Hara (female)",
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Henry Chapman',
+      customer_name: "Geraldine O'Conner (female)",
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Henry Fernandez',
+      customer_name: 'Paulette Walker (female)',
       num_orders: 2,
       lifetime_value: 3077.98
     },
     {
-      customer_name: 'Henry Garcia',
+      customer_name: 'Mrs. Gail Bradtke (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Henry Gonzalez',
+      customer_name: 'Joann Ankunding (female)',
       num_orders: 2,
       lifetime_value: 1422.94
     },
     {
-      customer_name: 'Henry Kapoor',
+      customer_name: "Angel D'Amore-Bailey (male)",
       num_orders: 2,
       lifetime_value: 3174.95
     },
     {
-      customer_name: 'Henry Lopez',
+      customer_name: 'Enrique Muller-Deckow (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Henry Madan',
+      customer_name: 'Adrian Nitzsche (female)',
       num_orders: 1,
       lifetime_value: 61.96
     },
     {
-      customer_name: 'Henry Martinez',
+      customer_name: 'Jenna Durgan (female)',
       num_orders: 2,
       lifetime_value: 3179.95
     },
     {
-      customer_name: 'Henry Mehta',
+      customer_name: 'Kelly Hayes MD (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Henry Nelson',
+      customer_name: 'Clint Brekke DDS (female)',
       num_orders: 1,
       lifetime_value: 49.48
     },
     {
-      customer_name: 'Henry Patel',
+      customer_name: 'Denise Sporer (male)',
       num_orders: 1,
       lifetime_value: 163.99
     },
     {
-      customer_name: 'Henry Perez',
+      customer_name: 'Drew Nolan (female)',
       num_orders: 1,
       lifetime_value: 597.26
     },
     {
-      customer_name: 'Henry Prasad',
+      customer_name: 'Cesar Heller (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Henry Raman',
+      customer_name: 'Curtis Kulas (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Henry Rana',
+      customer_name: 'Peggy Yost (male)',
       num_orders: 2,
       lifetime_value: 3148.94
     },
     {
-      customer_name: 'Henry Sanchez',
+      customer_name: 'Sherry McCullough (female)',
       num_orders: 2,
       lifetime_value: 3099.96
     },
     {
-      customer_name: 'Henry Sara',
+      customer_name: 'Paul Stoltenberg (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Henry Stone',
+      customer_name: 'Mr. Wilbert Conroy (male)',
       num_orders: 2,
       lifetime_value: 3108.95
     },
     {
-      customer_name: 'Henry Sullivan',
+      customer_name: 'Jared Schneider (male)',
       num_orders: 1,
       lifetime_value: 166.28
     },
     {
-      customer_name: 'Henry Suri',
+      customer_name: 'Shannon Collins (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Henry Vance',
+      customer_name: 'Mr. Blake Krajcik (female)',
       num_orders: 1,
       lifetime_value: 68.49
     },
     {
-      customer_name: 'Henry Young',
+      customer_name: 'Cynthia Larson (male)',
       num_orders: 2,
       lifetime_value: 4767.73
     },
     {
-      customer_name: 'Holly Arun',
+      customer_name: 'Oliver Douglas (male)',
       num_orders: 2,
       lifetime_value: 91.26
     },
     {
-      customer_name: 'Holly Chandra',
+      customer_name: 'Derek Gorczany (female)',
       num_orders: 2,
       lifetime_value: 82.25
     },
     {
-      customer_name: 'Holly Fernandez',
+      customer_name: 'Andres Mitchell (male)',
       num_orders: 2,
       lifetime_value: 6095.08
     },
     {
-      customer_name: 'Holly Garcia',
+      customer_name: 'Preston Ryan-Frami (female)',
       num_orders: 2,
       lifetime_value: 5377.23
     },
     {
-      customer_name: 'Holly Lopez',
+      customer_name: 'Mrs. Estelle Gusikowski-Hintz MD (male)',
       num_orders: 2,
       lifetime_value: 59.46
     },
     {
-      customer_name: 'Holly Malhotra',
+      customer_name: 'Dr. Thomas Anderson Sr. (male)',
       num_orders: 2,
       lifetime_value: 6058.21
     },
     {
-      customer_name: 'Holly Martinez',
+      customer_name: 'Dr. Michael Kessler (male)',
       num_orders: 1,
       lifetime_value: 94.46
     },
     {
-      customer_name: 'Holly Mehta',
+      customer_name: 'Ann Greenholt-Johnson (male)',
       num_orders: 1,
       lifetime_value: 32.28
     },
     {
-      customer_name: 'Holly Perez',
+      customer_name: 'Ms. Kari Cormier (female)',
       num_orders: 2,
       lifetime_value: 6093.2
     },
     {
-      customer_name: 'Holly Raman',
+      customer_name: 'Laurie Goldner (male)',
       num_orders: 2,
       lifetime_value: 114.95
     },
     {
-      customer_name: 'Holly Rana',
+      customer_name: 'Bobby Lockman (male)',
       num_orders: 2,
       lifetime_value: 116.74
     },
     {
-      customer_name: 'Holly Sai',
+      customer_name: 'Cody Muller (female)',
       num_orders: 2,
       lifetime_value: 6037.89
     },
     {
-      customer_name: 'Holly Sanchez',
+      customer_name: 'Pam Kihn (male)',
       num_orders: 2,
       lifetime_value: 5314.25
     },
     {
-      customer_name: 'Holly Srini',
+      customer_name: 'Johanna Huels (female)',
       num_orders: 2,
       lifetime_value: 109.46
     },
     {
-      customer_name: 'Holly Subram',
+      customer_name: 'Jacquelyn Larkin PhD (male)',
       num_orders: 2,
       lifetime_value: 6056.61
     },
     {
-      customer_name: 'Holly Suri',
+      customer_name: 'Alberta Lowe (female)',
       num_orders: 2,
       lifetime_value: 74.94
     },
     {
-      customer_name: 'Holly Vance',
+      customer_name: 'Tiffany Rau (male)',
       num_orders: 2,
       lifetime_value: 60.05
     },
     {
-      customer_name: 'Hunter Adams',
+      customer_name: 'Evan Funk (female)',
       num_orders: 2,
       lifetime_value: 5930.23
     },
     {
-      customer_name: 'Hunter Allen',
+      customer_name: 'Fredrick Russel (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Hunter Anderson',
+      customer_name: 'Elisa Botsford (male)',
       num_orders: 1,
       lifetime_value: 27.77
     },
     {
-      customer_name: 'Hunter Baker',
+      customer_name: 'Laverne Brown (male)',
       num_orders: 1,
       lifetime_value: 2369.96
     },
     {
-      customer_name: 'Hunter Brown',
+      customer_name: 'Rudolph Willms (male)',
       num_orders: 1,
       lifetime_value: 29.98
     },
     {
-      customer_name: 'Hunter Campbell',
+      customer_name: 'Bethany Hessel (male)',
       num_orders: 1,
       lifetime_value: 629.97
     },
     {
-      customer_name: 'Hunter Clark',
+      customer_name: "Miss Vanessa Funk-O'Kon (female)",
       num_orders: 3,
       lifetime_value: 6914.8525
     },
     {
-      customer_name: 'Hunter Collins',
+      customer_name: 'Becky Jacobson (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Hunter Davis',
+      customer_name: 'Leslie Collier (female)',
       num_orders: 2,
       lifetime_value: 2779.9075
     },
     {
-      customer_name: 'Hunter Edwards',
+      customer_name: 'Hilda Volkman (female)',
       num_orders: 2,
       lifetime_value: 3053.32
     },
     {
-      customer_name: 'Hunter Evans',
+      customer_name: 'Enrique Huel (female)',
       num_orders: 2,
       lifetime_value: 88.46
     },
     {
-      customer_name: 'Hunter Garcia',
+      customer_name: 'Muriel Kub (male)',
       num_orders: 3,
       lifetime_value: 7233.36
     },
     {
-      customer_name: 'Hunter Gonzalez',
+      customer_name: 'Dr. Kevin Carter (male)',
       num_orders: 2,
       lifetime_value: 2721.5525
     },
     {
-      customer_name: 'Hunter Hall',
+      customer_name: 'Juanita Roob (male)',
       num_orders: 1,
       lifetime_value: 68.49
     },
     {
-      customer_name: 'Hunter Hernandez',
+      customer_name: 'Jose Haag (male)',
       num_orders: 1,
       lifetime_value: 2294.99
     },
     {
-      customer_name: 'Hunter Hill',
+      customer_name: 'Dr. Wallace Koss (female)',
       num_orders: 2,
       lifetime_value: 3001.0425
     },
     {
-      customer_name: 'Hunter Jackson',
+      customer_name: 'Dr. Otis Hahn (male)',
       num_orders: 2,
       lifetime_value: 113.96
     },
     {
-      customer_name: 'Hunter Johnson',
+      customer_name: 'Dr. Israel Heidenreich (female)',
       num_orders: 1,
       lifetime_value: 78.96
     },
     {
-      customer_name: 'Hunter Jones',
+      customer_name: 'May Daniel Jr. (female)',
       num_orders: 2,
       lifetime_value: 2787.5125
     },
     {
-      customer_name: 'Hunter King',
+      customer_name: 'Marvin Crist (male)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Hunter Lee',
+      customer_name: 'Bruce Altenwerth (female)',
       num_orders: 2,
       lifetime_value: 123.96
     },
     {
-      customer_name: 'Hunter Lewis',
+      customer_name: 'Carroll Hansen (female)',
       num_orders: 2,
       lifetime_value: 4426.74
     },
     {
-      customer_name: 'Hunter Lopez',
+      customer_name: 'Jo Schimmel (female)',
       num_orders: 3,
       lifetime_value: 7292.31
     },
     {
-      customer_name: 'Hunter Martinez',
+      customer_name: 'Floyd DuBuque (female)',
       num_orders: 3,
       lifetime_value: 6952.5325
     },
     {
-      customer_name: 'Hunter Miller',
+      customer_name: 'Sue Grant (male)',
       num_orders: 2,
       lifetime_value: 4208.31
     },
     {
-      customer_name: 'Hunter Mitchell',
+      customer_name: 'Mr. Maurice Cummings (female)',
       num_orders: 1,
       lifetime_value: 24.99
     },
     {
-      customer_name: 'Hunter Moore',
+      customer_name: 'Marcella Zulauf (male)',
       num_orders: 1,
       lifetime_value: 31.27
     },
     {
-      customer_name: 'Hunter Parker',
+      customer_name: 'Miss Katrina Kub (female)',
       num_orders: 2,
       lifetime_value: 3124.96
     },
     {
-      customer_name: 'Hunter Perez',
+      customer_name: 'Anna Rempel DDS (male)',
       num_orders: 2,
       lifetime_value: 1379.95
     },
     {
-      customer_name: 'Hunter Phillips',
+      customer_name: 'Dr. Marty Jast (female)',
       num_orders: 1,
       lifetime_value: 64.47
     },
     {
-      customer_name: 'Hunter Roberts',
+      customer_name: 'Miss Beatrice Bergstrom (male)',
       num_orders: 2,
       lifetime_value: 3105.27
     },
     {
-      customer_name: 'Hunter Robinson',
+      customer_name: 'Lindsey Stehr IV (male)',
       num_orders: 1,
       lifetime_value: 47.94
     },
     {
-      customer_name: 'Hunter Rodriguez',
+      customer_name: 'Rosemary Schmitt (male)',
       num_orders: 2,
       lifetime_value: 4347.76
     },
     {
-      customer_name: 'Hunter Scott',
+      customer_name: 'Darren Leffler (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Hunter Smith',
+      customer_name: 'Antonio Gerhold (female)',
       num_orders: 2,
       lifetime_value: 119.95
     },
     {
-      customer_name: 'Hunter Thomas',
+      customer_name: 'Audrey Champlin-Conroy (female)',
       num_orders: 2,
       lifetime_value: 4698.76
     },
     {
-      customer_name: 'Hunter Thompson',
+      customer_name: 'Miss Lula Olson (female)',
       num_orders: 1,
       lifetime_value: 1764.96
     },
     {
-      customer_name: 'Hunter Turner',
+      customer_name: 'Kristin Hegmann (female)',
       num_orders: 1,
       lifetime_value: 89.97
     },
     {
-      customer_name: 'Hunter Walker',
+      customer_name: 'Megan Wunsch (female)',
       num_orders: 2,
       lifetime_value: 147.48
     },
     {
-      customer_name: 'Hunter Williams',
+      customer_name: 'Albert Glover DVM (male)',
       num_orders: 1,
       lifetime_value: 38.97
     },
     {
-      customer_name: 'Hunter Wilson',
+      customer_name: 'Monica Heidenreich (female)',
       num_orders: 1,
       lifetime_value: 29.99
     },
     {
-      customer_name: 'Hunter Wright',
+      customer_name: 'Craig Baumbach (male)',
       num_orders: 1,
       lifetime_value: 1763.97
     },
     {
-      customer_name: 'Ian Alexander',
+      customer_name: 'Jeffery Casper (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Ian Bailey',
+      customer_name: 'Mrs. Ada Schmitt (female)',
       num_orders: 2,
       lifetime_value: 4444.8896
     },
     {
-      customer_name: 'Ian Barnes',
+      customer_name: 'Mr. Darrel Turner (female)',
       num_orders: 2,
       lifetime_value: 4533.5225
     },
     {
-      customer_name: 'Ian Bell',
+      customer_name: 'Fred Volkman (female)',
       num_orders: 2,
       lifetime_value: 5943.25
     },
     {
-      customer_name: 'Ian Bennett',
+      customer_name: 'Erik Corwin (male)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Ian Brooks',
+      customer_name: 'Linda Emmerich (female)',
       num_orders: 2,
       lifetime_value: 5976.74
     },
     {
-      customer_name: 'Ian Bryant',
+      customer_name: 'Sam Borer (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Ian Coleman',
+      customer_name: 'Jaime Nikolaus III (female)',
       num_orders: 1,
       lifetime_value: 180.98
     },
     {
-      customer_name: 'Ian Cook',
+      customer_name: 'Dean Lakin (male)',
       num_orders: 1,
       lifetime_value: 12.94
     },
     {
-      customer_name: 'Ian Cooper',
+      customer_name: 'Boyd Strosin (female)',
       num_orders: 2,
       lifetime_value: 163.95
     },
     {
-      customer_name: 'Ian Cox',
+      customer_name: 'Faith Kilback Jr. (male)',
       num_orders: 2,
       lifetime_value: 2973.9825
     },
     {
-      customer_name: 'Ian Diaz',
+      customer_name: 'Marcia Bashirian (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Ian Flores',
+      customer_name: 'Melba Dare (male)',
       num_orders: 2,
       lifetime_value: 3282.81
     },
     {
-      customer_name: 'Ian Foster',
+      customer_name: 'Carmen Smith (female)',
       num_orders: 2,
       lifetime_value: 3084.0225
     },
     {
-      customer_name: 'Ian Gonzales',
+      customer_name: 'Ginger Krajcik (female)',
       num_orders: 2,
       lifetime_value: 3021.0425
     },
     {
-      customer_name: 'Ian Gray',
+      customer_name: 'Catherine Walter (male)',
       num_orders: 1,
       lifetime_value: 80.96
     },
     {
-      customer_name: 'Ian Griffin',
+      customer_name: 'Noel Sanford (male)',
       num_orders: 1,
       lifetime_value: 66.96
     },
     {
-      customer_name: 'Ian Hayes',
+      customer_name: 'Marion Schamberger (female)',
       num_orders: 2,
       lifetime_value: 3021.0425
     },
     {
-      customer_name: 'Ian Henderson',
+      customer_name: 'Dustin Brakus (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Ian Howard',
+      customer_name: 'Wade Strosin (female)',
       num_orders: 2,
       lifetime_value: 1613.0582
     },
     {
-      customer_name: 'Ian Hughes',
+      customer_name: 'Israel Runte (female)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Ian James',
+      customer_name: 'Billy Wehner (female)',
       num_orders: 2,
       lifetime_value: 104.24
     },
     {
-      customer_name: 'Ian Jenkins',
+      customer_name: 'Samantha Nicolas (male)',
       num_orders: 2,
       lifetime_value: 4765.63
     },
     {
-      customer_name: 'Ian Kelly',
+      customer_name: 'Jaime Becker (male)',
       num_orders: 3,
       lifetime_value: 5662.8982
     },
     {
-      customer_name: 'Ian Long',
+      customer_name: 'Craig Cummerata MD (female)',
       num_orders: 1,
       lifetime_value: 2366.96
     },
     {
-      customer_name: 'Ian Morgan',
+      customer_name: 'Marion Huels (male)',
       num_orders: 2,
       lifetime_value: 71.27
     },
     {
-      customer_name: 'Ian Morris',
+      customer_name: 'Lorena Welch-Paucek (female)',
       num_orders: 2,
       lifetime_value: 1622.47
     },
     {
-      customer_name: 'Ian Murphy',
+      customer_name: 'Meredith Runolfsdottir (male)',
       num_orders: 2,
       lifetime_value: 81.26
     },
     {
-      customer_name: 'Ian Patterson',
+      customer_name: 'Marlene Murphy IV (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Ian Perry',
+      customer_name: 'Lola Conroy (female)',
       num_orders: 1,
       lifetime_value: 76.97
     },
     {
-      customer_name: 'Ian Peterson',
+      customer_name: 'Tom Spinka (female)',
       num_orders: 2,
       lifetime_value: 3370.4075
     },
     {
-      customer_name: 'Ian Powell',
+      customer_name: 'Glen Cassin (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Ian Price',
+      customer_name: 'Santiago Kuhlman (male)',
       num_orders: 2,
       lifetime_value: 2986.0425
     },
     {
-      customer_name: 'Ian Ramirez',
+      customer_name: 'Curtis Gleichner (male)',
       num_orders: 2,
       lifetime_value: 1476.5382
     },
     {
-      customer_name: 'Ian Reed',
+      customer_name: 'Gabriel Littel (female)',
       num_orders: 2,
       lifetime_value: 3086.82
     },
     {
-      customer_name: 'Ian Richardson',
+      customer_name: 'Shannon Kovacek (male)',
       num_orders: 1,
       lifetime_value: 98.96
     },
     {
-      customer_name: 'Ian Rivera',
+      customer_name: 'Jon Spinka-Bergnaum (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Ian Rogers',
+      customer_name: 'Jackie Wiegand (male)',
       num_orders: 2,
       lifetime_value: 3114.94
     },
     {
-      customer_name: 'Ian Ross',
+      customer_name: 'Elijah Cassin IV (male)',
       num_orders: 1,
       lifetime_value: 30.97
     },
     {
-      customer_name: 'Ian Russell',
+      customer_name: 'Kimberly Effertz (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Ian Sanchez',
+      customer_name: 'Keith Padberg (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Ian Sanders',
+      customer_name: 'Irvin Kozey (female)',
       num_orders: 2,
       lifetime_value: 2765.3975
     },
     {
-      customer_name: 'Ian Simmons',
+      customer_name: 'Martin Franey (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Ian Stewart',
+      customer_name: 'Leo Grady (male)',
       num_orders: 1,
       lifetime_value: 59.98
     },
     {
-      customer_name: 'Ian Torres',
+      customer_name: 'Eunice Koepp (male)',
       num_orders: 2,
       lifetime_value: 3320.4275
     },
     {
-      customer_name: 'Ian Ward',
+      customer_name: 'Ms. Phyllis Schroeder II (female)',
       num_orders: 3,
       lifetime_value: 191.27
     },
     {
-      customer_name: 'Ian Washington',
+      customer_name: 'Stephen Mayert (female)',
       num_orders: 2,
       lifetime_value: 3043.0025
     },
     {
-      customer_name: 'Ian Watson',
+      customer_name: 'Adrian Auer (male)',
       num_orders: 3,
       lifetime_value: 200.26
     },
     {
-      customer_name: 'Ian Wood',
+      customer_name: 'Evan Thiel (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Ioannis Xylaras',
+      customer_name: 'Johnny Robel (female)',
       num_orders: 1,
       lifetime_value: 639.45
     },
     {
-      customer_name: 'Isaac Adams',
+      customer_name: 'Lynne Rogahn (female)',
       num_orders: 1,
       lifetime_value: 2479.94
     },
     {
-      customer_name: 'Isaac Allen',
+      customer_name: 'Darrell Fay-Monahan (male)',
       num_orders: 1,
       lifetime_value: 1763.97
     },
     {
-      customer_name: 'Isaac Bailey',
+      customer_name: 'Manuel Murazik (female)',
       num_orders: 2,
       lifetime_value: 63.97
     },
     {
-      customer_name: 'Isaac Brooks',
+      customer_name: 'Angelica Feest (male)',
       num_orders: 3,
       lifetime_value: 148.94
     },
     {
-      customer_name: 'Isaac Campbell',
+      customer_name: 'Teresa Pfannerstill (female)',
       num_orders: 2,
       lifetime_value: 90.47
     },
     {
-      customer_name: 'Isaac Carter',
+      customer_name: 'Mr. Johnny Heathcote III (female)',
       num_orders: 1,
       lifetime_value: 149.98
     },
     {
-      customer_name: 'Isaac Collins',
+      customer_name: 'Ollie Batz II (female)',
       num_orders: 2,
       lifetime_value: 132.44
     },
     {
-      customer_name: 'Isaac Cook',
+      customer_name: "Katrina O'Keefe (female)",
       num_orders: 3,
       lifetime_value: 165.3
     },
     {
-      customer_name: 'Isaac Cooper',
+      customer_name: 'Verna Bosco (male)',
       num_orders: 2,
       lifetime_value: 1547.5682
     },
     {
-      customer_name: 'Isaac Cox',
+      customer_name: 'Harry Kuhic (female)',
       num_orders: 3,
       lifetime_value: 7015.6125
     },
     {
-      customer_name: 'Isaac Edwards',
+      customer_name: 'Geoffrey Beatty (female)',
       num_orders: 2,
       lifetime_value: 4393.3582
     },
     {
-      customer_name: 'Isaac Evans',
+      customer_name: 'Dr. Terrence Anderson (female)',
       num_orders: 2,
       lifetime_value: 2753.8225
     },
     {
-      customer_name: 'Isaac Gonzalez',
+      customer_name: 'Oliver Boyle (female)',
       num_orders: 3,
       lifetime_value: 6917.5925
     },
     {
-      customer_name: 'Isaac Gray',
+      customer_name: 'Wilbert Rice (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Isaac Green',
+      customer_name: 'Eduardo Stroman (female)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Isaac Hernandez',
+      customer_name: 'Theresa Zemlak (female)',
       num_orders: 2,
       lifetime_value: 96.92
     },
     {
-      customer_name: 'Isaac Hill',
+      customer_name: 'Erin Schaefer (male)',
       num_orders: 2,
       lifetime_value: 290.46
     },
     {
-      customer_name: 'Isaac Howard',
+      customer_name: 'Kristi Homenick (female)',
       num_orders: 1,
       lifetime_value: 80.96
     },
     {
-      customer_name: 'Isaac James',
+      customer_name: 'Jose Halvorson (female)',
       num_orders: 2,
       lifetime_value: 4839
     },
     {
-      customer_name: 'Isaac Kelly',
+      customer_name: 'Tiffany Barton (female)',
       num_orders: 1,
       lifetime_value: 121.57
     },
     {
-      customer_name: 'Isaac King',
+      customer_name: 'Carole Wisozk (male)',
       num_orders: 1,
       lifetime_value: 2334.97
     },
     {
-      customer_name: 'Isaac Lopez',
+      customer_name: 'Jennie Hauck (male)',
       num_orders: 2,
       lifetime_value: 67.58
     },
     {
-      customer_name: 'Isaac Mitchell',
+      customer_name: 'Dr. Sammy Ondricka (female)',
       num_orders: 2,
       lifetime_value: 4659.9025
     },
     {
-      customer_name: 'Isaac Morgan',
+      customer_name: 'Bradley Wolf (male)',
       num_orders: 3,
       lifetime_value: 6865.57
     },
     {
-      customer_name: 'Isaac Morris',
+      customer_name: 'Isaac Koepp (female)',
       num_orders: 2,
       lifetime_value: 4843
     },
     {
-      customer_name: 'Isaac Murphy',
+      customer_name: 'Lynda Marks (male)',
       num_orders: 3,
       lifetime_value: 6675.6
     },
     {
-      customer_name: 'Isaac Oliver',
+      customer_name: 'Belinda Gutkowski (male)',
       num_orders: 1,
       lifetime_value: 15.23
     },
     {
-      customer_name: 'Isaac Parker',
+      customer_name: 'Juan Schuppe (female)',
       num_orders: 2,
       lifetime_value: 4416.3796
     },
     {
-      customer_name: 'Isaac Perez',
+      customer_name: 'Dave Schaefer (female)',
       num_orders: 2,
       lifetime_value: 83.97
     },
     {
-      customer_name: 'Isaac Peterson',
+      customer_name: 'Melissa Dach (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Isaac Phillips',
+      customer_name: 'Sergio Jerde-Mayert (female)',
       num_orders: 1,
       lifetime_value: 564.99
     },
     {
-      customer_name: 'Isaac Ramirez',
+      customer_name: 'Ebony Wolff (female)',
       num_orders: 2,
       lifetime_value: 115.25
     },
     {
-      customer_name: 'Isaac Reed',
+      customer_name: 'Jessie Huels (female)',
       num_orders: 2,
       lifetime_value: 1633.94
     },
     {
-      customer_name: 'Isaac Richardson',
+      customer_name: 'Rafael Sporer (male)',
       num_orders: 1,
       lifetime_value: 95.94
     },
     {
-      customer_name: 'Isaac Rivera',
+      customer_name: 'Elaine Huel (female)',
       num_orders: 2,
       lifetime_value: 3080.27
     },
     {
-      customer_name: 'Isaac Rogers',
+      customer_name: 'Oscar Reinger DVM (female)',
       num_orders: 2,
       lifetime_value: 3142.23
     },
     {
-      customer_name: 'Isaac Sanchez',
+      customer_name: 'May Nikolaus (female)',
       num_orders: 1,
       lifetime_value: 30.97
     },
     {
-      customer_name: 'Isaac Sandberg',
+      customer_name: 'Gerardo Barrows (female)',
       num_orders: 2,
       lifetime_value: 83.97
     },
     {
-      customer_name: 'Isaac Scott',
+      customer_name: 'Willie Dickens (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Isaac Turner',
+      customer_name: 'Phil Maggio (female)',
       num_orders: 3,
       lifetime_value: 3759.3625
     },
     {
-      customer_name: 'Isaac Ward',
+      customer_name: 'Tony Kihn (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Isaac Watson',
+      customer_name: 'Glen Stoltenberg-McDermott (female)',
       num_orders: 2,
       lifetime_value: 82.26
     },
     {
-      customer_name: 'Isaac Wright',
+      customer_name: 'Gilbert Blick (male)',
       num_orders: 3,
       lifetime_value: 6974.0625
     },
     {
-      customer_name: 'Isaac Young',
+      customer_name: 'Helen Dickens II (male)',
       num_orders: 2,
       lifetime_value: 189.94
     },
     {
-      customer_name: 'Isabella Anderson',
+      customer_name: 'Eugene Crist Jr. (female)',
       num_orders: 2,
       lifetime_value: 73.25
     },
     {
-      customer_name: 'Isabella Bailey',
+      customer_name: 'Arlene Sporer-Vandervort MD (male)',
       num_orders: 1,
       lifetime_value: 46.47
     },
     {
-      customer_name: 'Isabella Bell',
+      customer_name: 'Lee Hackett (female)',
       num_orders: 1,
       lifetime_value: 123.98
     },
     {
-      customer_name: 'Isabella Brown',
+      customer_name: 'Mr. Jonathan Hilpert (female)',
       num_orders: 17,
       lifetime_value: 1155.52
     },
     {
-      customer_name: 'Isabella Clark',
+      customer_name: 'Loren Nitzsche (female)',
       num_orders: 7,
       lifetime_value: 11469.1882
     },
     {
-      customer_name: 'Isabella Cook',
+      customer_name: 'Randall Steuber (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Isabella Davis',
+      customer_name: 'Vincent Christiansen (female)',
       num_orders: 2,
       lifetime_value: 5948.24
     },
     {
-      customer_name: 'Isabella Garcia',
+      customer_name: 'Samuel Gerlach (male)',
       num_orders: 4,
       lifetime_value: 10566.38
     },
     {
-      customer_name: 'Isabella Hall',
+      customer_name: 'Tracy Yundt (female)',
       num_orders: 1,
       lifetime_value: 38.47
     },
     {
-      customer_name: 'Isabella Harris',
+      customer_name: 'Blanca Ortiz (female)',
       num_orders: 2,
       lifetime_value: 179.43
     },
     {
-      customer_name: 'Isabella Jackson',
+      customer_name: 'Edna Abbott (female)',
       num_orders: 2,
       lifetime_value: 54.22
     },
     {
-      customer_name: 'Isabella Johnson',
+      customer_name: 'Joy Hackett-Crooks (female)',
       num_orders: 2,
       lifetime_value: 134.23
     },
     {
-      customer_name: 'Isabella Jones',
+      customer_name: 'Darlene Hilll (male)',
       num_orders: 2,
       lifetime_value: 70.76
     },
     {
-      customer_name: 'Isabella Lee',
+      customer_name: 'Rochelle Abernathy (male)',
       num_orders: 4,
       lifetime_value: 10575.33
     },
     {
-      customer_name: 'Isabella Lewis',
+      customer_name: 'Jenna Rowe (female)',
       num_orders: 4,
       lifetime_value: 7175.75
     },
     {
-      customer_name: 'Isabella Martin',
+      customer_name: 'Ms. Alma Quitzon (male)',
       num_orders: 2,
       lifetime_value: 138.45
     },
     {
-      customer_name: 'Isabella Martinez',
+      customer_name: 'Derek Reichel V (male)',
       num_orders: 4,
       lifetime_value: 7511.55
     },
     {
-      customer_name: 'Isabella Moore',
+      customer_name: 'Becky Hirthe DVM (female)',
       num_orders: 27,
       lifetime_value: 1205.38
     },
     {
-      customer_name: 'Isabella Morgan',
+      customer_name: 'Suzanne Stiedemann (female)',
       num_orders: 1,
       lifetime_value: 22.93
     },
     {
-      customer_name: 'Isabella Morris',
+      customer_name: 'Lorraine Effertz (male)',
       num_orders: 1,
       lifetime_value: 539.99
     },
     {
-      customer_name: 'Isabella Murphy',
+      customer_name: 'Matt Orn (female)',
       num_orders: 1,
       lifetime_value: 1170.48
     },
     {
-      customer_name: 'Isabella Reed',
+      customer_name: 'Ruth Tremblay II (female)',
       num_orders: 1,
       lifetime_value: 77.96
     },
     {
-      customer_name: 'Isabella Richardson',
+      customer_name: 'Gilbert Johnson (female)',
       num_orders: 1,
       lifetime_value: 22.93
     },
     {
-      customer_name: 'Isabella Robinson',
+      customer_name: 'Alexis Gottlieb (male)',
       num_orders: 4,
       lifetime_value: 7586.23
     },
     {
-      customer_name: 'Isabella Rodriguez',
+      customer_name: 'Marilyn Sanford (female)',
       num_orders: 4,
       lifetime_value: 7164.25
     },
     {
-      customer_name: 'Isabella Rogers',
+      customer_name: 'Dr. George Pacocha (male)',
       num_orders: 1,
       lifetime_value: 128.97
     },
     {
-      customer_name: 'Isabella Sanchez',
+      customer_name: 'Floyd Greenfelder (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Isabella Smith',
+      customer_name: 'Darla Nitzsche (male)',
       num_orders: 2,
       lifetime_value: 77.27
     },
     {
-      customer_name: 'Isabella Stewart',
+      customer_name: 'Marianne Erdman MD (female)',
       num_orders: 1,
       lifetime_value: 1184.46
     },
     {
-      customer_name: 'Isabella Taylor',
+      customer_name: 'Tamara Abbott V (female)',
       num_orders: 3,
       lifetime_value: 6685.59
     },
     {
-      customer_name: 'Isabella Thomas',
+      customer_name: 'Monique Weber (male)',
       num_orders: 2,
       lifetime_value: 5910.22
     },
     {
-      customer_name: 'Isabella Thompson',
+      customer_name: 'Bethany Huel (male)',
       num_orders: 2,
       lifetime_value: 113.96
     },
     {
-      customer_name: 'Isabella Walker',
+      customer_name: 'Lowell Schultz (male)',
       num_orders: 4,
       lifetime_value: 7131.51
     },
     {
-      customer_name: 'Isabella White',
+      customer_name: 'Saul Bartell V (female)',
       num_orders: 2,
       lifetime_value: 39.58
     },
     {
-      customer_name: 'Isabella Williams',
+      customer_name: 'Victoria Bruen (male)',
       num_orders: 2,
       lifetime_value: 37.29
     },
     {
-      customer_name: 'Isaiah Adams',
+      customer_name: 'Roman Gerhold (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Isaiah Allen',
+      customer_name: 'Julian Marvin (female)',
       num_orders: 1,
       lifetime_value: 61.45
     },
     {
-      customer_name: 'Isaiah Bailey',
+      customer_name: 'Gilbert Oberbrunner (male)',
       num_orders: 3,
       lifetime_value: 5151.7096
     },
     {
-      customer_name: 'Isaiah Baker',
+      customer_name: 'Mike Kihn (female)',
       num_orders: 1,
       lifetime_value: 618.98
     },
     {
-      customer_name: 'Isaiah Bell',
+      customer_name: 'Eileen Kovacek (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Isaiah Brooks',
+      customer_name: 'Mack Mosciski-Ankunding (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Isaiah Campbell',
+      customer_name: 'Dr. Drew Auer (female)',
       num_orders: 1,
       lifetime_value: 64.97
     },
     {
-      customer_name: 'Isaiah Carter',
+      customer_name: 'Mrs. Martha Schmidt (male)',
       num_orders: 3,
       lifetime_value: 6906.8925
     },
     {
-      customer_name: 'Isaiah Collins',
+      customer_name: 'Rickey Ebert (female)',
       num_orders: 2,
       lifetime_value: 4366.0682
     },
     {
-      customer_name: 'Isaiah Cox',
+      customer_name: 'Connie VonRueden (female)',
       num_orders: 1,
       lifetime_value: 29.93
     },
     {
-      customer_name: 'Isaiah Edwards',
+      customer_name: 'Ms. Alexis Hintz DDS (female)',
       num_orders: 1,
       lifetime_value: 83.97
     },
     {
-      customer_name: 'Isaiah Evans',
+      customer_name: 'Mack Smith (female)',
       num_orders: 2,
       lifetime_value: 3807.3996
     },
     {
-      customer_name: 'Isaiah Gonzalez',
+      customer_name: 'Diana Mueller (female)',
       num_orders: 3,
       lifetime_value: 7000.8725
     },
     {
-      customer_name: 'Isaiah Gray',
+      customer_name: 'Neil Kozey (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Isaiah Green',
+      customer_name: 'Dr. Debbie Kunze (male)',
       num_orders: 1,
       lifetime_value: 1700.99
     },
     {
-      customer_name: 'Isaiah Hall',
+      customer_name: 'Mrs. Brandi Gutmann (male)',
       num_orders: 1,
       lifetime_value: 1750.98
     },
     {
-      customer_name: 'Isaiah Hernandez',
+      customer_name: 'Tamara Schiller (female)',
       num_orders: 3,
       lifetime_value: 261.39
     },
     {
-      customer_name: 'Isaiah Hill',
+      customer_name: 'Denise Kub (female)',
       num_orders: 2,
       lifetime_value: 86.26
     },
     {
-      customer_name: 'Isaiah Howard',
+      customer_name: 'Melissa West (male)',
       num_orders: 1,
       lifetime_value: 90.47
     },
     {
-      customer_name: 'Isaiah James',
+      customer_name: 'Lula Kuvalis (female)',
       num_orders: 2,
       lifetime_value: 1597.5582
     },
     {
-      customer_name: 'Isaiah King',
+      customer_name: 'Rosemary Blanda (male)',
       num_orders: 1,
       lifetime_value: 1729.97
     },
     {
-      customer_name: 'Isaiah Lopez',
+      customer_name: 'Arturo Ebert (male)',
       num_orders: 3,
       lifetime_value: 7131.4
     },
     {
-      customer_name: 'Isaiah Mitchell',
+      customer_name: 'Tara Ernser (male)',
       num_orders: 2,
       lifetime_value: 4758.24
     },
     {
-      customer_name: 'Isaiah Morgan',
+      customer_name: 'Ms. Shelia Howe DDS (female)',
       num_orders: 1,
       lifetime_value: 95.94
     },
     {
-      customer_name: 'Isaiah Morris',
+      customer_name: 'Andre Dickinson Sr. (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Isaiah Murphy',
+      customer_name: 'Craig Altenwerth (female)',
       num_orders: 1,
       lifetime_value: 71.95
     },
     {
-      customer_name: 'Isaiah Nelson',
+      customer_name: 'Kimberly Hickle (male)',
       num_orders: 1,
       lifetime_value: 26.97
     },
     {
-      customer_name: 'Isaiah Parker',
+      customer_name: 'Bernadette Satterfield (female)',
       num_orders: 2,
       lifetime_value: 113.94
     },
     {
-      customer_name: 'Isaiah Perez',
+      customer_name: 'Cary McDermott (male)',
       num_orders: 2,
       lifetime_value: 3080.27
     },
     {
-      customer_name: 'Isaiah Peterson',
+      customer_name: 'Denise Bradtke (male)',
       num_orders: 2,
       lifetime_value: 3295.4275
     },
     {
-      customer_name: 'Isaiah Phillips',
+      customer_name: 'Daisy Gleichner (female)',
       num_orders: 1,
       lifetime_value: 579.97
     },
     {
-      customer_name: 'Isaiah Ramirez',
+      customer_name: 'Calvin Stracke-Mayer (male)',
       num_orders: 2,
       lifetime_value: 160.55
     },
     {
-      customer_name: 'Isaiah Reed',
+      customer_name: 'Abraham Fadel (male)',
       num_orders: 1,
       lifetime_value: 89.97
     },
     {
-      customer_name: 'Isaiah Richardson',
+      customer_name: 'Judith Gusikowski (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Isaiah Rivera',
+      customer_name: 'Belinda Larson IV (male)',
       num_orders: 2,
       lifetime_value: 3173.94
     },
     {
-      customer_name: 'Isaiah Roberts',
+      customer_name: 'Bruce Gutkowski (male)',
       num_orders: 2,
       lifetime_value: 3127.25
     },
     {
-      customer_name: 'Isaiah Rogers',
+      customer_name: 'Enrique Adams (male)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Isaiah Sanchez',
+      customer_name: 'Emma Quitzon (male)',
       num_orders: 2,
       lifetime_value: 59.98
     },
     {
-      customer_name: 'Isaiah Sanders',
+      customer_name: 'Forrest Pollich (male)',
       num_orders: 3,
       lifetime_value: 5621.2182
     },
     {
-      customer_name: 'Isaiah Scott',
+      customer_name: 'Leona Lockman (female)',
       num_orders: 1,
       lifetime_value: 2297.28
     },
     {
-      customer_name: 'Isaiah Stewart',
+      customer_name: 'Emilio Gutkowski (female)',
       num_orders: 2,
       lifetime_value: 98.96
     },
     {
-      customer_name: 'Isaiah Torres',
+      customer_name: 'Horace Crist (female)',
       num_orders: 3,
       lifetime_value: 5222.0196
     },
     {
-      customer_name: 'Isaiah Turner',
+      customer_name: 'Winifred Hickle (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Isaiah Ward',
+      customer_name: 'Miranda Botsford (female)',
       num_orders: 1,
       lifetime_value: 839.48
     },
     {
-      customer_name: 'Isaiah Watson',
+      customer_name: 'Theresa VonRueden (female)',
       num_orders: 3,
       lifetime_value: 5650.2396
     },
     {
-      customer_name: 'Isaiah Wright',
+      customer_name: 'Lester Herman-Dicki Jr. (female)',
       num_orders: 1,
       lifetime_value: 46.47
     },
     {
-      customer_name: 'Isaiah Young',
+      customer_name: 'Cameron Price (female)',
       num_orders: 3,
       lifetime_value: 108.54
     },
     {
-      customer_name: 'Jack Adams',
+      customer_name: 'Carl Larkin (male)',
       num_orders: 1,
       lifetime_value: 1763.97
     },
     {
-      customer_name: 'Jack Allen',
+      customer_name: 'Priscilla Bode (male)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Jack Baker',
+      customer_name: 'Lydia Veum (female)',
       num_orders: 1,
       lifetime_value: 553.97
     },
     {
-      customer_name: 'Jack Campbell',
+      customer_name: 'Caroline Schmitt (male)',
       num_orders: 2,
       lifetime_value: 133.34
     },
     {
-      customer_name: 'Jack Carter',
+      customer_name: 'Miranda Smith (male)',
       num_orders: 2,
       lifetime_value: 4696.4925
     },
     {
-      customer_name: 'Jack Collins',
+      customer_name: 'Willie Zieme (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Jack Edwards',
+      customer_name: 'Israel Hammes (male)',
       num_orders: 2,
       lifetime_value: 78.86
     },
     {
-      customer_name: 'Jack Evans',
+      customer_name: 'Miss Natalie Schmitt (male)',
       num_orders: 1,
       lifetime_value: 68.49
     },
     {
-      customer_name: 'Jack Gonzalez',
+      customer_name: 'Craig Hudson (female)',
       num_orders: 3,
       lifetime_value: 6920.6125
     },
     {
-      customer_name: 'Jack Green',
+      customer_name: 'Terrance Bradtke (male)',
       num_orders: 3,
       lifetime_value: 104.55
     },
     {
-      customer_name: 'Jack Hall',
+      customer_name: 'Clark McCullough (female)',
       num_orders: 2,
       lifetime_value: 98.96
     },
     {
-      customer_name: 'Jack Hernandez',
+      customer_name: 'Ms. Shari Anderson (female)',
       num_orders: 1,
       lifetime_value: 64.97
     },
     {
-      customer_name: 'Jack Hill',
+      customer_name: 'Miss Pauline Mertz (female)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Jack King',
+      customer_name: 'Dr. Jose Tillman (male)',
       num_orders: 1,
       lifetime_value: 2379.47
     },
     {
-      customer_name: 'Jack Lopez',
+      customer_name: 'Ms. Elena Gibson (female)',
       num_orders: 3,
       lifetime_value: 5429.76
     },
     {
-      customer_name: 'Jack Mitchell',
+      customer_name: 'Miss Gayle Abshire (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Jack Nelson',
+      customer_name: 'Otis Batz (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Jack Parker',
+      customer_name: 'Cedric Renner (male)',
       num_orders: 2,
       lifetime_value: 1344.96
     },
     {
-      customer_name: 'Jack Perez',
+      customer_name: 'Mr. Jared Herman (female)',
       num_orders: 2,
       lifetime_value: 1376.97
     },
     {
-      customer_name: 'Jack Phillips',
+      customer_name: 'Kristi Halvorson-Pfeffer (male)',
       num_orders: 3,
       lifetime_value: 157.51
     },
     {
-      customer_name: 'Jack Roberts',
+      customer_name: 'Ms. Katie DuBuque (female)',
       num_orders: 2,
       lifetime_value: 3157.97
     },
     {
-      customer_name: 'Jack Scott',
+      customer_name: 'Greg Buckridge (female)',
       num_orders: 2,
       lifetime_value: 6099.1
     },
     {
-      customer_name: 'Jack Turner',
+      customer_name: 'Phil Nicolas (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Jack Wright',
+      customer_name: 'Ms. Molly Schuster DVM (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Jack Young',
+      customer_name: 'Kim Jakubowski (female)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Jackson Adams',
+      customer_name: 'Shannon Armstrong Jr. (female)',
       num_orders: 2,
       lifetime_value: 141.96
     },
     {
-      customer_name: 'Jackson Allen',
+      customer_name: 'Isabel Halvorson-Vandervort (female)',
       num_orders: 1,
       lifetime_value: 1785.97
     },
     {
-      customer_name: 'Jackson Campbell',
+      customer_name: 'Kelly Lowe (female)',
       num_orders: 2,
       lifetime_value: 170.06
     },
     {
-      customer_name: 'Jackson Carter',
+      customer_name: 'Crystal Reilly DVM (male)',
       num_orders: 2,
       lifetime_value: 66.95
     },
     {
-      customer_name: 'Jackson Collins',
+      customer_name: 'Kristine Farrell (male)',
       num_orders: 2,
       lifetime_value: 3209.94
     },
     {
-      customer_name: 'Jackson Edwards',
+      customer_name: 'Elaine Gislason (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Jackson Evans',
+      customer_name: "Estelle O'Connell (male)",
       num_orders: 2,
       lifetime_value: 96.75
     },
     {
-      customer_name: 'Jackson Gonzalez',
+      customer_name: 'Damon Jacobson-Boyer (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Jackson Green',
+      customer_name: 'Roberta Stroman (female)',
       num_orders: 1,
       lifetime_value: 2482.23
     },
     {
-      customer_name: 'Jackson Hall',
+      customer_name: 'Willis Ferry (male)',
       num_orders: 1,
       lifetime_value: 2324.92
     },
     {
-      customer_name: 'Jackson Hernandez',
+      customer_name: 'Nellie Schneider (female)',
       num_orders: 1,
       lifetime_value: 1709.98
     },
     {
-      customer_name: 'Jackson Hill',
+      customer_name: 'Natasha Ferry (female)',
       num_orders: 2,
       lifetime_value: 69.87
     },
     {
-      customer_name: 'Jackson King',
+      customer_name: 'Tommy Williamson (male)',
       num_orders: 1,
       lifetime_value: 2318.96
     },
     {
-      customer_name: 'Jackson Lopez',
+      customer_name: 'Ed Fahey DVM (male)',
       num_orders: 3,
       lifetime_value: 6994.5825
     },
     {
-      customer_name: 'Jackson Mitchell',
+      customer_name: 'Chelsea Bosco (male)',
       num_orders: 2,
       lifetime_value: 4752.75
     },
     {
-      customer_name: 'Jackson Nelson',
+      customer_name: 'Sheri Bahringer (male)',
       num_orders: 1,
       lifetime_value: 2481.82
     },
     {
-      customer_name: 'Jackson Parker',
+      customer_name: 'Mr. Donnie Bayer IV (male)',
       num_orders: 2,
       lifetime_value: 4344.0882
     },
     {
-      customer_name: 'Jackson Perez',
+      customer_name: 'Francis Wiegand DDS (male)',
       num_orders: 2,
       lifetime_value: 1413.93
     },
     {
-      customer_name: 'Jackson Phillips',
+      customer_name: 'Dean Kshlerin (female)',
       num_orders: 1,
       lifetime_value: 2373.47
     },
     {
-      customer_name: 'Jackson Roberts',
+      customer_name: 'Charlene Spencer (female)',
       num_orders: 2,
       lifetime_value: 3134.95
     },
     {
-      customer_name: 'Jackson Scott',
+      customer_name: 'Abel Turcotte (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Jackson Turner',
+      customer_name: 'Agnes Nienow (male)',
       num_orders: 1,
       lifetime_value: 64.97
     },
     {
-      customer_name: 'Jackson Wright',
+      customer_name: 'Charlotte Jacobs (male)',
       num_orders: 1,
       lifetime_value: 2334.98
     },
     {
-      customer_name: 'Jackson Young',
+      customer_name: 'Billie Pfannerstill (male)',
       num_orders: 1,
       lifetime_value: 1700.99
     },
     {
-      customer_name: 'Jaclyn Andersen',
+      customer_name: 'Scott Morar (male)',
       num_orders: 1,
       lifetime_value: 100.46
     },
     {
-      customer_name: 'Jaclyn Becker',
+      customer_name: 'Lance Friesen IV (male)',
       num_orders: 3,
       lifetime_value: 118.18
     },
     {
-      customer_name: 'Jaclyn Cai',
+      customer_name: 'Lauren Beier (male)',
       num_orders: 1,
       lifetime_value: 36.96
     },
     {
-      customer_name: 'Jaclyn Chande',
+      customer_name: 'Regina Cummerata (female)',
       num_orders: 3,
       lifetime_value: 6759.4696
     },
     {
-      customer_name: 'Jaclyn Chander',
+      customer_name: 'Alvin Cummings III (female)',
       num_orders: 3,
       lifetime_value: 6817.1182
     },
     {
-      customer_name: 'Jaclyn Chen',
+      customer_name: 'Alberta Jacobson (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Jaclyn Ferrier',
+      customer_name: 'Pat Huels II (male)',
       num_orders: 3,
       lifetime_value: 294.94
     },
     {
-      customer_name: 'Jaclyn Gao',
+      customer_name: 'Bobby Murazik (male)',
       num_orders: 1,
       lifetime_value: 75.97
     },
     {
-      customer_name: 'Jaclyn Guo',
+      customer_name: 'Katherine Towne (female)',
       num_orders: 4,
       lifetime_value: 321.39
     },
     {
-      customer_name: 'Jaclyn He',
+      customer_name: 'Laverne Mante (female)',
       num_orders: 2,
       lifetime_value: 4507.5225
     },
     {
-      customer_name: 'Jaclyn Huang',
+      customer_name: 'Maxine Reilly (female)',
       num_orders: 1,
       lifetime_value: 30.97
     },
     {
-      customer_name: 'Jaclyn Jai',
+      customer_name: 'Dr. Irene Bechtelar (female)',
       num_orders: 2,
       lifetime_value: 4809.81
     },
     {
-      customer_name: 'Jaclyn Kumar',
+      customer_name: 'Frank Bartell (female)',
       num_orders: 2,
       lifetime_value: 83.97
     },
     {
-      customer_name: 'Jaclyn Lal',
+      customer_name: 'Beverly Thiel (female)',
       num_orders: 2,
       lifetime_value: 4618.5325
     },
     {
-      customer_name: 'Jaclyn Li',
+      customer_name: 'Deborah Bogan (female)',
       num_orders: 1,
       lifetime_value: 2332.28
     },
     {
-      customer_name: 'Jaclyn Liang',
+      customer_name: 'Eva Tromp-Hansen (female)',
       num_orders: 2,
       lifetime_value: 4501.5525
     },
     {
-      customer_name: 'Jaclyn Lin',
+      customer_name: 'Sophia Goldner DVM (female)',
       num_orders: 4,
       lifetime_value: 257.88
     },
     {
-      customer_name: 'Jaclyn Liu',
+      customer_name: 'Dr. Ella Ritchie (male)',
       num_orders: 2,
       lifetime_value: 5915.53
     },
     {
-      customer_name: 'Jaclyn Lu',
+      customer_name: 'Miss Terry Heathcote (female)',
       num_orders: 4,
       lifetime_value: 247.41
     },
     {
-      customer_name: 'Jaclyn Luo',
+      customer_name: 'Carlos Hills (female)',
       num_orders: 4,
       lifetime_value: 471.11
     },
     {
-      customer_name: 'Jaclyn Ma',
+      customer_name: 'Becky Olson (female)',
       num_orders: 4,
       lifetime_value: 237.91
     },
     {
-      customer_name: 'Jaclyn Nara',
+      customer_name: 'Edmond Jenkins (female)',
       num_orders: 3,
       lifetime_value: 6829.4696
     },
     {
-      customer_name: 'Jaclyn Pal',
+      customer_name: 'Lyle Hilpert (male)',
       num_orders: 2,
       lifetime_value: 57.97
     },
     {
-      customer_name: 'Jaclyn Rai',
+      customer_name: 'Oscar Bechtelar (female)',
       num_orders: 3,
       lifetime_value: 96.25
     },
     {
-      customer_name: 'Jaclyn Raji',
+      customer_name: 'Michele Lynch II (male)',
       num_orders: 3,
       lifetime_value: 6840.4596
     },
     {
-      customer_name: 'Jaclyn Shan',
+      customer_name: 'Santiago Carter DDS (female)',
       num_orders: 1,
       lifetime_value: 180.98
     },
     {
-      customer_name: 'Jaclyn Sharma',
+      customer_name: 'Shane Nader (female)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Jaclyn She',
+      customer_name: 'Irving Auer (female)',
       num_orders: 4,
       lifetime_value: 203.92
     },
     {
-      customer_name: 'Jaclyn Shen',
+      customer_name: 'Mrs. Tracey Hettinger I (female)',
       num_orders: 2,
       lifetime_value: 51.27
     },
     {
-      customer_name: 'Jaclyn Sun',
+      customer_name: 'Loren Rodriguez (female)',
       num_orders: 2,
       lifetime_value: 48.98
     },
     {
-      customer_name: 'Jaclyn Tang',
+      customer_name: 'Bridget Pagac (female)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Jaclyn Wang',
+      customer_name: 'Miss Toni Senger (female)',
       num_orders: 1,
       lifetime_value: 96.46
     },
     {
-      customer_name: 'Jaclyn Wu',
+      customer_name: 'Dianne Gutkowski (female)',
       num_orders: 2,
       lifetime_value: 5896.19
     },
     {
-      customer_name: 'Jaclyn Xie',
+      customer_name: 'Cedric Lynch (male)',
       num_orders: 2,
       lifetime_value: 108.46
     },
     {
-      customer_name: 'Jaclyn Xu',
+      customer_name: 'Evan Kutch (male)',
       num_orders: 2,
       lifetime_value: 4820.31
     },
     {
-      customer_name: 'Jaclyn Xu',
+      customer_name: 'Dr. Orville Bauch (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Jaclyn Yang',
+      customer_name: "Brittany O'Kon (female)",
       num_orders: 1,
       lifetime_value: 85.48
     },
     {
-      customer_name: 'Jaclyn Ye',
+      customer_name: "Donald O'Reilly (female)",
       num_orders: 2,
       lifetime_value: 4803.33
     },
     {
-      customer_name: 'Jaclyn Yuan',
+      customer_name: 'Owen Mitchell (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Jaclyn Zeng',
+      customer_name: 'Tracy Mohr (female)',
       num_orders: 2,
       lifetime_value: 108.46
     },
     {
-      customer_name: 'Jaclyn Zhang',
+      customer_name: 'Constance Bartell (female)',
       num_orders: 2,
       lifetime_value: 5958.74
     },
     {
-      customer_name: 'Jaclyn Zhao',
+      customer_name: 'Beulah Lesch (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Jaclyn Zheng',
+      customer_name: 'Julian Lindgren (male)',
       num_orders: 2,
       lifetime_value: 4558.5225
     },
     {
-      customer_name: 'Jaclyn Zhou',
+      customer_name: 'Dr. Edwin Hilpert (male)',
       num_orders: 2,
       lifetime_value: 105.95
     },
     {
-      customer_name: 'Jaclyn Zhu',
+      customer_name: 'Pearl Rohan (male)',
       num_orders: 2,
       lifetime_value: 4794.31
     },
     {
-      customer_name: 'Jacob Anderson',
+      customer_name: 'Rene Green (male)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Jacob Brown',
+      customer_name: 'Jordan Baumbach (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Jacob Clark',
+      customer_name: 'Georgia Grant (female)',
       num_orders: 2,
       lifetime_value: 6060.5
     },
     {
-      customer_name: 'Jacob Davis',
+      customer_name: 'Darin Collier (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Jacob Harris',
+      customer_name: 'Clay Lakin (female)',
       num_orders: 2,
       lifetime_value: 5279.26
     },
     {
-      customer_name: 'Jacob Johnson',
+      customer_name: 'Ms. Meredith Nicolas (female)',
       num_orders: 1,
       lifetime_value: 128.97
     },
     {
-      customer_name: 'Jacob Lee',
+      customer_name: 'Pablo Dooley (female)',
       num_orders: 2,
       lifetime_value: 86.21
     },
     {
-      customer_name: 'Jacob Lewis',
+      customer_name: 'Mrs. Betsy Rau (female)',
       num_orders: 2,
       lifetime_value: 6098.54
     },
     {
-      customer_name: 'Jacob Martinez',
+      customer_name: 'Allison Grant-Reichert (male)',
       num_orders: 2,
       lifetime_value: 5314.25
     },
     {
-      customer_name: 'Jacob Miller',
+      customer_name: 'Velma Bailey (male)',
       num_orders: 2,
       lifetime_value: 124.46
     },
     {
-      customer_name: 'Jacob Robinson',
+      customer_name: 'Jesse Adams (female)',
       num_orders: 2,
       lifetime_value: 33.26
     },
     {
-      customer_name: 'Jacob Rodriguez',
+      customer_name: 'Thelma Keebler (male)',
       num_orders: 2,
       lifetime_value: 6056.51
     },
     {
-      customer_name: 'Jacob Smith',
+      customer_name: 'Micheal Hirthe (female)',
       num_orders: 1,
       lifetime_value: 128.97
     },
     {
-      customer_name: 'Jacob Taylor',
+      customer_name: 'Helen Kuhn (female)',
       num_orders: 2,
       lifetime_value: 6070.59
     },
     {
-      customer_name: 'Jacob Thomas',
+      customer_name: 'Marlon Hammes (male)',
       num_orders: 2,
       lifetime_value: 6035.6
     },
     {
-      customer_name: 'Jacob Walker',
+      customer_name: 'Bobbie Harvey (female)',
       num_orders: 2,
       lifetime_value: 24.27
     },
     {
-      customer_name: 'Jacob White',
+      customer_name: 'Mr. Rickey Nolan (male)',
       num_orders: 2,
       lifetime_value: 6149.57
     },
     {
-      customer_name: 'Jacob Williams',
+      customer_name: 'Eva Franey (female)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Jacob Wilson',
+      customer_name: 'Christie Powlowski-Larson (female)',
       num_orders: 1,
       lifetime_value: 94.48
     },
     {
-      customer_name: 'Jaime Gutierrez',
+      customer_name: 'Rene Parisian (male)',
       num_orders: 1,
       lifetime_value: 8.99
     },
     {
-      customer_name: 'Jaime Hernandez',
+      customer_name: 'Melinda Rolfson MD (male)',
       num_orders: 2,
       lifetime_value: 53.97
     },
     {
-      customer_name: 'Jaime Jimenez',
+      customer_name: 'Virgil Morissette V (male)',
       num_orders: 2,
       lifetime_value: 159.99
     },
     {
-      customer_name: 'Jaime Moreno',
+      customer_name: 'Jerald Howell-Stokes (male)',
       num_orders: 1,
       lifetime_value: 35
     },
     {
-      customer_name: 'Jake Zukowski',
+      customer_name: 'Tommie Keeling (female)',
       num_orders: 2,
       lifetime_value: 6008.2
     },
     {
-      customer_name: 'James Adams',
+      customer_name: 'Bradley Koch (male)',
       num_orders: 3,
       lifetime_value: 7182.66
     },
     {
-      customer_name: 'James Allen',
+      customer_name: 'Christie Greenfelder (female)',
       num_orders: 2,
       lifetime_value: 160.92
     },
     {
-      customer_name: 'James Anderson',
+      customer_name: 'Brandy Corkery (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'James Baker',
+      customer_name: 'Ivan Kiehn (female)',
       num_orders: 1,
       lifetime_value: 1729.97
     },
     {
-      customer_name: 'James Brown',
+      customer_name: 'Adrienne Bins (female)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'James Campbell',
+      customer_name: 'Daisy Bartell (male)',
       num_orders: 1,
       lifetime_value: 589.96
     },
     {
-      customer_name: 'James Carter',
+      customer_name: 'Lee Moen (male)',
       num_orders: 1,
       lifetime_value: 58.98
     },
     {
-      customer_name: 'James Clark',
+      customer_name: 'Patsy Mertz-Deckow (male)',
       num_orders: 2,
       lifetime_value: 3075.0325
     },
     {
-      customer_name: 'James Collins',
+      customer_name: 'Mario Streich (female)',
       num_orders: 2,
       lifetime_value: 4426.4096
     },
     {
-      customer_name: 'James Davis',
+      customer_name: 'Christian Hegmann (male)',
       num_orders: 1,
       lifetime_value: 2369.97
     },
     {
-      customer_name: 'James Edwards',
+      customer_name: 'Ms. Mattie Raynor (male)',
       num_orders: 3,
       lifetime_value: 5253.07
     },
     {
-      customer_name: 'James Evans',
+      customer_name: 'Randal Gutmann (female)',
       num_orders: 2,
       lifetime_value: 4391.4096
     },
     {
-      customer_name: 'James Garcia',
+      customer_name: 'Jay Upton (female)',
       num_orders: 2,
       lifetime_value: 2736.4175
     },
     {
-      customer_name: 'James Gonzalez',
+      customer_name: 'Melanie Rosenbaum MD (female)',
       num_orders: 3,
       lifetime_value: 95.82
     },
     {
-      customer_name: 'James Green',
+      customer_name: 'Tara Olson (female)',
       num_orders: 3,
       lifetime_value: 7159.7
     },
     {
-      customer_name: 'James Hall',
+      customer_name: 'Mr. Leo VonRueden (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'James Harris',
+      customer_name: 'Dr. Teri Pagac (male)',
       num_orders: 1,
       lifetime_value: 2357.28
     },
     {
-      customer_name: 'James Hernandez',
+      customer_name: 'Phyllis Tremblay V (female)',
       num_orders: 1,
       lifetime_value: 2414.99
     },
     {
-      customer_name: 'James Hill',
+      customer_name: 'Antonio Blick-Borer (male)',
       num_orders: 2,
       lifetime_value: 106.56
     },
     {
-      customer_name: 'James Jackson',
+      customer_name: 'Veronica Kirlin II (female)',
       num_orders: 1,
       lifetime_value: 1763.97
     },
     {
-      customer_name: 'James Johnson',
+      customer_name: 'Herbert Osinski (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'James Jones',
+      customer_name: 'Dallas Reichel (female)',
       num_orders: 1,
       lifetime_value: 1750.98
     },
     {
-      customer_name: 'James Lee',
+      customer_name: 'Kenneth Lemke (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'James Lewis',
+      customer_name: 'Cristina Cruickshank (female)',
       num_orders: 1,
       lifetime_value: 1750.98
     },
     {
-      customer_name: 'James Lopez',
+      customer_name: 'Johanna Corwin (male)',
       num_orders: 2,
       lifetime_value: 77.27
     },
     {
-      customer_name: 'James Martin',
+      customer_name: 'Cesar Cummerata (female)',
       num_orders: 2,
       lifetime_value: 3001.0425
     },
     {
-      customer_name: 'James Martinez',
+      customer_name: 'Marian Greenfelder (female)',
       num_orders: 1,
       lifetime_value: 73.96
     },
     {
-      customer_name: 'James Miller',
+      customer_name: 'Wallace Roberts (male)',
       num_orders: 1,
       lifetime_value: 54.98
     },
     {
-      customer_name: 'James Mitchell',
+      customer_name: 'Ms. Susie Crist (female)',
       num_orders: 1,
       lifetime_value: 59.91
     },
     {
-      customer_name: 'James Moore',
+      customer_name: 'Bill Kessler (male)',
       num_orders: 1,
       lifetime_value: 2318.96
     },
     {
-      customer_name: 'James Nelson',
+      customer_name: 'Mr. Corey Boyle-Fadel (female)',
       num_orders: 2,
       lifetime_value: 111.95
     },
     {
-      customer_name: 'James Parker',
+      customer_name: 'Jon Paucek (male)',
       num_orders: 1,
       lifetime_value: 31.27
     },
     {
-      customer_name: 'James Perez',
+      customer_name: 'Chris Maggio (female)',
       num_orders: 2,
       lifetime_value: 4900.68
     },
     {
-      customer_name: 'James Phillips',
+      customer_name: 'Seth Prohaska (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'James Ptaszynski',
+      customer_name: 'Owen Hahn (male)',
       num_orders: 1,
       lifetime_value: 8.99
     },
     {
-      customer_name: 'James Roberts',
+      customer_name: 'Wendy Gibson (female)',
       num_orders: 3,
       lifetime_value: 6932.9025
     },
     {
-      customer_name: 'James Robinson',
+      customer_name: 'Wanda Rogahn (male)',
       num_orders: 1,
       lifetime_value: 149.98
     },
     {
-      customer_name: 'James Rodriguez',
+      customer_name: 'Mr. Erik Schmidt (female)',
       num_orders: 2,
       lifetime_value: 3017.33
     },
     {
-      customer_name: 'James Smith',
+      customer_name: 'Lynda Toy Sr. (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'James Thomas',
+      customer_name: 'Dr. Dewey Crist (female)',
       num_orders: 1,
       lifetime_value: 1700.99
     },
     {
-      customer_name: 'James Thompson',
+      customer_name: 'Myron Lakin (male)',
       num_orders: 2,
       lifetime_value: 106.24
     },
     {
-      customer_name: 'James Turner',
+      customer_name: 'Kristopher Doyle V (female)',
       num_orders: 1,
       lifetime_value: 2518.25
     },
     {
-      customer_name: 'James Walker',
+      customer_name: 'Terrance Mayert (male)',
       num_orders: 1,
       lifetime_value: 624.95
     },
     {
-      customer_name: 'James White',
+      customer_name: 'Catherine Hodkiewicz-Boyer (female)',
       num_orders: 1,
       lifetime_value: 1732.26
     },
     {
-      customer_name: 'James Williams',
+      customer_name: 'Shannon Mertz IV (male)',
       num_orders: 2,
       lifetime_value: 164.46
     },
     {
-      customer_name: 'James Wilson',
+      customer_name: 'Yvette Medhurst (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'James Wright',
+      customer_name: 'Chad Goldner (male)',
       num_orders: 1,
       lifetime_value: 562.96
     },
     {
-      customer_name: 'James Young',
+      customer_name: 'Wendell Tillman (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Jamie Alan',
+      customer_name: 'Ricardo Bruen (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jamie Ashe',
+      customer_name: 'Rodolfo Lubowitz (female)',
       num_orders: 2,
       lifetime_value: 1588.5682
     },
     {
-      customer_name: 'Jamie Blanco',
+      customer_name: 'Greg Schroeder (male)',
       num_orders: 3,
       lifetime_value: 5216.6896
     },
     {
-      customer_name: 'Jamie Carlson',
+      customer_name: 'Luke Friesen (female)',
       num_orders: 2,
       lifetime_value: 142.47
     },
     {
-      customer_name: 'Jamie Dominguez',
+      customer_name: 'Kim Powlowski (female)',
       num_orders: 2,
       lifetime_value: 3100.5482
     },
     {
-      customer_name: 'Jamie Gutierrez',
+      customer_name: 'Rebecca Stracke (female)',
       num_orders: 2,
       lifetime_value: 1588.5682
     },
     {
-      customer_name: 'Jamie Hernandez',
+      customer_name: 'Hope Morar (male)',
       num_orders: 2,
       lifetime_value: 1613.0582
     },
     {
-      customer_name: 'Jamie Jimenez',
+      customer_name: 'Judy Champlin (female)',
       num_orders: 2,
       lifetime_value: 1538.5582
     },
     {
-      customer_name: 'Jamie Moreno',
+      customer_name: 'Jeanne Howell (male)',
       num_orders: 2,
       lifetime_value: 3024.0182
     },
     {
-      customer_name: 'Jamie Muñoz',
+      customer_name: 'Mrs. Jodi Kessler (male)',
       num_orders: 2,
       lifetime_value: 1538.5782
     },
     {
-      customer_name: 'Jamie Ortega',
+      customer_name: 'Colleen Schmitt (female)',
       num_orders: 3,
       lifetime_value: 93.54
     },
     {
-      customer_name: 'Jamie Ramos',
+      customer_name: 'Ricky Runolfsson (male)',
       num_orders: 3,
       lifetime_value: 5237.7196
     },
     {
-      customer_name: 'Jamie Rubio',
+      customer_name: 'Earnest Metz (male)',
       num_orders: 3,
       lifetime_value: 98.95
     },
     {
-      customer_name: 'Jamie Sanz',
+      customer_name: 'Angelo Jerde (male)',
       num_orders: 3,
       lifetime_value: 5178.3982
     },
     {
-      customer_name: 'Jamie Serrano',
+      customer_name: 'Kimberly Kohler (female)',
       num_orders: 2,
       lifetime_value: 2934.3696
     },
     {
-      customer_name: 'Jamie Suarez',
+      customer_name: 'Miss Angela Haley Sr. (female)',
       num_orders: 2,
       lifetime_value: 81.26
     },
     {
-      customer_name: 'Jamie Torres',
+      customer_name: 'Darla Hahn (male)',
       num_orders: 3,
       lifetime_value: 195.02
     },
     {
-      customer_name: 'Jamie Vazquez',
+      customer_name: 'Stephanie Hudson (female)',
       num_orders: 3,
       lifetime_value: 5199.9182
     },
     {
-      customer_name: 'Janelle Arthur',
+      customer_name: 'Ira Stamm-Brown (male)',
       num_orders: 1,
       lifetime_value: 1760.47
     },
     {
-      customer_name: 'Janelle Chandra',
+      customer_name: 'Kari Rice (male)',
       num_orders: 2,
       lifetime_value: 6035.6
     },
     {
-      customer_name: 'Janelle Fernandez',
+      customer_name: 'Lillian Collins-Batz (female)',
       num_orders: 1,
       lifetime_value: 1760.47
     },
     {
-      customer_name: 'Janelle Garcia',
+      customer_name: 'Milton Feil (male)',
       num_orders: 2,
       lifetime_value: 6030.61
     },
     {
-      customer_name: 'Janelle Gonzalez',
+      customer_name: 'Dr. Salvador Harris (female)',
       num_orders: 1,
       lifetime_value: 1754.98
     },
     {
-      customer_name: 'Janelle Kapoor',
+      customer_name: 'Colin Schowalter (female)',
       num_orders: 2,
       lifetime_value: 3332.3875
     },
     {
-      customer_name: 'Janelle Lopez',
+      customer_name: 'Julia Botsford DVM (male)',
       num_orders: 1,
       lifetime_value: 2379.95
     },
     {
-      customer_name: 'Janelle Madan',
+      customer_name: 'Christian Torp II (male)',
       num_orders: 2,
       lifetime_value: 6145.07
     },
     {
-      customer_name: 'Janelle Malhotra',
+      customer_name: 'Kelli Franey (female)',
       num_orders: 2,
       lifetime_value: 126.94
     },
     {
-      customer_name: 'Janelle Martinez',
+      customer_name: 'Isabel Mueller (female)',
       num_orders: 1,
       lifetime_value: 2345.22
     },
     {
-      customer_name: 'Janelle Patel',
+      customer_name: 'Connie Hayes (female)',
       num_orders: 1,
       lifetime_value: 1709.98
     },
     {
-      customer_name: 'Janelle Perez',
+      customer_name: 'Ms. Lena Predovic (male)',
       num_orders: 1,
       lifetime_value: 1785.97
     },
     {
-      customer_name: 'Janelle Prasad',
+      customer_name: 'Monica Ruecker (male)',
       num_orders: 1,
       lifetime_value: 1725.98
     },
     {
-      customer_name: 'Janelle Raman',
+      customer_name: 'Alvin Russel III (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Janelle Rodriguez',
+      customer_name: 'Beulah Howe (female)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Janelle Sai',
+      customer_name: 'Maggie Kessler (male)',
       num_orders: 2,
       lifetime_value: 6106.6
     },
     {
-      customer_name: 'Janelle Sanchez',
+      customer_name: 'Dan Dach-Hilll (female)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Janelle Subram',
+      customer_name: 'Kyle Prosacco I (female)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Janelle Suri',
+      customer_name: 'Celia Robel (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Janice Bennett',
+      customer_name: 'Tracy Hamill (male)',
       num_orders: 2,
       lifetime_value: 5980.22
     },
     {
-      customer_name: 'Jared Bailey',
+      customer_name: 'Tracey Schoen (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Jared Bell',
+      customer_name: 'Hugh Halvorson (female)',
       num_orders: 2,
       lifetime_value: 2853.5682
     },
     {
-      customer_name: 'Jared Brooks',
+      customer_name: 'Leon Rosenbaum (male)',
       num_orders: 2,
       lifetime_value: 4397.75
     },
     {
-      customer_name: 'Jared Cook',
+      customer_name: 'Dawn Bernier (male)',
       num_orders: 1,
       lifetime_value: 124.99
     },
     {
-      customer_name: 'Jared Cox',
+      customer_name: 'Jesus Herzog (female)',
       num_orders: 2,
       lifetime_value: 4397.75
     },
     {
-      customer_name: 'Jared Gray',
+      customer_name: 'Miss Cindy Tremblay (male)',
       num_orders: 2,
       lifetime_value: 3394.3875
     },
     {
-      customer_name: 'Jared Howard',
+      customer_name: 'Kim Windler-Mueller (male)',
       num_orders: 2,
       lifetime_value: 5976.74
     },
     {
-      customer_name: 'Jared James',
+      customer_name: 'Brooke Veum IV (female)',
       num_orders: 2,
       lifetime_value: 62.27
     },
     {
-      customer_name: 'Jared Kelly',
+      customer_name: 'Hubert Lockman (female)',
       num_orders: 2,
       lifetime_value: 168.93
     },
     {
-      customer_name: 'Jared Morgan',
+      customer_name: 'Ana Dicki DDS (female)',
       num_orders: 1,
       lifetime_value: 29.48
     },
     {
-      customer_name: 'Jared Morris',
+      customer_name: 'Jesse Romaguera (male)',
       num_orders: 1,
       lifetime_value: 804.47
     },
     {
-      customer_name: 'Jared Moyer',
+      customer_name: 'Miss Robyn Ratke (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Jared Peterson',
+      customer_name: 'Victoria Medhurst (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Jared Ramirez',
+      customer_name: 'Jacob Koepp (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jared Reed',
+      customer_name: 'Carolyn Welch (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jared Richardson',
+      customer_name: 'Miss Willie Kulas IV (male)',
       num_orders: 3,
       lifetime_value: 120.41
     },
     {
-      customer_name: 'Jared Rivera',
+      customer_name: 'Edna Adams (female)',
       num_orders: 2,
       lifetime_value: 4399.0782
     },
     {
-      customer_name: 'Jared Rogers',
+      customer_name: 'Jan Kuhn (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jared Sanchez',
+      customer_name: 'Mr. Rickey Williamson-Stiedemann (female)',
       num_orders: 2,
       lifetime_value: 2935.3696
     },
     {
-      customer_name: 'Jared Sanders',
+      customer_name: 'Desiree Boyer (male)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Jared Stewart',
+      customer_name: 'Armando Watsica (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jared Torres',
+      customer_name: 'Traci Lemke (female)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Jared Ward',
+      customer_name: 'Robert Effertz (female)',
       num_orders: 3,
       lifetime_value: 258.44
     },
     {
-      customer_name: 'Jared Watson',
+      customer_name: 'Beatrice Becker (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Jarred Gill',
+      customer_name: 'Katrina Lehner (male)',
       num_orders: 2,
       lifetime_value: 64.9
     },
     {
-      customer_name: 'Jasmine Alexander',
+      customer_name: 'Tom Kilback (female)',
       num_orders: 2,
       lifetime_value: 4544.45
     },
     {
-      customer_name: 'Jasmine Anderson',
+      customer_name: 'James Morissette (male)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Jasmine Bailey',
+      customer_name: 'Grant Hintz (female)',
       num_orders: 1,
       lifetime_value: 574.98
     },
     {
-      customer_name: 'Jasmine Barnes',
+      customer_name: 'Randall Grady (male)',
       num_orders: 2,
       lifetime_value: 5807.93
     },
     {
-      customer_name: 'Jasmine Bell',
+      customer_name: 'Kristine Nikolaus III (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Jasmine Brooks',
+      customer_name: 'Hannah Cruickshank (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Jasmine Brown',
+      customer_name: 'Rosemary Jacobs (female)',
       num_orders: 3,
       lifetime_value: 6986.75
     },
     {
-      customer_name: 'Jasmine Bryant',
+      customer_name: 'Elias Trantow (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jasmine Butler',
+      customer_name: 'Terence Jones (female)',
       num_orders: 1,
       lifetime_value: 1155.48
     },
     {
-      customer_name: 'Jasmine Clark',
+      customer_name: 'Eugene Ernser (male)',
       num_orders: 7,
       lifetime_value: 11248.4582
     },
     {
-      customer_name: 'Jasmine Coleman',
+      customer_name: 'Carolyn Hudson (male)',
       num_orders: 1,
       lifetime_value: 123.98
     },
     {
-      customer_name: 'Jasmine Cook',
+      customer_name: 'Marion Larson (female)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Jasmine Cox',
+      customer_name: 'Eula Labadie DDS (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Jasmine Davis',
+      customer_name: 'Darin Sporer (male)',
       num_orders: 1,
       lifetime_value: 68.97
     },
     {
-      customer_name: 'Jasmine Diaz',
+      customer_name: 'Jake Langworth (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Jasmine Flores',
+      customer_name: 'Damon Lakin (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Jasmine Foster',
+      customer_name: 'Colin Pacocha (female)',
       num_orders: 1,
       lifetime_value: 608.96
     },
     {
-      customer_name: 'Jasmine Garcia',
+      customer_name: 'Jeanette Schumm IV (female)',
       num_orders: 2,
       lifetime_value: 4464.0682
     },
     {
-      customer_name: 'Jasmine Gonzales',
+      customer_name: 'Wilbur Bayer (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Jasmine Gray',
+      customer_name: 'Caleb Cummerata (male)',
       num_orders: 1,
       lifetime_value: 46.47
     },
     {
-      customer_name: 'Jasmine Griffin',
+      customer_name: 'Debra Feeney (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Jasmine Hall',
+      customer_name: 'Joe Bayer (male)',
       num_orders: 4,
       lifetime_value: 9917.99
     },
     {
-      customer_name: 'Jasmine Harris',
+      customer_name: 'Deanna West (female)',
       num_orders: 2,
       lifetime_value: 4415.0382
     },
     {
-      customer_name: 'Jasmine Henderson',
+      customer_name: 'Van Leffler (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Jasmine Hughes',
+      customer_name: 'Angelica Beahan (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Jasmine Jackson',
+      customer_name: 'Jay Prohaska (male)',
       num_orders: 3,
       lifetime_value: 5020.8696
     },
     {
-      customer_name: 'Jasmine James',
+      customer_name: 'Shari Hoeger-Rowe (female)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Jasmine Jenkins',
+      customer_name: 'Johnnie Harris (male)',
       num_orders: 1,
       lifetime_value: 1147.77
     },
     {
-      customer_name: 'Jasmine Johnson',
+      customer_name: 'Troy Satterfield (male)',
       num_orders: 1,
       lifetime_value: 48.97
     },
     {
-      customer_name: 'Jasmine Jones',
+      customer_name: 'Leslie Nitzsche-Feeney PhD (male)',
       num_orders: 3,
       lifetime_value: 6958.8
     },
     {
-      customer_name: 'Jasmine Kelly',
+      customer_name: 'Glenda Emard (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Jasmine Lee',
+      customer_name: 'Sherri Gerhold-Nolan (female)',
       num_orders: 6,
       lifetime_value: 10528.6282
     },
     {
-      customer_name: 'Jasmine Lewis',
+      customer_name: 'Lynn Zboncak I (male)',
       num_orders: 4,
       lifetime_value: 9904.97
     },
     {
-      customer_name: 'Jasmine Long',
+      customer_name: 'Grady West (female)',
       num_orders: 1,
       lifetime_value: 144.47
     },
     {
-      customer_name: 'Jasmine Peterson',
+      customer_name: 'Nadine Prosacco PhD (female)',
       num_orders: 1,
       lifetime_value: 564.99
     },
     {
-      customer_name: 'Jasmine Powell',
+      customer_name: 'Rachael Stroman (male)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Jasmine Price',
+      customer_name: 'Micheal Cummings (male)',
       num_orders: 1,
       lifetime_value: 604.96
     },
     {
-      customer_name: 'Jasmine Ramirez',
+      customer_name: 'Kay Strosin (female)',
       num_orders: 1,
       lifetime_value: 629.45
     },
     {
-      customer_name: 'Jasmine Reed',
+      customer_name: 'Hubert Hansen (male)',
       num_orders: 2,
       lifetime_value: 98.94
     },
     {
-      customer_name: 'Jasmine Richardson',
+      customer_name: 'Guadalupe Kemmer (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Jasmine Rivera',
+      customer_name: 'Kristin Leuschke (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Jasmine Robinson',
+      customer_name: 'Bessie Wolf (male)',
       num_orders: 4,
       lifetime_value: 7191.77
     },
     {
-      customer_name: 'Jasmine Rodriguez',
+      customer_name: 'Sally Lakin (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Jasmine Rogers',
+      customer_name: 'Ebony Shanahan (female)',
       num_orders: 2,
       lifetime_value: 6098.58
     },
     {
-      customer_name: 'Jasmine Ross',
+      customer_name: 'Tim MacGyver (female)',
       num_orders: 1,
       lifetime_value: 639.95
     },
     {
-      customer_name: 'Jasmine Russell',
+      customer_name: 'Matthew Rosenbaum (male)',
       num_orders: 1,
       lifetime_value: 1199.46
     },
     {
-      customer_name: 'Jasmine Sanders',
+      customer_name: 'Gertrude Marks (male)',
       num_orders: 1,
       lifetime_value: 589.98
     },
     {
-      customer_name: 'Jasmine Simmons',
+      customer_name: 'Richard Strosin (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Jasmine Smith',
+      customer_name: 'Lowell Hyatt (female)',
       num_orders: 1,
       lifetime_value: 48.97
     },
     {
-      customer_name: 'Jasmine Stewart',
+      customer_name: 'Angel VonRueden (male)',
       num_orders: 2,
       lifetime_value: 6058.21
     },
     {
-      customer_name: 'Jasmine Taylor',
+      customer_name: 'Mr. Alonzo Balistreri III (male)',
       num_orders: 2,
       lifetime_value: 5729.97
     },
     {
-      customer_name: 'Jasmine Thomas',
+      customer_name: 'Holly Mayert (female)',
       num_orders: 3,
       lifetime_value: 6967.78
     },
     {
-      customer_name: 'Jasmine Thompson',
+      customer_name: 'Linda West Sr. (male)',
       num_orders: 2,
       lifetime_value: 4444.0682
     },
     {
-      customer_name: 'Jasmine Torres',
+      customer_name: 'Cynthia Wisoky (male)',
       num_orders: 1,
       lifetime_value: 1155.48
     },
     {
-      customer_name: 'Jasmine Walker',
+      customer_name: 'Kim Miller (male)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Jasmine Ward',
+      customer_name: 'Isaac Schamberger (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Jasmine Washington',
+      customer_name: 'Josefina Douglas (male)',
       num_orders: 2,
       lifetime_value: 98.48
     },
     {
-      customer_name: 'Jasmine West',
+      customer_name: 'Lamar Flatley (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Jasmine White',
+      customer_name: 'Gilberto Maggio (male)',
       num_orders: 3,
       lifetime_value: 5059.3296
     },
     {
-      customer_name: 'Jasmine Williams',
+      customer_name: 'Jaime Gutmann (female)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Jasmine Wilson',
+      customer_name: 'Gabriel Koepp (female)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Jasmine Wood',
+      customer_name: 'Calvin Dooley (male)',
       num_orders: 1,
       lifetime_value: 604.46
     },
     {
-      customer_name: 'Jason Adams',
+      customer_name: 'Dr. Melinda Koch (male)',
       num_orders: 1,
       lifetime_value: 2380.47
     },
     {
-      customer_name: 'Jason Allen',
+      customer_name: 'Amos Witting (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Jason Campbell',
+      customer_name: 'Nora Koelpin (female)',
       num_orders: 2,
       lifetime_value: 81.81
     },
     {
-      customer_name: 'Jason Carter',
+      customer_name: 'Ramiro Mayert (male)',
       num_orders: 2,
       lifetime_value: 3001.0425
     },
     {
-      customer_name: 'Jason Collins',
+      customer_name: 'Leticia Pacocha (male)',
       num_orders: 1,
       lifetime_value: 89.97
     },
     {
-      customer_name: 'Jason Edwards',
+      customer_name: 'Regina Haley (female)',
       num_orders: 2,
       lifetime_value: 76.57
     },
     {
-      customer_name: 'Jason Evans',
+      customer_name: 'Erika Boyer (female)',
       num_orders: 2,
       lifetime_value: 5977.74
     },
     {
-      customer_name: 'Jason Gonzalez',
+      customer_name: 'Amelia Harber III (male)',
       num_orders: 2,
       lifetime_value: 3037.33
     },
     {
-      customer_name: 'Jason Green',
+      customer_name: 'Terence Durgan (female)',
       num_orders: 2,
       lifetime_value: 81.26
     },
     {
-      customer_name: 'Jason Hall',
+      customer_name: 'Patricia Jacobi (male)',
       num_orders: 2,
       lifetime_value: 119.91
     },
     {
-      customer_name: 'Jason Hill',
+      customer_name: 'Saul Okuneva (female)',
       num_orders: 1,
       lifetime_value: 54.98
     },
     {
-      customer_name: 'Jason King',
+      customer_name: 'Garrett West (female)',
       num_orders: 2,
       lifetime_value: 163.94
     },
     {
-      customer_name: 'Jason Lopez',
+      customer_name: 'Carol Casper (male)',
       num_orders: 2,
       lifetime_value: 4442.24
     },
     {
-      customer_name: 'Jason Mitchell',
+      customer_name: 'Pedro Kulas (female)',
       num_orders: 1,
       lifetime_value: 588.96
     },
     {
-      customer_name: 'Jason Nelson',
+      customer_name: 'Roosevelt Hintz (female)',
       num_orders: 2,
       lifetime_value: 169.43
     },
     {
-      customer_name: 'Jason Parker',
+      customer_name: 'Terence Marquardt (male)',
       num_orders: 2,
       lifetime_value: 1337.96
     },
     {
-      customer_name: 'Jason Perez',
+      customer_name: 'Emanuel Gottlieb V (female)',
       num_orders: 3,
       lifetime_value: 225.92
     },
     {
-      customer_name: 'Jason Phillips',
+      customer_name: 'Alison Lowe (male)',
       num_orders: 1,
       lifetime_value: 567.27
     },
     {
-      customer_name: 'Jason Roberts',
+      customer_name: 'Sandra Schmitt (male)',
       num_orders: 2,
       lifetime_value: 3127.25
     },
     {
-      customer_name: 'Jason Scott',
+      customer_name: 'Miss Candace Hegmann (male)',
       num_orders: 1,
       lifetime_value: 24.99
     },
     {
-      customer_name: 'Jason Wright',
+      customer_name: 'Judith Huels (female)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Jason Young',
+      customer_name: 'Bert Nikolaus (female)',
       num_orders: 1,
       lifetime_value: 1714.97
     },
     {
-      customer_name: 'Javier Alvarez',
+      customer_name: 'Sidney Boyle IV (female)',
       num_orders: 3,
       lifetime_value: 99.2
     },
     {
-      customer_name: 'Javier Browning',
+      customer_name: 'Miranda Koch V (female)',
       num_orders: 3,
       lifetime_value: 6765.4382
     },
     {
-      customer_name: 'Javier Dominguez',
+      customer_name: 'Johnny Littel (female)',
       num_orders: 2,
       lifetime_value: 144.74
     },
     {
-      customer_name: 'Javier Gill',
+      customer_name: 'Fredrick Little (female)',
       num_orders: 2,
       lifetime_value: 79.97
     },
     {
-      customer_name: 'Javier Gutierrez',
+      customer_name: 'Ms. Vickie Roberts-Schuster (female)',
       num_orders: 3,
       lifetime_value: 215.74
     },
     {
-      customer_name: 'Javier Hernandez',
+      customer_name: 'Elsie Willms (female)',
       num_orders: 3,
       lifetime_value: 6841.4296
     },
     {
-      customer_name: 'Javier Jiménez',
+      customer_name: 'Gretchen Schmidt (male)',
       num_orders: 3,
       lifetime_value: 118.96
     },
     {
-      customer_name: 'Javier Muñoz',
+      customer_name: 'Ms. Silvia Beer (female)',
       num_orders: 3,
       lifetime_value: 6889.1082
     },
     {
-      customer_name: 'Javier Navarro',
+      customer_name: 'Charlie Spinka (female)',
       num_orders: 3,
       lifetime_value: 234.93
     },
     {
-      customer_name: 'Javier Ortega',
+      customer_name: 'Janie Oberbrunner (female)',
       num_orders: 2,
       lifetime_value: 210.25
     },
     {
-      customer_name: 'Javier Ramos',
+      customer_name: 'Dr. Tomas Schaden (female)',
       num_orders: 1,
       lifetime_value: 56.97
     },
     {
-      customer_name: 'Javier Rubio',
+      customer_name: 'Becky Davis Sr. (male)',
       num_orders: 2,
       lifetime_value: 3021.0425
     },
     {
-      customer_name: 'Javier Sanz',
+      customer_name: 'Alfred Breitenberg-Conroy I (male)',
       num_orders: 1,
       lifetime_value: 65.96
     },
     {
-      customer_name: 'Javier Serrano',
+      customer_name: 'Sheila Frami (male)',
       num_orders: 3,
       lifetime_value: 6768.1382
     },
     {
-      customer_name: 'Javier Torres',
+      customer_name: 'Ernesto Cruickshank (male)',
       num_orders: 3,
       lifetime_value: 188.96
     },
     {
-      customer_name: 'Javier Vazquez',
+      customer_name: 'Mr. Don Hirthe (female)',
       num_orders: 3,
       lifetime_value: 6817.1182
     },
     {
-      customer_name: 'Jeffery Cai',
+      customer_name: 'Gerardo Wisoky (male)',
       num_orders: 1,
       lifetime_value: 2394.97
     },
     {
-      customer_name: 'Jeffery Chen',
+      customer_name: 'Jeanne Koepp (female)',
       num_orders: 1,
       lifetime_value: 24.99
     },
     {
-      customer_name: 'Jeffery Guo',
+      customer_name: 'Carlos Balistreri (female)',
       num_orders: 2,
       lifetime_value: 155.47
     },
     {
-      customer_name: 'Jeffery He',
+      customer_name: 'Kenneth Krajcik (female)',
       num_orders: 1,
       lifetime_value: 2439.99
     },
     {
-      customer_name: 'Jeffery Hu',
+      customer_name: 'Kent Jerde I (male)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Jeffery Huang',
+      customer_name: 'Leroy Cremin (male)',
       num_orders: 2,
       lifetime_value: 3941.5325
     },
     {
-      customer_name: 'Jeffery Li',
+      customer_name: "Frederick O'Conner (female)",
       num_orders: 2,
       lifetime_value: 2435.0782
     },
     {
-      customer_name: 'Jeffery Liang',
+      customer_name: 'Jan Romaguera-Johnson (male)',
       num_orders: 1,
       lifetime_value: 54.98
     },
     {
-      customer_name: 'Jeffery Lin',
+      customer_name: 'Leo Rippin (male)',
       num_orders: 1,
       lifetime_value: 64.97
     },
     {
-      customer_name: 'Jeffery Liu',
+      customer_name: 'Edwin Ledner (female)',
       num_orders: 1,
       lifetime_value: 29.98
     },
     {
-      customer_name: 'Jeffery Lu',
+      customer_name: 'Anita Mills (female)',
       num_orders: 1,
       lifetime_value: 1725.98
     },
     {
-      customer_name: 'Jeffery Ma',
+      customer_name: 'Antonio Schaden I (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Jeffery She',
+      customer_name: 'Kelly Lynch (male)',
       num_orders: 1,
       lifetime_value: 1700.99
     },
     {
-      customer_name: 'Jeffery Sun',
+      customer_name: 'Lola Crona (male)',
       num_orders: 1,
       lifetime_value: 1700.99
     },
     {
-      customer_name: 'Jeffery Wang',
+      customer_name: 'Ervin Bogan (female)',
       num_orders: 1,
       lifetime_value: 63.97
     },
     {
-      customer_name: 'Jeffery Wu',
+      customer_name: 'Ana Wiegand (male)',
       num_orders: 2,
       lifetime_value: 2435.0782
     },
     {
-      customer_name: 'Jeffery Yang',
+      customer_name: 'Shelia Ward III (male)',
       num_orders: 1,
       lifetime_value: 34.98
     },
     {
-      customer_name: 'Jeffery Ye',
+      customer_name: 'Marlon Turcotte (male)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Jeffery Zeng',
+      customer_name: 'Daniel Bauch (male)',
       num_orders: 2,
       lifetime_value: 200.94
     },
     {
-      customer_name: 'Jeffery Zhang',
+      customer_name: 'Nina Wilderman (male)',
       num_orders: 1,
       lifetime_value: 144.45
     },
     {
-      customer_name: 'Jeffery Zhao',
+      customer_name: 'Brandy Green (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jeffery Zheng',
+      customer_name: 'Herman Littel (male)',
       num_orders: 1,
       lifetime_value: 68.49
     },
     {
-      customer_name: 'Jeffery Zhou',
+      customer_name: 'Ms. Ora Simonis (male)',
       num_orders: 1,
       lifetime_value: 1750.98
     },
     {
-      customer_name: 'Jeffery Zhu',
+      customer_name: 'Ian Lubowitz (female)',
       num_orders: 1,
       lifetime_value: 1714.97
     },
     {
-      customer_name: 'Jenna Young',
+      customer_name: 'Mr. Eric Hodkiewicz PhD (female)',
       num_orders: 3,
       lifetime_value: 8139.29
     },
     {
-      customer_name: 'Jennifer Alexander',
+      customer_name: 'Iris Morar (female)',
       num_orders: 1,
       lifetime_value: 68.97
     },
     {
-      customer_name: 'Jennifer Anderson',
+      customer_name: 'Lynn Hills (female)',
       num_orders: 3,
       lifetime_value: 8180
     },
     {
-      customer_name: 'Jennifer Bailey',
+      customer_name: 'Elvira Bartoletti V (male)',
       num_orders: 1,
       lifetime_value: 23.78
     },
     {
-      customer_name: 'Jennifer Barnes',
+      customer_name: 'Clark Goodwin (female)',
       num_orders: 1,
       lifetime_value: 64.98
     },
     {
-      customer_name: 'Jennifer Bell',
+      customer_name: 'Arlene DuBuque (female)',
       num_orders: 1,
       lifetime_value: 9.99
     },
     {
-      customer_name: 'Jennifer Bennett',
+      customer_name: 'Katrina Oberbrunner IV (female)',
       num_orders: 1,
       lifetime_value: 23.97
     },
     {
-      customer_name: 'Jennifer Brooks',
+      customer_name: 'Miranda Johns-Pollich (male)',
       num_orders: 2,
       lifetime_value: 4400.0582
     },
     {
-      customer_name: 'Jennifer Brown',
+      customer_name: 'Wendell Flatley (female)',
       num_orders: 2,
       lifetime_value: 128.96
     },
     {
-      customer_name: 'Jennifer Bryant',
+      customer_name: 'Sandra Walter (female)',
       num_orders: 1,
       lifetime_value: 23.97
     },
     {
-      customer_name: 'Jennifer Butler',
+      customer_name: 'Alejandro Kulas (female)',
       num_orders: 1,
       lifetime_value: 103.96
     },
     {
-      customer_name: 'Jennifer Clark',
+      customer_name: 'Tanya Greenholt V (male)',
       num_orders: 3,
       lifetime_value: 8095.99
     },
     {
-      customer_name: 'Jennifer Coleman',
+      customer_name: 'Wade Koch (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Jennifer Cook',
+      customer_name: 'Cecelia Gottlieb (female)',
       num_orders: 2,
       lifetime_value: 6029.57
     },
     {
-      customer_name: 'Jennifer Cooper',
+      customer_name: 'Clark Huels (male)',
       num_orders: 1,
       lifetime_value: 73.96
     },
     {
-      customer_name: 'Jennifer Cox',
+      customer_name: 'Joey Goldner I (male)',
       num_orders: 1,
       lifetime_value: 1147.77
     },
     {
-      customer_name: 'Jennifer Davis',
+      customer_name: 'Timmy Gusikowski (female)',
       num_orders: 2,
       lifetime_value: 200.28
     },
     {
-      customer_name: 'Jennifer Diaz',
+      customer_name: 'Arthur Mann-Schimmel (female)',
       num_orders: 1,
       lifetime_value: 2492.32
     },
     {
-      customer_name: 'Jennifer Foster',
+      customer_name: 'Marty Doyle-Dickinson V (male)',
       num_orders: 1,
       lifetime_value: 31.92
     },
     {
-      customer_name: 'Jennifer Garcia',
+      customer_name: 'Thomas Wunsch (male)',
       num_orders: 3,
       lifetime_value: 102.91
     },
     {
-      customer_name: 'Jennifer Gonzales',
+      customer_name: 'Shelley Mueller (female)',
       num_orders: 1,
       lifetime_value: 14.98
     },
     {
-      customer_name: 'Jennifer Griffin',
+      customer_name: 'Kellie Goodwin DVM (female)',
       num_orders: 1,
       lifetime_value: 1174.48
     },
     {
-      customer_name: 'Jennifer Hall',
+      customer_name: 'Jim Balistreri (male)',
       num_orders: 3,
       lifetime_value: 122.89
     },
     {
-      customer_name: 'Jennifer Harris',
+      customer_name: 'Tammy Sauer V (female)',
       num_orders: 3,
       lifetime_value: 8215.99
     },
     {
-      customer_name: 'Jennifer Howard',
+      customer_name: 'Ms. Melba Mayer (male)',
       num_orders: 1,
       lifetime_value: 17.27
     },
     {
-      customer_name: 'Jennifer Hughes',
+      customer_name: 'Duane Larson (female)',
       num_orders: 1,
       lifetime_value: 25.22
     },
     {
-      customer_name: 'Jennifer Jackson',
+      customer_name: 'Elsie Paucek III (male)',
       num_orders: 3,
       lifetime_value: 8063.04
     },
     {
-      customer_name: 'Jennifer James',
+      customer_name: 'Mr. Gustavo Hettinger (female)',
       num_orders: 1,
       lifetime_value: 2521.31
     },
     {
-      customer_name: 'Jennifer Jenkins',
+      customer_name: 'Dr. Tyler Jacobi (male)',
       num_orders: 1,
       lifetime_value: 9.99
     },
     {
-      customer_name: 'Jennifer Johnson',
+      customer_name: 'Amy Kuhlman (female)',
       num_orders: 3,
       lifetime_value: 57.95
     },
     {
-      customer_name: 'Jennifer Jones',
+      customer_name: 'Cathy Marks (female)',
       num_orders: 2,
       lifetime_value: 3137.32
     },
     {
-      customer_name: 'Jennifer Kelly',
+      customer_name: 'Doreen Farrell (female)',
       num_orders: 1,
       lifetime_value: 1151.76
     },
     {
-      customer_name: 'Jennifer Lee',
+      customer_name: 'Raquel Pfannerstill (female)',
       num_orders: 3,
       lifetime_value: 8093.03
     },
     {
-      customer_name: 'Jennifer Lewis',
+      customer_name: 'Woodrow Gibson (female)',
       num_orders: 3,
       lifetime_value: 8124.04
     },
     {
-      customer_name: 'Jennifer Long',
+      customer_name: 'Dan Larson (male)',
       num_orders: 1,
       lifetime_value: 74.46
     },
     {
-      customer_name: 'Jennifer Miller',
+      customer_name: 'Dr. Ian Breitenberg (male)',
       num_orders: 2,
       lifetime_value: 3176.78
     },
     {
-      customer_name: 'Jennifer Moore',
+      customer_name: 'Wayne Graham (female)',
       num_orders: 3,
       lifetime_value: 6704.08
     },
     {
-      customer_name: 'Jennifer Morgan',
+      customer_name: 'Natalie Sauer (female)',
       num_orders: 2,
       lifetime_value: 6044.59
     },
     {
-      customer_name: 'Jennifer Morris',
+      customer_name: 'Jan Harvey (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Jennifer Murphy',
+      customer_name: "Melba D'Amore IV (male)",
       num_orders: 1,
       lifetime_value: 21.49
     },
     {
-      customer_name: 'Jennifer Patterson',
+      customer_name: 'Rebecca Fisher (male)',
       num_orders: 1,
       lifetime_value: 54.96
     },
     {
-      customer_name: 'Jennifer Perry',
+      customer_name: 'Terri Frami (male)',
       num_orders: 1,
       lifetime_value: 72.93
     },
     {
-      customer_name: 'Jennifer Peterson',
+      customer_name: 'Mr. Ismael Ratke (female)',
       num_orders: 1,
       lifetime_value: 14.98
     },
     {
-      customer_name: 'Jennifer Price',
+      customer_name: 'Lorena Fadel (male)',
       num_orders: 1,
       lifetime_value: 9.99
     },
     {
-      customer_name: 'Jennifer Ramirez',
+      customer_name: 'Glenn Nikolaus (female)',
       num_orders: 1,
       lifetime_value: 14.98
     },
     {
-      customer_name: 'Jennifer Reed',
+      customer_name: 'Tricia Bruen (female)',
       num_orders: 2,
       lifetime_value: 6078.71
     },
     {
-      customer_name: 'Jennifer Rivera',
+      customer_name: 'Kayla Haag (male)',
       num_orders: 2,
       lifetime_value: 6029.57
     },
     {
-      customer_name: 'Jennifer Robinson',
+      customer_name: 'Wilbur Bernhard (male)',
       num_orders: 3,
       lifetime_value: 8173.03
     },
     {
-      customer_name: 'Jennifer Rodriguez',
+      customer_name: 'Lois Quitzon (male)',
       num_orders: 3,
       lifetime_value: 8079.05
     },
     {
-      customer_name: 'Jennifer Rogers',
+      customer_name: 'Sylvester Ziemann (male)',
       num_orders: 1,
       lifetime_value: 2482.23
     },
     {
-      customer_name: 'Jennifer Ross',
+      customer_name: 'Dean Schmeler (male)',
       num_orders: 1,
       lifetime_value: 119.96
     },
     {
-      customer_name: 'Jennifer Russell',
+      customer_name: 'Russell Senger (female)',
       num_orders: 1,
       lifetime_value: 14.98
     },
     {
-      customer_name: 'Jennifer Sanchez',
+      customer_name: 'Karen Reynolds (male)',
       num_orders: 1,
       lifetime_value: 9.99
     },
     {
-      customer_name: 'Jennifer Sanders',
+      customer_name: 'Gerald Smith (female)',
       num_orders: 1,
       lifetime_value: 49.97
     },
     {
-      customer_name: 'Jennifer Simmons',
+      customer_name: 'Verna Sporer (male)',
       num_orders: 1,
       lifetime_value: 93.46
     },
     {
-      customer_name: 'Jennifer Smith',
+      customer_name: 'Allen Senger DDS (male)',
       num_orders: 3,
       lifetime_value: 8169.03
     },
     {
-      customer_name: 'Jennifer Stewart',
+      customer_name: 'Elsa Pouros (female)',
       num_orders: 1,
       lifetime_value: 69.97
     },
     {
-      customer_name: 'Jennifer Taylor',
+      customer_name: 'Mr. Louis Kuhic (male)',
       num_orders: 28,
       lifetime_value: 1189.33
     },
     {
-      customer_name: 'Jennifer Thomas',
+      customer_name: 'Essie Walter (female)',
       num_orders: 3,
       lifetime_value: 235.89
     },
     {
-      customer_name: 'Jennifer Thompson',
+      customer_name: 'Jacob Bednar (female)',
       num_orders: 3,
       lifetime_value: 8262.52
     },
     {
-      customer_name: 'Jennifer Torres',
+      customer_name: 'Juanita Gottlieb (male)',
       num_orders: 1,
       lifetime_value: 73.97
     },
     {
-      customer_name: 'Jennifer Walker',
+      customer_name: 'Mr. Elias Huels (female)',
       num_orders: 3,
       lifetime_value: 8137
     },
     {
-      customer_name: 'Jennifer Ward',
+      customer_name: "Ms. Anita D'Amore (female)",
       num_orders: 2,
       lifetime_value: 3169.5882
     },
     {
-      customer_name: 'Jennifer Washington',
+      customer_name: 'Morris Jerde (male)',
       num_orders: 1,
       lifetime_value: 14.98
     },
     {
-      customer_name: 'Jennifer Watson',
+      customer_name: 'Wilbur Casper (female)',
       num_orders: 1,
       lifetime_value: 85.48
     },
     {
-      customer_name: 'Jennifer White',
+      customer_name: 'Bobbie Wolff (female)',
       num_orders: 3,
       lifetime_value: 88.96
     },
     {
-      customer_name: 'Jennifer Williams',
+      customer_name: 'Veronica Stoltenberg (male)',
       num_orders: 2,
       lifetime_value: 104.26
     },
     {
-      customer_name: 'Jennifer Wilson',
+      customer_name: 'Stephen Crooks (female)',
       num_orders: 2,
       lifetime_value: 3188.28
     },
     {
-      customer_name: 'Jennifer Wood',
+      customer_name: 'Dr. Nelson Roberts (male)',
       num_orders: 1,
       lifetime_value: 2482.23
     },
     {
-      customer_name: 'Jenny Andersen',
+      customer_name: 'Shelia Champlin (female)',
       num_orders: 2,
       lifetime_value: 44.57
     },
     {
-      customer_name: 'Jenny Becker',
+      customer_name: 'Karla Buckridge MD (male)',
       num_orders: 2,
       lifetime_value: 39.58
     },
     {
-      customer_name: 'Jenny Cai',
+      customer_name: 'Janet Quigley (female)',
       num_orders: 1,
       lifetime_value: 62.98
     },
     {
-      customer_name: 'Jenny Chande',
+      customer_name: 'Kellie Haley (female)',
       num_orders: 1,
       lifetime_value: 35
     },
     {
-      customer_name: 'Jenny Chander',
+      customer_name: 'Linda Hirthe (female)',
       num_orders: 1,
       lifetime_value: 863.95
     },
     {
-      customer_name: 'Jenny Chen',
+      customer_name: 'Mark Rohan (female)',
       num_orders: 6,
       lifetime_value: 12909.6682
     },
     {
-      customer_name: 'Jenny Ferrier',
+      customer_name: 'Cecilia Dietrich (female)',
       num_orders: 2,
       lifetime_value: 5875.55
     },
     {
-      customer_name: 'Jenny Goel',
+      customer_name: 'Wade Schneider (male)',
       num_orders: 2,
       lifetime_value: 5888.24
     },
     {
-      customer_name: 'Jenny Guo',
+      customer_name: 'Guadalupe Baumbach (female)',
       num_orders: 3,
       lifetime_value: 8128.51
     },
     {
-      customer_name: 'Jenny He',
+      customer_name: 'Clint Haag (male)',
       num_orders: 3,
       lifetime_value: 6959.82
     },
     {
-      customer_name: 'Jenny Hu',
+      customer_name: 'Angel Haag (female)',
       num_orders: 3,
       lifetime_value: 8165.82
     },
     {
-      customer_name: 'Jenny Huang',
+      customer_name: 'Gustavo Gislason (female)',
       num_orders: 3,
       lifetime_value: 8136.02
     },
     {
-      customer_name: 'Jenny Kumar',
+      customer_name: 'Viola Schmeler DVM (male)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Jenny Lal',
+      customer_name: 'Ollie Mosciski (female)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Jenny Li',
+      customer_name: 'Connie Wilderman (male)',
       num_orders: 2,
       lifetime_value: 81.76
     },
     {
-      customer_name: 'Jenny Liang',
+      customer_name: 'Dominick Berge (male)',
       num_orders: 3,
       lifetime_value: 8116.33
     },
     {
-      customer_name: 'Jenny Lin',
+      customer_name: 'Margie Cummerata (male)',
       num_orders: 3,
       lifetime_value: 8078.02
     },
     {
-      customer_name: 'Jenny Liu',
+      customer_name: 'Florence Sawayn (female)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Jenny Lu',
+      customer_name: 'Antonio Huel (female)',
       num_orders: 3,
       lifetime_value: 8142.03
     },
     {
-      customer_name: 'Jenny Luo',
+      customer_name: 'Armando DuBuque (female)',
       num_orders: 3,
       lifetime_value: 8158.01
     },
     {
-      customer_name: 'Jenny McDonald',
+      customer_name: 'Wendy Upton (female)',
       num_orders: 3,
       lifetime_value: 8089.04
     },
     {
-      customer_name: 'Jenny Nara',
+      customer_name: 'Orlando Hoeger-Johnson (female)',
       num_orders: 1,
       lifetime_value: 39.99
     },
     {
-      customer_name: 'Jenny Nath',
+      customer_name: 'Kristen Bashirian (female)',
       num_orders: 16,
       lifetime_value: 757.27
     },
     {
-      customer_name: 'Jenny Pal',
+      customer_name: 'Colleen Wisozk PhD (female)',
       num_orders: 16,
       lifetime_value: 1026.29
     },
     {
-      customer_name: 'Jenny Rai',
+      customer_name: 'Kristen Streich (female)',
       num_orders: 2,
       lifetime_value: 5915.54
     },
     {
-      customer_name: 'Jenny Raje',
+      customer_name: 'Kelly Hessel-Sawayn (male)',
       num_orders: 2,
       lifetime_value: 77.27
     },
     {
-      customer_name: 'Jenny Raji',
+      customer_name: 'Herman Feil (male)',
       num_orders: 16,
       lifetime_value: 573.8
     },
     {
-      customer_name: 'Jenny Shan',
+      customer_name: 'Clifton Greenholt (female)',
       num_orders: 16,
       lifetime_value: 561.53
     },
     {
-      customer_name: 'Jenny She',
+      customer_name: 'Emily Erdman III (male)',
       num_orders: 1,
       lifetime_value: 53.99
     },
     {
-      customer_name: 'Jenny Shen',
+      customer_name: 'Lee Grady IV (female)',
       num_orders: 3,
       lifetime_value: 4966.3896
     },
     {
-      customer_name: 'Jenny Sun',
+      customer_name: 'Della Zboncak (male)',
       num_orders: 3,
       lifetime_value: 8211.48
     },
     {
-      customer_name: 'Jenny Tang',
+      customer_name: 'Pearl Schaden (female)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Jenny Wagner',
+      customer_name: 'Neal Wiegand (male)',
       num_orders: 4,
       lifetime_value: 9912.98
     },
     {
-      customer_name: 'Jenny Wu',
+      customer_name: 'Kurt Dietrich (male)',
       num_orders: 3,
       lifetime_value: 8237.01
     },
     {
-      customer_name: 'Jenny Xu',
+      customer_name: 'Carmen Schamberger (male)',
       num_orders: 3,
       lifetime_value: 8224.46
     },
     {
-      customer_name: 'Jenny Xu',
+      customer_name: 'Zachary Yost (female)',
       num_orders: 3,
       lifetime_value: 8090.33
     },
     {
-      customer_name: 'Jenny Yang',
+      customer_name: 'Linda Little DVM (female)',
       num_orders: 6,
       lifetime_value: 12489.1696
     },
     {
-      customer_name: 'Jenny Ye',
+      customer_name: 'Mandy Bins Sr. (female)',
       num_orders: 3,
       lifetime_value: 8249.49
     },
     {
-      customer_name: 'Jenny Zeng',
+      customer_name: 'Winston Gibson (male)',
       num_orders: 1,
       lifetime_value: 53.99
     },
     {
-      customer_name: 'Jenny Zhang',
+      customer_name: 'Pauline Hilll (female)',
       num_orders: 1,
       lifetime_value: 84.98
     },
     {
-      customer_name: 'Jenny Zheng',
+      customer_name: 'Mr. Lloyd Hudson (male)',
       num_orders: 2,
       lifetime_value: 4344.0882
     },
     {
-      customer_name: 'Jenny Zhou',
+      customer_name: 'Gerard Schmeler (female)',
       num_orders: 3,
       lifetime_value: 8130.32
     },
     {
-      customer_name: 'Jenny Zhu',
+      customer_name: 'Carrie White (male)',
       num_orders: 3,
       lifetime_value: 8141.33
     },
     {
-      customer_name: 'Jenny Zimmerman',
+      customer_name: 'Ramona Thiel (female)',
       num_orders: 3,
       lifetime_value: 6958.8
     },
     {
-      customer_name: 'Jeremiah Diaz',
+      customer_name: 'Phyllis Baumbach (male)',
       num_orders: 2,
       lifetime_value: 86.24
     },
     {
-      customer_name: 'Jeremiah Flores',
+      customer_name: 'Phil Stiedemann DDS (female)',
       num_orders: 2,
       lifetime_value: 4492.4482
     },
     {
-      customer_name: 'Jeremiah Gonzales',
+      customer_name: 'Drew Mayer (female)',
       num_orders: 2,
       lifetime_value: 4528.7496
     },
     {
-      customer_name: 'Jeremiah Gray',
+      customer_name: 'Marshall Brown (male)',
       num_orders: 1,
       lifetime_value: 29.48
     },
     {
-      customer_name: 'Jeremiah Griffin',
+      customer_name: 'Lana Dickinson (male)',
       num_orders: 2,
       lifetime_value: 137.94
     },
     {
-      customer_name: 'Jeremiah Hayes',
+      customer_name: 'Mr. Melvin Berge (female)',
       num_orders: 2,
       lifetime_value: 5973.24
     },
     {
-      customer_name: 'Jeremiah Henderson',
+      customer_name: 'Perry Yundt (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Jeremiah Howard',
+      customer_name: 'Carmen Metz (male)',
       num_orders: 2,
       lifetime_value: 1898.0682
     },
     {
-      customer_name: 'Jeremiah Hughes',
+      customer_name: 'Sylvia Nicolas (male)',
       num_orders: 2,
       lifetime_value: 2638.3582
     },
     {
-      customer_name: 'Jeremiah James',
+      customer_name: 'Shari Pouros (female)',
       num_orders: 3,
       lifetime_value: 5643.5396
     },
     {
-      customer_name: 'Jeremiah Jenkins',
+      customer_name: 'Gail Kohler Sr. (male)',
       num_orders: 2,
       lifetime_value: 48.96
     },
     {
-      customer_name: 'Jeremiah Long',
+      customer_name: 'Erin Jones PhD (male)',
       num_orders: 2,
       lifetime_value: 5948.24
     },
     {
-      customer_name: 'Jeremiah Morris',
+      customer_name: 'Mr. Jermaine Prosacco (male)',
       num_orders: 2,
       lifetime_value: 3139.94
     },
     {
-      customer_name: 'Jeremiah Ross',
+      customer_name: 'Kristopher Upton Jr. (female)',
       num_orders: 1,
       lifetime_value: 100.09
     },
     {
-      customer_name: 'Jeremiah Russell',
+      customer_name: 'Bryant Davis (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jeremiah Sanchez',
+      customer_name: 'Dr. Joy Zboncak (female)',
       num_orders: 1,
       lifetime_value: 54.96
     },
     {
-      customer_name: 'Jeremiah Sanders',
+      customer_name: 'Jimmie Hudson MD (male)',
       num_orders: 2,
       lifetime_value: 177.46
     },
     {
-      customer_name: 'Jeremiah Simmons',
+      customer_name: 'Mitchell Rosenbaum-Nitzsche (male)',
       num_orders: 2,
       lifetime_value: 67.26
     },
     {
-      customer_name: 'Jeremiah Stewart',
+      customer_name: 'Susie Howe (male)',
       num_orders: 2,
       lifetime_value: 2833.5682
     },
     {
-      customer_name: 'Jeremiah Townsend',
+      customer_name: 'Courtney Larkin (male)',
       num_orders: 1,
       lifetime_value: 898.46
     },
     {
-      customer_name: 'Jeremy Alexander',
+      customer_name: 'Angie Bogan (female)',
       num_orders: 1,
       lifetime_value: 186.28
     },
     {
-      customer_name: 'Jeremy Bailey',
+      customer_name: 'Myra Walter DDS (male)',
       num_orders: 1,
       lifetime_value: 98.96
     },
     {
-      customer_name: 'Jeremy Barnes',
+      customer_name: 'Wilson Stracke (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Jeremy Bell',
+      customer_name: 'Jamie Bogisich (male)',
       num_orders: 2,
       lifetime_value: 2992.33
     },
     {
-      customer_name: 'Jeremy Bennett',
+      customer_name: 'Randal Ernser (female)',
       num_orders: 2,
       lifetime_value: 4500.5225
     },
     {
-      customer_name: 'Jeremy Brooks',
+      customer_name: 'Ms. Sadie Fritsch (male)',
       num_orders: 1,
       lifetime_value: 71.97
     },
     {
-      customer_name: 'Jeremy Bryant',
+      customer_name: 'Benjamin Stamm (male)',
       num_orders: 2,
       lifetime_value: 4614.8596
     },
     {
-      customer_name: 'Jeremy Butler',
+      customer_name: 'Erica Breitenberg (male)',
       num_orders: 2,
       lifetime_value: 4514.7696
     },
     {
-      customer_name: 'Jeremy Cook',
+      customer_name: 'Guadalupe Carroll (male)',
       num_orders: 2,
       lifetime_value: 4190.23
     },
     {
-      customer_name: 'Jeremy Cooper',
+      customer_name: 'Joshua Kautzer (male)',
       num_orders: 1,
       lifetime_value: 80.96
     },
     {
-      customer_name: 'Jeremy Cox',
+      customer_name: 'Christina Reichel (female)',
       num_orders: 2,
       lifetime_value: 4392.74
     },
     {
-      customer_name: 'Jeremy Murphy',
+      customer_name: 'Ms. Marsha Hettinger I (male)',
       num_orders: 3,
       lifetime_value: 5215.3982
     },
     {
-      customer_name: 'Jeremy Patterson',
+      customer_name: 'Dr. Grady Quigley (male)',
       num_orders: 2,
       lifetime_value: 43.97
     },
     {
-      customer_name: 'Jeremy Perry',
+      customer_name: 'Marion VonRueden (female)',
       num_orders: 2,
       lifetime_value: 6012.23
     },
     {
-      customer_name: 'Jeremy Peterson',
+      customer_name: 'Pauline Friesen (female)',
       num_orders: 1,
       lifetime_value: 96.46
     },
     {
-      customer_name: 'Jeremy Powell',
+      customer_name: 'Suzanne Collins (male)',
       num_orders: 2,
       lifetime_value: 5918.24
     },
     {
-      customer_name: 'Jeremy Price',
+      customer_name: 'Curtis Wisoky (male)',
       num_orders: 2,
       lifetime_value: 4533.5225
     },
     {
-      customer_name: 'Jeremy Ramirez',
+      customer_name: 'Carl Stokes (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jeremy Reed',
+      customer_name: 'Freda Wisozk (male)',
       num_orders: 1,
       lifetime_value: 76.96
     },
     {
-      customer_name: 'Jeremy Richardson',
+      customer_name: 'Juan Bartell (female)',
       num_orders: 3,
       lifetime_value: 167.26
     },
     {
-      customer_name: 'Jeremy Rivera',
+      customer_name: 'Colleen Collins (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Jeremy Rogers',
+      customer_name: 'Dustin Okuneva (female)',
       num_orders: 2,
       lifetime_value: 3127.95
     },
     {
-      customer_name: 'Jeremy Ward',
+      customer_name: 'Mr. Perry Kassulke (female)',
       num_orders: 2,
       lifetime_value: 138.45
     },
     {
-      customer_name: 'Jeremy Washington',
+      customer_name: 'Karen Brekke (female)',
       num_orders: 2,
       lifetime_value: 4551.3596
     },
     {
-      customer_name: 'Jeremy Watson',
+      customer_name: 'Miss Meghan Bins (female)',
       num_orders: 1,
       lifetime_value: 839.48
     },
     {
-      customer_name: 'Jeremy Wood',
+      customer_name: 'Morris Flatley (female)',
       num_orders: 2,
       lifetime_value: 48.96
     },
     {
-      customer_name: 'Jerry Andersen',
+      customer_name: 'Kevin Kuhic (male)',
       num_orders: 1,
       lifetime_value: 2341.97
     },
     {
-      customer_name: 'Jerry Becker',
+      customer_name: 'Thomas Lebsack (male)',
       num_orders: 1,
       lifetime_value: 1775.47
     },
     {
-      customer_name: 'Jerry Chande',
+      customer_name: 'Jessie Yost (male)',
       num_orders: 1,
       lifetime_value: 2376.96
     },
     {
-      customer_name: 'Jerry Chander',
+      customer_name: 'Caleb Walsh (male)',
       num_orders: 1,
       lifetime_value: 58.98
     },
     {
-      customer_name: 'Jerry Deng',
+      customer_name: 'Dr. Willie Armstrong (male)',
       num_orders: 1,
       lifetime_value: 2294.99
     },
     {
-      customer_name: 'Jerry Ferrier',
+      customer_name: 'Forrest Sawayn (male)',
       num_orders: 2,
       lifetime_value: 54.42
     },
     {
-      customer_name: 'Jerry Johnsen',
+      customer_name: 'Toni Gerhold (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jerry Kumar',
+      customer_name: 'Craig Medhurst (male)',
       num_orders: 1,
       lifetime_value: 2341.97
     },
     {
-      customer_name: 'Jerry Lal',
+      customer_name: 'Mrs. Dolores Rodriguez-Greenholt (male)',
       num_orders: 1,
       lifetime_value: 2325.96
     },
     {
-      customer_name: 'Jerry Luo',
+      customer_name: 'Allison Morar (male)',
       num_orders: 1,
       lifetime_value: 1754.98
     },
     {
-      customer_name: 'Jerry Nara',
+      customer_name: 'Jody Terry (male)',
       num_orders: 1,
       lifetime_value: 2434.92
     },
     {
-      customer_name: 'Jerry Nath',
+      customer_name: 'Danny Mraz (male)',
       num_orders: 1,
       lifetime_value: 1754.98
     },
     {
-      customer_name: 'Jerry Pal',
+      customer_name: 'Allen Beatty (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Jerry Rai',
+      customer_name: 'Dr. Austin Schmeler (male)',
       num_orders: 1,
       lifetime_value: 64.47
     },
     {
-      customer_name: 'Jerry Raje',
+      customer_name: 'Ellen Bruen (male)',
       num_orders: 1,
       lifetime_value: 2366.96
     },
     {
-      customer_name: 'Jerry Shan',
+      customer_name: 'Sonia Tromp (female)',
       num_orders: 1,
       lifetime_value: 1750.98
     },
     {
-      customer_name: 'Jerry Sharma',
+      customer_name: 'Miss Valerie Schmitt (female)',
       num_orders: 1,
       lifetime_value: 1760.47
     },
     {
-      customer_name: 'Jerry She',
+      customer_name: 'Daryl Zemlak (male)',
       num_orders: 1,
       lifetime_value: 2319.99
     },
     {
-      customer_name: 'Jerry Shen',
+      customer_name: 'Dr. Jake Reilly (male)',
       num_orders: 1,
       lifetime_value: 48.97
     },
     {
-      customer_name: 'Jerry Tang',
+      customer_name: 'Jimmy Quitzon (male)',
       num_orders: 1,
       lifetime_value: 1729.97
     },
     {
-      customer_name: 'Jerry Xie',
+      customer_name: 'Lana Bergstrom (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Jerry Xu',
+      customer_name: 'Israel Lind IV (male)',
       num_orders: 1,
       lifetime_value: 1769.96
     },
     {
-      customer_name: 'Jerry Yuan',
+      customer_name: 'Kerry Harvey (female)',
       num_orders: 1,
       lifetime_value: 59.98
     },
     {
-      customer_name: 'Jesse Adams',
+      customer_name: 'Josh Balistreri (female)',
       num_orders: 2,
       lifetime_value: 3118.6
     },
     {
-      customer_name: 'Jesse Allen',
+      customer_name: 'Jimmie Williamson (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Jesse Bailey',
+      customer_name: 'Alexandra Ernser (female)',
       num_orders: 2,
       lifetime_value: 4366.4096
     },
     {
-      customer_name: 'Jesse Baker',
+      customer_name: 'Franklin Conroy (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jesse Bell',
+      customer_name: 'James Jones (female)',
       num_orders: 3,
       lifetime_value: 170.53
     },
     {
-      customer_name: 'Jesse Brooks',
+      customer_name: 'Tasha Ziemann (male)',
       num_orders: 2,
       lifetime_value: 3319.6975
     },
     {
-      customer_name: 'Jesse Campbell',
+      customer_name: 'Rolando Crooks (male)',
       num_orders: 1,
       lifetime_value: 92.48
     },
     {
-      customer_name: 'Jesse Carter',
+      customer_name: 'Stephanie Tremblay II (male)',
       num_orders: 1,
       lifetime_value: 24.99
     },
     {
-      customer_name: 'Jesse Cook',
+      customer_name: 'Esther Moore Jr. (female)',
       num_orders: 2,
       lifetime_value: 1685.45
     },
     {
-      customer_name: 'Jesse Cox',
+      customer_name: 'Constance Ankunding (female)',
       num_orders: 2,
       lifetime_value: 5923.23
     },
     {
-      customer_name: 'Jesse Edwards',
+      customer_name: 'Traci Langworth (female)',
       num_orders: 2,
       lifetime_value: 4393.6996
     },
     {
-      customer_name: 'Jesse Evans',
+      customer_name: 'Sheldon Hahn (male)',
       num_orders: 2,
       lifetime_value: 2992.33
     },
     {
-      customer_name: 'Jesse Gonzalez',
+      customer_name: 'Mr. Wilbert Flatley (male)',
       num_orders: 2,
       lifetime_value: 4551.5225
     },
     {
-      customer_name: 'Jesse Gray',
+      customer_name: 'Janie Feest (female)',
       num_orders: 2,
       lifetime_value: 4795.01
     },
     {
-      customer_name: 'Jesse Green',
+      customer_name: 'Theodore Von (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Jesse Hall',
+      customer_name: 'Mrs. Ollie Bogisich II (male)',
       num_orders: 1,
       lifetime_value: 2376.96
     },
     {
-      customer_name: 'Jesse Hernandez',
+      customer_name: 'Leslie Monahan V (male)',
       num_orders: 2,
       lifetime_value: 123.96
     },
     {
-      customer_name: 'Jesse Howard',
+      customer_name: 'Darren Schmeler (male)',
       num_orders: 2,
       lifetime_value: 115.25
     },
     {
-      customer_name: 'Jesse James',
+      customer_name: 'Dr. Rick Thompson-Kovacek (male)',
       num_orders: 3,
       lifetime_value: 137.95
     },
     {
-      customer_name: 'Jesse Kelly',
+      customer_name: 'Bobbie White (female)',
       num_orders: 1,
       lifetime_value: 46.83
     },
     {
-      customer_name: 'Jesse King',
+      customer_name: 'Melvin Schroeder (female)',
       num_orders: 2,
       lifetime_value: 4347.76
     },
     {
-      customer_name: 'Jesse Lopez',
+      customer_name: 'Wayne Osinski (male)',
       num_orders: 2,
       lifetime_value: 5898.26
     },
     {
-      customer_name: 'Jesse Mitchell',
+      customer_name: 'Della Wuckert (male)',
       num_orders: 1,
       lifetime_value: 83.97
     },
     {
-      customer_name: 'Jesse Morgan',
+      customer_name: 'Dr. Gerald Walker (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Jesse Morris',
+      customer_name: 'Carmen Farrell (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Jesse Murphy',
+      customer_name: 'Erin Bogan (male)',
       num_orders: 3,
       lifetime_value: 8305.3
     },
     {
-      customer_name: 'Jesse Nelson',
+      customer_name: 'Genevieve Simonis (female)',
       num_orders: 1,
       lifetime_value: 2478.34
     },
     {
-      customer_name: 'Jesse Parker',
+      customer_name: 'Christine Rippin (male)',
       num_orders: 2,
       lifetime_value: 4346.3782
     },
     {
-      customer_name: 'Jesse Perez',
+      customer_name: 'Kristopher Lynch (male)',
       num_orders: 3,
       lifetime_value: 6549.29
     },
     {
-      customer_name: 'Jesse Peterson',
+      customer_name: 'Mr. Boyd Casper (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jesse Phillips',
+      customer_name: 'Katie Bogan (female)',
       num_orders: 1,
       lifetime_value: 554.97
     },
     {
-      customer_name: 'Jesse Ramirez',
+      customer_name: 'Deanna Rolfson (female)',
       num_orders: 1,
       lifetime_value: 42.28
     },
     {
-      customer_name: 'Jesse Reed',
+      customer_name: 'Franklin Stroman (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Jesse Richardson',
+      customer_name: 'Kirk Johns (female)',
       num_orders: 2,
       lifetime_value: 5875.55
     },
     {
-      customer_name: 'Jesse Rivera',
+      customer_name: 'Glenn Hessel (male)',
       num_orders: 2,
       lifetime_value: 3142.97
     },
     {
-      customer_name: 'Jesse Roberts',
+      customer_name: 'Dana Green (female)',
       num_orders: 1,
       lifetime_value: 2371.96
     },
     {
-      customer_name: 'Jesse Rogers',
+      customer_name: 'Billy Rosenbaum (male)',
       num_orders: 2,
       lifetime_value: 3177.96
     },
     {
-      customer_name: 'Jesse Sanchez',
+      customer_name: 'Lowell Russel (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jesse Sanders',
+      customer_name: 'Debra Keeling (female)',
       num_orders: 2,
       lifetime_value: 78.97
     },
     {
-      customer_name: 'Jesse Scott',
+      customer_name: 'Janie Goodwin (male)',
       num_orders: 2,
       lifetime_value: 4930.68
     },
     {
-      customer_name: 'Jesse Stewart',
+      customer_name: 'Florence Ryan (male)',
       num_orders: 2,
       lifetime_value: 81.25
     },
     {
-      customer_name: 'Jesse Torres',
+      customer_name: 'Rafael Rath Jr. (female)',
       num_orders: 5,
       lifetime_value: 308.66
     },
     {
-      customer_name: 'Jesse Turner',
+      customer_name: 'Damon Schmitt-Runolfsson (female)',
       num_orders: 1,
       lifetime_value: 27.28
     },
     {
-      customer_name: 'Jesse Ward',
+      customer_name: 'Kristin Donnelly (male)',
       num_orders: 2,
       lifetime_value: 1538.5782
     },
     {
-      customer_name: 'Jesse Watson',
+      customer_name: 'Tara Lemke (male)',
       num_orders: 3,
       lifetime_value: 5647.9182
     },
     {
-      customer_name: 'Jesse Wright',
+      customer_name: 'Ed Terry (male)',
       num_orders: 2,
       lifetime_value: 4506.76
     },
     {
-      customer_name: 'Jesse Young',
+      customer_name: 'Jeff Purdy (female)',
       num_orders: 1,
       lifetime_value: 64.47
     },
     {
-      customer_name: 'Jessica Anderson',
+      customer_name: 'Otis Douglas (male)',
       num_orders: 2,
       lifetime_value: 5900.55
     },
     {
-      customer_name: 'Jessica Brown',
+      customer_name: 'Robyn Moore (male)',
       num_orders: 2,
       lifetime_value: 108.46
     },
     {
-      customer_name: 'Jessica Clark',
+      customer_name: 'Nichole Walsh (female)',
       num_orders: 2,
       lifetime_value: 5930.23
     },
     {
-      customer_name: 'Jessica Davis',
+      customer_name: 'Spencer McGlynn (male)',
       num_orders: 1,
       lifetime_value: 2294.99
     },
     {
-      customer_name: 'Jessica Garcia',
+      customer_name: 'Martha Streich (female)',
       num_orders: 2,
       lifetime_value: 5930.23
     },
     {
-      customer_name: 'Jessica Hall',
+      customer_name: 'Becky Brekke (female)',
       num_orders: 2,
       lifetime_value: 5946.2
     },
     {
-      customer_name: 'Jessica Harris',
+      customer_name: 'Dr. Mitchell Schinner-Rohan II (female)',
       num_orders: 2,
       lifetime_value: 5997.73
     },
     {
-      customer_name: 'Jessica Jackson',
+      customer_name: 'Patti Reichel (female)',
       num_orders: 2,
       lifetime_value: 129.47
     },
     {
-      customer_name: 'Jessica Johnson',
+      customer_name: 'Samuel Aufderhar (female)',
       num_orders: 2,
       lifetime_value: 5975.23
     },
     {
-      customer_name: 'Jessica Jones',
+      customer_name: 'Ella Wunsch (female)',
       num_orders: 2,
       lifetime_value: 5993.26
     },
     {
-      customer_name: 'Jessica Lee',
+      customer_name: 'Cathy Rice (male)',
       num_orders: 2,
       lifetime_value: 159.99
     },
     {
-      customer_name: 'Jessica Lewis',
+      customer_name: 'Tommy Langworth (male)',
       num_orders: 2,
       lifetime_value: 5933.25
     },
     {
-      customer_name: 'Jessica Martin',
+      customer_name: 'Casey Schoen (female)',
       num_orders: 2,
       lifetime_value: 5993.26
     },
     {
-      customer_name: 'Jessica Martinez',
+      customer_name: "Julius O'Keefe (male)",
       num_orders: 2,
       lifetime_value: 5888.24
     },
     {
-      customer_name: 'Jessica Miller',
+      customer_name: 'Miss Erin Rippin-Bahringer (female)',
       num_orders: 2,
       lifetime_value: 4710.03
     },
     {
-      customer_name: 'Jessica Moore',
+      customer_name: 'Delbert Boyle (male)',
       num_orders: 2,
       lifetime_value: 46.28
     },
     {
-      customer_name: 'Jessica Robinson',
+      customer_name: 'Dianne Jacobs (female)',
       num_orders: 2,
       lifetime_value: 194.98
     },
     {
-      customer_name: 'Jessica Rodriguez',
+      customer_name: 'Matt Wuckert (male)',
       num_orders: 2,
       lifetime_value: 89.98
     },
     {
-      customer_name: 'Jessica Smith',
+      customer_name: 'Jasmine Oberbrunner (female)',
       num_orders: 2,
       lifetime_value: 5873.26
     },
     {
-      customer_name: 'Jessica Taylor',
+      customer_name: 'Donna Johns (male)',
       num_orders: 2,
       lifetime_value: 56.93
     },
     {
-      customer_name: 'Jessica Thomas',
+      customer_name: 'Nichole Kirlin (female)',
       num_orders: 2,
       lifetime_value: 43.99
     },
     {
-      customer_name: 'Jessica Thompson',
+      customer_name: 'Meghan Braun (male)',
       num_orders: 4,
       lifetime_value: 222.23
     },
     {
-      customer_name: 'Jessica Walker',
+      customer_name: 'Kristie Anderson (male)',
       num_orders: 2,
       lifetime_value: 162.28
     },
     {
-      customer_name: 'Jessica White',
+      customer_name: 'Lucy Hagenes (male)',
       num_orders: 2,
       lifetime_value: 92.27
     },
     {
-      customer_name: 'Jessica Williams',
+      customer_name: 'April Schuster (female)',
       num_orders: 1,
       lifetime_value: 2366.96
     },
     {
-      customer_name: 'Jessica Wilson',
+      customer_name: 'Mr. Roderick Mosciski I (male)',
       num_orders: 1,
       lifetime_value: 2350.96
     },
     {
-      customer_name: 'Jill Alonso',
+      customer_name: 'Emily Rice (female)',
       num_orders: 3,
       lifetime_value: 7265.65
     },
     {
-      customer_name: 'Jill Ashe',
+      customer_name: 'Grant Erdman (female)',
       num_orders: 3,
       lifetime_value: 7229.37
     },
     {
-      customer_name: 'Jill Blanco',
+      customer_name: 'Jacqueline Kessler (male)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Jill Carlson',
+      customer_name: 'Tasha Thompson (female)',
       num_orders: 1,
       lifetime_value: 94.48
     },
     {
-      customer_name: 'Jill Diaz',
+      customer_name: 'Ed Breitenberg (male)',
       num_orders: 2,
       lifetime_value: 5900.55
     },
     {
-      customer_name: 'Jill Dominguez',
+      customer_name: 'Dennis Gleichner (male)',
       num_orders: 3,
       lifetime_value: 6952.5825
     },
     {
-      customer_name: 'Jill Gill',
+      customer_name: 'Phyllis Cartwright (female)',
       num_orders: 2,
       lifetime_value: 97.35
     },
     {
-      customer_name: 'Jill Gomez',
+      customer_name: 'Jon Hills (male)',
       num_orders: 3,
       lifetime_value: 6673.53
     },
     {
-      customer_name: 'Jill Gutierrez',
+      customer_name: 'Dan Zboncak (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Jill Hernandez',
+      customer_name: 'Kristie Swift (female)',
       num_orders: 3,
       lifetime_value: 7068.0825
     },
     {
-      customer_name: 'Jill Jimenez',
+      customer_name: 'Ida Gutmann (female)',
       num_orders: 2,
       lifetime_value: 5896.19
     },
     {
-      customer_name: 'Jill Martin',
+      customer_name: 'Otis Toy (male)',
       num_orders: 1,
       lifetime_value: 53.99
     },
     {
-      customer_name: 'Jill Martinez',
+      customer_name: 'Al McCullough (male)',
       num_orders: 4,
       lifetime_value: 7189.75
     },
     {
-      customer_name: 'Jill Miller',
+      customer_name: 'Marianne Roob (male)',
       num_orders: 1,
       lifetime_value: 33.98
     },
     {
-      customer_name: 'Jill Moore',
+      customer_name: 'Frances West (female)',
       num_orders: 3,
       lifetime_value: 8161.97
     },
     {
-      customer_name: 'Jill Moreno',
+      customer_name: 'Juana Brown (female)',
       num_orders: 1,
       lifetime_value: 163.99
     },
     {
-      customer_name: 'Jill Munoz',
+      customer_name: 'Tomas Glover (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Jill Murphy',
+      customer_name: 'Willie Auer (female)',
       num_orders: 3,
       lifetime_value: 193.01
     },
     {
-      customer_name: 'Jill Navarro',
+      customer_name: 'Courtney Reichert (male)',
       num_orders: 3,
       lifetime_value: 7255.66
     },
     {
-      customer_name: 'Jill Ortega',
+      customer_name: 'Albert Reinger (female)',
       num_orders: 3,
       lifetime_value: 5217.6982
     },
     {
-      customer_name: 'Jill Patterson',
+      customer_name: 'Martin Wiegand (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Jill Perry',
+      customer_name: 'Darrel Erdman-Cartwright (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Jill Ramos',
+      customer_name: 'Dominick Sauer (male)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Jill Rubio',
+      customer_name: 'Constance McLaughlin (male)',
       num_orders: 3,
       lifetime_value: 8301.31
     },
     {
-      customer_name: 'Jill Ruiz',
+      customer_name: 'Sara Corwin (male)',
       num_orders: 2,
       lifetime_value: 2731.5425
     },
     {
-      customer_name: 'Jill Sandoval',
+      customer_name: 'Tommy Pagac (male)',
       num_orders: 3,
       lifetime_value: 6974.5625
     },
     {
-      customer_name: 'Jill Serrano',
+      customer_name: 'Mr. Jacob Feil (male)',
       num_orders: 2,
       lifetime_value: 210.54
     },
     {
-      customer_name: 'Jill Suarez',
+      customer_name: 'Mrs. Marcella Bashirian (male)',
       num_orders: 3,
       lifetime_value: 6918.8725
     },
     {
-      customer_name: 'Jill Travers',
+      customer_name: 'Darlene Schultz (male)',
       num_orders: 3,
       lifetime_value: 8377.09
     },
     {
-      customer_name: 'Jill Vazquez',
+      customer_name: "Elisa O'Connell (male)",
       num_orders: 2,
       lifetime_value: 107.85
     },
     {
-      customer_name: 'Jillian Arthur',
+      customer_name: 'Carmen Brakus (female)',
       num_orders: 1,
       lifetime_value: 15.23
     },
     {
-      customer_name: 'Jillian Fernandez',
+      customer_name: 'Holly Sanford (female)',
       num_orders: 2,
       lifetime_value: 3199.44
     },
     {
-      customer_name: 'Jillian Garcia',
+      customer_name: 'Ruby Orn (female)',
       num_orders: 2,
       lifetime_value: 1584.76
     },
     {
-      customer_name: 'Jillian Gonzalez',
+      customer_name: 'Terry Erdman (female)',
       num_orders: 3,
       lifetime_value: 156.04
     },
     {
-      customer_name: 'Jillian Kapoor',
+      customer_name: 'Dean Swift (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jillian Lopez',
+      customer_name: 'Byron Schneider (male)',
       num_orders: 2,
       lifetime_value: 1631.46
     },
     {
-      customer_name: 'Jillian Madan',
+      customer_name: 'Tara Daniel (male)',
       num_orders: 1,
       lifetime_value: 89.97
     },
     {
-      customer_name: 'Jillian Malhotra',
+      customer_name: 'Matt Mante (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Jillian Martinez',
+      customer_name: 'Emily Metz-Kunze (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jillian Mehta',
+      customer_name: 'Barbara Murazik (male)',
       num_orders: 2,
       lifetime_value: 3152.95
     },
     {
-      customer_name: 'Jillian Patel',
+      customer_name: 'Ron Bayer (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jillian Perez',
+      customer_name: 'Tiffany Champlin (female)',
       num_orders: 2,
       lifetime_value: 3101.95
     },
     {
-      customer_name: 'Jillian Prasad',
+      customer_name: 'Ada Franey Jr. (male)',
       num_orders: 3,
       lifetime_value: 94.44
     },
     {
-      customer_name: 'Jillian Raman',
+      customer_name: 'Dr. Ricky Adams III (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jillian Rana',
+      customer_name: 'Courtney Koelpin-DuBuque (male)',
       num_orders: 2,
       lifetime_value: 1576.45
     },
     {
-      customer_name: 'Jillian Rodriguez',
+      customer_name: 'Al Crona (male)',
       num_orders: 2,
       lifetime_value: 1622.47
     },
     {
-      customer_name: 'Jillian Sai',
+      customer_name: 'Roxanne Gerhold DDS (male)',
       num_orders: 1,
       lifetime_value: 15.23
     },
     {
-      customer_name: 'Jillian Saunders',
+      customer_name: 'Connie Vandervort (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jillian Srini',
+      customer_name: 'Bobbie Kemmer (male)',
       num_orders: 2,
       lifetime_value: 1622.47
     },
     {
-      customer_name: 'Jillian Suri',
+      customer_name: 'Emily Ledner IV (male)',
       num_orders: 1,
       lifetime_value: 889.47
     },
     {
-      customer_name: 'Jillian Vance',
+      customer_name: 'Nelson Flatley (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jimmy Alonso',
+      customer_name: 'Veronica Sanford (female)',
       num_orders: 2,
       lifetime_value: 34.57
     },
     {
-      customer_name: 'Jimmy Ashe',
+      customer_name: 'Melba Mertz (male)',
       num_orders: 2,
       lifetime_value: 116.95
     },
     {
-      customer_name: 'Jimmy Blanco',
+      customer_name: 'Earl Ullrich (female)',
       num_orders: 2,
       lifetime_value: 3047.81
     },
     {
-      customer_name: 'Jimmy Carlson',
+      customer_name: 'Dr. Muriel Hirthe (female)',
       num_orders: 2,
       lifetime_value: 3089.3
     },
     {
-      customer_name: 'Jimmy Diaz',
+      customer_name: 'Archie Corkery (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Jimmy Dominguez',
+      customer_name: 'Mr. Jeffery Waters III (male)',
       num_orders: 3,
       lifetime_value: 5160.08
     },
     {
-      customer_name: 'Jimmy Gill',
+      customer_name: 'Frances Flatley (male)',
       num_orders: 1,
       lifetime_value: 24.99
     },
     {
-      customer_name: 'Jimmy Gomez',
+      customer_name: 'Darren Hilpert (male)',
       num_orders: 2,
       lifetime_value: 3027.32
     },
     {
-      customer_name: 'Jimmy Gutierrez',
+      customer_name: 'David Gibson (female)',
       num_orders: 2,
       lifetime_value: 3804.0782
     },
     {
-      customer_name: 'Jimmy Hernandez',
+      customer_name: 'Yvette Heaney (male)',
       num_orders: 3,
       lifetime_value: 5122.39
     },
     {
-      customer_name: 'Jimmy Jimenez',
+      customer_name: 'Alice Bauch (female)',
       num_orders: 3,
       lifetime_value: 6999.5725
     },
     {
-      customer_name: 'Jimmy Martin',
+      customer_name: 'Sophia Price V (male)',
       num_orders: 2,
       lifetime_value: 5959.72
     },
     {
-      customer_name: 'Jimmy Moreno',
+      customer_name: 'Dr. Raymond Corkery (female)',
       num_orders: 3,
       lifetime_value: 5162.37
     },
     {
-      customer_name: 'Jimmy Munoz',
+      customer_name: 'Clint Parker Sr. (male)',
       num_orders: 2,
       lifetime_value: 34.57
     },
     {
-      customer_name: 'Jimmy Navarro',
+      customer_name: 'Kelly Schoen (female)',
       num_orders: 2,
       lifetime_value: 3803.6796
     },
     {
-      customer_name: 'Jimmy Ortega',
+      customer_name: 'Percy Terry (female)',
       num_orders: 1,
       lifetime_value: 64.97
     },
     {
-      customer_name: 'Jimmy Ramos',
+      customer_name: 'Stella Rippin (male)',
       num_orders: 2,
       lifetime_value: 2770.5225
     },
     {
-      customer_name: 'Jimmy Romero',
+      customer_name: 'Fred Breitenberg (female)',
       num_orders: 2,
       lifetime_value: 3772.4096
     },
     {
-      customer_name: 'Jimmy Rubio',
+      customer_name: 'Dr. James Adams (female)',
       num_orders: 1,
       lifetime_value: 89.97
     },
     {
-      customer_name: 'Jimmy Ruiz',
+      customer_name: 'Dr. Wesley Deckow (female)',
       num_orders: 3,
       lifetime_value: 7169.39
     },
     {
-      customer_name: 'Jimmy Sanz',
+      customer_name: 'Mike Howe (female)',
       num_orders: 2,
       lifetime_value: 31.55
     },
     {
-      customer_name: 'Jimmy Serrano',
+      customer_name: 'Dr. Wesley Schneider (female)',
       num_orders: 3,
       lifetime_value: 5208.04
     },
     {
-      customer_name: 'Jimmy Suarez',
+      customer_name: 'Alan Rowe MD (male)',
       num_orders: 2,
       lifetime_value: 5898.26
     },
     {
-      customer_name: 'Jimmy Travers',
+      customer_name: 'Allen Goyette (female)',
       num_orders: 2,
       lifetime_value: 2746.5525
     },
     {
-      customer_name: 'Jimmy Vazquez',
+      customer_name: 'Jermaine Moore-Lakin (male)',
       num_orders: 3,
       lifetime_value: 5251.34
     },
     {
-      customer_name: 'Joan Coleman',
+      customer_name: 'Victoria Schumm (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Joan Gao',
+      customer_name: 'Bonnie Braun DDS (female)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Joan Hernandez',
+      customer_name: 'Darla Lueilwitz-Koch (male)',
       num_orders: 1,
       lifetime_value: 24.27
     },
     {
-      customer_name: 'Joan Martin',
+      customer_name: 'Lee Nienow (male)',
       num_orders: 2,
       lifetime_value: 91.95
     },
     {
-      customer_name: 'Joan Navarro',
+      customer_name: 'Fernando Heller (male)',
       num_orders: 2,
       lifetime_value: 5935.55
     },
     {
-      customer_name: 'Joan Vazquez',
+      customer_name: 'Ella Hirthe (male)',
       num_orders: 2,
       lifetime_value: 68.87
     },
     {
-      customer_name: 'Joanna Alonso',
+      customer_name: 'Blanca Cummerata (male)',
       num_orders: 2,
       lifetime_value: 4788.57
     },
     {
-      customer_name: 'Joanna Ashe',
+      customer_name: 'Ms. Jacquelyn Leffler (male)',
       num_orders: 3,
       lifetime_value: 6843.1382
     },
     {
-      customer_name: 'Joanna Blanco',
+      customer_name: 'Terence Stamm (male)',
       num_orders: 2,
       lifetime_value: 1804.9175
     },
     {
-      customer_name: 'Joanna Carlson',
+      customer_name: 'Jordan Carroll (female)',
       num_orders: 2,
       lifetime_value: 4586.3496
     },
     {
-      customer_name: 'Joanna Dominguez',
+      customer_name: 'Laura Ward (male)',
       num_orders: 2,
       lifetime_value: 1893.9075
     },
     {
-      customer_name: 'Joanna Gill',
+      customer_name: 'Marta Lind (female)',
       num_orders: 4,
       lifetime_value: 195.52
     },
     {
-      customer_name: 'Joanna Gutierrez',
+      customer_name: 'Eunice Frami (female)',
       num_orders: 2,
       lifetime_value: 59.98
     },
     {
-      customer_name: 'Joanna Hernandez',
+      customer_name: 'Matt Davis (male)',
       num_orders: 3,
       lifetime_value: 5721.9082
     },
     {
-      customer_name: 'Joanna Johnston',
+      customer_name: 'Randal Conroy Jr. (female)',
       num_orders: 2,
       lifetime_value: 77.27
     },
     {
-      customer_name: 'Joanna Moreno',
+      customer_name: 'Sabrina Nolan (female)',
       num_orders: 3,
       lifetime_value: 5237.7296
     },
     {
-      customer_name: 'Joanna Munoz',
+      customer_name: 'Myron Muller (male)',
       num_orders: 3,
       lifetime_value: 5138.7182
     },
     {
-      customer_name: 'Joanna Ortega',
+      customer_name: 'Dr. Clinton Flatley (male)',
       num_orders: 2,
       lifetime_value: 3295.4275
     },
     {
-      customer_name: 'Joanna Ramos',
+      customer_name: 'Francis Lesch (female)',
       num_orders: 2,
       lifetime_value: 66.26
     },
     {
-      customer_name: 'Joanna Romero',
+      customer_name: 'Madeline Stamm (male)',
       num_orders: 2,
       lifetime_value: 4775.3
     },
     {
-      customer_name: 'Joanna Sanz',
+      customer_name: 'Charlie Pfeffer (female)',
       num_orders: 1,
       lifetime_value: 85.48
     },
     {
-      customer_name: 'Joanna Serrano',
+      customer_name: 'Laurie Pouros (female)',
       num_orders: 2,
       lifetime_value: 4528.7496
     },
     {
-      customer_name: 'Joanna Suarez',
+      customer_name: 'Sherman Johns (male)',
       num_orders: 1,
       lifetime_value: 106.96
     },
     {
-      customer_name: 'Joanna Torres',
+      customer_name: 'Gabriel Marks (female)',
       num_orders: 2,
       lifetime_value: 3282.83
     },
     {
-      customer_name: 'Joanna Vazquez',
+      customer_name: 'Ronnie Glover (male)',
       num_orders: 1,
       lifetime_value: 85.48
     },
     {
-      customer_name: 'Joe Alonso',
+      customer_name: 'Chester Simonis (female)',
       num_orders: 2,
       lifetime_value: 123.95
     },
     {
-      customer_name: 'Joe Alvarez',
+      customer_name: 'Erick Stamm V (female)',
       num_orders: 1,
       lifetime_value: 34.99
     },
     {
-      customer_name: 'Joe Ashe',
+      customer_name: 'Lucy Torphy (male)',
       num_orders: 2,
       lifetime_value: 3112.33
     },
     {
-      customer_name: 'Joe Belson',
+      customer_name: 'Dana Dooley (male)',
       num_orders: 17,
       lifetime_value: 882.7
     },
     {
-      customer_name: 'Joe Blanco',
+      customer_name: 'Albert Gutmann (female)',
       num_orders: 3,
       lifetime_value: 113.36
     },
     {
-      customer_name: 'Joe Carlson',
+      customer_name: 'Randolph Murray (female)',
       num_orders: 3,
       lifetime_value: 94.19
     },
     {
-      customer_name: 'Joe Diaz',
+      customer_name: 'Priscilla Bergstrom (male)',
       num_orders: 3,
       lifetime_value: 6437.33
     },
     {
-      customer_name: 'Joe Dominguez',
+      customer_name: 'Mrs. Lindsey Herman (female)',
       num_orders: 1,
       lifetime_value: 2351.96
     },
     {
-      customer_name: 'Joe Gill',
+      customer_name: 'Lowell Hoeger (male)',
       num_orders: 2,
       lifetime_value: 202.57
     },
     {
-      customer_name: 'Joe Gomez',
+      customer_name: 'Desiree MacGyver MD (female)',
       num_orders: 1,
       lifetime_value: 2374.23
     },
     {
-      customer_name: 'Joe Gonzalez',
+      customer_name: 'Myrtle Harris (female)',
       num_orders: 3,
       lifetime_value: 6565.29
     },
     {
-      customer_name: 'Joe Gutierrez',
+      customer_name: 'Mrs. Gretchen Lesch (male)',
       num_orders: 3,
       lifetime_value: 8248.02
     },
     {
-      customer_name: 'Joe Hernandez',
+      customer_name: 'Patty Boyer (female)',
       num_orders: 1,
       lifetime_value: 2350.96
     },
     {
-      customer_name: 'Joe Jimenez',
+      customer_name: 'Anita Bergstrom (female)',
       num_orders: 2,
       lifetime_value: 47.98
     },
     {
-      customer_name: 'Joe Lopez',
+      customer_name: 'Mr. Otis Nikolaus (male)',
       num_orders: 1,
       lifetime_value: 2322.28
     },
     {
-      customer_name: 'Joe Madan',
+      customer_name: 'Mary King (male)',
       num_orders: 3,
       lifetime_value: 8121.33
     },
     {
-      customer_name: 'Joe Martin',
+      customer_name: 'Miss Isabel Blanda (female)',
       num_orders: 1,
       lifetime_value: 2354.98
     },
     {
-      customer_name: 'Joe Martinez',
+      customer_name: 'Blake Mayer Jr. (male)',
       num_orders: 3,
       lifetime_value: 6575.79
     },
     {
-      customer_name: 'Joe Mehta',
+      customer_name: 'Marguerite Mitchell (male)',
       num_orders: 3,
       lifetime_value: 6533.28
     },
     {
-      customer_name: 'Joe Moreno',
+      customer_name: 'Ross Bode (male)',
       num_orders: 3,
       lifetime_value: 6515.3
     },
     {
-      customer_name: 'Joe Navarro',
+      customer_name: 'Ms. Elsa Rodriguez (male)',
       num_orders: 1,
       lifetime_value: 2329.98
     },
     {
-      customer_name: 'Joe Perez',
+      customer_name: 'Mr. Bruce Leffler (female)',
       num_orders: 3,
       lifetime_value: 6491.32
     },
     {
-      customer_name: 'Joe Prasad',
+      customer_name: 'Maxine Koss (female)',
       num_orders: 3,
       lifetime_value: 8091.33
     },
     {
-      customer_name: 'Joe Raman',
+      customer_name: 'Floyd Harvey (male)',
       num_orders: 2,
       lifetime_value: 113.96
     },
     {
-      customer_name: 'Joe Ramos',
+      customer_name: 'Beulah Padberg I (female)',
       num_orders: 3,
       lifetime_value: 191.9
     },
     {
-      customer_name: 'Joe Rana',
+      customer_name: 'Krystal Rosenbaum (male)',
       num_orders: 3,
       lifetime_value: 8133.04
     },
     {
-      customer_name: 'Joe Romero',
+      customer_name: 'Kendra Heaney (female)',
       num_orders: 3,
       lifetime_value: 8131.32
     },
     {
-      customer_name: 'Joe Rubio',
+      customer_name: 'Diana Pacocha (male)',
       num_orders: 3,
       lifetime_value: 8204.02
     },
     {
-      customer_name: 'Joe Sanchez',
+      customer_name: 'Cody Kling (male)',
       num_orders: 3,
       lifetime_value: 6525.56
     },
     {
-      customer_name: 'Joe Sanz',
+      customer_name: 'Curtis Blanda (female)',
       num_orders: 17,
       lifetime_value: 913.27
     },
     {
-      customer_name: 'Joe Schmidt',
+      customer_name: 'Sheryl Wehner (male)',
       num_orders: 3,
       lifetime_value: 8088.04
     },
     {
-      customer_name: 'Joe Serrano',
+      customer_name: 'Rhonda Lehner (male)',
       num_orders: 3,
       lifetime_value: 110.23
     },
     {
-      customer_name: 'Joe Srini',
+      customer_name: 'Leigh Barton (female)',
       num_orders: 3,
       lifetime_value: 8106.31
     },
     {
-      customer_name: 'Joe Subram',
+      customer_name: 'Stella Carroll (male)',
       num_orders: 1,
       lifetime_value: 2500.97
     },
     {
-      customer_name: 'Joe Torres',
+      customer_name: 'Andres Halvorson IV (male)',
       num_orders: 3,
       lifetime_value: 8129.02
     },
     {
-      customer_name: 'Joe Vazquez',
+      customer_name: 'Daryl Bechtelar (male)',
       num_orders: 2,
       lifetime_value: 105.75
     },
     {
-      customer_name: 'Joel Arthur',
+      customer_name: 'Michele Schroeder III (male)',
       num_orders: 1,
       lifetime_value: 3399.99
     },
     {
-      customer_name: 'Joel Chapman',
+      customer_name: 'Miss Joanna Nicolas (female)',
       num_orders: 1,
       lifetime_value: 1170.48
     },
     {
-      customer_name: 'Joel Fernandez',
+      customer_name: 'Miss Megan Purdy (male)',
       num_orders: 1,
       lifetime_value: 1179.97
     },
     {
-      customer_name: 'Joel Garcia',
+      customer_name: 'Sheldon Thiel (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Joel Gonzalez',
+      customer_name: 'Della Jacobi (male)',
       num_orders: 1,
       lifetime_value: 68.49
     },
     {
-      customer_name: 'Joel Jordan',
+      customer_name: 'Hilda Wunsch (male)',
       num_orders: 1,
       lifetime_value: 64.97
     },
     {
-      customer_name: 'Joel Madan',
+      customer_name: 'Erma Schulist (female)',
       num_orders: 1,
       lifetime_value: 633.45
     },
     {
-      customer_name: 'Joel Malhotra',
+      customer_name: 'Jason Kihn (male)',
       num_orders: 1,
       lifetime_value: 1170.48
     },
     {
-      customer_name: 'Joel Martinez',
+      customer_name: 'Mr. Lester Cummerata V (male)',
       num_orders: 2,
       lifetime_value: 71.46
     },
     {
-      customer_name: 'Joel Mehta',
+      customer_name: 'Brett Price (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Joel Patel',
+      customer_name: 'Norman Metz (male)',
       num_orders: 1,
       lifetime_value: 1120.49
     },
     {
-      customer_name: 'Joel Perez',
+      customer_name: 'Calvin Batz (female)',
       num_orders: 1,
       lifetime_value: 68.97
     },
     {
-      customer_name: 'Joel Prasad',
+      customer_name: 'Clark Wintheiser (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Joel Raman',
+      customer_name: 'Daryl Wyman (male)',
       num_orders: 2,
       lifetime_value: 76.76
     },
     {
-      customer_name: 'Joel Rana',
+      customer_name: 'Shawn Kunze (female)',
       num_orders: 2,
       lifetime_value: 137.54
     },
     {
-      customer_name: 'Joel Rodriguez',
+      customer_name: 'Geneva Haley (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Joel Sai',
+      customer_name: 'Jonathan Rolfson (male)',
       num_orders: 1,
       lifetime_value: 588.96
     },
     {
-      customer_name: 'Joel Sanchez',
+      customer_name: 'Janis Gottlieb (male)',
       num_orders: 2,
       lifetime_value: 66.53
     },
     {
-      customer_name: 'Joel Schmidt',
+      customer_name: 'Dr. Jimmie Mertz (male)',
       num_orders: 1,
       lifetime_value: 548.98
     },
     {
-      customer_name: 'Joel Subram',
+      customer_name: 'Dr. Samuel Blanda (female)',
       num_orders: 2,
       lifetime_value: 128.55
     },
     {
-      customer_name: 'Joel Vance',
+      customer_name: 'Frankie Koelpin II (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'John Anderson',
+      customer_name: 'Mr. Jimmy Jast (female)',
       num_orders: 2,
       lifetime_value: 4698.76
     },
     {
-      customer_name: 'John Brown',
+      customer_name: 'Dr. Norman Welch (male)',
       num_orders: 2,
       lifetime_value: 39.25
     },
     {
-      customer_name: 'John Clark',
+      customer_name: 'Steve Leuschke (female)',
       num_orders: 1,
       lifetime_value: 15.23
     },
     {
-      customer_name: 'John Davis',
+      customer_name: 'Angelina Adams (female)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'John Garcia',
+      customer_name: 'Jane Ziemann-Halvorson (female)',
       num_orders: 2,
       lifetime_value: 6056.61
     },
     {
-      customer_name: 'John Harris',
+      customer_name: 'Verna Walker (male)',
       num_orders: 1,
       lifetime_value: 2309.97
     },
     {
-      customer_name: 'John Jackson',
+      customer_name: 'Kristen Reynolds (male)',
       num_orders: 2,
       lifetime_value: 115.47
     },
     {
-      customer_name: 'John Johnson',
+      customer_name: 'Bridget Goyette (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'John Jones',
+      customer_name: 'Miss Jody Kemmer (female)',
       num_orders: 2,
       lifetime_value: 6035.6
     },
     {
-      customer_name: 'John Lee',
+      customer_name: "Courtney D'Amore (female)",
       num_orders: 1,
       lifetime_value: 1700.99
     },
     {
-      customer_name: 'John Lewis',
+      customer_name: 'Tricia Hand (female)',
       num_orders: 1,
       lifetime_value: 1775.47
     },
     {
-      customer_name: 'John Martin',
+      customer_name: 'Moses Labadie (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'John Martinez',
+      customer_name: 'Hugh Hackett (female)',
       num_orders: 2,
       lifetime_value: 6089.59
     },
     {
-      customer_name: 'John Moore',
+      customer_name: 'Ms. Luz Lueilwitz MD (male)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'John Robinson',
+      customer_name: 'Roderick Krajcik (female)',
       num_orders: 2,
       lifetime_value: 6058.21
     },
     {
-      customer_name: 'John Rodriguez',
+      customer_name: 'Jamie Koss-Boehm (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'John Smith',
+      customer_name: 'Brendan Haley (female)',
       num_orders: 2,
       lifetime_value: 6044.59
     },
     {
-      customer_name: 'John Taylor',
+      customer_name: 'Miss Lorena Daniel (female)',
       num_orders: 3,
       lifetime_value: 146.53
     },
     {
-      customer_name: 'John Thomas',
+      customer_name: 'Wendy Shields (female)',
       num_orders: 1,
       lifetime_value: 1759.97
     },
     {
-      customer_name: 'John Thompson',
+      customer_name: 'Seth Rohan (male)',
       num_orders: 1,
       lifetime_value: 68.49
     },
     {
-      customer_name: 'John Walker',
+      customer_name: 'Grace Kautzer (female)',
       num_orders: 1,
       lifetime_value: 1754.98
     },
     {
-      customer_name: 'John White',
+      customer_name: 'Louis Green (male)',
       num_orders: 1,
       lifetime_value: 2334.98
     },
     {
-      customer_name: 'John Williams',
+      customer_name: 'Henrietta Toy (male)',
       num_orders: 1,
       lifetime_value: 2369.97
     },
     {
-      customer_name: 'Johnathan Arthur',
+      customer_name: 'Byron Harber (male)',
       num_orders: 2,
       lifetime_value: 1375.26
     },
     {
-      customer_name: 'Johnathan Chapman',
+      customer_name: 'Virgil Hartmann (male)',
       num_orders: 2,
       lifetime_value: 1397.95
     },
     {
-      customer_name: 'Johnathan Fernandez',
+      customer_name: 'Kyle Lang (male)',
       num_orders: 2,
       lifetime_value: 1397.95
     },
     {
-      customer_name: 'Johnathan Gonzalez',
+      customer_name: 'Gregory Runolfsdottir (female)',
       num_orders: 2,
       lifetime_value: 4899.02
     },
     {
-      customer_name: 'Johnathan Kapoor',
+      customer_name: 'Toby Runte IV (female)',
       num_orders: 2,
       lifetime_value: 1372.46
     },
     {
-      customer_name: 'Johnathan Madan',
+      customer_name: 'Mrs. Rochelle Jacobs (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Johnathan Malhotra',
+      customer_name: 'Henry Koss (male)',
       num_orders: 2,
       lifetime_value: 3178.95
     },
     {
-      customer_name: 'Johnathan McDonald',
+      customer_name: 'Willie Hills (male)',
       num_orders: 2,
       lifetime_value: 1394.95
     },
     {
-      customer_name: 'Johnathan Patel',
+      customer_name: 'David Tromp (male)',
       num_orders: 2,
       lifetime_value: 1422.46
     },
     {
-      customer_name: 'Johnathan Perez',
+      customer_name: 'Gerardo Lubowitz II (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Johnathan Prasad',
+      customer_name: 'Neal Bergstrom (male)',
       num_orders: 1,
       lifetime_value: 89.97
     },
     {
-      customer_name: 'Johnathan Raman',
+      customer_name: 'Cynthia Bogan (male)',
       num_orders: 2,
       lifetime_value: 3133.95
     },
     {
-      customer_name: 'Johnathan Rana',
+      customer_name: 'Fannie Cruickshank Sr. (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Johnathan Rodriguez',
+      customer_name: 'Kendra Bruen (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Johnathan Sai',
+      customer_name: 'Minnie Denesik (male)',
       num_orders: 2,
       lifetime_value: 4848.03
     },
     {
-      customer_name: 'Johnathan Sanchez',
+      customer_name: 'Miss Kelly Balistreri (female)',
       num_orders: 2,
       lifetime_value: 1380.25
     },
     {
-      customer_name: 'Johnathan Schmidt',
+      customer_name: 'Dominic Schimmel (male)',
       num_orders: 2,
       lifetime_value: 3114.94
     },
     {
-      customer_name: 'Johnathan Srini',
+      customer_name: 'Pete Bosco (female)',
       num_orders: 2,
       lifetime_value: 1428.94
     },
     {
-      customer_name: 'Johnathan Suri',
+      customer_name: 'Leah Botsford (female)',
       num_orders: 1,
       lifetime_value: 564.99
     },
     {
-      customer_name: 'Johnathan Vance',
+      customer_name: 'Tracy Kutch (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Johnny Anand',
+      customer_name: 'Ms. Kelli Stanton (male)',
       num_orders: 2,
       lifetime_value: 138.45
     },
     {
-      customer_name: 'Johnny Andersen',
+      customer_name: 'Allen Baumbach (female)',
       num_orders: 2,
       lifetime_value: 86.27
     },
     {
-      customer_name: 'Johnny Chander',
+      customer_name: 'Julio Gerhold (male)',
       num_orders: 2,
       lifetime_value: 105.75
     },
     {
-      customer_name: 'Johnny Chavez',
+      customer_name: 'Angel Dietrich (male)',
       num_orders: 2,
       lifetime_value: 4417.75
     },
     {
-      customer_name: 'Johnny Deng',
+      customer_name: 'Marilyn Dibbert (female)',
       num_orders: 2,
       lifetime_value: 176.95
     },
     {
-      customer_name: 'Johnny Goel',
+      customer_name: 'Anna Lubowitz-Mayert (male)',
       num_orders: 2,
       lifetime_value: 90.25
     },
     {
-      customer_name: 'Johnny Jai',
+      customer_name: 'Terence Littel (female)',
       num_orders: 2,
       lifetime_value: 83.98
     },
     {
-      customer_name: 'Johnny Kumar',
+      customer_name: 'Erika Bartoletti (male)',
       num_orders: 2,
       lifetime_value: 4382.75
     },
     {
-      customer_name: 'Johnny Lal',
+      customer_name: 'Ricky Boehm (female)',
       num_orders: 2,
       lifetime_value: 4496.23
     },
     {
-      customer_name: 'Johnny Luo',
+      customer_name: 'Annie Franey (male)',
       num_orders: 1,
       lifetime_value: 1760.47
     },
     {
-      customer_name: 'Johnny Moyer',
+      customer_name: 'Bridget Mertz (female)',
       num_orders: 2,
       lifetime_value: 78.97
     },
     {
-      customer_name: 'Johnny Nara',
+      customer_name: 'Annette Heathcote (male)',
       num_orders: 2,
       lifetime_value: 92.97
     },
     {
-      customer_name: 'Johnny Pal',
+      customer_name: 'Al Ebert V (male)',
       num_orders: 2,
       lifetime_value: 123.96
     },
     {
-      customer_name: 'Johnny Rai',
+      customer_name: 'Vickie Bruen (male)',
       num_orders: 2,
       lifetime_value: 123.96
     },
     {
-      customer_name: 'Johnny Raje',
+      customer_name: 'Yvette Mann (male)',
       num_orders: 2,
       lifetime_value: 100.25
     },
     {
-      customer_name: 'Johnny Raji',
+      customer_name: 'Ken Doyle (female)',
       num_orders: 2,
       lifetime_value: 103.46
     },
     {
-      customer_name: 'Johnny Shan',
+      customer_name: 'Brendan Feeney (female)',
       num_orders: 2,
       lifetime_value: 4417.75
     },
     {
-      customer_name: 'Johnny Sharma',
+      customer_name: 'Brendan Kunze-Heathcote (female)',
       num_orders: 2,
       lifetime_value: 83.98
     },
     {
-      customer_name: 'Johnny She',
+      customer_name: 'Rodney Wunsch (male)',
       num_orders: 1,
       lifetime_value: 58.98
     },
     {
-      customer_name: 'Johnny Shen',
+      customer_name: 'Tricia Blick (female)',
       num_orders: 1,
       lifetime_value: 2442.28
     },
     {
-      customer_name: 'Johnny Tang',
+      customer_name: 'Dr. Nina Kunze (female)',
       num_orders: 1,
       lifetime_value: 1700.99
     },
     {
-      customer_name: 'Johnny Xu',
+      customer_name: 'Eddie Dare (female)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Johnny Yuan',
+      customer_name: 'Gail Wuckert DDS (female)',
       num_orders: 2,
       lifetime_value: 4480.73
     },
     {
-      customer_name: 'Jon Alonso',
+      customer_name: 'Lori Jacobson (female)',
       num_orders: 1,
       lifetime_value: 83.97
     },
     {
-      customer_name: 'Jon Andersen',
+      customer_name: 'Mattie Padberg (female)',
       num_orders: 2,
       lifetime_value: 5898.26
     },
     {
-      customer_name: 'Jon Becker',
+      customer_name: 'Lynne Daniel (male)',
       num_orders: 1,
       lifetime_value: 24.27
     },
     {
-      customer_name: 'Jon Cai',
+      customer_name: 'Susan Mraz (male)',
       num_orders: 1,
       lifetime_value: 144.47
     },
     {
-      customer_name: 'Jon Chander',
+      customer_name: 'Joan Mertz (female)',
       num_orders: 2,
       lifetime_value: 5944.73
     },
     {
-      customer_name: 'Jon Chavez',
+      customer_name: 'Tricia Dicki (female)',
       num_orders: 1,
       lifetime_value: 29.93
     },
     {
-      customer_name: 'Jon Chen',
+      customer_name: 'Marcos Hirthe (female)',
       num_orders: 2,
       lifetime_value: 4549.7596
     },
     {
-      customer_name: 'Jon Gao',
+      customer_name: 'Evan Cronin (female)',
       num_orders: 3,
       lifetime_value: 6508.71
     },
     {
-      customer_name: 'Jon Goel',
+      customer_name: 'Kent Schmitt (female)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Jon Guo',
+      customer_name: 'Larry Bradtke (female)',
       num_orders: 2,
       lifetime_value: 4369.0882
     },
     {
-      customer_name: 'Jon He',
+      customer_name: 'Dr. Owen Bernier (female)',
       num_orders: 2,
       lifetime_value: 5932.22
     },
     {
-      customer_name: 'Jon Hu',
+      customer_name: 'Velma McDermott (male)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Jon Huang',
+      customer_name: 'Faith Crist (female)',
       num_orders: 2,
       lifetime_value: 59.2
     },
     {
-      customer_name: 'Jon Jai',
+      customer_name: 'Mr. Reginald Bogan (male)',
       num_orders: 2,
       lifetime_value: 5920.24
     },
     {
-      customer_name: 'Jon Lal',
+      customer_name: 'Mr. Chester Weimann (male)',
       num_orders: 4,
       lifetime_value: 288.9
     },
     {
-      customer_name: 'Jon Li',
+      customer_name: 'Sheldon Rogahn II (female)',
       num_orders: 2,
       lifetime_value: 4529.0382
     },
     {
-      customer_name: 'Jon Liang',
+      customer_name: 'Irving Hyatt (male)',
       num_orders: 2,
       lifetime_value: 4393.3582
     },
     {
-      customer_name: 'Jon Lin',
+      customer_name: 'Ms. Gertrude Kuhlman (female)',
       num_orders: 2,
       lifetime_value: 78.96
     },
     {
-      customer_name: 'Jon Liu',
+      customer_name: 'Franklin Lueilwitz (female)',
       num_orders: 2,
       lifetime_value: 4531.0396
     },
     {
-      customer_name: 'Jon Lu',
+      customer_name: 'Dr. Alton Heller II (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Jon Luo',
+      customer_name: 'Terence Cummings (male)',
       num_orders: 1,
       lifetime_value: 14.98
     },
     {
-      customer_name: 'Jon Ma',
+      customer_name: 'Sheila Volkman (male)',
       num_orders: 3,
       lifetime_value: 6453.23
     },
     {
-      customer_name: 'Jon Nara',
+      customer_name: 'Austin Emmerich (male)',
       num_orders: 2,
       lifetime_value: 5915.54
     },
     {
-      customer_name: 'Jon Nath',
+      customer_name: 'Rhonda Ortiz (male)',
       num_orders: 1,
       lifetime_value: 21.98
     },
     {
-      customer_name: 'Jon Pal',
+      customer_name: 'Opal Kassulke (female)',
       num_orders: 2,
       lifetime_value: 5983.22
     },
     {
-      customer_name: 'Jon Rai',
+      customer_name: 'Darnell Abbott I (male)',
       num_orders: 2,
       lifetime_value: 5935.55
     },
     {
-      customer_name: 'Jon Raje',
+      customer_name: 'Samuel Considine (female)',
       num_orders: 1,
       lifetime_value: 124.97
     },
     {
-      customer_name: 'Jon Shan',
+      customer_name: 'Mildred Dooley (male)',
       num_orders: 1,
       lifetime_value: 74.98
     },
     {
-      customer_name: 'Jon Sharma',
+      customer_name: 'Christian Ryan (female)',
       num_orders: 1,
       lifetime_value: 91.97
     },
     {
-      customer_name: 'Jon Shen',
+      customer_name: 'Ricardo Hayes I (male)',
       num_orders: 1,
       lifetime_value: 44.98
     },
     {
-      customer_name: 'Jon Sun',
+      customer_name: 'Ethel Mante (male)',
       num_orders: 3,
       lifetime_value: 6484.45
     },
     {
-      customer_name: 'Jon Tang',
+      customer_name: 'Wendy Kulas (male)',
       num_orders: 2,
       lifetime_value: 77.96
     },
     {
-      customer_name: 'Jon Wang',
+      customer_name: 'Gwendolyn Bashirian (female)',
       num_orders: 2,
       lifetime_value: 59.98
     },
     {
-      customer_name: 'Jon Wu',
+      customer_name: 'Seth Ondricka (male)',
       num_orders: 2,
       lifetime_value: 5908.25
     },
     {
-      customer_name: 'Jon Xu',
+      customer_name: 'Shawn Rodriguez (female)',
       num_orders: 2,
       lifetime_value: 5922.53
     },
     {
-      customer_name: 'Jon Xu',
+      customer_name: 'Douglas Wolf (female)',
       num_orders: 3,
       lifetime_value: 8375.29
     },
     {
-      customer_name: 'Jon Yang',
+      customer_name: 'Delbert Howe V (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Jon Ye',
+      customer_name: 'Amy Kutch DDS (male)',
       num_orders: 2,
       lifetime_value: 108.44
     },
     {
-      customer_name: 'Jon Yuan',
+      customer_name: 'Tim Zieme (female)',
       num_orders: 3,
       lifetime_value: 8355.27
     },
     {
-      customer_name: 'Jon Zeng',
+      customer_name: 'Sylvia Murphy (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Jon Zhang',
+      customer_name: 'Alyssa Pfannerstill (male)',
       num_orders: 3,
       lifetime_value: 5666.3782
     },
     {
-      customer_name: 'Jon Zhao',
+      customer_name: 'Dr. Yvette Goldner (female)',
       num_orders: 2,
       lifetime_value: 83.95
     },
     {
-      customer_name: 'Jon Zhou',
+      customer_name: 'Herman Harris (female)',
       num_orders: 2,
       lifetime_value: 5943.24
     },
     {
-      customer_name: 'Jon Zhu',
+      customer_name: 'Alicia Nikolaus (male)',
       num_orders: 3,
       lifetime_value: 6497.21
     },
     {
-      customer_name: 'Jonathan Adams',
+      customer_name: 'Kristi Gerhold (female)',
       num_orders: 3,
       lifetime_value: 7206.37
     },
     {
-      customer_name: 'Jonathan Allen',
+      customer_name: "Curtis O'Conner (male)",
       num_orders: 1,
       lifetime_value: 1750.47
     },
     {
-      customer_name: 'Jonathan Anderson',
+      customer_name: 'Richard Lynch-Senger (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Jonathan Baker',
+      customer_name: 'Teri Halvorson (female)',
       num_orders: 1,
       lifetime_value: 1788.95
     },
     {
-      customer_name: 'Jonathan Brown',
+      customer_name: 'Bridget Lindgren (female)',
       num_orders: 1,
       lifetime_value: 68.97
     },
     {
-      customer_name: 'Jonathan Campbell',
+      customer_name: 'George Johnson (female)',
       num_orders: 1,
       lifetime_value: 563.96
     },
     {
-      customer_name: 'Jonathan Carter',
+      customer_name: 'Colin Lebsack (female)',
       num_orders: 1,
       lifetime_value: 64.47
     },
     {
-      customer_name: 'Jonathan Clark',
+      customer_name: 'Horace Collier (female)',
       num_orders: 1,
       lifetime_value: 69.97
     },
     {
-      customer_name: 'Jonathan Collins',
+      customer_name: 'Julian Mueller (male)',
       num_orders: 1,
       lifetime_value: 76.94
     },
     {
-      customer_name: 'Jonathan Davis',
+      customer_name: 'Rose Ferry (female)',
       num_orders: 1,
       lifetime_value: 2404.97
     },
     {
-      customer_name: 'Jonathan Edwards',
+      customer_name: 'Joel Powlowski MD (male)',
       num_orders: 2,
       lifetime_value: 2771.5425
     },
     {
-      customer_name: 'Jonathan Evans',
+      customer_name: 'Dennis Marquardt (female)',
       num_orders: 2,
       lifetime_value: 167.93
     },
     {
-      customer_name: 'Jonathan Garcia',
+      customer_name: 'Heidi Towne (male)',
       num_orders: 2,
       lifetime_value: 77.91
     },
     {
-      customer_name: 'Jonathan Green',
+      customer_name: 'Brad Ondricka (male)',
       num_orders: 3,
       lifetime_value: 6994.5725
     },
     {
-      customer_name: 'Jonathan Hall',
+      customer_name: 'Antonio Swaniawski (male)',
       num_orders: 1,
       lifetime_value: 54.98
     },
     {
-      customer_name: 'Jonathan Harris',
+      customer_name: 'Penny Robel (male)',
       num_orders: 1,
       lifetime_value: 67.93
     },
     {
-      customer_name: 'Jonathan Hernandez',
+      customer_name: 'Nancy Towne (male)',
       num_orders: 1,
       lifetime_value: 124.99
     },
     {
-      customer_name: 'Jonathan Hill',
+      customer_name: 'Geraldine Keebler (female)',
       num_orders: 2,
       lifetime_value: 5973.24
     },
     {
-      customer_name: 'Jonathan Jackson',
+      customer_name: 'Jeffrey Feeney (female)',
       num_orders: 1,
       lifetime_value: 1779.47
     },
     {
-      customer_name: 'Jonathan Johnson',
+      customer_name: 'Lyle Smitham (female)',
       num_orders: 1,
       lifetime_value: 565.47
     },
     {
-      customer_name: 'Jonathan King',
+      customer_name: 'Frederick Waters (female)',
       num_orders: 2,
       lifetime_value: 3891.5425
     },
     {
-      customer_name: 'Jonathan Lee',
+      customer_name: 'Ethel Morar (male)',
       num_orders: 2,
       lifetime_value: 83.94
     },
     {
-      customer_name: 'Jonathan Lewis',
+      customer_name: 'Molly Waelchi (female)',
       num_orders: 2,
       lifetime_value: 2790.5325
     },
     {
-      customer_name: 'Jonathan Lopez',
+      customer_name: 'Lillie Schumm (male)',
       num_orders: 1,
       lifetime_value: 31.27
     },
     {
-      customer_name: 'Jonathan Martin',
+      customer_name: 'Ms. Shelley Dare (male)',
       num_orders: 1,
       lifetime_value: 67.93
     },
     {
-      customer_name: 'Jonathan Martinez',
+      customer_name: 'Rose Lang (female)',
       num_orders: 1,
       lifetime_value: 32.27
     },
     {
-      customer_name: 'Jonathan Miller',
+      customer_name: 'Dr. Clinton Schmidt (female)',
       num_orders: 1,
       lifetime_value: 2374.98
     },
     {
-      customer_name: 'Jonathan Mitchell',
+      customer_name: 'Luther Kuhic (female)',
       num_orders: 2,
       lifetime_value: 44.97
     },
     {
-      customer_name: 'Jonathan Moore',
+      customer_name: 'Raul Emmerich (male)',
       num_orders: 3,
       lifetime_value: 4122.7375
     },
     {
-      customer_name: 'Jonathan Nelson',
+      customer_name: 'Dr. Randall Mante (male)',
       num_orders: 2,
       lifetime_value: 4659.8025
     },
     {
-      customer_name: 'Jonathan Parker',
+      customer_name: 'Nick Goodwin (female)',
       num_orders: 3,
       lifetime_value: 6939.8725
     },
     {
-      customer_name: 'Jonathan Perez',
+      customer_name: 'Clark Jenkins (male)',
       num_orders: 2,
       lifetime_value: 3001.0425
     },
     {
-      customer_name: 'Jonathan Phillips',
+      customer_name: 'Brian Gusikowski (female)',
       num_orders: 1,
       lifetime_value: 664.89
     },
     {
-      customer_name: 'Jonathan Roberts',
+      customer_name: 'Marcus Skiles I (female)',
       num_orders: 3,
       lifetime_value: 6944.5825
     },
     {
-      customer_name: 'Jonathan Robinson',
+      customer_name: 'Dallas Crist (female)',
       num_orders: 1,
       lifetime_value: 56.96
     },
     {
-      customer_name: 'Jonathan Rodriguez',
+      customer_name: 'Timothy Reichert (male)',
       num_orders: 2,
       lifetime_value: 2840.0125
     },
     {
-      customer_name: 'Jonathan Scott',
+      customer_name: 'Grady Dickinson (male)',
       num_orders: 2,
       lifetime_value: 6090.59
     },
     {
-      customer_name: 'Jonathan Smith',
+      customer_name: 'Hilda Schowalter I (male)',
       num_orders: 1,
       lifetime_value: 539.99
     },
     {
-      customer_name: 'Jonathan Taylor',
+      customer_name: 'Dominick Satterfield (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jonathan Thomas',
+      customer_name: 'Heidi Wolf (female)',
       num_orders: 2,
       lifetime_value: 104.23
     },
     {
-      customer_name: 'Jonathan Thompson',
+      customer_name: 'Jenny Cummings (male)',
       num_orders: 2,
       lifetime_value: 2805.5325
     },
     {
-      customer_name: 'Jonathan Turner',
+      customer_name: 'Grady Brekke (female)',
       num_orders: 3,
       lifetime_value: 198.73
     },
     {
-      customer_name: 'Jonathan Walker',
+      customer_name: 'Lena Littel (male)',
       num_orders: 2,
       lifetime_value: 4752.23
     },
     {
-      customer_name: 'Jonathan White',
+      customer_name: 'Rodolfo Kuhlman DDS (female)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Jonathan Williams',
+      customer_name: 'Dr. Antonio Roob III (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Jonathan Wilson',
+      customer_name: 'Silvia Mraz (male)',
       num_orders: 2,
       lifetime_value: 32.95
     },
     {
-      customer_name: 'Jonathan Wright',
+      customer_name: 'Larry Brekke (female)',
       num_orders: 1,
       lifetime_value: 58.98
     },
     {
-      customer_name: 'Jonathan Young',
+      customer_name: 'Dawn Cassin (female)',
       num_orders: 2,
       lifetime_value: 70.95
     },
     {
-      customer_name: 'Jonathon Alonso',
+      customer_name: 'Wallace Mills (male)',
       num_orders: 1,
       lifetime_value: 89.97
     },
     {
-      customer_name: 'Jonathon Alvarez',
+      customer_name: 'Susan Abernathy Sr. (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jonathon Carlson',
+      customer_name: 'Josefina Littel (female)',
       num_orders: 3,
       lifetime_value: 122.26
     },
     {
-      customer_name: 'Jonathon Gill',
+      customer_name: 'Sonya Krajcik-Rice DVM (male)',
       num_orders: 1,
       lifetime_value: 54.96
     },
     {
-      customer_name: 'Jonathon Gutierrez',
+      customer_name: 'Jack Mante (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Jonathon Hernandez',
+      customer_name: 'Ramon Tromp IV (male)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jonathon Jimenez',
+      customer_name: 'Harold Fritsch (female)',
       num_orders: 2,
       lifetime_value: 3342.4075
     },
     {
-      customer_name: 'Jonathon Moreno',
+      customer_name: 'Gayle Gerhold (male)',
       num_orders: 3,
       lifetime_value: 194.94
     },
     {
-      customer_name: 'Jonathon Munoz',
+      customer_name: 'Stuart Hermiston (female)',
       num_orders: 2,
       lifetime_value: 3360.4175
     },
     {
-      customer_name: 'Jonathon Navarro',
+      customer_name: 'Melinda Bechtelar (female)',
       num_orders: 2,
       lifetime_value: 3310.4075
     },
     {
-      customer_name: 'Jonathon Ortega',
+      customer_name: 'Antonio Tillman (male)',
       num_orders: 2,
       lifetime_value: 3036.3682
     },
     {
-      customer_name: 'Jonathon Ramos',
+      customer_name: 'Lauren McClure (male)',
       num_orders: 1,
       lifetime_value: 64.47
     },
     {
-      customer_name: 'Jonathon Romero',
+      customer_name: 'Maureen Hegmann (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Jonathon Serrano',
+      customer_name: 'Mathew Torphy (male)',
       num_orders: 1,
       lifetime_value: 15.23
     },
     {
-      customer_name: 'Jonathon Suarez',
+      customer_name: "Matthew O'Kon (female)",
       num_orders: 3,
       lifetime_value: 162.24
     },
     {
-      customer_name: 'Jonathon Torres',
+      customer_name: 'Hugo Franey (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Jonathon Vazquez',
+      customer_name: 'Geoffrey Schmeler V (female)',
       num_orders: 2,
       lifetime_value: 1769.9275
     },
     {
-      customer_name: 'Jordan Adams',
+      customer_name: 'Traci Farrell (female)',
       num_orders: 1,
       lifetime_value: 1808.45
     },
     {
-      customer_name: 'Jordan Allen',
+      customer_name: 'Dominic Schroeder (male)',
       num_orders: 1,
       lifetime_value: 64.47
     },
     {
-      customer_name: 'Jordan Campbell',
+      customer_name: 'Mr. Greg Kassulke (female)',
       num_orders: 2,
       lifetime_value: 70.25
     },
     {
-      customer_name: 'Jordan Carter',
+      customer_name: 'Juanita Dicki (male)',
       num_orders: 2,
       lifetime_value: 4769.4025
     },
     {
-      customer_name: 'Jordan Collins',
+      customer_name: 'Katrina Wyman (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Jordan Edwards',
+      customer_name: 'Aubrey Schroeder-Strosin V (female)',
       num_orders: 3,
       lifetime_value: 6247.5325
     },
     {
-      customer_name: 'Jordan Evans',
+      customer_name: 'Rogelio Hilpert-Dooley (female)',
       num_orders: 3,
       lifetime_value: 5245.06
     },
     {
-      customer_name: 'Jordan Gonzalez',
+      customer_name: 'Nina Wisoky (female)',
       num_orders: 1,
       lifetime_value: 76.94
     },
     {
-      customer_name: 'Jordan Green',
+      customer_name: 'Janet Jaskolski III (female)',
       num_orders: 1,
       lifetime_value: 2451.3
     },
     {
-      customer_name: 'Jordan Hall',
+      customer_name: 'Ms. Opal Effertz (female)',
       num_orders: 2,
       lifetime_value: 6070.59
     },
     {
-      customer_name: 'Jordan Hernandez',
+      customer_name: 'Brian Doyle MD (female)',
       num_orders: 2,
       lifetime_value: 5006.7
     },
     {
-      customer_name: 'Jordan Hill',
+      customer_name: 'Nelson Homenick (male)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Jordan King',
+      customer_name: 'Greg Wilkinson (female)',
       num_orders: 1,
       lifetime_value: 1735.98
     },
     {
-      customer_name: 'Jordan Lopez',
+      customer_name: 'Darin Cremin (male)',
       num_orders: 2,
       lifetime_value: 52.92
     },
     {
-      customer_name: 'Jordan Mitchell',
+      customer_name: 'Jimmie Reinger-McClure (female)',
       num_orders: 2,
       lifetime_value: 130.94
     },
     {
-      customer_name: 'Jordan Nelson',
+      customer_name: 'Ms. Pat Torphy (female)',
       num_orders: 2,
       lifetime_value: 5948.49
     },
     {
-      customer_name: 'Jordan Parker',
+      customer_name: 'Perry Veum-Greenholt (male)',
       num_orders: 2,
       lifetime_value: 3112.97
     },
     {
-      customer_name: 'Jordan Perez',
+      customer_name: 'Sheila Lindgren (male)',
       num_orders: 1,
       lifetime_value: 699.97
     },
     {
-      customer_name: 'Jordan Phillips',
+      customer_name: 'Roberto Reichert (male)',
       num_orders: 1,
       lifetime_value: 2361.95
     },
     {
-      customer_name: 'Jordan Roberts',
+      customer_name: 'Cedric Reinger PhD (male)',
       num_orders: 3,
       lifetime_value: 208.41
     },
     {
-      customer_name: 'Jordan Scott',
+      customer_name: 'Randal Hansen (male)',
       num_orders: 1,
       lifetime_value: 59.98
     },
     {
-      customer_name: 'Jordan Turner',
+      customer_name: 'Dr. Rufus Kuhlman (female)',
       num_orders: 2,
       lifetime_value: 51.46
     },
     {
-      customer_name: 'Jordan Wright',
+      customer_name: 'Rodney Effertz (female)',
       num_orders: 1,
       lifetime_value: 1732.26
     },
     {
-      customer_name: 'Jordan Young',
+      customer_name: 'Jamie Grady (female)',
       num_orders: 3,
       lifetime_value: 248.01
     },
     {
-      customer_name: 'Jorge Cai',
+      customer_name: 'Mrs. Alyssa Schaden (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jorge Chen',
+      customer_name: 'Antoinette Bradtke (female)',
       num_orders: 2,
       lifetime_value: 141.55
     },
     {
-      customer_name: 'Jorge Gao',
+      customer_name: 'Lorenzo Hudson (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jorge Guo',
+      customer_name: 'Mrs. Carrie Hodkiewicz (female)',
       num_orders: 3,
       lifetime_value: 223.19
     },
     {
-      customer_name: 'Jorge He',
+      customer_name: 'Raul Fahey III (male)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Jorge Hu',
+      customer_name: 'Lindsey Dickinson (male)',
       num_orders: 2,
       lifetime_value: 97.96
     },
     {
-      customer_name: 'Jorge Huang',
+      customer_name: 'Rogelio Balistreri (female)',
       num_orders: 2,
       lifetime_value: 74.24
     },
     {
-      customer_name: 'Jorge Leitão',
+      customer_name: 'Eileen Stokes (male)',
       num_orders: 2,
       lifetime_value: 30.97
     },
     {
-      customer_name: 'Jorge Li',
+      customer_name: 'Ira Witting (female)',
       num_orders: 2,
       lifetime_value: 72.16
     },
     {
-      customer_name: 'Jorge Liang',
+      customer_name: 'Irvin Nolan (female)',
       num_orders: 1,
       lifetime_value: 60.47
     },
     {
-      customer_name: 'Jorge Lin',
+      customer_name: 'Melody Dickinson DVM (male)',
       num_orders: 2,
       lifetime_value: 144.27
     },
     {
-      customer_name: 'Jorge Liu',
+      customer_name: 'Bessie Spinka (female)',
       num_orders: 2,
       lifetime_value: 94.47
     },
     {
-      customer_name: 'Jorge Lu',
+      customer_name: 'Kerry Altenwerth (female)',
       num_orders: 2,
       lifetime_value: 6030.61
     },
     {
-      customer_name: 'Jorge Ma',
+      customer_name: 'Nelson Harber (female)',
       num_orders: 3,
       lifetime_value: 84.74
     },
     {
-      customer_name: 'Jorge She',
+      customer_name: 'Mike Bahringer (female)',
       num_orders: 2,
       lifetime_value: 88.97
     },
     {
-      customer_name: 'Jorge Sun',
+      customer_name: 'Arturo Barrows (female)',
       num_orders: 1,
       lifetime_value: 7.28
     },
     {
-      customer_name: 'Jorge Wang',
+      customer_name: 'Garry Reichel V (female)',
       num_orders: 2,
       lifetime_value: 6029.57
     },
     {
-      customer_name: 'Jorge Wu',
+      customer_name: 'Johnathan Hermiston Sr. (female)',
       num_orders: 2,
       lifetime_value: 78.26
     },
     {
-      customer_name: 'Jorge Xu',
+      customer_name: 'Tony Pfeffer (male)',
       num_orders: 2,
       lifetime_value: 6021.62
     },
     {
-      customer_name: 'Jorge Yang',
+      customer_name: 'Kara Tromp (male)',
       num_orders: 2,
       lifetime_value: 30.97
     },
     {
-      customer_name: 'Jorge Ye',
+      customer_name: 'Miss Delia Hayes (male)',
       num_orders: 2,
       lifetime_value: 6119.59
     },
     {
-      customer_name: 'Jorge Zhang',
+      customer_name: 'Sergio Senger-Mayert (male)',
       num_orders: 2,
       lifetime_value: 30.97
     },
     {
-      customer_name: 'Jorge Zhao',
+      customer_name: 'Christian Connelly (female)',
       num_orders: 2,
       lifetime_value: 32.22
     },
     {
-      customer_name: 'Jorge Zheng',
+      customer_name: 'Clyde Buckridge-Bogan (female)',
       num_orders: 2,
       lifetime_value: 108.85
     },
     {
-      customer_name: 'Jorge Zhou',
+      customer_name: 'Muriel Dicki (female)',
       num_orders: 2,
       lifetime_value: 6117.69
     },
     {
-      customer_name: 'Jorge Zhu',
+      customer_name: 'Roberto Erdman-Paucek (female)',
       num_orders: 3,
       lifetime_value: 115.73
     },
     {
-      customer_name: 'Jose Adams',
+      customer_name: 'Patricia Langosh II (female)',
       num_orders: 1,
       lifetime_value: 2316.97
     },
     {
-      customer_name: 'Jose Allen',
+      customer_name: 'Dr. Tyrone Schumm (male)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Jose Anderson',
+      customer_name: 'Amanda Brown (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Jose Baker',
+      customer_name: 'Ada Stroman (female)',
       num_orders: 1,
       lifetime_value: 2369.96
     },
     {
-      customer_name: 'Jose Brown',
+      customer_name: 'Hugh Kuphal (male)',
       num_orders: 1,
       lifetime_value: 2325.96
     },
     {
-      customer_name: 'Jose Carlson',
+      customer_name: 'Holly Schmeler (male)',
       num_orders: 3,
       lifetime_value: 6868.4396
     },
     {
-      customer_name: 'Jose Carter',
+      customer_name: 'Maggie Barton (male)',
       num_orders: 1,
       lifetime_value: 32.27
     },
     {
-      customer_name: 'Jose Clark',
+      customer_name: 'Donna Swift (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Jose Collins',
+      customer_name: 'Javier Hyatt (male)',
       num_orders: 3,
       lifetime_value: 296.91
     },
     {
-      customer_name: 'Jose Davis',
+      customer_name: 'Vivian Schinner III (female)',
       num_orders: 1,
       lifetime_value: 59.98
     },
     {
-      customer_name: 'Jose Edwards',
+      customer_name: 'Phil Jenkins DDS (female)',
       num_orders: 3,
       lifetime_value: 7200.86
     },
     {
-      customer_name: 'Jose Evans',
+      customer_name: 'Betty Kirlin (male)',
       num_orders: 2,
       lifetime_value: 114.96
     },
     {
-      customer_name: 'Jose Garcia',
+      customer_name: 'Kristin Sporer (female)',
       num_orders: 1,
       lifetime_value: 13.98
     },
     {
-      customer_name: 'Jose Gonzalez',
+      customer_name: 'Miranda Corwin (female)',
       num_orders: 2,
       lifetime_value: 81.96
     },
     {
-      customer_name: 'Jose Green',
+      customer_name: 'Angel Grady (female)',
       num_orders: 2,
       lifetime_value: 6081.1
     },
     {
-      customer_name: 'Jose Hall',
+      customer_name: 'Miss Nichole Kunze (male)',
       num_orders: 2,
       lifetime_value: 146.94
     },
     {
-      customer_name: 'Jose Harris',
+      customer_name: 'Ms. Cathy Corkery (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Jose Hill',
+      customer_name: 'Lorena Dare (female)',
       num_orders: 2,
       lifetime_value: 73.86
     },
     {
-      customer_name: 'Jose Johnson',
+      customer_name: 'Alonzo Funk (female)',
       num_orders: 3,
       lifetime_value: 6979.5625
     },
     {
-      customer_name: 'Jose Jones',
+      customer_name: 'Cornelius Hessel (male)',
       num_orders: 2,
       lifetime_value: 77.27
     },
     {
-      customer_name: 'Jose King',
+      customer_name: 'Sherry Haley (male)',
       num_orders: 1,
       lifetime_value: 93.97
     },
     {
-      customer_name: 'Jose Lee',
+      customer_name: 'Beulah Olson (male)',
       num_orders: 2,
       lifetime_value: 147.44
     },
     {
-      customer_name: 'Jose Lewis',
+      customer_name: 'Kelli Turcotte (male)',
       num_orders: 2,
       lifetime_value: 94.22
     },
     {
-      customer_name: 'Jose Martin',
+      customer_name: 'Bernice Pfeffer (female)',
       num_orders: 2,
       lifetime_value: 4742.74
     },
     {
-      customer_name: 'Jose Mitchell',
+      customer_name: 'Angelina Harris (male)',
       num_orders: 1,
       lifetime_value: 2385.94
     },
     {
-      customer_name: 'Jose Moore',
+      customer_name: 'Winifred Wolff (female)',
       num_orders: 2,
       lifetime_value: 4471.74
     },
     {
-      customer_name: 'Jose Muñoz',
+      customer_name: 'Craig Mayer (male)',
       num_orders: 1,
       lifetime_value: 2367.92
     },
     {
-      customer_name: 'Jose Nelson',
+      customer_name: 'Christie Mann (female)',
       num_orders: 2,
       lifetime_value: 171.27
     },
     {
-      customer_name: 'Jose Parker',
+      customer_name: 'Minnie Barrows (female)',
       num_orders: 1,
       lifetime_value: 39.98
     },
     {
-      customer_name: 'Jose Phillips',
+      customer_name: 'Mr. Earnest Collins (male)',
       num_orders: 1,
       lifetime_value: 2383.95
     },
     {
-      customer_name: 'Jose Scott',
+      customer_name: 'Alvin Swift (female)',
       num_orders: 2,
       lifetime_value: 6044.59
     },
     {
-      customer_name: 'Jose Smith',
+      customer_name: 'Joyce Bayer (female)',
       num_orders: 1,
       lifetime_value: 35.96
     },
     {
-      customer_name: 'Jose Taylor',
+      customer_name: 'Wilson Friesen (female)',
       num_orders: 2,
       lifetime_value: 94.47
     },
     {
-      customer_name: 'Jose Thomas',
+      customer_name: 'Owen Barton (male)',
       num_orders: 1,
       lifetime_value: 1764.96
     },
     {
-      customer_name: 'Jose Thompson',
+      customer_name: 'Andy Hilll DVM (male)',
       num_orders: 1,
       lifetime_value: 124.99
     },
     {
-      customer_name: 'Jose Turner',
+      customer_name: 'Debra Johns-Marquardt (male)',
       num_orders: 1,
       lifetime_value: 539.99
     },
     {
-      customer_name: 'Jose Walker',
+      customer_name: 'Rodney Hahn (female)',
       num_orders: 2,
       lifetime_value: 6030.61
     },
     {
-      customer_name: 'Jose White',
+      customer_name: 'Terri Swaniawski (male)',
       num_orders: 1,
       lifetime_value: 68.49
     },
     {
-      customer_name: 'Jose Williams',
+      customer_name: 'Harry Homenick (male)',
       num_orders: 1,
       lifetime_value: 66.96
     },
     {
-      customer_name: 'Jose Wilson',
+      customer_name: 'Kerry Braun (female)',
       num_orders: 2,
       lifetime_value: 78.96
     },
     {
-      customer_name: 'Jose Wright',
+      customer_name: 'Benjamin Haag (female)',
       num_orders: 1,
       lifetime_value: 12.94
     },
     {
-      customer_name: 'Jose Young',
+      customer_name: 'Bryan Rolfson II (male)',
       num_orders: 1,
       lifetime_value: 37.93
     },
     {
-      customer_name: 'Joseph Anderson',
+      customer_name: 'Dr. Tony Walsh (female)',
       num_orders: 2,
       lifetime_value: 244.23
     },
     {
-      customer_name: 'Joseph Brown',
+      customer_name: 'Ross Mayert (female)',
       num_orders: 1,
       lifetime_value: 1725.98
     },
     {
-      customer_name: 'Joseph Clark',
+      customer_name: 'Monica Daniel MD (female)',
       num_orders: 1,
       lifetime_value: 2341.46
     },
     {
-      customer_name: 'Joseph Davis',
+      customer_name: 'Johnathan Dibbert (female)',
       num_orders: 1,
       lifetime_value: 94.48
     },
     {
-      customer_name: 'Joseph Garcia',
+      customer_name: 'Amy Konopelski (female)',
       num_orders: 1,
       lifetime_value: 1754.98
     },
     {
-      customer_name: 'Joseph Harris',
+      customer_name: 'Lila Nitzsche (male)',
       num_orders: 2,
       lifetime_value: 146.94
     },
     {
-      customer_name: 'Joseph Jackson',
+      customer_name: 'Herbert Muller (female)',
       num_orders: 1,
       lifetime_value: 123.98
     },
     {
-      customer_name: 'Joseph Johnson',
+      customer_name: 'Horace Reilly (female)',
       num_orders: 2,
       lifetime_value: 6035.6
     },
     {
-      customer_name: 'Joseph Jones',
+      customer_name: 'Sally Kulas (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Joseph Lee',
+      customer_name: 'Georgia Wintheiser (female)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Joseph Lewis',
+      customer_name: 'Mr. James Baumbach (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Joseph Martin',
+      customer_name: 'Roger Trantow I (male)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Joseph Martinez',
+      customer_name: 'Jeanette Miller MD (male)',
       num_orders: 1,
       lifetime_value: 848.47
     },
     {
-      customer_name: 'Joseph Miller',
+      customer_name: 'Carmen Koelpin (female)',
       num_orders: 1,
       lifetime_value: 607.96
     },
     {
-      customer_name: 'Joseph Moore',
+      customer_name: 'Roy Bashirian (female)',
       num_orders: 1,
       lifetime_value: 2326.96
     },
     {
-      customer_name: 'Joseph Robinson',
+      customer_name: 'Wesley Thompson (male)',
       num_orders: 1,
       lifetime_value: 589.26
     },
     {
-      customer_name: 'Joseph Rodriguez',
+      customer_name: 'Elvira Prosacco (male)',
       num_orders: 1,
       lifetime_value: 567.27
     },
     {
-      customer_name: 'Joseph Smith',
+      customer_name: 'Marcus Erdman (male)',
       num_orders: 2,
       lifetime_value: 4167.23
     },
     {
-      customer_name: 'Joseph Taylor',
+      customer_name: 'Ed Boyer (male)',
       num_orders: 2,
       lifetime_value: 82.18
     },
     {
-      customer_name: 'Joseph Thomas',
+      customer_name: 'Felix Watsica (male)',
       num_orders: 2,
       lifetime_value: 6029.57
     },
     {
-      customer_name: 'Joseph Thompson',
+      customer_name: 'Madeline Stanton (male)',
       num_orders: 1,
       lifetime_value: 806.76
     },
     {
-      customer_name: 'Joseph Walker',
+      customer_name: 'Cheryl Moen (female)',
       num_orders: 1,
       lifetime_value: 69.99
     },
     {
-      customer_name: 'Joseph White',
+      customer_name: 'Dwayne Wiza (male)',
       num_orders: 1,
       lifetime_value: 839.48
     },
     {
-      customer_name: 'Joseph Williams',
+      customer_name: 'Willie Thiel (female)',
       num_orders: 1,
       lifetime_value: 64.47
     },
     {
-      customer_name: 'Joseph Wilson',
+      customer_name: 'Vanessa Kirlin (male)',
       num_orders: 1,
       lifetime_value: 78.98
     },
     {
-      customer_name: 'Joshua Anderson',
+      customer_name: 'Roger Mertz (female)',
       num_orders: 1,
       lifetime_value: 4.99
     },
     {
-      customer_name: 'Joshua Brown',
+      customer_name: 'Delia Lang (male)',
       num_orders: 1,
       lifetime_value: 119.98
     },
     {
-      customer_name: 'Joshua Clark',
+      customer_name: 'Cynthia Bogan (female)',
       num_orders: 37,
       lifetime_value: 1799.48
     },
     {
-      customer_name: 'Joshua Davis',
+      customer_name: 'Rosa Parisian (female)',
       num_orders: 2,
       lifetime_value: 4752.75
     }

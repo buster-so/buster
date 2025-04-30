@@ -1,7 +1,7 @@
 import { trendlineDatasetCreator } from './trendlineDatasetCreator';
 import { DATASET_IDS } from '../config';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
-import type { DatasetOption, DatasetOptionsWithTicks } from '../interfaces';
+import type { DatasetOption } from '../interfaces';
 import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import type { Trendline } from '@/api/asset_interfaces/metric/charts';
 
@@ -21,7 +21,7 @@ describe('trendlineDatasetCreator', () => {
         {
           id: 'test-column-id',
           data: [5, 10, 15, 20, 25],
-          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          label: [{ key: 'test-label', value: 'Test Label' }],
           dataKey: 'test-column-id',
           axisType: 'y',
           tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
@@ -47,7 +47,7 @@ describe('trendlineDatasetCreator', () => {
         dataKey: 'test-column-id',
         axisType: 'y'
       });
-      expect(result[0].label).toEqual([[{ key: 'value', value: 25 }]]);
+      expect(result[0].label).toEqual([{ key: 'value', value: 25 }]);
       expect(result[0].tooltipData).toEqual([[{ key: 'value', value: 25 }]]);
     });
 
@@ -65,7 +65,7 @@ describe('trendlineDatasetCreator', () => {
         {
           id: 'test-column-id',
           data: [5, 10, 15, 20, 25],
-          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          label: [{ key: 'test-label', value: 'Test Label' }],
           dataKey: 'test-column-id',
           axisType: 'y',
           tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
@@ -103,7 +103,7 @@ describe('trendlineDatasetCreator', () => {
         {
           id: 'test-column-id',
           data: [5, 10, 15, 20, 25],
-          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          label: [{ key: 'test-label', value: 'Test Label' }],
           dataKey: 'test-column-id',
           axisType: 'y',
           tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
@@ -129,7 +129,7 @@ describe('trendlineDatasetCreator', () => {
         dataKey: 'test-column-id',
         axisType: 'y'
       });
-      expect(result[0].label).toEqual([[{ key: 'value', value: 5 }]]);
+      expect(result[0].label).toEqual([{ key: 'value', value: 5 }]);
       expect(result[0].tooltipData).toEqual([[{ key: 'value', value: 5 }]]);
     });
 
@@ -147,7 +147,7 @@ describe('trendlineDatasetCreator', () => {
         {
           id: 'test-column-id',
           data: [5, -10, 15, -20, 25],
-          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          label: [{ key: 'test-label', value: 'Test Label' }],
           dataKey: 'test-column-id',
           axisType: 'y',
           tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
@@ -173,7 +173,7 @@ describe('trendlineDatasetCreator', () => {
         dataKey: 'test-column-id',
         axisType: 'y'
       });
-      expect(result[0].label).toEqual([[{ key: 'value', value: -20 }]]);
+      expect(result[0].label).toEqual([{ key: 'value', value: -20 }]);
       expect(result[0].tooltipData).toEqual([[{ key: 'value', value: -20 }]]);
     });
 
@@ -191,7 +191,7 @@ describe('trendlineDatasetCreator', () => {
         {
           id: 'test-column-id',
           data: [5, null, 15, undefined as unknown as null, -10],
-          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          label: [{ key: 'test-label', value: 'Test Label' }],
           dataKey: 'test-column-id',
           axisType: 'y',
           tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
@@ -233,7 +233,7 @@ describe('trendlineDatasetCreator', () => {
         {
           id: 'test-column-id',
           data: [5, 10, 15, 20, 25],
-          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          label: [{ key: 'test-label', value: 'Test Label' }],
           dataKey: 'test-column-id',
           axisType: 'y',
           tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
@@ -271,7 +271,7 @@ describe('trendlineDatasetCreator', () => {
         {
           id: 'test-column-id',
           data: [5, 20, 10, 25, 15],
-          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          label: [{ key: 'test-label', value: 'Test Label' }],
           dataKey: 'test-column-id',
           axisType: 'y',
           tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
@@ -301,7 +301,7 @@ describe('trendlineDatasetCreator', () => {
         dataKey: 'test-column-id',
         axisType: 'y'
       });
-      expect(result[0].label).toEqual([[{ key: 'value', value: 15 }]]);
+      expect(result[0].label).toEqual([{ key: 'value', value: 15 }]);
       expect(result[0].tooltipData).toEqual([[{ key: 'value', value: 15 }]]);
     });
 
@@ -319,7 +319,7 @@ describe('trendlineDatasetCreator', () => {
         {
           id: 'test-column-id',
           data: [5, 15, 10, 20],
-          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          label: [{ key: 'test-label', value: 'Test Label' }],
           dataKey: 'test-column-id',
           axisType: 'y',
           tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
@@ -349,7 +349,7 @@ describe('trendlineDatasetCreator', () => {
         dataKey: 'test-column-id',
         axisType: 'y'
       });
-      expect(result[0].label).toEqual([[{ key: 'value', value: 12.5 }]]);
+      expect(result[0].label).toEqual([{ key: 'value', value: 12.5 }]);
       expect(result[0].tooltipData).toEqual([[{ key: 'value', value: 12.5 }]]);
     });
 
@@ -367,7 +367,7 @@ describe('trendlineDatasetCreator', () => {
         {
           id: 'test-column-id',
           data: [5, null, 15, undefined as unknown as null, 10],
-          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          label: [{ key: 'test-label', value: 'Test Label' }],
           dataKey: 'test-column-id',
           axisType: 'y',
           tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
@@ -413,7 +413,7 @@ describe('trendlineDatasetCreator', () => {
         {
           id: 'test-column-id',
           data: [5, 10, 15, 20, 25],
-          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          label: [{ key: 'test-label', value: 'Test Label' }],
           dataKey: 'test-column-id',
           axisType: 'y',
           tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
@@ -453,7 +453,7 @@ describe('trendlineDatasetCreator', () => {
         {
           id: 'test-column-id',
           data: [],
-          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          label: [{ key: 'test-label', value: 'Test Label' }],
           dataKey: 'test-column-id',
           axisType: 'y',
           tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
@@ -495,7 +495,7 @@ describe('trendlineDatasetCreator', () => {
         {
           id: 'test-column-id',
           data: [2, 4, 6, 8, 10], // Perfect linear data
-          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          label: [{ key: 'test-label', value: 'Test Label' }],
           dataKey: 'x-axis',
           axisType: 'y',
           tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
@@ -557,7 +557,7 @@ describe('trendlineDatasetCreator', () => {
         {
           id: 'test-column-id',
           data: [10, 8, 6, 4, 2], // Perfect linear data with negative slope
-          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          label: [{ key: 'test-label', value: 'Test Label' }],
           dataKey: 'x-axis',
           axisType: 'y',
           tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
@@ -618,7 +618,7 @@ describe('trendlineDatasetCreator', () => {
         {
           id: 'test-column-id',
           data: [3, 5, 4, 7, 6, 9, 8], // Data with slight variations around the trend
-          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          label: [{ key: 'test-label', value: 'Test Label' }],
           dataKey: 'x-axis',
           axisType: 'y',
           tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
@@ -690,7 +690,7 @@ describe('trendlineDatasetCreator', () => {
         {
           id: 'test-column-id',
           data: [100, 120, 115, 140, 135, 160], // Values showing upward trend with some variation
-          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          label: [{ key: 'test-label', value: 'Test Label' }],
           dataKey: 'x-axis',
           axisType: 'y',
           tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
@@ -767,7 +767,7 @@ describe('trendlineDatasetCreator', () => {
         {
           id: 'test-column-id',
           data: [2, 4, 8, 16, 32], // Perfect exponential data (y = 2^(x+1))
-          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          label: [{ key: 'test-label', value: 'Test Label' }],
           dataKey: 'x-axis',
           axisType: 'y',
           tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
@@ -828,7 +828,7 @@ describe('trendlineDatasetCreator', () => {
         {
           id: 'test-column-id',
           data: [2, 4, 8, 16, 32], // Exponential growth
-          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          label: [{ key: 'test-label', value: 'Test Label' }],
           dataKey: 'x-axis',
           axisType: 'y',
           tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
@@ -882,7 +882,7 @@ describe('trendlineDatasetCreator', () => {
         {
           id: 'test-column-id',
           data: [1, 0.5, 4, 8, 16], // Mix of valid and invalid values
-          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          label: [{ key: 'test-label', value: 'Test Label' }],
           dataKey: 'x-axis',
           axisType: 'y',
           tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
@@ -935,7 +935,7 @@ describe('trendlineDatasetCreator', () => {
         {
           id: 'test-column-id',
           data: [-2, -1, 0, null, null] as (number | null)[], // Fixed typing for null values
-          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          label: [{ key: 'test-label', value: 'Test Label' }],
           dataKey: 'x-axis',
           axisType: 'y',
           tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
@@ -983,7 +983,7 @@ describe('trendlineDatasetCreator', () => {
         {
           id: 'test-column-id',
           data: [0, 0.301, 0.477, 0.602, 0.699], // log10(x) values
-          label: [[{ key: 'test-label', value: 'Test Label' }]],
+          label: [{ key: 'test-label', value: 'Test Label' }],
           dataKey: 'x-axis',
           axisType: 'y',
           tooltipData: [[{ key: 'test-tooltip', value: 'Test Tooltip' }]]
