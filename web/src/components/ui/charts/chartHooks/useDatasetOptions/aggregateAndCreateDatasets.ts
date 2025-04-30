@@ -51,7 +51,7 @@ export function aggregateAndCreateDatasets<
   }
 
   // Format tooltip values, treating missing as empty or replacement
-  function formatTooltip(raw: any, fmt: ColumnLabelFormatBase): string | number | boolean | object {
+  function formatTooltip(raw: any, fmt: ColumnLabelFormatBase): string | number | boolean {
     if (raw == null || raw === '') {
       if (fmt.replaceMissingDataWith !== undefined) {
         const rep = fmt.replaceMissingDataWith;

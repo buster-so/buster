@@ -14,6 +14,10 @@ export const barAndLineTooltipHelper = (
   hasMultipleShownDatasets: boolean,
   percentageMode: undefined | 'stacked'
 ): ITooltipItem[] => {
+  if (percentageMode) {
+    dataPoints.reverse();
+  }
+
   const tooltipItems = dataPoints.flatMap<ITooltipItem>((dataPoint) => {
     const tooltipDataset = dataPoint.dataset;
     const dataPointDataIndex = dataPoint.dataIndex;

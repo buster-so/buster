@@ -198,9 +198,26 @@ function applyPercentageStack(datasets: DatasetOption[]): DatasetOption[] {
     })
   );
 
-  // Convert each data point to percentage
+  // Convert each data point to percentage and update tooltips
   clone.forEach((ds) => {
-    ds.data = ds.data.map((v, i) => (sums[i] ? ((v === null ? 0 : v || 0) / sums[i]) * 100 : 0));
+    ds.data = ds.data.map((v, i) => {
+      const percentage = sums[i] ? ((v === null ? 0 : v || 0) / sums[i]) * 100 : 0;
+
+      // Update tooltip data if it exists
+      if (ds.tooltipData?.[i]) {
+        const tooltipData = ds.tooltipData[i];
+        // Find and update the value in tooltip
+        tooltipData.forEach((item) => {
+          if (item.value === v) {
+            item.value = percentage;
+          }
+        });
+        // Reverse the order of tooltip data
+        ds.tooltipData[i] = tooltipData;
+      }
+
+      return percentage;
+    });
   });
 
   return clone;
@@ -288,8 +305,6 @@ export function modifyDatasets({
       modifiedDatasets = sortResult.datasets;
       result.ticks = sortResult.ticks;
     }
-
-    console.log('modified datasets', modifiedDatasets);
 
     result.datasets = modifiedDatasets;
     return result;

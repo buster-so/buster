@@ -4,8 +4,42 @@ import { ChartType } from '../../../../api/asset_interfaces/metric/charts/enum';
 import { IColumnLabelFormat } from '../../../../api/asset_interfaces/metric/charts/columnLabelInterfaces';
 import { generateBarChartData } from '../../../../mocks/chart/chartMocks';
 import { sharedMeta } from './BusterChartShared';
-import { faker } from '@faker-js/faker';
 import { BarAndLineAxis } from '@/api/asset_interfaces/metric';
+
+// Helper functions for predictable data generation
+const generateProductName = (index: number) => `Product ${index + 1}`;
+const generateDepartment = (index: number) => {
+  const departments = ['Electronics', 'Clothing', 'Home', 'Books', 'Sports'];
+  return departments[index % departments.length];
+};
+const generateState = (index: number) => {
+  const states = ['California', 'Texas', 'New York', 'Florida', 'Illinois'];
+  return states[index % states.length];
+};
+const generateNumber = (base: number, variance: number, index: number) => {
+  // Use index to create predictable but varying numbers
+  const noise = Math.sin(index) * variance;
+  return Math.round(base + noise);
+};
+const generateDate = (index: number) => {
+  const baseDate = new Date('2024-01-01');
+  baseDate.setDate(baseDate.getDate() - index);
+  return baseDate.toISOString();
+};
+
+const generateRegion = (index: number) => {
+  const regions = [
+    'North',
+    'South',
+    'East',
+    'West',
+    'Central',
+    'Southeast',
+    'Southwest',
+    'Northeast'
+  ];
+  return regions[index % regions.length];
+};
 
 type BarChartData = ReturnType<typeof generateBarChartData>;
 
@@ -103,11 +137,11 @@ export const MultipleYAxis: Story = {
 export const WithCategory: Story = {
   args: {
     selectedChartType: ChartType.Bar,
-    data: Array.from({ length: 4 }, () => ({
-      region: faker.location.state(),
-      product: faker.commerce.productName(),
-      sales: faker.number.int({ min: 1000, max: 10000 }),
-      units: faker.number.int({ min: 50, max: 500 })
+    data: Array.from({ length: 4 }, (_, index) => ({
+      region: generateRegion(index),
+      product: generateProductName(index),
+      sales: generateNumber(5000, 1000, index),
+      units: generateNumber(500, 100, index)
     })),
     barAndLineAxis: {
       x: ['region'],
@@ -148,12 +182,12 @@ export const DateXAxis: Story = {
   args: {
     selectedChartType: ChartType.Bar,
     data: Array.from({ length: 7 }, (_, index) => {
-      const date = new Date();
+      const date = new Date('2024-01-01');
       date.setDate(date.getDate() - index);
       return {
         date: date.toISOString(),
-        sales: faker.number.int({ min: 1000, max: 10000 }),
-        units: faker.number.int({ min: 50, max: 500 })
+        sales: generateNumber(5000, 1000, index),
+        units: generateNumber(500, 100, index)
       };
     }),
     barAndLineAxis: {
@@ -337,10 +371,10 @@ export const LargeDataset: Story = {
     className: 'resize overflow-auto min-w-[250px] h-[400px]',
     selectedChartType: ChartType.Bar,
     data: Array.from({ length: 25 }, (_, index) => ({
-      category: faker.commerce.productName(),
-      sales: faker.number.int({ min: 5000, max: 50000 }),
-      units: faker.number.int({ min: 100, max: 1000 }),
-      returns: faker.number.int({ min: 100, max: 1000 })
+      category: generateProductName(index),
+      sales: generateNumber(25000, 5000, index),
+      units: generateNumber(500, 100, index),
+      returns: generateNumber(500, 100, index)
     })),
     barAndLineAxis: {
       x: ['category'],
@@ -375,10 +409,10 @@ export const LargeDatasetWithDualYAxis: Story = {
   args: {
     selectedChartType: ChartType.Combo,
     data: Array.from({ length: 25 }, (_, index) => ({
-      category: faker.commerce.productName(),
-      sales: faker.number.int({ min: 5000, max: 50000 }),
-      units: faker.number.int({ min: 100, max: 1000 }),
-      returns: faker.number.int({ min: 100, max: 1000 })
+      category: generateProductName(index),
+      sales: generateNumber(25000, 5000, index),
+      units: generateNumber(500, 100, index),
+      returns: generateNumber(500, 100, index)
     })),
     comboChartAxis: {
       x: ['category'],
@@ -433,15 +467,14 @@ export const WithDatesInXAxis: Story = {
   args: {
     ...Default.args,
     data: Array.from({ length: 7 }, (_, index) => ({
-      date: faker.date.past({ years: 1 }).toISOString(),
-      sales: faker.number.int({ min: 1000, max: 10000 })
+      date: generateDate(index),
+      sales: generateNumber(5000, 1000, index)
     })),
     barAndLineAxis: {
       x: ['date'],
       y: ['sales'],
       category: []
     },
-    //  barSortBy: ['asc'],
     columnLabelFormats: {
       date: {
         columnType: 'date',
@@ -461,8 +494,8 @@ export const WithDatesInXAxisAndSorting: Story = {
   args: {
     ...Default.args,
     data: Array.from({ length: 7 }, (_, index) => ({
-      date: faker.date.past({ years: 1 }).toISOString(),
-      sales: faker.number.int({ min: 1000, max: 10000 })
+      date: generateDate(index),
+      sales: generateNumber(5000, 1000, index)
     })),
     barAndLineAxis: {
       x: ['date'],
@@ -533,6 +566,133 @@ export const HorizontalBarWithGoalLine: Story = {
   render: (args) => {
     return (
       <div className="h-[400px] w-[800px]">
+        <BusterChart {...args} />
+      </div>
+    );
+  }
+};
+
+export const GroupedBar: Story = {
+  args: {
+    selectedChartType: ChartType.Bar,
+    data: ['Electronics', 'Clothing', 'Home', 'Books'].flatMap((category, index) => {
+      const states = ['Utah', 'Arizona', 'Idaho', 'Wyoming'];
+      return states.map((state, index2) => {
+        return {
+          region: state,
+          product: category,
+          sales:
+            generateNumber(5000, 1000, index) *
+            (index + 1.23) *
+            (index2 + 1.23) *
+            (1 + Math.cos(index * 0.5) * 0.3 + Math.sin(index2 * 0.7) * 0.2),
+          units: generateNumber(250, 50, index) * (index + 1.13) * (index2 + 1.03),
+          returns: generateNumber(50, 10, index) * (index + 1.83) * (index2 + 1.93)
+        };
+      });
+    }),
+    barAndLineAxis: {
+      x: ['region'],
+      y: ['sales'],
+      category: ['product']
+    },
+    barGroupType: 'group',
+    columnLabelFormats: {
+      region: {
+        columnType: 'text',
+        style: 'string'
+      } satisfies IColumnLabelFormat,
+      product: {
+        columnType: 'text',
+        style: 'string'
+      } satisfies IColumnLabelFormat,
+      sales: {
+        columnType: 'number',
+        style: 'currency',
+        currency: 'USD'
+      } satisfies IColumnLabelFormat,
+      units: {
+        columnType: 'number',
+        style: 'number',
+        numberSeparatorStyle: ','
+      } satisfies IColumnLabelFormat,
+      returns: {
+        columnType: 'number',
+        style: 'number',
+        numberSeparatorStyle: ','
+      } satisfies IColumnLabelFormat
+    }
+  },
+  render: (args) => {
+    return (
+      <div className="h-[400px] w-[800px]">
+        <BusterChart {...args} />
+      </div>
+    );
+  }
+};
+
+export const PercentageStackedBar: Story = {
+  args: {
+    selectedChartType: ChartType.Bar,
+    data: ['Electronics', 'Clothing', 'Home', 'Books'].flatMap((category, index) => {
+      const states = ['Utah', 'Arizona', 'Idaho', 'Wyoming'];
+      return states.map((state, index2) => {
+        return {
+          region: state,
+          product: category,
+          sales:
+            generateNumber(5000, 1000, index) *
+            (index + 1.23) *
+            (index2 + 1.23) *
+            (1 + Math.cos(index * 0.15) * 0.3 + Math.sin(index2 * 0.15) * 0.2),
+          units: generateNumber(250, 50, index) * (index + 1.13) * (index2 + 1.03),
+          returns: generateNumber(50, 10, index) * (index + 1.83) * (index2 + 1.93)
+        };
+      });
+    }),
+    barAndLineAxis: {
+      x: ['region'],
+      y: ['sales'],
+      category: ['product']
+    },
+    barGroupType: 'percentage-stack',
+    columnSettings: {
+      sales: {
+        showDataLabels: true
+      },
+      units: {
+        showDataLabels: true
+      },
+      returns: {
+        showDataLabels: true
+      }
+    },
+    columnLabelFormats: {
+      category: {
+        columnType: 'text',
+        style: 'string'
+      } satisfies IColumnLabelFormat,
+      sales: {
+        columnType: 'number',
+        style: 'currency',
+        currency: 'USD'
+      } satisfies IColumnLabelFormat,
+      units: {
+        columnType: 'number',
+        style: 'number',
+        numberSeparatorStyle: ','
+      } satisfies IColumnLabelFormat,
+      returns: {
+        columnType: 'number',
+        style: 'number',
+        numberSeparatorStyle: ','
+      } satisfies IColumnLabelFormat
+    }
+  },
+  render: (args) => {
+    return (
+      <div className="h-[300px] w-[400px]">
         <BusterChart {...args} />
       </div>
     );

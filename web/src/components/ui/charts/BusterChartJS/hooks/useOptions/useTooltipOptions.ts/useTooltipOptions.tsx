@@ -87,7 +87,6 @@ export const useTooltipOptions = ({
   }, [lineGroupType, pieDisplayLabelAs, selectedChartType, barGroupType]);
 
   const keyToUsePercentage: string[] = useMemo(() => {
-    console.log(useGlobalPercentage, selectedChartType, tooltipKeys);
     if (useGlobalPercentage)
       return tooltipKeys.filter((key) => {
         const selectedColumnLabelFormat = columnLabelFormats[key] || DEFAULT_COLUMN_LABEL_FORMAT;

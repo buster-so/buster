@@ -32,7 +32,7 @@ export const ChartTotalizerPlugin: Plugin<ChartType, ChartTotalizerPluginOptions
       .filter((dataset, index) => {
         const meta = chart.getDatasetMeta(index);
         //meta.hidden is true when the dataset is hidden by the legend
-        //dataset.hidden is true when the dataset is hidden by what was passed in the options (like tooltip datasets)
+        //dataset.hidden is true when the dataset is hidden by what was passed in the options
         return !meta.hidden && !dataset.hidden;
       })
       .forEach((dataset, datasetIndex) => {
