@@ -121,22 +121,28 @@ export function aggregateAndCreateDatasets<
 
   if (isScatterPlot) {
     // SCATTER: for each category group and each yKey
+    const scatterTicks: (string | number)[][] = [];
+    const scatterTicksKey: KV[] = xKeys.map((key) => ({ key, value: '' }));
+
     catGroups.forEach(({ rec: catRec, rows }) => {
       yKeys.forEach((yKey) => {
         const fmtY = colFormats[yKey];
         const axisType = 'y';
 
-        const dataArr = rows.map((r) => parseNumeric(r[yKey], fmtY));
+        // Filter out rows with null or undefined x values to ensure data-tick alignment
+        const validRows = rows.filter((row) => xKeys.every((xKey) => row[xKey] != null));
+
+        const dataArr = validRows.map((r) => parseNumeric(r[yKey], fmtY));
         let sizeArr: (number | null)[] | undefined;
         if (sizeKey) {
           const fmtSize = colFormats[sizeKey];
-          sizeArr = rows.map((r) => parseNumeric(r[sizeKey], fmtSize));
+          sizeArr = validRows.map((r) => parseNumeric(r[sizeKey], fmtSize));
         }
 
         // Generate labels for scatter plot
         const labelArr = generateLabels(yKey, catRec);
 
-        const tooltipArr = rows.map((r) => {
+        const tooltipArr = validRows.map((r) => {
           const pts: KV[] = [];
           if (tooltipKeys.length) {
             tooltipKeys.forEach((k) =>
@@ -157,6 +163,16 @@ export function aggregateAndCreateDatasets<
           return pts;
         });
 
+        // Generate ticks for this dataset
+        const datasetTicks = validRows.map((row) =>
+          xKeys.map((key) => row[key] as string | number)
+        );
+
+        // Only add ticks if this is the first dataset (to avoid duplicates)
+        if (datasets.length === 0) {
+          scatterTicks.push(...datasetTicks);
+        }
+
         // Generate ID for scatter plot dataset
         const id = createDatasetId(
           yKey,
@@ -174,6 +190,12 @@ export function aggregateAndCreateDatasets<
         });
       });
     });
+
+    return {
+      datasets,
+      ticksKey: scatterTicksKey,
+      ticks: scatterTicks
+    };
   } else {
     // NON-SCATTER
     if (catKeys.length) {
@@ -312,10 +334,10 @@ export function aggregateAndCreateDatasets<
   }));
 
   // Extract ticks from xGroups
-  const ticks: string[][] = xGroups.map((group) => {
+  const ticks: (string | number)[][] = xGroups.map((group) => {
     return xKeys.map((key) => {
       const value = group.rec[key];
-      return String(value);
+      return value;
     });
   });
 

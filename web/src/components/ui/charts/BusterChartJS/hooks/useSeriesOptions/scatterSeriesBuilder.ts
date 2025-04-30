@@ -1,13 +1,29 @@
 import type { ChartProps } from '../../core';
 import { LabelBuilderProps } from './useSeriesOptions';
 import { SeriesBuilderProps } from './interfaces';
-import { ScriptableContext } from 'chart.js';
+import { BubbleDataPoint, ScriptableContext } from 'chart.js';
 import { DEFAULT_CHART_CONFIG, DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import { addOpacityToColor } from '@/lib/colors';
 import { isDateColumnType } from '@/lib/messages';
 import { createDayjsDate } from '@/lib/date';
 import { lineSeriesBuilder_labels } from './lineSeriesBuilder';
-import { extractFieldsFromChain } from '../../../chartHooks';
+import { formatLabelForDataset } from '../../../commonHelpers';
+
+declare module 'chart.js' {
+  interface BubbleDataPoint {
+    originalR: number;
+  }
+}
+
+const colorsRecord: Record<
+  string,
+  {
+    color: string;
+    backgroundColor: string;
+    hoverBackgroundColor: string;
+    borderColor: string;
+  }
+> = {};
 
 export const scatterSeriesBuilder_data = ({
   colors,
@@ -22,17 +38,7 @@ export const scatterSeriesBuilder_data = ({
   const xAxisColumnLabelFormat = columnLabelFormats[xAxisKey] || DEFAULT_COLUMN_LABEL_FORMAT;
   const isXAxisDate = isDateColumnType(xAxisColumnLabelFormat.columnType);
 
-  const assignedColors: Record<
-    string,
-    {
-      color: string;
-      backgroundColor: string;
-      hoverBackgroundColor: string;
-      borderColor: string;
-    }
-  > = {};
-
-  const hasSizeKeyIndex = sizeOptions !== null;
+  const hasSizeKeyIndex = sizeOptions !== null && !!sizeOptions.key;
   const scatterElementConfig = hasSizeKeyIndex
     ? {
         point: {
@@ -42,7 +48,43 @@ export const scatterSeriesBuilder_data = ({
       }
     : undefined;
 
-  return [];
+  return datasetOptions.datasets.map((dataset, datasetIndex) => {
+    const color = colors[datasetIndex % colors.length];
+    let backgroundColor = colorsRecord[color]?.backgroundColor;
+    let hoverBackgroundColor = colorsRecord[color]?.hoverBackgroundColor;
+    let borderColor = colorsRecord[color]?.borderColor;
+
+    if (!colorsRecord[color]) {
+      backgroundColor = addOpacityToColor(color, 0.6);
+      hoverBackgroundColor = addOpacityToColor(color, 0.9);
+      borderColor = color;
+      colorsRecord[color] = { color, backgroundColor, hoverBackgroundColor, borderColor };
+    }
+
+    return {
+      label: formatLabelForDataset(dataset, columnLabelFormats),
+      elements: scatterElementConfig,
+      backgroundColor,
+      hoverBackgroundColor,
+      borderColor: color,
+      tooltipData: dataset.tooltipData,
+      yAxisKey: dataset.dataKey,
+      xAxisKeys,
+      data: dataset.data.reduce<BubbleDataPoint[]>((acc, yData, index) => {
+        if (yData !== null) {
+          acc.push({
+            x: getScatterXValue({
+              isXAxisDate,
+              xValue: datasetOptions.ticks[index][0]
+            }),
+            y: yData,
+            originalR: dataset.sizeData?.[index] ?? 0
+          });
+        }
+        return acc;
+      }, [])
+    };
+  });
 
   // return allYAxisKeysIndexes.flatMap((yKeyIndex, index) => {
   //   const { index: yIndex, name: yName } = yKeyIndex;
@@ -83,9 +125,9 @@ const getScatterXValue = ({
 }: {
   isXAxisDate: boolean;
   xValue: number | string | Date | null;
-}): number | Date => {
+}): number => {
   if (isXAxisDate && xValue) {
-    return createDayjsDate(xValue as string).toDate();
+    return createDayjsDate(xValue as string).valueOf();
   }
 
   return xValue as number;

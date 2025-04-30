@@ -58,14 +58,25 @@ export const generatePieChartData = (segmentCount = 5): IDataResult => {
   }));
 };
 
-// Scatter chart mock data with predictable patterns
+// Scatter chart mock data with organic distribution
 export const generateScatterChartData = (pointCount = 30): IDataResult => {
   const categories = ['Electronics', 'Clothing', 'Home Goods'];
-  return Array.from({ length: pointCount }, (_, index) => ({
-    x: (index % 10) * 10, // Values from 0-90 in steps of 10
-    y: Math.floor(index / 10) * 10, // Creates a grid pattern,
-    y2: Math.floor(index / 10) * 40, // Creates a grid pattern,
-    size: 10 + (index % 5) * 10, // Sizes cycle between 10-50 in steps of 10
-    category: categories[index % categories.length]
-  }));
+  return Array.from({ length: pointCount }, (_, index) => {
+    // Create a smooth curve using sine and cosine functions
+    const angle = (index / pointCount) * Math.PI * 2;
+    const radius = 50 + Math.sin(angle * 2) * 20; // Varies between 30-70
+
+    // Convert polar coordinates to cartesian for more natural distribution
+    const x = Math.round(Math.cos(angle) * radius + 50); // Center around 50
+    const y = Math.round(Math.sin(angle) * radius + 50); // Center around 50
+    const y2 = Math.round(y * 1.5); // Create a related but different y2 value
+
+    return {
+      x,
+      y,
+      y2,
+      size: 10 + Math.round(Math.abs(Math.sin(angle * 3)) * 40), // Sizes between 10-50
+      category: categories[index % categories.length]
+    };
+  });
 };

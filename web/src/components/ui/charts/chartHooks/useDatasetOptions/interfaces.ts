@@ -47,7 +47,7 @@ export type DatasetOption = {
 };
 
 export type DatasetOptionsWithTicks = {
-  ticks: string[][];
+  ticks: (string | number)[][];
   ticksKey: KV[];
   datasets: DatasetOption[];
 };

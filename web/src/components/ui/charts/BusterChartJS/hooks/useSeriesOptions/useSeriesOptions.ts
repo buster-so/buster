@@ -16,6 +16,7 @@ import { lineSeriesBuilder, lineSeriesBuilder_labels } from './lineSeriesBuilder
 import { scatterSeriesBuilder_data, scatterSeriesBuilder_labels } from './scatterSeriesBuilder';
 import { comboSeriesBuilder_data, comboSeriesBuilder_labels } from './comboSeriesBuilder';
 import type { ColumnMetaData } from '@/api/asset_interfaces/metric/interfaces';
+import { isNumeric, isNumericColumnType } from '@/lib';
 
 export interface UseSeriesOptionsProps {
   selectedChartType: ChartType;
@@ -67,12 +68,24 @@ export const useSeriesOptions = ({
     });
   }, [datasetOptions, columnSettings, columnLabelFormats, xAxisKeys, sizeKey]);
 
-  const sizeOptions = useMemo(() => {
+  const sizeOptions: SeriesBuilderProps['sizeOptions'] = useMemo(() => {
     if (!sizeKey || sizeKey.length === 0) {
       return null;
     }
 
-    return null;
+    const assosciatedColumn = columnMetadata.find((meta) => meta.name === sizeKey[0]);
+    const isNumberColumn = assosciatedColumn && isNumericColumnType(assosciatedColumn?.simple_type);
+
+    if (!isNumberColumn) {
+      console.warn('Size key is not a number column', { isNumberColumn, sizeKey });
+      return null;
+    }
+
+    return {
+      key: sizeKey[0],
+      minValue: Number(assosciatedColumn?.min_value),
+      maxValue: Number(assosciatedColumn?.max_value)
+    };
   }, [sizeKey]);
 
   const datasetSeries: ChartProps<ChartJSChartType>['data']['datasets'] = useMemo(() => {

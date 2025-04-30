@@ -171,12 +171,10 @@ export const useOptions = ({
     return datasets.reduce((acc, dataset) => acc + dataset.data.length, 0);
   }, [datasetOptions]);
 
-  console.log('numberOfSources', numberOfSources);
-
   const animation = useAnimations({
     animate,
     numberOfSources,
-    chartType: selectedChartType,
+    selectedChartType,
     barGroupType
   });
 

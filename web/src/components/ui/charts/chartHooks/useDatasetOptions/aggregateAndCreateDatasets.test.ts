@@ -164,7 +164,7 @@ describe('aggregateAndCreateDatasets', () => {
     expect(result.datasets[0].label).toEqual([{ key: 'y', value: '' }]);
 
     // Check ticks
-    expect(result.ticks).toEqual([['1'], ['2'], ['3']]);
+    expect(result.ticks).toEqual([[1], [2], [3]]);
     expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
   });
 
@@ -296,7 +296,7 @@ describe('aggregateAndCreateDatasets', () => {
     expect(result.datasets[0].label).toEqual([{ key: 'y', value: '' }]);
 
     // Check ticks
-    expect(result.ticks).toEqual([['1'], ['2'], ['3']]);
+    expect(result.ticks).toEqual([[1], [2], [3]]);
     expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
   });
 
@@ -341,7 +341,7 @@ describe('aggregateAndCreateDatasets', () => {
     ]);
 
     // Check ticks
-    expect(result.ticks).toEqual([['1'], ['2']]);
+    expect(result.ticks).toEqual([[1], [2]]);
     expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
   });
 
@@ -396,7 +396,7 @@ describe('aggregateAndCreateDatasets', () => {
     ]);
 
     // Check ticks
-    expect(result.ticks).toEqual([['1'], ['2']]);
+    expect(result.ticks).toEqual([[1], [2]]);
     expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
   });
 
@@ -596,7 +596,7 @@ describe('aggregateAndCreateDatasets', () => {
     ]);
 
     // Check ticks
-    expect(result.ticks).toEqual([['1'], ['2'], ['3']]);
+    expect(result.ticks).toEqual([[1], [2], [3]]);
     expect(result.ticksKey).toEqual([{ key: 'xValue', value: '' }]);
   });
 
@@ -652,7 +652,7 @@ describe('aggregateAndCreateDatasets', () => {
     ]);
 
     // Check ticks
-    expect(result.ticks).toEqual([['1'], ['2']]);
+    expect(result.ticks).toEqual([[1], [2]]);
     expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
   });
 
@@ -689,7 +689,7 @@ describe('aggregateAndCreateDatasets', () => {
     expect(dataset.tooltipData.length).toBe(2);
 
     // Check ticks
-    expect(result.ticks).toEqual([['1'], ['2']]);
+    expect(result.ticks).toEqual([[1], [2]]);
     expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
   });
 
@@ -809,7 +809,7 @@ describe('aggregateAndCreateDatasets', () => {
     ]);
 
     // Check ticks
-    expect(result.ticks).toEqual([['1'], ['2'], ['3']]);
+    expect(result.ticks).toEqual([[1], [2], [3]]);
     expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
   });
 
@@ -859,7 +859,7 @@ describe('aggregateAndCreateDatasets', () => {
     ]);
 
     // Check ticks
-    expect(result.ticks).toEqual([['1'], ['2'], ['3']]);
+    expect(result.ticks).toEqual([[1], [2], [3]]);
     expect(result.ticksKey).toEqual([{ key: 'id', value: '' }]);
   });
 
@@ -897,7 +897,7 @@ describe('aggregateAndCreateDatasets', () => {
     ]);
 
     // Check ticks
-    expect(result.ticks).toEqual([['1'], ['2'], ['3']]);
+    expect(result.ticks).toEqual([[1], [2], [3]]);
     expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
   });
 
@@ -1776,5 +1776,118 @@ describe('aggregateAndCreateDatasets', () => {
       { key: 'temperature', value: 20 },
       { key: 'humidity', value: 80 }
     ]);
+  });
+
+  it('should maintain exact data-tick alignment for scatter plots with large datasets', () => {
+    // Generate 50 data points with some null values mixed in
+    const testData = Array.from({ length: 60 }, (_, i) => ({
+      x: i, // Reduced null frequency to every 10th point
+      y: i * 2
+    }));
+
+    const result = aggregateAndCreateDatasets(
+      testData,
+      {
+        x: ['x'],
+        y: ['y']
+      },
+      {},
+      true // scatter plot mode
+    );
+
+    expect(result.ticks.length).toBe(60);
+    expect(result.datasets[0].data.length).toBe(60);
+    expect(result.datasets[0].tooltipData.length).toBe(60);
+  });
+
+  it('should maintain exact data-tick alignment for scatter plots with large datasets - with nulls', () => {
+    // Generate 50 data points with some null values mixed in
+    const testData = Array.from({ length: 60 }, (_, i) => ({
+      x: i === 5 ? null : i, // Reduced null frequency to every 10th point
+      y: i * 2
+    }));
+
+    const result = aggregateAndCreateDatasets(
+      testData,
+      {
+        x: ['x'],
+        y: ['y']
+      },
+      {},
+      true // scatter plot mode
+    );
+
+    expect(result.ticks.length).toBe(59);
+    expect(result.datasets[0].data.length).toBe(59);
+    expect(result.datasets[0].tooltipData.length).toBe(59);
+  });
+
+  it('should maintain exact data-tick alignment for scatter plots with large datasets - with nulls in y', () => {
+    const testData = Array.from({ length: 60 }, (_, i) => ({
+      x: i,
+      y: i === 5 ? null : i * 2
+    }));
+
+    const result = aggregateAndCreateDatasets(
+      testData,
+      {
+        x: ['x'],
+        y: ['y']
+      },
+      {},
+      true // scatter plot mode
+    );
+
+    expect(result.ticks.length).toBe(60);
+    expect(result.datasets[0].data.length).toBe(60);
+    expect(result.datasets[0].tooltipData.length).toBe(60);
+  });
+
+  it('should maintain exact data-tick alignment for scatter plots with large datasets - with category', () => {
+    const testData = Array.from({ length: 60 }, (_, i) => ({
+      x: i,
+      y: i,
+      category: i % 2 === 0 ? 'A' : 'B'
+    }));
+
+    const result = aggregateAndCreateDatasets(
+      testData,
+      {
+        x: ['x'],
+        y: ['y'],
+        category: ['category']
+      },
+      {},
+      true // scatter plot mode
+    );
+
+    expect(result.ticks.length).toBe(60 / 2); //because of the category
+    expect(result.datasets[0].data.length).toBe(60 / 2);
+    expect(result.datasets[0].tooltipData.length).toBe(60 / 2);
+  });
+
+  it('should maintain exact data-tick alignment for scatter plots with large datasets - with category and size', () => {
+    const testData = Array.from({ length: 60 }, (_, i) => ({
+      x: i,
+      y: i,
+      category: i % 2 === 0 ? 'A' : 'B',
+      size: i / 10
+    }));
+
+    const result = aggregateAndCreateDatasets(
+      testData,
+      {
+        x: ['x'],
+        y: ['y'],
+        category: ['category'],
+        size: ['size']
+      },
+      {},
+      true // scatter plot mode
+    );
+
+    expect(result.ticks.length).toBe(60 / 2); //because of the category
+    expect(result.datasets[0].data.length).toBe(60 / 2);
+    expect(result.datasets[0].tooltipData.length).toBe(60 / 2);
   });
 });

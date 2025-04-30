@@ -31,13 +31,8 @@ export const Default: Story = {
     data: generateScatterChartData(50),
     scatterAxis: {
       x: ['x'],
-      y: ['y', 'y2'],
-      size: [],
-      category: ['category']
-    },
-    barAndLineAxis: {
-      x: ['x'],
       y: ['y'],
+      size: [],
       category: []
     },
     columnLabelFormats: {
@@ -67,35 +62,43 @@ export const Default: Story = {
   }
 };
 
-export const WithoutCategory: Story = {
+export const WithCategory: Story = {
   args: {
     ...Default.args,
     scatterAxis: {
       x: ['x'],
       y: ['y'],
       size: [],
-      category: []
+      category: ['category']
     }
   }
 };
 
-export const LargeDataset: Story = {
+export const LargeDatasetNoCategory: Story = {
   args: {
     ...Default.args,
-    data: generateScatterChartData(3000)
+    data: generateScatterChartData(200)
   },
   render: (args) => {
-    const [isPending, startTransition] = React.useTransition();
     const [points, setPoints] = React.useState(200);
     const [data, setData] = React.useState(generateScatterChartData(points));
+    const [processingTime, setProcessingTime] = React.useState(0);
+    const startTimeRef = React.useRef(0);
+
+    React.useEffect(() => {
+      // Measure time after render is complete
+      const endTime = performance.now();
+      if (startTimeRef.current) {
+        setProcessingTime(Math.round(endTime - startTimeRef.current));
+      }
+    }, [data]); // Only run when data changes
 
     const { run: onSetData } = useDebounceFn(
       (value: number) => {
-        startTransition(() => {
-          setData(generateScatterChartData(value));
-        });
+        startTimeRef.current = performance.now(); // Start timing
+        setData(generateScatterChartData(value));
       },
-      { wait: 700 }
+      { wait: 1000 }
     );
 
     const onChangeValue = (value: number) => {
@@ -110,13 +113,80 @@ export const LargeDataset: Story = {
           <div className="w-64">
             <Slider
               min={0}
-              max={50000}
+              max={5000}
               step={50}
               defaultValue={[points]}
               onValueChange={(value) => onChangeValue(value[0])}
             />
           </div>
           <span className="w-16 text-sm">{points}</span>
+        </div>
+        <div>
+          <span className="text-sm">Total processing time: {processingTime}ms</span>
+        </div>
+        <div className="h-[400px] w-[400px]" key={points}>
+          <BusterChart {...args} data={data} />
+        </div>
+      </div>
+    );
+  }
+};
+
+export const LargeDatasetWithCategory: Story = {
+  args: {
+    ...Default.args,
+    data: generateScatterChartData(200),
+    scatterAxis: {
+      x: ['x'],
+      y: ['y'],
+      size: [],
+      category: ['category']
+    }
+  },
+  render: (args) => {
+    const [points, setPoints] = React.useState(200);
+    const [data, setData] = React.useState(generateScatterChartData(points));
+    const [processingTime, setProcessingTime] = React.useState(0);
+    const startTimeRef = React.useRef(0);
+
+    React.useEffect(() => {
+      // Measure time after render is complete
+      const endTime = performance.now();
+      if (startTimeRef.current) {
+        setProcessingTime(Math.round(endTime - startTimeRef.current));
+      }
+    }, [data]); // Only run when data changes
+
+    const { run: onSetData } = useDebounceFn(
+      (value: number) => {
+        startTimeRef.current = performance.now(); // Start timing
+        setData(generateScatterChartData(value));
+      },
+      { wait: 1000 }
+    );
+
+    const onChangeValue = (value: number) => {
+      setPoints(value);
+      onSetData(value);
+    };
+
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-4">
+          <span className="text-sm">Number of points:</span>
+          <div className="w-64">
+            <Slider
+              min={0}
+              max={5000}
+              step={50}
+              defaultValue={[points]}
+              onValueChange={(value) => onChangeValue(value[0])}
+            />
+          </div>
+          <span className="w-16 text-sm">{points}</span>
+        </div>
+        <div>
+          <span className="text-sm">Total processing time: {processingTime}ms</span>
         </div>
         <div className="h-[400px] w-[400px]" key={points}>
           <BusterChart {...args} data={data} />
@@ -132,7 +202,7 @@ export const WithSize: Story = {
     data: Array.from({ length: 5 }, (x, index) => ({
       x: index,
       y: index,
-      size: index,
+      size: [55, 30, 0, 100, 50][index % 5],
       category: 'Electronics'
     })),
     scatterAxis: {
@@ -144,8 +214,8 @@ export const WithSize: Story = {
       {
         name: 'size',
         min_value: 0,
-        max_value: 5,
-        unique_values: 3,
+        max_value: 100,
+        unique_values: 5,
         simple_type: 'number',
         type: 'number'
       }
