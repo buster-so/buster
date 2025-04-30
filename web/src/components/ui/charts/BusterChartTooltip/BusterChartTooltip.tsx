@@ -16,7 +16,7 @@ export const BusterChartTooltip: React.FC<{
 
   return (
     <div
-      className={`flex max-h-[500px] max-w-[300px] flex-col overflow-hidden ${
+      className={`flex max-h-[500px] max-w-[300px] min-w-24 flex-col overflow-hidden ${
         tooltipItems.length === 0 ? 'hidden!' : ''
       }`}>
       {title && <TooltipTitle title={title} />}
@@ -25,7 +25,7 @@ export const BusterChartTooltip: React.FC<{
         <div
           className={`grid ${
             isScatter
-              ? 'grid-cols-1 gap-y-1.5'
+              ? 'grid-cols-1 gap-y-[3px]'
               : 'grid-cols-[auto_auto] items-center gap-x-5 gap-y-[3px]'
           }`}>
           {shownItems.map((param, index) => (

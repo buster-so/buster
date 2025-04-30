@@ -21,7 +21,7 @@ export const barAndLineTooltipHelper = (
     const dataPointDataIndex = dataPoint.dataIndex;
     const tooltipData = tooltipDataset.tooltipData;
     const selectedToolTipData = tooltipData[dataPointDataIndex];
-    const items = selectedToolTipData.map<ITooltipItem>((item) => {
+    return selectedToolTipData.map<ITooltipItem>((item) => {
       const colorItem = tooltipDataset?.backgroundColor as string;
       const color =
         tooltipDataset && tooltipDataset.yAxisKey === item.key //we want to use the default gray color if the y axis key is the same as the item key (which means it is plotted)
@@ -58,8 +58,6 @@ export const barAndLineTooltipHelper = (
         ]
       };
     });
-
-    return items;
   });
 
   return tooltipItems;

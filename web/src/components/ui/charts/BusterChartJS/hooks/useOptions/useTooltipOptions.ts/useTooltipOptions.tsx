@@ -59,7 +59,7 @@ export const useTooltipOptions = ({
 
   const mode: TooltipOptions['mode'] = useMemo(() => {
     if (selectedChartType === 'scatter') {
-      return 'nearest';
+      return 'point';
     }
 
     if (selectedChartType === 'pie') {
@@ -90,7 +90,6 @@ export const useTooltipOptions = ({
     if (useGlobalPercentage)
       return tooltipKeys.filter((key) => {
         const selectedColumnLabelFormat = columnLabelFormats[key] || DEFAULT_COLUMN_LABEL_FORMAT;
-        console.log(key, selectedColumnLabelFormat);
         return isNumericColumnType(selectedColumnLabelFormat.columnType);
       });
 

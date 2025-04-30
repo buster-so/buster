@@ -59,6 +59,7 @@ export const scatterSeriesBuilder_data = ({
       hoverBackgroundColor = addOpacityToColor(color, 0.9);
       borderColor = color;
       colorsRecord[color] = { color, backgroundColor, hoverBackgroundColor, borderColor };
+      console.log(colorsRecord);
     }
 
     return {
@@ -85,38 +86,6 @@ export const scatterSeriesBuilder_data = ({
       }, [])
     };
   });
-
-  // return allYAxisKeysIndexes.flatMap((yKeyIndex, index) => {
-  //   const { index: yIndex, name: yName } = yKeyIndex;
-  //   return selectedDataset.source.map((item, itemIndex) => {
-  //     const name = categoryIndex !== -1 ? String(item[categoryIndex]) : yName;
-  //     console.log(categoryIndex, name);
-
-  //     let chosenColors = assignedColors[name];
-  //     if (!chosenColors) {
-  //       const color =
-  //         categoryIndex !== -1 ? colors[itemIndex % colors.length] : colors[index % colors.length];
-  //       const backgroundColor = addOpacityToColor(color, 0.6);
-  //       const hoverBackgroundColor = addOpacityToColor(color, 0.9);
-  //       assignedColors[name] = { color, backgroundColor, hoverBackgroundColor, borderColor: color };
-  //       chosenColors = assignedColors[name];
-  //     }
-
-  //     return {
-  //       label: name,
-  //       data: [
-  //         {
-  //           x: selectedDataset.source[itemIndex][0] as number,
-  //           y: selectedDataset.source[itemIndex][yIndex] as number
-  //         }
-  //       ],
-  //       elements: scatterElementConfig,
-  //       backgroundColor: chosenColors.backgroundColor,
-  //       hoverBackgroundColor: chosenColors.hoverBackgroundColor,
-  //       borderColor: chosenColors.borderColor
-  //     };
-  //   });
-  // });
 };
 
 const getScatterXValue = ({

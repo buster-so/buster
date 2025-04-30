@@ -5,7 +5,7 @@ import { LegendItem } from './LegendItem';
 import { cn } from '@/lib/classMerge';
 import { LegendItemDot } from './LegendDot';
 import { ChartType } from '@/api/asset_interfaces/metric/charts';
-import { ScrollArea } from '../../scroll-area';
+import { useVirtualizer } from '@tanstack/react-virtual';
 
 export const OverflowButton: React.FC<{
   legendItems: BusterChartLegendItem[];
@@ -17,23 +17,14 @@ export const OverflowButton: React.FC<{
     <Popover
       align="center"
       side="left"
-      className="flex max-h-[420px] max-w-[265px]! min-w-[200px] flex-col overflow-hidden px-0 py-0.5"
+      className="flex max-h-[420px] max-w-[265px]! min-w-[240px] flex-col overflow-hidden px-0 py-0.5"
       content={
-        <ScrollArea className="flex flex-col">
-          <div className="flex flex-col space-y-1 p-0.5">
-            {legendItems.map((item) => {
-              return (
-                <LegendItem
-                  key={item.id + item.serieName}
-                  item={item}
-                  onClickItem={onClickItem}
-                  onFocusItem={onFocusClick}
-                  onHoverItem={onHoverItem}
-                />
-              );
-            })}
-          </div>
-        </ScrollArea>
+        <OverflowPopoverContent
+          legendItems={legendItems}
+          onClickItem={onClickItem}
+          onFocusClick={onFocusClick}
+          onHoverItem={onHoverItem}
+        />
       }>
       <div
         className={cn(
@@ -47,3 +38,69 @@ export const OverflowButton: React.FC<{
   );
 });
 OverflowButton.displayName = 'OverflowButton';
+
+const OverflowPopoverContent = React.memo(
+  ({
+    legendItems,
+    onClickItem,
+    onFocusClick,
+    onHoverItem
+  }: {
+    legendItems: BusterChartLegendItem[];
+    onClickItem: BusterChartLegendProps['onClickItem'];
+    onFocusClick: BusterChartLegendProps['onFocusItem'];
+    onHoverItem: BusterChartLegendProps['onHoverItem'];
+  }) => {
+    const parentRef = React.useRef<HTMLDivElement>(null);
+
+    const rowVirtualizer = useVirtualizer({
+      count: legendItems.length,
+      getScrollElement: () => parentRef.current,
+      estimateSize: () => 24, // Estimated height of each row
+      overscan: 15
+    });
+
+    return (
+      <div
+        ref={parentRef}
+        style={{
+          maxHeight: `100%`,
+          width: `100%`,
+          overflow: 'auto'
+        }}>
+        <div
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`,
+            width: '100%',
+            position: 'relative'
+          }}>
+          {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+            const item = legendItems[virtualRow.index];
+            return (
+              <div
+                key={item.id + item.serieName}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: `${virtualRow.size}px`,
+                  transform: `translateY(${virtualRow.start}px)`
+                }}
+                className="p-0.5">
+                <LegendItem
+                  item={item}
+                  onClickItem={onClickItem}
+                  onFocusItem={onFocusClick}
+                  onHoverItem={onHoverItem}
+                />
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+);
+
+OverflowPopoverContent.displayName = 'OverflowPopoverContent';

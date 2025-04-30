@@ -173,7 +173,7 @@ export const useBusterChartJSLegend = ({
         });
       }, timeoutDuration);
     }),
-    { wait: isLargeDataset ? DELAY_DURATION_FOR_LARGE_DATASET * 2 : 0 }
+    { wait: isLargeDataset ? DELAY_DURATION_FOR_LARGE_DATASET * 2.5 : 0 }
   );
 
   const onLegendItemClick = useMemoizedFn(async (item: BusterChartLegendItem) => {

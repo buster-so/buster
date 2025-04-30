@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useRef, useState, useEffect, CSSProperties } from 'react';
+import React, { useMemo, useRef, useState, useEffect } from 'react';
 import {
   ColumnDef,
   getCoreRowModel,

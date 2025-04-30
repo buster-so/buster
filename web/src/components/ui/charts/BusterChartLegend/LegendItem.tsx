@@ -135,9 +135,9 @@ const LegendItemStandard = React.memo(
             inactive={item.inactive}
           />
 
-          <span
+          <div
             className={cn(
-              'flex! items-center truncate text-base transition-all duration-100 select-none',
+              'items-center truncate text-base transition-all duration-100 select-none',
               !inactive ? 'text-foreground' : 'text-text-secondary'
             )}>
             <AnimatePresence mode="wait" initial={false}>
@@ -151,7 +151,7 @@ const LegendItemStandard = React.memo(
             </AnimatePresence>
 
             {formattedName}
-          </span>
+          </div>
         </div>
       </motion.div>
     );
