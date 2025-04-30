@@ -133,33 +133,56 @@ function handlePieThreshold(datasets: DatasetOption[], minPercent: number): Data
 }
 
 // Helper: sort pie slices
-function sortPie(datasets: DatasetOption[], sortBy: PieSortBy): DatasetOption[] {
+function sortPie(
+  datasets: DatasetOption[],
+  sortBy: PieSortBy,
+  ticks: string[][] = []
+): { datasets: DatasetOption[]; ticks: string[][] } {
   const items = cloneDeep(datasets);
+  const result = { datasets: items, ticks };
 
+  if (!items.length) return result;
+
+  // Get the first dataset for sorting reference
+  const firstDataset = items[0];
+
+  // Create indices array based on the first dataset's length
+  const indices = Array.from({ length: firstDataset.data.length }, (_, i) => i);
+
+  // Sort indices based on the first dataset's values
   if (sortBy === 'value') {
-    // Create pairs of [index, value] for stable sorting
-    const indexValuePairs = items.map((item, index) => [index, item.data[0] || 0]);
+    indices.sort((a, b) => {
+      const valueA = firstDataset.data[a] === null ? 0 : firstDataset.data[a] || 0;
+      const valueB = firstDataset.data[b] === null ? 0 : firstDataset.data[b] || 0;
+      return valueA - valueB;
+    });
+  } else {
+    // Sort by label alphabetically using the first dataset's tooltips
+    const labels = indices.map((index) => {
+      const tooltip = firstDataset.tooltipData?.[index] || [];
+      const label = tooltip.find((t) => t.key === 'label' || t.key === 'category')?.value;
+      return (label?.toString() || '').toLowerCase();
+    });
 
-    // Sort by value (ascending - smallest first)
-    indexValuePairs.sort((a, b) => (a[1] as number) - (b[1] as number));
-
-    // Reorder the items based on the sorted indices
-    const sortedItems = indexValuePairs.map(([index]) => items[index as number]);
-    return sortedItems;
+    indices.sort((a, b) => labels[a].localeCompare(labels[b]));
   }
 
-  // Sort by label alphabetically
-  const indexLabelPairs = items.map((item, index) => {
-    const label = item.label?.[0]?.value?.toString().toLowerCase() || '';
-    return [index, label];
-  });
+  // Apply the same sorting order to all datasets
+  result.datasets = items.map((dataset) => ({
+    ...dataset,
+    data: indices.map((i) => dataset.data[i]),
+    tooltipData: dataset.tooltipData
+      ? indices.map((i) => dataset.tooltipData![i])
+      : dataset.tooltipData,
+    sizeData: dataset.sizeData ? indices.map((i) => dataset.sizeData![i]) : dataset.sizeData
+  }));
 
-  // Sort by label
-  indexLabelPairs.sort((a, b) => (a[1] as string).localeCompare(b[1] as string));
+  // Sort ticks if they exist
+  if (ticks.length > 0) {
+    result.ticks = indices.map((i) => ticks[i]);
+  }
 
-  // Reorder the items based on the sorted indices
-  const sortedItems = indexLabelPairs.map(([index]) => items[index as number]);
-  return sortedItems;
+  return result;
 }
 
 // Helper: convert to percentage-stack
@@ -181,6 +204,49 @@ function applyPercentageStack(datasets: DatasetOption[]): DatasetOption[] {
   });
 
   return clone;
+}
+
+// Helper: sort bar data
+function sortBar(
+  datasets: DatasetOption[],
+  sortKey: NonNullable<BarSortBy>[number],
+  ticks: any[] = []
+): { datasets: DatasetOption[]; ticks: any[] } {
+  const items = cloneDeep(datasets);
+  const result = { datasets: items, ticks };
+
+  const dataLen = items[0]?.data.length || 0;
+  if (!dataLen) return result;
+
+  // Compute sums for each data column
+  const sums = new Array<number>(dataLen).fill(0);
+  items.forEach((ds) =>
+    ds.data.forEach((v, i) => {
+      sums[i] += v === null ? 0 : v || 0;
+    })
+  );
+
+  // Create sorting indices
+  const indices = Array.from({ length: dataLen }, (_, idx) => idx);
+  indices.sort((a, b) => (sortKey === 'asc' ? sums[a] - sums[b] : sums[b] - sums[a]));
+
+  // Sort datasets
+  result.datasets = items.map((ds) => ({
+    ...ds,
+    // Sort data
+    data: indices.map((i) => ds.data[i]),
+    // Sort tooltipData if it exists
+    tooltipData: ds.tooltipData ? indices.map((i) => ds.tooltipData![i]) : ds.tooltipData,
+    // Sort sizeData if it exists
+    sizeData: ds.sizeData ? indices.map((i) => ds.sizeData![i]) : ds.sizeData
+  }));
+
+  // Sort ticks (x-axis labels)
+  if (ticks.length > 0) {
+    result.ticks = indices.map((i) => ticks[i] || []);
+  }
+
+  return result;
 }
 
 type ModifyDatasetsParams = {
@@ -218,58 +284,12 @@ export function modifyDatasets({
 
     // Apply sorting if needed
     if (pieSortBy) {
-      // For datasets with a single dataset but multiple values, we need to sort the ticks alongside the data
-      if (modifiedDatasets.length === 1 && modifiedDatasets[0].data.length > 1) {
-        const singleDataset = modifiedDatasets[0];
-        const indices = Array.from({ length: singleDataset.data.length }, (_, i) => i);
-
-        // Sort indices by value or label
-        if (pieSortBy === 'value') {
-          const values = singleDataset.data;
-          indices.sort((a, b) => {
-            const valA = values[a] === null ? 0 : values[a] || 0;
-            const valB = values[b] === null ? 0 : values[b] || 0;
-            return valA - valB; // Smallest first
-          });
-        } else {
-          // Sort by label from tooltipData
-          const labels = indices.map((i) => {
-            const tooltip = singleDataset.tooltipData?.[i] || [];
-            const label = tooltip.find((t) => t.key === 'label' || t.key === 'category')?.value;
-            return (label?.toString() || '').toLowerCase();
-          });
-          indices.sort((a, b) => labels[a].localeCompare(labels[b]));
-        }
-
-        // Sort the dataset
-        const newData = indices.map((i) => singleDataset.data[i]);
-        const newTooltipData = indices.map((i) => singleDataset.tooltipData?.[i] || []);
-
-        // Also sort the ticks (x-axis labels)
-        const newTicks = indices.map((i) => result.ticks[i] || []);
-
-        // Update the dataset and ticks
-        modifiedDatasets = [
-          {
-            ...singleDataset,
-            data: newData,
-            tooltipData: newTooltipData
-          }
-        ];
-
-        result.ticks = newTicks;
-
-        console.log('Sorted pie data (single dataset with multiple values):', {
-          sortBy: pieSortBy,
-          sortedIndices: indices,
-          newData,
-          newTicks
-        });
-      } else {
-        // Traditional pie chart with multiple datasets
-        modifiedDatasets = sortPie(modifiedDatasets, pieSortBy);
-      }
+      const sortResult = sortPie(modifiedDatasets, pieSortBy, result.ticks);
+      modifiedDatasets = sortResult.datasets;
+      result.ticks = sortResult.ticks;
     }
+
+    console.log('modified datasets', modifiedDatasets);
 
     result.datasets = modifiedDatasets;
     return result;
@@ -288,46 +308,10 @@ export function modifyDatasets({
   if (selectedChartType === ChartType.Bar && barSortBy && barSortBy.some((o) => o !== 'none')) {
     const sortKey = barSortBy.find((o) => o !== 'none');
     if (sortKey) {
-      const dataLen = datasets.datasets[0]?.data.length || 0;
-
-      // Compute sums for each data column
-      const sums = new Array<number>(dataLen).fill(0);
-      datasets.datasets.forEach((ds) =>
-        ds.data.forEach((v, i) => {
-          sums[i] += v === null ? 0 : v || 0;
-        })
-      );
-
-      // Create sorting indices
-      const indices = Array.from({ length: dataLen }, (_, idx) => idx);
-      indices.sort((a, b) => (sortKey === 'asc' ? sums[a] - sums[b] : sums[b] - sums[a]));
-
-      // Sort datasets
-      result.datasets.forEach((ds) => {
-        // Sort data
-        ds.data = indices.map((i) => ds.data[i]);
-
-        // Sort tooltipData if it exists
-        if (ds.tooltipData) {
-          ds.tooltipData = indices.map((i) => ds.tooltipData?.[i] || []);
-        }
-
-        // Sort sizeData if it exists
-        if (ds.sizeData) {
-          ds.sizeData = indices.map((i) => ds.sizeData?.[i] || null);
-        }
-      });
-
-      // Sort ticks (x-axis labels)
-      result.ticks = indices.map((i) => result.ticks[i] || []);
-
-      console.log('Sorted bar data:', {
-        sortKey,
-        sortedIndices: indices,
-        newTicks: result.ticks
-      });
+      const sortResult = sortBar(datasets.datasets, sortKey, result.ticks);
+      result.datasets = sortResult.datasets;
+      result.ticks = sortResult.ticks;
     }
-
     return result;
   }
 

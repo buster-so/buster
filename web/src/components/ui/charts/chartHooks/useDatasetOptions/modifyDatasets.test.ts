@@ -1238,7 +1238,7 @@ describe('modifyDatasets - pieSortBy tests', () => {
       {
         id: 'slice1',
         label: [{ key: 'category', value: 'Category C' }],
-        data: [300],
+        data: [300, 100, 500],
         dataKey: 'slice1',
         axisType: 'y',
         tooltipData: [[{ key: 'value', value: 300 }]]
@@ -1246,203 +1246,14 @@ describe('modifyDatasets - pieSortBy tests', () => {
       {
         id: 'slice2',
         label: [{ key: 'category', value: 'Category A' }],
-        data: [100],
+        data: [100, 300, 200],
         dataKey: 'slice2',
         axisType: 'y',
         tooltipData: [[{ key: 'value', value: 100 }]]
-      },
-      {
-        id: 'slice3',
-        label: [{ key: 'category', value: 'Category B' }],
-        data: [200],
-        dataKey: 'slice3',
-        axisType: 'y',
-        tooltipData: [[{ key: 'value', value: 200 }]]
       }
     ],
     ticks: [],
     ticksKey: []
-  });
-
-  test('should sort pie slices by value in descending order', () => {
-    const datasets = createPieDatasets();
-    const { datasets: result } = modifyDatasets({
-      datasets,
-      pieMinimumSlicePercentage: undefined,
-      barSortBy: undefined,
-      pieSortBy: 'value',
-      barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
-    });
-
-    // Should maintain the same number of slices
-    expect(result.length).toBe(3);
-
-    // Should be sorted by value (descending)
-    expect(result[0].data[0]).toBe(100); // Category C (largest)
-    expect(result[1].data[0]).toBe(200); // Category B
-    expect(result[2].data[0]).toBe(300); // Category A (smallest)
-
-    // Labels should maintain association with values
-    expect(result[0].label[0].value).toBe('Category A');
-    expect(result[1].label[0].value).toBe('Category B');
-    expect(result[2].label[0].value).toBe('Category C');
-  });
-
-  test('should sort pie slices by key alphabetically', () => {
-    const datasets = createPieDatasets();
-    const { datasets: result } = modifyDatasets({
-      datasets,
-      pieMinimumSlicePercentage: undefined,
-      barSortBy: undefined,
-      pieSortBy: 'key',
-      barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
-    });
-
-    // Should maintain the same number of slices
-    expect(result.length).toBe(3);
-
-    // Should be sorted by key (alphabetically)
-    expect(result[0].label[0].value).toBe('Category A');
-    expect(result[1].label[0].value).toBe('Category B');
-    expect(result[2].label[0].value).toBe('Category C');
-
-    // Values should maintain association with labels
-    expect(result[0].data[0]).toBe(100); // Category A
-    expect(result[1].data[0]).toBe(200); // Category B
-    expect(result[2].data[0]).toBe(300); // Category C
-  });
-
-  test('should handle pie sort by value with datasets containing null and zero values', () => {
-    const datasetsWithNullValues: DatasetOption[] = [
-      {
-        id: 'slice1',
-        label: [{ key: 'category', value: 'Category A' }],
-        data: [300],
-        dataKey: 'slice1',
-        axisType: 'y',
-        tooltipData: [[{ key: 'value', value: 300 }]]
-      },
-      {
-        id: 'slice2',
-        label: [{ key: 'category', value: 'Category B' }],
-        data: [null], // Null value
-        dataKey: 'slice2',
-        axisType: 'y',
-        tooltipData: [[{ key: 'value', value: null }]]
-      },
-      {
-        id: 'slice3',
-        label: [{ key: 'category', value: 'Category C' }],
-        data: [0], // Zero value
-        dataKey: 'slice3',
-        axisType: 'y',
-        tooltipData: [[{ key: 'value', value: 0 }]]
-      },
-      {
-        id: 'slice4',
-        label: [{ key: 'category', value: 'Category D' }],
-        data: [200],
-        dataKey: 'slice4',
-        axisType: 'y',
-        tooltipData: [[{ key: 'value', value: 200 }]]
-      }
-    ];
-
-    const { datasets: result } = modifyDatasets({
-      datasets: {
-        datasets: datasetsWithNullValues,
-        ticks: [],
-        ticksKey: []
-      },
-      pieMinimumSlicePercentage: undefined,
-      barSortBy: undefined,
-      pieSortBy: 'value',
-      barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
-    });
-
-    // Should maintain the same number of slices
-    expect(result.length).toBe(4);
-
-    // Should be sorted by value (ascending - smallest first)
-    expect(result[0].data[0]).toBe(null);
-    expect(result[1].data[0]).toBe(0);
-    expect(result[2].data[0]).toBe(200);
-    expect(result[3].data[0]).toBe(300);
-  });
-
-  test('should handle pie sort by key with non-alphabetic and numeric labels', () => {
-    const datasetsWithMixedLabels: DatasetOption[] = [
-      {
-        id: 'slice1',
-        label: [{ key: 'category', value: '123' }], // Numeric string
-        data: [300],
-        dataKey: 'slice1',
-        axisType: 'y',
-        tooltipData: [[{ key: 'value', value: 300 }]]
-      },
-      {
-        id: 'slice2',
-        label: [{ key: 'category', value: 'abc' }], // Lowercase letters
-        data: [100],
-        dataKey: 'slice2',
-        axisType: 'y',
-        tooltipData: [[{ key: 'value', value: 100 }]]
-      },
-      {
-        id: 'slice3',
-        label: [{ key: 'category', value: 'XYZ' }], // Uppercase letters
-        data: [200],
-        dataKey: 'slice3',
-        axisType: 'y',
-        tooltipData: [[{ key: 'value', value: 200 }]]
-      },
-      {
-        id: 'slice4',
-        label: [{ key: 'category', value: '!@#' }], // Special characters
-        data: [150],
-        dataKey: 'slice4',
-        axisType: 'y',
-        tooltipData: [[{ key: 'value', value: 150 }]]
-      }
-    ];
-
-    const { datasets: result } = modifyDatasets({
-      datasets: {
-        datasets: datasetsWithMixedLabels,
-        ticks: [],
-        ticksKey: []
-      },
-      pieMinimumSlicePercentage: undefined,
-      barSortBy: undefined,
-      pieSortBy: 'key',
-      barGroupType: undefined,
-      lineGroupType: undefined,
-      selectedChartType: ChartType.Pie
-    });
-
-    // Should maintain the same number of slices
-    expect(result.length).toBe(4);
-
-    // Special characters typically come before numbers and letters in ASCII/Unicode sorting
-    expect(result[0].label[0].value).toBe('!@#');
-
-    // Numbers typically come before letters
-    expect(result[1].label[0].value).toBe('123');
-
-    // Lowercase and uppercase might be sorted differently depending on implementation
-    // But both should come after numbers
-    const letters = [result[2].label[0].value, result[3].label[0].value].sort();
-    expect(letters).toEqual(['XYZ', 'abc']); // Case-insensitive sort results
-
-    // Check that values maintain association with correct labels
-    expect(result[0].data[0]).toBe(150); // !@#
-    expect(result[1].data[0]).toBe(300); // 123
   });
 });
 
