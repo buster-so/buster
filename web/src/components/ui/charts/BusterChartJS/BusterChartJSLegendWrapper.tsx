@@ -3,7 +3,7 @@ import { type BusterChartProps, type ChartEncodes } from '@/api/asset_interfaces
 import { ChartJSOrUndefined } from './core/types';
 import { useBusterChartJSLegend } from './hooks';
 import { BusterChartLegendWrapper } from '../BusterChartLegend/BusterChartLegendWrapper';
-import { DatasetOption, DatasetOptionsWithTicks } from '../chartHooks';
+import { DatasetOptionsWithTicks } from '../chartHooks';
 
 interface BusterChartJSLegendWrapperProps {
   children: React.ReactNode;
@@ -49,8 +49,6 @@ export const BusterChartJSLegendWrapper = React.memo<BusterChartJSLegendWrapperP
     pieMinimumSlicePercentage,
     isDownsampled
   }) => {
-    return <>{children}</>;
-
     const {
       renderLegend,
       legendItems,

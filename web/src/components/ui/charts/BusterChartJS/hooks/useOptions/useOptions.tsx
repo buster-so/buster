@@ -12,7 +12,7 @@ import { useYAxis } from './useYAxis';
 import { DeepPartial } from 'utility-types';
 import type { PluginChartOptions } from 'chart.js';
 import { useTooltipOptions } from './useTooltipOptions.ts/useTooltipOptions';
-import { DatasetOption, DatasetOptionsWithTicks } from '../../../chartHooks';
+import type { DatasetOptionsWithTicks } from '../../../chartHooks';
 import { useY2Axis } from './useY2Axis';
 import { AnnotationPluginOptions } from 'chartjs-plugin-annotation';
 import type { BusterChartTypeComponentProps } from '../../../interfaces';
@@ -171,10 +171,15 @@ export const useOptions = ({
     return datasets.reduce((acc, dataset) => acc + dataset.data.length, 0);
   }, [datasetOptions]);
 
-  const animation = useAnimations({ animate, numberOfSources, chartType: selectedChartType });
+  const animation = useAnimations({
+    animate,
+    numberOfSources,
+    chartType: selectedChartType,
+    barGroupType
+  });
 
   const disableTooltip = useMemo(() => {
-    return disableTooltipProp || numberOfSources >= TOOLTIP_THRESHOLD;
+    return disableTooltipProp || numberOfSources > TOOLTIP_THRESHOLD;
   }, [disableTooltipProp, numberOfSources]);
 
   const tooltipOptions = useTooltipOptions({

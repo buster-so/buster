@@ -1,15 +1,23 @@
+import { BusterChartProps } from '@/api/asset_interfaces/metric';
 import { AnimationOptions } from 'chart.js';
 
 const MAX_DELAY = 1000;
 
-export const barDelayAnimation = (props?: { maxDelay?: number }) => {
-  const { maxDelay = MAX_DELAY } = props || {};
+export const barDelayAnimation = (props?: {
+  maxDelay?: number;
+  barGroupType: BusterChartProps['barGroupType'];
+}) => {
+  const { maxDelay = MAX_DELAY, barGroupType } = props || {};
   let delayed = false;
   return {
     onComplete: () => {
       delayed = true;
     },
     delay: (context) => {
+      if (barGroupType === 'percentage-stack' || barGroupType === 'stack') {
+        return 0;
+      }
+
       let delay = 0;
       const dataIndex = context.dataIndex;
       const datasetIndex = context.datasetIndex;

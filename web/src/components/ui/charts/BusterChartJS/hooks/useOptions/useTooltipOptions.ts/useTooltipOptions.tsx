@@ -139,14 +139,14 @@ export const useTooltipOptions = ({
     () => ({
       enabled: false,
       mode,
-      external: disableTooltip ? () => {} : memoizedExternal
+      external: disableTooltip ? undefined : memoizedExternal
     }),
     [mode, disableTooltip, memoizedExternal, selectedChartType]
   );
 
   useEffect(() => {
     tooltipCache.current = {};
-  }, [selectedAxis, selectedChartType, disableTooltip]);
+  }, [selectedAxis, selectedChartType, disableTooltip, columnLabelFormats, columnSettings]);
 
   useUnmount(() => {
     const tooltipEl = document.getElementById('buster-chartjs-tooltip');

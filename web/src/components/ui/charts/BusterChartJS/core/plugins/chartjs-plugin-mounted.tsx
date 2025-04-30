@@ -1,4 +1,5 @@
 import { ChartType, Chart, Plugin } from 'chart.js';
+import { ANIMATION_DURATION } from '../../../config';
 
 export interface ChartMountedPluginOptions {
   onMounted?: (chart: Chart) => void;
@@ -12,6 +13,7 @@ declare module 'chart.js' {
 
   interface Chart {
     $mountedPlugin: boolean;
+    $initialAnimationCompleted: boolean;
   }
 }
 
@@ -23,6 +25,11 @@ export const ChartMountedPlugin: Plugin<ChartType, ChartMountedPluginOptions> = 
     chart.$mountedPlugin = true;
   },
   afterRender: (chart, args, options) => {
+    if (chart.$initialAnimationCompleted === undefined) {
+      chart.$initialAnimationCompleted = true;
+      // chart.update();
+    }
+
     if (chart.$mountedPlugin || !chart || !options) return;
     const hasLabels = !!chart.data?.labels?.length;
     if (hasLabels && options?.onInitialAnimationEnd) {

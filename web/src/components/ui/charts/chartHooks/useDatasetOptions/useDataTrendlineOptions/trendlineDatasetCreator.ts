@@ -70,12 +70,10 @@ export const trendlineDatasetCreator: Record<
         axisType: 'y' as const,
         tooltipData: [],
         label: [
-          [
-            {
-              key: 'value',
-              value: `Polynomial Regression (${isXAxisDate ? 'Date' : isXAxisNumeric ? 'Numeric' : 'Categorical'})`
-            }
-          ]
+          {
+            key: 'value',
+            value: `Polynomial Regression (${isXAxisDate ? 'Date' : isXAxisNumeric ? 'Numeric' : 'Categorical'})`
+          }
         ]
       }
     ];
@@ -137,12 +135,10 @@ export const trendlineDatasetCreator: Record<
         axisType: 'y' as const,
         tooltipData: [],
         label: [
-          [
-            {
-              key: 'value',
-              value: `Logarithmic Regression (${isXAxisDate ? 'Date' : isXAxisNumeric ? 'Numeric' : 'Categorical'})`
-            }
-          ]
+          {
+            key: 'value',
+            value: `Logarithmic Regression (${isXAxisDate ? 'Date' : isXAxisNumeric ? 'Numeric' : 'Categorical'})`
+          }
         ]
       }
     ];
@@ -205,12 +201,10 @@ export const trendlineDatasetCreator: Record<
         axisType: 'y' as const,
         tooltipData: [],
         label: [
-          [
-            {
-              key: 'value',
-              value: `Exponential Regression (${isXAxisDate ? 'Date' : isXAxisNumeric ? 'Numeric' : 'Categorical'})`
-            }
-          ]
+          {
+            key: 'value',
+            value: `Exponential Regression (${isXAxisDate ? 'Date' : isXAxisNumeric ? 'Numeric' : 'Categorical'})`
+          }
         ]
       }
     ];
@@ -272,12 +266,10 @@ export const trendlineDatasetCreator: Record<
         axisType: 'y' as const,
         tooltipData: [],
         label: [
-          [
-            {
-              key: 'value',
-              value: `Linear Regression (${isXAxisDate ? 'Date' : isXAxisNumeric ? 'Numeric' : 'Categorical'})`
-            }
-          ]
+          {
+            key: 'value',
+            value: `Linear Regression (${isXAxisDate ? 'Date' : isXAxisNumeric ? 'Numeric' : 'Categorical'})`
+          }
         ]
       }
     ];
@@ -304,7 +296,7 @@ export const trendlineDatasetCreator: Record<
       {
         ...trendline,
         id: DATASET_IDS.average(trendline.columnId),
-        label: [[{ key: 'value', value: average }]],
+        label: [{ key: 'value', value: average }],
         data: [average],
         dataKey: trendline.columnId,
         axisType: 'y',
@@ -332,7 +324,7 @@ export const trendlineDatasetCreator: Record<
       {
         ...trendline,
         id: DATASET_IDS.min(trendline.columnId),
-        label: [[{ key: 'value', value: min }]],
+        label: [{ key: 'value', value: min }],
         data: [min],
         dataKey: trendline.columnId,
         axisType: 'y',
@@ -360,7 +352,7 @@ export const trendlineDatasetCreator: Record<
       {
         ...trendline,
         id: DATASET_IDS.max(trendline.columnId),
-        label: [[{ key: 'value', value: max }]],
+        label: [{ key: 'value', value: max }],
         data: [max],
         dataKey: trendline.columnId,
         axisType: 'y',
@@ -397,7 +389,7 @@ export const trendlineDatasetCreator: Record<
       {
         ...trendline,
         id: DATASET_IDS.median(trendline.columnId),
-        label: [[{ key: 'value', value: median }]],
+        label: [{ key: 'value', value: median }],
         data: [median],
         dataKey: trendline.columnId,
         axisType: 'y',

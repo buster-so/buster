@@ -1,7 +1,6 @@
 import { BusterChartLegendItem } from './interfaces';
 import { BusterChartProps, ShowLegendHeadline } from '@/api/asset_interfaces/metric/charts';
 import { DataFrameOperations } from '@/lib/math';
-import { formatLabel } from '@/lib/columnFormatter';
 import { DatasetOptionsWithTicks } from '../chartHooks';
 import { createDayjsDate, getBestDateFormat } from '@/lib/date';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces/metric';

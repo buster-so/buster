@@ -101,6 +101,7 @@ export const lineBuilder = (
     xAxisKeys,
     label: formatLabelForDataset(dataset, columnLabelFormats),
     fill,
+    tooltipData: dataset.tooltipData,
     tension: getLineTension(lineType),
     stepped: lineType === 'step',
     spanGaps: true,
@@ -138,7 +139,7 @@ export const lineBuilder = (
         color: 'white'
       })
     } satisfies ChartProps<'line'>['data']['datasets'][number]['datalabels']
-  } as ChartProps<'line'>['data']['datasets'][number];
+  } satisfies ChartProps<'line'>['data']['datasets'][number];
 };
 
 const getLabelPosition = (

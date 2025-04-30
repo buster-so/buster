@@ -57,9 +57,7 @@ export const BusterChartJSTooltip: React.FC<{
         dataPoints,
         chart,
         columnLabelFormats,
-        hasMultipleMeasures,
         keyToUsePercentage,
-        hasCategoryAxis,
         hasMultipleShownDatasets,
         percentageMode
       );

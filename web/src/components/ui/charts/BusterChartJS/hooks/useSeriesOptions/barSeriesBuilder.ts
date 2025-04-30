@@ -155,7 +155,16 @@ export const barBuilder = ({
       clip: false,
       labels: {
         barTotal: {
+          color: dataLabelFontColorContrast,
+          borderWidth: 0,
+          padding: 1,
+          borderRadius: 2.5,
+          anchor: 'end',
+          align: 'start',
           display: (context) => {
+            // if (!context.chart.$initialAnimationCompleted) {
+            //   return false;
+            // }
             // Initialize the global rotation flag if it doesn't exist
             if (context.chart.$barDataLabelsGlobalRotation === undefined) {
               context.chart.$barDataLabelsGlobalRotation = false;
@@ -204,12 +213,6 @@ export const barBuilder = ({
             // Always use the global rotation setting
             return context.chart.$barDataLabelsGlobalRotation ? FULL_ROTATION_ANGLE : 0;
           },
-          color: dataLabelFontColorContrast,
-          borderWidth: 0,
-          padding: 1,
-          borderRadius: 2.5,
-          anchor: 'end',
-          align: 'start',
           backgroundColor: ({ datasetIndex, chart }) => {
             const backgroundColor = chart.options.backgroundColor as string[];
             return backgroundColor[datasetIndex];
@@ -217,7 +220,7 @@ export const barBuilder = ({
         },
         ...dataLabelOptions
       }
-    } as ChartProps<'bar'>['data']['datasets'][number]['datalabels']
+    } satisfies ChartProps<'bar'>['data']['datasets'][number]['datalabels']
   } satisfies ChartProps<'bar'>['data']['datasets'][number];
 };
 

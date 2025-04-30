@@ -17,7 +17,7 @@ import {
   UseChartLengendReturnValues
 } from '../../../BusterChartLegend';
 import { getLegendItems } from './helper';
-import { DatasetOption, DatasetOptionsWithTicks } from '../../../chartHooks';
+import { DatasetOptionsWithTicks } from '../../../chartHooks';
 import { LEGEND_ANIMATION_THRESHOLD } from '../../../config';
 import { timeout } from '@/lib';
 

@@ -84,7 +84,7 @@ export const Default: Story = {
   },
   render: (args) => {
     return (
-      <div className="h-[800px] w-[400px]">
+      <div className="h-[400px] w-[400px]">
         <BusterChart {...args} />
       </div>
     );
@@ -127,7 +127,7 @@ export const MultipleYAxis: Story = {
   },
   render: (args) => {
     return (
-      <div className="h-[400px] w-[800px]">
+      <div className="h-[400px] w-[400px]">
         <BusterChart {...args} />
       </div>
     );
@@ -171,7 +171,7 @@ export const WithCategory: Story = {
   },
   render: (args) => {
     return (
-      <div className="h-[400px] w-[800px]">
+      <div className="h-[400px] w-[400px]">
         <BusterChart {...args} />
       </div>
     );
@@ -216,7 +216,7 @@ export const DateXAxis: Story = {
   },
   render: (args) => {
     return (
-      <div className="h-[400px] w-[800px]">
+      <div className="h-[400px] w-[400px]">
         <BusterChart {...args} />
       </div>
     );
@@ -257,7 +257,7 @@ export const HorizontalBar: Story = {
   },
   render: (args) => {
     return (
-      <div className="h-[400px] w-[800px]">
+      <div className="h-[400px] w-[400px]">
         <BusterChart {...args} />
       </div>
     );
@@ -307,7 +307,7 @@ export const WithDataLabels: Story = {
   },
   render: (args) => {
     return (
-      <div className="h-[400px] w-[800px]">
+      <div className="h-[400px] w-[400px]">
         <BusterChart {...args} />
       </div>
     );
@@ -359,7 +359,7 @@ export const WithDataLabelsAndStackTotal: Story = {
   },
   render: (args) => {
     return (
-      <div className="h-[400px] w-[800px]">
+      <div className="h-[400px] w-[400px]">
         <BusterChart {...args} />
       </div>
     );
@@ -444,7 +444,7 @@ export const LargeDatasetWithDualYAxis: Story = {
   },
   render: (args) => {
     return (
-      <div className="h-[400px] w-[800px]">
+      <div className="h-[400px] w-[400px]">
         <BusterChart {...args} />
       </div>
     );
@@ -565,7 +565,7 @@ export const HorizontalBarWithGoalLine: Story = {
   },
   render: (args) => {
     return (
-      <div className="h-[400px] w-[800px]">
+      <div className="h-[400px] w-[400px]">
         <BusterChart {...args} />
       </div>
     );
@@ -625,7 +625,7 @@ export const GroupedBar: Story = {
   },
   render: (args) => {
     return (
-      <div className="h-[400px] w-[800px]">
+      <div className="h-[400px] w-[400px]">
         <BusterChart {...args} />
       </div>
     );
@@ -693,6 +693,91 @@ export const PercentageStackedBar: Story = {
   render: (args) => {
     return (
       <div className="h-[300px] w-[400px]">
+        <BusterChart {...args} />
+      </div>
+    );
+  }
+};
+
+export const ExtraLargeDataset: Story = {
+  args: {
+    className: 'resize overflow-auto min-w-[250px] h-[400px]',
+    selectedChartType: ChartType.Bar,
+    data: Array.from({ length: 500 }, (_, index) => ({
+      category: generateProductName(index),
+      sales: generateNumber(25000, 5000, index),
+      units: generateNumber(500, 100, index)
+    })),
+    barAndLineAxis: {
+      x: ['category'],
+      y: ['sales'],
+      category: []
+    },
+    columnLabelFormats: {
+      category: {
+        columnType: 'text',
+        style: 'string'
+      } satisfies IColumnLabelFormat,
+      sales: {
+        columnType: 'number',
+        style: 'currency',
+        currency: 'USD'
+      } satisfies IColumnLabelFormat,
+      units: {
+        columnType: 'number',
+        style: 'number',
+        numberSeparatorStyle: ','
+      } satisfies IColumnLabelFormat
+    }
+  },
+  render: (args) => {
+    return (
+      <div className="h-[400px] w-[400px]">
+        <BusterChart {...args} />
+      </div>
+    );
+  }
+};
+
+export const ExtraLargeDatasetWithCategory: Story = {
+  args: {
+    className: 'resize overflow-auto min-w-[250px] h-[400px]',
+    selectedChartType: ChartType.Bar,
+    data: Array.from({ length: 5000 }, (_, index) => ({
+      product: generateProductName(index),
+      sales: generateNumber(25000, 5000, index),
+      units: generateNumber(500, 100, index),
+      category: generateDepartment(index)
+    })),
+    barAndLineAxis: {
+      x: ['product'],
+      y: ['sales'],
+      category: []
+    },
+    columnLabelFormats: {
+      category: {
+        columnType: 'text',
+        style: 'string'
+      } satisfies IColumnLabelFormat,
+      sales: {
+        columnType: 'number',
+        style: 'currency',
+        currency: 'USD'
+      } satisfies IColumnLabelFormat,
+      product: {
+        columnType: 'text',
+        style: 'string'
+      } satisfies IColumnLabelFormat,
+      units: {
+        columnType: 'number',
+        style: 'number',
+        numberSeparatorStyle: ','
+      } satisfies IColumnLabelFormat
+    }
+  },
+  render: (args) => {
+    return (
+      <div className="h-[400px] w-[400px]">
         <BusterChart {...args} />
       </div>
     );

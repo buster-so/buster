@@ -37,6 +37,6 @@ export const sharedMeta: Partial<Meta<typeof BusterChart>> = {
   },
   args: {
     ...DEFAULT_CHART_CONFIG,
-    className: 'w-[800px] h-[400px]'
+    className: 'w-[400px] h-[400px]'
   }
 };

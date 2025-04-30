@@ -8,9 +8,7 @@ export const barAndLineTooltipHelper = (
   dataPoints: TooltipItem<keyof ChartTypeRegistry>[],
   chart: Chart,
   columnLabelFormats: NonNullable<BusterChartConfigProps['columnLabelFormats']>,
-  hasMultipleMeasures: boolean,
   keyToUsePercentage: string[],
-  hasCategoryAxis: boolean,
   hasMultipleShownDatasets: boolean,
   percentageMode: undefined | 'stacked'
 ): ITooltipItem[] => {
@@ -18,10 +16,13 @@ export const barAndLineTooltipHelper = (
     dataPoints.reverse();
   }
 
+  console.log('dataPoints', dataPoints);
+
   const tooltipItems = dataPoints.flatMap<ITooltipItem>((dataPoint) => {
     const tooltipDataset = dataPoint.dataset;
     const dataPointDataIndex = dataPoint.dataIndex;
     const tooltipData = tooltipDataset.tooltipData;
+    console.log('tooltipData', tooltipData, dataPointDataIndex);
     const selectedToolTipData = tooltipData[dataPointDataIndex];
     const items = selectedToolTipData.map<ITooltipItem>((item) => {
       const colorItem = tooltipDataset?.backgroundColor as string;
