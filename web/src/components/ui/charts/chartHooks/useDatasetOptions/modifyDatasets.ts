@@ -136,8 +136,8 @@ function handlePieThreshold(datasets: DatasetOption[], minPercent: number): Data
 function sortPie(
   datasets: DatasetOption[],
   sortBy: PieSortBy,
-  ticks: string[][] = []
-): { datasets: DatasetOption[]; ticks: string[][] } {
+  ticks: (string | number)[][] = []
+): { datasets: DatasetOption[]; ticks: DatasetOptionsWithTicks['ticks'] } {
   const items = cloneDeep(datasets);
   const result = { datasets: items, ticks };
 
