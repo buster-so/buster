@@ -23,6 +23,7 @@ import {
   DoughnutController,
   ChartDataset,
   ChartDatasetProperties,
+  ChartOptions,
   ChartType
 } from 'chart.js';
 import { ChartMountedPlugin } from './core/plugins';
@@ -217,5 +218,9 @@ declare module 'chart.js' {
     }[][];
     xAxisKeys: string[];
     yAxisKey: string; //this is the key of the y axis
+  }
+
+  interface CoreChartOptions<TType extends ChartType> {
+    //
   }
 }
