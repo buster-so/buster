@@ -203,18 +203,17 @@ export function aggregateAndCreateDatasets<
           const tooltipArr = tooltipKeys.length
             ? xGroups.map(({ rows }) => {
                 const row = rows[0] || {};
-                // Filter out duplicate tooltip keys when dealing with dual axis
-                const uniqueTooltipKeys = tooltipKeys.filter((k) => {
-                  // If this is a y2 axis metric, only include tooltip keys that aren't y-axis metrics
-                  if (axisType === 'y2') {
-                    return !yKeys.includes(k);
-                  }
-                  // If this is a y axis metric, only include tooltip keys that aren't y2-axis metrics
-                  if (axisType === 'y') {
-                    return !y2Keys.includes(k);
-                  }
-                  return true;
-                });
+                // For y2 axis, only include its own metric key
+                if (axisType === 'y2') {
+                  return [
+                    {
+                      key: metric,
+                      value: formatTooltip(row[metric], colFormats[metric] || {})
+                    }
+                  ];
+                }
+                // For y axis metrics, exclude y2-axis metrics from tooltips
+                const uniqueTooltipKeys = tooltipKeys.filter((k) => !y2Keys.includes(k));
                 return uniqueTooltipKeys.map((k) => ({
                   key: k,
                   value: formatTooltip(row[k], colFormats[k] || {})
@@ -268,18 +267,17 @@ export function aggregateAndCreateDatasets<
         const tooltipArr = tooltipKeys.length
           ? xGroups.map(({ rows }) => {
               const row = rows[0] || {};
-              // Filter out duplicate tooltip keys when dealing with dual axis
-              const uniqueTooltipKeys = tooltipKeys.filter((k) => {
-                // If this is a y2 axis metric, only include tooltip keys that aren't y-axis metrics
-                if (axisType === 'y2') {
-                  return !yKeys.includes(k);
-                }
-                // If this is a y axis metric, only include tooltip keys that aren't y2-axis metrics
-                if (axisType === 'y') {
-                  return !y2Keys.includes(k);
-                }
-                return true;
-              });
+              // For y2 axis, only include its own metric key
+              if (axisType === 'y2') {
+                return [
+                  {
+                    key: metric,
+                    value: formatTooltip(row[metric], colFormats[metric] || {})
+                  }
+                ];
+              }
+              // For y axis metrics, exclude y2-axis metrics from tooltips
+              const uniqueTooltipKeys = tooltipKeys.filter((k) => !y2Keys.includes(k));
               return uniqueTooltipKeys.map((k) => ({
                 key: k,
                 value: formatTooltip(row[k], colFormats[k] || {})

@@ -21,11 +21,11 @@ export const barSeriesBuilder = ({
   colors,
   columnSettings,
   columnLabelFormats,
-  xAxisKeys,
   barShowTotalAtTop,
   barGroupType,
   yAxisKeys,
   y2AxisKeys,
+  xAxisKeys,
   ...rest
 }: SeriesBuilderProps): ChartProps<'bar'>['data']['datasets'] => {
   const dataLabelOptions: Options['labels'] = {};
@@ -84,9 +84,9 @@ export const barSeriesBuilder = ({
         columnSettings,
         columnLabelFormats,
         index,
-        xAxisKeys,
         dataLabelOptions,
-        barGroupType
+        barGroupType,
+        xAxisKeys
       });
     }
   );
@@ -116,15 +116,14 @@ export const barBuilder = ({
   index,
   yAxisID,
   order,
-  xAxisKeys,
   dataLabelOptions,
-  barGroupType
-}: Pick<SeriesBuilderProps, 'colors' | 'columnSettings' | 'columnLabelFormats'> & {
+  barGroupType,
+  xAxisKeys
+}: Pick<SeriesBuilderProps, 'colors' | 'columnSettings' | 'columnLabelFormats' | 'xAxisKeys'> & {
   dataset: DatasetOption;
   index: number;
   yAxisID?: string;
   order?: number;
-  xAxisKeys: string[];
   dataLabelOptions?: Options['labels'];
   barGroupType: BusterChartProps['barGroupType'];
 }): ChartProps<'bar'>['data']['datasets'][number] => {
@@ -145,6 +144,7 @@ export const barBuilder = ({
     label: formatLabelForDataset(dataset, columnLabelFormats),
     yAxisID: yAxisID || 'y',
     order,
+    yAxisKey: yKey,
     data: dataset.data,
     backgroundColor: colors[index % colors.length],
     borderRadius: (columnSetting?.barRoundness || 0) / 2,

@@ -88,7 +88,7 @@ export const useXAxis = ({
         return 'time';
       }
 
-      if (isComboChart && columnSettings) {
+      if (isComboChart && columnSettings && xIsDate) {
         const allYAxisKeys = [...selectedAxis.y, ...((selectedAxis as ComboChartAxis).y2 || [])];
         const atLeastOneLineVisualization = allYAxisKeys.some(
           (y) =>

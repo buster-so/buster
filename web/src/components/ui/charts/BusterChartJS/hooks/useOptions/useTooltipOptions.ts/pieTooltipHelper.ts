@@ -24,7 +24,7 @@ export const pieTooltipHelper = (
       const { key, value } = item;
       const usePercentage = keyToUsePercentage.includes(key);
       const color = (tooltipDataset.backgroundColor as string[])[dataPointDataIndex];
-      const formattedLabel = tooltipDataset.label as string;
+      const formattedLabel = formatLabel(key as string, columnLabelFormats[key as string], true);
       const formattedValue = formatLabel(value as number, columnLabelFormats[key as string]);
       const formattedPercentage = usePercentage
         ? getPiePercentage(

@@ -56,8 +56,6 @@ export const useSeriesOptions = ({
   barShowTotalAtTop,
   barGroupType
 }: UseSeriesOptionsProps): ChartProps<ChartJSChartType>['data'] => {
-  const isScatter = selectedChartType === 'scatter';
-
   const labels: (string | Date)[] | undefined = useMemo(() => {
     return labelsBuilderRecord[selectedChartType]({
       datasetOptions,

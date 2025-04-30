@@ -1691,7 +1691,7 @@ describe('aggregateAndCreateDatasets', () => {
           const hasY2Metrics = tooltipGroup.some((tip) => tip.key === 'metric3');
           expect(hasY2Metrics).toBe(true);
           const hasAdditionalInfo = tooltipGroup.some((tip) => tip.key === 'additionalInfo');
-          expect(hasAdditionalInfo).toBe(true);
+          expect(hasAdditionalInfo).toBe(false);
         });
       });
     });
@@ -1715,8 +1715,12 @@ describe('aggregateAndCreateDatasets', () => {
           // Category and additional info should always be present
           const hasCategoryInfo = tooltipGroup.some((tip) => tip.key === 'category');
           const hasAdditionalInfo = tooltipGroup.some((tip) => tip.key === 'additionalInfo');
-          expect(hasCategoryInfo).toBe(true);
-          expect(hasAdditionalInfo).toBe(true);
+          if (dataset.axisType === 'y2') {
+            expect(hasCategoryInfo).toBe(false);
+          } else {
+            expect(hasCategoryInfo).toBe(true);
+            expect(hasAdditionalInfo).toBe(true);
+          }
 
           if (dataset.axisType === 'y') {
             // Y-axis tooltips should have metric1 but not metric2
@@ -1734,5 +1738,43 @@ describe('aggregateAndCreateDatasets', () => {
         });
       });
     });
+  });
+
+  it('should only include y2 metric in its tooltip when using dual axis', () => {
+    const testData = [
+      { month: 'Jan', temperature: 20, humidity: 80, rainfall: 50 },
+      { month: 'Feb', temperature: 22, humidity: 75, rainfall: 45 },
+      { month: 'Mar', temperature: 25, humidity: 70, rainfall: 40 }
+    ];
+
+    const result = aggregateAndCreateDatasets(
+      testData,
+      {
+        x: ['month'],
+        y: ['temperature', 'humidity'],
+        y2: ['rainfall'],
+        tooltip: ['temperature', 'humidity', 'rainfall']
+      },
+      {}
+    );
+
+    // Find the y2 dataset (rainfall)
+    const y2Dataset = result.datasets.find((d) => d.axisType === 'y2');
+    expect(y2Dataset).toBeDefined();
+    expect(y2Dataset?.dataKey).toBe('rainfall');
+
+    // Verify y2 tooltips only contain rainfall data
+    expect(y2Dataset?.tooltipData).toEqual([
+      [{ key: 'rainfall', value: 50 }],
+      [{ key: 'rainfall', value: 45 }],
+      [{ key: 'rainfall', value: 40 }]
+    ]);
+
+    // Verify y axis tooltips exclude y2 metrics
+    const yDataset = result.datasets.find((d) => d.dataKey === 'temperature');
+    expect(yDataset?.tooltipData?.[0]).toEqual([
+      { key: 'temperature', value: 20 },
+      { key: 'humidity', value: 80 }
+    ]);
   });
 });

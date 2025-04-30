@@ -215,6 +215,7 @@ declare module 'chart.js' {
       key: string;
       value: string | number | boolean | null;
     }[][];
-    xAxisKeys?: string[];
+    xAxisKeys: string[];
+    yAxisKey: string; //this is the key of the y axis
   }
 }

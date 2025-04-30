@@ -2,7 +2,7 @@ import type { ITooltipItem } from '../../../../BusterChartTooltip/interfaces';
 import type { Chart, TooltipItem, ChartTypeRegistry } from 'chart.js';
 import { getPercentage } from './helper';
 import type { BusterChartConfigProps } from '@/api/asset_interfaces/metric/charts';
-import { formatChartValueDelimiter } from '@/components/ui/charts/commonHelpers';
+import { formatLabel } from '@/lib';
 
 export const barAndLineTooltipHelper = (
   dataPoints: TooltipItem<keyof ChartTypeRegistry>[],
@@ -23,27 +23,27 @@ export const barAndLineTooltipHelper = (
     const selectedToolTipData = tooltipData[dataPointDataIndex];
     const items = selectedToolTipData.map<ITooltipItem>((item) => {
       const colorItem = tooltipDataset?.backgroundColor as string;
-      const color = tooltipDataset
-        ? typeof colorItem === 'function'
-          ? (tooltipDataset?.borderColor as string)
-          : (tooltipDataset?.backgroundColor as string)
-        : undefined;
+      const color =
+        tooltipDataset && tooltipDataset.yAxisKey === item.key //we want to use the default gray color if the y axis key is the same as the item key (which means it is plotted)
+          ? typeof colorItem === 'function'
+            ? (tooltipDataset?.borderColor as string)
+            : (tooltipDataset?.backgroundColor as string)
+          : undefined;
       const usePercentage =
         !!percentageMode || keyToUsePercentage.includes(tooltipDataset.label as string);
+
+      const formattedLabel = formatLabel(item.key as string, columnLabelFormats[item.key], true);
+      const formattedValue = formatLabel(item.value as number, columnLabelFormats[item.key]);
 
       return {
         seriesType: 'bar',
         color,
         usePercentage,
-        formattedLabel: tooltipDataset.label as string,
+        formattedLabel,
         values: [
           {
-            formattedValue: formatChartValueDelimiter(
-              item.value as number,
-              item.key,
-              columnLabelFormats
-            ),
-            formattedLabel: item.key,
+            formattedValue,
+            formattedLabel,
             formattedPercentage: getPercentage(
               item.value as number,
               dataPointDataIndex,

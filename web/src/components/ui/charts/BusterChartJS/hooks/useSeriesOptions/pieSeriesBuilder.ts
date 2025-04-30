@@ -11,12 +11,15 @@ type PieSerieType =
 export const pieSeriesBuilder_data = ({
   datasetOptions,
   colors,
+  xAxisKeys,
   columnLabelFormats
 }: SeriesBuilderProps): PieSerieType[] => {
   return datasetOptions.datasets.map<PieSerieType>((dataset) => {
     return {
       label: formatLabelForDataset(dataset, columnLabelFormats),
       backgroundColor: colors,
+      xAxisKeys,
+      yAxisKey: dataset.dataKey,
       //pie will only have one dataset
       data: dataset.data as number[],
       borderColor: 'white', //I tried to set this globally in the theme but it didn't work

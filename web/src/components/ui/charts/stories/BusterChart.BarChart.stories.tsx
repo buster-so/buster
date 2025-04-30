@@ -783,3 +783,77 @@ export const ExtraLargeDatasetWithCategory: Story = {
     );
   }
 };
+
+export const ManyUnPlottedTooltipItems: Story = {
+  args: {
+    selectedChartType: ChartType.Bar,
+    data: Array.from({ length: 12 }, (_, index) => ({
+      category: generateProductName(index),
+      sales: generateNumber(25000, 5000, index),
+      customerRating: generateNumber(3.5, 1, index),
+      stockLevel: generateNumber(50, 10, index),
+      returnRate: generateNumber(1, 15, index)
+    })),
+    barAndLineAxis: {
+      x: ['category'],
+      y: ['sales'],
+      category: [],
+      tooltip: ['sales', 'customerRating', 'stockLevel', 'returnRate']
+    },
+    columnSettings: {
+      sales: {
+        columnVisualization: 'bar'
+      },
+      customerRating: {
+        columnVisualization: 'line',
+        lineSymbolSize: 6,
+        lineWidth: 2
+      },
+      stockLevel: {
+        columnVisualization: 'line',
+        lineSymbolSize: 4,
+        lineWidth: 2
+      },
+      returnRate: {
+        columnVisualization: 'line',
+        lineSymbolSize: 4,
+        lineWidth: 2
+      }
+    },
+    columnLabelFormats: {
+      category: {
+        columnType: 'text',
+        style: 'string'
+      } satisfies IColumnLabelFormat,
+      sales: {
+        columnType: 'number',
+        style: 'currency',
+        currency: 'USD',
+        numberSeparatorStyle: ','
+      } satisfies IColumnLabelFormat,
+      customerRating: {
+        columnType: 'number',
+        style: 'number',
+        numberSeparatorStyle: ',',
+        suffix: ' ★'
+      } satisfies IColumnLabelFormat,
+      stockLevel: {
+        columnType: 'number',
+        style: 'number',
+        numberSeparatorStyle: ',',
+        suffix: ' units'
+      } satisfies IColumnLabelFormat,
+      returnRate: {
+        columnType: 'number',
+        style: 'number',
+        numberSeparatorStyle: ',',
+        suffix: '%'
+      } satisfies IColumnLabelFormat
+    },
+    yAxisAxisTitle: 'Sales Revenue',
+    y2AxisAxisTitle: 'Multiple Metrics',
+    gridLines: true,
+    showLegend: true,
+    className: 'w-[600px] h-[400px]'
+  }
+};

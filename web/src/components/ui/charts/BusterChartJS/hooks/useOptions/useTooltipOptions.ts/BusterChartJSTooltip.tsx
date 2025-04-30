@@ -97,7 +97,7 @@ export const BusterChartJSTooltip: React.FC<{
     //THIS IS ONLY FOR LINE CHART WITH A TIME AXIS
     const datasetIndex = dataPoints[0].datasetIndex;
     const dataset = datasets[datasetIndex!];
-    const xAxisKeys = (dataset as any).xAxisKeys as string[]; //hacky... TODO look into this
+    const xAxisKeys = dataset.xAxisKeys; //hacky... TODO look into this
     const key = xAxisKeys.at(0)!;
     const columnLabelFormat = columnLabelFormats[key!];
 

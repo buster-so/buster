@@ -1,9 +1,9 @@
-import { DatasetOption, extractFieldsFromChain } from '../../../chartHooks';
+import { DatasetOption } from '../../../chartHooks';
 import { Chart, Filler, ScriptableContext } from 'chart.js';
 import type { ChartProps } from '../../core';
 import { SeriesBuilderProps } from './interfaces';
 import { LabelBuilderProps } from './useSeriesOptions';
-import { formatChartLabelDelimiter, formatLabelForDataset } from '../../../commonHelpers';
+import { formatLabelForDataset } from '../../../commonHelpers';
 import { addOpacityToColor, createDayjsDate, formatLabel } from '@/lib';
 import { defaultLabelOptionConfig } from '../useChartSpecificOptions/labelOptionConfig';
 import {
@@ -21,36 +21,29 @@ export const lineSeriesBuilder = ({
   colors,
   columnSettings,
   columnLabelFormats,
-  xAxisKeys,
   lineGroupType,
-  datasetOptions
+  datasetOptions,
+  xAxisKeys
 }: SeriesBuilderProps): ChartProps<'line'>['data']['datasets'][number][] => {
-  return [];
-  // return allYAxisKeysIndexes.map<ChartProps<'line'>['data']['datasets'][number]>(
-  //   (yAxisItem, index) => {
-  //     return lineBuilder({
-  //       lineGroupType,
-  //       selectedDataset,
-  //       colors,
-  //       columnSettings,
-  //       columnLabelFormats,
-  //       yAxisItem,
-  //       index,
-  //       xAxisKeys
-  //     });
-  //   }
-  // );
+  return datasetOptions.datasets.map<ChartProps<'line'>['data']['datasets'][number]>(
+    (dataset, index) => {
+      return lineBuilder({
+        lineGroupType,
+        dataset,
+        colors,
+        columnSettings,
+        columnLabelFormats,
+        index,
+        xAxisKeys
+      });
+    }
+  );
 };
 
 export const lineBuilder = (
   props: Pick<
     SeriesBuilderProps,
-    | 'colors'
-    | 'columnSettings'
-    | 'columnLabelFormats'
-    | 'xAxisKeys'
-    | 'lineGroupType'
-    | 'barGroupType'
+    'colors' | 'columnSettings' | 'columnLabelFormats' | 'lineGroupType' | 'xAxisKeys'
   > & {
     index: number;
     yAxisID?: string;
@@ -64,10 +57,10 @@ export const lineBuilder = (
     columnSettings,
     columnLabelFormats,
     index,
-    xAxisKeys,
     yAxisID,
     order,
-    dataset
+    dataset,
+    xAxisKeys
   } = props;
   const { dataKey } = dataset;
   const yKey = dataKey;
@@ -98,13 +91,14 @@ export const lineBuilder = (
   return {
     type: 'line',
     yAxisID: yAxisID || 'y',
-    xAxisKeys,
     label: formatLabelForDataset(dataset, columnLabelFormats),
     fill,
     tooltipData: dataset.tooltipData,
+    xAxisKeys,
     tension: getLineTension(lineType),
     stepped: lineType === 'step',
     spanGaps: true,
+    yAxisKey: yKey,
     borderWidth: lineWidth,
     order: order || 0,
     //line will only have one dataset
