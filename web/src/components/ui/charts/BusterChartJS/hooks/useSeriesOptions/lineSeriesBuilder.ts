@@ -210,7 +210,7 @@ export const lineSeriesBuilder_labels = ({
   if (useDateLabels) {
     return datasetOptions.ticks.flatMap((item) => {
       return item.map<Date>((item, index) => {
-        return createDayjsDate(item[0] as string).toDate();
+        return createDayjsDate(item as string).toDate();
       });
     });
   }

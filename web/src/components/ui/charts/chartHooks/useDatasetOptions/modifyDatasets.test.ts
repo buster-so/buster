@@ -1241,7 +1241,20 @@ describe('modifyDatasets - pieSortBy tests', () => {
         data: [300, 100, 500],
         dataKey: 'slice1',
         axisType: 'y',
-        tooltipData: [[{ key: 'value', value: 300 }]]
+        tooltipData: [
+          [
+            { key: 'value', value: 300 },
+            { key: 'label', value: 'Category C' }
+          ],
+          [
+            { key: 'value', value: 100 },
+            { key: 'label', value: 'Category A' }
+          ],
+          [
+            { key: 'value', value: 500 },
+            { key: 'label', value: 'Category B' }
+          ]
+        ]
       },
       {
         id: 'slice2',
@@ -1249,11 +1262,121 @@ describe('modifyDatasets - pieSortBy tests', () => {
         data: [100, 300, 200],
         dataKey: 'slice2',
         axisType: 'y',
-        tooltipData: [[{ key: 'value', value: 100 }]]
+        tooltipData: [
+          [
+            { key: 'value', value: 100 },
+            { key: 'label', value: 'Category A' }
+          ],
+          [
+            { key: 'value', value: 300 },
+            { key: 'label', value: 'Category B' }
+          ],
+          [
+            { key: 'value', value: 200 },
+            { key: 'label', value: 'Category C' }
+          ]
+        ]
       }
     ],
     ticks: [],
     ticksKey: []
+  });
+
+  test('should sort pie chart data by value in ascending order', () => {
+    const datasets = createPieDatasets();
+    const { datasets: result } = modifyDatasets({
+      datasets,
+      pieMinimumSlicePercentage: undefined,
+      barSortBy: undefined,
+      pieSortBy: 'value',
+      barGroupType: undefined,
+      lineGroupType: undefined,
+      selectedChartType: ChartType.Pie
+    });
+
+    // Should maintain the same number of datasets
+    expect(result.length).toBe(2);
+
+    // First dataset should be slice2 (100) and second should be slice1 (300)
+
+    expect(result[0].data[0]).toBe(100);
+    expect(result[1].data[0]).toBe(300);
+
+    console.log(result[0].tooltipData);
+
+    // Check that tooltipData is also correctly reordered
+    expect(result[0].tooltipData?.[0]?.[0]?.value).toBe(100);
+    expect(result[1].tooltipData?.[0]?.[0]?.value).toBe(300);
+  });
+
+  test('should sort pie chart data by key alphabetically', () => {
+    const datasets = createPieDatasets();
+    const { datasets: result } = modifyDatasets({
+      datasets,
+      pieMinimumSlicePercentage: undefined,
+      barSortBy: undefined,
+      pieSortBy: 'key',
+      barGroupType: undefined,
+      lineGroupType: undefined,
+      selectedChartType: ChartType.Pie
+    });
+
+    // Should maintain the same number of datasets
+    expect(result.length).toBe(2);
+
+    // First dataset should be Category A (slice2) and second should be Category C (slice1)
+    expect(result[0].label[0].value).toBe('Category C');
+    expect(result[1].label[0].value).toBe('Category A');
+
+    // Check that data and tooltipData are correctly reordered
+    expect(result[0].data[0]).toBe(100);
+    expect(result[1].data[0]).toBe(300);
+    expect(result[0].tooltipData?.[0]?.[0]?.value).toBe(100);
+    expect(result[1].tooltipData?.[0]?.[0]?.value).toBe(300);
+  });
+
+  test('should not modify order when pieSortBy is null', () => {
+    const datasets = createPieDatasets();
+    const { datasets: result } = modifyDatasets({
+      datasets,
+      pieMinimumSlicePercentage: undefined,
+      barSortBy: undefined,
+      pieSortBy: null,
+      barGroupType: undefined,
+      lineGroupType: undefined,
+      selectedChartType: ChartType.Pie
+    });
+
+    // Should maintain the same number of datasets and original order
+    expect(result.length).toBe(2);
+    expect(result[0].id).toBe('slice1');
+    expect(result[1].id).toBe('slice2');
+
+    // Data and tooltipData should remain in original order
+    expect(result[0].data[0]).toBe(300);
+    expect(result[1].data[0]).toBe(100);
+    expect(result[0].tooltipData?.[0]?.[0]?.value).toBe(300);
+    expect(result[1].tooltipData?.[0]?.[0]?.value).toBe(100);
+  });
+
+  test('should handle empty datasets array', () => {
+    const emptyDatasets: DatasetOptionsWithTicks = {
+      datasets: [],
+      ticks: [],
+      ticksKey: []
+    };
+
+    const { datasets: result } = modifyDatasets({
+      datasets: emptyDatasets,
+      pieMinimumSlicePercentage: undefined,
+      barSortBy: undefined,
+      pieSortBy: 'value',
+      barGroupType: undefined,
+      lineGroupType: undefined,
+      selectedChartType: ChartType.Pie
+    });
+
+    expect(result).toEqual([]);
   });
 });
 

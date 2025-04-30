@@ -50,7 +50,7 @@ export const useTrendlines = ({
       (acc, trendline) => {
         const name = trendline.type;
         const builderResult = annotationBuilder[name](trendline);
-        const value = trendline.source[0][0] as number;
+        const value = trendline.data[0] as number;
         const formattedValue = formatLabel(value, columnLabelFormats[trendline.columnId]);
         const trendlineLabel = trendline.trendlineLabel || TypeToLabel[trendline.type];
         const labelContent = trendlineLabel
@@ -81,18 +81,20 @@ export const useTrendlines = ({
     const series = seriesTrendlines.map<ChartProps<'line'>['data']['datasets'][number]>(
       ({
         id,
-        source,
+        data,
         trendLineColor,
         trendlineLabel: trendlineLabelProp,
         showTrendlineLabel,
-        equation
+        equation,
+        tooltipData
       }) => {
         return {
           type: 'line',
-          data: source.map((i) => i[1] as number),
+          data: data.map((i) => i as number),
           borderColor: trendLineColor || 'black',
           borderWidth: 2,
           isTrendline: true,
+          tooltipData,
           pointHoverRadius: 0,
           pointRadius: 0,
           yAxisID: 'y',
@@ -138,19 +140,19 @@ const annotationBuilder: Record<
 > = {
   average: (trendline) => ({
     type: 'line',
-    value: trendline.source[0][0] as number
+    value: trendline.data[0] as number
   }),
   min: (trendline) => ({
     type: 'line',
-    value: trendline.source[0][0] as number
+    value: trendline.data[0] as number
   }),
   max: (trendline) => ({
     type: 'line',
-    value: trendline.source[0][0] as number
+    value: trendline.data[0] as number
   }),
   median: (trendline) => ({
     type: 'line',
-    value: trendline.source[0][0] as number
+    value: trendline.data[0] as number
   }),
   linear_regression: (trendline) => {
     const isLinearSlope = trendline.trendlineLabel === DATASET_IDS.linearSlope(trendline.columnId);

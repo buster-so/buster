@@ -303,7 +303,7 @@ export const ShowLabelAsPercent: Story = {
         numberSeparatorStyle: ','
       } satisfies IColumnLabelFormat
     } satisfies Record<keyof PieChartData, IColumnLabelFormat>,
-    pieDisplayLabelAs: 'number',
+    pieDisplayLabelAs: 'percent',
     pieDonutWidth: 5,
     pieInnerLabelTitle: 'Total',
     pieShowInnerLabel: false,

@@ -65,7 +65,6 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
     pieSortBy,
     columnMetadata
   } = params;
-  console.log('pieSortBy', pieSortBy);
   const {
     x: xFields,
     y: yAxisFields,
@@ -208,8 +207,6 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
     lineGroupType,
     selectedChartType
   ]);
-
-  console.log('datasetOptions', datasetOptions);
 
   const dataTrendlineOptions = useDataTrendlineOptions({
     datasetOptions,

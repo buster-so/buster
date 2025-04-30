@@ -30,10 +30,6 @@ export const comboSeriesBuilder_data = (props: SeriesBuilderProps): ComboSeries 
   });
 };
 
-export const comboSeriesBuilder_labels = (props: LabelBuilderProps): (string | Date)[] => {
-  return lineSeriesBuilder_labels(props);
-};
-
 type RenderBuilderProps = Pick<
   SeriesBuilderProps,
   | 'colors'
@@ -90,4 +86,8 @@ const renderBuilder: Record<
   bar: barBuilder,
   line: (props) => lineBuilder({ ...props, order: -props.index }),
   dot: dotSeriesBuilder
+};
+
+export const comboSeriesBuilder_labels = (props: LabelBuilderProps): (string | Date)[] => {
+  return lineSeriesBuilder_labels(props);
 };
