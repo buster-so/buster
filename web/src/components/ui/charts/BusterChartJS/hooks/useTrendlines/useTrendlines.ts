@@ -86,7 +86,8 @@ export const useTrendlines = ({
         trendlineLabel: trendlineLabelProp,
         showTrendlineLabel,
         equation,
-        tooltipData
+        tooltipData,
+        columnId
       }) => {
         return {
           type: 'line',
@@ -97,6 +98,8 @@ export const useTrendlines = ({
           tooltipData,
           pointHoverRadius: 0,
           pointRadius: 0,
+          xAxisKeys: [],
+          yAxisKey: columnId,
           yAxisID: 'y',
           stack: id,
           tension: 0.25,

@@ -39,6 +39,8 @@ interface UseBusterChartJSLegendProps {
   pieMinimumSlicePercentage: NonNullable<BusterChartProps['pieMinimumSlicePercentage']>;
 }
 
+const DELAY_DURATION_FOR_LARGE_DATASET = 0; //95
+
 export const useBusterChartJSLegend = ({
   chartRef,
   colors,
@@ -60,7 +62,7 @@ export const useBusterChartJSLegend = ({
   const [isUpdatingChart, setIsUpdatingChart] = useState(false);
   const [numberOfDataPoints, setNumberOfDataPoints] = useState(0);
   const isLargeDataset = numberOfDataPoints > LEGEND_ANIMATION_THRESHOLD;
-  const legendTimeoutDuration = isLargeDataset ? 95 : 0;
+  const legendTimeoutDuration = isLargeDataset ? DELAY_DURATION_FOR_LARGE_DATASET : 0;
 
   const {
     inactiveDatasets,
@@ -171,7 +173,7 @@ export const useBusterChartJSLegend = ({
         });
       }, timeoutDuration);
     }),
-    { wait: isLargeDataset ? 250 : 0 }
+    { wait: isLargeDataset ? DELAY_DURATION_FOR_LARGE_DATASET * 2 : 0 }
   );
 
   const onLegendItemClick = useMemoizedFn(async (item: BusterChartLegendItem) => {
