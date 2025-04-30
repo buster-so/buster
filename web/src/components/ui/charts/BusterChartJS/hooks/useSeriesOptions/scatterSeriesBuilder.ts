@@ -38,6 +38,8 @@ export const scatterSeriesBuilder_data = ({
   const xAxisColumnLabelFormat = columnLabelFormats[xAxisKey] || DEFAULT_COLUMN_LABEL_FORMAT;
   const isXAxisDate = isDateColumnType(xAxisColumnLabelFormat.columnType);
 
+  console.log(isXAxisDate, xAxisColumnLabelFormat);
+
   const hasSizeKeyIndex = sizeOptions !== null && !!sizeOptions.key;
   const scatterElementConfig = hasSizeKeyIndex
     ? {
@@ -59,11 +61,12 @@ export const scatterSeriesBuilder_data = ({
       hoverBackgroundColor = addOpacityToColor(color, 0.9);
       borderColor = color;
       colorsRecord[color] = { color, backgroundColor, hoverBackgroundColor, borderColor };
-      console.log(colorsRecord);
     }
 
     return {
+      parsing: false,
       label: formatLabelForDataset(dataset, columnLabelFormats),
+      //@ts-ignore
       elements: scatterElementConfig,
       backgroundColor,
       hoverBackgroundColor,
@@ -84,7 +87,7 @@ export const scatterSeriesBuilder_data = ({
         }
         return acc;
       }, [])
-    };
+    } satisfies ChartProps<'bubble'>['data']['datasets'][number];
   });
 };
 

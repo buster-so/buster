@@ -109,8 +109,6 @@ export const BusterChartJSComponent = React.memo(
         barGroupType
       });
 
-      console.log('data', data);
-
       const { chartPlugins, chartOptions } = useChartSpecificOptions({
         selectedChartType,
         pieShowInnerLabel,
@@ -196,8 +194,6 @@ export const BusterChartJSComponent = React.memo(
         if (selectedChartType === 'combo') return [ChartHoverBarPlugin, ChartTotalizerPlugin];
         return [];
       }, [selectedChartType]);
-
-      console.log('options', { options, type, data });
 
       return (
         <Chart

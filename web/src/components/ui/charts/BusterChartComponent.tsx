@@ -23,8 +23,6 @@ export const BusterChartComponent: React.FC<BusterChartRenderComponentProps> = (
     selectedAxis
   } = props;
 
-  console.log('raw data', dataProp, props.selectedAxis);
-
   const {
     numberOfDataPoints,
     datasetOptions,
