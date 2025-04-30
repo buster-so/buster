@@ -1,7 +1,7 @@
 // Also consider modifying this package to make it work with chartjs 4 https://pomgui.github.io/chartjs-plugin-regression/demo/
 
 import type { BusterChartProps, Trendline } from '@/api/asset_interfaces/metric/charts';
-import type { DatasetOptionsWithTicks } from '../interfaces';
+import type { DatasetOption, DatasetOptionsWithTicks } from '../interfaces';
 import type { TrendlineDataset } from './trendlineDataset.types';
 import { DATASET_IDS } from '../config';
 import { isDateColumnType, isNumericColumnType } from '@/lib/messages';
@@ -34,7 +34,7 @@ export const trendlineDatasetCreator: Record<
     const mappedPoints = dataMapper(
       selectedDataset,
       {
-        ticks: datasetsWithTicks.ticks,
+        ticks: getTicks(datasetsWithTicks, selectedDataset),
         ticksKey: datasetsWithTicks.ticksKey
       },
       columnLabelFormats
@@ -96,7 +96,7 @@ export const trendlineDatasetCreator: Record<
     const mappedPoints = dataMapper(
       selectedDataset,
       {
-        ticks: datasetsWithTicks.ticks,
+        ticks: getTicks(datasetsWithTicks, selectedDataset),
         ticksKey: datasetsWithTicks.ticksKey
       },
       columnLabelFormats
@@ -161,7 +161,7 @@ export const trendlineDatasetCreator: Record<
     const mappedPoints = dataMapper(
       selectedDataset,
       {
-        ticks: datasetsWithTicks.ticks,
+        ticks: getTicks(datasetsWithTicks, selectedDataset),
         ticksKey: datasetsWithTicks.ticksKey
       },
       columnLabelFormats
@@ -230,7 +230,7 @@ export const trendlineDatasetCreator: Record<
     const mappedPoints = dataMapper(
       selectedDataset,
       {
-        ticks: datasetsWithTicks.ticks,
+        ticks: getTicks(datasetsWithTicks, selectedDataset),
         ticksKey: datasetsWithTicks.ticksKey
       },
       columnLabelFormats
@@ -397,4 +397,15 @@ export const trendlineDatasetCreator: Record<
       }
     ];
   }
+};
+
+const getTicks = (
+  datasetsWithTicks: DatasetOptionsWithTicks,
+  dataset: DatasetOption
+): (string | number)[][] => {
+  const isScatterPlot = !!dataset.ticksForScatter && !!dataset.ticksForScatter.length;
+  if (isScatterPlot) {
+    return dataset.ticksForScatter ?? [];
+  }
+  return datasetsWithTicks.ticks;
 };

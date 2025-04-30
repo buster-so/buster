@@ -164,7 +164,7 @@ describe('aggregateAndCreateDatasets', () => {
     expect(result.datasets[0].label).toEqual([{ key: 'y', value: '' }]);
 
     // Check ticks
-    expect(result.ticks).toEqual([[1], [2], [3]]);
+    expect(result.datasets[0].ticksForScatter).toEqual([[1], [2], [3]]);
     expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
   });
 
@@ -296,8 +296,9 @@ describe('aggregateAndCreateDatasets', () => {
     expect(result.datasets[0].label).toEqual([{ key: 'y', value: '' }]);
 
     // Check ticks
-    expect(result.ticks).toEqual([[1], [2], [3]]);
+    expect(result.ticks).toEqual([]);
     expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
+    expect(result.datasets[0].ticksForScatter).toEqual([[1], [2], [3]]);
   });
 
   it('should handle bubble chart with size data in scatter plot mode', () => {
@@ -341,7 +342,7 @@ describe('aggregateAndCreateDatasets', () => {
     ]);
 
     // Check ticks
-    expect(result.ticks).toEqual([[1], [2]]);
+    expect(result.datasets[0].ticksForScatter).toEqual([[1], [2]]);
     expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
   });
 
@@ -396,7 +397,7 @@ describe('aggregateAndCreateDatasets', () => {
     ]);
 
     // Check ticks
-    expect(result.ticks).toEqual([[1], [2]]);
+    expect(result.datasets[0].ticksForScatter).toEqual([[1], [2]]);
     expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
   });
 
@@ -596,7 +597,7 @@ describe('aggregateAndCreateDatasets', () => {
     ]);
 
     // Check ticks
-    expect(result.ticks).toEqual([[1], [2], [3]]);
+    expect(result.datasets[0].ticksForScatter).toEqual([[1], [2], [3]]);
     expect(result.ticksKey).toEqual([{ key: 'xValue', value: '' }]);
   });
 
@@ -652,7 +653,7 @@ describe('aggregateAndCreateDatasets', () => {
     ]);
 
     // Check ticks
-    expect(result.ticks).toEqual([[1], [2]]);
+    expect(result.datasets[0].ticksForScatter).toEqual([[1], [2]]);
     expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
   });
 
@@ -689,7 +690,8 @@ describe('aggregateAndCreateDatasets', () => {
     expect(dataset.tooltipData.length).toBe(2);
 
     // Check ticks
-    expect(result.ticks).toEqual([[1], [2]]);
+    expect(result.ticks).toEqual([]);
+    expect(result.datasets[0].ticksForScatter).toEqual([[1], [2]]);
     expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
   });
 
@@ -809,7 +811,8 @@ describe('aggregateAndCreateDatasets', () => {
     ]);
 
     // Check ticks
-    expect(result.ticks).toEqual([[1], [2], [3]]);
+    expect(result.ticks).toEqual([]);
+    expect(result.datasets[0].ticksForScatter).toEqual([[1], [2], [3]]);
     expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
   });
 
@@ -859,7 +862,8 @@ describe('aggregateAndCreateDatasets', () => {
     ]);
 
     // Check ticks
-    expect(result.ticks).toEqual([[1], [2], [3]]);
+    expect(result.ticks).toEqual([]);
+    expect(result.datasets[0].ticksForScatter).toEqual([[1], [2], [3]]);
     expect(result.ticksKey).toEqual([{ key: 'id', value: '' }]);
   });
 
@@ -897,7 +901,8 @@ describe('aggregateAndCreateDatasets', () => {
     ]);
 
     // Check ticks
-    expect(result.ticks).toEqual([[1], [2], [3]]);
+    expect(result.ticks).toEqual([]);
+    expect(result.datasets[0].ticksForScatter).toEqual([[1], [2], [3]]);
     expect(result.ticksKey).toEqual([{ key: 'x', value: '' }]);
   });
 
@@ -1795,9 +1800,13 @@ describe('aggregateAndCreateDatasets', () => {
       true // scatter plot mode
     );
 
-    expect(result.ticks.length).toBe(60);
+    expect(result.ticks).toEqual([]); // Ticks should be empty for scatter plots
     expect(result.datasets[0].data.length).toBe(60);
     expect(result.datasets[0].tooltipData.length).toBe(60);
+    expect(result.datasets[0].ticksForScatter?.length).toBe(60); // Check ticksForScatter
+    // Verify first and last tick values
+    expect(result.datasets[0].ticksForScatter?.[0]).toEqual([0]);
+    expect(result.datasets[0].ticksForScatter?.[59]).toEqual([59]);
   });
 
   it('should maintain exact data-tick alignment for scatter plots with large datasets - with nulls', () => {
@@ -1817,9 +1826,12 @@ describe('aggregateAndCreateDatasets', () => {
       true // scatter plot mode
     );
 
-    expect(result.ticks.length).toBe(59);
+    expect(result.ticks).toEqual([]); // Ticks should be empty for scatter plots
     expect(result.datasets[0].data.length).toBe(59);
     expect(result.datasets[0].tooltipData.length).toBe(59);
+    expect(result.datasets[0].ticksForScatter?.length).toBe(59); // Check ticksForScatter
+    // Verify the gap where null was
+    expect(result.datasets[0].ticksForScatter?.map((t) => t[0])).not.toContain(5);
   });
 
   it('should maintain exact data-tick alignment for scatter plots with large datasets - with nulls in y', () => {
@@ -1838,9 +1850,12 @@ describe('aggregateAndCreateDatasets', () => {
       true // scatter plot mode
     );
 
-    expect(result.ticks.length).toBe(60);
+    expect(result.ticks).toEqual([]); // Ticks should be empty for scatter plots
     expect(result.datasets[0].data.length).toBe(60);
     expect(result.datasets[0].tooltipData.length).toBe(60);
+    expect(result.datasets[0].ticksForScatter?.length).toBe(60); // Check ticksForScatter
+    // Verify that x values are preserved even when y is null
+    expect(result.datasets[0].ticksForScatter?.[5]).toEqual([5]);
   });
 
   it('should maintain exact data-tick alignment for scatter plots with large datasets - with category', () => {
@@ -1861,9 +1876,17 @@ describe('aggregateAndCreateDatasets', () => {
       true // scatter plot mode
     );
 
-    expect(result.ticks.length).toBe(60 / 2); //because of the category
-    expect(result.datasets[0].data.length).toBe(60 / 2);
-    expect(result.datasets[0].tooltipData.length).toBe(60 / 2);
+    expect(result.ticks).toEqual([]); // Ticks should be empty for scatter plots
+    // We should have two datasets, one for each category
+    expect(result.datasets.length).toBe(2);
+    // Each dataset should have half the points
+    const expectedPointsPerDataset = Math.floor(60 / 2);
+    expect(result.datasets[0].data.length).toBe(expectedPointsPerDataset);
+    expect(result.datasets[0].tooltipData.length).toBe(expectedPointsPerDataset);
+    expect(result.datasets[0].ticksForScatter?.length).toBe(expectedPointsPerDataset);
+    // Verify category A has even numbers and B has odd numbers
+    expect(result.datasets[0].ticksForScatter?.every((t) => Number(t[0]) % 2 === 0)).toBe(true);
+    expect(result.datasets[1].ticksForScatter?.every((t) => Number(t[0]) % 2 === 1)).toBe(true);
   });
 
   it('should maintain exact data-tick alignment for scatter plots with large datasets - with category and size', () => {
@@ -1886,8 +1909,20 @@ describe('aggregateAndCreateDatasets', () => {
       true // scatter plot mode
     );
 
-    expect(result.ticks.length).toBe(60 / 2); //because of the category
-    expect(result.datasets[0].data.length).toBe(60 / 2);
-    expect(result.datasets[0].tooltipData.length).toBe(60 / 2);
+    expect(result.ticks).toEqual([]); // Ticks should be empty for scatter plots
+    // We should have two datasets, one for each category
+    expect(result.datasets.length).toBe(2);
+    // Each dataset should have half the points
+    const expectedPointsPerDataset = Math.floor(60 / 2);
+    expect(result.datasets[0].data.length).toBe(expectedPointsPerDataset);
+    expect(result.datasets[0].tooltipData.length).toBe(expectedPointsPerDataset);
+    expect(result.datasets[0].ticksForScatter?.length).toBe(expectedPointsPerDataset);
+    expect(result.datasets[0].sizeData?.length).toBe(expectedPointsPerDataset);
+    // Verify category A has even numbers and B has odd numbers
+    expect(result.datasets[0].ticksForScatter?.every((t) => Number(t[0]) % 2 === 0)).toBe(true);
+    expect(result.datasets[1].ticksForScatter?.every((t) => Number(t[0]) % 2 === 1)).toBe(true);
+    // Verify size data is correctly mapped
+    expect(result.datasets[0].sizeData?.[0]).toBe(0);
+    expect(result.datasets[1].sizeData?.[0]).toBe(0.1);
   });
 });

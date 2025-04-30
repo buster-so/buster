@@ -6,20 +6,20 @@ import { BusterChartProps, ChartType } from '@/api/asset_interfaces/metric';
 
 export const useAnimations = ({
   animate,
-  numberOfSources,
+  numberOfDataPoints,
   selectedChartType,
   barGroupType
 }: {
   animate: boolean;
-  numberOfSources: number;
+  numberOfDataPoints: number;
   selectedChartType: ChartType;
   barGroupType: BusterChartProps['barGroupType'];
 }): AnimationOptions<ChartTypeJS>['animation'] => {
   const isAnimationEnabled = useMemo(() => {
     if (selectedChartType === 'scatter') return false;
 
-    return animate && numberOfSources <= ANIMATION_THRESHOLD;
-  }, [animate, numberOfSources, selectedChartType]);
+    return animate && numberOfDataPoints <= ANIMATION_THRESHOLD;
+  }, [animate, numberOfDataPoints, selectedChartType]);
 
   return useMemo(() => {
     return isAnimationEnabled

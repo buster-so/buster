@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useTransition } from 'react';
+import React, { useEffect, useMemo, useState, useTransition } from 'react';
 import { ChartJSOrUndefined } from '../../core/types';
 import {
   BusterChartProps,
@@ -37,9 +37,11 @@ interface UseBusterChartJSLegendProps {
   columnSettings: NonNullable<BusterChartProps['columnSettings']>;
   columnMetadata: NonNullable<BusterChartProps['columnMetadata']>;
   pieMinimumSlicePercentage: NonNullable<BusterChartProps['pieMinimumSlicePercentage']>;
+  numberOfDataPoints: number;
+  animateLegend?: boolean;
 }
 
-const DELAY_DURATION_FOR_LARGE_DATASET = 0; //95
+const DELAY_DURATION_FOR_LARGE_DATASET = 95; //95
 
 export const useBusterChartJSLegend = ({
   chartRef,
@@ -56,11 +58,12 @@ export const useBusterChartJSLegend = ({
   barGroupType,
   datasetOptions,
   columnMetadata,
-  columnSettings
+  animateLegend: animateLegendProp,
+  columnSettings,
+  numberOfDataPoints
 }: UseBusterChartJSLegendProps): UseChartLengendReturnValues => {
   const [isPending, startTransition] = useTransition();
   const [isUpdatingChart, setIsUpdatingChart] = useState(false);
-  const [numberOfDataPoints, setNumberOfDataPoints] = useState(0);
   const isLargeDataset = numberOfDataPoints > LEGEND_ANIMATION_THRESHOLD;
   const legendTimeoutDuration = isLargeDataset ? DELAY_DURATION_FOR_LARGE_DATASET : 0;
 
@@ -83,6 +86,10 @@ export const useBusterChartJSLegend = ({
   });
 
   const categoryAxisColumnNames = (selectedAxis as ComboChartAxis).category as string[];
+
+  const animateLegend = useMemo(() => {
+    return !!animateLegendProp && numberOfDataPoints <= LEGEND_ANIMATION_THRESHOLD;
+  }, [animateLegendProp, numberOfDataPoints]);
 
   const calculateLegendItems = useMemoizedFn(() => {
     if (showLegend === false) return;
@@ -110,13 +117,6 @@ export const useBusterChartJSLegend = ({
         //   selectedChartType
         // );
       }
-
-      const numberOfPoints =
-        chartRef.current?.data.datasets.reduce<number>((acc, dataset) => {
-          if (dataset.hidden) return acc;
-          return acc + dataset.data.length;
-        }, 0) || 0;
-      setNumberOfDataPoints(numberOfPoints);
 
       startTransition(() => {
         setLegendItems(items);
@@ -282,6 +282,7 @@ export const useBusterChartJSLegend = ({
     onLegendItemFocus: selectedChartType === 'pie' ? undefined : onLegendItemFocus,
     showLegend,
     inactiveDatasets,
-    isUpdatingChart
+    isUpdatingChart,
+    animateLegend
   };
 };

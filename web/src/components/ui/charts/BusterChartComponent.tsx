@@ -26,6 +26,7 @@ export const BusterChartComponent: React.FC<BusterChartRenderComponentProps> = (
   console.log('raw data', dataProp, props.selectedAxis);
 
   const {
+    numberOfDataPoints,
     datasetOptions,
     dataTrendlineOptions,
     y2AxisKeys,
@@ -47,17 +48,6 @@ export const BusterChartComponent: React.FC<BusterChartRenderComponentProps> = (
     columnMetadata
   });
 
-  console.log('datasetOptions', datasetOptions);
-
-  console.log('others', {
-    tooltipKeys,
-    yAxisKeys,
-    y2AxisKeys,
-    dataTrendlineOptions,
-    hasMismatchedTooltipsAndMeasures,
-    isDownsampled
-  });
-
   const chartProps: BusterChartComponentProps = useMemo(
     () => ({
       ...props,
@@ -68,7 +58,8 @@ export const BusterChartComponent: React.FC<BusterChartRenderComponentProps> = (
       yAxisKeys,
       tooltipKeys,
       hasMismatchedTooltipsAndMeasures,
-      isDownsampled
+      isDownsampled,
+      numberOfDataPoints
     }),
     [
       props,
@@ -79,11 +70,10 @@ export const BusterChartComponent: React.FC<BusterChartRenderComponentProps> = (
       yAxisKeys,
       hasMismatchedTooltipsAndMeasures,
       tooltipKeys,
-      isDownsampled
+      isDownsampled,
+      numberOfDataPoints
     ]
   );
-
-  console.log('chartProps', chartProps);
 
   return <BusterChartJS {...chartProps} />;
 };

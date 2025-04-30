@@ -61,6 +61,7 @@ interface UseOptionsProps {
   trendlineAnnotations: AnnotationPluginOptions['annotations'];
   disableTooltip: boolean;
   xAxisTimeInterval: BusterChartProps['xAxisTimeInterval'];
+  numberOfDataPoints: number;
 }
 
 export const useOptions = ({
@@ -100,7 +101,8 @@ export const useOptions = ({
   goalLinesAnnotations,
   trendlineAnnotations,
   disableTooltip: disableTooltipProp,
-  xAxisTimeInterval
+  xAxisTimeInterval,
+  numberOfDataPoints
 }: UseOptionsProps) => {
   const xAxis = useXAxis({
     columnLabelFormats,
@@ -166,21 +168,16 @@ export const useOptions = ({
 
   const interaction = useInteractions({ selectedChartType, barLayout });
 
-  const numberOfSources = useMemo(() => {
-    const datasets = datasetOptions.datasets;
-    return datasets.reduce((acc, dataset) => acc + dataset.data.length, 0);
-  }, [datasetOptions]);
-
   const animation = useAnimations({
     animate,
-    numberOfSources,
+    numberOfDataPoints,
     selectedChartType,
     barGroupType
   });
 
   const disableTooltip = useMemo(() => {
-    return disableTooltipProp || numberOfSources > TOOLTIP_THRESHOLD;
-  }, [disableTooltipProp, numberOfSources]);
+    return disableTooltipProp || numberOfDataPoints > TOOLTIP_THRESHOLD;
+  }, [disableTooltipProp, numberOfDataPoints]);
 
   const tooltipOptions = useTooltipOptions({
     columnLabelFormats,
@@ -198,7 +195,7 @@ export const useOptions = ({
 
   const options: ChartProps<ChartJSChartType>['options'] = useMemo(() => {
     const chartAnnotations = chartPlugins?.annotation?.annotations;
-    const isLargeDataset = numberOfSources > LINE_DECIMATION_THRESHOLD;
+    const isLargeDataset = numberOfDataPoints > LINE_DECIMATION_THRESHOLD;
 
     return {
       indexAxis: isHorizontalBar ? 'y' : 'x',

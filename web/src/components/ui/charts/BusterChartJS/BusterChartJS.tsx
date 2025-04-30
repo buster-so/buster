@@ -24,7 +24,7 @@ export const BusterChartJS: React.FC<BusterChartComponentProps> = ({
   onChartMounted,
   onInitialAnimationEnd,
   columnSettings = DEFAULT_CHART_CONFIG.columnSettings,
-  animateLegend = true,
+  animateLegend,
   ...props
 }) => {
   const chartRef = useRef<ChartJSOrUndefined>(null);
@@ -60,6 +60,7 @@ export const BusterChartJS: React.FC<BusterChartComponentProps> = ({
       chartRef={chartRef}
       datasetOptions={datasetOptions}
       isDownsampled={props.isDownsampled}
+      numberOfDataPoints={props.numberOfDataPoints}
       pieMinimumSlicePercentage={pieMinimumSlicePercentage}>
       <BusterChartJSComponent
         ref={chartRef}

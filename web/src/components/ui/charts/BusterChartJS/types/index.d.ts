@@ -14,6 +14,12 @@ declare module 'chart.js' {
   interface ChartDatasetProperties<TType extends ChartType, TData> {
     tooltipHoverBar?: ChartHoverBarPluginOptions;
     isTrendline?: boolean;
+    tooltipData: {
+      key: string;
+      value: string | number | boolean | null;
+    }[][];
+    xAxisKeys: string[];
+    yAxisKey: string; //this is the key of the y axis
   }
 
   interface PluginOptionsByType<TType extends ChartType> {
@@ -22,5 +28,9 @@ declare module 'chart.js' {
 
   interface ChartConfiguration<TType extends ChartType = ChartType> {
     type: TType;
+  }
+
+  interface CoreChartOptions<TType extends ChartType> {
+    //
   }
 }

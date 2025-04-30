@@ -36,18 +36,23 @@ export type DatasetOption = {
    */
   tooltipData: KV[][];
   /**
-   * Optional key to determine the size of data points (used in scatter/bubble charts)
-   */
-  sizeDataKey?: string | undefined;
-  /**
    * Optional array of size values corresponding to each data point
    * Used when 'axis.size' is provided to determine point dimensions
    */
   sizeData?: (number | null)[];
+  /**
+   * Optional array of ticks for scatter plot data points
+   * Each inner array contains the x-axis values for that point
+   */
+  ticksForScatter?: (string | number)[][];
+  /**
+   * Optional key to determine the size of data points (used in scatter/bubble charts)
+   */
+  sizeDataKey?: string;
 };
 
 export type DatasetOptionsWithTicks = {
-  ticks: (string | number)[][];
+  ticks: (string | number)[][]; //ticks will be empty for scatter plots
   ticksKey: KV[];
   datasets: DatasetOption[];
 };

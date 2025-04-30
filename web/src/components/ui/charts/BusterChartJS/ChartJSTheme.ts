@@ -209,18 +209,3 @@ ChartJS.overrides.line = {
     }
   }
 };
-
-declare module 'chart.js' {
-  interface ChartDatasetProperties<TType extends ChartType, TData> {
-    tooltipData: {
-      key: string;
-      value: string | number | boolean | null;
-    }[][];
-    xAxisKeys: string[];
-    yAxisKey: string; //this is the key of the y axis
-  }
-
-  interface CoreChartOptions<TType extends ChartType> {
-    //
-  }
-}

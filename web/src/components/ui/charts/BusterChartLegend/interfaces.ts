@@ -34,4 +34,5 @@ export interface UseChartLengendReturnValues {
   renderLegend: boolean;
   inactiveDatasets: Record<string, boolean>;
   isUpdatingChart?: boolean;
+  animateLegend: boolean;
 }

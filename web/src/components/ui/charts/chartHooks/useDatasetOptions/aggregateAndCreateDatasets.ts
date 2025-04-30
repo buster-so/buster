@@ -121,7 +121,6 @@ export function aggregateAndCreateDatasets<
 
   if (isScatterPlot) {
     // SCATTER: for each category group and each yKey
-    const scatterTicks: (string | number)[][] = [];
     const scatterTicksKey: KV[] = xKeys.map((key) => ({ key, value: '' }));
 
     catGroups.forEach(({ rec: catRec, rows }) => {
@@ -164,14 +163,9 @@ export function aggregateAndCreateDatasets<
         });
 
         // Generate ticks for this dataset
-        const datasetTicks = validRows.map((row) =>
+        const ticksForScatter = validRows.map((row) =>
           xKeys.map((key) => row[key] as string | number)
         );
-
-        // Only add ticks if this is the first dataset (to avoid duplicates)
-        if (datasets.length === 0) {
-          scatterTicks.push(...datasetTicks);
-        }
 
         // Generate ID for scatter plot dataset
         const id = createDatasetId(
@@ -186,6 +180,7 @@ export function aggregateAndCreateDatasets<
           dataKey: yKey,
           axisType,
           tooltipData: tooltipArr,
+          ticksForScatter,
           ...(sizeArr && { sizeData: sizeArr, sizeDataKey: sizeKey ?? undefined })
         });
       });
@@ -194,7 +189,7 @@ export function aggregateAndCreateDatasets<
     return {
       datasets,
       ticksKey: scatterTicksKey,
-      ticks: scatterTicks
+      ticks: [] // Empty ticks for scatter plots
     };
   } else {
     // NON-SCATTER

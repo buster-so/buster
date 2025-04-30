@@ -7,7 +7,7 @@ import { DatasetOptionsWithTicks } from '../chartHooks';
 
 interface BusterChartJSLegendWrapperProps {
   children: React.ReactNode;
-  animateLegend: boolean;
+  animateLegend?: boolean;
   loading: boolean;
   columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>;
   selectedAxis: ChartEncodes | undefined;
@@ -25,6 +25,7 @@ interface BusterChartJSLegendWrapperProps {
   datasetOptions: DatasetOptionsWithTicks;
   pieMinimumSlicePercentage: NonNullable<BusterChartProps['pieMinimumSlicePercentage']>;
   isDownsampled: boolean;
+  numberOfDataPoints: number;
 }
 
 export const BusterChartJSLegendWrapper = React.memo<BusterChartJSLegendWrapperProps>(
@@ -38,7 +39,7 @@ export const BusterChartJSLegendWrapper = React.memo<BusterChartJSLegendWrapperP
     selectedAxis,
     chartRef,
     selectedChartType,
-    animateLegend,
+    animateLegend: animateLegendProp,
     columnSettings,
     columnMetadata,
     showLegendHeadline,
@@ -47,7 +48,8 @@ export const BusterChartJSLegendWrapper = React.memo<BusterChartJSLegendWrapperP
     colors,
     datasetOptions,
     pieMinimumSlicePercentage,
-    isDownsampled
+    isDownsampled,
+    numberOfDataPoints
   }) => {
     const {
       renderLegend,
@@ -57,7 +59,8 @@ export const BusterChartJSLegendWrapper = React.memo<BusterChartJSLegendWrapperP
       onLegendItemClick,
       onLegendItemFocus,
       showLegend,
-      isUpdatingChart
+      isUpdatingChart,
+      animateLegend
     } = useBusterChartJSLegend({
       selectedAxis,
       columnLabelFormats,
@@ -73,7 +76,9 @@ export const BusterChartJSLegendWrapper = React.memo<BusterChartJSLegendWrapperP
       colors,
       loading,
       datasetOptions,
-      pieMinimumSlicePercentage
+      pieMinimumSlicePercentage,
+      numberOfDataPoints,
+      animateLegend: animateLegendProp
     });
 
     return (

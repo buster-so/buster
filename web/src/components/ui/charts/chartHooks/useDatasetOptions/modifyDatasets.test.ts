@@ -1302,8 +1302,6 @@ describe('modifyDatasets - pieSortBy tests', () => {
     expect(result[0].data[0]).toBe(100);
     expect(result[1].data[0]).toBe(300);
 
-    console.log(result[0].tooltipData);
-
     // Check that tooltipData is also correctly reordered
     expect(result[0].tooltipData?.[0]?.[0]?.value).toBe(100);
     expect(result[1].tooltipData?.[0]?.[0]?.value).toBe(300);

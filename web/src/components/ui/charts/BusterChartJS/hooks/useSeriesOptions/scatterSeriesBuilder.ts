@@ -75,7 +75,7 @@ export const scatterSeriesBuilder_data = ({
           acc.push({
             x: getScatterXValue({
               isXAxisDate,
-              xValue: datasetOptions.ticks[index][0]
+              xValue: dataset.ticksForScatter![index][0]
             }),
             y: yData,
             originalR: dataset.sizeData?.[index] ?? 0
@@ -168,10 +168,32 @@ const computeSizeRatio = (
 };
 
 export const scatterSeriesBuilder_labels = (props: LabelBuilderProps) => {
-  const { trendlineSeries } = props;
+  const { trendlineSeries, datasetOptions } = props;
 
   if (trendlineSeries.length > 0) {
-    return lineSeriesBuilder_labels(props);
+    // Create a Set of relevant yAxisKeys for O(1) lookup
+    const relevantYAxisKeys = new Set(trendlineSeries.map((t) => t.yAxisKey));
+
+    // Combine filtering, flattening and uniqueness in a single pass
+    const allTicksForScatter = datasetOptions.datasets
+      .filter((dataset) => relevantYAxisKeys.has(dataset.dataKey))
+      .flatMap((dataset) => dataset.ticksForScatter || [])
+      .sort((a, b) => {
+        const aVal = a[0],
+          bVal = b[0];
+        return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+      })
+      .filter((tick, index, array) => index === 0 || tick[0] !== array[index - 1][0]);
+
+    const modifyFiedProps = {
+      ...props,
+      datasetOptions: {
+        ...props.datasetOptions,
+        ticks: allTicksForScatter
+      }
+    };
+
+    return lineSeriesBuilder_labels(modifyFiedProps);
   }
 
   return undefined;

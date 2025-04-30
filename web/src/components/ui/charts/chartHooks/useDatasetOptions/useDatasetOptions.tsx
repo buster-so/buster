@@ -32,6 +32,7 @@ type DatasetHookResult = {
   tooltipKeys: string[];
   hasMismatchedTooltipsAndMeasures: boolean;
   isDownsampled: boolean;
+  numberOfDataPoints: number;
 };
 
 type DatasetHookParams = {
@@ -184,13 +185,9 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
     isScatter
   ]);
 
-  const datasetOptionsRaw = useMemo(() => {
-    return aggregatedDatasets;
-  }, [aggregatedDatasets]);
-
   const datasetOptions = useMemo(() => {
     return modifyDatasets({
-      datasets: datasetOptionsRaw,
+      datasets: aggregatedDatasets,
       pieMinimumSlicePercentage,
       pieSortBy,
       barSortBy,
@@ -199,7 +196,7 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
       selectedChartType
     });
   }, [
-    datasetOptionsRaw,
+    aggregatedDatasets,
     pieMinimumSlicePercentage,
     pieSortBy,
     barSortBy,
@@ -216,7 +213,12 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
     columnLabelFormats
   });
 
+  const numberOfDataPoints = useMemo(() => {
+    return datasetOptions.datasets.reduce((acc, dataset) => acc + dataset.data.length, 0);
+  }, [datasetOptions]);
+
   return {
+    numberOfDataPoints,
     datasetOptions,
     dataTrendlineOptions,
     yAxisKeys,
