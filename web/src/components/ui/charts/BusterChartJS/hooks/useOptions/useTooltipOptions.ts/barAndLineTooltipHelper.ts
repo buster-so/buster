@@ -13,16 +13,13 @@ export const barAndLineTooltipHelper = (
   percentageMode: undefined | 'stacked'
 ): ITooltipItem[] => {
   if (percentageMode) {
-    dataPoints.reverse();
+    dataPoints.reverse(); //we do this because the data points are in reverse order and it looks better
   }
-
-  console.log('dataPoints', dataPoints);
 
   const tooltipItems = dataPoints.flatMap<ITooltipItem>((dataPoint) => {
     const tooltipDataset = dataPoint.dataset;
     const dataPointDataIndex = dataPoint.dataIndex;
     const tooltipData = tooltipDataset.tooltipData;
-    console.log('tooltipData', tooltipData, dataPointDataIndex);
     const selectedToolTipData = tooltipData[dataPointDataIndex];
     const items = selectedToolTipData.map<ITooltipItem>((item) => {
       const colorItem = tooltipDataset?.backgroundColor as string;

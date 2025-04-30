@@ -137,8 +137,6 @@ export const BusterChartJSComponent = React.memo(
         barGroupType
       });
 
-      console.log(tooltipKeys);
-
       const options: ChartOptions<ChartJSChartType> = useOptions({
         goalLinesAnnotations,
         trendlineAnnotations,
@@ -196,6 +194,8 @@ export const BusterChartJSComponent = React.memo(
         if (selectedChartType === 'combo') return [ChartHoverBarPlugin, ChartTotalizerPlugin];
         return [];
       }, [selectedChartType]);
+
+      console.log('options', { options, type, data });
 
       return (
         <Chart

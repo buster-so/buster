@@ -203,7 +203,19 @@ export function aggregateAndCreateDatasets<
           const tooltipArr = tooltipKeys.length
             ? xGroups.map(({ rows }) => {
                 const row = rows[0] || {};
-                return tooltipKeys.map((k) => ({
+                // Filter out duplicate tooltip keys when dealing with dual axis
+                const uniqueTooltipKeys = tooltipKeys.filter((k) => {
+                  // If this is a y2 axis metric, only include tooltip keys that aren't y-axis metrics
+                  if (axisType === 'y2') {
+                    return !yKeys.includes(k);
+                  }
+                  // If this is a y axis metric, only include tooltip keys that aren't y2-axis metrics
+                  if (axisType === 'y') {
+                    return !y2Keys.includes(k);
+                  }
+                  return true;
+                });
+                return uniqueTooltipKeys.map((k) => ({
                   key: k,
                   value: formatTooltip(row[k], colFormats[k] || {})
                 }));
@@ -256,7 +268,19 @@ export function aggregateAndCreateDatasets<
         const tooltipArr = tooltipKeys.length
           ? xGroups.map(({ rows }) => {
               const row = rows[0] || {};
-              return tooltipKeys.map((k) => ({
+              // Filter out duplicate tooltip keys when dealing with dual axis
+              const uniqueTooltipKeys = tooltipKeys.filter((k) => {
+                // If this is a y2 axis metric, only include tooltip keys that aren't y-axis metrics
+                if (axisType === 'y2') {
+                  return !yKeys.includes(k);
+                }
+                // If this is a y axis metric, only include tooltip keys that aren't y2-axis metrics
+                if (axisType === 'y') {
+                  return !y2Keys.includes(k);
+                }
+                return true;
+              });
+              return uniqueTooltipKeys.map((k) => ({
                 key: k,
                 value: formatTooltip(row[k], colFormats[k] || {})
               }));

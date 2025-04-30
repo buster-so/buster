@@ -3,7 +3,8 @@ import {
   BusterChartProps,
   ChartEncodes,
   ChartType,
-  ComboChartAxis
+  ComboChartAxis,
+  IColumnLabelFormat
 } from '@/api/asset_interfaces/metric/charts';
 import { useMemoizedFn } from '@/hooks';
 import type { DeepPartial } from 'utility-types';
@@ -11,7 +12,7 @@ import type { ScaleChartOptions, Scale } from 'chart.js';
 import { useMemo } from 'react';
 import { yAxisSimilar, formatYAxisLabel } from '../../../commonHelpers';
 import { useY2AxisTitle } from '../../../commonHelpers/useY2AxisTitle';
-import { DEFAULT_CHART_CONFIG } from '@/api/asset_interfaces/metric';
+import { DEFAULT_CHART_CONFIG, DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 
 export const useY2Axis = ({
   columnLabelFormats,
@@ -33,6 +34,11 @@ export const useY2Axis = ({
   y2AxisScaleType: BusterChartProps['y2AxisScaleType'];
 }): DeepPartial<ScaleChartOptions<'bar'>['scales']['y2']> | undefined => {
   const selectedAxis = selectedAxisProp as ComboChartAxis;
+  const y2AxisKeys = selectedAxis.y2 || [];
+
+  const y2AxisKeysString = useMemo(() => {
+    return y2AxisKeys.join(',');
+  }, [y2AxisKeys]);
 
   const isSupportedType = useMemo(() => {
     return selectedChartType === ChartType.Combo;
@@ -41,12 +47,12 @@ export const useY2Axis = ({
   const canUseSameY2Formatter = useMemo(() => {
     if (!isSupportedType) return false;
 
-    const hasMultipleY = (selectedAxis.y2?.length || 0) > 1;
-    return hasMultipleY ? yAxisSimilar(selectedAxis.y2 || [], columnLabelFormats) : true;
-  }, [selectedAxis.y2, columnLabelFormats, isSupportedType]);
+    const hasMultipleY = (y2AxisKeys.length || 0) > 1;
+    return hasMultipleY ? yAxisSimilar(y2AxisKeys, columnLabelFormats) : true;
+  }, [y2AxisKeysString, columnLabelFormats, isSupportedType]);
 
   const title = useY2AxisTitle({
-    y2Axis: selectedAxis.y2 || DEFAULT_CHART_CONFIG.comboChartAxis.y2 || [],
+    y2Axis: y2AxisKeys || DEFAULT_CHART_CONFIG.comboChartAxis.y2 || [],
     columnLabelFormats,
     y2AxisAxisTitle,
     y2AxisShowAxisTitle,
@@ -58,15 +64,17 @@ export const useY2Axis = ({
     return y2AxisScaleType === 'log' ? 'logarithmic' : 'linear';
   }, [y2AxisScaleType, isSupportedType]);
 
+  const y2AxisColumnFormats: Record<string, IColumnLabelFormat> = useMemo(() => {
+    if (!isSupportedType) return {};
+
+    return y2AxisKeys.reduce<Record<string, IColumnLabelFormat>>((acc, y) => {
+      acc[y] = columnLabelFormats[y] || DEFAULT_COLUMN_LABEL_FORMAT;
+      return acc;
+    }, {});
+  }, [y2AxisKeysString, columnLabelFormats]);
+
   const tickCallback = useMemoizedFn(function (this: Scale, value: string | number, index: number) {
-    const labelValue = this.getLabelForValue(index);
-    return formatYAxisLabel(
-      labelValue,
-      selectedAxis.y2 || [],
-      canUseSameY2Formatter,
-      columnLabelFormats,
-      false
-    );
+    return formatYAxisLabel(value, y2AxisKeys, canUseSameY2Formatter, y2AxisColumnFormats, false);
   });
 
   const memoizedYAxisOptions: DeepPartial<ScaleChartOptions<'bar'>['scales']['y2']> | undefined =
@@ -79,7 +87,7 @@ export const useY2Axis = ({
       return {
         type,
         position: 'right',
-        display: y2AxisShowAxisLabel !== false && selectedAxis.y2 && selectedAxis.y2?.length > 0,
+        display: y2AxisShowAxisLabel !== false && y2AxisKeys.length > 0,
         beginAtZero: y2AxisStartAxisAtZero !== false,
         title: {
           display: !!title,
@@ -96,7 +104,7 @@ export const useY2Axis = ({
     }, [
       tickCallback,
       title,
-      selectedAxis.y2?.join(','),
+      y2AxisKeysString,
       isSupportedType,
       y2AxisShowAxisLabel,
       y2AxisStartAxisAtZero,

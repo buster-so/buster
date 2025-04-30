@@ -1630,4 +1630,109 @@ describe('aggregateAndCreateDatasets', () => {
     // Check that data values are correctly associated
     expect(result.datasets[0].data).toEqual([100, 200, 300, 400]);
   });
+
+  describe('dual axis tooltip handling', () => {
+    const testData = [
+      {
+        date: '2024-01-01',
+        metric1: 100,
+        metric2: 200,
+        metric3: 300,
+        category: 'A',
+        additionalInfo: 'info1'
+      },
+      {
+        date: '2024-01-02',
+        metric1: 150,
+        metric2: 250,
+        metric3: 350,
+        category: 'B',
+        additionalInfo: 'info2'
+      }
+    ];
+
+    it('should not duplicate tooltip data in dual axis charts', () => {
+      const result = aggregateAndCreateDatasets(
+        testData,
+        {
+          x: ['date'],
+          y: ['metric1', 'metric2'],
+          y2: ['metric3'],
+          tooltip: ['metric1', 'metric2', 'metric3', 'additionalInfo']
+        },
+        {}
+      );
+
+      // Check y-axis datasets
+      const yAxisDatasets = result.datasets.filter((d) => d.axisType === 'y');
+      yAxisDatasets.forEach((dataset) => {
+        dataset.tooltipData.forEach((tooltipGroup) => {
+          // Y-axis tooltips should not contain y2 metrics
+          const hasY2Metrics = tooltipGroup.some((tip) => tip.key === 'metric3');
+          expect(hasY2Metrics).toBe(false);
+
+          // Should contain y metrics and additional info
+          const hasAdditionalInfo = tooltipGroup.some((tip) => tip.key === 'additionalInfo');
+          expect(hasAdditionalInfo).toBe(true);
+        });
+      });
+
+      // Check y2-axis datasets
+      const y2AxisDatasets = result.datasets.filter((d) => d.axisType === 'y2');
+      y2AxisDatasets.forEach((dataset) => {
+        dataset.tooltipData.forEach((tooltipGroup) => {
+          // Y2-axis tooltips should not contain y metrics
+          const hasYMetrics = tooltipGroup.some(
+            (tip) => tip.key === 'metric1' || tip.key === 'metric2'
+          );
+          expect(hasYMetrics).toBe(false);
+
+          // Should contain y2 metrics and additional info
+          const hasY2Metrics = tooltipGroup.some((tip) => tip.key === 'metric3');
+          expect(hasY2Metrics).toBe(true);
+          const hasAdditionalInfo = tooltipGroup.some((tip) => tip.key === 'additionalInfo');
+          expect(hasAdditionalInfo).toBe(true);
+        });
+      });
+    });
+
+    it('should handle tooltip data correctly with categories in dual axis charts', () => {
+      const result = aggregateAndCreateDatasets(
+        testData,
+        {
+          x: ['date'],
+          y: ['metric1'],
+          y2: ['metric2'],
+          category: ['category'],
+          tooltip: ['metric1', 'metric2', 'category', 'additionalInfo']
+        },
+        {}
+      );
+
+      // Verify each dataset has correct tooltip data based on its axis type
+      result.datasets.forEach((dataset) => {
+        dataset.tooltipData.forEach((tooltipGroup) => {
+          // Category and additional info should always be present
+          const hasCategoryInfo = tooltipGroup.some((tip) => tip.key === 'category');
+          const hasAdditionalInfo = tooltipGroup.some((tip) => tip.key === 'additionalInfo');
+          expect(hasCategoryInfo).toBe(true);
+          expect(hasAdditionalInfo).toBe(true);
+
+          if (dataset.axisType === 'y') {
+            // Y-axis tooltips should have metric1 but not metric2
+            const hasMetric1 = tooltipGroup.some((tip) => tip.key === 'metric1');
+            const hasMetric2 = tooltipGroup.some((tip) => tip.key === 'metric2');
+            expect(hasMetric1).toBe(true);
+            expect(hasMetric2).toBe(false);
+          } else {
+            // Y2-axis tooltips should have metric2 but not metric1
+            const hasMetric1 = tooltipGroup.some((tip) => tip.key === 'metric1');
+            const hasMetric2 = tooltipGroup.some((tip) => tip.key === 'metric2');
+            expect(hasMetric1).toBe(false);
+            expect(hasMetric2).toBe(true);
+          }
+        });
+      });
+    });
+  });
 });
