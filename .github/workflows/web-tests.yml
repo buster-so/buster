@@ -1,16 +1,13 @@
-name: Web Jest Tests
+name: Web Unit Tests
 
 on:
-  push:
-    paths:
-      - "web/**"
   pull_request:
     paths:
       - "web/**"
   workflow_dispatch:
 
 jobs:
-  test:
+  run-tests:
     runs-on: ubuntu-latest
 
     defaults:
@@ -23,7 +20,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "npm"
           cache-dependency-path: web/package-lock.json
 
