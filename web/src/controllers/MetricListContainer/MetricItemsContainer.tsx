@@ -23,7 +23,6 @@ export const MetricItemsContainer: React.FC<{
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
   const renderedDates = useRef<Record<string, string>>({});
   const renderedOwners = useRef<Record<string, React.ReactNode>>({});
-  const tableContainerRef = useRef<HTMLDivElement>(null);
 
   const onSelectChange = useMemoizedFn((selectedRowKeys: string[]) => {
     setSelectedRowKeys(selectedRowKeys);
@@ -109,7 +108,7 @@ export const MetricItemsContainer: React.FC<{
 
   return (
     <div
-      ref={tableContainerRef}
+      data-testid="metric-list-container"
       className={`${className} relative flex h-full flex-col items-center`}>
       <BusterList
         rows={metricsByDate}
