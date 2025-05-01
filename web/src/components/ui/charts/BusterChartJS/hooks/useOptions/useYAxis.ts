@@ -11,7 +11,7 @@ import type { ScaleChartOptions, Scale, GridLineOptions } from 'chart.js';
 import { useMemo } from 'react';
 import { yAxisSimilar, formatYAxisLabel } from '../../../commonHelpers';
 import { useIsStacked } from './useIsStacked';
-import { useYAxisTitle } from '../../../commonHelpers/useYAxisTitle';
+import { useYAxisTitle } from './axisHooks/useYAxisTitle';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 
 export const useYAxis = ({

@@ -8,17 +8,21 @@ import {
   NoChartData,
   PreparingYourRequestLoader
 } from './LoadingComponents/ChartLoadingComponents';
-import BusterTableChart from './TableChart';
-import { BusterChartProps, ChartEncodes, ChartType } from '@/api/asset_interfaces/metric/charts';
+import { BusterTableChart } from './TableChart';
+import {
+  type BusterChartProps,
+  type ChartEncodes,
+  ChartType
+} from '@/api/asset_interfaces/metric/charts';
 import { DEFAULT_DATA } from './BusterChartLegend/config';
 import { NoValidAxis } from './LoadingComponents';
-import BusterMetricChart from './MetricChart';
+import { BusterMetricChart } from './MetricChart';
 import { BusterChartErrorWrapper } from './BusterChartErrorWrapper';
 import { BusterChartWrapper } from './BusterChartWrapper';
-import { BusterChartRenderComponentProps } from './interfaces/chartComponentInterfaces';
+import type { BusterChartRenderComponentProps } from './interfaces/chartComponentInterfaces';
 import { BusterChartComponent } from './BusterChartComponent';
 import { DEFAULT_CHART_CONFIG } from '@/api/asset_interfaces/metric/defaults';
-import { Chart } from 'chart.js';
+import { type Chart } from 'chart.js';
 
 export const BusterChart: React.FC<BusterChartProps> = React.memo(
   ({

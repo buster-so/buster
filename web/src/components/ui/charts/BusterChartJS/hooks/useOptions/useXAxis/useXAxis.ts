@@ -11,7 +11,7 @@ import { useMemoizedFn } from '@/hooks';
 import { useMemo } from 'react';
 import { DeepPartial } from 'utility-types';
 import type { ScaleChartOptions, Scale, GridLineOptions, TimeScale } from 'chart.js';
-import { useXAxisTitle } from '../../../../commonHelpers/useXAxisTitle';
+import { useXAxisTitle } from '../axisHooks/useXAxisTitle';
 import { useIsStacked } from '../useIsStacked';
 import { formatLabel, isNumericColumnType, truncateText } from '@/lib';
 import isDate from 'lodash/isDate';

@@ -1,9 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { useXAxisTitle } from './useXAxisTitle';
-import { AXIS_TITLE_SEPARATOR } from './axisHelper';
 import { formatLabel } from '@/lib/columnFormatter';
-import { truncateWithEllipsis } from './titleHelpers';
-import { ChartType } from '@/api/asset_interfaces/metric/charts';
+import { truncateWithEllipsis } from '../../../../commonHelpers/titleHelpers';
 import type { ChartEncodes, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import type { SimplifiedColumnType } from '@/api/asset_interfaces/metric';
 
@@ -12,7 +10,7 @@ jest.mock('@/lib/columnFormatter', () => ({
   formatLabel: jest.fn()
 }));
 
-jest.mock('./titleHelpers', () => ({
+jest.mock('../../../../commonHelpers/titleHelpers', () => ({
   truncateWithEllipsis: jest.fn()
 }));
 

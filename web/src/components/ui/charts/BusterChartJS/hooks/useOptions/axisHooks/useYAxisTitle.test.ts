@@ -1,8 +1,8 @@
 import { renderHook } from '@testing-library/react';
 import { useYAxisTitle } from './useYAxisTitle';
-import { AXIS_TITLE_SEPARATOR } from './axisHelper';
+import { AXIS_TITLE_SEPARATOR } from '../../../../commonHelpers/axisHelper';
 import { formatLabel } from '@/lib/columnFormatter';
-import { truncateWithEllipsis } from './titleHelpers';
+import { truncateWithEllipsis } from '../../../../commonHelpers/titleHelpers';
 import type { ChartEncodes, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import type { SimplifiedColumnType } from '@/api/asset_interfaces/metric';
 
@@ -11,7 +11,7 @@ jest.mock('@/lib/columnFormatter', () => ({
   formatLabel: jest.fn()
 }));
 
-jest.mock('./titleHelpers', () => ({
+jest.mock('../../../../commonHelpers/titleHelpers', () => ({
   truncateWithEllipsis: jest.fn()
 }));
 
