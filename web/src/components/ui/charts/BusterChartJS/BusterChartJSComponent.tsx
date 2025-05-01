@@ -9,15 +9,14 @@ import {
   ChartTotalizerPlugin,
   OutLabelsPlugin
 } from './core';
-
-import { ChartJSOrUndefined, ChartProps } from './core/types';
+import type { ChartJSOrUndefined, ChartProps } from './core/types';
 import type { ChartType as ChartJSChartType, ChartOptions, Plugin } from 'chart.js';
 import { useColors } from '../chartHooks';
 import { useGoalLines, useOptions, useSeriesOptions } from './hooks';
 import { useChartSpecificOptions } from './hooks/useChartSpecificOptions';
-import { BusterChartTypeComponentProps } from '../interfaces/chartComponentInterfaces';
+import type { BusterChartTypeComponentProps } from '../interfaces/chartComponentInterfaces';
 import { useTrendlines } from './hooks/useTrendlines';
-import { ScatterAxis } from '@/api/asset_interfaces/metric/charts';
+import type { ScatterAxis } from '@/api/asset_interfaces/metric/charts';
 
 export const BusterChartJSComponent = React.memo(
   React.forwardRef<ChartJSOrUndefined, BusterChartTypeComponentProps>(

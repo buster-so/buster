@@ -4,11 +4,11 @@ import type {
   ChartType,
   Trendline
 } from '@/api/asset_interfaces/metric/charts';
-import { AnnotationOptions, AnnotationPluginOptions } from 'chartjs-plugin-annotation';
+import type { AnnotationOptions, AnnotationPluginOptions } from 'chartjs-plugin-annotation';
 import { useMemo } from 'react';
 import { defaultLabelOptionConfig } from '../useChartSpecificOptions/labelOptionConfig';
 import { formatLabel } from '@/lib';
-import { ChartProps } from '../../core';
+import type { ChartProps } from '../../core';
 import { TypeToLabel } from './config';
 
 export const useTrendlines = ({

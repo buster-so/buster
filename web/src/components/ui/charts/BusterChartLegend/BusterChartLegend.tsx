@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useRef } from 'react';
-import { BusterChartLegendProps } from './interfaces';
+import type { BusterChartLegendProps } from './interfaces';
 import { LegendItem } from './LegendItem';
 import { OverflowButton } from './OverflowContainer';
 import { AnimatePresence, motion } from 'framer-motion';

@@ -2,7 +2,6 @@ import { BusterChartLegendItem } from './interfaces';
 import { BusterChartProps, ShowLegendHeadline } from '@/api/asset_interfaces/metric/charts';
 import { ArrayOperations } from '@/lib/math';
 import { DatasetOptionsWithTicks } from '../chartHooks';
-import { createDayjsDate, getBestDateFormat } from '@/lib/date';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces/metric';
 import { isDateColumnType } from '@/lib/messages';
 import { formatLabel } from '@/lib/columnFormatter';
@@ -24,10 +23,8 @@ export const addLegendHeadlines = (
   const firstXAxisDimensionName = xAxisKeys[0];
   const xIsDate = isDateColumnType(columnLabelFormats[firstXAxisDimensionName]?.columnType);
 
-  const canUseRange = !hasMultipleXAxisDimensions && xIsDate;
-
+  //  const canUseRange = !hasMultipleXAxisDimensions && xIsDate;
   // let range: string;
-
   // if (canUseRange) {
   //   console.log(columnMetadata, firstXAxisDimensionName);
   //   const firstXAxisDimensionMetadata = columnMetadata.find(
@@ -40,6 +37,7 @@ export const addLegendHeadlines = (
   //   const dateFormat = getBestDateFormat(minDate, maxDate);
   //   range = `${minDate.format(dateFormat)} - ${maxDate.format(dateFormat)}`;
   // }
+
   const isPieChart = selectedChartType === 'pie';
 
   legendItems.forEach((item, index) => {

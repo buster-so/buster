@@ -23,7 +23,7 @@ export type BusterChartLegendWrapper = {
   onHoverItem: (item: BusterChartLegendItem, isHover: boolean) => void;
   onLegendItemClick: (item: BusterChartLegendItem) => void;
   onLegendItemFocus: ((item: BusterChartLegendItem) => void) | undefined;
-}; //TODO scope down to only the props that are needed for this component
+};
 
 export const BusterChartLegendWrapper: React.FC<BusterChartLegendWrapper> = React.memo(
   ({

@@ -5,7 +5,7 @@ import './ChartJSTheme';
 import React, { useCallback, useRef, useState } from 'react';
 import { DEFAULT_CHART_CONFIG, DEFAULT_COLUMN_METADATA } from '@/api/asset_interfaces/metric';
 import { BusterChartJSLegendWrapper } from './BusterChartJSLegendWrapper';
-import { ChartJSOrUndefined } from './core/types';
+import type { ChartJSOrUndefined } from './core/types';
 import { useMemoizedFn } from '@/hooks';
 import { BusterChartJSComponent } from './BusterChartJSComponent';
 import type { BusterChartComponentProps } from '../interfaces';

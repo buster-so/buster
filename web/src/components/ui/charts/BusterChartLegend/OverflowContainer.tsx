@@ -58,7 +58,7 @@ const OverflowPopoverContent = React.memo(
       count: legendItems.length,
       getScrollElement: () => parentRef.current,
       estimateSize: () => (hasHeadline ? 44 : 24), // Estimated height of each row
-      overscan: 15
+      overscan: 10
     });
 
     return (
