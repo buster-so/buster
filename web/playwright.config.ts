@@ -21,7 +21,7 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Run 3 tests in parallel */
-  workers: process.env.CI ? 3 : 3,
+  workers: process.env.CI ? 3 : 6,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
@@ -33,7 +33,7 @@ export default defineConfig({
     /* Capture screenshot on failure */
     screenshot: 'on',
     /* Run tests in headed mode (non-headless) */
-    headless: false,
+    headless: true,
     /* Use stored auth state only if it exists */
     storageState: fs.existsSync(path.join(__dirname, 'playwright-tests/auth-utils/auth.json'))
       ? path.join(__dirname, 'playwright-tests/auth-utils/auth.json')
