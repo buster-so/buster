@@ -1,4 +1,4 @@
-export const DATE_FORMATS = {
+export const AUTO_DATE_FORMATS = {
   datetime: 'MMM D, YYYY, h:mm:ss a', // e.g., "Mar 19, 2024, 2:30:45 pm"
   millisecond: 'h:mm:ss.SSS a', // e.g., "2:30:45.123 pm"
   second: 'h:mm:ss a', // e.g., "2:30:45 pm"

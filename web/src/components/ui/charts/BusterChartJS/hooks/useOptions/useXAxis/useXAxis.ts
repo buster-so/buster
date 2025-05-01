@@ -17,7 +17,7 @@ import { formatLabel, isNumericColumnType, truncateText } from '@/lib';
 import isDate from 'lodash/isDate';
 import { Chart as ChartJS } from 'chart.js';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
-import { DATE_FORMATS } from './config';
+import { AUTO_DATE_FORMATS } from './config';
 
 const DEFAULT_X_AXIS_TICK_CALLBACK = ChartJS.defaults.scales.category?.ticks?.callback;
 
@@ -155,7 +155,7 @@ export const useXAxis = ({
           | 'month'
           | 'quarter'
           | 'year';
-        const format = DATE_FORMATS[unit];
+        const format = AUTO_DATE_FORMATS[unit];
         return formatLabel(rawValue, { ...xColumnLabelFormat, dateFormat: format });
       }
       const res = formatLabel(rawValue, xColumnLabelFormat);
