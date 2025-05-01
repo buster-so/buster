@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react';
-import { act } from 'react-dom/test-utils';
+import { act } from 'react';
 import { useBusterChartLegend } from './useBusterChartLegend';
 import { ChartType } from '@/api/asset_interfaces/metric/charts/enum';
 import { BusterChartLegendItem } from './interfaces';
