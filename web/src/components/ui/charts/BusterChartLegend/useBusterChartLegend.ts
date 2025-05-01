@@ -15,6 +15,7 @@ import {
   DEFAULT_X_AXIS_COLUMN_NAMES,
   DEFAULT_Y_AXIS_COLUMN_NAMES
 } from './config';
+import { useUpdateEffect, useWhyDidYouUpdate } from '@/hooks';
 
 interface UseBusterChartLegendProps {
   selectedChartType: ChartType;
@@ -70,7 +71,7 @@ export const useBusterChartLegend = ({
     );
   }, [selectedChartType, lineGroupType, barGroupType]);
 
-  useEffect(() => {
+  useUpdateEffect(() => {
     setInactiveDatasets({});
   }, [allYAxisColumnNames, xAxisColumnNames, categoryAxisColumnNames]);
 

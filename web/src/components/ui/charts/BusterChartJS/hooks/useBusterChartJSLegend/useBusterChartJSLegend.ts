@@ -1,14 +1,13 @@
 'use client';
 
 import React, { useEffect, useMemo, useState, useTransition } from 'react';
-import { ChartJSOrUndefined } from '../../core/types';
-import {
+import type { ChartJSOrUndefined } from '../../core/types';
+import type {
   BusterChartProps,
   ChartEncodes,
-  ChartType,
-  ComboChartAxis
+  ChartType
 } from '@/api/asset_interfaces/metric/charts';
-import { useDebounceEffect, useDebounceFn, useMemoizedFn } from '@/hooks';
+import { useDebounceFn, useMemoizedFn, useUpdateDebounceEffect } from '@/hooks';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces/metric';
 import {
   addLegendHeadlines,
@@ -17,7 +16,7 @@ import {
   UseChartLengendReturnValues
 } from '../../../BusterChartLegend';
 import { getLegendItems } from './getLegendItems';
-import { DatasetOptionsWithTicks } from '../../../chartHooks';
+import type { DatasetOptionsWithTicks } from '../../../chartHooks';
 import { LEGEND_ANIMATION_THRESHOLD } from '../../../config';
 import { timeout } from '@/lib';
 
@@ -90,10 +89,11 @@ export const useBusterChartJSLegend = ({
   }, [animateLegendProp, numberOfDataPoints]);
 
   const calculateLegendItems = useMemoizedFn(() => {
-    if (showLegend === false) return;
+    if (showLegend === false || !chartMounted) return;
 
     // Defer the actual calculation to the next animation frame
     requestAnimationFrame(() => {
+      console.log('calculateLegendItems');
       const items = getLegendItems({
         chartRef,
         colors,
@@ -247,7 +247,7 @@ export const useBusterChartJSLegend = ({
     });
   });
 
-  useDebounceEffect(
+  useUpdateDebounceEffect(
     () => {
       calculateLegendItems();
     },

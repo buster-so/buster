@@ -2,7 +2,7 @@ import type { ChartProps } from '../../core';
 import type { ChartType as ChartJSChartType } from 'chart.js';
 import type { DeepPartial } from 'utility-types';
 import type { PluginChartOptions } from 'chart.js';
-import { ChartSpecificOptionsProps } from './interfaces';
+import type { ChartSpecificOptionsProps } from './interfaces';
 
 export const barOptionsHandler = (
   props: ChartSpecificOptionsProps
@@ -15,8 +15,8 @@ export const barPluginsHandler = ({
   barGroupType,
   columnSettings
 }: ChartSpecificOptionsProps): DeepPartial<PluginChartOptions<ChartJSChartType>>['plugins'] => {
-  const hasShowLabelAsPercentage = Object.entries(columnSettings || {}).some(
-    ([key, columnSetting]) => columnSetting?.showDataLabelsAsPercentage
+  const hasShowLabelAsPercentage = Object.values(columnSettings || {}).some(
+    (columnSetting) => columnSetting?.showDataLabelsAsPercentage
   );
 
   return {

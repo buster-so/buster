@@ -24,3 +24,4 @@ export * from './useWhyDidYouUpdate';
 export * from './useSetInterval';
 export * from './useWindowWidth';
 export * from './useIsChanged';
+export * from './useUpdateDebounceEffect';

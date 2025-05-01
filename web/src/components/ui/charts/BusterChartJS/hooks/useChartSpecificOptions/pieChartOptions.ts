@@ -5,18 +5,18 @@ import type { ChartSpecificOptionsProps } from './interfaces';
 import type { ChartType as ChartJSChartType } from 'chart.js';
 import type { DeepPartial } from 'utility-types';
 import type { PluginChartOptions } from 'chart.js';
-import { AnnotationPluginOptions } from 'chartjs-plugin-annotation';
+import type { AnnotationPluginOptions } from 'chartjs-plugin-annotation';
 import { ArrayOperations } from '@/lib/math';
 import { formatLabel } from '@/lib/columnFormatter';
 import { getPieInnerLabelTitle } from '../../../commonHelpers';
-import { ChartJSOrUndefined } from '../../core/types';
-import {
+import type { ChartJSOrUndefined } from '../../core/types';
+import type {
   BusterChartConfigProps,
   BusterChartProps,
   ColumnLabelFormat
 } from '@/api/asset_interfaces/metric/charts';
 import { determineFontColorContrast } from '@/lib/colors';
-import { Context } from 'chartjs-plugin-datalabels';
+import type { Context } from 'chartjs-plugin-datalabels';
 import { defaultLabelOptionConfig } from './labelOptionConfig';
 import { isServer } from '@tanstack/react-query';
 

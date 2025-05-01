@@ -917,3 +917,52 @@ export const WithMultipleXAxis: Story = {
     } satisfies BarAndLineAxis
   }
 };
+
+export const WithGoalLinesSimilar: Story = {
+  args: {
+    ...Default.args,
+    barAndLineAxis: {
+      ...Default.args!.barAndLineAxis!,
+      y: ['sales', 'units']
+    },
+    columnLabelFormats: {
+      ...Default.args!.columnLabelFormats,
+      sales: {
+        ...Default.args!.columnLabelFormats!.sales!,
+        columnType: 'number',
+        style: 'currency',
+        currency: 'USD'
+      },
+      units: {
+        ...Default.args!.columnLabelFormats!.units!,
+        columnType: 'number',
+        style: 'currency',
+        currency: 'USD'
+      }
+    },
+    goalLines: [
+      {
+        show: true,
+        value: 7500,
+        showGoalLineLabel: true,
+        goalLineLabel: 'Target Sales',
+        goalLineColor: '#FF6B6B'
+      }
+    ]
+  }
+};
+
+export const WithGoalLinesNotSimilar: Story = {
+  args: {
+    ...Default.args,
+    goalLines: [
+      {
+        show: true,
+        value: 7500,
+        showGoalLineLabel: true,
+        goalLineLabel: 'Target Sales',
+        goalLineColor: '#FF6B6B'
+      }
+    ]
+  }
+};

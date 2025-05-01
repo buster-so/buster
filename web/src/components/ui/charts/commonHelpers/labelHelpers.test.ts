@@ -1,103 +1,80 @@
-import { formatChartValueDelimiter } from './labelHelpers';
 import type { ColumnLabelFormat, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import { formatLabel } from '@/lib';
+import { DatasetOption } from '../chartHooks';
+import { JOIN_CHARACTER, formatLabelForDataset, formatLabelForPieLegend } from './labelHelpers';
+import { BusterChartProps } from '@/api/asset_interfaces/metric/charts';
 
-describe('formatChartValueDelimiter', () => {
-  it('should format a numeric value using the column format', () => {
-    const rawValue = 1234.56;
-    const columnNameDelimiter = 'value__🔑__';
-    const columnLabelFormats: Record<string, IColumnLabelFormat> = {
-      value: {
-        style: 'number',
-        columnType: 'number',
-        minimumFractionDigits: 1,
-        maximumFractionDigits: 1
-      }
-    };
+// Mock the formatLabel function
+jest.mock('@/lib', () => ({
+  formatLabel: jest.fn((value, format, useKey) => `formatted_${value}`)
+}));
 
-    const result = formatChartValueDelimiter(rawValue, columnNameDelimiter, columnLabelFormats);
-    expect(result).toBe('1,234.6');
+describe('labelHelpers', () => {
+  describe('JOIN_CHARACTER', () => {
+    it('should be defined as " | "', () => {
+      expect(JOIN_CHARACTER).toBe(' | ');
+    });
   });
 
-  it('If the key is not found, it will fallback to the default format', () => {
-    const rawValue = 1234.56;
-    const columnNameDelimiter = 'THIS_IS_INVALID_KEY';
-    const columnLabelFormats: Record<string, IColumnLabelFormat> = {
-      value: {
-        style: 'number',
-        columnType: 'number',
-        minimumFractionDigits: 1,
-        maximumFractionDigits: 1
-      }
-    };
+  describe('formatLabelForDataset', () => {
+    it('should format dataset labels and join them with JOIN_CHARACTER', () => {
+      const dataset: DatasetOption = {
+        id: 'test-id',
+        label: [
+          { key: 'key1', value: 'value1' },
+          { key: 'key2', value: 'value2' }
+        ],
+        data: [1, 2, 3],
+        dataKey: 'test-key',
+        axisType: 'y',
+        tooltipData: [[{ key: 'key1', value: 'value1' }], [{ key: 'key2', value: 'value2' }]]
+      };
 
-    const result = formatChartValueDelimiter(rawValue, columnNameDelimiter, columnLabelFormats);
-    expect(result).toBe('1234.56');
+      const columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']> = {
+        key1: { columnType: 'text', style: 'string' },
+        key2: { columnType: 'text', style: 'string' }
+      };
+
+      const result = formatLabelForDataset(dataset, columnLabelFormats);
+      expect(result).toBe('formatted_value1 | formatted_value2');
+      expect(formatLabel).toHaveBeenCalledWith('value1', columnLabelFormats.key1, false);
+      expect(formatLabel).toHaveBeenCalledWith('value2', columnLabelFormats.key2, false);
+    });
+
+    it('should use key when value is not provided', () => {
+      const dataset: DatasetOption = {
+        id: 'test-id',
+        label: [
+          { key: 'key1', value: null },
+          { key: 'key2', value: 'value2' }
+        ],
+        data: [1, 2, 3],
+        dataKey: 'test-key',
+        axisType: 'y',
+        tooltipData: [[{ key: 'key1', value: null }], [{ key: 'key2', value: 'value2' }]]
+      };
+
+      const columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']> = {
+        key1: { columnType: 'text', style: 'string' },
+        key2: { columnType: 'text', style: 'string' }
+      };
+
+      const result = formatLabelForDataset(dataset, columnLabelFormats);
+      expect(result).toBe('formatted_key1 | formatted_value2');
+      expect(formatLabel).toHaveBeenCalledWith('key1', columnLabelFormats.key1, true);
+      expect(formatLabel).toHaveBeenCalledWith('value2', columnLabelFormats.key2, false);
+    });
   });
 
-  it('should return a valid dollar format', () => {
-    const rawValue = 3363690.3966666665;
-    const columnNameDelimiter = 'long_term_avg__🔑__';
-    const columnLabelFormats: Record<string, IColumnLabelFormat> = {
-      month: {
-        style: 'date',
-        compactNumbers: false,
-        columnType: 'date',
-        displayName: '',
-        numberSeparatorStyle: ',',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-        currency: 'USD',
-        convertNumberTo: null,
-        dateFormat: 'MMM YYYY',
-        useRelativeTime: false,
-        isUTC: false,
-        multiplier: 1,
-        prefix: '',
-        suffix: '',
-        replaceMissingDataWith: null,
-        makeLabelHumanReadable: true
-      },
-      recent_total: {
-        style: 'currency',
-        compactNumbers: false,
-        columnType: 'number',
-        displayName: '',
-        numberSeparatorStyle: ',',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-        currency: 'USD',
-        convertNumberTo: null,
-        dateFormat: 'auto',
-        useRelativeTime: false,
-        isUTC: false,
-        multiplier: 1,
-        prefix: '',
-        suffix: '',
-        replaceMissingDataWith: 0,
-        makeLabelHumanReadable: true
-      },
-      long_term_avg: {
-        style: 'currency',
-        compactNumbers: false,
-        columnType: 'number',
-        displayName: '',
-        numberSeparatorStyle: ',',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-        currency: 'USD',
-        convertNumberTo: null,
-        dateFormat: 'auto',
-        useRelativeTime: false,
-        isUTC: false,
-        multiplier: 1,
-        prefix: '',
-        suffix: '',
-        replaceMissingDataWith: 0,
-        makeLabelHumanReadable: true
-      }
-    };
+  describe('formatLabelForPieLegend', () => {
+    it('should join label and datasetLabel when isMultipleYAxis is true', () => {
+      const result = formatLabelForPieLegend('label1', 'dataset1', true);
+      expect(result).toBe('label1 | dataset1');
+    });
 
-    const result = formatChartValueDelimiter(rawValue, columnNameDelimiter, columnLabelFormats);
-    expect(result).toBe('$3,363,690.40');
+    it('should return only label when isMultipleYAxis is false', () => {
+      const result = formatLabelForPieLegend('label1', 'dataset1', false);
+      expect(result).toBe('label1');
+    });
   });
 });
