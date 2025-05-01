@@ -85,8 +85,6 @@ export const useBusterChartJSLegend = ({
     barGroupType
   });
 
-  const categoryAxisColumnNames = (selectedAxis as ComboChartAxis).category as string[];
-
   const animateLegend = useMemo(() => {
     return !!animateLegendProp && numberOfDataPoints <= LEGEND_ANIMATION_THRESHOLD;
   }, [animateLegendProp, numberOfDataPoints]);
@@ -101,9 +99,7 @@ export const useBusterChartJSLegend = ({
         colors,
         inactiveDatasets,
         selectedChartType,
-        allYAxisColumnNames,
         columnLabelFormats,
-        categoryAxisColumnNames,
         columnSettings
       });
 
