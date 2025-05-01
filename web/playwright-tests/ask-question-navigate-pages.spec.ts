@@ -47,11 +47,11 @@ test('Can ask a question and navigate to top level pages', async ({ page }) => {
   await page.waitForURL((url) => url.toString().includes('chart'));
   expect(page.url()).toContain('chart');
 
-  await page.locator('a[aria-description="Reasoning link"]').click();
+  await page.locator('a[aria-label="Reasoning link"]').click();
   await page.waitForURL((url) => url.toString().includes('reasoning'));
   expect(page.url()).toContain('reasoning');
 
-  await page.click('[aria-description="Collapse file button"]');
+  await page.click('[aria-label="Collapse file button"]');
   // Wait for and check redirection to chat page after collapsing file
   await page.waitForURL((url) => {
     // URL should be in format /app/chats/{id} without any additional segments
