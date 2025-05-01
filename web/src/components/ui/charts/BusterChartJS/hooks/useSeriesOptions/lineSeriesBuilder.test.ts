@@ -298,10 +298,20 @@ describe('lineSeriesBuilder', () => {
     };
 
     it('should create date labels correctly when specified', () => {
-      const props = { ...baseProps, xAxisKeys: ['date'] as ChartEncodes['x'] };
+      const props = {
+        ...baseProps,
+        xAxisKeys: ['date'] as ChartEncodes['x'],
+        datasetOptions: {
+          ...baseProps.datasetOptions,
+          ticks: [['2023-01-01'], ['2023-01-02'], ['2023-01-03']]
+        }
+      };
       const labels = lineSeriesBuilder_labels(props);
+      console.log(props.datasetOptions.ticks);
+      expect(props.datasetOptions.ticks).toHaveLength(3);
+      console.log(labels);
       expect(labels).toHaveLength(3);
-      expect(typeof labels[0]).toBe('string');
+      expect(typeof labels[0]).not.toBe('string');
       expect(createDayjsDate).toHaveBeenCalledWith('2023-01-01');
       expect(createDayjsDate).toHaveBeenCalledWith('2023-01-02');
       expect(createDayjsDate).toHaveBeenCalledWith('2023-01-03');

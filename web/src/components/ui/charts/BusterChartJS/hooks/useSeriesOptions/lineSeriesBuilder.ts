@@ -198,6 +198,7 @@ export const lineSeriesBuilder_labels = ({
   const xColumnLabelFormat = columnLabelFormats[xAxisKeys[0]] || DEFAULT_COLUMN_LABEL_FORMAT;
   const useDateLabels =
     xAxisKeys.length === 1 &&
+    datasetOptions.ticks[0]?.length === 1 &&
     xColumnLabelFormat.columnType === 'date' &&
     xColumnLabelFormat.style === 'date';
   const ticksKey = datasetOptions.ticksKey;
