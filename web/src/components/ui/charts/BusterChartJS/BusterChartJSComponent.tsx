@@ -9,8 +9,9 @@ import {
   ChartTotalizerPlugin,
   OutLabelsPlugin
 } from './core';
+
 import { ChartJSOrUndefined, ChartProps } from './core/types';
-import type { ChartType as ChartJSChartType, ChartOptions } from 'chart.js';
+import type { ChartType as ChartJSChartType, ChartOptions, Plugin } from 'chart.js';
 import { useColors } from '../chartHooks';
 import { useGoalLines, useOptions, useSeriesOptions } from './hooks';
 import { useChartSpecificOptions } from './hooks/useChartSpecificOptions';
@@ -184,7 +185,7 @@ export const BusterChartJSComponent = React.memo(
         return 'line';
       }, [selectedChartType]);
 
-      const chartSpecificPlugins = useMemo((): any[] => {
+      const chartSpecificPlugins = useMemo((): Plugin[] => {
         if (selectedChartType === 'scatter') return [ChartHoverScatterPlugin];
         if (selectedChartType === 'line') return [ChartHoverLinePlugin, ChartTotalizerPlugin];
         if (selectedChartType === 'bar') {

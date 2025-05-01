@@ -227,8 +227,8 @@ function applyPercentageStack(datasets: DatasetOption[]): DatasetOption[] {
 function sortBar(
   datasets: DatasetOption[],
   sortKey: NonNullable<BarSortBy>[number],
-  ticks: any[] = []
-): { datasets: DatasetOption[]; ticks: any[] } {
+  ticks: (string | number)[][] = []
+): { datasets: DatasetOption[]; ticks: DatasetOptionsWithTicks['ticks'] } {
   const items = cloneDeep(datasets);
   const result = { datasets: items, ticks };
 

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { BusterChartLegend } from '../BusterChartLegend';
 import { ChartType } from '../../../../../api/asset_interfaces/metric/charts';
+import { BusterChartLegendItem } from '../interfaces';
 
 const meta: Meta<typeof BusterChartLegend> = {
   title: 'UI/Charts/BusterChartLegend',
@@ -24,14 +25,16 @@ const meta: Meta<typeof BusterChartLegend> = {
 export default meta;
 type Story = StoryObj<typeof BusterChartLegend>;
 
-const defaultLegendItems = [
+const defaultLegendItems: BusterChartLegendItem[] = [
   {
     color: '#1677FF',
     inactive: false,
     type: ChartType.Line,
     formattedName: 'Revenue',
     id: 'revenue',
-    serieName: 'revenue'
+    serieName: 'revenue',
+    data: [],
+    yAxisKey: 'revenue'
   },
   {
     color: '#52C41A',
@@ -39,7 +42,9 @@ const defaultLegendItems = [
     type: ChartType.Line,
     formattedName: 'Profit',
     id: 'profit',
-    serieName: 'profit'
+    serieName: 'profit',
+    data: [],
+    yAxisKey: 'profit'
   },
   {
     color: '#F5222D',
@@ -47,7 +52,9 @@ const defaultLegendItems = [
     type: ChartType.Bar,
     formattedName: 'Orders',
     id: 'orders',
-    serieName: 'orders'
+    serieName: 'orders',
+    data: [],
+    yAxisKey: 'orders'
   }
 ];
 
@@ -105,7 +112,9 @@ export const WithOverflow: Story = {
         type: ChartType.Line,
         formattedName: 'Customers',
         id: 'customers',
-        serieName: 'customers'
+        serieName: 'customers',
+        data: [],
+        yAxisKey: 'customers'
       },
       {
         color: '#13C2C2',
@@ -113,7 +122,9 @@ export const WithOverflow: Story = {
         type: ChartType.Line,
         formattedName: 'Average Order Value',
         id: 'aov',
-        serieName: 'aov'
+        serieName: 'aov',
+        data: [],
+        yAxisKey: 'aov'
       },
       {
         color: '#FA8C16',
@@ -121,7 +132,9 @@ export const WithOverflow: Story = {
         type: ChartType.Bar,
         formattedName: 'Returns',
         id: 'returns',
-        serieName: 'returns'
+        serieName: 'returns',
+        data: [],
+        yAxisKey: 'returns'
       }
     ],
     show: true,

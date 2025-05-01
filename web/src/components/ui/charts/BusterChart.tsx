@@ -18,6 +18,7 @@ import { BusterChartWrapper } from './BusterChartWrapper';
 import { BusterChartRenderComponentProps } from './interfaces/chartComponentInterfaces';
 import { BusterChartComponent } from './BusterChartComponent';
 import { DEFAULT_CHART_CONFIG } from '@/api/asset_interfaces/metric/defaults';
+import { Chart } from 'chart.js';
 
 export const BusterChart: React.FC<BusterChartProps> = React.memo(
   ({
@@ -73,7 +74,7 @@ export const BusterChart: React.FC<BusterChartProps> = React.memo(
       });
     }, [selectedChartType, isTable, selectedAxis]);
 
-    const onChartMounted = useMemoizedFn((chart?: any) => {
+    const onChartMounted = useMemoizedFn((chart?: Chart) => {
       onChartMountedProp?.(chart);
     });
 

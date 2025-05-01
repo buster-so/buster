@@ -64,14 +64,14 @@ const BusterTableChartBase: React.FC<BusterTableChartProps> = ({
 
   //THIS MUST BE A USE CALLBACK
   const onFormatHeader = useCallback(
-    (value: any, columnName: string) => {
+    (value: string | number | null | Date | boolean, columnName: string) => {
       return formatLabel(value, columnLabelFormats[columnName], true);
     },
     [columnLabelFormats]
   );
   //THIS MUST BE A USE CALLBACK
   const onFormatCell = useCallback(
-    (value: any, columnName: string) => {
+    (value: string | number | null | Date | boolean, columnName: string) => {
       return formatLabel(value, columnLabelFormats[columnName], false);
     },
     [columnLabelFormats]

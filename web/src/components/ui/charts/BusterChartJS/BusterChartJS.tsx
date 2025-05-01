@@ -34,7 +34,7 @@ export const BusterChartJS: React.FC<BusterChartComponentProps> = ({
 
   const onChartReady = useMemoizedFn(() => {
     setChartMounted(true);
-    onChartMounted?.();
+    if (chartRef.current) onChartMounted?.(chartRef.current);
   });
 
   const onInitialAnimationEndPreflight = useCallback(() => {
