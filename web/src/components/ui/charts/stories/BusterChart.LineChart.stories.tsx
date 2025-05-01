@@ -1943,3 +1943,27 @@ export const With5ThousandPoints: Story = {
     }
   }
 };
+
+export const DefaultWithLegendHeader: Story = {
+  args: {
+    ...Default.args,
+    showLegend: true,
+    showLegendHeadline: 'current'
+  }
+};
+
+export const DefaultWithLegendHeaderAverage: Story = {
+  args: {
+    ...Default.args,
+    showLegend: true,
+    showLegendHeadline: 'average'
+  }
+};
+
+export const CategoryWithLegendHeaderAverage: Story = {
+  args: {
+    ...CategoricalXNumericY.args,
+    showLegend: true,
+    showLegendHeadline: 'average'
+  }
+};

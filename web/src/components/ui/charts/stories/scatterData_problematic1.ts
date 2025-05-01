@@ -1,5 +1,4 @@
 import { ChartType } from '@/api/asset_interfaces';
-import { faker } from '@faker-js/faker';
 
 export const scatterDataProblematic1 = {
   metric_id: '7bbe91e5-7133-50f4-a9b2-5a4663f4848a',

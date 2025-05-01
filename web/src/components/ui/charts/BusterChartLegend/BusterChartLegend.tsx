@@ -7,6 +7,7 @@ import { OverflowButton } from './OverflowContainer';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useMemoizedFn } from '@/hooks';
 import { computeHiddenShowItems } from './helpers';
+import { ErrorBoundary } from '../../error';
 
 export const BusterChartLegend: React.FC<BusterChartLegendProps> = React.memo(
   ({
@@ -95,7 +96,7 @@ export const BusterChartLegend: React.FC<BusterChartLegendProps> = React.memo(
     }, [animateLegend, showLegend, show]);
 
     return (
-      <>
+      <ErrorBoundary errorComponent={<div className="text-red-500">Error rendering legend</div>}>
         <motion.div
           className={`chart-legend flex w-full items-center overflow-hidden ${forceInitialHeight ? 'min-h-[24px]' : ''}`}
           onAnimationComplete={onAnimationComplete}
@@ -128,7 +129,7 @@ export const BusterChartLegend: React.FC<BusterChartLegendProps> = React.memo(
             )}
           </AnimatePresence>
         </motion.div>
-      </>
+      </ErrorBoundary>
     );
   }
 );

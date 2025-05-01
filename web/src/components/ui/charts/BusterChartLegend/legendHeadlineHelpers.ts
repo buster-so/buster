@@ -26,19 +26,20 @@ export const addLegendHeadlines = (
 
   const canUseRange = !hasMultipleXAxisDimensions && xIsDate;
 
-  let range: string;
+  // let range: string;
 
-  if (canUseRange) {
-    const firstXAxisDimensionMetadata = columnMetadata.find(
-      (metadata) => metadata.name === firstXAxisDimensionName
-    );
-    const { min_value, max_value } = firstXAxisDimensionMetadata!;
-    const minDate = createDayjsDate((min_value as string) || new Date());
-    const maxDate = createDayjsDate((max_value as string) || new Date());
+  // if (canUseRange) {
+  //   console.log(columnMetadata, firstXAxisDimensionName);
+  //   const firstXAxisDimensionMetadata = columnMetadata.find(
+  //     (metadata) => metadata.name === firstXAxisDimensionName
+  //   );
+  //   const { min_value, max_value } = firstXAxisDimensionMetadata || {};
+  //   const minDate = createDayjsDate((min_value as string) || new Date());
+  //   const maxDate = createDayjsDate((max_value as string) || new Date());
 
-    const dateFormat = getBestDateFormat(minDate, maxDate);
-    range = `${minDate.format(dateFormat)} - ${maxDate.format(dateFormat)}`;
-  }
+  //   const dateFormat = getBestDateFormat(minDate, maxDate);
+  //   range = `${minDate.format(dateFormat)} - ${maxDate.format(dateFormat)}`;
+  // }
   const isPieChart = selectedChartType === 'pie';
 
   legendItems.forEach((item, index) => {
