@@ -71,6 +71,7 @@ test('Can ask a question and navigate to top level pages', async ({ page }) => {
 
   // Click the last matching element
   const count = await fileElements.count();
+  expect(count).toBeGreaterThan(0);
   await fileElements.nth(count - 1).click();
 
   await page.waitForURL((url) => url.toString().includes('chart'));
