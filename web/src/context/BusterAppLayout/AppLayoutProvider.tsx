@@ -36,6 +36,15 @@ export const useAppLayout = () => {
       const currentPathname = currentUrl.pathname;
       const hasQueryParams = targetPath.indexOf('?') !== -1;
 
+      console.log('onChangePage', {
+        targetPath,
+        targetUrl,
+        currentUrl,
+        targetPathname,
+        currentPathname,
+        options
+      });
+
       // Handle shallow routing (only updating query params)
       if (options?.shallow && targetPathname === currentPathname) {
         return new Promise((resolve) => {

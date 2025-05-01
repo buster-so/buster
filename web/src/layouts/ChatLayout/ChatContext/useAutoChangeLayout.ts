@@ -80,6 +80,7 @@ export const useAutoChangeLayout = ({
         });
 
         if (link) {
+          console.log('auto change layout', link);
           onChangePage(link);
         }
         return;
@@ -104,6 +105,7 @@ export const useAutoChangeLayout = ({
       });
 
       if (href) {
+        console.log('auto change layout2', href);
         onChangePage(href);
       }
     }

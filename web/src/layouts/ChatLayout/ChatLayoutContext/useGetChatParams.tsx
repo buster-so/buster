@@ -53,6 +53,20 @@ export const useGetChatParams = () => {
     return false;
   }, [secondaryView]);
 
+  useWhyDidYouUpdate('useGetChatParams', {
+    currentRoute,
+    isVersionHistoryMode,
+    chatId,
+    metricId,
+    dashboardId,
+    collectionId,
+    datasetId,
+    messageId,
+    metricVersionNumber,
+    dashboardVersionNumber,
+    secondaryView
+  });
+
   return useMemo(
     () => ({
       currentRoute,

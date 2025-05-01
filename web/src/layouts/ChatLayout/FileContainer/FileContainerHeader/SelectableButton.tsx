@@ -7,7 +7,7 @@ export const SelectableButton = React.memo<{
   tooltipText: string;
   tooltipShortcuts?: string[];
   icon: React.ReactNode;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   selected?: boolean;
 }>(({ tooltipText, tooltipShortcuts, icon, onClick, selected }) => {
   return (

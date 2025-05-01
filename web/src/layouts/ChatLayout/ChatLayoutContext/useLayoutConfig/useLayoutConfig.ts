@@ -88,6 +88,11 @@ export const useLayoutConfig = ({
       fileId?: string | undefined;
       secondaryView?: FileViewSecondary;
     }) => {
+      console.log('onSetFileView', {
+        fileView,
+        fileId: fileIdProp,
+        secondaryView
+      });
       const fileId = fileIdProp ?? selectedFileId;
       if (!fileId) {
         onCollapseFileClick();
@@ -141,6 +146,11 @@ export const useLayoutConfig = ({
 
   const closeSecondaryView = useMemoizedFn(async () => {
     if (!selectedFileId || !selectedFileViewConfig || !selectedFileView) return;
+    console.log('closeSecondaryView', {
+      selectedFileId,
+      selectedFileViewConfig,
+      selectedFileView
+    });
     setFileViews((prev) => {
       return create(prev, (draft) => {
         if (!draft[selectedFileId]?.fileViewConfig?.[selectedFileView]) return;
@@ -188,6 +198,7 @@ export const useLayoutConfig = ({
       messageId,
       currentRoute
     });
+
     const newInitialFileViews = initializeFileViews({
       secondaryView,
       metricId,
