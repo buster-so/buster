@@ -3559,3 +3559,4 @@ export { default as I12_arrowRotateAnticlockwise } from './arrow-rotate-anticloc
 export { default as I12_openInBrowser } from './open-in-browser-I12px';
 export { default as I12_arrowTurnDown } from './arrow-turn-down-I12px';
 export { default as I12_link2 } from './link-2-I12px';
+export { default as ChartStep } from './chart-step-chart';

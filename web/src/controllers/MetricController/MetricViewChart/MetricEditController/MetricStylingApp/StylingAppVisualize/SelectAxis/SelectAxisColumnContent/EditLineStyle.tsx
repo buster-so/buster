@@ -6,7 +6,7 @@ import { AppSegmented } from '@/components/ui/segmented';
 import { ENABLED_DOTS_ON_LINE_SIZE } from '@/api/asset_interfaces';
 import { useMemoizedFn } from '@/hooks';
 import { type SegmentedItem } from '@/components/ui/segmented';
-import { ChartLine, ChartArea, ChartActivity3, ChartCombo } from '@/components/ui/icons';
+import { ChartLine, ChartArea, ChartActivity3, ChartCombo, ChartStep } from '@/components/ui/icons';
 
 const options: { icon: React.ReactNode; value: LineValue }[] = [
   {
@@ -36,7 +36,7 @@ const options: { icon: React.ReactNode; value: LineValue }[] = [
   {
     icon: (
       <AppTooltip title="Step chart">
-        <ChartActivity3 />
+        <ChartStep />
       </AppTooltip>
     ),
     value: 'step'
