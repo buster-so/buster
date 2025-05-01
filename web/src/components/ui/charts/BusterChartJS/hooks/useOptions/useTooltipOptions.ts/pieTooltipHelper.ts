@@ -4,7 +4,7 @@ import type {
   BusterChartProps
 } from '@/api/asset_interfaces/metric/charts';
 import type { Chart, TooltipItem, ChartTypeRegistry } from 'chart.js';
-import { percentageFormatter } from './helper';
+import { percentageFormatter } from './helpers';
 import { formatLabel } from '@/lib';
 
 export const pieTooltipHelper = (
@@ -31,7 +31,6 @@ export const pieTooltipHelper = (
             dataPointDataIndex,
             datasetIndex,
             tooltipDataset.data,
-            tooltipDataset.label as string,
             columnLabelFormats,
             chart
           )
@@ -52,11 +51,10 @@ export const pieTooltipHelper = (
   return tooltipItems;
 };
 
-export const getPiePercentage = (
+const getPiePercentage = (
   dataPointDataIndex: number,
   datasetIndex: number,
   datasetData: Chart['data']['datasets'][number]['data'],
-  label: string,
   columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>,
   chart: Chart
 ): string => {
@@ -64,6 +62,8 @@ export const getPiePercentage = (
   const total = totalizer.seriesTotals[datasetIndex];
   const compareValue = datasetData[dataPointDataIndex] as number;
   const percentage = (compareValue / total) * 100;
+  const dataset = chart.data.datasets[datasetIndex];
+  const yAxisKey = dataset.yAxisKey;
 
-  return percentageFormatter(percentage, label, columnLabelFormats);
+  return percentageFormatter(percentage, yAxisKey, columnLabelFormats);
 };

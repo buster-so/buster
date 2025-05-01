@@ -136,7 +136,9 @@ export const barBuilder = ({
   const columnSetting = columnSettings[yKey];
   const columnLabelFormat = columnLabelFormats[yKey];
   const showLabels = !!columnSetting?.showDataLabels;
-  const isPercentageStackedBar = barGroupType === 'percentage-stack';
+  const isPercentageStackedBar =
+    barGroupType === 'percentage-stack' ||
+    (barGroupType === 'stack' && columnSetting?.showDataLabelsAsPercentage);
 
   const percentageMode = isPercentageStackedBar
     ? 'stacked'

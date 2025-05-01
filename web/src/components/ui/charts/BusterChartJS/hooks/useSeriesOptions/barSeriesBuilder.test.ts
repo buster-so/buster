@@ -2,6 +2,9 @@ import { barSeriesBuilder } from './barSeriesBuilder';
 import type { SeriesBuilderProps } from './interfaces';
 import type { DatasetOptionsWithTicks } from '../../../chartHooks/useDatasetOptions/interfaces';
 import { ChartType } from '@/api/asset_interfaces/metric/charts/enum';
+import { describe, it, expect } from '@jest/globals';
+import type { DatasetOption } from '../../../chartHooks';
+import type { BusterChartProps, IColumnLabelFormat } from '@/api/asset_interfaces/metric';
 
 describe('barSeriesBuilder', () => {
   it('should build bar chart datasets with correct properties', () => {
@@ -241,5 +244,63 @@ describe('barSeriesBuilder', () => {
       yAxisKey: 'marketShare'
     });
     expect(firstDataset.datalabels).toBeDefined();
+  });
+});
+
+describe('barBuilder', () => {
+  const defaultProps = {
+    dataset: {
+      dataKey: 'test',
+      data: [1, 2, 3]
+    } as DatasetOption,
+    colors: ['#000'],
+    columnSettings: {},
+    columnLabelFormats: {},
+    index: 0,
+    xAxisKeys: ['key1'],
+    barGroupType: 'group' as BusterChartProps['barGroupType'],
+    datasetOptions: {
+      datasets: [],
+      ticks: [],
+      ticksKey: []
+    },
+    categoryKeys: [],
+    sizeOptions: undefined,
+    scatterDotSize: undefined,
+    yAxisKeys: [],
+    y2AxisKeys: []
+  };
+});
+
+describe('percentage mode logic', () => {
+  const getPercentageMode = (
+    barGroupType: BusterChartProps['barGroupType'],
+    showDataLabelsAsPercentage?: boolean
+  ): 'stacked' | 'data-label' | false => {
+    const isPercentageStackedBar =
+      barGroupType === 'percentage-stack' ||
+      (barGroupType === 'stack' && showDataLabelsAsPercentage);
+
+    return isPercentageStackedBar ? 'stacked' : showDataLabelsAsPercentage ? 'data-label' : false;
+  };
+
+  it('should return "stacked" when barGroupType is percentage-stack', () => {
+    const result = getPercentageMode('percentage-stack');
+    expect(result).toBe('stacked');
+  });
+
+  it('should return "stacked" when barGroupType is stack and showDataLabelsAsPercentage is true', () => {
+    const result = getPercentageMode('stack', true);
+    expect(result).toBe('stacked');
+  });
+
+  it('should return "data-label" when showDataLabelsAsPercentage is true and not stacked', () => {
+    const result = getPercentageMode('group', true);
+    expect(result).toBe('data-label');
+  });
+
+  it('should return false when no percentage conditions are met', () => {
+    const result = getPercentageMode('group', false);
+    expect(result).toBe(false);
   });
 });

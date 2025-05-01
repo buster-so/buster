@@ -20,7 +20,6 @@ export const pieSeriesBuilder_data = ({
       backgroundColor: colors,
       xAxisKeys,
       yAxisKey: dataset.dataKey,
-      //pie will only have one dataset
       data: dataset.data as number[],
       borderColor: 'white', //I tried to set this globally in the theme but it didn't work
       tooltipData: dataset.tooltipData

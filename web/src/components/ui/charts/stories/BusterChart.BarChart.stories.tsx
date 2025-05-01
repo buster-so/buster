@@ -367,6 +367,45 @@ export const WithDataLabelsAndStackTotal: Story = {
   }
 };
 
+export const WithDataLabelAsPercentageInStackedBar: Story = {
+  args: {
+    ...WithDataLabelsAndStackTotal.args,
+    data: [
+      { category: 'Cat 1', sales: 3000, units: 3000, returns: 100 },
+      { category: 'Cat 2', sales: 10000, units: 1000, returns: 100 },
+      { category: 'Cat 3', sales: 8000, units: 1900, returns: 100 }
+    ],
+    barGroupType: 'stack',
+    columnSettings: {
+      ...WithDataLabelsAndStackTotal.args!.columnSettings,
+      units: {
+        ...WithDataLabelsAndStackTotal.args!.columnSettings!.units,
+        showDataLabelsAsPercentage: true
+      },
+      sales: {
+        ...WithDataLabelsAndStackTotal.args!.columnSettings!.sales,
+        showDataLabelsAsPercentage: false
+      }
+    }
+  }
+};
+
+export const WithDataLabelAsPercentageInGroupedBar: Story = {
+  args: {
+    ...WithDataLabelAsPercentageInStackedBar.args,
+    barGroupType: 'group',
+    barShowTotalAtTop: false
+  }
+};
+
+export const WithDataLabelAndPercentageStackedBar: Story = {
+  args: {
+    ...WithDataLabelAsPercentageInStackedBar.args,
+    barGroupType: 'percentage-stack',
+    barShowTotalAtTop: false
+  }
+};
+
 export const LargeDataset: Story = {
   args: {
     className: 'resize overflow-auto min-w-[250px] h-[400px]',

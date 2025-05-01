@@ -1,6 +1,6 @@
 import type { ITooltipItem } from '../../../../BusterChartTooltip/interfaces';
 import type { Chart, TooltipItem, ChartTypeRegistry } from 'chart.js';
-import { getPercentage } from './helper';
+import { getPercentage } from './helpers';
 import type { BusterChartConfigProps } from '@/api/asset_interfaces/metric/charts';
 import { formatLabel } from '@/lib';
 
@@ -48,7 +48,6 @@ export const barAndLineTooltipHelper = (
               item.value as number,
               dataPointDataIndex,
               dataPoint.datasetIndex,
-              tooltipDataset.label as string,
               columnLabelFormats,
               chart,
               hasMultipleShownDatasets,

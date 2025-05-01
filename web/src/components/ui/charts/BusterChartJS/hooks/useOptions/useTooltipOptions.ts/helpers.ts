@@ -1,4 +1,3 @@
-import { extractFieldsFromChain } from '../../../../chartHooks';
 import type { BusterChartProps } from '@/api/asset_interfaces/metric/charts';
 import { formatLabel } from '@/lib/columnFormatter';
 import type { Chart } from 'chart.js';
@@ -7,50 +6,50 @@ export const getPercentage = (
   rawValue: number,
   dataIndex: number,
   datasetIndex: number,
-  datasetKey: string,
   columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>,
   chart: Chart,
   hasMultipleShownDatasets: boolean,
   percentageMode: undefined | 'stacked'
 ) => {
   if (hasMultipleShownDatasets || percentageMode === 'stacked') {
-    return getStackedPercentage(rawValue, dataIndex, datasetKey, columnLabelFormats, chart);
+    return getStackedPercentage(rawValue, dataIndex, columnLabelFormats, chart);
   }
 
-  return getSeriesPercentage(rawValue, datasetIndex, datasetKey, columnLabelFormats, chart);
+  return getSeriesPercentage(rawValue, datasetIndex, columnLabelFormats, chart);
 };
 
 const getSeriesPercentage = (
   rawValue: number,
   datasetIndex: number,
-  key: string,
   columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>,
   chart: Chart
 ): string => {
   const total = chart.$totalizer.seriesTotals[datasetIndex];
   const percentage = (rawValue / total) * 100;
-  return percentageFormatter(percentage, key, columnLabelFormats);
+  const dataset = chart.data.datasets[datasetIndex];
+  const yAxisKey = dataset.yAxisKey;
+  return percentageFormatter(percentage, yAxisKey, columnLabelFormats);
 };
 
 const getStackedPercentage = (
   rawValue: number,
   dataPointIndex: number,
-  key: string,
   columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>,
   chart: Chart
 ) => {
   const stackTotal = chart.$totalizer.stackTotals[dataPointIndex!];
   const percentage = (rawValue / (stackTotal || 1)) * 100;
-  return percentageFormatter(percentage, key, columnLabelFormats);
+  const dataset = chart.data.datasets[dataPointIndex!];
+  const yAxisKey = dataset.yAxisKey;
+  return percentageFormatter(percentage, yAxisKey, columnLabelFormats);
 };
 
 export const percentageFormatter = (
   percentage: number,
-  axisKeyUnDeliminated: string,
+  yAxisKey: string,
   columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>
 ) => {
-  const { key } = extractFieldsFromChain(axisKeyUnDeliminated)[0];
-  let columnLabelFormat = columnLabelFormats[key];
+  let columnLabelFormat = columnLabelFormats[yAxisKey];
   const isPercentage = columnLabelFormat?.style === 'percent';
   if (!isPercentage) {
     columnLabelFormat = {

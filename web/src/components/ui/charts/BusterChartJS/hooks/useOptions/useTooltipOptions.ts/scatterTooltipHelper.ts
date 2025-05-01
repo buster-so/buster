@@ -4,7 +4,6 @@ import type { ChartDataset, TooltipItem, ChartTypeRegistry } from 'chart.js';
 import { formatLabel } from '@/lib/columnFormatter';
 
 export const scatterTooltipHelper = (
-  datasets: ChartDataset[],
   dataPoints: TooltipItem<keyof ChartTypeRegistry>[],
   columnLabelFormats: NonNullable<BusterChartConfigProps['columnLabelFormats']>
 ): ITooltipItem[] => {
