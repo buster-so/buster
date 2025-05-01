@@ -1,6 +1,6 @@
 import { BusterChartLegendItem } from './interfaces';
 import { BusterChartProps, ShowLegendHeadline } from '@/api/asset_interfaces/metric/charts';
-import { DataFrameOperations, ArrayOperations } from '@/lib/math';
+import { ArrayOperations } from '@/lib/math';
 import { DatasetOptionsWithTicks } from '../chartHooks';
 import { createDayjsDate, getBestDateFormat } from '@/lib/date';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces/metric';
@@ -42,6 +42,14 @@ export const addLegendHeadlines = (
   const isPieChart = selectedChartType === 'pie';
 
   legendItems.forEach((item, index) => {
+    if (!item.data || !Array.isArray(item.data)) {
+      item.headline = {
+        type: showLegendHeadline,
+        titleAmount: 0
+      };
+      return;
+    }
+
     if (isPieChart) {
       const result = item.data[index % item.data.length] as number;
       const formattedResult = formatLabel(result, columnLabelFormats[item.yAxisKey]);
@@ -53,14 +61,6 @@ export const addLegendHeadlines = (
       return;
     }
 
-    if (!item.data || !Array.isArray(item.data)) {
-      console.log('item', item);
-      item.headline = {
-        type: showLegendHeadline,
-        titleAmount: 0
-      };
-      return;
-    }
     const arrayOperations = new ArrayOperations(item.data as number[]);
 
     // Use the mapping to get the correct operation method
@@ -75,9 +75,10 @@ export const addLegendHeadlines = (
     }
 
     const result = operationMethod(arrayOperations);
+    const formattedResult = formatLabel(result, columnLabelFormats[item.yAxisKey]);
     const headline: BusterChartLegendItem['headline'] = {
       type: showLegendHeadline,
-      titleAmount: result
+      titleAmount: formattedResult
     };
     item.headline = headline;
   });

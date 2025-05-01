@@ -123,8 +123,7 @@ export const MultipleYAxis: Story = {
     } satisfies Record<keyof BarChartData, IColumnLabelFormat>,
     y2AxisShowAxisLabel: true,
     y2AxisShowAxisTitle: true,
-    y2AxisAxisTitle: 'Returns',
-    showLegendHeadline: 'average'
+    y2AxisAxisTitle: 'Returns'
   },
   render: (args) => {
     return (
@@ -864,6 +863,23 @@ export const WithLegendHeadline: Story = {
     ...Default.args,
     pieDisplayLabelAs: 'number',
     showLegend: true,
-    showLegendHeadline: 'average'
+    showLegendHeadline: 'average',
+    columnLabelFormats: {
+      ...Default.args!.columnLabelFormats,
+      sales: {
+        ...Default.args!.columnLabelFormats!.sales!,
+        columnType: 'number',
+        style: 'currency',
+        currency: 'USD'
+      }
+    }
+  }
+};
+
+export const WithLegendHeadlineMultipleYAxis: Story = {
+  args: {
+    ...MultipleYAxis.args,
+    showLegend: true,
+    showLegendHeadline: 'current'
   }
 };

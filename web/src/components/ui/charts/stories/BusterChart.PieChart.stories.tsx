@@ -422,7 +422,17 @@ export const WithLegendHeadline: Story = {
     ...Default.args,
     showLegend: true,
     showLegendHeadline: 'average',
-    pieDisplayLabelAs: 'number'
+    pieDisplayLabelAs: 'number',
+    pieDonutWidth: 40,
+    columnLabelFormats: {
+      ...Default.args!.columnLabelFormats,
+      value: {
+        ...Default.args!.columnLabelFormats!.value!,
+        columnType: 'number',
+        style: 'currency',
+        currency: 'USD'
+      }
+    }
   }
 };
 
