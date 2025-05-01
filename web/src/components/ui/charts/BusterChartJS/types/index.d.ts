@@ -30,6 +30,10 @@ declare module 'chart.js' {
     type: TType;
   }
 
+  interface ChartConfigurationCustomTypesPerDataset<TType extends ChartType = ChartType> {
+    type: TType;
+  }
+
   interface CoreChartOptions<TType extends ChartType> {
     //
   }

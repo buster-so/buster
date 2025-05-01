@@ -164,7 +164,6 @@ const createTooltipCacheKey = (
   if (!chart?.tooltip) return '';
 
   const parts = [
-    //@ts-ignore
     chart.config.type,
     chart.tooltip.title?.join(''),
     chart.tooltip.body?.map((b) => b.lines.join('')).join(''),

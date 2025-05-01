@@ -2,19 +2,17 @@ import React from 'react';
 import { BusterChartLegendItem } from '../../../BusterChartLegend';
 import type { ChartJSOrUndefined } from '../../core/types';
 import { type BusterChartProps, ChartType } from '@/api/asset_interfaces/metric/charts';
-import { formatChartLabel } from '../../helpers';
 import type { ChartDataset } from 'chart.js';
 import { extractFieldsFromChain } from '../../../chartHooks';
 import { formatLabelForPieLegend } from '../../../commonHelpers';
+import { formatLabel } from '@/lib/columnFormatter';
 
 export const getLegendItems = ({
   chartRef,
   colors,
   inactiveDatasets,
   selectedChartType,
-  allYAxisColumnNames,
   columnLabelFormats,
-  categoryAxisColumnNames,
   columnSettings
 }: {
   colors: string[];
@@ -23,12 +21,9 @@ export const getLegendItems = ({
   inactiveDatasets: Record<string, boolean>;
   columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>;
   selectedChartType: ChartType;
-  allYAxisColumnNames: string[];
-  categoryAxisColumnNames?: string[];
 }): BusterChartLegendItem[] => {
   const isComboChart = selectedChartType === 'combo';
-  //@ts-ignore
-  const globalType: ChartType = (chartRef.current?.config.type as 'pie') || ChartType.Bar;
+  const globalType: ChartType = (chartRef.current?.config.type as ChartType) || ChartType.Bar;
   const isPieChart = globalType === ChartType.Pie;
   const data = chartRef.current?.data;
 
@@ -54,19 +49,12 @@ export const getLegendItems = ({
 
   const datasets =
     data.datasets?.filter((dataset) => !dataset.hidden && !dataset.isTrendline) || [];
-  const hasMultipleMeasures = allYAxisColumnNames.length > 1;
-  const hasCategoryAxis: boolean = !!categoryAxisColumnNames && categoryAxisColumnNames?.length > 0;
 
   return datasets.map<BusterChartLegendItem>((dataset, index) => ({
     color: colors[index % colors.length],
     inactive: inactiveDatasets[dataset.label!],
     type: getType(isComboChart, globalType, dataset, columnSettings),
-    formattedName: formatChartLabel(
-      dataset.label!,
-      columnLabelFormats,
-      hasMultipleMeasures,
-      hasCategoryAxis
-    ),
+    formattedName: formatLabel(dataset.label!, columnLabelFormats[dataset.yAxisKey]),
     id: dataset.label!,
     data: dataset.data,
     yAxisKey: dataset.yAxisKey

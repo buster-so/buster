@@ -21,7 +21,6 @@ declare module 'chart.js' {
 export const ChartHoverScatterPlugin: Plugin<ChartType, ChartHoverScatterPluginOptions> = {
   id: 'tooltipHoverScatter',
   afterInit: (chart) => {
-    //@ts-ignore
     const chartType = chart.config.type as ChartType;
     chart.$pluginHoverScatterManager = {
       enabled: chartType === 'scatter' || chartType === 'bubble'

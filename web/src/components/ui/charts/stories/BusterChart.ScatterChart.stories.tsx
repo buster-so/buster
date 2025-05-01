@@ -55,7 +55,9 @@ export const Default: Story = {
       } satisfies IColumnLabelFormat,
       category: {
         columnType: 'text',
-        style: 'string'
+        style: 'string',
+        prefix: '🔥 ',
+        suffix: ' 🔥'
       } satisfies IColumnLabelFormat
     } satisfies Record<keyof ScatterChartData, IColumnLabelFormat>,
     className: 'w-[400px] h-[400px] max-w-[400px] max-h-[400px]'

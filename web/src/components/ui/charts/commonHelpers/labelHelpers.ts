@@ -22,7 +22,7 @@ export const formatChartLabelDelimiter = (
 };
 
 //used in the legend and axis labels. exported only for tooltip
-const formatLabelField = (
+export const formatLabelField = (
   field: { value: string; key: string },
   columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>
 ) => {

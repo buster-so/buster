@@ -196,6 +196,10 @@ export const BusterChartJSComponent = React.memo(
         return [];
       }, [selectedChartType]);
 
+      console.log('datasetOptions', datasetOptions);
+      console.log('data', data);
+      console.log('options', options);
+
       return (
         <Chart
           className={className}

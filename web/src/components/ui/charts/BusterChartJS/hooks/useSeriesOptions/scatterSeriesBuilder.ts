@@ -62,7 +62,7 @@ export const scatterSeriesBuilder_data = ({
     }
 
     return {
-      parsing: false,
+      parsing: false, //we need to make sure the data is sorted
       label: formatLabelForDataset(dataset, columnLabelFormats),
       //@ts-ignore
       elements: scatterElementConfig,

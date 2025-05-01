@@ -17,7 +17,6 @@ declare module 'chart.js' {
 export const ChartHoverBarPlugin: Plugin<ChartType, ChartHoverBarPluginOptions> = {
   id: 'tooltipHoverBar',
   afterInit: (chart) => {
-    //@ts-ignore
     const chartType = chart.config.type as ChartType;
     // Store whether this is a bar chart to avoid checking on every draw
     chart.$pluginHoverBarManager = {

@@ -68,7 +68,9 @@ export const Default: Story = {
       sales: {
         columnType: 'number',
         style: 'currency',
-        currency: 'USD'
+        currency: 'USD',
+        displayName: 'SALES',
+        suffix: '!!!'
       } satisfies IColumnLabelFormat,
       units: {
         columnType: 'number',

@@ -17,7 +17,6 @@ declare module 'chart.js' {
 export const ChartHoverLinePlugin: Plugin<ChartType, ChartHoverLinePluginOptions> = {
   id: 'tooltipHoverLine',
   afterInit: (chart) => {
-    //@ts-ignore
     const chartType = chart.config.type as ChartType;
     chart.$pluginHoverLineManager = {
       enabled: chartType === 'line'

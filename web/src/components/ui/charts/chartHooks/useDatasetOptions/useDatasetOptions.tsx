@@ -15,7 +15,7 @@ import type {
 } from '@/api/asset_interfaces/metric/charts';
 import uniq from 'lodash/uniq';
 import { sortLineBarData } from './datasetHelpers_BarLinePie';
-import { downsampleScatterData } from './datasetHelpers_Scatter';
+import { downsampleAndSortScatterData } from './datasetHelpers_Scatter';
 import { type TrendlineDataset, useDataTrendlineOptions } from './useDataTrendlineOptions';
 import type { DatasetOptionsWithTicks } from './interfaces';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
@@ -106,6 +106,10 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
       if (barSortBy && barSortBy?.some((y) => y !== 'none')) return [];
     }
 
+    if (isScatter) {
+      return [xFields[0]];
+    }
+
     return xFieldColumnLabelFormatColumnTypes.filter((columnType) => columnType === 'date');
   }, [xFieldColumnLabelFormatColumnTypes, pieSortBy, isPieChart, isBarChart, isScatter, barSortBy]);
 
@@ -120,7 +124,7 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
   }, [data, isScatter]);
 
   const sortedAndLimitedData = useMemo(() => {
-    if (isScatter) return downsampleScatterData(data);
+    if (isScatter) return downsampleAndSortScatterData(data, xFields[0]);
     return sortLineBarData(data, columnMetadata, xFieldSorts, xFields);
   }, [data, xFieldSortsString, xFieldsString, isScatter]);
 
