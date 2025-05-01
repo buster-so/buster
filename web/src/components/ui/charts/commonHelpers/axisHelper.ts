@@ -1,46 +1,14 @@
 import { formatLabel } from '@/lib/columnFormatter';
 import pick from 'lodash/pick';
 import isEqual from 'lodash/isEqual';
-import isNumber from 'lodash/isNumber';
-import type { ColumnMetaData } from '@/api/asset_interfaces/metric';
-import { formatChartLabelDelimiter, JOIN_CHARACTER } from './labelHelpers';
+import { JOIN_CHARACTER } from './labelHelpers';
 import {
-  type ChartEncodes,
   type BusterChartProps,
   type BarAndLineAxis,
-  type ScatterAxis,
-  ChartType
+  type ScatterAxis
 } from '@/api/asset_interfaces/metric/charts';
 
 export const AXIS_TITLE_SEPARATOR = JOIN_CHARACTER;
-
-export const formatXAxisLabel = (
-  value: string | number,
-  selectedAxis: ChartEncodes,
-  columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>,
-  xAxisColumnMetadata: ColumnMetaData | undefined,
-  selectedChartType: ChartType
-) => {
-  //scatter chart will have a number value
-  if (isNumber(value) || selectedChartType === ChartType.Scatter) {
-    //we can assumed there is only one x-axis
-    const assosciatedColumnFormat = columnLabelFormats[selectedAxis.x[0]];
-    const maxValue = xAxisColumnMetadata?.max_value ?? 0;
-    const minValue = xAxisColumnMetadata?.min_value ?? 0;
-
-    let shouldCompactNumbers = false;
-
-    if (typeof maxValue === 'number' && typeof minValue === 'number') {
-      // For x-axis ticks, use compact numbers if the range is large enough to warrant it
-      const range = maxValue - minValue;
-      shouldCompactNumbers = range > 1000 || maxValue > 1000;
-    }
-
-    return formatLabel(value, { ...assosciatedColumnFormat, compactNumbers: shouldCompactNumbers });
-  }
-
-  return formatChartLabelDelimiter(value, columnLabelFormats);
-};
 
 export const formatYAxisLabel = (
   value: string | number,

@@ -6,21 +6,6 @@ import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 
 export const JOIN_CHARACTER = ' | ';
 
-export const formatChartLabelDelimiter = (
-  text: string,
-  columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>
-): string => {
-  const fields = extractFieldsFromChain(text);
-
-  if (!fields || fields.length === 0) {
-    return ''; //I used to return text? Maybe I should?
-  }
-
-  const formattedFields = fields.map((field) => formatLabelField(field, columnLabelFormats));
-
-  return formattedFields.join(JOIN_CHARACTER);
-};
-
 //used in the legend and axis labels. exported only for tooltip
 export const formatLabelField = (
   field: { value: string; key: string },

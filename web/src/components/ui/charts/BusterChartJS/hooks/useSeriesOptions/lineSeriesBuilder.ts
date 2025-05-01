@@ -3,7 +3,7 @@ import { Chart, Filler, ScriptableContext } from 'chart.js';
 import type { ChartProps } from '../../core';
 import { SeriesBuilderProps } from './interfaces';
 import { LabelBuilderProps } from './useSeriesOptions';
-import { formatLabelForDataset } from '../../../commonHelpers';
+import { formatLabelForDataset, JOIN_CHARACTER } from '../../../commonHelpers';
 import { addOpacityToColor, createDayjsDate, formatLabel } from '@/lib';
 import { defaultLabelOptionConfig } from '../useChartSpecificOptions/labelOptionConfig';
 import {
@@ -204,17 +204,21 @@ export const lineSeriesBuilder_labels = ({
 
   if (useDateLabels) {
     return datasetOptions.ticks.flatMap((item) => {
-      return item.map<Date>((item, index) => {
-        return createDayjsDate(item as string).toDate();
-      });
+      return item
+        .map<Date>((item, index) => {
+          return createDayjsDate(item as string).toDate();
+        })
+        .join(JOIN_CHARACTER);
     });
   }
 
   return datasetOptions.ticks.flatMap((item) => {
-    return item.map<string>((item, index) => {
-      const key = ticksKey[index]?.key;
-      const columnLabelFormat = columnLabelFormats[key];
-      return formatLabel(item, columnLabelFormat);
-    });
+    return item
+      .map<string>((item, index) => {
+        const key = ticksKey[index]?.key;
+        const columnLabelFormat = columnLabelFormats[key];
+        return formatLabel(item, columnLabelFormat);
+      })
+      .join(JOIN_CHARACTER);
   });
 };

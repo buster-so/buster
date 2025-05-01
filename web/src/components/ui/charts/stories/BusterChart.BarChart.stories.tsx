@@ -69,8 +69,7 @@ export const Default: Story = {
         columnType: 'number',
         style: 'currency',
         currency: 'USD',
-        displayName: 'SALES',
-        suffix: '!!!'
+        displayName: 'SALES'
       } satisfies IColumnLabelFormat,
       units: {
         columnType: 'number',
@@ -883,5 +882,38 @@ export const WithLegendHeadlineMultipleYAxis: Story = {
     ...MultipleYAxis.args,
     showLegend: true,
     showLegendHeadline: 'current'
+  }
+};
+
+export const WithMultipleXAxis: Story = {
+  args: {
+    ...Default.args,
+    data: [
+      {
+        month: 'January',
+        year: 2023,
+        sales: 13000
+      },
+      {
+        month: 'February',
+        year: 2023,
+        sales: 14000
+      },
+      {
+        month: 'January',
+        year: 2024,
+        sales: 10000
+      },
+      {
+        month: 'February',
+        year: 2024,
+        sales: 20000
+      }
+    ],
+    barAndLineAxis: {
+      x: ['month', 'year'],
+      y: ['sales'],
+      category: []
+    } satisfies BarAndLineAxis
   }
 };

@@ -1,7 +1,12 @@
 import type { ChartProps } from '../../core';
 import type { SeriesBuilderProps } from './interfaces';
 import type { LabelBuilderProps } from './useSeriesOptions';
-import { formatLabelForDataset, formatYAxisLabel, yAxisSimilar } from '../../../commonHelpers';
+import {
+  formatLabelForDataset,
+  formatYAxisLabel,
+  JOIN_CHARACTER,
+  yAxisSimilar
+} from '../../../commonHelpers';
 import { dataLabelFontColorContrast, formatBarAndLineDataLabel } from '../../helpers';
 import type { BarElement } from 'chart.js';
 import type { Context } from 'chartjs-plugin-datalabels';
@@ -346,16 +351,14 @@ export const barSeriesBuilder_labels = ({
   const ticksKey = datasetOptions.ticksKey;
 
   const labels = datasetOptions.ticks.flatMap((item) => {
-    return item.map<string>((item, index) => {
-      const key = ticksKey[index]?.key;
-      const columnLabelFormat = columnLabelFormats[key];
-      return formatLabel(item, columnLabelFormat);
-    });
+    return item
+      .map<string>((item, index) => {
+        const key = ticksKey[index]?.key;
+        const columnLabelFormat = columnLabelFormats[key];
+        return formatLabel(item, columnLabelFormat);
+      })
+      .join(JOIN_CHARACTER);
   });
 
   return labels;
-
-  // return datasetOptions.datasets[0].label.map<string>((item) => {
-  //   return formatChartLabelDelimiter(item[0] as string, columnLabelFormats);
-  // });
 };

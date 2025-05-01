@@ -3,7 +3,6 @@ import { BusterChartLegendItem } from '../../../BusterChartLegend';
 import type { ChartJSOrUndefined } from '../../core/types';
 import { type BusterChartProps, ChartType } from '@/api/asset_interfaces/metric/charts';
 import type { ChartDataset } from 'chart.js';
-import { extractFieldsFromChain } from '../../../chartHooks';
 import { formatLabelForPieLegend } from '../../../commonHelpers';
 import { formatLabel } from '@/lib/columnFormatter';
 
@@ -54,7 +53,7 @@ export const getLegendItems = ({
     color: colors[index % colors.length],
     inactive: inactiveDatasets[dataset.label!],
     type: getType(isComboChart, globalType, dataset, columnSettings),
-    formattedName: formatLabel(dataset.label!, columnLabelFormats[dataset.yAxisKey]),
+    formattedName: formatLabel(dataset.label!, columnLabelFormats[dataset.yAxisKey], true),
     id: dataset.label!,
     data: dataset.data,
     yAxisKey: dataset.yAxisKey
@@ -68,7 +67,7 @@ const getType = (
   columnSettings: NonNullable<BusterChartProps['columnSettings']>
 ): ChartType => {
   if (!isComboChart) return globalType;
-  const key = extractFieldsFromChain(dataset.label!).at(-1)?.key!;
+  const key = dataset.yAxisKey;
   const columnLabelFormat = columnSettings[key];
   const columnVisualization = columnLabelFormat?.columnVisualization;
   if (columnVisualization === 'dot') return ChartType.Scatter;
