@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { OverflowButton } from '../OverflowContainer';
 import { ChartType } from '../../../../../api/asset_interfaces/metric/charts';
 import { fn } from '@storybook/test';
+import { BusterChartLegendItem } from '../interfaces';
 
 const meta = {
   title: 'UI/Charts/OverflowButton',
@@ -15,14 +16,16 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const mockLegendItems = [
+const mockLegendItems: BusterChartLegendItem[] = [
   {
     id: '1',
     color: '#FF5733',
     inactive: false,
     type: ChartType.Line,
     formattedName: 'Series A',
-    serieName: 'series-a'
+    serieName: 'series-a',
+    data: [],
+    yAxisKey: 'revenue'
   },
   {
     id: '2',
@@ -30,7 +33,9 @@ const mockLegendItems = [
     inactive: false,
     type: ChartType.Line,
     formattedName: 'Series B',
-    serieName: 'series-b'
+    serieName: 'series-b',
+    data: [],
+    yAxisKey: 'revenue'
   },
   {
     id: '3',
@@ -38,7 +43,9 @@ const mockLegendItems = [
     inactive: true,
     type: ChartType.Line,
     formattedName: 'Inactive Series C',
-    serieName: 'series-c'
+    serieName: 'series-c',
+    data: [],
+    yAxisKey: 'revenue'
   }
 ];
 
@@ -64,7 +71,9 @@ export const WithManyItems: Story = {
       inactive: false,
       type: ChartType.Line,
       formattedName: `Series ${String.fromCharCode(65 + i)}`,
-      serieName: `series-${String.fromCharCode(97 + i)}`
+      serieName: `series-${String.fromCharCode(97 + i)}`,
+      data: [],
+      yAxisKey: 'revenue'
     }))
   }
 };

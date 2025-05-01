@@ -1,7 +1,27 @@
-import { BusterChartProps } from '@/api/asset_interfaces/metric';
-import { AnimationOptions } from 'chart.js';
+import type { BusterChartProps } from '@/api/asset_interfaces/metric';
+import type { AnimationOptions } from 'chart.js';
+import memoize from 'lodash/memoize';
 
 const MAX_DELAY = 1000;
+
+// Create a memoized function that uses the chart ID as part of the cache key
+const createHasDataLabelsChecker = () => {
+  const memoizedFn = memoize(
+    (chartId: string, datasets: any[]): boolean => {
+      return datasets.some((d) => d.datalabels);
+    },
+    (chartId: string) => chartId // Use chart ID as the cache key
+  );
+
+  // Add type-safe cache property
+  const typedMemoizedFn = memoizedFn as typeof memoizedFn & {
+    cache: {
+      clear: () => void;
+    };
+  };
+
+  return typedMemoizedFn;
+};
 
 export const barDelayAnimation = (props?: {
   maxDelay?: number;
@@ -9,12 +29,26 @@ export const barDelayAnimation = (props?: {
 }) => {
   const { maxDelay = MAX_DELAY, barGroupType } = props || {};
   let delayed = false;
+
+  // Create a new memoized function for this animation instance
+  const hasDataLabels = createHasDataLabelsChecker();
+
+  // Clean up interval when animation completes
+  const cleanup = () => {
+    hasDataLabels.cache.clear();
+  };
+
   return {
     onComplete: () => {
       delayed = true;
+      cleanup();
     },
     delay: (context) => {
-      if (barGroupType === 'percentage-stack' || barGroupType === 'stack') {
+      if (
+        barGroupType === 'percentage-stack' ||
+        barGroupType === 'stack' ||
+        hasDataLabels(context.chart.id, context.chart.data.datasets)
+      ) {
         return 0;
       }
 
@@ -25,12 +59,8 @@ export const barDelayAnimation = (props?: {
       const numberOfDataPoints = context.chart.data.datasets[datasetIndex]?.data.length || 1;
 
       if (context.type === 'data' && context.mode === 'default' && !delayed) {
-        // Calculate a scaling factor to distribute delays evenly, with max total delay of 1500ms
-
-        const totalSegments = numberOfDatasets * numberOfDataPoints - 1; // -1 because first element has 0 delay
+        const totalSegments = numberOfDatasets * numberOfDataPoints - 1;
         const scalingFactor = totalSegments > 0 ? maxDelay / totalSegments : 0;
-
-        // Calculate position in overall sequence (dataset index * points per dataset + datapoint index)
         const sequencePosition = datasetIndex * numberOfDataPoints + dataIndex;
         delay = sequencePosition * scalingFactor;
       }

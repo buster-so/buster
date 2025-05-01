@@ -17,7 +17,9 @@ const meta = {
       type: ChartType.Line,
       formattedName: 'Sample Legend',
       id: '1',
-      serieName: 'series1'
+      serieName: 'series1',
+      data: [],
+      yAxisKey: 'revenue'
     }
   },
   argTypes: {
@@ -52,7 +54,9 @@ export const Basic: Story = {
       type: ChartType.Line,
       formattedName: 'Basic Legend',
       id: '1',
-      serieName: 'series1'
+      serieName: 'series1',
+      data: [],
+      yAxisKey: 'revenue'
     }
   }
 };
@@ -66,7 +70,9 @@ export const Inactive: Story = {
       type: ChartType.Line,
       formattedName: 'Inactive Legend',
       id: '2',
-      serieName: 'series2'
+      serieName: 'series2',
+      data: [],
+      yAxisKey: 'revenue'
     }
   }
 };
@@ -80,7 +86,9 @@ export const BarType: Story = {
       type: ChartType.Bar,
       formattedName: 'Bar Legend',
       id: '3',
-      serieName: 'series3'
+      serieName: 'series3',
+      data: [],
+      yAxisKey: 'revenue'
     }
   }
 };
@@ -94,7 +102,9 @@ export const ScatterType: Story = {
       type: ChartType.Scatter,
       formattedName: 'Scatter Legend',
       id: '4',
-      serieName: 'series4'
+      serieName: 'series4',
+      data: [],
+      yAxisKey: 'revenue'
     }
   }
 };
@@ -109,6 +119,8 @@ export const WithHeadline: Story = {
       formattedName: 'Revenue',
       id: '5',
       serieName: 'series5',
+      data: [],
+      yAxisKey: 'revenue',
       headline: {
         type: 'current',
         titleAmount: '$50,000'
@@ -127,6 +139,8 @@ export const WithAverageHeadline: Story = {
       formattedName: 'Monthly Sales',
       id: '6',
       serieName: 'series6',
+      data: [],
+      yAxisKey: 'revenue',
       headline: {
         type: 'average',
         titleAmount: '$25,000'
@@ -144,7 +158,9 @@ export const WithFocusEvent: Story = {
       type: ChartType.Line,
       formattedName: 'Interactive Legend',
       id: '7',
-      serieName: 'series7'
+      serieName: 'series7',
+      data: [],
+      yAxisKey: 'revenue'
     },
     onClickItem: fn(),
     onFocusItem: fn(),

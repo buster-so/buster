@@ -150,77 +150,88 @@ export const barBuilder = ({
     borderRadius: (columnSetting?.barRoundness || 0) / 2,
     tooltipData: dataset.tooltipData,
     xAxisKeys,
-    datalabels: {
-      clamp: false,
-      clip: false,
-      labels: {
-        barTotal: {
-          color: dataLabelFontColorContrast,
-          borderWidth: 0,
-          padding: 1,
-          borderRadius: 2.5,
-          anchor: 'end',
-          align: 'start',
-          display: (context) => {
-            // if (!context.chart.$initialAnimationCompleted) {
-            //   return false;
-            // }
-            // Initialize the global rotation flag if it doesn't exist
-            if (context.chart.$barDataLabelsGlobalRotation === undefined) {
-              context.chart.$barDataLabelsGlobalRotation = false;
-              context.chart.$barDataLabelsUpdateInProgress = false;
-              context.chart.$barDataLabelsLastRotationCheck = 0;
-            }
+    datalabels: showLabels
+      ? ({
+          clamp: false,
+          clip: false,
+          labels: {
+            barTotal: {
+              color: dataLabelFontColorContrast,
+              borderWidth: 0,
+              padding: 1,
+              borderRadius: 2.5,
+              anchor: 'end',
+              align: 'start',
+              display: (context) => {
+                // if (!context.chart.$initialAnimationCompleted) {
+                //   return false;
+                // }
+                // Initialize the global rotation flag if it doesn't exist
+                if (context.chart.$barDataLabelsGlobalRotation === undefined) {
+                  context.chart.$barDataLabelsGlobalRotation = false;
+                  context.chart.$barDataLabelsUpdateInProgress = false;
+                  context.chart.$barDataLabelsLastRotationCheck = 0;
+                  //we call this here to ensure that the barDataLabels are set
+                  getFormattedValueAndSetBarDataLabels(context, {
+                    percentageMode,
+                    columnLabelFormat: columnLabelFormat || DEFAULT_COLUMN_LABEL_FORMAT
+                  });
+                }
 
-            // First dataset - analyze all data points to determine if any need rotation
-            if (index === 0 && context.datasetIndex === 0) {
-              throttledSetGlobalRotation(context);
-            }
+                // First dataset - analyze all data points to determine if any need rotation
+                if (index === 0 && context.datasetIndex === 0) {
+                  throttledSetGlobalRotation(context);
+                }
 
-            const rawValue = context.dataset.data[context.dataIndex] as number;
+                const rawValue = context.dataset.data[context.dataIndex] as number;
 
-            if (!showLabels || !rawValue) return false;
+                if (!showLabels || !rawValue) return false;
 
-            const { barWidth, barHeight } = getBarDimensions(context);
+                const { barWidth, barHeight } = getBarDimensions(context);
 
-            if (barWidth < MAX_BAR_WIDTH) return false;
+                if (barWidth < MAX_BAR_WIDTH) return false;
 
-            const formattedValue = getFormattedValue(context, {
-              percentageMode,
-              columnLabelFormat: columnLabelFormat || DEFAULT_COLUMN_LABEL_FORMAT
-            });
+                const formattedValue = getFormattedValueAndSetBarDataLabels(context, {
+                  percentageMode,
+                  columnLabelFormat: columnLabelFormat || DEFAULT_COLUMN_LABEL_FORMAT
+                });
 
-            // Get text width for this specific label
-            const { width: textWidth } = context.chart.ctx.measureText(formattedValue);
+                // Get text width for this specific label
+                const { width: textWidth } = context.chart.ctx.measureText(formattedValue);
 
-            // Use the global rotation setting
-            const rotation = context.chart.$barDataLabelsGlobalRotation ? FULL_ROTATION_ANGLE : 0;
+                // Use the global rotation setting
+                const rotation = context.chart.$barDataLabelsGlobalRotation
+                  ? FULL_ROTATION_ANGLE
+                  : 0;
 
-            // Check if this label can be displayed even with rotation
-            if (rotation === -90 && textWidth > barHeight - TEXT_WIDTH_BUFFER) {
-              return false;
-            }
+                // Check if this label can be displayed even with rotation
+                if (rotation === -90 && textWidth > barHeight - TEXT_WIDTH_BUFFER) {
+                  return false;
+                }
 
-            // Check if the bar height is too small to display the label
-            if (barHeight < MAX_BAR_HEIGHT) return false;
+                // Check if the bar height is too small to display the label
+                if (barHeight < MAX_BAR_HEIGHT) return false;
 
-            return 'auto';
-          },
-          formatter: (_, context) => {
-            return context.chart.$barDataLabels?.[context.datasetIndex]?.[context.dataIndex] || '';
-          },
-          rotation: (context) => {
-            // Always use the global rotation setting
-            return context.chart.$barDataLabelsGlobalRotation ? FULL_ROTATION_ANGLE : 0;
-          },
-          backgroundColor: ({ datasetIndex, chart }) => {
-            const backgroundColor = chart.options.backgroundColor as string[];
-            return backgroundColor[datasetIndex];
+                return 'auto';
+              },
+              formatter: (_, context) => {
+                return (
+                  context.chart.$barDataLabels?.[context.datasetIndex]?.[context.dataIndex] || ''
+                );
+              },
+              rotation: (context) => {
+                // Always use the global rotation setting
+                return context.chart.$barDataLabelsGlobalRotation ? FULL_ROTATION_ANGLE : 0;
+              },
+              backgroundColor: ({ datasetIndex, chart }) => {
+                const backgroundColor = chart.options.backgroundColor as string[];
+                return backgroundColor[datasetIndex];
+              }
+            },
+            ...dataLabelOptions
           }
-        },
-        ...dataLabelOptions
-      }
-    } satisfies ChartProps<'bar'>['data']['datasets'][number]['datalabels']
+        } satisfies ChartProps<'bar'>['data']['datasets'][number]['datalabels'])
+      : undefined
   } satisfies ChartProps<'bar'>['data']['datasets'][number];
 };
 
@@ -271,10 +282,10 @@ const throttledSetGlobalRotation = (context: Context) => {
   // Mark that we're checking now
   context.chart.$barDataLabelsLastRotationCheck = now;
   context.chart.$barDataLabelsUpdateInProgress = true;
+  setGlobalRotation(context);
 
   // Use requestAnimationFrame to ensure we're not blocking the main thread
   requestAnimationFrame(() => {
-    setGlobalRotation(context);
     // Mark that we're done updating
     context.chart.$barDataLabelsUpdateInProgress = false;
   });
@@ -295,7 +306,7 @@ const setGlobalRotation = (context: Context) => {
   const labelNeedsToBeRotated = labels.some((label) => {
     if (!label && !!context.chart.ctx?.measureText) return false;
     const { width: textWidth } = context.chart.ctx?.measureText?.(label) || { width: 0 };
-    const { barWidth, barHeight } = getBarDimensions(context);
+    const { barWidth } = getBarDimensions(context);
     return textWidth > barWidth - TEXT_WIDTH_BUFFER;
   });
 
@@ -304,7 +315,7 @@ const setGlobalRotation = (context: Context) => {
   }
 };
 
-const getFormattedValue = (
+const getFormattedValueAndSetBarDataLabels = (
   context: Context,
   {
     percentageMode,
