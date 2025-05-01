@@ -1,9 +1,5 @@
-import type {
-  BusterChartProps,
-  ChartEncodes,
-  ScatterAxis
-} from '@/api/asset_interfaces/metric/charts';
-import type { DatasetOption, DatasetOptionsWithTicks } from '../../../chartHooks';
+import type { BusterChartProps, ChartEncodes } from '@/api/asset_interfaces/metric/charts';
+import type { DatasetOptionsWithTicks } from '../../../chartHooks';
 
 export interface SeriesBuilderProps {
   datasetOptions: DatasetOptionsWithTicks;
@@ -11,7 +7,7 @@ export interface SeriesBuilderProps {
   colors: string[];
   columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>;
   xAxisKeys: ChartEncodes['x'];
-  categoryKeys: ScatterAxis['category'];
+
   sizeOptions: {
     key: string;
     minValue: number;
@@ -19,9 +15,10 @@ export interface SeriesBuilderProps {
   } | null;
   scatterDotSize: BusterChartProps['scatterDotSize'];
   lineGroupType: BusterChartProps['lineGroupType'];
-  selectedChartType: BusterChartProps['selectedChartType'];
   barShowTotalAtTop: BusterChartProps['barShowTotalAtTop'];
   barGroupType: BusterChartProps['barGroupType'];
   yAxisKeys: string[];
   y2AxisKeys: string[];
+  // selectedChartType: BusterChartProps['selectedChartType'];
+  // categoryKeys: ScatterAxis['category'];
 }

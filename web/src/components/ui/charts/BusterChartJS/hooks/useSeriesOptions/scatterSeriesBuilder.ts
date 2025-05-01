@@ -31,7 +31,6 @@ export const scatterSeriesBuilder_data = ({
   columnLabelFormats,
   xAxisKeys,
   sizeOptions,
-  categoryKeys,
   datasetOptions
 }: SeriesBuilderProps): ChartProps<'bubble'>['data']['datasets'] => {
   const xAxisKey = xAxisKeys[0];

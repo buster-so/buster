@@ -30,8 +30,7 @@ export const barSeriesBuilder = ({
   barGroupType,
   yAxisKeys,
   y2AxisKeys,
-  xAxisKeys,
-  ...rest
+  xAxisKeys
 }: SeriesBuilderProps): ChartProps<'bar'>['data']['datasets'] => {
   const dataLabelOptions: Options['labels'] = {};
 

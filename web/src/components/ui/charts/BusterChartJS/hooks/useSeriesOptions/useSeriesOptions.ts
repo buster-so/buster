@@ -98,8 +98,6 @@ export const useSeriesOptions = ({
       scatterDotSize,
       sizeOptions,
       lineGroupType,
-      categoryKeys,
-      selectedChartType,
       barGroupType,
       barShowTotalAtTop,
       yAxisKeys,
@@ -108,18 +106,16 @@ export const useSeriesOptions = ({
   }, [
     datasetOptions,
     columnSettings,
-    yAxisKeys,
-    y2AxisKeys,
     colors,
     columnLabelFormats,
     xAxisKeys,
     scatterDotSize,
     sizeOptions,
     lineGroupType,
-    categoryKeys,
-    selectedChartType,
     barGroupType,
-    barShowTotalAtTop
+    barShowTotalAtTop,
+    yAxisKeys,
+    y2AxisKeys
   ]);
 
   const datasets: ChartProps<ChartJSChartType>['data']['datasets'] = useMemo(() => {

@@ -1,10 +1,10 @@
 import {
-  BusterChartConfigProps,
-  BusterChartProps,
-  ChartEncodes,
+  type BusterChartConfigProps,
+  type BusterChartProps,
+  type ChartEncodes,
   ChartType,
-  ComboChartAxis,
-  IColumnLabelFormat
+  type ComboChartAxis,
+  type IColumnLabelFormat
 } from '@/api/asset_interfaces/metric/charts';
 import { useMemoizedFn } from '@/hooks';
 import type { DeepPartial } from 'utility-types';

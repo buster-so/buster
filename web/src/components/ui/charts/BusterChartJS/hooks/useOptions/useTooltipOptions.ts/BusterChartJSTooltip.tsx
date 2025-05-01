@@ -68,13 +68,7 @@ export const BusterChartJSTooltip: React.FC<{
     }
 
     if (isScatter) {
-      return scatterTooltipHelper(
-        datasets,
-        dataPoints,
-        columnLabelFormats,
-        hasMultipleMeasures,
-        hasCategoryAxis
-      );
+      return scatterTooltipHelper(dataPoints, columnLabelFormats);
     }
 
     return [];

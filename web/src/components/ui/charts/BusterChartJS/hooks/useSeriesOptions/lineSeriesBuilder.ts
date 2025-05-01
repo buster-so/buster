@@ -1,8 +1,8 @@
-import { DatasetOption } from '../../../chartHooks';
-import { Chart, Filler, ScriptableContext } from 'chart.js';
+import type { DatasetOption } from '../../../chartHooks';
+import { Chart, Filler, type ScriptableContext } from 'chart.js';
 import type { ChartProps } from '../../core';
-import { SeriesBuilderProps } from './interfaces';
-import { LabelBuilderProps } from './useSeriesOptions';
+import type { SeriesBuilderProps } from './interfaces';
+import type { LabelBuilderProps } from './useSeriesOptions';
 import { formatLabelForDataset, JOIN_CHARACTER } from '../../../commonHelpers';
 import { addOpacityToColor, createDayjsDate, formatLabel } from '@/lib';
 import { defaultLabelOptionConfig } from '../useChartSpecificOptions/labelOptionConfig';
