@@ -23,7 +23,6 @@ async function globalSetup(config: FullConfig) {
   // Use chromium browser for the setup
   const browser = await chromium.launch({ headless: false });
   const page = await browser.newPage();
-  console.log('global setup page');
 
   // Check if we have valid stored credentials
   if (hasValidAuth()) {

@@ -20,7 +20,7 @@ test.describe('Authentication Flow', () => {
 
     // Try to access the protected home page again
     await page.goto(homePage);
-    await page.waitForTimeout(100);
+    await page.waitForTimeout(25);
 
     // Should be redirected away from the protected route
     await expect(page).not.toHaveURL(homePage);
@@ -31,7 +31,7 @@ test.describe('Authentication Flow', () => {
     await page.goto(homePage);
 
     //for 100 milliseconds
-    await page.waitForTimeout(100);
+    await page.waitForTimeout(10);
 
     await expect(page).toHaveURL(homePage);
   });
@@ -177,6 +177,66 @@ test.describe('Public Pages - No Redirect', () => {
       await page.goto(routeUrl);
 
       // Should NOT be redirected away from the public route
+      await expect(page).toHaveURL(routeUrl);
+    });
+  }
+});
+
+test.describe('Authenticated Page', () => {
+  //this is just a smoke tests for now
+  const authenticatedPages = {
+    home: createBusterRoute({
+      route: BusterRoutes.APP_HOME
+    }),
+    metricList: createBusterRoute({
+      route: BusterRoutes.APP_METRIC
+    }),
+    dashboardList: createBusterRoute({
+      route: BusterRoutes.APP_DASHBOARDS
+    }),
+    chat: createBusterRoute({
+      route: BusterRoutes.APP_CHAT
+    }),
+    chatId: createBusterRoute({
+      route: BusterRoutes.APP_CHAT_ID,
+      chatId: 'test-chat-id'
+    }),
+    chatIdMetricId: createBusterRoute({
+      route: BusterRoutes.APP_CHAT_ID_METRIC_ID,
+      chatId: 'test-chat-id',
+      metricId: 'test-metric-id'
+    }),
+    chatIdDashboardId: createBusterRoute({
+      route: BusterRoutes.APP_CHAT_ID_DASHBOARD_ID,
+      chatId: 'test-chat-id',
+      dashboardId: 'test-dashboard-id'
+    }),
+    chatIdDashboardIdVersionNumber: createBusterRoute({
+      route: BusterRoutes.APP_CHAT_ID_DASHBOARD_ID_VERSION_NUMBER,
+      chatId: 'test-chat-id',
+      dashboardId: 'test-dashboard-id',
+      versionNumber: 1
+    }),
+    settings: createBusterRoute({
+      route: BusterRoutes.SETTINGS
+    }),
+    settingsGeneral: createBusterRoute({
+      route: BusterRoutes.SETTINGS_API_KEYS
+    })
+  };
+
+  //make sure we are chad
+  test('make sure we are chad', async ({ page }) => {
+    await page.goto(homePage);
+
+    //assert the chad@buster.so is found on the page somewhere
+    await expect(page.locator('html')).toContainText('chad@buster.so');
+  });
+
+  for (const [routeName, routeUrl] of Object.entries(authenticatedPages)) {
+    test(`should redirect from ${routeName} when not authenticated`, async ({ page, context }) => {
+      await page.goto(routeUrl);
+
       await expect(page).toHaveURL(routeUrl);
     });
   }
