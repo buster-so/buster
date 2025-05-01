@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Chart,
   ChartHoverBarPlugin,
@@ -17,6 +17,7 @@ import { useChartSpecificOptions } from './hooks/useChartSpecificOptions';
 import type { BusterChartTypeComponentProps } from '../interfaces/chartComponentInterfaces';
 import { useTrendlines } from './hooks/useTrendlines';
 import type { ScatterAxis } from '@/api/asset_interfaces/metric/charts';
+import { useMount } from '@/hooks';
 
 export const BusterChartJSComponent = React.memo(
   React.forwardRef<ChartJSOrUndefined, BusterChartTypeComponentProps>(
@@ -200,17 +201,37 @@ export const BusterChartJSComponent = React.memo(
       console.log('options', options);
 
       return (
-        <Chart
-          className={className}
-          ref={ref}
-          options={options}
-          data={data}
-          type={type}
-          plugins={chartSpecificPlugins}
-        />
+        <ChartMountedWrapper>
+          <Chart
+            className={className}
+            ref={ref}
+            options={options}
+            data={data}
+            type={type}
+            plugins={chartSpecificPlugins}
+          />
+        </ChartMountedWrapper>
       );
     }
   )
 );
 
 BusterChartJSComponent.displayName = 'BusterChartJSComponent';
+
+const ChartMountedWrapper = ({ children }: { children: React.ReactNode }) => {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useMount(() => {
+    setTimeout(() => {
+      setIsMounted(true);
+    }, 35);
+  });
+
+  if (!isMounted) {
+    return (
+      <div className="to-bg-gradient-to-r to-border/15 h-full w-full bg-gradient-to-b from-transparent" />
+    );
+  }
+
+  return children;
+};

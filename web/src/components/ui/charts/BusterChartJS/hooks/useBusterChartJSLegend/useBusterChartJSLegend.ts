@@ -93,7 +93,6 @@ export const useBusterChartJSLegend = ({
 
     // Defer the actual calculation to the next animation frame
     requestAnimationFrame(() => {
-      console.log('calculateLegendItems');
       const items = getLegendItems({
         chartRef,
         colors,

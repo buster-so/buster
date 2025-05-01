@@ -52,7 +52,6 @@ export const BusterChart: React.FC<BusterChartProps> = React.memo(
     columnSettings = DEFAULT_CHART_CONFIG.columnSettings,
     ...props
   }) => {
-    const [isMounted, setIsMounted] = useState(false); //there is a responsive bug where we need to wait for the chart to mount before we can animate it
     const isTable = selectedChartType === ChartType.Table;
     const showNoData = !loading && (isEmpty(data) || data === null);
     const selectedAxis: ChartEncodes | undefined = useMemo(() => {
@@ -88,7 +87,7 @@ export const BusterChart: React.FC<BusterChartProps> = React.memo(
 
     const SwitchComponent = useMemoizedFn(() => {
       //chartjs need the parent to be mounted to render the chart. It is intermitent when it throws when the parent is not mounted.
-      if (!isMounted && selectedChartType !== ChartType.Table) return null;
+      // if (!isMounted && selectedChartType !== ChartType.Table) return null;
 
       if (loading || error) {
         return <PreparingYourRequestLoader error={error} />;
@@ -137,12 +136,6 @@ export const BusterChart: React.FC<BusterChartProps> = React.memo(
         );
       }
 
-      if (!isMounted) {
-        return (
-          <div className="to-bg-gradient-to-r to-border/10 h-full w-full bg-gradient-to-b from-transparent" />
-        );
-      }
-
       const chartProps: BusterChartRenderComponentProps = {
         ...DEFAULT_CHART_CONFIG,
         columnMetadata: props.columnMetadata ?? [],
@@ -162,12 +155,6 @@ export const BusterChart: React.FC<BusterChartProps> = React.memo(
       };
 
       return <BusterChartComponent {...chartProps} />;
-    });
-
-    useMount(() => {
-      setTimeout(() => {
-        setIsMounted(true);
-      }, 25);
     });
 
     return (

@@ -19,10 +19,9 @@ export const addLegendHeadlines = (
 
   if (!showLegendHeadline || isScatterChart) return legendItems;
 
-  const hasMultipleXAxisDimensions = xAxisKeys.length > 1;
-  const firstXAxisDimensionName = xAxisKeys[0];
-  const xIsDate = isDateColumnType(columnLabelFormats[firstXAxisDimensionName]?.columnType);
-
+  // const hasMultipleXAxisDimensions = xAxisKeys.length > 1;
+  // const firstXAxisDimensionName = xAxisKeys[0];
+  // const xIsDate = isDateColumnType(columnLabelFormats[firstXAxisDimensionName]?.columnType);
   //  const canUseRange = !hasMultipleXAxisDimensions && xIsDate;
   // let range: string;
   // if (canUseRange) {
