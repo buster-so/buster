@@ -12,7 +12,7 @@ export const getPercentage = (
   percentageMode: undefined | 'stacked'
 ) => {
   if (hasMultipleShownDatasets || percentageMode === 'stacked') {
-    return getStackedPercentage(rawValue, dataIndex, columnLabelFormats, chart);
+    return getStackedPercentage(rawValue, dataIndex, datasetIndex, columnLabelFormats, chart);
   }
 
   return getSeriesPercentage(rawValue, datasetIndex, columnLabelFormats, chart);
@@ -34,12 +34,13 @@ const getSeriesPercentage = (
 const getStackedPercentage = (
   rawValue: number,
   dataPointIndex: number,
+  datasetIndex: number,
   columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>,
   chart: Chart
 ) => {
-  const stackTotal = chart.$totalizer.stackTotals[dataPointIndex!];
+  const stackTotal = chart.$totalizer.stackTotals[dataPointIndex];
   const percentage = (rawValue / (stackTotal || 1)) * 100;
-  const dataset = chart.data.datasets[dataPointIndex!];
+  const dataset = chart.data.datasets[datasetIndex];
   const yAxisKey = dataset.yAxisKey;
   return percentageFormatter(percentage, yAxisKey, columnLabelFormats);
 };

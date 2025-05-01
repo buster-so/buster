@@ -15,6 +15,7 @@ import { BusterChartJSTooltip } from './BusterChartJSTooltip';
 import React from 'react';
 import { isNumericColumnType } from '@/lib/messages';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
+import { cn } from '@/lib/classMerge';
 
 type TooltipContext = Parameters<TooltipOptions['external']>[0];
 
@@ -32,7 +33,7 @@ interface UseTooltipOptionsProps {
   colors: string[];
 }
 
-const MAX_TOOLTIP_CACHE_SIZE = 25;
+const MAX_TOOLTIP_CACHE_SIZE = 20;
 
 export const useTooltipOptions = ({
   columnLabelFormats,
@@ -175,23 +176,25 @@ const createTooltipCacheKey = (
   return parts.join('');
 };
 
+const BUSTER_CHARTJS_TOOLTIP_ID = 'buster-chartjs-tooltip';
+
 const getOrCreateInitialTooltipContainer = (chart: ChartJSOrUndefined) => {
   if (!chart) return null;
 
-  let tooltipEl = document.getElementById('buster-chartjs-tooltip');
+  let tooltipEl = document.getElementById(BUSTER_CHARTJS_TOOLTIP_ID);
 
   if (!tooltipEl) {
     //@ts-ignore
     const isPieChart = chart.config.type === 'pie';
     tooltipEl = document.createElement('div');
-    tooltipEl.id = 'buster-chartjs-tooltip';
+    tooltipEl.id = BUSTER_CHARTJS_TOOLTIP_ID;
     tooltipEl.className =
       'pointer-events-none fixed left-0 shadow-lg top-0 bg-white dark:bg-black rounded-sm transition-all';
     tooltipEl.style.zIndex = '999';
 
     tooltipEl.innerHTML = `
-      <div class="tooltip-caret" ></div>
-      <div class="tooltip-content bg-background" style="position: relative; z-index: 2; border: 0.5px solid var(--color-border); border-radius: 4px"></div>
+      <div class="tooltip-caret absolute w-2 h-2"></div>
+      <div class="tooltip-content bg-background relative border rounded-sm z-10"></div>
     `;
 
     const caretEl = tooltipEl.querySelector('.tooltip-caret')! as HTMLDivElement;
@@ -286,7 +289,7 @@ const externalTooltip = (
   caretEl.style.top = caretTop;
   caretEl.style.marginLeft = caretLeft === '100%' ? '-4px' : '-4px';
   caretEl.style.marginTop = '-4px';
-  caretEl.className = `tooltip-caret ${caretBorder}`;
+  caretEl.className = cn(`tooltip-caret absolute w-2 h-2 ${caretBorder}`);
 
   return tooltipEl.querySelector('.tooltip-content')!.innerHTML;
 };
