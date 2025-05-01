@@ -21,7 +21,8 @@ const permissionGroup = (id: string) =>
 const permissionGroupListByDatasetId = (id: string) =>
   queryOptions<GetPermissionGroupResponse[]>({
     queryKey: ['permission_groups', 'list', id] as const,
-    staleTime: 10 * 1000
+    staleTime: 10 * 1000,
+    initialDataUpdatedAt: 0
   });
 
 const permissionGroupUsers = (id: string) =>

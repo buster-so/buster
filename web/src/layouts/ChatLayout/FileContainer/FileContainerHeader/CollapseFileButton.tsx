@@ -19,9 +19,13 @@ export const CollapseFileButton: React.FC<{
   return (
     <AnimatePresence mode="wait" initial={false}>
       {showCollapseButton && (
-        <motion.div variants={animation}>
+        <motion.div variants={animation} aria-description="Collapse file button">
           <AppTooltip title="Collapse file" delayDuration={350}>
-            <Button onClick={onCollapseFileClick} variant="ghost" prefix={icon}></Button>
+            <Button
+              onClick={onCollapseFileClick}
+              variant="ghost"
+              prefix={icon}
+              data-testid="collapse-file-button"></Button>
           </AppTooltip>
         </motion.div>
       )}

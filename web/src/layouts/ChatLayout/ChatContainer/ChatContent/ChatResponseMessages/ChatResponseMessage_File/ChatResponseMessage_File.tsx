@@ -35,7 +35,7 @@ export const ChatResponseMessage_File: React.FC<ChatResponseMessageProps> = Reac
     });
 
     return (
-      <Link href={href} prefetch>
+      <Link href={href} prefetch data-testid="chat-response-message-file">
         <StreamingMessage_File
           isCompletedStream={isCompletedStream}
           responseMessage={responseMessage}

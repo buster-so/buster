@@ -36,7 +36,9 @@ export const MetricViewChartContent: React.FC<MetricViewChartContentProps> = Rea
     }, [isTable, fetchedData]);
 
     return (
-      <div className={cn('flex h-full flex-col overflow-hidden', cardClassName, className)}>
+      <div
+        className={cn('flex h-full flex-col overflow-hidden', cardClassName, className)}
+        data-testid="metric-view-chart-content">
         <BusterChart
           loading={!fetchedData}
           error={errorMessage || undefined}
