@@ -133,7 +133,6 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODIzNDMwOTZ9.7UIsMFfHYKxH7bUJCRfxd6lr7CSXGF7UxtZQO10FMMo"
           NEXT_PUBLIC_WEB_SOCKET_URL: ws://localhost:3001
           CI: "true"
-          DEBUG: "pw:api"
         timeout-minutes: 15
 
       - name: Stop Supabase # Use the cleanup action

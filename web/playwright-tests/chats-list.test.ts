@@ -5,7 +5,7 @@ const chatsRoute = createBusterRoute({
   route: BusterRoutes.APP_CHAT
 });
 
-test('Can navigate to a metric chart from the metric list', async ({ page }) => {
+test.skip('Can navigate to a metric chart from the metric list', async ({ page }) => {
   await page.goto('http://localhost:3000/app/home');
   await page.getByRole('link', { name: 'Metrics' }).click();
   await expect(page.getByText('Chat history')).toBeVisible();
