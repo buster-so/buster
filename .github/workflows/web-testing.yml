@@ -49,6 +49,12 @@ jobs:
       - name: Setup Test Environment # Runs Supabase, migrations, seeding on host
         uses: ./.github/actions/setup-test-environment
 
+      # Install xvfb for X server virtualization
+      - name: Install xvfb
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+
       # Run API and Frontend builds in parallel
       - name: Frontend Install Dependencies and Build
         working-directory: ./web
@@ -129,19 +135,28 @@ jobs:
           ls -la ./playwright-tests/auth-utils/
           cat ./playwright-tests/auth-utils/auth.json
 
-      - name: Run Frontend E2E Tests with Debugging
+      # Modify global-setup.ts to force headless mode
+      - name: Force Headless Mode in Global Setup
+        run: |
+          sed -i 's/chromium.launch({ headless: true })/chromium.launch({ headless: true, args: ["--disable-gpu", "--no-sandbox"] })/' ./web/playwright-tests/auth-utils/global-setup.ts
+          echo "Modified global-setup.ts:"
+          cat ./web/playwright-tests/auth-utils/global-setup.ts | grep -A 3 "chromium.launch"
+
+      - name: Run Frontend E2E Tests with xvfb
         working-directory: ./web
         run: |
-          echo "Running web E2E tests with debugging enabled..."
-          # Add the --trace=on flag to capture traces for each test
-          DEBUG=pw:api,pw:browser*,pw:protocol* PWDEBUG=console npx playwright test --trace=on --timeout=300000 --workers=1 --retries=0
+          echo "Running web E2E tests with xvfb..."
+          # Use xvfb-run to provide a virtual display server
+          export PLAYWRIGHT_HEADLESS=true
+          xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" npx playwright test --timeout=300000 --workers=1 --retries=0
         env:
           NEXT_PUBLIC_API_URL: http://localhost:3001
           NEXT_PUBLIC_URL: http://localhost:3000
           NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
           NEXT_PUBLIC_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODIzNDMwOTZ9.7UIsMFfHYKxH7bUJCRfxd6lr7CSXGF7UxtZQO10FMMo"
           NEXT_PUBLIC_WEB_SOCKET_URL: ws://localhost:3001
-          CI: "true" # Ensure CI mode is explicitly set
+          CI: "true"
+          DEBUG: "pw:api"
         timeout-minutes: 15
 
       - name: Stop Supabase # Use the cleanup action
