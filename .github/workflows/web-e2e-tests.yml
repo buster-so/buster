@@ -49,12 +49,6 @@ jobs:
       - name: Setup Test Environment # Runs Supabase, migrations, seeding on host
         uses: ./.github/actions/setup-test-environment
 
-      # Install xvfb for X server virtualization
-      - name: Install xvfb
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y xvfb
-
       # Run API and Frontend builds in parallel
       - name: Frontend Install Dependencies and Build
         working-directory: ./web
@@ -127,28 +121,11 @@ jobs:
           echo "Checking make script content for 'start-fast':"
           cat web/Makefile | grep -A 10 "start-fast"
 
-      - name: Create and Verify auth.json for Playwright
-        working-directory: ./web
-        run: |
-          mkdir -p ./playwright-tests/auth-utils
-          echo '{"cookies":[],"localStorage":"{}","sessionStorage":"{}"}' > ./playwright-tests/auth-utils/auth.json
-          ls -la ./playwright-tests/auth-utils/
-          cat ./playwright-tests/auth-utils/auth.json
-
-      # Modify global-setup.ts to force headless mode
-      - name: Force Headless Mode in Global Setup
-        run: |
-          sed -i 's/chromium.launch({ headless: true })/chromium.launch({ headless: true, args: ["--disable-gpu", "--no-sandbox"] })/' ./web/playwright-tests/auth-utils/global-setup.ts
-          echo "Modified global-setup.ts:"
-          cat ./web/playwright-tests/auth-utils/global-setup.ts | grep -A 3 "chromium.launch"
-
       - name: Run Frontend E2E Tests with xvfb
         working-directory: ./web
         run: |
           echo "Running web E2E tests..."
-          # Use xvfb-run to provide a virtual display server
-          export PLAYWRIGHT_HEADLESS=true
-          npx playwright test --workers=1 --retries=0
+          npx playwright test
         env:
           NEXT_PUBLIC_API_URL: http://localhost:3001
           NEXT_PUBLIC_URL: http://localhost:3000
