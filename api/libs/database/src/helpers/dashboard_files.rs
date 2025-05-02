@@ -1,5 +1,5 @@
 use crate::enums::{AssetPermissionRole, AssetType};
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use diesel::JoinOnDsl;
 use diesel::{BoolExpressionMethods, ExpressionMethods, QueryDsl, Queryable};
 use diesel_async::RunQueryDsl;
@@ -9,6 +9,8 @@ use uuid::Uuid;
 use crate::models::{AssetPermission, DashboardFile};
 use crate::pool::get_pg_pool;
 use crate::schema::{asset_permissions, collections_to_assets, dashboard_files};
+use crate::types::VersionHistory;
+use chrono::Utc;
 
 /// Fetches a single dashboard file by ID that hasn't been deleted
 ///
@@ -173,7 +175,6 @@ pub async fn fetch_dashboard_file_with_permission(
     };
 
     // REMOVED: Logic that automatically granted CanView for public access.
-    // The handler is now responsible for checking public access rules.
     /*
     if is_public {
         if effective_permission.is_none() {
@@ -303,4 +304,73 @@ pub async fn fetch_dashboard_files_with_permissions(
         .collect();
 
     Ok(result)
+}
+
+/// Creates a new version of an existing dashboard file.
+///
+/// Fetches the specified dashboard, increments its version, creates a new record
+/// with the new version and a new ID, copying relevant details.
+///
+/// # Arguments
+/// * `old_dashboard_id` - The UUID of the dashboard file to create a new version of
+/// * `user_id` - The UUID of the user initiating the version creation
+///
+/// # Returns
+/// * `Result<DashboardFile>` - The newly created dashboard file record
+pub async fn create_new_dashboard_version(
+    old_dashboard_id: &Uuid,
+    user_id: &Uuid,
+) -> Result<DashboardFile> {
+    let pool = get_pg_pool();
+    let mut conn = pool.get().await?;
+
+    // Fetch the existing dashboard file
+    let old_dashboard = dashboard_files::table
+        .filter(dashboard_files::id.eq(old_dashboard_id))
+        .filter(dashboard_files::deleted_at.is_null())
+        .first::<DashboardFile>(&mut conn)
+        .await
+        .map_err(|e| anyhow!("Failed to fetch dashboard {}: {}", old_dashboard_id, e))?;
+
+    // Determine the new version number
+    let latest_version = old_dashboard
+        .version_history
+        .get_latest_version()
+        .ok_or_else(|| anyhow!("Dashboard {} has no version history", old_dashboard_id))?;
+    let new_version_number = latest_version.version_number + 1;
+    let latest_content = latest_version.content.clone();
+
+    // Create a new version history containing only the latest content with the new version number
+    let new_version_history = VersionHistory::new(new_version_number, latest_content);
+
+    let now = Utc::now();
+    let new_dashboard_id = Uuid::new_v4();
+
+    // Prepare the new dashboard file record
+    let new_dashboard = DashboardFile {
+        id: new_dashboard_id,
+        organization_id: old_dashboard.organization_id,
+        name: old_dashboard.name,
+        content: old_dashboard.content, // Content remains the same initially
+        version_history: new_version_history,
+        created_at: now,
+        updated_at: now,
+        deleted_at: None,
+        created_by: *user_id,
+        publicly_accessible: old_dashboard.publicly_accessible,
+        public_expiry_date: old_dashboard.public_expiry_date,
+        publicly_enabled_by: old_dashboard.publicly_enabled_by,
+        file_name: old_dashboard.file_name,
+        filter: old_dashboard.filter,
+        public_password: old_dashboard.public_password,
+    };
+
+    // Insert the new dashboard file record
+    diesel::insert_into(dashboard_files::table)
+        .values(&new_dashboard)
+        .execute(&mut conn)
+        .await
+        .map_err(|e| anyhow!("Failed to insert new dashboard version {}: {}", new_dashboard_id, e))?;
+
+    Ok(new_dashboard)
 }
