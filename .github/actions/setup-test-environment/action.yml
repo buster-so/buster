@@ -24,6 +24,7 @@ runs:
       run: cargo install diesel_cli --no-default-features --features postgres
 
     - name: Start Supabase
+      working-directory: ./api
       shell: bash
       run: |
         echo "Starting Supabase..."
