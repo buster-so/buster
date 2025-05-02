@@ -111,17 +111,38 @@ jobs:
           echo "API did not become healthy in time."
           exit 1
 
-      - name: Run Frontend E2E Tests
+      # Debug step to check dependencies and validate services
+      - name: Debug - Verify Environment
+        run: |
+          echo "Verifying API service:"
+          curl -v http://localhost:3001/health || echo "Failed to connect to API"
+          echo "Verifying Supabase service:"
+          curl -v http://127.0.0.1:54321/health || echo "Failed to connect to Supabase"
+          echo "Checking make script content for 'start-fast':"
+          cat web/Makefile | grep -A 10 "start-fast"
+
+      - name: Create and Verify auth.json for Playwright
         working-directory: ./web
         run: |
-          echo "Running web E2E tests..."
-          npm run test:e2e
+          mkdir -p ./playwright-tests/auth-utils
+          echo '{"cookies":[],"localStorage":"{}","sessionStorage":"{}"}' > ./playwright-tests/auth-utils/auth.json
+          ls -la ./playwright-tests/auth-utils/
+          cat ./playwright-tests/auth-utils/auth.json
+
+      - name: Run Frontend E2E Tests with Debugging
+        working-directory: ./web
+        run: |
+          echo "Running web E2E tests with debugging enabled..."
+          # Add the --trace=on flag to capture traces for each test
+          DEBUG=pw:api,pw:browser*,pw:protocol* PWDEBUG=console npx playwright test --trace=on --timeout=300000 --workers=1 --retries=0
         env:
           NEXT_PUBLIC_API_URL: http://localhost:3001
           NEXT_PUBLIC_URL: http://localhost:3000
           NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
           NEXT_PUBLIC_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODIzNDMwOTZ9.7UIsMFfHYKxH7bUJCRfxd6lr7CSXGF7UxtZQO10FMMo"
           NEXT_PUBLIC_WEB_SOCKET_URL: ws://localhost:3001
+          CI: "true" # Ensure CI mode is explicitly set
+        timeout-minutes: 15
 
       - name: Stop Supabase # Use the cleanup action
         uses: ./.github/actions/stop-supabase
