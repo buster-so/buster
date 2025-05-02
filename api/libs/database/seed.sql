@@ -4351,3 +4351,6 @@ SELECT pg_catalog.setval('supabase_functions.hooks_id_seq', 1, false);
 -- PostgreSQL database dump complete
 --
 
+update public.users set name = 'Chad' where id = 'c2dd64cd-f7f3-4884-bc91-d46ae431901e';
+update public.users set name = 'Blake' where id = '1fe85021-e799-471b-8837-953e9ae06e4c';
+update public.users set name = 'Nate' where id = '6840fa04-c0d7-4e0e-8d3d-ea9190d93874';
