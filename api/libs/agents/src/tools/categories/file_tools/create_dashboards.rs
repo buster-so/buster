@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::time::Instant;
 use std::{env, sync::Arc};
 
@@ -9,7 +10,9 @@ use database::{
     enums::{AssetPermissionRole, AssetType, IdentityType},
     models::{AssetPermission, DashboardFile, MetricFileToDashboardFile},
     pool::get_pg_pool,
-    schema::{asset_permissions, dashboard_files, metric_files_to_dashboard_files, users_to_organizations},
+    schema::{
+        asset_permissions, dashboard_files, metric_files_to_dashboard_files, users_to_organizations,
+    },
     types::{DashboardYml, VersionHistory},
 };
 use diesel::prelude::*;
@@ -27,10 +30,12 @@ use crate::{
 
 use super::{
     common::{generate_deterministic_uuid, validate_metric_ids},
+    create_metrics::FailedFileCreation,
     file_types::file::FileWithId,
     FileModificationTool,
-    create_metrics::FailedFileCreation,
 };
+
+use database::helpers::metric_files::fetch_metric_files_with_permissions;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct DashboardFileParams {
@@ -191,77 +196,130 @@ impl ToolExecutor for CreateDashboardFilesTool {
                     dashboard_ymls.push(dashboard_yml);
                 }
                 Err(e) => {
-                    failed_files.push(FailedFileCreation { name: file.name, error: e });
+                    failed_files.push(FailedFileCreation {
+                        name: file.name,
+                        error: e,
+                    });
                 }
             }
         }
 
-        // Second pass - bulk insert records
-        if !dashboard_records.is_empty() {
-            match insert_into(dashboard_files::table)
-                .values(&dashboard_records)
-                .execute(&mut conn)
+        // If no valid dashboards were processed, return early
+        if dashboard_records.is_empty() {
+            let duration = start_time.elapsed().as_millis() as i64;
+            return Ok(CreateDashboardFilesOutput {
+                message: "No valid dashboard files to create.".to_string(),
+                duration,
+                files: vec![],
+                failed_files,
+            });
+        }
+
+        // Collect all unique metric IDs from all valid dashboards
+        let all_metric_ids: Vec<Uuid> = dashboard_records
+            .iter()
+            .flat_map(|dr| {
+                dr.content
+                    .rows
+                    .iter()
+                    .flat_map(|row| row.items.iter().map(|item| item.id))
+            })
+            .collect::<std::collections::HashSet<_>>() // Deduplicate
+            .into_iter()
+            .collect();
+
+        // Fetch metric files to get their versions
+        let metric_versions = if !all_metric_ids.is_empty() {
+            fetch_metric_files_with_permissions(&all_metric_ids, &user_id)
                 .await
-            {
-                Ok(_) => {
-                    // Get the user ID from the agent state
-                    // let user_id = self.agent.get_user_id(); // Redundant
-                    
-                    // Create asset permissions for each dashboard file
-                    for dashboard_file in &dashboard_records {
-                        let asset_permission = AssetPermission {
-                            asset_id: dashboard_file.id,
-                            asset_type: AssetType::DashboardFile,
-                            identity_id: user_id,
-                            identity_type: IdentityType::User,
-                            role: AssetPermissionRole::Owner,
-                            created_by: user_id,
-                            updated_by: user_id,
-                            created_at: Utc::now(),
-                            updated_at: Utc::now(),
-                            deleted_at: None,
-                        };
-                        
-                        match diesel::insert_into(asset_permissions::table)
-                            .values(&asset_permission)
-                            .execute(&mut conn)
-                            .await
-                        {
-                            Ok(_) => (),
-                            Err(e) => {
-                                tracing::warn!(
-                                    "Failed to create asset permission for dashboard file {}: {}",
-                                    dashboard_file.id,
-                                    e
-                                );
-                            }
+                .map_err(|e| anyhow!("Failed to fetch metric file versions: {}", e))?
+                .into_iter()
+                .map(|mfp| {
+                    (
+                        mfp.metric_file.id,
+                        mfp.metric_file.version_history.get_version_number(),
+                    )
+                })
+                .collect::<HashMap<_, _>>()
+        } else {
+            HashMap::new()
+        };
+
+        // Second pass - bulk insert records
+        // Note: Transaction might be better here, but keeping existing pattern for now
+        match insert_into(dashboard_files::table)
+            .values(&dashboard_records)
+            .execute(&mut conn)
+            .await
+        {
+            Ok(_) => {
+                // Create asset permissions for each dashboard file
+                for dashboard_file in &dashboard_records {
+                    let asset_permission = AssetPermission {
+                        asset_id: dashboard_file.id,
+                        asset_type: AssetType::DashboardFile,
+                        identity_id: user_id,
+                        identity_type: IdentityType::User,
+                        role: AssetPermissionRole::Owner,
+                        created_by: user_id,
+                        updated_by: user_id,
+                        created_at: Utc::now(),
+                        updated_at: Utc::now(),
+                        deleted_at: None,
+                    };
+
+                    match diesel::insert_into(asset_permissions::table)
+                        .values(&asset_permission)
+                        .execute(&mut conn)
+                        .await
+                    {
+                        Ok(_) => (),
+                        Err(e) => {
+                            tracing::warn!(
+                                "Failed to create asset permission for dashboard file {}: {}",
+                                dashboard_file.id,
+                                e
+                            );
                         }
                     }
-                    
-                    // Create associations between metrics and dashboards
-                    for (i, dashboard_record) in dashboard_records.iter().enumerate() {
-                        let metric_ids: Vec<Uuid> = dashboard_record.content
-                            .rows
+                }
+
+                // Create associations between metrics and dashboards
+                for dashboard_record in dashboard_records.iter() {
+                    let metric_ids: Vec<Uuid> = dashboard_record
+                        .content
+                        .rows
+                        .iter()
+                        .flat_map(|row| row.items.iter())
+                        .map(|item| item.id)
+                        .collect();
+
+                    if !metric_ids.is_empty() {
+                        // Create a Vec of MetricFileToDashboardFile objects for bulk insert
+                        let metric_dashboard_values: Vec<MetricFileToDashboardFile> = metric_ids
                             .iter()
-                            .flat_map(|row| row.items.iter())
-                            .map(|item| item.id)
-                            .collect();
-                        
-                        if !metric_ids.is_empty() {
-                            // Create a Vec of MetricFileToDashboardFile objects for bulk insert
-                            let metric_dashboard_values: Vec<MetricFileToDashboardFile> = metric_ids
-                                .iter()
-                                .map(|metric_id| MetricFileToDashboardFile {
-                                    metric_file_id: *metric_id,
-                                    dashboard_file_id: dashboard_record.id,
-                                    created_at: Utc::now(),
-                                    updated_at: Utc::now(),
-                                    deleted_at: None,
-                                    created_by: user_id,
+                            .filter_map(|metric_id| {
+                                // Use filter_map to handle potential missing versions
+                                metric_versions.get(metric_id).map(|metric_version| {
+                                    MetricFileToDashboardFile {
+                                        metric_file_id: *metric_id,
+                                        dashboard_file_id: dashboard_record.id,
+                                        created_at: Utc::now(),
+                                        updated_at: Utc::now(),
+                                        deleted_at: None,
+                                        created_by: user_id,
+                                        dashboard_version_number: dashboard_record
+                                            .version_history
+                                            .get_version_number(),
+                                        metric_version_number: *metric_version, // Use fetched version
+                                    }
                                 })
-                                .collect();
-                            
-                            // Insert the associations
+                            })
+                            .collect();
+
+                        // Insert the associations
+                        if !metric_dashboard_values.is_empty() {
+                            // Check if there are any valid associations
                             match diesel::insert_into(metric_files_to_dashboard_files::table)
                                 .values(&metric_dashboard_values)
                                 .on_conflict_do_nothing() // In case the association already exists
@@ -271,37 +329,39 @@ impl ToolExecutor for CreateDashboardFilesTool {
                                 Ok(_) => (),
                                 Err(e) => {
                                     tracing::warn!(
-                                        "Failed to create metric-to-dashboard associations for dashboard {}: {}",
-                                        dashboard_record.id,
-                                        e
-                                    );
+                                            "Failed to create metric-to-dashboard associations for dashboard {}: {}",
+                                            dashboard_record.id,
+                                            e
+                                        );
                                 }
                             }
                         }
                     }
-                    
-                    for (i, yml) in dashboard_ymls.into_iter().enumerate() {
-                        created_files.push(FileWithId {
-                            id: dashboard_records[i].id,
-                            name: dashboard_records[i].name.clone(),
-                            file_type: "dashboard".to_string(),
-                            yml_content: serde_yaml::to_string(&yml).unwrap_or_default(),
-                            result_message: None,
-                            results: None,
-                            created_at: dashboard_records[i].created_at,
-                            updated_at: dashboard_records[i].updated_at,
-                            version_number: dashboard_records[i].version_history.get_version_number(),
-                        });
+                }
+
+                for (i, yml) in dashboard_ymls.into_iter().enumerate() {
+                    let record = &dashboard_records[i];
+                    created_files.push(FileWithId {
+                        id: record.id,
+                        name: record.name.clone(),
+                        file_type: "dashboard".to_string(),
+                        yml_content: serde_yaml::to_string(&yml).unwrap_or_default(),
+                        result_message: None,
+                        results: None,
+                        created_at: record.created_at,
+                        updated_at: record.updated_at,
+                        version_number: record.version_history.get_version_number(),
+                    });
+                }
+            }
+            Err(e) => {
+                failed_files.extend(dashboard_records.iter().map(|r| {
+                    // Use iter() here as well
+                    FailedFileCreation {
+                        name: r.file_name.clone(),
+                        error: format!("Failed to create dashboard file: {}", e),
                     }
-                }
-                Err(e) => {
-                    failed_files.extend(dashboard_records.iter().map(|r| {
-                        FailedFileCreation {
-                            name: r.file_name.clone(),
-                            error: format!("Failed to create dashboard file: {}", e),
-                        }
-                    }));
-                }
+                }));
             }
         }
 
@@ -343,9 +403,9 @@ impl ToolExecutor for CreateDashboardFilesTool {
             self.agent
                 .set_state_value(String::from("dashboards_available"), Value::Bool(true))
                 .await;
-            
+
             self.agent
-                .set_state_value(String::from("files_available"), Value::Bool(true)) 
+                .set_state_value(String::from("files_available"), Value::Bool(true))
                 .await;
         }
 
