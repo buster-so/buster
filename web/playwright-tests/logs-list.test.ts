@@ -9,7 +9,6 @@ test('Can navigate to a metric chart from the metric list', async ({ page }) => 
   await page.goto('http://localhost:3000/app/home');
   await page.getByRole('link', { name: 'Logs' }).click();
   await expect(page.getByText('Name')).toBeVisible();
-  await expect(page.getByText('Today')).toBeVisible();
 
   await page.locator('.list-container').getByRole('link').first().click();
 

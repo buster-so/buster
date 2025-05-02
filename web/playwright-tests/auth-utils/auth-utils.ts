@@ -69,6 +69,17 @@ export async function login(page: Page) {
   await page.getByRole('textbox', { name: 'Password' }).fill('password');
   await page.getByRole('button', { name: 'Sign in' }).click();
   await page.waitForURL('http://localhost:3000/app/home');
+  await page.waitForTimeout(350);
+  await page.goto('http://localhost:3000/app/new-user');
+  await page.getByRole('button', { name: 'Get Started' }).click();
+  await page.getByRole('textbox', { name: 'What is your full name' }).dblclick();
+  await page.getByRole('textbox', { name: 'What is your full name' }).fill('Chad');
+
+  await page.waitForTimeout(50);
+  await page.getByRole('button', { name: 'Create your account' }).click();
+  await page.waitForTimeout(50);
+
+  await page.waitForURL('http://localhost:3000/app/home');
 
   // Wait for the page to be fully loaded before accessing storage
   await page.waitForLoadState('networkidle');

@@ -3,6 +3,7 @@ import { applyAuth, login, authFile, hasValidAuth } from './auth-utils';
 import * as fs from 'fs';
 
 async function globalSetup(config: FullConfig) {
+  console.log('Starting global setup');
   try {
     // Make sure auth file exists with at least empty valid JSON to prevent errors
     if (!fs.existsSync(authFile)) {
@@ -37,9 +38,12 @@ async function globalSetup(config: FullConfig) {
       throw new Error(`Error during global setup: Failed to create page - ${error}`);
     });
 
+    const hasValidAuthJSON = hasValidAuth();
+    console.log('hasValidAuthJSON', hasValidAuthJSON);
+
     try {
       // Check if we have valid stored credentials
-      if (hasValidAuth()) {
+      if (hasValidAuthJSON) {
         const authSuccess = await applyAuth(page);
 
         if (authSuccess) {
