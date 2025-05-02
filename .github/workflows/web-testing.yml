@@ -145,10 +145,10 @@ jobs:
       - name: Run Frontend E2E Tests with xvfb
         working-directory: ./web
         run: |
-          echo "Running web E2E tests with xvfb..."
+          echo "Running web E2E tests..."
           # Use xvfb-run to provide a virtual display server
           export PLAYWRIGHT_HEADLESS=true
-          xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" npx playwright test --timeout=300000 --workers=1 --retries=0
+          npx playwright test --workers=1 --retries=0
         env:
           NEXT_PUBLIC_API_URL: http://localhost:3001
           NEXT_PUBLIC_URL: http://localhost:3000
