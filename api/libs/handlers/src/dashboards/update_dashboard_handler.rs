@@ -4,7 +4,7 @@ use database::enums::{AssetPermissionRole, Verification};
 use database::helpers::dashboard_files::fetch_dashboard_file_with_permission;
 use database::models::MetricFileToDashboardFile;
 use database::pool::get_pg_pool;
-use database::schema::{dashboard_files, metric_files_to_dashboard_files};
+use database::schema::{dashboard_files, metric_files, metric_files_to_dashboard_files};
 use database::types::dashboard_yml::{DashboardYml, Row, RowItem};
 use database::types::VersionHistory;
 use diesel::{ExpressionMethods, QueryDsl};
@@ -304,8 +304,18 @@ pub async fn update_dashboard_handler(
     // Extract metric IDs from the updated dashboard content
     let metric_ids = extract_metric_ids_from_dashboard(&dashboard_yml);
 
-    // Update metric associations
-    update_dashboard_metric_associations(dashboard_id, metric_ids, &user.id, &mut conn).await?;
+    // Get the latest dashboard version number AFTER potential updates
+    let latest_dashboard_version = current_version_history.get_version_number();
+
+    // Update metric associations for the specific new/updated dashboard version
+    update_dashboard_metric_associations(
+        dashboard_id,
+        latest_dashboard_version,
+        metric_ids,
+        &user.id,
+        &mut conn,
+    )
+    .await?;
 
     // Return the updated dashboard
     get_dashboard_handler(&dashboard_id, user, None, None).await
@@ -326,84 +336,121 @@ fn extract_metric_ids_from_dashboard(dashboard: &DashboardYml) -> Vec<Uuid> {
     metric_ids
 }
 
-/// Update associations between a dashboard and its metrics
+/// Update associations between a dashboard (specific version) and its metrics
 async fn update_dashboard_metric_associations(
     dashboard_id: Uuid,
+    dashboard_version_number: i32,
     metric_ids: Vec<Uuid>,
     user_id: &Uuid,
     conn: &mut diesel_async::AsyncPgConnection,
 ) -> Result<()> {
-    // First, mark all existing associations as deleted
+    let now = Utc::now();
+
+    // First, mark all existing associations for this specific dashboard version as deleted
+    // This ensures that if metrics are removed, their associations are marked deleted.
     diesel::update(
         metric_files_to_dashboard_files::table
             .filter(metric_files_to_dashboard_files::dashboard_file_id.eq(dashboard_id))
+            .filter(
+                metric_files_to_dashboard_files::dashboard_version_number
+                    .eq(dashboard_version_number),
+            )
             .filter(metric_files_to_dashboard_files::deleted_at.is_null()),
     )
-    .set(metric_files_to_dashboard_files::deleted_at.eq(Utc::now()))
+    .set(metric_files_to_dashboard_files::deleted_at.eq(now))
     .execute(conn)
     .await?;
 
-    // For each metric ID, either create a new association or restore a previously deleted one
+    // Prepare lists for batch operations
+    let mut associations_to_restore = Vec::new();
+    let mut associations_to_insert = Vec::new();
+
+    // For each metric ID in the current dashboard content...
     for metric_id in metric_ids {
-        // Check if the metric exists
+        // Check if the metric exists and is not deleted
         let metric_exists = diesel::dsl::select(diesel::dsl::exists(
-            database::schema::metric_files::table
-                .filter(database::schema::metric_files::id.eq(metric_id))
-                .filter(database::schema::metric_files::deleted_at.is_null()),
+            metric_files::table
+                .filter(metric_files::id.eq(metric_id))
+                .filter(metric_files::deleted_at.is_null()),
         ))
         .get_result::<bool>(conn)
-        .await;
+        .await
+        .unwrap_or(false);
 
-        // Skip if metric doesn't exist
-        if let Ok(exists) = metric_exists {
-            if !exists {
-                continue;
-            }
-        } else {
+        if !metric_exists {
+            tracing::warn!(%metric_id, %dashboard_id, "Metric not found or deleted, skipping association.");
             continue;
         }
 
-        // Check if there's a deleted association that can be restored
-        let existing = metric_files_to_dashboard_files::table
+        // Check if an association record exists for this dashboard/metric/version combo
+        let existing_association = metric_files_to_dashboard_files::table
             .filter(metric_files_to_dashboard_files::dashboard_file_id.eq(dashboard_id))
             .filter(metric_files_to_dashboard_files::metric_file_id.eq(metric_id))
+            .filter(
+                metric_files_to_dashboard_files::dashboard_version_number
+                    .eq(dashboard_version_number),
+            )
             .first::<MetricFileToDashboardFile>(conn)
             .await;
 
-        match existing {
+        match existing_association {
             Ok(assoc) if assoc.deleted_at.is_some() => {
-                // Restore the deleted association
-                diesel::update(
-                    metric_files_to_dashboard_files::table
-                        .filter(metric_files_to_dashboard_files::dashboard_file_id.eq(dashboard_id))
-                        .filter(metric_files_to_dashboard_files::metric_file_id.eq(metric_id)),
-                )
-                .set((
-                    metric_files_to_dashboard_files::deleted_at
-                        .eq::<Option<chrono::DateTime<Utc>>>(None),
-                    metric_files_to_dashboard_files::updated_at.eq(Utc::now()),
-                ))
-                .execute(conn)
-                .await?;
+                // Association exists but was marked deleted, needs restore
+                associations_to_restore.push((dashboard_id, metric_id, dashboard_version_number));
             }
             Ok(_) => {
-                // Association already exists and is not deleted, do nothing
+                // Association already exists and is active for this version, do nothing
             }
             Err(diesel::result::Error::NotFound) => {
-                // Create a new association
-                diesel::insert_into(metric_files_to_dashboard_files::table)
-                    .values((
-                        metric_files_to_dashboard_files::dashboard_file_id.eq(dashboard_id),
-                        metric_files_to_dashboard_files::metric_file_id.eq(metric_id),
-                        metric_files_to_dashboard_files::created_at.eq(Utc::now()),
-                        metric_files_to_dashboard_files::updated_at.eq(Utc::now()),
-                        metric_files_to_dashboard_files::created_by.eq(user_id),
-                    ))
-                    .execute(conn)
-                    .await?;
+                // No association exists for this version, needs insertion
+                // Fetch the latest version number for the metric
+                let latest_metric_version = metric_files::table
+                    .filter(metric_files::id.eq(metric_id))
+                    .select(metric_files::version_history)
+                    .first::<VersionHistory>(conn)
+                    .await?
+                    .get_version_number();
+
+                associations_to_insert.push(MetricFileToDashboardFile {
+                    metric_file_id: metric_id,
+                    dashboard_file_id: dashboard_id,
+                    metric_version_number: latest_metric_version,
+                    dashboard_version_number: dashboard_version_number,
+                    created_at: now,
+                    updated_at: now,
+                    deleted_at: None,
+                    created_by: *user_id,
+                });
             }
-            Err(e) => return Err(anyhow!("Database error: {}", e)),
+            Err(e) => return Err(anyhow!("Database error checking association: {}", e)),
         }
+    }
+
+    // Batch restore deleted associations
+    if !associations_to_restore.is_empty() {
+        for (d_id, m_id, d_ver) in associations_to_restore {
+            diesel::update(
+                metric_files_to_dashboard_files::table
+                    .filter(metric_files_to_dashboard_files::dashboard_file_id.eq(d_id))
+                    .filter(metric_files_to_dashboard_files::metric_file_id.eq(m_id))
+                    .filter(metric_files_to_dashboard_files::dashboard_version_number.eq(d_ver)),
+            )
+            .set((
+                metric_files_to_dashboard_files::deleted_at
+                    .eq::<Option<chrono::DateTime<Utc>>>(None),
+                metric_files_to_dashboard_files::updated_at.eq(Utc::now()),
+            ))
+            .execute(conn)
+            .await?;
+        }
+    }
+
+    // Batch insert new associations
+    if !associations_to_insert.is_empty() {
+        diesel::insert_into(metric_files_to_dashboard_files::table)
+            .values(&associations_to_insert)
+            .execute(conn)
+            .await?;
     }
 
     Ok(())

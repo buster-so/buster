@@ -29,7 +29,7 @@ pub struct MetricVersionInput {
 ///
 /// # Returns
 /// * `Result<()>` - Ok on success, or an error.
-pub async fn upgrade_metric_and_dashboard_version(
+pub async fn update_metric_dashboard_assocations(
     metric_versions_input: Vec<MetricVersionInput>,
     user_id: Uuid,
 ) -> Result<()> {
@@ -143,7 +143,7 @@ pub async fn upgrade_metric_and_dashboard_version(
 ///
 /// # Returns
 /// * `Result<()>` - Ok on success, or an error.
-pub async fn update_dashboard_version(
+pub async fn update_dashboard_metric_associations(
     old_dashboard_id_param: Uuid,
     new_dashboard_id_param: Uuid,
     new_dashboard_version_param: i32,

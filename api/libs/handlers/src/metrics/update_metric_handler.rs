@@ -11,6 +11,9 @@ use database::{
         VersionContent, VersionHistory,
     },
 };
+use database::helpers::metric_files_to_dashboard_files::{
+    update_metric_dashboard_assocations, MetricVersionInput,
+};
 use dataset_security::has_all_datasets_access;
 use diesel::{insert_into, AsChangeset, ExpressionMethods, QueryDsl};
 use diesel_async::RunQueryDsl;
@@ -381,6 +384,28 @@ pub async fn update_metric_handler(
                     e
                 )
             })?;
+    }
+
+    // --- Upgrade dependent dashboards if a new metric version was created ---
+    // Only run if the metric update itself was successful and versioning happened
+    if should_update_version || request.restore_to_version.is_some() {
+        let metric_version_input = vec![MetricVersionInput {
+            metric_id: *metric_id,
+            new_metric_version: latest_version_number,
+        }];
+        if let Err(e) =
+            update_metric_dashboard_assocations(metric_version_input, user.id).await
+        {
+            // Log the error but don't fail the entire metric update operation
+            // because the core metric update was successful.
+            warn!(
+                metric_id = %metric_id,
+                new_version = latest_version_number,
+                user_id = %user.id,
+                error = %e,
+                "Failed to upgrade associated dashboards for updated metric"
+            );
+        }
     }
 
     // Return the updated metric (latest version)

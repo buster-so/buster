@@ -416,7 +416,7 @@ diesel::table! {
 }
 
 diesel::table! {
-    metric_files_to_dashboard_files (metric_file_id, dashboard_file_id) {
+    metric_files_to_dashboard_files (metric_file_id, dashboard_file_id, metric_version_number, dashboard_version_number) {
         metric_file_id -> Uuid,
         dashboard_file_id -> Uuid,
         created_at -> Timestamptz,

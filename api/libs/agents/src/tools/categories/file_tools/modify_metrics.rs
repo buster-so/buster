@@ -6,20 +6,23 @@ use braintrust::{get_prompt_system_message, BraintrustClient};
 use database::{
     models::{MetricFile, MetricFileToDataset},
     pool::get_pg_pool,
-    schema::{datasets, metric_files, metric_files_to_datasets},
-    types::MetricYml,
+    schema::{metric_files, metric_files_to_datasets},
+    types::{MetricYml, VersionContent, VersionHistory},
 };
-use diesel::{upsert::excluded, ExpressionMethods, QueryDsl};
+use diesel::{insert_into, upsert::excluded, ExpressionMethods, QueryDsl};
 use diesel_async::RunQueryDsl;
 use futures::future::join_all;
 use indexmap::IndexMap;
-use query_engine::{data_source_query_routes::query_engine::query_engine, data_types::DataType};
+use query_engine::data_types::DataType;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use tracing::{debug, error, info};
+use tracing::{debug, error, info, warn};
 use uuid::Uuid;
 use chrono::Utc;
 use std::collections::HashMap;
+use database::helpers::metric_files_to_dashboard_files::{
+    update_metric_dashboard_assocations, MetricVersionInput,
+};
 
 use super::{
     common::{
@@ -350,7 +353,6 @@ impl ToolExecutor for ModifyMetricFilesTool {
 
         // Update metric files in database with version history and metadata
         if !batch.files.is_empty() {
-            use diesel::insert_into;
             match insert_into(metric_files::table)
                 .values(&batch.files)
                 .on_conflict(metric_files::id)
@@ -412,6 +414,36 @@ impl ToolExecutor for ModifyMetricFilesTool {
                         }
                    }
                     // --- End Insert --- 
+
+                    // --- Upgrade dependent dashboards --- 
+                    let user_id = self.agent.get_user_id();
+                    for (i, metric_file) in batch.files.iter().enumerate() {
+                        let latest_version_number = batch.updated_versions[i];
+                        let metric_version_input = vec![MetricVersionInput {
+                            metric_id: metric_file.id,
+                            new_metric_version: latest_version_number,
+                        }];
+                        if let Err(e) = update_metric_dashboard_assocations(
+                            metric_version_input,
+                            user_id,
+                        )
+                        .await
+                        {
+                            // Log error but don't fail the whole tool operation
+                            warn!(
+                                metric_id = %metric_file.id,
+                                new_version = latest_version_number,
+                                error = %e,
+                                "Failed to upgrade associated dashboards for updated metric"
+                            );
+                            // Optionally add to failed_updates for visibility
+                            batch.failed_updates.push((
+                                format!("Dashboard Association for Metric {}", metric_file.id),
+                                format!("Failed to upgrade dashboards: {}", e)
+                            ));
+                        }
+                    }
+                    // --- End Dashboard Upgrade --- 
 
                 }
                 Err(e) => {
