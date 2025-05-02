@@ -70,6 +70,10 @@ export async function login(page: Page) {
   await page.getByRole('button', { name: 'Sign in' }).click();
   await page.waitForURL('http://localhost:3000/app/home');
 
+  // Wait for the page to be fully loaded before accessing storage
+  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
+
   // Save authentication data
   const authData = {
     cookies: await page.context().cookies(),

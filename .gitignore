@@ -66,3 +66,4 @@ node_modules/
 /prds
 .DS_Store
 .aider*
+web/playwright-tests/auth-utils/auth.json
