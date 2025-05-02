@@ -423,7 +423,8 @@ diesel::table! {
         updated_at -> Timestamptz,
         deleted_at -> Nullable<Timestamptz>,
         created_by -> Uuid,
-        version_number -> Int4,
+        metric_version_number -> Int4,
+        dashboard_version_number -> Int4,
     }
 }
 

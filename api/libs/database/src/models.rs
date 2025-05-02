@@ -740,7 +740,8 @@ pub struct MetricFileToDashboardFile {
     pub updated_at: DateTime<Utc>,
     pub deleted_at: Option<DateTime<Utc>>,
     pub created_by: Uuid,
-    pub version_number: i32,
+    pub metric_version_number: i32,
+    pub dashboard_version_number: i32,
 }
 
 #[derive(Queryable, Insertable, Associations, Debug)]
