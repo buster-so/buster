@@ -732,6 +732,7 @@ pub enum StepProgress {
 #[diesel(belongs_to(MetricFile, foreign_key = metric_file_id))]
 #[diesel(belongs_to(DashboardFile, foreign_key = dashboard_file_id))]
 #[diesel(table_name = metric_files_to_dashboard_files)]
+#[diesel(primary_key(metric_file_id, dashboard_file_id))]
 pub struct MetricFileToDashboardFile {
     pub metric_file_id: Uuid,
     pub dashboard_file_id: Uuid,
@@ -739,6 +740,7 @@ pub struct MetricFileToDashboardFile {
     pub updated_at: DateTime<Utc>,
     pub deleted_at: Option<DateTime<Utc>>,
     pub created_by: Uuid,
+    pub version_number: i32,
 }
 
 #[derive(Queryable, Insertable, Associations, Debug)]
