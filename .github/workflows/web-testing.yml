@@ -2,8 +2,8 @@ name: Web App E2E Testing
 
 on:
   pull_request:
-    branches:
-      - main
+    paths:
+      - "web/**"
 
 jobs:
   test:
@@ -30,7 +30,7 @@ jobs:
       - name: Setup Node.js (Blacksmith Cache)
         uses: useblacksmith/setup-node@v5
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Mount NPM Cache (Sticky Disk)
         uses: useblacksmith/stickydisk@v1
@@ -55,7 +55,7 @@ jobs:
           context: ./api
           file: ./api/Dockerfile
           push: false # Do not push, load locally for service container
-          load: true  # Load the image into the runner's Docker daemon
+          load: true # Load the image into the runner's Docker daemon
           tags: local-api-test:latest # Tag for the service definition
 
       # --- Start API Container Manually ---
@@ -101,6 +101,7 @@ jobs:
           echo "Running web E2E tests..."
           # Add your actual test command here, e.g.:
           npm install # Or yarn install, pnpm install
+          npx playwright install --with-deps
           npm run build # If needed
           npm run test:e2e
         env:
@@ -109,7 +110,7 @@ jobs:
           NEXT_PUBLIC_URL: http://localhost:3000 # Assuming default URL for the app itself
           # Use Supabase details - pointing to Supabase running on the HOST (127.0.0.1)
           NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321 # Default local URL on host
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODIzNDMwOTZ9.7UIsMFfHYKxH7bUJCRfxd6lr7CSXGF7UxtZQO10FMMo' # Use default local value
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODIzNDMwOTZ9.7UIsMFfHYKxH7bUJCRfxd6lr7CSXGF7UxtZQO10FMMo" # Use default local value
           NEXT_PUBLIC_WEB_SOCKET_URL: ws://localhost:3001 # Point WS to API service container
 
           # Pass any other required NEXT_PUBLIC_ variables

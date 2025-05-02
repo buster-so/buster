@@ -14,10 +14,7 @@
     "analyze": "ANALYZE=true next build",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:debug": "playwright test --debug",
-    "test:e2e:codegen": "playwright codegen",
-    "test:e2e:clear-auth": "node -e \"require('fs').existsSync('./playwright-tests/auth.json') && require('fs').unlinkSync('./playwright-tests/auth.json') && console.log('Auth state cleared') || console.log('No auth state to clear')\"",
-    "test:e2e:setup-auth": "npx ts-node playwright-tests/auth-setup.ts"
+    "test:e2e:debug": "playwright test --debug"
   },
   "engines": {
     "node": ">=22.9.0"
