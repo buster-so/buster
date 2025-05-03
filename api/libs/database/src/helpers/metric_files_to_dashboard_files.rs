@@ -56,12 +56,7 @@ pub async fn update_metric_dashboard_assocations(
                 let latest_associations = metric_files_to_dashboard_files::table
                     .filter(metric_file_id.eq_any(&metric_ids_input))
                     .filter(deleted_at.is_null())
-                    .distinct_on((
-                        metric_file_id,
-                        dashboard_file_id,
-                        metric_version_number,
-                        dashboard_version_number,
-                    ))
+                    .distinct_on((metric_file_id, dashboard_file_id))
                     .order_by((
                         metric_file_id,
                         dashboard_file_id,
