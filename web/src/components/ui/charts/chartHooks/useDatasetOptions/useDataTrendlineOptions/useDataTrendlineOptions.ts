@@ -5,8 +5,7 @@ import {
   type Trendline
 } from '@/api/asset_interfaces/metric/charts';
 import { useMemo } from 'react';
-import last from 'lodash/last';
-import { DatasetOption, DatasetOptionsWithTicks } from '../interfaces';
+import { DatasetOptionsWithTicks } from '../interfaces';
 import { TrendlineDataset } from './trendlineDataset.types';
 import { canSupportTrendlineRecord } from './canSupportTrendline';
 import { trendlineDatasetCreator } from './trendlineDatasetCreator';

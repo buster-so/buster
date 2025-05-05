@@ -87,7 +87,8 @@ export const BusterChartJSComponent = React.memo(
         trendlines: dataTrendlineOptions,
         columnLabelFormats,
         selectedChartType,
-        lineGroupType
+        lineGroupType,
+        barGroupType
       });
 
       const data: ChartProps<ChartJSChartType>['data'] = useSeriesOptions({

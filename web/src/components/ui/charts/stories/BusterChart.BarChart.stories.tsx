@@ -1005,3 +1005,43 @@ export const WithGoalLinesNotSimilar: Story = {
     ]
   }
 };
+
+export const WithTrendlines: Story = {
+  args: {
+    ...Default.args,
+    trendlines: [
+      {
+        type: 'max',
+        show: true,
+        showTrendlineLabel: false,
+        trendlineLabel: 'Testing Max',
+        trendLineColor: 'red',
+        columnId: 'sales'
+      },
+      {
+        type: 'min',
+        show: true,
+        showTrendlineLabel: true,
+        trendlineLabel: 'Testing Min',
+        trendLineColor: 'blue',
+        columnId: 'sales'
+      },
+      {
+        type: 'average',
+        show: true,
+        showTrendlineLabel: true,
+        trendlineLabel: 'Testing Average',
+        trendLineColor: 'green',
+        columnId: 'sales'
+      },
+      {
+        type: 'median',
+        show: true,
+        showTrendlineLabel: true,
+        trendlineLabel: 'Testing Median',
+        trendLineColor: 'yellow',
+        columnId: 'sales'
+      }
+    ]
+  }
+};

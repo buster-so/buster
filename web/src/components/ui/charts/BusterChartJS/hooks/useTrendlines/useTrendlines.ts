@@ -15,12 +15,14 @@ export const useTrendlines = ({
   trendlines,
   columnLabelFormats,
   selectedChartType,
-  lineGroupType
+  lineGroupType,
+  barGroupType
 }: {
   trendlines: TrendlineDataset[];
   selectedChartType: ChartType;
   columnLabelFormats: NonNullable<BusterChartConfigProps['columnLabelFormats']>;
   lineGroupType: BusterChartConfigProps['lineGroupType'];
+  barGroupType: BusterChartConfigProps['barGroupType'];
 }): {
   trendlineAnnotations: AnnotationPluginOptions['annotations'];
   trendlineSeries: ChartProps<'line'>['data']['datasets'][number][];
@@ -29,8 +31,11 @@ export const useTrendlines = ({
     if (selectedChartType === 'line') {
       return lineGroupType !== 'percentage-stack';
     }
+    if (selectedChartType === 'bar') {
+      return barGroupType !== 'percentage-stack';
+    }
     return selectedChartType === 'scatter';
-  }, [selectedChartType, lineGroupType]);
+  }, [selectedChartType, lineGroupType, barGroupType]);
 
   const annotationTrendlines = useMemo(() => {
     if (!canSupportTrendlines) return [];
