@@ -13,7 +13,7 @@ const SelectGroup = SelectPrimitive.Group;
 const SelectValue = SelectPrimitive.Value;
 
 export const selectVariants = cva(
-  'flex w-full gap-x-1.5 transition-colors transition-border text-foreground duration-200 items-center justify-between rounded border px-3 py-1 text-sm focus:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 [&>span]:line-clamp-1 ',
+  'flex w-full gap-x-1.5 transition-colors transition-border text-foreground duration-200 items-center justify-between rounded border px-3 py-1 text-sm focus:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 [&>span]:line-clamp-1 [&>span]:text-left',
   {
     variants: {
       variant: {

@@ -47,7 +47,7 @@ export const BusterChartLegend: React.FC<BusterChartLegendProps> = React.memo(
       const hasHeadline = !completedInitialAnimation.current
         ? showLegendHeadline
         : legendItems.some((item) => item.headline);
-      if (hasHeadline) return '44px';
+      if (hasHeadline) return '38px';
       return '24px';
     }, [legendItems, showLegendHeadline]);
 

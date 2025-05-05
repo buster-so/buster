@@ -91,7 +91,7 @@ const LegendItemStandard = React.memo(
 
     const itemWrapperAnimation = useMemo(() => {
       return {
-        height: hasHeadline ? 44 : 24,
+        height: hasHeadline ? 38 : 24,
         borderRadius: hasHeadline ? 8 : 4
       };
     }, [hasHeadline]);
@@ -105,8 +105,7 @@ const LegendItemStandard = React.memo(
         onMouseEnter={onMouseEnterHandler}
         onMouseLeave={onMouseLeaveHandler}
         className={cn(
-          'flex flex-col justify-center space-y-1',
-          'h-[24px] rounded-sm px-2.5',
+          'flex h-[24px] flex-col justify-center space-y-0 rounded-sm px-2.5',
           clickable && 'transition-background hover:bg-item-hover cursor-pointer duration-100'
         )}>
         <AnimatePresence initial={false}>
@@ -137,9 +136,8 @@ const LegendItemStandard = React.memo(
 
           <div
             className={cn(
-              'items-center truncate text-base transition-all duration-100 select-none',
-              !inactive ? 'text-foreground' : 'text-text-secondary',
-              hasHeadline && 'flex'
+              'flex max-w-[185px] items-center truncate text-base transition-all duration-100 select-none',
+              !inactive ? 'text-foreground' : 'text-text-secondary'
             )}>
             <AnimatePresence mode="wait" initial={false}>
               {headlinePreText && (
@@ -151,7 +149,7 @@ const LegendItemStandard = React.memo(
               )}
             </AnimatePresence>
 
-            {formattedName}
+            <span className="swag"> {formattedName}</span>
           </div>
         </div>
       </motion.div>
