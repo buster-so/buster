@@ -93,7 +93,7 @@ export const FilterDashboardButton: React.FC = React.memo(() => {
       emptyStateText="No filters found"
       menuHeaderClassName="p-0!"
       onSelect={onSelectItem}>
-      <Button variant="ghost" prefix={<BarsFilter />}>
+      <Button variant="ghost" prefix={<BarsFilter />} data-testid="filter-dashboard-button">
         Filter
       </Button>
     </Dropdown>

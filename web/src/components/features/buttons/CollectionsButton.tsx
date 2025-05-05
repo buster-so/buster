@@ -9,7 +9,10 @@ export const CollectionButton: React.FC<{
 }> = ({ buttonType = 'default', useText = false }) => {
   return (
     <AppTooltip title={!useText ? 'Add to collection' : ''}>
-      <Button prefix={<ASSET_ICONS.collections />} variant={buttonType}>
+      <Button
+        prefix={<ASSET_ICONS.collections />}
+        variant={buttonType}
+        data-testid="add-to-collection-button">
         {useText ? 'Collections' : ''}
       </Button>
     </AppTooltip>

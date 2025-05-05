@@ -84,6 +84,7 @@ export const AppCodeEditor = forwardRef<AppCodeEditorHandle, AppCodeEditorProps>
           enabled: false
         },
         scrollbar: {
+          horizontalScrollbarSize: 5,
           verticalScrollbarSize: 5,
           alwaysConsumeMouseWheel: false,
           useShadows: false

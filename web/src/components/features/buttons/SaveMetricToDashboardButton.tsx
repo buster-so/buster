@@ -53,7 +53,12 @@ export const SaveMetricToDashboardButton: React.FC<{
       onSaveToDashboard={onSaveToDashboard}
       onRemoveFromDashboard={onRemoveFromDashboard}>
       <AppTooltip title={'Save to dashboard'}>
-        <Button variant="ghost" disabled={disabled} prefix={<ASSET_ICONS.dashboardAdd />} />
+        <Button
+          variant="ghost"
+          disabled={disabled}
+          prefix={<ASSET_ICONS.dashboardAdd />}
+          data-testid="save-to-dashboard-button"
+        />
       </AppTooltip>
     </SaveToDashboardDropdown>
   );
