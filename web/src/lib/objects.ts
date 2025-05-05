@@ -47,24 +47,24 @@ export const compareObjectsByKeys = <K extends string>(
     if (typeof val1 === 'object' && typeof val2 === 'object') {
       const itWasEqual = isEqual(val1, val2) || isEqual(JSON.stringify(val1), JSON.stringify(val2));
 
-      if (!itWasEqual) {
-        console.log('--------------NESTED KEYS NOT EQUAL------------------');
-        console.log('KEY', key);
-        console.log('ORIGINAL', val1);
-        console.log('NEW', val2);
-      }
+      // if (!itWasEqual) {
+      //   console.log('--------------NESTED KEYS NOT EQUAL------------------');
+      //   console.log('KEY', key);
+      //   console.log('ORIGINAL', val1);
+      //   console.log('NEW', val2);
+      // }
 
       return itWasEqual;
     }
 
     const itWasEqual = isEqual(val1, val2);
 
-    if (!itWasEqual) {
-      console.log('--------------KEYS NOT EQUAL------------------');
-      console.log('KEY', key);
-      console.log('ORIGINAL', val1);
-      console.log('NEW', val2);
-    }
+    // if (!itWasEqual) {
+    //   console.log('--------------KEYS NOT EQUAL------------------');
+    //   console.log('KEY', key);
+    //   console.log('ORIGINAL', val1);
+    //   console.log('NEW', val2);
+    // }
 
     return itWasEqual;
   });

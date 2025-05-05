@@ -17,7 +17,6 @@ export const useChatLayoutContext = ({ appSplitterRef }: UseLayoutConfigProps) =
   const chatParams = useGetChatParams();
 
   const animateOpenSplitter = useMemoizedFn((side: 'left' | 'right' | 'both') => {
-    console.log('animateOpenSplitter', !!appSplitterRef.current, { side });
     if (appSplitterRef.current) {
       const { animateWidth, sizes } = appSplitterRef.current;
       const leftSize = sizes[0] ?? 0;

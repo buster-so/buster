@@ -17,7 +17,7 @@ export const formatBarAndLineDataLabel = (
   );
   const hasMultipleDatasets = shownDatasets.length > 1;
 
-  const useStackTotal = !hasMultipleDatasets || percentageMode === 'stacked';
+  const useStackTotal = hasMultipleDatasets || percentageMode === 'stacked';
 
   const total: number = useStackTotal
     ? context.chart.$totalizer.stackTotals[context.dataIndex]

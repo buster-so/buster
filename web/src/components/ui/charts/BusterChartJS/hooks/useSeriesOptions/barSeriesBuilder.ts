@@ -332,13 +332,12 @@ const getFormattedValueAndSetBarDataLabels = (
   }
 ) => {
   const rawValue = context.dataset.data[context.dataIndex] as number;
-  const percentageModesMatch = context.chart.$barDataLabelsPercentageMode === percentageMode;
-  const currentValue = percentageModesMatch
-    ? context.chart.$barDataLabels?.[context.datasetIndex]?.[context.dataIndex] || ''
-    : '';
-
-  const formattedValue =
-    currentValue || formatBarAndLineDataLabel(rawValue, context, percentageMode, columnLabelFormat);
+  const formattedValue = formatBarAndLineDataLabel(
+    rawValue,
+    context,
+    percentageMode,
+    columnLabelFormat
+  );
   // Store only the formatted value, rotation is handled globally
   setBarDataLabelsManager(context, formattedValue, percentageMode);
 

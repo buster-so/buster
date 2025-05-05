@@ -1,6 +1,6 @@
 import { formatBarAndLineDataLabel } from './formatBarAndLineDataLabel';
 import { ColumnLabelFormat } from '@/api/asset_interfaces/metric';
-import { Context } from 'chartjs-plugin-datalabels';
+import type { Context } from 'chartjs-plugin-datalabels';
 
 describe('formatBarAndLineDataLabel', () => {
   it('formats a single value without percentage', () => {
@@ -32,5 +32,90 @@ describe('formatBarAndLineDataLabel', () => {
     const result = formatBarAndLineDataLabel(value, mockContext, false, columnLabelFormat);
 
     expect(result).toBe('1,234.56');
+  });
+
+  // Mock chart context
+  const createMockContext = (datasets: any[]): Partial<Context> => ({
+    chart: {
+      data: {
+        datasets
+      },
+      $totalizer: {
+        stackTotals: [100],
+        seriesTotals: [50]
+      }
+    } as any,
+    dataIndex: 0,
+    datasetIndex: 0
+  });
+
+  describe('useStackTotal logic', () => {
+    const baseDataset = { hidden: false, isTrendline: false };
+
+    test('should use stack total when there are multiple visible datasets', () => {
+      const mockContext = createMockContext([baseDataset, { ...baseDataset }]) as Context;
+
+      const result = formatBarAndLineDataLabel(25, mockContext, 'data-label', {
+        style: 'number',
+        columnType: 'number'
+      });
+
+      // 25 out of stack total (100) = 25%
+      expect(result).toBe('25%');
+    });
+
+    test('should use stack total when percentageMode is stacked', () => {
+      const mockContext = createMockContext([baseDataset]) as Context;
+
+      const result = formatBarAndLineDataLabel(25, mockContext, 'stacked', {
+        style: 'number',
+        columnType: 'number'
+      });
+
+      // 25 out of stack total (100) = 25%
+      expect(result).toBe('25%');
+    });
+
+    test('should use series total for single dataset and non-stacked percentage mode', () => {
+      const mockContext = createMockContext([baseDataset]) as Context;
+
+      const result = formatBarAndLineDataLabel(25, mockContext, 'data-label', {
+        style: 'number',
+        columnType: 'number'
+      });
+
+      // 25 out of series total (50) = 50%
+      expect(result).toBe('50%');
+    });
+
+    test('should ignore hidden datasets when counting multiple datasets', () => {
+      const mockContext = createMockContext([
+        baseDataset,
+        { ...baseDataset, hidden: true }
+      ]) as Context;
+
+      const result = formatBarAndLineDataLabel(25, mockContext, 'data-label', {
+        style: 'number',
+        columnType: 'number'
+      });
+
+      // 25 out of series total (50) = 50% (since second dataset is hidden)
+      expect(result).toBe('50%');
+    });
+
+    test('should ignore trendline datasets when counting multiple datasets', () => {
+      const mockContext = createMockContext([
+        baseDataset,
+        { ...baseDataset, isTrendline: true }
+      ]) as Context;
+
+      const result = formatBarAndLineDataLabel(25, mockContext, 'data-label', {
+        style: 'number',
+        columnType: 'number'
+      });
+
+      // 25 out of series total (50) = 50% (since second dataset is a trendline)
+      expect(result).toBe('50%');
+    });
   });
 });

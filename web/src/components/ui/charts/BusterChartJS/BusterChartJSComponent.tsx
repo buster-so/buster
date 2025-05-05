@@ -195,9 +195,6 @@ export const BusterChartJSComponent = React.memo(
         if (selectedChartType === 'combo') return [ChartHoverBarPlugin, ChartTotalizerPlugin];
         return [];
       }, [selectedChartType]);
-      console.log('datasetOptions', datasetOptions);
-      console.log('data', data);
-      console.log('options', options);
 
       return (
         <ChartMountedWrapper>
