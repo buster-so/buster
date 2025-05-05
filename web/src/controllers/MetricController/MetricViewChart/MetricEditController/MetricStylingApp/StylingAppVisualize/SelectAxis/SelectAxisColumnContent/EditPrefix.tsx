@@ -9,7 +9,7 @@ export const EditPrefix: React.FC<{
 }> = React.memo(
   ({ prefix, onUpdateColumnConfig }) => {
     return (
-      <LabelAndInput label="Prefix">
+      <LabelAndInput label="Prefix" dataTestId="edit-prefix-input">
         <Input
           className="w-full!"
           min={0}

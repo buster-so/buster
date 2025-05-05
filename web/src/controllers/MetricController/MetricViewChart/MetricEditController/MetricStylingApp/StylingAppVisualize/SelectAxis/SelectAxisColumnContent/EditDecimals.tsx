@@ -46,7 +46,7 @@ export const EditDecimals: React.FC<{
 
     return (
       <LabelAndInput label="Decimals">
-        <div className="flex w-full items-center space-x-2">
+        <div className="flex w-full items-center space-x-2" data-testid="edit-decimals-input">
           <InputNumber
             min={0}
             prefix="Min"

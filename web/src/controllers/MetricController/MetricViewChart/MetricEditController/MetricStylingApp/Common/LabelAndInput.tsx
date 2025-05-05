@@ -5,9 +5,11 @@ import React from 'react';
 export const LabelAndInput: React.FC<{
   label: string;
   children: React.ReactNode;
-}> = ({ label, children }) => {
+  dataTestId?: string;
+}> = ({ label, children, dataTestId }) => {
   return (
     <div
+      data-testid={dataTestId}
       className={cn('grid w-full grid-cols-[minmax(115px,115px)_1fr] items-center gap-2', 'h-7')}>
       <Text size="sm" variant="secondary">
         {label}

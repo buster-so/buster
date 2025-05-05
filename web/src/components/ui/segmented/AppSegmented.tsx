@@ -262,7 +262,7 @@ function SegmentedTriggerComponent<T extends string = string>(props: SegmentedTr
             selected: selectedValue === value
           })
         )}>
-        <LinkDiv href={link || ''} onClick={handleClick}>
+        <LinkDiv href={link || ''} onClick={handleClick} data-testid={`segmented-trigger-${value}`}>
           {icon && <span className={cn('flex items-center text-sm')}>{icon}</span>}
           {label && <span className={cn('text-sm')}>{label}</span>}
         </LinkDiv>

@@ -9,7 +9,7 @@ export const EditMultiplyBy: React.FC<{
 }> = React.memo(
   ({ multiplier, onUpdateColumnConfig }) => {
     return (
-      <LabelAndInput label="Multiply By">
+      <LabelAndInput label="Multiply By" dataTestId="edit-multiply-by-input">
         <InputNumber
           placeholder="1"
           className="w-full!"

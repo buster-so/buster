@@ -27,7 +27,7 @@ export const EditSeparator: React.FC<{
   }, [numberSeparatorStyle]);
 
   return (
-    <LabelAndInput label="Separator">
+    <LabelAndInput label="Separator" dataTestId="edit-separator-input">
       <Select
         items={options}
         value={selectedSeparator}

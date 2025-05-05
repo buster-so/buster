@@ -9,7 +9,7 @@ export const EditSuffix: React.FC<{
 }> = React.memo(
   ({ suffix, onUpdateColumnConfig }) => {
     return (
-      <LabelAndInput label="Suffix">
+      <LabelAndInput label="Suffix" dataTestId="edit-suffix-input">
         <Input
           className="w-full!"
           min={0}

@@ -39,7 +39,7 @@ export const EditLabelStyle: React.FC<{
   if (enabledOptions.length === 0) return null;
 
   return (
-    <LabelAndInput label="Style">
+    <LabelAndInput label="Style" dataTestId="edit-label-style-input">
       <div className="flex items-center justify-end">
         <AppSegmented options={options} value={style} type="button" onChange={onChange} />
       </div>
