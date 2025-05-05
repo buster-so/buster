@@ -266,5 +266,106 @@ test('Y axis config - Label style', async ({ page }) => {
   await page.getByTestId('segmented-trigger-number').click();
   await expect(page.getByText('Unsaved changes')).toBeVisible();
   await page.getByRole('button', { name: 'Save' }).click();
+});
+
+test('Y axis config - Label seperator style', async ({ page }) => {
+  await page.goto(
+    'http://localhost:3000/app/metrics/45c17750-2b61-5683-ba8d-ff6c6fefacee/chart?secondary_view=chart-edit'
+  );
+  await page.getByTestId('select-axis-drop-zone-yAxis').getByRole('button').nth(3).click();
+  await page.getByTestId('edit-separator-input').getByRole('combobox').click();
+  await page.getByRole('option', { name: '100000' }).click();
+  await page.getByRole('button', { name: 'Save' }).click();
+  await page.getByTestId('edit-separator-input').getByRole('combobox').click();
+  await page.getByText('100,000').click();
+  await page.getByRole('button', { name: 'Save' }).click();
+
+  page.reload();
+  await page.getByTestId('select-axis-drop-zone-yAxis').getByRole('button').nth(3).click();
+  expect(page.getByText('100,000')).toBeVisible();
+});
+
+test('Y axis config - Decimal places', async ({ page }) => {
+  await page.goto(
+    'http://localhost:3000/app/metrics/45c17750-2b61-5683-ba8d-ff6c6fefacee/chart?secondary_view=chart-edit'
+  );
+  await page.getByTestId('select-axis-drop-zone-yAxis').getByRole('button').nth(3).click();
+  await page.getByRole('combobox').filter({ hasText: 'Zero' }).click();
+  await page.getByRole('option', { name: 'Do not replace' }).click();
+  await page.getByRole('button', { name: 'Save' }).click();
+  page.reload();
+  await page.getByTestId('select-axis-drop-zone-yAxis').getByRole('button').nth(3).click();
+  expect(page.getByText('Do not replace')).toBeVisible();
+  await page.getByRole('combobox').filter({ hasText: 'Do not replace' }).click();
+  await page.getByRole('option', { name: 'Zero' }).click();
+  await page.getByRole('button', { name: 'Save' }).click();
+});
+
+test('Y axis config - adjust bar roundness', async ({ page }) => {
+  await page.goto(
+    'http://localhost:3000/app/metrics/45c17750-2b61-5683-ba8d-ff6c6fefacee/chart?secondary_view=chart-edit'
+  );
+  await page.getByTestId('select-axis-drop-zone-yAxis').getByRole('button').nth(3).click();
+  await page.getByRole('slider').click();
+  await page
+    .locator('div')
+    .filter({ hasText: /^Bar roundness$/ })
+    .getByRole('spinbutton')
+    .fill('25');
+  await expect(
+    page
+      .locator('div')
+      .filter({ hasText: /^Bar roundness$/ })
+      .getByRole('spinbutton')
+  ).toBeVisible();
+  await expect(page.locator('body')).toMatchAriaSnapshot(`
+    - textbox "New chart": Yearly Sales Revenue - Signature Cycles Products (Last 3 Years + YTD)
+    - text: /Jan 1, \\d+ - May 2, \\d+ • What is the total yearly sales revenue for products supplied by Signature Cycles from \\d+ to present\\?/
+    - img
+    - img
+    - text: Unsaved changes
+    - button "Reset"
+    - button "Save"
+    `);
+  await page.getByRole('button', { name: 'Save' }).click();
+
   await page.reload();
+  await page.getByTestId('select-axis-drop-zone-yAxis').getByRole('button').nth(3).click();
+
+  await page
+    .locator('div')
+    .filter({ hasText: /^Bar roundness$/ })
+    .getByRole('spinbutton')
+    .click();
+  await page
+    .locator('div')
+    .filter({ hasText: /^Bar roundness$/ })
+    .getByRole('spinbutton')
+    .fill('08');
+  await page.getByRole('button', { name: 'Save' }).click();
+  await expect(page.locator('body')).toMatchAriaSnapshot(`
+    - textbox "New chart": Yearly Sales Revenue - Signature Cycles Products (Last 3 Years + YTD)
+    - text: /Jan 1, \\d+ - May 2, \\d+ • What is the total yearly sales revenue for products supplied by Signature Cycles from \\d+ to present\\?/
+    - img
+    `);
+  //
+});
+
+test('Y axis config - show data labels', async ({ page }) => {
+  await page.goto(
+    'http://localhost:3000/app/metrics/45c17750-2b61-5683-ba8d-ff6c6fefacee/chart?secondary_view=chart-edit'
+  );
+  await page.getByTestId('select-axis-drop-zone-yAxis').getByRole('button').nth(3).click();
+  //
+  await page.getByRole('switch').click();
+  await expect(page.locator('body')).toMatchAriaSnapshot(`
+    - textbox "New chart": Yearly Sales Revenue - Signature Cycles Products (Last 3 Years + YTD)
+    - text: /Jan 1, \\d+ - May 2, \\d+ • What is the total yearly sales revenue for products supplied by Signature Cycles from \\d+ to present\\?/
+    - img
+    - img
+    - text: Unsaved changes
+    - button "Reset"
+    - button "Save"
+    `);
+  await page.getByRole('button', { name: 'Save' }).click();
 });
