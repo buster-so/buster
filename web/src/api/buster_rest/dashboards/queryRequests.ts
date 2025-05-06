@@ -356,11 +356,11 @@ export const useShareDashboard = () => {
       });
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(
-        dashboardQueryKeys.dashboardGetDashboard(data.dashboard.id, data.dashboard.version_number)
-          .queryKey,
-        data
-      );
+      // queryClient.setQueryData(
+      //   dashboardQueryKeys.dashboardGetDashboard(data.dashboard.id, data.dashboard.version_number)
+      //     .queryKey,
+      //   data
+      // );
     }
   });
 };
@@ -383,11 +383,7 @@ export const useUnshareDashboard = () => {
       });
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(
-        dashboardQueryKeys.dashboardGetDashboard(data.dashboard.id, data.dashboard.version_number)
-          .queryKey,
-        data
-      );
+      //
     }
   });
 };

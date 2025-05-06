@@ -30,6 +30,7 @@ type TextProps = {
   style?: React.CSSProperties;
   onClick?: React.MouseEventHandler<HTMLSpanElement>;
   children: React.ReactNode;
+  dataTestId?: string;
 } & VariantProps<typeof textVariants> &
   VariantProps<typeof textColorVariants>;
 
@@ -40,12 +41,14 @@ export const Text: React.FC<TextProps> = ({
   className,
   style,
   onClick,
-  children
+  children,
+  dataTestId
 }) => {
   const TextNode = truncate ? 'div' : 'span';
 
   return (
     <TextNode
+      data-testid={dataTestId}
       style={style}
       className={cn(textVariants({ size, truncate }), textColorVariants({ variant }), className)}
       onClick={onClick}>

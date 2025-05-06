@@ -84,6 +84,7 @@ export const AccessDropdown: React.FC<{
       align="end"
       side="bottom">
       <Text
+        dataTestId={`share-role-${shareLevel}`}
         variant="secondary"
         size="xs"
         className={cn('flex! items-center! space-x-1', !disabled && 'cursor-pointer', className)}>

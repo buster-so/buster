@@ -20,7 +20,9 @@ export const IndividualSharePerson: React.FC<{
   });
 
   return (
-    <div className="flex h-8 items-center justify-between space-x-2 overflow-hidden">
+    <div
+      className="flex h-8 items-center justify-between space-x-2 overflow-hidden"
+      data-testid={`share-person-${email}`}>
       <div className="flex h-full items-center space-x-1.5 overflow-hidden">
         <div className="flex h-full flex-col items-center justify-center">
           <Avatar className="h-[24px] w-[24px]" name={name || email} />

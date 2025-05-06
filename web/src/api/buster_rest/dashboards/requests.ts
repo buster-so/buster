@@ -91,15 +91,11 @@ export const dashboardsDeleteDashboard = async (data: { ids: string[] }) => {
 // share dashboards
 
 export const shareDashboard = async ({ id, params }: { id: string; params: SharePostRequest }) => {
-  return mainApi
-    .post<BusterDashboardResponse>(`/dashboards/${id}/sharing`, params)
-    .then((res) => res.data);
+  return mainApi.post<string>(`/dashboards/${id}/sharing`, params).then((res) => res.data);
 };
 
 export const unshareDashboard = async ({ id, data }: { id: string; data: ShareDeleteRequest }) => {
-  return mainApi
-    .delete<BusterDashboardResponse>(`/dashboards/${id}/sharing`, { data })
-    .then((res) => res.data);
+  return mainApi.delete<string>(`/dashboards/${id}/sharing`, { data }).then((res) => res.data);
 };
 
 export const updateDashboardShare = async ({
