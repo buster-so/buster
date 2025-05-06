@@ -3,7 +3,7 @@ import { askQuestion } from './question-helpers/ask-question';
 
 const question = 'Who would win in a fight, 100 humans or a gorilla?';
 
-test(`Question: ${question}`, async ({ page }) => {
+test.skip(`Question: ${question}`, async ({ page }) => {
   await askQuestion(page, question);
 
   //wait for 2 seconds

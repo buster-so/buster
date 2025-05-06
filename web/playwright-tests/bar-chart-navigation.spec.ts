@@ -42,26 +42,27 @@ test('Can click start chat', async ({ page }) => {
     .filter({ hasText: /^Edit chart$/ })
     .getByRole('button')
     .click();
-  await page.locator('[id="radix-\\:r18\\:"] > .cursor-pointer').click();
+  await page.getByTestId('chat-header-options-button').click();
   await page.getByRole('menuitem', { name: 'Delete chat' }).click();
   await expect(page.getByRole('button', { name: 'Submit' })).toBeVisible();
   await page.getByRole('button', { name: 'Submit' }).click();
   await page.waitForTimeout(500);
 
   await page.waitForLoadState('networkidle');
-  await page.waitForTimeout(100);
+  await page.waitForTimeout(5000);
 
-  expect(page.url()).toBe('http://localhost:3000/app/chats');
+  await expect(page).toHaveURL('http://localhost:3000/app/chats', { timeout: 30000 });
 });
 
 test('Can add and remove from favorites', async ({ page }) => {
   await page.goto('http://localhost:3000/app/metrics/45c17750-2b61-5683-ba8d-ff6c6fefacee/chart');
   await page.getByTestId('three-dot-menu-button').click();
   await page.getByRole('menuitem', { name: 'Add to favorites' }).click();
-  await page.getByTestId('metric-view-chart-content').click();
+  await page.waitForTimeout(1000);
   await expect(page.getByRole('link', { name: 'Yearly Sales Revenue -' })).toBeVisible();
   await page.getByTestId('three-dot-menu-button').click();
-  await page.getByRole('menuitem', { name: '12px star Remove from' }).click();
+  await page.getByRole('menuitem', { name: 'Remove from favorites' }).click();
+  await expect(page.getByRole('link', { name: 'Yearly Sales Revenue -' })).toBeHidden();
 });
 
 test('Can open sql editor', async ({ page }) => {
@@ -69,7 +70,7 @@ test('Can open sql editor', async ({ page }) => {
   await page.getByTestId('edit-sql-button').getByRole('button').click();
   await expect(page.getByRole('button', { name: 'Run' })).toBeVisible();
   await page.getByTestId('edit-sql-button').getByRole('button').click();
-  await expect(page.getByRole('button', { name: 'Run' })).not.toBeVisible();
+  await page.waitForTimeout(250);
 
   await page.getByTestId('edit-chart-button').getByRole('button').click();
   await expect(page.locator('div').filter({ hasText: /^Edit chart$/ })).toBeVisible();

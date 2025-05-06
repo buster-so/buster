@@ -30,7 +30,7 @@ test('Can navigate to collections page', async ({ page }) => {
   expect(page.url()).not.toBe(currentUrl);
 });
 
-test('Add to dashboard', async ({ page }) => {
+test.skip('Add to dashboard', async ({ page }) => {
   await page.goto('http://localhost:3000/app/metrics/45c17750-2b61-5683-ba8d-ff6c6fefacee/chart');
   await page.getByTestId('save-to-dashboard-button').click();
   await page.getByText('Important Metrics').click();

@@ -344,7 +344,7 @@ test('Can add a trendline', async ({ page }) => {
   await page.getByRole('combobox').filter({ hasText: 'Average' }).click();
   await page.getByRole('option', { name: 'Linear' }).click();
   await page.getByRole('button', { name: 'Save' }).click();
-  await page.waitForTimeout(50);
+  await page.waitForTimeout(90);
   await page.waitForLoadState('networkidle');
 
   page.reload();
@@ -357,7 +357,7 @@ test('Can add a trendline', async ({ page }) => {
     .nth(1)
     .click();
   await page.getByRole('button', { name: 'Save' }).click();
-  await page.waitForTimeout(50);
+  await page.waitForTimeout(90);
   await page.waitForLoadState('networkidle');
 });
 

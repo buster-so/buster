@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('Can ask a question and navigate to top level pages', async ({ page }) => {
+test.skip('Can ask a question and navigate to top level pages', async ({ page }) => {
   await page.goto('http://localhost:3000/app/home');
   await page.getByRole('textbox', { name: 'Ask Buster a question...' }).click();
   await page

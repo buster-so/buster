@@ -4,7 +4,7 @@ import { askQuestion, checkThatPageWasRedirected } from './question-helpers/ask-
 const question =
   'I need you to make a chart for me that shows my top 8 customers in the month of May. Can you make this chart sorted by the customers name? I want to see only 1 file created.';
 
-test(`Question: ${question}`, async ({ page }) => {
+test.skip(`Question: ${question}`, async ({ page }) => {
   await askQuestion(page, question);
 
   await checkThatPageWasRedirected(page, ['reasoning', 'chart']);

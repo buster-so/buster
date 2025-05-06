@@ -8,7 +8,7 @@ import { ChatContainerHeaderDropdown } from './ChatHeaderDropdown';
 export const ChatHeaderOptions: React.FC<{}> = React.memo(() => {
   return (
     <ChatContainerHeaderDropdown>
-      <Button variant="ghost" prefix={<Dots />} />
+      <Button variant="ghost" prefix={<Dots />} data-testid="chat-header-options-button" />
     </ChatContainerHeaderDropdown>
   );
 });

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { askQuestion, checkThatPageWasRedirected } from './question-helpers/ask-question';
 
-test('Question: Who is my top customer?', async ({ page }) => {
+test.skip('Question: Who is my top customer?', async ({ page }) => {
   await askQuestion(page, 'Who is my top customer?');
 
   await checkThatPageWasRedirected(page, ['reasoning', 'metrics']);

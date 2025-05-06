@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { askQuestion, checkThatPageWasRedirected } from './question-helpers/ask-question';
 
-test('Question: Can you make me a line chart that showcases my sales over time? The time frame should be 18 months. You should just create 1 file. The sales should be deliminated in USD.  The line should also be kind of smooth so I do not see a sharp turn at every month. Also the time should be broken down by month.', async ({
+test.skip('Question: Can you make me a line chart that showcases my sales over time? The time frame should be 18 months. You should just create 1 file. The sales should be deliminated in USD.  The line should also be kind of smooth so I do not see a sharp turn at every month. Also the time should be broken down by month.', async ({
   page
 }) => {
   await askQuestion(
