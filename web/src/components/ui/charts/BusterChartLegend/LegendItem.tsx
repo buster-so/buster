@@ -149,7 +149,7 @@ const LegendItemStandard = React.memo(
               )}
             </AnimatePresence>
 
-            <span className="swag"> {formattedName}</span>
+            <span>{formattedName}</span>
           </div>
         </div>
       </motion.div>

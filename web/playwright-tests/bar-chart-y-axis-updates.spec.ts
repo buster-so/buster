@@ -13,7 +13,7 @@ test('Y axis config - Title', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   expect(page.getByRole('textbox', { name: 'THIS IS A TEST!' })).toBeVisible();
 
-  page.reload();
+  await page.reload();
   await page.getByTestId('select-axis-drop-zone-yAxis').getByRole('button').nth(3).click();
   await page.getByRole('textbox', { name: 'THIS IS A TEST!' }).click();
   await page.getByRole('textbox', { name: 'THIS IS A TEST!' }).fill('Total Sales Revenue');
@@ -62,7 +62,7 @@ test('Y axis config - Label seperator style', async ({ page }) => {
   await page.getByRole('button', { name: 'Save' }).click();
   await page.waitForLoadState('networkidle');
 
-  page.reload();
+  await page.reload();
   await page.getByTestId('select-axis-drop-zone-yAxis').getByRole('button').nth(3).click();
   expect(page.getByText('100,000')).toBeVisible();
 });
@@ -194,7 +194,7 @@ test('Y axis config - global settings', async ({ page }) => {
     - img
     `);
 
-  page.reload();
+  await page.reload();
 
   await page
     .locator('div')
@@ -215,7 +215,7 @@ test('Y axis config - global settings', async ({ page }) => {
     - img
     `);
 
-  page.reload();
+  await page.reload();
 
   await page
     .locator('div')
@@ -236,7 +236,7 @@ test('Y axis config - global settings', async ({ page }) => {
     - img
     `);
 
-  page.reload();
+  await page.reload();
 
   await page
     .locator('div')

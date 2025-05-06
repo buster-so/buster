@@ -125,11 +125,11 @@ describe('barAndLineTooltipHelper', () => {
       seriesType: 'bar',
       color: '#FF0000',
       usePercentage: false,
-      formattedLabel: 'Value',
+      formattedLabel: 'Test Dataset',
       values: [
         {
           formattedValue: '250',
-          formattedLabel: 'Value',
+          formattedLabel: 'Test Dataset',
           formattedPercentage: '100%'
         }
       ]

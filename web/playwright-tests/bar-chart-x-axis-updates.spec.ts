@@ -58,7 +58,7 @@ test('X axis config - we can edit the label style', async ({ page }) => {
   expect(page.getByTestId('segmented-trigger-number')).toHaveAttribute('data-state', 'active');
 });
 
-test('X axis config - We can edit the label seperator style', async ({ page }) => {
+test('X axis config - We can edit the label separator style', async ({ page }) => {
   await page.goto(
     'http://localhost:3000/app/metrics/45c17750-2b61-5683-ba8d-ff6c6fefacee/chart?secondary_view=chart-edit'
   );
@@ -101,7 +101,7 @@ test('X axis config - We can edit the decimal places', async ({ page }) => {
   await page.getByRole('button', { name: 'Save' }).click();
   await page.waitForLoadState('networkidle');
 
-  page.reload();
+  await page.reload();
   await page.getByTestId('select-axis-drop-zone-xAxis').getByRole('button').nth(3).click();
   expect(page.getByRole('spinbutton').first()).toHaveValue('2');
 
@@ -125,7 +125,7 @@ test('X axis config - We can edit the multiply by places', async ({ page }) => {
   await page.getByRole('button', { name: 'Save' }).click();
   await page.waitForLoadState('networkidle');
 
-  page.reload();
+  await page.reload();
   await page.getByTestId('select-axis-drop-zone-xAxis').getByRole('button').nth(3).click();
   expect(page.getByPlaceholder('1')).toHaveValue('10');
   await page.getByPlaceholder('1').click();
@@ -162,7 +162,7 @@ test('X axis config - We can edit the prefix', async ({ page }) => {
       - img
       `);
 
-  page.reload();
+  await page.reload();
 
   await page.getByTestId('select-axis-drop-zone-xAxis').getByRole('button').nth(3).click();
   await page.getByRole('textbox', { name: '$' }).click();
