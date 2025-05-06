@@ -32,7 +32,8 @@ export const barAndLineTooltipHelper = (
       const usePercentage =
         !!percentageMode || keyToUsePercentage.includes(tooltipDataset.label as string);
 
-      const formattedLabel = formatLabel(item.key as string, columnLabelFormats[item.key], true);
+      const formattedLabel = tooltipDataset.label as string;
+
       const formattedValue = formatLabel(item.value as number, columnLabelFormats[item.key]);
 
       return {

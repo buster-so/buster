@@ -513,8 +513,8 @@ describe('aggregateAndCreateDatasets', () => {
     expect(result.datasets[0].label).toEqual([{ key: 'product', value: 'A' }]);
 
     expect(result.datasets[0].tooltipData).toEqual([
-      [{ key: 'sales', value: 1000 }],
-      [{ key: 'sales', value: 1200 }]
+      [{ key: 'sales', value: 1000, categoryValue: 'A', categoryKey: 'product' }],
+      [{ key: 'sales', value: 1200, categoryValue: 'A', categoryKey: 'product' }]
     ]);
     expect(result.datasets[0].dataKey).toBe('sales');
     expect(result.datasets[0].axisType).toBe('y');
@@ -523,8 +523,8 @@ describe('aggregateAndCreateDatasets', () => {
     expect(result.datasets[1].data).toEqual([800, 1000]);
     expect(result.datasets[1].label).toEqual([{ key: 'product', value: 'B' }]);
     expect(result.datasets[1].tooltipData).toEqual([
-      [{ key: 'sales', value: 800 }],
-      [{ key: 'sales', value: 1000 }]
+      [{ key: 'sales', value: 800, categoryValue: 'B', categoryKey: 'product' }],
+      [{ key: 'sales', value: 1000, categoryValue: 'B', categoryKey: 'product' }]
     ]);
     expect(result.datasets[1].dataKey).toBe('sales');
     expect(result.datasets[1].axisType).toBe('y');
@@ -1373,13 +1373,13 @@ describe('aggregateAndCreateDatasets', () => {
     expect(datasetA.tooltipData).toEqual([
       [
         { key: 'month', value: 'Jan' },
-        { key: 'product', value: 'A' },
+        { key: 'product', value: 'A', categoryValue: 'A', categoryKey: 'product' },
         { key: 'sales', value: 100 },
         { key: 'notes', value: 'New launch' }
       ],
       [
         { key: 'month', value: 'Feb' },
-        { key: 'product', value: 'A' },
+        { key: 'product', value: 'A', categoryValue: 'A', categoryKey: 'product' },
         { key: 'sales', value: 120 },
         { key: 'notes', value: 'Price increase' }
       ]
@@ -1924,5 +1924,109 @@ describe('aggregateAndCreateDatasets', () => {
     // Verify size data is correctly mapped
     expect(result.datasets[0].sizeData?.[0]).toBe(0);
     expect(result.datasets[1].sizeData?.[0]).toBe(0.1);
+  });
+
+  it('should include categoryKey in tooltip data for scatter plots with categories', () => {
+    const testData = [
+      { x: 1, y: 100, region: 'North', product: 'A' },
+      { x: 2, y: 150, region: 'North', product: 'B' },
+      { x: 3, y: 200, region: 'South', product: 'A' }
+    ];
+
+    const result = aggregateAndCreateDatasets(
+      testData,
+      {
+        x: ['x'],
+        y: ['y'],
+        category: ['region', 'product'],
+        tooltip: ['x', 'y', 'region', 'product']
+      },
+      {},
+      true // scatter plot mode
+    );
+
+    // We should have 4 datasets (2 regions × 2 products)
+    expect(result.datasets.length).toBeGreaterThan(0);
+
+    // Find the North/A dataset
+    const northADataset = result.datasets.find(
+      (d) =>
+        d.label.some((l) => l.key === 'region' && l.value === 'North') &&
+        d.label.some((l) => l.key === 'product' && l.value === 'A')
+    );
+
+    expect(northADataset).toBeDefined();
+
+    // Verify tooltip data includes both categoryKey and categoryValue for category fields
+    expect(northADataset?.tooltipData[0]).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: 'region',
+          value: 'North',
+          categoryKey: 'region',
+          categoryValue: 'North'
+        }),
+        expect.objectContaining({
+          key: 'product',
+          value: 'A',
+          categoryKey: 'product',
+          categoryValue: 'A'
+        })
+      ])
+    );
+  });
+
+  it('should include categoryKey in default tooltips with no custom tooltip fields', () => {
+    const testData = [
+      { month: 'Jan', sales: 1000, region: 'North' },
+      { month: 'Feb', sales: 1200, region: 'North' },
+      { month: 'Jan', sales: 800, region: 'South' },
+      { month: 'Feb', sales: 900, region: 'South' }
+    ];
+
+    const result = aggregateAndCreateDatasets(
+      testData,
+      {
+        x: ['month'],
+        y: ['sales'],
+        category: ['region']
+      },
+      {}
+    );
+
+    // We should have 2 datasets (one per region)
+    expect(result.datasets).toHaveLength(2);
+
+    // Find North dataset
+    const northDataset = result.datasets.find((d) =>
+      d.label.some((l) => l.key === 'region' && l.value === 'North')
+    );
+
+    expect(northDataset).toBeDefined();
+
+    // Verify tooltips include both the original metric key and the category information
+    expect(northDataset?.tooltipData[0]).toEqual([
+      expect.objectContaining({
+        key: 'sales',
+        value: 1000,
+        categoryKey: 'region',
+        categoryValue: 'North'
+      })
+    ]);
+
+    // Find South dataset
+    const southDataset = result.datasets.find((d) =>
+      d.label.some((l) => l.key === 'region' && l.value === 'South')
+    );
+
+    // Verify tooltips for South dataset
+    expect(southDataset?.tooltipData[0]).toEqual([
+      expect.objectContaining({
+        key: 'sales',
+        value: 800,
+        categoryKey: 'region',
+        categoryValue: 'South'
+      })
+    ]);
   });
 });

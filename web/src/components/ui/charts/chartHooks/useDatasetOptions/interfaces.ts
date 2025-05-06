@@ -1,6 +1,8 @@
 export interface KV {
   key: string;
   value: string | number | boolean | null;
+  categoryValue?: string;
+  categoryKey?: string;
 }
 
 /**

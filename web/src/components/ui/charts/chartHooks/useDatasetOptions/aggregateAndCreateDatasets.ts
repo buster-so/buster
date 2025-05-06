@@ -144,14 +144,38 @@ export function aggregateAndCreateDatasets<
         const tooltipArr = validRows.map((r) => {
           const pts: KV[] = [];
           if (tooltipKeys.length) {
-            tooltipKeys.forEach((k) =>
-              pts.push({ key: k, value: formatTooltip(r[k], colFormats[k] || {}) })
-            );
+            tooltipKeys.forEach((k) => {
+              const tooltip: KV = {
+                key: k,
+                value: formatTooltip(r[k], colFormats[k] || {})
+              };
+
+              // Add categoryKey and categoryValue for category keys if categories exist
+              if (catKeys.length > 0 && catKeys.includes(k)) {
+                tooltip.categoryValue = String(catRec[k]);
+                tooltip.categoryKey = k;
+              }
+
+              pts.push(tooltip);
+            });
           } else {
-            xKeys.forEach((k) =>
-              pts.push({ key: k, value: formatTooltip(r[k], colFormats[k] || {}) })
-            );
+            xKeys.forEach((k) => {
+              const tooltip: KV = {
+                key: k,
+                value: formatTooltip(r[k], colFormats[k] || {})
+              };
+
+              // Add categoryKey and categoryValue for category keys if categories exist
+              if (catKeys.length > 0 && catKeys.includes(k)) {
+                tooltip.categoryValue = String(catRec[k]);
+                tooltip.categoryKey = k;
+              }
+
+              pts.push(tooltip);
+            });
+
             pts.push({ key: yKey, value: formatTooltip(r[yKey], fmtY) });
+
             if (sizeArr) {
               pts.push({
                 key: sizeKey!,
@@ -231,17 +255,37 @@ export function aggregateAndCreateDatasets<
                 }
                 // For y axis metrics, exclude y2-axis metrics from tooltips
                 const uniqueTooltipKeys = tooltipKeys.filter((k) => !y2Keys.includes(k));
-                return uniqueTooltipKeys.map((k) => ({
-                  key: k,
-                  value: formatTooltip(row[k], colFormats[k] || {})
-                }));
+                return uniqueTooltipKeys.map((k) => {
+                  const tooltip: KV = {
+                    key: k,
+                    value: formatTooltip(row[k], colFormats[k] || {})
+                  };
+
+                  // Add categoryKey and categoryValue for category keys if categories exist
+                  if (catKeys.includes(k)) {
+                    tooltip.categoryValue = String(catRec[k]);
+                    tooltip.categoryKey = k;
+                  }
+
+                  return tooltip;
+                });
               })
-            : dataArr.map((value) => [
-                {
+            : dataArr.map((value) => {
+                const tooltip: KV = {
                   key: metric,
                   value: value === null ? '' : value
+                };
+
+                // Add category info if this is a metrics tooltip
+                if (catKeys.length > 0) {
+                  // We only add the first category as categoryValue to match the interface
+                  const firstCatKey = catKeys[0];
+                  tooltip.categoryValue = String(catRec[firstCatKey]);
+                  tooltip.categoryKey = firstCatKey;
                 }
-              ]);
+
+                return [tooltip];
+              });
 
           // Generate ID for category dataset
           const id = createDatasetId(metric, { keys: catKeys, record: catRec });
