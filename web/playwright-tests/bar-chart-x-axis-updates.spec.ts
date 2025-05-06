@@ -66,12 +66,16 @@ test('X axis config - We can edit the label separator style', async ({ page }) =
   await page.getByRole('combobox').click();
   await page.getByRole('option', { name: '100,000' }).click();
   await page.getByRole('button', { name: 'Save' }).click();
+
+  await page.waitForTimeout(10);
+  await page.waitForLoadState('networkidle');
+
   await expect(page.locator('body')).toMatchAriaSnapshot(`
       - textbox "New chart": Yearly Sales Revenue - Signature Cycles Products (Last 3 Years + YTD)
       - text: /Jan 1, \\d+ - May 2, \\d+ • What is the total yearly sales revenue for products supplied by Signature Cycles from \\d+ to present\\?/
       - img
       `);
-  await page.waitForTimeout(50);
+  await page.waitForTimeout(20);
   await page.waitForLoadState('networkidle');
 
   await page.reload();

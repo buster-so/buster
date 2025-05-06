@@ -68,6 +68,9 @@ test('Can add and remove from favorites', async ({ page }) => {
 test('Can open sql editor', async ({ page }) => {
   await page.goto('http://localhost:3000/app/metrics/45c17750-2b61-5683-ba8d-ff6c6fefacee/chart');
   await page.getByTestId('edit-sql-button').getByRole('button').click();
+  await page.waitForTimeout(50);
+  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   await expect(page.getByRole('button', { name: 'Run' })).toBeVisible();
   await page.getByTestId('edit-sql-button').getByRole('button').click();
   await page.waitForTimeout(250);

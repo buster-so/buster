@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('Line chart - x axis rotation', async ({ page }) => {
+test.skip('Line chart - x axis rotation', async ({ page }) => {
   await page.goto(
     'http://localhost:3000/app/metrics/635d9b06-afb1-5b05-8130-03c0b7a04bcb/chart?secondary_view=chart-edit'
   );

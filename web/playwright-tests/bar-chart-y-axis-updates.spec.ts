@@ -126,7 +126,9 @@ test('Y axis config - show data labels', async ({ page }) => {
   await page.getByTestId('select-axis-drop-zone-yAxis').getByRole('button').nth(3).click();
   await page.getByRole('switch').click();
   await page.getByRole('button', { name: 'Save' }).click();
+  await page.waitForTimeout(100);
   await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
   await expect(page.locator('body')).toMatchAriaSnapshot(`
     - textbox "New chart": Yearly Sales Revenue - Signature Cycles Products (Last 3 Years + YTD)
     - text: /Jan 1, \\d+ - May 2, \\d+ • What is the total yearly sales revenue for products supplied by Signature Cycles from \\d+ to present\\?/
