@@ -57,7 +57,7 @@ export interface ChartProps<
    * A mode string to indicate transition configuration should be used.
    * @see https://www.chartjs.org/docs/latest/developers/api.html#update-mode
    */
-  updateMode?: UpdateMode;
+  updateMode?: UpdateMode | ((ctx: { datasetIndex: number }) => UpdateMode);
 }
 
 /**

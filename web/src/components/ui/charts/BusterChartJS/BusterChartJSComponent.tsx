@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { MutableRefObject, useMemo, useState } from 'react';
 import {
   Chart,
   ChartHoverBarPlugin,
@@ -10,14 +10,14 @@ import {
   OutLabelsPlugin
 } from './core';
 import type { ChartJSOrUndefined, ChartProps } from './core/types';
-import type { ChartType as ChartJSChartType, ChartOptions, Plugin } from 'chart.js';
+import type { ChartType as ChartJSChartType, ChartOptions, Plugin, UpdateMode } from 'chart.js';
 import { useColors } from '../chartHooks';
 import { useGoalLines, useOptions, useSeriesOptions } from './hooks';
 import { useChartSpecificOptions } from './hooks/useChartSpecificOptions';
 import type { BusterChartTypeComponentProps } from '../interfaces/chartComponentInterfaces';
 import { useTrendlines } from './hooks/useTrendlines';
 import type { ScatterAxis } from '@/api/asset_interfaces/metric/charts';
-import { useMount } from '@/hooks';
+import { useMemoizedFn, useMount, usePreviousRef } from '@/hooks';
 
 export const BusterChartJSComponent = React.memo(
   React.forwardRef<ChartJSOrUndefined, BusterChartTypeComponentProps>(
@@ -110,6 +110,7 @@ export const BusterChartJSComponent = React.memo(
         trendlineSeries,
         barGroupType
       });
+      const previousData = usePreviousRef(data);
 
       const { chartPlugins, chartOptions } = useChartSpecificOptions({
         selectedChartType,
@@ -197,6 +198,13 @@ export const BusterChartJSComponent = React.memo(
         return [];
       }, [selectedChartType]);
 
+      const updateMode = useMemoizedFn((params: { datasetIndex: number }): UpdateMode => {
+        if (!ref) return 'default';
+        const areLabelsChanged = previousData?.labels !== data.labels;
+        if (areLabelsChanged) return 'none'; //this will disable animation
+        return 'default';
+      });
+
       return (
         <ChartMountedWrapper>
           <Chart
@@ -206,6 +214,7 @@ export const BusterChartJSComponent = React.memo(
             data={data}
             type={type}
             plugins={chartSpecificPlugins}
+            updateMode={updateMode}
           />
         </ChartMountedWrapper>
       );

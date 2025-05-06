@@ -5,6 +5,7 @@ import { Chart as ChartJS } from 'chart.js';
 import type { ChartType, DefaultDataPoint } from 'chart.js';
 import type { ForwardedRef, ChartProps, BaseChartComponent } from './types';
 import { reforwardRef, cloneData, setOptions, setLabels, setDatasets } from './utils';
+import { usePrevious, usePreviousRef } from '@/hooks';
 
 function ChartComponent<
   TType extends ChartType = ChartType,
@@ -26,6 +27,7 @@ function ChartComponent<
   } = props as ChartProps;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartRef = useRef<ChartJS | null>(undefined);
+  const previousDatasets = usePreviousRef(data.datasets);
 
   const renderChart = () => {
     if (!canvasRef.current) return;
