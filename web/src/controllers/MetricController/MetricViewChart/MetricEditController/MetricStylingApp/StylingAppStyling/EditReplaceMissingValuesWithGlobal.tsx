@@ -7,38 +7,33 @@ import { EditReplaceMissingData } from '../StylingAppVisualize/SelectAxis/Select
 export const EditReplaceMissingValuesWithGlobal: React.FC<{
   columnLabelFormats: IBusterMetricChartConfig['columnLabelFormats'];
   onUpdateChartConfig: (config: Partial<IBusterMetricChartConfig>) => void;
-}> = React.memo(
-  ({ columnLabelFormats, onUpdateChartConfig }) => {
-    const mostPermissiveMissingWith = useMemo(() => {
-      return Object.values(columnLabelFormats).some(
-        ({ replaceMissingDataWith }) => replaceMissingDataWith === null
-      )
-        ? null
-        : (0 as const);
-    }, [columnLabelFormats]);
+}> = React.memo(({ columnLabelFormats, onUpdateChartConfig }) => {
+  const mostPermissiveMissingWith = useMemo(() => {
+    return Object.values(columnLabelFormats).some(
+      ({ replaceMissingDataWith }) => replaceMissingDataWith === null
+    )
+      ? null
+      : (0 as const);
+  }, [columnLabelFormats]);
 
-    const onUpdateColumnLabel = useMemoizedFn((config: Partial<IColumnLabelFormat>) => {
-      const newColumnLabelFormats: IBusterMetricChartConfig['columnLabelFormats'] = Object.entries(
-        columnLabelFormats
-      ).reduce<IBusterMetricChartConfig['columnLabelFormats']>((acc, [key, value]) => {
-        acc[key] = { ...value, ...config };
-        return acc;
-      }, {});
+  const onUpdateColumnLabel = useMemoizedFn((config: Partial<IColumnLabelFormat>) => {
+    const newColumnLabelFormats: IBusterMetricChartConfig['columnLabelFormats'] = Object.entries(
+      columnLabelFormats
+    ).reduce<IBusterMetricChartConfig['columnLabelFormats']>((acc, [key, value]) => {
+      acc[key] = { ...value, ...config };
+      return acc;
+    }, {});
 
-      onUpdateChartConfig({ columnLabelFormats: newColumnLabelFormats });
-    });
+    onUpdateChartConfig({ columnLabelFormats: newColumnLabelFormats });
+  });
 
-    return (
-      <EditReplaceMissingValuesWithColumn
-        replaceMissingDataWith={mostPermissiveMissingWith}
-        onUpdateColumnLabel={onUpdateColumnLabel}
-      />
-    );
-  },
-  () => {
-    return true;
-  }
-);
+  return (
+    <EditReplaceMissingValuesWithColumn
+      replaceMissingDataWith={mostPermissiveMissingWith}
+      onUpdateColumnLabel={onUpdateColumnLabel}
+    />
+  );
+});
 EditReplaceMissingValuesWithGlobal.displayName = 'EditReplaceMissingValuesWithGlobal';
 
 const EditReplaceMissingValuesWithColumn: React.FC<{

@@ -12,7 +12,7 @@ export const EditShowDataLabels: React.FC<{
     <LabelAndInput label={'Data labels'}>
       <div className="flex justify-end gap-x-2">
         <WarningIcon rowCount={rowCount} />
-        <Switch defaultChecked={showDataLabels} onCheckedChange={onUpdateDataLabel} />
+        <Switch checked={showDataLabels} onCheckedChange={onUpdateDataLabel} />
       </div>
     </LabelAndInput>
   );

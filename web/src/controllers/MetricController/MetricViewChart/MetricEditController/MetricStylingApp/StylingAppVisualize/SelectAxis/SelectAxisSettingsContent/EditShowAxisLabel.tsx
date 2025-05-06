@@ -9,7 +9,7 @@ export const EditShowAxisLabel: React.FC<{
   return (
     <LabelAndInput label="Show axis label">
       <div className="flex justify-end">
-        <Switch defaultChecked={showAxisLabel} onCheckedChange={onChangeShowAxisLabel} />
+        <Switch checked={showAxisLabel} onCheckedChange={onChangeShowAxisLabel} />
       </div>
     </LabelAndInput>
   );

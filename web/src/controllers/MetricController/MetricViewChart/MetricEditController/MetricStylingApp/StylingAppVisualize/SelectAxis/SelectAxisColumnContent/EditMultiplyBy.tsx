@@ -6,26 +6,21 @@ import { InputNumber } from '@/components/ui/inputs';
 export const EditMultiplyBy: React.FC<{
   multiplier: IColumnLabelFormat['multiplier'];
   onUpdateColumnConfig: (columnLabelFormat: Partial<IColumnLabelFormat>) => void;
-}> = React.memo(
-  ({ multiplier, onUpdateColumnConfig }) => {
-    return (
-      <LabelAndInput label="Multiply By" dataTestId="edit-multiply-by-input">
-        <InputNumber
-          placeholder="1"
-          className="w-full!"
-          min={0}
-          defaultValue={multiplier}
-          onChange={(value) =>
-            onUpdateColumnConfig({
-              multiplier: value ?? 1
-            })
-          }
-        />
-      </LabelAndInput>
-    );
-  },
-  () => {
-    return true;
-  }
-);
+}> = React.memo(({ multiplier, onUpdateColumnConfig }) => {
+  return (
+    <LabelAndInput label="Multiply By" dataTestId="edit-multiply-by-input">
+      <InputNumber
+        placeholder="1"
+        className="w-full!"
+        min={0}
+        defaultValue={multiplier}
+        onChange={(value) =>
+          onUpdateColumnConfig({
+            multiplier: value ?? 1
+          })
+        }
+      />
+    </LabelAndInput>
+  );
+});
 EditMultiplyBy.displayName = 'EditMultiplyBy';

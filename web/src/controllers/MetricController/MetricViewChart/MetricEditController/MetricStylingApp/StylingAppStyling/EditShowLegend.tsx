@@ -26,7 +26,7 @@ export const EditShowLegend: React.FC<{
       <LabelAndInput label={'Show legend'}>
         <div className="flex justify-end">
           <Switch
-            defaultChecked={showLegend ?? false}
+            checked={showLegend ?? false}
             onCheckedChange={(v) => onUpdateChartConfig({ showLegend: v })}
           />
         </div>

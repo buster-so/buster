@@ -36,7 +36,7 @@ export const TrendlineLabel = React.memo(
       <>
         <LabelAndInput label="Show label">
           <div className="flex w-full justify-end">
-            <Switch defaultChecked={showTrendlineLabel} onCheckedChange={onChangeSwitch} />
+            <Switch checked={showTrendlineLabel} onCheckedChange={onChangeSwitch} />
           </div>
         </LabelAndInput>
 

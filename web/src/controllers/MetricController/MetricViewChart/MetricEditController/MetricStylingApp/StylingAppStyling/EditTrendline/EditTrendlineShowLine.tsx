@@ -21,7 +21,7 @@ export const EditTrendlineShowLine = React.memo(
     return (
       <LabelAndInput label="Show trend line">
         <div className="flex w-full justify-end">
-          <Switch defaultChecked={show} onCheckedChange={onChange} />
+          <Switch checked={show} onCheckedChange={onChange} />
         </div>
       </LabelAndInput>
     );

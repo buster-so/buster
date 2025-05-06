@@ -26,7 +26,7 @@ export const EditSmoothLinesGlobal: React.FC<{
   return (
     <LabelAndInput label="Smooth lines">
       <div className="flex w-full justify-end">
-        <Switch defaultChecked={allSmooth} onCheckedChange={onChangeAllSmooth} />
+        <Switch checked={allSmooth} onCheckedChange={onChangeAllSmooth} />
       </div>
     </LabelAndInput>
   );

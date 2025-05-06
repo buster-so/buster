@@ -15,7 +15,7 @@ export const EditPieShowInnerLabel = React.memo(
       <LabelAndInput label="Show inner label">
         <div className="flex w-full items-center justify-end space-x-2.5">
           <Switch
-            defaultChecked={pieShowInnerLabel}
+            checked={pieShowInnerLabel}
             onCheckedChange={(value) => onUpdateChartConfig({ pieShowInnerLabel: value })}
           />
         </div>

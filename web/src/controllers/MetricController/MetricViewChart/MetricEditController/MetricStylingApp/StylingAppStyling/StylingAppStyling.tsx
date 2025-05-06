@@ -214,7 +214,7 @@ const GlobalSettings: React.FC<
 
   const mostPermissiveDataLabel: boolean = useMemo(() => {
     return Object.values(columnSettings).some((x) => x.showDataLabels);
-  }, []);
+  }, [columnSettings]);
 
   const mostPermissiveHideYAxis: boolean = useMemo(() => {
     return yAxisShowAxisLabel === false || yAxisShowAxisTitle === false;

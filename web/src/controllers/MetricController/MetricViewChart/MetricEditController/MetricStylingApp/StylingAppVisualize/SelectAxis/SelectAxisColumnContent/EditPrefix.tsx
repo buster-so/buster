@@ -6,26 +6,21 @@ import { Input } from '@/components/ui/inputs';
 export const EditPrefix: React.FC<{
   prefix: IColumnLabelFormat['prefix'];
   onUpdateColumnConfig: (columnLabelFormat: Partial<IColumnLabelFormat>) => void;
-}> = React.memo(
-  ({ prefix, onUpdateColumnConfig }) => {
-    return (
-      <LabelAndInput label="Prefix" dataTestId="edit-prefix-input">
-        <Input
-          className="w-full!"
-          min={0}
-          placeholder="$"
-          defaultValue={prefix}
-          onChange={(e) =>
-            onUpdateColumnConfig({
-              prefix: e.target.value ?? ''
-            })
-          }
-        />
-      </LabelAndInput>
-    );
-  },
-  () => {
-    return true;
-  }
-);
+}> = React.memo(({ prefix, onUpdateColumnConfig }) => {
+  return (
+    <LabelAndInput label="Prefix" dataTestId="edit-prefix-input">
+      <Input
+        className="w-full!"
+        min={0}
+        placeholder="$"
+        defaultValue={prefix}
+        onChange={(e) =>
+          onUpdateColumnConfig({
+            prefix: e.target.value ?? ''
+          })
+        }
+      />
+    </LabelAndInput>
+  );
+});
 EditPrefix.displayName = 'EditPrefix';

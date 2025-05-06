@@ -8,24 +8,19 @@ export const EditShowDataLabel: React.FC<{
   showDataLabels: Required<ColumnSettings>['showDataLabels'];
   rowCount: number;
   onUpdateColumnSettingConfig: (columnSettings: Partial<ColumnSettings>) => void;
-}> = React.memo(
-  ({ showDataLabels, rowCount, onUpdateColumnSettingConfig }) => {
-    return (
-      <LabelAndInput label="Show data labels">
-        <div className="flex w-full justify-end gap-x-2">
-          <WarningIcon rowCount={rowCount} />
-          <Switch
-            defaultChecked={showDataLabels}
-            onCheckedChange={(v) => {
-              onUpdateColumnSettingConfig({ showDataLabels: v });
-            }}
-          />
-        </div>
-      </LabelAndInput>
-    );
-  },
-  () => {
-    return true;
-  }
-);
+}> = React.memo(({ showDataLabels, rowCount, onUpdateColumnSettingConfig }) => {
+  return (
+    <LabelAndInput label="Show data labels">
+      <div className="flex w-full justify-end gap-x-2">
+        <WarningIcon rowCount={rowCount} />
+        <Switch
+          checked={showDataLabels}
+          onCheckedChange={(v) => {
+            onUpdateColumnSettingConfig({ showDataLabels: v });
+          }}
+        />
+      </div>
+    </LabelAndInput>
+  );
+});
 EditShowDataLabel.displayName = 'EditShowDataLabel';

@@ -34,9 +34,6 @@ export const EditPieMinimumSlicePercentage = React.memo(
         />
       </LabelAndInput>
     );
-  },
-  () => {
-    return true;
   }
 );
 EditPieMinimumSlicePercentage.displayName = 'EditPieMinimumSlicePercentage';

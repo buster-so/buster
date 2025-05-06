@@ -98,7 +98,7 @@ const StackTotals: React.FC<{
   return (
     <LabelAndInput label="Stack totals">
       <div className="flex justify-end">
-        <Switch defaultChecked={value} onCheckedChange={onChange} />
+        <Switch checked={value} onCheckedChange={onChange} />
       </div>
     </LabelAndInput>
   );

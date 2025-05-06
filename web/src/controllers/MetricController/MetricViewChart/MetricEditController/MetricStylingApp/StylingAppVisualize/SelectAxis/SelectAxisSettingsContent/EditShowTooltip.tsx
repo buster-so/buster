@@ -9,7 +9,7 @@ export const EditShowTooltip: React.FC<{
   return (
     <LabelAndInput label="Disable tooltip">
       <div className="flex justify-end">
-        <Switch defaultChecked={disableTooltip} onCheckedChange={onChangeDisableTooltip} />
+        <Switch checked={disableTooltip} onCheckedChange={onChangeDisableTooltip} />
       </div>
     </LabelAndInput>
   );

@@ -6,26 +6,21 @@ import { Input } from '@/components/ui/inputs';
 export const EditSuffix: React.FC<{
   suffix: IColumnLabelFormat['suffix'];
   onUpdateColumnConfig: (columnLabelFormat: Partial<IColumnLabelFormat>) => void;
-}> = React.memo(
-  ({ suffix, onUpdateColumnConfig }) => {
-    return (
-      <LabelAndInput label="Suffix" dataTestId="edit-suffix-input">
-        <Input
-          className="w-full!"
-          min={0}
-          defaultValue={suffix}
-          placeholder="dollars"
-          onChange={(e) =>
-            onUpdateColumnConfig({
-              suffix: e.target.value ?? ''
-            })
-          }
-        />
-      </LabelAndInput>
-    );
-  },
-  () => {
-    return true;
-  }
-);
+}> = React.memo(({ suffix, onUpdateColumnConfig }) => {
+  return (
+    <LabelAndInput label="Suffix" dataTestId="edit-suffix-input">
+      <Input
+        className="w-full!"
+        min={0}
+        defaultValue={suffix}
+        placeholder="dollars"
+        onChange={(e) =>
+          onUpdateColumnConfig({
+            suffix: e.target.value ?? ''
+          })
+        }
+      />
+    </LabelAndInput>
+  );
+});
 EditSuffix.displayName = 'EditSuffix';

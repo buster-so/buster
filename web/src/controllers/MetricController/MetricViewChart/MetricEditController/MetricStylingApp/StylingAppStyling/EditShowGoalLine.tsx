@@ -24,116 +24,111 @@ export const EditGoalLine: React.FC<{
   onUpdateChartConfig: (config: Partial<IBusterMetricChartConfig>) => void;
   columnMetadata: ColumnMetaData[] | undefined;
   selectedAxis: ChartEncodes;
-}> = React.memo(
-  ({ goalLines, onUpdateChartConfig, columnMetadata, selectedAxis }) => {
-    const [goals, setGoals] = useState<LoopGoalLine[]>(
-      goalLines.map((goal) => ({ ...goal, id: uuidv4() }))
-    );
-    const [newGoalIds, { add: addNewGoalId }] = useSet<string>();
+}> = React.memo(({ goalLines, onUpdateChartConfig, columnMetadata, selectedAxis }) => {
+  const [goals, setGoals] = useState<LoopGoalLine[]>(
+    goalLines.map((goal) => ({ ...goal, id: uuidv4() }))
+  );
+  const [newGoalIds, { add: addNewGoalId }] = useSet<string>();
 
-    const yAxisKeys = selectedAxis.y;
+  const yAxisKeys = selectedAxis.y;
 
-    const onAddGoalLine = useMemoizedFn(() => {
-      const yAxisKey = yAxisKeys[0];
-      const yAxisMetadata = columnMetadata?.find((meta) => meta.name === yAxisKey);
-      const yAxisValue: number =
-        yAxisMetadata?.max_value && typeof yAxisMetadata.max_value === 'number'
-          ? Math.round(yAxisMetadata?.max_value * 0.85)
-          : 200;
+  const onAddGoalLine = useMemoizedFn(() => {
+    const yAxisKey = yAxisKeys[0];
+    const yAxisMetadata = columnMetadata?.find((meta) => meta.name === yAxisKey);
+    const yAxisValue: number =
+      yAxisMetadata?.max_value && typeof yAxisMetadata.max_value === 'number'
+        ? Math.round(yAxisMetadata?.max_value * 0.85)
+        : 200;
 
-      const newGoalLine: Required<LoopGoalLine> = {
-        id: uuidv4(),
-        show: true,
-        value: yAxisValue,
-        showGoalLineLabel: true,
-        goalLineLabel: null,
-        goalLineColor: null
-      };
+    const newGoalLine: Required<LoopGoalLine> = {
+      id: uuidv4(),
+      show: true,
+      value: yAxisValue,
+      showGoalLineLabel: true,
+      goalLineLabel: null,
+      goalLineColor: null
+    };
 
-      addNewGoalId(newGoalLine.id);
-      setGoals((prev) => {
-        const newGoals = [...prev, newGoalLine];
-        onUpdateGoalLines(newGoals);
-        return newGoals;
-      });
+    addNewGoalId(newGoalLine.id);
+    setGoals((prev) => {
+      const newGoals = [...prev, newGoalLine];
+      onUpdateGoalLines(newGoals);
+      return newGoals;
     });
+  });
 
-    const onUpdateGoalLines = useMemoizedFn((goals: LoopGoalLine[]) => {
-      const newGoals = goals.map(({ id, ...rest }) => ({
-        ...rest
-      }));
+  const onUpdateGoalLines = useMemoizedFn((goals: LoopGoalLine[]) => {
+    const newGoals = goals.map(({ id, ...rest }) => ({
+      ...rest
+    }));
 
-      requestAnimationFrame(() => {
-        onUpdateChartConfig({ goalLines: newGoals });
-      });
+    requestAnimationFrame(() => {
+      onUpdateChartConfig({ goalLines: newGoals });
     });
+  });
 
-    const onDeleteGoalLine = useMemoizedFn((id: string) => {
-      setGoals((prev) => {
-        const newGoals = prev.filter((goal) => goal.id !== id);
-        onUpdateGoalLines(newGoals);
-        return newGoals;
-      });
+  const onDeleteGoalLine = useMemoizedFn((id: string) => {
+    setGoals((prev) => {
+      const newGoals = prev.filter((goal) => goal.id !== id);
+      onUpdateGoalLines(newGoals);
+      return newGoals;
     });
+  });
 
-    const onUpdateExisitingGoalLine = useMemoizedFn((goal: LoopGoalLine) => {
-      setGoals((prev) => {
-        const newGoals = prev.map((g) => (g.id === goal.id ? goal : g));
-        onUpdateGoalLines(newGoals);
-        return newGoals;
-      });
+  const onUpdateExisitingGoalLine = useMemoizedFn((goal: LoopGoalLine) => {
+    setGoals((prev) => {
+      const newGoals = prev.map((g) => (g.id === goal.id ? goal : g));
+      onUpdateGoalLines(newGoals);
+      return newGoals;
     });
+  });
 
-    return (
-      <div className="flex flex-col space-y-2.5">
-        <LabelAndInput label="Goal line">
-          <div className="flex items-center justify-end">
-            <Button onClick={onAddGoalLine} variant="ghost" prefix={<Plus />}>
-              Add goal line
-            </Button>
-          </div>
-        </LabelAndInput>
+  return (
+    <div className="flex flex-col space-y-2.5">
+      <LabelAndInput label="Goal line">
+        <div className="flex items-center justify-end">
+          <Button onClick={onAddGoalLine} variant="ghost" prefix={<Plus />}>
+            Add goal line
+          </Button>
+        </div>
+      </LabelAndInput>
 
-        <AnimatePresence mode="popLayout" initial={false}>
-          {goals.map((goal) => (
-            <motion.div
-              key={goal.id}
-              layout="position"
-              layoutId={goal.id}
-              initial={{ opacity: 0, height: 0 }}
-              animate={{
-                opacity: 1,
-                height: 'auto',
-                transition: {
-                  height: { type: 'spring', bounce: 0.2, duration: 0.6 },
-                  opacity: { duration: 0.2 }
-                }
-              }}
-              exit={{
-                opacity: 0,
-                height: 0,
-                y: -5,
-                transition: {
-                  height: { duration: 0.2 },
-                  opacity: { duration: 0.2 }
-                }
-              }}>
-              <EditGoalLineItem
-                goal={goal}
-                onDeleteGoalLine={onDeleteGoalLine}
-                onUpdateExisitingGoalLine={onUpdateExisitingGoalLine}
-                isNewGoal={newGoalIds.has(goal.id)}
-              />
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
-    );
-  },
-  () => {
-    return true;
-  }
-);
+      <AnimatePresence mode="popLayout" initial={false}>
+        {goals.map((goal) => (
+          <motion.div
+            key={goal.id}
+            layout="position"
+            layoutId={goal.id}
+            initial={{ opacity: 0, height: 0 }}
+            animate={{
+              opacity: 1,
+              height: 'auto',
+              transition: {
+                height: { type: 'spring', bounce: 0.2, duration: 0.6 },
+                opacity: { duration: 0.2 }
+              }
+            }}
+            exit={{
+              opacity: 0,
+              height: 0,
+              y: -5,
+              transition: {
+                height: { duration: 0.2 },
+                opacity: { duration: 0.2 }
+              }
+            }}>
+            <EditGoalLineItem
+              goal={goal}
+              onDeleteGoalLine={onDeleteGoalLine}
+              onUpdateExisitingGoalLine={onUpdateExisitingGoalLine}
+              isNewGoal={newGoalIds.has(goal.id)}
+            />
+          </motion.div>
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+});
 EditGoalLine.displayName = 'EditGoalLine';
 
 const EditGoalLineItem: React.FC<{
@@ -166,7 +161,7 @@ const GoalLineItemContent: React.FC<{
         <LabelAndInput label="Show goal line">
           <div className="flex w-full justify-end">
             <Switch
-              defaultChecked={show}
+              checked={show}
               onCheckedChange={(checked) => onUpdateExisitingGoalLine({ ...goal, show: checked })}
             />
           </div>
@@ -201,7 +196,7 @@ const GoalLineItemContent: React.FC<{
         <LabelAndInput label="Show line label">
           <div className="flex w-full justify-end">
             <Switch
-              defaultChecked={showGoalLineLabel}
+              checked={showGoalLineLabel}
               onCheckedChange={(checked) =>
                 onUpdateExisitingGoalLine({ ...goal, showGoalLineLabel: checked })
               }

@@ -27,7 +27,7 @@ export const EditDotsOnLineGlobal: React.FC<{
   return (
     <LabelAndInput label="Dot on lines">
       <div className="flex w-full justify-end">
-        <Switch defaultChecked={allDotsOnLine} onCheckedChange={onChangeAllSmooth} />
+        <Switch checked={allDotsOnLine} onCheckedChange={onChangeAllSmooth} />
       </div>
     </LabelAndInput>
   );
