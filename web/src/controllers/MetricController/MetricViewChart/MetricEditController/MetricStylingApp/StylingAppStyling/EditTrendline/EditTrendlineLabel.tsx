@@ -43,7 +43,7 @@ export const TrendlineLabel = React.memo(
         {showTrendlineLabel && (
           <LabelAndInput label="Label">
             <Input
-              defaultValue={trendlineLabel || ''}
+              value={trendlineLabel || ''}
               className="w-full"
               placeholder={trendlineLabelPlaceholder as string}
               onChange={onChangeInput}

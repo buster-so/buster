@@ -16,7 +16,7 @@ import { lineSeriesBuilder, lineSeriesBuilder_labels } from './lineSeriesBuilder
 import { scatterSeriesBuilder_data, scatterSeriesBuilder_labels } from './scatterSeriesBuilder';
 import { comboSeriesBuilder_data, comboSeriesBuilder_labels } from './comboSeriesBuilder';
 import type { ColumnMetaData } from '@/api/asset_interfaces/metric/interfaces';
-import { isNumeric, isNumericColumnType } from '@/lib';
+import { isNumericColumnType } from '@/lib';
 
 export interface UseSeriesOptionsProps {
   selectedChartType: ChartType;

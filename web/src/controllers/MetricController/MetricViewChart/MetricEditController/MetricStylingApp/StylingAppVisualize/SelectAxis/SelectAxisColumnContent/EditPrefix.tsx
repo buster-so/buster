@@ -13,7 +13,7 @@ export const EditPrefix: React.FC<{
         className="w-full!"
         min={0}
         placeholder="$"
-        defaultValue={prefix}
+        value={prefix}
         onChange={(e) =>
           onUpdateColumnConfig({
             prefix: e.target.value ?? ''

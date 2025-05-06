@@ -171,7 +171,7 @@ const GoalLineItemContent: React.FC<{
           <div className="flex w-full justify-end">
             <InputNumber
               className="min-w-[120px]"
-              defaultValue={value}
+              value={value}
               onChange={(value) => onUpdateExisitingGoalLine({ ...goal, value: value as number })}
             />
           </div>
@@ -209,7 +209,7 @@ const GoalLineItemContent: React.FC<{
             <div className="flex w-full justify-end">
               <Input
                 className="w-full"
-                defaultValue={goalLineLabel || ''}
+                value={goalLineLabel || ''}
                 placeholder="Goal"
                 onChange={(e) =>
                   onUpdateExisitingGoalLine({ ...goal, goalLineLabel: e.target.value })

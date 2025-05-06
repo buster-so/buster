@@ -25,13 +25,7 @@ export const EditScatterDotSize: React.FC<{
 
   return (
     <LabelAndInput label="Dot size">
-      <Slider
-        min={1}
-        max={50}
-        step={1}
-        defaultValue={defaultValue as number[]}
-        onValueChange={onChange}
-      />
+      <Slider min={1} max={50} step={1} value={defaultValue as number[]} onValueChange={onChange} />
     </LabelAndInput>
   );
 });

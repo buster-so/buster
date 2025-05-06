@@ -74,7 +74,7 @@ export const EditAxisTitle: React.FC<{
     <LabelAndInput label={label}>
       <Input
         placeholder={formattedColumnTitle || 'Column ID'}
-        defaultValue={axisTitle || ''}
+        value={axisTitle || ''}
         onChange={(e) => {
           onChangeTitle(e.target.value || null);
         }}

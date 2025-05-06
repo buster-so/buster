@@ -13,7 +13,7 @@ export const EditTitle: React.FC<{
       <Input
         className="w-full"
         placeholder={formattedTitle}
-        defaultValue={displayName || ''}
+        value={displayName || ''}
         onChange={(e) => {
           onUpdateColumnConfig({
             displayName: e.target.value

@@ -46,7 +46,7 @@ export const EditCurrency: React.FC<{
           items={options}
           disabled={!isFetched}
           onChange={onChange}
-          defaultValue={selectedCurrency?.value}
+          value={selectedCurrency?.value}
           className="w-full!"
         />
       </div>

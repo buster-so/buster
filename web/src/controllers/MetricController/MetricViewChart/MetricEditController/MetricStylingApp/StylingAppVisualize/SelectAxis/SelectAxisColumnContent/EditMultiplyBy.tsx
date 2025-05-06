@@ -13,7 +13,7 @@ export const EditMultiplyBy: React.FC<{
         placeholder="1"
         className="w-full!"
         min={0}
-        defaultValue={multiplier}
+        value={multiplier}
         onChange={(value) =>
           onUpdateColumnConfig({
             multiplier: value ?? 1

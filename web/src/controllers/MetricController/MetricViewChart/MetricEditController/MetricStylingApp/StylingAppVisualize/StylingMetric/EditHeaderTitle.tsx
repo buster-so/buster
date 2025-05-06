@@ -28,7 +28,7 @@ export const EditHeaderTitle: React.FC<{
 
   return (
     <LabelAndInput label={title}>
-      <Input ref={inputRef} placeholder={placeholder} defaultValue={value} onChange={onChange} />
+      <Input ref={inputRef} placeholder={placeholder} value={value} onChange={onChange} />
     </LabelAndInput>
   );
 });

@@ -12,7 +12,7 @@ export const EditSuffix: React.FC<{
       <Input
         className="w-full!"
         min={0}
-        defaultValue={suffix}
+        value={suffix}
         placeholder="dollars"
         onChange={(e) =>
           onUpdateColumnConfig({
