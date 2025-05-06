@@ -26,7 +26,7 @@ export const BusterChartTooltip: React.FC<{
           className={`grid ${
             isScatter
               ? 'grid-cols-1 gap-y-[3px]'
-              : 'grid-cols-[auto_auto] items-center gap-x-5 gap-y-[3px]'
+              : 'grid-cols-[auto_auto] items-center gap-x-3 gap-y-[3px]'
           }`}>
           {shownItems.map((param, index) => (
             <TooltipItem key={index} {...param} />

@@ -161,7 +161,8 @@ const ColumnSettingComponent: React.FC<{
   const isSizeZone = zoneId === SelectAxisContainerId.SizeAxis;
   const isBarVisualization = columnVisualization === 'bar';
   const isLineVisualization = columnVisualization === 'line';
-  const isTablePieChart = selectedChartType === ChartType.Table || isPieChart;
+  const isTableChart = selectedChartType === ChartType.Table;
+  const isTablePieChart = isTableChart || isPieChart;
   const isTableMetricPieChart = isTablePieChart || isMetricChart;
 
   const isPercentStacked = useMemo(() => {
@@ -176,7 +177,7 @@ const ColumnSettingComponent: React.FC<{
 
   const ComponentsLoop = [
     {
-      enabled: !isXAxisZone && !isTablePieChart && !isSizeZone && !isScatterChart,
+      enabled: !isXAxisZone && !isTableChart && !isSizeZone && !isScatterChart,
       key: 'title',
       Component: (
         <EditTitle
