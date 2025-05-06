@@ -103,21 +103,18 @@ test('Line chart - styling updates - data labels', async ({ page }) => {
   await page.getByTestId('segmented-trigger-Styling').click();
   await page
     .locator('div')
-    .filter({ hasText: /^Show legend$/ })
+    .filter({ hasText: /^Data labels$/ })
     .getByRole('switch')
     .click();
   await expect(
     page
       .locator('div')
-      .filter({ hasText: /^Show legend$/ })
+      .filter({ hasText: /^Data labels$/ })
       .getByRole('switch')
   ).toHaveAttribute('data-state', 'checked');
+  await page.waitForTimeout(150);
   await page.getByRole('button', { name: 'Reset' }).click();
-  await page
-    .locator('div')
-    .filter({ hasText: /^Data labels$/ })
-    .getByRole('switch')
-    .click();
+  await page.waitForTimeout(150);
   await expect(
     page
       .locator('div')
