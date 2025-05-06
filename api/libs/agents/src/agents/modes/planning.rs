@@ -21,7 +21,7 @@ use crate::tools::{
 };
 
 // Function to get the configuration for the Planning mode
-pub fn get_configuration(agent_data: &ModeAgentData) -> ModeConfiguration {
+pub fn get_configuration(agent_data: &ModeAgentData, _data_source_syntax: Option<String>) -> ModeConfiguration {
     // 1. Get the prompt, formatted with current data
     let prompt = PLANNING_PROMPT
         .replace("{TODAYS_DATE}", &agent_data.todays_date)

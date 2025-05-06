@@ -1,0 +1,22 @@
+[package]
+name = "raindrop"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Workspace dependencies
+anyhow = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+tokio = { workspace = true, features = ["full"] }
+tracing = { workspace = true }
+chrono = { workspace = true, features = ["serde"] } 
+thiserror = { workspace = true }
+reqwest = { workspace = true, features = ["json", "rustls-tls"] }
+
+# Non-workspace dependencies (if any, prefer workspace)
+dotenvy = "0.15"
+
+[dev-dependencies]
+tokio-test = { workspace = true }
+mockito = { workspace = true } 

@@ -34,6 +34,7 @@ sqlx = { workspace = true }
 stored_values = { path = "../stored_values" }
 tokio-retry = { workspace = true }
 thiserror = { workspace = true }
+raindrop = { path = "../raindrop" }
 sql_analyzer = { path = "../sql_analyzer" }
 
 # Development dependencies

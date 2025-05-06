@@ -21,7 +21,7 @@ use crate::tools::{
 };
 
 // Function to get the configuration for the DataCatalogSearch mode
-pub fn get_configuration(agent_data: &ModeAgentData) -> ModeConfiguration {
+pub fn get_configuration(agent_data: &ModeAgentData, _data_source_syntax: Option<String>) -> ModeConfiguration {
     // 1. Get the prompt, formatted with current data
     let prompt = DATA_CATALOG_SEARCH_PROMPT
         .replace("{DATASETS}", &agent_data.dataset_with_descriptions.join("\n\n")) // Deref Arc and Vec to get slice for join

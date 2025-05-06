@@ -57,15 +57,31 @@ impl ModeProvider for BusterModeProvider {
     ) -> Result<ModeConfiguration> {
         let current_mode = determine_agent_state(state);
 
+        // Extract syntax (it might be None if not set yet, which is fine)
+        let data_source_syntax = state
+            .get("data_source_syntax")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string());
+
         // Call the appropriate get_configuration function based on the mode
+        // Pass the extracted syntax (or None) to all modes
         let mode_config = match current_mode {
-            AgentState::Initializing => modes::initialization::get_configuration(&self.agent_data),
-            AgentState::DataCatalogSearch => {
-                modes::data_catalog_search::get_configuration(&self.agent_data)
+            AgentState::Initializing => {
+                modes::initialization::get_configuration(&self.agent_data, data_source_syntax)
             }
-            AgentState::Planning => modes::planning::get_configuration(&self.agent_data),
-            AgentState::AnalysisExecution => modes::analysis::get_configuration(&self.agent_data),
-            AgentState::Review => modes::review::get_configuration(&self.agent_data),
+            AgentState::DataCatalogSearch => {
+                modes::data_catalog_search::get_configuration(&self.agent_data, data_source_syntax)
+            }
+            AgentState::Planning => {
+                modes::planning::get_configuration(&self.agent_data, data_source_syntax)
+            }
+            AgentState::AnalysisExecution => {
+                // Syntax is guaranteed to be extracted here or passed as None
+                modes::analysis::get_configuration(&self.agent_data, data_source_syntax)
+            }
+            AgentState::Review => {
+                modes::review::get_configuration(&self.agent_data, data_source_syntax)
+            }
         };
 
         Ok(mode_config)
@@ -120,7 +136,8 @@ impl BusterMultiAgent {
             .into_iter()
             .filter_map(|ds| ds.yml_content) // Get Some(String), filter out None
             .map(|content| serde_yaml::from_str::<YamlRoot>(&content)) // Parse String -> Result<YamlRoot, Error>
-            .filter_map(|result| { // Handle Result
+            .filter_map(|result| {
+                // Handle Result
                 match result {
                     Ok(parsed_root) => {
                         // Extract info from the first model if available
@@ -130,7 +147,7 @@ impl BusterMultiAgent {
                             tracing::warn!("Parsed YAML has no models");
                             None
                         }
-                    },
+                    }
                     Err(e) => {
                         tracing::warn!("Failed to parse dataset YAML: {}", e);
                         None // Filter out errors

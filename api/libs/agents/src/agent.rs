@@ -11,8 +11,12 @@ use std::time::{Duration, Instant};
 use std::{collections::HashMap, env, sync::Arc};
 use tokio::sync::{broadcast, mpsc, RwLock};
 use tokio_retry::{strategy::ExponentialBackoff, Retry};
-use tracing::{error, warn};
+use tracing::{debug, error, info, instrument, warn};
 use uuid::Uuid;
+
+// Raindrop imports
+use raindrop::types::{AiData as RaindropAiData, Event as RaindropEvent};
+use raindrop::RaindropClient;
 
 // Type definition for tool registry to simplify complex type
 // No longer needed, defined below
@@ -561,6 +565,9 @@ impl Agent {
         trace_builder: Option<TraceBuilder>,
         parent_span: Option<braintrust::Span>,
     ) -> Result<()> {
+        // Attempt to initialize Raindrop client (non-blocking)
+        let raindrop_client = RaindropClient::new().ok();
+
         // Set the initial thread
         {
             let mut current = agent.current_thread.write().await;
@@ -720,6 +727,35 @@ impl Agent {
             reasoning_effort: Some("high".to_string()),
             ..Default::default()
         };
+
+        // --- Track Request with Raindrop ---
+        if let Some(client) = raindrop_client.clone() {
+            let request_clone = request.clone(); // Clone request for tracking
+            let user_id = agent.user_id.clone();
+            let session_id = agent.session_id.to_string();
+            let current_history = agent.get_conversation_history().await.unwrap_or_default();
+            tokio::spawn(async move {
+                let event = RaindropEvent {
+                    user_id: user_id.to_string(),
+                    event: "llm_request".to_string(),
+                    properties: Some(HashMap::from([(
+                        "conversation_history".to_string(),
+                        serde_json::to_value(&current_history).unwrap_or(Value::Null),
+                    )])),
+                    attachments: None,
+                    ai_data: Some(RaindropAiData {
+                        model: request_clone.model.clone(),
+                        input: serde_json::to_string(&request_clone.messages).unwrap_or_default(),
+                        output: "".to_string(), // Output is not known yet
+                        convo_id: Some(session_id.clone()),
+                    }),
+                    event_id: None, // Raindrop assigns this
+                    timestamp: Some(chrono::Utc::now()),
+                };
+                if let Err(e) = client.track_events(vec![event]).await {}
+            });
+        }
+        // --- End Track Request ---
 
         // --- Retry Logic for Initial Stream Request ---
         let retry_strategy = ExponentialBackoff::from_millis(100).take(3); // Retry 3 times, ~100ms, ~200ms, ~400ms
@@ -979,6 +1015,37 @@ impl Agent {
 
         // Update thread with assistant message
         agent.update_current_thread(final_message.clone()).await?;
+
+        // --- Track Response with Raindrop ---
+        if let Some(client) = raindrop_client {
+            let request_clone = request.clone(); // Clone again for response tracking
+            let final_message_clone = final_message.clone();
+            let user_id = agent.user_id.clone();
+            let session_id = agent.session_id.to_string();
+            // Get history *after* adding the final message
+            let current_history = agent.get_conversation_history().await.unwrap_or_default();
+            tokio::spawn(async move {
+                let event = RaindropEvent {
+                    user_id: user_id.to_string(),
+                    event: "llm_response".to_string(),
+                    properties: Some(HashMap::from([(
+                        "conversation_history".to_string(),
+                        serde_json::to_value(&current_history).unwrap_or(Value::Null),
+                    )])),
+                    attachments: None,
+                    ai_data: Some(RaindropAiData {
+                        model: request_clone.model.clone(),
+                        input: serde_json::to_string(&request_clone.messages).unwrap_or_default(),
+                        output: serde_json::to_string(&final_message_clone).unwrap_or_default(),
+                        convo_id: Some(session_id.clone()),
+                    }),
+                    event_id: None, // Raindrop assigns this
+                    timestamp: Some(chrono::Utc::now()),
+                };
+                if let Err(e) = client.track_events(vec![event]).await {}
+            });
+        }
+        // --- End Track Response ---
 
         // Get the updated thread state AFTER adding the final assistant message
         // This will be used for the potential recursive call later.
@@ -1825,4 +1892,3 @@ mod tests {
         assert_eq!(agent.get_state_bool("bool_key").await, None);
     }
 }
-

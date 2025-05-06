@@ -150,19 +150,17 @@ pub const METRIC_YML_SCHEMA: &str = r##"
 #
 # --- FIELD DETAILS & RULES --- 
 # `name`: Human-readable title (e.g., Total Sales). 
-#   - RULE: Should NOT contain underscores (`_`). Use spaces instead.
+#   - RULE: CANNOT contain underscores (`_`). Use spaces instead.
 # `description`: Detailed explanation of the metric. 
 # `timeFrame`: Human-readable time period covered by the query, similar to a filter in a BI tool.
-#   RULE: Must accurately reflect the date/time filter used in the `sql` field. Do not misrepresent the time range.
-#   Examples:
-#   - Relative Dates: "Last 7 days", "Last 30 days", "Last Quarter", "Last Year", "Year to Date"
-#   - Fixed Dates: "June 1, 2025 - June 3, 2025", "2024", "Q2 2024"
-#   - Comparisons: Use the format "Comparison - [Period 1] vs [Period 2]". Examples:
-#     - "Comparison - Last 30 days vs Previous 30 days"
-#     - "Comparison - This Quarter vs Last Quarter"
-#     - "Comparison - 2024 vs 2023"
-#     - "Comparison - Q2 2024 vs Q2 2023"
-#   RULE: Follow general quoting rules. Should not contain ':'.
+#   - For queries with fixed date filters, use specific date ranges, e.g., "January 1, 2020 - December 31, 2020", "2024", "Q2 2024", "June 1, 2025".
+#   - For queries with relative date filters or no date filter, use relative terms, e.g., "Today", "Yesterday", "Last 7 days", "Last 30 days", "Last Quarter", "Last 12 Months", "Year to Date", "All time", etc.
+#   - For comparisons, use "Comparison: [Period 1] vs [Period 2]", with each period formatted according to whether it is fixed or relative, e.g., "Comparison: Last 30 days vs Previous 30 days" or "Comparison: June 1, 2025 - June 30, 2025 vs July 1, 2025 - July 31, 2025".
+#   Rules:
+#     - Must accurately reflect the date/time filter used in the `sql` field. Do not misrepresent the time range.
+#     - Use full month names for dates, e.g., "January", not "Jan".
+#     - Follow general quoting rules. CANNOT contain ':'.
+#   Note: Respond only with the time period, without explanation or additional copy.
 # `sql`: The SQL query for the metric.
 #   - RULE: MUST use the pipe `|` block scalar style to preserve formatting and newlines.
 #   - Example:
@@ -182,7 +180,7 @@ pub const METRIC_YML_SCHEMA: &str = r##"
 # --- GENERAL YAML RULES ---
 # 1. Use standard YAML syntax (indentation, colons for key-value, `-` for arrays).
 # 2. Quoting: Generally avoid quotes for simple strings. Use double quotes (`"...") ONLY if a string contains special characters (like :, {, }, [, ], ,, &, *, #, ?, |, -, <, >, =, !, %, @, `) or needs to preserve leading/trailing whitespace. 
-# 3. Metric name or description should not contain `:`
+# 3. Metric name, timeframe, or description CANNOT contain `:`
 # -------------------------------------
 
 # --- FORMAL SCHEMA --- (Used for validation, reflects rules above)
@@ -216,35 +214,28 @@ properties:
       Human-readable time period covered by the SQL query, similar to a filter in a BI tool.
       RULE: Must accurately reflect the date/time filter used in the `sql` field. Do not misrepresent the time range.
       Examples:
-      - Relative Dates: "Last 7 days", "Last 30 days", "Last Quarter", "Last Year", "Year to Date"
-      - Fixed Dates: "June 1, 2025 - June 3, 2025", "2024", "Q2 2024"
-      - Comparisons: Use the format "Comparison - [Period 1] vs [Period 2]". Examples:
-        - "Comparison - Last 30 days vs Previous 30 days"
-        - "Comparison - This Quarter vs Last Quarter"
-        - "Comparison - 2024 vs 2023"
-        - "Comparison - Q2 2024 vs Q2 2023"
-      RULE: Follow general quoting rules. Should not contain ':'.
+      - Fixed Dates: "January 1, 2020 - December 31, 2020", "2024", "Q2 2024", "June 1, 2025"
+      - Relative Dates: "Today", "Yesterday", "Last 7 days", "Last 30 days", "Last Quarter", "Last 12 Months", "Year to Date", "All time"
+      - Comparisons: Use the format "Comparison: [Period 1] vs [Period 2]". Examples:
+        - "Comparison: Last 30 days vs Previous 30 days"
+        - "Comparison: June 1, 2025 - June 30, 2025 vs July 1, 2025 - July 31, 2025"
+      RULE: Use full month names for dates, e.g., "January", not "Jan".
+      RULE: Follow general quoting rules. CANNOT contain ':'.
 
   # SQL QUERY
-  ### SQL Best Practices and Constraints** (when creating new metrics)  
-  #  - **Constraints**: Only join tables with explicit entity relationships.  
-  #  - **SQL Requirements**:  
-  #    - Use schema-qualified table names (`<DATABASE_NAME>.<SCHEMA_NAME>.<TABLE_NAME>`).  
-  #    - Use fully qualified column names with table aliases (e.g., `<table_alias>.<column>`).
-  #    - Select specific columns (avoid `SELECT *` or `COUNT(*)`).  
-  #    - Use CTEs instead of subqueries, and use snake_case for naming them.  
-  #    - Use `DISTINCT` (not `DISTINCT ON`) with matching `GROUP BY`/`SORT BY` clauses.  
-  #    - Show entity names rather than just IDs.  
-  #    - Handle date conversions appropriately.  
-  #    - Order dates in ascending order.
-  #    - Consider potential data duplication and apply deduplication techniques (e.g., `DISTINCT`, `GROUP BY`) where necessary.
+  # Describes how the SQL should be formatted within the YAML
   sql:
     required: true
     type: string
     description: |
-      SQL query using YAML pipe syntax (|)
+      SQL query using YAML pipe syntax (|).
       The SQL query should be formatted with proper indentation using the YAML pipe (|) syntax.
       This ensures the multi-line SQL is properly parsed while preserving whitespace and newlines.
+      Example:
+        sql: |
+          SELECT column1, column2
+          FROM my_table
+          WHERE condition;
 
   # CHART CONFIGURATION
   chartConfig:

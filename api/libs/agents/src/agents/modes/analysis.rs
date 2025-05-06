@@ -24,12 +24,27 @@ use crate::tools::{
 };
 
 // Function to get the configuration for the AnalysisExecution mode
-pub fn get_configuration(agent_data: &ModeAgentData) -> ModeConfiguration {
-    // 1. Get the prompt, formatted with current data
-    let prompt = PROMPT.replace("{TODAYS_DATE}", &agent_data.todays_date);
-    // Note: This prompt doesn't use {DATASETS}
+pub fn get_configuration(agent_data: &ModeAgentData, data_source_syntax: Option<String>) -> ModeConfiguration {
+    // Determine SQL dialect guidance based on syntax
+    let syntax = data_source_syntax.as_deref().unwrap_or("postgres"); // Default to postgres
+    let sql_dialect_guidance = match syntax {
+        "snowflake" => SNOWFLAKE_DIALECT_GUIDANCE.to_string(),
+        "bigquery" => BIGQUERY_DIALECT_GUIDANCE.to_string(),
+        "redshift" => REDSHIFT_DIALECT_GUIDANCE.to_string(),
+        "mysql" | "mariadb" => MYSQL_MARIADB_DIALECT_GUIDANCE.to_string(),
+        "sqlserver" => SQLSERVER_DIALECT_GUIDANCE.to_string(),
+        "databricks" => DATABRICKS_DIALECT_GUIDANCE.to_string(),
+        "supabase" => POSTGRES_DIALECT_GUIDANCE.to_string(), // Supabase uses Postgres
+        "postgres" => POSTGRES_DIALECT_GUIDANCE.to_string(), // Explicit postgres case
+        _ => POSTGRES_DIALECT_GUIDANCE.to_string(), // Default to Postgres for any others
+    };
 
-    // 2. Define the model for this mode (Using default based on original MODEL = None)
+    // 1. Get the prompt, formatted with current data and SQL guidance
+    let prompt = PROMPT
+        .replace("{TODAYS_DATE}", &agent_data.todays_date)
+        .replace("{SQL_DIALECT_GUIDANCE}", &sql_dialect_guidance);
+
+    // 2. Define the model for this mode
     let model = "gemini-2.5-pro-exp-03-25".to_string();
 
     // 3. Define the tool loader closure
@@ -139,7 +154,7 @@ pub fn get_configuration(agent_data: &ModeAgentData) -> ModeConfiguration {
         })
     });
 
-    // 4. Define terminating tools for this mode (From original load_tools)
+    // 4. Define terminating tools for this mode
     let terminating_tools = vec![Done::get_name()];
 
     // 5. Construct and return the ModeConfiguration
@@ -151,7 +166,71 @@ pub fn get_configuration(agent_data: &ModeAgentData) -> ModeConfiguration {
     }
 }
 
-// Keep the prompt constant, but it's no longer pub
+// Placeholder for SQL dialect guidance
+const POSTGRES_DIALECT_GUIDANCE: &str = r##"
+- **Date/Time Functions (PostgreSQL/Supabase)**:
+  - **`DATE_TRUNC`**: Prefer `DATE_TRUNC('day', column)`, `DATE_TRUNC('week', column)`, `DATE_TRUNC('month', column)`, etc., for grouping time series data. Note that `'week'` starts on Monday.
+  - **`EXTRACT`**: `EXTRACT(DOW FROM column)` (0=Sun), `EXTRACT(ISODOW FROM column)` (1=Mon), `EXTRACT(WEEK FROM column)`, `EXTRACT(EPOCH FROM column)` (Unix timestamp).
+  - **Intervals**: Use `INTERVAL '1 day'`, `INTERVAL '1 month'`, etc.
+  - **Current Date/Time**: `CURRENT_DATE`, `CURRENT_TIMESTAMP`, `NOW()`.
+"##;
+
+const SNOWFLAKE_DIALECT_GUIDANCE: &str = r##"
+- **Date/Time Functions (Snowflake)**:
+  - **`DATE_TRUNC`**: Similar usage: `DATE_TRUNC('DAY', column)`, `DATE_TRUNC('WEEK', column)`, `DATE_TRUNC('MONTH', column)`. Week start depends on `WEEK_START` parameter (default Sunday).
+  - **`EXTRACT`**: `EXTRACT(dayofweek FROM column)` (0=Sun), `EXTRACT(dayofweekiso FROM column)` (1=Mon), `EXTRACT(weekiso FROM column)`. Use `DATE_PART` for more options (e.g., `DATE_PART('epoch_second', column)`).
+  - **DateAdd/DateDiff**: Use `DATEADD(day, 1, column)`, `DATEDIFF(day, start_date, end_date)`.
+  - **Intervals**: Use `INTERVAL '1 DAY'`, `INTERVAL '1 MONTH'`.
+  - **Current Date/Time**: `CURRENT_DATE()`, `CURRENT_TIMESTAMP()`, `SYSDATE()`.
+"##;
+
+const BIGQUERY_DIALECT_GUIDANCE: &str = r##"
+- **Date/Time Functions (BigQuery)**:
+  - **`DATE_TRUNC`**: `DATE_TRUNC(column, DAY)`, `DATE_TRUNC(column, WEEK)`, `DATE_TRUNC(column, MONTH)`, etc. Week starts Sunday by default, use `WEEK(MONDAY)` for Monday start.
+  - **`EXTRACT`**: `EXTRACT(DAYOFWEEK FROM column)` (1=Sun, 7=Sat), `EXTRACT(ISOWEEK FROM column)`.
+  - **DateAdd/DateDiff**: Use `DATE_ADD(column, INTERVAL 1 DAY)`, `DATE_SUB(column, INTERVAL 1 MONTH)`, `DATE_DIFF(end_date, start_date, DAY)`.
+  - **Intervals**: Use `INTERVAL 1 DAY`, `INTERVAL 1 MONTH`.
+  - **Current Date/Time**: `CURRENT_DATE()`, `CURRENT_TIMESTAMP()`, `CURRENT_DATETIME()`.
+"##;
+
+// Add constants for other dialects
+const REDSHIFT_DIALECT_GUIDANCE: &str = r##"
+- **Date/Time Functions (Redshift)**:
+  - **`DATE_TRUNC`**: Similar to PostgreSQL: `DATE_TRUNC('day', column)`, `DATE_TRUNC('week', column)`, `DATE_TRUNC('month', column)`. Week starts Monday.
+  - **`EXTRACT`**: `EXTRACT(DOW FROM column)` (0=Sun), `EXTRACT(EPOCH FROM column)`. Also supports `DATE_PART` (e.g., `DATE_PART(w, column)` for week).
+  - **DateAdd/DateDiff**: Use `DATEADD(day, 1, column)`, `DATEDIFF(day, start_date, end_date)`.
+  - **Intervals**: Use `INTERVAL '1 day'`, `INTERVAL '1 month'`.
+  - **Current Date/Time**: `GETDATE()`, `CURRENT_DATE`, `SYSDATE`.
+"##;
+
+const MYSQL_MARIADB_DIALECT_GUIDANCE: &str = r##"
+- **Date/Time Functions (MySQL/MariaDB)**:
+  - **`DATE_FORMAT`**: Use `DATE_FORMAT(column, '%Y-%m-01')` for month truncation. For week, use `STR_TO_DATE(CONCAT(YEAR(column),'-',WEEK(column, 1),' Monday'), '%X-%V %W')` (Mode 1 starts week on Monday).
+  - **`EXTRACT`**: `EXTRACT(DAYOFWEEK FROM column)` (1=Sun, 7=Sat), `EXTRACT(WEEK FROM column)`. `UNIX_TIMESTAMP(column)` for epoch seconds.
+  - **DateAdd/DateDiff**: Use `DATE_ADD(column, INTERVAL 1 DAY)`, `DATE_SUB(column, INTERVAL 1 MONTH)`, `DATEDIFF(end_date, start_date)`.
+  - **Intervals**: Use `INTERVAL 1 DAY`, `INTERVAL 1 MONTH`.
+  - **Current Date/Time**: `CURDATE()`, `NOW()`, `CURRENT_TIMESTAMP`.
+"##;
+
+const SQLSERVER_DIALECT_GUIDANCE: &str = r##"
+- **Date/Time Functions (SQL Server)**:
+  - **`DATE_TRUNC`**: Available in recent versions: `DATE_TRUNC('day', column)`, `DATE_TRUNC('week', column)`, `DATE_TRUNC('month', column)`. Week start depends on `DATEFIRST` setting.
+  - **`DATEPART`**: `DATEPART(weekday, column)`, `DATEPART(iso_week, column)`, `DATEPART(epoch, column)` (requires user function usually).
+  - **DateAdd/DateDiff**: Use `DATEADD(day, 1, column)`, `DATEDIFF(day, start_date, end_date)`.
+  - **Intervals**: Generally handled by `DATEADD`/`DATEDIFF`.
+  - **Current Date/Time**: `GETDATE()`, `SYSDATETIME()`, `CURRENT_TIMESTAMP`.
+"##;
+
+const DATABRICKS_DIALECT_GUIDANCE: &str = r##"
+- **Date/Time Functions (Databricks SQL)**:
+  - **`DATE_TRUNC`**: `DATE_TRUNC('DAY', column)`, `DATE_TRUNC('WEEK', column)`, `DATE_TRUNC('MONTH', column)`. Week starts Monday.
+  - **`EXTRACT`**: `EXTRACT(DAYOFWEEK FROM column)` (1=Sun, 7=Sat), `EXTRACT(WEEK FROM column)`. `unix_timestamp(column)` for epoch seconds.
+  - **DateAdd/DateDiff**: Use `date_add(column, 1)`, `date_sub(column, 30)`, `datediff(end_date, start_date)`.
+  - **Intervals**: Use `INTERVAL 1 DAY`, `INTERVAL 1 MONTH`.
+  - **Current Date/Time**: `current_date()`, `current_timestamp()`.
+"##;
+
+// Keep the prompt template constant, but add the guidance placeholder
 const PROMPT: &str = r##"### Role & Task
 You are Buster, an expert analytics and data engineer. Your job is to assess what data is available (provided via search results) and then provide fast, accurate answers to analytics questions from non-technical users. You do this by analyzing user requests, using the provided data context, and building metrics or dashboards.
 
@@ -239,7 +318,10 @@ To conclude your worklow, you use the `finish_and_respond` tool to send a final 
 ---
 
 ## SQL Best Practices and Constraints** (when creating new metrics)
-- USE POSTGRESQL SYNTAX
+
+**Current SQL Dialect Guidance:**
+{SQL_DIALECT_GUIDANCE}
+
 - **Keep Queries Simple**: Strive for simplicity and clarity in your SQL. Adhere as closely as possible to the user's direct request without overcomplicating the logic or making unnecessary assumptions.
 - **Default Time Range**: If the user does not specify a time range for analysis, **default to the last 12 months** from {TODAYS_DATE}. Clearly state this assumption if making it.
 - **Avoid Bold Assumptions**: Do not make complex or bold assumptions about the user's intent or the underlying data. If the request is highly ambiguous beyond a reasonable time frame assumption, indicate this limitation in your final response.
@@ -285,8 +367,3 @@ You MUST plan extensively before each function call, and reflect extensively on 
 
 // No specific model override for analysis/execution mode
 pub const MODEL: Option<&str> = None;
-
-// Function to get the formatted prompt for this mode
-pub fn get_prompt(todays_date: &str) -> String {
-    PROMPT.replace("{TODAYS_DATE}", todays_date)
-}

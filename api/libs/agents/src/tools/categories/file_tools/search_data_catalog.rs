@@ -10,7 +10,12 @@ use cohere_rust::{
     api::rerank::{ReRankModel, ReRankRequest},
     Cohere,
 };
-use database::{pool::get_pg_pool, schema::datasets};
+use database::{
+    enums::DataSourceType,
+    pool::get_pg_pool,
+    schema::datasets,
+    schema::data_sources,
+};
 use diesel::prelude::*;
 use diesel_async::RunQueryDsl;
 use futures::stream::{self, StreamExt};
@@ -392,6 +397,45 @@ impl ToolExecutor for SearchDataCatalogTool {
         ).await;
         debug!(data_source_id = %target_data_source_id, "Cached data source ID in agent state");
 
+        // --- BEGIN: Spawn concurrent task to fetch data source syntax ---
+        let agent_clone = self.agent.clone(); // Clone Arc<Agent> for the async block
+        let syntax_future = tokio::spawn(async move {
+            let result: Result<String> = async {
+                let mut conn = get_pg_pool().get().await
+                    .context("Failed to get DB connection for data source type lookup")?;
+
+                let source_type = data_sources::table
+                    .filter(data_sources::id.eq(target_data_source_id))
+                    .select(data_sources::type_) // <-- Use type_ as per user edit
+                    .first::<DataSourceType>(&mut conn) // <-- Use corrected enum name
+                    .await
+                    .context(format!("Failed to find data source type for ID: {}", target_data_source_id))?;
+
+                // Use the enum's to_string() method directly
+                let syntax_string = source_type.to_string();
+                Ok(syntax_string)
+            }.await;
+
+            // Set state inside the spawned task
+            match result {
+                Ok(syntax) => {
+                    debug!(data_source_id = %target_data_source_id, syntax = %syntax, "Determined data source syntax concurrently");
+                    agent_clone.set_state_value(
+                        "data_source_syntax".to_string(),
+                        Value::String(syntax)
+                    ).await;
+                },
+                Err(e) => {
+                    warn!(data_source_id = %target_data_source_id, error = %e, "Failed to determine data source syntax concurrently, setting state to null");
+                    agent_clone.set_state_value(
+                        "data_source_syntax".to_string(),
+                        Value::Null
+                    ).await;
+                }
+            }
+        });
+        // --- END: Spawn concurrent task to fetch data source syntax ---
+
         // --- BEGIN REORDERED VALUE SEARCH ---
 
         // Extract value search terms
@@ -715,6 +759,18 @@ impl ToolExecutor for SearchDataCatalogTool {
             
             updated_results.push(updated_result);
         }
+
+        // --- BEGIN: Wait for syntax future ---
+        // Ensure the syntax task completes before finishing.
+        if let Err(e) = syntax_future.await {
+            // Handle potential join errors (e.g., if the spawned task panicked)
+            warn!(error = %e, "Syntax fetching task failed to join");
+            // Depending on requirements, you might want to return an error here
+            // or ensure the state is explicitly null if it didn't get set.
+            // For now, we'll just log the warning, as the task itself handles
+            // setting state to null on internal errors.
+        }
+        // --- END: Wait for syntax future ---
 
         // Return the updated results
         let mut message = if updated_results.is_empty() {
