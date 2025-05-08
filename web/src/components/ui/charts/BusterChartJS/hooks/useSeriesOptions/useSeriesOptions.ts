@@ -57,7 +57,7 @@ export const useSeriesOptions = ({
   barShowTotalAtTop,
   barGroupType
 }: UseSeriesOptionsProps): ChartProps<ChartJSChartType>['data'] => {
-  const labels: (string | Date)[] | undefined = useMemo(() => {
+  const labels: (string | Date | number)[] | undefined = useMemo(() => {
     return labelsBuilderRecord[selectedChartType]({
       datasetOptions,
       columnLabelFormats,
@@ -139,7 +139,7 @@ export type LabelBuilderProps = {
 
 const labelsBuilderRecord: Record<
   ChartType,
-  (props: LabelBuilderProps) => (string | Date)[] | undefined
+  (props: LabelBuilderProps) => (string | Date | number)[] | undefined
 > = {
   pie: pieSeriesBuilder_labels,
   bar: barSeriesBuilder_labels,
