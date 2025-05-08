@@ -1801,3 +1801,33 @@ export const ProblematicDatasetWithLinearRegression: Story = {
     ]
   }
 };
+
+export const ProblematicDatasetWithLogarithmicRegression_DateXAxis: Story = {
+  args: {
+    ...ProblematicDatasetWithLinearRegression.args,
+    trendlines: [
+      {
+        type: 'logarithmic_regression',
+        show: true,
+        showTrendlineLabel: true,
+        trendlineLabel: 'Logarithmic Regression',
+        columnId: 'total_revenue'
+      }
+    ]
+  }
+};
+
+export const ProblematicDatasetWithPolynomialRegression_DateXAxis: Story = {
+  args: {
+    ...ProblematicDatasetWithLinearRegression.args,
+    trendlines: [
+      {
+        type: 'polynomial_regression',
+        show: true,
+        showTrendlineLabel: true,
+        trendlineLabel: 'Polynomial Regression',
+        columnId: 'total_revenue'
+      }
+    ]
+  }
+};

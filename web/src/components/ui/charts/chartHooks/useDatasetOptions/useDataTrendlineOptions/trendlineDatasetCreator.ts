@@ -228,15 +228,6 @@ export const trendlineDatasetCreator: Record<
       datasetsWithTicks.ticks
     );
 
-    console.log('linear_regression', {
-      datasets,
-      datasetsWithTicks,
-      validData,
-      ticks,
-      xAxisColumn,
-      selectedDatasets
-    });
-
     if (!selectedDatasets || selectedDatasets.length === 0 || validData.length === 0) return [];
 
     const isXAxisDate = isDateColumnType(columnLabelFormats[xAxisColumn]?.columnType);

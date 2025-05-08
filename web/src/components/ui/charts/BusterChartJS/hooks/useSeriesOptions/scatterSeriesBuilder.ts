@@ -144,9 +144,6 @@ const computeSizeRatio = (
 
 export const scatterSeriesBuilder_labels = (props: LabelBuilderProps) => {
   const { trendlineSeries, datasetOptions, columnLabelFormats, xAxisKeys } = props;
-  console.log('scatterSeriesBuilder_labels', {
-    ...props
-  });
 
   if (!trendlineSeries.length) return undefined;
 
