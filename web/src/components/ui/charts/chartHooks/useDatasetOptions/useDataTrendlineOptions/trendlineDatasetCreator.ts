@@ -1,7 +1,7 @@
 // Also consider modifying this package to make it work with chartjs 4 https://pomgui.github.io/chartjs-plugin-regression/demo/
 
 import type { BusterChartProps, Trendline } from '@/api/asset_interfaces/metric/charts';
-import type { DatasetOption, DatasetOptionsWithTicks } from '../interfaces';
+import type { DatasetOptionsWithTicks } from '../interfaces';
 import type { TrendlineDataset } from './trendlineDataset.types';
 import { DATASET_IDS } from '../config';
 import { isDateColumnType, isNumericColumnType } from '@/lib/messages';
@@ -228,11 +228,17 @@ export const trendlineDatasetCreator: Record<
       datasetsWithTicks.ticks
     );
 
+    console.log('linear_regression', {
+      datasets,
+      datasetsWithTicks,
+      validData,
+      ticks,
+      xAxisColumn,
+      selectedDatasets
+    });
+
     if (!selectedDatasets || selectedDatasets.length === 0 || validData.length === 0) return [];
 
-    const isXAxisNumeric = isNumericColumnType(
-      columnLabelFormats[xAxisColumn]?.columnType || DEFAULT_COLUMN_LABEL_FORMAT.columnType
-    );
     const isXAxisDate = isDateColumnType(columnLabelFormats[xAxisColumn]?.columnType);
 
     // Get mapped data points using the updated dataMapper

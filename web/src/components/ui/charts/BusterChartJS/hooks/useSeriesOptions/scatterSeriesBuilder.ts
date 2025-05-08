@@ -143,33 +143,47 @@ const computeSizeRatio = (
 };
 
 export const scatterSeriesBuilder_labels = (props: LabelBuilderProps) => {
-  const { trendlineSeries, datasetOptions } = props;
+  const { trendlineSeries, datasetOptions, columnLabelFormats, xAxisKeys } = props;
+  console.log('scatterSeriesBuilder_labels', {
+    ...props
+  });
 
-  if (trendlineSeries.length > 0) {
-    // Create a Set of relevant yAxisKeys for O(1) lookup
-    const relevantYAxisKeys = new Set(trendlineSeries.map((t) => t.yAxisKey));
+  if (!trendlineSeries.length) return undefined;
 
-    // Combine filtering, flattening and uniqueness in a single pass
-    const allTicksForScatter = datasetOptions.datasets
-      .filter((dataset) => relevantYAxisKeys.has(dataset.dataKey))
-      .flatMap((dataset) => dataset.ticksForScatter || [])
-      .sort((a, b) => {
-        const aVal = a[0],
-          bVal = b[0];
-        return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
-      })
-      .filter((tick, index, array) => index === 0 || tick[0] !== array[index - 1][0]);
+  // Create a Set of relevant yAxisKeys for O(1) lookup
+  const relevantYAxisKeys = new Set(trendlineSeries.map((t) => t.yAxisKey));
 
-    const modifyFiedProps = {
-      ...props,
-      datasetOptions: {
-        ...props.datasetOptions,
-        ticks: allTicksForScatter
-      }
-    };
+  // Get X-axis format information once
+  const xColumnLabelFormat = columnLabelFormats[xAxisKeys[0]] || DEFAULT_COLUMN_LABEL_FORMAT;
+  const useDateLabels =
+    xAxisKeys.length === 1 &&
+    datasetOptions.ticks[0]?.length === 1 &&
+    xColumnLabelFormat.columnType === 'date' &&
+    xColumnLabelFormat.style === 'date';
 
-    return lineSeriesBuilder_labels(modifyFiedProps);
+  if (useDateLabels) {
+    // Process date labels directly without extra iterations
+    return datasetOptions.ticks.flatMap((item) =>
+      item.map<Date>((dateItem) => createDayjsDate(dateItem as string).toDate())
+    );
   }
 
-  return undefined;
+  // Only process relevant datasets
+  const relevantDatasets = datasetOptions.datasets.filter((dataset) =>
+    relevantYAxisKeys.has(dataset.dataKey)
+  );
+
+  // Early return for no relevant datasets
+  if (!relevantDatasets.length) return undefined;
+
+  // Collect all ticks without deduplication
+  const allTicks: (string | number)[][] = [];
+  relevantDatasets.forEach((dataset) => {
+    dataset.ticksForScatter?.forEach((tick) => {
+      allTicks.push(tick);
+    });
+  });
+
+  // Sort and flatten
+  return allTicks.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0)).flat();
 };

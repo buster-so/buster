@@ -205,6 +205,11 @@ export const BusterChartJSComponent = React.memo(
         return 'default';
       });
 
+      console.log('trendlineSeries', {
+        data,
+        options
+      });
+
       return (
         <ChartMountedWrapper>
           <Chart
