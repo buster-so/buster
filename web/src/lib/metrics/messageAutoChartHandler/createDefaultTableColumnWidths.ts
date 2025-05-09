@@ -22,7 +22,7 @@ export const createDefaultTableColumnWidths = (
   return initial;
 };
 
-const OFFSET = 32; //there are 16px of x padding
+const OFFSET = 32 / 1.5; //there are 16px of x padding
 
 const getDefaultColumnWidth = (
   rows: Record<string, string | number | null | Date>[],
@@ -34,7 +34,7 @@ const getDefaultColumnWidth = (
   const longestString = rows.reduce((acc, curr) => {
     const currString = cellFormat(curr[field], field);
     if (!currString) return acc;
-    return acc.length > currString.length ? acc : currString;
+    return String(acc).length > String(currString).length ? acc : currString;
   }, headerString);
   const longestWidth = measureTextWidth(longestString).width + OFFSET;
   return clamp(longestWidth, MIN_COLUMN_WIDTH, MAX_COLUMN_WIDTH);
