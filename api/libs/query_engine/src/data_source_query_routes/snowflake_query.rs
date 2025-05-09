@@ -340,22 +340,20 @@ fn handle_int8_array(
     }
 
     // Check if this is actually a decimal with scale
-    if let Some(scale_str) = scale_str {
-        if let Ok(scale) = scale_str.parse::<i32>() {
-            if scale != 0 {
-                // This is a decimal value
-                let decimal_val = val as f64;
-                let scaled_val = if scale > 0 {
-                    decimal_val / 10_f64.powi(scale)
-                } else {
-                    decimal_val * 10_f64.powi(-scale)
-                };
-                return DataType::Float8(Some(scaled_val));
-            }
+    if let Some(scale_str_val) = scale_str {
+        if let Ok(scale_val) = scale_str_val.parse::<i8>() {
+            // If scale metadata exists, treat as decimal and convert to Float8, even if scale is 0
+            let decimal_val = val as f64;
+            let scaled_val = if scale_val > 0 {
+                decimal_val / 10_f64.powi(scale_val as i32)
+            } else {
+                decimal_val * 10_f64.powi(-scale_val as i32)
+            };
+            return DataType::Float8(Some(scaled_val));
         }
     }
 
-    // Default case for regular integer
+    // Default case for regular integer (no scale metadata)
     DataType::Int2(Some(val as i16))
 }
 
@@ -412,22 +410,20 @@ fn handle_int16_array(
     }
 
     // Check if this is actually a decimal with scale
-    if let Some(scale_str) = scale_str {
-        if let Ok(scale) = scale_str.parse::<i32>() {
-            if scale != 0 {
-                // This is a decimal value
-                let decimal_val = val as f64;
-                let scaled_val = if scale > 0 {
-                    decimal_val / 10_f64.powi(scale)
-                } else {
-                    decimal_val * 10_f64.powi(-scale)
-                };
-                return DataType::Float8(Some(scaled_val));
-            }
+    if let Some(scale_str_val) = scale_str {
+        if let Ok(scale_val) = scale_str_val.parse::<i8>() {
+            // If scale metadata exists, treat as decimal and convert to Float8, even if scale is 0
+            let decimal_val = val as f64;
+            let scaled_val = if scale_val > 0 {
+                decimal_val / 10_f64.powi(scale_val as i32)
+            } else {
+                decimal_val * 10_f64.powi(-scale_val as i32)
+            };
+            return DataType::Float8(Some(scaled_val));
         }
     }
 
-    // Default case for regular integer
+    // Default case for regular integer (no scale metadata)
     DataType::Int2(Some(val))
 }
 
@@ -484,22 +480,20 @@ fn handle_int32_array(
     }
 
     // Check if this is actually a decimal with scale
-    if let Some(scale_str) = scale_str {
-        if let Ok(scale) = scale_str.parse::<i32>() {
-            if scale != 0 {
-                // This is a decimal value
-                let decimal_val = val as f64;
-                let scaled_val = if scale > 0 {
-                    decimal_val / 10_f64.powi(scale)
-                } else {
-                    decimal_val * 10_f64.powi(-scale)
-                };
-                return DataType::Float8(Some(scaled_val));
-            }
+    if let Some(scale_str_val) = scale_str {
+        if let Ok(scale_val) = scale_str_val.parse::<i8>() {
+            // If scale metadata exists, treat as decimal and convert to Float8, even if scale is 0
+            let decimal_val = val as f64;
+            let scaled_val = if scale_val > 0 {
+                decimal_val / 10_f64.powi(scale_val as i32)
+            } else {
+                decimal_val * 10_f64.powi(-scale_val as i32)
+            };
+            return DataType::Float8(Some(scaled_val));
         }
     }
 
-    // Default case for regular integer
+    // Default case for regular integer (no scale metadata)
     DataType::Int4(Some(val))
 }
 
@@ -556,22 +550,20 @@ fn handle_int64_array(
     }
 
     // Check if this is actually a decimal with scale
-    if let Some(scale_str) = scale_str {
-        if let Ok(scale) = scale_str.parse::<i32>() {
-            if scale != 0 {
-                // This is a decimal value
-                let decimal_val = val as f64;
-                let scaled_val = if scale > 0 {
-                    decimal_val / 10_f64.powi(scale)
-                } else {
-                    decimal_val * 10_f64.powi(-scale)
-                };
-                return DataType::Float8(Some(scaled_val));
-            }
+    if let Some(scale_str_val) = scale_str {
+        if let Ok(scale_val) = scale_str_val.parse::<i8>() {
+            // If scale metadata exists, treat as decimal and convert to Float8, even if scale is 0
+            let decimal_val = val as f64;
+            let scaled_val = if scale_val > 0 {
+                decimal_val / 10_f64.powi(scale_val as i32)
+            } else {
+                decimal_val * 10_f64.powi(-scale_val as i32)
+            };
+            return DataType::Float8(Some(scaled_val));
         }
     }
 
-    // Default case for regular integer
+    // Default case for regular integer (no scale metadata)
     DataType::Int8(Some(val))
 }
 
@@ -628,22 +620,20 @@ fn handle_uint8_array(
     }
 
     // Check if this is actually a decimal with scale
-    if let Some(scale_str) = scale_str {
-        if let Ok(scale) = scale_str.parse::<i32>() {
-            if scale != 0 {
-                // This is a decimal value
-                let decimal_val = val as f64;
-                let scaled_val = if scale > 0 {
-                    decimal_val / 10_f64.powi(scale)
-                } else {
-                    decimal_val * 10_f64.powi(-scale)
-                };
-                return DataType::Float8(Some(scaled_val));
-            }
+    if let Some(scale_str_val) = scale_str {
+        if let Ok(scale_val) = scale_str_val.parse::<i8>() {
+            // If scale metadata exists, treat as decimal and convert to Float8, even if scale is 0
+            let decimal_val = val as f64;
+            let scaled_val = if scale_val > 0 {
+                decimal_val / 10_f64.powi(scale_val as i32)
+            } else {
+                decimal_val * 10_f64.powi(-scale_val as i32)
+            };
+            return DataType::Float8(Some(scaled_val));
         }
     }
 
-    // Default case for regular integer
+    // Default case for regular integer (no scale metadata)
     DataType::Int2(Some(val as i16))
 }
 
@@ -700,22 +690,20 @@ fn handle_uint16_array(
     }
 
     // Check if this is actually a decimal with scale
-    if let Some(scale_str) = scale_str {
-        if let Ok(scale) = scale_str.parse::<i32>() {
-            if scale != 0 {
-                // This is a decimal value
-                let decimal_val = val as f64;
-                let scaled_val = if scale > 0 {
-                    decimal_val / 10_f64.powi(scale)
-                } else {
-                    decimal_val * 10_f64.powi(-scale)
-                };
-                return DataType::Float8(Some(scaled_val));
-            }
+    if let Some(scale_str_val) = scale_str {
+        if let Ok(scale_val) = scale_str_val.parse::<i8>() {
+            // If scale metadata exists, treat as decimal and convert to Float8, even if scale is 0
+            let decimal_val = val as f64;
+            let scaled_val = if scale_val > 0 {
+                decimal_val / 10_f64.powi(scale_val as i32)
+            } else {
+                decimal_val * 10_f64.powi(-scale_val as i32)
+            };
+            return DataType::Float8(Some(scaled_val));
         }
     }
 
-    // Default case for regular integer
+    // Default case for regular integer (no scale metadata)
     DataType::Int4(Some(val as i32))
 }
 
@@ -772,22 +760,20 @@ fn handle_uint32_array(
     }
 
     // Check if this is actually a decimal with scale
-    if let Some(scale_str) = scale_str {
-        if let Ok(scale) = scale_str.parse::<i32>() {
-            if scale != 0 {
-                // This is a decimal value
-                let decimal_val = val as f64;
-                let scaled_val = if scale > 0 {
-                    decimal_val / 10_f64.powi(scale)
-                } else {
-                    decimal_val * 10_f64.powi(-scale)
-                };
-                return DataType::Float8(Some(scaled_val));
-            }
+    if let Some(scale_str_val) = scale_str {
+        if let Ok(scale_val) = scale_str_val.parse::<i8>() {
+            // If scale metadata exists, treat as decimal and convert to Float8, even if scale is 0
+            let decimal_val = val as f64;
+            let scaled_val = if scale_val > 0 {
+                decimal_val / 10_f64.powi(scale_val as i32)
+            } else {
+                decimal_val * 10_f64.powi(-scale_val as i32)
+            };
+            return DataType::Float8(Some(scaled_val));
         }
     }
 
-    // Default case for regular integer
+    // Default case for regular integer (no scale metadata)
     DataType::Int8(Some(val as i64))
 }
 
@@ -844,22 +830,20 @@ fn handle_uint64_array(
     }
 
     // Check if this is actually a decimal with scale
-    if let Some(scale_str) = scale_str {
-        if let Ok(scale) = scale_str.parse::<i32>() {
-            if scale != 0 {
-                // This is a decimal value
-                let decimal_val = val as f64;
-                let scaled_val = if scale > 0 {
-                    decimal_val / 10_f64.powi(scale)
-                } else {
-                    decimal_val * 10_f64.powi(-scale)
-                };
-                return DataType::Float8(Some(scaled_val));
-            }
+    if let Some(scale_str_val) = scale_str {
+        if let Ok(scale_val) = scale_str_val.parse::<i8>() {
+            // If scale metadata exists, treat as decimal and convert to Float8, even if scale is 0
+            let decimal_val = val as f64;
+            let scaled_val = if scale_val > 0 {
+                decimal_val / 10_f64.powi(scale_val as i32)
+            } else {
+                decimal_val * 10_f64.powi(-scale_val as i32)
+            };
+            return DataType::Float8(Some(scaled_val));
         }
     }
 
-    // Default case for regular integer
+    // Default case for regular integer (no scale metadata)
     DataType::Int8(Some(val as i64))
 }
 
@@ -881,8 +865,8 @@ fn handle_float32_array(
             // Convert to i64 and handle as timestamp
             let val_i64 = val as i64;
             // Determine scale factor
-            let scale = if let Some(scale_str) = scale_str {
-                scale_str.parse::<i32>().unwrap_or(0)
+            let scale = if let Some(scale_str_val) = scale_str {
+                scale_str_val.parse::<i32>().unwrap_or(0)
             } else {
                 0
             };
@@ -916,14 +900,15 @@ fn handle_float32_array(
     }
 
     // Check if this is actually a decimal with scale
-    if let Some(scale_str) = scale_str {
-        if let Ok(scale) = scale_str.parse::<i32>() {
-            if scale != 0 {
+    if let Some(scale_str_val) = scale_str {
+        if let Ok(scale_val) = scale_str_val.parse::<i8>() {
+            // Changed to i8 for consistency
+            if scale_val != 0 {
                 // Apply scale if specified in metadata
-                let scaled_val = if scale > 0 {
-                    val / 10_f32.powi(scale)
+                let scaled_val = if scale_val > 0 {
+                    val / 10_f32.powi(scale_val as i32)
                 } else {
-                    val * 10_f32.powi(-scale)
+                    val * 10_f32.powi(-scale_val as i32)
                 };
                 return DataType::Float4(Some(scaled_val));
             }
@@ -952,8 +937,8 @@ fn handle_float64_array(
             // Convert to i64 and handle as timestamp
             let val_i64 = val as i64;
             // Determine scale factor
-            let scale = if let Some(scale_str) = scale_str {
-                scale_str.parse::<i32>().unwrap_or(0)
+            let scale = if let Some(scale_str_val) = scale_str {
+                scale_str_val.parse::<i32>().unwrap_or(0)
             } else {
                 0
             };
@@ -987,14 +972,15 @@ fn handle_float64_array(
     }
 
     // Check if this is actually a decimal with scale
-    if let Some(scale_str) = scale_str {
-        if let Ok(scale) = scale_str.parse::<i32>() {
-            if scale != 0 {
+    if let Some(scale_str_val) = scale_str {
+        if let Ok(scale_val) = scale_str_val.parse::<i8>() {
+            // Changed to i8 for consistency
+            if scale_val != 0 {
                 // Apply scale if specified in metadata
-                let scaled_val = if scale > 0 {
-                    val / 10_f64.powi(scale)
+                let scaled_val = if scale_val > 0 {
+                    val / 10_f64.powi(scale_val as i32)
                 } else {
-                    val * 10_f64.powi(-scale)
+                    val * 10_f64.powi(-scale_val as i32)
                 };
                 return DataType::Float8(Some(scaled_val));
             }
@@ -1732,26 +1718,72 @@ pub async fn snowflake_query(
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use super::*; // Imports functions from the parent module (snowflake_query.rs)
     use arrow::array::{
         ArrayRef,
+        BinaryArray,
+        BooleanArray, // Added BooleanArray
         Date32Array,
         Date64Array,
         Decimal128Array,
+        Decimal256Array,          // Added Decimal256Array
+        DictionaryArray,          // For dictionary type
+        DurationMicrosecondArray, // For Duration type (example, others exist)
+        FixedSizeBinaryArray,     // For binary types
+        FixedSizeListArray,       // For list, map types
+        Float32Array,
+        Float64Array, // Added Float32Array and Float64Array
+        Int16Array,
         Int32Array,
         Int64Array,
-        StringArray, // Replace Utf8Array with StringArray
+        Int8Array,
+        IntervalDayTimeArray, // For Interval type (example, others exist)
+        LargeBinaryArray,
+        ListArray,
+        MapArray,
+        NullArray, // For Null type
+        StringArray,
         StructArray,
+        Time32MillisecondArray, // For Time32 type (example)
+        Time64NanosecondArray,  // For Time64 type (example)
+                                // Add other specific types like BooleanArray, Float32Array etc. if they appear in other tests below.
         TimestampMicrosecondArray,
         TimestampMillisecondArray,
         TimestampNanosecondArray,
         TimestampSecondArray,
+        UInt16Array,
+        UInt32Array,
+        UInt64Array,
+        UInt8Array,
     };
-    use arrow::datatypes::i256;
-    use arrow::datatypes::{DataType as ArrowDataType, Field, Fields, Schema, TimeUnit};
-    use chrono::{Datelike, NaiveDate, NaiveDateTime, Timelike};
-    use std::str::FromStr;
+    use arrow::datatypes::{DataType as ArrowDataType, Field, Fields, Schema, TimeUnit}; // Removed Time32Unit, Time64Unit
+    use chrono::{
+        Datelike, LocalResult, NaiveDate, NaiveDateTime, NaiveTime, TimeZone, Timelike, Utc,
+    }; // Added NaiveTime
+    use std::collections::HashMap;
     use std::sync::Arc;
+
+    // Helper function to create a Field with metadata
+    fn create_test_field(
+        name: &str,
+        arrow_type: ArrowDataType,
+        nullable: bool,
+        logical_type: Option<&str>,
+        scale: Option<&str>,
+        precision: Option<&str>,
+    ) -> Field {
+        let mut metadata = HashMap::new();
+        if let Some(lt) = logical_type {
+            metadata.insert("logicalType".to_string(), lt.to_string());
+        }
+        if let Some(s) = scale {
+            metadata.insert("scale".to_string(), s.to_string());
+        }
+        if let Some(p) = precision {
+            metadata.insert("precision".to_string(), p.to_string());
+        }
+        Field::new(name, arrow_type, nullable).with_metadata(metadata)
+    }
 
     #[test]
     fn test_decimal128_conversion() {
@@ -2970,11 +3002,8 @@ mod tests {
         let schema = Arc::new(Schema::new(vec![value_field]));
 
         // Create record batch
-        let batch = RecordBatch::try_new(
-            schema.clone(),
-            vec![Arc::new(data_array) as ArrayRef],
-        )
-        .unwrap();
+        let batch =
+            RecordBatch::try_new(schema.clone(), vec![Arc::new(data_array) as ArrayRef]).unwrap();
 
         println!("Input RecordBatch schema: {:?}", batch.schema());
         println!(
@@ -2988,7 +3017,11 @@ mod tests {
         println!("Processed Rows: {:?}", processed_rows);
 
         // --- Assertions ---
-        assert_eq!(processed_rows.len(), raw_values.len(), "Number of processed rows should match input");
+        assert_eq!(
+            processed_rows.len(),
+            raw_values.len(),
+            "Number of processed rows should match input"
+        );
 
         // Expected scaled Float8 values
         let expected_values = vec![
@@ -3002,11 +3035,1930 @@ mod tests {
             assert_eq!(
                 processed_rows[i]["scaled_value"], // Field name is lowercased by process_record_batch
                 expected_values[i],
-                "Mismatch in row {} for 'scaled_value'", i
+                "Mismatch in row {} for 'scaled_value'",
+                i
             );
         }
 
         println!("✓ Verified Int64 FIXED with Scale processing");
     }
-}
 
+    #[test]
+    fn test_handle_int8_array_comprehensive() {
+        println!("\n=== Testing Int8Array comprehensive logic ===");
+
+        // Test Case 1: Null value
+        let array_null = Int8Array::from(vec![None]);
+        let field_null =
+            create_test_field("test_null", ArrowDataType::Int8, true, None, None, None);
+        let result_null = handle_int8_array(&array_null, 0, None, &field_null);
+        assert_eq!(
+            result_null,
+            DataType::Null,
+            "Test Case 1 Failed: Null value"
+        );
+
+        // Test Case 2: Regular integer (no scale)
+        let val_reg: i8 = 42;
+        let array_reg = Int8Array::from(vec![Some(val_reg)]);
+        let field_reg = create_test_field("test_reg", ArrowDataType::Int8, false, None, None, None);
+        let result_reg = handle_int8_array(&array_reg, 0, None, &field_reg);
+        assert_eq!(
+            result_reg,
+            DataType::Int2(Some(val_reg as i16)),
+            "Test Case 2 Failed: Regular integer"
+        );
+
+        // Test Case 3: Scaled integer (FIXED, scale > 0)
+        let val_scaled_pos: i8 = 123;
+        let array_scaled_pos = Int8Array::from(vec![Some(val_scaled_pos)]);
+        let field_scaled_pos = create_test_field(
+            "test_scaled_pos",
+            ArrowDataType::Int8,
+            false,
+            Some("FIXED"),
+            Some("2"),
+            Some("5"),
+        );
+        let scale_str_pos = field_scaled_pos.metadata().get("scale").map(|s| s.as_str());
+        let result_scaled_pos =
+            handle_int8_array(&array_scaled_pos, 0, scale_str_pos, &field_scaled_pos);
+        assert_eq!(
+            result_scaled_pos,
+            DataType::Float8(Some(1.23)),
+            "Test Case 3 Failed: Scaled positive"
+        );
+
+        // Test Case 4: Scaled integer (FIXED, scale = 0)
+        let val_scaled_zero: i8 = 100;
+        let array_scaled_zero = Int8Array::from(vec![Some(val_scaled_zero)]);
+        let field_scaled_zero = create_test_field(
+            "test_scaled_zero",
+            ArrowDataType::Int8,
+            false,
+            Some("FIXED"),
+            Some("0"),
+            Some("3"),
+        );
+        let scale_str_zero = field_scaled_zero
+            .metadata()
+            .get("scale")
+            .map(|s| s.as_str());
+        let result_scaled_zero =
+            handle_int8_array(&array_scaled_zero, 0, scale_str_zero, &field_scaled_zero);
+        assert_eq!(
+            result_scaled_zero,
+            DataType::Float8(Some(100.0)),
+            "Test Case 4 Failed: Scaled zero"
+        );
+
+        // Test Case 5: Scaled integer (FIXED, scale < 0)
+        let val_scaled_neg: i8 = 7;
+        let array_scaled_neg = Int8Array::from(vec![Some(val_scaled_neg)]);
+        let field_scaled_neg = create_test_field(
+            "test_scaled_neg",
+            ArrowDataType::Int8,
+            false,
+            Some("FIXED"),
+            Some("-2"),
+            Some("5"),
+        );
+        let scale_str_neg = field_scaled_neg.metadata().get("scale").map(|s| s.as_str());
+        let result_scaled_neg =
+            handle_int8_array(&array_scaled_neg, 0, scale_str_neg, &field_scaled_neg);
+        assert_eq!(
+            result_scaled_neg,
+            DataType::Float8(Some(700.0)),
+            "Test Case 5 Failed: Scaled negative"
+        );
+
+        // Test Case 6: Timestamp NTZ (various scales)
+        let ts_val_i8: i8 = 120; // Represents 120s, 120ms, 120us, 120ns depending on scale
+        let array_ts = Int8Array::from(vec![Some(ts_val_i8)]);
+
+        let scales_and_expected_ntz = vec![
+            (
+                "0",
+                Utc.timestamp_opt(ts_val_i8 as i64, 0).unwrap().naive_utc(),
+            ), // seconds
+            (
+                "3",
+                Utc.timestamp_opt(0, (ts_val_i8 as i64 % 1000 * 1_000_000) as u32)
+                    .map(|dt| dt.with_second((ts_val_i8 as i64 / 1000) as u32).unwrap())
+                    .unwrap()
+                    .naive_utc(),
+            ), // ms
+            (
+                "6",
+                Utc.timestamp_opt(0, (ts_val_i8 as i64 % 1_000_000 * 1000) as u32)
+                    .map(|dt| {
+                        dt.with_second((ts_val_i8 as i64 / 1_000_000) as u32)
+                            .unwrap()
+                    })
+                    .unwrap()
+                    .naive_utc(),
+            ), // us
+            (
+                "9",
+                Utc.timestamp_opt(0, (ts_val_i8 as i64 % 1_000_000_000) as u32)
+                    .map(|dt| {
+                        dt.with_second((ts_val_i8 as i64 / 1_000_000_000) as u32)
+                            .unwrap()
+                    })
+                    .unwrap()
+                    .naive_utc(),
+            ), // ns
+        ];
+
+        for (scale_val_str, expected_dt) in scales_and_expected_ntz {
+            let field_ts_ntz = create_test_field(
+                "test_ts_ntz",
+                ArrowDataType::Int8,
+                false,
+                Some("TIMESTAMP_NTZ"),
+                Some(scale_val_str),
+                None,
+            );
+            let scale_meta_str = field_ts_ntz.metadata().get("scale").map(|s| s.as_str());
+            let result_ts_ntz = handle_int8_array(&array_ts, 0, scale_meta_str, &field_ts_ntz);
+            assert_eq!(
+                result_ts_ntz,
+                DataType::Timestamp(Some(expected_dt)),
+                "Test Case 6 Failed: NTZ scale {}",
+                scale_val_str
+            );
+        }
+
+        // Test Case 7: Timestamp TZ (various scales)
+        let scales_and_expected_tz = vec![
+            ("0", Utc.timestamp_opt(ts_val_i8 as i64, 0).unwrap()), // seconds
+            (
+                "3",
+                Utc.timestamp_opt(0, (ts_val_i8 as i64 % 1000 * 1_000_000) as u32)
+                    .map(|dt| dt.with_second((ts_val_i8 as i64 / 1000) as u32).unwrap())
+                    .unwrap(),
+            ), // ms
+            (
+                "6",
+                Utc.timestamp_opt(0, (ts_val_i8 as i64 % 1_000_000 * 1000) as u32)
+                    .map(|dt| {
+                        dt.with_second((ts_val_i8 as i64 / 1_000_000) as u32)
+                            .unwrap()
+                    })
+                    .unwrap(),
+            ), // us
+            (
+                "9",
+                Utc.timestamp_opt(0, (ts_val_i8 as i64 % 1_000_000_000) as u32)
+                    .map(|dt| {
+                        dt.with_second((ts_val_i8 as i64 / 1_000_000_000) as u32)
+                            .unwrap()
+                    })
+                    .unwrap(),
+            ), // ns
+        ];
+        for (scale_val_str, expected_dt) in scales_and_expected_tz {
+            let field_ts_tz = create_test_field(
+                "test_ts_tz",
+                ArrowDataType::Int8,
+                false,
+                Some("TIMESTAMP_TZ"),
+                Some(scale_val_str),
+                None,
+            );
+            let scale_meta_str = field_ts_tz.metadata().get("scale").map(|s| s.as_str());
+            let result_ts_tz = handle_int8_array(&array_ts, 0, scale_meta_str, &field_ts_tz);
+            assert_eq!(
+                result_ts_tz,
+                DataType::Timestamptz(Some(expected_dt)),
+                "Test Case 7 Failed: TZ scale {}",
+                scale_val_str
+            );
+        }
+        println!("✓ Int8Array comprehensive logic tests passed.");
+    }
+
+    #[test]
+    fn test_handle_uint8_array_comprehensive() {
+        println!("\n=== Testing UInt8Array comprehensive logic ===");
+
+        // Test Case 1: Null value
+        let array_null = UInt8Array::from(vec![None]);
+        let field_null =
+            create_test_field("test_null_u8", ArrowDataType::UInt8, true, None, None, None);
+        let result_null = handle_uint8_array(&array_null, 0, None, &field_null);
+        assert_eq!(
+            result_null,
+            DataType::Null,
+            "Test Case 1 Failed (u8): Null value"
+        );
+
+        // Test Case 2: Regular integer (no scale)
+        let val_reg: u8 = 200;
+        let array_reg = UInt8Array::from(vec![Some(val_reg)]);
+        let field_reg =
+            create_test_field("test_reg_u8", ArrowDataType::UInt8, false, None, None, None);
+        let result_reg = handle_uint8_array(&array_reg, 0, None, &field_reg);
+        assert_eq!(
+            result_reg,
+            DataType::Int2(Some(val_reg as i16)),
+            "Test Case 2 Failed (u8): Regular integer"
+        );
+
+        // Test Case 3: Scaled integer (FIXED, scale > 0)
+        let val_scaled_pos: u8 = 150;
+        let array_scaled_pos = UInt8Array::from(vec![Some(val_scaled_pos)]);
+        let field_scaled_pos = create_test_field(
+            "test_scaled_pos_u8",
+            ArrowDataType::UInt8,
+            false,
+            Some("FIXED"),
+            Some("1"),
+            Some("4"),
+        );
+        let scale_str_pos = field_scaled_pos.metadata().get("scale").map(|s| s.as_str());
+        let result_scaled_pos =
+            handle_uint8_array(&array_scaled_pos, 0, scale_str_pos, &field_scaled_pos);
+        assert_eq!(
+            result_scaled_pos,
+            DataType::Float8(Some(15.0)),
+            "Test Case 3 Failed (u8): Scaled positive"
+        );
+
+        // Test Case 4: Scaled integer (FIXED, scale = 0)
+        let val_scaled_zero: u8 = 210;
+        let array_scaled_zero = UInt8Array::from(vec![Some(val_scaled_zero)]);
+        let field_scaled_zero = create_test_field(
+            "test_scaled_zero_u8",
+            ArrowDataType::UInt8,
+            false,
+            Some("FIXED"),
+            Some("0"),
+            Some("3"),
+        );
+        let scale_str_zero = field_scaled_zero
+            .metadata()
+            .get("scale")
+            .map(|s| s.as_str());
+        let result_scaled_zero =
+            handle_uint8_array(&array_scaled_zero, 0, scale_str_zero, &field_scaled_zero);
+        assert_eq!(
+            result_scaled_zero,
+            DataType::Float8(Some(210.0)),
+            "Test Case 4 Failed (u8): Scaled zero"
+        );
+
+        // Test Case 5: Scaled integer (FIXED, scale < 0)
+        let val_scaled_neg: u8 = 25;
+        let array_scaled_neg = UInt8Array::from(vec![Some(val_scaled_neg)]);
+        let field_scaled_neg = create_test_field(
+            "test_scaled_neg_u8",
+            ArrowDataType::UInt8,
+            false,
+            Some("FIXED"),
+            Some("-1"),
+            Some("4"),
+        );
+        let scale_str_neg = field_scaled_neg.metadata().get("scale").map(|s| s.as_str());
+        let result_scaled_neg =
+            handle_uint8_array(&array_scaled_neg, 0, scale_str_neg, &field_scaled_neg);
+        assert_eq!(
+            result_scaled_neg,
+            DataType::Float8(Some(250.0)),
+            "Test Case 5 Failed (u8): Scaled negative"
+        );
+
+        // Test Case 6: Timestamp NTZ (various scales)
+        let ts_val_u8: u8 = 230;
+        let array_ts = UInt8Array::from(vec![Some(ts_val_u8)]);
+
+        let scales_and_expected_ntz_u8 = vec![
+            (
+                "0",
+                Utc.timestamp_opt(ts_val_u8 as i64, 0).unwrap().naive_utc(),
+            ),
+            (
+                "3",
+                Utc.timestamp_opt(0, (ts_val_u8 as i64 % 1000 * 1_000_000) as u32)
+                    .map(|dt| dt.with_second((ts_val_u8 as i64 / 1000) as u32).unwrap())
+                    .unwrap()
+                    .naive_utc(),
+            ),
+            (
+                "6",
+                Utc.timestamp_opt(0, (ts_val_u8 as i64 % 1_000_000 * 1000) as u32)
+                    .map(|dt| {
+                        dt.with_second((ts_val_u8 as i64 / 1_000_000) as u32)
+                            .unwrap()
+                    })
+                    .unwrap()
+                    .naive_utc(),
+            ),
+            (
+                "9",
+                Utc.timestamp_opt(0, (ts_val_u8 as i64 % 1_000_000_000) as u32)
+                    .map(|dt| {
+                        dt.with_second((ts_val_u8 as i64 / 1_000_000_000) as u32)
+                            .unwrap()
+                    })
+                    .unwrap()
+                    .naive_utc(),
+            ),
+        ];
+        for (scale_val_str, expected_dt) in scales_and_expected_ntz_u8 {
+            let field_ts_ntz = create_test_field(
+                "test_ts_ntz_u8",
+                ArrowDataType::UInt8,
+                false,
+                Some("TIMESTAMP_NTZ"),
+                Some(scale_val_str),
+                None,
+            );
+            let scale_meta_str = field_ts_ntz.metadata().get("scale").map(|s| s.as_str());
+            let result_ts_ntz = handle_uint8_array(&array_ts, 0, scale_meta_str, &field_ts_ntz);
+            assert_eq!(
+                result_ts_ntz,
+                DataType::Timestamp(Some(expected_dt)),
+                "Test Case 6 Failed (u8): NTZ scale {}",
+                scale_val_str
+            );
+        }
+
+        // Test Case 7: Timestamp TZ (various scales)
+        let scales_and_expected_tz_u8 = vec![
+            ("0", Utc.timestamp_opt(ts_val_u8 as i64, 0).unwrap()),
+            (
+                "3",
+                Utc.timestamp_opt(0, (ts_val_u8 as i64 % 1000 * 1_000_000) as u32)
+                    .map(|dt| dt.with_second((ts_val_u8 as i64 / 1000) as u32).unwrap())
+                    .unwrap(),
+            ),
+            (
+                "6",
+                Utc.timestamp_opt(0, (ts_val_u8 as i64 % 1_000_000 * 1000) as u32)
+                    .map(|dt| {
+                        dt.with_second((ts_val_u8 as i64 / 1_000_000) as u32)
+                            .unwrap()
+                    })
+                    .unwrap(),
+            ),
+            (
+                "9",
+                Utc.timestamp_opt(0, (ts_val_u8 as i64 % 1_000_000_000) as u32)
+                    .map(|dt| {
+                        dt.with_second((ts_val_u8 as i64 / 1_000_000_000) as u32)
+                            .unwrap()
+                    })
+                    .unwrap(),
+            ),
+        ];
+        for (scale_val_str, expected_dt) in scales_and_expected_tz_u8 {
+            let field_ts_tz = create_test_field(
+                "test_ts_tz_u8",
+                ArrowDataType::UInt8,
+                false,
+                Some("TIMESTAMP_TZ"),
+                Some(scale_val_str),
+                None,
+            );
+            let scale_meta_str = field_ts_tz.metadata().get("scale").map(|s| s.as_str());
+            let result_ts_tz = handle_uint8_array(&array_ts, 0, scale_meta_str, &field_ts_tz);
+            assert_eq!(
+                result_ts_tz,
+                DataType::Timestamptz(Some(expected_dt)),
+                "Test Case 7 Failed (u8): TZ scale {}",
+                scale_val_str
+            );
+        }
+        println!("✓ UInt8Array comprehensive logic tests passed.");
+    }
+
+    #[test]
+    fn test_handle_int16_array_comprehensive() {
+        println!("\n=== Testing Int16Array comprehensive logic ===");
+
+        // Test Case 1: Null value
+        let array_null = Int16Array::from(vec![None]);
+        let field_null = create_test_field(
+            "test_null_i16",
+            ArrowDataType::Int16,
+            true,
+            None,
+            None,
+            None,
+        );
+        let result_null = handle_int16_array(&array_null, 0, None, &field_null);
+        assert_eq!(
+            result_null,
+            DataType::Null,
+            "Test Case 1 Failed (i16): Null value"
+        );
+
+        // Test Case 2: Regular integer (no scale)
+        let val_reg: i16 = 30000;
+        let array_reg = Int16Array::from(vec![Some(val_reg)]);
+        let field_reg = create_test_field(
+            "test_reg_i16",
+            ArrowDataType::Int16,
+            false,
+            None,
+            None,
+            None,
+        );
+        let result_reg = handle_int16_array(&array_reg, 0, None, &field_reg);
+        assert_eq!(
+            result_reg,
+            DataType::Int2(Some(val_reg)),
+            "Test Case 2 Failed (i16): Regular integer"
+        );
+
+        // Test Case 3: Scaled integer (FIXED, scale > 0)
+        let val_scaled_pos: i16 = 12345;
+        let array_scaled_pos = Int16Array::from(vec![Some(val_scaled_pos)]);
+        let field_scaled_pos = create_test_field(
+            "test_scaled_pos_i16",
+            ArrowDataType::Int16,
+            false,
+            Some("FIXED"),
+            Some("3"),
+            Some("8"),
+        );
+        let scale_str_pos = field_scaled_pos.metadata().get("scale").map(|s| s.as_str());
+        let result_scaled_pos =
+            handle_int16_array(&array_scaled_pos, 0, scale_str_pos, &field_scaled_pos);
+        assert_eq!(
+            result_scaled_pos,
+            DataType::Float8(Some(12.345)),
+            "Test Case 3 Failed (i16): Scaled positive"
+        );
+
+        // Test Case 4: Scaled integer (FIXED, scale = 0)
+        let val_scaled_zero: i16 = -5000;
+        let array_scaled_zero = Int16Array::from(vec![Some(val_scaled_zero)]);
+        let field_scaled_zero = create_test_field(
+            "test_scaled_zero_i16",
+            ArrowDataType::Int16,
+            false,
+            Some("FIXED"),
+            Some("0"),
+            Some("5"),
+        );
+        let scale_str_zero = field_scaled_zero
+            .metadata()
+            .get("scale")
+            .map(|s| s.as_str());
+        let result_scaled_zero =
+            handle_int16_array(&array_scaled_zero, 0, scale_str_zero, &field_scaled_zero);
+        assert_eq!(
+            result_scaled_zero,
+            DataType::Float8(Some(-5000.0)),
+            "Test Case 4 Failed (i16): Scaled zero"
+        );
+
+        // Test Case 5: Scaled integer (FIXED, scale < 0)
+        let val_scaled_neg: i16 = 99;
+        let array_scaled_neg = Int16Array::from(vec![Some(val_scaled_neg)]);
+        let field_scaled_neg = create_test_field(
+            "test_scaled_neg_i16",
+            ArrowDataType::Int16,
+            false,
+            Some("FIXED"),
+            Some("-2"),
+            Some("5"),
+        );
+        let scale_str_neg = field_scaled_neg.metadata().get("scale").map(|s| s.as_str());
+        let result_scaled_neg =
+            handle_int16_array(&array_scaled_neg, 0, scale_str_neg, &field_scaled_neg);
+        assert_eq!(
+            result_scaled_neg,
+            DataType::Float8(Some(9900.0)),
+            "Test Case 5 Failed (i16): Scaled negative"
+        );
+
+        // Test Case 6 & 7: Timestamps
+        let ts_val_i16: i16 = 15000;
+        let array_ts = Int16Array::from(vec![Some(ts_val_i16)]);
+        let ts_val_i64 = ts_val_i16 as i64;
+
+        let scales = vec!["0", "3", "6", "9"];
+        for scale_val_str in scales {
+            let (secs, nanos) = match scale_val_str {
+                "0" => (ts_val_i64, 0),
+                "3" => (
+                    ts_val_i64 / 1000,
+                    ((ts_val_i64 % 1000).abs() * 1_000_000) as u32,
+                ),
+                "6" => (
+                    ts_val_i64 / 1_000_000,
+                    ((ts_val_i64 % 1_000_000).abs() * 1000) as u32,
+                ),
+                "9" => (
+                    ts_val_i64 / 1_000_000_000,
+                    (ts_val_i64 % 1_000_000_000).abs() as u32,
+                ),
+                _ => panic!("Unhandled scale"),
+            };
+            let expected_dt_utc = Utc.timestamp_opt(secs, nanos).unwrap();
+            let expected_dt_naive = expected_dt_utc.naive_utc();
+
+            // NTZ Test
+            let field_ts_ntz = create_test_field(
+                "test_ts_ntz_i16",
+                ArrowDataType::Int16,
+                false,
+                Some("TIMESTAMP_NTZ"),
+                Some(scale_val_str),
+                None,
+            );
+            let scale_meta_str = field_ts_ntz.metadata().get("scale").map(|s| s.as_str());
+            let result_ts_ntz = handle_int16_array(&array_ts, 0, scale_meta_str, &field_ts_ntz);
+            assert_eq!(
+                result_ts_ntz,
+                DataType::Timestamp(Some(expected_dt_naive)),
+                "Test Case 6 Failed (i16): NTZ scale {}",
+                scale_val_str
+            );
+
+            // TZ Test
+            let field_ts_tz = create_test_field(
+                "test_ts_tz_i16",
+                ArrowDataType::Int16,
+                false,
+                Some("TIMESTAMP_TZ"),
+                Some(scale_val_str),
+                None,
+            );
+            let scale_meta_str_tz = field_ts_tz.metadata().get("scale").map(|s| s.as_str());
+            let result_ts_tz = handle_int16_array(&array_ts, 0, scale_meta_str_tz, &field_ts_tz);
+            assert_eq!(
+                result_ts_tz,
+                DataType::Timestamptz(Some(expected_dt_utc)),
+                "Test Case 7 Failed (i16): TZ scale {}",
+                scale_val_str
+            );
+        }
+        println!("✓ Int16Array comprehensive logic tests passed.");
+    }
+
+    #[test]
+    fn test_handle_uint16_array_comprehensive() {
+        println!("\n=== Testing UInt16Array comprehensive logic ===");
+
+        // Test Case 1: Null value
+        let array_null = UInt16Array::from(vec![None]);
+        let field_null = create_test_field(
+            "test_null_u16",
+            ArrowDataType::UInt16,
+            true,
+            None,
+            None,
+            None,
+        );
+        let result_null = handle_uint16_array(&array_null, 0, None, &field_null);
+        assert_eq!(
+            result_null,
+            DataType::Null,
+            "Test Case 1 Failed (u16): Null value"
+        );
+
+        // Test Case 2: Regular integer (no scale)
+        let val_reg: u16 = 60000;
+        let array_reg = UInt16Array::from(vec![Some(val_reg)]);
+        let field_reg = create_test_field(
+            "test_reg_u16",
+            ArrowDataType::UInt16,
+            false,
+            None,
+            None,
+            None,
+        );
+        let result_reg = handle_uint16_array(&array_reg, 0, None, &field_reg);
+        assert_eq!(
+            result_reg,
+            DataType::Int4(Some(val_reg as i32)),
+            "Test Case 2 Failed (u16): Regular integer"
+        );
+
+        // Test Case 3: Scaled integer (FIXED, scale > 0)
+        let val_scaled_pos: u16 = 54321;
+        let array_scaled_pos = UInt16Array::from(vec![Some(val_scaled_pos)]);
+        let field_scaled_pos = create_test_field(
+            "test_scaled_pos_u16",
+            ArrowDataType::UInt16,
+            false,
+            Some("FIXED"),
+            Some("2"),
+            Some("6"),
+        );
+        let scale_str_pos = field_scaled_pos.metadata().get("scale").map(|s| s.as_str());
+        let result_scaled_pos =
+            handle_uint16_array(&array_scaled_pos, 0, scale_str_pos, &field_scaled_pos);
+        assert_eq!(
+            result_scaled_pos,
+            DataType::Float8(Some(543.21)),
+            "Test Case 3 Failed (u16): Scaled positive"
+        );
+
+        // Test Case 4: Scaled integer (FIXED, scale = 0)
+        let val_scaled_zero: u16 = 10000;
+        let array_scaled_zero = UInt16Array::from(vec![Some(val_scaled_zero)]);
+        let field_scaled_zero = create_test_field(
+            "test_scaled_zero_u16",
+            ArrowDataType::UInt16,
+            false,
+            Some("FIXED"),
+            Some("0"),
+            Some("5"),
+        );
+        let scale_str_zero = field_scaled_zero
+            .metadata()
+            .get("scale")
+            .map(|s| s.as_str());
+        let result_scaled_zero =
+            handle_uint16_array(&array_scaled_zero, 0, scale_str_zero, &field_scaled_zero);
+        assert_eq!(
+            result_scaled_zero,
+            DataType::Float8(Some(10000.0)),
+            "Test Case 4 Failed (u16): Scaled zero"
+        );
+
+        // Test Case 5: Scaled integer (FIXED, scale < 0)
+        let val_scaled_neg: u16 = 12;
+        let array_scaled_neg = UInt16Array::from(vec![Some(val_scaled_neg)]);
+        let field_scaled_neg = create_test_field(
+            "test_scaled_neg_u16",
+            ArrowDataType::UInt16,
+            false,
+            Some("FIXED"),
+            Some("-3"),
+            Some("6"),
+        );
+        let scale_str_neg = field_scaled_neg.metadata().get("scale").map(|s| s.as_str());
+        let result_scaled_neg =
+            handle_uint16_array(&array_scaled_neg, 0, scale_str_neg, &field_scaled_neg);
+        assert_eq!(
+            result_scaled_neg,
+            DataType::Float8(Some(12000.0)),
+            "Test Case 5 Failed (u16): Scaled negative"
+        );
+
+        // Test Case 6 & 7: Timestamps
+        let ts_val_u16: u16 = 40000;
+        let array_ts = UInt16Array::from(vec![Some(ts_val_u16)]);
+        let ts_val_i64 = ts_val_u16 as i64;
+
+        let scales = vec!["0", "3", "6", "9"];
+        for scale_val_str in scales {
+            let (secs, nanos) = match scale_val_str {
+                "0" => (ts_val_i64, 0),
+                "3" => (
+                    ts_val_i64 / 1000,
+                    ((ts_val_i64 % 1000).abs() * 1_000_000) as u32,
+                ),
+                "6" => (
+                    ts_val_i64 / 1_000_000,
+                    ((ts_val_i64 % 1_000_000).abs() * 1000) as u32,
+                ),
+                "9" => (
+                    ts_val_i64 / 1_000_000_000,
+                    (ts_val_i64 % 1_000_000_000).abs() as u32,
+                ),
+                _ => panic!("Unhandled scale"),
+            };
+            let expected_dt_utc = Utc.timestamp_opt(secs, nanos).unwrap();
+            let expected_dt_naive = expected_dt_utc.naive_utc();
+
+            // NTZ Test
+            let field_ts_ntz = create_test_field(
+                "test_ts_ntz_u16",
+                ArrowDataType::UInt16,
+                false,
+                Some("TIMESTAMP_NTZ"),
+                Some(scale_val_str),
+                None,
+            );
+            let scale_meta_str = field_ts_ntz.metadata().get("scale").map(|s| s.as_str());
+            let result_ts_ntz = handle_uint16_array(&array_ts, 0, scale_meta_str, &field_ts_ntz);
+            assert_eq!(
+                result_ts_ntz,
+                DataType::Timestamp(Some(expected_dt_naive)),
+                "Test Case 6 Failed (u16): NTZ scale {}",
+                scale_val_str
+            );
+
+            // TZ Test
+            let field_ts_tz = create_test_field(
+                "test_ts_tz_u16",
+                ArrowDataType::UInt16,
+                false,
+                Some("TIMESTAMP_TZ"),
+                Some(scale_val_str),
+                None,
+            );
+            let scale_meta_str_tz = field_ts_tz.metadata().get("scale").map(|s| s.as_str());
+            let result_ts_tz = handle_uint16_array(&array_ts, 0, scale_meta_str_tz, &field_ts_tz);
+            assert_eq!(
+                result_ts_tz,
+                DataType::Timestamptz(Some(expected_dt_utc)),
+                "Test Case 7 Failed (u16): TZ scale {}",
+                scale_val_str
+            );
+        }
+        println!("✓ UInt16Array comprehensive logic tests passed.");
+    }
+
+    #[test]
+    fn test_handle_int32_array_comprehensive() {
+        println!("\n=== Testing Int32Array comprehensive logic ===");
+
+        // Test Case 1: Null value
+        let array_null = Int32Array::from(vec![None]);
+        let field_null = create_test_field(
+            "test_null_i32",
+            ArrowDataType::Int32,
+            true,
+            None,
+            None,
+            None,
+        );
+        let result_null = handle_int32_array(&array_null, 0, None, &field_null);
+        assert_eq!(
+            result_null,
+            DataType::Null,
+            "Test Case 1 Failed (i32): Null value"
+        );
+
+        // Test Case 2: Regular integer (no scale)
+        let val_reg: i32 = 1_000_000_000;
+        let array_reg = Int32Array::from(vec![Some(val_reg)]);
+        let field_reg = create_test_field(
+            "test_reg_i32",
+            ArrowDataType::Int32,
+            false,
+            None,
+            None,
+            None,
+        );
+        let result_reg = handle_int32_array(&array_reg, 0, None, &field_reg);
+        assert_eq!(
+            result_reg,
+            DataType::Int4(Some(val_reg)),
+            "Test Case 2 Failed (i32): Regular integer"
+        );
+
+        // Test Case 3: Scaled integer (FIXED, scale > 0)
+        let val_scaled_pos: i32 = 12345678;
+        let array_scaled_pos = Int32Array::from(vec![Some(val_scaled_pos)]);
+        let field_scaled_pos = create_test_field(
+            "test_scaled_pos_i32",
+            ArrowDataType::Int32,
+            false,
+            Some("FIXED"),
+            Some("4"),
+            Some("10"),
+        );
+        let scale_str_pos = field_scaled_pos.metadata().get("scale").map(|s| s.as_str());
+        let result_scaled_pos =
+            handle_int32_array(&array_scaled_pos, 0, scale_str_pos, &field_scaled_pos);
+        assert_eq!(
+            result_scaled_pos,
+            DataType::Float8(Some(1234.5678)),
+            "Test Case 3 Failed (i32): Scaled positive"
+        );
+
+        // Test Case 4: Scaled integer (FIXED, scale = 0)
+        let val_scaled_zero: i32 = -98765;
+        let array_scaled_zero = Int32Array::from(vec![Some(val_scaled_zero)]);
+        let field_scaled_zero = create_test_field(
+            "test_scaled_zero_i32",
+            ArrowDataType::Int32,
+            false,
+            Some("FIXED"),
+            Some("0"),
+            Some("6"),
+        );
+        let scale_str_zero = field_scaled_zero
+            .metadata()
+            .get("scale")
+            .map(|s| s.as_str());
+        let result_scaled_zero =
+            handle_int32_array(&array_scaled_zero, 0, scale_str_zero, &field_scaled_zero);
+        assert_eq!(
+            result_scaled_zero,
+            DataType::Float8(Some(-98765.0)),
+            "Test Case 4 Failed (i32): Scaled zero"
+        );
+
+        // Test Case 5: Scaled integer (FIXED, scale < 0)
+        let val_scaled_neg: i32 = 15;
+        let array_scaled_neg = Int32Array::from(vec![Some(val_scaled_neg)]);
+        let field_scaled_neg = create_test_field(
+            "test_scaled_neg_i32",
+            ArrowDataType::Int32,
+            false,
+            Some("FIXED"),
+            Some("-5"),
+            Some("8"),
+        );
+        let scale_str_neg = field_scaled_neg.metadata().get("scale").map(|s| s.as_str());
+        let result_scaled_neg =
+            handle_int32_array(&array_scaled_neg, 0, scale_str_neg, &field_scaled_neg);
+        assert_eq!(
+            result_scaled_neg,
+            DataType::Float8(Some(1500000.0)),
+            "Test Case 5 Failed (i32): Scaled negative"
+        );
+
+        // Test Case 6 & 7: Timestamps
+        let ts_val_i32: i32 = 1_800_500_250; // Close to i32 max, ~2027-ish if seconds
+        let array_ts = Int32Array::from(vec![Some(ts_val_i32)]);
+        let ts_val_i64 = ts_val_i32 as i64;
+
+        let scales = vec!["0", "3", "6", "9"];
+        for scale_val_str in scales {
+            let (secs, nanos) = match scale_val_str {
+                "0" => (ts_val_i64, 0),
+                "3" => (
+                    ts_val_i64 / 1000,
+                    ((ts_val_i64 % 1000).abs() * 1_000_000) as u32,
+                ),
+                "6" => (
+                    ts_val_i64 / 1_000_000,
+                    ((ts_val_i64 % 1_000_000).abs() * 1000) as u32,
+                ),
+                "9" => (
+                    ts_val_i64 / 1_000_000_000,
+                    (ts_val_i64 % 1_000_000_000).abs() as u32,
+                ),
+                _ => panic!("Unhandled scale"),
+            };
+            let expected_dt_utc = Utc.timestamp_opt(secs, nanos).unwrap();
+            let expected_dt_naive = expected_dt_utc.naive_utc();
+
+            // NTZ Test
+            let field_ts_ntz = create_test_field(
+                "test_ts_ntz_i32",
+                ArrowDataType::Int32,
+                false,
+                Some("TIMESTAMP_NTZ"),
+                Some(scale_val_str),
+                None,
+            );
+            let scale_meta_str = field_ts_ntz.metadata().get("scale").map(|s| s.as_str());
+            let result_ts_ntz = handle_int32_array(&array_ts, 0, scale_meta_str, &field_ts_ntz);
+            assert_eq!(
+                result_ts_ntz,
+                DataType::Timestamp(Some(expected_dt_naive)),
+                "Test Case 6 Failed (i32): NTZ scale {}",
+                scale_val_str
+            );
+
+            // TZ Test
+            let field_ts_tz = create_test_field(
+                "test_ts_tz_i32",
+                ArrowDataType::Int32,
+                false,
+                Some("TIMESTAMP_TZ"),
+                Some(scale_val_str),
+                None,
+            );
+            let scale_meta_str_tz = field_ts_tz.metadata().get("scale").map(|s| s.as_str());
+            let result_ts_tz = handle_int32_array(&array_ts, 0, scale_meta_str_tz, &field_ts_tz);
+            assert_eq!(
+                result_ts_tz,
+                DataType::Timestamptz(Some(expected_dt_utc)),
+                "Test Case 7 Failed (i32): TZ scale {}",
+                scale_val_str
+            );
+        }
+        println!("✓ Int32Array comprehensive logic tests passed.");
+    }
+
+    #[test]
+    fn test_handle_uint32_array_comprehensive() {
+        println!("\n=== Testing UInt32Array comprehensive logic ===");
+
+        // Test Case 1: Null value
+        let array_null = UInt32Array::from(vec![None]);
+        let field_null = create_test_field(
+            "test_null_u32",
+            ArrowDataType::UInt32,
+            true,
+            None,
+            None,
+            None,
+        );
+        let result_null = handle_uint32_array(&array_null, 0, None, &field_null);
+        assert_eq!(
+            result_null,
+            DataType::Null,
+            "Test Case 1 Failed (u32): Null value"
+        );
+
+        // Test Case 2: Regular integer (no scale)
+        let val_reg: u32 = 3_000_000_000;
+        let array_reg = UInt32Array::from(vec![Some(val_reg)]);
+        let field_reg = create_test_field(
+            "test_reg_u32",
+            ArrowDataType::UInt32,
+            false,
+            None,
+            None,
+            None,
+        );
+        let result_reg = handle_uint32_array(&array_reg, 0, None, &field_reg);
+        assert_eq!(
+            result_reg,
+            DataType::Int8(Some(val_reg as i64)),
+            "Test Case 2 Failed (u32): Regular integer"
+        );
+
+        // Test Case 3: Scaled integer (FIXED, scale > 0)
+        let val_scaled_pos: u32 = 987654321;
+        let array_scaled_pos = UInt32Array::from(vec![Some(val_scaled_pos)]);
+        let field_scaled_pos = create_test_field(
+            "test_scaled_pos_u32",
+            ArrowDataType::UInt32,
+            false,
+            Some("FIXED"),
+            Some("5"),
+            Some("10"),
+        );
+        let scale_str_pos = field_scaled_pos.metadata().get("scale").map(|s| s.as_str());
+        let result_scaled_pos =
+            handle_uint32_array(&array_scaled_pos, 0, scale_str_pos, &field_scaled_pos);
+        assert_eq!(
+            result_scaled_pos,
+            DataType::Float8(Some(9876.54321)),
+            "Test Case 3 Failed (u32): Scaled positive"
+        );
+
+        // Test Case 4: Scaled integer (FIXED, scale = 0)
+        let val_scaled_zero: u32 = 123456;
+        let array_scaled_zero = UInt32Array::from(vec![Some(val_scaled_zero)]);
+        let field_scaled_zero = create_test_field(
+            "test_scaled_zero_u32",
+            ArrowDataType::UInt32,
+            false,
+            Some("FIXED"),
+            Some("0"),
+            Some("6"),
+        );
+        let scale_str_zero = field_scaled_zero
+            .metadata()
+            .get("scale")
+            .map(|s| s.as_str());
+        let result_scaled_zero =
+            handle_uint32_array(&array_scaled_zero, 0, scale_str_zero, &field_scaled_zero);
+        assert_eq!(
+            result_scaled_zero,
+            DataType::Float8(Some(123456.0)),
+            "Test Case 4 Failed (u32): Scaled zero"
+        );
+
+        // Test Case 5: Scaled integer (FIXED, scale < 0)
+        let val_scaled_neg: u32 = 50;
+        let array_scaled_neg = UInt32Array::from(vec![Some(val_scaled_neg)]);
+        let field_scaled_neg = create_test_field(
+            "test_scaled_neg_u32",
+            ArrowDataType::UInt32,
+            false,
+            Some("FIXED"),
+            Some("-4"),
+            Some("8"),
+        );
+        let scale_str_neg = field_scaled_neg.metadata().get("scale").map(|s| s.as_str());
+        let result_scaled_neg =
+            handle_uint32_array(&array_scaled_neg, 0, scale_str_neg, &field_scaled_neg);
+        assert_eq!(
+            result_scaled_neg,
+            DataType::Float8(Some(500000.0)),
+            "Test Case 5 Failed (u32): Scaled negative"
+        );
+
+        // Test Case 6 & 7: Timestamps
+        let ts_val_u32: u32 = 4_000_000_000; // ~2096 if seconds
+        let array_ts = UInt32Array::from(vec![Some(ts_val_u32)]);
+        let ts_val_i64 = ts_val_u32 as i64;
+
+        let scales = vec!["0", "3", "6", "9"];
+        for scale_val_str in scales {
+            let (secs, nanos) = match scale_val_str {
+                "0" => (ts_val_i64, 0),
+                "3" => (
+                    ts_val_i64 / 1000,
+                    ((ts_val_i64 % 1000).abs() * 1_000_000) as u32,
+                ),
+                "6" => (
+                    ts_val_i64 / 1_000_000,
+                    ((ts_val_i64 % 1_000_000).abs() * 1000) as u32,
+                ),
+                "9" => (
+                    ts_val_i64 / 1_000_000_000,
+                    (ts_val_i64 % 1_000_000_000).abs() as u32,
+                ),
+                _ => panic!("Unhandled scale"),
+            };
+            let expected_dt_utc = Utc.timestamp_opt(secs, nanos).unwrap();
+            let expected_dt_naive = expected_dt_utc.naive_utc();
+
+            // NTZ Test
+            let field_ts_ntz = create_test_field(
+                "test_ts_ntz_u32",
+                ArrowDataType::UInt32,
+                false,
+                Some("TIMESTAMP_NTZ"),
+                Some(scale_val_str),
+                None,
+            );
+            let scale_meta_str = field_ts_ntz.metadata().get("scale").map(|s| s.as_str());
+            let result_ts_ntz = handle_uint32_array(&array_ts, 0, scale_meta_str, &field_ts_ntz);
+            assert_eq!(
+                result_ts_ntz,
+                DataType::Timestamp(Some(expected_dt_naive)),
+                "Test Case 6 Failed (u32): NTZ scale {}",
+                scale_val_str
+            );
+
+            // TZ Test
+            let field_ts_tz = create_test_field(
+                "test_ts_tz_u32",
+                ArrowDataType::UInt32,
+                false,
+                Some("TIMESTAMP_TZ"),
+                Some(scale_val_str),
+                None,
+            );
+            let scale_meta_str_tz = field_ts_tz.metadata().get("scale").map(|s| s.as_str());
+            let result_ts_tz = handle_uint32_array(&array_ts, 0, scale_meta_str_tz, &field_ts_tz);
+            assert_eq!(
+                result_ts_tz,
+                DataType::Timestamptz(Some(expected_dt_utc)),
+                "Test Case 7 Failed (u32): TZ scale {}",
+                scale_val_str
+            );
+        }
+        println!("✓ UInt32Array comprehensive logic tests passed.");
+    }
+
+    #[test]
+    fn test_handle_int64_array_comprehensive() {
+        println!("\n=== Testing Int64Array comprehensive logic ===");
+
+        // Test Case 1: Null value
+        let array_null = Int64Array::from(vec![None]);
+        let field_null = create_test_field(
+            "test_null_i64",
+            ArrowDataType::Int64,
+            true,
+            None,
+            None,
+            None,
+        );
+        let result_null = handle_int64_array(&array_null, 0, None, &field_null);
+        assert_eq!(
+            result_null,
+            DataType::Null,
+            "Test Case 1 Failed (i64): Null value"
+        );
+
+        // Test Case 2: Regular integer (no scale)
+        let val_reg: i64 = 5_000_000_000_000_000;
+        let array_reg = Int64Array::from(vec![Some(val_reg)]);
+        let field_reg = create_test_field(
+            "test_reg_i64",
+            ArrowDataType::Int64,
+            false,
+            None,
+            None,
+            None,
+        );
+        let result_reg = handle_int64_array(&array_reg, 0, None, &field_reg);
+        assert_eq!(
+            result_reg,
+            DataType::Int8(Some(val_reg)),
+            "Test Case 2 Failed (i64): Regular integer"
+        );
+
+        // Test Case 3: Scaled integer (FIXED, scale > 0)
+        let val_scaled_pos: i64 = 123456789012345;
+        let array_scaled_pos = Int64Array::from(vec![Some(val_scaled_pos)]);
+        let field_scaled_pos = create_test_field(
+            "test_scaled_pos_i64",
+            ArrowDataType::Int64,
+            false,
+            Some("FIXED"),
+            Some("9"),
+            Some("18"),
+        );
+        let scale_str_pos = field_scaled_pos.metadata().get("scale").map(|s| s.as_str());
+        let result_scaled_pos =
+            handle_int64_array(&array_scaled_pos, 0, scale_str_pos, &field_scaled_pos);
+        assert_eq!(
+            result_scaled_pos,
+            DataType::Float8(Some(123456.789012345)),
+            "Test Case 3 Failed (i64): Scaled positive"
+        );
+
+        // Test Case 4: Scaled integer (FIXED, scale = 0)
+        let val_scaled_zero: i64 = -1_000_000_000;
+        let array_scaled_zero = Int64Array::from(vec![Some(val_scaled_zero)]);
+        let field_scaled_zero = create_test_field(
+            "test_scaled_zero_i64",
+            ArrowDataType::Int64,
+            false,
+            Some("FIXED"),
+            Some("0"),
+            Some("10"),
+        );
+        let scale_str_zero = field_scaled_zero
+            .metadata()
+            .get("scale")
+            .map(|s| s.as_str());
+        let result_scaled_zero =
+            handle_int64_array(&array_scaled_zero, 0, scale_str_zero, &field_scaled_zero);
+        assert_eq!(
+            result_scaled_zero,
+            DataType::Float8(Some(-1_000_000_000.0)),
+            "Test Case 4 Failed (i64): Scaled zero"
+        );
+
+        // Test Case 5: Scaled integer (FIXED, scale < 0)
+        let val_scaled_neg: i64 = 3;
+        let array_scaled_neg = Int64Array::from(vec![Some(val_scaled_neg)]);
+        let field_scaled_neg = create_test_field(
+            "test_scaled_neg_i64",
+            ArrowDataType::Int64,
+            false,
+            Some("FIXED"),
+            Some("-10"),
+            Some("12"),
+        );
+        let scale_str_neg = field_scaled_neg.metadata().get("scale").map(|s| s.as_str());
+        let result_scaled_neg =
+            handle_int64_array(&array_scaled_neg, 0, scale_str_neg, &field_scaled_neg);
+        assert_eq!(
+            result_scaled_neg,
+            DataType::Float8(Some(3e10)),
+            "Test Case 5 Failed (i64): Scaled negative"
+        );
+
+        // Test Case 6 & 7: Timestamps
+        let ts_val_i64: i64 = 1678886400000; // Example: 2023-03-15T13:20:00Z in ms
+        let array_ts = Int64Array::from(vec![Some(ts_val_i64)]);
+
+        let scales = vec!["0", "3", "6", "9"];
+        for scale_val_str in scales {
+            let (secs, nanos) = match scale_val_str {
+                "0" => (ts_val_i64, 0),
+                "3" => (
+                    ts_val_i64 / 1000,
+                    ((ts_val_i64 % 1000).abs() * 1_000_000) as u32,
+                ),
+                "6" => (
+                    ts_val_i64 / 1_000_000,
+                    ((ts_val_i64 % 1_000_000).abs() * 1000) as u32,
+                ),
+                "9" => (
+                    ts_val_i64 / 1_000_000_000,
+                    (ts_val_i64 % 1_000_000_000).abs() as u32,
+                ),
+                _ => panic!("Unhandled scale"),
+            };
+            let expected_dt_utc = Utc.timestamp_opt(secs, nanos).unwrap();
+            let expected_dt_naive = expected_dt_utc.naive_utc();
+
+            // NTZ Test
+            let field_ts_ntz = create_test_field(
+                "test_ts_ntz_i64",
+                ArrowDataType::Int64,
+                false,
+                Some("TIMESTAMP_NTZ"),
+                Some(scale_val_str),
+                None,
+            );
+            let scale_meta_str = field_ts_ntz.metadata().get("scale").map(|s| s.as_str());
+            let result_ts_ntz = handle_int64_array(&array_ts, 0, scale_meta_str, &field_ts_ntz);
+            assert_eq!(
+                result_ts_ntz,
+                DataType::Timestamp(Some(expected_dt_naive)),
+                "Test Case 6 Failed (i64): NTZ scale {}",
+                scale_val_str
+            );
+
+            // TZ Test
+            let field_ts_tz = create_test_field(
+                "test_ts_tz_i64",
+                ArrowDataType::Int64,
+                false,
+                Some("TIMESTAMP_TZ"),
+                Some(scale_val_str),
+                None,
+            );
+            let scale_meta_str_tz = field_ts_tz.metadata().get("scale").map(|s| s.as_str());
+            let result_ts_tz = handle_int64_array(&array_ts, 0, scale_meta_str_tz, &field_ts_tz);
+            assert_eq!(
+                result_ts_tz,
+                DataType::Timestamptz(Some(expected_dt_utc)),
+                "Test Case 7 Failed (i64): TZ scale {}",
+                scale_val_str
+            );
+        }
+        println!("✓ Int64Array comprehensive logic tests passed.");
+    }
+
+    #[test]
+    fn test_handle_uint64_array_comprehensive() {
+        println!("\n=== Testing UInt64Array comprehensive logic ===");
+
+        // Test Case 1: Null value
+        let array_null = UInt64Array::from(vec![None]);
+        let field_null = create_test_field(
+            "test_null_u64",
+            ArrowDataType::UInt64,
+            true,
+            None,
+            None,
+            None,
+        );
+        let result_null = handle_uint64_array(&array_null, 0, None, &field_null);
+        assert_eq!(
+            result_null,
+            DataType::Null,
+            "Test Case 1 Failed (u64): Null value"
+        );
+
+        // Test Case 2: Regular integer (no scale)
+        let val_reg: u64 = 10_000_000_000_000_000_000;
+        let array_reg = UInt64Array::from(vec![Some(val_reg)]);
+        let field_reg = create_test_field(
+            "test_reg_u64",
+            ArrowDataType::UInt64,
+            false,
+            None,
+            None,
+            None,
+        );
+        let result_reg = handle_uint64_array(&array_reg, 0, None, &field_reg);
+        // u64 gets mapped to Int8 (i64) - potential truncation for very large values ignored here
+        assert_eq!(
+            result_reg,
+            DataType::Int8(Some(val_reg as i64)),
+            "Test Case 2 Failed (u64): Regular integer"
+        );
+
+        // Test Case 3: Scaled integer (FIXED, scale > 0)
+        let val_scaled_pos: u64 = 987654321098765432;
+        let array_scaled_pos = UInt64Array::from(vec![Some(val_scaled_pos)]);
+        let field_scaled_pos = create_test_field(
+            "test_scaled_pos_u64",
+            ArrowDataType::UInt64,
+            false,
+            Some("FIXED"),
+            Some("10"),
+            Some("20"),
+        );
+        let scale_str_pos = field_scaled_pos.metadata().get("scale").map(|s| s.as_str());
+        let result_scaled_pos =
+            handle_uint64_array(&array_scaled_pos, 0, scale_str_pos, &field_scaled_pos);
+        assert_eq!(
+            result_scaled_pos,
+            DataType::Float8(Some(98765432.10987654)),
+            "Test Case 3 Failed (u64): Scaled positive"
+        );
+
+        // Test Case 4: Scaled integer (FIXED, scale = 0)
+        let val_scaled_zero: u64 = 5_000_000_000;
+        let array_scaled_zero = UInt64Array::from(vec![Some(val_scaled_zero)]);
+        let field_scaled_zero = create_test_field(
+            "test_scaled_zero_u64",
+            ArrowDataType::UInt64,
+            false,
+            Some("FIXED"),
+            Some("0"),
+            Some("10"),
+        );
+        let scale_str_zero = field_scaled_zero
+            .metadata()
+            .get("scale")
+            .map(|s| s.as_str());
+        let result_scaled_zero =
+            handle_uint64_array(&array_scaled_zero, 0, scale_str_zero, &field_scaled_zero);
+        assert_eq!(
+            result_scaled_zero,
+            DataType::Float8(Some(5_000_000_000.0)),
+            "Test Case 4 Failed (u64): Scaled zero"
+        );
+
+        // Test Case 5: Scaled integer (FIXED, scale < 0)
+        let val_scaled_neg: u64 = 12;
+        let array_scaled_neg = UInt64Array::from(vec![Some(val_scaled_neg)]);
+        let field_scaled_neg = create_test_field(
+            "test_scaled_neg_u64",
+            ArrowDataType::UInt64,
+            false,
+            Some("FIXED"),
+            Some("-8"),
+            Some("12"),
+        );
+        let scale_str_neg = field_scaled_neg.metadata().get("scale").map(|s| s.as_str());
+        let result_scaled_neg =
+            handle_uint64_array(&array_scaled_neg, 0, scale_str_neg, &field_scaled_neg);
+        assert_eq!(
+            result_scaled_neg,
+            DataType::Float8(Some(12e8)),
+            "Test Case 5 Failed (u64): Scaled negative"
+        );
+
+        // Test Case 6 & 7: Timestamps
+        let ts_val_u64: u64 = 1700000000000; // ~Nov 2023 in ms
+        let array_ts = UInt64Array::from(vec![Some(ts_val_u64)]);
+        let ts_val_i64 = ts_val_u64 as i64; // Potential truncation if u64 > i64::MAX
+
+        let scales = vec!["0", "3", "6", "9"];
+        for scale_val_str in scales {
+            let (secs, nanos) = match scale_val_str {
+                "0" => (ts_val_i64, 0),
+                "3" => (
+                    ts_val_i64 / 1000,
+                    ((ts_val_i64 % 1000).abs() * 1_000_000) as u32,
+                ),
+                "6" => (
+                    ts_val_i64 / 1_000_000,
+                    ((ts_val_i64 % 1_000_000).abs() * 1000) as u32,
+                ),
+                "9" => (
+                    ts_val_i64 / 1_000_000_000,
+                    (ts_val_i64 % 1_000_000_000).abs() as u32,
+                ),
+                _ => panic!("Unhandled scale"),
+            };
+            let expected_dt_utc = Utc.timestamp_opt(secs, nanos).unwrap();
+            let expected_dt_naive = expected_dt_utc.naive_utc();
+
+            // NTZ Test
+            let field_ts_ntz = create_test_field(
+                "test_ts_ntz_u64",
+                ArrowDataType::UInt64,
+                false,
+                Some("TIMESTAMP_NTZ"),
+                Some(scale_val_str),
+                None,
+            );
+            let scale_meta_str = field_ts_ntz.metadata().get("scale").map(|s| s.as_str());
+            let result_ts_ntz = handle_uint64_array(&array_ts, 0, scale_meta_str, &field_ts_ntz);
+            assert_eq!(
+                result_ts_ntz,
+                DataType::Timestamp(Some(expected_dt_naive)),
+                "Test Case 6 Failed (u64): NTZ scale {}",
+                scale_val_str
+            );
+
+            // TZ Test
+            let field_ts_tz = create_test_field(
+                "test_ts_tz_u64",
+                ArrowDataType::UInt64,
+                false,
+                Some("TIMESTAMP_TZ"),
+                Some(scale_val_str),
+                None,
+            );
+            let scale_meta_str_tz = field_ts_tz.metadata().get("scale").map(|s| s.as_str());
+            let result_ts_tz = handle_uint64_array(&array_ts, 0, scale_meta_str_tz, &field_ts_tz);
+            assert_eq!(
+                result_ts_tz,
+                DataType::Timestamptz(Some(expected_dt_utc)),
+                "Test Case 7 Failed (u64): TZ scale {}",
+                scale_val_str
+            );
+        }
+        println!("✓ UInt64Array comprehensive logic tests passed.");
+    }
+
+    #[test]
+    fn test_handle_float32_array_comprehensive() {
+        println!("\n=== Testing Float32Array comprehensive logic ===");
+
+        // Test Case 1: Null value
+        let array_null = Float32Array::from(vec![None]);
+        let field_null = create_test_field(
+            "test_null_f32",
+            ArrowDataType::Float32,
+            true,
+            None,
+            None,
+            None,
+        );
+        let result_null = handle_float32_array(&array_null, 0, None, &field_null);
+        assert_eq!(
+            result_null,
+            DataType::Null,
+            "Test Case 1 Failed (f32): Null value"
+        );
+
+        // Test Case 2: Regular float (no scale)
+        let val_reg: f32 = 42.123;
+        let array_reg = Float32Array::from(vec![Some(val_reg)]);
+        let field_reg = create_test_field(
+            "test_reg_f32",
+            ArrowDataType::Float32,
+            false,
+            None,
+            None,
+            None,
+        );
+        let result_reg = handle_float32_array(&array_reg, 0, None, &field_reg);
+        assert_eq!(
+            result_reg,
+            DataType::Float4(Some(val_reg)),
+            "Test Case 2 Failed (f32): Regular float"
+        );
+
+        // Test Case 3: Scaled float (scale > 0)
+        let val_scaled_pos: f32 = 12345.67;
+        let array_scaled_pos = Float32Array::from(vec![Some(val_scaled_pos)]);
+        let field_scaled_pos = create_test_field(
+            "test_scaled_pos_f32",
+            ArrowDataType::Float32,
+            false,
+            None,
+            Some("2"),
+            None,
+        );
+        let scale_str_pos = field_scaled_pos.metadata().get("scale").map(|s| s.as_str());
+        let result_scaled_pos =
+            handle_float32_array(&array_scaled_pos, 0, scale_str_pos, &field_scaled_pos);
+        match result_scaled_pos {
+            DataType::Float4(Some(v)) => assert!(
+                (v - 123.4567).abs() < 0.00001,
+                "Test Case 3 Failed (f32): Scaled positive. Expected approx 123.4567, got {}",
+                v
+            ),
+            _ => panic!(
+                "Test Case 3 Failed (f32): Expected Float4(Some(_)), got {:?}",
+                result_scaled_pos
+            ),
+        }
+
+        // Test Case 4: Scaled float (scale = 0)
+        let val_scaled_zero: f32 = -5000.5;
+        let array_scaled_zero = Float32Array::from(vec![Some(val_scaled_zero)]);
+        let field_scaled_zero = create_test_field(
+            "test_scaled_zero_f32",
+            ArrowDataType::Float32,
+            false,
+            None,
+            Some("0"),
+            None,
+        );
+        let scale_str_zero = field_scaled_zero
+            .metadata()
+            .get("scale")
+            .map(|s| s.as_str());
+        let result_scaled_zero =
+            handle_float32_array(&array_scaled_zero, 0, scale_str_zero, &field_scaled_zero);
+        assert_eq!(
+            result_scaled_zero,
+            DataType::Float4(Some(-5000.5)),
+            "Test Case 4 Failed (f32): Scaled zero"
+        );
+
+        // Test Case 5: Scaled float (scale < 0)
+        let val_scaled_neg: f32 = 99.125;
+        let array_scaled_neg = Float32Array::from(vec![Some(val_scaled_neg)]);
+        let field_scaled_neg = create_test_field(
+            "test_scaled_neg_f32",
+            ArrowDataType::Float32,
+            false,
+            None,
+            Some("-2"),
+            None,
+        );
+        let scale_str_neg = field_scaled_neg.metadata().get("scale").map(|s| s.as_str());
+        let result_scaled_neg =
+            handle_float32_array(&array_scaled_neg, 0, scale_str_neg, &field_scaled_neg);
+        assert_eq!(
+            result_scaled_neg,
+            DataType::Float4(Some(9912.5)),
+            "Test Case 5 Failed (f32): Scaled negative"
+        );
+
+        // Test Case 6 & 7: Timestamps (less common for f32, but testing handler logic)
+        let ts_val_f32: f32 = 1700000000.123; // Represents a timestamp, fractional part lost in i64 cast
+        let array_ts = Float32Array::from(vec![Some(ts_val_f32)]);
+        let ts_val_i64 = ts_val_f32 as i64; // 1700000000
+
+        let scales = vec!["0", "3"]; // Testing limited scales for f32 timestamps
+        for scale_val_str in scales {
+            let (secs, nanos) = match scale_val_str {
+                "0" => (ts_val_i64, 0u32),
+                "3" => (ts_val_i64 / 1000, ((ts_val_i64 % 1000) * 1_000_000) as u32),
+                _ => panic!("Unhandled scale for f32 timestamp test"),
+            };
+            let expected_dt_utc = Utc.timestamp_opt(secs, nanos).unwrap();
+            let expected_dt_naive = expected_dt_utc.naive_utc();
+
+            // NTZ Test
+            let field_ts_ntz = create_test_field(
+                "test_ts_ntz_f32",
+                ArrowDataType::Float32,
+                false,
+                Some("TIMESTAMP_NTZ"),
+                Some(scale_val_str),
+                None,
+            );
+            let scale_meta_str = field_ts_ntz.metadata().get("scale").map(|s| s.as_str());
+            let result_ts_ntz = handle_float32_array(&array_ts, 0, scale_meta_str, &field_ts_ntz);
+            assert_eq!(
+                result_ts_ntz,
+                DataType::Timestamp(Some(expected_dt_naive)),
+                "Test Case 6 Failed (f32): NTZ scale {}",
+                scale_val_str
+            );
+
+            // TZ Test
+            let field_ts_tz = create_test_field(
+                "test_ts_tz_f32",
+                ArrowDataType::Float32,
+                false,
+                Some("TIMESTAMP_TZ"),
+                Some(scale_val_str),
+                None,
+            );
+            let scale_meta_str_tz = field_ts_tz.metadata().get("scale").map(|s| s.as_str());
+            let result_ts_tz = handle_float32_array(&array_ts, 0, scale_meta_str_tz, &field_ts_tz);
+            assert_eq!(
+                result_ts_tz,
+                DataType::Timestamptz(Some(expected_dt_utc)),
+                "Test Case 7 Failed (f32): TZ scale {}",
+                scale_val_str
+            );
+        }
+        println!("✓ Float32Array comprehensive logic tests passed.");
+    }
+
+    #[test]
+    fn test_handle_float64_array_comprehensive() {
+        println!("\n=== Testing Float64Array comprehensive logic ===");
+
+        // Test Case 1: Null value
+        let array_null = Float64Array::from(vec![None]);
+        let field_null = create_test_field(
+            "test_null_f64",
+            ArrowDataType::Float64,
+            true,
+            None,
+            None,
+            None,
+        );
+        let result_null = handle_float64_array(&array_null, 0, None, &field_null);
+        assert_eq!(
+            result_null,
+            DataType::Null,
+            "Test Case 1 Failed (f64): Null value"
+        );
+
+        // Test Case 2: Regular float (no scale)
+        let val_reg: f64 = 12345.67890123;
+        let array_reg = Float64Array::from(vec![Some(val_reg)]);
+        let field_reg = create_test_field(
+            "test_reg_f64",
+            ArrowDataType::Float64,
+            false,
+            None,
+            None,
+            None,
+        );
+        let result_reg = handle_float64_array(&array_reg, 0, None, &field_reg);
+        assert_eq!(
+            result_reg,
+            DataType::Float8(Some(val_reg)),
+            "Test Case 2 Failed (f64): Regular float"
+        );
+
+        // Test Case 3: Scaled float (scale > 0)
+        let val_scaled_pos: f64 = 9876543210.12345;
+        let array_scaled_pos = Float64Array::from(vec![Some(val_scaled_pos)]);
+        let field_scaled_pos = create_test_field(
+            "test_scaled_pos_f64",
+            ArrowDataType::Float64,
+            false,
+            None,
+            Some("5"),
+            None,
+        );
+        let scale_str_pos = field_scaled_pos.metadata().get("scale").map(|s| s.as_str());
+        let result_scaled_pos =
+            handle_float64_array(&array_scaled_pos, 0, scale_str_pos, &field_scaled_pos);
+        // Compare with epsilon for f64
+        match result_scaled_pos {
+            DataType::Float8(Some(v)) => assert!((v - 98765.4321012345).abs() < 0.0000000001, "Test Case 3 Failed (f64): Scaled positive. Expected approx 98765.4321012345, got {}", v),
+            _ => panic!("Test Case 3 Failed (f64): Expected Float8(Some(_)), got {:?}", result_scaled_pos),
+        }
+
+        // Test Case 4: Scaled float (scale = 0)
+        let val_scaled_zero: f64 = -1234567.89;
+        let array_scaled_zero = Float64Array::from(vec![Some(val_scaled_zero)]);
+        let field_scaled_zero = create_test_field(
+            "test_scaled_zero_f64",
+            ArrowDataType::Float64,
+            false,
+            None,
+            Some("0"),
+            None,
+        );
+        let scale_str_zero = field_scaled_zero
+            .metadata()
+            .get("scale")
+            .map(|s| s.as_str());
+        let result_scaled_zero =
+            handle_float64_array(&array_scaled_zero, 0, scale_str_zero, &field_scaled_zero);
+        assert_eq!(
+            result_scaled_zero,
+            DataType::Float8(Some(-1234567.89)),
+            "Test Case 4 Failed (f64): Scaled zero"
+        );
+
+        // Test Case 5: Scaled float (scale < 0)
+        let val_scaled_neg: f64 = 1.2345;
+        let array_scaled_neg = Float64Array::from(vec![Some(val_scaled_neg)]);
+        let field_scaled_neg = create_test_field(
+            "test_scaled_neg_f64",
+            ArrowDataType::Float64,
+            false,
+            None,
+            Some("-4"),
+            None,
+        );
+        let scale_str_neg = field_scaled_neg.metadata().get("scale").map(|s| s.as_str());
+        let result_scaled_neg =
+            handle_float64_array(&array_scaled_neg, 0, scale_str_neg, &field_scaled_neg);
+        assert_eq!(
+            result_scaled_neg,
+            DataType::Float8(Some(12345.0)),
+            "Test Case 5 Failed (f64): Scaled negative"
+        );
+
+        // Test Case 6 & 7: Timestamps (less common for f64, but testing handler logic)
+        let ts_val_f64: f64 = 1710000000.567; // Represents a timestamp, fractional part lost in i64 cast
+        let array_ts = Float64Array::from(vec![Some(ts_val_f64)]);
+        let ts_val_i64 = ts_val_f64 as i64; // 1710000000
+
+        let scales = vec!["0", "3", "6", "9"];
+        for scale_val_str in scales {
+            let (secs, nanos) = match scale_val_str {
+                "0" => (ts_val_i64, 0u32),
+                "3" => (ts_val_i64 / 1000, ((ts_val_i64 % 1000) * 1_000_000) as u32),
+                "6" => (
+                    ts_val_i64 / 1_000_000,
+                    ((ts_val_i64 % 1_000_000) * 1000) as u32,
+                ),
+                "9" => (
+                    ts_val_i64 / 1_000_000_000,
+                    (ts_val_i64 % 1_000_000_000) as u32,
+                ),
+                _ => panic!("Unhandled scale for f64 timestamp test"),
+            };
+            let expected_dt_utc = Utc.timestamp_opt(secs, nanos).unwrap();
+            let expected_dt_naive = expected_dt_utc.naive_utc();
+
+            // NTZ Test
+            let field_ts_ntz = create_test_field(
+                "test_ts_ntz_f64",
+                ArrowDataType::Float64,
+                false,
+                Some("TIMESTAMP_NTZ"),
+                Some(scale_val_str),
+                None,
+            );
+            let scale_meta_str = field_ts_ntz.metadata().get("scale").map(|s| s.as_str());
+            let result_ts_ntz = handle_float64_array(&array_ts, 0, scale_meta_str, &field_ts_ntz);
+            assert_eq!(
+                result_ts_ntz,
+                DataType::Timestamp(Some(expected_dt_naive)),
+                "Test Case 6 Failed (f64): NTZ scale {}",
+                scale_val_str
+            );
+
+            // TZ Test
+            let field_ts_tz = create_test_field(
+                "test_ts_tz_f64",
+                ArrowDataType::Float64,
+                false,
+                Some("TIMESTAMP_TZ"),
+                Some(scale_val_str),
+                None,
+            );
+            let scale_meta_str_tz = field_ts_tz.metadata().get("scale").map(|s| s.as_str());
+            let result_ts_tz = handle_float64_array(&array_ts, 0, scale_meta_str_tz, &field_ts_tz);
+            assert_eq!(
+                result_ts_tz,
+                DataType::Timestamptz(Some(expected_dt_utc)),
+                "Test Case 7 Failed (f64): TZ scale {}",
+                scale_val_str
+            );
+        }
+        println!("✓ Float64Array comprehensive logic tests passed.");
+    }
+
+    #[test]
+    fn test_handle_time_arrays() {
+        println!("\n=== Testing Time32Array and Time64Array comprehensive logic ===");
+
+        // --- Time32 Tests ---
+        let time32_test_cases = vec![
+            // (value, unit, expected_naive_time_h_m_s_ms)
+            (Some(3600i32), TimeUnit::Second, (1u32, 0u32, 0u32, 0u32)), // 1 hour
+            (
+                Some(90000i32),
+                TimeUnit::Millisecond,
+                (0u32, 1u32, 30u32, 0u32),
+            ), // 1 minute 30 seconds
+            (
+                Some(12345i32),
+                TimeUnit::Millisecond,
+                (0u32, 0u32, 12u32, 345u32),
+            ), // 12.345 seconds
+            (None, TimeUnit::Millisecond, (0u32, 0u32, 0u32, 0u32)),     // Null, expect Null
+        ];
+
+        for (i, (val_opt, unit, expected_hmsms_tuple)) in time32_test_cases.iter().enumerate() {
+            let field_name = format!("time32_field_{}", i);
+            let field = create_test_field(
+                &field_name,
+                ArrowDataType::Time32(*unit),
+                val_opt.is_some(),
+                None,
+                None,
+                None,
+            );
+
+            let array_data: Vec<Option<i32>> = vec![*val_opt];
+            let array = Int32Array::from(array_data); // Time32 is Int32Array
+
+            let result = handle_time32_array(&array, 0, unit);
+
+            if val_opt.is_none() {
+                assert_eq!(
+                    result,
+                    DataType::Null,
+                    "Test Case Time32 (Null) {} failed",
+                    i
+                );
+            } else {
+                let (h, m, s, ms) = expected_hmsms_tuple;
+                let expected_time = NaiveTime::from_hms_milli_opt(*h, *m, *s, *ms).unwrap();
+                assert_eq!(
+                    result,
+                    DataType::Time(Some(expected_time)),
+                    "Test Case Time32 {} failed",
+                    i
+                );
+            }
+        }
+
+        // --- Time64 Tests ---
+        let time64_test_cases = vec![
+            // (value, unit, expected_naive_time_h_m_s_ns)
+            (
+                Some(3600_000_000i64),
+                TimeUnit::Microsecond,
+                (1u32, 0u32, 0u32, 0u32),
+            ), // 1 hour (ns part is 0)
+            (
+                Some(90_000_000_000i64),
+                TimeUnit::Nanosecond,
+                (0u32, 1u32, 30u32, 0u32),
+            ), // 1 minute 30 seconds (ns part is 0)
+            (
+                Some(12_345_678_901i64),
+                TimeUnit::Nanosecond,
+                (0u32, 0u32, 12u32, 345678901u32),
+            ), // 12.345678901 seconds
+            (None, TimeUnit::Nanosecond, (0u32, 0u32, 0u32, 0u32)), // Null, expect Null
+        ];
+
+        for (i, (val_opt, unit, expected_hmsns_tuple)) in time64_test_cases.iter().enumerate() {
+            let field_name = format!("time64_field_{}", i);
+            let field = create_test_field(
+                &field_name,
+                ArrowDataType::Time64(*unit),
+                val_opt.is_some(),
+                None,
+                None,
+                None,
+            );
+
+            let array_data: Vec<Option<i64>> = vec![*val_opt];
+            let array = Int64Array::from(array_data); // Time64 is Int64Array
+
+            let result = handle_time64_array(&array, 0, unit);
+
+            if val_opt.is_none() {
+                assert_eq!(
+                    result,
+                    DataType::Null,
+                    "Test Case Time64 (Null) {} failed",
+                    i
+                );
+            } else {
+                let (h, m, s, ns) = expected_hmsns_tuple;
+                let expected_time = NaiveTime::from_hms_nano_opt(*h, *m, *s, *ns).unwrap();
+                assert_eq!(
+                    result,
+                    DataType::Time(Some(expected_time)),
+                    "Test Case Time64 {} failed",
+                    i
+                );
+            }
+        }
+        println!("✓ Time32Array and Time64Array tests passed.");
+    }
+
+    #[test]
+    fn test_handle_boolean_array() {
+        println!("\n=== Testing BooleanArray comprehensive logic ===");
+
+        let test_cases = vec![
+            (Some(true), DataType::Bool(Some(true))),
+            (Some(false), DataType::Bool(Some(false))),
+            (None, DataType::Null),
+        ];
+
+        for (i, (val_opt, expected_data_type)) in test_cases.iter().enumerate() {
+            let field =
+                create_test_field("bool_field", ArrowDataType::Boolean, true, None, None, None);
+            let array = BooleanArray::from(vec![*val_opt]);
+            let result = handle_boolean_array(&array, 0);
+
+            assert_eq!(
+                result, *expected_data_type,
+                "Test Case Boolean {} failed",
+                i
+            );
+        }
+        println!("✓ BooleanArray tests passed.");
+    }
+
+    #[test]
+    fn test_handle_string_arrays() {
+        println!("\n=== Testing StringArray, LargeStringArray, Utf8View, BinaryView arrays comprehensive logic ===");
+
+        // Test Case 1: StringArray
+        let string_array = StringArray::from(vec!["Hello", "World", "!"]);
+        let field_string =
+            create_test_field("string_field", ArrowDataType::Utf8, true, None, None, None);
+        let result_string = handle_string_array(&string_array, 0);
+        assert_eq!(
+            result_string,
+            DataType::Text(Some("Hello".to_string())),
+            "Test Case StringArray failed"
+        );
+
+        let string_array_null = StringArray::from(vec![
+            None,
+            Some("World".to_string()),
+            Some("!".to_string()),
+            None,
+        ]);
+        let result_string_null = handle_string_array(&string_array_null, 0);
+        assert_eq!(
+            result_string_null,
+            DataType::Null,
+            "Test Case StringArray (Null) failed"
+        );
+
+        // Test Case 2: LargeStringArray
+        let large_string_array = LargeStringArray::from(vec!["Hello", "World", "!"]);
+        let field_large_string = create_test_field(
+            "large_string_field",
+            ArrowDataType::LargeUtf8,
+            true,
+            None,
+            None,
+            None,
+        );
+        let result_large_string = handle_large_string_array(&large_string_array, 0);
+        assert_eq!(
+            result_large_string,
+            DataType::Text(Some("Hello".to_string())),
+            "Test Case LargeStringArray failed"
+        );
+
+        let large_string_array_null = LargeStringArray::from(vec![
+            None,
+            Some("World".to_string()),
+            Some("!".to_string()),
+            None,
+        ]);
+        let result_large_string_null = handle_large_string_array(&large_string_array_null, 0);
+        assert_eq!(
+            result_large_string_null,
+            DataType::Null,
+            "Test Case LargeStringArray (Null) failed"
+        );
+
+        // Test Case 3: Utf8View
+        // ... other tests ...
+    }
+}
