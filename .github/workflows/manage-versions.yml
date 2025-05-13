@@ -2,7 +2,7 @@ name: Manage Versions
 
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [closed]
     branches:
       - staging
   workflow_dispatch:
@@ -27,6 +27,27 @@ permissions:
   contents: write # To push commits back to the PR branch
 
 jobs:
+  merge_to_evals:
+    if: github.event.pull_request.merged == true
+    runs-on: blacksmith
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Merge staging into evals
+        run: |
+          git checkout evals
+          git merge staging --no-ff -m "chore: merge staging into evals [skip ci]"
+          git push origin evals
+
   bump_versions_in_pr:
     runs-on: blacksmith
     if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
