@@ -27,7 +27,9 @@ permissions:
   contents: write # To push commits back to the PR branch
 
 jobs:
+  # Job to merge staging into evals branch when PR is merged
   merge_to_evals:
+    name: Merge Staging to Evals
     if: github.event.pull_request.merged == true
     runs-on: blacksmith
     steps:
@@ -48,16 +50,17 @@ jobs:
           git merge staging --no-ff -m "chore: merge staging into evals [skip ci]"
           git push origin evals
 
-  bump_versions_in_pr:
+  # Job to determine version bump parameters
+  determine_version_params:
+    name: Determine Version Parameters
     runs-on: blacksmith
     if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
     outputs:
-      new_api_version: ${{ steps.bump.outputs.new_api_version }}
-      new_web_version: ${{ steps.bump.outputs.new_web_version }}
-      new_cli_version: ${{ steps.bump.outputs.new_cli_version }}
-      versions_bumped: ${{ steps.bump.outputs.versions_bumped }}
+      version_spec: ${{ steps.event_params.outputs.version_spec }}
+      component: ${{ steps.event_params.outputs.component }}
+      target_branch: ${{ steps.pr_branch_info.outputs.target_branch_name }}
     steps:
-      - name: Determine Target Branch for Checkout and Push
+      - name: Determine Target Branch
         id: pr_branch_info
         shell: bash
         run: |
@@ -78,30 +81,48 @@ jobs:
           fi
           echo "target_branch_name=$TARGET_BRANCH" >> $GITHUB_OUTPUT
 
-      - name: Checkout PR source branch
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ steps.pr_branch_info.outputs.target_branch_name }}
+          fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Set up Rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-
-      - name: Install cargo-edit
-        run: cargo install cargo-edit --locked
-
-      - name: Configure Git
+      - name: Determine Changed Components
+        id: changed_components
+        if: github.event_name == 'pull_request'
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Get the base and head commits for the PR
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          
+          # Get list of changed files
+          CHANGED_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA)
+          
+          # Initialize component flags
+          HAS_API_CHANGES="false"
+          HAS_WEB_CHANGES="false"
+          HAS_CLI_CHANGES="false"
+          
+          # Check for changes in each component
+          if echo "$CHANGED_FILES" | grep -q "^api/"; then
+            HAS_API_CHANGES="true"
+            echo "API changes detected"
+          fi
+          
+          if echo "$CHANGED_FILES" | grep -q "^web/"; then
+            HAS_WEB_CHANGES="true"
+            echo "Web changes detected"
+          fi
+          
+          if echo "$CHANGED_FILES" | grep -q "^cli/"; then
+            HAS_CLI_CHANGES="true"
+            echo "CLI changes detected"
+          fi
+          
+          # Set outputs
+          echo "has_api_changes=$HAS_API_CHANGES" >> $GITHUB_OUTPUT
+          echo "has_web_changes=$HAS_WEB_CHANGES" >> $GITHUB_OUTPUT
+          echo "has_cli_changes=$HAS_CLI_CHANGES" >> $GITHUB_OUTPUT
 
       - name: Determine Version Spec and Component
         id: event_params
@@ -116,8 +137,20 @@ jobs:
             echo "Using workflow_dispatch inputs: version_spec='$VERSION_SPEC', component='$COMPONENT'"
           elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
             PR_TITLE=$(echo "${{ github.event.pull_request.title }}" | tr '[:upper:]' '[:lower:]')
-            COMPONENT="all"
+            
+            # Determine which components have changes
+            if [[ "${{ steps.changed_components.outputs.has_api_changes }}" == "true" ]]; then
+              COMPONENT="api"
+            elif [[ "${{ steps.changed_components.outputs.has_web_changes }}" == "true" ]]; then
+              COMPONENT="web"
+            elif [[ "${{ steps.changed_components.outputs.has_cli_changes }}" == "true" ]]; then
+              COMPONENT="cli"
+            else
+              echo "No changes detected in API, Web, or CLI components. Skipping version bump."
+              COMPONENT="none"
+            fi
 
+            # Determine version spec based on PR title
             if echo "$PR_TITLE" | grep -q -E "breaking change|feat!:"; then VERSION_SPEC="major";
             elif echo "$PR_TITLE" | grep -q -E "^feat\\([^)]+\\)!:"; then VERSION_SPEC="major";
             elif echo "$PR_TITLE" | grep -q -E "^feat:"; then VERSION_SPEC="minor";
@@ -135,171 +168,214 @@ jobs:
             VERSION_SPEC="patch"
           fi
           if [[ -z "$COMPONENT" ]]; then
-            echo "Warning: COMPONENT is empty. Defaulting to all."
-            COMPONENT="all"
+            echo "Warning: COMPONENT is empty. Defaulting to none."
+            COMPONENT="none"
           fi
 
           echo "version_spec=$VERSION_SPEC" >> $GITHUB_OUTPUT
           echo "component=$COMPONENT" >> $GITHUB_OUTPUT
 
-      - name: Perform Version Bumps
+  # Job to bump API version
+  bump_api_version:
+    name: Bump API Version
+    needs: determine_version_params
+    if: |
+      (needs.determine_version_params.outputs.component == 'all' || 
+       needs.determine_version_params.outputs.component == 'api') &&
+      needs.determine_version_params.outputs.component != 'none'
+    runs-on: blacksmith
+    outputs:
+      new_version: ${{ steps.bump.outputs.new_version }}
+      old_version: ${{ steps.bump.outputs.old_version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.determine_version_params.outputs.target_branch }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Install cargo-edit
+        run: cargo install cargo-edit --locked
+
+      - name: Bump API Version
         id: bump
-        shell: bash
         run: |
-          COMPONENT="${{ steps.event_params.outputs.component }}"
-          VERSION_SPEC="${{ steps.event_params.outputs.version_spec }}"
-
-          echo "Component for bump: $COMPONENT"
-          echo "Version spec for bump: $VERSION_SPEC"
-
-          COMMIT_MESSAGE_PREFIX="chore(versions):"
-          COMMIT_CHANGES=false
-
-          NEW_API_VERSION=""
-          NEW_WEB_VERSION=""
-          NEW_CLI_VERSION=""
-
-          if [[ "$COMPONENT" == "all" || "$COMPONENT" == "api" ]]; then
-            echo "Processing API version using spec: $VERSION_SPEC..."
-            cd api/server
-            OLD_API_VERSION=$(cargo read-manifest | jq -r .version)
-            if [[ "$VERSION_SPEC" == "major" || "$VERSION_SPEC" == "minor" || "$VERSION_SPEC" == "patch" ]]; then
-              echo "Bumping API version with --bump $VERSION_SPEC"
-              cargo set-version --bump "$VERSION_SPEC"
-            else
-              CLEANED_VERSION_SPEC=$(echo "$VERSION_SPEC" | sed 's/^v//')
-              echo "Setting API version to $CLEANED_VERSION_SPEC"
-              cargo set-version "$CLEANED_VERSION_SPEC"
-            fi
-            NEW_API_VERSION=$(cargo read-manifest | jq -r .version)
-            echo "API: $OLD_API_VERSION -> $NEW_API_VERSION"
-            cd ../..
-            if [[ "$OLD_API_VERSION" != "$NEW_API_VERSION" ]]; then
-              git add api/server/Cargo.toml
-              COMMIT_MESSAGE_PREFIX="$COMMIT_MESSAGE_PREFIX bump api to v$NEW_API_VERSION;"
-              COMMIT_CHANGES=true
-              echo "new_api_version=$NEW_API_VERSION" >> $GITHUB_OUTPUT
-            fi
-          fi
-
-          if [[ "$COMPONENT" == "all" || "$COMPONENT" == "web" ]]; then
-            echo "Bumping Web version using spec: $VERSION_SPEC..."
-            cd web
-            OLD_WEB_VERSION=$(jq -r .version package.json)
-            npm version "$VERSION_SPEC" --no-git-tag-version --allow-same-version
-            NEW_WEB_VERSION=$(jq -r .version package.json)
-            echo "Web: $OLD_WEB_VERSION -> $NEW_WEB_VERSION"
-            cd ..
-            if [[ "$OLD_WEB_VERSION" != "$NEW_WEB_VERSION" ]]; then
-              git add web/package.json web/package-lock.json
-              COMMIT_MESSAGE_PREFIX="$COMMIT_MESSAGE_PREFIX bump web to v$NEW_WEB_VERSION;"
-              COMMIT_CHANGES=true
-              echo "new_web_version=$NEW_WEB_VERSION" >> $GITHUB_OUTPUT
-            fi
-          fi
-
-          if [[ "$COMPONENT" == "all" || "$COMPONENT" == "cli" ]]; then
-            echo "Processing CLI version using spec: $VERSION_SPEC..."
-            cd cli/cli
-            OLD_CLI_VERSION=$(cargo read-manifest | jq -r .version)
-            if [[ "$VERSION_SPEC" == "major" || "$VERSION_SPEC" == "minor" || "$VERSION_SPEC" == "patch" ]]; then
-              echo "Bumping CLI version with --bump $VERSION_SPEC"
-              cargo set-version --bump "$VERSION_SPEC"
-            else
-              CLEANED_VERSION_SPEC=$(echo "$VERSION_SPEC" | sed 's/^v//')
-              echo "Setting CLI version to $CLEANED_VERSION_SPEC"
-              cargo set-version "$CLEANED_VERSION_SPEC"
-            fi
-            NEW_CLI_VERSION=$(cargo read-manifest | jq -r .version)
-            echo "CLI: $OLD_CLI_VERSION -> $NEW_CLI_VERSION"
-            cd ../..
-            if [[ "$OLD_CLI_VERSION" != "$NEW_CLI_VERSION" ]]; then
-              git add cli/cli/Cargo.toml
-              COMMIT_MESSAGE_PREFIX="$COMMIT_MESSAGE_PREFIX bump cli to v$NEW_CLI_VERSION;"
-              COMMIT_CHANGES=true
-              echo "new_cli_version=$NEW_CLI_VERSION" >> $GITHUB_OUTPUT
-            fi
+          cd api/server
+          OLD_VERSION=$(cargo read-manifest | jq -r .version)
+          VERSION_SPEC="${{ needs.determine_version_params.outputs.version_spec }}"
+          
+          if [[ "$VERSION_SPEC" == "major" || "$VERSION_SPEC" == "minor" || "$VERSION_SPEC" == "patch" ]]; then
+            cargo set-version --bump "$VERSION_SPEC"
+          else
+            CLEANED_VERSION_SPEC=$(echo "$VERSION_SPEC" | sed 's/^v//')
+            cargo set-version "$CLEANED_VERSION_SPEC"
           fi
           
-          if [[ "$COMMIT_CHANGES" == true ]]; then
-            FINAL_COMMIT_MESSAGE=$(echo "$COMMIT_MESSAGE_PREFIX" | sed 's/;$//')
-            echo "Final Commit Message for version files: $FINAL_COMMIT_MESSAGE [skip ci]"
-            echo "commit_message=$FINAL_COMMIT_MESSAGE [skip ci]" >> $GITHUB_OUTPUT # For the version files commit
-            echo "versions_bumped=true" >> $GITHUB_OUTPUT
-          else
-            echo "No version changes detected for source files."
-            echo "commit_message=" >> $GITHUB_OUTPUT
-            echo "versions_bumped=false" >> $GITHUB_OUTPUT
+          NEW_VERSION=$(cargo read-manifest | jq -r .version)
+          echo "API: $OLD_VERSION -> $NEW_VERSION"
+          
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "old_version=$OLD_VERSION" >> $GITHUB_OUTPUT
+          
+          if [[ "$OLD_VERSION" != "$NEW_VERSION" ]]; then
+            git add Cargo.toml
+            git commit -m "chore(versions): bump api to v$NEW_VERSION [skip ci]"
+            git push origin HEAD:${{ needs.determine_version_params.outputs.target_branch }}
           fi
 
-          echo "New API Version Output: $NEW_API_VERSION"
-          echo "New Web Version Output: $NEW_WEB_VERSION"
-          echo "New CLI Version Output: $NEW_CLI_VERSION"
+  # Job to bump Web version
+  bump_web_version:
+    name: Bump Web Version
+    needs: determine_version_params
+    if: |
+      (needs.determine_version_params.outputs.component == 'all' || 
+       needs.determine_version_params.outputs.component == 'web') &&
+      needs.determine_version_params.outputs.component != 'none'
+    runs-on: blacksmith
+    outputs:
+      new_version: ${{ steps.bump.outputs.new_version }}
+      old_version: ${{ steps.bump.outputs.old_version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.determine_version_params.outputs.target_branch }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Commit and Push Version File Changes to PR Branch
-        if: steps.bump.outputs.versions_bumped == 'true'
-        env:
-          TARGET_BRANCH: ${{ steps.pr_branch_info.outputs.target_branch_name }}
-          COMMIT_MESSAGE_CONTENT: ${{ steps.bump.outputs.commit_message }} # This is the commit message for version files
-        run: |
-          echo "Committing version file changes with message: $COMMIT_MESSAGE_CONTENT"
-          git commit -m "$COMMIT_MESSAGE_CONTENT" # Files were already added by the 'bump' step
-          echo "Pushing version file changes to PR branch: $TARGET_BRANCH"
-          git push origin HEAD:"$TARGET_BRANCH"
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-      - name: Prepare, Commit, and Push Tag Information File
-        if: steps.bump.outputs.versions_bumped == 'true' # Only run if versions were actually bumped
-        id: prepare_tag_info_file
-        env:
-          TARGET_BRANCH: ${{ steps.pr_branch_info.outputs.target_branch_name }}
+      - name: Bump Web Version
+        id: bump
         run: |
-          echo "Preparing tag_info.json file..."
+          cd web
+          OLD_VERSION=$(jq -r .version package.json)
+          VERSION_SPEC="${{ needs.determine_version_params.outputs.version_spec }}"
+          
+          npm version "$VERSION_SPEC" --no-git-tag-version --allow-same-version
+          NEW_VERSION=$(jq -r .version package.json)
+          echo "Web: $OLD_VERSION -> $NEW_VERSION"
+          
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "old_version=$OLD_VERSION" >> $GITHUB_OUTPUT
+          
+          if [[ "$OLD_VERSION" != "$NEW_VERSION" ]]; then
+            git add package.json package-lock.json
+            git commit -m "chore(versions): bump web to v$NEW_VERSION [skip ci]"
+            git push origin HEAD:${{ needs.determine_version_params.outputs.target_branch }}
+          fi
+
+  # Job to bump CLI version
+  bump_cli_version:
+    name: Bump CLI Version
+    needs: determine_version_params
+    if: |
+      (needs.determine_version_params.outputs.component == 'all' || 
+       needs.determine_version_params.outputs.component == 'cli') &&
+      needs.determine_version_params.outputs.component != 'none'
+    runs-on: blacksmith
+    outputs:
+      new_version: ${{ steps.bump.outputs.new_version }}
+      old_version: ${{ steps.bump.outputs.old_version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.determine_version_params.outputs.target_branch }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+
+      - name: Install cargo-edit
+        run: cargo install cargo-edit --locked
+
+      - name: Bump CLI Version
+        id: bump
+        run: |
+          cd cli/cli
+          OLD_VERSION=$(cargo read-manifest | jq -r .version)
+          VERSION_SPEC="${{ needs.determine_version_params.outputs.version_spec }}"
+          
+          if [[ "$VERSION_SPEC" == "major" || "$VERSION_SPEC" == "minor" || "$VERSION_SPEC" == "patch" ]]; then
+            cargo set-version --bump "$VERSION_SPEC"
+          else
+            CLEANED_VERSION_SPEC=$(echo "$VERSION_SPEC" | sed 's/^v//')
+            cargo set-version "$CLEANED_VERSION_SPEC"
+          fi
+          
+          NEW_VERSION=$(cargo read-manifest | jq -r .version)
+          echo "CLI: $OLD_VERSION -> $NEW_VERSION"
+          
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "old_version=$OLD_VERSION" >> $GITHUB_OUTPUT
+          
+          if [[ "$OLD_VERSION" != "$NEW_VERSION" ]]; then
+            git add Cargo.toml
+            git commit -m "chore(versions): bump cli to v$NEW_VERSION [skip ci]"
+            git push origin HEAD:${{ needs.determine_version_params.outputs.target_branch }}
+          fi
+
+  # Job to create tag information file
+  create_tag_info:
+    name: Create Tag Information
+    needs: [bump_api_version, bump_web_version, bump_cli_version]
+    if: |
+      always() && 
+      (needs.bump_api_version.result == 'success' || needs.bump_web_version.result == 'success' || needs.bump_cli_version.result == 'success')
+    runs-on: blacksmith
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.determine_version_params.outputs.target_branch }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Tag Info File
+        run: |
+          echo "Creating tag_info.json file..."
           TAG_INFO_FILE="tag_info.json"
           echo "{" > $TAG_INFO_FILE
           FIRST_ENTRY=true
 
-          NEW_API_VERSION="${{ steps.bump.outputs.new_api_version }}"
-          NEW_WEB_VERSION="${{ steps.bump.outputs.new_web_version }}"
-          NEW_CLI_VERSION="${{ steps.bump.outputs.new_cli_version }}"
+          if [[ "${{ needs.bump_api_version.outputs.new_version }}" != "" ]]; then
+            if [ "$FIRST_ENTRY" = false ]; then echo "," >> $TAG_INFO_FILE; fi
+            echo "  \"api_tag\": \"api/v${{ needs.bump_api_version.outputs.new_version }}\", \"api_version\": \"${{ needs.bump_api_version.outputs.new_version }}\"" >> $TAG_INFO_FILE
+            FIRST_ENTRY=false
+          fi
 
-          if [[ -n "$NEW_API_VERSION" ]]; then
-            POTENTIAL_TAG_NAME="api/v$NEW_API_VERSION"
+          if [[ "${{ needs.bump_web_version.outputs.new_version }}" != "" ]]; then
             if [ "$FIRST_ENTRY" = false ]; then echo "," >> $TAG_INFO_FILE; fi
-            echo "  \"api_tag\": \"$POTENTIAL_TAG_NAME\", \"api_version\": \"$NEW_API_VERSION\"" >> $TAG_INFO_FILE
+            echo "  \"web_tag\": \"web/v${{ needs.bump_web_version.outputs.new_version }}\", \"web_version\": \"${{ needs.bump_web_version.outputs.new_version }}\"" >> $TAG_INFO_FILE
             FIRST_ENTRY=false
           fi
-          if [[ -n "$NEW_WEB_VERSION" ]]; then
-            POTENTIAL_TAG_NAME="web/v$NEW_WEB_VERSION"
+
+          if [[ "${{ needs.bump_cli_version.outputs.new_version }}" != "" ]]; then
             if [ "$FIRST_ENTRY" = false ]; then echo "," >> $TAG_INFO_FILE; fi
-            echo "  \"web_tag\": \"$POTENTIAL_TAG_NAME\", \"web_version\": \"$NEW_WEB_VERSION\"" >> $TAG_INFO_FILE
+            echo "  \"cli_tag\": \"cli/v${{ needs.bump_cli_version.outputs.new_version }}\", \"cli_version\": \"${{ needs.bump_cli_version.outputs.new_version }}\"" >> $TAG_INFO_FILE
             FIRST_ENTRY=false
           fi
-          if [[ -n "$NEW_CLI_VERSION" ]]; then
-            POTENTIAL_TAG_NAME="cli/v$NEW_CLI_VERSION"
-            if [ "$FIRST_ENTRY" = false ]; then echo "," >> $TAG_INFO_FILE; fi
-            echo "  \"cli_tag\": \"$POTENTIAL_TAG_NAME\", \"cli_version\": \"$NEW_CLI_VERSION\"" >> $TAG_INFO_FILE
-            FIRST_ENTRY=false
-          fi
-          
+
           echo "}" >> $TAG_INFO_FILE
-          echo "Created tag_info.json:"
-          cat $TAG_INFO_FILE
           
-          echo "Committing and pushing tag_info.json to $TARGET_BRANCH..."
           git add $TAG_INFO_FILE
-          # Check if there are changes to commit for tag_info.json to avoid empty commit
-          if ! git diff --staged --quiet; then
-            git commit -m "chore: update tag_info.json with potential release versions [skip ci]"
-            git push origin HEAD:"$TARGET_BRANCH"
-            echo "tag_info.json pushed to $TARGET_BRANCH."
-          else
-            echo "No changes to tag_info.json to commit."
-          fi
+          git commit -m "chore: update tag_info.json with potential release versions [skip ci]"
+          git push origin HEAD:${{ needs.determine_version_params.outputs.target_branch }}
 
-      - name: Upload Tag Information Artifact (for reference)
-        if: steps.bump.outputs.versions_bumped == 'true' # Or based on whether tag_info.json was actually changed/committed
+      - name: Upload Tag Information Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: version-tag-info-potential
-          path: tag_info.json # This will upload the latest version from the workspace
+          name: version-tag-info
+          path: tag_info.json
           retention-days: 7 
