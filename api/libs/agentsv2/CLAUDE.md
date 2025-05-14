@@ -1,8 +1,3 @@
----
-description: Helpful for working with and building tools
-globs: libs/agents/src/tools/**/*.rs,libs/agentsv2/src/tools/**/*.rs
-alwaysApply: false
----
 ## 1  Overview
 Tools are modular, async components that our agents can call to perform work (create files, search data catalog, fetch weather, etc.).  Each tool is **transport-agnostic** and communicates with the outside world through three Rust traits:
 

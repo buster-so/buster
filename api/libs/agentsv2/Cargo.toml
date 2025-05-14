@@ -1,0 +1,15 @@
+[package]
+name = "agentsv2"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true, features = ["full", "macros"] }
+agents = { path = "../agents" }
+tracing = { workspace = true }
+uuid = { workspace = true }
+litellm = { path = "../litellm" } 

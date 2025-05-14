@@ -14,6 +14,7 @@ members = [
     "libs/stored_values",
     "libs/semantic_layer",
     "libs/raindrop",
+    "libs/agentsv2",
 ]
 resolver = "2"
 

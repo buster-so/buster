@@ -9,6 +9,7 @@ pub mod tools;
 
 // Re-export public API
 pub use agent::{Agent, AgentError, AgentExt};
+pub use agent::ModeProvider;
 pub use agents::*;
 pub use models::*;
 

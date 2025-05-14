@@ -3,183 +3,175 @@ description: Helpful for working with and building tools
 globs: libs/agents/src/tools/**/*.rs
 alwaysApply: false
 ---
-# Tools Documentation and Guidelines
+## 1  Overview
+Tools are modular, async components that our agents can call to perform work (create files, search data catalog, fetch weather, etc.).  Each tool is **transport-agnostic** and communicates with the outside world through three Rust traits:
 
-## Overview
-This document outlines the architecture, patterns, and best practices for building tools in our system. Tools are modular, reusable components that provide specific functionality to our AI agents and application.
+| Trait | Purpose |
 
-## Core Architecture
 
-### ToolExecutor Trait
-The foundation of our tools system is the `ToolExecutor` trait. Any struct that wants to be used as a tool must implement this trait:
 
+
+
+
+|-------|---------|
+| `ToolExecutor`          | Core, synchronous business logic (executes once full parameters are available). |
+| `StreamingToolExecutor` | Optional incremental ingestion of LLM token chunks + deferred `finalize()`. |
+| `ToolStreamer`          | Optional mapper that converts low-level `StreamStage`s into **UI-ready** events and pushes them to a Tokio channel. |
+
+All three live in `libs/agentsv2/src/tools/tool.rs` and are available everywhere in the workspace.
+
+---
+
+## 2  Quick-Start Template
 ```rust
-#[async_trait]
-pub trait ToolExecutor: Send + Sync {
-    type Output: Serialize + Send;
-    async fn execute(&self, tool_call: &ToolCall) -> Result<Self::Output>;
-    fn get_schema(&self) -> serde_json::Value;
-    fn get_name(&self) -> String;
+use agentsv2::tools::tool::*;
+use serde::{Deserialize, Serialize};
+
+#[derive(Deserialize)]
+struct MyParams {
+    #[stream(visible, chunk = "query_chunk", full = "query")]
+    query: String,
 }
-```
 
-Key components:
-- `Output`: The return type of your tool (must be serializable)
-- `execute()`: The main function that implements your tool's logic
-- `get_schema()`: Returns the JSON schema describing the tool's interface
-- `get_name()`: Returns the tool's unique identifier
+#[derive(Serialize)]
+struct MyOutput { answer: String }
 
-## Tool Categories
+pub const MY_TOOL: ToolName = ToolName::new("my_tool");
 
-### 1. File Tools
-Our file tools provide a robust example of well-structured tool implementation. They handle:
-- File creation and modification
-- File searching and cataloging
-- File type-specific operations
-- User interaction with files
-
-Key patterns from file tools:
-- Modular organization by functionality
-- Clear separation of concerns
-- Type-safe file operations
-- Consistent error handling
-
-### 2. Interaction Tools
-Tools that manage user and system interactions.
-
-## Best Practices
-
-### 1. Tool Structure
-- Create a new module for each tool category
-- Implement the `ToolExecutor` trait
-- Use meaningful types for `Output`
-- Provide comprehensive error handling
-
-### 2. Schema Design
-- Document all parameters clearly
-- Use descriptive names for properties
-- Include example values where helpful
-- Validate input parameters
-
-### 3. Error Handling
-- Use `anyhow::Result` for flexible error handling
-- Provide meaningful error messages
-- Handle edge cases gracefully
-- Implement proper error propagation
-
-### 4. Testing
-- Write unit tests for each tool
-- Test edge cases and error conditions
-- Mock external dependencies
-- Ensure thread safety for async operations
-
-## Creating New Tools
-
-### Step 1: Define Your Tool
-```rust
-pub struct MyNewTool {
-    // Tool-specific fields
-}
+pub struct MyTool { buffer: String, params: Option<MyParams> }
 
 #[async_trait]
-impl ToolExecutor for MyNewTool {
-    type Output = YourOutputType;
-    
-    async fn execute(&self, tool_call: &ToolCall) -> Result<Self::Output> {
-        // Implementation
+impl ToolExecutor for MyTool {
+    type Params = MyParams;
+    type Output = MyOutput;
+
+    async fn execute(&self, p: Self::Params, _id: String) -> Result<Self::Output> {
+        // … your business logic …
+        Ok(MyOutput { answer: format!("Echo: {}", p.query) })
     }
-    
-    fn get_schema(&self) -> Value {
-        // Schema definition
-    }
-    
-    fn get_name(&self) -> String {
-        "my_new_tool".to_string()
+
+    async fn schema(&self) -> Value { /* produce JSON schema */ }
+    fn name(&self) -> ToolName { MY_TOOL }
+}
+
+// Derive StreamSpec manually or with the macro (coming soon)
+impl StreamSpec for MyParams {
+    fn stream_fields() -> &'static [FieldSpec] {
+        &[FieldSpec { json_key: "query", ui_chunk_key: Some("query_chunk"), ui_full_key: Some("query") }]
     }
 }
+
+// —— inherit default StreamingToolExecutor impl by writing your own or using the helper pattern ——
 ```
 
-### Step 2: Schema Definition
-```json
-{
-    "name": "my_new_tool",
-    "description": "Clear description of what the tool does",
-    "parameters": {
-        "type": "object",
-        "properties": {
-            // Tool parameters
-        },
-        "required": ["param1", "param2"]
-    }
-}
-```
+---
 
-### Step 3: Integration
-1. Add your tool to the appropriate module
-2. Register it in the tool registry
-3. Add necessary tests
-4. Document usage examples
-
-## Common Patterns
-
-### Value Conversion
-Use `IntoValueTool` trait when you need to convert tool output to generic JSON:
+## 3  Trait Cheat-Sheet
+### 3.1  `ToolExecutor`
 ```rust
-my_tool.into_value_tool()
+async fn execute(&self, params: Self::Params, tool_call_id: String) -> Result<Self::Output>;
 ```
+Called **once** after params are fully available. Should be pure business logic.
 
-### File Operations
-For tools that modify files:
-- Implement `FileModificationTool` trait
-- Use `add_line_numbers` for better output formatting
-- Handle file permissions appropriately
-
-## Security Considerations
-1. Validate all input parameters
-2. Check file permissions before operations
-3. Sanitize file paths
-4. Handle sensitive data appropriately
-
-## Examples
-
-### File Tool Example
+### 3.2  `StreamingToolExecutor`
+Override when you need incremental feedback while JSON is arriving.
+Typical implementation pattern:
 ```rust
-pub struct ReadFileTool {
-    base_path: PathBuf,
-}
-
-#[async_trait]
-impl ToolExecutor for ReadFileTool {
-    type Output = String;
-    
-    async fn execute(&self, tool_call: &ToolCall) -> Result<Self::Output> {
-        // Implementation
-    }
-}
+async fn ingest_chunk(&mut self, chunk: &str) -> Result<Vec<StreamStage>> { … }
+async fn finalize(&mut self) -> Result<Vec<StreamStage>> { … }
 ```
+Return combinations of:
+* `ParamsChunk(Value)`   – raw fragment (we immediately map to UI).
+* `ParamsComplete(Value)`– full JSON parsed.
+* `OutputComplete(Value)`– serialized output of `execute`.
+(We rarely use `OutputChunk` nowadays.)
 
-### Interaction Tool Example
+### 3.3  `ToolStreamer`
+Adds two convenience methods:
 ```rust
-pub struct UserPromptTool;
+async fn ingest_and_send(&mut self, chunk: &str, sender: &mpsc::Sender<UiEvent>)
+async fn finalize_and_send(&mut self, sender: &mpsc::Sender<UiEvent>)
+```
+Implement `map_stage` to convert low-level stages into your `UiEvent` enum or struct.  Most tools use the generic `map_param_chunk` + `StreamSpec` to keep this tiny.
 
-#[async_trait]
-impl ToolExecutor for UserPromptTool {
-    type Output = UserResponse;
-    
-    async fn execute(&self, tool_call: &ToolCall) -> Result<Self::Output> {
-        // Implementation
-    }
-}
+---
+
+## 4  Value-Only Parameter Streaming
+LLM sends a JSON object field-by-field.  We want to stream **only the value slices** (not keys / braces).  The helper set:
+* `FieldSpec` – static description of which JSON key maps to which UI keys.
+* `StreamSpec` – trait implemented on your params struct returning a `&'static [FieldSpec]` slice.
+* `map_param_chunk::<P>()` – generic fn that extracts `(ui_key, slice)` for every visible field in an incoming chunk.
+
+### Why value-only?
+• front-end UX is cleaner  
+• prevents accidental exposure of hidden keys  
+• allows per-field visibility toggles.
+
+---
+
+## 5  Testing
+### 5.1  Unit tests (inside `#[cfg(test)]`)
+1. **Direct execution** – call `execute()` with a filled param struct and assert output.
+2. **Streaming params** – feed JSON in small chunks, use `ingest_chunk`, assert that `map_stage` emits correct slices and that the accumulated cache matches expectations.
+3. **ParamsComplete event** – ensure exactly one full-description event arrives.
+4. **Finalize** – call `finalize`, assert one `OutputComplete`, no more param events.
+
+### 5.2  Channel tests
+Use a Tokio `mpsc::channel`, call `ingest_and_send` / `finalize_and_send`, and verify the sequence of UI events is what the front-end expects.
+
+> See `tool.rs` tests `weather_stream_…` and `poem_*` for ready-made patterns.
+
+### 5.3  Example: Planning-Tool (`create_plan_investigative`)
+A reference implementation that shows **all** recommended patterns (streaming, state-updates, UI mapping, offline-friendly tests) can be found in
+`libs/agentsv2/src/tools/planning_tools/create_plan_investigative.rs`.
+
+Highlights
+1.  `StreamSpec` exposes only the *value* of `plan` via `plan_chunk`.
+2.  `ToolStreamer` uses `map_param_chunk::<Params>()` to convert `StreamStage::ParamsChunk` into a **value-only** UI slice – no braces or key names leak.
+3.  Business logic updates agent state (`plan_available`, `todos`) and calls a helper (`generate_todos_from_plan`).  In test builds that helper is stubbed to avoid real network calls.
+4.  Unit-tests cover:
+    • execution returns `success` & mutates state  
+    • streaming emits chunk → complete → output  
+    • chunk slices contain *only* the plan value  
+    • schema fields are correct  
+    • `finalize()` is idempotent  
+    • incomplete JSON doesn't crash  
+    • 10 KB plan streams successfully.
+
+### Mocking external calls
+Inside `helpers/todo_generator.rs` we use conditional compilation:
+```rust
+#[cfg(test)]
+async fn generate_todos_from_plan(...) -> Result<Vec<Value>> { /* returns mock todo */ }
+```
+so tests run without an API key.  Production builds compile the real LLM call.
+
+When your tool needs an LLM *inside* unit-tests, set a dummy env-var before constructing `LiteLLMClient`:
+```rust
+std::env::set_var("LLM_API_KEY", "test_key");
 ```
 
-## Troubleshooting
-1. Check tool registration
-2. Verify schema correctness
-3. Ensure proper error handling
-4. Validate async operations
+Follow this pattern for any future tools that depend on external services.
 
-## Future Considerations
-1. Tool versioning
-2. Performance optimization
-3. Enhanced type safety
-4. Extended testing frameworks
+---
+
+## 6  Adding a New Tool – Checklist
+1. Create a params struct (`serde::Deserialize`) and mark visible fields via `impl StreamSpec`.  
+2. Implement `ToolExecutor` (and optionally `StreamingToolExecutor` if you need chunking).  
+3. Add a `ToolStreamer` mapping – usually 2-3 lines thanks to `map_param_chunk`.  
+4. Write unit tests following the patterns in section 5.  
+5. Add the tool to the agent registry so the LLM can call it (see `agents/src/tools/registry.rs`).  
+6. Update `docs/openapi.yaml` if it's a REST-exposed tool.
+
+---
+
+## 7  Troubleshooting
+| Symptom | Likely Cause | Fix |
+|---------|--------------|-----|
+| `trait bound ... StreamingToolExecutor not satisfied` | Forgot to implement the trait for your tool | Add `impl StreamingToolExecutor for MyTool` or use helper macro. |
+| UI receives braces / key names | Your params struct missing `StreamSpec` or wrong `json_key` | Check `stream_fields()` entries. |
+| Duplicate `ParamsComplete` events | Ingest parser resets buffer incorrectly | Ensure you only push once after `serde_json::from_str` succeeds. |
+
+---
+
+Happy Tool Building! 🎉
