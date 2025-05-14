@@ -13,7 +13,7 @@ use database::{
 use diesel::prelude::*;
 use diesel_async::RunQueryDsl;
 use futures::stream::{self, StreamExt};
-use litellm::{AgentMessage, ChatCompletionRequest, EmbeddingRequest, LiteLLMClient, Metadata, ResponseFormat};
+use litellm::{LiteLlmMessage, ChatCompletionRequest, EmbeddingRequest, LiteLLMClient, Metadata, ResponseFormat};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tracing::{debug, error, info, warn};
@@ -988,7 +988,7 @@ async fn llm_filter_helper(
 
     let request = ChatCompletionRequest {
         model,
-        messages: vec![AgentMessage::User {
+        messages: vec![LiteLlmMessage::User {
             id: None,
             content: prompt,
             name: None,
@@ -1013,7 +1013,7 @@ async fn llm_filter_helper(
     let response = llm_client.chat_completion(request).await?;
 
     let content = match response.choices.get(0).map(|c| &c.message) {
-        Some(AgentMessage::Assistant { content: Some(content), .. }) => content,
+        Some(LiteLlmMessage::Assistant { content: Some(content), .. }) => content,
         _ => {
             error!("LLM filter response missing or invalid content for query/topic: {}", query_or_topic);
             return Err(anyhow::anyhow!("LLM filter response missing or invalid content"));

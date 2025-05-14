@@ -1,4 +1,4 @@
-use agents::{Agent, AgentMessage};
+use agents::{Agent, LiteLlmMessage};
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use database::{
@@ -33,7 +33,7 @@ impl ContextLoader for MetricContextLoader {
         &self,
         user: &AuthenticatedUser,
         agent: &Arc<Agent>,
-    ) -> Result<Vec<AgentMessage>> {
+    ) -> Result<Vec<LiteLlmMessage>> {
         // Note: We don't need a separate connection pool get here,
         // fetch_metric_file_with_permissions handles it internally.
 
@@ -237,7 +237,7 @@ impl ContextLoader for MetricContextLoader {
             }
         }
 
-        Ok(vec![AgentMessage::Assistant {
+        Ok(vec![LiteLlmMessage::Assistant {
             id: None,
             content: Some(context_message),
             name: None,

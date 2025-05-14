@@ -16,7 +16,7 @@ use agents::{
         // Remove the old import
         // planning_tools::CreatePlanOutput,
     },
-    AgentExt, AgentMessage, AgentThread, BusterMultiAgent,
+    AgentExt, LiteLlmMessage, AgentThread, BusterMultiAgent,
 };
 
 use anyhow::{anyhow, Result};
@@ -32,7 +32,7 @@ use database::{
 use diesel::{insert_into, ExpressionMethods, QueryDsl};
 use diesel_async::RunQueryDsl;
 use litellm::{
-    AgentMessage as LiteLLMAgentMessage, ChatCompletionRequest, LiteLLMClient, MessageProgress,
+    LiteLlmMessage as LiteLLMAgentMessage, ChatCompletionRequest, LiteLLMClient, MessageProgress,
     Metadata, ToolCall,
 };
 use serde::{Deserialize, Serialize};
@@ -383,7 +383,7 @@ pub async fn post_chat_handler(
     }
 
     // Add the new user message (now with unwrap_or_default for optional prompt)
-    initial_messages.push(AgentMessage::user(
+    initial_messages.push(LiteLlmMessage::user(
         request.prompt.clone().unwrap_or_default(),
     ));
 
@@ -411,7 +411,7 @@ pub async fn post_chat_handler(
     // --- End Add timestamp tracking ---
 
     // Collect all messages for final processing
-    let mut all_messages: Vec<AgentMessage> = Vec::new();
+    let mut all_messages: Vec<LiteLlmMessage> = Vec::new();
     let mut all_transformed_containers: Vec<BusterContainer> = Vec::new();
     let mut sent_initial_files = false; // Flag to track if initial files have been sent
     let mut early_sent_file_messages: Vec<Value> = Vec::new(); // Store file messages sent early
@@ -459,7 +459,7 @@ pub async fn post_chat_handler(
         // --- End Calculate elapsed duration ---
 
         match message_result {
-            Ok(AgentMessage::Done) => {
+            Ok(LiteLlmMessage::Done) => {
                 // Agent has finished processing, break the loop
                 // --- Update timestamp before breaking ---
                 // No specific update needed here, handled by completion events
@@ -472,7 +472,7 @@ pub async fn post_chat_handler(
 
                 // Only store completed messages in raw_llm_messages
                 match &msg {
-                    AgentMessage::Assistant {
+                    LiteLlmMessage::Assistant {
                         progress,
                         content,
                         id,
@@ -501,7 +501,7 @@ pub async fn post_chat_handler(
                                     .unwrap_or_else(|| content_str.clone());
 
                                 // Create a new message with the deduplicated content
-                                raw_llm_messages.push(AgentMessage::Assistant {
+                                raw_llm_messages.push(LiteLlmMessage::Assistant {
                                     id: id.clone(),
                                     content: Some(complete_text),
                                     name: None,
@@ -518,13 +518,13 @@ pub async fn post_chat_handler(
                             }
                         }
                     }
-                    AgentMessage::Tool { progress, .. } => {
+                    LiteLlmMessage::Tool { progress, .. } => {
                         if matches!(progress, MessageProgress::Complete) {
                             raw_llm_messages.push(msg.clone());
                         }
                     }
                     // User messages and other types don't have progress, so we store them all
-                    AgentMessage::User { .. } => {
+                    LiteLlmMessage::User { .. } => {
                         raw_llm_messages.push(msg.clone());
                     }
                     _ => {} // Ignore other message types
@@ -554,7 +554,7 @@ pub async fn post_chat_handler(
                         // Check if this is the first text chunk and we haven't sent files yet
                         if !sent_initial_files {
                             // Look for an incoming text chunk within the *current* message `msg`
-                            if let AgentMessage::Assistant {
+                            if let LiteLlmMessage::Assistant {
                                 content: Some(_),
                                 progress: MessageProgress::InProgress,
                                 ..
@@ -1023,7 +1023,7 @@ fn prepare_final_message_state(containers: &[BusterContainer]) -> Result<(Vec<Va
 async fn process_completed_files(
     conn: &mut diesel_async::AsyncPgConnection,
     message: &Message,
-    messages: &[AgentMessage], // Use original AgentMessages for context if needed
+    messages: &[LiteLlmMessage], // Use original AgentMessages for context if needed
     _organization_id: &Uuid,
     _user_id: &Uuid,
     chunk_tracker: &ChunkTracker, // Pass tracker if needed for transforming messages again
@@ -1296,7 +1296,7 @@ enum ToolTransformResult {
 pub async fn transform_message(
     chat_id: &Uuid,
     message_id: &Uuid,
-    message: AgentMessage,
+    message: LiteLlmMessage,
     _tx: Option<&mpsc::Sender<Result<(BusterContainer, ThreadEvent)>>>,
     tracker: &ChunkTracker,
     start_time: &Instant, // Pass start_time for initial message
@@ -1304,7 +1304,7 @@ pub async fn transform_message(
     reasoning_complete_time: &mut Option<Instant>, // Use mutable ref for capturing completion time
 ) -> Result<Vec<(BusterContainer, ThreadEvent)>> {
     match message {
-        AgentMessage::Assistant {
+        LiteLlmMessage::Assistant {
             id,
             content,
             name: _name,
@@ -1432,7 +1432,7 @@ pub async fn transform_message(
                 Ok(vec![])
             }
         }
-        AgentMessage::Tool {
+        LiteLlmMessage::Tool {
             id: _id,
             content,
             tool_call_id,
@@ -2686,7 +2686,7 @@ type BusterContainerResult = Result<(BusterContainer, ThreadEvent)>;
 // The implementation has been moved to ChatContextLoader.update_context_from_tool_calls
 
 pub async fn generate_conversation_title(
-    messages: &[AgentMessage],
+    messages: &[LiteLlmMessage],
     message_id: &Uuid,
     user_id: &Uuid,
     session_id: &Uuid,
@@ -2747,7 +2747,7 @@ pub async fn generate_conversation_title(
 
     // Parse LLM response
     let content = match &response.choices[0].message {
-        AgentMessage::Assistant {
+        LiteLlmMessage::Assistant {
             content: Some(content),
             ..
         } => content,

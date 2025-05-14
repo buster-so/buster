@@ -1,4 +1,4 @@
-use agents::{Agent, AgentMessage};
+use agents::{Agent, LiteLlmMessage};
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use database::{
@@ -45,7 +45,7 @@ impl ContextLoader for GenericAssetContextLoader {
         &self,
         user: &AuthenticatedUser,
         agent: &Arc<Agent>,
-    ) -> Result<Vec<AgentMessage>> {
+    ) -> Result<Vec<LiteLlmMessage>> {
         // Delegate to appropriate specialized loader based on asset type
         match self.asset_type {
             AssetType::MetricFile => {

@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use litellm::AgentMessage;
+use litellm::LiteLlmMessage;
 
 /// A Thread represents a conversation between a user and the AI agent.
 /// It contains a sequence of messages in chronological order.
@@ -11,11 +11,11 @@ pub struct AgentThread {
     pub id: Uuid,
     pub user_id: Uuid,
     /// Ordered sequence of messages in the conversation
-    pub messages: Vec<AgentMessage>,
+    pub messages: Vec<LiteLlmMessage>,
 }
 
 impl AgentThread {
-    pub fn new(id: Option<Uuid>, user_id: Uuid, messages: Vec<AgentMessage>) -> Self {
+    pub fn new(id: Option<Uuid>, user_id: Uuid, messages: Vec<LiteLlmMessage>) -> Self {
         Self {
             id: id.unwrap_or(Uuid::new_v4()),
             user_id,
@@ -29,13 +29,13 @@ impl AgentThread {
         if let Some(pos) = self
             .messages
             .iter()
-            .position(|msg| matches!(msg, AgentMessage::Developer { .. }))
+            .position(|msg| matches!(msg, LiteLlmMessage::Developer { .. }))
         {
             // Update existing developer message
-            self.messages[pos] = AgentMessage::developer(message);
+            self.messages[pos] = LiteLlmMessage::developer(message);
         } else {
             // Insert new developer message at the start
-            self.messages.insert(0, AgentMessage::developer(message));
+            self.messages.insert(0, LiteLlmMessage::developer(message));
         }
     }
 
@@ -44,7 +44,7 @@ impl AgentThread {
         if let Some(pos) = self
             .messages
             .iter()
-            .rposition(|msg| matches!(msg, AgentMessage::Assistant { .. }))
+            .rposition(|msg| matches!(msg, LiteLlmMessage::Assistant { .. }))
         {
             self.messages.remove(pos);
         }
@@ -52,6 +52,6 @@ impl AgentThread {
 
     /// Add a user message to the thread
     pub fn add_user_message(&mut self, content: String) {
-        self.messages.push(AgentMessage::user(content));
+        self.messages.push(LiteLlmMessage::user(content));
     }
 } 

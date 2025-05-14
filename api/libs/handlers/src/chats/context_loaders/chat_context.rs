@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
-use agents::{Agent, AgentMessage};
+use agents::{Agent, LiteLlmMessage};
 use anyhow::Result;
 use async_trait::async_trait;
 use database::schema::metric_files;
@@ -56,9 +56,9 @@ impl ChatContextLoader {
     }
 
     // Helper function to check for tool usage and set appropriate context
-    async fn update_context_from_tool_calls(agent: &Arc<Agent>, message: &AgentMessage) {
+    async fn update_context_from_tool_calls(agent: &Arc<Agent>, message: &LiteLlmMessage) {
         // Handle tool calls from assistant messages
-        if let AgentMessage::Assistant {
+        if let LiteLlmMessage::Assistant {
             tool_calls: Some(tool_calls),
             ..
         } = message
@@ -104,7 +104,7 @@ impl ChatContextLoader {
         }
 
         // Handle tool responses - important for import_assets
-        if let AgentMessage::Tool {
+        if let LiteLlmMessage::Tool {
             name: Some(tool_name),
             content,
             ..
@@ -248,13 +248,13 @@ impl ChatContextLoader {
     // Returns a list of simulated AgentMessages representing the updates.
     async fn check_external_asset_updates(
         agent: &Arc<Agent>,
-        messages: &[AgentMessage],
-    ) -> Result<Vec<AgentMessage>> {
+        messages: &[LiteLlmMessage],
+    ) -> Result<Vec<LiteLlmMessage>> {
         let mut tool_history_versions: HashMap<Uuid, i32> = HashMap::new(); // asset_id -> latest version seen in tool history
 
         // First pass: Find the latest version mentioned for each asset in tool history
         for message in messages {
-            if let AgentMessage::Tool {
+            if let LiteLlmMessage::Tool {
                 name: Some(tool_name),
                 content,
                 ..
@@ -388,7 +388,7 @@ impl ChatContextLoader {
             let params = UserManuallyModifiedFileParams { asset_ids: modified_ids };
             let params_json = serde_json::to_string(&params)?;
 
-            let assistant_message = AgentMessage::Assistant {
+            let assistant_message = LiteLlmMessage::Assistant {
                 id: Some(tool_call_id.clone()), // Use ToolCall ID for Assistant Message ID
                 content: None,
                 tool_calls: Some(vec![ToolCall {
@@ -411,7 +411,7 @@ impl ChatContextLoader {
             let output = UserManuallyModifiedFileOutput { updated_files: modified_assets_info };
             let output_json = serde_json::to_string(&output)?;
 
-            let tool_message = AgentMessage::Tool {
+            let tool_message = LiteLlmMessage::Tool {
                 tool_call_id: tool_call_id, // Use ID #1 for the ToolCall
                 name: Some(tool_name),
                 content: output_json,
@@ -431,7 +431,7 @@ impl ContextLoader for ChatContextLoader {
         &self,
         user: &AuthenticatedUser,
         agent: &Arc<Agent>,
-    ) -> Result<Vec<AgentMessage>> {
+    ) -> Result<Vec<LiteLlmMessage>> {
         let mut conn = get_pg_pool().get().await?;
 
         // First verify the chat exists and user has access
@@ -458,7 +458,7 @@ impl ContextLoader for ChatContextLoader {
         // Convert the single message's history
         let mut agent_messages = Vec::new();
         let raw_messages =
-            match serde_json::from_value::<Vec<AgentMessage>>(message.raw_llm_messages) {
+            match serde_json::from_value::<Vec<LiteLlmMessage>>(message.raw_llm_messages) {
                 Ok(messages) => messages,
                 Err(e) => {
                     tracing::error!(

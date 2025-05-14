@@ -5,7 +5,14 @@ edition = "2021"
 
 [dependencies]
 anyhow = { workspace = true }
-sqlx = { workspace = true, features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono", "json", "macros"] }
+sqlx = { workspace = true, features = [
+    "runtime-tokio-rustls",
+    "postgres",
+    "uuid",
+    "chrono",
+    "json",
+    "macros",
+] }
 uuid = { workspace = true, features = ["v4"] }
 tracing = { workspace = true }
 chrono = { workspace = true }
@@ -15,6 +22,7 @@ diesel-async = { workspace = true }
 indexmap = { workspace = true }
 futures = { workspace = true }
 serde_yaml = { workspace = true }
+reqwest = { workspace = true }
 
 database = { path = "../database" }
 query_engine = { path = "../query_engine" }
@@ -26,4 +34,4 @@ litellm = { path = "../litellm" }
 
 [dev-dependencies]
 tokio-test = { workspace = true }
-# Add test utilities if needed later 
+# Add test utilities if needed later

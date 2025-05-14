@@ -1,5 +1,6 @@
-mod client;
-mod types;
+pub mod client;
+pub mod types;
 
-pub use client::*;
-pub use types::{AgentMessage, ChatCompletionChunk, ChatCompletionRequest, ChatCompletionResponse, Metadata, MessageProgress, Tool, ToolCall, ToolChoice, ResponseFormat, EmbeddingRequest, EmbeddingResponse, EmbeddingData, EmbeddingUsage, DeltaToolCall, FunctionCall}; 
+// Re-export key types/clients
+pub use client::{LiteLLMClient, LiteLLMConfig};
+pub use types::{ChatCompletionRequest, ChatCompletionResponse, LiteLlmMessage, EmbeddingRequest, EmbeddingResponse, Tool, ToolChoice, MessageProgress, ChatCompletionChunk};

@@ -7,7 +7,7 @@ use database::{pool::get_pg_pool, schema::datasets};
 use diesel::prelude::*;
 use diesel_async::RunQueryDsl;
 use futures::stream::{self, StreamExt};
-use litellm::{AgentMessage, ChatCompletionRequest, LiteLLMClient, Metadata, ResponseFormat};
+use litellm::{LiteLlmMessage, ChatCompletionRequest, LiteLLMClient, Metadata, ResponseFormat};
 use middleware::types::AuthenticatedUser;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -331,7 +331,7 @@ async fn filter_datasets_with_llm(
     // Create the request
     let request = ChatCompletionRequest {
         model, // Using a small model for cost efficiency
-        messages: vec![AgentMessage::User {
+        messages: vec![LiteLlmMessage::User {
             id: None,
             content: prompt,
             name: None,
@@ -359,7 +359,7 @@ async fn filter_datasets_with_llm(
 
     // Parse LLM response
     let content = match &response.choices[0].message {
-        AgentMessage::Assistant {
+        LiteLlmMessage::Assistant {
             content: Some(content),
             ..
         } => content,

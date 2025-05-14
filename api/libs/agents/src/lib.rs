@@ -16,4 +16,4 @@ pub use models::*;
 pub use tools::ToolExecutor;
 
 // Re-export types from dependencies that are part of our public API
-pub use litellm::AgentMessage; 
+pub use litellm::LiteLlmMessage; 

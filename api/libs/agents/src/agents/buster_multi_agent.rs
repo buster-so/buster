@@ -22,7 +22,7 @@ use crate::agents::modes::{
 // Import Agent related types
 use crate::{agent::ModeProvider, Agent, AgentError, AgentExt, AgentThread}; // Added ModeProvider and corrected path
 
-use litellm::AgentMessage;
+use litellm::LiteLlmMessage;
 
 // Import the semantic layer models
 use semantic_layer::models::Model; // Assuming models.rs is accessible like this
@@ -37,7 +37,7 @@ pub struct BusterSuperAgentOutput {
     pub message: String,
     pub duration: i64,
     pub thread_id: Uuid,
-    pub messages: Vec<AgentMessage>,
+    pub messages: Vec<LiteLlmMessage>,
     pub message_id: Option<Uuid>,
 }
 
@@ -200,7 +200,7 @@ impl BusterMultiAgent {
     pub async fn run(
         self: &Arc<Self>,
         thread: &mut AgentThread,
-    ) -> Result<broadcast::Receiver<Result<AgentMessage, AgentError>>> {
+    ) -> Result<broadcast::Receiver<Result<LiteLlmMessage, AgentError>>> {
         if let Some(user_prompt) = self.get_latest_user_message(thread) {
             self.agent // Use self.agent directly
                 .set_state_value("user_prompt".to_string(), Value::String(user_prompt))
@@ -230,7 +230,7 @@ impl BusterMultiAgent {
     pub fn get_latest_user_message(&self, thread: &AgentThread) -> Option<String> {
         // Iterate through messages in reverse order to find the most recent user message
         for message in thread.messages.iter().rev() {
-            if let AgentMessage::User { content, .. } = message {
+            if let LiteLlmMessage::User { content, .. } = message {
                 return Some(content.clone());
             }
         }

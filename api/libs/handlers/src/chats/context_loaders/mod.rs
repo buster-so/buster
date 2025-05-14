@@ -1,6 +1,6 @@
 use anyhow::Result;
 use async_trait::async_trait;
-use agents::AgentMessage;
+use agents::LiteLlmMessage;
 use middleware::AuthenticatedUser;
 use std::sync::Arc;
 use agents::Agent;
@@ -19,7 +19,7 @@ pub use generic_asset_context::{GenericAssetContextLoader, fetch_asset_details};
 
 #[async_trait]
 pub trait ContextLoader: Send + Sync {
-    async fn load_context(&self, user: &AuthenticatedUser, agent: &Arc<Agent>) -> Result<Vec<AgentMessage>>;
+    async fn load_context(&self, user: &AuthenticatedUser, agent: &Arc<Agent>) -> Result<Vec<LiteLlmMessage>>;
 }
 
 // Factory function for creating context loaders

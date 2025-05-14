@@ -1,7 +1,7 @@
 use crate::tools::{IntoToolCallExecutor, ToolExecutor};
 use anyhow::Result;
 use litellm::{
-    AgentMessage, ChatCompletionChunk, ChatCompletionRequest, DeltaToolCall, FunctionCall,
+    LiteLlmMessage, ChatCompletionChunk, ChatCompletionRequest, DeltaToolCall, FunctionCall,
     LiteLLMClient, MessageProgress, Metadata, Tool, ToolCall, ToolChoice,
 };
 use once_cell::sync::Lazy;
@@ -37,7 +37,7 @@ impl std::fmt::Display for AgentError {
 }
 // --- End Reverted AgentError Struct ---
 
-type MessageResult = Result<AgentMessage, AgentError>;
+type MessageResult = Result<LiteLlmMessage, AgentError>;
 
 #[derive(Debug)]
 struct MessageBuffer {
@@ -91,7 +91,7 @@ impl MessageBuffer {
         };
 
         // Create and send the message
-        let message = AgentMessage::assistant(
+        let message = LiteLlmMessage::assistant(
             self.message_id.clone(),
             if self.content.is_empty() {
                 None
@@ -353,7 +353,7 @@ impl Agent {
     }
 
     /// Get the complete conversation history of the current thread
-    pub async fn get_conversation_history(&self) -> Option<Vec<AgentMessage>> {
+    pub async fn get_conversation_history(&self) -> Option<Vec<LiteLlmMessage>> {
         self.current_thread
             .read()
             .await
@@ -362,7 +362,7 @@ impl Agent {
     }
 
     /// Update the current thread with a new message
-    async fn update_current_thread(&self, message: AgentMessage) -> Result<()> {
+    async fn update_current_thread(&self, message: LiteLlmMessage) -> Result<()> {
         let mut thread_lock = self.current_thread.write().await;
         if let Some(thread) = thread_lock.as_mut() {
             thread.messages.push(message);
@@ -435,13 +435,13 @@ impl Agent {
     ///
     /// # Returns
     /// * A Result containing the final Message from the assistant
-    pub async fn process_thread(self: &Arc<Self>, thread: &AgentThread) -> Result<AgentMessage> {
+    pub async fn process_thread(self: &Arc<Self>, thread: &AgentThread) -> Result<LiteLlmMessage> {
         let mut rx = self.process_thread_streaming(thread).await?;
 
         let mut final_message = None;
         while let Ok(msg) = rx.recv().await {
             match msg {
-                Ok(AgentMessage::Done) => break,  // Stop collecting on Done message
+                Ok(LiteLlmMessage::Done) => break,  // Stop collecting on Done message
                 Ok(m) => final_message = Some(m), // Store the latest non-Done message
                 Err(e) => return Err(e.into()),   // Propagate errors
             }
@@ -492,7 +492,7 @@ impl Agent {
                      // Use the clone created before select!
                      // Handle the Result from get_stream_sender
                      if let Ok(sender) = agent_clone_for_post_process.get_stream_sender().await {
-                         if let Err(e) = sender.send(Ok(AgentMessage::Done)) {
+                         if let Err(e) = sender.send(Ok(LiteLlmMessage::Done)) {
                             tracing::debug!("Failed to send Done message, receiver likely dropped: {}", e);
                          }
                      } else {
@@ -502,7 +502,7 @@ impl Agent {
                 _ = shutdown_rx.recv() => {
                     // Use the clone created before select!
                     let agent_clone_shutdown = agent_clone_for_post_process.clone(); // Can clone the clone
-                    let shutdown_msg = AgentMessage::assistant(
+                    let shutdown_msg = LiteLlmMessage::assistant(
                         Some("shutdown_message".to_string()),
                         Some("Processing interrupted due to shutdown signal".to_string()),
                         None,
@@ -521,7 +521,7 @@ impl Agent {
 
                     // Handle the Result from get_stream_sender
                     if let Ok(sender) = agent_clone_for_post_process.clone().get_stream_sender().await {
-                         if let Err(e) = sender.send(Ok(AgentMessage::Done)) {
+                         if let Err(e) = sender.send(Ok(LiteLlmMessage::Done)) {
                             tracing::debug!("Failed to send Done message after shutdown, receiver likely dropped: {}", e);
                         }
                     } else {
@@ -558,7 +558,7 @@ impl Agent {
         if recursion_depth >= 15 {
             let max_depth_msg = format!("Maximum recursion depth ({}) reached.", recursion_depth);
             warn!("{}", max_depth_msg);
-            let message = AgentMessage::assistant(
+            let message = LiteLlmMessage::assistant(
                 Some("max_recursion_depth_message".to_string()),
                 Some(max_depth_msg.clone()), // Send the message string
                 None,
@@ -612,7 +612,7 @@ impl Agent {
 
         // --- Prepare LLM Messages ---
         // Use prompt from mode_config
-        let system_message = AgentMessage::developer(mode_config.prompt);
+        let system_message = LiteLlmMessage::developer(mode_config.prompt);
         let mut llm_messages = vec![system_message];
         llm_messages.extend(
             agent
@@ -624,7 +624,7 @@ impl Agent {
                 .messages
                 // Filter out previous Developer messages if desired, or keep history clean
                 .iter()
-                .filter(|msg| !matches!(msg, AgentMessage::Developer { .. }))
+                .filter(|msg| !matches!(msg, LiteLlmMessage::Developer { .. }))
                 .cloned(),
         );
         // --- End Prepare LLM Messages ---
@@ -636,7 +636,7 @@ impl Agent {
         let _user_message = thread_ref
             .messages
             .last()
-            .filter(|msg| matches!(msg, AgentMessage::User { .. }))
+            .filter(|msg| matches!(msg, LiteLlmMessage::User { .. }))
             .cloned();
 
         // Create the tool-enabled request
@@ -877,7 +877,7 @@ impl Agent {
             None
         };
 
-        let final_message = AgentMessage::assistant(
+        let final_message = LiteLlmMessage::assistant(
             buffer.message_id,
             if buffer.content.is_empty() {
                 None
@@ -1020,7 +1020,7 @@ impl Agent {
                         Ok(r) => {
                             // Tool succeeded
                             let result_str = serde_json::to_string(&r)?;
-                            AgentMessage::tool(
+                            LiteLlmMessage::tool(
                                 None,
                                 result_str.clone(),
                                 tool_call.id.clone(),
@@ -1040,7 +1040,7 @@ impl Agent {
                             error!(agent_name = %agent.name, chat_id = %agent.session_id, user_id = %agent.user_id, tool_name = %tool_call.function.name, "{}", error_message);
 
                             // Create an error tool message to send back to the LLM
-                            AgentMessage::tool(
+                            LiteLlmMessage::tool(
                                 None,
                                 serde_json::json!({ "error": error_message }).to_string(), // Send descriptive error string
                                 tool_call.id.clone(),
@@ -1087,7 +1087,7 @@ impl Agent {
                     error!("{}", err_msg);
 
                     // Create a fake tool result indicating the error (string based)
-                    let error_result = AgentMessage::tool(
+                    let error_result = LiteLlmMessage::tool(
                         None,
                         serde_json::json!({ "error": err_msg.clone() }).to_string(), // Use the string message
                         tool_call.id.clone(),
@@ -1244,7 +1244,7 @@ pub trait AgentExt {
         self.get_agent_arc().process_thread_streaming(thread).await
     }
 
-    async fn process_thread(&self, thread: &AgentThread) -> Result<AgentMessage> {
+    async fn process_thread(&self, thread: &AgentThread) -> Result<LiteLlmMessage> {
         self.get_agent_arc().process_thread(thread).await
     }
 
@@ -1309,7 +1309,7 @@ mod tests {
             progress: MessageProgress,
         ) -> Result<()> {
             let message =
-                AgentMessage::tool(None, content, tool_id, Some(self.get_name()), progress);
+                LiteLlmMessage::tool(None, content, tool_id, Some(self.get_name()), progress);
             self.agent.get_stream_sender().await?.send(Ok(message))?;
             Ok(())
         }
@@ -1392,7 +1392,7 @@ mod tests {
         let thread = AgentThread::new(
             None,
             Uuid::new_v4(),
-            vec![AgentMessage::user("Hello, world!".to_string())],
+            vec![LiteLlmMessage::user("Hello, world!".to_string())],
         );
 
         // Use Arc<Agent> for process_thread call
@@ -1434,7 +1434,7 @@ mod tests {
         let thread = AgentThread::new(
             None,
             Uuid::new_v4(),
-            vec![AgentMessage::user(
+            vec![LiteLlmMessage::user(
                 "What is the weather in vineyard ut?".to_string(),
             )],
         );
@@ -1477,7 +1477,7 @@ mod tests {
         let thread = AgentThread::new(
             None,
             Uuid::new_v4(),
-            vec![AgentMessage::user(
+            vec![LiteLlmMessage::user(
                 "What is the weather in vineyard ut and san francisco?".to_string(),
             )],
         );
@@ -1528,7 +1528,7 @@ mod tests {
         let thread_disabled = AgentThread::new(
             None,
             Uuid::new_v4(),
-            vec![AgentMessage::user(
+            vec![LiteLlmMessage::user(
                 "What is the weather in Provo?".to_string(),
             )],
         );
@@ -1543,7 +1543,7 @@ mod tests {
             Err(e) => panic!("Error processing thread (disabled): {:?}", e),
         };
         // Expect response without tool call
-        if let AgentMessage::Assistant {
+        if let LiteLlmMessage::Assistant {
             tool_calls: Some(_),
             ..
         } = response_disabled
@@ -1556,7 +1556,7 @@ mod tests {
         let thread_enabled = AgentThread::new(
             None,
             Uuid::new_v4(),
-            vec![AgentMessage::user(
+            vec![LiteLlmMessage::user(
                 "What is the weather in Orem?".to_string(),
             )],
         );

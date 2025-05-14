@@ -1,7 +1,7 @@
 use std::env;
 
 use anyhow::Result;
-use litellm::{AgentMessage, ChatCompletionRequest, LiteLLMClient, Metadata, ResponseFormat};
+use litellm::{LiteLlmMessage, ChatCompletionRequest, LiteLLMClient, Metadata, ResponseFormat};
 use serde_json::Value;
 use tracing::{error, warn};
 use uuid::Uuid;
@@ -71,7 +71,7 @@ Example Output for the above plan: `["Create line chart visualization 'Daily Tra
 
     let request = ChatCompletionRequest {
         model,
-        messages: vec![AgentMessage::User { id: None, content: prompt, name: None }],
+        messages: vec![LiteLlmMessage::User { id: None, content: prompt, name: None }],
         stream: Some(false),
         response_format: Some(ResponseFormat { type_: "json_object".to_string(), json_schema: None }),
         store: Some(true),

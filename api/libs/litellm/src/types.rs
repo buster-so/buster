@@ -6,7 +6,7 @@ use std::env;
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ChatCompletionRequest {
     pub model: String,
-    pub messages: Vec<AgentMessage>,
+    pub messages: Vec<LiteLlmMessage>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub store: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -95,7 +95,7 @@ impl Default for ChatCompletionRequest {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq, Copy)]
 pub enum MessageProgress {
     InProgress,
     Complete,
@@ -110,7 +110,7 @@ impl Default for MessageProgress {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(tag = "role")]
 #[serde(rename_all = "lowercase")]
-pub enum AgentMessage {
+pub enum LiteLlmMessage {
     #[serde(alias = "system")]
     Developer {
         #[serde(skip)]
@@ -155,7 +155,7 @@ pub enum AgentMessage {
 
 // Helper methods for Message
 // Intentionally leaving out name for now.
-impl AgentMessage {
+impl LiteLlmMessage {
     pub fn developer(content: impl Into<String>) -> Self {
         Self::Developer {
             id: None,
@@ -381,7 +381,7 @@ pub struct ChatCompletionResponse {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Choice {
     pub index: i32,
-    pub message: AgentMessage,
+    pub message: LiteLlmMessage,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub delta: Option<Delta>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -474,6 +474,18 @@ pub struct EmbeddingRequest {
     // pub extra_params: Option<HashMap<String, Value>>,
 }
 
+impl Default for EmbeddingRequest {
+    fn default() -> Self {
+        Self {
+            model: "text-embedding-3-small".to_string(),
+            input: vec![],
+            encoding_format: Some("float".to_string()),
+            dimensions: Some(1536),
+            user: None,
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct EmbeddingResponse {
     pub object: String, // e.g., "list"
@@ -508,8 +520,8 @@ mod tests {
         let request = ChatCompletionRequest {
             model: "gpt-4o".to_string(),
             messages: vec![
-                AgentMessage::developer("You are a helpful assistant."),
-                AgentMessage::user("Hello!"),
+                LiteLlmMessage::developer("You are a helpful assistant."),
+                LiteLlmMessage::user("Hello!"),
             ],
             ..Default::default()
         };
@@ -531,7 +543,7 @@ mod tests {
 
         // Check first message (developer)
         match &deserialized.messages[0] {
-            AgentMessage::Developer { content, .. } => {
+            LiteLlmMessage::Developer { content, .. } => {
                 assert_eq!(content, "You are a helpful assistant.");
             }
             _ => panic!("First message should be developer role"),
@@ -539,7 +551,7 @@ mod tests {
 
         // Check second message (user)
         match &deserialized.messages[1] {
-            AgentMessage::User { content, .. } => {
+            LiteLlmMessage::User { content, .. } => {
                 assert_eq!(content, "Hello!");
             }
             _ => panic!("Second message should be user role"),
@@ -556,9 +568,9 @@ mod tests {
             system_fingerprint: Some("fp_44709d6fcb".to_string()),
             choices: vec![Choice {
                 index: 0,
-                message: AgentMessage::assistant(
-                    Some("\n\nHello there, how may I assist you today?".to_string()),
+                message: LiteLlmMessage::assistant(
                     None,
+                    Some("\n\nHello there, how may I assist you today?".to_string()),
                     None,
                     MessageProgress::Complete,
                     None,
@@ -606,7 +618,7 @@ mod tests {
 
         // Verify message
         match &choice.message {
-            AgentMessage::Assistant {
+            LiteLlmMessage::Assistant {
                 content,
                 tool_calls,
                 ..
@@ -637,7 +649,7 @@ mod tests {
     async fn test_chat_completion_request_with_tools() {
         let request = ChatCompletionRequest {
             model: "o1".to_string(),
-            messages: vec![AgentMessage::user(
+            messages: vec![LiteLlmMessage::user(
                 "Hello whats the weather in vineyard ut!",
             )],
             max_completion_tokens: Some(100),
@@ -680,7 +692,7 @@ mod tests {
         // Verify message
         assert_eq!(deserialized.messages.len(), 1);
         match &deserialized.messages[0] {
-            AgentMessage::User { content, .. } => {
+            LiteLlmMessage::User { content, .. } => {
                 assert_eq!(content, "Hello whats the weather in vineyard ut!");
             }
             _ => panic!("Expected user message"),
@@ -706,9 +718,9 @@ mod tests {
             choices: vec![Choice {
                 finish_reason: Some("length".to_string()),
                 index: 0,
-                message: AgentMessage::assistant(
-                    Some("".to_string()),
+                message: LiteLlmMessage::assistant(
                     None,
+                    Some("".to_string()),
                     None,
                     MessageProgress::Complete,
                     None,
@@ -753,7 +765,7 @@ mod tests {
 
         // Verify message is empty
         match &choice.message {
-            AgentMessage::Assistant {
+            LiteLlmMessage::Assistant {
                 content,
                 tool_calls,
                 ..
@@ -781,8 +793,8 @@ mod tests {
         let request = ChatCompletionRequest {
             model: "o1".to_string(),
             messages: vec![
-                AgentMessage::developer("You are a helpful assistant."),
-                AgentMessage::user("Hello!"),
+                LiteLlmMessage::developer("You are a helpful assistant."),
+                LiteLlmMessage::user("Hello!"),
             ],
             stream: Some(true),
             ..Default::default()
@@ -802,13 +814,13 @@ mod tests {
         // Verify messages
         assert_eq!(deserialized.messages.len(), 2);
         match &deserialized.messages[0] {
-            AgentMessage::Developer { content, .. } => {
+            LiteLlmMessage::Developer { content, .. } => {
                 assert_eq!(content, "You are a helpful assistant.");
             }
             _ => panic!("First message should be developer role"),
         }
         match &deserialized.messages[1] {
-            AgentMessage::User { content, .. } => {
+            LiteLlmMessage::User { content, .. } => {
                 assert_eq!(content, "Hello!");
             }
             _ => panic!("Second message should be user role"),
@@ -929,141 +941,329 @@ mod tests {
 
     #[tokio::test]
     async fn test_chat_completion_function_calling() {
-        // Test request with function tool
-        let request = ChatCompletionRequest {
-            model: "gpt-4o".to_string(),
-            messages: vec![AgentMessage::user(
-                "What's the weather like in Boston today?",
-            )],
-            tools: Some(vec![Tool {
-                tool_type: "function".to_string(),
-                function: json!({
-                    "name": "get_current_weather",
-                    "description": "Get the current weather in a given location",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "location": {
-                                "type": "string",
-                                "description": "The city and state, e.g. San Francisco, CA"
+        let request_json = r#"
+        {
+            "model": "gpt-3.5-turbo",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "What's the weather like in Boston today?"
+                }
+            ],
+            "tools": [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "get_current_weather",
+                        "description": "Get the current weather in a given location",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {
+                                "location": {
+                                    "type": "string",
+                                    "description": "The city and state, e.g. San Francisco, CA"
+                                },
+                                "unit": {
+                                    "type": "string",
+                                    "enum": ["celsius", "fahrenheit"]
+                                }
                             },
-                            "unit": {
-                                "type": "string",
-                                "enum": ["celsius", "fahrenheit"]
-                            }
-                        },
-                        "required": ["location"]
+                            "required": ["location"]
+                        }
                     }
-                }),
-            }]),
-            tool_choice: Some(ToolChoice::Required),
-            ..Default::default()
-        };
-
-        // Serialize request to JSON
-        let req_json = serde_json::to_string_pretty(&request).unwrap();
-        println!("Function Call Request JSON:\n{}", req_json);
-
-        // Deserialize request back
-        let deserialized_req: ChatCompletionRequest = serde_json::from_str(&req_json).unwrap();
-
-        // Verify request fields
-        assert_eq!(deserialized_req.model, "gpt-4o");
-        match &deserialized_req.messages[0] {
-            AgentMessage::User { content, .. } => {
-                assert_eq!(content, "What's the weather like in Boston today?");
+                }
+            ],
+            "tool_choice": {
+                "type": "function",
+                "function": {
+                    "name": "get_current_weather"
+                }
             }
-            _ => panic!("Expected user message"),
         }
+        "#;
+
+        let deserialized_req: ChatCompletionRequest = serde_json::from_str(request_json).unwrap();
+
+        assert_eq!(deserialized_req.model, "gpt-3.5-turbo");
+        assert_eq!(deserialized_req.messages.len(), 1);
+        assert_eq!(deserialized_req.messages[0].get_role(), "user");
+        assert_eq!(deserialized_req.messages[0].get_content(), Some("What's the weather like in Boston today?".to_string()));
 
         let tool = &deserialized_req.tools.as_ref().unwrap()[0];
         assert_eq!(tool.tool_type, "function");
+        
+        let function_def = tool.function.as_object().unwrap();
         assert_eq!(
-            tool.function.get("name").and_then(|v| v.as_str()),
+            function_def.get("name").and_then(|v| v.as_str()),
             Some("get_current_weather")
         );
+        assert_eq!(
+            function_def.get("description").and_then(|v| v.as_str()),
+            Some("Get the current weather in a given location")
+        );
 
-        // Test response with function call
-        let response = ChatCompletionResponse {
-            id: "chatcmpl-abc123".to_string(),
-            object: "chat.completion".to_string(),
-            created: 1699896916,
-            model: "gpt-4o-mini".to_string(),
-            choices: vec![Choice {
-                index: 0,
-                message: AgentMessage::assistant(
-                    None,
-                    None,
-                    Some(vec![ToolCall {
-                        id: "call_abc123".to_string(),
-                        call_type: "function".to_string(),
-                        function: FunctionCall {
-                            name: "get_current_weather".to_string(),
-                            arguments: "{\n\"location\": \"Boston, MA\"\n}".to_string(),
-                        },
-                        code_interpreter: None,
-                        retrieval: None,
-                    }]),
-                    MessageProgress::Complete,
-                    None,
-                    None,
-                ),
-                logprobs: None,
-                finish_reason: Some("tool_calls".to_string()),
-                delta: None,
-            }],
-            usage: Usage {
-                prompt_tokens: 82,
-                completion_tokens: 17,
-                total_tokens: 99,
-                completion_tokens_details: Some(CompletionTokensDetails {
-                    reasoning_tokens: 0,
-                    accepted_prediction_tokens: 0,
-                    rejected_prediction_tokens: 0,
-                }),
-            },
-            system_fingerprint: None,
-            service_tier: None,
-        };
-
-        // Serialize response to JSON
-        let resp_json = serde_json::to_string_pretty(&response).unwrap();
-        println!("Function Call Response JSON:\n{}", resp_json);
-
-        // Deserialize response back
-        let deserialized_resp: ChatCompletionResponse = serde_json::from_str(&resp_json).unwrap();
-
-        // Verify response fields
-        assert_eq!(deserialized_resp.id, "chatcmpl-abc123");
-
-        let choice = &deserialized_resp.choices[0];
-        assert_eq!(choice.finish_reason, Some("tool_calls".to_string()));
-
-        match &choice.message {
-            AgentMessage::Assistant {
-                id,
-                content,
-                tool_calls,
-                ..
-            } => {
-                assert_eq!(id, &None);
-                assert_eq!(content, &None);
-                let tool_call = &tool_calls.as_ref().unwrap()[0];
-                assert_eq!(tool_call.id, "call_abc123");
-                assert_eq!(tool_call.call_type, "function");
-                assert_eq!(tool_call.function.name, "get_current_weather");
-                assert_eq!(
-                    tool_call.function.arguments,
-                    "{\n\"location\": \"Boston, MA\"\n}"
-                );
+        let response_json = r#"
+        {
+            "id": "chatcmpl-abc123",
+            "object": "chat.completion",
+            "created": 1699896916,
+            "model": "gpt-3.5-turbo",
+            "choices": [
+                {
+                    "index": 0,
+                    "message": {
+                        "role": "assistant",
+                        "content": "The weather in Boston today is 75 degrees Fahrenheit."
+                    },
+                    "finish_reason": "tool_calls"
+                }
+            ],
+            "usage": {
+                "prompt_tokens": 82,
+                "completion_tokens": 17,
+                "total_tokens": 99
             }
-            _ => panic!("Expected assistant message"),
         }
+        "#;
 
-        // Verify usage
-        assert_eq!(deserialized_resp.usage.prompt_tokens, 82);
-        assert_eq!(deserialized_resp.usage.completion_tokens, 17);
-        assert_eq!(deserialized_resp.usage.total_tokens, 99);
+        let deserialized_resp: ChatCompletionResponse = serde_json::from_str(response_json).unwrap();
+
+        assert_eq!(deserialized_resp.id, "chatcmpl-abc123");
+        assert_eq!(deserialized_resp.choices.len(), 1);
+        assert_eq!(deserialized_resp.choices[0].finish_reason, Some("tool_calls".to_string()));
+
+        let choice = &deserialized_resp.choices[0].message;
+        assert_eq!(choice.get_role(), "assistant");
+        assert_eq!(choice.get_content(), Some("The weather in Boston today is 75 degrees Fahrenheit.".to_string()));
+    }
+
+    #[tokio::test]
+    async fn test_litellm_message_developer_constructor() {
+        let msg = LiteLlmMessage::developer("System prompt here");
+        assert_eq!(msg.get_role(), "developer");
+        assert_eq!(msg.get_content(), Some("System prompt here".to_string()));
+        assert!(msg.get_id().is_none());
+
+        match msg {
+            LiteLlmMessage::Developer { id, content, name } => {
+                assert_eq!(content, "System prompt here");
+                assert!(id.is_none());
+                assert!(name.is_none());
+            }
+            _ => panic!("Expected Developer message"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_litellm_message_user_constructor() {
+        let msg = LiteLlmMessage::user("User query here");
+        assert_eq!(msg.get_role(), "user");
+        assert_eq!(msg.get_content(), Some("User query here".to_string()));
+        assert!(msg.get_id().is_none());
+
+        match msg {
+            LiteLlmMessage::User { id, content, name } => {
+                assert_eq!(content, "User query here");
+                assert!(id.is_none());
+                assert!(name.is_none());
+            }
+            _ => panic!("Expected User message"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_litellm_message_assistant_constructor_all_some() {
+        let tool_call_id_str = "call_123";
+        let tool_call = ToolCall {
+            id: tool_call_id_str.to_string(),
+            call_type: "function".to_string(),
+            function: FunctionCall {
+                name: "get_weather".to_string(),
+                arguments: "{\"location\": \"Boston\"}".to_string(),
+            },
+            code_interpreter: None,
+            retrieval: None,
+        };
+        let assistant_id_str = "asst_id_001";
+        let assistant_content_str = "Assistant response.";
+        let assistant_name_str = "AssistantName";
+
+        let msg = LiteLlmMessage::assistant(
+            Some(assistant_id_str.to_string()),
+            Some(assistant_content_str.to_string()),
+            Some(vec![tool_call.clone()]),
+            MessageProgress::Complete,
+            Some(true), // initial = true
+            Some(assistant_name_str.to_string()),
+        );
+
+        assert_eq!(msg.get_role(), "assistant");
+        assert_eq!(msg.get_content(), Some(assistant_content_str.to_string()));
+        assert_eq!(msg.get_id(), Some(assistant_id_str.to_string()));
+        assert!(msg.get_tool_calls().is_some());
+        assert_eq!(msg.get_tool_calls().as_ref().unwrap().len(), 1);
+        assert_eq!(msg.get_tool_calls().as_ref().unwrap()[0].id, tool_call_id_str);
+
+        match msg {
+            LiteLlmMessage::Assistant { id, content, name, tool_calls, progress, initial } => {
+                assert_eq!(id.as_deref(), Some(assistant_id_str));
+                assert_eq!(content.as_deref(), Some(assistant_content_str));
+                assert_eq!(name.as_deref(), Some(assistant_name_str));
+                assert!(tool_calls.is_some());
+                let tc = tool_calls.unwrap();
+                assert_eq!(tc.len(), 1);
+                assert_eq!(tc[0].id, tool_call_id_str);
+                assert_eq!(progress, MessageProgress::Complete);
+                assert_eq!(initial, true);
+            }
+            _ => panic!("Expected Assistant message"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_litellm_message_assistant_constructor_minimal() {
+        let msg = LiteLlmMessage::assistant(
+            None, 
+            None, 
+            None, 
+            MessageProgress::InProgress, 
+            None, // initial will default to false
+            None
+        );
+        
+        assert_eq!(msg.get_role(), "assistant");
+        assert!(msg.get_content().is_none());
+        assert!(msg.get_id().is_none());
+        assert!(msg.get_tool_calls().is_none());
+
+        match msg {
+            LiteLlmMessage::Assistant { id, content, name, tool_calls, progress, initial } => {
+                assert!(id.is_none());
+                assert!(content.is_none());
+                assert!(name.is_none());
+                assert!(tool_calls.is_none());
+                assert_eq!(progress, MessageProgress::InProgress);
+                assert_eq!(initial, false); // Default value
+            }
+            _ => panic!("Expected Assistant message"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_litellm_message_tool_constructor() {
+        let tool_msg_id_str = "tool_id_002";
+        let tool_content_str = "Tool execution result";
+        let tool_call_id_str = "call_123";
+        let tool_name_str = "MyToolName";
+
+        let msg = LiteLlmMessage::tool(
+            Some(tool_msg_id_str.to_string()),
+            tool_content_str.to_string(),
+            tool_call_id_str.to_string(),
+            Some(tool_name_str.to_string()),
+            MessageProgress::Complete,
+        );
+
+        assert_eq!(msg.get_role(), "tool");
+        assert_eq!(msg.get_content(), Some(tool_content_str.to_string()));
+        assert_eq!(msg.get_id(), Some(tool_msg_id_str.to_string()));
+        assert_eq!(msg.get_tool_call_id(), Some(tool_call_id_str.to_string()));
+
+        match msg {
+            LiteLlmMessage::Tool { id, content, tool_call_id, name, progress } => {
+                assert_eq!(id.as_deref(), Some(tool_msg_id_str));
+                assert_eq!(content, tool_content_str);
+                assert_eq!(tool_call_id, tool_call_id_str);
+                assert_eq!(name.as_deref(), Some(tool_name_str));
+                assert_eq!(progress, MessageProgress::Complete);
+            }
+            _ => panic!("Expected Tool message"),
+        }
+    }
+    
+    #[tokio::test]
+    async fn test_litellm_message_done_getters() {
+        let msg = LiteLlmMessage::Done;
+        assert_eq!(msg.get_role(), "done");
+        assert!(msg.get_content().is_none());
+        assert!(msg.get_tool_call_id().is_none());
+        assert!(msg.get_tool_calls().is_none());
+        assert!(msg.get_id().is_none());
+    }
+
+    #[tokio::test]
+    async fn test_litellm_message_set_and_get_id() {
+        let mut msg_dev = LiteLlmMessage::developer("Hello");
+        msg_dev.set_id("dev_1".to_string());
+        assert_eq!(msg_dev.get_id(), Some("dev_1".to_string()));
+
+        let mut msg_user = LiteLlmMessage::user("Hi");
+        msg_user.set_id("user_1".to_string());
+        assert_eq!(msg_user.get_id(), Some("user_1".to_string()));
+
+        let mut msg_asst = LiteLlmMessage::assistant(None, None, None, MessageProgress::Complete, None, None);
+        msg_asst.set_id("asst_1".to_string());
+        assert_eq!(msg_asst.get_id(), Some("asst_1".to_string()));
+
+        let mut msg_tool = LiteLlmMessage::tool(None, "content", "tc_id", None, MessageProgress::Complete);
+        msg_tool.set_id("tool_1".to_string());
+        assert_eq!(msg_tool.get_id(), Some("tool_1".to_string()));
+        
+        // LiteLlmMessage::Done does not have an ID field to set
+        let mut msg_done = LiteLlmMessage::Done;
+        msg_done.set_id("done_1".to_string()); // This will arm, but get_id() will be None
+        assert_eq!(msg_done.get_id(), None);
+    }
+
+    #[tokio::test]
+    async fn test_chat_completion_request_default() {
+        let req = ChatCompletionRequest::default();
+        assert!(req.model.is_empty());
+        assert!(req.messages.is_empty());
+        assert!(req.store.is_none());
+        assert!(req.reasoning_effort.is_none());
+        assert!(req.frequency_penalty.is_none());
+        assert!(req.logit_bias.is_none());
+        assert!(req.logprobs.is_none());
+        assert!(req.top_logprobs.is_none());
+        assert!(req.max_completion_tokens.is_none());
+        assert!(req.n.is_none());
+        assert!(req.modalities.is_none());
+        assert!(req.prediction.is_none());
+        assert!(req.presence_penalty.is_none());
+        assert!(req.response_format.is_none());
+        assert!(req.seed.is_none());
+        assert!(req.service_tier.is_none());
+        assert!(req.stop.is_none());
+        assert!(req.stream.is_none());
+        assert!(req.temperature.is_none());
+        assert!(req.top_p.is_none());
+        assert!(req.tools.is_none());
+        assert!(req.tool_choice.is_none());
+        assert!(req.user.is_none());
+        assert!(req.parallel_tool_calls.is_none());
+        assert!(req.metadata.is_none());
+    }
+
+    #[tokio::test]
+    async fn test_embedding_request_default() {
+        let req = EmbeddingRequest::default();
+        assert_eq!(req.model, "text-embedding-3-small");
+        assert!(req.input.is_empty());
+        assert_eq!(req.encoding_format, Some("float".to_string()));
+        assert_eq!(req.dimensions, Some(1536));
+        assert!(req.user.is_none());
+    }
+
+    #[tokio::test]
+    async fn test_message_progress_default_and_equality() {
+        assert_eq!(MessageProgress::default(), MessageProgress::Complete);
+        assert_ne!(MessageProgress::InProgress, MessageProgress::Complete);
+        assert_eq!(MessageProgress::InProgress, MessageProgress::InProgress);
+        let prog_complete = MessageProgress::Complete;
+        let prog_inprogress = MessageProgress::InProgress;
+        assert_eq!(prog_complete, MessageProgress::Complete);
+        assert_eq!(prog_inprogress, MessageProgress::InProgress);
     }
 }
 

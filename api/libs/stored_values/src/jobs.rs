@@ -8,6 +8,7 @@ use tracing::{error, info, warn};
 use uuid::Uuid;
 use litellm::{EmbeddingRequest, LiteLLMClient};
 use sqlx::QueryBuilder;
+use reqwest;
 
 use database::{
     models::StoredValuesSyncJob,
@@ -166,10 +167,38 @@ pub async fn sync_distinct_values_chunk(
     }
 
     // Instantiate the LiteLLM Client
-    let litellm_client = LiteLLMClient::new(
-        std::env::var("OPENAI_API_KEY").ok(),
-        Some("https://api.openai.com/v1/".to_string()),
+    let openai_api_key_opt = std::env::var("OPENAI_API_KEY").ok();
+    let base_url_opt = Some("https://api.openai.com/v1/".to_string());
+    // For debug_logging_enabled, passing None will use the default logic within LiteLLMConfig::new.
+    let litellm_config = litellm::LiteLLMConfig::new(openai_api_key_opt, base_url_opt, None);
+
+    // Build reqwest client with necessary headers.
+    // The API key from litellm_config is resolved based on OPENAI_API_KEY, LLM_API_KEY, or LITELLM_CONFIG_PATH.
+    // If LITELLM_CONFIG_PATH is used leading to a "dummy-key-not-used", and the base_url is OpenAI's direct URL,
+    // authentication will likely fail at runtime, indicating a broader configuration issue.
+    let mut headers = reqwest::header::HeaderMap::new();
+    if !litellm_config.api_key.is_empty() && litellm_config.api_key != "dummy-key-not-used" {
+        headers.insert(
+            reqwest::header::AUTHORIZATION,
+            reqwest::header::HeaderValue::from_str(&format!("Bearer {}", litellm_config.api_key))
+                .with_context(|| format!("Failed to create Authorization header for LiteLLM client using API key: '{}'", litellm_config.api_key))?
+        );
+    }
+    headers.insert(
+        reqwest::header::CONTENT_TYPE,
+        reqwest::header::HeaderValue::from_static("application/json"),
     );
+    headers.insert(
+        reqwest::header::ACCEPT, // Commonly included for JSON APIs
+        reqwest::header::HeaderValue::from_static("application/json"),
+    );
+
+    let reqwest_client = reqwest::Client::builder()
+        .default_headers(headers)
+        .build()
+        .context("Failed to build reqwest client for LiteLLM")?;
+
+    let litellm_client = LiteLLMClient::new(litellm_config, reqwest_client);
 
     // Wrap the core sync logic in a closure or block to handle errors centrally
     let sync_result: Result<usize, anyhow::Error> = async {
