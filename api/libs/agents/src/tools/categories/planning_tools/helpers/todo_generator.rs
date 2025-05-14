@@ -1,7 +1,11 @@
 use std::env;
 
 use anyhow::Result;
-use litellm::{LiteLlmMessage, ChatCompletionRequest, LiteLLMClient, Metadata, ResponseFormat};
+use litellm::{
+    types::{ChatCompletionRequest, LiteLlmMessage, Metadata, ResponseFormat},
+    LiteLLMClient,
+};
+use reqwest::Client as ReqwestClient;
 use serde_json::Value;
 use tracing::{error, warn};
 use uuid::Uuid;
@@ -23,7 +27,7 @@ pub async fn generate_todos_from_plan(
     user_id: Uuid,
     session_id: Uuid,
 ) -> Result<Vec<Value>> {
-    let llm_client = LiteLLMClient::new(None, None);
+    let llm_client = LiteLLMClient::default();
 
     let prompt = format!(
         r#"

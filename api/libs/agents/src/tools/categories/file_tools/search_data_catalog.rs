@@ -83,7 +83,7 @@ struct SearchableDimension {
 
 // NEW: Helper function to generate embeddings for search terms
 async fn generate_embedding_for_text(text: &str) -> Result<Vec<f32>> {
-    let litellm_client = LiteLLMClient::new(None, None);
+    let litellm_client = LiteLLMClient::default();
     
     let embedding_request = EmbeddingRequest {
         model: "text-embedding-3-small".to_string(),
@@ -978,7 +978,7 @@ async fn llm_filter_helper(
         )
         .replace("{found_values_json}", &found_values_json);
 
-    let llm_client = LiteLLMClient::new(None, None);
+    let llm_client = LiteLLMClient::default();
 
     let model = if env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string()) == "local" {
         "gpt-4.1-nano".to_string()
@@ -1130,7 +1130,7 @@ async fn generate_embeddings_batch(texts: Vec<String>) -> Result<Vec<(String, Ve
         return Ok(vec![]);
     }
     
-    let litellm_client = LiteLLMClient::new(None, None);
+    let litellm_client = LiteLLMClient::default();
     
     let embedding_request = EmbeddingRequest {
         model: "text-embedding-3-small".to_string(),

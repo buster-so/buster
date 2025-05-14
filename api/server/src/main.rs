@@ -69,7 +69,7 @@ async fn main() -> Result<(), anyhow::Error> {
     info!("Starting stored values sync job scheduler...");
 
     // Schedule to run every hour
-    let job = Job::new_async("*/5 * * * * *", move |uuid, mut l| {
+    let job = Job::new_async("* */5 * * * *", move |uuid, mut l| {
         Box::pin(async move {
             info!(job_uuid = %uuid, "Running hourly stored values sync job check.");
             if let Err(e) = trigger_stale_sync_jobs().await {

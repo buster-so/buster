@@ -2711,7 +2711,7 @@ pub async fn generate_conversation_title(
     let prompt = TITLE_GENERATION_PROMPT.replace("{conversation_messages}", &formatted_messages);
 
     // Set up LiteLLM client
-    let llm_client = LiteLLMClient::new(None, None);
+    let llm_client = LiteLLMClient::default();
 
     let model = if env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string()) == "local" {
         "gpt-4.1-nano".to_string()

@@ -319,7 +319,7 @@ async fn filter_datasets_with_llm(
         );
 
     // Initialize LiteLLM client
-    let llm_client = LiteLLMClient::new(None, None);
+    let llm_client = LiteLLMClient::default();
 
     let model =
         if env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string()) == "local" {
