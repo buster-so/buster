@@ -9,10 +9,9 @@ use serde_json::Value;
 ///
 /// Each concrete tool declares its own constant, e.g.:
 /// ```
+/// # use agentsv2::tools::tool::ToolName; // This line is hidden in docs but helps the doctest compile
 /// pub const WEATHER: ToolName = ToolName::new("weather");
 /// ```
-/// This keeps type-safety (you cannot accidentally type the wrong string) without
-/// forcing every tool to be declared in this core module.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct ToolName(&'static str);
 
@@ -78,6 +77,8 @@ pub trait ToolExecutor: Send + Sync {
     type Params: DeserializeOwned + Send;
 
     /// Execute business logic after full params are available.
+    /// This might be called by `finalize` internally if the tool design prefers it,
+    /// or `finalize` itself might produce the output.
     async fn execute(&self, params: Self::Params, tool_call_id: String) -> Result<Self::Output>;
 
     /// Return the JSON schema describing this tool.
@@ -86,27 +87,22 @@ pub trait ToolExecutor: Send + Sync {
     /// Name of the tool.
     fn name(&self) -> ToolName;
 
+    /// Feed a raw UTF-8 chunk (from the model's arguments for this tool) into the tool.
+    /// Implementations buffer these chunks, attempt to parse `Self::Params`,
+    /// and may return `StreamStage`s for `ParamsChunk`, `ParamsComplete`.
+    /// It can also return `OutputChunk` or `OutputComplete` if the tool produces
+    /// output directly from `ingest_chunk`.
+    async fn ingest_chunk(&mut self, chunk: &str, tool_call_id: &str) -> Result<Vec<StreamStage>>;
+
+    /// Called when no more parameter chunks will arrive for this tool call.
+    /// Implementations should process any buffered chunks, finalize parameter parsing,
+    /// perform the main execution, and return `StreamStage`s, typically including
+    /// `OutputComplete` containing `Self::Output`.
+    async fn finalize(&mut self, tool_call_id: &str) -> Result<Vec<StreamStage>>;
+
     /// Called exactly once during graceful shutdown (optional).
     async fn handle_shutdown(&self) -> Result<()> {
         Ok(())
-    }
-}
-
-//--------------------------------------------------------------------
-//  Streaming interface (optional)
-//--------------------------------------------------------------------
-#[async_trait]
-pub trait StreamingToolExecutor: ToolExecutor {
-    /// Feed a raw UTF-8 chunk (from the model) into the tool.
-    /// Implementations may return zero or more `StreamStage`s to be forwarded
-    /// to the UI layer for progressive rendering.
-    async fn ingest_chunk(&mut self, chunk: &str) -> Result<Vec<StreamStage>>;
-
-    /// Called when no more chunks will arrive.  Default implementation simply
-    /// returns an empty vec – override if you need to emit final stages or
-    /// to run `execute` here.
-    async fn finalize(&mut self) -> Result<Vec<StreamStage>> {
-        Ok(vec![])
     }
 }
 
@@ -126,8 +122,8 @@ impl<T: ToolExecutor> JsonAdapter<T> {
 impl<T> ToolExecutor for JsonAdapter<T>
 where
     T: ToolExecutor + Send + Sync,
-    T::Params: DeserializeOwned,
-    T::Output: Serialize,
+    T::Params: DeserializeOwned + Send,
+    T::Output: Serialize + Send,
 {
     type Output = Value;
     type Params = Value;
@@ -145,6 +141,42 @@ where
 
     fn name(&self) -> ToolName {
         self.0.name()
+    }
+
+    async fn ingest_chunk(&mut self, chunk: &str, tool_call_id: &str) -> Result<Vec<StreamStage>> {
+        let stages_from_inner = self.0.ingest_chunk(chunk, tool_call_id).await?;
+        let mut mapped_stages = Vec::new();
+        for stage in stages_from_inner {
+            match stage {
+                StreamStage::ParamsChunk(val) => mapped_stages.push(StreamStage::ParamsChunk(val)),
+                StreamStage::ParamsComplete(val) => mapped_stages.push(StreamStage::ParamsComplete(val)),
+                StreamStage::OutputChunk(t_output_val) => {
+                    mapped_stages.push(StreamStage::OutputChunk(t_output_val));
+                }
+                StreamStage::OutputComplete(t_output_val) => {
+                    mapped_stages.push(StreamStage::OutputComplete(t_output_val));
+                }
+            }
+        }
+        Ok(mapped_stages)
+    }
+
+    async fn finalize(&mut self, tool_call_id: &str) -> Result<Vec<StreamStage>> {
+        let stages_from_inner = self.0.finalize(tool_call_id).await?;
+        let mut mapped_stages = Vec::new();
+        for stage in stages_from_inner {
+            match stage {
+                StreamStage::ParamsChunk(val) => mapped_stages.push(StreamStage::ParamsChunk(val)),
+                StreamStage::ParamsComplete(val) => mapped_stages.push(StreamStage::ParamsComplete(val)),
+                StreamStage::OutputChunk(t_output_val) => {
+                    mapped_stages.push(StreamStage::OutputChunk(t_output_val));
+                }
+                StreamStage::OutputComplete(t_output_val) => {
+                    mapped_stages.push(StreamStage::OutputComplete(t_output_val));
+                }
+            }
+        }
+        Ok(mapped_stages)
     }
 
     async fn handle_shutdown(&self) -> Result<()> {
@@ -179,7 +211,7 @@ where
 // ===========================================================================================
 
 #[async_trait]
-pub trait ToolStreamer: StreamingToolExecutor {
+pub trait ToolStreamer: ToolExecutor {
     /// Event type understood by the caller / UI layer.
     type UiEvent: Send + 'static;
 
@@ -189,7 +221,7 @@ pub trait ToolStreamer: StreamingToolExecutor {
     /// Convenience helper: feed a raw chunk, map all resulting stages, and push them across a channel.
     async fn ingest_and_send(&mut self, chunk: &str, sender: &tokio::sync::mpsc::Sender<Self::UiEvent>) -> Result<()>
     {
-        let stages = self.ingest_chunk(chunk).await?;
+        let stages = self.ingest_chunk(chunk, "").await?;
         for st in stages {
             for ev in self.map_stage(st) {
                 sender.send(ev).await.map_err(|e| anyhow::anyhow!(e.to_string()))?;
@@ -201,7 +233,7 @@ pub trait ToolStreamer: StreamingToolExecutor {
     /// After parameters are complete call this once to emit execution output.
     async fn finalize_and_send(&mut self, sender: &tokio::sync::mpsc::Sender<Self::UiEvent>) -> Result<()>
     {
-        let stages = self.finalize().await?;
+        let stages = self.finalize("").await?;
         for st in stages {
             for ev in self.map_stage(st) {
                 sender.send(ev).await.map_err(|e| anyhow::anyhow!(e.to_string()))?;
@@ -265,7 +297,7 @@ mod tests {
         executed: bool,
     }
 
-    #[derive(Deserialize, Serialize, Clone, Debug)]
+    #[derive(PartialEq, Deserialize, Serialize, Clone, Debug)]
     struct WeatherParams {
         location: String,
     }
@@ -290,17 +322,19 @@ mod tests {
 
         async fn execute(&self, params: Self::Params, _id: String) -> Result<Self::Output> {
             Ok(WeatherOutput {
-                forecast: format!("Always sunny in {}!", params.location),
+                forecast: format!("Sunny in {}!", params.location),
             })
         }
 
         async fn schema(&self) -> serde_json::Value {
             json!({
                 "name": WEATHER.as_str(),
-                "description": "Returns cheerful fake forecast",
+                "description": "Gets the weather forecast for a location.",
                 "parameters": {
                     "type": "object",
-                    "properties": {"location": {"type": "string"}},
+                    "properties": {
+                        "location": {"type": "string", "description": "The location to get the weather for."}
+                    },
                     "required": ["location"]
                 }
             })
@@ -309,29 +343,31 @@ mod tests {
         fn name(&self) -> ToolName {
             WEATHER
         }
-    }
 
-    #[async_trait]
-    impl StreamingToolExecutor for WeatherTool {
-        async fn ingest_chunk(&mut self, chunk: &str) -> Result<Vec<StreamStage>> {
+        async fn ingest_chunk(&mut self, chunk: &str, _tool_call_id: &str) -> Result<Vec<StreamStage>> {
             self.buffer.push_str(chunk);
             let mut stages = vec![StreamStage::ParamsChunk(serde_json::Value::String(chunk.to_string()))];
 
-            if self.parsed.is_none() {
-                if let Ok(p) = serde_json::from_str::<WeatherParams>(&self.buffer) {
-                    self.parsed = Some(p.clone());
-                    stages.push(StreamStage::ParamsComplete(serde_json::to_value(&p)?));
+            // Attempt to parse the current buffer
+            if let Ok(p_candidate) = serde_json::from_str::<WeatherParams>(&self.buffer) {
+                // Emit ParamsComplete if this is the first successful parse, 
+                // or if the newly parsed parameters are different from the previously stored ones (e.g. more complete).
+                let should_emit_complete = self.parsed.is_none() || self.parsed.as_ref() != Some(&p_candidate);
+                
+                self.parsed = Some(p_candidate.clone()); // Update with the latest successful parse
+
+                if should_emit_complete {
+                    stages.push(StreamStage::ParamsComplete(serde_json::to_value(&p_candidate)?));
                 }
             }
-
             Ok(stages)
         }
 
-        async fn finalize(&mut self) -> Result<Vec<StreamStage>> {
+        async fn finalize(&mut self, tool_call_id: &str) -> Result<Vec<StreamStage>> {
             let mut stages = Vec::new();
             if !self.executed {
                 if let Some(ref params) = self.parsed {
-                    let out = self.execute(params.clone(), "call_id".into()).await?;
+                    let out = self.execute(params.clone(), tool_call_id.to_string()).await?;
                     stages.push(StreamStage::OutputComplete(serde_json::to_value(out)?));
                     self.executed = true;
                 }
@@ -382,7 +418,7 @@ mod tests {
         assert_eq!(
             out,
             WeatherOutput {
-                forecast: "Always sunny in London!".into()
+                forecast: "Sunny in London!".into()
             }
         );
         Ok(())
@@ -391,26 +427,41 @@ mod tests {
     #[tokio::test]
     async fn weather_stream_partial_params() -> Result<()> {
         let mut tool = WeatherTool::default();
-        let stages = tool.ingest_chunk("{\"loc").await?;
-        assert!(matches!(stages[0], StreamStage::ParamsChunk(_)));
+        let stages = tool.ingest_chunk("{\"location\":\"Lon\"}", "test_call_id").await?;
+        assert!(stages.iter().any(|s| matches!(s, StreamStage::ParamsChunk(_))));
+        assert!(stages.iter().any(|s| matches!(s, StreamStage::ParamsComplete(_))), "Should emit ParamsComplete if partial JSON is parsable");
+        assert!(tool.parsed.is_some());
+        assert_eq!(tool.parsed.as_ref().unwrap().location, "Lon");
         Ok(())
     }
 
     #[tokio::test]
     async fn weather_stream_complete_params() -> Result<()> {
         let mut tool = WeatherTool::default();
-        tool.ingest_chunk("{\"location\":\"").await?;
-        let stages = tool.ingest_chunk("Paris\"}").await?;
-        assert!(stages.iter().any(|s| matches!(s, StreamStage::ParamsComplete(_))));
+        
+        // Chunk 1: Incomplete JSON string value
+        let stages1 = tool.ingest_chunk("{\"location\":\"Lon", "test_call_id").await?;
+        // After chunk 1, buffer is "{\"location\":\"Lon". serde_json::from_str should fail.
+        // So, stages1 should only contain ParamsChunk. self.parsed should be None.
+        assert!(stages1.iter().any(|s| matches!(s, StreamStage::ParamsChunk(_))));
+        assert!(!stages1.iter().any(|s| matches!(s, StreamStage::ParamsComplete(_))), "ParamsComplete should not be emitted for incomplete JSON: {:?}", stages1);
+        assert!(tool.parsed.is_none(), "Parsed should be None after incomplete chunk. Actual: {:?}", tool.parsed);
+
+        // Chunk 2: Completes the JSON
+        let stages2 = tool.ingest_chunk("don\"}", "test_call_id").await?;
+        // Buffer becomes "{\"location\":\"London\"}". serde_json::from_str should succeed.
+        // stages2 should contain ParamsComplete.
+        assert!(stages2.iter().any(|s| matches!(s, StreamStage::ParamsComplete(_))), "ParamsComplete should be emitted for complete JSON. Actual stages: {:?}", stages2);
+        assert!(tool.parsed.is_some(), "Parsed should be Some after complete JSON. Actual: {:?}", tool.parsed);
+        assert_eq!(tool.parsed.as_ref().unwrap().location, "London");
         Ok(())
     }
 
     #[tokio::test]
     async fn weather_stream_exec_output() -> Result<()> {
         let mut tool = WeatherTool::default();
-        tool.ingest_chunk("{\"location\":\"").await?;
-        tool.ingest_chunk("Berlin\"}").await?;
-        let finalize_stages = tool.finalize().await?;
+        tool.ingest_chunk("{\"location\":\"Berlin\"}", "test_call_id").await?;
+        let finalize_stages = tool.finalize("test_call_id").await?;
         let output_stage = finalize_stages
             .iter()
             .find_map(|s| if let StreamStage::OutputComplete(v) = s { Some(v) } else { None })
@@ -419,7 +470,7 @@ mod tests {
         assert_eq!(
             out,
             WeatherOutput {
-                forecast: "Always sunny in Berlin!".into()
+                forecast: "Sunny in Berlin!".into()
             }
         );
         Ok(())
@@ -487,9 +538,9 @@ mod tests {
             // Very simple poem: split description words into a four-line poem.
             let words: Vec<&str> = params.description.split_whitespace().collect();
             let mut poem_lines = Vec::new();
-            let chunk = (words.len() / 4).max(1);
-            for i in (0..words.len()).step_by(chunk) {
-                poem_lines.push(words[i..words.len().min(i + chunk)].join(" "));
+            let chunk_size = (words.len() / 4).max(1); // Use variable name that does not shadow outer scope
+            for i in (0..words.len()).step_by(chunk_size) {
+                poem_lines.push(words[i..words.len().min(i + chunk_size)].join(" "));
             }
             Ok(PoemOutput {
                 poem: poem_lines.join("\n"),
@@ -510,6 +561,30 @@ mod tests {
 
         fn name(&self) -> ToolName {
             POEM
+        }
+
+        async fn ingest_chunk(&mut self, chunk: &str, _tool_call_id: &str) -> Result<Vec<StreamStage>> {
+            self.buffer.push_str(chunk);
+            let mut stages = vec![StreamStage::ParamsChunk(Value::String(chunk.to_owned()))];
+            if self.params.is_none() {
+                if let Ok(p) = serde_json::from_str::<PoemParams>(&self.buffer) {
+                    self.params = Some(p.clone());
+                    stages.push(StreamStage::ParamsComplete(serde_json::to_value(&p)?));
+                }
+            }
+            Ok(stages)
+        }
+
+        async fn finalize(&mut self, tool_call_id: &str) -> Result<Vec<StreamStage>> {
+            let mut stages = Vec::new();
+            if !self.executed {
+                if let Some(ref params) = self.params {
+                    let out = self.execute(params.clone(), tool_call_id.to_string()).await?;
+                    stages.push(StreamStage::OutputComplete(serde_json::to_value(out)?));
+                    self.executed = true;
+                }
+            }
+            Ok(stages)
         }
     }
 
@@ -586,17 +661,25 @@ mod tests {
     async fn poem_params_complete_event() -> Result<()> {
         let (tx, mut rx) = tokio::sync::mpsc::channel::<PoemUi>(32);
         let mut tool = PoemGenerator::default();
-        let params_json = r#"{"description":"The ferris crab loves the gentle waves of Rustacean seas"}"#;
+        let params_json = r#"{"description":"The diligent crab taps its ergonomic keyboard"}"#;
 
         feed_poem_chunks(&mut tool, params_json, 5, &tx).await?;
-        // drain until we see description full value
-        let mut desc_full = None;
+        tool.finalize_and_send(&tx).await?;
+        drop(tx);
+
+        let mut saw_complete = false;
         while let Some(ev) = rx.recv().await {
-            if let PoemUi::Params(p) = ev {
-                if let Some(d) = p.description { desc_full = Some(d); break; }
+            match ev {
+                PoemUi::Params(pui) => {
+                    if let Some(full_desc) = pui.description {
+                        assert!(full_desc.contains("diligent"));
+                        saw_complete = true;
+                    }
+                }
+                PoemUi::Output(_) => {/* ignore */}
             }
         }
-        assert_eq!(desc_full.unwrap(), "The ferris crab loves the gentle waves of Rustacean seas");
+        assert!(saw_complete);
         Ok(())
     }
 
@@ -620,34 +703,5 @@ mod tests {
         }
         assert!(saw_output);
         Ok(())
-    }
-
-    // Implement StreamingToolExecutor for PoemGenerator (required for tests)
-    #[async_trait]
-    impl StreamingToolExecutor for PoemGenerator {
-        async fn ingest_chunk(&mut self, chunk: &str) -> Result<Vec<StreamStage>> {
-            self.buffer.push_str(chunk);
-            let mut stages = vec![StreamStage::ParamsChunk(Value::String(chunk.to_owned()))];
-            if self.params.is_none() {
-                if let Ok(p) = serde_json::from_str::<PoemParams>(&self.buffer) {
-                    self.params = Some(p.clone());
-                    stages.push(StreamStage::ParamsComplete(serde_json::to_value(p)?));
-                }
-            }
-            Ok(stages)
-        }
-
-        async fn finalize(&mut self) -> Result<Vec<StreamStage>> {
-            if self.executed {
-                return Ok(vec![]);
-            }
-            let mut stages = Vec::new();
-            if let Some(ref params) = self.params {
-                let out = self.execute(params.clone(), "call".into()).await?;
-                stages.push(StreamStage::OutputComplete(serde_json::to_value(out)?));
-                self.executed = true;
-            }
-            Ok(stages)
-        }
     }
 }

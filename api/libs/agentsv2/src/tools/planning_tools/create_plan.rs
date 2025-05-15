@@ -176,12 +176,8 @@ impl ToolExecutor for CreatePlan {
     fn name(&self) -> ToolName {
         self.tool_name
     }
-}
 
-// Streaming support
-#[async_trait]
-impl StreamingToolExecutor for CreatePlan {
-    async fn ingest_chunk(&mut self, chunk: &str) -> Result<Vec<StreamStage>> {
+    async fn ingest_chunk(&mut self, chunk: &str, _tool_call_id: &str) -> Result<Vec<StreamStage>> {
         self.buffer.push_str(chunk);
         let mut stages = vec![StreamStage::ParamsChunk(Value::String(chunk.to_owned()))];
 
@@ -194,13 +190,13 @@ impl StreamingToolExecutor for CreatePlan {
         Ok(stages)
     }
 
-    async fn finalize(&mut self) -> Result<Vec<StreamStage>> {
+    async fn finalize(&mut self, tool_call_id: &str) -> Result<Vec<StreamStage>> {
         if self.executed {
             return Ok(vec![]);
         }
         let mut stages = Vec::new();
         if let Some(ref params) = self.params {
-            let out = self.execute(params.clone(), "call".into()).await?;
+            let out = self.execute(params.clone(), tool_call_id.to_string()).await?;
             stages.push(StreamStage::OutputComplete(serde_json::to_value(out)?));
             self.executed = true;
         }
@@ -335,10 +331,10 @@ mod tests {
         let agent = build_dummy_agent();
         let mut tool = CreatePlanInvestigative::new(agent);
         for chunk in ["{\"plan\"", ":\"Plan ABC\"}"] {
-            let stages = tool.ingest_chunk(chunk).await?;
+            let stages = tool.ingest_chunk(chunk, "test_call_id_investigative").await?;
             assert!(stages.iter().any(|s| matches!(s, StreamStage::ParamsChunk(_))));
         }
-        let stages = tool.finalize().await?;
+        let stages = tool.finalize("test_call_id_investigative").await?;
         assert!(stages.iter().any(|s| matches!(s, StreamStage::OutputComplete(_))));
         Ok(())
     }
@@ -432,10 +428,10 @@ mod tests {
         let agent = build_dummy_agent();
         let mut tool = CreatePlanStraightforward::new(agent);
         for chunk in ["{\"plan\"", ":\"Plan DEF\"}"] {
-            let stages = tool.ingest_chunk(chunk).await?;
+            let stages = tool.ingest_chunk(chunk, "test_call_id_straightforward").await?;
             assert!(stages.iter().any(|s| matches!(s, StreamStage::ParamsChunk(_))));
         }
-        let stages = tool.finalize().await?;
+        let stages = tool.finalize("test_call_id_straightforward").await?;
         assert!(stages.iter().any(|s| matches!(s, StreamStage::OutputComplete(_))));
         Ok(())
     }

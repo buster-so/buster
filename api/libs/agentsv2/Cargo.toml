@@ -12,4 +12,5 @@ tokio = { workspace = true, features = ["full", "macros"] }
 agents = { path = "../agents" }
 tracing = { workspace = true }
 uuid = { workspace = true }
+tokio-retry = { workspace = true }
 litellm = { path = "../litellm" } 

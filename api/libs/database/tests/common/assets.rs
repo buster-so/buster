@@ -31,7 +31,6 @@ impl AssetTestHelpers {
             sql: "SELECT * FROM test".to_string(),
             time_frame: "last 30 days".to_string(),
             chart_config: create_default_chart_config(),
-            dataset_ids: Vec::new(),
         };
 
         let metric_file = MetricFile {
@@ -58,6 +57,7 @@ impl AssetTestHelpers {
             version_history: VersionHistory(HashMap::new()),
             data_metadata: None,
             public_password: None,
+            data_source_id: Uuid::new_v4(),
         };
 
         diesel::insert_into(metric_files::table)
