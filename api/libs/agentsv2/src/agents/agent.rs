@@ -903,11 +903,11 @@ impl<S: State> GenericAgent<S> {
             {
                 AgentStatus::Continue => {
                     current_depth += 1;
-                    if current_depth >= 15 { // MODIFIED: Max depth check to 15 to align with process_turn_streaming
-                        // Max depth check, similar to process_turn_streaming internal
-                        self.send_msg(Ok(LiteLlmMessage::Done)).await;
-                        return Ok(AgentStatus::Terminated);
-                    }
+                    // if current_depth >= 15 { // MODIFIED: Max depth check to 15 to align with process_turn_streaming
+                    //     // Max depth check, similar to process_turn_streaming internal
+                    //     self.send_msg(Ok(LiteLlmMessage::Done)).await;
+                    //     return Ok(AgentStatus::Terminated);
+                    // }
                 }
                 AgentStatus::NeedsUserInput(msg) => {
                     self.send_msg(Ok(LiteLlmMessage::Done)).await;
@@ -3003,7 +3003,7 @@ mod tests {
         let llm_facade: Arc<dyn LlmFacade + Send + Sync> = retrying_llm.clone();
 
         let agent_state = CounterState::default();
-        let mode_provider = Arc::new(DummyModeProvider);
+        let mode_provider = Arc::new(SingleTurnTerminateModeProvider);
 
         let agent = GenericAgent::with_mock(
             "retry_test_agent",
