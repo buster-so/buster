@@ -39,6 +39,7 @@ tower-http = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 uuid = { workspace = true }
+fastembed = { workspace = true }
 
 # Local dependencies
 handlers = { path = "../libs/handlers" }

@@ -5,12 +5,15 @@ use std::env;
 use std::sync::Arc;
 use std::time::Duration;
 
-use axum::{Extension, Router, extract::Request};
-use middleware::{cors::cors, error::{init_sentry, sentry_layer, init_tracing_subscriber}};
+use axum::{extract::Request, Extension, Router};
 use database::{self, pool::init_pools};
 use diesel::{Connection, PgConnection};
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use dotenv::dotenv;
+use middleware::{
+    cors::cors,
+    error::{init_sentry, init_tracing_subscriber, sentry_layer},
+};
 use rustls::crypto::ring;
 use stored_values::jobs::trigger_stale_sync_jobs;
 use tokio::sync::broadcast;
@@ -19,6 +22,7 @@ use tower::ServiceBuilder;
 use tower_http::{compression::CompressionLayer, trace::TraceLayer};
 use tracing::{error, info, warn};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
+use fastembed::{InitOptions, RerankInitOptions, RerankerModel, TextRerank};
 
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 
@@ -29,6 +33,13 @@ async fn main() -> Result<(), anyhow::Error> {
 
     let environment = env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string());
     let is_development = environment == "development";
+
+    if environment == "local" {
+        let options =
+            RerankInitOptions::new(RerankerModel::JINARerankerV1TurboEn).with_show_download_progress(true);
+        let model = TextRerank::try_new(options)?;
+        println!("Model loaded and ready!");
+    }
 
     ring::default_provider()
         .install_default()
@@ -43,9 +54,9 @@ async fn main() -> Result<(), anyhow::Error> {
     let log_level = env::var("LOG_LEVEL")
         .unwrap_or_else(|_| "warn".to_string())
         .to_uppercase();
-    
-    let env_filter = EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| EnvFilter::new(log_level));
+
+    let env_filter =
+        EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new(log_level));
 
     // Initialize the tracing subscriber with Sentry integration using our middleware helper
     init_tracing_subscriber(env_filter);

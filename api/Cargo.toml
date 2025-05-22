@@ -110,6 +110,7 @@ diesel_migrations = "2.0.0"
 html-escape = "0.2.13"
 tokio-cron-scheduler = "0.13.0"
 tokio-retry = "0.3.0"
+fastembed = "4.8.0"
 
 [profile.release]
 debug = false
