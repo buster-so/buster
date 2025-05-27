@@ -24,7 +24,23 @@
     "check:fix": "biome check --write ${1:-.}",
     "typecheck": "bun --cwd ${1:-packages/database} run tsc --noEmit || echo 'TypeScript check completed for ${1:-packages/database}'",
     "ci:check": "bun run check && bun run typecheck",
-    "pre-commit": "bun run lint:fix && bun run format:fix"
+    "pre-commit": "bun run lint:fix && bun run format:fix",
+    "db:generate": "bun run --cwd packages/database db:generate",
+    "db:migrate": "bun run --cwd packages/database db:migrate",
+    "db:push": "bun run --cwd packages/database db:push",
+    "db:pull": "bun run --cwd packages/database db:pull",
+    "db:introspect": "bun run --cwd packages/database db:introspect",
+    "db:studio": "bun run --cwd packages/database db:studio",
+    "db:check": "bun run --cwd packages/database db:check",
+    "db:setup": "bun run --cwd packages/database db:setup",
+    "db:snapshot": "bun run --cwd packages/database db:snapshot",
+    "db:validate": "bun run --cwd packages/database db:validate",
+    "db:reset": "bun run --cwd packages/database db:push --force",
+    "seed": "bun run --cwd packages/database seed",
+    "seed:generate": "bun run --cwd packages/database seed:generate",
+    "seed:run": "bun run --cwd packages/database seed:run",
+    "seed:snapshot": "bun run --cwd packages/database seed:snapshot",
+    "seed:list": "bun run --cwd packages/database seed:list"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4"

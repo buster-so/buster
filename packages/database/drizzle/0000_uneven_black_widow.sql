@@ -1,6 +1,8 @@
 -- Current sql file was generated after introspecting the database
--- If you want to run this migration please uncomment this code before executing migrations
-/*
+-- Migration uncommented for execution
+CREATE EXTENSION IF NOT EXISTS vector;
+CREATE EXTENSION IF NOT EXISTS pgroonga;
+
 CREATE TYPE "public"."asset_permission_role_enum" AS ENUM('owner', 'editor', 'viewer', 'full_access', 'can_edit', 'can_filter', 'can_view');--> statement-breakpoint
 CREATE TYPE "public"."asset_type_enum" AS ENUM('dashboard', 'thread', 'collection', 'chat', 'metric_file', 'dashboard_file');--> statement-breakpoint
 CREATE TYPE "public"."data_source_onboarding_status_enum" AS ENUM('notStarted', 'inProgress', 'completed', 'failed');--> statement-breakpoint
@@ -663,7 +665,7 @@ ALTER TABLE "users_to_organizations" ADD CONSTRAINT "users_to_organizations_user
 ALTER TABLE "users_to_organizations" ADD CONSTRAINT "users_to_organizations_created_by_fkey" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "users_to_organizations" ADD CONSTRAINT "users_to_organizations_updated_by_fkey" FOREIGN KEY ("updated_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE "users_to_organizations" ADD CONSTRAINT "users_to_organizations_deleted_by_fkey" FOREIGN KEY ("deleted_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE cascade;--> statement-breakpoint
-CREATE UNIQUE INDEX "asset_search_asset_id_asset_type_idx" ON "asset_search" USING btree ("asset_id" text_ops,"asset_type" text_ops);--> statement-breakpoint
+CREATE UNIQUE INDEX "asset_search_asset_id_asset_type_idx" ON "asset_search" USING btree ("asset_id" uuid_ops,"asset_type" text_ops);--> statement-breakpoint
 CREATE INDEX "pgroonga_content_index" ON "asset_search" USING pgroonga ("content" pgroonga_text_full_text_search_ops_v2);--> statement-breakpoint
 CREATE INDEX "terms_search_embedding_idx" ON "terms_search" USING hnsw ("embedding" vector_cosine_ops);--> statement-breakpoint
 CREATE INDEX "terms_search_fts_idx" ON "terms_search" USING gin ("fts" tsvector_ops);--> statement-breakpoint
@@ -708,4 +710,3 @@ CREATE POLICY "diesel_schema_migrations_policy" ON "__diesel_schema_migrations" 
 CREATE POLICY "permission_groups_to_users_policy" ON "permission_groups_to_users" AS PERMISSIVE FOR ALL TO "authenticated" USING (true);--> statement-breakpoint
 CREATE POLICY "datasets_to_permission_groups_policy" ON "datasets_to_permission_groups" AS PERMISSIVE FOR ALL TO "authenticated" USING (true);--> statement-breakpoint
 CREATE POLICY "datasets_to_dataset_groups_policy" ON "datasets_to_dataset_groups" AS PERMISSIVE FOR ALL TO "authenticated" USING (true);
-*/

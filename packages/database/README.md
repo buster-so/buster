@@ -108,10 +108,13 @@ When you need to make schema changes:
 
 1. **Update the schema** in `src/schema.ts`
 2. **Generate migration**:
+
    ```bash
    bun run db:generate
    ```
+
 3. **Apply migration**:
+
    ```bash
    bun run db:migrate
    ```
@@ -263,6 +266,7 @@ bun run db:generate
 ### Performance
 
 The connection pool is configured for optimal performance:
+
 - **Max connections**: 20 (configurable)
 - **Idle timeout**: 30 seconds
 - **Connect timeout**: 30 seconds
@@ -281,4 +285,4 @@ When adding new tables or modifying existing ones:
 
 - [Drizzle ORM Documentation](https://orm.drizzle.team/)
 - [Drizzle Kit CLI](https://orm.drizzle.team/docs/kit-overview)
-- [PostgreSQL with Drizzle](https://orm.drizzle.team/docs/get-started/postgresql-existing) 
+- [PostgreSQL with Drizzle](https://orm.drizzle.team/docs/get-started/postgresql-existing)
