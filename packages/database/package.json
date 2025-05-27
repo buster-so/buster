@@ -1,0 +1,35 @@
+{
+  "name": "@buster/database",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "bun run src/index.ts",
+    "build": "bun build src/index.ts --outdir dist",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:pull": "drizzle-kit pull",
+    "db:introspect": "drizzle-kit introspect",
+    "db:studio": "drizzle-kit studio",
+    "db:check": "drizzle-kit check",
+    "db:setup": "bun run src/setup.ts setup",
+    "db:snapshot": "bun run src/setup.ts snapshot",
+    "db:validate": "bun run src/setup.ts validate",
+    "seed": "bun run src/seed/cli.ts",
+    "seed:generate": "bun run src/seed/generate.ts",
+    "seed:run": "bun run src/seed/cli.ts run",
+    "seed:snapshot": "bun run src/seed/cli.ts snapshot",
+    "seed:list": "bun run src/seed/cli.ts list"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.43.1",
+    "postgres": "^3.4.5"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.1"
+  },
+  "peerDependencies": {
+    "bun": "^1.0.0"
+  }
+}

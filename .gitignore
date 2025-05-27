@@ -75,3 +75,9 @@ web/playwright-tests/auth-utils/auth.json
 .trigger
 
 .claude
+
+# Drizzle specific
+drizzle/.env
+drizzle/.env.*
+drizzle/*.log
+drizzle/meta/

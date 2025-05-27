@@ -32,7 +32,7 @@
       // Optionally enable these for even stricter checks
       "noUnusedLocals": true,
       "noUnusedParameters": true,
-      "noPropertyAccessFromIndexSignature": true
+      "noPropertyAccessFromIndexSignature": false
     }
   }
   
