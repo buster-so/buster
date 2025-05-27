@@ -1,6 +1,7 @@
 import sql from 'mssql';
 import { type Credentials, DataSourceType, type SQLServerCredentials } from '../types/credentials';
-import { type AdapterQueryResult, BaseAdapter } from './base';
+import type { QueryParameter } from '../types/query';
+import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
 
 /**
  * SQL Server database adapter
@@ -32,7 +33,10 @@ export class SQLServerAdapter extends BaseAdapter {
 
       // Handle instance name
       if (sqlServerCredentials.instance) {
-        config.options!.instanceName = sqlServerCredentials.instance;
+        if (!config.options) {
+          config.options = {};
+        }
+        config.options.instanceName = sqlServerCredentials.instance;
       }
 
       // Handle timeouts
@@ -56,7 +60,7 @@ export class SQLServerAdapter extends BaseAdapter {
     }
   }
 
-  async query(sqlQuery: string, params?: any[]): Promise<AdapterQueryResult> {
+  async query(sqlQuery: string, params?: QueryParameter[]): Promise<AdapterQueryResult> {
     this.ensureConnected();
 
     if (!this.pool) {
@@ -80,17 +84,27 @@ export class SQLServerAdapter extends BaseAdapter {
 
       const result = await request.query(processedQuery);
 
+      const fields: FieldMetadata[] = result.recordset?.columns
+        ? Object.keys(result.recordset.columns).map((name) => {
+            const column = result.recordset?.columns?.[name];
+            const columnType = typeof column?.type === 'function' ? column.type() : column?.type;
+
+            // Type the column type properly instead of using unknown
+            const typedColumnType = columnType as { name?: string } | undefined;
+
+            return {
+              name,
+              type: typedColumnType?.name || 'unknown',
+              length: column?.length,
+              nullable: column?.nullable,
+            };
+          })
+        : [];
+
       return {
         rows: result.recordset || [],
         rowCount: result.rowsAffected?.[0] || result.recordset?.length || 0,
-        fields: result.recordset?.columns
-          ? Object.keys(result.recordset.columns).map((name) => ({
-              name,
-              type: result.recordset?.columns?.[name]?.type,
-              length: result.recordset?.columns?.[name]?.length,
-              nullable: result.recordset?.columns?.[name]?.nullable,
-            }))
-          : [],
+        fields,
       };
     } catch (error) {
       throw new Error(

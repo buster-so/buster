@@ -22,13 +22,19 @@ describe('MySQLAdapter Integration', () => {
   testWithCredentials(
     'should connect to MySQL database',
     async () => {
+      if (!testConfig.mysql.database || !testConfig.mysql.username || !testConfig.mysql.password) {
+        throw new Error(
+          'TEST_MYSQL_DATABASE, TEST_MYSQL_USERNAME, and TEST_MYSQL_PASSWORD are required for this test'
+        );
+      }
+
       const credentials: MySQLCredentials = {
         type: DataSourceType.MySQL,
         host: testConfig.mysql.host,
         port: testConfig.mysql.port,
-        database: testConfig.mysql.database!,
-        username: testConfig.mysql.username!,
-        password: testConfig.mysql.password!,
+        database: testConfig.mysql.database,
+        username: testConfig.mysql.username,
+        password: testConfig.mysql.password,
         ssl: testConfig.mysql.ssl,
       };
 
@@ -42,13 +48,19 @@ describe('MySQLAdapter Integration', () => {
   testWithCredentials(
     'should execute simple SELECT query',
     async () => {
+      if (!testConfig.mysql.database || !testConfig.mysql.username || !testConfig.mysql.password) {
+        throw new Error(
+          'TEST_MYSQL_DATABASE, TEST_MYSQL_USERNAME, and TEST_MYSQL_PASSWORD are required for this test'
+        );
+      }
+
       const credentials: MySQLCredentials = {
         type: DataSourceType.MySQL,
         host: testConfig.mysql.host,
         port: testConfig.mysql.port,
-        database: testConfig.mysql.database!,
-        username: testConfig.mysql.username!,
-        password: testConfig.mysql.password!,
+        database: testConfig.mysql.database,
+        username: testConfig.mysql.username,
+        password: testConfig.mysql.password,
         ssl: testConfig.mysql.ssl,
       };
 
@@ -66,13 +78,19 @@ describe('MySQLAdapter Integration', () => {
   testWithCredentials(
     'should execute parameterized query',
     async () => {
+      if (!testConfig.mysql.database || !testConfig.mysql.username || !testConfig.mysql.password) {
+        throw new Error(
+          'TEST_MYSQL_DATABASE, TEST_MYSQL_USERNAME, and TEST_MYSQL_PASSWORD are required for this test'
+        );
+      }
+
       const credentials: MySQLCredentials = {
         type: DataSourceType.MySQL,
         host: testConfig.mysql.host,
         port: testConfig.mysql.port,
-        database: testConfig.mysql.database!,
-        username: testConfig.mysql.username!,
-        password: testConfig.mysql.password!,
+        database: testConfig.mysql.database,
+        username: testConfig.mysql.username,
+        password: testConfig.mysql.password,
         ssl: testConfig.mysql.ssl,
       };
 
@@ -92,13 +110,19 @@ describe('MySQLAdapter Integration', () => {
   testWithCredentials(
     'should handle query errors gracefully',
     async () => {
+      if (!testConfig.mysql.database || !testConfig.mysql.username || !testConfig.mysql.password) {
+        throw new Error(
+          'TEST_MYSQL_DATABASE, TEST_MYSQL_USERNAME, and TEST_MYSQL_PASSWORD are required for this test'
+        );
+      }
+
       const credentials: MySQLCredentials = {
         type: DataSourceType.MySQL,
         host: testConfig.mysql.host,
         port: testConfig.mysql.port,
-        database: testConfig.mysql.database!,
-        username: testConfig.mysql.username!,
-        password: testConfig.mysql.password!,
+        database: testConfig.mysql.database,
+        username: testConfig.mysql.username,
+        password: testConfig.mysql.password,
         ssl: testConfig.mysql.ssl,
       };
 

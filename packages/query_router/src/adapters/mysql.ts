@@ -1,6 +1,7 @@
 import mysql from 'mysql2/promise';
 import { type Credentials, DataSourceType, type MySQLCredentials } from '../types/credentials';
-import { type AdapterQueryResult, BaseAdapter } from './base';
+import type { QueryParameter } from '../types/query';
+import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
 
 /**
  * MySQL database adapter
@@ -53,7 +54,7 @@ export class MySQLAdapter extends BaseAdapter {
     }
   }
 
-  async query(sql: string, params?: any[]): Promise<AdapterQueryResult> {
+  async query(sql: string, params?: QueryParameter[]): Promise<AdapterQueryResult> {
     this.ensureConnected();
 
     if (!this.connection) {
@@ -64,30 +65,34 @@ export class MySQLAdapter extends BaseAdapter {
       const [rows, fields] = await this.connection.execute(sql, params);
 
       // Handle different result types
-      let resultRows: any[] = [];
+      let resultRows: Record<string, unknown>[] = [];
       let rowCount = 0;
 
       if (Array.isArray(rows)) {
-        resultRows = rows;
+        resultRows = rows as Record<string, unknown>[];
         rowCount = rows.length;
       } else if (rows && typeof rows === 'object' && 'affectedRows' in rows) {
         // For INSERT, UPDATE, DELETE operations
-        rowCount = (rows as any).affectedRows || 0;
+        const resultSet = rows as mysql.ResultSetHeader;
+        rowCount = resultSet.affectedRows || 0;
         resultRows = [];
       }
+
+      const fieldMetadata: FieldMetadata[] = Array.isArray(fields)
+        ? fields.map((field) => ({
+            name: field.name,
+            type: `mysql_type_${field.type}`, // MySQL field type
+            nullable: typeof field.flags === 'number' ? (field.flags & 1) === 0 : true, // NOT_NULL flag is bit 0
+            length: typeof field.length === 'number' && field.length > 0 ? field.length : undefined,
+            precision:
+              typeof field.decimals === 'number' && field.decimals > 0 ? field.decimals : undefined,
+          }))
+        : [];
 
       return {
         rows: resultRows,
         rowCount,
-        fields: Array.isArray(fields)
-          ? fields.map((field) => ({
-              name: field.name,
-              type: field.type,
-              length: field.length,
-              flags: field.flags,
-              decimals: field.decimals,
-            }))
-          : [],
+        fields: fieldMetadata,
       };
     } catch (error) {
       throw new Error(

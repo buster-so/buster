@@ -1,6 +1,7 @@
-import { BigQuery } from '@google-cloud/bigquery';
+import { BigQuery, type BigQueryOptions, type Query } from '@google-cloud/bigquery';
 import { type BigQueryCredentials, type Credentials, DataSourceType } from '../types/credentials';
-import { type AdapterQueryResult, BaseAdapter } from './base';
+import type { QueryParameter } from '../types/query';
+import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
 
 /**
  * BigQuery database adapter
@@ -13,7 +14,7 @@ export class BigQueryAdapter extends BaseAdapter {
     const bigqueryCredentials = credentials as BigQueryCredentials;
 
     try {
-      const options: any = {
+      const options: BigQueryOptions = {
         projectId: bigqueryCredentials.project_id,
       };
 
@@ -45,7 +46,7 @@ export class BigQueryAdapter extends BaseAdapter {
     }
   }
 
-  async query(sql: string, params?: any[]): Promise<AdapterQueryResult> {
+  async query(sql: string, params?: QueryParameter[]): Promise<AdapterQueryResult> {
     this.ensureConnected();
 
     if (!this.client) {
@@ -53,7 +54,7 @@ export class BigQueryAdapter extends BaseAdapter {
     }
 
     try {
-      const options: any = {
+      const options: Query = {
         query: sql,
         useLegacySql: false,
       };
@@ -66,10 +67,16 @@ export class BigQueryAdapter extends BaseAdapter {
       const [job] = await this.client.createQueryJob(options);
       const [rows] = await job.getQueryResults();
 
+      // Convert BigQuery rows to plain objects
+      const resultRows: Record<string, unknown>[] = rows.map((row) => ({ ...row }));
+
+      // BigQuery doesn't provide detailed field metadata in the same way as other databases
+      const fields: FieldMetadata[] = [];
+
       return {
-        rows: rows.map((row: any) => ({ ...row })), // Convert BigQuery rows to plain objects
+        rows: resultRows,
         rowCount: rows.length,
-        fields: [], // BigQuery doesn't provide field metadata in the same way
+        fields,
       };
     } catch (error) {
       throw new Error(

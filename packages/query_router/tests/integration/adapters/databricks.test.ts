@@ -22,11 +22,21 @@ describe('DatabricksAdapter Integration', () => {
   testWithCredentials(
     'should connect to Databricks',
     async () => {
+      if (
+        !testConfig.databricks.server_hostname ||
+        !testConfig.databricks.http_path ||
+        !testConfig.databricks.access_token
+      ) {
+        throw new Error(
+          'TEST_DATABRICKS_SERVER_HOSTNAME, TEST_DATABRICKS_HTTP_PATH, and TEST_DATABRICKS_ACCESS_TOKEN are required for this test'
+        );
+      }
+
       const credentials: DatabricksCredentials = {
         type: DataSourceType.Databricks,
-        server_hostname: testConfig.databricks.server_hostname!,
-        http_path: testConfig.databricks.http_path!,
-        access_token: testConfig.databricks.access_token!,
+        server_hostname: testConfig.databricks.server_hostname,
+        http_path: testConfig.databricks.http_path,
+        access_token: testConfig.databricks.access_token,
         catalog: testConfig.databricks.catalog,
         schema: testConfig.databricks.schema,
       };
@@ -41,11 +51,21 @@ describe('DatabricksAdapter Integration', () => {
   testWithCredentials(
     'should execute simple SELECT query',
     async () => {
+      if (
+        !testConfig.databricks.server_hostname ||
+        !testConfig.databricks.http_path ||
+        !testConfig.databricks.access_token
+      ) {
+        throw new Error(
+          'TEST_DATABRICKS_SERVER_HOSTNAME, TEST_DATABRICKS_HTTP_PATH, and TEST_DATABRICKS_ACCESS_TOKEN are required for this test'
+        );
+      }
+
       const credentials: DatabricksCredentials = {
         type: DataSourceType.Databricks,
-        server_hostname: testConfig.databricks.server_hostname!,
-        http_path: testConfig.databricks.http_path!,
-        access_token: testConfig.databricks.access_token!,
+        server_hostname: testConfig.databricks.server_hostname,
+        http_path: testConfig.databricks.http_path,
+        access_token: testConfig.databricks.access_token,
         catalog: testConfig.databricks.catalog,
         schema: testConfig.databricks.schema,
       };
@@ -63,11 +83,21 @@ describe('DatabricksAdapter Integration', () => {
   testWithCredentials(
     'should execute query with parameters (note: limited support)',
     async () => {
+      if (
+        !testConfig.databricks.server_hostname ||
+        !testConfig.databricks.http_path ||
+        !testConfig.databricks.access_token
+      ) {
+        throw new Error(
+          'TEST_DATABRICKS_SERVER_HOSTNAME, TEST_DATABRICKS_HTTP_PATH, and TEST_DATABRICKS_ACCESS_TOKEN are required for this test'
+        );
+      }
+
       const credentials: DatabricksCredentials = {
         type: DataSourceType.Databricks,
-        server_hostname: testConfig.databricks.server_hostname!,
-        http_path: testConfig.databricks.http_path!,
-        access_token: testConfig.databricks.access_token!,
+        server_hostname: testConfig.databricks.server_hostname,
+        http_path: testConfig.databricks.http_path,
+        access_token: testConfig.databricks.access_token,
         catalog: testConfig.databricks.catalog,
         schema: testConfig.databricks.schema,
       };
@@ -90,11 +120,21 @@ describe('DatabricksAdapter Integration', () => {
   testWithCredentials(
     'should handle query errors gracefully',
     async () => {
+      if (
+        !testConfig.databricks.server_hostname ||
+        !testConfig.databricks.http_path ||
+        !testConfig.databricks.access_token
+      ) {
+        throw new Error(
+          'TEST_DATABRICKS_SERVER_HOSTNAME, TEST_DATABRICKS_HTTP_PATH, and TEST_DATABRICKS_ACCESS_TOKEN are required for this test'
+        );
+      }
+
       const credentials: DatabricksCredentials = {
         type: DataSourceType.Databricks,
-        server_hostname: testConfig.databricks.server_hostname!,
-        http_path: testConfig.databricks.http_path!,
-        access_token: testConfig.databricks.access_token!,
+        server_hostname: testConfig.databricks.server_hostname,
+        http_path: testConfig.databricks.http_path,
+        access_token: testConfig.databricks.access_token,
         catalog: testConfig.databricks.catalog,
         schema: testConfig.databricks.schema,
       };

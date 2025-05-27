@@ -1,6 +1,7 @@
-import { Client } from 'pg';
+import { Client, type ClientConfig } from 'pg';
 import { type Credentials, DataSourceType, type PostgreSQLCredentials } from '../types/credentials';
-import { type AdapterQueryResult, BaseAdapter } from './base';
+import type { QueryParameter } from '../types/query';
+import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
 
 /**
  * PostgreSQL database adapter
@@ -13,7 +14,7 @@ export class PostgreSQLAdapter extends BaseAdapter {
     const pgCredentials = credentials as PostgreSQLCredentials;
 
     try {
-      const config: any = {
+      const config: ClientConfig = {
         host: pgCredentials.host,
         port: pgCredentials.port || 5432,
         database: pgCredentials.database,
@@ -48,7 +49,7 @@ export class PostgreSQLAdapter extends BaseAdapter {
     }
   }
 
-  async query(sql: string, params?: any[]): Promise<AdapterQueryResult> {
+  async query(sql: string, params?: QueryParameter[]): Promise<AdapterQueryResult> {
     this.ensureConnected();
 
     if (!this.client) {
@@ -58,17 +59,18 @@ export class PostgreSQLAdapter extends BaseAdapter {
     try {
       const result = await this.client.query(sql, params);
 
+      const fields: FieldMetadata[] =
+        result.fields?.map((field) => ({
+          name: field.name,
+          type: `pg_type_${field.dataTypeID}`, // PostgreSQL type ID
+          nullable: true, // PostgreSQL doesn't provide this info directly
+          length: field.dataTypeSize > 0 ? field.dataTypeSize : undefined,
+        })) || [];
+
       return {
         rows: result.rows,
         rowCount: result.rowCount || 0,
-        fields:
-          result.fields?.map((field) => ({
-            name: field.name,
-            dataTypeID: field.dataTypeID,
-            dataTypeSize: field.dataTypeSize,
-            dataTypeModifier: field.dataTypeModifier,
-            format: field.format,
-          })) || [],
+        fields,
       };
     } catch (error) {
       throw new Error(

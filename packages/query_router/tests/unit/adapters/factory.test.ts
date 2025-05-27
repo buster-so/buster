@@ -3,6 +3,7 @@ import { createAdapter, getSupportedTypes, isSupported } from '../../../src/adap
 import { DataSourceType } from '../../../src/types/credentials';
 import type {
   BigQueryCredentials,
+  Credentials,
   DatabricksCredentials,
   MySQLCredentials,
   PostgreSQLCredentials,
@@ -10,6 +11,15 @@ import type {
   SQLServerCredentials,
   SnowflakeCredentials,
 } from '../../../src/types/credentials';
+
+// Type for testing unsupported data source types
+type UnsupportedCredentials = {
+  type: 'unsupported';
+  host: string;
+  database: string;
+  username: string;
+  password: string;
+};
 
 describe('Adapter Factory', () => {
   describe('createAdapter', () => {
@@ -107,15 +117,15 @@ describe('Adapter Factory', () => {
     });
 
     it('should throw error for unsupported data source type', async () => {
-      const credentials = {
-        type: 'unsupported' as any,
+      const credentials: UnsupportedCredentials = {
+        type: 'unsupported',
         host: 'localhost',
         database: 'test',
         username: 'user',
         password: 'pass',
       };
 
-      await expect(createAdapter(credentials)).rejects.toThrow(
+      await expect(createAdapter(credentials as unknown as Credentials)).rejects.toThrow(
         'Unsupported data source type: unsupported'
       );
     });
@@ -147,7 +157,7 @@ describe('Adapter Factory', () => {
     });
 
     it('should return false for unsupported data source types', () => {
-      expect(isSupported('unsupported' as any)).toBe(false);
+      expect(isSupported('unsupported' as unknown as DataSourceType)).toBe(false);
     });
   });
 });

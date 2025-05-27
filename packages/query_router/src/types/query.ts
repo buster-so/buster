@@ -6,7 +6,7 @@ export interface QueryRequest {
   sql: string;
 
   /** Query parameters for parameterized queries */
-  params?: any[];
+  params?: QueryParameter[];
 
   /** Optional warehouse name to route the query to */
   warehouse?: string;
@@ -14,6 +14,11 @@ export interface QueryRequest {
   /** Query execution options */
   options?: QueryOptions;
 }
+
+/**
+ * Query parameter type for parameterized queries
+ */
+export type QueryParameter = string | number | boolean | null | Date | Buffer;
 
 /**
  * Query execution options
@@ -28,14 +33,14 @@ export interface QueryOptions {
   /** Whether to stream results */
   stream?: boolean;
 
-  /** Additional query-specific options */
-  [key: string]: any;
+  /** Additional query-specific options - use specific types when possible */
+  [key: string]: string | number | boolean | undefined;
 }
 
 /**
  * Query execution result
  */
-export interface QueryResult<T = any> {
+export interface QueryResult<T = Record<string, unknown>> {
   /** Query execution success status */
   success: boolean;
 
@@ -58,7 +63,7 @@ export interface QueryResult<T = any> {
   error?: QueryError;
 
   /** Additional metadata */
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -101,7 +106,7 @@ export interface QueryError {
   stack?: string;
 
   /** Additional error details */
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 /**

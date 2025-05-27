@@ -43,8 +43,11 @@ export async function createAdapter(credentials: Credentials): Promise<DatabaseA
       adapter = new DatabricksAdapter();
       break;
 
-    default:
-      throw new Error(`Unsupported data source type: ${(credentials as any).type}`);
+    default: {
+      // Use never type for exhaustive checking
+      const exhaustiveCheck: never = credentials;
+      throw new Error(`Unsupported data source type: ${(exhaustiveCheck as Credentials).type}`);
+    }
   }
 
   // Initialize the adapter with credentials

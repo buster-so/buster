@@ -22,13 +22,24 @@ describe('RedshiftAdapter Integration', () => {
   testWithCredentials(
     'should connect to Redshift database',
     async () => {
+      if (
+        !testConfig.redshift.host ||
+        !testConfig.redshift.database ||
+        !testConfig.redshift.username ||
+        !testConfig.redshift.password
+      ) {
+        throw new Error(
+          'TEST_REDSHIFT_HOST, TEST_REDSHIFT_DATABASE, TEST_REDSHIFT_USERNAME, and TEST_REDSHIFT_PASSWORD are required for this test'
+        );
+      }
+
       const credentials: RedshiftCredentials = {
         type: DataSourceType.Redshift,
-        host: testConfig.redshift.host!,
+        host: testConfig.redshift.host,
         port: testConfig.redshift.port,
-        database: testConfig.redshift.database!,
-        username: testConfig.redshift.username!,
-        password: testConfig.redshift.password!,
+        database: testConfig.redshift.database,
+        username: testConfig.redshift.username,
+        password: testConfig.redshift.password,
         schema: testConfig.redshift.schema,
         cluster_identifier: testConfig.redshift.cluster_identifier,
       };
@@ -43,13 +54,24 @@ describe('RedshiftAdapter Integration', () => {
   testWithCredentials(
     'should execute simple SELECT query',
     async () => {
+      if (
+        !testConfig.redshift.host ||
+        !testConfig.redshift.database ||
+        !testConfig.redshift.username ||
+        !testConfig.redshift.password
+      ) {
+        throw new Error(
+          'TEST_REDSHIFT_HOST, TEST_REDSHIFT_DATABASE, TEST_REDSHIFT_USERNAME, and TEST_REDSHIFT_PASSWORD are required for this test'
+        );
+      }
+
       const credentials: RedshiftCredentials = {
         type: DataSourceType.Redshift,
-        host: testConfig.redshift.host!,
+        host: testConfig.redshift.host,
         port: testConfig.redshift.port,
-        database: testConfig.redshift.database!,
-        username: testConfig.redshift.username!,
-        password: testConfig.redshift.password!,
+        database: testConfig.redshift.database,
+        username: testConfig.redshift.username,
+        password: testConfig.redshift.password,
         schema: testConfig.redshift.schema,
         cluster_identifier: testConfig.redshift.cluster_identifier,
       };
@@ -68,13 +90,24 @@ describe('RedshiftAdapter Integration', () => {
   testWithCredentials(
     'should execute parameterized query',
     async () => {
+      if (
+        !testConfig.redshift.host ||
+        !testConfig.redshift.database ||
+        !testConfig.redshift.username ||
+        !testConfig.redshift.password
+      ) {
+        throw new Error(
+          'TEST_REDSHIFT_HOST, TEST_REDSHIFT_DATABASE, TEST_REDSHIFT_USERNAME, and TEST_REDSHIFT_PASSWORD are required for this test'
+        );
+      }
+
       const credentials: RedshiftCredentials = {
         type: DataSourceType.Redshift,
-        host: testConfig.redshift.host!,
+        host: testConfig.redshift.host,
         port: testConfig.redshift.port,
-        database: testConfig.redshift.database!,
-        username: testConfig.redshift.username!,
-        password: testConfig.redshift.password!,
+        database: testConfig.redshift.database,
+        username: testConfig.redshift.username,
+        password: testConfig.redshift.password,
         schema: testConfig.redshift.schema,
         cluster_identifier: testConfig.redshift.cluster_identifier,
       };
@@ -95,13 +128,24 @@ describe('RedshiftAdapter Integration', () => {
   testWithCredentials(
     'should handle query errors gracefully',
     async () => {
+      if (
+        !testConfig.redshift.host ||
+        !testConfig.redshift.database ||
+        !testConfig.redshift.username ||
+        !testConfig.redshift.password
+      ) {
+        throw new Error(
+          'TEST_REDSHIFT_HOST, TEST_REDSHIFT_DATABASE, TEST_REDSHIFT_USERNAME, and TEST_REDSHIFT_PASSWORD are required for this test'
+        );
+      }
+
       const credentials: RedshiftCredentials = {
         type: DataSourceType.Redshift,
-        host: testConfig.redshift.host!,
+        host: testConfig.redshift.host,
         port: testConfig.redshift.port,
-        database: testConfig.redshift.database!,
-        username: testConfig.redshift.username!,
-        password: testConfig.redshift.password!,
+        database: testConfig.redshift.database,
+        username: testConfig.redshift.username,
+        password: testConfig.redshift.password,
         schema: testConfig.redshift.schema,
         cluster_identifier: testConfig.redshift.cluster_identifier,
       };

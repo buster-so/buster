@@ -5,6 +5,49 @@ import { DataSourceType } from '../../src/types/credentials';
 import type { MySQLCredentials, PostgreSQLCredentials } from '../../src/types/credentials';
 import { TEST_TIMEOUT, hasCredentials, testConfig } from '../setup';
 
+// Helper function to create PostgreSQL credentials with proper validation
+function createPostgreSQLCredentials(): PostgreSQLCredentials {
+  if (
+    !testConfig.postgresql.database ||
+    !testConfig.postgresql.username ||
+    !testConfig.postgresql.password
+  ) {
+    throw new Error(
+      'TEST_POSTGRES_DATABASE, TEST_POSTGRES_USERNAME, and TEST_POSTGRES_PASSWORD are required for this test'
+    );
+  }
+
+  return {
+    type: DataSourceType.PostgreSQL,
+    host: testConfig.postgresql.host,
+    port: testConfig.postgresql.port,
+    database: testConfig.postgresql.database,
+    username: testConfig.postgresql.username,
+    password: testConfig.postgresql.password,
+    schema: testConfig.postgresql.schema,
+    ssl: testConfig.postgresql.ssl,
+  };
+}
+
+// Helper function to create MySQL credentials with proper validation
+function createMySQLCredentials(): MySQLCredentials {
+  if (!testConfig.mysql.database || !testConfig.mysql.username || !testConfig.mysql.password) {
+    throw new Error(
+      'TEST_MYSQL_DATABASE, TEST_MYSQL_USERNAME, and TEST_MYSQL_PASSWORD are required for this test'
+    );
+  }
+
+  return {
+    type: DataSourceType.MySQL,
+    host: testConfig.mysql.host,
+    port: testConfig.mysql.port,
+    database: testConfig.mysql.database,
+    username: testConfig.mysql.username,
+    password: testConfig.mysql.password,
+    ssl: testConfig.mysql.ssl,
+  };
+}
+
 describe('QueryRouter Integration', () => {
   let router: QueryRouter;
 
@@ -24,16 +67,7 @@ describe('QueryRouter Integration', () => {
         {
           name: 'test-postgres',
           type: DataSourceType.PostgreSQL,
-          credentials: {
-            type: DataSourceType.PostgreSQL,
-            host: testConfig.postgresql.host,
-            port: testConfig.postgresql.port,
-            database: testConfig.postgresql.database!,
-            username: testConfig.postgresql.username!,
-            password: testConfig.postgresql.password!,
-            schema: testConfig.postgresql.schema,
-            ssl: testConfig.postgresql.ssl,
-          } as PostgreSQLCredentials,
+          credentials: createPostgreSQLCredentials(),
         },
       ];
 
@@ -54,16 +88,7 @@ describe('QueryRouter Integration', () => {
           {
             name: 'test-postgres',
             type: DataSourceType.PostgreSQL,
-            credentials: {
-              type: DataSourceType.PostgreSQL,
-              host: testConfig.postgresql.host,
-              port: testConfig.postgresql.port,
-              database: testConfig.postgresql.database!,
-              username: testConfig.postgresql.username!,
-              password: testConfig.postgresql.password!,
-              schema: testConfig.postgresql.schema,
-              ssl: testConfig.postgresql.ssl,
-            } as PostgreSQLCredentials,
+            credentials: createPostgreSQLCredentials(),
           },
         ];
 
@@ -90,16 +115,7 @@ describe('QueryRouter Integration', () => {
         dataSources.push({
           name: 'test-postgres',
           type: DataSourceType.PostgreSQL,
-          credentials: {
-            type: DataSourceType.PostgreSQL,
-            host: testConfig.postgresql.host,
-            port: testConfig.postgresql.port,
-            database: testConfig.postgresql.database!,
-            username: testConfig.postgresql.username!,
-            password: testConfig.postgresql.password!,
-            schema: testConfig.postgresql.schema,
-            ssl: testConfig.postgresql.ssl,
-          } as PostgreSQLCredentials,
+          credentials: createPostgreSQLCredentials(),
         });
       }
 
@@ -107,15 +123,7 @@ describe('QueryRouter Integration', () => {
         dataSources.push({
           name: 'test-mysql',
           type: DataSourceType.MySQL,
-          credentials: {
-            type: DataSourceType.MySQL,
-            host: testConfig.mysql.host,
-            port: testConfig.mysql.port,
-            database: testConfig.mysql.database!,
-            username: testConfig.mysql.username!,
-            password: testConfig.mysql.password!,
-            ssl: testConfig.mysql.ssl,
-          } as MySQLCredentials,
+          credentials: createMySQLCredentials(),
         });
       }
 
@@ -123,9 +131,14 @@ describe('QueryRouter Integration', () => {
         return; // Skip if no credentials available
       }
 
+      const firstDataSource = dataSources[0];
+      if (!firstDataSource) {
+        throw new Error('Expected at least one data source');
+      }
+
       router = new QueryRouter({
         dataSources,
-        defaultDataSource: dataSources[0]!.name,
+        defaultDataSource: firstDataSource.name,
       });
 
       const dataSourceNames = router.getDataSources();
@@ -143,16 +156,7 @@ describe('QueryRouter Integration', () => {
           {
             name: 'test-postgres',
             type: DataSourceType.PostgreSQL,
-            credentials: {
-              type: DataSourceType.PostgreSQL,
-              host: testConfig.postgresql.host,
-              port: testConfig.postgresql.port,
-              database: testConfig.postgresql.database!,
-              username: testConfig.postgresql.username!,
-              password: testConfig.postgresql.password!,
-              schema: testConfig.postgresql.schema,
-              ssl: testConfig.postgresql.ssl,
-            } as PostgreSQLCredentials,
+            credentials: createPostgreSQLCredentials(),
           },
         ];
 
@@ -183,16 +187,7 @@ describe('QueryRouter Integration', () => {
         await router.addDataSource({
           name: 'dynamic-postgres',
           type: DataSourceType.PostgreSQL,
-          credentials: {
-            type: DataSourceType.PostgreSQL,
-            host: testConfig.postgresql.host,
-            port: testConfig.postgresql.port,
-            database: testConfig.postgresql.database!,
-            username: testConfig.postgresql.username!,
-            password: testConfig.postgresql.password!,
-            schema: testConfig.postgresql.schema,
-            ssl: testConfig.postgresql.ssl,
-          } as PostgreSQLCredentials,
+          credentials: createPostgreSQLCredentials(),
         });
 
         const dataSourceNames = router.getDataSources();
@@ -210,16 +205,7 @@ describe('QueryRouter Integration', () => {
         {
           name: 'test-postgres',
           type: DataSourceType.PostgreSQL,
-          credentials: {
-            type: DataSourceType.PostgreSQL,
-            host: testConfig.postgresql.host,
-            port: testConfig.postgresql.port,
-            database: testConfig.postgresql.database!,
-            username: testConfig.postgresql.username!,
-            password: testConfig.postgresql.password!,
-            schema: testConfig.postgresql.schema,
-            ssl: testConfig.postgresql.ssl,
-          } as PostgreSQLCredentials,
+          credentials: createPostgreSQLCredentials(),
         },
       ];
 
@@ -243,16 +229,7 @@ describe('QueryRouter Integration', () => {
           {
             name: 'test-postgres',
             type: DataSourceType.PostgreSQL,
-            credentials: {
-              type: DataSourceType.PostgreSQL,
-              host: testConfig.postgresql.host,
-              port: testConfig.postgresql.port,
-              database: testConfig.postgresql.database!,
-              username: testConfig.postgresql.username!,
-              password: testConfig.postgresql.password!,
-              schema: testConfig.postgresql.schema,
-              ssl: testConfig.postgresql.ssl,
-            } as PostgreSQLCredentials,
+            credentials: createPostgreSQLCredentials(),
           },
         ];
 
@@ -279,16 +256,7 @@ describe('QueryRouter Integration', () => {
           {
             name: 'test-postgres',
             type: DataSourceType.PostgreSQL,
-            credentials: {
-              type: DataSourceType.PostgreSQL,
-              host: testConfig.postgresql.host,
-              port: testConfig.postgresql.port,
-              database: testConfig.postgresql.database!,
-              username: testConfig.postgresql.username!,
-              password: testConfig.postgresql.password!,
-              schema: testConfig.postgresql.schema,
-              ssl: testConfig.postgresql.ssl,
-            } as PostgreSQLCredentials,
+            credentials: createPostgreSQLCredentials(),
           },
         ];
 

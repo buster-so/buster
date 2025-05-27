@@ -1,13 +1,16 @@
 import { DBSQLClient } from '@databricks/sql';
+import type IDBSQLSession from '@databricks/sql/dist/contracts/IDBSQLSession';
+import type IOperation from '@databricks/sql/dist/contracts/IOperation';
 import { type Credentials, DataSourceType, type DatabricksCredentials } from '../types/credentials';
-import { type AdapterQueryResult, BaseAdapter } from './base';
+import type { QueryParameter } from '../types/query';
+import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
 
 /**
  * Databricks database adapter
  */
 export class DatabricksAdapter extends BaseAdapter {
   private client?: DBSQLClient;
-  private session?: any;
+  private session?: IDBSQLSession;
 
   async initialize(credentials: Credentials): Promise<void> {
     this.validateCredentials(credentials, DataSourceType.Databricks);
@@ -37,7 +40,7 @@ export class DatabricksAdapter extends BaseAdapter {
     }
   }
 
-  async query(sql: string, params?: any[]): Promise<AdapterQueryResult> {
+  async query(sql: string, params?: QueryParameter[]): Promise<AdapterQueryResult> {
     this.ensureConnected();
 
     if (!this.session) {
@@ -53,7 +56,7 @@ export class DatabricksAdapter extends BaseAdapter {
         );
       }
 
-      const queryOperation = await this.session.executeStatement(sql, {
+      const queryOperation: IOperation = await this.session.executeStatement(sql, {
         runAsync: true,
         maxRows: 10000, // Enable direct results feature
       });
@@ -61,10 +64,16 @@ export class DatabricksAdapter extends BaseAdapter {
       const result = await queryOperation.fetchAll();
       await queryOperation.close();
 
+      // Convert result to proper format
+      const resultRows: Record<string, unknown>[] = (result || []) as Record<string, unknown>[];
+
+      // Databricks doesn't provide detailed field metadata in the same format
+      const fields: FieldMetadata[] = [];
+
       return {
-        rows: result || [],
-        rowCount: result?.length || 0,
-        fields: [], // Databricks doesn't provide field metadata in the same format
+        rows: resultRows,
+        rowCount: resultRows.length,
+        fields,
       };
     } catch (error) {
       throw new Error(
@@ -80,7 +89,7 @@ export class DatabricksAdapter extends BaseAdapter {
       }
 
       // Test connection by running a simple query
-      const queryOperation = await this.session.executeStatement('SELECT 1 as test', {
+      const queryOperation: IOperation = await this.session.executeStatement('SELECT 1 as test', {
         runAsync: true,
         maxRows: 1,
       });

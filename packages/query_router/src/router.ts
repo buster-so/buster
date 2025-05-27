@@ -17,7 +17,7 @@ export interface DataSourceConfig {
   credentials: Credentials;
 
   /** Additional configuration options */
-  config?: Record<string, any>;
+  config?: Record<string, unknown>;
 }
 
 /**
@@ -64,8 +64,9 @@ export class QueryRouter {
    * Get or create adapter for a data source
    */
   private async getAdapter(dataSourceName: string): Promise<DatabaseAdapter> {
-    if (this.adapters.has(dataSourceName)) {
-      return this.adapters.get(dataSourceName)!;
+    const existingAdapter = this.adapters.get(dataSourceName);
+    if (existingAdapter) {
+      return existingAdapter;
     }
 
     const dataSource = this.dataSources.get(dataSourceName);
@@ -87,7 +88,7 @@ export class QueryRouter {
   /**
    * Execute a query on the specified data source
    */
-  async execute<T = any>(request: QueryRequest): Promise<QueryResult<T>> {
+  async execute<T = Record<string, unknown>>(request: QueryRequest): Promise<QueryResult<T>> {
     const dataSourceName = this.resolveDataSource(request);
     const adapter = await this.getAdapter(dataSourceName);
 
@@ -147,7 +148,11 @@ export class QueryRouter {
 
     // If only one data source is configured, use it
     if (this.dataSources.size === 1) {
-      return Array.from(this.dataSources.keys())[0]!;
+      const firstKey = Array.from(this.dataSources.keys())[0];
+      if (!firstKey) {
+        throw new Error('No data sources configured');
+      }
+      return firstKey;
     }
 
     // No data source specified and no default configured

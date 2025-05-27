@@ -1,17 +1,36 @@
 import type { Credentials } from '../types/credentials';
+import type { QueryParameter } from '../types/query';
+
+/**
+ * Field/column metadata for query results
+ */
+export interface FieldMetadata {
+  /** Field name */
+  name: string;
+  /** Field data type */
+  type: string;
+  /** Whether field allows null values */
+  nullable?: boolean;
+  /** Field length (for string types) */
+  length?: number;
+  /** Field precision (for numeric types) */
+  precision?: number;
+  /** Field scale (for numeric types) */
+  scale?: number;
+}
 
 /**
  * Simplified query result for adapters
  */
 export interface AdapterQueryResult {
   /** Result rows */
-  rows: any[];
+  rows: Record<string, unknown>[];
 
   /** Number of rows returned or affected */
   rowCount: number;
 
   /** Field/column metadata */
-  fields: any[];
+  fields: FieldMetadata[];
 }
 
 /**
@@ -26,7 +45,7 @@ export interface DatabaseAdapter {
   /**
    * Execute a SQL query
    */
-  query(sql: string, params?: any[]): Promise<AdapterQueryResult>;
+  query(sql: string, params?: QueryParameter[]): Promise<AdapterQueryResult>;
 
   /**
    * Test the connection to the database
@@ -52,7 +71,7 @@ export abstract class BaseAdapter implements DatabaseAdapter {
   protected connected = false;
 
   abstract initialize(credentials: Credentials): Promise<void>;
-  abstract query(sql: string, params?: any[]): Promise<AdapterQueryResult>;
+  abstract query(sql: string, params?: QueryParameter[]): Promise<AdapterQueryResult>;
   abstract testConnection(): Promise<boolean>;
   abstract close(): Promise<void>;
   abstract getDataSourceType(): string;

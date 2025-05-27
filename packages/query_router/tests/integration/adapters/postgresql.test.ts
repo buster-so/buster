@@ -22,13 +22,23 @@ describe('PostgreSQLAdapter Integration', () => {
   testWithCredentials(
     'should connect to PostgreSQL database',
     async () => {
+      if (
+        !testConfig.postgresql.database ||
+        !testConfig.postgresql.username ||
+        !testConfig.postgresql.password
+      ) {
+        throw new Error(
+          'TEST_POSTGRES_DATABASE, TEST_POSTGRES_USERNAME, and TEST_POSTGRES_PASSWORD are required for this test'
+        );
+      }
+
       const credentials: PostgreSQLCredentials = {
         type: DataSourceType.PostgreSQL,
         host: testConfig.postgresql.host,
         port: testConfig.postgresql.port,
-        database: testConfig.postgresql.database!,
-        username: testConfig.postgresql.username!,
-        password: testConfig.postgresql.password!,
+        database: testConfig.postgresql.database,
+        username: testConfig.postgresql.username,
+        password: testConfig.postgresql.password,
         schema: testConfig.postgresql.schema,
         ssl: testConfig.postgresql.ssl,
       };
@@ -43,13 +53,23 @@ describe('PostgreSQLAdapter Integration', () => {
   testWithCredentials(
     'should execute simple SELECT query',
     async () => {
+      if (
+        !testConfig.postgresql.database ||
+        !testConfig.postgresql.username ||
+        !testConfig.postgresql.password
+      ) {
+        throw new Error(
+          'TEST_POSTGRES_DATABASE, TEST_POSTGRES_USERNAME, and TEST_POSTGRES_PASSWORD are required for this test'
+        );
+      }
+
       const credentials: PostgreSQLCredentials = {
         type: DataSourceType.PostgreSQL,
         host: testConfig.postgresql.host,
         port: testConfig.postgresql.port,
-        database: testConfig.postgresql.database!,
-        username: testConfig.postgresql.username!,
-        password: testConfig.postgresql.password!,
+        database: testConfig.postgresql.database,
+        username: testConfig.postgresql.username,
+        password: testConfig.postgresql.password,
         schema: testConfig.postgresql.schema,
         ssl: testConfig.postgresql.ssl,
       };
@@ -68,13 +88,23 @@ describe('PostgreSQLAdapter Integration', () => {
   testWithCredentials(
     'should execute parameterized query',
     async () => {
+      if (
+        !testConfig.postgresql.database ||
+        !testConfig.postgresql.username ||
+        !testConfig.postgresql.password
+      ) {
+        throw new Error(
+          'TEST_POSTGRES_DATABASE, TEST_POSTGRES_USERNAME, and TEST_POSTGRES_PASSWORD are required for this test'
+        );
+      }
+
       const credentials: PostgreSQLCredentials = {
         type: DataSourceType.PostgreSQL,
         host: testConfig.postgresql.host,
         port: testConfig.postgresql.port,
-        database: testConfig.postgresql.database!,
-        username: testConfig.postgresql.username!,
-        password: testConfig.postgresql.password!,
+        database: testConfig.postgresql.database,
+        username: testConfig.postgresql.username,
+        password: testConfig.postgresql.password,
         schema: testConfig.postgresql.schema,
         ssl: testConfig.postgresql.ssl,
       };
@@ -95,13 +125,23 @@ describe('PostgreSQLAdapter Integration', () => {
   testWithCredentials(
     'should handle query errors gracefully',
     async () => {
+      if (
+        !testConfig.postgresql.database ||
+        !testConfig.postgresql.username ||
+        !testConfig.postgresql.password
+      ) {
+        throw new Error(
+          'TEST_POSTGRES_DATABASE, TEST_POSTGRES_USERNAME, and TEST_POSTGRES_PASSWORD are required for this test'
+        );
+      }
+
       const credentials: PostgreSQLCredentials = {
         type: DataSourceType.PostgreSQL,
         host: testConfig.postgresql.host,
         port: testConfig.postgresql.port,
-        database: testConfig.postgresql.database!,
-        username: testConfig.postgresql.username!,
-        password: testConfig.postgresql.password!,
+        database: testConfig.postgresql.database,
+        username: testConfig.postgresql.username,
+        password: testConfig.postgresql.password,
         schema: testConfig.postgresql.schema,
         ssl: testConfig.postgresql.ssl,
       };

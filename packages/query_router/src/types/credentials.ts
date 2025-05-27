@@ -331,7 +331,7 @@ export interface SnowflakeConnectionConfig extends SnowflakeCredentials {
   validateDefaultParameters?: boolean;
 
   /** Additional connection options */
-  options?: Record<string, any>;
+  options?: Record<string, unknown>;
 }
 
 /**
@@ -341,5 +341,5 @@ export interface WarehouseConfig {
   name: string;
   type: DataSourceType;
   credentials: Credentials;
-  config?: Record<string, any>;
+  config?: Record<string, unknown>;
 }

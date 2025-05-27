@@ -2,7 +2,11 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { BaseAdapter } from '../../../src/adapters/base';
 import type { AdapterQueryResult } from '../../../src/adapters/base';
 import { DataSourceType } from '../../../src/types/credentials';
-import type { Credentials, PostgreSQLCredentials } from '../../../src/types/credentials';
+import type {
+  Credentials,
+  MySQLCredentials,
+  PostgreSQLCredentials,
+} from '../../../src/types/credentials';
 
 // Mock implementation of BaseAdapter for testing
 class MockAdapter extends BaseAdapter {
@@ -12,7 +16,7 @@ class MockAdapter extends BaseAdapter {
     this.connected = true;
   }
 
-  async query(_sql: string, _params?: any[]): Promise<AdapterQueryResult> {
+  async query(_sql: string, _params?: unknown[]): Promise<AdapterQueryResult> {
     this.ensureConnected();
     return {
       rows: [{ test: 1 }],
@@ -71,7 +75,7 @@ describe('BaseAdapter', () => {
     });
 
     it('should throw error with invalid credentials type', async () => {
-      const credentials = {
+      const credentials: MySQLCredentials = {
         type: DataSourceType.MySQL,
         host: 'localhost',
         port: 3306,
@@ -80,7 +84,7 @@ describe('BaseAdapter', () => {
         password: 'pass',
       };
 
-      await expect(adapter.initialize(credentials as any)).rejects.toThrow(
+      await expect(adapter.initialize(credentials)).rejects.toThrow(
         'Invalid credentials type. Expected postgresql, got mysql'
       );
     });

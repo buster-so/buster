@@ -1,6 +1,7 @@
-import { Client } from 'pg';
+import { Client, type ClientConfig } from 'pg';
 import { type Credentials, DataSourceType, type RedshiftCredentials } from '../types/credentials';
-import { type AdapterQueryResult, BaseAdapter } from './base';
+import type { QueryParameter } from '../types/query';
+import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
 
 /**
  * Redshift database adapter (PostgreSQL-compatible)
@@ -13,7 +14,7 @@ export class RedshiftAdapter extends BaseAdapter {
     const redshiftCredentials = credentials as RedshiftCredentials;
 
     try {
-      const config: any = {
+      const config: ClientConfig = {
         host: redshiftCredentials.host,
         port: redshiftCredentials.port || 5439, // Default Redshift port
         database: redshiftCredentials.database,
@@ -44,7 +45,7 @@ export class RedshiftAdapter extends BaseAdapter {
     }
   }
 
-  async query(sql: string, params?: any[]): Promise<AdapterQueryResult> {
+  async query(sql: string, params?: QueryParameter[]): Promise<AdapterQueryResult> {
     this.ensureConnected();
 
     if (!this.client) {
@@ -54,17 +55,18 @@ export class RedshiftAdapter extends BaseAdapter {
     try {
       const result = await this.client.query(sql, params);
 
+      const fields: FieldMetadata[] =
+        result.fields?.map((field) => ({
+          name: field.name,
+          type: `redshift_type_${field.dataTypeID}`, // Redshift type ID
+          nullable: true, // Redshift doesn't provide this info directly
+          length: field.dataTypeSize > 0 ? field.dataTypeSize : undefined,
+        })) || [];
+
       return {
         rows: result.rows,
         rowCount: result.rowCount || 0,
-        fields:
-          result.fields?.map((field) => ({
-            name: field.name,
-            dataTypeID: field.dataTypeID,
-            dataTypeSize: field.dataTypeSize,
-            dataTypeModifier: field.dataTypeModifier,
-            format: field.format,
-          })) || [],
+        fields,
       };
     } catch (error) {
       throw new Error(

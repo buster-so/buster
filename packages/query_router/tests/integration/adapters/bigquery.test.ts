@@ -22,9 +22,13 @@ describe('BigQueryAdapter Integration', () => {
   testWithCredentials(
     'should connect to BigQuery',
     async () => {
+      if (!testConfig.bigquery.project_id) {
+        throw new Error('TEST_BIGQUERY_PROJECT_ID is required for this test');
+      }
+
       const credentials: BigQueryCredentials = {
         type: DataSourceType.BigQuery,
-        project_id: testConfig.bigquery.project_id!,
+        project_id: testConfig.bigquery.project_id,
         service_account_key: testConfig.bigquery.service_account_key,
         key_file_path: testConfig.bigquery.key_file_path,
         default_dataset: testConfig.bigquery.default_dataset,
@@ -41,9 +45,13 @@ describe('BigQueryAdapter Integration', () => {
   testWithCredentials(
     'should execute simple SELECT query',
     async () => {
+      if (!testConfig.bigquery.project_id) {
+        throw new Error('TEST_BIGQUERY_PROJECT_ID is required for this test');
+      }
+
       const credentials: BigQueryCredentials = {
         type: DataSourceType.BigQuery,
-        project_id: testConfig.bigquery.project_id!,
+        project_id: testConfig.bigquery.project_id,
         service_account_key: testConfig.bigquery.service_account_key,
         key_file_path: testConfig.bigquery.key_file_path,
         default_dataset: testConfig.bigquery.default_dataset,
@@ -63,9 +71,13 @@ describe('BigQueryAdapter Integration', () => {
   testWithCredentials(
     'should execute parameterized query',
     async () => {
+      if (!testConfig.bigquery.project_id) {
+        throw new Error('TEST_BIGQUERY_PROJECT_ID is required for this test');
+      }
+
       const credentials: BigQueryCredentials = {
         type: DataSourceType.BigQuery,
-        project_id: testConfig.bigquery.project_id!,
+        project_id: testConfig.bigquery.project_id,
         service_account_key: testConfig.bigquery.service_account_key,
         key_file_path: testConfig.bigquery.key_file_path,
         default_dataset: testConfig.bigquery.default_dataset,
@@ -88,9 +100,13 @@ describe('BigQueryAdapter Integration', () => {
   testWithCredentials(
     'should handle query errors gracefully',
     async () => {
+      if (!testConfig.bigquery.project_id) {
+        throw new Error('TEST_BIGQUERY_PROJECT_ID is required for this test');
+      }
+
       const credentials: BigQueryCredentials = {
         type: DataSourceType.BigQuery,
-        project_id: testConfig.bigquery.project_id!,
+        project_id: testConfig.bigquery.project_id,
         service_account_key: testConfig.bigquery.service_account_key,
         key_file_path: testConfig.bigquery.key_file_path,
         default_dataset: testConfig.bigquery.default_dataset,

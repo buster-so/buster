@@ -1,6 +1,7 @@
 import snowflake from 'snowflake-sdk';
 import { type Credentials, DataSourceType, type SnowflakeCredentials } from '../types/credentials';
-import { type AdapterQueryResult, BaseAdapter } from './base';
+import type { QueryParameter } from '../types/query';
+import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
 
 /**
  * Snowflake database adapter
@@ -34,7 +35,11 @@ export class SnowflakeAdapter extends BaseAdapter {
 
       // Connect to Snowflake
       await new Promise<void>((resolve, reject) => {
-        this.connection!.connect((err) => {
+        if (!this.connection) {
+          reject(new Error('Failed to create Snowflake connection'));
+          return;
+        }
+        this.connection.connect((err) => {
           if (err) {
             reject(new Error(`Failed to connect to Snowflake: ${err.message}`));
           } else {
@@ -52,7 +57,7 @@ export class SnowflakeAdapter extends BaseAdapter {
     }
   }
 
-  async query(sql: string, params?: any[]): Promise<AdapterQueryResult> {
+  async query(sql: string, params?: QueryParameter[]): Promise<AdapterQueryResult> {
     this.ensureConnected();
 
     if (!this.connection) {
@@ -60,31 +65,50 @@ export class SnowflakeAdapter extends BaseAdapter {
     }
 
     try {
-      const result = await new Promise<any>((resolve, reject) => {
-        this.connection!.execute({
+      interface SnowflakeQueryResult {
+        rows: Record<string, unknown>[];
+        statement: {
+          getColumns?: () => Array<{
+            getName(): string;
+            getType(): string;
+            isNullable(): boolean;
+            getScale(): number;
+            getPrecision(): number;
+          }>;
+        };
+      }
+
+      const result = await new Promise<SnowflakeQueryResult>((resolve, reject) => {
+        if (!this.connection) {
+          reject(new Error('Snowflake connection not initialized'));
+          return;
+        }
+        this.connection.execute({
           sqlText: sql,
-          binds: params,
+          binds: params as snowflake.Binds,
           complete: (err, stmt, rows) => {
             if (err) {
               reject(new Error(`Snowflake query failed: ${err.message}`));
             } else {
-              resolve({ rows, statement: stmt });
+              resolve({ rows: rows || [], statement: stmt });
             }
           },
         });
       });
 
+      const fields: FieldMetadata[] =
+        result.statement?.getColumns?.()?.map((col) => ({
+          name: col.getName(),
+          type: col.getType(),
+          nullable: col.isNullable(),
+          scale: col.getScale() > 0 ? col.getScale() : undefined,
+          precision: col.getPrecision() > 0 ? col.getPrecision() : undefined,
+        })) || [];
+
       return {
-        rows: result.rows || [],
-        rowCount: result.rows?.length || 0,
-        fields:
-          result.statement?.getColumns?.()?.map((col: any) => ({
-            name: col.getName(),
-            type: col.getType(),
-            nullable: col.isNullable(),
-            scale: col.getScale(),
-            precision: col.getPrecision(),
-          })) || [],
+        rows: result.rows,
+        rowCount: result.rows.length,
+        fields,
       };
     } catch (error) {
       throw new Error(
@@ -101,7 +125,11 @@ export class SnowflakeAdapter extends BaseAdapter {
 
       // Test connection by running a simple query
       await new Promise<void>((resolve, reject) => {
-        this.connection!.execute({
+        if (!this.connection) {
+          reject(new Error('Snowflake connection not initialized'));
+          return;
+        }
+        this.connection.execute({
           sqlText: 'SELECT 1 as test',
           complete: (err) => {
             if (err) {
@@ -122,7 +150,11 @@ export class SnowflakeAdapter extends BaseAdapter {
   async close(): Promise<void> {
     if (this.connection) {
       await new Promise<void>((resolve) => {
-        this.connection!.destroy((err) => {
+        if (!this.connection) {
+          resolve();
+          return;
+        }
+        this.connection.destroy((err) => {
           if (err) {
             console.warn(`Error closing Snowflake connection: ${err.message}`);
           }

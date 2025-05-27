@@ -20,15 +20,27 @@ describe('SnowflakeAdapter Integration', () => {
   });
 
   testWithCredentials(
-    'should connect to Snowflake database',
+    'should connect to Snowflake',
     async () => {
+      if (
+        !testConfig.snowflake.account_id ||
+        !testConfig.snowflake.warehouse_id ||
+        !testConfig.snowflake.username ||
+        !testConfig.snowflake.password ||
+        !testConfig.snowflake.default_database
+      ) {
+        throw new Error(
+          'TEST_SNOWFLAKE_ACCOUNT_ID, TEST_SNOWFLAKE_WAREHOUSE_ID, TEST_SNOWFLAKE_USERNAME, TEST_SNOWFLAKE_PASSWORD, and TEST_SNOWFLAKE_DATABASE are required for this test'
+        );
+      }
+
       const credentials: SnowflakeCredentials = {
         type: DataSourceType.Snowflake,
-        account_id: testConfig.snowflake.account_id!,
-        warehouse_id: testConfig.snowflake.warehouse_id!,
-        username: testConfig.snowflake.username!,
-        password: testConfig.snowflake.password!,
-        default_database: testConfig.snowflake.default_database!,
+        account_id: testConfig.snowflake.account_id,
+        warehouse_id: testConfig.snowflake.warehouse_id,
+        username: testConfig.snowflake.username,
+        password: testConfig.snowflake.password,
+        default_database: testConfig.snowflake.default_database,
         default_schema: testConfig.snowflake.default_schema,
         role: testConfig.snowflake.role,
       };
@@ -43,13 +55,25 @@ describe('SnowflakeAdapter Integration', () => {
   testWithCredentials(
     'should execute simple SELECT query',
     async () => {
+      if (
+        !testConfig.snowflake.account_id ||
+        !testConfig.snowflake.warehouse_id ||
+        !testConfig.snowflake.username ||
+        !testConfig.snowflake.password ||
+        !testConfig.snowflake.default_database
+      ) {
+        throw new Error(
+          'TEST_SNOWFLAKE_ACCOUNT_ID, TEST_SNOWFLAKE_WAREHOUSE_ID, TEST_SNOWFLAKE_USERNAME, TEST_SNOWFLAKE_PASSWORD, and TEST_SNOWFLAKE_DATABASE are required for this test'
+        );
+      }
+
       const credentials: SnowflakeCredentials = {
         type: DataSourceType.Snowflake,
-        account_id: testConfig.snowflake.account_id!,
-        warehouse_id: testConfig.snowflake.warehouse_id!,
-        username: testConfig.snowflake.username!,
-        password: testConfig.snowflake.password!,
-        default_database: testConfig.snowflake.default_database!,
+        account_id: testConfig.snowflake.account_id,
+        warehouse_id: testConfig.snowflake.warehouse_id,
+        username: testConfig.snowflake.username,
+        password: testConfig.snowflake.password,
+        default_database: testConfig.snowflake.default_database,
         default_schema: testConfig.snowflake.default_schema,
         role: testConfig.snowflake.role,
       };
@@ -67,13 +91,25 @@ describe('SnowflakeAdapter Integration', () => {
   testWithCredentials(
     'should execute parameterized query',
     async () => {
+      if (
+        !testConfig.snowflake.account_id ||
+        !testConfig.snowflake.warehouse_id ||
+        !testConfig.snowflake.username ||
+        !testConfig.snowflake.password ||
+        !testConfig.snowflake.default_database
+      ) {
+        throw new Error(
+          'TEST_SNOWFLAKE_ACCOUNT_ID, TEST_SNOWFLAKE_WAREHOUSE_ID, TEST_SNOWFLAKE_USERNAME, TEST_SNOWFLAKE_PASSWORD, and TEST_SNOWFLAKE_DATABASE are required for this test'
+        );
+      }
+
       const credentials: SnowflakeCredentials = {
         type: DataSourceType.Snowflake,
-        account_id: testConfig.snowflake.account_id!,
-        warehouse_id: testConfig.snowflake.warehouse_id!,
-        username: testConfig.snowflake.username!,
-        password: testConfig.snowflake.password!,
-        default_database: testConfig.snowflake.default_database!,
+        account_id: testConfig.snowflake.account_id,
+        warehouse_id: testConfig.snowflake.warehouse_id,
+        username: testConfig.snowflake.username,
+        password: testConfig.snowflake.password,
+        default_database: testConfig.snowflake.default_database,
         default_schema: testConfig.snowflake.default_schema,
         role: testConfig.snowflake.role,
       };
@@ -94,13 +130,25 @@ describe('SnowflakeAdapter Integration', () => {
   testWithCredentials(
     'should handle query errors gracefully',
     async () => {
+      if (
+        !testConfig.snowflake.account_id ||
+        !testConfig.snowflake.warehouse_id ||
+        !testConfig.snowflake.username ||
+        !testConfig.snowflake.password ||
+        !testConfig.snowflake.default_database
+      ) {
+        throw new Error(
+          'TEST_SNOWFLAKE_ACCOUNT_ID, TEST_SNOWFLAKE_WAREHOUSE_ID, TEST_SNOWFLAKE_USERNAME, TEST_SNOWFLAKE_PASSWORD, and TEST_SNOWFLAKE_DATABASE are required for this test'
+        );
+      }
+
       const credentials: SnowflakeCredentials = {
         type: DataSourceType.Snowflake,
-        account_id: testConfig.snowflake.account_id!,
-        warehouse_id: testConfig.snowflake.warehouse_id!,
-        username: testConfig.snowflake.username!,
-        password: testConfig.snowflake.password!,
-        default_database: testConfig.snowflake.default_database!,
+        account_id: testConfig.snowflake.account_id,
+        warehouse_id: testConfig.snowflake.warehouse_id,
+        username: testConfig.snowflake.username,
+        password: testConfig.snowflake.password,
+        default_database: testConfig.snowflake.default_database,
         default_schema: testConfig.snowflake.default_schema,
         role: testConfig.snowflake.role,
       };
