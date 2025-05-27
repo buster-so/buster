@@ -1,0 +1,12 @@
+{
+  "name": "my-monorepo",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "tasks/*",
+    "server"
+  ],
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4"
+  }
+}

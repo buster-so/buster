@@ -71,3 +71,7 @@ node_modules/
 web/playwright-tests/auth-utils/auth.json
 
 **/.claude/settings.local.json
+
+.trigger
+
+.claude
