@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "bun run src/index.ts",
     "build": "bun build src/index.ts --outdir dist",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "test:coverage": "bun test --coverage",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
@@ -27,7 +30,8 @@
     "postgres": "^3.4.5"
   },
   "devDependencies": {
-    "drizzle-kit": "^0.31.1"
+    "drizzle-kit": "^0.31.1",
+    "@types/bun": "latest"
   },
   "peerDependencies": {
     "bun": "^1.0.0"
