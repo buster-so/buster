@@ -24,16 +24,5 @@
     "seed:run": "bun run src/seed/cli.ts run",
     "seed:snapshot": "bun run src/seed/cli.ts snapshot",
     "seed:list": "bun run src/seed/cli.ts list"
-  },
-  "dependencies": {
-    "drizzle-orm": "^0.43.1",
-    "postgres": "^3.4.5"
-  },
-  "devDependencies": {
-    "drizzle-kit": "^0.31.1",
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "bun": "^1.0.0"
   }
 }

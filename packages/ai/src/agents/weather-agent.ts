@@ -1,8 +1,14 @@
-import { openai } from '@ai-sdk/openai';
+import { createOpenAI } from '@ai-sdk/openai';
 import { Agent } from '@mastra/core/agent';
-import { Memory } from '@mastra/memory';
 import { LibSQLStore } from '@mastra/libsql';
+import { Memory } from '@mastra/memory';
 import { weatherTool } from '../tools/weather-tool';
+
+const litellm = createOpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+  baseURL: process.env.LLM_BASE_URL,
+  compatibility: 'compatible',
+});
 
 export const weatherAgent = new Agent({
   name: 'Weather Agent',
@@ -18,7 +24,7 @@ export const weatherAgent = new Agent({
 
       Use the weatherTool to fetch current weather data.
 `,
-  model: openai('gpt-4o-mini'),
+  model: litellm('claude-sonnet-4'),
   tools: { weatherTool },
   memory: new Memory({
     storage: new LibSQLStore({
