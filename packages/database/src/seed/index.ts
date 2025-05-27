@@ -49,8 +49,8 @@ function ensureDirectories() {
 export function getAvailableSeeds(): string[] {
   ensureDirectories();
   return readdirSync(SEEDS_DIR)
-    .filter(file => extname(file) === '.ts' && !file.endsWith('.d.ts'))
-    .map(file => file.replace('.ts', ''))
+    .filter((file) => extname(file) === '.ts' && !file.endsWith('.d.ts'))
+    .map((file) => file.replace('.ts', ''))
     .sort();
 }
 
@@ -59,14 +59,14 @@ export function getAvailableSeeds(): string[] {
  */
 export async function loadSeedModule(seedName: string): Promise<SeedModule> {
   const seedPath = join(process.cwd(), SEEDS_DIR, `${seedName}.ts`);
-  
+
   if (!existsSync(seedPath)) {
     throw new Error(`Seed file not found: ${seedPath}`);
   }
 
   try {
     const module = await import(seedPath);
-    
+
     if (!module.config || !module.seed) {
       throw new Error(`Invalid seed module: ${seedName}. Must export 'config' and 'seed'`);
     }
@@ -86,29 +86,29 @@ export async function runSeed(seedName: string, db?: PostgresJsDatabase): Promis
 
   try {
     console.log(`🌱 Running seed: ${seedName}`);
-    
+
     const seedModule = await loadSeedModule(seedName);
     const result = await seedModule.seed(database);
-    
+
     const duration = Date.now() - startTime;
     console.log(`✅ Seed completed: ${seedName} (${duration}ms)`);
-    
+
     return {
       ...result,
       duration,
-      success: true
+      success: true,
     };
   } catch (error) {
     const duration = Date.now() - startTime;
     const errorMessage = error instanceof Error ? error.message : String(error);
-    
+
     console.error(`❌ Seed failed: ${seedName} - ${errorMessage}`);
-    
+
     return {
       name: seedName,
       success: false,
       duration,
-      error: errorMessage
+      error: errorMessage,
     };
   }
 }
@@ -116,18 +116,21 @@ export async function runSeed(seedName: string, db?: PostgresJsDatabase): Promis
 /**
  * Run multiple seeds with dependency resolution
  */
-export async function runSeeds(seedNames: string[], db?: PostgresJsDatabase): Promise<SeedResult[]> {
+export async function runSeeds(
+  seedNames: string[],
+  db?: PostgresJsDatabase
+): Promise<SeedResult[]> {
   const database = db || getDb();
   const results: SeedResult[] = [];
   const executed = new Set<string>();
-  
+
   async function executeSeed(seedName: string): Promise<void> {
     if (executed.has(seedName)) {
       return;
     }
 
     const seedModule = await loadSeedModule(seedName);
-    
+
     // Execute dependencies first
     if (seedModule.config.dependencies) {
       for (const dep of seedModule.config.dependencies) {
@@ -160,7 +163,7 @@ export async function runAllSeeds(db?: PostgresJsDatabase): Promise<SeedResult[]
  */
 export async function createSnapshot(name: string, tables?: string[]): Promise<void> {
   ensureDirectories();
-  
+
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const snapshotName = `${name}-${timestamp}`;
   const snapshotPath = join(SNAPSHOTS_DIR, `${snapshotName}.sql`);
@@ -175,21 +178,20 @@ export async function createSnapshot(name: string, tables?: string[]): Promise<v
     }
 
     let pgDumpCmd = `pg_dump "${databaseUrl}" --data-only --inserts`;
-    
+
     if (tables && tables.length > 0) {
-      const tableArgs = tables.map(table => `--table=${table}`).join(' ');
+      const tableArgs = tables.map((table) => `--table=${table}`).join(' ');
       pgDumpCmd += ` ${tableArgs}`;
     }
 
     pgDumpCmd += ` > "${snapshotPath}"`;
 
     execSync(pgDumpCmd, { stdio: 'inherit' });
-    
+
     console.log(`✅ Snapshot created: ${snapshotPath}`);
-    
+
     // Also create a TypeScript seed file from this snapshot
     await createSeedFromSnapshot(snapshotName, snapshotPath, tables);
-    
   } catch (error) {
     console.error(`❌ Failed to create snapshot: ${error}`);
     throw error;
@@ -199,9 +201,13 @@ export async function createSnapshot(name: string, tables?: string[]): Promise<v
 /**
  * Create a TypeScript seed file from a SQL snapshot
  */
-async function createSeedFromSnapshot(name: string, sqlPath: string, tables?: string[]): Promise<void> {
+async function createSeedFromSnapshot(
+  name: string,
+  sqlPath: string,
+  tables?: string[]
+): Promise<void> {
   const seedPath = join(SEEDS_DIR, `${name}.ts`);
-  
+
   const seedContent = `import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import { sql } from 'drizzle-orm';
 import type { SeedConfig, SeedResult } from '../index.js';
@@ -257,8 +263,8 @@ export async function seed(db: PostgresJsDatabase): Promise<SeedResult> {
 export function getAvailableSnapshots(): string[] {
   ensureDirectories();
   return readdirSync(SNAPSHOTS_DIR)
-    .filter(file => extname(file) === '.sql')
-    .map(file => file.replace('.sql', ''))
+    .filter((file) => extname(file) === '.sql')
+    .map((file) => file.replace('.sql', ''))
     .sort();
 }
 
@@ -268,11 +274,11 @@ export function getAvailableSnapshots(): string[] {
 export function cleanupSnapshots(keep = 5): void {
   const snapshots = getAvailableSnapshots();
   const toDelete = snapshots.slice(0, -keep);
-  
+
   for (const snapshot of toDelete) {
     const sqlPath = join(SNAPSHOTS_DIR, `${snapshot}.sql`);
     const tsPath = join(SEEDS_DIR, `${snapshot}.ts`);
-    
+
     try {
       if (existsSync(sqlPath)) {
         execSync(`rm "${sqlPath}"`);
@@ -285,4 +291,4 @@ export function cleanupSnapshots(keep = 5): void {
       console.warn(`⚠️  Failed to clean up snapshot ${snapshot}: ${error}`);
     }
   }
-} 
+}

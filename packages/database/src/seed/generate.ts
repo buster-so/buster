@@ -21,10 +21,10 @@ function getAvailableTemplates(): string[] {
   if (!existsSync(TEMPLATES_DIR)) {
     return [];
   }
-  
+
   return readdirSync(TEMPLATES_DIR)
-    .filter(file => file.endsWith('.template.ts'))
-    .map(file => file.replace('.template.ts', ''));
+    .filter((file) => file.endsWith('.template.ts'))
+    .map((file) => file.replace('.template.ts', ''));
 }
 
 /**
@@ -32,10 +32,12 @@ function getAvailableTemplates(): string[] {
  */
 export function generateSeed(options: GenerateOptions): void {
   const { name, template = 'basic-seed', description, tables = [], dependencies = [] } = options;
-  
+
   // Validate seed name
   if (!name || !/^[a-z0-9-_]+$/.test(name)) {
-    throw new Error('Seed name must contain only lowercase letters, numbers, hyphens, and underscores');
+    throw new Error(
+      'Seed name must contain only lowercase letters, numbers, hyphens, and underscores'
+    );
   }
 
   // Check if seed already exists
@@ -47,7 +49,9 @@ export function generateSeed(options: GenerateOptions): void {
   // Get template content
   const templatePath = join(TEMPLATES_DIR, `${template}.template.ts`);
   if (!existsSync(templatePath)) {
-    throw new Error(`Template not found: ${template}. Available templates: ${getAvailableTemplates().join(', ')}`);
+    throw new Error(
+      `Template not found: ${template}. Available templates: ${getAvailableTemplates().join(', ')}`
+    );
   }
 
   let templateContent = readFileSync(templatePath, 'utf-8');
@@ -57,11 +61,11 @@ export function generateSeed(options: GenerateOptions): void {
     .replace(/basic-seed-template/g, name)
     .replace(/Template for creating basic seed data/g, description || `Seed script for ${name}`)
     .replace(/\['users', 'organizations'\]/g, JSON.stringify(tables))
-         .replace(/dependencies: \[\]/g, `dependencies: ${JSON.stringify(dependencies)}`);
+    .replace(/dependencies: \[\]/g, `dependencies: ${JSON.stringify(dependencies)}`);
 
   // Write the new seed file
   writeFileSync(seedPath, templateContent);
-  
+
   console.log(`✅ Created seed script: ${seedPath}`);
   console.log('📝 Edit the file to add your seed logic');
   console.log(`🌱 Run with: bun run seed run ${name}`);
@@ -72,14 +76,14 @@ export function generateSeed(options: GenerateOptions): void {
  */
 async function main() {
   const args = process.argv.slice(2);
-  
+
   if (args.length === 0) {
     showHelp();
     return;
   }
 
   const command = args[0];
-  
+
   if (command === 'list-templates') {
     const templates = getAvailableTemplates();
     console.log('📋 Available templates:');
@@ -102,11 +106,11 @@ async function main() {
     }
 
     const options: GenerateOptions = { name };
-    
+
     // Parse additional options
     for (let i = 2; i < args.length; i++) {
       const arg = args[i];
-      
+
       if (arg === '--template' && args[i + 1]) {
         options.template = args[i + 1];
         i++;
@@ -116,13 +120,13 @@ async function main() {
       } else if (arg === '--tables' && args[i + 1]) {
         const tables = args[i + 1];
         if (tables) {
-          options.tables = tables.split(',').map(t => t.trim());
+          options.tables = tables.split(',').map((t) => t.trim());
         }
         i++;
       } else if (arg === '--dependencies' && args[i + 1]) {
         const deps = args[i + 1];
         if (deps) {
-          options.dependencies = deps.split(',').map(d => d.trim());
+          options.dependencies = deps.split(',').map((d) => d.trim());
         }
         i++;
       }
@@ -168,4 +172,4 @@ Examples:
 // Run CLI if this file is executed directly
 if (import.meta.main) {
   await main();
-} 
+}

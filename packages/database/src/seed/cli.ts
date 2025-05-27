@@ -1,13 +1,12 @@
 #!/usr/bin/env bun
 
-import { 
-  runSeed, 
-  runSeeds, 
-  runAllSeeds, 
-  createSnapshot, 
-  getAvailableSeeds, 
+import {
+  runSeeds,
+  runAllSeeds,
+  createSnapshot,
+  getAvailableSeeds,
   getAvailableSnapshots,
-  cleanupSnapshots 
+  cleanupSnapshots,
 } from './index.js';
 
 async function main() {
@@ -66,7 +65,7 @@ async function handleSnapshotCommand(args: string[]) {
   }
 
   const name = args[0];
-  const tables = args[1] ? args[1].split(',').map(t => t.trim()) : undefined;
+  const tables = args[1] ? args[1].split(',').map((t) => t.trim()) : undefined;
 
   if (!name) {
     console.error('❌ Snapshot name is required');
@@ -107,7 +106,7 @@ async function handleListCommand(args: string[]) {
 
 async function handleCleanupCommand(args: string[]) {
   const keep = args[0] ? Number.parseInt(args[0], 10) : 5;
-  
+
   if (Number.isNaN(keep) || keep < 1) {
     console.error('❌ Keep count must be a positive number');
     process.exit(1);
@@ -117,10 +116,18 @@ async function handleCleanupCommand(args: string[]) {
   console.log(`✅ Cleanup complete (kept ${keep} most recent snapshots)`);
 }
 
-function printResults(results: Array<{ name: string; success: boolean; duration: number; error?: string; recordsCreated?: number }>) {
+function printResults(
+  results: Array<{
+    name: string;
+    success: boolean;
+    duration: number;
+    error?: string;
+    recordsCreated?: number;
+  }>
+) {
   console.log('\n📊 Seed Results:');
   console.log('================');
-  
+
   let totalSuccess = 0;
   let totalFailed = 0;
   let totalDuration = 0;
@@ -130,9 +137,9 @@ function printResults(results: Array<{ name: string; success: boolean; duration:
     const status = result.success ? '✅' : '❌';
     const duration = `${result.duration}ms`;
     const records = result.recordsCreated ? ` (${result.recordsCreated} records)` : '';
-    
+
     console.log(`${status} ${result.name} - ${duration}${records}`);
-    
+
     if (result.error) {
       console.log(`   Error: ${result.error}`);
     }
@@ -181,4 +188,4 @@ Examples:
 // Run the CLI if this file is executed directly
 if (import.meta.main) {
   await main();
-} 
+}

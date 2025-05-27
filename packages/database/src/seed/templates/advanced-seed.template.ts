@@ -8,14 +8,14 @@ export const config: SeedConfig = {
   name: 'advanced-seed-template',
   description: 'Template for creating complex seed data with relationships',
   dependencies: ['basic-seed-template'], // This seed depends on basic seed
-  tables: ['users', 'organizations', 'teams', 'dashboards']
+  tables: ['users', 'organizations', 'teams', 'dashboards'],
 };
 
 export async function seed(db: PostgresJsDatabase): Promise<SeedResult> {
   console.log('🌱 Running advanced seed template');
-  
+
   const recordsCreated = 0;
-  
+
   try {
     // Example: Bulk insert with relationships
     /*
@@ -115,9 +115,9 @@ export async function seed(db: PostgresJsDatabase): Promise<SeedResult> {
       name: config.name,
       success: true,
       duration: 0, // Will be set by runner
-      recordsCreated
+      recordsCreated,
     };
   } catch (error) {
     throw new Error(`Failed to run advanced seed: ${error}`);
   }
-} 
+}

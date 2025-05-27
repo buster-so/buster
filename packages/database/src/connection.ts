@@ -79,4 +79,4 @@ export async function closePool(): Promise<void> {
 }
 
 // Export the default database instance
-export const db = getDb(); 
+export const db = getDb();

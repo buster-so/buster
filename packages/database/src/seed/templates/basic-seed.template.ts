@@ -8,14 +8,14 @@ export const config: SeedConfig = {
   name: 'basic-seed-template',
   description: 'Template for creating basic seed data',
   dependencies: [], // List any seed dependencies here
-  tables: ['users', 'organizations'] // List tables this seed affects
+  tables: ['users', 'organizations'], // List tables this seed affects
 };
 
 export async function seed(db: PostgresJsDatabase): Promise<SeedResult> {
   console.log('🌱 Running basic seed template');
-  
+
   const recordsCreated = 0;
-  
+
   try {
     // Example: Create organizations first (if they don't exist)
     /*
@@ -63,9 +63,9 @@ export async function seed(db: PostgresJsDatabase): Promise<SeedResult> {
       name: config.name,
       success: true,
       duration: 0, // Will be set by runner
-      recordsCreated
+      recordsCreated,
     };
   } catch (error) {
     throw new Error(`Failed to run basic seed: ${error}`);
   }
-} 
+}

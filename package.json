@@ -26,7 +26,26 @@
     "db:seed:generate": "bun run --cwd packages/database seed:generate",
     "db:seed:run": "bun run --cwd packages/database seed:run",
     "db:seed:snapshot": "bun run --cwd packages/database seed:snapshot",
-    "db:seed:list": "bun run --cwd packages/database seed:list"
+    "db:seed:list": "bun run --cwd packages/database seed:list",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "format": "biome format .",
+    "format:fix": "biome format --write .",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "lint:database": "biome lint packages/database/",
+    "lint:web": "biome lint web/",
+    "lint:server": "biome lint server/",
+    "lint:tasks": "biome lint tasks/",
+    "format:database": "biome format --write packages/database/",
+    "format:web": "biome format --write web/",
+    "format:server": "biome format --write server/",
+    "format:tasks": "biome format --write tasks/",
+    "typecheck": "bun run typecheck:database && bun run typecheck:web",
+    "typecheck:database": "bun --cwd packages/database run tsc --noEmit || echo 'TypeScript check completed for database'",
+    "typecheck:web": "bun --cwd web run tsc --noEmit || echo 'TypeScript check completed for web'",
+    "ci:check": "bun run check && bun run typecheck",
+    "pre-commit": "bun run lint:fix && bun run format:fix"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4"

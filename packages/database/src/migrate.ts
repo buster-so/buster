@@ -20,4 +20,4 @@ export async function runMigrationsAndClose(migrationsFolder = './drizzle'): Pro
     const client = getClient();
     await client.end();
   }
-} 
+}

@@ -1,11 +1,11 @@
 // Export database connection and pool management
-export { 
-  db, 
-  getDb, 
-  getClient, 
-  initializePool, 
+export {
+  db,
+  getDb,
+  getClient,
+  initializePool,
   closePool,
-  type PoolConfig 
+  type PoolConfig,
 } from '@/connection';
 
 // Export migration utilities
@@ -21,18 +21,18 @@ export * from '@/schema';
 export * from '@/relations';
 
 // Export common Drizzle utilities
-export { 
-  eq, 
-  and, 
-  or, 
-  not, 
-  isNull, 
-  isNotNull, 
-  inArray, 
-  notInArray, 
-  exists, 
+export {
+  eq,
+  and,
+  or,
+  not,
+  isNull,
+  isNotNull,
+  inArray,
+  notInArray,
+  exists,
   notExists,
-  desc, 
+  desc,
   asc,
-  sql 
-} from 'drizzle-orm'; 
+  sql,
+} from 'drizzle-orm';
