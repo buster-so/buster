@@ -1,11 +1,18 @@
 {
-  "name": "my-monorepo",
+  "name": "buster",
   "private": true,
   "workspaces": [
     "packages/*",
     "tasks/*",
     "server"
   ],
+  "scripts": {
+    "tasks:dev": "bun run --cwd tasks dev",
+    "tasks:deploy": "bun run --cwd tasks deploy",
+    "tasks:build": "bun run --cwd tasks build",
+    "trigger:dev": "bun run --cwd tasks dev",
+    "trigger:deploy": "bun run --cwd tasks deploy"
+  },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4"
   }
