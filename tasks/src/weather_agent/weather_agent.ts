@@ -22,19 +22,41 @@ export const weatherAgentTask = task({
         message = `${payload.context}\n\n${message}`;
       }
 
-      // Execute the weather agent
-      const response = await weatherAgent.generate(message);
+      const response = await weatherAgent.stream(message, {
+        maxSteps: 15,
+        temperature: 1,
+        threadId: 'testing',
+        resourceId: 'testing-user',
+        providerOptions: {
+          anthropic: {
+            thinking: { type: 'enabled', budgetTokens: 2000 },
+          },
+        },
+        onChunk: (chunk) => {
+          logger.log('Weather agent response chunk', {
+            chunk,
+          });
+        },
+      });
+
+      // Collect the streamed text chunks
+      let fullMessage = '';
+      for await (const chunk of response.fullStream) {
+        logger.log('Weather agent response chunk', {
+          chunk,
+        });
+        fullMessage += chunk;
+      }
 
       logger.log('Weather agent response received', {
         location: payload.location,
-        responseLength: response.text?.length || 0,
+        responseLength: fullMessage.length,
       });
 
       return {
-        message: response.text || 'No weather information available',
+        message: fullMessage || 'No weather information available',
         location: payload.location,
         success: true,
-        weatherData: response.toolResults || undefined,
       };
     } catch (error) {
       logger.error('Weather agent processing failed', {

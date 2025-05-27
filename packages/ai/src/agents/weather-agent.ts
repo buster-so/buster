@@ -1,8 +1,17 @@
+import { anthropic } from '@ai-sdk/anthropic';
 import { createOpenAI } from '@ai-sdk/openai';
 import { Agent } from '@mastra/core/agent';
 import { LibSQLStore } from '@mastra/libsql';
 import { Memory } from '@mastra/memory';
 import { weatherTool } from '../tools/weather-tool';
+
+import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock';
+import { fromNodeProviderChain } from '@aws-sdk/credential-providers';
+
+const bedrock = createAmazonBedrock({
+  region: 'us-east-1',
+  credentialProvider: fromNodeProviderChain(),
+});
 
 const litellm = createOpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -24,7 +33,8 @@ export const weatherAgent = new Agent({
 
       Use the weatherTool to fetch current weather data.
 `,
-  model: litellm('claude-sonnet-4'),
+  model: anthropic('claude-opus-4-20250514', {
+  }),
   tools: { weatherTool },
   memory: new Memory({
     storage: new LibSQLStore({

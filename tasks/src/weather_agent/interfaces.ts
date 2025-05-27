@@ -30,6 +30,4 @@ export interface WeatherAgentOutput {
   success: boolean;
   /** Any error message if the request failed */
   error?: string;
-  /** Raw weather workflow result if needed for further processing */
-  weatherData?: WeatherWorkflowResult;
 }

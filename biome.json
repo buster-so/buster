@@ -69,13 +69,6 @@
       "packages/**/*.js",
       "packages/**/*.jsx",
       "packages/**/*.json",
-      "web/**/*.ts",
-      "web/**/*.tsx",
-      "web/**/*.js",
-      "web/**/*.jsx",
-      "web/**/*.json",
-      "api/**/*.rs",
-      "cli/**/*.rs",
       "server/**/*.ts",
       "server/**/*.js",
       "tasks/**/*.ts",
@@ -91,7 +84,12 @@
       "**/drizzle/**",
       "**/*.d.ts",
       "**/generated/**",
-      "**/.trigger/**"
+      "**/.trigger/**",
+      "**/.mastra/**",
+      "**/output/**",
+      "**/playground/**",
+      "api/**",
+      "cli/**"
     ]
   },
   "overrides": [
@@ -109,7 +107,11 @@
       }
     },
     {
-      "include": ["packages/database/src/setup.ts", "packages/database/src/migrate.ts", "packages/database/src/seed/**/*.ts"],
+      "include": [
+        "packages/database/src/setup.ts",
+        "packages/database/src/migrate.ts",
+        "packages/database/src/seed/**/*.ts"
+      ],
       "linter": {
         "rules": {
           "suspicious": {
@@ -131,19 +133,6 @@
           }
         }
       }
-    },
-    {
-      "include": ["web/**/*.tsx", "web/**/*.ts"],
-      "linter": {
-        "rules": {
-          "correctness": {
-            "useExhaustiveDependencies": "error"
-          },
-          "suspicious": {
-            "noArrayIndexKey": "error"
-          }
-        }
-      }
     }
   ]
-} 
+}
