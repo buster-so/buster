@@ -59,9 +59,26 @@ export class BigQueryAdapter extends BaseAdapter {
         useLegacySql: false,
       };
 
-      // Handle parameterized queries
+      // Handle parameterized queries - BigQuery uses named parameters
       if (params && params.length > 0) {
-        options.params = params;
+        // Convert positional parameters to named parameters
+        let processedSql = sql;
+        const namedParams: Record<string, QueryParameter> = {};
+
+        // Replace ? placeholders with @param0, @param1, etc.
+        let paramIndex = 0;
+        processedSql = sql.replace(/\?/g, () => {
+          const paramName = `param${paramIndex}`;
+          const paramValue = params[paramIndex];
+          if (paramValue !== undefined) {
+            namedParams[paramName] = paramValue;
+          }
+          paramIndex++;
+          return `@${paramName}`;
+        });
+
+        options.query = processedSql;
+        options.params = namedParams;
       }
 
       const [job] = await this.client.createQueryJob(options);

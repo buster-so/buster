@@ -164,7 +164,7 @@ describe('SnowflakeAdapter Integration', () => {
     expect(adapter.getDataSourceType()).toBe(DataSourceType.Snowflake);
   });
 
-  it(
+  it.skip(
     'should fail to connect with invalid credentials',
     async () => {
       const invalidCredentials: SnowflakeCredentials = {

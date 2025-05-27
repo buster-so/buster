@@ -12,4 +12,4 @@ export { RedshiftAdapter } from './redshift';
 export { DatabricksAdapter } from './databricks';
 
 // Factory functions
-export { createAdapter, getSupportedTypes, isSupported } from './factory';
+export { createAdapter, createAdapterInstance, getSupportedTypes, isSupported } from './factory';

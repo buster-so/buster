@@ -48,7 +48,7 @@
       "name": "@buster/database",
       "version": "1.0.0",
     },
-    "packages/query-router": {
+    "packages/query_router": {
       "name": "@buster/query-router",
       "version": "0.1.0",
     },
@@ -227,7 +227,7 @@
 
     "@buster/database": ["@buster/database@workspace:packages/database"],
 
-    "@buster/query-router": ["@buster/query-router@workspace:packages/query-router"],
+    "@buster/query-router": ["@buster/query-router@workspace:packages/query_router"],
 
     "@buster/tasks": ["@buster/tasks@workspace:tasks"],
 

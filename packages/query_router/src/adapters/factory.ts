@@ -12,6 +12,17 @@ import { SQLServerAdapter } from './sqlserver';
  * Create an adapter instance based on credentials
  */
 export async function createAdapter(credentials: Credentials): Promise<DatabaseAdapter> {
+  const adapter = createAdapterInstance(credentials);
+
+  // Initialize the adapter with credentials
+  await adapter.initialize(credentials);
+  return adapter;
+}
+
+/**
+ * Create an adapter instance without initializing it (useful for testing)
+ */
+export function createAdapterInstance(credentials: Credentials): DatabaseAdapter {
   let adapter: DatabaseAdapter;
 
   switch (credentials.type) {
@@ -50,8 +61,6 @@ export async function createAdapter(credentials: Credentials): Promise<DatabaseA
     }
   }
 
-  // Initialize the adapter with credentials
-  await adapter.initialize(credentials);
   return adapter;
 }
 

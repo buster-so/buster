@@ -110,7 +110,7 @@ describe('PostgreSQLAdapter Integration', () => {
       };
 
       await adapter.initialize(credentials);
-      const result = await adapter.query('SELECT $1 as param_value, $2 as second_param', [
+      const result = await adapter.query('SELECT $1::integer as param_value, $2 as second_param', [
         42,
         'test',
       ]);

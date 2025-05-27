@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { createAdapter, getSupportedTypes, isSupported } from '../../../src/adapters/factory';
+import {
+  createAdapterInstance,
+  getSupportedTypes,
+  isSupported,
+} from '../../../src/adapters/factory';
 import { DataSourceType } from '../../../src/types/credentials';
 import type {
   BigQueryCredentials,
@@ -22,8 +26,8 @@ type UnsupportedCredentials = {
 };
 
 describe('Adapter Factory', () => {
-  describe('createAdapter', () => {
-    it('should create SnowflakeAdapter for Snowflake credentials', async () => {
+  describe('createAdapterInstance', () => {
+    it('should create SnowflakeAdapter for Snowflake credentials', () => {
       const credentials: SnowflakeCredentials = {
         type: DataSourceType.Snowflake,
         account_id: 'test-account',
@@ -33,22 +37,22 @@ describe('Adapter Factory', () => {
         default_database: 'test-db',
       };
 
-      const adapter = await createAdapter(credentials);
+      const adapter = createAdapterInstance(credentials);
       expect(adapter.getDataSourceType()).toBe(DataSourceType.Snowflake);
     });
 
-    it('should create BigQueryAdapter for BigQuery credentials', async () => {
+    it('should create BigQueryAdapter for BigQuery credentials', () => {
       const credentials: BigQueryCredentials = {
         type: DataSourceType.BigQuery,
         project_id: 'test-project',
         service_account_key: '{"type": "service_account"}',
       };
 
-      const adapter = await createAdapter(credentials);
+      const adapter = createAdapterInstance(credentials);
       expect(adapter.getDataSourceType()).toBe(DataSourceType.BigQuery);
     });
 
-    it('should create PostgreSQLAdapter for PostgreSQL credentials', async () => {
+    it('should create PostgreSQLAdapter for PostgreSQL credentials', () => {
       const credentials: PostgreSQLCredentials = {
         type: DataSourceType.PostgreSQL,
         host: 'localhost',
@@ -58,11 +62,11 @@ describe('Adapter Factory', () => {
         password: 'pass',
       };
 
-      const adapter = await createAdapter(credentials);
+      const adapter = createAdapterInstance(credentials);
       expect(adapter.getDataSourceType()).toBe(DataSourceType.PostgreSQL);
     });
 
-    it('should create MySQLAdapter for MySQL credentials', async () => {
+    it('should create MySQLAdapter for MySQL credentials', () => {
       const credentials: MySQLCredentials = {
         type: DataSourceType.MySQL,
         host: 'localhost',
@@ -72,11 +76,11 @@ describe('Adapter Factory', () => {
         password: 'pass',
       };
 
-      const adapter = await createAdapter(credentials);
+      const adapter = createAdapterInstance(credentials);
       expect(adapter.getDataSourceType()).toBe(DataSourceType.MySQL);
     });
 
-    it('should create SQLServerAdapter for SQL Server credentials', async () => {
+    it('should create SQLServerAdapter for SQL Server credentials', () => {
       const credentials: SQLServerCredentials = {
         type: DataSourceType.SQLServer,
         server: 'localhost',
@@ -86,11 +90,11 @@ describe('Adapter Factory', () => {
         password: 'pass',
       };
 
-      const adapter = await createAdapter(credentials);
+      const adapter = createAdapterInstance(credentials);
       expect(adapter.getDataSourceType()).toBe(DataSourceType.SQLServer);
     });
 
-    it('should create RedshiftAdapter for Redshift credentials', async () => {
+    it('should create RedshiftAdapter for Redshift credentials', () => {
       const credentials: RedshiftCredentials = {
         type: DataSourceType.Redshift,
         host: 'test-cluster.redshift.amazonaws.com',
@@ -100,11 +104,11 @@ describe('Adapter Factory', () => {
         password: 'pass',
       };
 
-      const adapter = await createAdapter(credentials);
+      const adapter = createAdapterInstance(credentials);
       expect(adapter.getDataSourceType()).toBe(DataSourceType.Redshift);
     });
 
-    it('should create DatabricksAdapter for Databricks credentials', async () => {
+    it('should create DatabricksAdapter for Databricks credentials', () => {
       const credentials: DatabricksCredentials = {
         type: DataSourceType.Databricks,
         server_hostname: 'test.cloud.databricks.com',
@@ -112,11 +116,11 @@ describe('Adapter Factory', () => {
         access_token: 'test-token',
       };
 
-      const adapter = await createAdapter(credentials);
+      const adapter = createAdapterInstance(credentials);
       expect(adapter.getDataSourceType()).toBe(DataSourceType.Databricks);
     });
 
-    it('should throw error for unsupported data source type', async () => {
+    it('should throw error for unsupported data source type', () => {
       const credentials: UnsupportedCredentials = {
         type: 'unsupported',
         host: 'localhost',
@@ -125,7 +129,7 @@ describe('Adapter Factory', () => {
         password: 'pass',
       };
 
-      await expect(createAdapter(credentials as unknown as Credentials)).rejects.toThrow(
+      expect(() => createAdapterInstance(credentials as unknown as Credentials)).toThrow(
         'Unsupported data source type: unsupported'
       );
     });

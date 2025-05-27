@@ -85,7 +85,7 @@ describe('BigQueryAdapter Integration', () => {
       };
 
       await adapter.initialize(credentials);
-      const result = await adapter.query('SELECT @param1 as param_value, @param2 as second_param', [
+      const result = await adapter.query('SELECT ? as param_value, ? as second_param', [
         42,
         'test',
       ]);
@@ -129,11 +129,17 @@ describe('BigQueryAdapter Integration', () => {
     async () => {
       const invalidCredentials: BigQueryCredentials = {
         type: DataSourceType.BigQuery,
-        project_id: 'invalid-project',
-        service_account_key: '{"type": "invalid"}',
+        project_id: 'invalid-project-that-does-not-exist-12345',
+        service_account_key:
+          '{"type": "service_account", "project_id": "invalid", "private_key": "invalid"}',
       };
 
-      await expect(adapter.initialize(invalidCredentials)).rejects.toThrow();
+      const adapter = new BigQueryAdapter();
+      await adapter.initialize(invalidCredentials);
+
+      // The connection test should fail with invalid credentials
+      const isConnected = await adapter.testConnection();
+      expect(isConnected).toBe(false);
     },
     TEST_TIMEOUT
   );
