@@ -1,23 +1,22 @@
 {
   "name": "@buster/data-source",
-  "version": "0.1.0",
-  "description": "TypeScript library for connecting to, querying, and introspecting multiple data source types including Snowflake, BigQuery, PostgreSQL, MySQL, SQL Server, Redshift, and Databricks",
-  "type": "module",
-  "main": "src/index.ts",
-  "module": "src/index.ts",
-  "types": "src/index.ts",
-  "exports": {
-    ".": {
-      "import": "./src/index.ts",
-      "types": "./src/index.ts"
-    }
-  },
+  "version": "1.0.0",
+  "description": "Data source abstraction layer for multiple database types",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "dev": "bun run src/index.ts",
-    "build": "bun build src/index.ts --outdir dist --target bun",
+    "build": "tsc",
     "test": "vitest run",
-    "test:watch": "vitest watch",
+    "test:watch": "vitest",
+    "test:unit": "vitest run tests/unit/",
+    "test:integration": "vitest run tests/integration/",
     "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc --noEmit"
-  }
+    "test:introspection": "vitest run tests/integration/data-source-introspection.test.ts",
+    "lint": "eslint src/ tests/",
+    "lint:fix": "eslint src/ tests/ --fix",
+    "clean": "rm -rf dist"
+  },
+  "keywords": ["database", "data-source", "introspection", "sql"],
+  "author": "Buster Team",
+  "license": "MIT"
 }

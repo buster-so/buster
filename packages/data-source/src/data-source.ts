@@ -144,7 +144,31 @@ export class DataSource {
   async introspect(dataSourceName?: string): Promise<DataSourceIntrospector> {
     const resolvedDataSourceName = dataSourceName || this.getDefaultDataSourceName();
     const adapter = await this.getAdapter(resolvedDataSourceName);
-    return adapter.introspect();
+    const introspector = adapter.introspect();
+
+    // Create a wrapper that ensures the correct data source name is used
+    return {
+      getDatabases: () => introspector.getDatabases(),
+      getSchemas: (database?: string) => introspector.getSchemas(database),
+      getTables: (database?: string, schema?: string) => introspector.getTables(database, schema),
+      getColumns: (database?: string, schema?: string, table?: string) =>
+        introspector.getColumns(database, schema, table),
+      getViews: (database?: string, schema?: string) => introspector.getViews(database, schema),
+      getTableStatistics: (database: string, schema: string, table: string) =>
+        introspector.getTableStatistics(database, schema, table),
+      getIndexes: introspector.getIndexes ? introspector.getIndexes.bind(introspector) : undefined,
+      getForeignKeys: introspector.getForeignKeys
+        ? introspector.getForeignKeys.bind(introspector)
+        : undefined,
+      getDataSourceType: () => introspector.getDataSourceType(),
+      async getFullIntrospection(): Promise<DataSourceIntrospectionResult> {
+        const result = await introspector.getFullIntrospection();
+        return {
+          ...result,
+          dataSourceName: resolvedDataSourceName,
+        };
+      },
+    };
   }
 
   /**
