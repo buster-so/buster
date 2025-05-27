@@ -1,6 +1,8 @@
 import { DBSQLClient } from '@databricks/sql';
 import type IDBSQLSession from '@databricks/sql/dist/contracts/IDBSQLSession';
 import type IOperation from '@databricks/sql/dist/contracts/IOperation';
+import type { DataSourceIntrospector } from '../introspection/base';
+import { DatabricksIntrospector } from '../introspection/databricks';
 import { type Credentials, DataSourceType, type DatabricksCredentials } from '../types/credentials';
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
@@ -11,6 +13,7 @@ import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base
 export class DatabricksAdapter extends BaseAdapter {
   private client?: DBSQLClient;
   private session?: IDBSQLSession;
+  private introspector?: DatabricksIntrospector;
 
   async initialize(credentials: Credentials): Promise<void> {
     this.validateCredentials(credentials, DataSourceType.Databricks);
@@ -124,5 +127,12 @@ export class DatabricksAdapter extends BaseAdapter {
 
   getDataSourceType(): string {
     return DataSourceType.Databricks;
+  }
+
+  introspect(): DataSourceIntrospector {
+    if (!this.introspector) {
+      this.introspector = new DatabricksIntrospector('databricks', this);
+    }
+    return this.introspector;
   }
 }

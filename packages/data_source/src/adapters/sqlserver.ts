@@ -1,4 +1,6 @@
 import sql from 'mssql';
+import type { DataSourceIntrospector } from '../introspection/base';
+import { SQLServerIntrospector } from '../introspection/sqlserver';
 import { type Credentials, DataSourceType, type SQLServerCredentials } from '../types/credentials';
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
@@ -8,6 +10,7 @@ import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base
  */
 export class SQLServerAdapter extends BaseAdapter {
   private pool?: sql.ConnectionPool;
+  private introspector?: SQLServerIntrospector;
 
   async initialize(credentials: Credentials): Promise<void> {
     this.validateCredentials(credentials, DataSourceType.SQLServer);
@@ -138,5 +141,12 @@ export class SQLServerAdapter extends BaseAdapter {
 
   getDataSourceType(): string {
     return DataSourceType.SQLServer;
+  }
+
+  introspect(): DataSourceIntrospector {
+    if (!this.introspector) {
+      this.introspector = new SQLServerIntrospector('sqlserver', this);
+    }
+    return this.introspector;
   }
 }

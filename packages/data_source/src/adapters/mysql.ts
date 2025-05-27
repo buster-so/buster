@@ -1,4 +1,6 @@
 import mysql from 'mysql2/promise';
+import type { DataSourceIntrospector } from '../introspection/base';
+import { MySQLIntrospector } from '../introspection/mysql';
 import { type Credentials, DataSourceType, type MySQLCredentials } from '../types/credentials';
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
@@ -8,6 +10,7 @@ import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base
  */
 export class MySQLAdapter extends BaseAdapter {
   private connection?: mysql.Connection;
+  private introspector?: MySQLIntrospector;
 
   async initialize(credentials: Credentials): Promise<void> {
     this.validateCredentials(credentials, DataSourceType.MySQL);
@@ -125,5 +128,12 @@ export class MySQLAdapter extends BaseAdapter {
 
   getDataSourceType(): string {
     return DataSourceType.MySQL;
+  }
+
+  introspect(): DataSourceIntrospector {
+    if (!this.introspector) {
+      this.introspector = new MySQLIntrospector('mysql', this);
+    }
+    return this.introspector;
   }
 }

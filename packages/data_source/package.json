@@ -1,6 +1,7 @@
 {
-  "name": "@buster/query-router",
+  "name": "@buster/data-source",
   "version": "0.1.0",
+  "description": "TypeScript library for connecting to, querying, and introspecting multiple data source types including Snowflake, BigQuery, PostgreSQL, MySQL, SQL Server, Redshift, and Databricks",
   "type": "module",
   "main": "src/index.ts",
   "module": "src/index.ts",

@@ -1,3 +1,4 @@
+import type { DataSourceIntrospector } from '../introspection/base';
 import type { Credentials } from '../types/credentials';
 import type { QueryParameter } from '../types/query';
 
@@ -61,6 +62,11 @@ export interface DatabaseAdapter {
    * Get the data source type this adapter handles
    */
   getDataSourceType(): string;
+
+  /**
+   * Get an introspector instance for this adapter
+   */
+  introspect(): DataSourceIntrospector;
 }
 
 /**
@@ -75,6 +81,7 @@ export abstract class BaseAdapter implements DatabaseAdapter {
   abstract testConnection(): Promise<boolean>;
   abstract close(): Promise<void>;
   abstract getDataSourceType(): string;
+  abstract introspect(): DataSourceIntrospector;
 
   /**
    * Check if the adapter is connected

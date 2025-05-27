@@ -1,10 +1,20 @@
 import type { DatabaseAdapter } from './adapters/base';
 import { createAdapter } from './adapters/factory';
+import type { DataSourceIntrospector } from './introspection/base';
 import type { Credentials, DataSourceType } from './types/credentials';
+import type {
+  Column,
+  DataSourceIntrospectionResult,
+  Database,
+  Schema,
+  Table,
+  TableStatistics,
+  View,
+} from './types/introspection';
 import type { QueryRequest, QueryResult } from './types/query';
 
 /**
- * Data source configuration for the QueryRouter
+ * Data source configuration for the DataSource
  */
 export interface DataSourceConfig {
   /** Unique identifier for this data source */
@@ -21,9 +31,9 @@ export interface DataSourceConfig {
 }
 
 /**
- * Configuration for the QueryRouter
+ * Configuration for the DataSource
  */
-export interface QueryRouterConfig {
+export interface DataSourceManagerConfig {
   /** List of data source configurations */
   dataSources: DataSourceConfig[];
 
@@ -39,14 +49,14 @@ export interface QueryRouterConfig {
 }
 
 /**
- * Main QueryRouter class that provides routing across multiple data source types
+ * Main DataSource class that provides routing and introspection across multiple data source types
  */
-export class QueryRouter {
+export class DataSource {
   private dataSources: Map<string, DataSourceConfig> = new Map();
   private adapters: Map<string, DatabaseAdapter> = new Map();
-  private config: QueryRouterConfig;
+  private config: DataSourceManagerConfig;
 
-  constructor(config: QueryRouterConfig) {
+  constructor(config: DataSourceManagerConfig) {
     this.config = config;
     this.initializeDataSources();
   }
@@ -124,6 +134,107 @@ export class QueryRouter {
         },
       };
     }
+  }
+
+  // ========== INTROSPECTION METHODS ==========
+
+  /**
+   * Get an introspector instance for a specific data source
+   */
+  async introspect(dataSourceName?: string): Promise<DataSourceIntrospector> {
+    const resolvedDataSourceName = dataSourceName || this.getDefaultDataSourceName();
+    const adapter = await this.getAdapter(resolvedDataSourceName);
+    return adapter.introspect();
+  }
+
+  /**
+   * Get all databases from a data source
+   */
+  async getDatabases(dataSourceName?: string): Promise<Database[]> {
+    const introspector = await this.introspect(dataSourceName);
+    return introspector.getDatabases();
+  }
+
+  /**
+   * Get all schemas from a data source
+   */
+  async getSchemas(dataSourceName?: string, database?: string): Promise<Schema[]> {
+    const introspector = await this.introspect(dataSourceName);
+    return introspector.getSchemas(database);
+  }
+
+  /**
+   * Get all tables from a data source
+   */
+  async getTables(dataSourceName?: string, database?: string, schema?: string): Promise<Table[]> {
+    const introspector = await this.introspect(dataSourceName);
+    return introspector.getTables(database, schema);
+  }
+
+  /**
+   * Get all columns from a data source
+   */
+  async getColumns(
+    dataSourceName?: string,
+    database?: string,
+    schema?: string,
+    table?: string
+  ): Promise<Column[]> {
+    const introspector = await this.introspect(dataSourceName);
+    return introspector.getColumns(database, schema, table);
+  }
+
+  /**
+   * Get all views from a data source
+   */
+  async getViews(dataSourceName?: string, database?: string, schema?: string): Promise<View[]> {
+    const introspector = await this.introspect(dataSourceName);
+    return introspector.getViews(database, schema);
+  }
+
+  /**
+   * Get table statistics for a specific table
+   */
+  async getTableStatistics(
+    database: string,
+    schema: string,
+    table: string,
+    dataSourceName?: string
+  ): Promise<TableStatistics> {
+    const introspector = await this.introspect(dataSourceName);
+    return introspector.getTableStatistics(database, schema, table);
+  }
+
+  /**
+   * Get comprehensive introspection data for a data source
+   */
+  async getFullIntrospection(dataSourceName?: string): Promise<DataSourceIntrospectionResult> {
+    const introspector = await this.introspect(dataSourceName);
+    return introspector.getFullIntrospection();
+  }
+
+  // ========== UTILITY METHODS ==========
+
+  /**
+   * Get the default data source name
+   */
+  private getDefaultDataSourceName(): string {
+    if (this.config.defaultDataSource) {
+      return this.config.defaultDataSource;
+    }
+
+    if (this.dataSources.size === 1) {
+      const firstKey = Array.from(this.dataSources.keys())[0];
+      if (!firstKey) {
+        throw new Error('No data sources configured');
+      }
+      return firstKey;
+    }
+
+    throw new Error(
+      'No default data source configured and multiple data sources available. ' +
+        'Please specify a data source name.'
+    );
   }
 
   /**
@@ -295,3 +406,7 @@ export class QueryRouter {
     this.adapters.clear();
   }
 }
+
+// Backward compatibility alias
+export const QueryRouter = DataSource;
+export type QueryRouterConfig = DataSourceManagerConfig;

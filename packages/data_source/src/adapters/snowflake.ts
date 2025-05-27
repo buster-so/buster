@@ -1,4 +1,6 @@
 import snowflake from 'snowflake-sdk';
+import type { DataSourceIntrospector } from '../introspection/base';
+import { SnowflakeIntrospector } from '../introspection/snowflake';
 import { type Credentials, DataSourceType, type SnowflakeCredentials } from '../types/credentials';
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
@@ -8,6 +10,7 @@ import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base
  */
 export class SnowflakeAdapter extends BaseAdapter {
   private connection?: snowflake.Connection;
+  private introspector?: SnowflakeIntrospector;
 
   async initialize(credentials: Credentials): Promise<void> {
     this.validateCredentials(credentials, DataSourceType.Snowflake);
@@ -168,5 +171,12 @@ export class SnowflakeAdapter extends BaseAdapter {
 
   getDataSourceType(): string {
     return DataSourceType.Snowflake;
+  }
+
+  introspect(): DataSourceIntrospector {
+    if (!this.introspector) {
+      this.introspector = new SnowflakeIntrospector('snowflake', this);
+    }
+    return this.introspector;
   }
 }

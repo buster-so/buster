@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { QueryRouter } from '../../src/router';
-import type { DataSourceConfig } from '../../src/router';
+import { DataSource, QueryRouter } from '../../src/data-source';
+import type { DataSourceConfig } from '../../src/data-source';
 import { DataSourceType } from '../../src/types/credentials';
 import type { MySQLCredentials, PostgreSQLCredentials } from '../../src/types/credentials';
 import { TEST_TIMEOUT, hasCredentials, testConfig } from '../setup';
@@ -48,12 +48,12 @@ function createMySQLCredentials(): MySQLCredentials {
   };
 }
 
-describe('QueryRouter Integration', () => {
-  let router: QueryRouter;
+describe('DataSource Integration', () => {
+  let dataSource: DataSource;
 
   afterEach(async () => {
-    if (router) {
-      await router.close();
+    if (dataSource) {
+      await dataSource.close();
     }
   });
 
@@ -71,9 +71,9 @@ describe('QueryRouter Integration', () => {
         },
       ];
 
-      router = new QueryRouter({ dataSources });
+      dataSource = new DataSource({ dataSources });
 
-      const dataSourceNames = router.getDataSources();
+      const dataSourceNames = dataSource.getDataSources();
       expect(dataSourceNames).toEqual(['test-postgres']);
     });
 
@@ -92,9 +92,9 @@ describe('QueryRouter Integration', () => {
           },
         ];
 
-        router = new QueryRouter({ dataSources });
+        dataSource = new DataSource({ dataSources });
 
-        const result = await router.execute({
+        const result = await dataSource.execute({
           sql: "SELECT 1 as test_value, 'hello' as message",
         });
 
@@ -136,12 +136,12 @@ describe('QueryRouter Integration', () => {
         throw new Error('Expected at least one data source');
       }
 
-      router = new QueryRouter({
+      dataSource = new DataSource({
         dataSources,
         defaultDataSource: firstDataSource.name,
       });
 
-      const dataSourceNames = router.getDataSources();
+      const dataSourceNames = dataSource.getDataSources();
       expect(dataSourceNames).toHaveLength(dataSources.length);
     });
 
@@ -160,9 +160,9 @@ describe('QueryRouter Integration', () => {
           },
         ];
 
-        router = new QueryRouter({ dataSources });
+        dataSource = new DataSource({ dataSources });
 
-        const result = await router.execute({
+        const result = await dataSource.execute({
           sql: 'SELECT 1 as test_value',
           warehouse: 'test-postgres',
         });
@@ -182,15 +182,15 @@ describe('QueryRouter Integration', () => {
           return; // Skip if no credentials
         }
 
-        router = new QueryRouter({ dataSources: [] });
+        dataSource = new DataSource({ dataSources: [] });
 
-        await router.addDataSource({
+        await dataSource.addDataSource({
           name: 'dynamic-postgres',
           type: DataSourceType.PostgreSQL,
           credentials: createPostgreSQLCredentials(),
         });
 
-        const dataSourceNames = router.getDataSources();
+        const dataSourceNames = dataSource.getDataSources();
         expect(dataSourceNames).toContain('dynamic-postgres');
       },
       TEST_TIMEOUT
@@ -209,13 +209,13 @@ describe('QueryRouter Integration', () => {
         },
       ];
 
-      router = new QueryRouter({ dataSources });
+      dataSource = new DataSource({ dataSources });
 
-      expect(router.getDataSources()).toContain('test-postgres');
+      expect(dataSource.getDataSources()).toContain('test-postgres');
 
-      await router.removeDataSource('test-postgres');
+      await dataSource.removeDataSource('test-postgres');
 
-      expect(router.getDataSources()).not.toContain('test-postgres');
+      expect(dataSource.getDataSources()).not.toContain('test-postgres');
     });
 
     it(
@@ -233,12 +233,87 @@ describe('QueryRouter Integration', () => {
           },
         ];
 
-        router = new QueryRouter({ dataSources });
+        dataSource = new DataSource({ dataSources });
 
-        const results = await router.testAllDataSources();
+        const results = await dataSource.testAllDataSources();
 
         expect(results).toHaveProperty('test-postgres');
         expect(results['test-postgres']).toBe(true);
+      },
+      TEST_TIMEOUT
+    );
+  });
+
+  describe('introspection capabilities', () => {
+    it(
+      'should get databases from data source',
+      async () => {
+        if (!hasCredentials('postgresql')) {
+          return; // Skip if no credentials
+        }
+
+        const dataSources: DataSourceConfig[] = [
+          {
+            name: 'test-postgres',
+            type: DataSourceType.PostgreSQL,
+            credentials: createPostgreSQLCredentials(),
+          },
+        ];
+
+        dataSource = new DataSource({ dataSources });
+
+        const databases = await dataSource.getDatabases('test-postgres');
+        expect(Array.isArray(databases)).toBe(true);
+        // PostgreSQL should have at least the test database
+        expect(databases.length).toBeGreaterThan(0);
+      },
+      TEST_TIMEOUT
+    );
+
+    it(
+      'should get schemas from data source',
+      async () => {
+        if (!hasCredentials('postgresql')) {
+          return; // Skip if no credentials
+        }
+
+        const dataSources: DataSourceConfig[] = [
+          {
+            name: 'test-postgres',
+            type: DataSourceType.PostgreSQL,
+            credentials: createPostgreSQLCredentials(),
+          },
+        ];
+
+        dataSource = new DataSource({ dataSources });
+
+        const schemas = await dataSource.getSchemas('test-postgres');
+        expect(Array.isArray(schemas)).toBe(true);
+        // PostgreSQL should have at least the public schema
+        expect(schemas.length).toBeGreaterThan(0);
+      },
+      TEST_TIMEOUT
+    );
+
+    it(
+      'should get introspector instance',
+      async () => {
+        if (!hasCredentials('postgresql')) {
+          return; // Skip if no credentials
+        }
+
+        const dataSources: DataSourceConfig[] = [
+          {
+            name: 'test-postgres',
+            type: DataSourceType.PostgreSQL,
+            credentials: createPostgreSQLCredentials(),
+          },
+        ];
+
+        dataSource = new DataSource({ dataSources });
+
+        const introspector = await dataSource.introspect('test-postgres');
+        expect(introspector.getDataSourceType()).toBe(DataSourceType.PostgreSQL);
       },
       TEST_TIMEOUT
     );
@@ -260,9 +335,9 @@ describe('QueryRouter Integration', () => {
           },
         ];
 
-        router = new QueryRouter({ dataSources });
+        dataSource = new DataSource({ dataSources });
 
-        const result = await router.execute({
+        const result = await dataSource.execute({
           sql: 'SELECT * FROM non_existent_table',
         });
 
@@ -274,14 +349,44 @@ describe('QueryRouter Integration', () => {
     );
 
     it('should throw error for non-existent data source', async () => {
-      router = new QueryRouter({ dataSources: [] });
+      dataSource = new DataSource({ dataSources: [] });
 
       await expect(
-        router.execute({
+        dataSource.execute({
           sql: 'SELECT 1',
           warehouse: 'non-existent',
         })
       ).rejects.toThrow("Specified data source 'non-existent' not found");
     });
+  });
+});
+
+// Test backward compatibility with QueryRouter alias
+describe('QueryRouter Backward Compatibility', () => {
+  let router: DataSource;
+
+  afterEach(async () => {
+    if (router) {
+      await router.close();
+    }
+  });
+
+  it('should work with QueryRouter alias', async () => {
+    if (!hasCredentials('postgresql')) {
+      return; // Skip if no credentials
+    }
+
+    const dataSources: DataSourceConfig[] = [
+      {
+        name: 'test-postgres',
+        type: DataSourceType.PostgreSQL,
+        credentials: createPostgreSQLCredentials(),
+      },
+    ];
+
+    router = new QueryRouter({ dataSources });
+
+    const dataSourceNames = router.getDataSources();
+    expect(dataSourceNames).toEqual(['test-postgres']);
   });
 });

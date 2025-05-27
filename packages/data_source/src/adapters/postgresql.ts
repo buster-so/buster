@@ -1,4 +1,6 @@
 import { Client, type ClientConfig } from 'pg';
+import type { DataSourceIntrospector } from '../introspection/base';
+import { PostgreSQLIntrospector } from '../introspection/postgresql';
 import { type Credentials, DataSourceType, type PostgreSQLCredentials } from '../types/credentials';
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
@@ -8,6 +10,7 @@ import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base
  */
 export class PostgreSQLAdapter extends BaseAdapter {
   private client?: Client;
+  private introspector?: PostgreSQLIntrospector;
 
   async initialize(credentials: Credentials): Promise<void> {
     this.validateCredentials(credentials, DataSourceType.PostgreSQL);
@@ -103,5 +106,12 @@ export class PostgreSQLAdapter extends BaseAdapter {
 
   getDataSourceType(): string {
     return DataSourceType.PostgreSQL;
+  }
+
+  introspect(): DataSourceIntrospector {
+    if (!this.introspector) {
+      this.introspector = new PostgreSQLIntrospector('postgresql', this);
+    }
+    return this.introspector;
   }
 }

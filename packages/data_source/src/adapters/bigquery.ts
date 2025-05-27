@@ -1,4 +1,6 @@
 import { BigQuery, type BigQueryOptions, type Query } from '@google-cloud/bigquery';
+import type { DataSourceIntrospector } from '../introspection/base';
+import { BigQueryIntrospector } from '../introspection/bigquery';
 import { type BigQueryCredentials, type Credentials, DataSourceType } from '../types/credentials';
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
@@ -8,6 +10,7 @@ import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base
  */
 export class BigQueryAdapter extends BaseAdapter {
   private client?: BigQuery;
+  private introspector?: BigQueryIntrospector;
 
   async initialize(credentials: Credentials): Promise<void> {
     this.validateCredentials(credentials, DataSourceType.BigQuery);
@@ -129,5 +132,12 @@ export class BigQueryAdapter extends BaseAdapter {
 
   getDataSourceType(): string {
     return DataSourceType.BigQuery;
+  }
+
+  introspect(): DataSourceIntrospector {
+    if (!this.introspector) {
+      this.introspector = new BigQueryIntrospector('bigquery', this);
+    }
+    return this.introspector;
   }
 }

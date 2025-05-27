@@ -1,4 +1,6 @@
 import { Client, type ClientConfig } from 'pg';
+import type { DataSourceIntrospector } from '../introspection/base';
+import { RedshiftIntrospector } from '../introspection/redshift';
 import { type Credentials, DataSourceType, type RedshiftCredentials } from '../types/credentials';
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
@@ -8,6 +10,7 @@ import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base
  */
 export class RedshiftAdapter extends BaseAdapter {
   private client?: Client;
+  private introspector?: RedshiftIntrospector;
 
   async initialize(credentials: Credentials): Promise<void> {
     this.validateCredentials(credentials, DataSourceType.Redshift);
@@ -99,5 +102,12 @@ export class RedshiftAdapter extends BaseAdapter {
 
   getDataSourceType(): string {
     return DataSourceType.Redshift;
+  }
+
+  introspect(): DataSourceIntrospector {
+    if (!this.introspector) {
+      this.introspector = new RedshiftIntrospector('redshift', this);
+    }
+    return this.introspector;
   }
 }
