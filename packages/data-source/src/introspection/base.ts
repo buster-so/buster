@@ -181,7 +181,8 @@ export abstract class BaseIntrospector implements DataSourceIntrospector {
                   column.nullCount = stat.nullCount;
                   column.minValue = stat.minValue;
                   column.maxValue = stat.maxValue;
-                  column.sampleValues = stat.sampleValues;
+                  // Apply smart truncation to sample values
+                  column.sampleValues = this.truncateSampleValues(stat.sampleValues, column);
                 }
               }
             } catch (error) {
@@ -244,5 +245,112 @@ export abstract class BaseIntrospector implements DataSourceIntrospector {
   protected getString(value: unknown): string | undefined {
     if (value === null || value === undefined) return undefined;
     return String(value);
+  }
+
+  /**
+   * Helper method to apply smart truncation to sample values
+   */
+  protected truncateSampleValues(
+    sampleValues: string | undefined,
+    column: Column
+  ): string | undefined {
+    if (!sampleValues) return undefined;
+
+    const values = sampleValues.split(',').filter((v) => v.trim().length > 0);
+    if (values.length === 0) return undefined;
+
+    const dataType = column.dataType.toLowerCase();
+
+    // Handle JSON columns - fewer samples, smart truncation
+    if (dataType.includes('json') || dataType.includes('jsonb')) {
+      return this.truncateJsonSamples(values);
+    }
+
+    // Handle long text columns - adaptive sample count
+    if (this.isLongTextColumn(column, values)) {
+      return this.truncateLongTextSamples(values);
+    }
+
+    // Handle normal columns - standard truncation
+    return this.truncateNormalSamples(values);
+  }
+
+  /**
+   * Truncate JSON sample values - show fewer samples with smart truncation
+   */
+  private truncateJsonSamples(values: string[]): string {
+    return values
+      .slice(0, 3) // Only show 3 JSON samples
+      .map((value) => {
+        if (value.length > 100) {
+          // Try to truncate at a logical JSON boundary
+          const truncated = value.substring(0, 100);
+          const lastComma = truncated.lastIndexOf(',');
+          const lastBrace = truncated.lastIndexOf('}');
+          const cutPoint = Math.max(lastComma, lastBrace);
+
+          if (cutPoint > 50) {
+            return `${truncated.substring(0, cutPoint)}...}`;
+          }
+          return `${truncated}...`;
+        }
+        return value;
+      })
+      .join(',');
+  }
+
+  /**
+   * Truncate long text sample values - fewer samples, shorter truncation
+   */
+  private truncateLongTextSamples(values: string[]): string {
+    const avgLength = values.reduce((sum, v) => sum + v.length, 0) / values.length;
+    const sampleCount = avgLength > 200 ? 3 : avgLength > 100 ? 5 : 10;
+    const truncateLength = avgLength > 200 ? 30 : 50;
+
+    return values
+      .slice(0, sampleCount)
+      .map((value) => {
+        if (value.length > truncateLength) {
+          return `${value.substring(0, truncateLength)}...`;
+        }
+        return value;
+      })
+      .join(',');
+  }
+
+  /**
+   * Truncate normal sample values - standard approach
+   */
+  private truncateNormalSamples(values: string[]): string {
+    return values
+      .slice(0, 20)
+      .map((value) => {
+        if (value.length > 100) {
+          return `${value.substring(0, 100)}...`;
+        }
+        return value;
+      })
+      .join(',');
+  }
+
+  /**
+   * Check if this is a long text column based on type and sample values
+   */
+  private isLongTextColumn(column: Column, values: string[]): boolean {
+    const dataType = column.dataType.toLowerCase();
+
+    // Check data type indicators
+    if (dataType.includes('text') || dataType.includes('varchar') || dataType.includes('char')) {
+      // Check if max length suggests long text
+      if (column.maxLength && column.maxLength > 255) {
+        return true;
+      }
+
+      // Check if sample values are long
+      const avgLength = values.reduce((sum, v) => sum + v.length, 0) / values.length;
+      return avgLength > 100;
+    }
+
+    return false;
   }
 }
