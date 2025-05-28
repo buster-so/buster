@@ -14,6 +14,4 @@ export default async function MetricPage(props: { params: Promise<{ metricId: st
       metricId
     })
   );
-
-  return <></>;
 }

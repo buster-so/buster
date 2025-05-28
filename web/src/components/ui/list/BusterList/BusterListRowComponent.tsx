@@ -84,7 +84,7 @@ export const BusterListRowComponent = React.memo(
               'group'
             )}
             ref={ref}>
-            {!!onSelectChange ? (
+            {onSelectChange ? (
               <CheckboxColumn checkStatus={checked ? 'checked' : 'unchecked'} onChange={onChange} />
             ) : (
               <></>

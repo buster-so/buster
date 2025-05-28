@@ -8,7 +8,7 @@ import { type DependencyList, useEffect, useRef } from 'react';
  * @param effect The effect function to run
  * @param deps The dependencies array
  */
-export const useUpdateEffect = (effect: () => undefined | (() => void), deps?: DependencyList) => {
+export const useUpdateEffect = (effect: () => void, deps?: DependencyList) => {
   const isFirstRender = useRef(true);
 
   useEffect(() => {

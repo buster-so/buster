@@ -19,27 +19,23 @@ export default function Page() {
 
   return (
     <div className="mx-auto overflow-y-auto px-14 pt-12 pb-12">
-      <>
-        {showSkeletonLoader ? (
-          <></>
-        ) : (
-          <div className="flex w-full flex-col space-y-5">
-            <OverviewHeader
-              datasetId={dataset.id}
-              description={dataset.description}
-              name={dataset.name}
-            />
+      {showSkeletonLoader ? null : (
+        <div className="flex w-full flex-col space-y-5">
+          <OverviewHeader
+            datasetId={dataset.id}
+            description={dataset.description}
+            name={dataset.name}
+          />
 
-            <Separator />
+          <Separator />
 
-            <OverviewData
-              datasetId={dataset.id}
-              data={datasetData || []}
-              isFetchedDatasetData={isFetchedDatasetData}
-            />
-          </div>
-        )}
-      </>
+          <OverviewData
+            datasetId={dataset.id}
+            data={datasetData || []}
+            isFetchedDatasetData={isFetchedDatasetData}
+          />
+        </div>
+      )}
     </div>
   );
 }
