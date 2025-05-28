@@ -9,6 +9,7 @@ export const ChartIcon_Combo: React.FC<{ colors?: string[]; disabled?: boolean }
 
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
+      <title>Combo Chart Icon</title>
       <g clipPath="url(#clip0_257_883)">
         <path
           d="M1.5 2C1.5 1.44772 1.94772 1 2.5 1H4.5C5.05228 1 5.5 1.44772 5.5 2V21H1.5V2Z"

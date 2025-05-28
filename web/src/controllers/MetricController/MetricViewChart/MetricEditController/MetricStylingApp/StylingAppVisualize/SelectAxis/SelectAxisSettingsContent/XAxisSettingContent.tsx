@@ -10,7 +10,7 @@ import { EditAxisLabelRotation } from './EditAxisLabelRotation';
 import { EditShowAxisLabel } from './EditShowAxisLabel';
 import { EditShowAxisTitle } from './EditShowAxisTitle';
 
-export const XAxisSettingContent: React.FC<{}> = React.memo(({}) => {
+export const XAxisSettingContent: React.FC = React.memo(() => {
   const { onUpdateMetricChartConfig } = useUpdateMetricChart();
   const xAxisAxisTitle = useSelectAxisContextSelector((x) => x.xAxisAxisTitle);
   const columnLabelFormats = useSelectAxisContextSelector((x) => x.columnLabelFormats);

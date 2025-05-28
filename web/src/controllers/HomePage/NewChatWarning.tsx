@@ -85,6 +85,8 @@ export const NewChatWarning = React.memo(
   }
 );
 
+NewChatWarning.displayName = 'NewChatWarning';
+
 interface SetupItemProps {
   number: string;
   status: boolean;

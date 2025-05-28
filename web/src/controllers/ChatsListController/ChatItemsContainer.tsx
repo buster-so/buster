@@ -204,7 +204,6 @@ const TitleCell = React.memo<{ name: string; chatId: string }>(({ name, chatId }
   return (
     <div className="flex w-full items-center space-x-2">
       <Text truncate>{name}</Text>
-      {/* biome-ignore lint/a11y/useKeyWithClickEvents: This div only stops event propagation, the FavoriteStar component handles accessibility */}
       <div className="mr-2 flex items-center" onClick={onFavoriteDivClick}>
         <FavoriteStar
           id={chatId}

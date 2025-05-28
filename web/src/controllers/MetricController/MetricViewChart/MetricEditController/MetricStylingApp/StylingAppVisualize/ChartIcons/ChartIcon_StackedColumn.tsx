@@ -9,6 +9,7 @@ export const ChartIcon_StackedColumn: React.FC<{ colors?: string[]; disabled?: b
 
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
+      <title>Stacked Column Chart Icon</title>
       <path
         d="M1.5 17C1.5 16.4477 1.94772 16 2.5 16H4.5C5.05228 16 5.5 16.4477 5.5 17V22H1.5V17Z"
         fill={colors[0]}

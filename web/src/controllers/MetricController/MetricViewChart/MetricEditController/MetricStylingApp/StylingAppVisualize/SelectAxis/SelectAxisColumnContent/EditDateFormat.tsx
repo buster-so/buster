@@ -49,7 +49,7 @@ export const EditDateFormat: React.FC<{
 
   const selectedOption = useMemo(() => {
     if (dateFormat === '') return NO_FORMATTING_ITEM;
-    return selectOptions.find((option) => option.value === dateFormat) || first(selectOptions)!;
+    return selectOptions.find((option) => option.value === dateFormat) || first(selectOptions);
   }, [dateFormat, selectOptions]);
 
   const onChange = useMemoizedFn((value: IColumnLabelFormat['dateFormat']) => {
@@ -70,7 +70,7 @@ export const EditDateFormat: React.FC<{
         key={convertNumberTo}
         className="w-full!"
         items={selectOptions}
-        value={selectedOption.value}
+        value={selectedOption?.value}
         onChange={onChange}
       />
     </LabelAndInput>

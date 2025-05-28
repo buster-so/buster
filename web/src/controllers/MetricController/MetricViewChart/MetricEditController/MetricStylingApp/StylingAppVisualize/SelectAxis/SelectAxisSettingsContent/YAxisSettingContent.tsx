@@ -5,15 +5,12 @@ import { useUpdateMetricChart } from '@/context/Metrics';
 import { useMemoizedFn } from '@/hooks';
 import { formatLabel } from '@/lib';
 import React, { useMemo } from 'react';
-import type { SelectAxisContainerId } from '../config';
 import { useSelectAxisContextSelector } from '../useSelectAxisContext';
 import { EditAxisScale } from './EditAxisScale';
 import { EditShowAxisLabel } from './EditShowAxisLabel';
 import { EditShowAxisTitle } from './EditShowAxisTitle';
 
-export const YAxisSettingContent: React.FC<{
-  zoneId: SelectAxisContainerId;
-}> = React.memo(({}) => {
+export const YAxisSettingContent: React.FC = React.memo(() => {
   const { onUpdateMetricChartConfig } = useUpdateMetricChart();
   const yAxisAxisTitle = useSelectAxisContextSelector((x) => x.yAxisAxisTitle);
   const selectedAxis = useSelectAxisContextSelector((x) => x.selectedAxis);

@@ -75,12 +75,12 @@ export const useMetricRunSQL = () => {
         const { data, data_metadata } = d;
         const metricMessage = getMetricMemoized(metricId);
         const currentMessageData = getMetricDataMemoized(metricId);
-        if (!originalConfigs.current) {
+        if (!originalConfigs.current && metricMessage?.sql && currentMessageData) {
           originalConfigs.current = {
-            chartConfig: metricMessage?.chart_config!,
-            sql: metricMessage?.sql!,
-            data: currentMessageData?.data!,
-            dataMetadata: currentMessageData?.data_metadata!
+            chartConfig: metricMessage?.chart_config,
+            sql: metricMessage?.sql,
+            data: currentMessageData?.data,
+            dataMetadata: currentMessageData?.data_metadata
           };
         }
 
@@ -136,8 +136,8 @@ export const useMetricRunSQL = () => {
     });
     onSetDataForMetric({
       metricId,
-      data: originalConfigs.current?.data!,
-      data_metadata: originalConfigs.current?.dataMetadata!,
+      data: originalConfigs.current?.data,
+      data_metadata: originalConfigs.current?.dataMetadata,
       isDataFromRerun: false
     });
     originalConfigs.current = null;

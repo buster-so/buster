@@ -11,9 +11,7 @@ import { EditAxisScale } from './EditAxisScale';
 import { EditShowAxisLabel } from './EditShowAxisLabel';
 import { EditShowAxisTitle } from './EditShowAxisTitle';
 
-export const Y2AxisSettingContent: React.FC<{
-  zoneId: SelectAxisContainerId;
-}> = React.memo(({}) => {
+export const Y2AxisSettingContent: React.FC = React.memo(() => {
   const { onUpdateMetricChartConfig } = useUpdateMetricChart();
   const selectedAxis = useSelectAxisContextSelector((x) => x.selectedAxis) as ComboChartAxis;
   const columnLabelFormats = useSelectAxisContextSelector((x) => x.columnLabelFormats);

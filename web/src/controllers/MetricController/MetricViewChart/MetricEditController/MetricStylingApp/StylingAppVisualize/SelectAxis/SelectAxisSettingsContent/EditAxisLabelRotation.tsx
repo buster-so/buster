@@ -17,7 +17,7 @@ export const EditAxisLabelRotation: React.FC<{
 }> = React.memo(({ xAxisLabelRotation, onChangeLabelRotation }) => {
   const selectedOption: IBusterMetricChartConfig['xAxisLabelRotation'] = useMemo(() => {
     return (
-      options.find((option) => option.value === xAxisLabelRotation)?.value ?? options[0]?.value!
+      options.find((option) => option.value === xAxisLabelRotation)?.value ?? options[0]?.value
     );
   }, [xAxisLabelRotation]);
 

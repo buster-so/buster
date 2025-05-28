@@ -24,7 +24,9 @@ export const EditMetricAggregate: React.FC<{
   onUpdateAggregate: (aggregate: IBusterMetricChartConfig['metricValueAggregate']) => void;
   columnLabelFormat: ColumnLabelFormat | undefined;
 }> = React.memo(({ aggregate, onUpdateAggregate, columnId, columnLabelFormat }) => {
-  const isNumberColumn = isNumericColumnType(columnLabelFormat?.columnType!);
+  const isNumberColumn = columnLabelFormat?.columnType
+    ? isNumericColumnType(columnLabelFormat?.columnType)
+    : false;
   const isNumericStyle = isNumericColumnStyle(columnLabelFormat?.style);
   const disableOptions = !isNumberColumn || !isNumericStyle;
 

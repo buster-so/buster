@@ -11,7 +11,7 @@ import { DatasetBreadcrumb } from './DatasetBreadcrumb';
 import { DatasetIndividualThreeDotMenu } from './DatasetIndividualThreeDotMenu';
 import { useDatasetPageContextSelector } from '../DatasetPageContext';
 
-export const DatasetsIndividualHeader: React.FC<{}> = React.memo(({}) => {
+export const DatasetsIndividualHeader: React.FC = React.memo(() => {
   const selectedApp = useDatasetPageContextSelector((state) => state.selectedApp);
   const dataset = useDatasetPageContextSelector((state) => state.dataset);
   const onPublishDataset = useDatasetPageContextSelector((state) => state.onPublishDataset);

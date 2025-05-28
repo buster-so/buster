@@ -17,6 +17,7 @@ export const ReasoningScrollToBottom: React.FC<{
       )}>
       <AppTooltip title="Stick to bottom" sideOffset={12} delayDuration={500}>
         <button
+          type="button"
           onClick={scrollToBottom}
           className={
             'bg-background/90 hover:bg-item-hover/90 cursor-pointer rounded-full border p-2 shadow transition-all duration-300 hover:scale-105 hover:shadow-md'

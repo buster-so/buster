@@ -20,7 +20,7 @@ export const EditDateType: React.FC<{
   onUpdateColumnConfig: (columnLabelFormat: Partial<IColumnLabelFormat>) => void;
 }> = React.memo(({ convertNumberTo, onUpdateColumnConfig }) => {
   const selectedOption = useMemo(() => {
-    return options.find((option) => option.value === convertNumberTo) || last(options)!;
+    return options.find((option) => option.value === convertNumberTo) || last(options);
   }, [convertNumberTo]);
 
   const onChange = useMemoizedFn((value: IColumnLabelFormat['convertNumberTo']) => {
@@ -56,7 +56,7 @@ export const EditDateType: React.FC<{
         <Select
           className="w-full!"
           items={options}
-          value={selectedOption.value}
+          value={selectedOption?.value}
           onChange={onChange}
         />
       </div>

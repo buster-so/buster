@@ -9,6 +9,7 @@ export const ChartIcon_Scatter: React.FC<{ colors?: string[]; disabled?: boolean
 
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="23" height="22" viewBox="0 0 23 22" fill="none">
+      <title>Scatter Chart Icon</title>
       <path
         d="M15.3348 4C15.3348 5.10457 14.4393 6 13.3348 6C12.2302 6 11.3348 5.10457 11.3348 4C11.3348 2.89543 12.2302 2 13.3348 2C14.4393 2 15.3348 2.89543 15.3348 4Z"
         fill={colors[1]}

@@ -73,7 +73,7 @@ const permissionAndSecurityItems = (currentParentRoute: BusterRoutes): ISidebarG
   }))
 });
 
-export const SidebarSettings: React.FC<{}> = React.memo(({}) => {
+export const SidebarSettings: React.FC = React.memo(() => {
   const isAdmin = useUserConfigContextSelector((x) => x.isAdmin);
   const currentParentRoute = useAppLayoutContextSelector((x) => x.currentParentRoute);
 

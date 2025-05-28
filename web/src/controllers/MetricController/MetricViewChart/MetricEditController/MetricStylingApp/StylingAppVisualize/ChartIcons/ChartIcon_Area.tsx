@@ -9,6 +9,7 @@ export const ChartIcon_Area: React.FC<{ colors?: string[]; disabled?: boolean }>
 
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="23" height="22" viewBox="0 0 23 22" fill="none">
+      <title>Area Chart Icon</title>
       <g clipPath="url(#clip0_257_1019)">
         <path
           d="M0.666992 14.5L15.667 11.5L22.667 7V20C22.667 20.5523 22.2193 21 21.667 21H1.66699C1.11471 21 0.666992 20.5523 0.666992 20V14.5Z"

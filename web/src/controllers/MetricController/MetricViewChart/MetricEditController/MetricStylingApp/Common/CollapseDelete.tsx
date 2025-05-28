@@ -90,6 +90,7 @@ const CollapseDeleteHeader = React.memo(
       <div
         ref={ref}
         onClick={onToggleDropdown}
+        onKeyUp={() => {}}
         style={{ ...style }}
         className={cn(
           'h-8 max-h-8 min-h-8',
@@ -156,14 +157,18 @@ const DropdownIcon: React.FC<{
     onClickDelete?.();
   });
 
-  const onClickContainer = useMemoizedFn((e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-  });
+  const onClickContainer = useMemoizedFn(
+    (event: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>) => {
+      event.stopPropagation();
+    }
+  );
 
   return (
     <div
       className="relative flex h-full cursor-pointer items-center space-x-0.5 pr-1"
-      onClick={onClickContainer}>
+      onClick={onClickContainer}
+      onKeyUp={(e) => e.key === 'Enter' && onClickContainer(e)}
+      onKeyDown={(e) => e.key === 'Enter' && onClickContainer(e)}>
       {onClickDelete && (
         <Button
           size="small"

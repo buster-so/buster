@@ -142,6 +142,7 @@ const ChartButton: React.FC<{
     return (
       <AppTooltip title={tooltipText} delayDuration={650}>
         <button
+          type="button"
           key={id}
           disabled={disabled}
           data-testid={`select-chart-type-${id}`}

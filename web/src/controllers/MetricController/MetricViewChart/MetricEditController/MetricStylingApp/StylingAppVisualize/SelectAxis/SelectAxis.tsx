@@ -43,7 +43,7 @@ export const SelectAxis: React.FC<
 
     const newChartEncodes: Partial<ChartEncodes> = dropZones.reduce<ChartEncodes>((acc, zone) => {
       const axis = zoneIdToAxis[zone.id];
-      return { ...acc, [axis]: zone.items };
+      return Object.assign(acc, { [axis]: zone.items });
     }, {} as ChartEncodes);
 
     const newChartConfig: Partial<IBusterMetricChartConfig> = {
