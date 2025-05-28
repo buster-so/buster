@@ -3,6 +3,7 @@ import { DataSource } from '../../../src/data-source';
 import type { DataSourceConfig } from '../../../src/data-source';
 import { DataSourceType } from '../../../src/types/credentials';
 import type { PostgreSQLCredentials } from '../../../src/types/credentials';
+import type { ColumnStatistics, Table, TableStatistics } from '../../../src/types/introspection';
 import { TEST_TIMEOUT, skipIfNoCredentials, testConfig } from '../../setup';
 
 function createPostgreSQLCredentials(): PostgreSQLCredentials {
@@ -24,6 +25,78 @@ function createPostgreSQLCredentials(): PostgreSQLCredentials {
     schema: testConfig.postgresql.schema,
     ssl: testConfig.postgresql.ssl,
   };
+}
+
+function validateTableStatisticsStructure(stats: TableStatistics, firstTable: Table) {
+  // Verify basic table statistics structure
+  expect(stats).toHaveProperty('table', firstTable.name);
+  expect(stats).toHaveProperty('schema', firstTable.schema);
+  expect(stats).toHaveProperty('database', firstTable.database);
+  expect(stats).toHaveProperty('columnStatistics');
+  expect(stats).toHaveProperty('lastUpdated');
+  expect(Array.isArray(stats.columnStatistics)).toBe(true);
+  expect(stats.lastUpdated).toBeInstanceOf(Date);
+}
+
+function validateColumnStatistics(columnStatistics: ColumnStatistics[]) {
+  // Verify column statistics structure
+  for (const colStat of columnStatistics) {
+    expect(colStat).toHaveProperty('columnName');
+    expect(typeof colStat.columnName).toBe('string');
+    expect(colStat.columnName.length).toBeGreaterThan(0);
+
+    // Verify distinct count is present and valid
+    expect(colStat).toHaveProperty('distinctCount');
+    if (colStat.distinctCount !== undefined) {
+      expect(typeof colStat.distinctCount).toBe('number');
+      expect(colStat.distinctCount).toBeGreaterThanOrEqual(0);
+    }
+
+    // Verify null count is present and valid
+    expect(colStat).toHaveProperty('nullCount');
+    if (colStat.nullCount !== undefined) {
+      expect(typeof colStat.nullCount).toBe('number');
+      expect(colStat.nullCount).toBeGreaterThanOrEqual(0);
+    }
+
+    // Verify min/max values are present (can be undefined for non-numeric/date columns)
+    expect(colStat).toHaveProperty('minValue');
+    expect(colStat).toHaveProperty('maxValue');
+
+    // If min/max values exist, they should be valid
+    if (colStat.minValue !== undefined && colStat.maxValue !== undefined) {
+      // For numeric columns, min should be <= max
+      if (typeof colStat.minValue === 'number' && typeof colStat.maxValue === 'number') {
+        expect(colStat.minValue).toBeLessThanOrEqual(colStat.maxValue);
+      }
+    }
+  }
+}
+
+async function validateColumnMapping(
+  dataSource: DataSource,
+  firstTable: Table,
+  stats: TableStatistics
+) {
+  // Verify we have statistics for each column in the table
+  const columns = await dataSource.getColumns(
+    'test-postgresql',
+    firstTable.database,
+    firstTable.schema,
+    firstTable.name
+  );
+
+  if (columns.length > 0) {
+    expect(stats.columnStatistics.length).toBe(columns.length);
+
+    // Verify each column has corresponding statistics
+    for (const column of columns) {
+      const columnStat = stats.columnStatistics.find(
+        (stat: ColumnStatistics) => stat.columnName === column.name
+      );
+      expect(columnStat).toBeDefined();
+    }
+  }
 }
 
 describe('PostgreSQL DataSource Introspection', () => {
@@ -223,19 +296,11 @@ describe('PostgreSQL DataSource Introspection', () => {
               'test-postgresql'
             );
 
-            expect(stats).toHaveProperty('table', firstTable.name);
-            expect(stats).toHaveProperty('schema', firstTable.schema);
-            expect(stats).toHaveProperty('database', firstTable.database);
-            expect(stats).toHaveProperty('columnStatistics');
-            expect(Array.isArray(stats.columnStatistics)).toBe(true);
-
-            // Verify column statistics structure if available
-            for (const colStat of stats.columnStatistics) {
-              expect(colStat).toHaveProperty('columnName');
-              expect(typeof colStat.columnName).toBe('string');
-            }
+            validateTableStatisticsStructure(stats, firstTable);
+            validateColumnStatistics(stats.columnStatistics);
+            await validateColumnMapping(dataSource, firstTable, stats);
           } catch (error) {
-            // Some tables might not have statistics available
+            // Some tables might not have statistics available or might be empty
             console.warn('Table statistics not available for', firstTable.name, ':', error);
             expect(error).toBeInstanceOf(Error);
           }

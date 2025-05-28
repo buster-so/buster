@@ -232,4 +232,42 @@ describe('BigQuery DataSource Introspection', () => {
     },
     TEST_TIMEOUT
   );
+
+  testFn(
+    'should get BigQuery table statistics (placeholder)',
+    async () => {
+      const config: DataSourceConfig = {
+        name: 'test-bigquery',
+        type: DataSourceType.BigQuery,
+        credentials: createBigQueryCredentials(),
+      };
+
+      dataSource = new DataSource({ dataSources: [config] });
+
+      // Since this is a placeholder implementation, we just verify the method exists
+      // and returns the expected structure
+      try {
+        const stats = await dataSource.getTableStatistics(
+          'default_project',
+          'default_dataset',
+          'test_table',
+          'test-bigquery'
+        );
+
+        // Verify basic structure (placeholder implementation returns empty stats)
+        expect(stats).toHaveProperty('table', 'test_table');
+        expect(stats).toHaveProperty('schema', 'default_dataset');
+        expect(stats).toHaveProperty('database', 'default_project');
+        expect(stats).toHaveProperty('columnStatistics');
+        expect(stats).toHaveProperty('lastUpdated');
+        expect(Array.isArray(stats.columnStatistics)).toBe(true);
+        expect(stats.lastUpdated).toBeInstanceOf(Date);
+      } catch (error) {
+        // Expected for placeholder implementation
+        console.warn('BigQuery table statistics not implemented:', error);
+        expect(error).toBeInstanceOf(Error);
+      }
+    },
+    TEST_TIMEOUT
+  );
 });

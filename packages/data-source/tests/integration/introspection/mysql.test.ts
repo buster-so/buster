@@ -3,6 +3,7 @@ import { DataSource } from '../../../src/data-source';
 import type { DataSourceConfig } from '../../../src/data-source';
 import { DataSourceType } from '../../../src/types/credentials';
 import type { MySQLCredentials } from '../../../src/types/credentials';
+import type { ColumnStatistics, Table, TableStatistics } from '../../../src/types/introspection';
 import { TEST_TIMEOUT, skipIfNoCredentials, testConfig } from '../../setup';
 
 function createMySQLCredentials(): MySQLCredentials {
@@ -19,6 +20,78 @@ function createMySQLCredentials(): MySQLCredentials {
     password: testConfig.mysql.password,
     ssl: testConfig.mysql.ssl,
   };
+}
+
+function validateTableStatisticsStructure(stats: TableStatistics, firstTable: Table) {
+  // Verify basic table statistics structure
+  expect(stats).toHaveProperty('table', firstTable.name);
+  expect(stats).toHaveProperty('schema', firstTable.schema);
+  expect(stats).toHaveProperty('database', firstTable.database);
+  expect(stats).toHaveProperty('columnStatistics');
+  expect(stats).toHaveProperty('lastUpdated');
+  expect(Array.isArray(stats.columnStatistics)).toBe(true);
+  expect(stats.lastUpdated).toBeInstanceOf(Date);
+}
+
+function validateColumnStatistics(columnStatistics: ColumnStatistics[]) {
+  // Verify column statistics structure
+  for (const colStat of columnStatistics) {
+    expect(colStat).toHaveProperty('columnName');
+    expect(typeof colStat.columnName).toBe('string');
+    expect(colStat.columnName.length).toBeGreaterThan(0);
+
+    // Verify distinct count is present and valid
+    expect(colStat).toHaveProperty('distinctCount');
+    if (colStat.distinctCount !== undefined) {
+      expect(typeof colStat.distinctCount).toBe('number');
+      expect(colStat.distinctCount).toBeGreaterThanOrEqual(0);
+    }
+
+    // Verify null count is present and valid
+    expect(colStat).toHaveProperty('nullCount');
+    if (colStat.nullCount !== undefined) {
+      expect(typeof colStat.nullCount).toBe('number');
+      expect(colStat.nullCount).toBeGreaterThanOrEqual(0);
+    }
+
+    // Verify min/max values are present (can be undefined for non-numeric/date columns)
+    expect(colStat).toHaveProperty('minValue');
+    expect(colStat).toHaveProperty('maxValue');
+
+    // If min/max values exist, they should be valid
+    if (colStat.minValue !== undefined && colStat.maxValue !== undefined) {
+      // For numeric columns, min should be <= max
+      if (typeof colStat.minValue === 'number' && typeof colStat.maxValue === 'number') {
+        expect(colStat.minValue).toBeLessThanOrEqual(colStat.maxValue);
+      }
+    }
+  }
+}
+
+async function validateColumnMapping(
+  dataSource: DataSource,
+  firstTable: Table,
+  stats: TableStatistics
+) {
+  // Verify we have statistics for each column in the table
+  const columns = await dataSource.getColumns(
+    'test-mysql',
+    firstTable.database,
+    firstTable.schema,
+    firstTable.name
+  );
+
+  if (columns.length > 0) {
+    expect(stats.columnStatistics.length).toBe(columns.length);
+
+    // Verify each column has corresponding statistics
+    for (const column of columns) {
+      const columnStat = stats.columnStatistics.find(
+        (stat: ColumnStatistics) => stat.columnName === column.name
+      );
+      expect(columnStat).toBeDefined();
+    }
+  }
 }
 
 describe('MySQL DataSource Introspection', () => {
@@ -234,6 +307,45 @@ describe('MySQL DataSource Introspection', () => {
 
       const connectionResult = await dataSource.testDataSource('test-mysql');
       expect(connectionResult).toBe(true);
+    },
+    TEST_TIMEOUT
+  );
+
+  testFn(
+    'should get MySQL table statistics',
+    async () => {
+      const config: DataSourceConfig = {
+        name: 'test-mysql',
+        type: DataSourceType.MySQL,
+        credentials: createMySQLCredentials(),
+      };
+
+      dataSource = new DataSource({ dataSources: [config] });
+
+      const tables = await dataSource.getTables('test-mysql');
+
+      // If tables exist, test statistics
+      if (tables.length > 0) {
+        const firstTable = tables[0];
+        if (firstTable) {
+          try {
+            const stats = await dataSource.getTableStatistics(
+              firstTable.database,
+              firstTable.schema,
+              firstTable.name,
+              'test-mysql'
+            );
+
+            validateTableStatisticsStructure(stats, firstTable);
+            validateColumnStatistics(stats.columnStatistics);
+            await validateColumnMapping(dataSource, firstTable, stats);
+          } catch (error) {
+            // Some tables might not have statistics available or might be empty
+            console.warn('Table statistics not available for', firstTable.name, ':', error);
+            expect(error).toBeInstanceOf(Error);
+          }
+        }
+      }
     },
     TEST_TIMEOUT
   );

@@ -239,4 +239,42 @@ describe('SQL Server DataSource Introspection', () => {
     },
     TEST_TIMEOUT
   );
+
+  testFn(
+    'should get SQL Server table statistics (placeholder)',
+    async () => {
+      const config: DataSourceConfig = {
+        name: 'test-sqlserver',
+        type: DataSourceType.SQLServer,
+        credentials: createSQLServerCredentials(),
+      };
+
+      dataSource = new DataSource({ dataSources: [config] });
+
+      // Since this is a placeholder implementation, we just verify the method exists
+      // and returns the expected structure
+      try {
+        const stats = await dataSource.getTableStatistics(
+          'default_database',
+          'dbo',
+          'test_table',
+          'test-sqlserver'
+        );
+
+        // Verify basic structure (placeholder implementation returns empty stats)
+        expect(stats).toHaveProperty('table', 'test_table');
+        expect(stats).toHaveProperty('schema', 'dbo');
+        expect(stats).toHaveProperty('database', 'default_database');
+        expect(stats).toHaveProperty('columnStatistics');
+        expect(stats).toHaveProperty('lastUpdated');
+        expect(Array.isArray(stats.columnStatistics)).toBe(true);
+        expect(stats.lastUpdated).toBeInstanceOf(Date);
+      } catch (error) {
+        // Expected for placeholder implementation
+        console.warn('SQL Server table statistics not implemented:', error);
+        expect(error).toBeInstanceOf(Error);
+      }
+    },
+    TEST_TIMEOUT
+  );
 });

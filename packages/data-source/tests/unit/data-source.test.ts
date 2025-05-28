@@ -394,7 +394,23 @@ describe('DataSource Unit Tests', () => {
         schema: 'public',
         database: 'test_db',
         rowCount: 100,
-        columnStatistics: [],
+        columnStatistics: [
+          {
+            columnName: 'id',
+            distinctCount: 100,
+            nullCount: 0,
+            minValue: 1,
+            maxValue: 100,
+          },
+          {
+            columnName: 'name',
+            distinctCount: 95,
+            nullCount: 5,
+            minValue: undefined,
+            maxValue: undefined,
+          },
+        ],
+        lastUpdated: new Date(),
       });
       vi.mocked(mockIntrospector.getDataSourceType).mockReturnValue('postgresql');
     });
@@ -475,7 +491,23 @@ describe('DataSource Unit Tests', () => {
         schema: 'public',
         database: 'test_db',
         rowCount: 100,
-        columnStatistics: [],
+        columnStatistics: [
+          {
+            columnName: 'id',
+            distinctCount: 100,
+            nullCount: 0,
+            minValue: 1,
+            maxValue: 100,
+          },
+          {
+            columnName: 'name',
+            distinctCount: 95,
+            nullCount: 5,
+            minValue: undefined,
+            maxValue: undefined,
+          },
+        ],
+        lastUpdated: new Date(),
       });
       expect(mockIntrospector.getTableStatistics).toHaveBeenCalledWith(
         'test_db',

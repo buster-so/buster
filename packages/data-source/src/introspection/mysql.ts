@@ -13,9 +13,18 @@ import { BaseIntrospector } from './base';
 
 /**
  * MySQL-specific introspector implementation
+ * Optimized to batch metadata queries and eliminate N+1 patterns
  */
 export class MySQLIntrospector extends BaseIntrospector {
   private adapter: DatabaseAdapter;
+  private metadataCache: {
+    databases?: Database[];
+    schemas?: Schema[];
+    tables?: Table[];
+    columns?: Column[];
+    views?: View[];
+    lastFetched?: Date;
+  } = {};
 
   constructor(dataSourceName: string, adapter: DatabaseAdapter) {
     super(dataSourceName);
@@ -26,140 +35,175 @@ export class MySQLIntrospector extends BaseIntrospector {
     return DataSourceType.MySQL;
   }
 
-  async getDatabases(): Promise<Database[]> {
-    const result = await this.adapter.query('SHOW DATABASES');
+  /**
+   * Fetch all metadata in batched queries for efficiency
+   */
+  private async fetchAllMetadata(): Promise<void> {
+    // Only fetch if not cached or cache is older than 5 minutes
+    const cacheAge = this.metadataCache.lastFetched
+      ? Date.now() - this.metadataCache.lastFetched.getTime()
+      : Number.POSITIVE_INFINITY;
 
-    return result.rows
-      .filter((row) => {
-        const name = this.getString(row.Database);
-        return name && !['information_schema', 'performance_schema', 'mysql', 'sys'].includes(name);
-      })
-      .map((row) => ({
-        name: this.getString(row.Database) || '',
+    if (cacheAge < 5 * 60 * 1000 && this.metadataCache.databases) {
+      return; // Use cached data
+    }
+
+    try {
+      // Query 1: Get all databases
+      const databasesResult = await this.adapter.query('SHOW DATABASES');
+
+      this.metadataCache.databases = databasesResult.rows
+        .filter((row) => {
+          const name = this.getString(row.Database);
+          return (
+            name && !['information_schema', 'performance_schema', 'mysql', 'sys'].includes(name)
+          );
+        })
+        .map((row) => ({
+          name: this.getString(row.Database) || '',
+        }));
+
+      // In MySQL, databases and schemas are the same concept
+      this.metadataCache.schemas = this.metadataCache.databases.map((db) => ({
+        name: db.name,
+        database: db.name,
+        owner: db.owner,
+        comment: db.comment,
       }));
+
+      // Query 2: Get all tables across all databases
+      const tablesResult = await this.adapter.query(`
+        SELECT table_schema as database_name,
+               table_name as name,
+               table_type as type,
+               table_comment as comment,
+               create_time as created,
+               update_time as last_modified
+        FROM information_schema.tables
+        WHERE table_schema NOT IN ('information_schema', 'performance_schema', 'mysql', 'sys')
+        ORDER BY table_schema, table_name
+      `);
+
+      this.metadataCache.tables = tablesResult.rows.map((row) => ({
+        name: this.getString(row.name) || '',
+        schema: this.getString(row.database_name) || '',
+        database: this.getString(row.database_name) || '',
+        type: this.mapTableType(this.getString(row.type)),
+        comment: this.getString(row.comment),
+        created: this.parseDate(row.created),
+        lastModified: this.parseDate(row.last_modified),
+      }));
+
+      // Query 3: Get all columns across all databases
+      const columnsResult = await this.adapter.query(`
+        SELECT table_schema as database_name,
+               table_name as table_name,
+               column_name as name,
+               ordinal_position as position,
+               data_type,
+               is_nullable,
+               column_default as default_value,
+               character_maximum_length as max_length,
+               numeric_precision as precision,
+               numeric_scale as scale,
+               column_comment as comment
+        FROM information_schema.columns
+        WHERE table_schema NOT IN ('information_schema', 'performance_schema', 'mysql', 'sys')
+        ORDER BY table_schema, table_name, ordinal_position
+      `);
+
+      this.metadataCache.columns = columnsResult.rows.map((row) => ({
+        name: this.getString(row.name) || '',
+        table: this.getString(row.table_name) || '',
+        schema: this.getString(row.database_name) || '',
+        database: this.getString(row.database_name) || '',
+        position: this.parseNumber(row.position) || 0,
+        dataType: this.getString(row.data_type) || '',
+        isNullable: this.getString(row.is_nullable) === 'YES',
+        defaultValue: this.getString(row.default_value),
+        maxLength: this.parseNumber(row.max_length),
+        precision: this.parseNumber(row.precision),
+        scale: this.parseNumber(row.scale),
+        comment: this.getString(row.comment),
+      }));
+
+      // Query 4: Get all views across all databases
+      const viewsResult = await this.adapter.query(`
+        SELECT table_schema as database_name,
+               table_name as name,
+               view_definition as definition
+        FROM information_schema.views
+        WHERE table_schema NOT IN ('information_schema', 'performance_schema', 'mysql', 'sys')
+        ORDER BY table_schema, table_name
+      `);
+
+      this.metadataCache.views = viewsResult.rows.map((row) => ({
+        name: this.getString(row.name) || '',
+        schema: this.getString(row.database_name) || '',
+        database: this.getString(row.database_name) || '',
+        definition: this.getString(row.definition) || '',
+      }));
+
+      this.metadataCache.lastFetched = new Date();
+    } catch (error) {
+      console.warn('Failed to fetch MySQL metadata:', error);
+      // Initialize empty arrays to prevent repeated failures
+      this.metadataCache.databases = [];
+      this.metadataCache.schemas = [];
+      this.metadataCache.tables = [];
+      this.metadataCache.columns = [];
+      this.metadataCache.views = [];
+      this.metadataCache.lastFetched = new Date();
+    }
+  }
+
+  async getDatabases(): Promise<Database[]> {
+    await this.fetchAllMetadata();
+    return this.metadataCache.databases || [];
   }
 
   async getSchemas(_database?: string): Promise<Schema[]> {
-    // In MySQL, databases and schemas are the same concept
-    const databases = await this.getDatabases();
-    return databases.map((db) => ({
-      name: db.name,
-      database: db.name,
-      owner: db.owner,
-      comment: db.comment,
-    }));
+    await this.fetchAllMetadata();
+    return this.metadataCache.schemas || [];
   }
 
   async getTables(database?: string, schema?: string): Promise<Table[]> {
+    await this.fetchAllMetadata();
+    let tables = this.metadataCache.tables || [];
+
     const targetDatabase = database || schema;
-    if (!targetDatabase) {
-      // Get all databases and their tables
-      const databases = await this.getDatabases();
-      const allTables: Table[] = [];
-
-      for (const db of databases) {
-        try {
-          const dbTables = await this.getTables(db.name);
-          allTables.push(...dbTables);
-        } catch (error) {
-          console.warn(`Could not access tables in database ${db.name}:`, error);
-        }
-      }
-
-      return allTables;
+    if (targetDatabase) {
+      tables = tables.filter((table) => table.database === targetDatabase);
     }
 
-    const result = await this.adapter.query(`
-      SELECT table_schema as database_name,
-             table_name as name,
-             table_type as type,
-             table_comment as comment,
-             create_time as created,
-             update_time as last_modified
-      FROM information_schema.tables
-      WHERE table_schema = '${targetDatabase}'
-      ORDER BY table_name
-    `);
-
-    return result.rows.map((row) => ({
-      name: this.getString(row.name) || '',
-      schema: this.getString(row.database_name) || '',
-      database: this.getString(row.database_name) || '',
-      type: this.mapTableType(this.getString(row.type)),
-      comment: this.getString(row.comment),
-      created: this.parseDate(row.created),
-      lastModified: this.parseDate(row.last_modified),
-    }));
+    return tables;
   }
 
   async getColumns(database?: string, schema?: string, table?: string): Promise<Column[]> {
+    await this.fetchAllMetadata();
+    let columns = this.metadataCache.columns || [];
+
     const targetDatabase = database || schema;
 
-    let whereClause =
-      "WHERE table_schema NOT IN ('information_schema', 'performance_schema', 'mysql', 'sys')";
     if (targetDatabase && table) {
-      whereClause = `WHERE table_schema = '${targetDatabase}' AND table_name = '${table}'`;
+      columns = columns.filter((col) => col.database === targetDatabase && col.table === table);
     } else if (targetDatabase) {
-      whereClause = `WHERE table_schema = '${targetDatabase}'`;
+      columns = columns.filter((col) => col.database === targetDatabase);
     }
 
-    const result = await this.adapter.query(`
-      SELECT table_schema as database_name,
-             table_name as table_name,
-             column_name as name,
-             ordinal_position as position,
-             data_type,
-             is_nullable,
-             column_default as default_value,
-             character_maximum_length as max_length,
-             numeric_precision as precision,
-             numeric_scale as scale,
-             column_comment as comment
-      FROM information_schema.columns
-      ${whereClause}
-      ORDER BY table_schema, table_name, ordinal_position
-    `);
-
-    return result.rows.map((row) => ({
-      name: this.getString(row.name) || '',
-      table: this.getString(row.table_name) || '',
-      schema: this.getString(row.database_name) || '',
-      database: this.getString(row.database_name) || '',
-      position: this.parseNumber(row.position) || 0,
-      dataType: this.getString(row.data_type) || '',
-      isNullable: this.getString(row.is_nullable) === 'YES',
-      defaultValue: this.getString(row.default_value),
-      maxLength: this.parseNumber(row.max_length),
-      precision: this.parseNumber(row.precision),
-      scale: this.parseNumber(row.scale),
-      comment: this.getString(row.comment),
-    }));
+    return columns;
   }
 
   async getViews(database?: string, schema?: string): Promise<View[]> {
-    const targetDatabase = database || schema;
+    await this.fetchAllMetadata();
+    let views = this.metadataCache.views || [];
 
-    let whereClause =
-      "WHERE table_schema NOT IN ('information_schema', 'performance_schema', 'mysql', 'sys')";
+    const targetDatabase = database || schema;
     if (targetDatabase) {
-      whereClause = `WHERE table_schema = '${targetDatabase}'`;
+      views = views.filter((view) => view.database === targetDatabase);
     }
 
-    const result = await this.adapter.query(`
-      SELECT table_schema as database_name,
-             table_name as name,
-             view_definition as definition
-      FROM information_schema.views
-      ${whereClause}
-      ORDER BY table_schema, table_name
-    `);
-
-    return result.rows.map((row) => ({
-      name: this.getString(row.name) || '',
-      schema: this.getString(row.database_name) || '',
-      database: this.getString(row.database_name) || '',
-      definition: this.getString(row.definition) || '',
-    }));
+    return views;
   }
 
   async getTableStatistics(
@@ -179,55 +223,7 @@ export class MySQLIntrospector extends BaseIntrospector {
 
     // Get column statistics
     const columns = await this.getColumns(targetDatabase, undefined, table);
-    const columnStatistics: ColumnStatistics[] = [];
-
-    for (const column of columns) {
-      try {
-        let statsQuery = '';
-
-        if (this.isNumericType(column.dataType)) {
-          statsQuery = `
-            SELECT 
-              '${column.name}' as column_name,
-              COUNT(DISTINCT \`${column.name}\`) as distinct_count,
-              COUNT(*) - COUNT(\`${column.name}\`) as null_count,
-              MIN(\`${column.name}\`) as min_value,
-              MAX(\`${column.name}\`) as max_value,
-              AVG(\`${column.name}\`) as avg_value
-            FROM \`${targetDatabase}\`.\`${table}\`
-          `;
-        } else {
-          statsQuery = `
-            SELECT 
-              '${column.name}' as column_name,
-              COUNT(DISTINCT \`${column.name}\`) as distinct_count,
-              COUNT(*) - COUNT(\`${column.name}\`) as null_count,
-              NULL as min_value,
-              NULL as max_value,
-              NULL as avg_value
-            FROM \`${targetDatabase}\`.\`${table}\`
-          `;
-        }
-
-        const statsResult = await this.adapter.query(statsQuery);
-
-        if (statsResult.rows.length > 0) {
-          const row = statsResult.rows[0];
-          if (row) {
-            columnStatistics.push({
-              columnName: column.name,
-              distinctCount: this.parseNumber(row.distinct_count),
-              nullCount: this.parseNumber(row.null_count),
-              minValue: row.min_value,
-              maxValue: row.max_value,
-              avgValue: this.parseNumber(row.avg_value),
-            });
-          }
-        }
-      } catch (error) {
-        console.warn(`Could not get statistics for column ${column.name}:`, error);
-      }
-    }
+    const columnStatistics = await this.getColumnStatistics(targetDatabase, table, columns);
 
     const basicStats = tableStatsResult.rows[0];
 
@@ -240,6 +236,97 @@ export class MySQLIntrospector extends BaseIntrospector {
       columnStatistics,
       lastUpdated: new Date(),
     };
+  }
+
+  /**
+   * Get column statistics using UNION query approach
+   */
+  private async getColumnStatistics(
+    database: string,
+    table: string,
+    columns: Column[]
+  ): Promise<ColumnStatistics[]> {
+    const columnStatistics: ColumnStatistics[] = [];
+
+    if (columns.length === 0) return columnStatistics;
+
+    // Build UNION query with one SELECT per column
+    const unionClauses = columns.map((column) =>
+      this.buildColumnStatsClause(column, database, table)
+    );
+
+    try {
+      const statsQuery = unionClauses.join('\n\nUNION ALL\n');
+      const statsResult = await this.adapter.query(statsQuery);
+
+      // Parse results - each row represents one column's statistics
+      for (const row of statsResult.rows) {
+        if (row) {
+          columnStatistics.push({
+            columnName: this.getString(row.column_name) || '',
+            distinctCount: this.parseNumber(row.distinct_count),
+            nullCount: this.parseNumber(row.null_count),
+            minValue: row.min_numeric || row.min_date,
+            maxValue: row.max_numeric || row.max_date,
+          });
+        }
+      }
+    } catch (error) {
+      console.warn(`Could not get statistics for table ${table}:`, error);
+
+      // Fallback: create empty statistics for each column
+      for (const column of columns) {
+        columnStatistics.push({
+          columnName: column.name,
+          distinctCount: undefined,
+          nullCount: undefined,
+          minValue: undefined,
+          maxValue: undefined,
+        });
+      }
+    }
+
+    return columnStatistics;
+  }
+
+  /**
+   * Build a single column statistics clause for UNION query
+   */
+  private buildColumnStatsClause(column: Column, database: string, table: string): string {
+    const columnName = column.name;
+    const isNumeric = this.isNumericType(column.dataType);
+    const isDate = this.isDateType(column.dataType);
+
+    let unionClause = `
+      SELECT '${columnName}' AS column_name,
+             COUNT(DISTINCT \`${columnName}\`) AS distinct_count,
+             COUNT(*) - COUNT(\`${columnName}\`) AS null_count`;
+
+    // Add min/max for numeric and date columns
+    if (isNumeric) {
+      unionClause += `,
+             MIN(\`${columnName}\`) AS min_numeric,
+             MAX(\`${columnName}\`) AS max_numeric,
+             NULL AS min_date,
+             NULL AS max_date`;
+    } else if (isDate) {
+      unionClause += `,
+             NULL AS min_numeric,
+             NULL AS max_numeric,
+             MIN(\`${columnName}\`) AS min_date,
+             MAX(\`${columnName}\`) AS max_date`;
+    } else {
+      unionClause += `,
+             NULL AS min_numeric,
+             NULL AS max_numeric,
+             NULL AS min_date,
+             NULL AS max_date`;
+    }
+
+    unionClause += `
+      FROM \`${database}\`.\`${table}\``;
+
+    return unionClause;
   }
 
   /**
@@ -277,5 +364,14 @@ export class MySQLIntrospector extends BaseIntrospector {
     ];
 
     return numericTypes.some((type) => dataType.toLowerCase().includes(type));
+  }
+
+  /**
+   * Check if a data type is date for statistics purposes
+   */
+  private isDateType(dataType: string): boolean {
+    const dateTypes = ['date', 'datetime', 'timestamp', 'time', 'year'];
+
+    return dateTypes.some((type) => dataType.toLowerCase().includes(type));
   }
 }

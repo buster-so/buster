@@ -8,12 +8,12 @@ import { weatherTool } from '../tools/weather-tool';
 import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock';
 import { fromNodeProviderChain } from '@aws-sdk/credential-providers';
 
-const bedrock = createAmazonBedrock({
+const _bedrock = createAmazonBedrock({
   region: 'us-east-1',
   credentialProvider: fromNodeProviderChain(),
 });
 
-const litellm = createOpenAI({
+const _litellm = createOpenAI({
   apiKey: process.env.OPENAI_API_KEY,
   baseURL: process.env.LLM_BASE_URL,
   compatibility: 'compatible',
@@ -26,15 +26,14 @@ export const weatherAgent = new Agent({
 
       Your primary function is to help users get weather details for specific locations. When responding:
       - Always ask for a location if none is provided
-      - If the location name isn’t in English, please translate it
+      - If the location name isn't in English, please translate it
       - If giving a location with multiple parts (e.g. "New York, NY"), use the most relevant part (e.g. "New York")
       - Include relevant details like humidity, wind conditions, and precipitation
       - Keep responses concise but informative
 
       Use the weatherTool to fetch current weather data.
 `,
-  model: anthropic('claude-opus-4-20250514', {
-  }),
+  model: anthropic('claude-opus-4-20250514', {}),
   tools: { weatherTool },
   memory: new Memory({
     storage: new LibSQLStore({
