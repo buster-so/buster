@@ -45,5 +45,5 @@ export const updateTerm = async (params: {
 };
 
 export const deleteTerms = async (data: { ids: string[] }) => {
-  return mainApi.delete<BusterTerm>(`/terms`, { data }).then((res) => res.data);
+  return mainApi.delete<BusterTerm>('/terms', { data }).then((res) => res.data);
 };

@@ -58,9 +58,9 @@ export const useDatasetUpdatePermissionGroups = () => {
         queryKeys.datasetPermissionGroupsList(dataset_id).queryKey,
         (oldData) => {
           const keyedChanges: Record<string, { id: string; assigned: boolean }> = {};
-          groups.forEach(({ id, assigned }) => {
+          for (const { id, assigned } of groups) {
             keyedChanges[id] = { id, assigned };
-          });
+          }
           const newData =
             oldData?.map((group) => {
               const updatedGroup = keyedChanges[group.id];
@@ -107,9 +107,9 @@ export const useDatasetUpdateDatasetGroups = () => {
     mutationFn: updateDatasetDatasetGroups,
     onMutate: ({ dataset_id, groups }) => {
       const keyedChanges: Record<string, { id: string; assigned: boolean }> = {};
-      groups.forEach(({ id, assigned }) => {
+      for (const { id, assigned } of groups) {
         keyedChanges[id] = { id, assigned };
-      });
+      }
       queryClient.setQueryData(queryKeys.datasetGroupsList.queryKey, (oldData) => {
         return (
           oldData?.map((group) => {
@@ -127,9 +127,9 @@ export const useDatasetUpdatePermissionUsers = (dataset_id: string) => {
   const queryClient = useQueryClient();
   const mutationFn = useMemoizedFn((users: { id: string; assigned: boolean }[]) => {
     const keyedChanges: Record<string, { id: string; assigned: boolean }> = {};
-    users.forEach(({ id, assigned }) => {
+    for (const { id, assigned } of users) {
       keyedChanges[id] = { id, assigned };
-    });
+    }
     queryClient.setQueryData(
       queryKeys.datasetPermissionUsersList(dataset_id).queryKey,
       (oldData) => {

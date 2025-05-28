@@ -226,7 +226,8 @@ export const useShareMetric = () => {
         selectedVersionNumber
       ).queryKey;
       queryClient.setQueryData(queryKey, (previousData: IBusterMetric | undefined) => {
-        return create(previousData!, (draft: IBusterMetric) => {
+        if (!previousData) return previousData;
+        return create(previousData, (draft: IBusterMetric) => {
           draft.individual_permissions = [
             ...variables.params,
             ...(draft.individual_permissions || [])
@@ -260,7 +261,8 @@ export const useUnshareMetric = () => {
         selectedVersionNumber
       ).queryKey;
       queryClient.setQueryData(queryKey, (previousData: IBusterMetric | undefined) => {
-        return create(previousData!, (draft: IBusterMetric) => {
+        if (!previousData) return previousData;
+        return create(previousData, (draft: IBusterMetric) => {
           draft.individual_permissions =
             draft.individual_permissions?.filter((t) => !variables.data.includes(t.email)) || [];
         });
@@ -292,7 +294,8 @@ export const useUpdateMetricShare = () => {
         selectedVersionNumber
       ).queryKey;
       queryClient.setQueryData(queryKey, (previousData: IBusterMetric | undefined) => {
-        return create(previousData!, (draft: IBusterMetric) => {
+        if (!previousData) return previousData;
+        return create(previousData, (draft: IBusterMetric) => {
           draft.individual_permissions =
             draft.individual_permissions?.map((t) => {
               const found = variables.params.users?.find((v) => v.email === t.email);
@@ -384,27 +387,27 @@ export const useBulkUpdateMetricVerificationStatus = () => {
   return useMutation({
     mutationFn: bulkUpdateMetricVerificationStatus,
     onMutate: (variables) => {
-      variables.forEach((metric) => {
+      for (const metric of variables) {
         const latestVersionNumber = getLatestMetricVersion(metric.id);
-        const foundMetric = queryClient.getQueryData(
+        const foundMetric = queryClient.getQueryData<IBusterMetric>(
           metricsQueryKeys.metricsGetMetric(metric.id, latestVersionNumber).queryKey
         );
         if (foundMetric) {
           queryClient.setQueryData(
             metricsQueryKeys.metricsGetMetric(metric.id, latestVersionNumber).queryKey,
-            create(foundMetric!, (draft: IBusterMetric) => {
+            create(foundMetric, (draft: IBusterMetric) => {
               draft.status = metric.status;
             })
           );
         }
-      });
+      }
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({
         queryKey: metricsQueryKeys.metricsGetList().queryKey,
         refetchType: 'all'
       });
-      data.updated_metrics.forEach((metric) => {
+      for (const metric of data.updated_metrics) {
         const oldMetric = queryClient.getQueryData(
           metricsQueryKeys.metricsGetMetric(metric.id, metric.version_number).queryKey
         );
@@ -413,7 +416,7 @@ export const useBulkUpdateMetricVerificationStatus = () => {
           metricsQueryKeys.metricsGetMetric(metric.id, metric.version_number).queryKey,
           upgradedMetric
         );
-      });
+      }
     }
   });
 };

@@ -7,7 +7,7 @@ import {
 
 // Get API Keys
 export const getApiKeys = async () => {
-  const response = await mainApi.get(`/api_keys`);
+  const response = await mainApi.get('/api_keys');
   const result = GetApiKeysResponseSchema.safeParse(response.data);
 
   if (!result.success) {
@@ -23,7 +23,7 @@ export const getApiKeys = async () => {
 // Create API Key
 
 export const createApiKey = async (name: string) => {
-  const response = await mainApi.post(`/api_keys`, { name });
+  const response = await mainApi.post('/api_keys', { name });
   const result = CreateApiKeyResponseSchema.safeParse(response.data);
 
   if (!result.success) {

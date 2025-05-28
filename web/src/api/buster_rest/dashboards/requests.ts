@@ -85,7 +85,7 @@ export const dashboardsUpdateDashboard = async (params: {
 };
 
 export const dashboardsDeleteDashboard = async (data: { ids: string[] }) => {
-  return await mainApi.delete<null>(`/dashboards`, { data }).then((res) => res.data);
+  return await mainApi.delete<null>('/dashboards', { data }).then((res) => res.data);
 };
 
 // share dashboards

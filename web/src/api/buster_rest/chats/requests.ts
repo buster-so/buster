@@ -22,7 +22,7 @@ export const getListLogs = async (
 ): Promise<BusterChatListItem[]> => {
   const { page_token = 0, page_size = 3500 } = params || {};
   return mainApi
-    .get<BusterChatListItem[]>(`/logs`, {
+    .get<BusterChatListItem[]>('/logs', {
       params: { page_token, page_size }
     })
     .then((res) => res.data);

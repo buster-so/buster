@@ -53,8 +53,9 @@ export const useUpdateUser = () => {
   const mutationFn = useMemoizedFn(async (params: Parameters<typeof updateOrganizationUser>[0]) => {
     const options = queryKeys.userGetUser(params.userId);
     queryClient.setQueryData(options.queryKey, (oldData) => {
+      if (!oldData) return oldData;
       return {
-        ...oldData!,
+        ...oldData,
         ...params
       };
     });

@@ -49,8 +49,8 @@ export const useListDatasources = (enabled = true) => {
 
 export const useGetDatasource = (id: string | undefined) => {
   return useQuery({
-    ...queryKeys.datasourceGet(id!),
-    queryFn: () => getDatasource(id!),
+    ...queryKeys.datasourceGet(id || ''),
+    queryFn: () => getDatasource(id || ''),
     enabled: !!id
   });
 };

@@ -59,20 +59,20 @@ export const useCreatePermissionGroup = (userId?: string) => {
           name: newPermissionGroup.name,
           assigned: false
         };
-        if (isEmpty(oldData)) {
+        if (!oldData) {
           return [newListItem];
         }
-        return [...oldData!, newListItem];
+        return [...oldData, newListItem];
       });
 
       if (dataset_id && newPermissionGroup?.id) {
         const options = queryKeys.permissionGroupListByDatasetId(dataset_id);
         queryClient.setQueryData(options.queryKey, (oldData) => {
           const newItem: GetPermissionGroupResponse = { ...newPermissionGroup };
-          if (isEmpty(oldData)) {
+          if (!oldData) {
             return [newItem];
           }
-          return [...oldData!, newItem];
+          return [...oldData, newItem];
         });
         await updateDatasetPermissionGroups({
           dataset_id,

@@ -75,7 +75,7 @@ export const useGetDashboardAndInitializeMetrics = (prefetchData = true) => {
     const { password } = getAssetPassword?.(id) || {};
 
     return dashboardsGetDashboard({
-      id: id!,
+      id: id || '',
       password,
       version_number: version_number || undefined
     }).then((data) => {

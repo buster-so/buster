@@ -47,7 +47,7 @@ import { hasOrganizationId, isQueryStale } from '@/lib';
 
 export const useGetDashboard = <TData = BusterDashboardResponse>(
   {
-    id,
+    id: idProp,
     versionNumber: versionNumberProp
   }: { id: string | undefined; versionNumber?: number | null },
   params?: Omit<
@@ -55,18 +55,19 @@ export const useGetDashboard = <TData = BusterDashboardResponse>(
     'queryKey' | 'queryFn'
   >
 ) => {
+  const id = idProp || '';
   const queryFn = useGetDashboardAndInitializeMetrics();
   const setAssetPasswordError = useBusterAssetsContextSelector((x) => x.setAssetPasswordError);
   const { selectedVersionNumber, latestVersionNumber, paramVersionNumber } =
     useGetDashboardVersionNumber({ versionNumber: versionNumberProp });
 
   const { isFetched: isFetchedInitial, isError: isErrorInitial } = useQuery({
-    ...dashboardQueryKeys.dashboardGetDashboard(id!, null),
-    queryFn: () => queryFn(id!, paramVersionNumber),
+    ...dashboardQueryKeys.dashboardGetDashboard(id, null),
+    queryFn: () => queryFn(id, paramVersionNumber),
     enabled: false, //we made this false because we want to be explicit about the fact that we fetch the dashboard server side
     retry(failureCount, error) {
       if (error?.message !== undefined) {
-        setAssetPasswordError(id!, error.message || 'An error occurred');
+        setAssetPasswordError(id, error.message || 'An error occurred');
       }
       return false;
     },
@@ -75,8 +76,8 @@ export const useGetDashboard = <TData = BusterDashboardResponse>(
   });
 
   return useQuery({
-    ...dashboardQueryKeys.dashboardGetDashboard(id!, selectedVersionNumber),
-    queryFn: () => queryFn(id!, selectedVersionNumber),
+    ...dashboardQueryKeys.dashboardGetDashboard(id, selectedVersionNumber),
+    queryFn: () => queryFn(id, selectedVersionNumber),
     enabled: !!latestVersionNumber && isFetchedInitial && !isErrorInitial,
     select: params?.select
   });
@@ -141,7 +142,8 @@ export const useUpdateDashboard = (params?: {
     mutationFn,
     onMutate: (variables) => {
       const originalDashboard = getOriginalDashboard(variables.id);
-      const updatedDashboard = create(originalDashboard!, (draft) => {
+      if (!originalDashboard) return;
+      const updatedDashboard = create(originalDashboard, (draft) => {
         Object.assign(draft, variables);
       });
       const queryKey = dashboardQueryKeys.dashboardGetDashboard(
@@ -150,7 +152,8 @@ export const useUpdateDashboard = (params?: {
       ).queryKey;
 
       queryClient.setQueryData(queryKey, (previousData) => {
-        return create(previousData!, (draft) => {
+        if (!previousData) return previousData;
+        return create(previousData, (draft) => {
           draft.dashboard = updatedDashboard;
         });
       });
@@ -178,7 +181,7 @@ export const useUpdateDashboardConfig = () => {
       const previousDashboard = queryClient.getQueryData(options.queryKey);
       const previousConfig = previousDashboard?.dashboard?.config;
       if (previousConfig) {
-        const newConfig = create(previousConfig!, (draft) => {
+        const newConfig = create(previousConfig, (draft) => {
           Object.assign(draft, newDashboard);
         });
         return mutateAsync({
@@ -346,7 +349,8 @@ export const useShareDashboard = () => {
         latestVersionNumber
       ).queryKey;
       queryClient.setQueryData(queryKey, (previousData) => {
-        return create(previousData!, (draft) => {
+        if (!previousData) return previousData;
+        return create(previousData, (draft) => {
           draft.individual_permissions = [
             ...variables.params,
             ...(draft.individual_permissions || [])
@@ -375,7 +379,8 @@ export const useUnshareDashboard = () => {
         latestVersionNumber
       ).queryKey;
       queryClient.setQueryData(queryKey, (previousData) => {
-        return create(previousData!, (draft) => {
+        if (!previousData) return previousData;
+        return create(previousData, (draft) => {
           draft.individual_permissions =
             draft.individual_permissions?.filter((t) => !variables.data.includes(t.email)) || [];
         });
@@ -395,7 +400,8 @@ export const useUpdateDashboardShare = () => {
     onMutate: ({ id, params }) => {
       const queryKey = dashboardQueryKeys.dashboardGetDashboard(id, latestVersionNumber).queryKey;
       queryClient.setQueryData(queryKey, (previousData) => {
-        return create(previousData!, (draft) => {
+        if (!previousData) return previousData;
+        return create(previousData, (draft) => {
           draft.individual_permissions =
             draft.individual_permissions?.map((t) => {
               const found = params.users?.find((v) => v.email === t.email);
@@ -580,19 +586,20 @@ export const useAddMetricsToDashboard = () => {
   return useMutation({
     mutationFn: addMetricToDashboard,
     onMutate: ({ metricIds, dashboardId }) => {
-      metricIds.forEach((metricId) => {
+      for (const metricId of metricIds) {
         const highestVersion = getLatestMetricVersion(metricId);
 
         // Update the dashboards array for the highest version metric
         if (highestVersion) {
           const options = metricsQueryKeys.metricsGetMetric(metricId, highestVersion);
           queryClient.setQueryData(options.queryKey, (old) => {
-            return create(old!, (draft) => {
+            if (!old) return old;
+            return create(old, (draft) => {
               draft.dashboards = [...(draft.dashboards || []), { id: dashboardId, name: '' }];
             });
           });
         }
-      });
+      }
     },
     onSuccess: (data) => {
       if (data) {
@@ -601,19 +608,20 @@ export const useAddMetricsToDashboard = () => {
             .queryKey,
           data
         );
-        Object.values(data.metrics).forEach((metric) => {
+        for (const metric of Object.values(data.metrics)) {
           const dashboardId = data.dashboard.id;
           const dashboardName = data.dashboard.name;
           const options = metricsQueryKeys.metricsGetMetric(metric.id, metric.version_number);
           queryClient.setQueryData(options.queryKey, (old) => {
-            return create(old!, (draft) => {
+            if (!old) return old;
+            return create(old, (draft) => {
               draft.dashboards = [
                 ...(draft.dashboards || []),
                 { id: dashboardId, name: dashboardName }
               ];
             });
           });
-        });
+        }
 
         setOriginalDashboard(data.dashboard);
         setLatestDashboardVersion(data.dashboard.id, data.dashboard.version_number);
@@ -641,18 +649,19 @@ export const useRemoveMetricsFromDashboard = () => {
       useConfirmModal?: boolean;
     }) => {
       const method = async () => {
-        metricIds.forEach((metricId) => {
+        for (const metricId of metricIds) {
           const highestVersion = getLatestMetricVersion(metricId);
           // Update the dashboards array for the highest version metric
           if (highestVersion) {
             const options = metricsQueryKeys.metricsGetMetric(metricId, highestVersion);
             queryClient.setQueryData(options.queryKey, (old) => {
-              return create(old!, (draft) => {
+              if (!old) return old;
+              return create(old, (draft) => {
                 draft.dashboards = old?.dashboards?.filter((d) => d.id !== dashboardId) || [];
               });
             });
           }
-        });
+        }
 
         const dashboardResponse = await ensureDashboardConfig(dashboardId);
 
@@ -668,7 +677,8 @@ export const useRemoveMetricsFromDashboard = () => {
           );
 
           queryClient.setQueryData(versionedOptions.queryKey, (currentDashboard) => {
-            return create(currentDashboard!, (draft) => {
+            if (!currentDashboard) return currentDashboard;
+            return create(currentDashboard, (draft) => {
               draft.dashboard.config = newConfig;
             });
           });
