@@ -22,8 +22,8 @@ export const useGetTermsList = (
 
 export const useGetTerm = (id: string | undefined) => {
   return useQuery({
-    ...queryKeys.termsGetTerm(id!),
-    queryFn: () => getTerm(id!),
+    ...queryKeys.termsGetTerm(id || ''),
+    queryFn: () => getTerm(id || ''),
     enabled: !!id
   });
 };

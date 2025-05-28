@@ -34,18 +34,18 @@ export const useGetMetric = <TData = IBusterMetric>(
   const getAssetPassword = useBusterAssetsContextSelector((x) => x.getAssetPassword);
   const onSetLatestMetricVersion = useMetricQueryStore((x) => x.onSetLatestMetricVersion);
   const setAssetPasswordError = useBusterAssetsContextSelector((x) => x.setAssetPasswordError);
-  const { password } = getAssetPassword(id!);
+  const { password } = getAssetPassword(id || '');
 
   const { selectedVersionNumber, paramVersionNumber, latestVersionNumber } =
     useGetMetricVersionNumber({
       versionNumber: versionNumberProp
     });
 
-  const initialOptions = metricsQueryKeys.metricsGetMetric(id!, paramVersionNumber || null);
+  const initialOptions = metricsQueryKeys.metricsGetMetric(id || '', paramVersionNumber || null);
 
   const initialQueryFn = useMemoizedFn(async (version?: number | null) => {
     const result = await getMetric({
-      id: id!,
+      id: id || '',
       password,
       version_number: version === null ? undefined : version
     });
@@ -55,7 +55,7 @@ export const useGetMetric = <TData = IBusterMetric>(
     if (isLatestVersion) {
       setOriginalMetric(updatedMetric);
     }
-    onSetLatestMetricVersion(id!, last(updatedMetric.versions)?.version_number || 0);
+    onSetLatestMetricVersion(id || '', last(updatedMetric.versions)?.version_number || 0);
     if (result?.version_number) {
       queryClient.setQueryData(
         metricsQueryKeys.metricsGetMetric(result.id, result.version_number).queryKey,
@@ -70,8 +70,8 @@ export const useGetMetric = <TData = IBusterMetric>(
     queryFn: () => initialQueryFn(paramVersionNumber),
     enabled: false, //In the year of our lord 2025, April 10, I, Nate Kelley, decided to disable this query in favor of explicityly fetching the data. May god have mercy on our souls.
     retry(failureCount, error) {
-      if (error?.message !== undefined) {
-        setAssetPasswordError(id!, error.message || 'An error occurred');
+      if (error?.message !== undefined && id) {
+        setAssetPasswordError(id, error.message || 'An error occurred');
       }
       return false;
     },
@@ -80,7 +80,7 @@ export const useGetMetric = <TData = IBusterMetric>(
   });
 
   return useQuery({
-    ...metricsQueryKeys.metricsGetMetric(id!, selectedVersionNumber),
+    ...metricsQueryKeys.metricsGetMetric(id || '', selectedVersionNumber),
     enabled: !!latestVersionNumber && isFetchedInitial && !isErrorInitial,
     queryFn: () => initialQueryFn(selectedVersionNumber),
     select: params?.select
@@ -118,7 +118,7 @@ export const useGetMetricData = <TData = IBusterMetricData>(
   params?: Omit<UseQueryOptions<BusterMetricData, RustApiError, TData>, 'queryKey' | 'queryFn'>
 ) => {
   const getAssetPassword = useBusterAssetsContextSelector((x) => x.getAssetPassword);
-  const { password } = getAssetPassword(id!);
+  const { password } = getAssetPassword(id);
   const { selectedVersionNumber } = useGetMetricVersionNumber({
     versionNumber: versionNumberProp
   });
@@ -134,7 +134,7 @@ export const useGetMetricData = <TData = IBusterMetricData>(
 
   const queryFn = useMemoizedFn(async () => {
     const result = await getMetricData({
-      id: id!,
+      id: id || '',
       version_number: selectedVersionNumber || undefined,
       password
     });
@@ -143,7 +143,7 @@ export const useGetMetricData = <TData = IBusterMetricData>(
   });
 
   return useQuery({
-    ...metricsQueryKeys.metricsGetData(id!, selectedVersionNumber!),
+    ...metricsQueryKeys.metricsGetData(id || '', selectedVersionNumber || 1),
     queryFn,
     enabled: () => {
       return (

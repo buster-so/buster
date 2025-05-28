@@ -61,12 +61,19 @@ const useBusterAssets = () => {
 
   const getAssetPassword = useCallback(
     (
-      assetId: string
+      assetId: string | undefined
     ): {
       password: undefined | string;
       error: string | null;
       type: ShareAssetType | undefined;
     } => {
+      if (!assetId) {
+        return {
+          password: undefined,
+          type: undefined,
+          error: null
+        };
+      }
       return {
         password: assetsToPasswords[assetId]?.password || undefined,
         type: assetsToPasswords[assetId]?.type || undefined,

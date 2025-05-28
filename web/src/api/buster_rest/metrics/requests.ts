@@ -85,7 +85,7 @@ export const updateMetric = async (params: {
 
 export const deleteMetrics = async (params: { ids: string[] }) => {
   return mainApi
-    .delete<null>(`/metrics`, {
+    .delete<null>('/metrics', {
       data: { ids: params.ids }
     })
     .then((res) => res.data);
@@ -96,7 +96,7 @@ export const duplicateMetric = async (params: {
   message_id: string;
   share_with_same_people: boolean;
 }) => {
-  return mainApi.post<BusterMetric>(`/metrics/duplicate`, params).then((res) => res.data);
+  return mainApi.post<BusterMetric>('/metrics/duplicate', params).then((res) => res.data);
 };
 
 export const bulkUpdateMetricVerificationStatus = async (
@@ -112,7 +112,7 @@ export const bulkUpdateMetricVerificationStatus = async (
       success_count: 0;
       total_processed: 0;
       updated_metrics: BusterMetric[];
-    }>(`/metrics`, params)
+    }>('/metrics', params)
     .then((res) => res.data);
 };
 

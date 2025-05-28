@@ -11,7 +11,7 @@ import type {
 
 export const listAllPermissionGroups = async (): Promise<ListPermissionGroupsResponse[]> => {
   return await mainApi
-    .get<ListPermissionGroupsResponse[]>(`/permission_groups`)
+    .get<ListPermissionGroupsResponse[]>('/permission_groups')
     .then((res) => res.data);
 };
 
@@ -34,7 +34,7 @@ export const getPermissionGroup_server = async ({
 export const updatePermissionGroups = async (
   data: { id: string; name: string }[]
 ): Promise<void> => {
-  return await mainApi.put(`/permission_groups`, data).then((res) => res.data);
+  return await mainApi.put('/permission_groups', data).then((res) => res.data);
 };
 
 export const deletePermissionGroup = async ({ id }: { id: string }): Promise<void> => {
@@ -47,7 +47,7 @@ export const createPermissionGroup = async ({
   name: string;
 }): Promise<CreatePermissionGroupResponse> => {
   return await mainApi
-    .post<CreatePermissionGroupResponse>(`/permission_groups`, { name })
+    .post<CreatePermissionGroupResponse>('/permission_groups', { name })
     .then((res) => res.data);
 };
 

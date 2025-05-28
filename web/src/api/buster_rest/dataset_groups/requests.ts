@@ -9,11 +9,11 @@ import type {
 } from '../../asset_interfaces';
 
 export const listDatasetGroups = async () => {
-  return mainApi.get<ListDatasetGroupsResponse[]>(`/dataset_groups`).then((res) => res.data);
+  return mainApi.get<ListDatasetGroupsResponse[]>('/dataset_groups').then((res) => res.data);
 };
 
 export const createDatasetGroup = async (data: { name: string }) => {
-  return mainApi.post(`/dataset_groups`, data).then((res) => res.data);
+  return mainApi.post('/dataset_groups', data).then((res) => res.data);
 };
 
 export const updateDatasetGroup = async (
@@ -22,11 +22,11 @@ export const updateDatasetGroup = async (
     name: string;
   }[]
 ) => {
-  return mainApi.put(`/dataset_groups`, data).then((res) => res.data);
+  return mainApi.put('/dataset_groups', data).then((res) => res.data);
 };
 
 export const deleteDatasetGroup = async (data: string[]) => {
-  return mainApi.delete(`/dataset_groups`, { data }).then((res) => res.data);
+  return mainApi.delete('/dataset_groups', { data }).then((res) => res.data);
 };
 
 export const getDatasetGroup = async (id: string) => {

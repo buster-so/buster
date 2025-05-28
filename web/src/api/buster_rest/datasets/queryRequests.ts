@@ -45,18 +45,18 @@ export const prefetchGetDatasets = async (
 };
 
 export const useGetDatasetData = (datasetId: string | undefined) => {
-  const queryFn = useMemoizedFn(() => getDatasetDataSample(datasetId!));
+  const queryFn = useMemoizedFn(() => getDatasetDataSample(datasetId || ''));
   return useQuery({
-    ...queryKeys.datasetData(datasetId!),
+    ...queryKeys.datasetData(datasetId || ''),
     queryFn,
     enabled: !!datasetId
   });
 };
 
 export const useGetDatasetMetadata = (datasetId: string | undefined) => {
-  const queryFn = useMemoizedFn(() => getDatasetMetadata(datasetId!));
+  const queryFn = useMemoizedFn(() => getDatasetMetadata(datasetId || ''));
   const res = useQuery({
-    ...queryKeys.datasetMetadata(datasetId!),
+    ...queryKeys.datasetMetadata(datasetId || ''),
     queryFn,
     enabled: !!datasetId
   });
