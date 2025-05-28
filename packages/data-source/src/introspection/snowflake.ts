@@ -267,7 +267,7 @@ export class SnowflakeIntrospector extends BaseIntrospector {
     schema: string,
     table: string
   ): Promise<TableStatistics> {
-    // Get basic table info
+    // Get basic table statistics only (no column statistics)
     const tableInfo = await this.adapter.query(`
       SELECT ROW_COUNT, BYTES
       FROM ${database}.INFORMATION_SCHEMA.TABLES
@@ -275,10 +275,6 @@ export class SnowflakeIntrospector extends BaseIntrospector {
         AND TABLE_SCHEMA = '${schema}' 
         AND TABLE_NAME = '${table}'
     `);
-
-    // Get column statistics
-    const columns = await this.getColumns(database, schema, table);
-    const columnStatistics = await this.getColumnStatistics(database, schema, table, columns);
 
     // Try to get clustering information
     let clusteringInfo: ClusteringInfo | undefined;
@@ -307,10 +303,23 @@ export class SnowflakeIntrospector extends BaseIntrospector {
       database,
       rowCount: this.parseNumber(basicInfo?.ROW_COUNT),
       sizeBytes: this.parseNumber(basicInfo?.BYTES),
-      columnStatistics,
+      columnStatistics: [], // No column statistics in basic table stats
       clusteringInfo,
       lastUpdated: new Date(),
     };
+  }
+
+  /**
+   * Get column statistics for all columns in a specific table
+   */
+  async getColumnStatistics(
+    database: string,
+    schema: string,
+    table: string
+  ): Promise<ColumnStatistics[]> {
+    // Get columns for this table
+    const columns = await this.getColumns(database, schema, table);
+    return this.getColumnStatisticsForColumns(database, schema, table, columns);
   }
 
   /**
@@ -331,7 +340,7 @@ export class SnowflakeIntrospector extends BaseIntrospector {
   /**
    * Get column statistics using UNION query approach
    */
-  private async getColumnStatistics(
+  private async getColumnStatisticsForColumns(
     database: string,
     schema: string,
     table: string,
@@ -341,7 +350,7 @@ export class SnowflakeIntrospector extends BaseIntrospector {
 
     if (columns.length === 0) return columnStatistics;
 
-    // Build UNION query with one SELECT per column
+    // Build UNION query with one SELECT per column, cast to string for compatibility
     const unionClauses = columns.map((column) =>
       this.buildColumnStatsClause(column, database, schema, table)
     );
@@ -357,8 +366,9 @@ export class SnowflakeIntrospector extends BaseIntrospector {
             columnName: this.getString(row.column_name) || '',
             distinctCount: this.parseNumber(row.distinct_count),
             nullCount: this.parseNumber(row.null_count),
-            minValue: row.min_numeric || row.min_date,
-            maxValue: row.max_numeric || row.max_date,
+            minValue: row.min_value,
+            maxValue: row.max_value,
+            sampleValues: this.getString(row.sample_values),
           });
         }
       }
@@ -373,6 +383,7 @@ export class SnowflakeIntrospector extends BaseIntrospector {
           nullCount: undefined,
           minValue: undefined,
           maxValue: undefined,
+          sampleValues: undefined,
         });
       }
     }
@@ -398,26 +409,39 @@ export class SnowflakeIntrospector extends BaseIntrospector {
              COUNT(DISTINCT ${columnName}) AS distinct_count,
              COUNT(*) - COUNT(${columnName}) AS null_count`;
 
-    // Add min/max for numeric and date columns
+    // Add min/max for numeric and date columns, cast to string for UNION compatibility
     if (isNumeric) {
       unionClause += `,
-             MIN(${columnName}) AS min_numeric,
-             MAX(${columnName}) AS max_numeric,
-             NULL AS min_date,
-             NULL AS max_date`;
+             TO_VARCHAR(MIN(${columnName})) AS min_value,
+             TO_VARCHAR(MAX(${columnName})) AS max_value`;
     } else if (isDate) {
       unionClause += `,
-             NULL AS min_numeric,
-             NULL AS max_numeric,
-             MIN(${columnName}) AS min_date,
-             MAX(${columnName}) AS max_date`;
+             TO_VARCHAR(MIN(${columnName})) AS min_value,
+             TO_VARCHAR(MAX(${columnName})) AS max_value`;
     } else {
       unionClause += `,
-             NULL AS min_numeric,
-             NULL AS max_numeric,
-             NULL AS min_date,
-             NULL AS max_date`;
+             NULL AS min_value,
+             NULL AS max_value`;
     }
+
+    // Add sample values - get up to 20 distinct values, truncated and comma-separated
+    unionClause += `,
+             (
+               SELECT LISTAGG(
+                 CASE 
+                   WHEN LENGTH(sample_val) > 100 
+                   THEN LEFT(sample_val, 100) || '...'
+                   ELSE sample_val
+                 END, 
+                 ','
+               ) WITHIN GROUP (ORDER BY sample_val)
+               FROM (
+                 SELECT DISTINCT TO_VARCHAR(${columnName}) as sample_val
+                 FROM ${database}.${schema}.${table}
+                 WHERE ${columnName} IS NOT NULL
+                 LIMIT 20
+               )
+             ) AS sample_values`;
 
     unionClause += `
       FROM ${database}.${schema}.${table}`;

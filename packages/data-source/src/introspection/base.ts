@@ -1,5 +1,6 @@
 import type {
   Column,
+  ColumnStatistics,
   DataSourceIntrospectionResult,
   Database,
   ForeignKey,
@@ -40,9 +41,14 @@ export interface DataSourceIntrospector {
   getViews(database?: string, schema?: string): Promise<View[]>;
 
   /**
-   * Get statistical information for a specific table
+   * Get statistical information for a specific table (basic table-level stats only)
    */
   getTableStatistics(database: string, schema: string, table: string): Promise<TableStatistics>;
+
+  /**
+   * Get column statistics for all columns in a specific table
+   */
+  getColumnStatistics(database: string, schema: string, table: string): Promise<ColumnStatistics[]>;
 
   /**
    * Get all indexes in a schema (or all indexes if no schema/database specified)
@@ -87,6 +93,11 @@ export abstract class BaseIntrospector implements DataSourceIntrospector {
     schema: string,
     table: string
   ): Promise<TableStatistics>;
+  abstract getColumnStatistics(
+    database: string,
+    schema: string,
+    table: string
+  ): Promise<ColumnStatistics[]>;
   abstract getDataSourceType(): string;
 
   /**
@@ -113,18 +124,79 @@ export abstract class BaseIntrospector implements DataSourceIntrospector {
           ).getForeignKeys()
         : undefined;
 
+    // Get column statistics in batches of 20 tables
+    const columnsWithStats = await this.attachColumnStatistics(tables, columns);
+
     return {
       dataSourceName: this.dataSourceName,
       dataSourceType: this.getDataSourceType(),
       databases,
       schemas,
       tables,
-      columns,
+      columns: columnsWithStats,
       views,
       indexes,
       foreignKeys,
       introspectedAt: new Date(),
     };
+  }
+
+  /**
+   * Attach column statistics to columns by processing tables in batches
+   */
+  private async attachColumnStatistics(tables: Table[], columns: Column[]): Promise<Column[]> {
+    // Create a map for quick column lookup
+    const columnMap = new Map<string, Column>();
+    for (const column of columns) {
+      const key = `${column.database}.${column.schema}.${column.table}.${column.name}`;
+      columnMap.set(key, { ...column });
+    }
+
+    // Process tables in batches of 20
+    const batchSize = 20;
+    const tableBatches: Table[][] = [];
+    for (let i = 0; i < tables.length; i += batchSize) {
+      tableBatches.push(tables.slice(i, i + batchSize));
+    }
+
+    // Process each batch in parallel
+    await Promise.all(
+      tableBatches.map(async (batch) => {
+        // Process all tables in this batch in parallel
+        await Promise.all(
+          batch.map(async (table) => {
+            try {
+              const columnStats = await this.getColumnStatistics(
+                table.database,
+                table.schema,
+                table.name
+              );
+
+              // Attach statistics to corresponding columns
+              for (const stat of columnStats) {
+                const key = `${table.database}.${table.schema}.${table.name}.${stat.columnName}`;
+                const column = columnMap.get(key);
+                if (column) {
+                  column.distinctCount = stat.distinctCount;
+                  column.nullCount = stat.nullCount;
+                  column.minValue = stat.minValue;
+                  column.maxValue = stat.maxValue;
+                  column.sampleValues = stat.sampleValues;
+                }
+              }
+            } catch (error) {
+              // Log warning but don't fail the entire introspection
+              console.warn(
+                `Failed to get column statistics for table ${table.database}.${table.schema}.${table.name}:`,
+                error
+              );
+            }
+          })
+        );
+      })
+    );
+
+    return Array.from(columnMap.values());
   }
 
   /**

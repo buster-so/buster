@@ -156,6 +156,8 @@ export class DataSource {
       getViews: (database?: string, schema?: string) => introspector.getViews(database, schema),
       getTableStatistics: (database: string, schema: string, table: string) =>
         introspector.getTableStatistics(database, schema, table),
+      getColumnStatistics: (database: string, schema: string, table: string) =>
+        introspector.getColumnStatistics(database, schema, table),
       getIndexes: introspector.getIndexes ? introspector.getIndexes.bind(introspector) : undefined,
       getForeignKeys: introspector.getForeignKeys
         ? introspector.getForeignKeys.bind(introspector)

@@ -213,13 +213,44 @@ export class SQLServerIntrospector extends BaseIntrospector {
 
     if (database && schema) {
       tables = tables.filter((table) => table.database === database && table.schema === schema);
-    } else if (schema) {
-      tables = tables.filter((table) => table.schema === schema);
     } else if (database) {
       tables = tables.filter((table) => table.database === database);
+    } else if (schema) {
+      tables = tables.filter((table) => table.schema === schema);
     }
 
-    return tables;
+    // Enhance tables with basic statistics
+    const tablesWithStats = await Promise.all(
+      tables.map(async (table) => {
+        try {
+          // Get basic table statistics
+          const tableStatsResult = await this.adapter.query(`
+            SELECT 
+              SUM(p.rows) as row_count,
+              SUM(a.total_pages) * 8 * 1024 as size_bytes
+            FROM sys.tables t
+            INNER JOIN sys.partitions p ON t.object_id = p.object_id
+            INNER JOIN sys.allocation_units a ON p.partition_id = a.container_id
+            WHERE t.name = '${table.name}' 
+              AND SCHEMA_NAME(t.schema_id) = '${table.schema}'
+              AND p.index_id IN (0,1)
+          `);
+
+          const stats = tableStatsResult.rows[0];
+          return {
+            ...table,
+            rowCount: this.parseNumber(stats?.row_count),
+            sizeBytes: this.parseNumber(stats?.size_bytes),
+          };
+        } catch (error) {
+          // If stats query fails, return table without stats
+          console.warn(`Failed to get stats for table ${table.schema}.${table.name}:`, error);
+          return table;
+        }
+      })
+    );
+
+    return tablesWithStats;
   }
 
   async getColumns(database?: string, schema?: string, table?: string): Promise<Column[]> {
@@ -261,21 +292,18 @@ export class SQLServerIntrospector extends BaseIntrospector {
     schema: string,
     table: string
   ): Promise<TableStatistics> {
-    // Get basic table statistics using SQL Server system views
+    // Get basic table statistics only (no column statistics)
     const tableStatsResult = await this.adapter.query(`
-      SELECT SUM(p.rows) as row_count,
-             SUM(a.total_pages) * 8 as size_bytes
+      SELECT 
+        SUM(p.rows) as row_count,
+        SUM(a.total_pages) * 8 * 1024 as size_bytes
       FROM sys.tables t
-      INNER JOIN sys.schemas s ON t.schema_id = s.schema_id
       INNER JOIN sys.partitions p ON t.object_id = p.object_id
       INNER JOIN sys.allocation_units a ON p.partition_id = a.container_id
-      WHERE s.name = '${schema}' AND t.name = '${table}'
+      WHERE t.name = '${table}' 
+        AND SCHEMA_NAME(t.schema_id) = '${schema}'
         AND p.index_id IN (0,1)
     `);
-
-    // Get column statistics
-    const columns = await this.getColumns(database, schema, table);
-    const columnStatistics = await this.getColumnStatistics(database, schema, table, columns);
 
     const basicStats = tableStatsResult.rows[0];
 
@@ -285,15 +313,28 @@ export class SQLServerIntrospector extends BaseIntrospector {
       database,
       rowCount: this.parseNumber(basicStats?.row_count),
       sizeBytes: this.parseNumber(basicStats?.size_bytes),
-      columnStatistics,
+      columnStatistics: [], // No column statistics in basic table stats
       lastUpdated: new Date(),
     };
   }
 
   /**
+   * Get column statistics for all columns in a specific table
+   */
+  async getColumnStatistics(
+    database: string,
+    schema: string,
+    table: string
+  ): Promise<ColumnStatistics[]> {
+    // Get columns for this table
+    const columns = await this.getColumns(database, schema, table);
+    return this.getColumnStatisticsForColumns(database, schema, table, columns);
+  }
+
+  /**
    * Get column statistics using UNION query approach
    */
-  private async getColumnStatistics(
+  private async getColumnStatisticsForColumns(
     _database: string,
     schema: string,
     table: string,
@@ -303,7 +344,7 @@ export class SQLServerIntrospector extends BaseIntrospector {
 
     if (columns.length === 0) return columnStatistics;
 
-    // Build UNION query with one SELECT per column
+    // Build UNION query with one SELECT per column, cast to text for compatibility
     const unionClauses = columns.map((column) =>
       this.buildColumnStatsClause(column, schema, table)
     );
@@ -319,8 +360,9 @@ export class SQLServerIntrospector extends BaseIntrospector {
             columnName: this.getString(row.column_name) || '',
             distinctCount: this.parseNumber(row.distinct_count),
             nullCount: this.parseNumber(row.null_count),
-            minValue: row.min_numeric || row.min_date,
-            maxValue: row.max_numeric || row.max_date,
+            minValue: row.min_value,
+            maxValue: row.max_value,
+            sampleValues: this.getString(row.sample_values),
           });
         }
       }
@@ -335,6 +377,7 @@ export class SQLServerIntrospector extends BaseIntrospector {
           nullCount: undefined,
           minValue: undefined,
           maxValue: undefined,
+          sampleValues: undefined,
         });
       }
     }
@@ -355,26 +398,39 @@ export class SQLServerIntrospector extends BaseIntrospector {
              COUNT(DISTINCT [${columnName}]) AS distinct_count,
              COUNT(*) - COUNT([${columnName}]) AS null_count`;
 
-    // Add min/max for numeric and date columns
+    // Add min/max for numeric and date columns, cast to text for UNION compatibility
     if (isNumeric) {
       unionClause += `,
-             MIN([${columnName}]) AS min_numeric,
-             MAX([${columnName}]) AS max_numeric,
-             NULL AS min_date,
-             NULL AS max_date`;
+             CAST(MIN([${columnName}]) AS NVARCHAR(MAX)) AS min_value,
+             CAST(MAX([${columnName}]) AS NVARCHAR(MAX)) AS max_value`;
     } else if (isDate) {
       unionClause += `,
-             NULL AS min_numeric,
-             NULL AS max_numeric,
-             MIN([${columnName}]) AS min_date,
-             MAX([${columnName}]) AS max_date`;
+             CAST(MIN([${columnName}]) AS NVARCHAR(MAX)) AS min_value,
+             CAST(MAX([${columnName}]) AS NVARCHAR(MAX)) AS max_value`;
     } else {
       unionClause += `,
-             NULL AS min_numeric,
-             NULL AS max_numeric,
-             NULL AS min_date,
-             NULL AS max_date`;
+             NULL AS min_value,
+             NULL AS max_value`;
     }
+
+    // Add sample values - get up to 20 distinct values, truncated and comma-separated
+    unionClause += `,
+             (
+               SELECT STRING_AGG(
+                 CASE 
+                   WHEN LEN(sample_val) > 100 
+                   THEN LEFT(sample_val, 100) + '...'
+                   ELSE sample_val
+                 END, 
+                 ','
+               ) WITHIN GROUP (ORDER BY sample_val)
+               FROM (
+                 SELECT DISTINCT TOP 20 CAST([${columnName}] AS NVARCHAR(MAX)) as sample_val
+                 FROM [${schema}].[${table}]
+                 WHERE [${columnName}] IS NOT NULL
+                 ORDER BY sample_val
+               ) samples
+             ) AS sample_values`;
 
     unionClause += `
       FROM [${schema}].[${table}]`;

@@ -201,7 +201,36 @@ export class PostgreSQLIntrospector extends BaseIntrospector {
       tables = tables.filter((table) => table.database === database);
     }
 
-    return tables;
+    // Enhance tables with basic statistics
+    const tablesWithStats = await Promise.all(
+      tables.map(async (table) => {
+        try {
+          // Get basic table statistics
+          const tableStatsResult = await this.adapter.query(`
+            SELECT 
+              schemaname, 
+              relname as tablename, 
+              n_live_tup as row_count,
+              pg_total_relation_size(schemaname||'.'||relname) as size_bytes
+            FROM pg_stat_user_tables 
+            WHERE schemaname = '${table.schema}' AND relname = '${table.name}'
+          `);
+
+          const stats = tableStatsResult.rows[0];
+          return {
+            ...table,
+            rowCount: this.parseNumber(stats?.row_count),
+            sizeBytes: this.parseNumber(stats?.size_bytes),
+          };
+        } catch (error) {
+          // If stats query fails, return table without stats
+          console.warn(`Failed to get stats for table ${table.schema}.${table.name}:`, error);
+          return table;
+        }
+      })
+    );
+
+    return tablesWithStats;
   }
 
   async getColumns(database?: string, schema?: string, table?: string): Promise<Column[]> {
@@ -243,16 +272,12 @@ export class PostgreSQLIntrospector extends BaseIntrospector {
     schema: string,
     table: string
   ): Promise<TableStatistics> {
-    // Get basic table statistics
+    // Get basic table statistics only (no column statistics)
     const tableStatsResult = await this.adapter.query(`
-      SELECT schemaname, tablename, n_tup_ins, n_tup_upd, n_tup_del, n_live_tup, n_dead_tup
+      SELECT schemaname, relname, n_tup_ins, n_tup_upd, n_tup_del, n_live_tup, n_dead_tup
       FROM pg_stat_user_tables 
-      WHERE schemaname = '${schema}' AND tablename = '${table}'
+      WHERE schemaname = '${schema}' AND relname = '${table}'
     `);
-
-    // Get column statistics
-    const columns = await this.getColumns(database, schema, table);
-    const columnStatistics = await this.getColumnStatistics(database, schema, table, columns);
 
     const basicStats = tableStatsResult.rows[0];
 
@@ -261,15 +286,28 @@ export class PostgreSQLIntrospector extends BaseIntrospector {
       schema,
       database,
       rowCount: this.parseNumber(basicStats?.n_live_tup),
-      columnStatistics,
+      columnStatistics: [], // No column statistics in basic table stats
       lastUpdated: new Date(),
     };
   }
 
   /**
+   * Get column statistics for all columns in a specific table
+   */
+  async getColumnStatistics(
+    database: string,
+    schema: string,
+    table: string
+  ): Promise<ColumnStatistics[]> {
+    // Get columns for this table
+    const columns = await this.getColumns(database, schema, table);
+    return this.getColumnStatisticsForColumns(database, schema, table, columns);
+  }
+
+  /**
    * Get column statistics using UNION query approach
    */
-  private async getColumnStatistics(
+  private async getColumnStatisticsForColumns(
     _database: string,
     schema: string,
     table: string,
@@ -295,8 +333,9 @@ export class PostgreSQLIntrospector extends BaseIntrospector {
             columnName: this.getString(row.column_name) || '',
             distinctCount: this.parseNumber(row.distinct_count),
             nullCount: this.parseNumber(row.null_count),
-            minValue: row.min_numeric || row.min_date,
-            maxValue: row.max_numeric || row.max_date,
+            minValue: row.min_value,
+            maxValue: row.max_value,
+            sampleValues: this.getString(row.sample_values),
           });
         }
       }
@@ -311,6 +350,7 @@ export class PostgreSQLIntrospector extends BaseIntrospector {
           nullCount: undefined,
           minValue: undefined,
           maxValue: undefined,
+          sampleValues: undefined,
         });
       }
     }
@@ -331,26 +371,40 @@ export class PostgreSQLIntrospector extends BaseIntrospector {
              COUNT(DISTINCT ${columnName}) AS distinct_count,
              COUNT(*) - COUNT(${columnName}) AS null_count`;
 
-    // Add min/max for numeric and date columns
+    // Add min/max for numeric and date columns, cast to text for UNION compatibility
     if (isNumeric) {
       unionClause += `,
-             MIN(${columnName}) AS min_numeric,
-             MAX(${columnName}) AS max_numeric,
-             NULL AS min_date,
-             NULL AS max_date`;
+             MIN(${columnName})::text AS min_value,
+             MAX(${columnName})::text AS max_value`;
     } else if (isDate) {
       unionClause += `,
-             NULL AS min_numeric,
-             NULL AS max_numeric,
-             MIN(${columnName}) AS min_date,
-             MAX(${columnName}) AS max_date`;
+             MIN(${columnName})::text AS min_value,
+             MAX(${columnName})::text AS max_value`;
     } else {
       unionClause += `,
-             NULL AS min_numeric,
-             NULL AS max_numeric,
-             NULL AS min_date,
-             NULL AS max_date`;
+             NULL AS min_value,
+             NULL AS max_value`;
     }
+
+    // Add sample values - get up to 20 distinct values, truncated and comma-separated
+    unionClause += `,
+             (
+               SELECT string_agg(
+                 CASE 
+                   WHEN length(sample_val::text) > 100 
+                   THEN left(sample_val::text, 100) || '...'
+                   ELSE sample_val::text
+                 END, 
+                 ','
+                 ORDER BY sample_val::text
+               )
+               FROM (
+                 SELECT DISTINCT ${columnName} as sample_val
+                 FROM ${schema}.${table}
+                 WHERE ${columnName} IS NOT NULL
+                 LIMIT 20
+               ) samples
+             ) AS sample_values`;
 
     unionClause += `
       FROM ${schema}.${table}`;

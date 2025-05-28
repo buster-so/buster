@@ -110,6 +110,16 @@ export interface Column {
   isPrimaryKey?: boolean;
   /** Whether column is part of a foreign key */
   isForeignKey?: boolean;
+  /** Approximate distinct value count */
+  distinctCount?: number;
+  /** Null value count */
+  nullCount?: number;
+  /** Minimum value */
+  minValue?: unknown;
+  /** Maximum value */
+  maxValue?: unknown;
+  /** Sample values (comma-separated string of up to 20 distinct values) */
+  sampleValues?: string;
   /** Additional column-specific metadata */
   metadata?: Record<string, unknown>;
 }
@@ -152,10 +162,8 @@ export interface ColumnStatistics {
   minValue?: unknown;
   /** Maximum value */
   maxValue?: unknown;
-  /** Average value (for numeric columns) */
-  avgValue?: number;
-  /** Most frequent values */
-  topValues?: Array<{ value: unknown; frequency: number }>;
+  /** Sample values (comma-separated string of up to 20 distinct values) */
+  sampleValues?: string;
   /** Additional column-specific statistics */
   metadata?: Record<string, unknown>;
 }

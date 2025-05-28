@@ -33,6 +33,7 @@ describe('DataSource Unit Tests', () => {
       getColumns: vi.fn().mockResolvedValue([]),
       getViews: vi.fn().mockResolvedValue([]),
       getTableStatistics: vi.fn().mockResolvedValue({}),
+      getColumnStatistics: vi.fn().mockResolvedValue([]),
       getIndexes: vi.fn().mockResolvedValue([]),
       getForeignKeys: vi.fn().mockResolvedValue([]),
       getFullIntrospection: vi.fn().mockResolvedValue({}),
@@ -389,6 +390,7 @@ describe('DataSource Unit Tests', () => {
           definition: 'SELECT * FROM users',
         },
       ]);
+      const fixedDate = new Date('2024-01-01T00:00:00.000Z');
       vi.mocked(mockIntrospector.getTableStatistics).mockResolvedValue({
         table: 'users',
         schema: 'public',
@@ -401,6 +403,7 @@ describe('DataSource Unit Tests', () => {
             nullCount: 0,
             minValue: 1,
             maxValue: 100,
+            sampleValues: '1,2,3,4,5',
           },
           {
             columnName: 'name',
@@ -408,9 +411,10 @@ describe('DataSource Unit Tests', () => {
             nullCount: 5,
             minValue: undefined,
             maxValue: undefined,
+            sampleValues: 'Alice,Bob,Charlie',
           },
         ],
-        lastUpdated: new Date(),
+        lastUpdated: fixedDate,
       });
       vi.mocked(mockIntrospector.getDataSourceType).mockReturnValue('postgresql');
     });
@@ -424,6 +428,7 @@ describe('DataSource Unit Tests', () => {
       expect(typeof introspector.getColumns).toBe('function');
       expect(typeof introspector.getViews).toBe('function');
       expect(typeof introspector.getTableStatistics).toBe('function');
+      expect(typeof introspector.getColumnStatistics).toBe('function');
       expect(typeof introspector.getFullIntrospection).toBe('function');
       expect(mockAdapter.introspect).toHaveBeenCalled();
     });
@@ -498,6 +503,7 @@ describe('DataSource Unit Tests', () => {
             nullCount: 0,
             minValue: 1,
             maxValue: 100,
+            sampleValues: '1,2,3,4,5',
           },
           {
             columnName: 'name',
@@ -505,9 +511,10 @@ describe('DataSource Unit Tests', () => {
             nullCount: 5,
             minValue: undefined,
             maxValue: undefined,
+            sampleValues: 'Alice,Bob,Charlie',
           },
         ],
-        lastUpdated: new Date(),
+        lastUpdated: new Date('2024-01-01T00:00:00.000Z'),
       });
       expect(mockIntrospector.getTableStatistics).toHaveBeenCalledWith(
         'test_db',

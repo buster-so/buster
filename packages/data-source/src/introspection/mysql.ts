@@ -176,7 +176,33 @@ export class MySQLIntrospector extends BaseIntrospector {
       tables = tables.filter((table) => table.database === targetDatabase);
     }
 
-    return tables;
+    // Enhance tables with basic statistics
+    const tablesWithStats = await Promise.all(
+      tables.map(async (table) => {
+        try {
+          // Get basic table statistics
+          const tableStatsResult = await this.adapter.query(`
+            SELECT table_rows as row_count,
+                   data_length + index_length as size_bytes
+            FROM information_schema.tables
+            WHERE table_schema = '${table.database}' AND table_name = '${table.name}'
+          `);
+
+          const stats = tableStatsResult.rows[0];
+          return {
+            ...table,
+            rowCount: this.parseNumber(stats?.row_count),
+            sizeBytes: this.parseNumber(stats?.size_bytes),
+          };
+        } catch (error) {
+          // If stats query fails, return table without stats
+          console.warn(`Failed to get stats for table ${table.database}.${table.name}:`, error);
+          return table;
+        }
+      })
+    );
+
+    return tablesWithStats;
   }
 
   async getColumns(database?: string, schema?: string, table?: string): Promise<Column[]> {
@@ -213,17 +239,13 @@ export class MySQLIntrospector extends BaseIntrospector {
   ): Promise<TableStatistics> {
     const targetDatabase = database || schema;
 
-    // Get basic table statistics
+    // Get basic table statistics only (no column statistics)
     const tableStatsResult = await this.adapter.query(`
       SELECT table_rows as row_count,
              data_length + index_length as size_bytes
       FROM information_schema.tables
       WHERE table_schema = '${targetDatabase}' AND table_name = '${table}'
     `);
-
-    // Get column statistics
-    const columns = await this.getColumns(targetDatabase, undefined, table);
-    const columnStatistics = await this.getColumnStatistics(targetDatabase, table, columns);
 
     const basicStats = tableStatsResult.rows[0];
 
@@ -233,15 +255,29 @@ export class MySQLIntrospector extends BaseIntrospector {
       database: targetDatabase,
       rowCount: this.parseNumber(basicStats?.row_count),
       sizeBytes: this.parseNumber(basicStats?.size_bytes),
-      columnStatistics,
+      columnStatistics: [], // No column statistics in basic table stats
       lastUpdated: new Date(),
     };
   }
 
   /**
+   * Get column statistics for all columns in a specific table
+   */
+  async getColumnStatistics(
+    database: string,
+    schema: string,
+    table: string
+  ): Promise<ColumnStatistics[]> {
+    const targetDatabase = database || schema;
+    // Get columns for this table
+    const columns = await this.getColumns(targetDatabase, undefined, table);
+    return this.getColumnStatisticsForColumns(targetDatabase, table, columns);
+  }
+
+  /**
    * Get column statistics using UNION query approach
    */
-  private async getColumnStatistics(
+  private async getColumnStatisticsForColumns(
     database: string,
     table: string,
     columns: Column[]
@@ -250,7 +286,7 @@ export class MySQLIntrospector extends BaseIntrospector {
 
     if (columns.length === 0) return columnStatistics;
 
-    // Build UNION query with one SELECT per column
+    // Build UNION query with one SELECT per column, cast to text for compatibility
     const unionClauses = columns.map((column) =>
       this.buildColumnStatsClause(column, database, table)
     );
@@ -266,8 +302,9 @@ export class MySQLIntrospector extends BaseIntrospector {
             columnName: this.getString(row.column_name) || '',
             distinctCount: this.parseNumber(row.distinct_count),
             nullCount: this.parseNumber(row.null_count),
-            minValue: row.min_numeric || row.min_date,
-            maxValue: row.max_numeric || row.max_date,
+            minValue: row.min_value,
+            maxValue: row.max_value,
+            sampleValues: this.getString(row.sample_values),
           });
         }
       }
@@ -282,6 +319,7 @@ export class MySQLIntrospector extends BaseIntrospector {
           nullCount: undefined,
           minValue: undefined,
           maxValue: undefined,
+          sampleValues: undefined,
         });
       }
     }
@@ -302,26 +340,40 @@ export class MySQLIntrospector extends BaseIntrospector {
              COUNT(DISTINCT \`${columnName}\`) AS distinct_count,
              COUNT(*) - COUNT(\`${columnName}\`) AS null_count`;
 
-    // Add min/max for numeric and date columns
+    // Add min/max for numeric and date columns, cast to text for UNION compatibility
     if (isNumeric) {
       unionClause += `,
-             MIN(\`${columnName}\`) AS min_numeric,
-             MAX(\`${columnName}\`) AS max_numeric,
-             NULL AS min_date,
-             NULL AS max_date`;
+             CAST(MIN(\`${columnName}\`) AS CHAR) AS min_value,
+             CAST(MAX(\`${columnName}\`) AS CHAR) AS max_value`;
     } else if (isDate) {
       unionClause += `,
-             NULL AS min_numeric,
-             NULL AS max_numeric,
-             MIN(\`${columnName}\`) AS min_date,
-             MAX(\`${columnName}\`) AS max_date`;
+             CAST(MIN(\`${columnName}\`) AS CHAR) AS min_value,
+             CAST(MAX(\`${columnName}\`) AS CHAR) AS max_value`;
     } else {
       unionClause += `,
-             NULL AS min_numeric,
-             NULL AS max_numeric,
-             NULL AS min_date,
-             NULL AS max_date`;
+             NULL AS min_value,
+             NULL AS max_value`;
     }
+
+    // Add sample values - get up to 20 distinct values, truncated and comma-separated
+    unionClause += `,
+             (
+               SELECT GROUP_CONCAT(
+                 CASE 
+                   WHEN CHAR_LENGTH(sample_val) > 100 
+                   THEN CONCAT(LEFT(sample_val, 100), '...')
+                   ELSE sample_val
+                 END
+                 ORDER BY sample_val
+                 SEPARATOR ','
+               )
+               FROM (
+                 SELECT DISTINCT CAST(\`${columnName}\` AS CHAR) as sample_val
+                 FROM \`${database}\`.\`${table}\`
+                 WHERE \`${columnName}\` IS NOT NULL
+                 LIMIT 20
+               ) samples
+             ) AS sample_values`;
 
     unionClause += `
       FROM \`${database}\`.\`${table}\``;

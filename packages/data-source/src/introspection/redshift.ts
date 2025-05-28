@@ -200,7 +200,33 @@ export class RedshiftIntrospector extends BaseIntrospector {
       tables = tables.filter((table) => table.database === database);
     }
 
-    return tables;
+    // Enhance tables with basic statistics
+    const tablesWithStats = await Promise.all(
+      tables.map(async (table) => {
+        try {
+          // Get basic table statistics using Redshift system tables
+          const tableStatsResult = await this.adapter.query(`
+            SELECT tbl_rows as row_count,
+                   size as size_bytes
+            FROM svv_table_info 
+            WHERE schema = '${table.schema}' AND "table" = '${table.name}'
+          `);
+
+          const stats = tableStatsResult.rows[0];
+          return {
+            ...table,
+            rowCount: this.parseNumber(stats?.row_count),
+            sizeBytes: this.parseNumber(stats?.size_bytes),
+          };
+        } catch (error) {
+          // If stats query fails, return table without stats
+          console.warn(`Failed to get stats for table ${table.schema}.${table.name}:`, error);
+          return table;
+        }
+      })
+    );
+
+    return tablesWithStats;
   }
 
   async getColumns(database?: string, schema?: string, table?: string): Promise<Column[]> {
@@ -242,17 +268,13 @@ export class RedshiftIntrospector extends BaseIntrospector {
     schema: string,
     table: string
   ): Promise<TableStatistics> {
-    // Get basic table statistics using Redshift system tables
+    // Get basic table statistics only (no column statistics)
     const tableStatsResult = await this.adapter.query(`
       SELECT tbl_rows as row_count,
              size as size_bytes
       FROM svv_table_info 
       WHERE schema = '${schema}' AND "table" = '${table}'
     `);
-
-    // Get column statistics
-    const columns = await this.getColumns(database, schema, table);
-    const columnStatistics = await this.getColumnStatistics(database, schema, table, columns);
 
     const basicStats = tableStatsResult.rows[0];
 
@@ -262,15 +284,28 @@ export class RedshiftIntrospector extends BaseIntrospector {
       database,
       rowCount: this.parseNumber(basicStats?.row_count),
       sizeBytes: this.parseNumber(basicStats?.size_bytes),
-      columnStatistics,
+      columnStatistics: [], // No column statistics in basic table stats
       lastUpdated: new Date(),
     };
   }
 
   /**
+   * Get column statistics for all columns in a specific table
+   */
+  async getColumnStatistics(
+    database: string,
+    schema: string,
+    table: string
+  ): Promise<ColumnStatistics[]> {
+    // Get columns for this table
+    const columns = await this.getColumns(database, schema, table);
+    return this.getColumnStatisticsForColumns(database, schema, table, columns);
+  }
+
+  /**
    * Get column statistics using UNION query approach
    */
-  private async getColumnStatistics(
+  private async getColumnStatisticsForColumns(
     _database: string,
     schema: string,
     table: string,
@@ -280,7 +315,7 @@ export class RedshiftIntrospector extends BaseIntrospector {
 
     if (columns.length === 0) return columnStatistics;
 
-    // Build UNION query with one SELECT per column
+    // Build UNION query with one SELECT per column, cast to text for compatibility
     const unionClauses = columns.map((column) =>
       this.buildColumnStatsClause(column, schema, table)
     );
@@ -296,8 +331,9 @@ export class RedshiftIntrospector extends BaseIntrospector {
             columnName: this.getString(row.column_name) || '',
             distinctCount: this.parseNumber(row.distinct_count),
             nullCount: this.parseNumber(row.null_count),
-            minValue: row.min_numeric || row.min_date,
-            maxValue: row.max_numeric || row.max_date,
+            minValue: row.min_value,
+            maxValue: row.max_value,
+            sampleValues: this.getString(row.sample_values),
           });
         }
       }
@@ -312,6 +348,7 @@ export class RedshiftIntrospector extends BaseIntrospector {
           nullCount: undefined,
           minValue: undefined,
           maxValue: undefined,
+          sampleValues: undefined,
         });
       }
     }
@@ -332,26 +369,39 @@ export class RedshiftIntrospector extends BaseIntrospector {
              COUNT(DISTINCT "${columnName}") AS distinct_count,
              COUNT(*) - COUNT("${columnName}") AS null_count`;
 
-    // Add min/max for numeric and date columns
+    // Add min/max for numeric and date columns, cast to text for UNION compatibility
     if (isNumeric) {
       unionClause += `,
-             MIN("${columnName}") AS min_numeric,
-             MAX("${columnName}") AS max_numeric,
-             NULL AS min_date,
-             NULL AS max_date`;
+             MIN("${columnName}")::text AS min_value,
+             MAX("${columnName}")::text AS max_value`;
     } else if (isDate) {
       unionClause += `,
-             NULL AS min_numeric,
-             NULL AS max_numeric,
-             MIN("${columnName}") AS min_date,
-             MAX("${columnName}") AS max_date`;
+             MIN("${columnName}")::text AS min_value,
+             MAX("${columnName}")::text AS max_value`;
     } else {
       unionClause += `,
-             NULL AS min_numeric,
-             NULL AS max_numeric,
-             NULL AS min_date,
-             NULL AS max_date`;
+             NULL AS min_value,
+             NULL AS max_value`;
     }
+
+    // Add sample values - get up to 20 distinct values, truncated and comma-separated
+    unionClause += `,
+             (
+               SELECT listagg(
+                 CASE 
+                   WHEN len(sample_val::text) > 100 
+                   THEN left(sample_val::text, 100) || '...'
+                   ELSE sample_val::text
+                 END, 
+                 ','
+               ) WITHIN GROUP (ORDER BY sample_val::text)
+               FROM (
+                 SELECT DISTINCT "${columnName}" as sample_val
+                 FROM "${schema}"."${table}"
+                 WHERE "${columnName}" IS NOT NULL
+                 LIMIT 20
+               )
+             ) AS sample_values`;
 
     unionClause += `
       FROM "${schema}"."${table}"`;

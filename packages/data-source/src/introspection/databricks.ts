@@ -165,12 +165,38 @@ export class DatabricksIntrospector extends BaseIntrospector {
     await this.fetchAllMetadata();
     let tables = this.metadataCache.tables || [];
 
-    const targetDatabase = database || schema;
-    if (targetDatabase) {
-      tables = tables.filter((table) => table.database === targetDatabase);
+    if (database && schema) {
+      tables = tables.filter((table) => table.database === database && table.schema === schema);
+    } else if (database) {
+      tables = tables.filter((table) => table.database === database);
+    } else if (schema) {
+      tables = tables.filter((table) => table.schema === schema);
     }
 
-    return tables;
+    // Enhance tables with basic statistics
+    const tablesWithStats = await Promise.all(
+      tables.map(async (table) => {
+        try {
+          // Get basic table statistics using Databricks system tables
+          const tableStatsResult = await this.adapter.query(`
+            DESCRIBE DETAIL ${table.database}.${table.schema}.${table.name}
+          `);
+
+          const stats = tableStatsResult.rows[0];
+          return {
+            ...table,
+            rowCount: this.parseNumber(stats?.numRows),
+            sizeBytes: this.parseNumber(stats?.sizeInBytes),
+          };
+        } catch (error) {
+          // If stats query fails, return table without stats
+          console.warn(`Failed to get stats for table ${table.schema}.${table.name}:`, error);
+          return table;
+        }
+      })
+    );
+
+    return tablesWithStats;
   }
 
   async getColumns(database?: string, schema?: string, table?: string): Promise<Column[]> {
@@ -209,44 +235,41 @@ export class DatabricksIntrospector extends BaseIntrospector {
     schema: string,
     table: string
   ): Promise<TableStatistics> {
-    const targetDatabase = database || schema;
+    // Get basic table statistics only (no column statistics)
+    const tableStatsResult = await this.adapter.query(`
+      DESCRIBE DETAIL ${database}.${schema}.${table}
+    `);
 
-    // Get basic table statistics using Databricks/Spark SQL
-    let rowCount: number | undefined;
-    let sizeBytes: number | undefined;
-
-    try {
-      // Try to get table statistics
-      const statsResult = await this.adapter.query(`DESCRIBE DETAIL ${targetDatabase}.${table}`);
-      const stats = statsResult.rows[0];
-
-      if (stats) {
-        rowCount = this.parseNumber(stats.numRows);
-        sizeBytes = this.parseNumber(stats.sizeInBytes);
-      }
-    } catch (error) {
-      console.warn(`Could not get table statistics for ${table}:`, error);
-    }
-
-    // Get column statistics
-    const columns = await this.getColumns(targetDatabase, undefined, table);
-    const columnStatistics = await this.getColumnStatistics(targetDatabase, table, columns);
+    const basicStats = tableStatsResult.rows[0];
 
     return {
       table,
-      schema: targetDatabase,
-      database: targetDatabase,
-      rowCount,
-      sizeBytes,
-      columnStatistics,
+      schema,
+      database,
+      rowCount: this.parseNumber(basicStats?.numRows),
+      sizeBytes: this.parseNumber(basicStats?.sizeInBytes),
+      columnStatistics: [], // No column statistics in basic table stats
       lastUpdated: new Date(),
     };
   }
 
   /**
+   * Get column statistics for all columns in a specific table
+   */
+  async getColumnStatistics(
+    database: string,
+    schema: string,
+    table: string
+  ): Promise<ColumnStatistics[]> {
+    // Get columns for this table
+    const columns = await this.getColumns(database, schema, table);
+    return this.getColumnStatisticsForColumns(database, table, columns);
+  }
+
+  /**
    * Get column statistics using UNION query approach
    */
-  private async getColumnStatistics(
+  private async getColumnStatisticsForColumns(
     database: string,
     table: string,
     columns: Column[]
@@ -255,7 +278,7 @@ export class DatabricksIntrospector extends BaseIntrospector {
 
     if (columns.length === 0) return columnStatistics;
 
-    // Build UNION query with one SELECT per column
+    // Build UNION query with one SELECT per column, cast to string for compatibility
     const unionClauses = columns.map((column) =>
       this.buildColumnStatsClause(column, database, table)
     );
@@ -271,8 +294,9 @@ export class DatabricksIntrospector extends BaseIntrospector {
             columnName: this.getString(row.column_name) || '',
             distinctCount: this.parseNumber(row.distinct_count),
             nullCount: this.parseNumber(row.null_count),
-            minValue: row.min_numeric || row.min_date,
-            maxValue: row.max_numeric || row.max_date,
+            minValue: row.min_value,
+            maxValue: row.max_value,
+            sampleValues: this.getString(row.sample_values),
           });
         }
       }
@@ -287,6 +311,7 @@ export class DatabricksIntrospector extends BaseIntrospector {
           nullCount: undefined,
           minValue: undefined,
           maxValue: undefined,
+          sampleValues: undefined,
         });
       }
     }
@@ -307,29 +332,44 @@ export class DatabricksIntrospector extends BaseIntrospector {
              COUNT(DISTINCT \`${columnName}\`) AS distinct_count,
              COUNT(*) - COUNT(\`${columnName}\`) AS null_count`;
 
-    // Add min/max for numeric and date columns
+    // Add min/max for numeric and date columns, cast to string for UNION compatibility
     if (isNumeric) {
       unionClause += `,
-             MIN(\`${columnName}\`) AS min_numeric,
-             MAX(\`${columnName}\`) AS max_numeric,
-             NULL AS min_date,
-             NULL AS max_date`;
+             CAST(MIN(\`${columnName}\`) AS STRING) AS min_value,
+             CAST(MAX(\`${columnName}\`) AS STRING) AS max_value`;
     } else if (isDate) {
       unionClause += `,
-             NULL AS min_numeric,
-             NULL AS max_numeric,
-             MIN(\`${columnName}\`) AS min_date,
-             MAX(\`${columnName}\`) AS max_date`;
+             CAST(MIN(\`${columnName}\`) AS STRING) AS min_value,
+             CAST(MAX(\`${columnName}\`) AS STRING) AS max_value`;
     } else {
       unionClause += `,
-             NULL AS min_numeric,
-             NULL AS max_numeric,
-             NULL AS min_date,
-             NULL AS max_date`;
+             NULL AS min_value,
+             NULL AS max_value`;
     }
 
+    // Add sample values - get up to 20 distinct values, truncated and comma-separated
+    unionClause += `,
+             (
+               SELECT concat_ws(',',
+                 collect_list(
+                   CASE 
+                     WHEN length(sample_val) > 100 
+                     THEN concat(substring(sample_val, 1, 100), '...')
+                     ELSE sample_val
+                   END
+                 )
+               )
+               FROM (
+                 SELECT DISTINCT CAST(\`${columnName}\` AS STRING) as sample_val
+                 FROM \`${database}\`.\`${table}\`
+                 WHERE \`${columnName}\` IS NOT NULL
+                 ORDER BY sample_val
+                 LIMIT 20
+               )
+             ) AS sample_values`;
+
     unionClause += `
-      FROM ${database}.\`${table}\``;
+      FROM \`${database}\`.\`${table}\``;
 
     return unionClause;
   }
