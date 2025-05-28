@@ -1,4 +1,4 @@
-import { ChartType, Chart, Plugin } from 'chart.js';
+import { type ChartType, Chart, type Plugin } from 'chart.js';
 
 export interface ChartTotalizerPluginOptions {
   enabled?: boolean;
@@ -16,10 +16,10 @@ declare module 'chart.js' {
 
 export const ChartTotalizerPlugin: Plugin<ChartType, ChartTotalizerPluginOptions> = {
   id: 'totalizer',
-  start: function (chart) {
+  start: (chart) => {
     chart.$totalizer = { stackTotals: {}, seriesTotals: [] };
   },
-  stop: function (chart) {
+  stop: (chart) => {
     chart.$totalizer = { stackTotals: {}, seriesTotals: [] };
   },
 

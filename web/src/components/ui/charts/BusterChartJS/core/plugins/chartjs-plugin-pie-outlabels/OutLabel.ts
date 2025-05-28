@@ -1,9 +1,9 @@
 import { drawRoundedRect, textSize } from './helpers';
-import Size from './Size';
-import { ArcElement, Point } from 'chart.js';
-import Rect from './Rect';
-import OutLabelsContext from './OutLabelsContext';
-import { OutLabelStyle } from './OutLabelsStyle';
+import type Size from './Size';
+import type { ArcElement, Point } from 'chart.js';
+import type Rect from './Rect';
+import type OutLabelsContext from './OutLabelsContext';
+import type { OutLabelStyle } from './OutLabelsStyle';
 import { toFontString } from 'chart.js/helpers';
 
 export default class OutLabel {
@@ -66,7 +66,7 @@ export default class OutLabel {
             return this.style.valuePrecision;
           }
         })
-        .forEach(function (val) {
+        .forEach((val) => {
           if (text) text = text.replace(/%v\.?(\d*)/i, context.value.toFixed(val));
         });
 

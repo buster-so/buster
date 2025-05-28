@@ -1,6 +1,7 @@
-import React, { useMemo } from 'react';
+import type React from 'react';
+import { useMemo } from 'react';
 import { useMemoizedFn, useUpdateLayoutEffect } from '@/hooks';
-import { type AppSplitterRef } from '@/components/ui/layouts';
+import type { AppSplitterRef } from '@/components/ui/layouts';
 import Cookies from 'js-cookie';
 import { createAutoSaveId } from '@/components/ui/layouts/AppSplitter/helper';
 

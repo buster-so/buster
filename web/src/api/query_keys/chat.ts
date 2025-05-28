@@ -1,7 +1,7 @@
 import { queryOptions } from '@tanstack/react-query';
 import type { BusterMetricData } from '@/api/asset_interfaces/metric/metricDataInterfaces';
 import type { IBusterChat, IBusterChatMessage } from '@/api/asset_interfaces/chat/iChatInterfaces';
-import { type getListLogs, type getListChats } from '@/api/buster_rest/chats/requests';
+import type { getListLogs, getListChats } from '@/api/buster_rest/chats/requests';
 import type { BusterChatListItem } from '../asset_interfaces/chat/chatInterfaces';
 
 const chatsGetChat = (chatId: string) =>
@@ -14,14 +14,14 @@ const chatsGetChat = (chatId: string) =>
 const chatsMessages = (messageId: string) =>
   queryOptions<IBusterChatMessage>({
     queryKey: ['chats', 'messages', messageId] as const,
-    staleTime: Infinity,
+    staleTime: Number.POSITIVE_INFINITY,
     enabled: !!messageId
   });
 
 const chatsMessagesFetchingData = (messageId: string) =>
   queryOptions<BusterMetricData>({
     queryKey: ['chats', 'messages-data', messageId] as const,
-    staleTime: Infinity,
+    staleTime: Number.POSITIVE_INFINITY,
     enabled: !!messageId
   });
 
@@ -38,7 +38,7 @@ const chatsGetList = (
 const chatsBlackBoxMessages = (messageId: string) =>
   queryOptions<string | null>({
     queryKey: ['chats', 'messages', messageId, 'local-only-black-box'] as const,
-    staleTime: Infinity,
+    staleTime: Number.POSITIVE_INFINITY,
     enabled: false, //this is local
     queryFn: () => Promise.resolve(null)
   });

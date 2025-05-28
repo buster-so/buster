@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { iconProps } from './iconProps';
+import type { iconProps } from './iconProps';
 
 function wallet2Key(props: iconProps) {
   const strokewidth = props.strokewidth || 1.3;

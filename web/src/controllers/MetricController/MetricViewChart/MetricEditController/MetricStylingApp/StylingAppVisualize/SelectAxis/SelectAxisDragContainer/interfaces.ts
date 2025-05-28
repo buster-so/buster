@@ -1,4 +1,4 @@
-import { SelectAxisContainerId } from '../config';
+import type { SelectAxisContainerId } from '../config';
 
 export interface SelectAxisItemProps {
   id: string;

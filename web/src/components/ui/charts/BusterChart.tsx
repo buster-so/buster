@@ -22,7 +22,7 @@ import { BusterChartWrapper } from './BusterChartWrapper';
 import type { BusterChartRenderComponentProps } from './interfaces/chartComponentInterfaces';
 import { BusterChartComponent } from './BusterChartComponent';
 import { DEFAULT_CHART_CONFIG } from '@/api/asset_interfaces/metric/defaults';
-import { type Chart } from 'chart.js';
+import type { Chart } from 'chart.js';
 
 export const BusterChart: React.FC<BusterChartProps> = React.memo(
   ({

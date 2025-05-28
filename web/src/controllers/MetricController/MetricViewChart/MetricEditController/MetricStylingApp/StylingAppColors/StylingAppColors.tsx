@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { CustomApp } from './CustomApp';
 import { PaletteApp } from './PaletteApp';
 import { ColorsApp } from './ColorsApp';
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { useMemoizedFn, useUnmount } from '@/hooks';
 import { useUpdateMetricChart } from '@/context/Metrics';
 import { cn } from '@/lib/classMerge';

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { ChartEncodes, ChartType } from '@/api/asset_interfaces/metric/charts';
-import { ColumnMetaData, IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { ChartEncodes, ChartType } from '@/api/asset_interfaces/metric/charts';
+import type { ColumnMetaData, IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { AppTooltip } from '@/components/ui/tooltip';
 import { CHART_ICON_LIST, ChartIconType, DETERMINE_SELECTED_CHART_TYPE_ORDER } from './config';
 import {

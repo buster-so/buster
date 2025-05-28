@@ -1,6 +1,6 @@
 'use server';
 
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { getSupabaseUserContext } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {

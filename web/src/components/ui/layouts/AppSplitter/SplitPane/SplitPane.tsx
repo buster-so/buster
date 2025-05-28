@@ -17,7 +17,7 @@ import {
   sashVerticalClassName,
   assertsSize
 } from './base';
-import { IAxis, ISplitProps, IPaneConfigs, ICacheSizes } from './types';
+import type { IAxis, ISplitProps, IPaneConfigs, ICacheSizes } from './types';
 
 const SplitPane = ({
   children,
@@ -78,7 +78,7 @@ const SplitPane = ({
   const paneLimitSizes = useMemo(
     () =>
       children.map((childNode) => {
-        const limits = [0, Infinity];
+        const limits = [0, Number.POSITIVE_INFINITY];
         if (childNode.type === Pane) {
           const { minSize, maxSize } = childNode.props as IPaneConfigs;
           limits[0] = assertsSize(minSize, wrapSize, 0);
@@ -90,12 +90,12 @@ const SplitPane = ({
   );
 
   const sizes = useMemo(
-    function () {
+    () => {
       let count = 0;
       let curSum = 0;
       const res = children.map((_, index) => {
         const size = assertsSize(propSizes[index], wrapSize);
-        if (size === Infinity) {
+        if (size === Number.POSITIVE_INFINITY) {
           count++;
         } else {
           curSum += size;
@@ -107,14 +107,14 @@ const SplitPane = ({
       if (curSum > wrapSize || (!count && curSum < wrapSize)) {
         const cacheNum = (curSum - wrapSize) / curSum;
         return res.map((size) => {
-          return size === Infinity ? 0 : size - size * cacheNum;
+          return size === Number.POSITIVE_INFINITY ? 0 : size - size * cacheNum;
         });
       }
 
       if (count > 0) {
         const average = (wrapSize - curSum) / count;
         return res.map((size) => {
-          return size === Infinity ? average : size;
+          return size === Number.POSITIVE_INFINITY ? average : size;
         });
       }
 
@@ -129,7 +129,7 @@ const SplitPane = ({
   );
 
   const dragStart = useCallback(
-    function (e: any) {
+    (e: any) => {
       document?.body?.classList?.add(bodyDisableUserSelect);
       axis.current = { x: e.pageX, y: e.pageY };
       cacheSizes.current = { sizes, sashPosSizes };
@@ -140,7 +140,7 @@ const SplitPane = ({
   );
 
   const dragEnd = useCallback(
-    function (e: any) {
+    (e: any) => {
       document?.body?.classList?.remove(bodyDisableUserSelect);
       axis.current = { x: e.pageX, y: e.pageY };
       cacheSizes.current = { sizes, sashPosSizes };
@@ -151,7 +151,7 @@ const SplitPane = ({
   );
 
   const onDragging = useCallback(
-    function (e: any, i: number) {
+    (e: any, i: number) => {
       const curAxis = { x: e.pageX, y: e.pageY };
       // @ts-ignore
       let distanceX = curAxis[splitAxis] - axis.current[splitAxis];

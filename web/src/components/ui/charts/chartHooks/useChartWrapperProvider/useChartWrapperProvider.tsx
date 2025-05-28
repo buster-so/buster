@@ -1,5 +1,6 @@
 import { createContext, useContextSelector } from 'use-context-selector';
-import React, { PropsWithChildren } from 'react';
+import type React from 'react';
+import type { PropsWithChildren } from 'react';
 
 const ChartWrapperContext = createContext<{
   width: number;

@@ -27,7 +27,7 @@ export const isNumeric = (str: string | undefined | number | Date | null) => {
   if (typeof str === 'boolean') return false;
   if (str === '') return false;
   if (isDate(str)) return false;
-  return !isNaN(+str) && !isNaN(parseFloat(str)); // Ensure the entire string is parsed
+  return !isNaN(+str) && !isNaN(Number.parseFloat(str)); // Ensure the entire string is parsed
 };
 
 export const formatNumber = (

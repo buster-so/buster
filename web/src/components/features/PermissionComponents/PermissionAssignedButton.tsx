@@ -1,8 +1,9 @@
 import { useMemoizedFn } from '@/hooks';
-import { Dropdown, DropdownItem, DropdownItems, DropdownProps } from '@/components/ui/dropdown';
+import { Dropdown, type DropdownItem, DropdownItems, type DropdownProps } from '@/components/ui/dropdown';
 import { Button } from '@/components/ui/buttons';
 import { CheckDouble, Xmark } from '@/components/ui/icons';
-import React, { useMemo } from 'react';
+import type React from 'react';
+import { useMemo } from 'react';
 import { PERMISSION_OPTIONS_INCLUDED, PERMISSION_OPTIONS_ASSIGNED } from './PermissionAssignedCell';
 
 export const PermissionAssignedButton: React.FC<{

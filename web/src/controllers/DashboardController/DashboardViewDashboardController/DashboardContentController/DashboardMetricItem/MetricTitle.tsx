@@ -3,7 +3,7 @@ import { Title, Text } from '@/components/ui/typography';
 import { DotsVertical, Trash } from '@/components/ui/icons';
 import { SortableItemContext } from '@/components/ui/grid/_BusterSortableItemDragContainer';
 import { useMemoizedFn, useMount } from '@/hooks';
-import { Dropdown, DropdownItems } from '@/components/ui/dropdown';
+import { Dropdown, type DropdownItems } from '@/components/ui/dropdown';
 import { Button } from '@/components/ui/buttons';
 import Link from 'next/link';
 import React, { useContext, useMemo, useState } from 'react';

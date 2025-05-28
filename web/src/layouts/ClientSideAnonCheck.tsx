@@ -1,7 +1,8 @@
 'use client';
 
 import { useSupabaseContext } from '@/context/Supabase';
-import React, { useLayoutEffect } from 'react';
+import type React from 'react';
+import { useLayoutEffect } from 'react';
 
 export const ClientSideAnonCheck: React.FC<{
   children: React.ReactNode;

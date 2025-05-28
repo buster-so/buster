@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { StatusCard } from '@/components/ui/card/StatusCard';
 
 export const MetricViewError: React.FC<{ error: string | undefined }> = ({

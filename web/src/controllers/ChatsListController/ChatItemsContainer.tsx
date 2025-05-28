@@ -8,7 +8,7 @@ import { Text } from '@/components/ui/typography';
 import { Avatar } from '@/components/ui/avatar';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { useMemoizedFn } from '@/hooks';
-import { BusterListColumn, BusterListRow } from '@/components/ui/list';
+import type { BusterListColumn, BusterListRow } from '@/components/ui/list';
 import { ChatSelectedOptionPopup } from './ChatItemsSelectedPopup';
 import { BusterList, ListEmptyStateWithButton } from '@/components/ui/list';
 import { useCreateListByDate } from '@/components/ui/list/useCreateListByDate';

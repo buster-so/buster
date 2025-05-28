@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query';
-import {
+import type {
   GetPermissionGroupDatasetGroupsResponse,
   GetPermissionGroupDatasetsResponse,
   GetPermissionGroupResponse,

@@ -1,7 +1,7 @@
 'use client';
 
-import { BusterDashboardResponse } from '@/api/asset_interfaces/dashboard';
-import { IBusterMetric } from '@/api/asset_interfaces/metric';
+import type { BusterDashboardResponse } from '@/api/asset_interfaces/dashboard';
+import type { IBusterMetric } from '@/api/asset_interfaces/metric';
 import { HydrationBoundaryMetricStore } from '../Metrics/useOriginalMetricStore';
 import { HydrationBoundaryDashboardStore } from '../Dashboards/useOriginalDashboardStore';
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileContainerButtonsProps } from './interfaces';
+import type { FileContainerButtonsProps } from './interfaces';
 
 export const ValueContainerHeaderButtons: React.FC<FileContainerButtonsProps> = React.memo(() => {
   return <div>ValueContainerHeaderButtons</div>;

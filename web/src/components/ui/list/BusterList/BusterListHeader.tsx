@@ -1,5 +1,5 @@
 import React from 'react';
-import { BusterListColumn } from './interfaces';
+import type { BusterListColumn } from './interfaces';
 import { CheckboxColumn } from './CheckboxColumn';
 import { Text } from '@/components/ui/typography';
 import { cn } from '@/lib/classMerge';

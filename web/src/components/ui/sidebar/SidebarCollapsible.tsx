@@ -6,7 +6,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger
 } from '../collapsible/CollapsibleBase';
-import { type ISidebarGroup } from './interfaces';
+import type { ISidebarGroup } from './interfaces';
 import { SidebarItem } from './SidebarItem';
 import { CaretDown } from '../icons/NucleoIconFilled';
 import { cn } from '@/lib/classMerge';
@@ -18,8 +18,8 @@ import {
   useSensor,
   useSensors,
   DragOverlay,
-  DragStartEvent,
-  DragEndEvent
+  type DragStartEvent,
+  type DragEndEvent
 } from '@dnd-kit/core';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import {

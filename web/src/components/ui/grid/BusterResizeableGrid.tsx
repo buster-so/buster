@@ -4,10 +4,10 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import {
   closestCenter,
-  CollisionDetection,
+  type CollisionDetection,
   DndContext,
-  DragEndEvent,
-  DragStartEvent,
+  type DragEndEvent,
+  type DragStartEvent,
   getFirstCollision,
   MeasuringStrategy,
   PointerSensor,
@@ -17,7 +17,7 @@ import {
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import { BusterSortableOverlay } from './_BusterSortableOverlay';
-import { BusterResizeableGridRow } from './interfaces';
+import type { BusterResizeableGridRow } from './interfaces';
 import { v4 as uuidv4 } from 'uuid';
 import { useMemoizedFn } from '@/hooks';
 import isEqual from 'lodash/isEqual';
@@ -211,7 +211,7 @@ export const BusterResizeableGrid: React.FC<{
           }
 
           if (newRowDroppedId) {
-            const numericId = parseInt(newRowDroppedId) + 1;
+            const numericId = Number.parseInt(newRowDroppedId) + 1;
             const newRows = filteredRows.reduce<BusterResizeableGridRow[]>((acc, row, index) => {
               if (index === numericId) {
                 acc.push(newRowConfig);

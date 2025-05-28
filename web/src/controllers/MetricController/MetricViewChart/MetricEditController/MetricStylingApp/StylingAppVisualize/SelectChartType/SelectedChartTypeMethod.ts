@@ -1,6 +1,6 @@
 import { ChartType } from '@/api/asset_interfaces/metric/charts';
 import { ChartIconType } from './config';
-import { SelectChartTypeProps } from './SelectChartType';
+import type { SelectChartTypeProps } from './SelectChartType';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import omit from 'lodash/omit';
 

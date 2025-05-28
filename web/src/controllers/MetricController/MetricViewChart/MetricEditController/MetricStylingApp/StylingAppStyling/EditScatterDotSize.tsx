@@ -1,5 +1,5 @@
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import { ChartEncodes, ScatterAxis } from '@/api/asset_interfaces/metric/charts';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { ChartEncodes, ScatterAxis } from '@/api/asset_interfaces/metric/charts';
 import { Slider } from '@/components/ui/slider';
 import React from 'react';
 import isEmpty from 'lodash/isEmpty';

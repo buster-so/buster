@@ -1,5 +1,5 @@
 import { hasUnmappedMetrics, hasRemovedMetrics } from './hasMappedMetrics';
-import { DashboardConfig } from '@/api/asset_interfaces/dashboard';
+import type { DashboardConfig } from '@/api/asset_interfaces/dashboard';
 import { createMockMetric } from '@/mocks/metric';
 import { NUMBER_OF_COLUMNS } from '@/components/ui/grid/helpers';
 

@@ -4,7 +4,7 @@ import * as React from 'react';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { cn } from '@/lib/utils';
 import { useMemoizedFn } from '@/hooks';
-import { cva, VariantProps } from 'class-variance-authority';
+import { cva, type VariantProps } from 'class-variance-authority';
 
 export type PopoverTriggerType = 'click' | 'hover';
 

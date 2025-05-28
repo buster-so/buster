@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react';
 import { Select } from '@/components/ui/select';
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { LabelAndInput } from '../../Common';
 import last from 'lodash/last';
 import { useMemoizedFn } from '@/hooks';
 import { isNumericColumnStyle, isNumericColumnType } from '@/lib';
-import { ColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
-import { SelectItem } from '@/components/ui/select';
+import type { ColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import type { SelectItem } from '@/components/ui/select';
 
 export const AGGREGATE_OPTIONS: SelectItem<IBusterMetricChartConfig['metricValueAggregate']>[] = [
   { label: 'Sum', value: 'sum' },

@@ -2,7 +2,8 @@
 
 import { ConfirmModal, ConfirmProps } from '@/components/ui/modal/ConfirmModal';
 import { Toaster } from '@/components/ui/toaster/Toaster';
-import React, { PropsWithChildren } from 'react';
+import type React from 'react';
+import type { PropsWithChildren } from 'react';
 import { toast, type ExternalToast } from 'sonner';
 import { useContextSelector, createContext } from 'use-context-selector';
 import { useOpenConfirmModal } from './useConfirmModal';

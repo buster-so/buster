@@ -3,7 +3,7 @@
 import { SortableContext, useSortable } from '@dnd-kit/sortable';
 import React, { useLayoutEffect, useMemo, useState } from 'react';
 import { BusterSortableItemDragContainer } from './_BusterSortableItemDragContainer';
-import { ResizeableGridDragItem } from './interfaces';
+import type { ResizeableGridDragItem } from './interfaces';
 import { useMemoizedFn, useMouse } from '@/hooks';
 import { BusterDragColumnMarkers } from './_BusterDragColumnMarkers';
 import { calculateColumnSpan, columnSpansToPercent } from './helpers';
@@ -113,7 +113,7 @@ export const BusterResizeColumns: React.FC<ContainerProps> = ({
     const srcElement = e.target as HTMLElement;
     const idOrSrcElement = srcElement?.id;
     if (idOrSrcElement) {
-      const parsedId = parseInt(idOrSrcElement);
+      const parsedId = Number.parseInt(idOrSrcElement);
       if (typeof parsedId === 'number') {
         setIsDraggingResizeColumn(parsedId);
       }

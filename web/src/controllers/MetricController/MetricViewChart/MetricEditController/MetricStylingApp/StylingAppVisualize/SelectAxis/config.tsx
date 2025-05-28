@@ -7,7 +7,7 @@ import {
   Percentage,
   Typography
 } from '@/components/ui/icons';
-import React from 'react';
+import type React from 'react';
 
 export const ColumnTypeIcon: Record<
   IColumnLabelFormat['style'],

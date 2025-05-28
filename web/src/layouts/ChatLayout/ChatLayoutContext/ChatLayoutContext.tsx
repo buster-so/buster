@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContextSelector } from 'use-context-selector';
-import React, { PropsWithChildren } from 'react';
+import React, { type PropsWithChildren } from 'react';
 import { useMemoizedFn } from '@/hooks';
 import type { AppSplitterRef } from '@/components/ui/layouts';
 import { DEFAULT_CHAT_OPTION_SIDEBAR_SIZE } from './config';
@@ -27,7 +27,7 @@ export const useChatLayoutContext = ({ appSplitterRef }: UseLayoutConfigProps) =
       } else if (side === 'right') {
         animateWidth('100%', 'right');
       } else if (side === 'both') {
-        const shouldAnimate = Number(leftSize) < 200 || parseInt(rightSize as string) < 340;
+        const shouldAnimate = Number(leftSize) < 200 || Number.parseInt(rightSize as string) < 340;
 
         if (!shouldAnimate) return;
 
@@ -79,7 +79,7 @@ const ChatLayoutContext = createContext<ReturnType<typeof useChatLayoutContext>>
   {} as ReturnType<typeof useChatLayoutContext>
 );
 
-interface ChatLayoutContextProviderProps {}
+type ChatLayoutContextProviderProps = {}
 
 export const ChatLayoutContextProvider: React.FC<
   PropsWithChildren<

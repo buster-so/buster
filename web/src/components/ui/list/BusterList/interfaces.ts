@@ -1,5 +1,5 @@
-import React from 'react';
-import { type ContextMenuProps } from '../../context/ContextMenu';
+import type React from 'react';
+import type { ContextMenuProps } from '../../context/ContextMenu';
 export interface BusterListProps {
   columns: BusterListColumn[];
   hideLastRowBorder?: boolean;

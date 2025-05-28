@@ -3,7 +3,7 @@ import { useOriginalMetricStore } from './useOriginalMetricStore';
 import { VerificationStatus } from '@/api/asset_interfaces/share';
 import { ShareRole } from '@/api/asset_interfaces/share/shareInterfaces';
 import { DEFAULT_CHART_CONFIG } from '@/api/asset_interfaces/metric/defaults';
-import { IBusterMetric } from '@/api/asset_interfaces/metric';
+import type { IBusterMetric } from '@/api/asset_interfaces/metric';
 
 describe('useOriginalMetricStore', () => {
   beforeEach(() => {

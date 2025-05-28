@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { BusterList } from './index';
-import { BusterListRow } from './interfaces';
+import type { BusterListRow } from './interfaces';
 import React, { useMemo } from 'react';
 import { faker } from '@faker-js/faker';
-import { ContextMenuProps } from '../../context/ContextMenu';
+import type { ContextMenuProps } from '../../context/ContextMenu';
 
 const meta: Meta<typeof BusterList> = {
   title: 'UI/List/BusterList',

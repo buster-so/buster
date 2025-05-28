@@ -1,11 +1,11 @@
-import { Chart } from 'chart.js';
-import OutLabel from './OutLabel';
+import type { Chart } from 'chart.js';
+import type OutLabel from './OutLabel';
 
 export default class OutLabelsManager {
-  renderedAt: number = 0;
-  animateStarted: boolean = false;
-  animateCompleted: boolean = false;
-  isCancelled: boolean = false;
+  renderedAt = 0;
+  animateStarted = false;
+  animateCompleted = false;
+  isCancelled = false;
   labels: Map<string, Map<number, OutLabel>> = new Map();
   usedShrink?: boolean = false;
 
@@ -51,7 +51,7 @@ export default class OutLabelsManager {
       const item = list[i];
       const rect = item.rect;
       // eslint-disable-next-line prefer-const
-      let delta = rect.y - lastPos;
+      const delta = rect.y - lastPos;
       if (delta < 0) {
         rect.y -= delta;
         item.y -= delta;

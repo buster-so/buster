@@ -8,7 +8,7 @@ import { BusterRoutes, createBusterRoute } from '@/routes';
 import { Text } from '@/components/ui/typography';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { Button } from '@/components/ui/buttons';
-import { Dropdown, DropdownItems } from '@/components/ui/dropdown';
+import { Dropdown, type DropdownItems } from '@/components/ui/dropdown';
 import { Plus, Dots, Trash } from '@/components/ui/icons';
 import { cn } from '@/lib/classMerge';
 import { useDeleteDatasource, useListDatasources } from '@/api/buster_rest/data_source';

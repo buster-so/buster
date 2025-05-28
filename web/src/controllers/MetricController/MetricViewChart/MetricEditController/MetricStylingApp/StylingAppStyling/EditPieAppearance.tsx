@@ -8,7 +8,7 @@ import {
 import { InputNumber } from '@/components/ui/inputs';
 import { Slider, SliderWithInputNumber } from '@/components/ui/slider';
 import { useMemoizedFn } from '@/hooks';
-import { AppSegmented, SegmentedItem } from '@/components/ui/segmented';
+import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
 
 const options: SegmentedItem<'donut' | 'pie'>[] = [
   { label: 'Donut', value: 'donut' },

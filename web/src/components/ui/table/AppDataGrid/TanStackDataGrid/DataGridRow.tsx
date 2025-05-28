@@ -1,6 +1,6 @@
-import React from 'react';
-import { Row } from '@tanstack/react-table';
-import { VirtualItem } from '@tanstack/react-virtual';
+import type React from 'react';
+import type { Row } from '@tanstack/react-table';
+import type { VirtualItem } from '@tanstack/react-virtual';
 import { DataGridCell } from './DataGridCell';
 import { cn } from '@/lib/classMerge';
 

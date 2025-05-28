@@ -1,10 +1,10 @@
 'use client';
 
-import { DataSource, BigQueryCredentials, BigQueryCredentialsSchema } from '@/api/asset_interfaces';
-import React from 'react';
+import { type DataSource, type BigQueryCredentials, BigQueryCredentialsSchema } from '@/api/asset_interfaces';
+import type React from 'react';
 import { FormWrapper } from './FormWrapper';
 import {
-  createBigQueryDataSource,
+  type createBigQueryDataSource,
   useCreateBigQueryDataSource,
   useUpdateBigQueryDataSource
 } from '@/api/buster_rest/data_source';

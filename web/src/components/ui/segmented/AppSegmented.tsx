@@ -174,11 +174,11 @@ export const AppSegmented: AppSegmentedComponent = React.memo(
             className={cn(gliderVariants({ type }), heightVariants({ size }))}
             initial={{
               width: gliderStyle.width,
-              x: parseInt(gliderStyle.transform.replace('translateX(', '').replace('px)', ''))
+              x: Number.parseInt(gliderStyle.transform.replace('translateX(', '').replace('px)', ''))
             }}
             animate={{
               width: gliderStyle.width,
-              x: parseInt(gliderStyle.transform.replace('translateX(', '').replace('px)', ''))
+              x: Number.parseInt(gliderStyle.transform.replace('translateX(', '').replace('px)', ''))
             }}
             transition={{
               type: 'spring',

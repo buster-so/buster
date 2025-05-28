@@ -1,17 +1,17 @@
-import React from 'react';
+import type React from 'react';
 import { StylingLabel } from '../Common';
 import { SelectChartType } from './SelectChartType';
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { SelectAxis } from './SelectAxis';
 import {
-  YAxisConfig,
-  CategoryAxisStyleConfig,
-  Y2AxisConfig,
+  type YAxisConfig,
+  type CategoryAxisStyleConfig,
+  type Y2AxisConfig,
   ChartType,
-  MetricChartProps,
-  ChartEncodes
+  type MetricChartProps,
+  type ChartEncodes
 } from '@/api/asset_interfaces/metric/charts';
-import { ISelectAxisContext } from './SelectAxis/useSelectAxisContext';
+import type { ISelectAxisContext } from './SelectAxis/useSelectAxisContext';
 import { StylingMetric } from './StylingMetric';
 import { cn } from '@/lib/classMerge';
 

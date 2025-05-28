@@ -1,5 +1,5 @@
 import React from 'react';
-import { BusterListRow, BusterListColumn, BusterListProps } from './interfaces';
+import type { BusterListRow, BusterListColumn, BusterListProps } from './interfaces';
 import { BusterListSectionComponent } from './BusterListSectionComponent';
 import { BusterListRowComponent } from './BusterListRowComponent';
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { Text } from '@/components/ui/typography';
 import { Check } from '@/components/ui/icons';
 

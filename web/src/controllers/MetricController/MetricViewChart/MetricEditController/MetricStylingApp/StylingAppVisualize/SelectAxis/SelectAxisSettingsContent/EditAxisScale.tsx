@@ -1,6 +1,6 @@
 import React from 'react';
 import { LabelAndInput } from '../../../Common/LabelAndInput';
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { Select } from '@/components/ui/select';
 
 const options: { label: string; value: IBusterMetricChartConfig['yAxisScaleType'] }[] = [

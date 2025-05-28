@@ -1,8 +1,9 @@
-import React, { useMemo } from 'react';
-import { DraggedItem } from './interfaces';
+import type React from 'react';
+import { useMemo } from 'react';
+import type { DraggedItem } from './interfaces';
 import {
   DragOverlay,
-  DropAnimation,
+  type DropAnimation,
   defaultDropAnimationSideEffects,
   defaultDropAnimation
 } from '@dnd-kit/core';

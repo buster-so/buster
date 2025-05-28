@@ -1,8 +1,8 @@
-import { BusterAppRoutes, BusterAppRoutesWithArgs } from './busterAppRoutes';
-import { BusterAuthRoutes, BusterAuthRoutesWithArgs } from './busterAuthRoutes';
-import { BusterEmbedRoutes, BusterEmbedRoutesWithArgs } from './busterEmbedRoutes';
-import { BusterInfoRoutes, BusterInfoRoutesWithArgs } from './busterInfoRoutes';
-import { BusterSettingsRoutes, BusterSettingsRoutesWithArgs } from './busterSettingsRoutes';
+import { BusterAppRoutes, type BusterAppRoutesWithArgs } from './busterAppRoutes';
+import { BusterAuthRoutes, type BusterAuthRoutesWithArgs } from './busterAuthRoutes';
+import { BusterEmbedRoutes, type BusterEmbedRoutesWithArgs } from './busterEmbedRoutes';
+import { BusterInfoRoutes, type BusterInfoRoutesWithArgs } from './busterInfoRoutes';
+import { BusterSettingsRoutes, type BusterSettingsRoutesWithArgs } from './busterSettingsRoutes';
 
 export enum BusterRootRoutes {
   ROOT = '/'

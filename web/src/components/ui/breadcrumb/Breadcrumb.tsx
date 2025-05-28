@@ -10,7 +10,7 @@ import {
   BreadcrumbEllipsis
 } from './BreadcrumbBase';
 import { createBusterRoute } from '@/routes/busterRoutes';
-import { Dropdown, DropdownItem } from '../dropdown/Dropdown';
+import { Dropdown, type DropdownItem } from '../dropdown/Dropdown';
 import Link from 'next/link';
 
 type CreateBusterRouteParams = Parameters<typeof createBusterRoute>[0];

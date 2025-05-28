@@ -5,8 +5,8 @@ import type {
   ChartType,
   ScatterAxis
 } from '@/api/asset_interfaces/metric/charts';
-import { DatasetOptionsWithTicks } from '../../../chartHooks';
-import { ChartProps } from '../../core';
+import type { DatasetOptionsWithTicks } from '../../../chartHooks';
+import type { ChartProps } from '../../core';
 import type { ChartType as ChartJSChartType } from 'chart.js';
 import { useMemo } from 'react';
 import { pieSeriesBuilder_data, pieSeriesBuilder_labels } from './pieSeriesBuilder';

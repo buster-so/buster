@@ -1,8 +1,8 @@
-import { DataSource, MySQLCredentials, MySQLCredentialsSchema } from '@/api/asset_interfaces';
-import React from 'react';
+import { type DataSource, type MySQLCredentials, MySQLCredentialsSchema } from '@/api/asset_interfaces';
+import type React from 'react';
 import { FormWrapper } from './FormWrapper';
 import {
-  createMySQLDataSource,
+  type createMySQLDataSource,
   useCreateMySQLDataSource,
   useUpdateMySQLDataSource
 } from '@/api/buster_rest/data_source';

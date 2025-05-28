@@ -1,10 +1,10 @@
 'use client';
 
-import React, { PropsWithChildren, useState } from 'react';
+import React, { type PropsWithChildren, useState } from 'react';
 import { Popover } from '@/components/ui/popover/Popover';
 import { AppTooltip } from '@/components/ui/tooltip';
 import { useMemoizedFn } from '@/hooks';
-import { BusterShare, ShareAssetType } from '@/api/asset_interfaces';
+import type { BusterShare, ShareAssetType } from '@/api/asset_interfaces';
 import { ShareMenuContent } from './ShareMenuContent';
 import { canShare } from '@/lib/share';
 

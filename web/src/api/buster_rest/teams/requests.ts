@@ -1,4 +1,4 @@
-import { BusterUserTeam } from '@/api/asset_interfaces/users';
+import type { BusterUserTeam } from '@/api/asset_interfaces/users';
 import { mainApi } from '../instances';
 
 export const createTeam = async (params: {

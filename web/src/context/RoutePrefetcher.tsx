@@ -3,11 +3,11 @@
 import React, { useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import { BusterAppRoutes } from '@/routes/busterRoutes/busterAppRoutes';
+import type { BusterAppRoutes } from '@/routes/busterRoutes/busterAppRoutes';
 import { useAsyncEffect } from '@/hooks';
 import { timeout } from '@/lib';
 import { prefetchGetMetricsList } from '@/api/buster_rest/metrics';
-import { QueryClient, useQueryClient } from '@tanstack/react-query';
+import { type QueryClient, useQueryClient } from '@tanstack/react-query';
 import { prefetchGetDashboardsList } from '@/api/buster_rest/dashboards';
 import { prefetchGetCollectionsList } from '@/api/buster_rest/collections';
 

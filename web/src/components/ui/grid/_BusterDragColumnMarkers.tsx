@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { NUMBER_OF_COLUMNS } from './helpers';
 import { cn } from '@/lib/utils';
 

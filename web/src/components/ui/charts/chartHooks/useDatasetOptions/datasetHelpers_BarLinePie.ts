@@ -1,8 +1,8 @@
 'use client';
 
-import { type BusterChartProps } from '@/api/asset_interfaces/metric/charts';
+import type { BusterChartProps } from '@/api/asset_interfaces/metric/charts';
 import { createDayjsDate } from '@/lib/date';
-import { type ColumnMetaData, type SimplifiedColumnType } from '@/api/asset_interfaces/metric';
+import type { ColumnMetaData, SimplifiedColumnType } from '@/api/asset_interfaces/metric';
 
 export const sortLineBarData = (
   data: NonNullable<BusterChartProps['data']>,

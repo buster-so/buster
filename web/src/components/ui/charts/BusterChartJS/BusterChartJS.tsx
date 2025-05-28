@@ -2,7 +2,8 @@
 
 import './ChartJSTheme';
 
-import React, { useCallback, useRef, useState } from 'react';
+import type React from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { DEFAULT_CHART_CONFIG, DEFAULT_COLUMN_METADATA } from '@/api/asset_interfaces/metric';
 import { BusterChartJSLegendWrapper } from './BusterChartJSLegendWrapper';
 import type { ChartJSOrUndefined } from './core/types';

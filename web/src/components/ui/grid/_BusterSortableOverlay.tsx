@@ -5,7 +5,7 @@ import type { DropAnimation, Modifier } from '@dnd-kit/core';
 import { BusterSortableItemContent } from './_BusterSortableItemContent';
 import { animate } from 'framer-motion';
 import React, { useEffect, useMemo } from 'react';
-import { BusterResizeableGridRow } from './interfaces';
+import type { BusterResizeableGridRow } from './interfaces';
 import { snapCenterToCursor } from '@dnd-kit/modifiers';
 import { NUMBER_OF_COLUMNS } from './helpers';
 

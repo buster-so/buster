@@ -1,7 +1,7 @@
 import { Avatar } from '@/components/ui/avatar';
 import { AccessDropdown } from './AccessDropdown';
 import React from 'react';
-import { ShareAssetType, ShareRole } from '@/api/asset_interfaces';
+import type { ShareAssetType, ShareRole } from '@/api/asset_interfaces';
 import { Text } from '@/components/ui/typography';
 import { useMemoizedFn } from '@/hooks';
 

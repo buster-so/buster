@@ -1,6 +1,6 @@
 import { _adapters } from 'chart.js';
 
-import dayjs, { QUnitType } from 'dayjs';
+import dayjs, { type QUnitType } from 'dayjs';
 
 import type { TimeUnit } from 'chart.js';
 
@@ -44,7 +44,7 @@ const FORMATS = {
 _adapters._date.override({
   //_id: 'dayjs', //DEBUG,
   formats: () => FORMATS,
-  parse: function (value: any, format?: TimeUnit) {
+  parse: (value: any, format?: TimeUnit) => {
     const valueType = typeof value;
 
     if (value === null || valueType === 'undefined') {
@@ -58,16 +58,10 @@ _adapters._date.override({
     }
     return null;
   },
-  format: function (time: any, format: TimeUnit): string {
-    return dayjs(time).format(format);
-  },
-  add: function (time: any, amount: number, unit: QUnitType & TimeUnit) {
-    return dayjs(time).add(amount, unit).valueOf();
-  },
-  diff: function (max: any, min: any, unit: TimeUnit) {
-    return dayjs(max).diff(dayjs(min), unit);
-  },
-  startOf: function (time: any, unit: (TimeUnit & QUnitType) | 'isoWeek', weekday?: number) {
+  format: (time: any, format: TimeUnit): string => dayjs(time).format(format),
+  add: (time: any, amount: number, unit: QUnitType & TimeUnit) => dayjs(time).add(amount, unit).valueOf(),
+  diff: (max: any, min: any, unit: TimeUnit) => dayjs(max).diff(dayjs(min), unit),
+  startOf: (time: any, unit: (TimeUnit & QUnitType) | 'isoWeek', weekday?: number) => {
     if (unit === 'isoWeek') {
       // Ensure that weekday has a valid format
       //const formattedWeekday
@@ -80,7 +74,5 @@ _adapters._date.override({
 
     return dayjs(time).startOf(unit).valueOf();
   },
-  endOf: function (time: any, unit: TimeUnit & QUnitType) {
-    return dayjs(time).endOf(unit).valueOf();
-  }
+  endOf: (time: any, unit: TimeUnit & QUnitType) => dayjs(time).endOf(unit).valueOf()
 });

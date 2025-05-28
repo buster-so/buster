@@ -4,7 +4,7 @@ import type { FileView } from '../../../ChatLayoutContext/useLayoutConfig';
 import { AppSegmented } from '@/components/ui/segmented';
 import { useChatLayoutContextSelector } from '../../../ChatLayoutContext';
 import { useMemoizedFn } from '@/hooks';
-import { type SegmentedItem } from '@/components/ui/segmented';
+import type { SegmentedItem } from '@/components/ui/segmented';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { useIsDashboardReadOnly } from '@/context/Dashboards/useIsDashboardReadOnly';
 import { Text } from '@/components/ui/typography';

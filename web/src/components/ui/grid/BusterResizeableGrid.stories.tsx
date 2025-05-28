@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { BusterResizeableGrid } from './BusterResizeableGrid';
 import { v4 as uuidv4 } from 'uuid';

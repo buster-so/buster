@@ -1,4 +1,4 @@
-import { BusterMetricListItem, VerificationStatus } from '@/api/asset_interfaces';
+import { type BusterMetricListItem, VerificationStatus } from '@/api/asset_interfaces';
 import { AppTooltip } from '@/components/ui/tooltip';
 import React from 'react';
 import { StatusNotRequestedIcon } from '@/components/ui/icons/customIcons/Status_NotRequested';

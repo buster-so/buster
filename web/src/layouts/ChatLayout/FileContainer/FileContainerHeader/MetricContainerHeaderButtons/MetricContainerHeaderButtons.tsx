@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { FileContainerButtonsProps } from '../interfaces';
-import { MetricFileViewSecondary, useChatLayoutContextSelector } from '../../../ChatLayoutContext';
+import type { FileContainerButtonsProps } from '../interfaces';
+import { type MetricFileViewSecondary, useChatLayoutContextSelector } from '../../../ChatLayoutContext';
 import { useMemoizedFn } from '@/hooks';
 import { useChatIndividualContextSelector } from '../../../ChatContext';
 import { HideButtonContainer } from '../HideButtonContainer';

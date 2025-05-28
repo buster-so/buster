@@ -2,11 +2,11 @@
 
 import React, { useMemo, useRef, useState, useEffect } from 'react';
 import {
-  ColumnDef,
+  type ColumnDef,
   getCoreRowModel,
   getSortedRowModel,
   useReactTable,
-  SortingState
+  type SortingState
 } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { defaultCellFormat, defaultHeaderFormat } from './defaultFormat';

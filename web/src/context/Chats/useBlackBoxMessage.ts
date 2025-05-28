@@ -9,7 +9,7 @@ import type {
   BusterChatMessageReasoning_text,
   IBusterChatMessage
 } from '@/api/asset_interfaces/chat';
-import { ChatEvent_GeneratingReasoningMessage } from '@/api/buster_socket/chats';
+import type { ChatEvent_GeneratingReasoningMessage } from '@/api/buster_socket/chats';
 import { useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/api/query_keys';
 import { useGetChatMessageMemoized } from '@/api/buster_rest/chats';

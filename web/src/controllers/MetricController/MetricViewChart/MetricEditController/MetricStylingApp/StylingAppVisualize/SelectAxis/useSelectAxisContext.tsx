@@ -1,4 +1,4 @@
-import { ColumnMetaData, IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { ColumnMetaData, IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import type {
   ChartEncodes,
   YAxisConfig,
@@ -7,8 +7,8 @@ import type {
   Y2AxisConfig
 } from '@/api/asset_interfaces/metric/charts';
 import { createContext, useContextSelector } from 'use-context-selector';
-import { PropsWithChildren } from 'react';
-import React from 'react';
+import type { PropsWithChildren } from 'react';
+import type React from 'react';
 
 export interface ISelectAxisContext
   extends Required<YAxisConfig>,

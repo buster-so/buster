@@ -11,7 +11,7 @@ import type {
   SharePostRequest,
   ShareUpdateRequest
 } from '@/api/asset_interfaces/shared_interfaces';
-import { VerificationStatus } from '@/api/asset_interfaces/share';
+import type { VerificationStatus } from '@/api/asset_interfaces/share';
 
 export const getMetric = async ({
   id,

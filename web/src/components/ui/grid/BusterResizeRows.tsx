@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useRef, useState } from 'react';
-import { BusterResizeableGridRow } from './interfaces';
+import type { BusterResizeableGridRow } from './interfaces';
 import { BusterResizeColumns } from './BusterResizeColumns';
 import { BusterNewItemDropzone } from './_BusterBusterNewItemDropzone';
 import { MIN_ROW_HEIGHT, TOP_SASH_ID, NEW_ROW_ID, MAX_ROW_HEIGHT } from './helpers';

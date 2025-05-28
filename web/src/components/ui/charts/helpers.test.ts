@@ -1,5 +1,5 @@
 import { doesChartHaveValidAxis } from './helpers';
-import { ChartType, ChartEncodes } from '@/api/asset_interfaces/metric/charts';
+import { ChartType, type ChartEncodes } from '@/api/asset_interfaces/metric/charts';
 
 describe('doesChartHaveValidAxis', () => {
   it('should return true when isTable is true regardless of other parameters', () => {

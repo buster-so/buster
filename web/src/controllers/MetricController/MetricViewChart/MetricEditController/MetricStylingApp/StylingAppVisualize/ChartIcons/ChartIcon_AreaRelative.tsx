@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import type React from 'react';
+import { useMemo } from 'react';
 import { DEFAULT_CHART_COLORS, DISABLED_CHART_COLORS } from '../config';
 import { addOpacityToColor } from '@/lib/colors';
 

@@ -32,27 +32,27 @@ export class JsonDataFrameOperationsSingle {
 
   // Method to calculate the average of a specified column
   average(): number {
-    const validEntries = this.data.filter((item) => !isNaN(parseFloat(item[this.column])));
+    const validEntries = this.data.filter((item) => !isNaN(Number.parseFloat(item[this.column])));
     return validEntries.length === 0 ? 0 : this.sum() / validEntries.length;
   }
 
   // Method to get the minimum value in the specified column
   min(): number {
     return Math.min(
-      ...this.data.map((item) => parseFloat(item[this.column])).filter((value) => !isNaN(value))
+      ...this.data.map((item) => Number.parseFloat(item[this.column])).filter((value) => !isNaN(value))
     );
   }
 
   // Method to get the maximum value in the specified column
   max(): number {
     return Math.max(
-      ...this.data.map((item) => parseFloat(item[this.column])).filter((value) => !isNaN(value))
+      ...this.data.map((item) => Number.parseFloat(item[this.column])).filter((value) => !isNaN(value))
     );
   }
 
   median(): number {
     const sortedValues = this.data
-      .map((item) => parseFloat(item[this.column]))
+      .map((item) => Number.parseFloat(item[this.column]))
       .filter((value) => !isNaN(value))
       .sort((a, b) => a - b);
     const middle = Math.floor(sortedValues.length / 2);
@@ -75,7 +75,7 @@ export class DataFrameOperations {
   private data: [...(number | string)[]][];
   private columnIndex: number;
 
-  constructor(data: [...(number | string)[]][], columnIndex: number = 1) {
+  constructor(data: [...(number | string)[]][], columnIndex = 1) {
     if (!Array.isArray(data)) {
       throw new Error('Data should be an array.');
     }

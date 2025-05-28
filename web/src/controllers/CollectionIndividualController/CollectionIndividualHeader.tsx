@@ -2,12 +2,12 @@
 
 import React, { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/buttons';
-import { Dropdown, DropdownItems } from '@/components/ui/dropdown';
+import { Dropdown, type DropdownItems } from '@/components/ui/dropdown';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { BusterRoutes } from '@/routes';
 import { FavoriteStar, useFavoriteStar } from '@/components/features/list/FavoriteStar';
 import { ShareMenu } from '@/components/features/ShareMenu';
-import { BusterCollection, ShareAssetType } from '@/api/asset_interfaces';
+import { type BusterCollection, ShareAssetType } from '@/api/asset_interfaces';
 import { useMemoizedFn } from '@/hooks';
 import { type BreadcrumbItem, Breadcrumb } from '@/components/ui/breadcrumb';
 import { Dots, Pencil, Plus, ShareAllRight, ShareRight, Trash } from '@/components/ui/icons';

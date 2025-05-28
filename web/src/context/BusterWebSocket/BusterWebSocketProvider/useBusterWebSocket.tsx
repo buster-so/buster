@@ -8,10 +8,10 @@ import type {
   BusterSocketResponseRoute
 } from '@/api/buster_socket';
 import { useWebSocket } from '@/hooks/useWebSocket';
-import { BusterSocketResponseBase } from '@/api/buster_socket/base_interfaces';
+import type { BusterSocketResponseBase } from '@/api/buster_socket/base_interfaces';
 import { useSupabaseContext } from '../../Supabase';
 import { createContext, useContextSelector } from 'use-context-selector';
-import { SupabaseContextReturnType } from '../../Supabase';
+import type { SupabaseContextReturnType } from '../../Supabase';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useUserConfigContextSelector } from '@/context/Users';
 

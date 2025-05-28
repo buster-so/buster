@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { TooltipTitle } from './TooltipTitle';
 import type { ITooltipItem } from './interfaces';
 import { TooltipItem } from './TooltipItem';

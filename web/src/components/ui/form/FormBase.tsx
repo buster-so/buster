@@ -4,7 +4,7 @@ import { Input } from '../inputs';
 import { InputPassword } from '../inputs/InputPassword';
 import { cn } from '@/lib/classMerge';
 import { Button } from '../buttons';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { Text } from '../typography';
 
 export const { fieldContext, useFieldContext, formContext, useFormContext } =

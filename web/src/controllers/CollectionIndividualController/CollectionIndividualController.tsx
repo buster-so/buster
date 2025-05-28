@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { CollectionsIndividualHeader } from './CollectionIndividualHeader';
 import { CollectionIndividualContent } from './CollectionIndividualContent';
 import { AppPageLayout } from '@/components/ui/layouts';

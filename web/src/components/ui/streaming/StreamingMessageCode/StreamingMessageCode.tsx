@@ -1,6 +1,6 @@
 'use client';
 
-import { BusterChatMessageReasoning_file } from '@/api/asset_interfaces';
+import type { BusterChatMessageReasoning_file } from '@/api/asset_interfaces';
 import { SyntaxHighlighterLightTheme } from '@/components/ui/typography/AppCodeBlock';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Text } from '@/components/ui/typography';

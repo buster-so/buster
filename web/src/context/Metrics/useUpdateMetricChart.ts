@@ -1,9 +1,9 @@
 'use client';
 
 import {
-  ColumnSettings,
+  type ColumnSettings,
   DEFAULT_CHART_CONFIG,
-  IColumnLabelFormat,
+  type IColumnLabelFormat,
   type IBusterMetricChartConfig
 } from '@/api/asset_interfaces/metric';
 import { useSaveMetric, useUpdateMetric } from '@/api/buster_rest/metrics';

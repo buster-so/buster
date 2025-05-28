@@ -1,5 +1,5 @@
 import type { BusterMetricData, IBusterMetricChartConfig } from '@/api/asset_interfaces/metric';
-import { RunSQLResponse } from '@/api/asset_interfaces/sql';
+import type { RunSQLResponse } from '@/api/asset_interfaces/sql';
 import { queryKeys } from '@/api/query_keys';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks';

@@ -1,4 +1,4 @@
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import React, { useEffect, useRef } from 'react';
 import { LabelAndInput } from '../../Common';
 import { Input } from '@/components/ui/inputs';

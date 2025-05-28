@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/buttons';
 import React, { useMemo } from 'react';
-import { SelectAxisContainerId } from '../config';
+import type { SelectAxisContainerId } from '../config';
 import { SelectAxisSettingContent } from './SelectAxisSettingContent';
 import { useSelectAxisContextSelector } from '../useSelectAxisContext';
 import { zoneIdToAxisSettingContent } from './config';

@@ -1,6 +1,6 @@
 import { toFontString } from 'chart.js/helpers'
-import Size from './Size'
-import { FontStyle } from './OutLabelsStyle'
+import type Size from './Size'
+import type { FontStyle } from './OutLabelsStyle'
 
 export function textSize(
     ctx: CanvasRenderingContext2D,

@@ -10,7 +10,7 @@ import {
   useAddMetricsToDashboard,
   useRemoveMetricsFromDashboard
 } from '@/api/buster_rest/dashboards';
-import { DropdownContent, DropdownItem, DropdownItems } from '@/components/ui/dropdown';
+import { DropdownContent, type DropdownItem, type DropdownItems } from '@/components/ui/dropdown';
 import {
   Trash,
   Dots,
@@ -28,7 +28,7 @@ import {
 import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import {
-  MetricFileViewSecondary,
+  type MetricFileViewSecondary,
   useChatLayoutContextSelector
 } from '@/layouts/ChatLayout/ChatLayoutContext';
 import { useMemo, useState } from 'react';

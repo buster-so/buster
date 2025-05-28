@@ -7,8 +7,8 @@ import { formatDate } from '@/lib/date';
 import {
   ListEmptyStateWithButton,
   BusterList,
-  BusterListColumn,
-  BusterListRow
+  type BusterListColumn,
+  type BusterListRow
 } from '@/components/ui/list';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import type { BusterTermListItem } from '@/api/asset_interfaces/terms';

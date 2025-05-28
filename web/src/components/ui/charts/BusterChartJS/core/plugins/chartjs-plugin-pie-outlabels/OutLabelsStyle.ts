@@ -1,7 +1,7 @@
 import { resolve, toFont, toLineHeight, toPadding } from 'chart.js/helpers';
-import { FontOptions, OutLabelsOptions } from './OutLabelsOptions';
-import OutLabelsContext from './OutLabelsContext';
-import { ChartArea, FontSpec } from 'chart.js';
+import type { FontOptions, OutLabelsOptions } from './OutLabelsOptions';
+import type OutLabelsContext from './OutLabelsContext';
+import type { ChartArea, FontSpec } from 'chart.js';
 import { defaults } from 'chart.js';
 import { determineFontColorContrast } from '@/lib';
 
@@ -40,22 +40,22 @@ export class FontStyle implements FontSpec {
 }
 
 export class OutLabelStyle {
-  display: boolean = true;
-  text: string = '%l %p';
-  textAlign: string = 'center';
-  color: string = 'white';
-  borderRadius: number = 4;
-  borderWidth: number = 0.5;
-  lineWidth: number = 1.5;
-  length: number = 28;
-  percentPrecision: number = 1;
-  valuePrecision: number = 3;
+  display = true;
+  text = '%l %p';
+  textAlign = 'center';
+  color = 'white';
+  borderRadius = 4;
+  borderWidth = 0.5;
+  lineWidth = 1.5;
+  length = 28;
+  percentPrecision = 1;
+  valuePrecision = 3;
   padding: ChartArea;
   font: FontStyle;
   backgroundColor: string | undefined;
   borderColor: string | undefined;
   lineColor: string | undefined;
-  shrinkPercentage: number = 1;
+  shrinkPercentage = 1;
 
   constructor(options: OutLabelsOptions, context: OutLabelsContext, index: number) {
     if (options.textAlign) this.textAlign = options.textAlign;

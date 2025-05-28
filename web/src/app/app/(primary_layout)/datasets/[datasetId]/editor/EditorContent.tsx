@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useMemo, useRef, useState } from 'react';
+import type React from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useMemoizedFn, useRequest } from '@/hooks';
 import type { IDataResult } from '@/api/asset_interfaces';
 import { EditorApps, EditorContainerSubHeader } from './EditorContainerSubHeader';

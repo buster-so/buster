@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/classMerge';
-import { type ISidebarItem } from './interfaces';
+import type { ISidebarItem } from './interfaces';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { Xmark } from '../icons';
 import { Button } from '../buttons/Button';

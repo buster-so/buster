@@ -19,7 +19,7 @@ import { useGetUserFavorites } from '../users';
 import { useMemoizedFn } from '@/hooks';
 import { useAddAssetToCollection, useRemoveAssetFromCollection } from '../collections';
 import { collectionQueryKeys } from '@/api/query_keys/collection';
-import { IBusterMetric } from '@/api/asset_interfaces/metric';
+import type { IBusterMetric } from '@/api/asset_interfaces/metric';
 import { create } from 'mutative';
 import { prepareMetricUpdateMetric, upgradeMetricToIMetric } from '@/lib/metrics';
 

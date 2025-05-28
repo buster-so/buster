@@ -1,7 +1,7 @@
 import { ColorPicker } from '@/components/ui/color-picker';
 import React, { useMemo } from 'react';
 import { LabelAndInput } from '../../Common';
-import { LoopTrendline } from './EditTrendline';
+import type { LoopTrendline } from './EditTrendline';
 import { useMemoizedFn } from '@/hooks';
 import { Switch } from '@/components/ui/switch';
 import { DEFAULT_TRENDLINE_CONFIG } from '@/api/asset_interfaces';

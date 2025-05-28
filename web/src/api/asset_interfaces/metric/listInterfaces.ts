@@ -1,4 +1,4 @@
-import { VerificationStatus } from '../share';
+import type { VerificationStatus } from '../share';
 
 export type BusterMetricListItem = {
   id: string;

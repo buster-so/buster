@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useSelectAxisContextSelector } from '../useSelectAxisContext';
-import { SelectAxisContainerId } from '../config';
+import type { SelectAxisContainerId } from '../config';
 import { EditShowAxisTitle } from './EditShowAxisTitle';
 import type { ColumnLabelFormat, ComboChartAxis } from '@/api/asset_interfaces/metric/charts';
 import { AXIS_TITLE_SEPARATOR } from '@/components/ui/charts/commonHelpers/axisHelper';
@@ -8,7 +8,7 @@ import { formatLabel } from '@/lib';
 import { useMemoizedFn } from '@/hooks';
 import { EditShowAxisLabel } from './EditShowAxisLabel';
 import { EditAxisScale } from './EditAxisScale';
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { useUpdateMetricChart } from '@/context/Metrics';
 
 export const Y2AxisSettingContent: React.FC<{

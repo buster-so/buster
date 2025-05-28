@@ -1,6 +1,6 @@
-import { Trendline } from '@/api/asset_interfaces/metric/charts';
-import { LoopTrendline } from './EditTrendline';
-import { SelectItem } from '@/components/ui/select';
+import type { Trendline } from '@/api/asset_interfaces/metric/charts';
+import type { LoopTrendline } from './EditTrendline';
+import type { SelectItem } from '@/components/ui/select';
 
 export const TypeToLabel: Record<Trendline['type'], string> = {
   linear_regression: 'Linear',

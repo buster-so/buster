@@ -7,7 +7,7 @@ import { BusterAuthRoutes } from './busterAuthRoutes';
 import { BusterAppRoutes } from './busterAppRoutes';
 import { BusterSettingsRoutes } from './busterSettingsRoutes';
 import { BusterRoutes } from './busterRoutes';
-import { DashboardFileViewSecondary, MetricFileViewSecondary } from '@/layouts/ChatLayout';
+import type { DashboardFileViewSecondary, MetricFileViewSecondary } from '@/layouts/ChatLayout';
 
 describe('createBusterRoute', () => {
   test('should return route as is when no parameters are provided', () => {

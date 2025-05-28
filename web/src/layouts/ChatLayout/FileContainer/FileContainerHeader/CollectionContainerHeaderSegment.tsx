@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileContainerSegmentProps } from './interfaces';
+import type { FileContainerSegmentProps } from './interfaces';
 
 export const CollectionContainerHeaderSegment: React.FC<FileContainerSegmentProps> = React.memo(
   () => {

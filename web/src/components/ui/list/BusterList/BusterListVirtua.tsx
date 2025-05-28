@@ -2,7 +2,7 @@
 
 import { VList } from 'virtua';
 import React, { useMemo, useRef } from 'react';
-import { BusterListProps } from './interfaces';
+import type { BusterListProps } from './interfaces';
 import { useMemoizedFn } from '@/hooks';
 import { getAllIdsInSection } from './helpers';
 import { HEIGHT_OF_ROW, HEIGHT_OF_SECTION_ROW } from './config';

@@ -1,9 +1,9 @@
 import {
   PopoverRoot as PopoverBase,
   PopoverContent,
-  PopoverContentVariant,
+  type PopoverContentVariant,
   PopoverTrigger,
-  PopoverTriggerType
+  type PopoverTriggerType
 } from './PopoverBase';
 import React from 'react';
 

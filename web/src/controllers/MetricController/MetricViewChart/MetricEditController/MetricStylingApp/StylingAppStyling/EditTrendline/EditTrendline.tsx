@@ -1,4 +1,4 @@
-import { DEFAULT_TRENDLINE_CONFIG, IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import { DEFAULT_TRENDLINE_CONFIG, type IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import React, { useEffect, useMemo, useState } from 'react';
 import type { ChartEncodes, ScatterAxis, Trendline } from '@/api/asset_interfaces/metric/charts';
 import { v4 as uuidv4 } from 'uuid';
@@ -10,7 +10,7 @@ import { Plus } from '@/components/ui/icons';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CollapseDelete } from '../../Common/CollapseDelete';
 import { formatLabel } from '@/lib';
-import { ColumnMetaData } from '@/api/asset_interfaces';
+import type { ColumnMetaData } from '@/api/asset_interfaces';
 import { TrendlineColumnId } from './EditTrendlineColumnId';
 import { TrendlineColorPicker } from './EditTrendlineColorPicker';
 import { TrendlineLabel } from './EditTrendlineLabel';
@@ -55,7 +55,7 @@ export const EditTrendline: React.FC<{
     const setTrends = useMemo(() => {
       return (
         setTrends: (prev: LoopTrendline[]) => LoopTrendline[],
-        saveToExternal: boolean = true
+        saveToExternal = true
       ) => {
         _setTrends((trendlines) => {
           const result = setTrends(trendlines);

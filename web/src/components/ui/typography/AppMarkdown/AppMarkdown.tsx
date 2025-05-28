@@ -1,4 +1,5 @@
-import React, { memo, useMemo } from 'react';
+import type React from 'react';
+import { memo, useMemo } from 'react';
 import ReactMarkdown, { type Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 //import rehypeRaw from 'rehype-raw'; // For rendering HTML

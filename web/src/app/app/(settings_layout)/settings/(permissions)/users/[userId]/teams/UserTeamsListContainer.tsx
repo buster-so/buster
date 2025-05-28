@@ -4,8 +4,8 @@ import { useUpdateUserTeams } from '@/api/buster_rest';
 import type { BusterUserTeamListItem, TeamRole } from '@/api/asset_interfaces';
 import { PermissionAssignTeamRole } from '@/components/features/PermissionComponents';
 import {
-  BusterListColumn,
-  BusterListRowItem,
+  type BusterListColumn,
+  type BusterListRowItem,
   EmptyStateList,
   InfiniteListContainer
 } from '@/components/ui/list';

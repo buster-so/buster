@@ -1,6 +1,6 @@
 import React from 'react';
 import { LabelAndInput } from '../../Common';
-import { LoopTrendline } from './EditTrendline';
+import type { LoopTrendline } from './EditTrendline';
 import { Switch } from '@/components/ui/switch';
 import { Text } from '@/components/ui/typography';
 import { CircleInfo } from '@/components/ui/icons';

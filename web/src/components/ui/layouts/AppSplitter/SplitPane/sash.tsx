@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from 'react';
 import { classNames, sashClassName } from './base';
-import { ISashProps } from './types';
+import type { ISashProps } from './types';
 import { useMemoizedFn } from '@/hooks';
 
 export default function Sash({
@@ -17,11 +17,11 @@ export default function Sash({
   const [active, setActive] = useState(false);
   const [draging, setDrag] = useState(false);
 
-  const handleMouseMove = function (e: any) {
+  const handleMouseMove = (e: any) => {
     onDragging(e);
   };
 
-  const handleMouseUp = function (e: any) {
+  const handleMouseUp = (e: any) => {
     setDrag(false);
     onDragEnd(e);
     window.removeEventListener('mousemove', handleMouseMove);

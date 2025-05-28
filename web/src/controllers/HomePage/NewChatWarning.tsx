@@ -1,6 +1,6 @@
 import { cn } from '@/lib/classMerge';
 import React from 'react';
-import { useNewChatWarning } from './useNewChatWarning';
+import type { useNewChatWarning } from './useNewChatWarning';
 import { ArrowUpRight, CircleCheck } from '@/components/ui/icons';
 import { Paragraph, Text } from '@/components/ui/typography';
 import { Button } from '@/components/ui/buttons';

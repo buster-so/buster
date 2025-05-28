@@ -1,11 +1,11 @@
-import { ColumnMetaData, IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { ColumnMetaData, IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import React, { useMemo } from 'react';
 import { EditMetricField } from './EditMetricField';
 import { useMemoizedFn } from '@/hooks';
 import { EditMetricAggregate } from './EditMetricType';
 import { EditMetricHeader } from './EditMetricHeaderType';
 import { Separator } from '@/components/ui/seperator';
-import { DerivedMetricTitle } from '@/api/asset_interfaces/metric/charts';
+import type { DerivedMetricTitle } from '@/api/asset_interfaces/metric/charts';
 import { EditHeaderTitle } from './EditHeaderTitle';
 import { createColumnFieldOptions } from './helpers';
 import { useUpdateMetricChart } from '@/context/Metrics';

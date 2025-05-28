@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LabelAndInput } from '../../Common';
-import { LoopTrendline } from './EditTrendline';
+import type { LoopTrendline } from './EditTrendline';
 import { useMemoizedFn } from '@/hooks';
 import { Slider } from '@/components/ui/slider';
 

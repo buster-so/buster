@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { AppTooltip } from '@/components/ui/tooltip';
 import { CircleQuestion } from '@/components/ui/icons';
 import { Text } from '@/components/ui/typography';

@@ -70,7 +70,7 @@ export function classNames(...args) {
 export function assertsSize(
   size: string | number | undefined,
   sum: number,
-  defaultValue = Infinity
+  defaultValue = Number.POSITIVE_INFINITY
 ) {
   if (typeof size === 'undefined') return defaultValue;
   if (typeof size === 'number') return size;

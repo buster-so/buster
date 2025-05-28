@@ -1,10 +1,10 @@
 import { renderHook } from '@testing-library/react';
 import { useGoalLines } from './useGoalLines';
 import {
-  ChartType,
+  type ChartType,
   ColumnLabelFormat,
-  GoalLine,
-  BusterChartConfigProps
+  type GoalLine,
+  type BusterChartConfigProps
 } from '@/api/asset_interfaces/metric/charts';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 

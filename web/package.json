@@ -103,6 +103,7 @@
     "zustand": "^5.0.5"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
     "@chromatic-com/storybook": "^3.2.6",
     "@eslint/eslintrc": "^3",
     "@next/bundle-analyzer": "^15.3.2",

@@ -1,13 +1,14 @@
 import { downloadImageData, exportElementToImage } from './exportUtils';
 import { createRoot } from 'react-dom/client';
 import { timeout } from './timeout';
-import React, { useEffect, useRef } from 'react';
+import type React from 'react';
+import { useEffect, useRef } from 'react';
 import type { IBusterMetric, BusterMetricData } from '@/api/asset_interfaces/metric';
 
 export const generateChartDownloadImage = async (
   message: IBusterMetric,
   messageData: NonNullable<BusterMetricData['data']>,
-  isDark: boolean = false
+  isDark = false
 ) => {
   const tempContainer = document.createElement('div');
   tempContainer.style.position = 'absolute';
@@ -66,7 +67,7 @@ export const generateChartPreviewImage = async (
     chart_config: IBusterMetric['chart_config'];
   } | null,
   messageData: BusterMetricData,
-  isDark: boolean = true
+  isDark = true
 ) => {
   // Create temporary container and append to body
   const tempContainer = document.createElement('div');

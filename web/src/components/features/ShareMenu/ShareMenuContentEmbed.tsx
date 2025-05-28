@@ -10,7 +10,7 @@ import { Link } from '@/components/ui/icons';
 import { useUpdateCollectionShare } from '@/api/buster_rest/collections';
 import { useUpdateMetricShare } from '@/api/buster_rest/metrics';
 import { useUpdateDashboardShare } from '@/api/buster_rest/dashboards';
-import { ShareMenuContentBodyProps } from './ShareMenuContentBody';
+import type { ShareMenuContentBodyProps } from './ShareMenuContentBody';
 import { cn } from '@/lib/classMerge';
 
 export const ShareMenuContentEmbed: React.FC<ShareMenuContentBodyProps> = React.memo(

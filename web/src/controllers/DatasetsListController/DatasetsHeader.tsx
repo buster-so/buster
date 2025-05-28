@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { Breadcrumb, BreadcrumbItem } from '@/components/ui/breadcrumb';
+import { Breadcrumb, type BreadcrumbItem } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/buttons';
 import { BusterRoutes } from '@/routes';
-import { AppSegmented, SegmentedItem } from '@/components/ui/segmented';
+import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
 import { AppTooltip } from '@/components/ui/tooltip';
 import { NewDatasetModal } from '@/components/features/modal/NewDatasetModal';
 import { useIndividualDataset } from '@/api/buster_rest';

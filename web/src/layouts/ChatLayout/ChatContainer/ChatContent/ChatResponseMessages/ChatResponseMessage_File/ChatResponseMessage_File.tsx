@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { ChatResponseMessageProps } from '../ChatResponseMessageSelector';
+import type { ChatResponseMessageProps } from '../ChatResponseMessageSelector';
 import type {
   BusterChatResponseMessage_file,
   BusterChatResponseMessage_fileMetadata

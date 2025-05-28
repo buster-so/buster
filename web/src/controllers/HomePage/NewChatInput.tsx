@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useRef } from 'react';
+import type React from 'react';
+import { useRef } from 'react';
 import { InputTextAreaButton } from '@/components/ui/inputs/InputTextAreaButton';
 import { useBusterNewChatContextSelector } from '@/context/Chats';
 import { inputHasText } from '@/lib/text';
 import { useMemoizedFn, useMount } from '@/hooks';
-import { ChangeEvent, useMemo, useState } from 'react';
+import { type ChangeEvent, useMemo, useState } from 'react';
 import { useGetDatasets } from '@/api/buster_rest';
 import { NewChatWarning } from './NewChatWarning';
 import { useNewChatWarning } from './useNewChatWarning';

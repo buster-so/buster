@@ -1,6 +1,6 @@
 import { normalizeNewMetricsIntoGrid } from './normalizeMetric';
-import { DashboardConfig } from '@/api/asset_interfaces/dashboard';
-import { BusterMetric } from '@/api/asset_interfaces/metric';
+import type { DashboardConfig } from '@/api/asset_interfaces/dashboard';
+import type { BusterMetric } from '@/api/asset_interfaces/metric';
 import {
   NUMBER_OF_COLUMNS,
   MAX_NUMBER_OF_ITEMS,

@@ -2,7 +2,7 @@
 
 import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
 import { useGetDashboard } from '@/api/buster_rest/dashboards';
-import { RustApiError } from '@/api/buster_rest/errors';
+import type { RustApiError } from '@/api/buster_rest/errors';
 import { useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
 import { useGetCollection } from '@/api/buster_rest/collections';
@@ -62,7 +62,7 @@ const useVersionNumber = (props: UseGetAssetProps) => {
           ? dashboardVersionNumber
           : null;
 
-    return queryVersion ? parseInt(queryVersion) : undefined;
+    return queryVersion ? Number.parseInt(queryVersion) : undefined;
   }, [props.type, props.versionNumber, metricVersionNumber, dashboardVersionNumber]);
 };
 

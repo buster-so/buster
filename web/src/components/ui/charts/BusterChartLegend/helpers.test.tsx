@@ -1,5 +1,5 @@
 import { computeHiddenShowItems } from './helpers';
-import { BusterChartLegendItem } from './interfaces';
+import type { BusterChartLegendItem } from './interfaces';
 import { renderToString } from 'react-dom/server';
 import { LegendItem } from './LegendItem';
 import { ChartType } from '@/api/asset_interfaces/metric/charts';

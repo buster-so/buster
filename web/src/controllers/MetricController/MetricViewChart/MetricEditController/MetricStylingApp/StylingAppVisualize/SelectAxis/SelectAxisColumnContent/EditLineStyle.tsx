@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
 import { LabelAndInput } from '../../../Common/LabelAndInput';
-import { BusterChartConfigProps, ColumnSettings } from '@/api/asset_interfaces/metric/charts';
+import type { BusterChartConfigProps, ColumnSettings } from '@/api/asset_interfaces/metric/charts';
 import { AppTooltip } from '@/components/ui/tooltip';
 import { AppSegmented } from '@/components/ui/segmented';
 import { ENABLED_DOTS_ON_LINE_SIZE } from '@/api/asset_interfaces';
 import { useMemoizedFn } from '@/hooks';
-import { type SegmentedItem } from '@/components/ui/segmented';
+import type { SegmentedItem } from '@/components/ui/segmented';
 import { ChartLine, ChartArea, ChartActivity3, ChartCombo, ChartStep } from '@/components/ui/icons';
 
 const options: { icon: React.ReactNode; value: LineValue }[] = [

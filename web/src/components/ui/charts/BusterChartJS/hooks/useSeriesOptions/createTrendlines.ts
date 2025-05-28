@@ -3,7 +3,7 @@ import {
   type BusterChartProps,
   type ChartEncodes
 } from '@/api/asset_interfaces/metric';
-import {
+import type {
   AggregateMultiple,
   TrendlineOptions,
   TrendlinePluginOptions

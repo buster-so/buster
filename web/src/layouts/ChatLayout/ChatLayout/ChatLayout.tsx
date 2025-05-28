@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useMemo, useRef, useState } from 'react';
-import { AppSplitter, AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
+import type React from 'react';
+import { useMemo, useRef, useState } from 'react';
+import { AppSplitter, type AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
 import { ChatContainer } from '../ChatContainer';
 import { FileContainer } from '../FileContainer';
 import { ChatLayoutContextProvider, useChatLayoutContext } from '../ChatLayoutContext';

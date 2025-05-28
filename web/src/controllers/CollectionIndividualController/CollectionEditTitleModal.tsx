@@ -1,5 +1,5 @@
-import { BusterCollection } from '@/api/asset_interfaces/collection';
-import { AppModal, ModalProps } from '@/components/ui/modal';
+import type { BusterCollection } from '@/api/asset_interfaces/collection';
+import { AppModal, type ModalProps } from '@/components/ui/modal';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Input } from '@/components/ui/inputs';
 import { useUpdateCollection } from '@/api/buster_rest/collections';

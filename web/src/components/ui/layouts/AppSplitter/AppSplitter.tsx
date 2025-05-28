@@ -203,10 +203,10 @@ export const AppSplitter = React.memo(
           const currentSizeNumber = getCurrentSizePercentage(currentSize, otherSize, container);
 
           if (
-            currentSizeNumber === Infinity ||
-            currentSizeNumber === -Infinity ||
-            targetPercentage === Infinity ||
-            targetPercentage === -Infinity
+            currentSizeNumber === Number.POSITIVE_INFINITY ||
+            currentSizeNumber === Number.NEGATIVE_INFINITY ||
+            targetPercentage === Number.POSITIVE_INFINITY ||
+            targetPercentage === Number.NEGATIVE_INFINITY
           ) {
             return;
           }

@@ -3,14 +3,15 @@
 import type { ListDatasetGroupsResponse } from '@/api/asset_interfaces';
 import { useDatasetUpdateDatasetGroups } from '@/api/buster_rest';
 import {
-  BusterListColumn,
-  BusterListRowItem,
+  type BusterListColumn,
+  type BusterListRowItem,
   EmptyStateList,
   InfiniteListContainer
 } from '@/components/ui/list';
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
 import { useMemoizedFn } from '@/hooks';
-import React, { useMemo, useState } from 'react';
+import type React from 'react';
+import { useMemo, useState } from 'react';
 import { PermissionDatasetGroupSelectedPopup } from './PermissionDatasetGroupSelectedPopup';
 import { PermissionAssignedCell } from '@/components/features/PermissionComponents';
 import { Text } from '@/components/ui/typography';

@@ -1,8 +1,8 @@
-import { DataSource, RedshiftCredentials, RedshiftCredentialsSchema } from '@/api/asset_interfaces';
-import React from 'react';
+import { type DataSource, type RedshiftCredentials, RedshiftCredentialsSchema } from '@/api/asset_interfaces';
+import type React from 'react';
 import { FormWrapper } from './FormWrapper';
 import {
-  createRedshiftDataSource,
+  type createRedshiftDataSource,
   useCreateRedshiftDataSource,
   useUpdateRedshiftDataSource
 } from '@/api/buster_rest/data_source';

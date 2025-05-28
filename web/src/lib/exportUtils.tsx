@@ -4,7 +4,7 @@ import { timeout } from './timeout';
 
 export async function exportJSONToCSV(
   data: Record<string, string | null | Date | number>[],
-  fileName: string = 'data'
+  fileName = 'data'
 ) {
   if (data.length === 0) {
     throw new Error('No data to export');

@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { PermissionTitleCard } from './PermissionTitleCard';
 import { PermissionsAppContainer } from './PermissionsAppContainer';
 

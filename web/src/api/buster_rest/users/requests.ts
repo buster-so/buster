@@ -7,7 +7,7 @@ import type {
 } from '@/api/asset_interfaces/users';
 import { mainApi } from '../instances';
 import { serverFetch } from '../../createServerInstance';
-import { ShareAssetType } from '@/api/asset_interfaces/share';
+import type { ShareAssetType } from '@/api/asset_interfaces/share';
 
 export const getMyUserInfo = async (): Promise<BusterUserResponse> => {
   return mainApi.get<BusterUserResponse>(`/users`).then((response) => response.data);

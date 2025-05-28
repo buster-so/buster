@@ -1,4 +1,4 @@
-import { DragStartEvent, DragOverEvent, DragEndEvent, Active, Over } from '@dnd-kit/core';
+import type { DragStartEvent, DragOverEvent, DragEndEvent, Active, Over } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import { useMemoizedFn, useUpdateEffect } from '@/hooks';
 import type {
@@ -53,7 +53,7 @@ export const useDropzonesInternal = ({
   const setDropZones = useMemo(() => {
     return (
       newDropZones: (prev: DropZoneInternal[]) => DropZoneInternal[],
-      saveToExternal: boolean = true
+      saveToExternal = true
     ) => {
       const result = newDropZones(dropZones);
       _setDropZones(result);

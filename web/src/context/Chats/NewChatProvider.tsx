@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import type React from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
 import { useMemoizedFn } from '@/hooks';
 import type { BusterSearchResult, FileType } from '@/api/asset_interfaces';

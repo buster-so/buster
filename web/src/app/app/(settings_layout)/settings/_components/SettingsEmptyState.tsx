@@ -9,7 +9,7 @@ import {
   CardTitle,
   CardHeader
 } from '@/components/ui/card/CardBase';
-import React from 'react';
+import type React from 'react';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { Plus } from '@/components/ui/icons';
 

@@ -1,4 +1,4 @@
-import { DependencyList, EffectCallback, useEffect, useLayoutEffect } from 'react';
+import { type DependencyList, type EffectCallback, useEffect, type useLayoutEffect } from 'react';
 import { useRef } from 'react';
 import { useUnmount } from './useUnmount';
 import { depsAreSame } from '@/lib/depAreSame';

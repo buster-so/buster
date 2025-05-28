@@ -4,8 +4,8 @@ import type {
 } from '@/api/asset_interfaces';
 import { useDatasetUpdatePermissionUsers } from '@/api/buster_rest/datasets';
 import {
-  BusterListColumn,
-  BusterListRowItem,
+  type BusterListColumn,
+  type BusterListRowItem,
   EmptyStateList,
   InfiniteListContainer
 } from '@/components/ui/list';

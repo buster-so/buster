@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import type React from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AppPageLayoutContent } from '@/components/ui/layouts/AppPageLayoutContent';
-import { Dropdown, DropdownItems } from '@/components/ui/dropdown';
+import { Dropdown, type DropdownItems } from '@/components/ui/dropdown';
 import { Button } from '@/components/ui/buttons';
 import { useDebounceFn } from '@/hooks';
 import { formatDate } from '@/lib';

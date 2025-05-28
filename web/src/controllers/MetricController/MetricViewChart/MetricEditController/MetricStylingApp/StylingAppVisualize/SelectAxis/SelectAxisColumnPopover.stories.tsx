@@ -4,7 +4,7 @@ import {
   type SelectAxisColumnPopoverProps
 } from './SelectAxisColumnPopover';
 import { Button } from '@/components/ui/buttons/Button';
-import { ChartType, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import { ChartType, type IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import { SelectAxisContainerId } from './config';
 import type { IBusterMetricChartConfig, SimplifiedColumnType } from '@/api/asset_interfaces';
 import { http, HttpResponse } from 'msw';

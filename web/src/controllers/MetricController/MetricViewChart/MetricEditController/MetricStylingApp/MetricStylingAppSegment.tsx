@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { MetricStylingAppSegments } from './config';
 import { useMemoizedFn } from '@/hooks';
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
 import { cn } from '@/lib/utils';
 

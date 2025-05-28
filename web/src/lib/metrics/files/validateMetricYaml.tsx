@@ -1,7 +1,8 @@
-import React, { useRef, useEffect } from 'react';
+import type React from 'react';
+import { useRef, useEffect } from 'react';
 import * as yaml from 'js-yaml';
 import * as monaco from 'monaco-editor';
-import { type editor } from 'monaco-editor/esm/vs/editor/editor.api';
+import type { editor } from 'monaco-editor/esm/vs/editor/editor.api';
 import MonacoEditor from '@monaco-editor/react';
 
 type IMarkerData = editor.IMarkerData;
@@ -49,7 +50,7 @@ export const validateMetricYaml = (
       // Fallback to regex for older versions or different error types
       const lineMatch = error.message.match(/line (\d+)/i);
       if (lineMatch && lineMatch[1]) {
-        lineNumber = parseInt(lineMatch[1], 10);
+        lineNumber = Number.parseInt(lineMatch[1], 10);
       }
     }
 

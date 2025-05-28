@@ -1,4 +1,4 @@
-import { BusterTerm } from '@/api/asset_interfaces/terms';
+import type { BusterTerm } from '@/api/asset_interfaces/terms';
 import { AppTooltip } from '@/components/ui/tooltip';
 import { Plus, Table } from '@/components/ui/icons';
 import { Dropdown, type DropdownProps } from '@/components/ui/dropdown';

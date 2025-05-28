@@ -1,7 +1,7 @@
 import type { BusterUserAttribute } from '@/api/asset_interfaces/users';
 import {
-  BusterListColumn,
-  BusterListRowItem,
+  type BusterListColumn,
+  type BusterListRowItem,
   EmptyStateList,
   InfiniteListContainer
 } from '@/components/ui/list';

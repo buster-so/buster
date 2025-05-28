@@ -1,8 +1,8 @@
 import React from 'react';
 import { LabelAndInput } from '../Common';
 import { Switch } from '@/components/ui/switch';
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import { ChartEncodes, ScatterAxis } from '@/api/asset_interfaces/metric/charts';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { ChartEncodes, ScatterAxis } from '@/api/asset_interfaces/metric/charts';
 import { useLegendAutoShow } from '@/components/ui/charts/BusterChartLegend';
 
 export const EditShowLegend: React.FC<{

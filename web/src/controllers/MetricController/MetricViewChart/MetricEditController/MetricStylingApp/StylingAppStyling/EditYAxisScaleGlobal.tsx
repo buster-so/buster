@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { EditAxisScale } from '../StylingAppVisualize/SelectAxis/SelectAxisSettingsContent/EditAxisScale';
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { useMemoizedFn } from '@/hooks';
 
 export const EditYAxisScaleGlobal: React.FC<{

@@ -1,10 +1,10 @@
 import {
-  DataSource,
-  DataSourceTypes,
-  PostgresCredentials,
+  type DataSource,
+  type DataSourceTypes,
+  type PostgresCredentials,
   PostgresCredentialsSchema
 } from '@/api/asset_interfaces/datasources';
-import React from 'react';
+import type React from 'react';
 import { FormWrapper } from './FormWrapper';
 import {
   useCreatePostgresDataSource,

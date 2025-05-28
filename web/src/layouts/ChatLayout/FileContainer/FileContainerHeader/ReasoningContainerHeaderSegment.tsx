@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-import { FileContainerSegmentProps } from './interfaces';
+import type { FileContainerSegmentProps } from './interfaces';
 import { AppSegmented } from '@/components/ui/segmented';
 import { useChatLayoutContextSelector } from '../../ChatLayoutContext';
 import type { FileView, ReasoningFileView } from '../../ChatLayoutContext/useLayoutConfig';
-import { type SegmentedItem } from '@/components/ui/segmented';
+import type { SegmentedItem } from '@/components/ui/segmented';
 import { useMemoizedFn } from '@/hooks';
 
 const segmentOptions: { label: string; value: ReasoningFileView }[] = [

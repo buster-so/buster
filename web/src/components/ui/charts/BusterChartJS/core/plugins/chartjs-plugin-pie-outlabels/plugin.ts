@@ -1,17 +1,17 @@
 import {
-  AnimationSpec,
-  ArcElement,
+  type AnimationSpec,
+  type ArcElement,
   Chart,
-  ChartDataset,
-  ChartMeta,
-  ChartType,
-  Plugin
+  type ChartDataset,
+  type ChartMeta,
+  type ChartType,
+  type Plugin
 } from 'chart.js';
 import OutLabel from './OutLabel';
-import OutLabelsContext from './OutLabelsContext';
+import type OutLabelsContext from './OutLabelsContext';
 import OutLabelsManager from './OutLabelsManager';
 import { OutLabelStyle } from './OutLabelsStyle';
-import { OutLabelsOptions } from './OutLabelsOptions';
+import type { OutLabelsOptions } from './OutLabelsOptions';
 
 interface CustomAnimationSpec extends AnimationSpec<'doughnut' | 'pie'> {
   onProgress?: (animation: { currentStep: number; numSteps: number }) => void;
@@ -35,14 +35,14 @@ declare type OutLabelsPlugin = Plugin<'doughnut' | 'pie', OutLabelsOptions> & {
 
 export const OutLabelsPlugin: OutLabelsPlugin = {
   id: 'outlabels',
-  install: function (chart) {
+  install: (chart) => {
     const outLabelsManager = new OutLabelsManager();
     outLabelsManager.set(chart.id);
     chart.$outLabelsManager = outLabelsManager;
   },
 
   // Helper function to check if plugin is enabled
-  _isEnabled: function (chart: Chart<'doughnut' | 'pie', number[], unknown>) {
+  _isEnabled: (chart: Chart<'doughnut' | 'pie', number[], unknown>) => {
     const options = chart.options.plugins?.outlabels as OutLabelsOptions;
     return options && options.display === true;
   },

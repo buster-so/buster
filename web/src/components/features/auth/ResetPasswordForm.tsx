@@ -1,7 +1,8 @@
 'use client';
 
 import { Title } from '@/components/ui/typography';
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { useMemoizedFn } from '@/hooks';
 import { BusterRoutes } from '@/routes/busterRoutes';
 import type { User } from '@supabase/supabase-js';

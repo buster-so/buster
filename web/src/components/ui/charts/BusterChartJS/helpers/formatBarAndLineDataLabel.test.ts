@@ -1,5 +1,5 @@
 import { formatBarAndLineDataLabel } from './formatBarAndLineDataLabel';
-import { ColumnLabelFormat } from '@/api/asset_interfaces/metric';
+import type { ColumnLabelFormat } from '@/api/asset_interfaces/metric';
 import type { Context } from 'chartjs-plugin-datalabels';
 
 describe('formatBarAndLineDataLabel', () => {

@@ -16,7 +16,7 @@ import {
   ContextMenuLink,
   ContextMenuPortal
 } from './ContextBase';
-import { ContextMenuProps as ContextMenuPropsRadix } from '@radix-ui/react-context-menu';
+import type { ContextMenuProps as ContextMenuPropsRadix } from '@radix-ui/react-context-menu';
 import CircleSpinnerLoader from '../loaders/CircleSpinnerLoader';
 import { cn } from '@/lib/classMerge';
 

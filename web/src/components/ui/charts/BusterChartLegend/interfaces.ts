@@ -1,5 +1,5 @@
-import { type ChartType, type ShowLegendHeadline } from '@/api/asset_interfaces/metric/charts';
-import { ChartDataset } from 'chart.js';
+import type { ChartType, ShowLegendHeadline } from '@/api/asset_interfaces/metric/charts';
+import type { ChartDataset } from 'chart.js';
 
 export interface BusterChartLegendProps {
   animateLegend: boolean;

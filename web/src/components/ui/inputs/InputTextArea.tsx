@@ -75,8 +75,8 @@ export const InputTextArea = React.forwardRef<HTMLTextAreaElement, InputTextArea
 
       const computedStyle = window.getComputedStyle(textarea);
       paddingRef.current = {
-        top: parseFloat(computedStyle.paddingTop),
-        bottom: parseFloat(computedStyle.paddingBottom)
+        top: Number.parseFloat(computedStyle.paddingTop),
+        bottom: Number.parseFloat(computedStyle.paddingBottom)
       };
       return paddingRef.current;
     });
@@ -87,7 +87,7 @@ export const InputTextArea = React.forwardRef<HTMLTextAreaElement, InputTextArea
 
       const computedStyle = window.getComputedStyle(textarea);
       const lineHeight =
-        parseFloat(computedStyle.lineHeight) || parseFloat(computedStyle.fontSize) * 1.2;
+        Number.parseFloat(computedStyle.lineHeight) || Number.parseFloat(computedStyle.fontSize) * 1.2;
       const { top, bottom } = getPaddingValues();
 
       return (autoResize.minRows || rows) * lineHeight + top + bottom;
@@ -104,11 +104,11 @@ export const InputTextArea = React.forwardRef<HTMLTextAreaElement, InputTextArea
 
       const computedStyle = window.getComputedStyle(textarea);
       const lineHeight =
-        parseFloat(computedStyle.lineHeight) || parseFloat(computedStyle.fontSize) * 1.3;
+        Number.parseFloat(computedStyle.lineHeight) || Number.parseFloat(computedStyle.fontSize) * 1.3;
       const { top, bottom } = getPaddingValues();
       const maxHeight = autoResize.maxRows
         ? autoResize.maxRows * lineHeight + top + bottom
-        : Infinity;
+        : Number.POSITIVE_INFINITY;
 
       const scrollHeight = Math.max(textarea.scrollHeight, minHeight);
       const newHeight = Math.min(scrollHeight, maxHeight);

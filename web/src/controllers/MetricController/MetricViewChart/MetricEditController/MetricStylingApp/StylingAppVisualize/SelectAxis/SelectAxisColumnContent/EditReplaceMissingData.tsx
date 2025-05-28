@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { LabelAndInput } from '../../../Common';
-import { Select, SelectItem } from '@/components/ui/select';
-import { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import { Select, type SelectItem } from '@/components/ui/select';
+import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 
 export const MISSING_VALUES_OPTIONS: SelectItem[] = [
   { label: 'Zero', value: '0' },

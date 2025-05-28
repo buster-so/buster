@@ -1,6 +1,6 @@
 'use client';
 
-import React, { PropsWithChildren, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { type PropsWithChildren, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useMemoizedFn } from '@/hooks';
 import { millisecondsFromUnixTimestamp } from '@/lib/date';
 import { createContext, useContextSelector } from 'use-context-selector';

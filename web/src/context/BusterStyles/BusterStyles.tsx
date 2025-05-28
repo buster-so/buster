@@ -1,4 +1,5 @@
-import React, { PropsWithChildren } from 'react';
+import type React from 'react';
+import type { PropsWithChildren } from 'react';
 import { ThemeProvider as NextThemeProvider } from 'next-themes';
 import { BusterNotificationsProvider } from '../BusterNotifications/BusterNotifications';
 

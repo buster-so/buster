@@ -9,7 +9,7 @@ import { DataBricks } from './customIcons/databricks';
 import { SupabaseIcon } from './customIcons/supabase';
 import { RedUsersIcons } from './customIcons/redUsers';
 import { AthenaIcon } from './customIcons/athena';
-import React from 'react';
+import type React from 'react';
 import { DataSourceTypes } from '@/api/asset_interfaces/datasources';
 import { Database } from './NucleoIconOutlined';
 

@@ -13,7 +13,7 @@ import {
   CardTitle,
   CardFooter
 } from '@/components/ui/card/CardBase';
-import { Select, SelectItem } from '@/components/ui/select';
+import { Select, type SelectItem } from '@/components/ui/select';
 import { useMemoizedFn } from '@/hooks';
 import { AppTooltip } from '@/components/ui/tooltip';
 import { useUpdateUser } from '@/api/buster_rest';

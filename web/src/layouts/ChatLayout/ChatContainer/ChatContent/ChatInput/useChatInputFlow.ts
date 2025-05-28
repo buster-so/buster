@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import type React from 'react';
+import { useMemo } from 'react';
 import { useChatIndividualContextSelector } from '@/layouts/ChatLayout/ChatContext';
 import { useMemoizedFn } from '@/hooks';
 import { useBusterNewChatContextSelector } from '@/context/Chats';

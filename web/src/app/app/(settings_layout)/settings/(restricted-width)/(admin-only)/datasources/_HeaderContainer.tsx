@@ -1,5 +1,5 @@
 import { BackButton } from '@/components/ui/buttons';
-import React from 'react';
+import type React from 'react';
 
 export const HeaderContainer: React.FC<{
   buttonText: string;

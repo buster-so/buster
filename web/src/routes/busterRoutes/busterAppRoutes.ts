@@ -1,4 +1,4 @@
-import { DashboardFileViewSecondary, MetricFileViewSecondary } from '@/layouts/ChatLayout';
+import type { DashboardFileViewSecondary, MetricFileViewSecondary } from '@/layouts/ChatLayout';
 
 export enum BusterAppRoutes {
   APP_HOME = '/app/home',

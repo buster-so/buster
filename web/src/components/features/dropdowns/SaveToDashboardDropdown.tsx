@@ -1,6 +1,7 @@
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useMemoizedFn } from '@/hooks';
-import React, { useMemo, useState } from 'react';
+import type React from 'react';
+import { useMemo, useState } from 'react';
 import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
 import { Button } from '@/components/ui/buttons';
 import { Dropdown, type DropdownProps } from '@/components/ui/dropdown/Dropdown';

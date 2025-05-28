@@ -1,4 +1,4 @@
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { ChartType } from '@/api/asset_interfaces/metric/charts';
 import React, { useMemo } from 'react';
 import { Text } from '@/components/ui/typography';

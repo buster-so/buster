@@ -4,7 +4,7 @@ import * as React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { Check3 as Check, ChevronDown, ChevronUp } from '../icons/NucleoIconOutlined';
 import { cn } from '@/lib/classMerge';
-import { cva, VariantProps } from 'class-variance-authority';
+import { cva, type VariantProps } from 'class-variance-authority';
 
 const Select = SelectPrimitive.Root;
 

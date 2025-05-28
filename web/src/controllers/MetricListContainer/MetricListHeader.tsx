@@ -5,7 +5,7 @@ import { AppSegmented } from '@/components/ui/segmented';
 import { VerificationStatus } from '@/api/asset_interfaces';
 import { Text } from '@/components/ui/typography';
 import { useMemoizedFn } from '@/hooks';
-import { type SegmentedItem } from '@/components/ui/segmented';
+import type { SegmentedItem } from '@/components/ui/segmented';
 
 export const MetricListHeader: React.FC<{
   filters: VerificationStatus[];

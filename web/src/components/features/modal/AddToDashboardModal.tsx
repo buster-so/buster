@@ -1,6 +1,6 @@
 import { useDebounce, useMemoizedFn } from '@/hooks';
 import React, { useLayoutEffect, useMemo, useState } from 'react';
-import { InputSelectModal, InputSelectModalProps } from '@/components/ui/modal/InputSelectModal';
+import { InputSelectModal, type InputSelectModalProps } from '@/components/ui/modal/InputSelectModal';
 import { formatDate } from '@/lib';
 import { Button } from '@/components/ui/buttons';
 import { useAddAndRemoveMetricsFromDashboard, useGetDashboard } from '@/api/buster_rest/dashboards';

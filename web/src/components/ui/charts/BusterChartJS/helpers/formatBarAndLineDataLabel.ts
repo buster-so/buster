@@ -1,4 +1,4 @@
-import { ColumnLabelFormat } from '@/api/asset_interfaces/metric';
+import type { ColumnLabelFormat } from '@/api/asset_interfaces/metric';
 import { formatLabel } from '@/lib/columnFormatter';
 import type { Context } from 'chartjs-plugin-datalabels';
 

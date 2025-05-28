@@ -1,5 +1,5 @@
 import { useDroppable } from '@dnd-kit/core';
-import React from 'react';
+import type React from 'react';
 import { HEIGHT_OF_DROPZONE, NEW_ROW_ID } from './helpers';
 import { cn } from '@/lib/utils';
 

@@ -1,10 +1,10 @@
 'use client';
 
-import { BusterRoutesWithArgsRoute, createBusterRoute } from '@/routes/busterRoutes';
+import { type BusterRoutesWithArgsRoute, createBusterRoute } from '@/routes/busterRoutes';
 import { pathNameToParentRoute, pathNameToRoute } from '@/routes/helpers';
 import { useMemoizedFn } from '@/hooks';
 import { useRouter, usePathname, useParams } from 'next/navigation';
-import React, { PropsWithChildren } from 'react';
+import React, { type PropsWithChildren } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
 import isEmpty from 'lodash/isEmpty';
 
@@ -137,8 +137,8 @@ const getQueryParamsFromPath = (path: string): Record<string, string> => {
 const waitForUrlChange = (
   condition: () => boolean,
   callback: () => void,
-  waitTime: number = 25,
-  iteration: number = 0
+  waitTime = 25,
+  iteration = 0
 ) => {
   if (condition()) {
     callback();

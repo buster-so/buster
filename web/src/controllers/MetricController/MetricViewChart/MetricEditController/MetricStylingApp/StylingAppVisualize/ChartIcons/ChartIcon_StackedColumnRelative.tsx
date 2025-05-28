@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { DEFAULT_CHART_COLORS, DISABLED_CHART_COLORS } from '../config';
 
 export const ChartIcon_StackedColumnRelative: React.FC<{

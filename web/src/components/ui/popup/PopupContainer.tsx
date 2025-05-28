@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/classMerge';
 

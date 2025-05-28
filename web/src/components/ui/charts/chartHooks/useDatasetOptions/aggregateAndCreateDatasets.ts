@@ -44,7 +44,7 @@ export function aggregateAndCreateDatasets<
     const n = Number(raw);
     if (raw == null || raw === '' || Number.isNaN(n)) {
       if (rep === null) return null;
-      if (typeof rep === 'string' && isNaN(Number(rep))) return NaN;
+      if (typeof rep === 'string' && isNaN(Number(rep))) return Number.NaN;
       return Number(rep);
     }
     return n;

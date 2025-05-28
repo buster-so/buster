@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import type React from 'react';
 
 import { Avatar } from '@/components/ui/avatar';
 import { formatDate } from '@/lib';

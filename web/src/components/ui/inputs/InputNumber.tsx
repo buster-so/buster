@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, InputProps } from './Input';
+import { Input, type InputProps } from './Input';
 import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 
@@ -14,7 +14,7 @@ export interface InputNumberProps extends Omit<InputProps, 'type' | 'value' | 'o
 export const InputNumber = React.forwardRef<HTMLInputElement, InputNumberProps>(
   ({ value, onChange, min, max, step = 1, className, ...props }, ref) => {
     const handleChange = useMemoizedFn((e: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = parseFloat(e.target.value);
+      const newValue = Number.parseFloat(e.target.value);
 
       if (isNaN(newValue)) {
         onChange?.(0);

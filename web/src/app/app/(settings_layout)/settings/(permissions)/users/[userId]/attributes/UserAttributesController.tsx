@@ -12,7 +12,8 @@ import {
   NewPermissionGroupModal,
   PermissionSearchAndListWrapper
 } from '@/components/features/PermissionComponents';
-import React, { useMemo, useState } from 'react';
+import type React from 'react';
+import { useMemo, useState } from 'react';
 import { UserAttributesListContainer } from './UserAttributesListContainer';
 import { Button } from '@/components/ui/buttons';
 import { useMemoizedFn } from '@/hooks';

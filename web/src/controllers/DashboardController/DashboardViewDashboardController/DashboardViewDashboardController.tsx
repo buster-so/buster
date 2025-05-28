@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import type React from 'react';
 import { DashboardEditTitles } from './DashboardEditTitle';
 import { DashboardContentController } from './DashboardContentController';
 import { useGetDashboard, useUpdateDashboardConfig } from '@/api/buster_rest/dashboards';

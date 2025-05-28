@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import type React from 'react';
+import { useEffect, useRef } from 'react';
 import { useGetChat, useGetChatMessage } from '@/api/buster_rest/chats';
 import { ReasoningMessageSelector } from './ReasoningMessages';
 import { BlackBoxMessage } from './ReasoningMessages/ReasoningBlackBoxMessage';
@@ -11,7 +12,7 @@ import isEmpty from 'lodash/isEmpty';
 import { ReasoningScrollToBottom } from './ReasoningScrollToBottom';
 import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '@/api/query_keys';
-import { BusterChatMessageReasoning_text } from '@/api/asset_interfaces/chat';
+import type { BusterChatMessageReasoning_text } from '@/api/asset_interfaces/chat';
 import last from 'lodash/last';
 
 interface ReasoningControllerProps {

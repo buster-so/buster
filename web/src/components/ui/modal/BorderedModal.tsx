@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
-import { Button, ButtonProps } from '../buttons/Button';
+import { Button, type ButtonProps } from '../buttons/Button';
 import {
   Dialog,
   DialogContent,
@@ -10,7 +10,7 @@ import {
   DialogDescription,
   DialogFooter
 } from './ModalBase';
-import React, { useState, ReactNode, useMemo } from 'react';
+import React, { useState, type ReactNode, useMemo } from 'react';
 import { cn } from '@/lib/classMerge';
 import { AppTooltip } from '../tooltip';
 

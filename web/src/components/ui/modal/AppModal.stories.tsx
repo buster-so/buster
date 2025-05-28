@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { AppModal } from './AppModal';
 import { Button } from '../buttons/Button';
 import React from 'react';
-import { ModalProps } from './AppModal';
+import type { ModalProps } from './AppModal';
 import { fn } from '@storybook/test';
 import { timeout } from '@/lib';
 

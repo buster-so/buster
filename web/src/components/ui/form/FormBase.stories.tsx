@@ -1,7 +1,7 @@
 import { formOptions } from '@tanstack/react-form';
 import { useAppForm, withForm } from './useFormBaseHooks';
 import React from 'react';
-import { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 
 const formOpts = formOptions({

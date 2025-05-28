@@ -18,7 +18,7 @@ export const parseWidthValue = (width: string): { value: number; unit: 'px' | '%
   const match = width.match(/^(\d+(?:\.\d+)?)(px|%)$/);
   if (!match) throw new Error('Invalid width format. Must be in px or %');
   return {
-    value: parseFloat(match[1]),
+    value: Number.parseFloat(match[1]),
     unit: match[2] as 'px' | '%'
   };
 };
@@ -44,12 +44,12 @@ export const getCurrentSizePercentage = (
 
   // Handle percentage
   if (size.endsWith('%')) {
-    return parseFloat(size);
+    return Number.parseFloat(size);
   }
 
   // Handle pixel values
   if (size.endsWith('px')) {
-    const pixels = parseFloat(size);
+    const pixels = Number.parseFloat(size);
     return convertPxToPercentage(pixels, container.getBoundingClientRect().width);
   }
 

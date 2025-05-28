@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import type React from 'react';
 import { useTheme } from 'next-themes';
 import { Toaster as ToasterSonner } from 'sonner';
 import { CircleCheck, CircleXmark, CircleWarning } from '@/components/ui/icons/NucleoIconFilled';

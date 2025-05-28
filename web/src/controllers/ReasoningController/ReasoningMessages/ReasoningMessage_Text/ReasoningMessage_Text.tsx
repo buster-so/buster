@@ -1,6 +1,6 @@
 import React from 'react';
-import { ReasoningMessageProps } from '../ReasoningMessageSelector';
-import { type BusterChatMessageReasoning_text } from '@/api/asset_interfaces/chat';
+import type { ReasoningMessageProps } from '../ReasoningMessageSelector';
+import type { BusterChatMessageReasoning_text } from '@/api/asset_interfaces/chat';
 import { useGetChatMessage } from '@/api/buster_rest/chats';
 import { AppMarkdown } from '@/components/ui/typography/AppMarkdown';
 

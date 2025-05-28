@@ -4,7 +4,7 @@ import React from 'react';
 import {
   buttonVariants,
   buttonIconVariants,
-  ButtonProps,
+  type ButtonProps,
   buttonTypeClasses,
   LoadingIcon
 } from './Button';

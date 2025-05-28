@@ -4,7 +4,7 @@ import {
   useQuery,
   useMutation,
   useQueryClient,
-  UseQueryOptions
+  type UseQueryOptions
 } from '@tanstack/react-query';
 import {
   getListChats,

@@ -5,7 +5,8 @@ import { queryKeys } from '@/api/query_keys';
 import { useMemoizedFn } from '@/hooks';
 import { timeout } from '@/lib';
 import { useQueryClient } from '@tanstack/react-query';
-import React, { useCallback, useState } from 'react';
+import type React from 'react';
+import { useCallback, useState } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
 
 const useBusterAssets = () => {

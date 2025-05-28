@@ -1,5 +1,5 @@
-import { cva, VariantProps } from 'class-variance-authority';
-import React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
+import type React from 'react';
 import { cn } from '@/lib/classMerge';
 import { Text } from '../typography';
 import { Xmark } from '../icons';

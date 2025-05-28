@@ -1,4 +1,4 @@
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import React, { useState } from 'react';
 import { LabelAndInput } from '../Common';
 import { CollapseDelete } from '../Common/CollapseDelete';
@@ -10,10 +10,10 @@ import { Input } from '@/components/ui/inputs';
 import { InputNumber } from '@/components/ui/inputs';
 import { Switch } from '@/components/ui/switch';
 import { Plus } from '@/components/ui/icons';
-import { ChartEncodes, GoalLine } from '@/api/asset_interfaces/metric/charts';
+import type { ChartEncodes, GoalLine } from '@/api/asset_interfaces/metric/charts';
 import { v4 as uuidv4 } from 'uuid';
 import { useMemoizedFn, useSet } from '@/hooks';
-import { ColumnMetaData } from '@/api/asset_interfaces';
+import type { ColumnMetaData } from '@/api/asset_interfaces';
 
 interface LoopGoalLine extends GoalLine {
   id: string;

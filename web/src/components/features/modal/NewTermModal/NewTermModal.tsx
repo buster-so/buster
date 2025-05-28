@@ -6,7 +6,7 @@ import { useGetDatasets } from '@/api/buster_rest/datasets';
 import { InputTextArea } from '@/components/ui/inputs/InputTextArea';
 import { Input } from '@/components/ui/inputs/Input';
 import { SelectMultiple } from '@/components/ui/select/SelectMultiple';
-import { SelectItem } from '@/components/ui/select';
+import type { SelectItem } from '@/components/ui/select';
 import { useCreateTerm } from '@/api/buster_rest/terms';
 
 export const NewTermModal: React.FC<{

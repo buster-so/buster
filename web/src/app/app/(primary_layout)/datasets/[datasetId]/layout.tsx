@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { DatasetPageProvider } from './_DatasetsLayout/DatasetPageContext';
 import { AppPageLayout } from '@/components/ui/layouts';
 import { DatasetsIndividualHeader } from './_DatasetsLayout/DatasetsIndividualHeader';

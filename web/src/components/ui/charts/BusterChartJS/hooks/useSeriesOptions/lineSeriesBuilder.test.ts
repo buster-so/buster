@@ -47,7 +47,7 @@ const mockContext = (
   dataIndex: number,
   datasetIndex: number,
   datasetData: any[],
-  scaleType: string = 'linear',
+  scaleType = 'linear',
   chartDatasets: any[] = [{ data: datasetData, hidden: false }]
 ) =>
   ({

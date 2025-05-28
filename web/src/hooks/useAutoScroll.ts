@@ -49,7 +49,7 @@ interface UseAutoScrollReturn {
 /**
  * Checks whether an element is "at the bottom" using a pixel threshold.
  */
-const isAtBottom = (element: HTMLElement, threshold: number = 30): boolean => {
+const isAtBottom = (element: HTMLElement, threshold = 30): boolean => {
   const { scrollHeight, scrollTop, clientHeight } = element;
   return scrollHeight - (scrollTop + clientHeight) <= threshold;
 };

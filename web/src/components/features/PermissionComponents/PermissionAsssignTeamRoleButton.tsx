@@ -1,9 +1,9 @@
-import { TeamRole } from '@/api/asset_interfaces';
+import type { TeamRole } from '@/api/asset_interfaces';
 import { TEAM_ROLE_OPTIONS } from './PermissionAssignTeamRole';
 import React, { useMemo } from 'react';
 import { useMemoizedFn } from '@/hooks';
 import { Button } from '@/components/ui/buttons';
-import { Dropdown, DropdownItem, DropdownItems, DropdownProps } from '@/components/ui/dropdown';
+import { Dropdown, DropdownItem, DropdownItems, type DropdownProps } from '@/components/ui/dropdown';
 import { CheckDouble } from '@/components/ui/icons';
 
 export const PermissionAssignTeamRoleButton: React.FC<{

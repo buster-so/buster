@@ -3,7 +3,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { SelectMultiple } from './SelectMultiple';
 import { useMemo, useState } from 'react';
-import { type SelectItem } from './Select';
+import type { SelectItem } from './Select';
 import { fn } from '@storybook/test';
 import { faker } from '@faker-js/faker';
 

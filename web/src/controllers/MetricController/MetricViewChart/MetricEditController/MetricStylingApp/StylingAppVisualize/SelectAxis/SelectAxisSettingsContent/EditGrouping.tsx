@@ -1,7 +1,7 @@
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import React, { useMemo, useState } from 'react';
 import { LabelAndInput } from '../../../Common/LabelAndInput';
-import { Select, SelectItem } from '@/components/ui/select';
+import { Select, type SelectItem } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useMemoizedFn } from '@/hooks';
 

@@ -1,5 +1,5 @@
-import React from 'react';
-import { type ExtraProps } from 'react-markdown';
+import type React from 'react';
+import type { ExtraProps } from 'react-markdown';
 import { AppCodeBlock } from '../AppCodeBlock/AppCodeBlock';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../../../lib/classMerge';

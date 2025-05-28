@@ -1,4 +1,4 @@
-import { ChartType, Chart, Plugin } from 'chart.js';
+import { type ChartType, Chart, type Plugin } from 'chart.js';
 
 export interface ChartHoverLinePluginOptions {
   lineWidth: number;

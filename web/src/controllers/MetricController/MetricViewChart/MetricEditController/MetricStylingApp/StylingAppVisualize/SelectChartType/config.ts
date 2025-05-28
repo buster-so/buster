@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { ChartIcon_Combo } from '../ChartIcons/ChartIcon_Combo';
 import { ChartIcon_Line } from '../ChartIcons/ChartIcon_Line';
 import { ChartIcon_Metric } from '../ChartIcons/ChartIcon_Metric';

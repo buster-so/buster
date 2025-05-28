@@ -40,7 +40,7 @@ export const barSeriesBuilder = ({
     let hasBeenDrawn = false;
 
     dataLabelOptions.stackTotal = {
-      display: function (context) {
+      display: (context) => {
         const chart = context.chart;
         const shownDatasets = context.chart.data.datasets.filter(
           (dataset, index) =>
@@ -60,7 +60,7 @@ export const barSeriesBuilder = ({
         }
         return canDisplay ? 'auto' : false;
       },
-      formatter: function (_, context) {
+      formatter: (_, context) => {
         const canUseSameYFormatter = yAxisSimilar(yAxisKeys, columnLabelFormats);
         const value = context.chart.$totalizer.stackTotals[context.dataIndex];
         return formatYAxisLabel(

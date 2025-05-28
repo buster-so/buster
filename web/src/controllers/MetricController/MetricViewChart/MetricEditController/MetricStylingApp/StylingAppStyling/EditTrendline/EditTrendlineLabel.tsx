@@ -2,7 +2,7 @@ import { Input } from '@/components/ui/inputs';
 import { Switch } from '@/components/ui/switch';
 import React, { useMemo } from 'react';
 import { LabelAndInput } from '../../Common';
-import { LoopTrendline } from './EditTrendline';
+import type { LoopTrendline } from './EditTrendline';
 import { trendlineOptions } from './config';
 import { useMemoizedFn } from '@/hooks';
 import { TrendlineOffset } from './TrendlineOffset';

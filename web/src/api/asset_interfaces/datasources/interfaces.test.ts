@@ -8,9 +8,9 @@ import {
   SnowflakeCredentialsSchema,
   DatabricksCredentialsSchema,
   SQLServerCredentialsSchema,
-  SnowflakeCredentials
+  type SnowflakeCredentials
 } from './interfaces';
-import { z } from 'zod/v4-mini';
+import type { z } from 'zod/v4-mini';
 
 // Helper function to test validation
 const testValidation = (

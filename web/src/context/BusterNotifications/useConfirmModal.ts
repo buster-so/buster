@@ -1,4 +1,4 @@
-import {
+import type {
   ConfirmModalProps,
   ConfirmProps as BaseConfirmProps
 } from '@/components/ui/modal/ConfirmModal';

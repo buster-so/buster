@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
-import { DropZone, SelectAxisDropzones, SelectAxisItem } from './SelectAxisDragContainer';
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import { type DropZone, SelectAxisDropzones, type SelectAxisItem } from './SelectAxisDragContainer';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { getChartTypeDropZones } from './helper';
-import { ISelectAxisContext, SelectAxisProvider } from './useSelectAxisContext';
+import { type ISelectAxisContext, SelectAxisProvider } from './useSelectAxisContext';
 import { useMemoizedFn } from '@/hooks';
 import { chartTypeToAxis, zoneIdToAxis } from './config';
-import {
+import type {
   CategoryAxisStyleConfig,
   ChartEncodes,
   XAxisConfig,

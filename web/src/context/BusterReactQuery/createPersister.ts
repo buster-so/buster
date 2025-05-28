@@ -1,6 +1,6 @@
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { isServer } from '@tanstack/react-query';
-import { PersistQueryClientProviderProps } from '@tanstack/react-query-persist-client';
+import type { PersistQueryClientProviderProps } from '@tanstack/react-query-persist-client';
 import { queryKeys } from '@/api/query_keys';
 import { hashKey } from '@tanstack/react-query';
 import packageJson from '../../../package.json';

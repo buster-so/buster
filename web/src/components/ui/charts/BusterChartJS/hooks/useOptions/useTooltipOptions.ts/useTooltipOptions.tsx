@@ -5,7 +5,7 @@ import type {
   ChartEncodes,
   ComboChartAxis
 } from '@/api/asset_interfaces/metric/charts';
-import { DeepPartial } from 'utility-types';
+import type { DeepPartial } from 'utility-types';
 import type { TooltipOptions } from 'chart.js';
 import { useEffect, useMemo, useRef } from 'react';
 import { useMemoizedFn, useUnmount } from '@/hooks';

@@ -1,5 +1,5 @@
 import type { SelectedFile } from '../../interfaces';
-import { useGetChatParams } from '../useGetChatParams';
+import type { useGetChatParams } from '../useGetChatParams';
 
 export const createSelectedFile = (
   params: ReturnType<typeof useGetChatParams>

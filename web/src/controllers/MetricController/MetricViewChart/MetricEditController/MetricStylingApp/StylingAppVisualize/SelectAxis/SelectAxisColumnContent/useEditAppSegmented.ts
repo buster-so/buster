@@ -1,5 +1,5 @@
 import { useMemoizedFn } from '@/hooks';
-import { MouseEventHandler } from 'react';
+import type { MouseEventHandler } from 'react';
 
 //I hate this. It feels soo hacky
 export const useEditAppSegmented = ({

@@ -1,6 +1,7 @@
 'use client';
 
-import React, { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
+import type React from 'react';
+import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
 import { PopoverRoot, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Input } from '@/components/ui/inputs';

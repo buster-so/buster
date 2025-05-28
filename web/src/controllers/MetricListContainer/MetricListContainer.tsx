@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { VerificationStatus } from '@/api/asset_interfaces';
+import type { VerificationStatus } from '@/api/asset_interfaces';
 import { MetricListHeader } from './MetricListHeader';
 import { MetricItemsContainer } from './MetricItemsContainer';
 import { AppPageLayout } from '@/components/ui/layouts';

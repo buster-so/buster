@@ -4,8 +4,8 @@ import type { GetPermissionGroupUsersResponse } from '@/api/asset_interfaces';
 import { useUpdatePermissionGroupUsers } from '@/api/buster_rest';
 import { PermissionAssignedCell } from '@/components/features/PermissionComponents';
 import {
-  BusterListColumn,
-  BusterListRowItem,
+  type BusterListColumn,
+  type BusterListRowItem,
   EmptyStateList,
   InfiniteListContainer
 } from '@/components/ui/list';

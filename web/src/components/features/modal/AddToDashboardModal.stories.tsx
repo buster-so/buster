@@ -3,7 +3,7 @@ import { AddToDashboardModal } from './AddToDashboardModal';
 import { http, HttpResponse } from 'msw';
 import { fn } from '@storybook/test';
 import { BASE_URL } from '@/api/buster_rest/config';
-import { BusterMetricListItem } from '@/api/asset_interfaces';
+import type { BusterMetricListItem } from '@/api/asset_interfaces';
 import { createMockListMetric } from '@/mocks/metric';
 import { generateMockDashboard } from '@/mocks/MOCK_DASHBOARD';
 

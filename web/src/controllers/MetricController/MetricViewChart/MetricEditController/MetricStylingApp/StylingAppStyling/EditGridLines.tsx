@@ -1,7 +1,7 @@
 import React from 'react';
 import { LabelAndInput } from '../Common';
 import { Switch } from '@/components/ui/switch';
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 
 export const EditGridLines: React.FC<{
   gridLines: IBusterMetricChartConfig['gridLines'];

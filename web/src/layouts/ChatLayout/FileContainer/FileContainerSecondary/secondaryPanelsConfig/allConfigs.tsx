@@ -1,6 +1,6 @@
 import type { FileType } from '@/api/asset_interfaces/chat';
 import type { FileContainerSecondaryProps } from '../interfaces';
-import React from 'react';
+import type React from 'react';
 import { MetricSecondaryRecord } from './metricPanels';
 import { DashboardSecondaryRecord } from './dashboardPanels';
 

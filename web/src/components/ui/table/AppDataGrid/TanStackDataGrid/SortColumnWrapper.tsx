@@ -5,16 +5,16 @@ import {
   MouseSensor,
   TouchSensor,
   KeyboardSensor,
-  DragStartEvent,
-  DragOverEvent,
-  DragEndEvent,
+  type DragStartEvent,
+  type DragOverEvent,
+  type DragEndEvent,
   DndContext,
   pointerWithin,
   DragOverlay
 } from '@dnd-kit/core';
 import { restrictToHorizontalAxis } from '@dnd-kit/modifiers';
 import { arrayMove } from '@dnd-kit/sortable';
-import { flexRender, Header, Table } from '@tanstack/react-table';
+import { flexRender, type Header, type Table } from '@tanstack/react-table';
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { useContextSelector, createContext } from 'use-context-selector';
 import { HEADER_HEIGHT } from './constants';

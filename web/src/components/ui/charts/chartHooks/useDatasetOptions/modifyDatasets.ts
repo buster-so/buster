@@ -1,5 +1,5 @@
-import { BarSortBy, BusterChartProps, ChartType, PieSortBy } from '@/api/asset_interfaces/metric';
-import { DatasetOption, DatasetOptionsWithTicks, KV } from './interfaces';
+import { type BarSortBy, type BusterChartProps, ChartType, type PieSortBy } from '@/api/asset_interfaces/metric';
+import type { DatasetOption, DatasetOptionsWithTicks, KV } from './interfaces';
 import cloneDeep from 'lodash/cloneDeep';
 import { sum as lodashSum } from 'lodash';
 

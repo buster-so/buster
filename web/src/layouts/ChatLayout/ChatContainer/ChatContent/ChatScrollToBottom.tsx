@@ -1,4 +1,4 @@
-import { type useAutoScroll } from '@/hooks/useAutoScroll';
+import type { useAutoScroll } from '@/hooks/useAutoScroll';
 import React from 'react';
 import { ChevronDown } from '@/components/ui/icons';
 import { cn } from '@/lib/utils';

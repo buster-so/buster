@@ -1,4 +1,4 @@
-import { BusterDashboardResponse } from '@/api/asset_interfaces/dashboard';
+import type { BusterDashboardResponse } from '@/api/asset_interfaces/dashboard';
 import { queryKeys } from '@/api/query_keys';
 import { dashboardQueryKeys } from '@/api/query_keys/dashboard';
 import { useBusterAssetsContextSelector } from '@/context/Assets/BusterAssetsProvider';
@@ -15,7 +15,7 @@ import {
 } from './dashboardQueryStore';
 import last from 'lodash/last';
 
-export const useEnsureDashboardConfig = (prefetchData: boolean = true) => {
+export const useEnsureDashboardConfig = (prefetchData = true) => {
   const queryClient = useQueryClient();
   const prefetchDashboard = useGetDashboardAndInitializeMetrics(prefetchData);
   const { openErrorMessage } = useBusterNotifications();
@@ -46,7 +46,7 @@ export const useEnsureDashboardConfig = (prefetchData: boolean = true) => {
   return method;
 };
 
-export const useGetDashboardAndInitializeMetrics = (prefetchData: boolean = true) => {
+export const useGetDashboardAndInitializeMetrics = (prefetchData = true) => {
   const queryClient = useQueryClient();
   const setOriginalDashboards = useOriginalDashboardStore((x) => x.setOriginalDashboard);
   const onSetLatestDashboardVersion = useDashboardQueryStore((x) => x.onSetLatestDashboardVersion);

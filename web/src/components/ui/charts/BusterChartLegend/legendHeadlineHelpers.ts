@@ -1,7 +1,7 @@
-import { BusterChartLegendItem } from './interfaces';
-import { BusterChartProps, ShowLegendHeadline } from '@/api/asset_interfaces/metric/charts';
+import type { BusterChartLegendItem } from './interfaces';
+import type { BusterChartProps, ShowLegendHeadline } from '@/api/asset_interfaces/metric/charts';
 import { ArrayOperations } from '@/lib/math';
-import { DatasetOptionsWithTicks } from '../chartHooks';
+import type { DatasetOptionsWithTicks } from '../chartHooks';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces/metric';
 import { isDateColumnType } from '@/lib/messages';
 import { formatLabel } from '@/lib/columnFormatter';

@@ -14,7 +14,7 @@ import { SupportedLanguages } from '../config/languages';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
 import {
-  ColumnLabelFormat,
+  type ColumnLabelFormat,
   DEFAULT_DATE_FORMAT_MONTH_OF_YEAR,
   DEFAULT_DATE_FORMAT_QUARTER,
   DEFAULT_DAY_OF_WEEK_FORMAT

@@ -1,5 +1,5 @@
-import React, { PropsWithChildren } from 'react';
-import { HTMLElementProps, IPaneConfigs } from './types';
+import React, { type PropsWithChildren } from 'react';
+import type { HTMLElementProps, IPaneConfigs } from './types';
 
 export default function Pane({
   children,

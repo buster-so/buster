@@ -1,4 +1,4 @@
-import { ShareAssetType } from '@/api/asset_interfaces';
+import type { ShareAssetType } from '@/api/asset_interfaces';
 import { AppTooltip } from '@/components/ui/tooltip';
 import React, { useMemo } from 'react';
 import { useMemoizedFn } from '@/hooks';

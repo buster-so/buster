@@ -46,7 +46,7 @@ export const ShimmerText: React.FC<ShimmerText2Props> = React.memo(
     const memoizedTransition = useMemo(() => {
       return {
         duration,
-        repeat: Infinity,
+        repeat: Number.POSITIVE_INFINITY,
         ease: 'linear'
       };
     }, [duration]);

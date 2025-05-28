@@ -1,4 +1,4 @@
-import { FileType } from '@/api/asset_interfaces/chat';
+import type { FileType } from '@/api/asset_interfaces/chat';
 import type { FileContainerButtonsProps, FileContainerSegmentProps } from './interfaces';
 import { MetricContainerHeaderButtons } from './MetricContainerHeaderButtons';
 import { DashboardContainerHeaderButtons } from './DashboardContainerHeaderButtons';

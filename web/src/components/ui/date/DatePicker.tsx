@@ -5,7 +5,7 @@ import { Calendar as CalendarIcon } from '@/components/ui/icons';
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/buttons';
-import { Calendar, CalendarProps } from '@/components/ui/calendar';
+import { Calendar, type CalendarProps } from '@/components/ui/calendar';
 import {
   PopoverRoot as Popover,
   PopoverContent,

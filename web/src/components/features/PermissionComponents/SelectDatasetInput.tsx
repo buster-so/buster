@@ -1,6 +1,6 @@
 import { useGetDatasets } from '@/api/buster_rest';
 import { SelectMultiple } from '@/components/ui/select/SelectMultiple';
-import { Select, SelectItem } from '@/components/ui/select/Select';
+import { Select, type SelectItem } from '@/components/ui/select/Select';
 import { useMemoizedFn } from '@/hooks';
 import React, { useMemo, useState } from 'react';
 

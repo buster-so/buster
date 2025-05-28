@@ -10,7 +10,7 @@ export type DataPoint = Record<string, string | number | null | Date>;
 export function detectAnomalies(
   data: DataPoint[],
   numericField: string,
-  threshold: number = 2
+  threshold = 2
 ): number[] {
   const values = data.map((point) => Number(point[numericField])).filter((val) => !isNaN(val));
 
@@ -81,7 +81,7 @@ export function uniformSampling(data: DataPoint[] | null, targetPoints: number):
 export function randomSampling(
   data: DataPoint[] | null,
   targetPoints: number,
-  preserveEnds: boolean = true,
+  preserveEnds = true,
   anomalyOptions?: {
     numericField: string;
     threshold?: number;

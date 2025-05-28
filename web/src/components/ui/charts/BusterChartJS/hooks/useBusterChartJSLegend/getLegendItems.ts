@@ -1,5 +1,5 @@
-import React from 'react';
-import { BusterChartLegendItem } from '../../../BusterChartLegend';
+import type React from 'react';
+import type { BusterChartLegendItem } from '../../../BusterChartLegend';
 import type { ChartJSOrUndefined } from '../../core/types';
 import { type BusterChartProps, ChartType } from '@/api/asset_interfaces/metric/charts';
 import type { ChartDataset } from 'chart.js';

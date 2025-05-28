@@ -1,7 +1,7 @@
-import React from 'react';
+import type React from 'react';
 import type { ITooltipItem, TooltipItemValueProps } from './interfaces';
 import { LegendItemDot } from '../BusterChartLegend/LegendDot';
-import { type ChartType } from '@/api/asset_interfaces/metric/charts';
+import type { ChartType } from '@/api/asset_interfaces/metric/charts';
 import { cn } from '@/lib/classMerge';
 
 export const TooltipItem: React.FC<ITooltipItem> = ({

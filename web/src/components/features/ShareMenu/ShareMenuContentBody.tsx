@@ -1,14 +1,14 @@
 import React from 'react';
 import { validate } from 'email-validator';
 import { useMemoizedFn } from '@/hooks';
-import { BusterShare, ShareRole, ShareAssetType } from '@/api/asset_interfaces';
+import { type BusterShare, ShareRole, ShareAssetType } from '@/api/asset_interfaces';
 import { Input } from '@/components/ui/inputs';
 import { Button } from '@/components/ui/buttons';
 import { AccessDropdown } from './AccessDropdown';
 import { IndividualSharePerson } from './IndividualSharePerson';
 import { ShareMenuContentEmbed } from './ShareMenuContentEmbed';
 import { ShareMenuContentPublish } from './ShareMenuContentPublish';
-import { ShareMenuTopBarOptions } from './ShareMenuTopBar';
+import type { ShareMenuTopBarOptions } from './ShareMenuTopBar';
 import { inputHasText } from '@/lib/text';
 import { cn } from '@/lib/classMerge';
 import {

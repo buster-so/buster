@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { useGetApiKeys, useCreateApiKey, useDeleteApiKey } from '@/api/buster_rest/api_keys';
 import { Button } from '@/components/ui/buttons';
 import { ApiKeyListItem } from './ApiKeyListItem';

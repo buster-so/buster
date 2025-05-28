@@ -1,6 +1,7 @@
-import React, { PropsWithChildren } from 'react';
+import type React from 'react';
+import type { PropsWithChildren } from 'react';
 import NewUserWelcome from '@/assets/png/new-user-welcome.png';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Buster Login'

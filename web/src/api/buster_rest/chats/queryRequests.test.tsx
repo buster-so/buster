@@ -9,7 +9,7 @@ import {
   useUpdateChatMessageFeedback
 } from './queryRequests';
 import type { IBusterChat } from '@/api/asset_interfaces/chat/iChatInterfaces';
-import React from 'react';
+import type React from 'react';
 
 // Mock the hooks and requests
 jest.mock('@/hooks', () => ({

@@ -3,8 +3,8 @@ import type {
   IBusterMetric,
   IBusterMetricData
 } from '@/api/asset_interfaces/metric';
-import { QueryClient, useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query';
-import { RustApiError } from '../errors';
+import { type QueryClient, useQuery, useQueryClient, type UseQueryOptions } from '@tanstack/react-query';
+import type { RustApiError } from '../errors';
 import { useOriginalMetricStore } from '@/context/Metrics/useOriginalMetricStore';
 import { useBusterAssetsContextSelector } from '@/context/Assets/BusterAssetsProvider';
 import { useGetMetricVersionNumber, useMetricQueryStore } from './metricQueryStore';

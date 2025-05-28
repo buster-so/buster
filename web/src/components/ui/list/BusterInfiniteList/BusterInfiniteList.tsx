@@ -2,7 +2,7 @@
 
 import React, { useRef } from 'react';
 import { useMemoizedFn } from '@/hooks';
-import { BusterListProps } from '../BusterList';
+import type { BusterListProps } from '../BusterList';
 import { getAllIdsInSection } from '../BusterList/helpers';
 import { useEffect, useMemo } from 'react';
 import { BusterListHeader } from '../BusterList/BusterListHeader';

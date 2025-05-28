@@ -1,12 +1,12 @@
 import isElement from 'lodash/isElement';
-import React from 'react';
+import type React from 'react';
 
 export const getAbsoluteHeight = (el: HTMLElement) => {
   // Get the DOM Node if you pass in a string
   const _el: any = typeof el === 'string' ? document.querySelector(el) : el;
   if (window && _el && el && isElement(_el)) {
     const styles = window.getComputedStyle(_el);
-    const margin = parseFloat(styles['marginTop']) + parseFloat(styles['marginBottom']);
+    const margin = Number.parseFloat(styles['marginTop']) + Number.parseFloat(styles['marginBottom']);
     return Math.ceil(_el.offsetHeight + margin);
   }
   return el?.offsetHeight || 0;
@@ -17,7 +17,7 @@ export const getAbsoluteWidth = (el: HTMLElement) => {
   const _el: any = typeof el === 'string' ? document.querySelector(el) : el;
   if (window && _el && el && isElement(_el)) {
     const styles = window.getComputedStyle(_el);
-    const margin = parseFloat(styles['marginLeft']) + parseFloat(styles['marginRight']);
+    const margin = Number.parseFloat(styles['marginLeft']) + Number.parseFloat(styles['marginRight']);
     return Math.ceil(_el.offsetWidth + margin);
   }
   return el?.offsetWidth || 0;

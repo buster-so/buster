@@ -1,6 +1,6 @@
-import { RustApiError } from '@/api/buster_rest/errors';
+import type { RustApiError } from '@/api/buster_rest/errors';
 import { userQueryKeys } from '@/api/query_keys/users';
-import { QueryClient, queryOptions } from '@tanstack/react-query';
+import type { QueryClient, queryOptions } from '@tanstack/react-query';
 
 export const isQueryStale = (
   options: ReturnType<typeof queryOptions<any, RustApiError, any>>,

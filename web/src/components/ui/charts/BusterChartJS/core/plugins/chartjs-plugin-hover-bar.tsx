@@ -1,4 +1,4 @@
-import { ChartType, Chart, Plugin } from 'chart.js';
+import type { ChartType, Chart, Plugin } from 'chart.js';
 
 export interface ChartHoverBarPluginOptions {
   //for bar chart

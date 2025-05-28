@@ -1,7 +1,7 @@
 import { Switch } from '@/components/ui/switch';
 import React from 'react';
 import { LabelAndInput } from '../../Common';
-import { LoopTrendline } from './EditTrendline';
+import type { LoopTrendline } from './EditTrendline';
 import { useMemoizedFn } from '@/hooks';
 
 export const EditTrendlineShowLine = React.memo(

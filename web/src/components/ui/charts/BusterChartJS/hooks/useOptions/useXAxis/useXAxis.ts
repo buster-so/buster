@@ -1,15 +1,15 @@
 import {
-  BusterChartConfigProps,
-  ChartEncodes,
+  type BusterChartConfigProps,
+  type ChartEncodes,
   ChartType,
-  BusterChartProps,
-  IColumnLabelFormat,
-  ComboChartAxis,
-  XAxisConfig
+  type BusterChartProps,
+  type IColumnLabelFormat,
+  type ComboChartAxis,
+  type XAxisConfig
 } from '@/api/asset_interfaces/metric/charts';
 import { useMemoizedFn } from '@/hooks';
 import { useMemo } from 'react';
-import { DeepPartial } from 'utility-types';
+import type { DeepPartial } from 'utility-types';
 import type { ScaleChartOptions, Scale, GridLineOptions, TimeScale } from 'chart.js';
 import { useXAxisTitle } from '../axisHooks/useXAxisTitle';
 import { useIsStacked } from '../useIsStacked';

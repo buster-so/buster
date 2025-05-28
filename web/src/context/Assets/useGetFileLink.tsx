@@ -1,4 +1,4 @@
-import { FileType } from '@/api/asset_interfaces/chat';
+import type { FileType } from '@/api/asset_interfaces/chat';
 import { useMemoizedFn } from '@/hooks';
 import { useChatLayoutContextSelector } from '@/layouts/ChatLayout';
 import { assetParamsToRoute } from '@/lib/assets';

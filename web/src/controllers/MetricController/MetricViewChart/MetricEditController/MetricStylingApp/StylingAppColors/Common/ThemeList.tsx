@@ -1,5 +1,5 @@
 import React from 'react';
-import { IColorTheme } from './interfaces';
+import type { IColorTheme } from './interfaces';
 import { Text } from '@/components/ui/typography';
 import { ThemeColorDots } from './ThemeColorDots';
 import { cn } from '@/lib/classMerge';

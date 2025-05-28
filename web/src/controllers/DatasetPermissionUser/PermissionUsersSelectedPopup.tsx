@@ -1,7 +1,7 @@
 import { useDatasetUpdatePermissionUsers } from '@/api/buster_rest';
 import { BusterListSelectedOptionPopupContainer } from '@/components/ui/list';
 import { useMemoizedFn } from '@/hooks';
-import { Dropdown, DropdownProps } from '@/components/ui/dropdown';
+import { Dropdown, type DropdownProps } from '@/components/ui/dropdown';
 import { Button } from '@/components/ui/buttons';
 import React, { useMemo } from 'react';
 import { PERMISSION_USERS_OPTIONS } from './config';

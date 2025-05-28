@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createTerm, deleteTerms, getTerm, getTermsList, updateTerm } from './requests';
 import { queryKeys } from '@/api/query_keys';
-import { BusterTerm } from '@/api/asset_interfaces/terms';
+import type { BusterTerm } from '@/api/asset_interfaces/terms';
 import { useMemo } from 'react';
 import { useMemoizedFn } from '@/hooks';
 import { useBusterNotifications } from '@/context/BusterNotifications';

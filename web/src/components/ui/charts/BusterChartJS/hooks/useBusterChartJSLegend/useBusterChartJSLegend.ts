@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useMemo, useState, useTransition } from 'react';
+import type React from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 import type { ChartJSOrUndefined } from '../../core/types';
 import type {
   BusterChartProps,
@@ -11,9 +12,9 @@ import { useDebounceFn, useMemoizedFn, useUpdateDebounceEffect } from '@/hooks';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces/metric';
 import {
   addLegendHeadlines,
-  BusterChartLegendItem,
+  type BusterChartLegendItem,
   useBusterChartLegend,
-  UseChartLengendReturnValues
+  type UseChartLengendReturnValues
 } from '../../../BusterChartLegend';
 import { getLegendItems } from './getLegendItems';
 import type { DatasetOptionsWithTicks } from '../../../chartHooks';

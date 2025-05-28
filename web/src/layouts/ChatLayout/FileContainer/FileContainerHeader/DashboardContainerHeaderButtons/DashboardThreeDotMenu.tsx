@@ -4,7 +4,7 @@ import {
   useGetDashboard,
   useRemoveDashboardFromCollection
 } from '@/api/buster_rest/dashboards';
-import { DropdownContent, DropdownItem, DropdownItems } from '@/components/ui/dropdown';
+import { DropdownContent, type DropdownItem, type DropdownItems } from '@/components/ui/dropdown';
 import {
   Trash,
   Dots,

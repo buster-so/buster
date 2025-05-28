@@ -1,5 +1,5 @@
-import React from 'react';
-import { SelectAxisContainerId } from '../config';
+import type React from 'react';
+import type { SelectAxisContainerId } from '../config';
 import { CategoryAxisSettingContent } from './CategoryAxisSettingContent';
 import { XAxisSettingContent } from './XAxisSettingContent';
 import { YAxisSettingContent } from './YAxisSettingContent';

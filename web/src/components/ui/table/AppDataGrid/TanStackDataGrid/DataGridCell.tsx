@@ -1,5 +1,5 @@
-import React from 'react';
-import { Cell, flexRender } from '@tanstack/react-table';
+import type React from 'react';
+import { type Cell, flexRender } from '@tanstack/react-table';
 import { cn } from '@/lib/utils';
 import { CELL_HEIGHT } from './constants';
 

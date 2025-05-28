@@ -1,12 +1,12 @@
 import { addLegendHeadlines } from './legendHeadlineHelpers';
-import { BusterChartLegendItem } from './interfaces';
+import type { BusterChartLegendItem } from './interfaces';
 import {
-  ShowLegendHeadline,
+  type ShowLegendHeadline,
   ChartType,
-  IColumnLabelFormat
+  type IColumnLabelFormat
 } from '@/api/asset_interfaces/metric/charts';
-import { DatasetOptionsWithTicks, KV } from '../chartHooks/useDatasetOptions/interfaces';
-import { ColumnMetaData, SimplifiedColumnType } from '@/api/asset_interfaces/metric';
+import { type DatasetOptionsWithTicks, KV } from '../chartHooks/useDatasetOptions/interfaces';
+import type { ColumnMetaData, SimplifiedColumnType } from '@/api/asset_interfaces/metric';
 
 describe('legendHeadlineHelpers', () => {
   const mockLegendItems: BusterChartLegendItem[] = [

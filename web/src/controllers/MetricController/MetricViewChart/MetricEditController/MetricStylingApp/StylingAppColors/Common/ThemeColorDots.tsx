@@ -1,5 +1,5 @@
 import { cn } from '@/lib/classMerge';
-import React from 'react';
+import type React from 'react';
 
 export const ThemeColorDots: React.FC<{
   selected: boolean;

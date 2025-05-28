@@ -1,6 +1,7 @@
 import { Avatar } from '@/components/ui/avatar';
 import { cn } from '@/lib/classMerge';
-import React, { forwardRef } from 'react';
+import type React from 'react';
+import { forwardRef } from 'react';
 
 interface MessageContainerProps {
   children: React.ReactNode;

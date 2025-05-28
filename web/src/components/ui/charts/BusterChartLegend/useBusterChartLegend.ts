@@ -2,13 +2,13 @@
 
 import React, { useMemo, useState } from 'react';
 import { useLegendAutoShow } from './useLegendAutoShow';
-import { BusterChartLegendItem } from './interfaces';
-import {
+import type { BusterChartLegendItem } from './interfaces';
+import type {
   BusterChartProps,
   ChartEncodes,
   ChartType,
   ComboChartAxis,
-  type ScatterAxis
+  ScatterAxis
 } from '@/api/asset_interfaces/metric/charts';
 import {
   DEFAULT_CATEGORY_AXIS_COLUMN_NAMES,

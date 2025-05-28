@@ -1,7 +1,7 @@
 import {
-  ColumnLabelFormat,
+  type ColumnLabelFormat,
   DEFAULT_COLUMN_LABEL_FORMAT,
-  IColumnLabelFormat,
+  type IColumnLabelFormat,
   type ColumnMetaData,
   type IBusterMetricChartConfig,
   type SimplifiedColumnType

@@ -5,7 +5,7 @@ import { CollapseFileButton } from './CollapseFileButton';
 import { useChatLayoutContextSelector } from '../../ChatLayoutContext';
 import { FileContainerHeaderVersionHistory } from './FileContainerHeaderVersionHistory';
 import { SelectedFileButtonsRecord, SelectedFileSegmentRecord } from './config';
-import { FileType } from '@/api/asset_interfaces/chat';
+import type { FileType } from '@/api/asset_interfaces/chat';
 import { useRouter } from 'next/navigation';
 import { useMount } from '@/hooks';
 import { BusterRoutes, createBusterRoute } from '@/routes';

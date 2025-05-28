@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { type BusterChartLegendItem, type BusterChartLegendProps } from './interfaces';
+import type { BusterChartLegendItem, BusterChartLegendProps } from './interfaces';
 import { useMemoizedFn } from '@/hooks';
 import { LegendItemDot } from './LegendDot';
 import { AnimatePresence, motion } from 'framer-motion';

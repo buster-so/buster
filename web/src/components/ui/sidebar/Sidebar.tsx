@@ -1,5 +1,5 @@
 import React from 'react';
-import { ISidebarGroup, ISidebarList, SidebarProps } from './interfaces';
+import type { ISidebarGroup, ISidebarList, SidebarProps } from './interfaces';
 import { SidebarCollapsible } from './SidebarCollapsible';
 import { SidebarItem } from './SidebarItem';
 

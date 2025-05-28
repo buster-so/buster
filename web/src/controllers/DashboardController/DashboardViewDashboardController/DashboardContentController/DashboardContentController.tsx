@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import isEmpty from 'lodash/isEmpty';
-import { BusterResizeableGrid, BusterResizeableGridRow } from '@/components/ui/grid';
+import { BusterResizeableGrid, type BusterResizeableGridRow } from '@/components/ui/grid';
 import { useDebounceFn, useMemoizedFn } from '@/hooks';
 import {
   hasRemovedMetrics,
@@ -18,7 +18,7 @@ import type {
   DashboardConfig
 } from '@/api/asset_interfaces';
 import { DashboardEmptyState, DashboardNoContentReadOnly } from './DashboardEmptyState';
-import { type useUpdateDashboardConfig } from '@/api/buster_rest/dashboards';
+import type { useUpdateDashboardConfig } from '@/api/buster_rest/dashboards';
 
 const DEFAULT_EMPTY_ROWS: DashboardConfig['rows'] = [];
 const DEFAULT_EMPTY_METRICS: Record<string, BusterMetric> = {};

@@ -1,12 +1,12 @@
 import {
-  DataSource,
-  DatabricksCredentials,
+  type DataSource,
+  type DatabricksCredentials,
   DatabricksCredentialsSchema
 } from '@/api/asset_interfaces';
-import React from 'react';
+import type React from 'react';
 import { FormWrapper } from './FormWrapper';
 import {
-  createDatabricksDataSource,
+  type createDatabricksDataSource,
   useCreateDatabricksDataSource,
   useUpdateDatabricksDataSource
 } from '@/api/buster_rest/data_source';

@@ -1,8 +1,8 @@
 import type { ColumnLabelFormat, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import { formatLabel } from '@/lib';
-import { DatasetOption } from '../chartHooks';
+import type { DatasetOption } from '../chartHooks';
 import { JOIN_CHARACTER, formatLabelForDataset, formatLabelForPieLegend } from './labelHelpers';
-import { BusterChartProps } from '@/api/asset_interfaces/metric/charts';
+import type { BusterChartProps } from '@/api/asset_interfaces/metric/charts';
 
 // Mock the formatLabel function
 jest.mock('@/lib', () => ({

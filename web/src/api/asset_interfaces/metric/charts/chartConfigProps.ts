@@ -1,4 +1,4 @@
-import { ChartType } from './enum';
+import type { ChartType } from './enum';
 import type { BarAndLineAxis, ComboChartAxis, PieChartAxis, ScatterAxis } from './axisInterfaces';
 import type {
   CategoryAxisStyleConfig,

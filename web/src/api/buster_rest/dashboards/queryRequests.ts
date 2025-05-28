@@ -1,9 +1,9 @@
 import {
-  QueryClient,
+  type QueryClient,
   useMutation,
   useQuery,
   useQueryClient,
-  UseQueryOptions
+  type UseQueryOptions
 } from '@tanstack/react-query';
 import {
   dashboardsGetList,
@@ -16,8 +16,8 @@ import {
 } from './requests';
 import { dashboardQueryKeys } from '@/api/query_keys/dashboard';
 import {
-  BusterDashboard,
-  BusterDashboardResponse,
+  type BusterDashboard,
+  type BusterDashboardResponse,
   MAX_NUMBER_OF_ITEMS_ON_DASHBOARD
 } from '@/api/asset_interfaces/dashboard';
 import { useMemo } from 'react';
@@ -31,7 +31,7 @@ import {
 import { collectionQueryKeys } from '@/api/query_keys/collection';
 import { addMetricToDashboardConfig, removeMetricFromDashboardConfig } from './helpers';
 import { addAndRemoveMetricsToDashboard } from './helpers/addAndRemoveMetricsToDashboard';
-import { RustApiError } from '../errors';
+import type { RustApiError } from '../errors';
 import { useOriginalDashboardStore } from '@/context/Dashboards';
 import { metricsQueryKeys } from '@/api/query_keys/metric';
 import {
@@ -461,7 +461,7 @@ export const useAddAndRemoveMetricsFromDashboard = () => {
             ...metricsToActuallyAdd.map((metric) => metric.id)
           ];
 
-          let newConfig = addAndRemoveMetricsToDashboard(
+          const newConfig = addAndRemoveMetricsToDashboard(
             finalMetricIds,
             dashboardResponse.dashboard.config
           );

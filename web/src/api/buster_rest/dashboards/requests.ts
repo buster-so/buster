@@ -4,7 +4,7 @@ import type {
   BusterDashboardResponse,
   DashboardConfig
 } from '@/api/asset_interfaces/dashboard';
-import {
+import type {
   ShareDeleteRequest,
   SharePostRequest,
   ShareUpdateRequest

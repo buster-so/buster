@@ -1,5 +1,5 @@
 import type { BusterCollection, BusterCollectionListItem } from '@/api/asset_interfaces/collection';
-import {
+import type {
   ShareDeleteRequest,
   SharePostRequest,
   ShareUpdateRequest

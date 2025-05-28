@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import type React from 'react';
 import { BusterListSelectedOptionPopupContainer } from '@/components/ui/list';
 import { Button } from '@/components/ui/buttons';
 import { useMemoizedFn } from '@/hooks';

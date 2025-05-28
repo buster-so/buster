@@ -1,5 +1,5 @@
 import { QueryClient, defaultShouldDehydrateQuery, isServer, Query } from '@tanstack/react-query';
-import { useBusterNotifications } from '../BusterNotifications';
+import type { useBusterNotifications } from '../BusterNotifications';
 import { openErrorNotification as openErrorNotificationMethod } from '../BusterNotifications';
 import { PERMANENT_QUERIES, PERSISTED_QUERIES } from './createPersister';
 

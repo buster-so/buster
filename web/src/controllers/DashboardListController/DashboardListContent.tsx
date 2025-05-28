@@ -5,8 +5,8 @@ import { Avatar } from '@/components/ui/avatar';
 import { formatDate } from '@/lib';
 import {
   BusterList,
-  BusterListColumn,
-  BusterListRow,
+  type BusterListColumn,
+  type BusterListRow,
   ListEmptyStateWithButton
 } from '@/components/ui/list';
 import { BusterRoutes, createBusterRoute } from '@/routes';

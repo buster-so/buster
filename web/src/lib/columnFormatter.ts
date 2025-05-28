@@ -4,7 +4,7 @@ import {
   DEFAULT_DATE_FORMAT_DAY_OF_WEEK,
   DEFAULT_DATE_FORMAT_MONTH_OF_YEAR,
   DEFAULT_DATE_FORMAT_QUARTER,
-  IColumnLabelFormat
+  type IColumnLabelFormat
 } from '@/api/asset_interfaces/metric';
 import { formatDate } from './date';
 import { formatNumber, roundNumber } from './numbers';
@@ -15,7 +15,7 @@ const DEFAULT_DATE_FORMAT = 'll';
 export const formatLabel = (
   textProp: string | number | Date | null | undefined | boolean,
   props: ColumnLabelFormat = DEFAULT_COLUMN_LABEL_FORMAT,
-  useKeyFormatter: boolean = false
+  useKeyFormatter = false
 ): string => {
   const {
     columnType = DEFAULT_COLUMN_LABEL_FORMAT.columnType,

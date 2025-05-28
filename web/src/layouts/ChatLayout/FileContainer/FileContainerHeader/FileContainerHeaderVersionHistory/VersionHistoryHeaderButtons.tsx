@@ -6,7 +6,7 @@ import { History } from '@/components/ui/icons';
 import { useMemoizedFn, useMount } from '@/hooks';
 import React from 'react';
 import { useListVersionDropdownItems } from '@/components/features/versionHistory/useListVersionDropdownItems';
-import { FileType } from '@/api/asset_interfaces/chat';
+import type { FileType } from '@/api/asset_interfaces/chat';
 import { Dropdown } from '@/components/ui/dropdown';
 
 export const VersionHistoryHeaderButtons: React.FC<{}> = React.memo(({}) => {

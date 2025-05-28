@@ -1,8 +1,8 @@
 'use client';
 
 import {
-  MutationFunction,
-  QueryKey,
+  type MutationFunction,
+  type QueryKey,
   type UseQueryOptions,
   useMutation,
   useQueryClient
@@ -20,7 +20,7 @@ import type {
   InferBusterSocketResponseData
 } from './types';
 import isEmpty from 'lodash/isEmpty';
-import { RustApiError } from '../buster_rest/errors';
+import type { RustApiError } from '../buster_rest/errors';
 
 /**
  * A custom hook that combines WebSocket communication with React Query's mutation capabilities.

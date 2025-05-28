@@ -3,9 +3,9 @@
 import React from 'react';
 import { Text } from '@/components/ui/typography';
 import { Button } from '@/components/ui/buttons';
-import { AppSegmented, SegmentedItem } from '@/components/ui/segmented';
+import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
 import { Plus } from '@/components/ui/icons';
-import { type dashboardsGetList } from '@/api/buster_rest/dashboards';
+import type { dashboardsGetList } from '@/api/buster_rest/dashboards';
 
 export const DashboardHeader: React.FC<{
   dashboardFilters: {

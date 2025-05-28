@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { BusterChart } from '../BusterChart';
+import type { BusterChart } from '../BusterChart';
 import { ChartType } from '../../../../api/asset_interfaces/metric/charts/enum';
-import { IColumnLabelFormat } from '../../../../api/asset_interfaces/metric/charts/columnLabelInterfaces';
+import type { IColumnLabelFormat } from '../../../../api/asset_interfaces/metric/charts/columnLabelInterfaces';
 import { addNoise, generateLineChartData } from '../../../../mocks/chart/chartMocks';
 import { sharedMeta } from './BusterChartShared';
 import dayjs from 'dayjs';

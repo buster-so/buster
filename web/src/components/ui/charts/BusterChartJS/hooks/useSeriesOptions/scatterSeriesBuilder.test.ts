@@ -1,4 +1,4 @@
-import { type IColumnLabelFormat } from '@/api/asset_interfaces/metric';
+import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric';
 import { scatterSeriesBuilder_data, scatterSeriesBuilder_labels } from './scatterSeriesBuilder';
 import { createDayjsDate } from '@/lib/date';
 import type { DatasetOptionsWithTicks } from '../../../chartHooks/useDatasetOptions/interfaces';

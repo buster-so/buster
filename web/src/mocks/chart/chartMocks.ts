@@ -1,4 +1,4 @@
-import { IDataResult } from '@/api/asset_interfaces/metric/interfaces';
+import type { IDataResult } from '@/api/asset_interfaces/metric/interfaces';
 import dayjs from 'dayjs';
 
 // Helper to generate dates for time series
@@ -14,7 +14,7 @@ const generateDates = (count: number) => {
 };
 
 // Helper to add controlled noise to values
-export const addNoise = (value: number, variabilityPercent: number = 10): number => {
+export const addNoise = (value: number, variabilityPercent = 10): number => {
   const maxNoise = value * (variabilityPercent / 100);
   const noise = Math.sin(value) * maxNoise; // Using sin for pseudo-random but predictable noise
   return Math.round(value + noise);

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { FileContainerButtonsProps } from '../interfaces';
+import type { FileContainerButtonsProps } from '../interfaces';
 import { useGetDashboard } from '@/api/buster_rest/dashboards';
 import { useIsDashboardReadOnly } from '@/context/Dashboards/useIsDashboardReadOnly';
 import { canEdit, getIsEffectiveOwner } from '@/lib/share';

@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import type React from 'react';
+import { useEffect } from 'react';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { HeaderContainer } from '../../_HeaderContainer';
 import { useState } from 'react';
-import { DatabaseNames, DataSourceTypes, SUPPORTED_DATASOURCES } from '@/api/asset_interfaces';
+import { DatabaseNames, type DataSourceTypes, SUPPORTED_DATASOURCES } from '@/api/asset_interfaces';
 import { DataSourceFormContent } from '../[datasourceId]/_forms/DatasourceFormContent';
 import { Title, Text } from '@/components/ui/typography';
 import { cn } from '@/lib/classMerge';

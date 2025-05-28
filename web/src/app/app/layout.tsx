@@ -1,6 +1,6 @@
 'use server';
 
-import React from 'react';
+import type React from 'react';
 import { createBusterRoute } from '@/routes';
 import { BusterRoutes } from '@/routes/busterRoutes';
 import { ClientRedirect } from '../../components/ui/layouts/ClientRedirect';

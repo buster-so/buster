@@ -1,8 +1,8 @@
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import React, { useMemo } from 'react';
 import { LabelAndInput } from '../Common';
-import { PieSortBy } from '@/api/asset_interfaces/metric/charts';
-import { AppSegmented, SegmentedItem } from '@/components/ui/segmented';
+import type { PieSortBy } from '@/api/asset_interfaces/metric/charts';
+import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
 import { SortAlphaAscending, SortNumAscending, Empty } from '@/components/ui/icons';
 import { useMemoizedFn } from '@/hooks';
 

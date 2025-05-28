@@ -14,7 +14,7 @@ import type {
 } from '@/api/buster_socket';
 import { useBusterWebSocket } from '@/context/BusterWebSocket';
 import { useMemoizedFn } from '@/hooks';
-import { InferBusterSocketResponseData } from './types';
+import type { InferBusterSocketResponseData } from './types';
 
 export function useSocketQueryEmitAndOnce<
   TRoute extends BusterSocketResponseRoute,

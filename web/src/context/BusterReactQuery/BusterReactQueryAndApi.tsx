@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useLayoutEffect, useState } from 'react';
+import type React from 'react';
+import { useLayoutEffect, useState } from 'react';
 import mainApi from '@/api/buster_rest/instances';
 import { defaultRequestHandler } from '@/api/createInstance';
 import nextApi from '@/api/next/instances';

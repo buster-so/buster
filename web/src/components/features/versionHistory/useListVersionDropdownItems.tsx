@@ -1,5 +1,5 @@
-import { FileType } from '@/api/asset_interfaces/chat';
-import { DropdownItems } from '@/components/ui/dropdown';
+import type { FileType } from '@/api/asset_interfaces/chat';
+import type { DropdownItems } from '@/components/ui/dropdown';
 import { useGetFileLink } from '@/context/Assets/useGetFileLink';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useMemoizedFn } from '@/hooks';

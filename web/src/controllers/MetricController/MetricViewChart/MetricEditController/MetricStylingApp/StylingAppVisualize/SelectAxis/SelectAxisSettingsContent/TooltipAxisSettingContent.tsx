@@ -1,5 +1,5 @@
 import React from 'react';
-import { SelectAxisContainerId } from '../config';
+import type { SelectAxisContainerId } from '../config';
 import { EditShowTooltip } from './EditShowTooltip';
 import { useSelectAxisContextSelector } from '../useSelectAxisContext';
 import { useMemoizedFn } from '@/hooks';

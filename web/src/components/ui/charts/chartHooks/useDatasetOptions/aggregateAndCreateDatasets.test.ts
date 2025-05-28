@@ -1,6 +1,6 @@
 import { describe, it, expect } from '@jest/globals';
 import { aggregateAndCreateDatasets } from './aggregateAndCreateDatasets';
-import { DEFAULT_COLUMN_LABEL_FORMAT, IColumnLabelFormat } from '@/api/asset_interfaces';
+import { DEFAULT_COLUMN_LABEL_FORMAT, type IColumnLabelFormat } from '@/api/asset_interfaces';
 
 describe('aggregateAndCreateDatasets', () => {
   it('should handle single x-axis and single y-axis', () => {

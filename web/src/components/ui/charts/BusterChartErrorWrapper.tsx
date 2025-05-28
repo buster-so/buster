@@ -1,7 +1,7 @@
 import { StatusCard } from '@/components/ui/card/StatusCard';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { ErrorBoundary } from '../error/ErrorBoundary';
-import React from 'react';
+import type React from 'react';
 
 interface Props {
   children: ReactNode;

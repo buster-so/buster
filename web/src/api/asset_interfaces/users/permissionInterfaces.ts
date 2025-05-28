@@ -1,4 +1,4 @@
-import { TeamRole } from './interfaces';
+import type { TeamRole } from './interfaces';
 
 export interface BusterUserDatasetGroup {
   id: string;

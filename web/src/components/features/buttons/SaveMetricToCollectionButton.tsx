@@ -1,6 +1,7 @@
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks';
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { SaveToCollectionsDropdown } from '../dropdowns/SaveToCollectionsDropdown';
 import { CollectionButton } from './CollectionsButton';
 import {

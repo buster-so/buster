@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { ConfirmModal, ConfirmProps } from './ConfirmModal';
+import { ConfirmModal, type ConfirmProps } from './ConfirmModal';
 import { Button } from '../buttons/Button';
 import React from 'react';
 import { fn } from '@storybook/test';

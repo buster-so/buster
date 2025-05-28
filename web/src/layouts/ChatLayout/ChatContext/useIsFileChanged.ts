@@ -1,5 +1,5 @@
 import { useIsMetricChanged } from '@/context/Metrics';
-import { SelectedFile } from '../interfaces';
+import type { SelectedFile } from '../interfaces';
 import { useIsDashboardChanged } from '@/context/Dashboards';
 import { useMemo } from 'react';
 

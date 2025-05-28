@@ -1,5 +1,5 @@
 import { mainApi } from '../instances';
-import { BusterTerm, BusterTermListItem } from '@/api/asset_interfaces/terms';
+import type { BusterTerm, BusterTermListItem } from '@/api/asset_interfaces/terms';
 
 export const getTermsList = async (params: {
   /** The page number to retrieve */

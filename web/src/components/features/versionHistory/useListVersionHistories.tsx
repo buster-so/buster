@@ -69,7 +69,7 @@ export const useListVersionHistories = ({
   }, [type, dashboardSelectedQueryVersion, metricSelectedQueryVersion]);
 
   const onClickRestoreVersion = useMemoizedFn(
-    async (versionNumber: number, rereouteToAsset: boolean = true) => {
+    async (versionNumber: number, rereouteToAsset = true) => {
       setRestoringVersion(versionNumber);
 
       if (type === 'metric') {

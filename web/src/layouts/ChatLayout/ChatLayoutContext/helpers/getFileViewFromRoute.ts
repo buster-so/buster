@@ -1,5 +1,5 @@
 import { BusterRoutes } from '@/routes/busterRoutes';
-import { FileView } from '../useLayoutConfig';
+import type { FileView } from '../useLayoutConfig';
 
 const routeToFileView: Partial<Record<BusterRoutes, FileView>> = {
   [BusterRoutes.APP_METRIC_ID_CHART]: 'chart',

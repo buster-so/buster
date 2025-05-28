@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { AppSegmented } from '@/components/ui/segmented';
 import { useMemoizedFn } from '@/hooks';
-import { type SegmentedItem } from '@/components/ui/segmented';
+import type { SegmentedItem } from '@/components/ui/segmented';
 import { Separator } from '@/components/ui/seperator';
 import { createBusterRoute, BusterRoutes } from '@/routes';
 

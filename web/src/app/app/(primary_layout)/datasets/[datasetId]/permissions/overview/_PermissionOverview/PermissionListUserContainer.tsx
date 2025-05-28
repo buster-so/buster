@@ -3,8 +3,8 @@
 import React, { useMemo, useState } from 'react';
 import type { DatasetPermissionOverviewUser } from '@/api/asset_interfaces';
 import {
-  BusterListColumn,
-  BusterListRowItem,
+  type BusterListColumn,
+  type BusterListRowItem,
   EmptyStateList,
   InfiniteListContainer
 } from '@/components/ui/list';

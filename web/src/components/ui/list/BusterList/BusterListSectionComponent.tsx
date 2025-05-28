@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Text } from '@/components/ui/typography';
-import { BusterListRow } from './interfaces';
+import type { BusterListRow } from './interfaces';
 import { useMemoizedFn } from '@/hooks';
 import { CheckboxColumn } from './CheckboxColumn';
 import { getAllIdsInSection } from './helpers';

@@ -1,4 +1,4 @@
-import { ShareAssetType, VerificationStatus, BusterMetricListItem } from '@/api/asset_interfaces';
+import { ShareAssetType, type VerificationStatus, type BusterMetricListItem } from '@/api/asset_interfaces';
 import { makeHumanReadble, formatDate } from '@/lib';
 import React, { memo, useMemo, useRef, useState } from 'react';
 import {
@@ -9,7 +9,7 @@ import { Text } from '@/components/ui/typography';
 import { Avatar } from '@/components/ui/avatar';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { useMemoizedFn } from '@/hooks';
-import { BusterListColumn, BusterListRow } from '@/components/ui/list';
+import type { BusterListColumn, BusterListRow } from '@/components/ui/list';
 import { MetricSelectedOptionPopup } from './MetricItemsSelectedPopup';
 import { BusterList, ListEmptyStateWithButton } from '@/components/ui/list';
 import { FavoriteStar } from '@/components/features/list';

@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { render, screen } from '@testing-library/react';
 import { MetricContainerHeaderSegment } from './MetricContainerHeaderSegment';
 import { useIsMetricReadOnly } from '@/context/Metrics/useIsMetricReadOnly';

@@ -1,7 +1,7 @@
 'use server';
 
-import { NextRequest, NextResponse } from 'next/server';
-import { AppSupportRequest } from '@/api/buster_rest/nextjs/support';
+import { type NextRequest, NextResponse } from 'next/server';
+import type { AppSupportRequest } from '@/api/buster_rest/nextjs/support';
 import { createClient } from '@/lib/supabase/server';
 
 const slackHookURL = process.env.NEXT_SLACK_APP_SUPPORT_URL!;

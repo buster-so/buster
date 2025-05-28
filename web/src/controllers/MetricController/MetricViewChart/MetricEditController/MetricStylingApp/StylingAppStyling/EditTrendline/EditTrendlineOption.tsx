@@ -1,10 +1,10 @@
-import { Select, SelectItem } from '@/components/ui/select';
+import { Select, type SelectItem } from '@/components/ui/select';
 import { LabelAndInput } from '../../Common';
 import { trendlineOptions } from './config';
-import { LoopTrendline } from './EditTrendline';
+import type { LoopTrendline } from './EditTrendline';
 import React, { useMemo } from 'react';
 import type { ChartType, Trendline } from '@/api/asset_interfaces/metric/charts';
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { isDateColumnType, isNumericColumnType } from '@/lib';
 import { AppTooltip } from '@/components/ui/tooltip';
 import { TriangleWarning } from '@/components/ui/icons';

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { LabelAndInput } from '../../../Common/LabelAndInput';
-import { Select, SelectItem } from '@/components/ui/select';
-import { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import { Select, type SelectItem } from '@/components/ui/select';
+import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import { useMemoizedFn } from '@/hooks';
 import last from 'lodash/last';
 import first from 'lodash/first';

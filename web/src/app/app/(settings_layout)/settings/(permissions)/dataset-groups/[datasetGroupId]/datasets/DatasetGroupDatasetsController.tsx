@@ -3,7 +3,8 @@
 import { useGetDatasetGroupDatasets } from '@/api/buster_rest';
 import { useDebounceSearch } from '@/hooks/useDebounceSearch';
 import { PermissionSearchAndListWrapper } from '@/components/features/PermissionComponents';
-import React, { useMemo, useState } from 'react';
+import type React from 'react';
+import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/buttons';
 import { Plus } from '@/components/ui/icons';
 import { DatasetGroupDatasetsListContainer } from './DatasetGroupDatasetsListContainer';

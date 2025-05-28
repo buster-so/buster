@@ -1,6 +1,6 @@
 import { BusterListSelectedOptionPopupContainer } from '@/components/ui/list';
 import { Button } from '@/components/ui/buttons';
-import { Dropdown, DropdownItem } from '@/components/ui/dropdown';
+import { Dropdown, type DropdownItem } from '@/components/ui/dropdown';
 import React, { useMemo } from 'react';
 import { useMemoizedFn } from '@/hooks';
 import { useDatasetUpdatePermissionGroups } from '@/api/buster_rest';

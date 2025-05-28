@@ -1,6 +1,6 @@
 import { sortLineBarData } from './datasetHelpers_BarLinePie';
-import { type BusterChartProps } from '@/api/asset_interfaces/metric/charts';
-import { type ColumnMetaData } from '@/api/asset_interfaces/metric';
+import type { BusterChartProps } from '@/api/asset_interfaces/metric/charts';
+import type { ColumnMetaData } from '@/api/asset_interfaces/metric';
 
 describe('sortLineBarData', () => {
   test('returns original data when xFieldSorts is empty', () => {

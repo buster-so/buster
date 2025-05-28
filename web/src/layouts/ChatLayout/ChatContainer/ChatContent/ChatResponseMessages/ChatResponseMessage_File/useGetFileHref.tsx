@@ -1,4 +1,4 @@
-import { BusterChatResponseMessage_file } from '@/api/asset_interfaces/chat';
+import type { BusterChatResponseMessage_file } from '@/api/asset_interfaces/chat';
 import { useGetFileLink } from '@/context/Assets/useGetFileLink';
 import { BusterRoutes } from '@/routes';
 

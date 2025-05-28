@@ -1,9 +1,9 @@
 import {
-  QueryClient,
+  type QueryClient,
   useMutation,
   useQuery,
   useQueryClient,
-  UseQueryOptions
+  type UseQueryOptions
 } from '@tanstack/react-query';
 import { collectionQueryKeys } from '@/api/query_keys/collection';
 import {
@@ -24,7 +24,7 @@ import { useMemoizedFn } from '@/hooks';
 import { useBusterAssetsContextSelector } from '@/context/Assets/BusterAssetsProvider';
 import { create } from 'mutative';
 import type { BusterCollection } from '@/api/asset_interfaces/collection';
-import { RustApiError } from '../errors';
+import type { RustApiError } from '../errors';
 import { hasOrganizationId, isQueryStale } from '@/lib';
 
 export const useGetCollectionsList = (

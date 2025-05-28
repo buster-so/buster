@@ -5,7 +5,7 @@ import React, { useMemo } from 'react';
 import { formatLabel } from '@/lib';
 import { EditTitle } from './EditTitle';
 import { EditDisplayAs } from './EditDisplayAs';
-import { ChartEncodes, ChartType, ColumnSettings } from '@/api/asset_interfaces/metric/charts';
+import { type ChartEncodes, ChartType, type ColumnSettings } from '@/api/asset_interfaces/metric/charts';
 import { EditBarRoundness } from './EditBarRoundness';
 import { EditShowDataLabel } from './EditShowDataLabel';
 import { EditShowBarLabelAsPercentage } from './EditShowLabelAsPercentage';

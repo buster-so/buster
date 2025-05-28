@@ -1,6 +1,6 @@
 import {
-  BusterDashboard,
-  BusterDashboardResponse,
+  type BusterDashboard,
+  type BusterDashboardResponse,
   VerificationStatus
 } from '@/api/asset_interfaces';
 import { ShareRole } from '@/api/asset_interfaces';
@@ -19,7 +19,7 @@ const createMockDashboardRow = (startIndex: number, metrics: string[], columnSiz
 
 export const generateMockDashboard = (
   numMetrics: number,
-  dashboardId: string = '123'
+  dashboardId = '123'
 ): DashboardMockResponse => {
   // Generate the specified number of metrics
   const metrics = Array.from({ length: numMetrics }, (_, i) => createMockMetric(`${i + 1}`));

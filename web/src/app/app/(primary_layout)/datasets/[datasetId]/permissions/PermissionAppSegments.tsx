@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useRef } from 'react';
-import { AppSegmented, SegmentedItem } from '@/components/ui/segmented';
+import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
 import { PermissionApps } from './config';
 import { useMemoizedFn, useSet } from '@/hooks';
 import { Separator } from '@/components/ui/seperator';

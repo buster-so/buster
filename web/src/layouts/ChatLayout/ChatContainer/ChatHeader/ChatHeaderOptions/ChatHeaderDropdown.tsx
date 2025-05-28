@@ -1,4 +1,4 @@
-import { Dropdown, DropdownItems } from '@/components/ui/dropdown';
+import { Dropdown, type DropdownItems } from '@/components/ui/dropdown';
 import React, { useMemo } from 'react';
 import { useChatIndividualContextSelector } from '../../../ChatContext';
 import { Copy, Trash, Pencil, DuplicatePlus, Star } from '@/components/ui/icons';

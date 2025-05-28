@@ -1,6 +1,6 @@
 import { ChartType } from '@/api/asset_interfaces/metric';
 import { modifyDatasets } from './modifyDatasets';
-import { DatasetOption, DatasetOptionsWithTicks } from './interfaces';
+import type { DatasetOption, DatasetOptionsWithTicks } from './interfaces';
 
 describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
   // Basic dataset setup

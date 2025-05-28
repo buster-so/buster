@@ -1,4 +1,4 @@
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import React, { useMemo } from 'react';
 import { EditBarRoundness } from '../StylingAppVisualize/SelectAxis/SelectAxisColumnContent/EditBarRoundness';
 import { useMemoizedFn } from '@/hooks';
@@ -11,7 +11,7 @@ export const EditBarRoundnessGlobal: React.FC<{
   const mostPermissiveBarRoundness = useMemo(() => {
     return Object.values(columnSettings).reduce((acc, curr) => {
       return Math.min(acc, curr.barRoundness);
-    }, Infinity);
+    }, Number.POSITIVE_INFINITY);
   }, []);
 
   const onUpdateBarRoundness = useMemoizedFn((v: Partial<ColumnSettings>) => {

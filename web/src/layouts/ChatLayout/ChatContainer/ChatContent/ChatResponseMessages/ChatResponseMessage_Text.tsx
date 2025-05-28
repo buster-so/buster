@@ -1,6 +1,6 @@
 import React from 'react';
-import { ChatResponseMessageProps } from './ChatResponseMessageSelector';
-import { BusterChatResponseMessage_text } from '@/api/asset_interfaces';
+import type { ChatResponseMessageProps } from './ChatResponseMessageSelector';
+import type { BusterChatResponseMessage_text } from '@/api/asset_interfaces';
 import { useGetChatMessage } from '@/api/buster_rest/chats';
 import { AppMarkdown } from '@/components/ui/typography/AppMarkdown/AppMarkdown';
 

@@ -5,7 +5,7 @@ import { AppModal } from '@/components/ui/modal';
 import { useUpdateCollection } from '@/api/buster_rest/collections';
 import { Input } from '@/components/ui/inputs/Input';
 import { useMemoizedFn } from '@/hooks';
-import { type ButtonProps } from '@/components/ui/buttons';
+import type { ButtonProps } from '@/components/ui/buttons';
 
 interface RenameCollectionModalProps {
   collectionId: string;

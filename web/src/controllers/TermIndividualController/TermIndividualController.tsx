@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import type React from 'react';
 import { TermIndividualHeader } from './TermIndividualHeader';
 import { AppPageLayout, AppSplitter } from '@/components/ui/layouts';
 import { TermIndividualHeaderSider } from './TermIndividualHeaderSider';

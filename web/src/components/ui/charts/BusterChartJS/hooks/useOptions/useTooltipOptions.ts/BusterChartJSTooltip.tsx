@@ -1,6 +1,7 @@
 import { BusterChartTooltip } from '../../../../BusterChartTooltip';
 import { type BusterChartProps, ChartType } from '@/api/asset_interfaces/metric/charts';
-import React, { useMemo } from 'react';
+import type React from 'react';
+import { useMemo } from 'react';
 import type { Chart, TooltipItem, ChartType as ChartJSChartType, TimeScale } from 'chart.js';
 import type { ITooltipItem } from '../../../../BusterChartTooltip/interfaces';
 import { barAndLineTooltipHelper } from './barAndLineTooltipHelper';

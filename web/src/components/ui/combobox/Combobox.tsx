@@ -81,7 +81,7 @@ export function Combobox(props: ComboboxProps) {
     if (useIndex) {
       const isKeyInIndex = e.key.match(/^\d+$/);
       if (isKeyInIndex) {
-        const index = parseInt(isKeyInIndex[0]);
+        const index = Number.parseInt(isKeyInIndex[0]);
         if (index < options.length) {
           e.preventDefault();
           handleSelect(options[index].value);

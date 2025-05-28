@@ -1,6 +1,6 @@
 import React from 'react';
 import { classNames } from './base';
-import { ISashContentProps } from './types';
+import type { ISashContentProps } from './types';
 
 function SashContent ({
 	className,

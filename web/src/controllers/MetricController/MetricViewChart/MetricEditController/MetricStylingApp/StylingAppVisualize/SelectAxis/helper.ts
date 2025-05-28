@@ -1,4 +1,4 @@
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import type { DropZone } from './SelectAxisDragContainer/interfaces';
 import { ChartType } from '@/api/asset_interfaces/metric/charts';
 import { SelectAxisContainerId } from './config';

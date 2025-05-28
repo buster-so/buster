@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import React from 'react';
+import type React from 'react';
 import { BusterStyleProvider } from '@/context/BusterStyles';
 import '../styles/styles.scss';
 

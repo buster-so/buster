@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useMemo } from 'react';
 import { Input } from '@/components/ui/inputs';
-import { Select, SelectItem } from '@/components/ui/select';
+import { Select, type SelectItem } from '@/components/ui/select';
 import { useMemoizedFn, useMount } from '@/hooks';
 import { useCreateDataset } from '@/api/buster_rest/datasets';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';

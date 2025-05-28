@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { LabelAndInput } from '../../Common';
-import { LoopTrendline } from './EditTrendline';
+import type { LoopTrendline } from './EditTrendline';
 import { SliderWithInputNumber } from '@/components/ui/slider';
 
 interface TrendlinePolynomialOrderProps {

@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
 import { useSelectAxisContextSelector } from '../useSelectAxisContext';
-import { ColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import type { ColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import { formatLabel } from '@/lib';
 import { useMemoizedFn } from '@/hooks';
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { EditShowAxisTitle } from './EditShowAxisTitle';
 import { EditShowAxisLabel } from './EditShowAxisLabel';
 import { EditAxisLabelRotation } from './EditAxisLabelRotation';

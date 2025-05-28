@@ -2,7 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useOriginalDashboardStore } from './useOriginalDashboardStore';
 import { useMemoizedFn } from '@/hooks';
 import { useGetDashboard } from '@/api/buster_rest/dashboards';
-import { BusterDashboardResponse } from '@/api/asset_interfaces/dashboard';
+import type { BusterDashboardResponse } from '@/api/asset_interfaces/dashboard';
 import { dashboardQueryKeys } from '@/api/query_keys/dashboard';
 import { compareObjectsByKeys } from '@/lib/objects';
 import { useMemo } from 'react';

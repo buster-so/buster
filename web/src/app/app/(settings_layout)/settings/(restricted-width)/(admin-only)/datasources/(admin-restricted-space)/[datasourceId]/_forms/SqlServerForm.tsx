@@ -1,12 +1,12 @@
 import {
-  DataSource,
-  SQLServerCredentials,
+  type DataSource,
+  type SQLServerCredentials,
   SQLServerCredentialsSchema
 } from '@/api/asset_interfaces';
-import React from 'react';
+import type React from 'react';
 import { FormWrapper } from './FormWrapper';
 import {
-  createSQLServerDataSource,
+  type createSQLServerDataSource,
   useCreateSQLServerDataSource,
   useUpdateSQLServerDataSource
 } from '@/api/buster_rest/data_source';

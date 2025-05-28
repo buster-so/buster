@@ -1,7 +1,7 @@
 import type { ChartProps } from '../../core';
-import { LabelBuilderProps } from './useSeriesOptions';
+import type { LabelBuilderProps } from './useSeriesOptions';
 import { formatLabelForDataset, JOIN_CHARACTER } from '../../../commonHelpers';
-import { SeriesBuilderProps } from './interfaces';
+import type { SeriesBuilderProps } from './interfaces';
 import { formatLabel } from '@/lib';
 
 type PieSerieType =

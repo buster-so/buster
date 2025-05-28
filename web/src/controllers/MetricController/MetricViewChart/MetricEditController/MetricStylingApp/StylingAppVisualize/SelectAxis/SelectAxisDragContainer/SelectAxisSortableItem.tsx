@@ -1,7 +1,8 @@
 import { useSortable } from '@dnd-kit/sortable';
-import React, { useMemo } from 'react';
+import type React from 'react';
+import { useMemo } from 'react';
 import { CSS } from '@dnd-kit/utilities';
-import { SelectAxisDraggableItemProps } from './interfaces';
+import type { SelectAxisDraggableItemProps } from './interfaces';
 import { SelectAxisItem } from './SelectAxisItem';
 
 export const SelectAxisSortableItem: React.FC<SelectAxisDraggableItemProps> = ({

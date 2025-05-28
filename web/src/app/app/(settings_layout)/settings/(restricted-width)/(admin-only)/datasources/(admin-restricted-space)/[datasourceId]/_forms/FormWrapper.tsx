@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import type React from 'react';
 import { WhiteListBlock } from './WhiteListBlock';
 import { FormApi } from '@tanstack/react-form';
 import { Button } from '@/components/ui/buttons';

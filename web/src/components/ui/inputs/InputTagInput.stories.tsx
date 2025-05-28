@@ -3,7 +3,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { InputTagInput } from './InputTagInput';
 import { useState } from 'react';
-import React from 'react';
+import type React from 'react';
 
 const meta: Meta<typeof InputTagInput> = {
   title: 'UI/Inputs/InputTagInput',

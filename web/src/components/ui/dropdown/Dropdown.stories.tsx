@@ -1,7 +1,7 @@
 'use client';
 
 import type { Meta, StoryObj } from '@storybook/react';
-import { Dropdown, DropdownItems } from './Dropdown';
+import { Dropdown, type DropdownItems } from './Dropdown';
 import { Button } from '../buttons/Button';
 import { PaintRoller, Star, Storage } from '../icons';
 import { faker } from '@faker-js/faker';

@@ -5,7 +5,7 @@ import {} from '@/components/ui/icons';
 import { Avatar } from '@/components/ui/avatar';
 import { createBusterRoute, BusterRoutes } from '@/routes';
 import { formatDate } from '@/lib';
-import {
+import type {
   BusterCollection,
   BusterCollectionItemAsset,
   BusterCollectionListItem
@@ -14,7 +14,7 @@ import { Text } from '@/components/ui/typography';
 import { ListEmptyStateWithButton } from '@/components/ui/list';
 import { ShareAssetType } from '@/api/asset_interfaces';
 import { useMemoizedFn } from '@/hooks';
-import { BusterList, BusterListColumn, BusterListRow } from '@/components/ui/list';
+import { BusterList, type BusterListColumn, type BusterListRow } from '@/components/ui/list';
 import { CollectionIndividualSelectedPopup } from './CollectionsIndividualPopup';
 import { ASSET_ICONS } from '@/components/features/config/assetIcons';
 import { AddToCollectionModal } from '@/components/features/modal/AddToCollectionModal';

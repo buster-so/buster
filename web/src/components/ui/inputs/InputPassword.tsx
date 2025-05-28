@@ -1,6 +1,6 @@
 'use client';
 
-import { Input, InputProps } from './Input';
+import { Input, type InputProps } from './Input';
 import React, { useState } from 'react';
 import { Button } from '../buttons';
 import { Eye, EyeSlash } from '../icons';

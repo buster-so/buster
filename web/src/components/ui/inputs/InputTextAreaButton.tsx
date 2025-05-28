@@ -1,5 +1,5 @@
 import React, { useMemo, forwardRef } from 'react';
-import { InputTextArea, InputTextAreaProps } from './InputTextArea';
+import { InputTextArea, type InputTextAreaProps } from './InputTextArea';
 import { cn } from '@/lib/classMerge';
 import { cva } from 'class-variance-authority';
 import { Button } from '../buttons/Button';

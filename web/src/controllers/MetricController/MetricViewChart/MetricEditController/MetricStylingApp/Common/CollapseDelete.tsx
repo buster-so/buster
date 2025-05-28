@@ -3,8 +3,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronRight, Trash } from '@/components/ui/icons';
 import { useMemoizedFn } from '@/hooks';
 import { Text } from '@/components/ui/typography';
-import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
-import { DraggableAttributes } from '@dnd-kit/core';
+import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
+import type { DraggableAttributes } from '@dnd-kit/core';
 import { Button } from '@/components/ui/buttons';
 import { cn } from '@/lib/classMerge';
 

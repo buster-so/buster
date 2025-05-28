@@ -1,4 +1,4 @@
-import { BusterChatResponseMessage_file } from '@/api/asset_interfaces';
+import type { BusterChatResponseMessage_file } from '@/api/asset_interfaces';
 import { useGetDashboardVersionNumber } from '@/api/buster_rest/dashboards/dashboardQueryStore';
 import { useGetMetricVersionNumber } from '@/api/buster_rest/metrics';
 import { useChatLayoutContextSelector } from '@/layouts/ChatLayout';

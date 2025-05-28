@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { type SelectItem } from './Select';
+import type { SelectItem } from './Select';
 import { selectVariants } from './SelectBase';
 import { cn } from '@/lib/classMerge';
 import { Dropdown, type DropdownItem } from '../dropdown/Dropdown';
-import { VariantProps } from 'class-variance-authority';
+import type { VariantProps } from 'class-variance-authority';
 import { useMemoizedFn } from '@/hooks';
 import { InputTag } from '../inputs/InputTag';
 

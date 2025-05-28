@@ -10,7 +10,7 @@ import type {
   OrganizationUser,
   BusterUserListItem
 } from '@/api/asset_interfaces/users';
-import { getUserList } from '../buster_rest/users/requests';
+import type { getUserList } from '../buster_rest/users/requests';
 
 const favoritesGetList = queryOptions<BusterUserFavorite[]>({
   queryKey: ['myself', 'list', 'favorites'] as const,

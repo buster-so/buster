@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useLayoutEffect, useMemo, useRef } from 'react';
+import type React from 'react';
+import { useLayoutEffect, useMemo, useRef } from 'react';
 import { FileContainerHeader } from './FileContainerHeader';
-import { AppPageLayout, AppSplitter, AppSplitterRef } from '@/components/ui/layouts';
+import { AppPageLayout, AppSplitter, type AppSplitterRef } from '@/components/ui/layouts';
 import { useChatLayoutContextSelector } from '../ChatLayoutContext';
 import { createAutoSaveId } from '@/components/ui/layouts/AppSplitter/helper';
 import Cookies from 'js-cookie';

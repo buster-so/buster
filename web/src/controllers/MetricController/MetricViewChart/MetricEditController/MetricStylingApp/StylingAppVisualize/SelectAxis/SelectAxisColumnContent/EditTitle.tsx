@@ -1,4 +1,4 @@
-import { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import React from 'react';
 import { LabelAndInput } from '../../../Common/LabelAndInput';
 import { Input } from '@/components/ui/inputs';

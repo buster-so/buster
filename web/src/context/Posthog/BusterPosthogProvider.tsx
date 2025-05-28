@@ -1,6 +1,6 @@
 'use client';
 
-import { PropsWithChildren, useEffect } from 'react';
+import { type PropsWithChildren, useEffect } from 'react';
 import { PostHogProvider } from 'posthog-js/react';
 import React from 'react';
 import type { PostHogConfig } from 'posthog-js';

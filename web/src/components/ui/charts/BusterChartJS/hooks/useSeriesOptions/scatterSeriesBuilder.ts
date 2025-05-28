@@ -1,7 +1,7 @@
 import type { ChartProps } from '../../core';
-import { LabelBuilderProps } from './useSeriesOptions';
-import { SeriesBuilderProps } from './interfaces';
-import { BubbleDataPoint, ScriptableContext } from 'chart.js';
+import type { LabelBuilderProps } from './useSeriesOptions';
+import type { SeriesBuilderProps } from './interfaces';
+import type { BubbleDataPoint, ScriptableContext } from 'chart.js';
 import { DEFAULT_CHART_CONFIG, DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import { addOpacityToColor } from '@/lib/colors';
 import { isDateColumnType } from '@/lib/messages';

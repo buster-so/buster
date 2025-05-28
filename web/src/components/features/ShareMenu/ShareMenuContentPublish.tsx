@@ -18,7 +18,7 @@ import { useUpdateCollectionShare } from '@/api/buster_rest/collections';
 import { useUpdateMetricShare } from '@/api/buster_rest/metrics';
 import { useUpdateDashboardShare } from '@/api/buster_rest/dashboards';
 import { SelectSingleEventHandler } from 'react-day-picker';
-import { ShareMenuContentBodyProps } from './ShareMenuContentBody';
+import type { ShareMenuContentBodyProps } from './ShareMenuContentBody';
 import { cn } from '@/lib/classMerge';
 
 export const ShareMenuContentPublish: React.FC<ShareMenuContentBodyProps> = React.memo(

@@ -9,7 +9,8 @@ import {
   NewDatasetGroupModal,
   PermissionSearchAndListWrapper
 } from '@/components/features/PermissionComponents';
-import React, { useMemo, useState } from 'react';
+import type React from 'react';
+import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/buttons';
 import { DatasetGroupPermissionGroupsListContainer } from './DatasetGroupPermissionGroupsListContainer';
 import { useMemoizedFn } from '@/hooks';

@@ -1,5 +1,5 @@
-import { Chart, ChartType, ChartData } from 'chart.js';
-import { ChartMountedPlugin, ChartMountedPluginOptions } from './chartjs-plugin-mounted';
+import type { Chart, ChartType, ChartData } from 'chart.js';
+import { ChartMountedPlugin, type ChartMountedPluginOptions } from './chartjs-plugin-mounted';
 
 // Mock Chart.js
 jest.mock('chart.js');

@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { listMetrics } from './requests';
-import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query';
+import { type QueryClient, useQuery, type UseQueryOptions } from '@tanstack/react-query';
 import { useMemoizedFn } from '@/hooks';
 import { metricsQueryKeys } from '@/api/query_keys/metric';
-import { RustApiError } from '../errors';
+import type { RustApiError } from '../errors';
 import { hasOrganizationId, isQueryStale } from '@/lib';
 import { useUserConfigContextSelector } from '@/context/Users';
 

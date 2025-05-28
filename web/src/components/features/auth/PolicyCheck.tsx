@@ -1,5 +1,6 @@
 import { CircleCheck, CircleXmark, CircleInfo } from '@/components/ui/icons';
-import React, { useEffect, useMemo } from 'react';
+import type React from 'react';
+import { useEffect, useMemo } from 'react';
 import { Text } from '@/components/ui/typography';
 import { Popover, PopoverProps } from '@/components/ui/popover/Popover';
 import { Button } from '@/components/ui/buttons/Button';

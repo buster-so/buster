@@ -1,12 +1,13 @@
-import React, { CSSProperties } from 'react';
+import type React from 'react';
+import type { CSSProperties } from 'react';
 import { useDraggable, useDroppable } from '@dnd-kit/core';
-import { Header, Table } from '@tanstack/react-table';
+import type { Header, Table } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
 import { cn } from '@/lib/classMerge';
 import { CaretDown, CaretUp } from '../../../icons/NucleoIconFilled';
 import { HEADER_HEIGHT } from './constants';
 import { useSortColumnContext } from './SortColumnWrapper';
-import { Virtualizer } from '@tanstack/react-virtual';
+import type { Virtualizer } from '@tanstack/react-virtual';
 import { Text } from '@/components/ui/typography';
 
 interface DraggableHeaderProps {

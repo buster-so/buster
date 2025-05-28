@@ -1,12 +1,12 @@
 import {
-  DataSource,
-  SnowflakeCredentials,
+  type DataSource,
+  type SnowflakeCredentials,
   SnowflakeCredentialsSchema
 } from '@/api/asset_interfaces';
-import React from 'react';
+import type React from 'react';
 import { FormWrapper } from './FormWrapper';
 import {
-  createSnowflakeDataSource,
+  type createSnowflakeDataSource,
   useCreateSnowflakeDataSource,
   useUpdateSnowflakeDataSource
 } from '@/api/buster_rest/data_source';

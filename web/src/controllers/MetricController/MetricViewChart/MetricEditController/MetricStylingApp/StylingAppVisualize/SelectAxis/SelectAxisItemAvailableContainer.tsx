@@ -1,6 +1,6 @@
 import React from 'react';
-import { DraggableAttributes } from '@dnd-kit/core';
-import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
+import type { DraggableAttributes } from '@dnd-kit/core';
+import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
 import { SelectAxisItemDragContainer } from './SelectAxisDragContainer';
 import { useSelectAxisContextSelector } from './useSelectAxisContext';
 import { SelectAxisItemLabel } from './SelectAxisItemLabel';
@@ -10,7 +10,7 @@ import { useMemoizedFn } from '@/hooks';
 import { SelectAxisColumnPopover } from './SelectAxisColumnPopover';
 import type { ChartEncodes, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import { SelectAxisContainerId } from './config';
+import type { SelectAxisContainerId } from './config';
 
 export const SelectAxisItemAvailableContainer = React.memo(
   React.forwardRef<

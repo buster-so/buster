@@ -1,5 +1,5 @@
 import React from 'react';
-import { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 import { EditPieAppearance } from './EditPieAppearance';
 import { fn } from '@storybook/test';
 import { DEFAULT_CHART_CONFIG } from '@/api/asset_interfaces';

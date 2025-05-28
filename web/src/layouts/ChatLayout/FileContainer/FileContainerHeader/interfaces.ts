@@ -1,4 +1,4 @@
-import { FileView } from '../../ChatLayoutContext/useLayoutConfig';
+import type { FileView } from '../../ChatLayoutContext/useLayoutConfig';
 
 export type FileContainerSegmentProps = {
   selectedFileView: FileView | undefined;

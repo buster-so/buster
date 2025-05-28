@@ -1,4 +1,4 @@
-import { ChartType, TimeScale } from 'chart.js';
+import { type ChartType, TimeScale } from 'chart.js';
 
 declare module 'chart.js' {
   interface PluginOptionsByType<TType extends ChartType> {}

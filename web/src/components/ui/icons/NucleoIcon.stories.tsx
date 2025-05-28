@@ -1,9 +1,9 @@
-import { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
 import { IconSelectOutlined } from './NucleoIconOutlined/iconStories';
 import { IconSelectFilled } from './NucleoIconFilled/iconStories';
 import * as OutlinedIcons from './NucleoIconOutlined';
 import * as FilledIcons from './NucleoIconFilled';
-import React from 'react';
+import type React from 'react';
 
 const TestComponent: React.FC<{
   icon: string;

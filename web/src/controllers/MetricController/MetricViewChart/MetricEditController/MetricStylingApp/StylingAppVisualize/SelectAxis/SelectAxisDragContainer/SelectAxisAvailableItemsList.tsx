@@ -1,5 +1,5 @@
-import React from 'react';
-import { SelectAxisItemProps } from './interfaces';
+import type React from 'react';
+import type { SelectAxisItemProps } from './interfaces';
 import { useDroppable } from '@dnd-kit/core';
 import { SelectAxisSortableItem } from './SelectAxisSortableItem';
 import { StylingLabel } from '../../../Common';

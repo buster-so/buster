@@ -1,6 +1,6 @@
 import React from 'react';
 import { LabelAndInput } from '../../Common';
-import { LoopTrendline } from './EditTrendline';
+import type { LoopTrendline } from './EditTrendline';
 import { Slider } from '@/components/ui/slider';
 
 interface TrendlineLabelPositionOffsetProps {

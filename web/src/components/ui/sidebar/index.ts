@@ -1,8 +1,8 @@
 export * from './Sidebar';
 
-export {
-  type SidebarProps,
-  type ISidebarItem,
-  type ISidebarGroup,
-  type ISidebarList
+export type {
+  SidebarProps,
+  ISidebarItem,
+  ISidebarGroup,
+  ISidebarList
 } from './interfaces';

@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { useAppLayout } from './AppLayoutProvider';
 import { useRouter, usePathname, useParams } from 'next/navigation';
-import { BusterRoutesWithArgsRoute } from '@/routes/busterRoutes';
+import type { BusterRoutesWithArgsRoute } from '@/routes/busterRoutes';
 import { BusterAppRoutes } from '@/routes/busterRoutes/busterAppRoutes';
 import { DashboardSecondaryRecord } from '@/layouts/ChatLayout/FileContainer/FileContainerSecondary/secondaryPanelsConfig/dashboardPanels';
 

@@ -1,5 +1,5 @@
-import { FileType } from '@/api/asset_interfaces/chat';
-import {
+import type { FileType } from '@/api/asset_interfaces/chat';
+import type {
   DashboardFileViewSecondary,
   FileViewSecondary,
   MetricFileViewSecondary

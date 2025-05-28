@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui/select';
+import { Select, type SelectItem } from '@/components/ui/select';
 import React from 'react';
 
 export const PERMISSION_OPTIONS_INCLUDED: SelectItem<'true' | 'false'>[] = [

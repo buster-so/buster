@@ -39,7 +39,7 @@ import type {
   SQLServerUpdateParams
 } from './types';
 
-export const useListDatasources = (enabled: boolean = true) => {
+export const useListDatasources = (enabled = true) => {
   return useQuery({
     ...queryKeys.datasourceGetList,
     queryFn: listDatasources,

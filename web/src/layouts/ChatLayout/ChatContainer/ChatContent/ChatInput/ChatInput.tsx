@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useMemo, useRef, useState } from 'react';
+import React, { type ChangeEvent, useMemo, useRef, useState } from 'react';
 import { useMemoizedFn } from '@/hooks';
 import { inputHasText } from '@/lib/text';
 import { AIWarning } from './AIWarning';

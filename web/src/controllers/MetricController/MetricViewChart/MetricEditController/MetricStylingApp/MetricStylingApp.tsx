@@ -1,16 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { MetricStylingAppSegments } from './config';
 import { MetricStylingAppSegment } from './MetricStylingAppSegment';
 import { StylingAppColors } from './StylingAppColors';
 import { StylingAppStyling } from './StylingAppStyling';
 import { StylingAppVisualize } from './StylingAppVisualize';
 import {
-  BarAndLineAxis,
-  ChartEncodes,
+  type BarAndLineAxis,
+  type ChartEncodes,
   ChartType,
-  ScatterAxis
+  type ScatterAxis
 } from '@/api/asset_interfaces/metric/charts';
 import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
 import { ScrollArea } from '@/components/ui/scroll-area';

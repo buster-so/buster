@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { Breadcrumb, BreadcrumbItem } from '@/components/ui/breadcrumb';
+import { Breadcrumb, type BreadcrumbItem } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/buttons';
 import { BusterRoutes } from '@/routes';
 import { AppTooltip } from '@/components/ui/tooltip';
@@ -10,11 +10,11 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import isEmpty from 'lodash/isEmpty';
 import omit from 'lodash/omit';
 import { useMemoizedFn } from '@/hooks';
-import { type SegmentedItem } from '@/components/ui/segmented';
+import type { SegmentedItem } from '@/components/ui/segmented';
 import { Plus } from '@/components/ui/icons';
-import { BusterCollectionListItem } from '@/api/asset_interfaces/collection';
+import type { BusterCollectionListItem } from '@/api/asset_interfaces/collection';
 import { useGetCollection } from '@/api/buster_rest/collections';
-import { collectionsGetList } from '@/api/buster_rest/collections/requests';
+import type { collectionsGetList } from '@/api/buster_rest/collections/requests';
 
 type CollectionListFilters = Omit<
   Parameters<typeof collectionsGetList>[0],

@@ -6,7 +6,7 @@ import { createAutoSaveId } from './helper';
 const DEFAULT_LAYOUT = ['230px', 'auto'];
 
 export async function getAppSplitterLayout(
-  id: string = '',
+  id = '',
   defaultLayout: string[] = DEFAULT_LAYOUT
 ): Promise<[string, string]> {
   const key = createAutoSaveId(id);

@@ -1,5 +1,5 @@
-import { BusterAppRoutes } from './busterAppRoutes';
-import { BusterRoutes, BusterRoutesWithArgsRoute } from './busterRoutes';
+import type { BusterAppRoutes } from './busterAppRoutes';
+import { BusterRoutes, type BusterRoutesWithArgsRoute } from './busterRoutes';
 
 export const createBusterRoute = ({ route, ...args }: BusterRoutesWithArgsRoute) => {
   if (!args) return route;

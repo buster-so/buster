@@ -1,9 +1,9 @@
 import { renderHook } from '@testing-library/react';
 import { useTooltipOptions } from './useTooltipOptions';
 import {
-  ChartType,
-  BusterChartProps,
-  ChartEncodes,
+  type ChartType,
+  type BusterChartProps,
+  type ChartEncodes,
   ComboChartAxis
 } from '@/api/asset_interfaces/metric/charts';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';

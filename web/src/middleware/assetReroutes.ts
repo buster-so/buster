@@ -5,7 +5,7 @@ import {
   isPublicPage,
   getEmbedAssetRedirect
 } from '@/routes/busterRoutes';
-import { User } from '@supabase/supabase-js';
+import type { User } from '@supabase/supabase-js';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export const assetReroutes = async (

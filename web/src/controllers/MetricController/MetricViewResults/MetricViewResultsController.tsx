@@ -2,9 +2,9 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useMemoizedFn } from '@/hooks';
-import { IDataResult } from '@/api/asset_interfaces';
+import type { IDataResult } from '@/api/asset_interfaces';
 import { useMetricResultsLayout } from './useMetricResultsLayout';
-import { AppSplitterRef } from '@/components/ui/layouts';
+import type { AppSplitterRef } from '@/components/ui/layouts';
 import { AppVerticalCodeSplitter } from '@/components/features/layouts/AppVerticalCodeSplitter';
 import { useMetricRunSQL } from './useMetricRunSQL';
 import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';

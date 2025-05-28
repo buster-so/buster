@@ -1,6 +1,6 @@
 import type { RustApiError } from '../../buster_rest/errors';
 import type { BusterChat } from '../../asset_interfaces/chat';
-import {
+import type {
   ChatEvent_GeneratingReasoningMessage,
   ChatEvent_GeneratingResponseMessage,
   ChatEvent_GeneratingTitle

@@ -1,6 +1,7 @@
-import React, { useMemo } from 'react';
+import type React from 'react';
+import { useMemo } from 'react';
 import { useMount } from '@/hooks';
-import { type BusterChartProps, ChartType } from '@/api/asset_interfaces/metric/charts';
+import type { BusterChartProps, ChartType } from '@/api/asset_interfaces/metric/charts';
 
 export const NoValidAxis: React.FC<{
   type: ChartType;

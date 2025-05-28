@@ -4,8 +4,8 @@ import { useUpdateUserDatasetGroups } from '@/api/buster_rest';
 import type { BusterUserDatasetGroup } from '@/api/asset_interfaces';
 import { PermissionAssignedCell } from '@/components/features/PermissionComponents';
 import {
-  BusterListColumn,
-  BusterListRowItem,
+  type BusterListColumn,
+  type BusterListRowItem,
   EmptyStateList,
   InfiniteListContainer
 } from '@/components/ui/list';

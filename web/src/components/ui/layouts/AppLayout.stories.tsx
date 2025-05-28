@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { AppLayout } from './AppLayout';
 import { AppPageLayout } from './AppPageLayout';
-import React from 'react';
+import type React from 'react';
 
 const TestContent = ({ children }: { children?: React.ReactNode }) => {
   if (children) {

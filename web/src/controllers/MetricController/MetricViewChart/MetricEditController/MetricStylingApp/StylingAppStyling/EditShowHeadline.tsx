@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { Select, SelectItem } from '@/components/ui/select';
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import { Select, type SelectItem } from '@/components/ui/select';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { LabelAndInput } from '../Common';
 import { useMemoizedFn } from '@/hooks';
 import first from 'lodash/first';

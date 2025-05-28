@@ -1,6 +1,6 @@
 'use client';
 
-import React, { PropsWithChildren } from 'react';
+import React, { type PropsWithChildren } from 'react';
 import { useGetMyUserInfo } from '@/api/buster_rest/users';
 import { useSupabaseContext } from '../Supabase';
 import { createContext, useContextSelector } from 'use-context-selector';
