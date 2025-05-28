@@ -1,14 +1,14 @@
-import {
-  simplifyColumnType,
-  isNumericColumnType,
-  isNumericColumnStyle,
-  isDateColumnType,
-  NUMBER_TYPES,
-  TEXT_TYPES,
-  DATE_TYPES
-} from './messages';
 import type { SimplifiedColumnType } from '@/api/asset_interfaces/metric/';
 import type { ColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import {
+  DATE_TYPES,
+  NUMBER_TYPES,
+  TEXT_TYPES,
+  isDateColumnType,
+  isNumericColumnStyle,
+  isNumericColumnType,
+  simplifyColumnType
+} from './messages';
 
 describe('simplifyColumnType', () => {
   test('should return "number" for numeric types', () => {

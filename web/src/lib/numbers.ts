@@ -1,8 +1,8 @@
-import isNumber from 'lodash/isNumber';
-import round from 'lodash/round';
-import max from 'lodash/max';
-import isString from 'lodash/isString';
 import isDate from 'lodash/isDate';
+import isNumber from 'lodash/isNumber';
+import isString from 'lodash/isString';
+import max from 'lodash/max';
+import round from 'lodash/round';
 
 export const roundNumber = (
   input: string | number | undefined,

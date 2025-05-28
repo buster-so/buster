@@ -2,15 +2,15 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import quarterOfYear from 'dayjs/plugin/quarterOfYear';
-import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+import { isNaN as lodashIsNaN } from 'lodash';
+import isDate from 'lodash/isDate';
 import isNumber from 'lodash/isNumber';
 import isString from 'lodash/isString';
-import isDate from 'lodash/isDate';
-import { isNaN as lodashIsNaN } from 'lodash';
-import { isNumeric } from './numbers';
-import { getBrowserLanguage } from './language';
 import { SupportedLanguages } from '../config/languages';
+import { getBrowserLanguage } from './language';
+import { isNumeric } from './numbers';
 
 import relativeTime from 'dayjs/plugin/relativeTime';
 

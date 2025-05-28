@@ -1,6 +1,6 @@
-import { updateChatToIChat } from './chat';
-import { MOCK_CHAT } from '@/mocks/MOCK_CHAT';
 import type { BusterChat } from '@/api/asset_interfaces/chat';
+import { MOCK_CHAT } from '@/mocks/MOCK_CHAT';
+import { updateChatToIChat } from './chat';
 
 describe('updateChatToIChat', () => {
   test('should correctly upgrade a chat with no messages', () => {

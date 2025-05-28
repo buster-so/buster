@@ -1,5 +1,5 @@
-import pick from 'lodash/pick';
 import isEqual from 'lodash/isEqual';
+import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
 
 type ObjectKeys<T> = keyof T;

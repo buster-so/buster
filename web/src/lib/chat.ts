@@ -1,8 +1,8 @@
 import type { BusterChat, BusterChatMessage } from '@/api/asset_interfaces/chat';
 import type { IBusterChat, IBusterChatMessage } from '@/api/asset_interfaces/chat';
-import { create } from 'mutative';
-import omit from 'lodash/omit';
 import last from 'lodash/last';
+import omit from 'lodash/omit';
+import { create } from 'mutative';
 
 const chatUpgrader = (chat: BusterChat, { isNewChat }: { isNewChat: boolean }): IBusterChat => {
   return {

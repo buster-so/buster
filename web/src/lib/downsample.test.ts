@@ -1,4 +1,4 @@
-import { uniformSampling, randomSampling } from './downsample';
+import { randomSampling, uniformSampling } from './downsample';
 import type { DataPoint } from './downsample';
 import { detectAnomalies } from './downsample';
 

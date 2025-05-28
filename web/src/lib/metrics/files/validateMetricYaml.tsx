@@ -1,9 +1,9 @@
-import type React from 'react';
-import { useRef } from 'react';
+import MonacoEditor from '@monaco-editor/react';
 import * as yaml from 'js-yaml';
 import * as monaco from 'monaco-editor';
 import type { editor } from 'monaco-editor/esm/vs/editor/editor.api';
-import MonacoEditor from '@monaco-editor/react';
+import type React from 'react';
+import { useRef } from 'react';
 
 type IMarkerData = editor.IMarkerData;
 

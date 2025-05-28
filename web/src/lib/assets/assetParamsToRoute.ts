@@ -1,10 +1,10 @@
 import type { FileType } from '@/api/asset_interfaces/chat';
+import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
 import type {
   DashboardFileViewSecondary,
   FileViewSecondary,
   MetricFileViewSecondary
 } from '../../layouts/ChatLayout/ChatLayoutContext/useLayoutConfig';
-import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
 
 type BaseParams = {
   chatId: string | undefined;

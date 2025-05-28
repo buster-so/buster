@@ -1,5 +1,5 @@
-import memoize from 'lodash/memoize';
 import { isServer } from '@tanstack/react-query';
+import memoize from 'lodash/memoize';
 
 let ctx: CanvasRenderingContext2D;
 const getCanvasContext = () => {

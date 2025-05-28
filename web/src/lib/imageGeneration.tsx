@@ -1,9 +1,9 @@
+import type { BusterMetricData, IBusterMetric } from '@/api/asset_interfaces/metric';
 import type React from 'react';
+import { useEffect, useRef } from 'react';
 import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
-import type { BusterMetricData, IBusterMetric } from '@/api/asset_interfaces/metric';
 import { downloadImageData, exportElementToImage } from './exportUtils';
-import { useEffect, useRef } from 'react';
 import { timeout } from './timeout';
 
 export const generateChartDownloadImage = async (

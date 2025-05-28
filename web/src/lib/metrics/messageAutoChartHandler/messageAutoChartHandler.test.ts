@@ -1,7 +1,7 @@
 import {
   ChartType,
-  type DataMetadata,
   DEFAULT_CHART_CONFIG,
+  type DataMetadata,
   type IBusterMetricChartConfig
 } from '@/api/asset_interfaces/metric';
 import { createDefaultChartConfig } from '.';

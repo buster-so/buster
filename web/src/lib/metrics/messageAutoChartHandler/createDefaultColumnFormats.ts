@@ -1,9 +1,9 @@
 import {
   type ColumnLabelFormat,
-  DEFAULT_COLUMN_LABEL_FORMAT,
-  type IColumnLabelFormat,
   type ColumnMetaData,
+  DEFAULT_COLUMN_LABEL_FORMAT,
   type IBusterMetricChartConfig,
+  type IColumnLabelFormat,
   type SimplifiedColumnType
 } from '@/api/asset_interfaces/metric';
 import { isDateColumnType, isNumericColumnType, simplifyColumnType } from '@/lib/messages';

@@ -1,5 +1,5 @@
-import type { MutableRefObject } from 'react';
 import isFunction from 'lodash/isFunction';
+import type { MutableRefObject } from 'react';
 import isBrowser from './isBrowser';
 
 type TargetValue<T> = T | undefined | null;

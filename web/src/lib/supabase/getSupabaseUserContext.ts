@@ -1,8 +1,8 @@
 'use server';
 
-import type { User, Session } from '@supabase/supabase-js';
-import type { createClient } from './server';
+import type { Session, User } from '@supabase/supabase-js';
 import type { Database } from './database.types';
+import type { createClient } from './server';
 import { signInWithAnonymousUser } from './signIn';
 
 type PromiseType<T extends Promise<unknown>> = T extends Promise<infer U> ? U : never;

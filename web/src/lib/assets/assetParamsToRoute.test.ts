@@ -1,6 +1,6 @@
-import { assetParamsToRoute } from './assetParamsToRoute';
-import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
 import type { FileType } from '@/api/asset_interfaces/chat';
+import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
+import { assetParamsToRoute } from './assetParamsToRoute';
 
 describe('assetParamsToRoute', () => {
   const mockChatId = 'chat123';

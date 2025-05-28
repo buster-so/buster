@@ -1,6 +1,6 @@
 import isNumber from 'lodash/isNumber';
-import { formatNumber } from './numbers';
 import truncate from 'lodash/truncate';
+import { formatNumber } from './numbers';
 
 export const inputHasText = (input: unknown): boolean => {
   if (typeof input !== 'string') {

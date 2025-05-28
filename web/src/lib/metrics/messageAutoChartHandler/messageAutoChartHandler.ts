@@ -1,20 +1,20 @@
 import {
   type BusterMetric,
-  type IBusterMetricChartConfig,
-  type DataMetadata,
   DEFAULT_CHART_CONFIG,
-  DEFAULT_CHART_CONFIG_ENTRIES
+  DEFAULT_CHART_CONFIG_ENTRIES,
+  type DataMetadata,
+  type IBusterMetricChartConfig
 } from '@/api/asset_interfaces/metric';
 import type { BusterChartConfigProps } from '@/api/asset_interfaces/metric/charts';
-import { create } from 'mutative';
 import isEmpty from 'lodash/isEmpty';
-import { createDefaultColumnLabelFormats } from './createDefaultColumnFormats';
-import { createDefaultColumnSettings } from './createDefaultColumnSettings';
+import { create } from 'mutative';
 import {
   createDefaultBarAndLineAxis,
   createDefaultPieAxis,
   createDefaultScatterAxis
 } from './createDefaultAxis';
+import { createDefaultColumnLabelFormats } from './createDefaultColumnFormats';
+import { createDefaultColumnSettings } from './createDefaultColumnSettings';
 
 const keySpecificHandlers: Partial<
   Record<
