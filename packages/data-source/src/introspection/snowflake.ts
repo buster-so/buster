@@ -586,12 +586,12 @@ export class SnowflakeIntrospector extends BaseIntrospector {
       for (const row of statsResult.rows) {
         if (row) {
           columnStatistics.push({
-            columnName: this.getString(row.column_name) || '',
-            distinctCount: this.parseNumber(row.distinct_count),
-            nullCount: this.parseNumber(row.null_count),
-            minValue: this.getString(row.min_value),
-            maxValue: this.getString(row.max_value),
-            sampleValues: this.getString(row.sample_values),
+            columnName: this.getString(row.COLUMN_NAME) || '',
+            distinctCount: this.parseNumber(row.DISTINCT_COUNT),
+            nullCount: this.parseNumber(row.NULL_COUNT),
+            minValue: this.getString(row.MIN_VALUE),
+            maxValue: this.getString(row.MAX_VALUE),
+            sampleValues: this.getString(row.SAMPLE_VALUES),
           });
         }
       }
