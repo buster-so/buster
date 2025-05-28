@@ -19,7 +19,10 @@ const PATHNAME_TO_ROUTE: Record<string, BusterRoutes> = {
   // [BusterRoutes.APP_TERMS_ID]: BusterRoutes.APP_TERMS
 };
 
-export const pathNameToRoute = (pathName: string, params: any): BusterRoutes => {
+export const pathNameToRoute = (
+  pathName: string,
+  params: Record<string, unknown>
+): BusterRoutes => {
   const route = Object.values(BusterRoutes).find((r) => {
     return r === pathName || createBusterRoute({ route: r, ...params }) === pathName;
   });
@@ -70,7 +73,10 @@ const PATHNAME_TO_PARENT_ROUTE: Record<string, BusterRoutes> = {
   [BusterRoutes.APP_CHAT_ID_DASHBOARD_ID_FILE]: BusterRoutes.APP_CHAT
 };
 
-export const pathNameToParentRoute = (pathName: string, params: any): BusterRoutes => {
+export const pathNameToParentRoute = (
+  pathName: string,
+  params: Record<string, unknown>
+): BusterRoutes => {
   const route = Object.values(BusterRoutes).find((r) => {
     return r === pathName || createBusterRoute({ route: r, ...params }) === pathName;
   });

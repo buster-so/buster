@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import './tailwindAnimations.css';
 @plugin 'tailwind-scrollbar';
 @plugin "tailwindcss-animate";
 
@@ -109,8 +110,6 @@
 
   --spacing: 4px;
 }
-
-@import "./tailwindAnimations.css";
 
 @layer base {
   * {

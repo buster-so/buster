@@ -12,9 +12,9 @@ export interface BusterSocketRequestBase<R = string, T = object> {
  * Interface representing the raw response message from the server
  * @template R - The route type, defaults to string
  * @template E - The event type, defaults to string
- * @template P - The payload type, defaults to any
+ * @template P - The payload type, defaults to unknown
  */
-export interface BusterSocketResponseMessage<R = string, E = string, P = any> {
+export interface BusterSocketResponseMessage<R = string, E = string, P = unknown> {
   route: R;
   payload: P;
   error: null | BusterSocketError;
@@ -24,9 +24,9 @@ export interface BusterSocketResponseMessage<R = string, E = string, P = any> {
 /**
  * Interface combining route and event for listener consumption
  * @template R - The route type, defaults to string
- * @template P - The payload type, defaults to any
+ * @template P - The payload type, defaults to unknown
  */
-export interface BusterSocketResponseBase<R = string, P = any> {
+export interface BusterSocketResponseBase<R = string, P = unknown> {
   route: R;
   payload: P;
   error: null | BusterSocketError;

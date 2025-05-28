@@ -84,7 +84,7 @@ export const getEmbedAssetRedirect = (request: NextRequest): string | undefined 
   const params = extractPathParamsFromRoute(route);
 
   if (matched) {
-    const newRoute = createBusterRoute({ route: matched, ...(params as any) });
+    const newRoute = createBusterRoute({ route: matched, ...(params as Record<string, unknown>) });
     return newRoute;
   }
 

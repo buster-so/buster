@@ -111,7 +111,7 @@ refresh_interval: 300`,
 
   const response: BusterDashboardResponse = {
     access: ShareRole.CAN_EDIT,
-    metrics: metrics.reduce((acc, metric) => ({ ...acc, [metric.id]: metric }), {}),
+    metrics: Object.fromEntries(metrics.map((metric) => [metric.id, metric])),
     dashboard,
     permission: ShareRole.CAN_EDIT,
     public_password: null,

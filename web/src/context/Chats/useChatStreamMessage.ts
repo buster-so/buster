@@ -37,12 +37,13 @@ export const useChatStreamMessage = () => {
   const onUpdateChatMessageTransition = useMemoizedFn(
     (chatMessage: Parameters<typeof onUpdateChatMessage>[0]) => {
       const currentChatMessage = chatRefMessages.current[chatMessage.id] || {};
-      const iChatMessage: IBusterChatMessage = create(currentChatMessage, (draft) => {
-        Object.assign(draft || {}, chatMessage);
-        if (chatMessage.id) {
-          draft.id = chatMessage.id;
-        }
-      })!;
+      const iChatMessage: IBusterChatMessage =
+        create(currentChatMessage, (draft) => {
+          Object.assign(draft || {}, chatMessage);
+          if (chatMessage.id) {
+            draft.id = chatMessage.id;
+          }
+        }) || currentChatMessage;
       chatRefMessages.current[chatMessage.id] = iChatMessage;
 
       onUpdateChatMessage(iChatMessage);
@@ -69,7 +70,7 @@ export const useChatStreamMessage = () => {
       const lastMessageId = iChat.message_ids[iChat.message_ids.length - 1];
       const lastMessage = iChatMessages[lastMessageId];
       if (lastMessage?.response_message_ids) {
-        Object.values(lastMessage.response_messages).forEach((responseMessage) => {
+        for (const responseMessage of Object.values(lastMessage.response_messages)) {
           if (responseMessage.type === 'file' && responseMessage.file_type === 'metric') {
             prefetchGetMetricDataClient(
               { id: responseMessage.id, version_number: responseMessage.version_number },
@@ -84,7 +85,7 @@ export const useChatStreamMessage = () => {
               refetchType: 'all'
             });
           }
-        });
+        }
       }
     }
   );
@@ -98,12 +99,12 @@ export const useChatStreamMessage = () => {
     prefetchLastMessageMetricData(iChat, iChatMessages);
 
     const refreshKeys = [queryKeys.chatsGetList().queryKey, queryKeys.metricsGetList().queryKey];
-    refreshKeys.forEach((key) => {
+    for (const key of refreshKeys) {
       queryClient.invalidateQueries({
         queryKey: key,
         refetchType: 'all'
       });
-    });
+    }
   });
 
   const stopChatCallback = useMemoizedFn((chatId: string) => {
@@ -127,18 +128,20 @@ export const useChatStreamMessage = () => {
     }
   });
 
-  const _generatingTitleCallback = useMemoizedFn((_: null, newData: ChatEvent_GeneratingTitle) => {
-    const { chat_id } = newData;
-    const currentChat = chatRef.current[chat_id];
-    if (currentChat) {
-      const updatedChat = updateChatTitle(currentChat, newData);
-      chatRef.current[chat_id] = updatedChat;
-      onUpdateChat(updatedChat);
+  const _generatingTitleCallback = useMemoizedFn(
+    (_: unknown, newData: ChatEvent_GeneratingTitle) => {
+      const { chat_id } = newData;
+      const currentChat = chatRef.current[chat_id];
+      if (currentChat) {
+        const updatedChat = updateChatTitle(currentChat, newData);
+        chatRef.current[chat_id] = updatedChat;
+        onUpdateChat(updatedChat);
+      }
     }
-  });
+  );
 
   const _generatingResponseMessageCallback = useMemoizedFn(
-    (_: null, d: ChatEvent_GeneratingResponseMessage) => {
+    (_: unknown, d: ChatEvent_GeneratingResponseMessage) => {
       const { message_id } = d;
       const updatedMessage = updateResponseMessage(
         message_id,
@@ -154,7 +157,7 @@ export const useChatStreamMessage = () => {
   );
 
   const _generatingReasoningMessageCallback = useMemoizedFn(
-    (_: null, d: ChatEvent_GeneratingReasoningMessage) => {
+    (_: unknown, d: ChatEvent_GeneratingReasoningMessage) => {
       const { message_id, reasoning } = d;
       const updatedMessage = updateReasoningMessage(
         message_id,
