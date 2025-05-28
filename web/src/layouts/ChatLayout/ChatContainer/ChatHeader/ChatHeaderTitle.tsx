@@ -21,7 +21,7 @@ export const ChatHeaderTitle: React.FC<{
 }> = React.memo(({ chatTitle, chatId, isCompletedStream }) => {
   const { mutateAsync: updateChat } = useUpdateChat();
 
-  if (!chatTitle) return <div></div>;
+  if (!chatTitle) return <div />;
 
   return (
     <AnimatePresence mode="wait" initial={false}>

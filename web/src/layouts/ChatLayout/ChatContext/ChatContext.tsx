@@ -90,7 +90,7 @@ const IndividualChatContext = createContext<ReturnType<typeof useChatIndividualC
   {} as ReturnType<typeof useChatIndividualContext>
 );
 
-export const ChatContextProvider = React.memo(({ children }: PropsWithChildren<{}>) => {
+export const ChatContextProvider = React.memo(({ children }: PropsWithChildren) => {
   const chatId = useChatLayoutContextSelector((x) => x.chatId);
   const selectedFile = useChatLayoutContextSelector((x) => x.selectedFile);
   const useChatContextValue = useChatIndividualContext({

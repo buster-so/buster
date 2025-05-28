@@ -9,7 +9,7 @@ import { cn } from '@/lib/classMerge';
 
 const autoResizeConfig = { minRows: 2, maxRows: 16 };
 
-export const ChatInput: React.FC<{}> = React.memo(({}) => {
+export const ChatInput: React.FC = React.memo(() => {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const loading = useChatIndividualContextSelector((x) => x.isStreamingMessage);
   const [inputValue, setInputValue] = useState('');

@@ -25,7 +25,8 @@ export const CollapseFileButton: React.FC<{
               onClick={onCollapseFileClick}
               variant="ghost"
               prefix={icon}
-              data-testid="collapse-file-button"></Button>
+              data-testid="collapse-file-button"
+            />
           </AppTooltip>
         </motion.div>
       )}

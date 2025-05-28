@@ -7,10 +7,11 @@ import { ChatInput } from './ChatInput';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { ChatScrollToBottom } from './ChatScrollToBottom';
 import { cn } from '@/lib/utils';
+import { useMount } from '@/hooks';
 
 const autoClass = 'mx-auto max-w-[600px] w-full';
 
-export const ChatContent: React.FC<{}> = React.memo(() => {
+export const ChatContent: React.FC = React.memo(() => {
   const chatId = useChatIndividualContextSelector((state) => state.chatId);
   const chatMessageIds = useChatIndividualContextSelector((state) => state.chatMessageIds);
   const containerRef = useRef<HTMLElement | null>(null);
@@ -20,14 +21,14 @@ export const ChatContent: React.FC<{}> = React.memo(() => {
     enabled: false
   });
 
-  useEffect(() => {
+  useMount(() => {
     const container = document.querySelector(
       '.chat-container-content .scroll-area-viewport'
     ) as HTMLElement;
     if (!container) return;
     containerRef.current = container;
     enableAutoScroll();
-  }, []);
+  });
 
   return (
     <>

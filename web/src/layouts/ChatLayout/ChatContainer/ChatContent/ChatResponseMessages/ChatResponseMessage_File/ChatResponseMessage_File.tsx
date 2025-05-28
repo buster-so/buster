@@ -65,7 +65,10 @@ const ChatResponseMessageBody: React.FC<{
   return (
     <div className="flex w-full flex-col items-center space-y-0.5 px-2.5 py-2">
       {metadata.map((metadata, index) => (
-        <MetadataItem metadata={metadata} key={index} />
+        <MetadataItem
+          metadata={metadata}
+          key={`${metadata.message}-${metadata.status}-${metadata.timestamp}-${index}`}
+        />
       ))}
     </div>
   );

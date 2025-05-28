@@ -127,9 +127,10 @@ export const useGetAsset = (props: UseGetAssetProps) => {
           isError: collectionIsError,
           showLoader: !collectionIsFetched && !collectionIsError
         };
-      default:
+      default: {
         const exhaustiveCheck: never = props.type;
         return { isFetched: false, error: null, isError: false, showLoader: false };
+      }
     }
   }, [
     props.type,

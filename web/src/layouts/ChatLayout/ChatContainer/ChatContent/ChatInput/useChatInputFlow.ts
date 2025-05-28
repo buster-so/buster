@@ -56,16 +56,18 @@ export const useChatInputFlow = ({
           break;
 
         case 'followup-metric':
+          if (!selectedFileId) return;
           await onStartChatFromFile({
             prompt: inputValue,
-            fileId: selectedFileId!,
+            fileId: selectedFileId,
             fileType: 'metric'
           });
           break;
         case 'followup-dashboard':
+          if (!selectedFileId) return;
           await onStartChatFromFile({
             prompt: inputValue,
-            fileId: selectedFileId!,
+            fileId: selectedFileId,
             fileType: 'dashboard'
           });
           break;
@@ -74,9 +76,10 @@ export const useChatInputFlow = ({
           await onStartNewChat({ prompt: inputValue });
           break;
 
-        default:
+        default: {
           const _exhaustiveCheck: never = flow;
           return _exhaustiveCheck;
+        }
       }
 
       setInputValue('');
@@ -113,7 +116,8 @@ export const useChatInputFlow = ({
   });
 
   const onStopChat = useMemoizedFn(() => {
-    onStopChatContext({ chatId: chatId!, messageId: currentMessageId });
+    if (!chatId) return;
+    onStopChatContext({ chatId, messageId: currentMessageId });
     textAreaRef.current?.focus();
     textAreaRef.current?.select();
   });

@@ -37,12 +37,11 @@ export const useGetInitialChatFile = () => {
         const messageExists = !!chat?.message_ids.some((id) => id === messageId);
         if (messageExists) {
           return;
-        } else {
-          return createBusterRoute({
-            route: BusterRoutes.APP_CHAT_ID,
-            chatId
-          });
         }
+        return createBusterRoute({
+          route: BusterRoutes.APP_CHAT_ID,
+          chatId
+        });
       }
 
       //dashboard_mode
@@ -53,17 +52,18 @@ export const useGetInitialChatFile = () => {
           >((acc, chatMessageId) => {
             const chatMessage = getChatMessageMemoized(chatMessageId);
 
-            chatMessage?.response_message_ids.forEach((responseMessageId) => {
-              const message = chatMessage?.response_messages[responseMessageId]!;
+            for (const responseMessageId of chatMessage?.response_message_ids || []) {
+              const message = chatMessage?.response_messages[responseMessageId];
+              if (!message) continue;
               const isFile =
                 message.type === 'file' &&
                 message.file_type === 'dashboard' &&
                 message.id === dashboardId;
 
               if (isFile) {
-                acc = message;
+                return message;
               }
-            });
+            }
 
             return acc;
           }, undefined);
@@ -93,17 +93,18 @@ export const useGetInitialChatFile = () => {
           >((acc, chatMessageId) => {
             const chatMessage = getChatMessageMemoized(chatMessageId);
 
-            chatMessage?.response_message_ids.forEach((responseMessageId) => {
-              const message = chatMessage?.response_messages[responseMessageId]!;
+            for (const responseMessageId of chatMessage?.response_message_ids || []) {
+              const message = chatMessage?.response_messages[responseMessageId];
+              if (!message) continue;
               const isFile =
                 message.type === 'file' &&
                 message.file_type === 'metric' &&
                 message.id === metricId;
 
               if (isFile) {
-                acc = message;
+                return message;
               }
-            });
+            }
 
             return acc;
           }, undefined);

@@ -33,7 +33,7 @@ export const ChatUserMessage: React.FC<{
   const handleCopy = useMemoizedFn((e?: React.ClipboardEvent) => {
     // Prevent default copy behavior
     //I do not know why this is needed, but it is...
-    if (e && e.clipboardData) {
+    if (e?.clipboardData) {
       e.preventDefault();
       e.clipboardData.setData('text/plain', request);
     } else {
