@@ -163,8 +163,12 @@ export class DataSource {
         ? introspector.getForeignKeys.bind(introspector)
         : undefined,
       getDataSourceType: () => introspector.getDataSourceType(),
-      async getFullIntrospection(): Promise<DataSourceIntrospectionResult> {
-        const result = await introspector.getFullIntrospection();
+      async getFullIntrospection(options?: {
+        databases?: string[];
+        schemas?: string[];
+        tables?: string[];
+      }): Promise<DataSourceIntrospectionResult> {
+        const result = await introspector.getFullIntrospection(options);
         return {
           ...result,
           dataSourceName: resolvedDataSourceName,
@@ -234,9 +238,16 @@ export class DataSource {
   /**
    * Get comprehensive introspection data for a data source
    */
-  async getFullIntrospection(dataSourceName?: string): Promise<DataSourceIntrospectionResult> {
+  async getFullIntrospection(
+    dataSourceName?: string,
+    options?: {
+      databases?: string[];
+      schemas?: string[];
+      tables?: string[];
+    }
+  ): Promise<DataSourceIntrospectionResult> {
     const introspector = await this.introspect(dataSourceName);
-    return introspector.getFullIntrospection();
+    return introspector.getFullIntrospection(options);
   }
 
   // ========== UTILITY METHODS ==========

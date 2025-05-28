@@ -3,6 +3,7 @@ import { DataSourceType } from '../types/credentials';
 import type {
   Column,
   ColumnStatistics,
+  DataSourceIntrospectionResult,
   Database,
   Schema,
   Table,
@@ -17,14 +18,15 @@ import { BaseIntrospector } from './base';
  */
 export class SnowflakeIntrospector extends BaseIntrospector {
   private adapter: DatabaseAdapter;
-  private metadataCache: {
-    databases?: Database[];
-    schemas?: Schema[];
-    tables?: Table[];
-    columns?: Column[];
-    views?: View[];
-    lastFetched?: Date;
+  private cache: {
+    databases?: { data: Database[]; lastFetched: Date };
+    schemas?: { data: Schema[]; lastFetched: Date };
+    tables?: { data: Table[]; lastFetched: Date };
+    columns?: { data: Column[]; lastFetched: Date };
+    views?: { data: View[]; lastFetched: Date };
   } = {};
+
+  private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
   constructor(dataSourceName: string, adapter: DatabaseAdapter) {
     super(dataSourceName);
@@ -36,23 +38,21 @@ export class SnowflakeIntrospector extends BaseIntrospector {
   }
 
   /**
-   * Fetch all metadata in batched queries for efficiency
+   * Check if cached data is still valid
    */
-  private async fetchAllMetadata(): Promise<void> {
-    // Only fetch if not cached or cache is older than 5 minutes
-    const cacheAge = this.metadataCache.lastFetched
-      ? Date.now() - this.metadataCache.lastFetched.getTime()
-      : Number.POSITIVE_INFINITY;
+  private isCacheValid(lastFetched: Date): boolean {
+    return Date.now() - lastFetched.getTime() < this.CACHE_TTL;
+  }
 
-    if (cacheAge < 5 * 60 * 1000 && this.metadataCache.databases) {
-      return; // Use cached data
+  async getDatabases(): Promise<Database[]> {
+    // Check if we have valid cached data
+    if (this.cache.databases && this.isCacheValid(this.cache.databases.lastFetched)) {
+      return this.cache.databases.data;
     }
 
     try {
-      // Query 1: Get all databases
-      const databasesResult = await this.adapter.query('SHOW DATABASES');
-
-      this.metadataCache.databases = databasesResult.rows.map((row) => ({
+      const result = await this.adapter.query('SHOW DATABASES');
+      const databases = result.rows.map((row) => ({
         name: this.getString(row.name) || '',
         owner: this.getString(row.owner),
         comment: this.getString(row.comment),
@@ -66,199 +66,443 @@ export class SnowflakeIntrospector extends BaseIntrospector {
         },
       }));
 
-      // Get accessible databases for further queries
-      const accessibleDatabases = this.metadataCache.databases.map((db) => db.name);
-
-      // Query 2: Get all schemas across all accessible databases
-      const schemasPromises = accessibleDatabases.map(async (dbName) => {
-        try {
-          const result = await this.adapter.query(`
-            SELECT SCHEMA_NAME, CATALOG_NAME, SCHEMA_OWNER, COMMENT
-            FROM ${dbName}.INFORMATION_SCHEMA.SCHEMATA
-            WHERE SCHEMA_NAME != 'INFORMATION_SCHEMA'
-          `);
-
-          return result.rows.map((row) => ({
-            name: this.getString(row.SCHEMA_NAME) || '',
-            database: this.getString(row.CATALOG_NAME) || dbName,
-            owner: this.getString(row.SCHEMA_OWNER),
-            comment: this.getString(row.COMMENT),
-          }));
-        } catch (error) {
-          console.warn(`Could not access schemas in database ${dbName}:`, error);
-          return [];
-        }
-      });
-
-      const schemasResults = await Promise.all(schemasPromises);
-      this.metadataCache.schemas = schemasResults.flat();
-
-      // Query 3: Get all tables across all accessible databases
-      const tablesPromises = accessibleDatabases.map(async (dbName) => {
-        try {
-          const result = await this.adapter.query(`
-            SELECT TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE, 
-                   ROW_COUNT, BYTES, COMMENT, CREATED, LAST_ALTERED
-            FROM ${dbName}.INFORMATION_SCHEMA.TABLES
-          `);
-
-          return result.rows.map((row) => ({
-            name: this.getString(row.TABLE_NAME) || '',
-            schema: this.getString(row.TABLE_SCHEMA) || '',
-            database: this.getString(row.TABLE_CATALOG) || dbName,
-            type: this.mapTableType(this.getString(row.TABLE_TYPE)),
-            rowCount: this.parseNumber(row.ROW_COUNT),
-            sizeBytes: this.parseNumber(row.BYTES),
-            comment: this.getString(row.COMMENT),
-            created: this.parseDate(row.CREATED),
-            lastModified: this.parseDate(row.LAST_ALTERED),
-          }));
-        } catch (error) {
-          console.warn(`Could not access tables in database ${dbName}:`, error);
-          return [];
-        }
-      });
-
-      const tablesResults = await Promise.all(tablesPromises);
-      this.metadataCache.tables = tablesResults.flat();
-
-      // Query 4: Get all columns across all accessible databases
-      const columnsPromises = accessibleDatabases.map(async (dbName) => {
-        try {
-          const result = await this.adapter.query(`
-            SELECT TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, 
-                   ORDINAL_POSITION, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT, 
-                   CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION, NUMERIC_SCALE, COMMENT
-            FROM ${dbName}.INFORMATION_SCHEMA.COLUMNS
-            ORDER BY TABLE_SCHEMA, TABLE_NAME, ORDINAL_POSITION
-          `);
-
-          return result.rows.map((row) => ({
-            name: this.getString(row.COLUMN_NAME) || '',
-            table: this.getString(row.TABLE_NAME) || '',
-            schema: this.getString(row.TABLE_SCHEMA) || '',
-            database: this.getString(row.TABLE_CATALOG) || dbName,
-            position: this.parseNumber(row.ORDINAL_POSITION) || 0,
-            dataType: this.getString(row.DATA_TYPE) || '',
-            isNullable: this.getString(row.IS_NULLABLE) === 'YES',
-            defaultValue: this.getString(row.COLUMN_DEFAULT),
-            maxLength: this.parseNumber(row.CHARACTER_MAXIMUM_LENGTH),
-            precision: this.parseNumber(row.NUMERIC_PRECISION),
-            scale: this.parseNumber(row.NUMERIC_SCALE),
-            comment: this.getString(row.COMMENT),
-          }));
-        } catch (error) {
-          console.warn(`Could not access columns in database ${dbName}:`, error);
-          return [];
-        }
-      });
-
-      const columnsResults = await Promise.all(columnsPromises);
-      this.metadataCache.columns = columnsResults.flat();
-
-      // Query 5: Get all views across all accessible databases
-      const viewsPromises = accessibleDatabases.map(async (dbName) => {
-        try {
-          const result = await this.adapter.query(`
-            SELECT TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, VIEW_DEFINITION, COMMENT
-            FROM ${dbName}.INFORMATION_SCHEMA.VIEWS
-          `);
-
-          return result.rows.map((row) => ({
-            name: this.getString(row.TABLE_NAME) || '',
-            schema: this.getString(row.TABLE_SCHEMA) || '',
-            database: this.getString(row.TABLE_CATALOG) || dbName,
-            definition: this.getString(row.VIEW_DEFINITION) || '',
-            comment: this.getString(row.COMMENT),
-          }));
-        } catch (error) {
-          console.warn(`Could not access views in database ${dbName}:`, error);
-          return [];
-        }
-      });
-
-      const viewsResults = await Promise.all(viewsPromises);
-      this.metadataCache.views = viewsResults.flat();
-
-      this.metadataCache.lastFetched = new Date();
+      this.cache.databases = { data: databases, lastFetched: new Date() };
+      return databases;
     } catch (error) {
-      console.warn('Failed to fetch Snowflake metadata:', error);
-      // Initialize empty arrays to prevent repeated failures
-      this.metadataCache.databases = [];
-      this.metadataCache.schemas = [];
-      this.metadataCache.tables = [];
-      this.metadataCache.columns = [];
-      this.metadataCache.views = [];
-      this.metadataCache.lastFetched = new Date();
+      console.warn('Failed to fetch databases:', error);
+      return [];
     }
-  }
-
-  async getDatabases(): Promise<Database[]> {
-    await this.fetchAllMetadata();
-    return this.metadataCache.databases || [];
   }
 
   async getSchemas(database?: string): Promise<Schema[]> {
-    await this.fetchAllMetadata();
-    const schemas = this.metadataCache.schemas || [];
-
-    if (database) {
-      return schemas.filter((schema) => schema.database === database);
+    // Check if we have valid cached data
+    if (this.cache.schemas && this.isCacheValid(this.cache.schemas.lastFetched)) {
+      const schemas = this.cache.schemas.data;
+      return database ? schemas.filter((schema) => schema.database === database) : schemas;
     }
-    return schemas;
+
+    try {
+      let schemas: Schema[] = [];
+
+      if (database) {
+        // Fetch schemas for specific database
+        const result = await this.adapter.query(`
+          SELECT SCHEMA_NAME, CATALOG_NAME, SCHEMA_OWNER, COMMENT
+          FROM ${database}.INFORMATION_SCHEMA.SCHEMATA
+          WHERE SCHEMA_NAME != 'INFORMATION_SCHEMA'
+        `);
+
+        schemas = result.rows.map((row) => ({
+          name: this.getString(row.SCHEMA_NAME) || '',
+          database: this.getString(row.CATALOG_NAME) || database,
+          owner: this.getString(row.SCHEMA_OWNER),
+          comment: this.getString(row.COMMENT),
+        }));
+      } else {
+        // Fetch schemas for all accessible databases
+        const databases = await this.getDatabases();
+        const schemasPromises = databases.map(async (db) => {
+          try {
+            const result = await this.adapter.query(`
+              SELECT SCHEMA_NAME, CATALOG_NAME, SCHEMA_OWNER, COMMENT
+              FROM ${db.name}.INFORMATION_SCHEMA.SCHEMATA
+              WHERE SCHEMA_NAME != 'INFORMATION_SCHEMA'
+            `);
+
+            return result.rows.map((row) => ({
+              name: this.getString(row.SCHEMA_NAME) || '',
+              database: this.getString(row.CATALOG_NAME) || db.name,
+              owner: this.getString(row.SCHEMA_OWNER),
+              comment: this.getString(row.COMMENT),
+            }));
+          } catch (error) {
+            console.warn(`Could not access schemas in database ${db.name}:`, error);
+            return [];
+          }
+        });
+
+        const schemasResults = await Promise.all(schemasPromises);
+        schemas = schemasResults.flat();
+      }
+
+      // Only cache if we fetched all schemas (no database filter)
+      if (!database) {
+        this.cache.schemas = { data: schemas, lastFetched: new Date() };
+      }
+
+      return schemas;
+    } catch (error) {
+      console.warn('Failed to fetch schemas:', error);
+      return [];
+    }
   }
 
   async getTables(database?: string, schema?: string): Promise<Table[]> {
-    await this.fetchAllMetadata();
-    let tables = this.metadataCache.tables || [];
-
-    if (database && schema) {
-      tables = tables.filter((table) => table.database === database && table.schema === schema);
-    } else if (database) {
-      tables = tables.filter((table) => table.database === database);
-    } else if (schema) {
-      tables = tables.filter((table) => table.schema === schema);
+    // Check if we have valid cached data and no filters
+    if (
+      !database &&
+      !schema &&
+      this.cache.tables &&
+      this.isCacheValid(this.cache.tables.lastFetched)
+    ) {
+      return this.cache.tables.data;
     }
 
-    return tables;
+    // If we have cached data and filters, use cached data
+    if (this.cache.tables && this.isCacheValid(this.cache.tables.lastFetched)) {
+      let tables = this.cache.tables.data;
+
+      if (database && schema) {
+        tables = tables.filter((table) => table.database === database && table.schema === schema);
+      } else if (database) {
+        tables = tables.filter((table) => table.database === database);
+      } else if (schema) {
+        tables = tables.filter((table) => table.schema === schema);
+      }
+
+      return tables;
+    }
+
+    try {
+      let tables: Table[] = [];
+
+      if (database && schema) {
+        // Fetch tables for specific database and schema
+        const result = await this.adapter.query(`
+          SELECT TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE, 
+                 ROW_COUNT, BYTES, COMMENT, CREATED, LAST_ALTERED
+          FROM ${database}.INFORMATION_SCHEMA.TABLES
+          WHERE TABLE_SCHEMA = '${schema}'
+        `);
+
+        tables = result.rows.map((row) => ({
+          name: this.getString(row.TABLE_NAME) || '',
+          schema: this.getString(row.TABLE_SCHEMA) || '',
+          database: this.getString(row.TABLE_CATALOG) || database,
+          type: this.mapTableType(this.getString(row.TABLE_TYPE)),
+          rowCount: this.parseNumber(row.ROW_COUNT),
+          sizeBytes: this.parseNumber(row.BYTES),
+          comment: this.getString(row.COMMENT),
+          created: this.parseDate(row.CREATED),
+          lastModified: this.parseDate(row.LAST_ALTERED),
+        }));
+      } else if (database) {
+        // Fetch tables for specific database
+        const result = await this.adapter.query(`
+          SELECT TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE, 
+                 ROW_COUNT, BYTES, COMMENT, CREATED, LAST_ALTERED
+          FROM ${database}.INFORMATION_SCHEMA.TABLES
+        `);
+
+        tables = result.rows.map((row) => ({
+          name: this.getString(row.TABLE_NAME) || '',
+          schema: this.getString(row.TABLE_SCHEMA) || '',
+          database: this.getString(row.TABLE_CATALOG) || database,
+          type: this.mapTableType(this.getString(row.TABLE_TYPE)),
+          rowCount: this.parseNumber(row.ROW_COUNT),
+          sizeBytes: this.parseNumber(row.BYTES),
+          comment: this.getString(row.COMMENT),
+          created: this.parseDate(row.CREATED),
+          lastModified: this.parseDate(row.LAST_ALTERED),
+        }));
+      } else {
+        // Fetch tables for all accessible databases
+        const databases = await this.getDatabases();
+        const tablesPromises = databases.map(async (db) => {
+          try {
+            const result = await this.adapter.query(`
+              SELECT TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, TABLE_TYPE, 
+                     ROW_COUNT, BYTES, COMMENT, CREATED, LAST_ALTERED
+              FROM ${db.name}.INFORMATION_SCHEMA.TABLES
+            `);
+
+            return result.rows.map((row) => ({
+              name: this.getString(row.TABLE_NAME) || '',
+              schema: this.getString(row.TABLE_SCHEMA) || '',
+              database: this.getString(row.TABLE_CATALOG) || db.name,
+              type: this.mapTableType(this.getString(row.TABLE_TYPE)),
+              rowCount: this.parseNumber(row.ROW_COUNT),
+              sizeBytes: this.parseNumber(row.BYTES),
+              comment: this.getString(row.COMMENT),
+              created: this.parseDate(row.CREATED),
+              lastModified: this.parseDate(row.LAST_ALTERED),
+            }));
+          } catch (error) {
+            console.warn(`Could not access tables in database ${db.name}:`, error);
+            return [];
+          }
+        });
+
+        const tablesResults = await Promise.all(tablesPromises);
+        tables = tablesResults.flat();
+      }
+
+      // Only cache if we fetched all tables (no filters)
+      if (!database && !schema) {
+        this.cache.tables = { data: tables, lastFetched: new Date() };
+      }
+
+      return tables;
+    } catch (error) {
+      console.warn('Failed to fetch tables:', error);
+      return [];
+    }
   }
 
   async getColumns(database?: string, schema?: string, table?: string): Promise<Column[]> {
-    await this.fetchAllMetadata();
-    let columns = this.metadataCache.columns || [];
-
-    if (database && schema && table) {
-      columns = columns.filter(
-        (col) => col.database === database && col.schema === schema && col.table === table
-      );
-    } else if (database && schema) {
-      columns = columns.filter((col) => col.database === database && col.schema === schema);
-    } else if (database) {
-      columns = columns.filter((col) => col.database === database);
-    } else if (schema) {
-      columns = columns.filter((col) => col.schema === schema);
+    // Check if we have valid cached data and no filters
+    if (
+      !database &&
+      !schema &&
+      !table &&
+      this.cache.columns &&
+      this.isCacheValid(this.cache.columns.lastFetched)
+    ) {
+      return this.cache.columns.data;
     }
 
-    if (table && !database && !schema) {
-      columns = columns.filter((col) => col.table === table);
+    // If we have cached data and filters, use cached data
+    if (this.cache.columns && this.isCacheValid(this.cache.columns.lastFetched)) {
+      let columns = this.cache.columns.data;
+
+      if (database && schema && table) {
+        columns = columns.filter(
+          (col) => col.database === database && col.schema === schema && col.table === table
+        );
+      } else if (database && schema) {
+        columns = columns.filter((col) => col.database === database && col.schema === schema);
+      } else if (database) {
+        columns = columns.filter((col) => col.database === database);
+      } else if (schema) {
+        columns = columns.filter((col) => col.schema === schema);
+      } else if (table) {
+        columns = columns.filter((col) => col.table === table);
+      }
+
+      return columns;
     }
 
-    return columns;
+    try {
+      let columns: Column[] = [];
+
+      if (database && schema && table) {
+        // Fetch columns for specific table
+        const result = await this.adapter.query(`
+          SELECT TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, 
+                 ORDINAL_POSITION, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT, 
+                 CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION, NUMERIC_SCALE, COMMENT
+          FROM ${database}.INFORMATION_SCHEMA.COLUMNS
+          WHERE TABLE_SCHEMA = '${schema}' AND TABLE_NAME = '${table}'
+          ORDER BY ORDINAL_POSITION
+        `);
+
+        columns = result.rows.map((row) => ({
+          name: this.getString(row.COLUMN_NAME) || '',
+          table: this.getString(row.TABLE_NAME) || '',
+          schema: this.getString(row.TABLE_SCHEMA) || '',
+          database: this.getString(row.TABLE_CATALOG) || database,
+          position: this.parseNumber(row.ORDINAL_POSITION) || 0,
+          dataType: this.getString(row.DATA_TYPE) || '',
+          isNullable: this.getString(row.IS_NULLABLE) === 'YES',
+          defaultValue: this.getString(row.COLUMN_DEFAULT),
+          maxLength: this.parseNumber(row.CHARACTER_MAXIMUM_LENGTH),
+          precision: this.parseNumber(row.NUMERIC_PRECISION),
+          scale: this.parseNumber(row.NUMERIC_SCALE),
+          comment: this.getString(row.COMMENT),
+        }));
+      } else if (database && schema) {
+        // Fetch columns for specific schema
+        const result = await this.adapter.query(`
+          SELECT TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, 
+                 ORDINAL_POSITION, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT, 
+                 CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION, NUMERIC_SCALE, COMMENT
+          FROM ${database}.INFORMATION_SCHEMA.COLUMNS
+          WHERE TABLE_SCHEMA = '${schema}'
+          ORDER BY TABLE_NAME, ORDINAL_POSITION
+        `);
+
+        columns = result.rows.map((row) => ({
+          name: this.getString(row.COLUMN_NAME) || '',
+          table: this.getString(row.TABLE_NAME) || '',
+          schema: this.getString(row.TABLE_SCHEMA) || '',
+          database: this.getString(row.TABLE_CATALOG) || database,
+          position: this.parseNumber(row.ORDINAL_POSITION) || 0,
+          dataType: this.getString(row.DATA_TYPE) || '',
+          isNullable: this.getString(row.IS_NULLABLE) === 'YES',
+          defaultValue: this.getString(row.COLUMN_DEFAULT),
+          maxLength: this.parseNumber(row.CHARACTER_MAXIMUM_LENGTH),
+          precision: this.parseNumber(row.NUMERIC_PRECISION),
+          scale: this.parseNumber(row.NUMERIC_SCALE),
+          comment: this.getString(row.COMMENT),
+        }));
+      } else if (database) {
+        // Fetch columns for specific database
+        const result = await this.adapter.query(`
+          SELECT TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, 
+                 ORDINAL_POSITION, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT, 
+                 CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION, NUMERIC_SCALE, COMMENT
+          FROM ${database}.INFORMATION_SCHEMA.COLUMNS
+          ORDER BY TABLE_SCHEMA, TABLE_NAME, ORDINAL_POSITION
+        `);
+
+        columns = result.rows.map((row) => ({
+          name: this.getString(row.COLUMN_NAME) || '',
+          table: this.getString(row.TABLE_NAME) || '',
+          schema: this.getString(row.TABLE_SCHEMA) || '',
+          database: this.getString(row.TABLE_CATALOG) || database,
+          position: this.parseNumber(row.ORDINAL_POSITION) || 0,
+          dataType: this.getString(row.DATA_TYPE) || '',
+          isNullable: this.getString(row.IS_NULLABLE) === 'YES',
+          defaultValue: this.getString(row.COLUMN_DEFAULT),
+          maxLength: this.parseNumber(row.CHARACTER_MAXIMUM_LENGTH),
+          precision: this.parseNumber(row.NUMERIC_PRECISION),
+          scale: this.parseNumber(row.NUMERIC_SCALE),
+          comment: this.getString(row.COMMENT),
+        }));
+      } else {
+        // Fetch columns for all accessible databases
+        const databases = await this.getDatabases();
+        const columnsPromises = databases.map(async (db) => {
+          try {
+            const result = await this.adapter.query(`
+              SELECT TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, COLUMN_NAME, 
+                     ORDINAL_POSITION, DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT, 
+                     CHARACTER_MAXIMUM_LENGTH, NUMERIC_PRECISION, NUMERIC_SCALE, COMMENT
+              FROM ${db.name}.INFORMATION_SCHEMA.COLUMNS
+              ORDER BY TABLE_SCHEMA, TABLE_NAME, ORDINAL_POSITION
+            `);
+
+            return result.rows.map((row) => ({
+              name: this.getString(row.COLUMN_NAME) || '',
+              table: this.getString(row.TABLE_NAME) || '',
+              schema: this.getString(row.TABLE_SCHEMA) || '',
+              database: this.getString(row.TABLE_CATALOG) || db.name,
+              position: this.parseNumber(row.ORDINAL_POSITION) || 0,
+              dataType: this.getString(row.DATA_TYPE) || '',
+              isNullable: this.getString(row.IS_NULLABLE) === 'YES',
+              defaultValue: this.getString(row.COLUMN_DEFAULT),
+              maxLength: this.parseNumber(row.CHARACTER_MAXIMUM_LENGTH),
+              precision: this.parseNumber(row.NUMERIC_PRECISION),
+              scale: this.parseNumber(row.NUMERIC_SCALE),
+              comment: this.getString(row.COMMENT),
+            }));
+          } catch (error) {
+            console.warn(`Could not access columns in database ${db.name}:`, error);
+            return [];
+          }
+        });
+
+        const columnsResults = await Promise.all(columnsPromises);
+        columns = columnsResults.flat();
+      }
+
+      // Only cache if we fetched all columns (no filters)
+      if (!database && !schema && !table) {
+        this.cache.columns = { data: columns, lastFetched: new Date() };
+      }
+
+      return columns;
+    } catch (error) {
+      console.warn('Failed to fetch columns:', error);
+      return [];
+    }
   }
 
   async getViews(database?: string, schema?: string): Promise<View[]> {
-    await this.fetchAllMetadata();
-    let views = this.metadataCache.views || [];
-
-    if (database && schema) {
-      views = views.filter((view) => view.database === database && view.schema === schema);
-    } else if (database) {
-      views = views.filter((view) => view.database === database);
-    } else if (schema) {
-      views = views.filter((view) => view.schema === schema);
+    // Check if we have valid cached data and no filters
+    if (
+      !database &&
+      !schema &&
+      this.cache.views &&
+      this.isCacheValid(this.cache.views.lastFetched)
+    ) {
+      return this.cache.views.data;
     }
 
-    return views;
+    // If we have cached data and filters, use cached data
+    if (this.cache.views && this.isCacheValid(this.cache.views.lastFetched)) {
+      let views = this.cache.views.data;
+
+      if (database && schema) {
+        views = views.filter((view) => view.database === database && view.schema === schema);
+      } else if (database) {
+        views = views.filter((view) => view.database === database);
+      } else if (schema) {
+        views = views.filter((view) => view.schema === schema);
+      }
+
+      return views;
+    }
+
+    try {
+      let views: View[] = [];
+
+      if (database && schema) {
+        // Fetch views for specific database and schema
+        const result = await this.adapter.query(`
+          SELECT TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, VIEW_DEFINITION, COMMENT
+          FROM ${database}.INFORMATION_SCHEMA.VIEWS
+          WHERE TABLE_SCHEMA = '${schema}'
+        `);
+
+        views = result.rows.map((row) => ({
+          name: this.getString(row.TABLE_NAME) || '',
+          schema: this.getString(row.TABLE_SCHEMA) || '',
+          database: this.getString(row.TABLE_CATALOG) || database,
+          definition: this.getString(row.VIEW_DEFINITION) || '',
+          comment: this.getString(row.COMMENT),
+        }));
+      } else if (database) {
+        // Fetch views for specific database
+        const result = await this.adapter.query(`
+          SELECT TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, VIEW_DEFINITION, COMMENT
+          FROM ${database}.INFORMATION_SCHEMA.VIEWS
+        `);
+
+        views = result.rows.map((row) => ({
+          name: this.getString(row.TABLE_NAME) || '',
+          schema: this.getString(row.TABLE_SCHEMA) || '',
+          database: this.getString(row.TABLE_CATALOG) || database,
+          definition: this.getString(row.VIEW_DEFINITION) || '',
+          comment: this.getString(row.COMMENT),
+        }));
+      } else {
+        // Fetch views for all accessible databases
+        const databases = await this.getDatabases();
+        const viewsPromises = databases.map(async (db) => {
+          try {
+            const result = await this.adapter.query(`
+              SELECT TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME, VIEW_DEFINITION, COMMENT
+              FROM ${db.name}.INFORMATION_SCHEMA.VIEWS
+            `);
+
+            return result.rows.map((row) => ({
+              name: this.getString(row.TABLE_NAME) || '',
+              schema: this.getString(row.TABLE_SCHEMA) || '',
+              database: this.getString(row.TABLE_CATALOG) || db.name,
+              definition: this.getString(row.VIEW_DEFINITION) || '',
+              comment: this.getString(row.COMMENT),
+            }));
+          } catch (error) {
+            console.warn(`Could not access views in database ${db.name}:`, error);
+            return [];
+          }
+        });
+
+        const viewsResults = await Promise.all(viewsPromises);
+        views = viewsResults.flat();
+      }
+
+      // Only cache if we fetched all views (no filters)
+      if (!database && !schema) {
+        this.cache.views = { data: views, lastFetched: new Date() };
+      }
+
+      return views;
+    } catch (error) {
+      console.warn('Failed to fetch views:', error);
+      return [];
+    }
   }
 
   async getTableStatistics(
@@ -460,5 +704,277 @@ export class SnowflakeIntrospector extends BaseIntrospector {
     const dateTypes = ['DATE', 'TIMESTAMP', 'TIMESTAMP_LTZ', 'TIMESTAMP_TZ', 'TIME'];
 
     return dateTypes.some((type) => dataType.toUpperCase().includes(type));
+  }
+
+  /**
+   * Snowflake-optimized full introspection that takes advantage of caching
+   * Fetches data sequentially: databases → schemas → tables → columns → views
+   * Each step benefits from the cache populated by previous steps
+   */
+  override async getFullIntrospection(options?: {
+    databases?: string[];
+    schemas?: string[];
+    tables?: string[];
+  }): Promise<DataSourceIntrospectionResult> {
+    // Step 1: Fetch all databases (populates database cache)
+    const allDatabases = await this.getDatabases();
+
+    // Filter databases if specified
+    const databases = options?.databases
+      ? allDatabases.filter((db) => options.databases?.includes(db.name) ?? false)
+      : allDatabases;
+
+    // Step 2: Fetch all schemas (benefits from database cache, populates schema cache)
+    const allSchemas = await this.getSchemas(); // No filter - gets all schemas and caches them
+
+    // Filter schemas if specified
+    let schemas = allSchemas;
+    if (options?.databases) {
+      // If databases are filtered, only include schemas from those databases
+      schemas = schemas.filter((schema) => databases.some((db) => db.name === schema.database));
+    }
+    if (options?.schemas) {
+      // If specific schemas are requested, filter to those
+      schemas = schemas.filter((schema) => options.schemas?.includes(schema.name) ?? false);
+    }
+
+    // Step 3: Fetch all tables (benefits from database cache, populates table cache)
+    const allTables = await this.getTables(); // No filter - gets all tables and caches them
+
+    // Filter tables if specified
+    let tables = allTables;
+    if (options?.databases) {
+      // If databases are filtered, only include tables from those databases
+      tables = tables.filter((table) => databases.some((db) => db.name === table.database));
+    }
+    if (options?.schemas) {
+      // If schemas are filtered, only include tables from those schemas
+      tables = tables.filter((table) =>
+        schemas.some((schema) => schema.name === table.schema && schema.database === table.database)
+      );
+    }
+    if (options?.tables) {
+      // If specific tables are requested, filter to those
+      tables = tables.filter((table) => options.tables?.includes(table.name) ?? false);
+    }
+
+    // Step 4: Fetch all columns (benefits from database cache, populates column cache)
+    const allColumns = await this.getColumns(); // No filter - gets all columns and caches them
+
+    // Filter columns based on filtered tables
+    const columns = allColumns.filter((column) =>
+      tables.some(
+        (table) =>
+          table.name === column.table &&
+          table.schema === column.schema &&
+          table.database === column.database
+      )
+    );
+
+    // Step 5: Fetch all views (benefits from database cache, populates view cache)
+    const allViews = await this.getViews(); // No filter - gets all views and caches them
+
+    // Filter views if specified
+    let views = allViews;
+    if (options?.databases) {
+      // If databases are filtered, only include views from those databases
+      views = views.filter((view) => databases.some((db) => db.name === view.database));
+    }
+    if (options?.schemas) {
+      // If schemas are filtered, only include views from those schemas
+      views = views.filter((view) =>
+        schemas.some((schema) => schema.name === view.schema && schema.database === view.database)
+      );
+    }
+
+    // Get column statistics in batches of 20 tables
+    const columnsWithStats = await this.attachColumnStatisticsSnowflake(tables, columns);
+
+    return {
+      dataSourceName: this.dataSourceName,
+      dataSourceType: this.getDataSourceType(),
+      databases,
+      schemas,
+      tables,
+      columns: columnsWithStats,
+      views,
+      indexes: undefined, // Snowflake doesn't expose index information
+      foreignKeys: undefined, // Snowflake doesn't expose foreign key information
+      introspectedAt: new Date(),
+    };
+  }
+
+  /**
+   * Attach column statistics to columns by processing tables in batches
+   * This is a copy of the base implementation to avoid dependency issues
+   */
+  private async attachColumnStatisticsSnowflake(
+    tables: Table[],
+    columns: Column[]
+  ): Promise<Column[]> {
+    // Create a map for quick column lookup
+    const columnMap = new Map<string, Column>();
+    for (const column of columns) {
+      const key = `${column.database}.${column.schema}.${column.table}.${column.name}`;
+      columnMap.set(key, { ...column });
+    }
+
+    // Process tables in batches of 20
+    const batchSize = 20;
+    const tableBatches: Table[][] = [];
+    for (let i = 0; i < tables.length; i += batchSize) {
+      tableBatches.push(tables.slice(i, i + batchSize));
+    }
+
+    // Process each batch in parallel
+    await Promise.all(
+      tableBatches.map(async (batch) => {
+        // Process all tables in this batch in parallel
+        await Promise.all(
+          batch.map(async (table) => {
+            try {
+              const columnStats = await this.getColumnStatistics(
+                table.database,
+                table.schema,
+                table.name
+              );
+
+              // Attach statistics to corresponding columns
+              for (const stat of columnStats) {
+                const key = `${table.database}.${table.schema}.${table.name}.${stat.columnName}`;
+                const column = columnMap.get(key);
+                if (column) {
+                  column.distinctCount = stat.distinctCount;
+                  column.nullCount = stat.nullCount;
+                  column.minValue = stat.minValue;
+                  column.maxValue = stat.maxValue;
+                  // Apply smart truncation to sample values
+                  column.sampleValues = this.truncateSampleValuesSnowflake(
+                    stat.sampleValues,
+                    column
+                  );
+                }
+              }
+            } catch (error) {
+              // Log warning but don't fail the entire introspection
+              console.warn(
+                `Failed to get column statistics for table ${table.database}.${table.schema}.${table.name}:`,
+                error
+              );
+            }
+          })
+        );
+      })
+    );
+
+    return Array.from(columnMap.values());
+  }
+
+  /**
+   * Helper method to apply smart truncation to sample values
+   * This is a copy of the base implementation to avoid dependency issues
+   */
+  private truncateSampleValuesSnowflake(
+    sampleValues: string | undefined,
+    column: Column
+  ): string | undefined {
+    if (!sampleValues) return undefined;
+
+    const values = sampleValues.split(',').filter((v) => v.trim().length > 0);
+    if (values.length === 0) return undefined;
+
+    const dataType = column.dataType.toLowerCase();
+
+    // Handle JSON columns - fewer samples, smart truncation
+    if (dataType.includes('json') || dataType.includes('jsonb')) {
+      return this.truncateJsonSamplesSnowflake(values);
+    }
+
+    // Handle long text columns - adaptive sample count
+    if (this.isLongTextColumnSnowflake(column, values)) {
+      return this.truncateLongTextSamplesSnowflake(values);
+    }
+
+    // Handle normal columns - standard truncation
+    return this.truncateNormalSamplesSnowflake(values);
+  }
+
+  /**
+   * Truncate JSON sample values - show fewer samples with smart truncation
+   */
+  private truncateJsonSamplesSnowflake(values: string[]): string {
+    return values
+      .slice(0, 3) // Only show 3 JSON samples
+      .map((value) => {
+        if (value.length > 100) {
+          // Try to truncate at a logical JSON boundary
+          const truncated = value.substring(0, 100);
+          const lastComma = truncated.lastIndexOf(',');
+          const lastBrace = truncated.lastIndexOf('}');
+          const cutPoint = Math.max(lastComma, lastBrace);
+
+          if (cutPoint > 50) {
+            return `${truncated.substring(0, cutPoint)}...}`;
+          }
+          return `${truncated}...`;
+        }
+        return value;
+      })
+      .join(',');
+  }
+
+  /**
+   * Truncate long text sample values - fewer samples, shorter truncation
+   */
+  private truncateLongTextSamplesSnowflake(values: string[]): string {
+    const avgLength = values.reduce((sum, v) => sum + v.length, 0) / values.length;
+    const sampleCount = avgLength > 200 ? 3 : avgLength > 100 ? 5 : 10;
+    const truncateLength = avgLength > 200 ? 30 : 50;
+
+    return values
+      .slice(0, sampleCount)
+      .map((value) => {
+        if (value.length > truncateLength) {
+          return `${value.substring(0, truncateLength)}...`;
+        }
+        return value;
+      })
+      .join(',');
+  }
+
+  /**
+   * Truncate normal sample values - standard approach
+   */
+  private truncateNormalSamplesSnowflake(values: string[]): string {
+    return values
+      .slice(0, 20)
+      .map((value) => {
+        if (value.length > 100) {
+          return `${value.substring(0, 100)}...`;
+        }
+        return value;
+      })
+      .join(',');
+  }
+
+  /**
+   * Check if this is a long text column based on type and sample values
+   */
+  private isLongTextColumnSnowflake(column: Column, values: string[]): boolean {
+    const dataType = column.dataType.toLowerCase();
+
+    // Check data type indicators
+    if (dataType.includes('text') || dataType.includes('varchar') || dataType.includes('char')) {
+      // Check if max length suggests long text
+      if (column.maxLength && column.maxLength > 255) {
+        return true;
+      }
+
+      // Check if sample values are long
+      const avgLength = values.reduce((sum, v) => sum + v.length, 0) / values.length;
+      return avgLength > 100;
+    }
+
+    return false;
   }
 }

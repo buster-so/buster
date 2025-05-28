@@ -64,8 +64,13 @@ export interface DataSourceIntrospector {
 
   /**
    * Get comprehensive introspection data for the entire data source
+   * @param options Optional scoping parameters to limit introspection to specific databases, schemas, or tables
    */
-  getFullIntrospection(): Promise<DataSourceIntrospectionResult>;
+  getFullIntrospection(options?: {
+    databases?: string[];
+    schemas?: string[];
+    tables?: string[];
+  }): Promise<DataSourceIntrospectionResult>;
 
   /**
    * Get the data source type this introspector handles
@@ -102,15 +107,79 @@ export abstract class BaseIntrospector implements DataSourceIntrospector {
 
   /**
    * Default implementation of getFullIntrospection that combines all introspection methods
+   * Fetches data sequentially to take advantage of caching: databases → schemas → tables → columns → views
    */
-  async getFullIntrospection(): Promise<DataSourceIntrospectionResult> {
-    const [databases, schemas, tables, columns, views] = await Promise.all([
-      this.getDatabases(),
-      this.getSchemas(),
-      this.getTables(),
-      this.getColumns(),
-      this.getViews(),
-    ]);
+  async getFullIntrospection(options?: {
+    databases?: string[];
+    schemas?: string[];
+    tables?: string[];
+  }): Promise<DataSourceIntrospectionResult> {
+    // Fetch data sequentially to enable caching optimizations
+    const allDatabases = await this.getDatabases();
+
+    // Filter databases if specified
+    const databases = options?.databases
+      ? allDatabases.filter((db) => options.databases?.includes(db.name) ?? false)
+      : allDatabases;
+
+    const allSchemas = await this.getSchemas();
+
+    // Filter schemas if specified
+    let schemas = allSchemas;
+    if (options?.databases) {
+      // If databases are filtered, only include schemas from those databases
+      schemas = schemas.filter((schema) => databases.some((db) => db.name === schema.database));
+    }
+    if (options?.schemas) {
+      // If specific schemas are requested, filter to those
+      schemas = schemas.filter((schema) => options.schemas?.includes(schema.name) ?? false);
+    }
+
+    const allTables = await this.getTables();
+
+    // Filter tables if specified
+    let tables = allTables;
+    if (options?.databases) {
+      // If databases are filtered, only include tables from those databases
+      tables = tables.filter((table) => databases.some((db) => db.name === table.database));
+    }
+    if (options?.schemas) {
+      // If schemas are filtered, only include tables from those schemas
+      tables = tables.filter((table) =>
+        schemas.some((schema) => schema.name === table.schema && schema.database === table.database)
+      );
+    }
+    if (options?.tables) {
+      // If specific tables are requested, filter to those
+      tables = tables.filter((table) => options.tables?.includes(table.name) ?? false);
+    }
+
+    const allColumns = await this.getColumns();
+
+    // Filter columns based on filtered tables
+    const columns = allColumns.filter((column) =>
+      tables.some(
+        (table) =>
+          table.name === column.table &&
+          table.schema === column.schema &&
+          table.database === column.database
+      )
+    );
+
+    const allViews = await this.getViews();
+
+    // Filter views if specified
+    let views = allViews;
+    if (options?.databases) {
+      // If databases are filtered, only include views from those databases
+      views = views.filter((view) => databases.some((db) => db.name === view.database));
+    }
+    if (options?.schemas) {
+      // If schemas are filtered, only include views from those schemas
+      views = views.filter((view) =>
+        schemas.some((schema) => schema.name === view.schema && schema.database === view.database)
+      );
+    }
 
     // Get indexes and foreign keys if supported
     const indexes =

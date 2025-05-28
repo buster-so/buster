@@ -3,6 +3,7 @@ import { DataSourceType } from '../types/credentials';
 import type {
   Column,
   ColumnStatistics,
+  DataSourceIntrospectionResult,
   Database,
   Schema,
   Table,
@@ -17,14 +18,15 @@ import { BaseIntrospector } from './base';
  */
 export class SQLServerIntrospector extends BaseIntrospector {
   private adapter: DatabaseAdapter;
-  private metadataCache: {
-    databases?: Database[];
-    schemas?: Schema[];
-    tables?: Table[];
-    columns?: Column[];
-    views?: View[];
-    lastFetched?: Date;
+  private cache: {
+    databases?: { data: Database[]; lastFetched: Date };
+    schemas?: { data: Schema[]; lastFetched: Date };
+    tables?: { data: Table[]; lastFetched: Date };
+    columns?: { data: Column[]; lastFetched: Date };
+    views?: { data: View[]; lastFetched: Date };
   } = {};
+
+  private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
   constructor(dataSourceName: string, adapter: DatabaseAdapter) {
     super(dataSourceName);
@@ -36,20 +38,19 @@ export class SQLServerIntrospector extends BaseIntrospector {
   }
 
   /**
-   * Fetch all metadata in batched queries for efficiency
+   * Check if cached data is still valid
    */
-  private async fetchAllMetadata(): Promise<void> {
-    // Only fetch if not cached or cache is older than 5 minutes
-    const cacheAge = this.metadataCache.lastFetched
-      ? Date.now() - this.metadataCache.lastFetched.getTime()
-      : Number.POSITIVE_INFINITY;
+  private isCacheValid(lastFetched: Date): boolean {
+    return Date.now() - lastFetched.getTime() < this.CACHE_TTL;
+  }
 
-    if (cacheAge < 5 * 60 * 1000 && this.metadataCache.databases) {
-      return; // Use cached data
+  async getDatabases(): Promise<Database[]> {
+    // Check if we have valid cached data
+    if (this.cache.databases && this.isCacheValid(this.cache.databases.lastFetched)) {
+      return this.cache.databases.data;
     }
 
     try {
-      // Query 1: Get all databases
       const databasesResult = await this.adapter.query(`
         SELECT name,
                database_id,
@@ -60,7 +61,7 @@ export class SQLServerIntrospector extends BaseIntrospector {
         ORDER BY name
       `);
 
-      this.metadataCache.databases = databasesResult.rows.map((row) => ({
+      const databases = databasesResult.rows.map((row) => ({
         name: this.getString(row.name) || '',
         created: this.parseDate(row.create_date),
         metadata: {
@@ -69,82 +70,193 @@ export class SQLServerIntrospector extends BaseIntrospector {
         },
       }));
 
-      // Query 2: Get all schemas
+      this.cache.databases = { data: databases, lastFetched: new Date() };
+      return databases;
+    } catch (error) {
+      console.warn('Failed to fetch SQL Server databases:', error);
+      return [];
+    }
+  }
+
+  async getSchemas(_database?: string): Promise<Schema[]> {
+    // Check if we have valid cached data
+    if (this.cache.schemas && this.isCacheValid(this.cache.schemas.lastFetched)) {
+      return this.cache.schemas.data;
+    }
+
+    try {
+      const whereClause = `WHERE s.name NOT IN ('sys', 'INFORMATION_SCHEMA', 'guest', 'db_owner', 'db_accessadmin', 
+                             'db_securityadmin', 'db_ddladmin', 'db_backupoperator', 'db_datareader', 
+                             'db_datawriter', 'db_denydatareader', 'db_denydatawriter')`;
+
       const schemasResult = await this.adapter.query(`
         SELECT s.name as schema_name,
                DB_NAME() as database_name,
                p.name as owner_name
         FROM sys.schemas s
         LEFT JOIN sys.database_principals p ON s.principal_id = p.principal_id
-        WHERE s.name NOT IN ('sys', 'INFORMATION_SCHEMA', 'guest', 'db_owner', 'db_accessadmin', 
-                             'db_securityadmin', 'db_ddladmin', 'db_backupoperator', 'db_datareader', 
-                             'db_datawriter', 'db_denydatareader', 'db_denydatawriter')
+        ${whereClause}
         ORDER BY s.name
       `);
 
-      this.metadataCache.schemas = schemasResult.rows.map((row) => ({
+      const schemas = schemasResult.rows.map((row) => ({
         name: this.getString(row.schema_name) || '',
         database: this.getString(row.database_name) || '',
         owner: this.getString(row.owner_name),
       }));
 
-      // Query 3: Get all tables and views in one query
-      const tablesAndViewsResult = await this.adapter.query(`
+      this.cache.schemas = { data: schemas, lastFetched: new Date() };
+      return schemas;
+    } catch (error) {
+      console.warn('Failed to fetch SQL Server schemas:', error);
+      return [];
+    }
+  }
+
+  async getTables(database?: string, schema?: string): Promise<Table[]> {
+    // Check if we have valid cached data and no filters
+    if (
+      !database &&
+      !schema &&
+      this.cache.tables &&
+      this.isCacheValid(this.cache.tables.lastFetched)
+    ) {
+      return this.cache.tables.data;
+    }
+
+    // If we have cached data and filters, use cached data
+    if (this.cache.tables && this.isCacheValid(this.cache.tables.lastFetched)) {
+      let tables = this.cache.tables.data;
+
+      if (database && schema) {
+        tables = tables.filter((table) => table.database === database && table.schema === schema);
+      } else if (database) {
+        tables = tables.filter((table) => table.database === database);
+      } else if (schema) {
+        tables = tables.filter((table) => table.schema === schema);
+      }
+
+      return tables;
+    }
+
+    try {
+      let whereClause = '';
+
+      if (database && schema) {
+        whereClause = `WHERE DB_NAME() = '${database}' AND s.name = '${schema}'`;
+      } else if (schema) {
+        whereClause = `WHERE s.name = '${schema}'`;
+      }
+
+      const tablesResult = await this.adapter.query(`
         SELECT DB_NAME() as database_name,
                s.name as schema_name,
                t.name as table_name,
                t.type as table_type,
                t.create_date,
-               t.modify_date,
-               NULL as view_definition
+               t.modify_date
         FROM sys.tables t
         INNER JOIN sys.schemas s ON t.schema_id = s.schema_id
-        WHERE t.type = 'U'
-        
-        UNION ALL
-        
-        SELECT DB_NAME() as database_name,
-               s.name as schema_name,
-               v.name as table_name,
-               'V' as table_type,
-               v.create_date,
-               v.modify_date,
-               m.definition as view_definition
-        FROM sys.views v
-        INNER JOIN sys.schemas s ON v.schema_id = s.schema_id
-        INNER JOIN sys.sql_modules m ON v.object_id = m.object_id
-        
-        ORDER BY schema_name, table_name
+        ${whereClause}
+        ORDER BY s.name, t.name
       `);
 
-      // Separate tables and views
-      this.metadataCache.tables = [];
-      this.metadataCache.views = [];
+      const tables = tablesResult.rows.map((row) => ({
+        name: this.getString(row.table_name) || '',
+        schema: this.getString(row.schema_name) || '',
+        database: this.getString(row.database_name) || '',
+        type: this.mapTableType(this.getString(row.table_type)),
+        created: this.parseDate(row.create_date),
+        lastModified: this.parseDate(row.modify_date),
+      }));
 
-      for (const row of tablesAndViewsResult.rows) {
-        const tableType = this.getString(row.table_type);
-        const item = {
-          name: this.getString(row.table_name) || '',
-          schema: this.getString(row.schema_name) || '',
-          database: this.getString(row.database_name) || '',
-          created: this.parseDate(row.create_date),
-          lastModified: this.parseDate(row.modify_date),
-        };
+      // Enhance tables with basic statistics
+      const tablesWithStats = await Promise.all(
+        tables.map(async (table) => {
+          try {
+            const tableStatsResult = await this.adapter.query(`
+              SELECT 
+                SUM(p.rows) as row_count,
+                SUM(a.total_pages) * 8 * 1024 as size_bytes
+              FROM sys.tables t
+              INNER JOIN sys.partitions p ON t.object_id = p.object_id
+              INNER JOIN sys.allocation_units a ON p.partition_id = a.container_id
+              WHERE t.name = '${table.name}' 
+                AND SCHEMA_NAME(t.schema_id) = '${table.schema}'
+                AND p.index_id IN (0,1)
+            `);
 
-        if (tableType === 'V') {
-          this.metadataCache.views.push({
-            ...item,
-            definition: this.getString(row.view_definition) || '',
-          });
-        } else {
-          this.metadataCache.tables.push({
-            ...item,
-            type: this.mapTableType(tableType),
-          });
-        }
+            const stats = tableStatsResult.rows[0];
+            return {
+              ...table,
+              rowCount: this.parseNumber(stats?.row_count),
+              sizeBytes: this.parseNumber(stats?.size_bytes),
+            };
+          } catch (error) {
+            console.warn(`Failed to get stats for table ${table.schema}.${table.name}:`, error);
+            return table;
+          }
+        })
+      );
+
+      // Only cache if we fetched all tables (no filters)
+      if (!database && !schema) {
+        this.cache.tables = { data: tablesWithStats, lastFetched: new Date() };
       }
 
-      // Query 4: Get all columns
+      return tablesWithStats;
+    } catch (error) {
+      console.warn('Failed to fetch SQL Server tables:', error);
+      return [];
+    }
+  }
+
+  async getColumns(database?: string, schema?: string, table?: string): Promise<Column[]> {
+    // Check if we have valid cached data and no filters
+    if (
+      !database &&
+      !schema &&
+      !table &&
+      this.cache.columns &&
+      this.isCacheValid(this.cache.columns.lastFetched)
+    ) {
+      return this.cache.columns.data;
+    }
+
+    // If we have cached data and filters, use cached data
+    if (this.cache.columns && this.isCacheValid(this.cache.columns.lastFetched)) {
+      let columns = this.cache.columns.data;
+
+      if (database && schema && table) {
+        columns = columns.filter(
+          (col) => col.database === database && col.schema === schema && col.table === table
+        );
+      } else if (database && schema) {
+        columns = columns.filter((col) => col.database === database && col.schema === schema);
+      } else if (database) {
+        columns = columns.filter((col) => col.database === database);
+      } else if (schema) {
+        columns = columns.filter((col) => col.schema === schema);
+      } else if (table) {
+        columns = columns.filter((col) => col.table === table);
+      }
+
+      return columns;
+    }
+
+    try {
+      let whereClause = '';
+
+      if (database && schema && table) {
+        whereClause = `WHERE DB_NAME() = '${database}' AND s.name = '${schema}' AND t.name = '${table}'`;
+      } else if (schema && table) {
+        whereClause = `WHERE s.name = '${schema}' AND t.name = '${table}'`;
+      } else if (schema) {
+        whereClause = `WHERE s.name = '${schema}'`;
+      } else if (table) {
+        whereClause = `WHERE t.name = '${table}'`;
+      }
+
       const columnsResult = await this.adapter.query(`
         SELECT DB_NAME() as database_name,
                s.name as schema_name,
@@ -162,10 +274,11 @@ export class SQLServerIntrospector extends BaseIntrospector {
         INNER JOIN sys.schemas s ON t.schema_id = s.schema_id
         INNER JOIN sys.types ty ON c.user_type_id = ty.user_type_id
         LEFT JOIN sys.default_constraints dc ON c.default_object_id = dc.object_id
+        ${whereClause}
         ORDER BY s.name, t.name, c.column_id
       `);
 
-      this.metadataCache.columns = columnsResult.rows.map((row) => ({
+      const columns = columnsResult.rows.map((row) => ({
         name: this.getString(row.column_name) || '',
         table: this.getString(row.table_name) || '',
         schema: this.getString(row.schema_name) || '',
@@ -179,112 +292,82 @@ export class SQLServerIntrospector extends BaseIntrospector {
         scale: this.parseNumber(row.scale),
       }));
 
-      this.metadataCache.lastFetched = new Date();
+      // Only cache if we fetched all columns (no filters)
+      if (!database && !schema && !table) {
+        this.cache.columns = { data: columns, lastFetched: new Date() };
+      }
+
+      return columns;
     } catch (error) {
-      console.warn('Failed to fetch SQL Server metadata:', error);
-      // Initialize empty arrays to prevent repeated failures
-      this.metadataCache.databases = [];
-      this.metadataCache.schemas = [];
-      this.metadataCache.tables = [];
-      this.metadataCache.columns = [];
-      this.metadataCache.views = [];
-      this.metadataCache.lastFetched = new Date();
+      console.warn('Failed to fetch SQL Server columns:', error);
+      return [];
     }
-  }
-
-  async getDatabases(): Promise<Database[]> {
-    await this.fetchAllMetadata();
-    return this.metadataCache.databases || [];
-  }
-
-  async getSchemas(database?: string): Promise<Schema[]> {
-    await this.fetchAllMetadata();
-    const schemas = this.metadataCache.schemas || [];
-
-    if (database) {
-      return schemas.filter((schema) => schema.database === database);
-    }
-    return schemas;
-  }
-
-  async getTables(database?: string, schema?: string): Promise<Table[]> {
-    await this.fetchAllMetadata();
-    let tables = this.metadataCache.tables || [];
-
-    if (database && schema) {
-      tables = tables.filter((table) => table.database === database && table.schema === schema);
-    } else if (database) {
-      tables = tables.filter((table) => table.database === database);
-    } else if (schema) {
-      tables = tables.filter((table) => table.schema === schema);
-    }
-
-    // Enhance tables with basic statistics
-    const tablesWithStats = await Promise.all(
-      tables.map(async (table) => {
-        try {
-          // Get basic table statistics
-          const tableStatsResult = await this.adapter.query(`
-            SELECT 
-              SUM(p.rows) as row_count,
-              SUM(a.total_pages) * 8 * 1024 as size_bytes
-            FROM sys.tables t
-            INNER JOIN sys.partitions p ON t.object_id = p.object_id
-            INNER JOIN sys.allocation_units a ON p.partition_id = a.container_id
-            WHERE t.name = '${table.name}' 
-              AND SCHEMA_NAME(t.schema_id) = '${table.schema}'
-              AND p.index_id IN (0,1)
-          `);
-
-          const stats = tableStatsResult.rows[0];
-          return {
-            ...table,
-            rowCount: this.parseNumber(stats?.row_count),
-            sizeBytes: this.parseNumber(stats?.size_bytes),
-          };
-        } catch (error) {
-          // If stats query fails, return table without stats
-          console.warn(`Failed to get stats for table ${table.schema}.${table.name}:`, error);
-          return table;
-        }
-      })
-    );
-
-    return tablesWithStats;
-  }
-
-  async getColumns(database?: string, schema?: string, table?: string): Promise<Column[]> {
-    await this.fetchAllMetadata();
-    let columns = this.metadataCache.columns || [];
-
-    if (database && schema && table) {
-      columns = columns.filter(
-        (col) => col.database === database && col.schema === schema && col.table === table
-      );
-    } else if (schema && table) {
-      columns = columns.filter((col) => col.schema === schema && col.table === table);
-    } else if (schema) {
-      columns = columns.filter((col) => col.schema === schema);
-    } else if (database) {
-      columns = columns.filter((col) => col.database === database);
-    }
-
-    return columns;
   }
 
   async getViews(database?: string, schema?: string): Promise<View[]> {
-    await this.fetchAllMetadata();
-    let views = this.metadataCache.views || [];
-
-    if (database && schema) {
-      views = views.filter((view) => view.database === database && view.schema === schema);
-    } else if (schema) {
-      views = views.filter((view) => view.schema === schema);
-    } else if (database) {
-      views = views.filter((view) => view.database === database);
+    // Check if we have valid cached data and no filters
+    if (
+      !database &&
+      !schema &&
+      this.cache.views &&
+      this.isCacheValid(this.cache.views.lastFetched)
+    ) {
+      return this.cache.views.data;
     }
 
-    return views;
+    // If we have cached data and filters, use cached data
+    if (this.cache.views && this.isCacheValid(this.cache.views.lastFetched)) {
+      let views = this.cache.views.data;
+
+      if (database && schema) {
+        views = views.filter((view) => view.database === database && view.schema === schema);
+      } else if (database) {
+        views = views.filter((view) => view.database === database);
+      } else if (schema) {
+        views = views.filter((view) => view.schema === schema);
+      }
+
+      return views;
+    }
+
+    try {
+      let whereClause = '';
+
+      if (database && schema) {
+        whereClause = `WHERE DB_NAME() = '${database}' AND s.name = '${schema}'`;
+      } else if (schema) {
+        whereClause = `WHERE s.name = '${schema}'`;
+      }
+
+      const viewsResult = await this.adapter.query(`
+        SELECT DB_NAME() as database_name,
+               s.name as schema_name,
+               v.name as table_name,
+               m.definition as view_definition
+        FROM sys.views v
+        INNER JOIN sys.schemas s ON v.schema_id = s.schema_id
+        INNER JOIN sys.sql_modules m ON v.object_id = m.object_id
+        ${whereClause}
+        ORDER BY s.name, v.name
+      `);
+
+      const views = viewsResult.rows.map((row) => ({
+        name: this.getString(row.table_name) || '',
+        schema: this.getString(row.schema_name) || '',
+        database: this.getString(row.database_name) || '',
+        definition: this.getString(row.view_definition) || '',
+      }));
+
+      // Only cache if we fetched all views (no filters)
+      if (!database && !schema) {
+        this.cache.views = { data: views, lastFetched: new Date() };
+      }
+
+      return views;
+    } catch (error) {
+      console.warn('Failed to fetch SQL Server views:', error);
+      return [];
+    }
   }
 
   async getTableStatistics(
@@ -480,5 +563,164 @@ export class SQLServerIntrospector extends BaseIntrospector {
     const dateTypes = ['date', 'time', 'datetime', 'datetime2', 'smalldatetime', 'datetimeoffset'];
 
     return dateTypes.some((type) => dataType.toLowerCase().includes(type));
+  }
+
+  /**
+   * SQL Server-optimized full introspection that takes advantage of caching
+   * Fetches data sequentially: databases → schemas → tables → columns → views
+   * Each step benefits from the cache populated by previous steps
+   */
+  override async getFullIntrospection(options?: {
+    databases?: string[];
+    schemas?: string[];
+    tables?: string[];
+  }): Promise<DataSourceIntrospectionResult> {
+    // Step 1: Fetch all databases (populates database cache)
+    const allDatabases = await this.getDatabases();
+
+    // Filter databases if specified
+    const databases = options?.databases
+      ? allDatabases.filter((db) => options.databases?.includes(db.name) ?? false)
+      : allDatabases;
+
+    // Step 2: Fetch all schemas (benefits from database cache, populates schema cache)
+    const allSchemas = await this.getSchemas(); // No filter - gets all schemas and caches them
+
+    // Filter schemas if specified
+    let schemas = allSchemas;
+    if (options?.databases) {
+      // If databases are filtered, only include schemas from those databases
+      schemas = schemas.filter((schema) => databases.some((db) => db.name === schema.database));
+    }
+    if (options?.schemas) {
+      // If specific schemas are requested, filter to those
+      schemas = schemas.filter((schema) => options.schemas?.includes(schema.name) ?? false);
+    }
+
+    // Step 3: Fetch all tables (benefits from database cache, populates table cache)
+    const allTables = await this.getTables(); // No filter - gets all tables and caches them
+
+    // Filter tables if specified
+    let tables = allTables;
+    if (options?.databases) {
+      // If databases are filtered, only include tables from those databases
+      tables = tables.filter((table) => databases.some((db) => db.name === table.database));
+    }
+    if (options?.schemas) {
+      // If schemas are filtered, only include tables from those schemas
+      tables = tables.filter((table) =>
+        schemas.some((schema) => schema.name === table.schema && schema.database === table.database)
+      );
+    }
+    if (options?.tables) {
+      // If specific tables are requested, filter to those
+      tables = tables.filter((table) => options.tables?.includes(table.name) ?? false);
+    }
+
+    // Step 4: Fetch all columns (benefits from database cache, populates column cache)
+    const allColumns = await this.getColumns(); // No filter - gets all columns and caches them
+
+    // Filter columns based on filtered tables
+    const columns = allColumns.filter((column) =>
+      tables.some(
+        (table) =>
+          table.name === column.table &&
+          table.schema === column.schema &&
+          table.database === column.database
+      )
+    );
+
+    // Step 5: Fetch all views (benefits from database cache, populates view cache)
+    const allViews = await this.getViews(); // No filter - gets all views and caches them
+
+    // Filter views if specified
+    let views = allViews;
+    if (options?.databases) {
+      // If databases are filtered, only include views from those databases
+      views = views.filter((view) => databases.some((db) => db.name === view.database));
+    }
+    if (options?.schemas) {
+      // If schemas are filtered, only include views from those schemas
+      views = views.filter((view) =>
+        schemas.some((schema) => schema.name === view.schema && schema.database === view.database)
+      );
+    }
+
+    // Get column statistics in batches of 20 tables
+    const columnsWithStats = await this.attachColumnStatisticsSQLServer(tables, columns);
+
+    return {
+      dataSourceName: this.dataSourceName,
+      dataSourceType: this.getDataSourceType(),
+      databases,
+      schemas,
+      tables,
+      columns: columnsWithStats,
+      views,
+      indexes: undefined, // SQL Server doesn't expose index information in this implementation
+      foreignKeys: undefined, // SQL Server doesn't expose foreign key information in this implementation
+      introspectedAt: new Date(),
+    };
+  }
+
+  /**
+   * Attach column statistics to columns by processing tables in batches
+   */
+  private async attachColumnStatisticsSQLServer(
+    tables: Table[],
+    columns: Column[]
+  ): Promise<Column[]> {
+    // Create a map for quick column lookup
+    const columnMap = new Map<string, Column>();
+    for (const column of columns) {
+      const key = `${column.database}.${column.schema}.${column.table}.${column.name}`;
+      columnMap.set(key, { ...column });
+    }
+
+    // Process tables in batches of 20
+    const batchSize = 20;
+    const tableBatches: Table[][] = [];
+    for (let i = 0; i < tables.length; i += batchSize) {
+      tableBatches.push(tables.slice(i, i + batchSize));
+    }
+
+    // Process each batch in parallel
+    await Promise.all(
+      tableBatches.map(async (batch) => {
+        // Process all tables in this batch in parallel
+        await Promise.all(
+          batch.map(async (table) => {
+            try {
+              const columnStats = await this.getColumnStatistics(
+                table.database,
+                table.schema,
+                table.name
+              );
+
+              // Attach statistics to corresponding columns
+              for (const stat of columnStats) {
+                const key = `${table.database}.${table.schema}.${table.name}.${stat.columnName}`;
+                const column = columnMap.get(key);
+                if (column) {
+                  column.distinctCount = stat.distinctCount;
+                  column.nullCount = stat.nullCount;
+                  column.minValue = stat.minValue;
+                  column.maxValue = stat.maxValue;
+                  column.sampleValues = stat.sampleValues;
+                }
+              }
+            } catch (error) {
+              // Log warning but don't fail the entire introspection
+              console.warn(
+                `Failed to get column statistics for table ${table.database}.${table.schema}.${table.name}:`,
+                error
+              );
+            }
+          })
+        );
+      })
+    );
+
+    return Array.from(columnMap.values());
   }
 }

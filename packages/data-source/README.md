@@ -373,4 +373,39 @@ TEST_BIGQUERY_SERVICE_ACCOUNT_KEY=path/to/key.json
 
 ## License
 
-MIT License - see [LICENSE](./LICENSE) for details. 
+MIT License - see [LICENSE](./LICENSE) for details.
+
+## Scoped Full Introspection
+
+You can now scope full introspection to specific databases, schemas, or tables:
+
+```typescript
+// Get introspection for specific databases
+const result = await dataSource.getFullIntrospection('myDataSource', {
+  databases: ['sales_db', 'analytics_db']
+});
+
+// Get introspection for specific schemas
+const result = await dataSource.getFullIntrospection('myDataSource', {
+  schemas: ['public', 'reporting']
+});
+
+// Get introspection for specific tables
+const result = await dataSource.getFullIntrospection('myDataSource', {
+  tables: ['customers', 'orders', 'products']
+});
+
+// Combine filters - get specific tables from specific schemas
+const result = await dataSource.getFullIntrospection('myDataSource', {
+  schemas: ['public'],
+  tables: ['customers', 'orders']
+});
+```
+
+The scoping works hierarchically:
+- If `databases` is specified, only schemas, tables, columns, and views from those databases are included
+- If `schemas` is specified, only tables, columns, and views from those schemas are included  
+- If `tables` is specified, only those specific tables and their columns are included
+- Filters can be combined for more precise scoping
+
+This is particularly useful for large data sources where you only need to introspect a subset of the available objects. 
