@@ -87,7 +87,7 @@ export const DashboardContentController: React.FC<{
                   <DashboardMetricItem
                     key={item.id}
                     metricId={item.id}
-                    dashboardId={dashboard?.id}
+                    dashboardId={dashboard?.id || ''}
                     readOnly={readOnly}
                     chatId={chatId}
                     numberOfMetrics={numberOfMetrics}

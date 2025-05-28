@@ -127,16 +127,18 @@ const ResizeRowHandle: React.FC<{
     const isDropzoneActive = showDropzone && isOver;
 
     const handler = useMemoizedFn((mouseDownEvent: React.MouseEvent<HTMLDivElement>) => {
+      if (!index) return;
       const startPosition = mouseDownEvent.pageY;
       const style = document.createElement('style');
-      style.innerHTML = `* { cursor: row-resize; }`;
+      style.innerHTML = '* { cursor: row-resize; }';
       document.head.appendChild(style);
-      setIsDraggingResizeId(index!);
+      setIsDraggingResizeId(index);
 
       function onMouseMove(mouseMoveEvent: MouseEvent) {
-        const newSize = sizes[index!] + (mouseMoveEvent.pageY - startPosition);
+        if (!index) return;
+        const newSize = sizes[index] + (mouseMoveEvent.pageY - startPosition);
         const clampedSize = clamp(newSize, MIN_ROW_HEIGHT, MAX_ROW_HEIGHT);
-        onResize(index!, clampedSize);
+        onResize(index, clampedSize);
       }
       function onMouseUp() {
         document.body.removeEventListener('mousemove', onMouseMove);

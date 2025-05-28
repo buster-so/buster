@@ -151,7 +151,7 @@ export const BusterResizeableGrid: React.FC<{
 
     const onDragStart = useMemoizedFn(({ active }: DragStartEvent) => {
       const style = document.createElement('style');
-      style.innerHTML = `* { cursor: grabbing; }`;
+      style.innerHTML = '* { cursor: grabbing; }';
       document.head.appendChild(style);
       styleRef.current = style;
       setActiveId(active.id as string);
@@ -291,7 +291,7 @@ export const BusterResizeableGrid: React.FC<{
                 return {
                   ...row,
                   items: arrayMove(row.items, activeIndex, overIndex),
-                  columnSizes: arrayMove(row.columnSizes!, activeIndex, overIndex)
+                  columnSizes: arrayMove(row.columnSizes || [], activeIndex, overIndex)
                 };
               }
 

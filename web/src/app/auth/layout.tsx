@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: 'Buster Login'
 };
 
-const LoginLayout: React.FC<PropsWithChildren<{}>> = async ({ children }) => {
+const LoginLayout: React.FC<PropsWithChildren> = async ({ children }) => {
   return (
     <section className="h-[100vh]">
       <div className="flex h-[100vh] items-center">

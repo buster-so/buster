@@ -8,10 +8,7 @@ import { type DependencyList, useLayoutEffect, useRef } from 'react';
  * @param effect The effect function to run
  * @param deps The dependencies array
  */
-export const useUpdateLayoutEffect = (
-  effect: () => undefined | (() => void),
-  deps?: DependencyList
-) => {
+export const useUpdateLayoutEffect = (effect: () => void, deps?: DependencyList) => {
   const isFirstRender = useRef(true);
 
   useLayoutEffect(() => {

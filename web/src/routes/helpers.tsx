@@ -24,7 +24,8 @@ export const pathNameToRoute = (
   params: Record<string, unknown>
 ): BusterRoutes => {
   const route = Object.values(BusterRoutes).find((r) => {
-    return r === pathName || createBusterRoute({ route: r, ...params }) === pathName;
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    return r === pathName || createBusterRoute({ route: r, ...(params as any) }) === pathName;
   });
 
   if (route && PATHNAME_TO_ROUTE[route as string]) {
@@ -78,7 +79,8 @@ export const pathNameToParentRoute = (
   params: Record<string, unknown>
 ): BusterRoutes => {
   const route = Object.values(BusterRoutes).find((r) => {
-    return r === pathName || createBusterRoute({ route: r, ...params }) === pathName;
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    return r === pathName || createBusterRoute({ route: r, ...(params as any) }) === pathName;
   });
 
   if (route && PATHNAME_TO_PARENT_ROUTE[route as string]) {

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: 'Buster Login'
 };
 
-const LoginLayout: React.FC<PropsWithChildren<{}>> = ({ children }) => {
+const LoginLayout: React.FC<PropsWithChildren> = ({ children }) => {
   return (
     <section className="h-[100vh]">
       <div className="flex h-[100vh] items-center">
@@ -20,7 +20,8 @@ const LoginLayout: React.FC<PropsWithChildren<{}>> = ({ children }) => {
                 height: '84vh',
                 background: `url(${NewUserWelcome.src}) no-repeat left center`,
                 backgroundSize: 'cover'
-              }}></div>
+              }}
+            />
           </div>
         </div>
       </div>

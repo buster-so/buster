@@ -38,7 +38,7 @@ export const useDatasetPageContext = ({ datasetId }: { datasetId: string }) => {
   const onPublishDataset = useMemoizedFn(async () => {
     if (disablePublish || !sql || !ymlFile) return;
     onUpdateDataset({
-      dataset_id: datasetId!,
+      dataset_id: datasetId,
       sql: sql,
       yml: ymlFile
     });
