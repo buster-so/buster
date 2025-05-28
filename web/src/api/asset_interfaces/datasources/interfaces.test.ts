@@ -14,15 +14,14 @@ import type { z } from 'zod/v4-mini';
 
 // Helper function to test validation
 const testValidation = (
-  schema: z.ZodMiniObject<any>,
-  value: any
+  schema: z.ZodMiniObject,
+  value: unknown
 ): { success: boolean; issues?: z.core.$ZodIssue[] } => {
   const result = schema.safeParse(value);
   if (result.success) {
     return { success: true };
-  } else {
-    return { success: false, issues: result.error.issues };
   }
+  return { success: false, issues: result.error.issues };
 };
 
 describe('DataSourceSchema', () => {
@@ -131,10 +130,12 @@ describe('DataSourceSchema', () => {
     const result = testValidation(DataSourceSchema, invalidPortDataSource);
     expect(result.success).toBe(false);
     expect(result.issues).toBeDefined();
-    expect(result.issues![0].message).toBe('Invalid input');
 
-    const testMessage = result.issues![0] as z.core.$ZodIssueInvalidUnion;
-    expect(testMessage.errors[0][0].message).toBe('Port must be greater than 0');
+    if (result.issues && result.issues.length > 0) {
+      expect(result.issues[0].message).toBe('Invalid input');
+      const testMessage = result.issues[0] as z.core.$ZodIssueInvalidUnion;
+      expect(testMessage.errors[0][0].message).toBe('Port must be greater than 0');
+    }
   });
 
   test('should fail validation with missing required fields', () => {

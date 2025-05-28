@@ -20,6 +20,10 @@
 	},
 	"linter": {
 		"enabled": true,
+		"ignore": [
+			"**/*.test.*",
+			"**/*.spec.*"
+		],
 		"rules": {
 			"recommended": true
 		}

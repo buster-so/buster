@@ -88,24 +88,27 @@ export const useGetChat = <TData = IBusterChat>(
     return getChat(params).then((chat) => {
       const { iChat, iChatMessages } = updateChatToIChat(chat, false);
       const lastMessageId = last(iChat.message_ids);
-      const lastMessage = iChatMessages[lastMessageId!];
+
+      if (!lastMessageId) return iChat;
+
+      const lastMessage = iChatMessages[lastMessageId];
       if (lastMessage) {
-        Object.values(lastMessage.response_messages).forEach((responseMessage) => {
+        for (const responseMessage of Object.values(lastMessage.response_messages)) {
           if (responseMessage.type === 'file' && responseMessage.file_type === 'metric') {
             prefetchGetMetricDataClient(
               { id: responseMessage.id, version_number: responseMessage.version_number },
               queryClient
             );
           }
-        });
+        }
       }
 
-      iChat.message_ids.forEach((messageId) => {
+      for (const messageId of iChat.message_ids) {
         queryClient.setQueryData(
           chatQueryKeys.chatsMessages(messageId).queryKey,
           iChatMessages[messageId]
         );
-      });
+      }
 
       return iChat;
     });
@@ -126,12 +129,12 @@ export const useStartChatFromAsset = () => {
   const mutationFn = useMemoizedFn(async (params: Parameters<typeof startChatFromAsset>[0]) => {
     const chat = await startChatFromAsset(params);
     const { iChat, iChatMessages } = updateChatToIChat(chat, false);
-    iChat.message_ids.forEach((messageId) => {
+    for (const messageId of iChat.message_ids) {
       queryClient.setQueryData(
         chatQueryKeys.chatsMessages(messageId).queryKey,
         iChatMessages[messageId]
       );
-    });
+    }
     queryClient.setQueryData(chatQueryKeys.chatsGetChat(chat.id).queryKey, iChat);
     return iChat;
   });
@@ -175,8 +178,9 @@ export const useUpdateChat = () => {
       if (data.title) {
         const options = chatQueryKeys.chatsGetChat(data.id);
         queryClient.setQueryData(options.queryKey, (old) => {
+          if (!old) return old;
           return {
-            ...old!,
+            ...old,
             ...data
           };
         });
@@ -192,8 +196,9 @@ export const useUpdateChatMessageFeedback = () => {
     onMutate: ({ message_id, feedback }) => {
       const options = chatQueryKeys.chatsMessages(message_id);
       queryClient.setQueryData(options.queryKey, (old) => {
+        if (!old) return old;
         return {
-          ...old!,
+          ...old,
           feedback
         };
       });

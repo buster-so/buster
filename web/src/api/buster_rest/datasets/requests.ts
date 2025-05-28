@@ -22,7 +22,7 @@ export const getDatasets = async (params?: {
 }): Promise<BusterDatasetListItem[]> => {
   const { page = 0, page_size = 1000, ...allParams } = params || {};
   return mainApi
-    .get<BusterDatasetListItem[]>(`/datasets`, { params: { page, page_size, ...allParams } })
+    .get<BusterDatasetListItem[]>('/datasets', { params: { page, page_size, ...allParams } })
     .then((res) => res.data);
 };
 
@@ -30,7 +30,7 @@ export const getDatasets_server = async (
   params?: Parameters<typeof getDatasets>[0]
 ): Promise<BusterDatasetListItem[]> => {
   const { page = 0, page_size = 1000, ...allParams } = params || {};
-  return await serverFetch<BusterDatasetListItem[]>(`/datasets`, {
+  return await serverFetch<BusterDatasetListItem[]>('/datasets', {
     params: { page, page_size, ...allParams }
   });
 };
@@ -57,11 +57,11 @@ export const createDataset = async (params: {
   /** The ID of the data source */
   data_source_id: string;
 }): Promise<BusterDataset> => {
-  return await mainApi.post<BusterDataset>(`/datasets`, params).then((res) => res.data);
+  return await mainApi.post<BusterDataset>('/datasets', params).then((res) => res.data);
 };
 
 export const deleteDataset = async (datasetIds: string[]): Promise<void> => {
-  return await mainApi.delete(`/datasets`, { data: { ids: datasetIds } }).then((res) => res.data);
+  return await mainApi.delete('/datasets', { data: { ids: datasetIds } }).then((res) => res.data);
 };
 
 export const deployDataset = async ({
@@ -76,7 +76,7 @@ export const deployDataset = async ({
   yml: string;
 }): Promise<void> => {
   return await mainApi
-    .post(`/datasets/deploy`, { id: dataset_id, ...params })
+    .post('/datasets/deploy', { id: dataset_id, ...params })
     .then((res) => res.data);
 };
 
