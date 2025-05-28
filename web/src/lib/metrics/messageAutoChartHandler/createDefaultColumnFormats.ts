@@ -40,7 +40,9 @@ const createDefaulColumnLabel = (
   columnsMetaData: ColumnMetaData[],
   name: string
 ): Required<ColumnLabelFormat> => {
-  const assosciatedColumn = columnsMetaData?.find((m) => m.name === name)!;
+  const assosciatedColumn = columnsMetaData?.find((m) => m.name === name) || {
+    simple_type: 'text'
+  };
   const columnType: SimplifiedColumnType = simplifyColumnType(assosciatedColumn?.simple_type);
   const style = createDefaultColumnLabelStyle(columnType);
   const replaceMissingDataWith = createDefaultReplaceMissingDataWith(columnType);

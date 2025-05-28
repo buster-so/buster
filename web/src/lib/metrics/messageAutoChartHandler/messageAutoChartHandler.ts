@@ -20,22 +20,25 @@ const keySpecificHandlers: Partial<
   Record<
     keyof IBusterMetricChartConfig,
     (
-      value: any,
+      value: unknown,
       dataMetadata: DataMetadata | undefined,
       pieChartAxis: IBusterMetricChartConfig['pieChartAxis'] | undefined
-    ) => any
+    ) => unknown
   >
 > = {
-  colors: (colors: IBusterMetricChartConfig['colors']) => {
+  colors: (value: unknown) => {
+    const colors = value as IBusterMetricChartConfig['colors'];
     if (isEmpty(colors)) return DEFAULT_CHART_CONFIG.colors;
     if (colors.length >= 3) return colors; //we need at least 3 colors for the chart icons
     return Array.from({ length: 3 }, (_, index) => colors[index % colors.length]);
   },
-  scatterDotSize: (scatterDotSize: IBusterMetricChartConfig['scatterDotSize']) => {
+  scatterDotSize: (value: unknown) => {
+    const scatterDotSize = value as IBusterMetricChartConfig['scatterDotSize'];
     if (isEmpty(scatterDotSize)) return DEFAULT_CHART_CONFIG.scatterDotSize;
     return scatterDotSize;
   },
-  barAndLineAxis: (barAndLineAxis: IBusterMetricChartConfig['barAndLineAxis'], dataMetadata) => {
+  barAndLineAxis: (value: unknown, dataMetadata) => {
+    const barAndLineAxis = value as IBusterMetricChartConfig['barAndLineAxis'];
     if (isEmpty(barAndLineAxis)) {
       return createDefaultBarAndLineAxis(dataMetadata?.column_metadata);
     }
@@ -46,7 +49,8 @@ const keySpecificHandlers: Partial<
       category: barAndLineAxis.category || DEFAULT_CHART_CONFIG.barAndLineAxis.category
     };
   },
-  pieChartAxis: (pieChartAxis: IBusterMetricChartConfig['pieChartAxis'], dataMetadata) => {
+  pieChartAxis: (value: unknown, dataMetadata) => {
+    const pieChartAxis = value as IBusterMetricChartConfig['pieChartAxis'];
     if (isEmpty(pieChartAxis)) return createDefaultPieAxis(dataMetadata?.column_metadata);
     return {
       x: pieChartAxis.x || DEFAULT_CHART_CONFIG.pieChartAxis.x,
@@ -54,7 +58,8 @@ const keySpecificHandlers: Partial<
       tooltip: pieChartAxis.tooltip || DEFAULT_CHART_CONFIG.pieChartAxis.tooltip
     };
   },
-  scatterAxis: (scatterAxis: IBusterMetricChartConfig['scatterAxis'], dataMetadata) => {
+  scatterAxis: (value: unknown, dataMetadata) => {
+    const scatterAxis = value as IBusterMetricChartConfig['scatterAxis'];
     if (isEmpty(scatterAxis)) return createDefaultScatterAxis(dataMetadata?.column_metadata);
     return {
       x: scatterAxis.x || DEFAULT_CHART_CONFIG.scatterAxis.x,
@@ -64,7 +69,8 @@ const keySpecificHandlers: Partial<
       category: scatterAxis.category || DEFAULT_CHART_CONFIG.scatterAxis.category
     };
   },
-  comboChartAxis: (comboChartAxis: IBusterMetricChartConfig['comboChartAxis'], dataMetadata) => {
+  comboChartAxis: (value: unknown, dataMetadata) => {
+    const comboChartAxis = value as IBusterMetricChartConfig['comboChartAxis'];
     if (isEmpty(comboChartAxis)) return createDefaultBarAndLineAxis(dataMetadata?.column_metadata);
     return {
       x: comboChartAxis.x || DEFAULT_CHART_CONFIG.comboChartAxis.x,
@@ -74,7 +80,8 @@ const keySpecificHandlers: Partial<
       category: comboChartAxis.category || DEFAULT_CHART_CONFIG.comboChartAxis.category
     };
   },
-  metricColumnId: (metricColumnId: IBusterMetricChartConfig['metricColumnId'], dataMetadata) => {
+  metricColumnId: (value: unknown, dataMetadata) => {
+    const metricColumnId = value as IBusterMetricChartConfig['metricColumnId'];
     if (isEmpty(metricColumnId)) {
       const firstNumberColumn = dataMetadata?.column_metadata?.find(
         (m) => m.simple_type === 'number'
@@ -83,28 +90,26 @@ const keySpecificHandlers: Partial<
     }
     return metricColumnId;
   },
-  metricHeader: (metricHeader: IBusterMetricChartConfig['metricHeader']) => {
+  metricHeader: (value: unknown) => {
+    const metricHeader = value as IBusterMetricChartConfig['metricHeader'];
     if (isEmpty(metricHeader)) return DEFAULT_CHART_CONFIG.metricHeader;
     return metricHeader;
   },
-  metricSubHeader: (metricSubHeader: IBusterMetricChartConfig['metricSubHeader']) => {
+  metricSubHeader: (value: unknown) => {
+    const metricSubHeader = value as IBusterMetricChartConfig['metricSubHeader'];
     if (isEmpty(metricSubHeader)) return DEFAULT_CHART_CONFIG.metricSubHeader;
     return metricSubHeader;
   },
-  columnLabelFormats: (
-    columnLabelFormats: IBusterMetricChartConfig['columnLabelFormats'],
-    dataMetadata
-  ) => {
+  columnLabelFormats: (value: unknown, dataMetadata) => {
+    const columnLabelFormats = value as IBusterMetricChartConfig['columnLabelFormats'];
     return createDefaultColumnLabelFormats(columnLabelFormats, dataMetadata?.column_metadata);
   },
-  columnSettings: (columnSettings: IBusterMetricChartConfig['columnSettings'], dataMetadata) => {
+  columnSettings: (value: unknown, dataMetadata) => {
+    const columnSettings = value as IBusterMetricChartConfig['columnSettings'];
     return createDefaultColumnSettings(columnSettings, dataMetadata?.column_metadata);
   },
-  pieLabelPosition: (
-    pieLabelPosition: IBusterMetricChartConfig['pieLabelPosition'],
-    dataMetadata,
-    pieChartAxis
-  ) => {
+  pieLabelPosition: (value: unknown, dataMetadata, pieChartAxis) => {
+    const pieLabelPosition = value as IBusterMetricChartConfig['pieLabelPosition'];
     // if (isEmpty(pieLabelPosition)) {
     //   const firstPieColumn = pieChartAxis?.x?.[0];
     //   const firstPieColumnMetaData = dataMetadata?.column_metadata?.find(
@@ -125,21 +130,21 @@ export const createDefaultChartConfig = (
   const pieChartAxis = chartConfig?.pieChartAxis;
 
   const newChartConfig = create(DEFAULT_CHART_CONFIG, (draft) => {
-    DEFAULT_CHART_CONFIG_ENTRIES.forEach(([_key, defaultValue]) => {
+    for (const [_key, defaultValue] of DEFAULT_CHART_CONFIG_ENTRIES) {
       const key = _key as keyof IBusterMetricChartConfig;
       const chartConfigValue = chartConfig?.[key];
 
       const handler = keySpecificHandlers[key];
 
       if (!handler) {
-        (draft as any)[key] = chartConfigValue ?? defaultValue;
-        return;
+        (draft as Record<string, unknown>)[key] = chartConfigValue ?? defaultValue;
+        continue;
       }
 
       const result = handler(chartConfigValue, dataMetadata, pieChartAxis);
 
-      (draft as any)[key] = result ?? defaultValue;
-    });
+      (draft as Record<string, unknown>)[key] = result ?? defaultValue;
+    }
   });
 
   return newChartConfig;

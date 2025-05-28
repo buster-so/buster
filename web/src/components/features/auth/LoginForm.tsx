@@ -27,17 +27,17 @@ import {
 } from '@/lib/supabase/signIn';
 
 const DEFAULT_CREDENTIALS = {
-  email: process.env.NEXT_PUBLIC_USER!,
-  password: process.env.NEXT_PUBLIC_USER_PASSWORD!
+  email: process.env.NEXT_PUBLIC_USER || '',
+  password: process.env.NEXT_PUBLIC_USER_PASSWORD || ''
 };
 
-export const LoginForm: React.FC<{}> = ({}) => {
+export const LoginForm: React.FC = () => {
   const [loading, setLoading] = useState<'google' | 'github' | 'azure' | 'email' | null>(null);
   const [errorMessages, setErrorMessages] = useState<string[]>([]);
   const [signUpFlow, setSignUpFlow] = useState(true);
   const [signUpSuccess, setSignUpSuccess] = useState(false);
 
-  const errorFallback = useMemoizedFn((error: any) => {
+  const errorFallback = useMemoizedFn((error: unknown) => {
     const errorMessage = rustErrorHandler(error);
     if (errorMessage?.message) {
       setErrorMessages(['Invalid email or password']);
@@ -51,7 +51,7 @@ export const LoginForm: React.FC<{}> = ({}) => {
       setLoading('email');
       try {
         await signInWithEmailAndPassword({ email, password });
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error(error);
         errorFallback(error);
         setLoading(null);
@@ -63,7 +63,7 @@ export const LoginForm: React.FC<{}> = ({}) => {
     setLoading('google');
     try {
       await signInWithGoogle();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       errorFallback(error);
       setLoading(null);
@@ -74,7 +74,7 @@ export const LoginForm: React.FC<{}> = ({}) => {
     setLoading('github');
     try {
       const res = await signInWithGithub();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       errorFallback(error);
       setLoading(null);
@@ -85,7 +85,7 @@ export const LoginForm: React.FC<{}> = ({}) => {
     setLoading('azure');
     try {
       await signInWithAzure();
-    } catch (error: any) {
+    } catch (error: unknown) {
       errorFallback(error);
       setLoading(null);
     }
@@ -96,7 +96,7 @@ export const LoginForm: React.FC<{}> = ({}) => {
     try {
       await signUp(d);
       setSignUpSuccess(true);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       errorFallback(error);
       setLoading(null);
@@ -110,10 +110,10 @@ export const LoginForm: React.FC<{}> = ({}) => {
 
       if (signUpFlow) onSignUp(d);
       else onSignInWithUsernameAndPassword(d);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
       const errorMessage = rustErrorHandler(error);
-      if (errorMessage?.message == 'User already registered') {
+      if (errorMessage?.message === 'User already registered') {
         onSignInWithUsernameAndPassword(d);
         return;
       }
@@ -178,9 +178,9 @@ const LoginOptions: React.FC<{
     !inputHasText(password) || !inputHasText(password2) || password !== password2 || !passwordCheck;
 
   const clearAllCookies = useMemoizedFn(() => {
-    Object.keys(Cookies.get()).forEach((cookieName) => {
+    for (const cookieName of Object.keys(Cookies.get())) {
       Cookies.remove(cookieName);
-    });
+    }
 
     //also clear local storage
     localStorage.clear();
@@ -220,8 +220,8 @@ const LoginOptions: React.FC<{
           }}
           block={true}
           loading={loading === 'google'}
-          tabIndex={1}>
-          {!signUpFlow ? `Continue with Google` : `Sign up with Google`}
+          tabIndex={0}>
+          {!signUpFlow ? 'Continue with Google' : 'Sign up with Google'}
         </Button>
         <Button
           prefix={<Github />}
@@ -233,8 +233,8 @@ const LoginOptions: React.FC<{
           }}
           block={true}
           loading={loading === 'github'}
-          tabIndex={2}>
-          {!signUpFlow ? `Continue with Github` : `Sign up with Github`}
+          tabIndex={-1}>
+          {!signUpFlow ? 'Continue with Github' : 'Sign up with Github'}
         </Button>
         <Button
           prefix={<Microsoft />}
@@ -246,8 +246,8 @@ const LoginOptions: React.FC<{
           }}
           block={true}
           loading={loading === 'azure'}
-          tabIndex={3}>
-          {!signUpFlow ? `Continue with Azure` : `Sign up with Azure`}
+          tabIndex={-2}>
+          {!signUpFlow ? 'Continue with Azure' : 'Sign up with Azure'}
         </Button>
       </div>
 
@@ -274,7 +274,7 @@ const LoginOptions: React.FC<{
           }}
           disabled={!!loading}
           autoComplete="email"
-          tabIndex={4}
+          tabIndex={-3}
         />
 
         <div className="relative">
@@ -289,7 +289,7 @@ const LoginOptions: React.FC<{
             name="password"
             placeholder="Password"
             autoComplete="new-password"
-            tabIndex={5}
+            tabIndex={-4}
           />
         </div>
         {signUpFlow && (
@@ -305,7 +305,7 @@ const LoginOptions: React.FC<{
               name="password2"
               placeholder="Confirm password"
               autoComplete="new-password"
-              tabIndex={6}
+              tabIndex={-5}
             />
 
             {password && (
@@ -321,7 +321,7 @@ const LoginOptions: React.FC<{
 
         <div className="flex flex-col space-y-0.5">
           {errorMessages.map((message, index) => (
-            <LoginAlertMessage key={index} message={message} />
+            <LoginAlertMessage key={index + message} message={message} />
           ))}
         </div>
 
@@ -332,8 +332,8 @@ const LoginOptions: React.FC<{
           loading={loading === 'email'}
           variant="black"
           disabled={!signUpFlow ? false : disableSubmitButton}
-          tabIndex={7}>
-          {!signUpFlow ? `Sign in` : `Sign up`}
+          tabIndex={-6}>
+          {!signUpFlow ? 'Sign in' : 'Sign up'}
         </Button>
       </form>
 
@@ -345,7 +345,7 @@ const LoginOptions: React.FC<{
           signUpFlow={signUpFlow}
         />
 
-        {!signUpFlow && <ResetPasswordLink email={email} tabIndex={8} />}
+        {!signUpFlow && <ResetPasswordLink email={email} tabIndex={-7} />}
       </div>
     </>
   );
@@ -378,7 +378,7 @@ const SignUpSuccess: React.FC<{
 const WelcomeText: React.FC<{
   signUpFlow: boolean;
 }> = ({ signUpFlow }) => {
-  const text = !signUpFlow ? `Sign in` : `Sign up for free`;
+  const text = !signUpFlow ? 'Sign in' : 'Sign up for free';
 
   return (
     <Title className="mb-0" as="h1">
@@ -406,7 +406,7 @@ const AlreadyHaveAccount: React.FC<{
   return (
     <div className="flex items-center justify-center gap-0.5">
       <Text className="" variant="secondary" size="xs">
-        {signUpFlow ? `Already have an account? ` : `Don't already have an account? `}
+        {signUpFlow ? 'Already have an account? ' : "Don't already have an account?"}
       </Text>
 
       <Text
@@ -418,7 +418,7 @@ const AlreadyHaveAccount: React.FC<{
           setPassword2('');
           setSignUpFlow(!signUpFlow);
         }}>
-        {!signUpFlow ? `Sign up` : `Sign in`}
+        {!signUpFlow ? 'Sign up' : 'Sign in'}
       </Text>
     </div>
   );
@@ -439,11 +439,9 @@ const ResetPasswordLink: React.FC<{ email: string; tabIndex?: number }> = ({ ema
   return (
     <Link
       className={cn('flex w-full cursor-pointer justify-center text-center font-normal')}
-      href={
-        createBusterRoute({
-          route: BusterRoutes.AUTH_RESET_PASSWORD_EMAIL
-        }) + `?email=${scrubbedEmail}`
-      }
+      href={`${createBusterRoute({
+        route: BusterRoutes.AUTH_RESET_PASSWORD_EMAIL
+      })}?email=${scrubbedEmail}`}
       tabIndex={tabIndex}>
       <Text variant="primary" size="xs">
         Reset password

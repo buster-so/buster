@@ -1,9 +1,10 @@
-import { downloadImageData, exportElementToImage } from './exportUtils';
-import { createRoot } from 'react-dom/client';
-import { timeout } from './timeout';
 import type React from 'react';
+import type { Root } from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
+import type { BusterMetricData, IBusterMetric } from '@/api/asset_interfaces/metric';
+import { downloadImageData, exportElementToImage } from './exportUtils';
 import { useEffect, useRef } from 'react';
-import type { IBusterMetric, BusterMetricData } from '@/api/asset_interfaces/metric';
+import { timeout } from './timeout';
 
 export const generateChartDownloadImage = async (
   message: IBusterMetric,
@@ -19,16 +20,11 @@ export const generateChartDownloadImage = async (
   document.body.appendChild(tempContainer);
 
   let container: React.ReactNode;
-  let root: any;
-
-  const darkClass = isDark
-    ? 'from-slate-950 via-slate-800 to-slate-900'
-    : 'from-stone-50 via-stone-100 to-stone-200';
 
   const renderChart: Promise<void> = new Promise((resolve) => {
     container = (
       // bg-linear-to-br ${darkClass}
-      <div className={`h-[655px] w-[880px]`}>
+      <div className="h-[655px] w-[880px]">
         <div className="relative flex h-full w-full items-center justify-center p-0">
           {/* <BusterChart
             data={messageData}
@@ -46,9 +42,11 @@ export const generateChartDownloadImage = async (
       </div>
     );
 
-    root = createRoot(tempContainer);
-    root.render(container);
+    resolve();
   });
+
+  const root = createRoot(tempContainer);
+  root.render(container);
 
   await renderChart;
 
@@ -57,7 +55,7 @@ export const generateChartDownloadImage = async (
 
   await downloadImageData(dataImage, `${title}.png`);
   await timeout(10);
-  root.unmount();
+  root?.unmount();
   tempContainer.remove();
   return dataImage;
 };
@@ -193,7 +191,7 @@ export const PreviewImageReactComponent: React.FC<{
           ? 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.15))'
           : 'drop-shadow(0 0 8px rgba(0, 0, 0, 0.1))'
       }}>
-      <></>
+      {/* Logo content would go here */}
     </div>
   );
 

@@ -10,8 +10,8 @@ export const clearAllBrowserStorage = (): void => {
   sessionStorage.clear();
 
   // Clear all cookies
-  document.cookie.split(';').forEach((cookie) => {
+  for (const cookie of document.cookie.split(';')) {
     const cookieName = cookie.replace(/^ +/, '').split('=')[0];
     document.cookie = `${cookieName}=;expires=${new Date().toUTCString()};path=/`;
-  });
+  }
 };

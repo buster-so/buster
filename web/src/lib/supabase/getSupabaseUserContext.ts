@@ -1,48 +1,57 @@
 'use server';
 
-import { createClient } from './server';
+import type { User, Session } from '@supabase/supabase-js';
+import type { createClient } from './server';
+import type { Database } from './database.types';
 import { signInWithAnonymousUser } from './signIn';
 
-type PromiseType<T extends Promise<any>> = T extends Promise<infer U> ? U : never;
+type PromiseType<T extends Promise<unknown>> = T extends Promise<infer U> ? U : never;
 
 export type UseSupabaseUserContextType = PromiseType<ReturnType<typeof getSupabaseUserContext>>;
 
-export const getSupabaseUserContext = async (preemptiveRefreshMinutes = 5) => {
-  const supabase = await createClient();
+export const getSupabaseUserContext = async (supabase: ReturnType<typeof createClient>) => {
+  let userContext: { user: User | null; session: Session | null } = {
+    user: null,
+    session: null
+  };
 
-  // Get the session first
-  let { data: sessionData } = await supabase.auth.getSession();
+  try {
+    let sessionData = await supabase.auth.getSession();
 
-  // Check if we need to refresh the session
-  if (sessionData.session) {
-    const refreshedSessionData = await refreshSessionIfNeeded(
-      supabase,
-      sessionData.session,
-      preemptiveRefreshMinutes
-    );
+    // If no session exists, try to refresh
+    if (!sessionData.session) {
+      const refreshedSessionData = await supabase.auth.refreshSession();
 
-    // If session was refreshed, get the updated session
-    if (refreshedSessionData && refreshedSessionData.session) {
-      // Replace the entire sessionData object to avoid type issues
-      sessionData = refreshedSessionData;
+      // If session was refreshed, get the updated session
+      if (refreshedSessionData?.session) {
+        // Replace the entire sessionData object to avoid type issues
+        sessionData = refreshedSessionData;
+      }
     }
-  }
 
-  // Get user data
-  const { data: userData } = await supabase.auth.getUser();
+    // If we still don't have a session, sign in anonymously
+    if (!sessionData.session) {
+      const anonymousSignInResult = await signInWithAnonymousUser(supabase);
+      if (anonymousSignInResult.data?.session) {
+        sessionData = {
+          data: {
+            session: anonymousSignInResult.data.session,
+            user: anonymousSignInResult.data.user
+          },
+          error: null
+        };
+      }
+    }
 
-  if (!userData.user) {
-    const { session: anonSession } = await signInWithAnonymousUser();
-    return {
-      user: anonSession?.user || null,
-      accessToken: anonSession?.access_token
+    userContext = {
+      user: sessionData.data.session?.user || null,
+      session: sessionData.data.session || null
     };
+  } catch (error) {
+    console.error('Error getting user context:', error);
   }
 
-  const user = userData.user;
-  const accessToken = sessionData.session?.access_token;
-  const refreshToken = sessionData.session?.refresh_token;
-  return { user, accessToken, refreshToken };
+  return userContext;
 };
 
 /**

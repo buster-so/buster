@@ -1,8 +1,8 @@
 export class JsonDataFrameOperationsSingle {
-  private data: Record<string, any>[];
+  private data: Record<string, unknown>[];
   private column: string;
 
-  constructor(data: Record<string, any>[], column: string) {
+  constructor(data: Record<string, unknown>[], column: string) {
     if (!Array.isArray(data)) {
       throw new Error('Data should be an array.');
     }
@@ -14,7 +14,7 @@ export class JsonDataFrameOperationsSingle {
   }
 
   first(): number {
-    return this.data[0]?.[this.column];
+    return this.data[0]?.[this.column] as number;
   }
 
   // Method to count the number of entries in the specified column
@@ -26,13 +26,15 @@ export class JsonDataFrameOperationsSingle {
   sum(): number {
     return this.data.reduce((acc, item) => {
       const value = Number(item[this.column]);
-      return acc + (isNaN(value) ? 0 : value);
+      return acc + (Number.isNaN(value) ? 0 : value);
     }, 0);
   }
 
   // Method to calculate the average of a specified column
   average(): number {
-    const validEntries = this.data.filter((item) => !isNaN(Number.parseFloat(item[this.column])));
+    const validEntries = this.data.filter(
+      (item) => !Number.isNaN(Number.parseFloat(item[this.column] as string))
+    );
     return validEntries.length === 0 ? 0 : this.sum() / validEntries.length;
   }
 
@@ -40,8 +42,8 @@ export class JsonDataFrameOperationsSingle {
   min(): number {
     return Math.min(
       ...this.data
-        .map((item) => Number.parseFloat(item[this.column]))
-        .filter((value) => !isNaN(value))
+        .map((item) => Number.parseFloat(item[this.column] as string))
+        .filter((value) => !Number.isNaN(value))
     );
   }
 
@@ -49,15 +51,15 @@ export class JsonDataFrameOperationsSingle {
   max(): number {
     return Math.max(
       ...this.data
-        .map((item) => Number.parseFloat(item[this.column]))
-        .filter((value) => !isNaN(value))
+        .map((item) => Number.parseFloat(item[this.column] as string))
+        .filter((value) => !Number.isNaN(value))
     );
   }
 
   median(): number {
     const sortedValues = this.data
-      .map((item) => Number.parseFloat(item[this.column]))
-      .filter((value) => !isNaN(value))
+      .map((item) => Number.parseFloat(item[this.column] as string))
+      .filter((value) => !Number.isNaN(value))
       .sort((a, b) => a - b);
     const middle = Math.floor(sortedValues.length / 2);
     return sortedValues.length % 2 !== 0
@@ -70,7 +72,7 @@ export class JsonDataFrameOperationsSingle {
   }
 
   // Method to filter data based on a condition in the specified column
-  filterByCondition(conditionFn: (value: any) => boolean): Record<string, any>[] {
+  filterByCondition(conditionFn: (value: unknown) => boolean): Record<string, unknown>[] {
     return this.data.filter((item) => conditionFn(item[this.column]));
   }
 }
@@ -106,31 +108,37 @@ export class DataFrameOperations {
   sum(): number {
     return this.data.reduce((acc, item) => {
       const value = item[this.columnIndex];
-      return acc + (isNaN(value as number) ? 0 : Number(value));
+      return acc + (Number.isNaN(value as number) ? 0 : Number(value));
     }, 0);
   }
 
   average(): number {
-    const validEntries = this.data.filter((item) => !isNaN(item[this.columnIndex] as number));
+    const validEntries = this.data.filter(
+      (item) => !Number.isNaN(item[this.columnIndex] as number)
+    );
     return validEntries.length === 0 ? 0 : this.sum() / validEntries.length;
   }
 
   min(): number {
     return Math.min(
-      ...this.data.map((item) => Number(item[this.columnIndex])).filter((value) => !isNaN(value))
+      ...this.data
+        .map((item) => Number(item[this.columnIndex]))
+        .filter((value) => !Number.isNaN(value))
     );
   }
 
   max(): number {
     return Math.max(
-      ...this.data.map((item) => Number(item[this.columnIndex])).filter((value) => !isNaN(value))
+      ...this.data
+        .map((item) => Number(item[this.columnIndex]))
+        .filter((value) => !Number.isNaN(value))
     );
   }
 
   median(): number {
     const sortedValues = this.data
       .map((item) => Number(item[this.columnIndex]))
-      .filter((value) => !isNaN(value))
+      .filter((value) => !Number.isNaN(value))
       .sort((a, b) => a - b);
 
     const middle = Math.floor(sortedValues.length / 2);
@@ -166,7 +174,7 @@ export class ArrayOperations {
   sum(): number {
     return this.data.reduce<number>((acc, item) => {
       const value = Number(item);
-      return acc + (isNaN(value) ? 0 : value);
+      return acc + (Number.isNaN(value) ? 0 : value);
     }, 0);
   }
 
@@ -175,22 +183,26 @@ export class ArrayOperations {
   }
 
   average(): number {
-    const validEntries = this.data.filter((item) => !isNaN(item as number));
+    const validEntries = this.data.filter((item) => !Number.isNaN(item as number));
     return validEntries.length === 0 ? 0 : this.sum() / validEntries.length;
   }
 
   min(): number {
-    return Math.min(...this.data.map((item) => Number(item)).filter((value) => !isNaN(value)));
+    return Math.min(
+      ...this.data.map((item) => Number(item)).filter((value) => !Number.isNaN(value))
+    );
   }
 
   max(): number {
-    return Math.max(...this.data.map((item) => Number(item)).filter((value) => !isNaN(value)));
+    return Math.max(
+      ...this.data.map((item) => Number(item)).filter((value) => !Number.isNaN(value))
+    );
   }
 
   median(): number {
     const sortedValues = this.data
       .map((item) => Number(item))
-      .filter((value) => !isNaN(value))
+      .filter((value) => !Number.isNaN(value))
       .sort((a, b) => a - b);
 
     const middle = Math.floor(sortedValues.length / 2);

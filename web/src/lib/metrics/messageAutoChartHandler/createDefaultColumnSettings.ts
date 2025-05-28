@@ -13,12 +13,12 @@ export const createDefaultColumnSettings = (
   if (!columnsMetaData) return {};
 
   return create({} as IBusterMetricChartConfig['columnSettings'], (draft) => {
-    columnsMetaData.forEach((column) => {
+    for (const column of columnsMetaData) {
       draft[column.name] = create(DEFAULT_COLUMN_SETTINGS, (settingsDraft) => {
         if (existingColumnSettings?.[column.name]) {
           Object.assign(settingsDraft, existingColumnSettings[column.name]);
         }
       });
-    });
+    }
   });
 };

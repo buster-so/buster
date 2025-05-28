@@ -11,8 +11,8 @@ export const timeout = (time = 1000) => {
 };
 
 export const createDebounceByParams = (
-  func: (...args: any) => any,
-  resolver: any,
+  func: (...args: unknown[]) => unknown,
+  resolver: (obj: unknown) => string | number,
   d: { delay: number }
 ) => {
   /*const hocSaveDebounced = createDebounceByParams(
@@ -24,8 +24,8 @@ export const createDebounceByParams = (
 );
 */
   return wrap(
-    memoize(() => debounce(func, d.delay), resolver),
-    //@ts-ignore
-    (getMemoizedFunc, obj: any) => getMemoizedFunc(obj)(obj)
+    memoize(() => debounce(func, d.delay)),
+    (getMemoizedFunc: unknown, obj: unknown) =>
+      (getMemoizedFunc as (obj: unknown) => (...args: unknown[]) => unknown)(obj)(obj)
   );
 };

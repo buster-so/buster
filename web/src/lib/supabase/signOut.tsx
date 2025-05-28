@@ -12,9 +12,9 @@ export const signOut = async () => {
 
   // Clear all cookies
   const allCookies = cookieStore.getAll();
-  allCookies.forEach((cookie) => {
+  for (const cookie of allCookies) {
     cookieStore.delete(cookie.name);
-  });
+  }
 
   const { error } = await supabase.auth.signOut();
 

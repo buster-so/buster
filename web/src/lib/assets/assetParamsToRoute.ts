@@ -97,13 +97,14 @@ const createMetricRoute = ({
           chatId,
           ...baseParams
         });
-      default:
+      default: {
         const test: never | undefined = secondaryView;
         return createBusterRoute({
           route: BusterRoutes.APP_CHAT_ID_METRIC_ID_CHART,
           chatId,
           metricId
         });
+      }
     }
   }
 
@@ -122,8 +123,6 @@ const createMetricRoute = ({
         route: BusterRoutes.APP_METRIC_ID_CHART,
         ...baseParams
       });
-    case 'version-history':
-    //
     default:
       return createBusterRoute({
         route: BusterRoutes.APP_METRIC_ID_CHART,

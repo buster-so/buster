@@ -100,9 +100,9 @@ export const formatLabel = (
     formattedText as string,
     prefix,
     suffix,
-    replaceMissingDataWith,
     style,
-    useKeyFormatter
+    useKeyFormatter,
+    replaceMissingDataWith
   );
 };
 
@@ -140,15 +140,17 @@ const prefixSuffixHandler = (
   text: string | number | null,
   prefix: string | undefined,
   suffix: string | undefined,
-  replaceMissingDataWith: ColumnLabelFormat['replaceMissingDataWith'],
-  style: IColumnLabelFormat['style'],
-  useKeyFormatter: boolean
+  style: string | undefined,
+  useKeyFormatter: boolean,
+  replaceMissingDataWith: string | null | undefined | 0
 ): string => {
   if (useKeyFormatter) return String(text);
   if (replaceMissingDataWith === null && !text) return String(text);
-  if (prefix) text = prefix + text;
-  if (suffix) text = text + suffix;
-  if (style === 'percent' && suffix !== '%') text = `${text}%`;
 
-  return String(text);
+  let result = String(text);
+  if (prefix) result = prefix + result;
+  if (suffix) result = result + suffix;
+  if (style === 'percent' && suffix !== '%') result = `${result}%`;
+
+  return result;
 };

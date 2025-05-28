@@ -11,8 +11,16 @@ const getCanvasContext = () => {
   return ctx;
 };
 
+interface FontOptions {
+  fontSize?: string | number;
+  fontFamily?: string;
+  fontWeight?: string;
+  fontStyle?: string;
+  fontVariant?: string;
+}
+
 export const measureTextWidth = memoize(
-  (text: string | number, font: any = {}) => {
+  (text: string | number, font: FontOptions = {}) => {
     if (!isServer) {
       const { fontSize, fontFamily = 'Roobert_Pro', fontWeight, fontStyle, fontVariant } = font;
       const ctx = getCanvasContext();

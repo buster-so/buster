@@ -8,19 +8,21 @@ export type DataPoint = Record<string, string | number | null | Date>;
  * @returns Array of indices of anomalous points
  */
 export function detectAnomalies(data: DataPoint[], numericField: string, threshold = 2): number[] {
-  const values = data.map((point) => Number(point[numericField])).filter((val) => !isNaN(val));
+  const values = data
+    .map((point) => Number(point[numericField]))
+    .filter((val) => !Number.isNaN(val));
 
   if (values.length === 0) return [];
 
   // Calculate mean and standard deviation
   const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
-  const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+  const variance = values.reduce((sum, val) => sum + (val - mean) ** 2, 0) / values.length;
   const stdDev = Math.sqrt(variance);
 
   // Find indices of anomalous points
   return data.reduce<number[]>((indices, point, index) => {
     const value = Number(point[numericField]);
-    if (isNaN(value)) return indices;
+    if (Number.isNaN(value)) return indices;
 
     if (Math.abs(value - mean) > threshold * stdDev) {
       indices.push(index);

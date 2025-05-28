@@ -25,7 +25,8 @@ export const addOpacityToColor = (color: string, opacity: number): string => {
     const g = Number.parseInt(color.slice(3, 5), 16);
     const b = Number.parseInt(color.slice(5, 7), 16);
     return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-  } else if (color.startsWith('rgb')) {
+  }
+  if (color.startsWith('rgb')) {
     // RGB color (rgb(r, g, b))
     const rgbValues = color.match(/\d+/g);
     if (rgbValues) {

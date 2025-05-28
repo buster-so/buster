@@ -10,6 +10,11 @@ export const inputHasText = (input: unknown): boolean => {
   return trimmedInput.length > 0;
 };
 
+const capitalizeFirstLetter = (str: string): string => {
+  if (!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+};
+
 export const getFirstTwoCapitalizedLetters = (input: string) => {
   const capitalizedLetters = input
     .replace('@', '')
@@ -25,13 +30,35 @@ export const getFirstTwoCapitalizedLetters = (input: string) => {
   }
   if (capitalizedLetters && capitalizedLetters.length >= 2) {
     return capitalizedLetters.slice(0, 2).filter(Boolean).join('');
-  } else {
-    return '';
   }
+  return '';
 };
 
 export const removeAllSpaces = (str?: string) => {
   return str ? str.replace(/\s/g, '') : '';
+};
+
+export const getInitials = (value: string | null | undefined): string => {
+  if (!value) return '';
+
+  // Split by spaces or other common separators and filter out empty strings
+  const words = value.trim().split(/\s+/).filter(Boolean);
+
+  // If we have multiple words, use the first letter of the first two words
+  if (words.length >= 2) {
+    return words
+      .slice(0, 2)
+      .map((word) => word.charAt(0).toUpperCase())
+      .join('');
+  }
+
+  // If we have only one word, split by capital letters
+  const capitalizedLetters = value.match(/[A-Z]/g);
+
+  if (capitalizedLetters && capitalizedLetters.length >= 2) {
+    return capitalizedLetters.slice(0, 2).filter(Boolean).join('');
+  }
+  return '';
 };
 
 export const makeHumanReadble = (input: string | number | undefined | null): string => {
@@ -40,34 +67,34 @@ export const makeHumanReadble = (input: string | number | undefined | null): str
   }
 
   if (isNumber(input)) {
-    return formatNumber(input, {
-      compact: false,
-      minDecimals: 0,
-      maximumDecimals: 2,
-      useGrouping: true
-    });
+    return String(input);
+  }
+
+  if (input === null || input === undefined) {
+    return '';
   }
 
   let convertedString: string;
-  input = String(input);
+  const inputString = String(input);
 
   // Check if input is in snake case
-  if (input.includes('_')) {
-    convertedString = input.replace(/_/g, ' ').toLowerCase();
+  if (inputString.includes('_')) {
+    convertedString = inputString
+      .split('_')
+      .map((word) => capitalizeFirstLetter(word))
+      .join(' ');
   }
   // Check if input is in camel case
-  else if (input.charAt(0) === input.charAt(0).toLowerCase()) {
-    convertedString = input.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase();
+  else if (/[a-z][A-Z]/.test(inputString)) {
+    convertedString = inputString.replace(/([a-z])([A-Z])/g, '$1 $2');
+    convertedString = capitalizeFirstLetter(convertedString);
   }
-  // Check if input is in pascal case
+  // If input is already in a readable format
   else {
-    convertedString = input.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase();
+    convertedString = capitalizeFirstLetter(inputString);
   }
 
-  // Capitalize the first letter of each word
-  const words = convertedString.split(' ');
-  const capitalizedWords = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1));
-  return capitalizedWords.join(' ');
+  return convertedString;
 };
 
 export const calculateTextWidth = (text: string, font: string): number => {

@@ -14,9 +14,9 @@ export async function exportJSONToCSV(
   const headers = Array.from(new Set(data.flatMap(Object.keys)));
 
   // Create CSV content
-  let csvContent = headers.join(',') + '\n';
+  let csvContent = `${headers.join(',')}\n`;
 
-  data.forEach((row) => {
+  for (const row of data) {
     const rowValues = headers.map((header) => {
       const value = row[header];
       if (value === null || value === undefined) {
@@ -32,8 +32,8 @@ export async function exportJSONToCSV(
       }
       return String(value);
     });
-    csvContent += rowValues.join(',') + '\n';
-  });
+    csvContent += `${rowValues.join(',')}\n`;
+  }
 
   // Create Blob and download
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -52,10 +52,14 @@ function downloadFile(fileName: string, data: Blob) {
   }, 100);
 }
 
+type DomToImageModule = {
+  toPng: (element: HTMLElement) => Promise<string>;
+};
+
 export async function exportElementToImage(element: HTMLElement) {
   //@ts-ignore
-  const domToImage = (await import('dom-to-image').then((m) => m.default)) as any;
-  const dataUrl = (await domToImage.toPng(element)) as string;
+  const domToImage = (await import('dom-to-image').then((m) => m.default)) as DomToImageModule;
+  const dataUrl = await domToImage.toPng(element);
   return dataUrl;
 }
 
@@ -83,8 +87,8 @@ export const capturePageScreenshot = async (
     const tempContainer = document.createElement('div');
     tempContainer.style.position = 'absolute';
     tempContainer.style.left = '-9999px';
-    tempContainer.style.width = elementToCapture.scrollWidth + 'px';
-    tempContainer.style.height = elementToCapture.scrollHeight + 'px';
+    tempContainer.style.width = `${elementToCapture.scrollWidth}px`;
+    tempContainer.style.height = `${elementToCapture.scrollHeight}px`;
 
     // Clone the element and its styles
     const clonedElement = elementToCapture.cloneNode(true) as HTMLElement;
@@ -121,23 +125,23 @@ export const capturePageScreenshot = async (
       'font-size'
     ];
 
-    stylesToCopy.forEach((property) => {
+    for (const property of stylesToCopy) {
       const value = computedStyle.getPropertyValue(property);
       if (value) {
         clonedElement.style.setProperty(property, value);
       }
-    });
+    }
 
     // Hide specified elements in the clone
     if (hideSelectors) {
-      hideSelectors.forEach((selector) => {
+      for (const selector of hideSelectors) {
         const elements = clonedElement.querySelectorAll(selector);
-        elements.forEach((element) => {
+        for (const element of elements) {
           if (element instanceof HTMLElement) {
             element.style.display = 'none';
           }
-        });
-      });
+        }
+      }
     }
 
     // Append clone to temporary container and add to document

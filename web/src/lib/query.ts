@@ -3,7 +3,7 @@ import { userQueryKeys } from '@/api/query_keys/users';
 import type { QueryClient, queryOptions } from '@tanstack/react-query';
 
 export const isQueryStale = (
-  options: ReturnType<typeof queryOptions<any, RustApiError, any>>,
+  options: ReturnType<typeof queryOptions<unknown, RustApiError, unknown>>,
   queryClient: QueryClient
 ): boolean => {
   const queryState = queryClient.getQueryState(options.queryKey);
