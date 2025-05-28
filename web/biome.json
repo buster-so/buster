@@ -22,7 +22,8 @@
 		"enabled": true,
 		"ignore": [
 			"**/*.test.*",
-			"**/*.spec.*"
+			"**/*.spec.*",
+			"**/*.stories.tsx"
 		],
 		"rules": {
 			"recommended": true,

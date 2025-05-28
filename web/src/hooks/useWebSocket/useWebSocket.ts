@@ -1,17 +1,18 @@
 'use client';
 
+import type { BusterSocketResponseBase } from '@/api/buster_socket/base_interfaces';
+import type { SupabaseContextReturnType } from '@/context/Supabase';
 import { useMemoizedFn, useMount, useNetwork, useThrottleFn, useWindowFocus } from '@/hooks';
 import { useEffect, useRef, useState } from 'react';
 import { ReadyState } from './config';
-import type { BusterSocketResponseBase } from '@/api/buster_socket/base_interfaces';
-import { createBusterResponse } from './helpers';
 import { type DeviceCapabilities, getDeviceCapabilities } from './deviceCapabilities';
-import type { SupabaseContextReturnType } from '@/context/Supabase';
+import { createBusterResponse } from './helpers';
 
 type WebSocketHookProps = {
   canConnect: boolean;
   url: string;
   checkTokenValidity: SupabaseContextReturnType['checkTokenValidity'];
+  // biome-ignore lint/suspicious/noExplicitAny: Generic message data type for WebSocket responses
   onMessage: (data: BusterSocketResponseBase<string, any>) => void; // Required prop for handling messages
 };
 
@@ -26,6 +27,7 @@ const useWebSocket = ({ url, checkTokenValidity, canConnect, onMessage }: WebSoc
   const { online } = useNetwork();
   const messageQueue = useRef<QueuedMessage[]>([]); // Updated queue type
   const processing = useRef<boolean>(false); // Flag to indicate if processing is ongoing
+  // biome-ignore lint/suspicious/noExplicitAny: Generic message queue for WebSocket data
   const sendQueue = useRef<Record<string, any>[]>([]); // Queue to store messages to be sent
   const ws = useRef<WebSocket | null>(null);
   const capabilities = useRef<DeviceCapabilities | null>(null);
@@ -123,6 +125,7 @@ const useWebSocket = ({ url, checkTokenValidity, canConnect, onMessage }: WebSoc
     }
   });
 
+  // biome-ignore lint/suspicious/noExplicitAny: Generic data type for WebSocket messages
   const sendJSONMessage = useMemoizedFn(async (data: Record<string, any>, isFromQueue = false) => {
     await checkTokenValidity(); //needed! This will refresh the token if it is expired. All other messages will be queued until the token is refreshed.
     if (ws.current?.readyState === ReadyState.Closed) {
@@ -157,7 +160,7 @@ const useWebSocket = ({ url, checkTokenValidity, canConnect, onMessage }: WebSoc
         .then(({ access_token, isTokenValid }) => {
           if (!isTokenValid) return;
           // If fetch succeeds, establish WebSocket connection
-          const socketURLWithAuth = url + `?authentication=${access_token}`;
+          const socketURLWithAuth = `${url}?authentication=${access_token}`;
           ws.current = new WebSocket(socketURLWithAuth);
           setupWebSocketHandlers();
         })

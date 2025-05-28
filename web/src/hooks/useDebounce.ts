@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback, useMemo } from 'react';
-import useLatest from './useLatest';
+import { isDev } from '@/config';
 import debounce from 'lodash/debounce';
 import isFunction from 'lodash/isFunction';
-import { isDev } from '@/config';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import useLatest from './useLatest';
 import { useUnmount } from './useUnmount';
 
 interface DebounceOptions {
@@ -14,6 +14,7 @@ interface DebounceOptions {
   trailing?: boolean;
 }
 
+// biome-ignore lint/suspicious/noExplicitAny: Required for generic function types
 type noop = (...args: any[]) => any;
 
 export function useDebounceFn<T extends noop>(fn: T, options?: DebounceOptions) {

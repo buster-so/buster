@@ -56,6 +56,7 @@ async function detectDeviceCapabilities(): Promise<DeviceCapabilities> {
     const cores = navigator.hardwareConcurrency || 2;
 
     // Check device memory (if available)
+    // biome-ignore lint/suspicious/noExplicitAny: navigator.deviceMemory is experimental and not standardized
     const memory = (navigator as any).deviceMemory || 4;
 
     // Calculate device tier
@@ -65,11 +66,11 @@ async function detectDeviceCapabilities(): Promise<DeviceCapabilities> {
       memory >= 4
     ) {
       return DEVICE_TIERS.high;
-    } else if (performanceScore < 100 && cores >= 2 && memory >= 2) {
-      return DEVICE_TIERS.medium;
-    } else {
-      return DEVICE_TIERS.low;
     }
+    if (performanceScore < 100 && cores >= 2 && memory >= 2) {
+      return DEVICE_TIERS.medium;
+    }
+    return DEVICE_TIERS.low;
   } catch (error) {
     console.warn('Error detecting device capabilities:', error);
     return DEVICE_TIERS.medium; // Fallback to medium tier

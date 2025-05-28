@@ -1,9 +1,9 @@
-import { type DependencyList, type EffectCallback, useEffect, type useLayoutEffect } from 'react';
-import { useRef } from 'react';
-import { useUnmount } from './useUnmount';
 import { depsAreSame } from '@/lib/depAreSame';
 import type { BasicTarget } from '@/lib/domTarget';
 import { getTargetElement } from '@/lib/domTarget';
+import { type DependencyList, type EffectCallback, useEffect, type useLayoutEffect } from 'react';
+import { useRef } from 'react';
+import { useUnmount } from './useUnmount';
 
 const createEffectWithTarget = (useEffectType: typeof useEffect | typeof useLayoutEffect) => {
   /**
@@ -15,14 +15,14 @@ const createEffectWithTarget = (useEffectType: typeof useEffect | typeof useLayo
   const useEffectWithTarget = (
     effect: EffectCallback,
     deps: DependencyList,
-    target: BasicTarget<any> | BasicTarget<any>[]
+    target: BasicTarget<Element> | BasicTarget<Element>[]
   ) => {
     const hasInitRef = useRef(false);
 
-    const lastElementRef = useRef<(Element | null)[]>([]);
+    const lastElementRef = useRef<(Element | null | undefined)[]>([]);
     const lastDepsRef = useRef<DependencyList>([]);
 
-    const unLoadRef = useRef<any>();
+    const unLoadRef = useRef<ReturnType<EffectCallback>>();
 
     useEffectType(() => {
       const targets = Array.isArray(target) ? target : [target];
@@ -43,7 +43,9 @@ const createEffectWithTarget = (useEffectType: typeof useEffect | typeof useLayo
         !depsAreSame(lastElementRef.current, els) ||
         !depsAreSame(lastDepsRef.current, deps)
       ) {
-        unLoadRef.current?.();
+        if (typeof unLoadRef.current === 'function') {
+          unLoadRef.current();
+        }
 
         lastElementRef.current = els;
         lastDepsRef.current = deps;
@@ -52,7 +54,9 @@ const createEffectWithTarget = (useEffectType: typeof useEffect | typeof useLayo
     });
 
     useUnmount(() => {
-      unLoadRef.current?.();
+      if (typeof unLoadRef.current === 'function') {
+        unLoadRef.current();
+      }
       // for react-refresh
       hasInitRef.current = false;
     });

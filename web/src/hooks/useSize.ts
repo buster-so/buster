@@ -39,9 +39,8 @@ export function useSize(
     if (debounceDelay > 0) {
       const timeoutId = setTimeout(updateSize, debounceDelay);
       return () => clearTimeout(timeoutId);
-    } else {
-      updateSize();
     }
+    updateSize();
   });
 
   useEffect(() => {

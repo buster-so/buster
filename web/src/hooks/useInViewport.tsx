@@ -24,7 +24,9 @@ export function useInViewport(target: BasicTarget | BasicTarget[], options?: Opt
   useEffectWithTarget(
     () => {
       const targets = Array.isArray(target) ? target : [target];
-      const els = targets.map((element) => getTargetElement(element)).filter(Boolean);
+      const els = targets
+        .map((element) => getTargetElement(element))
+        .filter((el): el is Element => el != null);
 
       if (!els.length) {
         return;
@@ -44,7 +46,9 @@ export function useInViewport(target: BasicTarget | BasicTarget[], options?: Opt
         }
       );
 
-      els.forEach((el) => observer.observe(el!));
+      for (const el of els) {
+        observer.observe(el);
+      }
 
       return () => {
         observer.disconnect();

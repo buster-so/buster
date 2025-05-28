@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useMemoizedFn } from './useMemoizedFn';
 
 /**
@@ -34,11 +34,10 @@ export function useSetInterval(callback: () => void, delay: number | null) {
           setIsActive(false);
         }
       };
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        setIsActive(false);
-      }
+    }
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      setIsActive(false);
     }
   }, [delay, savedCallback]);
 

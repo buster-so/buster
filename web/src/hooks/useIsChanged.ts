@@ -1,7 +1,7 @@
 'use client';
 
-import { useRef } from 'react';
 import isEqual from 'lodash/isEqual';
+import { useRef } from 'react';
 import { useMemoizedFn } from './useMemoizedFn';
 
 export const useIsChanged = <T = unknown>() => {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, type RefObject } from 'react';
+import { type RefObject, useEffect, useState } from 'react';
 
 interface ScrollState {
   left: number;

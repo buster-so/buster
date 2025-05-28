@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useMemoizedFn } from './useMemoizedFn';
 
 interface MouseState {
@@ -76,9 +76,11 @@ export function useMouse(options: UseMouseOptions = {}) {
 
     const element = target?.current ?? document;
 
+    // biome-ignore lint/suspicious/noExplicitAny: Element can be Document or HTMLElement with different event listener signatures
     element.addEventListener('mousemove', updateMouseState as any);
 
     return () => {
+      // biome-ignore lint/suspicious/noExplicitAny: Element can be Document or HTMLElement with different event listener signatures
       element.removeEventListener('mousemove', updateMouseState as any);
 
       // Clear any pending timers
