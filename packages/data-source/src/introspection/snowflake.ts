@@ -1,7 +1,6 @@
 import type { DatabaseAdapter } from '../adapters/base';
 import { DataSourceType } from '../types/credentials';
 import type {
-  ClusteringInfo,
   Column,
   ColumnStatistics,
   Database,
@@ -276,25 +275,6 @@ export class SnowflakeIntrospector extends BaseIntrospector {
         AND TABLE_NAME = '${table}'
     `);
 
-    // Try to get clustering information
-    let clusteringInfo: ClusteringInfo | undefined;
-    try {
-      const clusteringResult = await this.adapter.query(`
-        SELECT SYSTEM$CLUSTERING_INFORMATION('${database}.${schema}.${table}') as clustering_info
-      `);
-
-      if (clusteringResult.rows.length > 0) {
-        const clusteringData = clusteringResult.rows[0]?.clustering_info;
-        if (clusteringData && typeof clusteringData === 'object') {
-          // Parse clustering information from Snowflake's JSON response
-          clusteringInfo = this.parseClusteringInfo(clusteringData);
-        }
-      }
-    } catch (error) {
-      // Clustering information might not be available for all tables
-      console.warn(`Could not get clustering information for table ${table}:`, error);
-    }
-
     const basicInfo = tableInfo.rows[0];
 
     return {
@@ -304,7 +284,6 @@ export class SnowflakeIntrospector extends BaseIntrospector {
       rowCount: this.parseNumber(basicInfo?.ROW_COUNT),
       sizeBytes: this.parseNumber(basicInfo?.BYTES),
       columnStatistics: [], // No column statistics in basic table stats
-      clusteringInfo,
       lastUpdated: new Date(),
     };
   }
@@ -481,25 +460,5 @@ export class SnowflakeIntrospector extends BaseIntrospector {
     const dateTypes = ['DATE', 'TIMESTAMP', 'TIMESTAMP_LTZ', 'TIMESTAMP_TZ', 'TIME'];
 
     return dateTypes.some((type) => dataType.toUpperCase().includes(type));
-  }
-
-  /**
-   * Parse clustering information from Snowflake's SYSTEM$CLUSTERING_INFORMATION result
-   */
-  private parseClusteringInfo(clusteringData: unknown): ClusteringInfo | undefined {
-    try {
-      if (typeof clusteringData === 'string') {
-        const parsed = JSON.parse(clusteringData);
-        return {
-          clusteringKeys: parsed.cluster_by_keys || [],
-          clusteringDepth: this.parseNumber(parsed.total_cluster_depth),
-          clusteringWidth: this.parseNumber(parsed.total_cluster_width),
-          metadata: parsed,
-        };
-      }
-      return undefined;
-    } catch {
-      return undefined;
-    }
   }
 }
