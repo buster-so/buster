@@ -2,9 +2,9 @@ import { ChartType, type IColumnLabelFormat } from '@/api/asset_interfaces/metri
 import {
   Calendar,
   CurrencyDollar,
-  TextA,
   Numbers,
   Percentage,
+  TextA,
   Typography
 } from '@/components/ui/icons';
 import type React from 'react';

@@ -1,8 +1,8 @@
-import React from 'react';
-import type { IColorTheme } from './interfaces';
 import { Text } from '@/components/ui/typography';
-import { ThemeColorDots } from './ThemeColorDots';
 import { cn } from '@/lib/classMerge';
+import React from 'react';
+import { ThemeColorDots } from './ThemeColorDots';
+import type { IColorTheme } from './interfaces';
 
 export const ThemeList: React.FC<{
   themes: {

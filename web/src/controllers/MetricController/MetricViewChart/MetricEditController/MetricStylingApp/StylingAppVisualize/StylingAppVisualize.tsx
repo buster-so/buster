@@ -1,19 +1,19 @@
-import type React from 'react';
-import { StylingLabel } from '../Common';
-import { SelectChartType } from './SelectChartType';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import { SelectAxis } from './SelectAxis';
 import {
-  type YAxisConfig,
   type CategoryAxisStyleConfig,
-  type Y2AxisConfig,
+  type ChartEncodes,
   ChartType,
   type MetricChartProps,
-  type ChartEncodes
+  type Y2AxisConfig,
+  type YAxisConfig
 } from '@/api/asset_interfaces/metric/charts';
-import type { ISelectAxisContext } from './SelectAxis/useSelectAxisContext';
-import { StylingMetric } from './StylingMetric';
 import { cn } from '@/lib/classMerge';
+import type React from 'react';
+import { StylingLabel } from '../Common';
+import { SelectAxis } from './SelectAxis';
+import type { ISelectAxisContext } from './SelectAxis/useSelectAxisContext';
+import { SelectChartType } from './SelectChartType';
+import { StylingMetric } from './StylingMetric';
 
 export const StylingAppVisualize: React.FC<
   {
@@ -47,7 +47,7 @@ export const StylingAppVisualize: React.FC<
   const isMetricChart = selectedChartType === ChartType.Metric;
 
   return (
-    <div className={`flex h-full w-full flex-col space-y-3`}>
+    <div className={'flex h-full w-full flex-col space-y-3'}>
       <div className={className}>
         <StylingLabel label="Chart type">
           <SelectChartType

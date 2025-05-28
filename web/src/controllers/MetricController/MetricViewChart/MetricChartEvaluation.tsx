@@ -1,12 +1,12 @@
 import type { IBusterMetric } from '@/api/asset_interfaces/metric';
-import React, { useMemo } from 'react';
+import { Button, type ButtonProps } from '@/components/ui/buttons';
 import {
   CircleCheck,
   CircleWarning,
   TriangleWarning
 } from '@/components/ui/icons/NucleoIconFilled';
 import { Popover } from '@/components/ui/popover/Popover';
-import { Button, type ButtonProps } from '@/components/ui/buttons';
+import React, { useMemo } from 'react';
 
 export const MetricChartEvaluation: React.FC<{
   evaluationScore: IBusterMetric['evaluation_score'] | undefined;

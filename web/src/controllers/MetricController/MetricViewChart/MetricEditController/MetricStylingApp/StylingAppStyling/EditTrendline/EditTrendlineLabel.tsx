@@ -1,12 +1,12 @@
 import { Input } from '@/components/ui/inputs';
 import { Switch } from '@/components/ui/switch';
+import { useMemoizedFn } from '@/hooks';
 import React, { useMemo } from 'react';
 import { LabelAndInput } from '../../Common';
 import type { LoopTrendline } from './EditTrendline';
-import { trendlineOptions } from './config';
-import { useMemoizedFn } from '@/hooks';
-import { TrendlineOffset } from './TrendlineOffset';
 import { TrendlineLabelPositionOffset } from './TrendlineLabelPositionOffset';
+import { TrendlineOffset } from './TrendlineOffset';
+import { trendlineOptions } from './config';
 
 export const TrendlineLabel = React.memo(
   ({

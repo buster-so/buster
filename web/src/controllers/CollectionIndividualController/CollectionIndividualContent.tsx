@@ -1,24 +1,24 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
-import {} from '@/components/ui/icons';
-import { Avatar } from '@/components/ui/avatar';
-import { createBusterRoute, BusterRoutes } from '@/routes';
-import { formatDate } from '@/lib';
 import type {
   BusterCollection,
   BusterCollectionItemAsset,
   BusterCollectionListItem
 } from '@/api/asset_interfaces';
-import { Text } from '@/components/ui/typography';
-import { ListEmptyStateWithButton } from '@/components/ui/list';
 import { ShareAssetType } from '@/api/asset_interfaces';
-import { useMemoizedFn } from '@/hooks';
-import { BusterList, type BusterListColumn, type BusterListRow } from '@/components/ui/list';
-import { CollectionIndividualSelectedPopup } from './CollectionsIndividualPopup';
 import { ASSET_ICONS } from '@/components/features/config/assetIcons';
 import { AddToCollectionModal } from '@/components/features/modal/AddToCollectionModal';
+import { Avatar } from '@/components/ui/avatar';
+import {} from '@/components/ui/icons';
+import { ListEmptyStateWithButton } from '@/components/ui/list';
+import { BusterList, type BusterListColumn, type BusterListRow } from '@/components/ui/list';
+import { Text } from '@/components/ui/typography';
+import { useMemoizedFn } from '@/hooks';
+import { formatDate } from '@/lib';
 import { canEdit } from '@/lib/share';
+import { BusterRoutes, createBusterRoute } from '@/routes';
+import React, { useMemo, useState } from 'react';
+import { CollectionIndividualSelectedPopup } from './CollectionsIndividualPopup';
 
 export const CollectionIndividualContent: React.FC<{
   collection: BusterCollection | undefined;
@@ -115,7 +115,7 @@ const CollectionList: React.FC<{
       link: createAssetLink(asset, selectedCollection.id),
       data: {
         ...asset,
-        name: { name: asset.name || 'New ' + asset.asset_type, asset_type: asset.asset_type }
+        name: { name: asset.name || `New ${asset.asset_type}`, asset_type: asset.asset_type }
       }
     }));
   }, [assetList]);

@@ -3,6 +3,7 @@ import type {
   ListPermissionUsersResponse
 } from '@/api/asset_interfaces';
 import { useDatasetUpdatePermissionUsers } from '@/api/buster_rest/datasets';
+import { ListUserItem } from '@/components/features/list';
 import {
   type BusterListColumn,
   type BusterListRowItem,
@@ -10,13 +11,12 @@ import {
   InfiniteListContainer
 } from '@/components/ui/list';
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
-import { useMemoizedFn } from '@/hooks';
 import { Select } from '@/components/ui/select';
+import { useMemoizedFn } from '@/hooks';
+import { BusterRoutes, createBusterRoute } from '@/routes';
 import React, { useMemo, useState } from 'react';
 import { PermissionUsersSelectedPopup } from './PermissionUsersSelectedPopup';
 import { PERMISSION_USERS_OPTIONS } from './config';
-import { BusterRoutes, createBusterRoute } from '@/routes';
-import { ListUserItem } from '@/components/features/list';
 
 export const PermissionListUsersContainer: React.FC<{
   filteredPermissionUsers: ListPermissionUsersResponse[];
@@ -149,7 +149,7 @@ const PermissionGroupAssignedCell: React.FC<{
   onSelect: (value: { id: string; assigned: boolean }) => void;
 }> = ({ id, assigned, onSelect }) => {
   return (
-    <div className="flex" onClick={(e) => e.stopPropagation()}>
+    <div className="flex" onClick={(e) => e.stopPropagation()} onKeyUp={(e) => e.stopPropagation()}>
       <Select
         items={PERMISSION_USERS_OPTIONS}
         value={assigned ? 'included' : 'not_included'}

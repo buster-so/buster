@@ -1,8 +1,8 @@
-import React from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
-import { EditPieAppearance } from './EditPieAppearance';
-import { fn } from '@storybook/test';
 import { DEFAULT_CHART_CONFIG } from '@/api/asset_interfaces';
+import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
+import React from 'react';
+import { EditPieAppearance } from './EditPieAppearance';
 
 const meta: Meta<typeof EditPieAppearance> = {
   title: 'Controllers/EditMetricController/EditPieAppearance',

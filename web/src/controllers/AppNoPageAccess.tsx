@@ -1,9 +1,9 @@
-import React from 'react';
 import { BusterLogo } from '@/assets/svg/BusterLogo';
+import { Button } from '@/components/ui/buttons';
 import { Title } from '@/components/ui/typography';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import { Button } from '@/components/ui/buttons';
 import Link from 'next/link';
+import React from 'react';
 
 export const AppNoPageAccess: React.FC<{
   assetId: string;
@@ -13,9 +13,9 @@ export const AppNoPageAccess: React.FC<{
       <BusterLogo className="h-16 w-16" />
 
       <div className="max-w-[440px] text-center">
-        <Title
-          as="h2"
-          className="text-center">{`It looks like you don’t have access to this file...`}</Title>
+        <Title as="h2" className="text-center">
+          {'It looks like you don’t have access to this file...'}
+        </Title>
       </div>
 
       <div className="flex space-x-2">

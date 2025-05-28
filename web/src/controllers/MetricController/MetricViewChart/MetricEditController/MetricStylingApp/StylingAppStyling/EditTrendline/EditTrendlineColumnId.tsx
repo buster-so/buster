@@ -1,6 +1,6 @@
 import type { ColumnMetaData, IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import { formatLabel } from '@/lib';
 import { Select, type SelectItem } from '@/components/ui/select';
+import { formatLabel } from '@/lib';
 import React, { useMemo } from 'react';
 import { LabelAndInput } from '../../Common';
 import type { LoopTrendline } from './EditTrendline';

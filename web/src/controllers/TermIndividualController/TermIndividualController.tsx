@@ -1,12 +1,12 @@
 'use client';
 
-import type React from 'react';
-import { TermIndividualHeader } from './TermIndividualHeader';
-import { AppPageLayout, AppSplitter } from '@/components/ui/layouts';
-import { TermIndividualHeaderSider } from './TermIndividualHeaderSider';
-import { TermIndividualContentSider } from './TermIndividualContentSider';
-import { TermIndividualContent } from './TermIndividualContent';
 import { useGetTermsList } from '@/api/buster_rest/terms';
+import { AppPageLayout, AppSplitter } from '@/components/ui/layouts';
+import type React from 'react';
+import { TermIndividualContent } from './TermIndividualContent';
+import { TermIndividualContentSider } from './TermIndividualContentSider';
+import { TermIndividualHeader } from './TermIndividualHeader';
+import { TermIndividualHeaderSider } from './TermIndividualHeaderSider';
 
 export const TermIndividualController: React.FC<{
   termPageIdLayout: string[];

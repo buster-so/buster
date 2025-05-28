@@ -1,9 +1,9 @@
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import React, { useMemo, useState } from 'react';
-import { LabelAndInput } from '../../../Common/LabelAndInput';
 import { Select, type SelectItem } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useMemoizedFn } from '@/hooks';
+import React, { useMemo, useState } from 'react';
+import { LabelAndInput } from '../../../Common/LabelAndInput';
 
 const barGroupingOptions: SelectItem<NonNullable<IBusterMetricChartConfig['barGroupType']>>[] = [
   { label: 'Grouped', value: 'group' },

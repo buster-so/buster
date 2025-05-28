@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react';
-import { Select, type SelectItem } from '@/components/ui/select';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import { LabelAndInput } from '../Common';
+import { Select, type SelectItem } from '@/components/ui/select';
 import { useMemoizedFn } from '@/hooks';
 import first from 'lodash/first';
+import React, { useMemo } from 'react';
+import { LabelAndInput } from '../Common';
 
 const options: SelectItem<IBusterMetricChartConfig['showLegendHeadline'] | 'false'>[] = [
   { label: 'None', value: 'false' },
@@ -52,13 +52,11 @@ export const EditShowHeadline: React.FC<{
     }, [showLegendHeadline, allOptions]);
 
     const onChange = useMemoizedFn((value: string | false) => {
-      if (value === 'false') {
-        value = false;
-      }
+      const transformedValue = value === 'false' ? false : value;
 
       onUpdateChartConfig({
         showLegend: true,
-        showLegendHeadline: value as IBusterMetricChartConfig['showLegendHeadline']
+        showLegendHeadline: transformedValue as IBusterMetricChartConfig['showLegendHeadline']
       });
     });
 

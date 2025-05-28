@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
 import type { VerificationStatus } from '@/api/asset_interfaces';
-import { MetricListHeader } from './MetricListHeader';
-import { MetricItemsContainer } from './MetricItemsContainer';
-import { AppPageLayout } from '@/components/ui/layouts';
 import { useGetMetricsList } from '@/api/buster_rest/metrics';
+import { AppPageLayout } from '@/components/ui/layouts';
+import React, { useMemo, useState } from 'react';
+import { MetricItemsContainer } from './MetricItemsContainer';
+import { MetricListHeader } from './MetricListHeader';
 
 export const MetricListContainer: React.FC = React.memo(() => {
   const [filters, setFilters] = useState<VerificationStatus[]>([]);

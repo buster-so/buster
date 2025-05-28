@@ -1,5 +1,5 @@
-import type React from 'react';
 import { Text } from '@/components/ui/typography';
+import type React from 'react';
 
 export const ChatListHeader: React.FC<{
   type: 'logs' | 'chats';

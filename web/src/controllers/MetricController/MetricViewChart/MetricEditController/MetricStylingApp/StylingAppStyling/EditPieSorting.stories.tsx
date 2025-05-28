@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { EditPieSorting } from './EditPieSorting';
 import { fn } from '@storybook/test';
+import { EditPieSorting } from './EditPieSorting';
 
 const meta: Meta<typeof EditPieSorting> = {
   title: 'Controllers/MetricController/EditPieSorting',

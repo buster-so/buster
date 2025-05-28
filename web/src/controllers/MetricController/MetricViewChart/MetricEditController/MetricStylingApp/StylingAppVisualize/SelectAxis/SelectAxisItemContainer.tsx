@@ -1,15 +1,15 @@
-import React, { useMemo } from 'react';
-import { SelectAxisItemLabel } from './SelectAxisItemLabel';
-import { useSelectAxisContextSelector } from './useSelectAxisContext';
-import { useMemoizedFn } from '@/hooks';
-import { chartTypeToAxis, type SelectAxisContainerId, zoneIdToAxis } from './config';
-import { SelectAxisDropdownContent } from './SelectAxisColumnContent';
 import type { ChartEncodes, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
-import { CollapseDelete } from '../../Common/CollapseDelete';
-import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
-import type { DraggableAttributes } from '@dnd-kit/core';
-import { useUpdateMetricChart } from '@/context/Metrics';
 import { ErrorBoundary } from '@/components/ui/error';
+import { useUpdateMetricChart } from '@/context/Metrics';
+import { useMemoizedFn } from '@/hooks';
+import type { DraggableAttributes } from '@dnd-kit/core';
+import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
+import React, { useMemo } from 'react';
+import { CollapseDelete } from '../../Common/CollapseDelete';
+import { SelectAxisDropdownContent } from './SelectAxisColumnContent';
+import { SelectAxisItemLabel } from './SelectAxisItemLabel';
+import { type SelectAxisContainerId, chartTypeToAxis, zoneIdToAxis } from './config';
+import { useSelectAxisContextSelector } from './useSelectAxisContext';
 
 interface SelectAxisItemContainerProps {
   id: string;

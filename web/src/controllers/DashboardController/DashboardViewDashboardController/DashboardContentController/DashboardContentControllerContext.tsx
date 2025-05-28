@@ -1,8 +1,8 @@
+import type { BusterDashboard } from '@/api/asset_interfaces';
+import { useMemoizedFn } from '@/hooks';
 import type React from 'react';
 import { useState } from 'react';
-import { useMemoizedFn } from '@/hooks';
 import { createContext, useContextSelector } from 'use-context-selector';
-import type { BusterDashboard } from '@/api/asset_interfaces';
 
 interface DashboardMetricMetadata {
   initialAnimationEnded: boolean;

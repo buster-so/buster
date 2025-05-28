@@ -1,17 +1,17 @@
-import React, { useMemo } from 'react';
-import type { ChartEncodes, ChartType } from '@/api/asset_interfaces/metric/charts';
 import type { ColumnMetaData, IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { ChartEncodes, ChartType } from '@/api/asset_interfaces/metric/charts';
 import { AppTooltip } from '@/components/ui/tooltip';
-import { CHART_ICON_LIST, ChartIconType, DETERMINE_SELECTED_CHART_TYPE_ORDER } from './config';
-import {
-  selectedChartTypeMethod,
-  DetermineSelectedChartType,
-  disableTypeMethod
-} from './SelectedChartTypeMethod';
-import { useMemoizedFn, useUnmount } from '@/hooks';
-import { addOpacityToColor, NUMBER_TYPES } from '@/lib';
-import { cn } from '@/lib/classMerge';
 import { useUpdateMetricChart } from '@/context/Metrics';
+import { useMemoizedFn, useUnmount } from '@/hooks';
+import { NUMBER_TYPES, addOpacityToColor } from '@/lib';
+import { cn } from '@/lib/classMerge';
+import React, { useMemo } from 'react';
+import {
+  DetermineSelectedChartType,
+  disableTypeMethod,
+  selectedChartTypeMethod
+} from './SelectedChartTypeMethod';
+import { CHART_ICON_LIST, ChartIconType, DETERMINE_SELECTED_CHART_TYPE_ORDER } from './config';
 
 export interface SelectChartTypeProps {
   selectedChartType: ChartType;

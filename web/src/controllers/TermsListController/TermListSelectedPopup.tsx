@@ -1,10 +1,10 @@
 'use client';
 
-import type React from 'react';
-import { BusterListSelectedOptionPopupContainer } from '@/components/ui/list';
-import { Button } from '@/components/ui/buttons';
-import { useMemoizedFn } from '@/hooks';
 import { useDeleteTerm } from '@/api/buster_rest/terms';
+import { Button } from '@/components/ui/buttons';
+import { BusterListSelectedOptionPopupContainer } from '@/components/ui/list';
+import { useMemoizedFn } from '@/hooks';
+import type React from 'react';
 
 export const TermListSelectedOptionPopup: React.FC<{
   selectedRowKeys: string[];

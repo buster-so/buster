@@ -1,7 +1,7 @@
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import { Input } from '@/components/ui/inputs';
 import React, { useEffect, useRef } from 'react';
 import { LabelAndInput } from '../../Common';
-import { Input } from '@/components/ui/inputs';
 
 export const EditHeaderTitle: React.FC<{
   value: string | undefined;

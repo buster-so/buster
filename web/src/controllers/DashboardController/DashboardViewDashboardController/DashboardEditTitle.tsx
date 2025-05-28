@@ -1,8 +1,8 @@
-import { useMemoizedFn, useMount } from '@/hooks';
-import { EditableTitle } from '@/components/ui/typography/EditableTitle';
-import React, { useRef } from 'react';
 import { useUpdateDashboard } from '@/api/buster_rest/dashboards';
 import { InputTextArea } from '@/components/ui/inputs/InputTextArea';
+import { EditableTitle } from '@/components/ui/typography/EditableTitle';
+import { useMemoizedFn, useMount } from '@/hooks';
+import React, { useRef } from 'react';
 
 export const DASHBOARD_TITLE_INPUT_ID = 'dashboard-title-input';
 

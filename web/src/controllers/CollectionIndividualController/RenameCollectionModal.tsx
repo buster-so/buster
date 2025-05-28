@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { AppModal } from '@/components/ui/modal';
 import { useUpdateCollection } from '@/api/buster_rest/collections';
-import { Input } from '@/components/ui/inputs/Input';
-import { useMemoizedFn } from '@/hooks';
 import type { ButtonProps } from '@/components/ui/buttons';
+import { Input } from '@/components/ui/inputs/Input';
+import { AppModal } from '@/components/ui/modal';
+import { useMemoizedFn } from '@/hooks';
+import React, { useState, useMemo } from 'react';
 
 interface RenameCollectionModalProps {
   collectionId: string;

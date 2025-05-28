@@ -1,10 +1,10 @@
-import React from 'react';
-import { EditGrouping } from './EditGrouping';
-import { useSelectAxisContextSelector } from '../useSelectAxisContext';
-import { useMemoizedFn } from '@/hooks';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import { EditAxisTitle } from './EditShowAxisTitle';
 import { useUpdateMetricChart } from '@/context/Metrics';
+import { useMemoizedFn } from '@/hooks';
+import React from 'react';
+import { useSelectAxisContextSelector } from '../useSelectAxisContext';
+import { EditGrouping } from './EditGrouping';
+import { EditAxisTitle } from './EditShowAxisTitle';
 
 export const CategoryAxisSettingContent: React.FC<{}> = React.memo(({}) => {
   const { onUpdateMetricChartConfig } = useUpdateMetricChart();

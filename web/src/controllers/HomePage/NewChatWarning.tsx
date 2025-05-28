@@ -1,10 +1,10 @@
-import { cn } from '@/lib/classMerge';
-import React from 'react';
-import type { useNewChatWarning } from './useNewChatWarning';
+import { Button } from '@/components/ui/buttons';
 import { ArrowUpRight, CircleCheck } from '@/components/ui/icons';
 import { Paragraph, Text } from '@/components/ui/typography';
-import { Button } from '@/components/ui/buttons';
+import { cn } from '@/lib/classMerge';
 import Link from 'next/link';
+import React from 'react';
+import type { useNewChatWarning } from './useNewChatWarning';
 
 export const NewChatWarning = React.memo(
   ({ hasDatasets, hasDatasources }: ReturnType<typeof useNewChatWarning>) => {

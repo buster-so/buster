@@ -1,15 +1,15 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { Avatar } from '@/components/ui/avatar';
-import { formatDate } from '@/lib';
-import { BusterList, type BusterListColumn, type BusterListRow } from '@/components/ui/list';
-import { BUSTER_DOCS_QUICKSTART, BusterRoutes, createBusterRoute } from '@/routes';
 import type { BusterDatasetListItem } from '@/api/asset_interfaces';
+import { Avatar } from '@/components/ui/avatar';
+import { ArrowUpRight, ExternalLink } from '@/components/ui/icons';
+import { BusterList, type BusterListColumn, type BusterListRow } from '@/components/ui/list';
 import { ListEmptyStateWithButton } from '@/components/ui/list';
 import { useMemoizedFn } from '@/hooks';
+import { formatDate } from '@/lib';
+import { BUSTER_DOCS_QUICKSTART, BusterRoutes, createBusterRoute } from '@/routes';
+import React, { useState, useMemo } from 'react';
 import { DatasetSelectedOptionPopup } from './DatasetSelectedPopup';
-import { ArrowUpRight, ExternalLink } from '@/components/ui/icons';
 
 const columns: BusterListColumn[] = [
   {
@@ -93,7 +93,7 @@ export const DatasetListContent: React.FC<{
                 title="You don't have any datasets yet."
                 buttonText="Link to docs"
                 linkButton={BUSTER_DOCS_QUICKSTART}
-                buttonPrefix={<></>}
+                buttonPrefix={null}
                 buttonSuffix={<ArrowUpRight />}
                 linkButtonTarget="_blank"
                 description="Datasets help you organize your data and Buster uses them to help answer questions. Datasets will appear here when you create them. Currently, you can only create datasets through our CLI tool which you can read more about in our docs."

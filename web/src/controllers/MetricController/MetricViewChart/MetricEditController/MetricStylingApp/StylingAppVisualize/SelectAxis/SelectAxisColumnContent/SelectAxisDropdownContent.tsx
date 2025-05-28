@@ -1,35 +1,35 @@
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
-import { useMemoizedFn } from '@/hooks';
-import React, { useMemo } from 'react';
-import { formatLabel } from '@/lib';
-import { EditTitle } from './EditTitle';
-import { EditDisplayAs } from './EditDisplayAs';
 import {
   type ChartEncodes,
   ChartType,
   type ColumnSettings
 } from '@/api/asset_interfaces/metric/charts';
+import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
+import { useGetCurrencies } from '@/api/buster_rest/nextjs/currency';
+import { ErrorBoundary } from '@/components/ui/error';
+import { Text } from '@/components/ui/typography';
+import { useUpdateMetricChart } from '@/context/Metrics';
+import { useMemoizedFn } from '@/hooks';
+import { formatLabel } from '@/lib';
+import { cn } from '@/lib/classMerge';
+import React, { useMemo } from 'react';
+import { SelectAxisContainerId } from '../config';
 import { EditBarRoundness } from './EditBarRoundness';
-import { EditShowDataLabel } from './EditShowDataLabel';
-import { EditShowBarLabelAsPercentage } from './EditShowLabelAsPercentage';
-import { EditLabelStyle } from './EditLabelStyle';
-import { EditSeparator } from './EditSeparator';
+import { EditCurrency } from './EditCurrency';
+import { EditDateFormat } from './EditDateFormat';
+import { EditDateType } from './EditDateType';
 import { EditDecimals } from './EditDecimals';
+import { EditDisplayAs } from './EditDisplayAs';
+import { EditLabelStyle } from './EditLabelStyle';
+import { EditLineStyle } from './EditLineStyle';
 import { EditMultiplyBy } from './EditMultiplyBy';
 import { EditPrefix } from './EditPrefix';
-import { EditSuffix } from './EditSuffix';
-import { EditCurrency } from './EditCurrency';
-import { EditDateType } from './EditDateType';
-import { EditDateFormat } from './EditDateFormat';
-import { Text } from '@/components/ui/typography';
-import { SelectAxisContainerId } from '../config';
 import { EditReplaceMissingData } from './EditReplaceMissingData';
-import { EditLineStyle } from './EditLineStyle';
-import { useGetCurrencies } from '@/api/buster_rest/nextjs/currency';
-import { cn } from '@/lib/classMerge';
-import { useUpdateMetricChart } from '@/context/Metrics';
-import { ErrorBoundary } from '@/components/ui/error';
+import { EditSeparator } from './EditSeparator';
+import { EditShowDataLabel } from './EditShowDataLabel';
+import { EditShowBarLabelAsPercentage } from './EditShowLabelAsPercentage';
+import { EditSuffix } from './EditSuffix';
+import { EditTitle } from './EditTitle';
 
 export const SelectAxisDropdownContent: React.FC<{
   columnSetting: IBusterMetricChartConfig['columnSettings'][string];

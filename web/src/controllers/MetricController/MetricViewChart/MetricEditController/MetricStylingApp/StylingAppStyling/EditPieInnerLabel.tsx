@@ -1,8 +1,8 @@
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import React, { useMemo } from 'react';
-import { LabelAndInput } from '../Common';
 import { Input } from '@/components/ui/inputs';
 import { Select, type SelectItem } from '@/components/ui/select';
+import React, { useMemo } from 'react';
+import { LabelAndInput } from '../Common';
 
 export const EditPieInnerLabel = React.memo(
   ({

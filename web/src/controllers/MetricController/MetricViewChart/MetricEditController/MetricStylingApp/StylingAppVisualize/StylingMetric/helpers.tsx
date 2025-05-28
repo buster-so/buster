@@ -1,7 +1,7 @@
 import type { ColumnMetaData, IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { SelectItem } from '@/components/ui/select';
 import { formatLabel } from '@/lib';
 import { ColumnTypeIcon } from '../SelectAxis/config';
-import type { SelectItem } from '@/components/ui/select';
 
 export const createColumnFieldOptions = (
   columnMetadata: ColumnMetaData[],

@@ -1,8 +1,8 @@
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import React, { useMemo } from 'react';
-import { LabelAndInput } from '../Common';
 import { Switch } from '@/components/ui/switch';
 import { useMemoizedFn } from '@/hooks';
+import React, { useMemo } from 'react';
+import { LabelAndInput } from '../Common';
 
 export const EditSmoothLinesGlobal: React.FC<{
   columnSettings: IBusterMetricChartConfig['columnSettings'];

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { EditBarSorting } from './EditBarAxisSorting';
 import { fn } from '@storybook/test';
+import { EditBarSorting } from './EditBarAxisSorting';
 
 const meta: Meta<typeof EditBarSorting> = {
   title: 'Controllers/EditMetricController/EditBarAxisSorting',

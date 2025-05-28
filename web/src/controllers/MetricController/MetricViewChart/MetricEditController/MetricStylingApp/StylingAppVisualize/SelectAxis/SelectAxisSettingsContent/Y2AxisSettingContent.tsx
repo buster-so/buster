@@ -1,15 +1,15 @@
-import React, { useMemo } from 'react';
-import { useSelectAxisContextSelector } from '../useSelectAxisContext';
-import type { SelectAxisContainerId } from '../config';
-import { EditShowAxisTitle } from './EditShowAxisTitle';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import type { ColumnLabelFormat, ComboChartAxis } from '@/api/asset_interfaces/metric/charts';
 import { AXIS_TITLE_SEPARATOR } from '@/components/ui/charts/commonHelpers/axisHelper';
-import { formatLabel } from '@/lib';
-import { useMemoizedFn } from '@/hooks';
-import { EditShowAxisLabel } from './EditShowAxisLabel';
-import { EditAxisScale } from './EditAxisScale';
-import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { useUpdateMetricChart } from '@/context/Metrics';
+import { useMemoizedFn } from '@/hooks';
+import { formatLabel } from '@/lib';
+import React, { useMemo } from 'react';
+import type { SelectAxisContainerId } from '../config';
+import { useSelectAxisContextSelector } from '../useSelectAxisContext';
+import { EditAxisScale } from './EditAxisScale';
+import { EditShowAxisLabel } from './EditShowAxisLabel';
+import { EditShowAxisTitle } from './EditShowAxisTitle';
 
 export const Y2AxisSettingContent: React.FC<{
   zoneId: SelectAxisContainerId;

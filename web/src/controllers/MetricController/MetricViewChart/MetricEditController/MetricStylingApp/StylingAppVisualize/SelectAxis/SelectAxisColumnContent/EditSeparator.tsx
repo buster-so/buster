@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react';
 import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
-import { LabelAndInput } from '../../../Common/LabelAndInput';
 import { Select, type SelectItem } from '@/components/ui/select';
+import React, { useMemo } from 'react';
+import { LabelAndInput } from '../../../Common/LabelAndInput';
 
 const options: SelectItem[] = [
   {

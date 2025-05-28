@@ -1,8 +1,8 @@
-import React, { useMemo } from 'react';
-import { LabelAndInput } from '../../../Common/LabelAndInput';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
 import { useMemoizedFn } from '@/hooks';
+import React, { useMemo } from 'react';
+import { LabelAndInput } from '../../../Common/LabelAndInput';
 
 const options: SegmentedItem<IBusterMetricChartConfig['xAxisLabelRotation']>[] = [
   { label: 'Auto', value: 'auto' },

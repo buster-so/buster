@@ -1,8 +1,8 @@
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import { Select, type SelectItem } from '@/components/ui/select';
+import { useMemoizedFn } from '@/hooks';
 import React, { useMemo } from 'react';
 import { LabelAndInput } from '../../Common';
-import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import { useMemoizedFn } from '@/hooks';
-import { Select, type SelectItem } from '@/components/ui/select';
 
 const allOptions: SelectItem<'custom' | 'columnTitle' | 'columnValue' | 'none'>[] = [
   {

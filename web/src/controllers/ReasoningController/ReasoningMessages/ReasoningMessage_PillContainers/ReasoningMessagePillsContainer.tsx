@@ -1,6 +1,6 @@
 import type { BusterChatMessageReasoning_pills } from '@/api/asset_interfaces/chat';
-import type React from 'react';
 import { motion } from 'framer-motion';
+import type React from 'react';
 import { ReasoningMessagePillContainer } from './ReasoningMessagePillContainer';
 
 const containerVariants = {

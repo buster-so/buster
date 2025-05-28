@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { LabelAndInput } from '../Common';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { InputNumber } from '@/components/ui/inputs';
 import { Slider, SliderWithInputNumber } from '@/components/ui/slider';
-import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { useMemoizedFn } from '@/hooks';
+import React, { useState } from 'react';
+import { LabelAndInput } from '../Common';
 
 export const EditPieMinimumSlicePercentage = React.memo(
   ({

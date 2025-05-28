@@ -1,6 +1,6 @@
 import type {
-  IBusterMetric,
   ColumnMetaData,
+  IBusterMetric,
   IBusterMetricChartConfig
 } from '@/api/asset_interfaces/metric';
 import type {

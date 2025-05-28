@@ -1,11 +1,11 @@
 import { Button } from '@/components/ui/buttons';
+import { Sliders3 } from '@/components/ui/icons';
+import { Popover } from '@/components/ui/popover/Popover';
 import React, { useMemo } from 'react';
 import type { SelectAxisContainerId } from '../config';
-import { SelectAxisSettingContent } from './SelectAxisSettingContent';
 import { useSelectAxisContextSelector } from '../useSelectAxisContext';
+import { SelectAxisSettingContent } from './SelectAxisSettingContent';
 import { zoneIdToAxisSettingContent } from './config';
-import { Popover } from '@/components/ui/popover/Popover';
-import { Sliders3 } from '@/components/ui/icons';
 
 export const SelectAxisSettingsButton: React.FC<{
   zoneId: SelectAxisContainerId;

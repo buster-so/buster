@@ -1,6 +1,6 @@
+import { Switch } from '@/components/ui/switch';
 import React from 'react';
 import { LabelAndInput } from '../Common';
-import { Switch } from '@/components/ui/switch';
 
 export const EditHideYAxis: React.FC<{
   hideYAxis: boolean;

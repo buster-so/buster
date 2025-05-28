@@ -1,15 +1,15 @@
-import { useState } from 'react';
-import { SelectAxisContainerId } from '../config';
-import { useMemoizedFn } from '@/hooks';
-import type { DropZoneInternal } from './interfaces';
-import { useSelectAxisContextSelector } from '../useSelectAxisContext';
 import type {
   ChartEncodes,
   ChartType,
   IColumnLabelFormat
 } from '@/api/asset_interfaces/metric/charts';
-import type { Active } from '@dnd-kit/core';
+import { useMemoizedFn } from '@/hooks';
 import { isNumericColumnStyle, isNumericColumnType } from '@/lib';
+import type { Active } from '@dnd-kit/core';
+import { useState } from 'react';
+import { SelectAxisContainerId } from '../config';
+import { useSelectAxisContextSelector } from '../useSelectAxisContext';
+import type { DropZoneInternal } from './interfaces';
 
 interface ZoneError {
   error: boolean;

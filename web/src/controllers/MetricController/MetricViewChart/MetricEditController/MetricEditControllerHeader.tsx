@@ -1,9 +1,9 @@
-import React from 'react';
-import { Text } from '@/components/ui/typography';
 import { Button } from '@/components/ui/buttons';
 import { Xmark } from '@/components/ui/icons';
-import { useChatLayoutContextSelector } from '@/layouts/ChatLayout';
 import { AppTooltip } from '@/components/ui/tooltip';
+import { Text } from '@/components/ui/typography';
+import { useChatLayoutContextSelector } from '@/layouts/ChatLayout';
+import React from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 export const MetricEditControllerHeader: React.FC = React.memo(() => {

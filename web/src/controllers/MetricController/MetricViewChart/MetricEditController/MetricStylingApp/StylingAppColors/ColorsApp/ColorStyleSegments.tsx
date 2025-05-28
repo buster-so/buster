@@ -1,7 +1,7 @@
+import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
+import { useMemoizedFn } from '@/hooks';
 import React from 'react';
 import { ColorAppSegments } from './config';
-import { type SegmentedItem, AppSegmented } from '@/components/ui/segmented';
-import { useMemoizedFn } from '@/hooks';
 
 const options: SegmentedItem<ColorAppSegments>[] = [
   {
@@ -10,7 +10,8 @@ const options: SegmentedItem<ColorAppSegments>[] = [
         className="h-3 w-3 rounded-full"
         style={{
           background: 'linear-gradient(-45deg, #F87B8D, #AA8EFE, #F7B528)'
-        }}></div>
+        }}
+      />
     ),
     label: 'Colorful',
     value: ColorAppSegments.Colorful
@@ -19,7 +20,8 @@ const options: SegmentedItem<ColorAppSegments>[] = [
     icon: (
       <div
         className="h-3 w-3 rounded-full"
-        style={{ background: 'linear-gradient(-45deg, #2958E9, #5B9AFA)' }}></div>
+        style={{ background: 'linear-gradient(-45deg, #2958E9, #5B9AFA)' }}
+      />
     ),
     label: 'Monochrome',
     value: ColorAppSegments.Monochrome

@@ -1,11 +1,11 @@
 'use client';
 
+import { useGetDashboardsList } from '@/api/buster_rest/dashboards';
+import { AppPageLayout } from '@/components/ui/layouts';
 import type React from 'react';
 import { useState } from 'react';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardListContent } from './DashboardListContent';
-import { AppPageLayout } from '@/components/ui/layouts';
-import { useGetDashboardsList } from '@/api/buster_rest/dashboards';
 
 export const DashboardListController: React.FC = () => {
   const [openNewDashboardModal, setOpenNewDashboardModal] = useState(false);

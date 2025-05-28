@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
 import { LabelAndInput } from '../Common';
 
-import { useMemoizedFn } from '@/hooks';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
+import { useMemoizedFn } from '@/hooks';
 
 const options: SegmentedItem<'percent' | 'number'>[] = [
   { label: '%', value: 'percent' },

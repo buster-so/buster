@@ -1,15 +1,15 @@
 import type { BusterMetricData, IBusterMetricChartConfig } from '@/api/asset_interfaces/metric';
 import type { RunSQLResponse } from '@/api/asset_interfaces/sql';
+import { useRunSQL as useRunSQLQuery } from '@/api/buster_rest';
+import { useGetLatestMetricVersionMemoized, useUpdateMetric } from '@/api/buster_rest/metrics';
 import { queryKeys } from '@/api/query_keys';
 import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useGetMetricDataMemoized, useGetMetricMemoized } from '@/context/Metrics';
 import { useMemoizedFn } from '@/hooks';
+import { timeout } from '@/lib';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRef } from 'react';
 import { didColumnDataChange, simplifyChatConfigForSQLChange } from './helpers';
-import { useRunSQL as useRunSQLQuery } from '@/api/buster_rest';
-import { useGetLatestMetricVersionMemoized, useUpdateMetric } from '@/api/buster_rest/metrics';
-import { useGetMetricDataMemoized, useGetMetricMemoized } from '@/context/Metrics';
-import { timeout } from '@/lib';
 
 export const useMetricRunSQL = () => {
   const queryClient = useQueryClient();
@@ -157,15 +157,11 @@ export const useMetricRunSQL = () => {
       const dataSourceId = dataSourceIdProp || currentMetric?.data_source_id;
 
       if (!originalConfigs.current || originalConfigs.current.sql !== sql) {
-        try {
-          await runSQL({
-            metricId,
-            sql: sql,
-            dataSourceId
-          });
-        } catch (error) {
-          throw error;
-        }
+        await runSQL({
+          metricId,
+          sql: sql,
+          dataSourceId
+        });
       }
       await timeout(50);
 

@@ -1,21 +1,21 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import { type BusterCollection, ShareAssetType } from '@/api/asset_interfaces';
+import { useDeleteCollection, useUpdateCollection } from '@/api/buster_rest/collections';
+import { ShareMenu } from '@/components/features/ShareMenu';
+import { ShareCollectionButton } from '@/components/features/buttons/ShareMenuCollectionButton';
+import { FavoriteStar, useFavoriteStar } from '@/components/features/list/FavoriteStar';
+import { Breadcrumb, type BreadcrumbItem } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/buttons';
 import { Dropdown, type DropdownItems } from '@/components/ui/dropdown';
-import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
-import { BusterRoutes } from '@/routes';
-import { FavoriteStar, useFavoriteStar } from '@/components/features/list/FavoriteStar';
-import { ShareMenu } from '@/components/features/ShareMenu';
-import { type BusterCollection, ShareAssetType } from '@/api/asset_interfaces';
-import { useMemoizedFn } from '@/hooks';
-import { type BreadcrumbItem, Breadcrumb } from '@/components/ui/breadcrumb';
 import { Dots, Pencil, Plus, ShareAllRight, ShareRight, Trash } from '@/components/ui/icons';
-import { useDeleteCollection, useUpdateCollection } from '@/api/buster_rest/collections';
-import { canEdit, getIsEffectiveOwner } from '@/lib/share';
-import { ShareCollectionButton } from '@/components/features/buttons/ShareMenuCollectionButton';
-import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
 import { Star } from '@/components/ui/icons';
+import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
+import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
+import { useMemoizedFn } from '@/hooks';
+import { canEdit, getIsEffectiveOwner } from '@/lib/share';
+import { BusterRoutes } from '@/routes';
+import React, { useMemo, useState } from 'react';
 import { RenameCollectionModal } from './RenameCollectionModal';
 
 export const CollectionsIndividualHeader: React.FC<{
@@ -29,8 +29,9 @@ export const CollectionsIndividualHeader: React.FC<{
   const collectionTitle = isFetched ? collection?.name || 'No collection title' : '';
 
   const onSetTitleValue = useMemoizedFn((value: string) => {
+    if (!collection?.id) return;
     updateCollection({
-      id: collection?.id!,
+      id: collection.id,
       name: value
     });
   });
@@ -144,7 +145,7 @@ const ThreeDotDropdown: React.FC<{
   return (
     <>
       <Dropdown items={items}>
-        <Button variant="ghost" prefix={<Dots />}></Button>
+        <Button variant="ghost" prefix={<Dots />} />
       </Dropdown>
       <RenameCollectionModal
         collectionId={id}

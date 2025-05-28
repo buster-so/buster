@@ -1,9 +1,9 @@
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import type { ChartEncodes, ScatterAxis } from '@/api/asset_interfaces/metric/charts';
 import { Slider } from '@/components/ui/slider';
-import React from 'react';
-import isEmpty from 'lodash/isEmpty';
 import { useMemoizedFn } from '@/hooks';
+import isEmpty from 'lodash/isEmpty';
+import React from 'react';
 import { LabelAndInput } from '../Common';
 
 export const EditScatterDotSize: React.FC<{

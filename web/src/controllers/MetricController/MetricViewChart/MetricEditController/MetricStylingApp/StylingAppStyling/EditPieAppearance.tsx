@@ -1,14 +1,14 @@
-import React, { useMemo, useState } from 'react';
-import { LabelAndInput } from '../Common';
 import {
-  type IBusterMetricChartConfig,
   DEFAULT_CHART_CONFIG,
+  type IBusterMetricChartConfig,
   MIN_DONUT_WIDTH
 } from '@/api/asset_interfaces';
 import { InputNumber } from '@/components/ui/inputs';
+import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
 import { Slider, SliderWithInputNumber } from '@/components/ui/slider';
 import { useMemoizedFn } from '@/hooks';
-import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
+import React, { useMemo, useState } from 'react';
+import { LabelAndInput } from '../Common';
 
 const options: SegmentedItem<'donut' | 'pie'>[] = [
   { label: 'Donut', value: 'donut' },

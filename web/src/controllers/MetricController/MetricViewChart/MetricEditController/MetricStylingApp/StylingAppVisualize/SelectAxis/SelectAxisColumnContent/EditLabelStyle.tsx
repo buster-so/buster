@@ -1,10 +1,10 @@
 import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
+import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
+import { useMemoizedFn } from '@/hooks';
+import { isDateColumnType, isNumericColumnType } from '@/lib';
 import React, { useMemo } from 'react';
 import { LabelAndInput } from '../../../Common/LabelAndInput';
-import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
 import { ColumnTypeIcon } from '../config';
-import { isDateColumnType, isNumericColumnType } from '@/lib';
-import { useMemoizedFn } from '@/hooks';
 
 export const EditLabelStyle: React.FC<{
   onUpdateColumnConfig: (columnLabelFormat: Partial<IColumnLabelFormat>) => void;

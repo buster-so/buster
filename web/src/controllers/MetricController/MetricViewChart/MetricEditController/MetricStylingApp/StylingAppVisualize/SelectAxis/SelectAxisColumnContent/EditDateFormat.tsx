@@ -1,17 +1,17 @@
+import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import { Select, type SelectItem } from '@/components/ui/select';
+import { useMemoizedFn } from '@/hooks';
+import { formatDate, getNow } from '@/lib/date';
+import first from 'lodash/last';
 import React, { useMemo } from 'react';
 import { LabelAndInput } from '../../../Common/LabelAndInput';
-import { Select, type SelectItem } from '@/components/ui/select';
-import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import {
+  NO_FORMATTING_ITEM,
   getDefaultDateOptions,
   getDefaultDayOfWeekOptions,
   getDefaultMonthOptions,
-  getDefaultQuarterOptions,
-  NO_FORMATTING_ITEM
+  getDefaultQuarterOptions
 } from './dateConfig';
-import first from 'lodash/last';
-import { formatDate, getNow } from '@/lib/date';
-import { useMemoizedFn } from '@/hooks';
 
 export const EditDateFormat: React.FC<{
   dateFormat: IColumnLabelFormat['dateFormat'];

@@ -1,17 +1,17 @@
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import { DEFAULT_COLUMN_SETTINGS } from '@/api/asset_interfaces';
+import { ChartType, type DerivedMetricTitle } from '@/api/asset_interfaces/metric/charts';
+import { Button } from '@/components/ui/buttons';
+import { Dots } from '@/components/ui/icons';
+import { Popover } from '@/components/ui/popover/Popover';
+import { Select } from '@/components/ui/select';
+import { useMemoizedFn } from '@/hooks';
 import { isNumericColumnStyle, isNumericColumnType } from '@/lib/messages';
 import React, { useMemo } from 'react';
 import { LabelAndInput } from '../../Common';
-import { Select } from '@/components/ui/select';
-import { Button } from '@/components/ui/buttons';
-import { DEFAULT_COLUMN_SETTINGS } from '@/api/asset_interfaces';
-import { useMemoizedFn } from '@/hooks';
-import type { createColumnFieldOptions } from './helpers';
-import { Popover } from '@/components/ui/popover/Popover';
 import { SelectAxisDropdownContent } from '../SelectAxis/SelectAxisColumnContent';
-import { ChartType, type DerivedMetricTitle } from '@/api/asset_interfaces/metric/charts';
 import { SelectAxisContainerId } from '../SelectAxis/config';
-import { Dots } from '@/components/ui/icons';
+import type { createColumnFieldOptions } from './helpers';
 
 export const EditMetricField: React.FC<{
   label?: string;

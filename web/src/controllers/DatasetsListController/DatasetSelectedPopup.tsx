@@ -1,9 +1,9 @@
-import React from 'react';
-import { BusterListSelectedOptionPopupContainer } from '@/components/ui/list';
-import { Button } from '@/components/ui/buttons';
-import { useMemoizedFn } from '@/hooks';
-import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useDeleteDataset } from '@/api/buster_rest';
+import { Button } from '@/components/ui/buttons';
+import { BusterListSelectedOptionPopupContainer } from '@/components/ui/list';
+import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useMemoizedFn } from '@/hooks';
+import React from 'react';
 
 export const DatasetSelectedOptionPopup: React.FC<{
   selectedRowKeys: string[];

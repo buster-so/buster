@@ -1,12 +1,12 @@
+import { DEFAULT_DAY_OF_WEEK_FORMAT } from '@/api/asset_interfaces';
+import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import { Select, type SelectItem } from '@/components/ui/select';
+import { useMemoizedFn } from '@/hooks';
+import first from 'lodash/first';
+import last from 'lodash/last';
 import React, { useMemo } from 'react';
 import { LabelAndInput } from '../../../Common/LabelAndInput';
-import { Select, type SelectItem } from '@/components/ui/select';
-import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
-import { useMemoizedFn } from '@/hooks';
-import last from 'lodash/last';
-import first from 'lodash/first';
 import { getDefaultQuarterOptions } from './dateConfig';
-import { DEFAULT_DAY_OF_WEEK_FORMAT } from '@/api/asset_interfaces';
 
 const options: SelectItem<NonNullable<IColumnLabelFormat['convertNumberTo']>>[] = [
   { label: 'Day of Week', value: 'day_of_week' },

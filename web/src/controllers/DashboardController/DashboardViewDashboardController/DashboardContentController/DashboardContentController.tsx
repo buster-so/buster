@@ -1,24 +1,24 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
-import isEmpty from 'lodash/isEmpty';
+import type {
+  BusterDashboardResponse,
+  BusterMetric,
+  DashboardConfig
+} from '@/api/asset_interfaces';
+import type { useUpdateDashboardConfig } from '@/api/buster_rest/dashboards';
 import { BusterResizeableGrid, type BusterResizeableGridRow } from '@/components/ui/grid';
 import { useDebounceFn, useMemoizedFn } from '@/hooks';
+import isEmpty from 'lodash/isEmpty';
+import React, { useEffect, useMemo, useState } from 'react';
+import { DashboardContentControllerProvider } from './DashboardContentControllerContext';
+import { DashboardEmptyState, DashboardNoContentReadOnly } from './DashboardEmptyState';
+import { DashboardMetricItem } from './DashboardMetricItem';
 import {
   hasRemovedMetrics,
   hasUnmappedMetrics,
   normalizeNewMetricsIntoGrid,
   removeChildrenFromItems
 } from './helpers';
-import { DashboardMetricItem } from './DashboardMetricItem';
-import { DashboardContentControllerProvider } from './DashboardContentControllerContext';
-import type {
-  BusterMetric,
-  BusterDashboardResponse,
-  DashboardConfig
-} from '@/api/asset_interfaces';
-import { DashboardEmptyState, DashboardNoContentReadOnly } from './DashboardEmptyState';
-import type { useUpdateDashboardConfig } from '@/api/buster_rest/dashboards';
 
 const DEFAULT_EMPTY_ROWS: DashboardConfig['rows'] = [];
 const DEFAULT_EMPTY_METRICS: Record<string, BusterMetric> = {};
@@ -87,7 +87,7 @@ export const DashboardContentController: React.FC<{
                   <DashboardMetricItem
                     key={item.id}
                     metricId={item.id}
-                    dashboardId={dashboard!.id}
+                    dashboardId={dashboard?.id}
                     readOnly={readOnly}
                     chatId={chatId}
                     numberOfMetrics={numberOfMetrics}

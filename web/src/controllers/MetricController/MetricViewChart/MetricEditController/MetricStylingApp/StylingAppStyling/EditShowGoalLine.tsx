@@ -1,19 +1,19 @@
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import React, { useState } from 'react';
-import { LabelAndInput } from '../Common';
-import { CollapseDelete } from '../Common/CollapseDelete';
-import { motion, AnimatePresence } from 'framer-motion';
+import type { ColumnMetaData } from '@/api/asset_interfaces';
+import type { ChartEncodes, GoalLine } from '@/api/asset_interfaces/metric/charts';
 import { Button } from '@/components/ui/buttons';
 import { ColorPicker } from '@/components/ui/color-picker';
-import { Separator } from '@/components/ui/seperator';
+import { Plus } from '@/components/ui/icons';
 import { Input } from '@/components/ui/inputs';
 import { InputNumber } from '@/components/ui/inputs';
+import { Separator } from '@/components/ui/seperator';
 import { Switch } from '@/components/ui/switch';
-import { Plus } from '@/components/ui/icons';
-import type { ChartEncodes, GoalLine } from '@/api/asset_interfaces/metric/charts';
-import { v4 as uuidv4 } from 'uuid';
 import { useMemoizedFn, useSet } from '@/hooks';
-import type { ColumnMetaData } from '@/api/asset_interfaces';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import { LabelAndInput } from '../Common';
+import { CollapseDelete } from '../Common/CollapseDelete';
 
 interface LoopGoalLine extends GoalLine {
   id: string;

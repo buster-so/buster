@@ -1,15 +1,15 @@
 import type { BusterMetric } from '@/api/asset_interfaces';
-import { Title, Text } from '@/components/ui/typography';
-import { DotsVertical, Trash } from '@/components/ui/icons';
-import { SortableItemContext } from '@/components/ui/grid/_BusterSortableItemDragContainer';
-import { useMemoizedFn, useMount } from '@/hooks';
-import { Dropdown, type DropdownItems } from '@/components/ui/dropdown';
-import { Button } from '@/components/ui/buttons';
-import Link from 'next/link';
-import React, { useContext, useMemo, useState } from 'react';
 import { useRemoveMetricsFromDashboard } from '@/api/buster_rest/dashboards';
+import { Button } from '@/components/ui/buttons';
+import { Dropdown, type DropdownItems } from '@/components/ui/dropdown';
+import { SortableItemContext } from '@/components/ui/grid/_BusterSortableItemDragContainer';
+import { DotsVertical, Trash } from '@/components/ui/icons';
+import { Text, Title } from '@/components/ui/typography';
+import { useMemoizedFn, useMount } from '@/hooks';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import React, { useContext, useMemo, useState } from 'react';
 
 export const MetricTitle: React.FC<{
   name: BusterMetric['name'];
@@ -125,7 +125,7 @@ const ThreeDotMenu: React.FC<{
   return (
     <div
       onClick={onClick}
-      className={cn(`hidden w-8.5 rounded group-hover:block`, className, isOpen && 'block')}>
+      className={cn('hidden w-8.5 rounded group-hover:block', className, isOpen && 'block')}>
       <div className="absolute right-1.5">
         <Dropdown items={dropdownItems} side="top" align="end" onOpenChange={setIsOpen}>
           <Button variant="ghost" className="bg-item-hover!" prefix={<DotsVertical />} />

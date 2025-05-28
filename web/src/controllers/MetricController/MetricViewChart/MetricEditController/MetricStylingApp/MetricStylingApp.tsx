@@ -1,12 +1,5 @@
 'use client';
 
-import type React from 'react';
-import { useState } from 'react';
-import { MetricStylingAppSegments } from './config';
-import { MetricStylingAppSegment } from './MetricStylingAppSegment';
-import { StylingAppColors } from './StylingAppColors';
-import { StylingAppStyling } from './StylingAppStyling';
-import { StylingAppVisualize } from './StylingAppVisualize';
 import {
   type BarAndLineAxis,
   type ChartEncodes,
@@ -15,6 +8,13 @@ import {
 } from '@/api/asset_interfaces/metric/charts';
 import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import type React from 'react';
+import { useState } from 'react';
+import { MetricStylingAppSegment } from './MetricStylingAppSegment';
+import { StylingAppColors } from './StylingAppColors';
+import { StylingAppStyling } from './StylingAppStyling';
+import { StylingAppVisualize } from './StylingAppVisualize';
+import { MetricStylingAppSegments } from './config';
 
 export const MetricStylingApp: React.FC<{
   metricId: string;

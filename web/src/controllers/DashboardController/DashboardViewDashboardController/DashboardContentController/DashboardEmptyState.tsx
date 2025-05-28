@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/buttons';
 import { Plus } from '@/components/ui/icons';
-import React from 'react';
 import { Text } from '@/components/ui/typography';
+import React from 'react';
 
 export const DashboardEmptyState: React.FC<{
   onOpenAddContentModal: () => void;

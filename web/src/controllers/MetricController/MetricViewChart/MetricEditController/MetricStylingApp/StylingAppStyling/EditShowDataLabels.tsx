@@ -1,6 +1,6 @@
+import { Switch } from '@/components/ui/switch';
 import React from 'react';
 import { LabelAndInput } from '../Common';
-import { Switch } from '@/components/ui/switch';
 import { WarningIcon } from '../Common/WarningIcon';
 
 export const EditShowDataLabels: React.FC<{

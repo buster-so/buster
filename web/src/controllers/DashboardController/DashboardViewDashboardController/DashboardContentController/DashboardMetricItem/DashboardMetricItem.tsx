@@ -1,11 +1,11 @@
-import React, { useMemo } from 'react';
 import { Card, CardHeader } from '@/components/ui/card/CardBase';
-import { useDashboardMetric } from './useDashboardMetric';
-import { MetricTitle } from './MetricTitle';
-import { createBusterRoute, BusterRoutes } from '@/routes';
+import { BusterChart } from '@/components/ui/charts/BusterChart';
 import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
-import { BusterChart } from '@/components/ui/charts/BusterChart';
+import { BusterRoutes, createBusterRoute } from '@/routes';
+import React, { useMemo } from 'react';
+import { MetricTitle } from './MetricTitle';
+import { useDashboardMetric } from './useDashboardMetric';
 
 const DashboardMetricItemBase: React.FC<{
   metricId: string;
@@ -96,7 +96,7 @@ const DashboardMetricItemBase: React.FC<{
 
       <div
         className={cn(
-          `h-full w-full overflow-hidden bg-transparent`,
+          'h-full w-full overflow-hidden bg-transparent',
           isTable ? '' : 'p-3',
           isDragOverlay ? 'pointer-events-none' : 'pointer-events-auto'
         )}>

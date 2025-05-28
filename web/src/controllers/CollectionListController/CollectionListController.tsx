@@ -1,12 +1,12 @@
 'use client';
 
-import type React from 'react';
-import { useState } from 'react';
-import { CollectionsListContent } from './CollectionsListContent';
-import { CollectionListHeader } from './CollectionListHeader';
-import { AppPageLayout } from '@/components/ui/layouts';
 import { useGetCollectionsList } from '@/api/buster_rest/collections';
 import type { collectionsGetList } from '@/api/buster_rest/collections/requests';
+import { AppPageLayout } from '@/components/ui/layouts';
+import type React from 'react';
+import { useState } from 'react';
+import { CollectionListHeader } from './CollectionListHeader';
+import { CollectionsListContent } from './CollectionsListContent';
 
 export const CollectionListController: React.FC = () => {
   const [openNewCollectionModal, setOpenNewCollectionModal] = useState(false);

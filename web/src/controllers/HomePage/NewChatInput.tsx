@@ -1,13 +1,13 @@
 'use client';
 
-import type React from 'react';
-import { useRef } from 'react';
+import { useGetDatasets } from '@/api/buster_rest';
 import { InputTextAreaButton } from '@/components/ui/inputs/InputTextAreaButton';
 import { useBusterNewChatContextSelector } from '@/context/Chats';
-import { inputHasText } from '@/lib/text';
 import { useMemoizedFn, useMount } from '@/hooks';
+import { inputHasText } from '@/lib/text';
+import type React from 'react';
+import { useRef } from 'react';
 import { type ChangeEvent, useMemo, useState } from 'react';
-import { useGetDatasets } from '@/api/buster_rest';
 import { NewChatWarning } from './NewChatWarning';
 import { useNewChatWarning } from './useNewChatWarning';
 
@@ -16,7 +16,7 @@ const autoResizeConfig = {
   maxRows: 18
 };
 
-export const NewChatInput: React.FC<{}> = () => {
+export const NewChatInput: React.FC<Record<string, never>> = () => {
   const onStartNewChat = useBusterNewChatContextSelector((state) => state.onStartNewChat);
   const [inputValue, setInputValue] = useState('');
   const [loading, setLoading] = useState(false);

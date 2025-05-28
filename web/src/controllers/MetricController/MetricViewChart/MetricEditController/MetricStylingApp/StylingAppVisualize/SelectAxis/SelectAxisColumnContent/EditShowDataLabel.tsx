@@ -1,7 +1,7 @@
 import type { ColumnSettings } from '@/api/asset_interfaces/metric/charts';
+import { Switch } from '@/components/ui/switch';
 import React from 'react';
 import { LabelAndInput } from '../../../Common/LabelAndInput';
-import { Switch } from '@/components/ui/switch';
 import { WarningIcon } from '../../../Common/WarningIcon';
 
 export const EditShowDataLabel: React.FC<{

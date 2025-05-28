@@ -1,17 +1,17 @@
-import React, { useMemo } from 'react';
 import type {
   BusterChatMessageReasoning_file,
   BusterChatMessageReasoning_files
 } from '@/api/asset_interfaces/chat';
 import { useGetChatMessage } from '@/api/buster_rest/chats';
-import { ReasoningFileButtons } from './ReasoningFileButtons';
-import { StreamingMessageCode } from '@/components/ui/streaming/StreamingMessageCode';
-import isEmpty from 'lodash/isEmpty';
-import { Text } from '@/components/ui/typography';
-import { CircleSpinnerLoader } from '@/components/ui/loaders';
 import { CheckDouble } from '@/components/ui/icons';
-import { AnimatePresence, motion } from 'framer-motion';
 import { CircleWarning } from '@/components/ui/icons/NucleoIconFilled';
+import { CircleSpinnerLoader } from '@/components/ui/loaders';
+import { StreamingMessageCode } from '@/components/ui/streaming/StreamingMessageCode';
+import { Text } from '@/components/ui/typography';
+import { AnimatePresence, motion } from 'framer-motion';
+import isEmpty from 'lodash/isEmpty';
+import React, { useMemo } from 'react';
+import { ReasoningFileButtons } from './ReasoningFileButtons';
 
 export type ReasoningMessageFileProps = {
   chatId: string;

@@ -1,7 +1,7 @@
+import { Switch } from '@/components/ui/switch';
 import React from 'react';
 import { LabelAndInput } from '../../Common';
 import type { LoopTrendline } from './EditTrendline';
-import { Switch } from '@/components/ui/switch';
 
 interface TrendlineProjectionProps {
   trend: LoopTrendline;

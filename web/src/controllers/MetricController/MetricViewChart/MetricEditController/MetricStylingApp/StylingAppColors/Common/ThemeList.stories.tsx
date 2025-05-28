@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { ThemeList } from './ThemeList';
 import { fn } from '@storybook/test';
 import React from 'react';
+import { ThemeList } from './ThemeList';
 
 const meta: Meta<typeof ThemeList> = {
   title: 'Controllers/MetricController/ThemeList',

@@ -1,14 +1,14 @@
 'use client';
 
-import type React from 'react';
-import { useMemo } from 'react';
 import { Title } from '@/components/ui/typography';
 import { useUserConfigContextSelector } from '@/context/Users';
+import type React from 'react';
+import { useMemo } from 'react';
 import { NewChatInput } from './NewChatInput';
-import { useNewChatWarning } from './useNewChatWarning';
 import { NewChatWarning } from './NewChatWarning';
+import { useNewChatWarning } from './useNewChatWarning';
 
-export const HomePageController: React.FC<{}> = () => {
+export const HomePageController: React.FC<Record<string, never>> = () => {
   const newChatWarningProps = useNewChatWarning();
   const { showWarning } = newChatWarningProps;
 

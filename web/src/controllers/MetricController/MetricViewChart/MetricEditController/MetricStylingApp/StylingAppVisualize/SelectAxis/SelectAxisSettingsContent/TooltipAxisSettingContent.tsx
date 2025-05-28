@@ -1,9 +1,9 @@
+import { useUpdateMetricChart } from '@/context/Metrics';
+import { useMemoizedFn } from '@/hooks';
 import React from 'react';
 import type { SelectAxisContainerId } from '../config';
-import { EditShowTooltip } from './EditShowTooltip';
 import { useSelectAxisContextSelector } from '../useSelectAxisContext';
-import { useMemoizedFn } from '@/hooks';
-import { useUpdateMetricChart } from '@/context/Metrics';
+import { EditShowTooltip } from './EditShowTooltip';
 
 export const TooltipAxisSettingContent: React.FC<{
   zoneId: SelectAxisContainerId;

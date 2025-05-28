@@ -1,16 +1,16 @@
-import React from 'react';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { ChartEncodes, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import { Button } from '@/components/ui/buttons';
+import { DotsVertical } from '@/components/ui/icons';
+import { useMemoizedFn } from '@/hooks';
 import type { DraggableAttributes } from '@dnd-kit/core';
 import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
-import { SelectAxisItemDragContainer } from './SelectAxisDragContainer';
-import { useSelectAxisContextSelector } from './useSelectAxisContext';
-import { SelectAxisItemLabel } from './SelectAxisItemLabel';
-import { DotsVertical } from '@/components/ui/icons';
-import { Button } from '@/components/ui/buttons';
-import { useMemoizedFn } from '@/hooks';
+import React from 'react';
 import { SelectAxisColumnPopover } from './SelectAxisColumnPopover';
-import type { ChartEncodes, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
-import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import { SelectAxisItemDragContainer } from './SelectAxisDragContainer';
+import { SelectAxisItemLabel } from './SelectAxisItemLabel';
 import type { SelectAxisContainerId } from './config';
+import { useSelectAxisContextSelector } from './useSelectAxisContext';
 
 export const SelectAxisItemAvailableContainer = React.memo(
   React.forwardRef<
