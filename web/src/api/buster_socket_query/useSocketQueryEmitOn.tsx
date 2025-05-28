@@ -54,7 +54,7 @@ export const useSocketQueryEmitOn = <
       queryFn,
       enabled: !!enabledTrigger
     } as UseQueryOptions<TData, TError, TData, TQueryKey>;
-  }, [options.queryKey, enabledTrigger]);
+  }, [options, queryFn, enabledTrigger]);
 
   return useSocketQueryOn({
     responseEvent,

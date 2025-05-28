@@ -39,7 +39,7 @@ export const createInstance = (baseURL: string) => {
 };
 
 export const defaultRequestHandler = async (
-  config: InternalAxiosRequestConfig<any>,
+  config: InternalAxiosRequestConfig<unknown>,
   options?: {
     checkTokenValidity: SupabaseContextReturnType['checkTokenValidity'];
   }
@@ -51,7 +51,7 @@ export const defaultRequestHandler = async (
     token = (await options?.checkTokenValidity()?.then((res) => res?.access_token || '')) || '';
   }
 
-  (config.headers as AxiosRequestHeaders)['Authorization'] = 'Bearer ' + token;
+  (config.headers as AxiosRequestHeaders).Authorization = `Bearer ${token}`;
 
   return config;
 };

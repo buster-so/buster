@@ -8,7 +8,7 @@ import type { RustApiError } from './buster_rest/errors';
 
 export interface FetchConfig extends RequestInit {
   baseURL?: string;
-  params?: Record<string, any>;
+  params?: Record<string, unknown>;
 }
 
 export const serverFetch = async <T>(url: string, config: FetchConfig = {}): Promise<T> => {

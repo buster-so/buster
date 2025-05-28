@@ -122,7 +122,9 @@ export function useSocketQueryMutation<
 }: {
   emitEvent: TRequestRoute;
   responseEvent: TRoute;
-  options?: (UseQueryOptions<TQueryData, any, TQueryData, any> & { queryKey?: QueryKey }) | null;
+  options?:
+    | (UseQueryOptions<TQueryData, unknown, TQueryData, QueryKey> & { queryKey?: QueryKey })
+    | null;
   preCallback?:
     | ((currentData: TQueryData | null, variables: TPayload) => TQueryData | Promise<TQueryData>)
     | null;
@@ -139,44 +141,48 @@ export function useSocketQueryMutation<
 
   const mutationFn: MutationFunction<TData, TPayload> = useMemoizedFn(
     async (variables: TPayload): Promise<TData> => {
-      const queryKey: QueryKey = options?.queryKey;
+      const queryKey: QueryKey | undefined = options?.queryKey;
+
+      if (!queryKey) {
+        throw new Error('Query key is required');
+      }
 
       if (preCallback) {
         const currentData = queryKey
           ? (queryClient.getQueryData<TQueryData>(queryKey) ?? null)
           : null;
         const transformedData = await preCallback(currentData, variables);
-        if (!isEmpty(queryKey)) queryClient.setQueryData(queryKey, transformedData);
+        if (!isEmpty(queryKey) && queryKey) queryClient.setQueryData(queryKey, transformedData);
       }
 
       try {
         const result = await busterSocket.emitAndOnce({
           emitEvent: {
             route: emitEvent,
-            payload: variables
+            payload: variables as InferBusterSocketRequestPayload<TRequestRoute>
           } as BusterSocketRequest,
           responseEvent: {
             route: responseEvent,
-            onError: (error: RustApiError) => {
-              throw error;
-            },
-            callback: (d: unknown) => d
+            callback: (d: unknown) => {
+              const socketData = d as InferBusterSocketResponseData<TRoute>;
+              if (callback) {
+                const currentData = queryKey
+                  ? (queryClient.getQueryData<TQueryData>(queryKey) ?? null)
+                  : null;
+                const transformedData = callback(socketData, currentData, variables);
+                if (!isEmpty(queryKey)) queryClient.setQueryData(queryKey, transformedData);
+                return transformedData;
+              }
+              return socketData as TData;
+            }
           } as BusterSocketResponse
         });
 
-        if (callback) {
-          const socketData = result as InferBusterSocketResponseData<TRoute>;
-          const currentData = queryKey
-            ? (queryClient.getQueryData<TQueryData>(queryKey) ?? null)
-            : null;
-          const transformedData = callback(socketData, currentData, variables);
-          if (!isEmpty(queryKey)) queryClient.setQueryData(queryKey, transformedData);
-          return result as TData;
-        }
-
         return result as TData;
       } catch (error) {
-        throw error;
+        throw new Error(
+          `Failed to emit socket event: ${error instanceof Error ? error.message : 'Unknown error'}`
+        );
       }
     }
   );

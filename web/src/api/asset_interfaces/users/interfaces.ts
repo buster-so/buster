@@ -43,7 +43,7 @@ export type BusterUserFavoriteAsset = {
 };
 
 export interface BusterUser {
-  config: {};
+  config: Record<string, unknown>;
   created_at: string;
   email: string;
   favorites: BusterUserFavorite[];
