@@ -1,7 +1,7 @@
-import React from 'react';
-import { ChatHeader } from './ChatHeader';
-import { ChatContent } from './ChatContent';
 import { AppPageLayout } from '@/components/ui/layouts';
+import React from 'react';
+import { ChatContent } from './ChatContent';
+import { ChatHeader } from './ChatHeader';
 
 export const ChatContainer = React.memo(({ mounted }: { mounted?: boolean }) => {
   return (

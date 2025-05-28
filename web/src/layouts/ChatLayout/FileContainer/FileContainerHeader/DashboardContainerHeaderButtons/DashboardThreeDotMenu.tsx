@@ -1,43 +1,43 @@
+import { ShareAssetType } from '@/api/asset_interfaces/share';
 import {
   useAddDashboardToCollection,
   useDeleteDashboards,
   useGetDashboard,
   useRemoveDashboardFromCollection
 } from '@/api/buster_rest/dashboards';
+import { ShareMenuContent } from '@/components/features/ShareMenu/ShareMenuContent';
+import { getShareAssetConfig } from '@/components/features/ShareMenu/helpers';
+import { ASSET_ICONS } from '@/components/features/config/assetIcons';
+import { useSaveToCollectionsDropdownContent } from '@/components/features/dropdowns/SaveToCollectionsDropdown';
+import { useFavoriteStar } from '@/components/features/list/FavoriteStar';
+import { useListVersionDropdownItems } from '@/components/features/versionHistory/useListVersionDropdownItems';
+import { Button } from '@/components/ui/buttons';
 import { DropdownContent, type DropdownItem, type DropdownItems } from '@/components/ui/dropdown';
+import { Dropdown } from '@/components/ui/dropdown';
 import {
-  Trash,
+  ArrowUpRight,
   Dots,
-  Pencil,
-  History,
-  Star,
-  ShareRight,
-  Plus,
   Filter,
-  ArrowUpRight
+  History,
+  Pencil,
+  Plus,
+  ShareRight,
+  Star,
+  Trash
 } from '@/components/ui/icons';
 import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
-import { useBusterNotifications } from '@/context/BusterNotifications';
-import { useChatLayoutContextSelector } from '@/layouts/ChatLayout/ChatLayoutContext';
-import { useMemo } from 'react';
-import { Dropdown } from '@/components/ui/dropdown';
-import { Button } from '@/components/ui/buttons';
-import React from 'react';
-import { ASSET_ICONS } from '@/components/features/config/assetIcons';
-import { useMemoizedFn } from '@/hooks';
-import { useSaveToCollectionsDropdownContent } from '@/components/features/dropdowns/SaveToCollectionsDropdown';
-import { ShareAssetType } from '@/api/asset_interfaces/share';
-import { useFavoriteStar } from '@/components/features/list/FavoriteStar';
-import { timeout } from '@/lib';
-import { ShareMenuContent } from '@/components/features/ShareMenu/ShareMenuContent';
-import { DASHBOARD_TITLE_INPUT_ID } from '@/controllers/DashboardController/DashboardViewDashboardController/DashboardEditTitle';
-import { canEdit, canFilter, getIsEffectiveOwner } from '@/lib/share';
-import { getShareAssetConfig } from '@/components/features/ShareMenu/helpers';
-import { useDashboardContentStore } from '@/context/Dashboards';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
-import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
+import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useDashboardContentStore } from '@/context/Dashboards';
+import { DASHBOARD_TITLE_INPUT_ID } from '@/controllers/DashboardController/DashboardViewDashboardController/DashboardEditTitle';
+import { useMemoizedFn } from '@/hooks';
 import { useChatIndividualContextSelector } from '@/layouts/ChatLayout/ChatContext';
-import { useListVersionDropdownItems } from '@/components/features/versionHistory/useListVersionDropdownItems';
+import { useChatLayoutContextSelector } from '@/layouts/ChatLayout/ChatLayoutContext';
+import { timeout } from '@/lib';
+import { canEdit, canFilter, getIsEffectiveOwner } from '@/lib/share';
+import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
+import { useMemo } from 'react';
+import React from 'react';
 
 export const DashboardThreeDotMenu = React.memo(
   ({ dashboardId, isViewingOldVersion }: { dashboardId: string; isViewingOldVersion: boolean }) => {
@@ -310,17 +310,18 @@ export const useShareMenuSelectMenu = ({ dashboardId }: { dashboardId: string })
       value: 'share-dashboard',
       icon: <ShareRight />,
       disabled: !isOwner,
-      items: isOwner
-        ? [
-            <ShareMenuContent
-              key={dashboardId}
-              shareAssetConfig={dashboard!}
-              assetId={dashboardId}
-              assetType={ShareAssetType.DASHBOARD}
-            />
-          ]
-        : undefined
+      items:
+        isOwner && dashboard
+          ? [
+              <ShareMenuContent
+                key={dashboardId}
+                shareAssetConfig={dashboard}
+                assetId={dashboardId}
+                assetType={ShareAssetType.DASHBOARD}
+              />
+            ]
+          : undefined
     }),
-    [dashboardId]
+    [dashboardId, dashboard, isOwner]
   );
 };

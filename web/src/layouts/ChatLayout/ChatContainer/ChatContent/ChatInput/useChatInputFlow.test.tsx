@@ -1,7 +1,7 @@
+import { useBusterNewChatContextSelector } from '@/context/Chats';
+import { useChatIndividualContextSelector } from '@/layouts/ChatLayout/ChatContext';
 import { renderHook } from '@testing-library/react';
 import { useChatInputFlow } from './useChatInputFlow';
-import { useChatIndividualContextSelector } from '@/layouts/ChatLayout/ChatContext';
-import { useBusterNewChatContextSelector } from '@/context/Chats';
 
 // Mock the context selectors
 jest.mock('@/layouts/ChatLayout/ChatContext', () => ({

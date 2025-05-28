@@ -1,10 +1,10 @@
-import type React from 'react';
 import { render, screen } from '@testing-library/react';
+import type React from 'react';
 import '@testing-library/jest-dom';
-import { ChatResponseReasoning } from './ChatResponseReasoning';
-import { useChatLayoutContextSelector } from '../../../ChatLayoutContext';
 import { useGetChatMessage } from '@/api/buster_rest/chats';
 import { useQuery } from '@tanstack/react-query';
+import { useChatLayoutContextSelector } from '../../../ChatLayoutContext';
+import { ChatResponseReasoning } from './ChatResponseReasoning';
 
 // Mock the imports
 jest.mock('../../../ChatLayoutContext', () => ({

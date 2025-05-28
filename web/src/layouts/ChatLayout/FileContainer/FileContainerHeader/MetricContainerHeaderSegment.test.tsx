@@ -1,9 +1,9 @@
-import type React from 'react';
-import { render, screen } from '@testing-library/react';
-import { MetricContainerHeaderSegment } from './MetricContainerHeaderSegment';
-import { useIsMetricReadOnly } from '@/context/Metrics/useIsMetricReadOnly';
-import { useChatLayoutContextSelector } from '../../ChatLayoutContext';
 import { useGetMetric } from '@/api/buster_rest/metrics';
+import { useIsMetricReadOnly } from '@/context/Metrics/useIsMetricReadOnly';
+import { render, screen } from '@testing-library/react';
+import type React from 'react';
+import { useChatLayoutContextSelector } from '../../ChatLayoutContext';
+import { MetricContainerHeaderSegment } from './MetricContainerHeaderSegment';
 
 // Mock the hooks
 jest.mock('@/context/Metrics/useIsMetricReadOnly');

@@ -1,13 +1,13 @@
 'use client';
 
-import { createContext, useContextSelector } from 'use-context-selector';
-import React, { type PropsWithChildren } from 'react';
-import { useMemoizedFn } from '@/hooks';
 import type { AppSplitterRef } from '@/components/ui/layouts';
+import { useMemoizedFn } from '@/hooks';
+import React, { type PropsWithChildren } from 'react';
+import { createContext, useContextSelector } from 'use-context-selector';
 import { DEFAULT_CHAT_OPTION_SIDEBAR_SIZE } from './config';
-import { useSelectedFile } from './useSelectedFile';
-import { useLayoutConfig } from './useLayoutConfig';
 import { useGetChatParams } from './useGetChatParams';
+import { useLayoutConfig } from './useLayoutConfig';
+import { useSelectedFile } from './useSelectedFile';
 
 interface UseLayoutConfigProps {
   appSplitterRef: React.RefObject<AppSplitterRef | null>;
@@ -79,7 +79,7 @@ const ChatLayoutContext = createContext<ReturnType<typeof useChatLayoutContext>>
   {} as ReturnType<typeof useChatLayoutContext>
 );
 
-type ChatLayoutContextProviderProps = {};
+type ChatLayoutContextProviderProps = Record<string, never>;
 
 export const ChatLayoutContextProvider: React.FC<
   PropsWithChildren<

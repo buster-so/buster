@@ -25,7 +25,10 @@
 			"**/*.spec.*"
 		],
 		"rules": {
-			"recommended": true
+			"recommended": true,
+			"correctness": {
+				"useExhaustiveDependencies": "off"
+			}
 		}
 	},
 	"javascript": {

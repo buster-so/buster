@@ -66,7 +66,7 @@ export const ShareMenuContent: React.FC<{
 
       <ShareMenuContentFooter
         selectedOptions={selectedOptions}
-        publicly_accessible={publicly_accessible!}
+        publicly_accessible={publicly_accessible}
         assetId={assetId}
         assetType={assetType}
       />

@@ -1,6 +1,6 @@
 import type { BusterRoutes } from '@/routes';
-import type { FileConfig, FileView, FileViewSecondary } from './interfaces';
 import { getFileViewFromRoute } from '../helpers';
+import type { FileConfig, FileView, FileViewSecondary } from './interfaces';
 
 export const initializeFileViews = ({
   metricId,

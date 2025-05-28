@@ -19,14 +19,14 @@ export const useCloseVersionHistory = () => {
       if (metricId) {
         return createBusterRoute({
           route: BusterRoutes.APP_METRIC_ID_CHART,
-          metricId: metricId!
+          metricId
         });
       }
 
       if (dashboardId) {
         return createBusterRoute({
           route: BusterRoutes.APP_DASHBOARD_ID,
-          dashboardId: dashboardId!
+          dashboardId
         });
       }
 

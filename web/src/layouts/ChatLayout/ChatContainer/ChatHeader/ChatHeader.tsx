@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
+import { useChatIndividualContextSelector } from '../../ChatContext';
 import { ChatHeaderOptions } from './ChatHeaderOptions';
 import { ChatHeaderTitle } from './ChatHeaderTitle';
-import { useChatIndividualContextSelector } from '../../ChatContext';
 
 export const ChatHeader: React.FC = React.memo(() => {
   const chatId = useChatIndividualContextSelector((state) => state.chatId);

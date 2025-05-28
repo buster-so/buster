@@ -1,13 +1,13 @@
 'use client';
 
+import { AppPageLayout, AppSplitter, type AppSplitterRef } from '@/components/ui/layouts';
+import { createAutoSaveId } from '@/components/ui/layouts/AppSplitter/helper';
+import { useDebounce, useMemoizedFn, useUpdateLayoutEffect } from '@/hooks';
+import Cookies from 'js-cookie';
 import type React from 'react';
 import { useLayoutEffect, useMemo, useRef } from 'react';
-import { FileContainerHeader } from './FileContainerHeader';
-import { AppPageLayout, AppSplitter, type AppSplitterRef } from '@/components/ui/layouts';
 import { useChatLayoutContextSelector } from '../ChatLayoutContext';
-import { createAutoSaveId } from '@/components/ui/layouts/AppSplitter/helper';
-import Cookies from 'js-cookie';
-import { useDebounce, useMemoizedFn, useUpdateLayoutEffect } from '@/hooks';
+import { FileContainerHeader } from './FileContainerHeader';
 import { FileContainerSecondary } from './FileContainerSecondary';
 
 interface FileContainerProps {

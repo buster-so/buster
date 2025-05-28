@@ -1,13 +1,13 @@
 'use client';
 
+import { useMount } from '@/hooks';
+import { useAutoScroll } from '@/hooks/useAutoScroll';
+import { cn } from '@/lib/utils';
 import React, { useEffect, useRef, useState } from 'react';
 import { useChatIndividualContextSelector } from '../../ChatContext';
-import { ChatMessageBlock } from './ChatMessageBlock';
 import { ChatInput } from './ChatInput';
-import { useAutoScroll } from '@/hooks/useAutoScroll';
+import { ChatMessageBlock } from './ChatMessageBlock';
 import { ChatScrollToBottom } from './ChatScrollToBottom';
-import { cn } from '@/lib/utils';
-import { useMount } from '@/hooks';
 
 const autoClass = 'mx-auto max-w-[600px] w-full';
 

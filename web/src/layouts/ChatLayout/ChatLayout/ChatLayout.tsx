@@ -1,17 +1,17 @@
 'use client';
 
+import { AppSplitter, type AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
+import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useMount } from '@/hooks';
+import { CREATE_LANGFUSE_SESSION_URL } from '@/routes/externalRoutes';
 import type React from 'react';
 import { useMemo, useRef, useState } from 'react';
-import { AppSplitter, type AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
-import { ChatContainer } from '../ChatContainer';
-import { FileContainer } from '../FileContainer';
-import { ChatLayoutContextProvider, useChatLayoutContext } from '../ChatLayoutContext';
-import { ChatContextProvider } from '../ChatContext/ChatContext';
-import { DEFAULT_CHAT_OPTION_SIDEBAR_SIZE } from '../ChatLayoutContext/config';
-import { useMount } from '@/hooks';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { CREATE_LANGFUSE_SESSION_URL } from '@/routes/externalRoutes';
-import { useBusterNotifications } from '@/context/BusterNotifications';
+import { ChatContainer } from '../ChatContainer';
+import { ChatContextProvider } from '../ChatContext/ChatContext';
+import { ChatLayoutContextProvider, useChatLayoutContext } from '../ChatLayoutContext';
+import { DEFAULT_CHAT_OPTION_SIDEBAR_SIZE } from '../ChatLayoutContext/config';
+import { FileContainer } from '../FileContainer';
 
 interface ChatSplitterProps {
   children?: React.ReactNode;

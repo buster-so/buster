@@ -1,10 +1,10 @@
 import type { FileType } from '@/api/asset_interfaces/chat';
-import type { FileContainerButtonsProps, FileContainerSegmentProps } from './interfaces';
-import { MetricContainerHeaderButtons } from './MetricContainerHeaderButtons';
 import { DashboardContainerHeaderButtons } from './DashboardContainerHeaderButtons';
 import { DashboardContainerHeaderSegment } from './DashboardContainerHeaderSegment';
+import { MetricContainerHeaderButtons } from './MetricContainerHeaderButtons';
 import { MetricContainerHeaderSegment } from './MetricContainerHeaderSegment';
 import { ReasoningContainerHeaderSegment } from './ReasoningContainerHeaderSegment';
+import type { FileContainerButtonsProps, FileContainerSegmentProps } from './interfaces';
 
 export const SelectedFileSegmentRecord: Record<FileType, React.FC<FileContainerSegmentProps>> = {
   metric: MetricContainerHeaderSegment,

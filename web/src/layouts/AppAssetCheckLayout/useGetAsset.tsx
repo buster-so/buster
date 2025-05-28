@@ -1,11 +1,11 @@
 'use client';
 
-import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
+import { useGetCollection } from '@/api/buster_rest/collections';
 import { useGetDashboard } from '@/api/buster_rest/dashboards';
 import type { RustApiError } from '@/api/buster_rest/errors';
+import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
 import { useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
-import { useGetCollection } from '@/api/buster_rest/collections';
 
 type AssetType = 'metric' | 'dashboard' | 'collection';
 

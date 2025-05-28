@@ -1,10 +1,10 @@
-import { renderHook, act } from '@testing-library/react';
-import { useLayoutConfig } from './useLayoutConfig';
+import type { FileType } from '@/api/asset_interfaces/chat';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { BusterRoutes } from '@/routes';
-import type { FileType } from '@/api/asset_interfaces/chat';
+import { act, renderHook } from '@testing-library/react';
 import type { SelectedFile } from '../../interfaces';
 import type { FileViewSecondary } from './interfaces';
+import { useLayoutConfig } from './useLayoutConfig';
 
 // Mock dependencies
 jest.mock('@/context/BusterAppLayout', () => ({

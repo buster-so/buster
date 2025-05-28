@@ -1,8 +1,8 @@
 import type { FileType } from '@/api/asset_interfaces/chat';
-import type { FileContainerSecondaryProps } from '../interfaces';
 import type React from 'react';
-import { MetricSecondaryRecord } from './metricPanels';
+import type { FileContainerSecondaryProps } from '../interfaces';
 import { DashboardSecondaryRecord } from './dashboardPanels';
+import { MetricSecondaryRecord } from './metricPanels';
 
 export const SelectedFileSecondaryRecord: Record<
   FileType,

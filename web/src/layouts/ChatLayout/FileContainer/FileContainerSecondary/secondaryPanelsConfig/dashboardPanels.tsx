@@ -1,6 +1,6 @@
 import type { DashboardFileViewSecondary } from '@/layouts/ChatLayout/ChatLayoutContext/useLayoutConfig';
-import type { FileContainerSecondaryProps } from '../interfaces';
 import dynamic from 'next/dynamic';
+import type { FileContainerSecondaryProps } from '../interfaces';
 import { loading } from './loading';
 
 const VersionHistoryPanel = dynamic(

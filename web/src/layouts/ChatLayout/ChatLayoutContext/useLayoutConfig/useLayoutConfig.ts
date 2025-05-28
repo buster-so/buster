@@ -1,20 +1,20 @@
 'use client';
 
 import type { FileType } from '@/api/asset_interfaces/chat';
-import { type RefObject, useMemo, useState } from 'react';
-import type { FileConfig, FileView, FileViewConfig, FileViewSecondary } from './interfaces';
+import type { AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
+import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useIsChanged, useMemoizedFn, useUpdateEffect } from '@/hooks';
-import { create } from 'mutative';
-import type { ChatLayoutView } from '../../interfaces';
-import type { SelectedFile } from '../../interfaces';
 import { timeout } from '@/lib/timeout';
 import { BusterRoutes } from '@/routes/busterRoutes';
+import { create } from 'mutative';
+import { type RefObject, useMemo, useState } from 'react';
 import { SelectedFileSecondaryRenderRecord } from '../../FileContainer/FileContainerSecondary';
+import type { ChatLayoutView } from '../../interfaces';
+import type { SelectedFile } from '../../interfaces';
+import { DEFAULT_FILE_VIEW } from '../helpers';
 import type { ChatParams } from '../useGetChatParams';
 import { initializeFileViews } from './helpers';
-import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
-import type { AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
-import { DEFAULT_FILE_VIEW } from '../helpers';
+import type { FileConfig, FileView, FileViewConfig, FileViewSecondary } from './interfaces';
 
 export const useLayoutConfig = ({
   selectedFile,

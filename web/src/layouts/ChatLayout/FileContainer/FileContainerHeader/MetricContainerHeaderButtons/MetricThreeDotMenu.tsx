@@ -1,3 +1,8 @@
+import { ShareAssetType, VerificationStatus } from '@/api/asset_interfaces/share';
+import {
+  useAddMetricsToDashboard,
+  useRemoveMetricsFromDashboard
+} from '@/api/buster_rest/dashboards';
 import {
   useBulkUpdateMetricVerificationStatus,
   useDeleteMetric,
@@ -6,55 +11,50 @@ import {
   useRemoveMetricFromCollection,
   useSaveMetricToCollections
 } from '@/api/buster_rest/metrics';
-import {
-  useAddMetricsToDashboard,
-  useRemoveMetricsFromDashboard
-} from '@/api/buster_rest/dashboards';
+import { ShareMenuContent } from '@/components/features/ShareMenu/ShareMenuContent';
+import { getShareAssetConfig } from '@/components/features/ShareMenu/helpers';
+import { ASSET_ICONS } from '@/components/features/config/assetIcons';
+import { useSaveToCollectionsDropdownContent } from '@/components/features/dropdowns/SaveToCollectionsDropdown';
+import { useSaveToDashboardDropdownContent } from '@/components/features/dropdowns/SaveToDashboardDropdown';
+import { useFavoriteStar } from '@/components/features/list/FavoriteStar';
+import { StatusBadgeIndicator } from '@/components/features/metrics/StatusBadgeIndicator';
+import { useStatusDropdownContent } from '@/components/features/metrics/StatusBadgeIndicator/useStatusDropdownContent';
+import { useListVersionDropdownItems } from '@/components/features/versionHistory/useListVersionDropdownItems';
+import { Button } from '@/components/ui/buttons';
 import { DropdownContent, type DropdownItem, type DropdownItems } from '@/components/ui/dropdown';
+import { Dropdown } from '@/components/ui/dropdown';
 import {
-  Trash,
+  ArrowUpRight,
   Dots,
-  Pencil,
-  SquareChart,
   Download4,
   History,
-  SquareCode,
-  SquareChartPen,
-  Star,
+  Pencil,
   ShareRight,
-  ArrowUpRight,
-  Table
+  SquareChart,
+  SquareChartPen,
+  SquareCode,
+  Star,
+  Table,
+  Trash
 } from '@/components/ui/icons';
 import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
+import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useUserConfigContextSelector, useUserConfigProvider } from '@/context/Users';
+import { METRIC_CHART_TITLE_INPUT_ID } from '@/controllers/MetricController/MetricViewChart/MetricViewChartHeader';
+import { METRIC_CHART_CONTAINER_ID } from '@/controllers/MetricController/MetricViewChart/config';
+import { useMemoizedFn } from '@/hooks';
+import { useChatIndividualContextSelector } from '@/layouts/ChatLayout/ChatContext';
 import {
   type MetricFileViewSecondary,
   useChatLayoutContextSelector
 } from '@/layouts/ChatLayout/ChatLayoutContext';
-import { useMemo, useState } from 'react';
-import { Dropdown } from '@/components/ui/dropdown';
-import { Button } from '@/components/ui/buttons';
-import React from 'react';
-import { ASSET_ICONS } from '@/components/features/config/assetIcons';
-import { useSaveToDashboardDropdownContent } from '@/components/features/dropdowns/SaveToDashboardDropdown';
-import { useMemoizedFn } from '@/hooks';
-import { useSaveToCollectionsDropdownContent } from '@/components/features/dropdowns/SaveToCollectionsDropdown';
-import { ShareAssetType, VerificationStatus } from '@/api/asset_interfaces/share';
-import { useStatusDropdownContent } from '@/components/features/metrics/StatusBadgeIndicator/useStatusDropdownContent';
-import { StatusBadgeIndicator } from '@/components/features/metrics/StatusBadgeIndicator';
-import { useFavoriteStar } from '@/components/features/list/FavoriteStar';
-import { downloadElementToImage, exportJSONToCSV } from '@/lib/exportUtils';
-import { METRIC_CHART_CONTAINER_ID } from '@/controllers/MetricController/MetricViewChart/config';
 import { timeout } from '@/lib';
-import { METRIC_CHART_TITLE_INPUT_ID } from '@/controllers/MetricController/MetricViewChart/MetricViewChartHeader';
-import { ShareMenuContent } from '@/components/features/ShareMenu/ShareMenuContent';
+import { downloadElementToImage, exportJSONToCSV } from '@/lib/exportUtils';
 import { canEdit, getIsEffectiveOwner, getIsOwner } from '@/lib/share';
-import { getShareAssetConfig } from '@/components/features/ShareMenu/helpers';
-import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import { useListVersionDropdownItems } from '@/components/features/versionHistory/useListVersionDropdownItems';
-import { useChatIndividualContextSelector } from '@/layouts/ChatLayout/ChatContext';
-import { useUserConfigContextSelector, useUserConfigProvider } from '@/context/Users';
+import { useMemo, useState } from 'react';
+import React from 'react';
 
 export const ThreeDotMenuButton = React.memo(
   ({
@@ -535,18 +535,19 @@ export const useShareMenuSelectMenu = ({ metricId }: { metricId: string }) => {
       value: 'share-metric',
       icon: <ShareRight />,
       disabled: !isOwner,
-      items: isOwner
-        ? [
-            <ShareMenuContent
-              key={metricId}
-              shareAssetConfig={shareAssetConfig!}
-              assetId={metricId}
-              assetType={ShareAssetType.METRIC}
-            />
-          ]
-        : undefined
+      items:
+        isOwner && shareAssetConfig
+          ? [
+              <ShareMenuContent
+                key={metricId}
+                shareAssetConfig={shareAssetConfig}
+                assetId={metricId}
+                assetType={ShareAssetType.METRIC}
+              />
+            ]
+          : undefined
     }),
-    [metricId]
+    [metricId, shareAssetConfig, isOwner]
   );
 };
 

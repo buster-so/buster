@@ -1,6 +1,6 @@
+import { useMemo } from 'react';
 import type { FileContainerSecondaryProps } from './interfaces';
 import { SelectedFileSecondaryRecord } from './secondaryPanelsConfig';
-import { useMemo } from 'react';
 
 export const FileContainerSecondary: React.FC<FileContainerSecondaryProps> = ({
   selectedFile,

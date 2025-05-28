@@ -2,10 +2,10 @@
 
 import { Button } from '@/components/ui/buttons';
 import { ArrowLeft } from '@/components/ui/icons';
-import React from 'react';
-import { useCloseVersionHistory } from './useCloseVersionHistory';
-import { VersionHistoryHeaderButtons } from './VersionHistoryHeaderButtons';
 import Link from 'next/link';
+import React from 'react';
+import { VersionHistoryHeaderButtons } from './VersionHistoryHeaderButtons';
+import { useCloseVersionHistory } from './useCloseVersionHistory';
 
 export const FileContainerHeaderVersionHistory = React.memo(() => {
   return (
@@ -18,7 +18,7 @@ export const FileContainerHeaderVersionHistory = React.memo(() => {
 
 FileContainerHeaderVersionHistory.displayName = 'FileContainerHeaderVersionHistory';
 
-const ExitVersionHistoryButton = React.memo(({}: {}) => {
+const ExitVersionHistoryButton = React.memo(() => {
   const { href } = useCloseVersionHistory();
 
   return (

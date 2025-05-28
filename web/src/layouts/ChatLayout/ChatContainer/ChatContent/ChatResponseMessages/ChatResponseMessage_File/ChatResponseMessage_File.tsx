@@ -1,20 +1,20 @@
-import React, { useMemo } from 'react';
-import type { ChatResponseMessageProps } from '../ChatResponseMessageSelector';
 import type {
   BusterChatResponseMessage_file,
   BusterChatResponseMessage_fileMetadata
 } from '@/api/asset_interfaces';
-import { Text } from '@/components/ui/typography';
+import { useGetChatMessage } from '@/api/buster_rest/chats';
 import { StatusIndicator } from '@/components/ui/indicators';
 import { StreamingMessage_File } from '@/components/ui/streaming/StreamingMessage_File';
-import { useGetChatMessage } from '@/api/buster_rest/chats';
+import { Text } from '@/components/ui/typography';
+import { TextAndVersionPill } from '@/components/ui/typography/TextAndVersionPill';
 import { useMemoizedFn, useMount } from '@/hooks';
 import { useChatLayoutContextSelector } from '@/layouts/ChatLayout';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { TextAndVersionPill } from '@/components/ui/typography/TextAndVersionPill';
-import { useGetIsSelectedFile } from './useGetIsSelectedFile';
+import React, { useMemo } from 'react';
+import type { ChatResponseMessageProps } from '../ChatResponseMessageSelector';
 import { useGetFileHref } from './useGetFileHref';
+import { useGetIsSelectedFile } from './useGetIsSelectedFile';
 
 export const ChatResponseMessage_File: React.FC<ChatResponseMessageProps> = React.memo(
   ({ isCompletedStream, chatId, responseMessageId, messageId }) => {

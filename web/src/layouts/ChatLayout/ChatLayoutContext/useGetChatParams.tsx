@@ -1,10 +1,10 @@
 'use client';
 
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
+import { pathNameToRoute } from '@/routes/helpers';
 import { useParams, usePathname, useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
 import type { FileViewSecondary } from './useLayoutConfig';
-import { pathNameToRoute } from '@/routes/helpers';
 
 export const useGetChatParams = () => {
   const params = useParams() as {
