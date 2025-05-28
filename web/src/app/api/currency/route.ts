@@ -10,9 +10,9 @@ export async function GET(request: NextRequest) {
 
   if (user && !user?.is_anonymous) {
     return NextResponse.json(currencies);
-  } else {
-    return NextResponse.error();
   }
+
+  return NextResponse.error();
 }
 
 const currencies = [
