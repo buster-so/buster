@@ -82,6 +82,8 @@ export class FirecrawlService {
         maxDepth: options?.maxDepth || 5,
         timeLimit: options?.timeLimit || 180, // 3 minutes default
         maxUrls: options?.maxUrls || 10,
+        systemPrompt:
+          'This shouldnt be marketing material, it should be almost like a training doc that describes the company to a new hire or consultant.',
       });
 
       const firecrawlResponse = response as FirecrawlResponse & JobStatusResponse;

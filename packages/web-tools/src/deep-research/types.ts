@@ -27,18 +27,8 @@ interface ResearchRawData {
 }
 
 export interface CompanyResearch {
-  /** Company name */
-  company: string;
-  /** Primary industry/sector */
-  industry: string;
-  /** How the company makes money */
-  businessModel: string;
-  /** List of products/services offered */
-  services: string[];
-  /** 2-4 paragraph description in markdown format */
-  description: string;
-  /** Key insights for new employees */
-  keyInsights: string[];
+  /** The raw analysis text from the research */
+  analysis: string;
   /** Original URL researched */
   url: string;
   /** When the research was conducted */

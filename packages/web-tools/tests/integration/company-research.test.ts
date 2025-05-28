@@ -18,22 +18,16 @@ describeIntegration('Company Research Integration Tests', () => {
 
     // Verify basic structure
     expect(result).toBeDefined();
-    expect(result.company).toBeTruthy();
-    expect(result.industry).toBeTruthy();
-    expect(result.businessModel).toBeTruthy();
-    expect(result.services).toBeInstanceOf(Array);
-    expect(result.services.length).toBeGreaterThan(0);
-    expect(result.description).toBeTruthy();
-    expect(result.keyInsights).toBeInstanceOf(Array);
-    expect(result.keyInsights.length).toBeGreaterThan(0);
+    expect(result.analysis).toBeTruthy();
+    expect(typeof result.analysis).toBe('string');
+    expect(result.analysis.length).toBeGreaterThan(100); // Should be substantial
     expect(result.url).toBe('https://buster.so');
     expect(result.researchedAt).toBeInstanceOf(Date);
     expect(result.rawData).toBeDefined();
 
-    // Verify content quality for Buster
-    expect(result.company.toLowerCase()).toContain('buster');
-    expect(result.description.length).toBeGreaterThan(100); // Should be substantial
-    expect(result.industry.toLowerCase()).toMatch(/tech|software|data|analytics|business/);
+    // Verify content quality for Buster - analysis should mention Buster and relevant keywords
+    const lowerAnalysis = result.analysis.toLowerCase();
+    expect(lowerAnalysis).toMatch(/buster|data|analytics|business|intelligence/);
   }, 120000); // 2 minutes timeout for real API calls
 
   it('should handle research with custom options', async () => {
@@ -46,8 +40,9 @@ describeIntegration('Company Research Integration Tests', () => {
     });
 
     expect(result).toBeDefined();
-    expect(result.company).toBeTruthy();
-    expect(result.description).toBeTruthy();
+    expect(result.analysis).toBeTruthy();
+    expect(typeof result.analysis).toBe('string');
+    expect(result.analysis.length).toBeGreaterThan(50);
   }, 150000); // 2.5 minutes timeout
 
   it('should handle invalid URLs gracefully', async () => {

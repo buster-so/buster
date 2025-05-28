@@ -56,6 +56,9 @@
     "packages/web-tools": {
       "name": "web-tools",
       "version": "0.1.0",
+      "dependencies": {
+        "dotenv": "^16.5.0",
+      },
       "devDependencies": {
         "@types/bun": "latest",
         "@vitest/coverage-v8": "^2.0.0",
