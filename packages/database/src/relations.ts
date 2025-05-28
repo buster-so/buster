@@ -1,39 +1,42 @@
 import { relations } from 'drizzle-orm/relations';
 import {
-  organizations,
   apiKeys,
-  users,
-  teams,
-  permissionGroups,
-  terms,
+  assetPermissions,
+  chats,
   collections,
-  dashboards,
+  collectionsToAssets,
+  dashboardFiles,
   dashboardVersions,
+  dashboards,
   dataSources,
+  databaseMetadata,
   datasetGroups,
+  datasetGroupsPermissions,
   datasetPermissions,
   datasets,
-  datasetGroupsPermissions,
-  threadsDeprecated,
-  messagesDeprecated,
-  chats,
-  messages,
-  messagesToFiles,
-  dashboardFiles,
-  storedValuesSyncJobs,
-  metricFiles,
-  permissionGroupsToUsers,
-  metricFilesToDatasets,
-  termsToDatasets,
-  datasetsToPermissionGroups,
   datasetsToDatasetGroups,
+  datasetsToPermissionGroups,
+  messages,
+  messagesDeprecated,
+  messagesToFiles,
+  metricFiles,
+  metricFilesToDashboardFiles,
+  metricFilesToDatasets,
+  organizations,
+  permissionGroups,
+  permissionGroupsToIdentities,
+  permissionGroupsToUsers,
+  schemaMetadata,
+  storedValuesSyncJobs,
+  tableMetadata,
+  teams,
+  teamsToUsers,
+  terms,
+  termsToDatasets,
+  threadsDeprecated,
   threadsToDashboards,
   userFavorites,
-  teamsToUsers,
-  metricFilesToDashboardFiles,
-  collectionsToAssets,
-  permissionGroupsToIdentities,
-  assetPermissions,
+  users,
   usersToOrganizations,
 } from './schema';
 
@@ -293,6 +296,9 @@ export const dataSourcesRelations = relations(dataSources, ({ one, many }) => ({
   datasets: many(datasets),
   storedValuesSyncJobs: many(storedValuesSyncJobs),
   metricFiles: many(metricFiles),
+  databaseMetadata: many(databaseMetadata),
+  schemaMetadata: many(schemaMetadata),
+  tableMetadata: many(tableMetadata),
 }));
 
 export const datasetGroupsRelations = relations(datasetGroups, ({ one, many }) => ({
@@ -653,5 +659,41 @@ export const usersToOrganizationsRelations = relations(usersToOrganizations, ({ 
     fields: [usersToOrganizations.deletedBy],
     references: [users.id],
     relationName: 'usersToOrganizations_deletedBy_users_id',
+  }),
+}));
+
+export const databaseMetadataRelations = relations(databaseMetadata, ({ one, many }) => ({
+  dataSource: one(dataSources, {
+    fields: [databaseMetadata.dataSourceId],
+    references: [dataSources.id],
+  }),
+  schemaMetadata: many(schemaMetadata),
+  tableMetadata: many(tableMetadata),
+}));
+
+export const schemaMetadataRelations = relations(schemaMetadata, ({ one, many }) => ({
+  dataSource: one(dataSources, {
+    fields: [schemaMetadata.dataSourceId],
+    references: [dataSources.id],
+  }),
+  databaseMetadata: one(databaseMetadata, {
+    fields: [schemaMetadata.databaseId],
+    references: [databaseMetadata.id],
+  }),
+  tableMetadata: many(tableMetadata),
+}));
+
+export const tableMetadataRelations = relations(tableMetadata, ({ one }) => ({
+  dataSource: one(dataSources, {
+    fields: [tableMetadata.dataSourceId],
+    references: [dataSources.id],
+  }),
+  databaseMetadata: one(databaseMetadata, {
+    fields: [tableMetadata.databaseId],
+    references: [databaseMetadata.id],
+  }),
+  schemaMetadata: one(schemaMetadata, {
+    fields: [tableMetadata.schemaId],
+    references: [schemaMetadata.id],
   }),
 }));

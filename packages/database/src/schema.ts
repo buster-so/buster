@@ -1,24 +1,24 @@
+import { sql } from 'drizzle-orm';
 import {
-  pgTable,
+  bigint,
+  boolean,
+  check,
+  doublePrecision,
   foreignKey,
-  unique,
-  uuid,
+  index,
+  integer,
+  jsonb,
+  pgEnum,
+  pgPolicy,
+  pgTable,
+  primaryKey,
   text,
   timestamp,
-  boolean,
-  jsonb,
-  varchar,
-  bigint,
+  unique,
   uniqueIndex,
-  index,
-  pgPolicy,
-  check,
-  integer,
-  doublePrecision,
-  primaryKey,
-  pgEnum,
+  uuid,
+  varchar,
 } from 'drizzle-orm/pg-core';
-import { sql } from 'drizzle-orm';
 
 export const assetPermissionRoleEnum = pgEnum('asset_permission_role_enum', [
   'owner',
@@ -77,6 +77,13 @@ export const verificationEnum = pgEnum('verification_enum', [
   'inReview',
   'requested',
   'notRequested',
+]);
+export const tableTypeEnum = pgEnum('table_type_enum', [
+  'TABLE',
+  'VIEW',
+  'MATERIALIZED_VIEW',
+  'EXTERNAL_TABLE',
+  'TEMPORARY_TABLE',
 ]);
 
 export const apiKeys = pgTable(
@@ -1582,5 +1589,149 @@ export const usersToOrganizations = pgTable(
       columns: [table.userId, table.organizationId],
       name: 'users_to_organizations_pkey',
     }),
+  ]
+);
+
+export const databaseMetadata = pgTable(
+  'database_metadata',
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    dataSourceId: uuid('data_source_id').notNull(),
+    name: text().notNull(),
+    owner: text(),
+    comment: text(),
+    created: timestamp({ withTimezone: true, mode: 'string' }),
+    lastModified: timestamp('last_modified', { withTimezone: true, mode: 'string' }),
+    metadata: jsonb().default({}).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'string' }),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.dataSourceId],
+      foreignColumns: [dataSources.id],
+      name: 'database_metadata_data_source_id_fkey',
+    }).onDelete('cascade'),
+    unique('database_metadata_data_source_id_name_key').on(table.dataSourceId, table.name),
+    index('database_metadata_data_source_id_idx').using(
+      'btree',
+      table.dataSourceId.asc().nullsLast().op('uuid_ops')
+    ),
+  ]
+);
+
+export const schemaMetadata = pgTable(
+  'schema_metadata',
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    dataSourceId: uuid('data_source_id').notNull(),
+    databaseId: uuid('database_id'), // Optional for MySQL
+    name: text().notNull(),
+    databaseName: text('database_name').notNull(),
+    owner: text(),
+    comment: text(),
+    created: timestamp({ withTimezone: true, mode: 'string' }),
+    lastModified: timestamp('last_modified', { withTimezone: true, mode: 'string' }),
+    metadata: jsonb().default({}).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'string' }),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.dataSourceId],
+      foreignColumns: [dataSources.id],
+      name: 'schema_metadata_data_source_id_fkey',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [table.databaseId],
+      foreignColumns: [databaseMetadata.id],
+      name: 'schema_metadata_database_id_fkey',
+    }).onDelete('cascade'),
+    unique('schema_metadata_data_source_id_database_id_name_key').on(
+      table.dataSourceId,
+      table.databaseId,
+      table.name
+    ),
+    index('schema_metadata_data_source_id_idx').using(
+      'btree',
+      table.dataSourceId.asc().nullsLast().op('uuid_ops')
+    ),
+    index('schema_metadata_database_id_idx').using(
+      'btree',
+      table.databaseId.asc().nullsLast().op('uuid_ops')
+    ),
+  ]
+);
+
+export const tableMetadata = pgTable(
+  'table_metadata',
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    dataSourceId: uuid('data_source_id').notNull(),
+    databaseId: uuid('database_id'), // Optional for some databases
+    schemaId: uuid('schema_id').notNull(),
+    name: text().notNull(),
+    schemaName: text('schema_name').notNull(),
+    databaseName: text('database_name').notNull(),
+    type: tableTypeEnum().notNull(),
+    rowCount: bigint('row_count', { mode: 'number' }),
+    sizeBytes: bigint('size_bytes', { mode: 'number' }),
+    comment: text(),
+    created: timestamp({ withTimezone: true, mode: 'string' }),
+    lastModified: timestamp('last_modified', { withTimezone: true, mode: 'string' }),
+    clusteringKeys: jsonb('clustering_keys').default([]).notNull(),
+    columns: jsonb().default([]).notNull(), // Array of Column objects
+    metadata: jsonb().default({}).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'string' }),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.dataSourceId],
+      foreignColumns: [dataSources.id],
+      name: 'table_metadata_data_source_id_fkey',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [table.databaseId],
+      foreignColumns: [databaseMetadata.id],
+      name: 'table_metadata_database_id_fkey',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [table.schemaId],
+      foreignColumns: [schemaMetadata.id],
+      name: 'table_metadata_schema_id_fkey',
+    }).onDelete('cascade'),
+    unique('table_metadata_data_source_id_schema_id_name_key').on(
+      table.dataSourceId,
+      table.schemaId,
+      table.name
+    ),
+    index('table_metadata_data_source_id_idx').using(
+      'btree',
+      table.dataSourceId.asc().nullsLast().op('uuid_ops')
+    ),
+    index('table_metadata_database_id_idx').using(
+      'btree',
+      table.databaseId.asc().nullsLast().op('uuid_ops')
+    ),
+    index('table_metadata_schema_id_idx').using(
+      'btree',
+      table.schemaId.asc().nullsLast().op('uuid_ops')
+    ),
   ]
 );
