@@ -1,5 +1,10 @@
 import { useMemoizedFn } from '@/hooks';
-import { Dropdown, type DropdownItem, DropdownItems, type DropdownProps } from '@/components/ui/dropdown';
+import {
+  Dropdown,
+  type DropdownItem,
+  DropdownItems,
+  type DropdownProps
+} from '@/components/ui/dropdown';
 import { Button } from '@/components/ui/buttons';
 import { CheckDouble, Xmark } from '@/components/ui/icons';
 import type React from 'react';

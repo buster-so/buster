@@ -1091,7 +1091,10 @@ const trendlinePlugin: Plugin<'line'> = {
           }
 
           // Draw the aggregated trendline if we have valid data points
-          if (fitter.minx !== Number.POSITIVE_INFINITY && fitter.maxx !== Number.NEGATIVE_INFINITY) {
+          if (
+            fitter.minx !== Number.POSITIVE_INFINITY &&
+            fitter.maxx !== Number.NEGATIVE_INFINITY
+          ) {
             const defaultColor =
               (firstDatasetWithTrendline.borderColor as string) ?? 'rgba(0,0,0,0.3)';
 

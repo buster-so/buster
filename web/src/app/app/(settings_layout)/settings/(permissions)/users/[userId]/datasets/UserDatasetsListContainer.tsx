@@ -134,12 +134,7 @@ export const UserDatasetsListContainer: React.FC<{
         useRowClickSelectChange={false}
         selectedRowKeys={selectedRowKeys}
         onSelectChange={setSelectedRowKeys}
-        emptyState={useMemo(
-          () => (
-            <EmptyStateList text="No datasets found" />
-          ),
-          []
-        )}
+        emptyState={useMemo(() => <EmptyStateList text="No datasets found" />, [])}
       />
     </InfiniteListContainer>
   );

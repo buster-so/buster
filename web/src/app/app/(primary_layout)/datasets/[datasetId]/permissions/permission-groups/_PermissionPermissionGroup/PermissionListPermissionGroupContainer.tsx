@@ -2,7 +2,11 @@
 
 import type { ListPermissionGroupsResponse } from '@/api/asset_interfaces';
 import { useDatasetUpdatePermissionGroups } from '@/api/buster_rest/datasets';
-import { type BusterListColumn, type BusterListRowItem, EmptyStateList } from '@/components/ui/list';
+import {
+  type BusterListColumn,
+  type BusterListRowItem,
+  EmptyStateList
+} from '@/components/ui/list';
 import { useMemoizedFn } from '@/hooks';
 import React, { useMemo, useState } from 'react';
 import { PermissionGroupSelectedPopup } from './PermissionGroupSelectedPopup';

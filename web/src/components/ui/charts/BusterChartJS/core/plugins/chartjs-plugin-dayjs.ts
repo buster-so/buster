@@ -59,7 +59,8 @@ _adapters._date.override({
     return null;
   },
   format: (time: any, format: TimeUnit): string => dayjs(time).format(format),
-  add: (time: any, amount: number, unit: QUnitType & TimeUnit) => dayjs(time).add(amount, unit).valueOf(),
+  add: (time: any, amount: number, unit: QUnitType & TimeUnit) =>
+    dayjs(time).add(amount, unit).valueOf(),
   diff: (max: any, min: any, unit: TimeUnit) => dayjs(max).diff(dayjs(min), unit),
   startOf: (time: any, unit: (TimeUnit & QUnitType) | 'isoWeek', weekday?: number) => {
     if (unit === 'isoWeek') {

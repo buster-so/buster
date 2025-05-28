@@ -79,7 +79,7 @@ const ChatLayoutContext = createContext<ReturnType<typeof useChatLayoutContext>>
   {} as ReturnType<typeof useChatLayoutContext>
 );
 
-type ChatLayoutContextProviderProps = {}
+type ChatLayoutContextProviderProps = {};
 
 export const ChatLayoutContextProvider: React.FC<
   PropsWithChildren<

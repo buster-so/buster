@@ -15,9 +15,7 @@ export const MetricListContainer: React.FC = React.memo(() => {
     <AppPageLayout
       headerSizeVariant="list"
       header={useMemo(
-        () => (
-          <MetricListHeader filters={filters} onSetFilters={setFilters} />
-        ),
+        () => <MetricListHeader filters={filters} onSetFilters={setFilters} />,
         [filters]
       )}>
       <MetricItemsContainer

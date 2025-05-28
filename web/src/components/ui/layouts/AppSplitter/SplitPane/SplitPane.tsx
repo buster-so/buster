@@ -89,39 +89,36 @@ const SplitPane = ({
     [children, wrapSize]
   );
 
-  const sizes = useMemo(
-    () => {
-      let count = 0;
-      let curSum = 0;
-      const res = children.map((_, index) => {
-        const size = assertsSize(propSizes[index], wrapSize);
-        if (size === Number.POSITIVE_INFINITY) {
-          count++;
-        } else {
-          curSum += size;
-        }
-        return size;
+  const sizes = useMemo(() => {
+    let count = 0;
+    let curSum = 0;
+    const res = children.map((_, index) => {
+      const size = assertsSize(propSizes[index], wrapSize);
+      if (size === Number.POSITIVE_INFINITY) {
+        count++;
+      } else {
+        curSum += size;
+      }
+      return size;
+    });
+
+    // resize or illegal size input,recalculate pane sizes
+    if (curSum > wrapSize || (!count && curSum < wrapSize)) {
+      const cacheNum = (curSum - wrapSize) / curSum;
+      return res.map((size) => {
+        return size === Number.POSITIVE_INFINITY ? 0 : size - size * cacheNum;
       });
+    }
 
-      // resize or illegal size input,recalculate pane sizes
-      if (curSum > wrapSize || (!count && curSum < wrapSize)) {
-        const cacheNum = (curSum - wrapSize) / curSum;
-        return res.map((size) => {
-          return size === Number.POSITIVE_INFINITY ? 0 : size - size * cacheNum;
-        });
-      }
+    if (count > 0) {
+      const average = (wrapSize - curSum) / count;
+      return res.map((size) => {
+        return size === Number.POSITIVE_INFINITY ? average : size;
+      });
+    }
 
-      if (count > 0) {
-        const average = (wrapSize - curSum) / count;
-        return res.map((size) => {
-          return size === Number.POSITIVE_INFINITY ? average : size;
-        });
-      }
-
-      return res;
-    },
-    [propSizes, children.length, wrapSize]
-  );
+    return res;
+  }, [propSizes, children.length, wrapSize]);
 
   const sashPosSizes = useMemo(
     () => sizes.reduce((a, b) => [...a, a[a.length - 1] + b], [0]),

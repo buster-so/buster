@@ -24,7 +24,10 @@ export const ChatContainerHeaderDropdown: React.FC<{
   const currentMessageId = useChatIndividualContextSelector((state) => state.currentMessageId);
   const selectedFileId = useChatIndividualContextSelector((state) => state.selectedFileId);
   const selectedFileType = useChatIndividualContextSelector((state) => state.selectedFileType);
-  const { data: chatTitle } = useGetChat({ id: chatId || '' }, { select: (x) => x.title, enabled: !!chatId });
+  const { data: chatTitle } = useGetChat(
+    { id: chatId || '' },
+    { select: (x) => x.title, enabled: !!chatId }
+  );
 
   const { isFavorited, onFavoriteClick } = useFavoriteStar({
     id: chatId || '',

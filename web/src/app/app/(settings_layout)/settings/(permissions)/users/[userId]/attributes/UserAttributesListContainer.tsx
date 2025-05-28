@@ -44,12 +44,7 @@ export const UserAttributesListContainer: React.FC<{
         showHeader={true}
         showSelectAll={false}
         useRowClickSelectChange={false}
-        emptyState={useMemo(
-          () => (
-            <EmptyStateList text="No datasets found" />
-          ),
-          []
-        )}
+        emptyState={useMemo(() => <EmptyStateList text="No datasets found" />, [])}
       />
     </InfiniteListContainer>
   );

@@ -1,6 +1,10 @@
 'use client';
 
-import { type DataSource, type BigQueryCredentials, BigQueryCredentialsSchema } from '@/api/asset_interfaces';
+import {
+  type DataSource,
+  type BigQueryCredentials,
+  BigQueryCredentialsSchema
+} from '@/api/asset_interfaces';
 import type React from 'react';
 import { FormWrapper } from './FormWrapper';
 import {

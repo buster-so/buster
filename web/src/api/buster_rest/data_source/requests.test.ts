@@ -1,4 +1,8 @@
-import { type DataSource, DataSourceSchema, DataSourceTypes } from '@/api/asset_interfaces/datasources';
+import {
+  type DataSource,
+  DataSourceSchema,
+  DataSourceTypes
+} from '@/api/asset_interfaces/datasources';
 import { getDatasource } from './requests';
 import mainApi from '../instances';
 

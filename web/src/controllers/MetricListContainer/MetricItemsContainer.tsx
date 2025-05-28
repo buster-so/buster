@@ -1,4 +1,8 @@
-import { ShareAssetType, type VerificationStatus, type BusterMetricListItem } from '@/api/asset_interfaces';
+import {
+  ShareAssetType,
+  type VerificationStatus,
+  type BusterMetricListItem
+} from '@/api/asset_interfaces';
 import { makeHumanReadble, formatDate } from '@/lib';
 import React, { memo, useMemo, useRef, useState } from 'react';
 import {
@@ -115,12 +119,7 @@ export const MetricItemsContainer: React.FC<{
         columns={columns}
         onSelectChange={onSelectChange}
         selectedRowKeys={selectedRowKeys}
-        emptyState={useMemo(
-          () => (
-            <EmptyState loading={loading} />
-          ),
-          [loading]
-        )}
+        emptyState={useMemo(() => <EmptyState loading={loading} />, [loading])}
       />
 
       <MetricSelectedOptionPopup

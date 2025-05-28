@@ -54,12 +54,7 @@ export const ListPermissionGroupsComponent: React.FC<{
         showHeader={true}
         showSelectAll={false}
         rowClassName="pl-[30px]!"
-        emptyState={useMemo(
-          () => (
-            <EmptyStateList text="No permission groups found" />
-          ),
-          []
-        )}
+        emptyState={useMemo(() => <EmptyStateList text="No permission groups found" />, [])}
       />
     </InfiniteListContainer>
   );

@@ -43,7 +43,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
 DropdownMenuSubTrigger.displayName = DropdownMenuPrimitive.SubTrigger.displayName;
 
 const baseContentClass = cn(
-  `data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[8rem] overflow-hidden `,
+  'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[8rem] overflow-hidden',
   'bg-background text-foreground ',
   'rounded-md border min-w-48'
 );
@@ -271,13 +271,19 @@ const DropdownMenuLink: React.FC<{
 
   if (!link)
     return (
-      <div className={className} onClick={(e) => e.stopPropagation()}>
+      <div
+        className={className}
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}>
         {content}
       </div>
     );
 
   return (
-    <span className={className} onClick={(e) => e.stopPropagation()}>
+    <span
+      className={className}
+      onClick={(e) => e.stopPropagation()}
+      onKeyDown={(e) => e.stopPropagation()}>
       <Link href={link} target={linkTarget || isExternal ? '_blank' : '_self'} className="">
         {content}
       </Link>

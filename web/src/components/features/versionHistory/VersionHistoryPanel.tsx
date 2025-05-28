@@ -46,12 +46,7 @@ export const VersionHistoryPanel = React.memo(
 
     return (
       <AppPageLayout
-        header={useMemo(
-          () => (
-            <PanelHeader />
-          ),
-          [assetId, type, chatId]
-        )}
+        header={useMemo(() => <PanelHeader />, [assetId, type, chatId])}
         scrollable
         headerBorderVariant="ghost">
         <div ref={bodyRef} className="mx-2 mb-1.5 flex flex-col">

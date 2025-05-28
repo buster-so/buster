@@ -134,12 +134,7 @@ export const DatasetGroupDatasetsListContainer: React.FC<{
         useRowClickSelectChange={false}
         selectedRowKeys={selectedRowKeys}
         onSelectChange={setSelectedRowKeys}
-        emptyState={useMemo(
-          () => (
-            <EmptyStateList text="No dataset groups found" />
-          ),
-          []
-        )}
+        emptyState={useMemo(() => <EmptyStateList text="No dataset groups found" />, [])}
       />
     </InfiniteListContainer>
   );

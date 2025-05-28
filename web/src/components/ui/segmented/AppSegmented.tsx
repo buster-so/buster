@@ -168,17 +168,22 @@ export const AppSegmented: AppSegmentedComponent = React.memo(
         ref={rootRef}
         value={selectedValue as string}
         // onValueChange={handleTabClick}
-        className={cn(segmentedVariants({ block, type }), heightVariants({ size }), className)}>
+        className={cn(segmentedVariants({ block, type }), heightVariants({ size }), className)}
+      >
         {isMeasured && (
           <motion.div
             className={cn(gliderVariants({ type }), heightVariants({ size }))}
             initial={{
               width: gliderStyle.width,
-              x: Number.parseInt(gliderStyle.transform.replace('translateX(', '').replace('px)', ''))
+              x: Number.parseInt(
+                gliderStyle.transform.replace('translateX(', '').replace('px)', '')
+              )
             }}
             animate={{
               width: gliderStyle.width,
-              x: Number.parseInt(gliderStyle.transform.replace('translateX(', '').replace('px)', ''))
+              x: Number.parseInt(
+                gliderStyle.transform.replace('translateX(', '').replace('px)', '')
+              )
             }}
             transition={{
               type: 'spring',

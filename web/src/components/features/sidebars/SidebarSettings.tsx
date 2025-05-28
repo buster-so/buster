@@ -89,18 +89,8 @@ export const SidebarSettings: React.FC<{}> = React.memo(({}) => {
   return (
     <Sidebar
       content={content}
-      header={useMemo(
-        () => (
-          <SidebarSettingsHeader />
-        ),
-        []
-      )}
-      footer={useMemo(
-        () => (
-          <SidebarUserFooter />
-        ),
-        []
-      )}
+      header={useMemo(() => <SidebarSettingsHeader />, [])}
+      footer={useMemo(() => <SidebarUserFooter />, [])}
     />
   );
 });

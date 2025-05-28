@@ -39,14 +39,18 @@ export class JsonDataFrameOperationsSingle {
   // Method to get the minimum value in the specified column
   min(): number {
     return Math.min(
-      ...this.data.map((item) => Number.parseFloat(item[this.column])).filter((value) => !isNaN(value))
+      ...this.data
+        .map((item) => Number.parseFloat(item[this.column]))
+        .filter((value) => !isNaN(value))
     );
   }
 
   // Method to get the maximum value in the specified column
   max(): number {
     return Math.max(
-      ...this.data.map((item) => Number.parseFloat(item[this.column])).filter((value) => !isNaN(value))
+      ...this.data
+        .map((item) => Number.parseFloat(item[this.column]))
+        .filter((value) => !isNaN(value))
     );
   }
 

@@ -3,7 +3,11 @@ import { SelectAxisContainerId } from '../config';
 import { useMemoizedFn } from '@/hooks';
 import type { DropZoneInternal } from './interfaces';
 import { useSelectAxisContextSelector } from '../useSelectAxisContext';
-import type { ChartEncodes, ChartType, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import type {
+  ChartEncodes,
+  ChartType,
+  IColumnLabelFormat
+} from '@/api/asset_interfaces/metric/charts';
 import type { Active } from '@dnd-kit/core';
 import { isNumericColumnStyle, isNumericColumnType } from '@/lib';
 

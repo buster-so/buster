@@ -86,12 +86,7 @@ export const FileContainer: React.FC<FileContainerProps> = ({ children }) => {
   return (
     <AppPageLayout
       className="flex h-full min-w-[380px] flex-col"
-      header={useMemo(
-        () => (
-          <FileContainerHeader />
-        ),
-        []
-      )}
+      header={useMemo(() => <FileContainerHeader />, [])}
       headerClassName="">
       <AppSplitter
         ref={appSplitterRef}

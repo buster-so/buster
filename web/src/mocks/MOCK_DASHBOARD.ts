@@ -65,9 +65,11 @@ export const generateMockDashboard = (
     } else {
       // Add a row with 1 column
       rows.push(
-        createMockDashboardRow(rows.length + 1, metricIds.slice(currentIndex, currentIndex + 1), [
-          12
-        ])
+        createMockDashboardRow(
+          rows.length + 1,
+          metricIds.slice(currentIndex, currentIndex + 1),
+          [12]
+        )
       );
       currentIndex += 1;
     }

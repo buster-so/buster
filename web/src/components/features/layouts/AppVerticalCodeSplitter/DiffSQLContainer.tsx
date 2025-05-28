@@ -53,15 +53,11 @@ export const DiffSQLContainer: React.FC<{
     return (
       <FileCard
         headerButtons={useMemo(
-          () => (
-            <Button prefix={<Copy2 />} variant="ghost" onClick={onCopySQL} />
-          ),
+          () => <Button prefix={<Copy2 />} variant="ghost" onClick={onCopySQL} />,
           [onCopySQL]
         )}
         fileName={useMemo(
-          () => (
-            <TextAndVersionPill fileName={fileName || ''} versionNumber={versionNumber || 0} />
-          ),
+          () => <TextAndVersionPill fileName={fileName || ''} versionNumber={versionNumber || 0} />,
           [fileName, versionNumber]
         )}>
         <AppDiffCodeEditor

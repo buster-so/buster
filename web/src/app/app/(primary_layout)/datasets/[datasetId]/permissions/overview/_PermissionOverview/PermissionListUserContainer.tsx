@@ -104,12 +104,7 @@ export const PermissionListUserContainer: React.FC<{
           rows={rows}
           showHeader={false}
           showSelectAll={false}
-          emptyState={useMemo(
-            () => (
-              <EmptyStateList text="No users found" />
-            ),
-            []
-          )}
+          emptyState={useMemo(() => <EmptyStateList text="No users found" />, [])}
         />
       </InfiniteListContainer>
     </>

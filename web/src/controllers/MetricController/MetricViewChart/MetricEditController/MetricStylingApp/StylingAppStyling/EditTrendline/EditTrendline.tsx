@@ -53,10 +53,7 @@ export const EditTrendline: React.FC<{
     const [newTrendIds, { add: addNewTrendId }] = useSet<string>();
 
     const setTrends = useMemo(() => {
-      return (
-        setTrends: (prev: LoopTrendline[]) => LoopTrendline[],
-        saveToExternal = true
-      ) => {
+      return (setTrends: (prev: LoopTrendline[]) => LoopTrendline[], saveToExternal = true) => {
         _setTrends((trendlines) => {
           const result = setTrends(trendlines);
           if (saveToExternal) {

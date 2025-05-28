@@ -2,7 +2,7 @@
 
 import { useSelectedLayoutSegment } from 'next/navigation';
 import type React from 'react';
-import { type PropsWithChildren, useEffect, useMemo, useState } from 'react'
+import { type PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import type { DatasetApps } from './config';
 import { createContext, useContextSelector } from 'use-context-selector';
 import { useDebounce, useMemoizedFn } from '@/hooks';

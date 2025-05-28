@@ -91,9 +91,7 @@ export const StreamingMessageCode: React.FC<
   return (
     <FileCard
       fileName={useMemo(
-        () => (
-          <TextAndVersionPill fileName={file_name} versionNumber={version_number} />
-        ),
+        () => <TextAndVersionPill fileName={file_name} versionNumber={version_number} />,
         [file_name, version_number]
       )}
       headerButtons={buttons}>

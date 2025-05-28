@@ -7,11 +7,7 @@ export type DataPoint = Record<string, string | number | null | Date>;
  * @param threshold - Number of standard deviations to consider anomalous (default: 2)
  * @returns Array of indices of anomalous points
  */
-export function detectAnomalies(
-  data: DataPoint[],
-  numericField: string,
-  threshold = 2
-): number[] {
+export function detectAnomalies(data: DataPoint[], numericField: string, threshold = 2): number[] {
   const values = data.map((point) => Number(point[numericField])).filter((val) => !isNaN(val));
 
   if (values.length === 0) return [];

@@ -135,12 +135,7 @@ export const PermissionListUsersContainer: React.FC<{
         selectedRowKeys={selectedRowKeys}
         onSelectChange={setSelectedRowKeys}
         useRowClickSelectChange={false}
-        emptyState={useMemo(
-          () => (
-            <EmptyStateList text="No users found" />
-          ),
-          []
-        )}
+        emptyState={useMemo(() => <EmptyStateList text="No users found" />, [])}
       />
     </InfiniteListContainer>
   );

@@ -16,7 +16,7 @@ const sampleDataSource: DataSource = {
   },
   credentials: {
     type: 'bigquery',
-    service_role_key: '{\"type\":\"service_account\",\"project_id\":\"example-project\"}',
+    service_role_key: '{"type":"service_account","project_id":"example-project"}',
     default_project_id: 'example-project',
     default_dataset_id: 'example_dataset'
   },

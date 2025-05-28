@@ -1,4 +1,8 @@
-import { type DataSource, type MySQLCredentials, MySQLCredentialsSchema } from '@/api/asset_interfaces';
+import {
+  type DataSource,
+  type MySQLCredentials,
+  MySQLCredentialsSchema
+} from '@/api/asset_interfaces';
 import type React from 'react';
 import { FormWrapper } from './FormWrapper';
 import {

@@ -11,7 +11,9 @@ export const KeyboardShortcutPill: React.FC<{
 
   return (
     <div className="flex space-x-0.5">
-      {shortcut?.map((s, i) => <TooltipShortcut key={i} shortcut={s} />)}
+      {shortcut?.map((s, i) => (
+        <TooltipShortcut key={i} shortcut={s} />
+      ))}
     </div>
   );
 };
