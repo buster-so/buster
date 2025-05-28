@@ -322,7 +322,7 @@ export class BigQueryIntrospector extends BaseIntrospector {
   }
 
   /**
-   * Get column statistics using UNION query approach
+   * Get column statistics using optimized CTE approach with single table scan
    */
   private async getColumnStatisticsForColumns(
     dataset: string,
@@ -333,13 +333,9 @@ export class BigQueryIntrospector extends BaseIntrospector {
 
     if (columns.length === 0) return columnStatistics;
 
-    // Build UNION query with one SELECT per column, cast to string for compatibility
-    const unionClauses = columns.map((column) =>
-      this.buildColumnStatsClause(column, dataset, table)
-    );
-
     try {
-      const statsQuery = unionClauses.join('\n\nUNION ALL\n');
+      // Build the optimized CTE-based query
+      const statsQuery = this.buildOptimizedColumnStatsQuery(dataset, table, columns);
       const statsResult = await this.adapter.query(statsQuery);
 
       // Parse results - each row represents one column's statistics
@@ -349,8 +345,8 @@ export class BigQueryIntrospector extends BaseIntrospector {
             columnName: this.getString(row.column_name) || '',
             distinctCount: this.parseNumber(row.distinct_count),
             nullCount: this.parseNumber(row.null_count),
-            minValue: row.min_value,
-            maxValue: row.max_value,
+            minValue: this.getString(row.min_value),
+            maxValue: this.getString(row.max_value),
             sampleValues: this.getString(row.sample_values),
           });
         }
@@ -375,57 +371,120 @@ export class BigQueryIntrospector extends BaseIntrospector {
   }
 
   /**
-   * Build a single column statistics clause for UNION query
+   * Build optimized CTE-based query that scans the table only once
    */
-  private buildColumnStatsClause(column: Column, dataset: string, table: string): string {
-    const columnName = column.name;
-    const isNumeric = this.isNumericType(column.dataType);
-    const isDate = this.isDateType(column.dataType);
+  private buildOptimizedColumnStatsQuery(
+    dataset: string,
+    table: string,
+    columns: Column[]
+  ): string {
+    const fullyQualifiedTable = `\`${dataset}\`.\`${table}\``;
 
-    let unionClause = `
-      SELECT '${columnName}' AS column_name,
-             COUNT(DISTINCT \`${columnName}\`) AS distinct_count,
-             COUNT(*) - COUNT(\`${columnName}\`) AS null_count`;
+    // Build raw_stats CTE with all column statistics in one scan
+    const rawStatsSelects = columns
+      .map((column) => {
+        const columnName = column.name;
+        const isNumeric = this.isNumericType(column.dataType);
+        const isDate = this.isDateType(column.dataType);
 
-    // Add min/max for numeric and date columns, cast to string for UNION compatibility
-    if (isNumeric) {
-      unionClause += `,
-             CAST(MIN(\`${columnName}\`) AS STRING) AS min_value,
-             CAST(MAX(\`${columnName}\`) AS STRING) AS max_value`;
-    } else if (isDate) {
-      unionClause += `,
-             CAST(MIN(\`${columnName}\`) AS STRING) AS min_value,
-             CAST(MAX(\`${columnName}\`) AS STRING) AS max_value`;
-    } else {
-      unionClause += `,
-             NULL AS min_value,
-             NULL AS max_value`;
-    }
+        let selectClause = `
+        COUNT(DISTINCT \`${columnName}\`) AS distinct_count_${this.sanitizeColumnName(columnName)},
+        COUNTIF(\`${columnName}\` IS NULL) AS null_count_${this.sanitizeColumnName(columnName)}`;
 
-    // Add sample values - get up to 20 distinct values, truncated and comma-separated
-    unionClause += `,
-             (
-               SELECT STRING_AGG(
-                 CASE 
+        if (isNumeric || isDate) {
+          selectClause += `,
+        MIN(\`${columnName}\`) AS min_${this.sanitizeColumnName(columnName)},
+        MAX(\`${columnName}\`) AS max_${this.sanitizeColumnName(columnName)}`;
+        }
+
+        return selectClause;
+      })
+      .join(',');
+
+    // Build sample_values CTE with UNION ALL for each column
+    const sampleValuesUnions = columns
+      .map((column) => {
+        const columnName = column.name;
+        return `
+    SELECT '${columnName}' AS column_name,
+           STRING_AGG(
+               CASE 
                    WHEN LENGTH(sample_val) > 100 
                    THEN CONCAT(SUBSTR(sample_val, 1, 100), '...')
                    ELSE sample_val
-                 END, 
-                 ','
-                 ORDER BY sample_val
-               )
-               FROM (
-                 SELECT DISTINCT CAST(\`${columnName}\` AS STRING) as sample_val
-                 FROM \`${dataset}\`.\`${table}\`
-                 WHERE \`${columnName}\` IS NOT NULL
-                 LIMIT 20
-               )
-             ) AS sample_values`;
+               END, 
+               ','
+               ORDER BY sample_val
+           ) AS sample_values
+    FROM (
+        SELECT DISTINCT CAST(\`${columnName}\` AS STRING) AS sample_val
+        FROM sample_data
+        WHERE \`${columnName}\` IS NOT NULL
+        LIMIT 20
+    )`;
+      })
+      .join('\n    UNION ALL');
 
-    unionClause += `
-      FROM \`${dataset}\`.\`${table}\``;
+    // Build stats CTE with UNION ALL for each column
+    const statsUnions = columns
+      .map((column) => {
+        const columnName = column.name;
+        const sanitizedName = this.sanitizeColumnName(columnName);
+        const isNumeric = this.isNumericType(column.dataType);
+        const isDate = this.isDateType(column.dataType);
 
-    return unionClause;
+        let minMaxClause = 'NULL AS min_value,\n        NULL AS max_value';
+        if (isNumeric || isDate) {
+          minMaxClause = `CAST(rs.min_${sanitizedName} AS STRING) AS min_value,
+        CAST(rs.max_${sanitizedName} AS STRING) AS max_value`;
+        }
+
+        return `
+    SELECT
+        '${columnName}' AS column_name,
+        rs.distinct_count_${sanitizedName} AS distinct_count,
+        rs.null_count_${sanitizedName} AS null_count,
+        ${minMaxClause}
+    FROM raw_stats rs`;
+      })
+      .join('\n    UNION ALL');
+
+    // Combine all CTEs into final query
+    return `
+WITH raw_stats AS (
+    SELECT
+        ${rawStatsSelects}
+    FROM ${fullyQualifiedTable}
+),
+sample_data AS (
+    SELECT * FROM ${fullyQualifiedTable} TABLESAMPLE SYSTEM (1 PERCENT)
+),
+sample_values AS (
+    ${sampleValuesUnions}
+),
+stats AS (
+    ${statsUnions}
+)
+SELECT 
+    s.column_name,
+    s.distinct_count,
+    s.null_count,
+    s.min_value,
+    s.max_value,
+    sv.sample_values
+FROM stats s
+LEFT JOIN sample_values sv ON s.column_name = sv.column_name
+ORDER BY s.column_name`;
+  }
+
+  /**
+   * Sanitize column name for use in SQL aliases (replace special characters)
+   */
+  private sanitizeColumnName(columnName: string): string {
+    return columnName
+      .replace(/[^a-zA-Z0-9_]/g, '_')
+      .replace(/^(\d)/, '_$1') // Prefix with _ if starts with number
+      .toLowerCase();
   }
 
   /**

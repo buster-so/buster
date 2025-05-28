@@ -323,7 +323,7 @@ export abstract class BaseIntrospector implements DataSourceIntrospector {
     sampleValues: string | undefined,
     column: Column
   ): string | undefined {
-    if (!sampleValues) return undefined;
+    if (!sampleValues || sampleValues.trim().length === 0) return undefined;
 
     const values = sampleValues.split(',').filter((v) => v.trim().length > 0);
     if (values.length === 0) return undefined;

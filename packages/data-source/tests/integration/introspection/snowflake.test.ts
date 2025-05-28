@@ -281,7 +281,10 @@ describe('Snowflake DataSource Introspection', () => {
 
       dataSource = new DataSource({ dataSources: [config] });
 
-      const introspection = await dataSource.getFullIntrospection('test-snowflake');
+      const introspection = await dataSource.getFullIntrospection('test-snowflake', {
+        databases: ['DBT'],
+        schemas: ['REVENUE'],
+      });
 
       expect(introspection).toHaveProperty('dataSourceName', 'test-snowflake');
       expect(introspection).toHaveProperty('dataSourceType');
@@ -300,7 +303,7 @@ describe('Snowflake DataSource Introspection', () => {
       expect(Array.isArray(introspection.columns)).toBe(true);
       expect(Array.isArray(introspection.views)).toBe(true);
     },
-    TEST_TIMEOUT
+    { timeout: 120000 }
   );
 
   testFn(

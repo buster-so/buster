@@ -51,18 +51,23 @@ export class MySQLIntrospector extends BaseIntrospector {
     }
 
     try {
-      const databasesResult = await this.adapter.query('SHOW DATABASES');
+      // Enhanced query to get database metadata including default character set and collation
+      const databasesResult = await this.adapter.query(`
+        SELECT schema_name as name,
+               default_character_set_name as charset,
+               default_collation_name as collation
+        FROM information_schema.schemata
+        WHERE schema_name NOT IN ('information_schema', 'performance_schema', 'mysql', 'sys')
+        ORDER BY schema_name
+      `);
 
-      const databases = databasesResult.rows
-        .filter((row) => {
-          const name = this.getString(row.Database);
-          return (
-            name && !['information_schema', 'performance_schema', 'mysql', 'sys'].includes(name)
-          );
-        })
-        .map((row) => ({
-          name: this.getString(row.Database) || '',
-        }));
+      const databases = databasesResult.rows.map((row) => ({
+        name: this.getString(row.name) || '',
+        metadata: {
+          charset: this.getString(row.charset),
+          collation: this.getString(row.collation),
+        },
+      }));
 
       this.cache.databases = { data: databases, lastFetched: new Date() };
       return databases;
@@ -85,8 +90,7 @@ export class MySQLIntrospector extends BaseIntrospector {
       const schemas = databases.map((db) => ({
         name: db.name,
         database: db.name,
-        owner: db.owner,
-        comment: db.comment,
+        metadata: db.metadata,
       }));
 
       this.cache.schemas = { data: schemas, lastFetched: new Date() };
@@ -285,7 +289,7 @@ export class MySQLIntrospector extends BaseIntrospector {
   }
 
   /**
-   * Get column statistics using UNION query approach
+   * Get column statistics using optimized CTE approach with single table scan
    */
   private async getColumnStatisticsForColumns(
     database: string,
@@ -296,13 +300,9 @@ export class MySQLIntrospector extends BaseIntrospector {
 
     if (columns.length === 0) return columnStatistics;
 
-    // Build UNION query with one SELECT per column, cast to text for compatibility
-    const unionClauses = columns.map((column) =>
-      this.buildColumnStatsClause(column, database, table)
-    );
-
     try {
-      const statsQuery = unionClauses.join('\n\nUNION ALL\n');
+      // Build the optimized CTE-based query
+      const statsQuery = this.buildOptimizedColumnStatsQuery(database, table, columns);
       const statsResult = await this.adapter.query(statsQuery);
 
       // Parse results - each row represents one column's statistics
@@ -312,8 +312,8 @@ export class MySQLIntrospector extends BaseIntrospector {
             columnName: this.getString(row.column_name) || '',
             distinctCount: this.parseNumber(row.distinct_count),
             nullCount: this.parseNumber(row.null_count),
-            minValue: row.min_value,
-            maxValue: row.max_value,
+            minValue: this.getString(row.min_value),
+            maxValue: this.getString(row.max_value),
             sampleValues: this.getString(row.sample_values),
           });
         }
@@ -338,57 +338,120 @@ export class MySQLIntrospector extends BaseIntrospector {
   }
 
   /**
-   * Build a single column statistics clause for UNION query
+   * Build optimized CTE-based query that scans the table only once
    */
-  private buildColumnStatsClause(column: Column, database: string, table: string): string {
-    const columnName = column.name;
-    const isNumeric = this.isNumericType(column.dataType);
-    const isDate = this.isDateType(column.dataType);
+  private buildOptimizedColumnStatsQuery(
+    database: string,
+    table: string,
+    columns: Column[]
+  ): string {
+    const fullyQualifiedTable = `\`${database}\`.\`${table}\``;
 
-    let unionClause = `
-      SELECT '${columnName}' AS column_name,
-             COUNT(DISTINCT \`${columnName}\`) AS distinct_count,
-             COUNT(*) - COUNT(\`${columnName}\`) AS null_count`;
+    // Build raw_stats CTE with all column statistics in one scan
+    const rawStatsSelects = columns
+      .map((column) => {
+        const columnName = column.name;
+        const isNumeric = this.isNumericType(column.dataType);
+        const isDate = this.isDateType(column.dataType);
 
-    // Add min/max for numeric and date columns, cast to text for UNION compatibility
-    if (isNumeric) {
-      unionClause += `,
-             CAST(MIN(\`${columnName}\`) AS CHAR) AS min_value,
-             CAST(MAX(\`${columnName}\`) AS CHAR) AS max_value`;
-    } else if (isDate) {
-      unionClause += `,
-             CAST(MIN(\`${columnName}\`) AS CHAR) AS min_value,
-             CAST(MAX(\`${columnName}\`) AS CHAR) AS max_value`;
-    } else {
-      unionClause += `,
-             NULL AS min_value,
-             NULL AS max_value`;
-    }
+        let selectClause = `
+        COUNT(DISTINCT \`${columnName}\`) AS distinct_count_${this.sanitizeColumnName(columnName)},
+        SUM(CASE WHEN \`${columnName}\` IS NULL THEN 1 ELSE 0 END) AS null_count_${this.sanitizeColumnName(columnName)}`;
 
-    // Add sample values - get up to 20 distinct values, truncated and comma-separated
-    unionClause += `,
-             (
-               SELECT GROUP_CONCAT(
-                 CASE 
+        if (isNumeric || isDate) {
+          selectClause += `,
+        MIN(\`${columnName}\`) AS min_${this.sanitizeColumnName(columnName)},
+        MAX(\`${columnName}\`) AS max_${this.sanitizeColumnName(columnName)}`;
+        }
+
+        return selectClause;
+      })
+      .join(',');
+
+    // Build sample_values CTE with UNION ALL for each column
+    const sampleValuesUnions = columns
+      .map((column) => {
+        const columnName = column.name;
+        return `
+    SELECT '${columnName}' AS column_name,
+           GROUP_CONCAT(
+               CASE 
                    WHEN CHAR_LENGTH(sample_val) > 100 
                    THEN CONCAT(LEFT(sample_val, 100), '...')
                    ELSE sample_val
-                 END
-                 ORDER BY sample_val
-                 SEPARATOR ','
-               )
-               FROM (
-                 SELECT DISTINCT CAST(\`${columnName}\` AS CHAR) as sample_val
-                 FROM \`${database}\`.\`${table}\`
-                 WHERE \`${columnName}\` IS NOT NULL
-                 LIMIT 20
-               ) samples
-             ) AS sample_values`;
+               END
+               ORDER BY sample_val
+               SEPARATOR ','
+           ) AS sample_values
+    FROM (
+        SELECT DISTINCT CAST(\`${columnName}\` AS CHAR) AS sample_val
+        FROM sample_data
+        WHERE \`${columnName}\` IS NOT NULL
+        LIMIT 20
+    ) samples`;
+      })
+      .join('\n    UNION ALL');
 
-    unionClause += `
-      FROM \`${database}\`.\`${table}\``;
+    // Build stats CTE with UNION ALL for each column
+    const statsUnions = columns
+      .map((column) => {
+        const columnName = column.name;
+        const sanitizedName = this.sanitizeColumnName(columnName);
+        const isNumeric = this.isNumericType(column.dataType);
+        const isDate = this.isDateType(column.dataType);
 
-    return unionClause;
+        let minMaxClause = 'NULL AS min_value,\n        NULL AS max_value';
+        if (isNumeric || isDate) {
+          minMaxClause = `CAST(rs.min_${sanitizedName} AS CHAR) AS min_value,
+        CAST(rs.max_${sanitizedName} AS CHAR) AS max_value`;
+        }
+
+        return `
+    SELECT
+        '${columnName}' AS column_name,
+        rs.distinct_count_${sanitizedName} AS distinct_count,
+        rs.null_count_${sanitizedName} AS null_count,
+        ${minMaxClause}
+    FROM raw_stats rs`;
+      })
+      .join('\n    UNION ALL');
+
+    // Combine all CTEs into final query
+    return `
+WITH raw_stats AS (
+    SELECT
+        ${rawStatsSelects}
+    FROM ${fullyQualifiedTable}
+),
+sample_data AS (
+    SELECT * FROM ${fullyQualifiedTable} ORDER BY RAND() LIMIT 1000
+),
+sample_values AS (
+    ${sampleValuesUnions}
+),
+stats AS (
+    ${statsUnions}
+)
+SELECT 
+    s.column_name,
+    s.distinct_count,
+    s.null_count,
+    s.min_value,
+    s.max_value,
+    sv.sample_values
+FROM stats s
+LEFT JOIN sample_values sv ON s.column_name = sv.column_name
+ORDER BY s.column_name`;
+  }
+
+  /**
+   * Sanitize column name for use in SQL aliases (replace special characters)
+   */
+  private sanitizeColumnName(columnName: string): string {
+    return columnName
+      .replace(/[^a-zA-Z0-9_]/g, '_')
+      .replace(/^(\d)/, '_$1') // Prefix with _ if starts with number
+      .toLowerCase();
   }
 
   /**

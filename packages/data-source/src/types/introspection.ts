@@ -115,9 +115,9 @@ export interface Column {
   /** Null value count */
   nullCount?: number;
   /** Minimum value */
-  minValue?: unknown;
+  minValue?: string;
   /** Maximum value */
-  maxValue?: unknown;
+  maxValue?: string;
   /** Sample values (comma-separated string of up to 20 distinct values) */
   sampleValues?: string;
   /** Additional column-specific metadata */
@@ -159,9 +159,9 @@ export interface ColumnStatistics {
   /** Null value count */
   nullCount?: number;
   /** Minimum value */
-  minValue?: unknown;
+  minValue?: string;
   /** Maximum value */
-  maxValue?: unknown;
+  maxValue?: string;
   /** Sample values (comma-separated string of up to 20 distinct values) */
   sampleValues?: string;
   /** Additional column-specific statistics */

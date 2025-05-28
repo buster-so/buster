@@ -55,6 +55,7 @@
     "@mastra/libsql": "^0.10.0",
     "@mastra/loggers": "^0.10.0",
     "@mastra/memory": "^0.10.0",
+    "@mendable/firecrawl-js": "^1.25.2",
     "@trigger.dev/sdk": "^3.3.17",
     "ai": "^4.0.0",
     "drizzle-orm": "^0.43.1",

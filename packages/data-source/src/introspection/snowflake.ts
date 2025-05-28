@@ -87,7 +87,7 @@ export class SnowflakeIntrospector extends BaseIntrospector {
       if (database) {
         // Fetch schemas for specific database
         const result = await this.adapter.query(`
-          SELECT SCHEMA_NAME, CATALOG_NAME, SCHEMA_OWNER, COMMENT
+          SELECT SCHEMA_NAME, CATALOG_NAME, SCHEMA_OWNER, COMMENT, CREATED, LAST_ALTERED
           FROM ${database}.INFORMATION_SCHEMA.SCHEMATA
           WHERE SCHEMA_NAME != 'INFORMATION_SCHEMA'
         `);
@@ -97,6 +97,8 @@ export class SnowflakeIntrospector extends BaseIntrospector {
           database: this.getString(row.CATALOG_NAME) || database,
           owner: this.getString(row.SCHEMA_OWNER),
           comment: this.getString(row.COMMENT),
+          created: this.parseDate(row.CREATED),
+          lastModified: this.parseDate(row.LAST_ALTERED),
         }));
       } else {
         // Fetch schemas for all accessible databases
@@ -104,7 +106,7 @@ export class SnowflakeIntrospector extends BaseIntrospector {
         const schemasPromises = databases.map(async (db) => {
           try {
             const result = await this.adapter.query(`
-              SELECT SCHEMA_NAME, CATALOG_NAME, SCHEMA_OWNER, COMMENT
+              SELECT SCHEMA_NAME, CATALOG_NAME, SCHEMA_OWNER, COMMENT, CREATED, LAST_ALTERED
               FROM ${db.name}.INFORMATION_SCHEMA.SCHEMATA
               WHERE SCHEMA_NAME != 'INFORMATION_SCHEMA'
             `);
@@ -114,6 +116,8 @@ export class SnowflakeIntrospector extends BaseIntrospector {
               database: this.getString(row.CATALOG_NAME) || db.name,
               owner: this.getString(row.SCHEMA_OWNER),
               comment: this.getString(row.COMMENT),
+              created: this.parseDate(row.CREATED),
+              lastModified: this.parseDate(row.LAST_ALTERED),
             }));
           } catch (error) {
             console.warn(`Could not access schemas in database ${db.name}:`, error);
@@ -561,7 +565,7 @@ export class SnowflakeIntrospector extends BaseIntrospector {
   }
 
   /**
-   * Get column statistics using UNION query approach
+   * Get column statistics using optimized CTE approach with single table scan
    */
   private async getColumnStatisticsForColumns(
     database: string,
@@ -573,13 +577,9 @@ export class SnowflakeIntrospector extends BaseIntrospector {
 
     if (columns.length === 0) return columnStatistics;
 
-    // Build UNION query with one SELECT per column, cast to string for compatibility
-    const unionClauses = columns.map((column) =>
-      this.buildColumnStatsClause(column, database, schema, table)
-    );
-
     try {
-      const statsQuery = unionClauses.join('\n\nUNION ALL\n');
+      // Build the optimized CTE-based query
+      const statsQuery = this.buildOptimizedColumnStatsQuery(database, schema, table, columns);
       const statsResult = await this.adapter.query(statsQuery);
 
       // Parse results - each row represents one column's statistics
@@ -589,8 +589,8 @@ export class SnowflakeIntrospector extends BaseIntrospector {
             columnName: this.getString(row.column_name) || '',
             distinctCount: this.parseNumber(row.distinct_count),
             nullCount: this.parseNumber(row.null_count),
-            minValue: row.min_value,
-            maxValue: row.max_value,
+            minValue: this.getString(row.min_value),
+            maxValue: this.getString(row.max_value),
             sampleValues: this.getString(row.sample_values),
           });
         }
@@ -615,61 +615,120 @@ export class SnowflakeIntrospector extends BaseIntrospector {
   }
 
   /**
-   * Build a single column statistics clause for UNION query
+   * Build optimized CTE-based query that scans the table only once
    */
-  private buildColumnStatsClause(
-    column: Column,
+  private buildOptimizedColumnStatsQuery(
     database: string,
     schema: string,
-    table: string
+    table: string,
+    columns: Column[]
   ): string {
-    const columnName = column.name;
-    const isNumeric = this.isNumericType(column.dataType);
-    const isDate = this.isDateType(column.dataType);
+    const fullyQualifiedTable = `${database}.${schema}.${table}`;
 
-    let unionClause = `
-      SELECT '${columnName}' AS column_name,
-             COUNT(DISTINCT ${columnName}) AS distinct_count,
-             COUNT(*) - COUNT(${columnName}) AS null_count`;
+    // Build raw_stats CTE with all column statistics in one scan
+    const rawStatsSelects = columns
+      .map((column) => {
+        const columnName = column.name;
+        const isNumeric = this.isNumericType(column.dataType);
+        const isDate = this.isDateType(column.dataType);
 
-    // Add min/max for numeric and date columns, cast to string for UNION compatibility
-    if (isNumeric) {
-      unionClause += `,
-             TO_VARCHAR(MIN(${columnName})) AS min_value,
-             TO_VARCHAR(MAX(${columnName})) AS max_value`;
-    } else if (isDate) {
-      unionClause += `,
-             TO_VARCHAR(MIN(${columnName})) AS min_value,
-             TO_VARCHAR(MAX(${columnName})) AS max_value`;
-    } else {
-      unionClause += `,
-             NULL AS min_value,
-             NULL AS max_value`;
-    }
+        let selectClause = `
+        COUNT(DISTINCT ${columnName}) AS distinct_count_${this.sanitizeColumnName(columnName)},
+        SUM(CASE WHEN ${columnName} IS NULL THEN 1 ELSE 0 END) AS null_count_${this.sanitizeColumnName(columnName)}`;
 
-    // Add sample values - get up to 20 distinct values, truncated and comma-separated
-    unionClause += `,
-             (
-               SELECT LISTAGG(
-                 CASE 
+        if (isNumeric || isDate) {
+          selectClause += `,
+        MIN(${columnName}) AS min_${this.sanitizeColumnName(columnName)},
+        MAX(${columnName}) AS max_${this.sanitizeColumnName(columnName)}`;
+        }
+
+        return selectClause;
+      })
+      .join(',');
+
+    // Build sample_values CTE with UNION ALL for each column
+    const sampleValuesUnions = columns
+      .map((column) => {
+        const columnName = column.name;
+        return `
+    SELECT '${columnName}' AS column_name,
+           LISTAGG(
+               CASE 
                    WHEN LENGTH(sample_val) > 100 
                    THEN LEFT(sample_val, 100) || '...'
                    ELSE sample_val
-                 END, 
-                 ','
-               ) WITHIN GROUP (ORDER BY sample_val)
-               FROM (
-                 SELECT DISTINCT TO_VARCHAR(${columnName}) as sample_val
-                 FROM ${database}.${schema}.${table}
-                 WHERE ${columnName} IS NOT NULL
-                 LIMIT 20
-               )
-             ) AS sample_values`;
+               END, 
+               ','
+           ) WITHIN GROUP (ORDER BY sample_val) AS sample_values
+    FROM (
+        SELECT DISTINCT TO_VARCHAR(${columnName}) AS sample_val
+        FROM sample_data
+        WHERE ${columnName} IS NOT NULL
+        LIMIT 20
+    )`;
+      })
+      .join('\n    UNION ALL');
 
-    unionClause += `
-      FROM ${database}.${schema}.${table}`;
+    // Build stats CTE with UNION ALL for each column
+    const statsUnions = columns
+      .map((column) => {
+        const columnName = column.name;
+        const sanitizedName = this.sanitizeColumnName(columnName);
+        const isNumeric = this.isNumericType(column.dataType);
+        const isDate = this.isDateType(column.dataType);
 
-    return unionClause;
+        let minMaxClause = 'NULL AS min_value,\n        NULL AS max_value';
+        if (isNumeric || isDate) {
+          minMaxClause = `TO_VARCHAR(rs.min_${sanitizedName}) AS min_value,
+        TO_VARCHAR(rs.max_${sanitizedName}) AS max_value`;
+        }
+
+        return `
+    SELECT
+        '${columnName}' AS column_name,
+        rs.distinct_count_${sanitizedName} AS distinct_count,
+        rs.null_count_${sanitizedName} AS null_count,
+        ${minMaxClause}
+    FROM raw_stats rs`;
+      })
+      .join('\n    UNION ALL');
+
+    // Combine all CTEs into final query
+    return `
+WITH raw_stats AS (
+    SELECT
+        ${rawStatsSelects}
+    FROM ${fullyQualifiedTable}
+),
+sample_data AS (
+    SELECT * FROM ${fullyQualifiedTable} SAMPLE (100 ROWS)
+),
+sample_values AS (
+    ${sampleValuesUnions}
+),
+stats AS (
+    ${statsUnions}
+)
+SELECT 
+    s.column_name,
+    s.distinct_count,
+    s.null_count,
+    s.min_value,
+    s.max_value,
+    sv.sample_values
+FROM stats s
+LEFT JOIN sample_values sv ON s.column_name = sv.column_name
+ORDER BY s.column_name`;
+  }
+
+  /**
+   * Sanitize column name for use in SQL aliases (replace special characters)
+   */
+  private sanitizeColumnName(columnName: string): string {
+    return columnName
+      .replace(/[^a-zA-Z0-9_]/g, '_')
+      .replace(/^(\d)/, '_$1') // Prefix with _ if starts with number
+      .toLowerCase();
   }
 
   /**
@@ -833,6 +892,7 @@ export class SnowflakeIntrospector extends BaseIntrospector {
         await Promise.all(
           batch.map(async (table) => {
             try {
+              // Get column statistics
               const columnStats = await this.getColumnStatistics(
                 table.database,
                 table.schema,
@@ -848,11 +908,7 @@ export class SnowflakeIntrospector extends BaseIntrospector {
                   column.nullCount = stat.nullCount;
                   column.minValue = stat.minValue;
                   column.maxValue = stat.maxValue;
-                  // Apply smart truncation to sample values
-                  column.sampleValues = this.truncateSampleValuesSnowflake(
-                    stat.sampleValues,
-                    column
-                  );
+                  column.sampleValues = stat.sampleValues;
                 }
               }
             } catch (error) {
@@ -868,113 +924,5 @@ export class SnowflakeIntrospector extends BaseIntrospector {
     );
 
     return Array.from(columnMap.values());
-  }
-
-  /**
-   * Helper method to apply smart truncation to sample values
-   * This is a copy of the base implementation to avoid dependency issues
-   */
-  private truncateSampleValuesSnowflake(
-    sampleValues: string | undefined,
-    column: Column
-  ): string | undefined {
-    if (!sampleValues) return undefined;
-
-    const values = sampleValues.split(',').filter((v) => v.trim().length > 0);
-    if (values.length === 0) return undefined;
-
-    const dataType = column.dataType.toLowerCase();
-
-    // Handle JSON columns - fewer samples, smart truncation
-    if (dataType.includes('json') || dataType.includes('jsonb')) {
-      return this.truncateJsonSamplesSnowflake(values);
-    }
-
-    // Handle long text columns - adaptive sample count
-    if (this.isLongTextColumnSnowflake(column, values)) {
-      return this.truncateLongTextSamplesSnowflake(values);
-    }
-
-    // Handle normal columns - standard truncation
-    return this.truncateNormalSamplesSnowflake(values);
-  }
-
-  /**
-   * Truncate JSON sample values - show fewer samples with smart truncation
-   */
-  private truncateJsonSamplesSnowflake(values: string[]): string {
-    return values
-      .slice(0, 3) // Only show 3 JSON samples
-      .map((value) => {
-        if (value.length > 100) {
-          // Try to truncate at a logical JSON boundary
-          const truncated = value.substring(0, 100);
-          const lastComma = truncated.lastIndexOf(',');
-          const lastBrace = truncated.lastIndexOf('}');
-          const cutPoint = Math.max(lastComma, lastBrace);
-
-          if (cutPoint > 50) {
-            return `${truncated.substring(0, cutPoint)}...}`;
-          }
-          return `${truncated}...`;
-        }
-        return value;
-      })
-      .join(',');
-  }
-
-  /**
-   * Truncate long text sample values - fewer samples, shorter truncation
-   */
-  private truncateLongTextSamplesSnowflake(values: string[]): string {
-    const avgLength = values.reduce((sum, v) => sum + v.length, 0) / values.length;
-    const sampleCount = avgLength > 200 ? 3 : avgLength > 100 ? 5 : 10;
-    const truncateLength = avgLength > 200 ? 30 : 50;
-
-    return values
-      .slice(0, sampleCount)
-      .map((value) => {
-        if (value.length > truncateLength) {
-          return `${value.substring(0, truncateLength)}...`;
-        }
-        return value;
-      })
-      .join(',');
-  }
-
-  /**
-   * Truncate normal sample values - standard approach
-   */
-  private truncateNormalSamplesSnowflake(values: string[]): string {
-    return values
-      .slice(0, 20)
-      .map((value) => {
-        if (value.length > 100) {
-          return `${value.substring(0, 100)}...`;
-        }
-        return value;
-      })
-      .join(',');
-  }
-
-  /**
-   * Check if this is a long text column based on type and sample values
-   */
-  private isLongTextColumnSnowflake(column: Column, values: string[]): boolean {
-    const dataType = column.dataType.toLowerCase();
-
-    // Check data type indicators
-    if (dataType.includes('text') || dataType.includes('varchar') || dataType.includes('char')) {
-      // Check if max length suggests long text
-      if (column.maxLength && column.maxLength > 255) {
-        return true;
-      }
-
-      // Check if sample values are long
-      const avgLength = values.reduce((sum, v) => sum + v.length, 0) / values.length;
-      return avgLength > 100;
-    }
-
-    return false;
   }
 }

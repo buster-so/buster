@@ -55,7 +55,12 @@ export class SQLServerIntrospector extends BaseIntrospector {
         SELECT name,
                database_id,
                create_date,
-               collation_name
+               collation_name,
+               state_desc,
+               is_read_only,
+               is_auto_close_on,
+               is_auto_shrink_on,
+               recovery_model_desc
         FROM sys.databases
         WHERE name NOT IN ('master', 'tempdb', 'model', 'msdb')
         ORDER BY name
@@ -67,6 +72,11 @@ export class SQLServerIntrospector extends BaseIntrospector {
         metadata: {
           database_id: this.parseNumber(row.database_id),
           collation_name: this.getString(row.collation_name),
+          state_desc: this.getString(row.state_desc),
+          is_read_only: this.parseBoolean(row.is_read_only),
+          is_auto_close_on: this.parseBoolean(row.is_auto_close_on),
+          is_auto_shrink_on: this.parseBoolean(row.is_auto_shrink_on),
+          recovery_model_desc: this.getString(row.recovery_model_desc),
         },
       }));
 
@@ -92,7 +102,10 @@ export class SQLServerIntrospector extends BaseIntrospector {
       const schemasResult = await this.adapter.query(`
         SELECT s.name as schema_name,
                DB_NAME() as database_name,
-               p.name as owner_name
+               p.name as owner_name,
+               s.schema_id,
+               s.principal_id,
+               p.type_desc as owner_type
         FROM sys.schemas s
         LEFT JOIN sys.database_principals p ON s.principal_id = p.principal_id
         ${whereClause}
@@ -103,6 +116,11 @@ export class SQLServerIntrospector extends BaseIntrospector {
         name: this.getString(row.schema_name) || '',
         database: this.getString(row.database_name) || '',
         owner: this.getString(row.owner_name),
+        metadata: {
+          schema_id: this.parseNumber(row.schema_id),
+          principal_id: this.parseNumber(row.principal_id),
+          owner_type: this.getString(row.owner_type),
+        },
       }));
 
       this.cache.schemas = { data: schemas, lastFetched: new Date() };
@@ -279,13 +297,13 @@ export class SQLServerIntrospector extends BaseIntrospector {
       `);
 
       const columns = columnsResult.rows.map((row) => ({
-        name: this.getString(row.column_name) || '',
-        table: this.getString(row.table_name) || '',
-        schema: this.getString(row.schema_name) || '',
-        database: this.getString(row.database_name) || '',
+        name: this.getString(row.name) || '',
+        table: this.getString(row.table) || '',
+        schema: this.getString(row.schema) || '',
+        database: this.getString(row.database) || '',
         position: this.parseNumber(row.position) || 0,
         dataType: this.getString(row.data_type) || '',
-        isNullable: this.parseBoolean(row.is_nullable),
+        isNullable: this.getString(row.is_nullable) === 'YES',
         defaultValue: this.getString(row.default_value),
         maxLength: this.parseNumber(row.max_length),
         precision: this.parseNumber(row.precision),
@@ -415,7 +433,7 @@ export class SQLServerIntrospector extends BaseIntrospector {
   }
 
   /**
-   * Get column statistics using UNION query approach
+   * Get column statistics using optimized CTE approach with single table scan
    */
   private async getColumnStatisticsForColumns(
     _database: string,
@@ -427,13 +445,9 @@ export class SQLServerIntrospector extends BaseIntrospector {
 
     if (columns.length === 0) return columnStatistics;
 
-    // Build UNION query with one SELECT per column, cast to text for compatibility
-    const unionClauses = columns.map((column) =>
-      this.buildColumnStatsClause(column, schema, table)
-    );
-
     try {
-      const statsQuery = unionClauses.join('\n\nUNION ALL\n');
+      // Build the optimized CTE-based query
+      const statsQuery = this.buildOptimizedColumnStatsQuery(schema, table, columns);
       const statsResult = await this.adapter.query(statsQuery);
 
       // Parse results - each row represents one column's statistics
@@ -443,8 +457,8 @@ export class SQLServerIntrospector extends BaseIntrospector {
             columnName: this.getString(row.column_name) || '',
             distinctCount: this.parseNumber(row.distinct_count),
             nullCount: this.parseNumber(row.null_count),
-            minValue: row.min_value,
-            maxValue: row.max_value,
+            minValue: this.getString(row.min_value),
+            maxValue: this.getString(row.max_value),
             sampleValues: this.getString(row.sample_values),
           });
         }
@@ -469,56 +483,115 @@ export class SQLServerIntrospector extends BaseIntrospector {
   }
 
   /**
-   * Build a single column statistics clause for UNION query
+   * Build optimized CTE-based query that scans the table only once
    */
-  private buildColumnStatsClause(column: Column, schema: string, table: string): string {
-    const columnName = column.name;
-    const isNumeric = this.isNumericType(column.dataType);
-    const isDate = this.isDateType(column.dataType);
+  private buildOptimizedColumnStatsQuery(schema: string, table: string, columns: Column[]): string {
+    const fullyQualifiedTable = `[${schema}].[${table}]`;
 
-    let unionClause = `
-      SELECT '${columnName}' AS column_name,
-             COUNT(DISTINCT [${columnName}]) AS distinct_count,
-             COUNT(*) - COUNT([${columnName}]) AS null_count`;
+    // Build raw_stats CTE with all column statistics in one scan
+    const rawStatsSelects = columns
+      .map((column) => {
+        const columnName = column.name;
+        const isNumeric = this.isNumericType(column.dataType);
+        const isDate = this.isDateType(column.dataType);
 
-    // Add min/max for numeric and date columns, cast to text for UNION compatibility
-    if (isNumeric) {
-      unionClause += `,
-             CAST(MIN([${columnName}]) AS NVARCHAR(MAX)) AS min_value,
-             CAST(MAX([${columnName}]) AS NVARCHAR(MAX)) AS max_value`;
-    } else if (isDate) {
-      unionClause += `,
-             CAST(MIN([${columnName}]) AS NVARCHAR(MAX)) AS min_value,
-             CAST(MAX([${columnName}]) AS NVARCHAR(MAX)) AS max_value`;
-    } else {
-      unionClause += `,
-             NULL AS min_value,
-             NULL AS max_value`;
-    }
+        let selectClause = `
+        COUNT(DISTINCT [${columnName}]) AS distinct_count_${this.sanitizeColumnName(columnName)},
+        SUM(CASE WHEN [${columnName}] IS NULL THEN 1 ELSE 0 END) AS null_count_${this.sanitizeColumnName(columnName)}`;
 
-    // Add sample values - get up to 20 distinct values, truncated and comma-separated
-    unionClause += `,
-             (
-               SELECT STRING_AGG(
-                 CASE 
+        if (isNumeric || isDate) {
+          selectClause += `,
+        MIN([${columnName}]) AS min_${this.sanitizeColumnName(columnName)},
+        MAX([${columnName}]) AS max_${this.sanitizeColumnName(columnName)}`;
+        }
+
+        return selectClause;
+      })
+      .join(',');
+
+    // Build sample_values CTE with UNION ALL for each column
+    const sampleValuesUnions = columns
+      .map((column) => {
+        const columnName = column.name;
+        return `
+    SELECT '${columnName}' AS column_name,
+           STRING_AGG(
+               CASE 
                    WHEN LEN(sample_val) > 100 
                    THEN LEFT(sample_val, 100) + '...'
                    ELSE sample_val
-                 END, 
-                 ','
-               ) WITHIN GROUP (ORDER BY sample_val)
-               FROM (
-                 SELECT DISTINCT TOP 20 CAST([${columnName}] AS NVARCHAR(MAX)) as sample_val
-                 FROM [${schema}].[${table}]
-                 WHERE [${columnName}] IS NOT NULL
-                 ORDER BY sample_val
-               ) samples
-             ) AS sample_values`;
+               END, 
+               ','
+           ) WITHIN GROUP (ORDER BY sample_val) AS sample_values
+    FROM (
+        SELECT DISTINCT TOP 20 CAST([${columnName}] AS NVARCHAR(MAX)) AS sample_val
+        FROM sample_data
+        WHERE [${columnName}] IS NOT NULL
+        ORDER BY sample_val
+    ) samples`;
+      })
+      .join('\n    UNION ALL');
 
-    unionClause += `
-      FROM [${schema}].[${table}]`;
+    // Build stats CTE with UNION ALL for each column
+    const statsUnions = columns
+      .map((column) => {
+        const columnName = column.name;
+        const sanitizedName = this.sanitizeColumnName(columnName);
+        const isNumeric = this.isNumericType(column.dataType);
+        const isDate = this.isDateType(column.dataType);
 
-    return unionClause;
+        let minMaxClause = 'NULL AS min_value,\n        NULL AS max_value';
+        if (isNumeric || isDate) {
+          minMaxClause = `CAST(rs.min_${sanitizedName} AS NVARCHAR(MAX)) AS min_value,
+        CAST(rs.max_${sanitizedName} AS NVARCHAR(MAX)) AS max_value`;
+        }
+
+        return `
+    SELECT
+        '${columnName}' AS column_name,
+        rs.distinct_count_${sanitizedName} AS distinct_count,
+        rs.null_count_${sanitizedName} AS null_count,
+        ${minMaxClause}
+    FROM raw_stats rs`;
+      })
+      .join('\n    UNION ALL');
+
+    // Combine all CTEs into final query
+    return `
+WITH raw_stats AS (
+    SELECT
+        ${rawStatsSelects}
+    FROM ${fullyQualifiedTable}
+),
+sample_data AS (
+    SELECT TOP 1000 * FROM ${fullyQualifiedTable} ORDER BY NEWID()
+),
+sample_values AS (
+    ${sampleValuesUnions}
+),
+stats AS (
+    ${statsUnions}
+)
+SELECT 
+    s.column_name,
+    s.distinct_count,
+    s.null_count,
+    s.min_value,
+    s.max_value,
+    sv.sample_values
+FROM stats s
+LEFT JOIN sample_values sv ON s.column_name = sv.column_name
+ORDER BY s.column_name`;
+  }
+
+  /**
+   * Sanitize column name for use in SQL aliases (replace special characters)
+   */
+  private sanitizeColumnName(columnName: string): string {
+    return columnName
+      .replace(/[^a-zA-Z0-9_]/g, '_')
+      .replace(/^(\d)/, '_$1') // Prefix with _ if starts with number
+      .toLowerCase();
   }
 
   /**

@@ -1,0 +1,196 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { CompanyResearchError } from '../../src/deep-research/types.js';
+import { FirecrawlService } from '../../src/services/firecrawl.js';
+
+interface MockFirecrawlApp {
+  deepResearch: ReturnType<typeof vi.fn>;
+  checkDeepResearchStatus: ReturnType<typeof vi.fn>;
+  scrapeUrl: ReturnType<typeof vi.fn>;
+}
+
+// Mock the FirecrawlApp
+vi.mock('@mendable/firecrawl-js', () => {
+  return {
+    default: vi.fn().mockImplementation(
+      (): MockFirecrawlApp => ({
+        deepResearch: vi.fn(),
+        checkDeepResearchStatus: vi.fn(),
+        scrapeUrl: vi.fn(),
+      })
+    ),
+  };
+});
+
+describe('FirecrawlService', () => {
+  let service: FirecrawlService;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // Set API key for tests
+    process.env.FIRECRAWL_API_KEY = 'test-api-key';
+  });
+
+  it('should create service with API key from environment', () => {
+    service = new FirecrawlService();
+    expect(service).toBeInstanceOf(FirecrawlService);
+  });
+
+  it('should create service with API key from config', () => {
+    service = new FirecrawlService({ apiKey: 'custom-api-key' });
+    expect(service).toBeInstanceOf(FirecrawlService);
+  });
+
+  it('should throw error when no API key is provided', () => {
+    process.env.FIRECRAWL_API_KEY = undefined;
+
+    expect(() => new FirecrawlService()).toThrow(CompanyResearchError);
+    expect(() => new FirecrawlService()).toThrow('Firecrawl API key is required');
+  });
+
+  describe('startDeepResearch', () => {
+    beforeEach(() => {
+      service = new FirecrawlService();
+    });
+
+    it('should start deep research with default options', async () => {
+      const mockResponse = { id: 'job-123' };
+      const mockApp = (service as unknown as { app: MockFirecrawlApp }).app;
+      mockApp.deepResearch.mockResolvedValue(mockResponse);
+
+      const jobId = await service.startDeepResearch('test query');
+
+      expect(jobId).toBe('job-123');
+      expect(mockApp.deepResearch).toHaveBeenCalledWith('test query', {
+        maxDepth: 5,
+        timeLimit: 180,
+        maxUrls: 10,
+      });
+    });
+
+    it('should start deep research with custom options', async () => {
+      const mockResponse = { data: { id: 'job-456' } };
+      const mockApp = (service as unknown as { app: MockFirecrawlApp }).app;
+      mockApp.deepResearch.mockResolvedValue(mockResponse);
+
+      const jobId = await service.startDeepResearch('test query', {
+        maxDepth: 3,
+        timeLimit: 120,
+        maxUrls: 5,
+      });
+
+      expect(jobId).toBe('job-456');
+      expect(mockApp.deepResearch).toHaveBeenCalledWith('test query', {
+        maxDepth: 3,
+        timeLimit: 120,
+        maxUrls: 5,
+      });
+    });
+
+    it('should throw error when no job ID is returned', async () => {
+      const mockResponse = {};
+      const mockApp = (service as unknown as { app: MockFirecrawlApp }).app;
+      mockApp.deepResearch.mockResolvedValue(mockResponse);
+
+      await expect(service.startDeepResearch('test query')).rejects.toThrow(CompanyResearchError);
+    });
+
+    it('should handle API errors', async () => {
+      const mockApp = (service as unknown as { app: MockFirecrawlApp }).app;
+      mockApp.deepResearch.mockRejectedValue(new Error('API Error'));
+
+      await expect(service.startDeepResearch('test query')).rejects.toThrow(CompanyResearchError);
+    });
+  });
+
+  describe('getJobStatus', () => {
+    beforeEach(() => {
+      service = new FirecrawlService();
+    });
+
+    it('should get job status', async () => {
+      const mockResponse = { status: 'completed', data: { result: 'test' } };
+      const mockApp = (service as unknown as { app: MockFirecrawlApp }).app;
+      mockApp.checkDeepResearchStatus.mockResolvedValue(mockResponse);
+
+      const status = await service.getJobStatus('job-123');
+
+      expect(status).toEqual(mockResponse);
+      expect(mockApp.checkDeepResearchStatus).toHaveBeenCalledWith('job-123');
+    });
+
+    it('should handle status check errors', async () => {
+      const mockApp = (service as unknown as { app: MockFirecrawlApp }).app;
+      mockApp.checkDeepResearchStatus.mockRejectedValue(new Error('Network Error'));
+
+      await expect(service.getJobStatus('job-123')).rejects.toThrow(CompanyResearchError);
+    });
+  });
+
+  describe('scrapeUrl', () => {
+    beforeEach(() => {
+      service = new FirecrawlService();
+    });
+
+    it('should scrape URL with default options', async () => {
+      const mockResponse = { data: 'scraped content' };
+      const mockApp = (service as unknown as { app: MockFirecrawlApp }).app;
+      mockApp.scrapeUrl.mockResolvedValue(mockResponse);
+
+      const result = await service.scrapeUrl('https://example.com');
+
+      expect(result).toEqual(mockResponse);
+      expect(mockApp.scrapeUrl).toHaveBeenCalledWith('https://example.com', {
+        formats: ['markdown'],
+        onlyMainContent: true,
+      });
+    });
+
+    it('should scrape URL with custom options', async () => {
+      const mockResponse = { data: 'scraped content' };
+      const mockApp = (service as unknown as { app: MockFirecrawlApp }).app;
+      mockApp.scrapeUrl.mockResolvedValue(mockResponse);
+
+      const result = await service.scrapeUrl('https://example.com', {
+        formats: ['html', 'markdown'],
+        onlyMainContent: false,
+      });
+
+      expect(result).toEqual(mockResponse);
+      expect(mockApp.scrapeUrl).toHaveBeenCalledWith('https://example.com', {
+        formats: ['html', 'markdown'],
+        onlyMainContent: false,
+      });
+    });
+
+    it('should handle scraping errors', async () => {
+      const mockApp = (service as unknown as { app: MockFirecrawlApp }).app;
+      mockApp.scrapeUrl.mockRejectedValue(new Error('Scraping failed'));
+
+      await expect(service.scrapeUrl('https://example.com')).rejects.toThrow(CompanyResearchError);
+    });
+  });
+
+  describe('validateUrl', () => {
+    beforeEach(() => {
+      service = new FirecrawlService();
+    });
+
+    it('should return true for valid accessible URL', async () => {
+      const mockApp = (service as unknown as { app: MockFirecrawlApp }).app;
+      mockApp.scrapeUrl.mockResolvedValue({ data: 'content' });
+
+      const isValid = await service.validateUrl('https://example.com');
+
+      expect(isValid).toBe(true);
+    });
+
+    it('should return false for inaccessible URL', async () => {
+      const mockApp = (service as unknown as { app: MockFirecrawlApp }).app;
+      mockApp.scrapeUrl.mockRejectedValue(new Error('Not accessible'));
+
+      const isValid = await service.validateUrl('https://invalid.com');
+
+      expect(isValid).toBe(false);
+    });
+  });
+});
