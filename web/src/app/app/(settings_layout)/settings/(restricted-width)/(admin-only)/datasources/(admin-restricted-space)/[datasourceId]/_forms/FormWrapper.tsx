@@ -22,20 +22,13 @@ export interface BusterFormApi {
     isDirty: boolean;
   };
   AppForm: React.ComponentType<{ children?: React.ReactNode }>;
-  AppField: React.ComponentType<FieldComponentProps>;
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  AppField: any;
   SubscribeButton: React.ComponentType<{
     submitLabel: string;
     disableIfNotChanged?: boolean;
     useResetButton?: boolean;
   }>;
-}
-
-// Field interface representing what's available inside the field prop
-interface FieldInterface {
-  TextField: React.FC<FieldComponentProps>;
-  NumberField: React.FC<FieldComponentProps>;
-  PasswordField: React.FC<FieldComponentProps>;
-  name: string;
 }
 
 // Use a typed approach for the form

@@ -2,7 +2,7 @@ export const createAutoSaveId = (id: string) => `app-splitter-${id}`;
 
 import Cookies from 'js-cookie';
 
-export const setAppSplitterCookie = (key: string, value: string | number | boolean | null) => {
+export const setAppSplitterCookie = (key: string, value: string[]) => {
   Cookies.set(key, JSON.stringify(value), {
     expires: 365,
     secure: true,

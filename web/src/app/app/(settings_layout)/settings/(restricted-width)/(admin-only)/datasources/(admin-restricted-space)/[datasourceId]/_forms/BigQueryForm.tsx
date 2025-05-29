@@ -12,7 +12,7 @@ import {
 } from '@/api/buster_rest/data_source';
 import { useAppForm } from '@/components/ui/form/useFormBaseHooks';
 import type React from 'react';
-import { FormWrapper } from './FormWrapper';
+import { type BusterFormApi, FormWrapper } from './FormWrapper';
 import { useDataSourceFormSuccess } from './helpers';
 
 export const BigQueryForm: React.FC<{

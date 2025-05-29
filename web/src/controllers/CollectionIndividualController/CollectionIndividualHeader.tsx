@@ -5,7 +5,7 @@ import { useDeleteCollection, useUpdateCollection } from '@/api/buster_rest/coll
 import { ShareMenu } from '@/components/features/ShareMenu';
 import { ShareCollectionButton } from '@/components/features/buttons/ShareMenuCollectionButton';
 import { FavoriteStar, useFavoriteStar } from '@/components/features/list/FavoriteStar';
-import { Breadcrumb, type BreadcrumbItem } from '@/components/ui/breadcrumb';
+import { Breadcrumb, type BreadcrumbItemType } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/buttons';
 import { Dropdown, type DropdownItems } from '@/components/ui/dropdown';
 import { Dots, Pencil, Plus, ShareAllRight, ShareRight, Trash } from '@/components/ui/icons';
@@ -163,7 +163,7 @@ const CollectionBreadcrumb: React.FC<{
 }> = React.memo(({ collectionName }) => {
   const collectionBaseTitle = 'Collections';
 
-  const items: BreadcrumbItem[] = useMemo(
+  const items: BreadcrumbItemType[] = useMemo(
     () => [
       {
         label: collectionBaseTitle,

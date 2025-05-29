@@ -89,7 +89,7 @@ export const scatterSeriesBuilder_data = ({
           acc.push({
             x: getScatterXValue({
               isXAxisDate,
-              xValue: dataset.ticksForScatter?.[index][0]
+              xValue: dataset.ticksForScatter?.[index][0] ?? null
             }),
             y: yData,
             originalR: dataset.sizeData?.[index] ?? 0

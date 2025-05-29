@@ -3,7 +3,7 @@
 import type { BusterCollectionListItem } from '@/api/asset_interfaces/collection';
 import { useGetCollection } from '@/api/buster_rest/collections';
 import type { collectionsGetList } from '@/api/buster_rest/collections/requests';
-import { Breadcrumb, type BreadcrumbItem } from '@/components/ui/breadcrumb';
+import { Breadcrumb, type BreadcrumbItemType } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/buttons';
 import { Plus } from '@/components/ui/icons';
 import { AppSegmented } from '@/components/ui/segmented';
@@ -11,8 +11,6 @@ import type { SegmentedItem } from '@/components/ui/segmented';
 import { AppTooltip } from '@/components/ui/tooltip';
 import { useMemoizedFn } from '@/hooks';
 import { BusterRoutes } from '@/routes';
-import isEmpty from 'lodash/isEmpty';
-import omit from 'lodash/omit';
 import React, { useMemo } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
@@ -42,7 +40,7 @@ export const CollectionListHeader: React.FC<{
     const collectionTitle = collection?.name || 'Collections';
     const showFilters = true;
 
-    const breadcrumbItems: BreadcrumbItem[] = useMemo(
+    const breadcrumbItems: BreadcrumbItemType[] = useMemo(
       () => [
         {
           label: collectionTitle,

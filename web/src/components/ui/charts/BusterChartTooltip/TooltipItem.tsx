@@ -42,9 +42,9 @@ const TooltipItemValue: React.FC<{
   if (values.length > 1 || isScatter) {
     return (
       <div className="grid grid-cols-[auto_auto] items-center gap-x-5 px-3">
-        {values.map((value) => (
+        {values.map((value, index) => (
           <GroupTooltipValue
-            key={value.id}
+            key={index}
             label={value.formattedLabel}
             value={chooseValue(value.formattedValue, value.formattedPercentage)}
           />

@@ -2,7 +2,7 @@
 
 import { useIndividualDataset } from '@/api/buster_rest';
 import { NewDatasetModal } from '@/components/features/modal/NewDatasetModal';
-import { Breadcrumb, type BreadcrumbItem } from '@/components/ui/breadcrumb';
+import { Breadcrumb, type BreadcrumbItemType } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/buttons';
 import { Plus } from '@/components/ui/icons';
 import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
@@ -25,7 +25,7 @@ export const DatasetHeader: React.FC<{
     const { dataset } = useIndividualDataset({ datasetId });
     const datasetTitle = dataset?.data?.name || 'Datasets';
 
-    const breadcrumbItems: BreadcrumbItem[] = useMemo(
+    const breadcrumbItems: BreadcrumbItemType[] = useMemo(
       () => [
         {
           label: datasetTitle,
