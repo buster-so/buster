@@ -13,8 +13,8 @@ import {
   InfiniteListContainer
 } from '@/components/ui/list';
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
-import { BusterRoutes, createBusterRoute } from '@/routes';
 import { useMemoizedFn } from '@/hooks';
+import { BusterRoutes, createBusterRoute } from '@/routes';
 import React, { useMemo, useState } from 'react';
 import { DatasetGroupPermissionGroupSelectedPopup } from './DatasetGroupPermissionGroupSelectedPopup';
 

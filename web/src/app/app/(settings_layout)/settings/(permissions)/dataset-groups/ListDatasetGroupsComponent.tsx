@@ -1,3 +1,4 @@
+import type { DatasetGroup } from '@/api/asset_interfaces';
 import {
   type BusterListColumn,
   type BusterListRowItem,
@@ -5,9 +6,8 @@ import {
   InfiniteListContainer
 } from '@/components/ui/list';
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
-import React, { useMemo } from 'react';
-import type { DatasetGroup } from '@/api/asset_interfaces';
 import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
+import React, { useMemo } from 'react';
 
 export const ListDatasetGroupsComponent: React.FC<{
   datasetGroups: DatasetGroup[];

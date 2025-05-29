@@ -1,11 +1,11 @@
 'use client';
 
-import React from 'react';
 import { useGetUser } from '@/api/buster_rest';
-import { UserDefaultAccess } from './UserDefaultAccess';
 import { useUserConfigContextSelector } from '@/context/Users';
-import { UserLineageHeader } from './UserLineageHeader';
+import React from 'react';
 import { UserDatasetSearch } from './UserDatasetSearch';
+import { UserDefaultAccess } from './UserDefaultAccess';
+import { UserLineageHeader } from './UserLineageHeader';
 
 export const UserOverviewController = React.memo(({ userId }: { userId: string }) => {
   const { data: user, refetch: refetchUser } = useGetUser({ userId });

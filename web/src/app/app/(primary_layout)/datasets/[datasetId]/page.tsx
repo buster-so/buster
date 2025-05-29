@@ -1,6 +1,6 @@
-import React from 'react';
-import { permanentRedirect } from 'next/navigation';
 import { BusterRoutes, createBusterRoute } from '@/routes';
+import { permanentRedirect } from 'next/navigation';
+import React from 'react';
 
 export default async function DatasetPage(props: { params: Promise<{ datasetId: string }> }) {
   const params = await props.params;

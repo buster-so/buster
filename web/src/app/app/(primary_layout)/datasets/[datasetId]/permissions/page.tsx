@@ -1,5 +1,5 @@
-import { permanentRedirect } from 'next/navigation';
 import { BusterRoutes, createBusterRoute } from '@/routes';
+import { permanentRedirect } from 'next/navigation';
 
 export default async function Page(props: { params: Promise<{ datasetId: string }> }) {
   const params = await props.params;

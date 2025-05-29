@@ -2,18 +2,18 @@
 
 import type { ListPermissionGroupsResponse } from '@/api/asset_interfaces';
 import { useDatasetUpdatePermissionGroups } from '@/api/buster_rest/datasets';
+import { PermissionAssignedCell } from '@/components/features/PermissionComponents';
 import {
   type BusterListColumn,
   type BusterListRowItem,
   EmptyStateList
 } from '@/components/ui/list';
+import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
+import { InfiniteListContainer } from '@/components/ui/list/InfiniteListContainer';
+import { Text } from '@/components/ui/typography';
 import { useMemoizedFn } from '@/hooks';
 import React, { useMemo, useState } from 'react';
 import { PermissionGroupSelectedPopup } from './PermissionGroupSelectedPopup';
-import { InfiniteListContainer } from '@/components/ui/list/InfiniteListContainer';
-import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
-import { PermissionAssignedCell } from '@/components/features/PermissionComponents';
-import { Text } from '@/components/ui/typography';
 
 export const PermissionListPermissionGroupContainer: React.FC<{
   filteredPermissionGroups: ListPermissionGroupsResponse[];

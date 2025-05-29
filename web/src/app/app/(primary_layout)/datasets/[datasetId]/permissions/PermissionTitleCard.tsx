@@ -1,5 +1,5 @@
+import { Text, Title } from '@/components/ui/typography';
 import React from 'react';
-import { Title, Text } from '@/components/ui/typography';
 
 export const PermissionTitleCard: React.FC = React.memo(() => {
   return (

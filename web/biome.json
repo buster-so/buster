@@ -24,7 +24,8 @@
     "rules": {
       "recommended": true,
       "correctness": {
-        "useExhaustiveDependencies": "off"
+        "useExhaustiveDependencies": "off",
+        "noChildrenProp": "off"
       },
       "a11y": {
         "useKeyWithClickEvents": "off"

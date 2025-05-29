@@ -1,7 +1,7 @@
 'use client';
 
-import { useUpdateUserDatasetGroups } from '@/api/buster_rest';
 import type { BusterUserDatasetGroup } from '@/api/asset_interfaces';
+import { useUpdateUserDatasetGroups } from '@/api/buster_rest';
 import { PermissionAssignedCell } from '@/components/features/PermissionComponents';
 import {
   type BusterListColumn,
@@ -10,12 +10,12 @@ import {
   InfiniteListContainer
 } from '@/components/ui/list';
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
-import { BusterRoutes, createBusterRoute } from '@/routes';
+import { Text } from '@/components/ui/typography';
 import { useMemoizedFn } from '@/hooks';
+import { BusterRoutes, createBusterRoute } from '@/routes';
+import pluralize from 'pluralize';
 import React, { useMemo, useState } from 'react';
 import { UserDatasetGroupSelectedPopup } from './UserDatasetGroupSelectedPopup';
-import pluralize from 'pluralize';
-import { Text } from '@/components/ui/typography';
 
 export const UserDatasetGroupListContainer: React.FC<{
   filteredDatasetGroups: BusterUserDatasetGroup[];

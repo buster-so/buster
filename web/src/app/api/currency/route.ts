@@ -1,8 +1,8 @@
 'use server';
 
+import { getSupabaseUserContext } from '@/lib/supabase';
 import { type NextRequest, NextResponse } from 'next/server';
 import { codeToFlag } from './_codeToFlag';
-import { getSupabaseUserContext } from '@/lib/supabase';
 
 export async function GET(request: NextRequest) {
   // Check if user is authenticated

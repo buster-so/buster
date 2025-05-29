@@ -1,6 +1,7 @@
 'use client';
 
 import type { OrganizationUser } from '@/api/asset_interfaces/users';
+import { ListUserItem } from '@/components/features/list/ListUserItem';
 import {
   type BusterListColumn,
   type BusterListRowItem,
@@ -8,11 +9,10 @@ import {
   InfiniteListContainer
 } from '@/components/ui/list';
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
-import { ListUserItem } from '@/components/features/list/ListUserItem';
-import React, { useMemo } from 'react';
 import { Text } from '@/components/ui/typography';
-import { OrganizationUserRoleText } from './config';
 import { BusterRoutes, createBusterRoute } from '@/routes';
+import React, { useMemo } from 'react';
+import { OrganizationUserRoleText } from './config';
 
 export const ListUsersComponent: React.FC<{
   users: OrganizationUser[];

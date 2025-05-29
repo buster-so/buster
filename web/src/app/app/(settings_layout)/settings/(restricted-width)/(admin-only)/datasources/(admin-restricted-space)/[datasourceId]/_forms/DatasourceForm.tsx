@@ -1,15 +1,15 @@
 'use client';
 
 import type { DataSource } from '@/api/asset_interfaces';
-import { PulseLoader } from '@/components/ui/loaders';
-import { AppDataSourceIcon } from '@/components/ui/icons/AppDataSourceIcons';
-import { formatDate } from '@/lib';
+import { useDeleteDatasource, useGetDatasource } from '@/api/buster_rest/data_source';
 import { Dropdown, type DropdownItems } from '@/components/ui/dropdown';
+import { Trash } from '@/components/ui/icons';
+import { AppDataSourceIcon } from '@/components/ui/icons/AppDataSourceIcons';
+import { PulseLoader } from '@/components/ui/loaders';
+import { Text, Title } from '@/components/ui/typography';
+import { formatDate } from '@/lib';
 import type React from 'react';
 import { DataSourceFormContent } from './DatasourceFormContent';
-import { Title, Text } from '@/components/ui/typography';
-import { Trash } from '@/components/ui/icons';
-import { useDeleteDatasource, useGetDatasource } from '@/api/buster_rest/data_source';
 
 export const DatasourceForm: React.FC<{ datasourceId: string }> = ({ datasourceId }) => {
   const { data: dataSource, isFetched: isFetchedDataSource } = useGetDatasource(datasourceId);

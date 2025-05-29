@@ -26,10 +26,9 @@ export const useGetMetricDataMemoized = () => {
   const { selectedVersionNumber, latestVersionNumber } = useGetMetricVersionNumber();
   const getMetricDataMemoized = useMemoizedFn(
     (metricId: string, versionNumberProp?: number): IBusterMetricData | undefined => {
-      const options = queryKeys.metricsGetData(
-        metricId,
-        versionNumberProp || selectedVersionNumber || latestVersionNumber!
-      );
+      const versionNumber = versionNumberProp ?? selectedVersionNumber ?? latestVersionNumber;
+      if (versionNumber == null) return undefined;
+      const options = queryKeys.metricsGetData(metricId, versionNumber);
       const data = queryClient.getQueryData(options.queryKey);
       return data;
     }

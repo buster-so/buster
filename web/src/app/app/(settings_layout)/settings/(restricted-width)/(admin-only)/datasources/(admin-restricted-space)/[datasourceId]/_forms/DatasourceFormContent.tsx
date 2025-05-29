@@ -1,15 +1,15 @@
 'use client';
 
-import { DatabaseNames, type DataSource, type DataSourceTypes } from '@/api/asset_interfaces';
-import React from 'react';
-import { PostgresForm } from './PostgresForm';
-import { MySqlForm } from './MySqlForm';
-import { BigQueryForm } from './BigQueryForm';
-import { SnowflakeForm } from './SnowflakeForm';
-import { RedshiftForm } from './RedshiftForm';
-import { DataBricksForm } from './DataBricksForm';
-import { SqlServerForm } from './SqlServerForm';
+import { type DataSource, type DataSourceTypes, DatabaseNames } from '@/api/asset_interfaces';
 import { Text } from '@/components/ui/typography';
+import React from 'react';
+import { BigQueryForm } from './BigQueryForm';
+import { DataBricksForm } from './DataBricksForm';
+import { MySqlForm } from './MySqlForm';
+import { PostgresForm } from './PostgresForm';
+import { RedshiftForm } from './RedshiftForm';
+import { SnowflakeForm } from './SnowflakeForm';
+import { SqlServerForm } from './SqlServerForm';
 
 const FormRecord: Record<
   DataSourceTypes,

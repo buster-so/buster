@@ -1,14 +1,14 @@
 'use server';
 
-import type React from 'react';
+import { prefetchGetMyUserInfo } from '@/api/buster_rest';
+import { queryKeys } from '@/api/query_keys';
+import { AppProviders } from '@/context/AppProviders';
+import { getSupabaseUserContext } from '@/lib/supabase';
 import { createBusterRoute } from '@/routes';
 import { BusterRoutes } from '@/routes/busterRoutes';
-import { ClientRedirect } from '../../components/ui/layouts/ClientRedirect';
-import { prefetchGetMyUserInfo } from '@/api/buster_rest';
-import { getSupabaseUserContext } from '@/lib/supabase';
-import { AppProviders } from '@/context/AppProviders';
 import { headers } from 'next/headers';
-import { queryKeys } from '@/api/query_keys';
+import type React from 'react';
+import { ClientRedirect } from '../../components/ui/layouts/ClientRedirect';
 
 const newUserRoute = createBusterRoute({ route: BusterRoutes.NEW_USER });
 const loginRoute = createBusterRoute({ route: BusterRoutes.AUTH_LOGIN });

@@ -1,7 +1,7 @@
 'use client';
 
-import { useUpdateUserPermissionGroups } from '@/api/buster_rest';
 import type { BusterUserPermissionGroup } from '@/api/asset_interfaces';
+import { useUpdateUserPermissionGroups } from '@/api/buster_rest';
 import { PermissionAssignedCell } from '@/components/features/PermissionComponents';
 import {
   type BusterListColumn,
@@ -10,12 +10,12 @@ import {
   InfiniteListContainer
 } from '@/components/ui/list';
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
-import { BusterRoutes, createBusterRoute } from '@/routes';
+import { Text } from '@/components/ui/typography';
 import { useMemoizedFn } from '@/hooks';
+import { BusterRoutes, createBusterRoute } from '@/routes';
+import pluralize from 'pluralize';
 import React, { useMemo, useState } from 'react';
 import { UserPermissionGroupSelectedPopup } from './UserPermissionGroupSelectedPopup';
-import pluralize from 'pluralize';
-import { Text } from '@/components/ui/typography';
 
 export const UserPermissionGroupsListContainer: React.FC<{
   filteredPermissionGroups: BusterUserPermissionGroup[];

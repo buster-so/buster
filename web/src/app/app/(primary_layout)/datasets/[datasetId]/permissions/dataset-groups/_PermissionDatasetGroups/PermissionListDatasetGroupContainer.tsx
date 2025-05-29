@@ -2,6 +2,7 @@
 
 import type { ListDatasetGroupsResponse } from '@/api/asset_interfaces';
 import { useDatasetUpdateDatasetGroups } from '@/api/buster_rest';
+import { PermissionAssignedCell } from '@/components/features/PermissionComponents';
 import {
   type BusterListColumn,
   type BusterListRowItem,
@@ -9,12 +10,11 @@ import {
   InfiniteListContainer
 } from '@/components/ui/list';
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
+import { Text } from '@/components/ui/typography';
 import { useMemoizedFn } from '@/hooks';
 import type React from 'react';
 import { useMemo, useState } from 'react';
 import { PermissionDatasetGroupSelectedPopup } from './PermissionDatasetGroupSelectedPopup';
-import { PermissionAssignedCell } from '@/components/features/PermissionComponents';
-import { Text } from '@/components/ui/typography';
 
 export const PermissionListDatasetGroupContainer: React.FC<{
   filteredDatasetGroups: ListDatasetGroupsResponse[];

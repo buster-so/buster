@@ -1,23 +1,23 @@
 'use client';
 
-import React from 'react';
-import { SettingsPageHeader } from '../../_components/SettingsPageHeader';
-import { useDebounceSearch } from '@/hooks/useDebounceSearch';
 import { useGetOrganizationUsers } from '@/api/buster_rest';
-import { useUserConfigContextSelector } from '@/context/Users';
-import { ListUsersComponent } from './ListUsersComponent';
 import { PermissionSearch } from '@/components/features/PermissionComponents';
-import { useInviteModalStore } from '@/context/BusterAppLayout';
 import { InvitePeopleModal } from '@/components/features/modal/InvitePeopleModal';
-import { useMemoizedFn } from '@/hooks';
 import { Button } from '@/components/ui/buttons';
 import { Plus } from '@/components/ui/icons';
+import { useInviteModalStore } from '@/context/BusterAppLayout';
+import { useUserConfigContextSelector } from '@/context/Users';
+import { useMemoizedFn } from '@/hooks';
+import { useDebounceSearch } from '@/hooks/useDebounceSearch';
+import React from 'react';
+import { SettingsPageHeader } from '../../_components/SettingsPageHeader';
+import { ListUsersComponent } from './ListUsersComponent';
 
 export default function Page() {
   const userOrganization = useUserConfigContextSelector((x) => x.userOrganizations);
   const onToggleInviteModal = useInviteModalStore((s) => s.onToggleInviteModal);
   const openInviteModal = useInviteModalStore((s) => s.openInviteModal);
-  const firstOrganizationId = userOrganization?.id! || '';
+  const firstOrganizationId = userOrganization?.id || '';
   const { data: users, isFetched } = useGetOrganizationUsers(firstOrganizationId);
 
   const { filteredItems, handleSearchChange, searchText } = useDebounceSearch({

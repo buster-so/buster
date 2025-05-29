@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
 import { ResetEmailForm } from '@/components/features/auth/ResetEmailForm';
 import { resetPasswordEmailSend } from '@/lib/supabase/resetPassword';
 import { useSearchParams } from 'next/navigation';
+import React from 'react';
 
 export default function ResetPassword() {
   const searchParams = useSearchParams();

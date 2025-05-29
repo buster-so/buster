@@ -1,10 +1,10 @@
 'use client';
 
+import { Separator } from '@/components/ui/seperator';
 import React from 'react';
 import { useDatasetPageContextSelector } from '../_DatasetsLayout/DatasetPageContext';
-import { OverviewHeader } from './OverviewHeader';
 import { OverviewData } from './OverviewData';
-import { Separator } from '@/components/ui/seperator';
+import { OverviewHeader } from './OverviewHeader';
 
 export default function Page() {
   const datasetRes = useDatasetPageContextSelector((state) => state.dataset);

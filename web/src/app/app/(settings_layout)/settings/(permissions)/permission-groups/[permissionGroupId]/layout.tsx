@@ -1,6 +1,6 @@
-import type React from 'react';
 import { prefetchPermissionGroup } from '@/api/buster_rest';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
+import type React from 'react';
 import { PermissionGroupIndividualLayout } from './_PermissionGroupIndividualLayout';
 
 export default async function Layout(props: {

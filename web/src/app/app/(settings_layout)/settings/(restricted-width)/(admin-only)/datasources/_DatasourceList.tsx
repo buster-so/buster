@@ -1,18 +1,18 @@
 'use client';
 
-import React from 'react';
-import { AppDataSourceIcon } from '@/components/ui/icons/AppDataSourceIcons';
 import type { DataSourceListItem } from '@/api/asset_interfaces';
-import Link from 'next/link';
-import { BusterRoutes, createBusterRoute } from '@/routes';
-import { Text } from '@/components/ui/typography';
-import { useUserConfigContextSelector } from '@/context/Users';
+import { useDeleteDatasource, useListDatasources } from '@/api/buster_rest/data_source';
 import { Button } from '@/components/ui/buttons';
 import { Dropdown, type DropdownItems } from '@/components/ui/dropdown';
-import { Plus, Dots, Trash } from '@/components/ui/icons';
-import { cn } from '@/lib/classMerge';
-import { useDeleteDatasource, useListDatasources } from '@/api/buster_rest/data_source';
+import { Dots, Plus, Trash } from '@/components/ui/icons';
+import { AppDataSourceIcon } from '@/components/ui/icons/AppDataSourceIcons';
 import { ListEmptyStateWithButton } from '@/components/ui/list';
+import { Text } from '@/components/ui/typography';
+import { useUserConfigContextSelector } from '@/context/Users';
+import { cn } from '@/lib/classMerge';
+import { BusterRoutes, createBusterRoute } from '@/routes';
+import Link from 'next/link';
+import React from 'react';
 
 export const DatasourceList: React.FC = () => {
   const isAdmin = useUserConfigContextSelector((x) => x.isAdmin);

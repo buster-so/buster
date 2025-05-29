@@ -1,9 +1,9 @@
-import type React from 'react';
-import { DatasetGroupTitleAndDescription } from './DatasetGroupTitleAndDescription';
 import { prefetchDatasetGroup } from '@/api/buster_rest';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
-import { DatasetGroupBackButton } from './DatasetGroupBackButton';
+import type React from 'react';
 import { DatasetGroupAppSegments } from './DatasetGroupAppSegments';
+import { DatasetGroupBackButton } from './DatasetGroupBackButton';
+import { DatasetGroupTitleAndDescription } from './DatasetGroupTitleAndDescription';
 
 export default async function Layout(props: {
   children: React.ReactNode;

@@ -1,3 +1,4 @@
+import type { ListPermissionGroupsResponse } from '@/api/asset_interfaces';
 import {
   type BusterListColumn,
   type BusterListRowItem,
@@ -5,9 +6,8 @@ import {
   InfiniteListContainer
 } from '@/components/ui/list';
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
-import React, { useMemo } from 'react';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import type { ListPermissionGroupsResponse } from '@/api/asset_interfaces';
+import React, { useMemo } from 'react';
 
 export const ListPermissionGroupsComponent: React.FC<{
   permissionGroups: ListPermissionGroupsResponse[];

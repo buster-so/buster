@@ -1,7 +1,7 @@
-import React from 'react';
-import { Title, Text } from '@/components/ui/typography';
-import { Avatar } from '@/components/ui/avatar';
 import type { OrganizationUser } from '@/api/asset_interfaces';
+import { Avatar } from '@/components/ui/avatar';
+import { Text, Title } from '@/components/ui/typography';
+import React from 'react';
 
 export const UserHeader = React.memo(({ user }: { user: OrganizationUser }) => {
   return (

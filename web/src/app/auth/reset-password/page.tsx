@@ -1,10 +1,10 @@
-import React from 'react';
-import { redirect } from 'next/navigation';
-import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
 import { getMyUserInfo_server } from '@/api/buster_rest';
 import { ResetPasswordForm } from '@/components/features/auth/ResetPasswordForm';
-import { resetPassword } from '@/lib/supabase/resetPassword';
 import { getSupabaseUserContext } from '@/lib/supabase';
+import { resetPassword } from '@/lib/supabase/resetPassword';
+import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
+import { redirect } from 'next/navigation';
+import React from 'react';
 
 export default async function ResetPassword() {
   const { user, accessToken } = await getSupabaseUserContext();

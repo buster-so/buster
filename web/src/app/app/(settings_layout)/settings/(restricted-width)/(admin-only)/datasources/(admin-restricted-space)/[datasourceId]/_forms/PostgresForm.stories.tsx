@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { PostgresForm } from './PostgresForm';
-import { fn } from '@storybook/test';
 import { type DataSource, DataSourceTypes, PostgresCredentials } from '@/api/asset_interfaces';
+import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
+import { PostgresForm } from './PostgresForm';
 
 // Sample DataSource for the story
 const sampleDataSource: DataSource = {

@@ -3,15 +3,15 @@ import {
   type SQLServerCredentials,
   SQLServerCredentialsSchema
 } from '@/api/asset_interfaces';
-import type React from 'react';
-import { FormWrapper } from './FormWrapper';
 import {
   type createSQLServerDataSource,
   useCreateSQLServerDataSource,
   useUpdateSQLServerDataSource
 } from '@/api/buster_rest/data_source';
-import { useAppForm } from '@/components/ui/form/useFormBaseHooks';
 import { MultipleInlineFields } from '@/components/ui/form/FormBase';
+import { useAppForm } from '@/components/ui/form/useFormBaseHooks';
+import type React from 'react';
+import { FormWrapper } from './FormWrapper';
 import { useDataSourceFormSuccess } from './helpers';
 
 export const SqlServerForm: React.FC<{
@@ -39,7 +39,7 @@ export const SqlServerForm: React.FC<{
       await dataSourceFormSubmit({
         flow,
         dataSourceId: dataSource?.id,
-        onUpdate: () => updateDataSource({ id: dataSource!.id, ...value }),
+        onUpdate: () => updateDataSource({ id: dataSource?.id || '', ...value }),
         onCreate: () => createDataSource(value)
       });
     },

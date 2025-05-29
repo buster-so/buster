@@ -1,16 +1,16 @@
 'use client';
 
-import React, { useMemo, useRef } from 'react';
-import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
-import { PermissionApps } from './config';
-import { useMemoizedFn, useSet } from '@/hooks';
-import { Separator } from '@/components/ui/seperator';
 import {
   useDatasetListDatasetGroups,
   useDatasetListPermissionGroups,
   useDatasetListPermissionUsers
 } from '@/api/buster_rest';
+import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
+import { Separator } from '@/components/ui/seperator';
+import { useMemoizedFn, useSet } from '@/hooks';
 import { BusterRoutes, createBusterRoute } from '@/routes';
+import React, { useMemo, useRef } from 'react';
+import { PermissionApps } from './config';
 
 export const PermissionAppSegments: React.FC<{
   datasetId: string;

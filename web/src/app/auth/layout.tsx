@@ -1,6 +1,6 @@
+import type { Metadata } from 'next';
 import type React from 'react';
 import type { PropsWithChildren } from 'react';
-import type { Metadata } from 'next';
 import { WelcomeToBuster } from '../../components/features/auth/WelcomeSidebar';
 
 export const metadata: Metadata = {

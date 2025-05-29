@@ -18,7 +18,7 @@ import { useUserConfigContextSelector } from '@/context/Users';
 import { useContactSupportModalStore } from '@/context/BusterAppLayout';
 import { useSignOut } from '@/components/features/auth/SignOutHandler';
 
-export const SidebarUserFooter: React.FC<{}> = () => {
+export const SidebarUserFooter: React.FC = () => {
   const user = useUserConfigContextSelector((x) => x.user);
   const handleSignOut = useSignOut();
   if (!user) return null;

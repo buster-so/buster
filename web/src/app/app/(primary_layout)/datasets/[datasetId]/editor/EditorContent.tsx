@@ -1,17 +1,17 @@
 'use client';
 
+import type { IDataResult } from '@/api/asset_interfaces';
+import { useRunSQL } from '@/api/buster_rest';
+import { AppVerticalCodeSplitter } from '@/components/features/layouts/AppVerticalCodeSplitter';
+import type { AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
+import { useMemoizedFn, useRequest } from '@/hooks';
+import { cn } from '@/lib/classMerge';
+import isEmpty from 'lodash/isEmpty';
 import type React from 'react';
 import { useMemo, useRef, useState } from 'react';
-import { useMemoizedFn, useRequest } from '@/hooks';
-import type { IDataResult } from '@/api/asset_interfaces';
+import { useDatasetPageContextSelector } from '../_DatasetsLayout/DatasetPageContext';
 import { EditorApps, EditorContainerSubHeader } from './EditorContainerSubHeader';
 import { MetadataContainer } from './MetadataContainer';
-import { useRunSQL } from '@/api/buster_rest';
-import isEmpty from 'lodash/isEmpty';
-import type { AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
-import { useDatasetPageContextSelector } from '../_DatasetsLayout/DatasetPageContext';
-import { AppVerticalCodeSplitter } from '@/components/features/layouts/AppVerticalCodeSplitter';
-import { cn } from '@/lib/classMerge';
 
 export const EditorContent: React.FC<{
   defaultLayout: [string, string];
@@ -35,10 +35,13 @@ export const EditorContent: React.FC<{
 
   const { runAsync: runQuery, loading: fetchingTempData } = useRequest(
     async () => {
-      const res = await runSQLMutation({ data_source_id: dataset?.data_source_id!, sql });
-      const data = res.data;
-      setTempData(data);
-      return data;
+      if (dataset?.data_source_id) {
+        const res = await runSQLMutation({ data_source_id: dataset.data_source_id, sql });
+        const data = res.data;
+        setTempData(data);
+        return data;
+      }
+      return [];
     },
     { manual: true }
   );

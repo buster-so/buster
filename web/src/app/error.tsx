@@ -6,7 +6,7 @@ import { useEffect } from 'react';
 
 // Error boundaries must be Client Components
 
-export default function Error({
+export default function ErrorBoundary({
   error,
   reset
 }: {

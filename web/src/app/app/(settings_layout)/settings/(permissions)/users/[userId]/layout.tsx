@@ -1,7 +1,7 @@
-import type React from 'react';
-import { UsersBackButton } from './_LayoutHeaderAndSegment';
 import { prefetchGetUser } from '@/api/buster_rest';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
+import type React from 'react';
+import { UsersBackButton } from './_LayoutHeaderAndSegment';
 import { LayoutHeaderAndSegment } from './_LayoutHeaderAndSegment';
 
 export default async function Layout(props: {

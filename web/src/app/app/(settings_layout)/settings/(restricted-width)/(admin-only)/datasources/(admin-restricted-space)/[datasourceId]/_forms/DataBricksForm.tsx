@@ -3,14 +3,14 @@ import {
   type DatabricksCredentials,
   DatabricksCredentialsSchema
 } from '@/api/asset_interfaces';
-import type React from 'react';
-import { FormWrapper } from './FormWrapper';
 import {
   type createDatabricksDataSource,
   useCreateDatabricksDataSource,
   useUpdateDatabricksDataSource
 } from '@/api/buster_rest/data_source';
 import { useAppForm } from '@/components/ui/form/useFormBaseHooks';
+import type React from 'react';
+import { FormWrapper } from './FormWrapper';
 import { useDataSourceFormSuccess } from './helpers';
 
 export const DataBricksForm: React.FC<{
@@ -37,7 +37,7 @@ export const DataBricksForm: React.FC<{
       await dataSourceFormSubmit({
         flow,
         dataSourceId: dataSource?.id,
-        onUpdate: () => updateDataSource({ id: dataSource!.id, ...value }),
+        onUpdate: () => updateDataSource({ id: dataSource?.id || '', ...value }),
         onCreate: () => createDataSource(value)
       });
     },

@@ -3,20 +3,20 @@ import {
   type BusterUser,
   type OrganizationUser
 } from '@/api/asset_interfaces';
-import React from 'react';
-import { Title, Text } from '@/components/ui/typography';
+import { useUpdateUser } from '@/api/buster_rest';
 import {
   Card,
-  CardHeader,
   CardContent,
   CardDescription,
-  CardTitle,
-  CardFooter
+  CardFooter,
+  CardHeader,
+  CardTitle
 } from '@/components/ui/card/CardBase';
 import { Select, type SelectItem } from '@/components/ui/select';
-import { useMemoizedFn } from '@/hooks';
 import { AppTooltip } from '@/components/ui/tooltip';
-import { useUpdateUser } from '@/api/buster_rest';
+import { Text, Title } from '@/components/ui/typography';
+import { useMemoizedFn } from '@/hooks';
+import React from 'react';
 
 export const UserDefaultAccess: React.FC<{
   user: OrganizationUser;

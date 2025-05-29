@@ -2,9 +2,6 @@
 
 import type React from 'react';
 import { WhiteListBlock } from './WhiteListBlock';
-import { FormApi } from '@tanstack/react-form';
-import { Button } from '@/components/ui/buttons';
-import { SubscribeButton } from '@/components/ui/form/FormBase';
 
 // Common field interface properties
 interface FieldComponentProps {
@@ -25,7 +22,7 @@ export interface BusterFormApi {
     isDirty: boolean;
   };
   AppForm: React.ComponentType<{ children?: React.ReactNode }>;
-  AppField: any; // Using any for AppField to avoid type complexity
+  AppField: React.ComponentType<FieldComponentProps>;
   SubscribeButton: React.ComponentType<{
     submitLabel: string;
     disableIfNotChanged?: boolean;

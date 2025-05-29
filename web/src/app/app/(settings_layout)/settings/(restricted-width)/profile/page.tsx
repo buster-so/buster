@@ -1,11 +1,11 @@
 'use client';
 
-import React from 'react';
-import { SettingsPageHeader } from '../../_components/SettingsPageHeader';
+import { Avatar } from '@/components/ui/avatar';
+import { Text, Title } from '@/components/ui/typography';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { formatDate } from '@/lib/date';
-import { Title, Text } from '@/components/ui/typography';
-import { Avatar } from '@/components/ui/avatar';
+import React from 'react';
+import { SettingsPageHeader } from '../../_components/SettingsPageHeader';
 
 export default function ProfilePage() {
   const user = useUserConfigContextSelector((state) => state.user);
@@ -40,7 +40,7 @@ export default function ProfilePage() {
           <div className="flex items-center justify-between">
             <Text variant="secondary">Account Status</Text>
             <div className="flex items-center gap-2">
-              <span className="h-2.5 w-2.5 rounded-full bg-green-500"></span>
+              <span className="h-2.5 w-2.5 rounded-full bg-green-500" />
               <Text>Active</Text>
             </div>
           </div>

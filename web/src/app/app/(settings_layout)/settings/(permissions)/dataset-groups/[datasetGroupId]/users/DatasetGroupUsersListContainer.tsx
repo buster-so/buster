@@ -6,6 +6,7 @@ import type {
 } from '@/api/asset_interfaces';
 import { useUpdateDatasetGroupUsers } from '@/api/buster_rest';
 import { PermissionAssignedCell } from '@/components/features/PermissionComponents';
+import { ListUserItem } from '@/components/features/list/ListUserItem';
 import {
   type BusterListColumn,
   type BusterListRowItem,
@@ -13,10 +14,9 @@ import {
   InfiniteListContainer
 } from '@/components/ui/list';
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
-import { BusterRoutes, createBusterRoute } from '@/routes';
 import { useMemoizedFn } from '@/hooks';
+import { BusterRoutes, createBusterRoute } from '@/routes';
 import React, { useMemo, useState } from 'react';
-import { ListUserItem } from '@/components/features/list/ListUserItem';
 import { DatasetGroupUsersSelectedPopup } from './DatasetGroupUsersSelectedPopup';
 
 export const DatasetGroupUsersListContainer: React.FC<{

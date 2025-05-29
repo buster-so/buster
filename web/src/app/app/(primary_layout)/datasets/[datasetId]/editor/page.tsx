@@ -1,5 +1,5 @@
-import { EditorContent } from './EditorContent';
 import React from 'react';
+import { EditorContent } from './EditorContent';
 
 const defaultLayout: [string, string] = ['auto', '170px'];
 
