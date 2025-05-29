@@ -47,6 +47,7 @@ const useBusterWebSocketHook = ({
 }) => {
   const { openErrorNotification } = useBusterNotifications();
 
+  // biome-ignore lint/suspicious/noExplicitAny: this truly can be anything
   const onMessage = useMemoizedFn((responseMessage: BusterSocketResponseBase<string, any>) => {
     try {
       const { route, payload, error } = responseMessage;
@@ -56,7 +57,7 @@ const useBusterWebSocketHook = ({
       if (eventListeners.length > 0) {
         requestAnimationFrame(() => {
           const eventListeners = getCurrentListeners(route);
-          eventListeners.forEach(({ callback: cb, onError: onE }) => {
+          for (const { callback: cb, onError: onE } of eventListeners) {
             if (error) {
               if (onE) onE(error);
               else openErrorNotification(error);
@@ -68,7 +69,7 @@ const useBusterWebSocketHook = ({
                 openErrorNotification(callbackError);
               }
             }
-          });
+          }
         });
       }
     } catch (error) {
@@ -100,7 +101,7 @@ interface EventListeners {
 }
 
 const useBusterSocketListeners = (props: {
-  openErrorNotification: (d: any) => void;
+  openErrorNotification: (d: unknown) => void;
   emit: (d: BusterSocketRequest) => void;
 }) => {
   const { emit, openErrorNotification } = props;
@@ -122,12 +123,13 @@ const useBusterSocketListeners = (props: {
 
   const once: BusterSocket['once'] = useMemoizedFn(({ route, callback }) => {
     return new Promise((resolve, reject) => {
+      // biome-ignore lint/suspicious/noExplicitAny: this truly can be anything
       const onceCallback = (payload: any) => {
         callback(payload);
         off({ route: route as '/chats/post:initializeChat', callback: onceCallback });
         resolve(payload);
       };
-      const onError = (error: any) => {
+      const onError = (error: unknown) => {
         off({ route: route as '/chats/post:initializeChat', callback: onceCallback });
         reject(error);
       };
@@ -147,10 +149,12 @@ const useBusterSocketListeners = (props: {
       const { emitEvent, responseEvent } = params;
       const { route, callback, onError } = responseEvent;
       const promise = new Promise<Parameters<T['callback']>[0]>((resolve, reject) => {
+        // biome-ignore lint/suspicious/noExplicitAny: this truly can be anything
         const promiseCallback = (d: any) => {
           callback(d);
           resolve(d);
         };
+        // biome-ignore lint/suspicious/noExplicitAny: this truly can be anything
         const onErrorCallback = (d: any) => {
           if (!onError) openErrorNotification(d);
           else onError?.(d);
