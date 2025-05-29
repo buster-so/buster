@@ -9,7 +9,7 @@ import { DashboardListContent } from './DashboardListContent';
 
 export const DashboardListController: React.FC = () => {
   const [openNewDashboardModal, setOpenNewDashboardModal] = useState(false);
-  console.log('DashboardListController', openNewDashboardModal);
+
   const [dashboardListFilters, setDashboardListFilters] = useState<{
     shared_with_me?: boolean;
     only_my_dashboards?: boolean;

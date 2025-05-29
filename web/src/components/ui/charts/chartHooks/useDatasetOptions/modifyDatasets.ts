@@ -201,7 +201,6 @@ function applyPercentageStack(datasets: DatasetOption[]): DatasetOption[] {
       }
     });
   }
-  console.log('sums', sums);
 
   // Convert each data point to percentage and update tooltips
   for (const ds of clone) {

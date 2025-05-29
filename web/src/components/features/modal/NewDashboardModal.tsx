@@ -15,7 +15,6 @@ export const NewDashboardModal: React.FC<{
   useChangePage?: boolean;
   onDashboardCreated?: (dashboardId: string) => void;
 }> = React.memo(({ onClose, open, useChangePage = true, onDashboardCreated }) => {
-  console.log('NewDashboardModal', open);
   const [title, setTitle] = React.useState('');
   const inputRef = React.useRef<HTMLInputElement>(null);
   const { mutateAsync: createNewDashboard, isPending: isCreatingDashboard } = useCreateDashboard();

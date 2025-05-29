@@ -45,7 +45,6 @@ const InteractiveTagInput = (args: React.ComponentProps<typeof InputTagInput>) =
   const [tags, setTags] = useState<string[]>(args.tags || []);
 
   const handleTagAdd = (tag: string | string[]) => {
-    console.log('tag', tag);
     if (Array.isArray(tag)) {
       setTags([...tags, ...tag]);
     } else {
