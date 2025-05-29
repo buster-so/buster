@@ -5,11 +5,13 @@
   "scripts": {
     "dev": "next dev --turbo",
     "build": "npm run lint:biome && next build",
+    "build:skip-lint": "next build",
     "start": "next start",
     "lint": "npx biome check && next lint",
     "lint:biome": "npx biome check",
     "lint:eslint": "next lint",
     "lint:ci": "npx biome check",
+    "lint:fix": "npx biome check --write",
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:ui": "vitest --ui",
