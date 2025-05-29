@@ -1,18 +1,17 @@
 'use client';
 
-import type React from 'react';
-import { useLayoutEffect, useState } from 'react';
 import mainApi from '@/api/buster_rest/instances';
 import { defaultRequestHandler } from '@/api/createInstance';
 import nextApi from '@/api/next/instances';
-import { useSupabaseContext } from '../Supabase/SupabaseContextProvider';
-import { getQueryClient } from './getQueryClient';
-import dynamic from 'next/dynamic';
-import { useHotkeys } from 'react-hotkeys-hook';
-import {} from '@tanstack/react-query-devtools';
-import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
-import { persistOptions } from './createPersister';
 import { isDev } from '@/config';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import dynamic from 'next/dynamic';
+import type React from 'react';
+import { useLayoutEffect, useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
+import { useSupabaseContext } from '../Supabase/SupabaseContextProvider';
+import { persistOptions } from './createPersister';
+import { getQueryClient } from './getQueryClient';
 
 const ReactQueryDevtools = dynamic(
   () =>
@@ -36,7 +35,7 @@ const ReactQueryDevtoolsProduction = dynamic(
 
 // Create the persister outside the component
 
-export const BusterReactQueryProvider = ({ children }: { children: React.ReactElement<any> }) => {
+export const BusterReactQueryProvider = ({ children }: { children: React.ReactNode }) => {
   const accessToken = useSupabaseContext((state) => state.accessToken);
   const checkTokenValidity = useSupabaseContext((state) => state.checkTokenValidity);
   const queryClient = getQueryClient(accessToken);

@@ -1,8 +1,8 @@
+import { queryKeys } from '@/api/query_keys';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { isServer } from '@tanstack/react-query';
-import type { PersistQueryClientProviderProps } from '@tanstack/react-query-persist-client';
-import { queryKeys } from '@/api/query_keys';
 import { hashKey } from '@tanstack/react-query';
+import type { PersistQueryClientProviderProps } from '@tanstack/react-query-persist-client';
 import packageJson from '../../../package.json';
 
 const buster = packageJson.version;
@@ -25,12 +25,12 @@ const persister = createSyncStoragePersister({
      * This way the query will be refetched from the server when it is first mounted AND we
      * don't have to deal with the flash of stale data that would otherwise happen.
      */
-    client.clientState.queries.forEach((query) => {
+    for (const query of client.clientState.queries) {
       const isPermanentQuery = PERMANENT_QUERIES.includes(query.queryHash);
       if (!isPermanentQuery) {
         query.state.dataUpdatedAt = 1;
       }
-    });
+    }
     return JSON.stringify(client);
   }
 });

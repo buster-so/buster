@@ -46,7 +46,8 @@ export const useGetFileLink = () => {
     }): boolean => {
       if (fileType === 'metric') {
         return versionNumber === metricVersionNumber && fileId === metricId;
-      } else if (fileType === 'dashboard') {
+      }
+      if (fileType === 'dashboard') {
         return versionNumber === dashboardVersionNumber && fileId === dashboardId;
       }
 

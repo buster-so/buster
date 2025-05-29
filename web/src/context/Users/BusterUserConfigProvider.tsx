@@ -1,10 +1,10 @@
 'use client';
 
-import React, { type PropsWithChildren } from 'react';
 import { useGetMyUserInfo } from '@/api/buster_rest/users';
-import { useSupabaseContext } from '../Supabase';
-import { createContext, useContextSelector } from 'use-context-selector';
 import { checkIfUserIsAdmin } from '@/lib/user';
+import React, { type PropsWithChildren } from 'react';
+import { createContext, useContextSelector } from 'use-context-selector';
+import { useSupabaseContext } from '../Supabase';
 
 export const useUserConfigProvider = () => {
   const isAnonymousUser = useSupabaseContext((state) => state.isAnonymousUser);
@@ -37,7 +37,7 @@ const BusterUserConfig = createContext<ReturnType<typeof useUserConfigProvider>>
   {} as ReturnType<typeof useUserConfigProvider>
 );
 
-export const BusterUserConfigProvider = React.memo<PropsWithChildren<{}>>(({ children }) => {
+export const BusterUserConfigProvider = React.memo<PropsWithChildren>(({ children }) => {
   const userConfig = useUserConfigProvider();
 
   return <BusterUserConfig.Provider value={userConfig}>{children}</BusterUserConfig.Provider>;

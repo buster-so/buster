@@ -1,19 +1,19 @@
 'use client';
 
-import { useMemoizedFn } from '@/hooks';
-import React, { useMemo, useRef } from 'react';
 import type {
   BusterSocketRequest,
   BusterSocketResponse,
   BusterSocketResponseRoute
 } from '@/api/buster_socket';
-import { useWebSocket } from '@/hooks/useWebSocket';
 import type { BusterSocketResponseBase } from '@/api/buster_socket/base_interfaces';
-import { useSupabaseContext } from '../../Supabase';
-import { createContext, useContextSelector } from 'use-context-selector';
-import type { SupabaseContextReturnType } from '../../Supabase';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useUserConfigContextSelector } from '@/context/Users';
+import { useMemoizedFn } from '@/hooks';
+import { useWebSocket } from '@/hooks/useWebSocket';
+import React, { useMemo, useRef } from 'react';
+import { createContext, useContextSelector } from 'use-context-selector';
+import { useSupabaseContext } from '../../Supabase';
+import type { SupabaseContextReturnType } from '../../Supabase';
 
 const BUSTER_WS_URL = `${process.env.NEXT_PUBLIC_WEB_SOCKET_URL}/api/v1/ws`;
 

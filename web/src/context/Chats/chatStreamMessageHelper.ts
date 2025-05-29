@@ -1,16 +1,16 @@
-import { create } from 'mutative';
 import type { IBusterChat, IBusterChatMessage } from '@/api/asset_interfaces/chat';
 import type {
-  ChatEvent_GeneratingTitle,
-  ChatEvent_GeneratingResponseMessage,
-  ChatEvent_GeneratingReasoningMessage
-} from '@/api/buster_socket/chats';
-import type {
-  BusterChatResponseMessage_text,
-  BusterChatMessageReasoning_text,
+  BusterChatMessageReasoning_file,
   BusterChatMessageReasoning_files,
-  BusterChatMessageReasoning_file
+  BusterChatMessageReasoning_text,
+  BusterChatResponseMessage_text
 } from '@/api/asset_interfaces/chat';
+import type {
+  ChatEvent_GeneratingReasoningMessage,
+  ChatEvent_GeneratingResponseMessage,
+  ChatEvent_GeneratingTitle
+} from '@/api/buster_socket/chats';
+import { create } from 'mutative';
 
 const createInitialMessage = (messageId: string): IBusterChatMessage => ({
   id: messageId,

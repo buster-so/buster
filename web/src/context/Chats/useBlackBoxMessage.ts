@@ -1,18 +1,18 @@
 'use client';
 
-import { useMemoizedFn, useUnmount } from '@/hooks';
-import sample from 'lodash/sample';
-import random from 'lodash/random';
-import last from 'lodash/last';
-import { useRef } from 'react';
 import type {
   BusterChatMessageReasoning_text,
   IBusterChatMessage
 } from '@/api/asset_interfaces/chat';
-import type { ChatEvent_GeneratingReasoningMessage } from '@/api/buster_socket/chats';
-import { useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/api/query_keys';
 import { useGetChatMessageMemoized } from '@/api/buster_rest/chats';
+import type { ChatEvent_GeneratingReasoningMessage } from '@/api/buster_socket/chats';
+import { queryKeys } from '@/api/query_keys';
+import { useMemoizedFn, useUnmount } from '@/hooks';
+import { useQueryClient } from '@tanstack/react-query';
+import last from 'lodash/last';
+import random from 'lodash/random';
+import sample from 'lodash/sample';
+import { useRef } from 'react';
 
 export const useBlackBoxMessage = () => {
   const timeoutRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
@@ -75,9 +75,9 @@ export const useBlackBoxMessage = () => {
   });
 
   useUnmount(() => {
-    Object.values(timeoutRef.current).forEach((timeout) => {
+    for (const timeout of Object.values(timeoutRef.current)) {
       clearTimeout(timeout);
-    });
+    }
   });
 
   return { checkBlackBoxMessage, removeBlackBoxMessage };

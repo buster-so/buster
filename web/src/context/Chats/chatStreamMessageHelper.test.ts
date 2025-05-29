@@ -1,20 +1,20 @@
+import type {
+  BusterChatMessageReasoning_file,
+  BusterChatMessageReasoning_files,
+  BusterChatMessageReasoning_pillContainer,
+  BusterChatMessageReasoning_pills,
+  BusterChatMessageReasoning_text,
+  BusterChatResponseMessage_file,
+  BusterChatResponseMessage_text
+} from '@/api/asset_interfaces';
+import type { IBusterChat, IBusterChatMessage } from '@/api/asset_interfaces/chat';
+import type { ChatEvent_GeneratingResponseMessage } from '@/api/buster_socket/chats';
 import {
   initializeOrUpdateMessage,
   updateChatTitle,
-  updateResponseMessage,
-  updateReasoningMessage
+  updateReasoningMessage,
+  updateResponseMessage
 } from './chatStreamMessageHelper';
-import type { IBusterChatMessage, IBusterChat } from '@/api/asset_interfaces/chat';
-import type { ChatEvent_GeneratingResponseMessage } from '@/api/buster_socket/chats';
-import type {
-  BusterChatResponseMessage_file,
-  BusterChatResponseMessage_text,
-  BusterChatMessageReasoning_text,
-  BusterChatMessageReasoning_files,
-  BusterChatMessageReasoning_pills,
-  BusterChatMessageReasoning_file,
-  BusterChatMessageReasoning_pillContainer
-} from '@/api/asset_interfaces';
 
 const createBaseMessage = (
   messageId: string,

@@ -1,14 +1,14 @@
 'use client';
 
+import type { BusterSearchResult, FileType } from '@/api/asset_interfaces';
+import { useGetChatMemoized, useGetChatMessageMemoized } from '@/api/buster_rest/chats';
+import { useBusterWebSocket } from '@/context/BusterWebSocket';
+import { useMemoizedFn } from '@/hooks';
+import { create } from 'mutative';
 import type React from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
-import { useMemoizedFn } from '@/hooks';
-import type { BusterSearchResult, FileType } from '@/api/asset_interfaces';
-import { useBusterWebSocket } from '@/context/BusterWebSocket';
 import { useChatStreamMessage } from './useChatStreamMessage';
-import { useGetChatMemoized, useGetChatMessageMemoized } from '@/api/buster_rest/chats';
 import { useChatUpdate } from './useChatUpdate';
-import { create } from 'mutative';
 
 export const useBusterNewChat = () => {
   const busterSocket = useBusterWebSocket();
@@ -88,7 +88,9 @@ export const useBusterNewChat = () => {
     }) => {
       const currentChat = getChatMemoized(chatId);
       const currentMessage = getChatMessageMemoized(messageId);
-      const currentRequestMessage = currentMessage?.request_message!;
+      const currentRequestMessage = currentMessage?.request_message;
+      if (!currentRequestMessage) return;
+
       const messageIndex = currentChat?.message_ids.findIndex((mId) => mId === messageId);
 
       onUpdateChatMessage({

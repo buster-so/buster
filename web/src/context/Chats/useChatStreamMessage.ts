@@ -1,28 +1,28 @@
 'use client';
 
-import { useMemoizedFn } from '@/hooks';
 import type { BusterChat, IBusterChat, IBusterChatMessage } from '@/api/asset_interfaces/chat';
+import { prefetchGetMetricDataClient } from '@/api/buster_rest/metrics';
 import type {
   ChatEvent_GeneratingReasoningMessage,
   ChatEvent_GeneratingResponseMessage,
   ChatEvent_GeneratingTitle
 } from '@/api/buster_socket/chats';
-import { updateChatToIChat } from '@/lib/chat';
-import { useBlackBoxMessage } from './useBlackBoxMessage';
-import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
-import { BusterRoutes } from '@/routes';
 import { useSocketQueryOn } from '@/api/buster_socket_query';
-import { useRef, useTransition } from 'react';
 import { queryKeys } from '@/api/query_keys';
+import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
+import { useMemoizedFn } from '@/hooks';
+import { updateChatToIChat } from '@/lib/chat';
+import { BusterRoutes } from '@/routes';
 import { useQueryClient } from '@tanstack/react-query';
 import { create } from 'mutative';
+import { useRef, useTransition } from 'react';
 import {
   updateChatTitle,
-  updateResponseMessage,
-  updateReasoningMessage
+  updateReasoningMessage,
+  updateResponseMessage
 } from './chatStreamMessageHelper';
+import { useBlackBoxMessage } from './useBlackBoxMessage';
 import { useChatUpdate } from './useChatUpdate';
-import { prefetchGetMetricDataClient } from '@/api/buster_rest/metrics';
 
 export const useChatStreamMessage = () => {
   const queryClient = useQueryClient();

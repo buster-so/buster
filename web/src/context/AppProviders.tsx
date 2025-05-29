@@ -1,17 +1,17 @@
+import { isDev } from '@/config';
+import type { UseSupabaseUserContextType } from '@/lib/supabase';
+import { HydrationBoundary, type QueryClient, dehydrate } from '@tanstack/react-query';
 import type React from 'react';
 import type { PropsWithChildren } from 'react';
-import { BusterWebSocketProvider } from './BusterWebSocket';
-import { SupabaseContextProvider } from './Supabase/SupabaseContextProvider';
-import { BusterReactQueryProvider } from './BusterReactQuery/BusterReactQueryAndApi';
-import { AppLayoutProvider } from './BusterAppLayout';
-import { BusterUserConfigProvider } from './Users/BusterUserConfigProvider';
 import { BusterAssetsProvider } from './Assets/BusterAssetsProvider';
-import { BusterPosthogProvider } from './Posthog';
+import { AppLayoutProvider } from './BusterAppLayout';
+import { BusterReactQueryProvider } from './BusterReactQuery/BusterReactQueryAndApi';
+import { BusterWebSocketProvider } from './BusterWebSocket';
 import { BusterNewChatProvider } from './Chats';
-import type { UseSupabaseUserContextType } from '@/lib/supabase';
-import { dehydrate, HydrationBoundary, type QueryClient } from '@tanstack/react-query';
+import { BusterPosthogProvider } from './Posthog';
 import { RoutePrefetcher } from './RoutePrefetcher';
-import { isDev } from '@/config';
+import { SupabaseContextProvider } from './Supabase/SupabaseContextProvider';
+import { BusterUserConfigProvider } from './Users/BusterUserConfigProvider';
 
 // scan({
 //   enabled: true,

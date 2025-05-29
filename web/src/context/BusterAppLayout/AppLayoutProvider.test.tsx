@@ -1,9 +1,9 @@
-import { renderHook } from '@testing-library/react';
-import { useAppLayout } from './AppLayoutProvider';
-import { useRouter, usePathname, useParams } from 'next/navigation';
+import { DashboardSecondaryRecord } from '@/layouts/ChatLayout/FileContainer/FileContainerSecondary/secondaryPanelsConfig/dashboardPanels';
 import type { BusterRoutesWithArgsRoute } from '@/routes/busterRoutes';
 import { BusterAppRoutes } from '@/routes/busterRoutes/busterAppRoutes';
-import { DashboardSecondaryRecord } from '@/layouts/ChatLayout/FileContainer/FileContainerSecondary/secondaryPanelsConfig/dashboardPanels';
+import { renderHook } from '@testing-library/react';
+import { useParams, usePathname, useRouter } from 'next/navigation';
+import { useAppLayout } from './AppLayoutProvider';
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
