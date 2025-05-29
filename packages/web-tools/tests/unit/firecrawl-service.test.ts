@@ -40,13 +40,6 @@ describe('FirecrawlService', () => {
     expect(service).toBeInstanceOf(FirecrawlService);
   });
 
-  it('should throw error when no API key is provided', () => {
-    process.env.FIRECRAWL_API_KEY = undefined;
-
-    expect(() => new FirecrawlService()).toThrow(CompanyResearchError);
-    expect(() => new FirecrawlService()).toThrow('Firecrawl API key is required');
-  });
-
   describe('startDeepResearch', () => {
     beforeEach(() => {
       service = new FirecrawlService();

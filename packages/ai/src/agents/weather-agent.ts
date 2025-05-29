@@ -3,10 +3,16 @@ import { createOpenAI } from '@ai-sdk/openai';
 import { Agent } from '@mastra/core/agent';
 import { LibSQLStore } from '@mastra/libsql';
 import { Memory } from '@mastra/memory';
+import { initLogger, wrapAISDKModel } from 'braintrust';
 import { weatherTool } from '../tools/weather-tool';
 
 import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock';
 import { fromNodeProviderChain } from '@aws-sdk/credential-providers';
+
+initLogger({
+  apiKey: process.env.BRAINTRUST_API_KEY,
+  projectName: 'Weather Agent',
+});
 
 const _bedrock = createAmazonBedrock({
   region: 'us-east-1',
@@ -33,7 +39,7 @@ export const weatherAgent = new Agent({
 
       Use the weatherTool to fetch current weather data.
 `,
-  model: anthropic('claude-opus-4-20250514', {}),
+  model: wrapAISDKModel(anthropic('claude-opus-4-20250514', {})),
   tools: { weatherTool },
   memory: new Memory({
     storage: new LibSQLStore({

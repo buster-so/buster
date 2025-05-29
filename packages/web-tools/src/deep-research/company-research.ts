@@ -33,9 +33,6 @@ export async function researchCompany(
   const {
     maxWaitTime = 300000, // 5 minutes default
     pollingInterval = 5000, // 5 seconds default
-    includeFinancials = false,
-    includeNews = false,
-    focusAreas = ['business-model', 'services'],
   } = options;
 
   // Validate URL format
@@ -53,13 +50,25 @@ export async function researchCompany(
 
   try {
     // Create a focused research query for the company
-    const query = buildResearchQuery(url, { includeFinancials, includeNews, focusAreas });
+    const query = buildResearchQuery(url);
+
+    const analysisPrompt = `Provide a concise, data-driven analysis (4-5 paragraphs) focused on key business insights. The report should:
+
+1. Clearly identify the company's core business model and revenue streams
+2. Highlight critical operational metrics and market positioning
+3. Outline key competitive advantages and potential risks
+4. Provide actionable insights for business strategy and data analytics
+
+Avoid marketing language or unnecessary details. This analysis will be used for strategic decision-making and business consulting purposes.
+
+You must output in organized markdown format. Consisting of 3-6 sections.`;
+
+    const systemPrompt = `You are a data/ontology/analytics consultant at Palantir. Your goal is to thoroughly understand the company's business operations, including their business model, products, services, features, use cases, and value proposition. Always begin your research by analyzing the company's website when provided, as it contains the most authoritative and up-to-date information about their business. This research will be used to inform your consulting work and help you provide strategic insights and recommendations.`;
 
     // Start the deep research job
     const jobResult = await firecrawl.startDeepResearch(query, {
-      maxDepth: 3, // Not too deep to keep it focused
-      timeLimit: 180, // 3 minutes
-      maxUrls: 8, // Limited number of URLs to keep it concise
+      systemPrompt,
+      analysisPrompt,
     });
 
     let result: ResearchResult;
@@ -118,34 +127,26 @@ export async function researchCompany(
 /**
  * Build a focused research query for the company
  */
-function buildResearchQuery(
-  url: string,
-  options: { includeFinancials?: boolean; includeNews?: boolean; focusAreas?: string[] }
-): string {
+function buildResearchQuery(url: string): string {
   const domain = new URL(url).hostname;
   const companyName = domain.replace(/^www\./, '').split('.')[0];
 
-  let query = `Research the company ${companyName}, starting with their website at: ${domain}. I need to understand:
-- What industry they operate in
-- Their core business model and how they make money
-- What products or services they offer
-- Key information a new employee should know about the company
-- Key summary about the company.`;
+  const query = `
+  Research the company ${companyName}, starting with their website at: ${domain}. You're goal of understanding is:
+  - What the company does at a high level
+  - What their products and services are
+  - How those products and services are used
+  - How do they make money
 
-  if (options.includeFinancials) {
-    query += '\n- Recent financial performance and business metrics';
-  }
+  Things we don't need to know:
+  - Company marketing copy like vision, mission, values, etc.
+  - We don't need to know about the company's history or team.
+  - Legal information like trademarks, patents, etc.
 
-  if (options.includeNews) {
-    query += '\n- Recent news and company updates';
-  }
+  Once again, you should start with the company's website and then use other sources to understand the company's business model.
 
-  if (options.focusAreas?.length) {
-    query += `\n- Focus particularly on: ${options.focusAreas.join(', ')}`;
-  }
-
-  query +=
-    '\n\nProvide a comprehensive but concise overview suitable for onboarding new team members.';
+  WEBSITE: ${url}
+`;
 
   return query;
 }

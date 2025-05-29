@@ -71,19 +71,15 @@ export class FirecrawlService {
   async startDeepResearch(
     query: string,
     options?: {
-      maxDepth?: number;
-      timeLimit?: number;
-      maxUrls?: number;
+      systemPrompt?: string;
+      analysisPrompt?: string;
     }
   ): Promise<string | JobStatusResponse> {
     try {
       // Use the SDK's native deep research method
       const response = await this.app.deepResearch(query, {
-        maxDepth: options?.maxDepth || 5,
-        timeLimit: options?.timeLimit || 180, // 3 minutes default
-        maxUrls: options?.maxUrls || 10,
-        systemPrompt:
-          'This shouldnt be marketing material, it should be almost like a training doc that describes the company to a new hire or consultant.',
+        systemPrompt: options?.systemPrompt,
+        analysisPrompt: options?.analysisPrompt,
       });
 
       const firecrawlResponse = response as FirecrawlResponse & JobStatusResponse;

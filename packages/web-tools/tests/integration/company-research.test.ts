@@ -30,11 +30,25 @@ describeIntegration('Company Research Integration Tests', () => {
     expect(lowerAnalysis).toMatch(/buster|data|analytics|business|intelligence/);
   }, 120000); // 2 minutes timeout for real API calls
 
+  it('should successfully research Redo company information', async () => {
+    const result = await researchCompany('https://getredo.com');
+
+    // Verify basic structure
+    expect(result).toBeDefined();
+    expect(result.analysis).toBeTruthy();
+    expect(typeof result.analysis).toBe('string');
+    expect(result.analysis.length).toBeGreaterThan(100); // Should be substantial
+    expect(result.url).toBe('https://getredo.com');
+    expect(result.researchedAt).toBeInstanceOf(Date);
+    expect(result.rawData).toBeDefined();
+
+    // Verify content quality for Redo - analysis should mention Redo and relevant keywords
+    const lowerAnalysis = result.analysis.toLowerCase();
+    expect(lowerAnalysis).toMatch(/redo|productivity|task|project|workflow|management/);
+  }, 120000); // 2 minutes timeout for real API calls
+
   it('should handle research with custom options', async () => {
     const result = await researchCompany('https://buster.so', {
-      includeFinancials: true,
-      includeNews: true,
-      focusAreas: ['technology', 'business-model'],
       maxWaitTime: 120000, // 2 minutes
       pollingInterval: 3000, // 3 seconds
     });

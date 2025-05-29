@@ -1,5 +1,10 @@
 // Test setup file
+import { resolve } from 'node:path';
+import { config } from 'dotenv';
 import { beforeAll } from 'vitest';
+
+// Load environment variables from .env file
+config({ path: resolve(process.cwd(), '.env') });
 
 beforeAll(() => {
   // Check if .env file exists and load it
