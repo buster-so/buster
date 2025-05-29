@@ -1,12 +1,13 @@
-import type { DashboardConfig } from '@/api/asset_interfaces/dashboard';
-import type { BusterMetric } from '@/api/asset_interfaces/metric';
+import { describe, it, expect } from 'vitest';
+import { normalizeNewMetricsIntoGrid } from './normalizeMetric';
+import { DashboardConfig } from '@/api/asset_interfaces/dashboard';
+import { BusterMetric } from '@/api/asset_interfaces/metric';
 import {
+  NUMBER_OF_COLUMNS,
   MAX_NUMBER_OF_ITEMS,
-  MIN_ROW_HEIGHT,
-  NUMBER_OF_COLUMNS
+  MIN_ROW_HEIGHT
 } from '@/components/ui/grid/helpers';
 import { createMockMetric } from '@/mocks/metric';
-import { normalizeNewMetricsIntoGrid } from './normalizeMetric';
 
 describe('normalizeNewMetricsIntoGrid', () => {
   const mockMetric = (id: string): BusterMetric => createMockMetric(id);

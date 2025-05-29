@@ -1,8 +1,9 @@
+import { describe, it, expect } from 'vitest';
+import { renderHook } from '@testing-library/react';
+import { useYAxis } from './useYAxis';
 import { ChartType, DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import type { ChartEncodes } from '@/api/asset_interfaces/metric/charts';
-import { renderHook } from '@testing-library/react';
-import type { LinearScaleOptions } from 'chart.js';
-import { useYAxis } from './useYAxis';
+import { LinearScaleOptions } from 'chart.js';
 
 describe('useYAxis', () => {
   const defaultProps = {

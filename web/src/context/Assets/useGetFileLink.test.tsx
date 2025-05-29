@@ -1,15 +1,16 @@
-import { useChatLayoutContextSelector } from '@/layouts/ChatLayout';
-import { assetParamsToRoute } from '@/lib/assets';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useGetFileLink } from './useGetFileLink';
+import { useChatLayoutContextSelector } from '@/layouts/ChatLayout';
+import { assetParamsToRoute } from '@/lib/assets';
 
 // Mock dependencies
-jest.mock('@/layouts/ChatLayout', () => ({
-  useChatLayoutContextSelector: jest.fn()
+vi.mock('@/layouts/ChatLayout', () => ({
+  useChatLayoutContextSelector: vi.fn()
 }));
 
-jest.mock('@/lib/assets', () => ({
-  assetParamsToRoute: jest.fn()
+vi.mock('@/lib/assets', () => ({
+  assetParamsToRoute: vi.fn()
 }));
 
 describe('useGetFileLink', () => {
@@ -21,10 +22,10 @@ describe('useGetFileLink', () => {
   const mockChatId = 'chat-123';
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Mock useChatLayoutContextSelector to return our test values
-    (useChatLayoutContextSelector as jest.Mock).mockImplementation((selector) => {
+    (useChatLayoutContextSelector as any).mockImplementation((selector) => {
       const contextValues = {
         metricVersionNumber: mockMetricVersionNumber,
         dashboardVersionNumber: mockDashboardVersionNumber,
@@ -36,7 +37,7 @@ describe('useGetFileLink', () => {
     });
 
     // Mock assetParamsToRoute to return predictable values for testing
-    (assetParamsToRoute as jest.Mock).mockImplementation(
+    (assetParamsToRoute as any).mockImplementation(
       ({ assetId, type, versionNumber, secondaryView }) => {
         if (type === 'metric') {
           return `/metrics/${assetId}${versionNumber ? `/v${versionNumber}` : ''}${secondaryView ? `/${secondaryView}` : ''}`;

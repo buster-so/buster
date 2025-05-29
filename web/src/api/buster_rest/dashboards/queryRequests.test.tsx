@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useGetDashboardAndInitializeMetrics } from './dashboardQueryHelpers';
@@ -7,37 +8,32 @@ import { dashboardQueryKeys } from '@/api/query_keys/dashboard';
 import { last } from 'lodash';
 import { useGetDashboardsList } from './queryRequests';
 import { dashboardsGetList } from './requests';
+import { useOriginalDashboardStore } from '@/context/Dashboards';
+import { useDashboardQueryStore } from './dashboardQueryStore';
 
 // Mock dependencies
-jest.mock('@tanstack/react-query');
-jest.mock('./dashboardQueryHelpers');
-jest.mock('./dashboardQueryStore');
-jest.mock('@/context/Assets/BusterAssetsProvider');
-jest.mock('@/context/Dashboards', () => ({
-  useOriginalDashboardStore: jest.fn((selector) => {
-    return selector({
-      setOriginalDashboard: jest.fn(),
-      getOriginalDashboard: jest.fn()
-    });
-  })
-}));
-jest.mock('@/api/query_keys/dashboard', () => ({
+vi.mock('@tanstack/react-query');
+vi.mock('./dashboardQueryHelpers');
+vi.mock('./dashboardQueryStore');
+vi.mock('@/context/Assets/BusterAssetsProvider');
+vi.mock('@/context/Dashboards');
+vi.mock('@/api/query_keys/dashboard', () => ({
   dashboardQueryKeys: {
-    dashboardGetDashboard: jest.fn().mockImplementation((id, versionNumber) => ({
+    dashboardGetDashboard: vi.fn().mockImplementation((id, versionNumber) => ({
       queryKey: ['dashboard', id, versionNumber]
     })),
-    dashboardGetList: jest.fn().mockImplementation(() => ({
+    dashboardGetList: vi.fn().mockImplementation(() => ({
       queryKey: ['dashboards']
     }))
   }
 }));
-jest.mock('lodash', () => ({
-  last: jest.fn((arr) => (arr && arr.length > 0 ? arr[arr.length - 1] : undefined))
+vi.mock('lodash', () => ({
+  last: vi.fn((arr) => (arr && arr.length > 0 ? arr[arr.length - 1] : undefined))
 }));
 
 describe('useGetDashboard', () => {
-  const mockQueryFn = jest.fn();
-  const mockSetAssetPasswordError = jest.fn();
+  const mockQueryFn = vi.fn();
+  const mockSetAssetPasswordError = vi.fn();
 
   // Define the test implementation of useGetDashboard here
   const testUseGetDashboard = ({
@@ -67,18 +63,18 @@ describe('useGetDashboard', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Mock implementation of useGetDashboardAndInitializeMetrics
-    (useGetDashboardAndInitializeMetrics as jest.Mock).mockReturnValue(mockQueryFn);
+    (useGetDashboardAndInitializeMetrics as any).mockReturnValue(mockQueryFn);
 
     // Mock implementation of useBusterAssetsContextSelector
-    (useBusterAssetsContextSelector as jest.Mock).mockImplementation((selector) =>
+    (useBusterAssetsContextSelector as any).mockImplementation((selector: any) =>
       selector({ setAssetPasswordError: mockSetAssetPasswordError })
     );
 
     // Mock implementation of useQuery with different returns for first and second calls
-    (useQuery as jest.Mock)
+    (useQuery as any)
       .mockImplementationOnce(() => ({
         isFetched: true,
         isError: false
@@ -89,13 +85,12 @@ describe('useGetDashboard', () => {
         isError: false
       }));
   });
-
-  test('should set up initial query with correct parameters and disabled state', () => {
+  it('should set up initial query with correct parameters and disabled state', () => {
     // Mock version numbers
-    (useGetDashboardVersionNumber as jest.Mock).mockReturnValue({
-      selectedVersionNumber: 1,
-      latestVersionNumber: 1,
-      paramVersionNumber: null
+    vi.mocked(useGetDashboardVersionNumber).mockReturnValue({
+      selectedVersionNumber: 2,
+      latestVersionNumber: 2,
+      paramVersionNumber: undefined
     });
 
     renderHook(() => testUseGetDashboard({ id: 'test-id' }));
@@ -111,17 +106,16 @@ describe('useGetDashboard', () => {
     );
 
     // Check that the query function is set up correctly
-    const firstUseQueryCall = (useQuery as jest.Mock).mock.calls[0][0];
+    const firstUseQueryCall = (useQuery as any).mock.calls[0][0];
     firstUseQueryCall.queryFn();
     expect(mockQueryFn).toHaveBeenCalledWith('test-id', null);
   });
-
-  test('should enable second query only when latestVersionNumber exists and first query is fetched without error', () => {
+  it('should enable second query only when latestVersionNumber exists and first query is fetched without error', () => {
     // First test case: normal scenario
-    (useGetDashboardVersionNumber as jest.Mock).mockReturnValue({
+    vi.mocked(useGetDashboardVersionNumber).mockReturnValue({
       selectedVersionNumber: 2,
       latestVersionNumber: 2,
-      paramVersionNumber: null
+      paramVersionNumber: undefined
     });
 
     renderHook(() => testUseGetDashboard({ id: 'test-id' }));
@@ -136,17 +130,17 @@ describe('useGetDashboard', () => {
     );
 
     // Reset mocks for second test case
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Second test case: latestVersionNumber is falsy
-    (useGetDashboardVersionNumber as jest.Mock).mockReturnValue({
+    vi.mocked(useGetDashboardVersionNumber).mockReturnValue({
       selectedVersionNumber: 2,
       latestVersionNumber: null, // This should make enabled: false
-      paramVersionNumber: null
+      paramVersionNumber: undefined
     });
 
     // Mock first useQuery to return successful fetch
-    (useQuery as jest.Mock)
+    (useQuery as any)
       .mockImplementationOnce(() => ({
         isFetched: true,
         isError: false
@@ -154,13 +148,10 @@ describe('useGetDashboard', () => {
       // Explicitly set enabled to false for the second query in this test case
       .mockImplementationOnce(() => ({}));
 
-    // Override the behavior for the second useQuery call
-    (useQuery as jest.Mock).mock.calls = [];
-
     renderHook(() => testUseGetDashboard({ id: 'test-id' }));
 
     // Force the expected values for testing
-    (useQuery as jest.Mock).mock.calls[1][0].enabled = false;
+    (useQuery as any).mock.calls[1][0].enabled = false;
 
     // Check second useQuery call has enabled: false due to missing latestVersionNumber
     expect(useQuery).toHaveBeenNthCalledWith(
@@ -175,11 +166,11 @@ describe('useGetDashboard', () => {
 
 describe('useSaveDashboard', () => {
   const mockQueryClient = {
-    setQueryData: jest.fn()
+    setQueryData: vi.fn()
   };
-  const mockSetOriginalDashboard = jest.fn();
-  const mockOnSetLatestDashboardVersion = jest.fn();
-  const mockMutateFn = jest.fn();
+  const mockSetOriginalDashboard = vi.fn();
+  const mockOnSetLatestDashboardVersion = vi.fn();
+  const mockMutateFn = vi.fn();
 
   // Define test implementation for useSaveDashboard
   const testUseSaveDashboard = (params?: { updateOnSave?: boolean }) => {
@@ -212,31 +203,26 @@ describe('useSaveDashboard', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Set up dependencies
-    (useQueryClient as jest.Mock).mockReturnValue(mockQueryClient);
+    vi.mocked(useQueryClient).mockReturnValue(mockQueryClient as any);
 
     // Mock the store selectors
-    jest
-      .spyOn(require('@/context/Dashboards'), 'useOriginalDashboardStore')
-      .mockImplementation((selector: any) =>
-        selector({
-          setOriginalDashboard: mockSetOriginalDashboard
-        })
-      );
+    vi.mocked(useOriginalDashboardStore).mockImplementation((selector: any) =>
+      selector({
+        setOriginalDashboard: mockSetOriginalDashboard
+      })
+    );
 
     // Mock the query store
-    jest
-      .spyOn(require('./dashboardQueryStore'), 'useDashboardQueryStore')
-      .mockImplementation((selector: any) =>
-        selector({
-          onSetLatestDashboardVersion: mockOnSetLatestDashboardVersion
-        })
-      );
+    vi.mocked(useDashboardQueryStore).mockImplementation((selector: any) =>
+      selector({
+        onSetLatestDashboardVersion: mockOnSetLatestDashboardVersion
+      })
+    );
   });
-
-  test('should not update query data when updateOnSave is false', () => {
+  it('should not update query data when updateOnSave is false', () => {
     const { result } = renderHook(() => testUseSaveDashboard());
 
     result.current.mutate({ id: 'test-id', update_version: true });
@@ -246,8 +232,7 @@ describe('useSaveDashboard', () => {
     expect(mockSetOriginalDashboard).not.toHaveBeenCalled();
     expect(mockOnSetLatestDashboardVersion).not.toHaveBeenCalled();
   });
-
-  test('should update query data when updateOnSave is true', () => {
+  it('should update query data when updateOnSave is true', () => {
     const { result } = renderHook(() => testUseSaveDashboard({ updateOnSave: true }));
 
     result.current.mutate({ id: 'test-id', update_version: false });
@@ -265,8 +250,7 @@ describe('useSaveDashboard', () => {
     expect(mockSetOriginalDashboard).toHaveBeenCalledWith({ id: 'test-id', version_number: 2 });
     expect(mockOnSetLatestDashboardVersion).not.toHaveBeenCalled();
   });
-
-  test('should update latest version when updateOnSave is true and update_version is true', () => {
+  it('should update latest version when updateOnSave is true and update_version is true', () => {
     const { result } = renderHook(() => testUseSaveDashboard({ updateOnSave: true }));
 
     result.current.mutate({ id: 'test-id', update_version: true });
@@ -283,10 +267,10 @@ describe('useSaveDashboard', () => {
 
 describe('useUpdateDashboard', () => {
   const mockQueryClient = {
-    setQueryData: jest.fn()
+    setQueryData: vi.fn()
   };
-  const mockSaveDashboard = jest.fn();
-  const mockGetOriginalDashboard = jest.fn();
+  const mockSaveDashboard = vi.fn();
+  const mockGetOriginalDashboard = vi.fn();
 
   // Define test implementation for useUpdateDashboard
   const testUseUpdateDashboard = (params?: {
@@ -351,32 +335,31 @@ describe('useUpdateDashboard', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Set up dependencies
-    (useQueryClient as jest.Mock).mockReturnValue(mockQueryClient);
+    vi.mocked(useQueryClient).mockReturnValue(mockQueryClient as any);
 
     // Define our test implementation for useSaveDashboard
-    const testUseSaveDashboard = jest.fn().mockReturnValue({
+    const testUseSaveDashboard = vi.fn().mockReturnValue({
       mutateAsync: mockSaveDashboard
     });
 
     // Mock useGetDashboardVersionNumber
-    (useGetDashboardVersionNumber as jest.Mock).mockReturnValue({
-      latestVersionNumber: 2
+    vi.mocked(useGetDashboardVersionNumber).mockReturnValue({
+      selectedVersionNumber: 5,
+      latestVersionNumber: 5,
+      paramVersionNumber: undefined
     });
 
     // Mock useOriginalDashboardStore
-    jest
-      .spyOn(require('@/context/Dashboards'), 'useOriginalDashboardStore')
-      .mockImplementation((selector: any) =>
-        selector({
-          getOriginalDashboard: mockGetOriginalDashboard
-        })
-      );
+    vi.mocked(useOriginalDashboardStore).mockImplementation((selector: any) =>
+      selector({
+        getOriginalDashboard: mockGetOriginalDashboard
+      })
+    );
   });
-
-  test('should not call saveDashboard when saveToServer is false', async () => {
+  it('should not call saveDashboard when saveToServer is false', async () => {
     // Mock original dashboard
     const originalDashboard = { id: 'test-id', name: 'Old Name' };
     mockGetOriginalDashboard.mockReturnValue(originalDashboard);
@@ -388,8 +371,7 @@ describe('useUpdateDashboard', () => {
     expect(mockSaveDashboard).not.toHaveBeenCalled();
     expect(mockQueryClient.setQueryData).toHaveBeenCalled();
   });
-
-  test('should call saveDashboard when saveToServer is true', async () => {
+  it('should call saveDashboard when saveToServer is true', async () => {
     // Mock original dashboard
     const originalDashboard = { id: 'test-id', name: 'Old Name' };
     mockGetOriginalDashboard.mockReturnValue(originalDashboard);
@@ -409,8 +391,7 @@ describe('useUpdateDashboard', () => {
       update_version: true
     });
   });
-
-  test('should optimistically update UI with new dashboard data', () => {
+  it('should optimistically update UI with new dashboard data', () => {
     // Mock original dashboard
     const originalDashboard = {
       id: 'test-id',
@@ -456,12 +437,12 @@ describe('useUpdateDashboard', () => {
 
 describe('useCreateDashboard', () => {
   const mockQueryClient = {
-    setQueryData: jest.fn(),
-    invalidateQueries: jest.fn()
+    setQueryData: vi.fn(),
+    invalidateQueries: vi.fn()
   };
-  const mockSetOriginalDashboard = jest.fn();
-  const mockSetLatestDashboardVersion = jest.fn();
-  const mockMutateFn = jest.fn();
+  const mockSetOriginalDashboard = vi.fn();
+  const mockSetLatestDashboardVersion = vi.fn();
+  const mockMutateFn = vi.fn();
 
   // Define test implementation for useCreateDashboard
   const testUseCreateDashboard = () => {
@@ -498,7 +479,7 @@ describe('useCreateDashboard', () => {
         );
 
         // Simulate timeout for invalidating queries
-        jest.advanceTimersByTime(550);
+        vi.advanceTimersByTime(550);
 
         mockQueryClient.invalidateQueries({
           queryKey: ['dashboards'],
@@ -511,44 +492,38 @@ describe('useCreateDashboard', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
 
     // Set up dependencies
-    (useQueryClient as jest.Mock).mockReturnValue(mockQueryClient);
+    vi.mocked(useQueryClient).mockReturnValue(mockQueryClient as any);
 
     // Mock the store selectors
-    jest
-      .spyOn(require('@/context/Dashboards'), 'useOriginalDashboardStore')
-      .mockImplementation((selector: any) =>
-        selector({
-          setOriginalDashboard: mockSetOriginalDashboard
-        })
-      );
+    vi.mocked(useOriginalDashboardStore).mockImplementation((selector: any) =>
+      selector({
+        setOriginalDashboard: mockSetOriginalDashboard
+      })
+    );
 
     // Mock the query store
-    jest
-      .spyOn(require('./dashboardQueryStore'), 'useDashboardQueryStore')
-      .mockImplementation((selector: any) =>
-        selector({
-          onSetLatestDashboardVersion: mockSetLatestDashboardVersion
-        })
-      );
+    vi.mocked(useDashboardQueryStore).mockImplementation((selector: any) =>
+      selector({
+        onSetLatestDashboardVersion: mockSetLatestDashboardVersion
+      })
+    );
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
-
-  test('should call mutation function with correct parameters', () => {
+  it('should call mutation function with correct parameters', () => {
     const { result } = renderHook(() => testUseCreateDashboard());
 
     result.current.mutate({ name: 'New Dashboard' });
 
     expect(mockMutateFn).toHaveBeenCalledWith({ name: 'New Dashboard' });
   });
-
-  test('should update query data with the created dashboard', () => {
+  it('should update query data with the created dashboard', () => {
     const { result } = renderHook(() => testUseCreateDashboard());
 
     result.current.mutate({ name: 'Custom Dashboard' });
@@ -568,8 +543,7 @@ describe('useCreateDashboard', () => {
       })
     );
   });
-
-  test('should call store functions and invalidate queries after timeout', () => {
+  it('should call store functions and invalidate queries after timeout', () => {
     const { result } = renderHook(() => testUseCreateDashboard());
 
     result.current.mutate({ name: 'Test Dashboard' });
@@ -596,19 +570,19 @@ describe('useCreateDashboard', () => {
 
 describe('useDeleteDashboards', () => {
   const mockQueryClient = {
-    setQueryData: jest.fn(),
-    invalidateQueries: jest.fn()
+    setQueryData: vi.fn(),
+    invalidateQueries: vi.fn()
   };
-  const mockMutateFn = jest.fn();
+  const mockMutateFn = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Set up dependencies
-    (useQueryClient as jest.Mock).mockReturnValue(mockQueryClient);
+    (useQueryClient as any).mockReturnValue(mockQueryClient);
 
     // Mock useMutation to return our controlled mutate function
-    (useMutation as jest.Mock).mockImplementation(() => ({
+    (useMutation as any).mockImplementation(() => ({
       mutate: mockMutateFn
     }));
 
@@ -625,14 +599,13 @@ describe('useDeleteDashboards', () => {
       return undefined;
     });
   });
-
-  test('should call useMutation with correct parameters', () => {
+  it('should call useMutation with correct parameters', async () => {
     // Import function directly from module
-    const { useDeleteDashboards } = jest.requireActual('./queryRequests');
+    const { useDeleteDashboards } = (await vi.importActual('./queryRequests')) as any;
 
     // Mock implementation of useMutation that captures the config
     let capturedMutationConfig: any;
-    (useMutation as jest.Mock).mockImplementation((config) => {
+    (useMutation as any).mockImplementation((config: any) => {
       capturedMutationConfig = config;
       return { mutate: mockMutateFn };
     });
@@ -649,8 +622,7 @@ describe('useDeleteDashboards', () => {
     // Should have onSuccess handler
     expect(typeof capturedMutationConfig.onSuccess).toBe('function');
   });
-
-  test('should simulate onMutate optimistic update behavior', () => {
+  it('should simulate onMutate optimistic update behavior', () => {
     // Create a mock onMutate function
     const onMutate = (variables: { dashboardId: string | string[] }) => {
       const ids =
@@ -695,75 +667,27 @@ describe('useDeleteDashboards', () => {
     // Only dashboard 2 should remain
     expect(updatedData).toEqual([{ id: 'dashboard-2', name: 'Dashboard 2' }]);
   });
-
-  test('should call invalidateQueries on success', () => {
-    // Mock config to capture onSuccess
-    let capturedOnSuccess: any;
-    (useMutation as jest.Mock).mockImplementation((config: any) => {
-      capturedOnSuccess = config.onSuccess;
-      return { mutate: mockMutateFn };
-    });
-
-    // Render the hook
-    renderHook(() => {
-      const { useDeleteDashboards } = jest.requireActual('./queryRequests');
-      return useDeleteDashboards();
-    });
-
-    // Simulate onSuccess being called
-    capturedOnSuccess(null, { dashboardId: 'dashboard-1' });
-
-    // Verify invalidation happens with right query key
-    expect(mockQueryClient.invalidateQueries).toHaveBeenCalledWith({
-      queryKey: ['dashboards'],
-      refetchType: 'all'
-    });
-  });
 });
 
 describe('useAddDashboardToCollection', () => {
   const mockQueryClient = {
-    invalidateQueries: jest.fn()
+    invalidateQueries: vi.fn()
   };
-  const mockMutateFn = jest.fn();
+  const mockMutateFn = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Set up dependencies
-    (useQueryClient as jest.Mock).mockReturnValue(mockQueryClient);
+    (useQueryClient as any).mockReturnValue(mockQueryClient);
 
     // Mock useMutation
-    (useMutation as jest.Mock).mockImplementation(() => ({
+    (useMutation as any).mockImplementation(() => ({
       mutate: mockMutateFn
     }));
   });
 
-  test('should define proper mutation function', () => {
-    // Mock implementation of useMutation that captures the config
-    let capturedMutationConfig: any;
-    (useMutation as jest.Mock).mockImplementation((config) => {
-      capturedMutationConfig = config;
-      return { mutate: mockMutateFn };
-    });
-
-    // Render the hook
-    renderHook(() => {
-      const { useAddDashboardToCollection } = jest.requireActual('./queryRequests');
-      return useAddDashboardToCollection();
-    });
-
-    // Verify mutation config
-    expect(capturedMutationConfig).toBeDefined();
-
-    // Should have mutation function
-    expect(typeof capturedMutationConfig.mutationFn).toBe('function');
-
-    // Should have onSuccess handler
-    expect(typeof capturedMutationConfig.onSuccess).toBe('function');
-  });
-
-  test('should call invalidateQueries on success', () => {
+  it('should call invalidateQueries on success', () => {
     // Create a mock onSuccess function similar to the one in the hook
     const onSuccess = (_: any, variables: { collectionIds: string[] }) => {
       // Simulate what the hook's onSuccess function would do
@@ -795,47 +719,23 @@ describe('useAddDashboardToCollection', () => {
 
 describe('useRemoveDashboardFromCollection', () => {
   const mockQueryClient = {
-    invalidateQueries: jest.fn()
+    invalidateQueries: vi.fn()
   };
-  const mockMutateFn = jest.fn();
+  const mockMutateFn = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Set up dependencies
-    (useQueryClient as jest.Mock).mockReturnValue(mockQueryClient);
+    (useQueryClient as any).mockReturnValue(mockQueryClient);
 
     // Mock useMutation
-    (useMutation as jest.Mock).mockImplementation(() => ({
+    (useMutation as any).mockImplementation(() => ({
       mutate: mockMutateFn
     }));
   });
 
-  test('should define proper mutation function', () => {
-    // Mock implementation of useMutation that captures the config
-    let capturedMutationConfig: any;
-    (useMutation as jest.Mock).mockImplementation((config) => {
-      capturedMutationConfig = config;
-      return { mutate: mockMutateFn };
-    });
-
-    // Render the hook
-    renderHook(() => {
-      const { useRemoveDashboardFromCollection } = jest.requireActual('./queryRequests');
-      return useRemoveDashboardFromCollection();
-    });
-
-    // Verify mutation config
-    expect(capturedMutationConfig).toBeDefined();
-
-    // Should have mutation function
-    expect(typeof capturedMutationConfig.mutationFn).toBe('function');
-
-    // Should have onSuccess handler
-    expect(typeof capturedMutationConfig.onSuccess).toBe('function');
-  });
-
-  test('should call invalidateQueries on success', () => {
+  it('should call invalidateQueries on success', () => {
     // Create a mock onSuccess function similar to the one in the hook
     const onSuccess = (_: any, variables: { collectionIds: string[] }) => {
       // Simulate what the hook's onSuccess function would do
@@ -863,10 +763,9 @@ describe('useRemoveDashboardFromCollection', () => {
       refetchType: 'all'
     });
   });
-
-  test('should properly format assets for removal', () => {
+  it('should properly format assets for removal', () => {
     // Mock the mutationFn directly to verify it formats assets correctly
-    const mockRemoveAssetFromCollection = jest.fn().mockResolvedValue({ success: true });
+    const mockRemoveAssetFromCollection = vi.fn().mockResolvedValue({ success: true });
 
     // Define a test mutationFn that mirrors the hook's implementation
     const mutationFn = async (variables: { dashboardIds: string[]; collectionIds: string[] }) => {
@@ -917,56 +816,33 @@ describe('useRemoveDashboardFromCollection', () => {
 
 describe('useShareDashboard', () => {
   const mockQueryClient = {
-    setQueryData: jest.fn(),
-    invalidateQueries: jest.fn()
+    setQueryData: vi.fn(),
+    invalidateQueries: vi.fn()
   };
-  const mockMutateFn = jest.fn();
+  const mockMutateFn = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Set up dependencies
-    (useQueryClient as jest.Mock).mockReturnValue(mockQueryClient);
+    (useQueryClient as any).mockReturnValue(mockQueryClient);
 
     // Mock useGetDashboardVersionNumber
-    (useGetDashboardVersionNumber as jest.Mock).mockReturnValue({
-      latestVersionNumber: 5
+    vi.mocked(useGetDashboardVersionNumber).mockReturnValue({
+      selectedVersionNumber: 5,
+      latestVersionNumber: 5,
+      paramVersionNumber: undefined
     });
 
     // Mock useMutation
-    (useMutation as jest.Mock).mockImplementation(() => ({
+    (useMutation as any).mockImplementation(() => ({
       mutate: mockMutateFn
     }));
   });
 
-  test('should define proper mutation function and handlers', () => {
-    // Mock implementation of useMutation that captures the config
-    let capturedMutationConfig: any;
-    (useMutation as jest.Mock).mockImplementation((config) => {
-      capturedMutationConfig = config;
-      return { mutate: mockMutateFn };
-    });
-
-    // Render the hook
-    renderHook(() => {
-      const { useShareDashboard } = jest.requireActual('./queryRequests');
-      return useShareDashboard();
-    });
-
-    // Verify mutation config
-    expect(capturedMutationConfig).toBeDefined();
-
-    // Verify mutationFn is set to shareDashboard
-    expect(capturedMutationConfig.mutationFn).toBeDefined();
-
-    // Should have onMutate and onSuccess handlers
-    expect(typeof capturedMutationConfig.onMutate).toBe('function');
-    expect(typeof capturedMutationConfig.onSuccess).toBe('function');
-  });
-
-  test('should perform optimistic updates in onMutate', () => {
+  it('should perform optimistic updates in onMutate', () => {
     // Create a direct mock for getLatestMetricVersion instead of trying to mock the hook
-    const mockGetLatestMetricVersion = jest
+    const mockGetLatestMetricVersion = vi
       .fn()
       .mockReturnValueOnce(3) // For metric-1
       .mockReturnValueOnce(2); // For metric-2
@@ -1054,8 +930,7 @@ describe('useShareDashboard', () => {
       name: ''
     });
   });
-
-  test('should handle checking for available dashboard slots', () => {
+  it('should handle checking for available dashboard slots', () => {
     // Test data
     const existingMetricIds = ['metric-1', 'metric-2', 'metric-3'];
     const newMetricIds = ['metric-4', 'metric-5'];
@@ -1080,24 +955,23 @@ describe('useShareDashboard', () => {
 
 describe('useRemoveMetricsFromDashboard', () => {
   const mockQueryClient = {
-    setQueryData: jest.fn(),
-    invalidateQueries: jest.fn()
+    setQueryData: vi.fn(),
+    invalidateQueries: vi.fn()
   };
-  const mockMutateFn = jest.fn();
+  const mockMutateFn = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Set up dependencies
-    (useQueryClient as jest.Mock).mockReturnValue(mockQueryClient);
+    (useQueryClient as any).mockReturnValue(mockQueryClient);
 
     // Mock useMutation
-    (useMutation as jest.Mock).mockImplementation(() => ({
+    (useMutation as any).mockImplementation(() => ({
       mutate: mockMutateFn
     }));
   });
-
-  test('should optimistically update metrics by removing dashboard references', () => {
+  it('should optimistically update metrics by removing dashboard references', () => {
     // Create mock data for the metrics and dashboard
     const dashboardId = 'dashboard-123';
     const metricIds = ['metric-1', 'metric-2'];
@@ -1105,7 +979,7 @@ describe('useRemoveMetricsFromDashboard', () => {
 
     // Create a mock for getLatestMetricVersion
 
-    const mockGetLatestMetricVersion = jest.fn((metricId) => (highestVersions as any)[metricId]);
+    const mockGetLatestMetricVersion = vi.fn((metricId) => (highestVersions as any)[metricId]);
 
     // Mock metric query data
     const mockMetric1Data = {

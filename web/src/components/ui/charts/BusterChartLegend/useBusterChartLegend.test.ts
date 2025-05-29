@@ -1,8 +1,9 @@
-import { ChartType } from '@/api/asset_interfaces/metric/charts/enum';
+import { describe, it, expect } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { act } from 'react';
-import type { BusterChartLegendItem } from './interfaces';
 import { useBusterChartLegend } from './useBusterChartLegend';
+import { ChartType } from '@/api/asset_interfaces/metric/charts/enum';
+import { BusterChartLegendItem } from './interfaces';
 
 describe('useBusterChartLegend', () => {
   const defaultProps = {

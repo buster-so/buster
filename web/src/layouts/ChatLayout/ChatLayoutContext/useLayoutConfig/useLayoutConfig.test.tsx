@@ -1,37 +1,38 @@
-import type { FileType } from '@/api/asset_interfaces/chat';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
+import { useLayoutConfig } from './useLayoutConfig';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { BusterRoutes } from '@/routes';
-import { act, renderHook } from '@testing-library/react';
-import type { SelectedFile } from '../../interfaces';
-import type { FileViewSecondary } from './interfaces';
-import { useLayoutConfig } from './useLayoutConfig';
+import { FileType } from '@/api/asset_interfaces/chat';
+import { SelectedFile } from '../../interfaces';
+import { FileViewSecondary } from './interfaces';
 
 // Mock dependencies
-jest.mock('@/context/BusterAppLayout', () => ({
-  useAppLayoutContextSelector: jest.fn()
+vi.mock('@/context/BusterAppLayout', () => ({
+  useAppLayoutContextSelector: vi.fn()
 }));
 
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(() => ({
-    prefetch: jest.fn(),
-    push: jest.fn()
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(() => ({
+    prefetch: vi.fn(),
+    push: vi.fn()
   }))
 }));
 
 // Mock timeout to return immediately
-jest.mock('@/lib/timeout', () => ({
-  timeout: jest.fn().mockImplementation(() => Promise.resolve())
+vi.mock('@/lib/timeout', () => ({
+  timeout: vi.fn().mockImplementation(() => Promise.resolve())
 }));
 
 describe('useLayoutConfig', () => {
-  const mockOnChangePage = jest.fn();
-  const mockAnimateOpenSplitter = jest.fn();
-  const mockOnSetSelectedFile = jest.fn();
-  const mockOnChangeQueryParams = jest.fn();
+  const mockOnChangePage = vi.fn();
+  const mockAnimateOpenSplitter = vi.fn();
+  const mockOnSetSelectedFile = vi.fn();
+  const mockOnChangeQueryParams = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (useAppLayoutContextSelector as jest.Mock).mockImplementation((selector) => {
+    vi.clearAllMocks();
+    (useAppLayoutContextSelector as any).mockImplementation((selector) => {
       const state = {
         onChangePage: mockOnChangePage,
         onChangeQueryParams: mockOnChangeQueryParams
@@ -52,7 +53,7 @@ describe('useLayoutConfig', () => {
     animateOpenSplitter: mockAnimateOpenSplitter,
     appSplitterRef: {
       current: {
-        isSideClosed: jest.fn().mockReturnValue(false)
+        isSideClosed: vi.fn().mockReturnValue(false)
       }
     } as any,
     // ChatParams properties

@@ -5,22 +5,26 @@ import {
 } from '@/api/asset_interfaces/datasources';
 import { getDatasource } from './requests';
 import mainApi from '../instances';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 // Mock dependencies
-jest.mock('../instances', () => ({
+vi.mock('../instances', () => ({
   __esModule: true,
   default: {
-    get: jest.fn()
+    get: vi.fn()
   }
 }));
 
 // Mock the DataSourceSchema
-jest.mock('@/api/asset_interfaces/datasources', () => ({
-  ...jest.requireActual('@/api/asset_interfaces/datasources'),
-  DataSourceSchema: {
-    parse: jest.fn()
-  }
-}));
+vi.mock('@/api/asset_interfaces/datasources', async () => {
+  const actual = await vi.importActual('@/api/asset_interfaces/datasources');
+  return {
+    ...actual,
+    DataSourceSchema: {
+      parse: vi.fn()
+    }
+  };
+});
 
 describe('data_source requests', () => {
   const mockDataSource = {
@@ -47,18 +51,18 @@ describe('data_source requests', () => {
   } satisfies DataSource;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('getDatasource', () => {
     it('should fetch a data source by id', async () => {
       // Setup mock response
-      (mainApi.get as jest.Mock).mockResolvedValue({
+      (mainApi.get as any).mockResolvedValue({
         data: mockDataSource
       });
 
       // Setup schema validation mock
-      (DataSourceSchema.parse as jest.Mock).mockReturnValue(mockDataSource);
+      (DataSourceSchema.parse as any).mockReturnValue(mockDataSource);
 
       const result = await getDatasource('test-id');
 
@@ -70,7 +74,7 @@ describe('data_source requests', () => {
     it('should throw an error when the API request fails', async () => {
       // Setup mock error
       const mockError = new Error('Request failed');
-      (mainApi.get as jest.Mock).mockRejectedValue(mockError);
+      (mainApi.get as any).mockRejectedValue(mockError);
 
       // Call and expect error
       await expect(getDatasource('test-id')).rejects.toThrow('Request failed');
@@ -79,13 +83,13 @@ describe('data_source requests', () => {
 
     it('should throw an error when validation fails', async () => {
       // Setup mock response with invalid data
-      (mainApi.get as jest.Mock).mockResolvedValue({
+      (mainApi.get as any).mockResolvedValue({
         data: { invalid: 'data' }
       });
 
       // Setup validation error
       const validationError = new Error('Validation failed');
-      (DataSourceSchema.parse as jest.Mock).mockImplementation(() => {
+      (DataSourceSchema.parse as any).mockImplementation(() => {
         throw validationError;
       });
 

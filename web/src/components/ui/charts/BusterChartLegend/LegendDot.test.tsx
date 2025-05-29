@@ -1,7 +1,8 @@
-import { ChartType } from '@/api/asset_interfaces/metric/charts';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
 import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { LegendItemDot } from './LegendDot';
+import { ChartType } from '@/api/asset_interfaces/metric/charts';
 
 describe('LegendItemDot', () => {
   const defaultProps = {
@@ -42,7 +43,7 @@ describe('LegendItemDot', () => {
   });
 
   it('calls onFocusItem when clicked', () => {
-    const onFocusItem = jest.fn();
+    const onFocusItem = vi.fn();
     render(<LegendItemDot {...defaultProps} onFocusItem={onFocusItem} />);
 
     const dot = screen.getByTestId('legend-dot');
@@ -52,7 +53,7 @@ describe('LegendItemDot', () => {
   });
 
   it('shows focus target on hover when onFocusItem is provided', () => {
-    const onFocusItem = jest.fn();
+    const onFocusItem = vi.fn();
     render(<LegendItemDot {...defaultProps} onFocusItem={onFocusItem} />);
 
     const container = screen.getByTestId('legend-dot-container');
@@ -73,8 +74,8 @@ describe('LegendItemDot', () => {
   });
 
   it('stops event propagation when clicked with onFocusItem', () => {
-    const onFocusItem = jest.fn();
-    const parentClick = jest.fn();
+    const onFocusItem = vi.fn();
+    const parentClick = vi.fn();
 
     render(
       <div onClick={parentClick}>

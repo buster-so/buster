@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import { ChartType } from '@/api/asset_interfaces/metric';
 import type { DatasetOption, DatasetOptionsWithTicks } from './interfaces';
 import { modifyDatasets } from './modifyDatasets';
@@ -52,8 +53,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       ticksKey: []
     };
   };
-
-  test('should not modify datasets if chart type is not pie', () => {
+  it('should not modify datasets if chart type is not pie', () => {
     const datasets = createBasicDatasets();
     const { datasets: result } = modifyDatasets({
       datasets,
@@ -68,8 +68,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     expect(result).toEqual(datasets.datasets);
     expect(result.length).toBe(5);
   });
-
-  test('should not modify datasets if pieMinimumSlicePercentage is undefined', () => {
+  it('should not modify datasets if pieMinimumSlicePercentage is undefined', () => {
     const datasets = createBasicDatasets();
     const { datasets: result } = modifyDatasets({
       datasets,
@@ -84,8 +83,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     expect(result).toEqual(datasets.datasets);
     expect(result.length).toBe(5);
   });
-
-  test('should combine slices below the minimum percentage into an "Other" category', () => {
+  it('should combine slices below the minimum percentage into an "Other" category', () => {
     const datasets = createBasicDatasets();
     const minimumPercentage = 10;
 
@@ -118,8 +116,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     expect(otherCategory?.data[0]).toBe(100); // Combined value of slice4 (80) and slice5 (20)
     expect(otherCategory?.label[0].value).toBe('Other');
   });
-
-  test('should handle case when no slices are below the minimum percentage', () => {
+  it('should handle case when no slices are below the minimum percentage', () => {
     const datasets = createBasicDatasets();
     const minimumPercentage = 1; // All slices are above 1%
 
@@ -137,8 +134,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     expect(result.length).toBe(5);
     expect(result.some((dataset) => dataset.id === 'other')).toBe(false);
   });
-
-  test('should handle case when all slices are below the minimum percentage', () => {
+  it('should handle case when all slices are below the minimum percentage', () => {
     const datasets = createBasicDatasets();
     const minimumPercentage = 60; // All slices are below 60%
 
@@ -157,8 +153,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     expect(result[0].id).toBe('other');
     expect(result[0].data[0]).toBe(1000); // Sum of all values
   });
-
-  test('should handle empty datasets array', () => {
+  it('should handle empty datasets array', () => {
     const { datasets: result } = modifyDatasets({
       datasets: {
         datasets: [],
@@ -175,8 +170,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
 
     expect(result).toEqual([]);
   });
-
-  test('should handle datasets with null or zero values', () => {
+  it('should handle datasets with null or zero values', () => {
     const datasets: DatasetOption[] = [
       {
         id: 'slice1',
@@ -226,8 +220,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     expect(result[0].data[0]).toBe(100);
     expect(result[1].data[0]).toBe(0);
   });
-
-  test('should handle case when all values are null or zero', () => {
+  it('should handle case when all values are null or zero', () => {
     const datasets: DatasetOption[] = [
       {
         id: 'slice1',
@@ -264,8 +257,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     // Should return the original datasets when all values are null/zero
     expect(result).toEqual(datasets);
   });
-
-  test('should handle decimal values in pieMinimumSlicePercentage', () => {
+  it('should handle decimal values in pieMinimumSlicePercentage', () => {
     const datasets = createBasicDatasets();
     const minimumPercentage = 8.5; // Between slice4 (8%) and slice3 (10%)
 
@@ -290,8 +282,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     expect(otherCategory).toBeDefined();
     expect(otherCategory?.data[0]).toBe(100); // Combined value of slice4 (80) and slice5 (20)
   });
-
-  test('should preserve tooltipData when combining into Other category', () => {
+  it('should preserve tooltipData when combining into Other category', () => {
     const datasets = createBasicDatasets();
     const minimumPercentage = 10;
 
@@ -315,8 +306,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     expect(valueTooltip).toBeDefined();
     expect(valueTooltip?.value).toBe(100); // Combined value of slice4 (80) and slice5 (20)
   });
-
-  test('should handle edge case where pieMinimumSlicePercentage is exactly equal to a slice percentage', () => {
+  it('should handle edge case where pieMinimumSlicePercentage is exactly equal to a slice percentage', () => {
     const datasets = createBasicDatasets();
     const minimumPercentage = 8; // Exactly equal to slice4's percentage
 
@@ -342,8 +332,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     expect(otherCategory).toBeDefined();
     expect(otherCategory?.data[0]).toBe(20); // Only slice5 (20) is combined
   });
-
-  test('should correctly combine tooltipData from multiple slices into the Other category', () => {
+  it('should correctly combine tooltipData from multiple slices into the Other category', () => {
     // Create datasets with more complex tooltip data
     const datasetsWithDetailedTooltips: DatasetOption[] = [
       {
@@ -489,8 +478,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     expect(otherCategory?.label[0].key).toBe('category');
     expect(otherCategory?.label[0].value).toBe('Other');
   });
-
-  test('should accurately reflect the sum of combined values in tooltip when creating Other category', () => {
+  it('should accurately reflect the sum of combined values in tooltip when creating Other category', () => {
     const datasets = createBasicDatasets();
     const minimumPercentage = 15; // This will cause slices 3, 4, and 5 to be combined
 
@@ -524,8 +512,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     expect(valueTooltip).toBeDefined();
     expect(valueTooltip?.value).toBe(expectedOtherValue);
   });
-
-  test('should handle datasets with different tooltip structures when creating Other category', () => {
+  it('should handle datasets with different tooltip structures when creating Other category', () => {
     // Create datasets with varying tooltip structures
     const datasetsWithVariedTooltips: DatasetOption[] = [
       {
@@ -656,8 +643,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
       ]
     ]);
   });
-
-  test('should properly handle and combine numeric tooltip values in Other category', () => {
+  it('should properly handle and combine numeric tooltip values in Other category', () => {
     // Create datasets with numeric tooltip values
     const datasetsWithNumericTooltips: DatasetOption[] = [
       {
@@ -754,8 +740,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     expect(growthTooltip).toBeDefined();
     expect(growthTooltip?.value).toBe(20); // sum of the tooltip growth values in slices 3 and 4
   });
-
-  test('should correctly concatenate string tooltip values when combining into Other category', () => {
+  it('should correctly concatenate string tooltip values when combining into Other category', () => {
     // Create datasets with string tooltip values
     const datasetsWithStringTooltips: DatasetOption[] = [
       {
@@ -851,8 +836,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     expect(regionTooltip).toBeDefined();
     expect(regionTooltip?.value).toBe('East, West'); // String values should be concatenated with comma separator
   });
-
-  test('should correctly handle mixed types of tooltip values when combining into Other category', () => {
+  it('should correctly handle mixed types of tooltip values when combining into Other category', () => {
     // Create datasets with mixed tooltip value types
     const datasetsWithMixedTooltips: DatasetOption[] = [
       {
@@ -971,8 +955,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     expect(statusTooltip).toBeDefined();
     expect(statusTooltip?.value).toBe('Inactive, Pending, Active'); // Unique string values concatenated
   });
-
-  test('should handle tooltip merging when some slices have missing tooltip keys', () => {
+  it('should handle tooltip merging when some slices have missing tooltip keys', () => {
     // Create datasets with some missing tooltip keys
     const datasetsWithMissingTooltips: DatasetOption[] = [
       {
@@ -1095,8 +1078,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     expect(extraTooltip).toBeDefined();
     expect(extraTooltip?.value).toBe('Unique field'); // Only from slice4
   });
-
-  test('should handle negative values in pie charts', () => {
+  it('should handle negative values in pie charts', () => {
     const datasetsWithNegativeValues: DatasetOption[] = [
       {
         id: 'slice1',
@@ -1149,8 +1131,7 @@ describe('modifyDatasets - pieMinimumSlicePercentage tests', () => {
     // No "Other" category should be created
     expect(result.some((dataset) => dataset.id === 'other')).toBe(true);
   });
-
-  test('should handle pieMinimumSlicePercentage with datasets having different label structures', () => {
+  it('should handle pieMinimumSlicePercentage with datasets having different label structures', () => {
     const datasetsWithDifferentLabels: DatasetOption[] = [
       {
         id: 'slice1',
@@ -1281,8 +1262,7 @@ describe('modifyDatasets - pieSortBy tests', () => {
     ticks: [],
     ticksKey: []
   });
-
-  test('should sort pie chart data by value in ascending order', () => {
+  it('should sort pie chart data by value in ascending order', () => {
     const datasets = createPieDatasets();
     const { datasets: result } = modifyDatasets({
       datasets,
@@ -1306,8 +1286,7 @@ describe('modifyDatasets - pieSortBy tests', () => {
     expect(result[0].tooltipData?.[0]?.[0]?.value).toBe(100);
     expect(result[1].tooltipData?.[0]?.[0]?.value).toBe(300);
   });
-
-  test('should sort pie chart data by key alphabetically', () => {
+  it('should sort pie chart data by key alphabetically', () => {
     const datasets = createPieDatasets();
     const { datasets: result } = modifyDatasets({
       datasets,
@@ -1332,8 +1311,7 @@ describe('modifyDatasets - pieSortBy tests', () => {
     expect(result[0].tooltipData?.[0]?.[0]?.value).toBe(100);
     expect(result[1].tooltipData?.[0]?.[0]?.value).toBe(300);
   });
-
-  test('should not modify order when pieSortBy is null', () => {
+  it('should not modify order when pieSortBy is null', () => {
     const datasets = createPieDatasets();
     const { datasets: result } = modifyDatasets({
       datasets,
@@ -1356,8 +1334,7 @@ describe('modifyDatasets - pieSortBy tests', () => {
     expect(result[0].tooltipData?.[0]?.[0]?.value).toBe(300);
     expect(result[1].tooltipData?.[0]?.[0]?.value).toBe(100);
   });
-
-  test('should handle empty datasets array', () => {
+  it('should handle empty datasets array', () => {
     const emptyDatasets: DatasetOptionsWithTicks = {
       datasets: [],
       ticks: [],
@@ -1409,8 +1386,7 @@ describe('modifyDatasets - percentage stack tests', () => {
     ticks: [],
     ticksKey: []
   });
-
-  test('should convert bar chart values to percentages for percentage-stack mode', () => {
+  it('should convert bar chart values to percentages for percentage-stack mode', () => {
     const datasets = createBarDatasets();
     expect(datasets.datasets[0].data).toEqual([100, 200, 300]);
     expect(datasets.datasets[1].data).toEqual([50, 150, 250]);
@@ -1442,8 +1418,7 @@ describe('modifyDatasets - percentage stack tests', () => {
     expect(result[0].data[2]).toBeCloseTo(54.55, 1);
     expect(result[1].data[2]).toBeCloseTo(45.45, 1);
   });
-
-  test('should sort bar chart data by value in ascending order', () => {
+  it('should sort bar chart data by value in ascending order', () => {
     const datasets = createBarDatasets();
     const { datasets: result } = modifyDatasets({
       datasets,
@@ -1474,8 +1449,7 @@ describe('modifyDatasets - percentage stack tests', () => {
     expect(result[0].tooltipData?.[1]?.[0]?.value).toBe(200);
     expect(result[0].tooltipData?.[2]?.[0]?.value).toBe(300);
   });
-
-  test('should handle percentage-stack for line charts', () => {
+  it('should handle percentage-stack for line charts', () => {
     const datasets = createBarDatasets();
     const { datasets: result } = modifyDatasets({
       datasets,
@@ -1505,8 +1479,7 @@ describe('modifyDatasets - percentage stack tests', () => {
     expect(result[0].data[2]).toBeCloseTo(54.55, 1);
     expect(result[1].data[2]).toBeCloseTo(45.45, 1);
   });
-
-  test('should handle percentage-stack with zero values', () => {
+  it('should handle percentage-stack with zero values', () => {
     const datasetsWithZeros: DatasetOption[] = [
       {
         id: 'dataset1',
@@ -1566,8 +1539,7 @@ describe('modifyDatasets - percentage stack tests', () => {
     expect(result[0].data[2]).toBeCloseTo(100, 1);
     expect(result[1].data[2]).toBeCloseTo(0, 1);
   });
-
-  test('should handle percentage-stack with null and mixed values', () => {
+  it('should handle percentage-stack with null and mixed values', () => {
     const datasetsWithNulls: DatasetOption[] = [
       {
         id: 'dataset1',
@@ -1642,8 +1614,7 @@ describe('modifyDatasets - percentage stack tests', () => {
     expect(result[1].data[2]).toBeCloseTo(0, 1);
     expect(result[2].data[2]).toBeCloseTo(40, 1);
   });
-
-  test('should handle percentage-stack with uneven data lengths', () => {
+  it('should handle percentage-stack with uneven data lengths', () => {
     const datasetsWithUnevenLengths: DatasetOption[] = [
       {
         id: 'dataset1',
@@ -1734,8 +1705,7 @@ describe('modifyDatasets - barSortBy tests', () => {
     ticks: [],
     ticksKey: []
   });
-
-  test('should sort bar chart data by descending values', () => {
+  it('should sort bar chart data by descending values', () => {
     const datasets = createBarDatasets();
     const { datasets: result } = modifyDatasets({
       datasets,
@@ -1770,8 +1740,7 @@ describe('modifyDatasets - barSortBy tests', () => {
     expect(result[0].tooltipData?.[1]?.[0]?.value).toBe(100);
     expect(result[0].tooltipData?.[2]?.[0]?.value).toBe(200);
   });
-
-  test('should sort bar chart data by ascending values when values are not already in order', () => {
+  it('should sort bar chart data by ascending values when values are not already in order', () => {
     // Create datasets that are not already in ascending order
     const datasetsNotInOrder: DatasetOption[] = [
       {
@@ -1838,8 +1807,7 @@ describe('modifyDatasets - barSortBy tests', () => {
     expect(result[0].tooltipData?.[1]?.[0]?.value).toBe(200);
     expect(result[0].tooltipData?.[2]?.[0]?.value).toBe(300);
   });
-
-  test('should handle bar sort with multiple options but use first valid option', () => {
+  it('should handle bar sort with multiple options but use first valid option', () => {
     const datasets = createBarDatasets();
 
     const { datasets: result } = modifyDatasets({
@@ -1891,8 +1859,7 @@ describe('modifyDatasets - barSortBy tests', () => {
     expect(result2[1].data[1]).toBe(150);
     expect(result2[1].data[2]).toBe(50);
   });
-
-  test('should handle bar sort with datasets containing negative values', () => {
+  it('should handle bar sort with datasets containing negative values', () => {
     const datasetsWithNegatives: DatasetOption[] = [
       {
         id: 'dataset1',
@@ -1957,8 +1924,7 @@ describe('modifyDatasets - barSortBy tests', () => {
     expect(result[0].tooltipData?.[1]?.[0]?.value).toBe(-100);
     expect(result[0].tooltipData?.[2]?.[0]?.value).toBe(200);
   });
-
-  test('should handle bar sort with datasets containing null values', () => {
+  it('should handle bar sort with datasets containing null values', () => {
     const datasetsWithNulls: DatasetOption[] = [
       {
         id: 'dataset1',
@@ -2023,8 +1989,7 @@ describe('modifyDatasets - barSortBy tests', () => {
     expect(result[0].tooltipData?.[1]?.[0]?.value).toBe(200);
     expect(result[0].tooltipData?.[2]?.[0]?.value).toBe(null);
   });
-
-  test('single dataset can sort by ascending values', () => {
+  it('single dataset can sort by ascending values', () => {
     const datasets: DatasetOption[] = [
       {
         id: 'dataset1',
@@ -2059,8 +2024,7 @@ describe('modifyDatasets - barSortBy tests', () => {
     expect(result[0].data[1]).toBe(200);
     expect(result[0].data[2]).toBe(300);
   });
-
-  test('single dataset can sort by descending values', () => {
+  it('single dataset can sort by descending values', () => {
     const datasets: DatasetOption[] = [
       {
         id: 'dataset1',
@@ -2095,8 +2059,7 @@ describe('modifyDatasets - barSortBy tests', () => {
     expect(result[0].data[1]).toBe(200);
     expect(result[0].data[2]).toBe(100);
   });
-
-  test('single dataset with null values can sort by descending values', () => {
+  it('single dataset with null values can sort by descending values', () => {
     const datasets: DatasetOption[] = [
       {
         id: 'dataset1',

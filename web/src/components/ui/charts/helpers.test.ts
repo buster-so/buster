@@ -1,5 +1,6 @@
-import { type ChartEncodes, ChartType } from '@/api/asset_interfaces/metric/charts';
+import { describe, it, expect } from 'vitest';
 import { doesChartHaveValidAxis } from './helpers';
+import { ChartType, ChartEncodes } from '@/api/asset_interfaces/metric/charts';
 
 describe('doesChartHaveValidAxis', () => {
   it('should return true when isTable is true regardless of other parameters', () => {

@@ -1,9 +1,10 @@
+import { describe, it, expect, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 import { getEmbedAssetRedirect } from './assetPageChecks';
 import { BusterRoutes } from './busterRoutes';
 
-jest.mock('next/server', () => ({
-  NextRequest: jest.fn().mockImplementation((url) => ({
+vi.mock('next/server', () => ({
+  NextRequest: vi.fn().mockImplementation((url) => ({
     nextUrl: {
       pathname: new URL(url).pathname
     }
@@ -11,71 +12,61 @@ jest.mock('next/server', () => ({
 }));
 
 describe('getEmbedAssetRedirect', () => {
-  test('should redirect metric chart to embed metric', () => {
+  it('should redirect metric chart to embed metric', () => {
     const request = new NextRequest('https://example.com/app/metrics/123/chart');
     const redirect = getEmbedAssetRedirect(request);
     expect(redirect).toBe('/embed/metrics/123');
   });
-
-  test('should redirect metric results to embed metric', () => {
+  it('should redirect metric results to embed metric', () => {
     const request = new NextRequest('https://example.com/app/metrics/123/results');
     const redirect = getEmbedAssetRedirect(request);
     expect(redirect).toBe('/embed/metrics/123');
   });
-
-  test('should redirect metric file to embed metric', () => {
+  it('should redirect metric file to embed metric', () => {
     const request = new NextRequest('https://example.com/app/metrics/123/file');
     const redirect = getEmbedAssetRedirect(request);
     expect(redirect).toBe('/embed/metrics/123');
   });
-
-  test('should redirect metric version to embed metric', () => {
+  it('should redirect metric version to embed metric', () => {
     const request = new NextRequest('https://example.com/app/metrics/123/version/2');
     const redirect = getEmbedAssetRedirect(request);
     expect(redirect).toBeUndefined();
   });
-
-  test('should redirect dashboard to embed dashboard', () => {
+  it('should redirect dashboard to embed dashboard', () => {
     const request = new NextRequest('https://example.com/app/dashboards/456');
     const redirect = getEmbedAssetRedirect(request);
     expect(redirect).toBe('/embed/dashboards/456');
   });
-
-  test('should redirect dashboard file to embed dashboard', () => {
+  it('should redirect dashboard file to embed dashboard', () => {
     const request = new NextRequest('https://example.com/app/dashboards/456/file');
     const redirect = getEmbedAssetRedirect(request);
     expect(redirect).toBe('/embed/dashboards/456');
   });
-
-  test('should redirect chat metric to embed metric', () => {
+  it('should redirect chat metric to embed metric', () => {
     const request = new NextRequest(
       'https://example.com/app/chats/789/metrics/123/chart?secondary_view=file'
     );
     const redirect = getEmbedAssetRedirect(request);
     expect(redirect).toBe('/embed/metrics/123');
   });
-
-  test('should redirect chat metric chart to embed metric', () => {
+  it('should redirect chat metric chart to embed metric', () => {
     const request = new NextRequest(
       'https://example.com/app/chats/789/metrics/123/chart?secondary_view=file'
     );
     const redirect = getEmbedAssetRedirect(request);
     expect(redirect).toBe('/embed/metrics/123');
   });
-
-  test('should redirect chat dashboard to embed dashboard', () => {
+  it('should redirect chat dashboard to embed dashboard', () => {
     const request = new NextRequest('https://example.com/app/chats/789/dashboards/456');
     const redirect = getEmbedAssetRedirect(request);
     expect(redirect).toBe('/embed/dashboards/456');
   });
-
-  test('should redirect chat dashboard file to embed dashboard', () => {
+  it('should redirect chat dashboard file to embed dashboard', () => {
     const request = new NextRequest('https://example.com/app/chats/789/dashboards/456/file');
     const redirect = getEmbedAssetRedirect(request);
     expect(redirect).toBe('/embed/dashboards/456');
   });
-
-  test('should return undefined for non-matching route', () => {
+  it('should return undefined for non-matching route', () => {
     const request = new NextRequest('https://example.com/some/random/path');
     const redirect = getEmbedAssetRedirect(request);
     expect(redirect).toBeUndefined();

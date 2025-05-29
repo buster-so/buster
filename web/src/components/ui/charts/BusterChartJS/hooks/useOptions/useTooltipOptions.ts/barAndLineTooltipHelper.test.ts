@@ -1,13 +1,14 @@
+import { describe, it, expect } from 'vitest';
+import { barAndLineTooltipHelper } from './barAndLineTooltipHelper';
+import type {
+  Chart,
+  TooltipItem,
+  ChartTypeRegistry,
+  BarControllerDatasetOptions,
+  ChartDatasetProperties
+} from 'chart.js';
 import type { BusterChartConfigProps } from '@/api/asset_interfaces/metric/charts';
 import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
-import type {
-  BarControllerDatasetOptions,
-  Chart,
-  ChartDatasetProperties,
-  ChartTypeRegistry,
-  TooltipItem
-} from 'chart.js';
-import { barAndLineTooltipHelper } from './barAndLineTooltipHelper';
 
 type MockDataset = Partial<
   ChartDatasetProperties<'bar', number[]> & BarControllerDatasetOptions

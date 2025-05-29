@@ -1,12 +1,13 @@
-import axios, { type AxiosError, type InternalAxiosRequestConfig, AxiosHeaders } from 'axios';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import axios, { AxiosError, InternalAxiosRequestConfig, AxiosHeaders } from 'axios';
 import { createInstance, defaultRequestHandler } from './createInstance';
 import { rustErrorHandler } from './buster_rest/errors';
 
 // Mock dependencies
-jest.mock('axios');
-jest.mock('./buster_rest/errors');
-jest.mock('./createServerInstance');
-jest.mock('@tanstack/react-query', () => ({
+vi.mock('axios');
+vi.mock('./buster_rest/errors');
+vi.mock('./createServerInstance');
+vi.mock('@tanstack/react-query', () => ({
   isServer: false
 }));
 
@@ -14,11 +15,11 @@ describe('createInstance', () => {
   const mockBaseURL = 'https://api.example.com';
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (axios.create as jest.Mock).mockReturnValue({
+    vi.clearAllMocks();
+    (axios.create as any).mockReturnValue({
       interceptors: {
-        response: { use: jest.fn() },
-        request: { use: jest.fn() }
+        response: { use: vi.fn() },
+        request: { use: vi.fn() }
       }
     });
   });
@@ -38,11 +39,11 @@ describe('createInstance', () => {
   it('sets up response interceptors', () => {
     const mockInstance = {
       interceptors: {
-        response: { use: jest.fn() },
-        request: { use: jest.fn() }
+        response: { use: vi.fn() },
+        request: { use: vi.fn() }
       }
     };
-    (axios.create as jest.Mock).mockReturnValue(mockInstance);
+    (axios.create as any).mockReturnValue(mockInstance);
 
     createInstance(mockBaseURL);
 
@@ -54,12 +55,12 @@ describe('createInstance', () => {
     const mockError = new Error('API Error') as AxiosError;
     const mockInstance = {
       interceptors: {
-        response: { use: jest.fn() },
-        request: { use: jest.fn() }
+        response: { use: vi.fn() },
+        request: { use: vi.fn() }
       }
     };
-    (axios.create as jest.Mock).mockReturnValue(mockInstance);
-    (rustErrorHandler as jest.Mock).mockReturnValue('Processed Error');
+    (axios.create as any).mockReturnValue(mockInstance);
+    (rustErrorHandler as any).mockReturnValue('Processed Error');
 
     // Get the error handler by capturing the second argument passed to use()
     createInstance(mockBaseURL);
@@ -79,13 +80,13 @@ describe('defaultRequestHandler', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.resetModules();
+    vi.clearAllMocks();
+    vi.resetModules();
   });
 
   it('adds authorization header with token in client environment', async () => {
     const mockToken = 'test-token';
-    const mockCheckTokenValidity = jest.fn().mockResolvedValue({
+    const mockCheckTokenValidity = vi.fn().mockResolvedValue({
       access_token: mockToken,
       isTokenValid: true
     });
@@ -98,7 +99,7 @@ describe('defaultRequestHandler', () => {
   });
 
   it('handles empty token gracefully', async () => {
-    const mockCheckTokenValidity = jest.fn().mockResolvedValue({
+    const mockCheckTokenValidity = vi.fn().mockResolvedValue({
       access_token: '',
       isTokenValid: false
     });

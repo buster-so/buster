@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import { addMetricToDashboardConfig } from './addMetricToDashboard';
 import type { BusterDashboard } from '@/api/asset_interfaces/dashboard';
 

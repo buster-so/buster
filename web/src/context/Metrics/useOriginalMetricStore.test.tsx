@@ -1,9 +1,10 @@
-import type { IBusterMetric } from '@/api/asset_interfaces/metric';
-import { DEFAULT_CHART_CONFIG } from '@/api/asset_interfaces/metric/defaults';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
+import { useOriginalMetricStore } from './useOriginalMetricStore';
 import { VerificationStatus } from '@/api/asset_interfaces/share';
 import { ShareRole } from '@/api/asset_interfaces/share/shareInterfaces';
-import { act, renderHook } from '@testing-library/react';
-import { useOriginalMetricStore } from './useOriginalMetricStore';
+import { DEFAULT_CHART_CONFIG } from '@/api/asset_interfaces/metric/defaults';
+import { IBusterMetric } from '@/api/asset_interfaces/metric';
 
 describe('useOriginalMetricStore', () => {
   beforeEach(() => {

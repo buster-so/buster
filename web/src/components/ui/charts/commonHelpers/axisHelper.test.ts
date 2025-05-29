@@ -1,15 +1,16 @@
-import type { SimplifiedColumnType } from '@/api/asset_interfaces/metric';
-import { formatLabel } from '@/lib/columnFormatter';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { formatYAxisLabel, yAxisSimilar } from './axisHelper';
+import { formatLabel } from '@/lib/columnFormatter';
+import type { SimplifiedColumnType } from '@/api/asset_interfaces/metric';
 
 // Mock dependencies
-jest.mock('@/lib/columnFormatter', () => ({
-  formatLabel: jest.fn()
+vi.mock('@/lib/columnFormatter', () => ({
+  formatLabel: vi.fn()
 }));
 
 describe('formatYAxisLabel', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should use percentage formatting when usePercentageModeAxis is true', () => {
@@ -205,7 +206,7 @@ describe('formatYAxisLabel', () => {
 
 describe('yAxisSimilar', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should return true when all y-axis variables have the same style and currency', () => {

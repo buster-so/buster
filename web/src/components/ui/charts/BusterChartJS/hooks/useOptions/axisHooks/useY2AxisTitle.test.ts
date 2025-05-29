@@ -1,17 +1,18 @@
-import type { SimplifiedColumnType } from '@/api/asset_interfaces/metric';
-import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
-import { formatLabel } from '@/lib/columnFormatter';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { truncateWithEllipsis } from '../../../../commonHelpers/titleHelpers';
 import { useY2AxisTitle } from './useY2AxisTitle';
+import { formatLabel } from '@/lib/columnFormatter';
+import { truncateWithEllipsis } from '../../../../commonHelpers/titleHelpers';
+import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import type { SimplifiedColumnType } from '@/api/asset_interfaces/metric';
 
 // Mock the dependencies
-jest.mock('@/lib/columnFormatter', () => ({
-  formatLabel: jest.fn()
+vi.mock('@/lib/columnFormatter', () => ({
+  formatLabel: vi.fn()
 }));
 
-jest.mock('../../../../commonHelpers/titleHelpers', () => ({
-  truncateWithEllipsis: jest.fn()
+vi.mock('../../../../commonHelpers/titleHelpers', () => ({
+  truncateWithEllipsis: vi.fn()
 }));
 
 describe('useY2AxisTitle', () => {
@@ -39,10 +40,10 @@ describe('useY2AxisTitle', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Default mock implementations
-    (formatLabel as jest.Mock).mockImplementation((value) => `formatted_${value}`);
-    (truncateWithEllipsis as jest.Mock).mockImplementation((text) => text);
+    (formatLabel as any).mockImplementation((value) => `formatted_${value}`);
+    (truncateWithEllipsis as any).mockImplementation((text) => text);
   });
 
   it('should return empty string when chart type is not supported', () => {
@@ -76,7 +77,7 @@ describe('useY2AxisTitle', () => {
       y2AxisAxisTitle: customTitle
     };
 
-    (truncateWithEllipsis as jest.Mock).mockReturnValue('Truncated Custom Title');
+    (truncateWithEllipsis as any).mockReturnValue('Truncated Custom Title');
 
     const { result } = renderHook(() => useY2AxisTitle(props));
 
@@ -86,11 +87,11 @@ describe('useY2AxisTitle', () => {
   });
 
   it('should generate title from y2-axis columns when no custom title is provided', () => {
-    (formatLabel as jest.Mock)
+    (formatLabel as any)
       .mockReturnValueOnce('Formatted Revenue')
       .mockReturnValueOnce('Formatted Profit');
 
-    (truncateWithEllipsis as jest.Mock).mockReturnValue('Formatted Revenue | Formatted Profit');
+    (truncateWithEllipsis as any).mockReturnValue('Formatted Revenue | Formatted Profit');
 
     // Set y2AxisAxisTitle to null to test the fallback behavior
     const props = {
@@ -124,8 +125,8 @@ describe('useY2AxisTitle', () => {
       y2AxisAxisTitle: null
     };
 
-    (formatLabel as jest.Mock).mockReturnValue('Formatted Revenue');
-    (truncateWithEllipsis as jest.Mock).mockReturnValue('Formatted Revenue');
+    (formatLabel as any).mockReturnValue('Formatted Revenue');
+    (truncateWithEllipsis as any).mockReturnValue('Formatted Revenue');
 
     const { result } = renderHook(() => useY2AxisTitle(singleAxisProps));
 
@@ -169,7 +170,7 @@ describe('useY2AxisTitle', () => {
       y2AxisAxisTitle: 'New Title'
     };
 
-    (truncateWithEllipsis as jest.Mock).mockReturnValue('Truncated New Title');
+    (truncateWithEllipsis as any).mockReturnValue('Truncated New Title');
 
     rerender(newProps);
 
@@ -185,7 +186,7 @@ describe('useY2AxisTitle', () => {
       y2AxisAxisTitle: null
     };
 
-    (truncateWithEllipsis as jest.Mock).mockReturnValue('');
+    (truncateWithEllipsis as any).mockReturnValue('');
 
     const { result } = renderHook(() => useY2AxisTitle(emptyAxisProps));
 

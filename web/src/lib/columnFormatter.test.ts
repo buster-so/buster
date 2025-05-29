@@ -1,4 +1,5 @@
-import type { ColumnLabelFormat } from '@/api/asset_interfaces/metric';
+import { describe, it, expect } from 'vitest';
+import { ColumnLabelFormat } from '@/api/asset_interfaces/metric';
 import { formatLabel } from './columnFormatter';
 
 describe('formatLabel', () => {

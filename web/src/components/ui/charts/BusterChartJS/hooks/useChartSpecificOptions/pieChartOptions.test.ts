@@ -1,9 +1,10 @@
-import { determineFontColorContrast } from '@/lib/colors';
-import type { ChartData } from 'chart.js';
-import type { ChartSpecificOptionsProps } from './interfaces';
+import { describe, it, expect, vi } from 'vitest';
 import { pieOptionsHandler, piePluginsHandler } from './pieChartOptions';
+import { determineFontColorContrast } from '@/lib/colors';
+import type { ChartSpecificOptionsProps } from './interfaces';
+import type { ChartData } from 'chart.js';
 
-jest.mock('@/lib/colors');
+vi.mock('@/lib/colors');
 
 const mockChartData: ChartData = {
   labels: ['Test'],
@@ -71,7 +72,7 @@ describe('piePluginsHandler', () => {
   });
 
   it('should configure datalabels plugin correctly for inside position', () => {
-    const mockDetermineFontColorContrast = determineFontColorContrast as jest.Mock;
+    const mockDetermineFontColorContrast = determineFontColorContrast as any;
     mockDetermineFontColorContrast.mockReturnValue('#ffffff');
 
     const props: ChartSpecificOptionsProps = {

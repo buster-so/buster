@@ -1,5 +1,6 @@
-import dayjs from 'dayjs';
+import { describe, it, expect } from 'vitest';
 import { createChatRecord } from './createChatRecord';
+import dayjs from 'dayjs';
 
 describe('createChatRecord', () => {
   // Create test dates based on current time
@@ -13,8 +14,7 @@ describe('createChatRecord', () => {
   const yesterdayStart = now.subtract(1, 'day').startOf('day').format();
   const yesterdayMiddle = now.subtract(1, 'day').hour(12).minute(0).second(0).format();
   const yesterdayEnd = now.subtract(1, 'day').endOf('day').format();
-
-  test('should return empty buckets when input array is empty', () => {
+  it('should return empty buckets when input array is empty', () => {
     const result = createChatRecord([]);
 
     expect(result).toEqual({
@@ -24,8 +24,7 @@ describe('createChatRecord', () => {
       ALL_OTHERS: []
     });
   });
-
-  test('should categorize items into correct buckets', () => {
+  it('should categorize items into correct buckets', () => {
     const mockData = [
       { id: '1', last_edited: today },
       { id: '2', last_edited: yesterday },
@@ -51,8 +50,7 @@ describe('createChatRecord', () => {
     expect(result.ALL_OTHERS.length).toBe(1);
     expect(result.ALL_OTHERS[0].id).toBe('4');
   });
-
-  test('should place all items in ALL_OTHERS when all are older than a week', () => {
+  it('should place all items in ALL_OTHERS when all are older than a week', () => {
     const mockData = [
       { id: '1', last_edited: tenDaysAgo },
       { id: '2', last_edited: now.subtract(15, 'day').format() },
@@ -67,8 +65,7 @@ describe('createChatRecord', () => {
     expect(result.ALL_OTHERS).toHaveLength(3);
     expect(result.ALL_OTHERS.map((item) => item.id)).toEqual(['1', '2', '3']);
   });
-
-  test('should handle items with extended properties', () => {
+  it('should handle items with extended properties', () => {
     // Create an item with additional properties beyond the required id and last_edited
     const extendedItem = {
       id: '1',
@@ -87,8 +84,7 @@ describe('createChatRecord', () => {
     expect(result.TODAY[0].name).toBe('Test Item');
     expect(result.TODAY[0].extra_field).toBe('some value');
   });
-
-  test('should place multiple items from yesterday in the YESTERDAY bucket', () => {
+  it('should place multiple items from yesterday in the YESTERDAY bucket', () => {
     const mockData = [
       { id: 'y1', last_edited: yesterday },
       { id: 'y2', last_edited: yesterdayStart },
@@ -110,8 +106,7 @@ describe('createChatRecord', () => {
     expect(yesterdayIds).toContain('y3');
     expect(yesterdayIds).toContain('y4');
   });
-
-  test('should handle boundary cases for yesterday time', () => {
+  it('should handle boundary cases for yesterday time', () => {
     // Create dates right at the boundary of yesterday/today
     const almostToday = now.startOf('day').subtract(1, 'millisecond').format();
     const barelyToday = now.startOf('day').format();
@@ -129,8 +124,7 @@ describe('createChatRecord', () => {
     expect(result.TODAY).toHaveLength(1);
     expect(result.TODAY[0].id).toBe('barely-today');
   });
-
-  test('should sort items correctly when mixed with other time periods', () => {
+  it('should sort items correctly when mixed with other time periods', () => {
     // Create a mix of items with some yesterday dates mixed in
     const mockData = [
       { id: 'today-1', last_edited: today },

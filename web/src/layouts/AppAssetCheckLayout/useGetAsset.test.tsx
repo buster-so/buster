@@ -1,51 +1,51 @@
-import { useGetCollection } from '@/api/buster_rest/collections';
-import { useGetDashboard } from '@/api/buster_rest/dashboards';
-import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { useSearchParams } from 'next/navigation';
 import { useGetAsset } from './useGetAsset';
+import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
+import { useGetDashboard } from '@/api/buster_rest/dashboards';
+import { useGetCollection } from '@/api/buster_rest/collections';
+import { useSearchParams } from 'next/navigation';
 
 // Mock the dependencies
-jest.mock('@/api/buster_rest/metrics', () => ({
-  useGetMetric: jest.fn(),
-  useGetMetricData: jest.fn()
+vi.mock('@/api/buster_rest/metrics', () => ({
+  useGetMetric: vi.fn(),
+  useGetMetricData: vi.fn()
 }));
 
-jest.mock('@/api/buster_rest/dashboards', () => ({
-  useGetDashboard: jest.fn()
+vi.mock('@/api/buster_rest/dashboards', () => ({
+  useGetDashboard: vi.fn()
 }));
 
-jest.mock('@/api/buster_rest/collections', () => ({
-  useGetCollection: jest.fn()
+vi.mock('@/api/buster_rest/collections', () => ({
+  useGetCollection: vi.fn()
 }));
 
-jest.mock('next/navigation', () => ({
-  useSearchParams: jest.fn()
+vi.mock('next/navigation', () => ({
+  useSearchParams: vi.fn()
 }));
 
 describe('useGetAsset', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Default mock implementations
-    (useSearchParams as jest.Mock).mockReturnValue(new URLSearchParams());
-    (useGetMetric as jest.Mock).mockReturnValue({ error: null, isFetched: true });
-    (useGetMetricData as jest.Mock).mockReturnValue({ isFetched: true });
-    (useGetDashboard as jest.Mock).mockReturnValue({
+    (useSearchParams as any).mockReturnValue(new URLSearchParams());
+    (useGetMetric as any).mockReturnValue({ error: null, isFetched: true });
+    (useGetMetricData as any).mockReturnValue({ isFetched: true });
+    (useGetDashboard as any).mockReturnValue({
       error: null,
       isFetched: true,
       isError: false
     });
-    (useGetCollection as jest.Mock).mockReturnValue({
+    (useGetCollection as any).mockReturnValue({
       error: null,
       isFetched: true,
       isError: false
     });
   });
-
-  test('should properly handle metric asset type', () => {
-    (useGetMetric as jest.Mock).mockReturnValue({ error: null, isFetched: true });
-    (useGetMetricData as jest.Mock).mockReturnValue({ isFetched: true });
+  it('should properly handle metric asset type', () => {
+    (useGetMetric as any).mockReturnValue({ error: null, isFetched: true });
+    (useGetMetricData as any).mockReturnValue({ isFetched: true });
 
     const { result } = renderHook(() => useGetAsset({ assetId: 'metric-123', type: 'metric' }));
 
@@ -63,9 +63,8 @@ describe('useGetAsset', () => {
       showLoader: false
     });
   });
-
-  test('should properly handle dashboard asset type', () => {
-    (useGetDashboard as jest.Mock).mockReturnValue({
+  it('should properly handle dashboard asset type', () => {
+    (useGetDashboard as any).mockReturnValue({
       error: null,
       isFetched: true,
       isError: false
@@ -88,9 +87,8 @@ describe('useGetAsset', () => {
       showLoader: false
     });
   });
-
-  test('should properly handle collection asset type', () => {
-    (useGetCollection as jest.Mock).mockReturnValue({
+  it('should properly handle collection asset type', () => {
+    (useGetCollection as any).mockReturnValue({
       error: null,
       isFetched: true,
       isError: false
@@ -110,8 +108,7 @@ describe('useGetAsset', () => {
       showLoader: false
     });
   });
-
-  test('should use version number from props if provided', () => {
+  it('should use version number from props if provided', () => {
     const { result } = renderHook(() =>
       useGetAsset({ assetId: 'metric-123', type: 'metric', versionNumber: 42 })
     );
@@ -121,12 +118,11 @@ describe('useGetAsset', () => {
       { enabled: true }
     );
   });
-
-  test('should use version number from search params if not provided in props', () => {
+  it('should use version number from search params if not provided in props', () => {
     const mockSearchParams = new URLSearchParams({
       metric_version_number: '42'
     });
-    (useSearchParams as jest.Mock).mockReturnValue(mockSearchParams);
+    (useSearchParams as any).mockReturnValue(mockSearchParams);
 
     const { result } = renderHook(() => useGetAsset({ assetId: 'metric-123', type: 'metric' }));
 
@@ -135,10 +131,9 @@ describe('useGetAsset', () => {
       { enabled: true }
     );
   });
-
-  test('should handle password required error (418)', () => {
+  it('should handle password required error (418)', () => {
     const passwordError = { status: 418, message: 'Password required' };
-    (useGetMetric as jest.Mock).mockReturnValue({ error: passwordError, isFetched: true });
+    (useGetMetric as any).mockReturnValue({ error: passwordError, isFetched: true });
 
     const { result } = renderHook(() => useGetAsset({ assetId: 'metric-123', type: 'metric' }));
 
@@ -151,10 +146,9 @@ describe('useGetAsset', () => {
       showLoader: false
     });
   });
-
-  test('should handle deleted asset error (410)', () => {
+  it('should handle deleted asset error (410)', () => {
     const deletedError = { status: 410, message: 'Asset deleted' };
-    (useGetMetric as jest.Mock).mockReturnValue({ error: deletedError, isFetched: true });
+    (useGetMetric as any).mockReturnValue({ error: deletedError, isFetched: true });
 
     const { result } = renderHook(() => useGetAsset({ assetId: 'metric-123', type: 'metric' }));
 
@@ -167,10 +161,9 @@ describe('useGetAsset', () => {
       showLoader: false
     });
   });
-
-  test('should handle other errors', () => {
+  it('should handle other errors', () => {
     const otherError = { status: 500, message: 'Server error' };
-    (useGetMetric as jest.Mock).mockReturnValue({ error: otherError, isFetched: true });
+    (useGetMetric as any).mockReturnValue({ error: otherError, isFetched: true });
 
     const { result } = renderHook(() => useGetAsset({ assetId: 'metric-123', type: 'metric' }));
 
@@ -183,18 +176,16 @@ describe('useGetAsset', () => {
       showLoader: false
     });
   });
-
-  test('should show loader for metrics when data is loading', () => {
-    (useGetMetric as jest.Mock).mockReturnValue({ error: null, isFetched: false });
-    (useGetMetricData as jest.Mock).mockReturnValue({ isFetched: false });
+  it('should show loader for metrics when data is loading', () => {
+    (useGetMetric as any).mockReturnValue({ error: null, isFetched: false });
+    (useGetMetricData as any).mockReturnValue({ isFetched: false });
 
     const { result } = renderHook(() => useGetAsset({ assetId: 'metric-123', type: 'metric' }));
 
     expect(result.current.showLoader).toBe(true);
   });
-
-  test('should show loader for dashboards when data is loading', () => {
-    (useGetDashboard as jest.Mock).mockReturnValue({
+  it('should show loader for dashboards when data is loading', () => {
+    (useGetDashboard as any).mockReturnValue({
       error: null,
       isFetched: false,
       isError: false
@@ -206,9 +197,8 @@ describe('useGetAsset', () => {
 
     expect(result.current.showLoader).toBe(true);
   });
-
-  test('should show loader for collections when data is loading', () => {
-    (useGetCollection as jest.Mock).mockReturnValue({
+  it('should show loader for collections when data is loading', () => {
+    (useGetCollection as any).mockReturnValue({
       error: null,
       isFetched: false,
       isError: false

@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import { _adapters } from 'chart.js';
 import dayjs from 'dayjs';
 import './chartjs-plugin-dayjs';

@@ -1,75 +1,76 @@
-import { ShareAssetType } from '@/api/asset_interfaces';
-import { useGetChatMemoized, useGetChatMessageMemoized } from '@/api/buster_rest/chats';
-import { useBusterWebSocket } from '@/context/BusterWebSocket';
-import { act, renderHook } from '@testing-library/react';
-import { create } from 'mutative';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
 import { useBusterNewChat } from './NewChatProvider';
+import { useBusterWebSocket } from '@/context/BusterWebSocket';
 import { useChatStreamMessage } from './useChatStreamMessage';
+import { useGetChatMemoized, useGetChatMessageMemoized } from '@/api/buster_rest/chats';
 import { useChatUpdate } from './useChatUpdate';
+import { create } from 'mutative';
+import { ShareAssetType } from '@/api/asset_interfaces';
 
 // Mock dependencies
-jest.mock('@/hooks', () => ({
+vi.mock('@/hooks', () => ({
   useMemoizedFn: (fn: any) => fn
 }));
 
-jest.mock('@/context/BusterWebSocket');
-jest.mock('./useChatStreamMessage');
-jest.mock('@/api/buster_rest/chats');
-jest.mock('./useChatUpdate');
-jest.mock('mutative');
+vi.mock('@/context/BusterWebSocket');
+vi.mock('./useChatStreamMessage');
+vi.mock('@/api/buster_rest/chats');
+vi.mock('./useChatUpdate');
+vi.mock('mutative');
 
-const mockUseBusterWebSocket = useBusterWebSocket as jest.Mock;
-const mockUseChatStreamMessage = useChatStreamMessage as jest.Mock;
-const mockUseGetChatMemoized = useGetChatMemoized as jest.Mock;
-const mockUseGetChatMessageMemoized = useGetChatMessageMemoized as jest.Mock;
-const mockUseChatUpdate = useChatUpdate as jest.Mock;
-const mockCreate = create as jest.Mock;
+const mockUseBusterWebSocket = useBusterWebSocket as any;
+const mockUseChatStreamMessage = useChatStreamMessage as any;
+const mockUseGetChatMemoized = useGetChatMemoized as any;
+const mockUseGetChatMessageMemoized = useGetChatMessageMemoized as any;
+const mockUseChatUpdate = useChatUpdate as any;
+const mockCreate = create as any;
 
 describe('useBusterNewChat', () => {
   let mockBusterSocket: {
-    emitAndOnce: jest.Mock;
-    once: jest.Mock;
-    emit: jest.Mock;
+    emitAndOnce: any;
+    once: any;
+    emit: any;
   };
-  let mockInitializeNewChatCallback: jest.Mock;
-  let mockCompleteChatCallback: jest.Mock;
-  let mockStopChatCallback: jest.Mock;
-  let mockGetChatMemoized: jest.Mock;
-  let mockGetChatMessageMemoized: jest.Mock;
-  let mockOnUpdateChat: jest.Mock;
-  let mockOnUpdateChatMessage: jest.Mock;
+  let mockInitializeNewChatCallback: any;
+  let mockCompleteChatCallback: any;
+  let mockStopChatCallback: any;
+  let mockGetChatMemoized: any;
+  let mockGetChatMessageMemoized: any;
+  let mockOnUpdateChat: any;
+  let mockOnUpdateChatMessage: any;
 
   beforeEach(() => {
     mockBusterSocket = {
-      emitAndOnce: jest.fn().mockResolvedValue({}),
-      once: jest.fn(),
-      emit: jest.fn()
+      emitAndOnce: vi.fn().mockResolvedValue({}),
+      once: vi.fn(),
+      emit: vi.fn()
     };
     mockUseBusterWebSocket.mockReturnValue(mockBusterSocket);
 
-    mockInitializeNewChatCallback = jest.fn();
-    mockCompleteChatCallback = jest.fn();
-    mockStopChatCallback = jest.fn();
+    mockInitializeNewChatCallback = vi.fn();
+    mockCompleteChatCallback = vi.fn();
+    mockStopChatCallback = vi.fn();
     mockUseChatStreamMessage.mockReturnValue({
       initializeNewChatCallback: mockInitializeNewChatCallback,
       completeChatCallback: mockCompleteChatCallback,
       stopChatCallback: mockStopChatCallback
     });
 
-    mockGetChatMemoized = jest.fn();
+    mockGetChatMemoized = vi.fn();
     mockUseGetChatMemoized.mockReturnValue(mockGetChatMemoized);
 
-    mockGetChatMessageMemoized = jest.fn();
+    mockGetChatMessageMemoized = vi.fn();
     mockUseGetChatMessageMemoized.mockReturnValue(mockGetChatMessageMemoized);
 
-    mockOnUpdateChat = jest.fn();
-    mockOnUpdateChatMessage = jest.fn();
+    mockOnUpdateChat = vi.fn();
+    mockOnUpdateChatMessage = vi.fn();
     mockUseChatUpdate.mockReturnValue({
       onUpdateChat: mockOnUpdateChat,
       onUpdateChatMessage: mockOnUpdateChatMessage
     });
 
-    mockCreate.mockImplementation((base, updater) => {
+    mockCreate.mockImplementation((base: any, updater: any) => {
       const draft = JSON.parse(JSON.stringify(base));
       updater(draft);
       return draft;
@@ -77,12 +78,12 @@ describe('useBusterNewChat', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // Test 1: onSelectSearchAsset should resolve after a delay (mocked)
-  test('onSelectSearchAsset should complete', async () => {
-    jest.useFakeTimers();
+  it('onSelectSearchAsset should complete', async () => {
+    vi.useFakeTimers();
     const { result } = renderHook(() => useBusterNewChat());
     const promise = result.current.onSelectSearchAsset({
       id: 'asset1',
@@ -94,15 +95,15 @@ describe('useBusterNewChat', () => {
     });
 
     act(() => {
-      jest.runAllTimers();
+      vi.runAllTimers();
     });
 
     await expect(promise).resolves.toBeUndefined();
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   // Test 2: onStartNewChat should call busterSocket.emitAndOnce and busterSocket.once
-  test('onStartNewChat should call socket methods with correct parameters', async () => {
+  it('onStartNewChat should call socket methods with correct parameters', async () => {
     const { result } = renderHook(() => useBusterNewChat());
     const chatPayload = { prompt: 'Hello' };
 
@@ -130,7 +131,7 @@ describe('useBusterNewChat', () => {
   });
 
   // Test 3: onStartNewChat should include datasetId if provided
-  test('onStartNewChat should include datasetId when provided', async () => {
+  it('onStartNewChat should include datasetId when provided', async () => {
     const { result } = renderHook(() => useBusterNewChat());
     const chatPayload = { prompt: 'Test with dataset', datasetId: 'ds1' };
 
@@ -146,7 +147,7 @@ describe('useBusterNewChat', () => {
   });
 
   // Test 4: onStartChatFromFile should call onStartNewChat with metricId for metric fileType
-  test('onStartChatFromFile should call onStartNewChat with metricId for metric type', async () => {
+  it('onStartChatFromFile should call onStartNewChat with metricId for metric type', async () => {
     const { result } = renderHook(() => useBusterNewChat());
 
     const filePayload = {
@@ -170,7 +171,7 @@ describe('useBusterNewChat', () => {
   });
 
   // Test 5: onStartChatFromFile should call onStartNewChat with dashboardId for dashboard fileType
-  test('onStartChatFromFile should call onStartNewChat with dashboardId for dashboard type', async () => {
+  it('onStartChatFromFile should call onStartNewChat with dashboardId for dashboard type', async () => {
     const { result } = renderHook(() => useBusterNewChat());
 
     const filePayload = {
@@ -194,7 +195,7 @@ describe('useBusterNewChat', () => {
   });
 
   // Test 6: onFollowUpChat should call socket methods with correct parameters
-  test('onFollowUpChat should call socket methods with chatId', async () => {
+  it('onFollowUpChat should call socket methods with chatId', async () => {
     const { result } = renderHook(() => useBusterNewChat());
     const followUpPayload = { prompt: 'Follow up question', chatId: 'chat1' };
 
@@ -220,7 +221,7 @@ describe('useBusterNewChat', () => {
   });
 
   // Test 7: onStopChat should call busterSocket.emit and stopChatCallback
-  test('onStopChat should call emit and stopChatCallback', () => {
+  it('onStopChat should call emit and stopChatCallback', () => {
     const { result } = renderHook(() => useBusterNewChat());
     const stopPayload = { chatId: 'chat1', messageId: 'msg1' };
 
@@ -237,7 +238,7 @@ describe('useBusterNewChat', () => {
   });
 
   // Test 8: onReplaceMessageInChat updates message and chat correctly and calls socket
-  test('onReplaceMessageInChat should update message, chat, and call socket', async () => {
+  it('onReplaceMessageInChat should update message, chat, and call socket', async () => {
     const mockCurrentChat = { id: 'chat1', message_ids: ['msg0', 'msg1', 'msg2'] };
     const mockCurrentMessage = { id: 'msg1', request_message: { request: 'Old prompt' } };
 
@@ -284,7 +285,7 @@ describe('useBusterNewChat', () => {
   });
 
   // Test 9: onReplaceMessageInChat handles message not found in chat but still calls socket
-  test('onReplaceMessageInChat should not update chat if message not found, but still calls socket', async () => {
+  it('onReplaceMessageInChat should not update chat if message not found, but still calls socket', async () => {
     const mockCurrentChat = { id: 'chat1', message_ids: ['msg0', 'msg2'] }; // msg1 is missing
     const mockCurrentMessage = { id: 'msg1', request_message: { request: 'Old prompt' } };
 

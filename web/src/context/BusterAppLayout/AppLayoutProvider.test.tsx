@@ -1,29 +1,30 @@
-import { DashboardSecondaryRecord } from '@/layouts/ChatLayout/FileContainer/FileContainerSecondary/secondaryPanelsConfig/dashboardPanels';
-import type { BusterRoutesWithArgsRoute } from '@/routes/busterRoutes';
-import { BusterAppRoutes } from '@/routes/busterRoutes/busterAppRoutes';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useAppLayout } from './AppLayoutProvider';
+import { useRouter, usePathname, useParams } from 'next/navigation';
+import { BusterRoutesWithArgsRoute } from '@/routes/busterRoutes';
+import { BusterAppRoutes } from '@/routes/busterRoutes/busterAppRoutes';
+import { DashboardSecondaryRecord } from '@/layouts/ChatLayout/FileContainer/FileContainerSecondary/secondaryPanelsConfig/dashboardPanels';
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
-  usePathname: jest.fn(),
-  useParams: jest.fn()
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(),
+  usePathname: vi.fn(),
+  useParams: vi.fn()
 }));
 
 describe('useAppLayout - onChangePage', () => {
   // Mock window.location and history
-  const mockPush = jest.fn();
-  const mockPushState = jest.fn();
+  const mockPush = vi.fn();
+  const mockPushState = vi.fn();
   let originalLocation: Location;
   let originalHistory: History;
 
   beforeEach(() => {
     // Setup router mock
-    (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
-    (usePathname as jest.Mock).mockReturnValue('/');
-    (useParams as jest.Mock).mockReturnValue({});
+    (useRouter as any).mockReturnValue({ push: mockPush });
+    (usePathname as any).mockReturnValue('/');
+    (useParams as any).mockReturnValue({});
 
     // Store original window.location and history
     originalLocation = window.location;
@@ -48,7 +49,7 @@ describe('useAppLayout - onChangePage', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     window.location = originalLocation;
     window.history = originalHistory;
   });
@@ -227,15 +228,15 @@ describe('useAppLayout - onChangePage', () => {
 
 describe('useAppLayout - onChangeQueryParams', () => {
   // Mock window.location and history
-  const mockPushState = jest.fn();
+  const mockPushState = vi.fn();
   let originalLocation: Location;
   let originalHistory: History;
 
   beforeEach(() => {
     // Setup router mock
-    (useRouter as jest.Mock).mockReturnValue({ push: jest.fn() });
-    (usePathname as jest.Mock).mockReturnValue('/');
-    (useParams as jest.Mock).mockReturnValue({});
+    (useRouter as any).mockReturnValue({ push: vi.fn() });
+    (usePathname as any).mockReturnValue('/');
+    (useParams as any).mockReturnValue({});
 
     // Store original window.location and history
     originalLocation = window.location;
@@ -260,7 +261,7 @@ describe('useAppLayout - onChangeQueryParams', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     window.location = originalLocation;
     window.history = originalHistory;
   });

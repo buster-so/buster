@@ -1,7 +1,8 @@
-import type { DashboardConfig } from '@/api/asset_interfaces/dashboard';
-import { NUMBER_OF_COLUMNS } from '@/components/ui/grid/helpers';
+import { describe, it, expect } from 'vitest';
+import { hasUnmappedMetrics, hasRemovedMetrics } from './hasMappedMetrics';
+import { DashboardConfig } from '@/api/asset_interfaces/dashboard';
 import { createMockMetric } from '@/mocks/metric';
-import { hasRemovedMetrics, hasUnmappedMetrics } from './hasMappedMetrics';
+import { NUMBER_OF_COLUMNS } from '@/components/ui/grid/helpers';
 
 const createMockRow = (itemIds: string[]): NonNullable<DashboardConfig['rows']>[0] => ({
   id: `row-${itemIds[0]}`,

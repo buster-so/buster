@@ -1,5 +1,6 @@
-import type { Chart, ChartEvent } from 'chart.js';
-import crosshairPlugin, { type CrosshairPluginOptions } from './chartjs-plugin-crosshair';
+import { describe, it, expect } from 'vitest';
+import { Chart, ChartEvent } from 'chart.js';
+import crosshairPlugin, { CrosshairPluginOptions } from './chartjs-plugin-crosshair';
 
 describe('crosshairPlugin', () => {
   it('should update crosshair coordinates on mousemove event', () => {

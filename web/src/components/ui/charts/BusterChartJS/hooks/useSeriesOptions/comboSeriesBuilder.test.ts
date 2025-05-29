@@ -1,13 +1,13 @@
-import { DEFAULT_COLUMN_SETTINGS } from '@/api/asset_interfaces/metric';
+import { describe, it, expect } from 'vitest';
 import { comboSeriesBuilder_data } from './comboSeriesBuilder';
+import { DEFAULT_COLUMN_SETTINGS } from '@/api/asset_interfaces/metric';
 
 describe('comboSeriesBuilder_data', () => {
   const mockColors = ['#000000', '#111111'];
   const mockXAxisKeys = ['2023-01-01', '2023-01-02'];
   const mockTicks = mockXAxisKeys.map((key) => [key]);
   const mockTicksKey = [{ key: 'date', value: 'Date' }];
-
-  test('creates correct series types based on columnVisualization', () => {
+  it('creates correct series types based on columnVisualization', () => {
     const props = {
       colors: mockColors,
       xAxisKeys: mockXAxisKeys,
@@ -53,8 +53,7 @@ describe('comboSeriesBuilder_data', () => {
     expect(result[0].type).toBe('bar');
     expect(result[1].type).toBe('line');
   });
-
-  test('maps dataset values correctly', () => {
+  it('maps dataset values correctly', () => {
     const testData = [10, 20];
     const props = {
       colors: mockColors,

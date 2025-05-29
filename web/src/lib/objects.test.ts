@@ -1,3 +1,4 @@
+import { describe, it, expect, vi } from 'vitest';
 import { compareObjectsByKeys } from './objects';
 
 describe('compareObjectsByKeys', () => {
@@ -74,7 +75,7 @@ describe('compareObjectsByKeys', () => {
   });
 
   it('complex test with debug logging', () => {
-    const consoleSpy = jest.spyOn(console, 'log');
+    const consoleSpy = vi.spyOn(console, 'log');
 
     const object1 = {
       colors: [

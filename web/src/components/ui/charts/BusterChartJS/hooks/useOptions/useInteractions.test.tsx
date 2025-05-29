@@ -1,9 +1,10 @@
 import type { BusterChartConfigProps, ChartType } from '@/api/asset_interfaces/metric/charts';
+import { describe, it, expect } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useInteractions } from './useInteractions';
 
 describe('useInteractions', () => {
-  test('should return correct interactions for scatter chart', () => {
+  it('should return correct interactions for scatter chart', () => {
     const { result } = renderHook(() =>
       useInteractions({
         selectedChartType: 'scatter' as ChartType,
@@ -18,8 +19,7 @@ describe('useInteractions', () => {
       includeInvisible: false
     });
   });
-
-  test('should return correct interactions for vertical bar chart', () => {
+  it('should return correct interactions for vertical bar chart', () => {
     const { result } = renderHook(() =>
       useInteractions({
         selectedChartType: 'bar' as ChartType,
@@ -34,8 +34,7 @@ describe('useInteractions', () => {
       axis: 'x'
     });
   });
-
-  test('should return correct interactions for horizontal bar chart', () => {
+  it('should return correct interactions for horizontal bar chart', () => {
     const { result } = renderHook(() =>
       useInteractions({
         selectedChartType: 'bar' as ChartType,
@@ -50,8 +49,7 @@ describe('useInteractions', () => {
       axis: 'y'
     });
   });
-
-  test('should return correct interactions for line chart', () => {
+  it('should return correct interactions for line chart', () => {
     const { result } = renderHook(() =>
       useInteractions({
         selectedChartType: 'line' as ChartType,
@@ -66,8 +64,7 @@ describe('useInteractions', () => {
       axis: 'x'
     });
   });
-
-  test('should return correct interactions for combo chart', () => {
+  it('should return correct interactions for combo chart', () => {
     const { result } = renderHook(() =>
       useInteractions({
         selectedChartType: 'combo' as ChartType,
@@ -82,8 +79,7 @@ describe('useInteractions', () => {
       axis: 'x'
     });
   });
-
-  test('should return undefined for other chart types', () => {
+  it('should return undefined for other chart types', () => {
     const { result } = renderHook(() =>
       useInteractions({
         selectedChartType: 'pie' as ChartType,
@@ -93,8 +89,7 @@ describe('useInteractions', () => {
 
     expect(result.current).toBeUndefined();
   });
-
-  test('should memoize the result and not recalculate on rerenders with same props', () => {
+  it('should memoize the result and not recalculate on rerenders with same props', () => {
     const props = {
       selectedChartType: 'bar' as ChartType,
       barLayout: 'vertical' as BusterChartConfigProps['barLayout']
@@ -109,8 +104,7 @@ describe('useInteractions', () => {
     // Result should be the same object reference (memoized)
     expect(result.current).toBe(firstResult);
   });
-
-  test('should recalculate when props change', () => {
+  it('should recalculate when props change', () => {
     const { result, rerender } = renderHook((props) => useInteractions(props), {
       initialProps: {
         selectedChartType: 'bar' as ChartType,

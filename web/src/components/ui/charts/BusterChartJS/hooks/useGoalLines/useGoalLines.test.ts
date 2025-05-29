@@ -1,12 +1,13 @@
-import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
-import {
-  type BusterChartConfigProps,
-  type ChartType,
-  ColumnLabelFormat,
-  type GoalLine
-} from '@/api/asset_interfaces/metric/charts';
+import { describe, it, expect } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useGoalLines } from './useGoalLines';
+import {
+  ChartType,
+  ColumnLabelFormat,
+  GoalLine,
+  BusterChartConfigProps
+} from '@/api/asset_interfaces/metric/charts';
+import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 
 describe('useGoalLines', () => {
   const defaultParams = {

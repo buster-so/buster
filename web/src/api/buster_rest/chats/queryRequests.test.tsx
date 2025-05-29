@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import * as requests from './requests';
@@ -12,31 +13,29 @@ import type { IBusterChat } from '@/api/asset_interfaces/chat/iChatInterfaces';
 import type React from 'react';
 
 // Mock the hooks and requests
-jest.mock('@/hooks', () => ({
+vi.mock('@/hooks', () => ({
   useMemoizedFn: (fn: any) => fn
 }));
 
-jest.mock('./requests', () => ({
-  getListChats: jest.fn(),
-  getChat: jest.fn(),
-  updateChat: jest.fn(),
-  deleteChat: jest.fn(),
-  startChatFromAsset: jest.fn(),
-  updateChatMessageFeedback: jest.fn()
+vi.mock('./requests', () => ({
+  getListChats: vi.fn(),
+  getChat: vi.fn(),
+  updateChat: vi.fn(),
+  deleteChat: vi.fn(),
+  startChatFromAsset: vi.fn(),
+  updateChatMessageFeedback: vi.fn()
 }));
 
-jest.mock('@/lib/chat', () => ({
-  updateChatToIChat: jest.fn().mockImplementation((chat: IBusterChat) => ({
+vi.mock('@/lib/chat', () => ({
+  updateChatToIChat: vi.fn().mockImplementation((chat: IBusterChat) => ({
     iChat: { ...chat, message_ids: ['msg1'] },
     iChatMessages: { msg1: { id: 'msg1', content: 'test' } }
   }))
 }));
 
-jest.mock('@/context/BusterNotifications', () => ({
+vi.mock('@/context/BusterNotifications', () => ({
   useBusterNotifications: () => ({
-    openConfirmModal: jest
-      .fn()
-      .mockImplementation(({ onOk }: { onOk: () => Promise<any> }) => onOk())
+    openConfirmModal: vi.fn().mockImplementation(({ onOk }: { onOk: () => Promise<any> }) => onOk())
   })
 }));
 
@@ -69,13 +68,13 @@ describe('Chat Query Hooks', () => {
   } as IBusterChat;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('useGetListChats', () => {
     it('should fetch list of chats with custom filters', async () => {
       const mockChats = [mockChat];
-      (requests.getListChats as jest.Mock).mockResolvedValueOnce(mockChats);
+      (requests.getListChats as any).mockResolvedValueOnce(mockChats);
 
       const filters = { search: 'test' };
       const { result } = renderHook(() => useGetListChats(filters), {
@@ -102,7 +101,7 @@ describe('Chat Query Hooks', () => {
   describe('useUpdateChat', () => {
     it('should update chat title', async () => {
       const updateData = { id: 'test-chat-id', title: 'Updated Title' };
-      (requests.updateChat as jest.Mock).mockResolvedValueOnce(updateData);
+      (requests.updateChat as any).mockResolvedValueOnce(updateData);
 
       const { result } = renderHook(() => useUpdateChat(), {
         wrapper: createWrapper()
@@ -118,7 +117,7 @@ describe('Chat Query Hooks', () => {
 
   describe('useDeleteChat', () => {
     it('should delete chat with confirmation', async () => {
-      (requests.deleteChat as jest.Mock).mockResolvedValueOnce({ success: true });
+      (requests.deleteChat as any).mockResolvedValueOnce({ success: true });
 
       const { result } = renderHook(() => useDeleteChat(), {
         wrapper: createWrapper()
@@ -137,7 +136,7 @@ describe('Chat Query Hooks', () => {
 
   describe('useStartChatFromAsset', () => {
     it('should start a new chat from asset', async () => {
-      (requests.startChatFromAsset as jest.Mock).mockResolvedValueOnce(mockChat);
+      (requests.startChatFromAsset as any).mockResolvedValueOnce(mockChat);
 
       const { result } = renderHook(() => useStartChatFromAsset(), {
         wrapper: createWrapper()
@@ -163,7 +162,7 @@ describe('Chat Query Hooks', () => {
         message_id: 'msg1',
         feedback: 'negative' as const
       };
-      (requests.updateChatMessageFeedback as jest.Mock).mockResolvedValueOnce(feedbackData);
+      (requests.updateChatMessageFeedback as any).mockResolvedValueOnce(feedbackData);
 
       const { result } = renderHook(() => useUpdateChatMessageFeedback(), {
         wrapper: createWrapper()

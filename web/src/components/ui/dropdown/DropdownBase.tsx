@@ -179,7 +179,6 @@ const DropdownMenuCheckboxItemMultiple = React.forwardRef<
     },
     ref
   ) => {
-    console.log('dataTestId', dataTestId);
     return (
       <DropdownMenuPrimitive.CheckboxItem
         ref={ref}

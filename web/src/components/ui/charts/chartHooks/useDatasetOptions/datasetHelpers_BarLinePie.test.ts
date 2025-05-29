@@ -1,9 +1,10 @@
-import type { ColumnMetaData } from '@/api/asset_interfaces/metric';
-import type { BusterChartProps } from '@/api/asset_interfaces/metric/charts';
+import { describe, it, expect } from 'vitest';
 import { sortLineBarData } from './datasetHelpers_BarLinePie';
+import { type BusterChartProps } from '@/api/asset_interfaces/metric/charts';
+import { type ColumnMetaData } from '@/api/asset_interfaces/metric';
 
 describe('sortLineBarData', () => {
-  test('returns original data when xFieldSorts is empty', () => {
+  it('returns original data when xFieldSorts is empty', () => {
     const data = [{ id: 1 }, { id: 2 }];
     const columnMetadata: ColumnMetaData[] = [];
     const xFieldSorts: string[] = [];
@@ -14,8 +15,7 @@ describe('sortLineBarData', () => {
     // When xFieldSorts is empty, the function returns the original array reference
     expect(result).toBe(data);
   });
-
-  test('sorts numeric fields correctly', () => {
+  it('sorts numeric fields correctly', () => {
     const data = [
       { id: 3, value: 30 },
       { id: 1, value: 10 },
@@ -41,8 +41,7 @@ describe('sortLineBarData', () => {
       { id: 3, value: 30 }
     ]);
   });
-
-  test('sorts date fields correctly', () => {
+  it('sorts date fields correctly', () => {
     const data = [
       { id: 3, created: '2023-03-01' },
       { id: 1, created: '2023-01-01' },
@@ -68,8 +67,7 @@ describe('sortLineBarData', () => {
       { id: 3, created: '2023-03-01' }
     ]);
   });
-
-  test('sorts text fields correctly', () => {
+  it('sorts text fields correctly', () => {
     const data = [
       { id: 3, name: 'Charlie' },
       { id: 1, name: 'Alice' },
@@ -95,8 +93,7 @@ describe('sortLineBarData', () => {
       { id: 3, name: 'Charlie' }
     ]);
   });
-
-  test('handles multiple sort fields correctly', () => {
+  it('handles multiple sort fields correctly', () => {
     const data = [
       { id: 1, category: 'A', value: 30 },
       { id: 2, category: 'B', value: 10 },
@@ -132,8 +129,7 @@ describe('sortLineBarData', () => {
       { id: 4, category: 'B', value: 20 }
     ]);
   });
-
-  test('falls back to type inference when metadata is missing', () => {
+  it('falls back to type inference when metadata is missing', () => {
     const data = [
       { id: 3, value: 30 },
       { id: 1, value: 10 },

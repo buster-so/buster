@@ -1,11 +1,12 @@
-import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
+import { describe, it, expect } from 'vitest';
+import { renderHook } from '@testing-library/react';
+import { useY2Axis } from './useY2Axis';
 import {
   ChartType,
   type ComboChartAxis,
   type IColumnLabelFormat
 } from '@/api/asset_interfaces/metric/charts';
-import { renderHook } from '@testing-library/react';
-import { useY2Axis } from './useY2Axis';
+import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 
 describe('useY2Axis', () => {
   const defaultProps = {

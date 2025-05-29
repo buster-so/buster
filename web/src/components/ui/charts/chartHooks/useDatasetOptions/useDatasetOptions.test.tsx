@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import type {
   ChartType,
@@ -17,8 +18,7 @@ describe('useDatasetOptions', () => {
     profit: { columnType: 'number', style: 'number' },
     month: { columnType: 'text', style: 'string' }
   };
-
-  test('should return the correct axis keys for bar chart', () => {
+  it('should return the correct axis keys for bar chart', () => {
     const { result } = renderHook(() =>
       useDatasetOptions({
         data: mockData,
@@ -45,8 +45,7 @@ describe('useDatasetOptions', () => {
     expect(result.current.hasMismatchedTooltipsAndMeasures).toBe(true);
     expect(result.current.isDownsampled).toBe(false);
   });
-
-  test('should handle empty data correctly', () => {
+  it('should handle empty data correctly', () => {
     const { result } = renderHook(() =>
       useDatasetOptions({
         data: [],

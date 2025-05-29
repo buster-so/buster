@@ -1,8 +1,9 @@
-import type { Chart, ChartData, ChartType } from 'chart.js';
-import { ChartMountedPlugin, type ChartMountedPluginOptions } from './chartjs-plugin-mounted';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { Chart, ChartType, ChartData } from 'chart.js';
+import { ChartMountedPlugin, ChartMountedPluginOptions } from './chartjs-plugin-mounted';
 
 // Mock Chart.js
-jest.mock('chart.js');
+vi.mock('chart.js');
 
 describe('ChartMountedPlugin', () => {
   let mockChart: Partial<Chart>;
@@ -19,13 +20,13 @@ describe('ChartMountedPlugin', () => {
     };
 
     mockOptions = {
-      onMounted: jest.fn(),
-      onInitialAnimationEnd: jest.fn()
+      onMounted: vi.fn(),
+      onInitialAnimationEnd: vi.fn()
     };
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('afterInit', () => {

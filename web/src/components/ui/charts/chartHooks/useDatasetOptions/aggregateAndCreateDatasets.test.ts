@@ -1,6 +1,6 @@
-import { DEFAULT_COLUMN_LABEL_FORMAT, type IColumnLabelFormat } from '@/api/asset_interfaces';
-import { describe, expect, it } from '@jest/globals';
+import { describe, it, expect } from 'vitest';
 import { aggregateAndCreateDatasets } from './aggregateAndCreateDatasets';
+import { DEFAULT_COLUMN_LABEL_FORMAT, IColumnLabelFormat } from '@/api/asset_interfaces';
 
 describe('aggregateAndCreateDatasets', () => {
   it('should handle single x-axis and single y-axis', () => {
@@ -1046,13 +1046,13 @@ describe('aggregateAndCreateDatasets', () => {
     expect(result.datasets[0].tooltipData[0]).toEqual([
       { key: 'metric', value: 1000 },
       { key: 'boolean', value: true },
-      { key: 'object', value: '[object Object]' }
+      { key: 'object', value: { test: 'value' } }
     ]);
 
     expect(result.datasets[0].tooltipData[1]).toEqual([
       { key: 'metric', value: 1200 },
       { key: 'boolean', value: false },
-      { key: 'object', value: '[object Object]' }
+      { key: 'object', value: { test: 'other' } }
     ]);
   });
 

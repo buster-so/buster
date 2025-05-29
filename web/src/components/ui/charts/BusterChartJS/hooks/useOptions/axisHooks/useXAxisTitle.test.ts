@@ -1,17 +1,18 @@
-import type { SimplifiedColumnType } from '@/api/asset_interfaces/metric';
-import type { ChartEncodes, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
-import { formatLabel } from '@/lib/columnFormatter';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { truncateWithEllipsis } from '../../../../commonHelpers/titleHelpers';
 import { useXAxisTitle } from './useXAxisTitle';
+import { formatLabel } from '@/lib/columnFormatter';
+import { truncateWithEllipsis } from '../../../../commonHelpers/titleHelpers';
+import type { ChartEncodes, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import type { SimplifiedColumnType } from '@/api/asset_interfaces/metric';
 
 // Mock the dependencies
-jest.mock('@/lib/columnFormatter', () => ({
-  formatLabel: jest.fn()
+vi.mock('@/lib/columnFormatter', () => ({
+  formatLabel: vi.fn()
 }));
 
-jest.mock('../../../../commonHelpers/titleHelpers', () => ({
-  truncateWithEllipsis: jest.fn()
+vi.mock('../../../../commonHelpers/titleHelpers', () => ({
+  truncateWithEllipsis: vi.fn()
 }));
 
 describe('useXAxisTitle', () => {
@@ -41,10 +42,10 @@ describe('useXAxisTitle', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Default mock implementations
-    (formatLabel as jest.Mock).mockImplementation((value) => `formatted_${value}`);
-    (truncateWithEllipsis as jest.Mock).mockImplementation((text) => text);
+    (formatLabel as any).mockImplementation((value) => `formatted_${value}`);
+    (truncateWithEllipsis as any).mockImplementation((text) => text);
   });
 
   it('should return empty string when chart type is not supported', () => {
@@ -89,7 +90,7 @@ describe('useXAxisTitle', () => {
       xAxisAxisTitle: customTitle
     };
 
-    (truncateWithEllipsis as jest.Mock).mockReturnValue('Truncated Custom Title');
+    (truncateWithEllipsis as any).mockReturnValue('Truncated Custom Title');
 
     const { result } = renderHook(() => useXAxisTitle(props));
 
@@ -99,11 +100,11 @@ describe('useXAxisTitle', () => {
   });
 
   it('should generate title from x-axis columns when no custom title is provided', () => {
-    (formatLabel as jest.Mock)
+    (formatLabel as any)
       .mockReturnValueOnce('Formatted Date')
       .mockReturnValueOnce('Formatted Category');
 
-    (truncateWithEllipsis as jest.Mock).mockReturnValue('Formatted Date | Formatted Category');
+    (truncateWithEllipsis as any).mockReturnValue('Formatted Date | Formatted Category');
 
     // Modified props to ensure formatLabel is called
     const modifiedProps = {
@@ -139,8 +140,8 @@ describe('useXAxisTitle', () => {
       xAxisAxisTitle: null // Set to null instead of empty string to ensure formatLabel is called
     };
 
-    (formatLabel as jest.Mock).mockReturnValue('Formatted Date');
-    (truncateWithEllipsis as jest.Mock).mockReturnValue('Formatted Date');
+    (formatLabel as any).mockReturnValue('Formatted Date');
+    (truncateWithEllipsis as any).mockReturnValue('Formatted Date');
 
     const { result } = renderHook(() => useXAxisTitle(singleAxisProps));
 
@@ -180,7 +181,7 @@ describe('useXAxisTitle', () => {
       xAxisAxisTitle: 'New Title'
     };
 
-    (truncateWithEllipsis as jest.Mock).mockReturnValue('Truncated New Title');
+    (truncateWithEllipsis as any).mockReturnValue('Truncated New Title');
 
     rerender(newProps);
 

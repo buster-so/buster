@@ -1,22 +1,23 @@
-import { useGetMetric } from '@/api/buster_rest/metrics';
-import { useIsMetricReadOnly } from '@/context/Metrics/useIsMetricReadOnly';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import React from 'react';
 import { render, screen } from '@testing-library/react';
-import type React from 'react';
-import { useChatLayoutContextSelector } from '../../ChatLayoutContext';
 import { MetricContainerHeaderSegment } from './MetricContainerHeaderSegment';
+import { useIsMetricReadOnly } from '@/context/Metrics/useIsMetricReadOnly';
+import { useChatLayoutContextSelector } from '../../ChatLayoutContext';
+import { useGetMetric } from '@/api/buster_rest/metrics';
 
 // Mock the hooks
-jest.mock('@/context/Metrics/useIsMetricReadOnly');
-jest.mock('../../ChatLayoutContext');
-jest.mock('@/api/buster_rest/metrics');
-jest.mock('@/components/ui/typography', () => ({
+vi.mock('@/context/Metrics/useIsMetricReadOnly');
+vi.mock('../../ChatLayoutContext');
+vi.mock('@/api/buster_rest/metrics');
+vi.mock('@/components/ui/typography', () => ({
   Text: ({ children, ...props }: React.PropsWithChildren<any>) => (
     <div data-testid="mock-text" {...props}>
       {children}
     </div>
   )
 }));
-jest.mock('@/components/ui/segmented', () => ({
+vi.mock('@/components/ui/segmented', () => ({
   AppSegmented: ({ options, value }: any) => (
     <div data-testid="mock-segmented" data-options={JSON.stringify(options)} data-value={value} />
   )
@@ -24,11 +25,11 @@ jest.mock('@/components/ui/segmented', () => ({
 
 describe('MetricContainerHeaderSegment', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should render null when data is not fetched', () => {
-    (useIsMetricReadOnly as jest.Mock).mockReturnValue({
+    (useIsMetricReadOnly as any).mockReturnValue({
       isFetched: false,
       isError: false,
       isViewingOldVersion: false
@@ -46,7 +47,7 @@ describe('MetricContainerHeaderSegment', () => {
   });
 
   it('should render null when there is an error', () => {
-    (useIsMetricReadOnly as jest.Mock).mockReturnValue({
+    (useIsMetricReadOnly as any).mockReturnValue({
       isFetched: true,
       isError: true,
       isViewingOldVersion: false
@@ -64,7 +65,7 @@ describe('MetricContainerHeaderSegment', () => {
   });
 
   it('should render MetricOldVersion when viewing old version', () => {
-    (useIsMetricReadOnly as jest.Mock).mockReturnValue({
+    (useIsMetricReadOnly as any).mockReturnValue({
       isFetched: true,
       isError: false,
       isViewingOldVersion: true
@@ -85,14 +86,14 @@ describe('MetricContainerHeaderSegment', () => {
   });
 
   it('should render MetricSegments with proper options when not in a chat', () => {
-    (useIsMetricReadOnly as jest.Mock).mockReturnValue({
+    (useIsMetricReadOnly as any).mockReturnValue({
       isFetched: true,
       isError: false,
       isViewingOldVersion: false
     });
 
-    (useChatLayoutContextSelector as jest.Mock).mockReturnValue('metric-123');
-    (useGetMetric as jest.Mock).mockReturnValue({ error: null });
+    (useChatLayoutContextSelector as any).mockReturnValue('metric-123');
+    (useGetMetric as any).mockReturnValue({ error: null });
 
     render(
       <MetricContainerHeaderSegment
@@ -115,14 +116,14 @@ describe('MetricContainerHeaderSegment', () => {
   });
 
   it('should render MetricSegments with chat routes when chatId is provided', () => {
-    (useIsMetricReadOnly as jest.Mock).mockReturnValue({
+    (useIsMetricReadOnly as any).mockReturnValue({
       isFetched: true,
       isError: false,
       isViewingOldVersion: false
     });
 
-    (useChatLayoutContextSelector as jest.Mock).mockReturnValue('metric-123');
-    (useGetMetric as jest.Mock).mockReturnValue({ error: null });
+    (useChatLayoutContextSelector as any).mockReturnValue('metric-123');
+    (useGetMetric as any).mockReturnValue({ error: null });
 
     render(
       <MetricContainerHeaderSegment

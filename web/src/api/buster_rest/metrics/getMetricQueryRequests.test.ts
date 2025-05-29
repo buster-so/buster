@@ -1,11 +1,12 @@
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { QueryClient } from '@tanstack/react-query';
 import { prefetchGetMetricDataClient } from './getMetricQueryRequests';
 import { metricsQueryKeys } from '@/api/query_keys/metric';
 import { getMetricData } from './requests';
 
 // Mock the requests module
-jest.mock('./requests', () => ({
-  getMetricData: jest.fn()
+vi.mock('./requests', () => ({
+  getMetricData: vi.fn()
 }));
 
 describe('prefetchGetMetricDataClient', () => {
@@ -13,7 +14,7 @@ describe('prefetchGetMetricDataClient', () => {
 
   beforeEach(() => {
     queryClient = new QueryClient();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should prefetch metric data when no existing data is found', async () => {
@@ -23,7 +24,7 @@ describe('prefetchGetMetricDataClient', () => {
     const mockMetricData = { id: mockId, data: 'test-data' };
 
     // Mock the getMetricData function
-    (getMetricData as jest.Mock).mockResolvedValue(mockMetricData);
+    (getMetricData as any).mockResolvedValue(mockMetricData);
 
     // Execute
     await prefetchGetMetricDataClient(

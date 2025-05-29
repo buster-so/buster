@@ -1,14 +1,15 @@
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { canSupportTrendlineRecord } from './canSupportTrendline';
+import { isNumericColumnType } from '@/lib/messages';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import type { BusterChartProps, Trendline } from '@/api/asset_interfaces/metric/charts';
-import { isNumericColumnType } from '@/lib/messages';
-import { canSupportTrendlineRecord } from './canSupportTrendline';
 
 // Mock the isNumericColumnType function
-jest.mock('@/lib/messages', () => ({
-  isNumericColumnType: jest.fn()
+vi.mock('@/lib/messages', () => ({
+  isNumericColumnType: vi.fn()
 }));
 
-const mockedIsNumericColumnType = isNumericColumnType as jest.MockedFunction<
+const mockedIsNumericColumnType = isNumericColumnType as anyedFunction<
   typeof isNumericColumnType
 >;
 
@@ -33,7 +34,7 @@ describe('canSupportTrendlineRecord', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test.each(trendlineTypes)(
@@ -103,8 +104,7 @@ describe('canSupportTrendlineRecord', () => {
       );
     }
   );
-
-  test('confirms all trendline types are tested', () => {
+  it('confirms all trendline types are tested', () => {
     // This test ensures we've covered all trendline types in our tests
     const allTrendlineTypes = Object.keys(canSupportTrendlineRecord) as Trendline['type'][];
     expect(allTrendlineTypes.sort()).toEqual(trendlineTypes.sort());

@@ -1,21 +1,22 @@
-import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
-import {
-  type BusterChartProps,
-  type ChartEncodes,
-  type ChartType,
-  ComboChartAxis
-} from '@/api/asset_interfaces/metric/charts';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useTooltipOptions } from './useTooltipOptions';
+import {
+  ChartType,
+  BusterChartProps,
+  ChartEncodes,
+  ComboChartAxis
+} from '@/api/asset_interfaces/metric/charts';
+import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 
 // Mock necessary hooks and dependencies
-jest.mock('react-dom/server', () => ({
-  renderToString: jest.fn().mockReturnValue('<div>Mocked tooltip</div>')
+vi.mock('react-dom/server', () => ({
+  renderToString: vi.fn().mockReturnValue('<div>Mocked tooltip</div>')
 }));
 
-jest.mock('@/hooks', () => ({
-  useMemoizedFn: jest.fn((fn) => fn),
-  useUnmount: jest.fn((fn) => fn())
+vi.mock('@/hooks', () => ({
+  useMemoizedFn: vi.fn((fn) => fn),
+  useUnmount: vi.fn((fn) => fn())
 }));
 
 describe('useTooltipOptions', () => {
@@ -42,8 +43,7 @@ describe('useTooltipOptions', () => {
     // Clean up DOM before each test
     document.body.innerHTML = '';
   });
-
-  test('returns tooltip options with external function when tooltip is enabled', () => {
+  it('returns tooltip options with external function when tooltip is enabled', () => {
     const { result } = renderHook(() => useTooltipOptions(defaultProps));
 
     expect(result.current).toHaveProperty('enabled', false);
@@ -51,8 +51,7 @@ describe('useTooltipOptions', () => {
     expect(result.current.external).toBeDefined();
     expect(typeof result.current.external).toBe('function');
   });
-
-  test('does not include external function when disableTooltip is true', () => {
+  it('does not include external function when disableTooltip is true', () => {
     const { result } = renderHook(() =>
       useTooltipOptions({
         ...defaultProps,
@@ -64,8 +63,7 @@ describe('useTooltipOptions', () => {
     expect(result.current).toHaveProperty('mode', 'index');
     expect(result.current.external).toBeUndefined();
   });
-
-  test('sets mode to point for scatter chart type', () => {
+  it('sets mode to point for scatter chart type', () => {
     const { result } = renderHook(() =>
       useTooltipOptions({
         ...defaultProps,
@@ -75,8 +73,7 @@ describe('useTooltipOptions', () => {
 
     expect(result.current).toHaveProperty('mode', 'point');
   });
-
-  test('sets mode to nearest for pie chart type', () => {
+  it('sets mode to nearest for pie chart type', () => {
     const { result } = renderHook(() =>
       useTooltipOptions({
         ...defaultProps,
@@ -86,8 +83,7 @@ describe('useTooltipOptions', () => {
 
     expect(result.current).toHaveProperty('mode', 'nearest');
   });
-
-  test('changes keyToUsePercentage when pie chart type has percentage display', () => {
+  it('changes keyToUsePercentage when pie chart type has percentage display', () => {
     const { result: resultWithValue } = renderHook(() =>
       useTooltipOptions({
         ...defaultProps,
