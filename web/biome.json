@@ -7,7 +7,20 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": []
+    "ignore": [
+      "**/node_modules/**",
+      "**/.next/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/test-results/**",
+      "**/playwright-report/**",
+      "**/.git/**",
+      "**/public/**",
+      "**/.vercel/**",
+      "**/coverage/**",
+      "**/storybook-static/**",
+      "**/playwright-tests/**"
+    ]
   },
   "formatter": {
     "enabled": true,
@@ -23,13 +36,13 @@
     "ignore": ["**/*.test.*", "**/*.spec.*", "**/*.stories.tsx"],
     "rules": {
       "recommended": true,
-      "suspicious":{
+      "suspicious": {
         "noArrayIndexKey": "off"
       },
       "correctness": {
         "useExhaustiveDependencies": "off",
         "noChildrenProp": "off"
-       },
+      },
       "a11y": {
         "useKeyWithClickEvents": "off",
         "noSvgWithoutTitle": "off"
