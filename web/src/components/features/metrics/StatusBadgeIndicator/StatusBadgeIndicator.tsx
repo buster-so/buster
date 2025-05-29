@@ -42,7 +42,7 @@ export const StatusBadgeIndicator: React.FC<{
 );
 StatusBadgeIndicator.displayName = 'StatusBadgeIndicator';
 
-const statusRecordIcon: Record<VerificationStatus, React.FC<{}>> = {
+const statusRecordIcon: Record<VerificationStatus, React.FC<{ size?: number }>> = {
   [VerificationStatus.VERIFIED]: () => <CircleCheck />,
   [VerificationStatus.REQUESTED]: () => <HalfIcon />,
   [VerificationStatus.IN_REVIEW]: () => <ThreeFourthIcon />,

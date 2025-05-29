@@ -88,6 +88,7 @@ ChartJS.defaults.font = {
   weight: 'normal'
 };
 
+// biome-ignore lint/complexity/noForEach: I just want to use for each here. Shoot me.
 [
   ChartJS.defaults.scales.category,
   ChartJS.defaults.scales.linear,
@@ -104,6 +105,7 @@ ChartJS.defaults.font = {
   };
 });
 
+// biome-ignore lint/complexity/noForEach: I just want to use for each here. Shoot me.
 [
   ChartJS.defaults.scales.category,
   ChartJS.defaults.scales.time,
@@ -120,12 +122,16 @@ ChartJS.defaults.font = {
   };
 });
 
-[ChartJS.defaults.scales.linear, ChartJS.defaults.scales.logarithmic].forEach((scale) => {
+for (const scale of [
+  ChartJS.defaults.scales.category,
+  ChartJS.defaults.scales.linear,
+  ChartJS.defaults.scales.logarithmic
+]) {
   scale.ticks.z = 0; //this used to be a 100, but I changed it for datalabels sake
   scale.ticks.backdropColor = backgroundColor;
   scale.ticks.showLabelBackdrop = true;
   scale.ticks.autoSkipPadding = 2;
-});
+}
 
 export const DEFAULT_CHART_LAYOUT = {
   autoPadding: true,

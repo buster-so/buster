@@ -2,7 +2,14 @@
 
 import { usePrevious, usePreviousRef } from '@/hooks';
 import { Chart as ChartJS } from 'chart.js';
-import type { ChartType, DefaultDataPoint } from 'chart.js';
+import type {
+  ChartType,
+  DefaultDataPoint,
+  ChartData,
+  ChartTypeRegistry,
+  Point,
+  BubbleDataPoint
+} from 'chart.js';
 import React, { useEffect, useRef, forwardRef } from 'react';
 import type { BaseChartComponent, ChartProps, ForwardedRef } from './types';
 import { cloneData, reforwardRef, setDatasets, setLabels, setOptions } from './utils';
@@ -59,13 +66,28 @@ function ChartComponent<
 
   useEffect(() => {
     if (!redraw && chartRef.current) {
-      setLabels(chartRef.current.config.data as any, data.labels);
+      setLabels(
+        chartRef.current.config.data as ChartData<
+          keyof ChartTypeRegistry,
+          (number | [number, number] | Point | BubbleDataPoint | null)[],
+          unknown
+        >,
+        data.labels
+      );
     }
   }, [redraw, data.labels]);
 
   useEffect(() => {
     if (!redraw && chartRef.current && data.datasets) {
-      setDatasets(chartRef.current.config.data as any, data.datasets, datasetIdKey);
+      setDatasets(
+        chartRef.current.config.data as ChartData<
+          keyof ChartTypeRegistry,
+          (number | [number, number] | Point | BubbleDataPoint | null)[],
+          unknown
+        >,
+        data.datasets,
+        datasetIdKey
+      );
     }
   }, [redraw, data.datasets]);
 

@@ -15,14 +15,14 @@ import {
 
 type CreateBusterRouteParams = Parameters<typeof createBusterRoute>[0];
 
-export interface BreadcrumbItem {
+export interface BreadcrumbItemType {
   label: string | null; //if null, it will be an ellipsis
   route?: CreateBusterRouteParams;
   dropdown?: { label: string; route: CreateBusterRouteParams }[];
 }
 
 interface BreadcrumbProps {
-  items: BreadcrumbItem[];
+  items: BreadcrumbItemType[];
   className?: string;
   activeIndex?: number; //default will be the last item
 }
@@ -37,7 +37,8 @@ export const Breadcrumb = React.memo(
         <BreadcrumbList>
           {items.map((item, index) => (
             <BreadcrumbItemSelector
-              key={index}
+              // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+              key={index + (item.label ?? '')}
               item={item}
               isActive={chosenIndex === index}
               isLast={index === lastItemIndex}
@@ -50,7 +51,7 @@ export const Breadcrumb = React.memo(
 );
 
 const BreadcrumbItemSelector: React.FC<{
-  item: BreadcrumbItem;
+  item: BreadcrumbItemType;
   isActive: boolean;
   isLast: boolean;
 }> = ({ item, isActive, isLast }) => {

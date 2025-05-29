@@ -162,7 +162,7 @@ const ListItem = React.memo(
 );
 ListItem.displayName = 'ListItem';
 
-const PanelHeader = React.memo(({}: {}) => {
+const PanelHeader = React.memo(() => {
   const { href } = useCloseVersionHistory();
 
   return (
