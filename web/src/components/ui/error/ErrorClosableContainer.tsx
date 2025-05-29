@@ -2,8 +2,8 @@
 
 import { cn } from '@/lib/classMerge';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CircleWarning, Xmark } from '../icons';
 import React, { useEffect, useState } from 'react';
+import { CircleWarning, Xmark } from '../icons';
 
 export const ErrorClosableContainer: React.FC<{
   error: string;

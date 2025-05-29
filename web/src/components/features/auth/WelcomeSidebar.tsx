@@ -1,8 +1,8 @@
-import type React from 'react';
-import { Text } from '@/components/ui/typography';
-import Link from 'next/link';
 import { BusterLogoWithText } from '@/assets/svg/BusterLogoWithText';
-import { BUSTER_HOME_PAGE } from '@/routes/externalRoutes';
+import { Text } from '@/components/ui/typography';
+import { BUSTER_DOCS_URL, BUSTER_HOME_PAGE } from '@/routes/externalRoutes';
+import Link from 'next/link';
+import type React from 'react';
 
 export const WelcomeToBuster: React.FC<{
   hasUser: boolean;
@@ -28,10 +28,10 @@ export const WelcomeToBuster: React.FC<{
       </div>
       <div>
         <div className="flex space-x-8">
-          <a href="#">
+          <a href={'https://www.buster.so/terms-of-service'}>
             <Text>Terms of Service</Text>
           </a>
-          <a href="#">
+          <a href={'https://www.buster.so/privacy-policy'}>
             <Text>Privacy Policy</Text>
           </a>
         </div>

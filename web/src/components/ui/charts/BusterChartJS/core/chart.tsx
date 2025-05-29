@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useEffect, useRef, forwardRef } from 'react';
+import { usePrevious, usePreviousRef } from '@/hooks';
 import { Chart as ChartJS } from 'chart.js';
 import type { ChartType, DefaultDataPoint } from 'chart.js';
-import type { ForwardedRef, ChartProps, BaseChartComponent } from './types';
-import { reforwardRef, cloneData, setOptions, setLabels, setDatasets } from './utils';
-import { usePrevious, usePreviousRef } from '@/hooks';
+import React, { useEffect, useRef, forwardRef } from 'react';
+import type { BaseChartComponent, ChartProps, ForwardedRef } from './types';
+import { cloneData, reforwardRef, setDatasets, setLabels, setOptions } from './utils';
 
 function ChartComponent<
   TType extends ChartType = ChartType,

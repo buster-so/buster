@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { DatePicker } from './DatePicker';
 import { action } from '@storybook/addon-actions';
+import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import { DatePicker } from './DatePicker';
 
 const meta: Meta<typeof DatePicker> = {
   title: 'UI/Date/DatePicker',

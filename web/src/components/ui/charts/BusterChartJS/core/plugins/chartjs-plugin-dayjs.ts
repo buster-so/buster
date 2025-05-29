@@ -53,7 +53,8 @@ _adapters._date.override({
 
     if (valueType === 'string' && typeof format === 'string') {
       return dayjs(value, format).isValid() ? dayjs(value, format).valueOf() : null;
-    } else if (!(value instanceof dayjs)) {
+    }
+    if (!(value instanceof dayjs)) {
       return dayjs(value).isValid() ? dayjs(value).valueOf() : null;
     }
     return null;

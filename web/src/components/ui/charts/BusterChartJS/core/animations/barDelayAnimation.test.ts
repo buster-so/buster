@@ -1,5 +1,5 @@
-import { barDelayAnimation } from './barDelayAnimation';
 import type { Chart, ScriptableContext } from 'chart.js';
+import { barDelayAnimation } from './barDelayAnimation';
 
 describe('barDelayAnimation', () => {
   test('should calculate correct delay for regular bar chart', () => {

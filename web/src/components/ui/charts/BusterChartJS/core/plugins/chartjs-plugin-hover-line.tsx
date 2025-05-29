@@ -1,4 +1,4 @@
-import { type ChartType, Chart, type Plugin } from 'chart.js';
+import { Chart, type ChartType, type Plugin } from 'chart.js';
 
 export interface ChartHoverLinePluginOptions {
   lineWidth: number;
@@ -34,7 +34,7 @@ export const ChartHoverLinePlugin: Plugin<ChartType, ChartHoverLinePluginOptions
 
     const tooltipActive = tooltip?.getActiveElements();
 
-    if (tooltipActive && tooltipActive.length) {
+    if (tooltipActive?.length) {
       const activePoint = tooltipActive[0];
       const x = activePoint.element.x;
       const topY = top;

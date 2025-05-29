@@ -1,17 +1,17 @@
 import { ShareAssetType } from '@/api/asset_interfaces';
-import { BusterRoutes, createBusterRoute } from '@/routes';
-import { Button } from '@/components/ui/buttons';
-import { Text } from '@/components/ui/typography';
-import { Input } from '@/components/ui/inputs';
-import React, { useMemo } from 'react';
-import { useMemoizedFn } from '@/hooks';
-import { useBusterNotifications } from '@/context/BusterNotifications';
-import { Link } from '@/components/ui/icons';
 import { useUpdateCollectionShare } from '@/api/buster_rest/collections';
-import { useUpdateMetricShare } from '@/api/buster_rest/metrics';
 import { useUpdateDashboardShare } from '@/api/buster_rest/dashboards';
-import type { ShareMenuContentBodyProps } from './ShareMenuContentBody';
+import { useUpdateMetricShare } from '@/api/buster_rest/metrics';
+import { Button } from '@/components/ui/buttons';
+import { Link } from '@/components/ui/icons';
+import { Input } from '@/components/ui/inputs';
+import { Text } from '@/components/ui/typography';
+import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
+import { BusterRoutes, createBusterRoute } from '@/routes';
+import React, { useMemo } from 'react';
+import type { ShareMenuContentBodyProps } from './ShareMenuContentBody';
 
 export const ShareMenuContentEmbed: React.FC<ShareMenuContentBodyProps> = React.memo(
   ({ className, assetType, assetId }) => {
@@ -93,7 +93,7 @@ export const ShareMenuContentEmbedFooter = ({
   return (
     <div className="bg-item-hover flex justify-start overflow-hidden rounded-b px-3 py-2.5">
       <Text variant="secondary" className="text-xs!">
-        {`Your dashboard currently isn’t published.`}
+        {'Your dashboard currently isn’t published.'}
 
         <span
           onClick={() => {

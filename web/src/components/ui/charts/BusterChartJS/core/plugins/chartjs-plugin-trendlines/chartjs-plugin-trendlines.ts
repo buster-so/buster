@@ -1,8 +1,8 @@
 // chartjs-plugin-trendline.ts
 
-import type { Plugin, ChartType, ChartDataset, Point, Scale } from 'chart.js';
-import { defaultLabelOptionConfig } from '../../../hooks/useChartSpecificOptions/labelOptionConfig';
 import { DEFAULT_TRENDLINE_CONFIG } from '@/api/asset_interfaces/metric/defaults';
+import type { ChartDataset, ChartType, Plugin, Point, Scale } from 'chart.js';
+import { defaultLabelOptionConfig } from '../../../hooks/useChartSpecificOptions/labelOptionConfig';
 
 /** The three trendline modes we support */
 export type TrendlineType =
@@ -309,9 +309,9 @@ class PolynomialFitter extends BaseFitter {
     if (!this.coeffs) this.fit();
 
     // Use Horner's method for polynomial evaluation (more efficient)
-    let result = this.coeffs![this.coeffs!.length - 1];
-    for (let i = this.coeffs!.length - 2; i >= 0; i--) {
-      result = result * x + this.coeffs![i];
+    let result = this.coeffs?.[this.coeffs?.length - 1];
+    for (let i = this.coeffs?.length - 2; i >= 0; i--) {
+      result = result * x + this.coeffs?.[i];
     }
     return result;
   }
@@ -482,7 +482,6 @@ const createFitter = (opts: TrendlineOptions): BaseFitter => {
       return new MinFitter();
     case 'median':
       return new MedianFitter();
-    case 'linear_regression':
     default:
       return new LinearFitter();
   }
@@ -655,7 +654,7 @@ const drawLinePath = (
       const yPos = yScale.getPixelForValue(point.y);
 
       // Skip any NaN or infinite values that might occur
-      if (!isNaN(yPos) && isFinite(yPos)) {
+      if (!Number.isNaN(yPos) && Number.isFinite(yPos)) {
         ctx.lineTo(xPos, yPos);
       }
     }
@@ -698,7 +697,7 @@ const addDataPointsToFitter = (
 ) => {
   dataset.data.forEach((point, i: number) => {
     if (!point) return;
-    else if (typeof point === 'number') {
+    if (typeof point === 'number') {
       let x: number | Date | undefined | string = i;
       const y = point;
 
@@ -710,7 +709,7 @@ const addDataPointsToFitter = (
         fitter.add(x, y);
       }
     } else if (point) {
-      const x = point['x'] ?? i;
+      const x = point.x ?? i;
       const y = point[(yAxisID ?? dataset.yAxisID ?? 'y') as 'y'] ?? point;
       if (typeof x === 'number' && typeof y === 'number') {
         fitter.add(x, y);
@@ -812,7 +811,7 @@ class SpatialIndex {
       if (!this.cells.has(key)) {
         this.cells.set(key, []);
       }
-      this.cells.get(key)!.push(rect);
+      this.cells.get(key)?.push(rect);
     }
   }
 
@@ -992,7 +991,7 @@ const drawTrendlinePath = (
   const yBottom = chartArea.bottom;
 
   // Skip drawing if we have invalid coordinates
-  if (isNaN(y1) || isNaN(y2)) {
+  if (Number.isNaN(y1) || Number.isNaN(y2)) {
     console.warn('Skipping trendline drawing due to invalid values');
     return;
   }
@@ -1168,7 +1167,7 @@ const trendlinePlugin: Plugin<'line'> = {
           // Check if we have valid data (positive y values)
           const hasValidPoints = dataset.data.some((point) => {
             if (!point) return false;
-            else if (typeof point === 'number') return point > 0;
+            if (typeof point === 'number') return point > 0;
             const y = point[(dataset.yAxisID ?? 'y') as 'y'] ?? point;
             return typeof y === 'number' && y > 0;
           });

@@ -1,22 +1,22 @@
 'use client';
 
-import React, { useMemo } from 'react';
-import { BusterRoutes, createBusterRoute } from '@/routes';
-import {
-  Gear,
-  Database,
-  UserGroup,
-  Book2,
-  Message,
-  Flag,
-  ArrowRightFromLine
-} from '@/components/ui/icons/NucleoIconOutlined';
-import { BUSTER_DOCS_URL } from '@/routes/externalRoutes';
-import { type DropdownProps, Dropdown } from '@/components/ui/dropdown/Dropdown';
-import { AvatarUserButton } from '@/components/ui/avatar/AvatarUserButton';
-import { useUserConfigContextSelector } from '@/context/Users';
-import { useContactSupportModalStore } from '@/context/BusterAppLayout';
 import { useSignOut } from '@/components/features/auth/SignOutHandler';
+import { AvatarUserButton } from '@/components/ui/avatar/AvatarUserButton';
+import { Dropdown, type DropdownProps } from '@/components/ui/dropdown/Dropdown';
+import {
+  ArrowRightFromLine,
+  Book2,
+  Database,
+  Flag,
+  Gear,
+  Message,
+  UserGroup
+} from '@/components/ui/icons/NucleoIconOutlined';
+import { useContactSupportModalStore } from '@/context/BusterAppLayout';
+import { useUserConfigContextSelector } from '@/context/Users';
+import { BusterRoutes, createBusterRoute } from '@/routes';
+import { BUSTER_DOCS_URL } from '@/routes/externalRoutes';
+import React, { useMemo } from 'react';
 
 export const SidebarUserFooter: React.FC = () => {
   const user = useUserConfigContextSelector((x) => x.user);

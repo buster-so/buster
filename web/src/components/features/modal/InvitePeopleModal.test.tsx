@@ -1,7 +1,7 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { InvitePeopleModal } from './InvitePeopleModal';
 import { useInviteUser } from '@/api/buster_rest/users';
 import { useBusterNotifications } from '@/context/BusterNotifications';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { InvitePeopleModal } from './InvitePeopleModal';
 
 // Mock the hooks
 jest.mock('@/api/buster_rest/users', () => ({

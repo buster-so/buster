@@ -1,10 +1,10 @@
 'use client';
 
-import type { Meta, StoryObj } from '@storybook/react';
-import { StreamingMessageCode } from './StreamingMessageCode';
 import type { FileType } from '@/api/asset_interfaces';
 import { Button } from '@/components/ui/buttons';
+import type { Meta, StoryObj } from '@storybook/react';
 import React from 'react';
+import { StreamingMessageCode } from './StreamingMessageCode';
 
 const meta: Meta<typeof StreamingMessageCode> = {
   title: 'UI/streaming/StreamingMessageCode',

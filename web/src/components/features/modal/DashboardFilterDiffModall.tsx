@@ -2,12 +2,12 @@ import { Button } from '@/components/ui/buttons';
 import { Xmark } from '@/components/ui/icons';
 import { AppPageLayout } from '@/components/ui/layouts';
 import { Dialog, DialogContent } from '@/components/ui/modal/ModalBase';
+import { Text, Title } from '@/components/ui/typography';
+import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
+import { DialogTitle } from '@radix-ui/react-dialog';
 import React, { useEffect, useMemo, useState } from 'react';
 import { AppVerticalDiffCodeSplitter } from '../layouts/AppVerticalCodeSplitter/AppVerticalDiffCodeSplitter';
-import { DialogTitle } from '@radix-ui/react-dialog';
-import { useMemoizedFn } from '@/hooks';
-import { Text, Title } from '@/components/ui/typography';
 
 interface DashboardFilterDiffModallProps {
   open: boolean;

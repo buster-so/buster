@@ -1,10 +1,10 @@
-import React, { useMemo } from 'react';
-import { useMount } from '@/hooks';
-import { formatLabel, JsonDataFrameOperationsSingle, timeout } from '@/lib';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Title } from '@/components/ui/typography';
-import type { ColumnLabelFormat, MetricChartProps } from '@/api/asset_interfaces/metric/charts';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
+import type { ColumnLabelFormat, MetricChartProps } from '@/api/asset_interfaces/metric/charts';
+import { Title } from '@/components/ui/typography';
+import { useMount } from '@/hooks';
+import { JsonDataFrameOperationsSingle, formatLabel, timeout } from '@/lib';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { useMemo } from 'react';
 import type { BusterMetricChartProps } from './interfaces';
 
 export const BusterMetricChart: React.FC<BusterMetricChartProps> = React.memo(
@@ -118,7 +118,8 @@ export const BusterMetricChart: React.FC<BusterMetricChartProps> = React.memo(
         };
 
         return formatLabel(operator[metricValueAggregate](), format);
-      } else if (metricValueLabel) {
+      }
+      if (metricValueLabel) {
         return metricValueLabel;
       }
 
@@ -217,7 +218,7 @@ const AnimatedTitleWrapper = ({ title, type }: { title: string; type: 'header' |
 
 const fallbackAggregate = (
   columnId: string,
-  aggregate: MetricChartProps['metricValueAggregate'] = 'sum',
+  aggregate: MetricChartProps['metricValueAggregate'],
   columnLabelFormats: BusterMetricChartProps['columnLabelFormats']
 ): NonNullable<MetricChartProps['metricValueAggregate']> => {
   const columnLabelFormat = columnLabelFormats[columnId] || DEFAULT_COLUMN_LABEL_FORMAT;

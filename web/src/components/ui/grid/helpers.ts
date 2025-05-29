@@ -21,7 +21,7 @@ export const calculateColumnSpan = (layout: number[]) => {
 };
 
 export const columnSpanToPercent = (columnSpan: number): string => {
-  return (columnSpan / NUMBER_OF_COLUMNS) * 100 + '%';
+  return `${(columnSpan / NUMBER_OF_COLUMNS) * 100}%`;
 };
 
 export const columnSpansToPercent = (columnSpans: number[] | undefined) => {

@@ -1,36 +1,36 @@
 'use client';
 
+import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/classMerge';
+import {
+  DndContext,
+  type DragEndEvent,
+  DragOverlay,
+  type DragStartEvent,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors
+} from '@dnd-kit/core';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import React, { useEffect } from 'react';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger
 } from '../collapsible/CollapsibleBase';
-import type { ISidebarGroup } from './interfaces';
-import { SidebarItem } from './SidebarItem';
 import { CaretDown } from '../icons/NucleoIconFilled';
-import { cn } from '@/lib/classMerge';
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragOverlay,
-  type DragStartEvent,
-  type DragEndEvent
-} from '@dnd-kit/core';
-import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-  useSortable
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { useMemoizedFn } from '@/hooks';
+import { SidebarItem } from './SidebarItem';
+import type { ISidebarGroup } from './interfaces';
 
 const modifiers = [restrictToVerticalAxis];
 

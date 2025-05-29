@@ -1,9 +1,9 @@
-import React from 'react';
-import { Avatar as AvatarBase, AvatarFallback, AvatarImage } from './AvatarBase';
-import { getFirstTwoCapitalizedLetters } from '@/lib/text';
-import { Tooltip } from '../tooltip/Tooltip';
 import { BusterLogo } from '@/assets/svg/BusterLogo';
+import { getFirstTwoCapitalizedLetters } from '@/lib/text';
 import { cn } from '@/lib/utils';
+import React from 'react';
+import { Tooltip } from '../tooltip/Tooltip';
+import { Avatar as AvatarBase, AvatarFallback, AvatarImage } from './AvatarBase';
 
 export interface AvatarProps {
   image?: string | null;
@@ -71,7 +71,7 @@ const BusterAvatarFallback: React.FC<{ fallbackClassName?: string }> = ({ fallba
 const createNameLetters = (name?: string | null) => {
   if (name) {
     const firstTwoLetters = getFirstTwoCapitalizedLetters(name);
-    if (firstTwoLetters.length == 2) return firstTwoLetters;
+    if (firstTwoLetters.length === 2) return firstTwoLetters;
 
     const _name = name.split(' ') as [string, string];
     const returnName = `${_name[0][0]}`.toUpperCase().replace('@', '');

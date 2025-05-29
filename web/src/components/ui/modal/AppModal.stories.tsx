@@ -1,12 +1,12 @@
 'use client';
 
-import type { Meta, StoryObj } from '@storybook/react';
-import { AppModal } from './AppModal';
-import { Button } from '../buttons/Button';
-import React from 'react';
-import type { ModalProps } from './AppModal';
-import { fn } from '@storybook/test';
 import { timeout } from '@/lib';
+import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
+import React from 'react';
+import { Button } from '../buttons/Button';
+import { AppModal } from './AppModal';
+import type { ModalProps } from './AppModal';
 
 const meta: Meta<typeof AppModal> = {
   title: 'UI/Modal/AppModal',

@@ -1,6 +1,6 @@
-import { CircleCheck } from '../icons/NucleoIconFilled';
 import { cn } from '@/lib/classMerge';
 import React from 'react';
+import { CircleCheck } from '../icons/NucleoIconFilled';
 import { Card, CardContent, CardTitle } from './CardBase';
 
 interface SuccessCardProps extends React.HTMLAttributes<HTMLDivElement> {

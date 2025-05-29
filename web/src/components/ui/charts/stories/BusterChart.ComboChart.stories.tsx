@@ -1,8 +1,8 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import type { BusterChart } from '../BusterChart';
-import { ChartType } from '../../../../api/asset_interfaces/metric/charts/enum';
-import type { IColumnLabelFormat } from '../../../../api/asset_interfaces/metric/charts/columnLabelInterfaces';
 import { faker } from '@faker-js/faker';
+import type { Meta, StoryObj } from '@storybook/react';
+import type { IColumnLabelFormat } from '../../../../api/asset_interfaces/metric/charts/columnLabelInterfaces';
+import { ChartType } from '../../../../api/asset_interfaces/metric/charts/enum';
+import type { BusterChart } from '../BusterChart';
 import { sharedMeta } from './BusterChartShared';
 
 interface ComboChartDataPoint {

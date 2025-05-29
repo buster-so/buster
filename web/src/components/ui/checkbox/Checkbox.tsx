@@ -1,8 +1,8 @@
-import * as React from 'react';
-import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 import { cn } from '@/lib/classMerge';
-import { Minus, Check } from '../icons';
-import { cva, type VariantProps } from 'class-variance-authority';
+import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
+import { type VariantProps, cva } from 'class-variance-authority';
+import * as React from 'react';
+import { Check, Minus } from '../icons';
 
 const checkboxVariants = cva(
   'peer relative h-4 w-4 shrink-0 rounded-sm border focus-visible:outline-none disabled:cursor-not-allowed',

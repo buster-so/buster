@@ -1,8 +1,5 @@
 'use client';
 
-import * as React from 'react';
-import { Check } from '@/components/ui/icons';
-import { cn } from '@/lib/utils';
 import {
   Command,
   CommandEmpty,
@@ -11,9 +8,12 @@ import {
   CommandItem,
   CommandList
 } from '@/components/ui/command';
-import { useHotkeys } from 'react-hotkeys-hook';
-import { useMemoizedFn } from '@/hooks';
+import { Check } from '@/components/ui/icons';
 import { Text } from '@/components/ui/typography';
+import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/utils';
+import * as React from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 type BaseComboboxProps = {
   options: { value: string; label: string; icon?: React.ReactNode; secondaryLabel?: string }[];

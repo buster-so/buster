@@ -1,35 +1,35 @@
 'use client';
 
+import { DEFAULT_CHART_THEME } from '@/api/asset_interfaces/metric/charts/configColors';
+import { truncateText } from '@/lib/text';
+import { isServer } from '@tanstack/react-query';
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
   ArcElement,
+  BarController,
+  BarElement,
+  BubbleController,
+  CategoryScale,
+  Chart as ChartJS,
   Colors,
+  DoughnutController,
+  Legend,
+  LineController,
+  LineElement,
+  LinearScale,
   LogarithmicScale,
+  PieController,
+  PointElement,
+  ScatterController,
   TimeScale,
   TimeSeriesScale,
-  PointElement,
-  LineController,
-  BarController,
-  BubbleController,
-  PieController,
-  ScatterController,
-  DoughnutController
+  Title,
+  Tooltip
 } from 'chart.js';
-import { ChartMountedPlugin } from './core/plugins';
-import ChartDeferred from 'chartjs-plugin-deferred';
 import ChartJsAnnotationPlugin from 'chartjs-plugin-annotation';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import ChartDeferred from 'chartjs-plugin-deferred';
+import { ChartMountedPlugin } from './core/plugins';
 import ChartTrendlinePlugin from './core/plugins/chartjs-plugin-trendlines';
-import { DEFAULT_CHART_THEME } from '@/api/asset_interfaces/metric/charts/configColors';
-import { isServer } from '@tanstack/react-query';
-import { truncateText } from '@/lib/text';
 import './core/plugins/chartjs-plugin-dayjs';
 import './core/plugins/chartjs-scale-tick-duplicate';
 import './core/plugins/chartjs-plugin-trendlines';

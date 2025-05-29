@@ -1,7 +1,7 @@
+import { useMemoizedFn } from '@/hooks/useMemoizedFn';
+import React, { useMemo } from 'react';
 import { InputNumber } from '../inputs';
 import { Slider } from './Slider';
-import React, { useMemo } from 'react';
-import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 
 interface SliderWithInputNumberProps {
   min: number;

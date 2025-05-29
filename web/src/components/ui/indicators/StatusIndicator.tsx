@@ -1,7 +1,7 @@
-import React from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { RadioChecked, CircleWarning } from '../icons';
 import { cn } from '@/lib/classMerge';
+import { AnimatePresence, motion } from 'framer-motion';
+import React from 'react';
+import { CircleWarning, RadioChecked } from '../icons';
 
 const animationConfig = {
   initial: { opacity: 0 },

@@ -1,10 +1,10 @@
 'use client';
 
-import * as React from 'react';
-import * as PopoverPrimitive from '@radix-ui/react-popover';
-import { cn } from '@/lib/utils';
 import { useMemoizedFn } from '@/hooks';
-import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '@/lib/utils';
+import * as PopoverPrimitive from '@radix-ui/react-popover';
+import { type VariantProps, cva } from 'class-variance-authority';
+import * as React from 'react';
 
 export type PopoverTriggerType = 'click' | 'hover';
 

@@ -1,8 +1,8 @@
 'use client';
 
-import * as React from 'react';
-import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { Xmark } from '@/components/ui/icons';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 import { Button } from '../buttons';

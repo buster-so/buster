@@ -1,11 +1,11 @@
-import type { ITooltipItem } from '../../../../BusterChartTooltip/interfaces';
 import type {
   BusterChartConfigProps,
   BusterChartProps
 } from '@/api/asset_interfaces/metric/charts';
-import type { Chart, TooltipItem, ChartTypeRegistry } from 'chart.js';
-import { percentageFormatter } from './helpers';
 import { formatLabel } from '@/lib';
+import type { Chart, ChartTypeRegistry, TooltipItem } from 'chart.js';
+import type { ITooltipItem } from '../../../../BusterChartTooltip/interfaces';
+import { percentageFormatter } from './helpers';
 
 export const pieTooltipHelper = (
   dataPoints: TooltipItem<keyof ChartTypeRegistry>[],

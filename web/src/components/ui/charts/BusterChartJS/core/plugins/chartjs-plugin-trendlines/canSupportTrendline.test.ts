@@ -1,7 +1,7 @@
-import { canSupportTrendlineRecord } from './canSupportTrendline';
-import { isNumericColumnType } from '@/lib/messages';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import type { BusterChartProps, Trendline } from '@/api/asset_interfaces/metric/charts';
+import { isNumericColumnType } from '@/lib/messages';
+import { canSupportTrendlineRecord } from './canSupportTrendline';
 
 // Mock the isNumericColumnType function
 jest.mock('@/lib/messages', () => ({

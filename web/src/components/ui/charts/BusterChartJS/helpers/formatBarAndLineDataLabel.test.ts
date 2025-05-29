@@ -1,6 +1,6 @@
-import { formatBarAndLineDataLabel } from './formatBarAndLineDataLabel';
 import type { ColumnLabelFormat } from '@/api/asset_interfaces/metric';
 import type { Context } from 'chartjs-plugin-datalabels';
+import { formatBarAndLineDataLabel } from './formatBarAndLineDataLabel';
 
 describe('formatBarAndLineDataLabel', () => {
   it('formats a single value without percentage', () => {

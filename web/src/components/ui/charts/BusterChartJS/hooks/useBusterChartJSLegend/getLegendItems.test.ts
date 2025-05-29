@@ -1,9 +1,9 @@
 import { ChartType } from '@/api/asset_interfaces/metric/charts';
-import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
 import type { ColumnSettings } from '@/api/asset_interfaces/metric/charts/columnInterfaces';
+import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
 import type { SimplifiedColumnType } from '@/api/asset_interfaces/metric/interfaces';
-import { getLegendItems } from './getLegendItems';
 import type { Chart } from 'chart.js';
+import { getLegendItems } from './getLegendItems';
 
 describe('getLegendItems', () => {
   const mockColors = ['#FF0000', '#00FF00', '#0000FF'];

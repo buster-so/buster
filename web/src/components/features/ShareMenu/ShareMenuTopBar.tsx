@@ -1,9 +1,9 @@
+import { ShareAssetType } from '@/api/asset_interfaces';
 import { AppSegmented } from '@/components/ui/segmented';
+import type { SegmentedItem } from '@/components/ui/segmented';
+import { useMemoizedFn } from '@/hooks';
 import React, { useMemo } from 'react';
 import { CopyLinkButton } from './CopyLinkButton';
-import { ShareAssetType } from '@/api/asset_interfaces';
-import { useMemoizedFn } from '@/hooks';
-import type { SegmentedItem } from '@/components/ui/segmented';
 
 export enum ShareMenuTopBarOptions {
   Share = 'Share',

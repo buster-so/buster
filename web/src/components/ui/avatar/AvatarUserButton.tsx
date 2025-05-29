@@ -1,7 +1,7 @@
 import React from 'react';
-import { Avatar } from './Avatar';
-import { Text } from '../typography/Text';
 import { ChevronExpandY } from '../icons';
+import { Text } from '../typography/Text';
+import { Avatar } from './Avatar';
 
 export const AvatarUserButton = React.forwardRef<
   HTMLDivElement,

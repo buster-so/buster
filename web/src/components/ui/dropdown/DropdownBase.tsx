@@ -1,13 +1,13 @@
 'use client';
 
-import * as React from 'react';
-import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
-import { ArrowRight, ArrowUpRight, Check3 as Check } from '../icons/NucleoIconOutlined';
-import { CaretRight } from '../icons/NucleoIconFilled';
 import { cn } from '@/lib/classMerge';
-import { Checkbox } from '../checkbox/Checkbox';
-import { Button } from '../buttons/Button';
+import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import Link from 'next/link';
+import * as React from 'react';
+import { Button } from '../buttons/Button';
+import { Checkbox } from '../checkbox/Checkbox';
+import { CaretRight } from '../icons/NucleoIconFilled';
+import { ArrowRight, ArrowUpRight, Check3 as Check } from '../icons/NucleoIconOutlined';
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 

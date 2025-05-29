@@ -1,9 +1,9 @@
 import { renderHook } from '@testing-library/react';
-import { useDatasetOptions } from './useDatasetOptions';
 import type {
   ChartType,
   IColumnLabelFormat
 } from '../../../../../api/asset_interfaces/metric/charts';
+import { useDatasetOptions } from './useDatasetOptions';
 
 describe('useDatasetOptions', () => {
   const mockData = [

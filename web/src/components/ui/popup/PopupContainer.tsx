@@ -1,6 +1,6 @@
-import type React from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/classMerge';
+import { AnimatePresence, motion } from 'framer-motion';
+import type React from 'react';
 
 export const PopupContainer: React.FC<{
   show: boolean;

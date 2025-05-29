@@ -1,17 +1,17 @@
 'use client';
 
-import * as React from 'react';
-import * as SliderPrimitive from '@radix-ui/react-slider';
 import {
   Tooltip,
+  TooltipContent,
   TooltipProvider,
-  TooltipTrigger,
-  TooltipContent
+  TooltipTrigger
 } from '@/components/ui/tooltip/TooltipBase';
+import * as SliderPrimitive from '@radix-ui/react-slider';
+import * as React from 'react';
 
+import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/utils';
 import { ErrorBoundary } from '../error';
-import { useMemoizedFn } from '@/hooks';
 
 export interface SliderProps extends React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root> {
   min?: number;

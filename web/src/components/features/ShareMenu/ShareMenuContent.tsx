@@ -1,12 +1,12 @@
 import { type BusterShare, ShareAssetType, ShareRole } from '@/api/asset_interfaces';
-import React, { useState } from 'react';
-import { ShareMenuTopBar, ShareMenuTopBarOptions } from './ShareMenuTopBar';
-import { ShareMenuContentBody } from './ShareMenuContentBody';
-import { useMemoizedFn } from '@/hooks';
-import { BusterRoutes, createBusterRoute } from '@/routes';
 import { useBusterNotifications } from '@/context/BusterNotifications';
-import { ShareMenuContentEmbedFooter } from './ShareMenuContentEmbed';
+import { useMemoizedFn } from '@/hooks';
 import { getIsEffectiveOwner } from '@/lib/share';
+import { BusterRoutes, createBusterRoute } from '@/routes';
+import React, { useState } from 'react';
+import { ShareMenuContentBody } from './ShareMenuContentBody';
+import { ShareMenuContentEmbedFooter } from './ShareMenuContentEmbed';
+import { ShareMenuTopBar, ShareMenuTopBarOptions } from './ShareMenuTopBar';
 
 export const ShareMenuContent: React.FC<{
   shareAssetConfig: BusterShare;

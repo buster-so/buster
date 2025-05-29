@@ -1,6 +1,6 @@
+import { cn } from '@/lib/utils';
 import type React from 'react';
 import { NUMBER_OF_COLUMNS } from './helpers';
-import { cn } from '@/lib/utils';
 
 export const BusterDragColumnMarkers: React.FC<{
   isDraggingIndex: number | null;
@@ -16,12 +16,12 @@ export const BusterDragColumnMarkers: React.FC<{
       className="buster-column-markers pointer-events-none absolute mx-0! flex h-2 w-full items-center justify-between"
       style={{
         top: -2,
-        transform: `translateY(-100%)`
+        transform: 'translateY(-100%)'
       }}>
       <div
         className="relative h-full w-full transition duration-500"
         style={{
-          margin: `0px 5px`
+          margin: '0px 5px'
         }}>
         {Array.from({ length: NUMBER_OF_COLUMNS + 1 }).map((_, index) => (
           <div
@@ -48,7 +48,7 @@ export const BusterDragColumnMarkers: React.FC<{
 const geHideSnappedDot = (
   isDraggingIndex: number | null,
   index: number,
-  disabled = false,
+  disabled,
   itemsLength: number
 ) => {
   if (disabled || index < 3 || index > 9) return true;

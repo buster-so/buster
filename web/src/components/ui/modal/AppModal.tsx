@@ -1,8 +1,10 @@
 'use client';
 
+import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/classMerge';
 import type React from 'react';
 import { useMemo, useState } from 'react';
-import { type ButtonProps, Button } from '../buttons/Button';
+import { Button, type ButtonProps } from '../buttons/Button';
 import {
   Dialog,
   DialogContent,
@@ -11,8 +13,6 @@ import {
   DialogHeader,
   DialogTitle
 } from './ModalBase';
-import { useMemoizedFn } from '@/hooks';
-import { cn } from '@/lib/classMerge';
 
 export interface ModalProps<T = unknown> {
   className?: string;

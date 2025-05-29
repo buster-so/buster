@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useEffect, useMemo } from 'react';
+import { useCreateCollection } from '@/api/buster_rest/collections';
+import { Input } from '@/components/ui/inputs';
 import { AppModal } from '@/components/ui/modal';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
-import { BusterRoutes } from '@/routes';
-import { inputHasText } from '@/lib/text';
 import { useMemoizedFn } from '@/hooks';
-import { Input } from '@/components/ui/inputs';
-import { useCreateCollection } from '@/api/buster_rest/collections';
+import { inputHasText } from '@/lib/text';
+import { BusterRoutes } from '@/routes';
+import React, { useEffect, useMemo } from 'react';
 
 export const NewCollectionModal: React.FC<{
   open: boolean;

@@ -1,10 +1,10 @@
 import type {
-  ChartType,
   BusterChartProps,
-  ChartEncodes
+  ChartEncodes,
+  ChartType
 } from '@/api/asset_interfaces/metric/charts';
-import type { ChartProps } from '../../core';
 import type { ChartType as ChartJSChartType } from 'chart.js';
+import type { ChartProps } from '../../core';
 
 export interface UseChartSpecificOptionsProps {
   selectedChartType: ChartType;

@@ -1,3 +1,4 @@
+import { useMemoizedFn } from '@/hooks';
 import type React from 'react';
 import {
   Select as SelectBase,
@@ -8,7 +9,6 @@ import {
   SelectTrigger,
   SelectValue
 } from './SelectBase';
-import { useMemoizedFn } from '@/hooks';
 
 interface SelectItemGroup<T = string> {
   label: string;

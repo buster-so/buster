@@ -1,6 +1,6 @@
-import type React from 'react';
 import { Input } from '@/components/ui/inputs';
 import { useMemoizedFn } from '@/hooks';
+import type React from 'react';
 
 export const PermissionSearch: React.FC<{
   className?: string;

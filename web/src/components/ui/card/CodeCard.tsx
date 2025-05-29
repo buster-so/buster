@@ -1,10 +1,10 @@
-import React from 'react';
 import { AppCodeEditor } from '@/components/ui/inputs/AppCodeEditor';
-import { useMemoizedFn } from '@/hooks';
 import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useMemoizedFn } from '@/hooks';
+import React from 'react';
 import { Button } from '../buttons/Button';
-import { Download, Copy } from '../icons';
 import { ErrorClosableContainer } from '../error/ErrorClosableContainer';
+import { Copy, Download } from '../icons';
 import { FileCard } from './FileCard';
 
 export const CodeCard: React.FC<{

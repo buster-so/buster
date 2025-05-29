@@ -1,13 +1,13 @@
-import type { ChartProps } from '../../core';
-import type { LabelBuilderProps } from './useSeriesOptions';
-import type { SeriesBuilderProps } from './interfaces';
-import type { BubbleDataPoint, ScriptableContext } from 'chart.js';
 import { DEFAULT_CHART_CONFIG, DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import { addOpacityToColor } from '@/lib/colors';
-import { isDateColumnType } from '@/lib/messages';
 import { createDayjsDate } from '@/lib/date';
+import { isDateColumnType } from '@/lib/messages';
+import type { BubbleDataPoint, ScriptableContext } from 'chart.js';
 import { formatLabelForDataset } from '../../../commonHelpers';
+import type { ChartProps } from '../../core';
 import { createTrendlineOnSeries } from './createTrendlines';
+import type { SeriesBuilderProps } from './interfaces';
+import type { LabelBuilderProps } from './useSeriesOptions';
 
 declare module 'chart.js' {
   interface BubbleDataPoint {
@@ -89,7 +89,7 @@ export const scatterSeriesBuilder_data = ({
           acc.push({
             x: getScatterXValue({
               isXAxisDate,
-              xValue: dataset.ticksForScatter![index][0]
+              xValue: dataset.ticksForScatter?.[index][0]
             }),
             y: yData,
             originalR: dataset.sizeData?.[index] ?? 0

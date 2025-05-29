@@ -1,5 +1,5 @@
-import { comboSeriesBuilder_data } from './comboSeriesBuilder';
 import { DEFAULT_COLUMN_SETTINGS } from '@/api/asset_interfaces/metric';
+import { comboSeriesBuilder_data } from './comboSeriesBuilder';
 
 describe('comboSeriesBuilder_data', () => {
   const mockColors = ['#000000', '#111111'];

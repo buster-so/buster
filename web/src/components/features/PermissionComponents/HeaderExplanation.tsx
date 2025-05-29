@@ -1,5 +1,5 @@
+import { Paragraph, Text, Title } from '@/components/ui/typography';
 import React from 'react';
-import { Title, Text, Paragraph } from '@/components/ui/typography';
 
 export const HeaderExplanation: React.FC<{
   className?: string;

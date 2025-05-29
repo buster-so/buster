@@ -1,7 +1,7 @@
-import type React from 'react';
-import { ASSET_ICONS } from '../config/assetIcons';
 import { Button } from '@/components/ui/buttons';
 import { AppTooltip } from '@/components/ui/tooltip';
+import type React from 'react';
+import { ASSET_ICONS } from '../config/assetIcons';
 
 export const CollectionButton: React.FC<{
   buttonType?: 'ghost' | 'default';

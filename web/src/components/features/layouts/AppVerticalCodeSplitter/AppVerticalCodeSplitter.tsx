@@ -1,9 +1,9 @@
-import React, { forwardRef, MutableRefObject } from 'react';
-import { AppSplitter, type AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
-import { SQLContainer } from './SQLContainer';
-import { DataContainer } from './DataContainer';
 import type { IDataResult } from '@/api/asset_interfaces';
+import { AppSplitter, type AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
 import { useMount } from '@/hooks';
+import React, { forwardRef, MutableRefObject } from 'react';
+import { DataContainer } from './DataContainer';
+import { SQLContainer } from './SQLContainer';
 
 export interface AppVerticalCodeSplitterProps {
   sql: string;

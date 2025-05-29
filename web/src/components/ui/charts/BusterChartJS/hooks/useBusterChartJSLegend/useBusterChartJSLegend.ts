@@ -1,25 +1,25 @@
 'use client';
 
-import type React from 'react';
-import { useEffect, useMemo, useState, useTransition } from 'react';
-import type { ChartJSOrUndefined } from '../../core/types';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces/metric';
 import type {
   BusterChartProps,
   ChartEncodes,
   ChartType
 } from '@/api/asset_interfaces/metric/charts';
 import { useDebounceFn, useMemoizedFn, useUpdateDebounceEffect } from '@/hooks';
-import type { IBusterMetricChartConfig } from '@/api/asset_interfaces/metric';
+import { timeout } from '@/lib';
+import type React from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 import {
-  addLegendHeadlines,
   type BusterChartLegendItem,
-  useBusterChartLegend,
-  type UseChartLengendReturnValues
+  type UseChartLengendReturnValues,
+  addLegendHeadlines,
+  useBusterChartLegend
 } from '../../../BusterChartLegend';
-import { getLegendItems } from './getLegendItems';
 import type { DatasetOptionsWithTicks } from '../../../chartHooks';
 import { LEGEND_ANIMATION_THRESHOLD } from '../../../config';
-import { timeout } from '@/lib';
+import type { ChartJSOrUndefined } from '../../core/types';
+import { getLegendItems } from './getLegendItems';
 
 interface UseBusterChartJSLegendProps {
   chartRef: React.RefObject<ChartJSOrUndefined | null>;

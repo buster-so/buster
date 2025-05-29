@@ -1,5 +1,5 @@
-import { formatChartLabel } from './formatChartLabel';
 import type { BusterChartProps, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import { formatChartLabel } from './formatChartLabel';
 
 describe('formatChartLabel', () => {
   const columnLabelFormats = {

@@ -1,18 +1,18 @@
 'use client';
 
-import React from 'react';
-import {
-  buttonVariants,
-  buttonIconVariants,
-  type ButtonProps,
-  buttonTypeClasses,
-  LoadingIcon
-} from './Button';
-import { ChevronDown } from '../icons/NucleoIconOutlined';
+import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 import { cva } from 'class-variance-authority';
-import { type DropdownProps, Dropdown } from '../dropdown/Dropdown';
-import { useMemoizedFn } from '@/hooks';
+import React from 'react';
+import { Dropdown, type DropdownProps } from '../dropdown/Dropdown';
+import { ChevronDown } from '../icons/NucleoIconOutlined';
+import {
+  type ButtonProps,
+  LoadingIcon,
+  buttonIconVariants,
+  buttonTypeClasses,
+  buttonVariants
+} from './Button';
 
 interface ButtonDropdownProps {
   icon?: React.ReactNode;

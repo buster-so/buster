@@ -1,6 +1,6 @@
+import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
 import type { Meta, StoryObj } from '@storybook/react';
 import { BusterTableChart } from '../TableChart/BusterTableChart';
-import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
 
 // Helper functions for generating sample data
 const generateProductName = (index: number) => `Product ${index + 1}`;

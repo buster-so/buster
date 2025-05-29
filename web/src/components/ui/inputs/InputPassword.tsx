@@ -1,9 +1,9 @@
 'use client';
 
-import { Input, type InputProps } from './Input';
 import React, { useState } from 'react';
 import { Button } from '../buttons';
 import { Eye, EyeSlash } from '../icons';
+import { Input, type InputProps } from './Input';
 
 export const InputPassword = React.memo(({ ...props }: InputProps) => {
   const [visibilityToggle, setShowVisibilityToggle] = useState(false);
@@ -23,7 +23,8 @@ export const InputPassword = React.memo(({ ...props }: InputProps) => {
         type="button"
         className="absolute top-1/2 right-[7px] -translate-y-1/2"
         prefix={!visibilityToggle ? <Eye /> : <EyeSlash />}
-        onClick={() => setShowVisibilityToggle(!visibilityToggle)}></Button>
+        onClick={() => setShowVisibilityToggle(!visibilityToggle)}
+      />
     </div>
   );
 });

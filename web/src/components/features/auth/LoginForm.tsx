@@ -1,23 +1,16 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import { rustErrorHandler } from '@/api/buster_rest/errors';
 import { Button } from '@/components/ui/buttons';
-import { Input } from '@/components/ui/inputs';
-import { Title, Text } from '@/components/ui/typography';
-import { inputHasText } from '@/lib/text';
-import { isValidEmail } from '@/lib/email';
-import { useMemoizedFn } from '@/hooks';
-import Link from 'next/link';
-import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
+import { SuccessCard } from '@/components/ui/card/SuccessCard';
+import Github from '@/components/ui/icons/customIcons/Github';
 import Google from '@/components/ui/icons/customIcons/Google';
 import Microsoft from '@/components/ui/icons/customIcons/Microsoft';
-import Github from '@/components/ui/icons/customIcons/Github';
-import Cookies from 'js-cookie';
-import { PolicyCheck } from './PolicyCheck';
-import { rustErrorHandler } from '@/api/buster_rest/errors';
+import { Input } from '@/components/ui/inputs';
+import { Text, Title } from '@/components/ui/typography';
+import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
-import { SuccessCard } from '@/components/ui/card/SuccessCard';
-import { useHotkeys } from 'react-hotkeys-hook';
+import { isValidEmail } from '@/lib/email';
 import {
   signInWithAzure,
   signInWithEmailAndPassword,
@@ -25,6 +18,13 @@ import {
   signInWithGoogle,
   signUp
 } from '@/lib/supabase/signIn';
+import { inputHasText } from '@/lib/text';
+import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
+import Cookies from 'js-cookie';
+import Link from 'next/link';
+import React, { useMemo, useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
+import { PolicyCheck } from './PolicyCheck';
 
 const DEFAULT_CREDENTIALS = {
   email: process.env.NEXT_PUBLIC_USER || '',

@@ -1,4 +1,4 @@
-import type { Chart, ChartType, ChartData } from 'chart.js';
+import type { Chart, ChartData, ChartType } from 'chart.js';
 import { ChartMountedPlugin, type ChartMountedPluginOptions } from './chartjs-plugin-mounted';
 
 // Mock Chart.js

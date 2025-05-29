@@ -4,9 +4,9 @@ import {
   ChartType,
   type PieSortBy
 } from '@/api/asset_interfaces/metric';
-import type { DatasetOption, DatasetOptionsWithTicks, KV } from './interfaces';
-import cloneDeep from 'lodash/cloneDeep';
 import { sum as lodashSum } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import type { DatasetOption, DatasetOptionsWithTicks, KV } from './interfaces';
 
 // Helper: ensure pie slices meet minimum percentage
 function handlePieThreshold(datasets: DatasetOption[], minPercent: number): DatasetOption[] {
@@ -177,9 +177,9 @@ function sortPie(
     ...dataset,
     data: indices.map((i) => dataset.data[i]),
     tooltipData: dataset.tooltipData
-      ? indices.map((i) => dataset.tooltipData![i])
+      ? indices.map((i) => dataset.tooltipData?.[i])
       : dataset.tooltipData,
-    sizeData: dataset.sizeData ? indices.map((i) => dataset.sizeData![i]) : dataset.sizeData
+    sizeData: dataset.sizeData ? indices.map((i) => dataset.sizeData?.[i]) : dataset.sizeData
   }));
 
   // Sort ticks if they exist
@@ -258,9 +258,9 @@ function sortBar(
     // Sort data
     data: indices.map((i) => ds.data[i]),
     // Sort tooltipData if it exists
-    tooltipData: ds.tooltipData ? indices.map((i) => ds.tooltipData![i]) : ds.tooltipData,
+    tooltipData: ds.tooltipData ? indices.map((i) => ds.tooltipData?.[i]) : ds.tooltipData,
     // Sort sizeData if it exists
-    sizeData: ds.sizeData ? indices.map((i) => ds.sizeData![i]) : ds.sizeData
+    sizeData: ds.sizeData ? indices.map((i) => ds.sizeData?.[i]) : ds.sizeData
   }));
 
   // Sort ticks (x-axis labels)

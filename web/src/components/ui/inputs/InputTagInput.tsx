@@ -1,9 +1,9 @@
 'use client';
 
-import * as React from 'react';
-import type { VariantProps } from 'class-variance-authority';
-import { cn } from '@/lib/utils';
 import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/utils';
+import type { VariantProps } from 'class-variance-authority';
+import * as React from 'react';
 import { inputVariants } from './Input';
 import { InputTag } from './InputTag';
 
@@ -144,7 +144,8 @@ const InputTagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
               value={tag}
               label={tag}
               onRemove={() => onTagRemove?.(index)}
-              disabled={isDisabledTags}></InputTag>
+              disabled={isDisabledTags}
+            />
           ))}
           <input
             ref={ref}

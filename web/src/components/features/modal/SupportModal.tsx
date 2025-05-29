@@ -1,14 +1,14 @@
-import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import { Text } from '@/components/ui/typography';
-import { Input } from '@/components/ui/inputs';
-import { useMemoizedFn } from '@/hooks';
 import { submitAppSupportRequest } from '@/api/buster_rest/nextjs/support';
-import { useUserConfigContextSelector } from '@/context/Users';
-import { useBusterNotifications } from '@/context/BusterNotifications';
-import { AppModal } from '@/components/ui/modal';
+import { Input } from '@/components/ui/inputs';
 import { InputTextArea } from '@/components/ui/inputs/InputTextArea';
-import { capturePageScreenshot } from '@/lib/exportUtils';
+import { AppModal } from '@/components/ui/modal';
+import { Text } from '@/components/ui/typography';
+import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useUserConfigContextSelector } from '@/context/Users';
+import { useMemoizedFn } from '@/hooks';
 import { timeout } from '@/lib';
+import { capturePageScreenshot } from '@/lib/exportUtils';
+import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 
 export const SupportModal: React.FC<{
   onClose: () => void;
@@ -35,9 +35,9 @@ export const SupportModal: React.FC<{
       ]);
 
       const res = await submitAppSupportRequest({
-        userName: user?.name!,
-        userEmail: user?.email!,
-        userId: user?.id!,
+        userName: user?.name || 'Unknown',
+        userEmail: user?.email || 'Unknown',
+        userId: user?.id || 'Unknown',
         subject,
         message: selectedForm === 'feedback' ? feedback : helpRequest,
         type: selectedForm === 'feedback' ? 'feedback' : 'help',

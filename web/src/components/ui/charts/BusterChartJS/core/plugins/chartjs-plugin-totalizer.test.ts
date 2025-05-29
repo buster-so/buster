@@ -3,8 +3,8 @@
  */
 
 import { Chart, ChartConfiguration, ChartTypeRegistry } from 'chart.js';
-import { ChartTotalizerPlugin } from './chartjs-plugin-totalizer';
 import { ChartType } from 'chart.js';
+import { ChartTotalizerPlugin } from './chartjs-plugin-totalizer';
 
 // Mock canvas and Chart.js setup
 beforeAll(() => {

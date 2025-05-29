@@ -1,6 +1,6 @@
-import type * as React from 'react';
-import { cn } from '@/lib/classMerge';
 import { Xmark } from '@/components/ui/icons';
+import { cn } from '@/lib/classMerge';
+import type * as React from 'react';
 
 export const InputTag: React.FC<{
   label: string | React.ReactNode;

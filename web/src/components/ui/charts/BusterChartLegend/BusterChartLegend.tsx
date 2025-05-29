@@ -1,13 +1,13 @@
 'use client';
 
+import { useMemoizedFn } from '@/hooks';
+import { AnimatePresence, motion } from 'framer-motion';
 import React, { useMemo, useRef } from 'react';
-import type { BusterChartLegendProps } from './interfaces';
+import { ErrorBoundary } from '../../error';
 import { LegendItem } from './LegendItem';
 import { OverflowButton } from './OverflowContainer';
-import { AnimatePresence, motion } from 'framer-motion';
-import { useMemoizedFn } from '@/hooks';
 import { computeHiddenShowItems } from './helpers';
-import { ErrorBoundary } from '../../error';
+import type { BusterChartLegendProps } from './interfaces';
 
 export const BusterChartLegend: React.FC<BusterChartLegendProps> = React.memo(
   ({

@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import { cn } from '@/lib/classMerge';
-import { cva, type VariantProps } from 'class-variance-authority';
+import { type VariantProps, cva } from 'class-variance-authority';
+import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import { Input } from '../inputs/Input';
 
 const editableTitleVariants = cva('relative flex items-center justify-between', {
@@ -93,7 +93,7 @@ export const EditableTitle = React.memo(
               onPressEnter?.();
             }}
           />
-          <div className="from-page-background pointer-events-none absolute top-0 right-0 h-full w-6 bg-gradient-to-l to-transparent"></div>
+          <div className="from-page-background pointer-events-none absolute top-0 right-0 h-full w-6 bg-gradient-to-l to-transparent" />
         </div>
       );
     }

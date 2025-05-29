@@ -1,8 +1,8 @@
-import { computeHiddenShowItems } from './helpers';
-import type { BusterChartLegendItem } from './interfaces';
+import { ChartType } from '@/api/asset_interfaces/metric/charts';
 import { renderToString } from 'react-dom/server';
 import { LegendItem } from './LegendItem';
-import { ChartType } from '@/api/asset_interfaces/metric/charts';
+import { computeHiddenShowItems } from './helpers';
+import type { BusterChartLegendItem } from './interfaces';
 
 // Mock the DOM elements and methods
 const mockGetBoundingClientRect = jest.fn();

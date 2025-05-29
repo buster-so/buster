@@ -1,5 +1,5 @@
-import type React from 'react';
 import { cn } from '@/lib/classMerge';
+import type React from 'react';
 
 export const PulseLoader: React.FC<{
   size?: number;

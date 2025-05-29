@@ -1,7 +1,7 @@
-import { pieOptionsHandler, piePluginsHandler } from './pieChartOptions';
 import { determineFontColorContrast } from '@/lib/colors';
-import type { ChartSpecificOptionsProps } from './interfaces';
 import type { ChartData } from 'chart.js';
+import type { ChartSpecificOptionsProps } from './interfaces';
+import { pieOptionsHandler, piePluginsHandler } from './pieChartOptions';
 
 jest.mock('@/lib/colors');
 

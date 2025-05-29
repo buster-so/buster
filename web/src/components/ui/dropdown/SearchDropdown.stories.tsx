@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { Mailbox, MapSettings, User } from '../icons';
 import { SearchDropdown } from './SearchDropdown';
-import { User, MapSettings, Mailbox } from '../icons';
 
 const meta: Meta<typeof SearchDropdown> = {
   title: 'UI/Dropdowns/SearchDropdown',

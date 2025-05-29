@@ -44,7 +44,7 @@ export function aggregateAndCreateDatasets<
     const n = Number(raw);
     if (raw == null || raw === '' || Number.isNaN(n)) {
       if (rep === null) return null;
-      if (typeof rep === 'string' && isNaN(Number(rep))) return Number.NaN;
+      if (typeof rep === 'string' && Number.isNaN(Number(rep))) return Number.NaN;
       return Number(rep);
     }
     return n;
@@ -80,7 +80,7 @@ export function aggregateAndCreateDatasets<
       if (!map.has(id)) {
         map.set(id, { rec, rows: [] });
       }
-      map.get(id)!.rows.push(row);
+      map.get(id)?.rows.push(row);
     });
     return Array.from(map.entries()).map(([id, g]) => ({ id, rec: g.rec, rows: g.rows }));
   }
@@ -215,114 +215,30 @@ export function aggregateAndCreateDatasets<
       ticksKey: scatterTicksKey,
       ticks: [] // Empty ticks for scatter plots
     };
-  } else {
-    // NON-SCATTER
-    if (catKeys.length) {
-      // With categories
-      seriesMeta.forEach(({ key: metric, axisType }) => {
-        const fmt = colFormats[metric];
-        catGroups.forEach(({ rec: catRec, rows: catRows }) => {
-          const xSub = groupRows(xKeys, catRows);
-          const xMap = new Map(xSub.map((g) => [g.id, g.rows]));
+  }
+  // NON-SCATTER
+  if (catKeys.length) {
+    // With categories
+    seriesMeta.forEach(({ key: metric, axisType }) => {
+      const fmt = colFormats[metric];
+      catGroups.forEach(({ rec: catRec, rows: catRows }) => {
+        const xSub = groupRows(xKeys, catRows);
+        const xMap = new Map(xSub.map((g) => [g.id, g.rows]));
 
-          const dataArr = xGroups.map((g) => {
-            const grp = xMap.get(g.id) || [];
-            let sum = 0;
-            let sawNull = false;
-            grp.forEach((r) => {
-              const v = parseNumeric(r[metric], fmt);
-              if (v === null) sawNull = true;
-              else if (!Number.isNaN(v)) sum += v;
-            });
-            return sawNull ? null : sum;
-          });
-
-          // Generate labels according to the rules
-          const labelArr = generateLabels(metric, catRec, axisType === 'y2');
-
-          // For tooltip, use specified tooltip fields or default to metric value
-          const tooltipArr = tooltipKeys.length
-            ? xGroups.map(({ rows }) => {
-                const row = rows[0] || {};
-                // For y2 axis, only include its own metric key
-                if (axisType === 'y2') {
-                  return [
-                    {
-                      key: metric,
-                      value: formatTooltip(row[metric], colFormats[metric] || {})
-                    }
-                  ];
-                }
-                // For y axis metrics, exclude y2-axis metrics from tooltips
-                const uniqueTooltipKeys = tooltipKeys.filter((k) => !y2Keys.includes(k));
-                return uniqueTooltipKeys.map((k) => {
-                  const tooltip: KV = {
-                    key: k,
-                    value: formatTooltip(row[k], colFormats[k] || {})
-                  };
-
-                  // Add categoryKey and categoryValue for category keys if categories exist
-                  if (catKeys.includes(k)) {
-                    tooltip.categoryValue = String(catRec[k]);
-                    tooltip.categoryKey = k;
-                  }
-
-                  return tooltip;
-                });
-              })
-            : dataArr.map((value) => {
-                const tooltip: KV = {
-                  key: metric,
-                  value: value === null ? '' : value
-                };
-
-                // Add category info if this is a metrics tooltip
-                if (catKeys.length > 0) {
-                  // We only add the first category as categoryValue to match the interface
-                  const firstCatKey = catKeys[0];
-                  tooltip.categoryValue = String(catRec[firstCatKey]);
-                  tooltip.categoryKey = firstCatKey;
-                }
-
-                return [tooltip];
-              });
-
-          // Generate ID for category dataset
-          const id = createDatasetId(metric, { keys: catKeys, record: catRec });
-
-          datasets.push({
-            id,
-            label: labelArr,
-            data: dataArr,
-            dataKey: metric,
-            axisType,
-            tooltipData: tooltipArr
-          });
-        });
-      });
-    } else {
-      // Without categories
-      seriesMeta.forEach(({ key: metric, axisType }) => {
-        const fmt = colFormats[metric];
-
-        // Create a single dataset with all x-group data
-        const dataArr: (number | null)[] = [];
-
-        // Collect all values for the dataset
-        xGroups.forEach(({ rec, rows: grpRows }) => {
+        const dataArr = xGroups.map((g) => {
+          const grp = xMap.get(g.id) || [];
           let sum = 0;
           let sawNull = false;
-          grpRows.forEach((r) => {
+          grp.forEach((r) => {
             const v = parseNumeric(r[metric], fmt);
             if (v === null) sawNull = true;
             else if (!Number.isNaN(v)) sum += v;
           });
-          const value = sawNull ? null : sum;
-          dataArr.push(value);
+          return sawNull ? null : sum;
         });
 
         // Generate labels according to the rules
-        const labelArr = generateLabels(metric);
+        const labelArr = generateLabels(metric, catRec, axisType === 'y2');
 
         // For tooltip, use specified tooltip fields or default to metric value
         const tooltipArr = tooltipKeys.length
@@ -339,20 +255,40 @@ export function aggregateAndCreateDatasets<
               }
               // For y axis metrics, exclude y2-axis metrics from tooltips
               const uniqueTooltipKeys = tooltipKeys.filter((k) => !y2Keys.includes(k));
-              return uniqueTooltipKeys.map((k) => ({
-                key: k,
-                value: formatTooltip(row[k], colFormats[k] || {})
-              }));
+              return uniqueTooltipKeys.map((k) => {
+                const tooltip: KV = {
+                  key: k,
+                  value: formatTooltip(row[k], colFormats[k] || {})
+                };
+
+                // Add categoryKey and categoryValue for category keys if categories exist
+                if (catKeys.includes(k)) {
+                  tooltip.categoryValue = String(catRec[k]);
+                  tooltip.categoryKey = k;
+                }
+
+                return tooltip;
+              });
             })
-          : dataArr.map((value) => [
-              {
+          : dataArr.map((value) => {
+              const tooltip: KV = {
                 key: metric,
                 value: value === null ? '' : value
-              }
-            ]);
+              };
 
-        // Generate ID for the dataset
-        const id = createDatasetId(metric);
+              // Add category info if this is a metrics tooltip
+              if (catKeys.length > 0) {
+                // We only add the first category as categoryValue to match the interface
+                const firstCatKey = catKeys[0];
+                tooltip.categoryValue = String(catRec[firstCatKey]);
+                tooltip.categoryKey = firstCatKey;
+              }
+
+              return [tooltip];
+            });
+
+        // Generate ID for category dataset
+        const id = createDatasetId(metric, { keys: catKeys, record: catRec });
 
         datasets.push({
           id,
@@ -363,7 +299,70 @@ export function aggregateAndCreateDatasets<
           tooltipData: tooltipArr
         });
       });
-    }
+    });
+  } else {
+    // Without categories
+    seriesMeta.forEach(({ key: metric, axisType }) => {
+      const fmt = colFormats[metric];
+
+      // Create a single dataset with all x-group data
+      const dataArr: (number | null)[] = [];
+
+      // Collect all values for the dataset
+      xGroups.forEach(({ rec, rows: grpRows }) => {
+        let sum = 0;
+        let sawNull = false;
+        grpRows.forEach((r) => {
+          const v = parseNumeric(r[metric], fmt);
+          if (v === null) sawNull = true;
+          else if (!Number.isNaN(v)) sum += v;
+        });
+        const value = sawNull ? null : sum;
+        dataArr.push(value);
+      });
+
+      // Generate labels according to the rules
+      const labelArr = generateLabels(metric);
+
+      // For tooltip, use specified tooltip fields or default to metric value
+      const tooltipArr = tooltipKeys.length
+        ? xGroups.map(({ rows }) => {
+            const row = rows[0] || {};
+            // For y2 axis, only include its own metric key
+            if (axisType === 'y2') {
+              return [
+                {
+                  key: metric,
+                  value: formatTooltip(row[metric], colFormats[metric] || {})
+                }
+              ];
+            }
+            // For y axis metrics, exclude y2-axis metrics from tooltips
+            const uniqueTooltipKeys = tooltipKeys.filter((k) => !y2Keys.includes(k));
+            return uniqueTooltipKeys.map((k) => ({
+              key: k,
+              value: formatTooltip(row[k], colFormats[k] || {})
+            }));
+          })
+        : dataArr.map((value) => [
+            {
+              key: metric,
+              value: value === null ? '' : value
+            }
+          ]);
+
+      // Generate ID for the dataset
+      const id = createDatasetId(metric);
+
+      datasets.push({
+        id,
+        label: labelArr,
+        data: dataArr,
+        dataKey: metric,
+        axisType,
+        tooltipData: tooltipArr
+      });
+    });
   }
 
   // Create ticks from the x-axis values

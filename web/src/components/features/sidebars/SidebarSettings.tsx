@@ -1,12 +1,12 @@
 'use client';
 
 import { BackButton } from '@/components/ui/buttons';
+import { ApartmentBuilding, CircleUser, LockCircle } from '@/components/ui/icons';
 import { type ISidebarGroup, Sidebar } from '@/components/ui/sidebar';
-import { CircleUser, LockCircle, ApartmentBuilding } from '@/components/ui/icons';
+import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
+import { useUserConfigContextSelector } from '@/context/Users';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import React, { useMemo } from 'react';
-import { useUserConfigContextSelector } from '@/context/Users';
-import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { SidebarUserFooter } from './SidebarUserFooter/SidebarUserFooter';
 
 const accountItems = (currentParentRoute: BusterRoutes): ISidebarGroup => ({

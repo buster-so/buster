@@ -1,8 +1,8 @@
 import { VerificationStatus } from '@/api/asset_interfaces';
-import { useMemo } from 'react';
 import type { DropdownItem, DropdownProps } from '@/components/ui/dropdown';
-import { getTooltipText } from './helpers';
+import { useMemo } from 'react';
 import { StatusBadgeIndicator } from './StatusBadgeIndicator';
+import { getTooltipText } from './helpers';
 
 const statuses = [
   VerificationStatus.NOT_REQUESTED,

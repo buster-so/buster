@@ -1,20 +1,20 @@
 'use client';
 
-import React, { forwardRef } from 'react';
 import {
-  Chart as ChartJS,
-  LineController,
   BarController,
-  RadarController,
-  DoughnutController,
-  PolarAreaController,
   BubbleController,
+  Chart as ChartJS,
+  DoughnutController,
+  LineController,
   PieController,
+  PolarAreaController,
+  RadarController,
   ScatterController
 } from 'chart.js';
-import type { ChartType, ChartComponentLike } from 'chart.js';
-import type { ChartProps, ChartJSOrUndefined, TypedChartComponent } from './types.js';
+import type { ChartComponentLike, ChartType } from 'chart.js';
+import React, { forwardRef } from 'react';
 import { Chart } from './chart';
+import type { ChartJSOrUndefined, ChartProps, TypedChartComponent } from './types.js';
 
 function createTypedChart<T extends ChartType>(type: T, registerables: ChartComponentLike) {
   ChartJS.register(registerables);

@@ -1,9 +1,9 @@
-import React from 'react';
 import type { BusterChartProps, ChartEncodes } from '@/api/asset_interfaces/metric/charts';
-import type { ChartJSOrUndefined } from './core/types';
-import { useBusterChartJSLegend } from './hooks';
+import React from 'react';
 import { BusterChartLegendWrapper } from '../BusterChartLegend/BusterChartLegendWrapper';
 import type { DatasetOptionsWithTicks } from '../chartHooks';
+import type { ChartJSOrUndefined } from './core/types';
+import { useBusterChartJSLegend } from './hooks';
 
 interface BusterChartJSLegendWrapperProps {
   children: React.ReactNode;

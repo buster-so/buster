@@ -1,18 +1,18 @@
-import { useDebounce, useMemoizedFn } from '@/hooks';
-import React, { useLayoutEffect, useMemo, useState } from 'react';
-import {
-  InputSelectModal,
-  type InputSelectModalProps
-} from '@/components/ui/modal/InputSelectModal';
-import { formatDate } from '@/lib';
-import { Button } from '@/components/ui/buttons';
 import {
   useAddAndRemoveAssetsFromCollection,
   useGetCollection
 } from '@/api/buster_rest/collections';
-import { Text } from '@/components/ui/typography';
-import { ASSET_ICONS } from '../config/assetIcons';
 import { useSearch } from '@/api/buster_rest/search';
+import { Button } from '@/components/ui/buttons';
+import {
+  InputSelectModal,
+  type InputSelectModalProps
+} from '@/components/ui/modal/InputSelectModal';
+import { Text } from '@/components/ui/typography';
+import { useDebounce, useMemoizedFn } from '@/hooks';
+import { formatDate } from '@/lib';
+import React, { useLayoutEffect, useMemo, useState } from 'react';
+import { ASSET_ICONS } from '../config/assetIcons';
 
 export const AddToCollectionModal: React.FC<{
   open: boolean;
@@ -120,18 +120,18 @@ export const AddToCollectionModal: React.FC<{
     const hasAddedItems = addedAssetCount > 0;
 
     if (hasRemovedItems && hasAddedItems) {
-      return `Update collection`;
+      return 'Update collection';
     }
 
     if (hasRemovedItems) {
-      return `Remove assets`;
+      return 'Remove assets';
     }
 
     if (hasAddedItems) {
-      return `Add assets`;
+      return 'Add assets';
     }
 
-    return `Update collection`;
+    return 'Update collection';
   }, [isFetchedCollection, removedAssetCount, addedAssetCount]);
 
   const primaryButtonTooltipText = useMemo(() => {

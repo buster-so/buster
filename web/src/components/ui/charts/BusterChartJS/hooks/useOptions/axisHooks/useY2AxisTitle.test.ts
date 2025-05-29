@@ -1,9 +1,9 @@
-import { renderHook } from '@testing-library/react';
-import { useY2AxisTitle } from './useY2AxisTitle';
-import { formatLabel } from '@/lib/columnFormatter';
-import { truncateWithEllipsis } from '../../../../commonHelpers/titleHelpers';
-import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import type { SimplifiedColumnType } from '@/api/asset_interfaces/metric';
+import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import { formatLabel } from '@/lib/columnFormatter';
+import { renderHook } from '@testing-library/react';
+import { truncateWithEllipsis } from '../../../../commonHelpers/titleHelpers';
+import { useY2AxisTitle } from './useY2AxisTitle';
 
 // Mock the dependencies
 jest.mock('@/lib/columnFormatter', () => ({

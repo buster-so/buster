@@ -1,5 +1,5 @@
-import { formatLabel } from '@/lib';
 import type { BusterChartProps } from '@/api/asset_interfaces/metric/charts';
+import { formatLabel } from '@/lib';
 import type { DatasetOption } from '../chartHooks';
 
 export const JOIN_CHARACTER = ' | ';

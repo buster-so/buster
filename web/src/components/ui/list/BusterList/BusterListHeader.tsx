@@ -1,9 +1,9 @@
-import React from 'react';
-import type { BusterListColumn } from './interfaces';
-import { CheckboxColumn } from './CheckboxColumn';
 import { Text } from '@/components/ui/typography';
 import { cn } from '@/lib/classMerge';
+import React from 'react';
+import { CheckboxColumn } from './CheckboxColumn';
 import { HEIGHT_OF_HEADER } from './config';
+import type { BusterListColumn } from './interfaces';
 
 export const BusterListHeader: React.FC<{
   columns: BusterListColumn[];

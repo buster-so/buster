@@ -1,13 +1,13 @@
-import { useDebounce, useMemoizedFn } from '@/hooks';
-import React, { useLayoutEffect, useMemo, useState } from 'react';
+import { useAddAndRemoveMetricsFromDashboard, useGetDashboard } from '@/api/buster_rest/dashboards';
+import { useSearch } from '@/api/buster_rest/search';
+import { Button } from '@/components/ui/buttons';
 import {
   InputSelectModal,
   type InputSelectModalProps
 } from '@/components/ui/modal/InputSelectModal';
+import { useDebounce, useMemoizedFn } from '@/hooks';
 import { formatDate } from '@/lib';
-import { Button } from '@/components/ui/buttons';
-import { useAddAndRemoveMetricsFromDashboard, useGetDashboard } from '@/api/buster_rest/dashboards';
-import { useSearch } from '@/api/buster_rest/search';
+import React, { useLayoutEffect, useMemo, useState } from 'react';
 
 export const AddToDashboardModal: React.FC<{
   open: boolean;
@@ -119,18 +119,18 @@ export const AddToDashboardModal: React.FC<{
     const hasAddedItems = addedMetricCount > 0;
 
     if (hasRemovedItems && hasAddedItems) {
-      return `Update dashboard`;
+      return 'Update dashboard';
     }
 
     if (hasRemovedItems) {
-      return `Remove metrics`;
+      return 'Remove metrics';
     }
 
     if (hasAddedItems) {
-      return `Add metrics`;
+      return 'Add metrics';
     }
 
-    return `Update dashboard`;
+    return 'Update dashboard';
   }, [isFetchedDashboard, removedMetricCount, addedMetricCount]);
 
   const primaryButtonTooltipText = useMemo(() => {

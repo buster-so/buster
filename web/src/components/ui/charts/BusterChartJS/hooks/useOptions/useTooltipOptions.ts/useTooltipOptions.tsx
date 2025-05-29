@@ -1,21 +1,21 @@
 'use client';
 
+import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import type {
   BusterChartProps,
   ChartEncodes,
   ComboChartAxis
 } from '@/api/asset_interfaces/metric/charts';
-import type { DeepPartial } from 'utility-types';
+import { useMemoizedFn, useUnmount } from '@/hooks';
+import { cn } from '@/lib/classMerge';
+import { isNumericColumnType } from '@/lib/messages';
 import type { TooltipOptions } from 'chart.js';
 import { useEffect, useMemo, useRef } from 'react';
-import { useMemoizedFn, useUnmount } from '@/hooks';
-import type { ChartJSOrUndefined } from '../../../core/types';
-import { renderToString } from 'react-dom/server';
-import { BusterChartJSTooltip } from './BusterChartJSTooltip';
 import React from 'react';
-import { isNumericColumnType } from '@/lib/messages';
-import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
-import { cn } from '@/lib/classMerge';
+import { renderToString } from 'react-dom/server';
+import type { DeepPartial } from 'utility-types';
+import type { ChartJSOrUndefined } from '../../../core/types';
+import { BusterChartJSTooltip } from './BusterChartJSTooltip';
 
 type TooltipContext = Parameters<TooltipOptions['external']>[0];
 
@@ -203,7 +203,7 @@ const getOrCreateInitialTooltipContainer = (chart: ChartJSOrUndefined) => {
     caretEl.style.height = '8px';
     caretEl.style.transform = 'rotate(45deg)';
     caretEl.style.backgroundColor = 'inherit';
-    caretEl.style.border = `0.5px solid var(--color-border)`;
+    caretEl.style.border = '0.5px solid var(--color-border)';
     caretEl.style.borderRadius = '1px';
     caretEl.style.zIndex = '1';
     caretEl.style.display = isPieChart ? 'none' : '';
@@ -291,5 +291,5 @@ const externalTooltip = (
   caretEl.style.marginTop = '-4px';
   caretEl.className = cn(`tooltip-caret absolute w-2 h-2 ${caretBorder}`);
 
-  return tooltipEl.querySelector('.tooltip-content')!.innerHTML;
+  return tooltipEl.querySelector('.tooltip-content')?.innerHTML;
 };

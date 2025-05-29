@@ -1,8 +1,8 @@
-import { cva, type VariantProps } from 'class-variance-authority';
-import type React from 'react';
 import { cn } from '@/lib/classMerge';
-import { Text } from '../typography';
+import { type VariantProps, cva } from 'class-variance-authority';
+import type React from 'react';
 import { Xmark } from '../icons';
+import { Text } from '../typography';
 
 const statusVariants = cva('shadow p-3 rounded', {
   variants: {

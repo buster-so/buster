@@ -1,17 +1,17 @@
 'use client';
 
-import { createBusterRoute, BusterRoutes } from '@/routes';
-import { isValidEmail, timeout } from '@/lib';
 import { Button } from '@/components/ui/buttons';
+import { SuccessCard } from '@/components/ui/card/SuccessCard';
 import { Input } from '@/components/ui/inputs';
+import { Text, Title } from '@/components/ui/typography';
+import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useMemoizedFn } from '@/hooks';
+import { isValidEmail, timeout } from '@/lib';
+import { cn } from '@/lib/classMerge';
+import { BusterRoutes, createBusterRoute } from '@/routes';
 import Link from 'next/link';
 import type React from 'react';
 import { useState } from 'react';
-import { Title, Text } from '@/components/ui/typography';
-import { useMemoizedFn } from '@/hooks';
-import { useBusterNotifications } from '@/context/BusterNotifications';
-import { cn } from '@/lib/classMerge';
-import { SuccessCard } from '@/components/ui/card/SuccessCard';
 
 export const ResetEmailForm: React.FC<{
   queryEmail: string;

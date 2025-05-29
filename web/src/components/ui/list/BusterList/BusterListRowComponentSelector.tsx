@@ -1,7 +1,7 @@
 import React from 'react';
-import type { BusterListRow, BusterListColumn, BusterListProps } from './interfaces';
-import { BusterListSectionComponent } from './BusterListSectionComponent';
 import { BusterListRowComponent } from './BusterListRowComponent';
+import { BusterListSectionComponent } from './BusterListSectionComponent';
+import type { BusterListColumn, BusterListProps, BusterListRow } from './interfaces';
 
 export const BusterListRowComponentSelector = React.forwardRef<
   HTMLDivElement,

@@ -1,7 +1,7 @@
-import type { ChartProps } from '../../core';
 import type { ChartType as ChartJSChartType } from 'chart.js';
-import type { DeepPartial } from 'utility-types';
 import type { PluginChartOptions } from 'chart.js';
+import type { DeepPartial } from 'utility-types';
+import type { ChartProps } from '../../core';
 import type { ChartSpecificOptionsProps } from './interfaces';
 
 export const barOptionsHandler = (

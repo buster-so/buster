@@ -2,14 +2,14 @@
 
 import './ChartJSTheme';
 
+import { DEFAULT_CHART_CONFIG, DEFAULT_COLUMN_METADATA } from '@/api/asset_interfaces/metric';
+import { useMemoizedFn } from '@/hooks';
 import type React from 'react';
 import { useCallback, useRef, useState } from 'react';
-import { DEFAULT_CHART_CONFIG, DEFAULT_COLUMN_METADATA } from '@/api/asset_interfaces/metric';
+import type { BusterChartComponentProps } from '../interfaces';
+import { BusterChartJSComponent } from './BusterChartJSComponent';
 import { BusterChartJSLegendWrapper } from './BusterChartJSLegendWrapper';
 import type { ChartJSOrUndefined } from './core/types';
-import { useMemoizedFn } from '@/hooks';
-import { BusterChartJSComponent } from './BusterChartJSComponent';
-import type { BusterChartComponentProps } from '../interfaces';
 
 export const BusterChartJS: React.FC<BusterChartComponentProps> = ({
   selectedChartType,

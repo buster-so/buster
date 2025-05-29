@@ -1,18 +1,18 @@
 'use client';
 
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
+import { cn } from '@/lib/classMerge';
+import React, { useState, type ReactNode, useMemo } from 'react';
 import { Button, type ButtonProps } from '../buttons/Button';
+import { AppTooltip } from '../tooltip';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
-  DialogFooter
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
 } from './ModalBase';
-import React, { useState, type ReactNode, useMemo } from 'react';
-import { cn } from '@/lib/classMerge';
-import { AppTooltip } from '../tooltip';
 
 export interface BorderedModalProps {
   children: React.ReactNode;

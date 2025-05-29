@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useRef } from 'react';
 import { useMemoizedFn } from '@/hooks';
-import type { BusterListProps } from '../BusterList';
-import { getAllIdsInSection } from '../BusterList/helpers';
+import React, { useRef } from 'react';
 import { useEffect, useMemo } from 'react';
+import type { BusterListProps } from '../BusterList';
 import { BusterListHeader } from '../BusterList/BusterListHeader';
 import { BusterListRowComponentSelector } from '../BusterList/BusterListRowComponentSelector';
+import { getAllIdsInSection } from '../BusterList/helpers';
 import { EmptyStateList } from '../EmptyStateList';
 
 export interface BusterInfiniteListProps extends BusterListProps {

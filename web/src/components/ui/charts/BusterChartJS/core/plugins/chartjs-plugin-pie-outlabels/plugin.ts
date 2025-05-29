@@ -10,8 +10,8 @@ import {
 import OutLabel from './OutLabel';
 import type OutLabelsContext from './OutLabelsContext';
 import OutLabelsManager from './OutLabelsManager';
-import { OutLabelStyle } from './OutLabelsStyle';
 import type { OutLabelsOptions } from './OutLabelsOptions';
+import { OutLabelStyle } from './OutLabelsStyle';
 
 interface CustomAnimationSpec extends AnimationSpec<'doughnut' | 'pie'> {
   onProgress?: (animation: { currentStep: number; numSteps: number }) => void;

@@ -1,7 +1,7 @@
-import { pieTooltipHelper } from './pieTooltipHelper';
-import type { Chart, TooltipItem } from 'chart.js';
 import type { BusterChartConfigProps } from '@/api/asset_interfaces/metric/charts';
 import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
+import type { Chart, TooltipItem } from 'chart.js';
+import { pieTooltipHelper } from './pieTooltipHelper';
 
 describe('pieTooltipHelper', () => {
   // Mock data setup

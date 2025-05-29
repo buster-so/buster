@@ -1,12 +1,12 @@
+import omit from 'lodash/omit';
 import React from 'react';
+import { KeyboardShortcutPill } from '../pills/KeyboardShortcutPills';
 import {
   Tooltip as TooltipBase,
   TooltipContent as TooltipContentBase,
   TooltipProvider,
   TooltipTrigger
 } from './TooltipBase';
-import { KeyboardShortcutPill } from '../pills/KeyboardShortcutPills';
-import omit from 'lodash/omit';
 
 export interface TooltipProps
   extends Pick<React.ComponentProps<typeof TooltipContentBase>, 'align' | 'side' | 'sideOffset'>,

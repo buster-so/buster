@@ -1,12 +1,12 @@
 import { type BusterMetricListItem, VerificationStatus } from '@/api/asset_interfaces';
-import { AppTooltip } from '@/components/ui/tooltip';
-import React from 'react';
-import { StatusNotRequestedIcon } from '@/components/ui/icons/customIcons/Status_NotRequested';
 import { CircleCheck, CircleXmark } from '@/components/ui/icons/NucleoIconFilled';
-import { getTooltipText } from './helpers';
+import { StatusNotRequestedIcon } from '@/components/ui/icons/customIcons/Status_NotRequested';
+import { AppTooltip } from '@/components/ui/tooltip';
 import { cn } from '@/lib/classMerge';
+import React from 'react';
 import { HalfIcon } from './HalfIcon';
 import { ThreeFourthIcon } from './ThreeFourthIcon';
+import { getTooltipText } from './helpers';
 
 export const StatusBadgeIndicator: React.FC<{
   status: BusterMetricListItem['status'];
@@ -25,7 +25,7 @@ export const StatusBadgeIndicator: React.FC<{
     const tooltipText = getTooltipText(status);
     const isNotVerified =
       status === VerificationStatus.NOT_VERIFIED || VerificationStatus.NOT_REQUESTED;
-    const sharedClass = cn(`flex items-center justify-center rounded-full`, colorClasses);
+    const sharedClass = cn('flex items-center justify-center rounded-full', colorClasses);
     return (
       <AppTooltip title={showTooltip ? tooltipText : ''}>
         <div
@@ -42,7 +42,7 @@ export const StatusBadgeIndicator: React.FC<{
 );
 StatusBadgeIndicator.displayName = 'StatusBadgeIndicator';
 
-const statusRecordIcon: Record<VerificationStatus, React.FC<any>> = {
+const statusRecordIcon: Record<VerificationStatus, React.FC<{}>> = {
   [VerificationStatus.VERIFIED]: () => <CircleCheck />,
   [VerificationStatus.REQUESTED]: () => <HalfIcon />,
   [VerificationStatus.IN_REVIEW]: () => <ThreeFourthIcon />,

@@ -1,10 +1,10 @@
-import React, { useMemo } from 'react';
-import { useMemoizedFn } from '@/hooks';
-import type { BusterChartLegendItem } from './interfaces';
 import { ChartType } from '@/api/asset_interfaces/metric/charts';
-import { Target } from '../../icons';
+import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
-import { cva, type VariantProps } from 'class-variance-authority';
+import { type VariantProps, cva } from 'class-variance-authority';
+import React, { useMemo } from 'react';
+import { Target } from '../../icons';
+import type { BusterChartLegendItem } from './interfaces';
 
 const itemVariants = cva(
   'dot group relative flex items-center justify-center transition-all duration-300',
@@ -89,7 +89,8 @@ export const LegendItemDot: React.FC<
         className={cn(dotStyle, dotVariants({ size }), {
           'group-hover:opacity-0': hasFocusItem
         })}
-        style={{ backgroundColor: !inactive ? color : undefined }}></div>
+        style={{ backgroundColor: !inactive ? color : undefined }}
+      />
       {hasFocusItem && (
         <div
           onClick={onFocusItemPreflight}

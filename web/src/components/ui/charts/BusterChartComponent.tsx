@@ -1,11 +1,11 @@
 import type React from 'react';
 import { useMemo } from 'react';
+import { BusterChartJS } from './BusterChartJS';
+import { useDatasetOptions } from './chartHooks';
 import type {
   BusterChartComponentProps,
   BusterChartRenderComponentProps
 } from './interfaces/chartComponentInterfaces';
-import { BusterChartJS } from './BusterChartJS';
-import { useDatasetOptions } from './chartHooks';
 
 export const BusterChartComponent: React.FC<BusterChartRenderComponentProps> = ({
   data: dataProp,

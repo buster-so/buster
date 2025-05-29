@@ -1,5 +1,5 @@
-import { dataLabelFontColorContrast } from './datalabelHelper';
 import { determineFontColorContrast } from '@/lib/colors';
+import { dataLabelFontColorContrast } from './datalabelHelper';
 
 // Mock the determineFontColorContrast function
 jest.mock('@/lib/colors', () => ({

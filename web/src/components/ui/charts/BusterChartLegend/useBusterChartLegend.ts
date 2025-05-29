@@ -1,8 +1,5 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
-import { useLegendAutoShow } from './useLegendAutoShow';
-import type { BusterChartLegendItem } from './interfaces';
 import type {
   BusterChartProps,
   ChartEncodes,
@@ -10,12 +7,15 @@ import type {
   ComboChartAxis,
   ScatterAxis
 } from '@/api/asset_interfaces/metric/charts';
+import { useUpdateEffect } from '@/hooks';
+import React, { useMemo, useState } from 'react';
 import {
   DEFAULT_CATEGORY_AXIS_COLUMN_NAMES,
   DEFAULT_X_AXIS_COLUMN_NAMES,
   DEFAULT_Y_AXIS_COLUMN_NAMES
 } from './config';
-import { useUpdateEffect } from '@/hooks';
+import type { BusterChartLegendItem } from './interfaces';
+import { useLegendAutoShow } from './useLegendAutoShow';
 
 interface UseBusterChartLegendProps {
   selectedChartType: ChartType;

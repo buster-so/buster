@@ -1,14 +1,14 @@
 'use client';
 
-import { VList } from 'virtua';
-import React, { useMemo, useRef } from 'react';
-import type { BusterListProps } from './interfaces';
 import { useMemoizedFn } from '@/hooks';
-import { getAllIdsInSection } from './helpers';
-import { HEIGHT_OF_ROW, HEIGHT_OF_SECTION_ROW } from './config';
+import React, { useMemo, useRef } from 'react';
+import { VList } from 'virtua';
+import { ContextMenu, type ContextMenuProps } from '../../context/ContextMenu';
 import { BusterListHeader } from './BusterListHeader';
 import { BusterListRowComponentSelector } from './BusterListRowComponentSelector';
-import { ContextMenu, type ContextMenuProps } from '../../context/ContextMenu';
+import { HEIGHT_OF_ROW, HEIGHT_OF_SECTION_ROW } from './config';
+import { getAllIdsInSection } from './helpers';
+import type { BusterListProps } from './interfaces';
 
 export const BusterListVirtua = React.memo(
   ({
@@ -115,8 +115,8 @@ export const BusterListVirtua = React.memo(
     ]);
 
     const [WrapperNode, wrapperNodeProps] = useMemo(() => {
-      const node = !!contextMenu ? ContextMenu : React.Fragment;
-      const props: ContextMenuProps = !!contextMenu ? contextMenu : ({} as ContextMenuProps);
+      const node = contextMenu ? ContextMenu : React.Fragment;
+      const props: ContextMenuProps = contextMenu ? contextMenu : ({} as ContextMenuProps);
       return [node, props];
     }, [contextMenu]);
 

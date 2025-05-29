@@ -1,6 +1,6 @@
-import type * as React from 'react';
-import * as SwitchPrimitive from '@radix-ui/react-switch';
 import { cn } from '@/lib/classMerge';
+import * as SwitchPrimitive from '@radix-ui/react-switch';
+import type * as React from 'react';
 
 type SwitchProps = React.ComponentProps<typeof SwitchPrimitive.Root> & {
   checked?: boolean;

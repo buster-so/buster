@@ -1,17 +1,17 @@
-import { PostgresIcon } from './customIcons/postgres';
-import { MySQLIcon } from './customIcons/mysql';
-import { SnowflakeIcon } from './customIcons/snowflake';
-import { BigQueryIcon } from './customIcons/bigquery';
-import { RedshiftIcon } from './customIcons/redshift';
-import { MariaDB } from './customIcons/mariadb';
-import { SqlServer } from './customIcons/sqlserver';
-import { DataBricks } from './customIcons/databricks';
-import { SupabaseIcon } from './customIcons/supabase';
-import { RedUsersIcons } from './customIcons/redUsers';
-import { AthenaIcon } from './customIcons/athena';
-import type React from 'react';
 import { DataSourceTypes } from '@/api/asset_interfaces/datasources';
+import type React from 'react';
 import { Database } from './NucleoIconOutlined';
+import { AthenaIcon } from './customIcons/athena';
+import { BigQueryIcon } from './customIcons/bigquery';
+import { DataBricks } from './customIcons/databricks';
+import { MariaDB } from './customIcons/mariadb';
+import { MySQLIcon } from './customIcons/mysql';
+import { PostgresIcon } from './customIcons/postgres';
+import { RedUsersIcons } from './customIcons/redUsers';
+import { RedshiftIcon } from './customIcons/redshift';
+import { SnowflakeIcon } from './customIcons/snowflake';
+import { SqlServer } from './customIcons/sqlserver';
+import { SupabaseIcon } from './customIcons/supabase';
 
 const IconRecord: Record<DataSourceTypes, any> = {
   [DataSourceTypes.postgres]: PostgresIcon,

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { SuccessCard } from './SuccessCard';
-import { Button } from '../buttons/Button';
 import { fn } from '@storybook/test';
+import { Button } from '../buttons/Button';
+import { SuccessCard } from './SuccessCard';
 
 const meta: Meta<typeof SuccessCard> = {
   title: 'UI/Cards/SuccessCard',

@@ -1,12 +1,12 @@
+import { useDebounceSearch, useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/classMerge';
+import { DialogDescription, DialogTitle } from '@radix-ui/react-dialog';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import React, { useMemo } from 'react';
-import { BorderedModal, type BorderedModalProps } from './BorderedModal';
 import { Input } from '../inputs/Input';
 import { BusterList, type BusterListProps } from '../list/BusterList';
-import { useDebounceSearch, useMemoizedFn } from '@/hooks';
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { DialogDescription, DialogTitle } from '@radix-ui/react-dialog';
 import { Text } from '../typography';
-import { cn } from '@/lib/classMerge';
+import { BorderedModal, type BorderedModalProps } from './BorderedModal';
 
 export interface InputSelectModalProps extends Omit<BorderedModalProps, 'children'> {
   inputPlaceholder?: string;

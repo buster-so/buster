@@ -1,15 +1,15 @@
-import React, { useMemo } from 'react';
 import type {
   BusterChatResponseMessage_file,
   BusterChatResponseMessage_fileMetadata
 } from '@/api/asset_interfaces';
-import { Text } from '@/components/ui/typography';
-import { motion, AnimatePresence } from 'framer-motion';
-import { itemAnimationConfig } from './animationConfig';
 import { StatusIndicator } from '@/components/ui/indicators';
+import { Text } from '@/components/ui/typography';
+import { cn } from '@/lib/utils';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { useMemo } from 'react';
 import { FileCard } from '../card/FileCard';
 import { TextAndVersionPill } from '../typography/TextAndVersionPill';
-import { cn } from '@/lib/utils';
+import { itemAnimationConfig } from './animationConfig';
 
 export const StreamingMessage_File: React.FC<{
   isSelectedFile: boolean;

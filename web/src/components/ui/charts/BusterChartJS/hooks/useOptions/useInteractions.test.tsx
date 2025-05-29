@@ -1,6 +1,6 @@
+import type { BusterChartConfigProps, ChartType } from '@/api/asset_interfaces/metric/charts';
 import { renderHook } from '@testing-library/react';
 import { useInteractions } from './useInteractions';
-import type { ChartType, BusterChartConfigProps } from '@/api/asset_interfaces/metric/charts';
 
 describe('useInteractions', () => {
   test('should return correct interactions for scatter chart', () => {

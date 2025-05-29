@@ -1,19 +1,19 @@
 'use client';
 
+import type { BusterUserResponse } from '@/api/asset_interfaces/users';
+import { Button } from '@/components/ui/buttons';
+import { SuccessCard } from '@/components/ui/card/SuccessCard';
+import { Input } from '@/components/ui/inputs';
 import { Title } from '@/components/ui/typography';
-import type React from 'react';
-import { useState } from 'react';
+import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks';
+import { createBusterRoute } from '@/routes';
 import { BusterRoutes } from '@/routes/busterRoutes';
 import type { User } from '@supabase/supabase-js';
-import type { BusterUserResponse } from '@/api/asset_interfaces/users';
 import { useRouter } from 'next/navigation';
-import { createBusterRoute } from '@/routes';
-import { useBusterNotifications } from '@/context/BusterNotifications';
+import type React from 'react';
+import { useState } from 'react';
 import { PolicyCheck } from './PolicyCheck';
-import { SuccessCard } from '@/components/ui/card/SuccessCard';
-import { Button } from '@/components/ui/buttons';
-import { Input } from '@/components/ui/inputs';
 
 export const ResetPasswordForm: React.FC<{
   supabaseUser: User;
@@ -55,11 +55,10 @@ export const ResetPasswordForm: React.FC<{
       setLoading(false);
       if (res?.error) {
         throw res;
-      } else {
-        setResetSuccess(true);
-        openSuccessMessage('Password reset successfully');
-        startCountdown();
       }
+      setResetSuccess(true);
+      openSuccessMessage('Password reset successfully');
+      startCountdown();
     } catch (error) {
       openErrorMessage(error as string);
     }

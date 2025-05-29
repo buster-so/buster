@@ -1,9 +1,9 @@
 'use client';
 
+import { useMemoizedFn } from '@/hooks';
 import React, { useRef, useState } from 'react';
 import { classNames, sashClassName } from './base';
 import type { ISashProps } from './types';
-import { useMemoizedFn } from '@/hooks';
 
 export default function Sash({
   className,
@@ -52,7 +52,6 @@ export default function Sash({
 
   return (
     <div
-      role="Resizer"
       className={classNames(sashClassName, className)}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}

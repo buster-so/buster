@@ -2,7 +2,7 @@
 
 import { useMemoizedFn, useMount, useUnmount } from '@/hooks';
 import { useRouter } from 'next/navigation';
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import React from 'react';
 import { AppModal } from '../modal/AppModal';
 

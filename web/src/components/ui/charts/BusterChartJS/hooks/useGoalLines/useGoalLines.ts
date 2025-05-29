@@ -10,18 +10,18 @@
  * @packageDocumentation
  */
 
+import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import type {
   BusterChartConfigProps,
   ChartType,
   ColumnLabelFormat,
   GoalLine
 } from '@/api/asset_interfaces/metric/charts';
+import { formatLabel } from '@/lib/columnFormatter';
 import type { AnnotationOptions, AnnotationPluginOptions } from 'chartjs-plugin-annotation';
 import { useMemo } from 'react';
-import { formatLabel } from '@/lib/columnFormatter';
-import { defaultLabelOptionConfig } from '../useChartSpecificOptions/labelOptionConfig';
 import { yAxisSimilar } from '../../../commonHelpers';
-import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
+import { defaultLabelOptionConfig } from '../useChartSpecificOptions/labelOptionConfig';
 
 /** Interface for the useGoalLines hook parameters */
 interface UseGoalLinesParams {

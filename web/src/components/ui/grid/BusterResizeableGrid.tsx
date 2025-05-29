@@ -2,28 +2,28 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 
+import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/utils';
 import {
-  closestCenter,
   type CollisionDetection,
   DndContext,
   type DragEndEvent,
   type DragStartEvent,
-  getFirstCollision,
   MeasuringStrategy,
   PointerSensor,
+  closestCenter,
+  getFirstCollision,
   pointerWithin,
   useSensor,
   useSensors
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import { BusterSortableOverlay } from './_BusterSortableOverlay';
-import type { BusterResizeableGridRow } from './interfaces';
-import { v4 as uuidv4 } from 'uuid';
-import { useMemoizedFn } from '@/hooks';
 import isEqual from 'lodash/isEqual';
+import { v4 as uuidv4 } from 'uuid';
 import { BusterResizeRows } from './BusterResizeRows';
-import { NUMBER_OF_COLUMNS, NEW_ROW_ID, MIN_ROW_HEIGHT, TOP_SASH_ID } from './helpers';
-import { cn } from '@/lib/utils';
+import { BusterSortableOverlay } from './_BusterSortableOverlay';
+import { MIN_ROW_HEIGHT, NEW_ROW_ID, NUMBER_OF_COLUMNS, TOP_SASH_ID } from './helpers';
+import type { BusterResizeableGridRow } from './interfaces';
 
 const measuringConfig = {
   droppable: {

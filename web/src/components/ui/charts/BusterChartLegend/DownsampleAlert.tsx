@@ -1,10 +1,10 @@
+import { cn } from '@/lib/classMerge';
 import React, { useEffect, useState } from 'react';
-import { Text } from '../../typography/Text';
+import { Xmark } from '../../icons';
 import { TriangleWarning } from '../../icons/NucleoIconFilled';
 import { Popover } from '../../popover';
+import { Text } from '../../typography/Text';
 import { DOWNSIZE_SAMPLE_THRESHOLD } from '../config';
-import { cn } from '@/lib/classMerge';
-import { Xmark } from '../../icons';
 
 export const DownsampleAlert = React.memo(({ isDownsampled }: { isDownsampled: boolean }) => {
   const [close, setClose] = useState(false);

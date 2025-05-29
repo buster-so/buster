@@ -2,12 +2,12 @@
 
 import { DragOverlay, defaultDropAnimationSideEffects } from '@dnd-kit/core';
 import type { DropAnimation, Modifier } from '@dnd-kit/core';
-import { BusterSortableItemContent } from './_BusterSortableItemContent';
+import { snapCenterToCursor } from '@dnd-kit/modifiers';
 import { animate } from 'framer-motion';
 import React, { useEffect, useMemo } from 'react';
-import type { BusterResizeableGridRow } from './interfaces';
-import { snapCenterToCursor } from '@dnd-kit/modifiers';
+import { BusterSortableItemContent } from './_BusterSortableItemContent';
 import { NUMBER_OF_COLUMNS } from './helpers';
+import type { BusterResizeableGridRow } from './interfaces';
 
 const dropAnimationConfig: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({

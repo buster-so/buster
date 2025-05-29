@@ -1,13 +1,13 @@
-import { Dropdown, type DropdownItem, type DropdownProps } from '@/components/ui/dropdown';
-import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
-import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
-import { useMemoizedFn } from '@/hooks';
-import React, { useMemo } from 'react';
 import type { BusterCollectionListItem } from '@/api/asset_interfaces/collection';
-import { NewCollectionModal } from '../modal/NewCollectionModal';
-import { Plus } from '@/components/ui/icons';
-import { Button } from '@/components/ui/buttons';
 import { useGetCollectionsList } from '@/api/buster_rest/collections';
+import { Button } from '@/components/ui/buttons';
+import { Dropdown, type DropdownItem, type DropdownProps } from '@/components/ui/dropdown';
+import { Plus } from '@/components/ui/icons';
+import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
+import { useMemoizedFn } from '@/hooks';
+import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
+import React, { useMemo } from 'react';
+import { NewCollectionModal } from '../modal/NewCollectionModal';
 
 export const SaveToCollectionsDropdown: React.FC<{
   children: React.ReactNode;
@@ -42,7 +42,7 @@ export const SaveToCollectionsDropdown: React.FC<{
         {children}
       </Dropdown>
 
-      <>{modal}</>
+      {modal}
     </>
   );
 });

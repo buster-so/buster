@@ -1,14 +1,14 @@
 'use client';
 
 import type { BusterChatMessageReasoning_file } from '@/api/asset_interfaces';
-import { SyntaxHighlighterLightTheme } from '@/components/ui/typography/AppCodeBlock';
-import React, { useEffect, useMemo, useState } from 'react';
 import { Text } from '@/components/ui/typography';
-import pluralize from 'pluralize';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { TextAndVersionPill } from '../../typography/TextAndVersionPill';
-import { FileCard } from '../../card/FileCard';
+import { SyntaxHighlighterLightTheme } from '@/components/ui/typography/AppCodeBlock';
 import { cn } from '@/lib/classMerge';
+import pluralize from 'pluralize';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { FileCard } from '../../card/FileCard';
+import { TextAndVersionPill } from '../../typography/TextAndVersionPill';
 
 const style = SyntaxHighlighterLightTheme;
 
@@ -137,7 +137,7 @@ const MemoizedSyntaxHighlighter = React.memo(
         startingLineNumber={lineNumber}
         lineNumberStyle={lineNumberStyles}
         lineNumberContainerStyle={{ color: 'red' }}
-        className={`m-0! w-fit! border-none! p-0!`}>
+        className={'m-0! w-fit! border-none! p-0!'}>
         {text}
       </SyntaxHighlighter>
     );

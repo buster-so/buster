@@ -1,9 +1,9 @@
 import type { IDataResult } from '@/api/asset_interfaces/metric';
-import React from 'react';
-import isEmpty from 'lodash/isEmpty';
-import { AppDataGrid } from '@/components/ui/table/AppDataGrid';
 import { IndeterminateLinearLoader } from '@/components/ui/loaders/IndeterminateLinearLoader';
+import { AppDataGrid } from '@/components/ui/table/AppDataGrid';
 import { cn } from '@/lib/classMerge';
+import isEmpty from 'lodash/isEmpty';
+import React from 'react';
 
 export const DataContainer: React.FC<{
   data: IDataResult;

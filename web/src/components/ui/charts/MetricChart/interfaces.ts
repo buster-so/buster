@@ -1,6 +1,6 @@
 import type {
-  BusterChartPropsBase,
   BusterChartProps,
+  BusterChartPropsBase,
   MetricChartProps
 } from '@/api/asset_interfaces/metric/charts';
 

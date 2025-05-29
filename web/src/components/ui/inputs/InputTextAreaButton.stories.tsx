@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { InputTextAreaButton } from './InputTextAreaButton';
 import { fn } from '@storybook/test';
 import { ArrowUp, ShapeSquare } from '../icons/NucleoIconFilled';
+import { InputTextAreaButton } from './InputTextAreaButton';
 
 const meta: Meta<typeof InputTextAreaButton> = {
   title: 'UI/Inputs/InputTextAreaButton',

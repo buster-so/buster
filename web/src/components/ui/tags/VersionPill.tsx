@@ -1,6 +1,6 @@
 import { Text } from '@/components/ui/typography';
-import React from 'react';
 import { cn } from '@/lib/classMerge';
+import React from 'react';
 
 export const VersionPill: React.FC<{ version_number: number }> = React.memo(
   ({ version_number = 1 }) => {

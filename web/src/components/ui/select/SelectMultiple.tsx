@@ -1,13 +1,13 @@
 'use client';
 
+import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/classMerge';
+import type { VariantProps } from 'class-variance-authority';
 import React, { useMemo } from 'react';
+import { Dropdown, type DropdownItem } from '../dropdown/Dropdown';
+import { InputTag } from '../inputs/InputTag';
 import type { SelectItem } from './Select';
 import { selectVariants } from './SelectBase';
-import { cn } from '@/lib/classMerge';
-import { Dropdown, type DropdownItem } from '../dropdown/Dropdown';
-import type { VariantProps } from 'class-variance-authority';
-import { useMemoizedFn } from '@/hooks';
-import { InputTag } from '../inputs/InputTag';
 
 interface SelectMultipleProps extends VariantProps<typeof selectVariants> {
   items: SelectItem[];

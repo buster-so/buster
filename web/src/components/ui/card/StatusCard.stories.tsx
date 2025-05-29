@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { StatusCard } from './StatusCard';
-import { Button } from '../buttons';
 import { fn } from '@storybook/test';
+import { Button } from '../buttons';
+import { StatusCard } from './StatusCard';
 
 const meta: Meta<typeof StatusCard> = {
   title: 'UI/Cards/StatusCard',

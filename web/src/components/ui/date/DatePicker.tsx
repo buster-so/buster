@@ -1,9 +1,8 @@
 'use client';
 
-import * as React from 'react';
 import { Calendar as CalendarIcon } from '@/components/ui/icons';
+import * as React from 'react';
 
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/buttons';
 import { Calendar, type CalendarProps } from '@/components/ui/calendar';
 import {
@@ -11,9 +10,10 @@ import {
   PopoverContent,
   PopoverTrigger
 } from '@/components/ui/popover/PopoverBase';
-import { formatDate } from '@/lib';
-import { Xmark } from '../icons/NucleoIconFilled';
 import { useMemoizedFn } from '@/hooks';
+import { formatDate } from '@/lib';
+import { cn } from '@/lib/utils';
+import { Xmark } from '../icons/NucleoIconFilled';
 
 export type DatePickerProps = Omit<CalendarProps, 'selected'> & {
   dateFormat?: string;

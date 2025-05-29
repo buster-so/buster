@@ -1,12 +1,12 @@
-import type { MouseEvent } from 'react';
 import type {
-  ChartType,
+  Chart,
   ChartData,
-  DefaultDataPoint,
   ChartDataset,
   ChartOptions,
-  Chart
+  ChartType,
+  DefaultDataPoint
 } from 'chart.js';
+import type { MouseEvent } from 'react';
 
 import type { ForwardedRef } from './types.js';
 

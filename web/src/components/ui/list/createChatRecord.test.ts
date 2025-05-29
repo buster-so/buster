@@ -1,5 +1,5 @@
-import { createChatRecord } from './createChatRecord';
 import dayjs from 'dayjs';
+import { createChatRecord } from './createChatRecord';
 
 describe('createChatRecord', () => {
   // Create test dates based on current time

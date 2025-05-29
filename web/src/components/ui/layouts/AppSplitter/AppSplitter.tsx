@@ -1,6 +1,8 @@
 'use client';
 
 import { useMemoizedFn, useMount, useSize } from '@/hooks';
+import { cn } from '@/lib/classMerge';
+import Cookies from 'js-cookie';
 import React, {
   useEffect,
   useMemo,
@@ -18,8 +20,6 @@ import {
   parseWidthValue,
   setAppSplitterCookie
 } from './helper';
-import Cookies from 'js-cookie';
-import { cn } from '@/lib/classMerge';
 import './splitterStyles.css';
 import { timeout } from '@/lib';
 

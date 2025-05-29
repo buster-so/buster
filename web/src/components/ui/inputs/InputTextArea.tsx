@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
-import { cn } from '@/lib/classMerge';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { inputVariants } from './Input';
 import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/classMerge';
+import { type VariantProps, cva } from 'class-variance-authority';
+import React, { useEffect, useRef } from 'react';
+import { inputVariants } from './Input';
 
 const inputTextAreaVariants = inputVariants;
 

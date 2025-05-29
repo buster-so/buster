@@ -1,10 +1,10 @@
-import { CircleCheck, CircleXmark, CircleInfo } from '@/components/ui/icons';
+import { Button } from '@/components/ui/buttons/Button';
+import { CircleCheck, CircleInfo, CircleXmark } from '@/components/ui/icons';
+import { Popover, PopoverProps } from '@/components/ui/popover/Popover';
+import { Text } from '@/components/ui/typography';
+import { validate } from 'email-validator';
 import type React from 'react';
 import { useEffect, useMemo } from 'react';
-import { Text } from '@/components/ui/typography';
-import { Popover, PopoverProps } from '@/components/ui/popover/Popover';
-import { Button } from '@/components/ui/buttons/Button';
-import { validate } from 'email-validator';
 
 const PasswordCheckItem: React.FC<{
   passwordGood: boolean;
@@ -106,7 +106,8 @@ export const PolicyCheck: React.FC<{
       </div>
       <div className="flex flex-col gap-y-1 p-1.5">
         {items.map((item, index) => (
-          <PasswordCheckItem key={index} passwordGood={item.check} text={item.text} />
+          // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+          <PasswordCheckItem key={item.text + index} passwordGood={item.check} text={item.text} />
         ))}
       </div>
     </div>

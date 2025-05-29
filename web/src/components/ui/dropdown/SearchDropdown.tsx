@@ -1,12 +1,12 @@
+import { cn } from '@/lib/classMerge';
 import React from 'react';
+import { ArrowRight } from '../icons';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
 } from './DropdownBase';
-import { cn } from '@/lib/classMerge';
-import { ArrowRight } from '../icons';
 
 export interface SearchDropdownItem {
   label: string;

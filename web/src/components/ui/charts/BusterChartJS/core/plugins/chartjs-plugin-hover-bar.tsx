@@ -1,4 +1,4 @@
-import type { ChartType, Chart, Plugin } from 'chart.js';
+import type { Chart, ChartType, Plugin } from 'chart.js';
 
 export interface ChartHoverBarPluginOptions {
   //for bar chart
@@ -38,7 +38,7 @@ export const ChartHoverBarPlugin: Plugin<ChartType, ChartHoverBarPluginOptions> 
 
     const tooltipActive = tooltip?.getActiveElements();
 
-    if (tooltipActive && tooltipActive.length) {
+    if (tooltipActive?.length) {
       const isHorizontal = isHorizontalChart(chart);
       const hoverColor =
         options.hoverColor || options.isDarkMode

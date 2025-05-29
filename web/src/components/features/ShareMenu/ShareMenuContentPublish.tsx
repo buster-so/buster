@@ -1,25 +1,25 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import { ShareAssetType } from '@/api/asset_interfaces';
+import { useUpdateCollectionShare } from '@/api/buster_rest/collections';
+import { useUpdateDashboardShare } from '@/api/buster_rest/dashboards';
+import { useUpdateMetricShare } from '@/api/buster_rest/metrics';
 import { Button } from '@/components/ui/buttons';
+import { DatePicker } from '@/components/ui/date';
+import { Eye, EyeSlash, Link } from '@/components/ui/icons';
 import { Input } from '@/components/ui/inputs';
+import { PulseLoader } from '@/components/ui/loaders';
 import { Separator } from '@/components/ui/seperator';
 import { Switch } from '@/components/ui/switch';
-import { PulseLoader } from '@/components/ui/loaders';
-import { useMemoizedFn } from '@/hooks';
-import { createDayjsDate } from '@/lib/date';
-import { BusterRoutes, createBusterRoute } from '@/routes';
-import { ShareAssetType } from '@/api/asset_interfaces';
 import { Text } from '@/components/ui/typography';
 import { useBusterNotifications } from '@/context/BusterNotifications';
-import { Link, Eye, EyeSlash } from '@/components/ui/icons';
-import { DatePicker } from '@/components/ui/date';
-import { useUpdateCollectionShare } from '@/api/buster_rest/collections';
-import { useUpdateMetricShare } from '@/api/buster_rest/metrics';
-import { useUpdateDashboardShare } from '@/api/buster_rest/dashboards';
+import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/classMerge';
+import { createDayjsDate } from '@/lib/date';
+import { BusterRoutes, createBusterRoute } from '@/routes';
+import React, { useEffect, useMemo, useState } from 'react';
 import { SelectSingleEventHandler } from 'react-day-picker';
 import type { ShareMenuContentBodyProps } from './ShareMenuContentBody';
-import { cn } from '@/lib/classMerge';
 
 export const ShareMenuContentPublish: React.FC<ShareMenuContentBodyProps> = React.memo(
   ({
@@ -162,20 +162,18 @@ export const ShareMenuContentPublish: React.FC<ShareMenuContentBodyProps> = Reac
         </div>
 
         {publicly_accessible && (
-          <>
-            <div className={cn('flex justify-end space-x-2 border-t', className)}>
-              <Button
-                block
-                onClick={async (v) => {
-                  onTogglePublish(false);
-                }}>
-                Unpublish
-              </Button>
-              <Button block onClick={onCopyLink}>
-                Copy link
-              </Button>
-            </div>
-          </>
+          <div className={cn('flex justify-end space-x-2 border-t', className)}>
+            <Button
+              block
+              onClick={async (v) => {
+                onTogglePublish(false);
+              }}>
+              Unpublish
+            </Button>
+            <Button block onClick={onCopyLink}>
+              Copy link
+            </Button>
+          </div>
         )}
       </div>
     );
@@ -301,7 +299,8 @@ const SetAPassword: React.FC<{
                   size="small"
                   className="absolute top-1/2 right-[7px] -translate-y-1/2"
                   prefix={!visibilityToggle ? <Eye /> : <EyeSlash />}
-                  onClick={onClickVisibilityToggle}></Button>
+                  onClick={onClickVisibilityToggle}
+                />
               </div>
             </div>
 

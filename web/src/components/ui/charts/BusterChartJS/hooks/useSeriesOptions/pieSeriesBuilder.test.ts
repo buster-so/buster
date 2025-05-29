@@ -1,6 +1,6 @@
-import { pieSeriesBuilder_data, pieSeriesBuilder_labels } from './pieSeriesBuilder';
-import { formatLabelForDataset, JOIN_CHARACTER } from '../../../commonHelpers';
 import { formatLabel } from '@/lib';
+import { JOIN_CHARACTER, formatLabelForDataset } from '../../../commonHelpers';
+import { pieSeriesBuilder_data, pieSeriesBuilder_labels } from './pieSeriesBuilder';
 
 // Mock dependencies
 jest.mock('../../../commonHelpers', () => ({

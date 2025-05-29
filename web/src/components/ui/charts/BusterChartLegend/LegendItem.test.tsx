@@ -1,8 +1,8 @@
+import { ChartType } from '@/api/asset_interfaces/metric/charts';
+import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
 import { LegendItem } from './LegendItem';
 import type { BusterChartLegendItem } from './interfaces';
-import { ChartType } from '@/api/asset_interfaces/metric/charts';
 
 describe('LegendItem', () => {
   const mockItem: BusterChartLegendItem = {

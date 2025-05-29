@@ -1,24 +1,24 @@
 'use client';
 
-import type { ChartProps } from '../../core';
-import type { ChartSpecificOptionsProps } from './interfaces';
-import type { ChartType as ChartJSChartType } from 'chart.js';
-import type { DeepPartial } from 'utility-types';
-import type { PluginChartOptions } from 'chart.js';
-import type { AnnotationPluginOptions } from 'chartjs-plugin-annotation';
-import { ArrayOperations } from '@/lib/math';
-import { formatLabel } from '@/lib/columnFormatter';
-import { getPieInnerLabelTitle } from '../../../commonHelpers';
-import type { ChartJSOrUndefined } from '../../core/types';
 import type {
   BusterChartConfigProps,
   BusterChartProps,
   ColumnLabelFormat
 } from '@/api/asset_interfaces/metric/charts';
 import { determineFontColorContrast } from '@/lib/colors';
-import type { Context } from 'chartjs-plugin-datalabels';
-import { defaultLabelOptionConfig } from './labelOptionConfig';
+import { formatLabel } from '@/lib/columnFormatter';
+import { ArrayOperations } from '@/lib/math';
 import { isServer } from '@tanstack/react-query';
+import type { ChartType as ChartJSChartType } from 'chart.js';
+import type { PluginChartOptions } from 'chart.js';
+import type { AnnotationPluginOptions } from 'chartjs-plugin-annotation';
+import type { Context } from 'chartjs-plugin-datalabels';
+import type { DeepPartial } from 'utility-types';
+import { getPieInnerLabelTitle } from '../../../commonHelpers';
+import type { ChartProps } from '../../core';
+import type { ChartJSOrUndefined } from '../../core/types';
+import type { ChartSpecificOptionsProps } from './interfaces';
+import { defaultLabelOptionConfig } from './labelOptionConfig';
 
 type PieOptions = ChartProps<'pie'>['options'] | ChartProps<'doughnut'>['options'];
 
@@ -131,7 +131,7 @@ export const piePluginsHandler = ({
 const getInnerLabelValue = (
   chart: ChartJSOrUndefined,
   firstDatasetData: number[],
-  pieInnerLabelAggregate: BusterChartConfigProps['pieInnerLabelAggregate'] = 'sum',
+  pieInnerLabelAggregate: BusterChartConfigProps['pieInnerLabelAggregate'],
   selectedAxis: ChartSpecificOptionsProps['selectedAxis'],
   columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>
 ): string => {

@@ -1,10 +1,10 @@
-import React from 'react';
-import Link from 'next/link';
 import { cn } from '@/lib/classMerge';
-import type { ISidebarItem } from './interfaces';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { Xmark } from '../icons';
+import { type VariantProps, cva } from 'class-variance-authority';
+import Link from 'next/link';
+import React from 'react';
 import { Button } from '../buttons/Button';
+import { Xmark } from '../icons';
+import type { ISidebarItem } from './interfaces';
 
 const itemVariants = cva(
   'flex items-center group justify-between rounded px-1.5 min-h-7 max-h-7 text-base transition-colors cursor-pointer',
@@ -103,7 +103,8 @@ export const SidebarItem: React.FC<
               e.stopPropagation();
               e.preventDefault();
               onRemove();
-            }}></Button>
+            }}
+          />
         )}
       </ItemNode>
     );

@@ -1,23 +1,23 @@
 'use client';
 
 import React, { useEffect, useMemo, useCallback, useRef, useState } from 'react';
-import Pane from './pane';
-import SplitPaneSash from './sash';
 import SashContent from './SashContent';
 import {
-  classNames,
+  assertsSize,
   bodyDisableUserSelect,
+  classNames,
   paneClassName,
-  splitClassName,
-  splitDragClassName,
-  splitVerticalClassName,
-  splitHorizontalClassName,
   sashDisabledClassName,
   sashHorizontalClassName,
   sashVerticalClassName,
-  assertsSize
+  splitClassName,
+  splitDragClassName,
+  splitHorizontalClassName,
+  splitVerticalClassName
 } from './base';
-import type { IAxis, ISplitProps, IPaneConfigs, ICacheSizes } from './types';
+import Pane from './pane';
+import SplitPaneSash from './sash';
+import type { IAxis, ICacheSizes, IPaneConfigs, ISplitProps } from './types';
 
 const SplitPane = ({
   children,

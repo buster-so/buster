@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react';
-import type { BusterChartLegendItem, BusterChartLegendProps } from './interfaces';
 import { useMemoizedFn } from '@/hooks';
-import { LegendItemDot } from './LegendDot';
-import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { useMemo } from 'react';
+import { LegendItemDot } from './LegendDot';
+import type { BusterChartLegendItem, BusterChartLegendProps } from './interfaces';
 
 export const LegendItem: React.FC<{
   item: BusterChartLegendItem;
@@ -70,7 +70,7 @@ const LegendItemStandard = React.memo(
   >(({ onClickItem, onHoverItemPreflight, onFocusItem, item }, ref) => {
     const clickable = onClickItem !== undefined;
     const { formattedName, inactive, headline } = item;
-    const hasHeadline = headline !== undefined && headline.type;
+    const hasHeadline = headline?.type;
 
     const headlinePreText = useMemo(() => {
       if (hasHeadline && headline.type) return headlineTypeToText[headline.type];

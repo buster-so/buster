@@ -1,7 +1,7 @@
-import React from 'react';
-import { Card, CardContent, CardHeader, CardFooter } from './CardBase';
 import { cn } from '@/lib/classMerge';
+import React from 'react';
 import { Text } from '../typography/Text';
+import { Card, CardContent, CardFooter, CardHeader } from './CardBase';
 
 interface FileCardProps {
   fileName?: string | React.ReactNode;

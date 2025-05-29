@@ -1,6 +1,6 @@
-import type React from 'react';
-import isEmpty from 'lodash/isEmpty';
 import { cn } from '@/lib/classMerge';
+import isEmpty from 'lodash/isEmpty';
+import type React from 'react';
 
 export const KeyboardShortcutPill: React.FC<{
   shortcut?: string[];

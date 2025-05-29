@@ -1,6 +1,6 @@
+import type { ChartType } from '@/api/asset_interfaces/metric';
 import type React from 'react';
 import { LegendItemDot } from '../BusterChartLegend';
-import type { ChartType } from '@/api/asset_interfaces/metric';
 
 export const TooltipTitle: React.FC<{
   title: string | { title: string; color: string | undefined; seriesType: string } | undefined;

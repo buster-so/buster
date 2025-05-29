@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { StreamingMessage_File } from './StreamingMessage_File';
 import type { BusterChatResponseMessage_file } from '@/api/asset_interfaces';
+import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
+import { StreamingMessage_File } from './StreamingMessage_File';
 
 const meta: Meta<typeof StreamingMessage_File> = {
   title: 'UI/Streaming/StreamingMessage_File',

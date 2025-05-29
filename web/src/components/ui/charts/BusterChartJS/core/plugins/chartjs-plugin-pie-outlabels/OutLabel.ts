@@ -1,10 +1,10 @@
-import { drawRoundedRect, textSize } from './helpers';
-import type Size from './Size';
 import type { ArcElement, Point } from 'chart.js';
-import type Rect from './Rect';
+import { toFontString } from 'chart.js/helpers';
 import type OutLabelsContext from './OutLabelsContext';
 import type { OutLabelStyle } from './OutLabelsStyle';
-import { toFontString } from 'chart.js/helpers';
+import type Rect from './Rect';
+import type Size from './Size';
+import { drawRoundedRect, textSize } from './helpers';
 
 export default class OutLabel {
   ctx: CanvasRenderingContext2D;
@@ -62,9 +62,8 @@ export default class OutLabel {
           const prec = val.replace(/%v\./gi, '');
           if (prec.length) {
             return +prec;
-          } else {
-            return this.style.valuePrecision;
           }
+          return this.style.valuePrecision;
         })
         .forEach((val) => {
           if (text) text = text.replace(/%v\.?(\d*)/i, context.value.toFixed(val));
@@ -76,19 +75,18 @@ export default class OutLabel {
           const prec = val.replace(/%p\./gi, '');
           if (prec.length) {
             return +prec;
-          } else {
-            return this.style.percentPrecision;
           }
+          return this.style.percentPrecision;
         })
         .forEach((val) => {
           let percentPrecision = this.style.percentPrecision;
-          if (!isNaN(val)) {
+          if (!Number.isNaN(val)) {
             percentPrecision = val;
           }
           if (text)
             text = text.replace(
               /%p\.?(\d*)/i,
-              (context.percent * 100).toFixed(percentPrecision) + '%'
+              `${(context.percent * 100).toFixed(percentPrecision)}%`
             );
         });
     }

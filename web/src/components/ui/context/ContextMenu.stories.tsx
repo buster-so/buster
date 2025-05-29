@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { ContextMenu } from './ContextMenu';
-import {
-  Window,
-  WindowSettings,
-  WindowUser,
-  WindowEdit,
-  File,
-  WindowDownload,
-  CircleCopy
-} from '../icons/NucleoIconOutlined';
 import React from 'react';
+import {
+  CircleCopy,
+  File,
+  Window,
+  WindowDownload,
+  WindowEdit,
+  WindowSettings,
+  WindowUser
+} from '../icons/NucleoIconOutlined';
+import { ContextMenu } from './ContextMenu';
 
 const meta: Meta<typeof ContextMenu> = {
   title: 'UI/Context/ContextMenu',

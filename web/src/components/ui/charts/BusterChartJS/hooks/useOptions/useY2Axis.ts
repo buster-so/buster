@@ -1,3 +1,4 @@
+import { DEFAULT_CHART_CONFIG, DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import {
   type BusterChartConfigProps,
   type BusterChartProps,
@@ -7,12 +8,11 @@ import {
   type IColumnLabelFormat
 } from '@/api/asset_interfaces/metric/charts';
 import { useMemoizedFn } from '@/hooks';
-import type { DeepPartial } from 'utility-types';
-import type { ScaleChartOptions, Scale } from 'chart.js';
+import type { Scale, ScaleChartOptions } from 'chart.js';
 import { useMemo } from 'react';
-import { yAxisSimilar, formatYAxisLabel } from '../../../commonHelpers';
+import type { DeepPartial } from 'utility-types';
+import { formatYAxisLabel, yAxisSimilar } from '../../../commonHelpers';
 import { useY2AxisTitle } from './axisHooks/useY2AxisTitle';
-import { DEFAULT_CHART_CONFIG, DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 
 export const useY2Axis = ({
   columnLabelFormats,

@@ -1,6 +1,6 @@
-import type React from 'react';
-import { Text } from '@/components/ui/typography';
 import { Check } from '@/components/ui/icons';
+import { Text } from '@/components/ui/typography';
+import type React from 'react';
 
 export const DropdownLabel: React.FC<{ title: string; subtitle?: string }> = ({
   title,

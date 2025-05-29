@@ -1,4 +1,4 @@
-import { type ChartType, Chart, type Plugin } from 'chart.js';
+import { Chart, type ChartType, type Plugin } from 'chart.js';
 
 export interface ChartTotalizerPluginOptions {
   enabled?: boolean;

@@ -1,9 +1,9 @@
-import { resolve, toFont, toLineHeight, toPadding } from 'chart.js/helpers';
-import type { FontOptions, OutLabelsOptions } from './OutLabelsOptions';
-import type OutLabelsContext from './OutLabelsContext';
+import { determineFontColorContrast } from '@/lib';
 import type { ChartArea, FontSpec } from 'chart.js';
 import { defaults } from 'chart.js';
-import { determineFontColorContrast } from '@/lib';
+import { resolve, toFont, toLineHeight, toPadding } from 'chart.js/helpers';
+import type OutLabelsContext from './OutLabelsContext';
+import type { FontOptions, OutLabelsOptions } from './OutLabelsOptions';
 
 // Same as options but we make sure we have defaults
 //
@@ -68,10 +68,10 @@ export class OutLabelStyle {
     if (options.valuePrecision) this.valuePrecision = options.valuePrecision;
 
     const display = resolve([context.display], context, index);
-    if (typeof display == 'boolean') this.display = display;
+    if (typeof display === 'boolean') this.display = display;
 
     const text = resolve([options.text], context, index);
-    if (typeof text == 'string') this.text = text;
+    if (typeof text === 'string') this.text = text;
 
     this.font = new FontStyle(resolve([options.font || {}], context, index) as FontOptions);
     this.padding = toPadding(options.padding ?? 4);
@@ -85,7 +85,7 @@ export class OutLabelStyle {
       context,
       index
     );
-    if (typeof backgroundColor == 'string') {
+    if (typeof backgroundColor === 'string') {
       this.backgroundColor = backgroundColor;
       this.color = determineFontColorContrast(backgroundColor);
     }
@@ -100,14 +100,14 @@ export class OutLabelStyle {
       context,
       index
     );
-    if (typeof borderColor == 'string') this.borderColor = borderColor;
+    if (typeof borderColor === 'string') this.borderColor = borderColor;
 
     const lineColor = resolve(
       [options.lineColor, context.dataset.backgroundColor, context.chart.options.backgroundColor],
       context,
       index
     );
-    if (typeof lineColor == 'string') this.lineColor = lineColor;
+    if (typeof lineColor === 'string') this.lineColor = lineColor;
 
     if (options.shrinkPercentage !== undefined) {
       this.shrinkPercentage = options.shrinkPercentage;

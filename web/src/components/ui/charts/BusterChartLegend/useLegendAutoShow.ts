@@ -38,7 +38,7 @@ export const useLegendAutoShow = ({
       return true;
     }
 
-    const defaultShowLegend = categoryAxisColumnNames?.length ? true : false;
+    const defaultShowLegend = !!categoryAxisColumnNames?.length;
 
     return defaultShowLegend;
   }, [selectedChartType, allYAxisColumnNames, categoryAxisColumnNames, showLegendProp]);

@@ -1,9 +1,9 @@
 'use client';
 
 import type { Meta, StoryObj } from '@storybook/react';
-import { InputTagInput } from './InputTagInput';
 import { useState } from 'react';
 import type React from 'react';
+import { InputTagInput } from './InputTagInput';
 
 const meta: Meta<typeof InputTagInput> = {
   title: 'UI/Inputs/InputTagInput',

@@ -1,10 +1,10 @@
-import type { BusterChartLegendItem } from './interfaces';
-import type { BusterChartProps, ShowLegendHeadline } from '@/api/asset_interfaces/metric/charts';
-import { ArrayOperations } from '@/lib/math';
-import type { DatasetOptionsWithTicks } from '../chartHooks';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces/metric';
-import { isDateColumnType } from '@/lib/messages';
+import type { BusterChartProps, ShowLegendHeadline } from '@/api/asset_interfaces/metric/charts';
 import { formatLabel } from '@/lib/columnFormatter';
+import { ArrayOperations } from '@/lib/math';
+import { isDateColumnType } from '@/lib/messages';
+import type { DatasetOptionsWithTicks } from '../chartHooks';
+import type { BusterChartLegendItem } from './interfaces';
 
 export const addLegendHeadlines = (
   legendItems: BusterChartLegendItem[],
