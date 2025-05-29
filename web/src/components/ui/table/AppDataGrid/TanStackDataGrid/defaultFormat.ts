@@ -1,4 +1,4 @@
 import { makeHumanReadble } from '@/lib/text';
 
-export const defaultHeaderFormat = (v: any) => makeHumanReadble(v);
-export const defaultCellFormat = (v: any) => v;
+export const defaultHeaderFormat = (v: unknown) => makeHumanReadble(v);
+export const defaultCellFormat = (v: unknown) => v;

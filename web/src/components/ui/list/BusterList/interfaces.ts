@@ -20,7 +20,11 @@ export interface BusterListColumn {
   width?: number;
   minWidth?: number;
   align?: 'left' | 'center' | 'right'; //TODO
-  render?: (value: any, record: any) => React.JSX.Element | string | React.ReactNode;
+  render?: (
+    value: string | number | boolean | null | undefined,
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    record: any
+  ) => React.JSX.Element | string | React.ReactNode;
   headerRender?: (title: string) => React.ReactNode;
   ellipsis?: boolean;
 }
@@ -28,7 +32,7 @@ export interface BusterListColumn {
 export type BusterListRow = BusterListRowItem;
 export interface BusterListRowItem {
   id: string;
-  data: Record<string, string | React.ReactNode | any> | null;
+  data: Record<string, string | React.ReactNode | number | boolean | null | undefined> | null;
   onClick?: () => void;
   link?: string;
   onSelect?: () => void;

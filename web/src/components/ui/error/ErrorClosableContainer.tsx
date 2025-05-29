@@ -34,6 +34,7 @@ export const ErrorClosableContainer: React.FC<{
               <span>{error}</span>
             </div>
             <button
+              type="button"
               onClick={() => {
                 onClose?.();
                 setClosed(true);

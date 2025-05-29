@@ -26,5 +26,6 @@ export const doesChartHaveValidAxis = ({
   isTable: boolean;
 }) => {
   if (isTable) return true;
-  return AxisMethodCheckRecord[selectedChartType](selectedAxis!);
+  if (!selectedAxis) return false;
+  return AxisMethodCheckRecord[selectedChartType](selectedAxis);
 };

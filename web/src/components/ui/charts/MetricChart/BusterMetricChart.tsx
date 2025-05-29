@@ -1,4 +1,4 @@
-import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
+import { DEFAULT_CHART_CONFIG, DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import type { ColumnLabelFormat, MetricChartProps } from '@/api/asset_interfaces/metric/charts';
 import { Title } from '@/components/ui/typography';
 import { useMount } from '@/hooks';
@@ -28,7 +28,7 @@ export const BusterMetricChart: React.FC<BusterMetricChartProps> = React.memo(
     const headerColumnLabelFormat: ColumnLabelFormat = useMemo(() => {
       const isDerivedTitle = typeof metricHeader === 'object' && metricHeader?.columnId;
       if (isDerivedTitle && columnLabelFormats[metricHeader.columnId]) {
-        return columnLabelFormats[metricHeader.columnId]!;
+        return columnLabelFormats[metricHeader.columnId] as ColumnLabelFormat;
       }
       return DEFAULT_COLUMN_LABEL_FORMAT;
     }, [metricHeader, columnLabelFormats]);
@@ -225,7 +225,7 @@ const fallbackAggregate = (
   const isNumber =
     columnLabelFormat.style === 'number' && columnLabelFormat.columnType === 'number';
   const isValid = isNumber;
-  if (isValid) return aggregate;
+  if (isValid) return aggregate || DEFAULT_CHART_CONFIG.metricValueAggregate;
   return 'first';
 };
 

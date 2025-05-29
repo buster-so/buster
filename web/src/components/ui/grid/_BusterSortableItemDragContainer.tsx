@@ -5,6 +5,7 @@ import React, { createContext, useMemo } from 'react';
 import { BusterSortableItemContent } from './_BusterSortableItemContent';
 
 interface Context {
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   attributes: Record<string, any>;
   listeners: DraggableSyntheticListeners;
   // ref(node: HTMLElement | null): void;

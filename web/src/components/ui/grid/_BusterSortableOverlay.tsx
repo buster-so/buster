@@ -37,7 +37,11 @@ export const BusterSortableOverlay: React.FC<{
     const indexOfItem = r?.items.findIndex((item) => item.id === activeId);
 
     if (r && indexOfItem !== undefined && indexOfItem !== -1) {
-      const widthOfGrid = document.querySelector('.buster-resizeable-grid')?.clientWidth!;
+      const widthOfGrid = document.querySelector('.buster-resizeable-grid')?.clientWidth;
+      if (widthOfGrid === undefined) {
+        // Handle the case where widthOfGrid is undefined
+        return { widthOfItem: undefined, useSnapToCenter: false };
+      }
       let columnsOfItem = r.columnSizes?.[indexOfItem] || 4;
       const useSnapToCenter = columnsOfItem === 12;
       if (useSnapToCenter) {

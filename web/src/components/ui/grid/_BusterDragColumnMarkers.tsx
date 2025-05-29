@@ -25,6 +25,7 @@ export const BusterDragColumnMarkers: React.FC<{
         }}>
         {Array.from({ length: NUMBER_OF_COLUMNS + 1 }).map((_, index) => (
           <div
+            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
             key={index}
             className={cn(
               'bg-border',
@@ -48,7 +49,7 @@ export const BusterDragColumnMarkers: React.FC<{
 const geHideSnappedDot = (
   isDraggingIndex: number | null,
   index: number,
-  disabled,
+  disabled: boolean | undefined,
   itemsLength: number
 ) => {
   if (disabled || index < 3 || index > 9) return true;
@@ -112,7 +113,10 @@ const hackForTesting = (
         DEFAULT: 0
       }
     };
-    const offsetRecord = dragIndexRecord[isDraggingIndex as 1]!;
+    const offsetRecord = dragIndexRecord[isDraggingIndex as 1];
+    if (!offsetRecord) {
+      return {};
+    }
 
     return {
       left: `calc(${((dotIndex + 0) / NUMBER_OF_COLUMNS) * 100}% - ${offsetRecord?.[dotIndex as 4] || offsetRecord?.DEFAULT}px)`

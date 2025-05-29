@@ -315,6 +315,7 @@ const DropdownItemSelector = React.memo(
   }: {
     item: DropdownItems<T>[number];
     index: number;
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     onSelect?: (value: any) => void; // Using any here to resolve the type mismatch
     onSelectItem: (index: number) => void;
     closeOnSelect: boolean;
