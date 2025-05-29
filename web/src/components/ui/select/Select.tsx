@@ -67,7 +67,12 @@ export const Select = <T extends string>({
       </SelectTrigger>
       <SelectContent>
         {items.map((item, index) => (
-          <SelectItemSelector key={index} item={item} index={index} showIndex={showIndex} />
+          <SelectItemSelector
+            key={index.toString()}
+            item={item}
+            index={index}
+            showIndex={showIndex}
+          />
         ))}
       </SelectContent>
     </SelectBase>

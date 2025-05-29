@@ -25,7 +25,7 @@ export const BusterDragColumnMarkers: React.FC<{
         }}>
         {Array.from({ length: NUMBER_OF_COLUMNS + 1 }).map((_, index) => (
           <div
-            key={index}
+            key={index.toString()}
             className={cn(
               'bg-border',
               snappedDot === index && 'bg-primary shadow-primary-light',

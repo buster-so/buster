@@ -44,7 +44,7 @@ const TooltipItemValue: React.FC<{
       <div className="grid grid-cols-[auto_auto] items-center gap-x-5 px-3">
         {values.map((value, index) => (
           <GroupTooltipValue
-            key={index}
+            key={index.toString()}
             label={value.formattedLabel}
             value={chooseValue(value.formattedValue, value.formattedPercentage)}
           />

@@ -217,7 +217,7 @@ const SplitPane = ({
 
             return (
               <Pane
-                key={childIndex}
+                key={childIndex.toString()}
                 className={classNames(paneClassName, paneProps.className)}
                 style={style}>
                 {isPane ? paneProps.children : childNode}
@@ -226,7 +226,7 @@ const SplitPane = ({
           })}
           {sashPosSizes.slice(1, -1).map((posSize, index) => (
             <SplitPaneSash
-              key={index}
+              key={index.toString()}
               className={classNames(
                 !allowResize && sashDisabledClassName,
                 split === 'vertical' ? sashVerticalClassName : sashHorizontalClassName

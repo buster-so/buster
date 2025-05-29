@@ -137,7 +137,7 @@ export const BusterListVirtua = React.memo(
           {!showEmptyState && (
             <VList overscan={10}>
               {rows.map((row, index) => (
-                <div key={row.id + index} style={{ height: itemSize(index) }}>
+                <div key={row.id + index.toString()} style={{ height: itemSize(index) }}>
                   <BusterListRowComponentSelector
                     row={row}
                     id={row.id}

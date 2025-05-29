@@ -46,7 +46,7 @@ export const ReasoningMessagePillsContainer: React.FC<
       animate="visible"
       className="flex flex-col space-y-3">
       {pill_containers.map((pill_container, index) => (
-        <motion.div key={pill_container.title + index} variants={itemVariants}>
+        <motion.div key={pill_container.title + index.toString()} variants={itemVariants}>
           <ReasoningMessagePillContainer
             pillContainer={pill_container}
             isCompletedStream={isCompletedStream}

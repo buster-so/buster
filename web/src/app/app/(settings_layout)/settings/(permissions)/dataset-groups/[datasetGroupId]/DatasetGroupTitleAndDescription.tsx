@@ -18,7 +18,7 @@ export const DatasetGroupTitleAndDescription: React.FC<{
 
   return (
     <div className="flex flex-col space-y-0.5">
-      <EditableTitle children={data?.name || ''} onChange={onChangeTitle} />
+      <EditableTitle onChange={onChangeTitle}>{data?.name || ''}</EditableTitle>
     </div>
   );
 });

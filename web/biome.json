@@ -36,13 +36,9 @@
     "ignore": ["**/*.test.*", "**/*.spec.*", "**/*.stories.tsx"],
     "rules": {
       "recommended": true,
-      "suspicious": {
-        "noArrayIndexKey": "off"
-      },
-      "nursery": {},
       "correctness": {
         "useExhaustiveDependencies": "off",
-        "noChildrenProp": "off",
+        "noChildrenProp": "error",
         "noUnusedImports": "error"
       },
       "a11y": {

@@ -74,12 +74,12 @@ export const boldHighlights = (name: string, highlights: string[]): React.ReactN
         return splitParts.map((splitPart, splitIndex) => {
           if (matches.includes(splitPart.toLowerCase())) {
             return (
-              <span className="font-semibold" key={`bold-${splitPart}-${splitIndex}`}>
+              <span className="font-semibold" key={`bold-${splitPart}-${splitIndex.toString()}`}>
                 {splitPart}
               </span>
             );
           }
-          return <span key={`normal-${splitPart}-${splitIndex}`}>{splitPart}</span>;
+          return <span key={`normal-${splitPart}-${splitIndex.toString()}`}>{splitPart}</span>;
         });
       }
       return <span key={`part-${part}`}>{part}</span>;
