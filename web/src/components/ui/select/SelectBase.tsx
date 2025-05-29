@@ -180,6 +180,16 @@ const SelectSeparator = React.forwardRef<
 ));
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 
+// Define a type for SelectItem
+export type SelectItemType<T = string> = {
+  value: T;
+  label: string | React.ReactNode;
+  secondaryLabel?: string;
+  icon?: React.ReactNode;
+  searchLabel?: string;
+  disabled?: boolean;
+};
+
 export {
   Select,
   SelectGroup,

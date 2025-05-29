@@ -160,7 +160,7 @@ export const SidebarCollapsible: React.FC<
       <Collapsible open={isOpen} onOpenChange={setIsOpen} className="space-y-0.5">
         {variant === 'collapsible' && (
           <CollapsibleTrigger asChild className="w-full">
-            <button className="w-full text-left">
+            <button type="button" className="w-full text-left">
               <SidebarTrigger label={label} isOpen={isOpen} />
             </button>
           </CollapsibleTrigger>

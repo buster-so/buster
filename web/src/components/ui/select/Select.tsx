@@ -4,7 +4,7 @@ import {
   Select as SelectBase,
   SelectContent,
   SelectGroup,
-  SelectItem,
+  SelectItem as SelectItemComponent,
   SelectLabel,
   SelectTrigger,
   SelectValue
@@ -67,6 +67,7 @@ export const Select = <T extends string>({
       </SelectTrigger>
       <SelectContent>
         {items.map((item, index) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
           <SelectItemSelector key={index} item={item} index={index} showIndex={showIndex} />
         ))}
       </SelectContent>
@@ -101,7 +102,7 @@ const SelectItemSelector = <T,>({
   const { value, label, icon, secondaryLabel, disabled, ...rest } = item as SelectItem;
 
   return (
-    <SelectItem
+    <SelectItemComponent
       disabled={disabled}
       value={value}
       icon={icon}
@@ -110,7 +111,7 @@ const SelectItemSelector = <T,>({
         secondaryLabel && <SelectItemSecondaryText>{secondaryLabel}</SelectItemSecondaryText>
       }>
       {label}
-    </SelectItem>
+    </SelectItemComponent>
   );
 };
 
