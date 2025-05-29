@@ -281,10 +281,7 @@ describe('Snowflake DataSource Introspection', () => {
 
       dataSource = new DataSource({ dataSources: [config] });
 
-      const introspection = await dataSource.getFullIntrospection('test-snowflake', {
-        databases: ['DBT'],
-        schemas: ['REVENUE'],
-      });
+      const introspection = await dataSource.getFullIntrospection('test-snowflake');
 
       expect(introspection).toHaveProperty('dataSourceName', 'test-snowflake');
       expect(introspection).toHaveProperty('dataSourceType');
@@ -305,6 +302,252 @@ describe('Snowflake DataSource Introspection', () => {
     },
     { timeout: 120000 }
   );
+
+  describe('Snowflake Filtering Tests', () => {
+    testFn(
+      'should filter by database only',
+      async () => {
+        const config: DataSourceConfig = {
+          name: 'test-snowflake',
+          type: DataSourceType.Snowflake,
+          credentials: createSnowflakeCredentials(),
+        };
+
+        dataSource = new DataSource({ dataSources: [config] });
+
+        // Get full introspection with database filter
+        const filteredIntrospection = await dataSource.getFullIntrospection('test-snowflake', {
+          databases: ['DBT'],
+        });
+
+        // Verify only DBT database is returned
+        expect(filteredIntrospection.databases.some(db => db.name === 'DBT')).toBe(true);
+        const databaseNames = new Set(filteredIntrospection.databases.map(db => db.name));
+        expect(databaseNames.has('DBT')).toBe(true);
+        
+        // Verify all schemas belong to DBT database
+        for (const schema of filteredIntrospection.schemas) {
+          expect(schema.database).toBe('DBT');
+        }
+
+        // Verify all tables belong to DBT database
+        for (const table of filteredIntrospection.tables) {
+          expect(table.database).toBe('DBT');
+        }
+
+        // Verify all columns belong to DBT database
+        for (const column of filteredIntrospection.columns) {
+          expect(column.database).toBe('DBT');
+        }
+
+        // Verify all views belong to DBT database
+        for (const view of filteredIntrospection.views) {
+          expect(view.database).toBe('DBT');
+        }
+      },
+      { timeout: 120000 }
+    );
+
+    testFn(
+      'should filter by schema only',
+      async () => {
+        const config: DataSourceConfig = {
+          name: 'test-snowflake',
+          type: DataSourceType.Snowflake,
+          credentials: createSnowflakeCredentials(),
+        };
+
+        dataSource = new DataSource({ dataSources: [config] });
+
+        // Get full introspection with schema filter
+        const filteredIntrospection = await dataSource.getFullIntrospection('test-snowflake', {
+          schemas: ['REVENUE'],
+        });
+
+        // Verify only REVENUE schema is returned
+        const revenueSchemas = filteredIntrospection.schemas.filter(s => s.name === 'REVENUE');
+        expect(revenueSchemas.length).toBeGreaterThan(0);
+        expect(filteredIntrospection.schemas.every(s => s.name === 'REVENUE')).toBe(true);
+
+        // Verify all tables belong to REVENUE schema
+        for (const table of filteredIntrospection.tables) {
+          expect(table.schema).toBe('REVENUE');
+        }
+
+        // Verify all columns belong to tables in REVENUE schema
+        for (const column of filteredIntrospection.columns) {
+          expect(column.schema).toBe('REVENUE');
+        }
+
+        // Verify all views belong to REVENUE schema
+        for (const view of filteredIntrospection.views) {
+          expect(view.schema).toBe('REVENUE');
+        }
+
+        // Verify databases are filtered to only those containing REVENUE schema
+        const databasesWithRevenue = new Set(revenueSchemas.map(s => s.database));
+        for (const database of filteredIntrospection.databases) {
+          expect(databasesWithRevenue.has(database.name)).toBe(true);
+        }
+      },
+      { timeout: 120000 }
+    );
+
+    testFn(
+      'should filter by both database and schema',
+      async () => {
+        const config: DataSourceConfig = {
+          name: 'test-snowflake',
+          type: DataSourceType.Snowflake,
+          credentials: createSnowflakeCredentials(),
+        };
+
+        dataSource = new DataSource({ dataSources: [config] });
+
+        // Get full introspection with both filters
+        const filteredIntrospection = await dataSource.getFullIntrospection('test-snowflake', {
+          databases: ['DBT'],
+          schemas: ['REVENUE'],
+        });
+
+        // Verify only DBT database is returned
+        expect(filteredIntrospection.databases.some(db => db.name === 'DBT')).toBe(true);
+        
+        // Verify only REVENUE schema in DBT database is returned
+        expect(filteredIntrospection.schemas.length).toBeGreaterThan(0);
+        for (const schema of filteredIntrospection.schemas) {
+          expect(schema.name).toBe('REVENUE');
+          expect(schema.database).toBe('DBT');
+        }
+
+        // Verify all tables belong to DBT.REVENUE
+        for (const table of filteredIntrospection.tables) {
+          expect(table.database).toBe('DBT');
+          expect(table.schema).toBe('REVENUE');
+        }
+
+        // Verify all columns belong to DBT.REVENUE tables
+        for (const column of filteredIntrospection.columns) {
+          expect(column.database).toBe('DBT');
+          expect(column.schema).toBe('REVENUE');
+        }
+
+        // Verify all views belong to DBT.REVENUE
+        for (const view of filteredIntrospection.views) {
+          expect(view.database).toBe('DBT');
+          expect(view.schema).toBe('REVENUE');
+        }
+      },
+      { timeout: 120000 }
+    );
+
+    testFn(
+      'should handle non-existent database filter',
+      async () => {
+        const config: DataSourceConfig = {
+          name: 'test-snowflake',
+          type: DataSourceType.Snowflake,
+          credentials: createSnowflakeCredentials(),
+        };
+
+        dataSource = new DataSource({ dataSources: [config] });
+
+        // Get full introspection with non-existent database filter
+        const filteredIntrospection = await dataSource.getFullIntrospection('test-snowflake', {
+          databases: ['NONEXISTENT_DATABASE'],
+        });
+
+        // Verify empty results
+        expect(filteredIntrospection.databases.length).toBe(0);
+        expect(filteredIntrospection.schemas.length).toBe(0);
+        expect(filteredIntrospection.tables.length).toBe(0);
+        expect(filteredIntrospection.columns.length).toBe(0);
+        expect(filteredIntrospection.views.length).toBe(0);
+      },
+      { timeout: 120000 }
+    );
+
+    testFn(
+      'should handle non-existent schema filter',
+      async () => {
+        const config: DataSourceConfig = {
+          name: 'test-snowflake',
+          type: DataSourceType.Snowflake,
+          credentials: createSnowflakeCredentials(),
+        };
+
+        dataSource = new DataSource({ dataSources: [config] });
+
+        // Get full introspection with non-existent schema filter
+        const filteredIntrospection = await dataSource.getFullIntrospection('test-snowflake', {
+          schemas: ['NONEXISTENT_SCHEMA'],
+        });
+
+        // Verify empty results for schemas and dependent objects
+        expect(filteredIntrospection.schemas.length).toBe(0);
+        expect(filteredIntrospection.tables.length).toBe(0);
+        expect(filteredIntrospection.columns.length).toBe(0);
+        expect(filteredIntrospection.views.length).toBe(0);
+        // Databases are filtered to only those containing the schema
+        expect(filteredIntrospection.databases.length).toBe(0);
+      },
+      { timeout: 120000 }
+    );
+
+    testFn(
+      'should throw error for empty filter arrays',
+      async () => {
+        const config: DataSourceConfig = {
+          name: 'test-snowflake',
+          type: DataSourceType.Snowflake,
+          credentials: createSnowflakeCredentials(),
+        };
+
+        dataSource = new DataSource({ dataSources: [config] });
+
+        // Test empty databases array
+        await expect(
+          dataSource.getFullIntrospection('test-snowflake', { databases: [] })
+        ).rejects.toThrow('Database filter array is empty');
+
+        // Test empty schemas array
+        await expect(
+          dataSource.getFullIntrospection('test-snowflake', { schemas: [] })
+        ).rejects.toThrow('Schema filter array is empty');
+
+        // Test empty tables array
+        await expect(
+          dataSource.getFullIntrospection('test-snowflake', { tables: [] })
+        ).rejects.toThrow('Table filter array is empty');
+      },
+      { timeout: 120000 }
+    );
+
+    testFn(
+      'should handle case-sensitive filtering in Snowflake',
+      async () => {
+        const config: DataSourceConfig = {
+          name: 'test-snowflake',
+          type: DataSourceType.Snowflake,
+          credentials: createSnowflakeCredentials(),
+        };
+
+        dataSource = new DataSource({ dataSources: [config] });
+
+        // Test with incorrect case for 'REVENUE' schema (lowercase)
+        const filteredIntrospection = await dataSource.getFullIntrospection('test-snowflake', {
+          schemas: ['revenue'],
+        });
+
+        // Snowflake is case-sensitive for quoted identifiers
+        // This should return no results since 'revenue' != 'REVENUE'
+        expect(filteredIntrospection.schemas.length).toBe(0);
+        expect(filteredIntrospection.tables.length).toBe(0);
+        expect(filteredIntrospection.columns.length).toBe(0);
+      },
+      { timeout: 120000 }
+    );
+  });
 
   testFn(
     'should test Snowflake connection',

@@ -77,23 +77,45 @@ export class MySQLIntrospector extends BaseIntrospector {
     }
   }
 
-  async getSchemas(_database?: string): Promise<Schema[]> {
-    // Check if we have valid cached data
-    if (this.cache.schemas && this.isCacheValid(this.cache.schemas.lastFetched)) {
+  async getSchemas(database?: string): Promise<Schema[]> {
+    // Only use cache if no filter is applied
+    if (!database && this.cache.schemas && this.isCacheValid(this.cache.schemas.lastFetched)) {
       return this.cache.schemas.data;
     }
 
     try {
-      const databases = await this.getDatabases();
+      // Enhanced query to get schema metadata with optional database filter
+      let query = `
+        SELECT schema_name as name,
+               default_character_set_name as charset,
+               default_collation_name as collation
+        FROM information_schema.schemata
+        WHERE schema_name NOT IN ('information_schema', 'performance_schema', 'mysql', 'sys')
+      `;
+
+      if (database) {
+        query += ` AND schema_name = '${database}'`;
+      }
+
+      query += ' ORDER BY schema_name';
+
+      const schemasResult = await this.adapter.query(query);
 
       // In MySQL, databases and schemas are the same concept
-      const schemas = databases.map((db) => ({
-        name: db.name,
-        database: db.name,
-        metadata: db.metadata,
+      const schemas = schemasResult.rows.map((row) => ({
+        name: this.getString(row.name) || '',
+        database: this.getString(row.name) || '',
+        metadata: {
+          charset: this.getString(row.charset),
+          collation: this.getString(row.collation),
+        },
       }));
 
-      this.cache.schemas = { data: schemas, lastFetched: new Date() };
+      // Only cache if no filter was applied
+      if (!database) {
+        this.cache.schemas = { data: schemas, lastFetched: new Date() };
+      }
+
       return schemas;
     } catch (error) {
       console.warn('Failed to fetch MySQL schemas:', error);
@@ -510,6 +532,17 @@ ORDER BY s.column_name`;
     schemas?: string[];
     tables?: string[];
   }): Promise<DataSourceIntrospectionResult> {
+    // Validate that filter arrays are not empty
+    if (options?.databases && options.databases.length === 0) {
+      throw new Error('Database filter array is empty. Please provide at least one database name or remove the filter.');
+    }
+    if (options?.schemas && options.schemas.length === 0) {
+      throw new Error('Schema filter array is empty. Please provide at least one schema name or remove the filter.');
+    }
+    if (options?.tables && options.tables.length === 0) {
+      throw new Error('Table filter array is empty. Please provide at least one table name or remove the filter.');
+    }
+
     // Step 1: Fetch all databases (populates database cache)
     const allDatabases = await this.getDatabases();
 
@@ -584,10 +617,17 @@ ORDER BY s.column_name`;
     // Get column statistics in batches of 20 tables
     const columnsWithStats = await this.attachColumnStatisticsMySQL(tables, columns);
 
+    // Filter databases to only those that have schemas when schema filter is applied
+    let filteredDatabases = databases;
+    if (options?.schemas && !options?.databases) {
+      const databasesWithFilteredSchemas = new Set(schemas.map(schema => schema.database));
+      filteredDatabases = databases.filter(db => databasesWithFilteredSchemas.has(db.name));
+    }
+
     return {
       dataSourceName: this.dataSourceName,
       dataSourceType: this.getDataSourceType(),
-      databases,
+      databases: filteredDatabases,
       schemas,
       tables,
       columns: columnsWithStats,

@@ -359,4 +359,250 @@ describe('PostgreSQL DataSource Introspection', () => {
     },
     TEST_TIMEOUT
   );
+
+  describe('PostgreSQL Filtering Tests', () => {
+    testFn(
+      'should filter by database only',
+      async () => {
+        const config: DataSourceConfig = {
+          name: 'test-postgresql',
+          type: DataSourceType.PostgreSQL,
+          credentials: createPostgreSQLCredentials(),
+        };
+
+        dataSource = new DataSource({ dataSources: [config] });
+
+        // Get full introspection with database filter
+        const filteredIntrospection = await dataSource.getFullIntrospection('test-postgresql', {
+          databases: ['postgres'],
+        });
+
+        // Verify only postgres database is returned
+        expect(filteredIntrospection.databases.length).toBe(1);
+        expect(filteredIntrospection.databases[0]?.name).toBe('postgres');
+
+        // Verify all schemas belong to postgres database
+        for (const schema of filteredIntrospection.schemas) {
+          expect(schema.database).toBe('postgres');
+        }
+
+        // Verify all tables belong to postgres database
+        for (const table of filteredIntrospection.tables) {
+          expect(table.database).toBe('postgres');
+        }
+
+        // Verify all columns belong to postgres database
+        for (const column of filteredIntrospection.columns) {
+          expect(column.database).toBe('postgres');
+        }
+
+        // Verify all views belong to postgres database
+        for (const view of filteredIntrospection.views) {
+          expect(view.database).toBe('postgres');
+        }
+      },
+      TEST_TIMEOUT
+    );
+
+    testFn(
+      'should filter by schema only',
+      async () => {
+        const config: DataSourceConfig = {
+          name: 'test-postgresql',
+          type: DataSourceType.PostgreSQL,
+          credentials: createPostgreSQLCredentials(),
+        };
+
+        dataSource = new DataSource({ dataSources: [config] });
+
+        // Get full introspection with schema filter
+        const filteredIntrospection = await dataSource.getFullIntrospection('test-postgresql', {
+          schemas: ['public'],
+        });
+
+        // Verify only public schema is returned
+        const publicSchemas = filteredIntrospection.schemas.filter(s => s.name === 'public');
+        expect(publicSchemas.length).toBeGreaterThan(0);
+        expect(filteredIntrospection.schemas.every(s => s.name === 'public')).toBe(true);
+
+        // Verify all tables belong to public schema
+        for (const table of filteredIntrospection.tables) {
+          expect(table.schema).toBe('public');
+        }
+
+        // Verify all columns belong to tables in public schema
+        for (const column of filteredIntrospection.columns) {
+          expect(column.schema).toBe('public');
+        }
+
+        // Verify all views belong to public schema
+        for (const view of filteredIntrospection.views) {
+          expect(view.schema).toBe('public');
+        }
+
+        // Verify databases are filtered to only those containing public schema
+        const databasesWithPublic = new Set(publicSchemas.map(s => s.database));
+        for (const database of filteredIntrospection.databases) {
+          expect(databasesWithPublic.has(database.name)).toBe(true);
+        }
+      },
+      TEST_TIMEOUT
+    );
+
+    testFn(
+      'should filter by both database and schema',
+      async () => {
+        const config: DataSourceConfig = {
+          name: 'test-postgresql',
+          type: DataSourceType.PostgreSQL,
+          credentials: createPostgreSQLCredentials(),
+        };
+
+        dataSource = new DataSource({ dataSources: [config] });
+
+        // Get full introspection with both filters
+        const filteredIntrospection = await dataSource.getFullIntrospection('test-postgresql', {
+          databases: ['postgres'],
+          schemas: ['public'],
+        });
+
+        // Verify only postgres database is returned
+        expect(filteredIntrospection.databases.length).toBe(1);
+        expect(filteredIntrospection.databases[0]?.name).toBe('postgres');
+
+        // Verify only public schema in postgres database is returned
+        expect(filteredIntrospection.schemas.length).toBeGreaterThan(0);
+        for (const schema of filteredIntrospection.schemas) {
+          expect(schema.name).toBe('public');
+          expect(schema.database).toBe('postgres');
+        }
+
+        // Verify all tables belong to postgres.public
+        for (const table of filteredIntrospection.tables) {
+          expect(table.database).toBe('postgres');
+          expect(table.schema).toBe('public');
+        }
+
+        // Verify all columns belong to postgres.public tables
+        for (const column of filteredIntrospection.columns) {
+          expect(column.database).toBe('postgres');
+          expect(column.schema).toBe('public');
+        }
+
+        // Verify all views belong to postgres.public
+        for (const view of filteredIntrospection.views) {
+          expect(view.database).toBe('postgres');
+          expect(view.schema).toBe('public');
+        }
+      },
+      TEST_TIMEOUT
+    );
+
+    testFn(
+      'should handle non-existent database filter',
+      async () => {
+        const config: DataSourceConfig = {
+          name: 'test-postgresql',
+          type: DataSourceType.PostgreSQL,
+          credentials: createPostgreSQLCredentials(),
+        };
+
+        dataSource = new DataSource({ dataSources: [config] });
+
+        // Get full introspection with non-existent database filter
+        const filteredIntrospection = await dataSource.getFullIntrospection('test-postgresql', {
+          databases: ['nonexistent_database'],
+        });
+
+        // Verify empty results
+        expect(filteredIntrospection.databases.length).toBe(0);
+        expect(filteredIntrospection.schemas.length).toBe(0);
+        expect(filteredIntrospection.tables.length).toBe(0);
+        expect(filteredIntrospection.columns.length).toBe(0);
+        expect(filteredIntrospection.views.length).toBe(0);
+      },
+      TEST_TIMEOUT
+    );
+
+    testFn(
+      'should handle non-existent schema filter',
+      async () => {
+        const config: DataSourceConfig = {
+          name: 'test-postgresql',
+          type: DataSourceType.PostgreSQL,
+          credentials: createPostgreSQLCredentials(),
+        };
+
+        dataSource = new DataSource({ dataSources: [config] });
+
+        // Get full introspection with non-existent schema filter
+        const filteredIntrospection = await dataSource.getFullIntrospection('test-postgresql', {
+          schemas: ['nonexistent_schema'],
+        });
+
+        // Verify empty results for schemas and dependent objects
+        expect(filteredIntrospection.schemas.length).toBe(0);
+        expect(filteredIntrospection.tables.length).toBe(0);
+        expect(filteredIntrospection.columns.length).toBe(0);
+        expect(filteredIntrospection.views.length).toBe(0);
+        // Databases might still be returned since schema filter doesn't directly filter databases
+        expect(filteredIntrospection.databases.length).toBe(0);
+      },
+      TEST_TIMEOUT
+    );
+
+    testFn(
+      'should throw error for empty filter arrays',
+      async () => {
+        const config: DataSourceConfig = {
+          name: 'test-postgresql',
+          type: DataSourceType.PostgreSQL,
+          credentials: createPostgreSQLCredentials(),
+        };
+
+        dataSource = new DataSource({ dataSources: [config] });
+
+        // Test empty databases array
+        await expect(
+          dataSource.getFullIntrospection('test-postgresql', { databases: [] })
+        ).rejects.toThrow('Database filter array is empty');
+
+        // Test empty schemas array
+        await expect(
+          dataSource.getFullIntrospection('test-postgresql', { schemas: [] })
+        ).rejects.toThrow('Schema filter array is empty');
+
+        // Test empty tables array
+        await expect(
+          dataSource.getFullIntrospection('test-postgresql', { tables: [] })
+        ).rejects.toThrow('Table filter array is empty');
+      },
+      TEST_TIMEOUT
+    );
+
+    testFn(
+      'should handle case-sensitive filtering',
+      async () => {
+        const config: DataSourceConfig = {
+          name: 'test-postgresql',
+          type: DataSourceType.PostgreSQL,
+          credentials: createPostgreSQLCredentials(),
+        };
+
+        dataSource = new DataSource({ dataSources: [config] });
+
+        // Test with incorrect case for 'public' schema
+        const filteredIntrospection = await dataSource.getFullIntrospection('test-postgresql', {
+          schemas: ['PUBLIC'],
+        });
+
+        // PostgreSQL is case-insensitive for unquoted identifiers, so this might still return results
+        // But if we're implementing case-sensitive filtering as requested, this should return no results
+        expect(filteredIntrospection.schemas.length).toBe(0);
+        expect(filteredIntrospection.tables.length).toBe(0);
+        expect(filteredIntrospection.columns.length).toBe(0);
+      },
+      TEST_TIMEOUT
+    );
+  });
 });

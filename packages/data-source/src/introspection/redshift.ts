@@ -627,6 +627,17 @@ ORDER BY s.column_name`;
     schemas?: string[];
     tables?: string[];
   }): Promise<DataSourceIntrospectionResult> {
+    // Validate that filter arrays are not empty
+    if (options?.databases && options.databases.length === 0) {
+      throw new Error('Database filter array is empty. Please provide at least one database name or remove the filter.');
+    }
+    if (options?.schemas && options.schemas.length === 0) {
+      throw new Error('Schema filter array is empty. Please provide at least one schema name or remove the filter.');
+    }
+    if (options?.tables && options.tables.length === 0) {
+      throw new Error('Table filter array is empty. Please provide at least one table name or remove the filter.');
+    }
+
     // Step 1: Fetch all databases (populates database cache)
     const allDatabases = await this.getDatabases();
 
@@ -701,10 +712,17 @@ ORDER BY s.column_name`;
     // Get column statistics in batches of 20 tables
     const columnsWithStats = await this.attachColumnStatisticsRedshift(tables, columns);
 
+    // Filter databases to only those that have schemas when schema filter is applied
+    let filteredDatabases = databases;
+    if (options?.schemas && !options?.databases) {
+      const databasesWithFilteredSchemas = new Set(schemas.map(schema => schema.database));
+      filteredDatabases = databases.filter(db => databasesWithFilteredSchemas.has(db.name));
+    }
+
     return {
       dataSourceName: this.dataSourceName,
       dataSourceType: this.getDataSourceType(),
-      databases,
+      databases: filteredDatabases,
       schemas,
       tables,
       columns: columnsWithStats,
