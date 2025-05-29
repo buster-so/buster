@@ -24,7 +24,7 @@ export const PermissionListUserContainer: React.FC<{
       {
         title: 'Name',
         dataIndex: 'name',
-        render: (_: string, user: DatasetPermissionOverviewUser) => {
+        render: (value, user: DatasetPermissionOverviewUser) => {
           return (
             <div className="flex items-center justify-between space-x-2">
               <UserInfoCell user={user} />

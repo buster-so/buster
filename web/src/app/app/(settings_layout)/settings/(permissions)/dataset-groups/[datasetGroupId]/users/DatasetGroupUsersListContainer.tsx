@@ -38,8 +38,8 @@ export const DatasetGroupUsersListContainer: React.FC<{
       {
         title: 'Name',
         dataIndex: 'name',
-        render: (name: string, user: GetPermissionGroupUsersResponse) => {
-          return <ListUserItem name={name} email={user.email} />;
+        render: (name, user: GetPermissionGroupUsersResponse) => {
+          return <ListUserItem name={name as string} email={user.email} />;
         }
       },
       {

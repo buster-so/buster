@@ -21,7 +21,8 @@ export interface BusterListColumn {
   minWidth?: number;
   align?: 'left' | 'center' | 'right'; //TODO
   render?: (
-    value: string | number | boolean | null | undefined,
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    value: string | number | boolean | null | undefined | any,
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     record: any
   ) => React.JSX.Element | string | React.ReactNode;

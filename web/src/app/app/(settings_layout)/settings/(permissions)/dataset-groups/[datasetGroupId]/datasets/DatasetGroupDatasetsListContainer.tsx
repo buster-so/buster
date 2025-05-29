@@ -42,12 +42,12 @@ export const DatasetGroupDatasetsListContainer: React.FC<{
         title: 'Assigned',
         dataIndex: 'assigned',
         width: 130 + 85,
-        render: (assigned: boolean, permissionGroup: GetPermissionGroupUsersResponse) => {
+        render: (assigned, permissionGroup: GetPermissionGroupUsersResponse) => {
           return (
             <div className="flex justify-end">
               <PermissionAssignedCell
                 id={permissionGroup.id}
-                assigned={assigned}
+                assigned={assigned as boolean}
                 text="assigned"
                 onSelect={onSelectAssigned}
               />
