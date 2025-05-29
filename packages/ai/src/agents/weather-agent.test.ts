@@ -2,6 +2,7 @@ import { openai } from '@ai-sdk/openai';
 import { evaluate } from '@mastra/evals';
 import { AnswerRelevancyMetric, FaithfulnessMetric } from '@mastra/evals/llm';
 import { CompletenessMetric } from '@mastra/evals/nlp'; // Reverted to /nlp path and original names
+import { wrapTraced } from 'braintrust';
 // Assuming metrics are directly available or under a general path if not nlp
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { weatherTool } from '../tools/weather-tool';
@@ -10,13 +11,12 @@ import { weatherAgent } from './weather-agent';
 const model = openai('gpt-4o-mini');
 
 describe('Weather Agent Integration Tests', () => {
-  beforeAll(async () => {
-    // Setup test environment
-    process.env.OPENAI_API_KEY = process.env.OPENAI_API_KEY || 'test-key';
-  });
+  beforeAll(async () => {});
 
   afterAll(async () => {
     // Cleanup if needed
+    // Wait 500ms before finishing
+    await new Promise((resolve) => setTimeout(resolve, 500));
   });
 
   test('should be properly configured', () => {
@@ -30,8 +30,25 @@ describe('Weather Agent Integration Tests', () => {
   });
 
   test('should generate response for weather query', async () => {
-    const response = await weatherAgent.generate('What is the weather like in New York?');
+    // Wrap the entire workflow in a traced function
+    const tracedAgentWorkflow = wrapTraced(
+      async (input: string) => {
+        // Step 1: Generate response with weather agent
+        try {
+          const response = await weatherAgent.generate(input, {});
+          return response;
+        } catch (error) {
+          console.error(error);
+          throw error;
+        }
+      },
+      { name: 'WeatherAgentWorkflow' }
+    );
 
+    // Execute the workflow
+    const response = await tracedAgentWorkflow('What is the weather like in New York?');
+
+    // Verify response structure
     expect(response).toBeDefined();
     expect(response.text).toBeDefined();
     expect(typeof response.text).toBe('string');
