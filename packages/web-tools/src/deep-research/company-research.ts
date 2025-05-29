@@ -42,28 +42,39 @@ export async function researchCompany(
 
   const firecrawl = new FirecrawlService();
 
-  // Validate that the URL is accessible
-  const isAccessible = await firecrawl.validateUrl(url);
-  if (!isAccessible) {
-    throw new CompanyResearchError(`URL is not accessible or scrapeable: ${url}`, 'INVALID_URL');
-  }
-
   try {
     // Create a focused research query for the company
     const query = buildResearchQuery(url);
 
     const analysisPrompt = `Provide a concise, data-driven analysis (4-5 paragraphs) focused on key business insights. The report should:
 
-1. Clearly identify the company's core business model and revenue streams
-2. Highlight critical operational metrics and market positioning
-3. Outline key competitive advantages and potential risks
-4. Provide actionable insights for business strategy and data analytics
+  - What the company does at a high level
+  - What their products and services are
+  - How those products and services are used
+  - How do they make money
+
+  Things we don't need to know:
+  - Company marketing copy like vision, mission, values, etc.
+  - We don't need to know about the company's history or team.
+  - Legal information like trademarks, patents, etc.
+
 
 Avoid marketing language or unnecessary details. This analysis will be used for strategic decision-making and business consulting purposes.
 
 You must output in organized markdown format. Consisting of 3-6 sections.`;
 
-    const systemPrompt = `You are a data/ontology/analytics consultant at Palantir. Your goal is to thoroughly understand the company's business operations, including their business model, products, services, features, use cases, and value proposition. Always begin your research by analyzing the company's website when provided, as it contains the most authoritative and up-to-date information about their business. This research will be used to inform your consulting work and help you provide strategic insights and recommendations.`;
+    const systemPrompt = `You are a data/ontology/analytics consultant at Palantir. Your goal is to thoroughly understand the company's business operations, including their business model, products, services, features, use cases, and value proposition. Always begin your research by analyzing the company's website when provided, as it contains the most authoritative and up-to-date information about their business. This research will be used to inform your consulting work and help you provide strategic insights and recommendations.
+    
+    Your goal is to understand:
+      - What the company does at a high level
+  - What their products and services are
+  - How those products and services are used
+  - How do they make money
+
+  Things we don't need to know:
+  - Company marketing copy like vision, mission, values, etc.
+  - We don't need to know about the company's history or team.
+  - Legal information like trademarks, patents, etc.`;
 
     // Start the deep research job
     const jobResult = await firecrawl.startDeepResearch(query, {
@@ -132,16 +143,7 @@ function buildResearchQuery(url: string): string {
   const companyName = domain.replace(/^www\./, '').split('.')[0];
 
   const query = `
-  Research the company ${companyName}, starting with their website at: ${domain}. You're goal of understanding is:
-  - What the company does at a high level
-  - What their products and services are
-  - How those products and services are used
-  - How do they make money
-
-  Things we don't need to know:
-  - Company marketing copy like vision, mission, values, etc.
-  - We don't need to know about the company's history or team.
-  - Legal information like trademarks, patents, etc.
+  Research the company ${companyName}, starting with their website at: ${domain}.
 
   Once again, you should start with the company's website and then use other sources to understand the company's business model.
 
