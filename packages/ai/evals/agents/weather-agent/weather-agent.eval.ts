@@ -1,6 +1,6 @@
 import { LLMClassifierFromTemplate } from 'autoevals';
 import { Eval } from 'braintrust';
-import { weatherAgent } from '../src/agents/weather-agent';
+import { weatherAgent } from '../../../src/agents/weather-agent';
 
 // Types for weather agent message structure
 type ContentItem =

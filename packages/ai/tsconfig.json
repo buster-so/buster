@@ -19,9 +19,12 @@
     "noPropertyAccessFromIndexSignature": false,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@tools/*": ["src/tools/*"],
+      "@agents/*": ["src/agents/*"],
+      "@workflows/*": ["src/workflows/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "tests/**/*"],
   "exclude": ["node_modules", "dist"]
 }

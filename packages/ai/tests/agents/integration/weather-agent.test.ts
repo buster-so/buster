@@ -5,8 +5,8 @@ import { CompletenessMetric } from '@mastra/evals/nlp'; // Reverted to /nlp path
 import { wrapTraced } from 'braintrust';
 // Assuming metrics are directly available or under a general path if not nlp
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
-import { weatherTool } from '../tools/weather-tool';
-import { weatherAgent } from './weather-agent';
+import { weatherAgent } from '@agents/weather-agent';
+import { weatherTool } from '@tools/weather-tool';
 
 const model = openai('gpt-4o-mini');
 

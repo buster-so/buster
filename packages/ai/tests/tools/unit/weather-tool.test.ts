@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { weatherTool } from './weather-tool';
+import { weatherTool } from '@tools/weather-tool';
 
 describe('Weather Tool Unit Tests', () => {
   test('should have correct configuration', () => {
