@@ -19,7 +19,8 @@
       "**/.vercel/**",
       "**/coverage/**",
       "**/storybook-static/**",
-      "**/playwright-tests/auth-utils/auth.json"
+      "**/playwright-tests/auth-utils/auth.json",
+      "package.json"
     ]
   },
   "formatter": {
