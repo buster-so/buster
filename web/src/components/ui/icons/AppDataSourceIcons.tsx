@@ -13,7 +13,7 @@ import { SnowflakeIcon } from './customIcons/snowflake';
 import { SqlServer } from './customIcons/sqlserver';
 import { SupabaseIcon } from './customIcons/supabase';
 
-const IconRecord: Record<DataSourceTypes, any> = {
+const IconRecord: Record<DataSourceTypes, React.FC<Parameters<typeof PostgresIcon>[0]>> = {
   [DataSourceTypes.postgres]: PostgresIcon,
   [DataSourceTypes.mysql]: MySQLIcon,
   [DataSourceTypes.bigquery]: BigQueryIcon,

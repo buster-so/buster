@@ -36,7 +36,10 @@ export const PermissionListDatasetGroupContainer: React.FC<{
       {
         title: 'Name',
         dataIndex: 'name',
-        render: (name: string, datasetGroup: ListDatasetGroupsResponse) => {
+        render: (
+          name: string | number | boolean | null | undefined,
+          datasetGroup: ListDatasetGroupsResponse
+        ) => {
           return (
             <div className="flex items-center justify-between gap-x-2">
               <Text>{name}</Text>

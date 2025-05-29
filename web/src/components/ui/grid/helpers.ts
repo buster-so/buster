@@ -13,10 +13,10 @@ export const TOP_SASH_ID = 'top-sash-id';
 export const calculateColumnSpan = (layout: number[]) => {
   const columnSpans: number[] = [];
   const totalColumns = layout.reduce((sum, ratio) => sum + ratio, 0);
-  layout.forEach((ratio) => {
+  for (const ratio of layout) {
     const columnSpan = Math.round((ratio / totalColumns) * NUMBER_OF_COLUMNS);
     columnSpans.push(columnSpan);
-  });
+  }
   return columnSpans;
 };
 

@@ -43,8 +43,8 @@ const StreamingMessageBody: React.FC<{
 }> = React.memo(({ metadata }) => {
   return (
     <div className="flex w-full flex-col items-center space-y-1 px-2.5 py-2">
-      {metadata.map((metadata, index) => (
-        <MetadataItem metadata={metadata} key={index} />
+      {metadata.map((meta) => (
+        <MetadataItem metadata={meta} key={meta.message} />
       ))}
     </div>
   );

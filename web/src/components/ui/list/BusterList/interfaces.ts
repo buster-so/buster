@@ -32,7 +32,11 @@ export interface BusterListColumn {
 export type BusterListRow = BusterListRowItem;
 export interface BusterListRowItem {
   id: string;
-  data: Record<string, string | React.ReactNode | number | boolean | null | undefined> | null;
+  data: Record<
+    string,
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    string | React.ReactNode | number | boolean | null | undefined | object | any
+  > | null;
   onClick?: () => void;
   link?: string;
   onSelect?: () => void;

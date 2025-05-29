@@ -37,14 +37,13 @@ export const StreamingMessageCode: React.FC<
       let currentLine = 1;
 
       if (!modified || modified.length === 0) {
-        // If no modified ranges, process the entire text as visible
-        lines.forEach((line) => {
+        for (const line of lines) {
           segments.push({
             type: 'text',
             content: line,
             lineNumber: currentLine++
           });
-        });
+        }
       } else {
         // Sort modified ranges to ensure proper processing
         const sortedModified = [...modified].sort((a, b) => a[0] - b[0]);
