@@ -81,22 +81,28 @@ export class BigQueryIntrospector extends BaseIntrospector {
   }
 
   async getSchemas(database?: string): Promise<Schema[]> {
-    // Check if we have valid cached data
-    if (this.cache.schemas && this.isCacheValid(this.cache.schemas.lastFetched)) {
-      const schemas = this.cache.schemas.data;
-      return database ? schemas.filter((schema) => schema.database === database) : schemas;
+    // Only use cache if no filter is applied
+    if (!database && this.cache.schemas && this.isCacheValid(this.cache.schemas.lastFetched)) {
+      return this.cache.schemas.data;
     }
 
     try {
-      const datasetsResult = await this.adapter.query(`
+      let query = `
         SELECT schema_name as dataset_name,
                catalog_name as project_name,
                location,
                creation_time
         FROM INFORMATION_SCHEMA.SCHEMATA
         WHERE schema_name NOT IN ('INFORMATION_SCHEMA')
-        ORDER BY schema_name
-      `);
+      `;
+
+      if (database) {
+        query += ` AND catalog_name = '${database}'`;
+      }
+
+      query += ' ORDER BY schema_name';
+
+      const datasetsResult = await this.adapter.query(query);
 
       const schemas = datasetsResult.rows.map((row) => ({
         name: this.getString(row.dataset_name) || '',
@@ -108,8 +114,12 @@ export class BigQueryIntrospector extends BaseIntrospector {
         },
       }));
 
-      this.cache.schemas = { data: schemas, lastFetched: new Date() };
-      return database ? schemas.filter((schema) => schema.database === database) : schemas;
+      // Only cache if no filter was applied
+      if (!database) {
+        this.cache.schemas = { data: schemas, lastFetched: new Date() };
+      }
+
+      return schemas;
     } catch (error) {
       console.warn('Failed to fetch BigQuery schemas:', error);
       return [];
@@ -539,6 +549,17 @@ ORDER BY s.column_name`;
     schemas?: string[];
     tables?: string[];
   }): Promise<DataSourceIntrospectionResult> {
+    // Validate that filter arrays are not empty
+    if (options?.databases && options.databases.length === 0) {
+      throw new Error('Database filter array is empty. Please provide at least one database name or remove the filter.');
+    }
+    if (options?.schemas && options.schemas.length === 0) {
+      throw new Error('Schema filter array is empty. Please provide at least one schema name or remove the filter.');
+    }
+    if (options?.tables && options.tables.length === 0) {
+      throw new Error('Table filter array is empty. Please provide at least one table name or remove the filter.');
+    }
+
     // Step 1: Fetch all databases (populates database cache)
     const allDatabases = await this.getDatabases();
 
@@ -613,10 +634,17 @@ ORDER BY s.column_name`;
     // Get column statistics in batches of 20 tables
     const columnsWithStats = await this.attachColumnStatisticsBigQuery(tables, columns);
 
+    // Filter databases to only those that have schemas when schema filter is applied
+    let filteredDatabases = databases;
+    if (options?.schemas && !options?.databases) {
+      const databasesWithFilteredSchemas = new Set(schemas.map(schema => schema.database));
+      filteredDatabases = databases.filter(db => databasesWithFilteredSchemas.has(db.name));
+    }
+
     return {
       dataSourceName: this.dataSourceName,
       dataSourceType: this.getDataSourceType(),
-      databases,
+      databases: filteredDatabases,
       schemas,
       tables,
       columns: columnsWithStats,
