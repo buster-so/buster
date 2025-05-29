@@ -88,7 +88,6 @@ ChartJS.defaults.font = {
   weight: 'normal'
 };
 
-// biome-ignore lint/complexity/noForEach: I just want to use for each here. Shoot me.
 [
   ChartJS.defaults.scales.category,
   ChartJS.defaults.scales.linear,
@@ -105,7 +104,6 @@ ChartJS.defaults.font = {
   };
 });
 
-// biome-ignore lint/complexity/noForEach: I just want to use for each here. Shoot me.
 [
   ChartJS.defaults.scales.category,
   ChartJS.defaults.scales.time,

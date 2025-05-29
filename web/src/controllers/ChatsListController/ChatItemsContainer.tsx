@@ -175,7 +175,7 @@ const EmptyState: React.FC<{
   loading: boolean;
   type: 'logs' | 'chats';
 }> = React.memo(({ loading, type }) => {
-  if (loading) return <></>;
+  if (loading) return null;
 
   return (
     <ListEmptyStateWithButton

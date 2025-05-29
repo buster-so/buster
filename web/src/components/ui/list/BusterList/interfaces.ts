@@ -21,9 +21,9 @@ export interface BusterListColumn {
   minWidth?: number;
   align?: 'left' | 'center' | 'right'; //TODO
   render?: (
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    // biome-ignore lint/suspicious/noExplicitAny: This really could be anything...
     value: string | number | boolean | null | undefined | any,
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    // biome-ignore lint/suspicious/noExplicitAny: This really could be anything...
     record: any
   ) => React.JSX.Element | string | React.ReactNode;
   headerRender?: (title: string) => React.ReactNode;
@@ -35,7 +35,7 @@ export interface BusterListRowItem {
   id: string;
   data: Record<
     string,
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    // biome-ignore lint/suspicious/noExplicitAny: This really could be anything...
     string | React.ReactNode | number | boolean | null | undefined | object | any
   > | null;
   onClick?: () => void;

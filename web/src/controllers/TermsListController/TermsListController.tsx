@@ -80,9 +80,7 @@ export const TermsListController: React.FC<{
               onClick={onOpenNewTermModal}
               buttonText="New term"
             />
-          ) : (
-            <></>
-          )
+          ) : null
         }
       />
       <TermListSelectedOptionPopup

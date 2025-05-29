@@ -33,7 +33,7 @@ export const DashboardViewDashboardController: React.FC<{
   });
 
   if (!isFetched) {
-    return <></>;
+    return null;
   }
 
   if (isError) {

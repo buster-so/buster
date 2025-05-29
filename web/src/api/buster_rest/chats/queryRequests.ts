@@ -235,7 +235,7 @@ export const useDeleteChat = () => {
 
   return useMutation({
     mutationFn,
-    onSuccess(data, variables, context) {
+    onSuccess() {
       queryClient.invalidateQueries({
         queryKey: chatQueryKeys.chatsGetList().queryKey,
         refetchType: 'all'
@@ -341,7 +341,7 @@ export const useRemoveChatFromCollections = () => {
 
   return useMutation({
     mutationFn: removeChatFromCollection,
-    onSuccess: (_, { collectionIds, chatIds }) => {
+    onSuccess: (_, { collectionIds }) => {
       const collectionIsInFavorites = userFavorites.some((f) => {
         return collectionIds.includes(f.id);
       });

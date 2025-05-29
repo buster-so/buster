@@ -44,11 +44,12 @@ function DatePickerComponent({
           suffix={
             clearable &&
             selected && (
-              <div
+              <button
+                type="button"
                 onClick={onClickCancel}
                 className="hover:bg-gray-light/20 hover:text-default! -mr-1 flex items-center justify-center rounded-sm p-1 text-xs opacity-30 transition-opacity duration-200 group-hover:opacity-100">
                 <Xmark />
-              </div>
+              </button>
             )
           }
           className={cn(

@@ -126,7 +126,7 @@ const ResizeRowHandle: React.FC<{
     const showDropzone = !!over?.id && !hideDropzone;
     const isDropzoneActive = showDropzone && isOver;
 
-    const handler = useMemoizedFn((mouseDownEvent: React.MouseEvent<HTMLDivElement>) => {
+    const handler = useMemoizedFn((mouseDownEvent: React.MouseEvent<HTMLButtonElement>) => {
       if (!index) return;
       const startPosition = mouseDownEvent.pageY;
       const style = document.createElement('style');
@@ -164,7 +164,8 @@ const ResizeRowHandle: React.FC<{
 
     return (
       <div className="relative">
-        <div
+        <button
+          type="button"
           id={id}
           className={cn(
             !readOnly && 'hover:bg-border cursor-row-resize',

@@ -270,23 +270,25 @@ const DropdownMenuLink: React.FC<{
 
   if (!link)
     return (
-      <div
+      <button
+        type="button"
         className={className}
         onClick={(e) => e.stopPropagation()}
         onKeyDown={(e) => e.stopPropagation()}>
         {content}
-      </div>
+      </button>
     );
 
   return (
-    <span
+    <button
+      type="button"
       className={className}
       onClick={(e) => e.stopPropagation()}
       onKeyDown={(e) => e.stopPropagation()}>
       <Link href={link} target={linkTarget || isExternal ? '_blank' : '_self'} className="">
         {content}
       </Link>
-    </span>
+    </button>
   );
 };
 DropdownMenuLink.displayName = 'DropdownMenuLink';

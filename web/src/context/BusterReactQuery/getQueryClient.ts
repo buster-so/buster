@@ -51,7 +51,7 @@ function makeQueryClient(params?: {
   });
 }
 
-let browserQueryClient: QueryClient | undefined = undefined;
+let browserQueryClient: QueryClient | undefined;
 
 export function getQueryClient(accessToken?: string) {
   if (isServer) {

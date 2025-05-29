@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       const buffer = Buffer.from(base64Data, 'base64');
 
       // Generate a unique filename
-      const timestamp = new Date().getTime();
+      const timestamp = Date.now();
       const filename = `${body.organizationId}/${timestamp}.png`;
 
       // Check if bucket exists

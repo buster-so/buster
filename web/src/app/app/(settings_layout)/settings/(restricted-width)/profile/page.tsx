@@ -9,7 +9,7 @@ import { SettingsPageHeader } from '../../_components/SettingsPageHeader';
 export default function ProfilePage() {
   const user = useUserConfigContextSelector((state) => state.user);
 
-  if (!user) return <></>;
+  if (!user) return null;
 
   const { name, email, created_at } = user;
 

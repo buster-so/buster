@@ -1,5 +1,4 @@
 import { useMemoizedFn } from '@/hooks';
-import {} from 'react';
 import type { DropZone, DropZoneInternal } from './interfaces';
 
 export const useDropzonesExternal = ({

@@ -41,18 +41,16 @@ export const CodeCard: React.FC<{
 
     return (
       <FileCard fileName={fileName} headerButtons={ShownButtons} className={className}>
-        <>
-          <AppCodeEditor
-            language={language}
-            value={code}
-            onChange={onChange}
-            readOnly={readOnly}
-            height="100%"
-            onMetaEnter={onMetaEnter}
-            className="border-none"
-          />
-          {error && <ErrorClosableContainer error={error} className="bottom-10!" />}
-        </>
+        <AppCodeEditor
+          language={language}
+          value={code}
+          onChange={onChange}
+          readOnly={readOnly}
+          height="100%"
+          onMetaEnter={onMetaEnter}
+          className="border-none"
+        />
+        {error && <ErrorClosableContainer error={error} className="bottom-10!" />}
       </FileCard>
     );
   }

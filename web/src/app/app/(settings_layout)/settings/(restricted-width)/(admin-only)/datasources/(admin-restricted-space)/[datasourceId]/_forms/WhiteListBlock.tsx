@@ -21,12 +21,13 @@ export const WhiteListBlock: React.FC = React.memo(() => {
       <div className="flex gap-x-2">
         {IP_ADDRESSES.map((ip) => {
           return (
-            <div
+            <button
+              type="button"
               className="hover:bg-item-hover flex cursor-pointer items-center rounded-xl border px-2 py-1 shadow"
               onClick={() => onClickIpAddress(ip)}
               key={ip}>
               {ip}
-            </div>
+            </button>
           );
         })}
       </div>

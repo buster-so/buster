@@ -114,10 +114,8 @@ const ListItem = React.memo(
     const isRestoringVersion = restoringVersion === version_number;
 
     return (
-      <Link prefetch={false} href={link}>
+      <Link prefetch={false} href={link} onMouseEnter={onHoverLink} onMouseLeave={onHoverEnd}>
         <div
-          onMouseEnter={onHoverLink}
-          onMouseLeave={onHoverEnd}
           className={cn(
             'group hover:bg-item-hover flex cursor-pointer items-center justify-between space-x-2 rounded px-2.5 py-1.5',
             selected && 'bg-item-select hover:bg-item-select selected-version'
@@ -132,7 +130,8 @@ const ListItem = React.memo(
           <div className="text-icon-color animate-in fade-in-0 flex items-center space-x-2 duration-200">
             {showRestoreButton && (
               <AppTooltip title={restoringVersion ? 'Restoring...' : 'Restore version'}>
-                <div
+                <button
+                  type="button"
                   onClick={(e) => {
                     if (restoringVersion) return;
 
@@ -145,7 +144,7 @@ const ListItem = React.memo(
                     isRestoringVersion && 'cursor-not-allowed opacity-100!'
                   )}>
                   {isRestoringVersion ? <CircleSpinnerLoader size={12} /> : <History />}
-                </div>
+                </button>
               </AppTooltip>
             )}
 

@@ -84,7 +84,7 @@ export const getEmbedAssetRedirect = (request: NextRequest): string | undefined 
   const params = extractPathParamsFromRoute(route);
 
   if (matched) {
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    // biome-ignore lint/suspicious/noExplicitAny: I am just using any here because it was a pain to type this out
     const newRoute = createBusterRoute({ route: matched, ...(params as any) });
     return newRoute;
   }

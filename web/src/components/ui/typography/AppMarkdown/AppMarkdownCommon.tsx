@@ -152,8 +152,7 @@ export const CustomUnorderedList: React.FC<
         showLoader && 'fade-in transform-none! transition-none duration-500'
       )}
       //@ts-ignore
-      start={start}
-    >
+      start={start}>
       {children}
     </ul>
   );

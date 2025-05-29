@@ -9,7 +9,6 @@ import { ShareAssetType } from '@/api/asset_interfaces';
 import { ASSET_ICONS } from '@/components/features/config/assetIcons';
 import { AddToCollectionModal } from '@/components/features/modal/AddToCollectionModal';
 import { Avatar } from '@/components/ui/avatar';
-import {} from '@/components/ui/icons';
 import { ListEmptyStateWithButton } from '@/components/ui/list';
 import { BusterList, type BusterListColumn, type BusterListRow } from '@/components/ui/list';
 import { Text } from '@/components/ui/typography';
@@ -33,7 +32,7 @@ export const CollectionIndividualContent: React.FC<{
   });
 
   if (!loadedAsset) {
-    return <></>;
+    return null;
   }
 
   const assetList = collection?.assets || [];
@@ -143,9 +142,7 @@ const CollectionList: React.FC<{
               description="As soon as you add metrics and dashboards to your collection, they will appear here."
               onClick={onOpenAddTypeModal}
             />
-          ) : (
-            <></>
-          )
+          ) : null
         }
       />
 

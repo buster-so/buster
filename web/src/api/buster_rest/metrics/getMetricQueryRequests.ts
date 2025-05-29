@@ -69,7 +69,7 @@ export const useGetMetric = <TData = IBusterMetric>(
     ...initialOptions,
     queryFn: () => initialQueryFn(paramVersionNumber),
     enabled: false, //In the year of our lord 2025, April 10, I, Nate Kelley, decided to disable this query in favor of explicityly fetching the data. May god have mercy on our souls.
-    retry(failureCount, error) {
+    retry(_failureCount, error) {
       if (error?.message !== undefined && id) {
         setAssetPasswordError(id, error.message || 'An error occurred');
       }

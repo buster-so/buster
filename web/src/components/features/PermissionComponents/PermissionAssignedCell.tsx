@@ -33,7 +33,8 @@ export const PermissionAssignedCell: React.FC<{
   const assignedValue = assigned ? 'true' : 'false';
 
   return (
-    <div
+    <button
+      type="button"
       className="flex items-center space-x-5"
       onClick={(e) => {
         e.preventDefault();
@@ -48,7 +49,7 @@ export const PermissionAssignedCell: React.FC<{
           onSelect({ id, assigned: value === 'true' });
         }}
       />
-    </div>
+    </button>
   );
 });
 

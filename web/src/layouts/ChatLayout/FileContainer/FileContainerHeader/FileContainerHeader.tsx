@@ -42,7 +42,7 @@ const FileContainerHeaderStandard: React.FC<{
     () =>
       selectedFileType && SelectedFileSegmentRecord[selectedFileType]
         ? SelectedFileSegmentRecord[selectedFileType]
-        : () => <></>,
+        : () => null,
     [selectedFileType]
   );
 

@@ -66,9 +66,7 @@ export const MetricTitle: React.FC<{
           </div>
         </div>
 
-        {isDragOverlay || readOnly ? (
-          <></>
-        ) : (
+        {isDragOverlay || readOnly ? null : (
           <ThreeDotMenu dashboardId={dashboardId} metricId={metricId} />
         )}
       </Link>

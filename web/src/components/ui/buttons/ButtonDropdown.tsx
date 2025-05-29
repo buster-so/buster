@@ -124,10 +124,12 @@ export const ButtonSplit = React.memo(
             {buttonText && <span className="">{buttonText}</span>}
           </div>
           <div className="bg-border mr-0 h-full w-[0.5px]" />
-          <div className="flex h-full items-center justify-center text-sm" onClick={handleClick}>
-            <div
-              className={cn(splitButtonVariants({ variant }), 'border-none')}
-              aria-label="Open dropdown menu">
+          <button
+            type="button"
+            className="flex h-full items-center justify-center text-sm"
+            aria-label="Open dropdown menu"
+            onClick={handleClick}>
+            <div className={cn(splitButtonVariants({ variant }), 'border-none')}>
               <span
                 className={cn(
                   'transition-transform duration-100',
@@ -137,7 +139,7 @@ export const ButtonSplit = React.memo(
                 <ChevronDown />
               </span>
             </div>
-          </div>
+          </button>
         </div>
       );
     }

@@ -25,14 +25,15 @@ export const SelectAxisItemLabel = React.memo(
     const Icon = useMemo(() => ColumnTypeIcon[style] || ColumnTypeIcon.string, [style]);
 
     return (
-      <div
+      <button
+        type="button"
         className={`flex items-center space-x-1.5 overflow-hidden whitespace-nowrap ${onClick ? 'cursor-pointer' : ''}`}
         onClick={onClick}
         onKeyUp={(e) => e.key === 'Enter' && onClick?.()}
         onKeyDown={(e) => e.key === 'Enter' && onClick?.()}>
         <div className={cn('text-icon-color flex')}>{Icon.icon}</div>
         <Text className="truncate">{label}</Text>
-      </div>
+      </button>
     );
   }
 );

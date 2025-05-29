@@ -44,6 +44,16 @@ export const AppCodeBlock: React.FC<{
     openSuccessMessage('Copied to clipboard');
   });
 
+  const headerButtons = React.useMemo(() => {
+    return (
+      showCopyButton && (
+        <Button variant="ghost" onClick={copyCode} prefix={<Copy />}>
+          Copy
+        </Button>
+      )
+    );
+  }, [showCopyButton, copyCode]);
+
   //this is a huge assumption, but if there is no language, it is probably an inline code block
   if (!language) {
     return <CodeInlineWrapper>{children}</CodeInlineWrapper>;
@@ -53,15 +63,7 @@ export const AppCodeBlock: React.FC<{
     <FileCard
       fileName={title || language}
       className={wrapperClassName}
-      headerButtons={React.useMemo(() => {
-        return (
-          showCopyButton && (
-            <Button variant="ghost" onClick={copyCode} prefix={<Copy />}>
-              Copy
-            </Button>
-          )
-        );
-      }, [showCopyButton, copyCode])}>
+      headerButtons={headerButtons}>
       <div className="w-full overflow-x-auto">
         <div className="code-wrapper">
           {language ? (

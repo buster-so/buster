@@ -100,7 +100,7 @@ export const useDeployDataset = () => {
 
   return useMutation({
     mutationFn,
-    onSuccess: (data, variables, context) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: baseDatasetQueryKey,
         exact: true,

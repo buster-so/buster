@@ -32,7 +32,7 @@ export const PolicyCheck: React.FC<{
 }> = ({ email, password, password2, onChangePolicyCheck }) => {
   const items = useMemo(() => {
     const containsNumber = /\d/;
-    const containsSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
+    const containsSpecialChar = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/;
     const containsUppercase = /[A-Z]/;
     const containsLowercase = /[a-z]/;
 

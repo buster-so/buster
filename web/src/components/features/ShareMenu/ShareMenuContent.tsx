@@ -110,5 +110,5 @@ const ShareMenuContentFooter = React.memo<{
     );
   }
 
-  return <></>;
+  return null;
 });

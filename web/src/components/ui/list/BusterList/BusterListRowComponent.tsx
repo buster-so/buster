@@ -87,9 +87,7 @@ export const BusterListRowComponent = React.memo(
             ref={ref}>
             {onSelectChange ? (
               <CheckboxColumn checkStatus={checked ? 'checked' : 'unchecked'} onChange={onChange} />
-            ) : (
-              <></>
-            )}
+            ) : null}
             {columns.map((column, columnIndex) => (
               <BusterListCellComponent
                 key={column.dataIndex}

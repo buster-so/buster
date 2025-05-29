@@ -39,41 +39,35 @@ export const DatasetsIndividualHeader: React.FC = React.memo(() => {
 
   return (
     <>
-      <>
-        <div className="flex items-center space-x-3 overflow-hidden">
-          <DatasetBreadcrumb datasetName={datasetName} />
+      <div className="flex items-center space-x-3 overflow-hidden">
+        <DatasetBreadcrumb datasetName={datasetName} />
 
-          <DatasetsHeaderOptions
-            isAdmin={isAdmin}
-            selectedApp={selectedApp}
-            datasetId={datasetId}
-          />
-        </div>
+        <DatasetsHeaderOptions isAdmin={isAdmin} selectedApp={selectedApp} datasetId={datasetId} />
+      </div>
 
-        <div className="flex items-center">
+      <div className="flex items-center">
+        <div className="flex items-center space-x-2">
+          <DatasetIndividualThreeDotMenu datasetId={datasetId} />
+
+          <Separator orientation="vertical" className="h-4!" />
+
           <div className="flex items-center space-x-2">
-            <DatasetIndividualThreeDotMenu datasetId={datasetId} />
-
-            <Separator orientation="vertical" className="h-4!" />
-
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="ghost"
-                onClick={onReset}
-                disabled={!isChangedSQL || isDeployingDataset}>
-                Reset
-              </Button>
-              <Button
-                variant="primary"
-                disabled={disablePublish}
-                onClick={onPublishDataset}
-                loading={isDeployingDataset}>
-                Publish
-              </Button>
-            </div>
+            <Button
+              variant="ghost"
+              onClick={onReset}
+              disabled={!isChangedSQL || isDeployingDataset}>
+              Reset
+            </Button>
+            <Button
+              variant="primary"
+              disabled={disablePublish}
+              onClick={onPublishDataset}
+              loading={isDeployingDataset}>
+              Publish
+            </Button>
           </div>
         </div>
-      </>
+      </div>
 
       <PreventNavigation
         isDirty={preventNavigation}

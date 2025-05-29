@@ -85,9 +85,7 @@ export const DatasetListContent: React.FC<{
         onSelectChange={setSelectedRowKeys}
         emptyState={useMemo(
           () =>
-            !isFetchedDatasets ? (
-              <></>
-            ) : (
+            !isFetchedDatasets ? null : (
               <ListEmptyStateWithButton
                 isAdmin={isAdmin}
                 title="You don't have any datasets yet."

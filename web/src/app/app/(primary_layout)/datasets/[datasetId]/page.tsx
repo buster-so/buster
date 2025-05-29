@@ -13,5 +13,5 @@ export default async function DatasetPage(props: { params: Promise<{ datasetId: 
     })
   );
 
-  return <></>;
+  return null;
 }

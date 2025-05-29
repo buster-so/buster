@@ -43,7 +43,12 @@ describe('useGetFileLink', () => {
         type,
         versionNumber,
         secondaryView
-      }: { assetId: string; type: string; versionNumber: number; secondaryView: string }) => {
+      }: {
+        assetId: string;
+        type: string;
+        versionNumber: number;
+        secondaryView: string;
+      }) => {
         if (type === 'metric') {
           return `/metrics/${assetId}${versionNumber ? `/v${versionNumber}` : ''}${secondaryView ? `/${secondaryView}` : ''}`;
         }

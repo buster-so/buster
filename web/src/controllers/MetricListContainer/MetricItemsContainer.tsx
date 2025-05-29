@@ -135,7 +135,7 @@ const EmptyState: React.FC<{
   loading: boolean;
 }> = React.memo(({ loading }) => {
   if (loading) {
-    return <></>;
+    return null;
   }
 
   return (

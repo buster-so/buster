@@ -49,7 +49,7 @@ export function classNames(...args) {
         continue;
       }
       for (const key in arg) {
-        if (Object.hasOwnProperty.call(arg, key) && arg[key]) {
+        if (Object.hasOwn(arg, key) && arg[key]) {
           classList.push(key);
         }
       }

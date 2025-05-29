@@ -136,9 +136,7 @@ const CollectionList: React.FC<{
               description="Collections help you organize your metrics and dashboards. Collections will appear here."
               onClick={onOpenNewCollectionModal}
             />
-          ) : (
-            <></>
-          )
+          ) : null
         }
       />
 

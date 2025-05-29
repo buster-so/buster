@@ -39,9 +39,9 @@ export const StatusCard: React.FC<
 
       {extra && extra}
       {onClose && (
-        <div onClick={onClose} className="absolute top-2 right-2">
+        <button type="button" onClick={onClose} className="absolute top-2 right-2">
           <Xmark />
-        </div>
+        </button>
       )}
     </div>
   );

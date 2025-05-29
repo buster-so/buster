@@ -27,8 +27,8 @@ const FormRecord: Record<
   sqlserver: SqlServerForm,
   databricks: DataBricksForm,
   supabase: PostgresForm,
-  athena: () => <></>,
-  other: () => <></>
+  athena: () => null,
+  other: () => null
 };
 
 export const DataSourceFormContent: React.FC<{

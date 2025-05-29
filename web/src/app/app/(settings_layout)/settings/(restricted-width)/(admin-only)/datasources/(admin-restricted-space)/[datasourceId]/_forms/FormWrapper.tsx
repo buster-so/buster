@@ -22,7 +22,7 @@ export interface BusterFormApi {
     isDirty: boolean;
   };
   AppForm: React.ComponentType<{ children?: React.ReactNode }>;
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  // biome-ignore lint/suspicious/noExplicitAny: I am just using any here because it was a pain to type this out
   AppField: any;
   SubscribeButton: React.ComponentType<{
     submitLabel: string;

@@ -257,13 +257,6 @@ const SetAPassword: React.FC<{
       onSetPassword(password);
     });
 
-    const memoizedVisibilityToggle = useMemo(() => {
-      return {
-        visible: visibilityToggle,
-        onVisibleChange: (visible: boolean) => setVisibilityToggle(visible)
-      };
-    }, [visibilityToggle]);
-
     useEffect(() => {
       if (isPasswordProtected) {
         setPassword(password);

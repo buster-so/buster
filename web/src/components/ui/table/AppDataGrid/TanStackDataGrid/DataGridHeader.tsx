@@ -64,8 +64,7 @@ const DraggableHeader: React.FC<DraggableHeaderProps> = ({
         isOverTarget && 'bg-primary/10 border-primary inset border border-r! border-dashed'
       )}
       // onClick toggles sorting if enabled
-      onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}
-    >
+      onClick={header.column.getCanSort() ? header.column.getToggleSortingHandler() : undefined}>
       <span
         className={cn(
           'flex h-full flex-1 items-center space-x-1.5 overflow-hidden p-2',

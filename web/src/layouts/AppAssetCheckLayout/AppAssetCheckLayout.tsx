@@ -25,7 +25,7 @@ export const AppAssetCheckLayout: React.FC<
   });
 
   const Component = useMemo(() => {
-    if (!isFetched) return <></>;
+    if (!isFetched) return null;
 
     if (!hasAccess && !isPublic) {
       return <AppNoPageAccess assetId={assetId} />;

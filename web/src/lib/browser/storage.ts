@@ -12,6 +12,8 @@ export const clearAllBrowserStorage = (): void => {
   // Clear all cookies
   for (const cookie of document.cookie.split(';')) {
     const cookieName = cookie.replace(/^ +/, '').split('=')[0];
+
+    // biome-ignore lint/suspicious/noDocumentCookie: I am using document.cookie here to clear cookies
     document.cookie = `${cookieName}=;expires=${new Date().toUTCString()};path=/`;
   }
 };

@@ -95,13 +95,14 @@ export const ShareMenuContentEmbedFooter = ({
       <Text variant="secondary" className="text-xs!">
         {'Your dashboard currently isn’t published.'}
 
-        <span
+        <button
+          type="button"
           onClick={() => {
             onPublish();
           }}
           className="text-primary ml-1 cursor-pointer">
           Publish
-        </span>
+        </button>
       </Text>
     </div>
   );

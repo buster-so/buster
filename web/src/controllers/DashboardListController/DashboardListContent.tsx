@@ -117,9 +117,7 @@ export const DashboardListContent: React.FC<{
                 }
                 onClick={onClickEmptyState}
               />
-            ) : (
-              <></>
-            )
+            ) : null
           }
         />
 

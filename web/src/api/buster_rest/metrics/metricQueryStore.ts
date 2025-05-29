@@ -8,7 +8,7 @@ type MetricQueryStore = {
   onSetLatestMetricVersion: (metricId: string, versionNumber: number) => void;
 };
 
-export const useMetricQueryStore = create<MetricQueryStore>((set, get) => ({
+export const useMetricQueryStore = create<MetricQueryStore>((set) => ({
   latestMetricVersions: {},
   onSetLatestMetricVersion: (metricId: string, versionNumber: number) =>
     set((state) => ({

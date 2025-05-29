@@ -1,6 +1,6 @@
 import { organizationQueryKeys } from '@/api/query_keys/organization';
 import { useMemoizedFn } from '@/hooks';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { QueryClient } from '@tanstack/react-query';
 import { createOrganization, getOrganizationUsers, getOrganizationUsers_server } from './requests';
 
@@ -37,7 +37,6 @@ export const prefetchGetOrganizationUsers = async (
 };
 
 export const useCreateOrganization = () => {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: createOrganization
   });

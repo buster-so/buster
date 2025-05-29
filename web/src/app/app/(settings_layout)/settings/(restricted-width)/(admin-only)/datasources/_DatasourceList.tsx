@@ -106,7 +106,8 @@ const ListItem: React.FC<{
           <Text variant="secondary">{source.name}</Text>
         </div>
 
-        <span
+        <button
+          type="button"
           onClick={(e) => {
             e.stopPropagation();
             e.preventDefault();
@@ -121,7 +122,7 @@ const ListItem: React.FC<{
               prefix={<Dots />}
             />
           </Dropdown>
-        </span>
+        </button>
       </div>
     </Link>
   );

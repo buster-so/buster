@@ -168,8 +168,7 @@ export const AppSegmented: AppSegmentedComponent = React.memo(
         ref={rootRef}
         value={selectedValue as string}
         // onValueChange={handleTabClick}
-        className={cn(segmentedVariants({ block, type }), heightVariants({ size }), className)}
-      >
+        className={cn(segmentedVariants({ block, type }), heightVariants({ size }), className)}>
         {isMeasured && (
           <motion.div
             className={cn(gliderVariants({ type }), heightVariants({ size }))}

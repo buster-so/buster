@@ -60,14 +60,14 @@ export const LegendItemDot: React.FC<
 > = React.memo(({ color, type, inactive, onFocusItem, size = 'default' }) => {
   const hasFocusItem = onFocusItem !== undefined;
 
-  const onClick = useMemoizedFn((e: React.MouseEvent<HTMLDivElement>) => {
+  const onClick = useMemoizedFn((e: React.MouseEvent<HTMLButtonElement>) => {
     if (onFocusItem) {
       e.stopPropagation();
       onFocusItem();
     }
   });
 
-  const onFocusItemPreflight = useMemoizedFn((e: React.MouseEvent<HTMLDivElement>) => {
+  const onFocusItemPreflight = useMemoizedFn((e: React.MouseEvent<HTMLButtonElement>) => {
     if (onFocusItem) {
       e.stopPropagation();
       e.preventDefault();
@@ -83,7 +83,8 @@ export const LegendItemDot: React.FC<
 
   return (
     <div className={cn(itemVariants({ size }))} data-testid="legend-dot-container">
-      <div
+      <button
+        type="button"
         onClick={onClick}
         data-testid="legend-dot"
         className={cn(dotStyle, dotVariants({ size }), {
@@ -92,7 +93,8 @@ export const LegendItemDot: React.FC<
         style={{ backgroundColor: !inactive ? color : undefined }}
       />
       {hasFocusItem && (
-        <div
+        <button
+          type="button"
           onClick={onFocusItemPreflight}
           className="absolute hidden h-full w-full items-center justify-center overflow-hidden group-hover:flex">
           <div
@@ -106,7 +108,7 @@ export const LegendItemDot: React.FC<
               <Target />
             </div>
           </div>
-        </div>
+        </button>
       )}
     </div>
   );
