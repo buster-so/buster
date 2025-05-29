@@ -1,11 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import { DEFAULT_CHART_CONFIG } from '@/api/asset_interfaces/metric';
+import type { ColumnMetaData } from '@/api/asset_interfaces/metric';
+import { describe, expect, it } from 'vitest';
 import {
   createDefaultBarAndLineAxis,
   createDefaultPieAxis,
   createDefaultScatterAxis
 } from './createDefaultAxis';
-import { DEFAULT_CHART_CONFIG } from '@/api/asset_interfaces/metric';
-import type { ColumnMetaData } from '@/api/asset_interfaces/metric';
 
 describe('createDefaultAxis', () => {
   describe('createDefaultBarAndLineAxis', () => {

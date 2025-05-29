@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { barDelayAnimation } from './barDelayAnimation';
 import type { Chart, ScriptableContext } from 'chart.js';
+import { describe, expect, it } from 'vitest';
+import { barDelayAnimation } from './barDelayAnimation';
 
 describe('barDelayAnimation', () => {
   it('should calculate correct delay for regular bar chart', () => {

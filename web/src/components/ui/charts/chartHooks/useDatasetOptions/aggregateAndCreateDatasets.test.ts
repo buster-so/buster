@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { aggregateAndCreateDatasets } from './aggregateAndCreateDatasets';
 import { DEFAULT_COLUMN_LABEL_FORMAT, IColumnLabelFormat } from '@/api/asset_interfaces';
+import { describe, expect, it } from 'vitest';
+import { aggregateAndCreateDatasets } from './aggregateAndCreateDatasets';
 
 describe('aggregateAndCreateDatasets', () => {
   it('should handle single x-axis and single y-axis', () => {

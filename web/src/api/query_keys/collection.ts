@@ -1,6 +1,6 @@
-import { queryOptions } from '@tanstack/react-query';
-import type { BusterCollectionListItem, BusterCollection } from '@/api/asset_interfaces/collection';
+import type { BusterCollection, BusterCollectionListItem } from '@/api/asset_interfaces/collection';
 import type { collectionsGetList as collectionsGetListRequest } from '@/api/buster_rest/collections/requests';
+import { queryOptions } from '@tanstack/react-query';
 
 const collectionsGetList = (
   filters?: Omit<Parameters<typeof collectionsGetListRequest>[0], 'page_token' | 'page_size'>

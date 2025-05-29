@@ -1,8 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
-import { pieOptionsHandler, piePluginsHandler } from './pieChartOptions';
 import { determineFontColorContrast } from '@/lib/colors';
-import type { ChartSpecificOptionsProps } from './interfaces';
 import type { ChartData } from 'chart.js';
+import { describe, expect, it, vi } from 'vitest';
+import type { ChartSpecificOptionsProps } from './interfaces';
+import { pieOptionsHandler, piePluginsHandler } from './pieChartOptions';
 
 vi.mock('@/lib/colors');
 

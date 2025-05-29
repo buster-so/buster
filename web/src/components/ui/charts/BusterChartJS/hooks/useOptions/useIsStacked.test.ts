@@ -1,6 +1,6 @@
 import { BusterChartProps, ChartType } from '@/api/asset_interfaces/metric/charts';
-import { describe, it, expect } from 'vitest';
 import { renderHook } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 import { useIsStacked } from './useIsStacked';
 
 describe('useIsStacked', () => {

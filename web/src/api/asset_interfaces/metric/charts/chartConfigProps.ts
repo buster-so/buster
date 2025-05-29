@@ -1,15 +1,15 @@
-import type { ChartType } from './enum';
+import type { GoalLine, Trendline } from './annotationInterfaces';
 import type { BarAndLineAxis, ComboChartAxis, PieChartAxis, ScatterAxis } from './axisInterfaces';
+import type { ColumnSettings } from './columnInterfaces';
+import type { IColumnLabelFormat } from './columnLabelInterfaces';
+import type { ChartType } from './enum';
+import type { BarSortBy, PieSortBy, ShowLegendHeadline } from './etcInterfaces';
 import type {
   CategoryAxisStyleConfig,
   XAxisConfig,
   Y2AxisConfig,
   YAxisConfig
 } from './tickInterfaces';
-import type { ShowLegendHeadline, BarSortBy, PieSortBy } from './etcInterfaces';
-import type { GoalLine, Trendline } from './annotationInterfaces';
-import type { ColumnSettings } from './columnInterfaces';
-import type { IColumnLabelFormat } from './columnLabelInterfaces';
 
 export type BusterChartConfigProps = {
   selectedChartType: ChartType;

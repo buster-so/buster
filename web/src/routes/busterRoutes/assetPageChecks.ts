@@ -1,7 +1,7 @@
+import type { NextRequest } from 'next/server';
 import { BusterAuthRoutes } from './busterAuthRoutes';
 import { BusterEmbedRoutes } from './busterEmbedRoutes';
 import { BusterRoutes } from './busterRoutes';
-import type { NextRequest } from 'next/server';
 import {
   createBusterRoute,
   createPathnameToBusterRoute,

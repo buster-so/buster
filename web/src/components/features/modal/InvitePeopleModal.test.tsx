@@ -1,9 +1,9 @@
-import React from 'react';
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { InvitePeopleModal } from './InvitePeopleModal';
 import { useInviteUser } from '@/api/buster_rest/users';
 import { useBusterNotifications } from '@/context/BusterNotifications';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import React from 'react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { InvitePeopleModal } from './InvitePeopleModal';
 
 // Mock the hooks
 vi.mock('@/api/buster_rest/users', () => ({

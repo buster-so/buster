@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import axios, { AxiosError, InternalAxiosRequestConfig, AxiosHeaders } from 'axios';
-import { createInstance, defaultRequestHandler } from './createInstance';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { rustErrorHandler } from './buster_rest/errors';
+import { createInstance, defaultRequestHandler } from './createInstance';
 
 // Mock dependencies
 vi.mock('axios');

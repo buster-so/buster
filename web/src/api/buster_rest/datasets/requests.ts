@@ -1,6 +1,6 @@
-import type { BusterDataset, IDataResult, BusterDatasetListItem } from '../../asset_interfaces';
-import { mainApi } from '../instances';
 import { serverFetch } from '@/api/createServerInstance';
+import type { BusterDataset, BusterDatasetListItem, IDataResult } from '../../asset_interfaces';
+import { mainApi } from '../instances';
 
 export const getDatasets = async (params?: {
   /** Current page number */

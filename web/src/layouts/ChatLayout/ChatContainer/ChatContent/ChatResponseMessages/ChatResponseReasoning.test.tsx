@@ -1,11 +1,11 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import React from 'react';
 import { render, screen } from '@testing-library/react';
+import React from 'react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import '@testing-library/jest-dom';
-import { ChatResponseReasoning } from './ChatResponseReasoning';
-import { useChatLayoutContextSelector } from '../../../ChatLayoutContext';
 import { useGetChatMessage } from '@/api/buster_rest/chats';
 import { useQuery } from '@tanstack/react-query';
+import { useChatLayoutContextSelector } from '../../../ChatLayoutContext';
+import { ChatResponseReasoning } from './ChatResponseReasoning';
 
 // Mock the imports
 vi.mock('../../../ChatLayoutContext', () => ({

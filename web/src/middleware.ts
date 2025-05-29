@@ -1,7 +1,7 @@
-import { NextResponse, type NextRequest } from 'next/server';
 import { updateSession } from '@/middleware/supabaseMiddleware';
-import { pathnameMiddleware } from './middleware/pathnameMiddleware';
+import { type NextRequest, NextResponse } from 'next/server';
 import { assetReroutes } from './middleware/assetReroutes';
+import { pathnameMiddleware } from './middleware/pathnameMiddleware';
 
 export async function middleware(request: NextRequest) {
   try {

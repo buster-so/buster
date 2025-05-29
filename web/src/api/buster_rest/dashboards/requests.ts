@@ -1,4 +1,3 @@
-import mainApi from '@/api/buster_rest/instances';
 import type {
   BusterDashboardListItem,
   BusterDashboardResponse,
@@ -9,6 +8,7 @@ import type {
   SharePostRequest,
   ShareUpdateRequest
 } from '@/api/asset_interfaces/shared_interfaces';
+import mainApi from '@/api/buster_rest/instances';
 import { serverFetch } from '@/api/createServerInstance';
 
 export const dashboardsGetList = async (params: {

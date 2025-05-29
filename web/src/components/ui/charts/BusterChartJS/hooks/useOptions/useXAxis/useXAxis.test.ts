@@ -5,7 +5,7 @@ import type { ColumnSettings, SimplifiedColumnType } from '@/api/asset_interface
 import { ChartType } from '@/api/asset_interfaces/metric/charts';
 import type { ChartEncodes } from '@/api/asset_interfaces/metric/charts';
 import { renderHook } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { useXAxis } from './useXAxis';
 
 describe('useXAxis', () => {

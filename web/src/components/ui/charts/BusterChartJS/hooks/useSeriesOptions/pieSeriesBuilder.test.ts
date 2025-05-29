@@ -1,7 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
-import { pieSeriesBuilder_data, pieSeriesBuilder_labels } from './pieSeriesBuilder';
-import { formatLabelForDataset, JOIN_CHARACTER } from '../../../commonHelpers';
 import { formatLabel } from '@/lib';
+import { describe, expect, it, vi } from 'vitest';
+import { JOIN_CHARACTER, formatLabelForDataset } from '../../../commonHelpers';
+import { pieSeriesBuilder_data, pieSeriesBuilder_labels } from './pieSeriesBuilder';
 
 // Mock dependencies
 vi.mock('../../../commonHelpers', () => ({

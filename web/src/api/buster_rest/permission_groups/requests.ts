@@ -1,5 +1,4 @@
 import { serverFetch } from '@/api/createServerInstance';
-import { mainApi } from '../instances';
 import type {
   CreatePermissionGroupResponse,
   GetPermissionGroupDatasetGroupsResponse,
@@ -8,6 +7,7 @@ import type {
   GetPermissionGroupUsersResponse,
   ListPermissionGroupsResponse
 } from '../../asset_interfaces';
+import { mainApi } from '../instances';
 
 export const listAllPermissionGroups = async (): Promise<ListPermissionGroupsResponse[]> => {
   return await mainApi

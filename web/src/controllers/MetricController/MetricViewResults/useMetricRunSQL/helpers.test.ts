@@ -1,8 +1,7 @@
-import { describe, it, expect } from 'vitest';
-import { didColumnDataChange, simplifyChatConfigForSQLChange } from './helpers';
+import { describe, expect, it } from 'vitest';
 import type {
-  IBusterMetric,
   ColumnMetaData,
+  IBusterMetric,
   IBusterMetricChartConfig
 } from '../../../../api/asset_interfaces';
 import {
@@ -10,6 +9,7 @@ import {
   DEFAULT_COLUMN_LABEL_FORMAT
 } from '../../../../api/asset_interfaces';
 import type { IColumnLabelFormat } from '../../../../api/asset_interfaces/metric/charts';
+import { didColumnDataChange, simplifyChatConfigForSQLChange } from './helpers';
 
 const createColumnMetaData = (
   name: string,

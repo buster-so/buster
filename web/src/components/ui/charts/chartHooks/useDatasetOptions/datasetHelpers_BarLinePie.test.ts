@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest';
-import { sortLineBarData } from './datasetHelpers_BarLinePie';
-import { type BusterChartProps } from '@/api/asset_interfaces/metric/charts';
 import { type ColumnMetaData } from '@/api/asset_interfaces/metric';
+import { type BusterChartProps } from '@/api/asset_interfaces/metric/charts';
+import { describe, expect, it } from 'vitest';
+import { sortLineBarData } from './datasetHelpers_BarLinePie';
 
 describe('sortLineBarData', () => {
   it('returns original data when xFieldSorts is empty', () => {

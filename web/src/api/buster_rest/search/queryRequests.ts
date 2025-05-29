@@ -1,5 +1,5 @@
-import { useQuery, keepPreviousData, type UseQueryOptions } from '@tanstack/react-query';
 import { searchQueryKeys } from '@/api/query_keys/search';
+import { type UseQueryOptions, keepPreviousData, useQuery } from '@tanstack/react-query';
 import { search } from './requests';
 
 export const useSearch = (

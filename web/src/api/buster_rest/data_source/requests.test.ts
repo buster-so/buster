@@ -3,9 +3,9 @@ import {
   DataSourceSchema,
   DataSourceTypes
 } from '@/api/asset_interfaces/datasources';
-import { getDatasource } from './requests';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import mainApi from '../instances';
-import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { getDatasource } from './requests';
 
 // Mock dependencies
 vi.mock('../instances', () => ({

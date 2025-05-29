@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { formatChartLabel } from './formatChartLabel';
 import type { BusterChartProps, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import { describe, expect, it } from 'vitest';
+import { formatChartLabel } from './formatChartLabel';
 
 describe('formatChartLabel', () => {
   const columnLabelFormats = {

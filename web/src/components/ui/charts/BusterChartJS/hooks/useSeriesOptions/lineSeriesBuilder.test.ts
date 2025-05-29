@@ -1,22 +1,22 @@
-import { describe, it, expect, vi } from 'vitest';
-import { lineBuilder, lineSeriesBuilder_labels } from './lineSeriesBuilder';
+import type {
+  BusterChartProps,
+  ChartEncodes,
+  ColumnSettings,
+  IColumnLabelFormat,
+  ScatterAxis
+} from '@/api/asset_interfaces/metric';
 import {
   DEFAULT_COLUMN_LABEL_FORMAT,
   DEFAULT_COLUMN_SETTINGS
 } from '@/api/asset_interfaces/metric/defaults';
-import type { DatasetOption, DatasetOptionsWithTicks, KV } from '../../../chartHooks';
-import { formatLabelForDataset, JOIN_CHARACTER } from '../../../commonHelpers';
 import { addOpacityToColor, createDayjsDate, formatLabel } from '@/lib';
-import { formatBarAndLineDataLabel } from '../../helpers';
-import type {
-  BusterChartProps,
-  ChartEncodes,
-  ScatterAxis,
-  IColumnLabelFormat,
-  ColumnSettings
-} from '@/api/asset_interfaces/metric';
-import type { ScriptableContext, LineControllerDatasetOptions, ChartDataset } from 'chart.js';
+import type { ChartDataset, LineControllerDatasetOptions, ScriptableContext } from 'chart.js';
+import { describe, expect, it, vi } from 'vitest';
+import type { DatasetOption, DatasetOptionsWithTicks, KV } from '../../../chartHooks';
+import { JOIN_CHARACTER, formatLabelForDataset } from '../../../commonHelpers';
 import type { ChartProps } from '../../core';
+import { formatBarAndLineDataLabel } from '../../helpers';
+import { lineBuilder, lineSeriesBuilder_labels } from './lineSeriesBuilder';
 
 // Use NonNullable utility type for potentially nullable map types
 type ColumnLabelFormatMap = NonNullable<BusterChartProps['columnLabelFormats']>;

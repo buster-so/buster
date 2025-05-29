@@ -1,4 +1,3 @@
-import { mainApi } from '../../instances';
 import type {
   DatasetPermissionsOverviewResponse,
   ListDatasetGroupsResponse,
@@ -6,6 +5,7 @@ import type {
   ListPermissionUsersResponse
 } from '../../../asset_interfaces';
 import { serverFetch } from '../../../createServerInstance';
+import { mainApi } from '../../instances';
 
 export const listIndividualDatasetPermissionGroups = async (params: {
   dataset_id: string;

@@ -1,7 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
-import { assetParamsToRoute } from './assetParamsToRoute';
-import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
 import { FileType } from '@/api/asset_interfaces/chat';
+import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
+import { describe, expect, it, vi } from 'vitest';
+import { assetParamsToRoute } from './assetParamsToRoute';
 
 describe('assetParamsToRoute', () => {
   const mockChatId = 'chat123';

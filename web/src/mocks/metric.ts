@@ -1,10 +1,10 @@
 import {
+  type BusterMetricListItem,
   ChartType,
-  type DataMetadata,
   DEFAULT_CHART_CONFIG,
-  type IBusterMetricChartConfig,
+  type DataMetadata,
   type IBusterMetric,
-  type BusterMetricListItem
+  type IBusterMetricChartConfig
 } from '@/api/asset_interfaces/metric';
 import { ShareRole, VerificationStatus } from '@/api/asset_interfaces/share';
 

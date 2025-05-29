@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
 import { Chart } from 'chart.js';
+import { describe, expect, it, vi } from 'vitest';
 import { ChartHoverBarPlugin } from './chartjs-plugin-hover-bar';
 
 describe('ChartHoverBarPlugin', () => {

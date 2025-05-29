@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { renderHook } from '@testing-library/react';
-import { useXAxisTitle } from './useXAxisTitle';
-import { formatLabel } from '@/lib/columnFormatter';
-import { truncateWithEllipsis } from '../../../../commonHelpers/titleHelpers';
-import type { ChartEncodes, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import type { SimplifiedColumnType } from '@/api/asset_interfaces/metric';
+import type { ChartEncodes, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import { formatLabel } from '@/lib/columnFormatter';
+import { renderHook } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { truncateWithEllipsis } from '../../../../commonHelpers/titleHelpers';
+import { useXAxisTitle } from './useXAxisTitle';
 
 // Mock the dependencies
 vi.mock('@/lib/columnFormatter', () => ({

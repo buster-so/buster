@@ -1,13 +1,13 @@
-import { BASE_URL } from '@/api/buster_rest/config';
-import type {
-  OrganizationUser,
-  BusterUserResponse,
-  BusterUserFavorite,
-  BusterUserListItem
-} from '@/api/asset_interfaces/users';
-import { mainApi } from '../instances';
-import { serverFetch } from '../../createServerInstance';
 import type { ShareAssetType } from '@/api/asset_interfaces/share';
+import type {
+  BusterUserFavorite,
+  BusterUserListItem,
+  BusterUserResponse,
+  OrganizationUser
+} from '@/api/asset_interfaces/users';
+import { BASE_URL } from '@/api/buster_rest/config';
+import { serverFetch } from '../../createServerInstance';
+import { mainApi } from '../instances';
 
 export const getMyUserInfo = async (): Promise<BusterUserResponse> => {
   return mainApi.get<BusterUserResponse>('/users').then((response) => response.data);

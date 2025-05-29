@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
 import { BusterRoutes } from '@/routes/busterRoutes';
+import { describe, expect, it } from 'vitest';
 import { getFileViewFromRoute } from './getFileViewFromRoute';
 
 describe('getFileViewFromRoute', () => {

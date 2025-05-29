@@ -1,7 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
 import type { ColumnLabelFormat, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import type { BusterChartProps } from '@/api/asset_interfaces/metric/charts';
 import { formatLabel } from '@/lib';
+import { describe, expect, it, vi } from 'vitest';
 import type { DatasetOption } from '../chartHooks';
 import { JOIN_CHARACTER, formatLabelForDataset, formatLabelForPieLegend } from './labelHelpers';
 

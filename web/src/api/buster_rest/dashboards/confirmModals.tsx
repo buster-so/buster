@@ -1,7 +1,7 @@
 import { MAX_NUMBER_OF_ITEMS_ON_DASHBOARD } from '@/api/asset_interfaces/dashboard/config';
+import { cn } from '@/lib/classMerge';
 import { Text } from '../../../components/ui/typography/Text';
 import { Title } from '../../../components/ui/typography/Title';
-import { cn } from '@/lib/classMerge';
 
 export const createDashboardFullConfirmModal = ({
   availableSlots,

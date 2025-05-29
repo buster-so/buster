@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { renderHook } from '@testing-library/react';
-import { useGetAsset } from './useGetAsset';
-import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
-import { useGetDashboard } from '@/api/buster_rest/dashboards';
 import { useGetCollection } from '@/api/buster_rest/collections';
+import { useGetDashboard } from '@/api/buster_rest/dashboards';
+import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
+import { renderHook } from '@testing-library/react';
 import { useSearchParams } from 'next/navigation';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { useGetAsset } from './useGetAsset';
 
 // Mock the dependencies
 vi.mock('@/api/buster_rest/metrics', () => ({

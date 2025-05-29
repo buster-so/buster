@@ -10,7 +10,7 @@ import type {
   DefaultDataPoint,
   Point
 } from 'chart.js';
-import { useEffect, useRef, forwardRef } from 'react';
+import { forwardRef, useEffect, useRef } from 'react';
 import type { BaseChartComponent, ChartProps, ForwardedRef } from './types';
 import { cloneData, reforwardRef, setDatasets, setLabels, setOptions } from './utils';
 

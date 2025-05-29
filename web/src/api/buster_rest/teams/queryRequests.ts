@@ -1,5 +1,5 @@
-import { createTeam, getTeamsList } from './requests';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { createTeam, getTeamsList } from './requests';
 
 export const useCreateTeam = () => {
   return useMutation({

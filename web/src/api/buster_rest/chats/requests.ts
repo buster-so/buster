@@ -1,6 +1,6 @@
-import { mainApi } from '../instances';
+import type { BusterChat, BusterChatListItem } from '@/api/asset_interfaces/chat/chatInterfaces';
 import { serverFetch } from '../../createServerInstance';
-import type { BusterChatListItem, BusterChat } from '@/api/asset_interfaces/chat/chatInterfaces';
+import { mainApi } from '../instances';
 
 const CHATS_BASE = '/chats';
 

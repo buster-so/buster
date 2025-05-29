@@ -1,10 +1,10 @@
-import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
-import { rustErrorHandler } from './buster_rest/errors';
-import type { AxiosRequestHeaders } from 'axios';
-import { isServer } from '@tanstack/react-query';
-import { getSupabaseTokenFromCookies } from './createServerInstance';
 import type { SupabaseContextReturnType } from '@/context/Supabase/SupabaseContextProvider';
 import { BusterRoutes, createBusterRoute } from '@/routes';
+import { isServer } from '@tanstack/react-query';
+import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
+import type { AxiosRequestHeaders } from 'axios';
+import { rustErrorHandler } from './buster_rest/errors';
+import { getSupabaseTokenFromCookies } from './createServerInstance';
 
 const AXIOS_TIMEOUT = 120000; // 2 minutes
 

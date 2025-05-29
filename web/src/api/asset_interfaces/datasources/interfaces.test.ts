@@ -1,17 +1,17 @@
+import { describe, expect, it } from 'vitest';
+import type { z } from 'zod/v4-mini';
 import {
+  BigQueryCredentialsSchema,
   DataSourceSchema,
   DataSourceTypes,
-  PostgresCredentialsSchema,
-  MySQLCredentialsSchema,
-  BigQueryCredentialsSchema,
-  RedshiftCredentialsSchema,
-  SnowflakeCredentialsSchema,
   DatabricksCredentialsSchema,
+  MySQLCredentialsSchema,
+  PostgresCredentialsSchema,
+  RedshiftCredentialsSchema,
   SQLServerCredentialsSchema,
-  type SnowflakeCredentials
+  type SnowflakeCredentials,
+  SnowflakeCredentialsSchema
 } from './interfaces';
-import type { z } from 'zod/v4-mini';
-import { describe, it, expect } from 'vitest';
 
 // Helper function to test validation
 const testValidation = (

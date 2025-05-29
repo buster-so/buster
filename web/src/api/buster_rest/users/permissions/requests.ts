@@ -1,5 +1,3 @@
-import { mainApi } from '../../instances';
-import { serverFetch } from '../../../createServerInstance';
 import type {
   BusterUserAttribute,
   BusterUserDataset,
@@ -8,6 +6,8 @@ import type {
   BusterUserTeamListItem,
   TeamRole
 } from '@/api/asset_interfaces/users';
+import { serverFetch } from '../../../createServerInstance';
+import { mainApi } from '../../instances';
 
 export const getUserDatasetGroups = async ({ userId }: { userId: string }) => {
   return mainApi

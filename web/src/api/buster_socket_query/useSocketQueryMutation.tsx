@@ -1,12 +1,5 @@
 'use client';
 
-import {
-  type MutationFunction,
-  type QueryKey,
-  type UseQueryOptions,
-  useMutation,
-  useQueryClient
-} from '@tanstack/react-query';
 import type {
   BusterSocketRequest,
   BusterSocketResponse,
@@ -14,12 +7,19 @@ import type {
 } from '@/api/buster_socket';
 import { useBusterWebSocket } from '@/context/BusterWebSocket';
 import { useMemoizedFn } from '@/hooks';
+import {
+  type MutationFunction,
+  type QueryKey,
+  type UseQueryOptions,
+  useMutation,
+  useQueryClient
+} from '@tanstack/react-query';
+import isEmpty from 'lodash/isEmpty';
 import type {
   BusterSocketRequestRoute,
   InferBusterSocketRequestPayload,
   InferBusterSocketResponseData
 } from './types';
-import isEmpty from 'lodash/isEmpty';
 
 /**
  * A custom hook that combines WebSocket communication with React Query's mutation capabilities.

@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
 import { type ColumnMetaData, type IColumnLabelFormat } from '@/api/asset_interfaces/metric';
+import { describe, expect, it } from 'vitest';
 import { createDefaultColumnLabelFormats } from './createDefaultColumnFormats';
 
 describe('createDefaultColumnFormats', () => {

@@ -1,11 +1,11 @@
-import { useMemo } from 'react';
-import { listMetrics } from './requests';
-import { type QueryClient, useQuery, type UseQueryOptions } from '@tanstack/react-query';
-import { useMemoizedFn } from '@/hooks';
 import { metricsQueryKeys } from '@/api/query_keys/metric';
-import type { RustApiError } from '../errors';
-import { hasOrganizationId, isQueryStale } from '@/lib';
 import { useUserConfigContextSelector } from '@/context/Users';
+import { useMemoizedFn } from '@/hooks';
+import { hasOrganizationId, isQueryStale } from '@/lib';
+import { type QueryClient, type UseQueryOptions, useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
+import type { RustApiError } from '../errors';
+import { listMetrics } from './requests';
 
 export const useGetMetricsList = (
   params: Omit<Parameters<typeof listMetrics>[0], 'page_token' | 'page_size'>,

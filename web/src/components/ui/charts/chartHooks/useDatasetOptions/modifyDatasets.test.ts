@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
 import { ChartType } from '@/api/asset_interfaces/metric';
+import { describe, expect, it } from 'vitest';
 import type { DatasetOption, DatasetOptionsWithTicks } from './interfaces';
 import { modifyDatasets } from './modifyDatasets';
 

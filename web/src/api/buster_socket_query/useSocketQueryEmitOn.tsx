@@ -1,10 +1,10 @@
-import type { BusterSocketResponseRoute, BusterSocketRequest } from '@/api/buster_socket';
-import type { QueryKey, UseQueryOptions } from '@tanstack/react-query';
-import type { InferBusterSocketResponseData } from './types';
+import type { BusterSocketRequest, BusterSocketResponseRoute } from '@/api/buster_socket';
 import { useBusterWebSocket } from '@/context/BusterWebSocket';
-import { useMemo } from 'react';
-import { useSocketQueryOn } from './useSocketQueryOn';
 import { useMemoizedFn } from '@/hooks';
+import type { QueryKey, UseQueryOptions } from '@tanstack/react-query';
+import { useMemo } from 'react';
+import type { InferBusterSocketResponseData } from './types';
+import { useSocketQueryOn } from './useSocketQueryOn';
 
 export const useSocketQueryEmitOn = <
   TRoute extends BusterSocketResponseRoute,

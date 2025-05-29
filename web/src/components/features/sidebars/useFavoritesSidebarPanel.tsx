@@ -1,15 +1,15 @@
+import { ShareAssetType } from '@/api/asset_interfaces/share';
 import type { BusterUserFavorite } from '@/api/asset_interfaces/users';
-import type { ISidebarGroup } from '@/components/ui/sidebar';
-import { assetTypeToIcon, assetTypeToRoute } from '../config/assetIcons';
-import { useMemoizedFn } from '@/hooks';
 import {
   useDeleteUserFavorite,
   useGetUserFavorites,
   useUpdateUserFavorites
 } from '@/api/buster_rest/users';
-import { useMemo } from 'react';
+import type { ISidebarGroup } from '@/components/ui/sidebar';
+import { useMemoizedFn } from '@/hooks';
 import { useParams } from 'next/navigation';
-import { ShareAssetType } from '@/api/asset_interfaces/share';
+import { useMemo } from 'react';
+import { assetTypeToIcon, assetTypeToRoute } from '../config/assetIcons';
 
 export const useFavoriteSidebarPanel = () => {
   const { data: favorites } = useGetUserFavorites();

@@ -1,16 +1,16 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import type { IBusterChat } from '@/api/asset_interfaces/chat/iChatInterfaces';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import * as requests from './requests';
+import { act, renderHook, waitFor } from '@testing-library/react';
+import React from 'react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  useGetListChats,
-  useUpdateChat,
   useDeleteChat,
+  useGetListChats,
   useStartChatFromAsset,
+  useUpdateChat,
   useUpdateChatMessageFeedback
 } from './queryRequests';
-import type { IBusterChat } from '@/api/asset_interfaces/chat/iChatInterfaces';
-import React from 'react';
+import * as requests from './requests';
 
 // Mock the hooks and requests
 vi.mock('@/hooks', () => ({

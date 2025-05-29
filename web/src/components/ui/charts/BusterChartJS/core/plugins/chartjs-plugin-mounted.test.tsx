@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { Chart, ChartType, ChartData } from 'chart.js';
+import { Chart, ChartData, ChartType } from 'chart.js';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ChartMountedPlugin, ChartMountedPluginOptions } from './chartjs-plugin-mounted';
 
 // Mock Chart.js

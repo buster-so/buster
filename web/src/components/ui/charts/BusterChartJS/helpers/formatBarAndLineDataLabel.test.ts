@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest';
-import { formatBarAndLineDataLabel } from './formatBarAndLineDataLabel';
 import { ColumnLabelFormat } from '@/api/asset_interfaces/metric';
 import type { Context } from 'chartjs-plugin-datalabels';
+import { describe, expect, it } from 'vitest';
+import { formatBarAndLineDataLabel } from './formatBarAndLineDataLabel';
 
 describe('formatBarAndLineDataLabel', () => {
   it('formats a single value without percentage', () => {

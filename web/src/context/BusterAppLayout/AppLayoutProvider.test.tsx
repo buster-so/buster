@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { renderHook } from '@testing-library/react';
-import { useAppLayout } from './AppLayoutProvider';
-import { useRouter, usePathname, useParams } from 'next/navigation';
+import { DashboardSecondaryRecord } from '@/layouts/ChatLayout/FileContainer/FileContainerSecondary/secondaryPanelsConfig/dashboardPanels';
 import { BusterRoutesWithArgsRoute } from '@/routes/busterRoutes';
 import { BusterAppRoutes } from '@/routes/busterRoutes/busterAppRoutes';
-import { DashboardSecondaryRecord } from '@/layouts/ChatLayout/FileContainer/FileContainerSecondary/secondaryPanelsConfig/dashboardPanels';
+import { renderHook } from '@testing-library/react';
+import { useParams, usePathname, useRouter } from 'next/navigation';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { useAppLayout } from './AppLayoutProvider';
 
 // Mock next/navigation
 vi.mock('next/navigation', () => ({

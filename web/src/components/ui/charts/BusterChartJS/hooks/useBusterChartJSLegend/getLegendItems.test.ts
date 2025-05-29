@@ -1,9 +1,9 @@
-import { describe, it, expect } from 'vitest';
 import { ChartType } from '@/api/asset_interfaces/metric/charts';
 import type { ColumnSettings } from '@/api/asset_interfaces/metric/charts/columnInterfaces';
 import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
 import type { SimplifiedColumnType } from '@/api/asset_interfaces/metric/interfaces';
 import type { Chart } from 'chart.js';
+import { describe, expect, it } from 'vitest';
 import { getLegendItems } from './getLegendItems';
 
 describe('getLegendItems', () => {

@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
 import { NextRequest } from 'next/server';
+import { describe, expect, it, vi } from 'vitest';
 import { getEmbedAssetRedirect } from './assetPageChecks';
 import { BusterRoutes } from './busterRoutes';
 

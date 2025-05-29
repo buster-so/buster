@@ -1,9 +1,9 @@
 'use server';
 
-import { BASE_URL } from './buster_rest/config';
-import type { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { createClient } from '@/lib/supabase/server';
+import type { RequestInit } from 'next/dist/server/web/spec-extension/request';
 import { cookies } from 'next/headers';
+import { BASE_URL } from './buster_rest/config';
 import type { RustApiError } from './buster_rest/errors';
 
 export interface FetchConfig extends RequestInit {

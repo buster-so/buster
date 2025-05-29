@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { validateMetricYaml } from './validateMetricYaml';
 import * as yaml from 'js-yaml';
+import { describe, expect, it } from 'vitest';
+import { validateMetricYaml } from './validateMetricYaml';
 
 // Create a minimal mock for monaco
 const mockMonaco = {

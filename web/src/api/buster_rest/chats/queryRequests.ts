@@ -1,37 +1,37 @@
-import { useMemoizedFn } from '@/hooks/useMemoizedFn';
-import {
-  QueryClient,
-  useQuery,
-  useMutation,
-  useQueryClient,
-  type UseQueryOptions
-} from '@tanstack/react-query';
-import {
-  getListChats,
-  getListChats_server,
-  getChat,
-  getChat_server,
-  updateChat,
-  deleteChat,
-  getListLogs,
-  duplicateChat,
-  startChatFromAsset,
-  updateChatMessageFeedback
-} from './requests';
 import type { IBusterChat, IBusterChatMessage } from '@/api/asset_interfaces/chat/iChatInterfaces';
 import { chatQueryKeys } from '@/api/query_keys/chat';
-import { updateChatToIChat } from '@/lib/chat';
-import { useMemo } from 'react';
-import last from 'lodash/last';
-import { prefetchGetMetricDataClient } from '../metrics/queryRequests';
+import { collectionQueryKeys } from '@/api/query_keys/collection';
 import { useBusterNotifications } from '@/context/BusterNotifications';
-import { useGetUserFavorites } from '../users/queryRequestFavorites';
+import { useMemoizedFn } from '@/hooks/useMemoizedFn';
+import { updateChatToIChat } from '@/lib/chat';
+import {
+  QueryClient,
+  type UseQueryOptions,
+  useMutation,
+  useQuery,
+  useQueryClient
+} from '@tanstack/react-query';
+import last from 'lodash/last';
+import { useMemo } from 'react';
 import {
   useAddAssetToCollection,
   useRemoveAssetFromCollection
 } from '../collections/queryRequests';
-import { collectionQueryKeys } from '@/api/query_keys/collection';
 import type { RustApiError } from '../errors';
+import { prefetchGetMetricDataClient } from '../metrics/queryRequests';
+import { useGetUserFavorites } from '../users/queryRequestFavorites';
+import {
+  deleteChat,
+  duplicateChat,
+  getChat,
+  getChat_server,
+  getListChats,
+  getListChats_server,
+  getListLogs,
+  startChatFromAsset,
+  updateChat,
+  updateChatMessageFeedback
+} from './requests';
 
 export const useGetListChats = (
   filters?: Omit<Parameters<typeof getListChats>[0], 'page_token' | 'page_size'>

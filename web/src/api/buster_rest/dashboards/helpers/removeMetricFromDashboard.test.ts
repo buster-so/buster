@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { removeMetricFromDashboardConfig } from './removeMetricFromDashboard';
 import type { BusterDashboard } from '@/api/asset_interfaces/dashboard';
+import { describe, expect, it } from 'vitest';
+import { removeMetricFromDashboardConfig } from './removeMetricFromDashboard';
 
 describe('removeMetricFromDashboardConfig', () => {
   const createEmptyConfig = (): BusterDashboard['config'] => ({

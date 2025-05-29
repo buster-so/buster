@@ -1,12 +1,12 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
-import { useSelectedFile } from './useSelectedFile';
-import { createSelectedFile } from './createSelectedFile';
-import type { SelectedFile } from '../../interfaces';
-import type { AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
 import type { FileType } from '@/api/asset_interfaces/chat';
+import type { AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
 import { BusterRoutes } from '@/routes';
+import { act, renderHook } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { SelectedFile } from '../../interfaces';
 import type { FileViewSecondary } from '../useLayoutConfig';
+import { createSelectedFile } from './createSelectedFile';
+import { useSelectedFile } from './useSelectedFile';
 
 // Mock dependencies
 vi.mock('./createSelectedFile');

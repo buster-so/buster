@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { QueryClient } from '@tanstack/react-query';
-import { prefetchGetMetricDataClient } from './getMetricQueryRequests';
 import { metricsQueryKeys } from '@/api/query_keys/metric';
+import { QueryClient } from '@tanstack/react-query';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { prefetchGetMetricDataClient } from './getMetricQueryRequests';
 import { getMetricData } from './requests';
 
 // Mock the requests module

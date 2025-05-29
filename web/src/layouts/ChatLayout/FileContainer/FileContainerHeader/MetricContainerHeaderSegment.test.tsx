@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import React from 'react';
-import { render, screen } from '@testing-library/react';
-import { MetricContainerHeaderSegment } from './MetricContainerHeaderSegment';
-import { useIsMetricReadOnly } from '@/context/Metrics/useIsMetricReadOnly';
-import { useChatLayoutContextSelector } from '../../ChatLayoutContext';
 import { useGetMetric } from '@/api/buster_rest/metrics';
+import { useIsMetricReadOnly } from '@/context/Metrics/useIsMetricReadOnly';
+import { render, screen } from '@testing-library/react';
+import React from 'react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { useChatLayoutContextSelector } from '../../ChatLayoutContext';
+import { MetricContainerHeaderSegment } from './MetricContainerHeaderSegment';
 
 // Mock the hooks
 vi.mock('@/context/Metrics/useIsMetricReadOnly');

@@ -3,21 +3,21 @@ import type {
   IBusterMetric,
   IBusterMetricData
 } from '@/api/asset_interfaces/metric';
+import { metricsQueryKeys } from '@/api/query_keys/metric';
+import { useBusterAssetsContextSelector } from '@/context/Assets/BusterAssetsProvider';
+import { useOriginalMetricStore } from '@/context/Metrics/useOriginalMetricStore';
+import { useMemoizedFn } from '@/hooks';
+import { upgradeMetricToIMetric } from '@/lib/metrics';
 import {
   type QueryClient,
+  type UseQueryOptions,
   useQuery,
-  useQueryClient,
-  type UseQueryOptions
+  useQueryClient
 } from '@tanstack/react-query';
-import type { RustApiError } from '../errors';
-import { useOriginalMetricStore } from '@/context/Metrics/useOriginalMetricStore';
-import { useBusterAssetsContextSelector } from '@/context/Assets/BusterAssetsProvider';
-import { useGetMetricVersionNumber, useMetricQueryStore } from './metricQueryStore';
-import { metricsQueryKeys } from '@/api/query_keys/metric';
-import { useMemoizedFn } from '@/hooks';
-import { getMetric, getMetricData } from './requests';
-import { upgradeMetricToIMetric } from '@/lib/metrics';
 import last from 'lodash/last';
+import type { RustApiError } from '../errors';
+import { useGetMetricVersionNumber, useMetricQueryStore } from './metricQueryStore';
+import { getMetric, getMetricData } from './requests';
 
 export const useGetMetric = <TData = IBusterMetric>(
   {

@@ -1,18 +1,18 @@
+import { queryKeys } from '@/api/query_keys';
+import { useMemoizedFn } from '@/hooks';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { QueryClient, useQueryClient } from '@tanstack/react-query';
+import { useCreateOrganization } from '../organizations';
 import {
-  getUser,
-  getUser_server,
-  updateOrganizationUser,
   getMyUserInfo,
   getMyUserInfo_server,
-  inviteUser,
+  getUser,
   getUserList,
-  getUserList_server
+  getUserList_server,
+  getUser_server,
+  inviteUser,
+  updateOrganizationUser
 } from './requests';
-import { useMemoizedFn } from '@/hooks';
-import { QueryClient, useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/api/query_keys';
-import { useCreateOrganization } from '../organizations';
 
 export const useGetMyUserInfo = () => {
   return useQuery({

@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { createChatRecord } from './createChatRecord';
 import dayjs from 'dayjs';
+import { describe, expect, it } from 'vitest';
+import { createChatRecord } from './createChatRecord';
 
 describe('createChatRecord', () => {
   // Create test dates based on current time

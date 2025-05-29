@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { formatYAxisLabel, yAxisSimilar } from './axisHelper';
-import { formatLabel } from '@/lib/columnFormatter';
 import type { SimplifiedColumnType } from '@/api/asset_interfaces/metric';
+import { formatLabel } from '@/lib/columnFormatter';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { formatYAxisLabel, yAxisSimilar } from './axisHelper';
 
 // Mock dependencies
 vi.mock('@/lib/columnFormatter', () => ({

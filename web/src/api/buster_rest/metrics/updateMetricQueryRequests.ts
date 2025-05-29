@@ -1,5 +1,13 @@
+import type { IBusterMetric } from '@/api/asset_interfaces/metric';
+import { collectionQueryKeys } from '@/api/query_keys/collection';
+import { metricsQueryKeys } from '@/api/query_keys/metric';
 import { useOriginalMetricStore } from '@/context/Metrics/useOriginalMetricStore';
+import { useMemoizedFn } from '@/hooks';
+import { prepareMetricUpdateMetric, upgradeMetricToIMetric } from '@/lib/metrics';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { create } from 'mutative';
+import { useAddAssetToCollection, useRemoveAssetFromCollection } from '../collections';
+import { useGetUserFavorites } from '../users';
 import {
   useGetLatestMetricVersionMemoized,
   useGetMetricVersionNumber,
@@ -14,14 +22,6 @@ import {
   updateMetric,
   updateMetricShare
 } from './requests';
-import { metricsQueryKeys } from '@/api/query_keys/metric';
-import { useGetUserFavorites } from '../users';
-import { useMemoizedFn } from '@/hooks';
-import { useAddAssetToCollection, useRemoveAssetFromCollection } from '../collections';
-import { collectionQueryKeys } from '@/api/query_keys/collection';
-import type { IBusterMetric } from '@/api/asset_interfaces/metric';
-import { create } from 'mutative';
-import { prepareMetricUpdateMetric, upgradeMetricToIMetric } from '@/lib/metrics';
 
 /**
  * This is a mutation that saves a metric to the server.

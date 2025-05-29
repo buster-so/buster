@@ -1,12 +1,12 @@
 import {
   BusterRoutes,
   createBusterRoute,
-  isShareableAssetPage,
+  getEmbedAssetRedirect,
   isPublicPage,
-  getEmbedAssetRedirect
+  isShareableAssetPage
 } from '@/routes/busterRoutes';
 import type { User } from '@supabase/supabase-js';
-import { NextResponse, type NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export const assetReroutes = async (
   request: NextRequest,

@@ -7,13 +7,13 @@ import { useOriginalDashboardStore } from '@/context/Dashboards';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { upgradeMetricToIMetric } from '@/lib/metrics/upgradeToIMetric';
 import { useQueryClient } from '@tanstack/react-query';
+import last from 'lodash/last';
 import { prefetchGetMetricDataClient } from '../metrics/queryRequests';
-import { dashboardsGetDashboard } from './requests';
 import {
   useDashboardQueryStore,
   useGetLatestDashboardVersionMemoized
 } from './dashboardQueryStore';
-import last from 'lodash/last';
+import { dashboardsGetDashboard } from './requests';
 
 export const useEnsureDashboardConfig = (prefetchData = true) => {
   const queryClient = useQueryClient();

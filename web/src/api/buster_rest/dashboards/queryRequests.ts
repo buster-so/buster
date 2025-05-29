@@ -1,49 +1,49 @@
 import {
-  type QueryClient,
-  useMutation,
-  useQuery,
-  useQueryClient,
-  type UseQueryOptions
-} from '@tanstack/react-query';
-import {
-  dashboardsGetList,
-  dashboardsCreateDashboard,
-  dashboardsUpdateDashboard,
-  dashboardsDeleteDashboard,
-  shareDashboard,
-  updateDashboardShare,
-  unshareDashboard
-} from './requests';
-import { dashboardQueryKeys } from '@/api/query_keys/dashboard';
-import {
   type BusterDashboard,
   type BusterDashboardResponse,
   MAX_NUMBER_OF_ITEMS_ON_DASHBOARD
 } from '@/api/asset_interfaces/dashboard';
-import { useMemo } from 'react';
-import { useMemoizedFn } from '@/hooks';
+import { collectionQueryKeys } from '@/api/query_keys/collection';
+import { dashboardQueryKeys } from '@/api/query_keys/dashboard';
+import { metricsQueryKeys } from '@/api/query_keys/metric';
+import { useBusterAssetsContextSelector } from '@/context/Assets/BusterAssetsProvider';
 import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useOriginalDashboardStore } from '@/context/Dashboards';
+import { useMemoizedFn } from '@/hooks';
+import { hasOrganizationId, isQueryStale } from '@/lib';
+import {
+  type QueryClient,
+  type UseQueryOptions,
+  useMutation,
+  useQuery,
+  useQueryClient
+} from '@tanstack/react-query';
+import last from 'lodash/last';
 import { create } from 'mutative';
+import { useMemo } from 'react';
 import {
   useAddAssetToCollection,
   useRemoveAssetFromCollection
 } from '../collections/queryRequests';
-import { collectionQueryKeys } from '@/api/query_keys/collection';
-import { addMetricToDashboardConfig, removeMetricFromDashboardConfig } from './helpers';
-import { addAndRemoveMetricsToDashboard } from './helpers/addAndRemoveMetricsToDashboard';
 import type { RustApiError } from '../errors';
-import { useOriginalDashboardStore } from '@/context/Dashboards';
-import { metricsQueryKeys } from '@/api/query_keys/metric';
+import { useGetLatestMetricVersionMemoized } from '../metrics';
+import { createDashboardFullConfirmModal } from './confirmModals';
 import {
-  useGetDashboardAndInitializeMetrics,
-  useEnsureDashboardConfig
+  useEnsureDashboardConfig,
+  useGetDashboardAndInitializeMetrics
 } from './dashboardQueryHelpers';
 import { useDashboardQueryStore, useGetDashboardVersionNumber } from './dashboardQueryStore';
-import { useGetLatestMetricVersionMemoized } from '../metrics';
-import { useBusterAssetsContextSelector } from '@/context/Assets/BusterAssetsProvider';
-import last from 'lodash/last';
-import { createDashboardFullConfirmModal } from './confirmModals';
-import { hasOrganizationId, isQueryStale } from '@/lib';
+import { addMetricToDashboardConfig, removeMetricFromDashboardConfig } from './helpers';
+import { addAndRemoveMetricsToDashboard } from './helpers/addAndRemoveMetricsToDashboard';
+import {
+  dashboardsCreateDashboard,
+  dashboardsDeleteDashboard,
+  dashboardsGetList,
+  dashboardsUpdateDashboard,
+  shareDashboard,
+  unshareDashboard,
+  updateDashboardShare
+} from './requests';
 
 export const useGetDashboard = <TData = BusterDashboardResponse>(
   {

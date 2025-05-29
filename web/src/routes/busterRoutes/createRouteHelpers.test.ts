@@ -1,14 +1,14 @@
-import { describe, it, expect } from 'vitest';
+import type { DashboardFileViewSecondary, MetricFileViewSecondary } from '@/layouts/ChatLayout';
+import { describe, expect, it } from 'vitest';
+import { BusterAppRoutes } from './busterAppRoutes';
+import { BusterAuthRoutes } from './busterAuthRoutes';
+import { BusterRoutes } from './busterRoutes';
+import { BusterSettingsRoutes } from './busterSettingsRoutes';
 import {
   createBusterRoute,
   createPathnameToBusterRoute,
   extractPathParamsFromRoute
 } from './createRouteHelpers';
-import { BusterAuthRoutes } from './busterAuthRoutes';
-import { BusterAppRoutes } from './busterAppRoutes';
-import { BusterSettingsRoutes } from './busterSettingsRoutes';
-import { BusterRoutes } from './busterRoutes';
-import type { DashboardFileViewSecondary, MetricFileViewSecondary } from '@/layouts/ChatLayout';
 
 describe('createBusterRoute', () => {
   it('should return route as is when no parameters are provided', () => {

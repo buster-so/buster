@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest';
-import { updateChatToIChat } from './chat';
-import { MOCK_CHAT } from '@/mocks/MOCK_CHAT';
 import type { BusterChat } from '@/api/asset_interfaces/chat';
+import { MOCK_CHAT } from '@/mocks/MOCK_CHAT';
+import { describe, expect, it } from 'vitest';
+import { updateChatToIChat } from './chat';
 
 describe('updateChatToIChat', () => {
   it('should correctly upgrade a chat with no messages', () => {

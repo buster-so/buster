@@ -1,3 +1,4 @@
+import type { ShareAssetType } from '@/api/asset_interfaces';
 import type { BusterCollection, BusterCollectionListItem } from '@/api/asset_interfaces/collection';
 import type {
   ShareDeleteRequest,
@@ -5,7 +6,6 @@ import type {
   ShareUpdateRequest
 } from '@/api/asset_interfaces/shared_interfaces';
 import mainApi from '@/api/buster_rest/instances';
-import type { ShareAssetType } from '@/api/asset_interfaces';
 
 export const collectionsGetList = async (params: {
   /** Current page number (1-based indexing) */
