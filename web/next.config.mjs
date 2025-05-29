@@ -56,6 +56,10 @@ const createCspHeader = (isEmbed = false) => {
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
+  // Disable ESLint during builds since we're using Biome
+  eslint: {
+    ignoreDuringBuilds: true
+  },
   sassOptions: {
     includePaths: [path.join(__dirname, 'styles')],
     silenceDeprecations: ['legacy-js-api']
