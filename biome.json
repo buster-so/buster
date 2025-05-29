@@ -133,6 +133,16 @@
           }
         }
       }
+    },
+    {
+      "include": ["trigger/**/*.ts"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useImportType": "warn"
+          }
+        }
+      }
     }
   ]
 }

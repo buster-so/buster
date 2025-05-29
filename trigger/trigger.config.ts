@@ -18,5 +18,8 @@ export default defineConfig({
       randomize: true,
     },
   },
+  build: {
+    external: ['lz4', 'xxhash'],
+  },
   dirs: ['./src'],
 });

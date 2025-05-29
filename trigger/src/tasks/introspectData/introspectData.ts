@@ -1,8 +1,7 @@
 import { logger, task } from '@trigger.dev/sdk/v3';
-import { DataSource } from '../../../../packages/data-source/src/data-source';
-import type { DataSourceConfig } from '../../../../packages/data-source/src/data-source';
+import { DataSource } from '@buster/data-source';
+import type { DataSourceConfig } from '@buster/data-source';
 import type { IntrospectDataInput, IntrospectDataOutput } from './interfaces';
-
 /**
  * Task for introspecting data sources by connecting to them and analyzing their structure.
  *
