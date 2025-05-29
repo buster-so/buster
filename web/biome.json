@@ -18,7 +18,8 @@
       "**/public/**",
       "**/.vercel/**",
       "**/coverage/**",
-      "**/storybook-static/**"
+      "**/storybook-static/**",
+      "**/playwright-tests/auth-utils/auth.json"
     ]
   },
   "formatter": {

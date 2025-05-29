@@ -150,8 +150,6 @@
     "vitest": "^3.1.4"
   },
   "msw": {
-    "workerDirectory": [
-      "public"
-    ]
+    "workerDirectory": ["public"]
   }
 }
