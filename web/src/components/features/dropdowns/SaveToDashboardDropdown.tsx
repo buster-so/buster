@@ -34,21 +34,24 @@ export const SaveToDashboardDropdown: React.FC<{
     onOpenChangeProp?.(open);
   });
 
-  const dropdownProps = useSaveToDashboardDropdownContent({
+  const { ModalComponent, ...dropdownProps } = useSaveToDashboardDropdownContent({
     selectedDashboards,
     onSaveToDashboard,
     onRemoveFromDashboard
   });
 
   return (
-    <Dropdown
-      side={side}
-      align={align}
-      open={showDropdown}
-      onOpenChange={onOpenChange}
-      {...dropdownProps}>
-      {children}
-    </Dropdown>
+    <>
+      <Dropdown
+        side={side}
+        align={align}
+        open={showDropdown}
+        onOpenChange={onOpenChange}
+        {...dropdownProps}>
+        {children}
+      </Dropdown>
+      {ModalComponent}
+    </>
   );
 };
 
@@ -63,7 +66,9 @@ export const useSaveToDashboardDropdownContent = ({
 }): Pick<
   DropdownProps,
   'items' | 'footerContent' | 'menuHeader' | 'selectType' | 'emptyStateText'
-> => {
+> & {
+  ModalComponent: React.ReactNode;
+} => {
   const { data: dashboardsList } = useGetDashboardsList({});
   const onChangePage = useAppLayoutContextSelector((x) => x.onChangePage);
   const [openNewDashboardModal, setOpenNewDashboardModal] = useState(false);
@@ -130,7 +135,7 @@ export const useSaveToDashboardDropdownContent = ({
       menuHeader,
       selectType: 'multiple',
       emptyStateText: 'No dashboards found',
-      modal: (
+      ModalComponent: (
         <NewDashboardModal
           open={openNewDashboardModal}
           onClose={onCloseNewDashboardModal}

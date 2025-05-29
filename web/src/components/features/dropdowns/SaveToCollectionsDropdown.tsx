@@ -15,13 +15,7 @@ export const SaveToCollectionsDropdown: React.FC<{
   onSaveToCollection: (collectionId: string[]) => Promise<void>;
   onRemoveFromCollection: (collectionId: string) => Promise<void>;
 }> = React.memo(({ children, onRemoveFromCollection, onSaveToCollection, selectedCollections }) => {
-  const [showDropdown, setShowDropdown] = React.useState(false);
-
-  const onOpenChange = useMemoizedFn((open: boolean) => {
-    setShowDropdown(open);
-  });
-
-  const { modal, selectType, footerContent, menuHeader, items } =
+  const { ModalComponent, selectType, footerContent, menuHeader, items } =
     useSaveToCollectionsDropdownContent({
       selectedCollections,
       onSaveToCollection,
@@ -35,14 +29,13 @@ export const SaveToCollectionsDropdown: React.FC<{
         align="end"
         selectType={selectType}
         menuHeader={menuHeader}
-        onOpenChange={onOpenChange}
         footerContent={footerContent}
         emptyStateText="No collections found"
         items={items}>
         {children}
       </Dropdown>
 
-      {modal}
+      {ModalComponent}
     </>
   );
 });
@@ -61,7 +54,7 @@ export const useSaveToCollectionsDropdownContent = ({
   DropdownProps,
   'items' | 'footerContent' | 'menuHeader' | 'selectType' | 'emptyStateText'
 > & {
-  modal: React.ReactNode;
+  ModalComponent: React.ReactNode;
 } => {
   const { data: collectionsList, isPending: isCreatingCollection } = useGetCollectionsList({});
   const onChangePage = useAppLayoutContextSelector((s) => s.onChangePage);
@@ -135,7 +128,7 @@ export const useSaveToCollectionsDropdownContent = ({
       footerContent,
       selectType: 'multiple',
       emptyStateText: 'No collections found',
-      modal: (
+      ModalComponent: (
         <NewCollectionModal
           open={openCollectionModal}
           onClose={onCloseCollectionModal}
