@@ -19,6 +19,7 @@ export const AthenaIcon: React.FC<{
         strokeLinejoin="round"
         width={props.size || 24}
         height={props.size || 24}>
+        <title>Athena Icon</title>
         <use x="2.5" y="2.5" />
         <g stroke="none">
           <path d="M80 48.357l-40-4.981-40 4.981L40 80l40-31.643z" fill="#fcbf92" />

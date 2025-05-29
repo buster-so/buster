@@ -14,6 +14,7 @@ export const RedshiftIcon: React.FC<{
       enableBackground="new 0 0 1615 1783.7"
       viewBox="0 0 1615 1783.7"
       xmlns="http://www.w3.org/2000/svg">
+      <title>Redshift Icon</title>
       <path d="m807.5 1363.8 678.3 161.5v-1270.5l-678.3 161.5z" fill="#205b97" />
       <path
         d="m1485.8 254.8 129.2 64.6v1141.3l-129.2 64.6zm-678.3 1109-678.3 161.5v-1270.5l678.3 161.5z"

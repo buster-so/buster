@@ -12,6 +12,7 @@ export const LineChartDotLineIcon: React.FC<{
       height="16"
       viewBox="0 0 16 16"
       fill="none">
+      <title>Line Chart Dot Line Icon</title>
       <g clipPath="url(#clip0_93_11356)">
         <mask id="mask0_93_11356" maskUnits="userSpaceOnUse" x="-2" y="-2" width="20" height="20">
           <rect x="-2" y="-2" width="20" height="20" fill="#D9D9D9" />

@@ -13,6 +13,7 @@ export const PostgresIcon: React.FC<{
       height={props.size || 24}
       viewBox="0 0 432.071 445.383"
       xmlns="http://www.w3.org/2000/svg">
+      <title>Postgres Icon</title>
       <g id="orginal" fillRule="nonzero" clipRule="nonzero" stroke="#000000" strokeMiterlimit="4" />
       <g
         id="Layer_x0020_3"

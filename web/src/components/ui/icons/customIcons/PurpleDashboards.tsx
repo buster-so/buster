@@ -14,6 +14,7 @@ export const PurpleDashboards: React.FC<{
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg">
+      <title>Purple Dashboards Icon</title>
       <mask id="mask0_162_4043" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24" />
       <g>
         <path

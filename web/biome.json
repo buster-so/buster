@@ -16,7 +16,7 @@
     "lineWidth": 100
   },
   "organizeImports": {
-    "enabled": true
+    "enabled": false
   },
   "linter": {
     "enabled": true,
@@ -31,10 +31,12 @@
         "noChildrenProp": "off"
        },
       "a11y": {
-        "useKeyWithClickEvents": "off"
+        "useKeyWithClickEvents": "off",
+        "noSvgWithoutTitle": "off"
       }
     }
   },
+
   "javascript": {
     "formatter": {
       "quoteStyle": "single",

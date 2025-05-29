@@ -24,6 +24,7 @@ export const CircleWithRing: React.FC<{
       className={className}
       data-value={dataValue}
       {...props}>
+      <title>Circle With Ring Icon</title>
       {/* Outer ring */}
       <circle cx="8" cy="8" r="6" stroke={color} strokeWidth="1" fill="none" />
       {/* Inner circle */}

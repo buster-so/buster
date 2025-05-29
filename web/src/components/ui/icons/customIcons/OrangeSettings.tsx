@@ -14,6 +14,7 @@ export const OrgangeSettings: React.FC<{
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg">
+      <title>Orange Settings Icon</title>
       <mask id="mask0_162_4037" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
         <rect x="0.5" y="0.5" width="23" height="23" fill="#D9D9D9" stroke="#F24E1E" />
       </mask>
