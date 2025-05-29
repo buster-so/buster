@@ -44,7 +44,7 @@ Age: 30
     expect(
       result.some(
         (marker) =>
-          marker.message.includes('Missing required key "Siblings"') &&
+          marker.message.includes('Missing required key: "Siblings"') &&
           marker.severity === mockMonaco.MarkerSeverity.Error
       )
     ).toBe(true);

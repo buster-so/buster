@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import * as requests from './requests';
@@ -10,7 +10,7 @@ import {
   useUpdateChatMessageFeedback
 } from './queryRequests';
 import type { IBusterChat } from '@/api/asset_interfaces/chat/iChatInterfaces';
-import type React from 'react';
+import React from 'react';
 
 // Mock the hooks and requests
 vi.mock('@/hooks', () => ({

@@ -88,7 +88,6 @@ describe('barAndLineTooltipHelper', () => {
       ]
     ],
     hidden: false,
-    isTrendline: false,
     ...overrides
   });
 
