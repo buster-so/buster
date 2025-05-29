@@ -3,16 +3,13 @@
   "private": true,
   "workspaces": [
     "packages/*",
-    "tasks",
+    "trigger",
     "server"
   ],
   "scripts": {
     "ai:dev": "bun run --cwd packages/ai dev",
-    "tasks:dev": "bun run --cwd tasks dev",
-    "tasks:deploy": "bun run --cwd tasks deploy",
-    "tasks:build": "bun run --cwd tasks build",
-    "trigger:dev": "bun run --cwd tasks dev",
-    "trigger:deploy": "bun run --cwd tasks deploy",
+    "trigger:dev": "bun run --cwd trigger dev",
+    "trigger:deploy": "bun run --cwd trigger deploy",
     "db": "bun run --cwd packages/database ${1:-db:generate}",
     "test": "bun --cwd ${1:-packages/database} test ${2:-}",
     "test:watch": "bun --cwd ${1:-packages/database} test --watch ${2:-}",
@@ -60,6 +57,7 @@
     "ai": "^4.0.0",
     "drizzle-orm": "^0.43.1",
     "hono": "^4.7.10",
+    "lz4": "^0.6.5",
     "mssql": "^11.0.1",
     "mysql2": "^3.11.5",
     "pg": "^8.16.0",

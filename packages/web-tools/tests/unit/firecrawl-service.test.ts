@@ -53,11 +53,7 @@ describe('FirecrawlService', () => {
       const jobId = await service.startDeepResearch('test query');
 
       expect(jobId).toBe('job-123');
-      expect(mockApp.deepResearch).toHaveBeenCalledWith('test query', {
-        maxDepth: 5,
-        timeLimit: 180,
-        maxUrls: 10,
-      });
+      expect(mockApp.deepResearch).toHaveBeenCalledWith('test query', {});
     });
 
     it('should start deep research with custom options', async () => {
@@ -66,16 +62,14 @@ describe('FirecrawlService', () => {
       mockApp.deepResearch.mockResolvedValue(mockResponse);
 
       const jobId = await service.startDeepResearch('test query', {
-        maxDepth: 3,
-        timeLimit: 120,
-        maxUrls: 5,
+        systemPrompt: 'Custom system prompt',
+        analysisPrompt: 'Custom analysis prompt',
       });
 
       expect(jobId).toBe('job-456');
       expect(mockApp.deepResearch).toHaveBeenCalledWith('test query', {
-        maxDepth: 3,
-        timeLimit: 120,
-        maxUrls: 5,
+        systemPrompt: 'Custom system prompt',
+        analysisPrompt: 'Custom analysis prompt',
       });
     });
 

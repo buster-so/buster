@@ -1,12 +1,9 @@
 import { anthropic } from '@ai-sdk/anthropic';
-import { createOpenAI } from '@ai-sdk/openai';
 import { Agent } from '@mastra/core/agent';
 import { LibSQLStore } from '@mastra/libsql';
 import { Memory } from '@mastra/memory';
 import { weatherTool } from '../tools/weather-tool';
 
-import { createAmazonBedrock } from '@ai-sdk/amazon-bedrock';
-import { fromNodeProviderChain } from '@aws-sdk/credential-providers';
 import { initLogger, wrapAISDKModel } from 'braintrust';
 
 initLogger({
@@ -14,16 +11,16 @@ initLogger({
   projectName: 'Weather Agent',
 });
 
-const _bedrock = createAmazonBedrock({
-  region: 'us-east-1',
-  credentialProvider: fromNodeProviderChain(),
-});
+// const _bedrock = createAmazonBedrock({
+//   region: 'us-east-1',
+//   credentialProvider: fromNodeProviderChain(),
+// });
 
-const _litellm = createOpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-  baseURL: process.env.LLM_BASE_URL,
-  compatibility: 'compatible',
-});
+// const _litellm = createOpenAI({
+//   apiKey: process.env.OPENAI_API_KEY,
+//   baseURL: process.env.LLM_BASE_URL,
+//   compatibility: 'compatible',
+// });
 
 export const weatherAgent = new Agent({
   name: 'Weather Agent',

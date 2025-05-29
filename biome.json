@@ -71,8 +71,8 @@
       "packages/**/*.json",
       "server/**/*.ts",
       "server/**/*.js",
-      "tasks/**/*.ts",
-      "tasks/**/*.js"
+      "trigger/**/*.ts",
+      "trigger/**/*.js"
     ],
     "ignore": [
       "**/node_modules/**",
