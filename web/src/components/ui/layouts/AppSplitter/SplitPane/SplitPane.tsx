@@ -38,7 +38,7 @@ const SplitPane = ({
   const axis = useRef<IAxis>({ x: 0, y: 0 });
   const wrapper = useRef<HTMLDivElement>(null);
   const cacheSizes = useRef<ICacheSizes>({ sizes: [], sashPosSizes: [] });
-  const [wrapperRect, setWrapperRect] = useState<Record<string, DOMRect | any>>({});
+  const [wrapperRect, setWrapperRect] = useState<DOMRectReadOnly | null>(null);
   const [isDragging, setDragging] = useState<boolean>(false);
   const [isReady, setIsReady] = useState<boolean>(initialReady);
 
@@ -72,7 +72,10 @@ const SplitPane = ({
     [split]
   );
 
-  const wrapSize: number = wrapperRect[sizeName] ?? 0;
+  const wrapSize: number =
+    wrapperRect && typeof wrapperRect[sizeName as keyof DOMRect] === 'number'
+      ? Number(wrapperRect[sizeName as keyof DOMRect])
+      : 0;
 
   // Get limit sizes via children
   const paneLimitSizes = useMemo(
@@ -121,37 +124,44 @@ const SplitPane = ({
   }, [propSizes, children.length, wrapSize]);
 
   const sashPosSizes = useMemo(
-    () => sizes.reduce((a, b) => [...a, a[a.length - 1] + b], [0]),
+    () =>
+      sizes.reduce(
+        (a, b) => {
+          const newSize = a[a.length - 1] + b;
+          a.push(newSize);
+          return a;
+        },
+        [0]
+      ),
     [sizes] //THIS WAS MODIFIED FROM THE ORIGINAL
   );
 
   const dragStart = useCallback(
-    (e: any) => {
+    (e: React.MouseEvent<HTMLDivElement>) => {
       document?.body?.classList?.add(bodyDisableUserSelect);
       axis.current = { x: e.pageX, y: e.pageY };
       cacheSizes.current = { sizes, sashPosSizes };
       setDragging(true);
-      onDragStart(e);
+      onDragStart(e.nativeEvent);
     },
     [onDragStart, sizes, sashPosSizes]
   );
 
   const dragEnd = useCallback(
-    (e: any) => {
+    (e: React.MouseEvent<HTMLDivElement>) => {
       document?.body?.classList?.remove(bodyDisableUserSelect);
       axis.current = { x: e.pageX, y: e.pageY };
       cacheSizes.current = { sizes, sashPosSizes };
       setDragging(false);
-      onDragEnd(e);
+      onDragEnd(e.nativeEvent);
     },
     [onDragEnd, sizes, sashPosSizes]
   );
 
   const onDragging = useCallback(
-    (e: any, i: number) => {
+    (e: React.MouseEvent<HTMLDivElement>, i: number) => {
       const curAxis = { x: e.pageX, y: e.pageY };
-      // @ts-ignore
-      let distanceX = curAxis[splitAxis] - axis.current[splitAxis];
+      let distanceX = curAxis[splitAxis as keyof IAxis] - axis.current[splitAxis as keyof IAxis];
 
       const leftBorder = -Math.min(
         sizes[i] - paneLimitSizes[i][0],
@@ -169,7 +179,7 @@ const SplitPane = ({
         distanceX = rightBorder;
       }
 
-      const nextSizes = [...sizes];
+      const nextSizes = sizes.slice();
       nextSizes[i] += distanceX;
       nextSizes[i + 1] -= distanceX;
 

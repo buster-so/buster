@@ -56,8 +56,7 @@ export const SearchDropdown = React.memo(
           {items.map((item, index) => (
             <DropdownMenuItem
               disabled={item.disabled}
-              // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-              key={index}
+              key={`${item.value}-${index}`}
               className="group min-h-10"
               onClick={() => onSelect(item)}>
               {item.label}

@@ -67,7 +67,6 @@ export const Select = <T extends string>({
       </SelectTrigger>
       <SelectContent>
         {items.map((item, index) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
           <SelectItemSelector key={index} item={item} index={index} showIndex={showIndex} />
         ))}
       </SelectContent>

@@ -29,8 +29,7 @@ export const BusterChartTooltip: React.FC<{
               : 'grid-cols-[auto_auto] items-center gap-x-3 gap-y-[3px]'
           }`}>
           {shownItems.map((param, index) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-            <TooltipItem key={index} {...param} />
+            <TooltipItem key={`${param.seriesType}-${index}`} {...param} />
           ))}
         </div>
 

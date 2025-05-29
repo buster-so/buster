@@ -37,8 +37,7 @@ export const Breadcrumb = React.memo(
         <BreadcrumbList>
           {items.map((item, index) => (
             <BreadcrumbItemSelector
-              // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-              key={index + (item.label ?? '')}
+              key={`${item.label ?? 'ellipsis'}-${index}`}
               item={item}
               isActive={chosenIndex === index}
               isLast={index === lastItemIndex}

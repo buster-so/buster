@@ -106,8 +106,11 @@ export const PolicyCheck: React.FC<{
       </div>
       <div className="flex flex-col gap-y-1 p-1.5">
         {items.map((item, index) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-          <PasswordCheckItem key={item.text + index} passwordGood={item.check} text={item.text} />
+          <PasswordCheckItem
+            key={`${item.text}-${index}`}
+            passwordGood={item.check}
+            text={item.text}
+          />
         ))}
       </div>
     </div>

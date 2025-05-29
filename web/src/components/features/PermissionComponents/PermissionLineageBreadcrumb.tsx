@@ -66,8 +66,13 @@ const MultipleLineage: React.FC<{
             return <SelectedComponent key={v.id} item={v} />;
           });
 
-          // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-          return <LineageBreadcrumb key={lineageIndex} items={items} canQuery={canQuery} />;
+          return (
+            <LineageBreadcrumb
+              key={item[0]?.id || lineageIndex}
+              items={items}
+              canQuery={canQuery}
+            />
+          );
         })}
       </div>
     );

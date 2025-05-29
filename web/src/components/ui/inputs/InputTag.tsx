@@ -19,6 +19,7 @@ export const InputTag: React.FC<{
       )}>
       <span className="max-w-[100px] truncate">{label}</span>
       <button
+        type="button"
         onPointerDown={(e) => {
           e.preventDefault();
           e.stopPropagation();

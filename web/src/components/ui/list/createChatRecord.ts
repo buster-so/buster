@@ -24,7 +24,7 @@ export const createChatRecord = <T extends ListItem>(
   const ALL_OTHERS: T[] = [];
 
   // Loop through the data array only once
-  data.forEach((item) => {
+  for (const item of data) {
     if (
       isDateSame({
         date: item.last_edited,
@@ -57,7 +57,7 @@ export const createChatRecord = <T extends ListItem>(
     } else {
       ALL_OTHERS.push(item);
     }
-  });
+  }
 
   const result = {
     TODAY,

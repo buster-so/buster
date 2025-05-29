@@ -41,7 +41,6 @@ export const StreamingMessage_Text: React.FC<StreamingMessage_TextProps> = React
     return (
       <div className={'whitespace-pre-wrap'}>
         {textChunksRef.current.map((chunk, index) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: we need to use the index to animate the chunks
           <AnimatedSpan key={index} isCompletedStream={isCompletedStream}>
             {chunk}
           </AnimatedSpan>

@@ -46,7 +46,6 @@ export const ReasoningMessagePillsContainer: React.FC<
       animate="visible"
       className="flex flex-col space-y-3">
       {pill_containers.map((pill_container, index) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey:
         <motion.div key={pill_container.title + index} variants={itemVariants}>
           <ReasoningMessagePillContainer
             pillContainer={pill_container}

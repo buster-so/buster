@@ -6,8 +6,7 @@ export const CircleSpinnerLoader: React.FC<{
 }> = ({ size = 28, fill = '#7E3AF2' }) => {
   return (
     <div className="flex flex-col items-center justify-center space-y-4">
-      <div
-        role="status"
+      <output
         style={{
           width: `${size}px`,
           height: `${size}px`
@@ -32,7 +31,7 @@ export const CircleSpinnerLoader: React.FC<{
           />
         </svg>
         <span className="sr-only">Loading...</span>
-      </div>
+      </output>
     </div>
   );
 };

@@ -104,12 +104,13 @@ export const BusterInfiniteList: React.FC<BusterInfiniteListProps> = React.memo(
 
       // Find the first scrollable parent element
       const findScrollableParent = (element: HTMLElement | null): HTMLDivElement | null => {
-        while (element) {
-          const { overflowY } = window.getComputedStyle(element);
+        let currentElement = element;
+        while (currentElement) {
+          const { overflowY } = window.getComputedStyle(currentElement);
           if (overflowY === 'auto' || overflowY === 'scroll') {
-            return element as HTMLDivElement;
+            return currentElement as HTMLDivElement;
           }
-          element = element.parentElement;
+          currentElement = currentElement.parentElement;
         }
         return null;
       };

@@ -23,10 +23,13 @@
     "ignore": ["**/*.test.*", "**/*.spec.*", "**/*.stories.tsx"],
     "rules": {
       "recommended": true,
+      "suspicious":{
+        "noArrayIndexKey": "off"
+      },
       "correctness": {
         "useExhaustiveDependencies": "off",
         "noChildrenProp": "off"
-      },
+       },
       "a11y": {
         "useKeyWithClickEvents": "off"
       }

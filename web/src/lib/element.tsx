@@ -74,13 +74,11 @@ export const boldHighlights = (name: string, highlights: string[]): React.ReactN
         return splitParts.map((splitPart, splitIndex) => {
           if (matches.includes(splitPart.toLowerCase())) {
             return (
-              // biome-ignore lint/suspicious/noArrayIndexKey: Combined key with content is stable
               <span className="font-semibold" key={`bold-${splitPart}-${splitIndex}`}>
                 {splitPart}
               </span>
             );
           }
-          // biome-ignore lint/suspicious/noArrayIndexKey: Combined key with content is stable
           return <span key={`normal-${splitPart}-${splitIndex}`}>{splitPart}</span>;
         });
       }

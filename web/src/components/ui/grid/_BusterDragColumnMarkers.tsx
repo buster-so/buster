@@ -25,7 +25,6 @@ export const BusterDragColumnMarkers: React.FC<{
         }}>
         {Array.from({ length: NUMBER_OF_COLUMNS + 1 }).map((_, index) => (
           <div
-            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
             key={index}
             className={cn(
               'bg-border',
