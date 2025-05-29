@@ -12,7 +12,7 @@ const AxisMethodCheckRecord: Record<ChartType, (selectedAxis: ChartEncodes) => b
   [ChartType.Scatter]: defaultAxisCheck,
   [ChartType.Pie]: defaultAxisCheck,
   [ChartType.Combo]: defaultAxisCheck,
-  [ChartType.Metric]: () => true,
+  [ChartType.Metric]: (selectedAxis) => true,
   [ChartType.Table]: () => true
 };
 
@@ -26,6 +26,6 @@ export const doesChartHaveValidAxis = ({
   isTable: boolean;
 }) => {
   if (isTable) return true;
-  if (!selectedAxis) return false;
-  return AxisMethodCheckRecord[selectedChartType](selectedAxis);
+
+  return AxisMethodCheckRecord[selectedChartType](selectedAxis as ChartEncodes);
 };

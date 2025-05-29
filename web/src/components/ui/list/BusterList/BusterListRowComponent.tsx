@@ -72,6 +72,7 @@ export const BusterListRowComponent = React.memo(
             onClick={onContainerClick}
             style={rowStyles}
             onContextMenu={onContextMenu}
+            data-testid={row.dataTestId}
             className={cn(
               'border-border flex items-center border-b pr-6',
               checked ? 'bg-primary-background hover:bg-primary-background-hover' : '',

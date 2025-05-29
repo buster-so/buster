@@ -1,6 +1,7 @@
 import { useAddAndRemoveMetricsFromDashboard, useGetDashboard } from '@/api/buster_rest/dashboards';
 import { useSearch } from '@/api/buster_rest/search';
 import { Button } from '@/components/ui/buttons';
+import type { BusterListRowItem } from '@/components/ui/list';
 import {
   InputSelectModal,
   type InputSelectModalProps
@@ -55,10 +56,11 @@ export const AddToDashboardModal: React.FC<{
     []
   );
 
-  const rows = useMemo(() => {
+  const rows: BusterListRowItem[] = useMemo(() => {
     return (
       searchResults?.map((result) => ({
         id: result.id,
+        dataTestId: `item-${result.id}`,
         data: result
       })) || []
     );

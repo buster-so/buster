@@ -144,7 +144,7 @@ const ThreeDotDropdown: React.FC<{
   return (
     <>
       <Dropdown items={items}>
-        <Button variant="ghost" prefix={<Dots />} />
+        <Button variant="ghost" prefix={<Dots />} data-testid="collection-three-dot-dropdown" />
       </Dropdown>
       <RenameCollectionModal
         collectionId={id}

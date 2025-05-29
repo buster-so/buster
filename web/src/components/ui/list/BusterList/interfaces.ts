@@ -43,6 +43,7 @@ export interface BusterListRowItem {
   onSelect?: () => void;
   rowSection?: BusterListSectionRow;
   hidden?: boolean;
+  dataTestId?: string;
 }
 
 export interface BusterListSectionRow {

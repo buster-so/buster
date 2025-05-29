@@ -18,8 +18,7 @@
       "**/public/**",
       "**/.vercel/**",
       "**/coverage/**",
-      "**/storybook-static/**",
-      "**/playwright-tests/**"
+      "**/storybook-static/**"
     ]
   },
   "formatter": {
@@ -33,7 +32,7 @@
   },
   "linter": {
     "enabled": true,
-    "ignore": ["**/*.test.*", "**/*.spec.*", "**/*.stories.tsx"],
+    "ignore": ["**/*.stories.tsx"],
     "rules": {
       "recommended": true,
       "correctness": {
