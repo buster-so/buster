@@ -29,7 +29,7 @@
     "lineWidth": 100
   },
   "organizeImports": {
-    "enabled": false
+    "enabled": true
   },
   "linter": {
     "enabled": true,
