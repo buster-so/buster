@@ -163,6 +163,10 @@ test.describe
       await page.getByRole('textbox', { name: 'New dashboard' }).click();
       await page.getByRole('textbox', { name: 'New dashboard' }).fill('Important Metrics');
       await page.getByRole('button', { name: 'Save' }).click();
+      await page.waitForTimeout(100);
+      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForLoadState('load');
       await expect(page.getByRole('textbox', { name: 'New dashboard' })).toHaveValue(
         'Important Metrics'
       );

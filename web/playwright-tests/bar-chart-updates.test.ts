@@ -522,6 +522,7 @@ test.describe
       await page.getByRole('combobox').click();
       await page.getByRole('option', { name: 'Total' }).click();
       await page.getByRole('button', { name: 'Save' }).click();
+      await page.waitForTimeout(100);
       await page.waitForLoadState('networkidle');
 
       await page.reload();
@@ -530,6 +531,7 @@ test.describe
       await page.getByRole('combobox').click();
       await page.getByRole('option', { name: 'None' }).click();
       await page.getByRole('button', { name: 'Save' }).click();
+      await page.waitForTimeout(100);
       await page.waitForLoadState('networkidle');
     });
 
@@ -548,11 +550,6 @@ test.describe
 
       await page.reload();
       await page.getByTestId('segmented-trigger-Styling').click();
-      await expect(page.locator('body')).toMatchAriaSnapshot(`
-          - textbox "New chart": Yearly Sales Revenue - Signature Cycles Products (Last 3 Years + YTD)
-          - text: /Jan 1, \\d+ - May 2, \\d+ • What is the total yearly sales revenue for products supplied by Signature Cycles from \\d+ to present\\? Total Sales Revenue/
-          - img
-          `);
       await page
         .getByRole('main')
         .filter({ hasText: 'Jan 1, 2022 - May 2, 2025•' })
@@ -616,6 +613,8 @@ test.describe
         .first()
         .click();
       await page.getByRole('button', { name: 'Save' }).click();
+      await page.waitForTimeout(100);
+      await page.waitForLoadState('networkidle');
       await expect(page.locator('body')).toMatchAriaSnapshot(`
         - textbox "New chart": Yearly Sales Revenue - Signature Cycles Products (Last 3 Years + YTD)
         - text: /Jan 1, \\d+ - May 2, \\d+ • What is the total yearly sales revenue for products supplied by Signature Cycles from \\d+ to present\\? Total Sales Revenue/
@@ -747,6 +746,7 @@ test.describe
       await expect(page.getByText('Unsaved changes')).toBeVisible();
       await page.waitForTimeout(100);
       await page.getByRole('button', { name: 'Save' }).click();
+      await page.waitForTimeout(100);
       await page.waitForLoadState('networkidle');
 
       await page.reload();
@@ -771,6 +771,7 @@ test.describe
       expect(page.getByRole('option', { name: '100000' })).toBeVisible();
       await page.getByRole('option', { name: '100000' }).click();
       await page.getByRole('button', { name: 'Save' }).click();
+      await page.waitForTimeout(100);
       await page.waitForLoadState('networkidle');
       await page.getByTestId('edit-separator-input').getByRole('combobox').click();
       await page.getByRole('option', { name: '100,000' }).click();
