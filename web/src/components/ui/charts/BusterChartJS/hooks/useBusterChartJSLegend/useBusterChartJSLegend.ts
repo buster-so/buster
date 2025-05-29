@@ -229,12 +229,18 @@ export const useBusterChartJSLegend = ({
           datasets?.forEach((dataset, index) => {
             const value = index === assosciatedDatasetIndex;
             chartjs.setDatasetVisibility(index, value);
-            inactiveDatasetsRecord[dataset.label!] = !value;
+            const label = dataset.label;
+            if (label) {
+              inactiveDatasetsRecord[label] = !value;
+            }
           });
         } else {
           datasets?.forEach((dataset, index) => {
             chartjs.setDatasetVisibility(index, true);
-            inactiveDatasetsRecord[dataset.label!] = false;
+            const label = dataset.label;
+            if (label) {
+              inactiveDatasetsRecord[label] = false;
+            }
           });
         }
         setInactiveDatasets((prev) => ({

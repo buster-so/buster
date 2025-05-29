@@ -44,7 +44,7 @@ const FORMATS = {
 _adapters._date.override({
   //_id: 'dayjs', //DEBUG,
   formats: () => FORMATS,
-  parse: (value: any, format?: TimeUnit) => {
+  parse: (value: unknown, format?: TimeUnit) => {
     const valueType = typeof value;
 
     if (value === null || valueType === 'undefined') {
@@ -52,18 +52,27 @@ _adapters._date.override({
     }
 
     if (valueType === 'string' && typeof format === 'string') {
-      return dayjs(value, format).isValid() ? dayjs(value, format).valueOf() : null;
+      const parsedDate = dayjs(value as string, format);
+      return parsedDate.isValid() ? parsedDate.valueOf() : null;
     }
-    if (!(value instanceof dayjs)) {
-      return dayjs(value).isValid() ? dayjs(value).valueOf() : null;
+
+    if (value instanceof Date || typeof value === 'number') {
+      const parsedDate = dayjs(value);
+      return parsedDate.isValid() ? parsedDate.valueOf() : null;
     }
+
     return null;
   },
-  format: (time: any, format: TimeUnit): string => dayjs(time).format(format),
-  add: (time: any, amount: number, unit: QUnitType & TimeUnit) =>
+  format: (time: number | string | Date, format: TimeUnit): string => dayjs(time).format(format),
+  add: (time: number | string | Date, amount: number, unit: QUnitType & TimeUnit) =>
     dayjs(time).add(amount, unit).valueOf(),
-  diff: (max: any, min: any, unit: TimeUnit) => dayjs(max).diff(dayjs(min), unit),
-  startOf: (time: any, unit: (TimeUnit & QUnitType) | 'isoWeek', weekday?: number) => {
+  diff: (max: number | string | Date, min: number | string | Date, unit: TimeUnit) =>
+    dayjs(max).diff(dayjs(min), unit),
+  startOf: (
+    time: number | string | Date,
+    unit: (TimeUnit & QUnitType) | 'isoWeek',
+    weekday?: number
+  ) => {
     if (unit === 'isoWeek') {
       // Ensure that weekday has a valid format
       //const formattedWeekday
@@ -76,5 +85,6 @@ _adapters._date.override({
 
     return dayjs(time).startOf(unit).valueOf();
   },
-  endOf: (time: any, unit: TimeUnit & QUnitType) => dayjs(time).endOf(unit).valueOf()
+  endOf: (time: number | string | Date, unit: TimeUnit & QUnitType) =>
+    dayjs(time).endOf(unit).valueOf()
 });

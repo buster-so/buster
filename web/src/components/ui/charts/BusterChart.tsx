@@ -142,7 +142,7 @@ export const BusterChart: React.FC<BusterChartProps> = React.memo(
         data,
         onChartMounted,
         onInitialAnimationEnd: onInitialAnimationEndPreflight,
-        selectedAxis: selectedAxis!,
+        selectedAxis: selectedAxis as ChartEncodes,
         animate,
         animateLegend,
         className,

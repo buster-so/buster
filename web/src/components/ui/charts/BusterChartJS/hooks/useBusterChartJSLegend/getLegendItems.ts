@@ -53,7 +53,7 @@ export const getLegendItems = ({
     inactive: dataset.label ? inactiveDatasets[dataset.label] : false,
     type: getType(isComboChart, globalType, dataset, columnSettings),
     formattedName: dataset.label as string,
-    id: dataset.label!,
+    id: dataset.label || '',
     data: dataset.data,
     yAxisKey: dataset.yAxisKey
   }));

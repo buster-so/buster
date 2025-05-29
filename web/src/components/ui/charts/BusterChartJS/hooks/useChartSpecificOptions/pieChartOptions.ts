@@ -143,13 +143,13 @@ const getInnerLabelValue = (
       return firstDatasetData[index];
     });
     const operator = new ArrayOperations(dataByActiveLegendItems);
-    const result = operator[pieInnerLabelAggregate]();
+    const result = operator[pieInnerLabelAggregate || 'average']();
 
     if (pieInnerLabelAggregate === 'count') {
       return result.toString();
     }
 
-    const yColumn = selectedAxis.y[0]!;
+    const yColumn = selectedAxis.y[0] || 'defaultYColumn';
     const yColumnLabel = columnLabelFormats[yColumn];
     const formattedLabel = formatLabel(result, yColumnLabel);
     return formattedLabel;
@@ -173,7 +173,7 @@ const labelFormatter = (
     return formatLabel(value, percentStyle);
   }
 
-  const yColumn = selectedAxis.y[0]!;
+  const yColumn = selectedAxis.y[0] || 'defaultYColumn';
   const yColumnLabel = columnLabelFormats[yColumn];
   const formattedLabel = formatLabel(value, yColumnLabel);
   return formattedLabel;
@@ -184,7 +184,7 @@ const percentFormatter = (context: Context, value: number) => {
     (sum: number, val: number) => sum + val,
     0
   );
-  value = (value / total) * 100;
+  const result = (value / total) * 100 || 0;
 
-  return value;
+  return result;
 };

@@ -57,6 +57,7 @@ export default class OutLabel {
       text = text.replace(/%l/gi, label);
 
       /* Replace value marker with possible precision value */
+      // biome-ignore lint/complexity/noForEach: <explanation>
       (text.match(/%v\.?(\d*)/gi) || [])
         .map((val) => {
           const prec = val.replace(/%v\./gi, '');
@@ -70,6 +71,7 @@ export default class OutLabel {
         });
 
       /* Replace percent marker with possible precision value */
+      // biome-ignore lint/complexity/noForEach: <explanation>
       (text.match(/%p\.?(\d*)/gi) || [])
         .map((val) => {
           const prec = val.replace(/%p\./gi, '');

@@ -123,7 +123,7 @@ export const OutLabelsPlugin: OutLabelsPlugin = {
 
     const sumOfRemaining = legendItems.reduce((sum, current) => {
       if (current.hidden) return sum;
-      const labelValue = dataset?.data?.[current.index!] || 0;
+      const labelValue = dataset?.data?.[current.index as number] || 0;
       return sum + labelValue;
     }, 0);
 
@@ -179,7 +179,7 @@ export const OutLabelsPlugin: OutLabelsPlugin = {
 
     // Animate in the labels
     if (!outLabelsManager.animateCompleted) {
-      const duration = options?.animateInDuration!;
+      const duration = options?.animateInDuration ?? 0;
       const currentTime = performance.now();
       const elapsed = Math.min(currentTime - (outLabelsManager.renderedAt || 0), duration);
       const progress = Math.min(elapsed / duration, 1);
@@ -195,22 +195,22 @@ export const OutLabelsPlugin: OutLabelsPlugin = {
       }
     }
 
-    chartOutlabels.forEach((label) => {
+    for (const [, label] of chartOutlabels) {
       if (elements[label.index]) {
         label.positionCenter(elements[label.index]);
         label.updateRects();
       }
-    });
+    }
 
     outLabelsManager.avoidOverlap(chart);
 
-    chartOutlabels.forEach((label) => {
+    for (const [, label] of chartOutlabels) {
       if (label.style.display) {
         label.updateRects();
         label.drawLine();
         label.draw();
       }
-    });
+    }
 
     ctx.restore();
   },

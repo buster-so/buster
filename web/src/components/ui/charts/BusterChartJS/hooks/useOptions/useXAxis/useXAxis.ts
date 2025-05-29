@@ -10,7 +10,7 @@ import {
 } from '@/api/asset_interfaces/metric/charts';
 import { useMemoizedFn } from '@/hooks';
 import { formatLabel, isNumericColumnType, truncateText } from '@/lib';
-import type { GridLineOptions, Scale, ScaleChartOptions, TimeScale } from 'chart.js';
+import type { GridLineOptions, Scale, ScaleChartOptions, Tick, TimeScale } from 'chart.js';
 import { Chart as ChartJS } from 'chart.js';
 import isDate from 'lodash/isDate';
 import { useMemo } from 'react';
@@ -183,6 +183,7 @@ export const useXAxis = ({
       return formatLabel(value, firstXColumnLabelFormat);
     }
 
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     return DEFAULT_X_AXIS_TICK_CALLBACK.call(this, value, index, this.getLabels() as any);
   });
 
@@ -239,7 +240,7 @@ export const useXAxis = ({
           maxTicksLimit: type === 'time' ? (timeUnit === 'month' ? 18 : 18) : undefined,
           //  sampleSize: type === 'time' ? 28 : undefined, //DO NOT USE THIS. IT BREAK TIME SCALES
           display: xAxisShowAxisLabel,
-          callback: customTickCallback as any, //I need to use null for auto date
+          callback: customTickCallback,
           //@ts-ignore
           time: {
             unit: timeUnit

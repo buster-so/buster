@@ -86,7 +86,7 @@ export const CustomHeading: React.FC<
     stripFormatting?: boolean;
   } & ExtraPropsExtra
 > = ({ level, children, markdown, stripFormatting = false, showLoader, ...rest }) => {
-  const HeadingTag = `h${level}` as any;
+  const HeadingTag = `h${level}` as keyof JSX.IntrinsicElements;
   return (
     <HeadingTag
       className={cn(

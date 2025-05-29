@@ -85,7 +85,7 @@ export const useGoalLines = ({
     const allKeys = [...yAxisKeys, ...(y2AxisKeys || [])];
     const isSimilar = yAxisSimilar(allKeys, columnLabelFormats);
     if (isSimilar) {
-      const key = yAxisKeys[0]!;
+      const key = yAxisKeys[0];
       return columnLabelFormats[key] || DEFAULT_COLUMN_LABEL_FORMAT;
     }
     return {

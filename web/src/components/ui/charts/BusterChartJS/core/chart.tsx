@@ -3,12 +3,12 @@
 import { usePrevious, usePreviousRef } from '@/hooks';
 import { Chart as ChartJS } from 'chart.js';
 import type {
-  ChartType,
-  DefaultDataPoint,
+  BubbleDataPoint,
   ChartData,
+  ChartType,
   ChartTypeRegistry,
-  Point,
-  BubbleDataPoint
+  DefaultDataPoint,
+  Point
 } from 'chart.js';
 import React, { useEffect, useRef, forwardRef } from 'react';
 import type { BaseChartComponent, ChartProps, ForwardedRef } from './types';

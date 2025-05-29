@@ -30,7 +30,6 @@ export const ChartHoverLinePlugin: Plugin<ChartType, ChartHoverLinePluginOptions
       tooltip,
       chartArea: { top, bottom }
     } = chart;
-    const chartType = (chart.config as any).type as ChartType;
 
     const tooltipActive = tooltip?.getActiveElements();
 

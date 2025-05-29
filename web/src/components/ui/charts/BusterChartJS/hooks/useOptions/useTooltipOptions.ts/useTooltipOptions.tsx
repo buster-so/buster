@@ -197,7 +197,7 @@ const getOrCreateInitialTooltipContainer = (chart: ChartJSOrUndefined) => {
       <div class="tooltip-content bg-background relative border rounded-sm z-10"></div>
     `;
 
-    const caretEl = tooltipEl.querySelector('.tooltip-caret')! as HTMLDivElement;
+    const caretEl = tooltipEl.querySelector('.tooltip-caret') as HTMLDivElement;
     caretEl.style.position = 'absolute';
     caretEl.style.width = '8px';
     caretEl.style.height = '8px';
@@ -226,7 +226,8 @@ const externalTooltip = (
   lineGroupType: BusterChartProps['lineGroupType']
 ) => {
   const { chart, tooltip } = context;
-  const tooltipEl = getOrCreateInitialTooltipContainer(chart)!;
+  const tooltipEl = getOrCreateInitialTooltipContainer(chart);
+  if (!tooltipEl) return;
 
   if (tooltip.opacity === 0) {
     tooltipEl.style.opacity = '0';
@@ -234,25 +235,30 @@ const externalTooltip = (
   }
 
   if (matchedCacheItem) {
-    tooltipEl.querySelector('.tooltip-content')!.innerHTML = matchedCacheItem;
-    const isHidden = matchedCacheItem.includes('hidden!');
-    tooltipEl.style.display = isHidden ? 'none' : 'block';
+    const contentEl = tooltipEl.querySelector('.tooltip-content');
+    if (contentEl) {
+      contentEl.innerHTML = matchedCacheItem;
+      const isHidden = matchedCacheItem.includes('hidden!');
+      tooltipEl.style.display = isHidden ? 'none' : 'block';
+    }
   } else if (tooltip.body) {
     const dataPoints = tooltip.dataPoints;
-
-    tooltipEl.querySelector('.tooltip-content')!.innerHTML = renderToString(
-      <BusterChartJSTooltip
-        dataPoints={dataPoints}
-        columnLabelFormats={columnLabelFormats}
-        selectedChartType={selectedChartType}
-        keyToUsePercentage={keyToUsePercentage}
-        chart={chart}
-        hasCategoryAxis={hasCategoryAxis}
-        hasMultipleMeasures={hasMultipleMeasures}
-        barGroupType={barGroupType}
-        lineGroupType={lineGroupType}
-      />
-    );
+    const contentEl = tooltipEl.querySelector('.tooltip-content');
+    if (contentEl) {
+      contentEl.innerHTML = renderToString(
+        <BusterChartJSTooltip
+          dataPoints={dataPoints}
+          columnLabelFormats={columnLabelFormats}
+          selectedChartType={selectedChartType}
+          keyToUsePercentage={keyToUsePercentage}
+          chart={chart}
+          hasCategoryAxis={hasCategoryAxis}
+          hasMultipleMeasures={hasMultipleMeasures}
+          barGroupType={barGroupType}
+          lineGroupType={lineGroupType}
+        />
+      );
+    }
   }
 
   const chartRect = chart.canvas.getBoundingClientRect();
@@ -284,7 +290,7 @@ const externalTooltip = (
   tooltipEl.style.left = `${left}px`;
   tooltipEl.style.top = `${top}px`;
 
-  const caretEl = tooltipEl.querySelector('.tooltip-caret')! as HTMLDivElement;
+  const caretEl = tooltipEl.querySelector('.tooltip-caret') as HTMLDivElement;
   caretEl.style.left = caretLeft;
   caretEl.style.top = caretTop;
   caretEl.style.marginLeft = caretLeft === '100%' ? '-4px' : '-4px';

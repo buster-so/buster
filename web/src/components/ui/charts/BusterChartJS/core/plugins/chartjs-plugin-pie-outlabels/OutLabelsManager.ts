@@ -91,7 +91,7 @@ export default class OutLabelsManager {
     let maxY = 0;
     let rB = 0;
 
-    list.forEach((item) => {
+    for (const item of list) {
       const dy = Math.abs(item.rect.y - cy);
       if (dy > maxY) {
         const dx = item.rect.x - cx;
@@ -99,10 +99,10 @@ export default class OutLabelsManager {
         rB = Math.abs(dx) < rA ? Math.sqrt((dy * dy) / (1 - (dx * dx) / rA / rA)) : rA;
         maxY = dy;
       }
-    });
+    }
 
     const rB2 = rB * rB;
-    list.forEach((item) => {
+    for (const item of list) {
       const dy = Math.abs(item.rect.y - cy);
       // horizontal r is always same with original r because x is not changed.
       const rA = r + item.style.length;
@@ -112,7 +112,7 @@ export default class OutLabelsManager {
       const newX = cx + dx * dir;
 
       item.x = newX;
-    });
+    }
   }
 
   private isLabelWithinChartBounds(chart: Chart<'doughnut' | 'pie'>, label: OutLabel): boolean {
@@ -141,18 +141,18 @@ export default class OutLabelsManager {
       const bottomLeftList: OutLabel[] = [];
       const bottomRightList: OutLabel[] = [];
 
-      labels.forEach((label) => {
+      for (const item of labels.values()) {
         // Reset display in case it was previously hidden
-        label.style.display = true;
+        item.style.display = true;
 
-        if (label.x < cx) {
-          if (label.y < cy) topLeftList.push(label);
-          else bottomLeftList.push(label);
+        if (item.x < cx) {
+          if (item.y < cy) topLeftList.push(item);
+          else bottomLeftList.push(item);
         } else {
-          if (label.y < cy) topRightList.push(label);
-          else bottomRightList.push(label);
+          if (item.y < cy) topRightList.push(item);
+          else bottomRightList.push(item);
         }
-      });
+      }
 
       if (this.adjustQuadrant(topLeftList)) this.recalculateX(chart, topLeftList);
       if (this.adjustQuadrant(topRightList)) this.recalculateX(chart, topRightList);
@@ -161,11 +161,11 @@ export default class OutLabelsManager {
 
       // Only check bounds after animation is complete
       if (this.animateCompleted) {
-        labels.forEach((label) => {
-          if (!this.isLabelWithinChartBounds(chart, label)) {
-            label.style.display = false;
+        for (const item of labels.values()) {
+          if (!this.isLabelWithinChartBounds(chart, item)) {
+            item.style.display = false;
           }
-        });
+        }
       }
     }
   }

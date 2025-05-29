@@ -309,9 +309,9 @@ class PolynomialFitter extends BaseFitter {
     if (!this.coeffs) this.fit();
 
     // Use Horner's method for polynomial evaluation (more efficient)
-    let result = this.coeffs?.[this.coeffs?.length - 1];
-    for (let i = this.coeffs?.length - 2; i >= 0; i--) {
-      result = result * x + this.coeffs?.[i];
+    let result = this.coeffs?.[this.coeffs?.length - 1] ?? 0;
+    for (let i = (this.coeffs?.length || 0) - 2; i >= 0; i--) {
+      result = result * x + (this.coeffs?.[i] ?? 0);
     }
     return result;
   }
@@ -440,7 +440,7 @@ const processPadding = (
   if (cached) return cached;
 
   const defaultPadding = defaultLabelOptionConfig.padding;
-  let result;
+  let result: { top: number; right: number; bottom: number; left: number };
 
   if (typeof labelPadding === 'number') {
     result = { top: labelPadding, right: labelPadding, bottom: labelPadding, left: labelPadding };
@@ -1046,8 +1046,13 @@ const trendlinePlugin: Plugin<'line'> = {
     const labels = chart.data.labels as string[] | Date[] | undefined;
 
     // get horizontal (x) and vertical (y) scales
-    const xScale = Object.values(chart.scales).find((s) => s.isHorizontal())!;
-    const yScale = Object.values(chart.scales).find((s) => !s.isHorizontal())!;
+    const xScale = Object.values(chart.scales).find((s) => s.isHorizontal());
+    const yScale = Object.values(chart.scales).find((s) => !s.isHorizontal());
+
+    if (!xScale || !yScale) {
+      console.warn('Trendline plugin requires both x and y scales');
+      return;
+    }
 
     // Use spatial index for faster collision detection
     const labelSpatialIndex = new SpatialIndex();
@@ -1207,9 +1212,9 @@ const trendlinePlugin: Plugin<'line'> = {
     // After all trendlines are drawn, draw all labels on top - do this in a batch
     if (labelDrawingQueue.length > 0) {
       ctx.save();
-      labelDrawingQueue.forEach((item) => {
+      for (const item of labelDrawingQueue) {
         drawLabel(item.ctx, item.text, item.x, item.y, item.opts);
-      });
+      }
       ctx.restore();
     }
   }
