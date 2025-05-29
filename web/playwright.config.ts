@@ -1,6 +1,6 @@
-import { defineConfig, devices } from '@playwright/test';
-import path from 'node:path';
 import fs from 'node:fs';
+import path from 'node:path';
+import { defineConfig, devices } from '@playwright/test';
 
 /**
  * Read environment variables from file.
