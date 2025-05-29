@@ -1,8 +1,8 @@
+import { AnimatePresence, motion } from 'framer-motion';
+import React from 'react';
 import { Button } from '@/components/ui/buttons';
 import { DoubleChevronRight } from '@/components/ui/icons';
 import { AppTooltip } from '@/components/ui/tooltip';
-import { AnimatePresence, motion } from 'framer-motion';
-import React from 'react';
 
 const animation = {
   initial: { opacity: 0 },

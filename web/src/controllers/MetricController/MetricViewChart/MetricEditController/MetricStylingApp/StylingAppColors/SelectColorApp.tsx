@@ -1,7 +1,7 @@
+import React from 'react';
 import { Cards, Paintbrush, Palette } from '@/components/ui/icons';
 import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
 import { useMemoizedFn } from '@/hooks';
-import React from 'react';
 import { StylingAppColorsTab } from './config';
 
 const options: SegmentedItem<StylingAppColorsTab>[] = [

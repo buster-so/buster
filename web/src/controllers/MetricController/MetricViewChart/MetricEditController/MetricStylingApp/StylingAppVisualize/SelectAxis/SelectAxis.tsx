@@ -1,3 +1,5 @@
+import isEmpty from 'lodash/isEmpty';
+import React, { useMemo } from 'react';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import type {
   CategoryAxisStyleConfig,
@@ -9,12 +11,10 @@ import type {
 import { ErrorBoundary } from '@/components/ui/error';
 import { useUpdateMetricChart } from '@/context/Metrics';
 import { useMemoizedFn } from '@/hooks';
-import isEmpty from 'lodash/isEmpty';
-import React, { useMemo } from 'react';
-import { type DropZone, SelectAxisDropzones, type SelectAxisItem } from './SelectAxisDragContainer';
-import { SelectAxisEmptyState } from './SelectAxisEmptyState';
 import { chartTypeToAxis, zoneIdToAxis } from './config';
 import { getChartTypeDropZones } from './helper';
+import { type DropZone, SelectAxisDropzones, type SelectAxisItem } from './SelectAxisDragContainer';
+import { SelectAxisEmptyState } from './SelectAxisEmptyState';
 import { type ISelectAxisContext, SelectAxisProvider } from './useSelectAxisContext';
 
 export const SelectAxis: React.FC<

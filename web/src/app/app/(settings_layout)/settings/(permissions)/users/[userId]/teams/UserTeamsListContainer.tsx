@@ -1,5 +1,7 @@
 'use client';
 
+import pluralize from 'pluralize';
+import React, { useMemo, useState } from 'react';
 import type { BusterUserTeamListItem, TeamRole } from '@/api/asset_interfaces';
 import { useUpdateUserTeams } from '@/api/buster_rest';
 import { PermissionAssignTeamRole } from '@/components/features/PermissionComponents';
@@ -13,8 +15,6 @@ import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
 import { Text } from '@/components/ui/typography';
 import { useMemoizedFn } from '@/hooks';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import pluralize from 'pluralize';
-import React, { useMemo, useState } from 'react';
 import { UserTeamsSelectedPopup } from './UserTeamsSelectedPopup';
 
 export const UserTeamsListContainer: React.FC<{

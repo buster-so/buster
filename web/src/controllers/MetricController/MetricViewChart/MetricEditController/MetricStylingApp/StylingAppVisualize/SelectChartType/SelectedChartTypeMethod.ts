@@ -1,8 +1,8 @@
+import omit from 'lodash/omit';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { ChartType } from '@/api/asset_interfaces/metric/charts';
-import omit from 'lodash/omit';
-import type { SelectChartTypeProps } from './SelectChartType';
 import { ChartIconType } from './config';
+import type { SelectChartTypeProps } from './SelectChartType';
 
 export const DetermineSelectedChartType: Record<
   ChartIconType,

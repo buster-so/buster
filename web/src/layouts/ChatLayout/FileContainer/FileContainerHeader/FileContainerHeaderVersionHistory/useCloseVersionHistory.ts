@@ -1,9 +1,9 @@
+import { useMemo } from 'react';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useMemoizedFn } from '@/hooks';
 import { useGetInitialChatFile } from '@/layouts/ChatLayout/ChatContext/useGetInitialChatFile';
 import { useChatLayoutContextSelector } from '@/layouts/ChatLayout/ChatLayoutContext';
 import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
-import { useMemo } from 'react';
 
 export const useCloseVersionHistory = () => {
   const onChangePage = useAppLayoutContextSelector((x) => x.onChangePage);

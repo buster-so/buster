@@ -1,11 +1,11 @@
+import uniq from 'lodash/uniq';
+import React, { useState } from 'react';
 import {
   useAddDashboardToCollection,
   useRemoveDashboardFromCollection
 } from '@/api/buster_rest/dashboards';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks';
-import uniq from 'lodash/uniq';
-import React, { useState } from 'react';
 import { SaveToCollectionsDropdown } from '../dropdowns/SaveToCollectionsDropdown';
 import { CollectionButton } from './CollectionsButton';
 

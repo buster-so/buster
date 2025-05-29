@@ -1,9 +1,9 @@
+import React, { useMemo } from 'react';
 import { Card, CardHeader } from '@/components/ui/card/CardBase';
 import { BusterChart } from '@/components/ui/charts/BusterChart';
 import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import React, { useMemo } from 'react';
 import { MetricTitle } from './MetricTitle';
 import { useDashboardMetric } from './useDashboardMetric';
 

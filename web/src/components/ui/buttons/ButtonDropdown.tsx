@@ -1,17 +1,17 @@
 'use client';
 
-import { useMemoizedFn } from '@/hooks';
-import { cn } from '@/lib/classMerge';
 import { cva } from 'class-variance-authority';
 import React from 'react';
+import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/classMerge';
 import { Dropdown, type DropdownProps } from '../dropdown/Dropdown';
 import { ChevronDown } from '../icons/NucleoIconOutlined';
 import {
   type ButtonProps,
-  LoadingIcon,
   buttonIconVariants,
   buttonTypeClasses,
-  buttonVariants
+  buttonVariants,
+  LoadingIcon
 } from './Button';
 
 interface ButtonDropdownProps {

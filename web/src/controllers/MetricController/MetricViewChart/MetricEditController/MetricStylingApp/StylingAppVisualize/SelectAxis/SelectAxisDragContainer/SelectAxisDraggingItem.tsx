@@ -8,8 +8,8 @@ import { CSS } from '@dnd-kit/utilities';
 import type React from 'react';
 import { useMemo } from 'react';
 import { SelectAxisContainerId } from '../config';
-import { SelectAxisItem } from './SelectAxisItem';
 import type { DraggedItem } from './interfaces';
+import { SelectAxisItem } from './SelectAxisItem';
 
 const dropAnimation: DropAnimation = {
   duration: 200,

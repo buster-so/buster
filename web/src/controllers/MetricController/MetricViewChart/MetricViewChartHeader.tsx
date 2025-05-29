@@ -1,7 +1,7 @@
+import React from 'react';
 import { Text } from '@/components/ui/typography';
 import { EditableTitle } from '@/components/ui/typography/EditableTitle';
 import { cn } from '@/lib/classMerge';
-import React from 'react';
 
 export const METRIC_CHART_TITLE_INPUT_ID = 'metric-chart-title-input';
 

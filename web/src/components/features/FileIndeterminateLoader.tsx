@@ -1,5 +1,5 @@
-import { IndeterminateLinearLoader } from '@/components/ui/loaders';
 import type React from 'react';
+import { IndeterminateLinearLoader } from '@/components/ui/loaders';
 
 export const FileIndeterminateLoader: React.FC = () => {
   return (

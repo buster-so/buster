@@ -1,5 +1,5 @@
-import { CircleInfo, Code3, SquareMenu } from '@/components/ui/icons';
 import type React from 'react';
+import { CircleInfo, Code3, SquareMenu } from '@/components/ui/icons';
 
 export enum DatasetApps {
   OVERVIEW = 'overview',

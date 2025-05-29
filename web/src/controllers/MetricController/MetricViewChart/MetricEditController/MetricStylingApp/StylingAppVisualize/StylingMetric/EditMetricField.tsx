@@ -1,3 +1,4 @@
+import React, { useMemo } from 'react';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { DEFAULT_COLUMN_SETTINGS } from '@/api/asset_interfaces';
 import { ChartType, type DerivedMetricTitle } from '@/api/asset_interfaces/metric/charts';
@@ -7,10 +8,9 @@ import { Popover } from '@/components/ui/popover/Popover';
 import { Select } from '@/components/ui/select';
 import { useMemoizedFn } from '@/hooks';
 import { isNumericColumnStyle, isNumericColumnType } from '@/lib/messages';
-import React, { useMemo } from 'react';
 import { LabelAndInput } from '../../Common';
-import { SelectAxisDropdownContent } from '../SelectAxis/SelectAxisColumnContent';
 import { SelectAxisContainerId } from '../SelectAxis/config';
+import { SelectAxisDropdownContent } from '../SelectAxis/SelectAxisColumnContent';
 import type { createColumnFieldOptions } from './helpers';
 
 export const EditMetricField: React.FC<{

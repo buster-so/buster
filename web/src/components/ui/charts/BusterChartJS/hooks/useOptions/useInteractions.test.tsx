@@ -1,6 +1,6 @@
-import type { BusterChartConfigProps, ChartType } from '@/api/asset_interfaces/metric/charts';
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import type { BusterChartConfigProps, ChartType } from '@/api/asset_interfaces/metric/charts';
 import { useInteractions } from './useInteractions';
 
 describe('useInteractions', () => {

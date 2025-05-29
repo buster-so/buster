@@ -1,7 +1,7 @@
-import { BASE_URL } from '@/api/buster_rest/config';
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
-import { http, HttpResponse } from 'msw';
+import { HttpResponse, http } from 'msw';
+import { BASE_URL } from '@/api/buster_rest/config';
 import { NewTermModal } from './NewTermModal';
 
 interface TermRequestBody {

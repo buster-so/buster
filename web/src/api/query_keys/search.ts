@@ -1,5 +1,5 @@
-import type { BusterSearchResult } from '@/api/asset_interfaces/search';
 import { queryOptions } from '@tanstack/react-query';
+import type { BusterSearchResult } from '@/api/asset_interfaces/search';
 import type { search } from '../buster_rest/search';
 
 export const getSearchResult = (params: Parameters<typeof search>[0]) =>

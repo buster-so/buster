@@ -1,6 +1,6 @@
+import { describe, expect, it } from 'vitest';
 import type { BusterChat } from '@/api/asset_interfaces/chat';
 import { MOCK_CHAT } from '@/mocks/MOCK_CHAT';
-import { describe, expect, it } from 'vitest';
 import { updateChatToIChat } from './chat';
 
 describe('updateChatToIChat', () => {

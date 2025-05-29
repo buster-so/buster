@@ -1,13 +1,13 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
+import last from 'lodash/last';
+import { useMemo } from 'react';
 import { useGetMetric } from '@/api/buster_rest/metrics';
 import { metricsQueryKeys } from '@/api/query_keys/metric';
 import { useMemoizedFn } from '@/hooks';
 import { compareObjectsByKeys } from '@/lib/objects';
 import { canEdit } from '@/lib/share';
-import { useQueryClient } from '@tanstack/react-query';
-import last from 'lodash/last';
-import { useMemo } from 'react';
 import { useOriginalMetricStore } from './useOriginalMetricStore';
 
 export const useIsMetricChanged = ({ metricId }: { metricId: string | undefined }) => {

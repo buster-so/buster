@@ -1,8 +1,8 @@
+import { describe, expect, it, vi } from 'vitest';
 import type { BusterChartProps } from '@/api/asset_interfaces/metric/charts';
 import { formatLabel } from '@/lib';
-import { describe, expect, it, vi } from 'vitest';
 import type { DatasetOption } from '../chartHooks';
-import { JOIN_CHARACTER, formatLabelForDataset, formatLabelForPieLegend } from './labelHelpers';
+import { formatLabelForDataset, formatLabelForPieLegend, JOIN_CHARACTER } from './labelHelpers';
 
 // Mock the formatLabel function
 vi.mock('@/lib', () => ({

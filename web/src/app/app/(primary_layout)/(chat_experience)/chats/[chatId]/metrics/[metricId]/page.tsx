@@ -1,5 +1,5 @@
-import { BusterRoutes, createBusterRoute } from '@/routes';
 import { redirect } from 'next/navigation';
+import { BusterRoutes, createBusterRoute } from '@/routes';
 
 export default async function Page(props: {
   params: Promise<{ chatId: string; metricId: string }>;

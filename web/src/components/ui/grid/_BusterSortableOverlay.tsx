@@ -1,7 +1,7 @@
 'use client';
 
-import { DragOverlay, defaultDropAnimationSideEffects } from '@dnd-kit/core';
 import type { DropAnimation, Modifier } from '@dnd-kit/core';
+import { DragOverlay, defaultDropAnimationSideEffects } from '@dnd-kit/core';
 import { snapCenterToCursor } from '@dnd-kit/modifiers';
 import { animate } from 'framer-motion';
 import React, { useEffect, useMemo } from 'react';

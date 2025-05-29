@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useMemo, useState } from 'react';
 import { type BusterCollection, ShareAssetType } from '@/api/asset_interfaces';
 import { useDeleteCollection, useUpdateCollection } from '@/api/buster_rest/collections';
 import { ShareCollectionButton } from '@/components/features/buttons/ShareMenuCollectionButton';
@@ -7,14 +8,12 @@ import { FavoriteStar, useFavoriteStar } from '@/components/features/list/Favori
 import { Breadcrumb, type BreadcrumbItemType } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/buttons';
 import { Dropdown, type DropdownItems } from '@/components/ui/dropdown';
-import { Dots, Pencil, Plus, Trash } from '@/components/ui/icons';
-import { Star } from '@/components/ui/icons';
+import { Dots, Pencil, Plus, Star, Trash } from '@/components/ui/icons';
 import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useMemoizedFn } from '@/hooks';
 import { canEdit, getIsEffectiveOwner } from '@/lib/share';
 import { BusterRoutes } from '@/routes';
-import React, { useMemo, useState } from 'react';
 import { RenameCollectionModal } from './RenameCollectionModal';
 
 export const CollectionsIndividualHeader: React.FC<{

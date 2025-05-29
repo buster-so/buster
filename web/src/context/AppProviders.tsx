@@ -1,7 +1,7 @@
-import type { UseSupabaseUserContextType } from '@/lib/supabase';
-import { HydrationBoundary, type QueryClient, dehydrate } from '@tanstack/react-query';
+import { dehydrate, HydrationBoundary, type QueryClient } from '@tanstack/react-query';
 import type React from 'react';
 import type { PropsWithChildren } from 'react';
+import type { UseSupabaseUserContextType } from '@/lib/supabase';
 import { BusterAssetsProvider } from './Assets/BusterAssetsProvider';
 import { AppLayoutProvider } from './BusterAppLayout';
 import { BusterReactQueryProvider } from './BusterReactQuery/BusterReactQueryAndApi';

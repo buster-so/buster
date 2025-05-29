@@ -1,8 +1,8 @@
+import React, { useMemo } from 'react';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { Select, type SelectItem } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useMemoizedFn } from '@/hooks';
-import React, { useMemo } from 'react';
 import { LabelAndInput } from '../Common';
 
 const options: SelectItem<NonNullable<IBusterMetricChartConfig['pieLabelPosition']>>[] = [

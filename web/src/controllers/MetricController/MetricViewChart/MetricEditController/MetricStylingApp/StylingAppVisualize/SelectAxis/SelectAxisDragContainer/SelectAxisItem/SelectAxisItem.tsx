@@ -1,11 +1,10 @@
 import type { DraggableAttributes } from '@dnd-kit/core';
 import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities/useSyntheticListeners';
 import React from 'react';
-
+import { SelectAxisContainerId } from '../../config';
 //I really wanted it at the top level...
 import { SelectAxisItemAvailableContainer } from '../../SelectAxisItemAvailableContainer';
 import { SelectAxisItemContainer } from '../../SelectAxisItemContainer';
-import { SelectAxisContainerId } from '../../config';
 
 export const SelectAxisItem = React.forwardRef<
   HTMLDivElement,

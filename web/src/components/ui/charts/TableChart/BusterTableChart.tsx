@@ -1,3 +1,5 @@
+import isEmpty from 'lodash/isEmpty';
+import React, { useCallback } from 'react';
 import {
   type BusterChartPropsBase,
   DEFAULT_CHART_CONFIG,
@@ -8,8 +10,6 @@ import { useUpdateMetricChart } from '@/context/Metrics';
 import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 import { formatLabel } from '@/lib/columnFormatter';
-import isEmpty from 'lodash/isEmpty';
-import React, { useCallback } from 'react';
 import type { BusterTableChartConfig } from './interfaces';
 
 export interface BusterTableChartProps extends BusterTableChartConfig, BusterChartPropsBase {}

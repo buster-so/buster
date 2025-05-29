@@ -1,11 +1,11 @@
 'use client';
 
+import React, { useEffect, useMemo, useState } from 'react';
 import type { IDataResult } from '@/api/asset_interfaces';
 import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
 import { AppVerticalCodeSplitter } from '@/components/features/layouts/AppVerticalCodeSplitter';
 import type { AppSplitterRef } from '@/components/ui/layouts';
 import { useMemoizedFn } from '@/hooks';
-import React, { useEffect, useMemo, useState } from 'react';
 import { useMetricResultsLayout } from './useMetricResultsLayout';
 import { useMetricRunSQL } from './useMetricRunSQL';
 

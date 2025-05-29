@@ -1,5 +1,5 @@
-import { CircleSpinnerLoaderContainer } from '@/components/ui/loaders';
 import dynamic from 'next/dynamic';
+import { CircleSpinnerLoaderContainer } from '@/components/ui/loaders';
 
 const DynamicReactMarkdown = dynamic(() => import('./AppMarkdown'), {
   ssr: false,

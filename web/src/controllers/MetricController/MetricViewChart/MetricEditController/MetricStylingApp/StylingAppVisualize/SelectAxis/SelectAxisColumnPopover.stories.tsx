@@ -1,13 +1,13 @@
+import type { Meta, StoryObj } from '@storybook/react';
+import { HttpResponse, http } from 'msw';
 import type { IBusterMetricChartConfig, SimplifiedColumnType } from '@/api/asset_interfaces';
 import { ChartType, type IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import { Button } from '@/components/ui/buttons/Button';
-import type { Meta, StoryObj } from '@storybook/react';
-import { http, HttpResponse } from 'msw';
+import { SelectAxisContainerId } from './config';
 import {
   SelectAxisColumnPopover,
   type SelectAxisColumnPopoverProps
 } from './SelectAxisColumnPopover';
-import { SelectAxisContainerId } from './config';
 
 const meta: Meta<typeof SelectAxisColumnPopover> = {
   title: 'Controllers/EditMetricController/SelectAxisColumnPopover',

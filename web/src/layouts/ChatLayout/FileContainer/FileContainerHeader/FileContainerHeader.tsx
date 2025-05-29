@@ -1,14 +1,14 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+import React from 'react';
 import type { FileType } from '@/api/asset_interfaces/chat';
 import { useMount } from '@/hooks';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import { useRouter } from 'next/navigation';
-import React from 'react';
 import { useChatLayoutContextSelector } from '../../ChatLayoutContext';
 import { CollapseFileButton } from './CollapseFileButton';
-import { FileContainerHeaderVersionHistory } from './FileContainerHeaderVersionHistory';
 import { SelectedFileButtonsRecord, SelectedFileSegmentRecord } from './config';
+import { FileContainerHeaderVersionHistory } from './FileContainerHeaderVersionHistory';
 
 export const FileContainerHeader: React.FC = React.memo(() => {
   const selectedFileType = useChatLayoutContextSelector((x) => x.selectedFile?.type);

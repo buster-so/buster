@@ -1,8 +1,8 @@
+import type React from 'react';
 import { CircleInfo } from '@/components/ui/icons';
 import { AppTooltip } from '@/components/ui/tooltip';
 import { Text } from '@/components/ui/typography';
 import { cn } from '@/lib/classMerge';
-import type React from 'react';
 
 export const LabelAndInput: React.FC<{
   label: string | React.ReactNode;

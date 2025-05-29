@@ -1,13 +1,13 @@
 'use client';
 
+import type React from 'react';
+import { useMemo } from 'react';
 import { useGetDatasetGroupUsers } from '@/api/buster_rest';
 import { PermissionSearchAndListWrapper } from '@/components/features/PermissionComponents';
 import { Button } from '@/components/ui/buttons';
 import { Plus } from '@/components/ui/icons';
 import { useInviteModalStore } from '@/context/BusterAppLayout';
 import { useDebounceSearch } from '@/hooks/useDebounceSearch';
-import type React from 'react';
-import { useMemo } from 'react';
 import { DatasetGroupUsersListContainer } from './DatasetGroupUsersListContainer';
 
 export const DatasetGroupUsersController: React.FC<{

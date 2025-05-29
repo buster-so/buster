@@ -1,11 +1,11 @@
+import { renderHook } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import type {
   BusterChartProps,
   ChartEncodes,
   ChartType
 } from '@/api/asset_interfaces/metric/charts';
-import { renderHook } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useTooltipOptions } from './useTooltipOptions';
 
 // Mock necessary hooks and dependencies

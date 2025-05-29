@@ -1,8 +1,8 @@
+import React, { type ChangeEvent, useMemo, useRef, useState } from 'react';
 import { InputTextAreaButton } from '@/components/ui/inputs/InputTextAreaButton';
 import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 import { inputHasText } from '@/lib/text';
-import React, { type ChangeEvent, useMemo, useRef, useState } from 'react';
 import { useChatIndividualContextSelector } from '../../../ChatContext';
 import { AIWarning } from './AIWarning';
 import { useChatInputFlow } from './useChatInputFlow';

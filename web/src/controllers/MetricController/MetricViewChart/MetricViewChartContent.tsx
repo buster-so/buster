@@ -1,8 +1,8 @@
+import React, { useMemo } from 'react';
 import type { BusterMetricData, DataMetadata, IBusterMetric } from '@/api/asset_interfaces/metric';
 import { ChartType } from '@/api/asset_interfaces/metric/charts';
 import { BusterChart } from '@/components/ui/charts';
 import { cn } from '@/lib/classMerge';
-import React, { useMemo } from 'react';
 import { METRIC_CHART_CONTAINER_ID } from './config';
 
 interface MetricViewChartContentProps {

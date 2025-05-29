@@ -1,6 +1,6 @@
-import type { ColumnLabelFormat } from '@/api/asset_interfaces/metric';
 import type { Context } from 'chartjs-plugin-datalabels';
 import { describe, expect, it } from 'vitest';
+import type { ColumnLabelFormat } from '@/api/asset_interfaces/metric';
 import { formatBarAndLineDataLabel } from './formatBarAndLineDataLabel';
 
 describe('formatBarAndLineDataLabel', () => {

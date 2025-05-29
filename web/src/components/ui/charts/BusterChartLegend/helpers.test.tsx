@@ -1,5 +1,5 @@
-import { ChartType } from '@/api/asset_interfaces/metric/charts';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { ChartType } from '@/api/asset_interfaces/metric/charts';
 import { computeHiddenShowItems } from './helpers';
 import type { BusterChartLegendItem } from './interfaces';
 

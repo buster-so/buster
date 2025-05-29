@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   BusterOrganizationRole,
   type BusterUser,
@@ -15,7 +16,6 @@ import { Select, type SelectItem } from '@/components/ui/select';
 import { AppTooltip } from '@/components/ui/tooltip';
 import { Text } from '@/components/ui/typography';
 import { useMemoizedFn } from '@/hooks';
-import React from 'react';
 
 export const UserDefaultAccess: React.FC<{
   user: OrganizationUser;

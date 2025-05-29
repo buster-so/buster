@@ -1,3 +1,5 @@
+import type { Active } from '@dnd-kit/core';
+import { useState } from 'react';
 import type {
   ChartEncodes,
   ChartType,
@@ -5,8 +7,6 @@ import type {
 } from '@/api/asset_interfaces/metric/charts';
 import { useMemoizedFn } from '@/hooks';
 import { isNumericColumnStyle, isNumericColumnType } from '@/lib';
-import type { Active } from '@dnd-kit/core';
-import { useState } from 'react';
 import { SelectAxisContainerId } from '../config';
 import { useSelectAxisContextSelector } from '../useSelectAxisContext';
 import type { DropZoneInternal } from './interfaces';

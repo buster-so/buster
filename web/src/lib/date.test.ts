@@ -1,8 +1,6 @@
 import dayjs from 'dayjs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { formatDate } from './date';
-import { numberDateFallback } from './date';
-import { valueIsValidMonth } from './date';
+import { formatDate, numberDateFallback, valueIsValidMonth } from './date';
 
 describe('formatDate', () => {
   // Test 1: Basic date string formatting

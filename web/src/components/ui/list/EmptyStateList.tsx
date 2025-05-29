@@ -1,6 +1,6 @@
+import React from 'react';
 import { Card } from '@/components/ui/card/CardBase';
 import { Text } from '@/components/ui/typography';
-import React from 'react';
 
 interface EmptyStateListProps {
   text: string;

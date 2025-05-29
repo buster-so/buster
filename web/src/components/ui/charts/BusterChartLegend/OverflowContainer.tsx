@@ -1,11 +1,11 @@
+import { useVirtualizer } from '@tanstack/react-virtual';
+import React from 'react';
 import { ChartType } from '@/api/asset_interfaces/metric/charts';
 import { Popover } from '@/components/ui/popover/Popover';
 import { cn } from '@/lib/classMerge';
-import { useVirtualizer } from '@tanstack/react-virtual';
-import React from 'react';
+import type { BusterChartLegendItem, BusterChartLegendProps } from './interfaces';
 import { LegendItemDot } from './LegendDot';
 import { LegendItem } from './LegendItem';
-import type { BusterChartLegendItem, BusterChartLegendProps } from './interfaces';
 
 export const OverflowButton: React.FC<{
   legendItems: BusterChartLegendItem[];

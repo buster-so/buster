@@ -1,12 +1,12 @@
+import type { DraggableAttributes } from '@dnd-kit/core';
+import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/buttons';
 import { ChevronRight, Trash } from '@/components/ui/icons';
 import { Text } from '@/components/ui/typography';
 import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
-import type { DraggableAttributes } from '@dnd-kit/core';
-import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
-import { AnimatePresence, motion } from 'framer-motion';
-import React, { useState } from 'react';
 
 const ANIMATION_DURATION = 0.145;
 

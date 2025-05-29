@@ -1,6 +1,6 @@
-import { VerificationStatus } from '@/api/asset_interfaces';
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
+import { VerificationStatus } from '@/api/asset_interfaces';
 import { StatusBadgeButton } from './StatusBadgeButton';
 
 const meta = {

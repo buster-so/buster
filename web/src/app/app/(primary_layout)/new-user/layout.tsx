@@ -1,7 +1,7 @@
-import NewUserWelcome from '@/assets/png/new-user-welcome.png';
 import type { Metadata } from 'next';
 import type React from 'react';
 import type { PropsWithChildren } from 'react';
+import NewUserWelcome from '@/assets/png/new-user-welcome.png';
 
 export const metadata: Metadata = {
   title: 'Buster Login'

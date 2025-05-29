@@ -1,9 +1,9 @@
+import React, { useMemo } from 'react';
 import type { ColumnMetaData, IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import type { DerivedMetricTitle } from '@/api/asset_interfaces/metric/charts';
 import { Separator } from '@/components/ui/seperator';
 import { useUpdateMetricChart } from '@/context/Metrics';
 import { useMemoizedFn } from '@/hooks';
-import React, { useMemo } from 'react';
 import { EditHeaderTitle } from './EditHeaderTitle';
 import { EditMetricField } from './EditMetricField';
 import { EditMetricHeader } from './EditMetricHeaderType';

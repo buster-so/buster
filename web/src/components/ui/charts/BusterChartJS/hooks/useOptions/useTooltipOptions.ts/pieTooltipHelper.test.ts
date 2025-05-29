@@ -1,6 +1,6 @@
-import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
 import type { Chart, TooltipItem } from 'chart.js';
 import { describe, expect, it } from 'vitest';
+import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
 import { pieTooltipHelper } from './pieTooltipHelper';
 
 describe('pieTooltipHelper', () => {

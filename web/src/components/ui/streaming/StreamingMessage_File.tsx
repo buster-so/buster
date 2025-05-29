@@ -1,3 +1,5 @@
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { useMemo } from 'react';
 import type {
   BusterChatResponseMessage_file,
   BusterChatResponseMessage_fileMetadata
@@ -5,8 +7,6 @@ import type {
 import { StatusIndicator } from '@/components/ui/indicators';
 import { Text } from '@/components/ui/typography';
 import { cn } from '@/lib/utils';
-import { AnimatePresence, motion } from 'framer-motion';
-import React, { useMemo } from 'react';
 import { FileCard } from '../card/FileCard';
 import { TextAndVersionPill } from '../typography/TextAndVersionPill';
 import { itemAnimationConfig } from './animationConfig';

@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import type { DashboardConfig } from '@/api/asset_interfaces/dashboard';
 import type { BusterMetric } from '@/api/asset_interfaces/metric';
 import {
@@ -5,7 +6,6 @@ import {
   MIN_ROW_HEIGHT,
   NUMBER_OF_COLUMNS
 } from '@/components/ui/grid/helpers';
-import { v4 as uuidv4 } from 'uuid';
 
 export const normalizeNewMetricsIntoGrid = (
   metricsRecord: Record<string, BusterMetric>,

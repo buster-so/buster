@@ -2,10 +2,10 @@
 
 import './ChartJSTheme';
 
-import { DEFAULT_CHART_CONFIG, DEFAULT_COLUMN_METADATA } from '@/api/asset_interfaces/metric';
-import { useMemoizedFn } from '@/hooks';
 import type React from 'react';
 import { useCallback, useRef, useState } from 'react';
+import { DEFAULT_CHART_CONFIG, DEFAULT_COLUMN_METADATA } from '@/api/asset_interfaces/metric';
+import { useMemoizedFn } from '@/hooks';
 import type { BusterChartComponentProps } from '../interfaces';
 import { BusterChartJSComponent } from './BusterChartJSComponent';
 import { BusterChartJSLegendWrapper } from './BusterChartJSLegendWrapper';

@@ -1,9 +1,9 @@
 'use client';
 
+import React from 'react';
 import { useGetDatasetGroup, useUpdateDatasetGroup } from '@/api/buster_rest';
 import { EditableTitle } from '@/components/ui/typography/EditableTitle';
 import { useMemoizedFn } from '@/hooks';
-import React from 'react';
 
 export const DatasetGroupTitleAndDescription: React.FC<{
   datasetGroupId: string;

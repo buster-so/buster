@@ -1,7 +1,7 @@
-import { cn } from '@/lib/classMerge';
-import { type VariantProps, cva } from 'class-variance-authority';
+import { cva, type VariantProps } from 'class-variance-authority';
 import Link from 'next/link';
 import React from 'react';
+import { cn } from '@/lib/classMerge';
 import { Button } from '../buttons/Button';
 import { Xmark } from '../icons';
 import type { ISidebarItem } from './interfaces';

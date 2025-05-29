@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useRef, useState } from 'react';
 import type { BusterChatMessageRequest } from '@/api/asset_interfaces';
 import { Button } from '@/components/ui/buttons';
 import { Copy, PenWriting } from '@/components/ui/icons';
@@ -10,7 +11,6 @@ import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useBusterNewChatContextSelector } from '@/context/Chats';
 import { useMemoizedFn, useMount } from '@/hooks';
 import { cn } from '@/lib/classMerge';
-import React, { useState, useRef } from 'react';
 import { MessageContainer } from './MessageContainer';
 
 export const ChatUserMessage: React.FC<{

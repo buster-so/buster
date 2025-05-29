@@ -1,9 +1,9 @@
 'use client';
 
-import { useGetMyUserInfo } from '@/api/buster_rest/users';
-import { checkIfUserIsAdmin } from '@/lib/user';
 import React, { type PropsWithChildren } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
+import { useGetMyUserInfo } from '@/api/buster_rest/users';
+import { checkIfUserIsAdmin } from '@/lib/user';
 import { useSupabaseContext } from '../Supabase';
 
 export const useUserConfigProvider = () => {

@@ -1,8 +1,8 @@
+import type { BubbleDataPoint, ScriptableContext } from 'chart.js';
 import { DEFAULT_CHART_CONFIG, DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import { addOpacityToColor } from '@/lib/colors';
 import { createDayjsDate } from '@/lib/date';
 import { isDateColumnType } from '@/lib/messages';
-import type { BubbleDataPoint, ScriptableContext } from 'chart.js';
 import { formatLabelForDataset } from '../../../commonHelpers';
 import type { ChartProps } from '../../core';
 import { createTrendlineOnSeries } from './createTrendlines';

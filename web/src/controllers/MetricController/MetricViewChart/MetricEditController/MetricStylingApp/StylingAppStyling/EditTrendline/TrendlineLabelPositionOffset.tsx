@@ -1,5 +1,5 @@
-import { Slider } from '@/components/ui/slider';
 import React from 'react';
+import { Slider } from '@/components/ui/slider';
 import { LabelAndInput } from '../../Common';
 import type { LoopTrendline } from './EditTrendline';
 

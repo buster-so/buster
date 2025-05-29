@@ -1,5 +1,7 @@
 'use client';
 
+import type React from 'react';
+import { useState } from 'react';
 import {
   type getListChats,
   type getListLogs,
@@ -7,8 +9,6 @@ import {
   useGetListLogs
 } from '@/api/buster_rest/chats';
 import { useUserConfigContextSelector } from '@/context/Users';
-import type React from 'react';
-import { useState } from 'react';
 import { ChatItemsContainer } from './ChatItemsContainer';
 
 export const ChatListContainer: React.FC<{

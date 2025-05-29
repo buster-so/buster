@@ -1,3 +1,4 @@
+import React, { useLayoutEffect, useMemo, useState } from 'react';
 import {
   useAddAndRemoveAssetsFromCollection,
   useGetCollection
@@ -11,7 +12,6 @@ import {
 import { Text } from '@/components/ui/typography';
 import { useDebounce, useMemoizedFn } from '@/hooks';
 import { formatDate } from '@/lib';
-import React, { useLayoutEffect, useMemo, useState } from 'react';
 import { ASSET_ICONS } from '../config/assetIcons';
 
 export const AddToCollectionModal: React.FC<{

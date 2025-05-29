@@ -1,3 +1,5 @@
+import first from 'lodash/first';
+import React from 'react';
 import type { FileType } from '@/api/asset_interfaces/chat';
 import { useListVersionHistories } from '@/components/features/versionHistory';
 import { useListVersionDropdownItems } from '@/components/features/versionHistory/useListVersionDropdownItems';
@@ -6,8 +8,6 @@ import { Dropdown } from '@/components/ui/dropdown';
 import { History } from '@/components/ui/icons';
 import { useMemoizedFn } from '@/hooks';
 import { useChatLayoutContextSelector } from '@/layouts/ChatLayout';
-import first from 'lodash/first';
-import React from 'react';
 
 export const VersionHistoryHeaderButtons = React.memo(() => {
   const selectedFile = useChatLayoutContextSelector((x) => x.selectedFile);

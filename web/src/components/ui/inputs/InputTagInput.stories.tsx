@@ -1,8 +1,8 @@
 'use client';
 
 import type { Meta, StoryObj } from '@storybook/react';
-import { useState } from 'react';
 import type React from 'react';
+import { useState } from 'react';
 import { InputTagInput } from './InputTagInput';
 
 const meta: Meta<typeof InputTagInput> = {

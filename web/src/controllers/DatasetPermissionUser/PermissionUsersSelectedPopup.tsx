@@ -1,10 +1,10 @@
+import React, { useMemo } from 'react';
 import { useDatasetUpdatePermissionUsers } from '@/api/buster_rest';
 import { Button } from '@/components/ui/buttons';
 import { Dropdown, type DropdownProps } from '@/components/ui/dropdown';
 import { CheckDouble, Xmark } from '@/components/ui/icons';
 import { BusterListSelectedOptionPopupContainer } from '@/components/ui/list';
 import { useMemoizedFn } from '@/hooks';
-import React, { useMemo } from 'react';
 import { PERMISSION_USERS_OPTIONS } from './config';
 
 export const PermissionUsersSelectedPopup: React.FC<{

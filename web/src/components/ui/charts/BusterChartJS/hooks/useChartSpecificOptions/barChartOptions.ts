@@ -1,5 +1,4 @@
-import type { ChartType as ChartJSChartType } from 'chart.js';
-import type { PluginChartOptions } from 'chart.js';
+import type { ChartType as ChartJSChartType, PluginChartOptions } from 'chart.js';
 import type { DeepPartial } from 'utility-types';
 import type { ChartProps } from '../../core';
 import type { ChartSpecificOptionsProps } from './interfaces';

@@ -1,5 +1,7 @@
 'use client';
 
+import isEmpty from 'lodash/isEmpty';
+import React, { useEffect, useMemo, useState } from 'react';
 import type {
   BusterDashboardResponse,
   BusterMetric,
@@ -8,8 +10,6 @@ import type {
 import type { useUpdateDashboardConfig } from '@/api/buster_rest/dashboards';
 import { BusterResizeableGrid, type BusterResizeableGridRow } from '@/components/ui/grid';
 import { useDebounceFn, useMemoizedFn } from '@/hooks';
-import isEmpty from 'lodash/isEmpty';
-import React, { useEffect, useMemo, useState } from 'react';
 import { DashboardContentControllerProvider } from './DashboardContentControllerContext';
 import { DashboardEmptyState, DashboardNoContentReadOnly } from './DashboardEmptyState';
 import { DashboardMetricItem } from './DashboardMetricItem';

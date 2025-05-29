@@ -1,8 +1,8 @@
 'use client';
 
-import { Magnifier } from '@/components/ui/icons';
 import { Command as CommandPrimitive } from 'cmdk';
 import * as React from 'react';
+import { Magnifier } from '@/components/ui/icons';
 
 import { cn } from '@/lib/utils';
 

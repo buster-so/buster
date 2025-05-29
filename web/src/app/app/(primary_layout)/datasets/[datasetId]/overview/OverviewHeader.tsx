@@ -1,8 +1,8 @@
+import React from 'react';
 import { useUpdateDataset } from '@/api/buster_rest';
 import { Text } from '@/components/ui/typography';
 import { EditableTitle } from '@/components/ui/typography/EditableTitle';
 import { useMemoizedFn } from '@/hooks';
-import React from 'react';
 
 export const OverviewHeader: React.FC<{ datasetId: string; description: string; name: string }> =
   React.memo(({ datasetId, description, name }) => {

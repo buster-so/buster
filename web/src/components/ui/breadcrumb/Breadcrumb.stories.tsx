@@ -1,5 +1,5 @@
-import { BusterRoutes } from '@/routes/busterRoutes';
 import type { Meta, StoryObj } from '@storybook/react';
+import { BusterRoutes } from '@/routes/busterRoutes';
 import { Breadcrumb } from './Breadcrumb';
 
 const meta: Meta<typeof Breadcrumb> = {

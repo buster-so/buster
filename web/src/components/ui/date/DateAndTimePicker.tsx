@@ -1,5 +1,7 @@
 'use client';
 
+import { format } from 'date-fns';
+import * as React from 'react';
 import { Button } from '@/components/ui/buttons';
 import { Calendar } from '@/components/ui/calendar';
 import { Calendar as CalendarIcon } from '@/components/ui/icons';
@@ -10,8 +12,6 @@ import {
 } from '@/components/ui/popover/PopoverBase';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
-import * as React from 'react';
 
 export function DateTimePicker() {
   const [date, setDate] = React.useState<Date>();

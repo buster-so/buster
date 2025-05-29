@@ -1,5 +1,5 @@
-import { formatLabel } from '@/lib';
 import { describe, expect, it, vi } from 'vitest';
+import { formatLabel } from '@/lib';
 import { formatLabelForDataset } from '../../../commonHelpers';
 import { pieSeriesBuilder_data, pieSeriesBuilder_labels } from './pieSeriesBuilder';
 

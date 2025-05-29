@@ -1,13 +1,13 @@
 import type {
   BigQueryCredentials,
+  DatabricksCredentials,
   DataSource,
   DataSourceListItem,
-  DatabricksCredentials,
   MySQLCredentials,
   PostgresCredentials,
   RedshiftCredentials,
-  SQLServerCredentials,
-  SnowflakeCredentials
+  SnowflakeCredentials,
+  SQLServerCredentials
 } from '@/api/asset_interfaces/datasources';
 import { DataSourceSchema } from '@/api/asset_interfaces/datasources';
 import { serverFetch } from '@/api/createServerInstance';

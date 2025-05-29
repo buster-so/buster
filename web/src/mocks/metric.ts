@@ -1,8 +1,8 @@
 import {
   type BusterMetricListItem,
   ChartType,
-  DEFAULT_CHART_CONFIG,
   type DataMetadata,
+  DEFAULT_CHART_CONFIG,
   type IBusterMetric,
   type IBusterMetricChartConfig
 } from '@/api/asset_interfaces/metric';

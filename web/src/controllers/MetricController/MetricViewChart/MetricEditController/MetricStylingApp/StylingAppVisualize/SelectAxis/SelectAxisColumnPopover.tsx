@@ -1,9 +1,9 @@
+import React from 'react';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import type { ChartEncodes, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import { Popover } from '@/components/ui/popover/Popover';
-import React from 'react';
-import { SelectAxisDropdownContent } from './SelectAxisColumnContent';
 import type { SelectAxisContainerId } from './config';
+import { SelectAxisDropdownContent } from './SelectAxisColumnContent';
 
 export interface SelectAxisColumnPopoverProps {
   columnLabelFormat: IColumnLabelFormat;

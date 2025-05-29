@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/buttons/Button';
 import { FileCard } from '@/components/ui/card/FileCard';
 import { Copy2 } from '@/components/ui/icons';
@@ -7,7 +8,6 @@ import { AppDiffCodeEditor } from '@/components/ui/inputs/AppDiffCodeEditor';
 import { TextAndVersionPill } from '@/components/ui/typography/TextAndVersionPill';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks';
-import React, { useMemo, useState } from 'react';
 import type { AppVerticalCodeSplitterProps } from './AppVerticalCodeSplitter';
 
 export const DiffSQLContainer: React.FC<{

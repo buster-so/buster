@@ -1,6 +1,6 @@
-import { cn } from '@/lib/utils';
-import { type VariantProps, cva } from 'class-variance-authority';
+import { cva, type VariantProps } from 'class-variance-authority';
 import type React from 'react';
+import { cn } from '@/lib/utils';
 
 const headerVariants = cva(
   'bg-page-background flex max-h-[38px] min-h-[38px] items-center justify-between gap-x-2.5 relative',

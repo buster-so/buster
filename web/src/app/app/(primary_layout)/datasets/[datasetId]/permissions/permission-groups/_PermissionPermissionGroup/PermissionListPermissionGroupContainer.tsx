@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useMemo, useState } from 'react';
 import type { ListPermissionGroupsResponse } from '@/api/asset_interfaces';
 import { useDatasetUpdatePermissionGroups } from '@/api/buster_rest/datasets';
 import { PermissionAssignedCell } from '@/components/features/PermissionComponents';
@@ -12,7 +13,6 @@ import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
 import { InfiniteListContainer } from '@/components/ui/list/InfiniteListContainer';
 import { Text } from '@/components/ui/typography';
 import { useMemoizedFn } from '@/hooks';
-import React, { useMemo, useState } from 'react';
 import { PermissionGroupSelectedPopup } from './PermissionGroupSelectedPopup';
 
 export const PermissionListPermissionGroupContainer: React.FC<{

@@ -1,6 +1,6 @@
-import type { BusterChatResponseMessage_file } from '@/api/asset_interfaces';
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
+import type { BusterChatResponseMessage_file } from '@/api/asset_interfaces';
 import { StreamingMessage_File } from './StreamingMessage_File';
 
 const meta: Meta<typeof StreamingMessage_File> = {

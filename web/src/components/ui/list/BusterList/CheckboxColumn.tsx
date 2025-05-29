@@ -1,8 +1,8 @@
+import React from 'react';
 import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
-import React from 'react';
-import { MemoizedCheckbox } from './MemoizedCheckbox';
 import { WIDTH_OF_CHECKBOX_COLUMN } from './config';
+import { MemoizedCheckbox } from './MemoizedCheckbox';
 
 export const CheckboxColumn: React.FC<{
   checkStatus: 'checked' | 'unchecked' | 'indeterminate' | undefined;

@@ -1,3 +1,4 @@
+import React, { useLayoutEffect, useMemo, useState } from 'react';
 import { useAddAndRemoveMetricsFromDashboard, useGetDashboard } from '@/api/buster_rest/dashboards';
 import { useSearch } from '@/api/buster_rest/search';
 import { Button } from '@/components/ui/buttons';
@@ -8,7 +9,6 @@ import {
 } from '@/components/ui/modal/InputSelectModal';
 import { useDebounce, useMemoizedFn } from '@/hooks';
 import { formatDate } from '@/lib';
-import React, { useLayoutEffect, useMemo, useState } from 'react';
 
 export const AddToDashboardModal: React.FC<{
   open: boolean;

@@ -1,5 +1,6 @@
 'use client';
 
+import type React from 'react';
 import { Button } from '@/components/ui/buttons';
 import {
   Card,
@@ -10,7 +11,6 @@ import {
 } from '@/components/ui/card/CardBase';
 import { Plus } from '@/components/ui/icons';
 import { useBusterNotifications } from '@/context/BusterNotifications';
-import type React from 'react';
 
 export const SettingsEmptyState: React.FC<{
   title?: string;

@@ -1,6 +1,6 @@
+import React from 'react';
 import { TeamRole } from '@/api/asset_interfaces';
 import { Select, type SelectItem } from '@/components/ui/select';
-import React from 'react';
 
 export const TEAM_ROLE_OPTIONS: SelectItem<TeamRole>[] = [
   {

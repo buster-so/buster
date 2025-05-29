@@ -1,9 +1,9 @@
 'use client';
 
-import { cn } from '@/lib/classMerge';
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
 import Link from 'next/link';
 import * as React from 'react';
+import { cn } from '@/lib/classMerge';
 import { Button } from '../buttons/Button';
 import { Checkbox } from '../checkbox/Checkbox';
 import { CaretRight } from '../icons/NucleoIconFilled';

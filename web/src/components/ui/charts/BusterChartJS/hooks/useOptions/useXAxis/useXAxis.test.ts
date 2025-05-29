@@ -1,11 +1,11 @@
 import '../../../ChartJSTheme';
 
-import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
-import type { ColumnSettings, SimplifiedColumnType } from '@/api/asset_interfaces/metric';
-import { ChartType } from '@/api/asset_interfaces/metric/charts';
-import type { ChartEncodes } from '@/api/asset_interfaces/metric/charts';
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import type { ColumnSettings, SimplifiedColumnType } from '@/api/asset_interfaces/metric';
+import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
+import type { ChartEncodes } from '@/api/asset_interfaces/metric/charts';
+import { ChartType } from '@/api/asset_interfaces/metric/charts';
 import { useXAxis } from './useXAxis';
 
 describe('useXAxis', () => {

@@ -1,9 +1,9 @@
+import Link from 'next/link';
+import React from 'react';
 import { BusterLogo } from '@/assets/svg/BusterLogo';
 import { Button } from '@/components/ui/buttons';
 import { Title } from '@/components/ui/typography';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import Link from 'next/link';
-import React from 'react';
 
 export const AppNoPageAccess: React.FC<{
   assetId: string;

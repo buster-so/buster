@@ -1,10 +1,10 @@
+import React, { useMemo } from 'react';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { ChartType, type ColumnSettings } from '@/api/asset_interfaces/metric/charts';
 import { ChartBarAxisX, ChartLine, ChartScatter } from '@/components/ui/icons';
 import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
 import { AppTooltip } from '@/components/ui/tooltip';
 import { useMemoizedFn } from '@/hooks';
-import React, { useMemo } from 'react';
 import { LabelAndInput } from '../../../Common/LabelAndInput';
 
 const options = [

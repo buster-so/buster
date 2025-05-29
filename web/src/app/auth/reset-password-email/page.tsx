@@ -1,8 +1,8 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
 import { ResetEmailForm } from '@/components/features/auth/ResetEmailForm';
 import { resetPasswordEmailSend } from '@/lib/supabase/resetPassword';
-import { useSearchParams } from 'next/navigation';
 
 export default function ResetPassword() {
   const searchParams = useSearchParams();

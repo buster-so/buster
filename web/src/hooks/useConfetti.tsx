@@ -1,7 +1,7 @@
 'use client';
 
-import confetti from 'canvas-confetti';
 import type { Options } from 'canvas-confetti';
+import confetti from 'canvas-confetti';
 //https://www.kirilv.com/canvas-confetti/
 
 export const useConfetti = () => {

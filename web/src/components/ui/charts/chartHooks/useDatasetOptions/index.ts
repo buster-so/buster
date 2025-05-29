@@ -1,3 +1,3 @@
-export * from './useDatasetOptions';
-export * from './interfaces';
 export * from './config';
+export * from './interfaces';
+export * from './useDatasetOptions';

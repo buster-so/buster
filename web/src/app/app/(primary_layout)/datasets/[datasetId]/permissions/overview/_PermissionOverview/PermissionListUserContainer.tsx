@@ -1,8 +1,9 @@
 'use client';
 
+import React, { useMemo } from 'react';
 import type { DatasetPermissionOverviewUser } from '@/api/asset_interfaces';
-import { PermissionLineageBreadcrumb } from '@/components/features/PermissionComponents';
 import { ListUserItem } from '@/components/features/list';
+import { PermissionLineageBreadcrumb } from '@/components/features/PermissionComponents';
 import {
   type BusterListColumn,
   type BusterListRowItem,
@@ -11,7 +12,6 @@ import {
 } from '@/components/ui/list';
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import React, { useMemo } from 'react';
 
 export const PermissionListUserContainer: React.FC<{
   className?: string;

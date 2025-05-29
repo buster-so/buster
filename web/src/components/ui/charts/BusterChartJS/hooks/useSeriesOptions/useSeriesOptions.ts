@@ -1,3 +1,5 @@
+import type { ChartType as ChartJSChartType } from 'chart.js';
+import { useMemo } from 'react';
 import type {
   BusterChartConfigProps,
   BusterChartProps,
@@ -7,8 +9,6 @@ import type {
 } from '@/api/asset_interfaces/metric/charts';
 import type { ColumnMetaData } from '@/api/asset_interfaces/metric/interfaces';
 import { isNumericColumnType } from '@/lib';
-import type { ChartType as ChartJSChartType } from 'chart.js';
-import { useMemo } from 'react';
 import type { DatasetOptionsWithTicks } from '../../../chartHooks';
 import type { ChartProps } from '../../core';
 import { barSeriesBuilder, barSeriesBuilder_labels } from './barSeriesBuilder';

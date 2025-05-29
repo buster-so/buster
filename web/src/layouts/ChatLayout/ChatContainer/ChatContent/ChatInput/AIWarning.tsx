@@ -1,5 +1,5 @@
-import { Text } from '@/components/ui/typography';
 import React from 'react';
+import { Text } from '@/components/ui/typography';
 
 export const AIWarning = React.memo(
   () => {

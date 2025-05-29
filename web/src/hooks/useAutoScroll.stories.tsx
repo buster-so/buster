@@ -1,7 +1,7 @@
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAutoScroll } from './useAutoScroll';
 
 interface Message {

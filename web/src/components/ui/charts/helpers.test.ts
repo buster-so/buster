@@ -1,5 +1,5 @@
-import { type ChartEncodes, ChartType } from '@/api/asset_interfaces/metric/charts';
 import { describe, expect, it } from 'vitest';
+import { type ChartEncodes, ChartType } from '@/api/asset_interfaces/metric/charts';
 import { doesChartHaveValidAxis } from './helpers';
 
 describe('doesChartHaveValidAxis', () => {

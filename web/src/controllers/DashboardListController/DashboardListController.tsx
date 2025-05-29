@@ -1,9 +1,9 @@
 'use client';
 
-import { useGetDashboardsList } from '@/api/buster_rest/dashboards';
-import { AppPageLayout } from '@/components/ui/layouts';
 import type React from 'react';
 import { useState } from 'react';
+import { useGetDashboardsList } from '@/api/buster_rest/dashboards';
+import { AppPageLayout } from '@/components/ui/layouts';
 import { DashboardHeader } from './DashboardHeader';
 import { DashboardListContent } from './DashboardListContent';
 

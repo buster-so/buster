@@ -1,6 +1,6 @@
-import { Window, WindowSettings, WindowUser } from '@/components/ui/icons/NucleoIconOutlined';
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
+import { Window, WindowSettings, WindowUser } from '@/components/ui/icons/NucleoIconOutlined';
 import { Combobox } from './Combobox';
 
 const meta: Meta<typeof Combobox> = {

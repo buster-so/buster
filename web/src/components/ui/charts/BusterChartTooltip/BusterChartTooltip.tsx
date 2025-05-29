@@ -1,7 +1,7 @@
 import type React from 'react';
+import type { ITooltipItem } from './interfaces';
 import { TooltipItem } from './TooltipItem';
 import { TooltipTitle } from './TooltipTitle';
-import type { ITooltipItem } from './interfaces';
 
 const MAX_ITEMS_IN_TOOLTIP = 12;
 

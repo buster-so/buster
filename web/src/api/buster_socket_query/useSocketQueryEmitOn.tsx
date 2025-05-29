@@ -1,8 +1,8 @@
+import type { QueryKey, UseQueryOptions } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import type { BusterSocketRequest, BusterSocketResponseRoute } from '@/api/buster_socket';
 import { useBusterWebSocket } from '@/context/BusterWebSocket';
 import { useMemoizedFn } from '@/hooks';
-import type { QueryKey, UseQueryOptions } from '@tanstack/react-query';
-import { useMemo } from 'react';
 import type { InferBusterSocketResponseData } from './types';
 import { useSocketQueryOn } from './useSocketQueryOn';
 

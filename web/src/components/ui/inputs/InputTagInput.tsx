@@ -1,9 +1,9 @@
 'use client';
 
-import { useMemoizedFn } from '@/hooks';
-import { cn } from '@/lib/utils';
 import type { VariantProps } from 'class-variance-authority';
 import * as React from 'react';
+import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/utils';
 import { inputVariants } from './Input';
 import { InputTag } from './InputTag';
 

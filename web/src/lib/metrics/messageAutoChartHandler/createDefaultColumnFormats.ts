@@ -1,3 +1,4 @@
+import { create } from 'mutative';
 import {
   type ColumnLabelFormat,
   type ColumnMetaData,
@@ -7,7 +8,6 @@ import {
   type SimplifiedColumnType
 } from '@/api/asset_interfaces/metric';
 import { isDateColumnType, isNumericColumnType, simplifyColumnType } from '@/lib/messages';
-import { create } from 'mutative';
 
 export const createDefaultColumnLabelFormats = (
   columnLabelFormats: Record<string, IColumnLabelFormat> | undefined,

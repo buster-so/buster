@@ -1,6 +1,6 @@
+import type React from 'react';
 import type { ChartType } from '@/api/asset_interfaces/metric/charts';
 import { cn } from '@/lib/classMerge';
-import type React from 'react';
 import { LegendItemDot } from '../BusterChartLegend/LegendDot';
 import type { ITooltipItem, TooltipItemValueProps } from './interfaces';
 

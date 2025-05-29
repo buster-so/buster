@@ -1,5 +1,5 @@
-import { DEFAULT_COLUMN_LABEL_FORMAT, type IColumnLabelFormat } from '@/api/asset_interfaces';
 import { describe, expect, it } from 'vitest';
+import { DEFAULT_COLUMN_LABEL_FORMAT, type IColumnLabelFormat } from '@/api/asset_interfaces';
 import { aggregateAndCreateDatasets } from './aggregateAndCreateDatasets';
 
 describe('aggregateAndCreateDatasets', () => {

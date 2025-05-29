@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useMemo } from 'react';
 import type { OrganizationUser } from '@/api/asset_interfaces/users';
 import { ListUserItem } from '@/components/features/list/ListUserItem';
 import {
@@ -11,7 +12,6 @@ import {
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
 import { Text } from '@/components/ui/typography';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import React, { useMemo } from 'react';
 import { OrganizationUserRoleText } from './config';
 
 export const ListUsersComponent: React.FC<{

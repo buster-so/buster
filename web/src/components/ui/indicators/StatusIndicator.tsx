@@ -1,6 +1,6 @@
-import { cn } from '@/lib/classMerge';
 import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
+import { cn } from '@/lib/classMerge';
 import { CircleWarning, RadioChecked } from '../icons';
 
 const animationConfig = {

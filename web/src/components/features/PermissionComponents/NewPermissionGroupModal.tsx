@@ -1,9 +1,9 @@
+import React, { useMemo, useRef, useState } from 'react';
 import { useCreatePermissionGroup } from '@/api/buster_rest/permission_groups';
 import { Input } from '@/components/ui/inputs';
 import { AppModal } from '@/components/ui/modal';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks';
-import React, { useMemo, useRef, useState } from 'react';
 import { SelectedDatasetInput } from './SelectDatasetInput';
 
 interface NewPermissionGroupModalProps {

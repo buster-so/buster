@@ -1,3 +1,4 @@
+import React, { memo, useMemo, useRef, useState } from 'react';
 import {
   type BusterMetricListItem,
   ShareAssetType,
@@ -5,8 +6,8 @@ import {
 } from '@/api/asset_interfaces';
 import { FavoriteStar } from '@/components/features/list';
 import {
-  StatusBadgeIndicator,
-  getShareStatus
+  getShareStatus,
+  StatusBadgeIndicator
 } from '@/components/features/metrics/StatusBadgeIndicator';
 import { Avatar } from '@/components/ui/avatar';
 import type { BusterListColumn, BusterListRow } from '@/components/ui/list';
@@ -16,7 +17,6 @@ import { Text } from '@/components/ui/typography';
 import { useMemoizedFn } from '@/hooks';
 import { formatDate, makeHumanReadble } from '@/lib';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import React, { memo, useMemo, useRef, useState } from 'react';
 import { MetricSelectedOptionPopup } from './MetricItemsSelectedPopup';
 
 export const MetricItemsContainer: React.FC<{

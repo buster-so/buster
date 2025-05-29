@@ -1,3 +1,4 @@
+import React, { useMemo, useState } from 'react';
 import type {
   ListPermissionGroupsResponse,
   ListPermissionUsersResponse
@@ -14,9 +15,8 @@ import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
 import { Select } from '@/components/ui/select';
 import { useMemoizedFn } from '@/hooks';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import React, { useMemo, useState } from 'react';
-import { PermissionUsersSelectedPopup } from './PermissionUsersSelectedPopup';
 import { PERMISSION_USERS_OPTIONS } from './config';
+import { PermissionUsersSelectedPopup } from './PermissionUsersSelectedPopup';
 
 export const PermissionListUsersContainer: React.FC<{
   filteredPermissionUsers: ListPermissionUsersResponse[];

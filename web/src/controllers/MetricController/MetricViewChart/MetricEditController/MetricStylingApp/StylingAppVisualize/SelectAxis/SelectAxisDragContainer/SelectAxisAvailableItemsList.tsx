@@ -1,10 +1,10 @@
-import { cn } from '@/lib/classMerge';
 import { useDroppable } from '@dnd-kit/core';
 import type React from 'react';
+import { cn } from '@/lib/classMerge';
 import { StylingLabel } from '../../../Common';
 import { SelectAxisContainerId } from '../config';
-import { SelectAxisSortableItem } from './SelectAxisSortableItem';
 import type { SelectAxisItemProps } from './interfaces';
+import { SelectAxisSortableItem } from './SelectAxisSortableItem';
 
 interface AvailableItemsListProps {
   items: SelectAxisItemProps[];

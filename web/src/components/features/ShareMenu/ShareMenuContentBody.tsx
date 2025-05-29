@@ -1,3 +1,5 @@
+import { validate } from 'email-validator';
+import React from 'react';
 import { type BusterShare, ShareAssetType, ShareRole } from '@/api/asset_interfaces';
 import {
   useShareCollection,
@@ -16,8 +18,6 @@ import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 import { inputHasText } from '@/lib/text';
-import { validate } from 'email-validator';
-import React from 'react';
 import { AccessDropdown } from './AccessDropdown';
 import { IndividualSharePerson } from './IndividualSharePerson';
 import { ShareMenuContentEmbed } from './ShareMenuContentEmbed';

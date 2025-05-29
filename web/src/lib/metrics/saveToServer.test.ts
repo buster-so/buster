@@ -1,7 +1,7 @@
+import { describe, expect, it } from 'vitest';
 import type { IBusterMetric } from '@/api/asset_interfaces/metric';
 import { ChartType } from '@/api/asset_interfaces/metric/charts';
 import { VerificationStatus } from '@/api/asset_interfaces/share/verificationInterfaces';
-import { describe, expect, it } from 'vitest';
 import {
   getChangedTopLevelMessageValues,
   getChangesFromDefaultChartConfig

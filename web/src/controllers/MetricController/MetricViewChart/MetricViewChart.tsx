@@ -1,5 +1,8 @@
 'use client';
 
+import { AnimatePresence, motion } from 'framer-motion';
+import isEmpty from 'lodash/isEmpty';
+import React, { useMemo } from 'react';
 import { ChartType } from '@/api/asset_interfaces/metric/charts/enum';
 import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
 import { useUpdateMetricChart } from '@/context/Metrics';
@@ -7,9 +10,6 @@ import { useIsMetricReadOnly } from '@/context/Metrics/useIsMetricReadOnly';
 import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 import { inputHasText } from '@/lib/text';
-import { AnimatePresence, motion } from 'framer-motion';
-import isEmpty from 'lodash/isEmpty';
-import React, { useMemo } from 'react';
 import { MetricChartEvaluation } from './MetricChartEvaluation';
 import { MetricSaveFilePopup } from './MetricSaveFilePopup';
 import { MetricViewChartContent } from './MetricViewChartContent';

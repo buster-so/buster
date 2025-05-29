@@ -1,27 +1,26 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-
-import { useMemoizedFn } from '@/hooks';
-import { cn } from '@/lib/utils';
 import {
   type CollisionDetection,
+  closestCenter,
   DndContext,
   type DragEndEvent,
   type DragStartEvent,
+  getFirstCollision,
   MeasuringStrategy,
   PointerSensor,
-  closestCenter,
-  getFirstCollision,
   pointerWithin,
   useSensor,
   useSensors
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import isEqual from 'lodash/isEqual';
+import React, { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { BusterResizeRows } from './BusterResizeRows';
+import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/utils';
 import { BusterSortableOverlay } from './_BusterSortableOverlay';
+import { BusterResizeRows } from './BusterResizeRows';
 import { MIN_ROW_HEIGHT, NEW_ROW_ID, NUMBER_OF_COLUMNS, TOP_SASH_ID } from './helpers';
 import type { BusterResizeableGridRow } from './interfaces';
 

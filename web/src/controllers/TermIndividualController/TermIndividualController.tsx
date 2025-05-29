@@ -1,8 +1,8 @@
 'use client';
 
+import type React from 'react';
 import { useGetTermsList } from '@/api/buster_rest/terms';
 import { AppPageLayout, AppSplitter } from '@/components/ui/layouts';
-import type React from 'react';
 import { TermIndividualContent } from './TermIndividualContent';
 import { TermIndividualContentSider } from './TermIndividualContentSider';
 import { TermIndividualHeader } from './TermIndividualHeader';

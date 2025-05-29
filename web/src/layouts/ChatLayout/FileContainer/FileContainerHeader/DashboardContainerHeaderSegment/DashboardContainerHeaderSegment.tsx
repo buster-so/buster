@@ -1,10 +1,10 @@
-import { AppSegmented } from '@/components/ui/segmented';
+import React, { useMemo } from 'react';
 import type { SegmentedItem } from '@/components/ui/segmented';
+import { AppSegmented } from '@/components/ui/segmented';
 import { Text } from '@/components/ui/typography';
 import { useIsDashboardReadOnly } from '@/context/Dashboards/useIsDashboardReadOnly';
 import { useMemoizedFn } from '@/hooks';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import React, { useMemo } from 'react';
 import { useChatLayoutContextSelector } from '../../../ChatLayoutContext';
 import type { FileView } from '../../../ChatLayoutContext/useLayoutConfig';
 import type { FileContainerSegmentProps } from '../interfaces';

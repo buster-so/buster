@@ -1,5 +1,6 @@
 'use client';
 
+import type { ChartComponentLike, ChartType } from 'chart.js';
 import {
   BarController,
   BubbleController,
@@ -11,7 +12,6 @@ import {
   RadarController,
   ScatterController
 } from 'chart.js';
-import type { ChartComponentLike, ChartType } from 'chart.js';
 import { forwardRef } from 'react';
 import { Chart } from './chart';
 import type { ChartJSOrUndefined, ChartProps, TypedChartComponent } from './types.js';

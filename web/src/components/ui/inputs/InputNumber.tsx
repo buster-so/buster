@@ -1,6 +1,6 @@
+import React from 'react';
 import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
-import React from 'react';
 import { Input, type InputProps } from './Input';
 
 export interface InputNumberProps extends Omit<InputProps, 'type' | 'value' | 'onChange'> {

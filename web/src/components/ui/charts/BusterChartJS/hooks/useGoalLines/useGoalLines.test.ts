@@ -1,11 +1,11 @@
+import { renderHook } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import type {
   BusterChartConfigProps,
   ChartType,
   GoalLine
 } from '@/api/asset_interfaces/metric/charts';
-import { renderHook } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
 import { useGoalLines } from './useGoalLines';
 
 describe('useGoalLines', () => {

@@ -1,6 +1,6 @@
-import { cn } from '@/lib/utils';
 import { type Cell, flexRender } from '@tanstack/react-table';
 import type React from 'react';
+import { cn } from '@/lib/utils';
 import { CELL_HEIGHT } from './constants';
 
 interface DataGridCellProps {

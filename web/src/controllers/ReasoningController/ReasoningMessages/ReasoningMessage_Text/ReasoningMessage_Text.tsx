@@ -1,7 +1,7 @@
+import React from 'react';
 import type { BusterChatMessageReasoning_text } from '@/api/asset_interfaces/chat';
 import { useGetChatMessage } from '@/api/buster_rest/chats';
 import { AppMarkdown } from '@/components/ui/typography/AppMarkdown';
-import React from 'react';
 import type { ReasoningMessageProps } from '../ReasoningMessageSelector';
 
 export const ReasoningMessage_Text: React.FC<ReasoningMessageProps> = React.memo(

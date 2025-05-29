@@ -1,7 +1,7 @@
-import { useMemoizedFn } from '@/hooks';
-import { useChatLayoutContextSelector } from '@/layouts/ChatLayout';
 import { useMemo } from 'react';
 import { create } from 'zustand';
+import { useMemoizedFn } from '@/hooks';
+import { useChatLayoutContextSelector } from '@/layouts/ChatLayout';
 
 type MetricQueryStore = {
   latestMetricVersions: Record<string, number>;

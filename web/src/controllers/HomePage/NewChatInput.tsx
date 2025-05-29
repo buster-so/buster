@@ -1,11 +1,10 @@
 'use client';
+import type React from 'react';
+import { type ChangeEvent, useMemo, useRef, useState } from 'react';
 import { InputTextAreaButton } from '@/components/ui/inputs/InputTextAreaButton';
 import { useBusterNewChatContextSelector } from '@/context/Chats';
 import { useMemoizedFn, useMount } from '@/hooks';
 import { inputHasText } from '@/lib/text';
-import type React from 'react';
-import { useRef } from 'react';
-import { type ChangeEvent, useMemo, useState } from 'react';
 
 const autoResizeConfig = {
   minRows: 3,

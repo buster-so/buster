@@ -1,5 +1,5 @@
-import { BusterRoutes } from '@/routes';
 import { describe, expect, it } from 'vitest';
+import { BusterRoutes } from '@/routes';
 import { initializeFileViews } from './helpers';
 import type { FileViewSecondary } from './interfaces';
 

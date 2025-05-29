@@ -1,10 +1,10 @@
+import first from 'lodash/first';
+import last from 'lodash/last';
+import React, { useMemo } from 'react';
 import { DEFAULT_DAY_OF_WEEK_FORMAT } from '@/api/asset_interfaces';
 import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import { Select, type SelectItem } from '@/components/ui/select';
 import { useMemoizedFn } from '@/hooks';
-import first from 'lodash/first';
-import last from 'lodash/last';
-import React, { useMemo } from 'react';
 import { LabelAndInput } from '../../../Common/LabelAndInput';
 import { getDefaultQuarterOptions } from './dateConfig';
 

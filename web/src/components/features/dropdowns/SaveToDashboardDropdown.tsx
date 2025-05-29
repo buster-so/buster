@@ -1,3 +1,5 @@
+import type React from 'react';
+import { useMemo, useState } from 'react';
 import type { BusterDashboardListItem } from '@/api/asset_interfaces';
 import { useGetDashboardsList } from '@/api/buster_rest/dashboards';
 import { Button } from '@/components/ui/buttons';
@@ -6,8 +8,6 @@ import { Plus } from '@/components/ui/icons';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useMemoizedFn } from '@/hooks';
 import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
-import type React from 'react';
-import { useMemo, useState } from 'react';
 import { NewDashboardModal } from '../modal/NewDashboardModal';
 
 export const SaveToDashboardDropdown: React.FC<{

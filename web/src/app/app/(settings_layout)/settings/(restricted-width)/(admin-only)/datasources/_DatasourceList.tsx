@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+import React from 'react';
 import type { DataSourceListItem } from '@/api/asset_interfaces';
 import { useDeleteDatasource, useListDatasources } from '@/api/buster_rest/data_source';
 import { Button } from '@/components/ui/buttons';
@@ -11,8 +13,6 @@ import { Text } from '@/components/ui/typography';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { cn } from '@/lib/classMerge';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import Link from 'next/link';
-import React from 'react';
 
 export const DatasourceList: React.FC = () => {
   const isAdmin = useUserConfigContextSelector((x) => x.isAdmin);

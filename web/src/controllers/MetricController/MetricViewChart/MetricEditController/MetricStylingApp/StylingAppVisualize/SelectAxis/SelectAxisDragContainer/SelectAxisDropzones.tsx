@@ -1,18 +1,18 @@
 import {
   DndContext,
   MouseSensor,
-  TouchSensor,
   pointerWithin,
+  TouchSensor,
   useSensor,
   useSensors
 } from '@dnd-kit/core';
 import type React from 'react';
 import { useMemo } from 'react';
 import { SelectAxisContainerId } from '../config';
+import type { DropZone, SelectAxisItem } from './interfaces';
 import { AvailableItemsList } from './SelectAxisAvailableItemsList';
 import { SelectAxisDragOverlay } from './SelectAxisDraggingItem';
 import { SelectAxisDropZone } from './SelectAxisDropzone';
-import type { DropZone, SelectAxisItem } from './interfaces';
 import { useDropzonesExternal } from './useDropzonesExternal';
 import { useDropzonesInternal } from './useDropzonesInternal';
 

@@ -1,12 +1,12 @@
+import { act, renderHook } from '@testing-library/react';
+import { useParams } from 'next/navigation';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ShareAssetType } from '@/api/asset_interfaces/share';
 import {
   useDeleteUserFavorite,
   useGetUserFavorites,
   useUpdateUserFavorites
 } from '@/api/buster_rest/users';
-import { act, renderHook } from '@testing-library/react';
-import { useParams } from 'next/navigation';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useFavoriteSidebarPanel } from './useFavoritesSidebarPanel';
 
 // Mock the hooks

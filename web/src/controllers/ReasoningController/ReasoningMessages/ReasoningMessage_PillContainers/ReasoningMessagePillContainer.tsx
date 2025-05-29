@@ -1,6 +1,6 @@
+import React from 'react';
 import type { BusterChatMessageReasoning_pillContainer } from '@/api/asset_interfaces/chat';
 import { Text } from '@/components/ui/typography';
-import React from 'react';
 import { ReasoningMessagePills } from './ReasoningMessagePills';
 
 export const ReasoningMessagePillContainer: React.FC<{

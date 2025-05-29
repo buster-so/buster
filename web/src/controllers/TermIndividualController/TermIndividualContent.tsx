@@ -1,5 +1,8 @@
 'use client';
 
+import clamp from 'lodash/clamp';
+import type React from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDeleteTerm, useGetTerm, useUpdateTerm } from '@/api/buster_rest/terms';
 import { Button } from '@/components/ui/buttons';
 import { Card, CardContent, CardHeader } from '@/components/ui/card/CardBase';
@@ -13,9 +16,6 @@ import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useDebounceFn } from '@/hooks';
 import { formatDate } from '@/lib';
 import { BusterRoutes } from '@/routes';
-import clamp from 'lodash/clamp';
-import type React from 'react';
-import { useEffect, useMemo, useState } from 'react';
 
 export const TermIndividualContent: React.FC<{
   termId: string;

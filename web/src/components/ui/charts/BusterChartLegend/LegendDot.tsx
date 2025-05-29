@@ -1,8 +1,8 @@
+import { cva, type VariantProps } from 'class-variance-authority';
+import React, { useMemo } from 'react';
 import { ChartType } from '@/api/asset_interfaces/metric/charts';
 import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
-import { type VariantProps, cva } from 'class-variance-authority';
-import React, { useMemo } from 'react';
 import { Target } from '../../icons';
 import type { BusterChartLegendItem } from './interfaces';
 

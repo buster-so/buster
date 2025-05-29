@@ -1,8 +1,7 @@
-import { queryKeys } from '@/api/query_keys';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
-import { isServer } from '@tanstack/react-query';
-import { hashKey } from '@tanstack/react-query';
+import { hashKey, isServer } from '@tanstack/react-query';
 import type { PersistQueryClientProviderProps } from '@tanstack/react-query-persist-client';
+import { queryKeys } from '@/api/query_keys';
 import packageJson from '../../../package.json';
 
 const buster = packageJson.version;

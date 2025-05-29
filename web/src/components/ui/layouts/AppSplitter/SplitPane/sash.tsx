@@ -1,8 +1,8 @@
 'use client';
 
-import { useMemoizedFn } from '@/hooks';
-import { useRef, useState } from 'react';
 import type React from 'react';
+import { useRef, useState } from 'react';
+import { useMemoizedFn } from '@/hooks';
 import { classNames, sashClassName } from './base';
 import type { ISashProps } from './types';
 

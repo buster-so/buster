@@ -1,12 +1,12 @@
 'use client';
 
+import pluralize from 'pluralize';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import type { BusterChatMessageReasoning_file } from '@/api/asset_interfaces';
 import { Text } from '@/components/ui/typography';
 import { SyntaxHighlighterLightTheme } from '@/components/ui/typography/AppCodeBlock';
 import { cn } from '@/lib/classMerge';
-import pluralize from 'pluralize';
-import React, { useEffect, useMemo, useState } from 'react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { FileCard } from '../../card/FileCard';
 import { TextAndVersionPill } from '../../typography/TextAndVersionPill';
 

@@ -1,6 +1,6 @@
-import { determineFontColorContrast } from '@/lib/colors';
 import type { ChartData } from 'chart.js';
 import { describe, expect, it, vi } from 'vitest';
+import { determineFontColorContrast } from '@/lib/colors';
 import type { ChartSpecificOptionsProps } from './interfaces';
 import { pieOptionsHandler, piePluginsHandler } from './pieChartOptions';
 

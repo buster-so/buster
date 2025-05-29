@@ -1,7 +1,7 @@
 'use server';
 
-import { getSupabaseUserContext } from '@/lib/supabase';
 import { type NextRequest, NextResponse } from 'next/server';
+import { getSupabaseUserContext } from '@/lib/supabase';
 import { codeToFlag } from './_codeToFlag';
 
 export async function GET(request: NextRequest) {

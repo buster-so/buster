@@ -1,5 +1,5 @@
-import { BusterRoutes, createBusterRoute } from '@/routes';
 import { expect, test } from '@playwright/test';
+import { BusterRoutes, createBusterRoute } from '@/routes';
 
 // Define routes
 const homePage = createBusterRoute({

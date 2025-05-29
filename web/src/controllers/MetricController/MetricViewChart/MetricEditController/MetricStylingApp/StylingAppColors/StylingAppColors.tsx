@@ -1,13 +1,13 @@
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { useState } from 'react';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { useUpdateMetricChart } from '@/context/Metrics';
 import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
-import { AnimatePresence, motion } from 'framer-motion';
-import React, { useState } from 'react';
 import { ColorsApp } from './ColorsApp';
 import { CustomApp } from './CustomApp';
-import { PaletteApp } from './PaletteApp';
 import { StylingAppColorsTab } from './config';
+import { PaletteApp } from './PaletteApp';
 
 export const StylingAppColors: React.FC<{
   className: string;

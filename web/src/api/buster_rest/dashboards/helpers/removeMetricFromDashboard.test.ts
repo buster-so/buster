@@ -1,5 +1,5 @@
-import type { BusterDashboard } from '@/api/asset_interfaces/dashboard';
 import { describe, expect, it } from 'vitest';
+import type { BusterDashboard } from '@/api/asset_interfaces/dashboard';
 import { removeMetricFromDashboardConfig } from './removeMetricFromDashboard';
 
 describe('removeMetricFromDashboardConfig', () => {

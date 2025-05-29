@@ -1,3 +1,5 @@
+import Link from 'next/link';
+import React, { useMemo } from 'react';
 import { useGetMetric } from '@/api/buster_rest/metrics';
 import { SquareChartPen } from '@/components/ui/icons';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
@@ -5,8 +7,6 @@ import { useIsMetricReadOnly } from '@/context/Metrics/useIsMetricReadOnly';
 import { useMemoizedFn } from '@/hooks';
 import { assetParamsToRoute } from '@/lib/assets';
 import { canEdit, getIsEffectiveOwner } from '@/lib/share';
-import Link from 'next/link';
-import React, { useMemo } from 'react';
 import { SaveMetricToCollectionButton } from '../../../../../components/features/buttons/SaveMetricToCollectionButton';
 import { SaveMetricToDashboardButton } from '../../../../../components/features/buttons/SaveMetricToDashboardButton';
 import { ShareMetricButton } from '../../../../../components/features/buttons/ShareMetricButton';
@@ -18,8 +18,8 @@ import {
 import { CreateChatButton } from '../CreateChatButtont';
 import { FileButtonContainer } from '../FileButtonContainer';
 import { HideButtonContainer } from '../HideButtonContainer';
-import { SelectableButton } from '../SelectableButton';
 import type { FileContainerButtonsProps } from '../interfaces';
+import { SelectableButton } from '../SelectableButton';
 import { ThreeDotMenuButton } from './MetricThreeDotMenu';
 
 export const MetricContainerHeaderButtons: React.FC<FileContainerButtonsProps> = React.memo(

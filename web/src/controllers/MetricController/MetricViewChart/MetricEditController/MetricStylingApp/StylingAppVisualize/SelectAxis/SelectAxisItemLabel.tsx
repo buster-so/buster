@@ -1,9 +1,9 @@
+import React, { useMemo } from 'react';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces';
 import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import { Text } from '@/components/ui/typography';
 import { formatLabel } from '@/lib';
 import { cn } from '@/lib/classMerge';
-import React, { useMemo } from 'react';
 import { ColumnTypeIcon } from './config';
 
 export const SelectAxisItemLabel = React.memo(

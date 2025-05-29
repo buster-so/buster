@@ -1,15 +1,15 @@
+import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { DataSourceTypes } from '@/api/asset_interfaces/datasources/interfaces';
 import { queryKeys } from '@/api/query_keys';
 import { useBusterNotifications } from '@/context/BusterNotifications';
-import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   createBigQueryDataSource,
   createDatabricksDataSource,
   createMySQLDataSource,
   createPostgresDataSource,
   createRedshiftDataSource,
-  createSQLServerDataSource,
   createSnowflakeDataSource,
+  createSQLServerDataSource,
   deleteDatasource,
   getDatasource,
   getDatasource_server,
@@ -19,8 +19,8 @@ import {
   updateMySQLDataSource,
   updatePostgresDataSource,
   updateRedshiftDataSource,
-  updateSQLServerDataSource,
-  updateSnowflakeDataSource
+  updateSnowflakeDataSource,
+  updateSQLServerDataSource
 } from './requests';
 import type {
   BigQueryCreateParams,
@@ -33,10 +33,10 @@ import type {
   PostgresUpdateParams,
   RedshiftCreateParams,
   RedshiftUpdateParams,
-  SQLServerCreateParams,
-  SQLServerUpdateParams,
   SnowflakeCreateParams,
-  SnowflakeUpdateParams
+  SnowflakeUpdateParams,
+  SQLServerCreateParams,
+  SQLServerUpdateParams
 } from './types';
 
 export const useListDatasources = (enabled = true) => {

@@ -1,5 +1,7 @@
 'use client';
 
+import React, { useMemo } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import { useGetTerm } from '@/api/buster_rest/terms';
 import { NewTermModal } from '@/components/features/modal/NewTermModal';
 import { Breadcrumb, type BreadcrumbItemType } from '@/components/ui/breadcrumb';
@@ -9,8 +11,6 @@ import { AppTooltip } from '@/components/ui/tooltip';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { useMemoizedFn } from '@/hooks';
 import { BusterRoutes } from '@/routes';
-import React, { useMemo } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
 
 export const TermsHeader: React.FC<{
   termId?: string;

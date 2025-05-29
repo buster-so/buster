@@ -1,3 +1,4 @@
+import React, { useMemo } from 'react';
 import type { IBusterMetric } from '@/api/asset_interfaces/metric';
 import { Button, type ButtonProps } from '@/components/ui/buttons';
 import {
@@ -6,7 +7,6 @@ import {
   TriangleWarning
 } from '@/components/ui/icons/NucleoIconFilled';
 import { Popover } from '@/components/ui/popover/Popover';
-import React, { useMemo } from 'react';
 
 export const MetricChartEvaluation: React.FC<{
   evaluationScore: IBusterMetric['evaluation_score'] | undefined;

@@ -1,5 +1,5 @@
 import { formatLabel } from '@/lib';
-import { JOIN_CHARACTER, formatLabelForDataset } from '../../../commonHelpers';
+import { formatLabelForDataset, JOIN_CHARACTER } from '../../../commonHelpers';
 import type { ChartProps } from '../../core';
 import type { SeriesBuilderProps } from './interfaces';
 import type { LabelBuilderProps } from './useSeriesOptions';

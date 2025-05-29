@@ -1,4 +1,4 @@
-import axios, { type AxiosError, type InternalAxiosRequestConfig, AxiosHeaders } from 'axios';
+import axios, { type AxiosError, AxiosHeaders, type InternalAxiosRequestConfig } from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { rustErrorHandler } from './buster_rest/errors';
 import { createInstance, defaultRequestHandler } from './createInstance';

@@ -1,8 +1,8 @@
+import Link from 'next/link';
+import type React from 'react';
 import { BusterLogoWithText } from '@/assets/svg/BusterLogoWithText';
 import { Text } from '@/components/ui/typography';
 import { BUSTER_HOME_PAGE } from '@/routes/externalRoutes';
-import Link from 'next/link';
-import type React from 'react';
 
 export const WelcomeToBuster: React.FC<{
   hasUser: boolean;

@@ -1,8 +1,5 @@
 'use client';
 
-import type { BusterSocketResponse, BusterSocketResponseRoute } from '@/api/buster_socket';
-import { useBusterWebSocket } from '@/context/BusterWebSocket';
-import { useMemoizedFn, useMount, useUnmount } from '@/hooks';
 import {
   type QueryKey,
   type UseQueryOptions,
@@ -11,6 +8,9 @@ import {
   useQueryClient
 } from '@tanstack/react-query';
 import { useMemo } from 'react';
+import type { BusterSocketResponse, BusterSocketResponseRoute } from '@/api/buster_socket';
+import { useBusterWebSocket } from '@/context/BusterWebSocket';
+import { useMemoizedFn, useMount, useUnmount } from '@/hooks';
 import type { InferBusterSocketResponseData } from './types';
 
 type UseSocketQueryOnResult<TData, TError> = UseQueryResult<TData, TError>;

@@ -1,9 +1,9 @@
 'use client';
 
-import { cn } from '@/lib/classMerge';
 import * as SelectPrimitive from '@radix-ui/react-select';
-import { type VariantProps, cva } from 'class-variance-authority';
+import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
+import { cn } from '@/lib/classMerge';
 import { Check3 as Check, ChevronDown, ChevronUp } from '../icons/NucleoIconOutlined';
 
 const Select = SelectPrimitive.Root;

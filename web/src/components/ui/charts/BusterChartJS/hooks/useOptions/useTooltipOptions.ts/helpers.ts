@@ -1,6 +1,6 @@
+import type { Chart } from 'chart.js';
 import type { BusterChartProps } from '@/api/asset_interfaces/metric/charts';
 import { formatLabel } from '@/lib/columnFormatter';
-import type { Chart } from 'chart.js';
 
 export const getPercentage = (
   rawValue: number,

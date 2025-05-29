@@ -1,14 +1,14 @@
 'use client';
 
-import mainApi from '@/api/buster_rest/instances';
-import { defaultRequestHandler } from '@/api/createInstance';
-import nextApi from '@/api/next/instances';
-import { isDev } from '@/config';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import dynamic from 'next/dynamic';
 import type React from 'react';
 import { useLayoutEffect, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
+import mainApi from '@/api/buster_rest/instances';
+import { defaultRequestHandler } from '@/api/createInstance';
+import nextApi from '@/api/next/instances';
+import { isDev } from '@/config';
 import { useSupabaseContext } from '../Supabase/SupabaseContextProvider';
 import { persistOptions } from './createPersister';
 import { getQueryClient } from './getQueryClient';

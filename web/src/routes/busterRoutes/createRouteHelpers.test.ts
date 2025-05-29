@@ -1,5 +1,5 @@
-import type { DashboardFileViewSecondary, MetricFileViewSecondary } from '@/layouts/ChatLayout';
 import { describe, expect, it } from 'vitest';
+import type { DashboardFileViewSecondary, MetricFileViewSecondary } from '@/layouts/ChatLayout';
 import { BusterAppRoutes } from './busterAppRoutes';
 import { BusterAuthRoutes } from './busterAuthRoutes';
 import { BusterRoutes } from './busterRoutes';

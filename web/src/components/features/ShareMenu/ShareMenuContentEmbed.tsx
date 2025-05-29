@@ -1,3 +1,4 @@
+import React, { useMemo } from 'react';
 import { ShareAssetType } from '@/api/asset_interfaces';
 import { useUpdateCollectionShare } from '@/api/buster_rest/collections';
 import { useUpdateDashboardShare } from '@/api/buster_rest/dashboards';
@@ -10,7 +11,6 @@ import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import React, { useMemo } from 'react';
 import type { ShareMenuContentBodyProps } from './ShareMenuContentBody';
 
 export const ShareMenuContentEmbed: React.FC<ShareMenuContentBodyProps> = React.memo(

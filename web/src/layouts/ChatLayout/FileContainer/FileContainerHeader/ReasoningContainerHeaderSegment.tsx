@@ -1,9 +1,9 @@
 'use client';
 
-import { AppSegmented } from '@/components/ui/segmented';
-import type { SegmentedItem } from '@/components/ui/segmented';
-import { useMemoizedFn } from '@/hooks';
 import React from 'react';
+import type { SegmentedItem } from '@/components/ui/segmented';
+import { AppSegmented } from '@/components/ui/segmented';
+import { useMemoizedFn } from '@/hooks';
 import { useChatLayoutContextSelector } from '../../ChatLayoutContext';
 import type { FileView, ReasoningFileView } from '../../ChatLayoutContext/useLayoutConfig';
 import type { FileContainerSegmentProps } from './interfaces';

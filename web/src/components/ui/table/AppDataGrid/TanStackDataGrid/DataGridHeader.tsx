@@ -1,14 +1,14 @@
-import { Text } from '@/components/ui/typography';
-import { cn } from '@/lib/classMerge';
 import { useDraggable, useDroppable } from '@dnd-kit/core';
 import type { Header, Table } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
 import type { Virtualizer } from '@tanstack/react-virtual';
 import type React from 'react';
 import type { CSSProperties } from 'react';
+import { Text } from '@/components/ui/typography';
+import { cn } from '@/lib/classMerge';
 import { CaretDown, CaretUp } from '../../../icons/NucleoIconFilled';
-import { useSortColumnContext } from './SortColumnWrapper';
 import { HEADER_HEIGHT } from './constants';
+import { useSortColumnContext } from './SortColumnWrapper';
 
 interface DraggableHeaderProps {
   header: Header<Record<string, string | number | Date | null>, unknown>;

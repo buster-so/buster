@@ -1,15 +1,14 @@
 'use client';
 
+import { useQuery } from '@tanstack/react-query';
+import { AnimatePresence, motion } from 'framer-motion';
+import Link from 'next/link';
+import React, { useMemo } from 'react';
 import { useGetChatMessage } from '@/api/buster_rest/chats';
 import { queryKeys } from '@/api/query_keys';
 import { Text } from '@/components/ui/typography';
 import { ShimmerText } from '@/components/ui/typography/ShimmerText';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import { useQuery } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
-import { AnimatePresence } from 'framer-motion';
-import Link from 'next/link';
-import React, { useMemo } from 'react';
 import { useChatLayoutContextSelector } from '../../../ChatLayoutContext';
 
 const animations = {

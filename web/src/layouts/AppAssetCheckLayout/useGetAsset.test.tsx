@@ -1,9 +1,9 @@
-import { useGetCollection } from '@/api/buster_rest/collections';
-import { useGetDashboard } from '@/api/buster_rest/dashboards';
-import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
 import { renderHook } from '@testing-library/react';
 import { useSearchParams } from 'next/navigation';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { useGetCollection } from '@/api/buster_rest/collections';
+import { useGetDashboard } from '@/api/buster_rest/dashboards';
+import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
 import { useGetAsset } from './useGetAsset';
 
 // Mock the dependencies

@@ -1,7 +1,7 @@
+import React from 'react';
 import { TriangleWarning } from '@/components/ui/icons';
 import { Popover } from '@/components/ui/popover/Popover';
 import { cn } from '@/lib/classMerge';
-import React from 'react';
 
 export const WarningIcon: React.FC<{
   rowCountThreshold?: number;

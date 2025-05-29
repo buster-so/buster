@@ -1,7 +1,7 @@
-import { ChartType } from '@/api/asset_interfaces/metric/charts';
 import type { ChartType as ChartJSChartType, PluginChartOptions } from 'chart.js';
 import { useMemo } from 'react';
 import type { DeepPartial } from 'utility-types';
+import { ChartType } from '@/api/asset_interfaces/metric/charts';
 import type { ChartProps } from '../../core';
 import { barOptionsHandler, barPluginsHandler } from './barChartOptions';
 import type { ChartSpecificOptionsProps, UseChartSpecificOptionsProps } from './interfaces';

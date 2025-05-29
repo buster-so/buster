@@ -1,13 +1,13 @@
+import isEmpty from 'lodash/isEmpty';
+import { create } from 'mutative';
 import {
   type BusterMetric,
+  type DataMetadata,
   DEFAULT_CHART_CONFIG,
   DEFAULT_CHART_CONFIG_ENTRIES,
-  type DataMetadata,
   type IBusterMetricChartConfig
 } from '@/api/asset_interfaces/metric';
 import type { BusterChartConfigProps } from '@/api/asset_interfaces/metric/charts';
-import isEmpty from 'lodash/isEmpty';
-import { create } from 'mutative';
 import {
   createDefaultBarAndLineAxis,
   createDefaultPieAxis,

@@ -1,9 +1,9 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   type DataSource,
   DataSourceSchema,
   DataSourceTypes
 } from '@/api/asset_interfaces/datasources';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import mainApi from '../instances';
 import { getDatasource } from './requests';
 

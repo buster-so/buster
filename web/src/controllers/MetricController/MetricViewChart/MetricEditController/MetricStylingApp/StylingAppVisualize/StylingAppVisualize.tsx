@@ -1,3 +1,4 @@
+import type React from 'react';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import {
   type CategoryAxisStyleConfig,
@@ -8,7 +9,6 @@ import {
   type YAxisConfig
 } from '@/api/asset_interfaces/metric/charts';
 import { cn } from '@/lib/classMerge';
-import type React from 'react';
 import { StylingLabel } from '../Common';
 import { SelectAxis } from './SelectAxis';
 import type { ISelectAxisContext } from './SelectAxis/useSelectAxisContext';

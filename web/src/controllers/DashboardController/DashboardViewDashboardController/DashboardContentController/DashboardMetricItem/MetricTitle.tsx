@@ -1,3 +1,6 @@
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import React, { useContext, useMemo, useState } from 'react';
 import type { BusterMetric } from '@/api/asset_interfaces';
 import { useRemoveMetricsFromDashboard } from '@/api/buster_rest/dashboards';
 import { Button } from '@/components/ui/buttons';
@@ -7,9 +10,6 @@ import { DotsVertical, Trash } from '@/components/ui/icons';
 import { Text, Title } from '@/components/ui/typography';
 import { useMemoizedFn, useMount } from '@/hooks';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import React, { useContext, useMemo, useState } from 'react';
 
 export const MetricTitle: React.FC<{
   name: BusterMetric['name'];

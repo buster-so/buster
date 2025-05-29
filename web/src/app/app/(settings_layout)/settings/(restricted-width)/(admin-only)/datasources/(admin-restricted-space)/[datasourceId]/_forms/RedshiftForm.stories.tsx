@@ -1,5 +1,5 @@
-import { type DataSource, DataSourceTypes } from '@/api/asset_interfaces';
 import type { Meta, StoryObj } from '@storybook/react';
+import { type DataSource, DataSourceTypes } from '@/api/asset_interfaces';
 import { RedshiftForm } from './RedshiftForm';
 
 // Sample DataSource for the story

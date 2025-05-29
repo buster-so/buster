@@ -1,10 +1,10 @@
+import { describe, expect, it } from 'vitest';
 import {
   ChartType,
-  DEFAULT_CHART_CONFIG,
   type DataMetadata,
+  DEFAULT_CHART_CONFIG,
   type IBusterMetricChartConfig
 } from '@/api/asset_interfaces/metric';
-import { describe, expect, it } from 'vitest';
 import { createDefaultChartConfig } from '.';
 
 describe('createDefaultChartConfig', () => {

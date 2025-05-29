@@ -1,7 +1,8 @@
+import type React from 'react';
 import {
-  type DataSource,
   type DatabricksCredentials,
-  DatabricksCredentialsSchema
+  DatabricksCredentialsSchema,
+  type DataSource
 } from '@/api/asset_interfaces';
 import {
   type createDatabricksDataSource,
@@ -9,7 +10,6 @@ import {
   useUpdateDatabricksDataSource
 } from '@/api/buster_rest/data_source';
 import { useAppForm } from '@/components/ui/form/useFormBaseHooks';
-import type React from 'react';
 import { FormWrapper } from './FormWrapper';
 import { useDataSourceFormSuccess } from './helpers';
 

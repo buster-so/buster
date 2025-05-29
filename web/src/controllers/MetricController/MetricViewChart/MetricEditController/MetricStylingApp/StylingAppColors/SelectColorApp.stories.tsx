@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { SelectColorApp } from './SelectColorApp';
 import { StylingAppColorsTab } from './config';
+import { SelectColorApp } from './SelectColorApp';
 
 const meta: Meta<typeof SelectColorApp> = {
   title: 'Controllers/EditMetricController/SelectColorApp',

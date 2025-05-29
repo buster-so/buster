@@ -1,4 +1,3 @@
-import { useMemoizedFn } from '@/hooks';
 import {
   DndContext,
   type DragEndEvent,
@@ -7,16 +6,17 @@ import {
   type DragStartEvent,
   KeyboardSensor,
   MouseSensor,
-  TouchSensor,
   pointerWithin,
+  TouchSensor,
   useSensor,
   useSensors
 } from '@dnd-kit/core';
 import { restrictToHorizontalAxis } from '@dnd-kit/modifiers';
 import { arrayMove } from '@dnd-kit/sortable';
-import { type Header, type Table, flexRender } from '@tanstack/react-table';
-import React, { useState, useRef, useMemo, useEffect } from 'react';
+import { flexRender, type Header, type Table } from '@tanstack/react-table';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
+import { useMemoizedFn } from '@/hooks';
 import { HEADER_HEIGHT } from './constants';
 
 const ACTIVATION_CONSTRAINT = {

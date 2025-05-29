@@ -1,8 +1,8 @@
-import { useMemoizedFn } from '@/hooks';
-import { cn } from '@/lib/classMerge';
 import get from 'lodash/get';
 import Link from 'next/link';
 import React, { useMemo } from 'react';
+import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/classMerge';
 import { CheckboxColumn } from './CheckboxColumn';
 import { HEIGHT_OF_ROW } from './config';
 import type {

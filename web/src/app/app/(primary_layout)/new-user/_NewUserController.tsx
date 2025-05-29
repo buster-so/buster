@@ -1,5 +1,7 @@
 'use client';
 
+import { AnimatePresence, motion } from 'framer-motion';
+import { useState } from 'react';
 import { useCreateUserOrganization } from '@/api/buster_rest/users';
 import { Button } from '@/components/ui/buttons';
 import { Input } from '@/components/ui/inputs';
@@ -10,8 +12,6 @@ import { useUserConfigContextSelector } from '@/context/Users';
 import { useMemoizedFn } from '@/hooks';
 import { inputHasText } from '@/lib/text';
 import { BusterRoutes } from '@/routes/busterRoutes';
-import { AnimatePresence, motion } from 'framer-motion';
-import { useState } from 'react';
 
 export const NewUserController = () => {
   const [started, setStarted] = useState(false);

@@ -1,5 +1,5 @@
-import { cn } from '@/lib/utils';
 import React, { type PropsWithChildren } from 'react';
+import { cn } from '@/lib/utils';
 import { ScrollArea } from '../scroll-area/ScrollArea';
 
 export const AppPageLayoutContent: React.FC<

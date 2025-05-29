@@ -1,8 +1,8 @@
 'use client';
 
+import React, { useRef } from 'react';
 import { useSize } from '@/hooks';
 import { cn } from '@/lib/classMerge';
-import React, { useRef } from 'react';
 import { ChartWrapperProvider } from './chartHooks';
 
 export const BusterChartWrapper = React.memo<{

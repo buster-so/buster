@@ -1,8 +1,8 @@
+import Link from 'next/link';
+import React from 'react';
 import { Button } from '@/components/ui/buttons';
 import { Plus } from '@/components/ui/icons';
 import { Paragraph, Title } from '@/components/ui/typography';
-import Link from 'next/link';
-import React from 'react';
 
 export const ListEmptyStateWithButton: React.FC<{
   isAdmin?: boolean;

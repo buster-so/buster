@@ -1,12 +1,11 @@
+import React, { useMemo } from 'react';
 import { Button } from '@/components/ui/buttons';
 import { Dropdown } from '@/components/ui/dropdown';
 import { DropdownMenuHeaderSearch } from '@/components/ui/dropdown/DropdownMenuHeaderSearch';
-import { ArrowUpRight, BarsFilter } from '@/components/ui/icons';
-import { MagnifierSparkle } from '@/components/ui/icons';
+import { ArrowUpRight, BarsFilter, MagnifierSparkle } from '@/components/ui/icons';
 import { Text } from '@/components/ui/typography';
 import { useDebounceSearch, useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
-import React, { useMemo } from 'react';
 
 const items = Array.from({ length: 100 }, (_, index) => {
   const randomWord = `Filter ${index}`;

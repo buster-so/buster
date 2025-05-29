@@ -1,12 +1,12 @@
 'use client';
 
+import { jwtDecode } from 'jwt-decode';
+import React, { type PropsWithChildren, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { createContext, useContextSelector } from 'use-context-selector';
 import { checkTokenValidityFromServer } from '@/api/buster_rest/nextjs/auth';
 import { useMemoizedFn } from '@/hooks';
 import { millisecondsFromUnixTimestamp } from '@/lib/date';
 import type { UseSupabaseUserContextType } from '@/lib/supabase';
-import { jwtDecode } from 'jwt-decode';
-import React, { type PropsWithChildren, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { createContext, useContextSelector } from 'use-context-selector';
 
 const PREEMTIVE_REFRESH_MINUTES = 5;
 

@@ -1,4 +1,3 @@
-import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
 import type {
   BarControllerDatasetOptions,
   Chart,
@@ -6,6 +5,7 @@ import type {
   TooltipItem
 } from 'chart.js';
 import { describe, expect, it } from 'vitest';
+import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
 import { barAndLineTooltipHelper } from './barAndLineTooltipHelper';
 
 type MockDataset = Partial<

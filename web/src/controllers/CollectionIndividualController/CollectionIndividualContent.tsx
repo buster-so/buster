@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useMemo, useState } from 'react';
 import type {
   BusterCollection,
   BusterCollectionItemAsset,
@@ -9,14 +10,17 @@ import { ShareAssetType } from '@/api/asset_interfaces';
 import { ASSET_ICONS } from '@/components/features/config/assetIcons';
 import { AddToCollectionModal } from '@/components/features/modal/AddToCollectionModal';
 import { Avatar } from '@/components/ui/avatar';
-import { ListEmptyStateWithButton } from '@/components/ui/list';
-import { BusterList, type BusterListColumn, type BusterListRow } from '@/components/ui/list';
+import {
+  BusterList,
+  type BusterListColumn,
+  type BusterListRow,
+  ListEmptyStateWithButton
+} from '@/components/ui/list';
 import { Text } from '@/components/ui/typography';
 import { useMemoizedFn } from '@/hooks';
 import { formatDate } from '@/lib';
 import { canEdit } from '@/lib/share';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import React, { useMemo, useState } from 'react';
 import { CollectionIndividualSelectedPopup } from './CollectionsIndividualPopup';
 
 export const CollectionIndividualContent: React.FC<{

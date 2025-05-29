@@ -1,3 +1,4 @@
+import React from 'react';
 import { ShareAssetType } from '@/api/asset_interfaces/share';
 import { useDeleteCollection } from '@/api/buster_rest/collections';
 import { useThreeDotFavoritesOptions } from '@/components/features/dropdowns/useThreeDotFavoritesOptions';
@@ -6,7 +7,6 @@ import { Dropdown } from '@/components/ui/dropdown';
 import { Dots, Trash } from '@/components/ui/icons';
 import { BusterListSelectedOptionPopupContainer } from '@/components/ui/list';
 import { useMemoizedFn } from '@/hooks';
-import React from 'react';
 
 export const CollectionListSelectedPopup: React.FC<{
   selectedRowKeys: string[];

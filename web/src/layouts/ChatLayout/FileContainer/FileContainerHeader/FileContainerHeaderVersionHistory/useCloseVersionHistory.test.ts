@@ -1,8 +1,8 @@
+import { renderHook } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout/AppLayoutProvider';
 import { useGetInitialChatFile } from '@/layouts/ChatLayout/ChatContext/useGetInitialChatFile';
 import { useChatLayoutContextSelector } from '@/layouts/ChatLayout/ChatLayoutContext/ChatLayoutContext';
-import { renderHook } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useCloseVersionHistory } from './useCloseVersionHistory';
 
 // Mock the dependencies

@@ -1,6 +1,6 @@
+import { describe, expect, it } from 'vitest';
 import { type ColumnMetaData, DEFAULT_COLUMN_SETTINGS } from '@/api/asset_interfaces/metric';
 import type { ColumnSettings } from '@/api/asset_interfaces/metric/charts';
-import { describe, expect, it } from 'vitest';
 import { createDefaultColumnSettings } from './createDefaultColumnSettings';
 
 describe('createDefaultColumnSettings', () => {

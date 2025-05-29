@@ -1,5 +1,7 @@
 'use client';
 
+import { useParams } from 'next/navigation';
+import { useState } from 'react';
 import {
   type ColumnSettings,
   DEFAULT_CHART_CONFIG,
@@ -9,8 +11,6 @@ import {
 import { useUpdateMetric } from '@/api/buster_rest/metrics';
 import { useMemoizedFn } from '@/hooks';
 import { timeout } from '@/lib/timeout';
-import { useParams } from 'next/navigation';
-import { useState } from 'react';
 import { useGetMetricMemoized } from './useGetMetricMemoized';
 import { useOriginalMetricStore } from './useOriginalMetricStore';
 

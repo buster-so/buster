@@ -1,3 +1,5 @@
+import { useQueryClient } from '@tanstack/react-query';
+import last from 'lodash/last';
 import type { BusterDashboardResponse } from '@/api/asset_interfaces/dashboard';
 import { queryKeys } from '@/api/query_keys';
 import { dashboardQueryKeys } from '@/api/query_keys/dashboard';
@@ -6,8 +8,6 @@ import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useOriginalDashboardStore } from '@/context/Dashboards';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { upgradeMetricToIMetric } from '@/lib/metrics/upgradeToIMetric';
-import { useQueryClient } from '@tanstack/react-query';
-import last from 'lodash/last';
 import { prefetchGetMetricDataClient } from '../metrics/queryRequests';
 import {
   useDashboardQueryStore,

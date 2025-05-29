@@ -1,6 +1,6 @@
+import React, { useState } from 'react';
 import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
 import { InputNumber } from '@/components/ui/inputs';
-import React, { useState } from 'react';
 import { LabelAndInput } from '../../../Common/LabelAndInput';
 
 export const EditDecimals: React.FC<{

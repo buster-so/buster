@@ -1,8 +1,8 @@
-import { GripDotsVertical } from '@/components/ui/icons';
-import { cn } from '@/lib/classMerge';
 import type { DraggableAttributes } from '@dnd-kit/core';
 import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
 import React from 'react';
+import { GripDotsVertical } from '@/components/ui/icons';
+import { cn } from '@/lib/classMerge';
 
 export const SelectAxisItemDragContainer = React.forwardRef<
   HTMLDivElement,

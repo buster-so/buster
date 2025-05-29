@@ -1,11 +1,10 @@
-import { useBusterNotifications } from '@/context/BusterNotifications';
-import { useMemoizedFn, useUpdateEffect } from '@/hooks';
 import type { Active, DragEndEvent, DragOverEvent, DragStartEvent, Over } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import { useMemo, useState, useTransition } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useMemoizedFn, useUpdateEffect } from '@/hooks';
 import { SelectAxisContainerId } from '../config';
-import { FROM_AVAILABLE_DURATION } from './SelectAxisDraggingItem';
 import type {
   DraggedItem,
   DropZone,
@@ -13,6 +12,7 @@ import type {
   SelectAxisItem,
   SelectAxisItemProps
 } from './interfaces';
+import { FROM_AVAILABLE_DURATION } from './SelectAxisDraggingItem';
 import { useErrorZones } from './useErrorZones';
 
 export const useDropzonesInternal = ({

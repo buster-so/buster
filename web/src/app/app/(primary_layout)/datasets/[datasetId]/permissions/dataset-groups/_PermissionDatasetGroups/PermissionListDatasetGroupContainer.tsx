@@ -1,5 +1,7 @@
 'use client';
 
+import type React from 'react';
+import { useMemo, useState } from 'react';
 import type { ListDatasetGroupsResponse } from '@/api/asset_interfaces';
 import { useDatasetUpdateDatasetGroups } from '@/api/buster_rest';
 import { PermissionAssignedCell } from '@/components/features/PermissionComponents';
@@ -12,8 +14,6 @@ import {
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
 import { Text } from '@/components/ui/typography';
 import { useMemoizedFn } from '@/hooks';
-import type React from 'react';
-import { useMemo, useState } from 'react';
 import { PermissionDatasetGroupSelectedPopup } from './PermissionDatasetGroupSelectedPopup';
 
 export const PermissionListDatasetGroupContainer: React.FC<{

@@ -1,7 +1,7 @@
+import React, { useMemo } from 'react';
 import { Text } from '@/components/ui/typography';
 import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
-import React, { useMemo } from 'react';
 import { CheckboxColumn } from './CheckboxColumn';
 import { HEIGHT_OF_SECTION_ROW } from './config';
 import { getAllIdsInSection } from './helpers';

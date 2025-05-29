@@ -1,5 +1,5 @@
-import { VerificationStatus } from '@/api/asset_interfaces';
 import type { Meta, StoryObj } from '@storybook/react';
+import { VerificationStatus } from '@/api/asset_interfaces';
 import { StatusBadgeIndicator } from './StatusBadgeIndicator';
 
 const meta = {

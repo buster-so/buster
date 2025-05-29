@@ -1,9 +1,9 @@
 'use client';
 
-import { useUpdateChat } from '@/api/buster_rest/chats';
-import { EditableTitle } from '@/components/ui/typography/EditableTitle';
 import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
+import { useUpdateChat } from '@/api/buster_rest/chats';
+import { EditableTitle } from '@/components/ui/typography/EditableTitle';
 
 const animation = {
   initial: { opacity: 0 },

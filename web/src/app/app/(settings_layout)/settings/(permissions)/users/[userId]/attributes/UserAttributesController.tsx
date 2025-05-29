@@ -1,5 +1,7 @@
 'use client';
 
+import type React from 'react';
+import { useMemo, useState } from 'react';
 import { useGetUserAttributes } from '@/api/buster_rest';
 import {
   NewPermissionGroupModal,
@@ -7,10 +9,7 @@ import {
 } from '@/components/features/PermissionComponents';
 import { Button } from '@/components/ui/buttons';
 import { Plus } from '@/components/ui/icons';
-import { useDebounceSearch } from '@/hooks';
-import { useMemoizedFn } from '@/hooks';
-import type React from 'react';
-import { useMemo, useState } from 'react';
+import { useDebounceSearch, useMemoizedFn } from '@/hooks';
 import { UserAttributesListContainer } from './UserAttributesListContainer';
 
 export const UserAttributesController: React.FC<{ userId: string }> = ({ userId }) => {

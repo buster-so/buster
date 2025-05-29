@@ -1,10 +1,9 @@
 'use client';
 
-import { Calendar as CalendarIcon } from '@/components/ui/icons';
 import * as React from 'react';
-
 import { Button } from '@/components/ui/buttons';
 import { Calendar, type CalendarProps } from '@/components/ui/calendar';
+import { Calendar as CalendarIcon } from '@/components/ui/icons';
 import {
   PopoverRoot as Popover,
   PopoverContent,

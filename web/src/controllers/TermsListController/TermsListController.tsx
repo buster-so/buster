@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useMemo, useState } from 'react';
 import type { BusterTermListItem } from '@/api/asset_interfaces/terms';
 import { useGetTermsList } from '@/api/buster_rest/terms';
 import { Avatar } from '@/components/ui/avatar';
@@ -13,7 +14,6 @@ import { useUserConfigContextSelector } from '@/context/Users';
 import { useMemoizedFn } from '@/hooks';
 import { formatDate } from '@/lib/date';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import React, { useMemo, useState } from 'react';
 import { TermListSelectedOptionPopup } from './TermListSelectedPopup';
 
 const columns: BusterListColumn[] = [

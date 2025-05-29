@@ -1,5 +1,7 @@
 'use client';
 
+import findLast from 'lodash/findLast';
+import { useEffect, useRef } from 'react';
 import type {
   BusterChatMessageReasoning_text,
   BusterChatResponseMessage_file
@@ -8,8 +10,6 @@ import { useGetChatMessage, useGetChatMessageMemoized } from '@/api/buster_rest/
 import { useGetFileLink } from '@/context/Assets/useGetFileLink';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { usePrevious } from '@/hooks';
-import findLast from 'lodash/findLast';
-import { useEffect, useRef } from 'react';
 import { useChatLayoutContextSelector } from '../ChatLayoutContext';
 import { useGetInitialChatFile } from './useGetInitialChatFile';
 

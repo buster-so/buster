@@ -1,5 +1,5 @@
-import type { IDataResult } from '@/api/asset_interfaces/metric/interfaces';
 import dayjs from 'dayjs';
+import type { IDataResult } from '@/api/asset_interfaces/metric/interfaces';
 
 // Helper to generate dates for time series
 const generateDates = (count: number) => {

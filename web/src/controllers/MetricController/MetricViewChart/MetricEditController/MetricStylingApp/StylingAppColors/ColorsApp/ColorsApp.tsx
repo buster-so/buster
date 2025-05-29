@@ -1,7 +1,7 @@
-import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import { useMemoizedFn } from '@/hooks';
 import isEqual from 'lodash/isEqual';
 import React, { useMemo, useState } from 'react';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import { useMemoizedFn } from '@/hooks';
 import type { IColorTheme } from '../Common';
 import { ThemeList } from '../Common/ThemeList';
 import { ColorStyleSegments } from './ColorStyleSegments';

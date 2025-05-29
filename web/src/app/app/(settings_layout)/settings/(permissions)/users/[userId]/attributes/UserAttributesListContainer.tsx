@@ -1,3 +1,4 @@
+import React, { useMemo } from 'react';
 import type { BusterUserAttribute } from '@/api/asset_interfaces/users';
 import {
   type BusterListColumn,
@@ -6,7 +7,6 @@ import {
   InfiniteListContainer
 } from '@/components/ui/list';
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
-import React, { useMemo } from 'react';
 
 export const UserAttributesListContainer: React.FC<{
   filteredAttributes: BusterUserAttribute[];

@@ -1,8 +1,8 @@
+import React, { useMemo } from 'react';
 import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
 import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
 import { useMemoizedFn } from '@/hooks';
 import { isDateColumnType, isNumericColumnType } from '@/lib';
-import React, { useMemo } from 'react';
 import { LabelAndInput } from '../../../Common/LabelAndInput';
 import { ColumnTypeIcon } from '../config';
 

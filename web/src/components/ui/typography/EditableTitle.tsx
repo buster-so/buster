@@ -1,8 +1,8 @@
 'use client';
 
-import { cn } from '@/lib/classMerge';
-import { type VariantProps, cva } from 'class-variance-authority';
+import { cva, type VariantProps } from 'class-variance-authority';
 import React, { useLayoutEffect } from 'react';
+import { cn } from '@/lib/classMerge';
 import { Input } from '../inputs/Input';
 
 const editableTitleVariants = cva('relative flex items-center justify-between', {

@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { useGetDashboard } from '@/api/buster_rest/dashboards';
 import { SaveDashboardToCollectionButton } from '@/components/features/buttons/SaveDashboardToCollectionButton';
 import { ShareDashboardButton } from '@/components/features/buttons/ShareDashboardButton';
@@ -10,7 +11,6 @@ import { useDashboardContentStore } from '@/context/Dashboards';
 import { useIsDashboardReadOnly } from '@/context/Dashboards/useIsDashboardReadOnly';
 import { useChatLayoutContextSelector } from '@/layouts/ChatLayout/ChatLayoutContext';
 import { canEdit, getIsEffectiveOwner } from '@/lib/share';
-import React from 'react';
 import { CreateChatButton } from '../CreateChatButtont';
 import { FileButtonContainer } from '../FileButtonContainer';
 import { HideButtonContainer } from '../HideButtonContainer';

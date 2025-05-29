@@ -1,11 +1,11 @@
+import isEqual from 'lodash/isEqual';
+import pick from 'lodash/pick';
 import type {
   BarAndLineAxis,
   BusterChartProps,
   ScatterAxis
 } from '@/api/asset_interfaces/metric/charts';
 import { formatLabel } from '@/lib/columnFormatter';
-import isEqual from 'lodash/isEqual';
-import pick from 'lodash/pick';
 import { JOIN_CHARACTER } from './labelHelpers';
 
 export const AXIS_TITLE_SEPARATOR = JOIN_CHARACTER;

@@ -1,12 +1,12 @@
 'use client';
 
+import React from 'react';
 import { useGetDatasetPermissionsOverview } from '@/api/buster_rest/datasets';
 import {
   HeaderExplanation,
   PermissionSearchAndListWrapper
 } from '@/components/features/PermissionComponents';
 import { useDebounceSearch } from '@/hooks';
-import React from 'react';
 import { PermissionListUserContainer } from './PermissionListUserContainer';
 
 export const PermissionOverview: React.FC<{

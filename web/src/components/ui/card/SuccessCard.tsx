@@ -1,5 +1,5 @@
-import { cn } from '@/lib/classMerge';
 import React from 'react';
+import { cn } from '@/lib/classMerge';
 import { CircleCheck } from '../icons/NucleoIconFilled';
 import { Card, CardContent, CardTitle } from './CardBase';
 

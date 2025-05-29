@@ -1,17 +1,17 @@
+import type { BarElement } from 'chart.js';
+import type { Context } from 'chartjs-plugin-datalabels';
+import type { Options } from 'chartjs-plugin-datalabels/types/options';
 import {
   type BusterChartProps,
   DEFAULT_COLUMN_LABEL_FORMAT,
   type IColumnLabelFormat
 } from '@/api/asset_interfaces/metric';
 import { formatLabel } from '@/lib';
-import type { BarElement } from 'chart.js';
-import type { Context } from 'chartjs-plugin-datalabels';
-import type { Options } from 'chartjs-plugin-datalabels/types/options';
 import type { DatasetOption } from '../../../chartHooks';
 import {
-  JOIN_CHARACTER,
   formatLabelForDataset,
   formatYAxisLabel,
+  JOIN_CHARACTER,
   yAxisSimilar
 } from '../../../commonHelpers';
 import { DEFAULT_CHART_LAYOUT } from '../../ChartJSTheme';

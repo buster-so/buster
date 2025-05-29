@@ -1,3 +1,6 @@
+import { AnimatePresence, motion } from 'framer-motion';
+import isEmpty from 'lodash/isEmpty';
+import React, { useMemo } from 'react';
 import type {
   BusterChatMessageReasoning_file,
   BusterChatMessageReasoning_files
@@ -8,9 +11,6 @@ import { CircleWarning } from '@/components/ui/icons/NucleoIconFilled';
 import { CircleSpinnerLoader } from '@/components/ui/loaders';
 import { StreamingMessageCode } from '@/components/ui/streaming/StreamingMessageCode';
 import { Text } from '@/components/ui/typography';
-import { AnimatePresence, motion } from 'framer-motion';
-import isEmpty from 'lodash/isEmpty';
-import React, { useMemo } from 'react';
 import { ReasoningFileButtons } from './ReasoningFileButtons';
 
 export type ReasoningMessageFileProps = {

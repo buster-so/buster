@@ -1,6 +1,6 @@
+import type { QueryClient, queryOptions } from '@tanstack/react-query';
 import type { RustApiError } from '@/api/buster_rest/errors';
 import { userQueryKeys } from '@/api/query_keys/users';
-import type { QueryClient, queryOptions } from '@tanstack/react-query';
 
 export const isQueryStale = (
   // biome-ignore lint/suspicious/noExplicitAny: It really doesn't matter what the type is here

@@ -1,5 +1,5 @@
 import * as fs from 'node:fs';
-import { type FullConfig, chromium } from '@playwright/test';
+import { chromium, type FullConfig } from '@playwright/test';
 import { applyAuth, authFile, hasValidAuth, login } from './auth-utils';
 
 async function globalSetup(config: FullConfig) {

@@ -1,3 +1,5 @@
+import { cva } from 'class-variance-authority';
+import React, { useMemo } from 'react';
 import type { ShareAssetType } from '@/api/asset_interfaces';
 import {
   useAddUserFavorite,
@@ -10,8 +12,6 @@ import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
 import { AppTooltip } from '@/components/ui/tooltip';
 import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
-import { cva } from 'class-variance-authority';
-import React, { useMemo } from 'react';
 
 const favoriteStarVariants = cva('transition-colors', {
   variants: {

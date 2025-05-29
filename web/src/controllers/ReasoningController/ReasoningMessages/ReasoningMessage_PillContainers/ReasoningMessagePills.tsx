@@ -1,11 +1,11 @@
+import { AnimatePresence, motion } from 'framer-motion';
+import Link from 'next/link';
+import React from 'react';
 import type { BusterChatMessageReasoning_pill, FileType } from '@/api/asset_interfaces/chat';
 import { Popover } from '@/components/ui/popover/Popover';
 import { useMemoizedFn } from '@/hooks';
 import { assetParamsToRoute } from '@/lib/assets';
 import { cn } from '@/lib/classMerge';
-import { AnimatePresence, motion } from 'framer-motion';
-import Link from 'next/link';
-import React from 'react';
 
 const duration = 0.25;
 const maxStaggerDuration = 0.12; // 800ms max total duration

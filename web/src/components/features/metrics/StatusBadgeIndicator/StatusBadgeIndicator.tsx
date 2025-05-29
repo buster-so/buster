@@ -1,12 +1,12 @@
+import React from 'react';
 import { type BusterMetricListItem, VerificationStatus } from '@/api/asset_interfaces';
-import { CircleCheck, CircleXmark } from '@/components/ui/icons/NucleoIconFilled';
 import { StatusNotRequestedIcon } from '@/components/ui/icons/customIcons/Status_NotRequested';
+import { CircleCheck, CircleXmark } from '@/components/ui/icons/NucleoIconFilled';
 import { AppTooltip } from '@/components/ui/tooltip';
 import { cn } from '@/lib/classMerge';
-import React from 'react';
 import { HalfIcon } from './HalfIcon';
-import { ThreeFourthIcon } from './ThreeFourthIcon';
 import { getTooltipText } from './helpers';
+import { ThreeFourthIcon } from './ThreeFourthIcon';
 
 export const StatusBadgeIndicator: React.FC<{
   status: BusterMetricListItem['status'];

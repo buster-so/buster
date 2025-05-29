@@ -1,7 +1,5 @@
 'use client';
 
-import { DEFAULT_CHART_THEME } from '@/api/asset_interfaces/metric/charts/configColors';
-import { truncateText } from '@/lib/text';
 import { isServer } from '@tanstack/react-query';
 import {
   ArcElement,
@@ -13,9 +11,9 @@ import {
   Colors,
   DoughnutController,
   Legend,
+  LinearScale,
   LineController,
   LineElement,
-  LinearScale,
   LogarithmicScale,
   PieController,
   PointElement,
@@ -28,6 +26,8 @@ import {
 import ChartJsAnnotationPlugin from 'chartjs-plugin-annotation';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import ChartDeferred from 'chartjs-plugin-deferred';
+import { DEFAULT_CHART_THEME } from '@/api/asset_interfaces/metric/charts/configColors';
+import { truncateText } from '@/lib/text';
 import { ChartMountedPlugin } from './core/plugins';
 import ChartTrendlinePlugin from './core/plugins/chartjs-plugin-trendlines';
 import './core/plugins/chartjs-plugin-dayjs';

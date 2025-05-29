@@ -1,5 +1,8 @@
 'use client';
 
+import isEmpty from 'lodash/isEmpty';
+import uniq from 'lodash/uniq';
+import { useMemo } from 'react';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import type {
   BarSortBy,
@@ -13,9 +16,6 @@ import type {
   ScatterAxis,
   Trendline
 } from '@/api/asset_interfaces/metric/charts';
-import isEmpty from 'lodash/isEmpty';
-import uniq from 'lodash/uniq';
-import { useMemo } from 'react';
 import { DOWNSIZE_SAMPLE_THRESHOLD } from '../../config';
 import { aggregateAndCreateDatasets } from './aggregateAndCreateDatasets';
 import { sortLineBarData } from './datasetHelpers_BarLinePie';

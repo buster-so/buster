@@ -1,9 +1,9 @@
 'use client';
 
-import { useGetCollection } from '@/api/buster_rest/collections';
-import { AppPageLayout } from '@/components/ui/layouts';
 import type React from 'react';
 import { useState } from 'react';
+import { useGetCollection } from '@/api/buster_rest/collections';
+import { AppPageLayout } from '@/components/ui/layouts';
 import { CollectionIndividualContent } from './CollectionIndividualContent';
 import { CollectionsIndividualHeader } from './CollectionIndividualHeader';
 

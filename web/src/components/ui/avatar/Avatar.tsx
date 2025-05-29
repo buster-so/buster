@@ -1,7 +1,7 @@
+import React from 'react';
 import { BusterLogo } from '@/assets/svg/BusterLogo';
 import { getFirstTwoCapitalizedLetters } from '@/lib/text';
 import { cn } from '@/lib/utils';
-import React from 'react';
 import { Tooltip } from '../tooltip/Tooltip';
 import { Avatar as AvatarBase, AvatarFallback, AvatarImage } from './AvatarBase';
 

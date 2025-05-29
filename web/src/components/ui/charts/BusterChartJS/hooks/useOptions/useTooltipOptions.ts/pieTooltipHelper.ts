@@ -1,9 +1,9 @@
+import type { Chart, ChartTypeRegistry, TooltipItem } from 'chart.js';
 import type {
   BusterChartConfigProps,
   BusterChartProps
 } from '@/api/asset_interfaces/metric/charts';
 import { formatLabel } from '@/lib';
-import type { Chart, ChartTypeRegistry, TooltipItem } from 'chart.js';
 import type { ITooltipItem } from '../../../../BusterChartTooltip/interfaces';
 import { percentageFormatter } from './helpers';
 

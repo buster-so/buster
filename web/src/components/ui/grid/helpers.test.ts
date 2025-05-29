@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { calculateColumnSpan, columnSpanToPercent, columnSpansToPercent } from './helpers';
+import { calculateColumnSpan, columnSpansToPercent, columnSpanToPercent } from './helpers';
 
 describe('Grid Helpers', () => {
   describe('calculateColumnSpan', () => {

@@ -1,8 +1,8 @@
+import React, { useMemo } from 'react';
 import { DEFAULT_TRENDLINE_CONFIG } from '@/api/asset_interfaces';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { Switch } from '@/components/ui/switch';
 import { useMemoizedFn } from '@/hooks';
-import React, { useMemo } from 'react';
 import { LabelAndInput } from '../../Common';
 import type { LoopTrendline } from './EditTrendline';
 

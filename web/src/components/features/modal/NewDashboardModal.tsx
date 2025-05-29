@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useEffect, useMemo } from 'react';
 import { useCreateDashboard, useUpdateDashboard } from '@/api/buster_rest/dashboards';
 import { Input } from '@/components/ui/inputs';
 import { AppModal } from '@/components/ui/modal';
@@ -7,7 +8,6 @@ import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useMemoizedFn } from '@/hooks';
 import { inputHasText } from '@/lib/text';
 import { BusterRoutes } from '@/routes';
-import React, { useEffect, useMemo } from 'react';
 
 export const NewDashboardModal: React.FC<{
   open: boolean;

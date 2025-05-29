@@ -1,3 +1,5 @@
+import type { ChartDataset, ScriptableContext } from 'chart.js';
+import { describe, expect, it, vi } from 'vitest';
 import type {
   BusterChartProps,
   ChartEncodes,
@@ -10,8 +12,6 @@ import {
   DEFAULT_COLUMN_SETTINGS
 } from '@/api/asset_interfaces/metric/defaults';
 import { createDayjsDate, formatLabel } from '@/lib';
-import type { ChartDataset, ScriptableContext } from 'chart.js';
-import { describe, expect, it, vi } from 'vitest';
 import type { DatasetOption, DatasetOptionsWithTicks, KV } from '../../../chartHooks';
 import { formatBarAndLineDataLabel } from '../../helpers';
 import { lineBuilder, lineSeriesBuilder_labels } from './lineSeriesBuilder';

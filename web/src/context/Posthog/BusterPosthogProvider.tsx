@@ -1,14 +1,14 @@
 'use client';
 
-import type { BusterUserTeam } from '@/api/asset_interfaces';
-import { isDev } from '@/config';
 import { isServer } from '@tanstack/react-query';
 import type { PostHogConfig } from 'posthog-js';
 import posthog from 'posthog-js';
 import { PostHogProvider } from 'posthog-js/react';
-import { type PropsWithChildren, useEffect } from 'react';
-import React from 'react';
+import React, { type PropsWithChildren, useEffect } from 'react';
+import type { BusterUserTeam } from '@/api/asset_interfaces';
+import { isDev } from '@/config';
 import { useUserConfigContextSelector } from '../Users';
+
 const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
 
 export const BusterPosthogProvider: React.FC<PropsWithChildren> = React.memo(({ children }) => {

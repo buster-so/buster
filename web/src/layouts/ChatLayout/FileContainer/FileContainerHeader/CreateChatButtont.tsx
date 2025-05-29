@@ -1,3 +1,5 @@
+import React, { useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import { useStartChatFromAsset } from '@/api/buster_rest/chats/queryRequests';
 import { Button } from '@/components/ui/buttons';
 import { Stars } from '@/components/ui/icons';
@@ -6,8 +8,6 @@ import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useMemoizedFn } from '@/hooks';
 import { timeout } from '@/lib/timeout';
 import { BusterRoutes } from '@/routes';
-import React, { useState } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
 import { useChatLayoutContextSelector } from '../../ChatLayoutContext';
 
 export const CreateChatButton = React.memo(

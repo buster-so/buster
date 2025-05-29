@@ -1,12 +1,12 @@
+import { validate } from 'email-validator';
+import uniq from 'lodash/uniq';
+import React, { useMemo } from 'react';
 import { useInviteUser } from '@/api/buster_rest/users';
 import { InputTagInput } from '@/components/ui/inputs/InputTagInput';
 import { AppModal } from '@/components/ui/modal';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks';
 import { timeout } from '@/lib';
-import { validate } from 'email-validator';
-import uniq from 'lodash/uniq';
-import React, { useMemo } from 'react';
 
 export const InvitePeopleModal: React.FC<{
   open: boolean;

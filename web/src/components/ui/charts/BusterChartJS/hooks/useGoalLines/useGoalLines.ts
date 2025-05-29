@@ -10,6 +10,8 @@
  * @packageDocumentation
  */
 
+import type { AnnotationOptions, AnnotationPluginOptions } from 'chartjs-plugin-annotation';
+import { useMemo } from 'react';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import type {
   BusterChartConfigProps,
@@ -18,8 +20,6 @@ import type {
   GoalLine
 } from '@/api/asset_interfaces/metric/charts';
 import { formatLabel } from '@/lib/columnFormatter';
-import type { AnnotationOptions, AnnotationPluginOptions } from 'chartjs-plugin-annotation';
-import { useMemo } from 'react';
 import { yAxisSimilar } from '../../../commonHelpers';
 import { defaultLabelOptionConfig } from '../useChartSpecificOptions/labelOptionConfig';
 

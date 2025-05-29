@@ -1,5 +1,6 @@
 'use client';
 
+import type React from 'react';
 import {
   type BigQueryCredentials,
   BigQueryCredentialsSchema,
@@ -11,7 +12,6 @@ import {
   useUpdateBigQueryDataSource
 } from '@/api/buster_rest/data_source';
 import { useAppForm } from '@/components/ui/form/useFormBaseHooks';
-import type React from 'react';
 import { FormWrapper } from './FormWrapper';
 import { useDataSourceFormSuccess } from './helpers';
 

@@ -1,11 +1,11 @@
 'use client';
 
-import { Button } from '@/components/ui/buttons';
-import { ArrowLeft } from '@/components/ui/icons';
 import Link from 'next/link';
 import React from 'react';
-import { VersionHistoryHeaderButtons } from './VersionHistoryHeaderButtons';
+import { Button } from '@/components/ui/buttons';
+import { ArrowLeft } from '@/components/ui/icons';
 import { useCloseVersionHistory } from './useCloseVersionHistory';
+import { VersionHistoryHeaderButtons } from './VersionHistoryHeaderButtons';
 
 export const FileContainerHeaderVersionHistory = React.memo(() => {
   return (

@@ -1,17 +1,16 @@
 'use client';
 
-import { useMemoizedFn, useSize } from '@/hooks';
-import { cn } from '@/lib/classMerge';
 import Cookies from 'js-cookie';
 import React, {
-  useEffect,
-  useMemo,
-  useState,
   forwardRef,
+  useEffect,
   useImperativeHandle,
-  useRef
+  useMemo,
+  useRef,
+  useState
 } from 'react';
-import SplitPane, { Pane } from './SplitPane';
+import { useMemoizedFn, useSize } from '@/hooks';
+import { cn } from '@/lib/classMerge';
 import {
   convertPxToPercentage,
   createAutoSaveId,
@@ -20,6 +19,7 @@ import {
   parseWidthValue,
   setAppSplitterCookie
 } from './helper';
+import SplitPane, { Pane } from './SplitPane';
 import './splitterStyles.css';
 import { timeout } from '@/lib';
 

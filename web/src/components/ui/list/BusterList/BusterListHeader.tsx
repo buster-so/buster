@@ -1,6 +1,6 @@
+import React from 'react';
 import { Text } from '@/components/ui/typography';
 import { cn } from '@/lib/classMerge';
-import React from 'react';
 import { CheckboxColumn } from './CheckboxColumn';
 import { HEIGHT_OF_HEADER } from './config';
 import type { BusterListColumn } from './interfaces';

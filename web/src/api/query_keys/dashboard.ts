@@ -1,8 +1,8 @@
+import { queryOptions } from '@tanstack/react-query';
 import type {
   BusterDashboardListItem,
   BusterDashboardResponse
 } from '@/api/asset_interfaces/dashboard';
-import { queryOptions } from '@tanstack/react-query';
 import type { dashboardsGetList } from '../buster_rest/dashboards';
 
 const dashboardGetList = (

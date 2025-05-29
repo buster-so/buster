@@ -1,11 +1,11 @@
-import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import type { ColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
-import { Select } from '@/components/ui/select';
-import type { SelectItem } from '@/components/ui/select';
-import { useMemoizedFn } from '@/hooks';
-import { isNumericColumnStyle, isNumericColumnType } from '@/lib';
 import last from 'lodash/last';
 import React, { useMemo } from 'react';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { ColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import type { SelectItem } from '@/components/ui/select';
+import { Select } from '@/components/ui/select';
+import { useMemoizedFn } from '@/hooks';
+import { isNumericColumnStyle, isNumericColumnType } from '@/lib';
 import { LabelAndInput } from '../../Common';
 
 export const AGGREGATE_OPTIONS: SelectItem<IBusterMetricChartConfig['metricValueAggregate']>[] = [

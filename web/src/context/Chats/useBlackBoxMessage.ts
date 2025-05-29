@@ -1,5 +1,10 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
+import last from 'lodash/last';
+import random from 'lodash/random';
+import sample from 'lodash/sample';
+import { useRef } from 'react';
 import type {
   BusterChatMessageReasoning_text,
   IBusterChatMessage
@@ -8,11 +13,6 @@ import { useGetChatMessageMemoized } from '@/api/buster_rest/chats';
 import type { ChatEvent_GeneratingReasoningMessage } from '@/api/buster_socket/chats';
 import { queryKeys } from '@/api/query_keys';
 import { useMemoizedFn, useUnmount } from '@/hooks';
-import { useQueryClient } from '@tanstack/react-query';
-import last from 'lodash/last';
-import random from 'lodash/random';
-import sample from 'lodash/sample';
-import { useRef } from 'react';
 
 export const useBlackBoxMessage = () => {
   const timeoutRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});

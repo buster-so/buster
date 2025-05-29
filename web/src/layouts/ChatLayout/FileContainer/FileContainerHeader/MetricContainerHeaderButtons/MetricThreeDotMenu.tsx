@@ -1,3 +1,4 @@
+import React, { useMemo, useState } from 'react';
 import { ShareAssetType, VerificationStatus } from '@/api/asset_interfaces/share';
 import {
   useAddMetricsToDashboard,
@@ -11,18 +12,22 @@ import {
   useRemoveMetricFromCollection,
   useSaveMetricToCollections
 } from '@/api/buster_rest/metrics';
-import { ShareMenuContent } from '@/components/features/ShareMenu/ShareMenuContent';
-import { getShareAssetConfig } from '@/components/features/ShareMenu/helpers';
 import { ASSET_ICONS } from '@/components/features/config/assetIcons';
 import { useSaveToCollectionsDropdownContent } from '@/components/features/dropdowns/SaveToCollectionsDropdown';
 import { useSaveToDashboardDropdownContent } from '@/components/features/dropdowns/SaveToDashboardDropdown';
 import { useFavoriteStar } from '@/components/features/list/FavoriteStar';
 import { StatusBadgeIndicator } from '@/components/features/metrics/StatusBadgeIndicator';
 import { useStatusDropdownContent } from '@/components/features/metrics/StatusBadgeIndicator/useStatusDropdownContent';
+import { getShareAssetConfig } from '@/components/features/ShareMenu/helpers';
+import { ShareMenuContent } from '@/components/features/ShareMenu/ShareMenuContent';
 import { useListVersionDropdownItems } from '@/components/features/versionHistory/useListVersionDropdownItems';
 import { Button } from '@/components/ui/buttons';
-import { DropdownContent, type DropdownItem, type DropdownItems } from '@/components/ui/dropdown';
-import { Dropdown } from '@/components/ui/dropdown';
+import {
+  Dropdown,
+  DropdownContent,
+  type DropdownItem,
+  type DropdownItems
+} from '@/components/ui/dropdown';
 import {
   ArrowUpRight,
   Dots,
@@ -41,8 +46,8 @@ import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useUserConfigContextSelector } from '@/context/Users';
-import { METRIC_CHART_TITLE_INPUT_ID } from '@/controllers/MetricController/MetricViewChart/MetricViewChartHeader';
 import { METRIC_CHART_CONTAINER_ID } from '@/controllers/MetricController/MetricViewChart/config';
+import { METRIC_CHART_TITLE_INPUT_ID } from '@/controllers/MetricController/MetricViewChart/MetricViewChartHeader';
 import { useMemoizedFn } from '@/hooks';
 import { useChatIndividualContextSelector } from '@/layouts/ChatLayout/ChatContext';
 import {
@@ -53,8 +58,6 @@ import { timeout } from '@/lib';
 import { downloadElementToImage, exportJSONToCSV } from '@/lib/exportUtils';
 import { canEdit, getIsEffectiveOwner, getIsOwner } from '@/lib/share';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import { useMemo, useState } from 'react';
-import React from 'react';
 
 export const ThreeDotMenuButton = React.memo(
   ({

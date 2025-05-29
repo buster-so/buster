@@ -1,9 +1,3 @@
-import type { BusterCollection } from '@/api/asset_interfaces/collection';
-import { collectionQueryKeys } from '@/api/query_keys/collection';
-import { useBusterAssetsContextSelector } from '@/context/Assets/BusterAssetsProvider';
-import { useBusterNotifications } from '@/context/BusterNotifications';
-import { useMemoizedFn } from '@/hooks';
-import { hasOrganizationId, isQueryStale } from '@/lib';
 import {
   type QueryClient,
   type UseQueryOptions,
@@ -13,6 +7,12 @@ import {
 } from '@tanstack/react-query';
 import { create } from 'mutative';
 import { useMemo } from 'react';
+import type { BusterCollection } from '@/api/asset_interfaces/collection';
+import { collectionQueryKeys } from '@/api/query_keys/collection';
+import { useBusterAssetsContextSelector } from '@/context/Assets/BusterAssetsProvider';
+import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useMemoizedFn } from '@/hooks';
+import { hasOrganizationId, isQueryStale } from '@/lib';
 import type { RustApiError } from '../errors';
 import {
   addAssetToCollection,

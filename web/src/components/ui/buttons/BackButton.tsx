@@ -1,6 +1,6 @@
-import { cn } from '@/lib/classMerge';
 import Link from 'next/link';
 import React from 'react';
+import { cn } from '@/lib/classMerge';
 import { ChevronLeft } from '../icons';
 import { Button } from './Button';
 

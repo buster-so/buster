@@ -1,9 +1,3 @@
-import type { IBusterChat, IBusterChatMessage } from '@/api/asset_interfaces/chat/iChatInterfaces';
-import { chatQueryKeys } from '@/api/query_keys/chat';
-import { collectionQueryKeys } from '@/api/query_keys/collection';
-import { useBusterNotifications } from '@/context/BusterNotifications';
-import { useMemoizedFn } from '@/hooks/useMemoizedFn';
-import { updateChatToIChat } from '@/lib/chat';
 import {
   QueryClient,
   type UseQueryOptions,
@@ -13,6 +7,12 @@ import {
 } from '@tanstack/react-query';
 import last from 'lodash/last';
 import { useMemo } from 'react';
+import type { IBusterChat, IBusterChatMessage } from '@/api/asset_interfaces/chat/iChatInterfaces';
+import { chatQueryKeys } from '@/api/query_keys/chat';
+import { collectionQueryKeys } from '@/api/query_keys/collection';
+import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useMemoizedFn } from '@/hooks/useMemoizedFn';
+import { updateChatToIChat } from '@/lib/chat';
 import {
   useAddAssetToCollection,
   useRemoveAssetFromCollection

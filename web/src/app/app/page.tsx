@@ -1,5 +1,5 @@
-import { BusterRoutes, createBusterRoute } from '@/routes';
 import { permanentRedirect } from 'next/navigation';
+import { BusterRoutes, createBusterRoute } from '@/routes';
 
 export default function AppHomePage() {
   permanentRedirect(

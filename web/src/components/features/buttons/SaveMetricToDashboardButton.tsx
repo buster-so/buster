@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import {
   useAddMetricsToDashboard,
   useRemoveMetricsFromDashboard
@@ -6,7 +7,6 @@ import { Button } from '@/components/ui/buttons';
 import { AppTooltip } from '@/components/ui/tooltip';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks';
-import React, { useState } from 'react';
 import { ASSET_ICONS } from '../config/assetIcons';
 import { SaveToDashboardDropdown } from '../dropdowns/SaveToDashboardDropdown';
 

@@ -1,5 +1,5 @@
-import type { BusterChartProps, ChartEncodes } from '@/api/asset_interfaces/metric/charts';
 import React from 'react';
+import type { BusterChartProps, ChartEncodes } from '@/api/asset_interfaces/metric/charts';
 import { BusterChartLegendWrapper } from '../BusterChartLegend/BusterChartLegendWrapper';
 import type { DatasetOptionsWithTicks } from '../chartHooks';
 import type { ChartJSOrUndefined } from './core/types';

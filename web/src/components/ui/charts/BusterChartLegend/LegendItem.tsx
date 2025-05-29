@@ -1,9 +1,9 @@
-import { useMemoizedFn } from '@/hooks';
-import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useMemo } from 'react';
-import { LegendItemDot } from './LegendDot';
+import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/utils';
 import type { BusterChartLegendItem, BusterChartLegendProps } from './interfaces';
+import { LegendItemDot } from './LegendDot';
 
 export const LegendItem: React.FC<{
   item: BusterChartLegendItem;

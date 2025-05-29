@@ -1,5 +1,9 @@
 'use client';
 
+import type { User } from '@supabase/supabase-js';
+import { useRouter } from 'next/navigation';
+import type React from 'react';
+import { useState } from 'react';
 import type { BusterUserResponse } from '@/api/asset_interfaces/users';
 import { Button } from '@/components/ui/buttons';
 import { SuccessCard } from '@/components/ui/card/SuccessCard';
@@ -9,10 +13,6 @@ import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks';
 import { createBusterRoute } from '@/routes';
 import { BusterRoutes } from '@/routes/busterRoutes';
-import type { User } from '@supabase/supabase-js';
-import { useRouter } from 'next/navigation';
-import type React from 'react';
-import { useState } from 'react';
 import { PolicyCheck } from './PolicyCheck';
 
 export const ResetPasswordForm: React.FC<{

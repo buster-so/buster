@@ -1,7 +1,7 @@
+import { cva } from 'class-variance-authority';
+import React, { forwardRef, useMemo } from 'react';
 import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
-import { cva } from 'class-variance-authority';
-import React, { useMemo, forwardRef } from 'react';
 import { Button } from '../buttons/Button';
 import { ShapeSquare } from '../icons/NucleoIconFilled';
 import { ArrowUp } from '../icons/NucleoIconOutlined';

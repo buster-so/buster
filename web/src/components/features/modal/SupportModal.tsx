@@ -1,3 +1,4 @@
+import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { submitAppSupportRequest } from '@/api/buster_rest/nextjs/support';
 import { Input } from '@/components/ui/inputs';
 import { InputTextArea } from '@/components/ui/inputs/InputTextArea';
@@ -8,7 +9,6 @@ import { useUserConfigContextSelector } from '@/context/Users';
 import { useMemoizedFn } from '@/hooks';
 import { timeout } from '@/lib';
 import { capturePageScreenshot } from '@/lib/exportUtils';
-import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 
 export const SupportModal: React.FC<{
   onClose: () => void;

@@ -1,3 +1,8 @@
+import type { GridLineOptions, Scale, ScaleChartOptions, TimeScale } from 'chart.js';
+import { Chart as ChartJS } from 'chart.js';
+import isDate from 'lodash/isDate';
+import { useMemo } from 'react';
+import type { DeepPartial } from 'utility-types';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import {
   type BusterChartConfigProps,
@@ -10,11 +15,6 @@ import {
 } from '@/api/asset_interfaces/metric/charts';
 import { useMemoizedFn } from '@/hooks';
 import { formatLabel, isNumericColumnType, truncateText } from '@/lib';
-import type { GridLineOptions, Scale, ScaleChartOptions, TimeScale } from 'chart.js';
-import { Chart as ChartJS } from 'chart.js';
-import isDate from 'lodash/isDate';
-import { useMemo } from 'react';
-import type { DeepPartial } from 'utility-types';
 import { useXAxisTitle } from '../axisHooks/useXAxisTitle';
 import { useIsStacked } from '../useIsStacked';
 import { AUTO_DATE_FORMATS } from './config';

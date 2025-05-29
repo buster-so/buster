@@ -1,15 +1,13 @@
 'use client';
 
-import { useGetUserTeams } from '@/api/buster_rest';
-import { PermissionSearchAndListWrapper } from '@/components/features/PermissionComponents';
-import { Button } from '@/components/ui/buttons';
-import { useDebounceSearch } from '@/hooks';
-import { useMemoizedFn } from '@/hooks';
 import type React from 'react';
 import { useMemo, useState } from 'react';
-
+import { useGetUserTeams } from '@/api/buster_rest';
 import { NewTeamModal } from '@/components/features/modal/NewTeamModal';
+import { PermissionSearchAndListWrapper } from '@/components/features/PermissionComponents';
+import { Button } from '@/components/ui/buttons';
 import { Plus } from '@/components/ui/icons';
+import { useDebounceSearch, useMemoizedFn } from '@/hooks';
 import { UserTeamsListContainer } from './UserTeamsListContainer';
 
 export const UserTeamsController: React.FC<{ userId: string }> = ({ userId }) => {

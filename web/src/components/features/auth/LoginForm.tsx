@@ -1,5 +1,9 @@
 'use client';
 
+import Cookies from 'js-cookie';
+import Link from 'next/link';
+import React, { useMemo, useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import { rustErrorHandler } from '@/api/buster_rest/errors';
 import { Button } from '@/components/ui/buttons';
 import { SuccessCard } from '@/components/ui/card/SuccessCard';
@@ -20,10 +24,6 @@ import {
 } from '@/lib/supabase/signIn';
 import { inputHasText } from '@/lib/text';
 import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
-import Cookies from 'js-cookie';
-import Link from 'next/link';
-import React, { useMemo, useState } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
 import { PolicyCheck } from './PolicyCheck';
 
 const DEFAULT_CREDENTIALS = {

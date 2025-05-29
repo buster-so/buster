@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/buttons/Button';
 import { FileCard } from '@/components/ui/card/FileCard';
 import { ErrorClosableContainer } from '@/components/ui/error/ErrorClosableContainer';
@@ -7,7 +8,6 @@ import { Command, ReturnKey } from '@/components/ui/icons';
 import { AppCodeEditor } from '@/components/ui/inputs/AppCodeEditor';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks';
-import React, { useMemo, useState } from 'react';
 import type { AppVerticalCodeSplitterProps } from './AppVerticalCodeSplitter';
 
 export const SQLContainer: React.FC<{

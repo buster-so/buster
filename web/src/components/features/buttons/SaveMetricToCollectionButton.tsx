@@ -1,12 +1,12 @@
+import uniq from 'lodash/uniq';
+import type React from 'react';
+import { useState } from 'react';
 import {
   useRemoveMetricFromCollection,
   useSaveMetricToCollections
 } from '@/api/buster_rest/metrics';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks';
-import uniq from 'lodash/uniq';
-import type React from 'react';
-import { useState } from 'react';
 import { SaveToCollectionsDropdown } from '../dropdowns/SaveToCollectionsDropdown';
 import { CollectionButton } from './CollectionsButton';
 

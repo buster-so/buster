@@ -1,8 +1,8 @@
 'use client';
 
+import React from 'react';
 import { Separator } from '@/components/ui/seperator';
 import { Text, Title } from '@/components/ui/typography';
-import React from 'react';
 
 export const SettingsPageHeader: React.FC<{
   title: string;

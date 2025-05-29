@@ -1,9 +1,9 @@
 import {
   type BusterDashboard,
   type BusterDashboardResponse,
+  ShareRole,
   VerificationStatus
 } from '@/api/asset_interfaces';
-import { ShareRole } from '@/api/asset_interfaces';
 import { createMockMetric } from './metric';
 
 interface DashboardMockResponse {

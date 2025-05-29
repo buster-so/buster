@@ -1,22 +1,16 @@
-import { _adapters } from 'chart.js';
-
-import dayjs, { type QUnitType } from 'dayjs';
-
 import type { TimeUnit } from 'chart.js';
-
-// Needed to handle the custom parsing
-import CustomParseFormat from 'dayjs/plugin/customParseFormat.js';
-
+import { _adapters } from 'chart.js';
+import dayjs, { type QUnitType } from 'dayjs';
 // Needed to handle quarter format
 import AdvancedFormat from 'dayjs/plugin/advancedFormat.js';
-
-// Needed to handle adding/subtracting quarter
-import QuarterOfYear from 'dayjs/plugin/quarterOfYear.js';
+// Needed to handle the custom parsing
+import CustomParseFormat from 'dayjs/plugin/customParseFormat.js';
+import isoWeek from 'dayjs/plugin/isoWeek.js';
 
 // Needed to handle localization format
 import LocalizedFormat from 'dayjs/plugin/localizedFormat.js';
-
-import isoWeek from 'dayjs/plugin/isoWeek.js';
+// Needed to handle adding/subtracting quarter
+import QuarterOfYear from 'dayjs/plugin/quarterOfYear.js';
 
 dayjs.extend(AdvancedFormat);
 

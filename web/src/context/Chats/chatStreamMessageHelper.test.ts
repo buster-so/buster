@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import type {
   BusterChatMessageReasoning_file,
   BusterChatMessageReasoning_files,
@@ -9,7 +10,6 @@ import type {
 } from '@/api/asset_interfaces';
 import type { IBusterChat, IBusterChatMessage } from '@/api/asset_interfaces/chat';
 import type { ChatEvent_GeneratingResponseMessage } from '@/api/buster_socket/chats';
-import { describe, expect, it } from 'vitest';
 import {
   initializeOrUpdateMessage,
   updateChatTitle,

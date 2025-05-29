@@ -1,8 +1,8 @@
+import first from 'lodash/first';
+import React, { useMemo } from 'react';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { Select, type SelectItem } from '@/components/ui/select';
 import { useMemoizedFn } from '@/hooks';
-import first from 'lodash/first';
-import React, { useMemo } from 'react';
 import { LabelAndInput } from '../Common';
 
 const options: SelectItem<IBusterMetricChartConfig['showLegendHeadline'] | 'false'>[] = [

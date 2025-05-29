@@ -1,17 +1,17 @@
-import { DataSourceTypes } from '@/api/asset_interfaces/datasources';
 import type React from 'react';
-import { Database } from './NucleoIconOutlined';
+import { DataSourceTypes } from '@/api/asset_interfaces/datasources';
 import { AthenaIcon } from './customIcons/athena';
 import { BigQueryIcon } from './customIcons/bigquery';
 import { DataBricks } from './customIcons/databricks';
 import { MariaDB } from './customIcons/mariadb';
 import { MySQLIcon } from './customIcons/mysql';
 import { PostgresIcon } from './customIcons/postgres';
-import { RedUsersIcons } from './customIcons/redUsers';
 import { RedshiftIcon } from './customIcons/redshift';
+import { RedUsersIcons } from './customIcons/redUsers';
 import { SnowflakeIcon } from './customIcons/snowflake';
 import { SqlServer } from './customIcons/sqlserver';
 import { SupabaseIcon } from './customIcons/supabase';
+import { Database } from './NucleoIconOutlined';
 
 const IconRecord: Record<DataSourceTypes, React.FC<Parameters<typeof PostgresIcon>[0]>> = {
   [DataSourceTypes.postgres]: PostgresIcon,

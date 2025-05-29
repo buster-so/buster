@@ -1,5 +1,5 @@
-import type { BarAndLineAxis } from '@/api/asset_interfaces/metric';
 import type { Meta, StoryObj } from '@storybook/react';
+import type { BarAndLineAxis } from '@/api/asset_interfaces/metric';
 import type { IColumnLabelFormat } from '../../../../api/asset_interfaces/metric/charts/columnLabelInterfaces';
 import { ChartType } from '../../../../api/asset_interfaces/metric/charts/enum';
 import { generateBarChartData } from '../../../../mocks/chart/chartMocks';

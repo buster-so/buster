@@ -1,8 +1,8 @@
-import { useSet } from '@/hooks';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 import React from 'react';
+import { useSet } from '@/hooks';
 import { InputSelectModal } from './InputSelectModal';
 
 const meta: Meta<typeof InputSelectModal> = {

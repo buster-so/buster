@@ -1,8 +1,8 @@
+import React, { useMemo, useState } from 'react';
 import { useGetDatasets } from '@/api/buster_rest';
 import { Select, type SelectItem } from '@/components/ui/select/Select';
 import { SelectMultiple } from '@/components/ui/select/SelectMultiple';
 import { useMemoizedFn } from '@/hooks';
-import React, { useMemo, useState } from 'react';
 
 export const SelectedDatasetInput: React.FC<{
   onSetDatasetId: (datasetIds: string[]) => void;

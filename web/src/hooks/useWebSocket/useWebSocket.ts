@@ -1,9 +1,9 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import type { BusterSocketResponseBase } from '@/api/buster_socket/base_interfaces';
 import type { SupabaseContextReturnType } from '@/context/Supabase';
 import { useMemoizedFn, useMount, useNetwork, useThrottleFn, useWindowFocus } from '@/hooks';
-import { useEffect, useRef, useState } from 'react';
 import { ReadyState } from './config';
 import { type DeviceCapabilities, getDeviceCapabilities } from './deviceCapabilities';
 import { createBusterResponse } from './helpers';

@@ -1,2 +1,2 @@
-export * from './configColors';
 export * from './config';
+export * from './configColors';

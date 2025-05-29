@@ -1,5 +1,5 @@
-import type { BusterChartProps } from '@/api/asset_interfaces/metric/charts';
 import { describe, expect, it } from 'vitest';
+import type { BusterChartProps } from '@/api/asset_interfaces/metric/charts';
 import { formatChartLabel } from './formatChartLabel';
 
 describe('formatChartLabel', () => {

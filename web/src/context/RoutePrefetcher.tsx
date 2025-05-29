@@ -1,5 +1,8 @@
 'use client';
 
+import { type QueryClient, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+import React, { useRef } from 'react';
 import { prefetchGetCollectionsList } from '@/api/buster_rest/collections';
 import { prefetchGetDashboardsList } from '@/api/buster_rest/dashboards';
 import { prefetchGetMetricsList } from '@/api/buster_rest/metrics';
@@ -7,9 +10,6 @@ import { useAsyncEffect } from '@/hooks';
 import { timeout } from '@/lib';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import type { BusterAppRoutes } from '@/routes/busterRoutes/busterAppRoutes';
-import { type QueryClient, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import React, { useRef } from 'react';
 
 const HIGH_PRIORITY_ROUTES = [
   BusterRoutes.APP_HOME,

@@ -1,7 +1,7 @@
+import React from 'react';
 import { ChevronDown } from '@/components/ui/icons';
 import { AppTooltip } from '@/components/ui/tooltip';
 import { cn } from '@/lib/classMerge';
-import React from 'react';
 
 export const ReasoningScrollToBottom: React.FC<{
   isAutoScrollEnabled: boolean;

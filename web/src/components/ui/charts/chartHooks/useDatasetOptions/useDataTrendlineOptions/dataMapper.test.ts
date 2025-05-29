@@ -1,6 +1,6 @@
+import { describe, expect, it } from 'vitest';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
-import { describe, expect, it } from 'vitest';
 import { dataMapper } from './dataMapper';
 
 describe('dataMapper', () => {

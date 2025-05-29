@@ -1,5 +1,5 @@
-import { cn } from '@/lib/classMerge';
 import React from 'react';
+import { cn } from '@/lib/classMerge';
 
 export const InfiniteListContainer: React.FC<{
   children: React.ReactNode;

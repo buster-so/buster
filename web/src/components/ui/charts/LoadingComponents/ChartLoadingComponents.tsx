@@ -1,6 +1,6 @@
+import type React from 'react';
 import { ShimmerText } from '@/components/ui/typography/ShimmerText';
 import { cn } from '@/lib/utils';
-import type React from 'react';
 
 export const PreparingYourRequestLoader: React.FC<{
   className?: string;

@@ -1,8 +1,8 @@
 'use server';
 
-import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
 import { createClient } from './server';
 
 export const signOut = async () => {

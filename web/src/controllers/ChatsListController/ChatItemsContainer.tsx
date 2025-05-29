@@ -1,5 +1,6 @@
 'use client';
 
+import React, { memo, useMemo, useRef, useState } from 'react';
 import { type BusterChatListItem, ShareAssetType } from '@/api/asset_interfaces';
 import { FavoriteStar } from '@/components/features/list';
 import { getShareStatus } from '@/components/features/metrics/StatusBadgeIndicator';
@@ -11,7 +12,6 @@ import { Text } from '@/components/ui/typography';
 import { useMemoizedFn } from '@/hooks';
 import { formatDate, makeHumanReadble } from '@/lib';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import React, { memo, useMemo, useRef, useState } from 'react';
 import { ChatSelectedOptionPopup } from './ChatItemsSelectedPopup';
 
 export const ChatItemsContainer: React.FC<{

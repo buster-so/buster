@@ -1,8 +1,8 @@
+import React, { useMemo } from 'react';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { ENABLED_DOTS_ON_LINE } from '@/api/asset_interfaces';
 import { Switch } from '@/components/ui/switch';
 import { useMemoizedFn } from '@/hooks';
-import React, { useMemo } from 'react';
 import { LabelAndInput } from '../Common';
 
 export const EditDotsOnLineGlobal: React.FC<{

@@ -1,18 +1,18 @@
 'use client';
 
+import React, { useMemo } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import type { BusterCollectionListItem } from '@/api/asset_interfaces/collection';
 import { useGetCollection } from '@/api/buster_rest/collections';
 import type { collectionsGetList } from '@/api/buster_rest/collections/requests';
 import { Breadcrumb, type BreadcrumbItemType } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/buttons';
 import { Plus } from '@/components/ui/icons';
-import { AppSegmented } from '@/components/ui/segmented';
 import type { SegmentedItem } from '@/components/ui/segmented';
+import { AppSegmented } from '@/components/ui/segmented';
 import { AppTooltip } from '@/components/ui/tooltip';
 import { useMemoizedFn } from '@/hooks';
 import { BusterRoutes } from '@/routes';
-import React, { useMemo } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
 
 type CollectionListFilters = Omit<
   Parameters<typeof collectionsGetList>[0],

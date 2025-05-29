@@ -1,3 +1,4 @@
+import React, { useEffect, useMemo, useState } from 'react';
 import { useGetDatasets } from '@/api/buster_rest/datasets';
 import { useCreateTerm } from '@/api/buster_rest/terms';
 import { Input } from '@/components/ui/inputs/Input';
@@ -7,7 +8,6 @@ import type { SelectItem } from '@/components/ui/select';
 import { SelectMultiple } from '@/components/ui/select/SelectMultiple';
 import { Text } from '@/components/ui/typography';
 import { useMemoizedFn } from '@/hooks';
-import React, { useEffect, useMemo, useState } from 'react';
 
 export const NewTermModal: React.FC<{
   open: boolean;

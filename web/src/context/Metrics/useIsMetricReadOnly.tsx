@@ -1,8 +1,8 @@
+import last from 'lodash/last';
+import { useMemo } from 'react';
 import { useGetMetric } from '@/api/buster_rest/metrics';
 import { useChatLayoutContextSelector } from '@/layouts/ChatLayout';
 import { canEdit } from '@/lib/share';
-import last from 'lodash/last';
-import { useMemo } from 'react';
 
 export const useIsMetricReadOnly = ({
   metricId,

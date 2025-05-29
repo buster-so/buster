@@ -1,3 +1,4 @@
+import React, { useMemo } from 'react';
 import { ShareAssetType } from '@/api/asset_interfaces/share';
 import {
   useAddDashboardToCollection,
@@ -5,15 +6,19 @@ import {
   useGetDashboard,
   useRemoveDashboardFromCollection
 } from '@/api/buster_rest/dashboards';
-import { ShareMenuContent } from '@/components/features/ShareMenu/ShareMenuContent';
-import { getShareAssetConfig } from '@/components/features/ShareMenu/helpers';
 import { ASSET_ICONS } from '@/components/features/config/assetIcons';
 import { useSaveToCollectionsDropdownContent } from '@/components/features/dropdowns/SaveToCollectionsDropdown';
 import { useFavoriteStar } from '@/components/features/list/FavoriteStar';
+import { getShareAssetConfig } from '@/components/features/ShareMenu/helpers';
+import { ShareMenuContent } from '@/components/features/ShareMenu/ShareMenuContent';
 import { useListVersionDropdownItems } from '@/components/features/versionHistory/useListVersionDropdownItems';
 import { Button } from '@/components/ui/buttons';
-import { DropdownContent, type DropdownItem, type DropdownItems } from '@/components/ui/dropdown';
-import { Dropdown } from '@/components/ui/dropdown';
+import {
+  Dropdown,
+  DropdownContent,
+  type DropdownItem,
+  type DropdownItems
+} from '@/components/ui/dropdown';
 import {
   ArrowUpRight,
   Dots,
@@ -36,8 +41,6 @@ import { useChatLayoutContextSelector } from '@/layouts/ChatLayout/ChatLayoutCon
 import { timeout } from '@/lib';
 import { canEdit, canFilter, getIsEffectiveOwner } from '@/lib/share';
 import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
-import { useMemo } from 'react';
-import React from 'react';
 
 export const DashboardThreeDotMenu = React.memo(
   ({ dashboardId, isViewingOldVersion }: { dashboardId: string; isViewingOldVersion: boolean }) => {

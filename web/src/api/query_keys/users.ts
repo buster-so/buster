@@ -1,3 +1,4 @@
+import { queryOptions } from '@tanstack/react-query';
 import type {
   BusterUserAttribute,
   BusterUserDataset,
@@ -9,7 +10,6 @@ import type {
   BusterUserTeamListItem,
   OrganizationUser
 } from '@/api/asset_interfaces/users';
-import { queryOptions } from '@tanstack/react-query';
 import type { getUserList } from '../buster_rest/users/requests';
 
 const favoritesGetList = queryOptions<BusterUserFavorite[]>({

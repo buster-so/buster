@@ -1,3 +1,4 @@
+import React, { useMemo } from 'react';
 import type { BusterCollectionListItem } from '@/api/asset_interfaces/collection';
 import { useGetCollectionsList } from '@/api/buster_rest/collections';
 import { Button } from '@/components/ui/buttons';
@@ -6,7 +7,6 @@ import { Plus } from '@/components/ui/icons';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useMemoizedFn } from '@/hooks';
 import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
-import React, { useMemo } from 'react';
 import { NewCollectionModal } from '../modal/NewCollectionModal';
 
 export const SaveToCollectionsDropdown: React.FC<{

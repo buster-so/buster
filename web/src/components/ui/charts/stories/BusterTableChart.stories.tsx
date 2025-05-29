@@ -1,5 +1,5 @@
-import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
 import type { Meta, StoryObj } from '@storybook/react';
+import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
 import { BusterTableChart } from '../TableChart/BusterTableChart';
 
 // Helper functions for generating sample data

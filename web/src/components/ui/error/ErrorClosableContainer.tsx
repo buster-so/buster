@@ -1,8 +1,8 @@
 'use client';
 
-import { cn } from '@/lib/classMerge';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
+import { cn } from '@/lib/classMerge';
 import { CircleWarning, Xmark } from '../icons';
 
 export const ErrorClosableContainer: React.FC<{

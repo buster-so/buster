@@ -1,3 +1,5 @@
+import uniq from 'lodash/uniq';
+import React, { useState } from 'react';
 import { ShareAssetType, VerificationStatus } from '@/api/asset_interfaces';
 import {
   useAddMetricsToDashboard,
@@ -21,8 +23,6 @@ import { BusterListSelectedOptionPopupContainer } from '@/components/ui/list';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { useDebounceFn, useMemoizedFn } from '@/hooks';
-import uniq from 'lodash/uniq';
-import React, { useState } from 'react';
 
 export const MetricSelectedOptionPopup: React.FC<{
   selectedRowKeys: string[];

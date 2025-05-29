@@ -1,3 +1,10 @@
+import {
+  type QueryClient,
+  type UseQueryOptions,
+  useQuery,
+  useQueryClient
+} from '@tanstack/react-query';
+import last from 'lodash/last';
 import type {
   BusterMetricData,
   IBusterMetric,
@@ -8,13 +15,6 @@ import { useBusterAssetsContextSelector } from '@/context/Assets/BusterAssetsPro
 import { useOriginalMetricStore } from '@/context/Metrics/useOriginalMetricStore';
 import { useMemoizedFn } from '@/hooks';
 import { upgradeMetricToIMetric } from '@/lib/metrics';
-import {
-  type QueryClient,
-  type UseQueryOptions,
-  useQuery,
-  useQueryClient
-} from '@tanstack/react-query';
-import last from 'lodash/last';
 import type { RustApiError } from '../errors';
 import { useGetMetricVersionNumber, useMetricQueryStore } from './metricQueryStore';
 import { getMetric, getMetricData } from './requests';

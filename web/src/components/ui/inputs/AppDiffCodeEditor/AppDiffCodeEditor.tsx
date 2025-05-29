@@ -1,11 +1,11 @@
 'use client';
 
-import { useMemoizedFn } from '@/hooks';
-import { cn } from '@/lib/classMerge';
 import { DiffEditor } from '@monaco-editor/react';
 import type { editor } from 'monaco-editor/esm/vs/editor/editor.api';
 import { useTheme } from 'next-themes';
 import React, { forwardRef, useMemo } from 'react';
+import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/classMerge';
 import { CircleSpinnerLoaderContainer } from '../../loaders/CircleSpinnerLoaderContainer';
 
 export interface AppDiffCodeEditorProps {

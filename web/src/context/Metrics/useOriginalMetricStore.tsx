@@ -1,8 +1,8 @@
 'use client';
 
+import { create } from 'zustand';
 import type { IBusterMetric } from '@/api/asset_interfaces/metric';
 import { useMount } from '@/hooks';
-import { create } from 'zustand';
 
 type OriginalMetricStore = {
   originalMetrics: Record<string, IBusterMetric>;

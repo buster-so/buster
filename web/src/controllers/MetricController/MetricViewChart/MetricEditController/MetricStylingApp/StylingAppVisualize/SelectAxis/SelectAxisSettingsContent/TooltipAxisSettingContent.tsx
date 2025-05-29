@@ -1,6 +1,6 @@
+import React from 'react';
 import { useUpdateMetricChart } from '@/context/Metrics';
 import { useMemoizedFn } from '@/hooks';
-import React from 'react';
 import { useSelectAxisContextSelector } from '../useSelectAxisContext';
 import { EditShowTooltip } from './EditShowTooltip';
 

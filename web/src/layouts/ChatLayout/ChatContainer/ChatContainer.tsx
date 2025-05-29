@@ -1,5 +1,5 @@
-import { AppPageLayout } from '@/components/ui/layouts';
 import React from 'react';
+import { AppPageLayout } from '@/components/ui/layouts';
 import { ChatContent } from './ChatContent';
 import { ChatHeader } from './ChatHeader';
 

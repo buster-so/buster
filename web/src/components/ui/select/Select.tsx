@@ -1,5 +1,5 @@
-import { useMemoizedFn } from '@/hooks';
 import type React from 'react';
+import { useMemoizedFn } from '@/hooks';
 import {
   Select as SelectBase,
   SelectContent,

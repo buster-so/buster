@@ -1,8 +1,8 @@
+import { isServer } from '@tanstack/react-query';
+import type { AxiosRequestHeaders } from 'axios';
+import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import type { SupabaseContextReturnType } from '@/context/Supabase/SupabaseContextProvider';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import { isServer } from '@tanstack/react-query';
-import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
-import type { AxiosRequestHeaders } from 'axios';
 import { rustErrorHandler } from './buster_rest/errors';
 import { getSupabaseTokenFromCookies } from './createServerInstance';
 

@@ -1,6 +1,6 @@
+import React from 'react';
 import { ShareAssetType } from '@/api/asset_interfaces';
 import { useGetCollection } from '@/api/buster_rest/collections';
-import React from 'react';
 import { ShareMenu } from '../ShareMenu';
 import { getShareAssetConfig } from '../ShareMenu/helpers';
 import { ShareButton } from './ShareButton';

@@ -1,5 +1,5 @@
-import { DEFAULT_COLUMN_SETTINGS } from '@/api/asset_interfaces/metric';
 import { describe, expect, it } from 'vitest';
+import { DEFAULT_COLUMN_SETTINGS } from '@/api/asset_interfaces/metric';
 import { comboSeriesBuilder_data } from './comboSeriesBuilder';
 
 describe('comboSeriesBuilder_data', () => {

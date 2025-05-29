@@ -1,5 +1,5 @@
-import type { BusterTerm, BusterTermListItem } from '@/api/asset_interfaces/terms';
 import { queryOptions } from '@tanstack/react-query';
+import type { BusterTerm, BusterTermListItem } from '@/api/asset_interfaces/terms';
 
 export const termsGetList = queryOptions<BusterTermListItem[]>({
   queryKey: ['terms', 'list'] as const,

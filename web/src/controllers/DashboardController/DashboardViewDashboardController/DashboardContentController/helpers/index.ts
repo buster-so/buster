@@ -1,2 +1,2 @@
-export * from './normalizeMetric';
 export * from './hasMappedMetrics';
+export * from './normalizeMetric';

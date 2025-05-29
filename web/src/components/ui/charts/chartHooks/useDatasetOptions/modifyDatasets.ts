@@ -1,11 +1,11 @@
+import { sum as lodashSum } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 import {
   type BarSortBy,
   type BusterChartProps,
   ChartType,
   type PieSortBy
 } from '@/api/asset_interfaces/metric';
-import { sum as lodashSum } from 'lodash';
-import cloneDeep from 'lodash/cloneDeep';
 import type { DatasetOption, DatasetOptionsWithTicks, KV } from './interfaces';
 
 // Helper: ensure pie slices meet minimum percentage

@@ -1,9 +1,9 @@
+import React, { useMemo } from 'react';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces/metric';
 import { type BarAndLineAxis, ChartType } from '@/api/asset_interfaces/metric/charts';
 import { Separator } from '@/components/ui/seperator';
 import { useUpdateMetricChart } from '@/context/Metrics';
 import { useMemoizedFn } from '@/hooks';
-import React, { useMemo } from 'react';
 import { EditGrouping } from '../StylingAppVisualize/SelectAxis/SelectAxisSettingsContent/EditGrouping';
 import { EditBarSorting } from './EditBarAxisSorting';
 import { EditBarRoundnessGlobal } from './EditBarRoundnessGlobal';

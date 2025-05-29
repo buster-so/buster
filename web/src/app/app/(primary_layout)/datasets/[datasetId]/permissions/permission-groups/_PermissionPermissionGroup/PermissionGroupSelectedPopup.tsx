@@ -1,3 +1,4 @@
+import React, { useMemo } from 'react';
 import { useDatasetUpdatePermissionGroups } from '@/api/buster_rest';
 import { PERMISSION_OPTIONS_ASSIGNED } from '@/components/features/PermissionComponents';
 import { Button } from '@/components/ui/buttons';
@@ -5,7 +6,6 @@ import { Dropdown, type DropdownItem } from '@/components/ui/dropdown';
 import { CheckDouble, Xmark } from '@/components/ui/icons';
 import { BusterListSelectedOptionPopupContainer } from '@/components/ui/list';
 import { useMemoizedFn } from '@/hooks';
-import React, { useMemo } from 'react';
 
 export const PermissionGroupSelectedPopup: React.FC<{
   selectedRowKeys: string[];

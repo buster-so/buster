@@ -1,5 +1,5 @@
-import { updateSession } from '@/middleware/supabaseMiddleware';
 import { type NextRequest, NextResponse } from 'next/server';
+import { updateSession } from '@/middleware/supabaseMiddleware';
 import { assetReroutes } from './middleware/assetReroutes';
 import { pathnameMiddleware } from './middleware/pathnameMiddleware';
 

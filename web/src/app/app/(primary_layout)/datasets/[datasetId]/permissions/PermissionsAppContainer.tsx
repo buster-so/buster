@@ -1,11 +1,11 @@
 'use client';
 
-import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
-import { BusterRoutes } from '@/routes';
 import { useParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import { PermissionAppSegments } from './PermissionAppSegments';
+import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
+import { BusterRoutes } from '@/routes';
 import { PermissionApps } from './config';
+import { PermissionAppSegments } from './PermissionAppSegments';
 
 const routeToApp: Record<string, PermissionApps> = {
   [BusterRoutes.APP_DATASETS_ID_PERMISSIONS_OVERVIEW]: PermissionApps.OVERVIEW,

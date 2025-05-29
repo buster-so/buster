@@ -1,6 +1,6 @@
-import { cn } from '@/lib/utils';
 import { useDroppable } from '@dnd-kit/core';
 import type React from 'react';
+import { cn } from '@/lib/utils';
 import { HEIGHT_OF_DROPZONE, NEW_ROW_ID } from './helpers';
 
 export const BusterNewItemDropzone: React.FC = () => {

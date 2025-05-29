@@ -1,7 +1,7 @@
 // chartjs-plugin-trendline.ts
 
-import { DEFAULT_TRENDLINE_CONFIG } from '@/api/asset_interfaces/metric/defaults';
 import type { ChartDataset, ChartType, Plugin, Point, Scale } from 'chart.js';
+import { DEFAULT_TRENDLINE_CONFIG } from '@/api/asset_interfaces/metric/defaults';
 import { defaultLabelOptionConfig } from '../../../hooks/useChartSpecificOptions/labelOptionConfig';
 
 /** The three trendline modes we support */

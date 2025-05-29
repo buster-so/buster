@@ -1,7 +1,5 @@
 'use client';
 
-import { usePreviousRef } from '@/hooks';
-import { Chart as ChartJS } from 'chart.js';
 import type {
   BubbleDataPoint,
   ChartData,
@@ -10,7 +8,9 @@ import type {
   DefaultDataPoint,
   Point
 } from 'chart.js';
+import { Chart as ChartJS } from 'chart.js';
 import { forwardRef, useEffect, useRef } from 'react';
+import { usePreviousRef } from '@/hooks';
 import type { BaseChartComponent, ChartProps, ForwardedRef } from './types';
 import { cloneData, reforwardRef, setDatasets, setLabels, setOptions } from './utils';
 

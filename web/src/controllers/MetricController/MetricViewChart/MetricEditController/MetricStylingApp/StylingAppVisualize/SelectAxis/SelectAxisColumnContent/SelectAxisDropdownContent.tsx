@@ -1,3 +1,4 @@
+import React, { useMemo } from 'react';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import {
   type ChartEncodes,
@@ -12,7 +13,6 @@ import { useUpdateMetricChart } from '@/context/Metrics';
 import { useMemoizedFn } from '@/hooks';
 import { formatLabel } from '@/lib';
 import { cn } from '@/lib/classMerge';
-import React, { useMemo } from 'react';
 import { SelectAxisContainerId } from '../config';
 import { EditBarRoundness } from './EditBarRoundness';
 import { EditCurrency } from './EditCurrency';

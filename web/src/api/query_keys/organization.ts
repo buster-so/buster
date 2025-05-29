@@ -1,5 +1,5 @@
-import type { OrganizationUser } from '@/api/asset_interfaces/users';
 import { queryOptions } from '@tanstack/react-query';
+import type { OrganizationUser } from '@/api/asset_interfaces/users';
 
 const organizationUsers = (organizationId: string) =>
   queryOptions<OrganizationUser[]>({

@@ -1,7 +1,7 @@
-import { cn } from '@/lib/classMerge';
 import { Slot } from '@radix-ui/react-slot';
-import { type VariantProps, cva } from 'class-variance-authority';
+import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
+import { cn } from '@/lib/classMerge';
 import { CircleSpinnerLoader } from '../loaders/CircleSpinnerLoader';
 
 export const buttonTypeClasses = {

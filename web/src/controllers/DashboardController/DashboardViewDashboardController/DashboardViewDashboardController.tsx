@@ -1,11 +1,11 @@
 'use client';
 
+import type React from 'react';
 import { useGetDashboard, useUpdateDashboardConfig } from '@/api/buster_rest/dashboards';
 import { StatusCard } from '@/components/ui/card/StatusCard';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useDashboardContentStore } from '@/context/Dashboards';
 import { useIsDashboardReadOnly } from '@/context/Dashboards/useIsDashboardReadOnly';
-import type React from 'react';
 import { DashboardContentController } from './DashboardContentController';
 import { DashboardEditTitles } from './DashboardEditTitle';
 import { DashboardSaveFilePopup } from './DashboardSaveFilePopup';

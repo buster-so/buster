@@ -1,3 +1,4 @@
+import React, { useMemo, useState } from 'react';
 import {
   DEFAULT_CHART_CONFIG,
   type IBusterMetricChartConfig,
@@ -6,7 +7,6 @@ import {
 import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
 import { SliderWithInputNumber } from '@/components/ui/slider';
 import { useMemoizedFn } from '@/hooks';
-import React, { useMemo, useState } from 'react';
 import { LabelAndInput } from '../Common';
 
 const options: SegmentedItem<'donut' | 'pie'>[] = [

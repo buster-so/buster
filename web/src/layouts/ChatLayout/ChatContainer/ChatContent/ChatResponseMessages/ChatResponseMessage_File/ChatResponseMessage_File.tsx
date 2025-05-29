@@ -1,3 +1,6 @@
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import React, { useMemo } from 'react';
 import type {
   BusterChatResponseMessage_file,
   BusterChatResponseMessage_fileMetadata
@@ -8,9 +11,6 @@ import { StreamingMessage_File } from '@/components/ui/streaming/StreamingMessag
 import { Text } from '@/components/ui/typography';
 import { TextAndVersionPill } from '@/components/ui/typography/TextAndVersionPill';
 import { useMount } from '@/hooks';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import React, { useMemo } from 'react';
 import type { ChatResponseMessageProps } from '../ChatResponseMessageSelector';
 import { useGetFileHref } from './useGetFileHref';
 import { useGetIsSelectedFile } from './useGetIsSelectedFile';

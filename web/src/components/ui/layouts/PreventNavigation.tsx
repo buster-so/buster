@@ -1,9 +1,8 @@
 'use client';
 
-import { useMemoizedFn, useMount } from '@/hooks';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import React from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemoizedFn, useMount } from '@/hooks';
 import { AppModal } from '../modal/AppModal';
 
 type PreventNavigationProps = {

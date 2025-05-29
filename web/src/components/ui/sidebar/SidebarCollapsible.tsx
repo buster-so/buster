@@ -1,36 +1,36 @@
 'use client';
 
-import { useMemoizedFn } from '@/hooks';
-import { cn } from '@/lib/classMerge';
 import {
+  closestCenter,
   DndContext,
   type DragEndEvent,
   DragOverlay,
   type DragStartEvent,
   KeyboardSensor,
   PointerSensor,
-  closestCenter,
   useSensor,
   useSensors
 } from '@dnd-kit/core';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import {
-  SortableContext,
   arrayMove,
+  SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import React, { useEffect } from 'react';
+import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/classMerge';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger
 } from '../collapsible/CollapsibleBase';
 import { CaretDown } from '../icons/NucleoIconFilled';
-import { SidebarItem } from './SidebarItem';
 import type { ISidebarGroup } from './interfaces';
+import { SidebarItem } from './SidebarItem';
 
 const modifiers = [restrictToVerticalAxis];
 

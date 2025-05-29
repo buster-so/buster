@@ -1,7 +1,7 @@
 'use server';
 
-import { getSupabaseUserContext } from '@/lib/supabase';
 import { type NextRequest, NextResponse } from 'next/server';
+import { getSupabaseUserContext } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
   // Parse the request body to get minutesUntilExpiration

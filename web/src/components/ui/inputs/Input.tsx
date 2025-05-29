@@ -1,7 +1,7 @@
+import { cva, type VariantProps } from 'class-variance-authority';
+import React from 'react';
 import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
-import { type VariantProps, cva } from 'class-variance-authority';
-import React from 'react';
 
 export const inputVariants = cva(
   'flex w-full rounded border px-2.5 text-base transition-all duration-200  disabled:cursor-not-allowed  disabled:text-gray-light ',

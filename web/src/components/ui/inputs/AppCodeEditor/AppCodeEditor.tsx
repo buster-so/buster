@@ -5,10 +5,10 @@
 
 import './MonacoWebWorker';
 
-import { useMemoizedFn } from '@/hooks';
-import { cn } from '@/lib/classMerge';
 import type { editor } from 'monaco-editor/esm/vs/editor/editor.api';
 import React, { forwardRef, useMemo } from 'react';
+import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/classMerge';
 import { CircleSpinnerLoaderContainer } from '../../loaders/CircleSpinnerLoaderContainer';
 import { configureMonacoToUseYaml } from './yamlHelper';
 

@@ -1,8 +1,8 @@
 'use client';
 
+import React, { useEffect, useRef, useTransition } from 'react';
 import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
-import React, { useEffect, useRef, useTransition } from 'react';
 
 interface StreamingMessage_TextProps {
   isCompletedStream: boolean;

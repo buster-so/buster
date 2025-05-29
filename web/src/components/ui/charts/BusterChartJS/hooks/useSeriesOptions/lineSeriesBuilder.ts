@@ -1,12 +1,12 @@
+import { Chart, Filler, type ScriptableContext } from 'chart.js';
 import type { ColumnSettings } from '@/api/asset_interfaces/metric/charts';
 import {
   DEFAULT_COLUMN_LABEL_FORMAT,
   DEFAULT_COLUMN_SETTINGS
 } from '@/api/asset_interfaces/metric/defaults';
 import { addOpacityToColor, createDayjsDate, formatLabel } from '@/lib';
-import { Chart, Filler, type ScriptableContext } from 'chart.js';
 import type { DatasetOption } from '../../../chartHooks';
-import { JOIN_CHARACTER, formatLabelForDataset } from '../../../commonHelpers';
+import { formatLabelForDataset, JOIN_CHARACTER } from '../../../commonHelpers';
 import type { ChartProps } from '../../core';
 import { formatBarAndLineDataLabel } from '../../helpers';
 import { defaultLabelOptionConfig } from '../useChartSpecificOptions/labelOptionConfig';

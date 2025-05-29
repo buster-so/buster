@@ -1,5 +1,5 @@
-import type { DashboardFileViewSecondary } from '@/layouts/ChatLayout/ChatLayoutContext/useLayoutConfig';
 import dynamic from 'next/dynamic';
+import type { DashboardFileViewSecondary } from '@/layouts/ChatLayout/ChatLayoutContext/useLayoutConfig';
 import type { FileContainerSecondaryProps } from '../interfaces';
 import { loading } from './loading';
 

@@ -1,8 +1,8 @@
-import { CircleCheck, CircleXmark } from '@/components/ui/icons';
-import { Text } from '@/components/ui/typography';
 import { validate } from 'email-validator';
 import type React from 'react';
 import { useEffect, useMemo } from 'react';
+import { CircleCheck, CircleXmark } from '@/components/ui/icons';
+import { Text } from '@/components/ui/typography';
 
 const PasswordCheckItem: React.FC<{
   passwordGood: boolean;

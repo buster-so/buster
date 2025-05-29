@@ -1,3 +1,5 @@
+import type { User } from '@supabase/supabase-js';
+import { type NextRequest, NextResponse } from 'next/server';
 import {
   BusterRoutes,
   createBusterRoute,
@@ -5,8 +7,6 @@ import {
   isPublicPage,
   isShareableAssetPage
 } from '@/routes/busterRoutes';
-import type { User } from '@supabase/supabase-js';
-import { type NextRequest, NextResponse } from 'next/server';
 
 export const assetReroutes = async (
   request: NextRequest,

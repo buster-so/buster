@@ -1,5 +1,5 @@
-import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import React, { useMemo } from 'react';
+import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { InputNumber } from '../inputs';
 import { Slider } from './Slider';
 

@@ -1,10 +1,10 @@
 'use client';
 
+import React, { useMemo } from 'react';
 import type { ShareAssetType } from '@/api/asset_interfaces';
 import { FileIndeterminateLoader } from '@/components/features/FileIndeterminateLoader';
 import { AppNoPageAccess } from '@/controllers/AppNoPageAccess';
 import { AppPasswordAccess } from '@/controllers/AppPasswordAccess';
-import React, { useMemo } from 'react';
 import { useGetAsset } from './useGetAsset';
 
 export type AppAssetCheckLayoutProps = {

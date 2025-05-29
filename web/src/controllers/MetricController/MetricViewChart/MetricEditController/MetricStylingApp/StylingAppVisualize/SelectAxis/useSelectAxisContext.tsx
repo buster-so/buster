@@ -1,3 +1,6 @@
+import type React from 'react';
+import type { PropsWithChildren } from 'react';
+import { createContext, useContextSelector } from 'use-context-selector';
 import type { ColumnMetaData, IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import type {
   CategoryAxisStyleConfig,
@@ -6,9 +9,6 @@ import type {
   Y2AxisConfig,
   YAxisConfig
 } from '@/api/asset_interfaces/metric/charts';
-import type { PropsWithChildren } from 'react';
-import type React from 'react';
-import { createContext, useContextSelector } from 'use-context-selector';
 
 export interface ISelectAxisContext
   extends Required<YAxisConfig>,

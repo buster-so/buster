@@ -1,6 +1,6 @@
+import type React from 'react';
 import { Separator } from '@/components/ui/seperator';
 import { Text } from '@/components/ui/typography';
-import type React from 'react';
 import type { SelectAxisContainerId } from '../config';
 import { ZoneIdToTitle } from '../helper';
 import { zoneIdToAxisSettingContent } from './config';

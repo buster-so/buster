@@ -1,5 +1,5 @@
-import type { BusterChatListItem } from '@/api/asset_interfaces/chat/chatInterfaces';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { BusterChatListItem } from '@/api/asset_interfaces/chat/chatInterfaces';
 import { mainApi } from '../instances';
 
 // Mock the mainApi

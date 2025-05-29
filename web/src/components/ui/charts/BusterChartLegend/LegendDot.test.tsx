@@ -1,6 +1,6 @@
-import { ChartType } from '@/api/asset_interfaces/metric/charts';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { ChartType } from '@/api/asset_interfaces/metric/charts';
 import { LegendItemDot } from './LegendDot';
 
 describe('LegendItemDot', () => {

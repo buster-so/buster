@@ -1,5 +1,5 @@
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 import { prefetchGetUserAttributes } from '@/api/buster_rest/users';
-import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { UserAttributesController } from './UserAttributesController';
 
 export default async function Page(props: { params: Promise<{ userId: string }> }) {

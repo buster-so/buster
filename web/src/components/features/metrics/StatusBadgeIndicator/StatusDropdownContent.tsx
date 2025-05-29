@@ -1,6 +1,6 @@
+import React from 'react';
 import type { VerificationStatus } from '@/api/asset_interfaces';
 import { Dropdown } from '@/components/ui/dropdown';
-import React from 'react';
 import { useStatusDropdownContent } from './useStatusDropdownContent';
 
 export const StatusDropdownContent: React.FC<{

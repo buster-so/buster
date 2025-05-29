@@ -1,6 +1,6 @@
-import { measureTextWidth } from '@/lib';
 import clamp from 'lodash/clamp';
 import sampleSize from 'lodash/sampleSize';
+import { measureTextWidth } from '@/lib';
 
 export const MIN_COLUMN_WIDTH = 80;
 export const MAX_COLUMN_WIDTH = 370;

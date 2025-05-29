@@ -1,5 +1,5 @@
-import { DataSourceTypes } from '@/api/asset_interfaces/datasources';
 import type { Meta, StoryObj } from '@storybook/react';
+import { DataSourceTypes } from '@/api/asset_interfaces/datasources';
 import { AppDataSourceIcon } from './AppDataSourceIcons';
 
 const meta: Meta<typeof AppDataSourceIcon> = {

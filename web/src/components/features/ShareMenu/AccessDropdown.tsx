@@ -1,3 +1,4 @@
+import React, { useMemo } from 'react';
 import { ShareAssetType, ShareRole } from '@/api/asset_interfaces';
 import type { DropdownItem } from '@/components/ui/dropdown';
 import { Dropdown } from '@/components/ui/dropdown';
@@ -5,7 +6,6 @@ import { ChevronDown } from '@/components/ui/icons/NucleoIconFilled';
 import { Paragraph, Text } from '@/components/ui/typography';
 import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
-import React, { useMemo } from 'react';
 
 type DropdownValue = ShareRole | 'remove' | 'notShared';
 

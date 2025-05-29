@@ -1,7 +1,7 @@
+import { describe, expect, it } from 'vitest';
 import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import { createDayjsDate } from '@/lib/date';
-import { describe, expect, it } from 'vitest';
 import type { DatasetOptionsWithTicks } from '../../../chartHooks/useDatasetOptions/interfaces';
 import type { SeriesBuilderProps } from './interfaces';
 import { scatterSeriesBuilder_data, scatterSeriesBuilder_labels } from './scatterSeriesBuilder';

@@ -1,9 +1,9 @@
+import { queryOptions } from '@tanstack/react-query';
 import type {
   BusterMetricListItem,
   IBusterMetric,
   IBusterMetricData
 } from '@/api/asset_interfaces/metric';
-import { queryOptions } from '@tanstack/react-query';
 import type { listMetrics } from '../buster_rest/metrics';
 
 export const metricsGetMetric = (metricId: string, version_number: number | null) => {

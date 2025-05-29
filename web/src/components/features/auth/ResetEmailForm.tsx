@@ -1,5 +1,8 @@
 'use client';
 
+import Link from 'next/link';
+import type React from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/buttons';
 import { SuccessCard } from '@/components/ui/card/SuccessCard';
 import { Input } from '@/components/ui/inputs';
@@ -9,9 +12,6 @@ import { useMemoizedFn } from '@/hooks';
 import { isValidEmail, timeout } from '@/lib';
 import { cn } from '@/lib/classMerge';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import Link from 'next/link';
-import type React from 'react';
-import { useState } from 'react';
 
 export const ResetEmailForm: React.FC<{
   queryEmail: string;

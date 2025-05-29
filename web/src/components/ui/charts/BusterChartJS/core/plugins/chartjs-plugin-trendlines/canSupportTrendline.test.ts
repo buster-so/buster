@@ -1,7 +1,7 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import type { BusterChartProps, Trendline } from '@/api/asset_interfaces/metric/charts';
 import { isNumericColumnType } from '@/lib/messages';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { canSupportTrendlineRecord } from './canSupportTrendline';
 
 // Mock the isNumericColumnType function

@@ -4,15 +4,15 @@ import type {
   createMySQLDataSource,
   createPostgresDataSource,
   createRedshiftDataSource,
-  createSQLServerDataSource,
   createSnowflakeDataSource,
+  createSQLServerDataSource,
   updateBigQueryDataSource,
   updateDatabricksDataSource,
   updateMySQLDataSource,
   updatePostgresDataSource,
   updateRedshiftDataSource,
-  updateSQLServerDataSource,
-  updateSnowflakeDataSource
+  updateSnowflakeDataSource,
+  updateSQLServerDataSource
 } from './requests';
 
 // Type definitions for the create datasource parameters

@@ -1,6 +1,6 @@
-import { metricsQueryKeys } from '@/api/query_keys/metric';
 import { QueryClient } from '@tanstack/react-query';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { metricsQueryKeys } from '@/api/query_keys/metric';
 import { prefetchGetMetricDataClient } from './getMetricQueryRequests';
 import { getMetricData } from './requests';
 

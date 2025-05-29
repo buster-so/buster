@@ -1,17 +1,15 @@
-import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import type { ColumnMetaData } from '@/api/asset_interfaces';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import type { ColumnMetaData, IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import type { ChartEncodes, GoalLine } from '@/api/asset_interfaces/metric/charts';
 import { Button } from '@/components/ui/buttons';
 import { ColorPicker } from '@/components/ui/color-picker';
 import { Plus } from '@/components/ui/icons';
-import { Input } from '@/components/ui/inputs';
-import { InputNumber } from '@/components/ui/inputs';
+import { Input, InputNumber } from '@/components/ui/inputs';
 import { Separator } from '@/components/ui/seperator';
 import { Switch } from '@/components/ui/switch';
 import { useMemoizedFn, useSet } from '@/hooks';
-import { AnimatePresence, motion } from 'framer-motion';
-import React, { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import { LabelAndInput } from '../Common';
 import { CollapseDelete } from '../Common/CollapseDelete';
 

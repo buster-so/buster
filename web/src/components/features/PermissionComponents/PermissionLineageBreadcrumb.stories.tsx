@@ -1,5 +1,5 @@
-import type { DatasetPermissionOverviewUser } from '@/api/asset_interfaces';
 import type { Meta, StoryObj } from '@storybook/react';
+import type { DatasetPermissionOverviewUser } from '@/api/asset_interfaces';
 import { PermissionLineageBreadcrumb } from './PermissionLineageBreadcrumb';
 
 const meta: Meta<typeof PermissionLineageBreadcrumb> = {

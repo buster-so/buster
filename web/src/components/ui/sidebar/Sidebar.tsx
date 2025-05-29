@@ -1,7 +1,7 @@
 import React from 'react';
+import type { ISidebarGroup, ISidebarList, SidebarProps } from './interfaces';
 import { SidebarCollapsible } from './SidebarCollapsible';
 import { SidebarItem } from './SidebarItem';
-import type { ISidebarGroup, ISidebarList, SidebarProps } from './interfaces';
 
 export const Sidebar: React.FC<SidebarProps> = React.memo(({ header, content, footer }) => {
   return (

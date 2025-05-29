@@ -1,10 +1,10 @@
+import React, { useMemo } from 'react';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import type { ColumnLabelFormat, ComboChartAxis } from '@/api/asset_interfaces/metric/charts';
 import { AXIS_TITLE_SEPARATOR } from '@/components/ui/charts/commonHelpers/axisHelper';
 import { useUpdateMetricChart } from '@/context/Metrics';
 import { useMemoizedFn } from '@/hooks';
 import { formatLabel } from '@/lib';
-import React, { useMemo } from 'react';
 import { useSelectAxisContextSelector } from '../useSelectAxisContext';
 import { EditAxisScale } from './EditAxisScale';
 import { EditShowAxisLabel } from './EditShowAxisLabel';

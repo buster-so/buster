@@ -1,5 +1,5 @@
-import { dashboardQueryKeys } from '@/api/query_keys/dashboard';
 import { QueryClient } from '@tanstack/react-query';
+import { dashboardQueryKeys } from '@/api/query_keys/dashboard';
 import { getDashboard_server } from './requests';
 
 export const prefetchGetDashboard = async (

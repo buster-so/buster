@@ -1,8 +1,13 @@
+import {
+  type DependencyList,
+  type EffectCallback,
+  useEffect,
+  type useLayoutEffect,
+  useRef
+} from 'react';
 import { depsAreSame } from '@/lib/depAreSame';
 import type { BasicTarget } from '@/lib/domTarget';
 import { getTargetElement } from '@/lib/domTarget';
-import { type DependencyList, type EffectCallback, useEffect, type useLayoutEffect } from 'react';
-import { useRef } from 'react';
 import { useUnmount } from './useUnmount';
 
 const createEffectWithTarget = (useEffectType: typeof useEffect | typeof useLayoutEffect) => {

@@ -1,6 +1,6 @@
-import type { BusterChartProps } from '@/api/asset_interfaces/metric';
 import type { AnimationOptions, ChartDataset } from 'chart.js';
 import memoize from 'lodash/memoize';
+import type { BusterChartProps } from '@/api/asset_interfaces/metric';
 
 const DEFAULT_MAX_DELAY_DATA_POINT = 95;
 const DEFAULT_MAX_DELAY_DATASET = 250;

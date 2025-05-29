@@ -1,9 +1,10 @@
 'use client';
 
+import React, { useMemo, useState } from 'react';
 import type { GetPermissionGroupUsersResponse } from '@/api/asset_interfaces';
 import { useUpdatePermissionGroupUsers } from '@/api/buster_rest';
-import { PermissionAssignedCell } from '@/components/features/PermissionComponents';
 import { ListUserItem } from '@/components/features/list';
+import { PermissionAssignedCell } from '@/components/features/PermissionComponents';
 import {
   type BusterListColumn,
   type BusterListRowItem,
@@ -13,7 +14,6 @@ import {
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
 import { useMemoizedFn } from '@/hooks';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import React, { useMemo, useState } from 'react';
 import { PermissionGroupUsersSelectedPopup } from './PermissionGroupUsersSelectedPopup';
 
 export const PermissionGroupUsersListContainer: React.FC<{

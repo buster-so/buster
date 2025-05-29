@@ -1,14 +1,13 @@
 'use client';
 
+import dynamic from 'next/dynamic';
+import React from 'react';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
-import React from 'react';
 import { Button } from '../../buttons/Button';
 import { FileCard } from '../../card/FileCard';
 import { Copy } from '../../icons/NucleoIconOutlined';
 import lightTheme from './light';
-
-import dynamic from 'next/dynamic';
 
 const SyntaxHighlighter = dynamic(
   () => import('react-syntax-highlighter').then((mod) => mod.Prism),

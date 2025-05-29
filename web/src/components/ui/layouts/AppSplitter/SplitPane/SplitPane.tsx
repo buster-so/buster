@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useCallback, useRef, useState } from 'react';
-import SashContent from './SashContent';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   assertsSize,
   bodyDisableUserSelect,
@@ -16,6 +15,7 @@ import {
   splitVerticalClassName
 } from './base';
 import Pane from './pane';
+import SashContent from './SashContent';
 import SplitPaneSash from './sash';
 import type { IAxis, ICacheSizes, IPaneConfigs, ISplitProps } from './types';
 

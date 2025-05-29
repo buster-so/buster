@@ -1,6 +1,6 @@
+import { useEffect, useMemo, useRef } from 'react';
 import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
 import { useInViewport } from '@/hooks';
-import { useEffect, useMemo, useRef } from 'react';
 import { useDashboardContentControllerContextSelector } from '../DashboardContentControllerContext';
 
 export const useDashboardMetric = ({

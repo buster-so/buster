@@ -1,12 +1,12 @@
 'use client';
 
+import type React from 'react';
+import { useMemo, useRef, useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import { AppSplitter, type AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMount } from '@/hooks';
 import { CREATE_LANGFUSE_SESSION_URL } from '@/routes/externalRoutes';
-import type React from 'react';
-import { useMemo, useRef, useState } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
 import { ChatContainer } from '../ChatContainer';
 import { ChatContextProvider } from '../ChatContext/ChatContext';
 import { ChatLayoutContextProvider, useChatLayoutContext } from '../ChatLayoutContext';

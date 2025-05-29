@@ -1,6 +1,6 @@
-import { cn } from '@/lib/utils';
-import { type VariantProps, cva } from 'class-variance-authority';
+import { cva, type VariantProps } from 'class-variance-authority';
 import type React from 'react';
+import { cn } from '@/lib/utils';
 import { textColorVariants } from './variants';
 
 const paragraphVariants = cva('', {

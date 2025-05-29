@@ -1,8 +1,8 @@
+import isEmpty from 'lodash/isEmpty';
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { ChartType } from '@/api/asset_interfaces/metric/charts';
-import isEmpty from 'lodash/isEmpty';
-import type { DropZone } from './SelectAxisDragContainer/interfaces';
 import { SelectAxisContainerId } from './config';
+import type { DropZone } from './SelectAxisDragContainer/interfaces';
 
 const EMPTY_ARRAY: string[] = []; //This is to avoid a reference change
 const EMPTY_DROP_ZONE: DropZone[] = [

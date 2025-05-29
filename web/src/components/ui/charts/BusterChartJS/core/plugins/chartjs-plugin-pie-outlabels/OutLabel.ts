@@ -1,10 +1,10 @@
 import type { ArcElement, Point } from 'chart.js';
 import { toFontString } from 'chart.js/helpers';
+import { drawRoundedRect, textSize } from './helpers';
 import type OutLabelsContext from './OutLabelsContext';
 import type { OutLabelStyle } from './OutLabelsStyle';
 import type Rect from './Rect';
 import type Size from './Size';
-import { drawRoundedRect, textSize } from './helpers';
 
 export default class OutLabel {
   ctx: CanvasRenderingContext2D;

@@ -1,7 +1,7 @@
+import { describe, expect, it } from 'vitest';
 import type { DashboardConfig } from '@/api/asset_interfaces/dashboard';
 import { NUMBER_OF_COLUMNS } from '@/components/ui/grid/helpers';
 import { createMockMetric } from '@/mocks/metric';
-import { describe, expect, it } from 'vitest';
 import { hasRemovedMetrics, hasUnmappedMetrics } from './hasMappedMetrics';
 
 const createMockRow = (itemIds: string[]): NonNullable<DashboardConfig['rows']>[0] => ({

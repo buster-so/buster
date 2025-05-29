@@ -1,6 +1,6 @@
+import { useQuery } from '@tanstack/react-query';
 import nextApi from '@/api/next/instances';
 import { queryKeys } from '@/api/query_keys';
-import { useQuery } from '@tanstack/react-query';
 
 export const useGetCurrencies = () => {
   return useQuery({

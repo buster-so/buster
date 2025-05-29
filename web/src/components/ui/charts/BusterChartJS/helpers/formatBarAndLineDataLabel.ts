@@ -1,6 +1,6 @@
+import type { Context } from 'chartjs-plugin-datalabels';
 import type { ColumnLabelFormat } from '@/api/asset_interfaces/metric';
 import { formatLabel } from '@/lib/columnFormatter';
-import type { Context } from 'chartjs-plugin-datalabels';
 
 export const formatBarAndLineDataLabel = (
   value: number,

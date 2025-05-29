@@ -1,13 +1,12 @@
+import type { ChartType as ChartJSChartType, PluginChartOptions } from 'chart.js';
+import type { AnnotationPluginOptions } from 'chartjs-plugin-annotation';
+import { useMemo } from 'react';
+import type { DeepPartial } from 'utility-types';
 import type {
   BusterChartConfigProps,
   BusterChartProps,
   ChartEncodes
 } from '@/api/asset_interfaces/metric/charts';
-import type { ChartType as ChartJSChartType } from 'chart.js';
-import type { PluginChartOptions } from 'chart.js';
-import type { AnnotationPluginOptions } from 'chartjs-plugin-annotation';
-import { useMemo } from 'react';
-import type { DeepPartial } from 'utility-types';
 import type { DatasetOptionsWithTicks } from '../../../chartHooks';
 import {
   LINE_DECIMATION_SAMPLES,

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useListAllPermissionGroups } from '@/api/buster_rest';
 import {
   NewPermissionGroupModal,
@@ -9,7 +10,6 @@ import { Button } from '@/components/ui/buttons';
 import { Plus } from '@/components/ui/icons';
 import { useMemoizedFn } from '@/hooks';
 import { useDebounceSearch } from '@/hooks/useDebounceSearch';
-import { useState } from 'react';
 import { SettingsPageHeader } from '../../_components/SettingsPageHeader';
 import { ListPermissionGroupsComponent } from './ListPermissionGroupsComponent';
 

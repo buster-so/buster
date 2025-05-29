@@ -1,8 +1,8 @@
 'use server';
 
-import { BusterRoutes, createBusterRoute } from '@/routes';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { BusterRoutes, createBusterRoute } from '@/routes';
 import { createClient } from './server';
 
 const authURLFull = `${process.env.NEXT_PUBLIC_URL}${createBusterRoute({

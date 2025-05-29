@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useRef } from 'react';
 import type { ShareAssetType } from '@/api/asset_interfaces';
 import { BusterLogo } from '@/assets/svg/BusterLogo';
 import { Button } from '@/components/ui/buttons';
@@ -7,7 +8,6 @@ import { Input } from '@/components/ui/inputs';
 import { Title } from '@/components/ui/typography';
 import { useBusterAssetsContextSelector } from '@/context/Assets/BusterAssetsProvider';
 import { useMemoizedFn } from '@/hooks';
-import React, { useRef } from 'react';
 
 export const AppPasswordAccess: React.FC<{
   assetId: string;

@@ -1,8 +1,8 @@
+import React from 'react';
 import { ChevronDown } from '@/components/ui/icons';
 import { AppTooltip } from '@/components/ui/tooltip';
 import type { useAutoScroll } from '@/hooks/useAutoScroll';
 import { cn } from '@/lib/utils';
-import React from 'react';
 
 export const ChatScrollToBottom: React.FC<{
   isAutoScrollEnabled: boolean;

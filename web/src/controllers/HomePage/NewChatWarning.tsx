@@ -1,9 +1,9 @@
+import Link from 'next/link';
+import React from 'react';
 import { Button } from '@/components/ui/buttons';
 import { ArrowUpRight, CircleCheck } from '@/components/ui/icons';
 import { Paragraph, Text } from '@/components/ui/typography';
 import { cn } from '@/lib/classMerge';
-import Link from 'next/link';
-import React from 'react';
 import type { useNewChatWarning } from './useNewChatWarning';
 
 export const NewChatWarning = React.memo(

@@ -1,5 +1,10 @@
 'use client';
 
+import { isServer } from '@tanstack/react-query';
+import type { ChartType as ChartJSChartType, PluginChartOptions } from 'chart.js';
+import type { AnnotationPluginOptions } from 'chartjs-plugin-annotation';
+import type { Context } from 'chartjs-plugin-datalabels';
+import type { DeepPartial } from 'utility-types';
 import type {
   BusterChartConfigProps,
   BusterChartProps,
@@ -8,12 +13,6 @@ import type {
 import { determineFontColorContrast } from '@/lib/colors';
 import { formatLabel } from '@/lib/columnFormatter';
 import { ArrayOperations } from '@/lib/math';
-import { isServer } from '@tanstack/react-query';
-import type { ChartType as ChartJSChartType } from 'chart.js';
-import type { PluginChartOptions } from 'chart.js';
-import type { AnnotationPluginOptions } from 'chartjs-plugin-annotation';
-import type { Context } from 'chartjs-plugin-datalabels';
-import type { DeepPartial } from 'utility-types';
 import { getPieInnerLabelTitle } from '../../../commonHelpers';
 import type { ChartProps } from '../../core';
 import type { ChartJSOrUndefined } from '../../core/types';

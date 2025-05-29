@@ -1,10 +1,10 @@
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { useMemo } from 'react';
 import { DEFAULT_CHART_CONFIG, DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import type { ColumnLabelFormat, MetricChartProps } from '@/api/asset_interfaces/metric/charts';
 import { Title } from '@/components/ui/typography';
 import { useMount } from '@/hooks';
-import { JsonDataFrameOperationsSingle, formatLabel, timeout } from '@/lib';
-import { AnimatePresence, motion } from 'framer-motion';
-import React, { useMemo } from 'react';
+import { formatLabel, JsonDataFrameOperationsSingle, timeout } from '@/lib';
 import type { BusterMetricChartProps } from './interfaces';
 
 export const BusterMetricChart: React.FC<BusterMetricChartProps> = React.memo(

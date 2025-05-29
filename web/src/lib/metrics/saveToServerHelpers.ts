@@ -1,10 +1,11 @@
+import isEqual from 'lodash/isEqual';
+import type { DataMetadata, IBusterMetric } from '@/api/asset_interfaces/metric';
 import {
   DEFAULT_CHART_CONFIG_ENTRIES,
   DEFAULT_COLUMN_LABEL_FORMAT,
   DEFAULT_COLUMN_SETTINGS,
   type IBusterMetricChartConfig
 } from '@/api/asset_interfaces/metric';
-import type { DataMetadata, IBusterMetric } from '@/api/asset_interfaces/metric';
 import type {
   BarAndLineAxis,
   BusterChartConfigProps,
@@ -16,7 +17,6 @@ import type {
 } from '@/api/asset_interfaces/metric/charts';
 import type { updateMetric } from '@/api/buster_rest/metrics';
 import { getChangedValues } from '@/lib/objects';
-import isEqual from 'lodash/isEqual';
 import { createDefaultChartConfig } from './messageAutoChartHandler';
 
 const DEFAULT_COLUMN_SETTINGS_ENTRIES = Object.entries(DEFAULT_COLUMN_SETTINGS);

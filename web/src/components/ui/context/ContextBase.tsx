@@ -1,9 +1,9 @@
 'use client';
 
-import { Check, ShapeCircle as Circle } from '@/components/ui/icons';
-import { CaretRight } from '@/components/ui/icons/NucleoIconFilled';
 import * as ContextMenuPrimitive from '@radix-ui/react-context-menu';
 import * as React from 'react';
+import { Check, ShapeCircle as Circle } from '@/components/ui/icons';
+import { CaretRight } from '@/components/ui/icons/NucleoIconFilled';
 
 import { cn } from '@/lib/utils';
 import { DropdownMenuLink } from '../dropdown/DropdownBase';

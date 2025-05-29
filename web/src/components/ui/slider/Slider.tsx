@@ -1,13 +1,13 @@
 'use client';
 
+import * as SliderPrimitive from '@radix-ui/react-slider';
+import * as React from 'react';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip/TooltipBase';
-import * as SliderPrimitive from '@radix-ui/react-slider';
-import * as React from 'react';
 
 import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/utils';

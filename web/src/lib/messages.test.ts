@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
   DATE_TYPES,
-  NUMBER_TYPES,
-  TEXT_TYPES,
   isDateColumnType,
   isNumericColumnStyle,
   isNumericColumnType,
-  simplifyColumnType
+  NUMBER_TYPES,
+  simplifyColumnType,
+  TEXT_TYPES
 } from './messages';
 
 describe('simplifyColumnType', () => {

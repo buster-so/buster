@@ -1,8 +1,8 @@
 'use client';
 
-import { cn } from '@/lib/classMerge';
 import { motion } from 'framer-motion';
 import React, { useMemo } from 'react';
+import { cn } from '@/lib/classMerge';
 
 interface ShimmerText2Props {
   text: string;

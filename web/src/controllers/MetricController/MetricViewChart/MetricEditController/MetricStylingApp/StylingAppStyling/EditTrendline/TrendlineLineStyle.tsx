@@ -1,5 +1,5 @@
-import { Select, type SelectItem } from '@/components/ui/select';
 import React from 'react';
+import { Select, type SelectItem } from '@/components/ui/select';
 import { LabelAndInput } from '../../Common';
 import type { LoopTrendline } from './EditTrendline';
 

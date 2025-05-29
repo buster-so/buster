@@ -1,7 +1,7 @@
-import { determineFontColorContrast } from '@/lib';
 import type { ChartArea, FontSpec } from 'chart.js';
 import { defaults } from 'chart.js';
 import { resolve, toFont, toLineHeight, toPadding } from 'chart.js/helpers';
+import { determineFontColorContrast } from '@/lib';
 import type OutLabelsContext from './OutLabelsContext';
 import type { FontOptions, OutLabelsOptions } from './OutLabelsOptions';
 

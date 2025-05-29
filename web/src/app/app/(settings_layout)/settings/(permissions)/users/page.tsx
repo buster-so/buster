@@ -1,8 +1,8 @@
 'use client';
 
 import { useGetOrganizationUsers } from '@/api/buster_rest';
-import { PermissionSearch } from '@/components/features/PermissionComponents';
 import { InvitePeopleModal } from '@/components/features/modal/InvitePeopleModal';
+import { PermissionSearch } from '@/components/features/PermissionComponents';
 import { Button } from '@/components/ui/buttons';
 import { Plus } from '@/components/ui/icons';
 import { useInviteModalStore } from '@/context/BusterAppLayout';

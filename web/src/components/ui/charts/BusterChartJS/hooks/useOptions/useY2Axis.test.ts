@@ -1,7 +1,7 @@
-import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
-import { ChartType, type ComboChartAxis } from '@/api/asset_interfaces/metric/charts';
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
+import { ChartType, type ComboChartAxis } from '@/api/asset_interfaces/metric/charts';
 import { useY2Axis } from './useY2Axis';
 
 describe('useY2Axis', () => {

@@ -1,10 +1,10 @@
+import { create } from 'mutative';
 import {
   type ColumnMetaData,
   DEFAULT_COLUMN_SETTINGS,
   type IBusterMetricChartConfig
 } from '@/api/asset_interfaces/metric';
 import type { ColumnSettings } from '@/api/asset_interfaces/metric/charts';
-import { create } from 'mutative';
 
 export const createDefaultColumnSettings = (
   existingColumnSettings: Record<string, ColumnSettings> | undefined,

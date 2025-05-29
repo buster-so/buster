@@ -1,10 +1,10 @@
+import React from 'react';
 import { useGetMetric } from '@/api/buster_rest/metrics';
-import { AppSegmented } from '@/components/ui/segmented';
 import type { SegmentedItem } from '@/components/ui/segmented';
+import { AppSegmented } from '@/components/ui/segmented';
 import { Text } from '@/components/ui/typography';
 import { useIsMetricReadOnly } from '@/context/Metrics/useIsMetricReadOnly';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import React from 'react';
 import { useChatLayoutContextSelector } from '../../ChatLayoutContext';
 import type { FileView } from '../../ChatLayoutContext/useLayoutConfig';
 import type { FileContainerSegmentProps } from './interfaces';

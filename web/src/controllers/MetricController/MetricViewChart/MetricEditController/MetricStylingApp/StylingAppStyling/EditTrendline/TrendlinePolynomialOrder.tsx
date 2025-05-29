@@ -1,5 +1,5 @@
-import { SliderWithInputNumber } from '@/components/ui/slider';
 import React, { useEffect, useState } from 'react';
+import { SliderWithInputNumber } from '@/components/ui/slider';
 import { LabelAndInput } from '../../Common';
 import type { LoopTrendline } from './EditTrendline';
 

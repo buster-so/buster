@@ -1,3 +1,5 @@
+import { useQueryClient } from '@tanstack/react-query';
+import { useRef } from 'react';
 import type { BusterMetricData, IBusterMetricChartConfig } from '@/api/asset_interfaces/metric';
 import type { RunSQLResponse } from '@/api/asset_interfaces/sql';
 import { useRunSQL as useRunSQLQuery } from '@/api/buster_rest';
@@ -7,8 +9,6 @@ import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useGetMetricDataMemoized, useGetMetricMemoized } from '@/context/Metrics';
 import { useMemoizedFn } from '@/hooks';
 import { timeout } from '@/lib';
-import { useQueryClient } from '@tanstack/react-query';
-import { useRef } from 'react';
 import { didColumnDataChange, simplifyChatConfigForSQLChange } from './helpers';
 
 export const useMetricRunSQL = () => {

@@ -1,13 +1,12 @@
 'use client';
 
+import React from 'react';
 import { useDatasetListPermissionUsers } from '@/api/buster_rest';
 import { PermissionSearchAndListWrapper } from '@/components/features/PermissionComponents';
 import { Button } from '@/components/ui/buttons';
 import { Plus } from '@/components/ui/icons';
 import { useInviteModalStore } from '@/context/BusterAppLayout';
-import { useDebounceSearch } from '@/hooks';
-import { useMemoizedFn } from '@/hooks';
-import React from 'react';
+import { useDebounceSearch, useMemoizedFn } from '@/hooks';
 import { PermissionListUsersContainer } from './PermissionListUsersContainer';
 
 export const PermissionUsers: React.FC<{
