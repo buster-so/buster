@@ -2,11 +2,9 @@ name: Web Lint
 
 on:
   push:
-    branches: [ main, develop ]
     paths:
       - 'web/**'
   pull_request:
-    branches: [ main, develop ]
     paths:
       - 'web/**'
 
