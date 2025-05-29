@@ -36,7 +36,7 @@ describe('Grid Helpers', () => {
     });
 
     it('should handle decimal percentages', () => {
-      expect(columnSpanToPercent(5)).toBe((5 / 12) * 100 + '%');
+      expect(columnSpanToPercent(5)).toBe(`${(5 / 12) * 100}%`);
     });
   });
 

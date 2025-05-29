@@ -2,7 +2,7 @@ import type { SimplifiedColumnType } from '@/api/asset_interfaces/metric';
 import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import { formatLabel } from '@/lib/columnFormatter';
 import { renderHook } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { truncateWithEllipsis } from '../../../../commonHelpers/titleHelpers';
 import { useY2AxisTitle } from './useY2AxisTitle';
 
@@ -104,12 +104,12 @@ describe('useY2AxisTitle', () => {
     // Should format each y2-axis column
     expect(formatLabel).toHaveBeenCalledWith(
       'revenue',
-      defaultProps.columnLabelFormats['revenue'],
+      defaultProps.columnLabelFormats.revenue,
       true
     );
     expect(formatLabel).toHaveBeenCalledWith(
       'profit',
-      defaultProps.columnLabelFormats['profit'],
+      defaultProps.columnLabelFormats.profit,
       true
     );
 
@@ -132,7 +132,7 @@ describe('useY2AxisTitle', () => {
 
     expect(formatLabel).toHaveBeenCalledWith(
       'revenue',
-      defaultProps.columnLabelFormats['revenue'],
+      defaultProps.columnLabelFormats.revenue,
       true
     );
     expect(truncateWithEllipsis).toHaveBeenCalledWith('Formatted Revenue');

@@ -1,7 +1,7 @@
 import { useChatLayoutContextSelector } from '@/layouts/ChatLayout';
 import { assetParamsToRoute } from '@/lib/assets';
 import { renderHook } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useGetFileLink } from './useGetFileLink';
 
 // Mock dependencies
@@ -41,9 +41,11 @@ describe('useGetFileLink', () => {
       ({ assetId, type, versionNumber, secondaryView }) => {
         if (type === 'metric') {
           return `/metrics/${assetId}${versionNumber ? `/v${versionNumber}` : ''}${secondaryView ? `/${secondaryView}` : ''}`;
-        } else if (type === 'dashboard') {
+        }
+        if (type === 'dashboard') {
           return `/dashboards/${assetId}${versionNumber ? `/v${versionNumber}` : ''}${secondaryView ? `/${secondaryView}` : ''}`;
-        } else if (type === 'reasoning') {
+        }
+        if (type === 'reasoning') {
           return `/reasoning/${assetId}`;
         }
         return '';
@@ -241,7 +243,7 @@ describe('useGetFileLink', () => {
       });
 
       expect(meta).toEqual({
-        link: `/metrics/different-metric/v999`,
+        link: '/metrics/different-metric/v999',
         isSelected: false,
         selectedVersionNumber: mockMetricVersionNumber
       });

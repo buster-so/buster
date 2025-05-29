@@ -32,7 +32,7 @@
   },
   "linter": {
     "enabled": true,
-    "ignore": ["**/*.stories.tsx"],
+    "ignore": ["**/*.stories.tsx", "**/*.test.tsx", "**/*.test.ts", "**/*.spec.ts"],
     "rules": {
       "recommended": true,
       "correctness": {

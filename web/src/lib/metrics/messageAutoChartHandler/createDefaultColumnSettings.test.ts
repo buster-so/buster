@@ -1,8 +1,4 @@
-import {
-  type ColumnMetaData,
-  DEFAULT_COLUMN_SETTINGS,
-  type IBusterMetricChartConfig
-} from '@/api/asset_interfaces/metric';
+import { type ColumnMetaData, DEFAULT_COLUMN_SETTINGS } from '@/api/asset_interfaces/metric';
 import type { ColumnSettings } from '@/api/asset_interfaces/metric/charts';
 import { describe, expect, it } from 'vitest';
 import { createDefaultColumnSettings } from './createDefaultColumnSettings';

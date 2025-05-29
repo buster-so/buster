@@ -1,6 +1,6 @@
 import { formatLabel } from '@/lib';
 import { describe, expect, it, vi } from 'vitest';
-import { JOIN_CHARACTER, formatLabelForDataset } from '../../../commonHelpers';
+import { formatLabelForDataset } from '../../../commonHelpers';
 import { pieSeriesBuilder_data, pieSeriesBuilder_labels } from './pieSeriesBuilder';
 
 // Mock dependencies

@@ -1,4 +1,4 @@
-import { DashboardConfig } from '@/api/asset_interfaces/dashboard';
+import type { DashboardConfig } from '@/api/asset_interfaces/dashboard';
 import { NUMBER_OF_COLUMNS } from '@/components/ui/grid/helpers';
 import { createMockMetric } from '@/mocks/metric';
 import { describe, expect, it } from 'vitest';

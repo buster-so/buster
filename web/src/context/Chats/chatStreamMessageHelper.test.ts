@@ -245,7 +245,7 @@ describe('updateResponseMessage', () => {
     expect(result.response_message_ids).toContain('response-1');
     expect(
       (result.response_messages['response-1'] as BusterChatResponseMessage_text).message
-    ).toEqual('Initial message' + largeChunk);
+    ).toEqual(`Initial message${largeChunk}`);
   });
 
   it('should handle file type response messages', () => {

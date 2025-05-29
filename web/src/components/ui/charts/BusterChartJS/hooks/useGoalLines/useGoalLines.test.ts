@@ -1,8 +1,7 @@
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
-import {
+import type {
   BusterChartConfigProps,
   ChartType,
-  ColumnLabelFormat,
   GoalLine
 } from '@/api/asset_interfaces/metric/charts';
 import { renderHook } from '@testing-library/react';

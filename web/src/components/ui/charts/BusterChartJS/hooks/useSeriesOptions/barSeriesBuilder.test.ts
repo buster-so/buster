@@ -1,4 +1,4 @@
-import type { BusterChartProps, IColumnLabelFormat } from '@/api/asset_interfaces/metric';
+import type { BusterChartProps } from '@/api/asset_interfaces/metric';
 import { ChartType } from '@/api/asset_interfaces/metric/charts/enum';
 import { describe, expect, it } from 'vitest';
 import type { DatasetOption } from '../../../chartHooks';

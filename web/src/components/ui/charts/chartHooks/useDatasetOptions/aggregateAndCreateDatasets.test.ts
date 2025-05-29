@@ -1,4 +1,4 @@
-import { DEFAULT_COLUMN_LABEL_FORMAT, IColumnLabelFormat } from '@/api/asset_interfaces';
+import { DEFAULT_COLUMN_LABEL_FORMAT, type IColumnLabelFormat } from '@/api/asset_interfaces';
 import { describe, expect, it } from 'vitest';
 import { aggregateAndCreateDatasets } from './aggregateAndCreateDatasets';
 
@@ -1600,7 +1600,7 @@ describe('aggregateAndCreateDatasets', () => {
     expect(costDataset).toBeDefined();
 
     // Verify tooltip contain all specified fields in correct order
-    expect(salesDataset!.tooltipData[0].map((t) => t.key)).toEqual([
+    expect(salesDataset?.tooltipData[0].map((t) => t.key)).toEqual([
       'region',
       'product',
       'channel',

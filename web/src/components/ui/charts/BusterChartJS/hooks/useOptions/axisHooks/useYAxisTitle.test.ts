@@ -2,8 +2,7 @@ import type { SimplifiedColumnType } from '@/api/asset_interfaces/metric';
 import type { ChartEncodes, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import { formatLabel } from '@/lib/columnFormatter';
 import { renderHook } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { AXIS_TITLE_SEPARATOR } from '../../../../commonHelpers/axisHelper';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { truncateWithEllipsis } from '../../../../commonHelpers/titleHelpers';
 import { useYAxisTitle } from './useYAxisTitle';
 
@@ -109,16 +108,8 @@ describe('useYAxisTitle', () => {
     const { result } = renderHook(() => useYAxisTitle(modifiedProps));
 
     // Should format each y-axis column
-    expect(formatLabel).toHaveBeenCalledWith(
-      'value',
-      defaultProps.columnLabelFormats['value'],
-      true
-    );
-    expect(formatLabel).toHaveBeenCalledWith(
-      'count',
-      defaultProps.columnLabelFormats['count'],
-      true
-    );
+    expect(formatLabel).toHaveBeenCalledWith('value', defaultProps.columnLabelFormats.value, true);
+    expect(formatLabel).toHaveBeenCalledWith('count', defaultProps.columnLabelFormats.count, true);
 
     // Should generate title with separator
     expect(truncateWithEllipsis).toHaveBeenCalledWith('Formatted Value | Formatted Count');
@@ -141,11 +132,7 @@ describe('useYAxisTitle', () => {
 
     const { result } = renderHook(() => useYAxisTitle(singleAxisProps));
 
-    expect(formatLabel).toHaveBeenCalledWith(
-      'value',
-      defaultProps.columnLabelFormats['value'],
-      true
-    );
+    expect(formatLabel).toHaveBeenCalledWith('value', defaultProps.columnLabelFormats.value, true);
     expect(truncateWithEllipsis).toHaveBeenCalledWith('Formatted Value');
     expect(result.current).toBe('Formatted Value');
   });
@@ -231,16 +218,8 @@ describe('useYAxisTitle', () => {
     const { result } = renderHook(() => useYAxisTitle(differentAxisProps));
 
     // Should use selectedAxis.y for formatting, not yAxis
-    expect(formatLabel).toHaveBeenCalledWith(
-      'value',
-      defaultProps.columnLabelFormats['value'],
-      true
-    );
-    expect(formatLabel).toHaveBeenCalledWith(
-      'count',
-      defaultProps.columnLabelFormats['count'],
-      true
-    );
+    expect(formatLabel).toHaveBeenCalledWith('value', defaultProps.columnLabelFormats.value, true);
+    expect(formatLabel).toHaveBeenCalledWith('count', defaultProps.columnLabelFormats.count, true);
     expect(truncateWithEllipsis).toHaveBeenCalledWith('Formatted Value | Formatted Count');
     expect(result.current).toBe('Formatted Value | Formatted Count');
   });

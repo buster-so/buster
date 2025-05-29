@@ -1,15 +1,11 @@
-import { dashboardQueryKeys } from '@/api/query_keys/dashboard';
 import { useBusterAssetsContextSelector } from '@/context/Assets/BusterAssetsProvider';
 import { useOriginalDashboardStore } from '@/context/Dashboards';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { renderHook } from '@testing-library/react';
-import { last } from 'lodash';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useGetDashboardAndInitializeMetrics } from './dashboardQueryHelpers';
 import { useGetDashboardVersionNumber } from './dashboardQueryStore';
 import { useDashboardQueryStore } from './dashboardQueryStore';
-import { useGetDashboardsList } from './queryRequests';
-import { dashboardsGetList } from './requests';
 
 // Mock dependencies
 vi.mock('@tanstack/react-query');
@@ -889,7 +885,8 @@ describe('useShareDashboard', () => {
             mockMetric1Data = updaterFn;
           }
           return mockMetric1Data;
-        } else if (metricId === 'metric-2') {
+        }
+        if (metricId === 'metric-2') {
           if (typeof updaterFn === 'function') {
             mockMetric2Data = updaterFn(mockMetric2Data);
           } else {

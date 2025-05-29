@@ -1,5 +1,5 @@
-import { DashboardConfig } from '@/api/asset_interfaces/dashboard';
-import { BusterMetric } from '@/api/asset_interfaces/metric';
+import type { DashboardConfig } from '@/api/asset_interfaces/dashboard';
+import type { BusterMetric } from '@/api/asset_interfaces/metric';
 import {
   MAX_NUMBER_OF_ITEMS,
   MIN_ROW_HEIGHT,

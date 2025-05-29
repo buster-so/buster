@@ -1,7 +1,7 @@
 import * as appLayout from '@/context/BusterAppLayout';
 import { renderHook } from '@testing-library/react';
 import * as navigation from 'next/navigation';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useGetChatParams } from './useGetChatParams';
 
 // Mock the required hooks and modules

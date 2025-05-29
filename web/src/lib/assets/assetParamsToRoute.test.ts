@@ -1,4 +1,4 @@
-import { FileType } from '@/api/asset_interfaces/chat';
+import type { FileType } from '@/api/asset_interfaces/chat';
 import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
 import { describe, expect, it, vi } from 'vitest';
 import { assetParamsToRoute } from './assetParamsToRoute';

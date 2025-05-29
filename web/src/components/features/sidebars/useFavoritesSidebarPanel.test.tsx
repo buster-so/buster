@@ -6,8 +6,7 @@ import {
 } from '@/api/buster_rest/users';
 import { act, renderHook } from '@testing-library/react';
 import { useParams } from 'next/navigation';
-import React from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useFavoriteSidebarPanel } from './useFavoritesSidebarPanel';
 
 // Mock the hooks

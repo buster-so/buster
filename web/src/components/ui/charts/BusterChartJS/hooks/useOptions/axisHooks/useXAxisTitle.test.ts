@@ -2,7 +2,7 @@ import type { SimplifiedColumnType } from '@/api/asset_interfaces/metric';
 import type { ChartEncodes, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import { formatLabel } from '@/lib/columnFormatter';
 import { renderHook } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { truncateWithEllipsis } from '../../../../commonHelpers/titleHelpers';
 import { useXAxisTitle } from './useXAxisTitle';
 
@@ -117,10 +117,10 @@ describe('useXAxisTitle', () => {
     const { result } = renderHook(() => useXAxisTitle(modifiedProps));
 
     // Should format each x-axis column
-    expect(formatLabel).toHaveBeenCalledWith('date', defaultProps.columnLabelFormats['date'], true);
+    expect(formatLabel).toHaveBeenCalledWith('date', defaultProps.columnLabelFormats.date, true);
     expect(formatLabel).toHaveBeenCalledWith(
       'category',
-      defaultProps.columnLabelFormats['category'],
+      defaultProps.columnLabelFormats.category,
       true
     );
 
@@ -145,7 +145,7 @@ describe('useXAxisTitle', () => {
 
     const { result } = renderHook(() => useXAxisTitle(singleAxisProps));
 
-    expect(formatLabel).toHaveBeenCalledWith('date', defaultProps.columnLabelFormats['date'], true);
+    expect(formatLabel).toHaveBeenCalledWith('date', defaultProps.columnLabelFormats.date, true);
     expect(truncateWithEllipsis).toHaveBeenCalledWith('Formatted Date');
     expect(result.current).toBe('Formatted Date');
   });

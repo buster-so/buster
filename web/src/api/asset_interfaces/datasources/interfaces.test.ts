@@ -4,11 +4,8 @@ import {
   BigQueryCredentialsSchema,
   DataSourceSchema,
   DataSourceTypes,
-  DatabricksCredentialsSchema,
   MySQLCredentialsSchema,
   PostgresCredentialsSchema,
-  RedshiftCredentialsSchema,
-  SQLServerCredentialsSchema,
   type SnowflakeCredentials,
   SnowflakeCredentialsSchema
 } from './interfaces';

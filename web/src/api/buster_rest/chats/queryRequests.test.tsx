@@ -1,7 +1,7 @@
 import type { IBusterChat } from '@/api/asset_interfaces/chat/iChatInterfaces';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
-import React from 'react';
+import type React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   useDeleteChat,

@@ -1,4 +1,3 @@
-import { ChartType } from '@/api/asset_interfaces/metric/charts/enum';
 import { describe, expect, it } from 'vitest';
 import { barOptionsHandler, barPluginsHandler } from './barChartOptions';
 import type { ChartSpecificOptionsProps } from './interfaces';

@@ -1,4 +1,4 @@
-import { FullConfig } from '@playwright/test';
+import type { FullConfig } from '@playwright/test';
 
 async function globalTeardown(config: FullConfig) {
   // Add any cleanup operations here if needed

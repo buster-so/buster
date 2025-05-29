@@ -1,10 +1,8 @@
-import type { BusterChartConfigProps } from '@/api/asset_interfaces/metric/charts';
 import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
 import type {
   BarControllerDatasetOptions,
   Chart,
   ChartDatasetProperties,
-  ChartTypeRegistry,
   TooltipItem
 } from 'chart.js';
 import { describe, expect, it } from 'vitest';

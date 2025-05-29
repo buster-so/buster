@@ -1,4 +1,4 @@
-import type { BusterChartProps, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import type { BusterChartProps } from '@/api/asset_interfaces/metric/charts';
 import { describe, expect, it } from 'vitest';
 import { formatChartLabel } from './formatChartLabel';
 

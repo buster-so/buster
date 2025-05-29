@@ -1,5 +1,4 @@
-import { type IColumnLabelFormat } from '@/api/asset_interfaces/metric';
-import type { SimplifiedColumnType } from '@/api/asset_interfaces/metric';
+import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import { createDayjsDate } from '@/lib/date';
 import { describe, expect, it } from 'vitest';

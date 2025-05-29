@@ -1,10 +1,10 @@
-import { FileType } from '@/api/asset_interfaces/chat';
+import type { FileType } from '@/api/asset_interfaces/chat';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { BusterRoutes } from '@/routes';
 import { act, renderHook } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { SelectedFile } from '../../interfaces';
-import { FileViewSecondary } from './interfaces';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { SelectedFile } from '../../interfaces';
+import type { FileViewSecondary } from './interfaces';
 import { useLayoutConfig } from './useLayoutConfig';
 
 // Mock dependencies

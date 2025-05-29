@@ -1,5 +1,5 @@
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 const logsRoute = createBusterRoute({
   route: BusterRoutes.APP_LOGS

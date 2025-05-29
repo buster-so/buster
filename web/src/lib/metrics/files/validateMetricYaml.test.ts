@@ -1,4 +1,3 @@
-import * as yaml from 'js-yaml';
 import { describe, expect, it } from 'vitest';
 import { validateMetricYaml } from './validateMetricYaml';
 

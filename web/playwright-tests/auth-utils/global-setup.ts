@@ -1,6 +1,6 @@
-import { chromium, FullConfig } from '@playwright/test';
-import { applyAuth, login, authFile, hasValidAuth } from './auth-utils';
-import * as fs from 'fs';
+import * as fs from 'node:fs';
+import { type FullConfig, chromium } from '@playwright/test';
+import { applyAuth, authFile, hasValidAuth, login } from './auth-utils';
 
 async function globalSetup(config: FullConfig) {
   console.log('Starting global setup');

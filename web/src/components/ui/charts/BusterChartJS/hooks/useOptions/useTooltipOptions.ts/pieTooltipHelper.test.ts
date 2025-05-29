@@ -1,4 +1,3 @@
-import type { BusterChartConfigProps } from '@/api/asset_interfaces/metric/charts';
 import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
 import type { Chart, TooltipItem } from 'chart.js';
 import { describe, expect, it } from 'vitest';
@@ -174,11 +173,6 @@ describe('pieTooltipHelper', () => {
 
     // Both items should have formatted percentages since both keys are in keyToUsePercentage
     expect(result.every((item) => item.usePercentage)).toBe(true);
-    expect(
-      result.every(
-        (item) =>
-          item.values[0].formattedPercentage && item.values[0].formattedPercentage.includes('%')
-      )
-    ).toBe(true);
+    expect(result.every((item) => item.values[0].formattedPercentage?.includes('%'))).toBe(true);
   });
 });

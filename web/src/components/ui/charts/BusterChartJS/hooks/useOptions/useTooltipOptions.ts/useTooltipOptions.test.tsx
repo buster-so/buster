@@ -1,12 +1,11 @@
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
-import {
+import type {
   BusterChartProps,
   ChartEncodes,
-  ChartType,
-  ComboChartAxis
+  ChartType
 } from '@/api/asset_interfaces/metric/charts';
 import { renderHook } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useTooltipOptions } from './useTooltipOptions';
 
 // Mock necessary hooks and dependencies

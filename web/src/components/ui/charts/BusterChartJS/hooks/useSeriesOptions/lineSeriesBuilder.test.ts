@@ -9,12 +9,10 @@ import {
   DEFAULT_COLUMN_LABEL_FORMAT,
   DEFAULT_COLUMN_SETTINGS
 } from '@/api/asset_interfaces/metric/defaults';
-import { addOpacityToColor, createDayjsDate, formatLabel } from '@/lib';
-import type { ChartDataset, LineControllerDatasetOptions, ScriptableContext } from 'chart.js';
+import { createDayjsDate, formatLabel } from '@/lib';
+import type { ChartDataset, ScriptableContext } from 'chart.js';
 import { describe, expect, it, vi } from 'vitest';
 import type { DatasetOption, DatasetOptionsWithTicks, KV } from '../../../chartHooks';
-import { JOIN_CHARACTER, formatLabelForDataset } from '../../../commonHelpers';
-import type { ChartProps } from '../../core';
 import { formatBarAndLineDataLabel } from '../../helpers';
 import { lineBuilder, lineSeriesBuilder_labels } from './lineSeriesBuilder';
 
@@ -48,7 +46,7 @@ const mockContext = (
   dataIndex: number,
   datasetIndex: number,
   datasetData: any[],
-  scaleType: string = 'linear',
+  scaleType = 'linear',
   chartDatasets: any[] = [{ data: datasetData, hidden: false }]
 ) =>
   ({

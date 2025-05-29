@@ -1,5 +1,3 @@
-import type { SimplifiedColumnType } from '@/api/asset_interfaces/metric/';
-import type { ColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import { describe, expect, it } from 'vitest';
 import {
   DATE_TYPES,

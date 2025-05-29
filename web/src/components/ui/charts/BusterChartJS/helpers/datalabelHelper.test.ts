@@ -1,5 +1,5 @@
 import { determineFontColorContrast } from '@/lib/colors';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { dataLabelFontColorContrast } from './datalabelHelper';
 
 // Mock the determineFontColorContrast function

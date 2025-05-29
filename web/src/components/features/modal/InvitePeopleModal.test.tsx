@@ -1,8 +1,7 @@
 import { useInviteUser } from '@/api/buster_rest/users';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import React from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { InvitePeopleModal } from './InvitePeopleModal';
 
 // Mock the hooks

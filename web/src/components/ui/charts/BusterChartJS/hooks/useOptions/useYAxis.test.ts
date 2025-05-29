@@ -1,7 +1,7 @@
 import { ChartType, DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import type { ChartEncodes } from '@/api/asset_interfaces/metric/charts';
 import { renderHook } from '@testing-library/react';
-import { LinearScaleOptions } from 'chart.js';
+import type { LinearScaleOptions } from 'chart.js';
 import { describe, expect, it } from 'vitest';
 import { useYAxis } from './useYAxis';
 
