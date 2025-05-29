@@ -26,7 +26,6 @@ export const ChartMountedPlugin: Plugin<ChartType, ChartMountedPluginOptions> = 
   afterRender: (chart, args, options) => {
     if (chart.$initialAnimationCompleted === undefined) {
       chart.$initialAnimationCompleted = true;
-      // chart.update();
     }
 
     if (chart.$mountedPlugin || !chart || !options) return;

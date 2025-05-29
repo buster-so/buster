@@ -165,7 +165,7 @@ const useCollectionSelectMenu = ({ dashboardId }: { dashboardId: string }) => {
     openInfoMessage('Dashboard removed from collections');
   });
 
-  const { modal, ...dropdownProps } = useSaveToCollectionsDropdownContent({
+  const { ModalComponent, ...dropdownProps } = useSaveToCollectionsDropdownContent({
     onSaveToCollection,
     onRemoveFromCollection,
     selectedCollections
@@ -182,7 +182,7 @@ const useCollectionSelectMenu = ({ dashboardId }: { dashboardId: string }) => {
       icon: <ASSET_ICONS.collectionAdd />,
       items: [
         <React.Fragment key="collection-sub-menu">
-          {collectionSubMenu} {modal}
+          {collectionSubMenu} {ModalComponent}
         </React.Fragment>
       ]
     }),

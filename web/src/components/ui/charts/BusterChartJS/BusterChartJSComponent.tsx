@@ -190,7 +190,7 @@ export const BusterChartJSComponent = React.memo(
       const updateMode = useMemoizedFn((params: { datasetIndex: number }): UpdateMode => {
         if (!ref) return 'default';
         const areLabelsChanged = previousData?.labels !== data.labels;
-        if (areLabelsChanged) return 'none'; //this will disable animation
+        if (areLabelsChanged) return 'default'; //this will disable animation - this was 'none', I am not sure why...
         return 'default';
       });
 
