@@ -211,7 +211,7 @@ describe('assetParamsToRoute', () => {
     );
   });
   it('unsupported file type', () => {
-    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation();
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const result = assetParamsToRoute({
       chatId: mockChatId,
       assetId: mockAssetId,

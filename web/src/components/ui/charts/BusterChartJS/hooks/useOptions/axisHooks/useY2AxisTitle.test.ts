@@ -42,8 +42,8 @@ describe('useY2AxisTitle', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Default mock implementations
-    (formatLabel as any).mockImplementation((value) => `formatted_${value}`);
-    (truncateWithEllipsis as any).mockImplementation((text) => text);
+    (formatLabel as any).mockImplementation((value: string) => `formatted_${value}`);
+    (truncateWithEllipsis as any).mockImplementation((text: string) => text);
   });
 
   it('should return empty string when chart type is not supported', () => {

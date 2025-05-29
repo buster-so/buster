@@ -263,13 +263,13 @@ const useCollectionSelectMenu = ({ metricId }: { metricId: string }) => {
     openInfoMessage('Metrics removed from collections');
   });
 
-  const { modal, ...dropdownProps } = useSaveToCollectionsDropdownContent({
+  const { ModalComponent, ...dropdownProps } = useSaveToCollectionsDropdownContent({
     onSaveToCollection,
     onRemoveFromCollection,
     selectedCollections
   });
 
-  const collectionSubMenu = useMemo(() => {
+  const CollectionSubMenu = useMemo(() => {
     return <DropdownContent {...dropdownProps} />;
   }, [dropdownProps]);
 
@@ -280,11 +280,11 @@ const useCollectionSelectMenu = ({ metricId }: { metricId: string }) => {
       icon: <ASSET_ICONS.collectionAdd />,
       items: [
         <React.Fragment key="collection-sub-menu">
-          {collectionSubMenu} {modal}
+          {CollectionSubMenu} {ModalComponent}
         </React.Fragment>
       ]
     }),
-    [collectionSubMenu]
+    [CollectionSubMenu]
   );
 
   return collectionDropdownItem;

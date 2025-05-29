@@ -25,7 +25,7 @@ describe('useGetFileLink', () => {
     vi.clearAllMocks();
 
     // Mock useChatLayoutContextSelector to return our test values
-    (useChatLayoutContextSelector as any).mockImplementation((selector) => {
+    (useChatLayoutContextSelector as any).mockImplementation((selector: any) => {
       const contextValues = {
         metricVersionNumber: mockMetricVersionNumber,
         dashboardVersionNumber: mockDashboardVersionNumber,
@@ -38,7 +38,12 @@ describe('useGetFileLink', () => {
 
     // Mock assetParamsToRoute to return predictable values for testing
     (assetParamsToRoute as any).mockImplementation(
-      ({ assetId, type, versionNumber, secondaryView }) => {
+      ({
+        assetId,
+        type,
+        versionNumber,
+        secondaryView
+      }: { assetId: string; type: string; versionNumber: number; secondaryView: string }) => {
         if (type === 'metric') {
           return `/metrics/${assetId}${versionNumber ? `/v${versionNumber}` : ''}${secondaryView ? `/${secondaryView}` : ''}`;
         }

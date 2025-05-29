@@ -121,6 +121,7 @@ describe('lineSeriesBuilder', () => {
       xAxisKeys: ['category'] as ChartEncodes['x'],
       lineGroupType: undefined,
       index: 0,
+      trendlines: [],
       dataset: {
         id: 'm1',
         axisType: 'y' as const,

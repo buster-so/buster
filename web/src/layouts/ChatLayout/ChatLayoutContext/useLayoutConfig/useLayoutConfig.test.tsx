@@ -32,7 +32,7 @@ describe('useLayoutConfig', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (useAppLayoutContextSelector as any).mockImplementation((selector) => {
+    (useAppLayoutContextSelector as any).mockImplementation((selector: any) => {
       const state = {
         onChangePage: mockOnChangePage,
         onChangeQueryParams: mockOnChangeQueryParams

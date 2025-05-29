@@ -52,11 +52,10 @@ describe('barSeriesBuilder', () => {
       yAxisKeys: ['sales'],
       y2AxisKeys: [],
       xAxisKeys: ['date'],
-      categoryKeys: [],
+      trendlines: [],
       sizeOptions: null,
       scatterDotSize: [5, 5],
-      lineGroupType: null,
-      selectedChartType: ChartType.Bar
+      lineGroupType: null
     };
 
     // Act
@@ -143,11 +142,10 @@ describe('barSeriesBuilder', () => {
       yAxisKeys: ['sales2022', 'sales2023'],
       y2AxisKeys: [],
       xAxisKeys: ['quarter'],
-      categoryKeys: [],
+      trendlines: [],
       sizeOptions: null,
       scatterDotSize: [5, 5],
-      lineGroupType: null,
-      selectedChartType: ChartType.Bar
+      lineGroupType: null
     };
 
     // Act
@@ -220,11 +218,10 @@ describe('barSeriesBuilder', () => {
       yAxisKeys: ['marketShare'],
       y2AxisKeys: [],
       xAxisKeys: ['product'],
-      categoryKeys: [],
       sizeOptions: null,
       scatterDotSize: [5, 5],
       lineGroupType: null,
-      selectedChartType: ChartType.Bar
+      trendlines: []
     };
 
     // Act

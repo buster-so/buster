@@ -44,7 +44,8 @@ describe('comboSeriesBuilder_data', () => {
       scatterDotSize: [5, 10] as [number, number],
       barShowTotalAtTop: false,
       yAxisKeys: ['metric1'],
-      y2AxisKeys: ['metric2']
+      y2AxisKeys: ['metric2'],
+      trendlines: []
     };
 
     const result = comboSeriesBuilder_data(props);
@@ -82,7 +83,8 @@ describe('comboSeriesBuilder_data', () => {
       scatterDotSize: [5, 10] as [number, number],
       barShowTotalAtTop: false,
       yAxisKeys: ['metric1'],
-      y2AxisKeys: []
+      y2AxisKeys: [],
+      trendlines: []
     };
 
     const result = comboSeriesBuilder_data(props);

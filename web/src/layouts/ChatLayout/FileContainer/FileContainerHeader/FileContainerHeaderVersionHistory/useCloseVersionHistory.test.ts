@@ -18,7 +18,7 @@ describe('useCloseVersionHistory', () => {
     vi.clearAllMocks();
 
     // Mock useAppLayoutContextSelector
-    (useAppLayoutContextSelector as any).mockImplementation((selector) => {
+    (useAppLayoutContextSelector as any).mockImplementation((selector: any) => {
       return selector({ onChangePage: mockOnChangePage });
     });
 
@@ -35,7 +35,7 @@ describe('useCloseVersionHistory', () => {
     mockGetInitialChatFileHref.mockReturnValue(expectedHref);
 
     // Mock chat layout context values
-    (useChatLayoutContextSelector as any).mockImplementation((selector) =>
+    (useChatLayoutContextSelector as any).mockImplementation((selector: any) =>
       selector({
         chatId: 'chat-123',
         metricId: 'metric-123',
@@ -62,7 +62,7 @@ describe('useCloseVersionHistory', () => {
     mockGetInitialChatFileHref.mockReturnValue(null);
 
     // Mock chat layout context values
-    (useChatLayoutContextSelector as any).mockImplementation((selector) =>
+    (useChatLayoutContextSelector as any).mockImplementation((selector: any) =>
       selector({
         chatId: 'chat-123',
         metricId: 'metric-123',
@@ -81,7 +81,7 @@ describe('useCloseVersionHistory', () => {
     mockGetInitialChatFileHref.mockReturnValue(expectedHref);
 
     // Mock chat layout context values
-    (useChatLayoutContextSelector as any).mockImplementation((selector) =>
+    (useChatLayoutContextSelector as any).mockImplementation((selector: any) =>
       selector({
         chatId: 'chat-123',
         metricId: 'metric-123',
@@ -98,7 +98,7 @@ describe('useCloseVersionHistory', () => {
 
   it('should return correct href when chatId is not present', () => {
     // Mock chat layout context values
-    (useChatLayoutContextSelector as any).mockImplementation((selector) =>
+    (useChatLayoutContextSelector as any).mockImplementation((selector: any) =>
       selector({
         chatId: undefined,
         metricId: 'metric-123',
@@ -119,7 +119,7 @@ describe('useCloseVersionHistory', () => {
     mockGetInitialChatFileHref.mockReturnValue(expectedHref);
 
     // Mock chat layout context values
-    (useChatLayoutContextSelector as any).mockImplementation((selector) =>
+    (useChatLayoutContextSelector as any).mockImplementation((selector: any) =>
       selector({
         chatId: undefined,
         metricId: 'metric-123',

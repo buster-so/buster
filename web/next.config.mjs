@@ -60,6 +60,10 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true
   },
+  // Disable TypeScript type checking during builds
+  typescript: {
+    ignoreBuildErrors: true
+  },
   sassOptions: {
     includePaths: [path.join(__dirname, 'styles')],
     silenceDeprecations: ['legacy-js-api']

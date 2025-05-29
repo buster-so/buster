@@ -9,7 +9,7 @@ vi.mock('@/lib/messages', () => ({
   isNumericColumnType: vi.fn()
 }));
 
-const mockedIsNumericColumnType = isNumericColumnType as anyedFunction<typeof isNumericColumnType>;
+const mockedIsNumericColumnType = vi.mocked(isNumericColumnType);
 
 describe('canSupportTrendlineRecord', () => {
   const trendlineTypes: Trendline['type'][] = [
