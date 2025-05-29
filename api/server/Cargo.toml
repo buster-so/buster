@@ -1,6 +1,6 @@
 [package]
 name = "buster_server"
-version = "0.1.22"
+version = "0.1.23"
 edition = "2021"
 default-run = "buster_server"
 
