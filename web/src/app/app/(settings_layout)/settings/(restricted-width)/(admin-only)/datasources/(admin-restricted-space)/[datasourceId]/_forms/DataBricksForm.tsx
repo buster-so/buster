@@ -52,67 +52,61 @@ export const DataBricksForm: React.FC<{
 
   return (
     <FormWrapper form={form} flow={flow}>
-      <form.AppField
-        name="name"
-        children={(field) => (
+      <form.AppField name="name">
+        {(field) => (
           <field.TextField
             labelClassName={labelClassName}
             label="Name"
             placeholder="My Databricks"
           />
         )}
-      />
+      </form.AppField>
 
-      <form.AppField
-        name="host"
-        children={(field) => (
+      <form.AppField name="host">
+        {(field) => (
           <field.TextField
             labelClassName={labelClassName}
             label="Host"
             placeholder="your-workspace.cloud.databricks.com"
           />
         )}
-      />
+      </form.AppField>
 
-      <form.AppField
-        name="api_key"
-        children={(field) => (
+      <form.AppField name="api_key">
+        {(field) => (
           <field.PasswordField
             labelClassName={labelClassName}
             label="API Key"
             placeholder="dapi..."
           />
         )}
-      />
+      </form.AppField>
 
-      <form.AppField
-        name="warehouse_id"
-        children={(field) => (
+      <form.AppField name="warehouse_id">
+        {(field) => (
           <field.TextField
             labelClassName={labelClassName}
             label="Warehouse ID"
             placeholder="your-warehouse-id"
           />
         )}
-      />
+      </form.AppField>
 
-      <form.AppField
-        name="default_catalog"
-        children={(field) => (
+      <form.AppField name="default_catalog">
+        {(field) => (
           <field.TextField
             labelClassName={labelClassName}
             label="Catalog"
             placeholder="hive_metastore"
           />
         )}
-      />
+      </form.AppField>
 
-      <form.AppField
-        name="default_schema"
-        children={(field) => (
+      <form.AppField name="default_schema">
+        {(field) => (
           <field.TextField labelClassName={labelClassName} label="Schema" placeholder="default" />
         )}
-      />
+      </form.AppField>
     </FormWrapper>
   );
 };

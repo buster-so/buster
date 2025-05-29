@@ -53,47 +53,41 @@ export const MySqlForm: React.FC<{
 
   return (
     <FormWrapper form={form} flow={flow}>
-      <form.AppField
-        name="name"
-        children={(field) => (
+      <form.AppField name="name">
+        {(field) => (
           <field.TextField labelClassName={labelClassName} label="Name" placeholder="My MySQL" />
         )}
-      />
+      </form.AppField>
 
       <MultipleInlineFields label="Hostname & port" labelClassName={labelClassName}>
-        <form.AppField
-          name="host"
-          children={(field) => <field.TextField label={null} placeholder="mysql.example.com" />}
-        />
-        <form.AppField
-          name="port"
-          children={(field) => (
+        <form.AppField name="host">
+          {(field) => <field.TextField label={null} placeholder="mysql.example.com" />}
+        </form.AppField>
+        <form.AppField name="port">
+          {(field) => (
             <field.NumberField label={null} placeholder="3306" className="max-w-[75px]!" />
           )}
-        />
+        </form.AppField>
       </MultipleInlineFields>
 
       <MultipleInlineFields label="Username & password" labelClassName={labelClassName}>
-        <form.AppField
-          name="username"
-          children={(field) => <field.TextField label={null} placeholder="root" />}
-        />
-        <form.AppField
-          name="password"
-          children={(field) => <field.PasswordField label={null} placeholder="password" />}
-        />
+        <form.AppField name="username">
+          {(field) => <field.TextField label={null} placeholder="root" />}
+        </form.AppField>
+        <form.AppField name="password">
+          {(field) => <field.PasswordField label={null} placeholder="password" />}
+        </form.AppField>
       </MultipleInlineFields>
 
-      <form.AppField
-        name="default_database"
-        children={(field) => (
+      <form.AppField name="default_database">
+        {(field) => (
           <field.TextField
             labelClassName={labelClassName}
             label="Database name"
             placeholder="mydatabase"
           />
         )}
-      />
+      </form.AppField>
     </FormWrapper>
   );
 };

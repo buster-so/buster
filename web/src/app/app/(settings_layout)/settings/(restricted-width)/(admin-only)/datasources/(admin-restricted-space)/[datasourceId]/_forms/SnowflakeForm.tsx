@@ -55,78 +55,70 @@ export const SnowflakeForm: React.FC<{
 
   return (
     <FormWrapper form={form} flow={flow}>
-      <form.AppField
-        name="name"
-        children={(field) => (
+      <form.AppField name="name">
+        {(field) => (
           <field.TextField
             labelClassName={labelClassName}
             label="Name"
             placeholder="My Snowflake"
           />
         )}
-      />
+      </form.AppField>
 
-      <form.AppField
-        name="account_id"
-        children={(field) => (
+      <form.AppField name="account_id">
+        {(field) => (
           <field.TextField
             labelClassName={labelClassName}
             label="Account ID"
             placeholder="your-account-id"
           />
         )}
-      />
+      </form.AppField>
 
       <MultipleInlineFields label="Username & password" labelClassName={labelClassName}>
-        <form.AppField
-          name="username"
-          children={(field) => <field.TextField label={null} placeholder="username" />}
-        />
-        <form.AppField
-          name="password"
-          children={(field) => <field.PasswordField label={null} placeholder="password" />}
-        />
+        <form.AppField name="username">
+          {(field) => <field.TextField label={null} placeholder="username" />}
+        </form.AppField>
+        <form.AppField name="password">
+          {(field) => <field.PasswordField label={null} placeholder="password" />}
+        </form.AppField>
       </MultipleInlineFields>
 
-      <form.AppField
-        name="warehouse_id"
-        children={(field) => (
+      <form.AppField name="warehouse_id">
+        {(field) => (
           <field.TextField
             labelClassName={labelClassName}
             label="Warehouse ID"
             placeholder="your-warehouse-id"
           />
         )}
-      />
+      </form.AppField>
 
-      <form.AppField
-        name="default_database"
-        children={(field) => (
+      <form.AppField name="default_database">
+        {(field) => (
           <field.TextField
             labelClassName={labelClassName}
             label="Database"
             placeholder="your_database"
           />
         )}
-      />
+      </form.AppField>
 
-      <form.AppField
-        name="default_schema"
-        children={(field) => (
+      <form.AppField name="default_schema">
+        {(field) => (
           <field.TextField labelClassName={labelClassName} label="Schema" placeholder="PUBLIC" />
         )}
-      />
+      </form.AppField>
 
-      <form.AppField
-        name="role"
-        children={(field) => (
+      <form.AppField name="role">
+        {(field) => (
           <field.TextField
             labelClassName={labelClassName}
             label="Role (Optional)"
             placeholder="your_role"
           />
         )}
-      />
+      </form.AppField>
     </FormWrapper>
   );
 };

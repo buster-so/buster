@@ -55,54 +55,47 @@ export const PostgresForm: React.FC<{
 
   return (
     <FormWrapper form={form} flow={flow}>
-      <form.AppField
-        name="name"
-        children={(field) => (
+      <form.AppField name="name">
+        {(field) => (
           <field.TextField labelClassName={labelClassName} label="Name" placeholder="My Postgres" />
         )}
-      />
+      </form.AppField>
 
       <MultipleInlineFields label="Hostname & port" labelClassName={labelClassName}>
-        <form.AppField
-          name="host"
-          children={(field) => <field.TextField label={null} placeholder="www.example.com" />}
-        />
-        <form.AppField
-          name="port"
-          children={(field) => (
+        <form.AppField name="host">
+          {(field) => <field.TextField label={null} placeholder="www.example.com" />}
+        </form.AppField>
+        <form.AppField name="port">
+          {(field) => (
             <field.NumberField label={null} placeholder="5432" className="max-w-[75px]!" />
           )}
-        />
+        </form.AppField>
       </MultipleInlineFields>
 
       <MultipleInlineFields label="Username & password" labelClassName={labelClassName}>
-        <form.AppField
-          name="username"
-          children={(field) => <field.TextField label={null} placeholder="postgres" />}
-        />
-        <form.AppField
-          name="password"
-          children={(field) => <field.PasswordField label={null} placeholder="password" />}
-        />
+        <form.AppField name="username">
+          {(field) => <field.TextField label={null} placeholder="postgres" />}
+        </form.AppField>
+        <form.AppField name="password">
+          {(field) => <field.PasswordField label={null} placeholder="password" />}
+        </form.AppField>
       </MultipleInlineFields>
 
-      <form.AppField
-        name="default_database"
-        children={(field) => (
+      <form.AppField name="default_database">
+        {(field) => (
           <field.TextField
             labelClassName={labelClassName}
             label="Database name"
             placeholder="postgres"
           />
         )}
-      />
+      </form.AppField>
 
-      <form.AppField
-        name="default_schema"
-        children={(field) => (
+      <form.AppField name="default_schema">
+        {(field) => (
           <field.TextField labelClassName={labelClassName} label="Schema" placeholder="public" />
         )}
-      />
+      </form.AppField>
     </FormWrapper>
   );
 };

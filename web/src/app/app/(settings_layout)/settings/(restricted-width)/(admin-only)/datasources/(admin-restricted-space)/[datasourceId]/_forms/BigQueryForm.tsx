@@ -52,45 +52,41 @@ export const BigQueryForm: React.FC<{
 
   return (
     <FormWrapper form={form} flow={flow}>
-      <form.AppField
-        name="name"
-        children={(field) => (
+      <form.AppField name="name">
+        {(field) => (
           <field.TextField labelClassName={labelClassName} label="Name" placeholder="My BigQuery" />
         )}
-      />
+      </form.AppField>
 
-      <form.AppField
-        name="service_role_key"
-        children={(field) => (
+      <form.AppField name="service_role_key">
+        {(field) => (
           <field.TextField
             labelClassName={labelClassName}
             label="Service Account Key"
             placeholder="Paste your service account key JSON here"
           />
         )}
-      />
+      </form.AppField>
 
-      <form.AppField
-        name="default_project_id"
-        children={(field) => (
+      <form.AppField name="default_project_id">
+        {(field) => (
           <field.TextField
             labelClassName={labelClassName}
             label="Project ID"
             placeholder="your-project-id"
           />
         )}
-      />
+      </form.AppField>
 
-      <form.AppField
-        name="default_dataset_id"
-        children={(field) => (
+      <form.AppField name="default_dataset_id">
+        {(field) => (
           <field.TextField
             labelClassName={labelClassName}
             label="Dataset ID"
             placeholder="your_dataset"
           />
         )}
-      />
+      </form.AppField>
     </FormWrapper>
   );
 };
