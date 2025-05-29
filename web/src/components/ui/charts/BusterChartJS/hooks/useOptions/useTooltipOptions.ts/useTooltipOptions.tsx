@@ -11,7 +11,6 @@ import { cn } from '@/lib/classMerge';
 import { isNumericColumnType } from '@/lib/messages';
 import type { TooltipOptions } from 'chart.js';
 import { useEffect, useMemo, useRef } from 'react';
-import React from 'react';
 import { renderToString } from 'react-dom/server';
 import type { DeepPartial } from 'utility-types';
 import type { ChartJSOrUndefined } from '../../../core/types';

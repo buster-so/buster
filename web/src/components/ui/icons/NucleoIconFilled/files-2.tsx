@@ -1,5 +1,3 @@
-import React from 'react';
-
 import type { iconProps } from './iconProps';
 
 function files2(props: iconProps) {

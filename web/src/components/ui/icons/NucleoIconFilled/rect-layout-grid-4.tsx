@@ -1,5 +1,3 @@
-import React from 'react';
-
 import type { iconProps } from './iconProps';
 
 function rectLayoutGrid4(props: iconProps) {

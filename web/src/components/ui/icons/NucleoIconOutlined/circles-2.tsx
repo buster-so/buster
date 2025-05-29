@@ -1,5 +1,3 @@
-import React from 'react';
-
 import type { iconProps } from './iconProps';
 
 function circles2(props: iconProps) {

@@ -9,7 +9,6 @@ import { DatePicker } from '@/components/ui/date';
 import { Eye, EyeSlash, Link } from '@/components/ui/icons';
 import { Input } from '@/components/ui/inputs';
 import { PulseLoader } from '@/components/ui/loaders';
-import { Separator } from '@/components/ui/seperator';
 import { Switch } from '@/components/ui/switch';
 import { Text } from '@/components/ui/typography';
 import { useBusterNotifications } from '@/context/BusterNotifications';
@@ -18,7 +17,6 @@ import { cn } from '@/lib/classMerge';
 import { createDayjsDate } from '@/lib/date';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import React, { useEffect, useMemo, useState } from 'react';
-import { SelectSingleEventHandler } from 'react-day-picker';
 import type { ShareMenuContentBodyProps } from './ShareMenuContentBody';
 
 export const ShareMenuContentPublish: React.FC<ShareMenuContentBodyProps> = React.memo(

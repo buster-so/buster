@@ -1,6 +1,6 @@
 'use client';
 
-import { ConfirmModal, ConfirmProps } from '@/components/ui/modal/ConfirmModal';
+import { ConfirmModal } from '@/components/ui/modal/ConfirmModal';
 import { Toaster } from '@/components/ui/toaster/Toaster';
 import type React from 'react';
 import type { PropsWithChildren } from 'react';

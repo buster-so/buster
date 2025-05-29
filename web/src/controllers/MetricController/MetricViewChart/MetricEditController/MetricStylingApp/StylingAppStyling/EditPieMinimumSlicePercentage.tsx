@@ -1,6 +1,5 @@
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import { InputNumber } from '@/components/ui/inputs';
-import { Slider, SliderWithInputNumber } from '@/components/ui/slider';
+import { SliderWithInputNumber } from '@/components/ui/slider';
 import { useMemoizedFn } from '@/hooks';
 import React, { useState } from 'react';
 import { LabelAndInput } from '../Common';

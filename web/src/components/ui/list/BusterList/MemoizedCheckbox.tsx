@@ -1,5 +1,4 @@
 import { Checkbox } from '@/components/ui/checkbox';
-import { CheckedState } from '@radix-ui/react-checkbox';
 import React from 'react';
 
 export const MemoizedCheckbox = React.memo(

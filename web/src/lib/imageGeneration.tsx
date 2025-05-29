@@ -1,7 +1,6 @@
 import type { BusterMetricData, IBusterMetric } from '@/api/asset_interfaces/metric';
 import type React from 'react';
 import { useEffect, useRef } from 'react';
-import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { downloadImageData, exportElementToImage } from './exportUtils';
 import { timeout } from './timeout';

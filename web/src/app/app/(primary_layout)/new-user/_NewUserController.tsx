@@ -11,7 +11,7 @@ import { useMemoizedFn } from '@/hooks';
 import { inputHasText } from '@/lib/text';
 import { BusterRoutes } from '@/routes/busterRoutes';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 export const NewUserController = () => {
   const [started, setStarted] = useState(false);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemoizedFn, useMount, useSize } from '@/hooks';
+import { useMemoizedFn, useSize } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 import Cookies from 'js-cookie';
 import React, {

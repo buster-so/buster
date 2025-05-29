@@ -1,5 +1,4 @@
 import { AppPageLayout } from '@/components/ui/layouts';
-import React from 'react';
 import { ChatListContainer } from '../../../../controllers/ChatsListController';
 import { ChatListHeader } from '../../../../controllers/ChatsListController/ChatListHeader';
 

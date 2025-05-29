@@ -1,5 +1,3 @@
-import React from 'react';
-
 import type { iconProps } from './iconProps';
 
 function chevronMaximizeDiagonal2(props: iconProps) {

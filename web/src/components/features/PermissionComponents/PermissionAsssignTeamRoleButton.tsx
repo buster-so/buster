@@ -1,11 +1,6 @@
 import type { TeamRole } from '@/api/asset_interfaces';
 import { Button } from '@/components/ui/buttons';
-import {
-  Dropdown,
-  DropdownItem,
-  DropdownItems,
-  type DropdownProps
-} from '@/components/ui/dropdown';
+import { Dropdown, type DropdownProps } from '@/components/ui/dropdown';
 import { CheckDouble } from '@/components/ui/icons';
 import { useMemoizedFn } from '@/hooks';
 import React, { useMemo } from 'react';

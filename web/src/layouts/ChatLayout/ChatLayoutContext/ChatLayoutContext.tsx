@@ -2,7 +2,7 @@
 
 import type { AppSplitterRef } from '@/components/ui/layouts';
 import { useMemoizedFn } from '@/hooks';
-import React, { type PropsWithChildren } from 'react';
+import React from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
 import { DEFAULT_CHAT_OPTION_SIDEBAR_SIZE } from './config';
 import { useGetChatParams } from './useGetChatParams';

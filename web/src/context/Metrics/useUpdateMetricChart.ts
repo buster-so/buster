@@ -6,7 +6,7 @@ import {
   type IBusterMetricChartConfig,
   type IColumnLabelFormat
 } from '@/api/asset_interfaces/metric';
-import { useSaveMetric, useUpdateMetric } from '@/api/buster_rest/metrics';
+import { useUpdateMetric } from '@/api/buster_rest/metrics';
 import { useMemoizedFn } from '@/hooks';
 import { timeout } from '@/lib/timeout';
 import { useParams } from 'next/navigation';

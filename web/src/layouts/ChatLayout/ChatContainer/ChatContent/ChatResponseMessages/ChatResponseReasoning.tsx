@@ -4,7 +4,6 @@ import { useGetChatMessage } from '@/api/buster_rest/chats';
 import { queryKeys } from '@/api/query_keys';
 import { Text } from '@/components/ui/typography';
 import { ShimmerText } from '@/components/ui/typography/ShimmerText';
-import { useMemoizedFn } from '@/hooks';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';

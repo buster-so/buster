@@ -4,7 +4,7 @@ import {
   useUpdateChatMessageFeedback
 } from '@/api/buster_rest/chats';
 import { Button } from '@/components/ui/buttons';
-import { Copy, DuplicatePlus, ThumbsDown } from '@/components/ui/icons';
+import { DuplicatePlus, ThumbsDown } from '@/components/ui/icons';
 import { ThumbsDown as ThumbsDownFilled } from '@/components/ui/icons/NucleoIconFilled';
 import { AppTooltip } from '@/components/ui/tooltip';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';

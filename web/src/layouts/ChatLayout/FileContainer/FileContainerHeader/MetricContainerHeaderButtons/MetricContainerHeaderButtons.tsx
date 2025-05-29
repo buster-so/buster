@@ -1,11 +1,10 @@
 import { useGetMetric } from '@/api/buster_rest/metrics';
-import { SquareChartPen, SquareCode } from '@/components/ui/icons';
+import { SquareChartPen } from '@/components/ui/icons';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useIsMetricReadOnly } from '@/context/Metrics/useIsMetricReadOnly';
 import { useMemoizedFn } from '@/hooks';
 import { assetParamsToRoute } from '@/lib/assets';
 import { canEdit, getIsEffectiveOwner } from '@/lib/share';
-import { BusterRoutes, createBusterRoute } from '@/routes';
 import Link from 'next/link';
 import React, { useMemo } from 'react';
 import { SaveMetricToCollectionButton } from '../../../../../components/features/buttons/SaveMetricToCollectionButton';

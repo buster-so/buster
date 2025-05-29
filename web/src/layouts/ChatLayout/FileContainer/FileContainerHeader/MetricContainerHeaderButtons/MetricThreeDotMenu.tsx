@@ -40,7 +40,7 @@ import {
 import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useBusterNotifications } from '@/context/BusterNotifications';
-import { useUserConfigContextSelector, useUserConfigProvider } from '@/context/Users';
+import { useUserConfigContextSelector } from '@/context/Users';
 import { METRIC_CHART_TITLE_INPUT_ID } from '@/controllers/MetricController/MetricViewChart/MetricViewChartHeader';
 import { METRIC_CHART_CONTAINER_ID } from '@/controllers/MetricController/MetricViewChart/config';
 import { useMemoizedFn } from '@/hooks';

@@ -1,6 +1,4 @@
-import { Button } from '@/components/ui/buttons/Button';
-import { CircleCheck, CircleInfo, CircleXmark } from '@/components/ui/icons';
-import { Popover, PopoverProps } from '@/components/ui/popover/Popover';
+import { CircleCheck, CircleXmark } from '@/components/ui/icons';
 import { Text } from '@/components/ui/typography';
 import { validate } from 'email-validator';
 import type React from 'react';

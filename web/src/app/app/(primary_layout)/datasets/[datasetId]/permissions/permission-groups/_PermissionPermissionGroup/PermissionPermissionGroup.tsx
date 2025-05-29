@@ -2,7 +2,6 @@
 
 import { useDatasetListPermissionGroups } from '@/api/buster_rest';
 import {
-  HeaderExplanation,
   NewPermissionGroupModal,
   PermissionSearchAndListWrapper
 } from '@/components/features/PermissionComponents';

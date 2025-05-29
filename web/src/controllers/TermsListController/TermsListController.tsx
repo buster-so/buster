@@ -3,7 +3,6 @@
 import type { BusterTermListItem } from '@/api/asset_interfaces/terms';
 import { useGetTermsList } from '@/api/buster_rest/terms';
 import { Avatar } from '@/components/ui/avatar';
-import { AppPageLayoutContent } from '@/components/ui/layouts/AppPageLayoutContent';
 import {
   BusterList,
   type BusterListColumn,

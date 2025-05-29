@@ -12,7 +12,7 @@ import {
   ScatterController
 } from 'chart.js';
 import type { ChartComponentLike, ChartType } from 'chart.js';
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 import { Chart } from './chart';
 import type { ChartJSOrUndefined, ChartProps, TypedChartComponent } from './types.js';
 

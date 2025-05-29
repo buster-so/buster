@@ -8,7 +8,6 @@ import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import type React from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';

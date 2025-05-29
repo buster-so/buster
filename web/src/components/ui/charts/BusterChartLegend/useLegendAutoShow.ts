@@ -1,5 +1,5 @@
 import type { BusterChartProps } from '@/api/asset_interfaces/metric/charts';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 const UNSUPPORTED_CHART_TYPES = ['metric', 'table'];
 

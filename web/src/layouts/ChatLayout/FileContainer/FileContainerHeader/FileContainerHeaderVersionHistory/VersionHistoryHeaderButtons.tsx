@@ -4,7 +4,7 @@ import { useListVersionDropdownItems } from '@/components/features/versionHistor
 import { Button } from '@/components/ui/buttons';
 import { Dropdown } from '@/components/ui/dropdown';
 import { History } from '@/components/ui/icons';
-import { useMemoizedFn, useMount } from '@/hooks';
+import { useMemoizedFn } from '@/hooks';
 import { useChatLayoutContextSelector } from '@/layouts/ChatLayout';
 import first from 'lodash/first';
 import React from 'react';

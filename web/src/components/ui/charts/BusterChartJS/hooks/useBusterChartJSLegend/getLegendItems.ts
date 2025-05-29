@@ -1,5 +1,4 @@
 import { type BusterChartProps, ChartType } from '@/api/asset_interfaces/metric/charts';
-import { formatLabel } from '@/lib/columnFormatter';
 import type { ChartDataset } from 'chart.js';
 import type React from 'react';
 import type { BusterChartLegendItem } from '../../../BusterChartLegend';

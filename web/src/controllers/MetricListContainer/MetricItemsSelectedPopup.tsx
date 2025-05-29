@@ -1,6 +1,5 @@
 import { ShareAssetType, VerificationStatus } from '@/api/asset_interfaces';
 import {
-  useAddAndRemoveMetricsFromDashboard,
   useAddMetricsToDashboard,
   useRemoveMetricsFromDashboard
 } from '@/api/buster_rest/dashboards';
@@ -23,7 +22,7 @@ import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { useDebounceFn, useMemoizedFn } from '@/hooks';
 import uniq from 'lodash/uniq';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 
 export const MetricSelectedOptionPopup: React.FC<{
   selectedRowKeys: string[];

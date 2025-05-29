@@ -8,7 +8,7 @@ import type {
   ScatterAxis
 } from '@/api/asset_interfaces/metric/charts';
 import { useUpdateEffect } from '@/hooks';
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   DEFAULT_CATEGORY_AXIS_COLUMN_NAMES,
   DEFAULT_X_AXIS_COLUMN_NAMES,

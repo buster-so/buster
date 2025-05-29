@@ -1412,6 +1412,8 @@ describe('modifyDatasets - percentage stack tests', () => {
 
   test('should convert bar chart values to percentages for percentage-stack mode', () => {
     const datasets = createBarDatasets();
+    expect(datasets.datasets[0].data).toEqual([100, 200, 300]);
+    expect(datasets.datasets[1].data).toEqual([50, 150, 250]);
     const { datasets: result } = modifyDatasets({
       datasets,
       pieMinimumSlicePercentage: undefined,

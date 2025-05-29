@@ -8,13 +8,12 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle
 } from '@/components/ui/card/CardBase';
 import { Select, type SelectItem } from '@/components/ui/select';
 import { AppTooltip } from '@/components/ui/tooltip';
-import { Text, Title } from '@/components/ui/typography';
+import { Text } from '@/components/ui/typography';
 import { useMemoizedFn } from '@/hooks';
 import React from 'react';
 

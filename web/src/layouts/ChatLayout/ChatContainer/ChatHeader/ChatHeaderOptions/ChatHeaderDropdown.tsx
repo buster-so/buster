@@ -2,7 +2,7 @@ import { ShareAssetType } from '@/api/asset_interfaces/share';
 import { useDeleteChat, useDuplicateChat, useGetChat } from '@/api/buster_rest/chats';
 import { useFavoriteStar } from '@/components/features/list';
 import { Dropdown, type DropdownItems } from '@/components/ui/dropdown';
-import { Copy, DuplicatePlus, Pencil, Star, Trash } from '@/components/ui/icons';
+import { DuplicatePlus, Pencil, Star, Trash } from '@/components/ui/icons';
 import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useBusterNotifications } from '@/context/BusterNotifications';

@@ -1,6 +1,4 @@
-import { addOpacityToColor } from '@/lib/colors';
 import type React from 'react';
-import { useMemo } from 'react';
 import { DEFAULT_CHART_COLORS, DISABLED_CHART_COLORS } from '../config';
 
 export const ChartIcon_AreaRelative: React.FC<{ colors?: string[]; disabled?: boolean }> = ({

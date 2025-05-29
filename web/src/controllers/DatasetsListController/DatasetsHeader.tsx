@@ -1,12 +1,8 @@
 'use client';
 
 import { useIndividualDataset } from '@/api/buster_rest';
-import { NewDatasetModal } from '@/components/features/modal/NewDatasetModal';
 import { Breadcrumb, type BreadcrumbItemType } from '@/components/ui/breadcrumb';
-import { Button } from '@/components/ui/buttons';
-import { Plus } from '@/components/ui/icons';
 import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
-import { AppTooltip } from '@/components/ui/tooltip';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { useMemoizedFn } from '@/hooks';
 import { BusterRoutes } from '@/routes';

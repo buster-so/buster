@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/list';
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
 export const PermissionListUserContainer: React.FC<{
   className?: string;

@@ -7,7 +7,6 @@ import { Dropdown, type DropdownItems } from '@/components/ui/dropdown';
 import { CircleQuestion, Dots, EditSquare, Trash } from '@/components/ui/icons';
 import { AppCodeEditor } from '@/components/ui/inputs/AppCodeEditor';
 import { InputTextArea } from '@/components/ui/inputs/InputTextArea';
-import { AppPageLayoutContent } from '@/components/ui/layouts/AppPageLayoutContent';
 import { Text } from '@/components/ui/typography';
 import { EditableTitle } from '@/components/ui/typography/EditableTitle';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';

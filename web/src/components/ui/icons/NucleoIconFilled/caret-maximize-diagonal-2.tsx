@@ -1,5 +1,3 @@
-import React from 'react';
-
 import type { iconProps } from './iconProps';
 
 function caretMaximizeDiagonal2(props: iconProps) {

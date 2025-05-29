@@ -4,7 +4,6 @@ import { type BusterCollectionListItem, ShareAssetType } from '@/api/asset_inter
 import { FavoriteStar } from '@/components/features/list';
 import { NewCollectionModal } from '@/components/features/modal/NewCollectionModal';
 import { Avatar } from '@/components/ui/avatar';
-import { AppPageLayoutContent } from '@/components/ui/layouts/AppPageLayoutContent';
 import {
   BusterList,
   type BusterListColumn,

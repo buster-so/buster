@@ -19,7 +19,6 @@ import {
 import { useMemoizedFn } from '@/hooks';
 import { QueryClient, useQueryClient } from '@tanstack/react-query';
 import type { GetPermissionGroupResponse } from '@/api/asset_interfaces/permission_groups';
-import isEmpty from 'lodash/isEmpty';
 import { updateDatasetPermissionGroups } from '../datasets';
 import type { ListPermissionGroupsResponse } from '../../asset_interfaces';
 import { queryKeys } from '@/api/query_keys';

@@ -13,9 +13,7 @@ import {
   DropdownMenuCheckboxItemMultiple,
   DropdownMenuCheckboxItemSingle,
   DropdownMenuContent,
-  DropdownMenuGroup, //Do I need this?
   DropdownMenuItem,
-  DropdownMenuLabel, //Do I need this?
   DropdownMenuLink,
   DropdownMenuPortal,
   DropdownMenuSeparator,

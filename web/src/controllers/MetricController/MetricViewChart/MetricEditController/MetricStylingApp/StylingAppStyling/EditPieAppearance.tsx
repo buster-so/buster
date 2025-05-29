@@ -3,9 +3,8 @@ import {
   type IBusterMetricChartConfig,
   MIN_DONUT_WIDTH
 } from '@/api/asset_interfaces';
-import { InputNumber } from '@/components/ui/inputs';
 import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
-import { Slider, SliderWithInputNumber } from '@/components/ui/slider';
+import { SliderWithInputNumber } from '@/components/ui/slider';
 import { useMemoizedFn } from '@/hooks';
 import React, { useMemo, useState } from 'react';
 import { LabelAndInput } from '../Common';

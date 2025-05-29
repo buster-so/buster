@@ -7,7 +7,6 @@ import type {
 } from '@/api/buster_socket';
 import type { BusterSocketResponseBase } from '@/api/buster_socket/base_interfaces';
 import { useBusterNotifications } from '@/context/BusterNotifications';
-import { useUserConfigContextSelector } from '@/context/Users';
 import { useMemoizedFn } from '@/hooks';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import React, { useMemo, useRef } from 'react';

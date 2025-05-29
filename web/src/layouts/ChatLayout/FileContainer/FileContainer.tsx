@@ -5,7 +5,7 @@ import { createAutoSaveId } from '@/components/ui/layouts/AppSplitter/helper';
 import { useDebounce, useMemoizedFn, useUpdateLayoutEffect } from '@/hooks';
 import Cookies from 'js-cookie';
 import type React from 'react';
-import { useLayoutEffect, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { useChatLayoutContextSelector } from '../ChatLayoutContext';
 import { FileContainerHeader } from './FileContainerHeader';
 import { FileContainerSecondary } from './FileContainerSecondary';

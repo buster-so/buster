@@ -6,8 +6,6 @@ import {
   useDatasetListPermissionUsers
 } from '@/api/buster_rest';
 import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
-import { Separator } from '@/components/ui/seperator';
-import { useMemoizedFn, useSet } from '@/hooks';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import React, { useMemo, useRef } from 'react';
 import { PermissionApps } from './config';

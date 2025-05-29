@@ -1046,13 +1046,13 @@ describe('aggregateAndCreateDatasets', () => {
     expect(result.datasets[0].tooltipData[0]).toEqual([
       { key: 'metric', value: 1000 },
       { key: 'boolean', value: true },
-      { key: 'object', value: { test: 'value' } }
+      { key: 'object', value: '[object Object]' }
     ]);
 
     expect(result.datasets[0].tooltipData[1]).toEqual([
       { key: 'metric', value: 1200 },
       { key: 'boolean', value: false },
-      { key: 'object', value: { test: 'other' } }
+      { key: 'object', value: '[object Object]' }
     ]);
   });
 

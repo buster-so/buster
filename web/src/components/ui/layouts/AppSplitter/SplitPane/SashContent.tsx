@@ -1,4 +1,3 @@
-import React from 'react';
 import { classNames } from './base';
 import type { ISashContentProps } from './types';
 

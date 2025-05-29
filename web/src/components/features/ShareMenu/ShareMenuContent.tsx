@@ -1,4 +1,4 @@
-import { type BusterShare, ShareAssetType, ShareRole } from '@/api/asset_interfaces';
+import { type BusterShare, ShareAssetType } from '@/api/asset_interfaces';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks';
 import { getIsEffectiveOwner } from '@/lib/share';

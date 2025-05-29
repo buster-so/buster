@@ -1,7 +1,4 @@
 'use client';
-
-import { queryKeys } from '@/api/query_keys';
-import { useQuery } from '@tanstack/react-query';
 import React from 'react';
 import { BarContainer } from './BarContainer';
 

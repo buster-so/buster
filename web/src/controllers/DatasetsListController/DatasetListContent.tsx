@@ -2,7 +2,7 @@
 
 import type { BusterDatasetListItem } from '@/api/asset_interfaces';
 import { Avatar } from '@/components/ui/avatar';
-import { ArrowUpRight, ExternalLink } from '@/components/ui/icons';
+import { ArrowUpRight } from '@/components/ui/icons';
 import { BusterList, type BusterListColumn, type BusterListRow } from '@/components/ui/list';
 import { ListEmptyStateWithButton } from '@/components/ui/list';
 import { useMemoizedFn } from '@/hooks';

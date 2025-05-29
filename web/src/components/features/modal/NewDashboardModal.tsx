@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/inputs';
 import { AppModal } from '@/components/ui/modal';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useMemoizedFn } from '@/hooks';
-import { timeout } from '@/lib';
 import { inputHasText } from '@/lib/text';
 import { BusterRoutes } from '@/routes';
 import React, { useEffect, useMemo } from 'react';

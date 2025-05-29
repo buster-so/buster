@@ -5,7 +5,6 @@ import { useUpdateMetricChart } from '@/context/Metrics';
 import { useMemoizedFn } from '@/hooks';
 import { formatLabel } from '@/lib';
 import React, { useMemo } from 'react';
-import type { SelectAxisContainerId } from '../config';
 import { useSelectAxisContextSelector } from '../useSelectAxisContext';
 import { EditAxisScale } from './EditAxisScale';
 import { EditShowAxisLabel } from './EditShowAxisLabel';

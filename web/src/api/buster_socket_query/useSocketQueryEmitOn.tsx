@@ -1,17 +1,9 @@
 import type { BusterSocketResponseRoute, BusterSocketRequest } from '@/api/buster_socket';
-import {
-  useIsMutating,
-  useQueryClient,
-  useMutation,
-  useMutationState,
-  type QueryKey,
-  type UseQueryOptions
-} from '@tanstack/react-query';
+import type { QueryKey, UseQueryOptions } from '@tanstack/react-query';
 import type { InferBusterSocketResponseData } from './types';
 import { useBusterWebSocket } from '@/context/BusterWebSocket';
-import { useEffect, useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import { useSocketQueryOn } from './useSocketQueryOn';
-import { timeout } from '@/lib';
 import { useMemoizedFn } from '@/hooks';
 
 export const useSocketQueryEmitOn = <

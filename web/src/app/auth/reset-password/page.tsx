@@ -4,7 +4,6 @@ import { getSupabaseUserContext } from '@/lib/supabase';
 import { resetPassword } from '@/lib/supabase/resetPassword';
 import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
 import { redirect } from 'next/navigation';
-import React from 'react';
 
 export default async function ResetPassword() {
   const { user, accessToken } = await getSupabaseUserContext();

@@ -1,4 +1,4 @@
-import { Paragraph, Text, Title } from '@/components/ui/typography';
+import { Paragraph, Title } from '@/components/ui/typography';
 import React from 'react';
 
 export const HeaderExplanation: React.FC<{

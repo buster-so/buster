@@ -1,10 +1,5 @@
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import type { BarSortBy } from '@/api/asset_interfaces/metric/charts';
-import {
-  ChartBarAxisX,
-  ChartBarTrendDown,
-  ChartBarTrendUp
-} from '@/components/ui/icons/NucleoIconFilled';
 import { BarChartSortAscIcon } from '@/components/ui/icons/customIcons/BarChartSortAscIcon';
 import { BarChartSortDescIcon } from '@/components/ui/icons/customIcons/BarChartSortDescIcon';
 import { BarChartSortNoneIcon } from '@/components/ui/icons/customIcons/BarChart_NoSort';

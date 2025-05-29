@@ -5,7 +5,7 @@ import { cn } from '@/lib/classMerge';
 import { DiffEditor } from '@monaco-editor/react';
 import type { editor } from 'monaco-editor/esm/vs/editor/editor.api';
 import { useTheme } from 'next-themes';
-import React, { forwardRef, useRef, useMemo } from 'react';
+import React, { forwardRef, useMemo } from 'react';
 import { CircleSpinnerLoaderContainer } from '../../loaders/CircleSpinnerLoaderContainer';
 
 export interface AppDiffCodeEditorProps {

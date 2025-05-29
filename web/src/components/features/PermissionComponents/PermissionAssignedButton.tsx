@@ -1,10 +1,5 @@
 import { Button } from '@/components/ui/buttons';
-import {
-  Dropdown,
-  type DropdownItem,
-  DropdownItems,
-  type DropdownProps
-} from '@/components/ui/dropdown';
+import { Dropdown, type DropdownItem, type DropdownProps } from '@/components/ui/dropdown';
 import { CheckDouble, Xmark } from '@/components/ui/icons';
 import { useMemoizedFn } from '@/hooks';
 import type React from 'react';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { SettingsPageHeader } from '../../../_components/SettingsPageHeader';
 import { DatasourceList } from './_DatasourceList';
 

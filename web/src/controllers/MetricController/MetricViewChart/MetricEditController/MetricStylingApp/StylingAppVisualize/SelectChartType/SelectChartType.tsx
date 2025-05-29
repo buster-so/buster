@@ -2,7 +2,7 @@ import type { ColumnMetaData, IBusterMetricChartConfig } from '@/api/asset_inter
 import type { ChartEncodes, ChartType } from '@/api/asset_interfaces/metric/charts';
 import { AppTooltip } from '@/components/ui/tooltip';
 import { useUpdateMetricChart } from '@/context/Metrics';
-import { useMemoizedFn, useUnmount } from '@/hooks';
+import { useMemoizedFn } from '@/hooks';
 import { NUMBER_TYPES, addOpacityToColor } from '@/lib';
 import { cn } from '@/lib/classMerge';
 import React, { useMemo } from 'react';

@@ -8,7 +8,6 @@ import { Plus } from '@/components/ui/icons';
 import { AppTooltip } from '@/components/ui/tooltip';
 import { useDashboardContentStore } from '@/context/Dashboards';
 import { useIsDashboardReadOnly } from '@/context/Dashboards/useIsDashboardReadOnly';
-import { useChatIndividualContextSelector } from '@/layouts/ChatLayout/ChatContext';
 import { useChatLayoutContextSelector } from '@/layouts/ChatLayout/ChatLayoutContext';
 import { canEdit, getIsEffectiveOwner } from '@/lib/share';
 import React from 'react';

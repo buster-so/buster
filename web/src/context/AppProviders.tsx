@@ -1,4 +1,3 @@
-import { isDev } from '@/config';
 import type { UseSupabaseUserContextType } from '@/lib/supabase';
 import { HydrationBoundary, type QueryClient, dehydrate } from '@tanstack/react-query';
 import type React from 'react';

@@ -1,7 +1,6 @@
 'use client';
 
 import { Separator } from '@/components/ui/seperator';
-import React from 'react';
 import { useDatasetPageContextSelector } from '../_DatasetsLayout/DatasetPageContext';
 import { OverviewData } from './OverviewData';
 import { OverviewHeader } from './OverviewHeader';

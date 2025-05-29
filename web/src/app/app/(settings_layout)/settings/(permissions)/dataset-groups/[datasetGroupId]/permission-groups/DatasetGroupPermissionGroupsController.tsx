@@ -1,9 +1,6 @@
 'use client';
 
-import {
-  useGetDatasetGroupPermissionGroups,
-  useGetPermissionGroupDatasetGroups
-} from '@/api/buster_rest';
+import { useGetDatasetGroupPermissionGroups } from '@/api/buster_rest';
 import {
   NewDatasetGroupModal,
   PermissionSearchAndListWrapper

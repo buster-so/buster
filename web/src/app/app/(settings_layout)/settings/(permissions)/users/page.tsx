@@ -9,7 +9,6 @@ import { useInviteModalStore } from '@/context/BusterAppLayout';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { useMemoizedFn } from '@/hooks';
 import { useDebounceSearch } from '@/hooks/useDebounceSearch';
-import React from 'react';
 import { SettingsPageHeader } from '../../_components/SettingsPageHeader';
 import { ListUsersComponent } from './ListUsersComponent';
 

@@ -4,7 +4,6 @@ import { Avatar } from '@/components/ui/avatar';
 import { Text, Title } from '@/components/ui/typography';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { formatDate } from '@/lib/date';
-import React from 'react';
 import { SettingsPageHeader } from '../../_components/SettingsPageHeader';
 
 export default function ProfilePage() {

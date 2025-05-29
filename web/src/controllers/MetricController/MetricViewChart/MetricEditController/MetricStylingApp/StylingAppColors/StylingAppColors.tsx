@@ -1,13 +1,12 @@
 import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { useUpdateMetricChart } from '@/context/Metrics';
-import { useMemoizedFn, useUnmount } from '@/hooks';
+import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useState } from 'react';
 import { ColorsApp } from './ColorsApp';
 import { CustomApp } from './CustomApp';
 import { PaletteApp } from './PaletteApp';
-import { SelectColorApp } from './SelectColorApp';
 import { StylingAppColorsTab } from './config';
 
 export const StylingAppColors: React.FC<{

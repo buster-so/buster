@@ -3,7 +3,7 @@
 import { useMount } from '@/hooks';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { cn } from '@/lib/utils';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { useChatIndividualContextSelector } from '../../ChatContext';
 import { ChatInput } from './ChatInput';
 import { ChatMessageBlock } from './ChatMessageBlock';

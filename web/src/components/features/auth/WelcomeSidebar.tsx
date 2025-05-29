@@ -1,6 +1,6 @@
 import { BusterLogoWithText } from '@/assets/svg/BusterLogoWithText';
 import { Text } from '@/components/ui/typography';
-import { BUSTER_DOCS_URL, BUSTER_HOME_PAGE } from '@/routes/externalRoutes';
+import { BUSTER_HOME_PAGE } from '@/routes/externalRoutes';
 import Link from 'next/link';
 import type React from 'react';
 

@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/buttons';
-import { ShareRight, ShareRight3 } from '@/components/ui/icons';
+import { ShareRight } from '@/components/ui/icons';
 import React from 'react';
 
 export const ShareButton = React.memo(() => {

@@ -1,5 +1,4 @@
 import type { Chart, ChartType, Plugin } from 'chart.js';
-import { ANIMATION_DURATION } from '../../../config';
 
 export interface ChartMountedPluginOptions {
   onMounted?: (chart: Chart) => void;

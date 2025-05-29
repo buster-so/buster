@@ -1,6 +1,4 @@
-import { CircleInfo } from '@/components/ui/icons';
 import { Switch } from '@/components/ui/switch';
-import { Text } from '@/components/ui/typography';
 import React from 'react';
 import { LabelAndInput } from '../../Common';
 import type { LoopTrendline } from './EditTrendline';

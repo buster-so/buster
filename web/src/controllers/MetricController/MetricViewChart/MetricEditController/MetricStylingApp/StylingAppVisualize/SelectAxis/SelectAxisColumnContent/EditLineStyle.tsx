@@ -1,6 +1,6 @@
 import { ENABLED_DOTS_ON_LINE_SIZE } from '@/api/asset_interfaces';
 import type { BusterChartConfigProps, ColumnSettings } from '@/api/asset_interfaces/metric/charts';
-import { ChartActivity3, ChartArea, ChartCombo, ChartLine, ChartStep } from '@/components/ui/icons';
+import { ChartArea, ChartCombo, ChartLine, ChartStep } from '@/components/ui/icons';
 import { AppSegmented } from '@/components/ui/segmented';
 import type { SegmentedItem } from '@/components/ui/segmented';
 import { AppTooltip } from '@/components/ui/tooltip';

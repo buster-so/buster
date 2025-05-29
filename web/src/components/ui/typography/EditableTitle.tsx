@@ -2,7 +2,7 @@
 
 import { cn } from '@/lib/classMerge';
 import { type VariantProps, cva } from 'class-variance-authority';
-import React, { useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useLayoutEffect } from 'react';
 import { Input } from '../inputs/Input';
 
 const editableTitleVariants = cva('relative flex items-center justify-between', {

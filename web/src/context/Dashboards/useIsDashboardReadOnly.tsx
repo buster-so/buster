@@ -1,6 +1,6 @@
 import { useGetDashboard } from '@/api/buster_rest/dashboards';
 import { useChatLayoutContextSelector } from '@/layouts/ChatLayout';
-import { canEdit, getIsOwner } from '@/lib/share';
+import { canEdit } from '@/lib/share';
 import last from 'lodash/last';
 import { useMemo } from 'react';
 

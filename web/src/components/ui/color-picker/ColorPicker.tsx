@@ -6,7 +6,7 @@ import { useDebounceFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 import { cva } from 'class-variance-authority';
 import type React from 'react';
-import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
 
 interface ColorPickerProps {

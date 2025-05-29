@@ -10,7 +10,7 @@ import {
 } from '@/api/asset_interfaces/metric/charts';
 import { useMemoizedFn } from '@/hooks';
 import { formatLabel, isNumericColumnType, truncateText } from '@/lib';
-import type { GridLineOptions, Scale, ScaleChartOptions, Tick, TimeScale } from 'chart.js';
+import type { GridLineOptions, Scale, ScaleChartOptions, TimeScale } from 'chart.js';
 import { Chart as ChartJS } from 'chart.js';
 import isDate from 'lodash/isDate';
 import { useMemo } from 'react';

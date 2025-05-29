@@ -118,11 +118,10 @@ export const extractPathParamsFromRoute = (route: string): Record<string, string
 
     for (const param of templateQueryParams) {
       const [key, template] = param.split('=');
-      if (template?.startsWith(':')) {
+      if (template.startsWith(':')) {
         const paramName = template.slice(1);
-        if (Object.prototype.hasOwnProperty.call(params, paramName)) {
-          queryParams.set(key, String(params[paramName]));
-        }
+        const value = queryParams.get(key);
+        if (value) params[paramName] = value;
       }
     }
   }

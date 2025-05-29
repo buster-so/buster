@@ -195,12 +195,13 @@ function applyPercentageStack(datasets: DatasetOption[]): DatasetOption[] {
 
   // Calculate sums for each data point
   for (const ds of clone) {
-    for (const v of ds.data) {
+    ds.data.forEach((v, i) => {
       if (v !== null) {
-        sums[v] += v || 0;
+        sums[i] += v || 0;
       }
-    }
+    });
   }
+  console.log('sums', sums);
 
   // Convert each data point to percentage and update tooltips
   for (const ds of clone) {
@@ -239,9 +240,9 @@ function sortBar(
   // Compute sums for each data column
   const sums = new Array<number>(dataLen).fill(0);
   for (const ds of items) {
-    for (const v of ds.data) {
-      sums[v ?? 0] += v === null ? 0 : v || 0;
-    }
+    ds.data.forEach((v, i) => {
+      sums[i] += v === null ? 0 : v || 0;
+    });
   }
 
   // Create sorting indices

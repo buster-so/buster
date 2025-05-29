@@ -1,5 +1,3 @@
-import React from 'react';
-
 import type { iconProps } from './iconProps';
 
 function scaleFromBottomRight2(props: iconProps) {

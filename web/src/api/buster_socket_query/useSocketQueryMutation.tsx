@@ -20,7 +20,6 @@ import type {
   InferBusterSocketResponseData
 } from './types';
 import isEmpty from 'lodash/isEmpty';
-import type { RustApiError } from '../buster_rest/errors';
 
 /**
  * A custom hook that combines WebSocket communication with React Query's mutation capabilities.

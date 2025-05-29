@@ -2,7 +2,7 @@ import { BusterLogo } from '@/assets/svg/BusterLogo';
 import { Button } from '@/components/ui/buttons';
 import { Card, CardContent, CardFooter } from '@/components/ui/card/CardBase';
 import { ArrowUpRight } from '@/components/ui/icons';
-import { Paragraph, Text, Title } from '@/components/ui/typography';
+import { Paragraph, Title } from '@/components/ui/typography';
 import { BUSTER_GETTING_STARTED_URL } from '@/routes/externalRoutes';
 
 export default function GettingStartedPage() {

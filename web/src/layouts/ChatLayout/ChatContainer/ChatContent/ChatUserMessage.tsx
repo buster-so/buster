@@ -10,7 +10,7 @@ import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useBusterNewChatContextSelector } from '@/context/Chats';
 import { useMemoizedFn, useMount } from '@/hooks';
 import { cn } from '@/lib/classMerge';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { MessageContainer } from './MessageContainer';
 
 export const ChatUserMessage: React.FC<{

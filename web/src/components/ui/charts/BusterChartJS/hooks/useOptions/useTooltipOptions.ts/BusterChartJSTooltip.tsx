@@ -1,11 +1,10 @@
 import { type BusterChartProps, ChartType } from '@/api/asset_interfaces/metric/charts';
 import { formatLabel } from '@/lib/columnFormatter';
-import type { Chart, ChartType as ChartJSChartType, TimeScale, TooltipItem } from 'chart.js';
+import type { Chart, ChartType as ChartJSChartType, TooltipItem } from 'chart.js';
 import type React from 'react';
 import { useMemo } from 'react';
 import { BusterChartTooltip } from '../../../../BusterChartTooltip';
 import type { ITooltipItem } from '../../../../BusterChartTooltip/interfaces';
-import { AUTO_DATE_FORMATS } from '../useXAxis/config';
 import { barAndLineTooltipHelper } from './barAndLineTooltipHelper';
 import { pieTooltipHelper } from './pieTooltipHelper';
 import { scatterTooltipHelper } from './scatterTooltipHelper';

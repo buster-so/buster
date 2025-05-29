@@ -39,9 +39,11 @@
       "suspicious": {
         "noArrayIndexKey": "off"
       },
+      "nursery": {},
       "correctness": {
         "useExhaustiveDependencies": "off",
-        "noChildrenProp": "off"
+        "noChildrenProp": "off",
+        "noUnusedImports": "error"
       },
       "a11y": {
         "useKeyWithClickEvents": "off",

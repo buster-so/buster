@@ -3,8 +3,7 @@ import {
   DEFAULT_COLUMN_LABEL_FORMAT,
   DEFAULT_DATE_FORMAT_DAY_OF_WEEK,
   DEFAULT_DATE_FORMAT_MONTH_OF_YEAR,
-  DEFAULT_DATE_FORMAT_QUARTER,
-  type IColumnLabelFormat
+  DEFAULT_DATE_FORMAT_QUARTER
 } from '@/api/asset_interfaces/metric';
 import { formatDate } from './date';
 import { formatNumber, roundNumber } from './numbers';
