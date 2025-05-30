@@ -44,7 +44,7 @@ export const Tooltip = React.memo(
         <TooltipProvider delayDuration={delayDuration} skipDelayDuration={skipDelayDuration}>
           <TooltipBase open={open}>
             <TooltipTrigger asChild>
-              <span ref={ref}>{children}</span>
+              <span ref={ref} className={triggerClassName}>{children}</span>
             </TooltipTrigger>
             <TooltipContentBase
               align={align}
