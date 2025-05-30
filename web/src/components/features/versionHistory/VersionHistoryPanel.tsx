@@ -49,7 +49,7 @@ export const VersionHistoryPanel = React.memo(
           () => (
             <PanelHeader />
           ),
-          [assetId, type, chatId]
+          []
         )}
         scrollable
         headerBorderVariant="ghost">
