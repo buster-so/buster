@@ -76,20 +76,9 @@ jobs:
           name: api-image
           path: api-image.tar
 
-  # 3. Setup Supabase environment independently
-  setup-supabase:
-    runs-on: blacksmith-32vcpu-ubuntu-2204
-    environment: testing
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Supabase Environment
-        uses: ./.github/actions/setup-test-environment
-
-  # 4. Run tests in 4 parallel shards
+  # 3. Run tests in 4 parallel shards
   test:
-    needs: [build-frontend, build-api, setup-supabase]
+    needs: [build-frontend, build-api]
     runs-on: blacksmith-32vcpu-ubuntu-2204
     environment: testing
     services:
@@ -141,6 +130,9 @@ jobs:
 
       - name: Load API Docker Image
         run: docker load -i api-image.tar
+
+      - name: Setup Supabase Environment
+        uses: ./.github/actions/setup-test-environment
 
       - name: Start API Container
         run: |
