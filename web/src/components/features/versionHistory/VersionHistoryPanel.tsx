@@ -45,7 +45,12 @@ export const VersionHistoryPanel = React.memo(
 
     return (
       <AppPageLayout
-        header={useMemo(() => <PanelHeader />, [assetId, type, chatId])}
+        header={useMemo(
+          () => (
+            <PanelHeader />
+          ),
+          [assetId, type, chatId]
+        )}
         scrollable
         headerBorderVariant="ghost">
         <div ref={bodyRef} className="mx-2 mb-1.5 flex flex-col">
@@ -139,7 +144,7 @@ const ListItem = React.memo(
                     onClickRestoreVersion(version_number);
                   }}
                   className={cn(
-                    'hover:bg-gray-light/20 hover:text-foreground -mr-1 rounded p-1 opacity-0 group-hover:block group-hover:opacity-100',
+                    'hover:bg-gray-light/20 hover:text-foreground -mr-1 cursor-pointer rounded p-1 opacity-0 group-hover:block group-hover:opacity-100',
                     isRestoringVersion && 'cursor-not-allowed opacity-100!'
                   )}>
                   {isRestoringVersion ? <CircleSpinnerLoader size={12} /> : <History />}

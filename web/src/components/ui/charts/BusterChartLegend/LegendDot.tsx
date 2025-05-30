@@ -87,7 +87,7 @@ export const LegendItemDot: React.FC<
         type="button"
         onClick={onClick}
         data-testid="legend-dot"
-        className={cn(dotStyle, dotVariants({ size }), {
+        className={cn('cursor-pointer', dotStyle, dotVariants({ size }), {
           'group-hover:opacity-0': hasFocusItem
         })}
         style={{ backgroundColor: !inactive ? color : undefined }}
@@ -96,7 +96,7 @@ export const LegendItemDot: React.FC<
         <button
           type="button"
           onClick={onFocusItemPreflight}
-          className="absolute hidden h-full w-full items-center justify-center overflow-hidden group-hover:flex">
+          className="absolute hidden h-full w-full cursor-pointer items-center justify-center overflow-hidden group-hover:flex">
           <div
             data-testid="focus-target"
             className="focus-item group-hover:bg-item-hover flex h-full w-full items-center justify-center rounded-sm">

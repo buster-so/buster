@@ -170,7 +170,7 @@ const ResizeRowHandle: React.FC<{
           className={cn(
             !readOnly && 'hover:bg-border cursor-row-resize',
             showActive && 'bg-primary! z-10 opacity-100',
-            'h-1 w-full rounded-sm transition-colors duration-200 ease-in-out select-none',
+            'h-1 w-full cursor-pointer rounded-sm transition-colors duration-200 ease-in-out select-none',
             !top && 'dragger absolute'
           )}
           style={memoizedStyle}

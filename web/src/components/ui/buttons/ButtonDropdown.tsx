@@ -126,7 +126,7 @@ export const ButtonSplit = React.memo(
           <div className="bg-border mr-0 h-full w-[0.5px]" />
           <button
             type="button"
-            className="flex h-full items-center justify-center text-sm"
+            className="flex h-full cursor-pointer items-center justify-center text-sm"
             aria-label="Open dropdown menu"
             onClick={handleClick}>
             <div className={cn(splitButtonVariants({ variant }), 'border-none')}>

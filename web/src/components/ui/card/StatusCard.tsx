@@ -39,7 +39,7 @@ export const StatusCard: React.FC<
 
       {extra && extra}
       {onClose && (
-        <button type="button" onClick={onClose} className="absolute top-2 right-2">
+        <button type="button" onClick={onClose} className="absolute top-2 right-2 cursor-pointer">
           <Xmark />
         </button>
       )}

@@ -40,7 +40,7 @@ const InputTagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
     ref
   ) => {
     const [inputValue, setInputValue] = React.useState('');
-    const containerRef = React.useRef<HTMLButtonElement>(null);
+    const containerRef = React.useRef<HTMLDivElement>(null);
     const scrollRef = React.useRef<HTMLDivElement>(null);
 
     const addMultipleTags = useMemoizedFn((value: string) => {
@@ -123,8 +123,7 @@ const InputTagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
     const isDisabledInput = disabled || (maxTags !== undefined && tags.length >= maxTags);
 
     return (
-      <button
-        type="button"
+      <div
         ref={containerRef}
         className={cn(
           inputVariants({ variant, size }),
@@ -162,7 +161,7 @@ const InputTagInput = React.forwardRef<HTMLInputElement, TagInputProps>(
             disabled={isDisabledInput}
           />
         </div>
-      </button>
+      </div>
     );
   }
 );
