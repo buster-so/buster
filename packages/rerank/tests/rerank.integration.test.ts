@@ -14,6 +14,8 @@ describe('Reranker - Integration Tests', () => {
 
   beforeAll(() => {
     if (!isIntegrationTest) {
+      // Use console for test output in beforeAll
+      // eslint-disable-next-line no-console
       console.log('Skipping integration tests - real API credentials not available');
     }
   });
@@ -39,30 +41,38 @@ describe('Reranker - Integration Tests', () => {
       expect(results).toBeInstanceOf(Array);
 
       // Check that indices are valid
-      results.forEach((result) => {
+      for (const result of results) {
         expect(result.index).toBeGreaterThanOrEqual(0);
         expect(result.index).toBeLessThan(documents.length);
         expect(result.relevance_score).toBeGreaterThanOrEqual(0);
         expect(result.relevance_score).toBeLessThanOrEqual(1);
-      });
+      }
 
       // Check that results are sorted by relevance score (descending)
       for (let i = 1; i < results.length; i++) {
         expect(results[i - 1].relevance_score).toBeGreaterThanOrEqual(results[i].relevance_score);
       }
 
-      // Verify that Paris-related documents rank higher
-      const topResultDoc = documents[results[0].index];
-      expect(topResultDoc.toLowerCase()).toContain('paris');
+      // Based on actual API response, verify specific rankings
+      // Document at index 4 ("France is a country...") should rank first
+      expect(results[0].index).toBe(4);
+      expect(results[0].relevance_score).toBeGreaterThan(0.8);
 
-      // Log results for manual verification
-      console.log('Query:', query);
-      console.log('Top results:');
-      results.forEach((result, idx) => {
-        console.log(
-          `${idx + 1}. [Score: ${result.relevance_score.toFixed(4)}] ${documents[result.index]}`
-        );
-      });
+      // Document at index 0 ("Paris is a major...") should rank second
+      expect(results[1].index).toBe(0);
+      expect(results[1].relevance_score).toBeGreaterThan(0.4);
+      expect(results[1].relevance_score).toBeLessThan(0.5);
+
+      // Document at index 2 ("The Eiffel Tower...") should rank third
+      expect(results[2].index).toBe(2);
+      expect(results[2].relevance_score).toBeGreaterThan(0.2);
+      expect(results[2].relevance_score).toBeLessThan(0.3);
+
+      // Verify that all top results mention Paris
+      for (const result of results) {
+        const doc = documents[result.index];
+        expect(doc.toLowerCase()).toContain('paris');
+      }
     });
 
     it.skipIf(!isIntegrationTest)('should handle different query types', async () => {
@@ -78,7 +88,8 @@ describe('Reranker - Integration Tests', () => {
             'Primary keys ensure data integrity',
             'Chocolate cake recipe with strawberries',
           ],
-          expectedKeywords: ['database', 'sql', 'normalization', 'primary'],
+          expectedTopIndices: [0, 2, 3], // Database-related documents should rank higher
+          minTopScore: 0.1, // Top result should have meaningful relevance
         },
         {
           query: 'machine learning algorithms',
@@ -89,7 +100,8 @@ describe('Reranker - Integration Tests', () => {
             'Gradient descent optimizes model parameters',
             'The stock market closed higher today',
           ],
-          expectedKeywords: ['neural', 'random forest', 'gradient'],
+          expectedTopIndices: [0, 2, 3], // ML-related documents should rank higher
+          minTopScore: 0.1,
         },
       ];
 
@@ -98,12 +110,20 @@ describe('Reranker - Integration Tests', () => {
 
         expect(results).toHaveLength(3);
 
-        // Check that at least one of the top results contains expected keywords
-        const topDocs = results.map((r) => testCase.documents[r.index].toLowerCase());
-        const hasRelevantResult = topDocs.some((doc) =>
-          testCase.expectedKeywords.some((keyword) => doc.includes(keyword))
+        // Verify that top results are from expected indices
+        const topIndices = results.map((r) => r.index);
+        const hasExpectedDocs = testCase.expectedTopIndices.every((idx) =>
+          topIndices.includes(idx)
         );
-        expect(hasRelevantResult).toBe(true);
+        expect(hasExpectedDocs).toBe(true);
+
+        // Top result should have high relevance score
+        expect(results[0].relevance_score).toBeGreaterThan(testCase.minTopScore);
+
+        // Results should be sorted by relevance
+        for (let i = 1; i < results.length; i++) {
+          expect(results[i - 1].relevance_score).toBeGreaterThanOrEqual(results[i].relevance_score);
+        }
       }
     });
 
@@ -114,6 +134,7 @@ describe('Reranker - Integration Tests', () => {
       const singleDocResult = await reranker.rerank('test', ['single document']);
       expect(singleDocResult).toHaveLength(1);
       expect(singleDocResult[0].index).toBe(0);
+      expect(singleDocResult[0].relevance_score).toBeGreaterThan(0);
 
       // Large number of documents (should limit to top_n)
       const manyDocs = Array(50)
@@ -121,6 +142,12 @@ describe('Reranker - Integration Tests', () => {
         .map((_, i) => `Document ${i}`);
       const manyDocsResult = await reranker.rerank('test query', manyDocs, 5);
       expect(manyDocsResult).toHaveLength(5);
+
+      // Verify all results have valid scores
+      for (const result of manyDocsResult) {
+        expect(result.relevance_score).toBeGreaterThan(0);
+        expect(result.relevance_score).toBeLessThanOrEqual(1);
+      }
 
       // Unicode and special characters
       const unicodeDocs = [
@@ -130,6 +157,10 @@ describe('Reranker - Integration Tests', () => {
       ];
       const unicodeResult = await reranker.rerank('coffee shop', unicodeDocs, 2);
       expect(unicodeResult).toHaveLength(2);
+
+      // First result should contain "Café" as it's most relevant to "coffee shop"
+      expect(unicodeDocs[unicodeResult[0].index]).toContain('Café');
+      expect(unicodeResult[0].relevance_score).toBeGreaterThan(0.1);
     });
 
     it.skipIf(!isIntegrationTest)('should use rerankResults helper function', async () => {
@@ -144,20 +175,34 @@ describe('Reranker - Integration Tests', () => {
       const results = await rerankResults(query, documents, 2);
 
       expect(results).toHaveLength(2);
-      expect(results[0].relevance_score).toBeGreaterThan(0);
 
-      // TypeScript-related documents should rank higher
+      // First result should be the TypeScript document (index 0)
+      expect(results[0].index).toBe(0);
+      expect(results[0].relevance_score).toBeGreaterThan(0.3);
+
+      // Second result should be JavaScript or type safety document (index 2 or 3)
+      expect([2, 3]).toContain(results[1].index);
+      expect(results[1].relevance_score).toBeGreaterThan(0.1);
+
+      // Both top results should be TypeScript-related
       const topDoc = documents[results[0].index].toLowerCase();
-      expect(topDoc).toMatch(/typescript|type/);
+      expect(topDoc).toContain('typescript');
     });
   });
 
   describe('Error Handling with Real API', () => {
     it.skipIf(!isIntegrationTest)('should handle invalid API key gracefully', async () => {
+      const baseUrl = process.env.RERANK_BASE_URL;
+      const model = process.env.RERANK_MODEL;
+
+      if (!baseUrl || !model) {
+        throw new Error('Missing required environment variables');
+      }
+
       const reranker = new Reranker({
         apiKey: 'invalid-api-key',
-        baseUrl: process.env.RERANK_BASE_URL!,
-        model: process.env.RERANK_MODEL!,
+        baseUrl,
+        model,
       });
 
       const documents = ['doc1', 'doc2'];
@@ -165,7 +210,9 @@ describe('Reranker - Integration Tests', () => {
 
       // Should fallback to equal scores
       expect(results).toHaveLength(2);
+      expect(results[0].index).toBe(0);
       expect(results[0].relevance_score).toBe(1.0);
+      expect(results[1].index).toBe(1);
       expect(results[1].relevance_score).toBe(1.0);
     });
 
@@ -181,11 +228,20 @@ describe('Reranker - Integration Tests', () => {
       const results = await Promise.all(promises);
 
       // All should return results (either from API or fallback)
-      results.forEach((result) => {
+      for (const result of results) {
         expect(result).toHaveLength(3);
         expect(result[0]).toHaveProperty('index');
         expect(result[0]).toHaveProperty('relevance_score');
-      });
+
+        // Each result should have valid indices
+        for (const item of result) {
+          expect(item.index).toBeGreaterThanOrEqual(0);
+          expect(item.index).toBeLessThan(documents.length);
+          expect(item.relevance_score).toBeGreaterThan(0);
+          expect(item.relevance_score).toBeLessThanOrEqual(1);
+        }
+      }
     });
   });
 });
+
