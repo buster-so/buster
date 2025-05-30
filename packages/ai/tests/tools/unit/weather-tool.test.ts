@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'bun:test';
+import { describe, expect, test } from 'vitest';
 import { weatherTool } from '@tools/weather-tool';
 
 describe('Weather Tool Unit Tests', () => {

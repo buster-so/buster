@@ -9,6 +9,10 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "autoevals": "^0.0.129"
+    "autoevals": "^0.0.129",
+    "minimatch": "^10.0.1"
+  },
+  "devDependencies": {
+    "vite-tsconfig-paths": "^5.1.4"
   }
 }
