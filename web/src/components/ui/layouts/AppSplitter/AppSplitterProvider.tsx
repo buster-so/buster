@@ -3,7 +3,7 @@ import { createContext, useContextSelector } from 'use-context-selector';
 
 interface AppSplitterProviderProps {
   animateWidth: (width: string | number, side: 'left' | 'right', duration: number) => Promise<void>;
-  setSplitSizes: (sizes: [string, string]) => void;
+  setSplitSizes: (sizes: [string | number, string | number]) => void;
   isSideClosed: (side: 'left' | 'right') => boolean;
   getSizesInPixels: () => [number, number];
   sizes: [string | number, string | number];
