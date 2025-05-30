@@ -27,21 +27,21 @@ describe('Introspector Empty Filter Validation', () => {
   introspectors.forEach(({ name, introspector }) => {
     describe(name, () => {
       it('should throw error when databases filter is empty array', async () => {
-        await expect(
-          introspector.getFullIntrospection({ databases: [] })
-        ).rejects.toThrow('Database filter array is empty');
+        await expect(introspector.getFullIntrospection({ databases: [] })).rejects.toThrow(
+          'Database filter array is empty'
+        );
       });
 
       it('should throw error when schemas filter is empty array', async () => {
-        await expect(
-          introspector.getFullIntrospection({ schemas: [] })
-        ).rejects.toThrow('Schema filter array is empty');
+        await expect(introspector.getFullIntrospection({ schemas: [] })).rejects.toThrow(
+          'Schema filter array is empty'
+        );
       });
 
       it('should throw error when tables filter is empty array', async () => {
-        await expect(
-          introspector.getFullIntrospection({ tables: [] })
-        ).rejects.toThrow('Table filter array is empty');
+        await expect(introspector.getFullIntrospection({ tables: [] })).rejects.toThrow(
+          'Table filter array is empty'
+        );
       });
     });
   });

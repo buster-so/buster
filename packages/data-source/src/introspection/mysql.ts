@@ -534,13 +534,19 @@ ORDER BY s.column_name`;
   }): Promise<DataSourceIntrospectionResult> {
     // Validate that filter arrays are not empty
     if (options?.databases && options.databases.length === 0) {
-      throw new Error('Database filter array is empty. Please provide at least one database name or remove the filter.');
+      throw new Error(
+        'Database filter array is empty. Please provide at least one database name or remove the filter.'
+      );
     }
     if (options?.schemas && options.schemas.length === 0) {
-      throw new Error('Schema filter array is empty. Please provide at least one schema name or remove the filter.');
+      throw new Error(
+        'Schema filter array is empty. Please provide at least one schema name or remove the filter.'
+      );
     }
     if (options?.tables && options.tables.length === 0) {
-      throw new Error('Table filter array is empty. Please provide at least one table name or remove the filter.');
+      throw new Error(
+        'Table filter array is empty. Please provide at least one table name or remove the filter.'
+      );
     }
 
     // Step 1: Fetch all databases (populates database cache)
@@ -620,8 +626,8 @@ ORDER BY s.column_name`;
     // Filter databases to only those that have schemas when schema filter is applied
     let filteredDatabases = databases;
     if (options?.schemas && !options?.databases) {
-      const databasesWithFilteredSchemas = new Set(schemas.map(schema => schema.database));
-      filteredDatabases = databases.filter(db => databasesWithFilteredSchemas.has(db.name));
+      const databasesWithFilteredSchemas = new Set(schemas.map((schema) => schema.database));
+      filteredDatabases = databases.filter((db) => databasesWithFilteredSchemas.has(db.name));
     }
 
     return {

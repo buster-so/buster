@@ -321,10 +321,10 @@ describe('Snowflake DataSource Introspection', () => {
         });
 
         // Verify only DBT database is returned
-        expect(filteredIntrospection.databases.some(db => db.name === 'DBT')).toBe(true);
-        const databaseNames = new Set(filteredIntrospection.databases.map(db => db.name));
+        expect(filteredIntrospection.databases.some((db) => db.name === 'DBT')).toBe(true);
+        const databaseNames = new Set(filteredIntrospection.databases.map((db) => db.name));
         expect(databaseNames.has('DBT')).toBe(true);
-        
+
         // Verify all schemas belong to DBT database
         for (const schema of filteredIntrospection.schemas) {
           expect(schema.database).toBe('DBT');
@@ -365,9 +365,9 @@ describe('Snowflake DataSource Introspection', () => {
         });
 
         // Verify only REVENUE schema is returned
-        const revenueSchemas = filteredIntrospection.schemas.filter(s => s.name === 'REVENUE');
+        const revenueSchemas = filteredIntrospection.schemas.filter((s) => s.name === 'REVENUE');
         expect(revenueSchemas.length).toBeGreaterThan(0);
-        expect(filteredIntrospection.schemas.every(s => s.name === 'REVENUE')).toBe(true);
+        expect(filteredIntrospection.schemas.every((s) => s.name === 'REVENUE')).toBe(true);
 
         // Verify all tables belong to REVENUE schema
         for (const table of filteredIntrospection.tables) {
@@ -385,7 +385,7 @@ describe('Snowflake DataSource Introspection', () => {
         }
 
         // Verify databases are filtered to only those containing REVENUE schema
-        const databasesWithRevenue = new Set(revenueSchemas.map(s => s.database));
+        const databasesWithRevenue = new Set(revenueSchemas.map((s) => s.database));
         for (const database of filteredIntrospection.databases) {
           expect(databasesWithRevenue.has(database.name)).toBe(true);
         }
@@ -411,8 +411,8 @@ describe('Snowflake DataSource Introspection', () => {
         });
 
         // Verify only DBT database is returned
-        expect(filteredIntrospection.databases.some(db => db.name === 'DBT')).toBe(true);
-        
+        expect(filteredIntrospection.databases.some((db) => db.name === 'DBT')).toBe(true);
+
         // Verify only REVENUE schema in DBT database is returned
         expect(filteredIntrospection.schemas.length).toBeGreaterThan(0);
         for (const schema of filteredIntrospection.schemas) {

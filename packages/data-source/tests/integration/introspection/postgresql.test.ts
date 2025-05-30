@@ -421,9 +421,9 @@ describe('PostgreSQL DataSource Introspection', () => {
         });
 
         // Verify only public schema is returned
-        const publicSchemas = filteredIntrospection.schemas.filter(s => s.name === 'public');
+        const publicSchemas = filteredIntrospection.schemas.filter((s) => s.name === 'public');
         expect(publicSchemas.length).toBeGreaterThan(0);
-        expect(filteredIntrospection.schemas.every(s => s.name === 'public')).toBe(true);
+        expect(filteredIntrospection.schemas.every((s) => s.name === 'public')).toBe(true);
 
         // Verify all tables belong to public schema
         for (const table of filteredIntrospection.tables) {
@@ -441,7 +441,7 @@ describe('PostgreSQL DataSource Introspection', () => {
         }
 
         // Verify databases are filtered to only those containing public schema
-        const databasesWithPublic = new Set(publicSchemas.map(s => s.database));
+        const databasesWithPublic = new Set(publicSchemas.map((s) => s.database));
         for (const database of filteredIntrospection.databases) {
           expect(databasesWithPublic.has(database.name)).toBe(true);
         }
