@@ -73,6 +73,22 @@
         "vitest": "^1.0.4",
       },
     },
+    "packages/stored-values": {
+      "name": "@buster/stored-values",
+      "version": "1.0.0",
+      "dependencies": {
+        "@ai-sdk/openai": "^1.3.22",
+        "@buster/database": "workspace:*",
+        "ai": "^4.0.0",
+        "zod": "^3.22.4",
+      },
+      "devDependencies": {
+        "@types/node": "^20.0.0",
+        "@types/uuid": "^9.0.0",
+        "uuid": "^9.0.0",
+        "vitest": "^3.1.4",
+      },
+    },
     "packages/web-tools": {
       "name": "web-tools",
       "version": "0.1.0",
@@ -300,6 +316,8 @@
     "@buster/database": ["@buster/database@workspace:packages/database"],
 
     "@buster/rerank": ["@buster/rerank@workspace:packages/rerank"],
+
+    "@buster/stored-values": ["@buster/stored-values@workspace:packages/stored-values"],
 
     "@buster/trigger": ["@buster/trigger@workspace:trigger"],
 
