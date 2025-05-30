@@ -1,11 +1,14 @@
-import isEqual from 'lodash/isEqual';
-import type { DataMetadata, IBusterMetric } from '@/api/asset_interfaces/metric';
+import isEqual from "lodash/isEqual";
+import type {
+  DataMetadata,
+  IBusterMetric,
+} from "@/api/asset_interfaces/metric";
 import {
   DEFAULT_CHART_CONFIG_ENTRIES,
   DEFAULT_COLUMN_LABEL_FORMAT,
   DEFAULT_COLUMN_SETTINGS,
-  type IBusterMetricChartConfig
-} from '@/api/asset_interfaces/metric';
+  type IBusterMetricChartConfig,
+} from "@/api/asset_interfaces/metric";
 import type {
   BarAndLineAxis,
   BusterChartConfigProps,
@@ -13,20 +16,27 @@ import type {
   ColumnSettings,
   ComboChartAxis,
   PieChartAxis,
-  ScatterAxis
-} from '@/api/asset_interfaces/metric/charts';
-import type { updateMetric } from '@/api/buster_rest/metrics';
-import { getChangedValues } from '@/lib/objects';
-import { createDefaultChartConfig } from './messageAutoChartHandler';
+  ScatterAxis,
+} from "@/api/asset_interfaces/metric/charts";
+import type { updateMetric } from "@/api/buster_rest/metrics";
+import { getChangedValues } from "@/lib/objects";
+import { createDefaultChartConfig } from "./messageAutoChartHandler";
 
 const DEFAULT_COLUMN_SETTINGS_ENTRIES = Object.entries(DEFAULT_COLUMN_SETTINGS);
-const DEFAULT_COLUMN_LABEL_FORMATS_ENTRIES = Object.entries(DEFAULT_COLUMN_LABEL_FORMAT);
+const DEFAULT_COLUMN_LABEL_FORMATS_ENTRIES = Object.entries(
+  DEFAULT_COLUMN_LABEL_FORMAT
+);
 
 export const getChangedTopLevelMessageValues = (
   newMetric: IBusterMetric,
   oldMetric: IBusterMetric
 ) => {
-  const changes = getChangedValues(oldMetric, newMetric, ['name', 'status', 'sql', 'file']);
+  const changes = getChangedValues(oldMetric, newMetric, [
+    "name",
+    "status",
+    "sql",
+    "file",
+  ]);
   return changes;
 };
 
@@ -39,7 +49,8 @@ const keySpecificHandlers: Partial<
   comboChartAxis: (value: unknown) => value as ComboChartAxis,
   colors: (value: unknown) => value as string[],
   columnSettings: (columnSettings: unknown) => {
-    const typedColumnSettings = columnSettings as BusterChartConfigProps['columnSettings'];
+    const typedColumnSettings =
+      columnSettings as BusterChartConfigProps["columnSettings"];
     // Early return if no column settings
     if (!typedColumnSettings) return {};
 
@@ -51,11 +62,14 @@ const keySpecificHandlers: Partial<
       let hasChanges = false;
 
       // Check each default setting
-      for (const [settingKey, defaultValue] of DEFAULT_COLUMN_SETTINGS_ENTRIES) {
+      for (const [
+        settingKey,
+        defaultValue,
+      ] of DEFAULT_COLUMN_SETTINGS_ENTRIES) {
         const columnSettingValue = value?.[settingKey as keyof ColumnSettings];
         if (!isEqual(defaultValue, columnSettingValue)) {
-          //@ts-ignore
-          changedSettings[settingKey as keyof ColumnSettings] = columnSettingValue as unknown;
+          changedSettings[settingKey as keyof ColumnSettings] =
+            columnSettingValue;
           hasChanges = true;
         }
       }
@@ -68,7 +82,10 @@ const keySpecificHandlers: Partial<
     return diff;
   },
   columnLabelFormats: (columnLabelFormats: unknown) => {
-    const typedColumnLabelFormats = columnLabelFormats as Record<string, ColumnLabelFormat>;
+    const typedColumnLabelFormats = columnLabelFormats as Record<
+      string,
+      ColumnLabelFormat
+    >;
     // Early return if no column settings
     if (!typedColumnLabelFormats) return {};
 
@@ -80,11 +97,15 @@ const keySpecificHandlers: Partial<
       let hasChanges = false;
 
       // Check each default setting
-      for (const [settingKey, defaultValue] of DEFAULT_COLUMN_LABEL_FORMATS_ENTRIES) {
+      for (const [
+        settingKey,
+        defaultValue,
+      ] of DEFAULT_COLUMN_LABEL_FORMATS_ENTRIES) {
         const columnSettingValue = value[settingKey as keyof ColumnLabelFormat];
         if (!isEqual(defaultValue, columnSettingValue)) {
           //@ts-ignore
-          changedSettings[settingKey as keyof ColumnLabelFormat] = columnSettingValue;
+          changedSettings[settingKey as keyof ColumnLabelFormat] =
+            columnSettingValue;
           hasChanges = true;
         }
       }
@@ -95,7 +116,7 @@ const keySpecificHandlers: Partial<
     }
 
     return diff;
-  }
+  },
 };
 
 export const getChangesFromDefaultChartConfig = (newMetric: IBusterMetric) => {
@@ -133,7 +154,7 @@ export const combineChangeFromDefaultChartConfig = (
 ) => {
   const chartConfig = createDefaultChartConfig({
     chart_config: newMetric.chart_config,
-    data_metadata: dataMetadata
+    data_metadata: dataMetadata,
   });
   return chartConfig;
 };
@@ -148,11 +169,14 @@ export const prepareMetricUpdateMetric = (
   ) as unknown as Parameters<typeof updateMetric>[0];
   const dataMetadata = prevMetric.data_metadata;
 
-  const changedChartConfig = combineChangeFromDefaultChartConfig(newMetric, dataMetadata);
+  const changedChartConfig = combineChangeFromDefaultChartConfig(
+    newMetric,
+    dataMetadata
+  );
 
   return {
     ...changedTopLevelValues,
     chart_config: changedChartConfig,
-    id: newMetric.id
+    id: newMetric.id,
   };
 };

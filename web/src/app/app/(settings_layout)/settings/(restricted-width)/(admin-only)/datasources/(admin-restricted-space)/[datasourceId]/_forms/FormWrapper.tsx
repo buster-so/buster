@@ -3,14 +3,7 @@
 import type React from 'react';
 import { WhiteListBlock } from './WhiteListBlock';
 
-// Common field interface properties
-interface FieldComponentProps {
-  label: string | null;
-  labelClassName?: string;
-  className?: string;
-  placeholder?: string;
-}
-
+ 
 // Define a more specific but limited interface for our form
 // This avoids the deep type recursion while maintaining safety
 export interface BusterFormApi {
@@ -22,7 +15,7 @@ export interface BusterFormApi {
     isDirty: boolean;
   };
   AppForm: React.ComponentType<{ children?: React.ReactNode }>;
-  // biome-ignore lint/suspicious/noExplicitAny: I am just using any here because it was a pain to type this out
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- I am just using any here because it was a pain to type this out
   AppField: any;
   SubscribeButton: React.ComponentType<{
     submitLabel: string;

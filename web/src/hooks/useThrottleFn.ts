@@ -9,7 +9,7 @@ interface ThrottleOptions {
   trailing?: boolean;
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: Required for generic function types
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required for generic function types
 export function useThrottleFn<T extends (...args: any[]) => any>(
   fn: T,
   options: ThrottleOptions = {}

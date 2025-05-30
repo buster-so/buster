@@ -5,6 +5,7 @@ import { pathnameMiddleware } from './middleware/pathnameMiddleware';
 
 export async function middleware(request: NextRequest) {
   try {
+    // eslint-disable-next-line prefer-const
     let [response, user] = await updateSession(request);
 
     response = await pathnameMiddleware(request, response);

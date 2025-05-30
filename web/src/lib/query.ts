@@ -3,7 +3,7 @@ import type { RustApiError } from '@/api/buster_rest/errors';
 import { userQueryKeys } from '@/api/query_keys/users';
 
 export const isQueryStale = (
-  // biome-ignore lint/suspicious/noExplicitAny: It really doesn't matter what the type is here
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- It really doesn't matter what the type is here
   options: ReturnType<typeof queryOptions<any, RustApiError, any>>,
   queryClient: QueryClient
 ): boolean => {

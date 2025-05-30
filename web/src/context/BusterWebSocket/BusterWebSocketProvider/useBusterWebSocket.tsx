@@ -46,7 +46,7 @@ const useBusterWebSocketHook = ({
 }) => {
   const { openErrorNotification } = useBusterNotifications();
 
-  // biome-ignore lint/suspicious/noExplicitAny: this truly can be anything
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- this truly can be anything
   const onMessage = useMemoizedFn((responseMessage: BusterSocketResponseBase<string, any>) => {
     try {
       const { route, payload, error } = responseMessage;
@@ -122,7 +122,7 @@ const useBusterSocketListeners = (props: {
 
   const once: BusterSocket['once'] = useMemoizedFn(({ route, callback }) => {
     return new Promise((resolve, reject) => {
-      // biome-ignore lint/suspicious/noExplicitAny: this truly can be anything
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- this truly can be anything
       const onceCallback = (payload: any) => {
         callback(payload);
         off({ route: route as '/chats/post:initializeChat', callback: onceCallback });
@@ -148,12 +148,12 @@ const useBusterSocketListeners = (props: {
       const { emitEvent, responseEvent } = params;
       const { route, callback, onError } = responseEvent;
       const promise = new Promise<Parameters<T['callback']>[0]>((resolve, reject) => {
-        // biome-ignore lint/suspicious/noExplicitAny: this truly can be anything
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- this truly can be anything
         const promiseCallback = (d: any) => {
           callback(d);
           resolve(d);
         };
-        // biome-ignore lint/suspicious/noExplicitAny: this truly can be anything
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- this truly can be anything
         const onErrorCallback = (d: any) => {
           if (!onError) openErrorNotification(d);
           else onError?.(d);

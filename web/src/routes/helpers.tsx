@@ -24,7 +24,7 @@ export const pathNameToRoute = (
   params: Record<string, unknown>
 ): BusterRoutes => {
   const route = Object.values(BusterRoutes).find((r) => {
-    // biome-ignore lint/suspicious/noExplicitAny: I am using any here to make it easier because I am lazy okay
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- I am using any here to make it easier because I am lazy okay
     return r === pathName || createBusterRoute({ route: r, ...(params as any) }) === pathName;
   });
 
@@ -79,7 +79,8 @@ export const pathNameToParentRoute = (
   params: Record<string, unknown>
 ): BusterRoutes => {
   const route = Object.values(BusterRoutes).find((r) => {
-    // biome-ignore lint/suspicious/noExplicitAny: I am just using any here because it was a pain to type this out
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- I am just using any here because it was a pain to type this out
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- testing
     return r === pathName || createBusterRoute({ route: r, ...(params as any) }) === pathName;
   });
 

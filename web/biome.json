@@ -47,6 +47,9 @@
         "useKeyWithClickEvents": "off",
         "noSvgWithoutTitle": "off",
         "noStaticElementInteractions": "off"
+      },
+      "nursery": {
+        "useSortedClasses": "off"
       }
     }
   },

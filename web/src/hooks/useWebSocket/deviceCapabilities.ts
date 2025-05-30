@@ -56,7 +56,7 @@ async function detectDeviceCapabilities(): Promise<DeviceCapabilities> {
     const cores = navigator.hardwareConcurrency || 2;
 
     // Check device memory (if available)
-    // biome-ignore lint/suspicious/noExplicitAny: navigator.deviceMemory is experimental and not standardized
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- navigator.deviceMemory is experimental and not standardized
     const memory = (navigator as any).deviceMemory || 4;
 
     // Calculate device tier

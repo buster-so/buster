@@ -12,7 +12,7 @@ type WebSocketHookProps = {
   canConnect: boolean;
   url: string;
   checkTokenValidity: SupabaseContextReturnType['checkTokenValidity'];
-  // biome-ignore lint/suspicious/noExplicitAny: Generic message data type for WebSocket responses
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Generic message data type for WebSocket responses
   onMessage: (data: BusterSocketResponseBase<string, any>) => void; // Required prop for handling messages
 };
 
@@ -27,7 +27,7 @@ const useWebSocket = ({ url, checkTokenValidity, canConnect, onMessage }: WebSoc
   const { online } = useNetwork();
   const messageQueue = useRef<QueuedMessage[]>([]); // Updated queue type
   const processing = useRef<boolean>(false); // Flag to indicate if processing is ongoing
-  // biome-ignore lint/suspicious/noExplicitAny: Generic message queue for WebSocket data
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Generic message queue for WebSocket data
   const sendQueue = useRef<Record<string, any>[]>([]); // Queue to store messages to be sent
   const ws = useRef<WebSocket | null>(null);
   const capabilities = useRef<DeviceCapabilities | null>(null);
@@ -125,7 +125,7 @@ const useWebSocket = ({ url, checkTokenValidity, canConnect, onMessage }: WebSoc
     }
   });
 
-  // biome-ignore lint/suspicious/noExplicitAny: Generic data type for WebSocket messages
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Generic data type for WebSocket messages
   const sendJSONMessage = useMemoizedFn(async (data: Record<string, any>, isFromQueue = false) => {
     await checkTokenValidity(); //needed! This will refresh the token if it is expired. All other messages will be queued until the token is refreshed.
     if (ws.current?.readyState === ReadyState.Closed) {
