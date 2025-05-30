@@ -80,10 +80,6 @@ jobs:
     needs: [build-frontend, build-api]
     runs-on: blacksmith-32vcpu-ubuntu-2204
     environment: testing
-    strategy:
-      matrix:
-        shardIndex: [0, 1, 2, 3]
-        totalShards: [4]
     services:
       redis:
         image: redis
@@ -135,7 +131,25 @@ jobs:
         run: |
           docker run -d --name local-api -p 3001:3001 \
             --network=host \
-            -e <all your env vars…> \
+            -e DATABASE_URL='postgres://postgres:postgres@127.0.0.1:54322/postgres' \
+            -e POOLER_URL='postgres://postgres:postgres@127.0.0.1:54322/postgres' \
+            -e REDIS_URL='redis://127.0.0.1:6379' \
+            -e JWT_SECRET='super-secret-jwt-token-with-at-least-32-characters-long' \
+            -e SUPABASE_URL='http://127.0.0.1:54321' \
+            -e SUPABASE_SERVICE_ROLE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MjM0MzA5Nn0.EGgMpd9zvvHPCOq4DJRLwzJ1iS3GV4AEyzguXGcbEIY' \
+            -e ENVIRONMENT='development' \
+            -e BUSTER_URL='http://localhost:3000' \
+            -e BUSTER_WH_TOKEN='buster-wh-token' \
+            -e LOG_LEVEL='debug' \
+            -e PORT='3001' \
+            -e RUST_LOG='debug' \
+            -e OPENAI_API_KEY='${{ secrets.GH_ACTIONS_OPENAI_API_KEY }}' \
+            -e RESEND_API_KEY='${{ secrets.GH_ACTIONS_RESEND_API_KEY }}' \
+            -e RERANK_API_KEY='${{ secrets.GH_ACTIONS_COHERE_API_KEY }}' \
+            -e RERANK_MODEL='rerank-v3.5' \
+            -e RERANK_BASE_URL='https://api.cohere.com/v2/rerank' \
+            -e LLM_API_KEY='${{ secrets.GH_ACTIONS_LLM_API_KEY }}' \
+            -e LLM_BASE_URL='${{ secrets.GH_ACTIONS_LLM_BASE_URL }}' \
             local-api-test:latest
 
       - name: Wait for API Health Check
@@ -148,10 +162,10 @@ jobs:
           done
           echo "API did not become healthy." && exit 1
 
-      - name: Run Playwright Tests (Shard ${{ matrix.shardIndex }})
+      - name: Run Playwright Tests
         working-directory: ./web
         run: |
-          npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.totalShards }}
+          npx playwright test
         env:
           CI: "true"
           DEBUG: "pw:api"
