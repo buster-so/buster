@@ -105,7 +105,8 @@ const adminTools = (currentParentRoute: BusterRoutes): ISidebarGroup => ({
       label: 'Logs',
       icon: <UnorderedList2 />,
       route: BusterRoutes.APP_LOGS,
-      id: BusterRoutes.APP_LOGS
+      id: BusterRoutes.APP_LOGS,
+      collapsedTooltip: 'Logs'
     },
     // {
     //   label: 'Terms & Definitions',
@@ -117,7 +118,8 @@ const adminTools = (currentParentRoute: BusterRoutes): ISidebarGroup => ({
       label: 'Datasets',
       icon: <Table />,
       route: BusterRoutes.APP_DATASETS,
-      id: BusterRoutes.APP_DATASETS
+      id: BusterRoutes.APP_DATASETS,
+      collapsedTooltip: 'Datasets'
     }
   ].map((x) => ({
     ...x,

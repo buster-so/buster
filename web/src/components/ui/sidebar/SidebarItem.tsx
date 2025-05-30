@@ -5,6 +5,8 @@ import { cn } from '@/lib/classMerge';
 import { Button } from '../buttons/Button';
 import { Xmark } from '../icons';
 import type { ISidebarItem } from './interfaces';
+import { COLLAPSED_HIDDEN_BLOCK } from './config';
+import { AppTooltip } from '../tooltip';
 
 const itemVariants = cva(
   'flex items-center group justify-between rounded px-1.5 min-h-7 max-h-7 text-base transition-colors cursor-pointer',
@@ -74,7 +76,8 @@ export const SidebarItem: React.FC<
     variant = 'default',
     onRemove,
     className = '',
-    onClick
+    onClick,
+    collapsedTooltip
   }) => {
     const ItemNode = disabled || !route ? 'div' : Link;
 
@@ -84,14 +87,22 @@ export const SidebarItem: React.FC<
         className={cn(itemVariants({ active, disabled, variant }), className)}
         onClick={onClick}>
         <div className="flex items-center gap-2 overflow-hidden">
-          <span
-            className={cn('text-icon-size! text-icon-color', {
-              'text-text-disabled': disabled,
-              'pl-4.5': !icon //hmmm... maybe this should be a prop?
-            })}>
-            {icon}
+          <AppTooltip
+            title={collapsedTooltip || label}
+            side="right"
+            sideOffset={8}
+            delayDuration={750}>
+            <span
+              className={cn('text-icon-size! text-icon-color', {
+                'text-text-disabled': disabled,
+                'pl-4.5': !icon //hmmm... maybe this should be a prop?
+              })}>
+              {icon}
+            </span>
+          </AppTooltip>
+          <span className={cn(COLLAPSED_HIDDEN_BLOCK, 'leading-1.3 truncate', className)}>
+            {label}
           </span>
-          <span className="leading-1.3 truncate">{label}</span>
         </div>
         {onRemove && (
           <Button

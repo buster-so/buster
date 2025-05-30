@@ -10,20 +10,13 @@ import { useAppSplitterContext } from '../layouts/AppSplitter/AppSplitterProvide
 import { COLLAPSED_SIDEBAR_WIDTH, DEFAULT_SIDEBAR_WIDTH } from './config';
 
 export const Sidebar: React.FC<SidebarProps> = React.memo(
-  ({
-    header,
-    content,
-    footer,
-    useCollapsible = true,
-    isDefaultCollapsed: initialIsCollapsed = false,
-    onCollapseClick
-  }) => {
+  ({ header, content, footer, useCollapsible = true, onCollapseClick }) => {
     const animateWidth = useAppSplitterContext((x) => x.animateWidth);
     const getSizesInPixels = useAppSplitterContext((x) => x.getSizesInPixels);
 
     const onCollapseClickPreflight = useMemoizedFn(() => {
       const sizes = getSizesInPixels();
-      const parsedCollapsedWidth = parseInt(COLLAPSED_SIDEBAR_WIDTH);
+      const parsedCollapsedWidth = parseInt(COLLAPSED_SIDEBAR_WIDTH) + 6; //6 for a little buffer
       const parsedCurrentSize = sizes[0];
       const isCollapsed = parsedCurrentSize <= parsedCollapsedWidth;
       onCollapseClick?.(isCollapsed);
@@ -37,7 +30,7 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(
           <div className="mb-5">{header}</div>
           <div className="flex flex-grow flex-col space-y-4.5 overflow-y-auto pb-3">
             {content.map((item) => (
-              <ContentSelector key={item.id} content={item} />
+              <ContentSelector key={item.id} content={item} useCollapsible={useCollapsible} />
             ))}
           </div>
         </div>
@@ -55,11 +48,11 @@ Sidebar.displayName = 'Sidebar';
 
 const ContentSelector: React.FC<{
   content: SidebarProps['content'][number];
-}> = React.memo(({ content }) => {
+  useCollapsible: boolean;
+}> = React.memo(({ content, useCollapsible }) => {
   if (isSidebarGroup(content)) {
-    return <SidebarCollapsible {...content} />;
+    return <SidebarCollapsible {...content} useCollapsible={useCollapsible} />;
   }
-
   return <SidebarList items={content.items} />;
 });
 ContentSelector.displayName = 'ContentSelector';
