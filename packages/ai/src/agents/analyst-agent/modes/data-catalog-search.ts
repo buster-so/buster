@@ -1,6 +1,6 @@
 import type { RuntimeContext } from '@mastra/core/runtime-context';
-import { getDefaultModel } from './base';
-import type { ModeRuntimeContext } from './base';
+import { getDefaultModel } from './analyst-base';
+import type { AnalystRuntimeContext } from './analyst-base';
 import {
   type DataCatalogSearchPromptVariables,
   DataCatalogSearchPromptVariablesSchema,
@@ -113,42 +113,29 @@ export const createDataCatalogSearchPrompt = (variables: unknown): string => {
 
 export const getInstructions = ({
   runtimeContext,
-}: { runtimeContext: RuntimeContext<ModeRuntimeContext> }) => {
+}: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }) => {
   // Access the context data properly
   const contextData = (runtimeContext as any)?.state || runtimeContext;
+  const datasetDescriptions =
+    contextData?.datasetWithDescriptions?.join('\n\n') ||
+    '<Dataset descriptions currently unavailable>';
   const datasets = contextData?.datasetWithDescriptions?.join('\n\n') || '';
 
-  return `**Role & Task**
-You are a Search Strategist Agent. Your primary goal is to analyze the conversation history, the most recent user message, and available dataset descriptions to formulate the optimal parameters for the \`search_data_catalog\` tool or determine that no search is needed (\`no_search_needed\`).
-
-Your sole output MUST be a call to **ONE** of these tools: \`search_data_catalog\` or \`no_search_needed\`.
-
-**Available Dataset Descriptions:**
-\`\`\`
-${datasets}
-\`\`\`
-*(This section contains summaries or relevant snippets of YAML/metadata for datasets the agent is aware of. Use this to reason about potential joins, available attributes, and data relationships.)*
-
-**Core Responsibilities:**
-1.  **Analyze Request & Context**: Evaluate the user's request (\`"content"\` field of \`"role": "user"\` messages), conversation history, and dataset descriptions.
-2.  **Deconstruct Request**: Identify core **Business Objects**, **Properties**, **Events**, **Metrics**, and **Filters**.
-3.  **Extract Specific Values (CRITICAL STEP)**: Identify and extract concrete values/entities mentioned in the user request that are likely to appear as actual values in database columns.
-4.  **Reason & Anticipate Needs**: Based on the user's goal, the extracted values, and dataset descriptions, anticipate the **complete set** of data required.
-5.  **Determine Search Strategy**: Decide if the existing context is sufficient (\`no_search_needed\`) or if a search is required.
-6.  **Generate Tool Call Parameters**: If searching, formulate parameters for \`search_data_catalog\`, deciding the appropriate combination of \`specific_queries\`, \`exploratory_topics\`, and the extracted \`value_search_terms\`.
-
-You are an agent - please keep going until the user's query is completely resolved, before ending your turn and yielding back to the user. Only terminate your turn when you are sure that the problem is solved.`;
+  return createDataCatalogSearchPrompt({
+    datasetDescriptions,
+    datasets,
+  });
 };
 
 export const getModel = ({
   runtimeContext: _runtimeContext,
-}: { runtimeContext: RuntimeContext<ModeRuntimeContext> }) => {
+}: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }) => {
   return getDefaultModel();
 };
 
 export const getTools = ({
   runtimeContext: _runtimeContext,
-}: { runtimeContext: RuntimeContext<ModeRuntimeContext> }) => {
+}: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }) => {
   return {
     // TODO: Implement data catalog search mode tools
     // Based on the Rust code, this should include:

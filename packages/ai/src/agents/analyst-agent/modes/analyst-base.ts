@@ -34,8 +34,8 @@ import {
   getTools as getReviewTools,
 } from './review';
 
-// Define the agent modes enum
-export enum AgentMode {
+// Define the analyst agent modes
+export enum AnalystMode {
   Initialization = 'initialization',
   DataCatalogSearch = 'data_catalog_search',
   Planning = 'planning',
@@ -44,8 +44,8 @@ export enum AgentMode {
   FollowUpInitialization = 'follow_up_initialization',
 }
 
-// Define the runtime context interface that matches the Rust ModeAgentData
-export interface ModeRuntimeContext {
+// Define the analyst agent runtime context
+export interface AnalystRuntimeContext {
   // Shared data from ModeAgentData
   datasetWithDescriptions?: string[];
   todaysDate?: string;
@@ -61,8 +61,8 @@ export interface ModeRuntimeContext {
   sessionId?: string;
 }
 
-// Define the mode configuration interface
-export interface ModeConfiguration {
+// Define the analyst mode configuration
+export interface AnalystModeConfiguration {
   instructions: string;
   model: any; // AI SDK model
   tools: Record<string, any>;
@@ -73,8 +73,10 @@ export const getDefaultModel = () => {
   return wrapAISDKModel(anthropic('claude-sonnet-4-20250514', {}));
 };
 
-// Determine agent mode based on runtime context (stub implementation)
-export function determineAgentMode(runtimeContext: RuntimeContext<ModeRuntimeContext>): AgentMode {
+// Determine analyst agent mode based on runtime context
+export function determineAnalystMode(
+  runtimeContext: RuntimeContext<AnalystRuntimeContext>
+): AnalystMode {
   // Access the context data properly - it might be in state or context property
   const context = (runtimeContext as any)?.state || runtimeContext;
 
@@ -90,80 +92,80 @@ export function determineAgentMode(runtimeContext: RuntimeContext<ModeRuntimeCon
 
   // Handle the state before the user provides their first prompt in this turn
   if (!hasUserPrompt && !isFollowUp) {
-    return AgentMode.Initialization;
+    return AnalystMode.Initialization;
   }
 
   // Review always takes precedence after user speaks
   if (needsReview) {
-    return AgentMode.Review;
+    return AnalystMode.Review;
   }
 
   // If we haven't searched the catalog yet, do that now
   if (!searchedCatalog) {
-    return AgentMode.DataCatalogSearch;
+    return AnalystMode.DataCatalogSearch;
   }
 
   // If we have context but no plan, plan
   if (hasDataContext && !hasPlan) {
-    return AgentMode.Planning;
+    return AnalystMode.Planning;
   }
 
   // If we have context and a plan, execute analysis
   if (hasDataContext && hasPlan) {
-    return AgentMode.Analysis;
+    return AnalystMode.Analysis;
   }
 
   // Fallback: If state is ambiguous after searching and no review needed
   if (searchedCatalog && !hasDataContext && !hasPlan) {
-    return AgentMode.Planning;
+    return AnalystMode.Planning;
   }
 
   // Default fallback
-  return AgentMode.Initialization;
+  return AnalystMode.Initialization;
 }
 
-// Get mode configuration based on the determined mode
-export function getModeConfiguration(
-  mode: AgentMode,
-  runtimeContext: RuntimeContext<ModeRuntimeContext>
-): ModeConfiguration {
+// Get analyst mode configuration based on the determined mode
+export function getAnalystModeConfiguration(
+  mode: AnalystMode,
+  runtimeContext: RuntimeContext<AnalystRuntimeContext>
+): AnalystModeConfiguration {
   switch (mode) {
-    case AgentMode.Initialization:
+    case AnalystMode.Initialization:
       return {
         instructions: getInitializationInstructions({ runtimeContext }),
         model: getInitializationModel({ runtimeContext }),
         tools: getInitializationTools({ runtimeContext }),
       };
 
-    case AgentMode.DataCatalogSearch:
+    case AnalystMode.DataCatalogSearch:
       return {
         instructions: getDataCatalogSearchInstructions({ runtimeContext }),
         model: getDataCatalogSearchModel({ runtimeContext }),
         tools: getDataCatalogSearchTools({ runtimeContext }),
       };
 
-    case AgentMode.Planning:
+    case AnalystMode.Planning:
       return {
         instructions: getPlanningInstructions({ runtimeContext }),
         model: getPlanningModel({ runtimeContext }),
         tools: getPlanningTools({ runtimeContext }),
       };
 
-    case AgentMode.Analysis:
+    case AnalystMode.Analysis:
       return {
         instructions: getAnalysisInstructions({ runtimeContext }),
         model: getAnalysisModel({ runtimeContext }),
         tools: getAnalysisTools({ runtimeContext }),
       };
 
-    case AgentMode.Review:
+    case AnalystMode.Review:
       return {
         instructions: getReviewInstructions({ runtimeContext }),
         model: getReviewModel({ runtimeContext }),
         tools: getReviewTools({ runtimeContext }),
       };
 
-    case AgentMode.FollowUpInitialization:
+    case AnalystMode.FollowUpInitialization:
       return {
         instructions: getFollowUpInitializationInstructions({ runtimeContext }),
         model: getFollowUpInitializationModel({ runtimeContext }),
@@ -171,17 +173,17 @@ export function getModeConfiguration(
       };
 
     default:
-      throw new Error(`Unknown agent mode: ${mode}`);
+      throw new Error(`Unknown analyst mode: ${mode}`);
   }
 }
 
-// Main function to get agent configuration
-export function getAgentConfiguration(runtimeContext: RuntimeContext<ModeRuntimeContext>): {
-  mode: AgentMode;
-  configuration: ModeConfiguration;
+// Main function to get analyst agent configuration
+export function getAnalystConfiguration(runtimeContext: RuntimeContext<AnalystRuntimeContext>): {
+  mode: AnalystMode;
+  configuration: AnalystModeConfiguration;
 } {
-  const mode = determineAgentMode(runtimeContext);
-  const configuration = getModeConfiguration(mode, runtimeContext);
+  const mode = determineAnalystMode(runtimeContext);
+  const configuration = getAnalystModeConfiguration(mode, runtimeContext);
 
   return { mode, configuration };
 }

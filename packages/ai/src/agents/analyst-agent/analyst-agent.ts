@@ -5,47 +5,44 @@ import { Memory } from '@mastra/memory';
 
 import { initLogger } from 'braintrust';
 
-// Import the new mode system
-import { AgentMode, type ModeRuntimeContext, getAgentConfiguration } from './modes/base';
+// Import the analyst mode system
+import {
+  AnalystMode,
+  type AnalystRuntimeContext,
+  getAnalystConfiguration,
+} from './modes/analyst-base';
 
 initLogger({
   apiKey: process.env.BRAINTRUST_KEY,
   projectName: 'Analyst Agent',
 });
 
-interface AnalysisModeRuntimeContext extends ModeRuntimeContext {
-  // Additional fields specific to this agent if needed
-}
-
-const analysisModeInstructions = ({
+const getAnalystInstructions = ({
   runtimeContext,
-}: { runtimeContext: RuntimeContext<AnalysisModeRuntimeContext> }) => {
-  // Use the new mode system to get instructions
-  const { configuration } = getAgentConfiguration(runtimeContext);
+}: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }) => {
+  const { configuration } = getAnalystConfiguration(runtimeContext);
   return configuration.instructions;
 };
 
-const analysisModeTools = ({
+const getAnalystTools = ({
   runtimeContext,
-}: { runtimeContext: RuntimeContext<AnalysisModeRuntimeContext> }) => {
-  // Use the new mode system to get tools
-  const { configuration } = getAgentConfiguration(runtimeContext);
+}: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }) => {
+  const { configuration } = getAnalystConfiguration(runtimeContext);
   return configuration.tools;
 };
 
-const analysisModeModel = ({
+const getAnalystModel = ({
   runtimeContext,
-}: { runtimeContext: RuntimeContext<AnalysisModeRuntimeContext> }) => {
-  // Use the new mode system to get model
-  const { configuration } = getAgentConfiguration(runtimeContext);
+}: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }) => {
+  const { configuration } = getAnalystConfiguration(runtimeContext);
   return configuration.model;
 };
 
 export const analystAgent = new Agent({
   name: 'Analyst Agent',
-  instructions: analysisModeInstructions,
-  model: analysisModeModel,
-  tools: analysisModeTools,
+  instructions: getAnalystInstructions,
+  model: getAnalystModel,
+  tools: getAnalystTools,
   memory: new Memory({
     storage: new LibSQLStore({
       url: 'file:../mastra.db', // path is relative to the .mastra/output directory
@@ -53,5 +50,5 @@ export const analystAgent = new Agent({
   }),
 });
 
-// Export the mode system for use in other parts of the application
-export { getAgentConfiguration, AgentMode, type ModeRuntimeContext };
+// Export the analyst mode system for use in other parts of the application
+export { getAnalystConfiguration, AnalystMode, type AnalystRuntimeContext };

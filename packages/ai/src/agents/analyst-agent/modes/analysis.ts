@@ -1,6 +1,6 @@
 import type { RuntimeContext } from '@mastra/core/runtime-context';
-import { getDefaultModel } from './base';
-import type { ModeRuntimeContext } from './base';
+import { getDefaultModel } from './analyst-base';
+import type { AnalystRuntimeContext } from './analyst-base';
 import {
   type AnalysisPromptVariables,
   AnalysisPromptVariablesSchema,
@@ -254,7 +254,7 @@ export const createAnalysisPrompt = (variables: unknown): string => {
 
 export const getInstructions = ({
   runtimeContext,
-}: { runtimeContext: RuntimeContext<ModeRuntimeContext> }) => {
+}: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }) => {
   const todaysDate = new Date().toISOString();
   const dataSourceSyntax = runtimeContext.get('dataSourceSyntax') as string | undefined;
   const sqlDialectGuidance = getSqlDialectGuidance(dataSourceSyntax);
@@ -267,13 +267,13 @@ export const getInstructions = ({
 
 export const getModel = ({
   runtimeContext: _runtimeContext,
-}: { runtimeContext: RuntimeContext<ModeRuntimeContext> }) => {
+}: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }) => {
   return getDefaultModel();
 };
 
 export const getTools = ({
   runtimeContext: _runtimeContext,
-}: { runtimeContext: RuntimeContext<ModeRuntimeContext> }) => {
+}: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }) => {
   return {
     // TODO: Implement analysis mode tools
     // Based on the Rust code, this should include:

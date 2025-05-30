@@ -33,4 +33,4 @@ export {
 } from './review';
 
 // Export the base configuration system
-export * from './base';
+export * from './analyst-base';

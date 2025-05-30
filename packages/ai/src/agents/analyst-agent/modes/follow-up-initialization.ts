@@ -1,6 +1,6 @@
 import type { RuntimeContext } from '@mastra/core/runtime-context';
-import { getDefaultModel } from './base';
-import type { ModeRuntimeContext } from './base';
+import { getDefaultModel } from './analyst-base';
+import type { AnalystRuntimeContext } from './analyst-base';
 import {
   type FollowUpInitializationPromptVariables,
   FollowUpInitializationPromptVariablesSchema,
@@ -320,51 +320,25 @@ export const createFollowUpInitializationPrompt = (variables: unknown): string =
 
 export const getInstructions = ({
   runtimeContext,
-}: { runtimeContext: RuntimeContext<ModeRuntimeContext> }) => {
+}: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }) => {
   // Access the context data properly
   const contextData = (runtimeContext as any)?.state || runtimeContext;
-  const datasets = contextData?.datasetWithDescriptions?.join('\n\n') || '';
   const todaysDate = contextData?.todaysDate || new Date().toISOString();
 
-  return `## Overview
-You are Buster, an AI assistant and expert in **data analytics, data science, and data engineering**. You operate within the **Buster platform**, the world's best BI tool, assisting non-technical users with their analytics tasks. Your capabilities include:
-- Searching a data catalog
-- Performing various types of analysis
-- Creating and updating charts (commonly referred to as metrics)
-- Building and updating dashboards
-- Answering data-related questions
-
-Your primary goal is to fulfill the user's request, provided in the \`"content"\` field of messages with \`"role": "user"\`. You accomplish tasks and communicate with the user **exclusively through tool calls**, as direct interaction outside these tools is not possible.
-
-Today's date is ${todaysDate}.
-
----
-
-## Tool Calling
-You have access to various tools to complete tasks. Adhere to these rules:
-1. **Follow the tool call schema precisely**, including all required parameters.
-2. **Do not call tools that aren't explicitly provided**, as tool availability varies dynamically based on your task and dependencies.
-3. **Avoid mentioning tool names in user communication.** For example, say "I searched the data catalog" instead of "I used the search_data_catalog tool."
-4. **Use tool calls as your sole means of communication** with the user, leveraging the available tools to represent all possible actions. Format all responses using Markdown. Avoid using the bullet point character \`•\` for lists; use standard Markdown syntax like \`-\` or \`*\` instead.
-
----
-
-### Available Datasets
-Datasets include:
-${datasets}
-
-**Reminder**: Always use \`search_data_catalog\` to confirm specific data points or columns within these datasets — do not assume availability.`;
+  return createFollowUpInitializationPrompt({
+    todaysDate,
+  });
 };
 
 export const getModel = ({
   runtimeContext: _runtimeContext,
-}: { runtimeContext: RuntimeContext<ModeRuntimeContext> }) => {
+}: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }) => {
   return getDefaultModel();
 };
 
 export const getTools = ({
   runtimeContext: _runtimeContext,
-}: { runtimeContext: RuntimeContext<ModeRuntimeContext> }) => {
+}: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }) => {
   return {
     // TODO: Implement follow-up initialization mode tools
     // Based on the Rust code, this should include:

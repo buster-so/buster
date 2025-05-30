@@ -1,6 +1,6 @@
 import type { RuntimeContext } from '@mastra/core/runtime-context';
-import { getDefaultModel } from './base';
-import type { ModeRuntimeContext } from './base';
+import { getDefaultModel } from './analyst-base';
+import type { AnalystRuntimeContext } from './analyst-base';
 import {
   type PlanningPromptVariables,
   PlanningPromptVariablesSchema,
@@ -219,46 +219,27 @@ export const createPlanningPrompt = (variables: unknown): string => {
 
 export const getInstructions = ({
   runtimeContext,
-}: { runtimeContext: RuntimeContext<ModeRuntimeContext> }) => {
+}: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }) => {
   // Access the context data properly
   const contextData = (runtimeContext as any)?.state || runtimeContext;
   const datasets = contextData?.datasetWithDescriptions?.join('\n\n') || '';
   const todaysDate = contextData?.todaysDate || new Date().toISOString();
 
-  return `## Overview
-
-You are Buster, an AI data analytics assistant designed to help users with data-related tasks. Your role involves interpreting user requests, locating relevant data, and executing well-defined analysis plans. You excel at handling both simple and complex analytical tasks, relying on your ability to create clear, step-by-step plans that precisely meet the user's needs.
-
-**Important**: Pay close attention to the conversation history. If this is a follow-up question, leverage the context from previous turns (e.g., existing data context, previous plans or results) to refine or build upon the analysis.
-
-Today's date is ${todaysDate}.
-
-## Workflow Summary
-
-1. **Search the data catalog** to locate relevant data (if needed, based on conversation history).
-2. **Assess the adequacy** of the search results:
-   - If adequate or partially adequate, proceed to create or update a plan.
-   - If inadequate (required data is missing), use \`finish_and_respond\` to inform the user.
-   - If the request itself is partially or fully unsupported based on known limitations, proceed to create a plan for the supported parts (if any), noting the limitations.
-3. **Create or update a plan** using the appropriate create plan tool, considering previous interactions and noting any unsupported aspects.
-4. **Execute the plan** by creating or modifying assets such as metrics or dashboards for the supported parts of the request.
-5. **Send a final response to the user** using \`finish_and_respond\`, explaining what was done and clearly stating any parts of the original request that could not be fulfilled due to limitations.
-
-**Your current task is to create or update a plan based on the latest user request and conversation history.**
-
-## Available Datasets:
-${datasets}`;
+  return createPlanningPrompt({
+    todaysDate,
+    datasets,
+  });
 };
 
 export const getModel = ({
   runtimeContext: _runtimeContext,
-}: { runtimeContext: RuntimeContext<ModeRuntimeContext> }) => {
+}: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }) => {
   return getDefaultModel();
 };
 
 export const getTools = ({
   runtimeContext: _runtimeContext,
-}: { runtimeContext: RuntimeContext<ModeRuntimeContext> }) => {
+}: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }) => {
   return {
     // TODO: Implement planning mode tools
     // Based on the Rust code, this should include:
