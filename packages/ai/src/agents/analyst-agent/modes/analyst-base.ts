@@ -1,7 +1,7 @@
 import { anthropic } from '@ai-sdk/anthropic';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
+import type { LanguageModelV1 } from 'ai';
 import { wrapAISDKModel } from 'braintrust';
-
 // Import specific functions from each mode
 import {
   getInstructions as getAnalysisInstructions,
@@ -37,11 +37,11 @@ import {
 // Define the analyst agent modes
 export enum AnalystMode {
   Initialization = 'initialization',
-  DataCatalogSearch = 'data_catalog_search',
+  DataCatalogSearch = 'dataCatalogSearch',
   Planning = 'planning',
   Analysis = 'analysis',
   Review = 'review',
-  FollowUpInitialization = 'follow_up_initialization',
+  FollowUpInitialization = 'followUpInitialization',
 }
 
 // Define the analyst agent runtime context
@@ -64,8 +64,14 @@ export interface AnalystRuntimeContext {
 // Define the analyst mode configuration
 export interface AnalystModeConfiguration {
   instructions: string;
-  model: any; // AI SDK model
-  tools: Record<string, any>;
+  model: LanguageModelV1; // AI SDK model
+  tools:
+    | ReturnType<typeof getAnalysisTools>
+    | ReturnType<typeof getInitializationTools>
+    | ReturnType<typeof getDataCatalogSearchTools>
+    | ReturnType<typeof getPlanningTools>
+    | ReturnType<typeof getReviewTools>
+    | ReturnType<typeof getFollowUpInitializationTools>;
 }
 
 // Default model factory function
@@ -73,22 +79,31 @@ export const getDefaultModel = () => {
   return wrapAISDKModel(anthropic('claude-sonnet-4-20250514', {}));
 };
 
+// Helper function to extract and normalize context data
+function extractContextFlags(runtimeContext: RuntimeContext<AnalystRuntimeContext>) {
+  const isFollowUp = runtimeContext.get('isFollowUp') || false;
+  const searchedCatalog = runtimeContext.get('searchedDataCatalog') || false;
+  const hasDataContext = runtimeContext.get('dataContext') || false;
+  const hasPlan = runtimeContext.get('planAvailable') || false;
+  const needsReview = runtimeContext.get('reviewNeeded') || false;
+  const hasUserPrompt = runtimeContext.get('userPrompt') || false;
+
+  return {
+    isFollowUp,
+    searchedCatalog,
+    hasDataContext,
+    hasPlan,
+    needsReview,
+    hasUserPrompt,
+  };
+}
+
 // Determine analyst agent mode based on runtime context
 export function determineAnalystMode(
   runtimeContext: RuntimeContext<AnalystRuntimeContext>
 ): AnalystMode {
-  // Access the context data properly - it might be in state or context property
-  const context = (runtimeContext as any)?.state || runtimeContext;
-
-  // TODO: Implement the actual logic from determine_agent_state function
-  // This is stubbed out as requested
-
-  const isFollowUp = context.isFollowUp || false;
-  const searchedCatalog = context.searchedDataCatalog || false;
-  const hasDataContext = context.dataContext && context.dataContext.trim() !== '';
-  const hasPlan = context.planAvailable || false;
-  const needsReview = context.reviewNeeded || false;
-  const hasUserPrompt = !!context.userPrompt;
+  const { isFollowUp, searchedCatalog, hasDataContext, hasPlan, needsReview, hasUserPrompt } =
+    extractContextFlags(runtimeContext);
 
   // Handle the state before the user provides their first prompt in this turn
   if (!hasUserPrompt && !isFollowUp) {

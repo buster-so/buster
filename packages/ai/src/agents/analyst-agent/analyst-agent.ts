@@ -1,10 +1,10 @@
 import { Agent } from '@mastra/core/agent';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
-import { LibSQLStore } from '@mastra/libsql';
-import { Memory } from '@mastra/memory';
+import { PostgresStore } from '@mastra/pg';
 
 import { initLogger } from 'braintrust';
 
+import { Memory } from '@mastra/memory';
 // Import the analyst mode system
 import {
   AnalystMode,
@@ -38,17 +38,33 @@ const getAnalystModel = ({
   return configuration.model;
 };
 
+const DEFAULT_OPTIONS = {
+  maxSteps: 18,
+  temperature: 1,
+  providerOptions: {
+    anthropic: {
+      thinking: { type: 'enabled', budgetTokens: 5000 },
+    },
+  },
+};
+
 export const analystAgent = new Agent({
   name: 'Analyst Agent',
   instructions: getAnalystInstructions,
   model: getAnalystModel,
   tools: getAnalystTools,
   memory: new Memory({
-    storage: new LibSQLStore({
-      url: 'file:../mastra.db', // path is relative to the .mastra/output directory
+    storage: new PostgresStore({
+      connectionString:
+        process.env.DATABASE_URL ||
+        (() => {
+          throw new Error('DATABASE_URL environment variable is required');
+        })(),
+      schemaName: 'mastra',
     }),
   }),
+  defaultGenerateOptions: DEFAULT_OPTIONS,
+  defaultStreamOptions: DEFAULT_OPTIONS,
 });
 
-// Export the analyst mode system for use in other parts of the application
 export { getAnalystConfiguration, AnalystMode, type AnalystRuntimeContext };

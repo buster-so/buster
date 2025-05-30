@@ -8,6 +8,7 @@ import {
   createPromptInjector,
   validateAnalysisPromptVariables,
 } from './types';
+import { doneTool } from '../../../tools/done-tool';
 
 // SQL Dialect Guidance Constants
 const POSTGRES_DIALECT_GUIDANCE = `
@@ -275,13 +276,6 @@ export const getTools = ({
   runtimeContext: _runtimeContext,
 }: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }) => {
   return {
-    // TODO: Implement analysis mode tools
-    // Based on the Rust code, this should include:
-    // - CreateMetricFilesTool
-    // - ModifyMetricFilesTool
-    // - CreateDashboardFilesTool
-    // - ModifyDashboardFilesTool
-    // - Done
-    // - SearchDataCatalogTool
+    doneTool,
   };
 };

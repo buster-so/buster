@@ -18,6 +18,7 @@ type WeatherAgentMessage = {
 type WeatherAgentMessages = WeatherAgentMessage[];
 
 async function runWeatherAgentTask(input: string): Promise<any> {
+
   const weather = await weatherAgent.generate(input, {
     maxSteps: 15,
     temperature: 1,
@@ -26,6 +27,9 @@ async function runWeatherAgentTask(input: string): Promise<any> {
     providerOptions: {
       anthropic: {
         thinking: { type: 'enabled', budgetTokens: 2000 },
+      },
+      openai: {
+        reasoning_effort: 'high',
       },
     },
   });
