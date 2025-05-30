@@ -32,7 +32,6 @@ export const SelectAxisItemLabel = React.memo(
           onClick && 'cursor-pointer'
         )}
         onClick={onClick}
-        onKeyUp={(e) => e.key === 'Enter' && onClick?.()}
         onKeyDown={(e) => e.key === 'Enter' && onClick?.()}>
         <div className={cn('text-icon-color flex')}>{Icon.icon}</div>
         <Text className="truncate">{label}</Text>
