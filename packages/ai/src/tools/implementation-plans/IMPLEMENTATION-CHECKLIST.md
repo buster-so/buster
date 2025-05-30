@@ -4,12 +4,12 @@
 
 ### **✅ FOUNDATION PACKAGES (5 minutes - Human task)**
 
-1. **`packages/rerank/`** - Simple Cohere rerank API wrapper
+1. **`packages/rerank/`** - Simple Cohere rerank API wrapper [DONE]
    - File: `package-rerank.md`
    - Time: 2 minutes
    - Dependencies: axios, COHERE_API_KEY
 
-2. **`packages/stored-values/`** - Vector similarity search
+2. **`packages/stored-values/`** - Vector similarity search [DONE]
    - File: `package-stored-values.md` 
    - Time: 2 minutes
    - Dependencies: @ai-sdk/openai, @database, vector DB

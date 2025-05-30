@@ -66,6 +66,7 @@ Tests are organized into three categories:
 - **Integration Tests**: Test agent behavior end-to-end with tool integration
 - **Evaluation Tests**: LLM-as-Judge evaluations for quality metrics (answer relevancy, helpfulness, safety, etc.)
 
+
 Test configuration includes appropriate timeouts for LLM calls (30-60s) and uses Vitest with custom setup files.
 
 ### TypeScript Configuration

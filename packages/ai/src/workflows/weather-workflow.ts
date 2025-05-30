@@ -186,8 +186,7 @@ const weatherWorkflow = createWorkflow({
   }),
 })
   .then(fetchWeather)
-  .then(planActivities);
-
-weatherWorkflow.commit();
+  .then(planActivities)
+  .commit();
 
 export { weatherWorkflow };

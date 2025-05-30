@@ -71,12 +71,15 @@ export async function rerankResults(
 - Rate limiting and timeout scenarios
 - Invalid API key handling
 
+** Make sure to mock the timeout and rate limit errors.
+
 ### Integration Tests (`rerank.integration.test.ts`)
 - Real Cohere API integration (with API key)
 - Relevance score validation
 - Large document set handling
 - Network failure scenarios
 - API response parsing
+
 
 ## AI Agent Implementation Time
 
