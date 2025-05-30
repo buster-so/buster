@@ -44,7 +44,7 @@ export const useCloseVersionHistory = () => {
         messageId
       }) || 'error'
     );
-  }, [chatId, messageId, metricId, dashboardId]);
+  }, [chatId, messageId, metricId, dashboardId, getInitialChatFileHref, currentRoute]);
 
   const onCloseVersionHistory = useMemoizedFn(() => {
     onChangePage(href);
