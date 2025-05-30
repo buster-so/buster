@@ -13,7 +13,6 @@ import { useMemoizedFn, useSize } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 import {
   convertPxToPercentage,
-  convertPercentageToPx,
   createAutoSaveId,
   easeInOutCubic,
   getCurrentSizePercentage,
@@ -145,15 +144,6 @@ export const AppSplitter = React.memo(
         }
       });
 
-      useEffect(() => {
-        if (preserveSide && !hideSplitter && split === 'vertical') {
-          window.addEventListener('resize', onPreserveSide);
-          return () => {
-            window.removeEventListener('resize', onPreserveSide);
-          };
-        }
-      }, [preserveSide]);
-
       const setSplitSizes = useMemoizedFn((newSizes: (number | string)[]) => {
         // Convert all sizes to percentage strings
         const percentageSizes = newSizes.map((size) =>
@@ -265,6 +255,15 @@ export const AppSplitter = React.memo(
       useImperativeHandle(ref, imperativeHandleMethods);
 
       const size = useSize(containerRef);
+
+      useEffect(() => {
+        if (preserveSide) {
+          window.addEventListener('resize', onPreserveSide);
+          return () => {
+            window.removeEventListener('resize', onPreserveSide);
+          };
+        }
+      }, [preserveSide]);
 
       return (
         <div className={cn('flex h-full w-full flex-col', className)} ref={containerRef}>
