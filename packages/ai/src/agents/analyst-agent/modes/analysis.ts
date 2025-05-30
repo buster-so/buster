@@ -9,6 +9,96 @@ import {
   validateAnalysisPromptVariables,
 } from './types';
 
+// SQL Dialect Guidance Constants
+const POSTGRES_DIALECT_GUIDANCE = `
+- **Date/Time Functions (PostgreSQL/Supabase)**:
+  - **\`DATE_TRUNC\`**: Prefer \`DATE_TRUNC('day', column)\`, \`DATE_TRUNC('week', column)\`, \`DATE_TRUNC('month', column)\`, etc., for grouping time series data. Note that \`'week'\` starts on Monday.
+  - **\`EXTRACT\`**: \`EXTRACT(DOW FROM column)\` (0=Sun), \`EXTRACT(ISODOW FROM column)\` (1=Mon), \`EXTRACT(WEEK FROM column)\`, \`EXTRACT(EPOCH FROM column)\` (Unix timestamp).
+  - **Intervals**: Use \`INTERVAL '1 day'\`, \`INTERVAL '1 month'\`, etc.
+  - **Current Date/Time**: \`CURRENT_DATE\`, \`CURRENT_TIMESTAMP\`, \`NOW()\`.
+`;
+
+const SNOWFLAKE_DIALECT_GUIDANCE = `
+- **Date/Time Functions (Snowflake)**:
+  - **\`DATE_TRUNC\`**: Similar usage: \`DATE_TRUNC('DAY', column)\`, \`DATE_TRUNC('WEEK', column)\`, \`DATE_TRUNC('MONTH', column)\`. Week start depends on \`WEEK_START\` parameter (default Sunday).
+  - **\`EXTRACT\`**: \`EXTRACT(dayofweek FROM column)\` (0=Sun), \`EXTRACT(dayofweekiso FROM column)\` (1=Mon), \`EXTRACT(weekiso FROM column)\`. Use \`DATE_PART\` for more options (e.g., \`DATE_PART('epoch_second', column)\`).
+  - **DateAdd/DateDiff**: Use \`DATEADD(day, 1, column)\`, \`DATEDIFF(day, start_date, end_date)\`.
+  - **Intervals**: Use \`INTERVAL '1 DAY'\`, \`INTERVAL '1 MONTH'\`.
+  - **Current Date/Time**: \`CURRENT_DATE()\`, \`CURRENT_TIMESTAMP()\`, \`SYSDATE()\`.
+`;
+
+const BIGQUERY_DIALECT_GUIDANCE = `
+- **Date/Time Functions (BigQuery)**:
+  - **\`DATE_TRUNC\`**: \`DATE_TRUNC(column, DAY)\`, \`DATE_TRUNC(column, WEEK)\`, \`DATE_TRUNC(column, MONTH)\`, etc. Week starts Sunday by default, use \`WEEK(MONDAY)\` for Monday start.
+  - **\`EXTRACT\`**: \`EXTRACT(DAYOFWEEK FROM column)\` (1=Sun, 7=Sat), \`EXTRACT(ISOWEEK FROM column)\`.
+  - **DateAdd/DateDiff**: Use \`DATE_ADD(column, INTERVAL 1 DAY)\`, \`DATE_SUB(column, INTERVAL 1 MONTH)\`, \`DATE_DIFF(end_date, start_date, DAY)\`.
+  - **Intervals**: Use \`INTERVAL 1 DAY\`, \`INTERVAL 1 MONTH\`.
+  - **Current Date/Time**: \`CURRENT_DATE()\`, \`CURRENT_TIMESTAMP()\`, \`CURRENT_DATETIME()\`.
+`;
+
+const REDSHIFT_DIALECT_GUIDANCE = `
+- **Date/Time Functions (Redshift)**:
+  - **\`DATE_TRUNC\`**: Similar to PostgreSQL: \`DATE_TRUNC('day', column)\`, \`DATE_TRUNC('week', column)\`, \`DATE_TRUNC('month', column)\`. Week starts Monday.
+  - **\`EXTRACT\`**: \`EXTRACT(DOW FROM column)\` (0=Sun), \`EXTRACT(EPOCH FROM column)\`. Also supports \`DATE_PART\` (e.g., \`DATE_PART(w, column)\` for week).
+  - **DateAdd/DateDiff**: Use \`DATEADD(day, 1, column)\`, \`DATEDIFF(day, start_date, end_date)\`.
+  - **Intervals**: Use \`INTERVAL '1 day'\`, \`INTERVAL '1 month'\`.
+  - **Current Date/Time**: \`GETDATE()\`, \`CURRENT_DATE\`, \`SYSDATE\`.
+`;
+
+const MYSQL_MARIADB_DIALECT_GUIDANCE = `
+- **Date/Time Functions (MySQL/MariaDB)**:
+  - **\`DATE_FORMAT\`**: Use \`DATE_FORMAT(column, '%Y-%m-01')\` for month truncation. For week, use \`STR_TO_DATE(CONCAT(YEAR(column),'-',WEEK(column, 1),' Monday'), '%X-%V %W')\` (Mode 1 starts week on Monday).
+  - **\`EXTRACT\`**: \`EXTRACT(DAYOFWEEK FROM column)\` (1=Sun, 7=Sat), \`EXTRACT(WEEK FROM column)\`. \`UNIX_TIMESTAMP(column)\` for epoch seconds.
+  - **DateAdd/DateDiff**: Use \`DATE_ADD(column, INTERVAL 1 DAY)\`, \`DATE_SUB(column, INTERVAL 1 MONTH)\`, \`DATEDIFF(end_date, start_date)\`.
+  - **Intervals**: Use \`INTERVAL 1 DAY\`, \`INTERVAL 1 MONTH\`.
+  - **Current Date/Time**: \`CURDATE()\`, \`NOW()\`, \`CURRENT_TIMESTAMP\`.
+`;
+
+const SQLSERVER_DIALECT_GUIDANCE = `
+- **Date/Time Functions (SQL Server)**:
+  - **\`DATE_TRUNC\`**: Available in recent versions: \`DATE_TRUNC('day', column)\`, \`DATE_TRUNC('week', column)\`, \`DATE_TRUNC('month', column)\`. Week start depends on \`DATEFIRST\` setting.
+  - **\`DATEPART\`**: \`DATEPART(weekday, column)\`, \`DATEPART(iso_week, column)\`, \`DATEPART(epoch, column)\` (requires user function usually).
+  - **DateAdd/DateDiff**: Use \`DATEADD(day, 1, column)\`, \`DATEDIFF(day, start_date, end_date)\`.
+  - **Intervals**: Generally handled by \`DATEADD\`/\`DATEDIFF\`.
+  - **Current Date/Time**: \`GETDATE()\`, \`SYSDATETIME()\`, \`CURRENT_TIMESTAMP\`.
+`;
+
+const DATABRICKS_DIALECT_GUIDANCE = `
+- **Date/Time Functions (Databricks SQL)**:
+  - **\`DATE_TRUNC\`**: \`DATE_TRUNC('DAY', column)\`, \`DATE_TRUNC('WEEK', column)\`, \`DATE_TRUNC('MONTH', column)\`. Week starts Monday.
+  - **\`EXTRACT\`**: \`EXTRACT(DAYOFWEEK FROM column)\` (1=Sun, 7=Sat), \`EXTRACT(WEEK FROM column)\`. \`unix_timestamp(column)\` for epoch seconds.
+  - **DateAdd/DateDiff**: Use \`date_add(column, 1)\`, \`date_sub(column, 30)\`, \`datediff(end_date, start_date)\`.
+  - **Intervals**: Use \`INTERVAL 1 DAY\`, \`INTERVAL 1 MONTH\`.
+  - **Current Date/Time**: \`current_date()\`, \`current_timestamp()\`.
+`;
+
+// Function to get SQL dialect guidance based on data source syntax
+function getSqlDialectGuidance(dataSourceSyntax?: string): string {
+  const syntax = dataSourceSyntax?.toLowerCase() || 'postgres'; // Default to postgres
+
+  switch (syntax) {
+    case 'snowflake':
+      return SNOWFLAKE_DIALECT_GUIDANCE;
+    case 'bigquery':
+      return BIGQUERY_DIALECT_GUIDANCE;
+    case 'redshift':
+      return REDSHIFT_DIALECT_GUIDANCE;
+    case 'mysql':
+    case 'mariadb':
+      return MYSQL_MARIADB_DIALECT_GUIDANCE;
+    case 'sqlserver':
+      return SQLSERVER_DIALECT_GUIDANCE;
+    case 'databricks':
+      return DATABRICKS_DIALECT_GUIDANCE;
+    case 'supabase':
+      return POSTGRES_DIALECT_GUIDANCE; // Supabase uses Postgres
+    case 'postgres':
+      return POSTGRES_DIALECT_GUIDANCE; // Explicit postgres case
+    default:
+      return POSTGRES_DIALECT_GUIDANCE; // Default to Postgres for any others
+  }
+}
+
 export const ANALYSIS_SYSTEM_PROMPT: SystemPrompt<AnalysisPromptVariables> = {
   template: `### Role & Task
 You are Buster, an expert analytics and data engineer. Your job is to assess what data is available (provided via search results) and then provide fast, accurate answers to analytics questions from non-technical users. You do this by analyzing user requests, using the provided data context, and building metrics or dashboards.
@@ -165,33 +255,14 @@ export const createAnalysisPrompt = (variables: unknown): string => {
 export const getInstructions = ({
   runtimeContext,
 }: { runtimeContext: RuntimeContext<ModeRuntimeContext> }) => {
-  // Access the context data properly
-  const contextData = (runtimeContext as any)?.state || runtimeContext;
-  const todaysDate = contextData?.todaysDate || new Date().toISOString();
+  const todaysDate = new Date().toISOString();
+  const dataSourceSyntax = runtimeContext.get('dataSourceSyntax') as string | undefined;
+  const sqlDialectGuidance = getSqlDialectGuidance(dataSourceSyntax);
 
-  return `### Role & Task
-You are Buster, an expert analytics and data engineer. Your job is to assess what data is available (provided via search results) and then provide fast, accurate answers to analytics questions from non-technical users. You do this by analyzing user requests, using the provided data context, and building metrics or dashboards.
-
-**Crucially, you MUST only reference datasets, tables, columns, and values that have been explicitly provided to you through the results of data catalog searches in the conversation history or current context. Do not assume or invent data structures or content. Base all data operations strictly on the provided context.**
-
-Today's date is ${todaysDate}.
-
----
-
-## Workflow Summary
-
-1. **Thoughtfully review the user's request** and the provided data context from previous search steps. Understand the core need behind the query.
-2. **Assess the adequacy** of the *available* data context for fulfilling the specific user request.
-3. **Create a plan** using the appropriate create plan tool, based *only* on the available data and tailored to the user's goal.
-4. **Execute the plan** by creating assets such as metrics or dashboards.
-   - Execute the plan to the best of your ability using *only* the available data.
-   - If you encounter errors or realize data is missing *during* execution, use the appropriate search tool to find the necessary data *before* continuing or resorting to the \`finish_and_respond\` tool.
-   - If only certain aspects of the plan are possible with the available data (even after searching again), proceed to do whatever is possible.
-5. **Send a thoughtful final response to the user** with the \`finish_and_respond\` tool.
-   - Ensure your response directly addresses the user's original request and explains the results clearly.
-   - If you were not able to accomplish all aspects of the user request (due to missing data that couldn't be found), address the things that were not possible in your final response, explaining *why*.
-
-You are an agent - please keep going until the user's query is completely resolved, before ending your turn and yielding back to the user. Only terminate your turn when you are sure that the problem is solved.`;
+  return createAnalysisPrompt({
+    todaysDate,
+    sqlDialectGuidance,
+  });
 };
 
 export const getModel = ({
