@@ -87,7 +87,7 @@ export const LegendItemDot: React.FC<
         type="button"
         onClick={onClick}
         data-testid="legend-dot"
-        className={cn('cursor-pointer', dotStyle, dotVariants({ size }), {
+        className={cn('cursor-pointer', dotStyle, {
           'group-hover:opacity-0': hasFocusItem
         })}
         style={{ backgroundColor: !inactive ? color : undefined }}
