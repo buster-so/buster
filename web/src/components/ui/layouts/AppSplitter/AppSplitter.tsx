@@ -136,12 +136,23 @@ export const AppSplitter = React.memo(
       });
 
       const onPreserveSide = useMemoizedFn(() => {
-        const [left, right] = sizes;
-        if (preserveSide === 'left') {
-          setSizes([left, 'auto']);
-        } else if (preserveSide === 'right') {
-          setSizes(['auto', right]);
-        }
+        if (!containerRef.current) return;
+
+        // Add a small delay to ensure the container has adjusted to the new window size
+        // This prevents issues when dev tools open/close and trigger resize events
+        setTimeout(() => {
+          if (!containerRef.current) return;
+
+          const [left, right] = getCurrentSizesInPixels(
+            containerRef.current,
+            _sizes as [string, string]
+          );
+          if (preserveSide === 'left') {
+            setSizes([left, 'auto']);
+          } else if (preserveSide === 'right') {
+            setSizes(['auto', right]);
+          }
+        }, 10); // Small delay to allow DOM to update
       });
 
       const setSplitSizes = useMemoizedFn((newSizes: (number | string)[]) => {
@@ -168,6 +179,7 @@ export const AppSplitter = React.memo(
           if (!container) return;
 
           const containerWidth = container.getBoundingClientRect().width;
+          const sizesToUse = getCurrentSizesInPixels(container, _sizes as [string, string]);
           let targetPercentage: number;
 
           // If the container width is 0, wait for 10ms and try again
@@ -183,13 +195,9 @@ export const AppSplitter = React.memo(
             targetPercentage = targetValue;
           }
 
-          const bothSizesAreNumber = typeof _sizes[0] === 'number' && typeof _sizes[1] === 'number';
-          const leftPanelSize = bothSizesAreNumber
-            ? `${(Number(_sizes[0]) / (Number(_sizes[0]) + Number(_sizes[1]))) * 100}%`
-            : _sizes[0];
-          const rightPanelSize = bothSizesAreNumber
-            ? `${(Number(_sizes[1]) / (Number(_sizes[0]) + Number(_sizes[1]))) * 100}%`
-            : _sizes[1];
+          const leftPanelSize = `${(Number(sizesToUse[0]) / (Number(sizesToUse[0]) + Number(sizesToUse[1]))) * 100}%`;
+          const rightPanelSize = `${(Number(sizesToUse[1]) / (Number(sizesToUse[0]) + Number(sizesToUse[1]))) * 100}%`;
+
           const currentSize = side === 'left' ? leftPanelSize : rightPanelSize;
           const otherSize = side === 'left' ? rightPanelSize : leftPanelSize;
 
