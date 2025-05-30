@@ -8,7 +8,14 @@ import { BusterLogoWithText } from '@/assets/svg/BusterLogoWithText';
 import { Button } from '@/components/ui/buttons';
 import { Flag, Gear, House4, Plus, Table, UnorderedList2 } from '@/components/ui/icons';
 import { PencilSquareIcon } from '@/components/ui/icons/customIcons/Pencil_Square';
-import type { ISidebarGroup, ISidebarList, SidebarProps } from '@/components/ui/sidebar';
+import {
+  COLLAPSED_HIDDEN,
+  COLLAPSED_JUSTIFY_CENTER,
+  COLLAPSED_VISIBLE,
+  type ISidebarGroup,
+  type ISidebarList,
+  type SidebarProps
+} from '@/components/ui/sidebar';
 import { Sidebar } from '@/components/ui/sidebar/Sidebar';
 import { Tooltip } from '@/components/ui/tooltip/Tooltip';
 import {
@@ -24,6 +31,8 @@ import { InvitePeopleModal } from '../modal/InvitePeopleModal';
 import { SupportModal } from '../modal/SupportModal';
 import { SidebarUserFooter } from './SidebarUserFooter/SidebarUserFooter';
 import { useFavoriteSidebarPanel } from './useFavoritesSidebarPanel';
+import { cn } from '@/lib/classMerge';
+import { BusterLogo } from '@/assets/svg/BusterLogo';
 
 const topItems = (
   currentParentRoute: BusterRoutes,
@@ -222,10 +231,11 @@ const SidebarPrimaryHeader: React.FC<{ hideActions?: boolean }> = ({ hideActions
   });
 
   return (
-    <div className="flex items-center justify-between">
-      <BusterLogoWithText />
+    <div className={cn(COLLAPSED_JUSTIFY_CENTER, 'flex min-h-7 items-center')}>
+      <BusterLogoWithText className={COLLAPSED_HIDDEN} />
+      <BusterLogo className={COLLAPSED_VISIBLE} />
       {!hideActions && (
-        <div className="flex items-center gap-2">
+        <div className={cn(COLLAPSED_HIDDEN, 'items-center gap-2')}>
           <Tooltip title="Settings">
             <Link href={createBusterRoute({ route: BusterRoutes.SETTINGS_PROFILE })}>
               <Button prefix={<Gear />} variant="ghost" />
