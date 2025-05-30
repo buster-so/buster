@@ -148,7 +148,7 @@ const AutoScrollDemo = () => {
         ))}
         {messages.length === 0 && (
           <div className="text-center text-gray-500">
-            No messages. Click "Add Message" to start.
+            {`No messages. Click "Add Message" to start.`}
           </div>
         )}
       </div>

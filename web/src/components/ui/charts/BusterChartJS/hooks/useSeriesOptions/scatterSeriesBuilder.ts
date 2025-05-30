@@ -70,7 +70,7 @@ export const scatterSeriesBuilder_data = ({
     return {
       parsing: false, //we need to make sure the data is sorted
       label: formatLabelForDataset(dataset, columnLabelFormats),
-      //@ts-ignore
+      // @ts-expect-error - elements is not a valid prop for dataset
       elements: scatterElementConfig,
       backgroundColor,
       hoverBackgroundColor,
@@ -120,8 +120,7 @@ const radiusMethod = (
   sizeOptions: SeriesBuilderProps['sizeOptions'],
   scatterDotSize: SeriesBuilderProps['scatterDotSize']
 ) => {
-  //@ts-ignore
-  const originalR = context.raw?.originalR;
+  const originalR = (context.raw as BubbleDataPoint)?.originalR;
 
   if (typeof originalR === 'number' && sizeOptions) {
     return computeSizeRatio(originalR, scatterDotSize, sizeOptions.minValue, sizeOptions.maxValue);

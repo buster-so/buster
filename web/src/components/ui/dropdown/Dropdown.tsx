@@ -68,8 +68,7 @@ export interface DropdownProps<T = string> extends DropdownMenuProps {
   showEmptyState?: boolean;
 }
 
-export interface DropdownContentProps<T = string>
-  extends Omit<DropdownProps<T>, 'align' | 'side'> {}
+export type DropdownContentProps<T = string> = Omit<DropdownProps<T>, 'align' | 'side'>;
 
 const dropdownItemKey = <T,>(item: DropdownItems<T>[number], index: number): string => {
   if ((item as DropdownDivider).type === 'divider') return `divider-${index}`;

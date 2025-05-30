@@ -126,7 +126,7 @@ export const CustomOrderedList: React.FC<
 > = ({ children, start, markdown, showLoader }) => {
   return (
     <ol
-      //@ts-ignore
+      // @ts-expect-error - start is not a valid prop for ol
       start={start}
       className={cn(
         'mt-1 space-y-1',
@@ -144,14 +144,14 @@ export const CustomUnorderedList: React.FC<
     showLoader: boolean;
     start?: string;
   } & ExtraPropsExtra
-> = ({ start, children, markdown, showLoader, ...rest }) => {
+> = ({ start, children, showLoader }) => {
   return (
     <ul
       className={cn(
         'mt-1 space-y-1',
         showLoader && 'fade-in transform-none! transition-none duration-500'
       )}
-      //@ts-ignore
+      // @ts-expect-error - start is not a valid prop for ul
       start={start}>
       {children}
     </ul>

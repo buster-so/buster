@@ -3,8 +3,9 @@
 import type React from 'react';
 import { useRef, useState } from 'react';
 import { useMemoizedFn } from '@/hooks';
-import { classNames, sashClassName } from './base';
+import { sashClassName } from './base';
 import type { ISashProps } from './types';
+import { cn } from '@/lib/classMerge';
 
 export default function Sash({
   className,
@@ -14,7 +15,7 @@ export default function Sash({
   onDragEnd,
   ...others
 }: ISashProps) {
-  const timeout = useRef<number | null>(null);
+  const timeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [active, setActive] = useState(false);
   const [draging, setDrag] = useState(false);
 
@@ -30,7 +31,6 @@ export default function Sash({
   };
 
   const onMouseEnter = useMemoizedFn(() => {
-    //@ts-ignore
     timeout.current = setTimeout(() => {
       setActive(true);
     }, 150);
@@ -40,7 +40,6 @@ export default function Sash({
     setDrag(true);
     onDragStart(e);
 
-    const nativeEvent = e.nativeEvent as MouseEvent;
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
   });
@@ -54,7 +53,7 @@ export default function Sash({
 
   return (
     <div
-      className={classNames(sashClassName, className)}
+      className={cn(sashClassName, className)}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       onMouseDown={onMouseDown}

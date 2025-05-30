@@ -115,7 +115,7 @@ describe('useXAxis', () => {
 
     const { result } = renderHook(() => useXAxis(timeIntervalProps));
     expect(result.current?.type).toBe('time');
-    // @ts-ignore - Chart.js types don't properly expose the time unit property
+    // @ts-expect-error - Chart.js types don't properly expose the time unit property
     expect(result.current?.ticks?.time?.unit).toBe('month');
   });
 

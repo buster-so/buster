@@ -183,7 +183,6 @@ const getOrCreateInitialTooltipContainer = (chart: ChartJSOrUndefined) => {
   let tooltipEl = document.getElementById(BUSTER_CHARTJS_TOOLTIP_ID);
 
   if (!tooltipEl) {
-    //@ts-ignore
     const isPieChart = chart.config.type === 'pie';
     tooltipEl = document.createElement('div');
     tooltipEl.id = BUSTER_CHARTJS_TOOLTIP_ID;

@@ -56,7 +56,7 @@ export const FilterDashboardButton: React.FC = React.memo(() => {
             </Text>
             {searchText && (
               <Text truncate variant="tertiary">
-                "{searchText}"
+                &quot;{searchText}&quot;
               </Text>
             )}
           </div>

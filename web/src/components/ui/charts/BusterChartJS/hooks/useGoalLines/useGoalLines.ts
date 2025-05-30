@@ -134,7 +134,7 @@ export const useGoalLines = ({
           label: {
             content: formattedValue,
             display: showGoalLineLabel,
-            //@ts-ignore
+            // @ts-expect-error - anchor is not a valid prop for label
             anchor: 'end',
             align: 'top',
             ...defaultLabelOptionConfig

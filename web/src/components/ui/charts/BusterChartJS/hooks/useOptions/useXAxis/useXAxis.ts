@@ -122,7 +122,8 @@ export const useXAxis = ({
     isLineChart,
     columnSettings,
     xAxisColumnFormats,
-    firstXColumnLabelFormat
+    firstXColumnLabelFormat,
+    selectedAxis
   ]);
 
   const derivedTimeUnit = useMemo(() => {
@@ -241,7 +242,7 @@ export const useXAxis = ({
           //  sampleSize: type === 'time' ? 28 : undefined, //DO NOT USE THIS. IT BREAK TIME SCALES
           display: xAxisShowAxisLabel,
           callback: customTickCallback,
-          //@ts-ignore
+          // @ts-expect-error - time is not type for some reason!
           time: {
             unit: timeUnit
           }
@@ -252,14 +253,13 @@ export const useXAxis = ({
       timeUnit,
       offset,
       title,
-      isScatterChart,
+      xAxisTimeInterval,
       isPieChart,
       customTickCallback,
       xAxisShowAxisLabel,
       stacked,
       type,
       grid,
-      timeUnit,
       rotation
     ]);
 

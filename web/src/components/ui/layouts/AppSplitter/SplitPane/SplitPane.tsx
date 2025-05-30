@@ -4,7 +4,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   assertsSize,
   bodyDisableUserSelect,
-  classNames,
   paneClassName,
   sashDisabledClassName,
   sashHorizontalClassName,
@@ -18,6 +17,7 @@ import Pane from './pane';
 import SashContent from './SashContent';
 import SplitPaneSash from './sash';
 import type { IAxis, ICacheSizes, IPaneConfigs, ISplitProps } from './types';
+import { cn } from '@/lib/classMerge';
 
 const SplitPane = ({
   children,
@@ -194,7 +194,7 @@ const SplitPane = ({
 
   return (
     <div
-      className={classNames(
+      className={cn(
         splitClassName,
         split === 'vertical' && splitVerticalClassName,
         split === 'horizontal' && splitHorizontalClassName,
@@ -218,7 +218,7 @@ const SplitPane = ({
             return (
               <Pane
                 key={childIndex.toString()}
-                className={classNames(paneClassName, paneProps.className)}
+                className={cn(paneClassName, paneProps.className)}
                 style={style}>
                 {isPane ? paneProps.children : childNode}
               </Pane>
@@ -227,7 +227,7 @@ const SplitPane = ({
           {sashPosSizes.slice(1, -1).map((posSize, index) => (
             <SplitPaneSash
               key={index.toString()}
-              className={classNames(
+              className={cn(
                 !allowResize && sashDisabledClassName,
                 split === 'vertical' ? sashVerticalClassName : sashHorizontalClassName
               )}

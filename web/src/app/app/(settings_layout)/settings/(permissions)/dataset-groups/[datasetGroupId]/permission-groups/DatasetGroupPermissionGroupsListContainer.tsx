@@ -134,10 +134,14 @@ export const DatasetGroupPermissionGroupsListContainer: React.FC<{
         useRowClickSelectChange={false}
         selectedRowKeys={selectedRowKeys}
         onSelectChange={setSelectedRowKeys}
-        emptyState={useMemo(() => <EmptyStateList text="No permission groups found" />, [])}
+        emptyState={useMemo(
+          () => (
+            <EmptyStateList text="No permission groups found" />
+          ),
+          []
+        )}
       />
     </InfiniteListContainer>
   );
 });
-
-DatasetGroupPermissionGroupSelectedPopup.displayName = 'DatasetGroupPermissionGroupSelectedPopup';
+DatasetGroupPermissionGroupsListContainer.displayName = 'DatasetGroupPermissionGroupsListContainer';

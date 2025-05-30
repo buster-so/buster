@@ -112,3 +112,5 @@ const ShareMenuContentFooter = React.memo<{
 
   return null;
 });
+
+ShareMenuContentFooter.displayName = 'ShareMenuContentFooter';

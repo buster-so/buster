@@ -1,5 +1,9 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"],
+  "env": {
+    "jest": true,
+    "node": true
+  },
+  "extends": ["next/core-web-vitals", "next/typescript", "plugin:storybook/recommended"],
   "rules": {
     "@typescript-eslint/no-unused-vars": "warn"
   },
@@ -9,7 +13,8 @@
       "rules": {
         "@typescript-eslint/no-unused-vars": "off",
         "@typescript-eslint/no-explicit-any": "off",
-        "no-console": "off"
+        "no-console": "off",
+        "react/no-children-prop": "off"
       }
     }
   ]
