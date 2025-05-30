@@ -1042,8 +1042,17 @@ const trendlinePlugin: Plugin<'line'> = {
   id: 'chartjs-plugin-trendline-ts',
 
   afterDatasetsDraw(chart) {
-    const ctx = chart.ctx;
     const pluginOptions = chart.options.plugins?.trendline as TrendlinePluginOptions | undefined;
+    if (!pluginOptions) {
+      return;
+    }
+
+    const ctx = chart.ctx;
+    const chartType = chart.config.type as ChartType;
+    if (chartType === 'pie' || chartType === 'doughnut') {
+      return;
+    }
+
     const { chartArea } = chart;
     const labels = chart.data.labels as string[] | Date[] | undefined;
 

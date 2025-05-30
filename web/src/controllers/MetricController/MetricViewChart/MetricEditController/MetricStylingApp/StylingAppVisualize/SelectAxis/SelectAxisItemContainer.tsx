@@ -54,6 +54,7 @@ export const SelectAxisItemContainer = React.memo(
 
       return (
         <div
+          data-testid={`select-axis-drop-zone-${id}`}
           className={`transition-opacity duration-200 ${isPlaceholder ? 'opacity-0' : 'opacity-100'}`}>
           <CollapseDelete
             ref={ref}

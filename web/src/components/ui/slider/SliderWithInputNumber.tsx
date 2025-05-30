@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { InputNumber } from '../inputs';
 import { Slider } from './Slider';
@@ -31,6 +31,12 @@ export const SliderWithInputNumber: React.FC<SliderWithInputNumberProps> = ({
   const styleOfInputNumber = useMemo(() => {
     return { width: `${internalValue.toString().length * 17}px` };
   }, [internalValue]);
+
+  useEffect(() => {
+    if (value !== internalValue) {
+      setInternalValue(value);
+    }
+  }, [value]);
 
   return (
     <div className="flex items-center space-x-3">

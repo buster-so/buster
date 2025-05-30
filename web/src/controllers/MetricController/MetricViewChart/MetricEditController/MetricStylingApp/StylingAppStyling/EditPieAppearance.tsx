@@ -6,7 +6,7 @@ import {
 } from '@/api/asset_interfaces';
 import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
 import { SliderWithInputNumber } from '@/components/ui/slider';
-import { useMemoizedFn } from '@/hooks';
+import { useDebounceEffect, useMemoizedFn } from '@/hooks';
 import { LabelAndInput } from '../Common';
 
 const options: SegmentedItem<'donut' | 'pie'>[] = [
@@ -51,9 +51,16 @@ export const EditPieAppearance = React.memo(
       }
     });
 
-    const onChangeSlider = useMemoizedFn((value: number[]) => {
-      setPieDonutWidth(value[0]);
-    });
+    useDebounceEffect(
+      () => {
+        if (value !== pieDonutWidth) {
+          setValue(pieDonutWidth);
+          setShowDonutWidthSelector(pieDonutWidth > 0);
+        }
+      },
+      [pieDonutWidth],
+      { wait: 25 }
+    );
 
     return (
       <>
