@@ -1,4 +1,11 @@
 import type { RuntimeContext } from '@mastra/core/runtime-context';
+import {
+  createDashboardsTool,
+  createMetricsTool,
+  modifyDashboardsTool,
+  modifyMetricsTool,
+} from '../../../tools';
+import { doneTool } from '../../../tools/communication-tools/done-tool';
 import { getDefaultModel } from './analyst-base';
 import type { AnalystRuntimeContext } from './analyst-base';
 import {
@@ -8,7 +15,6 @@ import {
   createPromptInjector,
   validateAnalysisPromptVariables,
 } from './types';
-import { doneTool } from '../../../tools/done-tool';
 
 // SQL Dialect Guidance Constants
 const POSTGRES_DIALECT_GUIDANCE = `
@@ -275,7 +281,13 @@ export const getModel = ({
 export const getTools = ({
   runtimeContext: _runtimeContext,
 }: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }) => {
-  return {
+  const tools = {
+    createMetricsTool,
+    modifyMetricsTool,
+    createDashboardsTool,
+    modifyDashboardsTool,
     doneTool,
   };
+
+  return tools;
 };

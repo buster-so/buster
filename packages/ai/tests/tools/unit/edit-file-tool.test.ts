@@ -1,8 +1,8 @@
-import { describe, expect, test, beforeEach, afterEach } from 'vitest';
-import { editFileTool } from '@tools/edit-file-tool';
-import { writeFileSync, mkdirSync, rmSync, readFileSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { editFileTool } from '@/tools/file-tools/edit-file-tool';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 describe('Edit File Tool Unit Tests', () => {
   let tempDir: string;
@@ -26,7 +26,9 @@ describe('Edit File Tool Unit Tests', () => {
 
   test('should have correct configuration', () => {
     expect(editFileTool.id).toBe('edit-file');
-    expect(editFileTool.description).toBe('Perform exact string replacements in files with occurrence validation');
+    expect(editFileTool.description).toBe(
+      'Perform exact string replacements in files with occurrence validation'
+    );
     expect(editFileTool.inputSchema).toBeDefined();
     expect(editFileTool.outputSchema).toBeDefined();
     expect(editFileTool.execute).toBeDefined();
@@ -36,7 +38,7 @@ describe('Edit File Tool Unit Tests', () => {
     const validInput = {
       file_path: '/absolute/path/to/file.txt',
       old_string: 'old text',
-      new_string: 'new text'
+      new_string: 'new text',
     };
     const result = editFileTool.inputSchema.safeParse(validInput);
     expect(result.success).toBe(true);
@@ -52,9 +54,9 @@ describe('Edit File Tool Unit Tests', () => {
         {
           line_number: 1,
           old_line: 'old line',
-          new_line: 'new line'
-        }
-      ]
+          new_line: 'new line',
+        },
+      ],
     };
 
     const result = editFileTool.outputSchema.safeParse(validOutput);
@@ -69,8 +71,8 @@ describe('Edit File Tool Unit Tests', () => {
         file_path: testFile,
         old_string: 'world',
         new_string: 'universe',
-        create_backup: false
-      }
+        create_backup: false,
+      },
     });
 
     expect(result.success).toBe(true);
@@ -95,8 +97,8 @@ describe('Edit File Tool Unit Tests', () => {
         file_path: testFile,
         old_string: 'original',
         new_string: 'modified',
-        create_backup: true
-      }
+        create_backup: true,
+      },
     });
 
     expect(result.success).toBe(true);
@@ -116,8 +118,8 @@ describe('Edit File Tool Unit Tests', () => {
         old_string: 'test',
         new_string: 'exam',
         expected_occurrences: 3,
-        create_backup: false
-      }
+        create_backup: false,
+      },
     });
 
     expect(result.success).toBe(true);
@@ -134,8 +136,8 @@ describe('Edit File Tool Unit Tests', () => {
           old_string: 'test',
           new_string: 'exam',
           expected_occurrences: 3,
-          create_backup: false
-        }
+          create_backup: false,
+        },
       })
     ).rejects.toThrow('Expected 3 occurrences but found 2');
   });
@@ -149,8 +151,8 @@ describe('Edit File Tool Unit Tests', () => {
           file_path: testFile,
           old_string: 'missing',
           new_string: 'found',
-          create_backup: false
-        }
+          create_backup: false,
+        },
       })
     ).rejects.toThrow('String not found in file: "missing"');
   });
@@ -164,8 +166,8 @@ describe('Edit File Tool Unit Tests', () => {
           file_path: testFile,
           old_string: 'same',
           new_string: 'same',
-          create_backup: false
-        }
+          create_backup: false,
+        },
       })
     ).rejects.toThrow('old_string and new_string cannot be the same');
   });
@@ -179,8 +181,8 @@ describe('Edit File Tool Unit Tests', () => {
           file_path: testFile,
           old_string: '',
           new_string: 'something',
-          create_backup: false
-        }
+          create_backup: false,
+        },
       })
     ).rejects.toThrow('old_string cannot be empty');
   });
@@ -192,8 +194,8 @@ describe('Edit File Tool Unit Tests', () => {
           file_path: 'relative/path.txt',
           old_string: 'old',
           new_string: 'new',
-          create_backup: false
-        }
+          create_backup: false,
+        },
       })
     ).rejects.toThrow('File path must be absolute');
   });
@@ -207,8 +209,8 @@ describe('Edit File Tool Unit Tests', () => {
           file_path: nonExistentFile,
           old_string: 'old',
           new_string: 'new',
-          create_backup: false
-        }
+          create_backup: false,
+        },
       })
     ).rejects.toThrow(`File not found: ${nonExistentFile}`);
   });
@@ -220,8 +222,8 @@ describe('Edit File Tool Unit Tests', () => {
           file_path: '/tmp/../etc/passwd',
           old_string: 'old',
           new_string: 'new',
-          create_backup: false
-        }
+          create_backup: false,
+        },
       })
     ).rejects.toThrow('Path traversal not allowed');
   });
@@ -233,8 +235,8 @@ describe('Edit File Tool Unit Tests', () => {
           file_path: '/etc/passwd',
           old_string: 'old',
           new_string: 'new',
-          create_backup: false
-        }
+          create_backup: false,
+        },
       })
     ).rejects.toThrow('Access denied to path');
   });
@@ -249,8 +251,8 @@ describe('Edit File Tool Unit Tests', () => {
         old_string: 'line2',
         new_string: 'modified',
         create_backup: false,
-        preserve_line_endings: true
-      }
+        preserve_line_endings: true,
+      },
     });
 
     const updatedContent = readFileSync(testFile, 'utf8');
@@ -265,8 +267,8 @@ describe('Edit File Tool Unit Tests', () => {
         file_path: testFile,
         old_string: '$10.99',
         new_string: '$15.99',
-        create_backup: false
-      }
+        create_backup: false,
+      },
     });
 
     expect(result.success).toBe(true);
@@ -284,8 +286,8 @@ describe('Edit File Tool Unit Tests', () => {
         file_path: testFile,
         old_string: 'Line 2',
         new_string: 'Modified Line',
-        create_backup: false
-      }
+        create_backup: false,
+      },
     });
 
     expect(result.success).toBe(true);

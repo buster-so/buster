@@ -1,5 +1,5 @@
-import { describe, expect, test, beforeEach } from 'vitest';
-import { doneTool, doneToolWithSummary } from '@tools/done-tool';
+import { doneTool, doneToolWithSummary } from '@/tools/communication-tools/done-tool';
+import { beforeEach, describe, expect, test } from 'vitest';
 
 describe('Done Tool Integration Tests', () => {
   beforeEach(() => {
@@ -85,10 +85,10 @@ describe('Done Tool Integration Tests', () => {
 
   test('should calculate session duration accurately', async () => {
     const startTime = Date.now();
-    
+
     // Wait a small amount to ensure duration > 0
-    await new Promise(resolve => setTimeout(resolve, 10));
-    
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
     const result = await doneTool.execute({
       context: { message: 'Duration test' },
     });
@@ -124,7 +124,7 @@ describe('Done Tool Integration Tests', () => {
 describe('Done Tool With Summary Integration Tests', () => {
   test('should generate automatic summary', async () => {
     const result = await doneToolWithSummary.execute({
-      context: { 
+      context: {
         message: 'Workflow completed with auto-summary',
         include_auto_summary: true,
       },

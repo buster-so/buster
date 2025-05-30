@@ -1,8 +1,8 @@
-import { describe, expect, test, beforeEach, afterEach } from 'vitest';
-import { readFileTool } from '@tools/read-file-tool';
-import { writeFileSync, mkdirSync, rmSync } from 'node:fs';
-import { join } from 'node:path';
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { readFileTool } from '@/tools/file-tools/read-file-tool';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 describe('Read File Tool Unit Tests', () => {
   let tempDir: string;
@@ -32,7 +32,9 @@ describe('Read File Tool Unit Tests', () => {
 
   test('should have correct configuration', () => {
     expect(readFileTool.id).toBe('read-file');
-    expect(readFileTool.description).toBe('Reads files from the local filesystem with optional line offset and limit');
+    expect(readFileTool.description).toBe(
+      'Reads files from the local filesystem with optional line offset and limit'
+    );
     expect(readFileTool.inputSchema).toBeDefined();
     expect(readFileTool.outputSchema).toBeDefined();
     expect(readFileTool.execute).toBeDefined();
@@ -45,7 +47,9 @@ describe('Read File Tool Unit Tests', () => {
   });
 
   test('should validate multiple files input schema', () => {
-    const validInput = { file_paths: ['/absolute/path/to/file1.txt', '/absolute/path/to/file2.txt'] };
+    const validInput = {
+      file_paths: ['/absolute/path/to/file1.txt', '/absolute/path/to/file2.txt'],
+    };
     const result = readFileTool.inputSchema.safeParse(validInput);
     expect(result.success).toBe(true);
   });

@@ -9,21 +9,6 @@ import {
   getTools as getAnalysisTools,
 } from './analysis';
 import {
-  getInstructions as getDataCatalogSearchInstructions,
-  getModel as getDataCatalogSearchModel,
-  getTools as getDataCatalogSearchTools,
-} from './data-catalog-search';
-import {
-  getInstructions as getFollowUpInitializationInstructions,
-  getModel as getFollowUpInitializationModel,
-  getTools as getFollowUpInitializationTools,
-} from './follow-up-initialization';
-import {
-  getInstructions as getInitializationInstructions,
-  getModel as getInitializationModel,
-  getTools as getInitializationTools,
-} from './initialization';
-import {
   getInstructions as getPlanningInstructions,
   getModel as getPlanningModel,
   getTools as getPlanningTools,
@@ -33,6 +18,11 @@ import {
   getModel as getReviewModel,
   getTools as getReviewTools,
 } from './review';
+import {
+  getInstructions as getDataCatalogSearchInstructions,
+  getModel as getDataCatalogSearchModel,
+  getTools as getDataCatalogSearchTools,
+} from './search';
 
 // Define the analyst agent modes
 export enum AnalystMode {
@@ -67,11 +57,9 @@ export interface AnalystModeConfiguration {
   model: LanguageModelV1; // AI SDK model
   tools:
     | ReturnType<typeof getAnalysisTools>
-    | ReturnType<typeof getInitializationTools>
     | ReturnType<typeof getDataCatalogSearchTools>
     | ReturnType<typeof getPlanningTools>
-    | ReturnType<typeof getReviewTools>
-    | ReturnType<typeof getFollowUpInitializationTools>;
+    | ReturnType<typeof getReviewTools>;
 }
 
 // Default model factory function
@@ -102,13 +90,9 @@ function extractContextFlags(runtimeContext: RuntimeContext<AnalystRuntimeContex
 export function determineAnalystMode(
   runtimeContext: RuntimeContext<AnalystRuntimeContext>
 ): AnalystMode {
-  const { isFollowUp, searchedCatalog, hasDataContext, hasPlan, needsReview, hasUserPrompt } =
-    extractContextFlags(runtimeContext);
-
-  // Handle the state before the user provides their first prompt in this turn
-  if (!hasUserPrompt && !isFollowUp) {
-    return AnalystMode.Initialization;
-  }
+  const { searchedCatalog, hasDataContext, hasPlan, needsReview } = extractContextFlags(
+    runtimeContext
+  );
 
   // Review always takes precedence after user speaks
   if (needsReview) {
@@ -136,7 +120,7 @@ export function determineAnalystMode(
   }
 
   // Default fallback
-  return AnalystMode.Initialization;
+  return AnalystMode.DataCatalogSearch;
 }
 
 // Get analyst mode configuration based on the determined mode
@@ -145,13 +129,6 @@ export function getAnalystModeConfiguration(
   runtimeContext: RuntimeContext<AnalystRuntimeContext>
 ): AnalystModeConfiguration {
   switch (mode) {
-    case AnalystMode.Initialization:
-      return {
-        instructions: getInitializationInstructions({ runtimeContext }),
-        model: getInitializationModel({ runtimeContext }),
-        tools: getInitializationTools({ runtimeContext }),
-      };
-
     case AnalystMode.DataCatalogSearch:
       return {
         instructions: getDataCatalogSearchInstructions({ runtimeContext }),
@@ -179,14 +156,6 @@ export function getAnalystModeConfiguration(
         model: getReviewModel({ runtimeContext }),
         tools: getReviewTools({ runtimeContext }),
       };
-
-    case AnalystMode.FollowUpInitialization:
-      return {
-        instructions: getFollowUpInitializationInstructions({ runtimeContext }),
-        model: getFollowUpInitializationModel({ runtimeContext }),
-        tools: getFollowUpInitializationTools({ runtimeContext }),
-      };
-
     default:
       throw new Error(`Unknown analyst mode: ${mode}`);
   }

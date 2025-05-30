@@ -1,5 +1,5 @@
-import { describe, expect, test, beforeEach } from 'vitest';
-import { doneTool, doneToolWithSummary } from '@tools/done-tool';
+import { doneTool, doneToolWithSummary } from '@/tools/communication-tools/done-tool';
+import { beforeEach, describe, expect, test } from 'vitest';
 
 // Mock the SessionManager for testing
 const mockSessionManager = {
@@ -21,7 +21,9 @@ describe('Done Tool Unit Tests', () => {
 
   test('should have correct configuration', () => {
     expect(doneTool.id).toBe('done');
-    expect(doneTool.description).toBe('Signal completion of all requested tasks and end the workflow');
+    expect(doneTool.description).toBe(
+      'Signal completion of all requested tasks and end the workflow'
+    );
     expect(doneTool.inputSchema).toBeDefined();
     expect(doneTool.outputSchema).toBeDefined();
     expect(doneTool.execute).toBeDefined();
@@ -150,7 +152,9 @@ describe('Done Tool Unit Tests', () => {
 describe('Done Tool With Summary Unit Tests', () => {
   test('should have correct configuration', () => {
     expect(doneToolWithSummary.id).toBe('done-with-summary');
-    expect(doneToolWithSummary.description).toBe('Signal completion with automatic session summary generation');
+    expect(doneToolWithSummary.description).toBe(
+      'Signal completion with automatic session summary generation'
+    );
     expect(doneToolWithSummary.inputSchema).toBeDefined();
     expect(doneToolWithSummary.outputSchema).toBeDefined();
   });

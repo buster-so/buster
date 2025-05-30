@@ -1,8 +1,8 @@
-import { describe, expect, test, beforeEach, afterEach } from 'vitest';
-import { writeFileTool } from '@tools/write-file-tool';
-import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { writeFileTool } from '@/tools/file-tools/write-file-tool';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 describe('Write File Tool Unit Tests', () => {
   let tempDir: string;
@@ -31,7 +31,9 @@ describe('Write File Tool Unit Tests', () => {
 
   test('should have correct configuration', () => {
     expect(writeFileTool.id).toBe('write-file');
-    expect(writeFileTool.description).toBe('Write content to a file with atomic operations and safety checks');
+    expect(writeFileTool.description).toBe(
+      'Write content to a file with atomic operations and safety checks'
+    );
     expect(writeFileTool.inputSchema).toBeDefined();
     expect(writeFileTool.outputSchema).toBeDefined();
     expect(writeFileTool.execute).toBeDefined();

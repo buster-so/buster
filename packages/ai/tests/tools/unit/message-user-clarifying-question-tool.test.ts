@@ -1,14 +1,16 @@
-import { describe, expect, test } from 'vitest';
 import {
   messageUserClarifyingQuestionTool,
   processClarificationResponseTool,
   shouldAskClarification,
-} from '@tools/message-user-clarifying-question-tool';
+} from '@/tools/communication-tools/message-user-clarifying-question-tool';
+import { describe, expect, test } from 'vitest';
 
 describe('Message User Clarifying Question Tool Unit Tests', () => {
   test('should have correct configuration', () => {
     expect(messageUserClarifyingQuestionTool.id).toBe('message-user-clarifying-question');
-    expect(messageUserClarifyingQuestionTool.description).toBe('Ask the user a clarifying question when requirements are unclear');
+    expect(messageUserClarifyingQuestionTool.description).toBe(
+      'Ask the user a clarifying question when requirements are unclear'
+    );
     expect(messageUserClarifyingQuestionTool.inputSchema).toBeDefined();
     expect(messageUserClarifyingQuestionTool.outputSchema).toBeDefined();
     expect(messageUserClarifyingQuestionTool.execute).toBeDefined();
@@ -149,7 +151,9 @@ describe('Message User Clarifying Question Tool Unit Tests', () => {
 describe('Process Clarification Response Tool Tests', () => {
   test('should have correct configuration', () => {
     expect(processClarificationResponseTool.id).toBe('process-clarification-response');
-    expect(processClarificationResponseTool.description).toBe('Process user response to a clarifying question');
+    expect(processClarificationResponseTool.description).toBe(
+      'Process user response to a clarifying question'
+    );
   });
 
   test('should validate input schema', () => {
@@ -261,7 +265,7 @@ describe('Process Clarification Response Tool Tests', () => {
     const result = await processClarificationResponseTool.execute({
       context: { response: 'Some response' },
     });
-    
+
     // The tool may handle this gracefully rather than throwing
     expect(result.success).toBe(true);
     expect(result.response_processed).toBe(true);

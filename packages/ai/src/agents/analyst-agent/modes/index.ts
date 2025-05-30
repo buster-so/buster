@@ -8,24 +8,14 @@ export {
 } from './analysis';
 
 export {
-  DATA_CATALOG_SEARCH_SYSTEM_PROMPT,
-  injectDataCatalogSearchPrompt,
-} from './data-catalog-search';
-
-export {
-  INITIALIZATION_SYSTEM_PROMPT,
-  injectInitializationPrompt,
-} from './initialization';
+  SEARCH_SYSTEM_PROMPT as DATA_CATALOG_SEARCH_SYSTEM_PROMPT,
+  injectSearchPrompt as injectDataCatalogSearchPrompt,
+} from './search';
 
 export {
   PLANNING_SYSTEM_PROMPT,
   injectPlanningPrompt,
 } from './planning';
-
-export {
-  FOLLOW_UP_INITIALIZATION_SYSTEM_PROMPT,
-  injectFollowUpInitializationPrompt,
-} from './follow-up-initialization';
 
 export {
   REVIEW_SYSTEM_PROMPT,

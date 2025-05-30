@@ -1,8 +1,8 @@
-import { describe, expect, test, beforeEach, afterEach } from 'vitest';
-import { globTool, multiGlobTool } from '@tools/glob-tool';
-import { writeFileSync, mkdirSync, rmSync } from 'node:fs';
-import { join } from 'node:path';
+import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { globTool, multiGlobTool } from '@/tools/file-tools/glob-tool';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 describe('Glob Tool Unit Tests', () => {
   let tempDir: string;
@@ -14,7 +14,7 @@ describe('Glob Tool Unit Tests', () => {
     tempDir = join(tmpdir(), `glob-test-${Date.now()}`);
     sourceDir = join(tempDir, 'src');
     testsDir = join(tempDir, 'tests');
-    
+
     mkdirSync(tempDir, { recursive: true });
     mkdirSync(sourceDir, { recursive: true });
     mkdirSync(testsDir, { recursive: true });
@@ -52,7 +52,7 @@ describe('Glob Tool Unit Tests', () => {
   test('should validate input schema', () => {
     const validInput = {
       pattern: '**/*.ts',
-      cwd: '/absolute/path'
+      cwd: '/absolute/path',
     };
     const result = globTool.inputSchema.safeParse(validInput);
     expect(result.success).toBe(true);
@@ -64,7 +64,7 @@ describe('Glob Tool Unit Tests', () => {
       matches: ['/path/to/file.ts'],
       count: 1,
       truncated: false,
-      search_time_ms: 100
+      search_time_ms: 100,
     };
 
     const result = globTool.outputSchema.safeParse(validOutput);
@@ -76,8 +76,8 @@ describe('Glob Tool Unit Tests', () => {
       context: {
         pattern: '**/*.ts',
         cwd: tempDir,
-        ignore: []
-      }
+        ignore: [],
+      },
     });
 
     expect(result.count).toBeGreaterThan(0);
@@ -92,8 +92,8 @@ describe('Glob Tool Unit Tests', () => {
     const result = await globTool.execute({
       context: {
         pattern: '**/*.tsx',
-        cwd: tempDir
-      }
+        cwd: tempDir,
+      },
     });
 
     expect(result.count).toBe(2);
@@ -105,8 +105,8 @@ describe('Glob Tool Unit Tests', () => {
     const result = await globTool.execute({
       context: {
         pattern: 'src/**/*.ts',
-        cwd: tempDir
-      }
+        cwd: tempDir,
+      },
     });
 
     expect(result.matches).toContain('src/app.ts');
@@ -119,8 +119,8 @@ describe('Glob Tool Unit Tests', () => {
       context: {
         pattern: '*.md',
         cwd: tempDir,
-        absolute: true
-      }
+        absolute: true,
+      },
     });
 
     expect(result.count).toBe(1);
@@ -137,8 +137,8 @@ describe('Glob Tool Unit Tests', () => {
       context: {
         pattern: '**/*.ts',
         cwd: tempDir,
-        ignore: ['**/node_modules/**']
-      }
+        ignore: ['**/node_modules/**'],
+      },
     });
 
     expect(result.matches).not.toContain('node_modules/package.ts');
@@ -150,8 +150,8 @@ describe('Glob Tool Unit Tests', () => {
       context: {
         pattern: '**/*',
         cwd: tempDir,
-        limit: 3
-      }
+        limit: 3,
+      },
     });
 
     expect(result.count).toBe(3);
@@ -165,8 +165,8 @@ describe('Glob Tool Unit Tests', () => {
         pattern: '**/*',
         cwd: tempDir,
         only_files: false,
-        only_directories: true
-      }
+        only_directories: true,
+      },
     });
 
     expect(result.matches).toContain('src');
@@ -182,8 +182,8 @@ describe('Glob Tool Unit Tests', () => {
       context: {
         pattern: '**/*',
         cwd: tempDir,
-        max_depth: 1
-      }
+        max_depth: 1,
+      },
     });
 
     expect(result.matches).toContain('README.md');
@@ -197,8 +197,8 @@ describe('Glob Tool Unit Tests', () => {
       globTool.execute({
         context: {
           pattern: '',
-          cwd: tempDir
-        }
+          cwd: tempDir,
+        },
       })
     ).rejects.toThrow('Pattern cannot be empty');
   });
@@ -208,8 +208,8 @@ describe('Glob Tool Unit Tests', () => {
       globTool.execute({
         context: {
           pattern: '[invalid',
-          cwd: tempDir
-        }
+          cwd: tempDir,
+        },
       })
     ).rejects.toThrow();
   });
@@ -219,8 +219,8 @@ describe('Glob Tool Unit Tests', () => {
       globTool.execute({
         context: {
           pattern: '*.ts',
-          cwd: 'relative/path'
-        }
+          cwd: 'relative/path',
+        },
       })
     ).rejects.toThrow('Path must be absolute');
   });
@@ -230,8 +230,8 @@ describe('Glob Tool Unit Tests', () => {
       globTool.execute({
         context: {
           pattern: '*.ts',
-          cwd: '/tmp/../etc'
-        }
+          cwd: '/tmp/../etc',
+        },
       })
     ).rejects.toThrow('Path traversal not allowed');
   });
@@ -241,8 +241,8 @@ describe('Glob Tool Unit Tests', () => {
       globTool.execute({
         context: {
           pattern: '*.conf',
-          cwd: '/etc'
-        }
+          cwd: '/etc',
+        },
       })
     ).rejects.toThrow('Access denied to path');
   });
@@ -260,20 +260,20 @@ describe('Glob Tool Unit Tests', () => {
       const result = await multiGlobTool.execute({
         context: {
           patterns: ['**/*.ts', '**/*.tsx', '*.md'],
-          cwd: tempDir
-        }
+          cwd: tempDir,
+        },
       });
 
       expect(result.total_matches).toBeGreaterThan(0);
-      
+
       // Find files that match multiple patterns
-      const tsxFiles = result.matches.filter(m => m.path.endsWith('.tsx'));
+      const tsxFiles = result.matches.filter((m) => m.path.endsWith('.tsx'));
       expect(tsxFiles).toHaveLength(2);
-      
+
       // Find README.md
-      const readmeFiles = result.matches.filter(m => m.path.endsWith('README.md'));
+      const readmeFiles = result.matches.filter((m) => m.path.endsWith('README.md'));
       expect(readmeFiles).toHaveLength(1);
-      
+
       expect(result.search_time_ms).toBeGreaterThan(0);
     });
 
@@ -281,15 +281,15 @@ describe('Glob Tool Unit Tests', () => {
       const result = await multiGlobTool.execute({
         context: {
           patterns: ['**/*.ts', 'src/**/*'],
-          cwd: tempDir
-        }
+          cwd: tempDir,
+        },
       });
 
       // Find a TypeScript file in src directory
-      const srcTsFile = result.matches.find(m => 
-        m.path.includes('src') && m.path.endsWith('.ts')
+      const srcTsFile = result.matches.find(
+        (m) => m.path.includes('src') && m.path.endsWith('.ts')
       );
-      
+
       expect(srcTsFile).toBeDefined();
       expect(srcTsFile!.matched_patterns).toContain('**/*.ts');
       expect(srcTsFile!.matched_patterns).toContain('src/**/*');
@@ -298,7 +298,7 @@ describe('Glob Tool Unit Tests', () => {
     test('should validate multi-glob input schema', () => {
       const validInput = {
         patterns: ['**/*.ts', '**/*.js'],
-        cwd: '/absolute/path'
+        cwd: '/absolute/path',
       };
       const result = multiGlobTool.inputSchema.safeParse(validInput);
       expect(result.success).toBe(true);
@@ -307,12 +307,14 @@ describe('Glob Tool Unit Tests', () => {
     test('should validate multi-glob output schema', () => {
       const validOutput = {
         patterns: ['**/*.ts'],
-        matches: [{
-          path: '/path/to/file.ts',
-          matched_patterns: ['**/*.ts']
-        }],
+        matches: [
+          {
+            path: '/path/to/file.ts',
+            matched_patterns: ['**/*.ts'],
+          },
+        ],
         total_matches: 1,
-        search_time_ms: 100
+        search_time_ms: 100,
       };
 
       const result = multiGlobTool.outputSchema.safeParse(validOutput);

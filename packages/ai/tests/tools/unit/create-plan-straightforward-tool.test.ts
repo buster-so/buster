@@ -1,17 +1,17 @@
-import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest';
-import { createPlanStraightforwardTool } from '@tools/create-plan-straightforward-tool';
+import { createPlanStraightforwardTool } from '@/tools/planning-thinking-tools/create-plan-straightforward-tool';
 import { generateText } from 'ai';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 // Mock the AI SDK
 vi.mock('ai', async () => {
   return {
-    generateText: vi.fn()
+    generateText: vi.fn(),
   };
 });
 
 vi.mock('@ai-sdk/openai', async () => {
   return {
-    openai: vi.fn(() => 'mocked-model')
+    openai: vi.fn(() => 'mocked-model'),
   };
 });
 
@@ -28,7 +28,9 @@ describe('Create Plan Straightforward Tool Unit Tests', () => {
 
   test('should have correct configuration', () => {
     expect(createPlanStraightforwardTool.id).toBe('create-plan-straightforward');
-    expect(createPlanStraightforwardTool.description).toBe('Create a clear and actionable plan for analytical workflows');
+    expect(createPlanStraightforwardTool.description).toBe(
+      'Create a clear and actionable plan for analytical workflows'
+    );
     expect(createPlanStraightforwardTool.inputSchema).toBeDefined();
     expect(createPlanStraightforwardTool.outputSchema).toBeDefined();
     expect(createPlanStraightforwardTool.execute).toBeDefined();
@@ -36,7 +38,7 @@ describe('Create Plan Straightforward Tool Unit Tests', () => {
 
   test('should validate input schema', () => {
     const validInput = {
-      plan: 'Create a dashboard with user metrics'
+      plan: 'Create a dashboard with user metrics',
     };
     const result = createPlanStraightforwardTool.inputSchema.safeParse(validInput);
     expect(result.success).toBe(true);
@@ -45,7 +47,8 @@ describe('Create Plan Straightforward Tool Unit Tests', () => {
   test('should validate output schema structure', () => {
     const validOutput = {
       success: true,
-      todos: '[ ] Create user metrics dashboard\n[ ] Add filters for date range\n[ ] Test dashboard functionality'
+      todos:
+        '[ ] Create user metrics dashboard\n[ ] Add filters for date range\n[ ] Test dashboard functionality',
     };
 
     const result = createPlanStraightforwardTool.outputSchema.safeParse(validOutput);
@@ -59,8 +62,8 @@ describe('Create Plan Straightforward Tool Unit Tests', () => {
           'Query user data from database',
           'Create bar chart for user metrics',
           'Add date filters to dashboard',
-          'Test dashboard functionality'
-        ]
+          'Test dashboard functionality',
+        ],
       }),
       reasoning: '',
       files: [],
@@ -74,15 +77,15 @@ describe('Create Plan Straightforward Tool Unit Tests', () => {
       logprobs: undefined,
       finishReason: 'stop' as const,
       warnings: undefined,
-      responseMessages: []
+      responseMessages: [],
     };
 
     mockGenerateText.mockResolvedValueOnce(mockResponse);
 
     const result = await createPlanStraightforwardTool.execute({
       context: {
-        plan: 'Create a dashboard showing user metrics with charts and filters'
-      }
+        plan: 'Create a dashboard showing user metrics with charts and filters',
+      },
     });
 
     expect(result.success).toBe(true);
@@ -90,7 +93,7 @@ describe('Create Plan Straightforward Tool Unit Tests', () => {
     expect(result.todos).toContain('[ ] Create bar chart for user metrics');
     expect(result.todos).toContain('[ ] Add date filters to dashboard');
     expect(result.todos).toContain('[ ] Test dashboard functionality');
-    
+
     expect(mockGenerateText).toHaveBeenCalled();
   });
 
@@ -105,7 +108,7 @@ describe('Create Plan Straightforward Tool Unit Tests', () => {
 `;
 
     const result = await createPlanStraightforwardTool.execute({
-      context: { plan }
+      context: { plan },
     });
 
     expect(result.success).toBe(true);
@@ -117,7 +120,7 @@ describe('Create Plan Straightforward Tool Unit Tests', () => {
 
   test('should handle invalid LLM response format', async () => {
     const mockResponse = {
-      text: 'Invalid JSON response'
+      text: 'Invalid JSON response',
     };
 
     mockGenerateText.mockResolvedValueOnce(mockResponse);
@@ -129,7 +132,7 @@ describe('Create Plan Straightforward Tool Unit Tests', () => {
 `;
 
     const result = await createPlanStraightforwardTool.execute({
-      context: { plan }
+      context: { plan },
     });
 
     expect(result.success).toBe(true);
@@ -155,7 +158,7 @@ describe('Create Plan Straightforward Tool Unit Tests', () => {
 `;
 
     const result = await createPlanStraightforwardTool.execute({
-      context: { plan }
+      context: { plan },
     });
 
     expect(result.success).toBe(true);
@@ -181,7 +184,7 @@ Dashboard Development Tasks:
 `;
 
     const result = await createPlanStraightforwardTool.execute({
-      context: { plan }
+      context: { plan },
     });
 
     expect(result.success).toBe(true);
@@ -204,7 +207,7 @@ Test the system with production data.
 `;
 
     const result = await createPlanStraightforwardTool.execute({
-      context: { plan }
+      context: { plan },
     });
 
     expect(result.success).toBe(true);
@@ -216,7 +219,7 @@ Test the system with production data.
   test('should handle empty plan input', async () => {
     await expect(
       createPlanStraightforwardTool.execute({
-        context: { plan: '' }
+        context: { plan: '' },
       })
     ).rejects.toThrow('Plan cannot be empty');
   });
@@ -224,7 +227,7 @@ Test the system with production data.
   test('should handle whitespace-only plan input', async () => {
     await expect(
       createPlanStraightforwardTool.execute({
-        context: { plan: '   \n\t   ' }
+        context: { plan: '   \n\t   ' },
       })
     ).rejects.toThrow('Plan cannot be empty');
   });
@@ -237,11 +240,11 @@ Test the system with production data.
     const plan = planItems.join('\n');
 
     const result = await createPlanStraightforwardTool.execute({
-      context: { plan }
+      context: { plan },
     });
 
     expect(result.success).toBe(true);
-    
+
     // Count the number of todos (each starts with "[ ]")
     const todoCount = (result.todos.match(/\[ \]/g) || []).length;
     expect(todoCount).toBeLessThanOrEqual(15);
@@ -257,7 +260,7 @@ Test the system with production data.
 `;
 
     const result = await createPlanStraightforwardTool.execute({
-      context: { plan }
+      context: { plan },
     });
 
     expect(result.success).toBe(true);
@@ -277,7 +280,7 @@ Quality is important.
 `;
 
     const result = await createPlanStraightforwardTool.execute({
-      context: { plan }
+      context: { plan },
     });
 
     expect(result.success).toBe(true);
@@ -287,8 +290,8 @@ Quality is important.
   test('should handle LLM response with empty todos array', async () => {
     const mockResponse = {
       text: JSON.stringify({
-        todos: []
-      })
+        todos: [],
+      }),
     };
 
     mockGenerateText.mockResolvedValueOnce(mockResponse);
@@ -296,7 +299,7 @@ Quality is important.
     const plan = 'Create a simple dashboard';
 
     const result = await createPlanStraightforwardTool.execute({
-      context: { plan }
+      context: { plan },
     });
 
     expect(result.success).toBe(true);
@@ -309,9 +312,9 @@ Quality is important.
         todos: [
           { todo: 'First task', priority: 'high' },
           'Second task as string',
-          { todo: 'Third task', completed: false }
-        ]
-      })
+          { todo: 'Third task', completed: false },
+        ],
+      }),
     };
 
     mockGenerateText.mockResolvedValueOnce(mockResponse);
@@ -319,7 +322,7 @@ Quality is important.
     const plan = 'Create dashboard with multiple features';
 
     const result = await createPlanStraightforwardTool.execute({
-      context: { plan }
+      context: { plan },
     });
 
     expect(result.success).toBe(true);

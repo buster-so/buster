@@ -25,6 +25,12 @@
       "@workflows/*": ["src/workflows/*"]
     }
   },
-  "include": ["src/**/*", "tests/**/*"],
+  "include": [
+    "src/**/*",
+    "tests/**/*",
+    "src/tools/file-tools/edit-file-tool.ts",
+    "src/tools/file-tools/glob-tool.ts",
+    "src/tools/file-tools/grep-tool.ts"
+  ],
   "exclude": ["node_modules", "dist"]
 }

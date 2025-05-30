@@ -1,32 +1,21 @@
-// Wave 1: Independent Tools
-export { readFileTool } from './read-file-tool';
-export { writeFileTool } from './write-file-tool';
-export { lsTool } from './ls-tool';
-export { doneTool } from './done-tool';
-export { noSearchNeededTool } from './no-search-needed-tool';
-export { messageUserClarifyingQuestionTool } from './message-user-clarifying-question-tool';
-
-// Wave 2: Foundational Tools
-export { editFileTool } from './edit-file-tool';
-export { globTool } from './glob-tool';
-export { grepTool } from './grep-tool';
-export { createPlanStraightforwardTool } from './create-plan-straightforward-tool';
-
-// Wave 3: Complex Tools
-export { bashTool } from './bash-tool';
-export { batchTool } from './batch-tool';
-export { searchDataCatalogTool } from './search-data-catalog-tool';
-export { reviewPlanTool } from './review-plan-tool';
-
-// Wave 4: Business Logic Tools  
-export { createPlanInvestigativeTool } from './create-plan-investigative-tool';
-export { createMetricsTool } from './create-metrics-tool';
-export { createDashboardsTool } from './create-dashboards-tool';
-
-// Wave 5: Modification Tools
-export { modifyMetricsTool } from './modify-metrics-tool';
-export { modifyDashboardsTool } from './modify-dashboards-tool';
-export { filterDashboardsTool, searchDashboardsWithContentTool } from './filter-dashboards-tool';
-
-// Additional tools
-export { weatherTool } from './weather-tool';
+export { readFileTool } from './file-tools/read-file-tool';
+export { writeFileTool } from './file-tools/write-file-tool';
+export { lsTool } from './file-tools/ls-tool';
+export { doneTool } from './communication-tools/done-tool';
+export { editFileTool } from './file-tools/edit-file-tool';
+export { globTool } from './file-tools/glob-tool';
+export { grepTool } from './file-tools/grep-tool';
+export { createPlanStraightforwardTool } from './planning-thinking-tools/create-plan-straightforward-tool';
+export { bashTool } from './file-tools/bash-tool';
+export { batchTool } from './file-tools/batch-tool';
+export { searchDataCatalogTool } from './file-tools/search-data-catalog-tool/search-data-catalog-tool';
+export { reviewPlanTool } from './planning-thinking-tools/review-plan-tool';
+export { createPlanInvestigativeTool } from './planning-thinking-tools/create-plan-investigative-tool';
+export { createMetricsTool } from './visualization-tools/create-metrics-tool';
+export { createDashboardsTool } from './visualization-tools/create-dashboards-tool';
+export { modifyMetricsTool } from './visualization-tools/modify-metrics-tool';
+export { modifyDashboardsTool } from './visualization-tools/modify-dashboards-tool';
+export {
+  filterDashboardsTool,
+  searchDashboardsWithContentTool,
+} from './visualization-tools/filter-dashboards-tool';

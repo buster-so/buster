@@ -1,9 +1,9 @@
-import { describe, expect, test, beforeEach } from 'vitest';
 import {
   messageUserClarifyingQuestionTool,
   processClarificationResponseTool,
   shouldAskClarification,
-} from '@tools/message-user-clarifying-question-tool';
+} from '@/tools/communication-tools/message-user-clarifying-question-tool';
+import { beforeEach, describe, expect, test } from 'vitest';
 
 describe('Message User Clarifying Question Tool Integration Tests', () => {
   beforeEach(() => {
