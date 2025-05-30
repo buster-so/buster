@@ -7,6 +7,9 @@ test.describe
         'http://localhost:3000/app/metrics/88f342bf-19f9-53a9-87c6-804399e69644/chart'
       );
       await page.getByTestId('edit-chart-button').getByRole('button').click();
+      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForLoadState('load');
       await page.getByTestId('select-chart-type-pie').click();
       await page.waitForTimeout(250);
       const sourceElement = page
@@ -264,10 +267,15 @@ test.describe
       ).toHaveValue('Median');
       await page.getByRole('button', { name: 'Save' }).click();
 
-      await page.waitForTimeout(25);
+      await page.waitForTimeout(125);
       await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForLoadState('load');
 
       await page.reload();
+      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForLoadState('load');
       await page.getByTestId('segmented-trigger-Styling').click();
       await expect(
         page
