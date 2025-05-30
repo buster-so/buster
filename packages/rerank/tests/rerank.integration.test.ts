@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { config } from 'dotenv';
-import { Reranker, rerankResults } from '../rerank';
-import type { RerankResult } from '../types';
+import { Reranker, rerankResults } from '../src/index';
+import type { RerankResult } from '../src/types';
 
 // Load environment variables
 config();
