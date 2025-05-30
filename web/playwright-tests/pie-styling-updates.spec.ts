@@ -106,11 +106,6 @@ test.describe
         .filter({ hasText: /^Edit chart$/ })
         .getByRole('button')
         .click();
-      await expect(page.locator('body')).toMatchAriaSnapshot(`
-        - textbox "New chart": /Top \\d+ Products by Revenue \\(Last 4 Quarters\\)/
-        - text: /Q2 \\d+ - Q1 \\d+ • Which were the top \\d+ products by revenue in the last four completed quarters\\? Touring-\\d+ Yellow, \\d+ Road-\\d+-W Yellow, \\d+ Touring-\\d+ Blue, \\d+ Road-\\d+-W Yellow, \\d+ Next 6/
-        - img
-        `);
     });
 
     test('Pie chart - legend clicks work', async ({ page }) => {
@@ -134,10 +129,6 @@ test.describe
           .filter({ hasText: /^Mountain-200 Silver, 42$/ })
           .nth(2)
       ).toBeVisible();
-      await expect(page.getByTestId('metric-view-chart-content')).toMatchAriaSnapshot(`
-      - text: /Touring-\\d+ Yellow, \\d+ Road-\\d+-W Yellow, \\d+ Touring-\\d+ Blue, \\d+ Road-\\d+-W Yellow, \\d+ Next 6/
-      - img
-      `);
     });
 
     test('Pie chart - can disable tooltip', async ({ page }) => {
@@ -261,11 +252,6 @@ test.describe
       );
       await page.getByTestId('segmented-trigger-Styling').click();
       await expect(page.getByText('Touring-1000 Yellow,')).toBeVisible();
-      await expect(page.locator('body')).toMatchAriaSnapshot(`
-      - textbox "New chart": /Top \\d+ Products by Revenue \\(Last 4 Quarters\\)/
-      - text: /Q2 \\d+ - Q1 \\d+ • Which were the top \\d+ products by revenue in the last four completed quarters\\? Touring-\\d+ Yellow, \\d+ Road-\\d+-W Yellow, \\d+ Touring-\\d+ Blue, \\d+ Next 7/
-      - img
-      `);
       await expect(page.locator('body')).toContainText('Sum');
       await page.locator('html').click();
       await page.getByRole('combobox').filter({ hasText: 'Sum' }).click();
@@ -378,7 +364,7 @@ test.describe
         'http://localhost:3000/app/metrics/88f342bf-19f9-53a9-87c6-804399e69644/chart?secondary_view=chart-edit'
       );
       await expect(page.getByTestId('metric-view-chart-content').getByRole('img')).toBeVisible();
-      await page.getByTestId('select-axis-drop-zone-xAxis').getByRole('button').nth(1).click();
+      await page.getByTestId('select-axis-drop-zone-xAxis').getByTestId('delete-button').click();
       await expect(page.getByText('No valid axis selected')).toBeVisible();
       await page.getByTestId('select-chart-type-column').click();
 

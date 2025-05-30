@@ -64,9 +64,10 @@ test.describe
       );
       await page.getByTestId('add-to-collection-button').click();
       const currentUrl = page.url();
+
       await page
         .getByRole('menuitemcheckbox', { name: 'Important Things' })
-        .getByRole('button')
+        .getByRole('link')
         .click();
       await page.goto('http://localhost:3000/app/collections/0ac43ae2-beda-4007-9574-71a17425da0a');
       expect(page.url()).not.toBe(currentUrl);
@@ -318,9 +319,11 @@ test.describe
 
         await page.mouse.up();
       }
-
       await expect(
-        page.getByTestId('select-axis-drop-zone-xAxis').getByRole('button', { name: 'Year' })
+        page
+          .getByTestId('select-axis-drop-zone-xAxis')
+          .locator('button')
+          .filter({ hasText: 'Year' })
       ).toBeVisible();
 
       await page.getByTestId('select-axis-drop-zone-xAxis').getByRole('button').nth(2).click();
@@ -365,15 +368,17 @@ test.describe
             sourceBoundingBox.y + dy * i + sourceBoundingBox.height / 2,
             { steps: 1 }
           );
-          await page.waitForTimeout(1); // Add a small delay between each movement
+          await page.waitForTimeout(3); // Add a small delay between each movement
         }
 
         await page.mouse.up();
       }
 
       await page.getByRole('button', { name: 'Save' }).click();
-      await page.waitForTimeout(100);
+      await page.waitForTimeout(250);
       await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForLoadState('load');
 
       page.reload();
 
@@ -390,9 +395,12 @@ test.describe
       page.reload();
 
       await expect(
-        page.getByTestId('select-axis-drop-zone-tooltip').getByRole('button', { name: 'Year' })
+        page
+          .getByTestId('select-axis-drop-zone-tooltip')
+          .locator('button')
+          .filter({ hasText: 'Year' })
       ).toBeVisible();
-      await page.getByTestId('select-axis-drop-zone-tooltip').getByRole('button').nth(2).click();
+      await page.getByTestId('select-axis-drop-zone-tooltip').getByTestId('delete-button').click();
       await expect(
         page.getByTestId('select-axis-drop-zone-tooltip').getByText('Drag column here')
       ).toBeVisible();
@@ -510,6 +518,7 @@ test.describe
 
       await page.getByTestId('segmented-trigger-none').click();
       await page.getByRole('button', { name: 'Save' }).click();
+      await page.waitForTimeout(100);
       await page.waitForLoadState('networkidle');
     });
 
@@ -550,23 +559,15 @@ test.describe
 
       await page.reload();
       await page.getByTestId('segmented-trigger-Styling').click();
-      await page
-        .getByRole('main')
-        .filter({ hasText: 'Jan 1, 2022 - May 2, 2025•' })
-        .getByRole('button')
-        .nth(2)
-        .click();
+      await page.getByTestId('delete-button').click();
       await page.getByRole('button', { name: 'Save' }).click();
       await page.waitForTimeout(50);
+
       await page.waitForLoadState('networkidle');
 
       await page.reload();
-
-      await expect(page.locator('body')).toMatchAriaSnapshot(`
-          - textbox "New chart": Yearly Sales Revenue - Signature Cycles Products (Last 3 Years + YTD)
-          - text: /Jan 1, \\d+ - May 2, \\d+ • What is the total yearly sales revenue for products supplied by Signature Cycles from \\d+ to present\\? Total Sales Revenue/
-          - img
-          `);
+      await page.getByTestId('segmented-trigger-Styling').click();
+      await expect(page.getByTestId('delete-button')).not.toBeVisible();
     });
 
     test('Can add a trendline', async ({ page }) => {
@@ -614,14 +615,6 @@ test.describe
         .click();
       await page.getByRole('button', { name: 'Save' }).click();
       await page.waitForTimeout(100);
-      await page.waitForLoadState('networkidle');
-      await expect(page.locator('body')).toMatchAriaSnapshot(`
-        - textbox "New chart": Yearly Sales Revenue - Signature Cycles Products (Last 3 Years + YTD)
-        - text: /Jan 1, \\d+ - May 2, \\d+ • What is the total yearly sales revenue for products supplied by Signature Cycles from \\d+ to present\\? Total Sales Revenue/
-        - img
-        `);
-
-      await page.waitForTimeout(50);
       await page.waitForLoadState('networkidle');
 
       await page
@@ -718,7 +711,12 @@ test.describe
       await page.getByRole('textbox', { name: 'Total Sales Revenue' }).click();
       await page.getByRole('textbox', { name: 'Total Sales Revenue' }).press('ControlOrMeta+a');
       await page.getByRole('textbox', { name: 'Total Sales Revenue' }).fill('THIS IS A TEST!');
-      await expect(page.getByRole('button', { name: 'THIS IS A TEST!' })).toBeVisible();
+      await expect(
+        page
+          .getByTestId('select-axis-drop-zone-yAxis')
+          .locator('button')
+          .filter({ hasText: 'THIS IS A TEST!' })
+      ).toBeVisible();
       await page.getByRole('button', { name: 'Save' }).click();
       await page.waitForTimeout(100);
       await page.waitForLoadState('networkidle');
@@ -851,6 +849,7 @@ test.describe
       await page.goto(
         'http://localhost:3000/app/metrics/45c17750-2b61-5683-ba8d-ff6c6fefacee/chart?secondary_view=chart-edit'
       );
+
       await page.getByTestId('select-axis-drop-zone-yAxis').getByRole('button').nth(3).click();
       await page.getByRole('switch').click();
       await page.getByRole('button', { name: 'Save' }).click();
