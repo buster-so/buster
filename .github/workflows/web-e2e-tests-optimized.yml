@@ -1,3 +1,6 @@
+
+
+
 name: Web App E2E Testing - Optimized
 
 on:
@@ -76,44 +79,9 @@ jobs:
           name: api-image
           path: api-image.tar
 
-  # 3. Setup Supabase environment and create database dump
-  setup-database:
-    runs-on: blacksmith-32vcpu-ubuntu-2204
-    environment: testing
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Supabase Environment
-        uses: ./.github/actions/setup-test-environment
-
-      - name: Create Database Dump
-        shell: bash
-        run: |
-          echo "Creating database dump..."
-          PGPASSWORD=postgres pg_dump -h 127.0.0.1 -p 54322 -U postgres -d postgres --clean --if-exists --no-owner --no-privileges > database-dump.sql
-          
-          # Verify the dump was created successfully
-          if [ ! -f database-dump.sql ] || [ ! -s database-dump.sql ]; then
-            echo "::error::Database dump failed or is empty"
-            exit 1
-          fi
-          
-          echo "Database dump created successfully ($(wc -l < database-dump.sql) lines)"
-
-      - name: Upload Database Dump
-        uses: actions/upload-artifact@v4
-        with:
-          name: database-dump
-          path: database-dump.sql
-
-      - name: Stop Supabase
-        uses: ./.github/actions/stop-supabase
-        if: always()
-
-  # 4. Run tests using the prepared database
+  # 3. Run tests in 4 parallel shards
   test:
-    needs: [build-frontend, build-api, setup-database]
+    needs: [build-frontend, build-api]
     runs-on: blacksmith-32vcpu-ubuntu-2204
     environment: testing
     services:
@@ -142,36 +110,6 @@ jobs:
           key: tests-npm-${{ github.sha }}
           path: ~/.npm
 
-      - name: Download Database Dump
-        uses: actions/download-artifact@v4
-        with:
-          name: database-dump
-
-      - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
-        with:
-          version: latest
-
-      - name: Start Supabase and Restore Database
-        shell: bash
-        run: |
-          echo "Starting fresh Supabase instance..."
-          cd ./api
-          supabase start --exclude postgrest,studio
-          
-          echo "Waiting for Supabase to be ready..."
-          sleep 15
-          
-          echo "Restoring database from dump..."
-          PGPASSWORD=postgres psql -h 127.0.0.1 -p 54322 -U postgres -d postgres -f ../database-dump.sql
-          
-          if [ $? -ne 0 ]; then
-            echo "::error::Failed to restore database from dump"
-            exit 1
-          fi
-          
-          echo "Database restored successfully"
-  
       - name: Download Frontend Build
         uses: actions/download-artifact@v4
         with:
@@ -196,6 +134,8 @@ jobs:
       - name: Load API Docker Image
         run: docker load -i api-image.tar
 
+      - name: Setup Supabase Environment
+        uses: ./.github/actions/setup-test-environment
 
       - name: Start API Container
         run: |
