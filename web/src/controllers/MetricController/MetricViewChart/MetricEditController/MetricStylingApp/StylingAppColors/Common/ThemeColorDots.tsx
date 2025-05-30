@@ -12,7 +12,6 @@ export const ThemeColorDots: React.FC<{
     <div className="flex shrink-0 items-center gap-0">
       {colors.slice(0, numberOfColorsToShow).map((color, colorIdx) => (
         <div
-          // biome-ignore lint/suspicious/noArrayIndexKey: we need to use the index to force a re-render
           key={color + colorIdx}
           className={cn(
             'ball rounded-full',

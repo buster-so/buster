@@ -125,8 +125,7 @@ export const ThreeDotMenuButton = React.memo(
         deleteMetricMenu,
         downloadCSVMenu,
         downloadPNGMenu,
-        openSuccessMessage,
-        onSetSelectedFile,
+        isViewingOldVersion,
         versionHistoryItems,
         favoriteMetric,
         statusSelectMenu,
@@ -319,7 +318,7 @@ const useStatusSelectMenu = ({ metricId }: { metricId: string }) => {
       icon: <StatusBadgeIndicator status={metricStatus || VerificationStatus.NOT_REQUESTED} />,
       items: [<React.Fragment key="status-sub-menu">{statusSubMenu}</React.Fragment>]
     }),
-    [statusSubMenu]
+    [statusSubMenu, metricStatus]
   );
 
   return statusDropdownItem;
@@ -521,7 +520,7 @@ const useRenameMetricSelectMenu = ({ metricId }: { metricId: string }) => {
         }
       }
     }),
-    [metricId]
+    [onSetFileView]
   );
 };
 

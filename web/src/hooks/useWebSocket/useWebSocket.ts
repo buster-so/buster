@@ -206,12 +206,12 @@ const useWebSocket = ({ url, checkTokenValidity, canConnect, onMessage }: WebSoc
     if (canConnect && ws.current?.readyState !== ReadyState.Open) {
       connectWebSocket();
     }
-  }, [canConnect]);
+  }, [canConnect, connectWebSocket]);
 
   useEffect(() => {
     if (!online) disconnect();
     //I chose not to connectWebSocket because I opted to use it when a message is sent?
-  }, [online]);
+  }, [online, disconnect]);
 
   // Initialize device capabilities
   useMount(() => {

@@ -20,7 +20,6 @@ export const BusterListSelectedOptionPopupContainer: React.FC<{
         {buttons.length > 0 && <PopupSplitter />}
 
         {buttons.map((button, index) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: we need to use the index as the key for the fragment
           <React.Fragment key={index}>{button}</React.Fragment>
         ))}
       </div>

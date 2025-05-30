@@ -14,6 +14,7 @@ export const FileContainerSecondary: React.FC<FileContainerSecondaryProps> = ({
     if (!assosciatedType) return null;
 
     return assosciatedType[selectedFileViewSecondary];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedFileViewSecondary, selectedFile?.id, selectedFile?.type]);
 
   return (

@@ -57,11 +57,11 @@ const nextConfig = {
   reactStrictMode: false,
   // Disable ESLint during builds since we're using Biome
   eslint: {
-    ignoreDuringBuilds: true
+    ignoreDuringBuilds: false
   },
   // Disable TypeScript type checking during builds
   typescript: {
-    ignoreBuildErrors: true
+    ignoreBuildErrors: false
   },
   sassOptions: {
     includePaths: [path.join(__dirname, 'styles')],

@@ -121,7 +121,7 @@ const CollectionList: React.FC<{
         name: { name: asset.name || `New ${asset.asset_type}`, asset_type: asset.asset_type }
       }
     }));
-  }, [assetList]);
+  }, [assetList, selectedCollection.id]);
 
   const onSelectChange = useMemoizedFn((selectedRowKeys: string[]) => {
     setSelectedRowKeys(selectedRowKeys);

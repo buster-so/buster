@@ -1,5 +1,5 @@
 import { useQueries } from '@tanstack/react-query';
-import React, { type PropsWithChildren } from 'react';
+import React, { useMemo, type PropsWithChildren } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
 import type { IBusterChatMessage } from '@/api/asset_interfaces/chat';
 import { useGetChat } from '@/api/buster_rest/chats';
@@ -26,7 +26,7 @@ const useChatIndividualContext = ({
   );
   const hasChat = !!chatId && !!chat?.id;
   const chatTitle = chat?.title;
-  const chatMessageIds = chat?.message_ids ?? [];
+  const chatMessageIds = useMemo(() => chat?.message_ids ?? [], [chat?.message_ids]);
 
   //FILE
   const hasFile = !!selectedFileId;

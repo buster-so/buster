@@ -12,7 +12,7 @@ export const ClientSideAnonCheck: React.FC<{
 
   useLayoutEffect(() => {
     if (jwtToken) setAccessToken(jwtToken);
-  }, [jwtToken]);
+  }, [jwtToken, setAccessToken]);
 
   return <>{children}</>;
 };

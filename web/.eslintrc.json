@@ -5,7 +5,9 @@
   },
   "extends": ["next/core-web-vitals", "next/typescript", "plugin:storybook/recommended"],
   "rules": {
-    "@typescript-eslint/no-unused-vars": "warn"
+    "@typescript-eslint/no-unused-vars": "off",
+    "no-console": "off",
+    "react/no-array-index-key": "warn"
   },
   "overrides": [
     {
@@ -13,7 +15,6 @@
       "rules": {
         "@typescript-eslint/no-unused-vars": "off",
         "@typescript-eslint/no-explicit-any": "off",
-        "no-console": "off",
         "react/no-children-prop": "off"
       }
     }

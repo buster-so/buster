@@ -81,7 +81,7 @@ const DropdownSelect: React.FC<{
         onChange(newDatasets.map((i) => i.id));
       }
     }));
-  }, [datasets, datasetsList]);
+  }, [datasets, datasetsList, onChange]);
 
   const onSelect = useMemoizedFn((itemId: string) => {
     alert('This feature is not implemented yet');
