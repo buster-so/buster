@@ -8,6 +8,9 @@ test.describe
       await page.getByRole('link', { name: 'Total Unique Products Sold' }).click();
 
       await page.getByTestId('edit-chart-button').getByRole('button').click();
+      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForLoadState('load');
       expect(page.getByTestId('metric-view-chart-content')).toBeVisible();
 
       expect(page.getByTestId('select-chart-type-column')).toBeVisible();

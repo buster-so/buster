@@ -31,7 +31,7 @@ jobs:
       - name: Setup Node.js (Blacksmith Cache)
         uses: useblacksmith/setup-node@v5
         with:
-          node-version: "20"
+          node-version: "22"
 
       - name: Mount NPM Cache (Sticky Disk)
         uses: useblacksmith/stickydisk@v1
@@ -123,7 +123,7 @@ jobs:
           echo "Checking make script content for 'start-fast':"
           cat web/Makefile | grep -A 10 "start-fast"
 
-      - name: Run Frontend E2E Tests with xvfb
+      - name: Run Frontend E2E Tests
         working-directory: ./web
         run: |
           echo "Running web E2E tests..."

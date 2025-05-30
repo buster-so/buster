@@ -83,9 +83,9 @@ const ThreeDotMenu: React.FC<{
   }
 
   return (
-    <button type="button" onClick={onClickButton} className="flex">
+    <div onClick={onClickButton} className="flex">
       <SelectAxisColumnPopover {...props}>{ButtonNode}</SelectAxisColumnPopover>
-    </button>
+    </div>
   );
 };
 

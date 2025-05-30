@@ -36,7 +36,7 @@ test.describe
       await page.waitForLoadState('networkidle');
       await page.waitForLoadState('domcontentloaded');
       await page.waitForLoadState('load');
-      await page.getByTestId('select-axis-drop-zone-yAxis').getByRole('button').nth(3).click();
+      await page.getByRole('button', { name: 'Avg Revenue Per Customer' }).first().click();
       await page.getByRole('textbox', { name: 'Avg Revenue Per Customer' }).click();
       await page.getByRole('textbox', { name: 'Avg Revenue Per Customer' }).fill('NATE RULEZ');
       await page.getByRole('button', { name: 'Save' }).click();
@@ -61,10 +61,14 @@ test.describe
       await page.goto(
         'http://localhost:3000/app/metrics/635d9b06-afb1-5b05-8130-03c0b7a04bcb/chart?secondary_view=chart-edit'
       );
-      await page.getByTestId('select-axis-drop-zone-yAxis').getByRole('button').nth(3).click();
+
+      await page.getByRole('button', { name: 'Avg Revenue Per Customer' }).first().click();
+
+      expect(page.getByTestId('segmented-trigger-line')).toHaveAttribute('data-state', 'active');
       await page.getByTestId('segmented-trigger-dot-line').click();
+      await page.waitForTimeout(100);
       await page.getByRole('button', { name: 'Save' }).click();
-      await page.waitForTimeout(120);
+      await page.waitForTimeout(100);
       await page.waitForLoadState('networkidle');
       await expect(page.getByTestId('segmented-trigger-dot-line')).toHaveAttribute(
         'data-state',
@@ -83,10 +87,15 @@ test.describe
         'data-state',
         'active'
       );
-      await page.waitForTimeout(100);
+      await page.waitForTimeout(200);
       await page.getByTestId('segmented-trigger-line').click();
+      await page.waitForTimeout(100);
+      await expect(page.getByTestId('segmented-trigger-line')).toHaveAttribute(
+        'data-state',
+        'active'
+      );
       await page.getByRole('button', { name: 'Save' }).click();
-      await page.waitForTimeout(50);
+      await page.waitForTimeout(100);
       await page.waitForLoadState('networkidle');
       await expect(page.getByTestId('segmented-trigger-line')).toHaveAttribute(
         'data-state',
@@ -98,7 +107,7 @@ test.describe
       await page.goto(
         'http://localhost:3000/app/metrics/635d9b06-afb1-5b05-8130-03c0b7a04bcb/chart?secondary_view=chart-edit'
       );
-      await page.getByTestId('select-axis-drop-zone-yAxis').getByRole('button').nth(3).click();
+      await page.getByRole('button', { name: 'Avg Revenue Per Customer' }).first().click();
       await page.getByRole('switch').click();
       await expect(page.getByRole('switch')).toBeVisible();
       await expect(page.getByRole('switch')).toHaveAttribute('data-state', 'checked');
@@ -200,7 +209,9 @@ test.describe
 
       await page.reload();
       await page.getByTestId('segmented-trigger-Styling').click();
-
+      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForLoadState('load');
       await expect(
         page
           .locator('div')
@@ -230,6 +241,12 @@ test.describe
         'http://localhost:3000/app/metrics/635d9b06-afb1-5b05-8130-03c0b7a04bcb/chart?secondary_view=chart-edit'
       );
       await page.getByTestId('segmented-trigger-Styling').click();
+      await expect(
+        page
+          .locator('div')
+          .filter({ hasText: /^Dot on lines$/ })
+          .getByRole('switch')
+      ).toHaveAttribute('data-state', 'unchecked');
       await page.waitForTimeout(100);
       await page.waitForLoadState('networkidle');
       await page.waitForLoadState('domcontentloaded');
@@ -240,9 +257,16 @@ test.describe
         .getByRole('switch')
         .click();
       await page.getByRole('button', { name: 'Save' }).click();
-
+      await page.waitForTimeout(50);
+      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForLoadState('load');
       await page.reload();
       await page.getByTestId('segmented-trigger-Styling').click();
+      await page.waitForTimeout(50);
+      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForLoadState('load');
       await expect(
         page
           .locator('div')
@@ -252,6 +276,10 @@ test.describe
 
       await page.reload();
       await page.getByTestId('segmented-trigger-Styling').click();
+      await page.waitForTimeout(50);
+      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForLoadState('load');
       await page
         .locator('div')
         .filter({ hasText: /^Dot on lines$/ })

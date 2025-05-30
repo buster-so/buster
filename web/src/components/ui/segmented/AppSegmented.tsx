@@ -157,9 +157,7 @@ export const AppSegmented: AppSegmentedComponent = React.memo(
 
     useEffect(() => {
       if (value !== undefined && value !== selectedValue) {
-        startTransition(() => {
-          setSelectedValue(value);
-        });
+        setSelectedValue(value);
       }
     }, [value]);
 

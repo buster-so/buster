@@ -158,14 +158,13 @@ const DropdownIcon: React.FC<{
   });
 
   const onClickContainer = useMemoizedFn(
-    (event: React.MouseEvent<HTMLButtonElement> | React.KeyboardEvent<HTMLButtonElement>) => {
+    (event: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>) => {
       event.stopPropagation();
     }
   );
 
   return (
-    <button
-      type="button"
+    <div
       className="relative flex h-full cursor-pointer items-center space-x-0.5 pr-1"
       onClick={onClickContainer}
       onKeyUp={(e) => e.key === 'Enter' && onClickContainer(e)}
@@ -205,7 +204,7 @@ const DropdownIcon: React.FC<{
           </div>
         }
       />
-    </button>
+    </div>
   );
 });
 DropdownIcon.displayName = 'DropdownIcon';
