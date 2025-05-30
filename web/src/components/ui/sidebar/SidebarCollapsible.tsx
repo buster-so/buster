@@ -82,12 +82,12 @@ const SortableSidebarItem: React.FC<SortableSidebarItemProps> = React.memo(({ it
     opacity: isDragging ? 0 : 1
   };
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = useMemoizedFn((e: React.MouseEvent) => {
     if (isDragging) {
       e.preventDefault();
       e.stopPropagation();
     }
-  };
+  });
 
   return (
     <div

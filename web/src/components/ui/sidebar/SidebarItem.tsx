@@ -5,11 +5,18 @@ import { cn } from '@/lib/classMerge';
 import { Button } from '../buttons/Button';
 import { Xmark } from '../icons';
 import type { ISidebarItem } from './interfaces';
-import { COLLAPSED_HIDDEN_BLOCK } from './config';
+import {
+  COLLAPSED_HIDDEN_BLOCK,
+  COLLAPSED_HIDDEN_FLEX_GROUP,
+  COLLAPSED_JUSTIFY_CENTER
+} from './config';
 import { AppTooltip } from '../tooltip';
 
 const itemVariants = cva(
-  'flex items-center group justify-between rounded px-1.5 min-h-7 max-h-7 text-base transition-colors cursor-pointer',
+  cn(
+    'flex items-center group rounded px-1.5 min-h-7 max-h-7 text-base transition-colors cursor-pointer',
+    COLLAPSED_JUSTIFY_CENTER
+  ),
   {
     variants: {
       variant: {
@@ -82,16 +89,16 @@ export const SidebarItem: React.FC<
     const ItemNode = disabled || !route ? 'div' : Link;
 
     return (
-      <ItemNode
-        href={route || ''}
-        className={cn(itemVariants({ active, disabled, variant }), className)}
-        onClick={onClick}>
-        <div className="flex items-center gap-2 overflow-hidden">
-          <AppTooltip
-            title={collapsedTooltip || label}
-            side="right"
-            sideOffset={8}
-            delayDuration={750}>
+      <AppTooltip
+        title={<span className="block max-w-[260px] truncate">{collapsedTooltip || label}</span>}
+        side="right"
+        sideOffset={8}
+        delayDuration={1000}>
+        <ItemNode
+          href={route || ''}
+          className={cn(itemVariants({ active, disabled, variant }), className)}
+          onClick={onClick}>
+          <div className={'flex items-center gap-2 overflow-hidden'}>
             <span
               className={cn('text-icon-size! text-icon-color', {
                 'text-text-disabled': disabled,
@@ -99,25 +106,25 @@ export const SidebarItem: React.FC<
               })}>
               {icon}
             </span>
-          </AppTooltip>
-          <span className={cn(COLLAPSED_HIDDEN_BLOCK, 'leading-1.3 truncate', className)}>
-            {label}
-          </span>
-        </div>
-        {onRemove && (
-          <Button
-            className="hidden group-hover:flex"
-            variant="ghost"
-            size={'small'}
-            prefix={<Xmark />}
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              onRemove();
-            }}
-          />
-        )}
-      </ItemNode>
+            <span className={cn(COLLAPSED_HIDDEN_BLOCK, 'leading-1.3 truncate', className)}>
+              {label}
+            </span>
+          </div>
+          {onRemove && (
+            <Button
+              className={cn(COLLAPSED_HIDDEN_FLEX_GROUP)}
+              variant="ghost"
+              size={'small'}
+              prefix={<Xmark />}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                onRemove();
+              }}
+            />
+          )}
+        </ItemNode>
+      </AppTooltip>
     );
   }
 );

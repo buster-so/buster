@@ -34,7 +34,6 @@ export const PermissionAssignedCell: React.FC<{
 
   return (
     <div
-      type="button"
       className="flex cursor-pointer items-center space-x-5"
       onClick={(e) => {
         e.preventDefault();
