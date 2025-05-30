@@ -275,7 +275,8 @@ test.describe
 
       //can remove x axis from bar chart
       await page.getByTestId('edit-chart-button').getByRole('button').click();
-      await page.locator('.relative > button').first().click();
+
+      await page.getByTestId('select-axis-drop-zone-xAxis').getByTestId('delete-button').click();
       await expect(page.getByText('No valid axis selected')).toBeVisible();
 
       //can drag a numeric column to x axis
@@ -326,7 +327,7 @@ test.describe
           .filter({ hasText: 'Year' })
       ).toBeVisible();
 
-      await page.getByTestId('select-axis-drop-zone-xAxis').getByRole('button').nth(2).click();
+      await page.getByTestId('select-axis-drop-zone-xAxis').getByTestId('delete-button').click();
       await expect(page.getByRole('button', { name: 'Reset' })).toBeVisible();
       await page.getByRole('button', { name: 'Reset' }).click();
       await expect(page.getByRole('button', { name: 'Reset' })).not.toBeVisible();

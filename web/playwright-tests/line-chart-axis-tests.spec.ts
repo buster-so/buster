@@ -230,6 +230,10 @@ test.describe
         'http://localhost:3000/app/metrics/635d9b06-afb1-5b05-8130-03c0b7a04bcb/chart?secondary_view=chart-edit'
       );
       await page.getByTestId('segmented-trigger-Styling').click();
+      await page.waitForTimeout(100);
+      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForLoadState('load');
       await page
         .locator('div')
         .filter({ hasText: /^Dot on lines$/ })
