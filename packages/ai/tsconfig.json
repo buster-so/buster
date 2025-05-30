@@ -22,7 +22,8 @@
       "@/*": ["src/*"],
       "@tools/*": ["src/tools/*"],
       "@agents/*": ["src/agents/*"],
-      "@workflows/*": ["src/workflows/*"]
+      "@workflows/*": ["src/workflows/*"],
+      "@access-controls/*": ["../../access-controls/src/*"]
     }
   },
   "include": [

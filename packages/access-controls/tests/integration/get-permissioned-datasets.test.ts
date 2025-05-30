@@ -142,10 +142,11 @@ describe('getPermissionedDatasets Integration Tests', () => {
   });
 
   describe('User Dataset Access - Limited Access User', () => {
-    test('should verify limited access user permissions (currently no datasets)', async () => {
+    test('should verify limited access user has access to sales_person dataset', async () => {
       const result = await getPermissionedDatasets(limitedAccessUserId, 0, 100);
 
       expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBeGreaterThan(0);
 
       console.log(`User ${limitedAccessUserId} has access to ${result.length} datasets`);
 
@@ -153,7 +154,7 @@ describe('getPermissionedDatasets Integration Tests', () => {
       const datasetNames = result.map((d) => d.name).sort();
       console.log(`Accessible datasets: ${datasetNames.join(', ')}`);
 
-      // Check specific datasets
+      // Check for sales_person dataset access
       const salesPersonDataset = result.find((dataset) => dataset.name === 'sales_person');
       const employeeDeptHistoryDataset = result.find(
         (dataset) => dataset.name === 'employee_department_history'
@@ -164,14 +165,27 @@ describe('getPermissionedDatasets Integration Tests', () => {
         `Employee department history dataset found: ${employeeDeptHistoryDataset ? 'YES' : 'NO'}`
       );
 
-      // Based on the current seeded data, this user has no access to any datasets
-      // This test verifies the access control system properly restricts access
-      expect(result.length).toBe(0);
-      expect(salesPersonDataset).toBeUndefined();
-      expect(employeeDeptHistoryDataset).toBeUndefined();
+      // This user should have access to sales_person dataset
+      expect(salesPersonDataset).toBeDefined();
+      expect(salesPersonDataset?.name).toBe('sales_person');
 
-      // Note: If the seeded data changes to give this user access to sales_person but not
-      // employee_department_history, update this test accordingly
+      // Verify dataset structure for sales_person
+      if (salesPersonDataset) {
+        expect(salesPersonDataset).toHaveProperty('id');
+        expect(salesPersonDataset).toHaveProperty('name');
+        expect(salesPersonDataset).toHaveProperty('ymlFile');
+        expect(salesPersonDataset).toHaveProperty('createdAt');
+        expect(salesPersonDataset).toHaveProperty('updatedAt');
+        expect(salesPersonDataset).toHaveProperty('deletedAt');
+        expect(salesPersonDataset).toHaveProperty('dataSourceId');
+
+        expect(typeof salesPersonDataset.id).toBe('string');
+        expect(typeof salesPersonDataset.name).toBe('string');
+        expect(typeof salesPersonDataset.dataSourceId).toBe('string');
+      }
+
+      // This user should not have access to employee_department_history
+      expect(employeeDeptHistoryDataset).toBeUndefined();
     });
 
     test('should return datasets in alphabetical order for limited access user', async () => {

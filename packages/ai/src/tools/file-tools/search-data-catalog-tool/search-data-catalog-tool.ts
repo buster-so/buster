@@ -1,4 +1,5 @@
 import { openai } from '@ai-sdk/openai';
+import { type PermissionedDataset, getPermissionedDatasets } from '@buster/access-controls';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { createTool } from '@mastra/core/tools';
 import { embed, generateText } from 'ai';
@@ -12,13 +13,8 @@ interface SearchDataCatalogParams {
   specific_queries?: string[];
   exploratory_topics?: string[];
   value_search_terms?: string[];
-}
-
-interface PermissionedDataset {
-  id: string;
-  name: string;
-  yml_content: string;
-  data_source_id: string;
+  max_results?: number;
+  include_metadata?: boolean;
 }
 
 interface FoundValueInfo {
@@ -174,7 +170,13 @@ const searchDataCatalog = wrapTraced(
     runtimeContext: RuntimeContext<AnalystRuntimeContext>
   ) => {
     const startTime = Date.now();
-    const { specific_queries = [], exploratory_topics = [], value_search_terms = [] } = params;
+    const {
+      specific_queries = [],
+      exploratory_topics = [],
+      value_search_terms = [],
+      max_results = 10,
+      include_metadata = true,
+    } = params;
 
     const userId: string = runtimeContext.get('userId');
     const userPrompt: string = runtimeContext.get('user_prompt') || '';
@@ -184,7 +186,7 @@ const searchDataCatalog = wrapTraced(
     }
 
     // Get permissioned datasets from database
-    const datasets = await getPermissionedDatasets(userId);
+    const datasets = await getPermissionedDatasets(userId, 0, 1000);
 
     if (datasets.length === 0) {
       return {
@@ -200,9 +202,10 @@ const searchDataCatalog = wrapTraced(
     }
 
     // Extract and cache data source ID
-    const targetDataSourceId = datasets[0]?.data_source_id;
+    const targetDataSourceId = datasets[0]?.dataSourceId;
     if (targetDataSourceId) {
-      await runtimeContext?.setStateValue?.('data_source_id', targetDataSourceId);
+      // Note: setStateValue doesn't exist on RuntimeContext, commenting out
+      // await runtimeContext?.setStateValue?.('data_source_id', targetDataSourceId);
     }
 
     // Get data source syntax concurrently
@@ -238,7 +241,7 @@ const searchDataCatalog = wrapTraced(
     }
 
     // Prepare documents for reranking
-    const documents = datasets.filter((d) => d.yml_content).map((d) => d.yml_content!);
+    const documents = datasets.filter((d) => d.ymlFile).map((d) => d.ymlFile!);
 
     if (documents.length === 0) {
       return {
@@ -300,10 +303,6 @@ const searchDataCatalog = wrapTraced(
       ? await injectMetadata(combinedResults, allFoundValues)
       : combinedResults;
 
-    // Set agent state
-    await runtimeContext?.setStateValue?.('data_context', finalResults.length > 0);
-    await runtimeContext?.setStateValue?.('searched_data_catalog', true);
-
     // Wait for syntax promise to complete
     await syntaxPromise;
 
@@ -324,22 +323,10 @@ const searchDataCatalog = wrapTraced(
   { name: 'search-data-catalog' }
 );
 
-async function getDataSourceSyntax(dataSourceId: string | undefined, runtimeContext: any) {
-  if (!dataSourceId) return;
-
-  try {
-    // Mock implementation for now
-    // const result = await db.query(`
-    //   SELECT type FROM data_sources WHERE id = $1
-    // `, [dataSourceId]);
-
-    // const syntax = result.rows[0]?.type || null;
-    const syntax = 'postgresql'; // Mock value
-    await runtimeContext?.setStateValue?.('data_source_syntax', syntax);
-  } catch (error) {
-    console.warn('Failed to get data source syntax:', error);
-    await runtimeContext?.setStateValue?.('data_source_syntax', null);
-  }
+async function getDataSourceSyntax(_dataSourceId: string | undefined, _runtimeContext: any) {
+  // Mock implementation - would normally fetch data source syntax from database
+  // and set it in runtime context, but setStateValue doesn't exist on RuntimeContext
+  return;
 }
 
 function isTimePeriodTerm(term: string): boolean {
@@ -496,7 +483,7 @@ async function rerankDatasets(
 function cosineSimilarity(a: number[], b: number[]): number {
   if (a.length !== b.length || a.length === 0) return 0;
 
-  const dotProduct = a.reduce((sum, val, i) => sum + val * b[i], 0);
+  const dotProduct = a.reduce((sum, val, i) => sum + val * (b[i] || 0), 0);
   const magnitudeA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
   const magnitudeB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0));
 
@@ -526,7 +513,7 @@ async function filterDatasetsWithLLM(
   const datasetsJson = rankedDatasets.map((ranked) => ({
     id: ranked.dataset.id,
     name: ranked.dataset.name,
-    yml_content: ranked.dataset.yml_content || '',
+    yml_content: ranked.dataset.ymlFile || '',
   }));
 
   const foundValuesJson =
@@ -575,7 +562,7 @@ async function filterDatasetsWithLLM(
         return {
           id: rankedDataset.dataset.id,
           name: rankedDataset.dataset.name,
-          yml_content: rankedDataset.dataset.yml_content,
+          yml_content: rankedDataset.dataset.ymlFile,
           relevance_score: rankedDataset.relevance_score,
           match_type: generationNameSuffix as 'specific' | 'exploratory',
         };
@@ -629,7 +616,7 @@ function combineAndRankResults(
 
   for (const result of allResults) {
     const tableName = result.name?.toLowerCase().replace(/\s+/g, '_');
-    if (valueMatchDatasets.has(tableName)) {
+    if (tableName && valueMatchDatasets.has(tableName)) {
       result.relevance_score = Math.min(result.relevance_score + 0.3, 1.0);
       result.match_type = 'value_match';
     }

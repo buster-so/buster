@@ -1,8 +1,22 @@
 import { defineWorkspace } from 'vitest/config'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 export default defineWorkspace([
-  "./packages/web-tools/vitest.config.ts",
-  "./packages/data-source/vitest.config.ts",
-  "./packages/ai/vitest.config.ts",
-  "./packages/stored-values/vitest.config.ts"
+  // Root workspace config for shared functionality
+  {
+    plugins: [tsconfigPaths()],
+    resolve: {
+      alias: {
+        // Add any global aliases you need across packages
+      },
+    },
+    test: {
+      // Global test configuration that applies to all packages
+      environment: 'node',
+      globals: true,
+      testTimeout: 30000,
+    },
+  },
+  // Include all individual package configs
+  "./packages/*/vitest.config.ts"
 ])

@@ -11,6 +11,10 @@ export {
   checkPermission,
   hasRole,
   validateAccess,
+  getPermissionedDatasets,
+  hasDatasetAccess,
+  hasAllDatasetsAccess,
+  type PermissionedDataset,
 } from './access-controls';
 
 // Export utility functions
