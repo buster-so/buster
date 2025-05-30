@@ -120,6 +120,7 @@ jobs:
       - name: Install Dependencies for Testing
         working-directory: ./web
         run: |
+          npm install
           npx playwright install --with-deps
 
       - name: Download API Image
