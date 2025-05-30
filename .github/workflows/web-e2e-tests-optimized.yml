@@ -27,12 +27,13 @@ jobs:
           key: frontend-npm-${{ github.sha }}
           path: ~/.npm
 
-      - name: Install & Build Frontend
+      - name: Install Frontend Dependencies
         working-directory: ./web
-        run: |
-          npm install
-          npx playwright install --with-deps
-          npm run build
+        run: npm install
+
+      - name: Build Frontend
+        working-directory: ./web
+        run: npm run build
         env:
           NEXT_PUBLIC_API_URL: http://localhost:3001
           NEXT_PUBLIC_URL: http://localhost:3000
@@ -115,6 +116,11 @@ jobs:
         run: |
           mkdir -p web/.next
           tar -xzf web-build.tar.gz -C web/
+
+      - name: Install Dependencies for Testing
+        working-directory: ./web
+        run: |
+          npx playwright install --with-deps
 
       - name: Download API Image
         uses: actions/download-artifact@v4
