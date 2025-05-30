@@ -127,7 +127,7 @@ export const ButtonSplit = React.memo(
           <button
             type="button"
             className="flex h-full cursor-pointer items-center justify-center text-sm"
-            aria-label="Open dropdown menu"
+            aria-label={open ? 'Close dropdown menu' : 'Open dropdown menu'}
             onClick={handleClick}>
             <div className={cn(splitButtonVariants({ variant }), 'border-none')}>
               <span
