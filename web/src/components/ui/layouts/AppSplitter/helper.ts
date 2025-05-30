@@ -27,6 +27,10 @@ export const convertPxToPercentage = (px: number, containerWidth: number): numbe
   return (px / containerWidth) * 100;
 };
 
+export const convertPercentageToPx = (percentage: number, containerWidth: number): number => {
+  return (percentage / 100) * containerWidth;
+};
+
 export const getCurrentSizePercentage = (
   size: string | number,
   otherSize: string | number,
@@ -54,4 +58,58 @@ export const getCurrentSizePercentage = (
   }
 
   return 0;
+};
+
+export const getCurrentSizesInPixels = (
+  container: HTMLElement,
+  sizes: [string | number | 'auto', string | number | 'auto']
+): [number, number] => {
+  if (!container) return [0, 0];
+  const containerWidth = container.getBoundingClientRect().width;
+
+  // Helper function to calculate size in pixels for a single side
+  const calculateSizeInPixels = (size: string | number): number => {
+    // If it's already a number, treat it as pixels
+    if (typeof size === 'number') {
+      return size;
+    }
+
+    // Parse the string value to get value and unit
+    const { value, unit } = parseWidthValue(size);
+
+    // If it's already in pixels, return the value directly
+    if (unit === 'px') {
+      return value;
+    }
+
+    // If it's a percentage, convert to pixels
+    if (unit === '%') {
+      return convertPercentageToPx(value, containerWidth);
+    }
+
+    return 0; // fallback
+  };
+
+  return sizes.map((size, index) => {
+    // Handle 'auto' case
+    if (size === 'auto') {
+      // Get the other side's index (0 -> 1, 1 -> 0)
+      const otherIndex = index === 0 ? 1 : 0;
+      const otherSize = sizes[otherIndex];
+
+      // If the other side is also auto, split equally
+      if (otherSize === 'auto') {
+        return containerWidth / 2;
+      }
+
+      // Calculate the other side's width in pixels
+      const otherSizeInPixels = calculateSizeInPixels(otherSize);
+
+      // Return the remaining width
+      return containerWidth - otherSizeInPixels;
+    }
+
+    // For non-auto sizes, use the helper function
+    return calculateSizeInPixels(size);
+  }) as [number, number];
 };

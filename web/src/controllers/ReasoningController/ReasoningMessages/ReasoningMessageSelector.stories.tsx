@@ -285,14 +285,14 @@ export const InteractiveTitles: Story = {
           <div className="flex flex-col gap-4">
             <div className="flex gap-2">
               <button
-                className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+                className="cursor-pointer rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
                 onClick={() =>
                   updateMessage({ title: `New Title ${Math.floor(Math.random() * 1000)}` })
                 }>
                 Change Title
               </button>
               <button
-                className="rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600"
+                className="cursor-pointer rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600"
                 onClick={() =>
                   updateMessage({
                     secondary_title: `New Secondary Title ${Math.floor(Math.random() * 1000)}`
@@ -301,7 +301,7 @@ export const InteractiveTitles: Story = {
                 Change Secondary Title
               </button>
               <button
-                className="rounded bg-purple-500 px-4 py-2 text-white hover:bg-purple-600"
+                className="cursor-pointer rounded bg-purple-500 px-4 py-2 text-white hover:bg-purple-600"
                 onClick={() => {
                   const currentData = queryClient.getQueryData([
                     'chats',
@@ -319,7 +319,7 @@ export const InteractiveTitles: Story = {
                 Toggle Secondary Title
               </button>
               <button
-                className="rounded bg-orange-500 px-4 py-2 text-white hover:bg-orange-600"
+                className="cursor-pointer rounded bg-orange-500 px-4 py-2 text-white hover:bg-orange-600"
                 onClick={() => {
                   const randomNum = Math.floor(Math.random() * 1000);
                   updateMessage({

@@ -8,6 +8,8 @@ export const buttonTypeClasses = {
   default:
     'bg-background border hover:bg-item-hover disabled:bg-disabled disabled:text-gray-light active:bg-item-active data-[selected=true]:bg-item-select',
   black: 'bg-black text-white hover:bg-foreground-hover disabled:bg-black/60',
+  outlined:
+    'bg-transparent border border-border text-gray-dark hover:bg-item-hover disabled:bg-transparent disabled:text-gray-light active:bg-item-active data-[selected=true]:bg-item-select',
   primary:
     'bg-primary disabled:bg-disabled text-white hover:bg-primary-light disabled:text-gray-light active:bg-primary-dark data-[selected=true]:bg-primary-dark',
   ghost:
@@ -82,6 +84,7 @@ export const buttonIconVariants = cva('', {
     variant: {
       default: 'text-icon-color',
       black: 'text-white!',
+      outlined: 'text-icon-color',
       primary: 'text-white',
       ghost: 'text-icon-color',
       link: 'text-icon-color',
@@ -104,6 +107,11 @@ export const buttonIconVariants = cva('', {
       variant: 'black',
       disabled: true,
       className: 'text-white'
+    },
+    {
+      variant: 'outlined',
+      size: 'tall',
+      className: 'text-icon-size!'
     }
   ]
 });

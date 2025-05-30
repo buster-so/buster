@@ -30,7 +30,7 @@ export const DropdownMenuHeaderSearch = <T,>({
 
   return (
     <div className={cn('flex items-center gap-x-0', className)}>
-      <span className="text-icon-color swag ml-2 flex">
+      <span className="text-icon-color ml-2 flex">
         <Magnifier />
       </span>
       <Input

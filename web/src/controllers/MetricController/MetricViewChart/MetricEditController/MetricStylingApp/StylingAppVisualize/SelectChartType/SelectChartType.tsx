@@ -149,8 +149,7 @@ const ChartButton: React.FC<{
           onClick={() => !disabled && onSelectChartType(id)}
           data-state={isSelected ? 'selected' : 'not-selected'}
           className={cn(
-            'flex aspect-square h-[35px] w-full items-center justify-center hover:transition-none',
-            'hover:bg-item-hover cursor-pointer rounded',
+            'hover:bg-item-hover flex aspect-square h-[35px] w-full cursor-pointer items-center justify-center rounded hover:transition-none',
             isSelected && 'bg-background hover:bg-background border',
             disabled && 'cursor-not-allowed! bg-transparent!'
           )}>

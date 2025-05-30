@@ -17,6 +17,13 @@ import { useContactSupportModalStore } from '@/context/BusterAppLayout';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { BUSTER_DOCS_URL } from '@/routes/externalRoutes';
+import { Button } from '@/components/ui/buttons';
+import {
+  COLLAPSED_HIDDEN,
+  COLLAPSED_VISIBLE,
+  COLLAPSED_WIDTH_FIT
+} from '@/components/ui/sidebar/config';
+import { cn } from '@/lib/classMerge';
 
 export const SidebarUserFooter: React.FC = () => {
   const user = useUserConfigContextSelector((x) => x.user);
@@ -28,11 +35,20 @@ export const SidebarUserFooter: React.FC = () => {
   if (!name || !email) return null;
 
   return (
-    <SidebarUserDropdown signOut={handleSignOut}>
-      <div className="flex w-full">
-        <AvatarUserButton username={name} email={email} />
-      </div>
-    </SidebarUserDropdown>
+    <div className={cn(COLLAPSED_WIDTH_FIT, 'overflow-hidden')}>
+      <SidebarUserDropdown signOut={handleSignOut}>
+        <div className="w-full overflow-hidden">
+          <AvatarUserButton
+            username={name}
+            email={email}
+            className={cn(COLLAPSED_HIDDEN, 'w-full')}
+          />
+        </div>
+        <div className={cn(COLLAPSED_VISIBLE, 'items-center justify-center')}>
+          <Button prefix={<Gear />} variant={'ghost'} size={'tall'} />
+        </div>
+      </SidebarUserDropdown>
+    </div>
   );
 };
 

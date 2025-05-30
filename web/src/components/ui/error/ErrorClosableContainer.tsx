@@ -40,7 +40,7 @@ export const ErrorClosableContainer: React.FC<{
                 setClosed(true);
               }}
               className={cn(
-                'text-danger-foreground flex items-center justify-center border-none bg-none hover:opacity-80',
+                'text-danger-foreground flex cursor-pointer items-center justify-center border-none bg-none hover:opacity-80',
                 'cursor-pointer rounded-sm p-0.5 transition-colors hover:bg-black/5'
               )}>
               <Xmark />

@@ -261,7 +261,7 @@ const ColumnSettingComponent: React.FC<{
 
   return (
     <>
-      <div className={`${className} swag2 flex w-full flex-col space-y-3 overflow-hidden p-3`}>
+      <div className={`${className} flex w-full flex-col space-y-3 overflow-hidden p-3`}>
         {EnabledComponentsLoop.map(({ enabled, key, Component }) => {
           return <React.Fragment key={key}>{Component}</React.Fragment>;
         })}
@@ -433,7 +433,7 @@ const LabelSettings: React.FC<{
 
   return (
     <ErrorBoundary>
-      <div className={`${className} swag flex w-full flex-col space-y-3 overflow-hidden p-3`}>
+      <div className={`${className} flex w-full flex-col space-y-3 overflow-hidden p-3`}>
         {ComponentsLoop.map(({ key, Component }) => {
           return <React.Fragment key={key}>{Component}</React.Fragment>;
         })}

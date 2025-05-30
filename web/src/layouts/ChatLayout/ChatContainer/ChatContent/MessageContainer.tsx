@@ -22,7 +22,7 @@ export const MessageContainer = forwardRef<HTMLButtonElement, MessageContainerPr
       <button
         ref={ref}
         type="button"
-        className={'flex w-full space-x-2'}
+        className={'flex w-full cursor-pointer space-x-2'}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}>
         {senderName ? (

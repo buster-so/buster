@@ -47,7 +47,7 @@ export const DashboardFilterDiffModall: React.FC<DashboardFilterDiffModallProps>
           showClose={false}
           className="h-[80vh] max-h-[80vh] min-h-[75vh] w-full max-w-[1000px] min-w-[1000px] overflow-hidden">
           <div className="flex max-h-full w-full overflow-hidden">
-            <Sidebar
+            <ModalSidebar
               className="w-full max-w-[250px]"
               metrics={metrics}
               selectedMetricId={selectedMetricId}
@@ -64,7 +64,7 @@ export const DashboardFilterDiffModall: React.FC<DashboardFilterDiffModallProps>
 
 DashboardFilterDiffModall.displayName = 'DashboardFilterDiffModall';
 
-const Sidebar: React.FC<{
+const ModalSidebar: React.FC<{
   className?: string;
   metrics: DashboardFilterDiffModallProps['metrics'];
   selectedMetricId: string | null;

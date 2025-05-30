@@ -1,36 +1,33 @@
 name: Web Lint
 
 on:
-  push:
-    paths:
-      - 'web/**'
   pull_request:
     paths:
-      - 'web/**'
+      - "web/**"
 
 jobs:
   web-lint:
     runs-on: ubuntu-latest
-    
+
     strategy:
       matrix:
         node-version: [22.x]
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-        cache-dependency-path: 'web/package-lock.json'
-        
-    - name: Install dependencies
-      run: npm ci
-      working-directory: ./web
-      
-    - name: Run linting
-      run: npm run lint:ci
-      working-directory: ./web 
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+          cache-dependency-path: "web/package-lock.json"
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./web
+
+      - name: Run linting
+        run: npm run lint:ci
+        working-directory: ./web

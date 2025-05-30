@@ -83,7 +83,7 @@ const TitleContainer: React.FC<{
   isCompletedStream: boolean;
 }> = React.memo(({ title, secondaryTitle, isCompletedStream }) => {
   return (
-    <div className={cn('@container', 'flex w-full items-center space-x-1.5 overflow-hidden')}>
+    <div className={cn('@container flex w-full items-center space-x-1.5 overflow-hidden')}>
       <AnimatePresence mode="wait" initial={!isCompletedStream}>
         <motion.div
           className="flex items-center space-x-1.5"
