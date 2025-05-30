@@ -1,7 +1,7 @@
 {
-  "api_tag": "api/v0.1.32", "api_version": "0.1.32"
+  "api_tag": "api/v0.1.33", "api_version": "0.1.33"
 ,
-  "web_tag": "web/v0.1.32", "web_version": "0.1.32"
+  "web_tag": "web/v0.1.33", "web_version": "0.1.33"
 ,
-  "cli_tag": "cli/v0.1.32", "cli_version": "0.1.32"
+  "cli_tag": "cli/v0.1.33", "cli_version": "0.1.33"
 }
