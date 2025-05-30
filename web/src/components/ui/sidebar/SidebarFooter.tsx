@@ -22,7 +22,7 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = React.memo(
         )}
         data-testid="sidebar-footer">
         {children}
-        {useCollapsible && <CollapseibleButton onClick={onCollapseClick} />}
+        {useCollapsible && <CollapseButton onClick={onCollapseClick} />}
       </div>
     );
   }
@@ -30,7 +30,7 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = React.memo(
 
 SidebarFooter.displayName = 'SidebarFooter';
 
-const CollapseibleButton: React.FC<{
+const CollapseButton: React.FC<{
   onClick: () => void;
 }> = React.memo(({ onClick }) => {
   return (
@@ -47,4 +47,4 @@ const CollapseibleButton: React.FC<{
   );
 });
 
-CollapseibleButton.displayName = 'CollapseibleButton';
+CollapseButton.displayName = 'CollapseButton';
