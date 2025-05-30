@@ -116,13 +116,19 @@ export abstract class BaseIntrospector implements DataSourceIntrospector {
   }): Promise<DataSourceIntrospectionResult> {
     // Validate that filter arrays are not empty
     if (options?.databases && options.databases.length === 0) {
-      throw new Error('Database filter array is empty. Please provide at least one database name or remove the filter.');
+      throw new Error(
+        'Database filter array is empty. Please provide at least one database name or remove the filter.'
+      );
     }
     if (options?.schemas && options.schemas.length === 0) {
-      throw new Error('Schema filter array is empty. Please provide at least one schema name or remove the filter.');
+      throw new Error(
+        'Schema filter array is empty. Please provide at least one schema name or remove the filter.'
+      );
     }
     if (options?.tables && options.tables.length === 0) {
-      throw new Error('Table filter array is empty. Please provide at least one table name or remove the filter.');
+      throw new Error(
+        'Table filter array is empty. Please provide at least one table name or remove the filter.'
+      );
     }
 
     // Fetch data sequentially to enable caching optimizations

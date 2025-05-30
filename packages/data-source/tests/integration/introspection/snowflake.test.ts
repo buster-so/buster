@@ -321,10 +321,10 @@ describe('Snowflake DataSource Introspection', () => {
         });
 
         // Verify only DBT database is returned
-        expect(filteredIntrospection.databases.some(db => db.name === 'DBT')).toBe(true);
-        const databaseNames = new Set(filteredIntrospection.databases.map(db => db.name));
+        expect(filteredIntrospection.databases.some((db) => db.name === 'DBT')).toBe(true);
+        const databaseNames = new Set(filteredIntrospection.databases.map((db) => db.name));
         expect(databaseNames.has('DBT')).toBe(true);
-        
+
         // Verify all schemas belong to DBT database
         for (const schema of filteredIntrospection.schemas) {
           expect(schema.database).toBe('DBT');
@@ -365,9 +365,9 @@ describe('Snowflake DataSource Introspection', () => {
         });
 
         // Verify only REVENUE schema is returned
-        const revenueSchemas = filteredIntrospection.schemas.filter(s => s.name === 'REVENUE');
+        const revenueSchemas = filteredIntrospection.schemas.filter((s) => s.name === 'REVENUE');
         expect(revenueSchemas.length).toBeGreaterThan(0);
-        expect(filteredIntrospection.schemas.every(s => s.name === 'REVENUE')).toBe(true);
+        expect(filteredIntrospection.schemas.every((s) => s.name === 'REVENUE')).toBe(true);
 
         // Verify all tables belong to REVENUE schema
         for (const table of filteredIntrospection.tables) {
@@ -385,7 +385,7 @@ describe('Snowflake DataSource Introspection', () => {
         }
 
         // Verify databases are filtered to only those containing REVENUE schema
-        const databasesWithRevenue = new Set(revenueSchemas.map(s => s.database));
+        const databasesWithRevenue = new Set(revenueSchemas.map((s) => s.database));
         for (const database of filteredIntrospection.databases) {
           expect(databasesWithRevenue.has(database.name)).toBe(true);
         }
@@ -411,8 +411,8 @@ describe('Snowflake DataSource Introspection', () => {
         });
 
         // Verify only DBT database is returned
-        expect(filteredIntrospection.databases.some(db => db.name === 'DBT')).toBe(true);
-        
+        expect(filteredIntrospection.databases.some((db) => db.name === 'DBT')).toBe(true);
+
         // Verify only REVENUE schema in DBT database is returned
         expect(filteredIntrospection.schemas.length).toBeGreaterThan(0);
         for (const schema of filteredIntrospection.schemas) {
@@ -621,10 +621,6 @@ describe('Snowflake DataSource Introspection', () => {
       const table = 'EMAIL_SMS_REVENUE';
 
       try {
-        console.log(`Starting column statistics test for ${database}.${schema}.${table}`);
-
-        // First verify the table exists
-        console.log('Getting tables list...');
         const tables = await dataSource.getTables('test-snowflake');
         const targetTable = tables.find(
           (t) => t.database === database && t.schema === schema && t.name === table
@@ -634,41 +630,20 @@ describe('Snowflake DataSource Introspection', () => {
           console.warn(`Table ${database}.${schema}.${table} not found, skipping test`);
           return;
         }
-
-        console.log(`Found target table: ${targetTable.name}, row count: ${targetTable.rowCount}`);
-
-        // Get columns for the table
-        console.log('Getting columns...');
         const columns = await dataSource.getColumns('test-snowflake', database, schema, table);
         expect(Array.isArray(columns)).toBe(true);
         expect(columns.length).toBeGreaterThan(0);
-        console.log(`Found ${columns.length} columns:`);
-        for (const column of columns) {
-          console.log(`  - ${column.name} (${column.dataType})`);
+        for (const _column of columns) {
         }
-
-        // Get column statistics using the introspector directly
-        console.log('Getting introspector...');
         const introspector = await dataSource.introspect('test-snowflake');
         expect(introspector).toBeDefined();
-
-        console.log('Calling getColumnStatistics...');
-        const startTime = Date.now();
+        const _startTime = Date.now();
         const columnStats = await introspector.getColumnStatistics(database, schema, table);
-        const endTime = Date.now();
-        console.log(`getColumnStatistics took ${endTime - startTime}ms`);
+        const _endTime = Date.now();
 
         expect(Array.isArray(columnStats)).toBe(true);
         expect(columnStats.length).toBe(columns.length);
-
-        // Log the actual statistics before validation
-        console.log(`Raw column statistics for ${database}.${schema}.${table}:`);
-        for (const stat of columnStats) {
-          console.log(`  Column: "${stat.columnName}" (length: ${stat.columnName.length})`);
-          console.log(`    distinctCount: ${stat.distinctCount}`);
-          console.log(`    nullCount: ${stat.nullCount}`);
-          console.log(`    minValue: ${stat.minValue}`);
-          console.log(`    maxValue: ${stat.maxValue}`);
+        for (const _stat of columnStats) {
         }
 
         // Validate column statistics structure (but skip validation if empty column names)
@@ -689,13 +664,7 @@ describe('Snowflake DataSource Introspection', () => {
           expect(columnStat).toBeDefined();
           expect(columnStat?.columnName).toBe(column.name);
         }
-
-        // Log some statistics for debugging
-        console.log(`Column statistics for ${database}.${schema}.${table}:`);
-        for (const stat of columnStats) {
-          console.log(
-            `  ${stat.columnName}: distinct=${stat.distinctCount}, nulls=${stat.nullCount}`
-          );
+        for (const _stat of columnStats) {
         }
       } catch (error) {
         console.warn(`Column statistics test failed for ${database}.${schema}.${table}:`, error);

@@ -1,5 +1,5 @@
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
-import { getDb, getClient } from './connection.js';
+import { getClient, getDb } from './connection.js';
 
 export async function runMigrations(migrationsFolder = './drizzle'): Promise<void> {
   try {

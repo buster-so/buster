@@ -69,6 +69,14 @@
       "packages/**/*.js",
       "packages/**/*.jsx",
       "packages/**/*.json",
+      "packages/**/*.mjs",
+      "packages/**/*.cjs",
+      "packages/**/*.mts",
+      "packages/**/*.cts",
+      "packages/**/package.json",
+      "packages/**/tsconfig.json",
+      "packages/**/*.config.js",
+      "packages/**/*.config.ts",
       "server/**/*.ts",
       "server/**/*.js",
       "trigger/**/*.ts",
@@ -89,7 +97,10 @@
       "**/output/**",
       "**/playground/**",
       "api/**",
-      "cli/**"
+      "cli/**",
+      "packages/**/node_modules/**",
+      "packages/**/dist/**",
+      "packages/**/build/**"
     ]
   },
   "overrides": [
