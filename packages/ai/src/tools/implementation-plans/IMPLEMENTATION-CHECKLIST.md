@@ -14,20 +14,16 @@
    - Time: 2 minutes
    - Dependencies: @ai-sdk/openai, @database, vector DB
 
-3. **Tool utilities** - Basic createTool patterns
-   - Time: 1 minute
-   - Location: `packages/ai/src/tools/utils/`
-
 ### **🤖 WAVE 1: INDEPENDENT TOOLS (3 minutes - 6 parallel AI agents)**
 
 | Tool | File | Time | Type | Tests |
 |------|------|------|------|-------|
-| `read_file_tool` | `cli-tools-read-file-tool.md` | 2 min | Function | ✅ Complete |
-| `write_file_tool` | `cli-tools-write-file-tool.md` | 2 min | Function | ✅ Complete |
-| `ls_tool` | `cli-tools-ls-tool.md` | 2 min | Function | ✅ Complete |
-| `done` | `response-tools-done.md` | 2 min | Function | ✅ Complete |
-| `no_search_needed` | `utility-tools-no-search-needed.md` | 2 min | Function | ✅ Complete |
-| `message_user_clarifying_question` | `response-tools-message-user-clarifying-question.md` | 3 min | Agent | ✅ Complete |
+| `read_file_tool` | `cli-tools-read-file-tool.md` | 2 min | Function | ✅ Complete | [DONE]
+| `write_file_tool` | `cli-tools-write-file-tool.md` | 2 min | Function | ✅ Complete | [DONE]
+| `ls_tool` | `cli-tools-ls-tool.md` | 2 min | Function | ✅ Complete | [DONE]
+| `done` | `response-tools-done.md` | 2 min | Function | ✅ Complete | [DONE]
+| `no_search_needed` | `utility-tools-no-search-needed.md` | 2 min | Function | ✅ Complete | [DONE]
+| `message_user_clarifying_question` | `response-tools-message-user-clarifying-question.md` | 3 min | Agent | ✅ Complete | [DONE]
 
 ### **🤖 WAVE 2: FOUNDATIONAL TOOLS (3 minutes - 4 parallel AI agents)**
 
