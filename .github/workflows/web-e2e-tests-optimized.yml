@@ -39,7 +39,7 @@ jobs:
         run: tar -czf web-build.tar.gz build
 
       - name: Upload Frontend Build
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: web-build
           path: web/web-build.tar.gz
@@ -64,7 +64,7 @@ jobs:
         run: docker save local-api-test:latest -o api-image.tar
 
       - name: Upload API Image
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: api-image
           path: api-image.tar
@@ -105,7 +105,7 @@ jobs:
           path: ~/.npm
 
       - name: Download Frontend Build
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: web-build
 
@@ -115,7 +115,7 @@ jobs:
           tar -xzf web-build.tar.gz -C web/build
 
       - name: Download API Image
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: api-image
 
