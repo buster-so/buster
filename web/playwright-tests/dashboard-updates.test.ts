@@ -4,6 +4,10 @@ test.describe
   .serial('dashboard updates', () => {
     test('Go to dashboard', async ({ page }) => {
       await page.goto('http://localhost:3000/app/dashboards');
+      await page.waitForTimeout(100);
+      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForLoadState('load');
       await expect(page.getByText('Dashboards').nth(1)).toBeVisible();
       await expect(page.getByRole('button', { name: 'New dashboard' })).toBeVisible();
       await expect(page.getByRole('button', { name: '12px star' })).toBeVisible();
