@@ -7,7 +7,8 @@
   "rules": {
     "@typescript-eslint/no-unused-vars": "off",
     "no-console": "off",
-    "react/no-array-index-key": "warn"
+    "react/no-array-index-key": "warn",
+    "react-hooks/exhaustive-deps": "off"
   },
   "overrides": [
     {

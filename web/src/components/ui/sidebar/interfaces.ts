@@ -34,4 +34,7 @@ export interface SidebarProps {
   content: SidebarContent[];
   footer?: React.ReactNode;
   isSortable?: boolean;
+  useCollapsible?: boolean;
+  isDefaultCollapsed?: boolean;
+  onCollapseClick?: (value: boolean) => void;
 }

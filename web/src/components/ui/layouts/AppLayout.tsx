@@ -38,7 +38,7 @@ export const AppLayout: React.FC<
       autoSaveId="app-layout"
       preserveSide="left"
       splitterClassName={''}
-      leftPanelMinSize={'190px'}
+      leftPanelMinSize={'150px'}
       leftPanelMaxSize={'300px'}
       hideSplitter={true}
       leftChildren={sidebar}

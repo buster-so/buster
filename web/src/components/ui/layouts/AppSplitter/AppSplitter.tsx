@@ -13,15 +13,18 @@ import { useMemoizedFn, useSize } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 import {
   convertPxToPercentage,
+  convertPercentageToPx,
   createAutoSaveId,
   easeInOutCubic,
   getCurrentSizePercentage,
   parseWidthValue,
-  setAppSplitterCookie
+  setAppSplitterCookie,
+  getCurrentSizesInPixels
 } from './helper';
 import SplitPane, { Pane } from './SplitPane';
 import './splitterStyles.css';
 import { timeout } from '@/lib';
+import { AppSplitterProvider } from './AppSplitterProvider';
 
 // First, define the ref type
 export interface AppSplitterRef {
@@ -114,7 +117,7 @@ export const AppSplitter = React.memo(
 
       const hideSash = useMemo(() => {
         return hideSplitter ?? (leftHidden || rightHidden);
-      }, [hideSplitter, allowResize, leftHidden, rightHidden]);
+      }, [hideSplitter, leftHidden, rightHidden]);
 
       const sashRender = useMemoizedFn((_: number, active: boolean) => (
         <AppSplitterSash
@@ -168,8 +171,9 @@ export const AppSplitter = React.memo(
       });
 
       const animateWidth = useMemoizedFn(
-        async (width: string, side: 'left' | 'right', duration = 0.25) => {
-          const { value: targetValue, unit: targetUnit } = parseWidthValue(width);
+        async (width: string | number, side: 'left' | 'right', duration: number = 0.25) => {
+          const { value: targetValue, unit: targetUnit } =
+            typeof width === 'number' ? { value: width, unit: 'px' } : parseWidthValue(width);
           const container = containerRef.current;
           if (!container) return;
 
@@ -242,6 +246,12 @@ export const AppSplitter = React.memo(
         }
       );
 
+      const getSizesInPixels = useMemoizedFn((): [number, number] => {
+        const container = containerRef.current;
+        if (!container) return [0, 0];
+        return getCurrentSizesInPixels(container, _sizes as [string, string]);
+      });
+
       const imperativeHandleMethods = useMemo(() => {
         return () => ({
           setSplitSizes,
@@ -258,33 +268,42 @@ export const AppSplitter = React.memo(
 
       return (
         <div className={cn('flex h-full w-full flex-col', className)} ref={containerRef}>
-          <SplitPane
-            autoSizeId={autoSaveId}
-            initialReady={initialReady}
-            split={split}
-            sizes={_sizes}
-            style={style}
-            allowResize={_allowResize}
-            onChange={onChangePanels}
-            // onDragStart={onDragStart}
-            // onDragEnd={onDragEnd}
-            resizerSize={3}
-            sashRender={sashRender}>
-            <Pane
-              style={memoizedLeftPaneStyle}
-              className={'left-pane flex h-full flex-col'}
-              minSize={leftPanelMinSize}
-              maxSize={leftPanelMaxSize}>
-              {leftHidden || size?.width === 0 || size?.width === undefined ? null : leftChildren}
-            </Pane>
-            <Pane
-              className="right-pane flex h-full flex-col"
-              style={memoizedRightPaneStyle}
-              minSize={rightPanelMinSize}
-              maxSize={rightPanelMaxSize}>
-              {rightHidden || size?.width === 0 || size?.width === undefined ? null : rightChildren}
-            </Pane>
-          </SplitPane>
+          <AppSplitterProvider
+            animateWidth={animateWidth}
+            setSplitSizes={setSplitSizes}
+            isSideClosed={isSideClosed}
+            getSizesInPixels={getSizesInPixels}
+            sizes={_sizes as [string, string]}>
+            <SplitPane
+              autoSizeId={autoSaveId}
+              initialReady={initialReady}
+              split={split}
+              sizes={_sizes}
+              style={style}
+              allowResize={_allowResize}
+              onChange={onChangePanels}
+              // onDragStart={onDragStart}
+              // onDragEnd={onDragEnd}
+              resizerSize={3}
+              sashRender={sashRender}>
+              <Pane
+                style={memoizedLeftPaneStyle}
+                className={'left-pane flex h-full flex-col'}
+                minSize={leftPanelMinSize}
+                maxSize={leftPanelMaxSize}>
+                {leftHidden || size?.width === 0 || size?.width === undefined ? null : leftChildren}
+              </Pane>
+              <Pane
+                className="right-pane flex h-full flex-col"
+                style={memoizedRightPaneStyle}
+                minSize={rightPanelMinSize}
+                maxSize={rightPanelMaxSize}>
+                {rightHidden || size?.width === 0 || size?.width === undefined
+                  ? null
+                  : rightChildren}
+              </Pane>
+            </SplitPane>
+          </AppSplitterProvider>
         </div>
       );
     }

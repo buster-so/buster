@@ -184,7 +184,16 @@ export const SidebarPrimary = React.memo(() => {
     items.push(tryGroup(onToggleInviteModal, () => onOpenContactSupportModal('feedback'), isAdmin));
 
     return items;
-  }, [isUserRegistered, adminToolsItems, yourStuffItems, favoritesDropdownItems]);
+  }, [
+    isUserRegistered,
+    adminToolsItems,
+    yourStuffItems,
+    favoritesDropdownItems,
+    onToggleInviteModal,
+    onOpenContactSupportModal,
+    isAdmin,
+    topItemsItems
+  ]);
 
   const onCloseSupportModal = useMemoizedFn(() => onOpenContactSupportModal(false));
 
@@ -192,6 +201,7 @@ export const SidebarPrimary = React.memo(() => {
     () => <SidebarPrimaryHeader hideActions={!isUserRegistered} />,
     [isUserRegistered]
   );
+
   const FooterMemoized = useMemo(() => <SidebarUserFooter />, []);
 
   return (
