@@ -1,0 +1,167 @@
+name: Web App E2E Testing - Optimized
+
+on:
+  pull_request:
+    paths:
+      - "web/**"
+  workflow_dispatch:
+
+jobs:
+  # 1. Build the frontend once
+  build-frontend:
+    runs-on: blacksmith-32vcpu-ubuntu-2204
+    outputs:
+      build-artifact: web-build.tar.gz
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js (Blacksmith Cache)
+        uses: useblacksmith/setup-node@v5
+        with:
+          node-version: "22"
+
+      - name: Mount NPM Cache
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: frontend-npm-${{ github.sha }}
+          path: ~/.npm
+
+      - name: Install & Build Frontend
+        working-directory: ./web
+        run: |
+          npm install
+          npx playwright install --with-deps
+          npm run build
+
+      - name: Archive Frontend Build
+        working-directory: ./web
+        run: tar -czf web-build.tar.gz build
+
+      - name: Upload Frontend Build
+        uses: actions/upload-artifact@v3
+        with:
+          name: web-build
+          path: web/web-build.tar.gz
+
+  # 2. Build the API Docker image once
+  build-api:
+    runs-on: blacksmith-32vcpu-ubuntu-2204
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build & Load API Docker Image
+        uses: useblacksmith/build-push-action@v1
+        with:
+          context: ./api
+          file: ./api/Dockerfile
+          push: false
+          load: true
+          tags: local-api-test:latest
+
+      - name: Save API Image to TAR
+        run: docker save local-api-test:latest -o api-image.tar
+
+      - name: Upload API Image
+        uses: actions/upload-artifact@v3
+        with:
+          name: api-image
+          path: api-image.tar
+
+  # 3. Run tests in 4 parallel shards
+  test:
+    needs: [build-frontend, build-api]
+    runs-on: blacksmith-32vcpu-ubuntu-2204
+    environment: testing
+    strategy:
+      matrix:
+        shardIndex: [0, 1, 2, 3]
+        totalShards: [4]
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js (Blacksmith Cache)
+        uses: useblacksmith/setup-node@v5
+        with:
+          node-version: "22"
+
+      - name: Mount NPM Cache
+        uses: useblacksmith/stickydisk@v1
+        with:
+          key: tests-npm-${{ github.sha }}
+          path: ~/.npm
+
+      - name: Download Frontend Build
+        uses: actions/download-artifact@v3
+        with:
+          name: web-build
+
+      - name: Extract Frontend Build
+        run: |
+          mkdir -p web/build
+          tar -xzf web-build.tar.gz -C web/build
+
+      - name: Download API Image
+        uses: actions/download-artifact@v3
+        with:
+          name: api-image
+
+      - name: Load API Docker Image
+        run: docker load -i api-image.tar
+
+      - name: Setup Supabase Environment
+        uses: ./.github/actions/setup-test-environment
+
+      - name: Start API Container
+        run: |
+          docker run -d --name local-api -p 3001:3001 \
+            --network=host \
+            -e <all your env vars…> \
+            local-api-test:latest
+
+      - name: Wait for API Health Check
+        run: |
+          for i in {1..30}; do
+            if curl -f http://localhost:3001/health; then
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "API did not become healthy." && exit 1
+
+      - name: Run Playwright Tests (Shard ${{ matrix.shardIndex }})
+        working-directory: ./web
+        run: |
+          npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.totalShards }}
+        env:
+          NEXT_PUBLIC_API_URL: http://localhost:3001
+          NEXT_PUBLIC_URL: http://localhost:3000
+          NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODIzNDMwOTZ9.7UIsMFfHYKxH7bUJCRfxd6lr7CSXGF7UxtZQO10FMMo"
+          NEXT_PUBLIC_WEB_SOCKET_URL: ws://localhost:3001
+          CI: "true"
+          DEBUG: "pw:api"
+        timeout-minutes: 15
+
+      - name: Stop Supabase
+        uses: ./.github/actions/stop-supabase
+        if: always()
+
+      - name: Cleanup API Container
+        if: always()
+        run: |
+          docker stop local-api
+          docker rm local-api
