@@ -83,7 +83,6 @@ export const OutLabelsPlugin: OutLabelsPlugin = {
     // Restore original radius
     const dataset = chart.data.datasets[0];
     if (dataset && this._isEnabled(chart) && chart.ctx) {
-      //@ts-ignore
       (dataset as ChartDataset<'pie'>).radius = '100%';
       outLabelsManager.setUsedShrink(false);
       chart.update(); // Trigger chart update to apply the radius change
@@ -97,14 +96,13 @@ export const OutLabelsPlugin: OutLabelsPlugin = {
     const outLabelsManager = chart.$outLabelsManager;
     if (!outLabelsManager.usedShrink && shrinkPercentage < 1) {
       const dataset = chart.data.datasets[0];
-      //@ts-ignore
+
       const chartRadius = (dataset as ChartDataset<'pie'>).radius;
       const containerRadius = Math.min(chart.width, chart.height) / 2;
       const radius =
         typeof chartRadius === 'string' || !chartRadius ? containerRadius : chartRadius;
 
       if (dataset) {
-        //@ts-ignore
         (dataset as ChartDataset<'pie'>).radius = radius * shrinkPercentage;
         outLabelsManager.setUsedShrink(true);
       }

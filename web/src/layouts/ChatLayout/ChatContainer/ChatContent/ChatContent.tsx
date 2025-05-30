@@ -70,3 +70,5 @@ const ChatInputWrapper: React.FC<{
     </div>
   );
 });
+
+ChatInputWrapper.displayName = 'ChatInputWrapper';

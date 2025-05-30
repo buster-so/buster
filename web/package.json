@@ -7,7 +7,7 @@
     "build": "npm run lint:biome && npm run typecheck && next build",
     "build:skip-lint": "next build",
     "start": "next start",
-    "lint": "npx biome check && npm run typecheck && next lint",
+    "lint": "next lint",
     "lint:biome": "npx biome check",
     "lint:eslint": "next lint",
     "lint:ci": "npx biome check && npm run typecheck",

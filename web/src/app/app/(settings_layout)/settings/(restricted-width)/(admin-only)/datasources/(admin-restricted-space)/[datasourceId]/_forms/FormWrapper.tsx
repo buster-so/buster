@@ -3,7 +3,6 @@
 import type React from 'react';
 import { WhiteListBlock } from './WhiteListBlock';
 
- 
 // Define a more specific but limited interface for our form
 // This avoids the deep type recursion while maintaining safety
 export interface BusterFormApi {

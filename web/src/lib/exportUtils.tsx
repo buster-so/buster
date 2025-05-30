@@ -57,7 +57,8 @@ type DomToImageModule = {
 };
 
 export async function exportElementToImage(element: HTMLElement) {
-  //@ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- this is a workaround to avoid type errors
+  // @ts-expect-error -- dom-to-image is not typed, bummer
   const domToImage = (await import('dom-to-image').then((m) => m.default)) as DomToImageModule;
   const dataUrl = await domToImage.toPng(element);
   return dataUrl;

@@ -19,7 +19,7 @@ export const signInWithEmailAndPassword = async ({
   'use server';
   const supabase = await createClient();
 
-  const {  error } = await supabase.auth.signInWithPassword({
+  const { error } = await supabase.auth.signInWithPassword({
     email,
     password
   });
