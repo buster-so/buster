@@ -25,3 +25,4 @@ export * from './useWebSocket';
 export * from './useWhyDidYouUpdate';
 export * from './useWindowFocus';
 export * from './useWindowWidth';
+export * from './useLocalStorageState';
