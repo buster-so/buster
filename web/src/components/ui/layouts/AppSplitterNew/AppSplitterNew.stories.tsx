@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { AppSplitterNew } from './AppSplitterNew';
+import React, { useRef } from 'react';
+import { AppSplitterNew, type AppSplitterNewHandle } from './AppSplitterNew';
+import { useAppSplitterNewContext } from './AppSplitterNewProvider';
 import { Title } from '@/components/ui/typography/Title';
 import { Text } from '@/components/ui/typography/Text';
+import { Button } from '@/components/ui/buttons/Button';
 
 const meta: Meta<typeof AppSplitterNew> = {
   title: 'UI/layouts/AppSplitterNew',
@@ -11,7 +14,7 @@ const meta: Meta<typeof AppSplitterNew> = {
   },
   decorators: [
     (Story) => (
-      <div style={{ width: '100vw', height: '100vh' }}>
+      <div style={{ height: '600px', width: '100%', border: '1px solid #ccc' }}>
         <Story />
       </div>
     )
@@ -29,7 +32,7 @@ const meta: Meta<typeof AppSplitterNew> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<typeof AppSplitterNew>;
 
 // Helper components for demo content
 const LeftContent = ({ title = 'Left Panel' }: { title?: string }) => (
@@ -316,5 +319,208 @@ export const NestedThreePanel: Story = {
     preserveSide: 'left',
     leftPanelMinSize: 200,
     leftPanelMaxSize: 400
+  }
+};
+
+// Story with animation controls via ref
+const AnimationViaRefExample = () => {
+  const splitterRef = useRef<AppSplitterNewHandle>(null);
+
+  const handleAnimateLeft = (size: string) => {
+    splitterRef.current?.animateWidth(size, 'left', 200);
+  };
+
+  const handleAnimateRight = (size: string) => {
+    splitterRef.current?.animateWidth(size, 'right', 200);
+  };
+
+  return (
+    <AppSplitterNew
+      ref={splitterRef}
+      leftChildren={
+        <div className="h-full bg-blue-100 p-4">
+          <h2 className="mb-4 text-lg font-semibold">Left Panel (via Ref)</h2>
+          <div className="space-y-2">
+            <Button onClick={() => handleAnimateLeft('200px')}>Set Left to 200px</Button>
+            <Button onClick={() => handleAnimateLeft('400px')}>Set Left to 400px</Button>
+            <Button onClick={() => handleAnimateLeft('30%')}>Set Left to 30%</Button>
+            <Button onClick={() => handleAnimateLeft('50%')}>Set Left to 50%</Button>
+          </div>
+        </div>
+      }
+      rightChildren={
+        <div className="h-full bg-green-100 p-4">
+          <h2 className="mb-4 text-lg font-semibold">Right Panel (via Ref)</h2>
+          <div className="space-y-2">
+            <Button onClick={() => handleAnimateRight('200px')}>Set Right to 200px</Button>
+            <Button onClick={() => handleAnimateRight('400px')}>Set Right to 400px</Button>
+            <Button onClick={() => handleAnimateRight('30%')}>Set Right to 30%</Button>
+            <Button onClick={() => handleAnimateRight('50%')}>Set Right to 50%</Button>
+          </div>
+        </div>
+      }
+      autoSaveId="animation-ref-splitter"
+      defaultLayout={['50%', 'auto']}
+      preserveSide="left"
+      leftPanelMinSize={150}
+      rightPanelMinSize={150}
+    />
+  );
+};
+
+export const AnimationViaRef: Story = {
+  render: () => <AnimationViaRefExample />
+};
+
+// Story with animation controls via context
+const ContextControlPanel = () => {
+  const animateWidth = useAppSplitterNewContext((ctx) => ctx.animateWidth);
+  const sizes = useAppSplitterNewContext((ctx) => ctx.sizes);
+  const getSizesInPixels = useAppSplitterNewContext((ctx) => ctx.getSizesInPixels);
+
+  const handleGetSizes = () => {
+    const [leftPx, rightPx] = getSizesInPixels();
+    alert(`Current sizes - Left: ${leftPx}px, Right: ${rightPx}px`);
+  };
+
+  return (
+    <div className="p-4">
+      <h3 className="mb-4 text-lg font-semibold">Context Controls</h3>
+      <p className="mb-4 text-sm text-gray-600">Current sizes: {sizes.join(', ')}</p>
+      <div className="space-y-2">
+        <Button onClick={() => animateWidth('300px', 'left', 800)}>
+          Animate Left to 300px (800ms)
+        </Button>
+        <Button onClick={() => animateWidth('40%', 'left', 600)}>
+          Animate Left to 40% (600ms)
+        </Button>
+        <Button onClick={() => animateWidth('250px', 'right', 1000)}>
+          Animate Right to 250px (1s)
+        </Button>
+        <Button onClick={() => animateWidth('35%', 'right', 400)}>
+          Animate Right to 35% (400ms)
+        </Button>
+        <Button onClick={handleGetSizes}>Get Sizes in Pixels</Button>
+      </div>
+    </div>
+  );
+};
+
+const AnimationViaContextExample = () => {
+  return (
+    <AppSplitterNew
+      leftChildren={
+        <div className="h-full bg-purple-100">
+          <ContextControlPanel />
+        </div>
+      }
+      rightChildren={
+        <div className="h-full bg-yellow-100 p-4">
+          <h2 className="text-lg font-semibold">Right Panel (via Context)</h2>
+          <p>The controls in the left panel use the context to animate both panels.</p>
+        </div>
+      }
+      autoSaveId="animation-context-splitter"
+      defaultLayout={['400px', 'auto']}
+      preserveSide="left"
+      leftPanelMinSize={200}
+      rightPanelMinSize={200}
+    />
+  );
+};
+
+export const AnimationViaContext: Story = {
+  render: () => <AnimationViaContextExample />
+};
+
+// Story demonstrating different animation durations
+const AnimationDurationsExample = () => {
+  const splitterRef = useRef<AppSplitterNewHandle>(null);
+
+  const animations = [
+    { label: 'Fast (200ms)', duration: 200, size: '300px' },
+    { label: 'Normal (500ms)', duration: 500, size: '400px' },
+    { label: 'Slow (1000ms)', duration: 1000, size: '500px' },
+    { label: 'Very Slow (2000ms)', duration: 2000, size: '250px' }
+  ];
+
+  return (
+    <AppSplitterNew
+      ref={splitterRef}
+      leftChildren={
+        <div className="h-full bg-indigo-100 p-4">
+          <h2 className="mb-4 text-lg font-semibold">Animation Durations</h2>
+          <div className="space-y-2">
+            {animations.map((anim) => (
+              <Button
+                key={anim.label}
+                onClick={() => splitterRef.current?.animateWidth(anim.size, 'left', anim.duration)}>
+                {anim.label} → {anim.size}
+              </Button>
+            ))}
+          </div>
+        </div>
+      }
+      rightChildren={
+        <div className="h-full bg-pink-100 p-4">
+          <h2 className="text-lg font-semibold">Right Panel</h2>
+          <p>Watch the different animation speeds with smooth easing!</p>
+        </div>
+      }
+      autoSaveId="animation-durations-splitter"
+      defaultLayout={['350px', 'auto']}
+      preserveSide="left"
+      leftPanelMinSize={200}
+      rightPanelMinSize={200}
+    />
+  );
+};
+
+export const AnimationDurations: Story = {
+  render: () => <AnimationDurationsExample />
+};
+
+// Story for horizontal split with animations
+export const HorizontalWithAnimation: Story = {
+  render: () => {
+    const splitterRef = useRef<AppSplitterNewHandle>(null);
+
+    return (
+      <AppSplitterNew
+        ref={splitterRef}
+        split="horizontal"
+        leftChildren={
+          <div className="h-full w-full bg-teal-100 p-4">
+            <h2 className="mb-4 text-lg font-semibold">Top Panel</h2>
+            <div className="space-x-2">
+              <Button onClick={() => splitterRef.current?.animateWidth('200px', 'left', 500)}>
+                Top to 200px
+              </Button>
+              <Button onClick={() => splitterRef.current?.animateWidth('40%', 'left', 500)}>
+                Top to 40%
+              </Button>
+            </div>
+          </div>
+        }
+        rightChildren={
+          <div className="h-full w-full bg-orange-100 p-4">
+            <h2 className="mb-4 text-lg font-semibold">Bottom Panel</h2>
+            <div className="space-x-2">
+              <Button onClick={() => splitterRef.current?.animateWidth('250px', 'right', 500)}>
+                Bottom to 250px
+              </Button>
+              <Button onClick={() => splitterRef.current?.animateWidth('60%', 'right', 500)}>
+                Bottom to 60%
+              </Button>
+            </div>
+          </div>
+        }
+        autoSaveId="horizontal-animation-splitter"
+        defaultLayout={['50%', 'auto']}
+        preserveSide="left"
+        leftPanelMinSize={100}
+        rightPanelMinSize={100}
+      />
+    );
   }
 };
