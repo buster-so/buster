@@ -76,12 +76,19 @@
     "@types/node": "^20.0.0",
     "@types/pg": "^8.11.10",
     "@types/snowflake-sdk": "^1.6.24",
+    "@types/uuid": "^9.0.0",
+    "@vitest/coverage-v8": "^3.1.4",
+    "@vitest/ui": "^3.1.4",
+    "axios": "^1.6.2",
     "braintrust": "^0.0.205",
+    "dotenv": "^16.5.0",
     "drizzle-kit": "^0.31.1",
     "testcontainers": "^11.0.0",
     "typescript": "^5.0.0",
+    "uuid": "^9.0.0",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.1.4"
+    "vitest": "^3.1.4",
+    "zod": "^3.22.4"
   },
   "peerDependencies": {
     "bun": "^1.0.0",

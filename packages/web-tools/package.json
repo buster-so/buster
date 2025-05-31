@@ -12,15 +12,10 @@
     "dev": "bun run src/index.ts"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "vitest": "^2.0.0",
-    "@vitest/ui": "^2.0.0",
-    "@vitest/coverage-v8": "^2.0.0"
+    "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
-  "dependencies": {
-    "dotenv": "^16.5.0"
-  }
+  "dependencies": {}
 }

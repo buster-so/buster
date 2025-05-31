@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@trigger.dev/sdk": "^3.3.17",
-    "@buster/data-source": "workspace:*"
+    "@buster/data-source": "*"
   },
   "devDependencies": {
     "@trigger.dev/build": "^3.3.17",
