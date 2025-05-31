@@ -234,3 +234,87 @@ export const Playground: Story = {
     rightHidden: false
   }
 };
+
+// Nested Three Panel Layout Story
+export const NestedThreePanel: Story = {
+  args: {
+    leftChildren: (
+      <div className="h-full bg-green-100/10 p-6">
+        <Title as="h3">Left Panel</Title>
+        <Text className="text-muted-foreground mt-2">
+          This is the leftmost panel. It&apos;s preserved when resizing the parent splitter.
+        </Text>
+        <div className="mt-4 space-y-2">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="bg-muted/40 rounded p-3">
+              <Text>Navigation Item {i}</Text>
+            </div>
+          ))}
+        </div>
+      </div>
+    ),
+    rightChildren: (
+      <div className="flex h-full w-full overflow-hidden">
+        <AppSplitterNew
+          leftChildren={
+            <div className="h-full bg-blue-100/10 p-6">
+              <Title as="h3">Middle Panel</Title>
+              <Text className="text-muted-foreground mt-2">
+                This is the middle panel. It takes the remaining space when the right panel is
+                resized.
+              </Text>
+              <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="bg-muted/10 flex h-24 items-center justify-center rounded-lg border">
+                    <Text>Content Block {i}</Text>
+                  </div>
+                ))}
+              </div>
+            </div>
+          }
+          rightChildren={
+            <div className="h-full bg-purple-100/10 p-6">
+              <Title as="h3">Right Panel</Title>
+              <Text className="text-muted-foreground mt-2">
+                This is the rightmost panel. It&apos;s preserved when resizing the nested splitter.
+              </Text>
+              <div className="mt-4 space-y-3">
+                <div className="bg-muted/20 rounded p-4">
+                  <Title as="h4" className="mb-2">
+                    Details
+                  </Title>
+                  <Text className="text-sm">
+                    The parent splitter preserves the left panel, while the nested splitter
+                    preserves the right panel. This creates a flexible 3-panel layout.
+                  </Text>
+                </div>
+                <div className="bg-muted/20 rounded p-4">
+                  <Title as="h4" className="mb-2">
+                    Usage
+                  </Title>
+                  <Text className="text-sm">
+                    Try dragging both splitters to resize the panels. Each splitter&apos;s position
+                    is saved independently in localStorage.
+                  </Text>
+                </div>
+              </div>
+            </div>
+          }
+          autoSaveId="nested-right"
+          defaultLayout={['auto', '350px']}
+          preserveSide="right"
+          rightPanelMinSize={250}
+          rightPanelMaxSize={500}
+          leftPanelMinSize={300}
+        />
+      </div>
+    ),
+    autoSaveId: 'nested-three-panel',
+    defaultLayout: ['250px', 'auto'],
+    preserveSide: 'left',
+    leftPanelMinSize: 200,
+    leftPanelMaxSize: 400
+  }
+};

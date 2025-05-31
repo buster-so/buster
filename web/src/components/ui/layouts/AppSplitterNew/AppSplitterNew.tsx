@@ -101,7 +101,7 @@ export const AppSplitterNew: React.FC<IAppSplitterNewProps> = ({
   );
 
   const [preservedPanelSize, setPreservedPanelSize] = useState<number>(() => {
-    return savedLayout || 280;
+    return savedLayout || 0;
   });
 
   // Update container size
@@ -113,19 +113,35 @@ export const AppSplitterNew: React.FC<IAppSplitterNewProps> = ({
           : containerRef.current.offsetHeight;
         setContainerSize(size);
 
-        // Initialize size on first mount
-        if (!savedLayout && size > 0) {
-          const initialSize = getInitialSize(size);
+        // Initialize size on first mount or when going from 0 to a real size
+        if (
+          size > 0 &&
+          (preservedPanelSize === 0 || (!savedLayout && preservedPanelSize === 280))
+        ) {
+          const initialSize = savedLayout || getInitialSize(size);
           setPreservedPanelSize(initialSize);
         }
       }
     };
 
     updateContainerSize();
+
+    // Use ResizeObserver for better detection of size changes
+    const resizeObserver = new ResizeObserver(() => {
+      updateContainerSize();
+    });
+
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
     window.addEventListener('resize', updateContainerSize);
 
-    return () => window.removeEventListener('resize', updateContainerSize);
-  }, [isVertical, savedLayout, getInitialSize]);
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', updateContainerSize);
+    };
+  }, [isVertical, savedLayout, getInitialSize, preservedPanelSize]);
 
   // Convert min/max sizes to pixels
   const leftMinPx = containerSize ? sizeToPixels(leftPanelMinSize, containerSize) : 0;
@@ -138,6 +154,11 @@ export const AppSplitterNew: React.FC<IAppSplitterNewProps> = ({
   // Calculate actual panel sizes
   const calculatePanelSizes = useCallback(() => {
     if (!containerSize) return { leftSize: 0, rightSize: 0 };
+
+    // If we haven't initialized yet (preservedPanelSize is 0), return 0 for both
+    if (preservedPanelSize === 0 && !savedLayout) {
+      return { leftSize: 0, rightSize: 0 };
+    }
 
     if (leftHidden && !rightHidden) {
       return { leftSize: 0, rightSize: containerSize };
