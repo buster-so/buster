@@ -3,7 +3,6 @@
 import type React from 'react';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { useLocalStorageState } from '@/hooks/useLocalStorageState';
 import { cn } from '@/lib/classMerge';
 import { Panel } from './Panel';
@@ -205,6 +204,7 @@ export const AppSplitterNew: React.FC<IAppSplitterNewProps> = ({
       setIsDragging(true);
       startPosRef.current = isVertical ? e.clientX : e.clientY;
       startSizeRef.current = preservedPanelSize;
+
       e.preventDefault();
     },
     [allowResize, isVertical, preservedPanelSize]
@@ -237,6 +237,7 @@ export const AppSplitterNew: React.FC<IAppSplitterNewProps> = ({
 
         // Ensure left panel constraints
         const resultingLeftSize = containerSize - newSize;
+
         if (resultingLeftSize < leftMinPx) {
           newSize = containerSize - leftMinPx;
         }
@@ -244,7 +245,6 @@ export const AppSplitterNew: React.FC<IAppSplitterNewProps> = ({
           newSize = containerSize - leftMaxPx;
         }
       }
-
       setPreservedPanelSize(newSize);
     },
     [

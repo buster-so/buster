@@ -33,7 +33,7 @@ type Story = StoryObj<typeof meta>;
 
 // Helper components for demo content
 const LeftContent = ({ title = 'Left Panel' }: { title?: string }) => (
-  <div className="bg-muted/20 h-full p-6">
+  <div className="bg-muted/20 h-full bg-blue-100/10 p-6">
     <Title as="h3">{title}</Title>
     <Text className="text-muted-foreground mt-2">
       This is the left panel content. Try resizing the panels by dragging the splitter.
@@ -49,7 +49,7 @@ const LeftContent = ({ title = 'Left Panel' }: { title?: string }) => (
 );
 
 const RightContent = ({ title = 'Right Panel' }: { title?: string }) => (
-  <div className="h-full p-6">
+  <div className="h-full bg-red-100/10 p-6">
     <Title as="h2">{title}</Title>
     <Text className="text-muted-foreground mt-2">
       This is the right panel content. The panel sizes are automatically saved to localStorage.

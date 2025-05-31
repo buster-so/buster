@@ -1,6 +1,6 @@
 'use client';
 
-import type React from 'react';
+import React from 'react';
 import { cn } from '@/lib/classMerge';
 
 interface ISplitterProps {
@@ -12,36 +12,31 @@ interface ISplitterProps {
   disabled?: boolean;
 }
 
-export const Splitter: React.FC<ISplitterProps> = ({
-  onMouseDown,
-  isDragging,
-  split,
-  className,
-  hidden,
-  disabled
-}) => {
-  const isVertical = split === 'vertical';
+export const Splitter: React.FC<ISplitterProps> = React.memo(
+  ({ onMouseDown, isDragging, split, className, hidden, disabled }) => {
+    const isVertical = split === 'vertical';
 
-  console.log(hidden, isDragging, disabled);
-
-  return (
-    <div
-      className={cn(
-        'relative flex items-center justify-center transition-colors',
-        hidden ? 'bg-transparent' : 'bg-border',
-        !disabled ? (hidden ? 'hover:bg-border/80' : 'hover:bg-primary') : undefined,
-        isVertical ? 'min-w-[1px] cursor-col-resize' : 'min-h-[1px] cursor-row-resize',
-        isDragging ? (hidden ? 'bg-border/80' : 'bg-primary') : undefined,
-        disabled && 'cursor-default',
-        className
-      )}
-      onMouseDown={disabled ? undefined : onMouseDown}>
+    return (
       <div
         className={cn(
-          'absolute flex items-center justify-center',
-          isVertical ? '-inset-x-1 inset-y-0' : 'inset-x-0 -inset-y-1'
+          'relative flex items-center justify-center transition-colors',
+          hidden ? 'bg-transparent' : 'bg-border',
+          !disabled ? (hidden ? 'hover:bg-border/80' : 'hover:bg-primary') : undefined,
+          isVertical ? 'min-w-[1px] cursor-col-resize' : 'min-h-[1px] cursor-row-resize',
+          isDragging ? (hidden ? 'bg-border/80' : 'bg-primary') : undefined,
+          disabled && 'cursor-default',
+          className
         )}
-      />
-    </div>
-  );
-};
+        onMouseDown={disabled ? undefined : onMouseDown}>
+        <div
+          className={cn(
+            'absolute flex items-center justify-center',
+            isVertical ? '-inset-x-1 inset-y-0' : 'inset-x-0 -inset-y-1'
+          )}
+        />
+      </div>
+    );
+  }
+);
+
+Splitter.displayName = 'Splitter';
