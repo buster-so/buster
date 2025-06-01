@@ -75,7 +75,9 @@ describe('Done Tool Integration Tests', () => {
 
   test('should generate default message when none provided', async () => {
     const result = await doneTool.execute({
-      context: {},
+      context: {
+        message: '',
+      },
     });
 
     expect(result.success).toBe(true);
@@ -84,17 +86,13 @@ describe('Done Tool Integration Tests', () => {
   });
 
   test('should calculate session duration accurately', async () => {
-    const startTime = Date.now();
-
-    // Wait a small amount to ensure duration > 0
-    await new Promise((resolve) => setTimeout(resolve, 10));
-
     const result = await doneTool.execute({
       context: { message: 'Duration test' },
     });
 
-    expect(result.session_duration).toBeGreaterThan(0);
-    expect(result.session_duration).toBeLessThan(Date.now() - startTime + 1000); // Should be reasonable
+    // The mock getSessionStartTime returns Date.now() - 60000, so duration should be around 60000ms
+    expect(result.session_duration).toBeGreaterThan(59000); // Allow some variance
+    expect(result.session_duration).toBeLessThan(61000); // Should be around 60 seconds
   });
 
   test('should handle artifact with missing optional fields', async () => {
@@ -118,6 +116,73 @@ describe('Done Tool Integration Tests', () => {
     expect(result.artifacts_created).toBe(1);
     expect(result.message).toContain('Data Analysis');
     expect(result.message).not.toContain(' - undefined');
+  });
+
+  test('should validate input schema correctly', () => {
+    // Test valid input
+    const validInput = { message: 'Task completed successfully' };
+    const validResult = doneTool.inputSchema.safeParse(validInput);
+    expect(validResult.success).toBe(true);
+
+    // Test invalid input (missing message)
+    const invalidInput = {};
+    const invalidResult = doneTool.inputSchema.safeParse(invalidInput);
+    expect(invalidResult.success).toBe(false);
+  });
+
+  test('should validate output schema correctly', () => {
+    const validOutput = {
+      success: true,
+      message: 'Test',
+      session_ended: true,
+      artifacts_created: 0,
+      session_duration: 1000,
+    };
+    const result = doneTool.outputSchema.safeParse(validOutput);
+    expect(result.success).toBe(true);
+  });
+
+  test('should have correct tool configuration', () => {
+    expect(doneTool.id).toBe('done');
+    expect(doneTool.description).toBe(
+      'Signal completion of all requested tasks and end the workflow'
+    );
+    expect(doneTool.inputSchema).toBeDefined();
+    expect(doneTool.outputSchema).toBeDefined();
+    expect(doneTool.execute).toBeDefined();
+  });
+
+  test('should handle markdown message formatting', async () => {
+    const markdownMessage = `
+## Task Complete
+
+- Created dashboard
+- Generated reports  
+- Analyzed data
+
+Task finished successfully.
+    `.trim();
+
+    const result = await doneTool.execute({
+      context: {
+        message: markdownMessage,
+      },
+    });
+
+    expect(result.success).toBe(true);
+    expect(result.message).toContain('## Task Complete');
+  });
+
+  test('should handle long message content', async () => {
+    const longMessage = `${'A'.repeat(1000)} - Task completed successfully`;
+
+    const result = await doneTool.execute({
+      context: {
+        message: longMessage,
+      },
+    });
+
+    expect(result.success).toBe(true);
   });
 });
 
