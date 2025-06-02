@@ -20,8 +20,6 @@ export * from '@/schema';
 // Export relations
 export * from '@/relations';
 
-export * from '@/helpers';
-
 // Export common Drizzle utilities
 export {
   eq,

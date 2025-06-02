@@ -1,24 +1,29 @@
 {
   "compilerOptions": {
+    "lib": ["ESNext"],
     "target": "ESNext",
     "module": "ESNext",
-    "lib": ["ESNext"],
     "moduleResolution": "bundler",
     "esModuleInterop": true,
+    "allowJs": true,
+    "noEmit": true,
+    "strict": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "strict": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": false,
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "noEmit": true,
+    "baseUrl": ".",
     "paths": {
-      "@database": ["../database/src/index.ts"],
-      "@buster/database": ["../database/src/index.ts"]
+      "@/*": ["src/*"],
+      "@database/*": ["../database/src/*"]
     }
   },
   "include": ["src/**/*"],
