@@ -95,7 +95,7 @@ const defaultRows = [
         children: <ExampleContent text="Item 7" />
       }
     ],
-    columnSizes: [6, 6],
+    columnSizes: [4, 4],
     rowHeight: MIN_ROW_HEIGHT
   }
 ];

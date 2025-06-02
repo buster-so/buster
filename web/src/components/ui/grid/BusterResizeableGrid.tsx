@@ -17,7 +17,7 @@ import { arrayMove } from '@dnd-kit/sortable';
 import isEqual from 'lodash/isEqual';
 import React, { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { useMemoizedFn } from '@/hooks';
+import { useMemoizedFn, useUpdateEffect } from '@/hooks';
 import { cn } from '@/lib/utils';
 import { BusterSortableOverlay } from './_BusterSortableOverlay';
 import { BusterResizeRows } from './BusterResizeRows';
@@ -54,12 +54,11 @@ export const BusterResizeableGrid: React.FC<{
     onStartDrag,
     onEndDrag
   }) => {
-    const [rows, setRows] = useState<BusterResizeableGridRow[]>(serverRows);
+    const [rows, setRows] = useState<BusterResizeableGridRow[]>(() => newRowPreflight(serverRows));
     const styleRef = useRef<HTMLStyleElement>(undefined);
 
     const onRowLayoutChangePreflight = useMemoizedFn((newLayout: BusterResizeableGridRow[]) => {
       const filteredRows = newRowPreflight(newLayout);
-
       if (checkRowEquality(filteredRows, rows)) {
         return;
       }
@@ -316,9 +315,10 @@ export const BusterResizeableGrid: React.FC<{
       });
     }, [rows]);
 
-    useEffect(() => {
+    useUpdateEffect(() => {
       if (!checkRowEquality(serverRows, rows) && !isAnimating.current) {
-        setRows(serverRows);
+        console.log('notEqual');
+        //  setRows(serverRows);
       }
     }, [serverRows]);
 

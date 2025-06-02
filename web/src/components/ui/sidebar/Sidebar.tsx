@@ -21,7 +21,6 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(
       const isCollapsed = parsedCurrentSize <= parsedCollapsedWidth;
       onCollapseClick?.(isCollapsed);
       const targetWidth = !isCollapsed ? COLLAPSED_SIDEBAR_WIDTH : DEFAULT_SIDEBAR_WIDTH;
-      console.log(targetWidth);
       animateWidth(targetWidth, 'left', 200);
     });
 

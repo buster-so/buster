@@ -1,12 +1,13 @@
 'use client';
 
 import { SortableContext, useSortable } from '@dnd-kit/sortable';
-import React, { useMemo, useState } from 'react';
-import { useMemoizedFn, useMouse } from '@/hooks';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useMemoizedFn, useMount, useMouse } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 import { BusterSortableItemDragContainer } from './_BusterSortableItemDragContainer';
 import type { ResizeableGridDragItem } from './interfaces';
 import { BusterResizeColumnsSplitPanes } from './BusterResizeColumnsSplitPanes';
+import isEqual from 'lodash/isEqual';
 
 type ContainerProps = {
   rowId: string;
@@ -32,7 +33,7 @@ export const BusterResizeColumns: React.FC<ContainerProps> = ({
     disabled: readOnly
   });
   const mouse = useMouse({ moveThrottleMs: 50, disabled: readOnly || !over });
-  const [stagedLayoutColumns, setStagedLayoutColumns] = useState<number[]>([]);
+  const [stagedLayoutColumns, setStagedLayoutColumns] = useState<number[]>(() => columnSizes || []);
 
   const canResize = useMemo(() => items.length > 1 && items.length < 4, [items.length]);
   const isDropzoneActives = useMemo(() => !!over?.id && canResize, [over?.id, canResize]);
@@ -88,15 +89,22 @@ export const BusterResizeColumns: React.FC<ContainerProps> = ({
 
   const onChangeLayout = useMemoizedFn((newColumnSpans: number[]) => {
     setStagedLayoutColumns(newColumnSpans);
+    onRowLayoutChange(newColumnSpans, rowId);
   });
 
   const onDragEnd = useMemoizedFn(() => {
-    onRowLayoutChange(stagedLayoutColumns, rowId);
+    //
   });
 
   const onDragStart = useMemoizedFn(() => {
     // Optional: Add any additional drag start logic
   });
+
+  useEffect(() => {
+    if (!isEqual(stagedLayoutColumns, columnSizes)) {
+      setStagedLayoutColumns(columnSizes || []);
+    }
+  }, [columnSizes]);
 
   return (
     <SortableContext id={rowId} items={items} disabled={false}>
@@ -105,7 +113,7 @@ export const BusterResizeColumns: React.FC<ContainerProps> = ({
         className="buster-resize-columns relative h-full w-full"
         data-testid={`buster-resize-columns-${rowIndex}`}>
         <BusterResizeColumnsSplitPanes
-          columnSpans={columnSizes || []}
+          columnSpans={stagedLayoutColumns || []}
           allowResize={!readOnly && canResize}
           onDragStart={onDragStart}
           onDragEnd={onDragEnd}
