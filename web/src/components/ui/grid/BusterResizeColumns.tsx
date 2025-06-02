@@ -16,7 +16,6 @@ type ContainerProps = {
   columnSizes: number[] | undefined;
   readOnly?: boolean;
   onRowLayoutChange: (layout: number[], rowId: string) => void;
-  fluid?: boolean;
 };
 
 export const BusterResizeColumns: React.FC<ContainerProps> = ({
@@ -25,10 +24,9 @@ export const BusterResizeColumns: React.FC<ContainerProps> = ({
   index: rowIndex,
   columnSizes,
   readOnly = true,
-  items = [],
-  fluid = true
+  items = []
 }) => {
-  const { setNodeRef, isOver, active, over } = useSortable({
+  const { setNodeRef, active, over } = useSortable({
     id: rowId,
     disabled: readOnly
   });
@@ -93,7 +91,7 @@ export const BusterResizeColumns: React.FC<ContainerProps> = ({
   });
 
   const onDragEnd = useMemoizedFn(() => {
-    //
+    //Optional: Add any additional drag end logic
   });
 
   const onDragStart = useMemoizedFn(() => {
@@ -129,7 +127,9 @@ export const BusterResizeColumns: React.FC<ContainerProps> = ({
               data-testid={`pane-${index}`}>
               <DropzonePlaceholder
                 right={false}
+                index={index}
                 isDropzoneActives={isDropzoneActives}
+                numberOfColumns={items.length}
                 active={!!over && insertPosition(item.id, index, mouse.clientX) === Position.Before}
               />
               <BusterSortableItemDragContainer itemId={item.id} allowEdit={!readOnly}>
@@ -137,6 +137,8 @@ export const BusterResizeColumns: React.FC<ContainerProps> = ({
               </BusterSortableItemDragContainer>
               <DropzonePlaceholder
                 right={true}
+                index={index}
+                numberOfColumns={items.length}
                 isDropzoneActives={isDropzoneActives}
                 active={!!over && insertPosition(item.id, index, mouse.clientX) === Position.After}
               />
@@ -157,14 +159,22 @@ const DropzonePlaceholder: React.FC<{
   active: boolean;
   right: boolean;
   isDropzoneActives: boolean;
-}> = React.memo(({ active, right, isDropzoneActives }) => {
+  index: number;
+  numberOfColumns: number;
+}> = React.memo(({ active, right, isDropzoneActives, index, numberOfColumns }) => {
   const memoizedStyle = useMemo(() => {
+    const isLeftEdge = index === 0 && !right;
+    const isRightEdge = index === numberOfColumns - 1 && right;
+    const isEdge = isLeftEdge || isRightEdge;
+    const offset = isEdge ? -8 : -2;
+    const baseOpacity = active || isDropzoneActives ? 1 : 0;
+
     return {
-      right: right ? -7.5 : undefined,
-      left: right ? undefined : -7.5,
-      opacity: active || isDropzoneActives ? 1 : 0
+      [right ? 'right' : 'left']: offset,
+      [right ? 'left' : 'right']: undefined,
+      opacity: baseOpacity
     };
-  }, [active, isDropzoneActives, right]);
+  }, [active, isDropzoneActives, right, index, numberOfColumns]);
 
   return (
     <div

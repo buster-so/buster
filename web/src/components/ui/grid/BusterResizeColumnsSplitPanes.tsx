@@ -31,7 +31,7 @@ const ColumnMarkers = React.memo<{
 }>(({ positions, visiblePositions, currentSnapPosition }) => {
   return (
     <div
-      className="pointer-events-none absolute -top-2 right-0 left-0 flex h-2 items-center justify-between"
+      className="animate-fade-in pointer-events-none absolute -top-0.5 right-0 left-0 flex h-2 items-center justify-between transition-opacity duration-100"
       style={{ transform: 'translateY(-100%)' }}>
       <div className="relative h-full w-full px-1.5">
         {positions.map((position, index) => {
@@ -78,11 +78,12 @@ const Sash = React.memo<{
   return (
     <div
       className={cn(
-        'flex h-full w-1 items-center justify-center rounded-lg transition-colors duration-200',
+        'absolute top-0 z-10 flex h-full w-1 -translate-x-1/2 items-center justify-center rounded-lg transition-colors duration-200',
         canResize && 'cursor-col-resize',
         canResize && active && 'bg-primary',
         canResize && !active && 'hover:bg-border'
       )}
+      style={{ left: '100%' }}
       onMouseDown={handleMouseDown}
       data-sash-index={index}></div>
   );
@@ -375,18 +376,16 @@ export const BusterResizeColumnsSplitPanes: React.FC<BusterResizeColumnsSplitPan
           const widthPercentage = (span / NUMBER_OF_COLUMNS) * 100;
 
           return (
-            <React.Fragment key={`column-${index}`}>
-              {/* Column */}
-              <div
-                className="relative h-full transition-all duration-200 ease-out"
-                style={{
-                  width: `${widthPercentage}%`,
-                  transition: dragState.isDragging ? 'none' : 'width 200ms ease-out'
-                }}>
-                {child}
-              </div>
+            <div
+              key={`column-${index}`}
+              className="relative h-full transition-all duration-200 ease-out"
+              style={{
+                width: `${widthPercentage}%`,
+                transition: dragState.isDragging ? 'none' : 'width 200ms ease-out'
+              }}>
+              {child}
 
-              {/* Sash */}
+              {/* Sash positioned at the right edge of this column */}
               {index < children.length - 1 && (
                 <Sash
                   key={`sash-${index}`}
@@ -396,7 +395,7 @@ export const BusterResizeColumnsSplitPanes: React.FC<BusterResizeColumnsSplitPan
                   canResize={canResize}
                 />
               )}
-            </React.Fragment>
+            </div>
           );
         })}
       </div>
