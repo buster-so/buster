@@ -1,15 +1,12 @@
 'use client';
 
 import { SortableContext, useSortable } from '@dnd-kit/sortable';
-import React, { useLayoutEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useMemoizedFn, useMouse } from '@/hooks';
 import { cn } from '@/lib/classMerge';
-import SplitPane, { Pane } from '../layouts/AppSplitterOld/SplitPane';
-import { BusterDragColumnMarkers } from './_BusterDragColumnMarkers';
 import { BusterSortableItemDragContainer } from './_BusterSortableItemDragContainer';
-import { calculateColumnSpan, columnSpansToPercent } from './helpers';
 import type { ResizeableGridDragItem } from './interfaces';
-import '../layouts/AppSplitterOld/splitterStyles.css';
+import { BusterResizeColumnsSplitPanes } from './BusterResizeColumnsSplitPanes';
 
 type ContainerProps = {
   rowId: string;
@@ -35,11 +32,8 @@ export const BusterResizeColumns: React.FC<ContainerProps> = ({
     disabled: readOnly
   });
   const mouse = useMouse({ moveThrottleMs: 50, disabled: readOnly || !over });
-  const [isDragginResizeColumn, setIsDraggingResizeColumn] = useState<number | null>(null);
-  const columnMarkerColumnIndex = useMemo(
-    () => (typeof isDragginResizeColumn === 'number' ? isDragginResizeColumn + 1 : null),
-    [isDragginResizeColumn]
-  );
+  const [stagedLayoutColumns, setStagedLayoutColumns] = useState<number[]>([]);
+
   const canResize = useMemo(() => items.length > 1 && items.length < 4, [items.length]);
   const isDropzoneActives = useMemo(() => !!over?.id && canResize, [over?.id, canResize]);
 
@@ -87,53 +81,22 @@ export const BusterResizeColumns: React.FC<ContainerProps> = ({
     return res;
   });
 
-  //NEW LOGIC
-  const [_sizes, setSizes] = useState<(number | string)[]>(columnSpansToPercent(columnSizes));
-  const sizes = _sizes.length === items.length ? _sizes : columnSpansToPercent(columnSizes);
-  const [stagedLayoutColumns, setStagedLayoutColumns] = useState<number[]>([]);
-
   const activeDragId = active?.id;
   const activeIndex = useMemo(() => {
     return activeDragId ? items.findIndex((item) => item.id === active?.id) : -1;
   }, [activeDragId, items, active?.id]);
 
-  const onChangeLayout = useMemoizedFn((sizes: number[]) => {
-    setSizes(sizes);
-    setStagedLayoutColumns(calculateColumnSpan(sizes));
+  const onChangeLayout = useMemoizedFn((newColumnSpans: number[]) => {
+    setStagedLayoutColumns(newColumnSpans);
   });
 
   const onDragEnd = useMemoizedFn(() => {
-    setIsDraggingResizeColumn(null);
-    const sizesFromColumnSpans = columnSpansToPercent(stagedLayoutColumns);
-    setSizes(sizesFromColumnSpans);
     onRowLayoutChange(stagedLayoutColumns, rowId);
   });
 
-  const onDragStart = useMemoizedFn((e: MouseEvent) => {
-    const srcElement = e.target as HTMLElement;
-    const idOrSrcElement = srcElement?.id;
-    if (idOrSrcElement) {
-      const parsedId = Number.parseInt(idOrSrcElement);
-      if (typeof parsedId === 'number') {
-        setIsDraggingResizeColumn(parsedId);
-      }
-    }
+  const onDragStart = useMemoizedFn(() => {
+    // Optional: Add any additional drag start logic
   });
-
-  const sashRender = useMemoizedFn((index: number, active: boolean) => {
-    return (
-      <ColumnSash
-        allowEdit={!readOnly && canResize}
-        isDraggingId={isDragginResizeColumn}
-        active={active}
-        index={index}
-      />
-    );
-  });
-
-  useLayoutEffect(() => {
-    setSizes(columnSpansToPercent(columnSizes));
-  }, [items.length, columnSizes]);
 
   return (
     <SortableContext id={rowId} items={items} disabled={false}>
@@ -141,53 +104,37 @@ export const BusterResizeColumns: React.FC<ContainerProps> = ({
         ref={setNodeRef}
         className="buster-resize-columns relative h-full w-full"
         data-testid={`buster-resize-columns-${rowIndex}`}>
-        <BusterDragColumnMarkers
-          isDraggingIndex={columnMarkerColumnIndex}
-          itemsLength={items.length}
-          stagedLayoutColumns={stagedLayoutColumns}
-          disabled={!canResize}
-        />
-
-        <SplitPane
-          autoSizeId="resize-column"
-          split="vertical"
-          sizes={sizes}
+        <BusterResizeColumnsSplitPanes
+          columnSpans={columnSizes || []}
           allowResize={!readOnly && canResize}
           onDragStart={onDragStart}
           onDragEnd={onDragEnd}
-          sashRender={sashRender}
           onChange={onChangeLayout}>
           {items.map((item, index) => (
-            <Pane
+            <div
+              key={item.id}
               className={cn(
-                'overflow-visible!',
+                'relative h-full w-full',
                 index !== items.length - 1 ? 'pr-1.5' : 'pr-0',
                 index !== 0 ? 'pl-1.5' : 'pl-0'
               )}
-              key={item.id}
-              minSize={'25%'}>
-              <div className="relative h-full w-full" data-testid={`pane-${index}`}>
-                <DropzonePlaceholder
-                  right={false}
-                  isDropzoneActives={isDropzoneActives}
-                  active={
-                    !!over && insertPosition(item.id, index, mouse.clientX) === Position.Before
-                  }
-                />
-                <BusterSortableItemDragContainer itemId={item.id} allowEdit={!readOnly}>
-                  {item.children}
-                </BusterSortableItemDragContainer>
-                <DropzonePlaceholder
-                  right={true}
-                  isDropzoneActives={isDropzoneActives}
-                  active={
-                    !!over && insertPosition(item.id, index, mouse.clientX) === Position.After
-                  }
-                />
-              </div>
-            </Pane>
+              data-testid={`pane-${index}`}>
+              <DropzonePlaceholder
+                right={false}
+                isDropzoneActives={isDropzoneActives}
+                active={!!over && insertPosition(item.id, index, mouse.clientX) === Position.Before}
+              />
+              <BusterSortableItemDragContainer itemId={item.id} allowEdit={!readOnly}>
+                {item.children}
+              </BusterSortableItemDragContainer>
+              <DropzonePlaceholder
+                right={true}
+                isDropzoneActives={isDropzoneActives}
+                active={!!over && insertPosition(item.id, index, mouse.clientX) === Position.After}
+              />
+            </div>
           ))}
-        </SplitPane>
+        </BusterResizeColumnsSplitPanes>
       </div>
     </SortableContext>
   );
@@ -224,24 +171,3 @@ const DropzonePlaceholder: React.FC<{
   );
 });
 DropzonePlaceholder.displayName = 'DropzonePlaceholder';
-
-const ColumnSash: React.FC<{
-  index: number;
-  active: boolean;
-  isDraggingId: number | null;
-  allowEdit: boolean;
-}> = React.memo(({ active, allowEdit, isDraggingId, index }) => {
-  return (
-    <div
-      className={cn(
-        'grid-column-sash h-full w-1 rounded-lg',
-        'z-10 transition-colors duration-200 ease-in-out',
-        allowEdit ? 'hover:bg-border' : 'hidden',
-        active ? 'bg-border' : '',
-        isDraggingId === index ? 'bg-primary!' : ''
-      )}
-      id={index.toString()}
-    />
-  );
-});
-ColumnSash.displayName = 'ColumnSash';
