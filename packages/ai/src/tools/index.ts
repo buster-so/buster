@@ -15,6 +15,8 @@ export { createMetricsTool } from './visualization-tools/create-metrics-tool';
 export { createMetricsFileTool } from './visualization-tools/create-metrics-file-tool';
 export { modifyMetricsFileTool } from './visualization-tools/modify-metrics-file-tool';
 export { createDashboardsTool } from './visualization-tools/create-dashboards-tool';
+export { createDashboardsFileTool } from './visualization-tools/create-dashboards-file-tool';
+export { modifyDashboardsFileTool } from './visualization-tools/modify-dashboards-file-tool';
 export { modifyMetricsTool } from './visualization-tools/modify-metrics-tool';
 export { modifyDashboardsTool } from './visualization-tools/modify-dashboards-tool';
 export {
