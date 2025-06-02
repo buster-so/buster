@@ -218,7 +218,7 @@ test.describe('Authenticated Page', () => {
       versionNumber: 1
     }),
     settings: createBusterRoute({
-      route: BusterRoutes.SETTINGS
+      route: BusterRoutes.SETTINGS_PROFILE
     }),
     settingsGeneral: createBusterRoute({
       route: BusterRoutes.SETTINGS_API_KEYS

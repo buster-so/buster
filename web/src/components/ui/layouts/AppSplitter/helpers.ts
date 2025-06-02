@@ -1,3 +1,5 @@
+import { cookies } from 'next/headers';
+
 export const createAutoSaveId = (id: string) => `app-splitter-${id}`;
 
 // Helper function to convert size values to pixels
@@ -25,3 +27,5 @@ export const sizeToPixels = (size: string | number, containerSize: number): numb
 export const easeInOutCubic = (t: number): number => {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 };
+
+export const DEFAULT_LAYOUT = ['230px', 'auto'];

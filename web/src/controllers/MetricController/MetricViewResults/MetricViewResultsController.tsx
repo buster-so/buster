@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import type { IDataResult } from '@/api/asset_interfaces';
 import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
 import { AppVerticalCodeSplitter } from '@/components/features/layouts/AppVerticalCodeSplitter';
-import type { AppSplitterRef } from '@/components/ui/layouts';
+import type { AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
 import { useMemoizedFn } from '@/hooks';
 import { useMetricResultsLayout } from './useMetricResultsLayout';
 import { useMetricRunSQL } from './useMetricRunSQL';

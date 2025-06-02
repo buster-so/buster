@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import React, { useRef } from 'react';
-import { AppSplitter, type AppSplitterHandle } from './AppSplitter';
+import { AppSplitter, type AppSplitterRef } from './AppSplitter';
 import { useAppSplitterContext } from './AppSplitterProvider';
 import { Title } from '@/components/ui/typography/Title';
 import { Text } from '@/components/ui/typography/Text';
@@ -305,7 +305,7 @@ export const NestedThreePanel: Story = {
 
 // Story with animation controls via ref
 const AnimationViaRefExample = () => {
-  const splitterRef = useRef<AppSplitterHandle>(null);
+  const splitterRef = useRef<AppSplitterRef>(null);
 
   const handleAnimateLeft = (size: string) => {
     splitterRef.current?.animateWidth(size, 'left', 200);
@@ -416,7 +416,7 @@ export const AnimationViaContext: Story = {
 
 // Story demonstrating different animation durations
 const AnimationDurationsExample = () => {
-  const splitterRef = useRef<AppSplitterHandle>(null);
+  const splitterRef = useRef<AppSplitterRef>(null);
 
   const animations = [
     { label: 'Default', duration: undefined, size: '100px' },
@@ -465,7 +465,7 @@ export const AnimationDurations: Story = {
 // Story for horizontal split with animations
 export const HorizontalWithAnimation: Story = {
   render: () => {
-    const splitterRef = useRef<AppSplitterHandle>(null);
+    const splitterRef = useRef<AppSplitterRef>(null);
 
     return (
       <AppSplitter
@@ -509,8 +509,8 @@ export const HorizontalWithAnimation: Story = {
 
 // Three panel layout with animation controls
 const ThreePanelWithAnimationExample = () => {
-  const outerSplitterRef = useRef<AppSplitterHandle>(null);
-  const innerSplitterRef = useRef<AppSplitterHandle>(null);
+  const outerSplitterRef = useRef<AppSplitterRef>(null);
+  const innerSplitterRef = useRef<AppSplitterRef>(null);
 
   // Animation controls for left panel (outer splitter left side)
   const animateLeftPanel = (size: string, duration = 500) => {
