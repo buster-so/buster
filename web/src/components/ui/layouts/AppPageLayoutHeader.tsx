@@ -18,7 +18,14 @@ const headerVariants = cva(
     defaultVariants: {
       borderVariant: 'default',
       sizeVariant: 'default'
-    }
+    },
+    compoundVariants: [
+      {
+        borderVariant: 'ghost',
+        sizeVariant: 'default',
+        className: 'max-h-[37.5px] min-h-[37.5px]' // hack. figure out a better way to do this
+      }
+    ]
   }
 );
 

@@ -70,7 +70,7 @@ export const AppSplitter = forwardRef<AppSplitterRef, IAppSplitterProps>(
       rightHidden = false,
       leftHidden = false,
       style,
-      hideSplitter = false,
+      hideSplitter: hideSplitterProp = false,
       leftPanelClassName,
       rightPanelClassName
     },
@@ -82,6 +82,7 @@ export const AppSplitter = forwardRef<AppSplitterRef, IAppSplitterProps>(
     const [isAnimating, setIsAnimating] = useState(false);
     const [isInitialized, setIsInitialized] = useState(false);
     const [sizeSetByAnimation, setSizeSetByAnimation] = useState(false); // Track if current size was set by animation
+    const [hasUserInteracted, setHasUserInteracted] = useState(false); // Track if user has ever dragged the splitter
     const startPosRef = useRef(0);
     const startSizeRef = useRef(0);
     const animationRef = useRef<number | null>(null);
@@ -184,7 +185,20 @@ export const AppSplitter = forwardRef<AppSplitterRef, IAppSplitterProps>(
         return { leftSize: Math.max(0, leftSize), rightSize: Math.max(0, rightSize) };
       }
 
-      // Normal constraint logic when user is dragging or size was set by user interaction
+      // Only apply constraints if user has interacted with the splitter
+      // This allows default layout to be respected exactly, even if it violates constraints
+      if (!hasUserInteracted) {
+        if (preserveSide === 'left') {
+          leftSize = preservedPanelSize;
+          rightSize = containerSize - leftSize;
+        } else {
+          rightSize = preservedPanelSize;
+          leftSize = containerSize - rightSize;
+        }
+        return { leftSize: Math.max(0, leftSize), rightSize: Math.max(0, rightSize) };
+      }
+
+      // Apply constraint logic only when user has interacted (dragged) the splitter
       if (preserveSide === 'left') {
         leftSize = Math.max(leftMinPx, Math.min(preservedPanelSize, leftMaxPx || containerSize));
         rightSize = containerSize - leftSize;
@@ -211,7 +225,6 @@ export const AppSplitter = forwardRef<AppSplitterRef, IAppSplitterProps>(
           leftSize = leftMaxPx;
           rightSize = containerSize - leftSize;
         }
-        console.log(leftSize, rightSize);
       }
 
       return { leftSize, rightSize };
@@ -228,10 +241,15 @@ export const AppSplitter = forwardRef<AppSplitterRef, IAppSplitterProps>(
       rightHidden,
       isAnimating,
       sizeSetByAnimation,
-      isDragging
+      isDragging,
+      hasUserInteracted
     ]);
 
     const { leftSize, rightSize } = panelSizes;
+
+    const hideSplitter = useMemo(() => {
+      return hideSplitterProp || (leftHidden && rightHidden) || leftSize === 0 || rightSize === 0;
+    }, [hideSplitterProp, leftHidden, rightHidden, leftSize, rightSize]);
 
     // Memoize sizes array to prevent recreation on every render
     const sizes = useMemo<[string | number, string | number]>(
@@ -352,6 +370,7 @@ export const AppSplitter = forwardRef<AppSplitterRef, IAppSplitterProps>(
         if (!allowResize) return;
 
         setIsDragging(true);
+        setHasUserInteracted(true); // Mark that user has interacted with the splitter
         setSizeSetByAnimation(false); // Clear animation flag - user is now controlling the size
         startPosRef.current = isVertical ? e.clientX : e.clientY;
         startSizeRef.current = preservedPanelSize;
