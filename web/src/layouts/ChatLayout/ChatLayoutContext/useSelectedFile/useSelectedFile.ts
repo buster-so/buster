@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import type { AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
+import type { AppSplitterRef } from '@/components/ui/layouts/AppSplitterOld';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useMemoizedFn } from '@/hooks';
 import { assetParamsToRoute } from '@/lib/assets';

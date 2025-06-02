@@ -6,7 +6,7 @@ import { SidebarCollapsible } from './SidebarCollapsible';
 import { SidebarItem } from './SidebarItem';
 import { SidebarFooter } from './SidebarFooter';
 import { useMemoizedFn } from '@/hooks';
-import { useAppSplitterContext } from '../layouts/AppSplitter/AppSplitterProvider';
+import { useAppSplitterContext } from '../layouts/AppSplitterOld/AppSplitterProvider';
 import { COLLAPSED_SIDEBAR_WIDTH, DEFAULT_SIDEBAR_WIDTH } from './config';
 
 export const Sidebar: React.FC<SidebarProps> = React.memo(

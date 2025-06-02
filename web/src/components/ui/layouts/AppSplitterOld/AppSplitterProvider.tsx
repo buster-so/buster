@@ -1,7 +1,7 @@
 import React from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
 
-interface AppSplitterNewProviderProps {
+interface AppSplitterProviderProps {
   animateWidth: (width: string | number, side: 'left' | 'right', duration: number) => Promise<void>;
   setSplitSizes: (sizes: [string | number, string | number]) => void;
   isSideClosed: (side: 'left' | 'right') => boolean;
@@ -9,7 +9,7 @@ interface AppSplitterNewProviderProps {
   sizes: [string | number, string | number];
 }
 
-const AppSplitterNewContext = createContext<AppSplitterNewProviderProps>({
+const AppSplitterContext = createContext<AppSplitterProviderProps>({
   animateWidth: async () => {},
   setSplitSizes: () => {},
   isSideClosed: () => false,
@@ -17,11 +17,12 @@ const AppSplitterNewContext = createContext<AppSplitterNewProviderProps>({
   sizes: ['0', '0']
 });
 
-export const AppSplitterNewProvider: React.FC<
-  React.PropsWithChildren<AppSplitterNewProviderProps>
-> = ({ children, ...props }) => {
-  return <AppSplitterNewContext.Provider value={props}>{children}</AppSplitterNewContext.Provider>;
+export const AppSplitterProvider: React.FC<React.PropsWithChildren<AppSplitterProviderProps>> = ({
+  children,
+  ...props
+}) => {
+  return <AppSplitterContext.Provider value={props}>{children}</AppSplitterContext.Provider>;
 };
 
-export const useAppSplitterNewContext = <T,>(selector: (value: AppSplitterNewProviderProps) => T) =>
-  useContextSelector(AppSplitterNewContext, selector);
+export const useAppSplitterContext = <T,>(selector: (value: AppSplitterProviderProps) => T) =>
+  useContextSelector(AppSplitterContext, selector);

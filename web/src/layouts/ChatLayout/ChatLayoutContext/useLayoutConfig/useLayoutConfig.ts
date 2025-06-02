@@ -3,7 +3,7 @@
 import { create } from 'mutative';
 import { type RefObject, useMemo, useState } from 'react';
 import type { FileType } from '@/api/asset_interfaces/chat';
-import type { AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
+import type { AppSplitterRef } from '@/components/ui/layouts/AppSplitterOld';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useIsChanged, useMemoizedFn, useUpdateEffect } from '@/hooks';
 import { timeout } from '@/lib/timeout';

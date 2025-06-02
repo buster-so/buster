@@ -4,12 +4,12 @@ import { SortableContext, useSortable } from '@dnd-kit/sortable';
 import React, { useLayoutEffect, useMemo, useState } from 'react';
 import { useMemoizedFn, useMouse } from '@/hooks';
 import { cn } from '@/lib/classMerge';
-import SplitPane, { Pane } from '../layouts/AppSplitter/SplitPane';
+import SplitPane, { Pane } from '../layouts/AppSplitterOld/SplitPane';
 import { BusterDragColumnMarkers } from './_BusterDragColumnMarkers';
 import { BusterSortableItemDragContainer } from './_BusterSortableItemDragContainer';
 import { calculateColumnSpan, columnSpansToPercent } from './helpers';
 import type { ResizeableGridDragItem } from './interfaces';
-import '../layouts/AppSplitter/splitterStyles.css';
+import '../layouts/AppSplitterOld/splitterStyles.css';
 
 type ContainerProps = {
   rowId: string;

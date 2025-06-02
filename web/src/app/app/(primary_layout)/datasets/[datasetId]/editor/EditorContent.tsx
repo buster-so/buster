@@ -6,7 +6,7 @@ import { useMemo, useRef, useState } from 'react';
 import type { IDataResult } from '@/api/asset_interfaces';
 import { useRunSQL } from '@/api/buster_rest';
 import { AppVerticalCodeSplitter } from '@/components/features/layouts/AppVerticalCodeSplitter';
-import type { AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
+import type { AppSplitterRef } from '@/components/ui/layouts/AppSplitterOld';
 import { useMemoizedFn, useRequest } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 import { useDatasetPageContextSelector } from '../_DatasetsLayout/DatasetPageContext';

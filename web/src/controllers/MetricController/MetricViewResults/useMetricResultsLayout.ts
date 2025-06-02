@@ -2,7 +2,7 @@ import Cookies from 'js-cookie';
 import type React from 'react';
 import { useMemo } from 'react';
 import type { AppSplitterRef } from '@/components/ui/layouts';
-import { createAutoSaveId } from '@/components/ui/layouts/AppSplitter/helper';
+import { createAutoSaveId } from '@/components/ui/layouts/AppSplitterOld/helper';
 import { useMemoizedFn, useUpdateLayoutEffect } from '@/hooks';
 
 const defaultSqlOpenLayout = ['80%', 'auto'];
