@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { AppSplitter } from './AppSplitter';
 
 const meta = {
-  title: 'UI/Layouts/AppSplitter',
+  title: 'UI/Layouts/AppSplitterOld',
   component: AppSplitter,
   parameters: {
     layout: 'fullscreen'
