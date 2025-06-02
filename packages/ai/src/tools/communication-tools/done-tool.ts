@@ -1,166 +1,132 @@
 import { createTool } from '@mastra/core/tools';
+import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 
-const MESSAGE_PARAM_DESCRIPTION = `
-The final response message to the user. 
+// Core interfaces matching Rust structs
+interface DoneInput {
+  final_response: string;
+}
 
-**MUST** be formatted in Markdown. Use bullet points or other appropriate Markdown formatting. Do not include headers. Do not use the '•' bullet character. 
+interface DoneOutput {
+  success: boolean;
+  todos: string;
+}
 
-Do not include markdown tables.
-`;
+interface RuntimeContext {
+  get(key: string): any | undefined;
+  set(key: string, value: any): void;
+}
 
-// Artifact type definitions
-const ArtifactSchema = z.object({
-  type: z.enum(['dashboard', 'metric', 'report', 'analysis']),
-  id: z.string(),
-  title: z.string(),
-  description: z.string().optional(),
+interface TodoItem {
+  todo: string;
+  completed: boolean;
+  [key: string]: any; // Allow other fields
+}
+
+// Parse and validate todo items from agent state
+function parseTodos(todosValue: any): TodoItem[] {
+  if (!Array.isArray(todosValue)) {
+    return [];
+  }
+
+  return todosValue.filter((item): item is TodoItem => {
+    return (
+      typeof item === 'object' &&
+      item !== null &&
+      typeof item.todo === 'string' &&
+      typeof item.completed === 'boolean'
+    );
+  });
+}
+
+// Format todos list for output with completion annotations
+function formatTodosOutput(todos: TodoItem[], markedByDone: number[]): string {
+  return todos
+    .map((todo, idx) => {
+      const annotation = markedByDone.includes(idx) 
+        ? ' *Marked complete by calling the done tool'
+        : '';
+      return `[x] ${todo.todo}${annotation}`;
+    })
+    .join('\n');
+}
+
+// Process done tool execution with todo management
+async function processDone(
+  params: DoneInput,
+  runtimeContext?: RuntimeContext
+): Promise<DoneOutput> {
+  if (!runtimeContext) {
+    throw new Error('Runtime context not found');
+  }
+
+  // Get the current todos from state
+  const todosValue = runtimeContext.get('todos');
+  const todos = parseTodos(todosValue);
+
+  // If no todos exist, just return success without a list
+  if (todos.length === 0) {
+    return {
+      success: true,
+      todos: 'No to-do list found.'
+    };
+  }
+
+  const markedByDone: number[] = []; // Track items marked by this tool
+
+  // Mark all remaining unfinished todos as complete
+  for (let idx = 0; idx < todos.length; idx++) {
+    const todo = todos[idx];
+    if (!todo.completed) {
+      todo.completed = true;
+      markedByDone.push(idx); // Track 0-based index
+    }
+  }
+
+  // Save the updated todos back to state
+  runtimeContext.set('todos', todos);
+
+  // Format the output string, potentially noting items marked by 'done'
+  const todosString = formatTodosOutput(todos, markedByDone);
+
+  // This tool signals the end of the workflow and provides the final response.
+  // The actual agent termination logic resides elsewhere.
+  return {
+    success: true,
+    todos: todosString
+  };
+}
+
+// Main done function with tracing
+const executeDone = wrapTraced(
+  async (params: DoneInput & { runtimeContext?: RuntimeContext }): Promise<DoneOutput> => {
+    const { runtimeContext, ...doneParams } = params;
+    return await processDone(doneParams, runtimeContext);
+  },
+  { name: 'done-tool' }
+);
+
+// Input/Output schemas
+const inputSchema = z.object({
+  final_response: z.string().min(1, 'Final response is required').describe(
+    'The final response message to the user. **MUST** be formatted in Markdown. Use bullet points or other appropriate Markdown formatting. Do not include headers. Do not use the \'•\' bullet character. Do not include markdown tables.'
+  )
 });
 
-type Artifact = z.infer<typeof ArtifactSchema>;
+const outputSchema = z.object({
+  success: z.boolean(),
+  todos: z.string()
+});
 
-// Mock session manager - in a real implementation this would come from context
-const getSessionStartTime = (): number => {
-  // For now, assume session started 1 minute ago
-  return Date.now() - 60000;
-};
-
-function generateCompletionMessage(
-  message: string,
-  summary?: string,
-  artifacts?: Artifact[]
-): string {
-  let finalMessage = message;
-
-  if (summary) {
-    finalMessage += `\n\n${summary}`;
-  }
-
-  if (artifacts && artifacts.length > 0) {
-    finalMessage += '\n\n**Created artifacts:**\n';
-    for (const artifact of artifacts) {
-      finalMessage += `- **${artifact.title}** (${artifact.type})`;
-      if (artifact.description) {
-        finalMessage += ` - ${artifact.description}`;
-      }
-      finalMessage += '\n';
-    }
-  }
-
-  return finalMessage;
-}
-
-function generateAutoSummary(artifacts?: Artifact[]): string {
-  let summary = '## Session Summary:\n\n';
-
-  if (!artifacts || artifacts.length === 0) {
-    summary += 'No artifacts were created during this session. ';
-    summary += 'Provided information and guidance to complete the requested tasks.';
-  } else {
-    const dashboards = artifacts.filter((a) => a.type === 'dashboard');
-    const metrics = artifacts.filter((a) => a.type === 'metric');
-    const reports = artifacts.filter((a) => a.type === 'report');
-    const analyses = artifacts.filter((a) => a.type === 'analysis');
-
-    summary += `Created ${artifacts.length} total artifact${artifacts.length === 1 ? '' : 's'}:\n`;
-
-    if (dashboards.length > 0) {
-      summary += `- ${dashboards.length} dashboard${dashboards.length === 1 ? '' : 's'}\n`;
-    }
-    if (metrics.length > 0) {
-      summary += `- ${metrics.length} metric${metrics.length === 1 ? '' : 's'}\n`;
-    }
-    if (reports.length > 0) {
-      summary += `- ${reports.length} report${reports.length === 1 ? '' : 's'}\n`;
-    }
-    if (analyses.length > 0) {
-      summary += `- ${analyses.length} analys${analyses.length === 1 ? 'is' : 'es'}\n`;
-    }
-  }
-
-  return summary;
-}
-
+// Export the tool
 export const doneTool = createTool({
   id: 'done',
-  description: 'Signal completion of all requested tasks and end the workflow',
-  inputSchema: z.object({
-    message: z.string().describe(MESSAGE_PARAM_DESCRIPTION),
-    summary: z.string().optional().describe('Optional summary of what was accomplished'),
-    final_artifacts: z
-      .array(ArtifactSchema)
-      .optional()
-      .describe('List of artifacts created during the session'),
-  }),
-  outputSchema: z.object({
-    success: z.boolean(),
-    message: z.string(),
-    session_ended: z.boolean(),
-    artifacts_created: z.number(),
-    session_duration: z.number(),
-  }),
+  description: 'Marks all remaining unfinished tasks as complete, sends a final response to the user, and ends the workflow. Use this when the workflow is finished. This must be in markdown format and not use the \'•\' bullet character.',
+  inputSchema,
+  outputSchema,
   execute: async ({ context }) => {
-    const { message, summary, final_artifacts } = context;
-    const sessionStartTime = getSessionStartTime();
-    const sessionDuration = Date.now() - sessionStartTime;
-    const artifactsCount = final_artifacts?.length || 0;
-
-    const finalMessage = message || 'Task completed successfully.';
-    const completionMessage = generateCompletionMessage(finalMessage, summary, final_artifacts);
-
-    return {
-      success: true,
-      message: completionMessage,
-      session_ended: true,
-      artifacts_created: artifactsCount,
-      session_duration: sessionDuration,
-    };
-  },
+    return await executeDone(context as DoneInput & { runtimeContext?: RuntimeContext });
+  }
 });
 
-export const doneToolWithSummary = createTool({
-  id: 'done-with-summary',
-  description: 'Signal completion with automatic session summary generation',
-  inputSchema: z.object({
-    message: z.string().describe(MESSAGE_PARAM_DESCRIPTION),
-    include_auto_summary: z
-      .boolean()
-      .default(true)
-      .describe('Whether to include automatic session summary'),
-    final_artifacts: z
-      .array(ArtifactSchema)
-      .optional()
-      .describe('List of artifacts created during the session'),
-  }),
-  outputSchema: z.object({
-    success: z.boolean(),
-    message: z.string(),
-    session_ended: z.boolean(),
-    artifacts_created: z.number(),
-    session_duration: z.number(),
-    auto_summary: z.string().optional(),
-  }),
-  execute: async ({ context }) => {
-    const { message, include_auto_summary = true, final_artifacts } = context;
-    const sessionStartTime = getSessionStartTime();
-    const sessionDuration = Date.now() - sessionStartTime;
-    const artifactsCount = final_artifacts?.length || 0;
-
-    let autoSummary: string | undefined;
-    let finalMessage = message;
-
-    if (include_auto_summary) {
-      autoSummary = generateAutoSummary(final_artifacts);
-      finalMessage = `${message}\n\n${autoSummary}`;
-    }
-
-    return {
-      success: true,
-      message: finalMessage,
-      session_ended: true,
-      artifacts_created: artifactsCount,
-      session_duration: sessionDuration,
-      auto_summary: autoSummary,
-    };
-  },
-});
+export default doneTool;
