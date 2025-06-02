@@ -10,8 +10,5 @@
   },
   "dependencies": {
     "@buster/database": "*"
-  },
-  "devDependencies": {
-    "vite-tsconfig-paths": "^5.1.4"
   }
 }

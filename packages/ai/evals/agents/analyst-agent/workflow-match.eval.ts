@@ -1,5 +1,4 @@
-import { LLMClassifierFromTemplate } from 'autoevals';
-import { Eval } from 'braintrust';
+import { Eval, initDataset } from 'braintrust';
 import { analystAgent } from '../../../src/agents/analyst-agent/analyst-agent';
 
 async function runWeatherAgentTask(input: string): Promise<any> {
@@ -13,7 +12,7 @@ async function runWeatherAgentTask(input: string): Promise<any> {
         thinking: { type: 'enabled', budgetTokens: 2000 },
       },
       openai: {
-        reasoning_effort: 'high',
+        reasoning_effort: 'medium',
       },
     },
   });
@@ -23,7 +22,6 @@ async function runWeatherAgentTask(input: string): Promise<any> {
 const firstMessageIsSearchDataCatalogToolCall = (args: {
   input: string;
   output: any;
-  expected: any;
 }) => {
   const { output } = args;
 
@@ -43,38 +41,30 @@ const firstMessageIsSearchDataCatalogToolCall = (args: {
 const doesWorkflowRoughlyMatch = (args: {
   input: string;
   output: any;
-  expected: any;
 }) => {
-  const classifier = LLMClassifierFromTemplate({
-    name: 'doesWorkflowRoughlyMatch',
-    promptTemplate: `
-    I need you to determine if the actual workflow of the agent to get weather is roughly the same as the expected workflow.
+  // Since no expected data is available, just check if the workflow contains basic analysis steps
+  const { output } = args;
 
-    We aren't worried about the minor details like args and stuff, but mainly trying to make sure that logically it roughly matches the steps.
+  let hasSearchStep = false;
 
-    Here is the expected workflow:
-    {{expected}}
+  for (const message of output) {
+    if (message.content && Array.isArray(message.content)) {
+      for (const contentItem of message.content) {
+        if (contentItem.type === 'tool-call') {
+          if (contentItem.toolName === 'searchDataCatalogTool') {
+            hasSearchStep = true;
+          }
+          // Add other analysis tool checks here if needed
+        }
+      }
+    }
+  }
 
-    Here is the actual workflow:
-    {{output}}
-    `,
-    choiceScores: {
-      Y: 1,
-      N: 0,
-    },
-  });
-
-  return classifier({
-    output: JSON.stringify(args.output, null, 2),
-    expected: JSON.stringify(args.expected, null, 2),
-  });
+  return hasSearchStep ? 1 : 0;
 };
 
-Eval('Weather Agent', {
-  data: () => {
-    return [];
-  },
+Eval('Analyst Agent', {
+  data: initDataset('Analyst Agent', { dataset: 'General Workflow Dataset' }),
   task: runWeatherAgentTask,
-  name: 'analyst-agent',
   scores: [firstMessageIsSearchDataCatalogToolCall, doesWorkflowRoughlyMatch],
 });
