@@ -154,8 +154,7 @@ const PermissionGroupAssignedCell: React.FC<{
   onSelect: (value: { id: string; assigned: boolean }) => void;
 }> = ({ id, assigned, onSelect }) => {
   return (
-    <button
-      type="button"
+    <div
       className="flex cursor-pointer"
       onClick={(e) => e.stopPropagation()}
       onKeyUp={(e) => e.stopPropagation()}>
@@ -166,6 +165,6 @@ const PermissionGroupAssignedCell: React.FC<{
           onSelect({ id, assigned: value === 'included' });
         }}
       />
-    </button>
+    </div>
   );
 };
