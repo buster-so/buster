@@ -2,7 +2,15 @@
 
 import type React from 'react';
 
-import { useCallback, useEffect, useRef, useState, useImperativeHandle, forwardRef } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useImperativeHandle,
+  forwardRef,
+  useMemo
+} from 'react';
 import { useLocalStorageState } from '@/hooks/useLocalStorageState';
 import { cn } from '@/lib/classMerge';
 import { Panel } from './Panel';
@@ -99,25 +107,22 @@ export const AppSplitterNew = forwardRef<AppSplitterNewHandle, IAppSplitterNewPr
     const startSizeRef = useRef(0);
     const animationRef = useRef<number | null>(null);
 
-    const isVertical = split === 'vertical';
+    const isVertical = useMemo(() => split === 'vertical', [split]);
 
-    // Parse default layout
-    const getInitialSize = useCallback(
-      (containerSize: number) => {
-        const [leftValue, rightValue] = defaultLayout;
+    // Parse default layout - removed useCallback since it's not passed as prop
+    const getInitialSize = (containerSize: number) => {
+      const [leftValue, rightValue] = defaultLayout;
 
-        if (preserveSide === 'left' && leftValue !== 'auto') {
-          return sizeToPixels(leftValue, containerSize);
-        } else if (preserveSide === 'right' && rightValue !== 'auto') {
-          const rightSize = sizeToPixels(rightValue, containerSize);
-          return containerSize - rightSize;
-        }
+      if (preserveSide === 'left' && leftValue !== 'auto') {
+        return sizeToPixels(leftValue, containerSize);
+      } else if (preserveSide === 'right' && rightValue !== 'auto') {
+        const rightSize = sizeToPixels(rightValue, containerSize);
+        return containerSize - rightSize;
+      }
 
-        // Default fallback
-        return 280;
-      },
-      [defaultLayout, preserveSide]
-    );
+      // Default fallback
+      return 280;
+    };
 
     // Load saved layout from localStorage
     const [savedLayout, setSavedLayout] = useLocalStorageState<number | null>(
@@ -129,21 +134,31 @@ export const AppSplitterNew = forwardRef<AppSplitterNewHandle, IAppSplitterNewPr
       return savedLayout || 0;
     });
 
-    // Convert min/max sizes to pixels
-    const leftMinPx = containerSize ? sizeToPixels(leftPanelMinSize, containerSize) : 0;
-    const leftMaxPx =
-      leftPanelMaxSize && containerSize ? sizeToPixels(leftPanelMaxSize, containerSize) : undefined;
-    const rightMinPx = containerSize ? sizeToPixels(rightPanelMinSize, containerSize) : 0;
-    const rightMaxPx =
-      rightPanelMaxSize && containerSize
-        ? sizeToPixels(rightPanelMaxSize, containerSize)
-        : undefined;
+    // Memoize size calculations to prevent recalculation on every render
+    const sizeConstraints = useMemo(() => {
+      if (!containerSize) {
+        return {
+          leftMinPx: 0,
+          leftMaxPx: undefined,
+          rightMinPx: 0,
+          rightMaxPx: undefined
+        };
+      }
 
-    const showSplitter = !leftHidden && !rightHidden;
+      return {
+        leftMinPx: sizeToPixels(leftPanelMinSize, containerSize),
+        leftMaxPx: leftPanelMaxSize ? sizeToPixels(leftPanelMaxSize, containerSize) : undefined,
+        rightMinPx: sizeToPixels(rightPanelMinSize, containerSize),
+        rightMaxPx: rightPanelMaxSize ? sizeToPixels(rightPanelMaxSize, containerSize) : undefined
+      };
+    }, [containerSize, leftPanelMinSize, rightPanelMinSize, leftPanelMaxSize, rightPanelMaxSize]);
 
-    // Calculate current sizes for context
-    // Calculate actual panel sizes
-    const calculatePanelSizes = useCallback(() => {
+    const { leftMinPx, leftMaxPx, rightMinPx, rightMaxPx } = sizeConstraints;
+
+    const showSplitter = useMemo(() => !leftHidden && !rightHidden, [leftHidden, rightHidden]);
+
+    // Memoize panel size calculations since this is expensive
+    const panelSizes = useMemo(() => {
       if (!containerSize) return { leftSize: 0, rightSize: 0 };
 
       // If we haven't initialized yet, return 0 for both
@@ -236,15 +251,21 @@ export const AppSplitterNew = forwardRef<AppSplitterNewHandle, IAppSplitterNewPr
       sizeSetByAnimation,
       isDragging
     ]);
-    const { leftSize, rightSize } = calculatePanelSizes();
-    const sizes: [string | number, string | number] = [`${leftSize}px`, `${rightSize}px`];
+
+    const { leftSize, rightSize } = panelSizes;
+
+    // Memoize sizes array to prevent recreation on every render
+    const sizes = useMemo<[string | number, string | number]>(
+      () => [`${leftSize}px`, `${rightSize}px`],
+      [leftSize, rightSize]
+    );
 
     // Animation function
     const animateWidth = useCallback(
       async (
         width: string | number,
         side: 'left' | 'right',
-        duration: number | undefined = 250
+        duration: number = 250
       ): Promise<void> => {
         return new Promise((resolve) => {
           if (!containerSize) {
@@ -415,34 +436,33 @@ export const AppSplitterNew = forwardRef<AppSplitterNewHandle, IAppSplitterNewPr
       setSavedLayout(preservedPanelSize);
     }, [preservedPanelSize, setSavedLayout]);
 
+    // Memoize the updateContainerSize function to prevent ResizeObserver recreation
+    const updateContainerSize = useCallback(() => {
+      if (containerRef.current) {
+        const size = isVertical
+          ? containerRef.current.offsetWidth
+          : containerRef.current.offsetHeight;
+        setContainerSize(size);
+
+        // Initialize size ONLY if not initialized yet, not animating, and we have a valid container size
+        if (
+          !isInitialized && // Only initialize once
+          !isAnimating && // Don't override during animation
+          size > 0
+        ) {
+          const initialSize = savedLayout || getInitialSize(size);
+          setPreservedPanelSize(initialSize);
+          setIsInitialized(true); // Mark as initialized
+        }
+      }
+    }, [isVertical, isInitialized, isAnimating, savedLayout]);
+
     // Update container size
     useEffect(() => {
-      const updateContainerSize = () => {
-        if (containerRef.current) {
-          const size = isVertical
-            ? containerRef.current.offsetWidth
-            : containerRef.current.offsetHeight;
-          setContainerSize(size);
-
-          // Initialize size ONLY if not initialized yet, not animating, and we have a valid container size
-          if (
-            !isInitialized && // Only initialize once
-            !isAnimating && // Don't override during animation
-            size > 0
-          ) {
-            const initialSize = savedLayout || getInitialSize(size);
-            setPreservedPanelSize(initialSize);
-            setIsInitialized(true); // Mark as initialized
-          }
-        }
-      };
-
       updateContainerSize();
 
       // Use ResizeObserver for better detection of size changes
-      const resizeObserver = new ResizeObserver(() => {
-        updateContainerSize();
-      });
+      const resizeObserver = new ResizeObserver(updateContainerSize);
 
       if (containerRef.current) {
         resizeObserver.observe(containerRef.current);
@@ -454,7 +474,7 @@ export const AppSplitterNew = forwardRef<AppSplitterNewHandle, IAppSplitterNewPr
         resizeObserver.disconnect();
         window.removeEventListener('resize', updateContainerSize);
       };
-    }, [isVertical, getInitialSize, isInitialized, isAnimating, savedLayout]);
+    }, [updateContainerSize]);
 
     useEffect(() => {
       if (isDragging) {
