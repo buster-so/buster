@@ -720,3 +720,60 @@ const ThreePanelWithAnimationExample = () => {
 export const ThreePanelWithAnimation: Story = {
   render: () => <ThreePanelWithAnimationExample />
 };
+
+export const CollapsedLeftPanel: Story = {
+  args: {
+    leftChildren: (
+      <div className="bg-muted/20 h-full p-6">
+        <Title as="h3">Collapsible Left Panel</Title>
+        <Text className="text-muted-foreground mt-2">
+          This panel starts collapsed at 0px but has a minimum size of 200px when expanded.
+        </Text>
+        <div className="mt-4 space-y-2">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="bg-muted/40 rounded p-3">
+              <Text>Navigation Item {i}</Text>
+            </div>
+          ))}
+        </div>
+        <div className="bg-muted/30 mt-6 rounded p-4">
+          <Text className="text-sm font-medium">Panel Info</Text>
+          <Text className="text-muted-foreground mt-1 text-xs">
+            Try dragging the splitter to expand this panel. It will snap to at least 200px wide.
+          </Text>
+        </div>
+      </div>
+    ),
+    rightChildren: (
+      <div className="h-full p-6">
+        <Title as="h2">Main Content Area</Title>
+        <Text className="text-muted-foreground mt-2">
+          This panel takes up the full width initially since the left panel is collapsed. When you
+          expand the left panel, this content area will adjust automatically.
+        </Text>
+        <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div
+              key={i}
+              className="bg-muted/10 flex h-32 items-center justify-center rounded-lg border">
+              <Text>Content Block {i}</Text>
+            </div>
+          ))}
+        </div>
+        <div className="bg-muted/20 mt-6 rounded p-4">
+          <Title as="h4" className="mb-2">
+            Usage
+          </Title>
+          <Text className="text-sm">
+            This layout is perfect for sidebars that can be collapsed to save space but need a
+            reasonable minimum width when expanded.
+          </Text>
+        </div>
+      </div>
+    ),
+    autoSaveId: 'collapsed-left-panel',
+    defaultLayout: ['0%', '100%'],
+    leftPanelMinSize: '200px',
+    preserveSide: 'right'
+  }
+};

@@ -10,7 +10,10 @@ import { CREATE_LANGFUSE_SESSION_URL } from '@/routes/externalRoutes';
 import { ChatContainer } from '../ChatContainer';
 import { ChatContextProvider } from '../ChatContext/ChatContext';
 import { ChatLayoutContextProvider, useChatLayoutContext } from '../ChatLayoutContext';
-import { DEFAULT_CHAT_OPTION_SIDEBAR_SIZE } from '../ChatLayoutContext/config';
+import {
+  DEFAULT_CHAT_OPTION_SIDEBAR_SIZE,
+  DEFAULT_FILE_OPTION_SIDEBAR_SIZE
+} from '../ChatLayoutContext/config';
 import { FileContainer } from '../FileContainer';
 
 interface ChatSplitterProps {
@@ -26,8 +29,8 @@ export const ChatLayout: React.FC<ChatSplitterProps> = ({ children }) => {
   const { selectedLayout, selectedFile } = chatLayoutProps;
 
   const defaultSplitterLayout = useMemo(() => {
-    if (selectedLayout === 'chat-only') return ['100%', '0%'];
-    if (selectedLayout === 'file-only' || selectedLayout === 'chat-hidden') return ['0%', '100%'];
+    if (selectedLayout === 'chat-only') return ['auto', '0px'];
+    if (selectedLayout === 'file-only' || selectedLayout === 'chat-hidden') return ['0px', 'auto'];
     return ['380px', 'auto'];
   }, [selectedLayout]);
 
@@ -52,13 +55,13 @@ export const ChatLayout: React.FC<ChatSplitterProps> = ({ children }) => {
     }
   );
 
+  console.log(defaultSplitterLayout);
+
   return (
     <ChatLayoutContextProvider chatLayoutProps={chatLayoutProps}>
       <ChatContextProvider>
         <AppSplitter
           ref={appSplitterRef}
-          leftHidden={selectedLayout === 'file-only' || selectedLayout === 'chat-hidden'}
-          rightHidden={selectedLayout === 'chat-only' || selectedLayout === 'chat-hidden'}
           leftChildren={useMemo(() => mounted && <ChatContainer mounted={mounted} />, [mounted])}
           rightChildren={useMemo(
             () => mounted && <FileContainer>{children}</FileContainer>,
@@ -68,7 +71,8 @@ export const ChatLayout: React.FC<ChatSplitterProps> = ({ children }) => {
           defaultLayout={defaultSplitterLayout}
           allowResize={selectedLayout === 'both'}
           preserveSide="left"
-          leftPanelMinSize={selectedFile ? DEFAULT_CHAT_OPTION_SIDEBAR_SIZE : undefined}
+          leftPanelMinSize={selectedFile ? DEFAULT_CHAT_OPTION_SIDEBAR_SIZE : '0px'}
+          rightPanelMinSize={selectedFile ? DEFAULT_FILE_OPTION_SIDEBAR_SIZE : '0px'}
         />
       </ChatContextProvider>
     </ChatLayoutContextProvider>

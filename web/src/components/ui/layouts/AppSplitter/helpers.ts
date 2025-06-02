@@ -2,6 +2,7 @@ export const createAutoSaveId = (id: string) => `app-splitter-${id}`;
 
 // Helper function to convert size values to pixels
 export const sizeToPixels = (size: string | number, containerSize: number): number => {
+  console.log(size, containerSize);
   if (typeof size === 'number') {
     return size;
   }
@@ -9,12 +10,12 @@ export const sizeToPixels = (size: string | number, containerSize: number): numb
   const sizeStr = size.toString();
 
   if (sizeStr.endsWith('%')) {
-    const percentage = parseFloat(sizeStr) / 100;
+    const percentage = parseFloat(sizeStr.replace('%', '')) / 100;
     return Math.round(containerSize * percentage);
   }
 
   if (sizeStr.endsWith('px')) {
-    return parseFloat(sizeStr);
+    return parseFloat(sizeStr.replace('px', ''));
   }
 
   // Default to parsing as number
