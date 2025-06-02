@@ -1,4 +1,6 @@
 import type { RuntimeContext } from '@mastra/core/runtime-context';
+import { reviewPlanTool } from '../../../tools';
+import doneTool from '../../../tools/communication-tools/done-tool';
 import { getDefaultModel } from './analyst-base';
 import type { AnalystRuntimeContext } from './analyst-base';
 import {
@@ -82,9 +84,7 @@ export const getTools = ({
   runtimeContext: _runtimeContext,
 }: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }) => {
   return {
-    // TODO: Implement review mode tools
-    // Based on the Rust code, this should include:
-    // - ReviewPlan
-    // - Done
+    reviewPlan: reviewPlanTool,
+    done: doneTool,
   };
 };

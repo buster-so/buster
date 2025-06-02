@@ -8,6 +8,9 @@ import {
   createPromptInjector,
   validatePlanningPromptVariables,
 } from './types';
+import doneTool from '../../../tools/communication-tools/done-tool';
+import createPlanInvestigativeTool from '../../../tools/planning-thinking-tools/create-plan-investigative-tool';
+import { createPlanStraightforwardTool } from '../../../tools';
 
 export const PLANNING_SYSTEM_PROMPT: SystemPrompt<PlanningPromptVariables> = {
   template: `## Overview
@@ -241,11 +244,8 @@ export const getTools = ({
   runtimeContext: _runtimeContext,
 }: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }) => {
   return {
-    // TODO: Implement planning mode tools
-    // Based on the Rust code, this should include:
-    // - CreatePlanStraightforward
-    // - CreatePlanInvestigative
-    // - Done
-    // - MessageUserClarifyingQuestion
+    createPlanStraightforward: createPlanStraightforwardTool,
+    createPlanInvestigative: createPlanInvestigativeTool,
+    done: doneTool,
   };
 };
