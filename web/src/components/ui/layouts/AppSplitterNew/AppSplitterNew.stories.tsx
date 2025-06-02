@@ -219,25 +219,6 @@ export const PercentageBasedSizing: Story = {
   }
 };
 
-// Interactive playground story
-export const Playground: Story = {
-  args: {
-    leftChildren: <LeftContent />,
-    rightChildren: <RightContent />,
-    autoSaveId: 'playground',
-    defaultLayout: ['300px', 'auto'],
-    preserveSide: 'left',
-    leftPanelMinSize: 200,
-    leftPanelMaxSize: 600,
-    rightPanelMinSize: 200,
-    allowResize: true,
-    split: 'vertical',
-    hideSplitter: false,
-    leftHidden: false,
-    rightHidden: false
-  }
-};
-
 // Nested Three Panel Layout Story
 export const NestedThreePanel: Story = {
   args: {
@@ -438,6 +419,7 @@ const AnimationDurationsExample = () => {
   const splitterRef = useRef<AppSplitterNewHandle>(null);
 
   const animations = [
+    { label: 'Default', duration: undefined, size: '100px' },
     { label: 'Fast (200ms)', duration: 200, size: '300px' },
     { label: 'Normal (500ms)', duration: 500, size: '400px' },
     { label: 'Slow (1000ms)', duration: 1000, size: '500px' },
@@ -523,4 +505,218 @@ export const HorizontalWithAnimation: Story = {
       />
     );
   }
+};
+
+// Three panel layout with animation controls
+const ThreePanelWithAnimationExample = () => {
+  const outerSplitterRef = useRef<AppSplitterNewHandle>(null);
+  const innerSplitterRef = useRef<AppSplitterNewHandle>(null);
+
+  // Animation controls for left panel (outer splitter left side)
+  const animateLeftPanel = (size: string, duration = 500) => {
+    outerSplitterRef.current?.animateWidth(size, 'left', duration);
+  };
+
+  // Animation controls for middle panel (inner splitter left side)
+  const animateMiddlePanel = (size: string, duration = 500) => {
+    innerSplitterRef.current?.animateWidth(size, 'left', duration);
+  };
+
+  // Animation controls for right panel (inner splitter right side)
+  const animateRightPanel = (size: string, duration = 500) => {
+    innerSplitterRef.current?.animateWidth(size, 'right', duration);
+  };
+
+  return (
+    <AppSplitterNew
+      ref={outerSplitterRef}
+      leftChildren={
+        <div className="h-full bg-blue-100/20 p-4">
+          <Title as="h3" className="mb-4">
+            Left Panel
+          </Title>
+          <Text className="text-muted-foreground mb-4">
+            Control this panel with the buttons below:
+          </Text>
+          <div className="space-y-2">
+            <Button onClick={() => animateLeftPanel('200px')} className="w-full" variant="outlined">
+              Set to 200px
+            </Button>
+            <Button onClick={() => animateLeftPanel('300px')} className="w-full" variant="outlined">
+              Set to 300px
+            </Button>
+            <Button onClick={() => animateLeftPanel('25%')} className="w-full" variant="outlined">
+              Set to 25%
+            </Button>
+            <Button
+              onClick={() => animateLeftPanel('400px', 1000)}
+              className="w-full"
+              variant="outlined">
+              Set to 400px (slow)
+            </Button>
+          </div>
+
+          <div className="bg-muted/20 mt-6 rounded p-3">
+            <Text className="text-sm font-medium">Animation Test</Text>
+            <Text className="text-muted-foreground mt-1 text-xs">
+              This panel is preserved by the outer splitter
+            </Text>
+          </div>
+        </div>
+      }
+      rightChildren={
+        <div className="flex h-full w-full overflow-hidden">
+          <AppSplitterNew
+            ref={innerSplitterRef}
+            leftChildren={
+              <div className="h-full bg-green-100/20 p-4">
+                <Title as="h3" className="mb-4">
+                  Middle Panel
+                </Title>
+                <Text className="text-muted-foreground mb-4">
+                  This panel takes remaining space when the right panel resizes:
+                </Text>
+                <div className="space-y-2">
+                  <Button
+                    onClick={() => animateMiddlePanel('auto')}
+                    className="w-full"
+                    variant="outlined">
+                    Set to Auto
+                  </Button>
+                  <Button
+                    onClick={() => animateMiddlePanel('50%')}
+                    className="w-full"
+                    variant="outlined">
+                    Set to 50%
+                  </Button>
+                  <Button
+                    onClick={() => animateMiddlePanel('60%')}
+                    className="w-full"
+                    variant="outlined">
+                    Set to 60%
+                  </Button>
+                </div>
+
+                <div className="bg-muted/20 mt-6 rounded p-3">
+                  <Text className="text-sm font-medium">Global Controls</Text>
+                  <Text className="text-muted-foreground mt-1 mb-3 text-xs">
+                    Control all panels with these buttons:
+                  </Text>
+                  <div className="space-y-2">
+                    <Button
+                      onClick={() => {
+                        animateLeftPanel('250px', 800);
+                        setTimeout(() => animateRightPanel('300px', 800), 200);
+                        setTimeout(() => animateMiddlePanel('auto', 800), 400);
+                      }}
+                      className="w-full"
+                      variant="default"
+                      size="small">
+                      Cascade Animation
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        animateLeftPanel('300px');
+                        animateRightPanel('350px');
+                        animateMiddlePanel('auto');
+                      }}
+                      className="w-full"
+                      variant="default"
+                      size="small">
+                      Sync Animation
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            }
+            rightChildren={
+              <div className="h-full bg-purple-100/20 p-4">
+                <Title as="h3" className="mb-4">
+                  Right Panel
+                </Title>
+                <Text className="text-muted-foreground mb-4">
+                  This panel is preserved by the inner splitter:
+                </Text>
+                <div className="space-y-2">
+                  <Button
+                    onClick={() => animateRightPanel('250px')}
+                    className="w-full"
+                    variant="outlined">
+                    Set to 250px
+                  </Button>
+                  <Button
+                    onClick={() => animateRightPanel('350px')}
+                    className="w-full"
+                    variant="outlined">
+                    Set to 350px
+                  </Button>
+                  <Button
+                    onClick={() => animateRightPanel('30%')}
+                    className="w-full"
+                    variant="outlined">
+                    Set to 30%
+                  </Button>
+                  <Button
+                    onClick={() => animateRightPanel('400px', 1500)}
+                    className="w-full"
+                    variant="outlined">
+                    Set to 400px (very slow)
+                  </Button>
+                  <Button
+                    onClick={() => animateRightPanel('0px')}
+                    className="w-full"
+                    variant="danger">
+                    Close Panel (0px)
+                  </Button>
+                  <Button
+                    onClick={() => animateRightPanel('320px')}
+                    className="w-full"
+                    variant="primary">
+                    Reopen Panel (320px)
+                  </Button>
+                </div>
+
+                <div className="mt-6 space-y-3">
+                  <div className="bg-muted/20 rounded p-3">
+                    <Text className="text-sm font-medium">Speed Tests</Text>
+                    <div className="mt-2 space-y-1">
+                      <Button
+                        onClick={() => animateRightPanel('200px', 100)}
+                        className="w-full"
+                        variant="ghost"
+                        size="small">
+                        Fast (100ms)
+                      </Button>
+                      <Button
+                        onClick={() => animateRightPanel('450px', 2000)}
+                        className="w-full"
+                        variant="ghost"
+                        size="small">
+                        Ultra Slow (2s)
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+            autoSaveId="three-panel-inner"
+            defaultLayout={['auto', '320px']}
+            preserveSide="right"
+            rightPanelMinSize={200}
+            rightPanelMaxSize={600}
+            leftPanelMinSize={250}
+          />
+        </div>
+      }
+      autoSaveId="three-panel-outer"
+      defaultLayout={['280px', 'auto']}
+      preserveSide="left"
+      leftPanelMinSize={200}
+      leftPanelMaxSize={500}
+    />
+  );
+};
+
+export const ThreePanelWithAnimation: Story = {
+  render: () => <ThreePanelWithAnimationExample />
 };

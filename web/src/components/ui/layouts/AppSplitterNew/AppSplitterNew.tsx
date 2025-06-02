@@ -30,7 +30,11 @@ interface IAppSplitterNewProps {
 }
 
 export interface AppSplitterNewHandle {
-  animateWidth: (width: string | number, side: 'left' | 'right', duration: number) => Promise<void>;
+  animateWidth: (
+    width: string | number,
+    side: 'left' | 'right',
+    duration?: number
+  ) => Promise<void>;
   setSplitSizes: (sizes: [string | number, string | number]) => void;
   isSideClosed: (side: 'left' | 'right') => boolean;
   getSizesInPixels: () => [number, number];
@@ -243,7 +247,7 @@ export const AppSplitterNew = forwardRef<AppSplitterNewHandle, IAppSplitterNewPr
       async (
         width: string | number,
         side: 'left' | 'right',
-        duration: number = 200
+        duration: number | undefined = 250
       ): Promise<void> => {
         return new Promise((resolve) => {
           if (!containerSize) {
