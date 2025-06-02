@@ -106,8 +106,7 @@ const SidebarItem: React.FC<{
   onSelectMetric: (metricId: string) => void;
 }> = ({ className, metric, selectedMetricId, onSelectMetric }) => {
   return (
-    <button
-      type="button"
+    <div
       onClick={() => onSelectMetric(metric.id)}
       className={cn(
         'hover:bg-item-hover flex h-11 cursor-pointer flex-col space-y-0.5 rounded px-2 py-1.5',
@@ -118,7 +117,7 @@ const SidebarItem: React.FC<{
       <Text size={'sm'} truncate variant={'secondary'}>
         {metric.description}
       </Text>
-    </button>
+    </div>
   );
 };
 

@@ -1,7 +1,4 @@
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
-/**
- * @jest-environment jsdom
- */
 
 import { Chart } from 'chart.js';
 import { ChartTotalizerPlugin } from './chartjs-plugin-totalizer';

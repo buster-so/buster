@@ -16,7 +16,7 @@ import { cn } from '@/lib/classMerge';
 import { Panel } from './Panel';
 import { Splitter } from './Splitter';
 import { AppSplitterProvider } from './AppSplitterProvider';
-import { sizeToPixels, easeInOutCubic } from './helpers';
+import { sizeToPixels, easeInOutCubic, createAutoSaveId } from './helpers';
 
 interface IAppSplitterProps {
   leftChildren: React.ReactNode;
@@ -102,7 +102,7 @@ export const AppSplitter = forwardRef<AppSplitterHandle, IAppSplitterProps>(
 
     // Load saved layout from localStorage
     const [savedLayout, setSavedLayout] = useLocalStorageState<number | null>(
-      `splitter-${autoSaveId}`,
+      createAutoSaveId(autoSaveId),
       { defaultValue: null }
     );
 

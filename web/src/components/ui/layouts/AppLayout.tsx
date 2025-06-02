@@ -1,6 +1,6 @@
 import type React from 'react';
 import { cn } from '@/lib/utils';
-import { AppSplitter } from './AppSplitterOld/AppSplitter';
+import { AppSplitter } from './AppSplitter/AppSplitter';
 
 const DEFAULT_LAYOUT = ['230px', 'auto'];
 

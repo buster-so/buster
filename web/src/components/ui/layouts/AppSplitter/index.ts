@@ -1,4 +1,4 @@
-export { AppSplitterNew, type AppSplitterNewHandle } from './AppSplitter';
-export { AppSplitterNewProvider, useAppSplitterNewContext } from './AppSplitterProvider';
+export { AppSplitter, type AppSplitterHandle } from './AppSplitter';
+export { AppSplitterProvider, useAppSplitterContext } from './AppSplitterProvider';
 export { Panel } from './Panel';
 export { Splitter } from './Splitter';

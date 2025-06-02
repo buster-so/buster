@@ -1,6 +1,5 @@
 {
   "env": {
-    "jest": true,
     "node": true
   },
   "extends": ["next/core-web-vitals", "next/typescript", "plugin:storybook/recommended"],

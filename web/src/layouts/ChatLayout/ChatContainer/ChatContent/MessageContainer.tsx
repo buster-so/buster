@@ -13,15 +13,14 @@ interface MessageContainerProps {
   onMouseLeave?: () => void;
 }
 
-export const MessageContainer = forwardRef<HTMLButtonElement, MessageContainerProps>(
+export const MessageContainer = forwardRef<HTMLDivElement, MessageContainerProps>(
   (
     { children, senderName, senderId, senderAvatar, className = '', onMouseEnter, onMouseLeave },
     ref
   ) => {
     return (
-      <button
+      <div
         ref={ref}
-        type="button"
         className={'flex w-full cursor-pointer space-x-2'}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}>
@@ -31,7 +30,7 @@ export const MessageContainer = forwardRef<HTMLButtonElement, MessageContainerPr
           <Avatar size={24} />
         )}
         <div className={cn('relative mt-1 w-full px-1', className)}>{children}</div>
-      </button>
+      </div>
     );
   }
 );

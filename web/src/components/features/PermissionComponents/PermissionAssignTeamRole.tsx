@@ -24,8 +24,7 @@ export const PermissionAssignTeamRole: React.FC<{
   children?: React.ReactNode;
 }> = React.memo(({ role, id, onRoleChange, children }) => {
   return (
-    <button
-      type="button"
+    <div
       className="flex items-center space-x-5"
       onClick={(e) => {
         e.stopPropagation();
@@ -39,7 +38,7 @@ export const PermissionAssignTeamRole: React.FC<{
           onRoleChange({ id, role: v as TeamRole });
         }}
       />
-    </button>
+    </div>
   );
 });
 

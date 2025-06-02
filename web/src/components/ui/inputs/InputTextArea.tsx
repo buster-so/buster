@@ -101,6 +101,7 @@ export const InputTextArea = React.forwardRef<HTMLTextAreaElement, InputTextArea
       const minHeight = calculateMinHeight();
       if (!minHeight) return;
 
+      // Temporarily set height to auto to get accurate scrollHeight
       textarea.style.height = 'auto';
 
       const computedStyle = window.getComputedStyle(textarea);
@@ -112,11 +113,24 @@ export const InputTextArea = React.forwardRef<HTMLTextAreaElement, InputTextArea
         ? autoResize.maxRows * lineHeight + top + bottom
         : Number.POSITIVE_INFINITY;
 
-      const scrollHeight = Math.max(textarea.scrollHeight, minHeight);
-      const newHeight = Math.min(scrollHeight, maxHeight);
+      // Check if textarea is empty or has minimal content
+      const isEmpty = !textarea.value || textarea.value.trim().length === 0;
+      const hasMinimalContent =
+        textarea.value && textarea.value.split('\n').length <= (autoResize.minRows || rows);
+
+      let newHeight: number;
+
+      if (isEmpty || (hasMinimalContent && textarea.scrollHeight <= minHeight + 10)) {
+        // Use minHeight for empty or minimal content to avoid inflated scrollHeight
+        newHeight = minHeight;
+      } else {
+        // Use scrollHeight for content that actually needs more space
+        const scrollHeight = Math.max(textarea.scrollHeight, minHeight);
+        newHeight = Math.min(scrollHeight, maxHeight);
+      }
 
       textarea.style.height = `${newHeight}px`;
-      textarea.style.overflowY = scrollHeight > maxHeight ? 'auto' : 'hidden';
+      textarea.style.overflowY = newHeight >= maxHeight ? 'auto' : 'hidden';
     });
 
     const handleInput = useMemoizedFn(() => {
