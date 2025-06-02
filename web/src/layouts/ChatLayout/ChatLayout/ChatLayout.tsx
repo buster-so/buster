@@ -57,6 +57,8 @@ export const ChatLayout: React.FC<ChatSplitterProps> = ({ children }) => {
       <ChatContextProvider>
         <AppSplitter
           ref={appSplitterRef}
+          leftHidden={selectedLayout === 'file-only' || selectedLayout === 'chat-hidden'}
+          rightHidden={selectedLayout === 'chat-only' || selectedLayout === 'chat-hidden'}
           leftChildren={useMemo(() => mounted && <ChatContainer mounted={mounted} />, [mounted])}
           rightChildren={useMemo(
             () => mounted && <FileContainer>{children}</FileContainer>,
