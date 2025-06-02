@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
 import { useState } from 'react';
-import { BusterResizeColumnsSplitPanes } from './BusterResizeColumnsSplitPanes';
+import { BusterResizeColumnsSplitPanes } from './_BusterResizeColumnsSplitPanes';
 
 const meta: Meta<typeof BusterResizeColumnsSplitPanes> = {
   title: 'UI/Grid/BusterResizeColumnsSplitPanes',

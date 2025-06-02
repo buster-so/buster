@@ -6,7 +6,7 @@ import { useMemoizedFn, useMount, useMouse } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 import { BusterSortableItemDragContainer } from './_BusterSortableItemDragContainer';
 import type { ResizeableGridDragItem } from './interfaces';
-import { BusterResizeColumnsSplitPanes } from './BusterResizeColumnsSplitPanes';
+import { BusterResizeColumnsSplitPanes } from './_BusterResizeColumnsSplitPanes';
 import isEqual from 'lodash/isEqual';
 
 type ContainerProps = {

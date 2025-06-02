@@ -1,5 +1,3 @@
-import { cookies } from 'next/headers';
-
 export const createAutoSaveId = (id: string) => `app-splitter-${id}`;
 
 // Helper function to convert size values to pixels
