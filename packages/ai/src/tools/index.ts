@@ -12,6 +12,8 @@ export { searchDataCatalogTool } from './file-tools/search-data-catalog-tool/sea
 export { reviewPlanTool } from './planning-thinking-tools/review-plan-tool';
 export { createPlanInvestigativeTool } from './planning-thinking-tools/create-plan-investigative-tool';
 export { createMetricsTool } from './visualization-tools/create-metrics-tool';
+export { createMetricsFileTool } from './visualization-tools/create-metrics-file-tool';
+export { modifyMetricsFileTool } from './visualization-tools/modify-metrics-file-tool';
 export { createDashboardsTool } from './visualization-tools/create-dashboards-tool';
 export { modifyMetricsTool } from './visualization-tools/modify-metrics-tool';
 export { modifyDashboardsTool } from './visualization-tools/modify-dashboards-tool';

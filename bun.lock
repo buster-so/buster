@@ -70,6 +70,7 @@
         "autoevals": "^0.0.129",
         "glob": "^11.0.2",
         "minimatch": "^10.0.1",
+        "yaml": "^2.8.0",
       },
     },
     "packages/data-source": {
