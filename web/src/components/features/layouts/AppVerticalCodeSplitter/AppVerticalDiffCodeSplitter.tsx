@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 import type { IDataResult } from '@/api/asset_interfaces';
-import { AppSplitter, type AppSplitterRef } from '@/components/ui/layouts/AppSplitterOld';
+import { AppSplitter, type AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
 import { DataContainer } from './DataContainer';
 import { DiffSQLContainer } from './DiffSQLContainer';
 

@@ -3,12 +3,13 @@
 import Cookies from 'js-cookie';
 import type React from 'react';
 import { useMemo, useRef } from 'react';
-import { AppPageLayout, AppSplitter, type AppSplitterRef } from '@/components/ui/layouts';
-import { createAutoSaveId } from '@/components/ui/layouts/AppSplitterOld/helper';
+import { createAutoSaveId } from '@/components/ui/layouts/AppSplitter/helpers';
+import { AppSplitter, type AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
 import { useDebounce, useMemoizedFn, useUpdateLayoutEffect } from '@/hooks';
 import { useChatLayoutContextSelector } from '../ChatLayoutContext';
 import { FileContainerHeader } from './FileContainerHeader';
 import { FileContainerSecondary } from './FileContainerSecondary';
+import { AppPageLayout } from '@/components/ui/layouts/AppPageLayout';
 
 interface FileContainerProps {
   children: React.ReactNode;
@@ -98,7 +99,6 @@ export const FileContainer: React.FC<FileContainerProps> = ({ children }) => {
         ref={appSplitterRef}
         autoSaveId={autoSaveId}
         defaultLayout={defaultLayout}
-        initialReady={false}
         leftChildren={children}
         rightChildren={rightChildren}
         allowResize={selectedFileViewRenderSecondary}

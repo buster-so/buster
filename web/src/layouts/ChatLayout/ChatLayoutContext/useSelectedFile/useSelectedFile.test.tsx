@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, type MockedFunction, vi } from 'vitest';
 import type { FileType } from '@/api/asset_interfaces/chat';
-import type { AppSplitterRef } from '@/components/ui/layouts/AppSplitterOld';
+import type { AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
 import { BusterRoutes } from '@/routes';
 import type { SelectedFile } from '../../interfaces';
 import type { FileViewSecondary } from '../useLayoutConfig';
@@ -26,7 +26,8 @@ describe('useSelectedFile', () => {
       isSideClosed: vi.fn((side: 'left' | 'right') => false),
       setSplitSizes: vi.fn(),
       animateWidth: vi.fn(),
-      sizes: [0, 0, 0]
+      sizes: [0, 0, 0],
+      getSizesInPixels: vi.fn()
     } as AppSplitterRef
   };
   const mockChatParams = {

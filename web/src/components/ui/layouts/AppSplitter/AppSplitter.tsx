@@ -76,7 +76,6 @@ export const AppSplitter = forwardRef<AppSplitterRef, IAppSplitterProps>(
     },
     ref
   ) => {
-    console.log(autoSaveId);
     const containerRef = useRef<HTMLDivElement>(null);
     const [containerSize, setContainerSize] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
@@ -96,7 +95,6 @@ export const AppSplitter = forwardRef<AppSplitterRef, IAppSplitterProps>(
         return sizeToPixels(leftValue, containerSize);
       } else if (preserveSide === 'right' && rightValue !== 'auto') {
         const rightSize = sizeToPixels(rightValue, containerSize);
-        console.log(rightSize, containerSize - rightSize);
         return rightSize; // Return the right panel size directly, not containerSize - rightSize
       }
 

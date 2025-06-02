@@ -3,7 +3,7 @@
 import type React from 'react';
 import { useMemo, useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { AppSplitter, type AppSplitterRef } from '@/components/ui/layouts/AppSplitterOld';
+import { AppSplitter, type AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMount } from '@/hooks';
 import { CREATE_LANGFUSE_SESSION_URL } from '@/routes/externalRoutes';
