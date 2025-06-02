@@ -36,9 +36,11 @@ interface IAppSplitterProps {
   leftHidden?: boolean; //whether the left panel should be hidden
   style?: React.CSSProperties; //the style of the container
   hideSplitter?: boolean; //whether the splitter should be hidden
+  leftPanelClassName?: string; //the class name of the left panel
+  rightPanelClassName?: string; //the class name of the right panel
 }
 
-export interface AppSplitterHandle {
+export interface AppSplitterRef {
   animateWidth: (
     width: string | number,
     side: 'left' | 'right',
@@ -49,7 +51,7 @@ export interface AppSplitterHandle {
   getSizesInPixels: () => [number, number];
 }
 
-export const AppSplitter = forwardRef<AppSplitterHandle, IAppSplitterProps>(
+export const AppSplitter = forwardRef<AppSplitterRef, IAppSplitterProps>(
   (
     {
       leftChildren,
@@ -68,10 +70,13 @@ export const AppSplitter = forwardRef<AppSplitterHandle, IAppSplitterProps>(
       rightHidden = false,
       leftHidden = false,
       style,
-      hideSplitter = false
+      hideSplitter = false,
+      leftPanelClassName,
+      rightPanelClassName
     },
     ref
   ) => {
+    console.log(autoSaveId);
     const containerRef = useRef<HTMLDivElement>(null);
     const [containerSize, setContainerSize] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
@@ -87,7 +92,6 @@ export const AppSplitter = forwardRef<AppSplitterHandle, IAppSplitterProps>(
     // Parse default layout - removed useCallback since it's not passed as prop
     const getInitialSize = (containerSize: number) => {
       const [leftValue, rightValue] = defaultLayout;
-      console.log(rightValue, preserveSide);
       if (preserveSide === 'left' && leftValue !== 'auto') {
         return sizeToPixels(leftValue, containerSize);
       } else if (preserveSide === 'right' && rightValue !== 'auto') {
@@ -487,6 +491,7 @@ export const AppSplitter = forwardRef<AppSplitterHandle, IAppSplitterProps>(
         className={cn('flex h-full w-full', isVertical ? 'flex-row' : 'flex-col', className)}
         style={style}>
         <Panel
+          className={leftPanelClassName}
           width={isVertical ? leftSize : 'auto'}
           height={!isVertical ? leftSize : 'auto'}
           hidden={leftHidden}>
@@ -505,6 +510,7 @@ export const AppSplitter = forwardRef<AppSplitterHandle, IAppSplitterProps>(
         )}
 
         <Panel
+          className={rightPanelClassName}
           width={isVertical ? rightSize : 'auto'}
           height={!isVertical ? rightSize : 'auto'}
           hidden={rightHidden}>
