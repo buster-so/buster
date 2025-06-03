@@ -1,18 +1,12 @@
 import { RuntimeContext } from '@mastra/core/runtime-context';
-import { initLogger } from 'braintrust';
+import { wrapTraced } from 'braintrust';
 import { beforeAll, describe, test } from 'vitest';
 import analystWorkflow, {
   type AnalystWorkflowRuntimeContext,
 } from '../../../src/workflows/analyst-workflow';
 
 describe('Analyst Workflow Integration Tests', () => {
-  beforeAll(() => {
-    // Initialize Braintrust logger for testing
-    initLogger({
-      apiKey: process.env.BRAINTRUST_KEY,
-      projectName: 'Development',
-    });
-  });
+  beforeAll(() => {});
 
   test('should successfully execute analyst workflow with valid input', async () => {
     const testInput = {
@@ -24,13 +18,18 @@ describe('Analyst Workflow Integration Tests', () => {
       ['threadId', 'test-thread-456'],
     ]);
 
-    // Create and run the workflow
-    const run = analystWorkflow.createRun();
+    const tracedWorkflow = wrapTraced(
+      async () => {
+        const run = analystWorkflow.createRun();
+        return await run.stream({
+          inputData: testInput,
+          runtimeContext,
+        });
+      },
+      { name: 'Analyst Workflow' }
+    );
 
-    const result = await run.stream({
-      inputData: testInput,
-      runtimeContext,
-    });
+    const result = await tracedWorkflow();
 
     for await (const event of result.stream) {
       console.log(event);

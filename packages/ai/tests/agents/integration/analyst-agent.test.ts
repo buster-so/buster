@@ -16,14 +16,9 @@ describe('Analyst Agent Integration Tests', () => {
       async (input: string) => {
         // Step 1: Generate response with analyst agent
         try {
-          const response = await analystAgent.stream(input, {});
+          const response = await analystAgent.generate(input, {});
 
-          const result = '';
-
-          for await (const chunk of response.fullStream) {
-          }
-
-          return result;
+          return response;
         } catch (error) {
           console.error(error);
           throw error;
