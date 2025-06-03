@@ -87,32 +87,44 @@ export const AppSplitter = forwardRef<AppSplitterRef, IAppSplitterProps>(
     const startSizeRef = useRef(0);
     const animationRef = useRef<number | null>(null);
 
-    // Parse default layout - removed useCallback since it's not passed as prop
-    const getInitialSize = (containerSize: number) => {
-      const [leftValue, rightValue] = defaultLayout;
-      console.log(leftValue, rightValue, preserveSide);
-      if (preserveSide === 'left' && leftValue !== 'auto') {
-        return sizeToPixels(leftValue, containerSize);
-      } else if (preserveSide === 'right' && rightValue !== 'auto') {
-        const rightSize = sizeToPixels(rightValue, containerSize);
-        return rightSize; // Return the right panel size directly, not containerSize - rightSize
-      }
+    // Parse default layout
+    const getInitialSize = useCallback(
+      (containerSize: number) => {
+        if (containerSize === 0) return null; // Don't calculate until we have a valid container size
 
-      // Default fallback
-      return 280;
-    };
+        const [leftValue, rightValue] = defaultLayout;
+        console.log(leftValue, rightValue, preserveSide);
+        if (preserveSide === 'left' && leftValue !== 'auto') {
+          return sizeToPixels(leftValue, containerSize);
+        } else if (preserveSide === 'right' && rightValue !== 'auto') {
+          const rightSize = sizeToPixels(rightValue, containerSize);
+          return rightSize; // Return the right panel size directly, not containerSize - rightSize
+        }
+
+        // Default fallback - only use when we have a valid container size
+        return 280;
+      },
+      [defaultLayout, preserveSide]
+    );
 
     // Load saved layout from localStorage
     const [savedLayout, setSavedLayout] = useLocalStorageState<number | null>(
       createAutoSaveId(autoSaveId),
-      { defaultValue: getInitialSize(containerSize) }
+      { defaultValue: null }
     );
 
     const isVertical = useMemo(() => split === 'vertical', [split]);
 
-    console.log(savedLayout);
+    console.log(
+      'Debug - savedLayout:',
+      savedLayout,
+      'containerSize:',
+      containerSize,
+      'isInitialized:',
+      isInitialized
+    );
 
-    // Get the current panel size, handling null case
+    // Get the current panel size, handling null and undefined cases
     const currentPanelSize = savedLayout ?? 0;
 
     // Memoize size calculations to prevent recalculation on every render
@@ -447,12 +459,23 @@ export const AppSplitter = forwardRef<AppSplitterRef, IAppSplitterProps>(
           !isAnimating && // Don't override during animation
           size > 0
         ) {
-          const initialSize = savedLayout || getInitialSize(size);
-          setSavedLayout(initialSize);
-          setIsInitialized(true); // Mark as initialized
+          // If savedLayout is null/undefined, it means localStorage is empty - use defaultLayout
+          if (savedLayout === null || savedLayout === undefined) {
+            const initialSize = getInitialSize(size);
+            if (initialSize !== null) {
+              console.log(
+                'No saved layout found, setting initial size from defaultLayout to:',
+                initialSize
+              );
+              setSavedLayout(initialSize);
+            }
+          } else {
+            console.log('Using existing saved layout:', savedLayout);
+          }
+          setIsInitialized(true); // Mark as initialized regardless
         }
       }
-    }, [isVertical, isInitialized, isAnimating, savedLayout, setSavedLayout]);
+    }, [isVertical, isInitialized, isAnimating, savedLayout, setSavedLayout, getInitialSize]);
 
     // Update container size
     useEffect(() => {
