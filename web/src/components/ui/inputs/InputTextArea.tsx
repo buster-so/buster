@@ -2,7 +2,7 @@
 
 import { cva, type VariantProps } from 'class-variance-authority';
 import React, { useEffect, useRef } from 'react';
-import { useAsyncEffect, useMemoizedFn } from '@/hooks';
+import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 import { inputVariants } from './Input';
 import { timeout } from '@/lib';
