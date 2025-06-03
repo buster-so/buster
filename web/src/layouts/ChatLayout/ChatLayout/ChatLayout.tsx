@@ -48,8 +48,8 @@ export const ChatLayout: React.FC<ChatSplitterProps> = ({ children }) => {
   }, [selectedLayout]);
 
   const autoSaveId = useMemo(() => {
-    return 'chat-splitter';
-  }, []);
+    return `chat-splitter-${chatLayoutProps.chatId}-${chatLayoutProps.metricId}`;
+  }, [chatLayoutProps.chatId, chatLayoutProps.metricId]);
 
   const bustStorageOnInit = useMemo(() => {
     return (
@@ -98,7 +98,7 @@ export const ChatLayout: React.FC<ChatSplitterProps> = ({ children }) => {
           preserveSide="left"
           leftPanelMinSize={selectedFile ? DEFAULT_CHAT_OPTION_SIDEBAR_SIZE : '0px'}
           rightPanelMinSize={selectedFile ? DEFAULT_FILE_OPTION_SIDEBAR_SIZE : '0px'}
-          bustStorageOnInit={bustStorageOnInit}
+          bustStorageOnInit={false}
         />
       </ChatContextProvider>
     </ChatLayoutContextProvider>
