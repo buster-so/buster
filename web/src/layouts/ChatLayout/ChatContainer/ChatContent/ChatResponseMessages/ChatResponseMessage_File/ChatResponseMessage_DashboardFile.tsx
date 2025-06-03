@@ -25,7 +25,8 @@ export const ChatResponseMessage_DashboardFile: React.FC<{
   responseMessage: BusterChatResponseMessage_file;
   isSelectedFile: boolean;
   chatId: string;
-}> = React.memo(({ isCompletedStream, responseMessage, isSelectedFile, chatId }) => {
+  href: string;
+}> = React.memo(({ isCompletedStream, responseMessage, isSelectedFile, chatId, href }) => {
   const { version_number, id, file_name } = responseMessage;
   const metricId = useChatLayoutContextSelector((x) => x.metricId);
   const prefetchGetDashboard = usePrefetchGetDashboardClient();
@@ -40,11 +41,21 @@ export const ChatResponseMessage_DashboardFile: React.FC<{
       versionNumber: version_number
     },
     {
-      select: (data) => {
-        return data;
+      select: ({ dashboard, metrics }) => {
+        return { dashboard, metrics };
       }
     }
   );
+
+  const HeaderWrapper = useMemo(() => {
+    const Component = ({ children }: { children: React.ReactNode }) => (
+      <Link href={href} passHref prefetch>
+        {children}
+      </Link>
+    );
+    Component.displayName = 'HeaderWrapper';
+    return Component;
+  }, [href]);
 
   useMount(() => {
     if (isSelectedFile) prefetchGetDashboard(id, version_number);
@@ -61,16 +72,15 @@ export const ChatResponseMessage_DashboardFile: React.FC<{
         <FileCard
           className={cn(
             'overflow-hidden',
-            isSelectedFile &&
-              'border-foreground hover:border-gray-light shadow-md transition-all duration-200'
+            isSelectedFile && 'border-foreground shadow-md transition-all duration-200',
+            !isSelectedFile && 'hover:border-gray-light'
           )}
           collapseContent={true}
           collapsible={isFetched && !isError}
-          collapseDefaultIcon={
-            <HeaderIcon isLoading={isLoading} isFetched={isFetched} isError={isError} />
-          }
+          collapseDefaultIcon={<HeaderIcon isLoading={isLoading} isError={isError} />}
           headerClassName="bg-background"
-          fileName={<TextAndVersionPill fileName={file_name} versionNumber={version_number} />}>
+          fileName={<TextAndVersionPill fileName={file_name} versionNumber={version_number} />}
+          headerWrapper={HeaderWrapper}>
           {dashboardResponse && (
             <Content
               dashboardResponse={dashboardResponse}
@@ -90,10 +100,9 @@ export const ChatResponseMessage_DashboardFile: React.FC<{
 ChatResponseMessage_DashboardFile.displayName = 'ChatResponseMessage_DashboardFile';
 
 const HeaderIcon: React.FC<{
-  isFetched: boolean;
   isLoading: boolean;
   isError: boolean;
-}> = React.memo(({ isFetched, isLoading, isError }) => {
+}> = React.memo(({ isLoading, isError }) => {
   if (isLoading) {
     return <CircleSpinnerLoader size={12} />;
   }
@@ -112,7 +121,7 @@ const HeaderIcon: React.FC<{
 HeaderIcon.displayName = 'HeaderIcon';
 
 const Content: React.FC<{
-  dashboardResponse: BusterDashboardResponse;
+  dashboardResponse: Pick<BusterDashboardResponse, 'dashboard' | 'metrics'>;
   isFetched: boolean;
   isError: boolean;
   metricId: string | undefined;
@@ -178,18 +187,27 @@ const Content: React.FC<{
   ]);
 
   return (
-    <div className="flex flex-col gap-y-2.5 px-3.5 py-2">
+    <div
+      className="flex flex-col gap-y-2.5 px-3.5 py-2"
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}>
       {items.map((item) => (
         <div
           className="flex items-center justify-between space-x-2.5 overflow-hidden"
           key={item.id}>
-          <Link href={item.link} passHref prefetch>
-            <Text truncate size={'sm'} variant={item.isSelectedMetric ? 'default' : 'secondary'}>
+          <Link href={item.link} passHref prefetch className="truncate">
+            <Text
+              truncate
+              size={'sm'}
+              className="cursor-pointer hover:underline"
+              variant={item.isSelectedMetric ? 'default' : 'secondary'}>
               {item.name}
             </Text>
           </Link>
 
-          <AppTooltip title={item.iconTooltip}>
+          <AppTooltip title={item.iconTooltip} delayDuration={300}>
             <div className="flex items-center justify-center text-sm">{item.icon}</div>
           </AppTooltip>
         </div>

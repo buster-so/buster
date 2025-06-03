@@ -37,14 +37,13 @@ export const ChatResponseMessage_File: React.FC<ChatResponseMessageProps> = Reac
     }, [file_type]);
 
     return (
-      <Link href={href} prefetch data-testid="chat-response-message-file">
-        <SelectedComponent
-          isCompletedStream={isCompletedStream}
-          responseMessage={responseMessage}
-          isSelectedFile={isSelectedFile}
-          chatId={chatId}
-        />
-      </Link>
+      <SelectedComponent
+        isCompletedStream={isCompletedStream}
+        responseMessage={responseMessage}
+        isSelectedFile={isSelectedFile}
+        chatId={chatId}
+        href={href}
+      />
     );
   }
 );

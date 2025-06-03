@@ -19,6 +19,7 @@ interface FileCardProps {
   collapseDefaultIcon?: React.ReactNode;
   onCollapse?: (value: boolean) => void;
   headerClassName?: string;
+  headerWrapper?: React.ComponentType<{ children: React.ReactNode }>;
 }
 
 export const FileCard = React.memo(
@@ -34,7 +35,8 @@ export const FileCard = React.memo(
     collapsible = false,
     collapseContent = true,
     collapseDefaultIcon,
-    onCollapse
+    onCollapse,
+    headerWrapper
   }: FileCardProps) => {
     const [isCollapsed, setIsCollapsed] = useState(collapseContent);
     const [isHeaderHovered, setIsHeaderHovered] = useState(false);
@@ -71,35 +73,39 @@ export const FileCard = React.memo(
       }
     });
 
+    const HeaderWrapperComponent = headerWrapper || React.Fragment;
+
     return (
       <Card className={cn('h-full', className)}>
         {showHeader && (
-          <CardHeader
-            variant={'gray'}
-            size={'xsmall'}
-            className={cn(
-              'justify-center',
-              collapsible && 'cursor-pointer select-none',
-              collapsible && isCollapsed && 'border-b-0',
-              headerClassName
-            )}
-            onMouseEnter={handleHeaderMouseEnter}
-            onMouseLeave={handleHeaderMouseLeave}>
-            <div className="flex items-center gap-x-1 overflow-hidden">
-              <div className="flex items-center gap-1 whitespace-nowrap">
-                {collapseDefaultIcon && (
-                  <CollapseToggleIcon
-                    isCollapsed={isCollapsed}
-                    isHovered={isHeaderHovered}
-                    collapseDefaultIcon={collapseDefaultIcon}
-                    onClick={handleHeaderClick}
-                  />
-                )}
-                {headerButtons}
+          <HeaderWrapperComponent>
+            <CardHeader
+              variant={'gray'}
+              size={'xsmall'}
+              className={cn(
+                'justify-center',
+                collapsible && 'cursor-pointer select-none',
+                collapsible && isCollapsed && 'border-b-0',
+                headerClassName
+              )}
+              onMouseEnter={handleHeaderMouseEnter}
+              onMouseLeave={handleHeaderMouseLeave}>
+              <div className="flex items-center gap-x-1 overflow-hidden">
+                <div className="flex items-center gap-1 whitespace-nowrap">
+                  {collapseDefaultIcon && (
+                    <CollapseToggleIcon
+                      isCollapsed={isCollapsed}
+                      isHovered={isHeaderHovered}
+                      collapseDefaultIcon={collapseDefaultIcon}
+                      onClick={handleHeaderClick}
+                    />
+                  )}
+                  {headerButtons}
+                </div>
+                {typeof fileName === 'string' ? <Text truncate>{fileName}</Text> : fileName}
               </div>
-              {typeof fileName === 'string' ? <Text truncate>{fileName}</Text> : fileName}
-            </div>
-          </CardHeader>
+            </CardHeader>
+          </HeaderWrapperComponent>
         )}
 
         <AnimatePresence initial={false}>
