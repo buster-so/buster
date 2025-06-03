@@ -1,5 +1,6 @@
 import { createWorkflow } from '@mastra/core';
 import { z } from 'zod';
+import { analystStep } from '../steps/analyst-step';
 import { createTodosStep } from '../steps/create-todos';
 import { extractValuesSearchStep } from '../steps/extract-values-search';
 import { generateChatTitleStep } from '../steps/generate-chat-title';
@@ -8,6 +9,9 @@ import { thinkAndPrepStep } from '../steps/think-and-prep-step';
 export interface AnalystWorkflowRuntimeContext {
   userId: string;
   threadId: string;
+  dataSourceId: string;
+  dataSourceSyntax: string;
+  organizationId: string;
 }
 
 export const thinkAndPrepWorkflowInputSchema = z.object({
@@ -28,6 +32,7 @@ const analystWorkflow = createWorkflow({
 })
   .parallel([generateChatTitleStep, extractValuesSearchStep, createTodosStep])
   .then(thinkAndPrepStep)
+  .then(analystStep)
   .commit();
 
 export default analystWorkflow;
