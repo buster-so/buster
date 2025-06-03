@@ -217,7 +217,12 @@ export const SidebarPrimary = React.memo(() => {
 
   return (
     <>
-      <Sidebar content={sidebarItems} header={HeaderMemoized} footer={FooterMemoized} />
+      <Sidebar
+        content={sidebarItems}
+        header={HeaderMemoized}
+        footer={FooterMemoized}
+        useCollapsible={isUserRegistered}
+      />
 
       <GlobalModals onCloseSupportModal={onCloseSupportModal} />
     </>

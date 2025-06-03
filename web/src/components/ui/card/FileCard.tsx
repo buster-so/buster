@@ -75,6 +75,13 @@ export const FileCard = React.memo(
 
     const HeaderWrapperComponent = headerWrapper || React.Fragment;
 
+    const Content = (
+      <CardContent
+        className={cn('bg-background relative h-full overflow-hidden p-0', bodyClassName)}>
+        {children}
+      </CardContent>
+    );
+
     return (
       <Card className={cn('h-full', className)}>
         {showHeader && (
@@ -108,24 +115,25 @@ export const FileCard = React.memo(
           </HeaderWrapperComponent>
         )}
 
-        <AnimatePresence initial={false}>
-          {!isCollapsed && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{
-                duration: 0.2,
-                ease: 'easeInOut'
-              }}
-              style={{ overflow: 'hidden' }}>
-              <CardContent
-                className={cn('bg-background relative h-full overflow-hidden p-0', bodyClassName)}>
-                {children}
-              </CardContent>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {collapsible ? (
+          <AnimatePresence initial={false}>
+            {!isCollapsed && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{
+                  duration: 0.2,
+                  ease: 'easeInOut'
+                }}
+                style={{ overflow: 'hidden' }}>
+                {Content}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        ) : (
+          Content
+        )}
 
         {footer && (
           <CardFooter className={cn('bg-background px-4 py-2.5', footerClassName)}>
