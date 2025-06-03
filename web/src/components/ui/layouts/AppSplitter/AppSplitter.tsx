@@ -36,6 +36,7 @@ interface IAppSplitterProps {
   hideSplitter?: boolean;
   leftPanelClassName?: string;
   rightPanelClassName?: string;
+  bustStorageOnInit?: boolean;
 }
 
 export interface AppSplitterRef {
@@ -78,6 +79,7 @@ export const AppSplitter = React.memo(
         preserveSide,
         rightHidden = false,
         leftHidden = false,
+        bustStorageOnInit = false,
         style,
         hideSplitter: hideSplitterProp = false,
         leftPanelClassName,
@@ -103,7 +105,7 @@ export const AppSplitter = React.memo(
       // Load saved layout from localStorage
       const [savedLayout, setSavedLayout] = useLocalStorageState<number | null>(
         createAutoSaveId(autoSaveId),
-        { defaultValue: null }
+        { defaultValue: null, bustStorageOnInit }
       );
 
       const isVertical = useMemo(() => split === 'vertical', [split]);
@@ -119,6 +121,12 @@ export const AppSplitter = React.memo(
             return sizeToPixels(leftValue, containerSize);
           } else if (preserveSide === 'right' && rightValue !== 'auto') {
             return sizeToPixels(rightValue, containerSize);
+          }
+          if (preserveSide === 'left') {
+            return containerSize;
+          }
+          if (preserveSide === 'right') {
+            return containerSize;
           }
 
           return 280; // Default fallback

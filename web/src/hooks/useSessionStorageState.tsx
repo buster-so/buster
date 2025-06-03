@@ -12,7 +12,7 @@ interface Options<T> {
   bustStorageOnInit?: boolean;
 }
 
-export function useLocalStorageState<T>(
+export function useSessionStorageState<T>(
   key: string,
   options?: Options<T>
 ): [T | undefined, (value?: SetState<T>) => void] {
@@ -24,15 +24,15 @@ export function useLocalStorageState<T>(
     bustStorageOnInit = false
   } = options || {};
 
-  // Get initial value from localStorage or use default
+  // Get initial value from sessionStorage or use default
   const getInitialValue = useCallback((): T | undefined => {
-    // If bustStorageOnInit is true, ignore localStorage and use default value
+    // If bustStorageOnInit is true, ignore sessionStorage and use default value
     if (bustStorageOnInit) {
       return typeof defaultValue === 'function' ? (defaultValue as () => T)() : defaultValue;
     }
 
     try {
-      const item = window.localStorage.getItem(key);
+      const item = window.sessionStorage.getItem(key);
       if (item === null) {
         return typeof defaultValue === 'function' ? (defaultValue as () => T)() : defaultValue;
       }
@@ -45,18 +45,18 @@ export function useLocalStorageState<T>(
 
   const [state, setState] = useState<T | undefined>(getInitialValue);
 
-  // Initialize state from localStorage on mount
+  // Initialize state from sessionStorage on mount
   useEffect(() => {
     setState(getInitialValue());
   }, [getInitialValue]);
 
-  // Update localStorage when state changes
+  // Update sessionStorage when state changes
   useEffect(() => {
     try {
       if (state === undefined) {
-        window.localStorage.removeItem(key);
+        window.sessionStorage.removeItem(key);
       } else {
-        window.localStorage.setItem(key, serializer(state));
+        window.sessionStorage.setItem(key, serializer(state));
       }
     } catch (error) {
       onError?.(error);

@@ -26,3 +26,4 @@ export * from './useWhyDidYouUpdate';
 export * from './useWindowFocus';
 export * from './useWindowWidth';
 export * from './useLocalStorageState';
+export * from './useSessionStorageState';
