@@ -1,4 +1,4 @@
-import { anthropic, createAnthropic } from '@ai-sdk/anthropic';
+import {} from '@ai-sdk/anthropic';
 import { Agent } from '@mastra/core';
 import { Memory } from '@mastra/memory';
 import { PostgresStore } from '@mastra/pg';
@@ -10,8 +10,8 @@ import {
   modifyDashboardsFileTool,
   modifyMetricsFileTool,
 } from '../../tools';
-import { getAnalystInstructions } from './analyst-agent-instructions';
 import { anthropicCachedModel } from '../../utils/models/anthropic-cached';
+import { getAnalystInstructions } from './analyst-agent-instructions';
 
 const DEFAULT_OPTIONS = {
   maxSteps: 18,
@@ -22,7 +22,7 @@ const DEFAULT_OPTIONS = {
 export const analystAgent = new Agent({
   name: 'Analyst Agent',
   instructions: getAnalystInstructions,
-  model: anthropicCachedModel('claude-sonnet-4-20250514'),
+  model: wrapAISDKModel(anthropicCachedModel('claude-sonnet-4-20250514')),
   tools: {
     createMetricsFileTool,
     modifyMetricsFileTool,

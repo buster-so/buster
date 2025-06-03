@@ -1,7 +1,6 @@
 import { createAnthropic } from '@ai-sdk/anthropic';
-import { wrapAISDKModel } from 'braintrust';
 
-export const anthropicCachedModel = wrapAISDKModel(
+export const anthropicCachedModel = 
   createAnthropic({
     fetch: ((url, options) => {
       if (options?.body) {
@@ -35,6 +34,5 @@ export const anthropicCachedModel = wrapAISDKModel(
       }
 
       return fetch(url, options);
-    }) as typeof fetch,
-  })
-);
+  }) as typeof fetch,
+});

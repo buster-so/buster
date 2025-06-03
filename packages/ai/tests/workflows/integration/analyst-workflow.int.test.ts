@@ -13,6 +13,10 @@ describe('Analyst Workflow Integration Tests', () => {
     });
   });
 
+  afterAll(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  });
+
   test('should successfully execute analyst workflow with valid input', async () => {
     const testInput = {
       prompt: 'Analyze the quarterly sales data and create action items for improving performance',
