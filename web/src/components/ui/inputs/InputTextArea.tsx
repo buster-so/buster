@@ -5,7 +5,6 @@ import React, { useEffect, useRef } from 'react';
 import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 import { inputVariants } from './Input';
-import { timeout } from '@/lib';
 
 const inputTextAreaVariants = inputVariants;
 
