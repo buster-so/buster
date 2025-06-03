@@ -34,7 +34,7 @@ export const ChatLayout: React.FC<ChatSplitterProps> = ({ children }) => {
   const chatLayoutProps = useChatLayoutContext({ appSplitterRef });
   const { selectedLayout, selectedFile } = chatLayoutProps;
   const [previousSeenCombinedId, setPreviousSeenCombinedId] = useLocalStorageState<string | null>(
-    'combined-id',
+    `combined-id`,
     {
       defaultValue: null,
       bustStorageOnInit: false

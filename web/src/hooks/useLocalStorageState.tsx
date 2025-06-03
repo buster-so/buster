@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useMemoizedFn } from './useMemoizedFn';
 
 type SetState<S> = S | ((prevState?: S) => S);
 
@@ -25,7 +26,7 @@ export function useLocalStorageState<T>(
   } = options || {};
 
   // Get initial value from localStorage or use default
-  const getInitialValue = useCallback((): T | undefined => {
+  const getInitialValue = useMemoizedFn((): T | undefined => {
     // If bustStorageOnInit is true, ignore localStorage and use default value
     if (bustStorageOnInit) {
       return typeof defaultValue === 'function' ? (defaultValue as () => T)() : defaultValue;
@@ -41,7 +42,7 @@ export function useLocalStorageState<T>(
       onError?.(error);
       return typeof defaultValue === 'function' ? (defaultValue as () => T)() : defaultValue;
     }
-  }, [key, defaultValue, deserializer, onError, bustStorageOnInit]);
+  });
 
   const [state, setState] = useState<T | undefined>(getInitialValue);
 
