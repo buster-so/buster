@@ -29,6 +29,7 @@ export const ChatResponseMessage_DashboardFile: React.FC<{
 }> = React.memo(({ isCompletedStream, responseMessage, isSelectedFile, chatId, href }) => {
   const { version_number, id, file_name } = responseMessage;
   const metricId = useChatLayoutContextSelector((x) => x.metricId);
+  const metricVersionNumber = useChatLayoutContextSelector((x) => x.metricVersionNumber);
   const prefetchGetDashboard = usePrefetchGetDashboardClient();
   const {
     data: dashboardResponse,
@@ -85,10 +86,8 @@ export const ChatResponseMessage_DashboardFile: React.FC<{
             <Content
               dashboardResponse={dashboardResponse}
               isFetched={isFetched}
-              isError={isError}
               metricId={metricId}
               chatId={chatId}
-              isSelectedFile={isSelectedFile}
             />
           )}
         </FileCard>
@@ -123,13 +122,10 @@ HeaderIcon.displayName = 'HeaderIcon';
 const Content: React.FC<{
   dashboardResponse: Pick<BusterDashboardResponse, 'dashboard' | 'metrics'>;
   isFetched: boolean;
-  isError: boolean;
   metricId: string | undefined;
   chatId: string;
-  isSelectedFile: boolean;
-}> = React.memo(({ dashboardResponse, chatId, metricId, isSelectedFile, isFetched, isError }) => {
+}> = React.memo(({ dashboardResponse, chatId, metricId, isFetched }) => {
   const getMetricMemoized = useGetMetricMemoized();
-
   type RowItem = {
     id: string;
     name: string;
@@ -170,7 +166,7 @@ const Content: React.FC<{
               metricId: metric.id,
               versionNumber: metric.version_number
             }),
-            isSelectedMetric: metric.id === metricId && isSelectedFile,
+            isSelectedMetric: metric.id === metricId,
             icon: selectedChartIconConfig?.icon ? <selectedChartIconConfig.icon /> : null,
             iconTooltip: selectedChartIconConfig?.tooltipText || ''
           };
