@@ -17,7 +17,7 @@ describe('Create Metrics File Tool Integration Tests', () => {
     mockRuntimeContext = {
       get: (key: string) => {
         const values: Record<string, string> = {
-          data_source_id: testDataSourceId,
+          dataSourceId: testDataSourceId,
           data_source_syntax: 'postgresql',
           user_id: testUserId,
           organization_id: testOrgId,
@@ -104,7 +104,7 @@ chartConfig:
   test('should handle runtime context requirements', async () => {
     const contextWithoutDataSource = {
       get: (key: string) => {
-        if (key === 'data_source_id') return undefined;
+        if (key === 'dataSourceId') return undefined;
         return 'test-value';
       },
     };

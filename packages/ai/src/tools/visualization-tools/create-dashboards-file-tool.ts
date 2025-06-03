@@ -1,10 +1,16 @@
+import { randomUUID } from 'node:crypto';
+import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
-import { z } from 'zod';
-import { eq, sql, inArray } from 'drizzle-orm';
-import { db, dashboardFiles, assetPermissions, metricFilesToDashboardFiles, metricFiles } from '@buster/database';
-import { randomUUID } from 'node:crypto';
+import { inArray } from 'drizzle-orm';
 import * as yaml from 'yaml';
+import { z } from 'zod';
+import { db } from '../../../../database/src/connection';
+import {
+  dashboardFiles,
+  metricFiles,
+  metricFilesToDashboardFiles,
+} from '../../../../database/src/schema';
 
 // Core interfaces matching Rust structs
 interface DashboardFileParams {
@@ -40,53 +46,67 @@ interface CreateDashboardFilesOutput {
   failed_files: FailedFileCreation[];
 }
 
-interface RuntimeContext {
-  get(key: string): string | undefined;
-}
-
 // Dashboard YAML schema validation with full rules
 const dashboardItemSchema = z.object({
-  id: z.string().uuid('Must be a valid UUID for an existing metric')
+  id: z.string().uuid('Must be a valid UUID for an existing metric'),
 });
 
-const dashboardRowSchema = z.object({
-  id: z.number().int().positive('Row ID must be a positive integer'),
-  items: z.array(dashboardItemSchema)
-    .min(1, 'Each row must have at least 1 item')
-    .max(4, 'Each row can have at most 4 items'),
-  columnSizes: z.array(z.number().int().min(3, 'Each column size must be at least 3').max(12, 'Each column size cannot exceed 12'))
-    .min(1, 'columnSizes array cannot be empty')
-    .refine((sizes) => sizes.reduce((sum, size) => sum + size, 0) === 12, {
-      message: 'Column sizes must sum to exactly 12'
-    })
-}).refine((row) => row.items.length === row.columnSizes.length, {
-  message: 'Number of items must match number of column sizes'
-});
+const dashboardRowSchema = z
+  .object({
+    id: z.number().int().positive('Row ID must be a positive integer'),
+    items: z
+      .array(dashboardItemSchema)
+      .min(1, 'Each row must have at least 1 item')
+      .max(4, 'Each row can have at most 4 items'),
+    columnSizes: z
+      .array(
+        z
+          .number()
+          .int()
+          .min(3, 'Each column size must be at least 3')
+          .max(12, 'Each column size cannot exceed 12')
+      )
+      .min(1, 'columnSizes array cannot be empty')
+      .refine((sizes) => sizes.reduce((sum, size) => sum + size, 0) === 12, {
+        message: 'Column sizes must sum to exactly 12',
+      }),
+  })
+  .refine((row) => row.items.length === row.columnSizes.length, {
+    message: 'Number of items must match number of column sizes',
+  });
 
 const dashboardYmlSchema = z.object({
   name: z.string().min(1, 'Dashboard name is required'),
   description: z.string().min(1, 'Dashboard description is required'),
-  rows: z.array(dashboardRowSchema)
+  rows: z
+    .array(dashboardRowSchema)
     .min(1, 'Dashboard must have at least one row')
-    .refine((rows) => {
-      const ids = rows.map(row => row.id);
-      const uniqueIds = new Set(ids);
-      return ids.length === uniqueIds.size;
-    }, {
-      message: 'All row IDs must be unique'
-    })
+    .refine(
+      (rows) => {
+        const ids = rows.map((row) => row.id);
+        const uniqueIds = new Set(ids);
+        return ids.length === uniqueIds.size;
+      },
+      {
+        message: 'All row IDs must be unique',
+      }
+    ),
 });
 
 // Parse and validate dashboard YAML content
-function parseAndValidateYaml(ymlContent: string): { success: boolean; error?: string; data?: any } {
+function parseAndValidateYaml(ymlContent: string): {
+  success: boolean;
+  error?: string;
+  data?: any;
+} {
   try {
     const parsedYml = yaml.parse(ymlContent);
     const validationResult = dashboardYmlSchema.safeParse(parsedYml);
-    
+
     if (!validationResult.success) {
       return {
         success: false,
-        error: `Invalid YAML structure: ${validationResult.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`
+        error: `Invalid YAML structure: ${validationResult.error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ')}`,
       };
     }
 
@@ -94,13 +114,15 @@ function parseAndValidateYaml(ymlContent: string): { success: boolean; error?: s
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'YAML parsing failed'
+      error: error instanceof Error ? error.message : 'YAML parsing failed',
     };
   }
 }
 
 // Validate that all referenced metric IDs exist in the database
-async function validateMetricIds(metricIds: string[]): Promise<{ success: boolean; missingIds?: string[]; error?: string }> {
+async function validateMetricIds(
+  metricIds: string[]
+): Promise<{ success: boolean; missingIds?: string[]; error?: string }> {
   if (metricIds.length === 0) {
     return { success: true };
   }
@@ -112,8 +134,8 @@ async function validateMetricIds(metricIds: string[]): Promise<{ success: boolea
       .where(inArray(metricFiles.id, metricIds))
       .execute();
 
-    const existingIds = existingMetrics.map(m => m.id);
-    const missingIds = metricIds.filter(id => !existingIds.includes(id));
+    const existingIds = existingMetrics.map((m) => m.id);
+    const missingIds = metricIds.filter((id) => !existingIds.includes(id));
 
     if (missingIds.length > 0) {
       return { success: false, missingIds };
@@ -121,9 +143,9 @@ async function validateMetricIds(metricIds: string[]): Promise<{ success: boolea
 
     return { success: true };
   } catch (error) {
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Failed to validate metric IDs' 
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to validate metric IDs',
     };
   }
 }
@@ -140,7 +162,7 @@ async function processDashboardFile(
   if (!yamlValidation.success) {
     return {
       success: false,
-      error: `Invalid YAML format: ${yamlValidation.error}`
+      error: `Invalid YAML format: ${yamlValidation.error}`,
     };
   }
 
@@ -161,12 +183,12 @@ async function processDashboardFile(
       if (metricValidation.missingIds) {
         return {
           success: false,
-          error: `Invalid metric references: ${metricValidation.missingIds.join(', ')}`
+          error: `Invalid metric references: ${metricValidation.missingIds.join(', ')}`,
         };
       }
       return {
         success: false,
-        error: `Failed to validate metrics: ${metricValidation.error}`
+        error: `Failed to validate metrics: ${metricValidation.error}`,
       };
     }
   }
@@ -186,30 +208,35 @@ async function processDashboardFile(
     publiclyEnabledBy: null,
     publicExpiryDate: null,
     versionHistory: {
-      versions: [{
-        versionNumber: 1,
-        content: dashboardYml,
-        createdAt: new Date().toISOString()
-      }]
+      versions: [
+        {
+          versionNumber: 1,
+          content: dashboardYml,
+          createdAt: new Date().toISOString(),
+        },
+      ],
     },
-    publicPassword: null
+    publicPassword: null,
   };
 
   return {
     success: true,
     dashboardFile,
-    dashboardYml
+    dashboardYml,
   };
 }
 
 // Main create dashboard files function
 const createDashboardFiles = wrapTraced(
-  async (params: CreateDashboardFilesParams & { runtimeContext?: RuntimeContext }): Promise<CreateDashboardFilesOutput> => {
+  async (
+    params: CreateDashboardFilesParams,
+    runtimeContext: RuntimeContext
+  ): Promise<CreateDashboardFilesOutput> => {
     const startTime = Date.now();
 
     // Get runtime context values
-    const userId = params.runtimeContext?.get('user_id');
-    const organizationId = params.runtimeContext?.get('organization_id');
+    const userId = runtimeContext?.get('userId');
+    const organizationId = runtimeContext?.get('organizationId');
 
     if (!userId) {
       throw new Error('User ID not found in runtime context');
@@ -241,7 +268,7 @@ const createDashboardFiles = wrapTraced(
         } else {
           failedFiles.push({
             name: file.name,
-            error: result.error || 'Unknown error'
+            error: result.error || 'Unknown error',
           });
         }
       }
@@ -267,7 +294,7 @@ const createDashboardFiles = wrapTraced(
               publiclyEnabledBy: dashboardRecord.publiclyEnabledBy,
               publicExpiryDate: dashboardRecord.publicExpiryDate,
               versionHistory: dashboardRecord.versionHistory,
-              publicPassword: dashboardRecord.publicPassword
+              publicPassword: dashboardRecord.publicPassword,
             })
             .execute();
         }
@@ -285,16 +312,13 @@ const createDashboardFiles = wrapTraced(
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
               deletedAt: null,
-              createdBy: userId
+              createdBy: userId,
             }));
 
             // Insert associations with conflict handling
             for (const association of metricDashboardAssociations) {
               try {
-                await db
-                  .insert(metricFilesToDashboardFiles)
-                  .values(association)
-                  .execute();
+                await db.insert(metricFilesToDashboardFiles).values(association).execute();
               } catch (error) {
                 // Log warning but don't fail the whole operation
                 console.warn(`Failed to create metric-dashboard association: ${error}`);
@@ -307,7 +331,7 @@ const createDashboardFiles = wrapTraced(
         for (let i = 0; i < dashboardRecords.length; i++) {
           const dashboardRecord = dashboardRecords[i];
           const dashboardYml = dashboardYmls[i];
-          
+
           files.push({
             id: dashboardRecord.id,
             name: dashboardRecord.name,
@@ -317,17 +341,16 @@ const createDashboardFiles = wrapTraced(
             results: undefined,
             created_at: dashboardRecord.createdAt,
             updated_at: dashboardRecord.updatedAt,
-            version_number: 1
+            version_number: 1,
           });
         }
       }
-
     } catch (error) {
       return {
         message: `Failed to create dashboard files: ${error instanceof Error ? error.message : 'Unknown error'}`,
         duration: Date.now() - startTime,
         files: [],
-        failed_files: []
+        failed_files: [],
       };
     }
 
@@ -343,14 +366,14 @@ const createDashboardFiles = wrapTraced(
         message = `Failed to create '${failedFiles[0].name}': ${failedFiles[0].error}.`;
       } else {
         const failures = failedFiles
-          .map(failure => `Failed to create '${failure.name}': ${failure.error}`)
+          .map((failure) => `Failed to create '${failure.name}': ${failure.error}`)
           .join('\n');
         message = `Failed to create ${failureCount} dashboard files:\n${failures}`;
       }
     } else if (successCount > 0 && failureCount > 0) {
       const successMsg = `Successfully created ${successCount} dashboard file${successCount === 1 ? '' : 's'}. `;
       const failures = failedFiles
-        .map(failure => `Failed to create '${failure.name}': ${failure.error}`)
+        .map((failure) => `Failed to create '${failure.name}': ${failure.error}`)
         .join('\n');
       message = `${successMsg}Failed to create ${failureCount} dashboard files:\n${failures}`;
     } else {
@@ -361,7 +384,7 @@ const createDashboardFiles = wrapTraced(
       message,
       duration: Date.now() - startTime,
       files,
-      failed_files: failedFiles
+      failed_files: failedFiles,
     };
   },
   { name: 'create-dashboard-files' }
@@ -369,41 +392,50 @@ const createDashboardFiles = wrapTraced(
 
 // Input/Output schemas
 const inputSchema = z.object({
-  files: z.array(z.object({
-    name: z.string().min(1, 'Dashboard name cannot be empty'),
-    yml_content: z.string().min(1, 'YAML content cannot be empty')
-  })).min(1, 'At least one dashboard file must be provided')
+  files: z
+    .array(
+      z.object({
+        name: z.string().min(1, 'Dashboard name cannot be empty'),
+        yml_content: z.string().min(1, 'YAML content cannot be empty'),
+      })
+    )
+    .min(1, 'At least one dashboard file must be provided'),
 });
 
 const outputSchema = z.object({
   message: z.string(),
   duration: z.number(),
-  files: z.array(z.object({
-    id: z.string(),
-    name: z.string(),
-    file_type: z.string(),
-    yml_content: z.string(),
-    result_message: z.string().optional(),
-    results: z.array(z.record(z.any())).optional(),
-    created_at: z.string(),
-    updated_at: z.string(),
-    version_number: z.number()
-  })),
-  failed_files: z.array(z.object({
-    name: z.string(),
-    error: z.string()
-  }))
+  files: z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      file_type: z.string(),
+      yml_content: z.string(),
+      result_message: z.string().optional(),
+      results: z.array(z.record(z.any())).optional(),
+      created_at: z.string(),
+      updated_at: z.string(),
+      version_number: z.number(),
+    })
+  ),
+  failed_files: z.array(
+    z.object({
+      name: z.string(),
+      error: z.string(),
+    })
+  ),
 });
 
 // Export the tool
 export const createDashboardsFileTool = createTool({
   id: 'create-dashboards-file',
-  description: 'Creates new dashboard files. Use this if no existing dashboard file can fulfill the user\'s needs. Before using this tool, carefully think through the dashboard format, specification, and structure to ensure it meets requirements. Each dashboard references existing metrics by their UUIDs and organizes them into rows with specific column layouts.',
+  description:
+    "Creates new dashboard files. Use this if no existing dashboard file can fulfill the user's needs. Before using this tool, carefully think through the dashboard format, specification, and structure to ensure it meets requirements. Each dashboard references existing metrics by their UUIDs and organizes them into rows with specific column layouts.",
   inputSchema,
   outputSchema,
-  execute: async ({ context }) => {
-    return await createDashboardFiles(context as CreateDashboardFilesParams & { runtimeContext?: RuntimeContext });
-  }
+  execute: async ({ context, runtimeContext }) => {
+    return await createDashboardFiles(context as CreateDashboardFilesParams, runtimeContext);
+  },
 });
 
 export default createDashboardsFileTool;

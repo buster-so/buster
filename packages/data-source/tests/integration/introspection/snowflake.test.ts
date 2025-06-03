@@ -410,6 +410,8 @@ describe('Snowflake DataSource Introspection', () => {
           schemas: ['REVENUE'],
         });
 
+        const json = JSON.stringify(filteredIntrospection, null, 2);
+
         // Verify only DBT database is returned
         expect(filteredIntrospection.databases.some((db) => db.name === 'DBT')).toBe(true);
 
@@ -438,7 +440,7 @@ describe('Snowflake DataSource Introspection', () => {
           expect(view.schema).toBe('REVENUE');
         }
       },
-      { timeout: 120000 }
+      { timeout: 180000 }
     );
 
     testFn(

@@ -26,13 +26,9 @@
       "baseUrl": ".",
       "paths": {
         "@buster/data-source": ["../packages/data-source/src"],
-        "@buster/data-source/*": ["../packages/data-source/src/*"],
         "@buster/ai": ["../packages/ai/src"],
-        "@buster/ai/*": ["../packages/ai/src/*"],
         "@buster/database": ["../packages/database/src"],
-        "@buster/database/*": ["../packages/database/src/*"],
         "@buster/web-tools": ["../packages/web-tools/src"],
-        "@buster/web-tools/*": ["../packages/web-tools/src/*"]
       },
   
       // Strictness and safety (Rust-like experience)

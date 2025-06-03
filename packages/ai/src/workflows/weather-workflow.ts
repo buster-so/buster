@@ -1,9 +1,15 @@
-import { openai } from '@ai-sdk/openai';
+import { anthropic } from '@ai-sdk/anthropic';
 import { Agent } from '@mastra/core/agent';
 import { createStep, createWorkflow } from '@mastra/core/workflows';
+import { initLogger, wrapAISDKModel } from 'braintrust';
 import { z } from 'zod';
 
-const llm = openai('gpt-4o-mini');
+initLogger({
+  apiKey: process.env.BRAINTRUST_KEY,
+  projectName: 'Weather Workflow',
+});
+
+const llm = wrapAISDKModel(anthropic('claude-sonnet-4-20250514'));
 
 const agent = new Agent({
   name: 'Weather Agent',

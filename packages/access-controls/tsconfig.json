@@ -23,7 +23,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@database/*": ["../database/src/*"]
+      "@database": ["../database/src"]
     }
   },
   "include": ["src/**/*"],

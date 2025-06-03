@@ -17,8 +17,7 @@
     "sourceMap": true,
     "noEmit": true,
     "paths": {
-      "@database": ["../database/src/index.ts"],
-      "@buster/database": ["../database/src/index.ts"]
+      "@database": ["../database/src"]
     }
   },
   "include": ["src/**/*"],

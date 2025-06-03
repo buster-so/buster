@@ -6,19 +6,19 @@ export {
   initializePool,
   closePool,
   type PoolConfig,
-} from '@/connection';
+} from './connection';
 
 // Export migration utilities
-export { runMigrations, runMigrationsAndClose } from '@/migrate';
+export { runMigrations, runMigrationsAndClose } from './migrate';
 
 // Export setup utilities for existing databases
-export { setupExistingDatabase, generateSnapshot, validateSchema } from '@/setup';
+export { setupExistingDatabase, generateSnapshot, validateSchema } from './setup';
 
 // Export introspected schema and types
-export * from '@/schema';
+export * from './schema';
 
 // Export relations
-export * from '@/relations';
+export * from './relations';
 
 // Export common Drizzle utilities
 export {

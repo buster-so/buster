@@ -1,8 +1,8 @@
-import { modifyMetricsFileTool } from '@/tools/visualization-tools/modify-metrics-file-tool';
-import { createMetricsFileTool } from '@/tools/visualization-tools/create-metrics-file-tool';
-import { beforeEach, describe, expect, test, afterEach } from 'vitest';
-import { db, metricFiles, assetPermissions, eq } from '@buster/database';
 import { randomUUID } from 'node:crypto';
+import { createMetricsFileTool } from '@/tools/visualization-tools/create-metrics-file-tool';
+import { modifyMetricsFileTool } from '@/tools/visualization-tools/modify-metrics-file-tool';
+import { db, eq, metricFiles } from '@buster/database';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 describe('Modify Metrics File Tool Integration Tests', () => {
   let mockRuntimeContext: any;
@@ -20,13 +20,13 @@ describe('Modify Metrics File Tool Integration Tests', () => {
     mockRuntimeContext = {
       get: (key: string) => {
         const values: Record<string, string> = {
-          'data_source_id': testDataSourceId,
-          'data_source_syntax': 'postgresql',
-          'user_id': testUserId,
-          'organization_id': testOrgId
+          dataSourceId: testDataSourceId,
+          data_source_syntax: 'postgresql',
+          user_id: testUserId,
+          organization_id: testOrgId,
         };
         return values[key];
-      }
+      },
     };
 
     // Reset created metrics array
@@ -37,10 +37,7 @@ describe('Modify Metrics File Tool Integration Tests', () => {
     // Clean up created metrics
     if (createdMetricIds.length > 0) {
       try {
-        await db
-          .delete(metricFiles)
-          .where(eq(metricFiles.id, createdMetricIds[0]))
-          .execute();
+        await db.delete(metricFiles).where(eq(metricFiles.id, createdMetricIds[0])).execute();
       } catch (error) {
         // Ignore cleanup errors
       }
@@ -48,7 +45,7 @@ describe('Modify Metrics File Tool Integration Tests', () => {
   });
 
   // Helper function to create a test metric first
-  async function createTestMetric(name: string = 'Test Metric for Update'): Promise<string> {
+  async function createTestMetric(name = 'Test Metric for Update'): Promise<string> {
     const createYaml = `
 name: ${name}
 description: A metric created for testing updates
@@ -77,23 +74,25 @@ chartConfig:
 
     const createInput = {
       files: [{ name, yml_content: createYaml }],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const createResult = await createMetricsFileTool.execute({ context: createInput });
-    
+
     if (createResult.files.length > 0) {
       const metricId = createResult.files[0].id;
       createdMetricIds.push(metricId);
       return metricId;
     }
-    
+
     throw new Error('Failed to create test metric');
   }
 
   test('should have correct tool configuration', () => {
     expect(modifyMetricsFileTool.id).toBe('modify-metrics-file');
-    expect(modifyMetricsFileTool.description).toContain('Updates existing metric configuration files');
+    expect(modifyMetricsFileTool.description).toContain(
+      'Updates existing metric configuration files'
+    );
     expect(modifyMetricsFileTool.inputSchema).toBeDefined();
     expect(modifyMetricsFileTool.outputSchema).toBeDefined();
     expect(modifyMetricsFileTool.execute).toBeDefined();
@@ -135,9 +134,9 @@ chartConfig:
       currency: "USD"
       numberSeparatorStyle: ","
       replaceMissingDataWith: 0
-          `
-        }
-      ]
+          `,
+        },
+      ],
     };
 
     const result = modifyMetricsFileTool.inputSchema.safeParse(validInput);
@@ -156,10 +155,10 @@ chartConfig:
           yml_content: 'name: Updated Test',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-          version_number: 2
-        }
+          version_number: 2,
+        },
       ],
-      failed_files: []
+      failed_files: [],
     };
 
     const result = modifyMetricsFileTool.outputSchema.safeParse(validOutput);
@@ -169,9 +168,9 @@ chartConfig:
   test('should handle runtime context requirements for updates', async () => {
     const contextWithoutDataSource = {
       get: (key: string) => {
-        if (key === 'data_source_id') return undefined;
+        if (key === 'dataSourceId') return undefined;
         return 'test-value';
-      }
+      },
     };
 
     const validYaml = `
@@ -191,11 +190,12 @@ chartConfig:
 
     const input = {
       files: [{ id: randomUUID(), yml_content: validYaml }],
-      runtimeContext: contextWithoutDataSource
+      runtimeContext: contextWithoutDataSource,
     };
 
-    await expect(modifyMetricsFileTool.execute({ context: input }))
-      .rejects.toThrow('Data source ID not found in runtime context');
+    await expect(modifyMetricsFileTool.execute({ context: input })).rejects.toThrow(
+      'Data source ID not found in runtime context'
+    );
   });
 
   test('should reject updates with invalid YAML in integration context', async () => {
@@ -218,7 +218,7 @@ chartConfig:
 
     const input = {
       files: [{ id: metricId, yml_content: invalidYaml }],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await modifyMetricsFileTool.execute({ context: input });
@@ -250,7 +250,7 @@ chartConfig:
 
     const input = {
       files: [{ id: metricId, yml_content: invalidSqlYaml }],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await modifyMetricsFileTool.execute({ context: input });
@@ -309,7 +309,7 @@ chartConfig:
 
     const input = {
       files: [{ id: metricId, yml_content: updatedYaml }],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await modifyMetricsFileTool.execute({ context: input });
@@ -359,9 +359,9 @@ chartConfig:
     const input = {
       files: [
         { id: validMetricId, yml_content: validUpdatedYaml },
-        { id: invalidMetricId, yml_content: invalidUpdatedYaml }
+        { id: invalidMetricId, yml_content: invalidUpdatedYaml },
       ],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await modifyMetricsFileTool.execute({ context: input });
@@ -369,12 +369,12 @@ chartConfig:
     // Should have one success and one failure
     expect(result.files).toHaveLength(1);
     expect(result.failed_files).toHaveLength(1);
-    
+
     // The success should be the valid update
     expect(result.files[0].name).toBe('Valid Updated Metric');
-    
+
     // The failure should be due to YAML validation (empty sql)
-    const yamlFailure = result.failed_files.find(f => f.file_name === 'Invalid Update Target');
+    const yamlFailure = result.failed_files.find((f) => f.file_name === 'Invalid Update Target');
     expect(yamlFailure?.error).toContain('Invalid YAML structure');
   });
 
@@ -399,7 +399,7 @@ chartConfig:
 
     const input = {
       files: [{ id: metricId, yml_content: validYaml }],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await modifyMetricsFileTool.execute({ context: input });
@@ -414,7 +414,7 @@ chartConfig:
     const metricIds = await Promise.all([
       createTestMetric('Bulk Update Metric 1'),
       createTestMetric('Bulk Update Metric 2'),
-      createTestMetric('Bulk Update Metric 3')
+      createTestMetric('Bulk Update Metric 3'),
     ]);
 
     const createUpdatedYaml = (index: number) => `
@@ -434,12 +434,12 @@ chartConfig:
 
     const files = metricIds.map((id, i) => ({
       id,
-      yml_content: createUpdatedYaml(i + 1)
+      yml_content: createUpdatedYaml(i + 1),
     }));
 
     const input = {
       files,
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await modifyMetricsFileTool.execute({ context: input });
@@ -460,7 +460,7 @@ chartConfig:
   test('should generate appropriate success and error messages for updates', async () => {
     // Test success message
     const successMetricId = await createTestMetric('Success Message Update Test');
-    
+
     const validYaml = `
 name: Success Message Updated Test
 description: Test success message generation for updates
@@ -478,7 +478,7 @@ chartConfig:
 
     const successInput = {
       files: [{ id: successMetricId, yml_content: validYaml }],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const successResult = await modifyMetricsFileTool.execute({ context: successInput });
@@ -490,18 +490,20 @@ chartConfig:
 
     const failureInput = {
       files: [{ id: failureMetricId, yml_content: invalidYaml }],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const failureResult = await modifyMetricsFileTool.execute({ context: failureInput });
     expect(failureResult.message).toBe('Failed to modify 1 metric file.');
     expect(failureResult.failed_files).toHaveLength(1);
-    expect(failureResult.failed_files[0].error).toContain('Please attempt to modify the metric again');
+    expect(failureResult.failed_files[0].error).toContain(
+      'Please attempt to modify the metric again'
+    );
   });
 
   test('should handle non-existent metric ID gracefully', async () => {
     const nonExistentId = randomUUID();
-    
+
     const validYaml = `
 name: Non-existent Update
 description: Trying to update a non-existent metric
@@ -519,7 +521,7 @@ chartConfig:
 
     const input = {
       files: [{ id: nonExistentId, yml_content: validYaml }],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await modifyMetricsFileTool.execute({ context: input });
@@ -550,7 +552,7 @@ chartConfig:
 
     const firstInput = {
       files: [{ id: metricId, yml_content: firstUpdateYaml }],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const firstResult = await modifyMetricsFileTool.execute({ context: firstInput });
@@ -576,7 +578,7 @@ chartConfig:
 
     const secondInput = {
       files: [{ id: metricId, yml_content: secondUpdateYaml }],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const secondResult = await modifyMetricsFileTool.execute({ context: secondInput });

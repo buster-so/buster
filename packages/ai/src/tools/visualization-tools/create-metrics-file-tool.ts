@@ -1,15 +1,12 @@
+import { randomUUID } from 'node:crypto';
+import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
-import { z } from 'zod';
-import { eq, sql } from 'drizzle-orm';
-import { db } from '@buster/database';
-import { 
-  metricFiles, 
-  assetPermissions, 
-  metricFilesToDatasets
-} from '@buster/database';
-import { randomUUID } from 'node:crypto';
+import {} from 'drizzle-orm';
 import * as yaml from 'yaml';
+import { z } from 'zod';
+import { db } from '../../../../database/src/connection';
+import { assetPermissions, metricFiles } from '../../../../database/src/schema';
 
 // Core interfaces matching Rust structs
 interface MetricFileParams {
@@ -45,10 +42,6 @@ interface CreateMetricFilesOutput {
   failed_files: FailedFileCreation[];
 }
 
-interface RuntimeContext {
-  get(key: string): string | undefined;
-}
-
 // Comprehensive YAML schema validation
 const columnLabelFormatSchema = z.object({
   columnType: z.enum(['number', 'string', 'date']),
@@ -66,7 +59,7 @@ const columnLabelFormatSchema = z.object({
   dateFormat: z.string().optional(),
   useRelativeTime: z.boolean().optional(),
   isUtc: z.boolean().optional(),
-  convertNumberTo: z.enum(['day_of_week', 'month_of_year', 'quarter']).optional()
+  convertNumberTo: z.enum(['day_of_week', 'month_of_year', 'quarter']).optional(),
 });
 
 const baseChartConfigSchema = z.object({
@@ -80,28 +73,34 @@ const baseChartConfigSchema = z.object({
   goalLines: z.array(z.any()).optional(),
   trendlines: z.array(z.any()).optional(),
   disableTooltip: z.boolean().optional(),
-  xAxisConfig: z.object({
-    xAxisTimeInterval: z.enum(['day', 'week', 'month', 'quarter', 'year', 'null']),
-    xAxisShowAxisLabel: z.boolean().optional(),
-    xAxisShowAxisTitle: z.boolean().optional(),
-    xAxisAxisTitle: z.string().nullable().optional(),
-    xAxisLabelRotation: z.enum(['0', '45', '90', 'auto']).optional(),
-    xAxisDataZoom: z.boolean().optional()
-  }).optional(),
-  yAxisConfig: z.object({
-    yAxisShowAxisLabel: z.boolean().optional(),
-    yAxisShowAxisTitle: z.boolean().optional(),
-    yAxisAxisTitle: z.string().nullable().optional(),
-    yAxisStartAxisAtZero: z.boolean().nullable().optional(),
-    yAxisScaleType: z.enum(['log', 'linear']).optional()
-  }).optional(),
-  y2AxisConfig: z.object({
-    y2AxisShowAxisLabel: z.boolean().optional(),
-    y2AxisShowAxisTitle: z.boolean().optional(),
-    y2AxisAxisTitle: z.string().nullable().optional(),
-    y2AxisStartAxisAtZero: z.boolean().nullable().optional(),
-    y2AxisScaleType: z.enum(['log', 'linear']).optional()
-  }).optional()
+  xAxisConfig: z
+    .object({
+      xAxisTimeInterval: z.enum(['day', 'week', 'month', 'quarter', 'year', 'null']),
+      xAxisShowAxisLabel: z.boolean().optional(),
+      xAxisShowAxisTitle: z.boolean().optional(),
+      xAxisAxisTitle: z.string().nullable().optional(),
+      xAxisLabelRotation: z.enum(['0', '45', '90', 'auto']).optional(),
+      xAxisDataZoom: z.boolean().optional(),
+    })
+    .optional(),
+  yAxisConfig: z
+    .object({
+      yAxisShowAxisLabel: z.boolean().optional(),
+      yAxisShowAxisTitle: z.boolean().optional(),
+      yAxisAxisTitle: z.string().nullable().optional(),
+      yAxisStartAxisAtZero: z.boolean().nullable().optional(),
+      yAxisScaleType: z.enum(['log', 'linear']).optional(),
+    })
+    .optional(),
+  y2AxisConfig: z
+    .object({
+      y2AxisShowAxisLabel: z.boolean().optional(),
+      y2AxisShowAxisTitle: z.boolean().optional(),
+      y2AxisAxisTitle: z.string().nullable().optional(),
+      y2AxisStartAxisAtZero: z.boolean().nullable().optional(),
+      y2AxisScaleType: z.enum(['log', 'linear']).optional(),
+    })
+    .optional(),
 });
 
 // Chart-specific schemas
@@ -110,10 +109,10 @@ const barChartConfigSchema = baseChartConfigSchema.extend({
   barAndLineAxis: z.object({
     x: z.array(z.string()),
     y: z.array(z.string()),
-    category: z.array(z.string()).optional()
+    category: z.array(z.string()).optional(),
   }),
   barLayout: z.enum(['horizontal', 'vertical']).optional(),
-  barGroupType: z.enum(['stack', 'group', 'percentage-stack']).optional()
+  barGroupType: z.enum(['stack', 'group', 'percentage-stack']).optional(),
 });
 
 const lineChartConfigSchema = baseChartConfigSchema.extend({
@@ -121,32 +120,44 @@ const lineChartConfigSchema = baseChartConfigSchema.extend({
   barAndLineAxis: z.object({
     x: z.array(z.string()),
     y: z.array(z.string()),
-    category: z.array(z.string()).optional()
+    category: z.array(z.string()).optional(),
   }),
   barLayout: z.enum(['horizontal', 'vertical']).optional(),
-  barGroupType: z.enum(['stack', 'group', 'percentage-stack']).optional()
+  barGroupType: z.enum(['stack', 'group', 'percentage-stack']).optional(),
 });
 
 const tableChartConfigSchema = baseChartConfigSchema.extend({
   selectedChartType: z.literal('table'),
-  tableColumnOrder: z.array(z.string()).optional()
+  tableColumnOrder: z.array(z.string()).optional(),
 });
 
 const metricChartConfigSchema = baseChartConfigSchema.extend({
   selectedChartType: z.literal('metric'),
   metricColumnId: z.string(),
-  metricValueAggregate: z.enum(['sum', 'average', 'median', 'max', 'min', 'count', 'first']).optional(),
-  metricHeader: z.union([z.string(), z.object({
-    columnId: z.string(),
-    useValue: z.boolean(),
-    aggregate: z.enum(['sum', 'average', 'median', 'max', 'min', 'count', 'first']).optional()
-  })]).optional(),
-  metricSubHeader: z.union([z.string(), z.object({
-    columnId: z.string(),
-    useValue: z.boolean(),
-    aggregate: z.enum(['sum', 'average', 'median', 'max', 'min', 'count', 'first']).optional()
-  })]).optional(),
-  metricValueLabel: z.string().optional()
+  metricValueAggregate: z
+    .enum(['sum', 'average', 'median', 'max', 'min', 'count', 'first'])
+    .optional(),
+  metricHeader: z
+    .union([
+      z.string(),
+      z.object({
+        columnId: z.string(),
+        useValue: z.boolean(),
+        aggregate: z.enum(['sum', 'average', 'median', 'max', 'min', 'count', 'first']).optional(),
+      }),
+    ])
+    .optional(),
+  metricSubHeader: z
+    .union([
+      z.string(),
+      z.object({
+        columnId: z.string(),
+        useValue: z.boolean(),
+        aggregate: z.enum(['sum', 'average', 'median', 'max', 'min', 'count', 'first']).optional(),
+      }),
+    ])
+    .optional(),
+  metricValueLabel: z.string().optional(),
 });
 
 const scatterChartConfigSchema = baseChartConfigSchema.extend({
@@ -155,24 +166,24 @@ const scatterChartConfigSchema = baseChartConfigSchema.extend({
     x: z.array(z.string()),
     y: z.array(z.string()),
     category: z.array(z.string()).optional(),
-    size: z.array(z.string()).optional()
-  })
+    size: z.array(z.string()).optional(),
+  }),
 });
 
 const pieChartConfigSchema = baseChartConfigSchema.extend({
   selectedChartType: z.literal('pie'),
   pieChartAxis: z.object({
     x: z.array(z.string()),
-    y: z.array(z.string())
-  })
+    y: z.array(z.string()),
+  }),
 });
 
 const comboChartConfigSchema = baseChartConfigSchema.extend({
   selectedChartType: z.literal('combo'),
   comboChartAxis: z.object({
     x: z.array(z.string()),
-    y: z.array(z.string())
-  })
+    y: z.array(z.string()),
+  }),
 });
 
 const chartConfigSchema = z.discriminatedUnion('selectedChartType', [
@@ -182,7 +193,7 @@ const chartConfigSchema = z.discriminatedUnion('selectedChartType', [
   metricChartConfigSchema,
   scatterChartConfigSchema,
   pieChartConfigSchema,
-  comboChartConfigSchema
+  comboChartConfigSchema,
 ]);
 
 const metricYmlSchema = z.object({
@@ -190,7 +201,7 @@ const metricYmlSchema = z.object({
   description: z.string().min(1),
   timeFrame: z.string().min(1),
   sql: z.string().min(1),
-  chartConfig: chartConfigSchema
+  chartConfig: chartConfigSchema,
 });
 
 type MetricYml = z.infer<typeof metricYmlSchema>;
@@ -198,50 +209,73 @@ type MetricYml = z.infer<typeof metricYmlSchema>;
 // Tool implementation
 export const createMetricsFileTool = createTool({
   id: 'create-metrics-file',
-  description: 'Creates metric configuration files with YAML content following the metric schema specification. Before using this tool, carefully consider the appropriate visualization type (bar, line, scatter, pie, combo, metric, table) and its specific configuration requirements. Each visualization has unique axis settings, formatting options, and data structure needs that must be thoroughly planned to create effective metrics. **This tool supports creating multiple metrics in a single call; prefer using bulk creation over creating metrics one by one.**',
+  description:
+    'Creates metric configuration files with YAML content following the metric schema specification. Before using this tool, carefully consider the appropriate visualization type (bar, line, scatter, pie, combo, metric, table) and its specific configuration requirements. Each visualization has unique axis settings, formatting options, and data structure needs that must be thoroughly planned to create effective metrics. **This tool supports creating multiple metrics in a single call; prefer using bulk creation over creating metrics one by one.**',
   inputSchema: z.object({
-    files: z.array(z.object({
-      name: z.string().describe('The natural language name/title for the metric, exactly matching the \'name\' field within the YML content. This name will identify the metric in the UI. Do not include file extensions or use file path characters.'),
-      yml_content: z.string().describe('The YAML content for a single metric, adhering to the comprehensive metric schema. Multiple metrics can be created in one call by providing multiple entries in the \'files\' array. **Prefer creating metrics in bulk.**')
-    })).min(1).describe('List of file parameters to create. The files will contain YAML content that adheres to the metric schema specification.')
+    files: z
+      .array(
+        z.object({
+          name: z
+            .string()
+            .describe(
+              "The natural language name/title for the metric, exactly matching the 'name' field within the YML content. This name will identify the metric in the UI. Do not include file extensions or use file path characters."
+            ),
+          yml_content: z
+            .string()
+            .describe(
+              "The YAML content for a single metric, adhering to the comprehensive metric schema. Multiple metrics can be created in one call by providing multiple entries in the 'files' array. **Prefer creating metrics in bulk.**"
+            ),
+        })
+      )
+      .min(1)
+      .describe(
+        'List of file parameters to create. The files will contain YAML content that adheres to the metric schema specification.'
+      ),
   }),
   outputSchema: z.object({
     message: z.string(),
     duration: z.number(),
-    files: z.array(z.object({
-      id: z.string(),
-      name: z.string(),
-      file_type: z.string(),
-      yml_content: z.string(),
-      result_message: z.string().optional(),
-      results: z.array(z.record(z.any())).optional(),
-      created_at: z.string(),
-      updated_at: z.string(),
-      version_number: z.number()
-    })),
-    failed_files: z.array(z.object({
-      name: z.string(),
-      error: z.string()
-    }))
+    files: z.array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        file_type: z.string(),
+        yml_content: z.string(),
+        result_message: z.string().optional(),
+        results: z.array(z.record(z.any())).optional(),
+        created_at: z.string(),
+        updated_at: z.string(),
+        version_number: z.number(),
+      })
+    ),
+    failed_files: z.array(
+      z.object({
+        name: z.string(),
+        error: z.string(),
+      })
+    ),
   }),
-  execute: async ({ context }) => {
-    return await createMetricFiles(context as CreateMetricFilesParams & { runtimeContext?: RuntimeContext });
+  execute: async ({ context, runtimeContext }) => {
+    return await createMetricFiles(context as CreateMetricFilesParams, runtimeContext);
   },
 });
 
 const createMetricFiles = wrapTraced(
-  async (params: CreateMetricFilesParams & { runtimeContext?: RuntimeContext }): Promise<CreateMetricFilesOutput> => {
+  async (
+    params: CreateMetricFilesParams,
+    runtimeContext: RuntimeContext
+  ): Promise<CreateMetricFilesOutput> => {
     const startTime = Date.now();
-    const { files, runtimeContext } = params;
+    const { files } = params;
 
     const createdFiles: FileWithId[] = [];
     const failedFiles: FailedFileCreation[] = [];
 
     // Extract context values
-    const dataSourceId = runtimeContext?.get('data_source_id');
-    const dataSourceSyntax = runtimeContext?.get('data_source_syntax') || 'generic';
-    const userId = runtimeContext?.get('user_id');
-    const organizationId = runtimeContext?.get('organization_id');
+    const dataSourceId = runtimeContext?.get('dataSourceId');
+    const dataSourceSyntax = runtimeContext?.get('dataSourceSyntax') || 'generic';
+    const userId = runtimeContext?.get('userId');
+    const organizationId = runtimeContext?.get('organizationId');
 
     if (!dataSourceId) {
       throw new Error('Data source ID not found in runtime context');
@@ -282,20 +316,20 @@ const createMetricFiles = wrapTraced(
         if (result.success) {
           successfulProcessing.push({
             metricFile: result.metricFile,
-            metricYml: result.metricYml,
-            message: result.message,
-            results: result.results
+            metricYml: result.metricYml!,
+            message: result.message!,
+            results: result.results!,
           });
         } else {
           failedFiles.push({
             name: fileName,
-            error: result.error || 'Unknown error'
+            error: result.error || 'Unknown error',
           });
         }
       } else {
         failedFiles.push({
           name: 'unknown',
-          error: processResult.reason?.message || 'Processing failed'
+          error: processResult.reason?.message || 'Processing failed',
         });
       }
     }
@@ -305,11 +339,11 @@ const createMetricFiles = wrapTraced(
       try {
         await db.transaction(async (tx) => {
           // Insert metric files
-          const metricRecords = successfulProcessing.map(sp => sp.metricFile);
+          const metricRecords = successfulProcessing.map((sp) => sp.metricFile);
           await tx.insert(metricFiles).values(metricRecords);
 
           // Insert asset permissions
-          const assetPermissionRecords = metricRecords.map(record => ({
+          const assetPermissionRecords = metricRecords.map((record) => ({
             identityId: userId,
             identityType: 'user' as const,
             assetId: record.id,
@@ -319,7 +353,7 @@ const createMetricFiles = wrapTraced(
             updatedAt: new Date().toISOString(),
             deletedAt: null,
             createdBy: userId,
-            updatedBy: userId
+            updatedBy: userId,
           }));
           await tx.insert(assetPermissions).values(assetPermissionRecords);
         });
@@ -336,16 +370,15 @@ const createMetricFiles = wrapTraced(
             results: sp.results,
             created_at: sp.metricFile.createdAt,
             updated_at: sp.metricFile.updatedAt,
-            version_number: 1
+            version_number: 1,
           });
         }
-
       } catch (error) {
         // Add all successful processing to failed if database operation fails
         for (const sp of successfulProcessing) {
           failedFiles.push({
             name: sp.metricFile.name,
-            error: `Failed to save to database: ${error instanceof Error ? error.message : 'Unknown error'}`
+            error: `Failed to save to database: ${error instanceof Error ? error.message : 'Unknown error'}`,
           });
         }
       }
@@ -359,7 +392,7 @@ const createMetricFiles = wrapTraced(
       message,
       duration,
       files: createdFiles,
-      failed_files: failedFiles
+      failed_files: failedFiles,
     };
   },
   { name: 'create-metrics-file' }
@@ -389,16 +422,12 @@ async function processMetricFile(
     const metricId = randomUUID();
 
     // Validate SQL by running it
-    const sqlValidationResult = await validateSql(
-      metricYml.sql,
-      dataSourceId,
-      dataSourceDialect
-    );
+    const sqlValidationResult = await validateSql(metricYml.sql, dataSourceId, dataSourceDialect);
 
     if (!sqlValidationResult.success) {
       return {
         success: false,
-        error: `Invalid SQL query: ${sqlValidationResult.error}`
+        error: `Invalid SQL query: ${sqlValidationResult.error}`,
       };
     }
 
@@ -424,7 +453,7 @@ async function processMetricFile(
       versionHistory: { version: 1, history: [metricYml] },
       dataMetadata: sqlValidationResult.metadata,
       publicPassword: null,
-      dataSourceId: dataSourceId
+      dataSourceId: dataSourceId,
     };
 
     return {
@@ -432,14 +461,13 @@ async function processMetricFile(
       metricFile,
       metricYml,
       message: sqlValidationResult.message,
-      results: sqlValidationResult.results
+      results: sqlValidationResult.results,
     };
-
   } catch (error) {
     let errorMessage = 'Unknown error';
-    
+
     if (error instanceof z.ZodError) {
-      errorMessage = `Invalid YAML structure: ${error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`;
+      errorMessage = `Invalid YAML structure: ${error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ')}`;
     } else if (error instanceof Error) {
       if (error.message.includes('YAMLParseError')) {
         errorMessage = `Invalid YAML format: ${error.message}`;
@@ -450,7 +478,7 @@ async function processMetricFile(
 
     return {
       success: false,
-      error: errorMessage
+      error: errorMessage,
     };
   }
 }
@@ -486,39 +514,42 @@ async function validateSql(
     const mockMetadata = {
       columns: [],
       rowCount: 0,
-      executionTime: 100
+      executionTime: 100,
     };
 
-    const message = mockResults.length === 0 
-      ? 'No records were found' 
-      : `${mockResults.length} records were returned`;
+    const message =
+      mockResults.length === 0
+        ? 'No records were found'
+        : `${mockResults.length} records were returned`;
 
     return {
       success: true,
       message,
       results: mockResults,
-      metadata: mockMetadata
+      metadata: mockMetadata,
     };
-
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'SQL validation failed'
+      error: error instanceof Error ? error.message : 'SQL validation failed',
     };
   }
 }
 
-function generateResultMessage(createdFiles: FileWithId[], failedFiles: FailedFileCreation[]): string {
+function generateResultMessage(
+  createdFiles: FileWithId[],
+  failedFiles: FailedFileCreation[]
+): string {
   if (failedFiles.length === 0) {
     return `Successfully created ${createdFiles.length} metric files.`;
   }
 
-  const successMsg = createdFiles.length > 0 
-    ? `Successfully created ${createdFiles.length} metric files. ` 
-    : '';
+  const successMsg =
+    createdFiles.length > 0 ? `Successfully created ${createdFiles.length} metric files. ` : '';
 
-  const failures = failedFiles.map(failure => 
-    `Failed to create '${failure.name}': ${failure.error}.\n\nPlease recreate the metric from scratch rather than attempting to modify. This error could be due to:\n- Using a dataset that doesn't exist (please reevaluate the available datasets in the chat conversation)\n- Invalid configuration in the metric file\n- Special characters in the metric name or SQL query\n- Syntax errors in the SQL query`
+  const failures = failedFiles.map(
+    (failure) =>
+      `Failed to create '${failure.name}': ${failure.error}.\n\nPlease recreate the metric from scratch rather than attempting to modify. This error could be due to:\n- Using a dataset that doesn't exist (please reevaluate the available datasets in the chat conversation)\n- Invalid configuration in the metric file\n- Special characters in the metric name or SQL query\n- Syntax errors in the SQL query`
   );
 
   if (failures.length === 1) {

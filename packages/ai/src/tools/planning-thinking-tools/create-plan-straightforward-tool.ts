@@ -1,8 +1,9 @@
+import { openai } from '@ai-sdk/openai';
 import { createTool } from '@mastra/core/tools';
+import { generateText } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
-import { openai } from '@ai-sdk/openai';
-import { generateText } from 'ai';
+import type { AnalystRuntimeContext } from '../../agents/analyst-agent/analyst-agent';
 
 // Core interfaces matching Rust structs
 interface CreatePlanStraightforwardInput {
@@ -57,31 +58,32 @@ Return your response as a JSON object with this structure:
       messages: [
         {
           role: 'system',
-          content: prompt
+          content: prompt,
         },
         {
           role: 'user',
-          content: `Plan to convert to TODOs:\n\n${plan}`
-        }
+          content: `Plan to convert to TODOs:\n\n${plan}`,
+        },
       ],
       temperature: 0.0,
       maxTokens: 2000,
     });
-    
+
     const parsed = JSON.parse(result.text);
-    
+
     if (!parsed.todos || !Array.isArray(parsed.todos)) {
       throw new Error('Invalid response format: missing todos array');
     }
-    
-    return parsed.todos.map((todo: any): TodoItem => ({
-      todo: typeof todo === 'string' ? todo : todo.todo || '',
-      completed: false
-    }));
-    
+
+    return parsed.todos.map(
+      (todo: any): TodoItem => ({
+        todo: typeof todo === 'string' ? todo : todo.todo || '',
+        completed: false,
+      })
+    );
   } catch (error) {
     console.warn('Failed to generate todos from plan using LLM:', error);
-    
+
     // Fallback: extract simple todos from plan text
     return extractTodosFromPlanText(plan);
   }
@@ -91,42 +93,42 @@ Return your response as a JSON object with this structure:
 function extractTodosFromPlanText(plan: string): TodoItem[] {
   const lines = plan.split('\n');
   const todos: TodoItem[] = [];
-  
+
   for (const line of lines) {
     const trimmed = line.trim();
-    
+
     // Look for numbered items, bullet points, or action words
     if (
       /^\d+\.\s+/.test(trimmed) || // 1. Create...
-      /^[-*]\s+/.test(trimmed) ||  // - Create... or * Create...
+      /^[-*]\s+/.test(trimmed) || // - Create... or * Create...
       /^(create|build|implement|add|setup|configure|test|deploy|verify)\s+/i.test(trimmed) // Action words
     ) {
-      let todoText = trimmed
+      const todoText = trimmed
         .replace(/^\d+\.\s*/, '') // Remove "1. "
-        .replace(/^[-*]\s*/, '')  // Remove "- " or "* "
+        .replace(/^[-*]\s*/, '') // Remove "- " or "* "
         .trim();
-        
+
       if (todoText.length > 5 && todoText.length < 150) {
         todos.push({
           todo: todoText,
-          completed: false
+          completed: false,
         });
-        
+
         if (todos.length >= 15) {
           break;
         }
       }
     }
   }
-  
+
   // If no todos found, create a generic one
   if (todos.length === 0) {
     todos.push({
       todo: 'Review and execute the provided plan',
-      completed: false
+      completed: false,
     });
   }
-  
+
   return todos;
 }
 
@@ -140,42 +142,43 @@ async function processCreatePlanStraightforward(
   }
 
   // Set plan_available to true in agent state (matches Rust line 42-44)
-  runtimeContext.set('plan_available', true);
+  runtimeContext.set('planAvailable', true);
 
   let todosString = '';
 
   try {
     // Generate todos from plan using LLM (matches Rust lines 48-53)
     const todosStateObjects = await generateTodosFromPlan(params.plan);
-    
+
     // Format todos as "[ ] {todo}" strings (matches Rust lines 56-62)
     const formattedTodos = todosStateObjects
       .filter((item) => item.todo && typeof item.todo === 'string')
       .map((item) => `[ ] ${item.todo}`);
-    
+
     todosString = formattedTodos.join('\n');
-    
+
     // Save todos to agent state (matches Rust lines 65-67)
     runtimeContext.set('todos', todosStateObjects);
-    
   } catch (error) {
     console.warn(
       `Failed to generate todos from plan using LLM: ${error instanceof Error ? error.message : String(error)}. Proceeding without todos.`
     );
-    
+
     // Set empty todos array on error (matches Rust lines 74-76)
     runtimeContext.set('todos', []);
   }
 
   return {
     success: true,
-    todos: todosString
+    todos: todosString,
   };
 }
 
 // Main create plan function with tracing
 const executeCreatePlanStraightforward = wrapTraced(
-  async (params: CreatePlanStraightforwardInput & { runtimeContext?: RuntimeContext }): Promise<CreatePlanStraightforwardOutput> => {
+  async (
+    params: CreatePlanStraightforwardInput & { runtimeContext?: RuntimeContext }
+  ): Promise<CreatePlanStraightforwardOutput> => {
     const { runtimeContext, ...planParams } = params;
     return await processCreatePlanStraightforward(planParams, runtimeContext);
   },
@@ -184,14 +187,15 @@ const executeCreatePlanStraightforward = wrapTraced(
 
 // Input/Output schemas
 const inputSchema = z.object({
-  plan: z.string().min(1, 'Plan is required').describe(
-    'The step-by-step plan for an analytical workflow'
-  )
+  plan: z
+    .string()
+    .min(1, 'Plan is required')
+    .describe('The step-by-step plan for an analytical workflow'),
 });
 
 const outputSchema = z.object({
   success: z.boolean(),
-  todos: z.string()
+  todos: z.string(),
 });
 
 // Get description - matches Rust get_create_plan_straightforward_description
@@ -199,7 +203,7 @@ function getCreatePlanStraightforwardDescription(): string {
   return 'Use to create a plan for an analytical workflow.';
 }
 
-// Get plan description - matches Rust get_plan_straightforward_description  
+// Get plan description - matches Rust get_plan_straightforward_description
 function getPlanStraightforwardDescription(): string {
   return PLAN_STRAIGHTFORWARD_TEMPLATE;
 }
@@ -384,8 +388,10 @@ export const createPlanStraightforwardTool = createTool({
   inputSchema,
   outputSchema,
   execute: async ({ context }) => {
-    return await executeCreatePlanStraightforward(context as CreatePlanStraightforwardInput & { runtimeContext?: RuntimeContext });
-  }
+    return await executeCreatePlanStraightforward(
+      context as CreatePlanStraightforwardInput & { runtimeContext?: RuntimeContext }
+    );
+  },
 });
 
 export default createPlanStraightforwardTool;
