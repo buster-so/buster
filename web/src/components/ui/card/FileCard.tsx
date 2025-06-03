@@ -4,7 +4,7 @@ import { Text } from '../typography/Text';
 import { Card, CardContent, CardFooter, CardHeader } from './CardBase';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown } from '@/components/ui/icons';
-import { useDebounceFn, useMemoizedFn, useMount } from '@/hooks';
+import { useMemoizedFn } from '@/hooks';
 
 interface FileCardProps {
   fileName?: string | React.ReactNode;
