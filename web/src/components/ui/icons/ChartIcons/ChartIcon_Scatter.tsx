@@ -1,5 +1,5 @@
 import type React from 'react';
-import { DEFAULT_CHART_COLORS, DISABLED_CHART_COLORS } from '../config';
+import { DEFAULT_CHART_COLORS, DISABLED_CHART_COLORS } from './config';
 
 export const ChartIcon_Scatter: React.FC<{ colors?: string[]; disabled?: boolean }> = ({
   colors: colorsProp = DEFAULT_CHART_COLORS,
@@ -8,7 +8,12 @@ export const ChartIcon_Scatter: React.FC<{ colors?: string[]; disabled?: boolean
   const colors = disabled ? DISABLED_CHART_COLORS : colorsProp;
 
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="23" height="22" viewBox="0 0 23 22" fill="none">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 23 22"
+      fill="none">
       <title>Scatter Chart Icon</title>
       <path
         d="M15.3348 4C15.3348 5.10457 14.4393 6 13.3348 6C12.2302 6 11.3348 5.10457 11.3348 4C11.3348 2.89543 12.2302 2 13.3348 2C14.4393 2 15.3348 2.89543 15.3348 4Z"

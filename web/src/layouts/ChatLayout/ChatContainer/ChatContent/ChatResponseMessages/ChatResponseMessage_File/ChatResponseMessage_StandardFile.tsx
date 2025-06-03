@@ -6,7 +6,8 @@ export const ChatResponseMessage_StandardFile: React.FC<{
   isCompletedStream: boolean;
   responseMessage: BusterChatResponseMessage_file;
   isSelectedFile: boolean;
-}> = React.memo(({ isCompletedStream, responseMessage, isSelectedFile }) => {
+  chatId: string;
+}> = React.memo(({ isCompletedStream, responseMessage, isSelectedFile, chatId }) => {
   return (
     <StreamingMessage_File
       isCompletedStream={isCompletedStream}

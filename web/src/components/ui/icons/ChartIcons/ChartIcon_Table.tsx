@@ -1,5 +1,5 @@
 import type React from 'react';
-import { DEFAULT_CHART_COLORS, DISABLED_CHART_COLORS } from '../config';
+import { DEFAULT_CHART_COLORS, DISABLED_CHART_COLORS } from './config';
 
 export const ChartIcon_Table: React.FC<{ colors?: string[]; disabled?: boolean }> = ({
   colors: colorsProp = DEFAULT_CHART_COLORS,
@@ -9,7 +9,12 @@ export const ChartIcon_Table: React.FC<{ colors?: string[]; disabled?: boolean }
   const firstColor = colors[0] || '#575859';
 
   return (
-    <svg width="23" height="22" viewBox="0 0 23 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      width="1em"
+      height="1em"
+      viewBox="0 0 23 22"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg">
       <title>Table Icon</title>
       <g clipPath="url(#clip0_257_1030)">
         <path

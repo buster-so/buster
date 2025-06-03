@@ -1,5 +1,5 @@
 import type React from 'react';
-import { DEFAULT_CHART_COLORS, DISABLED_CHART_COLORS } from '../config';
+import { DEFAULT_CHART_COLORS, DISABLED_CHART_COLORS } from './config';
 
 export const ChartIcon_Pie: React.FC<{ colors?: string[]; disabled?: boolean }> = ({
   colors: colorsProp = DEFAULT_CHART_COLORS,
@@ -8,7 +8,12 @@ export const ChartIcon_Pie: React.FC<{ colors?: string[]; disabled?: boolean }> 
   const colors = disabled ? DISABLED_CHART_COLORS : colorsProp;
 
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="23" height="22" viewBox="0 0 23 22" fill="none">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 23 22"
+      fill="none">
       <title>Pie Chart Icon</title>
       <path
         d="M22.167 11.0073C22.167 16.2133 18.2042 20.4938 13.1305 20.9969C12.5788 21.0516 12.128 20.5989 12.128 20.0444C12.1281 16.887 12.1286 7.05258 12.1286 1.96812C12.1286 1.41368 12.5794 0.962974 13.1311 1.01768C18.2048 1.52071 22.167 5.80122 22.167 11.0073Z"

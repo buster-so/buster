@@ -1,5 +1,5 @@
 import type React from 'react';
-import { DEFAULT_CHART_COLORS, DISABLED_CHART_COLORS } from '../config';
+import { DEFAULT_CHART_COLORS, DISABLED_CHART_COLORS } from './config';
 
 export const ChartIcon_GroupedBar: React.FC<{ colors?: string[]; disabled?: boolean }> = ({
   colors: colorsProp = DEFAULT_CHART_COLORS,
@@ -8,7 +8,12 @@ export const ChartIcon_GroupedBar: React.FC<{ colors?: string[]; disabled?: bool
   const colors = disabled ? DISABLED_CHART_COLORS : colorsProp;
 
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="23" height="22" viewBox="0 0 23 22" fill="none">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 23 22"
+      fill="none">
       <title>Grouped Bar Chart Icon</title>
       <path
         d="M18.667 0C19.2193 0 19.667 0.447715 19.667 1V3C19.667 3.55228 19.2193 4 18.667 4L0.666992 4V0L18.667 0Z"

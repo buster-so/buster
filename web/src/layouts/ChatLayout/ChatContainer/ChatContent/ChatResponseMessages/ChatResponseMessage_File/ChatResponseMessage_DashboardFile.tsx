@@ -1,6 +1,6 @@
 import type { BusterChatResponseMessage_file } from '@/api/asset_interfaces/chat/chatMessageInterfaces';
 import { useGetDashboard, usePrefetchGetDashboardClient } from '@/api/buster_rest/dashboards';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@/lib/classMerge';
 import { FileCard } from '@/components/ui/card/FileCard';
@@ -11,21 +11,29 @@ import { CircleSpinnerLoader } from '@/components/ui/loaders/CircleSpinnerLoader
 import { CircleXmark } from '@/components/ui/icons';
 import { ASSET_ICONS } from '@/components/features/config/assetIcons';
 import { AppTooltip } from '@/components/ui/tooltip';
-import { CHART_ICON_LIST } from '@/controllers/MetricController/MetricViewChart/MetricEditController/MetricStylingApp/StylingAppVisualize/SelectChartType/config';
 import { useMount } from '@/hooks';
-import { prefetchGetDashboard } from '@/api/buster_rest/dashboards/queryServerRequests';
+import { useChatLayoutContextSelector } from '@/layouts/ChatLayout/ChatLayoutContext';
+import { ChartType, DEFAULT_CHART_CONFIG } from '@/api/asset_interfaces/metric';
+import { useGetMetricMemoized } from '@/context/Metrics';
+import { BusterRoutes, createBusterRoute } from '@/routes';
+import { getSelectedChartTypeConfig } from '@/lib/metrics/selectedChartType';
+import { Text } from '@/components/ui/typography';
+import Link from 'next/link';
 
 export const ChatResponseMessage_DashboardFile: React.FC<{
   isCompletedStream: boolean;
   responseMessage: BusterChatResponseMessage_file;
   isSelectedFile: boolean;
-}> = React.memo(({ isCompletedStream, responseMessage, isSelectedFile }) => {
+  chatId: string;
+}> = React.memo(({ isCompletedStream, responseMessage, isSelectedFile, chatId }) => {
   const { version_number, id, file_name } = responseMessage;
+  const metricId = useChatLayoutContextSelector((x) => x.metricId);
   const prefetchGetDashboard = usePrefetchGetDashboardClient();
   const {
-    data: dashboard,
+    data: dashboardResponse,
     isError,
-    isFetched
+    isFetched,
+    isLoading
   } = useGetDashboard(
     {
       id,
@@ -33,26 +41,23 @@ export const ChatResponseMessage_DashboardFile: React.FC<{
     },
     {
       select: (data) => {
-        return data.dashboard;
+        return data;
       }
     }
   );
 
   useMount(() => {
-    prefetchGetDashboard(id, version_number);
+    if (isSelectedFile) prefetchGetDashboard(id, version_number);
   });
-
-  if (isError) {
-    return <div>Error</div>;
-  }
-
-  if (!isFetched) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <AnimatePresence initial={!isCompletedStream}>
-      <motion.div id={id} {...itemAnimationConfig}>
+      <motion.div
+        id={id}
+        {...itemAnimationConfig}
+        onMouseEnter={() => {
+          prefetchGetDashboard(id, version_number);
+        }}>
         <FileCard
           className={cn(
             'overflow-hidden',
@@ -61,10 +66,21 @@ export const ChatResponseMessage_DashboardFile: React.FC<{
           )}
           collapseContent={true}
           collapsible={isFetched && !isError}
-          collapseDefaultIcon={<HeaderIcon isFetched={isFetched} isError={isError} />}
+          collapseDefaultIcon={
+            <HeaderIcon isLoading={isLoading} isFetched={isFetched} isError={isError} />
+          }
           headerClassName="bg-background"
           fileName={<TextAndVersionPill fileName={file_name} versionNumber={version_number} />}>
-          {dashboard && <Content dashboard={dashboard} />}
+          {dashboardResponse && (
+            <Content
+              dashboardResponse={dashboardResponse}
+              isFetched={isFetched}
+              isError={isError}
+              metricId={metricId}
+              chatId={chatId}
+              isSelectedFile={isSelectedFile}
+            />
+          )}
         </FileCard>
       </motion.div>
     </AnimatePresence>
@@ -75,9 +91,10 @@ ChatResponseMessage_DashboardFile.displayName = 'ChatResponseMessage_DashboardFi
 
 const HeaderIcon: React.FC<{
   isFetched: boolean;
+  isLoading: boolean;
   isError: boolean;
-}> = React.memo(({ isFetched, isError }) => {
-  if (!isFetched) {
+}> = React.memo(({ isFetched, isLoading, isError }) => {
+  if (isLoading) {
     return <CircleSpinnerLoader size={12} />;
   }
 
@@ -95,9 +112,90 @@ const HeaderIcon: React.FC<{
 HeaderIcon.displayName = 'HeaderIcon';
 
 const Content: React.FC<{
-  dashboard: BusterDashboardResponse['dashboard'];
-}> = React.memo(({ dashboard }) => {
-  return <div>Content</div>;
+  dashboardResponse: BusterDashboardResponse;
+  isFetched: boolean;
+  isError: boolean;
+  metricId: string | undefined;
+  chatId: string;
+  isSelectedFile: boolean;
+}> = React.memo(({ dashboardResponse, chatId, metricId, isSelectedFile, isFetched, isError }) => {
+  const getMetricMemoized = useGetMetricMemoized();
+
+  type RowItem = {
+    id: string;
+    name: string;
+    chartType: ChartType;
+    link: string;
+    isSelectedMetric: boolean;
+    icon: React.ReactNode;
+    iconTooltip: string;
+  };
+
+  const items: RowItem[] = useMemo(() => {
+    const rows = dashboardResponse.dashboard.config.rows || [];
+    return rows.reduce<RowItem[]>((acc, row) => {
+      return [
+        ...acc,
+        ...row.items.map((item) => {
+          const metricFromDashboardResponse = dashboardResponse.metrics[item.id];
+          const metric =
+            getMetricMemoized(item.id, metricFromDashboardResponse?.version_number) ||
+            metricFromDashboardResponse;
+          const chartType =
+            metric.chart_config?.selectedChartType || DEFAULT_CHART_CONFIG.selectedChartType;
+          const selectedChartIconConfig = getSelectedChartTypeConfig({
+            selectedChartType: chartType,
+            lineGroupType: metric.chart_config?.lineGroupType,
+            barGroupType: metric.chart_config?.barGroupType,
+            barLayout: metric.chart_config?.barLayout,
+            hasAreaStyle: false
+          });
+
+          return {
+            id: item.id,
+            name: metric.file_name || 'Untitled',
+            chartType,
+            link: createBusterRoute({
+              route: BusterRoutes.APP_CHAT_ID_METRIC_ID_CHART,
+              chatId,
+              metricId: metric.id,
+              versionNumber: metric.version_number
+            }),
+            isSelectedMetric: metric.id === metricId && isSelectedFile,
+            icon: selectedChartIconConfig?.icon ? <selectedChartIconConfig.icon /> : null,
+            iconTooltip: selectedChartIconConfig?.tooltipText || ''
+          };
+        })
+      ];
+    }, []);
+  }, [
+    dashboardResponse.dashboard,
+    dashboardResponse.metrics,
+    isFetched,
+    metricId,
+    chatId,
+    getMetricMemoized
+  ]);
+
+  return (
+    <div className="flex flex-col gap-y-2.5 px-3.5 py-2">
+      {items.map((item) => (
+        <div
+          className="flex items-center justify-between space-x-2.5 overflow-hidden"
+          key={item.id}>
+          <Link href={item.link} passHref prefetch>
+            <Text truncate size={'sm'} variant={item.isSelectedMetric ? 'default' : 'secondary'}>
+              {item.name}
+            </Text>
+          </Link>
+
+          <AppTooltip title={item.iconTooltip}>
+            <div className="flex items-center justify-center text-sm">{item.icon}</div>
+          </AppTooltip>
+        </div>
+      ))}
+    </div>
+  );
 });
 
 Content.displayName = 'Content';

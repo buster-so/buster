@@ -1,5 +1,5 @@
 import type React from 'react';
-import { DEFAULT_CHART_COLORS, DISABLED_CHART_COLORS } from '../config';
+import { DEFAULT_CHART_COLORS, DISABLED_CHART_COLORS } from './config';
 
 export const ChartIcon_AreaRelative: React.FC<{ colors?: string[]; disabled?: boolean }> = ({
   colors: colorsProp = DEFAULT_CHART_COLORS,
@@ -11,7 +11,12 @@ export const ChartIcon_AreaRelative: React.FC<{ colors?: string[]; disabled?: bo
   const thirdColor = colors[2] || '#575859';
 
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 22 22" fill="none">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 22 22"
+      fill="none">
       <title>Area Relative Chart Icon</title>
       <path
         d="M0 17.8889L7 15L16 17L22 15V20C22 20.5523 21.5523 21 21 21H1C0.447716 21 0 20.5523 0 20V17.8889Z"

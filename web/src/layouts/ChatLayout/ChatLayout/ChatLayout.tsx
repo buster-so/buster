@@ -20,12 +20,6 @@ interface ChatSplitterProps {
   children?: React.ReactNode;
 }
 
-const CHAT_SPLITTER_STORAGE_ID = 'chat-splitter';
-
-const createCombinedId = (chatId: string | undefined, metricId: string | undefined) => {
-  return (chatId || '') + (metricId || '');
-};
-
 export const ChatLayout: React.FC<ChatSplitterProps> = ({ children }) => {
   const appSplitterRef = useRef<AppSplitterRef>(null);
   const { openErrorNotification } = useBusterNotifications();

@@ -1,18 +1,18 @@
 import type React from 'react';
-import { ChartIcon_Area } from '../ChartIcons/ChartIcon_Area';
-import { ChartIcon_AreaRelative } from '../ChartIcons/ChartIcon_AreaRelative';
-import { ChartIcon_Combo } from '../ChartIcons/ChartIcon_Combo';
-import { ChartIcon_GroupedBar } from '../ChartIcons/ChartIcon_GroupedBar';
-import { ChartIcon_GroupedColumn } from '../ChartIcons/ChartIcon_GroupedColumn';
-import { ChartIcon_Line } from '../ChartIcons/ChartIcon_Line';
-import { ChartIcon_Metric } from '../ChartIcons/ChartIcon_Metric';
-import { ChartIcon_Pie } from '../ChartIcons/ChartIcon_Pie';
-import { ChartIcon_Scatter } from '../ChartIcons/ChartIcon_Scatter';
-import { ChartIcon_StackedBar } from '../ChartIcons/ChartIcon_StackedBar';
-import { ChartIcon_StackedBarRelative } from '../ChartIcons/ChartIcon_StackedBarRelative';
-import { ChartIcon_StackedColumn } from '../ChartIcons/ChartIcon_StackedColumn';
-import { ChartIcon_StackedColumnRelative } from '../ChartIcons/ChartIcon_StackedColumnRelative';
-import { ChartIcon_Table } from '../ChartIcons/ChartIcon_Table';
+import { ChartIcon_Area } from '@/components/ui/icons/ChartIcons/ChartIcon_Area';
+import { ChartIcon_AreaRelative } from '@/components/ui/icons/ChartIcons/ChartIcon_AreaRelative';
+import { ChartIcon_Combo } from '@/components/ui/icons/ChartIcons/ChartIcon_Combo';
+import { ChartIcon_GroupedBar } from '@/components/ui/icons/ChartIcons/ChartIcon_GroupedBar';
+import { ChartIcon_GroupedColumn } from '@/components/ui/icons/ChartIcons/ChartIcon_GroupedColumn';
+import { ChartIcon_Line } from '@/components/ui/icons/ChartIcons/ChartIcon_Line';
+import { ChartIcon_Metric } from '@/components/ui/icons/ChartIcons/ChartIcon_Metric';
+import { ChartIcon_Pie } from '@/components/ui/icons/ChartIcons/ChartIcon_Pie';
+import { ChartIcon_Scatter } from '@/components/ui/icons/ChartIcons/ChartIcon_Scatter';
+import { ChartIcon_StackedBar } from '@/components/ui/icons/ChartIcons/ChartIcon_StackedBar';
+import { ChartIcon_StackedBarRelative } from '@/components/ui/icons/ChartIcons/ChartIcon_StackedBarRelative';
+import { ChartIcon_StackedColumn } from '@/components/ui/icons/ChartIcons/ChartIcon_StackedColumn';
+import { ChartIcon_StackedColumnRelative } from '@/components/ui/icons/ChartIcons/ChartIcon_StackedColumnRelative';
+import { ChartIcon_Table } from '@/components/ui/icons/ChartIcons/ChartIcon_Table';
 
 export enum ChartIconType {
   COLUMN = 'column',

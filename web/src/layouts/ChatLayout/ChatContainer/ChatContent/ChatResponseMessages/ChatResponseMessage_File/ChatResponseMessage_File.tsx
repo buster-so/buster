@@ -42,6 +42,7 @@ export const ChatResponseMessage_File: React.FC<ChatResponseMessageProps> = Reac
           isCompletedStream={isCompletedStream}
           responseMessage={responseMessage}
           isSelectedFile={isSelectedFile}
+          chatId={chatId}
         />
       </Link>
     );
