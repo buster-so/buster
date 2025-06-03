@@ -10,7 +10,7 @@ const inputSchema = z.object({
     .describe('The prompt that the user submitted that will be used to extract values.'),
 });
 
-const outputSchema = z.object({
+export const generateChatTitleOutputSchema = z.object({
   title: z.string().describe('The title for the chat.'),
 });
 
@@ -30,7 +30,7 @@ const generateChatTitleExecution = async ({
 }: {
   inputData: z.infer<typeof inputSchema>;
   runtimeContext: RuntimeContext<AnalystWorkflowRuntimeContext>;
-}): Promise<z.infer<typeof outputSchema>> => {
+}): Promise<z.infer<typeof generateChatTitleOutputSchema>> => {
   const threadId = runtimeContext.get('threadId');
   const resourceId = runtimeContext.get('userId');
 
@@ -38,7 +38,7 @@ const generateChatTitleExecution = async ({
     maxSteps: 0,
     threadId: threadId,
     resourceId: resourceId,
-    output: outputSchema,
+    output: generateChatTitleOutputSchema,
   });
 
   return response.object;
@@ -48,6 +48,6 @@ export const generateChatTitleStep = createStep({
   id: 'generate-chat-title',
   description: 'This step is a single llm call to quickly generate a title for the chat.',
   inputSchema,
-  outputSchema,
+  outputSchema: generateChatTitleOutputSchema,
   execute: generateChatTitleExecution,
 });

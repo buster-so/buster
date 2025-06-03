@@ -10,7 +10,7 @@ const inputSchema = z.object({
     .describe('The prompt that the user submitted that will be used to extract values.'),
 });
 
-const outputSchema = z.object({
+export const extractValuesSearchOutputSchema = z.object({
   values: z.array(z.string()).describe('The values that the agent will search for.'),
 });
 
@@ -75,13 +75,13 @@ const extractValuesSearchStepExecution = async ({
 }: {
   inputData: z.infer<typeof inputSchema>;
   runtimeContext: RuntimeContext<AnalystWorkflowRuntimeContext>;
-}): Promise<z.infer<typeof outputSchema>> => {
+}): Promise<z.infer<typeof extractValuesSearchOutputSchema>> => {
   const threadId = runtimeContext.get('threadId');
   const resourceId = runtimeContext.get('userId');
 
   const response = await valuesAgent.generate(inputData.prompt, {
     maxSteps: 0,
-    output: outputSchema,
+    output: extractValuesSearchOutputSchema,
     threadId: threadId,
     resourceId: resourceId,
   });
@@ -93,6 +93,6 @@ export const extractValuesSearchStep = createStep({
   id: 'extract-values-search',
   description: 'This step is a single llm call to quickly extract values from the user request.',
   inputSchema,
-  outputSchema,
+  outputSchema: extractValuesSearchOutputSchema,
   execute: extractValuesSearchStepExecution,
 });

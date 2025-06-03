@@ -10,7 +10,7 @@ const inputSchema = z.object({
     .describe('The prompt that the user submitted that will be used to create the todos.'),
 });
 
-const outputSchema = z.object({
+export const createTodosOutputSchema = z.object({
   todos: z.string().describe('The todos that the agent will work on.'),
 });
 
@@ -141,13 +141,13 @@ const todoStepExecution = async ({
 }: {
   inputData: z.infer<typeof inputSchema>;
   runtimeContext: RuntimeContext<AnalystWorkflowRuntimeContext>;
-}): Promise<z.infer<typeof outputSchema>> => {
+}): Promise<z.infer<typeof createTodosOutputSchema>> => {
   const threadId = runtimeContext.get('threadId');
   const resourceId = runtimeContext.get('userId');
 
   const response = await todosAgent.generate(inputData.prompt, {
     maxSteps: 0,
-    output: outputSchema,
+    output: createTodosOutputSchema,
     threadId: threadId,
     resourceId: resourceId,
   });
@@ -159,6 +159,6 @@ export const createTodosStep = createStep({
   id: 'create-todos',
   description: 'This step is a single llm call to quickly create todos for the agent to work on.',
   inputSchema,
-  outputSchema,
+  outputSchema: createTodosOutputSchema,
   execute: todoStepExecution,
 });

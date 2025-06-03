@@ -2,7 +2,6 @@ import { Agent } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { Memory } from '@mastra/memory';
 import { PostgresStore } from '@mastra/pg';
-import { initLogger } from 'braintrust';
 import { getPermissionedDatasets } from '../../../../access-controls/src/access-controls';
 import {
   createDashboardsFileTool,
@@ -13,11 +12,6 @@ import {
   sequentialThinkingTool,
 } from '../../tools';
 import { anthropicCachedModel } from '../../utils/models/anthropic-cached';
-
-initLogger({
-  apiKey: process.env.BRAINTRUST_KEY,
-  projectName: 'Analyst Agent',
-});
 
 const DEFAULT_OPTIONS = {
   maxSteps: 18,

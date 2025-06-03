@@ -16,13 +16,14 @@ describe('Analyst Agent Integration Tests', () => {
       async (input: string) => {
         // Step 1: Generate response with analyst agent
         try {
-          const response = await analystAgent.generate(input, {
-            providerOptions: { anthropic: { cache_control: { type: 'ephemeral', ttl: '5m' } } },
-          });
+          const response = await analystAgent.stream(input, {});
 
-          await new Promise((resolve) => setTimeout(resolve, 500));
+          const result = '';
 
-          return response;
+          for await (const chunk of response.fullStream) {
+          }
+
+          return result;
         } catch (error) {
           console.error(error);
           throw error;
