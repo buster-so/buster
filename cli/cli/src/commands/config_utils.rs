@@ -2,9 +2,11 @@ use crate::error::BusterError;
 use dirs;
 use serde::{Deserialize, Serialize};
 use serde_yaml;
+use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
+use std::str::FromStr;
 use colored::*;
 use inquire::{Confirm, Password, Select, Text, PasswordDisplayMode, validator::Validation};
 
@@ -170,6 +172,60 @@ pub fn update_env_file(
         ));
     }
 
+    fs::write(target_dotenv_path, new_env_lines.join("\n")).map_err(|e| {
+        BusterError::CommandError(format!(
+            "Failed to write updated .env file to {}: {}",
+            target_dotenv_path.display(),
+            e
+        ))
+    })
+}
+
+pub fn update_arbitrary_env_vars(
+    target_dotenv_path: &Path,
+    env_vars: &[(String, String)],
+) -> Result<(), BusterError> {
+    let mut new_env_lines: Vec<String> = Vec::new();
+    let mut updated_vars: HashSet<String> = HashSet::new();
+
+    // Read existing .env file if it exists
+    if target_dotenv_path.exists() {
+        let env_content = fs::read_to_string(target_dotenv_path).map_err(|e| {
+            BusterError::CommandError(format!(
+                "Failed to read .env file at {}: {}",
+                target_dotenv_path.display(),
+                e
+            ))
+        })?;
+
+        for line in env_content.lines() {
+            let mut line_replaced = false;
+            
+            // Check if this line starts with any of our env vars
+            for (key, value) in env_vars {
+                if line.starts_with(&format!("{}=", key)) {
+                    new_env_lines.push(format!("{}=\"{}\"", key, value));
+                    updated_vars.insert(key.clone());
+                    line_replaced = true;
+                    break;
+                }
+            }
+            
+            // If no replacement was made, keep the original line
+            if !line_replaced {
+                new_env_lines.push(line.to_string());
+            }
+        }
+    }
+
+    // Add any environment variables that weren't found in the existing file
+    for (key, value) in env_vars {
+        if !updated_vars.contains(key) {
+            new_env_lines.push(format!("{}=\"{}\"", key, value));
+        }
+    }
+
+    // Write the updated content back to the file
     fs::write(target_dotenv_path, new_env_lines.join("\n")).map_err(|e| {
         BusterError::CommandError(format!(
             "Failed to write updated .env file to {}: {}",
