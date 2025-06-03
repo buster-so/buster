@@ -19,7 +19,6 @@ export const thinkAndPrepAgent = new Agent({
     sequentialThinkingTool,
     executeSqlStatementTool,
     doneTool,
-    
   },
   memory: new Memory({
     storage: new PostgresStore({

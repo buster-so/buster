@@ -1,12 +1,17 @@
 import { RuntimeContext } from '@mastra/core/runtime-context';
-import { wrapTraced } from 'braintrust';
+import { initLogger, wrapTraced } from 'braintrust';
 import { beforeAll, describe, test } from 'vitest';
 import analystWorkflow, {
   type AnalystRuntimeContext,
 } from '../../../src/workflows/analyst-workflow';
 
 describe('Analyst Workflow Integration Tests', () => {
-  beforeAll(() => {});
+  beforeAll(() => {
+    initLogger({
+      apiKey: process.env.BRAINTRUST_KEY,
+      projectName: 'ANALYST-WORKFLOW',
+    });
+  });
 
   test('should successfully execute analyst workflow with valid input', async () => {
     const testInput = {
