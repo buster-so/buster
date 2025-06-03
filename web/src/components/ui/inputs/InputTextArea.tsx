@@ -2,9 +2,10 @@
 
 import { cva, type VariantProps } from 'class-variance-authority';
 import React, { useEffect, useRef } from 'react';
-import { useMemoizedFn } from '@/hooks';
+import { useAsyncEffect, useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 import { inputVariants } from './Input';
+import { timeout } from '@/lib';
 
 const inputTextAreaVariants = inputVariants;
 
@@ -57,6 +58,8 @@ export const InputTextArea = React.forwardRef<HTMLTextAreaElement, InputTextArea
   ) => {
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
     const paddingRef = useRef<PaddingValues | null>(null);
+    const lastWidthRef = useRef<number | null>(null);
+    const resizeObserverRef = useRef<ResizeObserver | null>(null);
 
     const combinedRef = useMemoizedFn((node: HTMLTextAreaElement) => {
       textareaRef.current = node;
@@ -101,6 +104,9 @@ export const InputTextArea = React.forwardRef<HTMLTextAreaElement, InputTextArea
       const minHeight = calculateMinHeight();
       if (!minHeight) return;
 
+      // Store current scroll position to restore it after height adjustment
+      const scrollTop = textarea.scrollTop;
+
       // Temporarily set height to auto to get accurate scrollHeight
       textarea.style.height = 'auto';
 
@@ -131,6 +137,9 @@ export const InputTextArea = React.forwardRef<HTMLTextAreaElement, InputTextArea
 
       textarea.style.height = `${newHeight}px`;
       textarea.style.overflowY = newHeight >= maxHeight ? 'auto' : 'hidden';
+
+      // Restore scroll position
+      textarea.scrollTop = scrollTop;
     });
 
     const handleInput = useMemoizedFn(() => {
@@ -150,6 +159,26 @@ export const InputTextArea = React.forwardRef<HTMLTextAreaElement, InputTextArea
       props.onKeyDown?.(e);
     });
 
+    // Handle width changes that affect text wrapping
+    const handleResize = useMemoizedFn((entries: ResizeObserverEntry[]) => {
+      const entry = entries[0];
+      if (!entry) return;
+
+      const newWidth = entry.contentRect.width;
+
+      // Only adjust height if width actually changed
+      if (lastWidthRef.current !== null && Math.abs(lastWidthRef.current - newWidth) > 0.5) {
+        // Clear padding cache since width change might affect layout
+        paddingRef.current = null;
+        // Use a small delay to ensure layout is stable
+        requestAnimationFrame(() => {
+          requestAnimationFrame(adjustHeight);
+        });
+      }
+
+      lastWidthRef.current = newWidth;
+    });
+
     useEffect(() => {
       const textarea = textareaRef.current;
       if (!textarea || !autoResize) return;
@@ -159,8 +188,19 @@ export const InputTextArea = React.forwardRef<HTMLTextAreaElement, InputTextArea
         textarea.style.minHeight = `${minHeight}px`;
       }
 
-      // Set initial height
-      adjustHeight();
+      // Set initial width
+      lastWidthRef.current = textarea.getBoundingClientRect().width;
+
+      // Set initial height with a small delay to ensure layout is complete
+      requestAnimationFrame(() => {
+        requestAnimationFrame(adjustHeight);
+      });
+
+      // Set up ResizeObserver to watch for width changes
+      if (typeof ResizeObserver !== 'undefined') {
+        resizeObserverRef.current = new ResizeObserver(handleResize);
+        resizeObserverRef.current.observe(textarea);
+      }
 
       textarea.addEventListener('input', handleInput);
       window.addEventListener('resize', adjustHeight);
@@ -168,11 +208,20 @@ export const InputTextArea = React.forwardRef<HTMLTextAreaElement, InputTextArea
       return () => {
         textarea.removeEventListener('input', handleInput);
         window.removeEventListener('resize', adjustHeight);
+
+        if (resizeObserverRef.current) {
+          resizeObserverRef.current.disconnect();
+        }
       };
     }, [autoResize]);
 
     useEffect(() => {
-      if (!props.value) adjustHeight();
+      if (!props.value) {
+        // Small delay to ensure layout is stable before adjusting height
+        requestAnimationFrame(() => {
+          requestAnimationFrame(adjustHeight);
+        });
+      }
     }, [props.value]);
 
     return (
