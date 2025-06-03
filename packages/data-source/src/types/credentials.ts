@@ -4,7 +4,7 @@
 export enum DataSourceType {
   Snowflake = 'snowflake',
   BigQuery = 'bigquery',
-  PostgreSQL = 'postgresql',
+  PostgreSQL = 'postgres',
   MySQL = 'mysql',
   SQLServer = 'sqlserver',
   Redshift = 'redshift',

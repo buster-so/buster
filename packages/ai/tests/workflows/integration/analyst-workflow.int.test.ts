@@ -1,6 +1,6 @@
 import { RuntimeContext } from '@mastra/core/runtime-context';
 import { initLogger, wrapTraced } from 'braintrust';
-import { beforeAll, describe, test } from 'vitest';
+import { afterAll, beforeAll, describe, test } from 'vitest';
 import analystWorkflow, {
   type AnalystRuntimeContext,
 } from '../../../src/workflows/analyst-workflow';
@@ -19,14 +19,17 @@ describe('Analyst Workflow Integration Tests', () => {
     };
 
     const runtimeContext = new RuntimeContext<AnalystRuntimeContext>([
-      ['userId', 'test-user-123'],
-      ['threadId', 'test-thread-456'],
+      ['userId', 'c2dd64cd-f7f3-4884-bc91-d46ae431901e'],
+      ['threadId', 'c2dd64cd-f7f3-4884-bc91-d46ae431901e'],
+      ['organizationId', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce'],
+      ['dataSourceId', 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a'],
+      ['dataSourceSyntax', 'postgresql'],
     ]);
 
     const tracedWorkflow = wrapTraced(
       async () => {
         const run = analystWorkflow.createRun();
-        return await run.stream({
+        return await run.start({
           inputData: testInput,
           runtimeContext,
         });
@@ -35,9 +38,10 @@ describe('Analyst Workflow Integration Tests', () => {
     );
 
     const result = await tracedWorkflow();
-
-    for await (const event of result.stream) {
-      console.log(event);
-    }
+    console.log(result);
   }, 0);
+
+  afterAll(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  });
 });

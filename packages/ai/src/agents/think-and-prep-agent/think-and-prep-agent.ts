@@ -2,6 +2,7 @@ import { Agent } from '@mastra/core';
 import { Memory } from '@mastra/memory';
 import { PostgresStore } from '@mastra/pg';
 import { doneTool, executeSqlStatementTool, sequentialThinkingTool } from '../../tools';
+import submitThoughtsTool from '../../tools/communication-tools/submit-thoughts-tool';
 import { anthropicCachedModel } from '../../utils/models/anthropic-cached';
 import { getThinkAndPrepInstructions } from './think-and-prep-instructions';
 
@@ -19,6 +20,7 @@ export const thinkAndPrepAgent = new Agent({
     sequentialThinkingTool,
     executeSqlStatementTool,
     doneTool,
+    submitThoughtsTool,
   },
   memory: new Memory({
     storage: new PostgresStore({

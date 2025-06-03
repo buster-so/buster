@@ -162,12 +162,9 @@ async function executeSingleStatement(
       return { success: false, error: 'SQL statement cannot be empty' };
     }
 
-    // Add automatic LIMIT to ensure we don't return too many results
-    const limitedSql = addLimitToQuery(sqlStatement, 25);
-
     // Execute the SQL query using the DataSource
     const result = await dataSource.execute({
-      sql: limitedSql,
+      sql: sqlStatement,
     });
 
     if (result.success) {
@@ -186,18 +183,6 @@ async function executeSingleStatement(
       error: error instanceof Error ? error.message : 'SQL execution failed',
     };
   }
-}
-
-function addLimitToQuery(sql: string, limit: number): string {
-  const trimmedSql = sql.trim();
-
-  // Check if query already has a LIMIT clause (case-insensitive)
-  if (trimmedSql.toLowerCase().includes('limit')) {
-    return trimmedSql;
-  }
-
-  // Add LIMIT clause
-  return `${trimmedSql} LIMIT ${limit}`;
 }
 
 // Export the tool

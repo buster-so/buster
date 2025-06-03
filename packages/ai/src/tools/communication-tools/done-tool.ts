@@ -41,9 +41,7 @@ export const doneTool = createTool({
     "Marks all remaining unfinished tasks as complete, sends a final response to the user, and ends the workflow. Use this when the workflow is finished. This must be in markdown format and not use the '•' bullet character.",
   inputSchema: doneInputSchema,
   outputSchema: doneOutputSchema,
-  execute: async () => {
-    return await executeDone();
-  },
+  execute: executeDone,
 });
 
 export default doneTool;
