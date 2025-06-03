@@ -56,7 +56,6 @@ export const BusterResizeableGrid: React.FC<{
   }) => {
     const [rows, setRows] = useState<BusterResizeableGridRow[]>(() => newRowPreflight(serverRows));
     const styleRef = useRef<HTMLStyleElement>(undefined);
-    console.log(rows, serverRows);
 
     const onRowLayoutChangePreflight = useMemoizedFn((newLayout: BusterResizeableGridRow[]) => {
       const filteredRows = newRowPreflight(newLayout);

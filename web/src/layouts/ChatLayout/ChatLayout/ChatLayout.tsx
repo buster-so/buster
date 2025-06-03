@@ -34,6 +34,13 @@ export const ChatLayout: React.FC<ChatSplitterProps> = ({ children }) => {
     return ['380px', 'auto'];
   }, [selectedLayout]);
 
+  const autoSaveId = useMemo(() => {
+    if (selectedLayout === 'chat-only') return 'chat-splitter-chat-only';
+    if (selectedLayout === 'file-only') return 'chat-splitter-file-only';
+    if (selectedLayout === 'chat-hidden') return 'chat-splitter-chat-hidden';
+    return 'chat-splitter';
+  }, [selectedLayout]);
+
   useMount(() => {
     setMounted(true); //we need to wait for the app splitter to be mounted because this is nested in the app splitter
   });
@@ -55,8 +62,6 @@ export const ChatLayout: React.FC<ChatSplitterProps> = ({ children }) => {
     }
   );
 
-  console.log(defaultSplitterLayout);
-
   return (
     <ChatLayoutContextProvider chatLayoutProps={chatLayoutProps}>
       <ChatContextProvider>
@@ -67,7 +72,7 @@ export const ChatLayout: React.FC<ChatSplitterProps> = ({ children }) => {
             () => mounted && <FileContainer>{children}</FileContainer>,
             [children, mounted]
           )}
-          autoSaveId="chat-splitter"
+          autoSaveId={autoSaveId}
           defaultLayout={defaultSplitterLayout}
           allowResize={selectedLayout === 'both'}
           preserveSide="left"

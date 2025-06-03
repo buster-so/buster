@@ -2,7 +2,6 @@ export const createAutoSaveId = (id: string) => `app-splitter-${id}`;
 
 // Helper function to convert size values to pixels
 export const sizeToPixels = (size: string | number, containerSize: number): number => {
-  console.log(size, containerSize);
   if (typeof size === 'number') {
     return size;
   }

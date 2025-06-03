@@ -299,7 +299,6 @@ export const BusterResizeColumnsSplitPanes: React.FC<BusterResizeColumnsSplitPan
       }
 
       // Finalize the change with snapped values
-      console.log('onChangeRef', snappedColumnSpans);
       onChangeRef.current?.(snappedColumnSpans);
       onDragEndRef.current?.(event);
 
