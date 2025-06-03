@@ -2,7 +2,7 @@ import { RuntimeContext } from '@mastra/core/runtime-context';
 import { wrapTraced } from 'braintrust';
 import { beforeAll, describe, test } from 'vitest';
 import analystWorkflow, {
-  type AnalystWorkflowRuntimeContext,
+  type AnalystRuntimeContext,
 } from '../../../src/workflows/analyst-workflow';
 
 describe('Analyst Workflow Integration Tests', () => {
@@ -13,7 +13,7 @@ describe('Analyst Workflow Integration Tests', () => {
       prompt: 'Analyze the quarterly sales data and create action items for improving performance',
     };
 
-    const runtimeContext = new RuntimeContext<AnalystWorkflowRuntimeContext>([
+    const runtimeContext = new RuntimeContext<AnalystRuntimeContext>([
       ['userId', 'test-user-123'],
       ['threadId', 'test-thread-456'],
     ]);

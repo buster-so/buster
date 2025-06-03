@@ -3,12 +3,12 @@ import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { z } from 'zod';
 import { thinkAndPrepAgent } from '../agents/think-and-prep-agent/think-and-prep-agent';
 import type {
-  AnalystWorkflowRuntimeContext,
+  AnalystRuntimeContext,
   thinkAndPrepWorkflowInputSchema,
 } from '../workflows/analyst-workflow';
-import { createTodosOutputSchema } from './create-todos';
-import { extractValuesSearchOutputSchema } from './extract-values-search';
-import { generateChatTitleOutputSchema } from './generate-chat-title';
+import { createTodosOutputSchema } from './create-todos-step';
+import { extractValuesSearchOutputSchema } from './extract-values-search-step';
+import { generateChatTitleOutputSchema } from './generate-chat-title-step';
 
 const inputSchema = z.object({
   'create-todos': createTodosOutputSchema,
@@ -28,7 +28,7 @@ const thinkAndPrepExecution = async ({
 }: {
   inputData: z.infer<typeof inputSchema>;
   getInitData: () => Promise<z.infer<typeof thinkAndPrepWorkflowInputSchema>>;
-  runtimeContext: RuntimeContext<AnalystWorkflowRuntimeContext>;
+  runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof outputSchema>> => {
   const threadId = runtimeContext.get('threadId');
   const resourceId = runtimeContext.get('userId');

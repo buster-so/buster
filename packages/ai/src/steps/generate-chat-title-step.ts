@@ -2,7 +2,7 @@ import { Agent, createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { z } from 'zod';
 import { anthropicCachedModel } from '../utils/models/anthropic-cached';
-import type { AnalystWorkflowRuntimeContext } from '../workflows/analyst-workflow';
+import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
 
 const inputSchema = z.object({
   prompt: z
@@ -29,7 +29,7 @@ const generateChatTitleExecution = async ({
   runtimeContext,
 }: {
   inputData: z.infer<typeof inputSchema>;
-  runtimeContext: RuntimeContext<AnalystWorkflowRuntimeContext>;
+  runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof generateChatTitleOutputSchema>> => {
   const threadId = runtimeContext.get('threadId');
   const resourceId = runtimeContext.get('userId');

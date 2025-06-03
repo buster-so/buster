@@ -3,7 +3,7 @@ import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { z } from 'zod';
 import { analystAgent } from '../agents/analyst-agent/analyst-agent';
 import type {
-  AnalystWorkflowRuntimeContext,
+  AnalystRuntimeContext,
   thinkAndPrepWorkflowInputSchema,
 } from '../workflows/analyst-workflow';
 
@@ -19,7 +19,7 @@ const analystExecution = async ({
 }: {
   inputData: z.infer<typeof inputSchema>;
   getInitData: () => Promise<z.infer<typeof thinkAndPrepWorkflowInputSchema>>;
-  runtimeContext: RuntimeContext<AnalystWorkflowRuntimeContext>;
+  runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof outputSchema>> => {
   const userId = runtimeContext.get('userId');
   const sessionId = runtimeContext.get('threadId');

@@ -1,6 +1,11 @@
+import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
+import { sql } from 'drizzle-orm';
 import { z } from 'zod';
+import { DataSource } from '../../../../data-source/src/data-source';
+import type { Credentials } from '../../../../data-source/src/types/credentials';
+import { db } from '../../../../database/src/connection';
 
 const executeSqlStatementInputSchema = z.object({
   statements: z
@@ -28,11 +33,172 @@ const executeSqlStatementOutputSchema = z.object({
 });
 
 const executeSqlStatement = wrapTraced(
-  async (): Promise<z.infer<typeof executeSqlStatementOutputSchema>> => {
-    return await executeSqlStatement();
+  async (
+    params: z.infer<typeof executeSqlStatementInputSchema>,
+    runtimeContext: RuntimeContext
+  ): Promise<z.infer<typeof executeSqlStatementOutputSchema>> => {
+    const { statements } = params;
+
+    // Extract context values
+    const dataSourceId = runtimeContext?.get('dataSourceId') as string;
+    const userId = runtimeContext?.get('userId') as string;
+    const organizationId = runtimeContext?.get('organizationId') as string;
+
+    if (!dataSourceId) {
+      throw new Error('Data source ID not found in runtime context');
+    }
+    if (!userId) {
+      throw new Error('User ID not found in runtime context');
+    }
+    if (!organizationId) {
+      throw new Error('Organization ID not found in runtime context');
+    }
+
+    // Get data source credentials from vault
+    let dataSource: DataSource;
+    try {
+      const credentials = await getDataSourceCredentials(dataSourceId);
+      dataSource = new DataSource({
+        dataSources: [
+          {
+            name: `datasource-${dataSourceId}`,
+            type: credentials.type as any,
+            credentials: credentials,
+          },
+        ],
+        defaultDataSource: `datasource-${dataSourceId}`,
+      });
+    } catch (error) {
+      // If we can't get credentials, return error for all statements
+      return {
+        results: statements.map((sql) => ({
+          status: 'error' as const,
+          sql,
+          error_message: `Failed to initialize data source: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        })),
+      };
+    }
+
+    try {
+      // Execute all SQL statements concurrently
+      const executionResults = await Promise.allSettled(
+        statements.map(async (sqlStatement) => {
+          const result = await executeSingleStatement(sqlStatement, dataSource);
+          return { sql: sqlStatement, result };
+        })
+      );
+
+      // Process results and format according to output schema
+      const results = executionResults.map((executionResult, index) => {
+        const sql = statements[index]!; // We know this exists since we're mapping over statements
+
+        if (executionResult.status === 'fulfilled') {
+          const { result } = executionResult.value;
+          if (result.success) {
+            return {
+              status: 'success' as const,
+              sql,
+              results: result.data || [],
+            };
+          }
+          return {
+            status: 'error' as const,
+            sql,
+            error_message: result.error || 'Unknown error occurred',
+          };
+        }
+        return {
+          status: 'error' as const,
+          sql,
+          error_message: executionResult.reason?.message || 'Execution failed',
+        };
+      });
+
+      return { results };
+    } finally {
+      // Always close the data source connection
+      await dataSource.close();
+    }
   },
   { name: 'execute-sql-statement' }
 );
+
+async function getDataSourceCredentials(dataSourceId: string): Promise<Credentials> {
+  try {
+    // Query the vault to get the credentials
+    const secretResult = await db.execute(
+      sql`SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = ${dataSourceId} LIMIT 1`
+    );
+
+    if (!secretResult || secretResult.length === 0) {
+      throw new Error(`No credentials found for data source: ${dataSourceId}`);
+    }
+
+    const secretString = secretResult[0]?.decrypted_secret as string;
+    if (!secretString) {
+      throw new Error(`Invalid credentials data for data source: ${dataSourceId}`);
+    }
+
+    // Parse the credentials JSON
+    const credentials = JSON.parse(secretString) as Credentials;
+    return credentials;
+  } catch (error) {
+    throw new Error(
+      `Failed to fetch data source credentials: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+}
+
+async function executeSingleStatement(
+  sqlStatement: string,
+  dataSource: DataSource
+): Promise<{
+  success: boolean;
+  data?: Record<string, any>[];
+  error?: string;
+}> {
+  try {
+    if (!sqlStatement.trim()) {
+      return { success: false, error: 'SQL statement cannot be empty' };
+    }
+
+    // Add automatic LIMIT to ensure we don't return too many results
+    const limitedSql = addLimitToQuery(sqlStatement, 25);
+
+    // Execute the SQL query using the DataSource
+    const result = await dataSource.execute({
+      sql: limitedSql,
+    });
+
+    if (result.success) {
+      return {
+        success: true,
+        data: result.rows,
+      };
+    }
+    return {
+      success: false,
+      error: result.error?.message || 'Query execution failed',
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'SQL execution failed',
+    };
+  }
+}
+
+function addLimitToQuery(sql: string, limit: number): string {
+  const trimmedSql = sql.trim();
+
+  // Check if query already has a LIMIT clause (case-insensitive)
+  if (trimmedSql.toLowerCase().includes('limit')) {
+    return trimmedSql;
+  }
+
+  // Add LIMIT clause
+  return `${trimmedSql} LIMIT ${limit}`;
+}
 
 // Export the tool
 export const executeSqlStatementTool = createTool({
@@ -41,8 +207,11 @@ export const executeSqlStatementTool = createTool({
     'Use this to run lightweight, validation queries to understand values in columns, date ranges, etc. Will only ever return 25 results max',
   inputSchema: executeSqlStatementInputSchema,
   outputSchema: executeSqlStatementOutputSchema,
-  execute: async () => {
-    return await executeSqlStatement();
+  execute: async ({ context, runtimeContext }) => {
+    return await executeSqlStatement(
+      context as z.infer<typeof executeSqlStatementInputSchema>,
+      runtimeContext
+    );
   },
 });
 

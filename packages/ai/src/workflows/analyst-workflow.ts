@@ -1,12 +1,12 @@
 import { createWorkflow } from '@mastra/core';
 import { z } from 'zod';
 import { analystStep } from '../steps/analyst-step';
-import { createTodosStep } from '../steps/create-todos';
-import { extractValuesSearchStep } from '../steps/extract-values-search';
-import { generateChatTitleStep } from '../steps/generate-chat-title';
+import { createTodosStep } from '../steps/create-todos-step';
+import { extractValuesSearchStep } from '../steps/extract-values-search-step';
+import { generateChatTitleStep } from '../steps/generate-chat-title-step';
 import { thinkAndPrepStep } from '../steps/think-and-prep-step';
 
-export interface AnalystWorkflowRuntimeContext {
+export interface AnalystRuntimeContext {
   userId: string;
   threadId: string;
   dataSourceId: string;
