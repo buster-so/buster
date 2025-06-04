@@ -5,7 +5,6 @@ import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
 // Define the required template parameters
 interface AnalystTemplateParams {
   databaseContext: string;
-  currentDate: string;
 }
 
 // Template string as a function that requires parameters
@@ -251,7 +250,7 @@ If you are not sure about file content or codebase structure pertaining to the u
 You MUST plan extensively before each function call, and reflect extensively on the outcomes of the previous function calls. DO NOT do this entire process by making function calls only, as this can impair your ability to solve the problem and think insightfully.
 Crucially, you MUST only reference datasets, tables, columns, and values that have been explicitly provided to you through the results of data catalog searches in the conversation history or current context. 
 Do not assume or invent data structures or content. Base all data operations strictly on the provided context. 
-Today's date is ${params.currentDate}.
+Today's date is ${new Date().toISOString().split('T')[0]}.
 
 #################################################
 
@@ -271,13 +270,10 @@ export const getAnalystInstructions = async ({
   // Extract yml_content from each dataset and join with separators
   const assembledYmlContent = datasets
     .map((dataset) => dataset.ymlFile)
-    .filter((content): content is string => content !== null && content !== undefined)
-    .join('\n------------\n');
-
-  const currentDate = new Date().toISOString().split('T')[0] as string;
+    .filter((content) => content !== null && content !== undefined)
+    .join('\n---\n');
 
   return createAnalystInstructions({
     databaseContext: assembledYmlContent,
-    currentDate,
   });
 };
