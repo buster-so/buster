@@ -1,5 +1,6 @@
 import { createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
+import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { analystAgent } from '../agents/analyst-agent/analyst-agent';
 import type {
@@ -10,8 +11,6 @@ import type {
 const inputSchema = z.object({});
 
 const outputSchema = z.object({});
-
-const abortSignal = new AbortController();
 
 const analystExecution = async ({
   getInitData,
@@ -27,21 +26,24 @@ const analystExecution = async ({
   const initData = await getInitData();
   const prompt = initData.prompt;
 
-  try {
-    await analystAgent.generate(prompt, {
-      maxSteps: 15,
-      threadId: sessionId,
-      resourceId: userId,
-      runtimeContext,
-      abortSignal: abortSignal.signal,
-      onStepFinish: (step) => {
-        if (step.toolResults.some((result) => result.toolName === 'done')) {
-          abortSignal.abort();
-        }
-      },
-    });
-  } catch (error) {
-    if (error instanceof AbortSignal) {
+  const wrappedStream = wrapTraced(
+    async () => {
+      const stream = await analystAgent.stream(prompt, {
+        threadId: sessionId,
+        resourceId: userId,
+        runtimeContext,
+      });
+
+      return stream;
+    },
+    {
+      name: 'Analyst',
+    }
+  );
+
+  const stream = await wrappedStream();
+  for await (const chunk of stream.fullStream) {
+    if (chunk.type === 'tool-result' && chunk.toolName === 'doneTool') {
       return {};
     }
   }

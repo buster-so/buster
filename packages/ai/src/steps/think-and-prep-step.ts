@@ -1,5 +1,6 @@
 import { createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
+import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { thinkAndPrepAgent } from '../agents/think-and-prep-agent/think-and-prep-agent';
 import type {
@@ -19,8 +20,6 @@ const inputSchema = z.object({
 export const thinkAndPrepOutputSchema = z.object({});
 
 const outputSchema = z.object({});
-
-const abortSignal = new AbortController();
 
 const thinkAndPrepExecution = async ({
   inputData,
@@ -42,21 +41,25 @@ const thinkAndPrepExecution = async ({
 
   runtimeContext.set('todos', todos);
 
-  try {
-    await thinkAndPrepAgent.generate(prompt, {
-      maxSteps: 15,
-      threadId: threadId,
-      resourceId: resourceId,
-      runtimeContext,
-      abortSignal: abortSignal.signal,
-      onStepFinish: (step) => {
-        if (step.toolResults.some((result) => result.toolName === 'submit-thoughts')) {
-          abortSignal.abort();
-        }
-      },
-    });
-  } catch (error) {
-    if (error instanceof AbortSignal) {
+  const wrappedStream = wrapTraced(
+    async () => {
+      const stream = await thinkAndPrepAgent.stream(prompt, {
+        threadId: threadId,
+        resourceId: resourceId,
+        runtimeContext,
+      });
+
+      return stream;
+    },
+    {
+      name: 'Think and Prep',
+    }
+  );
+
+  const stream = await wrappedStream();
+
+  for await (const chunk of stream.fullStream) {
+    if (chunk.type === 'tool-result' && chunk.toolName === 'submitThoughtsTool') {
       return {};
     }
   }
