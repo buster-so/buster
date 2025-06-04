@@ -2,19 +2,14 @@ import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { getPermissionedDatasets } from '../../../../access-controls/src/access-controls';
 import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
 
-export const getAnalystInstructions = async ({
-  runtimeContext,
-}: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }) => {
-  const datasets = await getPermissionedDatasets(runtimeContext.get('userId'), 0, 1000);
+// Define the required template parameters
+interface AnalystTemplateParams {
+  databaseContext: string;
+  currentDate: string;
+}
 
-  const datasetContext = datasets
-    .map(
-      (dataset) => `
-    ${dataset.ymlFile}
-  `
-    )
-    .join('\n------------\n');
-
+// Template string as a function that requires parameters
+const createAnalystInstructions = (params: AnalystTemplateParams): string => {
   return `
 You are a specialized AI agent within an AI-powered data analyst system.
 
@@ -256,13 +251,33 @@ If you are not sure about file content or codebase structure pertaining to the u
 You MUST plan extensively before each function call, and reflect extensively on the outcomes of the previous function calls. DO NOT do this entire process by making function calls only, as this can impair your ability to solve the problem and think insightfully.
 Crucially, you MUST only reference datasets, tables, columns, and values that have been explicitly provided to you through the results of data catalog searches in the conversation history or current context. 
 Do not assume or invent data structures or content. Base all data operations strictly on the provided context. 
-Today's date is ${new Date().toISOString().split('T')[0]}.
-
+Today's date is ${params.currentDate}.
 
 #################################################
 
 <relevant_data_context>
-${datasetContext}
+${params.databaseContext}
 </relevant_data_context>
 `;
+};
+
+export const getAnalystInstructions = async ({
+  runtimeContext,
+}: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }): Promise<string> => {
+  const userId = runtimeContext.get('userId');
+
+  const datasets = await getPermissionedDatasets(userId, 0, 1000);
+
+  // Extract yml_content from each dataset and join with separators
+  const assembledYmlContent = datasets
+    .map((dataset) => dataset.ymlFile)
+    .filter((content): content is string => content !== null && content !== undefined)
+    .join('\n------------\n');
+
+  const currentDate = new Date().toISOString().split('T')[0] as string;
+
+  return createAnalystInstructions({
+    databaseContext: assembledYmlContent,
+    currentDate,
+  });
 };
