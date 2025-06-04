@@ -313,9 +313,9 @@ Start by using the \`sequential_thinking\` to immediately start checking off ite
 
 --------------
 
-<DATABASE CONTEXT>
+<DATABASE_CONTEXT>
 ${params.databaseContext}
-</DATABASE CONTEXT>
+</DATABASE_CONTEXT>
 `;
 };
 
