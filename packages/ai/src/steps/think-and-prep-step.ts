@@ -23,8 +23,6 @@ const outputSchema = z.object({
   finished: z.boolean(),
 });
 
-const abortController = new AbortController();
-
 const thinkAndPrepExecution = async ({
   inputData,
   getInitData,
@@ -34,6 +32,8 @@ const thinkAndPrepExecution = async ({
   getInitData: () => Promise<z.infer<typeof thinkAndPrepWorkflowInputSchema>>;
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof outputSchema>> => {
+  const abortController = new AbortController();
+
   const threadId = runtimeContext.get('threadId');
   const resourceId = runtimeContext.get('userId');
 

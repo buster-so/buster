@@ -14,8 +14,6 @@ const inputSchema = z.object({
 
 const outputSchema = z.object({});
 
-const abortController = new AbortController();
-
 const analystExecution = async ({
   getInitData,
   runtimeContext,
@@ -24,6 +22,8 @@ const analystExecution = async ({
   getInitData: () => Promise<z.infer<typeof thinkAndPrepWorkflowInputSchema>>;
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof outputSchema>> => {
+  const abortController = new AbortController();
+
   const userId = runtimeContext.get('userId');
   const sessionId = runtimeContext.get('threadId');
 
