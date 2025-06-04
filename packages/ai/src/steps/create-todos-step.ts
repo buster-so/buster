@@ -130,15 +130,16 @@ The TODO list should break down each aspect of the user request into tasks, base
 ---
 `;
 
-const DefaultOptions = {
+const DEFAULT_OPTIONS = {
   maxSteps: 0,
-  output: createTodosOutputSchema,
 };
 
 export const todosAgent = new Agent({
   name: 'Create Todos',
   instructions: todosInstructions,
   model: wrapAISDKModel(anthropicCachedModel('claude-sonnet-4-20250514')),
+  defaultGenerateOptions: DEFAULT_OPTIONS,
+  defaultStreamOptions: DEFAULT_OPTIONS,
 });
 
 const todoStepExecution = async ({
@@ -154,7 +155,7 @@ const todoStepExecution = async ({
   const response = await todosAgent.generate(inputData.prompt, {
     threadId: threadId,
     resourceId: resourceId,
-    ...DefaultOptions,
+    output: createTodosOutputSchema,
   });
 
   return response.object;
