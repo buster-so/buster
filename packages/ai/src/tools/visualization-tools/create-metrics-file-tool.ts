@@ -60,7 +60,7 @@ const y2AxisConfigSchema = z.object({
 });
 
 const xAxisConfigSchema = z.object({
-  xAxisTimeInterval: z.enum(['day', 'week', 'month', 'quarter', 'year']).optional(),
+  xAxisTimeInterval: z.enum(['day', 'week', 'month', 'quarter', 'year', 'null']).optional(),
   xAxisShowAxisLabel: z.boolean().optional(),
   xAxisShowAxisTitle: z.boolean().optional(),
   xAxisAxisTitle: z.string().nullable().optional(),
