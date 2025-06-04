@@ -21,6 +21,8 @@ export const thinkAndPrepOutputSchema = z.object({});
 
 const outputSchema = z.object({});
 
+const abortController = new AbortController();
+
 const thinkAndPrepExecution = async ({
   inputData,
   getInitData,
@@ -47,6 +49,8 @@ const thinkAndPrepExecution = async ({
         threadId: threadId,
         resourceId: resourceId,
         runtimeContext,
+        abortSignal: abortController.signal,
+        toolChoice: 'required',
       });
 
       return stream;
@@ -60,6 +64,7 @@ const thinkAndPrepExecution = async ({
 
   for await (const chunk of stream.fullStream) {
     if (chunk.type === 'tool-result' && chunk.toolName === 'submitThoughtsTool') {
+      abortController.abort();
       return {};
     }
   }

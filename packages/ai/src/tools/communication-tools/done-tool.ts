@@ -12,18 +12,13 @@ const doneInputSchema = z.object({
     ),
 });
 
-const doneOutputSchema = z.object({
-  success: z.boolean(),
-  todos: z.string(),
-});
+const doneOutputSchema = z.object({});
+
 // Process done tool execution with todo management
 async function processDone(): Promise<z.infer<typeof doneOutputSchema>> {
   // This tool signals the end of the workflow and provides the final response.
   // The actual agent termination logic resides elsewhere.
-  return {
-    success: true,
-    todos: 'DONE WITH ALL TODOS',
-  };
+  return {};
 }
 
 // Main done function with tracing

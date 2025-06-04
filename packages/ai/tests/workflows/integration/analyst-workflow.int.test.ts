@@ -14,7 +14,7 @@ describe('Analyst Workflow Integration Tests', () => {
   });
 
   afterAll(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    await new Promise((resolve) => setTimeout(resolve, 10000));
   });
 
   test('should successfully execute analyst workflow with valid input', async () => {

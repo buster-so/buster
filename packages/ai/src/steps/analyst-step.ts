@@ -12,6 +12,8 @@ const inputSchema = z.object({});
 
 const outputSchema = z.object({});
 
+const abortController = new AbortController();
+
 const analystExecution = async ({
   getInitData,
   runtimeContext,
@@ -32,6 +34,8 @@ const analystExecution = async ({
         threadId: sessionId,
         resourceId: userId,
         runtimeContext,
+        toolChoice: 'required',
+        abortSignal: abortController.signal,
       });
 
       return stream;
@@ -44,6 +48,7 @@ const analystExecution = async ({
   const stream = await wrappedStream();
   for await (const chunk of stream.fullStream) {
     if (chunk.type === 'tool-result' && chunk.toolName === 'doneTool') {
+      abortController.abort();
       return {};
     }
   }
