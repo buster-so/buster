@@ -1,6 +1,5 @@
 import type { DatabaseAdapter } from '@/adapters/base';
 import { BigQueryIntrospector } from '@/introspection/bigquery';
-import { DatabricksIntrospector } from '@/introspection/databricks';
 import { MySQLIntrospector } from '@/introspection/mysql';
 import { PostgreSQLIntrospector } from '@/introspection/postgresql';
 import { RedshiftIntrospector } from '@/introspection/redshift';
@@ -21,7 +20,6 @@ describe('Introspector Empty Filter Validation', () => {
     { name: 'BigQuery', introspector: new BigQueryIntrospector('test', mockAdapter) },
     { name: 'SQL Server', introspector: new SQLServerIntrospector('test', mockAdapter) },
     { name: 'Redshift', introspector: new RedshiftIntrospector('test', mockAdapter) },
-    { name: 'Databricks', introspector: new DatabricksIntrospector('test', mockAdapter) },
   ];
 
   introspectors.forEach(({ name, introspector }) => {

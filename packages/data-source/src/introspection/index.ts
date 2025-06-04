@@ -9,4 +9,3 @@ export { MySQLIntrospector } from './mysql';
 export { BigQueryIntrospector } from './bigquery';
 export { SQLServerIntrospector } from './sqlserver';
 export { RedshiftIntrospector } from './redshift';
-export { DatabricksIntrospector } from './databricks';

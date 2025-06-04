@@ -8,7 +8,6 @@ import { DataSourceType } from '../../../src/types/credentials';
 import type {
   BigQueryCredentials,
   Credentials,
-  DatabricksCredentials,
   MySQLCredentials,
   PostgreSQLCredentials,
   RedshiftCredentials,
@@ -108,18 +107,6 @@ describe('Adapter Factory', () => {
       expect(adapter.getDataSourceType()).toBe(DataSourceType.Redshift);
     });
 
-    it('should create DatabricksAdapter for Databricks credentials', () => {
-      const credentials: DatabricksCredentials = {
-        type: DataSourceType.Databricks,
-        server_hostname: 'test.cloud.databricks.com',
-        http_path: '/sql/1.0/warehouses/test',
-        access_token: 'test-token',
-      };
-
-      const adapter = createAdapterInstance(credentials);
-      expect(adapter.getDataSourceType()).toBe(DataSourceType.Databricks);
-    });
-
     it('should throw error for unsupported data source type', () => {
       const credentials: UnsupportedCredentials = {
         type: 'unsupported',
@@ -145,7 +132,6 @@ describe('Adapter Factory', () => {
       expect(supportedTypes).toContain(DataSourceType.MySQL);
       expect(supportedTypes).toContain(DataSourceType.SQLServer);
       expect(supportedTypes).toContain(DataSourceType.Redshift);
-      expect(supportedTypes).toContain(DataSourceType.Databricks);
     });
   });
 
@@ -157,7 +143,6 @@ describe('Adapter Factory', () => {
       expect(isSupported(DataSourceType.MySQL)).toBe(true);
       expect(isSupported(DataSourceType.SQLServer)).toBe(true);
       expect(isSupported(DataSourceType.Redshift)).toBe(true);
-      expect(isSupported(DataSourceType.Databricks)).toBe(true);
     });
 
     it('should return false for unsupported data source types', () => {

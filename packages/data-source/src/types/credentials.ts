@@ -8,7 +8,6 @@ export enum DataSourceType {
   MySQL = 'mysql',
   SQLServer = 'sqlserver',
   Redshift = 'redshift',
-  Databricks = 'databricks',
 }
 
 /**
@@ -219,32 +218,6 @@ export interface RedshiftCredentials {
 }
 
 /**
- * Databricks credentials interface
- */
-export interface DatabricksCredentials {
-  /** Data source type */
-  type: DataSourceType.Databricks;
-
-  /** Databricks server hostname */
-  server_hostname: string;
-
-  /** HTTP path for the cluster or SQL warehouse */
-  http_path: string;
-
-  /** Personal access token for authentication */
-  access_token: string;
-
-  /** Default catalog to use */
-  catalog?: string;
-
-  /** Default schema to use */
-  schema?: string;
-
-  /** Connection timeout in milliseconds */
-  connection_timeout?: number;
-}
-
-/**
  * Union type for all supported credential types
  */
 export type Credentials =
@@ -253,8 +226,7 @@ export type Credentials =
   | PostgreSQLCredentials
   | MySQLCredentials
   | SQLServerCredentials
-  | RedshiftCredentials
-  | DatabricksCredentials;
+  | RedshiftCredentials;
 
 /**
  * Type guard to check if credentials are for Snowflake
@@ -306,15 +278,6 @@ export function isRedshiftCredentials(
   credentials: Credentials
 ): credentials is RedshiftCredentials {
   return credentials.type === DataSourceType.Redshift;
-}
-
-/**
- * Type guard to check if credentials are for Databricks
- */
-export function isDatabricksCredentials(
-  credentials: Credentials
-): credentials is DatabricksCredentials {
-  return credentials.type === DataSourceType.Databricks;
 }
 
 /**

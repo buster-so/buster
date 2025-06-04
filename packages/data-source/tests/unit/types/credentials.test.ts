@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import {
   DataSourceType,
   isBigQueryCredentials,
-  isDatabricksCredentials,
   isMySQLCredentials,
   isPostgreSQLCredentials,
   isRedshiftCredentials,
@@ -11,7 +10,6 @@ import {
 } from '../../../src/types/credentials';
 import type {
   BigQueryCredentials,
-  DatabricksCredentials,
   MySQLCredentials,
   PostgreSQLCredentials,
   RedshiftCredentials,
@@ -71,13 +69,6 @@ describe('Credential Type Guards', () => {
     password: 'pass',
   };
 
-  const databricksCredentials: DatabricksCredentials = {
-    type: DataSourceType.Databricks,
-    server_hostname: 'test.cloud.databricks.com',
-    http_path: '/sql/1.0/warehouses/test',
-    access_token: 'test-token',
-  };
-
   describe('isSnowflakeCredentials', () => {
     it('should return true for Snowflake credentials', () => {
       expect(isSnowflakeCredentials(snowflakeCredentials)).toBe(true);
@@ -89,7 +80,6 @@ describe('Credential Type Guards', () => {
       expect(isSnowflakeCredentials(mysqlCredentials)).toBe(false);
       expect(isSnowflakeCredentials(sqlserverCredentials)).toBe(false);
       expect(isSnowflakeCredentials(redshiftCredentials)).toBe(false);
-      expect(isSnowflakeCredentials(databricksCredentials)).toBe(false);
     });
   });
 
@@ -104,7 +94,6 @@ describe('Credential Type Guards', () => {
       expect(isBigQueryCredentials(mysqlCredentials)).toBe(false);
       expect(isBigQueryCredentials(sqlserverCredentials)).toBe(false);
       expect(isBigQueryCredentials(redshiftCredentials)).toBe(false);
-      expect(isBigQueryCredentials(databricksCredentials)).toBe(false);
     });
   });
 
@@ -119,7 +108,6 @@ describe('Credential Type Guards', () => {
       expect(isPostgreSQLCredentials(mysqlCredentials)).toBe(false);
       expect(isPostgreSQLCredentials(sqlserverCredentials)).toBe(false);
       expect(isPostgreSQLCredentials(redshiftCredentials)).toBe(false);
-      expect(isPostgreSQLCredentials(databricksCredentials)).toBe(false);
     });
   });
 
@@ -134,7 +122,6 @@ describe('Credential Type Guards', () => {
       expect(isMySQLCredentials(postgresqlCredentials)).toBe(false);
       expect(isMySQLCredentials(sqlserverCredentials)).toBe(false);
       expect(isMySQLCredentials(redshiftCredentials)).toBe(false);
-      expect(isMySQLCredentials(databricksCredentials)).toBe(false);
     });
   });
 
@@ -149,7 +136,6 @@ describe('Credential Type Guards', () => {
       expect(isSQLServerCredentials(postgresqlCredentials)).toBe(false);
       expect(isSQLServerCredentials(mysqlCredentials)).toBe(false);
       expect(isSQLServerCredentials(redshiftCredentials)).toBe(false);
-      expect(isSQLServerCredentials(databricksCredentials)).toBe(false);
     });
   });
 
@@ -164,22 +150,6 @@ describe('Credential Type Guards', () => {
       expect(isRedshiftCredentials(postgresqlCredentials)).toBe(false);
       expect(isRedshiftCredentials(mysqlCredentials)).toBe(false);
       expect(isRedshiftCredentials(sqlserverCredentials)).toBe(false);
-      expect(isRedshiftCredentials(databricksCredentials)).toBe(false);
-    });
-  });
-
-  describe('isDatabricksCredentials', () => {
-    it('should return true for Databricks credentials', () => {
-      expect(isDatabricksCredentials(databricksCredentials)).toBe(true);
-    });
-
-    it('should return false for non-Databricks credentials', () => {
-      expect(isDatabricksCredentials(snowflakeCredentials)).toBe(false);
-      expect(isDatabricksCredentials(bigqueryCredentials)).toBe(false);
-      expect(isDatabricksCredentials(postgresqlCredentials)).toBe(false);
-      expect(isDatabricksCredentials(mysqlCredentials)).toBe(false);
-      expect(isDatabricksCredentials(sqlserverCredentials)).toBe(false);
-      expect(isDatabricksCredentials(redshiftCredentials)).toBe(false);
     });
   });
 });

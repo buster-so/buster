@@ -9,7 +9,6 @@ use sqlparser::ast::{
 use sqlparser::dialect::{
     AnsiDialect, BigQueryDialect, ClickHouseDialect, DatabricksDialect, Dialect, DuckDbDialect,
     GenericDialect, HiveDialect, MsSqlDialect, MySqlDialect, PostgreSqlDialect, SQLiteDialect,
-    SnowflakeDialect,
 };
 use sqlparser::parser::Parser;
 use std::collections::{HashMap, HashSet};

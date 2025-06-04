@@ -71,15 +71,6 @@ export const testConfig = {
     schema: process.env.TEST_REDSHIFT_SCHEMA,
     cluster_identifier: process.env.TEST_REDSHIFT_CLUSTER_ID,
   },
-
-  // Databricks
-  databricks: {
-    server_hostname: process.env.TEST_DATABRICKS_SERVER_HOSTNAME,
-    http_path: process.env.TEST_DATABRICKS_HTTP_PATH,
-    access_token: process.env.TEST_DATABRICKS_ACCESS_TOKEN,
-    catalog: process.env.TEST_DATABRICKS_CATALOG,
-    schema: process.env.TEST_DATABRICKS_SCHEMA,
-  },
 } as const;
 
 /**
@@ -121,11 +112,6 @@ export function hasCredentials(dataSource: keyof typeof testConfig): boolean {
     case 'redshift': {
       const config = testConfig.redshift;
       return !!(config.host && config.database && config.username && config.password);
-    }
-
-    case 'databricks': {
-      const config = testConfig.databricks;
-      return !!(config.server_hostname && config.http_path && config.access_token);
     }
 
     default:
