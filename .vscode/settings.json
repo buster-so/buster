@@ -9,7 +9,7 @@
   "typescript.suggest.autoImports": true,
   "typescript.updateImportsOnFileMove.enabled": "always",
   "[typescript]": {
-    "editor.defaultFormatter": "biomejs.biome"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[typescriptreact]": {
     "editor.defaultFormatter": "biomejs.biome"
@@ -23,4 +23,4 @@
   "[json]": {
     "editor.defaultFormatter": "vscode.json-language-features"
   }
-} 
+}
