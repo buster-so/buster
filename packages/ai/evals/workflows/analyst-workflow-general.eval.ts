@@ -1,6 +1,11 @@
 import { RuntimeContext } from '@mastra/core/runtime-context';
-import { Eval, initDataset } from 'braintrust';
+import { Eval, initDataset, initLogger } from 'braintrust';
 import analystWorkflow, { type AnalystRuntimeContext } from '../../src/workflows/analyst-workflow';
+
+initLogger({
+  apiKey: process.env.BRAINTRUST_KEY,
+  projectName: 'ANALYST-WORKFLOW',
+});
 
 const runAnalystWorkflow = async (input: string) => {
   const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();
