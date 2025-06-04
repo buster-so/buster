@@ -61,7 +61,7 @@ export async function researchCompany(
 
 Avoid marketing language or unnecessary details. This analysis will be used for strategic decision-making and business consulting purposes.
 
-You must output in organized markdown format. Consisting of 3-6 sections.`;
+You must output in organized markdown format. Consisting of 3-6 sections. Each of those sections can leverage subheaders, bullet points, and anything that makes it well organized.`;
 
     const systemPrompt = `You are a data/ontology/analytics consultant at Palantir. Your goal is to thoroughly understand the company's business operations, including their business model, products, services, features, use cases, and value proposition. Always begin your research by analyzing the company's website when provided, as it contains the most authoritative and up-to-date information about their business. This research will be used to inform your consulting work and help you provide strategic insights and recommendations.
     
