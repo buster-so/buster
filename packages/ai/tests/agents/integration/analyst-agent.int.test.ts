@@ -23,10 +23,12 @@ describe('Analyst Agent Integration Tests', () => {
       async (input: string) => {
         // Step 1: Generate response with analyst agent
         try {
+          const threadId = crypto.randomUUID();
+
           // Create runtime context with required properties
           const runtimeContext = new RuntimeContext<AnalystRuntimeContext>([
             ['userId', 'c2dd64cd-f7f3-4884-bc91-d46ae431901e'],
-            ['threadId', 'c2dd64cd-f7f3-4884-bc91-d46ae431901e'],
+            ['threadId', threadId],
             ['dataSourceId', 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a'],
             ['dataSourceSyntax', 'postgresql'],
             ['organizationId', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce'],
@@ -34,7 +36,7 @@ describe('Analyst Agent Integration Tests', () => {
 
           const response = await analystAgent.generate(input, {
             maxSteps: 15,
-            threadId: 'c2dd64cd-f7f3-4884-bc91-d46ae431901e',
+            threadId,
             resourceId: 'c2dd64cd-f7f3-4884-bc91-d46ae431901e', // Valid UUID format for test user
             runtimeContext,
           });
