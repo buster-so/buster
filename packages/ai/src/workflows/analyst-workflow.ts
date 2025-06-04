@@ -12,6 +12,7 @@ export interface AnalystRuntimeContext {
   dataSourceId: string;
   dataSourceSyntax: string;
   organizationId: string;
+  todos: string;
 }
 
 export const thinkAndPrepWorkflowInputSchema = z.object({

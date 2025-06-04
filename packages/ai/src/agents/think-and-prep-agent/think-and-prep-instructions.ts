@@ -52,7 +52,7 @@ Once all TODO list items are addressed and submitted for review, the system will
 
 <todo_list>
 - Below are the items on your TODO list:
-{{clean_todo_list}}
+${params.todo_list}
 </todo_list>
 
 <todo_rules>
@@ -82,7 +82,7 @@ Once all TODO list items are addressed and submitted for review, the system will
   - Interpret results and update your resolutions.
   - Run SQL queries using \`generate_and_run_sql_statements\` to validate assumptions or explore data as needed.
   - Continue until all flagged items are resolved.
-- When in doubt, flag the item for further validation or exploration. It’s better to be thorough than to submit incomplete prep work.
+- When in doubt, flag the item for further validation or exploration. It's better to be thorough than to submit incomplete prep work.
 - Estimating the "totalThoughts"
     - If fully resolved in the first thought, set "totalThoughts" to "1" and set "nextThoughtNeeded" to "false" and "needsMoreThoughts" to "false"
     - If flagged items remain, set "totalThoughts" to "1 + (number of items likely needed)"
@@ -92,9 +92,9 @@ Once all TODO list items are addressed and submitted for review, the system will
 - Guidelines for using the \`generate_and_run_sql_statements\` tool:
   - Use this tool in specific scenarios where documentation lacks clarity or key details, requiring validation through SQL queries. These scenarios 
   - This tool is often used for entity identification
-    - This is when a term or entity in the user request isn’t defined in the documentation (e.g., a term like "Baltic Born" isn't included as a relevant value). 
+    - This is when a term or entity in the user request isn't defined in the documentation (e.g., a term like "Baltic Born" isn't included as a relevant value). 
     - Run queries to determine what the entity represents and where it resides in the datasets
-    - Example: If "Baltic Born" isn’t defined, run many query variations at once of things like:
+    - Example: If "Baltic Born" isn't defined, run many query variations at once of things like:
       - \`SELECT customer_name FROM orders WHERE customer_name LIKE '%Baltic%' OR customer_name LIKE '%Born%'\`
       - \`SELECT customer_name FROM orders WHERE customer_name ILIKE 'Baltic%' OR customer_name ILIKE 'Born%'\`
       - \`SELECT customer_name FROM orders WHERE customer_name ILIKE '%Baltic' OR customer_name ILIKE '%Born'\`
@@ -115,15 +115,15 @@ Once all TODO list items are addressed and submitted for review, the system will
 - Make assumptions when documentation lacks information (e.g., undefined metrics, segments, or values)
 - Verify assumptions with exploratory SQL queries when possible
 - Document assumptions clearly in \`sequential_thinking\`
-- Do not assume data exists if documentation and queries show it’s unavailable
+- Do not assume data exists if documentation and queries show it's unavailable
 </assumption_rules>
 
 <data_existence_rules>
 - All documentation is provided at instantiation
 - Make assumptions when data or instructions are missing
 - Base assumptions on available documentation and common logic (e.g., "sales" likely means total revenue)
-- Document each assumption in your thoughts using the \`sequential_thinking\` tool (e.g., "Assuming ‘sales’ refers to sales_amount column")
-- If requested data isn’t in the documentation, conclude it doesn’t exist and inform the user via \`message_user_clarifying_question\` or \`done\`
+- Document each assumption in your thoughts using the \`sequential_thinking\` tool (e.g., "Assuming 'sales' refers to sales_amount column")
+- If requested data isn't in the documentation, conclude it doesn't exist and inform the user via \`message_user_clarifying_question\` or \`done\`
 </data_existence_rules>
 
 <communication_rules>
@@ -330,8 +330,16 @@ export const getThinkAndPrepInstructions = async ({
 
   const datasets = await getPermissionedDatasets(userId, 0, 1000);
 
+  // Extract yml_content from each dataset and join with separators
+  const assembledYmlContent = datasets
+    .map((dataset) => dataset.ymlFile)
+    .filter((content) => content !== null && content !== undefined)
+    .join('\n---\n');
+
+  const todoList = runtimeContext.get('todos');
+
   return createThinkAndPrepInstructions({
-    todo_list: 'TODO LIST',
-    databaseContext: 'DATABASE CONTEXT',
+    todo_list: todoList,
+    databaseContext: assembledYmlContent,
   });
 };

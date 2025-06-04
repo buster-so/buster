@@ -23,6 +23,7 @@ const outputSchema = z.object({});
 const abortSignal = new AbortController();
 
 const thinkAndPrepExecution = async ({
+  inputData,
   getInitData,
   runtimeContext,
 }: {
@@ -36,6 +37,10 @@ const thinkAndPrepExecution = async ({
   const initData = await getInitData();
 
   const prompt = initData.prompt;
+
+  const todos = inputData['create-todos'].todos;
+
+  runtimeContext.set('todos', todos);
 
   try {
     await thinkAndPrepAgent.generate(prompt, {
