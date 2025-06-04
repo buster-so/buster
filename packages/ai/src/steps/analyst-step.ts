@@ -32,6 +32,7 @@ const analystExecution = async ({
       maxSteps: 15,
       threadId: sessionId,
       resourceId: userId,
+      runtimeContext,
       abortSignal: abortSignal.signal,
       onStepFinish: (step) => {
         if (step.toolResults.some((result) => result.toolName === 'done')) {

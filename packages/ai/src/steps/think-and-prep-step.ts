@@ -42,6 +42,7 @@ const thinkAndPrepExecution = async ({
       maxSteps: 15,
       threadId: threadId,
       resourceId: resourceId,
+      runtimeContext,
       abortSignal: abortSignal.signal,
       onStepFinish: (step) => {
         if (step.toolResults.some((result) => result.toolName === 'submit-thoughts')) {

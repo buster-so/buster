@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { DataSource } from '../../../../data-source/src/data-source';
 import type { Credentials } from '../../../../data-source/src/types/credentials';
 import { db } from '../../../../database/src/connection';
+import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
 
 const executeSqlStatementInputSchema = z.object({
   statements: z
@@ -35,14 +36,14 @@ const executeSqlStatementOutputSchema = z.object({
 const executeSqlStatement = wrapTraced(
   async (
     params: z.infer<typeof executeSqlStatementInputSchema>,
-    runtimeContext: RuntimeContext
+    runtimeContext: RuntimeContext<AnalystRuntimeContext>
   ): Promise<z.infer<typeof executeSqlStatementOutputSchema>> => {
     const { statements } = params;
 
     // Extract context values
-    const dataSourceId = runtimeContext?.get('dataSourceId') as string;
-    const userId = runtimeContext?.get('userId') as string;
-    const organizationId = runtimeContext?.get('organizationId') as string;
+    const dataSourceId = runtimeContext.get('dataSourceId') as string;
+    const userId = runtimeContext.get('userId') as string;
+    const organizationId = runtimeContext.get('organizationId') as string;
 
     if (!dataSourceId) {
       throw new Error('Data source ID not found in runtime context');
@@ -192,11 +193,14 @@ export const executeSqlStatementTool = createTool({
     'Use this to run lightweight, validation queries to understand values in columns, date ranges, etc. Will only ever return 25 results max',
   inputSchema: executeSqlStatementInputSchema,
   outputSchema: executeSqlStatementOutputSchema,
-  execute: async ({ context, runtimeContext }) => {
-    return await executeSqlStatement(
-      context as z.infer<typeof executeSqlStatementInputSchema>,
-      runtimeContext
-    );
+  execute: async ({
+    context,
+    runtimeContext,
+  }: {
+    context: z.infer<typeof executeSqlStatementInputSchema>;
+    runtimeContext: RuntimeContext<AnalystRuntimeContext>;
+  }) => {
+    return await executeSqlStatement(context, runtimeContext);
   },
 });
 
