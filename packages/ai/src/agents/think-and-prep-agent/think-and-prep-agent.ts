@@ -2,7 +2,8 @@ import { Agent } from '@mastra/core';
 import { Memory } from '@mastra/memory';
 import { PostgresStore } from '@mastra/pg';
 import { wrapAISDKModel } from 'braintrust';
-import { doneTool, executeSqlStatementTool, sequentialThinkingTool } from '../../tools';
+import { executeSqlStatementTool, sequentialThinkingTool } from '../../tools';
+import finishAndRespondTool from '../../tools/communication-tools/finish-and-respond';
 import submitThoughtsTool from '../../tools/communication-tools/submit-thoughts-tool';
 import { anthropicCachedModel } from '../../utils/models/anthropic-cached';
 import { getThinkAndPrepInstructions } from './think-and-prep-instructions';
@@ -20,7 +21,7 @@ export const thinkAndPrepAgent = new Agent({
   tools: {
     sequentialThinkingTool,
     executeSqlStatementTool,
-    doneTool,
+    finishAndRespondTool,
     submitThoughtsTool,
   },
   memory: new Memory({
