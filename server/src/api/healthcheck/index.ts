@@ -1,3 +1,4 @@
+import { Hono } from 'hono';
 import type { Context } from 'hono';
 
 interface HealthCheckResult {
@@ -97,7 +98,7 @@ async function performHealthCheck(): Promise<HealthCheckResult> {
   };
 }
 
-export async function healthCheckHandler(c: Context) {
+async function healthCheckHandler(c: Context) {
   try {
     const healthResult = await performHealthCheck();
 
@@ -117,3 +118,11 @@ export async function healthCheckHandler(c: Context) {
     );
   }
 }
+
+// Create healthcheck routes
+const healthcheckRoutes = new Hono();
+
+// GET /healthcheck - Comprehensive health check
+healthcheckRoutes.get('/', healthCheckHandler);
+
+export default healthcheckRoutes;

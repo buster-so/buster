@@ -1,25 +1,19 @@
 import { Hono } from 'hono';
 
 // Import feature-specific routes
-import userRoutes from './user';
+import userRoutes from './users';
 
 const app = new Hono();
 
-console.log('Setting up v2 API routes...');
-
-app.get('/', (c) => {
-  console.log('v2 root route hit');
+app.get('/healthcheck', (c) => {
   return c.json({
-    message: 'Buster API v2',
-    endpoints: ['/api/v2/healthcheck', '/api/v2/user', '/api/v2/datasets']
+    success: true,
+    message: 'API v2 is healthy',
+    timestamp: new Date().toISOString()
   });
 });
 
-// Mount feature-specific routes
-console.log('Mounting user routes...');
-app.route('/user', userRoutes);
-
-console.log('v2 API setup complete');
+app.route('/users', userRoutes);
 
 // TODO: Add more feature routes as they are created
 // import datasetRoutes from './datasets';
