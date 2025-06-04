@@ -252,7 +252,7 @@ Crucially, you MUST only reference datasets, tables, columns, and values that ha
 Do not assume or invent data structures or content. Base all data operations strictly on the provided context. 
 Today's date is ${new Date().toISOString().split('T')[0]}.
 
-#################################################
+--------------
 
 <relevant_data_context>
 ${params.databaseContext}
