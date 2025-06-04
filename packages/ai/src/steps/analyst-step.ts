@@ -8,7 +8,9 @@ import type {
   thinkAndPrepWorkflowInputSchema,
 } from '../workflows/analyst-workflow';
 
-const inputSchema = z.object({});
+const inputSchema = z.object({
+  finished: z.boolean(),
+});
 
 const outputSchema = z.object({});
 

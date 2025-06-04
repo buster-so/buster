@@ -19,7 +19,9 @@ const inputSchema = z.object({
 
 export const thinkAndPrepOutputSchema = z.object({});
 
-const outputSchema = z.object({});
+const outputSchema = z.object({
+  finished: z.boolean(),
+});
 
 const abortController = new AbortController();
 
@@ -68,11 +70,11 @@ const thinkAndPrepExecution = async ({
       ['submitThoughtsTool', 'finishAndRespondTool'].includes(chunk.toolName)
     ) {
       abortController.abort();
-      return {};
+      return { finished: true };
     }
   }
 
-  return {};
+  return { finished: false };
 };
 
 export const thinkAndPrepStep = createStep({

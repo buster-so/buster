@@ -33,7 +33,10 @@ const analystWorkflow = createWorkflow({
 })
   .parallel([generateChatTitleStep, extractValuesSearchStep, createTodosStep])
   .then(thinkAndPrepStep)
-  .then(analystStep)
+  .branch([
+    // Only run analystStep if thinkAndPrepStep returned finished: false
+    [async ({ inputData }) => inputData.finished === false, analystStep],
+  ])
   .commit();
 
 export default analystWorkflow;
