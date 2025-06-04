@@ -1,6 +1,6 @@
 import { Agent, createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
-import { wrapAISDKModel } from 'braintrust';
+import { wrapAISDKModel, wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { anthropicCachedModel } from '../utils/models/anthropic-cached';
 import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
@@ -152,13 +152,24 @@ const todoStepExecution = async ({
   const threadId = runtimeContext.get('threadId');
   const resourceId = runtimeContext.get('userId');
 
-  const response = await todosAgent.generate(inputData.prompt, {
-    threadId: threadId,
-    resourceId: resourceId,
-    output: createTodosOutputSchema,
-  });
+  const tracedTodos = wrapTraced(
+    async () => {
+      const response = await todosAgent.generate(inputData.prompt, {
+        threadId: threadId,
+        resourceId: resourceId,
+        output: createTodosOutputSchema,
+      });
 
-  return response.object;
+      return response.object;
+    },
+    {
+      name: 'Create Todos',
+    }
+  );
+
+  const todos = await tracedTodos();
+
+  return todos;
 };
 
 export const createTodosStep = createStep({

@@ -12,7 +12,7 @@ const executeSqlStatementInputSchema = z.object({
   statements: z
     .array(z.string())
     .describe(
-      'Array of lightweight, optimized SQL statements to execute. Each statement should be small and focused. All queries will be automatically limited to 25 results maximum for performance.'
+      'Array of lightweight, optimized SQL statements to execute. Each statement should be small and focused. All queries will be automatically limited to 25 results maximum for performance. YOU MUST USE THE <SCHEMA_NAME>.<TABLE_NAME> syntax/qualifier for all table names. Otherwise the queries wont run successfully.'
     ),
 });
 
@@ -190,7 +190,7 @@ async function executeSingleStatement(
 export const executeSqlStatementTool = createTool({
   id: 'execute-sql-statement',
   description:
-    'Use this to run lightweight, validation queries to understand values in columns, date ranges, etc. Will only ever return 25 results max',
+    'Use this to run lightweight, validation queries to understand values in columns, date ranges, etc. Will only ever return 25 results max.',
   inputSchema: executeSqlStatementInputSchema,
   outputSchema: executeSqlStatementOutputSchema,
   execute: async ({

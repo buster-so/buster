@@ -315,6 +315,8 @@ ${params.todo_list}
 
 Start by using the \`sequential_thinking\` to immediately start checking off items on your TODO list
 
+Today's date is ${new Date().toISOString().split('T')[0]}.
+
 --------------
 
 <DATABASE_CONTEXT>
