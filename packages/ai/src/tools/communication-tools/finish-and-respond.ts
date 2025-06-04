@@ -26,7 +26,7 @@ const executeDone = wrapTraced(
   async (): Promise<z.infer<typeof finishAndRespondOutputSchema>> => {
     return await processDone();
   },
-  { name: 'done-tool' }
+  { name: 'finish-and-respond' }
 );
 
 // Export the tool
