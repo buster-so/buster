@@ -1,5 +1,6 @@
 import { Agent, createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
+import { wrapAISDKModel } from 'braintrust';
 import { z } from 'zod';
 import { anthropicCachedModel } from '../utils/models/anthropic-cached';
 import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
@@ -129,10 +130,15 @@ The TODO list should break down each aspect of the user request into tasks, base
 ---
 `;
 
-const todosAgent = new Agent({
+const DefaultOptions = {
+  maxSteps: 0,
+  output: createTodosOutputSchema,
+};
+
+export const todosAgent = new Agent({
   name: 'Create Todos',
   instructions: todosInstructions,
-  model: anthropicCachedModel('claude-sonnet-4-20250514'),
+  model: wrapAISDKModel(anthropicCachedModel('claude-sonnet-4-20250514')),
 });
 
 const todoStepExecution = async ({
@@ -146,10 +152,9 @@ const todoStepExecution = async ({
   const resourceId = runtimeContext.get('userId');
 
   const response = await todosAgent.generate(inputData.prompt, {
-    maxSteps: 0,
-    output: createTodosOutputSchema,
     threadId: threadId,
     resourceId: resourceId,
+    ...DefaultOptions,
   });
 
   return response.object;
