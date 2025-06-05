@@ -6,7 +6,7 @@ baseDir="packages/ai/evals"
 if [ -z "$arg" ]; then
   cd "$baseDir" && npx braintrust eval
 else
-  file=$(find "$baseDir" -type f -name "${arg}.eval.*.ts" | head -n 1)
+  file=$(find "$baseDir" -type f -name "*.eval*.ts" | grep -E "${arg}\.eval|${arg}/" | head -n 1)
   if [ -n "$file" ]; then
     npx braintrust eval "$file"
   else
