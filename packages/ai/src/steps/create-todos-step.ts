@@ -1,6 +1,6 @@
 import { Agent, createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
-import { wrapAISDKModel, wrapTraced } from 'braintrust';
+import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { anthropicCachedModel } from '../utils/models/anthropic-cached';
 import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
@@ -116,7 +116,7 @@ const DEFAULT_OPTIONS = {
 export const todosAgent = new Agent({
   name: 'Create Todos',
   instructions: todosInstructions,
-  model: wrapAISDKModel(anthropicCachedModel('claude-sonnet-4-20250514')),
+  model: anthropicCachedModel('claude-sonnet-4-20250514'),
   defaultGenerateOptions: DEFAULT_OPTIONS,
   defaultStreamOptions: DEFAULT_OPTIONS,
 });
@@ -152,14 +152,16 @@ const todoStepExecution = async ({
     return todos;
   } catch (error) {
     console.error('Failed to create todos:', error);
-    
+
     // Check if it's a database connection error
     if (error instanceof Error && error.message.includes('DATABASE_URL')) {
       throw new Error('Unable to connect to the analysis service. Please try again later.');
     }
-    
+
     // For other errors, throw a user-friendly message
-    throw new Error('Unable to create the analysis plan. Please try again or rephrase your request.');
+    throw new Error(
+      'Unable to create the analysis plan. Please try again or rephrase your request.'
+    );
   }
 };
 

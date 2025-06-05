@@ -2,7 +2,6 @@ import {} from '@ai-sdk/anthropic';
 import { Agent } from '@mastra/core';
 import { Memory } from '@mastra/memory';
 import { PostgresStore } from '@mastra/pg';
-import { wrapAISDKModel } from 'braintrust';
 import {
   createDashboardsFileTool,
   createMetricsFileTool,
@@ -22,7 +21,7 @@ const DEFAULT_OPTIONS = {
 export const analystAgent = new Agent({
   name: 'Analyst Agent',
   instructions: getAnalystInstructions,
-  model: wrapAISDKModel(anthropicCachedModel('claude-sonnet-4-20250514')),
+  model: anthropicCachedModel('claude-sonnet-4-20250514'),
   tools: {
     createMetricsFileTool,
     modifyMetricsFileTool,

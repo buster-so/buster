@@ -1,7 +1,6 @@
 import { Agent } from '@mastra/core';
 import { Memory } from '@mastra/memory';
 import { PostgresStore } from '@mastra/pg';
-import { wrapAISDKModel } from 'braintrust';
 import { executeSqlStatementTool, sequentialThinkingTool } from '../../tools';
 import finishAndRespondTool from '../../tools/communication-tools/finish-and-respond';
 import submitThoughtsTool from '../../tools/communication-tools/submit-thoughts-tool';
@@ -17,7 +16,7 @@ const DEFAULT_OPTIONS = {
 export const thinkAndPrepAgent = new Agent({
   name: 'Think and Prep Agent',
   instructions: getThinkAndPrepInstructions,
-  model: wrapAISDKModel(anthropicCachedModel('claude-sonnet-4-20250514')),
+  model: anthropicCachedModel('claude-sonnet-4-20250514'),
   tools: {
     sequentialThinkingTool,
     executeSqlStatementTool,
