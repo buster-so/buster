@@ -1012,6 +1012,7 @@ export const organizations = pgTable(
       .notNull(),
     deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'string' }),
     paymentRequired: boolean('payment_required').default(false).notNull(),
+    testField: text('test_field'),
   },
   (table) => [unique('organizations_name_key').on(table.name)]
 );

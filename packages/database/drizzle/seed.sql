@@ -1617,3 +1617,6 @@ aa0a1367-3a10-4fe5-9244-2db46c000d64	bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce	restri
 8e98a1fc-c4d5-401c-98d8-2cce60e11079	bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce	restricted_querier	none	f	f	f	f	2025-05-02 17:14:31.649276+00	2025-05-02 17:14:31.649276+00	\N	c2dd64cd-f7f3-4884-bc91-d46ae431901e	c2dd64cd-f7f3-4884-bc91-d46ae431901e	\N	active
 70d05d4e-b2c1-40c5-be69-315e420fd0ab	bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce	viewer	none	f	f	f	f	2025-05-02 17:14:31.649276+00	2025-05-02 17:14:31.649276+00	\N	c2dd64cd-f7f3-4884-bc91-d46ae431901e	c2dd64cd-f7f3-4884-bc91-d46ae431901e	\N	active
 \.
+
+-- Set all existing messages to complete (true) since they are already fully processed
+UPDATE "messages" SET "is_completed" = true WHERE "is_completed" = false;
