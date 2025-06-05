@@ -5,8 +5,7 @@
     "packages/*",
     "trigger",
     "server",
-    "electric-server",
-    "web"
+    "electric-server"
   ],
   "scripts": {
     "ai:dev": "bun run --cwd packages/ai dev",
