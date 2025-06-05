@@ -25,10 +25,10 @@ const analystExecution = async ({
   const abortController = new AbortController();
 
   try {
-    const userId = runtimeContext.get('userId');
-    const sessionId = runtimeContext.get('threadId');
+    const resourceId = runtimeContext.get('userId');
+    const threadId = runtimeContext.get('threadId');
 
-    if (!userId || !sessionId) {
+    if (!resourceId || !threadId) {
       throw new Error('Unable to access your session. Please refresh and try again.');
     }
 
@@ -38,8 +38,8 @@ const analystExecution = async ({
     const wrappedStream = wrapTraced(
       async () => {
         const stream = await analystAgent.stream(prompt, {
-          threadId: sessionId,
-          resourceId: userId,
+          threadId,
+          resourceId,
           runtimeContext,
           toolChoice: 'required',
           abortSignal: abortController.signal,
@@ -53,7 +53,7 @@ const analystExecution = async ({
     );
 
     const stream = await wrappedStream();
-    
+
     for await (const chunk of stream.fullStream) {
       if (chunk.type === 'tool-result' && chunk.toolName === 'doneTool') {
         abortController.abort();
@@ -77,12 +77,19 @@ const analystExecution = async ({
     }
 
     // Check if it's an API/model error
-    if (error instanceof Error && (error.message.includes('API') || error.message.includes('model'))) {
-      throw new Error('The analysis service is temporarily unavailable. Please try again in a few moments.');
+    if (
+      error instanceof Error &&
+      (error.message.includes('API') || error.message.includes('model'))
+    ) {
+      throw new Error(
+        'The analysis service is temporarily unavailable. Please try again in a few moments.'
+      );
     }
 
     // For unexpected errors, provide a generic friendly message
-    throw new Error('Something went wrong during the analysis. Please try again or contact support if the issue persists.');
+    throw new Error(
+      'Something went wrong during the analysis. Please try again or contact support if the issue persists.'
+    );
   }
 };
 

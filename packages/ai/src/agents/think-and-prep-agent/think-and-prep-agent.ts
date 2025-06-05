@@ -1,10 +1,9 @@
 import { Agent } from '@mastra/core';
-import { Memory } from '@mastra/memory';
-import { PostgresStore } from '@mastra/pg';
 import { executeSqlStatementTool, sequentialThinkingTool } from '../../tools';
 import finishAndRespondTool from '../../tools/communication-tools/finish-and-respond';
 import submitThoughtsTool from '../../tools/communication-tools/submit-thoughts-tool';
 import { anthropicCachedModel } from '../../utils/models/anthropic-cached';
+import { getSharedMemory } from '../../utils/shared-memory';
 import { getThinkAndPrepInstructions } from './think-and-prep-instructions';
 
 const DEFAULT_OPTIONS = {
@@ -23,16 +22,7 @@ export const thinkAndPrepAgent = new Agent({
     finishAndRespondTool,
     submitThoughtsTool,
   },
-  memory: new Memory({
-    storage: new PostgresStore({
-      connectionString:
-        process.env.DATABASE_URL ||
-        (() => {
-          throw new Error('Unable to connect to the database. Please check your configuration.');
-        })(),
-      schemaName: 'mastra',
-    }),
-  }),
+  memory: getSharedMemory(),
   defaultGenerateOptions: DEFAULT_OPTIONS,
   defaultStreamOptions: DEFAULT_OPTIONS,
 });

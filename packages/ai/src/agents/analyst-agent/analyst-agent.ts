@@ -1,7 +1,5 @@
 import {} from '@ai-sdk/anthropic';
 import { Agent } from '@mastra/core';
-import { Memory } from '@mastra/memory';
-import { PostgresStore } from '@mastra/pg';
 import {
   createDashboardsFileTool,
   createMetricsFileTool,
@@ -10,6 +8,7 @@ import {
   modifyMetricsFileTool,
 } from '../../tools';
 import { anthropicCachedModel } from '../../utils/models/anthropic-cached';
+import { getSharedMemory } from '../../utils/shared-memory';
 import { getAnalystInstructions } from './analyst-agent-instructions';
 
 const DEFAULT_OPTIONS = {
@@ -29,16 +28,7 @@ export const analystAgent = new Agent({
     modifyDashboardsFileTool,
     doneTool,
   },
-  memory: new Memory({
-    storage: new PostgresStore({
-      connectionString:
-        process.env.DATABASE_URL ||
-        (() => {
-          throw new Error('Unable to connect to the database. Please check your configuration.');
-        })(),
-      schemaName: 'mastra',
-    }),
-  }),
+  memory: getSharedMemory(),
   defaultGenerateOptions: DEFAULT_OPTIONS,
   defaultStreamOptions: DEFAULT_OPTIONS,
 });
