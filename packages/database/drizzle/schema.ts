@@ -593,6 +593,7 @@ export const messages = pgTable("messages", {
 	deletedAt: timestamp("deleted_at", { withTimezone: true, mode: 'string' }),
 	createdBy: uuid("created_by").notNull(),
 	feedback: text(),
+	isCompleted: boolean("is_completed").default(false).notNull(),
 }, (table) => {
 	return {
 		chatIdIdx: index("messages_chat_id_idx").using("btree", table.chatId.asc().nullsLast().op("uuid_ops")),
