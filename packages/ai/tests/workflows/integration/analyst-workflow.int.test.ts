@@ -19,7 +19,7 @@ describe('Analyst Workflow Integration Tests', () => {
 
   test('should successfully execute analyst workflow with valid input', async () => {
     const testInput = {
-      prompt: 'what is the carbon footprint of our production process per product unit',
+      prompt: 'which products sell the most during christmas time',
     };
 
     const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();

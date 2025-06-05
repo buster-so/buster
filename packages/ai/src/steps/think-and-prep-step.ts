@@ -65,12 +65,16 @@ const thinkAndPrepExecution = async ({
   const stream = await wrappedStream();
 
   for await (const chunk of stream.fullStream) {
-    if (
-      chunk.type === 'tool-result' &&
-      ['submitThoughtsTool', 'finishAndRespondTool'].includes(chunk.toolName)
-    ) {
-      abortController.abort();
-      return { finished: true };
+    if (chunk.type === 'tool-result') {
+      if (['finishAndRespondTool'].includes(chunk.toolName)) {
+        abortController.abort();
+        return { finished: true };
+      }
+
+      if (['submitThoughtsTool'].includes(chunk.toolName)) {
+        abortController.abort();
+        return { finished: false };
+      }
     }
   }
 
