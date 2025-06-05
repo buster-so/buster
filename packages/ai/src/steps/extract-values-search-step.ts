@@ -1,5 +1,6 @@
 import { Agent, createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
+import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { anthropicCachedModel } from '../utils/models/anthropic-cached';
 import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
@@ -80,14 +81,25 @@ const extractValuesSearchStepExecution = async ({
     const threadId = runtimeContext.get('threadId');
     const resourceId = runtimeContext.get('userId');
 
-    const response = await valuesAgent.generate(inputData.prompt, {
-      maxSteps: 0,
-      output: extractValuesSearchOutputSchema,
-      threadId: threadId,
-      resourceId: resourceId,
-    });
+    const tracedValuesExtraction = wrapTraced(
+      async () => {
+        const response = await valuesAgent.generate(inputData.prompt, {
+          maxSteps: 0,
+          output: extractValuesSearchOutputSchema,
+          threadId: threadId,
+          resourceId: resourceId,
+        });
 
-    return response.object;
+        return response.object;
+      },
+      {
+        name: 'Extract Values',
+      }
+    );
+
+    const values = await tracedValuesExtraction();
+
+    return values;
   } catch (error) {
     console.error('Failed to extract values:', error);
     // Return empty values array instead of crashing
