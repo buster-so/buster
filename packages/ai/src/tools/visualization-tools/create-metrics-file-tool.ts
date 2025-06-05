@@ -3,8 +3,11 @@ import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
 import {} from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import * as yaml from 'yaml';
 import { z } from 'zod';
+import { DataSource } from '../../../../data-source/src/data-source';
+import type { Credentials } from '../../../../data-source/src/types/credentials';
 import { db } from '../../../../database/src/connection';
 import { assetPermissions, metricFiles } from '../../../../database/src/schema';
 
@@ -1083,7 +1086,7 @@ async function processMetricFile(
   fileName: string,
   ymlContent: string,
   dataSourceId: string,
-  dataSourceDialect: string,
+  _dataSourceDialect: string,
   userId: string,
   organizationId: string
 ): Promise<{
@@ -1103,7 +1106,7 @@ async function processMetricFile(
     const metricId = randomUUID();
 
     // Validate SQL by running it
-    const sqlValidationResult = await validateSql(metricYml.sql, dataSourceId, dataSourceDialect);
+    const sqlValidationResult = await validateSql(metricYml.sql, dataSourceId);
 
     if (!sqlValidationResult.success) {
       return {
@@ -1148,7 +1151,8 @@ async function processMetricFile(
     let errorMessage = 'Unknown error';
 
     if (error instanceof z.ZodError) {
-      errorMessage = 'The metric configuration is invalid. Please check that all required fields are provided and properly formatted.';
+      errorMessage =
+        'The metric configuration is invalid. Please check that all required fields are provided and properly formatted.';
     } else if (error instanceof Error) {
       if (error.message.includes('YAMLParseError')) {
         errorMessage = 'The YAML format is incorrect. Please check the syntax and indentation.';
@@ -1166,8 +1170,7 @@ async function processMetricFile(
 
 async function validateSql(
   sqlQuery: string,
-  _dataSourceId: string,
-  _dataSourceDialect: string
+  dataSourceId: string
 ): Promise<{
   success: boolean;
   message?: string;
@@ -1189,31 +1192,102 @@ async function validateSql(
       return { success: false, error: 'SQL query must contain FROM clause' };
     }
 
-    // TODO: Execute SQL query against the data source to validate it
-    // For now, simulate successful validation
-    const mockResults: Record<string, any>[] = [];
-    const mockMetadata = {
-      columns: [],
-      rowCount: 0,
-      executionTime: 100,
-    };
+    // Get data source credentials from vault
+    let dataSource: DataSource;
+    try {
+      const credentials = await getDataSourceCredentials(dataSourceId);
+      dataSource = new DataSource({
+        dataSources: [
+          {
+            name: `datasource-${dataSourceId}`,
+            type: credentials.type as any,
+            credentials: credentials,
+          },
+        ],
+        defaultDataSource: `datasource-${dataSourceId}`,
+      });
+    } catch (_error) {
+      return {
+        success: false,
+        error: `Unable to connect to your data source. Please check that it's properly configured and accessible.`,
+      };
+    }
 
-    const message =
-      mockResults.length === 0
-        ? 'No records were found'
-        : `${mockResults.length} records were returned`;
+    try {
+      // Execute the SQL query using the DataSource
+      const result = await dataSource.execute({
+        sql: sqlQuery,
+      });
 
-    return {
-      success: true,
-      message,
-      results: mockResults,
-      metadata: mockMetadata,
-    };
+      if (result.success) {
+        const allResults = result.rows || [];
+        // Truncate results to 25 records for validation
+        const results = allResults.slice(0, 25);
+
+        const metadata = {
+          columns: results.length > 0 ? Object.keys(results[0] || {}) : [],
+          rowCount: results.length,
+          totalRowCount: allResults.length, // Track original count
+          executionTime: 100, // We don't have actual execution time from DataSource
+        };
+
+        const message =
+          allResults.length === 0
+            ? 'Query executed successfully but returned no records'
+            : `Query validated successfully and returned ${results.length} sample records${allResults.length > 25 ? ` (showing first 25 of ${allResults.length} total)` : ''}`;
+
+        return {
+          success: true,
+          message,
+          results,
+          metadata,
+        };
+      }
+
+      return {
+        success: false,
+        error: result.error?.message || 'Query execution failed',
+      };
+    } finally {
+      // Always close the data source connection
+      await dataSource.close();
+    }
   } catch (error) {
     return {
       success: false,
       error: error instanceof Error ? error.message : 'SQL validation failed',
     };
+  }
+}
+
+async function getDataSourceCredentials(dataSourceId: string): Promise<Credentials> {
+  try {
+    // Query the vault to get the credentials
+    const secretResult = await db.execute(
+      sql`SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = ${dataSourceId} LIMIT 1`
+    );
+
+    if (!secretResult || secretResult.length === 0) {
+      throw new Error(
+        'Unable to access your data source credentials. Please ensure the data source is properly configured.'
+      );
+    }
+
+    const secretString = secretResult[0]?.decrypted_secret as string;
+    if (!secretString) {
+      throw new Error(
+        'The data source credentials appear to be invalid. Please reconfigure your data source.'
+      );
+    }
+
+    // Parse the credentials JSON
+    const credentials = JSON.parse(secretString) as Credentials;
+    return credentials;
+  } catch (error) {
+    console.error('Error getting data source credentials:', error);
+    throw new Error(
+      'Unable to retrieve data source credentials. Please contact support if this issue persists.'
+    );
   }
 }
 
