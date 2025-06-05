@@ -1,10 +1,12 @@
 {
   "name": "server",
   "scripts": {
-    "dev": "bun run --hot src/index.ts"
+    "dev": "bun run --hot src/index.ts",
+    "build": "bun build src/index.ts --outdir ./dist --target bun",
+    "start": "bun run dist/index.js",
+    "prod": "bun run build && bun run start"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.49.10",
-    "jsonwebtoken": "^9.0.2"
+    "@supabase/supabase-js": "^2.49.10"
   }
 }
