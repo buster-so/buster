@@ -1,8 +1,8 @@
-import React from 'react';
-import type { ITooltipItem, TooltipItemValueProps } from './interfaces';
-import { LegendItemDot } from '../BusterChartLegend/LegendDot';
-import { type ChartType } from '@/api/asset_interfaces/metric/charts';
+import type React from 'react';
+import type { ChartType } from '@/api/asset_interfaces/metric/charts';
 import { cn } from '@/lib/classMerge';
+import { LegendItemDot } from '../BusterChartLegend/LegendDot';
+import type { ITooltipItem, TooltipItemValueProps } from './interfaces';
 
 export const TooltipItem: React.FC<ITooltipItem> = ({
   values,
@@ -44,7 +44,7 @@ const TooltipItemValue: React.FC<{
       <div className="grid grid-cols-[auto_auto] items-center gap-x-5 px-3">
         {values.map((value, index) => (
           <GroupTooltipValue
-            key={index}
+            key={index.toString()}
             label={value.formattedLabel}
             value={chooseValue(value.formattedValue, value.formattedPercentage)}
           />

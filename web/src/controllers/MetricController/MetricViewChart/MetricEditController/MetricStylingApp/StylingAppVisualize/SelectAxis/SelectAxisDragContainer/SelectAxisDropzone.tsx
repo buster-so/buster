@@ -1,11 +1,11 @@
-import React, { useMemo } from 'react';
-import type { DraggedItem, DropZoneInternal } from './interfaces';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { SelectAxisSortableItem } from './SelectAxisSortableItem';
+import React, { useMemo } from 'react';
+import { cn } from '@/lib/classMerge';
 import { StylingLabel } from '../../../Common';
 import { SelectAxisSettingsButton } from '../SelectAxisSettingsContent';
-import { cn } from '@/lib/classMerge';
+import type { DraggedItem, DropZoneInternal } from './interfaces';
+import { SelectAxisSortableItem } from './SelectAxisSortableItem';
 
 export const SelectAxisDropZone: React.FC<{
   zone: DropZoneInternal;

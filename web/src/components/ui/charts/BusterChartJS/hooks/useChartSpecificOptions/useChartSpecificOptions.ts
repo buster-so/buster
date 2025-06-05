@@ -1,11 +1,11 @@
+import type { ChartType as ChartJSChartType, PluginChartOptions } from 'chart.js';
+import { useMemo } from 'react';
+import type { DeepPartial } from 'utility-types';
 import { ChartType } from '@/api/asset_interfaces/metric/charts';
 import type { ChartProps } from '../../core';
-import type { ChartType as ChartJSChartType, PluginChartOptions } from 'chart.js';
-import type { DeepPartial } from 'utility-types';
-import { useMemo } from 'react';
-import { pieOptionsHandler, piePluginsHandler } from './pieChartOptions';
-import type { ChartSpecificOptionsProps, UseChartSpecificOptionsProps } from './interfaces';
 import { barOptionsHandler, barPluginsHandler } from './barChartOptions';
+import type { ChartSpecificOptionsProps, UseChartSpecificOptionsProps } from './interfaces';
+import { pieOptionsHandler, piePluginsHandler } from './pieChartOptions';
 
 export const useChartSpecificOptions = ({
   selectedChartType,

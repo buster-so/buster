@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { SaveResetFilePopup } from './SaveResetFilePopup';
+import { fn } from '@storybook/test';
 import React from 'react';
 import { Button } from '@/components/ui/buttons';
-import { fn } from '@storybook/test';
+import { SaveResetFilePopup } from './SaveResetFilePopup';
 
 const meta: Meta<typeof SaveResetFilePopup> = {
   title: 'Features/Popups/SaveResetFilePopup',

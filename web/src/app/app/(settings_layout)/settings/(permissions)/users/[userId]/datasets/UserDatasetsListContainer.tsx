@@ -1,18 +1,18 @@
 'use client';
 
-import { useUpdateUserDatasets } from '@/api/buster_rest';
+import React, { useMemo, useState } from 'react';
 import type { BusterUserDataset, BusterUserPermissionGroup } from '@/api/asset_interfaces';
+import { useUpdateUserDatasets } from '@/api/buster_rest';
 import { PermissionAssignedCell } from '@/components/features/PermissionComponents';
 import {
-  BusterListColumn,
-  BusterListRowItem,
+  type BusterListColumn,
+  type BusterListRowItem,
   EmptyStateList,
   InfiniteListContainer
 } from '@/components/ui/list';
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
-import { BusterRoutes, createBusterRoute } from '@/routes';
 import { useMemoizedFn } from '@/hooks';
-import React, { useMemo, useState } from 'react';
+import { BusterRoutes, createBusterRoute } from '@/routes';
 import { UserDatasetsSelectedPopup } from './UserDatasetsSelectedPopup';
 
 export const UserDatasetsListContainer: React.FC<{
@@ -134,12 +134,7 @@ export const UserDatasetsListContainer: React.FC<{
         useRowClickSelectChange={false}
         selectedRowKeys={selectedRowKeys}
         onSelectChange={setSelectedRowKeys}
-        emptyState={useMemo(
-          () => (
-            <EmptyStateList text="No datasets found" />
-          ),
-          []
-        )}
+        emptyState={useMemo(() => <EmptyStateList text="No datasets found" />, [])}
       />
     </InfiniteListContainer>
   );

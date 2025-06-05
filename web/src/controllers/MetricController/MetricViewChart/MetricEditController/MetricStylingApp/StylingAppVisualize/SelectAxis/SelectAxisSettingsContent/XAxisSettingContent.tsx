@@ -1,16 +1,16 @@
 import React, { useMemo } from 'react';
-import { useSelectAxisContextSelector } from '../useSelectAxisContext';
-import { ColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
-import { formatLabel } from '@/lib';
-import { useMemoizedFn } from '@/hooks';
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import { EditShowAxisTitle } from './EditShowAxisTitle';
-import { EditShowAxisLabel } from './EditShowAxisLabel';
-import { EditAxisLabelRotation } from './EditAxisLabelRotation';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { ColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import { AXIS_TITLE_SEPARATOR } from '@/components/ui/charts/commonHelpers/axisHelper';
 import { useUpdateMetricChart } from '@/context/Metrics';
+import { useMemoizedFn } from '@/hooks';
+import { formatLabel } from '@/lib';
+import { useSelectAxisContextSelector } from '../useSelectAxisContext';
+import { EditAxisLabelRotation } from './EditAxisLabelRotation';
+import { EditShowAxisLabel } from './EditShowAxisLabel';
+import { EditShowAxisTitle } from './EditShowAxisTitle';
 
-export const XAxisSettingContent: React.FC<{}> = React.memo(({}) => {
+export const XAxisSettingContent: React.FC = React.memo(() => {
   const { onUpdateMetricChartConfig } = useUpdateMetricChart();
   const xAxisAxisTitle = useSelectAxisContextSelector((x) => x.xAxisAxisTitle);
   const columnLabelFormats = useSelectAxisContextSelector((x) => x.columnLabelFormats);

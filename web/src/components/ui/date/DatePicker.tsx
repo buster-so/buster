@@ -1,19 +1,18 @@
 'use client';
 
 import * as React from 'react';
-import { Calendar as CalendarIcon } from '@/components/ui/icons';
-
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/buttons';
-import { Calendar, CalendarProps } from '@/components/ui/calendar';
+import { Calendar, type CalendarProps } from '@/components/ui/calendar';
+import { Calendar as CalendarIcon } from '@/components/ui/icons';
 import {
   PopoverRoot as Popover,
   PopoverContent,
   PopoverTrigger
 } from '@/components/ui/popover/PopoverBase';
-import { formatDate } from '@/lib';
-import { Xmark } from '../icons/NucleoIconFilled';
 import { useMemoizedFn } from '@/hooks';
+import { formatDate } from '@/lib';
+import { cn } from '@/lib/utils';
+import { Xmark } from '../icons/NucleoIconFilled';
 
 export type DatePickerProps = Omit<CalendarProps, 'selected'> & {
   dateFormat?: string;
@@ -44,11 +43,12 @@ function DatePickerComponent({
           suffix={
             clearable &&
             selected && (
-              <div
+              <button
+                type="button"
                 onClick={onClickCancel}
-                className="hover:bg-gray-light/20 hover:text-default! -mr-1 flex items-center justify-center rounded-sm p-1 text-xs opacity-30 transition-opacity duration-200 group-hover:opacity-100">
+                className="hover:bg-gray-light/20 hover:text-default! -mr-1 flex cursor-pointer items-center justify-center rounded-sm p-1 text-xs opacity-30 transition-opacity duration-200 group-hover:opacity-100">
                 <Xmark />
-              </div>
+              </button>
             )
           }
           className={cn(

@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { ScrollArea, ScrollBar } from './ScrollArea';
 import { faker } from '@faker-js/faker';
+import type { Meta, StoryObj } from '@storybook/react';
 import Image from 'next/image';
+import { ScrollArea, ScrollBar } from './ScrollArea';
 
 const meta = {
   title: 'UI/ScrollArea/ScrollArea',

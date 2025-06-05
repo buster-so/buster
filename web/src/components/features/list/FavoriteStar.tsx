@@ -1,17 +1,17 @@
-import { ShareAssetType } from '@/api/asset_interfaces';
-import { AppTooltip } from '@/components/ui/tooltip';
-import React, { useMemo } from 'react';
-import { useMemoizedFn } from '@/hooks';
-import { Button } from '@/components/ui/buttons';
-import { cn } from '@/lib/classMerge';
-import { Star } from '@/components/ui/icons';
-import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
 import { cva } from 'class-variance-authority';
+import React, { useMemo } from 'react';
+import type { ShareAssetType } from '@/api/asset_interfaces';
 import {
   useAddUserFavorite,
   useDeleteUserFavorite,
   useGetUserFavorites
 } from '@/api/buster_rest/users';
+import { Button } from '@/components/ui/buttons';
+import { Star } from '@/components/ui/icons';
+import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
+import { AppTooltip } from '@/components/ui/tooltip';
+import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/classMerge';
 
 const favoriteStarVariants = cva('transition-colors', {
   variants: {

@@ -1,13 +1,13 @@
 import React, { useMemo } from 'react';
-import type { FileContainerSegmentProps } from '../interfaces';
-import type { FileView } from '../../../ChatLayoutContext/useLayoutConfig';
+import type { SegmentedItem } from '@/components/ui/segmented';
 import { AppSegmented } from '@/components/ui/segmented';
-import { useChatLayoutContextSelector } from '../../../ChatLayoutContext';
-import { useMemoizedFn } from '@/hooks';
-import { type SegmentedItem } from '@/components/ui/segmented';
-import { BusterRoutes, createBusterRoute } from '@/routes';
-import { useIsDashboardReadOnly } from '@/context/Dashboards/useIsDashboardReadOnly';
 import { Text } from '@/components/ui/typography';
+import { useIsDashboardReadOnly } from '@/context/Dashboards/useIsDashboardReadOnly';
+import { useMemoizedFn } from '@/hooks';
+import { BusterRoutes, createBusterRoute } from '@/routes';
+import { useChatLayoutContextSelector } from '../../../ChatLayoutContext';
+import type { FileView } from '../../../ChatLayoutContext/useLayoutConfig';
+import type { FileContainerSegmentProps } from '../interfaces';
 
 export const DashboardContainerHeaderSegment: React.FC<FileContainerSegmentProps> = React.memo(
   (props) => {

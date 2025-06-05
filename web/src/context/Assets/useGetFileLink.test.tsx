@@ -1,15 +1,16 @@
 import { renderHook } from '@testing-library/react';
-import { useGetFileLink } from './useGetFileLink';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useChatLayoutContextSelector } from '@/layouts/ChatLayout';
 import { assetParamsToRoute } from '@/lib/assets';
+import { useGetFileLink } from './useGetFileLink';
 
 // Mock dependencies
-jest.mock('@/layouts/ChatLayout', () => ({
-  useChatLayoutContextSelector: jest.fn()
+vi.mock('@/layouts/ChatLayout', () => ({
+  useChatLayoutContextSelector: vi.fn()
 }));
 
-jest.mock('@/lib/assets', () => ({
-  assetParamsToRoute: jest.fn()
+vi.mock('@/lib/assets', () => ({
+  assetParamsToRoute: vi.fn()
 }));
 
 describe('useGetFileLink', () => {
@@ -21,10 +22,10 @@ describe('useGetFileLink', () => {
   const mockChatId = 'chat-123';
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Mock useChatLayoutContextSelector to return our test values
-    (useChatLayoutContextSelector as jest.Mock).mockImplementation((selector) => {
+    (useChatLayoutContextSelector as any).mockImplementation((selector: any) => {
       const contextValues = {
         metricVersionNumber: mockMetricVersionNumber,
         dashboardVersionNumber: mockDashboardVersionNumber,
@@ -36,13 +37,25 @@ describe('useGetFileLink', () => {
     });
 
     // Mock assetParamsToRoute to return predictable values for testing
-    (assetParamsToRoute as jest.Mock).mockImplementation(
-      ({ assetId, type, versionNumber, secondaryView }) => {
+    (assetParamsToRoute as any).mockImplementation(
+      ({
+        assetId,
+        type,
+        versionNumber,
+        secondaryView
+      }: {
+        assetId: string;
+        type: string;
+        versionNumber: number;
+        secondaryView: string;
+      }) => {
         if (type === 'metric') {
           return `/metrics/${assetId}${versionNumber ? `/v${versionNumber}` : ''}${secondaryView ? `/${secondaryView}` : ''}`;
-        } else if (type === 'dashboard') {
+        }
+        if (type === 'dashboard') {
           return `/dashboards/${assetId}${versionNumber ? `/v${versionNumber}` : ''}${secondaryView ? `/${secondaryView}` : ''}`;
-        } else if (type === 'reasoning') {
+        }
+        if (type === 'reasoning') {
           return `/reasoning/${assetId}`;
         }
         return '';
@@ -240,7 +253,7 @@ describe('useGetFileLink', () => {
       });
 
       expect(meta).toEqual({
-        link: `/metrics/different-metric/v999`,
+        link: '/metrics/different-metric/v999',
         isSelected: false,
         selectedVersionNumber: mockMetricVersionNumber
       });

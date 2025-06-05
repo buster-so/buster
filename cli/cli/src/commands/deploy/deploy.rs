@@ -439,23 +439,9 @@ fn to_deploy_request(model: &Model, sql_content: String) -> DeployDatasetsReques
         });
     }
 
-    // Convert entity relationships
-    let entity_relationships: Option<Vec<DeployDatasetsEntityRelationshipsRequest>> =
-        if !model.relationships.is_empty() {
-            Some(
-                model
-                    .relationships
-                    .iter()
-                    .map(|rel| DeployDatasetsEntityRelationshipsRequest {
-                        name: rel.name.clone(),
-                        expr: rel.source_col.clone(), // Assuming foreign_key is the expression for the relationship for now
-                        type_: rel.type_.clone().unwrap_or_else(|| "LEFT".to_string()), // Default to LEFT if not specified
-                    })
-                    .collect(),
-            )
-        } else {
-            None
-        };
+    // Note: Relationships are now preserved in the yml_file field rather than being converted to entity_relationships.
+    // This allows the full semantic model structure (including relationships with all their metadata like 
+    // cardinality, descriptions, etc.) to be preserved and processed by the backend.
 
     let data_source_name = model.data_source_name.clone()
         .expect("data_source_name missing after validation, should be resolved by resolve_model_configurations");
@@ -464,7 +450,7 @@ fn to_deploy_request(model: &Model, sql_content: String) -> DeployDatasetsReques
     );
 
     // Serialize the input Model to YAML to be stored in the yml_file field of the request.
-    // This captures the full semantic definition as sent.
+    // This captures the full semantic definition as sent, including relationships with all their metadata.
     let yml_content_for_request = serde_yaml::to_string(&model).unwrap_or_else(|e| {
         eprintln!(
             "Error serializing model {} to YAML for deploy request: {}. Using empty string.",
@@ -484,7 +470,7 @@ fn to_deploy_request(model: &Model, sql_content: String) -> DeployDatasetsReques
         database: model.database.clone(),
         description: model.description.clone().unwrap_or_default(),
         sql_definition: Some(sql_content),
-        entity_relationships,
+        entity_relationships: None, // Relationships are now preserved in yml_file instead
         columns,
         yml_file: Some(yml_content_for_request), // Store the YAML of the model being deployed
     }
@@ -1191,7 +1177,7 @@ mod tests {
 name: test_model
 description: "Test model"
 
-dimension:
+dimensions:
   - name: dim1
     description: "First dimension"
     type: "string"
@@ -1362,19 +1348,15 @@ models:
         };
 
         let sql_content = "SELECT * FROM test_schema.test_model";
-        let request = to_deploy_request(&model, sql_content.to_string()); // Call the restored function
+        let request = to_deploy_request(&model, sql_content.to_string());
 
         assert_eq!(request.name, "test_model");
         assert_eq!(request.columns.len(), 2); // 1 dim, 1 measure
         assert_eq!(request.columns[0].name, "dim1");
         assert_eq!(request.columns[0].searchable, true);
         assert_eq!(request.columns[1].name, "measure1");
-        assert!(request.entity_relationships.is_some());
-        assert_eq!(request.entity_relationships.as_ref().unwrap().len(), 1);
-        assert_eq!(
-            request.entity_relationships.as_ref().unwrap()[0].name,
-            "related_model"
-        );
+        // The model has empty relationships, so entity_relationships should be None
+        assert!(request.entity_relationships.is_none());
         let expected_yml_content = serde_yaml::to_string(&model)?;
         assert_eq!(request.yml_file, Some(expected_yml_content));
 

@@ -1,12 +1,12 @@
 'use client';
 
-import { BusterRoutesWithArgsRoute, createBusterRoute } from '@/routes/busterRoutes';
-import { pathNameToParentRoute, pathNameToRoute } from '@/routes/helpers';
-import { useMemoizedFn } from '@/hooks';
-import { useRouter, usePathname, useParams } from 'next/navigation';
-import React, { PropsWithChildren } from 'react';
-import { createContext, useContextSelector } from 'use-context-selector';
 import isEmpty from 'lodash/isEmpty';
+import { useParams, usePathname, useRouter } from 'next/navigation';
+import React, { type PropsWithChildren } from 'react';
+import { createContext, useContextSelector } from 'use-context-selector';
+import { useMemoizedFn } from '@/hooks';
+import { type BusterRoutesWithArgsRoute, createBusterRoute } from '@/routes/busterRoutes';
+import { pathNameToParentRoute, pathNameToRoute } from '@/routes/helpers';
 
 export const useAppLayout = () => {
   const { push } = useRouter();
@@ -113,13 +113,13 @@ const createQueryParams = (params: Record<string, string | null>, preserveExisti
   }
 
   // Add new parameters
-  Object.entries(params).forEach(([key, value]) => {
+  for (const [key, value] of Object.entries(params)) {
     if (value) {
       url.searchParams.set(key, value);
     } else {
       url.searchParams.delete(key);
     }
-  });
+  }
 
   return url;
 };
@@ -137,8 +137,8 @@ const getQueryParamsFromPath = (path: string): Record<string, string> => {
 const waitForUrlChange = (
   condition: () => boolean,
   callback: () => void,
-  waitTime: number = 25,
-  iteration: number = 0
+  waitTime = 25,
+  iteration = 0
 ) => {
   if (condition()) {
     callback();

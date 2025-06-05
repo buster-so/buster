@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { DashboardFilterDiffModall } from './DashboardFilterDiffModall';
-import { fn } from '@storybook/test';
 import { faker } from '@faker-js/faker';
+import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
+import { DashboardFilterDiffModall } from './DashboardFilterDiffModall';
 
 const meta = {
   title: 'Features/Modal/DashboardFilterDiffModall',

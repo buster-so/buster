@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.skip('Can ask a question and navigate to top level pages', async ({ page }) => {
   await page.goto('http://localhost:3000/app/home');

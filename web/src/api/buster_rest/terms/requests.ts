@@ -1,5 +1,5 @@
+import type { BusterTerm, BusterTermListItem } from '@/api/asset_interfaces/terms';
 import { mainApi } from '../instances';
-import { BusterTerm, BusterTermListItem } from '@/api/asset_interfaces/terms';
 
 export const getTermsList = async (params: {
   /** The page number to retrieve */
@@ -45,5 +45,5 @@ export const updateTerm = async (params: {
 };
 
 export const deleteTerms = async (data: { ids: string[] }) => {
-  return mainApi.delete<BusterTerm>(`/terms`, { data }).then((res) => res.data);
+  return mainApi.delete<BusterTerm>('/terms', { data }).then((res) => res.data);
 };

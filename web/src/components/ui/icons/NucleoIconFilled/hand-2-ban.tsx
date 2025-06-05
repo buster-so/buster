@@ -1,6 +1,4 @@
-import React from 'react';
-
-import { iconProps } from './iconProps';
+import type { iconProps } from './iconProps';
 
 function hand2Ban(props: iconProps) {
   const strokewidth = props.strokewidth || 1.3;

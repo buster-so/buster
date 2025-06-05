@@ -1,22 +1,22 @@
-import { useMemoizedFn } from '@/hooks';
 import {
-  useSensors,
-  useSensor,
-  MouseSensor,
-  TouchSensor,
-  KeyboardSensor,
-  DragStartEvent,
-  DragOverEvent,
-  DragEndEvent,
   DndContext,
+  type DragEndEvent,
+  type DragOverEvent,
+  DragOverlay,
+  type DragStartEvent,
+  KeyboardSensor,
+  MouseSensor,
   pointerWithin,
-  DragOverlay
+  TouchSensor,
+  useSensor,
+  useSensors
 } from '@dnd-kit/core';
 import { restrictToHorizontalAxis } from '@dnd-kit/modifiers';
 import { arrayMove } from '@dnd-kit/sortable';
-import { flexRender, Header, Table } from '@tanstack/react-table';
-import React, { useState, useRef, useMemo, useEffect } from 'react';
-import { useContextSelector, createContext } from 'use-context-selector';
+import { flexRender, type Header, type Table } from '@tanstack/react-table';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { createContext, useContextSelector } from 'use-context-selector';
+import { useMemoizedFn } from '@/hooks';
 import { HEADER_HEIGHT } from './constants';
 
 const ACTIVATION_CONSTRAINT = {
@@ -60,7 +60,7 @@ export const SortColumnWrapper: React.FC<{
 
     // Add global cursor style
     const style = document.createElement('style');
-    style.innerHTML = `* { cursor: grabbing !important; }`;
+    style.innerHTML = '* { cursor: grabbing !important; }';
     document.head.appendChild(style);
     styleRef.current = style;
 

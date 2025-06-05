@@ -1,5 +1,5 @@
 import { BusterOrganizationRole } from '@/api/asset_interfaces/organizations';
-import { type BusterUserResponse } from '@/api/asset_interfaces/users';
+import type { BusterUserResponse } from '@/api/asset_interfaces/users';
 
 export const checkIfUserIsAdmin = (userInfo?: BusterUserResponse | null): boolean => {
   if (!userInfo) return false;

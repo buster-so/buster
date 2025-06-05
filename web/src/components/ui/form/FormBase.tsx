@@ -1,10 +1,10 @@
 import { createFormHookContexts } from '@tanstack/react-form';
-import { Label } from '../label/LabelBase';
-import { Input } from '../inputs';
-import { InputPassword } from '../inputs/InputPassword';
+import type { ReactNode } from 'react';
 import { cn } from '@/lib/classMerge';
 import { Button } from '../buttons';
-import { ReactNode } from 'react';
+import { Input } from '../inputs';
+import { InputPassword } from '../inputs/InputPassword';
+import { Label } from '../label/LabelBase';
 import { Text } from '../typography';
 
 export const { fieldContext, useFieldContext, formContext, useFormContext } =

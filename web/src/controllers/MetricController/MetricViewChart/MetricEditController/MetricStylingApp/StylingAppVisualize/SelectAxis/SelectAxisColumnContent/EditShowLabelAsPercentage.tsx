@@ -1,8 +1,8 @@
 import React from 'react';
-import { LabelAndInput } from '../../../Common/LabelAndInput';
+import type { ColumnSettings } from '@/api/asset_interfaces/metric/charts';
 import { Switch } from '@/components/ui/switch';
 import { useMemoizedFn } from '@/hooks';
-import { ColumnSettings } from '@/api/asset_interfaces/metric/charts';
+import { LabelAndInput } from '../../../Common/LabelAndInput';
 
 export const EditShowBarLabelAsPercentage: React.FC<{
   onUpdateColumnSettingConfig: (columnSettings: Partial<ColumnSettings>) => void;

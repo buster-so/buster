@@ -1,12 +1,12 @@
-import React, { useMemo } from 'react';
-import { Select } from '@/components/ui/select';
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import { LabelAndInput } from '../../Common';
 import last from 'lodash/last';
+import React, { useMemo } from 'react';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { ColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import type { SelectItem } from '@/components/ui/select';
+import { Select } from '@/components/ui/select';
 import { useMemoizedFn } from '@/hooks';
 import { isNumericColumnStyle, isNumericColumnType } from '@/lib';
-import { ColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
-import { SelectItem } from '@/components/ui/select';
+import { LabelAndInput } from '../../Common';
 
 export const AGGREGATE_OPTIONS: SelectItem<IBusterMetricChartConfig['metricValueAggregate']>[] = [
   { label: 'Sum', value: 'sum' },
@@ -24,7 +24,9 @@ export const EditMetricAggregate: React.FC<{
   onUpdateAggregate: (aggregate: IBusterMetricChartConfig['metricValueAggregate']) => void;
   columnLabelFormat: ColumnLabelFormat | undefined;
 }> = React.memo(({ aggregate, onUpdateAggregate, columnId, columnLabelFormat }) => {
-  const isNumberColumn = isNumericColumnType(columnLabelFormat?.columnType!);
+  const isNumberColumn = columnLabelFormat?.columnType
+    ? isNumericColumnType(columnLabelFormat?.columnType)
+    : false;
   const isNumericStyle = isNumericColumnStyle(columnLabelFormat?.style);
   const disableOptions = !isNumberColumn || !isNumericStyle;
 

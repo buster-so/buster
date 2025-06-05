@@ -1,22 +1,16 @@
 'use client';
 
-import {
-  useGetDatasetGroup,
-  useGetUserAttributes,
-  useGetUserDatasetGroups,
-  useGetUserDatasets,
-  useGetUserPermissionGroups
-} from '@/api/buster_rest';
-import { useDebounceSearch } from '@/hooks';
+import type React from 'react';
+import { useMemo, useState } from 'react';
+import { useGetUserAttributes } from '@/api/buster_rest';
 import {
   NewPermissionGroupModal,
   PermissionSearchAndListWrapper
 } from '@/components/features/PermissionComponents';
-import React, { useMemo, useState } from 'react';
-import { UserAttributesListContainer } from './UserAttributesListContainer';
 import { Button } from '@/components/ui/buttons';
-import { useMemoizedFn } from '@/hooks';
 import { Plus } from '@/components/ui/icons';
+import { useDebounceSearch, useMemoizedFn } from '@/hooks';
+import { UserAttributesListContainer } from './UserAttributesListContainer';
 
 export const UserAttributesController: React.FC<{ userId: string }> = ({ userId }) => {
   const { data: attributes } = useGetUserAttributes({ userId });

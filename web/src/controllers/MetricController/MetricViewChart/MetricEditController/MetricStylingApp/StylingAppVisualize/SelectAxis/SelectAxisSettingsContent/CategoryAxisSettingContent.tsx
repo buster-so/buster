@@ -1,13 +1,13 @@
 import React from 'react';
-import { EditGrouping } from './EditGrouping';
-import { useSelectAxisContextSelector } from '../useSelectAxisContext';
-import { useMemoizedFn } from '@/hooks';
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import { EditAxisTitle } from './EditShowAxisTitle';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { useUpdateMetricChart } from '@/context/Metrics';
+import { useMemoizedFn } from '@/hooks';
+import { useSelectAxisContextSelector } from '../useSelectAxisContext';
+import { EditGrouping } from './EditGrouping';
+import { EditAxisTitle } from './EditShowAxisTitle';
 
-export const CategoryAxisSettingContent: React.FC<{}> = React.memo(({}) => {
-  const { onUpdateMetricChartConfig } = useUpdateMetricChart();
+export const CategoryAxisSettingContent: React.FC = React.memo(() => {
+  const { onUpdateMetricChartConfig: contextOnUpdateMetricChartConfig } = useUpdateMetricChart();
   const selectedChartType = useSelectAxisContextSelector((x) => x.selectedChartType);
   const lineGroupType = useSelectAxisContextSelector((x) => x.lineGroupType);
   const barGroupType = useSelectAxisContextSelector((x) => x.barGroupType);
@@ -15,11 +15,11 @@ export const CategoryAxisSettingContent: React.FC<{}> = React.memo(({}) => {
   const barShowTotalAtTop = useSelectAxisContextSelector((x) => x.barShowTotalAtTop);
 
   const onChangeCategoryAxisTitle = useMemoizedFn((value: string | null) => {
-    onUpdateMetricChartConfig({ chartConfig: { categoryAxisTitle: value } });
+    contextOnUpdateMetricChartConfig({ chartConfig: { categoryAxisTitle: value } });
   });
 
   const onUpdateChartConfig = useMemoizedFn((chartConfig: Partial<IBusterMetricChartConfig>) => {
-    onUpdateMetricChartConfig({ chartConfig });
+    contextOnUpdateMetricChartConfig({ chartConfig });
   });
 
   return (

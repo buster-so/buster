@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { StatusBadgeIndicator } from './StatusBadgeIndicator';
 import { VerificationStatus } from '@/api/asset_interfaces';
+import { StatusBadgeIndicator } from './StatusBadgeIndicator';
 
 const meta = {
   title: 'Features/Metrics/StatusBadgeIndicator',

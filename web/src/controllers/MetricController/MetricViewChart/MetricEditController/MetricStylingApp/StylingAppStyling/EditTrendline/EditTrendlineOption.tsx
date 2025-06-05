@@ -1,13 +1,13 @@
-import { Select, SelectItem } from '@/components/ui/select';
+import React, { useMemo } from 'react';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { ChartType, Trendline } from '@/api/asset_interfaces/metric/charts';
+import { TriangleWarning } from '@/components/ui/icons';
+import { Select, type SelectItem } from '@/components/ui/select';
+import { AppTooltip } from '@/components/ui/tooltip';
+import { isDateColumnType, isNumericColumnType } from '@/lib';
 import { LabelAndInput } from '../../Common';
 import { trendlineOptions } from './config';
-import { LoopTrendline } from './EditTrendline';
-import React, { useMemo } from 'react';
-import type { ChartType, Trendline } from '@/api/asset_interfaces/metric/charts';
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import { isDateColumnType, isNumericColumnType } from '@/lib';
-import { AppTooltip } from '@/components/ui/tooltip';
-import { TriangleWarning } from '@/components/ui/icons';
+import type { LoopTrendline } from './EditTrendline';
 
 export const EditTrendlineOption = React.memo(
   ({

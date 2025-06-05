@@ -1,3 +1,6 @@
+import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { userQueryKeys } from '@/api/query_keys/users';
+import { useUserConfigContextSelector } from '@/context/Users/BusterUserConfigProvider';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import {
   createUserFavorite,
@@ -6,9 +9,6 @@ import {
   getUserFavorites_server,
   updateUserFavorites
 } from './requests';
-import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useUserConfigContextSelector } from '@/context/Users/BusterUserConfigProvider';
-import { userQueryKeys } from '@/api/query_keys/users';
 
 export const useGetUserFavorites = () => {
   const queryFn = useMemoizedFn(async () => getUserFavorites());

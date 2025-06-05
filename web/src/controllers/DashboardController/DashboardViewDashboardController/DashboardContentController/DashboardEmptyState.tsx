@@ -1,6 +1,6 @@
+import React from 'react';
 import { Button } from '@/components/ui/buttons';
 import { Plus } from '@/components/ui/icons';
-import React from 'react';
 import { Text } from '@/components/ui/typography';
 
 export const DashboardEmptyState: React.FC<{

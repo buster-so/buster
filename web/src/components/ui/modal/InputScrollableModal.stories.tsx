@@ -1,9 +1,9 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { InputSelectModal } from './InputSelectModal';
-import React from 'react';
-import { fn } from '@storybook/test';
 import { faker } from '@faker-js/faker';
+import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
+import React from 'react';
 import { useSet } from '@/hooks';
+import { InputSelectModal } from './InputSelectModal';
 
 const meta: Meta<typeof InputSelectModal> = {
   title: 'UI/Modal/InputSelectModal',

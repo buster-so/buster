@@ -1,18 +1,19 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import isEmpty from 'lodash/isEmpty';
+import last from 'lodash/last';
+import type React from 'react';
+import { useEffect, useRef } from 'react';
+import type { BusterChatMessageReasoning_text } from '@/api/asset_interfaces/chat';
 import { useGetChat, useGetChatMessage } from '@/api/buster_rest/chats';
-import { ReasoningMessageSelector } from './ReasoningMessages';
-import { BlackBoxMessage } from './ReasoningMessages/ReasoningBlackBoxMessage';
+import { queryKeys } from '@/api/query_keys';
 import { FileIndeterminateLoader } from '@/components/features/FileIndeterminateLoader';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
-import isEmpty from 'lodash/isEmpty';
+import { ReasoningMessageSelector } from './ReasoningMessages';
+import { BlackBoxMessage } from './ReasoningMessages/ReasoningBlackBoxMessage';
 import { ReasoningScrollToBottom } from './ReasoningScrollToBottom';
-import { useQuery } from '@tanstack/react-query';
-import { queryKeys } from '@/api/query_keys';
-import { BusterChatMessageReasoning_text } from '@/api/asset_interfaces/chat';
-import last from 'lodash/last';
 
 interface ReasoningControllerProps {
   chatId: string;

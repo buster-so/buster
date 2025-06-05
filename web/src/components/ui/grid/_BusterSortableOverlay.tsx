@@ -1,13 +1,13 @@
 'use client';
 
-import { DragOverlay, defaultDropAnimationSideEffects } from '@dnd-kit/core';
 import type { DropAnimation, Modifier } from '@dnd-kit/core';
-import { BusterSortableItemContent } from './_BusterSortableItemContent';
+import { DragOverlay, defaultDropAnimationSideEffects } from '@dnd-kit/core';
+import { snapCenterToCursor } from '@dnd-kit/modifiers';
 import { animate } from 'framer-motion';
 import React, { useEffect, useMemo } from 'react';
-import { BusterResizeableGridRow } from './interfaces';
-import { snapCenterToCursor } from '@dnd-kit/modifiers';
+import { BusterSortableItemContent } from './_BusterSortableItemContent';
 import { NUMBER_OF_COLUMNS } from './helpers';
+import type { BusterResizeableGridRow } from './interfaces';
 
 const dropAnimationConfig: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -37,7 +37,11 @@ export const BusterSortableOverlay: React.FC<{
     const indexOfItem = r?.items.findIndex((item) => item.id === activeId);
 
     if (r && indexOfItem !== undefined && indexOfItem !== -1) {
-      const widthOfGrid = document.querySelector('.buster-resizeable-grid')?.clientWidth!;
+      const widthOfGrid = document.querySelector('.buster-resizeable-grid')?.clientWidth;
+      if (widthOfGrid === undefined) {
+        // Handle the case where widthOfGrid is undefined
+        return { widthOfItem: undefined, useSnapToCenter: false };
+      }
       let columnsOfItem = r.columnSizes?.[indexOfItem] || 4;
       const useSnapToCenter = columnsOfItem === 12;
       if (useSnapToCenter) {

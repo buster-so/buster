@@ -1,28 +1,29 @@
 import { renderHook } from '@testing-library/react';
-import { useCloseVersionHistory } from './useCloseVersionHistory';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout/AppLayoutProvider';
 import { useGetInitialChatFile } from '@/layouts/ChatLayout/ChatContext/useGetInitialChatFile';
 import { useChatLayoutContextSelector } from '@/layouts/ChatLayout/ChatLayoutContext/ChatLayoutContext';
+import { useCloseVersionHistory } from './useCloseVersionHistory';
 
 // Mock the dependencies
-jest.mock('@/context/BusterAppLayout/AppLayoutProvider');
-jest.mock('@/layouts/ChatLayout/ChatContext/useGetInitialChatFile');
-jest.mock('@/layouts/ChatLayout/ChatLayoutContext/ChatLayoutContext');
+vi.mock('@/context/BusterAppLayout/AppLayoutProvider');
+vi.mock('@/layouts/ChatLayout/ChatContext/useGetInitialChatFile');
+vi.mock('@/layouts/ChatLayout/ChatLayoutContext/ChatLayoutContext');
 
 describe('useCloseVersionHistory', () => {
-  const mockOnChangePage = jest.fn();
-  const mockGetInitialChatFileHref = jest.fn();
+  const mockOnChangePage = vi.fn();
+  const mockGetInitialChatFileHref = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Mock useAppLayoutContextSelector
-    (useAppLayoutContextSelector as jest.Mock).mockImplementation((selector) => {
+    (useAppLayoutContextSelector as any).mockImplementation((selector: any) => {
       return selector({ onChangePage: mockOnChangePage });
     });
 
     // Mock useGetInitialChatFile
-    (useGetInitialChatFile as jest.Mock).mockReturnValue(mockGetInitialChatFileHref);
+    (useGetInitialChatFile as any).mockReturnValue(mockGetInitialChatFileHref);
   });
 
   it('should be true', () => {
@@ -34,7 +35,7 @@ describe('useCloseVersionHistory', () => {
     mockGetInitialChatFileHref.mockReturnValue(expectedHref);
 
     // Mock chat layout context values
-    (useChatLayoutContextSelector as jest.Mock).mockImplementation((selector) =>
+    (useChatLayoutContextSelector as any).mockImplementation((selector: any) =>
       selector({
         chatId: 'chat-123',
         metricId: 'metric-123',
@@ -61,7 +62,7 @@ describe('useCloseVersionHistory', () => {
     mockGetInitialChatFileHref.mockReturnValue(null);
 
     // Mock chat layout context values
-    (useChatLayoutContextSelector as jest.Mock).mockImplementation((selector) =>
+    (useChatLayoutContextSelector as any).mockImplementation((selector: any) =>
       selector({
         chatId: 'chat-123',
         metricId: 'metric-123',
@@ -80,7 +81,7 @@ describe('useCloseVersionHistory', () => {
     mockGetInitialChatFileHref.mockReturnValue(expectedHref);
 
     // Mock chat layout context values
-    (useChatLayoutContextSelector as jest.Mock).mockImplementation((selector) =>
+    (useChatLayoutContextSelector as any).mockImplementation((selector: any) =>
       selector({
         chatId: 'chat-123',
         metricId: 'metric-123',
@@ -97,7 +98,7 @@ describe('useCloseVersionHistory', () => {
 
   it('should return correct href when chatId is not present', () => {
     // Mock chat layout context values
-    (useChatLayoutContextSelector as jest.Mock).mockImplementation((selector) =>
+    (useChatLayoutContextSelector as any).mockImplementation((selector: any) =>
       selector({
         chatId: undefined,
         metricId: 'metric-123',
@@ -118,7 +119,7 @@ describe('useCloseVersionHistory', () => {
     mockGetInitialChatFileHref.mockReturnValue(expectedHref);
 
     // Mock chat layout context values
-    (useChatLayoutContextSelector as jest.Mock).mockImplementation((selector) =>
+    (useChatLayoutContextSelector as any).mockImplementation((selector: any) =>
       selector({
         chatId: undefined,
         metricId: 'metric-123',

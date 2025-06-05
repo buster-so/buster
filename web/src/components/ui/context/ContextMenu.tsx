@@ -1,9 +1,14 @@
+import type { ContextMenuProps as ContextMenuPropsRadix } from '@radix-ui/react-context-menu';
 import React from 'react';
+import { cn } from '@/lib/classMerge';
+import CircleSpinnerLoader from '../loaders/CircleSpinnerLoader';
 import {
-  ContextMenu as ContextMenuPrimitive,
   ContextMenuCheckboxItem,
   ContextMenuContent,
   ContextMenuItem as ContextMenuItemPrimitive,
+  ContextMenuLink,
+  ContextMenuPortal,
+  ContextMenu as ContextMenuPrimitive,
   //   ContextMenuLabel,
   //   ContextMenuRadioGroup,
   //   ContextMenuRadioItem,
@@ -12,13 +17,8 @@ import {
   ContextMenuSub,
   ContextMenuSubContent,
   ContextMenuSubTrigger,
-  ContextMenuTrigger,
-  ContextMenuLink,
-  ContextMenuPortal
+  ContextMenuTrigger
 } from './ContextBase';
-import { ContextMenuProps as ContextMenuPropsRadix } from '@radix-ui/react-context-menu';
-import CircleSpinnerLoader from '../loaders/CircleSpinnerLoader';
-import { cn } from '@/lib/classMerge';
 
 export interface ContextMenuItem {
   label: React.ReactNode | string;

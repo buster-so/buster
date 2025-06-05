@@ -1,12 +1,12 @@
 import isElement from 'lodash/isElement';
-import React from 'react';
+import type React from 'react';
 
 export const getAbsoluteHeight = (el: HTMLElement) => {
   // Get the DOM Node if you pass in a string
-  const _el: any = typeof el === 'string' ? document.querySelector(el) : el;
+  const _el: HTMLElement | null = typeof el === 'string' ? document.querySelector(el) : el;
   if (window && _el && el && isElement(_el)) {
     const styles = window.getComputedStyle(_el);
-    const margin = parseFloat(styles['marginTop']) + parseFloat(styles['marginBottom']);
+    const margin = Number.parseFloat(styles.marginTop) + Number.parseFloat(styles.marginBottom);
     return Math.ceil(_el.offsetHeight + margin);
   }
   return el?.offsetHeight || 0;
@@ -14,10 +14,10 @@ export const getAbsoluteHeight = (el: HTMLElement) => {
 
 export const getAbsoluteWidth = (el: HTMLElement) => {
   // Get the DOM Node if you pass in a string
-  const _el: any = typeof el === 'string' ? document.querySelector(el) : el;
+  const _el: HTMLElement | null = typeof el === 'string' ? document.querySelector(el) : el;
   if (window && _el && el && isElement(_el)) {
     const styles = window.getComputedStyle(_el);
-    const margin = parseFloat(styles['marginLeft']) + parseFloat(styles['marginRight']);
+    const margin = Number.parseFloat(styles.marginLeft) + Number.parseFloat(styles.marginRight);
     return Math.ceil(_el.offsetWidth + margin);
   }
   return el?.offsetWidth || 0;
@@ -29,7 +29,12 @@ export const getTextWidth = (
 ) => {
   const { fontSize = 14, fontFamily = '-apple-system' } = options || {};
   const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d') as any;
+  const context = canvas.getContext('2d');
+
+  if (!context) {
+    canvas.remove();
+    return 0;
+  }
 
   // Set the font style for the text
   context.font = `${fontSize}px ${fontFamily}`;
@@ -69,15 +74,15 @@ export const boldHighlights = (name: string, highlights: string[]): React.ReactN
         return splitParts.map((splitPart, splitIndex) => {
           if (matches.includes(splitPart.toLowerCase())) {
             return (
-              <span className="font-semibold" key={`${index}-${splitIndex}`}>
+              <span className="font-semibold" key={`bold-${splitPart}-${splitIndex.toString()}`}>
                 {splitPart}
               </span>
             );
           }
-          return <span key={`${index}-${splitIndex}`}>{splitPart}</span>;
+          return <span key={`normal-${splitPart}-${splitIndex.toString()}`}>{splitPart}</span>;
         });
       }
-      return <span key={index}>{part}</span>;
+      return <span key={`part-${part}`}>{part}</span>;
     });
 
     return formattedParts.map((part, index) => {
@@ -86,7 +91,7 @@ export const boldHighlights = (name: string, highlights: string[]): React.ReactN
           style={{
             marginRight: 2.5
           }}
-          key={index}>
+          key={`formatted-${typeof part === 'string' ? part : index}`}>
           {part}
         </span>
       );

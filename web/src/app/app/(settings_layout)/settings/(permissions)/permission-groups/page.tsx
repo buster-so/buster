@@ -1,17 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
-import { SettingsPageHeader } from '../../_components/SettingsPageHeader';
-import {
-  PermissionSearch,
-  NewPermissionGroupModal
-} from '@/components/features/PermissionComponents';
-import { useDebounceSearch } from '@/hooks/useDebounceSearch';
+import { useState } from 'react';
 import { useListAllPermissionGroups } from '@/api/buster_rest';
-import { ListPermissionGroupsComponent } from './ListPermissionGroupsComponent';
-import { useMemoizedFn } from '@/hooks';
+import {
+  NewPermissionGroupModal,
+  PermissionSearch
+} from '@/components/features/PermissionComponents';
 import { Button } from '@/components/ui/buttons';
 import { Plus } from '@/components/ui/icons';
+import { useMemoizedFn } from '@/hooks';
+import { useDebounceSearch } from '@/hooks/useDebounceSearch';
+import { SettingsPageHeader } from '../../_components/SettingsPageHeader';
+import { ListPermissionGroupsComponent } from './ListPermissionGroupsComponent';
 
 export default function Page() {
   const { data: permissionGroups, isFetched, refetch } = useListAllPermissionGroups();

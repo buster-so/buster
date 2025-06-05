@@ -1,18 +1,18 @@
-import type { DatasetOption } from '../../../chartHooks';
 import { Chart, Filler, type ScriptableContext } from 'chart.js';
-import type { ChartProps } from '../../core';
-import type { SeriesBuilderProps } from './interfaces';
-import type { LabelBuilderProps } from './useSeriesOptions';
-import { formatLabelForDataset, JOIN_CHARACTER } from '../../../commonHelpers';
-import { addOpacityToColor, createDayjsDate, formatLabel } from '@/lib';
-import { defaultLabelOptionConfig } from '../useChartSpecificOptions/labelOptionConfig';
+import type { ColumnSettings } from '@/api/asset_interfaces/metric/charts';
 import {
   DEFAULT_COLUMN_LABEL_FORMAT,
   DEFAULT_COLUMN_SETTINGS
 } from '@/api/asset_interfaces/metric/defaults';
-import type { ColumnSettings } from '@/api/asset_interfaces/metric/charts';
+import { addOpacityToColor, createDayjsDate, formatLabel } from '@/lib';
+import type { DatasetOption } from '../../../chartHooks';
+import { formatLabelForDataset, JOIN_CHARACTER } from '../../../commonHelpers';
+import type { ChartProps } from '../../core';
 import { formatBarAndLineDataLabel } from '../../helpers';
+import { defaultLabelOptionConfig } from '../useChartSpecificOptions/labelOptionConfig';
 import { createTrendlineOnSeries } from './createTrendlines';
+import type { SeriesBuilderProps } from './interfaces';
+import type { LabelBuilderProps } from './useSeriesOptions';
 
 Chart.register(Filler);
 

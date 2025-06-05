@@ -1,4 +1,5 @@
-@import 'tailwindcss';
+@import "tailwindcss";
+@import "./tailwindAnimations.css";
 @plugin 'tailwind-scrollbar';
 @plugin "tailwindcss-animate";
 
@@ -6,8 +7,8 @@
 
 @theme {
   /* font */
-  --font-sans: 'Roobert_Pro', sans-serif;
-  --font-mono: Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  --font-sans: "Roobert_Pro", sans-serif;
+  --font-mono: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
   /* shadows */
   --shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.05);
@@ -66,7 +67,7 @@
   /* base color */
   --color-background: #ffffff;
   --color-foreground: #000000;
-  --color-background-secondary: '#f3f3f3';
+  --color-background-secondary: "#f3f3f3";
   --color-foreground-hover: #393939;
   --color-primary: #7c3aed;
   --color-primary-light: #a26cff;
@@ -109,8 +110,6 @@
 
   --spacing: 4px;
 }
-
-@import './tailwindAnimations.css';
 
 @layer base {
   * {

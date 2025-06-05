@@ -1,8 +1,7 @@
-import React from 'react';
-
 function Google() {
   return (
     <svg height="1em" width="1em" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+      <title>Google Icon</title>
       <g fill="currentColor">
         <path
           d="M29.44,16.318c0-.993-.089-1.947-.255-2.864h-13.185v5.422h7.535c-.331,1.744-1.324,3.22-2.813,4.213v3.525h4.544c2.647-2.444,4.175-6.033,4.175-10.296Z"

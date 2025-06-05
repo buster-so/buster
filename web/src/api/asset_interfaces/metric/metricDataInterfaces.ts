@@ -1,4 +1,4 @@
-import { DataMetadata, IDataResult } from './interfaces';
+import type { DataMetadata, IDataResult } from './interfaces';
 
 export type BusterMetricData = {
   data: IDataResult | null;

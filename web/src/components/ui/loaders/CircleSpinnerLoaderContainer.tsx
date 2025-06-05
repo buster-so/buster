@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import CircleSpinnerLoader from './CircleSpinnerLoader';
 
 export const CircleSpinnerLoaderContainer: React.FC<{

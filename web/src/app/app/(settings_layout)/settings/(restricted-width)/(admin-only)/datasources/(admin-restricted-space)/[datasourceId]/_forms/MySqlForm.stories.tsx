@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { type DataSource, DataSourceTypes } from '@/api/asset_interfaces';
 import { MySqlForm } from './MySqlForm';
-import { DataSource, DataSourceTypes } from '@/api/asset_interfaces';
 
 // Sample DataSource for the story
 const sampleDataSource: DataSource = {

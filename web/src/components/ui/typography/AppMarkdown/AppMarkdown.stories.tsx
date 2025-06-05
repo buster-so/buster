@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { AppMarkdown } from './AppMarkdown';
-import { Button } from '@/components/ui/buttons';
 import { useState } from 'react';
+import { Button } from '@/components/ui/buttons';
 import { Checkbox } from '../../checkbox';
 import { Switch } from '../../switch/Switch';
+import { AppMarkdown } from './AppMarkdown';
 
 const meta: Meta<typeof AppMarkdown> = {
   title: 'UI/Typography/AppMarkdown',

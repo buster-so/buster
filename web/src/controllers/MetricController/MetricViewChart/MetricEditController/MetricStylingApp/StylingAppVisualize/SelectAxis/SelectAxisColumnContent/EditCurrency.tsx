@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
-import { LabelAndInput } from '../../../Common/LabelAndInput';
 import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
-import { Select, SelectItem } from '@/components/ui/select';
 import { useGetCurrencies } from '@/api/buster_rest/nextjs/currency';
-import { useMemoizedFn } from '@/hooks';
+import { Select, type SelectItem } from '@/components/ui/select';
 import { Text } from '@/components/ui/typography';
+import { useMemoizedFn } from '@/hooks';
+import { LabelAndInput } from '../../../Common/LabelAndInput';
 
 export const EditCurrency: React.FC<{
   currency: IColumnLabelFormat['currency'];
@@ -24,7 +24,7 @@ export const EditCurrency: React.FC<{
           </div>
         ),
         value: currency.code,
-        searchLabel: currency.code + ' ' + currency.description
+        searchLabel: `${currency.code} ${currency.description}`
       })) || []
     );
   }, [currencies]);

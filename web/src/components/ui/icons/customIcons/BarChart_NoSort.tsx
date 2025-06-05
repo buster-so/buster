@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 export const BarChartSortNoneIcon: React.FC<{
   'data-value'?: string;
@@ -11,6 +11,7 @@ export const BarChartSortNoneIcon: React.FC<{
       height="12"
       viewBox="0 0 11 12"
       fill="none">
+      <title>Bar Chart No Sort Icon</title>
       <path
         d="M8.62598 9.9375L8.62593 5.125M1.87598 9.9375V6.875M5.25098 9.9375V2.9375"
         stroke="#575859"

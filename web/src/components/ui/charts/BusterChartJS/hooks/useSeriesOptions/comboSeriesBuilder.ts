@@ -1,11 +1,11 @@
-import type { ChartProps } from '../../core';
-import { LabelBuilderProps } from './useSeriesOptions';
-import { SeriesBuilderProps } from './interfaces';
-import { DatasetOption } from '../../../chartHooks';
 import { DEFAULT_COLUMN_SETTINGS, ENABLED_DOTS_ON_LINE_SIZE } from '@/api/asset_interfaces/metric';
+import type { ColumnSettings } from '@/api/asset_interfaces/metric/charts';
+import type { DatasetOption } from '../../../chartHooks';
+import type { ChartProps } from '../../core';
 import { barBuilder } from './barSeriesBuilder';
+import type { SeriesBuilderProps } from './interfaces';
 import { lineBuilder, lineSeriesBuilder_labels } from './lineSeriesBuilder';
-import { ColumnSettings } from '@/api/asset_interfaces/metric/charts';
+import type { LabelBuilderProps } from './useSeriesOptions';
 
 type ComboSeries = Array<
   ChartProps<'bar'>['data']['datasets'][number] | ChartProps<'line'>['data']['datasets'][number]

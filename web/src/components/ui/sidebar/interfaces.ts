@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 export interface ISidebarItem {
   label: string;
@@ -9,6 +9,7 @@ export interface ISidebarItem {
   active?: boolean;
   onRemove?: () => void;
   onClick?: () => void;
+  collapsedTooltip?: string;
 }
 
 export interface ISidebarGroup {
@@ -20,6 +21,8 @@ export interface ISidebarGroup {
   defaultOpen?: boolean; //will default to true
   isSortable?: boolean;
   onItemsReorder?: (ids: string[]) => void;
+  triggerClassName?: string;
+  className?: string;
 }
 
 export interface ISidebarList {
@@ -34,4 +37,6 @@ export interface SidebarProps {
   content: SidebarContent[];
   footer?: React.ReactNode;
   isSortable?: boolean;
+  useCollapsible?: boolean;
+  onCollapseClick?: (value: boolean) => void;
 }

@@ -1,12 +1,11 @@
 'use client';
 
-import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
-import { useRouter } from 'next/navigation';
 import React, { useMemo } from 'react';
-import { DatasetApps, DataSetAppText } from '../config';
-import { createBusterRoute, BusterRoutes } from '@/routes';
-import { useMemoizedFn } from '@/hooks';
+import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
+import { useMemoizedFn } from '@/hooks';
+import { BusterRoutes, createBusterRoute } from '@/routes';
+import { DataSetAppText, DatasetApps } from '../config';
 
 export const DatasetsHeaderOptions: React.FC<{
   selectedApp: DatasetApps;
@@ -26,7 +25,7 @@ export const DatasetsHeaderOptions: React.FC<{
     () =>
       optionsItems.map((key) => ({
         label: DataSetAppText[key as DatasetApps],
-        link: keyToRoute(datasetId!, key),
+        link: datasetId ? keyToRoute(datasetId, key) : '',
         value: key
       })),
     [datasetId, optionsItems]

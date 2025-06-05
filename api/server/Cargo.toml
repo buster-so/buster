@@ -1,6 +1,6 @@
 [package]
 name = "buster_server"
-version = "0.1.12"
+version = "0.2.3"
 edition = "2021"
 default-run = "buster_server"
 
@@ -39,7 +39,6 @@ tower-http = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 uuid = { workspace = true }
-fastembed = { workspace = true }
 
 # Local dependencies
 handlers = { path = "../libs/handlers" }

@@ -1,26 +1,26 @@
-import { DEFAULT_TRENDLINE_CONFIG, IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import React, { useEffect, useMemo, useState } from 'react';
-import type { ChartEncodes, ScatterAxis, Trendline } from '@/api/asset_interfaces/metric/charts';
-import { v4 as uuidv4 } from 'uuid';
-import { useSet, useMemoizedFn } from '@/hooks';
-import { LabelAndInput } from '../../Common';
-import { Button } from '@/components/ui/buttons';
-import { Separator } from '@/components/ui/seperator';
-import { Plus } from '@/components/ui/icons';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CollapseDelete } from '../../Common/CollapseDelete';
-import { formatLabel } from '@/lib';
-import { ColumnMetaData } from '@/api/asset_interfaces';
-import { TrendlineColumnId } from './EditTrendlineColumnId';
-import { TrendlineColorPicker } from './EditTrendlineColorPicker';
-import { TrendlineLabel } from './EditTrendlineLabel';
-import { EditTrendlineShowLine } from './EditTrendlineShowLine';
-import { EditTrendlineOption } from './EditTrendlineOption';
-import { TypeToLabel } from './config';
-import { JOIN_CHARACTER } from '@/components/ui/charts/commonHelpers';
 import isEqual from 'lodash/isEqual';
-import { TrendlineLineStyle } from './TrendlineLineStyle';
+import React, { useEffect, useMemo, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import type { ColumnMetaData } from '@/api/asset_interfaces';
+import { DEFAULT_TRENDLINE_CONFIG, type IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { ChartEncodes, ScatterAxis, Trendline } from '@/api/asset_interfaces/metric/charts';
+import { Button } from '@/components/ui/buttons';
+import { JOIN_CHARACTER } from '@/components/ui/charts/commonHelpers';
+import { Plus } from '@/components/ui/icons';
+import { Separator } from '@/components/ui/seperator';
+import { useMemoizedFn, useSet } from '@/hooks';
+import { formatLabel } from '@/lib';
+import { LabelAndInput } from '../../Common';
+import { CollapseDelete } from '../../Common/CollapseDelete';
+import { TypeToLabel } from './config';
+import { TrendlineColorPicker } from './EditTrendlineColorPicker';
+import { TrendlineColumnId } from './EditTrendlineColumnId';
+import { TrendlineLabel } from './EditTrendlineLabel';
+import { EditTrendlineOption } from './EditTrendlineOption';
+import { EditTrendlineShowLine } from './EditTrendlineShowLine';
 import { TrendlineAggregateAllCategories } from './TrendlineAggregateAllCategories';
+import { TrendlineLineStyle } from './TrendlineLineStyle';
 import { TrendlinePolynomialOrder } from './TrendlinePolynomialOrder';
 // import { TrendlineProjection } from './TrendlineProjection';
 // import { TrendlinePolynomialOrder } from './TrendlinePolynomialOrder';
@@ -53,10 +53,7 @@ export const EditTrendline: React.FC<{
     const [newTrendIds, { add: addNewTrendId }] = useSet<string>();
 
     const setTrends = useMemo(() => {
-      return (
-        setTrends: (prev: LoopTrendline[]) => LoopTrendline[],
-        saveToExternal: boolean = true
-      ) => {
+      return (setTrends: (prev: LoopTrendline[]) => LoopTrendline[], saveToExternal = true) => {
         _setTrends((trendlines) => {
           const result = setTrends(trendlines);
           if (saveToExternal) {

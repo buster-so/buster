@@ -1,21 +1,21 @@
+import isEmpty from 'lodash/isEmpty';
 import React, { useMemo } from 'react';
-import { DropZone, SelectAxisDropzones, SelectAxisItem } from './SelectAxisDragContainer';
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import { getChartTypeDropZones } from './helper';
-import { ISelectAxisContext, SelectAxisProvider } from './useSelectAxisContext';
-import { useMemoizedFn } from '@/hooks';
-import { chartTypeToAxis, zoneIdToAxis } from './config';
-import {
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type {
   CategoryAxisStyleConfig,
   ChartEncodes,
   XAxisConfig,
   Y2AxisConfig,
   YAxisConfig
 } from '@/api/asset_interfaces/metric/charts';
-import isEmpty from 'lodash/isEmpty';
-import { SelectAxisEmptyState } from './SelectAxisEmptyState';
-import { useUpdateMetricChart } from '@/context/Metrics';
 import { ErrorBoundary } from '@/components/ui/error';
+import { useUpdateMetricChart } from '@/context/Metrics';
+import { useMemoizedFn } from '@/hooks';
+import { chartTypeToAxis, zoneIdToAxis } from './config';
+import { getChartTypeDropZones } from './helper';
+import { type DropZone, SelectAxisDropzones, type SelectAxisItem } from './SelectAxisDragContainer';
+import { SelectAxisEmptyState } from './SelectAxisEmptyState';
+import { type ISelectAxisContext, SelectAxisProvider } from './useSelectAxisContext';
 
 export const SelectAxis: React.FC<
   Required<YAxisConfig> &
@@ -43,7 +43,7 @@ export const SelectAxis: React.FC<
 
     const newChartEncodes: Partial<ChartEncodes> = dropZones.reduce<ChartEncodes>((acc, zone) => {
       const axis = zoneIdToAxis[zone.id];
-      return { ...acc, [axis]: zone.items };
+      return Object.assign(acc, { [axis]: zone.items });
     }, {} as ChartEncodes);
 
     const newChartConfig: Partial<IBusterMetricChartConfig> = {

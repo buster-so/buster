@@ -1,12 +1,13 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
+import type React from 'react';
+import { useCallback, useState } from 'react';
+import { createContext, useContextSelector } from 'use-context-selector';
 import type { ShareAssetType } from '@/api/asset_interfaces/share';
 import { queryKeys } from '@/api/query_keys';
 import { useMemoizedFn } from '@/hooks';
 import { timeout } from '@/lib';
-import { useQueryClient } from '@tanstack/react-query';
-import React, { useCallback, useState } from 'react';
-import { createContext, useContextSelector } from 'use-context-selector';
 
 const useBusterAssets = () => {
   const queryClient = useQueryClient();
@@ -60,12 +61,19 @@ const useBusterAssets = () => {
 
   const getAssetPassword = useCallback(
     (
-      assetId: string
+      assetId: string | undefined
     ): {
       password: undefined | string;
       error: string | null;
       type: ShareAssetType | undefined;
     } => {
+      if (!assetId) {
+        return {
+          password: undefined,
+          type: undefined,
+          error: null
+        };
+      }
       return {
         password: assetsToPasswords[assetId]?.password || undefined,
         type: assetsToPasswords[assetId]?.type || undefined,

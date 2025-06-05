@@ -1,17 +1,17 @@
 import {
-  AnimationSpec,
-  ArcElement,
+  type AnimationSpec,
+  type ArcElement,
   Chart,
-  ChartDataset,
-  ChartMeta,
-  ChartType,
-  Plugin
+  type ChartDataset,
+  type ChartMeta,
+  type ChartType,
+  type Plugin
 } from 'chart.js';
 import OutLabel from './OutLabel';
-import OutLabelsContext from './OutLabelsContext';
+import type OutLabelsContext from './OutLabelsContext';
 import OutLabelsManager from './OutLabelsManager';
+import type { OutLabelsOptions } from './OutLabelsOptions';
 import { OutLabelStyle } from './OutLabelsStyle';
-import { OutLabelsOptions } from './OutLabelsOptions';
 
 interface CustomAnimationSpec extends AnimationSpec<'doughnut' | 'pie'> {
   onProgress?: (animation: { currentStep: number; numSteps: number }) => void;
@@ -35,14 +35,14 @@ declare type OutLabelsPlugin = Plugin<'doughnut' | 'pie', OutLabelsOptions> & {
 
 export const OutLabelsPlugin: OutLabelsPlugin = {
   id: 'outlabels',
-  install: function (chart) {
+  install: (chart) => {
     const outLabelsManager = new OutLabelsManager();
     outLabelsManager.set(chart.id);
     chart.$outLabelsManager = outLabelsManager;
   },
 
   // Helper function to check if plugin is enabled
-  _isEnabled: function (chart: Chart<'doughnut' | 'pie', number[], unknown>) {
+  _isEnabled: (chart: Chart<'doughnut' | 'pie', number[], unknown>) => {
     const options = chart.options.plugins?.outlabels as OutLabelsOptions;
     return options && options.display === true;
   },
@@ -83,7 +83,6 @@ export const OutLabelsPlugin: OutLabelsPlugin = {
     // Restore original radius
     const dataset = chart.data.datasets[0];
     if (dataset && this._isEnabled(chart) && chart.ctx) {
-      //@ts-ignore
       (dataset as ChartDataset<'pie'>).radius = '100%';
       outLabelsManager.setUsedShrink(false);
       chart.update(); // Trigger chart update to apply the radius change
@@ -97,14 +96,13 @@ export const OutLabelsPlugin: OutLabelsPlugin = {
     const outLabelsManager = chart.$outLabelsManager;
     if (!outLabelsManager.usedShrink && shrinkPercentage < 1) {
       const dataset = chart.data.datasets[0];
-      //@ts-ignore
+
       const chartRadius = (dataset as ChartDataset<'pie'>).radius;
       const containerRadius = Math.min(chart.width, chart.height) / 2;
       const radius =
         typeof chartRadius === 'string' || !chartRadius ? containerRadius : chartRadius;
 
       if (dataset) {
-        //@ts-ignore
         (dataset as ChartDataset<'pie'>).radius = radius * shrinkPercentage;
         outLabelsManager.setUsedShrink(true);
       }
@@ -123,7 +121,7 @@ export const OutLabelsPlugin: OutLabelsPlugin = {
 
     const sumOfRemaining = legendItems.reduce((sum, current) => {
       if (current.hidden) return sum;
-      const labelValue = dataset?.data?.[current.index!] || 0;
+      const labelValue = dataset?.data?.[current.index as number] || 0;
       return sum + labelValue;
     }, 0);
 
@@ -179,7 +177,7 @@ export const OutLabelsPlugin: OutLabelsPlugin = {
 
     // Animate in the labels
     if (!outLabelsManager.animateCompleted) {
-      const duration = options?.animateInDuration!;
+      const duration = options?.animateInDuration ?? 0;
       const currentTime = performance.now();
       const elapsed = Math.min(currentTime - (outLabelsManager.renderedAt || 0), duration);
       const progress = Math.min(elapsed / duration, 1);
@@ -195,22 +193,22 @@ export const OutLabelsPlugin: OutLabelsPlugin = {
       }
     }
 
-    chartOutlabels.forEach((label) => {
+    for (const [, label] of chartOutlabels) {
       if (elements[label.index]) {
         label.positionCenter(elements[label.index]);
         label.updateRects();
       }
-    });
+    }
 
     outLabelsManager.avoidOverlap(chart);
 
-    chartOutlabels.forEach((label) => {
+    for (const [, label] of chartOutlabels) {
       if (label.style.display) {
         label.updateRects();
         label.drawLine();
         label.draw();
       }
-    });
+    }
 
     ctx.restore();
   },

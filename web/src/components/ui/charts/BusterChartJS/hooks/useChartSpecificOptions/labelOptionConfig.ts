@@ -1,7 +1,7 @@
 'use client';
 
 import { isServer } from '@tanstack/react-query';
-import { ChartProps } from '../../core';
+import type { ChartProps } from '../../core';
 
 const backgroundColor = isServer
   ? '#e6e6e6'

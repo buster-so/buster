@@ -1,19 +1,18 @@
-import {
-  ShareRole,
-  type BusterChat,
-  type BusterChatMessage,
-  type BusterChatMessageReasoning,
-  type BusterChatMessageReasoning_file,
-  type BusterChatMessageResponse
+import type {
+  BusterChat,
+  BusterChatMessage,
+  BusterChatMessageReasoning,
+  BusterChatMessageReasoning_file,
+  BusterChatMessageResponse
 } from '@/api/asset_interfaces';
 
 // Helper functions for predictable data generation
-const generateId = (prefix: string, index: number = 0) => `${prefix}-${index}`;
-const generateTimestamp = (index: number = 0) => new Date(2024, 0, 1, 0, 0, index).toISOString();
+const generateId = (prefix: string, index = 0) => `${prefix}-${index}`;
+const generateTimestamp = (index = 0) => new Date(2024, 0, 1, 0, 0, index).toISOString();
 
 const MOCK_MESSAGE_RESPONSE = (
   typeProp?: 'text' | 'file',
-  index: number = 0
+  index = 0
 ): BusterChatMessageResponse => {
   const type = typeProp || (index % 2 === 0 ? 'text' : 'file');
 
@@ -45,7 +44,7 @@ const MOCK_MESSAGE_RESPONSE = (
 
 const MOCK_MESSAGE_REASONING = (
   typeProp?: 'text' | 'files' | 'pills',
-  index: number = 0
+  index = 0
 ): BusterChatMessageReasoning => {
   const type = typeProp || ['text', 'files', 'pills'][index % 3];
 
@@ -106,7 +105,7 @@ const MOCK_MESSAGE_REASONING = (
   };
 };
 
-const MOCK_MESSAGE = (messageIndex: number = 0): BusterChatMessage => {
+const MOCK_MESSAGE = (messageIndex = 0): BusterChatMessage => {
   const responseTypes: ('text' | 'file')[] = ['text', 'file', 'file', 'file', 'text'];
   const responseMessage = Array.from({ length: 5 }, (_, i) =>
     MOCK_MESSAGE_RESPONSE(responseTypes[i], i + messageIndex * 5)
@@ -153,7 +152,7 @@ const MOCK_MESSAGE = (messageIndex: number = 0): BusterChatMessage => {
   };
 };
 
-export const MOCK_CHAT = (chatIndex: number = 0): BusterChat => {
+export const MOCK_CHAT = (chatIndex = 0): BusterChat => {
   const messages = Array.from({ length: 3 }, (_, i) => MOCK_MESSAGE(i + chatIndex * 3));
   const messageIds = messages.map((m) => m.id);
 

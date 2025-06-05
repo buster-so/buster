@@ -1,14 +1,14 @@
 'use client';
 
-import React, { useMemo, useRef, useState } from 'react';
-import { BusterResizeableGridRow } from './interfaces';
-import { BusterResizeColumns } from './BusterResizeColumns';
-import { BusterNewItemDropzone } from './_BusterBusterNewItemDropzone';
-import { MIN_ROW_HEIGHT, TOP_SASH_ID, NEW_ROW_ID, MAX_ROW_HEIGHT } from './helpers';
-import clamp from 'lodash/clamp';
-import { useDebounceFn, useMemoizedFn, useUpdateLayoutEffect } from '@/hooks';
 import { useDroppable } from '@dnd-kit/core';
+import clamp from 'lodash/clamp';
+import React, { useMemo, useRef, useState } from 'react';
+import { useDebounceFn, useMemoizedFn, useUpdateLayoutEffect } from '@/hooks';
 import { cn } from '@/lib/classMerge';
+import { BusterNewItemDropzone } from './_BusterBusterNewItemDropzone';
+import { BusterResizeColumns } from './BusterResizeColumns';
+import { MAX_ROW_HEIGHT, MIN_ROW_HEIGHT, NEW_ROW_ID, TOP_SASH_ID } from './helpers';
+import type { BusterResizeableGridRow } from './interfaces';
 
 export const BusterResizeRows: React.FC<{
   rows: BusterResizeableGridRow[];
@@ -126,17 +126,19 @@ const ResizeRowHandle: React.FC<{
     const showDropzone = !!over?.id && !hideDropzone;
     const isDropzoneActive = showDropzone && isOver;
 
-    const handler = useMemoizedFn((mouseDownEvent: React.MouseEvent<HTMLDivElement>) => {
+    const handler = useMemoizedFn((mouseDownEvent: React.MouseEvent<HTMLButtonElement>) => {
+      if (!index) return;
       const startPosition = mouseDownEvent.pageY;
       const style = document.createElement('style');
-      style.innerHTML = `* { cursor: row-resize; }`;
+      style.innerHTML = '* { cursor: row-resize; }';
       document.head.appendChild(style);
-      setIsDraggingResizeId(index!);
+      setIsDraggingResizeId(index);
 
       function onMouseMove(mouseMoveEvent: MouseEvent) {
-        const newSize = sizes[index!] + (mouseMoveEvent.pageY - startPosition);
+        if (!index) return;
+        const newSize = sizes[index] + (mouseMoveEvent.pageY - startPosition);
         const clampedSize = clamp(newSize, MIN_ROW_HEIGHT, MAX_ROW_HEIGHT);
-        onResize(index!, clampedSize);
+        onResize(index, clampedSize);
       }
       function onMouseUp() {
         document.body.removeEventListener('mousemove', onMouseMove);
@@ -162,12 +164,13 @@ const ResizeRowHandle: React.FC<{
 
     return (
       <div className="relative">
-        <div
+        <button
+          type="button"
           id={id}
           className={cn(
             !readOnly && 'hover:bg-border cursor-row-resize',
             showActive && 'bg-primary! z-10 opacity-100',
-            'h-1 w-full rounded-sm transition-colors duration-200 ease-in-out select-none',
+            'h-1 w-full cursor-pointer rounded-sm transition-colors duration-200 ease-in-out select-none',
             !top && 'dragger absolute'
           )}
           style={memoizedStyle}

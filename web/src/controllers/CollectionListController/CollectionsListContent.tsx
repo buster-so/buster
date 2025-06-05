@@ -1,22 +1,21 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { AppPageLayoutContent } from '@/components/ui/layouts/AppPageLayoutContent';
+import { type BusterCollectionListItem, ShareAssetType } from '@/api/asset_interfaces';
+import { FavoriteStar } from '@/components/features/list';
+import { NewCollectionModal } from '@/components/features/modal/NewCollectionModal';
 import { Avatar } from '@/components/ui/avatar';
-import { formatDate, makeHumanReadble } from '@/lib';
-import { BusterRoutes, createBusterRoute } from '@/routes';
 import {
   BusterList,
-  BusterListColumn,
-  BusterListRow,
+  type BusterListColumn,
+  type BusterListRow,
   ListEmptyStateWithButton
 } from '@/components/ui/list';
-import { useMemoizedFn } from '@/hooks';
-import { NewCollectionModal } from '@/components/features/modal/NewCollectionModal';
-import { BusterCollectionListItem, ShareAssetType } from '@/api/asset_interfaces';
-import { CollectionListSelectedPopup } from './CollectionListSelectedPopup';
 import { Text } from '@/components/ui/typography';
-import { FavoriteStar } from '@/components/features/list';
+import { useMemoizedFn } from '@/hooks';
+import { formatDate, makeHumanReadble } from '@/lib';
+import { BusterRoutes, createBusterRoute } from '@/routes';
+import { CollectionListSelectedPopup } from './CollectionListSelectedPopup';
 
 export const CollectionsListContent: React.FC<{
   openNewCollectionModal: boolean;
@@ -137,9 +136,7 @@ const CollectionList: React.FC<{
               description="Collections help you organize your metrics and dashboards. Collections will appear here."
               onClick={onOpenNewCollectionModal}
             />
-          ) : (
-            <></>
-          )
+          ) : null
         }
       />
 

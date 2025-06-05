@@ -1,6 +1,6 @@
-import { cn } from '@/lib/classMerge';
 import { cva, type VariantProps } from 'class-variance-authority';
 import React from 'react';
+import { cn } from '@/lib/classMerge';
 
 const infoCardVariants = cva('rounded relative flex gap-1 w-full h-full justify-between', {
   variants: {

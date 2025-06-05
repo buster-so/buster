@@ -1,10 +1,10 @@
-import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { rustErrorHandler } from './buster_rest/errors';
-import { AxiosRequestHeaders } from 'axios';
 import { isServer } from '@tanstack/react-query';
-import { getSupabaseTokenFromCookies } from './createServerInstance';
-import { SupabaseContextReturnType } from '@/context/Supabase/SupabaseContextProvider';
+import type { AxiosRequestHeaders } from 'axios';
+import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
+import type { SupabaseContextReturnType } from '@/context/Supabase/SupabaseContextProvider';
 import { BusterRoutes, createBusterRoute } from '@/routes';
+import { rustErrorHandler } from './buster_rest/errors';
+import { getSupabaseTokenFromCookies } from './createServerInstance';
 
 const AXIOS_TIMEOUT = 120000; // 2 minutes
 
@@ -39,7 +39,7 @@ export const createInstance = (baseURL: string) => {
 };
 
 export const defaultRequestHandler = async (
-  config: InternalAxiosRequestConfig<any>,
+  config: InternalAxiosRequestConfig<unknown>,
   options?: {
     checkTokenValidity: SupabaseContextReturnType['checkTokenValidity'];
   }
@@ -51,7 +51,7 @@ export const defaultRequestHandler = async (
     token = (await options?.checkTokenValidity()?.then((res) => res?.access_token || '')) || '';
   }
 
-  (config.headers as AxiosRequestHeaders)['Authorization'] = 'Bearer ' + token;
+  (config.headers as AxiosRequestHeaders).Authorization = `Bearer ${token}`;
 
   return config;
 };

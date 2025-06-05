@@ -1,13 +1,13 @@
+import React, { useMemo } from 'react';
+import type { ListPermissionGroupsResponse } from '@/api/asset_interfaces';
 import {
-  BusterListColumn,
-  BusterListRowItem,
+  type BusterListColumn,
+  type BusterListRowItem,
   EmptyStateList,
   InfiniteListContainer
 } from '@/components/ui/list';
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
-import React, { useMemo } from 'react';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import type { ListPermissionGroupsResponse } from '@/api/asset_interfaces';
 
 export const ListPermissionGroupsComponent: React.FC<{
   permissionGroups: ListPermissionGroupsResponse[];
@@ -54,12 +54,7 @@ export const ListPermissionGroupsComponent: React.FC<{
         showHeader={true}
         showSelectAll={false}
         rowClassName="pl-[30px]!"
-        emptyState={useMemo(
-          () => (
-            <EmptyStateList text="No permission groups found" />
-          ),
-          []
-        )}
+        emptyState={useMemo(() => <EmptyStateList text="No permission groups found" />, [])}
       />
     </InfiniteListContainer>
   );

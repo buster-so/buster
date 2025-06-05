@@ -1,21 +1,21 @@
 'use client';
 
-import { useUpdateUserPermissionGroups } from '@/api/buster_rest';
+import pluralize from 'pluralize';
+import React, { useMemo, useState } from 'react';
 import type { BusterUserPermissionGroup } from '@/api/asset_interfaces';
+import { useUpdateUserPermissionGroups } from '@/api/buster_rest';
 import { PermissionAssignedCell } from '@/components/features/PermissionComponents';
 import {
-  BusterListColumn,
-  BusterListRowItem,
+  type BusterListColumn,
+  type BusterListRowItem,
   EmptyStateList,
   InfiniteListContainer
 } from '@/components/ui/list';
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
-import { BusterRoutes, createBusterRoute } from '@/routes';
-import { useMemoizedFn } from '@/hooks';
-import React, { useMemo, useState } from 'react';
-import { UserPermissionGroupSelectedPopup } from './UserPermissionGroupSelectedPopup';
-import pluralize from 'pluralize';
 import { Text } from '@/components/ui/typography';
+import { useMemoizedFn } from '@/hooks';
+import { BusterRoutes, createBusterRoute } from '@/routes';
+import { UserPermissionGroupSelectedPopup } from './UserPermissionGroupSelectedPopup';
 
 export const UserPermissionGroupsListContainer: React.FC<{
   filteredPermissionGroups: BusterUserPermissionGroup[];
@@ -140,12 +140,7 @@ export const UserPermissionGroupsListContainer: React.FC<{
         useRowClickSelectChange={false}
         selectedRowKeys={selectedRowKeys}
         onSelectChange={setSelectedRowKeys}
-        emptyState={useMemo(
-          () => (
-            <EmptyStateList text="No permission groups found" />
-          ),
-          []
-        )}
+        emptyState={useMemo(() => <EmptyStateList text="No permission groups found" />, [])}
       />
     </InfiniteListContainer>
   );

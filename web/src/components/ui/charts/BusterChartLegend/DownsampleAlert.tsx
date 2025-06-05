@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Text } from '../../typography/Text';
-import { TriangleWarning } from '../../icons/NucleoIconFilled';
-import { Popover } from '../../popover';
-import { DOWNSIZE_SAMPLE_THRESHOLD } from '../config';
 import { cn } from '@/lib/classMerge';
 import { Xmark } from '../../icons';
+import { TriangleWarning } from '../../icons/NucleoIconFilled';
+import { Popover } from '../../popover';
+import { Text } from '../../typography/Text';
+import { DOWNSIZE_SAMPLE_THRESHOLD } from '../config';
 
 export const DownsampleAlert = React.memo(({ isDownsampled }: { isDownsampled: boolean }) => {
   const [close, setClose] = useState(false);
@@ -20,10 +20,7 @@ export const DownsampleAlert = React.memo(({ isDownsampled }: { isDownsampled: b
   }
 
   return (
-    <div
-      className="absolute right-0 bottom-0.5 left-0 w-full px-1 pb-0"
-      onMouseEnter={() => setOnHover(true)}
-      onMouseLeave={() => setOnHover(false)}>
+    <div className="absolute right-0 bottom-0.5 left-0 w-full px-1 pb-0">
       <Popover
         align="center"
         side="top"
@@ -35,8 +32,11 @@ export const DownsampleAlert = React.memo(({ isDownsampled }: { isDownsampled: b
             <Text>{`This chart has been downsampled to ${DOWNSIZE_SAMPLE_THRESHOLD} data points to improve performance. Click the results tab or download the data to see all points.`}</Text>
           </div>
         }>
-        <div
+        <button
+          type="button"
           onClick={() => open && setClose(true)}
+          onMouseEnter={() => setOnHover(true)}
+          onMouseLeave={() => setOnHover(false)}
           className={cn(
             'group relative z-10 flex h-6 w-full cursor-pointer items-center justify-center overflow-hidden rounded-sm border px-1.5 text-sm',
             'border-gray-100 bg-white text-gray-500 shadow transition-all duration-200 hover:bg-gray-50',
@@ -58,7 +58,7 @@ export const DownsampleAlert = React.memo(({ isDownsampled }: { isDownsampled: b
             <Xmark />
             <span>Close</span>
           </div>
-        </div>
+        </button>
       </Popover>
     </div>
   );

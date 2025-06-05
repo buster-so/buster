@@ -12,6 +12,7 @@ export const StarsIcon: React.FC<{
       height="16"
       viewBox="0 0 16 16"
       fill="none">
+      <title>Stars Icon</title>
       <path
         d="M4.20288 9.07812L4.96021 10.9768L6.85887 11.7341L4.96021 12.4808L4.20288 14.3901L3.45621 12.4808L1.54688 11.7341L3.45621 10.9768L4.20288 9.07812Z"
         stroke={color}

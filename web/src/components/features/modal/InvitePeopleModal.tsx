@@ -1,11 +1,11 @@
-import React, { useMemo } from 'react';
-import { useMemoizedFn } from '@/hooks';
-import { AppModal } from '@/components/ui/modal';
-import { InputTagInput } from '@/components/ui/inputs/InputTagInput';
-import { useInviteUser } from '@/api/buster_rest/users';
 import { validate } from 'email-validator';
-import { useBusterNotifications } from '@/context/BusterNotifications';
 import uniq from 'lodash/uniq';
+import React, { useMemo } from 'react';
+import { useInviteUser } from '@/api/buster_rest/users';
+import { InputTagInput } from '@/components/ui/inputs/InputTagInput';
+import { AppModal } from '@/components/ui/modal';
+import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useMemoizedFn } from '@/hooks';
 import { timeout } from '@/lib';
 
 export const InvitePeopleModal: React.FC<{
@@ -34,7 +34,8 @@ export const InvitePeopleModal: React.FC<{
   const memoizedHeader = useMemo(() => {
     return {
       title: 'Invite others to join your workspace',
-      description: `You can share the link below with others you’d like to join your workspace. You can also input their email to send them an invite.`
+      description:
+        'You can share the link below with others you’d like to join your workspace. You can also input their email to send them an invite.'
     };
   }, []);
 

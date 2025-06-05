@@ -1,17 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useMemoizedFn } from '@/hooks';
+import { useDatasetListPermissionGroups } from '@/api/buster_rest';
+import {
+  NewPermissionGroupModal,
+  PermissionSearchAndListWrapper
+} from '@/components/features/PermissionComponents';
 import { Button } from '@/components/ui/buttons';
 import { Plus } from '@/components/ui/icons';
+import { useDebounceSearch, useMemoizedFn } from '@/hooks';
 import { PermissionListPermissionGroupContainer } from './PermissionListPermissionGroupContainer';
-import {
-  PermissionSearchAndListWrapper,
-  HeaderExplanation,
-  NewPermissionGroupModal
-} from '@/components/features/PermissionComponents';
-import { useDebounceSearch } from '@/hooks';
-import { useDatasetListPermissionGroups } from '@/api/buster_rest';
 
 export const PermissionPermissionGroup: React.FC<{
   datasetId: string;

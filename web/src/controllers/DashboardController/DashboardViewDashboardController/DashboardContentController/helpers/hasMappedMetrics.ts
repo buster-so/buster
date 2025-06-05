@@ -1,7 +1,7 @@
+import omit from 'lodash/omit';
 import type { DashboardConfig } from '@/api/asset_interfaces/dashboard';
 import type { BusterMetric } from '@/api/asset_interfaces/metric';
-import { BusterResizeableGridRow } from '@/components/ui/grid';
-import omit from 'lodash/omit';
+import type { BusterResizeableGridRow } from '@/components/ui/grid';
 
 export const hasUnmappedMetrics = (
   metrics: Record<string, BusterMetric>,

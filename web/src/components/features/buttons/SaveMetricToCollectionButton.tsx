@@ -1,13 +1,14 @@
-import { useBusterNotifications } from '@/context/BusterNotifications';
-import { useMemoizedFn } from '@/hooks';
-import React, { useState } from 'react';
-import { SaveToCollectionsDropdown } from '../dropdowns/SaveToCollectionsDropdown';
-import { CollectionButton } from './CollectionsButton';
+import uniq from 'lodash/uniq';
+import type React from 'react';
+import { useState } from 'react';
 import {
   useRemoveMetricFromCollection,
   useSaveMetricToCollections
 } from '@/api/buster_rest/metrics';
-import uniq from 'lodash/uniq';
+import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useMemoizedFn } from '@/hooks';
+import { SaveToCollectionsDropdown } from '../dropdowns/SaveToCollectionsDropdown';
+import { CollectionButton } from './CollectionsButton';
 
 export const SaveMetricToCollectionButton: React.FC<{
   metricIds: string[];

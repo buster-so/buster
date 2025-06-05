@@ -1,13 +1,13 @@
-import { Dropdown, type DropdownItem, type DropdownProps } from '@/components/ui/dropdown';
-import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
-import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
-import { useMemoizedFn } from '@/hooks';
 import React, { useMemo } from 'react';
 import type { BusterCollectionListItem } from '@/api/asset_interfaces/collection';
-import { NewCollectionModal } from '../modal/NewCollectionModal';
-import { Plus } from '@/components/ui/icons';
-import { Button } from '@/components/ui/buttons';
 import { useGetCollectionsList } from '@/api/buster_rest/collections';
+import { Button } from '@/components/ui/buttons';
+import { Dropdown, type DropdownItem, type DropdownProps } from '@/components/ui/dropdown';
+import { Plus } from '@/components/ui/icons';
+import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
+import { useMemoizedFn } from '@/hooks';
+import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
+import { NewCollectionModal } from '../modal/NewCollectionModal';
 
 export const SaveToCollectionsDropdown: React.FC<{
   children: React.ReactNode;
@@ -15,13 +15,7 @@ export const SaveToCollectionsDropdown: React.FC<{
   onSaveToCollection: (collectionId: string[]) => Promise<void>;
   onRemoveFromCollection: (collectionId: string) => Promise<void>;
 }> = React.memo(({ children, onRemoveFromCollection, onSaveToCollection, selectedCollections }) => {
-  const [showDropdown, setShowDropdown] = React.useState(false);
-
-  const onOpenChange = useMemoizedFn((open: boolean) => {
-    setShowDropdown(open);
-  });
-
-  const { modal, selectType, footerContent, menuHeader, items } =
+  const { ModalComponent, selectType, footerContent, menuHeader, items } =
     useSaveToCollectionsDropdownContent({
       selectedCollections,
       onSaveToCollection,
@@ -35,14 +29,13 @@ export const SaveToCollectionsDropdown: React.FC<{
         align="end"
         selectType={selectType}
         menuHeader={menuHeader}
-        onOpenChange={onOpenChange}
         footerContent={footerContent}
         emptyStateText="No collections found"
         items={items}>
         {children}
       </Dropdown>
 
-      <>{modal}</>
+      {ModalComponent}
     </>
   );
 });
@@ -61,7 +54,7 @@ export const useSaveToCollectionsDropdownContent = ({
   DropdownProps,
   'items' | 'footerContent' | 'menuHeader' | 'selectType' | 'emptyStateText'
 > & {
-  modal: React.ReactNode;
+  ModalComponent: React.ReactNode;
 } => {
   const { data: collectionsList, isPending: isCreatingCollection } = useGetCollectionsList({});
   const onChangePage = useAppLayoutContextSelector((s) => s.onChangePage);
@@ -135,7 +128,7 @@ export const useSaveToCollectionsDropdownContent = ({
       footerContent,
       selectType: 'multiple',
       emptyStateText: 'No collections found',
-      modal: (
+      ModalComponent: (
         <NewCollectionModal
           open={openCollectionModal}
           onClose={onCloseCollectionModal}

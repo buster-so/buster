@@ -1,8 +1,9 @@
-import { barDelayAnimation } from './barDelayAnimation';
 import type { Chart, ScriptableContext } from 'chart.js';
+import { describe, expect, it } from 'vitest';
+import { barDelayAnimation } from './barDelayAnimation';
 
 describe('barDelayAnimation', () => {
-  test('should calculate correct delay for regular bar chart', () => {
+  it('should calculate correct delay for regular bar chart', () => {
     const animation = barDelayAnimation({
       barGroupType: 'group',
       maxDelayBetweenDatasets: 500,
@@ -34,8 +35,7 @@ describe('barDelayAnimation', () => {
     const delay = animation.delay?.(context);
     expect(delay).toBe(1200);
   });
-
-  test('should return zero delay for percentage-stack chart type', () => {
+  it('should return zero delay for percentage-stack chart type', () => {
     const animation = barDelayAnimation({
       barGroupType: 'percentage-stack',
       maxDelayBetweenDatasets: 500,

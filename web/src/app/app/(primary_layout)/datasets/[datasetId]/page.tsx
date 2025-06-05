@@ -1,4 +1,3 @@
-import React from 'react';
 import { permanentRedirect } from 'next/navigation';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 
@@ -14,5 +13,5 @@ export default async function DatasetPage(props: { params: Promise<{ datasetId: 
     })
   );
 
-  return <></>;
+  return null;
 }

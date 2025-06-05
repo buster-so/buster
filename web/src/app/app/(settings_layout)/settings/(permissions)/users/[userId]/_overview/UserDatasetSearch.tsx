@@ -1,7 +1,7 @@
 import React from 'react';
-import { useDebounceSearch } from '@/hooks';
 import type { OrganizationUser } from '@/api/asset_interfaces';
 import { PermissionSearchAndListWrapper } from '@/components/features/PermissionComponents';
+import { useDebounceSearch } from '@/hooks';
 import { UserDatasetListContainer } from './UserDatasetListContainer';
 
 export const UserDatasetSearch = React.memo(({ user }: { user: OrganizationUser }) => {

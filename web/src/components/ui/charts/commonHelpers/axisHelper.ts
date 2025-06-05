@@ -1,12 +1,12 @@
-import { formatLabel } from '@/lib/columnFormatter';
-import pick from 'lodash/pick';
 import isEqual from 'lodash/isEqual';
-import { JOIN_CHARACTER } from './labelHelpers';
-import {
-  type BusterChartProps,
-  type BarAndLineAxis,
-  type ScatterAxis
+import pick from 'lodash/pick';
+import type {
+  BarAndLineAxis,
+  BusterChartProps,
+  ScatterAxis
 } from '@/api/asset_interfaces/metric/charts';
+import { formatLabel } from '@/lib/columnFormatter';
+import { JOIN_CHARACTER } from './labelHelpers';
 
 export const AXIS_TITLE_SEPARATOR = JOIN_CHARACTER;
 
@@ -16,7 +16,7 @@ export const formatYAxisLabel = (
   canUseSameFormatter: boolean,
   columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>,
   usePercentageModeAxis: boolean,
-  compactNumbers: boolean = true
+  compactNumbers = true
 ) => {
   if (usePercentageModeAxis) {
     return formatLabel(value, { columnType: 'number', style: 'percent' }, false);

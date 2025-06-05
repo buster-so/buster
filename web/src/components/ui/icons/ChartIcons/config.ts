@@ -1,0 +1,3 @@
+export const DEFAULT_CHART_COLORS = ['#B399FD', '#FC8497', '#FABD30'];
+
+export const DISABLED_CHART_COLORS = ['#D9D9D9', '#BFBFBF', '#A6A6A6'];

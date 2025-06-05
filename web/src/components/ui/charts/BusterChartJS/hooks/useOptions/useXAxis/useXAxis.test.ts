@@ -1,11 +1,12 @@
 import '../../../ChartJSTheme';
 
 import { renderHook } from '@testing-library/react';
-import { useXAxis } from './useXAxis';
-import { ChartType } from '@/api/asset_interfaces/metric/charts';
+import { describe, expect, it } from 'vitest';
+import type { ColumnSettings, SimplifiedColumnType } from '@/api/asset_interfaces/metric';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
-import type { SimplifiedColumnType, ColumnSettings } from '@/api/asset_interfaces/metric';
 import type { ChartEncodes } from '@/api/asset_interfaces/metric/charts';
+import { ChartType } from '@/api/asset_interfaces/metric/charts';
+import { useXAxis } from './useXAxis';
 
 describe('useXAxis', () => {
   const defaultProps = {
@@ -114,7 +115,7 @@ describe('useXAxis', () => {
 
     const { result } = renderHook(() => useXAxis(timeIntervalProps));
     expect(result.current?.type).toBe('time');
-    // @ts-ignore - Chart.js types don't properly expose the time unit property
+    // @ts-expect-error - Chart.js types don't properly expose the time unit property
     expect(result.current?.ticks?.time?.unit).toBe('month');
   });
 

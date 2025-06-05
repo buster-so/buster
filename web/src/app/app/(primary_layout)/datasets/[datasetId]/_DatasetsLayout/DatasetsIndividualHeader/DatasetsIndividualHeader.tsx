@@ -2,16 +2,16 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/buttons';
-import { Separator } from '@/components/ui/seperator';
 import { PreventNavigation } from '@/components/ui/layouts/PreventNavigation';
-import { useMemoizedFn } from '@/hooks';
+import { Separator } from '@/components/ui/seperator';
 import { useUserConfigContextSelector } from '@/context/Users';
-import { DatasetsHeaderOptions } from './DatasetHeaderOptions';
-import { DatasetBreadcrumb } from './DatasetBreadcrumb';
-import { DatasetIndividualThreeDotMenu } from './DatasetIndividualThreeDotMenu';
+import { useMemoizedFn } from '@/hooks';
 import { useDatasetPageContextSelector } from '../DatasetPageContext';
+import { DatasetBreadcrumb } from './DatasetBreadcrumb';
+import { DatasetsHeaderOptions } from './DatasetHeaderOptions';
+import { DatasetIndividualThreeDotMenu } from './DatasetIndividualThreeDotMenu';
 
-export const DatasetsIndividualHeader: React.FC<{}> = React.memo(({}) => {
+export const DatasetsIndividualHeader: React.FC = React.memo(() => {
   const selectedApp = useDatasetPageContextSelector((state) => state.selectedApp);
   const dataset = useDatasetPageContextSelector((state) => state.dataset);
   const onPublishDataset = useDatasetPageContextSelector((state) => state.onPublishDataset);
@@ -39,41 +39,35 @@ export const DatasetsIndividualHeader: React.FC<{}> = React.memo(({}) => {
 
   return (
     <>
-      <>
-        <div className="flex items-center space-x-3 overflow-hidden">
-          <DatasetBreadcrumb datasetName={datasetName} />
+      <div className="flex items-center space-x-3 overflow-hidden">
+        <DatasetBreadcrumb datasetName={datasetName} />
 
-          <DatasetsHeaderOptions
-            isAdmin={isAdmin}
-            selectedApp={selectedApp}
-            datasetId={datasetId}
-          />
-        </div>
+        <DatasetsHeaderOptions isAdmin={isAdmin} selectedApp={selectedApp} datasetId={datasetId} />
+      </div>
 
-        <div className="flex items-center">
+      <div className="flex items-center">
+        <div className="flex items-center space-x-2">
+          <DatasetIndividualThreeDotMenu datasetId={datasetId} />
+
+          <Separator orientation="vertical" className="h-4!" />
+
           <div className="flex items-center space-x-2">
-            <DatasetIndividualThreeDotMenu datasetId={datasetId} />
-
-            <Separator orientation="vertical" className="h-4!" />
-
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="ghost"
-                onClick={onReset}
-                disabled={!isChangedSQL || isDeployingDataset}>
-                Reset
-              </Button>
-              <Button
-                variant="primary"
-                disabled={disablePublish}
-                onClick={onPublishDataset}
-                loading={isDeployingDataset}>
-                Publish
-              </Button>
-            </div>
+            <Button
+              variant="ghost"
+              onClick={onReset}
+              disabled={!isChangedSQL || isDeployingDataset}>
+              Reset
+            </Button>
+            <Button
+              variant="primary"
+              disabled={disablePublish}
+              onClick={onPublishDataset}
+              loading={isDeployingDataset}>
+              Publish
+            </Button>
           </div>
         </div>
-      </>
+      </div>
 
       <PreventNavigation
         isDirty={preventNavigation}

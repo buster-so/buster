@@ -1,15 +1,15 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import React, { useMemo } from 'react';
 import type {
   BusterChatResponseMessage_file,
   BusterChatResponseMessage_fileMetadata
 } from '@/api/asset_interfaces';
-import { Text } from '@/components/ui/typography';
-import { motion, AnimatePresence } from 'framer-motion';
-import { itemAnimationConfig } from './animationConfig';
 import { StatusIndicator } from '@/components/ui/indicators';
+import { Text } from '@/components/ui/typography';
+import { cn } from '@/lib/utils';
 import { FileCard } from '../card/FileCard';
 import { TextAndVersionPill } from '../typography/TextAndVersionPill';
-import { cn } from '@/lib/utils';
+import { itemAnimationConfig } from './animationConfig';
 
 export const StreamingMessage_File: React.FC<{
   isSelectedFile: boolean;
@@ -43,8 +43,8 @@ const StreamingMessageBody: React.FC<{
 }> = React.memo(({ metadata }) => {
   return (
     <div className="flex w-full flex-col items-center space-y-1 px-2.5 py-2">
-      {metadata.map((metadata, index) => (
-        <MetadataItem metadata={metadata} key={index} />
+      {metadata.map((meta) => (
+        <MetadataItem metadata={meta} key={meta.message} />
       ))}
     </div>
   );

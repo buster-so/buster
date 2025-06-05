@@ -1,6 +1,7 @@
 import React from 'react';
-import { Paragraph } from '@/components/ui/typography';
 import { AppModal } from '@/components/ui/modal';
+import { Paragraph } from '@/components/ui/typography';
+
 interface ApiKeyCreatedModalProps {
   apiKey: string | null;
   onCopy: () => void;

@@ -1,11 +1,10 @@
 import type {
-  IBusterMetric,
   ColumnMetaData,
+  IBusterMetric,
   IBusterMetricChartConfig
 } from '@/api/asset_interfaces/metric';
 import type {
   BusterChartConfigProps,
-  ColumnLabelFormat,
   IColumnLabelFormat
 } from '@/api/asset_interfaces/metric/charts';
 import { createDefaultChartConfig } from '@/lib/metrics/messageAutoChartHandler';

@@ -1,9 +1,8 @@
-import { useMutation, useQuery, useQueryClient, QueryClient } from '@tanstack/react-query';
+import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { DataSourceTypes } from '@/api/asset_interfaces/datasources/interfaces';
+import { queryKeys } from '@/api/query_keys';
+import { useBusterNotifications } from '@/context/BusterNotifications';
 import {
-  listDatasources,
-  getDatasource,
-  getDatasource_server,
-  deleteDatasource,
   createBigQueryDataSource,
   createDatabricksDataSource,
   createMySQLDataSource,
@@ -11,17 +10,18 @@ import {
   createRedshiftDataSource,
   createSnowflakeDataSource,
   createSQLServerDataSource,
-  updatePostgresDataSource,
-  updateMySQLDataSource,
+  deleteDatasource,
+  getDatasource,
+  getDatasource_server,
+  listDatasources,
   updateBigQueryDataSource,
+  updateDatabricksDataSource,
+  updateMySQLDataSource,
+  updatePostgresDataSource,
   updateRedshiftDataSource,
   updateSnowflakeDataSource,
-  updateDatabricksDataSource,
   updateSQLServerDataSource
 } from './requests';
-import { queryKeys } from '@/api/query_keys';
-import { useBusterNotifications } from '@/context/BusterNotifications';
-import { DataSourceTypes } from '@/api/asset_interfaces/datasources/interfaces';
 import type {
   BigQueryCreateParams,
   BigQueryUpdateParams,
@@ -39,7 +39,7 @@ import type {
   SQLServerUpdateParams
 } from './types';
 
-export const useListDatasources = (enabled: boolean = true) => {
+export const useListDatasources = (enabled = true) => {
   return useQuery({
     ...queryKeys.datasourceGetList,
     queryFn: listDatasources,
@@ -49,8 +49,8 @@ export const useListDatasources = (enabled: boolean = true) => {
 
 export const useGetDatasource = (id: string | undefined) => {
   return useQuery({
-    ...queryKeys.datasourceGet(id!),
-    queryFn: () => getDatasource(id!),
+    ...queryKeys.datasourceGet(id || ''),
+    queryFn: () => getDatasource(id || ''),
     enabled: !!id
   });
 };

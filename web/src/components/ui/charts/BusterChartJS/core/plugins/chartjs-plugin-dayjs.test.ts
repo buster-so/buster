@@ -1,5 +1,6 @@
 import { _adapters } from 'chart.js';
 import dayjs from 'dayjs';
+import { describe, expect, it } from 'vitest';
 import './chartjs-plugin-dayjs';
 
 describe('chartjs-plugin-dayjs', () => {

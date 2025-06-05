@@ -8,6 +8,7 @@ export interface GetPermissionGroupResponse {
   updated_by: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- empty object type is valid
 export interface CreatePermissionGroupResponse extends GetPermissionGroupResponse {}
 
 export interface GetPermissionGroupUsersResponse {

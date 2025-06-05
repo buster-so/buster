@@ -4,7 +4,7 @@ import type {
   IBusterMetric,
   IBusterMetricData
 } from '@/api/asset_interfaces/metric';
-import { type listMetrics } from '../buster_rest/metrics';
+import type { listMetrics } from '../buster_rest/metrics';
 
 export const metricsGetMetric = (metricId: string, version_number: number | null) => {
   return queryOptions<IBusterMetric>({

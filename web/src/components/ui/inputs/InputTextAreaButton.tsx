@@ -1,11 +1,11 @@
-import React, { useMemo, forwardRef } from 'react';
-import { InputTextArea, InputTextAreaProps } from './InputTextArea';
-import { cn } from '@/lib/classMerge';
 import { cva } from 'class-variance-authority';
-import { Button } from '../buttons/Button';
-import { ArrowUp } from '../icons/NucleoIconOutlined';
-import { ShapeSquare } from '../icons/NucleoIconFilled';
+import React, { forwardRef, useMemo } from 'react';
 import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/classMerge';
+import { Button } from '../buttons/Button';
+import { ShapeSquare } from '../icons/NucleoIconFilled';
+import { ArrowUp } from '../icons/NucleoIconOutlined';
+import { InputTextArea, type InputTextAreaProps } from './InputTextArea';
 
 const inputTextAreaButtonVariants = cva(
   'relative flex flex-col w-full items-center overflow-visible rounded-xl cursor-text border border-border transition-all duration-200',

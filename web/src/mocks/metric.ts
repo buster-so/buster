@@ -1,10 +1,10 @@
 import {
+  type BusterMetricListItem,
   ChartType,
   type DataMetadata,
   DEFAULT_CHART_CONFIG,
-  type IBusterMetricChartConfig,
   type IBusterMetric,
-  BusterMetricListItem
+  type IBusterMetricChartConfig
 } from '@/api/asset_interfaces/metric';
 import { ShareRole, VerificationStatus } from '@/api/asset_interfaces/share';
 
@@ -52,7 +52,7 @@ const generatePredictableDate = (id: string): string => {
   return date.toISOString();
 };
 
-const generatePredictableUUID = (id: string, salt: string = ''): string => {
+const generatePredictableUUID = (id: string, salt = ''): string => {
   const hash = Array.from(id + salt).reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const segments = [8, 4, 4, 4, 12].map((length, index) => {
     return Array.from({ length }, (_, i) => ((hash + index + i) % 16).toString(16)).join('');

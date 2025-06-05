@@ -5,7 +5,7 @@ import type {
   GetDatasetGroupPermissionGroupsResponse,
   GetDatasetGroupUsersResponse
 } from '@/api/asset_interfaces/dataset_groups';
-import {
+import type {
   DatasetPermissionsOverviewResponse,
   ListDatasetGroupsResponse,
   ListPermissionUsersResponse

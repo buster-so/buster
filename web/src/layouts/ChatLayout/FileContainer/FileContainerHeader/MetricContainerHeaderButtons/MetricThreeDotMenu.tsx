@@ -1,3 +1,9 @@
+import React, { useMemo, useState } from 'react';
+import { ShareAssetType, VerificationStatus } from '@/api/asset_interfaces/share';
+import {
+  useAddMetricsToDashboard,
+  useRemoveMetricsFromDashboard
+} from '@/api/buster_rest/dashboards';
 import {
   useBulkUpdateMetricVerificationStatus,
   useDeleteMetric,
@@ -6,55 +12,52 @@ import {
   useRemoveMetricFromCollection,
   useSaveMetricToCollections
 } from '@/api/buster_rest/metrics';
+import { ASSET_ICONS } from '@/components/features/config/assetIcons';
+import { useSaveToCollectionsDropdownContent } from '@/components/features/dropdowns/SaveToCollectionsDropdown';
+import { useSaveToDashboardDropdownContent } from '@/components/features/dropdowns/SaveToDashboardDropdown';
+import { useFavoriteStar } from '@/components/features/list/FavoriteStar';
+import { StatusBadgeIndicator } from '@/components/features/metrics/StatusBadgeIndicator';
+import { useStatusDropdownContent } from '@/components/features/metrics/StatusBadgeIndicator/useStatusDropdownContent';
+import { getShareAssetConfig } from '@/components/features/ShareMenu/helpers';
+import { ShareMenuContent } from '@/components/features/ShareMenu/ShareMenuContent';
+import { useListVersionDropdownItems } from '@/components/features/versionHistory/useListVersionDropdownItems';
+import { Button } from '@/components/ui/buttons';
 import {
-  useAddMetricsToDashboard,
-  useRemoveMetricsFromDashboard
-} from '@/api/buster_rest/dashboards';
-import { DropdownContent, DropdownItem, DropdownItems } from '@/components/ui/dropdown';
+  Dropdown,
+  DropdownContent,
+  type DropdownItem,
+  type DropdownItems
+} from '@/components/ui/dropdown';
 import {
-  Trash,
+  ArrowUpRight,
   Dots,
-  Pencil,
-  SquareChart,
   Download4,
   History,
-  SquareCode,
-  SquareChartPen,
-  Star,
+  Pencil,
   ShareRight,
-  ArrowUpRight,
-  Table
+  SquareChart,
+  SquareChartPen,
+  SquareCode,
+  Star,
+  Table,
+  Trash
 } from '@/components/ui/icons';
 import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
+import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useUserConfigContextSelector } from '@/context/Users';
+import { METRIC_CHART_CONTAINER_ID } from '@/controllers/MetricController/MetricViewChart/config';
+import { METRIC_CHART_TITLE_INPUT_ID } from '@/controllers/MetricController/MetricViewChart/MetricViewChartHeader';
+import { useMemoizedFn } from '@/hooks';
+import { useChatIndividualContextSelector } from '@/layouts/ChatLayout/ChatContext';
 import {
-  MetricFileViewSecondary,
+  type MetricFileViewSecondary,
   useChatLayoutContextSelector
 } from '@/layouts/ChatLayout/ChatLayoutContext';
-import { useMemo, useState } from 'react';
-import { Dropdown } from '@/components/ui/dropdown';
-import { Button } from '@/components/ui/buttons';
-import React from 'react';
-import { ASSET_ICONS } from '@/components/features/config/assetIcons';
-import { useSaveToDashboardDropdownContent } from '@/components/features/dropdowns/SaveToDashboardDropdown';
-import { useMemoizedFn } from '@/hooks';
-import { useSaveToCollectionsDropdownContent } from '@/components/features/dropdowns/SaveToCollectionsDropdown';
-import { ShareAssetType, VerificationStatus } from '@/api/asset_interfaces/share';
-import { useStatusDropdownContent } from '@/components/features/metrics/StatusBadgeIndicator/useStatusDropdownContent';
-import { StatusBadgeIndicator } from '@/components/features/metrics/StatusBadgeIndicator';
-import { useFavoriteStar } from '@/components/features/list/FavoriteStar';
-import { downloadElementToImage, exportJSONToCSV } from '@/lib/exportUtils';
-import { METRIC_CHART_CONTAINER_ID } from '@/controllers/MetricController/MetricViewChart/config';
 import { timeout } from '@/lib';
-import { METRIC_CHART_TITLE_INPUT_ID } from '@/controllers/MetricController/MetricViewChart/MetricViewChartHeader';
-import { ShareMenuContent } from '@/components/features/ShareMenu/ShareMenuContent';
+import { downloadElementToImage, exportJSONToCSV } from '@/lib/exportUtils';
 import { canEdit, getIsEffectiveOwner, getIsOwner } from '@/lib/share';
-import { getShareAssetConfig } from '@/components/features/ShareMenu/helpers';
-import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import { useListVersionDropdownItems } from '@/components/features/versionHistory/useListVersionDropdownItems';
-import { useChatIndividualContextSelector } from '@/layouts/ChatLayout/ChatContext';
-import { useUserConfigContextSelector, useUserConfigProvider } from '@/context/Users';
 
 export const ThreeDotMenuButton = React.memo(
   ({
@@ -122,8 +125,7 @@ export const ThreeDotMenuButton = React.memo(
         deleteMetricMenu,
         downloadCSVMenu,
         downloadPNGMenu,
-        openSuccessMessage,
-        onSetSelectedFile,
+        isViewingOldVersion,
         versionHistoryItems,
         favoriteMetric,
         statusSelectMenu,
@@ -233,7 +235,7 @@ const useVersionHistorySelectMenu = ({ metricId }: { metricId: string }) => {
         </React.Fragment>
       ]
     }),
-    [versionHistoryItems]
+    [reverseVersionHistoryItems]
   );
 };
 
@@ -263,13 +265,13 @@ const useCollectionSelectMenu = ({ metricId }: { metricId: string }) => {
     openInfoMessage('Metrics removed from collections');
   });
 
-  const { modal, ...dropdownProps } = useSaveToCollectionsDropdownContent({
+  const { ModalComponent, ...dropdownProps } = useSaveToCollectionsDropdownContent({
     onSaveToCollection,
     onRemoveFromCollection,
     selectedCollections
   });
 
-  const collectionSubMenu = useMemo(() => {
+  const CollectionSubMenu = useMemo(() => {
     return <DropdownContent {...dropdownProps} />;
   }, [dropdownProps]);
 
@@ -280,11 +282,11 @@ const useCollectionSelectMenu = ({ metricId }: { metricId: string }) => {
       icon: <ASSET_ICONS.collectionAdd />,
       items: [
         <React.Fragment key="collection-sub-menu">
-          {collectionSubMenu} {modal}
+          {CollectionSubMenu} {ModalComponent}
         </React.Fragment>
       ]
     }),
-    [collectionSubMenu]
+    [CollectionSubMenu, ModalComponent]
   );
 
   return collectionDropdownItem;
@@ -316,7 +318,7 @@ const useStatusSelectMenu = ({ metricId }: { metricId: string }) => {
       icon: <StatusBadgeIndicator status={metricStatus || VerificationStatus.NOT_REQUESTED} />,
       items: [<React.Fragment key="status-sub-menu">{statusSubMenu}</React.Fragment>]
     }),
-    [statusSubMenu]
+    [statusSubMenu, metricStatus]
   );
 
   return statusDropdownItem;
@@ -356,7 +358,7 @@ const useEditChartSelectMenu = () => {
       onClick: onClickButton,
       icon: <SquareChartPen />
     }),
-    []
+    [onClickButton]
   );
 };
 
@@ -389,7 +391,7 @@ const useResultsViewSelectMenu = ({
       link,
       icon: <Table />
     }),
-    []
+    [link]
   );
 };
 
@@ -422,7 +424,7 @@ const useSQLEditorSelectMenu = ({
       icon: <SquareCode />,
       link
     }),
-    []
+    [link]
   );
 };
 
@@ -479,7 +481,7 @@ const useDownloadPNGSelectMenu = ({ metricId }: { metricId: string }) => {
         openErrorMessage('Failed to download PNG');
       }
     }),
-    [canDownload]
+    [canDownload, metricId, name, openErrorMessage]
   );
 };
 
@@ -497,7 +499,7 @@ const useDeleteMetricSelectMenu = ({ metricId }: { metricId: string }) => {
         onChangePage({ route: BusterRoutes.APP_METRIC });
       }
     }),
-    [metricId]
+    [metricId, onChangePage, deleteMetric]
   );
 };
 
@@ -518,7 +520,7 @@ const useRenameMetricSelectMenu = ({ metricId }: { metricId: string }) => {
         }
       }
     }),
-    [metricId]
+    [onSetFileView]
   );
 };
 
@@ -535,18 +537,19 @@ export const useShareMenuSelectMenu = ({ metricId }: { metricId: string }) => {
       value: 'share-metric',
       icon: <ShareRight />,
       disabled: !isOwner,
-      items: isOwner
-        ? [
-            <ShareMenuContent
-              key={metricId}
-              shareAssetConfig={shareAssetConfig!}
-              assetId={metricId}
-              assetType={ShareAssetType.METRIC}
-            />
-          ]
-        : undefined
+      items:
+        isOwner && shareAssetConfig
+          ? [
+              <ShareMenuContent
+                key={metricId}
+                shareAssetConfig={shareAssetConfig}
+                assetId={metricId}
+                assetType={ShareAssetType.METRIC}
+              />
+            ]
+          : undefined
     }),
-    [metricId]
+    [metricId, shareAssetConfig, isOwner]
   );
 };
 

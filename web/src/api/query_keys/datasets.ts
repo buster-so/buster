@@ -1,7 +1,7 @@
 import { queryOptions } from '@tanstack/react-query';
 import type { BusterDataset, BusterDatasetListItem } from '../asset_interfaces/datasets/interfaces';
 import type { IDataResult } from '../asset_interfaces/metric/interfaces';
-import { type getDatasets } from '../buster_rest/datasets';
+import type { getDatasets } from '../buster_rest/datasets';
 
 const datasetsListQueryOptions = (params?: Parameters<typeof getDatasets>[0]) =>
   queryOptions<BusterDatasetListItem[]>({

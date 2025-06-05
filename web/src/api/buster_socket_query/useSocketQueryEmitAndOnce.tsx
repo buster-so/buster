@@ -14,7 +14,7 @@ import type {
 } from '@/api/buster_socket';
 import { useBusterWebSocket } from '@/context/BusterWebSocket';
 import { useMemoizedFn } from '@/hooks';
-import { InferBusterSocketResponseData } from './types';
+import type { InferBusterSocketResponseData } from './types';
 
 export function useSocketQueryEmitAndOnce<
   TRoute extends BusterSocketResponseRoute,
@@ -36,26 +36,22 @@ export function useSocketQueryEmitAndOnce<
   const queryClient = useQueryClient();
 
   const queryFn: QueryFunction<TData> = useMemoizedFn(async ({ queryKey }): Promise<TData> => {
-    try {
-      const result = await busterSocket.emitAndOnce({
-        emitEvent,
-        responseEvent: {
-          route: responseEvent,
-          callback: (d: unknown) => {
-            const socketData = d as InferBusterSocketResponseData<TRoute>;
-            if (callback) {
-              const currentData = queryClient.getQueryData<TData>(queryKey) ?? null;
-              return callback(currentData, socketData);
-            }
-            return socketData as TData;
+    const result = await busterSocket.emitAndOnce({
+      emitEvent,
+      responseEvent: {
+        route: responseEvent,
+        callback: (d: unknown) => {
+          const socketData = d as InferBusterSocketResponseData<TRoute>;
+          if (callback) {
+            const currentData = queryClient.getQueryData<TData>(queryKey) ?? null;
+            return callback(currentData, socketData);
           }
-        } as BusterSocketResponse
-      });
+          return socketData as TData;
+        }
+      } as BusterSocketResponse
+    });
 
-      return result as TData;
-    } catch (error) {
-      throw error;
-    }
+    return result as TData;
   });
 
   return useQuery({

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Sidebar } from './Sidebar';
-import { BusterRoutes } from '../../../routes';
-import { Window, WindowUser, WindowSettings, WindowAlert } from '../icons/NucleoIconOutlined';
-import React from 'react';
 import { fn } from '@storybook/test';
+import React from 'react';
+import { BusterRoutes } from '../../../routes';
+import { Window, WindowAlert, WindowSettings, WindowUser } from '../icons/NucleoIconOutlined';
+import { Sidebar } from './Sidebar';
 
 const meta: Meta<typeof Sidebar> = {
   title: 'UI/Sidebar/Sidebar',

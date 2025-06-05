@@ -1,21 +1,21 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
-import { AppPageLayoutContent } from '@/components/ui/layouts/AppPageLayoutContent';
-import { Dropdown, DropdownItems } from '@/components/ui/dropdown';
+import clamp from 'lodash/clamp';
+import type React from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useDeleteTerm, useGetTerm, useUpdateTerm } from '@/api/buster_rest/terms';
 import { Button } from '@/components/ui/buttons';
+import { Card, CardContent, CardHeader } from '@/components/ui/card/CardBase';
+import { Dropdown, type DropdownItems } from '@/components/ui/dropdown';
+import { CircleQuestion, Dots, EditSquare, Trash } from '@/components/ui/icons';
+import { AppCodeEditor } from '@/components/ui/inputs/AppCodeEditor';
+import { InputTextArea } from '@/components/ui/inputs/InputTextArea';
+import { Text } from '@/components/ui/typography';
+import { EditableTitle } from '@/components/ui/typography/EditableTitle';
+import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useDebounceFn } from '@/hooks';
 import { formatDate } from '@/lib';
-import { CircleQuestion, Dots, EditSquare, Trash } from '@/components/ui/icons';
-import { EditableTitle } from '@/components/ui/typography/EditableTitle';
-import { AppCodeEditor } from '@/components/ui/inputs/AppCodeEditor';
-import clamp from 'lodash/clamp';
-import { Text } from '@/components/ui/typography';
 import { BusterRoutes } from '@/routes';
-import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
-import { Card, CardHeader, CardContent } from '@/components/ui/card/CardBase';
-import { InputTextArea } from '@/components/ui/inputs/InputTextArea';
-import { useDeleteTerm, useGetTerm, useUpdateTerm } from '@/api/buster_rest/terms';
 
 export const TermIndividualContent: React.FC<{
   termId: string;
@@ -81,10 +81,12 @@ export const TermIndividualContent: React.FC<{
             <div>
               <Text variant="secondary">
                 Last updated:{' '}
-                {formatDate({
-                  date: term?.updated_at!,
-                  format: 'lll'
-                })}
+                {term?.updated_at
+                  ? formatDate({
+                      date: term.updated_at,
+                      format: 'lll'
+                    })
+                  : 'Unknown date'}
               </Text>
             </div>
           </div>

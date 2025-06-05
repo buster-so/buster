@@ -1,19 +1,20 @@
 'use client';
 
+import type React from 'react';
+import { useMemo, useState } from 'react';
 import type { ListDatasetGroupsResponse } from '@/api/asset_interfaces';
 import { useDatasetUpdateDatasetGroups } from '@/api/buster_rest';
+import { PermissionAssignedCell } from '@/components/features/PermissionComponents';
 import {
-  BusterListColumn,
-  BusterListRowItem,
+  type BusterListColumn,
+  type BusterListRowItem,
   EmptyStateList,
   InfiniteListContainer
 } from '@/components/ui/list';
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
-import { useMemoizedFn } from '@/hooks';
-import React, { useMemo, useState } from 'react';
-import { PermissionDatasetGroupSelectedPopup } from './PermissionDatasetGroupSelectedPopup';
-import { PermissionAssignedCell } from '@/components/features/PermissionComponents';
 import { Text } from '@/components/ui/typography';
+import { useMemoizedFn } from '@/hooks';
+import { PermissionDatasetGroupSelectedPopup } from './PermissionDatasetGroupSelectedPopup';
 
 export const PermissionListDatasetGroupContainer: React.FC<{
   filteredDatasetGroups: ListDatasetGroupsResponse[];
@@ -35,7 +36,10 @@ export const PermissionListDatasetGroupContainer: React.FC<{
       {
         title: 'Name',
         dataIndex: 'name',
-        render: (name: string, datasetGroup: ListDatasetGroupsResponse) => {
+        render: (
+          name: string | number | boolean | null | undefined,
+          datasetGroup: ListDatasetGroupsResponse
+        ) => {
           return (
             <div className="flex items-center justify-between gap-x-2">
               <Text>{name}</Text>

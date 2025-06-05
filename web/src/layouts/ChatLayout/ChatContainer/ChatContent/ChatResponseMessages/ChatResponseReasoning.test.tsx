@@ -1,28 +1,28 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
-import { ChatResponseReasoning } from './ChatResponseReasoning';
-import { useChatLayoutContextSelector } from '../../../ChatLayoutContext';
-import { useGetChatMessage } from '@/api/buster_rest/chats';
+import type React from 'react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useQuery } from '@tanstack/react-query';
+import { useGetChatMessage } from '@/api/buster_rest/chats';
+import { useChatLayoutContextSelector } from '../../../ChatLayoutContext';
+import { ChatResponseReasoning } from './ChatResponseReasoning';
 
 // Mock the imports
-jest.mock('../../../ChatLayoutContext', () => ({
-  useChatLayoutContextSelector: jest.fn()
+vi.mock('../../../ChatLayoutContext', () => ({
+  useChatLayoutContextSelector: vi.fn()
 }));
 
-jest.mock('@/api/buster_rest/chats', () => ({
-  useGetChatMessage: jest.fn()
+vi.mock('@/api/buster_rest/chats', () => ({
+  useGetChatMessage: vi.fn()
 }));
 
-jest.mock('@tanstack/react-query', () => ({
-  useQuery: jest.fn()
+vi.mock('@tanstack/react-query', () => ({
+  useQuery: vi.fn()
 }));
 
 // Mock query keys
-jest.mock('@/api/query_keys', () => ({
+vi.mock('@/api/query_keys', () => ({
   queryKeys: {
-    chatsBlackBoxMessages: jest.fn().mockReturnValue({
+    chatsBlackBoxMessages: vi.fn().mockReturnValue({
       queryKey: ['chats', 'blackBoxMessages'],
       notifyOnChangeProps: ['data']
     })
@@ -30,21 +30,21 @@ jest.mock('@/api/query_keys', () => ({
 }));
 
 // Mock next/link
-jest.mock('next/link', () => {
-  return ({ children, href }: { children: React.ReactNode; href: string }) => (
+vi.mock('next/link', () => ({
+  default: ({ children, href }: { children: React.ReactNode; href: string }) => (
     <a href={href} data-testid="link">
       {children}
     </a>
-  );
-});
+  )
+}));
 
 // Mock routes
-jest.mock('@/routes', () => ({
+vi.mock('@/routes', () => ({
   BusterRoutes: {
     APP_CHAT_ID: '/app/chat/:chatId',
     APP_CHAT_ID_REASONING_ID: '/app/chat/:chatId/:messageId/reasoning'
   },
-  createBusterRoute: jest.fn().mockImplementation(({ route, chatId, messageId }) => {
+  createBusterRoute: vi.fn().mockImplementation(({ route, chatId, messageId }) => {
     if (route === '/app/chat/:chatId') {
       return `/app/chat/${chatId}`;
     }
@@ -56,12 +56,12 @@ jest.mock('@/routes', () => ({
 }));
 
 // Mock ShimmerText component
-jest.mock('@/components/ui/typography/ShimmerText', () => ({
+vi.mock('@/components/ui/typography/ShimmerText', () => ({
   ShimmerText: ({ text }: { text: string }) => <span data-testid="shimmer">{text}</span>
 }));
 
 // Mock Text component
-jest.mock('@/components/ui/typography', () => ({
+vi.mock('@/components/ui/typography', () => ({
   Text: ({
     children,
     variant,
@@ -78,7 +78,7 @@ jest.mock('@/components/ui/typography', () => ({
 }));
 
 // Mock framer-motion components
-jest.mock('framer-motion', () => ({
+vi.mock('framer-motion', () => ({
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>
   },
@@ -95,17 +95,17 @@ describe('ChatResponseReasoning', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Default mock implementation
-    (useChatLayoutContextSelector as jest.Mock).mockImplementation((selector) => {
+    (useChatLayoutContextSelector as any).mockImplementation((selector: any) => {
       if (selector.toString().includes('messageId')) return 'different-message-id';
       if (selector.toString().includes('selectedFileType')) return 'not-reasoning';
       return null;
     });
 
     // Mock useGetChatMessage with proper selector behavior
-    (useGetChatMessage as jest.Mock).mockImplementation((id, options) => {
+    (useGetChatMessage as any).mockImplementation((id: any, options: any) => {
       if (options?.select?.toString().includes('reasoning_messages')) {
         return { data: 'Test Title' };
       }
@@ -115,7 +115,7 @@ describe('ChatResponseReasoning', () => {
       return { data: null };
     });
 
-    (useQuery as jest.Mock).mockReturnValue({
+    (useQuery as any).mockReturnValue({
       data: null
     });
   });
@@ -146,7 +146,7 @@ describe('ChatResponseReasoning', () => {
   });
 
   it('displays finalReasoningMessage when available', () => {
-    (useGetChatMessage as jest.Mock).mockImplementation((id, options) => {
+    (useGetChatMessage as any).mockImplementation((id: any, options: any) => {
       if (options?.select?.toString().includes('reasoning_messages')) {
         return { data: 'Test Title' };
       }
@@ -162,7 +162,7 @@ describe('ChatResponseReasoning', () => {
   });
 
   it('displays blackBoxMessage when available', () => {
-    (useQuery as jest.Mock).mockReturnValue({
+    (useQuery as any).mockReturnValue({
       data: 'Black box message'
     });
 
@@ -172,7 +172,7 @@ describe('ChatResponseReasoning', () => {
   });
 
   it('renders with correct link when reasoning file is selected', () => {
-    (useChatLayoutContextSelector as jest.Mock).mockImplementation((selector) => {
+    (useChatLayoutContextSelector as any).mockImplementation((selector: any) => {
       if (selector.toString().includes('messageId')) return 'message-id';
       if (selector.toString().includes('selectedFileType')) return 'reasoning';
       return null;
@@ -186,8 +186,8 @@ describe('ChatResponseReasoning', () => {
   });
 
   it('renders "Thinking..." as fallback text', () => {
-    (useGetChatMessage as jest.Mock).mockImplementation(() => ({ data: null }));
-    (useQuery as jest.Mock).mockReturnValue({ data: null });
+    (useGetChatMessage as any).mockImplementation(() => ({ data: null }));
+    (useQuery as any).mockReturnValue({ data: null });
 
     render(<ChatResponseReasoning {...defaultProps} />);
 

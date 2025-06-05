@@ -1,11 +1,11 @@
 import React from 'react';
-import type { ReasoningMessageProps } from '../ReasoningMessageSelector';
 import type {
-  BusterChatMessageReasoning_files,
-  BusterChatMessage
+  BusterChatMessage,
+  BusterChatMessageReasoning_files
 } from '@/api/asset_interfaces/chat';
-import { ReasoningMessage_File } from './ReasoningMessageFile';
 import { useGetChatMessage } from '@/api/buster_rest/chats';
+import type { ReasoningMessageProps } from '../ReasoningMessageSelector';
+import { ReasoningMessage_File } from './ReasoningMessageFile';
 
 const getReasoningMessage = (x: BusterChatMessage | undefined, reasoningMessageId: string) =>
   x?.reasoning_messages[reasoningMessageId] as BusterChatMessageReasoning_files;

@@ -1,14 +1,15 @@
-import React, { useMemo } from 'react';
-import { DraggedItem } from './interfaces';
 import {
   DragOverlay,
-  DropAnimation,
-  defaultDropAnimationSideEffects,
-  defaultDropAnimation
+  type DropAnimation,
+  defaultDropAnimation,
+  defaultDropAnimationSideEffects
 } from '@dnd-kit/core';
-import { SelectAxisItem } from './SelectAxisItem';
-import { SelectAxisContainerId } from '../config';
 import { CSS } from '@dnd-kit/utilities';
+import type React from 'react';
+import { useMemo } from 'react';
+import { SelectAxisContainerId } from '../config';
+import type { DraggedItem } from './interfaces';
+import { SelectAxisItem } from './SelectAxisItem';
 
 const dropAnimation: DropAnimation = {
   duration: 200,

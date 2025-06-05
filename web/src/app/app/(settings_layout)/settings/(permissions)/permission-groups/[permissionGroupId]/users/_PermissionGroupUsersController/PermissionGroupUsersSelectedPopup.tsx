@@ -1,7 +1,7 @@
+import React from 'react';
 import { useUpdatePermissionGroupUsers } from '@/api/buster_rest';
 import { PermissionAssignedButton } from '@/components/features/PermissionComponents';
 import { BusterListSelectedOptionPopupContainer } from '@/components/ui/list';
-import React from 'react';
 
 export const PermissionGroupUsersSelectedPopup: React.FC<{
   selectedRowKeys: string[];

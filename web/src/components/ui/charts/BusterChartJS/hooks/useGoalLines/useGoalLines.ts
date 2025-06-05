@@ -10,18 +10,18 @@
  * @packageDocumentation
  */
 
+import type { AnnotationOptions, AnnotationPluginOptions } from 'chartjs-plugin-annotation';
+import { useMemo } from 'react';
+import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import type {
   BusterChartConfigProps,
   ChartType,
   ColumnLabelFormat,
   GoalLine
 } from '@/api/asset_interfaces/metric/charts';
-import type { AnnotationOptions, AnnotationPluginOptions } from 'chartjs-plugin-annotation';
-import { useMemo } from 'react';
 import { formatLabel } from '@/lib/columnFormatter';
-import { defaultLabelOptionConfig } from '../useChartSpecificOptions/labelOptionConfig';
 import { yAxisSimilar } from '../../../commonHelpers';
-import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
+import { defaultLabelOptionConfig } from '../useChartSpecificOptions/labelOptionConfig';
 
 /** Interface for the useGoalLines hook parameters */
 interface UseGoalLinesParams {
@@ -85,7 +85,7 @@ export const useGoalLines = ({
     const allKeys = [...yAxisKeys, ...(y2AxisKeys || [])];
     const isSimilar = yAxisSimilar(allKeys, columnLabelFormats);
     if (isSimilar) {
-      const key = yAxisKeys[0]!;
+      const key = yAxisKeys[0];
       return columnLabelFormats[key] || DEFAULT_COLUMN_LABEL_FORMAT;
     }
     return {
@@ -134,7 +134,7 @@ export const useGoalLines = ({
           label: {
             content: formattedValue,
             display: showGoalLineLabel,
-            //@ts-ignore
+            // @ts-expect-error - anchor is not a valid prop for label
             anchor: 'end',
             align: 'top',
             ...defaultLabelOptionConfig

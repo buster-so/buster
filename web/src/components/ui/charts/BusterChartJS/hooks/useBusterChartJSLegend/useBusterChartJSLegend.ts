@@ -1,24 +1,25 @@
 'use client';
 
-import React, { useEffect, useMemo, useState, useTransition } from 'react';
-import type { ChartJSOrUndefined } from '../../core/types';
+import type React from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces/metric';
 import type {
   BusterChartProps,
   ChartEncodes,
   ChartType
 } from '@/api/asset_interfaces/metric/charts';
 import { useDebounceFn, useMemoizedFn, useUpdateDebounceEffect } from '@/hooks';
-import type { IBusterMetricChartConfig } from '@/api/asset_interfaces/metric';
+import { timeout } from '@/lib';
 import {
   addLegendHeadlines,
-  BusterChartLegendItem,
-  useBusterChartLegend,
-  UseChartLengendReturnValues
+  type BusterChartLegendItem,
+  type UseChartLengendReturnValues,
+  useBusterChartLegend
 } from '../../../BusterChartLegend';
-import { getLegendItems } from './getLegendItems';
 import type { DatasetOptionsWithTicks } from '../../../chartHooks';
 import { LEGEND_ANIMATION_THRESHOLD } from '../../../config';
-import { timeout } from '@/lib';
+import type { ChartJSOrUndefined } from '../../core/types';
+import { getLegendItems } from './getLegendItems';
 
 interface UseBusterChartJSLegendProps {
   chartRef: React.RefObject<ChartJSOrUndefined | null>;
@@ -228,12 +229,18 @@ export const useBusterChartJSLegend = ({
           datasets?.forEach((dataset, index) => {
             const value = index === assosciatedDatasetIndex;
             chartjs.setDatasetVisibility(index, value);
-            inactiveDatasetsRecord[dataset.label!] = !value;
+            const label = dataset.label;
+            if (label) {
+              inactiveDatasetsRecord[label] = !value;
+            }
           });
         } else {
           datasets?.forEach((dataset, index) => {
             chartjs.setDatasetVisibility(index, true);
-            inactiveDatasetsRecord[dataset.label!] = false;
+            const label = dataset.label;
+            if (label) {
+              inactiveDatasetsRecord[label] = false;
+            }
           });
         }
         setInactiveDatasets((prev) => ({

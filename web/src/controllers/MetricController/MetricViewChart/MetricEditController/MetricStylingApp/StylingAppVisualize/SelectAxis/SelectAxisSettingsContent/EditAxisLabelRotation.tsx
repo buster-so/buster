@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
-import { LabelAndInput } from '../../../Common/LabelAndInput';
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
 import { useMemoizedFn } from '@/hooks';
+import { LabelAndInput } from '../../../Common/LabelAndInput';
 
 const options: SegmentedItem<IBusterMetricChartConfig['xAxisLabelRotation']>[] = [
   { label: 'Auto', value: 'auto' },
@@ -17,7 +17,7 @@ export const EditAxisLabelRotation: React.FC<{
 }> = React.memo(({ xAxisLabelRotation, onChangeLabelRotation }) => {
   const selectedOption: IBusterMetricChartConfig['xAxisLabelRotation'] = useMemo(() => {
     return (
-      options.find((option) => option.value === xAxisLabelRotation)?.value ?? options[0]?.value!
+      options.find((option) => option.value === xAxisLabelRotation)?.value ?? options[0]?.value
     );
   }, [xAxisLabelRotation]);
 

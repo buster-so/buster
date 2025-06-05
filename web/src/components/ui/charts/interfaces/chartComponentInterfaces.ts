@@ -1,5 +1,5 @@
 import type { BusterChartProps, ChartEncodes } from '@/api/asset_interfaces/metric/charts';
-import { useDatasetOptions } from '../chartHooks';
+import type { useDatasetOptions } from '../chartHooks';
 
 export interface BusterChartTypeComponentProps
   extends Omit<

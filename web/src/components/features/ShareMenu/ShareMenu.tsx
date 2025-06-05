@@ -1,12 +1,12 @@
 'use client';
 
-import React, { PropsWithChildren, useState } from 'react';
+import React, { type PropsWithChildren, useState } from 'react';
+import type { BusterShare, ShareAssetType } from '@/api/asset_interfaces';
 import { Popover } from '@/components/ui/popover/Popover';
 import { AppTooltip } from '@/components/ui/tooltip';
 import { useMemoizedFn } from '@/hooks';
-import { BusterShare, ShareAssetType } from '@/api/asset_interfaces';
-import { ShareMenuContent } from './ShareMenuContent';
 import { canShare } from '@/lib/share';
+import { ShareMenuContent } from './ShareMenuContent';
 
 export const ShareMenu: React.FC<
   PropsWithChildren<{

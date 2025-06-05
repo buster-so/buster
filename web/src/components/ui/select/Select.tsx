@@ -1,14 +1,14 @@
-import React from 'react';
+import type React from 'react';
+import { useMemoizedFn } from '@/hooks';
 import {
   Select as SelectBase,
   SelectContent,
   SelectGroup,
-  SelectItem,
+  SelectItem as SelectItemComponent,
   SelectLabel,
   SelectTrigger,
   SelectValue
 } from './SelectBase';
-import { useMemoizedFn } from '@/hooks';
 
 interface SelectItemGroup<T = string> {
   label: string;
@@ -67,7 +67,12 @@ export const Select = <T extends string>({
       </SelectTrigger>
       <SelectContent>
         {items.map((item, index) => (
-          <SelectItemSelector key={index} item={item} index={index} showIndex={showIndex} />
+          <SelectItemSelector
+            key={index.toString()}
+            item={item}
+            index={index}
+            showIndex={showIndex}
+          />
         ))}
       </SelectContent>
     </SelectBase>
@@ -101,7 +106,7 @@ const SelectItemSelector = <T,>({
   const { value, label, icon, secondaryLabel, disabled, ...rest } = item as SelectItem;
 
   return (
-    <SelectItem
+    <SelectItemComponent
       disabled={disabled}
       value={value}
       icon={icon}
@@ -110,7 +115,7 @@ const SelectItemSelector = <T,>({
         secondaryLabel && <SelectItemSecondaryText>{secondaryLabel}</SelectItemSecondaryText>
       }>
       {label}
-    </SelectItem>
+    </SelectItemComponent>
   );
 };
 

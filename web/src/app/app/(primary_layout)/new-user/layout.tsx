@@ -1,12 +1,13 @@
-import React, { PropsWithChildren } from 'react';
+import type { Metadata } from 'next';
+import type React from 'react';
+import type { PropsWithChildren } from 'react';
 import NewUserWelcome from '@/assets/png/new-user-welcome.png';
-import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Buster Login'
 };
 
-const LoginLayout: React.FC<PropsWithChildren<{}>> = ({ children }) => {
+const LoginLayout: React.FC<PropsWithChildren> = ({ children }) => {
   return (
     <section className="h-[100vh]">
       <div className="flex h-[100vh] items-center">
@@ -19,7 +20,8 @@ const LoginLayout: React.FC<PropsWithChildren<{}>> = ({ children }) => {
                 height: '84vh',
                 background: `url(${NewUserWelcome.src}) no-repeat left center`,
                 backgroundSize: 'cover'
-              }}></div>
+              }}
+            />
           </div>
         </div>
       </div>

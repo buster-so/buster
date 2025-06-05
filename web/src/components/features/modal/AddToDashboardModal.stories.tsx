@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { AddToDashboardModal } from './AddToDashboardModal';
-import { http, HttpResponse } from 'msw';
 import { fn } from '@storybook/test';
+import { HttpResponse, http } from 'msw';
+import type { BusterMetricListItem } from '@/api/asset_interfaces';
 import { BASE_URL } from '@/api/buster_rest/config';
-import { BusterMetricListItem } from '@/api/asset_interfaces';
-import { createMockListMetric } from '@/mocks/metric';
 import { generateMockDashboard } from '@/mocks/MOCK_DASHBOARD';
+import { createMockListMetric } from '@/mocks/metric';
+import { AddToDashboardModal } from './AddToDashboardModal';
 
 const mockMetrics: BusterMetricListItem[] = Array.from({ length: 100 }, (_, index) =>
   createMockListMetric(`${index + 1}`)

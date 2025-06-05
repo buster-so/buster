@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { AppSegmented } from './AppSegmented';
-import { BottleChampagne, Grid, HouseModern, PaintRoller } from '../icons';
-import { PreventNavigation } from '../layouts/PreventNavigation';
 import { useState } from 'react';
 import { Checkbox } from '../checkbox';
+import { BottleChampagne, Grid, HouseModern, PaintRoller } from '../icons';
+import { PreventNavigation } from '../layouts/PreventNavigation';
+import { AppSegmented } from './AppSegmented';
 
 const meta: Meta<typeof AppSegmented> = {
   title: 'UI/Segmented/AppSegmented',

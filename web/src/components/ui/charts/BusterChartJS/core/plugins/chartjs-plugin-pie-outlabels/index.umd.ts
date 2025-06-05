@@ -1,4 +1,4 @@
-import { Chart } from 'chart.js'
-import plugin from './plugin'
+import { Chart } from 'chart.js';
+import plugin from './plugin';
 
-Chart.register(plugin)
+Chart.register(plugin);

@@ -1,2 +1,2 @@
-export * from './StylingLabel';
 export * from './LabelAndInput';
+export * from './StylingLabel';

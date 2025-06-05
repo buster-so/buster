@@ -1,10 +1,10 @@
 'use client';
 
+import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react';
-import { StreamingMessage_Text } from './StreamingMessage_Text';
 import React, { useState } from 'react';
 import { Button } from '../buttons/Button';
-import { faker } from '@faker-js/faker';
+import { StreamingMessage_Text } from './StreamingMessage_Text';
 
 const meta: Meta<typeof StreamingMessage_Text> = {
   title: 'UI/Streaming/StreamingMessage_Text',

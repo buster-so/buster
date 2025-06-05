@@ -1,10 +1,10 @@
 import React from 'react';
-import { Text } from '@/components/ui/typography';
+import { useHotkeys } from 'react-hotkeys-hook';
 import { Button } from '@/components/ui/buttons';
 import { Xmark } from '@/components/ui/icons';
-import { useChatLayoutContextSelector } from '@/layouts/ChatLayout';
 import { AppTooltip } from '@/components/ui/tooltip';
-import { useHotkeys } from 'react-hotkeys-hook';
+import { Text } from '@/components/ui/typography';
+import { useChatLayoutContextSelector } from '@/layouts/ChatLayout';
 
 export const MetricEditControllerHeader: React.FC = React.memo(() => {
   const closeSecondaryView = useChatLayoutContextSelector((x) => x.closeSecondaryView);

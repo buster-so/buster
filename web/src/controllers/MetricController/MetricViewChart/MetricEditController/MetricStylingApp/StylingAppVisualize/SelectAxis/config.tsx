@@ -1,13 +1,6 @@
+import type React from 'react';
 import { ChartType, type IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
-import {
-  Calendar,
-  CurrencyDollar,
-  TextA,
-  Numbers,
-  Percentage,
-  Typography
-} from '@/components/ui/icons';
-import React from 'react';
+import { Calendar, CurrencyDollar, Numbers, Percentage, Typography } from '@/components/ui/icons';
 
 export const ColumnTypeIcon: Record<
   IColumnLabelFormat['style'],

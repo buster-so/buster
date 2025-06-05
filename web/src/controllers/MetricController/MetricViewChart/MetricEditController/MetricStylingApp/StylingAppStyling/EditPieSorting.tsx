@@ -1,10 +1,10 @@
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import React, { useMemo } from 'react';
-import { LabelAndInput } from '../Common';
-import { PieSortBy } from '@/api/asset_interfaces/metric/charts';
-import { AppSegmented, SegmentedItem } from '@/components/ui/segmented';
-import { SortAlphaAscending, SortNumAscending, Empty } from '@/components/ui/icons';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { PieSortBy } from '@/api/asset_interfaces/metric/charts';
+import { Empty, SortAlphaAscending, SortNumAscending } from '@/components/ui/icons';
+import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
 import { useMemoizedFn } from '@/hooks';
+import { LabelAndInput } from '../Common';
 
 const options: SegmentedItem<NonNullable<PieSortBy> | 'none'>[] = [
   {

@@ -1,17 +1,17 @@
 'use client';
 
+import React, { useRef, useState } from 'react';
 import type { BusterChatMessageRequest } from '@/api/asset_interfaces';
-import React, { useState, useRef, useEffect } from 'react';
-import { Paragraph } from '@/components/ui/typography';
-import { MessageContainer } from './MessageContainer';
-import { Tooltip } from '@/components/ui/tooltip';
-import { cn } from '@/lib/classMerge';
-import { PenWriting, Copy } from '@/components/ui/icons';
 import { Button } from '@/components/ui/buttons';
-import { useBusterNotifications } from '@/context/BusterNotifications';
-import { useMemoizedFn, useMount } from '@/hooks';
+import { Copy, PenWriting } from '@/components/ui/icons';
 import { InputTextArea } from '@/components/ui/inputs/InputTextArea';
+import { Tooltip } from '@/components/ui/tooltip';
+import { Paragraph } from '@/components/ui/typography';
+import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useBusterNewChatContextSelector } from '@/context/Chats';
+import { useMemoizedFn, useMount } from '@/hooks';
+import { cn } from '@/lib/classMerge';
+import { MessageContainer } from './MessageContainer';
 
 export const ChatUserMessage: React.FC<{
   messageId: string;
@@ -33,7 +33,7 @@ export const ChatUserMessage: React.FC<{
   const handleCopy = useMemoizedFn((e?: React.ClipboardEvent) => {
     // Prevent default copy behavior
     //I do not know why this is needed, but it is...
-    if (e && e.clipboardData) {
+    if (e?.clipboardData) {
       e.preventDefault();
       e.clipboardData.setData('text/plain', request);
     } else {
@@ -170,3 +170,5 @@ const EditMessage: React.FC<{
     </div>
   );
 });
+
+EditMessage.displayName = 'EditMessage';

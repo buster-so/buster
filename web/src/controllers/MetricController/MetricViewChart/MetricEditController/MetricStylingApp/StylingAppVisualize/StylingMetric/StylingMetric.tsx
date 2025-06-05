@@ -1,14 +1,14 @@
-import { ColumnMetaData, IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import React, { useMemo } from 'react';
-import { EditMetricField } from './EditMetricField';
-import { useMemoizedFn } from '@/hooks';
-import { EditMetricAggregate } from './EditMetricType';
-import { EditMetricHeader } from './EditMetricHeaderType';
+import type { ColumnMetaData, IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { DerivedMetricTitle } from '@/api/asset_interfaces/metric/charts';
 import { Separator } from '@/components/ui/seperator';
-import { DerivedMetricTitle } from '@/api/asset_interfaces/metric/charts';
-import { EditHeaderTitle } from './EditHeaderTitle';
-import { createColumnFieldOptions } from './helpers';
 import { useUpdateMetricChart } from '@/context/Metrics';
+import { useMemoizedFn } from '@/hooks';
+import { EditHeaderTitle } from './EditHeaderTitle';
+import { EditMetricField } from './EditMetricField';
+import { EditMetricHeader } from './EditMetricHeaderType';
+import { EditMetricAggregate } from './EditMetricType';
+import { createColumnFieldOptions } from './helpers';
 
 export const StylingMetric: React.FC<{
   className?: string;

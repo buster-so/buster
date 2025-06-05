@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { LabelAndInput } from '../../../Common/LabelAndInput';
-import { InputNumber } from '@/components/ui/inputs';
-import { Slider, SliderWithInputNumber } from '@/components/ui/slider';
-import { ColumnSettings } from '@/api/asset_interfaces/metric/charts';
+import type { ColumnSettings } from '@/api/asset_interfaces/metric/charts';
+import { SliderWithInputNumber } from '@/components/ui/slider';
 import { useMemoizedFn } from '@/hooks';
+import { LabelAndInput } from '../../../Common/LabelAndInput';
 
 const BAR_ROUNDNESS_MIN = 0;
 const BAR_ROUNDNESS_MAX = 50;

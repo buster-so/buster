@@ -1,22 +1,21 @@
 'use client';
 
 import React from 'react';
-import { FileContainerButtonsProps } from '../interfaces';
 import { useGetDashboard } from '@/api/buster_rest/dashboards';
-import { useIsDashboardReadOnly } from '@/context/Dashboards/useIsDashboardReadOnly';
-import { canEdit, getIsEffectiveOwner } from '@/lib/share';
-import { FileButtonContainer } from '../FileButtonContainer';
-import { ShareDashboardButton } from '@/components/features/buttons/ShareDashboardButton';
-import { DashboardThreeDotMenu } from './DashboardThreeDotMenu';
-import { HideButtonContainer } from '../HideButtonContainer';
-import { CreateChatButton } from '../CreateChatButtont';
-import { useChatIndividualContextSelector } from '@/layouts/ChatLayout/ChatContext';
 import { SaveDashboardToCollectionButton } from '@/components/features/buttons/SaveDashboardToCollectionButton';
-import { useDashboardContentStore } from '@/context/Dashboards';
-import { AppTooltip } from '@/components/ui/tooltip';
+import { ShareDashboardButton } from '@/components/features/buttons/ShareDashboardButton';
 import { Button } from '@/components/ui/buttons';
 import { Plus } from '@/components/ui/icons';
+import { AppTooltip } from '@/components/ui/tooltip';
+import { useDashboardContentStore } from '@/context/Dashboards';
+import { useIsDashboardReadOnly } from '@/context/Dashboards/useIsDashboardReadOnly';
 import { useChatLayoutContextSelector } from '@/layouts/ChatLayout/ChatLayoutContext';
+import { canEdit, getIsEffectiveOwner } from '@/lib/share';
+import { CreateChatButton } from '../CreateChatButtont';
+import { FileButtonContainer } from '../FileButtonContainer';
+import { HideButtonContainer } from '../HideButtonContainer';
+import type { FileContainerButtonsProps } from '../interfaces';
+import { DashboardThreeDotMenu } from './DashboardThreeDotMenu';
 
 export const DashboardContainerHeaderButtons: React.FC<FileContainerButtonsProps> = React.memo(
   ({ selectedFileId }) => {

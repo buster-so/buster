@@ -1,19 +1,19 @@
 'use client';
 
+import React, { useMemo, useState } from 'react';
 import type { GetPermissionGroupUsersResponse } from '@/api/asset_interfaces';
 import { useUpdatePermissionGroupUsers } from '@/api/buster_rest';
+import { ListUserItem } from '@/components/features/list';
 import { PermissionAssignedCell } from '@/components/features/PermissionComponents';
 import {
-  BusterListColumn,
-  BusterListRowItem,
+  type BusterListColumn,
+  type BusterListRowItem,
   EmptyStateList,
   InfiniteListContainer
 } from '@/components/ui/list';
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
-import { BusterRoutes, createBusterRoute } from '@/routes';
 import { useMemoizedFn } from '@/hooks';
-import React, { useMemo, useState } from 'react';
-import { ListUserItem } from '@/components/features/list';
+import { BusterRoutes, createBusterRoute } from '@/routes';
 import { PermissionGroupUsersSelectedPopup } from './PermissionGroupUsersSelectedPopup';
 
 export const PermissionGroupUsersListContainer: React.FC<{
@@ -133,12 +133,7 @@ export const PermissionGroupUsersListContainer: React.FC<{
         useRowClickSelectChange={false}
         selectedRowKeys={selectedRowKeys}
         onSelectChange={setSelectedRowKeys}
-        emptyState={useMemo(
-          () => (
-            <EmptyStateList text="No dataset groups found" />
-          ),
-          []
-        )}
+        emptyState={useMemo(() => <EmptyStateList text="No dataset groups found" />, [])}
       />
     </InfiniteListContainer>
   );

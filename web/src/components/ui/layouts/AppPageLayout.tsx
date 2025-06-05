@@ -1,7 +1,7 @@
-import React from 'react';
+import type React from 'react';
 import { cn } from '@/lib/utils';
-import { AppPageLayoutHeader } from './AppPageLayoutHeader';
 import { AppPageLayoutContent } from './AppPageLayoutContent';
+import { AppPageLayoutHeader } from './AppPageLayoutHeader';
 
 /**
  * @param header - Header content at the top of the page
@@ -54,7 +54,7 @@ export const AppPageLayout: React.FC<
         scrollable={scrollable}
         id={contentContainerId}>
         {header && scrollable && headerBorderVariant === 'ghost' && (
-          <div className="scroll-header"></div>
+          <div className="scroll-header" />
         )}
 
         {children}

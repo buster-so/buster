@@ -1,18 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { BusterChart } from '../BusterChart';
-import { ChartType } from '../../../../api/asset_interfaces/metric/charts/enum';
-import { IColumnLabelFormat } from '../../../../api/asset_interfaces/metric/charts/columnLabelInterfaces';
-import { generateScatterChartData } from '../../../../mocks/chart/chartMocks';
-import { sharedMeta } from './BusterChartShared';
+import dayjs from 'dayjs';
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
 import { useDebounceFn } from '@/hooks';
-import dayjs from 'dayjs';
+import type { IColumnLabelFormat } from '../../../../api/asset_interfaces/metric/charts/columnLabelInterfaces';
+import { ChartType } from '../../../../api/asset_interfaces/metric/charts/enum';
+import { generateScatterChartData } from '../../../../mocks/chart/chartMocks';
+import { BusterChart } from '../BusterChart';
+import { sharedMeta } from './BusterChartShared';
 import {
   scatterConfig_problematic1,
+  scatterConfig_problematic2,
   scatterData_problematic2,
-  scatterDataProblematic1,
-  scatterConfig_problematic2
+  scatterDataProblematic1
 } from './scatterData_problematic1';
 
 type ScatterChartData = ReturnType<typeof generateScatterChartData>;

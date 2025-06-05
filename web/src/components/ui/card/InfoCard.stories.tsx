@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { InfoCard } from './InfoCard';
 import { faker } from '@faker-js/faker';
+import type { Meta, StoryObj } from '@storybook/react';
 import { Bell } from '@/components/ui/icons';
+import { InfoCard } from './InfoCard';
 
 const meta: Meta<typeof InfoCard> = {
   title: 'UI/Cards/InfoCard',

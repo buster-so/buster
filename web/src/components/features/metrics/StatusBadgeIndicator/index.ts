@@ -1,3 +1,3 @@
-export * from './StatusBadgeIndicator';
-export * from './StatusBadgeButton';
 export * from './helpers';
+export * from './StatusBadgeButton';
+export * from './StatusBadgeIndicator';

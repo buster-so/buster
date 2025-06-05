@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-import { Text } from '@/components/ui/typography';
+import type { dashboardsGetList } from '@/api/buster_rest/dashboards';
 import { Button } from '@/components/ui/buttons';
-import { AppSegmented, SegmentedItem } from '@/components/ui/segmented';
 import { Plus } from '@/components/ui/icons';
-import { type dashboardsGetList } from '@/api/buster_rest/dashboards';
+import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
+import { Text } from '@/components/ui/typography';
 
 export const DashboardHeader: React.FC<{
   dashboardFilters: {

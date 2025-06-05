@@ -1,19 +1,23 @@
-import { ShareAssetType, VerificationStatus, BusterMetricListItem } from '@/api/asset_interfaces';
-import { makeHumanReadble, formatDate } from '@/lib';
 import React, { memo, useMemo, useRef, useState } from 'react';
 import {
-  StatusBadgeIndicator,
-  getShareStatus
-} from '@/components/features/metrics/StatusBadgeIndicator';
-import { Text } from '@/components/ui/typography';
-import { Avatar } from '@/components/ui/avatar';
-import { BusterRoutes, createBusterRoute } from '@/routes';
-import { useMemoizedFn } from '@/hooks';
-import { BusterListColumn, BusterListRow } from '@/components/ui/list';
-import { MetricSelectedOptionPopup } from './MetricItemsSelectedPopup';
-import { BusterList, ListEmptyStateWithButton } from '@/components/ui/list';
+  type BusterMetricListItem,
+  ShareAssetType,
+  type VerificationStatus
+} from '@/api/asset_interfaces';
 import { FavoriteStar } from '@/components/features/list';
+import {
+  getShareStatus,
+  StatusBadgeIndicator
+} from '@/components/features/metrics/StatusBadgeIndicator';
+import { Avatar } from '@/components/ui/avatar';
+import type { BusterListColumn, BusterListRow } from '@/components/ui/list';
+import { BusterList, ListEmptyStateWithButton } from '@/components/ui/list';
 import { useCreateListByDate } from '@/components/ui/list/useCreateListByDate';
+import { Text } from '@/components/ui/typography';
+import { useMemoizedFn } from '@/hooks';
+import { formatDate, makeHumanReadble } from '@/lib';
+import { BusterRoutes, createBusterRoute } from '@/routes';
+import { MetricSelectedOptionPopup } from './MetricItemsSelectedPopup';
 
 export const MetricItemsContainer: React.FC<{
   metrics: BusterMetricListItem[];
@@ -115,12 +119,7 @@ export const MetricItemsContainer: React.FC<{
         columns={columns}
         onSelectChange={onSelectChange}
         selectedRowKeys={selectedRowKeys}
-        emptyState={useMemo(
-          () => (
-            <EmptyState loading={loading} />
-          ),
-          [loading]
-        )}
+        emptyState={useMemo(() => <EmptyState loading={loading} />, [loading])}
       />
 
       <MetricSelectedOptionPopup
@@ -136,7 +135,7 @@ const EmptyState: React.FC<{
   loading: boolean;
 }> = React.memo(({ loading }) => {
   if (loading) {
-    return <></>;
+    return null;
   }
 
   return (

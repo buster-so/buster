@@ -1,10 +1,10 @@
 import React from 'react';
 import { AppCodeEditor } from '@/components/ui/inputs/AppCodeEditor';
-import { useMemoizedFn } from '@/hooks';
 import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useMemoizedFn } from '@/hooks';
 import { Button } from '../buttons/Button';
-import { Download, Copy } from '../icons';
 import { ErrorClosableContainer } from '../error/ErrorClosableContainer';
+import { Copy, Download } from '../icons';
 import { FileCard } from './FileCard';
 
 export const CodeCard: React.FC<{
@@ -41,18 +41,16 @@ export const CodeCard: React.FC<{
 
     return (
       <FileCard fileName={fileName} headerButtons={ShownButtons} className={className}>
-        <>
-          <AppCodeEditor
-            language={language}
-            value={code}
-            onChange={onChange}
-            readOnly={readOnly}
-            height="100%"
-            onMetaEnter={onMetaEnter}
-            className="border-none"
-          />
-          {error && <ErrorClosableContainer error={error} className="bottom-10!" />}
-        </>
+        <AppCodeEditor
+          language={language}
+          value={code}
+          onChange={onChange}
+          readOnly={readOnly}
+          height="100%"
+          onMetaEnter={onMetaEnter}
+          className="border-none"
+        />
+        {error && <ErrorClosableContainer error={error} className="bottom-10!" />}
       </FileCard>
     );
   }

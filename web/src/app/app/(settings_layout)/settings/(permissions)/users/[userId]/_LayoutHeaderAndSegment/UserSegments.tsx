@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
+import type { SegmentedItem } from '@/components/ui/segmented';
 import { AppSegmented } from '@/components/ui/segmented';
-import { useMemoizedFn } from '@/hooks';
-import { type SegmentedItem } from '@/components/ui/segmented';
 import { Separator } from '@/components/ui/seperator';
-import { createBusterRoute, BusterRoutes } from '@/routes';
+import { useMemoizedFn } from '@/hooks';
+import { BusterRoutes, createBusterRoute } from '@/routes';
 
 export enum UserSegmentsApps {
   OVERVIEW = 'Overview',

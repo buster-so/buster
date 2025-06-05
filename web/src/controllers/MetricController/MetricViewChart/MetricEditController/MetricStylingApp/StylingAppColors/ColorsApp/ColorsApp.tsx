@@ -1,11 +1,11 @@
-import React, { useMemo, useState } from 'react';
-import { ColorStyleSegments } from './ColorStyleSegments';
-import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import { ColorAppSegments, COLORFUL_THEMES, MONOCHROME_THEMES } from './config';
 import isEqual from 'lodash/isEqual';
-import { IColorTheme } from '../Common';
+import React, { useMemo, useState } from 'react';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { useMemoizedFn } from '@/hooks';
+import type { IColorTheme } from '../Common';
 import { ThemeList } from '../Common/ThemeList';
+import { ColorStyleSegments } from './ColorStyleSegments';
+import { COLORFUL_THEMES, ColorAppSegments, MONOCHROME_THEMES } from './config';
 
 export const ColorsApp: React.FC<{
   colors: IBusterMetricChartConfig['colors'];

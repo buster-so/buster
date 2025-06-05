@@ -1,5 +1,5 @@
-import type { BusterShare, ShareRole, VerificationStatus } from '../share';
 import type { BusterMetric } from '../metric';
+import type { BusterShare, ShareRole, VerificationStatus } from '../share';
 import type { DashboardConfig } from './dashboardConfigInterfaces';
 
 export interface BusterDashboardListItem {

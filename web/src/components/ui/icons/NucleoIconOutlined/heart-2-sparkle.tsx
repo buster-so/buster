@@ -1,6 +1,4 @@
-import React from 'react';
-
-import { iconProps } from './iconProps';
+import type { iconProps } from './iconProps';
 
 function heart2Sparkle(props: iconProps) {
   const strokewidth = props.strokewidth || 1.3;

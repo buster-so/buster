@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import type { DraggableAttributes } from '@dnd-kit/core';
+import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronRight, Trash } from '@/components/ui/icons';
-import { useMemoizedFn } from '@/hooks';
-import { Text } from '@/components/ui/typography';
-import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
-import { DraggableAttributes } from '@dnd-kit/core';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/buttons';
+import { ChevronRight, Trash } from '@/components/ui/icons';
+import { Text } from '@/components/ui/typography';
+import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 
 const ANIMATION_DURATION = 0.145;
@@ -90,6 +90,7 @@ const CollapseDeleteHeader = React.memo(
       <div
         ref={ref}
         onClick={onToggleDropdown}
+        onKeyUp={() => {}}
         style={{ ...style }}
         className={cn(
           'h-8 max-h-8 min-h-8',
@@ -156,14 +157,18 @@ const DropdownIcon: React.FC<{
     onClickDelete?.();
   });
 
-  const onClickContainer = useMemoizedFn((e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-  });
+  const onClickContainer = useMemoizedFn(
+    (event: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>) => {
+      event.stopPropagation();
+    }
+  );
 
   return (
     <div
       className="relative flex h-full cursor-pointer items-center space-x-0.5 pr-1"
-      onClick={onClickContainer}>
+      onClick={onClickContainer}
+      onKeyUp={(e) => e.key === 'Enter' && onClickContainer(e)}
+      onKeyDown={(e) => e.key === 'Enter' && onClickContainer(e)}>
       {onClickDelete && (
         <Button
           size="small"
@@ -197,7 +202,8 @@ const DropdownIcon: React.FC<{
             )}>
             <ChevronRight />
           </div>
-        }></Button>
+        }
+      />
     </div>
   );
 });

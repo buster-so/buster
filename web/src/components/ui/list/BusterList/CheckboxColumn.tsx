@@ -1,8 +1,8 @@
-import { useMemoizedFn } from '@/hooks';
 import React from 'react';
-import { MemoizedCheckbox } from './MemoizedCheckbox';
-import { WIDTH_OF_CHECKBOX_COLUMN } from './config';
+import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
+import { WIDTH_OF_CHECKBOX_COLUMN } from './config';
+import { MemoizedCheckbox } from './MemoizedCheckbox';
 
 export const CheckboxColumn: React.FC<{
   checkStatus: 'checked' | 'unchecked' | 'indeterminate' | undefined;
@@ -14,7 +14,7 @@ export const CheckboxColumn: React.FC<{
   const onClickStopPropagation = useMemoizedFn((e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     e.preventDefault();
-    const value = checkStatus === 'checked' ? false : true;
+    const value = checkStatus !== 'checked';
     onChange(value, e);
   });
 

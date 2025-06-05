@@ -1,8 +1,8 @@
-import { type useAutoScroll } from '@/hooks/useAutoScroll';
 import React from 'react';
 import { ChevronDown } from '@/components/ui/icons';
-import { cn } from '@/lib/utils';
 import { AppTooltip } from '@/components/ui/tooltip';
+import type { useAutoScroll } from '@/hooks/useAutoScroll';
+import { cn } from '@/lib/utils';
 
 export const ChatScrollToBottom: React.FC<{
   isAutoScrollEnabled: boolean;
@@ -18,6 +18,7 @@ export const ChatScrollToBottom: React.FC<{
       )}>
       <AppTooltip title="Stick to bottom" sideOffset={12} delayDuration={500}>
         <button
+          type="button"
           onClick={scrollToBottom}
           className={
             'bg-background/90 hover:bg-item-hover/90 cursor-pointer rounded-full border p-2 shadow transition-all duration-300 hover:shadow-md'

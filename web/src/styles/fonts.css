@@ -1,35 +1,35 @@
 @font-face {
-  font-family: 'Roobert_Pro';
-  src: url('./fonts/Roobert-Light.otf') format('opentype');
+  font-family: "Roobert_Pro";
+  src: url("./fonts/Roobert-Light.otf") format("opentype");
   font-weight: 300;
 }
 
 @font-face {
-  font-family: 'Roobert_Pro';
-  src: url('./fonts/Roobert-Regular.otf') format('opentype');
+  font-family: "Roobert_Pro";
+  src: url("./fonts/Roobert-Regular.otf") format("opentype");
   font-weight: 400;
 }
 
 @font-face {
-  font-family: 'Roobert_Pro';
-  src: url('./fonts/Roobert-Medium.otf') format('opentype');
+  font-family: "Roobert_Pro";
+  src: url("./fonts/Roobert-Medium.otf") format("opentype");
   font-weight: 500;
 }
 
 @font-face {
-  font-family: 'Roobert_Pro';
-  src: url('./fonts/Roobert-SemiBold.otf') format('opentype');
+  font-family: "Roobert_Pro";
+  src: url("./fonts/Roobert-SemiBold.otf") format("opentype");
   font-weight: 600;
 }
 
 @font-face {
-  font-family: 'Roobert_Pro';
-  src: url('./fonts/Roobert-Bold.otf') format('opentype');
+  font-family: "Roobert_Pro";
+  src: url("./fonts/Roobert-Bold.otf") format("opentype");
   font-weight: 700;
 }
 
 @font-face {
-  font-family: 'Roobert_Pro';
-  src: url('./fonts/Roobert-Heavy.otf') format('opentype');
+  font-family: "Roobert_Pro";
+  src: url("./fonts/Roobert-Heavy.otf") format("opentype");
   font-weight: 900;
 }

@@ -1,7 +1,10 @@
+import first from 'lodash/last';
 import React, { useMemo } from 'react';
+import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import { Select, type SelectItem } from '@/components/ui/select';
+import { useMemoizedFn } from '@/hooks';
+import { formatDate, getNow } from '@/lib/date';
 import { LabelAndInput } from '../../../Common/LabelAndInput';
-import { Select, SelectItem } from '@/components/ui/select';
-import { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import {
   getDefaultDateOptions,
   getDefaultDayOfWeekOptions,
@@ -9,9 +12,6 @@ import {
   getDefaultQuarterOptions,
   NO_FORMATTING_ITEM
 } from './dateConfig';
-import first from 'lodash/last';
-import { formatDate, getNow } from '@/lib/date';
-import { useMemoizedFn } from '@/hooks';
 
 export const EditDateFormat: React.FC<{
   dateFormat: IColumnLabelFormat['dateFormat'];
@@ -49,7 +49,7 @@ export const EditDateFormat: React.FC<{
 
   const selectedOption = useMemo(() => {
     if (dateFormat === '') return NO_FORMATTING_ITEM;
-    return selectOptions.find((option) => option.value === dateFormat) || first(selectOptions)!;
+    return selectOptions.find((option) => option.value === dateFormat) || first(selectOptions);
   }, [dateFormat, selectOptions]);
 
   const onChange = useMemoizedFn((value: IColumnLabelFormat['dateFormat']) => {
@@ -70,7 +70,7 @@ export const EditDateFormat: React.FC<{
         key={convertNumberTo}
         className="w-full!"
         items={selectOptions}
-        value={selectedOption.value}
+        value={selectedOption?.value}
         onChange={onChange}
       />
     </LabelAndInput>

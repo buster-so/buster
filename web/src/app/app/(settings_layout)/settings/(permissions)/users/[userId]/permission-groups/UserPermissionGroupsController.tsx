@@ -1,16 +1,16 @@
 'use client';
 
+import type React from 'react';
+import { useMemo, useState } from 'react';
 import { useGetUserPermissionGroups } from '@/api/buster_rest';
-import { useDebounceSearch } from '@/hooks';
 import {
   NewPermissionGroupModal,
   PermissionSearchAndListWrapper
 } from '@/components/features/PermissionComponents';
-import React, { useMemo, useState } from 'react';
-import { UserPermissionGroupsListContainer } from './UserPermissionGroupsListContainer';
 import { Button } from '@/components/ui/buttons';
-import { useMemoizedFn } from '@/hooks';
 import { Plus } from '@/components/ui/icons';
+import { useDebounceSearch, useMemoizedFn } from '@/hooks';
+import { UserPermissionGroupsListContainer } from './UserPermissionGroupsListContainer';
 
 export const UserPermissionGroupsController: React.FC<{ userId: string }> = ({ userId }) => {
   const { data: permissionGroups } = useGetUserPermissionGroups({ userId });

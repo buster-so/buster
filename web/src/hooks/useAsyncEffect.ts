@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 
-type AsyncEffect = () => Promise<void | (() => void)>;
+type AsyncEffect = () => Promise<undefined | (() => void)>;
 type DependencyList = ReadonlyArray<unknown>;
 
 /**
@@ -15,7 +15,7 @@ type DependencyList = ReadonlyArray<unknown>;
 export const useAsyncEffect = (effect: AsyncEffect, deps?: DependencyList) => {
   useEffect(() => {
     let mounted = true;
-    let cleanup: void | (() => void);
+    let cleanup: undefined | (() => void);
 
     const runEffect = async () => {
       try {

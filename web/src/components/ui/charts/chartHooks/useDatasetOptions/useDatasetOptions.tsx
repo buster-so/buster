@@ -1,27 +1,27 @@
 'use client';
 
+import isEmpty from 'lodash/isEmpty';
+import uniq from 'lodash/uniq';
 import { useMemo } from 'react';
+import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import type {
+  BarSortBy,
   BusterChartConfigProps,
   BusterChartProps,
-  ChartType,
-  BarSortBy,
   ChartEncodes,
-  ScatterAxis,
-  Trendline,
+  ChartType,
   ComboChartAxis,
   IColumnLabelFormat,
-  PieSortBy
+  PieSortBy,
+  ScatterAxis,
+  Trendline
 } from '@/api/asset_interfaces/metric/charts';
-import uniq from 'lodash/uniq';
+import { DOWNSIZE_SAMPLE_THRESHOLD } from '../../config';
+import { aggregateAndCreateDatasets } from './aggregateAndCreateDatasets';
 import { sortLineBarData } from './datasetHelpers_BarLinePie';
 import { downsampleAndSortScatterData } from './datasetHelpers_Scatter';
 import type { DatasetOptionsWithTicks } from './interfaces';
-import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
-import { DOWNSIZE_SAMPLE_THRESHOLD } from '../../config';
-import { aggregateAndCreateDatasets } from './aggregateAndCreateDatasets';
 import { modifyDatasets } from './modifyDatasets';
-import isEmpty from 'lodash/isEmpty';
 
 type DatasetHookResult = {
   datasetOptions: DatasetOptionsWithTicks;
@@ -101,7 +101,7 @@ export const useDatasetOptions = (params: DatasetHookParams): DatasetHookResult 
     }
 
     if (isBarChart) {
-      if (barSortBy && barSortBy?.some((y) => y !== 'none')) return [];
+      if (barSortBy?.some((y) => y !== 'none')) return [];
     }
 
     if (isScatter) {

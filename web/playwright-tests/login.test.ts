@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test('Login to buster', async ({ page }) => {
   //await page.getByText('Sign in').click();

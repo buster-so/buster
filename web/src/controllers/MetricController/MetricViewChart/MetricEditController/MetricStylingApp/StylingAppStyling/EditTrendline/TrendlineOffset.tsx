@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { LabelAndInput } from '../../Common';
-import { LoopTrendline } from './EditTrendline';
-import { useMemoizedFn } from '@/hooks';
+import React, { useEffect, useState } from 'react';
 import { Slider } from '@/components/ui/slider';
+import { useMemoizedFn } from '@/hooks';
+import { LabelAndInput } from '../../Common';
+import type { LoopTrendline } from './EditTrendline';
 
 interface TrendlineOffsetProps {
   trend: LoopTrendline;

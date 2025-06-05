@@ -1,28 +1,28 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import type { Chart } from 'chart.js';
 import isEmpty from 'lodash/isEmpty';
-import { doesChartHaveValidAxis } from './helpers';
-import { useMemoizedFn } from '@/hooks';
-import {
-  NoChartData,
-  PreparingYourRequestLoader
-} from './LoadingComponents/ChartLoadingComponents';
-import { BusterTableChart } from './TableChart';
+import React, { useMemo } from 'react';
 import {
   type BusterChartProps,
   type ChartEncodes,
   ChartType
 } from '@/api/asset_interfaces/metric/charts';
-import { DEFAULT_DATA } from './BusterChartLegend/config';
-import { NoValidAxis } from './LoadingComponents';
-import { BusterMetricChart } from './MetricChart';
-import { BusterChartErrorWrapper } from './BusterChartErrorWrapper';
-import { BusterChartWrapper } from './BusterChartWrapper';
-import type { BusterChartRenderComponentProps } from './interfaces/chartComponentInterfaces';
-import { BusterChartComponent } from './BusterChartComponent';
 import { DEFAULT_CHART_CONFIG } from '@/api/asset_interfaces/metric/defaults';
-import { type Chart } from 'chart.js';
+import { useMemoizedFn } from '@/hooks';
+import { BusterChartComponent } from './BusterChartComponent';
+import { BusterChartErrorWrapper } from './BusterChartErrorWrapper';
+import { DEFAULT_DATA } from './BusterChartLegend/config';
+import { BusterChartWrapper } from './BusterChartWrapper';
+import { doesChartHaveValidAxis } from './helpers';
+import type { BusterChartRenderComponentProps } from './interfaces/chartComponentInterfaces';
+import { NoValidAxis } from './LoadingComponents';
+import {
+  NoChartData,
+  PreparingYourRequestLoader
+} from './LoadingComponents/ChartLoadingComponents';
+import { BusterMetricChart } from './MetricChart';
+import { BusterTableChart } from './TableChart';
 
 export const BusterChart: React.FC<BusterChartProps> = React.memo(
   ({
@@ -142,7 +142,7 @@ export const BusterChart: React.FC<BusterChartProps> = React.memo(
         data,
         onChartMounted,
         onInitialAnimationEnd: onInitialAnimationEndPreflight,
-        selectedAxis: selectedAxis!,
+        selectedAxis: selectedAxis as ChartEncodes,
         animate,
         animateLegend,
         className,

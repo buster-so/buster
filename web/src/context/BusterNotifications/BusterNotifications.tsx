@@ -1,10 +1,11 @@
 'use client';
 
-import { ConfirmModal, ConfirmProps } from '@/components/ui/modal/ConfirmModal';
+import type React from 'react';
+import type { PropsWithChildren } from 'react';
+import { type ExternalToast, toast } from 'sonner';
+import { createContext, useContextSelector } from 'use-context-selector';
+import { ConfirmModal } from '@/components/ui/modal/ConfirmModal';
 import { Toaster } from '@/components/ui/toaster/Toaster';
-import React, { PropsWithChildren } from 'react';
-import { toast, type ExternalToast } from 'sonner';
-import { useContextSelector, createContext } from 'use-context-selector';
 import { useOpenConfirmModal } from './useConfirmModal';
 
 export type NotificationType = 'success' | 'info' | 'warning' | 'error';
@@ -45,7 +46,7 @@ const openNotification = (props: NotificationProps) => {
 };
 
 const openErrorNotification = (data: NotificationProps | unknown) => {
-  const values = data || ({} as any);
+  const values = typeof data === 'object' && data !== null ? (data as NotificationProps) : {};
   const type = values.type || 'error';
   const title = values.title || 'Error';
   const message = values.message || 'Something went wrong. Please try again.';

@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useLayoutEffect, useState } from 'react';
-import { UserHeader } from './UserHeader';
-import { SegmentToApp, UserSegments, UserSegmentsApps } from './UserSegments';
 import { useGetUser } from '@/api/buster_rest';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useUserConfigContextSelector } from '@/context/Users';
+import { UserHeader } from './UserHeader';
+import { SegmentToApp, UserSegments, UserSegmentsApps } from './UserSegments';
 
 export const LayoutHeaderAndSegment = React.memo(
   ({ children, userId }: { children: React.ReactNode; userId: string }) => {

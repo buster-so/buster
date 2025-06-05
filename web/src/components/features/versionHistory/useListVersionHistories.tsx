@@ -1,5 +1,8 @@
 'use client';
 
+import last from 'lodash/last';
+import { useRouter } from 'next/navigation';
+import { useMemo, useState } from 'react';
 import {
   useGetDashboard,
   usePrefetchGetDashboardClient,
@@ -7,6 +10,7 @@ import {
 } from '@/api/buster_rest/dashboards';
 import {
   useGetMetric,
+  usePrefetchGetMetricClient,
   usePrefetchGetMetricDataClient,
   useSaveMetric
 } from '@/api/buster_rest/metrics';
@@ -14,12 +18,8 @@ import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useMemoizedFn } from '@/hooks';
 import { useChatLayoutContextSelector } from '@/layouts/ChatLayout';
 import { useCloseVersionHistory } from '@/layouts/ChatLayout/FileContainer/FileContainerHeader/FileContainerHeaderVersionHistory';
-import { BusterRoutes, createBusterRoute } from '@/routes';
-import last from 'lodash/last';
-import { useMemo, useState } from 'react';
-import { usePrefetchGetMetricClient } from '@/api/buster_rest/metrics';
-import { useRouter } from 'next/navigation';
 import { timeout } from '@/lib/timeout';
+import { BusterRoutes, createBusterRoute } from '@/routes';
 
 export const useListVersionHistories = ({
   assetId,
@@ -69,7 +69,7 @@ export const useListVersionHistories = ({
   }, [type, dashboardSelectedQueryVersion, metricSelectedQueryVersion]);
 
   const onClickRestoreVersion = useMemoizedFn(
-    async (versionNumber: number, rereouteToAsset: boolean = true) => {
+    async (versionNumber: number, rereouteToAsset = true) => {
       setRestoringVersion(versionNumber);
 
       if (type === 'metric') {

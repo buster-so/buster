@@ -1,35 +1,36 @@
 import { renderHook } from '@testing-library/react';
-import { useChatInputFlow } from './useChatInputFlow';
-import { useChatIndividualContextSelector } from '@/layouts/ChatLayout/ChatContext';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useBusterNewChatContextSelector } from '@/context/Chats';
+import { useChatIndividualContextSelector } from '@/layouts/ChatLayout/ChatContext';
+import { useChatInputFlow } from './useChatInputFlow';
 
 // Mock the context selectors
-jest.mock('@/layouts/ChatLayout/ChatContext', () => ({
-  useChatIndividualContextSelector: jest.fn()
+vi.mock('@/layouts/ChatLayout/ChatContext', () => ({
+  useChatIndividualContextSelector: vi.fn()
 }));
 
-jest.mock('@/context/Chats', () => ({
-  useBusterNewChatContextSelector: jest.fn()
+vi.mock('@/context/Chats', () => ({
+  useBusterNewChatContextSelector: vi.fn()
 }));
 
 describe('useChatInputFlow', () => {
-  const mockSetInputValue = jest.fn();
+  const mockSetInputValue = vi.fn();
   const mockTextAreaRef = {
     current: {
-      focus: jest.fn(),
-      select: jest.fn(),
+      focus: vi.fn(),
+      select: vi.fn(),
       value: '',
       type: 'textarea'
     } as unknown as HTMLTextAreaElement
   };
-  const mockOnStartNewChat = jest.fn();
-  const mockOnFollowUpChat = jest.fn();
-  const mockOnStartChatFromFile = jest.fn();
-  const mockOnStopChat = jest.fn();
+  const mockOnStartNewChat = vi.fn();
+  const mockOnFollowUpChat = vi.fn();
+  const mockOnStartChatFromFile = vi.fn();
+  const mockOnStopChat = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (useBusterNewChatContextSelector as jest.Mock).mockImplementation((selector) => {
+    vi.clearAllMocks();
+    (useBusterNewChatContextSelector as any).mockImplementation((selector: any) => {
       const state = {
         onStartNewChat: mockOnStartNewChat,
         onFollowUpChat: mockOnFollowUpChat,
@@ -49,7 +50,7 @@ describe('useChatInputFlow', () => {
   };
 
   it('should handle followup-chat flow', async () => {
-    (useChatIndividualContextSelector as jest.Mock).mockImplementation((selector) => {
+    (useChatIndividualContextSelector as any).mockImplementation((selector: any) => {
       const state = {
         hasChat: true,
         chatId: 'test-chat-id',
@@ -74,7 +75,7 @@ describe('useChatInputFlow', () => {
   });
 
   it('should handle followup-metric flow', async () => {
-    (useChatIndividualContextSelector as jest.Mock).mockImplementation((selector) => {
+    (useChatIndividualContextSelector as any).mockImplementation((selector: any) => {
       const state = {
         hasChat: false,
         chatId: 'test-chat-id',
@@ -100,7 +101,7 @@ describe('useChatInputFlow', () => {
   });
 
   it('should handle followup-dashboard flow', async () => {
-    (useChatIndividualContextSelector as jest.Mock).mockImplementation((selector) => {
+    (useChatIndividualContextSelector as any).mockImplementation((selector: any) => {
       const state = {
         hasChat: false,
         chatId: 'test-chat-id',
@@ -126,7 +127,7 @@ describe('useChatInputFlow', () => {
   });
 
   it('should handle new chat flow', async () => {
-    (useChatIndividualContextSelector as jest.Mock).mockImplementation((selector) => {
+    (useChatIndividualContextSelector as any).mockImplementation((selector: any) => {
       const state = {
         hasChat: false,
         chatId: 'test-chat-id',
@@ -150,7 +151,7 @@ describe('useChatInputFlow', () => {
   });
 
   it('should handle stop chat', () => {
-    (useChatIndividualContextSelector as jest.Mock).mockImplementation((selector) => {
+    (useChatIndividualContextSelector as any).mockImplementation((selector: any) => {
       const state = {
         hasChat: true,
         chatId: 'test-chat-id',
@@ -174,7 +175,7 @@ describe('useChatInputFlow', () => {
   });
 
   it('should not submit when disabled', async () => {
-    (useChatIndividualContextSelector as jest.Mock).mockImplementation((selector) => {
+    (useChatIndividualContextSelector as any).mockImplementation((selector: any) => {
       const state = {
         hasChat: true,
         chatId: 'test-chat-id',
@@ -195,7 +196,7 @@ describe('useChatInputFlow', () => {
   });
 
   it('should stop chat when loading', async () => {
-    (useChatIndividualContextSelector as jest.Mock).mockImplementation((selector) => {
+    (useChatIndividualContextSelector as any).mockImplementation((selector: any) => {
       const state = {
         hasChat: true,
         chatId: 'test-chat-id',

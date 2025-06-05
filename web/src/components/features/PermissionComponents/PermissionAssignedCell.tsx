@@ -1,5 +1,5 @@
-import { Select, SelectItem } from '@/components/ui/select';
 import React from 'react';
+import { Select, type SelectItem } from '@/components/ui/select';
 
 export const PERMISSION_OPTIONS_INCLUDED: SelectItem<'true' | 'false'>[] = [
   {
@@ -34,7 +34,7 @@ export const PermissionAssignedCell: React.FC<{
 
   return (
     <div
-      className="flex items-center space-x-5"
+      className="flex cursor-pointer items-center space-x-5"
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();

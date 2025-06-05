@@ -1,6 +1,4 @@
-import React from 'react';
-
-import { iconProps } from './iconProps';
+import type { iconProps } from './iconProps';
 
 function tileToRight(props: iconProps) {
   const strokewidth = props.strokewidth || 1.3;

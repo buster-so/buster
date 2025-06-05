@@ -1,9 +1,9 @@
-import { Avatar } from '@/components/ui/avatar';
-import { AccessDropdown } from './AccessDropdown';
 import React from 'react';
-import { ShareAssetType, ShareRole } from '@/api/asset_interfaces';
+import type { ShareAssetType, ShareRole } from '@/api/asset_interfaces';
+import { Avatar } from '@/components/ui/avatar';
 import { Text } from '@/components/ui/typography';
 import { useMemoizedFn } from '@/hooks';
+import { AccessDropdown } from './AccessDropdown';
 
 export const IndividualSharePerson: React.FC<{
   name?: string;

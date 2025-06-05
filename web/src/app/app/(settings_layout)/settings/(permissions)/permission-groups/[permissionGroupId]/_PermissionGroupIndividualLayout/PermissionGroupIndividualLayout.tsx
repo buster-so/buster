@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { PermissionAppSegments } from './PermissionAppSegments';
 import { PermissionGroupBackButton } from './PermissionBackButton';
 import { PermissionGroupTitleAndDescription } from './PermissionGroupTitleAndDescription';

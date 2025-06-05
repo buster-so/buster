@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useMemo, useState } from 'react';
 import type {
   GetPermissionGroupDatasetsResponse,
   GetPermissionGroupUsersResponse
@@ -7,15 +8,14 @@ import type {
 import { useUpdatePermissionGroupDatasets } from '@/api/buster_rest';
 import { PermissionAssignedCell } from '@/components/features/PermissionComponents';
 import {
-  BusterListColumn,
-  BusterListRowItem,
+  type BusterListColumn,
+  type BusterListRowItem,
   EmptyStateList,
   InfiniteListContainer
 } from '@/components/ui/list';
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
-import { BusterRoutes, createBusterRoute } from '@/routes';
 import { useMemoizedFn } from '@/hooks';
-import React, { useMemo, useState } from 'react';
+import { BusterRoutes, createBusterRoute } from '@/routes';
 import { PermissionGroupDatasetSelectedPopup } from './PermissionGroupDatasetSelectedPopup';
 
 export const PermissionGroupDatasetsListContainer: React.FC<{
@@ -134,12 +134,7 @@ export const PermissionGroupDatasetsListContainer: React.FC<{
         useRowClickSelectChange={false}
         selectedRowKeys={selectedRowKeys}
         onSelectChange={setSelectedRowKeys}
-        emptyState={useMemo(
-          () => (
-            <EmptyStateList text="No dataset groups found" />
-          ),
-          []
-        )}
+        emptyState={useMemo(() => <EmptyStateList text="No dataset groups found" />, [])}
       />
     </InfiniteListContainer>
   );

@@ -1,6 +1,6 @@
 import type { ColumnMetaData } from '@/api/asset_interfaces/metric';
+import type { ChartJSOrUndefined } from '@/components/ui/charts/BusterChartJS/core/types';
 import type { BusterChartConfigProps } from './chartConfigProps';
-import { ChartJSOrUndefined } from '@/components/ui/charts/BusterChartJS/core/types';
 
 export type BusterChartProps = {
   data: Record<string, string | number | null | Date>[] | null;

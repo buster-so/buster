@@ -1,7 +1,7 @@
+import type { NextRequest } from 'next/server';
 import { BusterAuthRoutes } from './busterAuthRoutes';
 import { BusterEmbedRoutes } from './busterEmbedRoutes';
 import { BusterRoutes } from './busterRoutes';
-import { NextRequest } from 'next/server';
 import {
   createBusterRoute,
   createPathnameToBusterRoute,
@@ -84,6 +84,7 @@ export const getEmbedAssetRedirect = (request: NextRequest): string | undefined 
   const params = extractPathParamsFromRoute(route);
 
   if (matched) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- I am just using any here because it was a pain to type this out
     const newRoute = createBusterRoute({ route: matched, ...(params as any) });
     return newRoute;
   }

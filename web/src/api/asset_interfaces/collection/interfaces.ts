@@ -1,4 +1,4 @@
-import { BusterShare, ShareAssetType, ShareRole } from '../share';
+import type { BusterShare, ShareAssetType, ShareRole } from '../share';
 
 export type BusterCollectionListItem = {
   id: string;

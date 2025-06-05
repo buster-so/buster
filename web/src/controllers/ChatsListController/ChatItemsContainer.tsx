@@ -1,18 +1,18 @@
 'use client';
 
-import { ShareAssetType, type BusterChatListItem } from '@/api/asset_interfaces';
-import { makeHumanReadble, formatDate } from '@/lib';
 import React, { memo, useMemo, useRef, useState } from 'react';
+import { type BusterChatListItem, ShareAssetType } from '@/api/asset_interfaces';
 import { FavoriteStar } from '@/components/features/list';
-import { Text } from '@/components/ui/typography';
+import { getShareStatus } from '@/components/features/metrics/StatusBadgeIndicator';
 import { Avatar } from '@/components/ui/avatar';
-import { BusterRoutes, createBusterRoute } from '@/routes';
-import { useMemoizedFn } from '@/hooks';
-import { BusterListColumn, BusterListRow } from '@/components/ui/list';
-import { ChatSelectedOptionPopup } from './ChatItemsSelectedPopup';
+import type { BusterListColumn, BusterListRow } from '@/components/ui/list';
 import { BusterList, ListEmptyStateWithButton } from '@/components/ui/list';
 import { useCreateListByDate } from '@/components/ui/list/useCreateListByDate';
-import { getShareStatus } from '@/components/features/metrics/StatusBadgeIndicator';
+import { Text } from '@/components/ui/typography';
+import { useMemoizedFn } from '@/hooks';
+import { formatDate, makeHumanReadble } from '@/lib';
+import { BusterRoutes, createBusterRoute } from '@/routes';
+import { ChatSelectedOptionPopup } from './ChatItemsSelectedPopup';
 
 export const ChatItemsContainer: React.FC<{
   chats: BusterChatListItem[];
@@ -70,8 +70,9 @@ export const ChatItemsContainer: React.FC<{
             dashboardId: chat.latest_file_id
           });
         }
-        default:
+        default: {
           const _exhaustiveCheck: never = chat.latest_file_type;
+        }
       }
     }
 
@@ -158,12 +159,7 @@ export const ChatItemsContainer: React.FC<{
         columns={columns}
         onSelectChange={onSelectChange}
         selectedRowKeys={selectedRowKeys}
-        emptyState={useMemo(
-          () => (
-            <EmptyState loading={loading} type={type} />
-          ),
-          [loading, type]
-        )}
+        emptyState={useMemo(() => <EmptyState loading={loading} type={type} />, [loading, type])}
       />
 
       <ChatSelectedOptionPopup
@@ -179,7 +175,7 @@ const EmptyState: React.FC<{
   loading: boolean;
   type: 'logs' | 'chats';
 }> = React.memo(({ loading, type }) => {
-  if (loading) return <></>;
+  if (loading) return null;
 
   return (
     <ListEmptyStateWithButton

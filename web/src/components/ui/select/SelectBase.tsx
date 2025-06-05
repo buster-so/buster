@@ -1,10 +1,10 @@
 'use client';
 
-import * as React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
-import { Check3 as Check, ChevronDown, ChevronUp } from '../icons/NucleoIconOutlined';
+import { cva, type VariantProps } from 'class-variance-authority';
+import * as React from 'react';
 import { cn } from '@/lib/classMerge';
-import { cva, VariantProps } from 'class-variance-authority';
+import { Check3 as Check, ChevronDown, ChevronUp } from '../icons/NucleoIconOutlined';
 
 const Select = SelectPrimitive.Root;
 
@@ -179,6 +179,16 @@ const SelectSeparator = React.forwardRef<
   />
 ));
 SelectSeparator.displayName = SelectPrimitive.Separator.displayName;
+
+// Define a type for SelectItem
+export type SelectItemType<T = string> = {
+  value: T;
+  label: string | React.ReactNode;
+  secondaryLabel?: string;
+  icon?: React.ReactNode;
+  searchLabel?: string;
+  disabled?: boolean;
+};
 
 export {
   Select,

@@ -1,2 +1,2 @@
-export * from './languages';
 export * from './dev';
+export * from './languages';

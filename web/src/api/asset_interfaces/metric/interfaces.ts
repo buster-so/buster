@@ -1,4 +1,4 @@
-import { type BusterShare, type VerificationStatus } from '../share';
+import type { BusterShare, VerificationStatus } from '../share';
 import type { BusterChartConfigProps } from './charts';
 
 export type BusterMetric = {

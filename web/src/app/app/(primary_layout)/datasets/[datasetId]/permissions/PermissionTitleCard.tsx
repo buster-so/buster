@@ -1,7 +1,7 @@
 import React from 'react';
-import { Title, Text } from '@/components/ui/typography';
+import { Text, Title } from '@/components/ui/typography';
 
-export const PermissionTitleCard: React.FC<{}> = React.memo(({}) => {
+export const PermissionTitleCard: React.FC = React.memo(() => {
   return (
     <div className="flex flex-col space-y-1">
       <Title as="h3">Dataset Permissions</Title>

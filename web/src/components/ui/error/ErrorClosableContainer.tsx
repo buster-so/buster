@@ -1,9 +1,9 @@
 'use client';
 
-import { cn } from '@/lib/classMerge';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CircleWarning, Xmark } from '../icons';
 import React, { useEffect, useState } from 'react';
+import { cn } from '@/lib/classMerge';
+import { CircleWarning, Xmark } from '../icons';
 
 export const ErrorClosableContainer: React.FC<{
   error: string;
@@ -34,12 +34,13 @@ export const ErrorClosableContainer: React.FC<{
               <span>{error}</span>
             </div>
             <button
+              type="button"
               onClick={() => {
                 onClose?.();
                 setClosed(true);
               }}
               className={cn(
-                'text-danger-foreground flex items-center justify-center border-none bg-none hover:opacity-80',
+                'text-danger-foreground flex cursor-pointer items-center justify-center border-none bg-none hover:opacity-80',
                 'cursor-pointer rounded-sm p-0.5 transition-colors hover:bg-black/5'
               )}>
               <Xmark />

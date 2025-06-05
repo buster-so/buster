@@ -1,14 +1,15 @@
-import { dataLabelFontColorContrast } from './datalabelHelper';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { determineFontColorContrast } from '@/lib/colors';
+import { dataLabelFontColorContrast } from './datalabelHelper';
 
 // Mock the determineFontColorContrast function
-jest.mock('@/lib/colors', () => ({
-  determineFontColorContrast: jest.fn()
+vi.mock('@/lib/colors', () => ({
+  determineFontColorContrast: vi.fn()
 }));
 
 describe('dataLabelFontColorContrast', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should call determineFontColorContrast with the background color from context', () => {
@@ -20,7 +21,7 @@ describe('dataLabelFontColorContrast', () => {
     };
 
     // Mock return value
-    (determineFontColorContrast as jest.Mock).mockReturnValue('#FFFFFF');
+    (determineFontColorContrast as any).mockReturnValue('#FFFFFF');
 
     // Call the function
     const result = dataLabelFontColorContrast(context as any);
@@ -39,7 +40,7 @@ describe('dataLabelFontColorContrast', () => {
     };
 
     // Mock return value
-    (determineFontColorContrast as jest.Mock).mockReturnValue('#000000');
+    (determineFontColorContrast as any).mockReturnValue('#000000');
 
     // Call the function
     const result = dataLabelFontColorContrast(context as any);
@@ -58,7 +59,7 @@ describe('dataLabelFontColorContrast', () => {
     };
 
     // Mock return value
-    (determineFontColorContrast as jest.Mock).mockReturnValue('#000000');
+    (determineFontColorContrast as any).mockReturnValue('#000000');
 
     // Call the function
     const result = dataLabelFontColorContrast(context as any);

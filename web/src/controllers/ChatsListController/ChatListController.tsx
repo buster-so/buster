@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { ChatItemsContainer } from './ChatItemsContainer';
+import type React from 'react';
+import { useState } from 'react';
 import {
   type getListChats,
   type getListLogs,
@@ -9,6 +9,7 @@ import {
   useGetListLogs
 } from '@/api/buster_rest/chats';
 import { useUserConfigContextSelector } from '@/context/Users';
+import { ChatItemsContainer } from './ChatItemsContainer';
 
 export const ChatListContainer: React.FC<{
   type: 'logs' | 'chats';
@@ -22,7 +23,7 @@ export const ChatListContainer: React.FC<{
   return <LogsContainer />;
 };
 
-const ChatsContainer: React.FC<{}> = ({}) => {
+const ChatsContainer: React.FC<Record<string, never>> = () => {
   const [filters, setFilters] = useState<Partial<Parameters<typeof getListChats>[0]>>({});
 
   const { data: list, isFetched } = useGetListChats(filters);
@@ -30,7 +31,7 @@ const ChatsContainer: React.FC<{}> = ({}) => {
   return <ChatItemsContainer chats={list} loading={!isFetched} type={'chats'} />;
 };
 
-const LogsContainer: React.FC<{}> = ({}) => {
+const LogsContainer: React.FC<Record<string, never>> = () => {
   const [filters, setFilters] = useState<Partial<Parameters<typeof getListLogs>[0]>>({});
 
   const { data: list, isFetched } = useGetListLogs(filters);

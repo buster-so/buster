@@ -2,6 +2,7 @@
 
 import { useMemo, useRef } from 'react';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- Required for generic function types
 type noop = (this: any, ...args: any[]) => any;
 
 type PickFunction<T extends noop> = (

@@ -1,36 +1,36 @@
 import { renderHook } from '@testing-library/react';
-import { useGetChatParams } from './useGetChatParams';
 import * as navigation from 'next/navigation';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as appLayout from '@/context/BusterAppLayout';
+import { useGetChatParams } from './useGetChatParams';
 
 // Mock the required hooks and modules
-jest.mock('next/navigation', () => ({
-  useParams: jest.fn(),
-  useSearchParams: jest.fn(() => ({
-    get: jest.fn()
+vi.mock('next/navigation', () => ({
+  useParams: vi.fn(),
+  useSearchParams: vi.fn(() => ({
+    get: vi.fn()
   })),
-  usePathname: jest.fn()
+  usePathname: vi.fn()
 }));
 
-jest.mock('@/context/BusterAppLayout', () => ({
-  useAppLayoutContextSelector: jest.fn()
+vi.mock('@/context/BusterAppLayout', () => ({
+  useAppLayoutContextSelector: vi.fn()
 }));
 
 describe('useGetChatParams', () => {
-  const mockUseParams = navigation.useParams as jest.Mock;
-  const mockUseSearchParams = navigation.useSearchParams as jest.Mock;
-  const mockUseAppLayoutContextSelector = appLayout.useAppLayoutContextSelector as jest.Mock;
+  const mockUseParams = navigation.useParams as any;
+  const mockUseSearchParams = navigation.useSearchParams as any;
+  const mockUseAppLayoutContextSelector = appLayout.useAppLayoutContextSelector as any;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseSearchParams.mockImplementation(() => ({
-      get: jest.fn().mockReturnValue(null)
+      get: vi.fn().mockReturnValue(null)
     }));
     mockUseAppLayoutContextSelector.mockReturnValue('default-route');
-    (navigation.usePathname as jest.Mock).mockReturnValue('/');
+    (navigation.usePathname as any).mockReturnValue('/');
   });
-
-  test('returns undefined values when no params are provided', () => {
+  it('returns undefined values when no params are provided', () => {
     mockUseParams.mockReturnValue({});
 
     const { result } = renderHook(() => useGetChatParams());
@@ -49,8 +49,7 @@ describe('useGetChatParams', () => {
       secondaryView: null
     });
   });
-
-  test('correctly processes chat and message IDs', () => {
+  it('correctly processes chat and message IDs', () => {
     mockUseParams.mockReturnValue({
       chatId: 'chat-123',
       messageId: 'msg-456'
@@ -61,8 +60,7 @@ describe('useGetChatParams', () => {
     expect(result.current.chatId).toBe('chat-123');
     expect(result.current.messageId).toBe('msg-456');
   });
-
-  test('handles metric version number from path parameter', () => {
+  it('handles metric version number from path parameter', () => {
     mockUseParams.mockReturnValue({
       metricId: 'metric-123',
       versionNumber: '42'
@@ -73,8 +71,7 @@ describe('useGetChatParams', () => {
     expect(result.current.metricId).toBe('metric-123');
     expect(result.current.metricVersionNumber).toBe(42);
   });
-
-  test('handles metric version number from query parameter', () => {
+  it('handles metric version number from query parameter', () => {
     mockUseParams.mockReturnValue({
       metricId: 'metric-123'
     });
@@ -86,8 +83,7 @@ describe('useGetChatParams', () => {
 
     expect(result.current.metricVersionNumber).toBe(43);
   });
-
-  test('handles dashboard version number from path parameter', () => {
+  it('handles dashboard version number from path parameter', () => {
     mockUseParams.mockReturnValue({
       dashboardId: 'dashboard-123',
       versionNumber: '44'
@@ -98,8 +94,7 @@ describe('useGetChatParams', () => {
     expect(result.current.dashboardId).toBe('dashboard-123');
     expect(result.current.dashboardVersionNumber).toBe(44);
   });
-
-  test('handles dashboard version number from query parameter', () => {
+  it('handles dashboard version number from query parameter', () => {
     mockUseParams.mockReturnValue({
       dashboardId: 'dashboard-123'
     });
@@ -111,8 +106,7 @@ describe('useGetChatParams', () => {
 
     expect(result.current.dashboardVersionNumber).toBe(45);
   });
-
-  test('correctly identifies version history mode', () => {
+  it('correctly identifies version history mode', () => {
     mockUseSearchParams.mockImplementation(() => ({
       get: (param: string) => (param === 'secondary_view' ? 'version-history' : null)
     }));
@@ -121,8 +115,7 @@ describe('useGetChatParams', () => {
 
     expect(result.current.isVersionHistoryMode).toBe(true);
   });
-
-  test('handles collection and dataset IDs', () => {
+  it('handles collection and dataset IDs', () => {
     mockUseParams.mockReturnValue({
       collectionId: 'collection-123',
       datasetId: 'dataset-456'
@@ -133,8 +126,7 @@ describe('useGetChatParams', () => {
     expect(result.current.collectionId).toBe('collection-123');
     expect(result.current.datasetId).toBe('dataset-456');
   });
-
-  test('returns consistent values on multiple renders without param changes', () => {
+  it('returns consistent values on multiple renders without param changes', () => {
     mockUseParams.mockReturnValue({
       chatId: 'chat-123',
       metricId: 'metric-123',

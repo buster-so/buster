@@ -1,11 +1,11 @@
+import { cva } from 'class-variance-authority';
+import Link from 'next/link';
+import React, { useMemo } from 'react';
 import type { DatasetPermissionOverviewUser } from '@/api/asset_interfaces';
 import { ChevronRight } from '@/components/ui/icons';
 import { Popover } from '@/components/ui/popover/Popover';
-import { BusterRoutes, createBusterRoute } from '@/routes';
-import Link from 'next/link';
-import React, { useMemo } from 'react';
 import { cn } from '@/lib/utils';
-import { cva } from 'class-variance-authority';
+import { BusterRoutes, createBusterRoute } from '@/routes';
 
 export const PermissionLineageBreadcrumb: React.FC<{
   lineage: DatasetPermissionOverviewUser['lineage'];
@@ -25,9 +25,9 @@ export const PermissionLineageBreadcrumb: React.FC<{
 
     const firstItem = lineage[0];
 
-    return firstItem.map((v, index) => {
+    return firstItem.map((v) => {
       return (
-        <React.Fragment key={index}>
+        <React.Fragment key={v.id}>
           <SelectedComponent item={v} />
         </React.Fragment>
       );
@@ -61,12 +61,18 @@ const MultipleLineage: React.FC<{
   const Content = useMemo(() => {
     return (
       <div className="flex min-w-[200px] flex-col space-y-2">
-        {lineage.map((item, lineageindex) => {
-          const items = item.map((v, index) => {
-            return <SelectedComponent key={index} item={v} />;
+        {lineage.map((item, lineageIndex) => {
+          const items = item.map((v) => {
+            return <SelectedComponent key={v.id} item={v} />;
           });
 
-          return <LineageBreadcrumb key={lineageindex} items={items} canQuery={canQuery} />;
+          return (
+            <LineageBreadcrumb
+              key={item[0]?.id || lineageIndex}
+              items={items}
+              canQuery={canQuery}
+            />
+          );
         })}
       </div>
     );
@@ -122,10 +128,11 @@ const LineageBreadcrumb: React.FC<{
 
   return (
     <div className={cn('text-text-secondary', 'flex justify-end space-x-0.5')}>
-      {allItems.map((item, index) => {
+      {allItems.map((item: React.ReactNode | { id: string }, index) => {
+        const key = typeof item === 'object' && item !== null && 'id' in item ? item.id : index;
         return (
-          <div key={index} className="flex items-center space-x-0">
-            {item}
+          <div key={key} className="flex items-center space-x-0">
+            {typeof item === 'object' && item !== null && 'id' in item ? item.id : item}
             {index < allItems.length - 1 && (
               <div className="flex items-center justify-center">
                 <ChevronRight />

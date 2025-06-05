@@ -1,9 +1,9 @@
-import { useUpdateUserTeams } from '@/api/buster_rest';
+import React from 'react';
 import type { TeamRole } from '@/api/asset_interfaces';
+import { useUpdateUserTeams } from '@/api/buster_rest';
+import { PermissionAssignTeamRoleButton } from '@/components/features/PermissionComponents';
 import { BusterListSelectedOptionPopupContainer } from '@/components/ui/list';
 import { useMemoizedFn } from '@/hooks';
-import React from 'react';
-import { PermissionAssignTeamRoleButton } from '@/components/features/PermissionComponents';
 
 export const UserTeamsSelectedPopup: React.FC<{
   selectedRowKeys: string[];

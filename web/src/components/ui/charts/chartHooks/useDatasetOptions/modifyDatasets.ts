@@ -1,7 +1,12 @@
-import { BarSortBy, BusterChartProps, ChartType, PieSortBy } from '@/api/asset_interfaces/metric';
-import { DatasetOption, DatasetOptionsWithTicks, KV } from './interfaces';
-import cloneDeep from 'lodash/cloneDeep';
 import { sum as lodashSum } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import {
+  type BarSortBy,
+  type BusterChartProps,
+  ChartType,
+  type PieSortBy
+} from '@/api/asset_interfaces/metric';
+import type { DatasetOption, DatasetOptionsWithTicks, KV } from './interfaces';
 
 // Helper: ensure pie slices meet minimum percentage
 function handlePieThreshold(datasets: DatasetOption[], minPercent: number): DatasetOption[] {
@@ -34,10 +39,10 @@ function handlePieThreshold(datasets: DatasetOption[], minPercent: number): Data
     const newTooltipData: KV[][] = [];
 
     // Add all data points above threshold
-    aboveIndices.forEach((i) => {
+    for (const i of aboveIndices) {
       newData.push(dataset.data[i]);
       newTooltipData.push(dataset.tooltipData?.[i] || []);
-    });
+    }
 
     // Add the "Other" data point
     newData.push(otherValue);
@@ -80,11 +85,11 @@ function handlePieThreshold(datasets: DatasetOption[], minPercent: number): Data
   const above: DatasetOption[] = [];
   const below: DatasetOption[] = [];
 
-  datasets.forEach((ds) => {
+  for (const ds of datasets) {
     const value = ds.data[0] || 0;
     const pct = (value / total) * 100;
     (pct >= minPercent ? above : below).push(ds);
-  });
+  }
 
   if (!below.length) return above;
 
@@ -94,28 +99,25 @@ function handlePieThreshold(datasets: DatasetOption[], minPercent: number): Data
   const valueKey = firstTooltip.find((t) => t.value === below[0].data[0])?.key || 'value';
   const tooltipMap = new Map<string, string | number | null>([[valueKey, otherValue]]);
 
-  below.forEach((ds) => {
+  for (const ds of below) {
     const items = ds.tooltipData?.[0] || [];
-    items.forEach(({ key, value }) => {
-      if (key === 'value') return;
+    for (const { key, value } of items) {
+      if (key === 'value') continue;
 
       const existing = tooltipMap.get(key);
       if (existing != null) {
         if (typeof existing === 'number' && typeof value === 'number') {
-          // Sum numeric values
           tooltipMap.set(key, existing + value);
         } else if (typeof existing === 'string' && typeof value === 'string') {
-          // Concatenate string values
           tooltipMap.set(key, `${existing}, ${value}`);
         }
       } else {
-        // Set the initial value
         if (typeof value === 'string' || typeof value === 'number' || value === null) {
           tooltipMap.set(key, value);
         }
       }
-    });
-  });
+    }
+  }
 
   const otherTooltip = Array.from(tooltipMap.entries()).map(([key, value]) => ({ key, value }));
 
@@ -172,9 +174,9 @@ function sortPie(
     ...dataset,
     data: indices.map((i) => dataset.data[i]),
     tooltipData: dataset.tooltipData
-      ? indices.map((i) => dataset.tooltipData![i])
+      ? indices.map((i) => dataset.tooltipData?.[i])
       : dataset.tooltipData,
-    sizeData: dataset.sizeData ? indices.map((i) => dataset.sizeData![i]) : dataset.sizeData
+    sizeData: dataset.sizeData ? indices.map((i) => dataset.sizeData?.[i] ?? null) : []
   }));
 
   // Sort ticks if they exist
@@ -192,33 +194,32 @@ function applyPercentageStack(datasets: DatasetOption[]): DatasetOption[] {
   const sums = new Array<number>(length).fill(0);
 
   // Calculate sums for each data point
-  clone.forEach((ds) =>
+  for (const ds of clone) {
     ds.data.forEach((v, i) => {
-      sums[i] += v === null ? 0 : v || 0;
-    })
-  );
+      if (v !== null) {
+        sums[i] += v || 0;
+      }
+    });
+  }
 
   // Convert each data point to percentage and update tooltips
-  clone.forEach((ds) => {
+  for (const ds of clone) {
     ds.data = ds.data.map((v, i) => {
       const percentage = sums[i] ? ((v === null ? 0 : v || 0) / sums[i]) * 100 : 0;
 
-      // Update tooltip data if it exists
       if (ds.tooltipData?.[i]) {
         const tooltipData = ds.tooltipData[i];
-        // Find and update the value in tooltip
-        tooltipData.forEach((item) => {
+        for (const item of tooltipData) {
           if (item.value === v) {
             item.value = percentage;
           }
-        });
-        // Reverse the order of tooltip data
+        }
         ds.tooltipData[i] = tooltipData;
       }
 
       return percentage;
     });
-  });
+  }
 
   return clone;
 }
@@ -237,11 +238,11 @@ function sortBar(
 
   // Compute sums for each data column
   const sums = new Array<number>(dataLen).fill(0);
-  items.forEach((ds) =>
+  for (const ds of items) {
     ds.data.forEach((v, i) => {
       sums[i] += v === null ? 0 : v || 0;
-    })
-  );
+    });
+  }
 
   // Create sorting indices
   const indices = Array.from({ length: dataLen }, (_, idx) => idx);
@@ -253,9 +254,9 @@ function sortBar(
     // Sort data
     data: indices.map((i) => ds.data[i]),
     // Sort tooltipData if it exists
-    tooltipData: ds.tooltipData ? indices.map((i) => ds.tooltipData![i]) : ds.tooltipData,
+    tooltipData: ds.tooltipData ? indices.map((i) => ds.tooltipData?.[i]) : ds.tooltipData,
     // Sort sizeData if it exists
-    sizeData: ds.sizeData ? indices.map((i) => ds.sizeData![i]) : ds.sizeData
+    sizeData: ds.sizeData ? indices.map((i) => ds.sizeData?.[i] ?? null) : []
   }));
 
   // Sort ticks (x-axis labels)

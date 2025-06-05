@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
-import { CollectionsIndividualHeader } from './CollectionIndividualHeader';
-import { CollectionIndividualContent } from './CollectionIndividualContent';
-import { AppPageLayout } from '@/components/ui/layouts';
+import type React from 'react';
+import { useState } from 'react';
 import { useGetCollection } from '@/api/buster_rest/collections';
+import { AppPageLayout } from '@/components/ui/layouts';
+import { CollectionIndividualContent } from './CollectionIndividualContent';
+import { CollectionsIndividualHeader } from './CollectionIndividualHeader';
 
 export const CollectionIndividualController: React.FC<{
   collectionId: string;

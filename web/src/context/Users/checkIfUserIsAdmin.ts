@@ -1,7 +1,7 @@
+import { useGetMyUserInfo } from '@/api/buster_rest';
 import { getMyUserInfo_server } from '@/api/buster_rest/users/requests';
 import { getSupabaseUserContext } from '@/lib/supabase';
 import { checkIfUserIsAdmin } from '@/lib/user';
-import { useGetMyUserInfo } from '@/api/buster_rest';
 
 export const checkIfUserIsAdmin_server = async (): Promise<boolean> => {
   const supabaseContext = await getSupabaseUserContext();

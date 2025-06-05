@@ -1,7 +1,7 @@
 'use client';
 
-import { useGetPermissionGroup, useUpdatePermissionGroup } from '@/api/buster_rest';
 import React from 'react';
+import { useGetPermissionGroup, useUpdatePermissionGroup } from '@/api/buster_rest';
 import { EditableTitle } from '@/components/ui/typography/EditableTitle';
 import { useMemoizedFn } from '@/hooks';
 
@@ -18,7 +18,7 @@ export const PermissionGroupTitleAndDescription: React.FC<{
 
   return (
     <div className="flex flex-col space-y-0.5">
-      <EditableTitle children={data?.name || ''} onChange={onChangeTitle} />
+      <EditableTitle onChange={onChangeTitle}>{data?.name || ''}</EditableTitle>
     </div>
   );
 });

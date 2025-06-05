@@ -1,8 +1,8 @@
-import {
-  ConfirmModalProps,
-  ConfirmProps as BaseConfirmProps
+import { useMemo, useState } from 'react';
+import type {
+  ConfirmProps as BaseConfirmProps,
+  ConfirmModalProps
 } from '@/components/ui/modal/ConfirmModal';
-import { useState, useRef, useMemo } from 'react';
 
 interface ConfirmProps<T = unknown> extends Omit<BaseConfirmProps, 'onOk'> {
   title: string | React.ReactNode;
@@ -20,7 +20,7 @@ const defaultConfirmModalProps: ConfirmProps<unknown> = {
 
 interface QueuedModal<T = unknown> extends Omit<ConfirmProps<T>, 'onOk' | 'onCancel'> {
   resolve: (value: T | undefined) => void;
-  reject: (reason?: any) => void;
+  reject: (reason?: unknown) => void;
   onClose: () => void;
   onOk: () => Promise<void>;
   onCancel?: () => Promise<void>;

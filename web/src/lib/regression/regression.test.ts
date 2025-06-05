@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { regression } from './regression';
 
 describe('regression', () => {

@@ -1,10 +1,10 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import React, { useMemo } from 'react';
+import { DEFAULT_CHART_CONFIG, DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
+import type { ColumnLabelFormat, MetricChartProps } from '@/api/asset_interfaces/metric/charts';
+import { Title } from '@/components/ui/typography';
 import { useMount } from '@/hooks';
 import { formatLabel, JsonDataFrameOperationsSingle, timeout } from '@/lib';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Title } from '@/components/ui/typography';
-import type { ColumnLabelFormat, MetricChartProps } from '@/api/asset_interfaces/metric/charts';
-import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import type { BusterMetricChartProps } from './interfaces';
 
 export const BusterMetricChart: React.FC<BusterMetricChartProps> = React.memo(
@@ -28,7 +28,7 @@ export const BusterMetricChart: React.FC<BusterMetricChartProps> = React.memo(
     const headerColumnLabelFormat: ColumnLabelFormat = useMemo(() => {
       const isDerivedTitle = typeof metricHeader === 'object' && metricHeader?.columnId;
       if (isDerivedTitle && columnLabelFormats[metricHeader.columnId]) {
-        return columnLabelFormats[metricHeader.columnId]!;
+        return columnLabelFormats[metricHeader.columnId] as ColumnLabelFormat;
       }
       return DEFAULT_COLUMN_LABEL_FORMAT;
     }, [metricHeader, columnLabelFormats]);
@@ -118,7 +118,8 @@ export const BusterMetricChart: React.FC<BusterMetricChartProps> = React.memo(
         };
 
         return formatLabel(operator[metricValueAggregate](), format);
-      } else if (metricValueLabel) {
+      }
+      if (metricValueLabel) {
         return metricValueLabel;
       }
 
@@ -217,14 +218,14 @@ const AnimatedTitleWrapper = ({ title, type }: { title: string; type: 'header' |
 
 const fallbackAggregate = (
   columnId: string,
-  aggregate: MetricChartProps['metricValueAggregate'] = 'sum',
+  aggregate: MetricChartProps['metricValueAggregate'],
   columnLabelFormats: BusterMetricChartProps['columnLabelFormats']
 ): NonNullable<MetricChartProps['metricValueAggregate']> => {
   const columnLabelFormat = columnLabelFormats[columnId] || DEFAULT_COLUMN_LABEL_FORMAT;
   const isNumber =
     columnLabelFormat.style === 'number' && columnLabelFormat.columnType === 'number';
   const isValid = isNumber;
-  if (isValid) return aggregate;
+  if (isValid) return aggregate || DEFAULT_CHART_CONFIG.metricValueAggregate;
   return 'first';
 };
 

@@ -1,6 +1,6 @@
+import { useMemo } from 'react';
 import { useGetDatasets } from '@/api/buster_rest';
 import { useListDatasources } from '@/api/buster_rest/data_source';
-import { useMemo } from 'react';
 
 export const useNewChatWarning = () => {
   const { data: datasets, isFetched: isDatasetsFetched } = useGetDatasets();

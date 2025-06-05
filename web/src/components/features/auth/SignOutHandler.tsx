@@ -1,11 +1,11 @@
 'use client';
 
 import { useCallback } from 'react';
-import { signOut } from '@/lib/supabase/signOut';
-import { clearAllBrowserStorage } from '@/lib/browser/storage';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
-import { BusterRoutes } from '@/routes/busterRoutes';
 import { useBusterNotifications } from '@/context/BusterNotifications';
+import { clearAllBrowserStorage } from '@/lib/browser/storage';
+import { signOut } from '@/lib/supabase/signOut';
+import { BusterRoutes } from '@/routes/busterRoutes';
 
 export const useSignOut = () => {
   const onChangePage = useAppLayoutContextSelector((x) => x.onChangePage);

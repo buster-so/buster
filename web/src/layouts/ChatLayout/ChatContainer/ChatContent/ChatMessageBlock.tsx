@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { ChatUserMessage } from './ChatUserMessage';
-import { ChatResponseMessages } from './ChatResponseMessages';
 import { useGetChatMessage } from '@/api/buster_rest/chats';
+import { ChatResponseMessages } from './ChatResponseMessages';
+import { ChatUserMessage } from './ChatUserMessage';
 
 export const ChatMessageBlock: React.FC<{
   messageId: string;
@@ -16,7 +16,7 @@ export const ChatMessageBlock: React.FC<{
   const { data: requestMessage } = useGetChatMessage(messageId, {
     select: (message) => message?.request_message
   });
-  const { data: isCompletedStream } = useGetChatMessage(messageId, {
+  const { data: isCompletedStream = false } = useGetChatMessage(messageId, {
     select: (x) => x?.isCompletedStream
   });
 
@@ -26,14 +26,14 @@ export const ChatMessageBlock: React.FC<{
     <div className={'flex flex-col space-y-3.5 py-2 pr-3 pl-4'} id={messageId}>
       {requestMessage && (
         <ChatUserMessage
-          isCompletedStream={isCompletedStream!}
+          isCompletedStream={isCompletedStream}
           chatId={chatId}
           messageId={messageId}
           requestMessage={requestMessage}
         />
       )}
       <ChatResponseMessages
-        isCompletedStream={isCompletedStream!}
+        isCompletedStream={isCompletedStream}
         messageId={messageId}
         chatId={chatId}
         messageIndex={messageIndex}

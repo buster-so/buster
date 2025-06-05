@@ -1,28 +1,26 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { GetPermissionGroupResponse } from '@/api/asset_interfaces/permission_groups';
+import { queryKeys } from '@/api/query_keys';
+import { useMemoizedFn } from '@/hooks';
+import type { ListPermissionGroupsResponse } from '../../asset_interfaces';
+import { updateDatasetPermissionGroups } from '../datasets';
 import {
-  getPermissionGroup,
   createPermissionGroup,
   deletePermissionGroup,
-  listAllPermissionGroups,
-  updatePermissionGroups,
-  getPermissionGroupUsers,
-  getPermissionGroupDatasets,
+  getPermissionGroup,
+  getPermissionGroup_server,
   getPermissionGroupDatasetGroups,
-  updatePermissionGroupUsers,
-  updatePermissionGroupDatasets,
-  updatePermissionGroupDatasetGroups,
-  getPermissionGroupUsers_server,
-  getPermissionGroupDatasets_server,
   getPermissionGroupDatasetGroups_server,
-  getPermissionGroup_server
+  getPermissionGroupDatasets,
+  getPermissionGroupDatasets_server,
+  getPermissionGroupUsers,
+  getPermissionGroupUsers_server,
+  listAllPermissionGroups,
+  updatePermissionGroupDatasetGroups,
+  updatePermissionGroupDatasets,
+  updatePermissionGroups,
+  updatePermissionGroupUsers
 } from './requests';
-import { useMemoizedFn } from '@/hooks';
-import { QueryClient, useQueryClient } from '@tanstack/react-query';
-import type { GetPermissionGroupResponse } from '@/api/asset_interfaces/permission_groups';
-import isEmpty from 'lodash/isEmpty';
-import { updateDatasetPermissionGroups } from '../datasets';
-import type { ListPermissionGroupsResponse } from '../../asset_interfaces';
-import { queryKeys } from '@/api/query_keys';
 
 export const useListAllPermissionGroups = () => {
   return useQuery({
@@ -59,20 +57,20 @@ export const useCreatePermissionGroup = (userId?: string) => {
           name: newPermissionGroup.name,
           assigned: false
         };
-        if (isEmpty(oldData)) {
+        if (!oldData) {
           return [newListItem];
         }
-        return [...oldData!, newListItem];
+        return [...oldData, newListItem];
       });
 
       if (dataset_id && newPermissionGroup?.id) {
         const options = queryKeys.permissionGroupListByDatasetId(dataset_id);
         queryClient.setQueryData(options.queryKey, (oldData) => {
           const newItem: GetPermissionGroupResponse = { ...newPermissionGroup };
-          if (isEmpty(oldData)) {
+          if (!oldData) {
             return [newItem];
           }
-          return [...oldData!, newItem];
+          return [...oldData, newItem];
         });
         await updateDatasetPermissionGroups({
           dataset_id,

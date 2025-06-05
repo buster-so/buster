@@ -1,4 +1,4 @@
 export default interface Point {
-    height: number
-    width: number
+  height: number;
+  width: number;
 }

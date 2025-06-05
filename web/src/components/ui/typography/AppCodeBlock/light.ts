@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 const magneta5 = '#08979c';
 const token = {

@@ -13,7 +13,7 @@ export default async function EmbedLayout({ children }: { children: React.ReactN
         <BusterAssetsProvider>
           <BusterPosthogProvider>
             <main className="bg-background h-screen max-h-screen min-h-screen w-full">
-              <>{children}</>
+              {children}
             </main>
           </BusterPosthogProvider>
         </BusterAssetsProvider>

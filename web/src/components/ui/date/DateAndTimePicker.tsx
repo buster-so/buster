@@ -1,17 +1,17 @@
 'use client';
 
-import * as React from 'react';
-import { Calendar as CalendarIcon } from '@/components/ui/icons';
 import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
+import * as React from 'react';
 import { Button } from '@/components/ui/buttons';
 import { Calendar } from '@/components/ui/calendar';
+import { Calendar as CalendarIcon } from '@/components/ui/icons';
 import {
   PopoverRoot as Popover,
   PopoverContent,
   PopoverTrigger
 } from '@/components/ui/popover/PopoverBase';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { cn } from '@/lib/utils';
 
 export function DateTimePicker() {
   const [date, setDate] = React.useState<Date>();
@@ -28,9 +28,9 @@ export function DateTimePicker() {
     if (date) {
       const newDate = new Date(date);
       if (type === 'hour') {
-        newDate.setHours((parseInt(value) % 12) + (newDate.getHours() >= 12 ? 12 : 0));
+        newDate.setHours((Number.parseInt(value) % 12) + (newDate.getHours() >= 12 ? 12 : 0));
       } else if (type === 'minute') {
-        newDate.setMinutes(parseInt(value));
+        newDate.setMinutes(Number.parseInt(value));
       } else if (type === 'ampm') {
         const currentHours = newDate.getHours();
         newDate.setHours(value === 'PM' ? currentHours + 12 : currentHours - 12);

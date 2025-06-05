@@ -1,5 +1,5 @@
-import { type ChartEncodes, ChartType } from '@/api/asset_interfaces/metric/charts';
 import isEmpty from 'lodash/isEmpty';
+import { type ChartEncodes, ChartType } from '@/api/asset_interfaces/metric/charts';
 
 const defaultAxisCheck = (selectedAxis: ChartEncodes) => {
   if (isEmpty(selectedAxis.x) || isEmpty(selectedAxis.y)) return false;
@@ -12,7 +12,7 @@ const AxisMethodCheckRecord: Record<ChartType, (selectedAxis: ChartEncodes) => b
   [ChartType.Scatter]: defaultAxisCheck,
   [ChartType.Pie]: defaultAxisCheck,
   [ChartType.Combo]: defaultAxisCheck,
-  [ChartType.Metric]: () => true,
+  [ChartType.Metric]: (selectedAxis) => true,
   [ChartType.Table]: () => true
 };
 
@@ -26,5 +26,6 @@ export const doesChartHaveValidAxis = ({
   isTable: boolean;
 }) => {
   if (isTable) return true;
-  return AxisMethodCheckRecord[selectedChartType](selectedAxis!);
+
+  return AxisMethodCheckRecord[selectedChartType](selectedAxis as ChartEncodes);
 };

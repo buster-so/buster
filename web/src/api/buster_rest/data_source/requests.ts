@@ -10,9 +10,8 @@ import type {
   SQLServerCredentials
 } from '@/api/asset_interfaces/datasources';
 import { DataSourceSchema } from '@/api/asset_interfaces/datasources';
-import * as v from 'valibot';
-import mainApi from '../instances';
 import { serverFetch } from '@/api/createServerInstance';
+import mainApi from '../instances';
 
 export const listDatasources = async () => {
   return await mainApi.get<DataSourceListItem[]>('/data_sources').then((res) => res.data);
@@ -21,13 +20,13 @@ export const listDatasources = async () => {
 export const getDatasource = async (id: string) => {
   return await mainApi
     .get<DataSource>(`/data_sources/${id}`)
-    .then((res) => v.parse(DataSourceSchema, res.data));
+    .then((res) => DataSourceSchema.parse(res.data));
 };
 
 export const getDatasource_server = async (id: string) => {
   const response = await serverFetch<DataSource>(`/data_sources/${id}`);
   // Validate response with DataSourceSchema
-  return v.parse(DataSourceSchema, response);
+  return DataSourceSchema.parse(response);
 };
 
 export const deleteDatasource = async (id: string) => {

@@ -1,16 +1,17 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { BusterChatListItem } from '@/api/asset_interfaces/chat/chatInterfaces';
 import { mainApi } from '../instances';
-import { BusterChatListItem } from '@/api/asset_interfaces/chat/chatInterfaces';
 
 // Mock the mainApi
-jest.mock('../instances', () => ({
+vi.mock('../instances', () => ({
   mainApi: {
-    get: jest.fn()
+    get: vi.fn()
   }
 }));
 
 describe('Chat API Requests', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('getListChats', () => {
@@ -34,7 +35,7 @@ describe('Chat API Requests', () => {
       ];
 
       // Setup mock response
-      (mainApi.get as jest.Mock).mockResolvedValueOnce({ data: mockChats });
+      (mainApi.get as any).mockResolvedValueOnce({ data: mockChats });
 
       // Import the function we want to test
       const { getListChats } = await import('./requests');

@@ -1,14 +1,14 @@
-import mainApi from '@/api/buster_rest/instances';
 import type {
   BusterDashboardListItem,
   BusterDashboardResponse,
   DashboardConfig
 } from '@/api/asset_interfaces/dashboard';
-import {
+import type {
   ShareDeleteRequest,
   SharePostRequest,
   ShareUpdateRequest
 } from '@/api/asset_interfaces/shared_interfaces';
+import mainApi from '@/api/buster_rest/instances';
 import { serverFetch } from '@/api/createServerInstance';
 
 export const dashboardsGetList = async (params: {
@@ -85,7 +85,7 @@ export const dashboardsUpdateDashboard = async (params: {
 };
 
 export const dashboardsDeleteDashboard = async (data: { ids: string[] }) => {
-  return await mainApi.delete<null>(`/dashboards`, { data }).then((res) => res.data);
+  return await mainApi.delete<null>('/dashboards', { data }).then((res) => res.data);
 };
 
 // share dashboards

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { SidebarCollapsible } from './SidebarCollapsible';
-import { HouseModern, MapSettings, User } from '../icons/NucleoIconOutlined';
-import { BusterRoutes } from '../../../routes';
-import React from 'react';
 import { fn } from '@storybook/test';
+import React from 'react';
+import { BusterRoutes } from '../../../routes';
+import { HouseModern, MapSettings, User } from '../icons/NucleoIconOutlined';
+import { SidebarCollapsible } from './SidebarCollapsible';
 
 const meta: Meta<typeof SidebarCollapsible> = {
   title: 'UI/Sidebar/SidebarCollapsible',

@@ -1,8 +1,7 @@
+import { AnimatePresence, motion } from 'framer-motion';
+import React from 'react';
 import type { BusterChatMessageReasoning_status } from '@/api/asset_interfaces';
 import { StatusIndicator } from '@/components/ui/indicators';
-import { motion } from 'framer-motion';
-import { AnimatePresence } from 'framer-motion';
-import React from 'react';
 import { Text } from '@/components/ui/typography';
 import { cn } from '@/lib/classMerge';
 
@@ -22,7 +21,7 @@ export const BarContainer: React.FC<{
         isCompletedStream={isCompletedStream}
       />
 
-      <div className={`mb-2 flex w-full flex-col space-y-2 overflow-hidden`}>
+      <div className={'mb-2 flex w-full flex-col space-y-2 overflow-hidden'}>
         <TitleContainer
           title={title}
           secondaryTitle={secondaryTitle}
@@ -84,7 +83,7 @@ const TitleContainer: React.FC<{
   isCompletedStream: boolean;
 }> = React.memo(({ title, secondaryTitle, isCompletedStream }) => {
   return (
-    <div className={cn('@container', 'flex w-full items-center space-x-1.5 overflow-hidden')}>
+    <div className={cn('@container flex w-full items-center space-x-1.5 overflow-hidden')}>
       <AnimatePresence mode="wait" initial={!isCompletedStream}>
         <motion.div
           className="flex items-center space-x-1.5"
@@ -93,13 +92,13 @@ const TitleContainer: React.FC<{
           exit={{ opacity: 0 }}
           transition={{ delay: 0 }}
           key={title + secondaryTitle}>
-          <Text size="sm" className={cn(`whitespace-nowrap`)} variant={'default'}>
+          <Text size="sm" className={cn('whitespace-nowrap')} variant={'default'}>
             {title}
           </Text>
           {secondaryTitle && (
             <Text
               size="sm"
-              className={cn(`hidden whitespace-nowrap @[170px]:flex!`)}
+              className={cn('hidden whitespace-nowrap @[170px]:flex!')}
               variant={'tertiary'}>
               {secondaryTitle}
             </Text>

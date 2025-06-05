@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 export const SqlServer: React.FC<{
   onClick?: () => void;
@@ -13,6 +13,7 @@ export const SqlServer: React.FC<{
       viewBox="0 0 48 48"
       width={props.size || 24}
       height={props.size || 24}>
+      <title>SQL Server Icon</title>
       <path
         fill="#cfd8dc"
         d="M23.084,11.277c-1.633-2.449-1.986-5.722-2.063-7.067c-4.148,0.897-8.269,2.506-8.031,3.691 c0.03,0.149,0.218,0.328,0.53,0.502l-0.488,0.873c-0.596-0.334-0.931-0.719-1.022-1.179c-0.269-1.341,1.25-2.554,4.642-3.709 c2.316-0.789,4.652-1.26,4.751-1.279l0.597-0.12L22,3.6c0,0.042,0.026,4.288,1.916,7.123L23.084,11.277z"

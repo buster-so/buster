@@ -1,14 +1,13 @@
 import React, { useMemo, useState } from 'react';
-import { LabelAndInput } from '../Common';
 import {
-  type IBusterMetricChartConfig,
   DEFAULT_CHART_CONFIG,
+  type IBusterMetricChartConfig,
   MIN_DONUT_WIDTH
 } from '@/api/asset_interfaces';
-import { InputNumber } from '@/components/ui/inputs';
-import { Slider, SliderWithInputNumber } from '@/components/ui/slider';
-import { useMemoizedFn } from '@/hooks';
-import { AppSegmented, SegmentedItem } from '@/components/ui/segmented';
+import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
+import { SliderWithInputNumber } from '@/components/ui/slider';
+import { useDebounceEffect, useMemoizedFn } from '@/hooks';
+import { LabelAndInput } from '../Common';
 
 const options: SegmentedItem<'donut' | 'pie'>[] = [
   { label: 'Donut', value: 'donut' },
@@ -52,9 +51,16 @@ export const EditPieAppearance = React.memo(
       }
     });
 
-    const onChangeSlider = useMemoizedFn((value: number[]) => {
-      setPieDonutWidth(value[0]);
-    });
+    useDebounceEffect(
+      () => {
+        if (value !== pieDonutWidth) {
+          setValue(pieDonutWidth);
+          setShowDonutWidthSelector(pieDonutWidth > 0);
+        }
+      },
+      [pieDonutWidth],
+      { wait: 25 }
+    );
 
     return (
       <>

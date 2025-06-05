@@ -1,8 +1,5 @@
 'use client';
-
-import { useQuery } from '@tanstack/react-query';
 import React from 'react';
-import { queryKeys } from '@/api/query_keys';
 import { BarContainer } from './BarContainer';
 
 export const BlackBoxMessage: React.FC<{ blackBoxMessage: string | undefined | null }> = React.memo(

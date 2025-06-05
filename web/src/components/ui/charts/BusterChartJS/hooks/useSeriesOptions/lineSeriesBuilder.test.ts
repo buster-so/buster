@@ -1,42 +1,41 @@
-import { lineBuilder, lineSeriesBuilder_labels } from './lineSeriesBuilder';
+import type { ChartDataset, ScriptableContext } from 'chart.js';
+import { describe, expect, it, vi } from 'vitest';
+import type {
+  BusterChartProps,
+  ChartEncodes,
+  ColumnSettings,
+  IColumnLabelFormat,
+  ScatterAxis
+} from '@/api/asset_interfaces/metric';
 import {
   DEFAULT_COLUMN_LABEL_FORMAT,
   DEFAULT_COLUMN_SETTINGS
 } from '@/api/asset_interfaces/metric/defaults';
+import { createDayjsDate, formatLabel } from '@/lib';
 import type { DatasetOption, DatasetOptionsWithTicks, KV } from '../../../chartHooks';
-import { formatLabelForDataset, JOIN_CHARACTER } from '../../../commonHelpers';
-import { addOpacityToColor, createDayjsDate, formatLabel } from '@/lib';
 import { formatBarAndLineDataLabel } from '../../helpers';
-import type {
-  BusterChartProps,
-  ChartEncodes,
-  ScatterAxis,
-  IColumnLabelFormat,
-  ColumnSettings
-} from '@/api/asset_interfaces/metric';
-import type { ScriptableContext, LineControllerDatasetOptions, ChartDataset } from 'chart.js';
-import type { ChartProps } from '../../core';
+import { lineBuilder, lineSeriesBuilder_labels } from './lineSeriesBuilder';
 
 // Use NonNullable utility type for potentially nullable map types
 type ColumnLabelFormatMap = NonNullable<BusterChartProps['columnLabelFormats']>;
 type ColumnSettingsMap = NonNullable<BusterChartProps['columnSettings']>;
 
 // Mock dependencies
-jest.mock('../../../commonHelpers', () => ({
-  formatLabelForDataset: jest.fn((dataset) => dataset.label[0]?.value || dataset.dataKey),
+vi.mock('../../../commonHelpers', () => ({
+  formatLabelForDataset: vi.fn((dataset) => dataset.label[0]?.value || dataset.dataKey),
   JOIN_CHARACTER: ' | '
 }));
 
-jest.mock('@/lib', () => ({
-  addOpacityToColor: jest.fn((color, opacity) => `${color}-opacity-${opacity}`),
-  createDayjsDate: jest.fn((dateString) => ({
+vi.mock('@/lib', () => ({
+  addOpacityToColor: vi.fn((color, opacity) => `${color}-opacity-${opacity}`),
+  createDayjsDate: vi.fn((dateString) => ({
     toDate: () => new Date(dateString)
   })),
-  formatLabel: jest.fn((value) => `formatted-${value}`)
+  formatLabel: vi.fn((value) => `formatted-${value}`)
 }));
 
-jest.mock('../../helpers', () => ({
-  formatBarAndLineDataLabel: jest.fn(
+vi.mock('../../helpers', () => ({
+  formatBarAndLineDataLabel: vi.fn(
     (value, context, percentageMode, columnLabelFormat) =>
       `label-${value}-${percentageMode || 'none'}`
   )
@@ -47,15 +46,15 @@ const mockContext = (
   dataIndex: number,
   datasetIndex: number,
   datasetData: any[],
-  scaleType: string = 'linear',
+  scaleType = 'linear',
   chartDatasets: any[] = [{ data: datasetData, hidden: false }]
 ) =>
   ({
     chart: {
       scales: { x: { type: scaleType } },
       ctx: {
-        createLinearGradient: jest.fn(() => ({
-          addColorStop: jest.fn()
+        createLinearGradient: vi.fn(() => ({
+          addColorStop: vi.fn()
         }))
       },
       height: 400,
@@ -122,6 +121,7 @@ describe('lineSeriesBuilder', () => {
       xAxisKeys: ['category'] as ChartEncodes['x'],
       lineGroupType: undefined,
       index: 0,
+      trendlines: [],
       dataset: {
         id: 'm1',
         axisType: 'y' as const,

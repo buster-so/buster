@@ -1,6 +1,6 @@
 import React from 'react';
-import { LabelAndInput } from '../../../Common/LabelAndInput';
 import { Switch } from '@/components/ui/switch';
+import { LabelAndInput } from '../../../Common/LabelAndInput';
 
 export const EditShowTooltip: React.FC<{
   disableTooltip: boolean;

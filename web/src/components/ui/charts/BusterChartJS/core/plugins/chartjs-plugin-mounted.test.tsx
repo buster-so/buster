@@ -1,8 +1,9 @@
-import { Chart, ChartType, ChartData } from 'chart.js';
-import { ChartMountedPlugin, ChartMountedPluginOptions } from './chartjs-plugin-mounted';
+import type { Chart, ChartData, ChartType } from 'chart.js';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { ChartMountedPlugin, type ChartMountedPluginOptions } from './chartjs-plugin-mounted';
 
 // Mock Chart.js
-jest.mock('chart.js');
+vi.mock('chart.js');
 
 describe('ChartMountedPlugin', () => {
   let mockChart: Partial<Chart>;
@@ -19,31 +20,31 @@ describe('ChartMountedPlugin', () => {
     };
 
     mockOptions = {
-      onMounted: jest.fn(),
-      onInitialAnimationEnd: jest.fn()
+      onMounted: vi.fn(),
+      onInitialAnimationEnd: vi.fn()
     };
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('afterInit', () => {
     it('should call onMounted and set $mountedPlugin to true', () => {
-      ChartMountedPlugin.afterInit!(mockChart as Chart, null as any, mockOptions);
+      ChartMountedPlugin.afterInit?.(mockChart as Chart, null as any, mockOptions);
 
       expect(mockOptions.onMounted).toHaveBeenCalledWith(mockChart);
       expect(mockChart.$mountedPlugin).toBe(true);
     });
 
     it('should not call onMounted when chart is undefined', () => {
-      ChartMountedPlugin.afterInit!(undefined as unknown as Chart, null as any, mockOptions);
+      ChartMountedPlugin.afterInit?.(undefined as unknown as Chart, null as any, mockOptions);
 
       expect(mockOptions.onMounted).not.toHaveBeenCalled();
     });
 
     it('should not call onMounted when options is undefined', () => {
-      ChartMountedPlugin.afterInit!(
+      ChartMountedPlugin.afterInit?.(
         mockChart as Chart,
         null as any,
         null as unknown as ChartMountedPluginOptions
@@ -57,13 +58,13 @@ describe('ChartMountedPlugin', () => {
     it('should not call onInitialAnimationEnd if $mountedPlugin is true', () => {
       mockChart.$mountedPlugin = true;
 
-      ChartMountedPlugin.afterRender!(mockChart as Chart, null as any, mockOptions);
+      ChartMountedPlugin.afterRender?.(mockChart as Chart, null as any, mockOptions);
 
       expect(mockOptions.onInitialAnimationEnd).not.toHaveBeenCalled();
     });
 
     it('should call onInitialAnimationEnd if chart has labels and plugin not mounted', () => {
-      ChartMountedPlugin.afterRender!(mockChart as Chart, null as any, mockOptions);
+      ChartMountedPlugin.afterRender?.(mockChart as Chart, null as any, mockOptions);
 
       expect(mockOptions.onInitialAnimationEnd).toHaveBeenCalledWith(mockChart);
       expect(mockChart.$mountedPlugin).toBe(true);
@@ -72,7 +73,7 @@ describe('ChartMountedPlugin', () => {
     it('should not call onInitialAnimationEnd if chart has no labels', () => {
       mockChart.data!.labels = [];
 
-      ChartMountedPlugin.afterRender!(mockChart as Chart, null as any, mockOptions);
+      ChartMountedPlugin.afterRender?.(mockChart as Chart, null as any, mockOptions);
 
       expect(mockOptions.onInitialAnimationEnd).not.toHaveBeenCalled();
       expect(mockChart.$mountedPlugin).toBe(false);

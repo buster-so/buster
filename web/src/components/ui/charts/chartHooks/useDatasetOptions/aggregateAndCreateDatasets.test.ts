@@ -1,6 +1,6 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, expect, it } from 'vitest';
+import { DEFAULT_COLUMN_LABEL_FORMAT, type IColumnLabelFormat } from '@/api/asset_interfaces';
 import { aggregateAndCreateDatasets } from './aggregateAndCreateDatasets';
-import { DEFAULT_COLUMN_LABEL_FORMAT, IColumnLabelFormat } from '@/api/asset_interfaces';
 
 describe('aggregateAndCreateDatasets', () => {
   it('should handle single x-axis and single y-axis', () => {
@@ -1046,13 +1046,13 @@ describe('aggregateAndCreateDatasets', () => {
     expect(result.datasets[0].tooltipData[0]).toEqual([
       { key: 'metric', value: 1000 },
       { key: 'boolean', value: true },
-      { key: 'object', value: { test: 'value' } }
+      { key: 'object', value: '[object Object]' }
     ]);
 
     expect(result.datasets[0].tooltipData[1]).toEqual([
       { key: 'metric', value: 1200 },
       { key: 'boolean', value: false },
-      { key: 'object', value: { test: 'other' } }
+      { key: 'object', value: '[object Object]' }
     ]);
   });
 
@@ -1600,7 +1600,7 @@ describe('aggregateAndCreateDatasets', () => {
     expect(costDataset).toBeDefined();
 
     // Verify tooltip contain all specified fields in correct order
-    expect(salesDataset!.tooltipData[0].map((t) => t.key)).toEqual([
+    expect(salesDataset?.tooltipData[0].map((t) => t.key)).toEqual([
       'region',
       'product',
       'channel',

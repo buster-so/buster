@@ -1,18 +1,18 @@
+import type { GridLineOptions, Scale, ScaleChartOptions } from 'chart.js';
+import { useMemo } from 'react';
+import type { DeepPartial } from 'utility-types';
+import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import {
-  BusterChartConfigProps,
-  BusterChartProps,
-  ChartEncodes,
+  type BusterChartConfigProps,
+  type BusterChartProps,
+  type ChartEncodes,
   ChartType,
-  IColumnLabelFormat
+  type IColumnLabelFormat
 } from '@/api/asset_interfaces/metric/charts';
 import { useMemoizedFn } from '@/hooks';
-import type { DeepPartial } from 'utility-types';
-import type { ScaleChartOptions, Scale, GridLineOptions } from 'chart.js';
-import { useMemo } from 'react';
-import { yAxisSimilar, formatYAxisLabel } from '../../../commonHelpers';
-import { useIsStacked } from './useIsStacked';
+import { formatYAxisLabel, yAxisSimilar } from '../../../commonHelpers';
 import { useYAxisTitle } from './axisHooks/useYAxisTitle';
-import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
+import { useIsStacked } from './useIsStacked';
 
 export const useYAxis = ({
   columnLabelFormats,

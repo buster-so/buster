@@ -1,15 +1,19 @@
 'use client';
 
+import React, { useMemo, useState } from 'react';
 import type { ListPermissionGroupsResponse } from '@/api/asset_interfaces';
 import { useDatasetUpdatePermissionGroups } from '@/api/buster_rest/datasets';
-import { BusterListColumn, BusterListRowItem, EmptyStateList } from '@/components/ui/list';
-import { useMemoizedFn } from '@/hooks';
-import React, { useMemo, useState } from 'react';
-import { PermissionGroupSelectedPopup } from './PermissionGroupSelectedPopup';
-import { InfiniteListContainer } from '@/components/ui/list/InfiniteListContainer';
-import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
 import { PermissionAssignedCell } from '@/components/features/PermissionComponents';
+import {
+  type BusterListColumn,
+  type BusterListRowItem,
+  EmptyStateList
+} from '@/components/ui/list';
+import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
+import { InfiniteListContainer } from '@/components/ui/list/InfiniteListContainer';
 import { Text } from '@/components/ui/typography';
+import { useMemoizedFn } from '@/hooks';
+import { PermissionGroupSelectedPopup } from './PermissionGroupSelectedPopup';
 
 export const PermissionListPermissionGroupContainer: React.FC<{
   filteredPermissionGroups: ListPermissionGroupsResponse[];
@@ -32,7 +36,7 @@ export const PermissionListPermissionGroupContainer: React.FC<{
       {
         title: 'Name',
         dataIndex: 'name',
-        render: (name: string, permissionGroup: ListPermissionGroupsResponse) => {
+        render: (name, permissionGroup: ListPermissionGroupsResponse) => {
           return (
             <div className="flex items-center justify-between gap-x-2">
               <Text>{name}</Text>

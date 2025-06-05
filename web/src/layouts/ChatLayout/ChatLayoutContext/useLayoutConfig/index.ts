@@ -1,2 +1,2 @@
-export * from './useLayoutConfig';
 export * from './interfaces';
+export * from './useLayoutConfig';

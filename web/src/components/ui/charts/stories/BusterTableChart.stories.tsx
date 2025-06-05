@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
 import { BusterTableChart } from '../TableChart/BusterTableChart';
-import { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
 
 // Helper functions for generating sample data
 const generateProductName = (index: number) => `Product ${index + 1}`;
@@ -15,7 +15,7 @@ const generateDate = (index: number) => {
 };
 
 // Generate table data
-const generateTableData = (count: number = 5) => {
+const generateTableData = (count = 5) => {
   return Array.from({ length: count }, (_, index) => ({
     product: generateProductName(index),
     sales: generateSales(index),

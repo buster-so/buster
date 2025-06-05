@@ -1,5 +1,5 @@
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import React from 'react';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { Text } from '@/components/ui/typography';
 
 export const PaletteApp: React.FC<{

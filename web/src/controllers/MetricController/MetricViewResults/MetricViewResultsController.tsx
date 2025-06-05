@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { useMemoizedFn } from '@/hooks';
-import { IDataResult } from '@/api/asset_interfaces';
-import { useMetricResultsLayout } from './useMetricResultsLayout';
-import { AppSplitterRef } from '@/components/ui/layouts';
-import { AppVerticalCodeSplitter } from '@/components/features/layouts/AppVerticalCodeSplitter';
-import { useMetricRunSQL } from './useMetricRunSQL';
+import type { IDataResult } from '@/api/asset_interfaces';
 import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
+import { AppVerticalCodeSplitter } from '@/components/features/layouts/AppVerticalCodeSplitter';
+import type { AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
+import { useMemoizedFn } from '@/hooks';
+import { useMetricResultsLayout } from './useMetricResultsLayout';
+import { useMetricRunSQL } from './useMetricRunSQL';
 
 const autoSaveId = 'metric-view-results';
 
@@ -59,7 +59,7 @@ export const MetricViewResultsController: React.FC<{
         metricId
       });
 
-      if (res && res.data && res.data.length > 0) {
+      if (res?.data && res.data.length > 0) {
         const data = res.data;
         const headerHeight = 28.1;
         const heightOfRow = 28.1;

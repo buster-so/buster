@@ -1,11 +1,11 @@
-import { BusterTerm } from '@/api/asset_interfaces/terms';
-import { AppTooltip } from '@/components/ui/tooltip';
-import { Plus, Table } from '@/components/ui/icons';
-import { Dropdown, type DropdownProps } from '@/components/ui/dropdown';
 import React, { useMemo } from 'react';
-import { Button } from '@/components/ui/buttons';
-import { Text } from '@/components/ui/typography';
+import type { BusterTerm } from '@/api/asset_interfaces/terms';
 import { useGetDatasets } from '@/api/buster_rest/datasets';
+import { Button } from '@/components/ui/buttons';
+import { Dropdown, type DropdownProps } from '@/components/ui/dropdown';
+import { Plus, Table } from '@/components/ui/icons';
+import { AppTooltip } from '@/components/ui/tooltip';
+import { Text } from '@/components/ui/typography';
 import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 
@@ -81,7 +81,7 @@ const DropdownSelect: React.FC<{
         onChange(newDatasets.map((i) => i.id));
       }
     }));
-  }, [datasets, datasetsList]);
+  }, [datasets, datasetsList, onChange]);
 
   const onSelect = useMemoizedFn((itemId: string) => {
     alert('This feature is not implemented yet');

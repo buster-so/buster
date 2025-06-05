@@ -13,7 +13,7 @@
       type: string # Optional, inferred if omitted
   metrics:
     - name: string # Required
-      expr: string # Required, can use model.column from entities
+      expr: string # Required, can use model.column from relationships
       description: string # Optional
       args: # Optional, required only if expr contains arguments, default: null
         - name: string # Required
@@ -21,16 +21,16 @@
           description: string # Optional
   filters:
     - name: string # Required
-      expr: string # Required, can use model.column from entities
+      expr: string # Required, can use model.column from relationships
       description: string # Optional
       args: # Optional, required only if expr contains arguments, default: null
         - name: string # Required
           type: string # Required
           description: string # Optional
-  entities:
+  relationships:
     - name: string # Required
-      primary_key: string # Required
-      foreign_key: string # Required
+      source_col: string # Required
+      ref_col: string # Required
       type: string # Optional, e.g., "LEFT", "INNER"; LLM decides if omitted
       cardinality: string # Optional, e.g., "one-to-many", "many-to-many"
       description: string # Optional

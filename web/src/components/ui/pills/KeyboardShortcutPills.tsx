@@ -1,5 +1,5 @@
-import React from 'react';
 import isEmpty from 'lodash/isEmpty';
+import type React from 'react';
 import { cn } from '@/lib/classMerge';
 
 export const KeyboardShortcutPill: React.FC<{
@@ -11,7 +11,9 @@ export const KeyboardShortcutPill: React.FC<{
 
   return (
     <div className="flex space-x-0.5">
-      {shortcut?.map((s, i) => <TooltipShortcut key={i} shortcut={s} />)}
+      {shortcut?.map((s) => (
+        <TooltipShortcut key={s} shortcut={s} />
+      ))}
     </div>
   );
 };

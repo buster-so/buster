@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { SidebarSettings } from './SidebarSettings';
 import React from 'react';
+import { SidebarSettings } from './SidebarSettings';
 
 const meta: Meta<typeof SidebarSettings> = {
   title: 'Features/Sidebars/SidebarSettings',

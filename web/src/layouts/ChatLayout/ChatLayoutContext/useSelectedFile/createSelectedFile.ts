@@ -1,9 +1,15 @@
 import type { SelectedFile } from '../../interfaces';
-import { useGetChatParams } from '../useGetChatParams';
 
-export const createSelectedFile = (
-  params: ReturnType<typeof useGetChatParams>
-): SelectedFile | null => {
+export const createSelectedFile = (params: {
+  metricId?: string;
+  collectionId?: string;
+  datasetId?: string;
+  dashboardId?: string;
+  chatId?: string;
+  messageId?: string;
+  metricVersionNumber?: number;
+  dashboardVersionNumber?: number;
+}): SelectedFile | null => {
   const {
     metricId,
     collectionId,

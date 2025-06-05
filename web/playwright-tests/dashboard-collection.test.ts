@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test.skip('Can add dashboard to collection', async ({ page }) => {
   await page.goto('http://localhost:3000/app/dashboards/c0855f0f-f50a-424e-9e72-9e53711a7f6a/file');

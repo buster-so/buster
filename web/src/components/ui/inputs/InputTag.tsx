@@ -1,6 +1,6 @@
-import * as React from 'react';
-import { cn } from '@/lib/classMerge';
+import type * as React from 'react';
 import { Xmark } from '@/components/ui/icons';
+import { cn } from '@/lib/classMerge';
 
 export const InputTag: React.FC<{
   label: string | React.ReactNode;
@@ -19,6 +19,7 @@ export const InputTag: React.FC<{
       )}>
       <span className="max-w-[100px] truncate">{label}</span>
       <button
+        type="button"
         onPointerDown={(e) => {
           e.preventDefault();
           e.stopPropagation();

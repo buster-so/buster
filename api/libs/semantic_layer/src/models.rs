@@ -18,7 +18,7 @@ pub struct Model {
     pub metrics: Vec<Metric>,
     #[serde(default)]
     pub filters: Vec<Filter>,
-    #[serde(rename = "entities", default)] // Added default
+    #[serde(default)] // Added default
     pub relationships: Vec<Relationship>,
 }
 

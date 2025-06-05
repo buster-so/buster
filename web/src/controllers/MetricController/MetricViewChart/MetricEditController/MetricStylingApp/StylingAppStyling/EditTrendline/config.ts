@@ -1,6 +1,6 @@
-import { Trendline } from '@/api/asset_interfaces/metric/charts';
-import { LoopTrendline } from './EditTrendline';
-import { SelectItem } from '@/components/ui/select';
+import type { Trendline } from '@/api/asset_interfaces/metric/charts';
+import type { SelectItem } from '@/components/ui/select';
+import type { LoopTrendline } from './EditTrendline';
 
 export const TypeToLabel: Record<Trendline['type'], string> = {
   linear_regression: 'Linear',
@@ -14,12 +14,12 @@ export const TypeToLabel: Record<Trendline['type'], string> = {
 };
 
 export const trendlineOptions: SelectItem<LoopTrendline['type']>[] = [
-  { label: TypeToLabel['linear_regression'], value: 'linear_regression' },
-  { label: TypeToLabel['logarithmic_regression'], value: 'logarithmic_regression' },
-  { label: TypeToLabel['exponential_regression'], value: 'exponential_regression' },
-  { label: TypeToLabel['polynomial_regression'], value: 'polynomial_regression' },
-  { label: TypeToLabel['average'], value: 'average' },
-  { label: TypeToLabel['min'], value: 'min' },
-  { label: TypeToLabel['max'], value: 'max' },
-  { label: TypeToLabel['median'], value: 'median' }
+  { label: TypeToLabel.linear_regression, value: 'linear_regression' },
+  { label: TypeToLabel.logarithmic_regression, value: 'logarithmic_regression' },
+  { label: TypeToLabel.exponential_regression, value: 'exponential_regression' },
+  { label: TypeToLabel.polynomial_regression, value: 'polynomial_regression' },
+  { label: TypeToLabel.average, value: 'average' },
+  { label: TypeToLabel.min, value: 'min' },
+  { label: TypeToLabel.max, value: 'max' },
+  { label: TypeToLabel.median, value: 'median' }
 ];

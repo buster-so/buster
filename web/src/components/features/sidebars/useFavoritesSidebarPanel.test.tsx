@@ -1,22 +1,23 @@
-import { renderHook, act } from '@testing-library/react';
-import { useFavoriteSidebarPanel } from './useFavoritesSidebarPanel';
-import {
-  useGetUserFavorites,
-  useUpdateUserFavorites,
-  useDeleteUserFavorite
-} from '@/api/buster_rest/users';
+import { act, renderHook } from '@testing-library/react';
 import { useParams } from 'next/navigation';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ShareAssetType } from '@/api/asset_interfaces/share';
+import {
+  useDeleteUserFavorite,
+  useGetUserFavorites,
+  useUpdateUserFavorites
+} from '@/api/buster_rest/users';
+import { useFavoriteSidebarPanel } from './useFavoritesSidebarPanel';
 
 // Mock the hooks
-jest.mock('@/api/buster_rest/users', () => ({
-  useGetUserFavorites: jest.fn(),
-  useUpdateUserFavorites: jest.fn(),
-  useDeleteUserFavorite: jest.fn()
+vi.mock('@/api/buster_rest/users', () => ({
+  useGetUserFavorites: vi.fn(),
+  useUpdateUserFavorites: vi.fn(),
+  useDeleteUserFavorite: vi.fn()
 }));
 
-jest.mock('next/navigation', () => ({
-  useParams: jest.fn()
+vi.mock('next/navigation', () => ({
+  useParams: vi.fn()
 }));
 
 // Do not mock useMemoizedFn to use the real implementation
@@ -29,40 +30,38 @@ describe('useFavoriteSidebarPanel', () => {
     { id: 'collection1', name: 'Collection 1', asset_type: ShareAssetType.COLLECTION }
   ];
 
-  const mockUpdateFavorites = jest.fn();
-  const mockDeleteFavorite = jest.fn();
+  const mockUpdateFavorites = vi.fn();
+  const mockDeleteFavorite = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
-    (useGetUserFavorites as jest.Mock).mockReturnValue({
+    (useGetUserFavorites as any).mockReturnValue({
       data: mockFavorites
     });
 
-    (useUpdateUserFavorites as jest.Mock).mockReturnValue({
+    (useUpdateUserFavorites as any).mockReturnValue({
       mutateAsync: mockUpdateFavorites
     });
 
-    (useDeleteUserFavorite as jest.Mock).mockReturnValue({
+    (useDeleteUserFavorite as any).mockReturnValue({
       mutateAsync: mockDeleteFavorite
     });
 
-    (useParams as jest.Mock).mockReturnValue({
+    (useParams as any).mockReturnValue({
       chatId: undefined,
       metricId: undefined,
       dashboardId: undefined,
       collectionId: undefined
     });
   });
-
-  test('should return correct initial structure', () => {
+  it('should return correct initial structure', () => {
     const { result } = renderHook(() => useFavoriteSidebarPanel());
 
     expect(result.current).toHaveProperty('favoritesDropdownItems');
     expect(result.current).toHaveProperty('favoritedPageType');
   });
-
-  test('should call updateUserFavorites when onFavoritesReorder is called', () => {
+  it('should call updateUserFavorites when onFavoritesReorder is called', () => {
     const { result } = renderHook(() => useFavoriteSidebarPanel());
     const itemIds = ['metric1', 'dashboard1'];
 
@@ -75,9 +74,8 @@ describe('useFavoriteSidebarPanel', () => {
 
     expect(mockUpdateFavorites).toHaveBeenCalledWith(itemIds);
   });
-
-  test('should correctly identify active chat asset', () => {
-    (useParams as jest.Mock).mockReturnValue({
+  it('should correctly identify active chat asset', () => {
+    (useParams as any).mockReturnValue({
       chatId: 'chat1'
     });
 
@@ -89,9 +87,8 @@ describe('useFavoriteSidebarPanel', () => {
 
     expect(chatItem?.active).toBe(true);
   });
-
-  test('should correctly identify active metric asset', () => {
-    (useParams as jest.Mock).mockReturnValue({
+  it('should correctly identify active metric asset', () => {
+    (useParams as any).mockReturnValue({
       metricId: 'metric1'
     });
 
@@ -103,9 +100,8 @@ describe('useFavoriteSidebarPanel', () => {
 
     expect(metricItem?.active).toBe(true);
   });
-
-  test('should set favoritedPageType to METRIC when metricId is in favorites', () => {
-    (useParams as jest.Mock).mockReturnValue({
+  it('should set favoritedPageType to METRIC when metricId is in favorites', () => {
+    (useParams as any).mockReturnValue({
       metricId: 'metric1'
     });
 
@@ -113,9 +109,8 @@ describe('useFavoriteSidebarPanel', () => {
 
     expect(result.current.favoritedPageType).toBe(ShareAssetType.METRIC);
   });
-
-  test('should set favoritedPageType to null when page is not favorited', () => {
-    (useParams as jest.Mock).mockReturnValue({
+  it('should set favoritedPageType to null when page is not favorited', () => {
+    (useParams as any).mockReturnValue({
       metricId: 'nonexistent'
     });
 
@@ -123,9 +118,8 @@ describe('useFavoriteSidebarPanel', () => {
 
     expect(result.current.favoritedPageType).toBe(null);
   });
-
-  test('should return null for favoritesDropdownItems when no favorites exist', () => {
-    (useGetUserFavorites as jest.Mock).mockReturnValue({
+  it('should return null for favoritesDropdownItems when no favorites exist', () => {
+    (useGetUserFavorites as any).mockReturnValue({
       data: []
     });
 
@@ -133,8 +127,7 @@ describe('useFavoriteSidebarPanel', () => {
 
     expect(result.current.favoritesDropdownItems).toBe(null);
   });
-
-  test('should call deleteUserFavorite when item removal is triggered', () => {
+  it('should call deleteUserFavorite when item removal is triggered', () => {
     const { result } = renderHook(() => useFavoriteSidebarPanel());
 
     act(() => {
@@ -146,9 +139,8 @@ describe('useFavoriteSidebarPanel', () => {
 
     expect(mockDeleteFavorite).toHaveBeenCalledWith(['metric1']);
   });
-
-  test('should set favoritedPageType to null when chatId and another param exist', () => {
-    (useParams as jest.Mock).mockReturnValue({
+  it('should set favoritedPageType to null when chatId and another param exist', () => {
+    (useParams as any).mockReturnValue({
       chatId: 'chat1',
       metricId: 'metric1'
     });

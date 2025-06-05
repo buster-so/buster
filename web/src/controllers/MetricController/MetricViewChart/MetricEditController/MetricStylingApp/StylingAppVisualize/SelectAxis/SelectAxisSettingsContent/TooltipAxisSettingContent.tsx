@@ -1,13 +1,10 @@
 import React from 'react';
-import { SelectAxisContainerId } from '../config';
-import { EditShowTooltip } from './EditShowTooltip';
-import { useSelectAxisContextSelector } from '../useSelectAxisContext';
-import { useMemoizedFn } from '@/hooks';
 import { useUpdateMetricChart } from '@/context/Metrics';
+import { useMemoizedFn } from '@/hooks';
+import { useSelectAxisContextSelector } from '../useSelectAxisContext';
+import { EditShowTooltip } from './EditShowTooltip';
 
-export const TooltipAxisSettingContent: React.FC<{
-  zoneId: SelectAxisContainerId;
-}> = React.memo(({}) => {
+export const TooltipAxisSettingContent: React.FC = React.memo(() => {
   const { onUpdateMetricChartConfig } = useUpdateMetricChart();
   const disableTooltip = useSelectAxisContextSelector((x) => x.disableTooltip);
 

@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useMemo, useState } from 'react';
 import type {
   GetDatasetGroupDatasetsResponse,
   GetPermissionGroupUsersResponse
@@ -7,15 +8,14 @@ import type {
 import { useUpdateDatasetGroupDatasets } from '@/api/buster_rest';
 import { PermissionAssignedCell } from '@/components/features/PermissionComponents';
 import {
-  BusterListColumn,
-  BusterListRowItem,
+  type BusterListColumn,
+  type BusterListRowItem,
   EmptyStateList,
   InfiniteListContainer
 } from '@/components/ui/list';
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
-import { BusterRoutes, createBusterRoute } from '@/routes';
 import { useMemoizedFn } from '@/hooks';
-import React, { useMemo, useState } from 'react';
+import { BusterRoutes, createBusterRoute } from '@/routes';
 import { DatasetGroupDatasetSelectedPopup } from './DatasetGroupDatasetSelectedPopup';
 
 export const DatasetGroupDatasetsListContainer: React.FC<{
@@ -42,12 +42,12 @@ export const DatasetGroupDatasetsListContainer: React.FC<{
         title: 'Assigned',
         dataIndex: 'assigned',
         width: 130 + 85,
-        render: (assigned: boolean, permissionGroup: GetPermissionGroupUsersResponse) => {
+        render: (assigned, permissionGroup: GetPermissionGroupUsersResponse) => {
           return (
             <div className="flex justify-end">
               <PermissionAssignedCell
                 id={permissionGroup.id}
-                assigned={assigned}
+                assigned={assigned as boolean}
                 text="assigned"
                 onSelect={onSelectAssigned}
               />
@@ -134,12 +134,7 @@ export const DatasetGroupDatasetsListContainer: React.FC<{
         useRowClickSelectChange={false}
         selectedRowKeys={selectedRowKeys}
         onSelectChange={setSelectedRowKeys}
-        emptyState={useMemo(
-          () => (
-            <EmptyStateList text="No dataset groups found" />
-          ),
-          []
-        )}
+        emptyState={useMemo(() => <EmptyStateList text="No dataset groups found" />, [])}
       />
     </InfiniteListContainer>
   );

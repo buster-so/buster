@@ -1,12 +1,13 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { defineConfig, devices } from '@playwright/test';
-import path from 'path';
-import fs from 'fs';
 
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
 import dotenv from 'dotenv';
+
 dotenv.config();
 
 /**
@@ -22,7 +23,7 @@ export default defineConfig({
   timeout: 1000 * 60 * 2.5,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 1,
-  /* Run 3 tests in parallel */
+  /* Run 2 tests in parallel */
   workers: process.env.CI ? 1 : 10,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',

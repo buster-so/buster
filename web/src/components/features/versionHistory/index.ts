@@ -1,2 +1,2 @@
-export * from './VersionHistoryPanel';
 export * from './useListVersionHistories';
+export * from './VersionHistoryPanel';

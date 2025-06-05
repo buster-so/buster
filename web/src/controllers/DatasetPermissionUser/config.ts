@@ -1,4 +1,4 @@
-import { SelectItem } from '@/components/ui/select';
+import type { SelectItem } from '@/components/ui/select';
 
 export const PERMISSION_USERS_OPTIONS: SelectItem<'included' | 'not_included'>[] = [
   {

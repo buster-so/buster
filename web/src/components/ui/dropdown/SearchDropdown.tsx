@@ -1,12 +1,12 @@
 import React from 'react';
+import { cn } from '@/lib/classMerge';
+import { ArrowRight } from '../icons';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger
 } from './DropdownBase';
-import { cn } from '@/lib/classMerge';
-import { ArrowRight } from '../icons';
 
 export interface SearchDropdownItem {
   label: string;
@@ -56,7 +56,7 @@ export const SearchDropdown = React.memo(
           {items.map((item, index) => (
             <DropdownMenuItem
               disabled={item.disabled}
-              key={index}
+              key={`${item.value}-${index}`}
               className="group min-h-10"
               onClick={() => onSelect(item)}>
               {item.label}

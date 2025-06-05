@@ -21,25 +21,25 @@ models:
             description: Minimum number of logins
         description: Customers with logins above threshold and active subscription
     metrics:
-      # Metric using entity columns, requires deduplication for many-to-many
+      # Metric using relationship columns, requires deduplication for many-to-many
       - name: popular_product_revenue
         expr: SUM(revenue) WHERE culture_products.product_count > 5
         description: Revenue from cultures with popular products
-    entities:
+    relationships:
       - name: logins
-        primary_key: cultureid
-        foreign_key: cultureid
+        source_col: cultureid
+        ref_col: cultureid
         type: LEFT  # Explicitly set, but LLM could override
         cardinality: one-to-many
         description: Links to login activity
       - name: subscriptions
-        primary_key: cultureid
-        foreign_key: cultureid
+        source_col: cultureid
+        ref_col: cultureid
         cardinality: one-to-one
         description: Links to subscription data (no type, LLM decides)
       - name: culture_products
-        primary_key: cultureid
-        foreign_key: cultureid
+        source_col: cultureid
+        ref_col: cultureid
         cardinality: many-to-many
         description: Links to product associations (many-to-many via junction)
 
@@ -52,10 +52,10 @@ models:
     measures:
       - name: login_count
         description: Number of logins
-    entities:
+    relationships:
       - name: culture
-        primary_key: cultureid
-        foreign_key: cultureid
+        source_col: cultureid
+        ref_col: cultureid
         cardinality: many-to-one
 
   # Model for subscriptions
@@ -67,10 +67,10 @@ models:
       - name: subscription_status
         description: Current subscription status
         options: ["active", "inactive"]
-    entities:
+    relationships:
       - name: culture
-        primary_key: cultureid
-        foreign_key: cultureid
+        source_col: cultureid
+        ref_col: cultureid
         cardinality: one-to-one
 
   # Junction model for many-to-many between culture and products
@@ -84,12 +84,12 @@ models:
     measures:
       - name: product_count
         description: Number of products in this association
-    entities:
+    relationships:
       - name: culture
-        primary_key: cultureid
-        foreign_key: cultureid
+        source_col: cultureid
+        ref_col: cultureid
         cardinality: many-to-many
       - name: products
-        primary_key: productid
-        foreign_key: productid
+        source_col: productid
+        ref_col: productid
         cardinality: many-to-many

@@ -1,4 +1,4 @@
-import { type BusterChartProps } from '@/api/asset_interfaces/metric/charts';
+import type { BusterChartProps } from '@/api/asset_interfaces/metric/charts';
 import { randomSampling } from '@/lib/downsample';
 import { DOWNSIZE_SAMPLE_THRESHOLD } from '../../config';
 

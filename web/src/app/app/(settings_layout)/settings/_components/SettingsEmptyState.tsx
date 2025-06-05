@@ -1,17 +1,16 @@
 'use client';
 
+import type React from 'react';
 import { Button } from '@/components/ui/buttons';
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
-  CardTitle,
-  CardHeader
+  CardHeader,
+  CardTitle
 } from '@/components/ui/card/CardBase';
-import React from 'react';
-import { useBusterNotifications } from '@/context/BusterNotifications';
 import { Plus } from '@/components/ui/icons';
+import { useBusterNotifications } from '@/context/BusterNotifications';
 
 export const SettingsEmptyState: React.FC<{
   title?: string;
@@ -22,7 +21,7 @@ export const SettingsEmptyState: React.FC<{
   showButton?: boolean;
 }> = ({
   title = 'This page is coming soon.',
-  description = `This page isn’t built yet, but one day it will be.`,
+  description = 'This page isn’t built yet, but one day it will be.',
   buttonAction,
   buttonText = 'Request support',
   buttonIcon = <Plus />,

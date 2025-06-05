@@ -1,6 +1,6 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { dashboardQueryKeys } from '@/api/query_keys/dashboard';
 import { useMemoizedFn } from '@/hooks';
-import { useQueryClient } from '@tanstack/react-query';
 
 export const useGetDashboardMemoized = () => {
   const queryClient = useQueryClient();

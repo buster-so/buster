@@ -1,5 +1,5 @@
-import { VerificationStatus } from '@/api/asset_interfaces';
 import React from 'react';
+import type { VerificationStatus } from '@/api/asset_interfaces';
 import { Dropdown } from '@/components/ui/dropdown';
 import { useStatusDropdownContent } from './useStatusDropdownContent';
 

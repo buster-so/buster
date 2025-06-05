@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
-import { LabelAndInput } from '../Common';
-import { Select, SelectItem } from '@/components/ui/select';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import { Select, type SelectItem } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { type IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { useMemoizedFn } from '@/hooks';
+import { LabelAndInput } from '../Common';
 
 const options: SelectItem<NonNullable<IBusterMetricChartConfig['pieLabelPosition']>>[] = [
   { label: 'Outside', value: 'outside' },

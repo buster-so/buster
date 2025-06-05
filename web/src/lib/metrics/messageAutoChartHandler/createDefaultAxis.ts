@@ -1,4 +1,4 @@
-import { DEFAULT_CHART_CONFIG, type ColumnMetaData } from '@/api/asset_interfaces/metric';
+import { type ColumnMetaData, DEFAULT_CHART_CONFIG } from '@/api/asset_interfaces/metric';
 import type {
   BarAndLineAxis,
   PieChartAxis,

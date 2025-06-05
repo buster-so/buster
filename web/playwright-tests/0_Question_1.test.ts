@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { askQuestion, checkThatPageWasRedirected } from './question-helpers/ask-question';
 
 test.skip('Question: Who is my top customer?', async ({ page }) => {

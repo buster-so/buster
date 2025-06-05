@@ -1,5 +1,3 @@
-import React from 'react';
-
 type iconProps = {
   fill?: string;
   secondaryfill?: string;

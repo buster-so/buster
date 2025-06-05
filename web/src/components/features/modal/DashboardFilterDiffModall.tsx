@@ -1,13 +1,13 @@
+import { DialogTitle } from '@radix-ui/react-dialog';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/buttons';
 import { Xmark } from '@/components/ui/icons';
 import { AppPageLayout } from '@/components/ui/layouts';
 import { Dialog, DialogContent } from '@/components/ui/modal/ModalBase';
-import { cn } from '@/lib/classMerge';
-import React, { useEffect, useMemo, useState } from 'react';
-import { AppVerticalDiffCodeSplitter } from '../layouts/AppVerticalCodeSplitter/AppVerticalDiffCodeSplitter';
-import { DialogTitle } from '@radix-ui/react-dialog';
-import { useMemoizedFn } from '@/hooks';
 import { Text, Title } from '@/components/ui/typography';
+import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/classMerge';
+import { AppVerticalDiffCodeSplitter } from '../layouts/AppVerticalCodeSplitter/AppVerticalDiffCodeSplitter';
 
 interface DashboardFilterDiffModallProps {
   open: boolean;
@@ -47,7 +47,7 @@ export const DashboardFilterDiffModall: React.FC<DashboardFilterDiffModallProps>
           showClose={false}
           className="h-[80vh] max-h-[80vh] min-h-[75vh] w-full max-w-[1000px] min-w-[1000px] overflow-hidden">
           <div className="flex max-h-full w-full overflow-hidden">
-            <Sidebar
+            <ModalSidebar
               className="w-full max-w-[250px]"
               metrics={metrics}
               selectedMetricId={selectedMetricId}
@@ -64,7 +64,7 @@ export const DashboardFilterDiffModall: React.FC<DashboardFilterDiffModallProps>
 
 DashboardFilterDiffModall.displayName = 'DashboardFilterDiffModall';
 
-const Sidebar: React.FC<{
+const ModalSidebar: React.FC<{
   className?: string;
   metrics: DashboardFilterDiffModallProps['metrics'];
   selectedMetricId: string | null;

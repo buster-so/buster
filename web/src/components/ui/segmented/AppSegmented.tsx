@@ -1,16 +1,16 @@
 'use client';
 
-import * as React from 'react';
 import * as Tabs from '@radix-ui/react-tabs';
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/classMerge';
-import { useEffect, useState, useLayoutEffect, useTransition } from 'react';
 import { cva } from 'class-variance-authority';
-import { useMemoizedFn, useMount, useSize } from '@/hooks';
-import { Tooltip } from '../tooltip/Tooltip';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import * as React from 'react';
+import { useEffect, useLayoutEffect, useState, useTransition } from 'react';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
+import { useMemoizedFn, useMount, useSize } from '@/hooks';
+import { cn } from '@/lib/classMerge';
+import { Tooltip } from '../tooltip/Tooltip';
 
 export interface SegmentedItem<T extends string | number = string> {
   value: T;
@@ -98,7 +98,7 @@ const gliderVariants = cva('absolute border-border rounded border', {
 // Create a type for the forwardRef component that includes displayName
 type AppSegmentedComponent = (<T extends string = string>(
   props: AppSegmentedProps<T> & { ref?: React.ForwardedRef<HTMLDivElement> }
-) => React.ReactElement<any>) & {
+) => React.ReactElement) & {
   displayName?: string;
 };
 
@@ -157,9 +157,7 @@ export const AppSegmented: AppSegmentedComponent = React.memo(
 
     useEffect(() => {
       if (value !== undefined && value !== selectedValue) {
-        startTransition(() => {
-          setSelectedValue(value);
-        });
+        setSelectedValue(value);
       }
     }, [value]);
 
@@ -174,11 +172,15 @@ export const AppSegmented: AppSegmentedComponent = React.memo(
             className={cn(gliderVariants({ type }), heightVariants({ size }))}
             initial={{
               width: gliderStyle.width,
-              x: parseInt(gliderStyle.transform.replace('translateX(', '').replace('px)', ''))
+              x: Number.parseInt(
+                gliderStyle.transform.replace('translateX(', '').replace('px)', '')
+              )
             }}
             animate={{
               width: gliderStyle.width,
-              x: parseInt(gliderStyle.transform.replace('translateX(', '').replace('px)', ''))
+              x: Number.parseInt(
+                gliderStyle.transform.replace('translateX(', '').replace('px)', '')
+              )
             }}
             transition={{
               type: 'spring',

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { SliderWithInputNumber } from './SliderWithInputNumber';
 import { fn } from '@storybook/test';
+import { SliderWithInputNumber } from './SliderWithInputNumber';
 
 const meta: Meta<typeof SliderWithInputNumber> = {
   title: 'UI/Slider/SliderWithInputNumber',

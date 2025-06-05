@@ -1,6 +1,6 @@
-import React from 'react';
-import { PermissionTitleCard } from './PermissionTitleCard';
+import type React from 'react';
 import { PermissionsAppContainer } from './PermissionsAppContainer';
+import { PermissionTitleCard } from './PermissionTitleCard';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (

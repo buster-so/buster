@@ -1,29 +1,38 @@
 'use client';
 
-import React, { useMemo } from 'react';
-import { Sidebar } from '@/components/ui/sidebar/Sidebar';
-import { BusterLogoWithText } from '@/assets/svg/BusterLogoWithText';
-import { BusterRoutes, createBusterRoute } from '@/routes';
-import type { ISidebarGroup, ISidebarList, SidebarProps } from '@/components/ui/sidebar';
-import { Flag, Gear, House4, Table, UnorderedList2, Plus } from '@/components/ui/icons';
-import { PencilSquareIcon } from '@/components/ui/icons/customIcons/Pencil_Square';
-import { ASSET_ICONS } from '../config/assetIcons';
-import { Button } from '@/components/ui/buttons';
-import { Tooltip } from '@/components/ui/tooltip/Tooltip';
 import Link from 'next/link';
-import { useUserConfigContextSelector } from '@/context/Users';
+import React, { useMemo } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
+import { ShareAssetType } from '@/api/asset_interfaces/share';
+import { BusterLogoWithText } from '@/assets/svg/BusterLogoWithText';
+import { Button } from '@/components/ui/buttons';
+import { Flag, Gear, House4, Plus, Table, UnorderedList2 } from '@/components/ui/icons';
+import { PencilSquareIcon } from '@/components/ui/icons/customIcons/Pencil_Square';
+import {
+  COLLAPSED_HIDDEN,
+  COLLAPSED_JUSTIFY_CENTER,
+  COLLAPSED_VISIBLE,
+  type ISidebarGroup,
+  type ISidebarList,
+  type SidebarProps
+} from '@/components/ui/sidebar';
+import { Sidebar } from '@/components/ui/sidebar/Sidebar';
+import { Tooltip } from '@/components/ui/tooltip/Tooltip';
 import {
   useAppLayoutContextSelector,
-  useContactSupportModalStore
+  useContactSupportModalStore,
+  useInviteModalStore
 } from '@/context/BusterAppLayout';
-import { SupportModal } from '../modal/SupportModal';
-import { InvitePeopleModal } from '../modal/InvitePeopleModal';
+import { useUserConfigContextSelector } from '@/context/Users';
 import { useMemoizedFn } from '@/hooks';
+import { BusterRoutes, createBusterRoute } from '@/routes';
+import { ASSET_ICONS } from '../config/assetIcons';
+import { InvitePeopleModal } from '../modal/InvitePeopleModal';
+import { SupportModal } from '../modal/SupportModal';
 import { SidebarUserFooter } from './SidebarUserFooter/SidebarUserFooter';
-import { useHotkeys } from 'react-hotkeys-hook';
-import { useInviteModalStore } from '@/context/BusterAppLayout';
 import { useFavoriteSidebarPanel } from './useFavoritesSidebarPanel';
-import { ShareAssetType } from '@/api/asset_interfaces/share';
+import { cn } from '@/lib/classMerge';
+import { BusterLogo } from '@/assets/svg/BusterLogo';
 
 const topItems = (
   currentParentRoute: BusterRoutes,
@@ -96,7 +105,8 @@ const adminTools = (currentParentRoute: BusterRoutes): ISidebarGroup => ({
       label: 'Logs',
       icon: <UnorderedList2 />,
       route: BusterRoutes.APP_LOGS,
-      id: BusterRoutes.APP_LOGS
+      id: BusterRoutes.APP_LOGS,
+      collapsedTooltip: 'Logs'
     },
     // {
     //   label: 'Terms & Definitions',
@@ -108,7 +118,8 @@ const adminTools = (currentParentRoute: BusterRoutes): ISidebarGroup => ({
       label: 'Datasets',
       icon: <Table />,
       route: BusterRoutes.APP_DATASETS,
-      id: BusterRoutes.APP_DATASETS
+      id: BusterRoutes.APP_DATASETS,
+      collapsedTooltip: 'Datasets'
     }
   ].map((x) => ({
     ...x,
@@ -184,7 +195,16 @@ export const SidebarPrimary = React.memo(() => {
     items.push(tryGroup(onToggleInviteModal, () => onOpenContactSupportModal('feedback'), isAdmin));
 
     return items;
-  }, [isUserRegistered, adminToolsItems, yourStuffItems, favoritesDropdownItems]);
+  }, [
+    isUserRegistered,
+    adminToolsItems,
+    yourStuffItems,
+    favoritesDropdownItems,
+    onToggleInviteModal,
+    onOpenContactSupportModal,
+    isAdmin,
+    topItemsItems
+  ]);
 
   const onCloseSupportModal = useMemoizedFn(() => onOpenContactSupportModal(false));
 
@@ -192,11 +212,17 @@ export const SidebarPrimary = React.memo(() => {
     () => <SidebarPrimaryHeader hideActions={!isUserRegistered} />,
     [isUserRegistered]
   );
+
   const FooterMemoized = useMemo(() => <SidebarUserFooter />, []);
 
   return (
     <>
-      <Sidebar content={sidebarItems} header={HeaderMemoized} footer={FooterMemoized} />
+      <Sidebar
+        content={sidebarItems}
+        header={HeaderMemoized}
+        footer={FooterMemoized}
+        useCollapsible={isUserRegistered}
+      />
 
       <GlobalModals onCloseSupportModal={onCloseSupportModal} />
     </>
@@ -212,10 +238,11 @@ const SidebarPrimaryHeader: React.FC<{ hideActions?: boolean }> = ({ hideActions
   });
 
   return (
-    <div className="flex items-center justify-between">
-      <BusterLogoWithText />
+    <div className={cn(COLLAPSED_JUSTIFY_CENTER, 'flex min-h-7 items-center')}>
+      <BusterLogoWithText className={COLLAPSED_HIDDEN} />
+      <BusterLogo className={COLLAPSED_VISIBLE} />
       {!hideActions && (
-        <div className="flex items-center gap-2">
+        <div className={cn(COLLAPSED_HIDDEN, 'items-center gap-2')}>
           <Tooltip title="Settings">
             <Link href={createBusterRoute({ route: BusterRoutes.SETTINGS_PROFILE })}>
               <Button prefix={<Gear />} variant="ghost" />

@@ -1,11 +1,12 @@
 'use client';
 
 import { useSelectedLayoutSegment } from 'next/navigation';
-import React, { PropsWithChildren, useEffect, useMemo, useState } from 'react';
-import { DatasetApps } from './config';
+import type React from 'react';
+import { type PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
-import { useDebounce, useMemoizedFn } from '@/hooks';
 import { useDeployDataset, useIndividualDataset } from '@/api/buster_rest';
+import { useDebounce, useMemoizedFn } from '@/hooks';
+import type { DatasetApps } from './config';
 
 export const useDatasetPageContext = ({ datasetId }: { datasetId: string }) => {
   const segments = useSelectedLayoutSegment() as DatasetApps;
@@ -37,7 +38,7 @@ export const useDatasetPageContext = ({ datasetId }: { datasetId: string }) => {
   const onPublishDataset = useMemoizedFn(async () => {
     if (disablePublish || !sql || !ymlFile) return;
     onUpdateDataset({
-      dataset_id: datasetId!,
+      dataset_id: datasetId,
       sql: sql,
       yml: ymlFile
     });

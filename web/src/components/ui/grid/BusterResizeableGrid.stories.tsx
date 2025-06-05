@@ -1,13 +1,14 @@
-import React from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { BusterResizeableGrid } from './BusterResizeableGrid';
-import { v4 as uuidv4 } from 'uuid';
-import { MIN_ROW_HEIGHT } from './helpers';
-import { useContext } from 'react';
-import { SortableItemContext } from './_BusterSortableItemDragContainer';
-import { Hand } from '../icons';
-import { cn } from '@/lib/classMerge';
 import { fn } from '@storybook/test';
+import type React from 'react';
+import { useContext, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import { cn } from '@/lib/classMerge';
+import { Hand } from '../icons';
+import { SortableItemContext } from './_BusterSortableItemDragContainer';
+import { BusterResizeableGrid } from './BusterResizeableGrid';
+import { MIN_ROW_HEIGHT } from './helpers';
+import type { BusterResizeableGridRow } from './interfaces';
 
 const meta: Meta<typeof BusterResizeableGrid> = {
   title: 'UI/Grid/BusterResizeableGrid',
@@ -221,4 +222,133 @@ export const EmptyColumnSizes: Story = {
     onRowLayoutChange: fn(),
     readOnly: false
   }
+};
+
+// Story component with reset functionality
+const GridWithReset: React.FC = () => {
+  const originalRows: BusterResizeableGridRow[] = [
+    {
+      id: uuidv4(),
+      items: [
+        {
+          id: uuidv4(),
+          children: <ExampleContent text="Item 1" />
+        },
+        {
+          id: uuidv4(),
+          children: <ExampleContent text="Item 2" />
+        }
+      ],
+      columnSizes: [6, 6],
+      rowHeight: MIN_ROW_HEIGHT
+    },
+    {
+      id: uuidv4(),
+      items: [
+        {
+          id: uuidv4(),
+          children: <ExampleContent text="Item 3" />
+        },
+        {
+          id: uuidv4(),
+          children: <ExampleContent text="Item 4" />
+        },
+        {
+          id: uuidv4(),
+          children: <ExampleContent text="Item 5" />
+        }
+      ],
+      columnSizes: [4, 4, 4],
+      rowHeight: MIN_ROW_HEIGHT
+    },
+    {
+      id: uuidv4(),
+      items: [
+        {
+          id: uuidv4(),
+          children: <ExampleContent text="Item 6" />
+        },
+        {
+          id: uuidv4(),
+          children: <ExampleContent text="Item 7" />
+        }
+      ],
+      columnSizes: [4, 4],
+      rowHeight: MIN_ROW_HEIGHT
+    }
+  ];
+
+  const [rows, setRows] = useState<BusterResizeableGridRow[]>(originalRows);
+
+  const handleReset = () => {
+    const resetRows: BusterResizeableGridRow[] = [
+      {
+        id: uuidv4(),
+        items: [
+          {
+            id: uuidv4(),
+            children: <ExampleContent text="Item 1" />
+          },
+          {
+            id: uuidv4(),
+            children: <ExampleContent text="Item 2" />
+          }
+        ],
+        columnSizes: [6, 6],
+        rowHeight: MIN_ROW_HEIGHT
+      },
+      {
+        id: uuidv4(),
+        items: [
+          {
+            id: uuidv4(),
+            children: <ExampleContent text="Item 3" />
+          },
+          {
+            id: uuidv4(),
+            children: <ExampleContent text="Item 4" />
+          },
+          {
+            id: uuidv4(),
+            children: <ExampleContent text="Item 5" />
+          }
+        ],
+        columnSizes: [4, 4, 4],
+        rowHeight: MIN_ROW_HEIGHT
+      },
+      {
+        id: uuidv4(),
+        items: [
+          {
+            id: uuidv4(),
+            children: <ExampleContent text="Item 6" />
+          },
+          {
+            id: uuidv4(),
+            children: <ExampleContent text="Item 7" />
+          }
+        ],
+        columnSizes: [4, 4],
+        rowHeight: MIN_ROW_HEIGHT
+      }
+    ];
+    setRows(resetRows);
+  };
+
+  return (
+    <div className="h-full w-full">
+      <div className="mb-4 flex justify-end">
+        <button
+          onClick={handleReset}
+          className="bg-primary hover:bg-primary/90 focus:ring-primary rounded-md px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-offset-2 focus:outline-none">
+          Reset Grid
+        </button>
+      </div>
+      <BusterResizeableGrid rows={rows} onRowLayoutChange={setRows} readOnly={false} />
+    </div>
+  );
+};
+
+export const WithReset: Story = {
+  render: () => <GridWithReset />
 };

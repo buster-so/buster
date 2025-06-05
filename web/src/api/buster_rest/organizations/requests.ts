@@ -1,7 +1,7 @@
 import type { BusterOrganization } from '@/api/asset_interfaces/organizations';
+import type { OrganizationUser } from '@/api/asset_interfaces/users';
 import { serverFetch } from '../../createServerInstance';
 import { mainApi } from '../instances';
-import type { OrganizationUser } from '@/api/asset_interfaces/users';
 
 export const getOrganizationUsers = async ({
   organizationId

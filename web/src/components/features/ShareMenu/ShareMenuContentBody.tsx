@@ -1,28 +1,28 @@
-import React from 'react';
 import { validate } from 'email-validator';
-import { useMemoizedFn } from '@/hooks';
-import { BusterShare, ShareRole, ShareAssetType } from '@/api/asset_interfaces';
-import { Input } from '@/components/ui/inputs';
-import { Button } from '@/components/ui/buttons';
-import { AccessDropdown } from './AccessDropdown';
-import { IndividualSharePerson } from './IndividualSharePerson';
-import { ShareMenuContentEmbed } from './ShareMenuContentEmbed';
-import { ShareMenuContentPublish } from './ShareMenuContentPublish';
-import { ShareMenuTopBarOptions } from './ShareMenuTopBar';
-import { inputHasText } from '@/lib/text';
-import { cn } from '@/lib/classMerge';
+import React from 'react';
+import { type BusterShare, ShareAssetType, ShareRole } from '@/api/asset_interfaces';
 import {
   useShareCollection,
   useUnshareCollection,
   useUpdateCollectionShare
 } from '@/api/buster_rest/collections';
-import { useShareMetric, useUnshareMetric, useUpdateMetricShare } from '@/api/buster_rest/metrics';
 import {
   useShareDashboard,
   useUnshareDashboard,
   useUpdateDashboardShare
 } from '@/api/buster_rest/dashboards';
+import { useShareMetric, useUnshareMetric, useUpdateMetricShare } from '@/api/buster_rest/metrics';
+import { Button } from '@/components/ui/buttons';
+import { Input } from '@/components/ui/inputs';
 import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/classMerge';
+import { inputHasText } from '@/lib/text';
+import { AccessDropdown } from './AccessDropdown';
+import { IndividualSharePerson } from './IndividualSharePerson';
+import { ShareMenuContentEmbed } from './ShareMenuContentEmbed';
+import { ShareMenuContentPublish } from './ShareMenuContentPublish';
+import type { ShareMenuTopBarOptions } from './ShareMenuTopBar';
 
 export const ShareMenuContentBody: React.FC<{
   selectedOptions: ShareMenuTopBarOptions;

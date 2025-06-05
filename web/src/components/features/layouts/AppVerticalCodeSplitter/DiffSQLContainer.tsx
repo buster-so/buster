@@ -1,14 +1,14 @@
 'use client';
 
+import React, { useMemo, useState } from 'react';
+import { Button } from '@/components/ui/buttons/Button';
+import { FileCard } from '@/components/ui/card/FileCard';
+import { Copy2 } from '@/components/ui/icons';
+import { AppDiffCodeEditor } from '@/components/ui/inputs/AppDiffCodeEditor';
+import { TextAndVersionPill } from '@/components/ui/typography/TextAndVersionPill';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks';
-import { Button } from '@/components/ui/buttons/Button';
-import React, { useMemo, useState } from 'react';
 import type { AppVerticalCodeSplitterProps } from './AppVerticalCodeSplitter';
-import { AppDiffCodeEditor } from '@/components/ui/inputs/AppDiffCodeEditor';
-import { Copy2 } from '@/components/ui/icons';
-import { FileCard } from '@/components/ui/card/FileCard';
-import { TextAndVersionPill } from '@/components/ui/typography/TextAndVersionPill';
 
 export const DiffSQLContainer: React.FC<{
   className?: string;
@@ -53,15 +53,11 @@ export const DiffSQLContainer: React.FC<{
     return (
       <FileCard
         headerButtons={useMemo(
-          () => (
-            <Button prefix={<Copy2 />} variant="ghost" onClick={onCopySQL} />
-          ),
+          () => <Button prefix={<Copy2 />} variant="ghost" onClick={onCopySQL} />,
           [onCopySQL]
         )}
         fileName={useMemo(
-          () => (
-            <TextAndVersionPill fileName={fileName || ''} versionNumber={versionNumber || 0} />
-          ),
+          () => <TextAndVersionPill fileName={fileName || ''} versionNumber={versionNumber || 0} />,
           [fileName, versionNumber]
         )}>
         <AppDiffCodeEditor

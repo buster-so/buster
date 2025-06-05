@@ -1,15 +1,15 @@
 'use client';
 
-import React, { useRef } from 'react';
+import { type QueryClient, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { BusterRoutes, createBusterRoute } from '@/routes';
-import { BusterAppRoutes } from '@/routes/busterRoutes/busterAppRoutes';
+import React, { useRef } from 'react';
+import { prefetchGetCollectionsList } from '@/api/buster_rest/collections';
+import { prefetchGetDashboardsList } from '@/api/buster_rest/dashboards';
+import { prefetchGetMetricsList } from '@/api/buster_rest/metrics';
 import { useAsyncEffect } from '@/hooks';
 import { timeout } from '@/lib';
-import { prefetchGetMetricsList } from '@/api/buster_rest/metrics';
-import { QueryClient, useQueryClient } from '@tanstack/react-query';
-import { prefetchGetDashboardsList } from '@/api/buster_rest/dashboards';
-import { prefetchGetCollectionsList } from '@/api/buster_rest/collections';
+import { BusterRoutes, createBusterRoute } from '@/routes';
+import type { BusterAppRoutes } from '@/routes/busterRoutes/busterAppRoutes';
 
 const HIGH_PRIORITY_ROUTES = [
   BusterRoutes.APP_HOME,
@@ -35,7 +35,7 @@ const LOW_PRIORITY_PREFETCH: ((queryClient: QueryClient) => Promise<QueryClient>
   (queryClient) => prefetchGetCollectionsList(queryClient)
 ];
 
-export const RoutePrefetcher: React.FC<{}> = React.memo(() => {
+export const RoutePrefetcher: React.FC = React.memo(() => {
   const router = useRouter();
   const queryClient = useQueryClient();
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -51,14 +51,14 @@ export const RoutePrefetcher: React.FC<{}> = React.memo(() => {
       if (priority === 'high' && isPreFetchedHighPriorityRef.current) return;
       if (priority === 'low' && isPreFetchedLowPriorityRef.current) return;
 
-      routes.forEach((route) => {
+      for (const route of routes) {
         const path = createBusterRoute({ route: route as BusterAppRoutes.APP_COLLECTIONS });
         router.prefetch(path);
-      });
+      }
 
-      prefetchFns.forEach((prefetchFn) => {
+      for (const prefetchFn of prefetchFns) {
         prefetchFn(queryClient);
-      });
+      }
 
       if (priority === 'high') {
         isPreFetchedHighPriorityRef.current = true;

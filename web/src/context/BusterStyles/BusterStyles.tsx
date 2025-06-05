@@ -1,5 +1,6 @@
-import React, { PropsWithChildren } from 'react';
 import { ThemeProvider as NextThemeProvider } from 'next-themes';
+import type React from 'react';
+import type { PropsWithChildren } from 'react';
 import { BusterNotificationsProvider } from '../BusterNotifications/BusterNotifications';
 
 const ENABLE_DARK_MODE = false;
