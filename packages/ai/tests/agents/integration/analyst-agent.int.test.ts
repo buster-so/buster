@@ -23,21 +23,23 @@ describe('Analyst Agent Integration Tests', () => {
       async (input: string) => {
         // Step 1: Generate response with analyst agent
         try {
-          const threadId = crypto.randomUUID();
+          const threadId = 'da05b6fb-01b2-4c1c-bc7f-7e55029a5c75';
+          const resourceId = 'c2dd64cd-f7f3-4884-bc91-d46ae431901e';
 
           // Create runtime context with required properties
           const runtimeContext = new RuntimeContext<AnalystRuntimeContext>([
-            ['userId', 'c2dd64cd-f7f3-4884-bc91-d46ae431901e'],
+            ['userId', resourceId],
             ['threadId', threadId],
             ['dataSourceId', 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a'],
             ['dataSourceSyntax', 'postgresql'],
             ['organizationId', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce'],
           ]);
 
+
           const response = await analystAgent.generate(input, {
             maxSteps: 15,
             threadId,
-            resourceId: 'c2dd64cd-f7f3-4884-bc91-d46ae431901e', // Valid UUID format for test user
+            resourceId,
             runtimeContext,
           });
 
@@ -52,7 +54,7 @@ describe('Analyst Agent Integration Tests', () => {
 
     // Execute the workflow
     const response = await tracedAgentWorkflow(
-      'For the merchant Nani Swimwear, we need to see the the last 6 months return rate by revenue, item, and order. Please make sure the sales channel is only online store.'
+      'please continue with the analysis'
     );
 
     // Verify response structure

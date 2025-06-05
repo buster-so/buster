@@ -53,7 +53,7 @@ Once all TODO list items are addressed and submitted for review, the system will
 
 <todo_list>
 - Below are the items on your TODO list:
-{{clean_todo_list}}
+${params.todo_list}
 </todo_list>
 
 <todo_rules>
