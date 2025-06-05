@@ -31,17 +31,25 @@ const generateChatTitleExecution = async ({
   inputData: z.infer<typeof inputSchema>;
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof generateChatTitleOutputSchema>> => {
-  const threadId = runtimeContext.get('threadId');
-  const resourceId = runtimeContext.get('userId');
+  try {
+    const threadId = runtimeContext.get('threadId');
+    const resourceId = runtimeContext.get('userId');
 
-  const response = await todosAgent.generate(inputData.prompt, {
-    maxSteps: 0,
-    threadId: threadId,
-    resourceId: resourceId,
-    output: generateChatTitleOutputSchema,
-  });
+    const response = await todosAgent.generate(inputData.prompt, {
+      maxSteps: 0,
+      threadId: threadId,
+      resourceId: resourceId,
+      output: generateChatTitleOutputSchema,
+    });
 
-  return response.object;
+    return response.object;
+  } catch (error) {
+    console.error('Failed to generate chat title:', error);
+    // Return a fallback title instead of crashing
+    return {
+      title: 'New Analysis',
+    };
+  }
 };
 
 export const generateChatTitleStep = createStep({

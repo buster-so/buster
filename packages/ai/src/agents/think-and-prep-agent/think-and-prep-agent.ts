@@ -29,7 +29,7 @@ export const thinkAndPrepAgent = new Agent({
       connectionString:
         process.env.DATABASE_URL ||
         (() => {
-          throw new Error('DATABASE_URL environment variable is required');
+          throw new Error('Unable to connect to the database. Please check your configuration.');
         })(),
       schemaName: 'mastra',
     }),

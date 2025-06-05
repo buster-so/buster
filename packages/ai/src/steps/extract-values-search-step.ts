@@ -76,17 +76,25 @@ const extractValuesSearchStepExecution = async ({
   inputData: z.infer<typeof inputSchema>;
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof extractValuesSearchOutputSchema>> => {
-  const threadId = runtimeContext.get('threadId');
-  const resourceId = runtimeContext.get('userId');
+  try {
+    const threadId = runtimeContext.get('threadId');
+    const resourceId = runtimeContext.get('userId');
 
-  const response = await valuesAgent.generate(inputData.prompt, {
-    maxSteps: 0,
-    output: extractValuesSearchOutputSchema,
-    threadId: threadId,
-    resourceId: resourceId,
-  });
+    const response = await valuesAgent.generate(inputData.prompt, {
+      maxSteps: 0,
+      output: extractValuesSearchOutputSchema,
+      threadId: threadId,
+      resourceId: resourceId,
+    });
 
-  return response.object;
+    return response.object;
+  } catch (error) {
+    console.error('Failed to extract values:', error);
+    // Return empty values array instead of crashing
+    return {
+      values: [],
+    };
+  }
 };
 
 export const extractValuesSearchStep = createStep({

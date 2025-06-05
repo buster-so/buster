@@ -128,27 +128,39 @@ const todoStepExecution = async ({
   inputData: z.infer<typeof inputSchema>;
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof createTodosOutputSchema>> => {
-  const threadId = runtimeContext.get('threadId');
-  const resourceId = runtimeContext.get('userId');
+  try {
+    const threadId = runtimeContext.get('threadId');
+    const resourceId = runtimeContext.get('userId');
 
-  const tracedTodos = wrapTraced(
-    async () => {
-      const response = await todosAgent.generate(inputData.prompt, {
-        threadId: threadId,
-        resourceId: resourceId,
-        output: createTodosOutputSchema,
-      });
+    const tracedTodos = wrapTraced(
+      async () => {
+        const response = await todosAgent.generate(inputData.prompt, {
+          threadId: threadId,
+          resourceId: resourceId,
+          output: createTodosOutputSchema,
+        });
 
-      return response.object;
-    },
-    {
-      name: 'Create Todos',
+        return response.object;
+      },
+      {
+        name: 'Create Todos',
+      }
+    );
+
+    const todos = await tracedTodos();
+
+    return todos;
+  } catch (error) {
+    console.error('Failed to create todos:', error);
+    
+    // Check if it's a database connection error
+    if (error instanceof Error && error.message.includes('DATABASE_URL')) {
+      throw new Error('Unable to connect to the analysis service. Please try again later.');
     }
-  );
-
-  const todos = await tracedTodos();
-
-  return todos;
+    
+    // For other errors, throw a user-friendly message
+    throw new Error('Unable to create the analysis plan. Please try again or rephrase your request.');
+  }
 };
 
 export const createTodosStep = createStep({

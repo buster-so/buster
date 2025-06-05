@@ -34,51 +34,72 @@ const thinkAndPrepExecution = async ({
 }): Promise<z.infer<typeof outputSchema>> => {
   const abortController = new AbortController();
 
-  const threadId = runtimeContext.get('threadId');
-  const resourceId = runtimeContext.get('userId');
+  try {
+    const threadId = runtimeContext.get('threadId');
+    const resourceId = runtimeContext.get('userId');
 
-  const initData = await getInitData();
-
-  const prompt = initData.prompt;
-
-  const todos = inputData['create-todos'].todos;
-
-  runtimeContext.set('todos', todos);
-
-  const wrappedStream = wrapTraced(
-    async () => {
-      const stream = await thinkAndPrepAgent.stream(prompt, {
-        threadId: threadId,
-        resourceId: resourceId,
-        runtimeContext,
-        abortSignal: abortController.signal,
-        toolChoice: 'required',
-      });
-
-      return stream;
-    },
-    {
-      name: 'Think and Prep',
+    if (!threadId || !resourceId) {
+      console.error('Missing required context values');
+      return { finished: true }; // Skip to avoid crash
     }
-  );
 
-  const stream = await wrappedStream();
+    const initData = await getInitData();
+    const prompt = initData.prompt;
+    const todos = inputData['create-todos'].todos;
 
-  for await (const chunk of stream.fullStream) {
-    if (chunk.type === 'tool-result') {
-      if (['finishAndRespondTool'].includes(chunk.toolName)) {
-        abortController.abort();
-        return { finished: true };
+    runtimeContext.set('todos', todos);
+
+    const wrappedStream = wrapTraced(
+      async () => {
+        const stream = await thinkAndPrepAgent.stream(prompt, {
+          threadId: threadId,
+          resourceId: resourceId,
+          runtimeContext,
+          abortSignal: abortController.signal,
+          toolChoice: 'required',
+        });
+
+        return stream;
+      },
+      {
+        name: 'Think and Prep',
       }
+    );
 
-      if (['submitThoughtsTool'].includes(chunk.toolName)) {
-        abortController.abort();
-        return { finished: false };
+    const stream = await wrappedStream();
+
+    for await (const chunk of stream.fullStream) {
+      if (chunk.type === 'tool-result') {
+        if (['finishAndRespondTool'].includes(chunk.toolName)) {
+          abortController.abort();
+          return { finished: true };
+        }
+
+        if (['submitThoughtsTool'].includes(chunk.toolName)) {
+          abortController.abort();
+          return { finished: false };
+        }
       }
     }
+
+    return { finished: false };
+  } catch (error) {
+    // Handle abort errors gracefully
+    if (error instanceof Error && error.name === 'AbortError') {
+      // This is expected when we abort the stream
+      return { finished: false };
+    }
+
+    console.error('Error in think and prep step:', error);
+    
+    // Check if it's a database connection error
+    if (error instanceof Error && error.message.includes('DATABASE_URL')) {
+      throw new Error('Unable to connect to the analysis service. Please try again later.');
+    }
+
+    // For other errors, continue to analyst step
+    return { finished: false };
   }
-
-  return { finished: false };
 };
 
 export const thinkAndPrepStep = createStep({

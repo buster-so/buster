@@ -24,38 +24,66 @@ const analystExecution = async ({
 }): Promise<z.infer<typeof outputSchema>> => {
   const abortController = new AbortController();
 
-  const userId = runtimeContext.get('userId');
-  const sessionId = runtimeContext.get('threadId');
+  try {
+    const userId = runtimeContext.get('userId');
+    const sessionId = runtimeContext.get('threadId');
 
-  const initData = await getInitData();
-  const prompt = initData.prompt;
-
-  const wrappedStream = wrapTraced(
-    async () => {
-      const stream = await analystAgent.stream(prompt, {
-        threadId: sessionId,
-        resourceId: userId,
-        runtimeContext,
-        toolChoice: 'required',
-        abortSignal: abortController.signal,
-      });
-
-      return stream;
-    },
-    {
-      name: 'Analyst',
+    if (!userId || !sessionId) {
+      throw new Error('Unable to access your session. Please refresh and try again.');
     }
-  );
 
-  const stream = await wrappedStream();
-  for await (const chunk of stream.fullStream) {
-    if (chunk.type === 'tool-result' && chunk.toolName === 'doneTool') {
-      abortController.abort();
+    const initData = await getInitData();
+    const prompt = initData.prompt;
+
+    const wrappedStream = wrapTraced(
+      async () => {
+        const stream = await analystAgent.stream(prompt, {
+          threadId: sessionId,
+          resourceId: userId,
+          runtimeContext,
+          toolChoice: 'required',
+          abortSignal: abortController.signal,
+        });
+
+        return stream;
+      },
+      {
+        name: 'Analyst',
+      }
+    );
+
+    const stream = await wrappedStream();
+    
+    for await (const chunk of stream.fullStream) {
+      if (chunk.type === 'tool-result' && chunk.toolName === 'doneTool') {
+        abortController.abort();
+        return {};
+      }
+    }
+
+    return {};
+  } catch (error) {
+    // Handle abort errors gracefully
+    if (error instanceof Error && error.name === 'AbortError') {
+      // This is expected when we abort the stream
       return {};
     }
-  }
 
-  return {};
+    console.error('Error in analyst step:', error);
+
+    // Check if it's a database connection error
+    if (error instanceof Error && error.message.includes('DATABASE_URL')) {
+      throw new Error('Unable to connect to the analysis service. Please try again later.');
+    }
+
+    // Check if it's an API/model error
+    if (error instanceof Error && (error.message.includes('API') || error.message.includes('model'))) {
+      throw new Error('The analysis service is temporarily unavailable. Please try again in a few moments.');
+    }
+
+    // For unexpected errors, provide a generic friendly message
+    throw new Error('Something went wrong during the analysis. Please try again or contact support if the issue persists.');
+  }
 };
 
 export const analystStep = createStep({

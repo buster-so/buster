@@ -961,13 +961,13 @@ const createMetricFiles = wrapTraced(
     const organizationId = runtimeContext?.get('organizationId') as string;
 
     if (!dataSourceId) {
-      throw new Error('Data source ID not found in runtime context');
+      throw new Error('Unable to identify the data source. Please refresh and try again.');
     }
     if (!userId) {
-      throw new Error('User ID not found in runtime context');
+      throw new Error('Unable to verify your identity. Please log in again.');
     }
     if (!organizationId) {
-      throw new Error('Organization ID not found in runtime context');
+      throw new Error('Unable to access your organization. Please check your permissions.');
     }
 
     // Process files concurrently
@@ -1108,7 +1108,7 @@ async function processMetricFile(
     if (!sqlValidationResult.success) {
       return {
         success: false,
-        error: `Invalid SQL query: ${sqlValidationResult.error}`,
+        error: `The SQL query has an issue: ${sqlValidationResult.error}. Please check your query syntax.`,
       };
     }
 
@@ -1148,10 +1148,10 @@ async function processMetricFile(
     let errorMessage = 'Unknown error';
 
     if (error instanceof z.ZodError) {
-      errorMessage = `Invalid YAML structure: ${error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ')}`;
+      errorMessage = 'The metric configuration is invalid. Please check that all required fields are provided and properly formatted.';
     } else if (error instanceof Error) {
       if (error.message.includes('YAMLParseError')) {
-        errorMessage = `Invalid YAML format: ${error.message}`;
+        errorMessage = 'The YAML format is incorrect. Please check the syntax and indentation.';
       } else {
         errorMessage = error.message;
       }

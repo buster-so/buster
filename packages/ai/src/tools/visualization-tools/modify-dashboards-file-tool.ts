@@ -1,3 +1,4 @@
+import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
 import { eq, inArray } from 'drizzle-orm';
@@ -5,6 +6,7 @@ import * as yaml from 'yaml';
 import { z } from 'zod';
 import { db } from '../../../../database/src/connection';
 import { dashboardFiles, metricFiles } from '../../../../database/src/schema';
+import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
 
 // Core interfaces matching Rust structs
 interface FileUpdate {
@@ -47,10 +49,6 @@ interface ModifyFilesOutput {
   duration: number;
   files: FileWithId[];
   failed_files: FailedFileModification[];
-}
-
-interface RuntimeContext {
-  get(key: string): string | undefined;
 }
 
 // Dashboard YAML schema validation with full rules
@@ -248,13 +246,14 @@ async function processDashboardFileUpdate(
 // Main modify dashboard files function
 const modifyDashboardFiles = wrapTraced(
   async (
-    params: UpdateFilesParams & { runtimeContext?: RuntimeContext }
+    params: UpdateFilesParams,
+    runtimeContext: RuntimeContext<AnalystRuntimeContext>
   ): Promise<ModifyFilesOutput> => {
     const startTime = Date.now();
 
     // Get runtime context values (for logging/tracking)
-    const userId = params.runtimeContext?.get('userId');
-    const organizationId = params.runtimeContext?.get('organizationId');
+    const userId = runtimeContext.get('userId');
+    const organizationId = runtimeContext.get('organizationId');
 
     if (!userId) {
       throw new Error('User ID not found in runtime context');
@@ -449,10 +448,8 @@ export const modifyDashboardsFileTool = createTool({
     'Updates existing dashboard configuration files with new YAML content. Provide the complete YAML content for each dashboard, replacing the entire existing file. This tool is ideal for bulk modifications when you need to update multiple dashboards simultaneously. The system will preserve version history and perform all necessary validations on the new content. For each dashboard, you need its UUID and the complete updated YAML content.',
   inputSchema,
   outputSchema,
-  execute: async ({ context }) => {
-    return await modifyDashboardFiles(
-      context as UpdateFilesParams & { runtimeContext?: RuntimeContext }
-    );
+  execute: async ({ context, runtimeContext }) => {
+    return await modifyDashboardFiles(context as UpdateFilesParams, runtimeContext);
   },
 });
 

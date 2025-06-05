@@ -46,13 +46,13 @@ const executeSqlStatement = wrapTraced(
     const organizationId = runtimeContext.get('organizationId') as string;
 
     if (!dataSourceId) {
-      throw new Error('Data source ID not found in runtime context');
+      throw new Error('Unable to identify the data source. Please refresh and try again.');
     }
     if (!userId) {
-      throw new Error('User ID not found in runtime context');
+      throw new Error('Unable to verify your identity. Please log in again.');
     }
     if (!organizationId) {
-      throw new Error('Organization ID not found in runtime context');
+      throw new Error('Unable to access your organization. Please check your permissions.');
     }
 
     // Get data source credentials from vault
@@ -69,13 +69,13 @@ const executeSqlStatement = wrapTraced(
         ],
         defaultDataSource: `datasource-${dataSourceId}`,
       });
-    } catch (error) {
+    } catch (_error) {
       // If we can't get credentials, return error for all statements
       return {
         results: statements.map((sql) => ({
           status: 'error' as const,
           sql,
-          error_message: `Failed to initialize data source: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          error_message: `Unable to connect to your data source. Please check that it's properly configured and accessible.`,
         })),
       };
     }
@@ -132,20 +132,25 @@ async function getDataSourceCredentials(dataSourceId: string): Promise<Credentia
     );
 
     if (!secretResult || secretResult.length === 0) {
-      throw new Error(`No credentials found for data source: ${dataSourceId}`);
+      throw new Error(
+        'Unable to access your data source credentials. Please ensure the data source is properly configured.'
+      );
     }
 
     const secretString = secretResult[0]?.decrypted_secret as string;
     if (!secretString) {
-      throw new Error(`Invalid credentials data for data source: ${dataSourceId}`);
+      throw new Error(
+        'The data source credentials appear to be invalid. Please reconfigure your data source.'
+      );
     }
 
     // Parse the credentials JSON
     const credentials = JSON.parse(secretString) as Credentials;
     return credentials;
   } catch (error) {
+    console.error('Error getting data source credentials:', error);
     throw new Error(
-      `Failed to fetch data source credentials: ${error instanceof Error ? error.message : 'Unknown error'}`
+      'Unable to retrieve data source credentials. Please contact support if this issue persists.'
     );
   }
 }
