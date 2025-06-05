@@ -5,6 +5,12 @@ import { type Credentials, DataSourceType, type SnowflakeCredentials } from '../
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
 
+// Configure Snowflake SDK to disable logging
+snowflake.configure({
+  logLevel: 'OFF',
+  additionalLogToConsole: false,
+});
+
 /**
  * Snowflake database adapter
  */
