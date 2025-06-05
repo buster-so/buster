@@ -1,8 +1,10 @@
 import type { Context } from 'hono';
 import type { ErrorResponse } from '../types/errors.types';
 
-export const errorResponse = (c: Context, message: string, status: 400 | 500 | 422 = 400) => {
-  return c.json({ message } satisfies ErrorResponse, status);
+export const errorResponse = (c: Context, message: string | Error | unknown, status: 400 | 500 | 422 | 403 = 400) => {
+  const errorMessage =
+    typeof message === 'string' ? message : message instanceof Error ? message.message : 'Internal server error';
+  return c.json({ message: errorMessage } satisfies ErrorResponse, status);
 };
 
 export const notFoundResponse = (c: Context, resource = 'Resource') => {

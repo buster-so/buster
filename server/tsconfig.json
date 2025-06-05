@@ -2,6 +2,11 @@
   "compilerOptions": {
     "strict": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
+    "jsxImportSource": "hono/jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@/access-controls/*": ["../packages/access-controls/src/*"]
+    }
   }
 }

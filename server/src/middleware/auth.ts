@@ -5,12 +5,14 @@ import { createSupabaseClient } from './supabase';
 const supabase = createSupabaseClient();
 
 export const requireAuth = bearerAuth({
-  verifyToken: async (token) => {
-    const { data, error } = await supabase.auth.getUser(token);
+  verifyToken: async (token, c) => {
+    const { data, error } = await supabase.auth.getUser(token); //usually takes about 3 - 7ms
 
     if (error || !data.user) {
       return false;
     }
+
+    c.set('supabaseUser', data.user);
 
     return !!data.user.is_anonymous === false;
   }
