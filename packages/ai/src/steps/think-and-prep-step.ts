@@ -21,6 +21,7 @@ export const thinkAndPrepOutputSchema = z.object({});
 
 const outputSchema = z.object({
   finished: z.boolean(),
+  outputMessages: z.array(z.any()),
 });
 
 const thinkAndPrepExecution = async ({
@@ -34,13 +35,16 @@ const thinkAndPrepExecution = async ({
 }): Promise<z.infer<typeof outputSchema>> => {
   const abortController = new AbortController();
 
+  let outputMessages = [];
+  let finished = false;
+
   try {
     const threadId = runtimeContext.get('threadId');
     const resourceId = runtimeContext.get('userId');
 
     if (!threadId || !resourceId) {
       console.error('Missing required context values');
-      return { finished: true }; // Skip to avoid crash
+      throw new Error('Missing required context values');
     }
 
     const initData = await getInitData();
@@ -57,6 +61,24 @@ const thinkAndPrepExecution = async ({
           runtimeContext,
           abortSignal: abortController.signal,
           toolChoice: 'required',
+          onStepFinish: async (step) => {
+            const toolNames = step.toolCalls.map((call) => call.toolName);
+
+            if (
+              toolNames.some((toolName) =>
+                ['submitThoughtsTool', 'finishAndRespondTool'].includes(toolName)
+              )
+            ) {
+              outputMessages = step.response.messages;
+
+              // Set finished to true if finishAndRespondTool was called
+              if (toolNames.includes('finishAndRespondTool')) {
+                finished = true;
+              }
+
+              abortController.abort();
+            }
+          },
         });
 
         return stream;
@@ -68,38 +90,17 @@ const thinkAndPrepExecution = async ({
 
     const stream = await wrappedStream();
 
-    for await (const chunk of stream.fullStream) {
-      if (chunk.type === 'tool-result') {
-        if (['finishAndRespondTool'].includes(chunk.toolName)) {
-          abortController.abort();
-          return { finished: true };
-        }
-
-        if (['submitThoughtsTool'].includes(chunk.toolName)) {
-          abortController.abort();
-          return { finished: false };
-        }
-      }
+    for await (const _ of stream.fullStream) {
     }
 
-    return { finished: false };
+    return { finished, outputMessages };
   } catch (error) {
-    // Handle abort errors gracefully
-    if (error instanceof Error && error.name === 'AbortError') {
-      // This is expected when we abort the stream
-      return { finished: false };
-    }
-
-    console.error('Error in think and prep step:', error);
-    
-    // Check if it's a database connection error
-    if (error instanceof Error && error.message.includes('DATABASE_URL')) {
+    if (error instanceof Error && error.name !== 'AbortError') {
       throw new Error('Unable to connect to the analysis service. Please try again later.');
     }
-
-    // For other errors, continue to analyst step
-    return { finished: false };
   }
+
+  return { finished, outputMessages };
 };
 
 export const thinkAndPrepStep = createStep({

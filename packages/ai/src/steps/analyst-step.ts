@@ -10,11 +10,13 @@ import type {
 
 const inputSchema = z.object({
   finished: z.boolean(),
+  outputMessages: z.array(z.any()),
 });
 
 const outputSchema = z.object({});
 
 const analystExecution = async ({
+  inputData,
   getInitData,
   runtimeContext,
 }: {
@@ -32,12 +34,9 @@ const analystExecution = async ({
       throw new Error('Unable to access your session. Please refresh and try again.');
     }
 
-    const initData = await getInitData();
-    const prompt = initData.prompt;
-
     const wrappedStream = wrapTraced(
       async () => {
-        const stream = await analystAgent.stream(prompt, {
+        const stream = await analystAgent.stream(inputData.outputMessages, {
           threadId,
           resourceId,
           runtimeContext,

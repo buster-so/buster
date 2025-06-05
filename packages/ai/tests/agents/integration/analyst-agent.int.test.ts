@@ -35,13 +35,15 @@ describe('Analyst Agent Integration Tests', () => {
             ['organizationId', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce'],
           ]);
 
-
-          const response = await analystAgent.generate(input, {
+          const response = await analystAgent.stream(input, {
             maxSteps: 15,
             threadId,
             resourceId,
             runtimeContext,
           });
+
+          for await (const chunk of response.fullStream) {
+          }
 
           return response;
         } catch (error) {
@@ -53,9 +55,7 @@ describe('Analyst Agent Integration Tests', () => {
     );
 
     // Execute the workflow
-    const response = await tracedAgentWorkflow(
-      'please continue with the analysis'
-    );
+    const response = await tracedAgentWorkflow('please continue with the analysis');
 
     // Verify response structure
     expect(response).toBeDefined();

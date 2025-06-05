@@ -1,3 +1,4 @@
+import { db } from '@buster/database/src/connection';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
@@ -5,7 +6,6 @@ import { sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { DataSource } from '../../../../data-source/src/data-source';
 import type { Credentials } from '../../../../data-source/src/types/credentials';
-import { db } from '../../../../database/src/connection';
 import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
 
 const executeSqlStatementInputSchema = z.object({
@@ -121,7 +121,7 @@ const executeSqlStatement = wrapTraced(
       await dataSource.close();
     }
   },
-  { name: 'execute-sql-statement' }
+  { name: 'find-required-text-values' }
 );
 
 async function getDataSourceCredentials(dataSourceId: string): Promise<Credentials> {
@@ -192,8 +192,8 @@ async function executeSingleStatement(
 }
 
 // Export the tool
-export const executeSqlStatementTool = createTool({
-  id: 'execute-sql-statement',
+export const findRequiredTextValues = createTool({
+  id: 'find-required-text-values',
   description:
     'Use this to run lightweight, validation queries to understand values in columns, date ranges, etc. Will only ever return 25 results max.',
   inputSchema: executeSqlStatementInputSchema,
@@ -209,4 +209,4 @@ export const executeSqlStatementTool = createTool({
   },
 });
 
-export default executeSqlStatementTool;
+export default findRequiredTextValues;
