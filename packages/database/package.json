@@ -17,15 +17,10 @@
     "db:studio": "drizzle-kit studio",
     "db:check": "drizzle-kit check",
     "db:setup": "bun run src/setup.ts setup",
-    "db:setup:force": "bun run src/setup.ts force",
-    "db:setup:status": "bun run src/setup.ts status",
-    "db:baseline": "bun run src/baseline.ts setup",
-    "db:baseline-validate": "bun run src/baseline.ts validate",
-    "seed": "bun run src/seed/cli.ts",
-    "seed:generate": "bun run src/seed/generate.ts --template generate_seed",
-    "seed:run": "bun run src/seed/cli.ts run",
-    "seed:snapshot": "bun run src/seed/cli.ts snapshot",
-    "seed:list": "bun run src/seed/cli.ts list"
+    "seed:list": "bun run src/seed/cli.ts list",
+    "setup:data": "bun run src/setup.ts setup-data",
+    "setup:seed": "bun run src/setup.ts seed",
+    "setup:full": "bun run src/setup.ts run"
   },
   "dependencies": {
     "drizzle-orm": "^0.36.4",
