@@ -27,7 +27,6 @@ interface FileWithId {
   id: string;
   name: string;
   file_type: string;
-  yml_content: string;
   result_message?: string;
   results?: Record<string, any>[];
   created_at: string;
@@ -925,7 +924,6 @@ definitions:
         id: z.string(),
         name: z.string(),
         file_type: z.string(),
-        yml_content: z.string(),
         result_message: z.string().optional(),
         results: z.array(z.record(z.any())).optional(),
         created_at: z.string(),
@@ -1049,7 +1047,6 @@ const createMetricFiles = wrapTraced(
             id: sp.metricFile.id,
             name: sp.metricFile.name,
             file_type: 'metric',
-            yml_content: yaml.stringify(sp.metricYml),
             result_message: sp.message,
             results: sp.results,
             created_at: sp.metricFile.createdAt,

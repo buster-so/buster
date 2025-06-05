@@ -32,7 +32,6 @@ interface FileWithId {
   id: string;
   name: string;
   file_type: string;
-  yml_content: string;
   result_message?: string;
   results?: Record<string, any>[];
   created_at: string;
@@ -387,7 +386,6 @@ const createDashboardFiles = wrapTraced(
             id: sp.dashboardFile.id,
             name: sp.dashboardFile.name,
             file_type: 'dashboard',
-            yml_content: yaml.stringify(sp.dashboardYml),
             result_message: undefined,
             results: undefined,
             created_at: sp.dashboardFile.createdAt,
@@ -601,7 +599,6 @@ rows:
         id: z.string(),
         name: z.string(),
         file_type: z.string(),
-        yml_content: z.string(),
         result_message: z.string().optional(),
         results: z.array(z.record(z.any())).optional(),
         created_at: z.string(),

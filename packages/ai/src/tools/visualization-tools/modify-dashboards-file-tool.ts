@@ -35,7 +35,6 @@ interface FileWithId {
   id: string;
   name: string;
   file_type: string;
-  yml_content: string;
   result_message?: string;
   results?: Record<string, any>[];
   created_at: string;
@@ -269,7 +268,6 @@ const modifyDashboardFiles = wrapTraced(
     const updateResults: ModificationResult[] = [];
 
     const dashboardFilesToUpdate: any[] = [];
-    const dashboardYmls: any[] = [];
 
     try {
       // Process each file update
@@ -290,7 +288,7 @@ const modifyDashboardFiles = wrapTraced(
             continue;
           }
 
-          const existingFile = dashboardFile[0];
+          const existingFile = dashboardFile[0]!;
           const duration = Date.now() - startTime;
 
           // Process the dashboard file update
@@ -300,23 +298,13 @@ const modifyDashboardFiles = wrapTraced(
             duration
           );
 
-          const {
-            dashboardFile: updatedFile,
-            dashboardYml,
-            results,
-            validationMessage,
-            validationResults,
-          } = updateResult;
+          const { dashboardFile: updatedFile, dashboardYml, results } = updateResult;
 
           // Calculate next version number from existing version history
           const currentVersionHistory = existingFile.versionHistory as any;
           let nextVersion = 1;
 
-          if (
-            currentVersionHistory &&
-            currentVersionHistory.versions &&
-            Array.isArray(currentVersionHistory.versions)
-          ) {
+          if (currentVersionHistory?.versions && Array.isArray(currentVersionHistory.versions)) {
             const versions = currentVersionHistory.versions;
             if (versions.length > 0) {
               const latestVersion = versions[versions.length - 1];
@@ -342,7 +330,6 @@ const modifyDashboardFiles = wrapTraced(
           updatedFile.name = dashboardYml.name;
 
           dashboardFilesToUpdate.push(updatedFile);
-          dashboardYmls.push(dashboardYml);
           updateResults.push(...results);
         } catch (error) {
           failedFiles.push({
@@ -368,10 +355,7 @@ const modifyDashboardFiles = wrapTraced(
         }
 
         // Add successful files to output
-        for (let i = 0; i < dashboardFilesToUpdate.length; i++) {
-          const file = dashboardFilesToUpdate[i];
-          const dashboardYml = dashboardYmls[i];
-
+        for (const file of dashboardFilesToUpdate) {
           // Get the latest version number
           const versionHistory = file.versionHistory as any;
           const latestVersion =
@@ -381,7 +365,6 @@ const modifyDashboardFiles = wrapTraced(
             id: file.id,
             name: file.name,
             file_type: 'dashboard',
-            yml_content: yaml.stringify(dashboardYml),
             result_message: 'Dashboard validation successful',
             results: [],
             created_at: file.createdAt,
@@ -444,7 +427,6 @@ const outputSchema = z.object({
       id: z.string(),
       name: z.string(),
       file_type: z.string(),
-      yml_content: z.string(),
       result_message: z.string().optional(),
       results: z.array(z.record(z.any())).optional(),
       created_at: z.string(),
