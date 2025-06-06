@@ -239,7 +239,7 @@ const formattedMessages = formatMessagesForAnalyst(
 export const agentName = new Agent({
   name: 'Agent Name',
   instructions: getInstructions,
-  model: anthropicCachedModel('claude-sonnet-4-20250514'),
+  model:  anthropicCachedModel('anthropic/claude-sonnet-4'),
   tools: { tool1, tool2, tool3 },
   memory: getSharedMemory(),
   defaultGenerateOptions: DEFAULT_OPTIONS,

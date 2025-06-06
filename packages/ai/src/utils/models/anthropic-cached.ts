@@ -1,22 +1,25 @@
-import { createAnthropic } from '@ai-sdk/anthropic';
+import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { wrapAISDKModel } from 'braintrust';
 
 // Token estimation using: tokens = number of words + number of punctuation marks
 const estimateTokens = (text: string): number => {
   if (!text) return 0;
-  
+
   // Count words (split by whitespace and filter out empty strings)
-  const words = text.trim().split(/\s+/).filter(word => word.length > 0);
-  
+  const words = text
+    .trim()
+    .split(/\s+/)
+    .filter((word) => word.length > 0);
+
   // Count punctuation marks
   const punctuation = text.match(/[.,;:!?'"()\[\]{}\-–—]/g) || [];
-  
+
   return words.length + punctuation.length;
 };
 
 const getTokensFromMessage = (message: any): number => {
   let tokens = 0;
-  
+
   if (typeof message === 'string') {
     tokens += estimateTokens(message);
   } else if (message && typeof message === 'object') {
@@ -36,12 +39,13 @@ const getTokensFromMessage = (message: any): number => {
       }
     }
   }
-  
+
   return tokens;
 };
 
 export const anthropicCachedModel = (modelId: string) => {
-  const anthropic = createAnthropic({
+  const anthropic = createOpenRouter({
+    apiKey: process.env.OPENROUTER_API_KEY,
     fetch: ((url, options) => {
       if (options?.body) {
         try {
@@ -70,9 +74,15 @@ export const anthropicCachedModel = (modelId: string) => {
           }
 
           // Apply caching at 1k milestones (1k, 2k, 3k, 4k, etc.)
-          const shouldCacheConversation = conversationTokens >= 1000 && Math.floor(conversationTokens / 1000) >= 1;
+          const shouldCacheConversation =
+            conversationTokens >= 1000 && Math.floor(conversationTokens / 1000) >= 1;
 
-          if (shouldCacheConversation && modifiedBody.messages && Array.isArray(modifiedBody.messages) && modifiedBody.messages.length > 0) {
+          if (
+            shouldCacheConversation &&
+            modifiedBody.messages &&
+            Array.isArray(modifiedBody.messages) &&
+            modifiedBody.messages.length > 0
+          ) {
             // Apply cache to the last message in conversation
             const lastMessageIndex = modifiedBody.messages.length - 1;
             modifiedBody.messages[lastMessageIndex] = {

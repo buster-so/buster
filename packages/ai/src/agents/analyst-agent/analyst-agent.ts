@@ -20,7 +20,7 @@ const DEFAULT_OPTIONS = {
 export const analystAgent = new Agent({
   name: 'Analyst Agent',
   instructions: getAnalystInstructions,
-  model: anthropicCachedModel('claude-sonnet-4-20250514'),
+  model: anthropicCachedModel('anthropic/claude-sonnet-4'),
   tools: {
     createMetricsFileTool,
     modifyMetricsFileTool,
