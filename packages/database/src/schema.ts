@@ -268,7 +268,10 @@ export const dashboards = pgTable(
     config: jsonb().notNull(),
     publiclyAccessible: boolean('publicly_accessible').default(false).notNull(),
     publiclyEnabledBy: uuid('publicly_enabled_by'),
-    publicExpiryDate: timestamp('public_expiry_date', { withTimezone: true, mode: 'string' }),
+    publicExpiryDate: timestamp('public_expiry_date', {
+      withTimezone: true,
+      mode: 'string',
+    }),
     passwordSecretId: uuid('password_secret_id'),
     createdBy: uuid('created_by').notNull(),
     updatedBy: uuid('updated_by').notNull(),
@@ -384,7 +387,10 @@ export const datasetColumns = pgTable(
     type: text().notNull(),
     description: text(),
     nullable: boolean().notNull(),
-    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' }).notNull(),
+    createdAt: timestamp('created_at', {
+      withTimezone: true,
+      mode: 'string',
+    }).notNull(),
     updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
       .defaultNow()
       .notNull(),
@@ -614,7 +620,10 @@ export const threadsDeprecated = pgTable(
     updatedBy: uuid('updated_by').notNull(),
     publiclyAccessible: boolean('publicly_accessible').default(false).notNull(),
     publiclyEnabledBy: uuid('publicly_enabled_by'),
-    publicExpiryDate: timestamp('public_expiry_date', { withTimezone: true, mode: 'string' }),
+    publicExpiryDate: timestamp('public_expiry_date', {
+      withTimezone: true,
+      mode: 'string',
+    }),
     passwordSecretId: uuid('password_secret_id'),
     stateMessageId: uuid('state_message_id'),
     parentThreadId: uuid('parent_thread_id'),
@@ -812,6 +821,7 @@ export const messages = pgTable(
     deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'string' }),
     createdBy: uuid('created_by').notNull(),
     feedback: text(),
+    isCompleted: boolean('is_completed').default(false).notNull(),
   },
   (table) => [
     index('messages_chat_id_idx').using('btree', table.chatId.asc().nullsLast().op('uuid_ops')),
@@ -889,7 +899,10 @@ export const dashboardFiles = pgTable(
     deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'string' }),
     publiclyAccessible: boolean('publicly_accessible').default(false).notNull(),
     publiclyEnabledBy: uuid('publicly_enabled_by'),
-    publicExpiryDate: timestamp('public_expiry_date', { withTimezone: true, mode: 'string' }),
+    publicExpiryDate: timestamp('public_expiry_date', {
+      withTimezone: true,
+      mode: 'string',
+    }),
     versionHistory: jsonb('version_history').default({}).notNull(),
     publicPassword: text('public_password'),
   },
@@ -936,7 +949,10 @@ export const chats = pgTable(
     updatedBy: uuid('updated_by').notNull(),
     publiclyAccessible: boolean('publicly_accessible').default(false).notNull(),
     publiclyEnabledBy: uuid('publicly_enabled_by'),
-    publicExpiryDate: timestamp('public_expiry_date', { withTimezone: true, mode: 'string' }),
+    publicExpiryDate: timestamp('public_expiry_date', {
+      withTimezone: true,
+      mode: 'string',
+    }),
     mostRecentFileId: uuid('most_recent_file_id'),
     mostRecentFileType: varchar('most_recent_file_type', { length: 255 }),
     mostRecentVersionNumber: integer('most_recent_version_number'),
@@ -996,6 +1012,7 @@ export const organizations = pgTable(
       .notNull(),
     deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'string' }),
     paymentRequired: boolean('payment_required').default(false).notNull(),
+    testField: text('test_field'),
   },
   (table) => [unique('organizations_name_key').on(table.name)]
 );
@@ -1009,7 +1026,10 @@ export const storedValuesSyncJobs = pgTable(
     schemaName: text('schema_name').notNull(),
     tableName: text('table_name').notNull(),
     columnName: text('column_name').notNull(),
-    lastSyncedAt: timestamp('last_synced_at', { withTimezone: true, mode: 'string' }),
+    lastSyncedAt: timestamp('last_synced_at', {
+      withTimezone: true,
+      mode: 'string',
+    }),
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
       .defaultNow()
       .notNull(),
@@ -1062,7 +1082,10 @@ export const metricFiles = pgTable(
     deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'string' }),
     publiclyAccessible: boolean('publicly_accessible').default(false).notNull(),
     publiclyEnabledBy: uuid('publicly_enabled_by'),
-    publicExpiryDate: timestamp('public_expiry_date', { withTimezone: true, mode: 'string' }),
+    publicExpiryDate: timestamp('public_expiry_date', {
+      withTimezone: true,
+      mode: 'string',
+    }),
     versionHistory: jsonb('version_history').default({}).notNull(),
     dataMetadata: jsonb('data_metadata'),
     publicPassword: text('public_password'),
@@ -1210,7 +1233,10 @@ export const termsToDatasets = pgTable(
       foreignColumns: [datasets.id],
       name: 'terms_to_datasets_dataset_id_fkey',
     }).onDelete('cascade'),
-    primaryKey({ columns: [table.termId, table.datasetId], name: 'terms_to_datasets_pkey' }),
+    primaryKey({
+      columns: [table.termId, table.datasetId],
+      name: 'terms_to_datasets_pkey',
+    }),
   ]
 );
 
@@ -1379,7 +1405,10 @@ export const teamsToUsers = pgTable(
       foreignColumns: [users.id],
       name: 'teams_to_users_user_id_fkey',
     }).onUpdate('cascade'),
-    primaryKey({ columns: [table.teamId, table.userId], name: 'teams_to_users_pkey' }),
+    primaryKey({
+      columns: [table.teamId, table.userId],
+      name: 'teams_to_users_pkey',
+    }),
   ]
 );
 
@@ -1601,7 +1630,10 @@ export const databaseMetadata = pgTable(
     owner: text(),
     comment: text(),
     created: timestamp({ withTimezone: true, mode: 'string' }),
-    lastModified: timestamp('last_modified', { withTimezone: true, mode: 'string' }),
+    lastModified: timestamp('last_modified', {
+      withTimezone: true,
+      mode: 'string',
+    }),
     metadata: jsonb().default({}).notNull(),
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
       .defaultNow()
@@ -1636,7 +1668,10 @@ export const schemaMetadata = pgTable(
     owner: text(),
     comment: text(),
     created: timestamp({ withTimezone: true, mode: 'string' }),
-    lastModified: timestamp('last_modified', { withTimezone: true, mode: 'string' }),
+    lastModified: timestamp('last_modified', {
+      withTimezone: true,
+      mode: 'string',
+    }),
     metadata: jsonb().default({}).notNull(),
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
       .defaultNow()
@@ -1688,7 +1723,10 @@ export const tableMetadata = pgTable(
     sizeBytes: bigint('size_bytes', { mode: 'number' }),
     comment: text(),
     created: timestamp({ withTimezone: true, mode: 'string' }),
-    lastModified: timestamp('last_modified', { withTimezone: true, mode: 'string' }),
+    lastModified: timestamp('last_modified', {
+      withTimezone: true,
+      mode: 'string',
+    }),
     clusteringKeys: jsonb('clustering_keys').default([]).notNull(),
     columns: jsonb().default([]).notNull(), // Array of Column objects
     metadata: jsonb().default({}).notNull(),

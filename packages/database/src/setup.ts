@@ -1,107 +1,191 @@
 #!/usr/bin/env bun
 
-import { execSync } from 'node:child_process';
-import { existsSync, mkdirSync } from 'node:fs';
+import { exec } from 'node:child_process';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { promisify } from 'node:util';
+import { closePool } from './connection.js';
+
+const execAsync = promisify(exec);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 /**
- * Setup script for working with an existing database
- * This will introspect your existing database and generate the initial schema
+ * Execute a SQL file against the database using psql command
  */
-
-const DRIZZLE_DIR = './drizzle';
-const SCHEMA_FILE = './src/schema.ts';
-
-async function setupExistingDatabase() {
-  console.log('🔍 Setting up Drizzle ORM for existing database...\n');
-
-  // Create drizzle directory if it doesn't exist
-  if (!existsSync(DRIZZLE_DIR)) {
-    mkdirSync(DRIZZLE_DIR, { recursive: true });
-    console.log('✅ Created drizzle directory');
-  }
-
+async function executeSqlFile(filePath: string): Promise<void> {
   try {
-    // Step 1: Pull the existing database schema
-    console.log('📥 Pulling existing database schema...');
-    execSync('bun run db:pull', { stdio: 'inherit' });
-    console.log('✅ Database schema pulled successfully\n');
+    console.log(`📄 Executing SQL file with psql: ${filePath}`);
 
-    // Step 2: Generate TypeScript schema from the pulled schema
-    console.log('🔄 Generating TypeScript schema...');
-    execSync('bun run db:generate', { stdio: 'inherit' });
-    console.log('✅ TypeScript schema generated\n');
+    const command = `PGPASSWORD=postgres psql -h 127.0.0.1 -p 54322 -d postgres -U postgres -f "${filePath}"`;
 
-    console.log('🎉 Setup complete! Your existing database has been introspected.');
-    console.log('\nNext steps:');
-    console.log('1. Review the generated schema in:', SCHEMA_FILE);
-    console.log('2. Run migrations with: bun run db:migrate');
-    console.log('3. Create seed data with: bun run seed:generate my-seed');
-    console.log('4. Run seeds with: bun run seed run');
-    console.log('5. Open Drizzle Studio with: bun run db:studio');
+    const { stdout, stderr } = await execAsync(command);
+
+    if (stdout) {
+      console.log(stdout);
+    }
+    if (stderr) {
+      // psql outputs some info to stderr that isn't actually errors
+      console.log(stderr);
+    }
+
+    console.log(`✅ Successfully executed SQL file: ${filePath}`);
   } catch (error) {
-    console.error('❌ Setup failed:', error);
-    console.log('\nTroubleshooting:');
-    console.log('1. Make sure your DATABASE_URL is set correctly');
-    console.log('2. Ensure your database is accessible');
-    console.log('3. Check that you have the necessary permissions');
+    console.error(`❌ Error executing SQL file ${filePath}:`, error);
+    throw error;
+  }
+}
+
+/**
+ * Run database migrations using bun run db:migrate
+ */
+async function runDatabaseMigrations(): Promise<void> {
+  try {
+    console.log('🚀 Running database migrations...');
+    const { stdout, stderr } = await execAsync('bun run db:migrate', {
+      cwd: process.cwd(),
+    });
+
+    if (stdout) {
+      console.log(stdout);
+    }
+    if (stderr) {
+      console.warn(stderr);
+    }
+
+    console.log('✅ Database migrations completed successfully');
+  } catch (error) {
+    console.error('❌ Database migrations failed:', error);
+    throw error;
+  }
+}
+
+/**
+ * Setup database with migrations, setup.sql, and seed.sql
+ */
+async function setupDatabase(): Promise<void> {
+  try {
+    console.log('🔧 Starting database setup...\n');
+
+    // Step 1: Run migrations
+    await runDatabaseMigrations();
+    console.log('');
+
+    // Step 2: Execute setup.sql
+    const setupSqlPath = join(__dirname, '..', 'drizzle', 'setup.sql');
+    await executeSqlFile(setupSqlPath);
+    console.log('');
+
+    // Step 3: Execute seed.sql
+    const seedSqlPath = join(__dirname, '..', 'drizzle', 'seed.sql');
+    await executeSqlFile(seedSqlPath);
+    console.log('');
+
+    console.log('🎉 Database setup completed successfully!');
+  } catch (error) {
+    console.error('❌ Database setup failed:', error);
     process.exit(1);
+  } finally {
+    await closePool();
   }
 }
 
 /**
- * Generate a snapshot of the current database state
- * Useful for creating a baseline migration
+ * Setup data only (setup.sql)
  */
-async function generateSnapshot() {
-  console.log('📸 Generating database snapshot...');
-
+async function setupData(): Promise<void> {
   try {
-    execSync('bun run db:generate', { stdio: 'inherit' });
-    console.log('✅ Snapshot generated successfully');
+    console.log('🔧 Setting up database data...\n');
+
+    const setupSqlPath = join(__dirname, '..', 'drizzle', 'setup.sql');
+    await executeSqlFile(setupSqlPath);
+
+    console.log('🎉 Database data setup completed successfully!');
   } catch (error) {
-    console.error('❌ Failed to generate snapshot:', error);
-    throw error;
+    console.error('❌ Database data setup failed:', error);
+    process.exit(1);
+  } finally {
+    await closePool();
   }
 }
 
 /**
- * Validate the current schema against the database
+ * Seed data only (seed.sql)
  */
-async function validateSchema() {
-  console.log('🔍 Validating schema against database...');
-
+async function seedData(): Promise<void> {
   try {
-    execSync('bun run db:check', { stdio: 'inherit' });
-    console.log('✅ Schema validation passed');
+    console.log('🌱 Seeding database...\n');
+
+    const seedSqlPath = join(__dirname, '..', 'drizzle', 'seed.sql');
+    await executeSqlFile(seedSqlPath);
+
+    console.log('🎉 Database seeding completed successfully!');
   } catch (error) {
-    console.error('❌ Schema validation failed:', error);
-    console.log('Run `bun run db:pull` to sync with the current database state');
-    throw error;
+    console.error('❌ Database seeding failed:', error);
+    process.exit(1);
+  } finally {
+    await closePool();
   }
 }
 
-// Export functions for programmatic use
-export { setupExistingDatabase, generateSnapshot, validateSchema };
+/**
+ * Run migrations only
+ */
+async function migrateOnly(): Promise<void> {
+  try {
+    console.log('🚀 Running migrations only...\n');
 
-// CLI usage
-if (import.meta.main) {
-  const command = process.argv[2];
+    await runDatabaseMigrations();
 
-  switch (command) {
-    case 'setup':
-      await setupExistingDatabase();
-      break;
-    case 'snapshot':
-      await generateSnapshot();
-      break;
-    case 'validate':
-      await validateSchema();
-      break;
-    default:
-      console.log('Usage: bun run src/setup.ts [setup|snapshot|validate]');
-      console.log('  setup    - Setup Drizzle for existing database');
-      console.log('  snapshot - Generate current database snapshot');
-      console.log('  validate - Validate schema against database');
-      process.exit(1);
+    console.log('🎉 Migrations completed successfully!');
+  } catch (error) {
+    console.error('❌ Migrations failed:', error);
+    process.exit(1);
+  } finally {
+    await closePool();
   }
+}
+
+// CLI handling
+const command = process.argv[2];
+
+switch (command) {
+  case 'run':
+  case 'setup':
+    await setupDatabase();
+    break;
+  case 'setup-data':
+    await setupData();
+    break;
+  case 'seed':
+    await seedData();
+    break;
+  case 'migrate':
+    await migrateOnly();
+    break;
+  default:
+    console.log(`
+🔧 Database Setup Tool
+
+Usage: bun run src/setup.ts <command>
+
+Commands:
+  run, setup     Run migrations, setup.sql, and seed.sql (full setup)
+  migrate        Run migrations only
+  setup-data     Run setup.sql only
+  seed           Run seed.sql only
+
+Examples:
+  bun run src/setup.ts run          # Full database setup
+  bun run src/setup.ts migrate      # Migrations only
+  bun run src/setup.ts setup-data   # Setup data only
+  bun run src/setup.ts seed         # Seed data only
+
+Available npm scripts:
+  npm run db:setup      # Full setup (same as 'run')
+  npm run setup:data    # Setup data only
+  npm run setup:seed    # Seed data only
+  npm run setup:full    # Full setup (same as 'run')
+`);
+    process.exit(1);
 }

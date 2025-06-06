@@ -4,7 +4,8 @@
   "workspaces": [
     "packages/*",
     "trigger",
-    "server"
+    "server",
+    "electric-server"
   ],
   "scripts": {
     "ai:dev": "bun run --cwd packages/ai dev",
