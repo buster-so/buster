@@ -7,11 +7,10 @@ import type {
   AnalystRuntimeContext,
   thinkAndPrepWorkflowInputSchema,
 } from '../workflows/analyst-workflow';
+import { ThinkAndPrepOutputSchema } from '../utils/memory/types';
+import { formatMessagesForAnalyst } from '../utils/memory/message-history';
 
-const inputSchema = z.object({
-  finished: z.boolean(),
-  outputMessages: z.array(z.any()),
-});
+const inputSchema = ThinkAndPrepOutputSchema;
 
 const outputSchema = z.object({});
 
@@ -34,9 +33,19 @@ const analystExecution = async ({
       throw new Error('Unable to access your session. Please refresh and try again.');
     }
 
+    // Get the initial prompt from the workflow
+    const initData = await getInitData();
+    const initialPrompt = initData.prompt;
+    
+    // Format messages for the analyst agent
+    const formattedMessages = formatMessagesForAnalyst(
+      inputData.outputMessages,
+      initialPrompt
+    );
+
     const wrappedStream = wrapTraced(
       async () => {
-        const stream = await analystAgent.stream(inputData.outputMessages, {
+        const stream = await analystAgent.stream(formattedMessages, {
           threadId,
           resourceId,
           runtimeContext,
@@ -48,6 +57,14 @@ const analystExecution = async ({
       },
       {
         name: 'Analyst',
+        metadata: {
+          messageCount: formattedMessages.length,
+          previousStep: {
+            toolsUsed: inputData.metadata?.toolsUsed,
+            finalTool: inputData.metadata?.finalTool,
+            hasReasoning: !!inputData.metadata?.reasoning,
+          },
+        },
       }
     );
 

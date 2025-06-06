@@ -17,12 +17,12 @@ const inputSchema = z.object({
   'generate-chat-title': generateChatTitleOutputSchema,
 });
 
+import { ThinkAndPrepOutputSchema } from '../utils/memory/types';
+import { extractMessageHistory, getLastToolUsed, getAllToolsUsed } from '../utils/memory/message-history';
+
 export const thinkAndPrepOutputSchema = z.object({});
 
-const outputSchema = z.object({
-  finished: z.boolean(),
-  outputMessages: z.array(z.any()),
-});
+const outputSchema = ThinkAndPrepOutputSchema;
 
 const thinkAndPrepExecution = async ({
   inputData,
@@ -37,6 +37,7 @@ const thinkAndPrepExecution = async ({
 
   let outputMessages = [];
   let finished = false;
+  let finalStepData = null;
 
   try {
     const threadId = runtimeContext.get('threadId');
@@ -69,7 +70,11 @@ const thinkAndPrepExecution = async ({
                 ['submitThoughtsTool', 'finishAndRespondTool'].includes(toolName)
               )
             ) {
-              outputMessages = step.response.messages;
+              // Extract and validate messages
+              outputMessages = extractMessageHistory(step.response.messages);
+              
+              // Store the full step data
+              finalStepData = step;
 
               // Set finished to true if finishAndRespondTool was called
               if (toolNames.includes('finishAndRespondTool')) {
@@ -93,14 +98,34 @@ const thinkAndPrepExecution = async ({
     for await (const _ of stream.fullStream) {
     }
 
-    return { finished, outputMessages };
+    return { 
+      finished, 
+      outputMessages,
+      stepData: finalStepData,
+      metadata: {
+        toolsUsed: getAllToolsUsed(outputMessages),
+        finalTool: getLastToolUsed(outputMessages) as 'submitThoughtsTool' | 'finishAndRespondTool' | undefined,
+        text: finalStepData?.text,
+        reasoning: finalStepData?.reasoning,
+      }
+    };
   } catch (error) {
     if (error instanceof Error && error.name !== 'AbortError') {
       throw new Error('Unable to connect to the analysis service. Please try again later.');
     }
   }
 
-  return { finished, outputMessages };
+  return { 
+    finished, 
+    outputMessages,
+    stepData: finalStepData,
+    metadata: {
+      toolsUsed: getAllToolsUsed(outputMessages),
+      finalTool: getLastToolUsed(outputMessages) as 'submitThoughtsTool' | 'finishAndRespondTool' | undefined,
+      text: finalStepData?.text,
+      reasoning: finalStepData?.reasoning,
+    }
+  };
 };
 
 export const thinkAndPrepStep = createStep({
