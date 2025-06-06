@@ -116,7 +116,7 @@ const DEFAULT_OPTIONS = {
 export const todosAgent = new Agent({
   name: 'Create Todos',
   instructions: todosInstructions,
-  model:  anthropicCachedModel('anthropic/claude-sonnet-4'),
+  model: anthropicCachedModel('claude-sonnet-4-20250514'),
   defaultGenerateOptions: DEFAULT_OPTIONS,
   defaultStreamOptions: DEFAULT_OPTIONS,
 });

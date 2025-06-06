@@ -15,7 +15,7 @@ const DEFAULT_OPTIONS = {
 export const thinkAndPrepAgent = new Agent({
   name: 'Think and Prep Agent',
   instructions: getThinkAndPrepInstructions,
-  model: anthropicCachedModel('anthropic/claude-sonnet-4'),
+  model: anthropicCachedModel('claude-sonnet-4-20250514'),
   tools: {
     sequentialThinkingTool,
     executeSqlStatementTool,

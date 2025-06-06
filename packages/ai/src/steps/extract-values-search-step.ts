@@ -67,7 +67,7 @@ Focus only on extracting meaningful, specific values that could be searched for 
 const valuesAgent = new Agent({
   name: 'Extract Values',
   instructions: extractValuesInstructions,
-  model:  anthropicCachedModel('anthropic/claude-sonnet-4'),
+  model: anthropicCachedModel('claude-sonnet-4-20250514'),
 });
 
 const extractValuesSearchStepExecution = async ({
