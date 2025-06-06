@@ -1,15 +1,13 @@
 'use client';
 
-import React from 'react';
-import lightTheme from './light';
-import { cn } from '../../../../lib/classMerge';
-import { useMemoizedFn } from '@/hooks/useMemoizedFn';
-import { useBusterNotifications } from '@/context/BusterNotifications';
-import { FileCard } from '../../card/FileCard';
-import { Button } from '../../buttons/Button';
-import { Copy } from '../../icons/NucleoIconOutlined';
-
 import dynamic from 'next/dynamic';
+import React from 'react';
+import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useMemoizedFn } from '@/hooks/useMemoizedFn';
+import { Button } from '../../buttons/Button';
+import { FileCard } from '../../card/FileCard';
+import { Copy } from '../../icons/NucleoIconOutlined';
+import lightTheme from './light';
 
 const SyntaxHighlighter = dynamic(
   () => import('react-syntax-highlighter').then((mod) => mod.Prism),
@@ -45,6 +43,16 @@ export const AppCodeBlock: React.FC<{
     openSuccessMessage('Copied to clipboard');
   });
 
+  const headerButtons = React.useMemo(() => {
+    return (
+      showCopyButton && (
+        <Button variant="ghost" onClick={copyCode} prefix={<Copy />}>
+          Copy
+        </Button>
+      )
+    );
+  }, [showCopyButton, copyCode]);
+
   //this is a huge assumption, but if there is no language, it is probably an inline code block
   if (!language) {
     return <CodeInlineWrapper>{children}</CodeInlineWrapper>;
@@ -54,15 +62,7 @@ export const AppCodeBlock: React.FC<{
     <FileCard
       fileName={title || language}
       className={wrapperClassName}
-      headerButtons={React.useMemo(() => {
-        return (
-          showCopyButton && (
-            <Button variant="ghost" onClick={copyCode} prefix={<Copy />}>
-              Copy
-            </Button>
-          )
-        );
-      }, [showCopyButton, copyCode])}>
+      headerButtons={headerButtons}>
       <div className="w-full overflow-x-auto">
         <div className="code-wrapper">
           {language ? (

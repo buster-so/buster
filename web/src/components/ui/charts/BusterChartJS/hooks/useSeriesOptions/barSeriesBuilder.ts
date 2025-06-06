@@ -1,26 +1,26 @@
-import type { ChartProps } from '../../core';
-import type { SeriesBuilderProps } from './interfaces';
-import type { LabelBuilderProps } from './useSeriesOptions';
-import {
-  formatLabelForDataset,
-  formatYAxisLabel,
-  JOIN_CHARACTER,
-  yAxisSimilar
-} from '../../../commonHelpers';
-import { dataLabelFontColorContrast, formatBarAndLineDataLabel } from '../../helpers';
 import type { BarElement } from 'chart.js';
 import type { Context } from 'chartjs-plugin-datalabels';
-import { defaultLabelOptionConfig } from '../useChartSpecificOptions/labelOptionConfig';
 import type { Options } from 'chartjs-plugin-datalabels/types/options';
-import { DEFAULT_CHART_LAYOUT } from '../../ChartJSTheme';
-import type { DatasetOption } from '../../../chartHooks';
 import {
   type BusterChartProps,
   DEFAULT_COLUMN_LABEL_FORMAT,
   type IColumnLabelFormat
 } from '@/api/asset_interfaces/metric';
 import { formatLabel } from '@/lib';
+import type { DatasetOption } from '../../../chartHooks';
+import {
+  formatLabelForDataset,
+  formatYAxisLabel,
+  JOIN_CHARACTER,
+  yAxisSimilar
+} from '../../../commonHelpers';
+import { DEFAULT_CHART_LAYOUT } from '../../ChartJSTheme';
+import type { ChartProps } from '../../core';
+import { dataLabelFontColorContrast, formatBarAndLineDataLabel } from '../../helpers';
+import { defaultLabelOptionConfig } from '../useChartSpecificOptions/labelOptionConfig';
 import { createTrendlineOnSeries } from './createTrendlines';
+import type { SeriesBuilderProps } from './interfaces';
+import type { LabelBuilderProps } from './useSeriesOptions';
 
 export const barSeriesBuilder = ({
   datasetOptions,
@@ -40,7 +40,7 @@ export const barSeriesBuilder = ({
     let hasBeenDrawn = false;
 
     dataLabelOptions.stackTotal = {
-      display: function (context) {
+      display: (context) => {
         const chart = context.chart;
         const shownDatasets = context.chart.data.datasets.filter(
           (dataset, index) =>
@@ -60,7 +60,7 @@ export const barSeriesBuilder = ({
         }
         return canDisplay ? 'auto' : false;
       },
-      formatter: function (_, context) {
+      formatter: (_, context) => {
         const canUseSameYFormatter = yAxisSimilar(yAxisKeys, columnLabelFormats);
         const value = context.chart.$totalizer.stackTotals[context.dataIndex];
         return formatYAxisLabel(

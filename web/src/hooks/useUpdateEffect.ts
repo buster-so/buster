@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { type DependencyList, useEffect, useRef } from 'react';
 
 /**
  * A hook that executes a function on the second update and subsequent updates.
@@ -8,7 +8,7 @@ import { useEffect, useRef } from 'react';
  * @param effect The effect function to run
  * @param deps The dependencies array
  */
-export const useUpdateEffect = (effect: () => void | (() => void), deps?: any[]) => {
+export const useUpdateEffect = (effect: () => void, deps?: DependencyList) => {
   const isFirstRender = useRef(true);
 
   useEffect(() => {

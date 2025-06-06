@@ -1,13 +1,13 @@
+import uniq from 'lodash/uniq';
 import React, { useState } from 'react';
-import { SaveToCollectionsDropdown } from '../dropdowns/SaveToCollectionsDropdown';
-import { useMemoizedFn } from '@/hooks';
-import { useBusterNotifications } from '@/context/BusterNotifications';
-import { CollectionButton } from './CollectionsButton';
 import {
   useAddDashboardToCollection,
   useRemoveDashboardFromCollection
 } from '@/api/buster_rest/dashboards';
-import uniq from 'lodash/uniq';
+import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useMemoizedFn } from '@/hooks';
+import { SaveToCollectionsDropdown } from '../dropdowns/SaveToCollectionsDropdown';
+import { CollectionButton } from './CollectionsButton';
 
 export const SaveDashboardToCollectionButton: React.FC<{
   dashboardIds: string[];

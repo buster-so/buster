@@ -1,13 +1,13 @@
 'use client';
 
-import { BusterLogo } from '@/assets/svg/BusterLogo';
 import React, { useRef } from 'react';
 import type { ShareAssetType } from '@/api/asset_interfaces';
-import { useBusterAssetsContextSelector } from '@/context/Assets/BusterAssetsProvider';
-import { useMemoizedFn } from '@/hooks';
-import { Title, Text } from '@/components/ui/typography';
+import { BusterLogo } from '@/assets/svg/BusterLogo';
 import { Button } from '@/components/ui/buttons';
 import { Input } from '@/components/ui/inputs';
+import { Title } from '@/components/ui/typography';
+import { useBusterAssetsContextSelector } from '@/context/Assets/BusterAssetsProvider';
+import { useMemoizedFn } from '@/hooks';
 
 export const AppPasswordAccess: React.FC<{
   assetId: string;
@@ -61,9 +61,9 @@ const AppPasswordInputComponent: React.FC<{
         <BusterLogo className="h-16 w-16" />
 
         <div className="text-center">
-          <Title
-            as="h2"
-            className="text-center">{`To access this page, enter the password below`}</Title>
+          <Title as="h2" className="text-center">
+            {'To access this page, enter the password below'}
+          </Title>
         </div>
 
         <div className="flex w-full flex-col space-y-2 space-x-0">

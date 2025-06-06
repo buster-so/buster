@@ -1,11 +1,11 @@
 'use client';
 
-import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
-import { useGetDashboard } from '@/api/buster_rest/dashboards';
-import { RustApiError } from '@/api/buster_rest/errors';
 import { useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
 import { useGetCollection } from '@/api/buster_rest/collections';
+import { useGetDashboard } from '@/api/buster_rest/dashboards';
+import type { RustApiError } from '@/api/buster_rest/errors';
+import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
 
 type AssetType = 'metric' | 'dashboard' | 'collection';
 
@@ -62,7 +62,7 @@ const useVersionNumber = (props: UseGetAssetProps) => {
           ? dashboardVersionNumber
           : null;
 
-    return queryVersion ? parseInt(queryVersion) : undefined;
+    return queryVersion ? Number.parseInt(queryVersion) : undefined;
   }, [props.type, props.versionNumber, metricVersionNumber, dashboardVersionNumber]);
 };
 
@@ -127,9 +127,10 @@ export const useGetAsset = (props: UseGetAssetProps) => {
           isError: collectionIsError,
           showLoader: !collectionIsFetched && !collectionIsError
         };
-      default:
+      default: {
         const exhaustiveCheck: never = props.type;
         return { isFetched: false, error: null, isError: false, showLoader: false };
+      }
     }
   }, [
     props.type,

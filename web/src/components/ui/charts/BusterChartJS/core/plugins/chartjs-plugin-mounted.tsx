@@ -1,5 +1,4 @@
-import { ChartType, Chart, Plugin } from 'chart.js';
-import { ANIMATION_DURATION } from '../../../config';
+import type { Chart, ChartType, Plugin } from 'chart.js';
 
 export interface ChartMountedPluginOptions {
   onMounted?: (chart: Chart) => void;
@@ -27,7 +26,6 @@ export const ChartMountedPlugin: Plugin<ChartType, ChartMountedPluginOptions> = 
   afterRender: (chart, args, options) => {
     if (chart.$initialAnimationCompleted === undefined) {
       chart.$initialAnimationCompleted = true;
-      // chart.update();
     }
 
     if (chart.$mountedPlugin || !chart || !options) return;

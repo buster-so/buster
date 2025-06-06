@@ -19,9 +19,13 @@ const PATHNAME_TO_ROUTE: Record<string, BusterRoutes> = {
   // [BusterRoutes.APP_TERMS_ID]: BusterRoutes.APP_TERMS
 };
 
-export const pathNameToRoute = (pathName: string, params: any): BusterRoutes => {
+export const pathNameToRoute = (
+  pathName: string,
+  params: Record<string, unknown>
+): BusterRoutes => {
   const route = Object.values(BusterRoutes).find((r) => {
-    return r === pathName || createBusterRoute({ route: r, ...params }) === pathName;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- I am using any here to make it easier because I am lazy okay
+    return r === pathName || createBusterRoute({ route: r, ...(params as any) }) === pathName;
   });
 
   if (route && PATHNAME_TO_ROUTE[route as string]) {
@@ -70,9 +74,14 @@ const PATHNAME_TO_PARENT_ROUTE: Record<string, BusterRoutes> = {
   [BusterRoutes.APP_CHAT_ID_DASHBOARD_ID_FILE]: BusterRoutes.APP_CHAT
 };
 
-export const pathNameToParentRoute = (pathName: string, params: any): BusterRoutes => {
+export const pathNameToParentRoute = (
+  pathName: string,
+  params: Record<string, unknown>
+): BusterRoutes => {
   const route = Object.values(BusterRoutes).find((r) => {
-    return r === pathName || createBusterRoute({ route: r, ...params }) === pathName;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- I am just using any here because it was a pain to type this out
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- testing
+    return r === pathName || createBusterRoute({ route: r, ...(params as any) }) === pathName;
   });
 
   if (route && PATHNAME_TO_PARENT_ROUTE[route as string]) {

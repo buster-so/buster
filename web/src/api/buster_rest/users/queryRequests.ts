@@ -1,24 +1,17 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/api/query_keys';
+import { useMemoizedFn } from '@/hooks';
+import { useCreateOrganization } from '../organizations';
 import {
-  getUser,
-  getUser_server,
-  updateOrganizationUser,
   getMyUserInfo,
   getMyUserInfo_server,
-  getUserFavorites,
-  getUserFavorites_server,
-  createUserFavorite,
-  deleteUserFavorite,
-  updateUserFavorites,
-  inviteUser,
+  getUser,
+  getUser_server,
   getUserList,
-  getUserList_server
+  getUserList_server,
+  inviteUser,
+  updateOrganizationUser
 } from './requests';
-import { useMemoizedFn } from '@/hooks';
-import { QueryClient, useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/api/query_keys';
-import { useBusterNotifications } from '@/context/BusterNotifications';
-import { useCreateOrganization } from '../organizations';
 
 export const useGetMyUserInfo = () => {
   return useQuery({
@@ -53,8 +46,9 @@ export const useUpdateUser = () => {
   const mutationFn = useMemoizedFn(async (params: Parameters<typeof updateOrganizationUser>[0]) => {
     const options = queryKeys.userGetUser(params.userId);
     queryClient.setQueryData(options.queryKey, (oldData) => {
+      if (!oldData) return oldData;
       return {
-        ...oldData!,
+        ...oldData,
         ...params
       };
     });

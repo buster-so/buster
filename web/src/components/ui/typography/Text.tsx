@@ -1,6 +1,6 @@
+import { cva, type VariantProps } from 'class-variance-authority';
+import type React from 'react';
 import { cn } from '@/lib/classMerge';
-import { cva, VariantProps } from 'class-variance-authority';
-import React from 'react';
 import { textColorVariants } from './variants';
 
 const textVariants = cva('leading-1.3', {

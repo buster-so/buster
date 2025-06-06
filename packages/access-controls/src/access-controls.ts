@@ -1,8 +1,16 @@
 import { and, count, eq, inArray, isNull } from 'drizzle-orm';
 import { z } from 'zod';
-import { type AccessControlOptions, AccessControlsError } from './types';
 import { getDb } from '../../database/src/connection';
-import { datasetPermissions, datasets, datasetsToPermissionGroups, permissionGroups, permissionGroupsToIdentities, teamsToUsers, usersToOrganizations } from '../../database/src/schema';
+import {
+  datasetPermissions,
+  datasets,
+  datasetsToPermissionGroups,
+  permissionGroups,
+  permissionGroupsToIdentities,
+  teamsToUsers,
+  usersToOrganizations,
+} from '../../database/src/schema';
+import { type AccessControlOptions, AccessControlsError } from './types';
 
 // Schema for the permissioned dataset result
 const PermissionedDatasetSchema = z.object({

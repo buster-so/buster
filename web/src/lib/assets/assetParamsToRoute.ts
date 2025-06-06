@@ -1,10 +1,10 @@
-import { FileType } from '@/api/asset_interfaces/chat';
-import {
+import type { FileType } from '@/api/asset_interfaces/chat';
+import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
+import type {
   DashboardFileViewSecondary,
   FileViewSecondary,
   MetricFileViewSecondary
 } from '../../layouts/ChatLayout/ChatLayoutContext/useLayoutConfig';
-import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
 
 type BaseParams = {
   chatId: string | undefined;
@@ -97,13 +97,14 @@ const createMetricRoute = ({
           chatId,
           ...baseParams
         });
-      default:
+      default: {
         const test: never | undefined = secondaryView;
         return createBusterRoute({
           route: BusterRoutes.APP_CHAT_ID_METRIC_ID_CHART,
           chatId,
           metricId
         });
+      }
     }
   }
 
@@ -122,8 +123,6 @@ const createMetricRoute = ({
         route: BusterRoutes.APP_METRIC_ID_CHART,
         ...baseParams
       });
-    case 'version-history':
-    //
     default:
       return createBusterRoute({
         route: BusterRoutes.APP_METRIC_ID_CHART,

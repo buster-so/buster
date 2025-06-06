@@ -1,5 +1,5 @@
-import pick from 'lodash/pick';
 import isEqual from 'lodash/isEqual';
+import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
 
 type ObjectKeys<T> = keyof T;
@@ -109,10 +109,10 @@ export const getChangedValues = <T extends object>(
   keysToCheck: (keyof T)[]
 ): Partial<T> => {
   return pickBy(object2, (value, key) => {
-    if (!keysToCheck.includes(key as any)) {
+    if (!keysToCheck.includes(key as keyof T)) {
       return false; // Ignore keys not in the specified list
     }
-    return !isEqual(value, (object1 as any)[key as any]); // Compare values and return true if they are not equal
+    return !isEqual(value, (object1 as Record<string, unknown>)[key]); // Compare values and return true if they are not equal
   }) as Partial<T>;
 };
 
@@ -120,15 +120,19 @@ export const compareByKeys = <T, U>(obj1: T, obj2: U, keys: (keyof T)[]): boolea
   return isEqual(pick(obj1, keys), pick(obj2, keys));
 };
 
-export const removeUndefined = (obj: Record<string, any> = {}) => {
-  Object.keys(obj).forEach((key) => obj[key] === undefined && delete obj[key]);
+export const removeUndefined = (obj: Record<string, unknown> = {}) => {
+  for (const key of Object.keys(obj)) {
+    if (obj[key] === undefined) {
+      delete obj[key];
+    }
+  }
   return obj;
 };
 
-export const setNestedProperty = <T>(obj: T, path: (keyof T)[], value: any): T => {
+export const setNestedProperty = <T>(obj: T, path: (keyof T)[], value: unknown): T => {
   return path.reduceRight(
     (acc, key, index) => ({
-      ...((index === 0 ? obj : acc) as any),
+      ...((index === 0 ? obj : acc) as Record<string, unknown>),
       [key]: acc
     }),
     value

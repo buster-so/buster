@@ -1,4 +1,4 @@
-import * as v from 'valibot';
+import { z } from 'zod/v4-mini';
 
 export enum DataSourceStatus {
   ACTIVE = 'active',
@@ -56,145 +56,148 @@ export enum DataSourceEnvironment {
   development = 'development'
 }
 
-export const PostgresCredentialsSchema = v.object({
-  name: v.pipe(v.string(), v.minLength(3, 'Name must be at least 3 characters')),
-  type: v.union([v.literal('postgres'), v.literal('supabase')]),
-  host: v.pipe(v.string(), v.minLength(1, 'Host must not be empty')),
-  port: v.pipe(
-    v.number(),
-    v.minValue(1, 'Port must be greater than 0'),
-    v.maxValue(65535, 'Port must be less than or equal to 65535')
-  ),
-  username: v.pipe(v.string(), v.minLength(1, 'Username must not be empty')),
-  password: v.pipe(v.string(), v.minLength(1, 'Password must not be empty')),
-  default_database: v.pipe(v.string(), v.minLength(1, 'Database must not be empty')), // postgres
-  default_schema: v.pipe(v.string(), v.minLength(1, 'Schema must not be empty')) // public
+export const PostgresCredentialsSchema = z.object({
+  name: z.string().check(z.minLength(3, 'Name must be at least 3 characters')),
+  type: z.union([z.literal('postgres'), z.literal('supabase')]),
+  host: z.string().check(z.minLength(1, 'Host must not be empty')),
+  port: z
+    .number()
+    .check(
+      z.gte(1, 'Port must be greater than 0'),
+      z.lte(65535, 'Port must be less than or equal to 65535')
+    ),
+  username: z.string().check(z.minLength(1, 'Username must not be empty')),
+  password: z.string().check(z.minLength(1, 'Password must not be empty')),
+  default_database: z.string().check(z.minLength(1, 'Database must not be empty')), // postgres
+  default_schema: z.string().check(z.minLength(1, 'Schema must not be empty')) // public
 });
 
-export type PostgresCredentials = v.InferOutput<typeof PostgresCredentialsSchema>;
+export type PostgresCredentials = z.infer<typeof PostgresCredentialsSchema>;
 
-export const MySQLCredentialsSchema = v.object({
-  name: v.pipe(v.string(), v.minLength(1, 'Name must not be empty')),
-  type: v.union([v.literal('mysql'), v.literal('mariadb')]),
-  host: v.pipe(v.string(), v.minLength(1, 'Host must not be empty')),
-  port: v.pipe(
-    v.number(),
-    v.minValue(1, 'Port must be greater than 0'),
-    v.maxValue(65535, 'Port must be less than or equal to 65535')
-  ),
-  username: v.pipe(v.string(), v.minLength(1, 'Username must not be empty')),
-  password: v.pipe(v.string(), v.minLength(1, 'Password must not be empty')),
-  default_database: v.pipe(v.string(), v.minLength(1, 'Database must not be empty'))
+export const MySQLCredentialsSchema = z.object({
+  name: z.string().check(z.minLength(1, 'Name must not be empty')),
+  type: z.union([z.literal('mysql'), z.literal('mariadb')]),
+  host: z.string().check(z.minLength(1, 'Host must not be empty')),
+  port: z
+    .number()
+    .check(
+      z.gte(1, 'Port must be greater than 0'),
+      z.lte(65535, 'Port must be less than or equal to 65535')
+    ),
+  username: z.string().check(z.minLength(1, 'Username must not be empty')),
+  password: z.string().check(z.minLength(1, 'Password must not be empty')),
+  default_database: z.string().check(z.minLength(1, 'Database must not be empty'))
 });
 
-export type MySQLCredentials = v.InferOutput<typeof MySQLCredentialsSchema>;
+export type MySQLCredentials = z.infer<typeof MySQLCredentialsSchema>;
 
-export const BigQueryCredentialsSchema = v.object({
-  name: v.pipe(v.string(), v.minLength(1, 'Name must not be empty')),
-  type: v.literal('bigquery'),
-  service_role_key: v.pipe(v.string(), v.minLength(1, 'Service role key must not be empty')),
-  default_project_id: v.pipe(v.string(), v.minLength(1, 'Project ID must not be empty')),
-  default_dataset_id: v.pipe(v.string(), v.minLength(1, 'Dataset ID must not be empty'))
+export const BigQueryCredentialsSchema = z.object({
+  name: z.string().check(z.minLength(1, 'Name must not be empty')),
+  type: z.literal('bigquery'),
+  service_role_key: z.string().check(z.minLength(1, 'Service role key must not be empty')),
+  default_project_id: z.string().check(z.minLength(1, 'Project ID must not be empty')),
+  default_dataset_id: z.string().check(z.minLength(1, 'Dataset ID must not be empty'))
 });
 
-export type BigQueryCredentials = v.InferOutput<typeof BigQueryCredentialsSchema>;
+export type BigQueryCredentials = z.infer<typeof BigQueryCredentialsSchema>;
 
-export const RedshiftCredentialsSchema = v.object({
-  name: v.pipe(v.string(), v.minLength(1, 'Name must not be empty')),
-  type: v.literal('redshift'),
-  host: v.pipe(v.string(), v.minLength(1, 'Host must not be empty')),
-  port: v.pipe(
-    v.number(),
-    v.minValue(1, 'Port must be greater than 0'),
-    v.maxValue(65535, 'Port must be less than or equal to 65535')
-  ),
-  username: v.pipe(v.string(), v.minLength(1, 'Username must not be empty')),
-  password: v.pipe(v.string(), v.minLength(1, 'Password must not be empty')),
-  default_database: v.pipe(v.string(), v.minLength(1, 'Database must not be empty')),
-  default_schema: v.pipe(v.string(), v.minLength(1, 'Schema must not be empty'))
+export const RedshiftCredentialsSchema = z.object({
+  name: z.string().check(z.minLength(1, 'Name must not be empty')),
+  type: z.literal('redshift'),
+  host: z.string().check(z.minLength(1, 'Host must not be empty')),
+  port: z
+    .number()
+    .check(
+      z.gte(1, 'Port must be greater than 0'),
+      z.lte(65535, 'Port must be less than or equal to 65535')
+    ),
+  username: z.string().check(z.minLength(1, 'Username must not be empty')),
+  password: z.string().check(z.minLength(1, 'Password must not be empty')),
+  default_database: z.string().check(z.minLength(1, 'Database must not be empty')),
+  default_schema: z.string().check(z.minLength(1, 'Schema must not be empty'))
 });
 
-export type RedshiftCredentials = v.InferOutput<typeof RedshiftCredentialsSchema>;
+export type RedshiftCredentials = z.infer<typeof RedshiftCredentialsSchema>;
 
-export const SnowflakeCredentialsSchema = v.object({
-  name: v.pipe(v.string(), v.minLength(1, 'Name must not be empty')),
-  type: v.literal('snowflake'),
-  account_id: v.pipe(v.string(), v.minLength(1, 'Account ID must not be empty')),
-  warehouse_id: v.pipe(v.string(), v.minLength(1, 'Warehouse ID must not be empty')),
-  username: v.pipe(v.string(), v.minLength(1, 'Username must not be empty')),
-  password: v.pipe(v.string(), v.minLength(1, 'Password must not be empty')),
-  role: v.nullable(v.string()),
-  default_database: v.pipe(v.string(), v.minLength(1, 'Database must not be empty')),
-  default_schema: v.pipe(
-    v.string(),
-    v.minLength(1, 'Schema must not be empty'),
-    v.toUpperCase(),
-    v.custom((value) => value === String(value).toUpperCase(), 'Must be all uppercase')
+export const SnowflakeCredentialsSchema = z.object({
+  name: z.string().check(z.minLength(1, 'Name must not be empty')),
+  type: z.literal('snowflake'),
+  account_id: z.string().check(z.minLength(1, 'Account ID must not be empty')),
+  warehouse_id: z.string().check(z.minLength(1, 'Warehouse ID must not be empty')),
+  username: z.string().check(z.minLength(1, 'Username must not be empty')),
+  password: z.string().check(z.minLength(1, 'Password must not be empty')),
+  role: z.nullable(z.string()),
+  default_database: z.string().check(z.minLength(1, 'Database must not be empty')),
+  default_schema: z.string().check(
+    z.minLength(1, 'Schema must not be empty'),
+    z.toUpperCase(),
+    z.refine((val) => val === val.toUpperCase(), 'Must be all uppercase')
   )
 });
 
-export type SnowflakeCredentials = v.InferOutput<typeof SnowflakeCredentialsSchema>;
+export type SnowflakeCredentials = z.infer<typeof SnowflakeCredentialsSchema>;
 
-export const DatabricksCredentialsSchema = v.object({
-  name: v.string(),
-  type: v.literal('databricks'),
-  host: v.string(),
-  api_key: v.string('API key is required'),
-  warehouse_id: v.string('Warehouse ID is required'),
-  default_catalog: v.string(),
-  default_schema: v.string()
+export const DatabricksCredentialsSchema = z.object({
+  name: z.string(),
+  type: z.literal('databricks'),
+  host: z.string(),
+  api_key: z.string().check(z.refine((val) => val.length > 0, 'API key is required')),
+  warehouse_id: z.string().check(z.refine((val) => val.length > 0, 'Warehouse ID is required')),
+  default_catalog: z.string(),
+  default_schema: z.string()
 });
 
-export type DatabricksCredentials = v.InferOutput<typeof DatabricksCredentialsSchema>;
+export type DatabricksCredentials = z.infer<typeof DatabricksCredentialsSchema>;
 
-export const SQLServerCredentialsSchema = v.object({
-  name: v.string(),
-  type: v.literal('sqlserver'),
-  host: v.string(),
-  port: v.pipe(
-    v.number(),
-    v.minValue(1, 'Port must be greater than 0'),
-    v.maxValue(65535, 'Port must be less than or equal to 65535')
-  ),
-  username: v.pipe(v.string(), v.minLength(1, 'Username must not be empty')),
-  password: v.pipe(v.string(), v.minLength(1, 'Password must not be empty')),
-  default_database: v.string(),
-  default_schema: v.string()
+export const SQLServerCredentialsSchema = z.object({
+  name: z.string().check(z.minLength(1, 'Name must not be empty')),
+  type: z.literal('sqlserver'),
+  host: z.string().check(z.minLength(1, 'Host must not be empty')),
+  port: z
+    .number()
+    .check(
+      z.gte(1, 'Port must be greater than 0'),
+      z.lte(65535, 'Port must be less than or equal to 65535')
+    ),
+  username: z.string().check(z.minLength(1, 'Username must not be empty')),
+  password: z.string().check(z.minLength(1, 'Password must not be empty')),
+  default_database: z.string().check(z.minLength(1, 'Database must not be empty')),
+  default_schema: z.string().check(z.minLength(1, 'Schema must not be empty'))
 });
 
-export type SQLServerCredentials = v.InferOutput<typeof SQLServerCredentialsSchema>;
+export type SQLServerCredentials = z.infer<typeof SQLServerCredentialsSchema>;
 
-export const DataSetSchema = v.object({
-  id: v.string('Dataset ID is required'),
-  name: v.string('Dataset name is required')
+export const DataSetSchema = z.object({
+  id: z.string().check(z.refine((val) => val.length > 0, 'Dataset ID is required')),
+  name: z.string().check(z.refine((val) => val.length > 0, 'Dataset name is required'))
 });
 
-export const CreatedBySchema = v.object({
-  email: v.string('Email is required'),
-  id: v.string('User ID is required'),
-  name: v.string('User name is required')
+export const CreatedBySchema = z.object({
+  email: z.string().check(z.refine((val) => val.length > 0, 'Email is required')),
+  id: z.string().check(z.refine((val) => val.length > 0, 'User ID is required')),
+  name: z.string().check(z.refine((val) => val.length > 0, 'User name is required'))
 });
 
-export const DataSourceSchema = v.object({
-  created_at: v.pipe(v.string()),
+export const DataSourceSchema = z.object({
+  created_at: z.string(),
   created_by: CreatedBySchema,
-  credentials: v.union([
-    v.omit(PostgresCredentialsSchema, ['name']),
-    v.omit(MySQLCredentialsSchema, ['name']),
-    v.omit(BigQueryCredentialsSchema, ['name']),
-    v.omit(RedshiftCredentialsSchema, ['name']),
-    v.omit(SnowflakeCredentialsSchema, ['name']),
-    v.omit(DatabricksCredentialsSchema, ['name']),
-    v.omit(SQLServerCredentialsSchema, ['name'])
+  credentials: z.union([
+    z.omit(PostgresCredentialsSchema, { name: true }),
+    z.omit(MySQLCredentialsSchema, { name: true }),
+    z.omit(BigQueryCredentialsSchema, { name: true }),
+    z.omit(RedshiftCredentialsSchema, { name: true }),
+    z.omit(SnowflakeCredentialsSchema, { name: true }),
+    z.omit(DatabricksCredentialsSchema, { name: true }),
+    z.omit(SQLServerCredentialsSchema, { name: true })
   ]),
-  data_sets: v.array(DataSetSchema),
-  id: v.string('Data source ID is required'),
-  name: v.string('Data source name is required'),
-  type: v.enum(DataSourceTypes),
-  updated_at: v.pipe(v.string())
+  data_sets: z.array(DataSetSchema),
+  id: z.string().check(z.refine((val) => val.length > 0, 'Data source ID is required')),
+  name: z.string().check(z.refine((val) => val.length > 0, 'Data source name is required')),
+  type: z.enum(DataSourceTypes),
+  updated_at: z.string()
 });
 
-export type DataSource = v.InferOutput<typeof DataSourceSchema>;
+export type DataSource = z.infer<typeof DataSourceSchema>;
 
 export interface DataSourceListItem {
   name: string;

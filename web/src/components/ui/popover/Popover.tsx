@@ -1,11 +1,11 @@
+import React from 'react';
 import {
   PopoverRoot as PopoverBase,
   PopoverContent,
-  PopoverContentVariant,
+  type PopoverContentVariant,
   PopoverTrigger,
-  PopoverTriggerType
+  type PopoverTriggerType
 } from './PopoverBase';
-import React from 'react';
 
 export interface PopoverProps
   extends React.ComponentProps<typeof PopoverBase>,

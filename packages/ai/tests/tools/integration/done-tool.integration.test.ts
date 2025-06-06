@@ -7,15 +7,15 @@ describe('Done Tool Integration Tests', () => {
   beforeEach(() => {
     mockRuntimeContext = {
       state: new Map<string, any>(),
-      get: function(key: string) {
+      get: function (key: string) {
         return this.state.get(key);
       },
-      set: function(key: string, value: any) {
+      set: function (key: string, value: any) {
         this.state.set(key, value);
       },
-      clear: function() {
+      clear: function () {
         this.state.clear();
-      }
+      },
     };
   });
 
@@ -31,7 +31,7 @@ describe('Done Tool Integration Tests', () => {
 
   test('should validate tool input schema', () => {
     const validInput = {
-      final_response: 'Task completed successfully. All requirements have been met.'
+      final_response: 'Task completed successfully. All requirements have been met.',
     };
 
     const result = doneTool.inputSchema.safeParse(validInput);
@@ -41,7 +41,7 @@ describe('Done Tool Integration Tests', () => {
   test('should validate tool output schema', () => {
     const validOutput = {
       success: true,
-      todos: '[x] Task 1\n[x] Task 2 *Marked complete by calling the done tool'
+      todos: '[x] Task 1\n[x] Task 2 *Marked complete by calling the done tool',
     };
 
     const result = doneTool.outputSchema.safeParse(validOutput);
@@ -50,24 +50,23 @@ describe('Done Tool Integration Tests', () => {
 
   test('should handle runtime context requirements', async () => {
     const contextWithoutGet = {
-      set: (key: string, value: any) => {}
+      set: (key: string, value: any) => {},
     };
 
     const input = {
       final_response: 'Test completion',
-      runtimeContext: contextWithoutGet
+      runtimeContext: contextWithoutGet,
     };
 
     // This should still work because get is checked in the tool logic
     // But let's test the actual tool execution
-    await expect(doneTool.execute({ context: input }))
-      .rejects.toThrow(); // Should fail due to missing runtime context functionality
+    await expect(doneTool.execute({ context: input })).rejects.toThrow(); // Should fail due to missing runtime context functionality
   });
 
   test('should complete workflow when no todos exist', async () => {
     const input = {
       final_response: 'Workflow completed successfully. No tasks were in progress.',
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await doneTool.execute({ context: input });
@@ -81,12 +80,12 @@ describe('Done Tool Integration Tests', () => {
     mockRuntimeContext.set('todos', [
       { todo: 'Create dashboard', completed: false },
       { todo: 'Generate reports', completed: false },
-      { todo: 'Analyze data', completed: true } // Already completed
+      { todo: 'Analyze data', completed: true }, // Already completed
     ]);
 
     const input = {
       final_response: 'All tasks have been completed successfully.',
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await doneTool.execute({ context: input });
@@ -94,8 +93,8 @@ describe('Done Tool Integration Tests', () => {
     expect(result.success).toBe(true);
     expect(result.todos).toBe(
       '[x] Create dashboard *Marked complete by calling the done tool\n' +
-      '[x] Generate reports *Marked complete by calling the done tool\n' +
-      '[x] Analyze data'
+        '[x] Generate reports *Marked complete by calling the done tool\n' +
+        '[x] Analyze data'
     );
 
     // Verify state was updated
@@ -109,19 +108,19 @@ describe('Done Tool Integration Tests', () => {
     mockRuntimeContext.set('todos', [
       { todo: 'Task 1', completed: true },
       { todo: 'Task 2', completed: true },
-      { todo: 'Task 3', completed: true }
+      { todo: 'Task 3', completed: true },
     ]);
 
     const input = {
       final_response: 'Review completed. All tasks were already finished.',
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await doneTool.execute({ context: input });
 
     expect(result.success).toBe(true);
     expect(result.todos).toBe('[x] Task 1\n[x] Task 2\n[x] Task 3');
-    
+
     // Should not contain any "marked complete" annotations
     expect(result.todos).not.toContain('*Marked complete by calling the done tool');
   });
@@ -132,12 +131,12 @@ describe('Done Tool Integration Tests', () => {
       { todo: 'Create API endpoints', completed: false },
       { todo: 'Write documentation', completed: true },
       { todo: 'Deploy to production', completed: false },
-      { todo: 'Configure monitoring', completed: false }
+      { todo: 'Configure monitoring', completed: false },
     ]);
 
     const input = {
       final_response: 'Project deployment completed. All remaining tasks have been finished.',
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await doneTool.execute({ context: input });
@@ -145,10 +144,10 @@ describe('Done Tool Integration Tests', () => {
     expect(result.success).toBe(true);
     expect(result.todos).toBe(
       '[x] Setup database\n' +
-      '[x] Create API endpoints *Marked complete by calling the done tool\n' +
-      '[x] Write documentation\n' +
-      '[x] Deploy to production *Marked complete by calling the done tool\n' +
-      '[x] Configure monitoring *Marked complete by calling the done tool'
+        '[x] Create API endpoints *Marked complete by calling the done tool\n' +
+        '[x] Write documentation\n' +
+        '[x] Deploy to production *Marked complete by calling the done tool\n' +
+        '[x] Configure monitoring *Marked complete by calling the done tool'
     );
 
     // Verify state was properly updated
@@ -165,12 +164,12 @@ describe('Done Tool Integration Tests', () => {
       'string item', // Wrong type
       { todo: 'Valid task 2', completed: true },
       { completed: false }, // Missing todo field
-      { todo: 'Valid task 3', completed: false }
+      { todo: 'Valid task 3', completed: false },
     ]);
 
     const input = {
       final_response: 'Cleaned up todos and completed remaining valid tasks.',
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await doneTool.execute({ context: input });
@@ -179,26 +178,26 @@ describe('Done Tool Integration Tests', () => {
     // Should only show valid todos
     expect(result.todos).toBe(
       '[x] Valid task 1 *Marked complete by calling the done tool\n' +
-      '[x] Valid task 2\n' +
-      '[x] Valid task 3 *Marked complete by calling the done tool'
+        '[x] Valid task 2\n' +
+        '[x] Valid task 3 *Marked complete by calling the done tool'
     );
   });
 
   test('should preserve todo properties when marking complete', async () => {
     mockRuntimeContext.set('todos', [
-      { 
-        todo: 'Complex task', 
-        completed: false, 
+      {
+        todo: 'Complex task',
+        completed: false,
         priority: 'high',
         assignee: 'john.doe@example.com',
         tags: ['backend', 'api'],
-        dueDate: '2024-12-31'
-      }
+        dueDate: '2024-12-31',
+      },
     ]);
 
     const input = {
       final_response: 'Complex task with metadata completed.',
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await doneTool.execute({ context: input });
@@ -217,31 +216,24 @@ describe('Done Tool Integration Tests', () => {
   });
 
   test('should handle single todo item', async () => {
-    mockRuntimeContext.set('todos', [
-      { todo: 'Single task to complete', completed: false }
-    ]);
+    mockRuntimeContext.set('todos', [{ todo: 'Single task to complete', completed: false }]);
 
     const input = {
       final_response: 'The only remaining task has been completed.',
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await doneTool.execute({ context: input });
 
     expect(result.success).toBe(true);
-    expect(result.todos).toBe('[x] Single task to complete *Marked complete by calling the done tool');
+    expect(result.todos).toBe(
+      '[x] Single task to complete *Marked complete by calling the done tool'
+    );
   });
 
   test('should handle non-array todos data', async () => {
     // Test various non-array values
-    const nonArrayValues = [
-      null,
-      undefined,
-      'string',
-      123,
-      { object: 'value' },
-      true
-    ];
+    const nonArrayValues = [null, undefined, 'string', 123, { object: 'value' }, true];
 
     for (const value of nonArrayValues) {
       mockRuntimeContext.clear();
@@ -249,7 +241,7 @@ describe('Done Tool Integration Tests', () => {
 
       const input = {
         final_response: 'No valid todos found.',
-        runtimeContext: mockRuntimeContext
+        runtimeContext: mockRuntimeContext,
       };
 
       const result = await doneTool.execute({ context: input });
@@ -264,7 +256,7 @@ describe('Done Tool Integration Tests', () => {
 
     const input = {
       final_response: 'Empty todo list processed.',
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await doneTool.execute({ context: input });
@@ -279,10 +271,10 @@ describe('Done Tool Integration Tests', () => {
       {}, // Missing final_response
       { final_response: '' }, // Empty final_response
       { final_response: null }, // Null final_response
-      { final_response: 123 } // Wrong type
+      { final_response: 123 }, // Wrong type
     ];
 
-    invalidInputs.forEach(input => {
+    invalidInputs.forEach((input) => {
       const result = doneTool.inputSchema.safeParse(input);
       expect(result.success).toBe(false);
     });
@@ -294,9 +286,7 @@ describe('Done Tool Integration Tests', () => {
   });
 
   test('should handle markdown formatted final_response', async () => {
-    mockRuntimeContext.set('todos', [
-      { todo: 'Task 1', completed: false }
-    ]);
+    mockRuntimeContext.set('todos', [{ todo: 'Task 1', completed: false }]);
 
     const markdownResponse = `
 ## Workflow Complete
@@ -312,7 +302,7 @@ The following tasks have been completed:
 
     const input = {
       final_response: markdownResponse,
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await doneTool.execute({ context: input });
@@ -323,52 +313,54 @@ The following tasks have been completed:
 
   test('should handle runtime context state access errors', async () => {
     const faultyContext = {
-      get: () => { throw new Error('State access failed'); },
-      set: () => {}
+      get: () => {
+        throw new Error('State access failed');
+      },
+      set: () => {},
     };
 
     const input = {
       final_response: 'Test error handling',
-      runtimeContext: faultyContext
+      runtimeContext: faultyContext,
     };
 
-    await expect(doneTool.execute({ context: input }))
-      .rejects.toThrow('State access failed');
+    await expect(doneTool.execute({ context: input })).rejects.toThrow('State access failed');
   });
 
   test('should handle runtime context state update errors', async () => {
     const faultyContext = {
       get: () => [{ todo: 'Test task', completed: false }],
-      set: () => { throw new Error('State update failed'); }
+      set: () => {
+        throw new Error('State update failed');
+      },
     };
 
     const input = {
       final_response: 'Test update error',
-      runtimeContext: faultyContext
+      runtimeContext: faultyContext,
     };
 
-    await expect(doneTool.execute({ context: input }))
-      .rejects.toThrow('State update failed');
+    await expect(doneTool.execute({ context: input })).rejects.toThrow('State update failed');
   });
 
   test('should handle large number of todos', async () => {
     // Create 100 todos with mixed completion states
     const largeTodoList = Array.from({ length: 100 }, (_, i) => ({
       todo: `Task ${i + 1}`,
-      completed: i % 3 === 0 // Every 3rd task is completed
+      completed: i % 3 === 0, // Every 3rd task is completed
     }));
 
     mockRuntimeContext.set('todos', largeTodoList);
 
     const input = {
       final_response: 'Completed large batch of tasks.',
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await doneTool.execute({ context: input });
 
     expect(result.success).toBe(true);
-    
+
     // Verify all todos are now completed
     const updatedTodos = mockRuntimeContext.get('todos');
     expect(updatedTodos).toHaveLength(100);
@@ -377,9 +369,11 @@ The following tasks have been completed:
     // Check output format
     const todoLines = result.todos.split('\n');
     expect(todoLines).toHaveLength(100);
-    
+
     // Count how many were marked by done tool (should be ~67 since every 3rd was already done)
-    const markedByDone = todoLines.filter(line => line.includes('*Marked complete by calling the done tool'));
+    const markedByDone = todoLines.filter((line) =>
+      line.includes('*Marked complete by calling the done tool')
+    );
     expect(markedByDone.length).toBeGreaterThan(60); // Approximately 67
     expect(markedByDone.length).toBeLessThan(70);
   });
@@ -388,10 +382,10 @@ The following tasks have been completed:
     const schema = doneTool.inputSchema;
     const shape = schema.shape as any;
     const finalResponseField = shape.final_response;
-    
+
     expect(finalResponseField.description).toContain('**MUST** be formatted in Markdown');
     expect(finalResponseField.description).toContain('Do not include headers');
-    expect(finalResponseField.description).toContain('Do not use the \'•\' bullet character');
+    expect(finalResponseField.description).toContain("Do not use the '•' bullet character");
     expect(finalResponseField.description).toContain('Do not include markdown tables');
   });
 });

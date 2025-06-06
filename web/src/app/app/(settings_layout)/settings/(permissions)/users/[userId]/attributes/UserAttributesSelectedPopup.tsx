@@ -1,5 +1,5 @@
-import { BusterListSelectedOptionPopupContainer } from '@/components/ui/list';
 import React from 'react';
+import { BusterListSelectedOptionPopupContainer } from '@/components/ui/list';
 
 export const UserAttributesSelectedPopup: React.FC<{
   selectedRowKeys: string[];

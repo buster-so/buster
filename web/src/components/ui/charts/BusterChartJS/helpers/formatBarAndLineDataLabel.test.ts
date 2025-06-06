@@ -1,6 +1,7 @@
-import { formatBarAndLineDataLabel } from './formatBarAndLineDataLabel';
-import { ColumnLabelFormat } from '@/api/asset_interfaces/metric';
 import type { Context } from 'chartjs-plugin-datalabels';
+import { describe, expect, it } from 'vitest';
+import type { ColumnLabelFormat } from '@/api/asset_interfaces/metric';
+import { formatBarAndLineDataLabel } from './formatBarAndLineDataLabel';
 
 describe('formatBarAndLineDataLabel', () => {
   it('formats a single value without percentage', () => {
@@ -51,8 +52,7 @@ describe('formatBarAndLineDataLabel', () => {
 
   describe('useStackTotal logic', () => {
     const baseDataset = { hidden: false, isTrendline: false };
-
-    test('should use stack total when there are multiple visible datasets', () => {
+    it('should use stack total when there are multiple visible datasets', () => {
       const mockContext = createMockContext([baseDataset, { ...baseDataset }]) as Context;
 
       const result = formatBarAndLineDataLabel(25, mockContext, 'data-label', {
@@ -63,8 +63,7 @@ describe('formatBarAndLineDataLabel', () => {
       // 25 out of stack total (100) = 25%
       expect(result).toBe('25%');
     });
-
-    test('should use stack total when percentageMode is stacked', () => {
+    it('should use stack total when percentageMode is stacked', () => {
       const mockContext = createMockContext([baseDataset]) as Context;
 
       const result = formatBarAndLineDataLabel(25, mockContext, 'stacked', {
@@ -75,8 +74,7 @@ describe('formatBarAndLineDataLabel', () => {
       // 25 out of stack total (100) = 25%
       expect(result).toBe('25%');
     });
-
-    test('should use series total for single dataset and non-stacked percentage mode', () => {
+    it('should use series total for single dataset and non-stacked percentage mode', () => {
       const mockContext = createMockContext([baseDataset]) as Context;
 
       const result = formatBarAndLineDataLabel(25, mockContext, 'data-label', {
@@ -87,8 +85,7 @@ describe('formatBarAndLineDataLabel', () => {
       // 25 out of series total (50) = 50%
       expect(result).toBe('50%');
     });
-
-    test('should ignore hidden datasets when counting multiple datasets', () => {
+    it('should ignore hidden datasets when counting multiple datasets', () => {
       const mockContext = createMockContext([
         baseDataset,
         { ...baseDataset, hidden: true }

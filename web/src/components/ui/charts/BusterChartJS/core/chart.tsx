@@ -1,11 +1,18 @@
 'use client';
 
-import React, { useEffect, useRef, forwardRef } from 'react';
+import type {
+  BubbleDataPoint,
+  ChartData,
+  ChartType,
+  ChartTypeRegistry,
+  DefaultDataPoint,
+  Point
+} from 'chart.js';
 import { Chart as ChartJS } from 'chart.js';
-import type { ChartType, DefaultDataPoint } from 'chart.js';
-import type { ForwardedRef, ChartProps, BaseChartComponent } from './types';
-import { reforwardRef, cloneData, setOptions, setLabels, setDatasets } from './utils';
-import { usePrevious, usePreviousRef } from '@/hooks';
+import { forwardRef, useEffect, useRef } from 'react';
+import { usePreviousRef } from '@/hooks';
+import type { BaseChartComponent, ChartProps, ForwardedRef } from './types';
+import { cloneData, reforwardRef, setDatasets, setLabels, setOptions } from './utils';
 
 function ChartComponent<
   TType extends ChartType = ChartType,
@@ -59,13 +66,28 @@ function ChartComponent<
 
   useEffect(() => {
     if (!redraw && chartRef.current) {
-      setLabels(chartRef.current.config.data as any, data.labels);
+      setLabels(
+        chartRef.current.config.data as ChartData<
+          keyof ChartTypeRegistry,
+          (number | [number, number] | Point | BubbleDataPoint | null)[],
+          unknown
+        >,
+        data.labels
+      );
     }
   }, [redraw, data.labels]);
 
   useEffect(() => {
     if (!redraw && chartRef.current && data.datasets) {
-      setDatasets(chartRef.current.config.data as any, data.datasets, datasetIdKey);
+      setDatasets(
+        chartRef.current.config.data as ChartData<
+          keyof ChartTypeRegistry,
+          (number | [number, number] | Point | BubbleDataPoint | null)[],
+          unknown
+        >,
+        data.datasets,
+        datasetIdKey
+      );
     }
   }, [redraw, data.datasets]);
 

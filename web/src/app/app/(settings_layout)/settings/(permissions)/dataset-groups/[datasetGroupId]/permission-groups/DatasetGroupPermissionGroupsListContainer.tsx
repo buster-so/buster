@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useMemo, useState } from 'react';
 import type {
   GetDatasetGroupPermissionGroupsResponse,
   GetPermissionGroupDatasetGroupsResponse
@@ -7,15 +8,14 @@ import type {
 import { useUpdateDatasetGroupPermissionGroups } from '@/api/buster_rest';
 import { PermissionAssignedCell } from '@/components/features/PermissionComponents';
 import {
-  BusterListColumn,
-  BusterListRowItem,
+  type BusterListColumn,
+  type BusterListRowItem,
   EmptyStateList,
   InfiniteListContainer
 } from '@/components/ui/list';
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
-import { BusterRoutes, createBusterRoute } from '@/routes';
 import { useMemoizedFn } from '@/hooks';
-import React, { useMemo, useState } from 'react';
+import { BusterRoutes, createBusterRoute } from '@/routes';
 import { DatasetGroupPermissionGroupSelectedPopup } from './DatasetGroupPermissionGroupSelectedPopup';
 
 export const DatasetGroupPermissionGroupsListContainer: React.FC<{
@@ -42,12 +42,12 @@ export const DatasetGroupPermissionGroupsListContainer: React.FC<{
         title: 'Assigned',
         dataIndex: 'assigned',
         width: 130 + 85,
-        render: (assigned: boolean, datasetGroup: GetPermissionGroupDatasetGroupsResponse) => {
+        render: (assigned, datasetGroup: GetPermissionGroupDatasetGroupsResponse) => {
           return (
             <div className="flex justify-end">
               <PermissionAssignedCell
                 id={datasetGroup.id}
-                assigned={assigned}
+                assigned={assigned as boolean}
                 text="assigned"
                 onSelect={onSelectAssigned}
               />
@@ -144,5 +144,4 @@ export const DatasetGroupPermissionGroupsListContainer: React.FC<{
     </InfiniteListContainer>
   );
 });
-
-DatasetGroupPermissionGroupSelectedPopup.displayName = 'DatasetGroupPermissionGroupSelectedPopup';
+DatasetGroupPermissionGroupsListContainer.displayName = 'DatasetGroupPermissionGroupsListContainer';

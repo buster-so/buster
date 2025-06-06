@@ -1,6 +1,6 @@
-import { uniformSampling, randomSampling } from './downsample';
+import { describe, expect, it } from 'vitest';
 import type { DataPoint } from './downsample';
-import { detectAnomalies } from './downsample';
+import { detectAnomalies, randomSampling, uniformSampling } from './downsample';
 
 describe('uniformSampling', () => {
   // Sample data for testing

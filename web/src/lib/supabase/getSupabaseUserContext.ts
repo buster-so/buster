@@ -3,7 +3,7 @@
 import { createClient } from './server';
 import { signInWithAnonymousUser } from './signIn';
 
-type PromiseType<T extends Promise<any>> = T extends Promise<infer U> ? U : never;
+type PromiseType<T extends Promise<unknown>> = T extends Promise<infer U> ? U : never;
 
 export type UseSupabaseUserContextType = PromiseType<ReturnType<typeof getSupabaseUserContext>>;
 
@@ -15,14 +15,14 @@ export const getSupabaseUserContext = async (preemptiveRefreshMinutes = 5) => {
 
   // Check if we need to refresh the session
   if (sessionData.session) {
-    const refreshedSessionData = await refreshSessionIfNeeded(
+    const refreshedSessionData = (await refreshSessionIfNeeded(
       supabase,
       sessionData.session,
       preemptiveRefreshMinutes
-    );
+    )) as Awaited<ReturnType<typeof refreshSessionIfNeeded>>;
 
     // If session was refreshed, get the updated session
-    if (refreshedSessionData && refreshedSessionData.session) {
+    if (refreshedSessionData && 'session' in refreshedSessionData) {
       // Replace the entire sessionData object to avoid type issues
       sessionData = refreshedSessionData;
     }

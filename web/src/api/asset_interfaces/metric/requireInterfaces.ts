@@ -1,5 +1,5 @@
-import { BusterChartConfigProps, ColumnSettings, IColumnLabelFormat } from './charts';
-import { BusterMetric } from './interfaces';
+import type { BusterChartConfigProps, ColumnSettings, IColumnLabelFormat } from './charts';
+import type { BusterMetric } from './interfaces';
 
 export type IBusterMetricChartConfig = Required<
   Omit<BusterChartConfigProps, 'columnLabelFormats'>

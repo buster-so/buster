@@ -1,8 +1,7 @@
 import React from 'react';
+import { Select, type SelectItem } from '@/components/ui/select';
 import { LabelAndInput } from '../../Common';
-import { LoopTrendline } from './EditTrendline';
-import { Select, SelectItem } from '@/components/ui/select';
-import { LineDashed } from '@/components/ui/icons';
+import type { LoopTrendline } from './EditTrendline';
 
 interface TrendlineLineStyleProps {
   trend: LoopTrendline;

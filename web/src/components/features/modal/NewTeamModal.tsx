@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useMemoizedFn } from '@/hooks';
-import { AppModal } from '@/components/ui/modal';
 import { useCreateTeam } from '@/api/buster_rest';
 import { Input } from '@/components/ui/inputs';
+import { AppModal } from '@/components/ui/modal';
+import { useMemoizedFn } from '@/hooks';
 
 export const NewTeamModal: React.FC<{
   isOpen: boolean;

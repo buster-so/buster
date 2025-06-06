@@ -1,6 +1,6 @@
-import type { BusterChartProps } from '@/api/asset_interfaces/metric';
-import type { AnimationOptions } from 'chart.js';
+import type { AnimationOptions, ChartDataset } from 'chart.js';
 import memoize from 'lodash/memoize';
+import type { BusterChartProps } from '@/api/asset_interfaces/metric';
 
 const DEFAULT_MAX_DELAY_DATA_POINT = 95;
 const DEFAULT_MAX_DELAY_DATASET = 250;
@@ -8,7 +8,7 @@ const DEFAULT_MAX_DELAY_DATASET = 250;
 // Create a memoized function that uses the chart ID as part of the cache key
 const createHasDataLabelsChecker = () => {
   const memoizedFn = memoize(
-    (chartId: string, datasets: any[]): boolean => {
+    (chartId: string, datasets: ChartDataset[]): boolean => {
       return datasets.some((d) => d.datalabels);
     },
     (chartId: string) => chartId // Use chart ID as the cache key

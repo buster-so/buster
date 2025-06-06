@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { type DataSource, DataSourceTypes } from '@/api/asset_interfaces';
 import { BigQueryForm } from './BigQueryForm';
-import { DataSource, DataSourceTypes } from '@/api/asset_interfaces';
 
 // Sample DataSource for the story
 const sampleDataSource: DataSource = {
@@ -16,7 +16,7 @@ const sampleDataSource: DataSource = {
   },
   credentials: {
     type: 'bigquery',
-    service_role_key: '{\"type\":\"service_account\",\"project_id\":\"example-project\"}',
+    service_role_key: '{"type":"service_account","project_id":"example-project"}',
     default_project_id: 'example-project',
     default_dataset_id: 'example_dataset'
   },

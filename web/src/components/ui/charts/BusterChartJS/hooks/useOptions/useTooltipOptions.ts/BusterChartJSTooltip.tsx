@@ -1,13 +1,13 @@
-import { BusterChartTooltip } from '../../../../BusterChartTooltip';
+import type { Chart, ChartType as ChartJSChartType, TooltipItem } from 'chart.js';
+import type React from 'react';
+import { useMemo } from 'react';
 import { type BusterChartProps, ChartType } from '@/api/asset_interfaces/metric/charts';
-import React, { useMemo } from 'react';
-import type { Chart, TooltipItem, ChartType as ChartJSChartType, TimeScale } from 'chart.js';
+import { formatLabel } from '@/lib/columnFormatter';
+import { BusterChartTooltip } from '../../../../BusterChartTooltip';
 import type { ITooltipItem } from '../../../../BusterChartTooltip/interfaces';
 import { barAndLineTooltipHelper } from './barAndLineTooltipHelper';
 import { pieTooltipHelper } from './pieTooltipHelper';
-import { formatLabel } from '@/lib/columnFormatter';
 import { scatterTooltipHelper } from './scatterTooltipHelper';
-import { AUTO_DATE_FORMATS } from '../useXAxis/config';
 
 export const BusterChartJSTooltip: React.FC<{
   chart: Chart;
@@ -85,32 +85,24 @@ export const BusterChartJSTooltip: React.FC<{
     }
 
     const dataIndex = dataPoints[0].dataIndex;
-    const value = chart.data.labels?.[dataIndex!];
+    const value = dataIndex !== undefined ? chart.data.labels?.[dataIndex] : undefined;
     if (typeof value === 'string') return String(value);
 
-    //THIS IS ONLY FOR LINE CHART WITH A TIME AXIS
     const datasetIndex = dataPoints[0].datasetIndex;
-    const dataset = datasets[datasetIndex!];
-    const xAxisKeys = dataset.xAxisKeys;
-    const key = xAxisKeys.at(0)!;
-    const columnLabelFormat = columnLabelFormats[key!];
+    const dataset = datasetIndex !== undefined ? datasets[datasetIndex] : undefined;
+    const xAxisKeys = dataset?.xAxisKeys;
+    const key = xAxisKeys?.at(0);
+    const columnLabelFormat = key ? columnLabelFormats[key] : undefined;
 
-    //I decided to do this because the tooltip really need to be more detailed than the x...
-    // const isAutoDateFormat =
-    //   columnLabelFormat?.dateFormat === 'auto' && columnLabelFormat?.style === 'date';
+    if (columnLabelFormat) {
+      return formatLabel(value as number | string, columnLabelFormat);
+    }
 
-    // if (isAutoDateFormat) {
-    //   const unit = (chart.scales.x as TimeScale)._unit;
-    //   const format = AUTO_DATE_FORMATS[unit];
-
-    //   return formatLabel(value as number | Date, { ...columnLabelFormat, dateFormat: format });
-    // }
-
-    return formatLabel(value as number | string, columnLabelFormat);
+    return undefined;
   }, [dataPoints, isPie, isScatter, chart, tooltipItems[0], hasCategoryAxis]);
 
   //use mount will not work here because the tooltip is passed to a renderString function
-  const busterTooltipNode = document?.querySelector('#buster-chartjs-tooltip')!;
+  const busterTooltipNode = document?.querySelector('#buster-chartjs-tooltip');
   if (busterTooltipNode) {
     if (tooltipItems.length === 0) {
       (busterTooltipNode as HTMLElement).style.display = 'none';

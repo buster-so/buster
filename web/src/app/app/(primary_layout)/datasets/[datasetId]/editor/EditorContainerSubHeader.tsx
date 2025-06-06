@@ -1,7 +1,7 @@
+import React from 'react';
+import type { SegmentedItem } from '@/components/ui/segmented';
 import { AppSegmented } from '@/components/ui/segmented';
 import { useMemoizedFn } from '@/hooks';
-import { type SegmentedItem } from '@/components/ui/segmented';
-import React from 'react';
 import { cn } from '@/lib/classMerge';
 
 export enum EditorApps {

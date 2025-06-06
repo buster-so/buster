@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-import { useMemoizedFn } from '@/hooks';
-import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useGetMetric, useUpdateMetric } from '@/api/buster_rest/metrics';
 import { EditFileContainer } from '@/components/features/files/EditFileContainer';
+import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useIsMetricReadOnly } from '@/context/Metrics/useIsMetricReadOnly';
+import { useMemoizedFn } from '@/hooks';
 
 export const MetricViewFile: React.FC<{ metricId: string }> = React.memo(({ metricId }) => {
   const { data: metric } = useGetMetric(

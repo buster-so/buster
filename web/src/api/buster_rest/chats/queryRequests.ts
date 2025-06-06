@@ -1,37 +1,37 @@
-import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import {
   QueryClient,
-  useQuery,
+  type UseQueryOptions,
   useMutation,
-  useQueryClient,
-  UseQueryOptions
+  useQuery,
+  useQueryClient
 } from '@tanstack/react-query';
-import {
-  getListChats,
-  getListChats_server,
-  getChat,
-  getChat_server,
-  updateChat,
-  deleteChat,
-  getListLogs,
-  duplicateChat,
-  startChatFromAsset,
-  updateChatMessageFeedback
-} from './requests';
+import last from 'lodash/last';
+import { useMemo } from 'react';
 import type { IBusterChat, IBusterChatMessage } from '@/api/asset_interfaces/chat/iChatInterfaces';
 import { chatQueryKeys } from '@/api/query_keys/chat';
-import { updateChatToIChat } from '@/lib/chat';
-import { useMemo } from 'react';
-import last from 'lodash/last';
-import { prefetchGetMetricDataClient } from '../metrics/queryRequests';
+import { collectionQueryKeys } from '@/api/query_keys/collection';
 import { useBusterNotifications } from '@/context/BusterNotifications';
-import { useGetUserFavorites } from '../users/queryRequestFavorites';
+import { useMemoizedFn } from '@/hooks/useMemoizedFn';
+import { updateChatToIChat } from '@/lib/chat';
 import {
   useAddAssetToCollection,
   useRemoveAssetFromCollection
 } from '../collections/queryRequests';
-import { collectionQueryKeys } from '@/api/query_keys/collection';
 import type { RustApiError } from '../errors';
+import { prefetchGetMetricDataClient } from '../metrics/queryRequests';
+import { useGetUserFavorites } from '../users/queryRequestFavorites';
+import {
+  deleteChat,
+  duplicateChat,
+  getChat,
+  getChat_server,
+  getListChats,
+  getListChats_server,
+  getListLogs,
+  startChatFromAsset,
+  updateChat,
+  updateChatMessageFeedback
+} from './requests';
 
 export const useGetListChats = (
   filters?: Omit<Parameters<typeof getListChats>[0], 'page_token' | 'page_size'>
@@ -88,24 +88,27 @@ export const useGetChat = <TData = IBusterChat>(
     return getChat(params).then((chat) => {
       const { iChat, iChatMessages } = updateChatToIChat(chat, false);
       const lastMessageId = last(iChat.message_ids);
-      const lastMessage = iChatMessages[lastMessageId!];
+
+      if (!lastMessageId) return iChat;
+
+      const lastMessage = iChatMessages[lastMessageId];
       if (lastMessage) {
-        Object.values(lastMessage.response_messages).forEach((responseMessage) => {
+        for (const responseMessage of Object.values(lastMessage.response_messages)) {
           if (responseMessage.type === 'file' && responseMessage.file_type === 'metric') {
             prefetchGetMetricDataClient(
               { id: responseMessage.id, version_number: responseMessage.version_number },
               queryClient
             );
           }
-        });
+        }
       }
 
-      iChat.message_ids.forEach((messageId) => {
+      for (const messageId of iChat.message_ids) {
         queryClient.setQueryData(
           chatQueryKeys.chatsMessages(messageId).queryKey,
           iChatMessages[messageId]
         );
-      });
+      }
 
       return iChat;
     });
@@ -126,12 +129,12 @@ export const useStartChatFromAsset = () => {
   const mutationFn = useMemoizedFn(async (params: Parameters<typeof startChatFromAsset>[0]) => {
     const chat = await startChatFromAsset(params);
     const { iChat, iChatMessages } = updateChatToIChat(chat, false);
-    iChat.message_ids.forEach((messageId) => {
+    for (const messageId of iChat.message_ids) {
       queryClient.setQueryData(
         chatQueryKeys.chatsMessages(messageId).queryKey,
         iChatMessages[messageId]
       );
-    });
+    }
     queryClient.setQueryData(chatQueryKeys.chatsGetChat(chat.id).queryKey, iChat);
     return iChat;
   });
@@ -175,8 +178,9 @@ export const useUpdateChat = () => {
       if (data.title) {
         const options = chatQueryKeys.chatsGetChat(data.id);
         queryClient.setQueryData(options.queryKey, (old) => {
+          if (!old) return old;
           return {
-            ...old!,
+            ...old,
             ...data
           };
         });
@@ -192,8 +196,9 @@ export const useUpdateChatMessageFeedback = () => {
     onMutate: ({ message_id, feedback }) => {
       const options = chatQueryKeys.chatsMessages(message_id);
       queryClient.setQueryData(options.queryKey, (old) => {
+        if (!old) return old;
         return {
-          ...old!,
+          ...old,
           feedback
         };
       });
@@ -230,7 +235,7 @@ export const useDeleteChat = () => {
 
   return useMutation({
     mutationFn,
-    onSuccess(data, variables, context) {
+    onSuccess() {
       queryClient.invalidateQueries({
         queryKey: chatQueryKeys.chatsGetList().queryKey,
         refetchType: 'all'
@@ -336,7 +341,7 @@ export const useRemoveChatFromCollections = () => {
 
   return useMutation({
     mutationFn: removeChatFromCollection,
-    onSuccess: (_, { collectionIds, chatIds }) => {
+    onSuccess: (_, { collectionIds }) => {
       const collectionIsInFavorites = userFavorites.some((f) => {
         return collectionIds.includes(f.id);
       });

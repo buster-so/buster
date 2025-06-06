@@ -1,8 +1,8 @@
 import React from 'react';
-import { StylingAppColorsTab } from './config';
-import { type SegmentedItem, AppSegmented } from '@/components/ui/segmented';
-import { Palette, Cards, Paintbrush } from '@/components/ui/icons';
+import { Cards, Paintbrush, Palette } from '@/components/ui/icons';
+import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
 import { useMemoizedFn } from '@/hooks';
+import { StylingAppColorsTab } from './config';
 
 const options: SegmentedItem<StylingAppColorsTab>[] = [
   { label: 'Colors', icon: <Palette />, value: StylingAppColorsTab.Colors },

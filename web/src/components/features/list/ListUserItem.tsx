@@ -1,6 +1,6 @@
-import { Text } from '@/components/ui/typography';
-import { Avatar } from '@/components/ui/avatar';
 import React from 'react';
+import { Avatar } from '@/components/ui/avatar';
+import { Text } from '@/components/ui/typography';
 
 export const ListUserItem = React.memo(({ name, email }: { name: string; email: string }) => {
   return (

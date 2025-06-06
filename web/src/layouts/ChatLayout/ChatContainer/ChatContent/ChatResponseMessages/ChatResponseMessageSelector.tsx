@@ -1,7 +1,7 @@
 import React from 'react';
-import { ChatResponseMessage_File } from './ChatResponseMessage_File';
 import type { BusterChatMessageResponse } from '@/api/asset_interfaces';
 import { useGetChatMessage } from '@/api/buster_rest/chats';
+import { ChatResponseMessage_File } from './ChatResponseMessage_File';
 import { ChatResponseMessage_Text } from './ChatResponseMessage_Text';
 
 const ChatResponseMessageRecord: Record<

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Select } from './Select';
-import { User, MapSettings, Mailbox } from '../icons';
 import { fn } from '@storybook/test';
+import { Mailbox, MapSettings, User } from '../icons';
+import { Select } from './Select';
 
 const meta: Meta<typeof Select> = {
   title: 'UI/Select/Select',

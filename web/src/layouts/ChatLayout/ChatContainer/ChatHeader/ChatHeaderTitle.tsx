@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import React from 'react';
 import { useUpdateChat } from '@/api/buster_rest/chats';
 import { EditableTitle } from '@/components/ui/typography/EditableTitle';
 
@@ -21,7 +21,7 @@ export const ChatHeaderTitle: React.FC<{
 }> = React.memo(({ chatTitle, chatId, isCompletedStream }) => {
   const { mutateAsync: updateChat } = useUpdateChat();
 
-  if (!chatTitle) return <div></div>;
+  if (!chatTitle) return <div />;
 
   return (
     <AnimatePresence mode="wait" initial={false}>

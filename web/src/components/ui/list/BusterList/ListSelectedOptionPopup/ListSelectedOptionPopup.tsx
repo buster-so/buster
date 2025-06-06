@@ -1,7 +1,7 @@
-import { Xmark } from '@/components/ui/icons';
-import { Text } from '@/components/ui/typography';
 import React from 'react';
+import { Xmark } from '@/components/ui/icons';
 import { PopupContainer, PopupSplitter } from '@/components/ui/popup/PopupContainer';
+import { Text } from '@/components/ui/typography';
 import { cn } from '@/lib/classMerge';
 
 export const BusterListSelectedOptionPopupContainer: React.FC<{

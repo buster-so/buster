@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { type BusterShare, ShareAssetType, ShareRole } from '@/api/asset_interfaces';
 import { ShareMenuContent } from './ShareMenuContent';
-import { BusterShare, ShareAssetType, ShareRole } from '@/api/asset_interfaces';
 
 const meta: Meta<typeof ShareMenuContent> = {
   title: 'Features/ShareMenu/ShareMenuContent',

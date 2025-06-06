@@ -1,11 +1,11 @@
-import { Popover } from '@/components/ui/popover/Popover';
-import React from 'react';
-import { BusterChartLegendItem, BusterChartLegendProps } from './interfaces';
-import { LegendItem } from './LegendItem';
-import { cn } from '@/lib/classMerge';
-import { LegendItemDot } from './LegendDot';
-import { ChartType } from '@/api/asset_interfaces/metric/charts';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import React from 'react';
+import { ChartType } from '@/api/asset_interfaces/metric/charts';
+import { Popover } from '@/components/ui/popover/Popover';
+import { cn } from '@/lib/classMerge';
+import type { BusterChartLegendItem, BusterChartLegendProps } from './interfaces';
+import { LegendItemDot } from './LegendDot';
+import { LegendItem } from './LegendItem';
 
 export const OverflowButton: React.FC<{
   legendItems: BusterChartLegendItem[];
@@ -65,8 +65,8 @@ const OverflowPopoverContent = React.memo(
       <div
         ref={parentRef}
         style={{
-          maxHeight: `100%`,
-          width: `100%`,
+          maxHeight: '100%',
+          width: '100%',
           overflow: 'auto'
         }}>
         <div

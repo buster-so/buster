@@ -1,10 +1,10 @@
-import {
+import type {
   FontSpec,
   Scriptable,
   ScriptableAndScriptableOptions,
   ScriptableChartContext
 } from 'chart.js';
-import OutLabelsContext from './OutLabelsContext';
+import type OutLabelsContext from './OutLabelsContext';
 
 export type TRBL = {
   top: number;

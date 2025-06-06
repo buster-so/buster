@@ -1,8 +1,8 @@
-import React, { useRef, useEffect } from 'react';
-import * as yaml from 'js-yaml';
-import * as monaco from 'monaco-editor';
-import { type editor } from 'monaco-editor/esm/vs/editor/editor.api';
 import MonacoEditor from '@monaco-editor/react';
+import * as yaml from 'js-yaml';
+import type { editor } from 'monaco-editor/esm/vs/editor/editor.api';
+import type React from 'react';
+import { useRef } from 'react';
 
 type IMarkerData = editor.IMarkerData;
 
@@ -31,36 +31,40 @@ export const validateMetricYaml = (
   monaco: typeof import('monaco-editor')
 ): IMarkerData[] => {
   const markers: IMarkerData[] = [];
-  let parsed: any;
+  let parsed: unknown;
 
   // Parse YAML content
   try {
     parsed = yaml.load(content);
-  } catch (error: any) {
+  } catch (error: unknown) {
     // For parse errors, extract line and column information from the error
     let lineNumber = 1;
     let columnNumber = 1;
 
-    // js-yaml errors include mark object with position information
-    if (error.mark) {
-      lineNumber = error.mark.line + 1; // Convert to 1-based line numbering
-      columnNumber = error.mark.column + 1; // Convert to 1-based column numbering
-    } else {
-      // Fallback to regex for older versions or different error types
-      const lineMatch = error.message.match(/line (\d+)/i);
-      if (lineMatch && lineMatch[1]) {
-        lineNumber = parseInt(lineMatch[1], 10);
+    if (error instanceof Error) {
+      // Extract line number from error message if available
+      if ('mark' in error && typeof error.mark === 'object' && error.mark) {
+        const mark = error.mark as { line?: number; column?: number };
+        lineNumber = (mark.line || 0) + 1; // Monaco uses 1-based line numbers
+        columnNumber = (mark.column || 0) + 1; // Monaco uses 1-based column numbers
+      } else {
+        // Fallback to regex for older versions or different error types
+        const lineMatch = error.message.match(/line (\d+)/i);
+        if (lineMatch?.[1]) {
+          lineNumber = Number.parseInt(lineMatch[1], 10);
+        }
       }
     }
 
     markers.push({
       severity: monaco.MarkerSeverity.Error,
-      message: 'Invalid YAML: ' + error.message,
+      message: `Invalid YAML: ${(error as Error).message}`,
       startLineNumber: lineNumber,
       startColumn: columnNumber,
       endLineNumber: lineNumber,
-      endColumn: columnNumber + 1 // Highlight at least one character
+      endColumn: columnNumber
     });
+
     return markers;
   }
 
@@ -82,33 +86,32 @@ export const validateMetricYaml = (
   const keys = Object.keys(parsed);
 
   // Check for any unexpected keys
-  keys.forEach((key) => {
+  for (const key of keys) {
     if (!allowedKeys.includes(key)) {
-      const lineNumber = findLineNumberForKey(content, key);
       markers.push({
-        severity: monaco.MarkerSeverity.Error,
-        message: `Unexpected key "${key}". Only ${allowedKeys.join(', ')} are allowed.`,
-        startLineNumber: lineNumber,
+        severity: monaco.MarkerSeverity.Warning,
+        message: `Unexpected key: "${key}"`,
+        startLineNumber: findLineNumberForKey(content, key) || 1,
         startColumn: 1,
-        endLineNumber: lineNumber,
-        endColumn: content.split('\n')[lineNumber - 1]?.length || 1
+        endLineNumber: findLineNumberForKey(content, key) || 1,
+        endColumn: 100
       });
     }
-  });
+  }
 
   // Check for missing keys
-  allowedKeys.forEach((key) => {
+  for (const key of allowedKeys) {
     if (!(key in parsed)) {
       markers.push({
         severity: monaco.MarkerSeverity.Error,
-        message: `Missing required key "${key}".`,
+        message: `Missing required key: "${key}"`,
         startLineNumber: 1,
         startColumn: 1,
         endLineNumber: 1,
-        endColumn: 1
+        endColumn: 100
       });
     }
-  });
+  }
 
   // Validate types for each field
   if ('Person' in parsed && typeof parsed.Person !== 'string') {
@@ -166,7 +169,7 @@ export const validateMetricYaml = (
     } else {
       // Validate that each sibling's age is a number
       const lines = content.split('\n');
-      Object.entries(parsed.Siblings).forEach(([siblingName, siblingAge]) => {
+      for (const [siblingName, siblingAge] of Object.entries(parsed.Siblings)) {
         if (typeof siblingAge !== 'number') {
           // Look for the sibling in the content
           let siblingLineNumber = siblingsLineNumber + 1; // Start after Siblings:
@@ -186,7 +189,7 @@ export const validateMetricYaml = (
             endColumn: lines[siblingLineNumber - 1]?.length || 1
           });
         }
-      });
+      }
     }
   }
 
@@ -204,7 +207,8 @@ const configureYamlSchema = (
   if (model) {
     // Check if the YAML language support exists
     // This is dynamically added by monaco-yaml and may not be typed correctly
-    const yamlDefaults = (monaco.languages as any).yaml?.yamlDefaults;
+    const yamlDefaults = (monaco.languages as unknown as { yaml?: { yamlDefaults: unknown } }).yaml
+      ?.yamlDefaults as { setDiagnosticsOptions?: (options: unknown) => void };
     if (yamlDefaults && typeof yamlDefaults.setDiagnosticsOptions === 'function') {
       yamlDefaults.setDiagnosticsOptions({
         validate: true,
@@ -245,7 +249,7 @@ export const MyYamlEditor: React.FC = () => {
     // Try to configure YAML schema if monaco-yaml is properly loaded
     try {
       // Check if the YAML language support exists using type assertion
-      if ((monacoInstance.languages as any).yaml?.yamlDefaults) {
+      if ((monacoInstance.languages as unknown as { yaml?: unknown }).yaml) {
         configureYamlSchema(monacoInstance, editor);
       }
     } catch (err) {
@@ -256,7 +260,10 @@ export const MyYamlEditor: React.FC = () => {
     editor.onDidChangeModelContent(() => {
       const value = editor.getValue();
       const markers = validateMetricYaml(value, monacoInstance);
-      monacoInstance.editor.setModelMarkers(editor.getModel()!, 'yaml', markers);
+      const model = editor.getModel();
+      if (model) {
+        monacoInstance.editor.setModelMarkers(model, 'yaml', markers);
+      }
     });
   };
 

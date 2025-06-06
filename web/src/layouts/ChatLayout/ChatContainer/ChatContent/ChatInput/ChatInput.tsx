@@ -1,15 +1,15 @@
-import React, { ChangeEvent, useMemo, useRef, useState } from 'react';
+import React, { type ChangeEvent, useMemo, useRef, useState } from 'react';
+import { InputTextAreaButton } from '@/components/ui/inputs/InputTextAreaButton';
 import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/classMerge';
 import { inputHasText } from '@/lib/text';
+import { useChatIndividualContextSelector } from '../../../ChatContext';
 import { AIWarning } from './AIWarning';
 import { useChatInputFlow } from './useChatInputFlow';
-import { useChatIndividualContextSelector } from '../../../ChatContext';
-import { InputTextAreaButton } from '@/components/ui/inputs/InputTextAreaButton';
-import { cn } from '@/lib/classMerge';
 
 const autoResizeConfig = { minRows: 2, maxRows: 16 };
 
-export const ChatInput: React.FC<{}> = React.memo(({}) => {
+export const ChatInput: React.FC = React.memo(() => {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const loading = useChatIndividualContextSelector((x) => x.isStreamingMessage);
   const [inputValue, setInputValue] = useState('');

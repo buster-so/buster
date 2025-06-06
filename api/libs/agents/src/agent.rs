@@ -554,8 +554,13 @@ impl Agent {
             *current = Some(thread_ref.clone());
         }
 
+        let max_recursion = std::env::var("MAX_RECURSION")
+            .ok()
+            .and_then(|v| v.parse::<u32>().ok())
+            .unwrap_or(15);
+
         // Limit recursion to a maximum of 15 times
-        if recursion_depth >= 15 {
+        if recursion_depth >= max_recursion {
             let max_depth_msg = format!("Maximum recursion depth ({}) reached.", recursion_depth);
             warn!("{}", max_depth_msg);
             let message = AgentMessage::assistant(

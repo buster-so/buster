@@ -1,29 +1,30 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { InvitePeopleModal } from './InvitePeopleModal';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useInviteUser } from '@/api/buster_rest/users';
 import { useBusterNotifications } from '@/context/BusterNotifications';
+import { InvitePeopleModal } from './InvitePeopleModal';
 
 // Mock the hooks
-jest.mock('@/api/buster_rest/users', () => ({
-  useInviteUser: jest.fn()
+vi.mock('@/api/buster_rest/users', () => ({
+  useInviteUser: vi.fn()
 }));
 
-jest.mock('@/context/BusterNotifications', () => ({
-  useBusterNotifications: jest.fn()
+vi.mock('@/context/BusterNotifications', () => ({
+  useBusterNotifications: vi.fn()
 }));
 
 describe('InvitePeopleModal', () => {
-  const mockOnClose = jest.fn();
-  const mockMutateAsync = jest.fn();
-  const mockOpenErrorMessage = jest.fn();
+  const mockOnClose = vi.fn();
+  const mockMutateAsync = vi.fn();
+  const mockOpenErrorMessage = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (useInviteUser as jest.Mock).mockReturnValue({
+    vi.clearAllMocks();
+    (useInviteUser as any).mockReturnValue({
       mutateAsync: mockMutateAsync,
       isPending: false
     });
-    (useBusterNotifications as jest.Mock).mockReturnValue({
+    (useBusterNotifications as any).mockReturnValue({
       openErrorMessage: mockOpenErrorMessage
     });
   });

@@ -1,26 +1,23 @@
 'use client';
 
-import { DataSource, BigQueryCredentials, BigQueryCredentialsSchema } from '@/api/asset_interfaces';
-import React from 'react';
-import { FormWrapper } from './FormWrapper';
+import type React from 'react';
 import {
-  createBigQueryDataSource,
+  type BigQueryCredentials,
+  BigQueryCredentialsSchema,
+  type DataSource
+} from '@/api/asset_interfaces';
+import {
+  type createBigQueryDataSource,
   useCreateBigQueryDataSource,
   useUpdateBigQueryDataSource
 } from '@/api/buster_rest/data_source';
 import { useAppForm } from '@/components/ui/form/useFormBaseHooks';
+import { FormWrapper } from './FormWrapper';
 import { useDataSourceFormSuccess } from './helpers';
-import { useBusterNotifications } from '@/context/BusterNotifications';
-import { BusterRoutes } from '@/routes/busterRoutes';
-import { useConfetti } from '@/hooks/useConfetti';
-import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 
 export const BigQueryForm: React.FC<{
   dataSource?: DataSource;
 }> = ({ dataSource }) => {
-  const { fireConfetti } = useConfetti();
-  const { openSuccessMessage, openConfirmModal } = useBusterNotifications();
-  const onChangePage = useAppLayoutContextSelector((state) => state.onChangePage);
   const { mutateAsync: createDataSource } = useCreateBigQueryDataSource();
   const { mutateAsync: updateDataSource } = useUpdateBigQueryDataSource();
   const credentials = dataSource?.credentials as BigQueryCredentials;
@@ -40,7 +37,7 @@ export const BigQueryForm: React.FC<{
       await dataSourceFormSubmit({
         flow,
         dataSourceId: dataSource?.id,
-        onUpdate: () => updateDataSource({ id: dataSource!.id, ...value }),
+        onUpdate: () => updateDataSource({ id: dataSource?.id || '', ...value }),
         onCreate: () => createDataSource(value)
       });
     },
@@ -55,45 +52,41 @@ export const BigQueryForm: React.FC<{
 
   return (
     <FormWrapper form={form} flow={flow}>
-      <form.AppField
-        name="name"
-        children={(field) => (
+      <form.AppField name="name">
+        {(field) => (
           <field.TextField labelClassName={labelClassName} label="Name" placeholder="My BigQuery" />
         )}
-      />
+      </form.AppField>
 
-      <form.AppField
-        name="service_role_key"
-        children={(field) => (
+      <form.AppField name="service_role_key">
+        {(field) => (
           <field.TextField
             labelClassName={labelClassName}
             label="Service Account Key"
             placeholder="Paste your service account key JSON here"
           />
         )}
-      />
+      </form.AppField>
 
-      <form.AppField
-        name="default_project_id"
-        children={(field) => (
+      <form.AppField name="default_project_id">
+        {(field) => (
           <field.TextField
             labelClassName={labelClassName}
             label="Project ID"
             placeholder="your-project-id"
           />
         )}
-      />
+      </form.AppField>
 
-      <form.AppField
-        name="default_dataset_id"
-        children={(field) => (
+      <form.AppField name="default_dataset_id">
+        {(field) => (
           <field.TextField
             labelClassName={labelClassName}
             label="Dataset ID"
             placeholder="your_dataset"
           />
         )}
-      />
+      </form.AppField>
     </FormWrapper>
   );
 };

@@ -1,14 +1,14 @@
 'use client';
 
-import { VList } from 'virtua';
 import React, { useMemo, useRef } from 'react';
-import { BusterListProps } from './interfaces';
+import { VList } from 'virtua';
 import { useMemoizedFn } from '@/hooks';
-import { getAllIdsInSection } from './helpers';
-import { HEIGHT_OF_ROW, HEIGHT_OF_SECTION_ROW } from './config';
+import { ContextMenu, type ContextMenuProps } from '../../context/ContextMenu';
 import { BusterListHeader } from './BusterListHeader';
 import { BusterListRowComponentSelector } from './BusterListRowComponentSelector';
-import { ContextMenu, type ContextMenuProps } from '../../context/ContextMenu';
+import { HEIGHT_OF_ROW, HEIGHT_OF_SECTION_ROW } from './config';
+import { getAllIdsInSection } from './helpers';
+import type { BusterListProps } from './interfaces';
 
 export const BusterListVirtua = React.memo(
   ({
@@ -115,8 +115,8 @@ export const BusterListVirtua = React.memo(
     ]);
 
     const [WrapperNode, wrapperNodeProps] = useMemo(() => {
-      const node = !!contextMenu ? ContextMenu : React.Fragment;
-      const props: ContextMenuProps = !!contextMenu ? contextMenu : ({} as ContextMenuProps);
+      const node = contextMenu ? ContextMenu : React.Fragment;
+      const props: ContextMenuProps = contextMenu ? contextMenu : ({} as ContextMenuProps);
       return [node, props];
     }, [contextMenu]);
 
@@ -137,7 +137,7 @@ export const BusterListVirtua = React.memo(
           {!showEmptyState && (
             <VList overscan={10}>
               {rows.map((row, index) => (
-                <div key={index} style={{ height: itemSize(index) }}>
+                <div key={row.id + index.toString()} style={{ height: itemSize(index) }}>
                   <BusterListRowComponentSelector
                     row={row}
                     id={row.id}

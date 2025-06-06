@@ -1,6 +1,6 @@
-import React from 'react';
-import { DatasetPageProvider } from './_DatasetsLayout/DatasetPageContext';
+import type React from 'react';
 import { AppPageLayout } from '@/components/ui/layouts';
+import { DatasetPageProvider } from './_DatasetsLayout/DatasetPageContext';
 import { DatasetsIndividualHeader } from './_DatasetsLayout/DatasetsIndividualHeader';
 
 export default async function Layout({

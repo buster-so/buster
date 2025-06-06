@@ -1,6 +1,6 @@
+import React from 'react';
 import { Button } from '@/components/ui/buttons';
 import { Link } from '@/components/ui/icons';
-import React from 'react';
 
 export const CopyLinkButton: React.FC<{
   onCopyLink: () => void;

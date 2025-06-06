@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { BusterChartLegend } from '../BusterChartLegend';
 import { ChartType } from '../../../../../api/asset_interfaces/metric/charts';
-import { BusterChartLegendItem } from '../interfaces';
+import { BusterChartLegend } from '../BusterChartLegend';
+import type { BusterChartLegendItem } from '../interfaces';
 
 const meta: Meta<typeof BusterChartLegend> = {
   title: 'UI/Charts/BusterChartLegend',

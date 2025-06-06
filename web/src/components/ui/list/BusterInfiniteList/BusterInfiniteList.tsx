@@ -1,12 +1,10 @@
 'use client';
-
-import React, { useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useMemoizedFn } from '@/hooks';
-import { BusterListProps } from '../BusterList';
-import { getAllIdsInSection } from '../BusterList/helpers';
-import { useEffect, useMemo } from 'react';
+import type { BusterListProps } from '../BusterList';
 import { BusterListHeader } from '../BusterList/BusterListHeader';
 import { BusterListRowComponentSelector } from '../BusterList/BusterListRowComponentSelector';
+import { getAllIdsInSection } from '../BusterList/helpers';
 import { EmptyStateList } from '../EmptyStateList';
 
 export interface BusterInfiniteListProps extends BusterListProps {
@@ -104,12 +102,13 @@ export const BusterInfiniteList: React.FC<BusterInfiniteListProps> = React.memo(
 
       // Find the first scrollable parent element
       const findScrollableParent = (element: HTMLElement | null): HTMLDivElement | null => {
-        while (element) {
-          const { overflowY } = window.getComputedStyle(element);
+        let currentElement = element;
+        while (currentElement) {
+          const { overflowY } = window.getComputedStyle(currentElement);
           if (overflowY === 'auto' || overflowY === 'scroll') {
-            return element as HTMLDivElement;
+            return currentElement as HTMLDivElement;
           }
-          element = element.parentElement;
+          currentElement = currentElement.parentElement;
         }
         return null;
       };

@@ -1,14 +1,15 @@
-import React, { useMemo } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import type React from 'react';
+import { useMemo } from 'react';
 import type {
   BusterChatMessageReasoning,
   BusterChatMessageReasoning_text
 } from '@/api/asset_interfaces/chat';
-import { ReasoningMessage_PillsContainer } from './ReasoningMessage_PillContainers';
-import { ReasoningMessage_Files } from './ReasoningMessage_Files';
-import { ReasoningMessage_Text } from './ReasoningMessage_Text';
 import { useGetChatMessage } from '@/api/buster_rest/chats';
-import { AnimatePresence, motion } from 'framer-motion';
 import { BarContainer } from './BarContainer';
+import { ReasoningMessage_Files } from './ReasoningMessage_Files';
+import { ReasoningMessage_PillsContainer } from './ReasoningMessage_PillContainers';
+import { ReasoningMessage_Text } from './ReasoningMessage_Text';
 
 const itemAnimationConfig = {
   initial: { opacity: 0, height: 0 },

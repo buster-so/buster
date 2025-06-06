@@ -1,2 +1,2 @@
-export * from './SettingsPageHeader';
 export * from './SettingsEmptyState';
+export * from './SettingsPageHeader';

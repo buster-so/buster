@@ -1,6 +1,6 @@
+import type { DraggableAttributes } from '@dnd-kit/core';
+import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
 import React from 'react';
-import { DraggableAttributes } from '@dnd-kit/core';
-import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
 import { GripDotsVertical } from '@/components/ui/icons';
 import { cn } from '@/lib/classMerge';
 
@@ -29,7 +29,7 @@ export const SelectAxisItemDragContainer = React.forwardRef<
         {...listeners}
         {...attributes}
         className={cn(
-          `text-icon-color hover:bg-item-active flex h-full w-8 min-w-8 cursor-grab items-center justify-center rounded`
+          'text-icon-color hover:bg-item-active flex h-full w-8 min-w-8 cursor-grab items-center justify-center rounded'
         )}>
         <GripDotsVertical />
       </div>

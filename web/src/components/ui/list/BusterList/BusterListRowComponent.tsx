@@ -1,11 +1,16 @@
-import { useMemoizedFn } from '@/hooks';
 import get from 'lodash/get';
-import React, { useMemo } from 'react';
-import { BusterListRow, BusterListColumn, BusterListRowItem, BusterListProps } from './interfaces';
 import Link from 'next/link';
+import React, { useMemo } from 'react';
+import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/classMerge';
 import { CheckboxColumn } from './CheckboxColumn';
 import { HEIGHT_OF_ROW } from './config';
-import { cn } from '@/lib/classMerge';
+import type {
+  BusterListColumn,
+  BusterListProps,
+  BusterListRow,
+  BusterListRowItem
+} from './interfaces';
 
 export const BusterListRowComponent = React.memo(
   React.forwardRef<
@@ -67,6 +72,7 @@ export const BusterListRowComponent = React.memo(
             onClick={onContainerClick}
             style={rowStyles}
             onContextMenu={onContextMenu}
+            data-testid={row.dataTestId}
             className={cn(
               'border-border flex items-center border-b pr-6',
               checked ? 'bg-primary-background hover:bg-primary-background-hover' : '',
@@ -79,11 +85,9 @@ export const BusterListRowComponent = React.memo(
               'group'
             )}
             ref={ref}>
-            {!!onSelectChange ? (
+            {onSelectChange ? (
               <CheckboxColumn checkStatus={checked ? 'checked' : 'unchecked'} onChange={onChange} />
-            ) : (
-              <></>
-            )}
+            ) : null}
             {columns.map((column, columnIndex) => (
               <BusterListCellComponent
                 key={column.dataIndex}

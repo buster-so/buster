@@ -2,28 +2,28 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import quarterOfYear from 'dayjs/plugin/quarterOfYear';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
+import { isNaN as lodashIsNaN } from 'lodash';
+import isDate from 'lodash/isDate';
 import isNumber from 'lodash/isNumber';
 import isString from 'lodash/isString';
-import isDate from 'lodash/isDate';
-import isNaN from 'lodash/isNaN';
-import { isNumeric } from './numbers';
-import { getBrowserLanguage } from './language';
-import { SupportedLanguages } from '../config/languages';
-
-import relativeTime from 'dayjs/plugin/relativeTime';
-
 import {
-  ColumnLabelFormat,
+  type ColumnLabelFormat,
   DEFAULT_DATE_FORMAT_MONTH_OF_YEAR,
   DEFAULT_DATE_FORMAT_QUARTER,
   DEFAULT_DAY_OF_WEEK_FORMAT
 } from '@/api/asset_interfaces/metric';
+import { SupportedLanguages } from '../config/languages';
+import { getBrowserLanguage } from './language';
+import { isNumeric } from './numbers';
 
 dayjs.extend(relativeTime);
 dayjs.extend(customParseFormat);
 dayjs.extend(localizedFormat);
 dayjs.extend(utc);
+dayjs.extend(timezone);
 dayjs.extend(quarterOfYear);
 
 export const getNow = () => dayjs();
@@ -75,7 +75,8 @@ export const numberDateFallback = (
 ) => {
   if (convertNumberTo === 'day_of_week' && isNumber(date) && valueIsValidDayOfWeek(date, dateKey)) {
     return dayjs().day(Number(date)).startOf('day');
-  } else if (valueIsValidMonth(date, dateKey) || convertNumberTo === 'month_of_year') {
+  }
+  if (valueIsValidMonth(date, dateKey) || convertNumberTo === 'month_of_year') {
     return dayjs()
       .month(Number(date) - 1)
       .startOf('month')
@@ -83,7 +84,7 @@ export const numberDateFallback = (
   }
 
   const numericDate = Number(date);
-  if (!isNaN(numericDate)) {
+  if (!lodashIsNaN(numericDate)) {
     // Check for 13 digit timestamp (milliseconds)
     if (String(numericDate).length === 13) {
       return dayjs(numericDate);
@@ -241,8 +242,9 @@ export const isDateValid = ({
 }) => {
   if (isDate(date)) return true;
   if (useNumbersAsDateKey && dateKey && isNumeric(date as string) && isKeyLikelyDate(dateKey)) {
-    return valueIsValidMonth(date!, dateKey);
-  } else if (!date || isNumber(date)) return false;
+    return valueIsValidMonth(date || '', dateKey);
+  }
+  if (!date || isNumber(date)) return false;
   const hyphenCount = (date.match(/-/g) || []).length;
   const twoHyphens = hyphenCount === 2;
 
@@ -253,9 +255,9 @@ export const isDateValid = ({
     filter = true; //YYYY-MM-DDTHH:mm:ss.sssZ
   else if (twoHyphens && date.length === 10)
     filter = true; //2023-10-17
-  else if (date.length === 13 && isNaN(Number(date)))
+  else if (date.length === 13 && lodashIsNaN(Number(date)))
     filter = true; // 1634468020000
-  else if (date.length === 10 && isNaN(Number(date))) filter = true; // 1634468020
+  else if (date.length === 10 && lodashIsNaN(Number(date))) filter = true; // 1634468020
 
   if (filter) return filter && dayjs(date).isValid();
 
@@ -270,7 +272,7 @@ export const keysWithDate = (
     absoluteFormats?: boolean;
   }
 ): string[] => {
-  const uniqueKeys = Object.keys(data[0]! || {});
+  const uniqueKeys = Object.keys(data[0] || {});
   const { parseable, includeFormats = true, absoluteFormats = true } = params || {};
 
   if (parseable) {
@@ -303,8 +305,8 @@ export const keysWithDate = (
     });
 };
 
-export const formatTime = (date: string | Date, format = 'h:mm A', isUTC: boolean) => {
-  return isUTC ? dayjs.utc(date).format(format) : dayjs(date).format(format);
+export const formatTime = (date: string | Date, format: string, isUTC: boolean) => {
+  return isUTC ? dayjs.utc(date).format(format) : dayjs(date).format(format || 'h:mm A');
 };
 
 export const millisecondsFromUnixTimestamp = (timestamp = 0) => {
@@ -362,13 +364,15 @@ export const getBestDateFormat = (minDate: dayjs.Dayjs, maxDate: dayjs.Dayjs) =>
 
   if (diffInDays <= 1) {
     return 'h:mmA'; // 1/1 2:30 PM
-  } else if (diffInDays <= 31) {
-    return 'MMM D'; // Jan 1
-  } else if (diffInMonths <= 12) {
-    return 'MMM YYYY'; // Jan 2024
-  } else if (diffInYears <= 1) {
-    return 'MMM YYYY'; // Jan 2024
-  } else {
-    return 'YYYY'; // 2024
   }
+  if (diffInDays <= 31) {
+    return 'MMM D'; // Jan 1
+  }
+  if (diffInMonths <= 12) {
+    return 'MMM YYYY'; // Jan 2024
+  }
+  if (diffInYears <= 1) {
+    return 'MMM YYYY'; // Jan 2024
+  }
+  return 'YYYY'; // 2024
 };

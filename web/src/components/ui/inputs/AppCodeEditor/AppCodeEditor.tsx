@@ -5,11 +5,11 @@
 
 import './MonacoWebWorker';
 
+import type { editor } from 'monaco-editor/esm/vs/editor/editor.api';
 import React, { forwardRef, useMemo } from 'react';
-import { CircleSpinnerLoaderContainer } from '../../loaders/CircleSpinnerLoaderContainer';
 import { useMemoizedFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
-import type { editor } from 'monaco-editor/esm/vs/editor/editor.api';
+import { CircleSpinnerLoaderContainer } from '../../loaders/CircleSpinnerLoaderContainer';
 import { configureMonacoToUseYaml } from './yamlHelper';
 
 //import GithubLightTheme from 'monaco-themes/themes/Github Light.json';

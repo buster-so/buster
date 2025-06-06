@@ -1,12 +1,12 @@
 'use client';
 
-import { BackButton } from '@/components/ui/buttons';
-import { type ISidebarGroup, Sidebar } from '@/components/ui/sidebar';
-import { CircleUser, LockCircle, ApartmentBuilding } from '@/components/ui/icons';
-import { BusterRoutes, createBusterRoute } from '@/routes';
 import React, { useMemo } from 'react';
-import { useUserConfigContextSelector } from '@/context/Users';
+import { BackButton } from '@/components/ui/buttons';
+import { ApartmentBuilding, CircleUser, LockCircle } from '@/components/ui/icons';
+import { type ISidebarGroup, Sidebar } from '@/components/ui/sidebar';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
+import { useUserConfigContextSelector } from '@/context/Users';
+import { BusterRoutes, createBusterRoute } from '@/routes';
 import { SidebarUserFooter } from './SidebarUserFooter/SidebarUserFooter';
 
 const accountItems = (currentParentRoute: BusterRoutes): ISidebarGroup => ({
@@ -73,7 +73,7 @@ const permissionAndSecurityItems = (currentParentRoute: BusterRoutes): ISidebarG
   }))
 });
 
-export const SidebarSettings: React.FC<{}> = React.memo(({}) => {
+export const SidebarSettings: React.FC = React.memo(() => {
   const isAdmin = useUserConfigContextSelector((x) => x.isAdmin);
   const currentParentRoute = useAppLayoutContextSelector((x) => x.currentParentRoute);
 
@@ -89,18 +89,8 @@ export const SidebarSettings: React.FC<{}> = React.memo(({}) => {
   return (
     <Sidebar
       content={content}
-      header={useMemo(
-        () => (
-          <SidebarSettingsHeader />
-        ),
-        []
-      )}
-      footer={useMemo(
-        () => (
-          <SidebarUserFooter />
-        ),
-        []
-      )}
+      header={useMemo(() => <SidebarSettingsHeader />, [])}
+      footer={useMemo(() => <SidebarUserFooter />, [])}
     />
   );
 });

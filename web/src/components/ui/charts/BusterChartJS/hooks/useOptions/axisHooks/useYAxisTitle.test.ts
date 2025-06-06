@@ -1,18 +1,18 @@
 import { renderHook } from '@testing-library/react';
-import { useYAxisTitle } from './useYAxisTitle';
-import { AXIS_TITLE_SEPARATOR } from '../../../../commonHelpers/axisHelper';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { SimplifiedColumnType } from '@/api/asset_interfaces/metric';
+import type { ChartEncodes, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
 import { formatLabel } from '@/lib/columnFormatter';
 import { truncateWithEllipsis } from '../../../../commonHelpers/titleHelpers';
-import type { ChartEncodes, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
-import type { SimplifiedColumnType } from '@/api/asset_interfaces/metric';
+import { useYAxisTitle } from './useYAxisTitle';
 
 // Mock the dependencies
-jest.mock('@/lib/columnFormatter', () => ({
-  formatLabel: jest.fn()
+vi.mock('@/lib/columnFormatter', () => ({
+  formatLabel: vi.fn()
 }));
 
-jest.mock('../../../../commonHelpers/titleHelpers', () => ({
-  truncateWithEllipsis: jest.fn()
+vi.mock('../../../../commonHelpers/titleHelpers', () => ({
+  truncateWithEllipsis: vi.fn()
 }));
 
 describe('useYAxisTitle', () => {
@@ -46,10 +46,10 @@ describe('useYAxisTitle', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Default mock implementations
-    (formatLabel as jest.Mock).mockImplementation((value) => `formatted_${value}`);
-    (truncateWithEllipsis as jest.Mock).mockImplementation((text) => text);
+    (formatLabel as any).mockImplementation((value: string) => `formatted_${value}`);
+    (truncateWithEllipsis as any).mockImplementation((text: string) => text);
   });
 
   it('should return empty string when chart type is not supported', () => {
@@ -83,7 +83,7 @@ describe('useYAxisTitle', () => {
       yAxisAxisTitle: customTitle
     };
 
-    (truncateWithEllipsis as jest.Mock).mockReturnValue('Truncated Custom Title');
+    (truncateWithEllipsis as any).mockReturnValue('Truncated Custom Title');
 
     const { result } = renderHook(() => useYAxisTitle(props));
 
@@ -93,11 +93,11 @@ describe('useYAxisTitle', () => {
   });
 
   it('should generate title from y-axis columns when no custom title is provided', () => {
-    (formatLabel as jest.Mock)
+    (formatLabel as any)
       .mockReturnValueOnce('Formatted Value')
       .mockReturnValueOnce('Formatted Count');
 
-    (truncateWithEllipsis as jest.Mock).mockReturnValue('Formatted Value | Formatted Count');
+    (truncateWithEllipsis as any).mockReturnValue('Formatted Value | Formatted Count');
 
     // Modified props to ensure formatLabel is called
     const modifiedProps = {
@@ -108,16 +108,8 @@ describe('useYAxisTitle', () => {
     const { result } = renderHook(() => useYAxisTitle(modifiedProps));
 
     // Should format each y-axis column
-    expect(formatLabel).toHaveBeenCalledWith(
-      'value',
-      defaultProps.columnLabelFormats['value'],
-      true
-    );
-    expect(formatLabel).toHaveBeenCalledWith(
-      'count',
-      defaultProps.columnLabelFormats['count'],
-      true
-    );
+    expect(formatLabel).toHaveBeenCalledWith('value', defaultProps.columnLabelFormats.value, true);
+    expect(formatLabel).toHaveBeenCalledWith('count', defaultProps.columnLabelFormats.count, true);
 
     // Should generate title with separator
     expect(truncateWithEllipsis).toHaveBeenCalledWith('Formatted Value | Formatted Count');
@@ -135,16 +127,12 @@ describe('useYAxisTitle', () => {
       yAxisAxisTitle: null // Set to null instead of empty string to ensure formatLabel is called
     };
 
-    (formatLabel as jest.Mock).mockReturnValue('Formatted Value');
-    (truncateWithEllipsis as jest.Mock).mockReturnValue('Formatted Value');
+    (formatLabel as any).mockReturnValue('Formatted Value');
+    (truncateWithEllipsis as any).mockReturnValue('Formatted Value');
 
     const { result } = renderHook(() => useYAxisTitle(singleAxisProps));
 
-    expect(formatLabel).toHaveBeenCalledWith(
-      'value',
-      defaultProps.columnLabelFormats['value'],
-      true
-    );
+    expect(formatLabel).toHaveBeenCalledWith('value', defaultProps.columnLabelFormats.value, true);
     expect(truncateWithEllipsis).toHaveBeenCalledWith('Formatted Value');
     expect(result.current).toBe('Formatted Value');
   });
@@ -180,7 +168,7 @@ describe('useYAxisTitle', () => {
       yAxisAxisTitle: 'New Title'
     };
 
-    (truncateWithEllipsis as jest.Mock).mockReturnValue('Truncated New Title');
+    (truncateWithEllipsis as any).mockReturnValue('Truncated New Title');
 
     rerender(newProps);
 
@@ -200,7 +188,7 @@ describe('useYAxisTitle', () => {
       yAxisAxisTitle: null
     };
 
-    (truncateWithEllipsis as jest.Mock).mockReturnValue('');
+    (truncateWithEllipsis as any).mockReturnValue('');
 
     const { result } = renderHook(() => useYAxisTitle(emptyAxisProps));
 
@@ -221,25 +209,17 @@ describe('useYAxisTitle', () => {
       yAxisAxisTitle: null
     };
 
-    (formatLabel as jest.Mock)
+    (formatLabel as any)
       .mockReturnValueOnce('Formatted Value')
       .mockReturnValueOnce('Formatted Count');
 
-    (truncateWithEllipsis as jest.Mock).mockReturnValue('Formatted Value | Formatted Count');
+    (truncateWithEllipsis as any).mockReturnValue('Formatted Value | Formatted Count');
 
     const { result } = renderHook(() => useYAxisTitle(differentAxisProps));
 
     // Should use selectedAxis.y for formatting, not yAxis
-    expect(formatLabel).toHaveBeenCalledWith(
-      'value',
-      defaultProps.columnLabelFormats['value'],
-      true
-    );
-    expect(formatLabel).toHaveBeenCalledWith(
-      'count',
-      defaultProps.columnLabelFormats['count'],
-      true
-    );
+    expect(formatLabel).toHaveBeenCalledWith('value', defaultProps.columnLabelFormats.value, true);
+    expect(formatLabel).toHaveBeenCalledWith('count', defaultProps.columnLabelFormats.count, true);
     expect(truncateWithEllipsis).toHaveBeenCalledWith('Formatted Value | Formatted Count');
     expect(result.current).toBe('Formatted Value | Formatted Count');
   });

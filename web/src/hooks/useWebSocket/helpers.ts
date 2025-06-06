@@ -1,10 +1,10 @@
-import { isDev } from '@/config';
+import type { BusterSocketResponseRoute } from '@/api/buster_socket';
 import type {
   BusterSocketResponseBase,
   BusterSocketResponseMessage
 } from '@/api/buster_socket/base_interfaces';
 import { ChatsResponses } from '@/api/buster_socket/chats';
-import type { BusterSocketResponseRoute } from '@/api/buster_socket';
+import { isDev } from '@/config';
 
 export const createBusterResponse = (
   message: BusterSocketResponseMessage

@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-import { useMemoizedFn } from '@/hooks';
-import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useGetDashboard, useUpdateDashboard } from '@/api/buster_rest/dashboards';
 import { EditFileContainer } from '@/components/features/files/EditFileContainer';
+import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useIsDashboardReadOnly } from '@/context/Dashboards/useIsDashboardReadOnly';
+import { useMemoizedFn } from '@/hooks';
 
 export const DashboardViewFileController: React.FC<{
   dashboardId: string;

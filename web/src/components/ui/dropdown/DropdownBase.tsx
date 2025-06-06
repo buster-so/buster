@@ -1,13 +1,13 @@
 'use client';
 
-import * as React from 'react';
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
-import { ArrowRight, ArrowUpRight, Check3 as Check } from '../icons/NucleoIconOutlined';
-import { CaretRight } from '../icons/NucleoIconFilled';
-import { cn } from '@/lib/classMerge';
-import { Checkbox } from '../checkbox/Checkbox';
-import { Button } from '../buttons/Button';
 import Link from 'next/link';
+import * as React from 'react';
+import { cn } from '@/lib/classMerge';
+import { Button } from '../buttons/Button';
+import { Checkbox } from '../checkbox/Checkbox';
+import { CaretRight } from '../icons/NucleoIconFilled';
+import { ArrowRight, ArrowUpRight, Check3 as Check } from '../icons/NucleoIconOutlined';
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 
@@ -43,7 +43,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
 DropdownMenuSubTrigger.displayName = DropdownMenuPrimitive.SubTrigger.displayName;
 
 const baseContentClass = cn(
-  `data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[8rem] overflow-hidden `,
+  'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 min-w-[8rem] overflow-hidden',
   'bg-background text-foreground ',
   'rounded-md border min-w-48'
 );
@@ -179,7 +179,6 @@ const DropdownMenuCheckboxItemMultiple = React.forwardRef<
     },
     ref
   ) => {
-    console.log('dataTestId', dataTestId);
     return (
       <DropdownMenuPrimitive.CheckboxItem
         ref={ref}
@@ -271,17 +270,23 @@ const DropdownMenuLink: React.FC<{
 
   if (!link)
     return (
-      <div className={className} onClick={(e) => e.stopPropagation()}>
+      <div
+        className={className}
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => e.stopPropagation()}>
         {content}
       </div>
     );
 
   return (
-    <span className={className} onClick={(e) => e.stopPropagation()}>
+    <div
+      className={className}
+      onClick={(e) => e.stopPropagation()}
+      onKeyDown={(e) => e.stopPropagation()}>
       <Link href={link} target={linkTarget || isExternal ? '_blank' : '_self'} className="">
         {content}
       </Link>
-    </span>
+    </div>
   );
 };
 DropdownMenuLink.displayName = 'DropdownMenuLink';

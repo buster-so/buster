@@ -1,3 +1,4 @@
+import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
 import { eq, inArray } from 'drizzle-orm';
@@ -5,6 +6,7 @@ import * as yaml from 'yaml';
 import { z } from 'zod';
 import { db } from '../../../../database/src/connection';
 import { metricFiles } from '../../../../database/src/schema';
+import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
 
 // Core interfaces matching Rust structs
 interface FileUpdate {
@@ -25,7 +27,6 @@ interface FileWithId {
   id: string;
   name: string;
   file_type: string;
-  yml_content: string;
   result_message?: string;
   results?: Record<string, any>[];
   created_at: string;
@@ -39,11 +40,6 @@ interface ModifyFilesOutput {
   files: FileWithId[];
   failed_files: FailedFileModification[];
 }
-
-interface RuntimeContext {
-  get(key: string): string | undefined;
-}
-
 interface ModificationResult {
   file_id: string;
   file_name: string;
@@ -216,10 +212,7 @@ function parseAndValidateYaml(ymlContent: string): {
 async function processMetricFileUpdate(
   existingFile: any,
   ymlContent: string,
-  duration: number,
-  userId: string,
-  dataSourceId: string,
-  dataSourceDialect: string
+  duration: number
 ): Promise<{
   success: boolean;
   updatedFile?: any;
@@ -344,15 +337,15 @@ async function processMetricFileUpdate(
 // Main modify metrics function
 const modifyMetricFiles = wrapTraced(
   async (
-    params: UpdateFilesParams & { runtimeContext?: RuntimeContext }
+    params: UpdateFilesParams,
+    runtimeContext: RuntimeContext<AnalystRuntimeContext>
   ): Promise<ModifyFilesOutput> => {
     const startTime = Date.now();
 
     // Get runtime context values
-    const dataSourceId = params.runtimeContext?.get('dataSourceId');
-    const dataSourceSyntax = params.runtimeContext?.get('dataSourceSyntax') || 'postgresql';
-    const userId = params.runtimeContext?.get('user_id');
-    const organizationId = params.runtimeContext?.get('organization_id');
+    const dataSourceId = runtimeContext.get('dataSourceId');
+    const userId = runtimeContext.get('userId');
+    const organizationId = runtimeContext.get('organizationId');
 
     if (!dataSourceId) {
       throw new Error('Data source ID not found in runtime context');
@@ -402,10 +395,7 @@ const modifyMetricFiles = wrapTraced(
           const result = await processMetricFileUpdate(
             existingFile,
             fileUpdate.yml_content,
-            Date.now() - startTime,
-            userId,
-            dataSourceId,
-            dataSourceSyntax
+            Date.now() - startTime
           );
 
           if (!result.success) {
@@ -515,7 +505,6 @@ Please attempt to modify the metric again. This error could be due to:
             id: file.id,
             name: file.name,
             file_type: 'metric',
-            yml_content: yaml.stringify(file.content),
             result_message: results.find((r) => 'success' in r && r.updatedFile?.id === file.id)
               ?.validationMessage,
             results: results.find((r) => 'success' in r && r.updatedFile?.id === file.id)
@@ -582,7 +571,6 @@ const outputSchema = z.object({
       id: z.string(),
       name: z.string(),
       file_type: z.string(),
-      yml_content: z.string(),
       result_message: z.string().optional(),
       results: z.array(z.record(z.any())).optional(),
       created_at: z.string(),
@@ -605,10 +593,8 @@ export const modifyMetricsFileTool = createTool({
     'Updates existing metric configuration files with new YAML content. Provide the complete YAML content for each metric, replacing the entire existing file. This tool is ideal for bulk modifications when you need to update multiple metrics simultaneously. The system will preserve version history and perform all necessary validations on the new content. For each metric, you need its UUID and the complete updated YAML content. Prefer modifying metrics in bulk using this tool rather than one by one.',
   inputSchema,
   outputSchema,
-  execute: async ({ context }) => {
-    return await modifyMetricFiles(
-      context as UpdateFilesParams & { runtimeContext?: RuntimeContext }
-    );
+  execute: async ({ context, runtimeContext }) => {
+    return await modifyMetricFiles(context as UpdateFilesParams, runtimeContext);
   },
 });
 

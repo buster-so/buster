@@ -1,0 +1,64 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.0.0-beta.5/schema.json",
+  "vcs": {
+    "enabled": false,
+    "clientKind": "git",
+    "useIgnoreFile": false
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "includes": [
+      "**",
+      "!**/node_modules/**",
+      "!**/.next/**",
+      "!**/dist/**",
+      "!**/build/**",
+      "!**/test-results/**",
+      "!**/playwright-report/**",
+      "!**/.git/**",
+      "!**/public/**",
+      "!**/.vercel/**",
+      "!**/coverage/**",
+      "!**/storybook-static/**",
+      "!**/playwright-tests/auth-utils/auth.json",
+      "!**/package.json"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "linter": {
+    "enabled": true,
+    "includes": ["**", "!**/*.stories.tsx", "!**/*.test.tsx", "!**/*.test.ts", "!**/*.spec.ts"],
+    "rules": {
+      "recommended": true,
+      "correctness": {
+        "useExhaustiveDependencies": "off",
+        "noChildrenProp": "error",
+        "noUnusedImports": "error",
+        "noUnusedFunctionParameters": "off",
+        "noUnusedVariables": "off"
+      },
+      "a11y": {
+        "useKeyWithClickEvents": "off",
+        "noSvgWithoutTitle": "off",
+        "noStaticElementInteractions": "off"
+      },
+      "nursery": {
+        "useSortedClasses": "off"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "semicolons": "always",
+      "trailingCommas": "none",
+      "bracketSameLine": true
+    }
+  }
+}

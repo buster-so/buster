@@ -1,6 +1,6 @@
-import React from 'react';
-import { NUMBER_OF_COLUMNS } from './helpers';
+import type React from 'react';
 import { cn } from '@/lib/utils';
+import { NUMBER_OF_COLUMNS } from './helpers';
 
 export const BusterDragColumnMarkers: React.FC<{
   isDraggingIndex: number | null;
@@ -16,16 +16,16 @@ export const BusterDragColumnMarkers: React.FC<{
       className="buster-column-markers pointer-events-none absolute mx-0! flex h-2 w-full items-center justify-between"
       style={{
         top: -2,
-        transform: `translateY(-100%)`
+        transform: 'translateY(-100%)'
       }}>
       <div
         className="relative h-full w-full transition duration-500"
         style={{
-          margin: `0px 5px`
+          margin: '0px 5px'
         }}>
         {Array.from({ length: NUMBER_OF_COLUMNS + 1 }).map((_, index) => (
           <div
-            key={index}
+            key={index.toString()}
             className={cn(
               'bg-border',
               snappedDot === index && 'bg-primary shadow-primary-light',
@@ -48,7 +48,7 @@ export const BusterDragColumnMarkers: React.FC<{
 const geHideSnappedDot = (
   isDraggingIndex: number | null,
   index: number,
-  disabled = false,
+  disabled: boolean | undefined,
   itemsLength: number
 ) => {
   if (disabled || index < 3 || index > 9) return true;
@@ -112,7 +112,10 @@ const hackForTesting = (
         DEFAULT: 0
       }
     };
-    const offsetRecord = dragIndexRecord[isDraggingIndex as 1]!;
+    const offsetRecord = dragIndexRecord[isDraggingIndex as 1];
+    if (!offsetRecord) {
+      return {};
+    }
 
     return {
       left: `calc(${((dotIndex + 0) / NUMBER_OF_COLUMNS) * 100}% - ${offsetRecord?.[dotIndex as 4] || offsetRecord?.DEFAULT}px)`

@@ -1,10 +1,11 @@
+import { describe, expect, it } from 'vitest';
+import type { IBusterMetric } from '@/api/asset_interfaces/metric';
+import { ChartType } from '@/api/asset_interfaces/metric/charts';
+import { VerificationStatus } from '@/api/asset_interfaces/share/verificationInterfaces';
 import {
   getChangedTopLevelMessageValues,
   getChangesFromDefaultChartConfig
 } from './saveToServerHelpers';
-import { DEFAULT_COLUMN_SETTINGS, type IBusterMetric } from '@/api/asset_interfaces/metric';
-import { VerificationStatus } from '@/api/asset_interfaces/share/verificationInterfaces';
-import { ChartType } from '@/api/asset_interfaces/metric/charts';
 
 // Mock minimal metric objects for testing
 const createMockMetric = (overrides?: Partial<IBusterMetric>): IBusterMetric =>
@@ -163,7 +164,7 @@ describe('getChangesFromDefaultChartConfig', () => {
     // Create a metric with partial chart config that will be merged with defaults
     const metric = createMockMetric();
     // Assert on a non-typed partial chart_config to avoid TypeScript errors
-    // @ts-ignore - We're testing runtime behavior, TypeScript doesn't need to validate this test data
+    // @ts-expect-error - We're testing runtime behavior, TypeScript doesn't need to validate this test data
     metric.chart_config = {
       selectedChartType: ChartType.Bar,
       showLegend: true,
@@ -199,7 +200,6 @@ describe('getChangesFromDefaultChartConfig', () => {
       }
     };
 
-    // @ts-ignore - Using any type for testing
     metric.chart_config = chartConfig;
 
     const result = getChangesFromDefaultChartConfig(metric);

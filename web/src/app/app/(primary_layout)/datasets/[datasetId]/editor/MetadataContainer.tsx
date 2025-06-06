@@ -1,6 +1,6 @@
+import React from 'react';
 import { AppCodeEditor } from '@/components/ui/inputs/AppCodeEditor';
 import { cn } from '@/lib/classMerge';
-import React from 'react';
 
 export const MetadataContainer: React.FC<{
   ymlFile: string;

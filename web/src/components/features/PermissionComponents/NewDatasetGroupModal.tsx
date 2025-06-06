@@ -1,9 +1,9 @@
-import { AppModal } from '@/components/ui/modal';
-import { useMemoizedFn } from '@/hooks';
 import React, { useMemo, useRef, useState } from 'react';
-import { Input } from '@/components/ui/inputs';
-import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useCreateDatasetGroup } from '@/api/buster_rest/dataset_groups';
+import { Input } from '@/components/ui/inputs';
+import { AppModal } from '@/components/ui/modal';
+import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useMemoizedFn } from '@/hooks';
 import { SelectedDatasetInput } from './SelectDatasetInput';
 
 interface NewDatasetGroupModalProps {

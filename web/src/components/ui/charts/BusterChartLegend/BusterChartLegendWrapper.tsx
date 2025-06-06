@@ -1,12 +1,12 @@
 import React from 'react';
-import { BusterChartLegend, BusterChartLegendItem } from '.';
-import { ShowLegendHeadline } from '@/api/asset_interfaces/metric/charts';
+import type { ShowLegendHeadline } from '@/api/asset_interfaces/metric/charts';
+import { cn } from '@/lib/classMerge';
+import { CircleSpinnerLoader } from '../../loaders';
 import {
   ChartLegendWrapperProvider,
   useChartWrapperContextSelector
 } from '../chartHooks/useChartWrapperProvider';
-import { cn } from '@/lib/classMerge';
-import { CircleSpinnerLoader } from '../../loaders';
+import { BusterChartLegend, type BusterChartLegendItem } from '.';
 import { DownsampleAlert } from './DownsampleAlert';
 
 export type BusterChartLegendWrapper = {

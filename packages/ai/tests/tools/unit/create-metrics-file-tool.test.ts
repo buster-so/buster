@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import * as yaml from 'yaml';
 import { z } from 'zod';
 
@@ -21,7 +21,7 @@ const columnLabelFormatSchema = z.object({
   dateFormat: z.string().optional(),
   useRelativeTime: z.boolean().optional(),
   isUtc: z.boolean().optional(),
-  convertNumberTo: z.enum(['day_of_week', 'month_of_year', 'quarter']).optional()
+  convertNumberTo: z.enum(['day_of_week', 'month_of_year', 'quarter']).optional(),
 });
 
 const baseChartConfigSchema = z.object({
@@ -34,30 +34,27 @@ const baseChartConfigSchema = z.object({
   showLegendHeadline: z.union([z.boolean(), z.string()]).optional(),
   goalLines: z.array(z.any()).optional(),
   trendlines: z.array(z.any()).optional(),
-  disableTooltip: z.boolean().optional()
+  disableTooltip: z.boolean().optional(),
 });
 
 const tableChartConfigSchema = baseChartConfigSchema.extend({
   selectedChartType: z.literal('table'),
-  tableColumnOrder: z.array(z.string()).optional()
+  tableColumnOrder: z.array(z.string()).optional(),
 });
 
 const metricChartConfigSchema = baseChartConfigSchema.extend({
   selectedChartType: z.literal('metric'),
-  metricColumnId: z.string()
+  metricColumnId: z.string(),
 });
 
-const chartConfigSchema = z.union([
-  tableChartConfigSchema,
-  metricChartConfigSchema
-]);
+const chartConfigSchema = z.union([tableChartConfigSchema, metricChartConfigSchema]);
 
 const metricYmlSchema = z.object({
   name: z.string().min(1),
   description: z.string().min(1),
   timeFrame: z.string().min(1),
   sql: z.string().min(1),
-  chartConfig: chartConfigSchema
+  chartConfig: chartConfigSchema,
 });
 
 // Test the core validation functions
@@ -77,15 +74,19 @@ function validateSqlBasic(sqlQuery: string): { success: boolean; error?: string 
   return { success: true };
 }
 
-function parseAndValidateYaml(ymlContent: string): { success: boolean; error?: string; data?: any } {
+function parseAndValidateYaml(ymlContent: string): {
+  success: boolean;
+  error?: string;
+  data?: any;
+} {
   try {
     const parsedYml = yaml.parse(ymlContent);
     const validationResult = metricYmlSchema.safeParse(parsedYml);
-    
+
     if (!validationResult.success) {
       return {
         success: false,
-        error: `Invalid YAML structure: ${validationResult.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`
+        error: `Invalid YAML structure: ${validationResult.error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ')}`,
       };
     }
 
@@ -93,7 +94,7 @@ function parseAndValidateYaml(ymlContent: string): { success: boolean; error?: s
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'YAML parsing failed'
+      error: error instanceof Error ? error.message : 'YAML parsing failed',
     };
   }
 }
@@ -255,7 +256,8 @@ chartConfig:
 
   describe('SQL Validation', () => {
     test('should accept valid SELECT SQL', () => {
-      const validSql = 'SELECT id, name, amount FROM sales WHERE created_at > NOW() - INTERVAL \'1 day\'';
+      const validSql =
+        "SELECT id, name, amount FROM sales WHERE created_at > NOW() - INTERVAL '1 day'";
       const result = validateSqlBasic(validSql);
       expect(result.success).toBe(true);
     });
@@ -267,7 +269,7 @@ chartConfig:
     });
 
     test('should reject SQL without SELECT', () => {
-      const noSelectSql = 'INSERT INTO test VALUES (1, \'test\')';
+      const noSelectSql = "INSERT INTO test VALUES (1, 'test')";
       const result = validateSqlBasic(noSelectSql);
       expect(result.success).toBe(false);
       expect(result.error).toBe('SQL query must contain SELECT statement');
@@ -294,7 +296,7 @@ chartConfig:
         ORDER BY total_spent DESC
         LIMIT 100
       `;
-      
+
       const result = validateSqlBasic(complexSql);
       expect(result.success).toBe(true);
     });
@@ -307,7 +309,7 @@ chartConfig:
         style: 'currency' as const,
         currency: 'USD',
         numberSeparatorStyle: ',',
-        replaceMissingDataWith: 0
+        replaceMissingDataWith: 0,
       };
 
       const result = columnLabelFormatSchema.safeParse(numberFormat);
@@ -320,7 +322,7 @@ chartConfig:
         style: 'date' as const,
         dateFormat: 'MMM D, YYYY',
         numberSeparatorStyle: null,
-        replaceMissingDataWith: null
+        replaceMissingDataWith: null,
       };
 
       const result = columnLabelFormatSchema.safeParse(dateFormat);
@@ -332,7 +334,7 @@ chartConfig:
         columnType: 'string' as const,
         style: 'string' as const,
         numberSeparatorStyle: null,
-        replaceMissingDataWith: null
+        replaceMissingDataWith: null,
       };
 
       const result = columnLabelFormatSchema.safeParse(stringFormat);
@@ -344,7 +346,7 @@ chartConfig:
         columnType: 'invalid_type',
         style: 'string',
         numberSeparatorStyle: null,
-        replaceMissingDataWith: null
+        replaceMissingDataWith: null,
       };
 
       const result = columnLabelFormatSchema.safeParse(invalidFormat);
@@ -356,7 +358,7 @@ chartConfig:
         columnType: 'string' as const,
         style: 'invalid_style',
         numberSeparatorStyle: null,
-        replaceMissingDataWith: null
+        replaceMissingDataWith: null,
       };
 
       const result = columnLabelFormatSchema.safeParse(invalidFormat);
@@ -370,9 +372,10 @@ chartConfig:
         files: [
           {
             name: 'Test Metric',
-            yml_content: 'name: Test Metric\ndescription: Test\ntimeFrame: Today\nsql: SELECT * FROM test\nchartConfig:\n  selectedChartType: table\n  columnLabelFormats:\n    test:\n      columnType: string\n      style: string\n      numberSeparatorStyle: null\n      replaceMissingDataWith: null'
-          }
-        ]
+            yml_content:
+              'name: Test Metric\ndescription: Test\ntimeFrame: Today\nsql: SELECT * FROM test\nchartConfig:\n  selectedChartType: table\n  columnLabelFormats:\n    test:\n      columnType: string\n      style: string\n      numberSeparatorStyle: null\n      replaceMissingDataWith: null',
+          },
+        ],
       };
 
       // Basic validation that files array exists and has proper structure
@@ -383,7 +386,7 @@ chartConfig:
 
     test('should reject empty files array', () => {
       const invalidInput = { files: [] };
-      
+
       // This would fail our minimum length validation
       expect(invalidInput.files).toHaveLength(0);
     });
@@ -393,7 +396,7 @@ chartConfig:
     test('should generate appropriate error message for YAML parsing', () => {
       const invalidYaml = 'invalid: yaml: [structure';
       const result = parseAndValidateYaml(invalidYaml);
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
       expect(typeof result.error).toBe('string');
@@ -402,7 +405,7 @@ chartConfig:
     test('should generate appropriate error message for SQL validation', () => {
       const invalidSql = '';
       const result = validateSqlBasic(invalidSql);
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBe('SQL query cannot be empty');
     });

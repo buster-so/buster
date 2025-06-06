@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { ShareAssetType } from '@/api/asset_interfaces';
-import { AppPasswordAccess } from '@/controllers/AppPasswordAccess';
-import { AppNoPageAccess } from '@/controllers/AppNoPageAccess';
-import { useGetAsset } from './useGetAsset';
+import type { ShareAssetType } from '@/api/asset_interfaces';
 import { FileIndeterminateLoader } from '@/components/features/FileIndeterminateLoader';
+import { AppNoPageAccess } from '@/controllers/AppNoPageAccess';
+import { AppPasswordAccess } from '@/controllers/AppPasswordAccess';
+import { useGetAsset } from './useGetAsset';
 
 export type AppAssetCheckLayoutProps = {
   assetId: string;
@@ -25,7 +25,7 @@ export const AppAssetCheckLayout: React.FC<
   });
 
   const Component = useMemo(() => {
-    if (!isFetched) return <></>;
+    if (!isFetched) return null;
 
     if (!hasAccess && !isPublic) {
       return <AppNoPageAccess assetId={assetId} />;

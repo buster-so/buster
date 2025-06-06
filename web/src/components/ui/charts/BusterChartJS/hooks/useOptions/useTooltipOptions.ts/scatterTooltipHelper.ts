@@ -1,7 +1,7 @@
-import type { ITooltipItem } from '../../../../BusterChartTooltip/interfaces';
+import type { ChartTypeRegistry, TooltipItem } from 'chart.js';
 import type { BusterChartConfigProps } from '@/api/asset_interfaces/metric/charts';
-import type { ChartDataset, TooltipItem, ChartTypeRegistry } from 'chart.js';
 import { formatLabel } from '@/lib/columnFormatter';
+import type { ITooltipItem } from '../../../../BusterChartTooltip/interfaces';
 
 export const scatterTooltipHelper = (
   dataPoints: TooltipItem<keyof ChartTypeRegistry>[],

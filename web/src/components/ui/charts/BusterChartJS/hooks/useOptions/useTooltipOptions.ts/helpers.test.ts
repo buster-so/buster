@@ -1,6 +1,7 @@
-import { getPercentage, percentageFormatter } from './helpers';
 import type { Chart } from 'chart.js';
+import { describe, expect, it } from 'vitest';
 import type { BusterChartProps } from '@/api/asset_interfaces/metric/charts';
+import { getPercentage, percentageFormatter } from './helpers';
 
 describe('getPercentage', () => {
   const mockChart = {

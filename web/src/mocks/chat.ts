@@ -1,4 +1,4 @@
-import { type IBusterChatMessage } from '@/api/asset_interfaces';
+import type { IBusterChatMessage } from '@/api/asset_interfaces';
 
 export const mockBusterChatMessage: IBusterChatMessage = {
   id: 'message-1',

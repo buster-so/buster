@@ -1,4 +1,4 @@
-import type { DataMetadata, BusterMetricData } from '@/api/asset_interfaces/metric';
+import type { BusterMetricData, DataMetadata } from '@/api/asset_interfaces/metric';
 
 const PRODUCTS = [
   'Laptop',
@@ -19,7 +19,7 @@ const generateDate = (index: number): string => {
   return baseDate.toISOString();
 };
 
-const mockData = (length: number = 10): Record<string, string | number | null>[] => {
+const mockData = (length = 10): Record<string, string | number | null>[] => {
   return Array.from({ length }, (_, index) => ({
     sales: (index + 1) * 100,
     date: generateDate(index),

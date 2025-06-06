@@ -1,18 +1,18 @@
 'use client';
 
+import { cva } from 'class-variance-authority';
 import React from 'react';
+import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/classMerge';
+import { Dropdown, type DropdownProps } from '../dropdown/Dropdown';
+import { ChevronDown } from '../icons/NucleoIconOutlined';
 import {
-  buttonVariants,
+  type ButtonProps,
   buttonIconVariants,
-  ButtonProps,
   buttonTypeClasses,
+  buttonVariants,
   LoadingIcon
 } from './Button';
-import { ChevronDown } from '../icons/NucleoIconOutlined';
-import { cn } from '@/lib/classMerge';
-import { cva } from 'class-variance-authority';
-import { type DropdownProps, Dropdown } from '../dropdown/Dropdown';
-import { useMemoizedFn } from '@/hooks';
 
 interface ButtonDropdownProps {
   icon?: React.ReactNode;
@@ -124,10 +124,13 @@ export const ButtonSplit = React.memo(
             {buttonText && <span className="">{buttonText}</span>}
           </div>
           <div className="bg-border mr-0 h-full w-[0.5px]" />
-          <div className="flex h-full items-center justify-center text-sm" onClick={handleClick}>
-            <div
-              className={cn(splitButtonVariants({ variant }), 'border-none')}
-              aria-label="Open dropdown menu">
+          <button
+            type="button"
+            className="flex h-full cursor-pointer items-center justify-center text-sm"
+            aria-label={open ? 'Close dropdown menu' : 'Open dropdown menu'}
+            aria-expanded={open}
+            onClick={handleClick}>
+            <div className={cn(splitButtonVariants({ variant }), 'border-none')}>
               <span
                 className={cn(
                   'transition-transform duration-100',
@@ -137,7 +140,7 @@ export const ButtonSplit = React.memo(
                 <ChevronDown />
               </span>
             </div>
-          </div>
+          </button>
         </div>
       );
     }

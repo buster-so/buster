@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { createTerm, deleteTerms, getTerm, getTermsList, updateTerm } from './requests';
-import { queryKeys } from '@/api/query_keys';
-import { BusterTerm } from '@/api/asset_interfaces/terms';
 import { useMemo } from 'react';
-import { useMemoizedFn } from '@/hooks';
+import type { BusterTerm } from '@/api/asset_interfaces/terms';
+import { queryKeys } from '@/api/query_keys';
 import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useMemoizedFn } from '@/hooks';
+import { createTerm, deleteTerms, getTerm, getTermsList, updateTerm } from './requests';
 
 export const useGetTermsList = (
   params?: Omit<Parameters<typeof getTermsList>[0], 'page_token' | 'page_size'>
@@ -22,8 +22,8 @@ export const useGetTermsList = (
 
 export const useGetTerm = (id: string | undefined) => {
   return useQuery({
-    ...queryKeys.termsGetTerm(id!),
-    queryFn: () => getTerm(id!),
+    ...queryKeys.termsGetTerm(id || ''),
+    queryFn: () => getTerm(id || ''),
     enabled: !!id
   });
 };

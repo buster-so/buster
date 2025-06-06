@@ -1,12 +1,13 @@
-import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
-import { useMemoizedFn } from '@/hooks';
-import React, { useMemo, useState } from 'react';
-import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
+import type React from 'react';
+import { useMemo, useState } from 'react';
+import type { BusterDashboardListItem } from '@/api/asset_interfaces';
+import { useGetDashboardsList } from '@/api/buster_rest/dashboards';
 import { Button } from '@/components/ui/buttons';
 import { Dropdown, type DropdownProps } from '@/components/ui/dropdown/Dropdown';
 import { Plus } from '@/components/ui/icons';
-import type { BusterDashboardListItem } from '@/api/asset_interfaces';
-import { useGetDashboardsList } from '@/api/buster_rest/dashboards';
+import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
+import { useMemoizedFn } from '@/hooks';
+import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
 import { NewDashboardModal } from '../modal/NewDashboardModal';
 
 export const SaveToDashboardDropdown: React.FC<{
@@ -33,21 +34,24 @@ export const SaveToDashboardDropdown: React.FC<{
     onOpenChangeProp?.(open);
   });
 
-  const dropdownProps = useSaveToDashboardDropdownContent({
+  const { ModalComponent, ...dropdownProps } = useSaveToDashboardDropdownContent({
     selectedDashboards,
     onSaveToDashboard,
     onRemoveFromDashboard
   });
 
   return (
-    <Dropdown
-      side={side}
-      align={align}
-      open={showDropdown}
-      onOpenChange={onOpenChange}
-      {...dropdownProps}>
-      {children}
-    </Dropdown>
+    <>
+      <Dropdown
+        side={side}
+        align={align}
+        open={showDropdown}
+        onOpenChange={onOpenChange}
+        {...dropdownProps}>
+        {children}
+      </Dropdown>
+      {ModalComponent}
+    </>
   );
 };
 
@@ -62,7 +66,9 @@ export const useSaveToDashboardDropdownContent = ({
 }): Pick<
   DropdownProps,
   'items' | 'footerContent' | 'menuHeader' | 'selectType' | 'emptyStateText'
-> => {
+> & {
+  ModalComponent: React.ReactNode;
+} => {
   const { data: dashboardsList } = useGetDashboardsList({});
   const onChangePage = useAppLayoutContextSelector((x) => x.onChangePage);
   const [openNewDashboardModal, setOpenNewDashboardModal] = useState(false);
@@ -129,7 +135,7 @@ export const useSaveToDashboardDropdownContent = ({
       menuHeader,
       selectType: 'multiple',
       emptyStateText: 'No dashboards found',
-      modal: (
+      ModalComponent: (
         <NewDashboardModal
           open={openNewDashboardModal}
           onClose={onCloseNewDashboardModal}

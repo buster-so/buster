@@ -1,4 +1,4 @@
-import { Chart, ChartDataset } from 'chart.js';
+import type { Chart, ChartDataset } from 'chart.js';
 
 export default interface OutLabelsContext {
   chart: Chart<'doughnut'>;

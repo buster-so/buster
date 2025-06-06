@@ -1,11 +1,11 @@
 'use client';
 
-import confetti from 'canvas-confetti';
 import type { Options } from 'canvas-confetti';
+import confetti from 'canvas-confetti';
 //https://www.kirilv.com/canvas-confetti/
 
 export const useConfetti = () => {
-  const fireConfetti = (zIndex: number = 20) => {
+  const fireConfetti = (zIndex = 20) => {
     const count = 200;
     const defaults = {
       origin: { y: 0.45 },

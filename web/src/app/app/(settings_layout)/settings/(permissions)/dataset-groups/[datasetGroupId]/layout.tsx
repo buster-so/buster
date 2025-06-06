@@ -1,25 +1,19 @@
-import React from 'react';
-import { DatasetGroupTitleAndDescription } from './DatasetGroupTitleAndDescription';
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
+import type React from 'react';
 import { prefetchDatasetGroup } from '@/api/buster_rest';
-import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
-import { DatasetGroupBackButton } from './DatasetGroupBackButton';
 import { DatasetGroupAppSegments } from './DatasetGroupAppSegments';
+import { DatasetGroupBackButton } from './DatasetGroupBackButton';
+import { DatasetGroupTitleAndDescription } from './DatasetGroupTitleAndDescription';
 
-export default async function Layout(
-  props: {
-    children: React.ReactNode;
-    params: Promise<{ datasetGroupId: string }>;
-  }
-) {
+export default async function Layout(props: {
+  children: React.ReactNode;
+  params: Promise<{ datasetGroupId: string }>;
+}) {
   const params = await props.params;
 
-  const {
-    datasetGroupId
-  } = params;
+  const { datasetGroupId } = params;
 
-  const {
-    children
-  } = props;
+  const { children } = props;
 
   const queryClient = await prefetchDatasetGroup(datasetGroupId);
 

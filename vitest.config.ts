@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitest/config'
+import { loadEnv } from 'vite'
 
 export default defineConfig({
   test: {
@@ -7,5 +8,7 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     testTimeout: 30000,
+    // Option 1: Load specific .env file using loadEnv
+    env: loadEnv('', process.cwd(), ''),
   },
 })

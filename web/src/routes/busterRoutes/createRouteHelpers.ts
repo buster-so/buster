@@ -1,5 +1,5 @@
-import { BusterAppRoutes } from './busterAppRoutes';
-import { BusterRoutes, BusterRoutesWithArgsRoute } from './busterRoutes';
+import type { BusterAppRoutes } from './busterAppRoutes';
+import { BusterRoutes, type BusterRoutesWithArgsRoute } from './busterRoutes';
 
 export const createBusterRoute = ({ route, ...args }: BusterRoutesWithArgsRoute) => {
   if (!args) return route;
@@ -86,10 +86,11 @@ export const extractPathParamsFromRoute = (route: string): Record<string, string
     if (templateParts.length !== routeParts.length) return false;
 
     return templateParts.every((part, i) => {
+      let cleanPart = part;
       if (part.includes('?')) {
-        part = part.split('?')[0];
+        cleanPart = part.split('?')[0];
       }
-      return part.startsWith(':') || part.startsWith('[') || part === routeParts[i];
+      return cleanPart.startsWith(':') || cleanPart.startsWith('[') || cleanPart === routeParts[i];
     });
   });
 
@@ -115,14 +116,14 @@ export const extractPathParamsFromRoute = (route: string): Record<string, string
     const queryParams = new URLSearchParams(queryString);
     const templateQueryParams = routeTemplate.split('?')[1].split('&');
 
-    templateQueryParams.forEach((param) => {
+    for (const param of templateQueryParams) {
       const [key, template] = param.split('=');
       if (template.startsWith(':')) {
         const paramName = template.slice(1);
         const value = queryParams.get(key);
         if (value) params[paramName] = value;
       }
-    });
+    }
   }
 
   return params;

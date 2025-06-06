@@ -1,7 +1,7 @@
 import React from 'react';
-import { LabelAndInput } from '../Common';
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { Switch } from '@/components/ui/switch';
+import { LabelAndInput } from '../Common';
 
 export const EditPieShowInnerLabel = React.memo(
   ({

@@ -1,6 +1,7 @@
+import { describe, expect, it } from 'vitest';
 import { BusterRoutes } from '@/routes';
 import { initializeFileViews } from './helpers';
-import { FileViewSecondary } from './interfaces';
+import type { FileViewSecondary } from './interfaces';
 
 describe('initializeFileViews', () => {
   it('should return empty object when no metricId or dashboardId is provided', () => {

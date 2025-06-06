@@ -1,12 +1,12 @@
-import type { ColumnLabelFormat, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import { describe, expect, it, vi } from 'vitest';
+import type { BusterChartProps } from '@/api/asset_interfaces/metric/charts';
 import { formatLabel } from '@/lib';
-import { DatasetOption } from '../chartHooks';
-import { JOIN_CHARACTER, formatLabelForDataset, formatLabelForPieLegend } from './labelHelpers';
-import { BusterChartProps } from '@/api/asset_interfaces/metric/charts';
+import type { DatasetOption } from '../chartHooks';
+import { formatLabelForDataset, formatLabelForPieLegend, JOIN_CHARACTER } from './labelHelpers';
 
 // Mock the formatLabel function
-jest.mock('@/lib', () => ({
-  formatLabel: jest.fn((value, format, useKey) => `formatted_${value}`)
+vi.mock('@/lib', () => ({
+  formatLabel: vi.fn((value, format, useKey) => `formatted_${value}`)
 }));
 
 describe('labelHelpers', () => {

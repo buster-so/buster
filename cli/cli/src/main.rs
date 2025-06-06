@@ -3,10 +3,10 @@ mod error;
 mod types;
 mod utils;
 
-use anyhow;
 use clap::{Parser, Subcommand};
 use commands::{auth::check_authentication, auth::AuthArgs, init, run};
 use utils::updater::check_for_updates;
+use anyhow;
 
 pub const APP_NAME: &str = "buster";
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -95,6 +95,10 @@ pub enum Commands {
         /// Disable telemetry tracking
         #[arg(long, default_value_t = false)]
         no_track: bool,
+        /// Set environment variables (can be used multiple times)
+        /// Format: KEY=VALUE
+        #[arg(long = "env", action = clap::ArgAction::Append)]
+        env_vars: Vec<String>,
     },
     /// Stop the Buster services
     Stop,
@@ -161,7 +165,22 @@ async fn main() {
         } => commands::generate::generate_semantic_models_command(path, target_semantic_file).await,
         Commands::Parse { path } => commands::parse::parse_models_command(path).await,
         Commands::Config => commands::config::manage_settings_interactive().await.map_err(anyhow::Error::from),
-        Commands::Start { no_track } => run::start(no_track).await.map_err(anyhow::Error::from),
+        Commands::Start { no_track, env_vars } => {
+            // Parse env vars from KEY=VALUE format
+            let parsed_env_vars: Result<Vec<(String, String)>, _> = env_vars
+                .iter()
+                .map(|env_str| {
+                    env_str.split_once('=')
+                        .map(|(k, v)| (k.to_string(), v.to_string()))
+                        .ok_or_else(|| anyhow::anyhow!("Invalid env var format '{}'. Expected KEY=VALUE", env_str))
+                })
+                .collect();
+            
+            match parsed_env_vars {
+                Ok(env_pairs) => run::start(no_track, env_pairs).await.map_err(anyhow::Error::from),
+                Err(e) => Err(e),
+            }
+        }
         Commands::Stop => run::stop().await.map_err(anyhow::Error::from),
         Commands::Reset => run::reset().await.map_err(anyhow::Error::from),
     };

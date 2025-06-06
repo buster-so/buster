@@ -1,10 +1,10 @@
+import { v4 as uuidv4 } from 'uuid';
 import type { DashboardConfig } from '@/api/asset_interfaces/dashboard';
 import type { BusterMetric } from '@/api/asset_interfaces/metric';
-import { v4 as uuidv4 } from 'uuid';
 import {
-  NUMBER_OF_COLUMNS,
   MAX_NUMBER_OF_ITEMS,
-  MIN_ROW_HEIGHT
+  MIN_ROW_HEIGHT,
+  NUMBER_OF_COLUMNS
 } from '@/components/ui/grid/helpers';
 
 export const normalizeNewMetricsIntoGrid = (
@@ -65,7 +65,7 @@ export const normalizeNewMetricsIntoGrid = (
     if (numberOfRows === 0 || newGrid.length === 0) {
       newGrid = createNewOverflowRows(newMetrics);
     } else {
-      const numberOfItemsInFirstRow = newGrid[0].items?.length!;
+      const numberOfItemsInFirstRow = newGrid[0].items?.length || 0;
       const canFitInFirstRow = numberOfItemsInFirstRow + numberOfNewMetrics <= MAX_NUMBER_OF_ITEMS;
       if (canFitInFirstRow) {
         const newItems = newMetrics.map((m) => ({

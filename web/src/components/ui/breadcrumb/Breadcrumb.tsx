@@ -1,28 +1,27 @@
+import Link from 'next/link';
 import React, { useMemo } from 'react';
-
+import { createBusterRoute } from '@/routes/busterRoutes';
+import { Dropdown, type DropdownItem } from '../dropdown/Dropdown';
 import {
   Breadcrumb as BreadcrumbBase,
-  BreadcrumbList,
+  BreadcrumbEllipsis,
   BreadcrumbItem,
   BreadcrumbLink,
+  BreadcrumbList,
   BreadcrumbPage,
-  BreadcrumbSeparator,
-  BreadcrumbEllipsis
+  BreadcrumbSeparator
 } from './BreadcrumbBase';
-import { createBusterRoute } from '@/routes/busterRoutes';
-import { Dropdown, DropdownItem } from '../dropdown/Dropdown';
-import Link from 'next/link';
 
 type CreateBusterRouteParams = Parameters<typeof createBusterRoute>[0];
 
-export interface BreadcrumbItem {
+export interface BreadcrumbItemType {
   label: string | null; //if null, it will be an ellipsis
   route?: CreateBusterRouteParams;
   dropdown?: { label: string; route: CreateBusterRouteParams }[];
 }
 
 interface BreadcrumbProps {
-  items: BreadcrumbItem[];
+  items: BreadcrumbItemType[];
   className?: string;
   activeIndex?: number; //default will be the last item
 }
@@ -37,7 +36,7 @@ export const Breadcrumb = React.memo(
         <BreadcrumbList>
           {items.map((item, index) => (
             <BreadcrumbItemSelector
-              key={index}
+              key={`${item.label ?? 'ellipsis'}-${index}`}
               item={item}
               isActive={chosenIndex === index}
               isLast={index === lastItemIndex}
@@ -50,7 +49,7 @@ export const Breadcrumb = React.memo(
 );
 
 const BreadcrumbItemSelector: React.FC<{
-  item: BreadcrumbItem;
+  item: BreadcrumbItemType;
   isActive: boolean;
   isLast: boolean;
 }> = ({ item, isActive, isLast }) => {

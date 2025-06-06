@@ -1,10 +1,10 @@
-import React, { useMemo } from 'react';
-import { useMemoizedFn } from '@/hooks';
-import { type BusterChartLegendItem } from './interfaces';
-import { ChartType } from '@/api/asset_interfaces/metric/charts';
-import { Target } from '../../icons';
-import { cn } from '@/lib/classMerge';
 import { cva, type VariantProps } from 'class-variance-authority';
+import React, { useMemo } from 'react';
+import { ChartType } from '@/api/asset_interfaces/metric/charts';
+import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/classMerge';
+import { Target } from '../../icons';
+import type { BusterChartLegendItem } from './interfaces';
 
 const itemVariants = cva(
   'dot group relative flex items-center justify-center transition-all duration-300',
@@ -60,14 +60,14 @@ export const LegendItemDot: React.FC<
 > = React.memo(({ color, type, inactive, onFocusItem, size = 'default' }) => {
   const hasFocusItem = onFocusItem !== undefined;
 
-  const onClick = useMemoizedFn((e: React.MouseEvent<HTMLDivElement>) => {
+  const onClick = useMemoizedFn((e: React.MouseEvent<HTMLButtonElement>) => {
     if (onFocusItem) {
       e.stopPropagation();
       onFocusItem();
     }
   });
 
-  const onFocusItemPreflight = useMemoizedFn((e: React.MouseEvent<HTMLDivElement>) => {
+  const onFocusItemPreflight = useMemoizedFn((e: React.MouseEvent<HTMLButtonElement>) => {
     if (onFocusItem) {
       e.stopPropagation();
       e.preventDefault();
@@ -83,17 +83,20 @@ export const LegendItemDot: React.FC<
 
   return (
     <div className={cn(itemVariants({ size }))} data-testid="legend-dot-container">
-      <div
+      <button
+        type="button"
         onClick={onClick}
         data-testid="legend-dot"
-        className={cn(dotStyle, dotVariants({ size }), {
+        className={cn('cursor-pointer', dotStyle, {
           'group-hover:opacity-0': hasFocusItem
         })}
-        style={{ backgroundColor: !inactive ? color : undefined }}></div>
+        style={{ backgroundColor: !inactive ? color : undefined }}
+      />
       {hasFocusItem && (
-        <div
+        <button
+          type="button"
           onClick={onFocusItemPreflight}
-          className="absolute hidden h-full w-full items-center justify-center overflow-hidden group-hover:flex">
+          className="absolute hidden h-full w-full cursor-pointer items-center justify-center overflow-hidden group-hover:flex">
           <div
             data-testid="focus-target"
             className="focus-item group-hover:bg-item-hover flex h-full w-full items-center justify-center rounded-sm">
@@ -105,7 +108,7 @@ export const LegendItemDot: React.FC<
               <Target />
             </div>
           </div>
-        </div>
+        </button>
       )}
     </div>
   );

@@ -1,5 +1,5 @@
+import { describe, expect, it } from 'vitest';
 import { validateMetricYaml } from './validateMetricYaml';
-import * as yaml from 'js-yaml';
 
 // Create a minimal mock for monaco
 const mockMonaco = {
@@ -43,7 +43,7 @@ Age: 30
     expect(
       result.some(
         (marker) =>
-          marker.message.includes('Missing required key "Siblings"') &&
+          marker.message.includes('Missing required key: "Siblings"') &&
           marker.severity === mockMonaco.MarkerSeverity.Error
       )
     ).toBe(true);

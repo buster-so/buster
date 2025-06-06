@@ -1,51 +1,54 @@
 'use client';
 
-import React, { useEffect } from 'react';
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger
-} from '../collapsible/CollapsibleBase';
-import { type ISidebarGroup } from './interfaces';
-import { SidebarItem } from './SidebarItem';
-import { CaretDown } from '../icons/NucleoIconFilled';
-import { cn } from '@/lib/classMerge';
-import {
-  DndContext,
   closestCenter,
+  DndContext,
+  type DragEndEvent,
+  DragOverlay,
+  type DragStartEvent,
   KeyboardSensor,
   PointerSensor,
   useSensor,
-  useSensors,
-  DragOverlay,
-  DragStartEvent,
-  DragEndEvent
+  useSensors
 } from '@dnd-kit/core';
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-  useSortable
+  useSortable,
+  verticalListSortingStrategy
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import React, { useEffect } from 'react';
 import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/classMerge';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger
+} from '../collapsible/CollapsibleBase';
+import { CaretDown } from '../icons/NucleoIconFilled';
+import type { ISidebarGroup } from './interfaces';
+import { SidebarItem } from './SidebarItem';
+import { COLLAPSED_HIDDEN } from './config';
 
 const modifiers = [restrictToVerticalAxis];
 
 interface SidebarTriggerProps {
   label: string;
   isOpen: boolean;
+  className?: string;
 }
 
-const SidebarTrigger: React.FC<SidebarTriggerProps> = React.memo(({ label, isOpen }) => {
+const SidebarTrigger: React.FC<SidebarTriggerProps> = React.memo(({ label, isOpen, className }) => {
   return (
     <div
       className={cn(
         'flex items-center gap-1 rounded px-1.5 py-1 text-base transition-colors',
         'text-text-secondary hover:bg-nav-item-hover',
-        'group min-h-6 cursor-pointer'
+        'group min-h-6 cursor-pointer',
+        className
       )}>
       <span className="">{label}</span>
 
@@ -79,12 +82,12 @@ const SortableSidebarItem: React.FC<SortableSidebarItemProps> = React.memo(({ it
     opacity: isDragging ? 0 : 1
   };
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = useMemoizedFn((e: React.MouseEvent) => {
     if (isDragging) {
       e.preventDefault();
       e.stopPropagation();
     }
-  };
+  });
 
   return (
     <div
@@ -104,7 +107,11 @@ const SortableSidebarItem: React.FC<SortableSidebarItemProps> = React.memo(({ it
 SortableSidebarItem.displayName = 'SortableSidebarItem';
 
 export const SidebarCollapsible: React.FC<
-  ISidebarGroup & { activeItem?: string; onItemsReorder?: (ids: string[]) => void }
+  ISidebarGroup & {
+    useCollapsible?: boolean;
+    activeItem?: string;
+    onItemsReorder?: (ids: string[]) => void;
+  }
 > = React.memo(
   ({
     label,
@@ -114,7 +121,10 @@ export const SidebarCollapsible: React.FC<
     onItemsReorder,
     variant = 'collapsible',
     icon,
-    defaultOpen = true
+    defaultOpen = true,
+    useCollapsible,
+    triggerClassName,
+    className
   }) => {
     const [isOpen, setIsOpen] = React.useState(defaultOpen);
     const [sortedItems, setSortedItems] = React.useState(items);
@@ -159,8 +169,10 @@ export const SidebarCollapsible: React.FC<
     return (
       <Collapsible open={isOpen} onOpenChange={setIsOpen} className="space-y-0.5">
         {variant === 'collapsible' && (
-          <CollapsibleTrigger asChild className="w-full">
-            <button className="w-full text-left">
+          <CollapsibleTrigger
+            asChild
+            className={cn(useCollapsible && COLLAPSED_HIDDEN, 'w-full', triggerClassName)}>
+            <button type="button" className="w-full cursor-pointer text-left">
               <SidebarTrigger label={label} isOpen={isOpen} />
             </button>
           </CollapsibleTrigger>

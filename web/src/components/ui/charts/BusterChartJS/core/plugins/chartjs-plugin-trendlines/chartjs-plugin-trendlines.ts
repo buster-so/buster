@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // chartjs-plugin-trendline.ts
 
-import { Plugin, ChartType, ChartDataset, Point, Scale } from 'chart.js';
-import { defaultLabelOptionConfig } from '../../../hooks/useChartSpecificOptions/labelOptionConfig';
+import type { ChartDataset, ChartType, Plugin, Point, Scale } from 'chart.js';
 import { DEFAULT_TRENDLINE_CONFIG } from '@/api/asset_interfaces/metric/defaults';
+import { defaultLabelOptionConfig } from '../../../hooks/useChartSpecificOptions/labelOptionConfig';
 
 /** The three trendline modes we support */
 export type TrendlineType =
@@ -105,10 +106,10 @@ interface TrendlineCoordinates {
 
 /** Minimal interface to fit points and predict y for any x */
 abstract class BaseFitter {
-  public minx = Infinity;
-  public maxx = -Infinity;
-  public maxY = -Infinity;
-  public minY = Infinity;
+  public minx = Number.POSITIVE_INFINITY;
+  public maxx = Number.NEGATIVE_INFINITY;
+  public maxY = Number.NEGATIVE_INFINITY;
+  public minY = Number.POSITIVE_INFINITY;
   public averageY = 0;
   public medianY = 0;
   protected computed = false;
@@ -220,7 +221,7 @@ class LogarithmicFitter extends BaseFitter {
   }
 
   protected calculateValue(x: number): number {
-    if (x <= 0) return NaN;
+    if (x <= 0) return Number.NaN;
     return this.lin.f(Math.log(x));
   }
 }
@@ -280,7 +281,7 @@ class PolynomialFitter extends BaseFitter {
     // Gaussian elimination (in-place)
     for (let k = 0; k <= m; k++) {
       // pivot
-      let pivot = A[k][k];
+      const pivot = A[k][k];
       if (Math.abs(pivot) < 1e-12) continue;
       for (let j = k; j <= m; j++) A[k][j] /= pivot;
       b[k] /= pivot;
@@ -309,9 +310,9 @@ class PolynomialFitter extends BaseFitter {
     if (!this.coeffs) this.fit();
 
     // Use Horner's method for polynomial evaluation (more efficient)
-    let result = this.coeffs![this.coeffs!.length - 1];
-    for (let i = this.coeffs!.length - 2; i >= 0; i--) {
-      result = result * x + this.coeffs![i];
+    let result = this.coeffs?.[this.coeffs?.length - 1] ?? 0;
+    for (let i = (this.coeffs?.length || 0) - 2; i >= 0; i--) {
+      result = result * x + (this.coeffs?.[i] ?? 0);
     }
     return result;
   }
@@ -440,7 +441,7 @@ const processPadding = (
   if (cached) return cached;
 
   const defaultPadding = defaultLabelOptionConfig.padding;
-  let result;
+  let result: { top: number; right: number; bottom: number; left: number };
 
   if (typeof labelPadding === 'number') {
     result = { top: labelPadding, right: labelPadding, bottom: labelPadding, left: labelPadding };
@@ -482,7 +483,6 @@ const createFitter = (opts: TrendlineOptions): BaseFitter => {
       return new MinFitter();
     case 'median':
       return new MedianFitter();
-    case 'linear_regression':
     default:
       return new LinearFitter();
   }
@@ -494,7 +494,7 @@ const lineStyleCache = {
   currentWidth: 0
 };
 
-const setLineStyle = (ctx: CanvasRenderingContext2D, lineStyle?: string, lineWidth: number = 2) => {
+const setLineStyle = (ctx: CanvasRenderingContext2D, lineStyle?: string, lineWidth = 2) => {
   const styleKey = `${lineStyle ?? 'solid'}-${lineWidth}`;
 
   // Always set the line width regardless of cache state
@@ -655,7 +655,7 @@ const drawLinePath = (
       const yPos = yScale.getPixelForValue(point.y);
 
       // Skip any NaN or infinite values that might occur
-      if (!isNaN(yPos) && isFinite(yPos)) {
+      if (!Number.isNaN(yPos) && Number.isFinite(yPos)) {
         ctx.lineTo(xPos, yPos);
       }
     }
@@ -698,7 +698,7 @@ const addDataPointsToFitter = (
 ) => {
   dataset.data.forEach((point, i: number) => {
     if (!point) return;
-    else if (typeof point === 'number') {
+    if (typeof point === 'number') {
       let x: number | Date | undefined | string = i;
       const y = point;
 
@@ -710,7 +710,7 @@ const addDataPointsToFitter = (
         fitter.add(x, y);
       }
     } else if (point) {
-      const x = point['x'] ?? i;
+      const x = point.x ?? i;
       const y = point[(yAxisID ?? dataset.yAxisID ?? 'y') as 'y'] ?? point;
       if (typeof x === 'number' && typeof y === 'number') {
         fitter.add(x, y);
@@ -812,7 +812,7 @@ class SpatialIndex {
       if (!this.cells.has(key)) {
         this.cells.set(key, []);
       }
-      this.cells.get(key)!.push(rect);
+      this.cells.get(key)?.push(rect);
     }
   }
 
@@ -926,7 +926,7 @@ const queueTrendlineLabel = (
   const offsetValue = lbl.offset ?? 0;
 
   // Apply offset
-  let offsetX = 0;
+  const offsetX = 0;
   let offsetY = offsetValue;
 
   // Apply additional offsets based on dataset and trendline indices if provided
@@ -992,7 +992,7 @@ const drawTrendlinePath = (
   const yBottom = chartArea.bottom;
 
   // Skip drawing if we have invalid coordinates
-  if (isNaN(y1) || isNaN(y2)) {
+  if (Number.isNaN(y1) || Number.isNaN(y2)) {
     console.warn('Skipping trendline drawing due to invalid values');
     return;
   }
@@ -1041,14 +1041,28 @@ const trendlinePlugin: Plugin<'line'> = {
   id: 'chartjs-plugin-trendline-ts',
 
   afterDatasetsDraw(chart) {
-    const ctx = chart.ctx;
     const pluginOptions = chart.options.plugins?.trendline as TrendlinePluginOptions | undefined;
+    if (!pluginOptions) {
+      return;
+    }
+
+    const ctx = chart.ctx;
+    const chartType = chart.config.type as ChartType;
+    if (chartType === 'pie' || chartType === 'doughnut') {
+      return;
+    }
+
     const { chartArea } = chart;
     const labels = chart.data.labels as string[] | Date[] | undefined;
 
     // get horizontal (x) and vertical (y) scales
-    const xScale = Object.values(chart.scales).find((s) => s.isHorizontal())!;
-    const yScale = Object.values(chart.scales).find((s) => !s.isHorizontal())!;
+    const xScale = Object.values(chart.scales).find((s) => s.isHorizontal());
+    const yScale = Object.values(chart.scales).find((s) => !s.isHorizontal());
+
+    if (!xScale || !yScale) {
+      console.warn('Trendline plugin requires both x and y scales');
+      return;
+    }
 
     // Use spatial index for faster collision detection
     const labelSpatialIndex = new SpatialIndex();
@@ -1091,7 +1105,10 @@ const trendlinePlugin: Plugin<'line'> = {
           }
 
           // Draw the aggregated trendline if we have valid data points
-          if (fitter.minx !== Infinity && fitter.maxx !== -Infinity) {
+          if (
+            fitter.minx !== Number.POSITIVE_INFINITY &&
+            fitter.maxx !== Number.NEGATIVE_INFINITY
+          ) {
             const defaultColor =
               (firstDatasetWithTrendline.borderColor as string) ?? 'rgba(0,0,0,0.3)';
 
@@ -1156,7 +1173,7 @@ const trendlinePlugin: Plugin<'line'> = {
         addDataPointsToFitter(dataset, labels, fitter);
 
         // Skip if no valid points were added
-        if (fitter.minx === Infinity || fitter.maxx === -Infinity) {
+        if (fitter.minx === Number.POSITIVE_INFINITY || fitter.maxx === Number.NEGATIVE_INFINITY) {
           return;
         }
 
@@ -1165,7 +1182,7 @@ const trendlinePlugin: Plugin<'line'> = {
           // Check if we have valid data (positive y values)
           const hasValidPoints = dataset.data.some((point) => {
             if (!point) return false;
-            else if (typeof point === 'number') return point > 0;
+            if (typeof point === 'number') return point > 0;
             const y = point[(dataset.yAxisID ?? 'y') as 'y'] ?? point;
             return typeof y === 'number' && y > 0;
           });
@@ -1205,9 +1222,9 @@ const trendlinePlugin: Plugin<'line'> = {
     // After all trendlines are drawn, draw all labels on top - do this in a batch
     if (labelDrawingQueue.length > 0) {
       ctx.save();
-      labelDrawingQueue.forEach((item) => {
+      for (const item of labelDrawingQueue) {
         drawLabel(item.ctx, item.text, item.x, item.y, item.opts);
-      });
+      }
       ctx.restore();
     }
   }

@@ -1,6 +1,6 @@
-import React from 'react';
-import { AppTooltip } from '@/components/ui/tooltip';
+import type React from 'react';
 import { CircleQuestion } from '@/components/ui/icons';
+import { AppTooltip } from '@/components/ui/tooltip';
 import { Text } from '@/components/ui/typography';
 
 export const TermIndividualHeaderSider: React.FC = () => {

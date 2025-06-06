@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { TanStackDataGrid } from './TanStackDataGrid';
 import { faker } from '@faker-js/faker';
+import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
+import { TanStackDataGrid } from './TanStackDataGrid';
 
 const sampleData = Array.from({ length: 1000 }, (_, index) => ({
   id: index + 1,

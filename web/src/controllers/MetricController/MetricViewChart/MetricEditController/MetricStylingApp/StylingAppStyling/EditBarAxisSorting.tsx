@@ -1,17 +1,12 @@
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import React, { useMemo } from 'react';
-import { LabelAndInput } from '../Common';
-import { BarSortBy } from '@/api/asset_interfaces/metric/charts';
-import { AppSegmented, SegmentedItem } from '@/components/ui/segmented';
-import {
-  ChartBarAxisX,
-  ChartBarTrendDown,
-  ChartBarTrendUp
-} from '@/components/ui/icons/NucleoIconFilled';
-import { BarChartSortAscIcon } from '@/components/ui/icons/customIcons/BarChartSortAscIcon';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type { BarSortBy } from '@/api/asset_interfaces/metric/charts';
 import { BarChartSortNoneIcon } from '@/components/ui/icons/customIcons/BarChart_NoSort';
+import { BarChartSortAscIcon } from '@/components/ui/icons/customIcons/BarChartSortAscIcon';
 import { BarChartSortDescIcon } from '@/components/ui/icons/customIcons/BarChartSortDescIcon';
+import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
 import { useMemoizedFn } from '@/hooks';
+import { LabelAndInput } from '../Common';
 
 const options: SegmentedItem<BarSortBy[0]>[] = [
   {

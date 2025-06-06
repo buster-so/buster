@@ -1,2 +1,2 @@
-export * from './SidebarSettings';
 export * from './SidebarPrimary';
+export * from './SidebarSettings';

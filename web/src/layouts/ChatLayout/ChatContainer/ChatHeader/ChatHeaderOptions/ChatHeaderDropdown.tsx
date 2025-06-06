@@ -1,17 +1,17 @@
-import { Dropdown, DropdownItems } from '@/components/ui/dropdown';
 import React, { useMemo } from 'react';
-import { useChatIndividualContextSelector } from '../../../ChatContext';
-import { Copy, Trash, Pencil, DuplicatePlus, Star } from '@/components/ui/icons';
-import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
+import { ShareAssetType } from '@/api/asset_interfaces/share';
 import { useDeleteChat, useDuplicateChat, useGetChat } from '@/api/buster_rest/chats';
-import { CHAT_HEADER_TITLE_ID } from '../ChatHeaderTitle';
-import { timeout } from '@/lib';
-import { BusterRoutes } from '@/routes';
+import { useFavoriteStar } from '@/components/features/list';
+import { Dropdown, type DropdownItems } from '@/components/ui/dropdown';
+import { DuplicatePlus, Pencil, Star, Trash } from '@/components/ui/icons';
+import { Star as StarFilled } from '@/components/ui/icons/NucleoIconFilled';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useBusterNotifications } from '@/context/BusterNotifications';
+import { timeout } from '@/lib';
 import { assetParamsToRoute } from '@/lib/assets';
-import { useFavoriteStar } from '@/components/features/list';
-import { ShareAssetType } from '@/api/asset_interfaces/share';
+import { BusterRoutes } from '@/routes';
+import { useChatIndividualContextSelector } from '../../../ChatContext';
+import { CHAT_HEADER_TITLE_ID } from '../ChatHeaderTitle';
 
 export const ChatContainerHeaderDropdown: React.FC<{
   children: React.ReactNode;
@@ -24,7 +24,10 @@ export const ChatContainerHeaderDropdown: React.FC<{
   const currentMessageId = useChatIndividualContextSelector((state) => state.currentMessageId);
   const selectedFileId = useChatIndividualContextSelector((state) => state.selectedFileId);
   const selectedFileType = useChatIndividualContextSelector((state) => state.selectedFileType);
-  const { data: chatTitle } = useGetChat({ id: chatId || '' }, { select: (x) => x.title, enabled: !!chatId });
+  const { data: chatTitle } = useGetChat(
+    { id: chatId || '' },
+    { select: (x) => x.title, enabled: !!chatId }
+  );
 
   const { isFavorited, onFavoriteClick } = useFavoriteStar({
     id: chatId || '',
@@ -100,12 +103,14 @@ export const ChatContainerHeaderDropdown: React.FC<{
     chatId,
     isDeleting,
     isDuplicating,
-    currentMessageId,
     deleteChat,
     duplicateChat,
     isFavorited,
     onFavoriteClick,
-    openSuccessMessage
+    openSuccessMessage,
+    onChangePage,
+    selectedFileType,
+    selectedFileId
   ]);
 
   return (

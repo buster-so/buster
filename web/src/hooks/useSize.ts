@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 import { useMemoizedFn } from './useMemoizedFn';
 
 interface Size {
@@ -16,7 +17,7 @@ interface Size {
  */
 export function useSize(
   ref: React.RefObject<HTMLElement | null> | React.RefObject<HTMLDivElement | null> | null,
-  debounceDelay: number = 0
+  debounceDelay = 0
 ): Size | undefined {
   const [size, setSize] = useState<Size>();
 
@@ -38,9 +39,8 @@ export function useSize(
     if (debounceDelay > 0) {
       const timeoutId = setTimeout(updateSize, debounceDelay);
       return () => clearTimeout(timeoutId);
-    } else {
-      updateSize();
     }
+    updateSize();
   });
 
   useEffect(() => {

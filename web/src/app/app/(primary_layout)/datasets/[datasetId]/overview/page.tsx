@@ -1,10 +1,9 @@
 'use client';
 
-import React from 'react';
-import { useDatasetPageContextSelector } from '../_DatasetsLayout/DatasetPageContext';
-import { OverviewHeader } from './OverviewHeader';
-import { OverviewData } from './OverviewData';
 import { Separator } from '@/components/ui/seperator';
+import { useDatasetPageContextSelector } from '../_DatasetsLayout/DatasetPageContext';
+import { OverviewData } from './OverviewData';
+import { OverviewHeader } from './OverviewHeader';
 
 export default function Page() {
   const datasetRes = useDatasetPageContextSelector((state) => state.dataset);
@@ -19,27 +18,23 @@ export default function Page() {
 
   return (
     <div className="mx-auto overflow-y-auto px-14 pt-12 pb-12">
-      <>
-        {showSkeletonLoader ? (
-          <></>
-        ) : (
-          <div className="flex w-full flex-col space-y-5">
-            <OverviewHeader
-              datasetId={dataset.id}
-              description={dataset.description}
-              name={dataset.name}
-            />
+      {showSkeletonLoader ? null : (
+        <div className="flex w-full flex-col space-y-5">
+          <OverviewHeader
+            datasetId={dataset.id}
+            description={dataset.description}
+            name={dataset.name}
+          />
 
-            <Separator />
+          <Separator />
 
-            <OverviewData
-              datasetId={dataset.id}
-              data={datasetData || []}
-              isFetchedDatasetData={isFetchedDatasetData}
-            />
-          </div>
-        )}
-      </>
+          <OverviewData
+            datasetId={dataset.id}
+            data={datasetData || []}
+            isFetchedDatasetData={isFetchedDatasetData}
+          />
+        </div>
+      )}
     </div>
   );
 }

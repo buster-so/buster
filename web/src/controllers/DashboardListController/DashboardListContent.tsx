@@ -1,23 +1,23 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
+import type { BusterDashboardListItem } from '@/api/asset_interfaces';
+import { ShareAssetType } from '@/api/asset_interfaces';
+import { FavoriteStar } from '@/components/features/list';
+import { getShareStatus } from '@/components/features/metrics/StatusBadgeIndicator/helpers';
+import { NewDashboardModal } from '@/components/features/modal/NewDashboardModal';
 import { Avatar } from '@/components/ui/avatar';
-import { formatDate } from '@/lib';
 import {
   BusterList,
-  BusterListColumn,
-  BusterListRow,
+  type BusterListColumn,
+  type BusterListRow,
   ListEmptyStateWithButton
 } from '@/components/ui/list';
-import { BusterRoutes, createBusterRoute } from '@/routes';
-import { useMemoizedFn } from '@/hooks';
-import { DashboardSelectedOptionPopup } from './DashboardSelectedPopup';
-import type { BusterDashboardListItem } from '@/api/asset_interfaces';
-import { getShareStatus } from '@/components/features/metrics/StatusBadgeIndicator/helpers';
-import { FavoriteStar } from '@/components/features/list';
-import { ShareAssetType } from '@/api/asset_interfaces';
 import { Text } from '@/components/ui/typography';
-import { NewDashboardModal } from '@/components/features/modal/NewDashboardModal';
+import { useMemoizedFn } from '@/hooks';
+import { formatDate } from '@/lib';
+import { BusterRoutes, createBusterRoute } from '@/routes';
+import { DashboardSelectedOptionPopup } from './DashboardSelectedPopup';
 
 const columns: BusterListColumn[] = [
   {
@@ -110,14 +110,14 @@ export const DashboardListContent: React.FC<{
           emptyState={
             !loading ? (
               <ListEmptyStateWithButton
-                title={`You don’t have any dashboards yet.`}
+                title={'You don’t have any dashboards yet.'}
                 buttonText="New dashboard"
-                description={`You don’t have any dashboards. As soon as you do, they will start to  appear here.`}
+                description={
+                  'You don’t have any dashboards. As soon as you do, they will start to  appear here.'
+                }
                 onClick={onClickEmptyState}
               />
-            ) : (
-              <></>
-            )
+            ) : null
           }
         />
 

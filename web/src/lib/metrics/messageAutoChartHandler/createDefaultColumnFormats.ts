@@ -1,13 +1,13 @@
+import { create } from 'mutative';
 import {
-  ColumnLabelFormat,
-  DEFAULT_COLUMN_LABEL_FORMAT,
-  IColumnLabelFormat,
+  type ColumnLabelFormat,
   type ColumnMetaData,
+  DEFAULT_COLUMN_LABEL_FORMAT,
   type IBusterMetricChartConfig,
+  type IColumnLabelFormat,
   type SimplifiedColumnType
 } from '@/api/asset_interfaces/metric';
 import { isDateColumnType, isNumericColumnType, simplifyColumnType } from '@/lib/messages';
-import { create } from 'mutative';
 
 export const createDefaultColumnLabelFormats = (
   columnLabelFormats: Record<string, IColumnLabelFormat> | undefined,
@@ -40,7 +40,9 @@ const createDefaulColumnLabel = (
   columnsMetaData: ColumnMetaData[],
   name: string
 ): Required<ColumnLabelFormat> => {
-  const assosciatedColumn = columnsMetaData?.find((m) => m.name === name)!;
+  const assosciatedColumn = columnsMetaData?.find((m) => m.name === name) || {
+    simple_type: 'text'
+  };
   const columnType: SimplifiedColumnType = simplifyColumnType(assosciatedColumn?.simple_type);
   const style = createDefaultColumnLabelStyle(columnType);
   const replaceMissingDataWith = createDefaultReplaceMissingDataWith(columnType);

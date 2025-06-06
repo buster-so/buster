@@ -1,4 +1,4 @@
-import { DropZone, SelectAxisItem } from './interfaces';
+import type { DropZone, SelectAxisItem } from './interfaces';
 import { SelectAxisItemDragContainer } from './SelectAxisItem/SelectAxisItemDragContainer';
 
 export * from './SelectAxisDropzones';

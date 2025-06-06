@@ -1,3 +1,4 @@
+import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
 import { eq, inArray } from 'drizzle-orm';
@@ -5,6 +6,7 @@ import * as yaml from 'yaml';
 import { z } from 'zod';
 import { db } from '../../../../database/src/connection';
 import { dashboardFiles, metricFiles } from '../../../../database/src/schema';
+import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
 
 // Core interfaces matching Rust structs
 interface FileUpdate {
@@ -35,7 +37,6 @@ interface FileWithId {
   id: string;
   name: string;
   file_type: string;
-  yml_content: string;
   result_message?: string;
   results?: Record<string, any>[];
   created_at: string;
@@ -48,10 +49,6 @@ interface ModifyFilesOutput {
   duration: number;
   files: FileWithId[];
   failed_files: FailedFileModification[];
-}
-
-interface RuntimeContext {
-  get(key: string): string | undefined;
 }
 
 // Dashboard YAML schema validation with full rules
@@ -249,13 +246,14 @@ async function processDashboardFileUpdate(
 // Main modify dashboard files function
 const modifyDashboardFiles = wrapTraced(
   async (
-    params: UpdateFilesParams & { runtimeContext?: RuntimeContext }
+    params: UpdateFilesParams,
+    runtimeContext: RuntimeContext<AnalystRuntimeContext>
   ): Promise<ModifyFilesOutput> => {
     const startTime = Date.now();
 
     // Get runtime context values (for logging/tracking)
-    const userId = params.runtimeContext?.get('userId');
-    const organizationId = params.runtimeContext?.get('organizationId');
+    const userId = runtimeContext.get('userId');
+    const organizationId = runtimeContext.get('organizationId');
 
     if (!userId) {
       throw new Error('User ID not found in runtime context');
@@ -269,7 +267,6 @@ const modifyDashboardFiles = wrapTraced(
     const updateResults: ModificationResult[] = [];
 
     const dashboardFilesToUpdate: any[] = [];
-    const dashboardYmls: any[] = [];
 
     try {
       // Process each file update
@@ -290,7 +287,7 @@ const modifyDashboardFiles = wrapTraced(
             continue;
           }
 
-          const existingFile = dashboardFile[0];
+          const existingFile = dashboardFile[0]!;
           const duration = Date.now() - startTime;
 
           // Process the dashboard file update
@@ -300,23 +297,13 @@ const modifyDashboardFiles = wrapTraced(
             duration
           );
 
-          const {
-            dashboardFile: updatedFile,
-            dashboardYml,
-            results,
-            validationMessage,
-            validationResults,
-          } = updateResult;
+          const { dashboardFile: updatedFile, dashboardYml, results } = updateResult;
 
           // Calculate next version number from existing version history
           const currentVersionHistory = existingFile.versionHistory as any;
           let nextVersion = 1;
 
-          if (
-            currentVersionHistory &&
-            currentVersionHistory.versions &&
-            Array.isArray(currentVersionHistory.versions)
-          ) {
+          if (currentVersionHistory?.versions && Array.isArray(currentVersionHistory.versions)) {
             const versions = currentVersionHistory.versions;
             if (versions.length > 0) {
               const latestVersion = versions[versions.length - 1];
@@ -342,7 +329,6 @@ const modifyDashboardFiles = wrapTraced(
           updatedFile.name = dashboardYml.name;
 
           dashboardFilesToUpdate.push(updatedFile);
-          dashboardYmls.push(dashboardYml);
           updateResults.push(...results);
         } catch (error) {
           failedFiles.push({
@@ -368,10 +354,7 @@ const modifyDashboardFiles = wrapTraced(
         }
 
         // Add successful files to output
-        for (let i = 0; i < dashboardFilesToUpdate.length; i++) {
-          const file = dashboardFilesToUpdate[i];
-          const dashboardYml = dashboardYmls[i];
-
+        for (const file of dashboardFilesToUpdate) {
           // Get the latest version number
           const versionHistory = file.versionHistory as any;
           const latestVersion =
@@ -381,7 +364,6 @@ const modifyDashboardFiles = wrapTraced(
             id: file.id,
             name: file.name,
             file_type: 'dashboard',
-            yml_content: yaml.stringify(dashboardYml),
             result_message: 'Dashboard validation successful',
             results: [],
             created_at: file.createdAt,
@@ -444,7 +426,6 @@ const outputSchema = z.object({
       id: z.string(),
       name: z.string(),
       file_type: z.string(),
-      yml_content: z.string(),
       result_message: z.string().optional(),
       results: z.array(z.record(z.any())).optional(),
       created_at: z.string(),
@@ -467,10 +448,8 @@ export const modifyDashboardsFileTool = createTool({
     'Updates existing dashboard configuration files with new YAML content. Provide the complete YAML content for each dashboard, replacing the entire existing file. This tool is ideal for bulk modifications when you need to update multiple dashboards simultaneously. The system will preserve version history and perform all necessary validations on the new content. For each dashboard, you need its UUID and the complete updated YAML content.',
   inputSchema,
   outputSchema,
-  execute: async ({ context }) => {
-    return await modifyDashboardFiles(
-      context as UpdateFilesParams & { runtimeContext?: RuntimeContext }
-    );
+  execute: async ({ context, runtimeContext }) => {
+    return await modifyDashboardFiles(context as UpdateFilesParams, runtimeContext);
   },
 });
 

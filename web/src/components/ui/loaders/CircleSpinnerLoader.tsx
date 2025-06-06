@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 export const CircleSpinnerLoader: React.FC<{
   size?: number;
@@ -6,15 +6,14 @@ export const CircleSpinnerLoader: React.FC<{
 }> = ({ size = 28, fill = '#7E3AF2' }) => {
   return (
     <div className="flex flex-col items-center justify-center space-y-4">
-      <div
-        role="status"
+      <output
         style={{
           width: `${size}px`,
           height: `${size}px`
         }}>
         <svg
           aria-hidden="true"
-          className={`mr-2 animate-spin text-gray-200 dark:text-gray-500`} /* */
+          className={'mr-2 animate-spin text-gray-200 dark:text-gray-500'} /* */
           viewBox="0 0 100 101"
           fill={fill}
           style={{
@@ -32,7 +31,7 @@ export const CircleSpinnerLoader: React.FC<{
           />
         </svg>
         <span className="sr-only">Loading...</span>
-      </div>
+      </output>
     </div>
   );
 };

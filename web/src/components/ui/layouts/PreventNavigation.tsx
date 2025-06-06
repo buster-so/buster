@@ -1,9 +1,8 @@
 'use client';
 
-import { useMemoizedFn, useMount, useUnmount } from '@/hooks';
 import { useRouter } from 'next/navigation';
-import { useState, useRef, useEffect, useMemo } from 'react';
-import React from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemoizedFn, useMount } from '@/hooks';
 import { AppModal } from '../modal/AppModal';
 
 type PreventNavigationProps = {
@@ -37,8 +36,8 @@ export const PreventNavigation: React.FC<PreventNavigationProps> = React.memo(
      * @param e The triggered event.
      */
     const handleClick = useMemoizedFn((event: MouseEvent) => {
-      let originalTarget = event.target as HTMLElement;
-      let originalEvent = event;
+      const originalTarget = event.target as HTMLElement;
+      const originalEvent = event;
 
       const newEvent = new MouseEvent('click', {
         bubbles: true,
@@ -64,9 +63,9 @@ export const PreventNavigation: React.FC<PreventNavigationProps> = React.memo(
         // Store both the target and the original event details
         confirmationFn.current = () => {
           // Remove all click listeners temporarily
-          document.querySelectorAll('a').forEach((link) => {
+          for (const link of document.querySelectorAll('a')) {
             link.removeEventListener('click', handleClick);
-          });
+          }
 
           // Get all click event handlers on the original target
           const clickHandlers = originalTarget.onclick;
@@ -87,9 +86,9 @@ export const PreventNavigation: React.FC<PreventNavigationProps> = React.memo(
 
         setLeavingPage(true);
       } else {
-        document.querySelectorAll('a').forEach((link) => {
+        for (const link of document.querySelectorAll('a')) {
           link.removeEventListener('click', handleClick);
-        });
+        }
         originalTarget.dispatchEvent(newEvent);
       }
     });
@@ -124,17 +123,17 @@ export const PreventNavigation: React.FC<PreventNavigationProps> = React.memo(
 
     useEffect(() => {
       /* *************************** Open listeners ************************** */
-      document.querySelectorAll('a').forEach((link) => {
+      for (const link of document.querySelectorAll('a')) {
         link.addEventListener('click', handleClick);
-      });
+      }
       window.addEventListener('popstate', handlePopState);
       window.addEventListener('beforeunload', handleBeforeUnload);
 
       /* ************** Return from useEffect closing listeners ************** */
       return () => {
-        document.querySelectorAll('a').forEach((link) => {
+        for (const link of document.querySelectorAll('a')) {
           link.removeEventListener('click', handleClick);
-        });
+        }
         window.removeEventListener('popstate', handlePopState);
         window.removeEventListener('beforeunload', handleBeforeUnload);
       };

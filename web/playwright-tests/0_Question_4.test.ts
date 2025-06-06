@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { askQuestion } from './question-helpers/ask-question';
 
 const question = 'Who would win in a fight, 100 humans or a gorilla?';

@@ -1,6 +1,5 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import path, { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -56,13 +55,19 @@ const createCspHeader = (isEmbed = false) => {
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
+  // Disable ESLint during builds since we're using Biome
+  eslint: {
+    ignoreDuringBuilds: false
+  },
+  // Disable TypeScript type checking during builds
+  typescript: {
+    ignoreBuildErrors: false
+  },
   sassOptions: {
     includePaths: [path.join(__dirname, 'styles')],
     silenceDeprecations: ['legacy-js-api']
   },
   experimental: {
-    serverComponentsExternalPackages: [],
-    instrumentationHook: false,
     serverActions: {
       bodySizeLimit: '2mb'
     }

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { BorderedModal } from './BorderedModal';
-import { useState } from 'react';
 import { fn } from '@storybook/test';
+import { useState } from 'react';
+import { BorderedModal } from './BorderedModal';
 
 const meta: Meta<typeof BorderedModal> = {
   title: 'UI/Modal/ScrollableModal',

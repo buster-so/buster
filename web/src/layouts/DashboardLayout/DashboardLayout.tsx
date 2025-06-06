@@ -1,6 +1,6 @@
 'use server';
 
-import React from 'react';
+import type React from 'react';
 import { AppAssetCheckLayout } from '../AppAssetCheckLayout';
 import { DashboardLayoutContainer } from './DashboardLayoutContainer';
 

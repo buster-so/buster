@@ -1,9 +1,9 @@
 'use client';
 
 import type { Meta, StoryObj } from '@storybook/react';
-import { InputTagInput } from './InputTagInput';
+import type React from 'react';
 import { useState } from 'react';
-import React from 'react';
+import { InputTagInput } from './InputTagInput';
 
 const meta: Meta<typeof InputTagInput> = {
   title: 'UI/Inputs/InputTagInput',
@@ -45,7 +45,6 @@ const InteractiveTagInput = (args: React.ComponentProps<typeof InputTagInput>) =
   const [tags, setTags] = useState<string[]>(args.tags || []);
 
   const handleTagAdd = (tag: string | string[]) => {
-    console.log('tag', tag);
     if (Array.isArray(tag)) {
       setTags([...tags, ...tag]);
     } else {

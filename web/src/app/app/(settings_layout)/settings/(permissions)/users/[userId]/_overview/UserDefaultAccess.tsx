@@ -1,22 +1,21 @@
+import React from 'react';
 import {
   BusterOrganizationRole,
   type BusterUser,
   type OrganizationUser
 } from '@/api/asset_interfaces';
-import React from 'react';
-import { Title, Text } from '@/components/ui/typography';
+import { useUpdateUser } from '@/api/buster_rest';
 import {
   Card,
-  CardHeader,
   CardContent,
   CardDescription,
-  CardTitle,
-  CardFooter
+  CardHeader,
+  CardTitle
 } from '@/components/ui/card/CardBase';
-import { Select, SelectItem } from '@/components/ui/select';
-import { useMemoizedFn } from '@/hooks';
+import { Select, type SelectItem } from '@/components/ui/select';
 import { AppTooltip } from '@/components/ui/tooltip';
-import { useUpdateUser } from '@/api/buster_rest';
+import { Text } from '@/components/ui/typography';
+import { useMemoizedFn } from '@/hooks';
 
 export const UserDefaultAccess: React.FC<{
   user: OrganizationUser;

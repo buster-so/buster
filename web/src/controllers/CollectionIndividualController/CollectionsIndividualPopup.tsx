@@ -1,8 +1,8 @@
-import { Trash } from '@/components/ui/icons';
-import { BusterListSelectedOptionPopupContainer } from '@/components/ui/list';
-import { Button } from '@/components/ui/buttons';
 import React from 'react';
 import { useGetCollection, useRemoveAssetFromCollection } from '@/api/buster_rest/collections';
+import { Button } from '@/components/ui/buttons';
+import { Trash } from '@/components/ui/icons';
+import { BusterListSelectedOptionPopupContainer } from '@/components/ui/list';
 import { useMemoizedFn } from '@/hooks';
 
 export const CollectionIndividualSelectedPopup: React.FC<{

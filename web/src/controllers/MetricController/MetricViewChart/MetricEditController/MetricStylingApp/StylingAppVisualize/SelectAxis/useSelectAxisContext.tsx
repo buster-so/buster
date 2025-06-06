@@ -1,14 +1,14 @@
-import { ColumnMetaData, IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import type {
-  ChartEncodes,
-  YAxisConfig,
-  XAxisConfig,
-  CategoryAxisStyleConfig,
-  Y2AxisConfig
-} from '@/api/asset_interfaces/metric/charts';
+import type React from 'react';
+import type { PropsWithChildren } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
-import { PropsWithChildren } from 'react';
-import React from 'react';
+import type { ColumnMetaData, IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import type {
+  CategoryAxisStyleConfig,
+  ChartEncodes,
+  XAxisConfig,
+  Y2AxisConfig,
+  YAxisConfig
+} from '@/api/asset_interfaces/metric/charts';
 
 export interface ISelectAxisContext
   extends Required<YAxisConfig>,

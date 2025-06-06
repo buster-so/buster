@@ -1,8 +1,8 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { useRef, useState, useCallback, useEffect } from 'react';
-import { useAutoScroll } from './useAutoScroll';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { faker } from '@faker-js/faker';
+import type { Meta, StoryObj } from '@storybook/react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useAutoScroll } from './useAutoScroll';
 
 interface Message {
   id: number;
@@ -63,16 +63,19 @@ const AutoScrollDemo = () => {
     <div className="flex w-[600px] flex-col gap-4">
       <div className="flex gap-2">
         <button
+          type="button"
           onClick={addMessage}
           className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600">
           Add Message
         </button>
         <button
+          type="button"
           onClick={addManyMessages}
           className="rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600">
           Add 10 Messages
         </button>
         <button
+          type="button"
           onClick={toggleAutoAdd}
           className={`rounded px-4 py-2 text-white ${
             isAutoAddEnabled
@@ -82,6 +85,7 @@ const AutoScrollDemo = () => {
           Auto Add {isAutoAddEnabled ? 'ON' : 'OFF'}
         </button>
         <button
+          type="button"
           onClick={() => setEnabled(!enabled)}
           className={`rounded px-4 py-2 text-white ${
             enabled ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'
@@ -94,6 +98,7 @@ const AutoScrollDemo = () => {
         <div className="flex items-center gap-2">
           <span className="text-sm">Auto-scroll:</span>
           <button
+            type="button"
             onClick={isAutoScrollEnabled ? disableAutoScroll : enableAutoScroll}
             className={`rounded px-3 py-1 text-white ${
               isAutoScrollEnabled ? 'bg-green-500' : 'bg-red-500'
@@ -103,21 +108,25 @@ const AutoScrollDemo = () => {
         </div>
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={() => scrollToTop()}
             className="rounded bg-gray-500 px-3 py-1 text-white hover:bg-gray-600">
             Scroll to Top (smooth)
           </button>
           <button
+            type="button"
             onClick={() => scrollToTop()}
             className="rounded bg-gray-500 px-3 py-1 text-white hover:bg-gray-600">
             Scroll to Top (instant)
           </button>
           <button
+            type="button"
             onClick={() => scrollToBottom()}
             className="rounded bg-gray-500 px-3 py-1 text-white hover:bg-gray-600">
             Scroll to Bottom (smooth)
           </button>
           <button
+            type="button"
             onClick={() => scrollToBottom()}
             className="rounded bg-gray-500 px-3 py-1 text-white hover:bg-gray-600">
             Scroll to Bottom (instant)
@@ -139,7 +148,7 @@ const AutoScrollDemo = () => {
         ))}
         {messages.length === 0 && (
           <div className="text-center text-gray-500">
-            No messages. Click "Add Message" to start.
+            {`No messages. Click "Add Message" to start.`}
           </div>
         )}
       </div>
@@ -178,7 +187,7 @@ const Lorem = {
         { length: wordCount },
         () => Lorem.words[Math.floor(Math.random() * Lorem.words.length)]
       );
-      sentences.push(words.join(' ') + '.');
+      sentences.push(`${words.join(' ')}.`);
     }
     return sentences.join(' ');
   }
@@ -201,7 +210,7 @@ export const ScrollAreaComponentWithAutoScroll: Story = {
   render: () => {
     const generateCard = (index: number) => ({
       id: index,
-      title: faker.company.name() + ' ' + index,
+      title: `${faker.company.name()} ${index}`,
       color: faker.color.rgb(),
       sentences: faker.lorem.sentences(2)
     });
@@ -253,11 +262,13 @@ export const ScrollAreaComponentWithAutoScroll: Story = {
           <h3 className="text-lg font-semibold">Scrollable Grid Layout</h3>
           <div className="flex gap-2">
             <button
+              type="button"
               onClick={addCard}
               className="rounded bg-blue-500 px-3 py-1 text-sm text-white hover:bg-blue-600">
               Add Card
             </button>
             <button
+              type="button"
               onClick={toggleAutoAdd}
               className={`rounded px-3 py-1 text-sm text-white ${
                 isAutoAddEnabled
@@ -267,6 +278,7 @@ export const ScrollAreaComponentWithAutoScroll: Story = {
               Auto Add {isAutoAddEnabled ? 'ON' : 'OFF'}
             </button>
             <button
+              type="button"
               onClick={isAutoScrollEnabled ? disableAutoScroll : enableAutoScroll}
               className={`rounded px-3 py-1 text-sm text-white ${
                 isAutoScrollEnabled
@@ -276,11 +288,13 @@ export const ScrollAreaComponentWithAutoScroll: Story = {
               Auto-scroll {isAutoScrollEnabled ? 'ON' : 'OFF'}
             </button>
             <button
+              type="button"
               onClick={() => scrollToTop()}
               className="rounded bg-gray-500 px-3 py-1 text-sm text-white hover:bg-gray-600">
               To Top
             </button>
             <button
+              type="button"
               onClick={() => scrollToBottom()}
               className="rounded bg-gray-500 px-3 py-1 text-sm text-white hover:bg-gray-600">
               To Bottom
@@ -322,7 +336,7 @@ export const RapidTextAppend: Story = {
 
     const addWord = useCallback(() => {
       const randomWord = faker.word.words(2);
-      setText((old) => old + ' ' + randomWord);
+      setText((old) => `${old} ${randomWord}`);
     }, []);
 
     const toggleRunning = useCallback(() => {
@@ -355,6 +369,7 @@ export const RapidTextAppend: Story = {
           <h3 className="text-lg font-semibold">Rapid Text Append</h3>
           <div className="flex gap-2">
             <button
+              type="button"
               onClick={toggleRunning}
               className={`rounded px-3 py-1 text-sm text-white ${
                 isRunning ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'
@@ -362,6 +377,7 @@ export const RapidTextAppend: Story = {
               {isRunning ? 'Stop' : 'Start'} Adding Words
             </button>
             <button
+              type="button"
               onClick={isAutoScrollEnabled ? disableAutoScroll : enableAutoScroll}
               className={`rounded px-3 py-1 text-sm text-white ${
                 isAutoScrollEnabled

@@ -1,5 +1,5 @@
+import type { BusterSearchResult } from '@/api/asset_interfaces/search';
 import { mainApi } from '../instances';
-import { BusterSearchResult } from '@/api/asset_interfaces/search';
 
 export const search = async (params: {
   query: string;

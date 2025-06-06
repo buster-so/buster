@@ -1,24 +1,23 @@
 'use client';
 
-import type { ChartProps } from '../../core';
-import type { ChartSpecificOptionsProps } from './interfaces';
-import type { ChartType as ChartJSChartType } from 'chart.js';
-import type { DeepPartial } from 'utility-types';
-import type { PluginChartOptions } from 'chart.js';
+import { isServer } from '@tanstack/react-query';
+import type { ChartType as ChartJSChartType, PluginChartOptions } from 'chart.js';
 import type { AnnotationPluginOptions } from 'chartjs-plugin-annotation';
-import { ArrayOperations } from '@/lib/math';
-import { formatLabel } from '@/lib/columnFormatter';
-import { getPieInnerLabelTitle } from '../../../commonHelpers';
-import type { ChartJSOrUndefined } from '../../core/types';
+import type { Context } from 'chartjs-plugin-datalabels';
+import type { DeepPartial } from 'utility-types';
 import type {
   BusterChartConfigProps,
   BusterChartProps,
   ColumnLabelFormat
 } from '@/api/asset_interfaces/metric/charts';
 import { determineFontColorContrast } from '@/lib/colors';
-import type { Context } from 'chartjs-plugin-datalabels';
+import { formatLabel } from '@/lib/columnFormatter';
+import { ArrayOperations } from '@/lib/math';
+import { getPieInnerLabelTitle } from '../../../commonHelpers';
+import type { ChartProps } from '../../core';
+import type { ChartJSOrUndefined } from '../../core/types';
+import type { ChartSpecificOptionsProps } from './interfaces';
 import { defaultLabelOptionConfig } from './labelOptionConfig';
-import { isServer } from '@tanstack/react-query';
 
 type PieOptions = ChartProps<'pie'>['options'] | ChartProps<'doughnut'>['options'];
 
@@ -131,7 +130,7 @@ export const piePluginsHandler = ({
 const getInnerLabelValue = (
   chart: ChartJSOrUndefined,
   firstDatasetData: number[],
-  pieInnerLabelAggregate: BusterChartConfigProps['pieInnerLabelAggregate'] = 'sum',
+  pieInnerLabelAggregate: BusterChartConfigProps['pieInnerLabelAggregate'],
   selectedAxis: ChartSpecificOptionsProps['selectedAxis'],
   columnLabelFormats: NonNullable<BusterChartProps['columnLabelFormats']>
 ): string => {
@@ -143,13 +142,13 @@ const getInnerLabelValue = (
       return firstDatasetData[index];
     });
     const operator = new ArrayOperations(dataByActiveLegendItems);
-    const result = operator[pieInnerLabelAggregate]();
+    const result = operator[pieInnerLabelAggregate || 'average']();
 
     if (pieInnerLabelAggregate === 'count') {
       return result.toString();
     }
 
-    const yColumn = selectedAxis.y[0]!;
+    const yColumn = selectedAxis.y[0] || 'defaultYColumn';
     const yColumnLabel = columnLabelFormats[yColumn];
     const formattedLabel = formatLabel(result, yColumnLabel);
     return formattedLabel;
@@ -173,7 +172,7 @@ const labelFormatter = (
     return formatLabel(value, percentStyle);
   }
 
-  const yColumn = selectedAxis.y[0]!;
+  const yColumn = selectedAxis.y[0] || 'defaultYColumn';
   const yColumnLabel = columnLabelFormats[yColumn];
   const formattedLabel = formatLabel(value, yColumnLabel);
   return formattedLabel;
@@ -184,7 +183,7 @@ const percentFormatter = (context: Context, value: number) => {
     (sum: number, val: number) => sum + val,
     0
   );
-  value = (value / total) * 100;
+  const result = (value / total) * 100 || 0;
 
-  return value;
+  return result;
 };

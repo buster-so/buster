@@ -49,9 +49,7 @@ export const MetricViewChartHeader: React.FC<{
             </Text>
           </div>
         </>
-      ) : (
-        <></>
-      )}
+      ) : null}
     </div>
   );
 });

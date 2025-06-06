@@ -1,8 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Check } from '@/components/ui/icons';
-import { cn } from '@/lib/utils';
+import { useHotkeys } from 'react-hotkeys-hook';
 import {
   Command,
   CommandEmpty,
@@ -11,9 +10,10 @@ import {
   CommandItem,
   CommandList
 } from '@/components/ui/command';
-import { useHotkeys } from 'react-hotkeys-hook';
-import { useMemoizedFn } from '@/hooks';
+import { Check } from '@/components/ui/icons';
 import { Text } from '@/components/ui/typography';
+import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/utils';
 
 type BaseComboboxProps = {
   options: { value: string; label: string; icon?: React.ReactNode; secondaryLabel?: string }[];
@@ -81,7 +81,7 @@ export function Combobox(props: ComboboxProps) {
     if (useIndex) {
       const isKeyInIndex = e.key.match(/^\d+$/);
       if (isKeyInIndex) {
-        const index = parseInt(isKeyInIndex[0]);
+        const index = Number.parseInt(isKeyInIndex[0]);
         if (index < options.length) {
           e.preventDefault();
           handleSelect(options[index].value);

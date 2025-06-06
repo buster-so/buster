@@ -2,16 +2,16 @@
 
 import {
   type QueryKey,
-  useQuery,
-  useQueryClient,
   type UseQueryOptions,
-  type UseQueryResult
+  type UseQueryResult,
+  useQuery,
+  useQueryClient
 } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import type { BusterSocketResponse, BusterSocketResponseRoute } from '@/api/buster_socket';
 import { useBusterWebSocket } from '@/context/BusterWebSocket';
-import { useMemo } from 'react';
-import type { InferBusterSocketResponseData } from './types';
 import { useMemoizedFn, useMount, useUnmount } from '@/hooks';
+import type { InferBusterSocketResponseData } from './types';
 
 type UseSocketQueryOnResult<TData, TError> = UseQueryResult<TData, TError>;
 
@@ -32,7 +32,7 @@ export const useSocketQueryOn = <
     | ((
         currentData: TData | null,
         newData: InferBusterSocketResponseData<TRoute>
-      ) => TData | undefined | void)
+      ) => TData | undefined)
     | null;
   isEmitOn?: boolean;
 }): UseSocketQueryOnResult<TData, TError> => {
@@ -46,7 +46,7 @@ export const useSocketQueryOn = <
     const socketData = d as InferBusterSocketResponseData<TRoute>;
 
     const transformer = callback || defaultCallback<TData, TRoute>;
-    const currentData = queryKey ? queryClient.getQueryData<TData>(queryKey)! : (null as TData);
+    const currentData = queryKey ? (queryClient.getQueryData<TData>(queryKey) ?? null) : null;
     const transformedData = transformer(currentData, socketData);
 
     if (hasBufferCallback && transformedData) {
@@ -77,7 +77,7 @@ export const useSocketQueryOn = <
     queryKey: queryKey as TQueryKey,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
-    enabled: options?.enabled ?? (options?.queryFn ? true : false) // must be disabled, because it will be enabled by the socket
+    enabled: options?.enabled ?? !!options?.queryFn // must be disabled, because it will be enabled by the socket
   });
 };
 

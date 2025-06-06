@@ -1,15 +1,15 @@
 'use client';
 
-import React from 'react';
-import { useGetDatasets } from '@/api/buster_rest/datasets';
-import { useUserConfigContextSelector } from '@/context/Users';
+import type React from 'react';
 import { useMemo, useState } from 'react';
-import { DatasetListContent } from './DatasetListContent';
-import { DatasetHeader } from './DatasetsHeader';
+import { useGetDatasets } from '@/api/buster_rest/datasets';
 import { NewDatasetModal } from '@/components/features/modal/NewDatasetModal';
 import { AppPageLayout } from '@/components/ui/layouts';
+import { useUserConfigContextSelector } from '@/context/Users';
+import { DatasetListContent } from './DatasetListContent';
+import { DatasetHeader } from './DatasetsHeader';
 
-export const DatasetsListController: React.FC<{}> = ({}) => {
+export const DatasetsListController: React.FC<Record<string, never>> = () => {
   const isAdmin = useUserConfigContextSelector((state) => state.isAdmin);
   const [datasetFilter, setDatasetFilter] = useState<'all' | 'published' | 'drafts'>('all');
   const [openDatasetModal, setOpenDatasetModal] = useState<boolean>(false);

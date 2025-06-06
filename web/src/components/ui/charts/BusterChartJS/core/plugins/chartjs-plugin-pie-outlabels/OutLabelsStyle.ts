@@ -1,9 +1,9 @@
-import { resolve, toFont, toLineHeight, toPadding } from 'chart.js/helpers';
-import { FontOptions, OutLabelsOptions } from './OutLabelsOptions';
-import OutLabelsContext from './OutLabelsContext';
-import { ChartArea, FontSpec } from 'chart.js';
+import type { ChartArea, FontSpec } from 'chart.js';
 import { defaults } from 'chart.js';
+import { resolve, toFont, toLineHeight, toPadding } from 'chart.js/helpers';
 import { determineFontColorContrast } from '@/lib';
+import type OutLabelsContext from './OutLabelsContext';
+import type { FontOptions, OutLabelsOptions } from './OutLabelsOptions';
 
 // Same as options but we make sure we have defaults
 //
@@ -40,22 +40,22 @@ export class FontStyle implements FontSpec {
 }
 
 export class OutLabelStyle {
-  display: boolean = true;
-  text: string = '%l %p';
-  textAlign: string = 'center';
-  color: string = 'white';
-  borderRadius: number = 4;
-  borderWidth: number = 0.5;
-  lineWidth: number = 1.5;
-  length: number = 28;
-  percentPrecision: number = 1;
-  valuePrecision: number = 3;
+  display = true;
+  text = '%l %p';
+  textAlign = 'center';
+  color = 'white';
+  borderRadius = 4;
+  borderWidth = 0.5;
+  lineWidth = 1.5;
+  length = 28;
+  percentPrecision = 1;
+  valuePrecision = 3;
   padding: ChartArea;
   font: FontStyle;
   backgroundColor: string | undefined;
   borderColor: string | undefined;
   lineColor: string | undefined;
-  shrinkPercentage: number = 1;
+  shrinkPercentage = 1;
 
   constructor(options: OutLabelsOptions, context: OutLabelsContext, index: number) {
     if (options.textAlign) this.textAlign = options.textAlign;
@@ -68,10 +68,10 @@ export class OutLabelStyle {
     if (options.valuePrecision) this.valuePrecision = options.valuePrecision;
 
     const display = resolve([context.display], context, index);
-    if (typeof display == 'boolean') this.display = display;
+    if (typeof display === 'boolean') this.display = display;
 
     const text = resolve([options.text], context, index);
-    if (typeof text == 'string') this.text = text;
+    if (typeof text === 'string') this.text = text;
 
     this.font = new FontStyle(resolve([options.font || {}], context, index) as FontOptions);
     this.padding = toPadding(options.padding ?? 4);
@@ -85,7 +85,7 @@ export class OutLabelStyle {
       context,
       index
     );
-    if (typeof backgroundColor == 'string') {
+    if (typeof backgroundColor === 'string') {
       this.backgroundColor = backgroundColor;
       this.color = determineFontColorContrast(backgroundColor);
     }
@@ -100,14 +100,14 @@ export class OutLabelStyle {
       context,
       index
     );
-    if (typeof borderColor == 'string') this.borderColor = borderColor;
+    if (typeof borderColor === 'string') this.borderColor = borderColor;
 
     const lineColor = resolve(
       [options.lineColor, context.dataset.backgroundColor, context.chart.options.backgroundColor],
       context,
       index
     );
-    if (typeof lineColor == 'string') this.lineColor = lineColor;
+    if (typeof lineColor === 'string') this.lineColor = lineColor;
 
     if (options.shrinkPercentage !== undefined) {
       this.shrinkPercentage = options.shrinkPercentage;

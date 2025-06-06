@@ -1,7 +1,7 @@
 import { MAX_NUMBER_OF_ITEMS_ON_DASHBOARD } from '@/api/asset_interfaces/dashboard/config';
+import { cn } from '@/lib/classMerge';
 import { Text } from '../../../components/ui/typography/Text';
 import { Title } from '../../../components/ui/typography/Title';
-import { cn } from '@/lib/classMerge';
 
 export const createDashboardFullConfirmModal = ({
   availableSlots,
@@ -34,7 +34,7 @@ export const createDashboardFullConfirmModal = ({
             <ul className="space-y-2">
               {metricsToActuallyAdd.map((metric) => (
                 <li key={metric.id} className="flex items-center gap-2">
-                  <div className="bg-primary h-1.5 w-1.5 rounded-full"></div>
+                  <div className="bg-primary h-1.5 w-1.5 rounded-full" />
                   <Text className="text-sm font-medium text-gray-600 transition-colors duration-200 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100">
                     {metric.name}
                   </Text>
@@ -51,7 +51,7 @@ export const createDashboardFullConfirmModal = ({
               <ul className="space-y-2">
                 {metricsToAdd.slice(availableSlots).map((metric) => (
                   <li key={metric.id} className="flex items-center gap-2">
-                    <div className="bg-danger-foreground h-1.5 w-1.5 rounded-full"></div>
+                    <div className="bg-danger-foreground h-1.5 w-1.5 rounded-full" />
                     <Text
                       className={cn(
                         'text-sm font-medium transition-colors duration-200',

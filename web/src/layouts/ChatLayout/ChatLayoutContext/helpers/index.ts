@@ -1,5 +1,5 @@
-import { FileType } from '@/api/asset_interfaces/chat';
-import { FileView } from '../useLayoutConfig';
+import type { FileType } from '@/api/asset_interfaces/chat';
+import type { FileView } from '../useLayoutConfig';
 
 export * from './getFileViewFromRoute';
 

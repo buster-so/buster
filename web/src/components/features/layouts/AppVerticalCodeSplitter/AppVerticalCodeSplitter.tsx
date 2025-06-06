@@ -1,9 +1,8 @@
-import React, { forwardRef, MutableRefObject } from 'react';
-import { AppSplitter, type AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
-import { SQLContainer } from './SQLContainer';
-import { DataContainer } from './DataContainer';
+import { forwardRef } from 'react';
 import type { IDataResult } from '@/api/asset_interfaces';
-import { useMount } from '@/hooks';
+import { AppSplitter, type AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
+import { DataContainer } from './DataContainer';
+import { SQLContainer } from './SQLContainer';
 
 export interface AppVerticalCodeSplitterProps {
   sql: string;
@@ -43,15 +42,15 @@ export const AppVerticalCodeSplitter = forwardRef<AppSplitterRef, AppVerticalCod
     ref
   ) => {
     //tailwind might not like this, but yolo
-    const sqlContainerClassName = !topHidden ? `mb-${gapAmount}` : '';
-    const dataContainerClassName = !topHidden ? `mt-${gapAmount}` : '';
+    const sqlContainerClassName = !topHidden ? `pb-${gapAmount} swag1` : '';
+    const dataContainerClassName = !topHidden ? `pt-${gapAmount} swag2` : '';
 
     return (
       <AppSplitter
         ref={ref}
+        leftPanelClassName={sqlContainerClassName}
         leftChildren={
           <SQLContainer
-            className={sqlContainerClassName}
             sql={sql}
             setDatasetSQL={setSQL}
             error={runSQLError}
@@ -61,13 +60,8 @@ export const AppVerticalCodeSplitter = forwardRef<AppSplitterRef, AppVerticalCod
             readOnly={readOnly}
           />
         }
-        rightChildren={
-          <DataContainer
-            className={dataContainerClassName}
-            data={data}
-            fetchingData={fetchingData}
-          />
-        }
+        rightPanelClassName={dataContainerClassName}
+        rightChildren={<DataContainer data={data} fetchingData={fetchingData} />}
         split="horizontal"
         defaultLayout={defaultLayout}
         autoSaveId={autoSaveId}

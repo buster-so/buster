@@ -1,5 +1,5 @@
-import React from 'react';
-import { type ContextMenuProps } from '../../context/ContextMenu';
+import type React from 'react';
+import type { ContextMenuProps } from '../../context/ContextMenu';
 export interface BusterListProps {
   columns: BusterListColumn[];
   hideLastRowBorder?: boolean;
@@ -20,7 +20,12 @@ export interface BusterListColumn {
   width?: number;
   minWidth?: number;
   align?: 'left' | 'center' | 'right'; //TODO
-  render?: (value: any, record: any) => React.JSX.Element | string | React.ReactNode;
+  render?: (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- This really could be anything...
+    value: string | number | boolean | null | undefined | any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- This really could be anything...
+    record: any
+  ) => React.JSX.Element | string | React.ReactNode;
   headerRender?: (title: string) => React.ReactNode;
   ellipsis?: boolean;
 }
@@ -28,12 +33,17 @@ export interface BusterListColumn {
 export type BusterListRow = BusterListRowItem;
 export interface BusterListRowItem {
   id: string;
-  data: Record<string, string | React.ReactNode | any> | null;
+  data: Record<
+    string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- This really could be anything...
+    string | React.ReactNode | number | boolean | null | undefined | object | any
+  > | null;
   onClick?: () => void;
   link?: string;
   onSelect?: () => void;
   rowSection?: BusterListSectionRow;
   hidden?: boolean;
+  dataTestId?: string;
 }
 
 export interface BusterListSectionRow {

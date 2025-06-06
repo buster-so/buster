@@ -81,3 +81,5 @@ drizzle/.env
 drizzle/.env.*
 drizzle/*.log
 drizzle/meta/
+
+**/evals/**/*.eval.private.ts

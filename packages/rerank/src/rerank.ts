@@ -1,5 +1,5 @@
 import axios, { type AxiosInstance } from 'axios';
-import type { RerankResult, RerankConfig, RerankResponse } from './types';
+import type { RerankConfig, RerankResponse, RerankResult } from './types';
 import { RerankResponseSchema } from './types';
 
 export class Reranker {

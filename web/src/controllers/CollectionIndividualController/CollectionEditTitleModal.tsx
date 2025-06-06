@@ -1,8 +1,8 @@
-import { BusterCollection } from '@/api/asset_interfaces/collection';
-import { AppModal, ModalProps } from '@/components/ui/modal';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Input } from '@/components/ui/inputs';
+import type { BusterCollection } from '@/api/asset_interfaces/collection';
 import { useUpdateCollection } from '@/api/buster_rest/collections';
+import { Input } from '@/components/ui/inputs';
+import { AppModal, type ModalProps } from '@/components/ui/modal';
 import { useMemoizedFn } from '@/hooks';
 import { inputHasText } from '@/lib/text';
 
@@ -52,3 +52,5 @@ export const CollectionEditTitleModal: React.FC<{
     </AppModal>
   );
 });
+
+CollectionEditTitleModal.displayName = 'CollectionEditTitleModal';

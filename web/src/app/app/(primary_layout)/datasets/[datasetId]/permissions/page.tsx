@@ -4,9 +4,7 @@ import { BusterRoutes, createBusterRoute } from '@/routes';
 export default async function Page(props: { params: Promise<{ datasetId: string }> }) {
   const params = await props.params;
 
-  const {
-    datasetId
-  } = params;
+  const { datasetId } = params;
 
   return permanentRedirect(
     createBusterRoute({

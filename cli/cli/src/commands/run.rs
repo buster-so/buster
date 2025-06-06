@@ -23,7 +23,7 @@ use colored::*;
 #[exclude = "supabase/docker-compose.override.yml"]
 struct StaticAssets;
 
-async fn setup_persistent_app_environment() -> Result<PathBuf, BusterError> {
+async fn setup_persistent_app_environment(env_vars: Option<&[(String, String)]>) -> Result<PathBuf, BusterError> {
     let app_base_dir = config_utils::get_app_base_dir().map_err(|e| {
         BusterError::CommandError(format!("Failed to get app base directory: {}", e))
     })?;
@@ -171,6 +171,25 @@ async fn setup_persistent_app_environment() -> Result<PathBuf, BusterError> {
             e
         ))
     })?;
+
+    // Update arbitrary environment variables if provided
+    if let Some(env_vars) = env_vars {
+        if !env_vars.is_empty() {
+            println!("Updating custom environment variables...");
+            config_utils::update_arbitrary_env_vars(&main_dot_env_path, env_vars)
+                .map_err(|e| {
+                    BusterError::CommandError(format!(
+                        "Failed to update custom environment variables in {}: {}",
+                        main_dot_env_path.display(),
+                        e
+                    ))
+                })?;
+            
+            for (key, value) in env_vars {
+                println!("Set {}={}", key, if key.to_lowercase().contains("key") || key.to_lowercase().contains("password") || key.to_lowercase().contains("secret") { "***" } else { value });
+            }
+        }
+    }
 
     println!("--- Configuration Setup/Check Complete ---");
     // --- END Configuration Checks/Updates --- 
@@ -371,9 +390,10 @@ async fn run_docker_compose_command(
     }
 }
 
-pub async fn start(no_track: bool) -> Result<(), BusterError> {
+pub async fn start(no_track: bool, env_vars: Vec<(String, String)>) -> Result<(), BusterError> {
     // First, run the setup/check which includes printing headers/prompts if needed
-    let app_base_dir = setup_persistent_app_environment().await?;
+    let env_vars_option = if env_vars.is_empty() { None } else { Some(env_vars.as_slice()) };
+    let app_base_dir = setup_persistent_app_environment(env_vars_option).await?;
     // Then, run the docker command in that directory
     run_docker_compose_command(&app_base_dir, &["up", "-d"], "Starting", no_track).await
 }

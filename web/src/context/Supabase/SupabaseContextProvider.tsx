@@ -1,11 +1,11 @@
 'use client';
 
-import React, { PropsWithChildren, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { useMemoizedFn } from '@/hooks';
-import { millisecondsFromUnixTimestamp } from '@/lib/date';
+import { jwtDecode } from 'jwt-decode';
+import React, { type PropsWithChildren, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
 import { checkTokenValidityFromServer } from '@/api/buster_rest/nextjs/auth';
-import { jwtDecode } from 'jwt-decode';
+import { useMemoizedFn } from '@/hooks';
+import { millisecondsFromUnixTimestamp } from '@/lib/date';
 import type { UseSupabaseUserContextType } from '@/lib/supabase';
 
 const PREEMTIVE_REFRESH_MINUTES = 5;

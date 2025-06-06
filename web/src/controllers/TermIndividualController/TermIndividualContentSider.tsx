@@ -1,12 +1,12 @@
 'use client';
 
-import React from 'react';
+import type React from 'react';
 
-import { Avatar } from '@/components/ui/avatar';
-import { formatDate } from '@/lib';
-import { Text } from '@/components/ui/typography';
-import { DatasetList } from './TermDatasetSelect';
 import { useGetTerm, useUpdateTerm } from '@/api/buster_rest/terms';
+import { Avatar } from '@/components/ui/avatar';
+import { Text } from '@/components/ui/typography';
+import { formatDate } from '@/lib';
+import { DatasetList } from './TermDatasetSelect';
 
 export const TermIndividualContentSider: React.FC<{ termId: string }> = ({ termId }) => {
   const { mutateAsync: updateTerm } = useUpdateTerm();
@@ -49,10 +49,12 @@ export const TermIndividualContentSider: React.FC<{ termId: string }> = ({ termI
           <Text>{term?.created_by.name}</Text>
           <Text variant="secondary">
             (
-            {formatDate({
-              date: term?.created_at!,
-              format: 'LL'
-            })}
+            {term?.created_at
+              ? formatDate({
+                  date: term.created_at,
+                  format: 'LL'
+                })
+              : 'Unknown date'}
             )
           </Text>
         </div>

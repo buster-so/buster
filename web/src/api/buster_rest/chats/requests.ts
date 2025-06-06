@@ -1,6 +1,6 @@
-import { mainApi } from '../instances';
+import type { BusterChat, BusterChatListItem } from '@/api/asset_interfaces/chat/chatInterfaces';
 import { serverFetch } from '../../createServerInstance';
-import type { BusterChatListItem, BusterChat } from '@/api/asset_interfaces/chat/chatInterfaces';
+import { mainApi } from '../instances';
 
 const CHATS_BASE = '/chats';
 
@@ -22,7 +22,7 @@ export const getListLogs = async (
 ): Promise<BusterChatListItem[]> => {
   const { page_token = 0, page_size = 3500 } = params || {};
   return mainApi
-    .get<BusterChatListItem[]>(`/logs`, {
+    .get<BusterChatListItem[]>('/logs', {
       params: { page_token, page_size }
     })
     .then((res) => res.data);

@@ -1,18 +1,18 @@
 'use client';
 
-import React from 'react';
-import { AppDataSourceIcon } from '@/components/ui/icons/AppDataSourceIcons';
-import type { DataSourceListItem } from '@/api/asset_interfaces';
 import Link from 'next/link';
-import { BusterRoutes, createBusterRoute } from '@/routes';
+import React from 'react';
+import type { DataSourceListItem } from '@/api/asset_interfaces';
+import { useDeleteDatasource, useListDatasources } from '@/api/buster_rest/data_source';
+import { Button } from '@/components/ui/buttons';
+import { Dropdown, type DropdownItems } from '@/components/ui/dropdown';
+import { Dots, Plus, Trash } from '@/components/ui/icons';
+import { AppDataSourceIcon } from '@/components/ui/icons/AppDataSourceIcons';
+import { ListEmptyStateWithButton } from '@/components/ui/list';
 import { Text } from '@/components/ui/typography';
 import { useUserConfigContextSelector } from '@/context/Users';
-import { Button } from '@/components/ui/buttons';
-import { Dropdown, DropdownItems } from '@/components/ui/dropdown';
-import { Plus, Dots, Trash } from '@/components/ui/icons';
 import { cn } from '@/lib/classMerge';
-import { useDeleteDatasource, useListDatasources } from '@/api/buster_rest/data_source';
-import { ListEmptyStateWithButton } from '@/components/ui/list';
+import { BusterRoutes, createBusterRoute } from '@/routes';
 
 export const DatasourceList: React.FC = () => {
   const isAdmin = useUserConfigContextSelector((x) => x.isAdmin);
@@ -106,7 +106,7 @@ const ListItem: React.FC<{
           <Text variant="secondary">{source.name}</Text>
         </div>
 
-        <span
+        <div
           onClick={(e) => {
             e.stopPropagation();
             e.preventDefault();
@@ -121,7 +121,7 @@ const ListItem: React.FC<{
               prefix={<Dots />}
             />
           </Dropdown>
-        </span>
+        </div>
       </div>
     </Link>
   );

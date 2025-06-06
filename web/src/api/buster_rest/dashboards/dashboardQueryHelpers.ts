@@ -1,4 +1,6 @@
-import { BusterDashboardResponse } from '@/api/asset_interfaces/dashboard';
+import { useQueryClient } from '@tanstack/react-query';
+import last from 'lodash/last';
+import type { BusterDashboardResponse } from '@/api/asset_interfaces/dashboard';
 import { queryKeys } from '@/api/query_keys';
 import { dashboardQueryKeys } from '@/api/query_keys/dashboard';
 import { useBusterAssetsContextSelector } from '@/context/Assets/BusterAssetsProvider';
@@ -6,16 +8,14 @@ import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useOriginalDashboardStore } from '@/context/Dashboards';
 import { useMemoizedFn } from '@/hooks/useMemoizedFn';
 import { upgradeMetricToIMetric } from '@/lib/metrics/upgradeToIMetric';
-import { useQueryClient } from '@tanstack/react-query';
 import { prefetchGetMetricDataClient } from '../metrics/queryRequests';
-import { dashboardsGetDashboard } from './requests';
 import {
   useDashboardQueryStore,
   useGetLatestDashboardVersionMemoized
 } from './dashboardQueryStore';
-import last from 'lodash/last';
+import { dashboardsGetDashboard } from './requests';
 
-export const useEnsureDashboardConfig = (prefetchData: boolean = true) => {
+export const useEnsureDashboardConfig = (prefetchData = true) => {
   const queryClient = useQueryClient();
   const prefetchDashboard = useGetDashboardAndInitializeMetrics(prefetchData);
   const { openErrorMessage } = useBusterNotifications();
@@ -46,7 +46,7 @@ export const useEnsureDashboardConfig = (prefetchData: boolean = true) => {
   return method;
 };
 
-export const useGetDashboardAndInitializeMetrics = (prefetchData: boolean = true) => {
+export const useGetDashboardAndInitializeMetrics = (prefetchData = true) => {
   const queryClient = useQueryClient();
   const setOriginalDashboards = useOriginalDashboardStore((x) => x.setOriginalDashboard);
   const onSetLatestDashboardVersion = useDashboardQueryStore((x) => x.onSetLatestDashboardVersion);
@@ -75,7 +75,7 @@ export const useGetDashboardAndInitializeMetrics = (prefetchData: boolean = true
     const { password } = getAssetPassword?.(id) || {};
 
     return dashboardsGetDashboard({
-      id: id!,
+      id: id || '',
       password,
       version_number: version_number || undefined
     }).then((data) => {

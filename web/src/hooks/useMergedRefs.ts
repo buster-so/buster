@@ -19,21 +19,21 @@ type ReactRef<T> = React.RefCallback<T> | React.MutableRefObject<T> | null;
  * });
  * ```
  */
-export function useMergedRefs<T = any>(refs: ReactRef<T>[]): React.RefCallback<T> {
+export function useMergedRefs<T = unknown>(refs: ReactRef<T>[]): React.RefCallback<T> {
   return useCallback(
     (element: T | null) => {
-      refs.forEach((ref) => {
-        if (!ref) return;
+      for (const ref of refs) {
+        if (!ref) continue;
 
         // Handle callback refs
         if (typeof ref === 'function') {
           ref(element);
-          return;
+          continue;
         }
 
         // Handle object refs
         (ref as React.MutableRefObject<T | null>).current = element;
-      });
+      }
     },
     [refs]
   );

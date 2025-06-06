@@ -1,6 +1,4 @@
-import React from 'react';
-
-import { iconProps } from './iconProps';
+import type { iconProps } from './iconProps';
 
 function shapeSquare(props: iconProps) {
   return (

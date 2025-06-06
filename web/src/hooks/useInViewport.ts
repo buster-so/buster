@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 
 interface UseInViewportOptions {
   /** The percentage of the element that needs to be visible (0 to 1) */

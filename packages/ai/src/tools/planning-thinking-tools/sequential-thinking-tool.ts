@@ -17,18 +17,7 @@ interface SequentialThinkingParams {
 }
 
 interface SequentialThinkingOutput {
-  message: string;
-  thought: string;
-  thoughtNumber: number;
-  totalThoughts: number;
-  isRevision: boolean;
-  revisesThought?: number;
-  branchFromThought?: number;
-  branchId?: string;
-  nextThoughtNeeded: boolean;
-  needsMoreThoughts: boolean;
-  duration: number;
-  timestamp: string;
+  success: boolean;
 }
 
 // Zod schema for input validation
@@ -110,26 +99,7 @@ Each thought can build on, question, or revise previous insights as understandin
 11. Only set next_thought_needed to false when truly done and a satisfactory answer is reached`,
   inputSchema: sequentialThinkingSchema,
   outputSchema: z.object({
-    message: z.string().describe('Summary message of the thinking process'),
-    thought: z.string().describe('The current thought that was processed'),
-    thoughtNumber: z.number().int().describe('Current thought number in sequence'),
-    totalThoughts: z.number().int().describe('Current estimate of thoughts needed'),
-    isRevision: z.boolean().describe('Whether this thought revises previous thinking'),
-    revisesThought: z
-      .number()
-      .int()
-      .optional()
-      .describe('Which thought number is being reconsidered'),
-    branchFromThought: z
-      .number()
-      .int()
-      .optional()
-      .describe('Which thought number is the branching point'),
-    branchId: z.string().optional().describe('Identifier for the current branch'),
-    nextThoughtNeeded: z.boolean().describe('Whether another thought step is needed'),
-    needsMoreThoughts: z.boolean().describe('If reaching end but realizing more thoughts needed'),
-    duration: z.number().describe('Time taken to process this thought in milliseconds'),
-    timestamp: z.string().describe('ISO timestamp of when this thought was processed'),
+    success: z.boolean().describe('Whether the thinking step was processed successfully'),
   }),
   execute: async ({ context, runtimeContext }) => {
     return await processSequentialThinking(context as SequentialThinkingParams, runtimeContext);
@@ -141,9 +111,6 @@ const processSequentialThinking = wrapTraced(
     params: SequentialThinkingParams,
     runtimeContext: RuntimeContext
   ): Promise<SequentialThinkingOutput> => {
-    const startTime = Date.now();
-    const timestamp = new Date().toISOString();
-
     // Extract any relevant context values if needed
     const userId = runtimeContext?.get('userId') as string | undefined;
     const sessionId = runtimeContext?.get('sessionId') as string | undefined;
@@ -152,26 +119,10 @@ const processSequentialThinking = wrapTraced(
     const validatedParams = sequentialThinkingSchema.parse(params);
 
     // Process the thought
-    const processedThought = await processThought(validatedParams, userId, sessionId);
-
-    const duration = Date.now() - startTime;
-
-    // Generate appropriate message based on the thought state
-    const message = generateThoughtMessage(processedThought);
+    await processThought(validatedParams, userId, sessionId);
 
     return {
-      message,
-      thought: processedThought.thought,
-      thoughtNumber: processedThought.thoughtNumber,
-      totalThoughts: processedThought.totalThoughts,
-      isRevision: processedThought.isRevision,
-      revisesThought: processedThought.revisesThought,
-      branchFromThought: processedThought.branchFromThought,
-      branchId: processedThought.branchId,
-      nextThoughtNeeded: processedThought.nextThoughtNeeded,
-      needsMoreThoughts: processedThought.needsMoreThoughts,
-      duration,
-      timestamp,
+      success: true,
     };
   },
   { name: 'sequential-thinking' }
@@ -203,27 +154,4 @@ async function processThought(
     branchId: params.branchId,
     needsMoreThoughts: params.needsMoreThoughts,
   };
-}
-
-function generateThoughtMessage(thought: SequentialThinkingParams): string {
-  const thoughtType = thought.isRevision ? 'revision' : 'new thought';
-  const branchInfo = thought.branchId ? ` (branch: ${thought.branchId})` : '';
-  const revisionInfo =
-    thought.isRevision && thought.revisesThought
-      ? ` revising thought #${thought.revisesThought}`
-      : '';
-
-  let message = `Processed ${thoughtType} #${thought.thoughtNumber}/${thought.totalThoughts}${branchInfo}${revisionInfo}.`;
-
-  if (thought.needsMoreThoughts) {
-    message += ' More thoughts may be needed to complete the analysis.';
-  }
-
-  if (!thought.nextThoughtNeeded) {
-    message += ' Thinking process complete - ready to proceed with analysis.';
-  } else {
-    message += ' Continuing with next thought.';
-  }
-
-  return message;
 }

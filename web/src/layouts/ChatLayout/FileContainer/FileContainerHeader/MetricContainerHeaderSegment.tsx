@@ -1,13 +1,13 @@
 import React from 'react';
-import { FileContainerSegmentProps } from './interfaces';
-import { AppSegmented } from '@/components/ui/segmented';
-import { useChatLayoutContextSelector } from '../../ChatLayoutContext';
-import type { FileView } from '../../ChatLayoutContext/useLayoutConfig';
-import { type SegmentedItem } from '@/components/ui/segmented';
-import { BusterRoutes, createBusterRoute } from '@/routes';
 import { useGetMetric } from '@/api/buster_rest/metrics';
+import type { SegmentedItem } from '@/components/ui/segmented';
+import { AppSegmented } from '@/components/ui/segmented';
 import { Text } from '@/components/ui/typography';
 import { useIsMetricReadOnly } from '@/context/Metrics/useIsMetricReadOnly';
+import { BusterRoutes, createBusterRoute } from '@/routes';
+import { useChatLayoutContextSelector } from '../../ChatLayoutContext';
+import type { FileView } from '../../ChatLayoutContext/useLayoutConfig';
+import type { FileContainerSegmentProps } from './interfaces';
 
 export const MetricContainerHeaderSegment: React.FC<FileContainerSegmentProps> = React.memo(
   (props) => {

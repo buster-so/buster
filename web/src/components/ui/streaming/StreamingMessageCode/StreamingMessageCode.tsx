@@ -1,14 +1,14 @@
 'use client';
 
-import { BusterChatMessageReasoning_file } from '@/api/asset_interfaces';
-import { SyntaxHighlighterLightTheme } from '@/components/ui/typography/AppCodeBlock';
-import React, { useEffect, useMemo, useState } from 'react';
-import { Text } from '@/components/ui/typography';
 import pluralize from 'pluralize';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { TextAndVersionPill } from '../../typography/TextAndVersionPill';
-import { FileCard } from '../../card/FileCard';
+import type { BusterChatMessageReasoning_file } from '@/api/asset_interfaces';
+import { Text } from '@/components/ui/typography';
+import { SyntaxHighlighterLightTheme } from '@/components/ui/typography/AppCodeBlock';
 import { cn } from '@/lib/classMerge';
+import { FileCard } from '../../card/FileCard';
+import { TextAndVersionPill } from '../../typography/TextAndVersionPill';
 
 const style = SyntaxHighlighterLightTheme;
 
@@ -37,14 +37,13 @@ export const StreamingMessageCode: React.FC<
       let currentLine = 1;
 
       if (!modified || modified.length === 0) {
-        // If no modified ranges, process the entire text as visible
-        lines.forEach((line) => {
+        for (const line of lines) {
           segments.push({
             type: 'text',
             content: line,
             lineNumber: currentLine++
           });
-        });
+        }
       } else {
         // Sort modified ranges to ensure proper processing
         const sortedModified = [...modified].sort((a, b) => a[0] - b[0]);
@@ -91,9 +90,7 @@ export const StreamingMessageCode: React.FC<
   return (
     <FileCard
       fileName={useMemo(
-        () => (
-          <TextAndVersionPill fileName={file_name} versionNumber={version_number} />
-        ),
+        () => <TextAndVersionPill fileName={file_name} versionNumber={version_number} />,
         [file_name, version_number]
       )}
       headerButtons={buttons}>
@@ -139,7 +136,7 @@ const MemoizedSyntaxHighlighter = React.memo(
         startingLineNumber={lineNumber}
         lineNumberStyle={lineNumberStyles}
         lineNumberContainerStyle={{ color: 'red' }}
-        className={`m-0! w-fit! border-none! p-0!`}>
+        className={'m-0! w-fit! border-none! p-0!'}>
         {text}
       </SyntaxHighlighter>
     );

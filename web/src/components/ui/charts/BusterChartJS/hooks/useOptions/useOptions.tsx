@@ -1,28 +1,27 @@
+import type { ChartType as ChartJSChartType, PluginChartOptions } from 'chart.js';
+import type { AnnotationPluginOptions } from 'chartjs-plugin-annotation';
 import { useMemo } from 'react';
-import type { ChartProps } from '../../core';
-import { ChartType as ChartJSChartType } from 'chart.js';
+import type { DeepPartial } from 'utility-types';
 import type {
   BusterChartConfigProps,
   BusterChartProps,
   ChartEncodes
 } from '@/api/asset_interfaces/metric/charts';
-import { useInteractions } from './useInteractions';
-import { useXAxis } from './useXAxis';
-import { useYAxis } from './useYAxis';
-import { DeepPartial } from 'utility-types';
-import type { PluginChartOptions } from 'chart.js';
-import { useTooltipOptions } from './useTooltipOptions.ts/useTooltipOptions';
 import type { DatasetOptionsWithTicks } from '../../../chartHooks';
-import { useY2Axis } from './useY2Axis';
-import { AnnotationPluginOptions } from 'chartjs-plugin-annotation';
-import type { BusterChartTypeComponentProps } from '../../../interfaces';
 import {
   LINE_DECIMATION_SAMPLES,
   LINE_DECIMATION_THRESHOLD,
   TOOLTIP_THRESHOLD
 } from '../../../config';
-import { useAnimations } from './useAnimations';
+import type { BusterChartTypeComponentProps } from '../../../interfaces';
+import type { ChartProps } from '../../core';
 import { createAggregrateTrendlines } from '../useSeriesOptions/createTrendlines';
+import { useAnimations } from './useAnimations';
+import { useInteractions } from './useInteractions';
+import { useTooltipOptions } from './useTooltipOptions.ts/useTooltipOptions';
+import { useXAxis } from './useXAxis';
+import { useY2Axis } from './useY2Axis';
+import { useYAxis } from './useYAxis';
 
 interface UseOptionsProps {
   colors: string[];

@@ -1,20 +1,19 @@
 'use client';
 
-import { FileType } from '@/api/asset_interfaces/chat';
-import { RefObject, useMemo, useState } from 'react';
-import { FileConfig, FileView, FileViewConfig, FileViewSecondary } from './interfaces';
-import { useIsChanged, useMemoizedFn, useUpdateEffect } from '@/hooks';
 import { create } from 'mutative';
-import { ChatLayoutView } from '../../interfaces';
-import type { SelectedFile } from '../../interfaces';
+import { type RefObject, useMemo, useState } from 'react';
+import type { FileType } from '@/api/asset_interfaces/chat';
+import type { AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
+import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
+import { useIsChanged, useMemoizedFn, useUpdateEffect } from '@/hooks';
 import { timeout } from '@/lib/timeout';
 import { BusterRoutes } from '@/routes/busterRoutes';
 import { SelectedFileSecondaryRenderRecord } from '../../FileContainer/FileContainerSecondary';
-import { ChatParams } from '../useGetChatParams';
-import { initializeFileViews } from './helpers';
-import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
-import { AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
+import type { ChatLayoutView, SelectedFile } from '../../interfaces';
 import { DEFAULT_FILE_VIEW } from '../helpers';
+import type { ChatParams } from '../useGetChatParams';
+import { initializeFileViews } from './helpers';
+import type { FileConfig, FileView, FileViewConfig, FileViewSecondary } from './interfaces';
 
 export const useLayoutConfig = ({
   selectedFile,
@@ -100,7 +99,7 @@ export const useLayoutConfig = ({
         animateOpenSplitter('right');
 
         //if the chat is open, we need to wait for the splitter to close before opening the secondary view
-        const waitToOpen = !appSplitterRef.current?.isSideClosed('left') && chatId ? 250 : 0;
+        const waitToOpen = !appSplitterRef.current?.isSideClosed('left') && chatId ? 0 : 0; //I used to wait 250ms, but I changed the app splitter and I think it fixed the bug
         await timeout(waitToOpen);
       } else if (chatId) {
         animateOpenSplitter('both');

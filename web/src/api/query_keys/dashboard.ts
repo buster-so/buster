@@ -3,7 +3,7 @@ import type {
   BusterDashboardListItem,
   BusterDashboardResponse
 } from '@/api/asset_interfaces/dashboard';
-import { dashboardsGetList } from '../buster_rest/dashboards';
+import type { dashboardsGetList } from '../buster_rest/dashboards';
 
 const dashboardGetList = (
   filters?: Omit<Parameters<typeof dashboardsGetList>[0], 'page_token' | 'page_size'>

@@ -1,35 +1,35 @@
 'use client';
 
+import { isServer } from '@tanstack/react-query';
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
   ArcElement,
+  BarController,
+  BarElement,
+  BubbleController,
+  CategoryScale,
+  Chart as ChartJS,
   Colors,
+  DoughnutController,
+  Legend,
+  LinearScale,
+  LineController,
+  LineElement,
   LogarithmicScale,
+  PieController,
+  PointElement,
+  ScatterController,
   TimeScale,
   TimeSeriesScale,
-  PointElement,
-  LineController,
-  BarController,
-  BubbleController,
-  PieController,
-  ScatterController,
-  DoughnutController
+  Title,
+  Tooltip
 } from 'chart.js';
-import { ChartMountedPlugin } from './core/plugins';
-import ChartDeferred from 'chartjs-plugin-deferred';
 import ChartJsAnnotationPlugin from 'chartjs-plugin-annotation';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import ChartTrendlinePlugin from './core/plugins/chartjs-plugin-trendlines';
+import ChartDeferred from 'chartjs-plugin-deferred';
 import { DEFAULT_CHART_THEME } from '@/api/asset_interfaces/metric/charts/configColors';
-import { isServer } from '@tanstack/react-query';
 import { truncateText } from '@/lib/text';
+import { ChartMountedPlugin } from './core/plugins';
+import ChartTrendlinePlugin from './core/plugins/chartjs-plugin-trendlines';
 import './core/plugins/chartjs-plugin-dayjs';
 import './core/plugins/chartjs-scale-tick-duplicate';
 import './core/plugins/chartjs-plugin-trendlines';
@@ -120,12 +120,16 @@ ChartJS.defaults.font = {
   };
 });
 
-[ChartJS.defaults.scales.linear, ChartJS.defaults.scales.logarithmic].forEach((scale) => {
+for (const scale of [
+  ChartJS.defaults.scales.category,
+  ChartJS.defaults.scales.linear,
+  ChartJS.defaults.scales.logarithmic
+]) {
   scale.ticks.z = 0; //this used to be a 100, but I changed it for datalabels sake
   scale.ticks.backdropColor = backgroundColor;
   scale.ticks.showLabelBackdrop = true;
   scale.ticks.autoSkipPadding = 2;
-});
+}
 
 export const DEFAULT_CHART_LAYOUT = {
   autoPadding: true,

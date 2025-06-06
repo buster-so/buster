@@ -1,6 +1,6 @@
-import type { BusterChatMessageReasoning_pills } from '@/api/asset_interfaces/chat';
-import React from 'react';
 import { motion } from 'framer-motion';
+import type React from 'react';
+import type { BusterChatMessageReasoning_pills } from '@/api/asset_interfaces/chat';
 import { ReasoningMessagePillContainer } from './ReasoningMessagePillContainer';
 
 const containerVariants = {
@@ -46,9 +46,8 @@ export const ReasoningMessagePillsContainer: React.FC<
       animate="visible"
       className="flex flex-col space-y-3">
       {pill_containers.map((pill_container, index) => (
-        <motion.div key={index} variants={itemVariants}>
+        <motion.div key={pill_container.title + index.toString()} variants={itemVariants}>
           <ReasoningMessagePillContainer
-            key={index}
             pillContainer={pill_container}
             isCompletedStream={isCompletedStream}
             chatId={chatId}

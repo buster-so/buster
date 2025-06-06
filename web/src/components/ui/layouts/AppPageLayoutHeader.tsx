@@ -1,6 +1,6 @@
-import { cn } from '@/lib/utils';
-import React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
+import type React from 'react';
+import { cn } from '@/lib/utils';
 
 const headerVariants = cva(
   'bg-page-background flex max-h-[38px] min-h-[38px] items-center justify-between gap-x-2.5 relative',
@@ -18,7 +18,14 @@ const headerVariants = cva(
     defaultVariants: {
       borderVariant: 'default',
       sizeVariant: 'default'
-    }
+    },
+    compoundVariants: [
+      {
+        borderVariant: 'ghost',
+        sizeVariant: 'default',
+        className: 'max-h-[37.5px] min-h-[37.5px]' // hack. figure out a better way to do this
+      }
+    ]
   }
 );
 

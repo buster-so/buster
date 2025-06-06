@@ -1,8 +1,8 @@
+import { spawn } from 'node:child_process';
+import { isAbsolute, resolve } from 'node:path';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
-import { spawn } from 'node:child_process';
-import { resolve, isAbsolute } from 'node:path';
 
 interface BashToolParams {
   command: string;
@@ -29,7 +29,7 @@ export const bashTool = createTool({
     timeout: z.number().default(30000).describe('Timeout in milliseconds (default: 30000)'),
     workingDir: z.string().optional().describe('Working directory for command execution'),
     captureOutput: z.boolean().default(true).describe('Whether to capture command output'),
-    env: z.record(z.string()).optional().describe('Environment variables to set')
+    env: z.record(z.string()).optional().describe('Environment variables to set'),
   }),
   outputSchema: z.object({
     stdout: z.string(),
@@ -37,7 +37,7 @@ export const bashTool = createTool({
     exitCode: z.number(),
     success: z.boolean(),
     duration: z.number(),
-    command: z.string()
+    command: z.string(),
   }),
   execute: async ({ context }) => {
     return await executeBashCommand(context as BashToolParams);
@@ -47,19 +47,19 @@ export const bashTool = createTool({
 const executeBashCommand = wrapTraced(
   async (params: BashToolParams): Promise<BashToolResult> => {
     const { command, timeout = 30000, workingDir, captureOutput = true, env } = params;
-    
+
     // Security validation
     validateCommand(command);
-    
+
     // Validate working directory if provided
     let resolvedWorkingDir: string | undefined;
     if (workingDir) {
       validateWorkingDirectory(workingDir);
       resolvedWorkingDir = resolve(workingDir);
     }
-    
+
     const startTime = Date.now();
-    
+
     return new Promise((resolve, reject) => {
       // Combine environment variables
       const processEnv = {
@@ -67,50 +67,50 @@ const executeBashCommand = wrapTraced(
         ...env,
         // Security: Remove sensitive variables
         PATH: process.env.PATH || '/usr/local/bin:/usr/bin:/bin',
-        HOME: process.env.HOME || '/tmp'
+        HOME: process.env.HOME || '/tmp',
       };
-      
+
       // Remove potentially dangerous env vars
       delete (processEnv as any).SUDO_USER;
       delete (processEnv as any).SUDO_COMMAND;
-      
+
       const childProcess = spawn('bash', ['-c', command], {
         cwd: resolvedWorkingDir || process.cwd(),
         timeout,
         stdio: captureOutput ? 'pipe' : 'inherit',
         env: processEnv,
-        shell: false // Use bash directly, not shell
+        shell: false, // Use bash directly, not shell
       });
-      
+
       let stdout = '';
       let stderr = '';
-      
+
       if (captureOutput) {
         childProcess.stdout?.on('data', (data) => {
           stdout += data.toString();
         });
-        
+
         childProcess.stderr?.on('data', (data) => {
           stderr += data.toString();
         });
       }
-      
+
       childProcess.on('close', (code) => {
         const duration = Date.now() - startTime;
-        
+
         resolve({
           stdout: stdout.trim(),
           stderr: stderr.trim(),
           exitCode: code || 0,
           success: code === 0,
           duration,
-          command
+          command,
         });
       });
-      
+
       childProcess.on('error', (error) => {
         const duration = Date.now() - startTime;
-        
+
         if (error.message.includes('ETIMEDOUT')) {
           resolve({
             stdout: '',
@@ -118,13 +118,13 @@ const executeBashCommand = wrapTraced(
             exitCode: 124, // Standard timeout exit code
             success: false,
             duration,
-            command
+            command,
           });
         } else {
           reject(new Error(`Command execution failed: ${error.message}`));
         }
       });
-      
+
       // Handle timeout manually for better control
       const timeoutId = setTimeout(() => {
         childProcess.kill('SIGTERM');
@@ -134,7 +134,7 @@ const executeBashCommand = wrapTraced(
           }
         }, 5000); // Give 5s for graceful shutdown
       }, timeout);
-      
+
       childProcess.on('close', () => {
         clearTimeout(timeoutId);
       });
@@ -147,7 +147,7 @@ function validateCommand(command: string): void {
   if (!command || command.trim() === '') {
     throw new Error('Command cannot be empty');
   }
-  
+
   // Check for dangerous commands
   const dangerousCommands = [
     'rm -rf /',
@@ -184,17 +184,17 @@ function validateCommand(command: string): void {
     '< /dev/',
     '/dev/zero',
     '/dev/null > ',
-    'exec('
+    'exec(',
   ];
-  
+
   const normalizedCommand = command.toLowerCase().replace(/\s+/g, ' ');
-  
+
   for (const dangerous of dangerousCommands) {
     if (normalizedCommand.includes(dangerous.toLowerCase())) {
       throw new Error(`Dangerous command detected: ${dangerous}`);
     }
   }
-  
+
   // Check for command injection patterns
   const injectionPatterns = [
     /;[\s]*rm/,
@@ -210,15 +210,15 @@ function validateCommand(command: string): void {
     />\s*\/root\//,
     /curl.*\|.*sh/,
     /wget.*\|.*sh/,
-    /bash.*<.*\(/
+    /bash.*<.*\(/,
   ];
-  
+
   for (const pattern of injectionPatterns) {
     if (pattern.test(command)) {
       throw new Error('Potentially dangerous command pattern detected');
     }
   }
-  
+
   // Validate command length
   if (command.length > 2000) {
     throw new Error('Command too long (max 2000 characters)');
@@ -230,12 +230,12 @@ function validateWorkingDirectory(workingDir: string): void {
   if (!isAbsolute(workingDir)) {
     throw new Error(`Working directory must be absolute: ${workingDir}`);
   }
-  
+
   // Ensure path doesn't contain traversal attempts
   if (workingDir.includes('..') || workingDir.includes('~')) {
     throw new Error(`Path traversal not allowed: ${workingDir}`);
   }
-  
+
   // Block access to sensitive system directories
   const blockedPaths = [
     '/etc/',
@@ -248,9 +248,9 @@ function validateWorkingDirectory(workingDir: string): void {
     '/bin/',
     '/sbin/',
     '/usr/bin/',
-    '/usr/sbin/'
+    '/usr/sbin/',
   ];
-  
+
   // Add user-specific sensitive paths if HOME is available
   if (process.env.HOME) {
     blockedPaths.push(
@@ -259,9 +259,9 @@ function validateWorkingDirectory(workingDir: string): void {
       `${process.env.HOME}/.config/`
     );
   }
-  
+
   const resolvedPath = resolve(workingDir);
-  
+
   for (const blocked of blockedPaths) {
     if (resolvedPath.startsWith(blocked)) {
       throw new Error(`Access denied to path: ${resolvedPath}`);
@@ -283,6 +283,6 @@ export async function executeCommand(
     workingDir: options.cwd,
     env: options.env,
     timeout: options.timeout,
-    captureOutput: true
+    captureOutput: true,
   });
 }

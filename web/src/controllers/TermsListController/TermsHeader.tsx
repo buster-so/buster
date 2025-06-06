@@ -1,16 +1,16 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { Button } from '@/components/ui/buttons';
-import { BusterRoutes } from '@/routes';
-import { AppTooltip } from '@/components/ui/tooltip';
-import { Plus } from '@/components/ui/icons';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { useGetTerm } from '@/api/buster_rest/terms';
+import { NewTermModal } from '@/components/features/modal/NewTermModal';
+import { Breadcrumb, type BreadcrumbItemType } from '@/components/ui/breadcrumb';
+import { Button } from '@/components/ui/buttons';
+import { Plus } from '@/components/ui/icons';
+import { AppTooltip } from '@/components/ui/tooltip';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { useMemoizedFn } from '@/hooks';
-import { NewTermModal } from '@/components/features/modal/NewTermModal';
-import { type BreadcrumbItem, Breadcrumb } from '@/components/ui/breadcrumb';
-import { useGetTerm } from '@/api/buster_rest/terms';
+import { BusterRoutes } from '@/routes';
 
 export const TermsHeader: React.FC<{
   termId?: string;
@@ -55,7 +55,7 @@ TermsHeader.displayName = 'TermsHeader';
 const TermsBreadcrumb: React.FC<{
   termName: string | undefined;
 }> = React.memo(({ termName }) => {
-  const items: BreadcrumbItem[] = useMemo(
+  const items: BreadcrumbItemType[] = useMemo(
     () =>
       [
         {
@@ -63,7 +63,7 @@ const TermsBreadcrumb: React.FC<{
           route: { route: BusterRoutes.APP_TERMS }
         },
         { label: termName }
-      ].filter((item) => item.label) as BreadcrumbItem[],
+      ].filter((item) => item.label) as BreadcrumbItemType[],
     [termName]
   );
 

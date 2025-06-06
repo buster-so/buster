@@ -1,6 +1,6 @@
+import { describe, expect, it } from 'vitest';
 import { barOptionsHandler, barPluginsHandler } from './barChartOptions';
 import type { ChartSpecificOptionsProps } from './interfaces';
-import { ChartType } from '@/api/asset_interfaces/metric/charts/enum';
 
 type BarGroupType = 'stack' | 'group' | 'percentage-stack' | null;
 

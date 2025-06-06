@@ -1,10 +1,10 @@
 'use client';
 
-import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { useParams, usePathname, useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
-import { FileViewSecondary } from './useLayoutConfig';
+import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { pathNameToRoute } from '@/routes/helpers';
+import type { FileViewSecondary } from './useLayoutConfig';
 
 export const useGetChatParams = () => {
   const params = useParams() as {
@@ -35,15 +35,15 @@ export const useGetChatParams = () => {
 
   const metricVersionNumber = useMemo(() => {
     if (!metricId) return undefined;
-    if (versionNumberPath) return parseInt(versionNumberPath);
-    if (queryMetricVersionNumber) return parseInt(queryMetricVersionNumber);
+    if (versionNumberPath) return Number.parseInt(versionNumberPath);
+    if (queryMetricVersionNumber) return Number.parseInt(queryMetricVersionNumber);
     return undefined;
   }, [versionNumberPath, metricId, queryMetricVersionNumber]);
 
   const dashboardVersionNumber = useMemo(() => {
     if (!dashboardId) return undefined;
-    if (versionNumberPath) return parseInt(versionNumberPath);
-    if (queryDashboardVersionNumber) return parseInt(queryDashboardVersionNumber);
+    if (versionNumberPath) return Number.parseInt(versionNumberPath);
+    if (queryDashboardVersionNumber) return Number.parseInt(queryDashboardVersionNumber);
     return undefined;
   }, [versionNumberPath, dashboardId, queryDashboardVersionNumber]);
 

@@ -1,10 +1,18 @@
+import { randomBytes } from 'node:crypto';
+import { existsSync } from 'node:fs';
+import {
+  chmod,
+  copyFile,
+  writeFile as fsWriteFile,
+  mkdir,
+  rename,
+  stat,
+  unlink,
+} from 'node:fs/promises';
+import { dirname, isAbsolute, join, resolve } from 'node:path';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
-import { writeFile as fsWriteFile, mkdir, stat, copyFile, rename, unlink, chmod } from 'node:fs/promises';
-import { dirname, join, isAbsolute, resolve } from 'node:path';
-import { existsSync } from 'node:fs';
-import { randomBytes } from 'node:crypto';
 
 interface WriteFileParams {
   file_path: string;
@@ -48,7 +56,14 @@ export const writeFileTool = createTool({
 
 const writeFile = wrapTraced(
   async (params: WriteFileParams): Promise<WriteFileResult> => {
-    const { file_path, content, overwrite = false, create_backup = true, encoding = 'utf8', mode } = params;
+    const {
+      file_path,
+      content,
+      overwrite = false,
+      create_backup = true,
+      encoding = 'utf8',
+      mode,
+    } = params;
 
     // Security validation
     validateWritePath(file_path);

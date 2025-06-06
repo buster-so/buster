@@ -23,19 +23,49 @@ describe('Think and Prep Agent Integration Tests', () => {
       async (input: string) => {
         // Step 1: Generate response with analyst agent
         try {
+          const threadId = 'da05b6fb-01b2-4c1c-bc7f-7e55029a5c75';
+          const resourceId = 'c2dd64cd-f7f3-4884-bc91-d46ae431901e';
+
           // Create runtime context with required properties
           const runtimeContext = new RuntimeContext<AnalystRuntimeContext>([
-            ['userId', 'c2dd64cd-f7f3-4884-bc91-d46ae431901e'],
-            ['threadId', 'c2dd64cd-f7f3-4884-bc91-d46ae431901e'],
+            ['userId', resourceId],
+            ['threadId', threadId],
             ['dataSourceId', 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a'],
-            ['dataSourceSyntax', 'postgresql'],
+            ['dataSourceSyntax', 'postgres'],
             ['organizationId', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce'],
           ]);
 
-          const response = await thinkAndPrepAgent.generate(input, {
+          // Use stream instead of generate to see the actual structure
+          const stream = await thinkAndPrepAgent.stream(input, {
             maxSteps: 15,
+            threadId,
+            resourceId,
             runtimeContext,
+            onStepFinish: async (step) => {
+              console.log('\n=== onStepFinish callback ===');
+              console.log('Step structure:', JSON.stringify(step, null, 2));
+              console.log('Tool calls:', step.toolCalls);
+              console.log('Response messages:', step.response.messages);
+              console.log('Response text:', step.response.text);
+              console.log('===========================\n');
+            },
           });
+
+          // Consume the stream and log chunks
+          const chunks = [];
+          for await (const chunk of stream.fullStream) {
+            console.log('\n=== Stream chunk ===');
+            console.log('Chunk type:', chunk.type);
+            console.log('Chunk data:', JSON.stringify(chunk, null, 2));
+            console.log('===================\n');
+            chunks.push(chunk);
+          }
+
+          // Get the final response
+          const response = await stream.response;
+          console.log('\n=== Final response ===');
+          console.log('Response structure:', JSON.stringify(response, null, 2));
+          console.log('=====================\n');
 
           return response;
         } catch (error) {
@@ -48,7 +78,7 @@ describe('Think and Prep Agent Integration Tests', () => {
 
     // Execute the workflow
     const response = await tracedAgentWorkflow(
-      'For the merchant Nani Swimwear, we need to see the the last 6 months return rate by revenue, item, and order. Please make sure the sales channel is only online store.'
+      'How many black products did we sell in the last 6 months?'
     );
 
     // Verify response structure

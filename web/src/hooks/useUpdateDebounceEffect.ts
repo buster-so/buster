@@ -1,6 +1,6 @@
 'use client';
 
-import { DependencyList, EffectCallback, useEffect, useRef } from 'react';
+import { type DependencyList, type EffectCallback, useEffect, useRef } from 'react';
 
 interface UpdateDebounceEffectOptions {
   wait?: number;

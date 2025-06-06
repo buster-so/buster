@@ -1,8 +1,8 @@
-import React from 'react';
-import { Row } from '@tanstack/react-table';
-import { VirtualItem } from '@tanstack/react-virtual';
-import { DataGridCell } from './DataGridCell';
+import type { Row } from '@tanstack/react-table';
+import type { VirtualItem } from '@tanstack/react-virtual';
+import type React from 'react';
 import { cn } from '@/lib/classMerge';
+import { DataGridCell } from './DataGridCell';
 
 interface DataGridRowProps {
   row: Row<Record<string, string | number | Date | null>>;

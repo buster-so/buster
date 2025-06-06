@@ -19,12 +19,12 @@ const executeSubmitThoughts = wrapTraced(
   async (): Promise<z.infer<typeof submitThoughtsOutputSchema>> => {
     return await processSubmitThoughts();
   },
-  { name: 'submit-thoughts' }
+  { name: 'submitThoughtsTool' }
 );
 
 // Export the tool
 export const submitThoughtsTool = createTool({
-  id: 'submit_thoughts',
+  id: 'submitThoughtsTool',
   description:
     'Confirms that the agent has finished thinking through all of its steps and is ready to move on to the next phase of the workflow. This is a signal tool with no input or output parameters.',
   inputSchema: submitThoughtsInputSchema,

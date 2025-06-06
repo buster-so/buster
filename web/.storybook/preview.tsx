@@ -1,10 +1,9 @@
-import React from 'react';
 import type { Preview } from '@storybook/react';
-
-import { initialize, mswLoader } from 'msw-storybook-addon';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BusterStyleProvider } from '../src/context/BusterStyles/BusterStyles';
+import { initialize, mswLoader } from 'msw-storybook-addon';
+import React from 'react';
 import { BusterAssetsProvider } from '../src/context/Assets/BusterAssetsProvider';
+import { BusterStyleProvider } from '../src/context/BusterStyles/BusterStyles';
 import '../src/styles/styles.scss';
 
 initialize();

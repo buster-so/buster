@@ -1,13 +1,14 @@
-import { assetParamsToRoute } from './assetParamsToRoute';
+import { describe, expect, it, vi } from 'vitest';
+import type { FileType } from '@/api/asset_interfaces/chat';
 import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
-import { FileType } from '@/api/asset_interfaces/chat';
+import { assetParamsToRoute } from './assetParamsToRoute';
 
 describe('assetParamsToRoute', () => {
   const mockChatId = 'chat123';
   const mockAssetId = 'asset123';
 
   // Metric tests with chatId
-  test('metric with chatId and chart-edit secondary view and version number', () => {
+  it('metric with chatId and chart-edit secondary view and version number', () => {
     const result = assetParamsToRoute({
       chatId: mockChatId,
       assetId: mockAssetId,
@@ -25,8 +26,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('metric with chatId and chart-edit secondary view without version number', () => {
+  it('metric with chatId and chart-edit secondary view without version number', () => {
     const result = assetParamsToRoute({
       chatId: mockChatId,
       assetId: mockAssetId,
@@ -42,8 +42,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('metric with chatId and sql-edit secondary view and version number', () => {
+  it('metric with chatId and sql-edit secondary view and version number', () => {
     const result = assetParamsToRoute({
       chatId: mockChatId,
       assetId: mockAssetId,
@@ -59,8 +58,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('metric with chatId and version-history secondary view and version number', () => {
+  it('metric with chatId and version-history secondary view and version number', () => {
     const result = assetParamsToRoute({
       chatId: mockChatId,
       assetId: mockAssetId,
@@ -76,8 +74,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('metric with chatId and version-history secondary view without version number', () => {
+  it('metric with chatId and version-history secondary view without version number', () => {
     const result = assetParamsToRoute({
       chatId: mockChatId,
       assetId: mockAssetId,
@@ -93,8 +90,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('metric with chatId without secondary view and with version number', () => {
+  it('metric with chatId without secondary view and with version number', () => {
     const result = assetParamsToRoute({
       chatId: mockChatId,
       assetId: mockAssetId,
@@ -110,8 +106,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('metric with chatId without secondary view or version number', () => {
+  it('metric with chatId without secondary view or version number', () => {
     const result = assetParamsToRoute({
       chatId: mockChatId,
       assetId: mockAssetId,
@@ -127,7 +122,7 @@ describe('assetParamsToRoute', () => {
   });
 
   // Metric tests without chatId
-  test('metric without chatId and chart-edit secondary view', () => {
+  it('metric without chatId and chart-edit secondary view', () => {
     const result = assetParamsToRoute({
       chatId: undefined,
       assetId: mockAssetId,
@@ -142,8 +137,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('metric without chatId and version-history secondary view', () => {
+  it('metric without chatId and version-history secondary view', () => {
     const result = assetParamsToRoute({
       chatId: undefined,
       assetId: mockAssetId,
@@ -157,8 +151,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('metric without chatId or secondary view', () => {
+  it('metric without chatId or secondary view', () => {
     const result = assetParamsToRoute({
       chatId: undefined,
       assetId: mockAssetId,
@@ -173,7 +166,7 @@ describe('assetParamsToRoute', () => {
   });
 
   // Dashboard tests
-  test('dashboard with chatId and version-history secondary view', () => {
+  it('dashboard with chatId and version-history secondary view', () => {
     const result = assetParamsToRoute({
       chatId: mockChatId,
       assetId: mockAssetId,
@@ -190,8 +183,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('dashboard with chatId without secondary view', () => {
+  it('dashboard with chatId without secondary view', () => {
     const result = assetParamsToRoute({
       chatId: mockChatId,
       assetId: mockAssetId,
@@ -205,8 +197,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('dashboard without chatId', () => {
+  it('dashboard without chatId', () => {
     const result = assetParamsToRoute({
       chatId: undefined,
       assetId: mockAssetId,
@@ -219,9 +210,8 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('unsupported file type', () => {
-    const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
+  it('unsupported file type', () => {
+    const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const result = assetParamsToRoute({
       chatId: mockChatId,
       assetId: mockAssetId,
@@ -236,7 +226,7 @@ describe('assetParamsToRoute', () => {
   });
 
   // Additional edge cases and combinations
-  test('metric with empty chatId should behave like undefined chatId', () => {
+  it('metric with empty chatId should behave like undefined chatId', () => {
     const result = assetParamsToRoute({
       chatId: '',
       assetId: mockAssetId,
@@ -251,8 +241,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('metric with empty assetId should still construct route', () => {
+  it('metric with empty assetId should still construct route', () => {
     const result = assetParamsToRoute({
       chatId: mockChatId,
       assetId: '',
@@ -268,8 +257,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('metric with very long chatId and assetId', () => {
+  it('metric with very long chatId and assetId', () => {
     const longId = 'a'.repeat(100);
     const result = assetParamsToRoute({
       chatId: longId,
@@ -286,8 +274,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('metric with special characters in chatId and assetId', () => {
+  it('metric with special characters in chatId and assetId', () => {
     const specialId = '!@#$%^&*()_+-=[]{}|;:,.<>?';
     const result = assetParamsToRoute({
       chatId: specialId,
@@ -304,8 +291,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('metric with version number 0', () => {
+  it('metric with version number 0', () => {
     const result = assetParamsToRoute({
       chatId: mockChatId,
       assetId: mockAssetId,
@@ -321,8 +307,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('metric with negative version number', () => {
+  it('metric with negative version number', () => {
     const result = assetParamsToRoute({
       chatId: mockChatId,
       assetId: mockAssetId,
@@ -338,8 +323,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('dashboard with empty chatId should behave like undefined chatId', () => {
+  it('dashboard with empty chatId should behave like undefined chatId', () => {
     const result = assetParamsToRoute({
       chatId: '',
       assetId: mockAssetId,
@@ -354,8 +338,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('dashboard with empty assetId', () => {
+  it('dashboard with empty assetId', () => {
     const result = assetParamsToRoute({
       chatId: undefined,
       assetId: '',
@@ -368,8 +351,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('dashboard with very long ids', () => {
+  it('dashboard with very long ids', () => {
     const longId = 'a'.repeat(100);
     const result = assetParamsToRoute({
       chatId: undefined,
@@ -383,8 +365,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('metric with invalid secondary view', () => {
+  it('metric with invalid secondary view', () => {
     const result = assetParamsToRoute({
       chatId: mockChatId,
       assetId: mockAssetId,
@@ -399,8 +380,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('dashboard with non-version-history secondary view', () => {
+  it('dashboard with non-version-history secondary view', () => {
     const result = assetParamsToRoute({
       assetId: mockAssetId,
       chatId: undefined,
@@ -413,8 +393,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('dashboard with a version history secondary view', () => {
+  it('dashboard with a version history secondary view', () => {
     const result = assetParamsToRoute({
       chatId: mockChatId,
       assetId: mockAssetId,
@@ -432,8 +411,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('no chat id, metric with version number', () => {
+  it('no chat id, metric with version number', () => {
     const test = {
       assetId: '06d9d8b7-eb96-59af-9a03-0436205b60a9',
       type: 'metric',
@@ -452,8 +430,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('no chat id, metric without version number', () => {
+  it('no chat id, metric without version number', () => {
     const test = {
       assetId: '06d9d8b7-eb96-59af-9a03-0436205b60a9',
       type: 'metric',
@@ -468,8 +445,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('reasoning messaged with chatid', () => {
+  it('reasoning messaged with chatid', () => {
     const test = {
       assetId: '06d9d8b7-eb96-59af-9a03-0436205b60a9',
       type: 'reasoning',
@@ -485,8 +461,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('dataset route without chatId', () => {
+  it('dataset route without chatId', () => {
     const result = assetParamsToRoute({
       chatId: undefined,
       assetId: mockAssetId,
@@ -499,8 +474,7 @@ describe('assetParamsToRoute', () => {
       })
     );
   });
-
-  test('dataset route with chatId (should ignore chatId)', () => {
+  it('dataset route with chatId (should ignore chatId)', () => {
     const result = assetParamsToRoute({
       chatId: mockChatId,
       assetId: mockAssetId,

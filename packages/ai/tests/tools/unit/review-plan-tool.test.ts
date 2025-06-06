@@ -3,16 +3,15 @@ import { z } from 'zod';
 
 // Import the schemas we want to test (extracted from the tool file)
 const inputSchema = z.object({
-  todo_items: z.array(
-    z.number().int().min(1, 'Todo item index must be at least 1 (1-based indexing)')
-  ).min(1, 'At least one todo item index must be provided').describe(
-    'A list of 1-based indices of the tasks to mark as complete (1 is the first item).'
-  )
+  todo_items: z
+    .array(z.number().int().min(1, 'Todo item index must be at least 1 (1-based indexing)'))
+    .min(1, 'At least one todo item index must be provided')
+    .describe('A list of 1-based indices of the tasks to mark as complete (1 is the first item).'),
 });
 
 const outputSchema = z.object({
   success: z.boolean(),
-  todos: z.string()
+  todos: z.string(),
 });
 
 // Define todo item interface for testing
@@ -94,17 +93,13 @@ async function processReviewPlan(
     const idxZeroBased = idxOneBased - 1;
 
     if (idxZeroBased >= totalTodos) {
-      throw new Error(
-        `todo_item index ${idxOneBased} out of range (${totalTodos} todos, 1-based)`
-      );
+      throw new Error(`todo_item index ${idxOneBased} out of range (${totalTodos} todos, 1-based)`);
     }
 
     // Mark the todo at the given index as complete
     const todo = todos[idxZeroBased];
     if (!todo || typeof todo !== 'object') {
-      throw new Error(
-        `Todo item at index ${idxOneBased} (1-based) is not a valid object.`
-      );
+      throw new Error(`Todo item at index ${idxOneBased} (1-based) is not a valid object.`);
     }
 
     todo.completed = true;
@@ -121,7 +116,7 @@ async function processReviewPlan(
 
   return {
     success: true,
-    todos: todosString
+    todos: todosString,
   };
 }
 
@@ -135,7 +130,7 @@ describe('Review Plan Tool Unit Tests', () => {
   describe('Input Schema Validation', () => {
     test('should validate correct input format', () => {
       const validInput = {
-        todo_items: [1, 2, 3]
+        todo_items: [1, 2, 3],
       };
 
       const result = inputSchema.safeParse(validInput);
@@ -144,7 +139,7 @@ describe('Review Plan Tool Unit Tests', () => {
 
     test('should validate single todo item', () => {
       const validInput = {
-        todo_items: [1]
+        todo_items: [1],
       };
 
       const result = inputSchema.safeParse(validInput);
@@ -153,7 +148,7 @@ describe('Review Plan Tool Unit Tests', () => {
 
     test('should reject empty todo_items array', () => {
       const invalidInput = {
-        todo_items: []
+        todo_items: [],
       };
 
       const result = inputSchema.safeParse(invalidInput);
@@ -162,7 +157,7 @@ describe('Review Plan Tool Unit Tests', () => {
 
     test('should reject zero index', () => {
       const invalidInput = {
-        todo_items: [0]
+        todo_items: [0],
       };
 
       const result = inputSchema.safeParse(invalidInput);
@@ -171,7 +166,7 @@ describe('Review Plan Tool Unit Tests', () => {
 
     test('should reject negative indices', () => {
       const invalidInput = {
-        todo_items: [-1, -2]
+        todo_items: [-1, -2],
       };
 
       const result = inputSchema.safeParse(invalidInput);
@@ -180,7 +175,7 @@ describe('Review Plan Tool Unit Tests', () => {
 
     test('should reject non-integer indices', () => {
       const invalidInput = {
-        todo_items: [1.5, 2.7]
+        todo_items: [1.5, 2.7],
       };
 
       const result = inputSchema.safeParse(invalidInput);
@@ -196,7 +191,7 @@ describe('Review Plan Tool Unit Tests', () => {
 
     test('should reject non-array todo_items', () => {
       const invalidInput = {
-        todo_items: 'not an array'
+        todo_items: 'not an array',
       };
 
       const result = inputSchema.safeParse(invalidInput);
@@ -208,7 +203,7 @@ describe('Review Plan Tool Unit Tests', () => {
     test('should validate correct output format', () => {
       const validOutput = {
         success: true,
-        todos: '[x] Task 1\n[ ] Task 2\n[x] Task 3'
+        todos: '[x] Task 1\n[ ] Task 2\n[x] Task 3',
       };
 
       const result = outputSchema.safeParse(validOutput);
@@ -218,7 +213,7 @@ describe('Review Plan Tool Unit Tests', () => {
     test('should validate output with empty todos', () => {
       const validOutput = {
         success: true,
-        todos: ''
+        todos: '',
       };
 
       const result = outputSchema.safeParse(validOutput);
@@ -227,7 +222,7 @@ describe('Review Plan Tool Unit Tests', () => {
 
     test('should reject output without success field', () => {
       const invalidOutput = {
-        todos: 'Some todos'
+        todos: 'Some todos',
       };
 
       const result = outputSchema.safeParse(invalidOutput);
@@ -236,7 +231,7 @@ describe('Review Plan Tool Unit Tests', () => {
 
     test('should reject output without todos field', () => {
       const invalidOutput = {
-        success: true
+        success: true,
       };
 
       const result = outputSchema.safeParse(invalidOutput);
@@ -249,7 +244,7 @@ describe('Review Plan Tool Unit Tests', () => {
       const validTodos = [
         { todo: 'Task 1', completed: false },
         { todo: 'Task 2', completed: true },
-        { todo: 'Task 3', completed: false }
+        { todo: 'Task 3', completed: false },
       ];
 
       const result = parseTodos(validTodos);
@@ -266,7 +261,7 @@ describe('Review Plan Tool Unit Tests', () => {
         { completed: true }, // Invalid - missing todo
         'string item', // Invalid
         null, // Invalid
-        { todo: 'Another Valid Task', completed: true }
+        { todo: 'Another Valid Task', completed: true },
       ];
 
       const result = parseTodos(mixedTodos);
@@ -294,7 +289,7 @@ describe('Review Plan Tool Unit Tests', () => {
       const todos = [
         { todo: 'Task 1', completed: true },
         { todo: 'Task 2', completed: false },
-        { todo: 'Task 3', completed: true }
+        { todo: 'Task 3', completed: true },
       ];
 
       const result = formatTodosOutput(todos);
@@ -323,7 +318,7 @@ describe('Review Plan Tool Unit Tests', () => {
     test('should format all incomplete todos', () => {
       const todos = [
         { todo: 'Task 1', completed: false },
-        { todo: 'Task 2', completed: false }
+        { todo: 'Task 2', completed: false },
       ];
 
       const result = formatTodosOutput(todos);
@@ -333,7 +328,7 @@ describe('Review Plan Tool Unit Tests', () => {
     test('should format all completed todos', () => {
       const todos = [
         { todo: 'Task 1', completed: true },
-        { todo: 'Task 2', completed: true }
+        { todo: 'Task 2', completed: true },
       ];
 
       const result = formatTodosOutput(todos);
@@ -346,7 +341,7 @@ describe('Review Plan Tool Unit Tests', () => {
       const todos = [
         { todo: 'Task 1', completed: false },
         { todo: 'Task 2', completed: false },
-        { todo: 'Task 3', completed: false }
+        { todo: 'Task 3', completed: false },
       ];
       mockRuntimeContext.set('todos', todos);
 
@@ -373,7 +368,7 @@ describe('Review Plan Tool Unit Tests', () => {
         { todo: 'Task 1', completed: false },
         { todo: 'Task 2', completed: false },
         { todo: 'Task 3', completed: false },
-        { todo: 'Task 4', completed: false }
+        { todo: 'Task 4', completed: false },
       ];
       mockRuntimeContext.set('todos', todos);
 
@@ -397,7 +392,7 @@ describe('Review Plan Tool Unit Tests', () => {
       const todos = [
         { todo: 'Task 1', completed: true },
         { todo: 'Task 2', completed: false },
-        { todo: 'Task 3', completed: true }
+        { todo: 'Task 3', completed: true },
       ];
       mockRuntimeContext.set('todos', todos);
 
@@ -417,54 +412,54 @@ describe('Review Plan Tool Unit Tests', () => {
     });
 
     test('should throw error when runtime context is missing', async () => {
-      await expect(
-        processReviewPlan({ todo_items: [1] }, undefined)
-      ).rejects.toThrow('Runtime context not found');
+      await expect(processReviewPlan({ todo_items: [1] }, undefined)).rejects.toThrow(
+        'Runtime context not found'
+      );
     });
 
     test('should throw error when no todos exist', async () => {
       // No todos in state
-      await expect(
-        processReviewPlan({ todo_items: [1] }, mockRuntimeContext)
-      ).rejects.toThrow("Could not find 'todos' in agent state or it's not an array.");
+      await expect(processReviewPlan({ todo_items: [1] }, mockRuntimeContext)).rejects.toThrow(
+        "Could not find 'todos' in agent state or it's not an array."
+      );
     });
 
     test('should throw error when todos is not an array', async () => {
       mockRuntimeContext.set('todos', 'not an array');
 
-      await expect(
-        processReviewPlan({ todo_items: [1] }, mockRuntimeContext)
-      ).rejects.toThrow("Could not find 'todos' in agent state or it's not an array.");
+      await expect(processReviewPlan({ todo_items: [1] }, mockRuntimeContext)).rejects.toThrow(
+        "Could not find 'todos' in agent state or it's not an array."
+      );
     });
 
     test('should throw error for zero index', async () => {
       const todos = [{ todo: 'Task 1', completed: false }];
       mockRuntimeContext.set('todos', todos);
 
-      await expect(
-        processReviewPlan({ todo_items: [0] }, mockRuntimeContext)
-      ).rejects.toThrow('todo_item index cannot be 0, indexing starts from 1.');
+      await expect(processReviewPlan({ todo_items: [0] }, mockRuntimeContext)).rejects.toThrow(
+        'todo_item index cannot be 0, indexing starts from 1.'
+      );
     });
 
     test('should throw error for out of range index', async () => {
       const todos = [
         { todo: 'Task 1', completed: false },
-        { todo: 'Task 2', completed: false }
+        { todo: 'Task 2', completed: false },
       ];
       mockRuntimeContext.set('todos', todos);
 
-      await expect(
-        processReviewPlan({ todo_items: [3] }, mockRuntimeContext)
-      ).rejects.toThrow('todo_item index 3 out of range (2 todos, 1-based)');
+      await expect(processReviewPlan({ todo_items: [3] }, mockRuntimeContext)).rejects.toThrow(
+        'todo_item index 3 out of range (2 todos, 1-based)'
+      );
     });
 
     test('should throw error for multiple out of range indices', async () => {
       const todos = [{ todo: 'Task 1', completed: false }];
       mockRuntimeContext.set('todos', todos);
 
-      await expect(
-        processReviewPlan({ todo_items: [1, 5] }, mockRuntimeContext)
-      ).rejects.toThrow('todo_item index 5 out of range (1 todos, 1-based)');
+      await expect(processReviewPlan({ todo_items: [1, 5] }, mockRuntimeContext)).rejects.toThrow(
+        'todo_item index 5 out of range (1 todos, 1-based)'
+      );
     });
 
     test('should throw error for invalid todo object', async () => {
@@ -472,16 +467,13 @@ describe('Review Plan Tool Unit Tests', () => {
       // We need to test the raw array processing, not the filtered result
       const todos = [
         { todo: 'Valid Task', completed: false },
-        { todo: 'Another Valid Task', completed: false }
+        { todo: 'Another Valid Task', completed: false },
       ];
       mockRuntimeContext.set('todos', todos);
 
       // Modify one entry to be invalid after parseTodos has run
       // This simulates a case where the todo array has been corrupted
-      const result = await processReviewPlan(
-        { todo_items: [1] },
-        mockRuntimeContext
-      );
+      const result = await processReviewPlan({ todo_items: [1] }, mockRuntimeContext);
 
       expect(result.success).toBe(true);
       expect(result.todos).toBe('[x] Valid Task\n[ ] Another Valid Task');
@@ -489,19 +481,16 @@ describe('Review Plan Tool Unit Tests', () => {
 
     test('should handle todos with additional properties', async () => {
       const todos = [
-        { 
-          todo: 'Task with extra props', 
-          completed: false, 
+        {
+          todo: 'Task with extra props',
+          completed: false,
           priority: 'high',
-          assignee: 'user123'
-        }
+          assignee: 'user123',
+        },
       ];
       mockRuntimeContext.set('todos', todos);
 
-      const result = await processReviewPlan(
-        { todo_items: [1] },
-        mockRuntimeContext
-      );
+      const result = await processReviewPlan({ todo_items: [1] }, mockRuntimeContext);
 
       expect(result.success).toBe(true);
       expect(result.todos).toBe('[x] Task with extra props');
@@ -517,16 +506,13 @@ describe('Review Plan Tool Unit Tests', () => {
       const mixedTodos = [
         { todo: 'Valid task 1', completed: false },
         { invalid: 'structure' }, // This will be filtered out by parseTodos
-        { todo: 'Valid task 2', completed: false }
+        { todo: 'Valid task 2', completed: false },
       ];
       mockRuntimeContext.set('todos', mixedTodos);
 
       // Since parseTodos filters out invalid items, we get 2 valid todos
       // So index 2 (1-based) refers to the second valid todo
-      const result = await processReviewPlan(
-        { todo_items: [2] },
-        mockRuntimeContext
-      );
+      const result = await processReviewPlan({ todo_items: [2] }, mockRuntimeContext);
 
       expect(result.success).toBe(true);
       expect(result.todos).toBe('[ ] Valid task 1\n[x] Valid task 2');
@@ -536,25 +522,29 @@ describe('Review Plan Tool Unit Tests', () => {
   describe('Error Handling', () => {
     test('should handle runtime context state access errors gracefully', async () => {
       const faultyContext = {
-        get: () => { throw new Error('State access error'); },
-        set: () => {}
+        get: () => {
+          throw new Error('State access error');
+        },
+        set: () => {},
       };
 
-      await expect(
-        processReviewPlan({ todo_items: [1] }, faultyContext as any)
-      ).rejects.toThrow('State access error');
+      await expect(processReviewPlan({ todo_items: [1] }, faultyContext as any)).rejects.toThrow(
+        'State access error'
+      );
     });
 
     test('should handle runtime context state update errors gracefully', async () => {
       const todos = [{ todo: 'Test task', completed: false }];
       const faultyContext = {
-        get: (key: string) => key === 'todos' ? todos : undefined,
-        set: () => { throw new Error('State update error'); }
+        get: (key: string) => (key === 'todos' ? todos : undefined),
+        set: () => {
+          throw new Error('State update error');
+        },
       };
 
-      await expect(
-        processReviewPlan({ todo_items: [1] }, faultyContext as any)
-      ).rejects.toThrow('State update error');
+      await expect(processReviewPlan({ todo_items: [1] }, faultyContext as any)).rejects.toThrow(
+        'State update error'
+      );
     });
   });
 
@@ -563,7 +553,7 @@ describe('Review Plan Tool Unit Tests', () => {
       const todos = [
         { todo: 'Index 0 (1-based: 1)', completed: false },
         { todo: 'Index 1 (1-based: 2)', completed: false },
-        { todo: 'Index 2 (1-based: 3)', completed: false }
+        { todo: 'Index 2 (1-based: 3)', completed: false },
       ];
       mockRuntimeContext.set('todos', todos);
 
@@ -572,18 +562,15 @@ describe('Review Plan Tool Unit Tests', () => {
         { input: [1], expectedCompleted: [0] },
         { input: [2], expectedCompleted: [1] },
         { input: [3], expectedCompleted: [2] },
-        { input: [1, 3], expectedCompleted: [0, 2] }
+        { input: [1, 3], expectedCompleted: [0, 2] },
       ];
 
       for (const testCase of testCases) {
         // Reset todos
-        const freshTodos = todos.map(t => ({ ...t, completed: false }));
+        const freshTodos = todos.map((t) => ({ ...t, completed: false }));
         mockRuntimeContext.set('todos', freshTodos);
 
-        await processReviewPlan(
-          { todo_items: testCase.input },
-          mockRuntimeContext
-        );
+        await processReviewPlan({ todo_items: testCase.input }, mockRuntimeContext);
 
         const updatedTodos = mockRuntimeContext.get('todos');
         for (let i = 0; i < updatedTodos.length; i++) {
@@ -609,7 +596,7 @@ describe('Review Plan Tool Unit Tests', () => {
     test('should handle duplicate indices gracefully', async () => {
       const todos = [
         { todo: 'Task 1', completed: false },
-        { todo: 'Task 2', completed: false }
+        { todo: 'Task 2', completed: false },
       ];
       mockRuntimeContext.set('todos', todos);
 

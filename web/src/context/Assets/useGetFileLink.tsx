@@ -1,4 +1,4 @@
-import { FileType } from '@/api/asset_interfaces/chat';
+import type { FileType } from '@/api/asset_interfaces/chat';
 import { useMemoizedFn } from '@/hooks';
 import { useChatLayoutContextSelector } from '@/layouts/ChatLayout';
 import { assetParamsToRoute } from '@/lib/assets';
@@ -46,7 +46,8 @@ export const useGetFileLink = () => {
     }): boolean => {
       if (fileType === 'metric') {
         return versionNumber === metricVersionNumber && fileId === metricId;
-      } else if (fileType === 'dashboard') {
+      }
+      if (fileType === 'dashboard') {
         return versionNumber === dashboardVersionNumber && fileId === dashboardId;
       }
 

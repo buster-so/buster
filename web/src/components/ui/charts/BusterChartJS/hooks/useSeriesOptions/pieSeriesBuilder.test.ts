@@ -1,25 +1,26 @@
-import { pieSeriesBuilder_data, pieSeriesBuilder_labels } from './pieSeriesBuilder';
-import { formatLabelForDataset, JOIN_CHARACTER } from '../../../commonHelpers';
+import { describe, expect, it, vi } from 'vitest';
 import { formatLabel } from '@/lib';
+import { formatLabelForDataset } from '../../../commonHelpers';
+import { pieSeriesBuilder_data, pieSeriesBuilder_labels } from './pieSeriesBuilder';
 
 // Mock dependencies
-jest.mock('../../../commonHelpers', () => ({
-  formatLabelForDataset: jest.fn((dataset) => `Formatted ${dataset.name}`),
+vi.mock('../../../commonHelpers', () => ({
+  formatLabelForDataset: vi.fn((dataset) => `Formatted ${dataset.name}`),
   JOIN_CHARACTER: '|'
 }));
 
-jest.mock('@/lib', () => ({
-  formatLabel: jest.fn((item, format) => (format ? `Formatted ${item}` : String(item)))
+vi.mock('@/lib', () => ({
+  formatLabel: vi.fn((item, format) => (format ? `Formatted ${item}` : String(item)))
 }));
 
 // Mock the implementation of the functions to avoid TypeScript errors
 // This allows us to test the functions without having to match the exact complex types
-jest.mock('./pieSeriesBuilder', () => {
-  const originalModule = jest.requireActual('./pieSeriesBuilder');
+vi.mock('./pieSeriesBuilder', async () => {
+  const originalModule = (await vi.importActual('./pieSeriesBuilder')) as any;
   return {
     ...originalModule,
-    pieSeriesBuilder_data: jest.fn(originalModule.pieSeriesBuilder_data),
-    pieSeriesBuilder_labels: jest.fn(originalModule.pieSeriesBuilder_labels)
+    pieSeriesBuilder_data: vi.fn(originalModule.pieSeriesBuilder_data),
+    pieSeriesBuilder_labels: vi.fn(originalModule.pieSeriesBuilder_labels)
   };
 });
 
@@ -150,7 +151,7 @@ describe('pieSeriesBuilder_labels', () => {
     };
 
     // Reset mocks
-    (formatLabel as jest.Mock).mockImplementation((item, format) =>
+    (formatLabel as any).mockImplementation((item: any, format: any) =>
       format ? `Formatted ${item}` : String(item)
     );
 

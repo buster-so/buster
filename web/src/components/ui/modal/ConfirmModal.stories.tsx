@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { ConfirmModal, ConfirmProps } from './ConfirmModal';
-import { Button } from '../buttons/Button';
-import React from 'react';
 import { fn } from '@storybook/test';
+import React from 'react';
 import { useBusterNotifications } from '../../../context/BusterNotifications';
+import { Button } from '../buttons/Button';
+import { ConfirmModal, type ConfirmProps } from './ConfirmModal';
 
 const meta: Meta<typeof ConfirmModal> = {
   title: 'UI/Modal/ConfirmModal',

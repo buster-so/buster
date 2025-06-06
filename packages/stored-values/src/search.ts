@@ -98,7 +98,7 @@ export async function searchValuesByEmbedding(
 
     // Format embedding as PostgreSQL array literal for halfvec
     const embeddingLiteral = `[${validEmbedding.join(',')}]`;
-    
+
     const params = validOptions.similarityThreshold
       ? [embeddingLiteral, validOptions.limit, validOptions.similarityThreshold]
       : [embeddingLiteral, validOptions.limit];

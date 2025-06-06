@@ -1,8 +1,8 @@
-import { cva, VariantProps } from 'class-variance-authority';
-import React from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
+import type React from 'react';
 import { cn } from '@/lib/classMerge';
-import { Text } from '../typography';
 import { Xmark } from '../icons';
+import { Text } from '../typography';
 
 const statusVariants = cva('shadow p-3 rounded', {
   variants: {
@@ -39,9 +39,9 @@ export const StatusCard: React.FC<
 
       {extra && extra}
       {onClose && (
-        <div onClick={onClose} className="absolute top-2 right-2">
+        <button type="button" onClick={onClose} className="absolute top-2 right-2 cursor-pointer">
           <Xmark />
-        </div>
+        </button>
       )}
     </div>
   );

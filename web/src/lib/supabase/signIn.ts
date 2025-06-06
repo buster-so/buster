@@ -1,9 +1,9 @@
 'use server';
 
-import { createClient } from './server';
-import { BusterRoutes, createBusterRoute } from '@/routes';
-import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+import { BusterRoutes, createBusterRoute } from '@/routes';
+import { createClient } from './server';
 
 const authURLFull = `${process.env.NEXT_PUBLIC_URL}${createBusterRoute({
   route: BusterRoutes.AUTH_CALLBACK
@@ -19,7 +19,7 @@ export const signInWithEmailAndPassword = async ({
   'use server';
   const supabase = await createClient();
 
-  const { data, error } = await supabase.auth.signInWithPassword({
+  const { error } = await supabase.auth.signInWithPassword({
     email,
     password
   });

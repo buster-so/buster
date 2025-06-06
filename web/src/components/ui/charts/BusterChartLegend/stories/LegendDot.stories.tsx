@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { LegendItemDot } from '../LegendDot';
-import { ChartType } from '../../../../../api/asset_interfaces/metric/charts';
 import { fn } from '@storybook/test';
+import { ChartType } from '../../../../../api/asset_interfaces/metric/charts';
+import { LegendItemDot } from '../LegendDot';
 
 const meta = {
   title: 'UI/Charts/LegendDot',

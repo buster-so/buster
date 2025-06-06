@@ -1,22 +1,22 @@
 'use client';
 
-import React, { useMemo, useRef, useState, useEffect } from 'react';
 import {
-  ColumnDef,
+  type ColumnDef,
   getCoreRowModel,
   getSortedRowModel,
-  useReactTable,
-  SortingState
+  type SortingState,
+  useReactTable
 } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { defaultCellFormat, defaultHeaderFormat } from './defaultFormat';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useDebounceFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
+import { createDefaultTableColumnWidths } from '@/lib/metrics/messageAutoChartHandler/createDefaultTableColumnWidths';
+import { CELL_HEIGHT, OVERSCAN } from './constants';
 import { DataGridHeader } from './DataGridHeader';
 import { DataGridRow } from './DataGridRow';
-import { CELL_HEIGHT, OVERSCAN } from './constants';
+import { defaultCellFormat, defaultHeaderFormat } from './defaultFormat';
 import { SortColumnWrapper } from './SortColumnWrapper';
-import { useDebounceFn } from '@/hooks';
-import { createDefaultTableColumnWidths } from '@/lib/metrics/messageAutoChartHandler/createDefaultTableColumnWidths';
 
 export interface TanStackDataGridProps {
   className?: string;

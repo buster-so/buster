@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
 import { expect } from '@playwright/test';
 
 export const askQuestion = async (page: Page, question: string) => {

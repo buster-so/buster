@@ -1,15 +1,19 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { Avatar } from '@/components/ui/avatar';
-import { formatDate } from '@/lib';
-import { BusterList, BusterListColumn, BusterListRow } from '@/components/ui/list';
-import { BUSTER_DOCS_QUICKSTART, BusterRoutes, createBusterRoute } from '@/routes';
+import React, { useMemo, useState } from 'react';
 import type { BusterDatasetListItem } from '@/api/asset_interfaces';
-import { ListEmptyStateWithButton } from '@/components/ui/list';
+import { Avatar } from '@/components/ui/avatar';
+import { ArrowUpRight } from '@/components/ui/icons';
+import {
+  BusterList,
+  type BusterListColumn,
+  type BusterListRow,
+  ListEmptyStateWithButton
+} from '@/components/ui/list';
 import { useMemoizedFn } from '@/hooks';
+import { formatDate } from '@/lib';
+import { BUSTER_DOCS_QUICKSTART, BusterRoutes, createBusterRoute } from '@/routes';
 import { DatasetSelectedOptionPopup } from './DatasetSelectedPopup';
-import { ArrowUpRight, ExternalLink } from '@/components/ui/icons';
 
 const columns: BusterListColumn[] = [
   {
@@ -85,15 +89,13 @@ export const DatasetListContent: React.FC<{
         onSelectChange={setSelectedRowKeys}
         emptyState={useMemo(
           () =>
-            !isFetchedDatasets ? (
-              <></>
-            ) : (
+            !isFetchedDatasets ? null : (
               <ListEmptyStateWithButton
                 isAdmin={isAdmin}
                 title="You don't have any datasets yet."
                 buttonText="Link to docs"
                 linkButton={BUSTER_DOCS_QUICKSTART}
-                buttonPrefix={<></>}
+                buttonPrefix={null}
                 buttonSuffix={<ArrowUpRight />}
                 linkButtonTarget="_blank"
                 description="Datasets help you organize your data and Buster uses them to help answer questions. Datasets will appear here when you create them. Currently, you can only create datasets through our CLI tool which you can read more about in our docs."

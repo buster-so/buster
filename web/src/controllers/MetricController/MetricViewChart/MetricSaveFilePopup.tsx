@@ -1,7 +1,7 @@
+import React from 'react';
 import { SaveResetFilePopup } from '@/components/features/popups/SaveResetFilePopup';
 import { useUpdateMetricChart } from '@/context/Metrics/useUpdateMetricChart';
 import { useChatIndividualContextSelector } from '@/layouts/ChatLayout/ChatContext';
-import React from 'react';
 
 export const MetricSaveFilePopup: React.FC<{ metricId: string }> = React.memo(({ metricId }) => {
   const onResetToOriginal = useChatIndividualContextSelector((x) => x.onResetToOriginal);

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import * as yaml from 'yaml';
 import { z } from 'zod';
 
@@ -19,7 +19,7 @@ const columnLabelFormatSchema = z.object({
   dateFormat: z.string().optional(),
   useRelativeTime: z.boolean().optional(),
   isUtc: z.boolean().optional(),
-  convertNumberTo: z.enum(['day_of_week', 'month_of_year', 'quarter']).optional()
+  convertNumberTo: z.enum(['day_of_week', 'month_of_year', 'quarter']).optional(),
 });
 
 const baseChartConfigSchema = z.object({
@@ -32,37 +32,37 @@ const baseChartConfigSchema = z.object({
   showLegendHeadline: z.union([z.boolean(), z.string()]).optional(),
   goalLines: z.array(z.any()).optional(),
   trendlines: z.array(z.any()).optional(),
-  disableTooltip: z.boolean().optional()
+  disableTooltip: z.boolean().optional(),
 });
 
 const tableChartConfigSchema = baseChartConfigSchema.extend({
   selectedChartType: z.literal('table'),
-  tableColumnOrder: z.array(z.string()).optional()
+  tableColumnOrder: z.array(z.string()).optional(),
 });
 
 const metricChartConfigSchema = baseChartConfigSchema.extend({
   selectedChartType: z.literal('metric'),
-  metricColumnId: z.string()
+  metricColumnId: z.string(),
 });
 
 const barChartConfigSchema = baseChartConfigSchema.extend({
-  selectedChartType: z.literal('bar')
+  selectedChartType: z.literal('bar'),
 });
 
 const lineChartConfigSchema = baseChartConfigSchema.extend({
-  selectedChartType: z.literal('line')
+  selectedChartType: z.literal('line'),
 });
 
 const scatterChartConfigSchema = baseChartConfigSchema.extend({
-  selectedChartType: z.literal('scatter')
+  selectedChartType: z.literal('scatter'),
 });
 
 const pieChartConfigSchema = baseChartConfigSchema.extend({
-  selectedChartType: z.literal('pie')
+  selectedChartType: z.literal('pie'),
 });
 
 const comboChartConfigSchema = baseChartConfigSchema.extend({
-  selectedChartType: z.literal('combo')
+  selectedChartType: z.literal('combo'),
 });
 
 const chartConfigSchema = z.discriminatedUnion('selectedChartType', [
@@ -72,7 +72,7 @@ const chartConfigSchema = z.discriminatedUnion('selectedChartType', [
   lineChartConfigSchema,
   scatterChartConfigSchema,
   pieChartConfigSchema,
-  comboChartConfigSchema
+  comboChartConfigSchema,
 ]);
 
 const metricYmlSchema = z.object({
@@ -80,7 +80,7 @@ const metricYmlSchema = z.object({
   description: z.string().min(1),
   timeFrame: z.string().min(1),
   sql: z.string().min(1),
-  chartConfig: chartConfigSchema
+  chartConfig: chartConfigSchema,
 });
 
 // Test the core validation functions
@@ -100,15 +100,19 @@ function validateSqlBasic(sqlQuery: string): { success: boolean; error?: string 
   return { success: true };
 }
 
-function parseAndValidateYaml(ymlContent: string): { success: boolean; error?: string; data?: any } {
+function parseAndValidateYaml(ymlContent: string): {
+  success: boolean;
+  error?: string;
+  data?: any;
+} {
   try {
     const parsedYml = yaml.parse(ymlContent);
     const validationResult = metricYmlSchema.safeParse(parsedYml);
-    
+
     if (!validationResult.success) {
       return {
         success: false,
-        error: `Invalid YAML structure: ${validationResult.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`
+        error: `Invalid YAML structure: ${validationResult.error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ')}`,
       };
     }
 
@@ -116,7 +120,7 @@ function parseAndValidateYaml(ymlContent: string): { success: boolean; error?: s
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'YAML parsing failed'
+      error: error instanceof Error ? error.message : 'YAML parsing failed',
     };
   }
 }
@@ -318,13 +322,14 @@ chartConfig:
       const result = parseAndValidateYaml(complexUpdateYaml);
       expect(result.success).toBe(true);
       expect(result.data?.chartConfig.showLegend).toBe(true);
-      expect(result.data?.chartConfig.colors).toEqual(["#FF5733", "#33FF57", "#3357FF"]);
+      expect(result.data?.chartConfig.colors).toEqual(['#FF5733', '#33FF57', '#3357FF']);
     });
   });
 
   describe('SQL Validation for Updates', () => {
     test('should accept valid updated SELECT SQL', () => {
-      const updatedSql = 'SELECT id, name, amount, created_at FROM updated_sales WHERE created_at > NOW() - INTERVAL \'7 days\'';
+      const updatedSql =
+        "SELECT id, name, amount, created_at FROM updated_sales WHERE created_at > NOW() - INTERVAL '7 days'";
       const result = validateSqlBasic(updatedSql);
       expect(result.success).toBe(true);
     });
@@ -367,7 +372,7 @@ chartConfig:
         ORDER BY total_spent DESC
         LIMIT 50
       `;
-      
+
       const result = validateSqlBasic(complexUpdatedSql);
       expect(result.success).toBe(true);
     });
@@ -379,9 +384,10 @@ chartConfig:
         files: [
           {
             id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-            yml_content: 'name: Updated Metric\ndescription: Updated description\ntimeFrame: Today\nsql: SELECT * FROM updated_test\nchartConfig:\n  selectedChartType: table\n  columnLabelFormats:\n    test:\n      columnType: string\n      style: string\n      numberSeparatorStyle: null\n      replaceMissingDataWith: null'
-          }
-        ]
+            yml_content:
+              'name: Updated Metric\ndescription: Updated description\ntimeFrame: Today\nsql: SELECT * FROM updated_test\nchartConfig:\n  selectedChartType: table\n  columnLabelFormats:\n    test:\n      columnType: string\n      style: string\n      numberSeparatorStyle: null\n      replaceMissingDataWith: null',
+          },
+        ],
       };
 
       // Basic validation that files array exists and has proper structure
@@ -395,11 +401,11 @@ chartConfig:
         files: [
           {
             // Missing id
-            yml_content: 'name: Test'
-          }
-        ]
+            yml_content: 'name: Test',
+          },
+        ],
       };
-      
+
       // This would fail our ID validation requirement
       expect(invalidInput.files[0]).not.toHaveProperty('id');
     });
@@ -409,11 +415,11 @@ chartConfig:
         files: [
           {
             id: 'not-a-valid-uuid',
-            yml_content: 'name: Test'
-          }
-        ]
+            yml_content: 'name: Test',
+          },
+        ],
       };
-      
+
       // This would fail our UUID validation
       expect(invalidUuidInput.files[0].id).toBe('not-a-valid-uuid');
       // In real validation, this would be rejected as not a valid UUID
@@ -424,17 +430,19 @@ chartConfig:
         files: [
           {
             id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-            yml_content: 'name: First Updated Metric\ndescription: First update\ntimeFrame: Today\nsql: SELECT * FROM test1\nchartConfig:\n  selectedChartType: table\n  columnLabelFormats:\n    test:\n      columnType: string\n      style: string\n      numberSeparatorStyle: null\n      replaceMissingDataWith: null'
+            yml_content:
+              'name: First Updated Metric\ndescription: First update\ntimeFrame: Today\nsql: SELECT * FROM test1\nchartConfig:\n  selectedChartType: table\n  columnLabelFormats:\n    test:\n      columnType: string\n      style: string\n      numberSeparatorStyle: null\n      replaceMissingDataWith: null',
           },
           {
             id: 'a47ac10b-58cc-4372-a567-0e02b2c3d480',
-            yml_content: 'name: Second Updated Metric\ndescription: Second update\ntimeFrame: Last 7 days\nsql: SELECT * FROM test2\nchartConfig:\n  selectedChartType: metric\n  metricColumnId: test\n  columnLabelFormats:\n    test:\n      columnType: number\n      style: number\n      numberSeparatorStyle: null\n      replaceMissingDataWith: null'
-          }
-        ]
+            yml_content:
+              'name: Second Updated Metric\ndescription: Second update\ntimeFrame: Last 7 days\nsql: SELECT * FROM test2\nchartConfig:\n  selectedChartType: metric\n  metricColumnId: test\n  columnLabelFormats:\n    test:\n      columnType: number\n      style: number\n      numberSeparatorStyle: null\n      replaceMissingDataWith: null',
+          },
+        ],
       };
 
       expect(bulkUpdateInput.files).toHaveLength(2);
-      expect(bulkUpdateInput.files.every(f => f.id && f.yml_content)).toBe(true);
+      expect(bulkUpdateInput.files.every((f) => f.id && f.yml_content)).toBe(true);
     });
   });
 
@@ -446,7 +454,7 @@ chartConfig:
         numberSeparatorStyle: ',',
         replaceMissingDataWith: 0,
         minimumFractionDigits: 2,
-        maximumFractionDigits: 4
+        maximumFractionDigits: 4,
       };
 
       const result = columnLabelFormatSchema.safeParse(updatedNumberFormat);
@@ -461,7 +469,7 @@ chartConfig:
         useRelativeTime: true,
         isUtc: false,
         numberSeparatorStyle: null,
-        replaceMissingDataWith: null
+        replaceMissingDataWith: null,
       };
 
       const result = columnLabelFormatSchema.safeParse(updatedDateFormat);
@@ -476,7 +484,7 @@ chartConfig:
         prefix: 'Updated: ',
         suffix: ' (modified)',
         numberSeparatorStyle: null,
-        replaceMissingDataWith: null
+        replaceMissingDataWith: null,
       };
 
       const result = columnLabelFormatSchema.safeParse(updatedStringFormat);
@@ -488,7 +496,7 @@ chartConfig:
     test('should generate appropriate error message for invalid YAML in updates', () => {
       const invalidUpdateYaml = 'invalid: yaml: [structure for update';
       const result = parseAndValidateYaml(invalidUpdateYaml);
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
       expect(typeof result.error).toBe('string');
@@ -497,7 +505,7 @@ chartConfig:
     test('should generate appropriate error message for SQL validation in updates', () => {
       const invalidSql = 'DELETE FROM test WHERE id = 1';
       const result = validateSqlBasic(invalidSql);
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBe('SQL query must contain SELECT statement');
     });
@@ -530,7 +538,7 @@ chartConfig:
       // Test the concept of version management
       const currentVersion = 3;
       const nextVersion = currentVersion + 1;
-      
+
       expect(nextVersion).toBe(4);
     });
 
@@ -540,11 +548,11 @@ chartConfig:
         versions: [
           { versionNumber: 1, content: { name: 'Original' } },
           { versionNumber: 2, content: { name: 'First Update' } },
-          { versionNumber: 3, content: { name: 'Second Update' } }
+          { versionNumber: 3, content: { name: 'Second Update' } },
         ],
-        getLatestVersion: function() {
+        getLatestVersion: function () {
           return this.versions[this.versions.length - 1];
-        }
+        },
       };
 
       const latestVersion = mockVersionHistory.getLatestVersion();
@@ -561,7 +569,7 @@ chartConfig:
         success: true,
         modification_type: 'content',
         timestamp: new Date().toISOString(),
-        duration: 150
+        duration: 150,
       };
 
       expect(successResult.success).toBe(true);
@@ -577,7 +585,7 @@ chartConfig:
         error: 'Invalid YAML structure',
         modification_type: 'validation',
         timestamp: new Date().toISOString(),
-        duration: 75
+        duration: 75,
       };
 
       expect(failureResult.success).toBe(false);

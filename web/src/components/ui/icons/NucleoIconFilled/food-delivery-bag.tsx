@@ -1,6 +1,4 @@
-import React from 'react';
-
-import { iconProps } from './iconProps';
+import type { iconProps } from './iconProps';
 
 function foodDeliveryBag(props: iconProps) {
   const strokewidth = props.strokewidth || 1.3;

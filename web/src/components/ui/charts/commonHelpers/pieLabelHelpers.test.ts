@@ -1,5 +1,6 @@
-import { InnerLabelTitleRecord, getPieInnerLabelTitle } from './pieLabelHelpers';
+import { describe, expect, it } from 'vitest';
 import type { BusterChartConfigProps } from '@/api/asset_interfaces/metric/charts';
+import { getPieInnerLabelTitle, InnerLabelTitleRecord } from './pieLabelHelpers';
 
 describe('pieLabelHelpers', () => {
   describe('InnerLabelTitleRecord', () => {

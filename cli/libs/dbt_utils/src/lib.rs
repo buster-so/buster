@@ -13,7 +13,7 @@ use models::{CatalogNode, DbtCatalog};
 pub async fn run_dbt_docs_generate(dbt_project_path: &Path) -> Result<()> {
     println!(
         "{}",
-        format!("Running 'dbt docs generate' for project at: {}", dbt_project_path.display()).dimmed()
+        format!("Running 'dbt clean && dbt docs generate' for project at: {}", dbt_project_path.display()).dimmed()
     );
     let spinner = ProgressBar::new_spinner();
     spinner.set_style(
@@ -21,13 +21,40 @@ pub async fn run_dbt_docs_generate(dbt_project_path: &Path) -> Result<()> {
             .template("{spinner:.green} {msg}")
             .context("Failed to create progress style for dbt docs generate spinner")? // Added context
     );
-    spinner.set_message("Executing dbt docs generate...");
+    
+    // First run dbt clean
+    spinner.set_message("Executing dbt clean...");
     spinner.enable_steady_tick(Duration::from_millis(100));
+
+    let clean_output = tokio::process::Command::new("dbt")
+        .arg("clean")
+        .arg("--project-dir")
+        .arg(dbt_project_path.as_os_str())
+        .output()
+        .await
+        .with_context(|| format!("Failed to execute 'dbt clean' command for project: {}", dbt_project_path.display()))?;
+
+    if !clean_output.status.success() {
+        eprintln!(
+            "{}",
+            format!(
+                "⚠️ 'dbt clean' failed but continuing. Status: {}.\nStdout: {}\nStderr: {}",
+                clean_output.status,
+                String::from_utf8_lossy(&clean_output.stdout),
+                String::from_utf8_lossy(&clean_output.stderr)
+            )
+            .yellow()
+        );
+    }
+
+    // Then run dbt docs generate
+    spinner.set_message("Executing dbt docs generate...");
 
     let output = tokio::process::Command::new("dbt") // Switched to tokio::process::Command for async
         .arg("docs")
         .arg("generate")
         .arg("--project-dir")
+        
         .arg(dbt_project_path.as_os_str())
         .output()
         .await
@@ -38,7 +65,7 @@ pub async fn run_dbt_docs_generate(dbt_project_path: &Path) -> Result<()> {
     if output.status.success() {
         println!(
             "{}",
-            "✓ 'dbt docs generate' completed successfully.".green()
+            "✓ 'dbt clean && dbt docs generate' completed successfully.".green()
         );
         // It might be useful to check if catalog.json was actually created/updated here, 
         // but for now, we assume success means it's likely fine.

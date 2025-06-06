@@ -1,31 +1,31 @@
 import {
-  QueryClient,
+  type QueryClient,
+  type UseQueryOptions,
   useMutation,
   useQuery,
-  useQueryClient,
-  UseQueryOptions
+  useQueryClient
 } from '@tanstack/react-query';
-import { collectionQueryKeys } from '@/api/query_keys/collection';
-import {
-  collectionsGetList,
-  collectionsGetCollection,
-  collectionsCreateCollection,
-  collectionsUpdateCollection,
-  collectionsDeleteCollection,
-  shareCollection,
-  unshareCollection,
-  updateCollectionShare,
-  addAssetToCollection,
-  removeAssetFromCollection
-} from './requests';
+import { create } from 'mutative';
 import { useMemo } from 'react';
+import type { BusterCollection } from '@/api/asset_interfaces/collection';
+import { collectionQueryKeys } from '@/api/query_keys/collection';
+import { useBusterAssetsContextSelector } from '@/context/Assets/BusterAssetsProvider';
 import { useBusterNotifications } from '@/context/BusterNotifications';
 import { useMemoizedFn } from '@/hooks';
-import { useBusterAssetsContextSelector } from '@/context/Assets/BusterAssetsProvider';
-import { create } from 'mutative';
-import type { BusterCollection } from '@/api/asset_interfaces/collection';
-import { RustApiError } from '../errors';
 import { hasOrganizationId, isQueryStale } from '@/lib';
+import type { RustApiError } from '../errors';
+import {
+  addAssetToCollection,
+  collectionsCreateCollection,
+  collectionsDeleteCollection,
+  collectionsGetCollection,
+  collectionsGetList,
+  collectionsUpdateCollection,
+  removeAssetFromCollection,
+  shareCollection,
+  unshareCollection,
+  updateCollectionShare
+} from './requests';
 
 export const useGetCollectionsList = (
   filters: Omit<Parameters<typeof collectionsGetList>[0], 'page_token' | 'page_size'>,
@@ -68,8 +68,8 @@ const useFetchCollection = () => {
   const getAssetPassword = useBusterAssetsContextSelector((state) => state.getAssetPassword);
 
   return useMemoizedFn(async (collectionId: string) => {
-    const { password } = getAssetPassword(collectionId!);
-    return collectionsGetCollection({ id: collectionId!, password });
+    const { password } = getAssetPassword(collectionId);
+    return collectionsGetCollection({ id: collectionId, password });
   });
 };
 
@@ -79,9 +79,9 @@ export const useGetCollection = <T = BusterCollection>(
 ) => {
   const fetchCollection = useFetchCollection();
   return useQuery({
-    ...collectionQueryKeys.collectionsGetCollection(collectionId!),
+    ...collectionQueryKeys.collectionsGetCollection(collectionId || ''),
     queryFn: () => {
-      return fetchCollection(collectionId!);
+      return fetchCollection(collectionId || '');
     },
     enabled: !!collectionId,
     select
@@ -110,11 +110,13 @@ export const useUpdateCollection = () => {
   return useMutation({
     mutationFn: collectionsUpdateCollection,
     onMutate: (variables) => {
+      if (!variables.id) return;
       const queryKey = collectionQueryKeys.collectionsGetCollection(variables.id).queryKey;
       queryClient.setQueryData(queryKey, (v) => {
+        if (!v) return v;
         return {
-          ...v!,
-          name: variables.name || v?.name!
+          ...v,
+          name: variables.name || v.name || ''
         };
       });
     },
@@ -174,7 +176,8 @@ export const useShareCollection = () => {
     onMutate: ({ params, id }) => {
       const queryKey = collectionQueryKeys.collectionsGetCollection(id).queryKey;
       queryClient.setQueryData(queryKey, (previousData) => {
-        return create(previousData!, (draft: BusterCollection) => {
+        if (!previousData) return previousData;
+        return create(previousData, (draft: BusterCollection) => {
           draft.individual_permissions = [...params, ...(draft.individual_permissions || [])];
         });
       });
@@ -195,7 +198,8 @@ export const useUnshareCollection = () => {
     onMutate: (variables) => {
       const queryKey = collectionQueryKeys.collectionsGetCollection(variables.id).queryKey;
       queryClient.setQueryData(queryKey, (previousData) => {
-        return create(previousData!, (draft: BusterCollection) => {
+        if (!previousData) return previousData;
+        return create(previousData, (draft: BusterCollection) => {
           draft.individual_permissions =
             draft.individual_permissions?.filter((t) => !variables.data.includes(t.email)) || [];
         });
@@ -217,7 +221,8 @@ export const useUpdateCollectionShare = () => {
     onMutate: ({ params, id }) => {
       const queryKey = collectionQueryKeys.collectionsGetCollection(id).queryKey;
       queryClient.setQueryData(queryKey, (previousData) => {
-        return create(previousData!, (draft) => {
+        if (!previousData) return previousData;
+        return create(previousData, (draft) => {
           draft.individual_permissions =
             draft.individual_permissions?.map((t) => {
               const found = params.users?.find((v) => v.email === t.email);
@@ -264,8 +269,9 @@ export const useRemoveAssetFromCollection = (useInvalidate = true) => {
       const previousData = queryClient.getQueryData<BusterCollection>(queryKey);
       if (!previousData) return;
       queryClient.setQueryData(queryKey, (previousData) => {
+        if (!previousData) return previousData;
         const ids = variables.assets.map((a) => a.id);
-        return create(previousData!, (draft) => {
+        return create(previousData, (draft) => {
           draft.assets = draft.assets?.filter((a) => !ids.includes(a.id)) || [];
         });
       });

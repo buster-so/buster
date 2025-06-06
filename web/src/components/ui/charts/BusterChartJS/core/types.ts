@@ -1,13 +1,13 @@
-import type { JSX, CanvasHTMLAttributes, MutableRefObject, ReactNode } from 'react';
 import type {
   Chart,
-  ChartType,
   ChartData,
   ChartOptions,
+  ChartType,
   DefaultDataPoint,
   Plugin,
   UpdateMode
 } from 'chart.js';
+import type { CanvasHTMLAttributes, JSX, MutableRefObject, ReactNode } from 'react';
 
 export type ForwardedRef<T> = ((instance: T | null) => void) | MutableRefObject<T | null> | null;
 

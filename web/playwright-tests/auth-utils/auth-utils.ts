@@ -1,9 +1,9 @@
-import { Page } from '@playwright/test';
-import * as fs from 'fs';
-import * as path from 'path';
-import isEmpty from 'lodash/isEmpty';
-import { jwtDecode } from 'jwt-decode';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import type { Page } from '@playwright/test';
 import { expect } from '@playwright/test';
+import { jwtDecode } from 'jwt-decode';
+import isEmpty from 'lodash/isEmpty';
 
 // Path to the authentication state file
 export const authFile = path.join(__dirname, 'auth.json');

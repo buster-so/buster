@@ -1,10 +1,10 @@
 'use server';
 
-import { NextRequest, NextResponse } from 'next/server';
-import { AppSupportRequest } from '@/api/buster_rest/nextjs/support';
+import { type NextRequest, NextResponse } from 'next/server';
+import type { AppSupportRequest } from '@/api/buster_rest/nextjs/support';
 import { createClient } from '@/lib/supabase/server';
 
-const slackHookURL = process.env.NEXT_SLACK_APP_SUPPORT_URL!;
+const slackHookURL = process.env.NEXT_SLACK_APP_SUPPORT_URL || '';
 const STORAGE_BUCKET = 'support-screenshots'; // Using the default public bucket that usually exists
 
 export async function POST(request: NextRequest) {
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
       const buffer = Buffer.from(base64Data, 'base64');
 
       // Generate a unique filename
-      const timestamp = new Date().getTime();
+      const timestamp = Date.now();
       const filename = `${body.organizationId}/${timestamp}.png`;
 
       // Check if bucket exists

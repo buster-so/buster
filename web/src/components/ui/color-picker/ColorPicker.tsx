@@ -1,11 +1,12 @@
 'use client';
 
-import React, { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
-import { HexColorPicker } from 'react-colorful';
-import { PopoverRoot, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Input } from '@/components/ui/inputs';
-import { useDebounceFn } from '@/hooks';
 import { cva } from 'class-variance-authority';
+import type React from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { HexColorPicker } from 'react-colorful';
+import { Input } from '@/components/ui/inputs';
+import { PopoverContent, PopoverRoot, PopoverTrigger } from '@/components/ui/popover';
+import { useDebounceFn } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 
 interface ColorPickerProps {

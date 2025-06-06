@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { EditableTitle } from './EditableTitle';
-import React from 'react';
 import { fn } from '@storybook/test';
+import React from 'react';
+import { EditableTitle } from './EditableTitle';
 
 const meta: Meta<typeof EditableTitle> = {
   title: 'UI/Typography/EditableTitle',

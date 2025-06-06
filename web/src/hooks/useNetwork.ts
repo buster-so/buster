@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface NetworkState {
   online: boolean;
@@ -20,6 +20,7 @@ export function useNetwork(): NetworkState {
   useEffect(() => {
     function updateNetworkInfo() {
       if (typeof navigator !== 'undefined' && 'connection' in navigator) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- navigator.connection is not fully standardized
         const connection = (navigator as any).connection;
         setNetwork({
           online: navigator.onLine,
@@ -46,6 +47,7 @@ export function useNetwork(): NetworkState {
     window.addEventListener('offline', updateNetworkInfo);
 
     if (typeof navigator !== 'undefined' && 'connection' in navigator) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- navigator.connection is not fully standardized
       (navigator as any).connection?.addEventListener('change', updateNetworkInfo);
     }
 
@@ -54,6 +56,7 @@ export function useNetwork(): NetworkState {
       window.removeEventListener('online', updateNetworkInfo);
       window.removeEventListener('offline', updateNetworkInfo);
       if (typeof navigator !== 'undefined' && 'connection' in navigator) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- navigator.connection is not fully standardized
         (navigator as any).connection?.removeEventListener('change', updateNetworkInfo);
       }
     };

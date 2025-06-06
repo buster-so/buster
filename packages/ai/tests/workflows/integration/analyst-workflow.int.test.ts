@@ -14,17 +14,17 @@ describe('Analyst Workflow Integration Tests', () => {
   });
 
   afterAll(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 10000));
   });
 
   test('should successfully execute analyst workflow with valid input', async () => {
     const testInput = {
-      prompt: 'Analyze the quarterly sales data and create action items for improving performance',
+      prompt: 'which products sell the most during christmas time',
     };
 
     const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();
     runtimeContext.set('userId', 'c2dd64cd-f7f3-4884-bc91-d46ae431901e');
-    runtimeContext.set('threadId', 'c2dd64cd-f7f3-4884-bc91-d46ae431901e');
+    runtimeContext.set('threadId', crypto.randomUUID());
     runtimeContext.set('organizationId', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce');
     runtimeContext.set('dataSourceId', 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a');
     runtimeContext.set('dataSourceSyntax', 'postgresql');
@@ -40,7 +40,6 @@ describe('Analyst Workflow Integration Tests', () => {
       { name: 'Analyst Workflow' }
     );
 
-    const result = await tracedWorkflow();
-    console.log(result);
+    const _result = await tracedWorkflow();
   }, 0);
 });

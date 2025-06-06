@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Text } from '@/components/ui/typography';
-import { AppModal } from '@/components/ui/modal';
-import { useMemoizedFn } from '@/hooks';
 import { useGetDatasets } from '@/api/buster_rest/datasets';
-import { InputTextArea } from '@/components/ui/inputs/InputTextArea';
-import { Input } from '@/components/ui/inputs/Input';
-import { SelectMultiple } from '@/components/ui/select/SelectMultiple';
-import { SelectItem } from '@/components/ui/select';
 import { useCreateTerm } from '@/api/buster_rest/terms';
+import { Input } from '@/components/ui/inputs/Input';
+import { InputTextArea } from '@/components/ui/inputs/InputTextArea';
+import { AppModal } from '@/components/ui/modal';
+import type { SelectItem } from '@/components/ui/select';
+import { SelectMultiple } from '@/components/ui/select/SelectMultiple';
+import { Text } from '@/components/ui/typography';
+import { useMemoizedFn } from '@/hooks';
 
 export const NewTermModal: React.FC<{
   open: boolean;
@@ -52,7 +52,8 @@ export const NewTermModal: React.FC<{
   const memoizedHeader = useMemo(() => {
     return {
       title: 'Create term',
-      description: `Define business terms, domain-specific, and more. Any terms and definition you create will be referenced by our LLM features in real-time.`
+      description:
+        'Define business terms, domain-specific, and more. Any terms and definition you create will be referenced by our LLM features in real-time.'
     };
   }, []);
 

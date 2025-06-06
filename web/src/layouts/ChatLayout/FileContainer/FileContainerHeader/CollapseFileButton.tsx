@@ -1,7 +1,7 @@
-import { DoubleChevronRight } from '@/components/ui/icons';
-import { Button } from '@/components/ui/buttons';
-import React, { useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import React from 'react';
+import { Button } from '@/components/ui/buttons';
+import { DoubleChevronRight } from '@/components/ui/icons';
 import { AppTooltip } from '@/components/ui/tooltip';
 
 const animation = {
@@ -25,7 +25,8 @@ export const CollapseFileButton: React.FC<{
               onClick={onCollapseFileClick}
               variant="ghost"
               prefix={icon}
-              data-testid="collapse-file-button"></Button>
+              data-testid="collapse-file-button"
+            />
           </AppTooltip>
         </motion.div>
       )}

@@ -1,14 +1,14 @@
-import { useMemoizedFn } from '@/hooks';
 import React, { useState } from 'react';
-import { SaveToDashboardDropdown } from '../dropdowns/SaveToDashboardDropdown';
-import { Button } from '@/components/ui/buttons';
-import { ASSET_ICONS } from '../config/assetIcons';
 import {
-  useRemoveMetricsFromDashboard,
-  useAddMetricsToDashboard
+  useAddMetricsToDashboard,
+  useRemoveMetricsFromDashboard
 } from '@/api/buster_rest/dashboards';
+import { Button } from '@/components/ui/buttons';
 import { AppTooltip } from '@/components/ui/tooltip';
 import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useMemoizedFn } from '@/hooks';
+import { ASSET_ICONS } from '../config/assetIcons';
+import { SaveToDashboardDropdown } from '../dropdowns/SaveToDashboardDropdown';
 
 export const SaveMetricToDashboardButton: React.FC<{
   metricIds: string[];

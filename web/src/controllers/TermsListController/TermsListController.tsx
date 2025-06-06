@@ -1,21 +1,20 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { AppPageLayoutContent } from '@/components/ui/layouts/AppPageLayoutContent';
-import { Avatar } from '@/components/ui/avatar';
-import { formatDate } from '@/lib/date';
-import {
-  ListEmptyStateWithButton,
-  BusterList,
-  BusterListColumn,
-  BusterListRow
-} from '@/components/ui/list';
-import { BusterRoutes, createBusterRoute } from '@/routes';
 import type { BusterTermListItem } from '@/api/asset_interfaces/terms';
-import { useMemoizedFn } from '@/hooks';
-import { useUserConfigContextSelector } from '@/context/Users';
-import { TermListSelectedOptionPopup } from './TermListSelectedPopup';
 import { useGetTermsList } from '@/api/buster_rest/terms';
+import { Avatar } from '@/components/ui/avatar';
+import {
+  BusterList,
+  type BusterListColumn,
+  type BusterListRow,
+  ListEmptyStateWithButton
+} from '@/components/ui/list';
+import { useUserConfigContextSelector } from '@/context/Users';
+import { useMemoizedFn } from '@/hooks';
+import { formatDate } from '@/lib/date';
+import { BusterRoutes, createBusterRoute } from '@/routes';
+import { TermListSelectedOptionPopup } from './TermListSelectedPopup';
 
 const columns: BusterListColumn[] = [
   {
@@ -81,9 +80,7 @@ export const TermsListController: React.FC<{
               onClick={onOpenNewTermModal}
               buttonText="New term"
             />
-          ) : (
-            <></>
-          )
+          ) : null
         }
       />
       <TermListSelectedOptionPopup

@@ -1,15 +1,15 @@
-import type { BusterMetric } from '@/api/asset_interfaces';
-import { Title, Text } from '@/components/ui/typography';
-import { DotsVertical, Trash } from '@/components/ui/icons';
-import { SortableItemContext } from '@/components/ui/grid/_BusterSortableItemDragContainer';
-import { useMemoizedFn, useMount } from '@/hooks';
-import { Dropdown, DropdownItems } from '@/components/ui/dropdown';
-import { Button } from '@/components/ui/buttons';
 import Link from 'next/link';
-import React, { useContext, useMemo, useState } from 'react';
-import { useRemoveMetricsFromDashboard } from '@/api/buster_rest/dashboards';
-import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
+import React, { useContext, useMemo, useState } from 'react';
+import type { BusterMetric } from '@/api/asset_interfaces';
+import { useRemoveMetricsFromDashboard } from '@/api/buster_rest/dashboards';
+import { Button } from '@/components/ui/buttons';
+import { Dropdown, type DropdownItems } from '@/components/ui/dropdown';
+import { SortableItemContext } from '@/components/ui/grid/_BusterSortableItemDragContainer';
+import { DotsVertical, Trash } from '@/components/ui/icons';
+import { Text, Title } from '@/components/ui/typography';
+import { useMemoizedFn, useMount } from '@/hooks';
+import { cn } from '@/lib/utils';
 
 export const MetricTitle: React.FC<{
   name: BusterMetric['name'];
@@ -66,9 +66,7 @@ export const MetricTitle: React.FC<{
           </div>
         </div>
 
-        {isDragOverlay || readOnly ? (
-          <></>
-        ) : (
+        {isDragOverlay || readOnly ? null : (
           <ThreeDotMenu dashboardId={dashboardId} metricId={metricId} />
         )}
       </Link>
@@ -125,7 +123,7 @@ const ThreeDotMenu: React.FC<{
   return (
     <div
       onClick={onClick}
-      className={cn(`hidden w-8.5 rounded group-hover:block`, className, isOpen && 'block')}>
+      className={cn('hidden w-8.5 rounded group-hover:block', className, isOpen && 'block')}>
       <div className="absolute right-1.5">
         <Dropdown items={dropdownItems} side="top" align="end" onOpenChange={setIsOpen}>
           <Button variant="ghost" className="bg-item-hover!" prefix={<DotsVertical />} />

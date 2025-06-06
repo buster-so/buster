@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 
 test('Can enter in a user name', async ({ page }) => {
   await page.goto('http://localhost:3000/app/new-user');

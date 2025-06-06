@@ -4,8 +4,7 @@ export type ColumnSettings = {
   columnVisualization?: 'bar' | 'line' | 'dot'; //OPTIONAL: default is null. These can be applied to any number column. If this is set to null, then the yAxisColumnVisualization will be inherited from the chart level.
 } & LineColumnSettings &
   BarColumnSettings &
-  DotColumnSettings &
-  DefaultColumnSettings;
+  DotColumnSettings;
 
 type LineColumnSettings = {
   lineWidth?: number; //OPTIONAL: default is 2. This will only apply if the columnVisualization is set to 'line'.
@@ -21,5 +20,3 @@ export type BarColumnSettings = {
 export type DotColumnSettings = {
   lineSymbolSize?: number; //OPTIONAL: default is 10. This will only apply if the columnVisualization is set to 'dot'. This represents the size range of the dots in pixels.
 };
-
-export type DefaultColumnSettings = {};

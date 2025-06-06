@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 test('Can navigate to a metric chart from the metric list', async ({ page }) => {
   await page.goto('http://localhost:3000/app/home');

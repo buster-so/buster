@@ -22,7 +22,6 @@ use tower::ServiceBuilder;
 use tower_http::{compression::CompressionLayer, trace::TraceLayer};
 use tracing::{error, info, warn};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
-use fastembed::{InitOptions, RerankInitOptions, RerankerModel, TextRerank};
 
 pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 
@@ -33,13 +32,6 @@ async fn main() -> Result<(), anyhow::Error> {
 
     let environment = env::var("ENVIRONMENT").unwrap_or_else(|_| "development".to_string());
     let is_development = environment == "development";
-
-    if environment == "local" {
-        let options =
-            RerankInitOptions::new(RerankerModel::JINARerankerV1TurboEn).with_show_download_progress(true);
-        let model = TextRerank::try_new(options)?;
-        println!("Model loaded and ready!");
-    }
 
     ring::default_provider()
         .install_default()

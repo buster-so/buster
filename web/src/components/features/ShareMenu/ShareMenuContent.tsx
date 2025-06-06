@@ -1,12 +1,12 @@
-import { type BusterShare, ShareAssetType, ShareRole } from '@/api/asset_interfaces';
 import React, { useState } from 'react';
-import { ShareMenuTopBar, ShareMenuTopBarOptions } from './ShareMenuTopBar';
-import { ShareMenuContentBody } from './ShareMenuContentBody';
-import { useMemoizedFn } from '@/hooks';
-import { BusterRoutes, createBusterRoute } from '@/routes';
+import { type BusterShare, ShareAssetType } from '@/api/asset_interfaces';
 import { useBusterNotifications } from '@/context/BusterNotifications';
-import { ShareMenuContentEmbedFooter } from './ShareMenuContentEmbed';
+import { useMemoizedFn } from '@/hooks';
 import { getIsEffectiveOwner } from '@/lib/share';
+import { BusterRoutes, createBusterRoute } from '@/routes';
+import { ShareMenuContentBody } from './ShareMenuContentBody';
+import { ShareMenuContentEmbedFooter } from './ShareMenuContentEmbed';
+import { ShareMenuTopBar, ShareMenuTopBarOptions } from './ShareMenuTopBar';
 
 export const ShareMenuContent: React.FC<{
   shareAssetConfig: BusterShare;
@@ -66,7 +66,7 @@ export const ShareMenuContent: React.FC<{
 
       <ShareMenuContentFooter
         selectedOptions={selectedOptions}
-        publicly_accessible={publicly_accessible!}
+        publicly_accessible={publicly_accessible}
         assetId={assetId}
         assetType={assetType}
       />
@@ -110,5 +110,7 @@ const ShareMenuContentFooter = React.memo<{
     );
   }
 
-  return <></>;
+  return null;
 });
+
+ShareMenuContentFooter.displayName = 'ShareMenuContentFooter';

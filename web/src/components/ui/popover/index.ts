@@ -1,2 +1,2 @@
-export * from './PopoverBase';
 export * from './Popover';
+export * from './PopoverBase';

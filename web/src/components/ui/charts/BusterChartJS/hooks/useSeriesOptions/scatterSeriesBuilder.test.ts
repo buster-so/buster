@@ -1,11 +1,11 @@
-import { type IColumnLabelFormat } from '@/api/asset_interfaces/metric';
-import { scatterSeriesBuilder_data, scatterSeriesBuilder_labels } from './scatterSeriesBuilder';
+import { describe, expect, it } from 'vitest';
+import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric';
+import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import { createDayjsDate } from '@/lib/date';
 import type { DatasetOptionsWithTicks } from '../../../chartHooks/useDatasetOptions/interfaces';
-import type { SimplifiedColumnType } from '@/api/asset_interfaces/metric';
 import type { SeriesBuilderProps } from './interfaces';
+import { scatterSeriesBuilder_data, scatterSeriesBuilder_labels } from './scatterSeriesBuilder';
 import type { LabelBuilderProps } from './useSeriesOptions';
-import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 
 describe('scatterSeriesBuilder_data', () => {
   const mockColors = ['#FF0000', '#00FF00'];
@@ -124,7 +124,7 @@ describe('scatterSeriesBuilder_data', () => {
 });
 
 describe('scatterSeriesBuilder_labels', () => {
-  test('should return undefined when trendlineSeries is empty', () => {
+  it('should return undefined when trendlineSeries is empty', () => {
     const props: LabelBuilderProps = {
       trendlineSeries: [],
       datasetOptions: {
@@ -141,8 +141,7 @@ describe('scatterSeriesBuilder_labels', () => {
     const result = scatterSeriesBuilder_labels(props);
     expect(result).toBeUndefined();
   });
-
-  test('should return undefined when no relevant datasets are found', () => {
+  it('should return undefined when no relevant datasets are found', () => {
     const props: LabelBuilderProps = {
       datasetOptions: {
         ticks: [],

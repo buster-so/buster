@@ -8,5 +8,5 @@ export default function AppHomePage() {
     })
   );
 
-  return <></>;
+  return null;
 }

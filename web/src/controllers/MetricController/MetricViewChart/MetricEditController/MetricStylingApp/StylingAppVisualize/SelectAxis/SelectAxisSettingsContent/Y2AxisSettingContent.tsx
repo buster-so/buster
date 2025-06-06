@@ -1,19 +1,16 @@
 import React, { useMemo } from 'react';
-import { useSelectAxisContextSelector } from '../useSelectAxisContext';
-import { SelectAxisContainerId } from '../config';
-import { EditShowAxisTitle } from './EditShowAxisTitle';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import type { ColumnLabelFormat, ComboChartAxis } from '@/api/asset_interfaces/metric/charts';
 import { AXIS_TITLE_SEPARATOR } from '@/components/ui/charts/commonHelpers/axisHelper';
-import { formatLabel } from '@/lib';
-import { useMemoizedFn } from '@/hooks';
-import { EditShowAxisLabel } from './EditShowAxisLabel';
-import { EditAxisScale } from './EditAxisScale';
-import { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { useUpdateMetricChart } from '@/context/Metrics';
+import { useMemoizedFn } from '@/hooks';
+import { formatLabel } from '@/lib';
+import { useSelectAxisContextSelector } from '../useSelectAxisContext';
+import { EditAxisScale } from './EditAxisScale';
+import { EditShowAxisLabel } from './EditShowAxisLabel';
+import { EditShowAxisTitle } from './EditShowAxisTitle';
 
-export const Y2AxisSettingContent: React.FC<{
-  zoneId: SelectAxisContainerId;
-}> = React.memo(({}) => {
+export const Y2AxisSettingContent: React.FC = React.memo(() => {
   const { onUpdateMetricChartConfig } = useUpdateMetricChart();
   const selectedAxis = useSelectAxisContextSelector((x) => x.selectedAxis) as ComboChartAxis;
   const columnLabelFormats = useSelectAxisContextSelector((x) => x.columnLabelFormats);

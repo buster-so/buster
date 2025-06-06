@@ -1,20 +1,18 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { Breadcrumb, BreadcrumbItem } from '@/components/ui/breadcrumb';
-import { Button } from '@/components/ui/buttons';
-import { BusterRoutes } from '@/routes';
-import { AppTooltip } from '@/components/ui/tooltip';
-import { AppSegmented } from '@/components/ui/segmented';
 import { useHotkeys } from 'react-hotkeys-hook';
-import isEmpty from 'lodash/isEmpty';
-import omit from 'lodash/omit';
-import { useMemoizedFn } from '@/hooks';
-import { type SegmentedItem } from '@/components/ui/segmented';
-import { Plus } from '@/components/ui/icons';
-import { BusterCollectionListItem } from '@/api/asset_interfaces/collection';
+import type { BusterCollectionListItem } from '@/api/asset_interfaces/collection';
 import { useGetCollection } from '@/api/buster_rest/collections';
-import { collectionsGetList } from '@/api/buster_rest/collections/requests';
+import type { collectionsGetList } from '@/api/buster_rest/collections/requests';
+import { Breadcrumb, type BreadcrumbItemType } from '@/components/ui/breadcrumb';
+import { Button } from '@/components/ui/buttons';
+import { Plus } from '@/components/ui/icons';
+import type { SegmentedItem } from '@/components/ui/segmented';
+import { AppSegmented } from '@/components/ui/segmented';
+import { AppTooltip } from '@/components/ui/tooltip';
+import { useMemoizedFn } from '@/hooks';
+import { BusterRoutes } from '@/routes';
 
 type CollectionListFilters = Omit<
   Parameters<typeof collectionsGetList>[0],
@@ -42,7 +40,7 @@ export const CollectionListHeader: React.FC<{
     const collectionTitle = collection?.name || 'Collections';
     const showFilters = true;
 
-    const breadcrumbItems: BreadcrumbItem[] = useMemo(
+    const breadcrumbItems: BreadcrumbItemType[] = useMemo(
       () => [
         {
           label: collectionTitle,
@@ -115,7 +113,7 @@ const CollectionFilters: React.FC<{
   }, [filters, collectionListFilters]);
 
   const onChangeFilter = useMemoizedFn((v: SegmentedItem) => {
-    let parsedValue;
+    let parsedValue: CollectionListFilters = {};
     try {
       parsedValue = JSON.parse(v.value as string);
     } catch (error) {

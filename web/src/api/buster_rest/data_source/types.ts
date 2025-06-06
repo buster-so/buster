@@ -1,17 +1,17 @@
 import type {
-  createPostgresDataSource,
-  createMySQLDataSource,
   createBigQueryDataSource,
+  createDatabricksDataSource,
+  createMySQLDataSource,
+  createPostgresDataSource,
   createRedshiftDataSource,
   createSnowflakeDataSource,
-  createDatabricksDataSource,
   createSQLServerDataSource,
-  updatePostgresDataSource,
-  updateMySQLDataSource,
   updateBigQueryDataSource,
+  updateDatabricksDataSource,
+  updateMySQLDataSource,
+  updatePostgresDataSource,
   updateRedshiftDataSource,
   updateSnowflakeDataSource,
-  updateDatabricksDataSource,
   updateSQLServerDataSource
 } from './requests';
 

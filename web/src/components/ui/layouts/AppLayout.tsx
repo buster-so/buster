@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 import { cn } from '@/lib/utils';
 import { AppSplitter } from './AppSplitter/AppSplitter';
 
@@ -19,8 +19,16 @@ export const AppLayout: React.FC<
     sidebar?: React.ReactNode;
     defaultLayout?: [string, string];
     leftHidden?: boolean;
+    autoSaveId?: string;
   }>
-> = ({ children, defaultLayout, floating = true, className = '', sidebar }) => {
+> = ({
+  children,
+  defaultLayout,
+  floating = true,
+  className = '',
+  sidebar,
+  autoSaveId = 'app-layout'
+}) => {
   const PageContent = (
     <PageLayout hasSidebar={!!sidebar} floating={floating} className={className}>
       {children}
@@ -35,10 +43,10 @@ export const AppLayout: React.FC<
     <AppSplitter
       defaultLayout={defaultLayout ?? DEFAULT_LAYOUT}
       className="min-h-screen overflow-hidden"
-      autoSaveId="app-layout"
+      autoSaveId={autoSaveId}
       preserveSide="left"
       splitterClassName={''}
-      leftPanelMinSize={'190px'}
+      leftPanelMinSize={'175px'}
       leftPanelMaxSize={'300px'}
       hideSplitter={true}
       leftChildren={sidebar}

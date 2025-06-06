@@ -1,3 +1,5 @@
+import type { ChartType as ChartJSChartType } from 'chart.js';
+import { useMemo } from 'react';
 import type {
   BusterChartConfigProps,
   BusterChartProps,
@@ -5,18 +7,16 @@ import type {
   ChartType,
   ScatterAxis
 } from '@/api/asset_interfaces/metric/charts';
-import { DatasetOptionsWithTicks } from '../../../chartHooks';
-import { ChartProps } from '../../core';
-import type { ChartType as ChartJSChartType } from 'chart.js';
-import { useMemo } from 'react';
-import { pieSeriesBuilder_data, pieSeriesBuilder_labels } from './pieSeriesBuilder';
-import { barSeriesBuilder, barSeriesBuilder_labels } from './barSeriesBuilder';
-import type { SeriesBuilderProps } from './interfaces';
-import { lineSeriesBuilder, lineSeriesBuilder_labels } from './lineSeriesBuilder';
-import { scatterSeriesBuilder_data, scatterSeriesBuilder_labels } from './scatterSeriesBuilder';
-import { comboSeriesBuilder_data, comboSeriesBuilder_labels } from './comboSeriesBuilder';
 import type { ColumnMetaData } from '@/api/asset_interfaces/metric/interfaces';
 import { isNumericColumnType } from '@/lib';
+import type { DatasetOptionsWithTicks } from '../../../chartHooks';
+import type { ChartProps } from '../../core';
+import { barSeriesBuilder, barSeriesBuilder_labels } from './barSeriesBuilder';
+import { comboSeriesBuilder_data, comboSeriesBuilder_labels } from './comboSeriesBuilder';
+import type { SeriesBuilderProps } from './interfaces';
+import { lineSeriesBuilder, lineSeriesBuilder_labels } from './lineSeriesBuilder';
+import { pieSeriesBuilder_data, pieSeriesBuilder_labels } from './pieSeriesBuilder';
+import { scatterSeriesBuilder_data, scatterSeriesBuilder_labels } from './scatterSeriesBuilder';
 
 export interface UseSeriesOptionsProps {
   selectedChartType: ChartType;

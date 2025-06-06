@@ -1,18 +1,17 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import Link from 'next/link';
+import type React from 'react';
+import { useEffect, useState } from 'react';
+import { DatabaseNames, type DataSourceTypes, SUPPORTED_DATASOURCES } from '@/api/asset_interfaces';
+import { AppDataSourceIcon } from '@/components/ui/icons/AppDataSourceIcons';
+import { Text, Title } from '@/components/ui/typography';
+import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
+import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/classMerge';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { HeaderContainer } from '../../_HeaderContainer';
-import { useState } from 'react';
-import { DatabaseNames, DataSourceTypes, SUPPORTED_DATASOURCES } from '@/api/asset_interfaces';
 import { DataSourceFormContent } from '../[datasourceId]/_forms/DatasourceFormContent';
-import { Title, Text } from '@/components/ui/typography';
-import { cn } from '@/lib/classMerge';
-import { AppDataSourceIcon } from '@/components/ui/icons/AppDataSourceIcons';
-import { useRouter } from 'next/navigation';
-import { useMemoizedFn } from '@/hooks';
-import Link from 'next/link';
-import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 
 export default function Page({
   searchParams: { type }
@@ -63,27 +62,25 @@ export default function Page({
   );
 }
 
-const ConnectHeader: React.FC<{}> = ({}) => {
+const ConnectHeader: React.FC = () => {
   return (
     <div className="flex flex-col space-y-1">
-      <Title as="h3">{`Connect a datasource`}</Title>
-      <Text variant="secondary">{`Select the datasource you’d like to connect`}</Text>
+      <Title as="h3">{'Connect a datasource'}</Title>
+      <Text variant="secondary">{"Select the datasource you'd like to connect"}</Text>
     </div>
   );
 };
 
-const DataSourceList: React.FC<{}> = ({}) => {
+const DataSourceList: React.FC = () => {
   return (
     <div className="grid grid-cols-3 gap-4">
       {SUPPORTED_DATASOURCES.map((dataSource) => {
         const name = DatabaseNames[dataSource];
         return (
           <Link
-            href={
-              createBusterRoute({
-                route: BusterRoutes.SETTINGS_DATASOURCES_ADD
-              }) + `?type=${dataSource}`
-            }
+            href={`${createBusterRoute({
+              route: BusterRoutes.SETTINGS_DATASOURCES_ADD
+            })}?type=${dataSource}`}
             key={dataSource}
             className={cn(
               'flex cursor-pointer items-center space-x-4 px-4 py-3 shadow transition',

@@ -1,24 +1,26 @@
+import Link from 'next/link';
 import React, { useMemo } from 'react';
-import { FileContainerButtonsProps } from '../interfaces';
-import { MetricFileViewSecondary, useChatLayoutContextSelector } from '../../../ChatLayoutContext';
+import { useGetMetric } from '@/api/buster_rest/metrics';
+import { SquareChartPen } from '@/components/ui/icons';
+import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
+import { useIsMetricReadOnly } from '@/context/Metrics/useIsMetricReadOnly';
 import { useMemoizedFn } from '@/hooks';
-import { useChatIndividualContextSelector } from '../../../ChatContext';
-import { HideButtonContainer } from '../HideButtonContainer';
-import { FileButtonContainer } from '../FileButtonContainer';
-import { CreateChatButton } from '../CreateChatButtont';
-import { SelectableButton } from '../SelectableButton';
+import { assetParamsToRoute } from '@/lib/assets';
+import { canEdit, getIsEffectiveOwner } from '@/lib/share';
 import { SaveMetricToCollectionButton } from '../../../../../components/features/buttons/SaveMetricToCollectionButton';
 import { SaveMetricToDashboardButton } from '../../../../../components/features/buttons/SaveMetricToDashboardButton';
 import { ShareMetricButton } from '../../../../../components/features/buttons/ShareMetricButton';
-import { SquareChartPen, SquareCode } from '@/components/ui/icons';
-import { useGetMetric } from '@/api/buster_rest/metrics';
+import { useChatIndividualContextSelector } from '../../../ChatContext';
+import {
+  type MetricFileViewSecondary,
+  useChatLayoutContextSelector
+} from '../../../ChatLayoutContext';
+import { CreateChatButton } from '../CreateChatButtont';
+import { FileButtonContainer } from '../FileButtonContainer';
+import { HideButtonContainer } from '../HideButtonContainer';
+import type { FileContainerButtonsProps } from '../interfaces';
+import { SelectableButton } from '../SelectableButton';
 import { ThreeDotMenuButton } from './MetricThreeDotMenu';
-import { canEdit, getIsEffectiveOwner } from '@/lib/share';
-import Link from 'next/link';
-import { assetParamsToRoute } from '@/lib/assets';
-import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
-import { useIsMetricReadOnly } from '@/context/Metrics/useIsMetricReadOnly';
-import { BusterRoutes, createBusterRoute } from '@/routes';
 
 export const MetricContainerHeaderButtons: React.FC<FileContainerButtonsProps> = React.memo(
   ({ selectedFileId }) => {

@@ -1,7 +1,7 @@
-import { describe, it, expect } from '@jest/globals';
-import { dataMapper } from './dataMapper';
+import { describe, expect, it } from 'vitest';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import { dataMapper } from './dataMapper';
 
 describe('dataMapper', () => {
   it('should handle numeric x-axis values correctly', () => {

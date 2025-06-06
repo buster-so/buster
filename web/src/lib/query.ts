@@ -1,8 +1,9 @@
-import { RustApiError } from '@/api/buster_rest/errors';
+import type { QueryClient, queryOptions } from '@tanstack/react-query';
+import type { RustApiError } from '@/api/buster_rest/errors';
 import { userQueryKeys } from '@/api/query_keys/users';
-import { QueryClient, queryOptions } from '@tanstack/react-query';
 
 export const isQueryStale = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- It really doesn't matter what the type is here
   options: ReturnType<typeof queryOptions<any, RustApiError, any>>,
   queryClient: QueryClient
 ): boolean => {

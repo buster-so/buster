@@ -1,8 +1,8 @@
-import { useGetDashboard } from '@/api/buster_rest/dashboards';
-import { canEdit, getIsOwner } from '@/lib/share';
-import { useMemo } from 'react';
 import last from 'lodash/last';
+import { useMemo } from 'react';
+import { useGetDashboard } from '@/api/buster_rest/dashboards';
 import { useChatLayoutContextSelector } from '@/layouts/ChatLayout';
+import { canEdit } from '@/lib/share';
 
 export const useIsDashboardReadOnly = ({
   dashboardId,

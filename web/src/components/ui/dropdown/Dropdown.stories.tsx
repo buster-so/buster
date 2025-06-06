@@ -1,12 +1,12 @@
 'use client';
 
+import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react';
-import { Dropdown, DropdownItems } from './Dropdown';
+import { fn } from '@storybook/test';
+import React from 'react';
 import { Button } from '../buttons/Button';
 import { PaintRoller, Star, Storage } from '../icons';
-import { faker } from '@faker-js/faker';
-import React from 'react';
-import { fn } from '@storybook/test';
+import { Dropdown, type DropdownItems } from './Dropdown';
 
 const meta: Meta<typeof Dropdown> = {
   title: 'UI/Dropdowns/Dropdown',

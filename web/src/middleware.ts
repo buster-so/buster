@@ -1,10 +1,11 @@
-import { NextResponse, type NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { updateSession } from '@/middleware/supabaseMiddleware';
-import { pathnameMiddleware } from './middleware/pathnameMiddleware';
 import { assetReroutes } from './middleware/assetReroutes';
+import { pathnameMiddleware } from './middleware/pathnameMiddleware';
 
 export async function middleware(request: NextRequest) {
   try {
+    // eslint-disable-next-line prefer-const
     let [response, user] = await updateSession(request);
 
     response = await pathnameMiddleware(request, response);

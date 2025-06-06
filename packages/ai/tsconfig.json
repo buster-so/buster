@@ -23,6 +23,8 @@
       "@tools/*": ["src/tools/*"],
       "@agents/*": ["src/agents/*"],
       "@workflows/*": ["src/workflows/*"],
+      "@utils/*": ["src/utils/*"],
+      "@memory/*": ["src/utils/memory/*"],
       "@access-controls/*": ["../../access-controls/src/*"]
     }
   },

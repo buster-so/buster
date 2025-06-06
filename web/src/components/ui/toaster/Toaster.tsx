@@ -1,9 +1,9 @@
 'use client';
 
-import React from 'react';
 import { useTheme } from 'next-themes';
+import type React from 'react';
 import { Toaster as ToasterSonner } from 'sonner';
-import { CircleCheck, CircleXmark, CircleWarning } from '@/components/ui/icons/NucleoIconFilled';
+import { CircleCheck, CircleWarning, CircleXmark } from '@/components/ui/icons/NucleoIconFilled';
 
 type ToasterProps = React.ComponentProps<typeof ToasterSonner>;
 

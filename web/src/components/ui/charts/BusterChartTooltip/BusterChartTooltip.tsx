@@ -1,7 +1,7 @@
-import React from 'react';
-import { TooltipTitle } from './TooltipTitle';
+import type React from 'react';
 import type { ITooltipItem } from './interfaces';
 import { TooltipItem } from './TooltipItem';
+import { TooltipTitle } from './TooltipTitle';
 
 const MAX_ITEMS_IN_TOOLTIP = 12;
 
@@ -29,7 +29,7 @@ export const BusterChartTooltip: React.FC<{
               : 'grid-cols-[auto_auto] items-center gap-x-3 gap-y-[3px]'
           }`}>
           {shownItems.map((param, index) => (
-            <TooltipItem key={index} {...param} />
+            <TooltipItem key={`${param.seriesType}-${index}`} {...param} />
           ))}
         </div>
 

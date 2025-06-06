@@ -1,8 +1,8 @@
-import isNumber from 'lodash/isNumber';
-import round from 'lodash/round';
-import max from 'lodash/max';
-import isString from 'lodash/isString';
 import isDate from 'lodash/isDate';
+import isNumber from 'lodash/isNumber';
+import isString from 'lodash/isString';
+import max from 'lodash/max';
+import round from 'lodash/round';
 
 export const roundNumber = (
   input: string | number | undefined,
@@ -27,7 +27,7 @@ export const isNumeric = (str: string | undefined | number | Date | null) => {
   if (typeof str === 'boolean') return false;
   if (str === '') return false;
   if (isDate(str)) return false;
-  return !isNaN(+str) && !isNaN(parseFloat(str)); // Ensure the entire string is parsed
+  return !Number.isNaN(+str) && !Number.isNaN(Number.parseFloat(str)); // Ensure the entire string is parsed
 };
 
 export const formatNumber = (
@@ -46,8 +46,9 @@ export const formatNumber = (
   if (value === undefined || value === null) return '';
   if (!isNumeric(value)) return String(value);
 
+  let processedValue = value;
   if (options?.minDecimals || options?.maximumDecimals) {
-    value = roundNumber(value, options?.minDecimals, options?.maximumDecimals);
+    processedValue = roundNumber(value, options?.minDecimals, options?.maximumDecimals);
   }
 
   const maxFractionDigits = max(
@@ -70,10 +71,10 @@ export const formatNumber = (
       useGrouping: options?.useGrouping !== false
     });
 
-    return formatter.format(Number(value));
+    return formatter.format(Number(processedValue));
   } catch (error) {
-    console.error('error', error, { value, options });
-    return String(value);
+    console.error('error', error, { value: processedValue, options });
+    return String(processedValue);
   }
 
   /*

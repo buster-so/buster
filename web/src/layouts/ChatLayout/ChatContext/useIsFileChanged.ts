@@ -1,7 +1,7 @@
-import { useIsMetricChanged } from '@/context/Metrics';
-import { SelectedFile } from '../interfaces';
-import { useIsDashboardChanged } from '@/context/Dashboards';
 import { useMemo } from 'react';
+import { useIsDashboardChanged } from '@/context/Dashboards';
+import { useIsMetricChanged } from '@/context/Metrics';
+import type { SelectedFile } from '../interfaces';
 
 type UseIsFileChangeReturn = {
   isFileChanged: boolean;

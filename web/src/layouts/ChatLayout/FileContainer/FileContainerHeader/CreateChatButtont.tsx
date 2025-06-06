@@ -1,14 +1,14 @@
-import { Stars } from '@/components/ui/icons';
-import { Button } from '@/components/ui/buttons';
 import React, { useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { useMemoizedFn } from '@/hooks';
-import { AppTooltip } from '@/components/ui/tooltip';
 import { useStartChatFromAsset } from '@/api/buster_rest/chats/queryRequests';
+import { Button } from '@/components/ui/buttons';
+import { Stars } from '@/components/ui/icons';
+import { AppTooltip } from '@/components/ui/tooltip';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
+import { useMemoizedFn } from '@/hooks';
+import { timeout } from '@/lib/timeout';
 import { BusterRoutes } from '@/routes';
 import { useChatLayoutContextSelector } from '../../ChatLayoutContext';
-import { timeout } from '@/lib/timeout';
 
 export const CreateChatButton = React.memo(
   ({ assetId, assetType }: { assetId: string; assetType: 'metric' | 'dashboard' }) => {

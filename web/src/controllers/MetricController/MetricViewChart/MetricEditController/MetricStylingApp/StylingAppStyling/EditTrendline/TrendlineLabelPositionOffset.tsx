@@ -1,7 +1,7 @@
 import React from 'react';
-import { LabelAndInput } from '../../Common';
-import { LoopTrendline } from './EditTrendline';
 import { Slider } from '@/components/ui/slider';
+import { LabelAndInput } from '../../Common';
+import type { LoopTrendline } from './EditTrendline';
 
 interface TrendlineLabelPositionOffsetProps {
   trend: LoopTrendline;

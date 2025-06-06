@@ -1,8 +1,7 @@
-import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
-import { ChevronRight, Dots } from '../icons';
-
+import * as React from 'react';
 import { cn } from '@/lib/utils';
+import { ChevronRight, Dots } from '../icons';
 
 const Breadcrumb = React.forwardRef<
   HTMLElement,
@@ -64,6 +63,7 @@ const BreadcrumbPage = React.forwardRef<HTMLSpanElement, React.ComponentPropsWit
       aria-disabled="true"
       aria-current="page"
       className={cn('text-foreground truncate font-normal', className)}
+      tabIndex={0}
       {...props}
     />
   )

@@ -1,13 +1,17 @@
-import { DataSource, RedshiftCredentials, RedshiftCredentialsSchema } from '@/api/asset_interfaces';
-import React from 'react';
-import { FormWrapper } from './FormWrapper';
+import type React from 'react';
 import {
-  createRedshiftDataSource,
+  type DataSource,
+  type RedshiftCredentials,
+  RedshiftCredentialsSchema
+} from '@/api/asset_interfaces';
+import {
+  type createRedshiftDataSource,
   useCreateRedshiftDataSource,
   useUpdateRedshiftDataSource
 } from '@/api/buster_rest/data_source';
-import { useAppForm } from '@/components/ui/form/useFormBaseHooks';
 import { MultipleInlineFields } from '@/components/ui/form/FormBase';
+import { useAppForm } from '@/components/ui/form/useFormBaseHooks';
+import { FormWrapper } from './FormWrapper';
 import { useDataSourceFormSuccess } from './helpers';
 
 export const RedshiftForm: React.FC<{
@@ -35,7 +39,7 @@ export const RedshiftForm: React.FC<{
       await dataSourceFormSubmit({
         flow,
         dataSourceId: dataSource?.id,
-        onUpdate: () => updateDataSource({ id: dataSource!.id, ...value }),
+        onUpdate: () => updateDataSource({ id: dataSource?.id || '', ...value }),
         onCreate: () => createDataSource(value)
       });
     },
@@ -50,59 +54,52 @@ export const RedshiftForm: React.FC<{
 
   return (
     <FormWrapper form={form} flow={flow}>
-      <form.AppField
-        name="name"
-        children={(field) => (
+      <form.AppField name="name">
+        {(field) => (
           <field.TextField labelClassName={labelClassName} label="Name" placeholder="My Redshift" />
         )}
-      />
+      </form.AppField>
 
       <MultipleInlineFields label="Hostname & port" labelClassName={labelClassName}>
-        <form.AppField
-          name="host"
-          children={(field) => (
+        <form.AppField name="host">
+          {(field) => (
             <field.TextField
               label={null}
               placeholder="cluster-name.region.redshift.amazonaws.com"
             />
           )}
-        />
-        <form.AppField
-          name="port"
-          children={(field) => (
+        </form.AppField>
+        <form.AppField name="port">
+          {(field) => (
             <field.NumberField label={null} placeholder="5439" className="max-w-[75px]!" />
           )}
-        />
+        </form.AppField>
       </MultipleInlineFields>
 
       <MultipleInlineFields label="Username & password" labelClassName={labelClassName}>
-        <form.AppField
-          name="username"
-          children={(field) => <field.TextField label={null} placeholder="awsuser" />}
-        />
-        <form.AppField
-          name="password"
-          children={(field) => <field.PasswordField label={null} placeholder="password" />}
-        />
+        <form.AppField name="username">
+          {(field) => <field.TextField label={null} placeholder="awsuser" />}
+        </form.AppField>
+        <form.AppField name="password">
+          {(field) => <field.PasswordField label={null} placeholder="password" />}
+        </form.AppField>
       </MultipleInlineFields>
 
-      <form.AppField
-        name="default_database"
-        children={(field) => (
+      <form.AppField name="default_database">
+        {(field) => (
           <field.TextField
             labelClassName={labelClassName}
             label="Database name"
             placeholder="dev"
           />
         )}
-      />
+      </form.AppField>
 
-      <form.AppField
-        name="default_schema"
-        children={(field) => (
+      <form.AppField name="default_schema">
+        {(field) => (
           <field.TextField labelClassName={labelClassName} label="Schema" placeholder="public" />
         )}
-      />
+      </form.AppField>
     </FormWrapper>
   );
 };

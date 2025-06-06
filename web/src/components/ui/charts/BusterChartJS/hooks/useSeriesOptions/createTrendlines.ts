@@ -1,16 +1,16 @@
 import {
-  DEFAULT_TRENDLINE_CONFIG,
   type BusterChartProps,
-  type ChartEncodes
+  type ChartEncodes,
+  DEFAULT_TRENDLINE_CONFIG
 } from '@/api/asset_interfaces/metric';
-import {
+import { formatLabel } from '@/lib/columnFormatter';
+import type {
   AggregateMultiple,
   TrendlineOptions,
   TrendlinePluginOptions
 } from '../../core/plugins/chartjs-plugin-trendlines';
-import { TypeToLabel } from '../../core/plugins/chartjs-plugin-trendlines/config';
-import { formatLabel } from '@/lib/columnFormatter';
 import { canSupportTrendlineRecord } from '../../core/plugins/chartjs-plugin-trendlines/canSupportTrendline';
+import { TypeToLabel } from '../../core/plugins/chartjs-plugin-trendlines/config';
 
 export const createTrendlineOnSeries = ({
   trendlines,
@@ -124,7 +124,7 @@ export const createAggregrateTrendlines = ({
       useAggregateTrendlines: true
     });
 
-    if (result && result[0]) {
+    if (result?.[0]) {
       const isYAxis = selectedAxis.y.includes(trendline.columnId);
       acc.push({
         ...result[0],

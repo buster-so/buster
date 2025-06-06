@@ -1,9 +1,9 @@
 import {
-  BusterDashboard,
-  BusterDashboardResponse,
+  type BusterDashboard,
+  type BusterDashboardResponse,
+  ShareRole,
   VerificationStatus
 } from '@/api/asset_interfaces';
-import { ShareRole } from '@/api/asset_interfaces';
 import { createMockMetric } from './metric';
 
 interface DashboardMockResponse {
@@ -19,7 +19,7 @@ const createMockDashboardRow = (startIndex: number, metrics: string[], columnSiz
 
 export const generateMockDashboard = (
   numMetrics: number,
-  dashboardId: string = '123'
+  dashboardId = '123'
 ): DashboardMockResponse => {
   // Generate the specified number of metrics
   const metrics = Array.from({ length: numMetrics }, (_, i) => createMockMetric(`${i + 1}`));
@@ -65,9 +65,11 @@ export const generateMockDashboard = (
     } else {
       // Add a row with 1 column
       rows.push(
-        createMockDashboardRow(rows.length + 1, metricIds.slice(currentIndex, currentIndex + 1), [
-          12
-        ])
+        createMockDashboardRow(
+          rows.length + 1,
+          metricIds.slice(currentIndex, currentIndex + 1),
+          [12]
+        )
       );
       currentIndex += 1;
     }
@@ -109,7 +111,7 @@ refresh_interval: 300`,
 
   const response: BusterDashboardResponse = {
     access: ShareRole.CAN_EDIT,
-    metrics: metrics.reduce((acc, metric) => ({ ...acc, [metric.id]: metric }), {}),
+    metrics: Object.fromEntries(metrics.map((metric) => [metric.id, metric])),
     dashboard,
     permission: ShareRole.CAN_EDIT,
     public_password: null,

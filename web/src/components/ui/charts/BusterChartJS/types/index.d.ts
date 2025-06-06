@@ -1,13 +1,6 @@
-import {
-  ChartType,
-  Plugin,
-  CartesianScaleTypeRegistry,
-  ScaleOptionsByType,
-  ChartTypeRegistry
-} from 'chart.js';
-import { OutLabelsOptions, TextCenterPluginOptions } from '../BusterPieChartJs/plugins';
-import { ChartHoverBarPluginOptions } from '../core/plugins';
-import { Options } from 'chartjs-plugin-datalabels/types';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import type { ChartType } from 'chart.js';
+import type { ChartHoverBarPluginOptions } from '../core/plugins';
 
 declare module 'chart.js' {
   interface ChartDatasetProperties<TType extends ChartType, TData> {
@@ -19,6 +12,9 @@ declare module 'chart.js' {
     }[][];
     xAxisKeys: string[];
     yAxisKey: string; //this is the key of the y axis
+
+    // just for pie charts
+    radius?: TType extends 'pie' ? number | string : never;
   }
 
   interface PluginOptionsByType<TType extends ChartType> {
@@ -31,9 +27,5 @@ declare module 'chart.js' {
 
   interface ChartConfigurationCustomTypesPerDataset<TType extends ChartType = ChartType> {
     type: TType;
-  }
-
-  interface CoreChartOptions<TType extends ChartType> {
-    //
   }
 }

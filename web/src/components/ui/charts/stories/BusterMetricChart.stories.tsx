@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { BusterMetricChart } from '../MetricChart/BusterMetricChart';
 import { DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import type { ColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import { BusterMetricChart } from '../MetricChart/BusterMetricChart';
 
 const meta: Meta<typeof BusterMetricChart> = {
   title: 'UI/Charts/BusterChart/BusterMetricChart',

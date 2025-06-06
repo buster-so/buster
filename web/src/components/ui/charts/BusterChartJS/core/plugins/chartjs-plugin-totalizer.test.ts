@@ -1,10 +1,7 @@
-/**
- * @jest-environment jsdom
- */
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
-import { Chart, ChartConfiguration, ChartTypeRegistry } from 'chart.js';
+import { Chart } from 'chart.js';
 import { ChartTotalizerPlugin } from './chartjs-plugin-totalizer';
-import { ChartType } from 'chart.js';
 
 // Mock canvas and Chart.js setup
 beforeAll(() => {
@@ -35,8 +32,7 @@ describe('ChartTotalizerPlugin', () => {
       })
     };
   });
-
-  test('plugin initializes with empty totals', () => {
+  it('plugin initializes with empty totals', () => {
     // Call the start hook
     ChartTotalizerPlugin.start?.(mockChart, mockArgs, { enabled: true });
 
@@ -44,8 +40,7 @@ describe('ChartTotalizerPlugin', () => {
     expect(mockChart.$totalizer.stackTotals).toEqual({});
     expect(mockChart.$totalizer.seriesTotals).toEqual([]);
   });
-
-  test('calculates correct stack totals for visible datasets', () => {
+  it('calculates correct stack totals for visible datasets', () => {
     // Set up multiple datasets
     mockChart.data.datasets = [
       { data: [10, 20, 30], label: 'Dataset 1', hidden: false },
@@ -62,8 +57,7 @@ describe('ChartTotalizerPlugin', () => {
       2: 55 // 30 + 25
     });
   });
-
-  test('ignores hidden datasets in calculations', () => {
+  it('ignores hidden datasets in calculations', () => {
     // Set up datasets with one hidden
     mockChart.data.datasets = [
       { data: [10, 20, 30], label: 'Dataset 1', hidden: false },
@@ -80,8 +74,7 @@ describe('ChartTotalizerPlugin', () => {
       2: 30
     });
   });
-
-  test('calculates correct series totals', () => {
+  it('calculates correct series totals', () => {
     // Set up multiple datasets
     mockChart.data.datasets = [
       { data: [10, 20, 30], label: 'Dataset 1', hidden: false },

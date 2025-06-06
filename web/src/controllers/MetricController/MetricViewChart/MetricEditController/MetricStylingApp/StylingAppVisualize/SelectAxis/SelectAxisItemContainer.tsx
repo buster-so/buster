@@ -1,15 +1,15 @@
+import type { DraggableAttributes } from '@dnd-kit/core';
+import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
 import React, { useMemo } from 'react';
+import type { ChartEncodes, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
+import { ErrorBoundary } from '@/components/ui/error';
+import { useUpdateMetricChart } from '@/context/Metrics';
+import { useMemoizedFn } from '@/hooks';
+import { CollapseDelete } from '../../Common/CollapseDelete';
+import { chartTypeToAxis, type SelectAxisContainerId, zoneIdToAxis } from './config';
+import { SelectAxisDropdownContent } from './SelectAxisColumnContent';
 import { SelectAxisItemLabel } from './SelectAxisItemLabel';
 import { useSelectAxisContextSelector } from './useSelectAxisContext';
-import { useMemoizedFn } from '@/hooks';
-import { chartTypeToAxis, SelectAxisContainerId, zoneIdToAxis } from './config';
-import { SelectAxisDropdownContent } from './SelectAxisColumnContent';
-import { ChartEncodes, IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts';
-import { CollapseDelete } from '../../Common/CollapseDelete';
-import { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities';
-import { DraggableAttributes } from '@dnd-kit/core';
-import { useUpdateMetricChart } from '@/context/Metrics';
-import { ErrorBoundary } from '@/components/ui/error';
 
 interface SelectAxisItemContainerProps {
   id: string;
@@ -54,6 +54,7 @@ export const SelectAxisItemContainer = React.memo(
 
       return (
         <div
+          data-testid={`select-axis-drop-zone-${id}`}
           className={`transition-opacity duration-200 ${isPlaceholder ? 'opacity-0' : 'opacity-100'}`}>
           <CollapseDelete
             ref={ref}

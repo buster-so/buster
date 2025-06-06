@@ -296,13 +296,13 @@ describeFn('search.ts - Integration Tests', () => {
       // Check that they have the same length and are reasonably close
       expect(embedding1).toHaveLength(1536);
       expect(embedding2).toHaveLength(1536);
-      
+
       // Calculate cosine similarity to verify they're very similar
       const dotProduct = embedding1.reduce((sum, a, i) => sum + a * embedding2[i], 0);
       const magnitude1 = Math.sqrt(embedding1.reduce((sum, a) => sum + a * a, 0));
       const magnitude2 = Math.sqrt(embedding2.reduce((sum, a) => sum + a * a, 0));
       const similarity = dotProduct / (magnitude1 * magnitude2);
-      
+
       // Should be highly similar (> 0.99) for the same input
       expect(similarity).toBeGreaterThan(0.99);
     }, 30000);

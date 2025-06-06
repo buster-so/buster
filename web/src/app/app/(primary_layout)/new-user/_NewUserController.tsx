@@ -1,17 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Title, Paragraph } from '@/components/ui/typography';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useUserConfigContextSelector } from '@/context/Users';
-import { inputHasText } from '@/lib/text';
-import { useMemoizedFn } from '@/hooks';
-import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
-import { BusterRoutes } from '@/routes/busterRoutes';
-import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useState } from 'react';
+import { useCreateUserOrganization } from '@/api/buster_rest/users';
 import { Button } from '@/components/ui/buttons';
 import { Input } from '@/components/ui/inputs';
-import { useCreateUserOrganization } from '@/api/buster_rest/users';
+import { Paragraph, Title } from '@/components/ui/typography';
+import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
+import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useUserConfigContextSelector } from '@/context/Users';
+import { useMemoizedFn } from '@/hooks';
+import { inputHasText } from '@/lib/text';
+import { BusterRoutes } from '@/routes/busterRoutes';
 
 export const NewUserController = () => {
   const [started, setStarted] = useState(false);

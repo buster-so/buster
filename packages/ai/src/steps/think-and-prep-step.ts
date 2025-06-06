@@ -1,5 +1,6 @@
 import { createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
+import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { thinkAndPrepAgent } from '../agents/think-and-prep-agent/think-and-prep-agent';
 import type {
@@ -16,11 +17,20 @@ const inputSchema = z.object({
   'generate-chat-title': generateChatTitleOutputSchema,
 });
 
+import {
+  extractMessageHistory,
+  getAllToolsUsed,
+  getLastToolUsed,
+} from '../utils/memory/message-history';
+import {
+  type MessageHistory,
+  type StepFinishData,
+  ThinkAndPrepOutputSchema,
+} from '../utils/memory/types';
+
 export const thinkAndPrepOutputSchema = z.object({});
 
-const outputSchema = z.object({});
-
-const abortSignal = new AbortController();
+const outputSchema = ThinkAndPrepOutputSchema;
 
 const thinkAndPrepExecution = async ({
   inputData,
@@ -31,37 +41,106 @@ const thinkAndPrepExecution = async ({
   getInitData: () => Promise<z.infer<typeof thinkAndPrepWorkflowInputSchema>>;
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof outputSchema>> => {
-  const threadId = runtimeContext.get('threadId');
-  const resourceId = runtimeContext.get('userId');
+  const abortController = new AbortController();
 
-  const initData = await getInitData();
-
-  const prompt = initData.prompt;
-
-  const todos = inputData['create-todos'].todos;
-
-  runtimeContext.set('todos', todos);
+  let outputMessages: MessageHistory = [];
+  let finished = false;
+  let finalStepData: StepFinishData | null = null;
 
   try {
-    await thinkAndPrepAgent.generate(prompt, {
-      maxSteps: 15,
-      threadId: threadId,
-      resourceId: resourceId,
-      runtimeContext,
-      abortSignal: abortSignal.signal,
-      onStepFinish: (step) => {
-        if (step.toolResults.some((result) => result.toolName === 'submit-thoughts')) {
-          abortSignal.abort();
-        }
+    const threadId = runtimeContext.get('threadId');
+    const resourceId = runtimeContext.get('userId');
+
+    if (!threadId || !resourceId) {
+      console.error('Missing required context values');
+      throw new Error('Missing required context values');
+    }
+
+    const initData = await getInitData();
+    const prompt = initData.prompt;
+    const todos = inputData['create-todos'].todos;
+
+    runtimeContext.set('todos', todos);
+
+    const wrappedStream = wrapTraced(
+      async () => {
+        const stream = await thinkAndPrepAgent.stream(prompt, {
+          threadId: threadId,
+          resourceId: resourceId,
+          runtimeContext,
+          abortSignal: abortController.signal,
+          toolChoice: 'required',
+          onStepFinish: async (step) => {
+            const toolNames = step.toolCalls.map((call) => call.toolName);
+
+            if (
+              toolNames.some((toolName) =>
+                ['submitThoughtsTool', 'finishAndRespondTool'].includes(toolName)
+              )
+            ) {
+              // Extract and validate messages from the step response
+              // step.response.messages contains the conversation history for this step
+              outputMessages = extractMessageHistory(step.response.messages);
+
+              // Store the full step data (cast to our expected type)
+              finalStepData = step as any;
+
+              // Set finished to true if finishAndRespondTool was called
+              if (toolNames.includes('finishAndRespondTool')) {
+                finished = true;
+              }
+
+              abortController.abort();
+            }
+          },
+        });
+
+        return stream;
       },
-    });
+      {
+        name: 'Think and Prep',
+      }
+    );
+
+    const stream = await wrappedStream();
+
+    for await (const _ of stream.fullStream) {
+    }
+
+    return {
+      finished,
+      outputMessages,
+      stepData: finalStepData as any,
+      metadata: {
+        toolsUsed: getAllToolsUsed(outputMessages),
+        finalTool: getLastToolUsed(outputMessages) as
+          | 'submitThoughtsTool'
+          | 'finishAndRespondTool'
+          | undefined,
+        text: (finalStepData as any)?.text,
+        reasoning: (finalStepData as any)?.reasoning,
+      },
+    };
   } catch (error) {
-    if (error instanceof AbortSignal) {
-      return {};
+    if (error instanceof Error && error.name !== 'AbortError') {
+      throw new Error('Unable to connect to the analysis service. Please try again later.');
     }
   }
 
-  return {};
+  return {
+    finished,
+    outputMessages,
+    stepData: finalStepData,
+    metadata: {
+      toolsUsed: getAllToolsUsed(outputMessages),
+      finalTool: getLastToolUsed(outputMessages) as
+        | 'submitThoughtsTool'
+        | 'finishAndRespondTool'
+        | undefined,
+      text: (finalStepData as any)?.text,
+      reasoning: (finalStepData as any)?.reasoning,
+    },
+  };
 };
 
 export const thinkAndPrepStep = createStep({

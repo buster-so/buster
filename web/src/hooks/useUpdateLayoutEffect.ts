@@ -1,6 +1,6 @@
 'use client';
 
-import { useLayoutEffect, useRef } from 'react';
+import { type DependencyList, useLayoutEffect, useRef } from 'react';
 
 /**
  * A hook that executes a function on the second update and subsequent updates.
@@ -8,7 +8,7 @@ import { useLayoutEffect, useRef } from 'react';
  * @param effect The effect function to run
  * @param deps The dependencies array
  */
-export const useUpdateLayoutEffect = (effect: () => void | (() => void), deps?: any[]) => {
+export const useUpdateLayoutEffect = (effect: () => void, deps?: DependencyList) => {
   const isFirstRender = useRef(true);
 
   useLayoutEffect(() => {

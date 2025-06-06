@@ -1,5 +1,5 @@
+import { useMemo } from 'react';
 import type { BusterChartProps } from '@/api/asset_interfaces/metric/charts';
-import React, { useMemo } from 'react';
 
 const UNSUPPORTED_CHART_TYPES = ['metric', 'table'];
 
@@ -38,7 +38,7 @@ export const useLegendAutoShow = ({
       return true;
     }
 
-    const defaultShowLegend = categoryAxisColumnNames?.length ? true : false;
+    const defaultShowLegend = !!categoryAxisColumnNames?.length;
 
     return defaultShowLegend;
   }, [selectedChartType, allYAxisColumnNames, categoryAxisColumnNames, showLegendProp]);

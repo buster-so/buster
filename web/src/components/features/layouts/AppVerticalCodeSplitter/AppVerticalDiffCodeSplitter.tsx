@@ -1,8 +1,7 @@
-import React, { forwardRef } from 'react';
-import { AppSplitter, type AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
-import { SQLContainer } from './SQLContainer';
-import { DataContainer } from './DataContainer';
+import { forwardRef } from 'react';
 import type { IDataResult } from '@/api/asset_interfaces';
+import { AppSplitter, type AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
+import { DataContainer } from './DataContainer';
 import { DiffSQLContainer } from './DiffSQLContainer';
 
 const DEFAULT_LAYOUT = ['auto', '300px'];

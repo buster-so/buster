@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { createSelectedFile } from './createSelectedFile';
 import type { ChatURLParsed } from './parsePathnameSegments';
 

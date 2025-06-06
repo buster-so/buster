@@ -1,20 +1,19 @@
-import React, { useMemo, useRef } from 'react';
-import { Button } from '@/components/ui/buttons';
-import { Xmark, History } from '@/components/ui/icons';
-import { Check3 } from '@/components/ui/icons/NucleoIconFilled';
-import { Text } from '@/components/ui/typography';
-import { useCloseVersionHistory } from '@/layouts/ChatLayout/FileContainer/FileContainerHeader/FileContainerHeaderVersionHistory';
-import { cn } from '@/lib/classMerge';
-import { timeFromNow, timeout } from '@/lib';
-import { AppPageLayout } from '@/components/ui/layouts';
-import { useListVersionHistories } from './useListVersionHistories';
-import { useMemoizedFn, useMount } from '@/hooks';
-import { AppTooltip } from '@/components/ui/tooltip';
 import Link from 'next/link';
-import { useGetFileLink } from '@/context/Assets/useGetFileLink';
-import { useChatLayoutContextSelector } from '@/layouts/ChatLayout';
-import { useCallback } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
+import { Button } from '@/components/ui/buttons';
+import { History, Xmark } from '@/components/ui/icons';
+import { Check3 } from '@/components/ui/icons/NucleoIconFilled';
+import { AppPageLayout } from '@/components/ui/layouts';
 import { CircleSpinnerLoader } from '@/components/ui/loaders';
+import { AppTooltip } from '@/components/ui/tooltip';
+import { Text } from '@/components/ui/typography';
+import { useGetFileLink } from '@/context/Assets/useGetFileLink';
+import { useMemoizedFn, useMount } from '@/hooks';
+import { useChatLayoutContextSelector } from '@/layouts/ChatLayout';
+import { useCloseVersionHistory } from '@/layouts/ChatLayout/FileContainer/FileContainerHeader/FileContainerHeaderVersionHistory';
+import { timeFromNow, timeout } from '@/lib';
+import { cn } from '@/lib/classMerge';
+import { useListVersionHistories } from './useListVersionHistories';
 
 export const VersionHistoryPanel = React.memo(
   ({ assetId, type }: { assetId: string; type: 'metric' | 'dashboard' }) => {
@@ -50,7 +49,7 @@ export const VersionHistoryPanel = React.memo(
           () => (
             <PanelHeader />
           ),
-          [assetId, type, chatId]
+          []
         )}
         scrollable
         headerBorderVariant="ghost">
@@ -119,10 +118,8 @@ const ListItem = React.memo(
     const isRestoringVersion = restoringVersion === version_number;
 
     return (
-      <Link prefetch={false} href={link}>
+      <Link prefetch={false} href={link} onMouseEnter={onHoverLink} onMouseLeave={onHoverEnd}>
         <div
-          onMouseEnter={onHoverLink}
-          onMouseLeave={onHoverEnd}
           className={cn(
             'group hover:bg-item-hover flex cursor-pointer items-center justify-between space-x-2 rounded px-2.5 py-1.5',
             selected && 'bg-item-select hover:bg-item-select selected-version'
@@ -137,7 +134,8 @@ const ListItem = React.memo(
           <div className="text-icon-color animate-in fade-in-0 flex items-center space-x-2 duration-200">
             {showRestoreButton && (
               <AppTooltip title={restoringVersion ? 'Restoring...' : 'Restore version'}>
-                <div
+                <button
+                  type="button"
                   onClick={(e) => {
                     if (restoringVersion) return;
 
@@ -146,11 +144,11 @@ const ListItem = React.memo(
                     onClickRestoreVersion(version_number);
                   }}
                   className={cn(
-                    'hover:bg-gray-light/20 hover:text-foreground -mr-1 rounded p-1 opacity-0 group-hover:block group-hover:opacity-100',
+                    'hover:bg-gray-light/20 hover:text-foreground -mr-1 cursor-pointer rounded p-1 opacity-0 group-hover:block group-hover:opacity-100',
                     isRestoringVersion && 'cursor-not-allowed opacity-100!'
                   )}>
                   {isRestoringVersion ? <CircleSpinnerLoader size={12} /> : <History />}
-                </div>
+                </button>
               </AppTooltip>
             )}
 
@@ -167,7 +165,7 @@ const ListItem = React.memo(
 );
 ListItem.displayName = 'ListItem';
 
-const PanelHeader = React.memo(({}: {}) => {
+const PanelHeader = React.memo(() => {
   const { href } = useCloseVersionHistory();
 
   return (

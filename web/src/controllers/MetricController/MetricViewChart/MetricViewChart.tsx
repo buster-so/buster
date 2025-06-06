@@ -1,19 +1,19 @@
 'use client';
 
+import { AnimatePresence, motion } from 'framer-motion';
+import isEmpty from 'lodash/isEmpty';
 import React, { useMemo } from 'react';
-import { MetricViewChartContent } from './MetricViewChartContent';
-import { MetricViewChartHeader } from './MetricViewChartHeader';
+import { ChartType } from '@/api/asset_interfaces/metric/charts/enum';
 import { useGetMetric, useGetMetricData } from '@/api/buster_rest/metrics';
+import { useUpdateMetricChart } from '@/context/Metrics';
+import { useIsMetricReadOnly } from '@/context/Metrics/useIsMetricReadOnly';
 import { useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/classMerge';
 import { inputHasText } from '@/lib/text';
 import { MetricChartEvaluation } from './MetricChartEvaluation';
-import { ChartType } from '@/api/asset_interfaces/metric/charts/enum';
-import { AnimatePresence, motion } from 'framer-motion';
-import { cn } from '@/lib/classMerge';
-import { useIsMetricReadOnly } from '@/context/Metrics/useIsMetricReadOnly';
 import { MetricSaveFilePopup } from './MetricSaveFilePopup';
-import { useUpdateMetricChart } from '@/context/Metrics';
-import isEmpty from 'lodash/isEmpty';
+import { MetricViewChartContent } from './MetricViewChartContent';
+import { MetricViewChartHeader } from './MetricViewChartHeader';
 
 export const MetricViewChart: React.FC<{
   metricId: string;

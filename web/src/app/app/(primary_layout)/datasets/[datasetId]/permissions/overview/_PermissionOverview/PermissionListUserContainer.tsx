@@ -1,17 +1,17 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import type { DatasetPermissionOverviewUser } from '@/api/asset_interfaces';
+import { ListUserItem } from '@/components/features/list';
+import { PermissionLineageBreadcrumb } from '@/components/features/PermissionComponents';
 import {
-  BusterListColumn,
-  BusterListRowItem,
+  type BusterListColumn,
+  type BusterListRowItem,
   EmptyStateList,
   InfiniteListContainer
 } from '@/components/ui/list';
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import { PermissionLineageBreadcrumb } from '@/components/features/PermissionComponents';
-import { ListUserItem } from '@/components/features/list';
 
 export const PermissionListUserContainer: React.FC<{
   className?: string;
@@ -24,7 +24,7 @@ export const PermissionListUserContainer: React.FC<{
       {
         title: 'Name',
         dataIndex: 'name',
-        render: (_: string, user: DatasetPermissionOverviewUser) => {
+        render: (value, user: DatasetPermissionOverviewUser) => {
           return (
             <div className="flex items-center justify-between space-x-2">
               <UserInfoCell user={user} />
@@ -104,12 +104,7 @@ export const PermissionListUserContainer: React.FC<{
           rows={rows}
           showHeader={false}
           showSelectAll={false}
-          emptyState={useMemo(
-            () => (
-              <EmptyStateList text="No users found" />
-            ),
-            []
-          )}
+          emptyState={useMemo(() => <EmptyStateList text="No users found" />, [])}
         />
       </InfiniteListContainer>
     </>

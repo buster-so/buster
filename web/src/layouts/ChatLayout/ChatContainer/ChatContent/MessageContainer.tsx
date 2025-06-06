@@ -1,6 +1,7 @@
+import type React from 'react';
+import { forwardRef } from 'react';
 import { Avatar } from '@/components/ui/avatar';
 import { cn } from '@/lib/classMerge';
-import React, { forwardRef } from 'react';
 
 interface MessageContainerProps {
   children: React.ReactNode;
@@ -20,7 +21,7 @@ export const MessageContainer = forwardRef<HTMLDivElement, MessageContainerProps
     return (
       <div
         ref={ref}
-        className={'flex w-full space-x-2'}
+        className={'flex w-full cursor-pointer space-x-2'}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}>
         {senderName ? (

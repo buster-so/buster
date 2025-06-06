@@ -7,21 +7,23 @@ describe('Review Plan Tool Integration Tests', () => {
   beforeEach(() => {
     mockRuntimeContext = {
       state: new Map<string, any>(),
-      get: function(key: string) {
+      get: function (key: string) {
         return this.state.get(key);
       },
-      set: function(key: string, value: any) {
+      set: function (key: string, value: any) {
         this.state.set(key, value);
       },
-      clear: function() {
+      clear: function () {
         this.state.clear();
-      }
+      },
     };
   });
 
   test('should have correct tool configuration', () => {
     expect(reviewPlanTool.id).toBe('review-plan');
-    expect(reviewPlanTool.description).toBe('Marks one or more tasks as complete by their 1-based indices in the to-do list.');
+    expect(reviewPlanTool.description).toBe(
+      'Marks one or more tasks as complete by their 1-based indices in the to-do list.'
+    );
     expect(reviewPlanTool.inputSchema).toBeDefined();
     expect(reviewPlanTool.outputSchema).toBeDefined();
     expect(reviewPlanTool.execute).toBeDefined();
@@ -29,7 +31,7 @@ describe('Review Plan Tool Integration Tests', () => {
 
   test('should validate tool input schema', () => {
     const validInput = {
-      todo_items: [1, 2, 3]
+      todo_items: [1, 2, 3],
     };
 
     const result = reviewPlanTool.inputSchema.safeParse(validInput);
@@ -39,7 +41,7 @@ describe('Review Plan Tool Integration Tests', () => {
   test('should validate tool output schema', () => {
     const validOutput = {
       success: true,
-      todos: '[x] Task 1\n[ ] Task 2\n[x] Task 3'
+      todos: '[x] Task 1\n[ ] Task 2\n[x] Task 3',
     };
 
     const result = reviewPlanTool.outputSchema.safeParse(validOutput);
@@ -48,17 +50,16 @@ describe('Review Plan Tool Integration Tests', () => {
 
   test('should handle runtime context requirements', async () => {
     const contextWithoutGet = {
-      set: (key: string, value: any) => {}
+      set: (key: string, value: any) => {},
     };
 
     const input = {
       todo_items: [1],
-      runtimeContext: contextWithoutGet
+      runtimeContext: contextWithoutGet,
     };
 
     // This should fail because get is missing
-    await expect(reviewPlanTool.execute({ context: input }))
-      .rejects.toThrow();
+    await expect(reviewPlanTool.execute({ context: input })).rejects.toThrow();
   });
 
   test('should mark single todo as complete', async () => {
@@ -66,21 +67,19 @@ describe('Review Plan Tool Integration Tests', () => {
     mockRuntimeContext.set('todos', [
       { todo: 'Create dashboard', completed: false },
       { todo: 'Generate reports', completed: false },
-      { todo: 'Analyze data', completed: false }
+      { todo: 'Analyze data', completed: false },
     ]);
 
     const input = {
       todo_items: [2], // Mark second todo complete
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await reviewPlanTool.execute({ context: input });
 
     expect(result.success).toBe(true);
     expect(result.todos).toBe(
-      '[ ] Create dashboard\n' +
-      '[x] Generate reports\n' +
-      '[ ] Analyze data'
+      '[ ] Create dashboard\n' + '[x] Generate reports\n' + '[ ] Analyze data'
     );
 
     // Verify state was updated
@@ -100,23 +99,19 @@ describe('Review Plan Tool Integration Tests', () => {
       { todo: 'Task 2', completed: false },
       { todo: 'Task 3', completed: false },
       { todo: 'Task 4', completed: false },
-      { todo: 'Task 5', completed: false }
+      { todo: 'Task 5', completed: false },
     ]);
 
     const input = {
       todo_items: [1, 3, 5], // Mark first, third, and fifth todos complete
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await reviewPlanTool.execute({ context: input });
 
     expect(result.success).toBe(true);
     expect(result.todos).toBe(
-      '[x] Task 1\n' +
-      '[ ] Task 2\n' +
-      '[x] Task 3\n' +
-      '[ ] Task 4\n' +
-      '[x] Task 5'
+      '[x] Task 1\n' + '[ ] Task 2\n' + '[x] Task 3\n' + '[ ] Task 4\n' + '[x] Task 5'
     );
 
     // Verify state was updated correctly
@@ -133,22 +128,18 @@ describe('Review Plan Tool Integration Tests', () => {
     mockRuntimeContext.set('todos', [
       { todo: 'Already done', completed: true },
       { todo: 'Needs completion', completed: false },
-      { todo: 'Also done', completed: true }
+      { todo: 'Also done', completed: true },
     ]);
 
     const input = {
       todo_items: [1, 2], // Mark first (already done) and second
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await reviewPlanTool.execute({ context: input });
 
     expect(result.success).toBe(true);
-    expect(result.todos).toBe(
-      '[x] Already done\n' +
-      '[x] Needs completion\n' +
-      '[x] Also done'
-    );
+    expect(result.todos).toBe('[x] Already done\n' + '[x] Needs completion\n' + '[x] Also done');
 
     // Verify all are now completed
     const updatedTodos = mockRuntimeContext.get('todos');
@@ -157,23 +148,23 @@ describe('Review Plan Tool Integration Tests', () => {
 
   test('should handle todos with additional properties', async () => {
     mockRuntimeContext.set('todos', [
-      { 
-        todo: 'Complex task', 
-        completed: false, 
+      {
+        todo: 'Complex task',
+        completed: false,
         priority: 'high',
         assignee: 'john.doe@example.com',
         tags: ['backend', 'api'],
-        dueDate: '2024-12-31'
+        dueDate: '2024-12-31',
       },
       {
         todo: 'Simple task',
-        completed: false
-      }
+        completed: false,
+      },
     ]);
 
     const input = {
       todo_items: [1], // Mark first todo complete
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await reviewPlanTool.execute({ context: input });
@@ -192,13 +183,11 @@ describe('Review Plan Tool Integration Tests', () => {
   });
 
   test('should handle single todo list', async () => {
-    mockRuntimeContext.set('todos', [
-      { todo: 'Only task', completed: false }
-    ]);
+    mockRuntimeContext.set('todos', [{ todo: 'Only task', completed: false }]);
 
     const input = {
       todo_items: [1], // Mark the only todo complete
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await reviewPlanTool.execute({ context: input });
@@ -214,37 +203,40 @@ describe('Review Plan Tool Integration Tests', () => {
   test('should reject invalid indices', async () => {
     mockRuntimeContext.set('todos', [
       { todo: 'Task 1', completed: false },
-      { todo: 'Task 2', completed: false }
+      { todo: 'Task 2', completed: false },
     ]);
 
     // Test zero index
     const zeroIndexInput = {
       todo_items: [0],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
-    await expect(reviewPlanTool.execute({ context: zeroIndexInput }))
-      .rejects.toThrow('todo_item index cannot be 0, indexing starts from 1.');
+    await expect(reviewPlanTool.execute({ context: zeroIndexInput })).rejects.toThrow(
+      'todo_item index cannot be 0, indexing starts from 1.'
+    );
 
     // Test out of range index
     const outOfRangeInput = {
       todo_items: [5],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
-    await expect(reviewPlanTool.execute({ context: outOfRangeInput }))
-      .rejects.toThrow('todo_item index 5 out of range (2 todos, 1-based)');
+    await expect(reviewPlanTool.execute({ context: outOfRangeInput })).rejects.toThrow(
+      'todo_item index 5 out of range (2 todos, 1-based)'
+    );
   });
 
   test('should handle missing todos gracefully', async () => {
     // No todos in state
     const input = {
       todo_items: [1],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
-    await expect(reviewPlanTool.execute({ context: input }))
-      .rejects.toThrow("Could not find 'todos' in agent state or it's not an array.");
+    await expect(reviewPlanTool.execute({ context: input })).rejects.toThrow(
+      "Could not find 'todos' in agent state or it's not an array."
+    );
   });
 
   test('should handle invalid todo data gracefully', async () => {
@@ -254,12 +246,12 @@ describe('Review Plan Tool Integration Tests', () => {
       { invalid: 'structure' }, // This will be filtered out
       null, // This will be filtered out
       'string item', // This will be filtered out
-      { todo: 'Valid task 2', completed: false }
+      { todo: 'Valid task 2', completed: false },
     ]);
 
     const input = {
       todo_items: [2], // Should refer to the second valid task
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await reviewPlanTool.execute({ context: input });
@@ -272,12 +264,12 @@ describe('Review Plan Tool Integration Tests', () => {
   test('should handle duplicate indices', async () => {
     mockRuntimeContext.set('todos', [
       { todo: 'Task 1', completed: false },
-      { todo: 'Task 2', completed: false }
+      { todo: 'Task 2', completed: false },
     ]);
 
     const input = {
       todo_items: [1, 1, 2, 1], // Duplicate indices
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await reviewPlanTool.execute({ context: input });
@@ -295,7 +287,7 @@ describe('Review Plan Tool Integration Tests', () => {
     // Create 50 todos
     const largeTodoList = Array.from({ length: 50 }, (_, i) => ({
       todo: `Task ${i + 1}`,
-      completed: false
+      completed: false,
     }));
 
     mockRuntimeContext.set('todos', largeTodoList);
@@ -305,7 +297,7 @@ describe('Review Plan Tool Integration Tests', () => {
 
     const input = {
       todo_items: indicesToComplete,
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await reviewPlanTool.execute({ context: input });
@@ -327,13 +319,13 @@ describe('Review Plan Tool Integration Tests', () => {
   test('should handle edge case index values', async () => {
     mockRuntimeContext.set('todos', [
       { todo: 'First task', completed: false },
-      { todo: 'Last task', completed: false }
+      { todo: 'Last task', completed: false },
     ]);
 
     // Test first index (1)
     const firstInput = {
       todo_items: [1],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const firstResult = await reviewPlanTool.execute({ context: firstInput });
@@ -342,13 +334,13 @@ describe('Review Plan Tool Integration Tests', () => {
     // Reset state
     mockRuntimeContext.set('todos', [
       { todo: 'First task', completed: false },
-      { todo: 'Last task', completed: false }
+      { todo: 'Last task', completed: false },
     ]);
 
     // Test last index (2)
     const lastInput = {
       todo_items: [2],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const lastResult = await reviewPlanTool.execute({ context: lastInput });
@@ -357,43 +349,43 @@ describe('Review Plan Tool Integration Tests', () => {
 
   test('should handle runtime context state access errors', async () => {
     const faultyContext = {
-      get: () => { throw new Error('State access failed'); },
-      set: () => {}
+      get: () => {
+        throw new Error('State access failed');
+      },
+      set: () => {},
     };
 
     const input = {
       todo_items: [1],
-      runtimeContext: faultyContext
+      runtimeContext: faultyContext,
     };
 
-    await expect(reviewPlanTool.execute({ context: input }))
-      .rejects.toThrow('State access failed');
+    await expect(reviewPlanTool.execute({ context: input })).rejects.toThrow('State access failed');
   });
 
   test('should handle runtime context state update errors', async () => {
     const faultyContext = {
       get: () => [{ todo: 'Test task', completed: false }],
-      set: () => { throw new Error('State update failed'); }
+      set: () => {
+        throw new Error('State update failed');
+      },
     };
 
     const input = {
       todo_items: [1],
-      runtimeContext: faultyContext
+      runtimeContext: faultyContext,
     };
 
-    await expect(reviewPlanTool.execute({ context: input }))
-      .rejects.toThrow('State update failed');
+    await expect(reviewPlanTool.execute({ context: input })).rejects.toThrow('State update failed');
   });
 
   test('should verify review_needed flag is always set to false', async () => {
-    mockRuntimeContext.set('todos', [
-      { todo: 'Task 1', completed: false }
-    ]);
+    mockRuntimeContext.set('todos', [{ todo: 'Task 1', completed: false }]);
     mockRuntimeContext.set('review_needed', true); // Initially true
 
     const input = {
       todo_items: [1],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     await reviewPlanTool.execute({ context: input });
@@ -407,12 +399,12 @@ describe('Review Plan Tool Integration Tests', () => {
       { todo: 'Completed task', completed: true },
       { todo: 'Incomplete task 1', completed: false },
       { todo: 'Incomplete task 2', completed: false },
-      { todo: 'Another completed task', completed: true }
+      { todo: 'Another completed task', completed: true },
     ]);
 
     const input = {
       todo_items: [2, 3], // Mark the two incomplete tasks
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await reviewPlanTool.execute({ context: input });
@@ -420,9 +412,9 @@ describe('Review Plan Tool Integration Tests', () => {
     expect(result.success).toBe(true);
     expect(result.todos).toBe(
       '[x] Completed task\n' +
-      '[x] Incomplete task 1\n' +
-      '[x] Incomplete task 2\n' +
-      '[x] Another completed task'
+        '[x] Incomplete task 1\n' +
+        '[x] Incomplete task 2\n' +
+        '[x] Another completed task'
     );
 
     // Verify all tasks are now completed
@@ -436,10 +428,10 @@ describe('Review Plan Tool Integration Tests', () => {
       { todo_items: [1] },
       { todo_items: [1, 2, 3] },
       { todo_items: [10, 5, 1] },
-      { todo_items: [100] }
+      { todo_items: [100] },
     ];
 
-    validInputs.forEach(input => {
+    validInputs.forEach((input) => {
       const result = reviewPlanTool.inputSchema.safeParse(input);
       expect(result.success).toBe(true);
     });
@@ -452,10 +444,10 @@ describe('Review Plan Tool Integration Tests', () => {
       { todo_items: [-1] }, // Negative index
       { todo_items: [1.5] }, // Non-integer
       { todo_items: 'not an array' }, // Wrong type
-      { todo_items: [1, 0, 2] } // Mixed valid/invalid
+      { todo_items: [1, 0, 2] }, // Mixed valid/invalid
     ];
 
-    invalidInputs.forEach(input => {
+    invalidInputs.forEach((input) => {
       const result = reviewPlanTool.inputSchema.safeParse(input);
       expect(result.success).toBe(false);
     });
@@ -465,19 +457,19 @@ describe('Review Plan Tool Integration Tests', () => {
     const testCases = [
       {
         todos: [{ todo: 'Single incomplete', completed: false }],
-        expected: '[ ] Single incomplete'
+        expected: '[ ] Single incomplete',
       },
       {
         todos: [{ todo: 'Single complete', completed: true }],
-        expected: '[x] Single complete'
+        expected: '[x] Single complete',
       },
       {
         todos: [
           { todo: 'Task A', completed: false },
-          { todo: 'Task B', completed: true }
+          { todo: 'Task B', completed: true },
         ],
-        expected: '[ ] Task A\n[x] Task B'
-      }
+        expected: '[ ] Task A\n[x] Task B',
+      },
     ];
 
     for (const testCase of testCases) {
@@ -486,14 +478,15 @@ describe('Review Plan Tool Integration Tests', () => {
 
       const input = {
         todo_items: [1], // Just trigger the formatting
-        runtimeContext: mockRuntimeContext
+        runtimeContext: mockRuntimeContext,
       };
 
       const result = await reviewPlanTool.execute({ context: input });
-      
+
       // The first task will be marked complete, so adjust expectation
-      const adjustedExpected = testCase.expected.replace('[ ] Task A', '[x] Task A')
-                                                .replace('[ ] Single incomplete', '[x] Single incomplete');
+      const adjustedExpected = testCase.expected
+        .replace('[ ] Task A', '[x] Task A')
+        .replace('[ ] Single incomplete', '[x] Single incomplete');
       expect(result.todos).toBe(adjustedExpected);
     }
   });

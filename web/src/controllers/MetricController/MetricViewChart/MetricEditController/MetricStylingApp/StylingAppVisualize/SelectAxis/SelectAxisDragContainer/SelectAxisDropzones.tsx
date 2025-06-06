@@ -1,19 +1,20 @@
-import React, { useMemo } from 'react';
 import {
   DndContext,
-  useSensor,
-  useSensors,
   MouseSensor,
+  pointerWithin,
   TouchSensor,
-  pointerWithin
+  useSensor,
+  useSensors
 } from '@dnd-kit/core';
-import { SelectAxisDropZone } from './SelectAxisDropzone';
+import type React from 'react';
+import { useMemo } from 'react';
+import { SelectAxisContainerId } from '../config';
+import type { DropZone, SelectAxisItem } from './interfaces';
 import { AvailableItemsList } from './SelectAxisAvailableItemsList';
 import { SelectAxisDragOverlay } from './SelectAxisDraggingItem';
-import { useDropzonesInternal } from './useDropzonesInternal';
-import { DropZone, SelectAxisItem } from './interfaces';
+import { SelectAxisDropZone } from './SelectAxisDropzone';
 import { useDropzonesExternal } from './useDropzonesExternal';
-import { SelectAxisContainerId } from '../config';
+import { useDropzonesInternal } from './useDropzonesInternal';
 
 export const SelectAxisDropzones: React.FC<{
   items: SelectAxisItem[];

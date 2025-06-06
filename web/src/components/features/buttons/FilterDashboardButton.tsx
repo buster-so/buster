@@ -1,15 +1,14 @@
 import React, { useMemo } from 'react';
 import { Button } from '@/components/ui/buttons';
-import { ArrowUpRight, BarsFilter } from '@/components/ui/icons';
 import { Dropdown } from '@/components/ui/dropdown';
-import { MagnifierSparkle } from '@/components/ui/icons';
-import { Text } from '@/components/ui/typography';
-import { cn } from '@/lib/classMerge';
 import { DropdownMenuHeaderSearch } from '@/components/ui/dropdown/DropdownMenuHeaderSearch';
+import { ArrowUpRight, BarsFilter, MagnifierSparkle } from '@/components/ui/icons';
+import { Text } from '@/components/ui/typography';
 import { useDebounceSearch, useMemoizedFn } from '@/hooks';
+import { cn } from '@/lib/classMerge';
 
 const items = Array.from({ length: 100 }, (_, index) => {
-  const randomWord = 'Filter ' + index;
+  const randomWord = `Filter ${index}`;
   return {
     label: randomWord,
     value: randomWord + index
@@ -57,7 +56,7 @@ export const FilterDashboardButton: React.FC = React.memo(() => {
             </Text>
             {searchText && (
               <Text truncate variant="tertiary">
-                "{searchText}"
+                &quot;{searchText}&quot;
               </Text>
             )}
           </div>

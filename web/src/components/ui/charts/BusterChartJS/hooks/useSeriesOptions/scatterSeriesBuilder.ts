@@ -1,13 +1,13 @@
-import type { ChartProps } from '../../core';
-import { LabelBuilderProps } from './useSeriesOptions';
-import { SeriesBuilderProps } from './interfaces';
-import { BubbleDataPoint, ScriptableContext } from 'chart.js';
+import type { BubbleDataPoint, ScriptableContext } from 'chart.js';
 import { DEFAULT_CHART_CONFIG, DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import { addOpacityToColor } from '@/lib/colors';
-import { isDateColumnType } from '@/lib/messages';
 import { createDayjsDate } from '@/lib/date';
+import { isDateColumnType } from '@/lib/messages';
 import { formatLabelForDataset } from '../../../commonHelpers';
+import type { ChartProps } from '../../core';
 import { createTrendlineOnSeries } from './createTrendlines';
+import type { SeriesBuilderProps } from './interfaces';
+import type { LabelBuilderProps } from './useSeriesOptions';
 
 declare module 'chart.js' {
   interface BubbleDataPoint {
@@ -70,7 +70,7 @@ export const scatterSeriesBuilder_data = ({
     return {
       parsing: false, //we need to make sure the data is sorted
       label: formatLabelForDataset(dataset, columnLabelFormats),
-      //@ts-ignore
+      // @ts-expect-error - elements is not a valid prop for dataset
       elements: scatterElementConfig,
       backgroundColor,
       hoverBackgroundColor,
@@ -89,7 +89,7 @@ export const scatterSeriesBuilder_data = ({
           acc.push({
             x: getScatterXValue({
               isXAxisDate,
-              xValue: dataset.ticksForScatter![index][0]
+              xValue: dataset.ticksForScatter?.[index][0] ?? null
             }),
             y: yData,
             originalR: dataset.sizeData?.[index] ?? 0
@@ -120,8 +120,7 @@ const radiusMethod = (
   sizeOptions: SeriesBuilderProps['sizeOptions'],
   scatterDotSize: SeriesBuilderProps['scatterDotSize']
 ) => {
-  //@ts-ignore
-  const originalR = context.raw?.originalR;
+  const originalR = (context.raw as BubbleDataPoint)?.originalR;
 
   if (typeof originalR === 'number' && sizeOptions) {
     return computeSizeRatio(originalR, scatterDotSize, sizeOptions.minValue, sizeOptions.maxValue);

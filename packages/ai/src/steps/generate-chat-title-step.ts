@@ -1,5 +1,6 @@
 import { Agent, createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
+import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { anthropicCachedModel } from '../utils/models/anthropic-cached';
 import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
@@ -31,17 +32,36 @@ const generateChatTitleExecution = async ({
   inputData: z.infer<typeof inputSchema>;
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof generateChatTitleOutputSchema>> => {
-  const threadId = runtimeContext.get('threadId');
-  const resourceId = runtimeContext.get('userId');
+  try {
+    const threadId = runtimeContext.get('threadId');
+    const resourceId = runtimeContext.get('userId');
 
-  const response = await todosAgent.generate(inputData.prompt, {
-    maxSteps: 0,
-    threadId: threadId,
-    resourceId: resourceId,
-    output: generateChatTitleOutputSchema,
-  });
+    const tracedChatTitle = wrapTraced(
+      async () => {
+        const response = await todosAgent.generate(inputData.prompt, {
+          maxSteps: 0,
+          threadId: threadId,
+          resourceId: resourceId,
+          output: generateChatTitleOutputSchema,
+        });
 
-  return response.object;
+        return response.object;
+      },
+      {
+        name: 'Generate Chat Title',
+      }
+    );
+
+    const title = await tracedChatTitle();
+
+    return title;
+  } catch (error) {
+    console.error('Failed to generate chat title:', error);
+    // Return a fallback title instead of crashing
+    return {
+      title: 'New Analysis',
+    };
+  }
 };
 
 export const generateChatTitleStep = createStep({

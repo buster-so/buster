@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
-import { DatasetOption } from './useDatasetOptions';
+import { useMemo } from 'react';
 import { ChartType } from '@/api/asset_interfaces/metric';
+import type { DatasetOption } from './useDatasetOptions';
 
 export const useColors = ({
   colors: colorsProp,

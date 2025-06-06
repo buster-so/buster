@@ -1,5 +1,5 @@
+import { expect, test } from '@playwright/test';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import { test, expect } from '@playwright/test';
 
 // Define routes
 const homePage = createBusterRoute({
@@ -218,7 +218,7 @@ test.describe('Authenticated Page', () => {
       versionNumber: 1
     }),
     settings: createBusterRoute({
-      route: BusterRoutes.SETTINGS
+      route: BusterRoutes.SETTINGS_PROFILE
     }),
     settingsGeneral: createBusterRoute({
       route: BusterRoutes.SETTINGS_API_KEYS

@@ -1,9 +1,9 @@
 'use client';
 
+import isEqual from 'lodash/isEqual';
+import { useLayoutEffect, useState, useTransition } from 'react';
 import { useDebounceFn } from './useDebounce';
 import { useMemoizedFn } from './useMemoizedFn';
-import { useLayoutEffect, useState, useTransition } from 'react';
-import isEqual from 'lodash/isEqual';
 
 interface UseDebounceSearchProps<T> {
   items: T[];

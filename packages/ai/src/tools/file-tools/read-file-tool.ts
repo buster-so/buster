@@ -1,9 +1,9 @@
+import { existsSync } from 'node:fs';
+import { readFile, stat } from 'node:fs/promises';
+import { isAbsolute, resolve } from 'node:path';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
-import { readFile, stat } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
-import { isAbsolute, resolve } from 'node:path';
 
 interface ReadFileParams {
   file_path?: string;
@@ -138,21 +138,11 @@ function validateFilePath(filePath: string): void {
   const resolvedPath = resolve(filePath);
 
   // Block access to sensitive system directories
-  const blockedPaths = [
-    '/etc/',
-    '/var/log/',
-    '/root/',
-    '/home/',
-    '/proc/',
-    '/sys/',
-  ];
+  const blockedPaths = ['/etc/', '/var/log/', '/root/', '/home/', '/proc/', '/sys/'];
 
   // Add user-specific sensitive paths if HOME is available
   if (process.env.HOME) {
-    blockedPaths.push(
-      `${process.env.HOME}/.ssh/`,
-      `${process.env.HOME}/.aws/`
-    );
+    blockedPaths.push(`${process.env.HOME}/.ssh/`, `${process.env.HOME}/.aws/`);
   }
 
   for (const blocked of blockedPaths) {

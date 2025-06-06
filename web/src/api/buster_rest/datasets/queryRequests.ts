@@ -1,19 +1,18 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { queryKeys } from '@/api/query_keys';
+import { datasetQueryKeys } from '@/api/query_keys/datasets';
+import { useMemoizedFn } from '@/hooks';
 import {
   createDataset,
+  deleteDataset,
   deployDataset,
   getDatasetDataSample,
   getDatasetMetadata,
+  getDatasetMetadata_server,
   getDatasets,
-  updateDataset,
-  deleteDataset,
   getDatasets_server,
-  getDatasetMetadata_server
+  updateDataset
 } from './requests';
-import { useMemoizedFn } from '@/hooks';
-import { QueryClient, useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/api/query_keys';
-import { datasetQueryKeys } from '@/api/query_keys/datasets';
 
 const options = datasetQueryKeys.datasetsListQueryOptions();
 const baseDatasetQueryKey = options.queryKey;
@@ -45,18 +44,18 @@ export const prefetchGetDatasets = async (
 };
 
 export const useGetDatasetData = (datasetId: string | undefined) => {
-  const queryFn = useMemoizedFn(() => getDatasetDataSample(datasetId!));
+  const queryFn = useMemoizedFn(() => getDatasetDataSample(datasetId || ''));
   return useQuery({
-    ...queryKeys.datasetData(datasetId!),
+    ...queryKeys.datasetData(datasetId || ''),
     queryFn,
     enabled: !!datasetId
   });
 };
 
 export const useGetDatasetMetadata = (datasetId: string | undefined) => {
-  const queryFn = useMemoizedFn(() => getDatasetMetadata(datasetId!));
+  const queryFn = useMemoizedFn(() => getDatasetMetadata(datasetId || ''));
   const res = useQuery({
-    ...queryKeys.datasetMetadata(datasetId!),
+    ...queryKeys.datasetMetadata(datasetId || ''),
     queryFn,
     enabled: !!datasetId
   });
@@ -100,7 +99,7 @@ export const useDeployDataset = () => {
 
   return useMutation({
     mutationFn,
-    onSuccess: (data, variables, context) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: baseDatasetQueryKey,
         exact: true,

@@ -1,9 +1,9 @@
-import type { ColumnMetaData, IBusterMetricChartConfig } from '@/api/asset_interfaces';
-import { formatLabel } from '@/lib';
-import { Select, SelectItem } from '@/components/ui/select';
 import React, { useMemo } from 'react';
+import type { ColumnMetaData, IBusterMetricChartConfig } from '@/api/asset_interfaces';
+import { Select, type SelectItem } from '@/components/ui/select';
+import { formatLabel } from '@/lib';
 import { LabelAndInput } from '../../Common';
-import { LoopTrendline } from './EditTrendline';
+import type { LoopTrendline } from './EditTrendline';
 
 export const TrendlineColumnId = React.memo(
   ({

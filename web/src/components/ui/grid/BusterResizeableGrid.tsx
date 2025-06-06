@@ -1,13 +1,11 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-
 import {
+  type CollisionDetection,
   closestCenter,
-  CollisionDetection,
   DndContext,
-  DragEndEvent,
-  DragStartEvent,
+  type DragEndEvent,
+  type DragStartEvent,
   getFirstCollision,
   MeasuringStrategy,
   PointerSensor,
@@ -16,14 +14,15 @@ import {
   useSensors
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import { BusterSortableOverlay } from './_BusterSortableOverlay';
-import { BusterResizeableGridRow } from './interfaces';
-import { v4 as uuidv4 } from 'uuid';
-import { useMemoizedFn } from '@/hooks';
 import isEqual from 'lodash/isEqual';
-import { BusterResizeRows } from './BusterResizeRows';
-import { NUMBER_OF_COLUMNS, NEW_ROW_ID, MIN_ROW_HEIGHT, TOP_SASH_ID } from './helpers';
+import React, { useEffect, useRef, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import { useMemoizedFn, useUpdateEffect } from '@/hooks';
 import { cn } from '@/lib/utils';
+import { BusterSortableOverlay } from './_BusterSortableOverlay';
+import { BusterResizeRows } from './BusterResizeRows';
+import { MIN_ROW_HEIGHT, NEW_ROW_ID, NUMBER_OF_COLUMNS, TOP_SASH_ID } from './helpers';
+import type { BusterResizeableGridRow } from './interfaces';
 
 const measuringConfig = {
   droppable: {
@@ -55,12 +54,11 @@ export const BusterResizeableGrid: React.FC<{
     onStartDrag,
     onEndDrag
   }) => {
-    const [rows, setRows] = useState<BusterResizeableGridRow[]>(serverRows);
+    const [rows, setRows] = useState<BusterResizeableGridRow[]>(() => newRowPreflight(serverRows));
     const styleRef = useRef<HTMLStyleElement>(undefined);
 
     const onRowLayoutChangePreflight = useMemoizedFn((newLayout: BusterResizeableGridRow[]) => {
       const filteredRows = newRowPreflight(newLayout);
-
       if (checkRowEquality(filteredRows, rows)) {
         return;
       }
@@ -151,7 +149,7 @@ export const BusterResizeableGrid: React.FC<{
 
     const onDragStart = useMemoizedFn(({ active }: DragStartEvent) => {
       const style = document.createElement('style');
-      style.innerHTML = `* { cursor: grabbing; }`;
+      style.innerHTML = '* { cursor: grabbing; }';
       document.head.appendChild(style);
       styleRef.current = style;
       setActiveId(active.id as string);
@@ -211,7 +209,7 @@ export const BusterResizeableGrid: React.FC<{
           }
 
           if (newRowDroppedId) {
-            const numericId = parseInt(newRowDroppedId) + 1;
+            const numericId = Number.parseInt(newRowDroppedId) + 1;
             const newRows = filteredRows.reduce<BusterResizeableGridRow[]>((acc, row, index) => {
               if (index === numericId) {
                 acc.push(newRowConfig);
@@ -291,7 +289,7 @@ export const BusterResizeableGrid: React.FC<{
                 return {
                   ...row,
                   items: arrayMove(row.items, activeIndex, overIndex),
-                  columnSizes: arrayMove(row.columnSizes!, activeIndex, overIndex)
+                  columnSizes: arrayMove(row.columnSizes || [], activeIndex, overIndex)
                 };
               }
 
@@ -317,7 +315,7 @@ export const BusterResizeableGrid: React.FC<{
       });
     }, [rows]);
 
-    useEffect(() => {
+    useUpdateEffect(() => {
       if (!checkRowEquality(serverRows, rows) && !isAnimating.current) {
         setRows(serverRows);
       }

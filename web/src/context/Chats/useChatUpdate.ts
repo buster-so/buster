@@ -1,8 +1,8 @@
-import { useMemoizedFn } from '@/hooks';
-import type { IBusterChat, IBusterChatMessage } from '@/api/asset_interfaces/chat';
 import { useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/api/query_keys';
 import { create } from 'mutative';
+import type { IBusterChat, IBusterChatMessage } from '@/api/asset_interfaces/chat';
+import { queryKeys } from '@/api/query_keys';
+import { useMemoizedFn } from '@/hooks';
 
 export const useChatUpdate = () => {
   const queryClient = useQueryClient();

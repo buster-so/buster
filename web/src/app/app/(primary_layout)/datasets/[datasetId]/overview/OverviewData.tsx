@@ -1,11 +1,11 @@
-import type { IDataResult } from '@/api/asset_interfaces';
-import { ShimmerText } from '@/components/ui/typography/ShimmerText';
-import { AppDataGrid } from '@/components/ui/table/AppDataGrid';
-import { useUserConfigContextSelector } from '@/context/Users';
-import React from 'react';
-import { Text } from '@/components/ui/typography';
-import { useMemoizedFn } from '@/hooks';
 import isEmpty from 'lodash/isEmpty';
+import React from 'react';
+import type { IDataResult } from '@/api/asset_interfaces';
+import { AppDataGrid } from '@/components/ui/table/AppDataGrid';
+import { Text } from '@/components/ui/typography';
+import { ShimmerText } from '@/components/ui/typography/ShimmerText';
+import { useUserConfigContextSelector } from '@/context/Users';
+import { useMemoizedFn } from '@/hooks';
 
 export const OverviewData: React.FC<{
   datasetId: string;
@@ -14,7 +14,7 @@ export const OverviewData: React.FC<{
 }> = React.memo(({ data, isFetchedDatasetData }) => {
   const isAdmin = useUserConfigContextSelector((state) => state.isAdmin);
 
-  const defaultCellFormatter = useMemoizedFn((value: any, key: string): string => {
+  const defaultCellFormatter = useMemoizedFn((value: unknown): string => {
     return String(value);
   });
 
@@ -45,7 +45,7 @@ const EmptyState = () => {
   );
 };
 
-const LoadingState: React.FC<{}> = () => {
+const LoadingState: React.FC = () => {
   return (
     <div className="flex justify-center py-24">
       <ShimmerText text="Loading data..." />

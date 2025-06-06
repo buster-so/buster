@@ -1,9 +1,10 @@
-import { updateChatToIChat } from './chat';
-import { MOCK_CHAT } from '@/mocks/MOCK_CHAT';
+import { describe, expect, it } from 'vitest';
 import type { BusterChat } from '@/api/asset_interfaces/chat';
+import { MOCK_CHAT } from '@/mocks/MOCK_CHAT';
+import { updateChatToIChat } from './chat';
 
 describe('updateChatToIChat', () => {
-  test('should correctly upgrade a chat with no messages', () => {
+  it('should correctly upgrade a chat with no messages', () => {
     const mockChat: BusterChat = {
       ...MOCK_CHAT(),
       message_ids: [],
@@ -16,8 +17,7 @@ describe('updateChatToIChat', () => {
     expect(iChat.isNewChat).toBe(false);
     expect(Object.keys(iChatMessages)).toHaveLength(0);
   });
-
-  test('should correctly upgrade a chat with existing messages when not new', () => {
+  it('should correctly upgrade a chat with existing messages when not new', () => {
     const mockChat = MOCK_CHAT();
     const { iChat, iChatMessages } = updateChatToIChat(mockChat, false);
 
@@ -28,8 +28,7 @@ describe('updateChatToIChat', () => {
       expect(message.isCompletedStream).toBe(true);
     });
   });
-
-  test('should mark the last message as incomplete stream when isNewChat is true', () => {
+  it('should mark the last message as incomplete stream when isNewChat is true', () => {
     const mockChat = MOCK_CHAT();
     const { iChat, iChatMessages } = updateChatToIChat(mockChat, true);
 
@@ -43,8 +42,7 @@ describe('updateChatToIChat', () => {
       expect(iChatMessages[messageId].isCompletedStream).toBe(!isLastMessage);
     });
   });
-
-  test('should preserve all chat properties except messages when upgrading', () => {
+  it('should preserve all chat properties except messages when upgrading', () => {
     const mockChat = MOCK_CHAT();
     const { iChat } = updateChatToIChat(mockChat, false);
 
@@ -62,8 +60,7 @@ describe('updateChatToIChat', () => {
     // Verify messages property is removed
     expect('messages' in iChat).toBe(false);
   });
-
-  test('should maintain message order when upgrading messages', () => {
+  it('should maintain message order when upgrading messages', () => {
     const mockChat = MOCK_CHAT();
     const { iChatMessages } = updateChatToIChat(mockChat, false);
 
@@ -84,8 +81,7 @@ describe('updateChatToIChat', () => {
       expect(upgradedMessage.feedback).toBe(originalMessage.feedback);
     });
   });
-
-  test('should handle a chat with a single message correctly', () => {
+  it('should handle a chat with a single message correctly', () => {
     const fullMockChat = MOCK_CHAT();
     // Modify the mock to only have one message
     const singleMessageId = fullMockChat.message_ids[0];

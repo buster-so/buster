@@ -1,15 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useGetApiKeys, useCreateApiKey, useDeleteApiKey } from '@/api/buster_rest/api_keys';
+import type React from 'react';
+import { useState } from 'react';
+import { useCreateApiKey, useDeleteApiKey, useGetApiKeys } from '@/api/buster_rest/api_keys';
 import { Button } from '@/components/ui/buttons';
+import { Plus } from '@/components/ui/icons';
+import { useBusterNotifications } from '@/context/BusterNotifications';
+import { useMemoizedFn } from '@/hooks';
+import ApiKeyCreatedModal from './ApiKeyCreatedModal';
 import { ApiKeyListItem } from './ApiKeyListItem';
 import { ApiKeysLoading } from './ApiKeysLoading';
-import { useMemoizedFn } from '@/hooks';
-
-import ApiKeyCreatedModal from './ApiKeyCreatedModal';
-import { useBusterNotifications } from '@/context/BusterNotifications';
-import { Plus } from '@/components/ui/icons';
 
 export const ApiKeysController: React.FC = () => {
   const [newApiKey, setNewApiKey] = useState<string | null>(null);
@@ -58,7 +58,7 @@ export const ApiKeysController: React.FC = () => {
   return (
     <div className="mx-auto">
       <div className="mb-6 flex items-center justify-between">
-        <div></div>
+        <div />
         <Button
           variant="ghost"
           prefix={<Plus />}

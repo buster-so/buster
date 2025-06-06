@@ -1,19 +1,18 @@
 'use client';
 
-import { useMemoizedFn } from '@/hooks';
 import React, { useMemo, useRef } from 'react';
+import { createContext, useContextSelector } from 'use-context-selector';
 import type {
   BusterSocketRequest,
   BusterSocketResponse,
   BusterSocketResponseRoute
 } from '@/api/buster_socket';
-import { useWebSocket } from '@/hooks/useWebSocket';
-import { BusterSocketResponseBase } from '@/api/buster_socket/base_interfaces';
-import { useSupabaseContext } from '../../Supabase';
-import { createContext, useContextSelector } from 'use-context-selector';
-import { SupabaseContextReturnType } from '../../Supabase';
+import type { BusterSocketResponseBase } from '@/api/buster_socket/base_interfaces';
 import { useBusterNotifications } from '@/context/BusterNotifications';
-import { useUserConfigContextSelector } from '@/context/Users';
+import { useMemoizedFn } from '@/hooks';
+import { useWebSocket } from '@/hooks/useWebSocket';
+import type { SupabaseContextReturnType } from '../../Supabase';
+import { useSupabaseContext } from '../../Supabase';
 
 const BUSTER_WS_URL = `${process.env.NEXT_PUBLIC_WEB_SOCKET_URL}/api/v1/ws`;
 
@@ -47,6 +46,7 @@ const useBusterWebSocketHook = ({
 }) => {
   const { openErrorNotification } = useBusterNotifications();
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- this truly can be anything
   const onMessage = useMemoizedFn((responseMessage: BusterSocketResponseBase<string, any>) => {
     try {
       const { route, payload, error } = responseMessage;
@@ -56,7 +56,7 @@ const useBusterWebSocketHook = ({
       if (eventListeners.length > 0) {
         requestAnimationFrame(() => {
           const eventListeners = getCurrentListeners(route);
-          eventListeners.forEach(({ callback: cb, onError: onE }) => {
+          for (const { callback: cb, onError: onE } of eventListeners) {
             if (error) {
               if (onE) onE(error);
               else openErrorNotification(error);
@@ -68,7 +68,7 @@ const useBusterWebSocketHook = ({
                 openErrorNotification(callbackError);
               }
             }
-          });
+          }
         });
       }
     } catch (error) {
@@ -100,7 +100,7 @@ interface EventListeners {
 }
 
 const useBusterSocketListeners = (props: {
-  openErrorNotification: (d: any) => void;
+  openErrorNotification: (d: unknown) => void;
   emit: (d: BusterSocketRequest) => void;
 }) => {
   const { emit, openErrorNotification } = props;
@@ -122,12 +122,13 @@ const useBusterSocketListeners = (props: {
 
   const once: BusterSocket['once'] = useMemoizedFn(({ route, callback }) => {
     return new Promise((resolve, reject) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- this truly can be anything
       const onceCallback = (payload: any) => {
         callback(payload);
         off({ route: route as '/chats/post:initializeChat', callback: onceCallback });
         resolve(payload);
       };
-      const onError = (error: any) => {
+      const onError = (error: unknown) => {
         off({ route: route as '/chats/post:initializeChat', callback: onceCallback });
         reject(error);
       };
@@ -147,10 +148,12 @@ const useBusterSocketListeners = (props: {
       const { emitEvent, responseEvent } = params;
       const { route, callback, onError } = responseEvent;
       const promise = new Promise<Parameters<T['callback']>[0]>((resolve, reject) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- this truly can be anything
         const promiseCallback = (d: any) => {
           callback(d);
           resolve(d);
         };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- this truly can be anything
         const onErrorCallback = (d: any) => {
           if (!onError) openErrorNotification(d);
           else onError?.(d);

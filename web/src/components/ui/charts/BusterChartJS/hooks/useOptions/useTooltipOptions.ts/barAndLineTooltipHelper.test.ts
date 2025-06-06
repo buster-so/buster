@@ -1,13 +1,12 @@
-import { barAndLineTooltipHelper } from './barAndLineTooltipHelper';
 import type {
-  Chart,
-  TooltipItem,
-  ChartTypeRegistry,
   BarControllerDatasetOptions,
-  ChartDatasetProperties
+  Chart,
+  ChartDatasetProperties,
+  TooltipItem
 } from 'chart.js';
-import type { BusterChartConfigProps } from '@/api/asset_interfaces/metric/charts';
+import { describe, expect, it } from 'vitest';
 import type { IColumnLabelFormat } from '@/api/asset_interfaces/metric/charts/columnLabelInterfaces';
+import { barAndLineTooltipHelper } from './barAndLineTooltipHelper';
 
 type MockDataset = Partial<
   ChartDatasetProperties<'bar', number[]> & BarControllerDatasetOptions
@@ -87,7 +86,6 @@ describe('barAndLineTooltipHelper', () => {
       ]
     ],
     hidden: false,
-    isTrendline: false,
     ...overrides
   });
 

@@ -1,6 +1,6 @@
+import { NextResponse } from 'next/server';
 import { isDev } from '@/config/dev';
 import { createClient } from '@/lib/supabase/server';
-import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -18,11 +18,11 @@ export async function GET(request: Request) {
       if (isDev) {
         // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
         return NextResponse.redirect(`${origin}/app`);
-      } else if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${next}`);
-      } else {
-        return NextResponse.redirect(`${origin}/app`);
       }
+      if (forwardedHost) {
+        return NextResponse.redirect(`https://${forwardedHost}${next}`);
+      }
+      return NextResponse.redirect(`${origin}/app`);
     }
 
     console.error('ERROR EXCHANGING CODE FOR SESSION :(', { error });

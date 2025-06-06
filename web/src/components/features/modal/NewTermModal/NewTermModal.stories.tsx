@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { NewTermModal } from './NewTermModal';
-import { http, HttpResponse } from 'msw';
 import { fn } from '@storybook/test';
+import { HttpResponse, http } from 'msw';
 import { BASE_URL } from '@/api/buster_rest/config';
+import { NewTermModal } from './NewTermModal';
 
 interface TermRequestBody {
   name: string;

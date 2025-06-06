@@ -30,9 +30,11 @@ export const DATE_TYPES: (ColumnDataType | string)[] = ['date', 'timestamp', 'ti
 export const simplifyColumnType = (type: string): SimplifiedColumnType => {
   if (type === 'number' || NUMBER_TYPES.includes(type as ColumnDataType)) {
     return 'number';
-  } else if (type === 'text' || TEXT_TYPES.includes(type as ColumnDataType)) {
+  }
+  if (type === 'text' || TEXT_TYPES.includes(type as ColumnDataType)) {
     return 'text';
-  } else if (type === 'date' || DATE_TYPES.includes(type as ColumnDataType)) {
+  }
+  if (type === 'date' || DATE_TYPES.includes(type as ColumnDataType)) {
     return 'date';
   }
 

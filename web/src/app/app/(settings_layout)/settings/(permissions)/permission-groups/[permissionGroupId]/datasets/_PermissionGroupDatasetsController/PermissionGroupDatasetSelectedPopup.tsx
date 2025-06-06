@@ -1,12 +1,8 @@
-import {
-  useUpdatePermissionGroupDatasets,
-  useUpdatePermissionGroupUsers,
-  useUpdateUserDatasets
-} from '@/api/buster_rest';
+import React from 'react';
+import { useUpdatePermissionGroupDatasets } from '@/api/buster_rest';
 import { PermissionAssignedButton } from '@/components/features/PermissionComponents';
 import { BusterListSelectedOptionPopupContainer } from '@/components/ui/list';
 import { useMemoizedFn } from '@/hooks';
-import React from 'react';
 
 export const PermissionGroupDatasetSelectedPopup: React.FC<{
   selectedRowKeys: string[];

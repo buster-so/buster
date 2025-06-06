@@ -1,6 +1,6 @@
 export * from './AppCodeBlock';
 
-import SyntaxHighlighterLightTheme from './light';
 import SyntaxHighlighterDarkTheme from './dark';
+import SyntaxHighlighterLightTheme from './light';
 
 export { SyntaxHighlighterLightTheme, SyntaxHighlighterDarkTheme };

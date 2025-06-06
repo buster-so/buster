@@ -1,22 +1,22 @@
+import React, { useMemo, useState } from 'react';
 import type {
   ListPermissionGroupsResponse,
   ListPermissionUsersResponse
 } from '@/api/asset_interfaces';
 import { useDatasetUpdatePermissionUsers } from '@/api/buster_rest/datasets';
+import { ListUserItem } from '@/components/features/list';
 import {
-  BusterListColumn,
-  BusterListRowItem,
+  type BusterListColumn,
+  type BusterListRowItem,
   EmptyStateList,
   InfiniteListContainer
 } from '@/components/ui/list';
 import { BusterInfiniteList } from '@/components/ui/list/BusterInfiniteList';
-import { useMemoizedFn } from '@/hooks';
 import { Select } from '@/components/ui/select';
-import React, { useMemo, useState } from 'react';
-import { PermissionUsersSelectedPopup } from './PermissionUsersSelectedPopup';
-import { PERMISSION_USERS_OPTIONS } from './config';
+import { useMemoizedFn } from '@/hooks';
 import { BusterRoutes, createBusterRoute } from '@/routes';
-import { ListUserItem } from '@/components/features/list';
+import { PERMISSION_USERS_OPTIONS } from './config';
+import { PermissionUsersSelectedPopup } from './PermissionUsersSelectedPopup';
 
 export const PermissionListUsersContainer: React.FC<{
   filteredPermissionUsers: ListPermissionUsersResponse[];
@@ -154,7 +154,10 @@ const PermissionGroupAssignedCell: React.FC<{
   onSelect: (value: { id: string; assigned: boolean }) => void;
 }> = ({ id, assigned, onSelect }) => {
   return (
-    <div className="flex" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="flex cursor-pointer"
+      onClick={(e) => e.stopPropagation()}
+      onKeyUp={(e) => e.stopPropagation()}>
       <Select
         items={PERMISSION_USERS_OPTIONS}
         value={assigned ? 'included' : 'not_included'}

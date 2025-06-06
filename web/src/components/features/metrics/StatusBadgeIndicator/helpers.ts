@@ -1,4 +1,4 @@
-import { VerificationStatus, type BusterMetricListItem } from '@/api/asset_interfaces';
+import { type BusterMetricListItem, VerificationStatus } from '@/api/asset_interfaces';
 
 const statusRecordText: Record<VerificationStatus, string> = {
   [VerificationStatus.VERIFIED]: 'Verified',

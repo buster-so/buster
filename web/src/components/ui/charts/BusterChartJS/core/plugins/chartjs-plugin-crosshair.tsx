@@ -1,4 +1,4 @@
-import { Chart, ChartEvent, Plugin } from 'chart.js';
+import type { Chart, ChartEvent, Plugin } from 'chart.js';
 
 declare module 'chart.js' {
   interface Chart {

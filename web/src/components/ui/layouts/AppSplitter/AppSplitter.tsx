@@ -1,320 +1,513 @@
 'use client';
 
-import { useMemoizedFn, useMount, useSize } from '@/hooks';
 import React, {
+  useCallback,
   useEffect,
-  useMemo,
+  useRef,
   useState,
-  forwardRef,
   useImperativeHandle,
-  useRef
+  forwardRef,
+  useMemo
 } from 'react';
-import SplitPane, { Pane } from './SplitPane';
-import {
-  convertPxToPercentage,
-  createAutoSaveId,
-  easeInOutCubic,
-  getCurrentSizePercentage,
-  parseWidthValue,
-  setAppSplitterCookie
-} from './helper';
-import Cookies from 'js-cookie';
+import { useLocalStorageState } from '@/hooks/useLocalStorageState';
 import { cn } from '@/lib/classMerge';
-import './splitterStyles.css';
-import { timeout } from '@/lib';
+import { Panel } from './Panel';
+import { Splitter } from './Splitter';
+import { AppSplitterProvider } from './AppSplitterProvider';
+import { sizeToPixels, easeInOutCubic, createAutoSaveId } from './helpers';
 
-// First, define the ref type
+interface IAppSplitterProps {
+  leftChildren: React.ReactNode;
+  rightChildren: React.ReactNode;
+  autoSaveId: string;
+  defaultLayout: (string | number)[];
+  leftPanelMinSize?: number | string;
+  rightPanelMinSize?: number | string;
+  leftPanelMaxSize?: number | string;
+  rightPanelMaxSize?: number | string;
+  className?: string;
+  allowResize?: boolean;
+  split?: 'vertical' | 'horizontal';
+  splitterClassName?: string;
+  preserveSide: 'left' | 'right';
+  rightHidden?: boolean;
+  leftHidden?: boolean;
+  style?: React.CSSProperties;
+  hideSplitter?: boolean;
+  leftPanelClassName?: string;
+  rightPanelClassName?: string;
+  bustStorageOnInit?: boolean;
+}
+
 export interface AppSplitterRef {
-  setSplitSizes: (newSizes: (number | string)[]) => void;
-  animateWidth: (width: string, side: 'left' | 'right', duration?: number) => Promise<void>;
+  animateWidth: (
+    width: string | number,
+    side: 'left' | 'right',
+    duration?: number
+  ) => Promise<void>;
+  setSplitSizes: (sizes: [string | number, string | number]) => void;
   isSideClosed: (side: 'left' | 'right') => boolean;
-  sizes: (number | string)[];
+  getSizesInPixels: () => [number, number];
+}
+
+// Consolidated state interface for better organization
+interface SplitterState {
+  containerSize: number;
+  isDragging: boolean;
+  isAnimating: boolean;
+  isInitialized: boolean;
+  sizeSetByAnimation: boolean;
+  hasUserInteracted: boolean;
 }
 
 export const AppSplitter = React.memo(
-  forwardRef<
-    AppSplitterRef,
-    {
-      leftChildren: React.ReactNode;
-      rightChildren: React.ReactNode;
-      autoSaveId: string;
-      defaultLayout: (string | number)[];
-      leftPanelMinSize?: number | string;
-      rightPanelMinSize?: number | string;
-      leftPanelMaxSize?: number | string;
-      rightPanelMaxSize?: number | string;
-      className?: string;
-      allowResize?: boolean;
-      split?: 'vertical' | 'horizontal';
-      splitterClassName?: string;
-      preserveSide: 'left' | 'right' | null;
-      rightHidden?: boolean;
-      leftHidden?: boolean;
-      style?: React.CSSProperties;
-      hideSplitter?: boolean;
-      initialReady?: boolean;
-    }
-  >(
+  forwardRef<AppSplitterRef, IAppSplitterProps>(
     (
       {
-        style,
         leftChildren,
-        preserveSide,
         rightChildren,
         autoSaveId,
         defaultLayout,
-        leftPanelMinSize,
-        rightPanelMinSize,
-        split = 'vertical',
+        leftPanelMinSize = 0,
+        rightPanelMinSize = 0,
         leftPanelMaxSize,
         rightPanelMaxSize,
-        allowResize,
-        className = '',
-        splitterClassName = '',
-        leftHidden,
-        rightHidden,
-        hideSplitter,
-        initialReady = true
+        className,
+        allowResize = true,
+        split = 'vertical',
+        splitterClassName,
+        preserveSide,
+        rightHidden = false,
+        leftHidden = false,
+        bustStorageOnInit = false,
+        style,
+        hideSplitter: hideSplitterProp = false,
+        leftPanelClassName,
+        rightPanelClassName
       },
       ref
     ) => {
       const containerRef = useRef<HTMLDivElement>(null);
-      const [sizes, setSizes] = useState<(number | string)[]>(defaultLayout);
-      const hasHidden = useMemo(() => leftHidden || rightHidden, [leftHidden, rightHidden]);
-      const _allowResize = useMemo(
-        () => (hasHidden ? false : allowResize),
-        [hasHidden, allowResize]
+      const startPosRef = useRef(0);
+      const startSizeRef = useRef(0);
+      const animationRef = useRef<number | null>(null);
+
+      // Consolidated state management
+      const [state, setState] = useState<SplitterState>({
+        containerSize: 0,
+        isDragging: false,
+        isAnimating: false,
+        isInitialized: false,
+        sizeSetByAnimation: false,
+        hasUserInteracted: false
+      });
+
+      // Load saved layout from localStorage
+      const [savedLayout, setSavedLayout] = useLocalStorageState<number | null>(
+        createAutoSaveId(autoSaveId),
+        { defaultValue: null, bustStorageOnInit }
       );
 
-      const _sizes = useMemo(() => {
-        return hasHidden ? (leftHidden ? ['0px', 'auto'] : ['auto', '0px']) : sizes;
-      }, [hasHidden, leftHidden, sizes]);
+      const isVertical = useMemo(() => split === 'vertical', [split]);
 
-      const memoizedLeftPaneStyle = useMemo(() => {
-        const isHidden = leftHidden;
-        const isEffectivelyHidden = _sizes[0] === '0px' || _sizes[0] === '0%';
-        return {
-          display: isHidden ? 'none' : undefined,
-          overflow: isEffectivelyHidden ? 'hidden' : undefined
-        };
-      }, [leftHidden, _sizes[0]]);
+      // Calculate initial size based on default layout
+      const calculateInitialSize = useCallback(
+        (containerSize: number): number => {
+          if (containerSize === 0) return 0;
 
-      const memoizedRightPaneStyle = useMemo(() => {
-        return {
-          display: rightHidden ? 'none' : undefined
-        };
-      }, [rightHidden]);
+          const [leftValue, rightValue] = defaultLayout;
 
-      const isSideClosed = useMemoizedFn((side: 'left' | 'right') => {
-        if (side === 'left') {
-          return _sizes[0] === '0px' || _sizes[0] === '0%' || _sizes[0] === 0;
-        }
-        return _sizes[1] === '0px' || _sizes[1] === '0%' || _sizes[1] === 0;
-      });
-
-      const hideSash = useMemo(() => {
-        return hideSplitter ?? (leftHidden || rightHidden);
-      }, [hideSplitter, allowResize, leftHidden, rightHidden]);
-
-      const sashRender = useMemoizedFn((_: number, active: boolean) => (
-        <AppSplitterSash
-          hideSplitter={hideSash}
-          active={active}
-          splitterClassName={splitterClassName}
-          splitDirection={split}
-        />
-      ));
-
-      const onChangePanels = useMemoizedFn((sizes: number[]) => {
-        //    if (!isDragging) return;
-        setSizes(sizes);
-        const key = createAutoSaveId(autoSaveId);
-        const sizesString = preserveSide === 'left' ? [sizes[0], 'auto'] : ['auto', sizes[1]];
-        Cookies.set(key, JSON.stringify(sizesString), { expires: 365 });
-      });
-
-      const onPreserveSide = useMemoizedFn(() => {
-        const [left, right] = sizes;
-        if (preserveSide === 'left') {
-          setSizes([left, 'auto']);
-        } else if (preserveSide === 'right') {
-          setSizes(['auto', right]);
-        }
-      });
-
-      useEffect(() => {
-        if (preserveSide && !hideSplitter && split === 'vertical') {
-          window.addEventListener('resize', onPreserveSide);
-          return () => {
-            window.removeEventListener('resize', onPreserveSide);
-          };
-        }
-      }, [preserveSide]);
-
-      const setSplitSizes = useMemoizedFn((newSizes: (number | string)[]) => {
-        // Convert all sizes to percentage strings
-        const percentageSizes = newSizes.map((size) =>
-          typeof size === 'number' ? `${size * 100}%` : size
-        );
-
-        setSizes(percentageSizes);
-        if (preserveSide) {
-          const key = createAutoSaveId(autoSaveId);
-          const sizesString =
-            preserveSide === 'left' ? [percentageSizes[0], 'auto'] : ['auto', percentageSizes[1]];
-          Cookies.set(key, JSON.stringify(sizesString), { expires: 365 });
-          setAppSplitterCookie(key, sizesString);
-        }
-      });
-
-      const animateWidth = useMemoizedFn(
-        async (width: string, side: 'left' | 'right', duration = 0.25) => {
-          const { value: targetValue, unit: targetUnit } = parseWidthValue(width);
-          const container = containerRef.current;
-          if (!container) return;
-
-          const containerWidth = container.getBoundingClientRect().width;
-          let targetPercentage: number;
-
-          // If the container width is 0, wait for 10ms and try again
-          if (containerWidth === 0) {
-            await timeout(25);
-            return animateWidth(width, side, duration);
+          if (preserveSide === 'left' && leftValue !== 'auto') {
+            return sizeToPixels(leftValue, containerSize);
+          } else if (preserveSide === 'right' && rightValue !== 'auto') {
+            return sizeToPixels(rightValue, containerSize);
+          }
+          if (preserveSide === 'left') {
+            return containerSize;
+          }
+          if (preserveSide === 'right') {
+            return containerSize;
           }
 
-          // Convert target width to percentage
-          if (targetUnit === 'px') {
-            targetPercentage = convertPxToPercentage(targetValue, containerWidth);
+          return 280; // Default fallback
+        },
+        [defaultLayout, preserveSide]
+      );
+
+      // Calculate size constraints once per container size change
+      const constraints = useMemo(() => {
+        if (!state.containerSize) return null;
+
+        return {
+          leftMin: sizeToPixels(leftPanelMinSize, state.containerSize),
+          leftMax: leftPanelMaxSize
+            ? sizeToPixels(leftPanelMaxSize, state.containerSize)
+            : state.containerSize,
+          rightMin: sizeToPixels(rightPanelMinSize, state.containerSize),
+          rightMax: rightPanelMaxSize
+            ? sizeToPixels(rightPanelMaxSize, state.containerSize)
+            : state.containerSize
+        };
+      }, [
+        state.containerSize,
+        leftPanelMinSize,
+        rightPanelMinSize,
+        leftPanelMaxSize,
+        rightPanelMaxSize
+      ]);
+
+      // Apply constraints to a size value
+      const applyConstraints = useCallback(
+        (size: number): number => {
+          if (!constraints || !state.containerSize) return size;
+
+          let constrainedSize = size;
+
+          if (preserveSide === 'left') {
+            constrainedSize = Math.max(constraints.leftMin, Math.min(size, constraints.leftMax));
+            const rightSize = state.containerSize - constrainedSize;
+
+            if (rightSize < constraints.rightMin) {
+              constrainedSize = state.containerSize - constraints.rightMin;
+            }
+            if (rightSize > constraints.rightMax) {
+              constrainedSize = state.containerSize - constraints.rightMax;
+            }
           } else {
-            targetPercentage = targetValue;
+            constrainedSize = Math.max(constraints.rightMin, Math.min(size, constraints.rightMax));
+            const leftSize = state.containerSize - constrainedSize;
+
+            if (leftSize < constraints.leftMin) {
+              constrainedSize = state.containerSize - constraints.leftMin;
+            }
+            if (leftSize > constraints.leftMax) {
+              constrainedSize = state.containerSize - constraints.leftMax;
+            }
           }
 
-          const bothSizesAreNumber = typeof _sizes[0] === 'number' && typeof _sizes[1] === 'number';
-          const leftPanelSize = bothSizesAreNumber
-            ? `${(Number(_sizes[0]) / (Number(_sizes[0]) + Number(_sizes[1]))) * 100}%`
-            : _sizes[0];
-          const rightPanelSize = bothSizesAreNumber
-            ? `${(Number(_sizes[1]) / (Number(_sizes[0]) + Number(_sizes[1]))) * 100}%`
-            : _sizes[1];
-          const currentSize = side === 'left' ? leftPanelSize : rightPanelSize;
-          const otherSize = side === 'left' ? rightPanelSize : leftPanelSize;
+          return constrainedSize;
+        },
+        [constraints, preserveSide, state.containerSize]
+      );
 
-          // Calculate current percentage considering 'auto' cases
-          const currentSizeNumber = getCurrentSizePercentage(currentSize, otherSize, container);
+      // Calculate panel sizes with simplified logic
+      const { leftSize, rightSize } = useMemo(() => {
+        const {
+          containerSize,
+          isInitialized,
+          isAnimating,
+          sizeSetByAnimation,
+          isDragging,
+          hasUserInteracted
+        } = state;
 
-          if (
-            currentSizeNumber === Infinity ||
-            currentSizeNumber === -Infinity ||
-            targetPercentage === Infinity ||
-            targetPercentage === -Infinity
-          ) {
-            return;
+        if (!containerSize || !isInitialized) {
+          return { leftSize: 0, rightSize: 0 };
+        }
+
+        // Handle hidden panels
+        if (leftHidden && !rightHidden) return { leftSize: 0, rightSize: containerSize };
+        if (rightHidden && !leftHidden) return { leftSize: containerSize, rightSize: 0 };
+        if (leftHidden && rightHidden) return { leftSize: 0, rightSize: 0 };
+
+        const currentSize = savedLayout ?? 0;
+
+        // During animation or when size was set by animation (and not currently dragging),
+        // don't apply constraints to allow smooth animations
+        const shouldApplyConstraints =
+          !isAnimating && !sizeSetByAnimation && hasUserInteracted && !isDragging;
+
+        const finalSize = shouldApplyConstraints ? applyConstraints(currentSize) : currentSize;
+
+        if (preserveSide === 'left') {
+          const left = Math.max(0, finalSize);
+          const right = Math.max(0, containerSize - left);
+          return { leftSize: left, rightSize: right };
+        } else {
+          const right = Math.max(0, finalSize);
+          const left = Math.max(0, containerSize - right);
+          return { leftSize: left, rightSize: right };
+        }
+      }, [state, savedLayout, leftHidden, rightHidden, preserveSide, applyConstraints]);
+
+      // Determine if splitter should be hidden
+      const shouldHideSplitter =
+        hideSplitterProp || (leftHidden && rightHidden) || leftSize === 0 || rightSize === 0;
+
+      const showSplitter = !leftHidden && !rightHidden;
+
+      // Update container size and handle initialization
+      const updateContainerSize = useCallback(() => {
+        if (!containerRef.current) return;
+
+        const size = isVertical
+          ? containerRef.current.offsetWidth
+          : containerRef.current.offsetHeight;
+
+        setState((prev) => {
+          if (prev.containerSize === size) return prev;
+
+          const newState = { ...prev, containerSize: size };
+
+          // Initialize if needed
+          if (!prev.isInitialized && !prev.isAnimating && size > 0) {
+            newState.isInitialized = true;
+
+            // Set initial size if no saved layout exists
+            if (savedLayout === null || savedLayout === undefined) {
+              const initialSize = calculateInitialSize(size);
+              setSavedLayout(initialSize);
+            }
           }
 
-          await new Promise((resolve) => {
+          return newState;
+        });
+      }, [isVertical, savedLayout, setSavedLayout, calculateInitialSize]);
+
+      // Animation function
+      const animateWidth = useCallback(
+        async (
+          width: string | number,
+          side: 'left' | 'right',
+          duration: number = 250
+        ): Promise<void> => {
+          return new Promise((resolve) => {
+            if (!state.containerSize) {
+              resolve();
+              return;
+            }
+
+            setState((prev) => ({ ...prev, isAnimating: true }));
+
+            if (animationRef.current) {
+              cancelAnimationFrame(animationRef.current);
+            }
+
+            const targetPixels = sizeToPixels(width, state.containerSize);
+            let targetSize: number;
+
+            if (side === 'left') {
+              targetSize =
+                preserveSide === 'left' ? targetPixels : state.containerSize - targetPixels;
+            } else {
+              targetSize =
+                preserveSide === 'right' ? targetPixels : state.containerSize - targetPixels;
+            }
+
+            const startSize = savedLayout ?? 0;
             const startTime = performance.now();
-            const endTime = startTime + duration * 1000;
 
             const animate = (currentTime: number) => {
-              const elapsedTime = currentTime - startTime;
-              const progress = Math.min(elapsedTime / (duration * 1000), 1);
-
+              const elapsed = currentTime - startTime;
+              const progress = Math.min(elapsed / duration, 1);
               const easedProgress = easeInOutCubic(progress);
-              const newSizeNumber =
-                currentSizeNumber + (targetPercentage - currentSizeNumber) * easedProgress;
 
-              const newSize = `${newSizeNumber}%`;
-              const otherSize = `${100 - newSizeNumber}%`;
+              const currentSize = startSize + (targetSize - startSize) * easedProgress;
+              setSavedLayout(currentSize);
 
-              const newSizes = side === 'left' ? [newSize, otherSize] : [otherSize, newSize];
-
-              setSplitSizes(newSizes);
-
-              if (currentTime < endTime) {
-                requestAnimationFrame(animate);
+              if (progress < 1) {
+                animationRef.current = requestAnimationFrame(animate);
               } else {
-                resolve(true);
+                animationRef.current = null;
+                setState((prev) => ({
+                  ...prev,
+                  isAnimating: false,
+                  sizeSetByAnimation: true
+                }));
+                resolve();
               }
             };
 
-            requestAnimationFrame(animate);
+            animationRef.current = requestAnimationFrame(animate);
           });
-        }
+        },
+        [state.containerSize, preserveSide, savedLayout, setSavedLayout]
       );
 
-      const imperativeHandleMethods = useMemo(() => {
-        return () => ({
-          setSplitSizes,
+      // Set split sizes function
+      const setSplitSizes = useCallback(
+        (sizes: [string | number, string | number]) => {
+          if (!state.containerSize) return;
+
+          const [leftValue, rightValue] = sizes;
+
+          if (preserveSide === 'left' && leftValue !== 'auto') {
+            const newSize = sizeToPixels(leftValue, state.containerSize);
+            setSavedLayout(newSize);
+          } else if (preserveSide === 'right' && rightValue !== 'auto') {
+            const newSize = sizeToPixels(rightValue, state.containerSize);
+            setSavedLayout(newSize);
+          }
+
+          setState((prev) => ({ ...prev, sizeSetByAnimation: false }));
+        },
+        [state.containerSize, preserveSide, setSavedLayout]
+      );
+
+      // Check if side is closed
+      const isSideClosed = useCallback(
+        (side: 'left' | 'right') => {
+          if (side === 'left') {
+            return leftHidden || leftSize === 0;
+          } else {
+            return rightHidden || rightSize === 0;
+          }
+        },
+        [leftHidden, rightHidden, leftSize, rightSize]
+      );
+
+      // Get sizes in pixels
+      const getSizesInPixels = useCallback((): [number, number] => {
+        return [leftSize, rightSize];
+      }, [leftSize, rightSize]);
+
+      // Mouse event handlers
+      const handleMouseDown = useCallback(
+        (e: React.MouseEvent) => {
+          if (!allowResize) return;
+
+          setState((prev) => ({
+            ...prev,
+            isDragging: true,
+            hasUserInteracted: true,
+            sizeSetByAnimation: false
+          }));
+
+          startPosRef.current = isVertical ? e.clientX : e.clientY;
+          startSizeRef.current = savedLayout ?? 0;
+          e.preventDefault();
+        },
+        [allowResize, isVertical, savedLayout]
+      );
+
+      const handleMouseMove = useCallback(
+        (e: MouseEvent) => {
+          if (!state.isDragging || !state.containerSize) return;
+
+          const currentPos = isVertical ? e.clientX : e.clientY;
+          const delta = currentPos - startPosRef.current;
+
+          let newSize: number;
+
+          if (preserveSide === 'left') {
+            newSize = startSizeRef.current + delta;
+          } else {
+            newSize = startSizeRef.current - delta;
+          }
+
+          const constrainedSize = applyConstraints(newSize);
+          setSavedLayout(constrainedSize);
+        },
+        [
+          state.isDragging,
+          state.containerSize,
+          isVertical,
+          preserveSide,
+          applyConstraints,
+          setSavedLayout
+        ]
+      );
+
+      const handleMouseUp = useCallback(() => {
+        setState((prev) => ({ ...prev, isDragging: false }));
+      }, []);
+
+      // Effects
+      useEffect(() => {
+        updateContainerSize();
+
+        const resizeObserver = new ResizeObserver(updateContainerSize);
+        if (containerRef.current) {
+          resizeObserver.observe(containerRef.current);
+        }
+
+        window.addEventListener('resize', updateContainerSize);
+
+        return () => {
+          resizeObserver.disconnect();
+          window.removeEventListener('resize', updateContainerSize);
+        };
+      }, [updateContainerSize]);
+
+      useEffect(() => {
+        if (state.isDragging) {
+          document.addEventListener('mousemove', handleMouseMove);
+          document.addEventListener('mouseup', handleMouseUp);
+          document.body.style.cursor = isVertical ? 'col-resize' : 'row-resize';
+          document.body.style.userSelect = 'none';
+
+          return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+          };
+        }
+      }, [state.isDragging, handleMouseMove, handleMouseUp, isVertical]);
+
+      // Expose methods via ref
+      useImperativeHandle(
+        ref,
+        () => ({
           animateWidth,
+          setSplitSizes,
           isSideClosed,
-          sizes: _sizes
-        });
-      }, [setSplitSizes, animateWidth, isSideClosed, _sizes]);
+          getSizesInPixels
+        }),
+        [animateWidth, setSplitSizes, isSideClosed, getSizesInPixels]
+      );
 
-      // Add useImperativeHandle to expose the function
-      useImperativeHandle(ref, imperativeHandleMethods);
+      const sizes = useMemo<[string | number, string | number]>(
+        () => [`${leftSize}px`, `${rightSize}px`],
+        [leftSize, rightSize]
+      );
 
-      const size = useSize(containerRef);
+      const content = (
+        <div
+          ref={containerRef}
+          className={cn('flex h-full w-full', isVertical ? 'flex-row' : 'flex-col', className)}
+          style={style}>
+          <Panel
+            className={leftPanelClassName}
+            width={isVertical ? leftSize : 'auto'}
+            height={!isVertical ? leftSize : 'auto'}
+            hidden={leftHidden}>
+            {leftChildren}
+          </Panel>
+
+          {showSplitter && (
+            <Splitter
+              onMouseDown={handleMouseDown}
+              isDragging={state.isDragging}
+              split={split}
+              className={splitterClassName}
+              disabled={!allowResize}
+              hidden={shouldHideSplitter}
+            />
+          )}
+
+          <Panel
+            className={rightPanelClassName}
+            width={isVertical ? rightSize : 'auto'}
+            height={!isVertical ? rightSize : 'auto'}
+            hidden={rightHidden}>
+            {rightChildren}
+          </Panel>
+        </div>
+      );
 
       return (
-        <div className={cn('flex h-full w-full flex-col', className)} ref={containerRef}>
-          <SplitPane
-            autoSizeId={autoSaveId}
-            initialReady={initialReady}
-            split={split}
-            sizes={_sizes}
-            style={style}
-            allowResize={_allowResize}
-            onChange={onChangePanels}
-            // onDragStart={onDragStart}
-            // onDragEnd={onDragEnd}
-            resizerSize={3}
-            sashRender={sashRender}>
-            <Pane
-              style={memoizedLeftPaneStyle}
-              className={'left-pane flex h-full flex-col'}
-              minSize={leftPanelMinSize}
-              maxSize={leftPanelMaxSize}>
-              {leftHidden || size?.width === 0 || size?.width === undefined ? null : leftChildren}
-            </Pane>
-            <Pane
-              className="right-pane flex h-full flex-col"
-              style={memoizedRightPaneStyle}
-              minSize={rightPanelMinSize}
-              maxSize={rightPanelMaxSize}>
-              {rightHidden || size?.width === 0 || size?.width === undefined ? null : rightChildren}
-            </Pane>
-          </SplitPane>
-        </div>
+        <AppSplitterProvider
+          animateWidth={animateWidth}
+          setSplitSizes={setSplitSizes}
+          isSideClosed={isSideClosed}
+          getSizesInPixels={getSizesInPixels}
+          sizes={sizes}>
+          {content}
+        </AppSplitterProvider>
       );
     }
   )
 );
-AppSplitter.displayName = 'AppSplitter';
 
-const AppSplitterSash: React.FC<{
-  active: boolean;
-  splitterClassName?: string;
-  hideSplitter?: boolean;
-  splitDirection?: 'vertical' | 'horizontal';
-}> = React.memo(
-  ({ active, splitterClassName = '', hideSplitter = false, splitDirection = 'vertical' }) => {
-    return (
-      <div
-        className={cn(
-          splitterClassName,
-          //  styles.splitter,
-          'bg-primary left-[1px]',
-          'absolute transition',
-          `cursor-${splitDirection}-resize`,
-          splitDirection === 'vertical' ? 'h-full w-[0.5px]' : 'h-[0.5px] w-full',
-          active && 'bg-primary',
-          !active && 'bg-border',
-          hideSplitter && 'bg-transparent',
-          hideSplitter && active && 'bg-border'
-        )}
-      />
-    );
-  }
-);
-AppSplitterSash.displayName = 'AppSplitterSash';
+AppSplitter.displayName = 'AppSplitter';

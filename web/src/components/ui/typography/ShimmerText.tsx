@@ -1,8 +1,8 @@
 'use client';
 
-import { cn } from '@/lib/classMerge';
 import { motion } from 'framer-motion';
 import React, { useMemo } from 'react';
+import { cn } from '@/lib/classMerge';
 
 interface ShimmerText2Props {
   text: string;
@@ -46,7 +46,7 @@ export const ShimmerText: React.FC<ShimmerText2Props> = React.memo(
     const memoizedTransition = useMemo(() => {
       return {
         duration,
-        repeat: Infinity,
+        repeat: Number.POSITIVE_INFINITY,
         ease: 'linear'
       };
     }, [duration]);

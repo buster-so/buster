@@ -1,9 +1,9 @@
 import React from 'react';
+import { useGetChatMessage } from '@/api/buster_rest/chats';
+import { ChatMessageOptions } from '../ChatMessageOptions';
 import { MessageContainer } from '../MessageContainer';
 import { ChatResponseMessageSelector } from './ChatResponseMessageSelector';
 import { ChatResponseReasoning } from './ChatResponseReasoning';
-import { useGetChatMessage } from '@/api/buster_rest/chats';
-import { ChatMessageOptions } from '../ChatMessageOptions';
 
 interface ChatResponseMessagesProps {
   isCompletedStream: boolean;

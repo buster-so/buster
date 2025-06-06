@@ -1,24 +1,23 @@
-import { computeHiddenShowItems } from './helpers';
-import { BusterChartLegendItem } from './interfaces';
-import { renderToString } from 'react-dom/server';
-import { LegendItem } from './LegendItem';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ChartType } from '@/api/asset_interfaces/metric/charts';
+import { computeHiddenShowItems } from './helpers';
+import type { BusterChartLegendItem } from './interfaces';
 
 // Mock the DOM elements and methods
-const mockGetBoundingClientRect = jest.fn();
-const mockCreateElement = jest.fn();
-const mockAppendChild = jest.fn();
-const mockRemoveChild = jest.fn();
+const mockGetBoundingClientRect = vi.fn();
+const mockCreateElement = vi.fn();
+const mockAppendChild = vi.fn();
+const mockRemoveChild = vi.fn();
 
 // Mock renderToString to return a predictable width
-jest.mock('react-dom/server', () => ({
-  renderToString: jest.fn(() => '<div style="width: 100px">Mock Item</div>')
+vi.mock('react-dom/server', () => ({
+  renderToString: vi.fn(() => '<div style="width: 100px">Mock Item</div>')
 }));
 
 describe('computeHiddenShowItems', () => {
   beforeEach(() => {
     // Reset all mocks before each test
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Setup DOM mocks
     mockGetBoundingClientRect.mockReturnValue({ width: 100 });

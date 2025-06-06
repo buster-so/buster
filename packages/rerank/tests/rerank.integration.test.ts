@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeAll } from 'vitest';
 import { config } from 'dotenv';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { Reranker, rerankResults } from '../src/index';
 import type { RerankResult } from '../src/types';
 
@@ -244,4 +244,3 @@ describe('Reranker - Integration Tests', () => {
     });
   });
 });
-

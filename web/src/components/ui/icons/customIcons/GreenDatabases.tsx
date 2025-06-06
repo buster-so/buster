@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 export const GreenDatabases: React.FC<{
   onClick?: () => void;
@@ -14,6 +14,7 @@ export const GreenDatabases: React.FC<{
       viewBox="0 0 24 24"
       fill="none"
       xmlns="http://www.w3.org/2000/svg">
+      <title>Green Databases Icon</title>
       <mask id="mask0_162_4040" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
         <rect x="0.5" y="0.5" width="23" height="23" fill="#D9D9D9" stroke="black" />
       </mask>

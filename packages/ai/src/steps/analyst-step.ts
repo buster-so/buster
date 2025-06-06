@@ -1,19 +1,21 @@
 import { createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
+import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { analystAgent } from '../agents/analyst-agent/analyst-agent';
+import { formatMessagesForAnalyst } from '../utils/memory/message-history';
+import { ThinkAndPrepOutputSchema } from '../utils/memory/types';
 import type {
   AnalystRuntimeContext,
   thinkAndPrepWorkflowInputSchema,
 } from '../workflows/analyst-workflow';
 
-const inputSchema = z.object({});
+const inputSchema = ThinkAndPrepOutputSchema;
 
 const outputSchema = z.object({});
 
-const abortSignal = new AbortController();
-
 const analystExecution = async ({
+  inputData,
   getInitData,
   runtimeContext,
 }: {
@@ -21,32 +23,87 @@ const analystExecution = async ({
   getInitData: () => Promise<z.infer<typeof thinkAndPrepWorkflowInputSchema>>;
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof outputSchema>> => {
-  const userId = runtimeContext.get('userId');
-  const sessionId = runtimeContext.get('threadId');
-
-  const initData = await getInitData();
-  const prompt = initData.prompt;
+  const abortController = new AbortController();
 
   try {
-    await analystAgent.generate(prompt, {
-      maxSteps: 15,
-      threadId: sessionId,
-      resourceId: userId,
-      runtimeContext,
-      abortSignal: abortSignal.signal,
-      onStepFinish: (step) => {
-        if (step.toolResults.some((result) => result.toolName === 'done')) {
-          abortSignal.abort();
-        }
+    const resourceId = runtimeContext.get('userId');
+    const threadId = runtimeContext.get('threadId');
+
+    if (!resourceId || !threadId) {
+      throw new Error('Unable to access your session. Please refresh and try again.');
+    }
+
+    // Get the initial prompt from the workflow
+    const initData = await getInitData();
+    const initialPrompt = initData.prompt;
+
+    // Format messages for the analyst agent
+    const formattedMessages = formatMessagesForAnalyst(inputData.outputMessages, initialPrompt);
+
+    const wrappedStream = wrapTraced(
+      async () => {
+        const stream = await analystAgent.stream(formattedMessages, {
+          threadId,
+          resourceId,
+          runtimeContext,
+          toolChoice: 'required',
+          abortSignal: abortController.signal,
+        });
+
+        return stream;
       },
-    });
+      {
+        name: 'Analyst',
+        spanAttributes: {
+          messageCount: formattedMessages.length,
+          previousStep: {
+            toolsUsed: inputData.metadata?.toolsUsed,
+            finalTool: inputData.metadata?.finalTool,
+            hasReasoning: !!inputData.metadata?.reasoning,
+          },
+        },
+      }
+    );
+
+    const stream = await wrappedStream();
+
+    for await (const chunk of stream.fullStream) {
+      if (chunk.type === 'tool-result' && chunk.toolName === 'doneTool') {
+        abortController.abort();
+        return {};
+      }
+    }
+
+    return {};
   } catch (error) {
-    if (error instanceof AbortSignal) {
+    // Handle abort errors gracefully
+    if (error instanceof Error && error.name === 'AbortError') {
+      // This is expected when we abort the stream
       return {};
     }
-  }
 
-  return {};
+    console.error('Error in analyst step:', error);
+
+    // Check if it's a database connection error
+    if (error instanceof Error && error.message.includes('DATABASE_URL')) {
+      throw new Error('Unable to connect to the analysis service. Please try again later.');
+    }
+
+    // Check if it's an API/model error
+    if (
+      error instanceof Error &&
+      (error.message.includes('API') || error.message.includes('model'))
+    ) {
+      throw new Error(
+        'The analysis service is temporarily unavailable. Please try again in a few moments.'
+      );
+    }
+
+    // For unexpected errors, provide a generic friendly message
+    throw new Error(
+      'Something went wrong during the analysis. Please try again or contact support if the issue persists.'
+    );
+  }
 };
 
 export const analystStep = createStep({

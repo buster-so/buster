@@ -1,6 +1,7 @@
 import { renderHook } from '@testing-library/react';
-import { useLegendAutoShow } from './useLegendAutoShow';
+import { describe, expect, it } from 'vitest';
 import type { BusterChartProps } from '@/api/asset_interfaces/metric/charts';
+import { useLegendAutoShow } from './useLegendAutoShow';
 
 type ChartType = BusterChartProps['selectedChartType'];
 

@@ -1,9 +1,9 @@
 'use server';
 
-import { createClient } from './server';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
-import { cookies } from 'next/headers';
+import { createClient } from './server';
 
 export const signOut = async () => {
   'use server';
@@ -12,9 +12,9 @@ export const signOut = async () => {
 
   // Clear all cookies
   const allCookies = cookieStore.getAll();
-  allCookies.forEach((cookie) => {
+  for (const cookie of allCookies) {
     cookieStore.delete(cookie.name);
-  });
+  }
 
   const { error } = await supabase.auth.signOut();
 

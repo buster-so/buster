@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 export const LineChartAreaChartIcon: React.FC<{
   'data-value'?: string;
@@ -12,6 +12,7 @@ export const LineChartAreaChartIcon: React.FC<{
       height="16"
       viewBox="0 0 17 16"
       fill="none">
+      <title>Line Chart Area Chart Icon</title>
       <mask id="mask0_385_399" maskUnits="userSpaceOnUse" x="-2" y="-2" width="21" height="20">
         <rect x="-1.29102" y="-2" width="20" height="20" fill="#D9D9D9" />
       </mask>

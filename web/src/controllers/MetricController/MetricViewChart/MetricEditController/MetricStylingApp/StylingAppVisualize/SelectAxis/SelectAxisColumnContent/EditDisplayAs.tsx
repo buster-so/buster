@@ -1,11 +1,11 @@
-import { type IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import React, { useMemo } from 'react';
-import { LabelAndInput } from '../../../Common/LabelAndInput';
-import { AppSegmented, SegmentedItem } from '@/components/ui/segmented';
-import { AppTooltip } from '@/components/ui/tooltip';
+import type { IBusterMetricChartConfig } from '@/api/asset_interfaces';
 import { ChartType, type ColumnSettings } from '@/api/asset_interfaces/metric/charts';
-import { useMemoizedFn } from '@/hooks';
 import { ChartBarAxisX, ChartLine, ChartScatter } from '@/components/ui/icons';
+import { AppSegmented, type SegmentedItem } from '@/components/ui/segmented';
+import { AppTooltip } from '@/components/ui/tooltip';
+import { useMemoizedFn } from '@/hooks';
+import { LabelAndInput } from '../../../Common/LabelAndInput';
 
 const options = [
   {

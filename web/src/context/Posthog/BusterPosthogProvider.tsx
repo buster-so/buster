@@ -1,15 +1,15 @@
 'use client';
 
-import { PropsWithChildren, useEffect } from 'react';
-import { PostHogProvider } from 'posthog-js/react';
-import React from 'react';
-import type { PostHogConfig } from 'posthog-js';
-import { isDev } from '@/config';
-import posthog from 'posthog-js';
-import { useUserConfigContextSelector } from '../Users';
 import { isServer } from '@tanstack/react-query';
+import type { PostHogConfig } from 'posthog-js';
+import posthog from 'posthog-js';
+import { PostHogProvider } from 'posthog-js/react';
+import React, { type PropsWithChildren, useEffect } from 'react';
 import type { BusterUserTeam } from '@/api/asset_interfaces';
-const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY!;
+import { isDev } from '@/config';
+import { useUserConfigContextSelector } from '../Users';
+
+const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
 
 export const BusterPosthogProvider: React.FC<PropsWithChildren> = React.memo(({ children }) => {
   if (isDev || !POSTHOG_KEY) {
@@ -34,7 +34,7 @@ const options: Partial<PostHogConfig> = {
   }
 };
 
-const PosthogWrapper: React.FC<PropsWithChildren<{}>> = ({ children }) => {
+const PosthogWrapper: React.FC<PropsWithChildren> = ({ children }) => {
   const user = useUserConfigContextSelector((state) => state.user);
   const userTeams = useUserConfigContextSelector((state) => state.userTeams);
   const userOrganizations = useUserConfigContextSelector((state) => state.userOrganizations);

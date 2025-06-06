@@ -1,6 +1,5 @@
-import {} from 'react';
-import { DropZone, DropZoneInternal } from './interfaces';
 import { useMemoizedFn } from '@/hooks';
+import type { DropZone, DropZoneInternal } from './interfaces';
 
 export const useDropzonesExternal = ({
   onChange

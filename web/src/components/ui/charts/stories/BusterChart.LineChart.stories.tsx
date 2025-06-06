@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { BusterChart } from '../BusterChart';
-import { ChartType } from '../../../../api/asset_interfaces/metric/charts/enum';
-import { IColumnLabelFormat } from '../../../../api/asset_interfaces/metric/charts/columnLabelInterfaces';
-import { addNoise, generateLineChartData } from '../../../../mocks/chart/chartMocks';
-import { sharedMeta } from './BusterChartShared';
 import dayjs from 'dayjs';
+import type { IColumnLabelFormat } from '../../../../api/asset_interfaces/metric/charts/columnLabelInterfaces';
+import { ChartType } from '../../../../api/asset_interfaces/metric/charts/enum';
+import { addNoise, generateLineChartData } from '../../../../mocks/chart/chartMocks';
+import type { BusterChart } from '../BusterChart';
+import { sharedMeta } from './BusterChartShared';
 
 type LineChartData = ReturnType<typeof generateLineChartData>;
 

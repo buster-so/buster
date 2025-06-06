@@ -1,31 +1,33 @@
-import { renderHook, act } from '@testing-library/react';
-import { useSelectedFile } from './useSelectedFile';
-import { createSelectedFile } from './createSelectedFile';
-import type { SelectedFile } from '../../interfaces';
-import type { AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
+import { act, renderHook } from '@testing-library/react';
+import { beforeEach, describe, expect, it, type MockedFunction, vi } from 'vitest';
 import type { FileType } from '@/api/asset_interfaces/chat';
+import type { AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
 import { BusterRoutes } from '@/routes';
+import type { SelectedFile } from '../../interfaces';
 import type { FileViewSecondary } from '../useLayoutConfig';
+import { createSelectedFile } from './createSelectedFile';
+import { useSelectedFile } from './useSelectedFile';
 
 // Mock dependencies
-jest.mock('./createSelectedFile');
+vi.mock('./createSelectedFile');
 
 // Mock the BusterAppLayout context
-const mockOnChangePage = jest.fn();
-jest.mock('@/context/BusterAppLayout', () => ({
-  useAppLayoutContextSelector: jest.fn((selector) => mockOnChangePage)
+const mockOnChangePage = vi.fn();
+vi.mock('@/context/BusterAppLayout', () => ({
+  useAppLayoutContextSelector: vi.fn((selector) => mockOnChangePage)
 }));
 
-const mockCreateSelectedFile = createSelectedFile as jest.MockedFunction<typeof createSelectedFile>;
+const mockCreateSelectedFile = createSelectedFile as MockedFunction<typeof createSelectedFile>;
 
 describe('useSelectedFile', () => {
-  const mockAnimateOpenSplitter = jest.fn();
+  const mockAnimateOpenSplitter = vi.fn();
   const mockAppSplitterRef = {
     current: {
-      isSideClosed: jest.fn((side: 'left' | 'right') => false),
-      setSplitSizes: jest.fn(),
-      animateWidth: jest.fn(),
-      sizes: [0, 0, 0]
+      isSideClosed: vi.fn((side: 'left' | 'right') => false),
+      setSplitSizes: vi.fn(),
+      animateWidth: vi.fn(),
+      sizes: [0, 0, 0],
+      getSizesInPixels: vi.fn()
     } as AppSplitterRef
   };
   const mockChatParams = {
@@ -43,7 +45,7 @@ describe('useSelectedFile', () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should initialize with null selected file when no chat params are provided', () => {
