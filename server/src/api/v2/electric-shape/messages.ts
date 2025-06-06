@@ -5,7 +5,7 @@ import { extractParamFromWhere } from './_helpers';
 
 export const messagesProxyRouter = async (url: URL, userId: string, c: Context) => {
   const chatId = extractParamFromWhere(url, 'chat_id');
-
+  
   if (!chatId) {
     return errorResponse(c, 'Chat ID is required', 403);
   }

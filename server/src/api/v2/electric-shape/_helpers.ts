@@ -45,6 +45,7 @@ export const createProxiedResponse = async (url: URL) => {
  */
 export const extractParamFromWhere = (url: URL, paramName: string): string | null => {
   const whereClause = url.searchParams.get('where');
+  console.log('whereClause', whereClause);
 
   if (!whereClause) {
     return null;
@@ -53,6 +54,7 @@ export const extractParamFromWhere = (url: URL, paramName: string): string | nul
   // Create regex to match: paramName='value' or paramName="value"
   const regex = new RegExp(`${paramName}=['"]([^'"]+)['"]`);
   const match = whereClause.match(regex);
+  console.log('match', match);
 
   return match ? match[1] : null;
 };
