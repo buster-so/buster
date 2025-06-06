@@ -7,21 +7,23 @@ describe('Create Plan Straightforward Tool Integration Tests', () => {
   beforeEach(() => {
     mockRuntimeContext = {
       state: new Map<string, any>(),
-      get: function(key: string) {
+      get: function (key: string) {
         return this.state.get(key);
       },
-      set: function(key: string, value: any) {
+      set: function (key: string, value: any) {
         this.state.set(key, value);
       },
-      clear: function() {
+      clear: function () {
         this.state.clear();
-      }
+      },
     };
   });
 
   test('should have correct tool configuration', () => {
     expect(createPlanStraightforwardTool.id).toBe('create-plan-straightforward');
-    expect(createPlanStraightforwardTool.description).toBe('Use to create a plan for an analytical workflow.');
+    expect(createPlanStraightforwardTool.description).toBe(
+      'Use to create a plan for an analytical workflow.'
+    );
     expect(createPlanStraightforwardTool.inputSchema).toBeDefined();
     expect(createPlanStraightforwardTool.outputSchema).toBeDefined();
     expect(createPlanStraightforwardTool.execute).toBeDefined();
@@ -29,7 +31,7 @@ describe('Create Plan Straightforward Tool Integration Tests', () => {
 
   test('should validate tool input schema', () => {
     const validInput = {
-      plan: 'Create a comprehensive analytics dashboard with multiple visualizations'
+      plan: 'Create a comprehensive analytics dashboard with multiple visualizations',
     };
 
     const result = createPlanStraightforwardTool.inputSchema.safeParse(validInput);
@@ -39,7 +41,7 @@ describe('Create Plan Straightforward Tool Integration Tests', () => {
   test('should validate tool output schema', () => {
     const validOutput = {
       success: true,
-      todos: '[ ] Create dashboard\n[ ] Add visualizations\n[ ] Test functionality'
+      todos: '[ ] Create dashboard\n[ ] Add visualizations\n[ ] Test functionality',
     };
 
     const result = createPlanStraightforwardTool.outputSchema.safeParse(validOutput);
@@ -48,17 +50,16 @@ describe('Create Plan Straightforward Tool Integration Tests', () => {
 
   test('should handle runtime context requirements', async () => {
     const contextWithoutGet = {
-      set: (key: string, value: any) => {}
+      set: (key: string, value: any) => {},
     };
 
     const input = {
       plan: 'Create a simple dashboard',
-      runtimeContext: contextWithoutGet
+      runtimeContext: contextWithoutGet,
     };
 
     // This should fail because get is missing
-    await expect(createPlanStraightforwardTool.execute({ context: input }))
-      .rejects.toThrow();
+    await expect(createPlanStraightforwardTool.execute({ context: input })).rejects.toThrow();
   });
 
   test('should process simple plan and generate todos', async () => {
@@ -69,7 +70,7 @@ describe('Create Plan Straightforward Tool Integration Tests', () => {
 3. Implement user filters
 4. Review and publish
       `,
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createPlanStraightforwardTool.execute({ context: input });
@@ -108,7 +109,7 @@ Create a comprehensive sales analysis dashboard with multiple visualizations to 
 **Notes**
 Use last 12 months of data for trends and ensure all charts are responsive.
       `,
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createPlanStraightforwardTool.execute({ context: input });
@@ -139,7 +140,7 @@ Data Analytics Project Tasks:
 - Implement automated reporting features
 - Deploy dashboard to production environment
       `,
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createPlanStraightforwardTool.execute({ context: input });
@@ -163,22 +164,29 @@ Implement machine learning models for predictive user behavior analysis.
 Setup monitoring and alerting systems for data quality issues.
 Deploy solution to cloud infrastructure with auto-scaling capabilities.
       `,
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createPlanStraightforwardTool.execute({ context: input });
 
     expect(result.success).toBe(true);
-    expect(result.todos).toContain('[ ] Create comprehensive user analytics system for tracking engagement metrics.');
-    expect(result.todos).toContain('[ ] Build real-time data processing pipeline using modern technologies.');
-    expect(result.todos).toContain('[ ] Implement machine learning models for predictive user behavior analysis.');
+    expect(result.todos).toContain(
+      '[ ] Create comprehensive user analytics system for tracking engagement metrics.'
+    );
+    expect(result.todos).toContain(
+      '[ ] Build real-time data processing pipeline using modern technologies.'
+    );
+    expect(result.todos).toContain(
+      '[ ] Implement machine learning models for predictive user behavior analysis.'
+    );
 
     // Verify all todos have correct structure
     const savedTodos = mockRuntimeContext.get('todos');
-    expect(savedTodos.every((todo: any) => 
-      typeof todo.todo === 'string' && 
-      typeof todo.completed === 'boolean'
-    )).toBe(true);
+    expect(
+      savedTodos.every(
+        (todo: any) => typeof todo.todo === 'string' && typeof todo.completed === 'boolean'
+      )
+    ).toBe(true);
   });
 
   test('should handle plan with no extractable actionable items', async () => {
@@ -189,7 +197,7 @@ We want to enhance data-driven decision making across the organization.
 The solution should be scalable and maintainable.
 Quality and performance are important considerations.
       `,
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createPlanStraightforwardTool.execute({ context: input });
@@ -205,10 +213,13 @@ Quality and performance are important considerations.
 
   test('should limit todos to maximum of 15 items', async () => {
     // Create a plan with many items
-    const planItems = Array.from({ length: 25 }, (_, i) => `${i + 1}. Task number ${i + 1} for comprehensive testing`);
+    const planItems = Array.from(
+      { length: 25 },
+      (_, i) => `${i + 1}. Task number ${i + 1} for comprehensive testing`
+    );
     const input = {
       plan: planItems.join('\n'),
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createPlanStraightforwardTool.execute({ context: input });
@@ -233,7 +244,7 @@ Quality and performance are important considerations.
 5. Add interactive filtering capabilities
 6. Fix
       `,
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createPlanStraightforwardTool.execute({ context: input });
@@ -263,7 +274,7 @@ Implement role-based access controls
    - Test functionality
    Deploy to production
       `,
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createPlanStraightforwardTool.execute({ context: input });
@@ -278,43 +289,53 @@ Implement role-based access controls
     // Verify state consistency
     const savedTodos = mockRuntimeContext.get('todos');
     expect(savedTodos.length).toBeGreaterThan(0);
-    expect(savedTodos.every((todo: any) => todo.hasOwnProperty('todo') && todo.hasOwnProperty('completed'))).toBe(true);
+    expect(
+      savedTodos.every(
+        (todo: any) => todo.hasOwnProperty('todo') && todo.hasOwnProperty('completed')
+      )
+    ).toBe(true);
   });
 
   test('should handle runtime context state access errors', async () => {
     const faultyContext = {
-      get: () => { throw new Error('State access failed'); },
-      set: () => {}
+      get: () => {
+        throw new Error('State access failed');
+      },
+      set: () => {},
     };
 
     const input = {
       plan: '1. Create dashboard',
-      runtimeContext: faultyContext
+      runtimeContext: faultyContext,
     };
 
-    await expect(createPlanStraightforwardTool.execute({ context: input }))
-      .rejects.toThrow('State access failed');
+    await expect(createPlanStraightforwardTool.execute({ context: input })).rejects.toThrow(
+      'State access failed'
+    );
   });
 
   test('should handle runtime context state update errors', async () => {
     const faultyContext = {
       get: () => undefined,
-      set: () => { throw new Error('State update failed'); }
+      set: () => {
+        throw new Error('State update failed');
+      },
     };
 
     const input = {
       plan: '1. Create dashboard',
-      runtimeContext: faultyContext
+      runtimeContext: faultyContext,
     };
 
-    await expect(createPlanStraightforwardTool.execute({ context: input }))
-      .rejects.toThrow('State update failed');
+    await expect(createPlanStraightforwardTool.execute({ context: input })).rejects.toThrow(
+      'State update failed'
+    );
   });
 
   test('should preserve plan_available flag setting', async () => {
     const input = {
       plan: '1. Create analytics dashboard',
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     // Initially should not be set
@@ -339,7 +360,7 @@ Implement role-based access controls
         4.Multiple    spaces   in   between
 
       `,
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createPlanStraightforwardTool.execute({ context: input });
@@ -356,10 +377,10 @@ Implement role-based access controls
     const validInputs = [
       { plan: 'Simple plan' },
       { plan: 'Complex plan with detailed steps:\n1. First step\n2. Second step' },
-      { plan: 'Plan with special characters: @#$%^&*()' }
+      { plan: 'Plan with special characters: @#$%^&*()' },
     ];
 
-    validInputs.forEach(input => {
+    validInputs.forEach((input) => {
       const result = createPlanStraightforwardTool.inputSchema.safeParse(input);
       expect(result.success).toBe(true);
     });
@@ -370,10 +391,10 @@ Implement role-based access controls
       { plan: '' }, // Empty plan
       { plan: null }, // Null plan
       { plan: 123 }, // Non-string plan
-      { plan: ['array', 'plan'] } // Array instead of string
+      { plan: ['array', 'plan'] }, // Array instead of string
     ];
 
-    invalidInputs.forEach(input => {
+    invalidInputs.forEach((input) => {
       const result = createPlanStraightforwardTool.inputSchema.safeParse(input);
       expect(result.success).toBe(false);
     });
@@ -386,13 +407,13 @@ Implement role-based access controls
 2. Second task item
 3. Third task item
       `,
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createPlanStraightforwardTool.execute({ context: input });
 
     expect(result.todos).toBe('[ ] First task item\n[ ] Second task item\n[ ] Third task item');
-    
+
     // Verify no extra whitespace or formatting issues
     expect(result.todos.startsWith('[ ]')).toBe(true);
     expect(result.todos.endsWith('item')).toBe(true);
@@ -402,20 +423,20 @@ Implement role-based access controls
   test('should handle todos with additional properties', async () => {
     const input = {
       plan: '1. Create dashboard with proper functionality',
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createPlanStraightforwardTool.execute({ context: input });
 
     expect(result.success).toBe(true);
-    
+
     // Verify saved todos have the expected structure
     const savedTodos = mockRuntimeContext.get('todos');
     expect(savedTodos[0]).toEqual({
       todo: 'Create dashboard with proper functionality',
-      completed: false
+      completed: false,
     });
-    
+
     // Should allow additional properties if they exist
     expect(typeof savedTodos[0]).toBe('object');
     expect(savedTodos[0].todo).toBeDefined();

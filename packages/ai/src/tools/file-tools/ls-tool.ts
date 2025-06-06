@@ -1,11 +1,11 @@
-import { createTool } from '@mastra/core/tools';
-import { wrapTraced } from 'braintrust';
-import { z } from 'zod';
+import { existsSync } from 'node:fs';
+import type { Dirent, Stats } from 'node:fs';
 import { readdir, stat } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
-import { existsSync } from 'node:fs';
+import { createTool } from '@mastra/core/tools';
+import { wrapTraced } from 'braintrust';
 import { minimatch } from 'minimatch';
-import type { Dirent, Stats } from 'node:fs';
+import { z } from 'zod';
 
 interface LsParams {
   path?: string;
@@ -148,15 +148,15 @@ function formatSize(bytes: number): string {
 
 function formatPermissions(mode: number): string {
   const perms = [
-    (mode & 0o400) ? 'r' : '-',
-    (mode & 0o200) ? 'w' : '-',
-    (mode & 0o100) ? 'x' : '-',
-    (mode & 0o040) ? 'r' : '-',
-    (mode & 0o020) ? 'w' : '-',
-    (mode & 0o010) ? 'x' : '-',
-    (mode & 0o004) ? 'r' : '-',
-    (mode & 0o002) ? 'w' : '-',
-    (mode & 0o001) ? 'x' : '-',
+    mode & 0o400 ? 'r' : '-',
+    mode & 0o200 ? 'w' : '-',
+    mode & 0o100 ? 'x' : '-',
+    mode & 0o040 ? 'r' : '-',
+    mode & 0o020 ? 'w' : '-',
+    mode & 0o010 ? 'x' : '-',
+    mode & 0o004 ? 'r' : '-',
+    mode & 0o002 ? 'w' : '-',
+    mode & 0o001 ? 'x' : '-',
   ];
   return perms.join('');
 }
@@ -189,12 +189,7 @@ function sortItems(items: FileItem[], sortBy: string, reverse: boolean): FileIte
 
 function validateReadPath(filePath: string): void {
   // Block access to sensitive system directories
-  const blockedPaths = [
-    '/etc/shadow',
-    '/etc/passwd',
-    '/proc/',
-    '/sys/',
-  ];
+  const blockedPaths = ['/etc/shadow', '/etc/passwd', '/proc/', '/sys/'];
 
   // Add user-specific sensitive paths if HOME is available
   if (process.env.HOME) {

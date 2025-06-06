@@ -46,7 +46,9 @@ describeFn('search.ts - Focused Integration Tests with Real Data', () => {
     it('should find file extensions when searching for document types', async () => {
       const searchEmbedding = await generateEmbedding(['file', 'document', 'extension', 'format']);
 
-      const results = await searchValuesByEmbedding(testDataSourceId, searchEmbedding, { limit: 5 });
+      const results = await searchValuesByEmbedding(testDataSourceId, searchEmbedding, {
+        limit: 5,
+      });
       results.forEach((_r, _i) => {});
 
       // Check if we found file extensions
@@ -160,7 +162,9 @@ describeFn('search.ts - Focused Integration Tests with Real Data', () => {
       const searchEmbedding = await generateEmbedding(['value']);
       const _midTime = Date.now();
 
-      const results = await searchValuesByEmbedding(testDataSourceId, searchEmbedding, { limit: 100 });
+      const results = await searchValuesByEmbedding(testDataSourceId, searchEmbedding, {
+        limit: 100,
+      });
       const endTime = Date.now();
       results.slice(0, 5).forEach((_r, _i) => {});
 
@@ -188,7 +192,9 @@ describeFn('search.ts - Focused Integration Tests with Real Data', () => {
     it('should show similarity differences in results', async () => {
       // Search for something specific
       const searchEmbedding = await generateEmbedding(['United States regions']);
-      const results = await searchValuesByEmbedding(testDataSourceId, searchEmbedding, { limit: 10 });
+      const results = await searchValuesByEmbedding(testDataSourceId, searchEmbedding, {
+        limit: 10,
+      });
       results.forEach((_r, _i) => {});
 
       // The results should be ordered by similarity

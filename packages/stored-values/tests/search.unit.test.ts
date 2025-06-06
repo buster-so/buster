@@ -140,7 +140,14 @@ describe('search.ts - Unit Tests', () => {
       expect(query).toContain('schema_name = $4');
       expect(query).toContain('table_name = $5');
       expect(query).toContain('column_name = $6');
-      expect(params).toEqual([`[${validEmbedding.join(',')}]`, 10, 'test_db', 'public', 'users', 'email']);
+      expect(params).toEqual([
+        `[${validEmbedding.join(',')}]`,
+        10,
+        'test_db',
+        'public',
+        'users',
+        'email',
+      ]);
     });
 
     it('should apply no filters when none provided', async () => {

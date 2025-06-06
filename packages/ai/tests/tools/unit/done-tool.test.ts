@@ -3,14 +3,17 @@ import { z } from 'zod';
 
 // Import the schemas we want to test (extracted from the tool file)
 const inputSchema = z.object({
-  final_response: z.string().min(1, 'Final response is required').describe(
-    'The final response message to the user. **MUST** be formatted in Markdown. Use bullet points or other appropriate Markdown formatting. Do not include headers. Do not use the \'•\' bullet character. Do not include markdown tables.'
-  )
+  final_response: z
+    .string()
+    .min(1, 'Final response is required')
+    .describe(
+      "The final response message to the user. **MUST** be formatted in Markdown. Use bullet points or other appropriate Markdown formatting. Do not include headers. Do not use the '•' bullet character. Do not include markdown tables."
+    ),
 });
 
 const outputSchema = z.object({
   success: z.boolean(),
-  todos: z.string()
+  todos: z.string(),
 });
 
 // Define todo item interface for testing
@@ -57,7 +60,7 @@ function parseTodos(todosValue: any): TodoItem[] {
 function formatTodosOutput(todos: TodoItem[], markedByDone: number[]): string {
   return todos
     .map((todo, idx) => {
-      const annotation = markedByDone.includes(idx) 
+      const annotation = markedByDone.includes(idx)
         ? ' *Marked complete by calling the done tool'
         : '';
       return `[x] ${todo.todo}${annotation}`;
@@ -82,7 +85,7 @@ async function processDone(
   if (todos.length === 0) {
     return {
       success: true,
-      todos: 'No to-do list found.'
+      todos: 'No to-do list found.',
     };
   }
 
@@ -107,7 +110,7 @@ async function processDone(
   // The actual agent termination logic resides elsewhere.
   return {
     success: true,
-    todos: todosString
+    todos: todosString,
   };
 }
 
@@ -121,7 +124,7 @@ describe('Done Tool Unit Tests', () => {
   describe('Input Schema Validation', () => {
     test('should validate correct input format', () => {
       const validInput = {
-        final_response: 'Task completed successfully. All requirements have been met.'
+        final_response: 'Task completed successfully. All requirements have been met.',
       };
 
       const result = inputSchema.safeParse(validInput);
@@ -130,7 +133,7 @@ describe('Done Tool Unit Tests', () => {
 
     test('should reject empty final_response', () => {
       const invalidInput = {
-        final_response: ''
+        final_response: '',
       };
 
       const result = inputSchema.safeParse(invalidInput);
@@ -152,7 +155,7 @@ describe('Done Tool Unit Tests', () => {
 - Generated reports
 - Analyzed data
 
-All requirements have been fulfilled.`
+All requirements have been fulfilled.`,
       };
 
       const result = inputSchema.safeParse(markdownInput);
@@ -164,7 +167,7 @@ All requirements have been fulfilled.`
     test('should validate correct output format', () => {
       const validOutput = {
         success: true,
-        todos: '[x] Task 1\n[x] Task 2 *Marked complete by calling the done tool'
+        todos: '[x] Task 1\n[x] Task 2 *Marked complete by calling the done tool',
       };
 
       const result = outputSchema.safeParse(validOutput);
@@ -174,7 +177,7 @@ All requirements have been fulfilled.`
     test('should validate output with no todos message', () => {
       const validOutput = {
         success: true,
-        todos: 'No to-do list found.'
+        todos: 'No to-do list found.',
       };
 
       const result = outputSchema.safeParse(validOutput);
@@ -183,7 +186,7 @@ All requirements have been fulfilled.`
 
     test('should reject output without success field', () => {
       const invalidOutput = {
-        todos: 'Some todos'
+        todos: 'Some todos',
       };
 
       const result = outputSchema.safeParse(invalidOutput);
@@ -192,7 +195,7 @@ All requirements have been fulfilled.`
 
     test('should reject output without todos field', () => {
       const invalidOutput = {
-        success: true
+        success: true,
       };
 
       const result = outputSchema.safeParse(invalidOutput);
@@ -205,7 +208,7 @@ All requirements have been fulfilled.`
       const validTodos = [
         { todo: 'Task 1', completed: false },
         { todo: 'Task 2', completed: true },
-        { todo: 'Task 3', completed: false }
+        { todo: 'Task 3', completed: false },
       ];
 
       const result = parseTodos(validTodos);
@@ -222,7 +225,7 @@ All requirements have been fulfilled.`
         { completed: true }, // Invalid - missing todo
         'string item', // Invalid
         null, // Invalid
-        { todo: 'Another Valid Task', completed: true }
+        { todo: 'Another Valid Task', completed: true },
       ];
 
       const result = parseTodos(mixedTodos);
@@ -249,7 +252,7 @@ All requirements have been fulfilled.`
     test('should format todos without any marked by done', () => {
       const todos = [
         { todo: 'Task 1', completed: true },
-        { todo: 'Task 2', completed: true }
+        { todo: 'Task 2', completed: true },
       ];
       const markedByDone: number[] = [];
 
@@ -261,15 +264,15 @@ All requirements have been fulfilled.`
       const todos = [
         { todo: 'Task 1', completed: true },
         { todo: 'Task 2', completed: true },
-        { todo: 'Task 3', completed: true }
+        { todo: 'Task 3', completed: true },
       ];
       const markedByDone = [1, 2]; // Tasks 2 and 3 marked by done
 
       const result = formatTodosOutput(todos, markedByDone);
       expect(result).toBe(
         '[x] Task 1\n' +
-        '[x] Task 2 *Marked complete by calling the done tool\n' +
-        '[x] Task 3 *Marked complete by calling the done tool'
+          '[x] Task 2 *Marked complete by calling the done tool\n' +
+          '[x] Task 3 *Marked complete by calling the done tool'
       );
     });
 
@@ -290,10 +293,7 @@ All requirements have been fulfilled.`
   describe('Done Tool Processing Logic', () => {
     test('should handle no todos found case', async () => {
       // No todos in state
-      const result = await processDone(
-        { final_response: 'Task completed' },
-        mockRuntimeContext
-      );
+      const result = await processDone({ final_response: 'Task completed' }, mockRuntimeContext);
 
       expect(result.success).toBe(true);
       expect(result.todos).toBe('No to-do list found.');
@@ -302,18 +302,15 @@ All requirements have been fulfilled.`
     test('should handle all todos already completed', async () => {
       const todos = [
         { todo: 'Task 1', completed: true },
-        { todo: 'Task 2', completed: true }
+        { todo: 'Task 2', completed: true },
       ];
       mockRuntimeContext.set('todos', todos);
 
-      const result = await processDone(
-        { final_response: 'All done' },
-        mockRuntimeContext
-      );
+      const result = await processDone({ final_response: 'All done' }, mockRuntimeContext);
 
       expect(result.success).toBe(true);
       expect(result.todos).toBe('[x] Task 1\n[x] Task 2');
-      
+
       // Verify state wasn't modified (todos already completed)
       const updatedTodos = mockRuntimeContext.get('todos');
       expect(updatedTodos[0].completed).toBe(true);
@@ -324,20 +321,17 @@ All requirements have been fulfilled.`
       const todos = [
         { todo: 'Task 1', completed: true },
         { todo: 'Task 2', completed: false },
-        { todo: 'Task 3', completed: false }
+        { todo: 'Task 3', completed: false },
       ];
       mockRuntimeContext.set('todos', todos);
 
-      const result = await processDone(
-        { final_response: 'Finishing up' },
-        mockRuntimeContext
-      );
+      const result = await processDone({ final_response: 'Finishing up' }, mockRuntimeContext);
 
       expect(result.success).toBe(true);
       expect(result.todos).toBe(
         '[x] Task 1\n' +
-        '[x] Task 2 *Marked complete by calling the done tool\n' +
-        '[x] Task 3 *Marked complete by calling the done tool'
+          '[x] Task 2 *Marked complete by calling the done tool\n' +
+          '[x] Task 3 *Marked complete by calling the done tool'
       );
 
       // Verify state was updated
@@ -352,21 +346,18 @@ All requirements have been fulfilled.`
         { todo: 'Already done', completed: true },
         { todo: 'Needs completion', completed: false },
         { todo: 'Also done', completed: true },
-        { todo: 'Another incomplete', completed: false }
+        { todo: 'Another incomplete', completed: false },
       ];
       mockRuntimeContext.set('todos', todos);
 
-      const result = await processDone(
-        { final_response: 'Workflow complete' },
-        mockRuntimeContext
-      );
+      const result = await processDone({ final_response: 'Workflow complete' }, mockRuntimeContext);
 
       expect(result.success).toBe(true);
       expect(result.todos).toBe(
         '[x] Already done\n' +
-        '[x] Needs completion *Marked complete by calling the done tool\n' +
-        '[x] Also done\n' +
-        '[x] Another incomplete *Marked complete by calling the done tool'
+          '[x] Needs completion *Marked complete by calling the done tool\n' +
+          '[x] Also done\n' +
+          '[x] Another incomplete *Marked complete by calling the done tool'
       );
 
       // Verify only incomplete ones were updated
@@ -375,9 +366,9 @@ All requirements have been fulfilled.`
     });
 
     test('should throw error when runtime context is missing', async () => {
-      await expect(
-        processDone({ final_response: 'Test' }, undefined)
-      ).rejects.toThrow('Runtime context not found');
+      await expect(processDone({ final_response: 'Test' }, undefined)).rejects.toThrow(
+        'Runtime context not found'
+      );
     });
 
     test('should handle invalid todo data gracefully', async () => {
@@ -386,13 +377,10 @@ All requirements have been fulfilled.`
         { todo: 'Valid task', completed: false },
         { invalid: 'data' }, // This will be filtered out
         null,
-        'string item'
+        'string item',
       ]);
 
-      const result = await processDone(
-        { final_response: 'Done' },
-        mockRuntimeContext
-      );
+      const result = await processDone({ final_response: 'Done' }, mockRuntimeContext);
 
       expect(result.success).toBe(true);
       expect(result.todos).toBe('[x] Valid task *Marked complete by calling the done tool');
@@ -400,22 +388,21 @@ All requirements have been fulfilled.`
 
     test('should handle todos with additional properties', async () => {
       const todos = [
-        { 
-          todo: 'Task with extra props', 
-          completed: false, 
+        {
+          todo: 'Task with extra props',
+          completed: false,
           priority: 'high',
-          assignee: 'user123'
-        }
+          assignee: 'user123',
+        },
       ];
       mockRuntimeContext.set('todos', todos);
 
-      const result = await processDone(
-        { final_response: 'Complete' },
-        mockRuntimeContext
-      );
+      const result = await processDone({ final_response: 'Complete' }, mockRuntimeContext);
 
       expect(result.success).toBe(true);
-      expect(result.todos).toBe('[x] Task with extra props *Marked complete by calling the done tool');
+      expect(result.todos).toBe(
+        '[x] Task with extra props *Marked complete by calling the done tool'
+      );
 
       // Verify extra properties are preserved
       const updatedTodos = mockRuntimeContext.get('todos');
@@ -428,13 +415,15 @@ All requirements have been fulfilled.`
   describe('Error Handling', () => {
     test('should handle runtime context errors gracefully', async () => {
       const faultyContext = {
-        get: () => { throw new Error('State access error'); },
-        set: () => {}
+        get: () => {
+          throw new Error('State access error');
+        },
+        set: () => {},
       };
 
-      await expect(
-        processDone({ final_response: 'Test' }, faultyContext as any)
-      ).rejects.toThrow('State access error');
+      await expect(processDone({ final_response: 'Test' }, faultyContext as any)).rejects.toThrow(
+        'State access error'
+      );
     });
   });
 
@@ -446,10 +435,10 @@ All requirements have been fulfilled.`
         '1. Numbered list\n2. Second item',
         '**Bold text** and *italic text*',
         'Text with `code` snippets',
-        'Multiple\n\nParagraphs\n\nSupported'
+        'Multiple\n\nParagraphs\n\nSupported',
       ];
 
-      markdownFormats.forEach(format => {
+      markdownFormats.forEach((format) => {
         const result = inputSchema.safeParse({ final_response: format });
         expect(result.success).toBe(true);
       });

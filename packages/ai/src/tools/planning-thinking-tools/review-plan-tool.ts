@@ -78,17 +78,13 @@ async function processReviewPlan(
     const idxZeroBased = idxOneBased - 1;
 
     if (idxZeroBased >= totalTodos) {
-      throw new Error(
-        `todo_item index ${idxOneBased} out of range (${totalTodos} todos, 1-based)`
-      );
+      throw new Error(`todo_item index ${idxOneBased} out of range (${totalTodos} todos, 1-based)`);
     }
 
     // Mark the todo at the given index as complete
     const todo = todos[idxZeroBased];
     if (!todo || typeof todo !== 'object') {
-      throw new Error(
-        `Todo item at index ${idxOneBased} (1-based) is not a valid object.`
-      );
+      throw new Error(`Todo item at index ${idxOneBased} (1-based) is not a valid object.`);
     }
 
     todo.completed = true;
@@ -105,13 +101,15 @@ async function processReviewPlan(
 
   return {
     success: true,
-    todos: todosString
+    todos: todosString,
   };
 }
 
 // Main review plan function with tracing
 const executeReviewPlan = wrapTraced(
-  async (params: ReviewPlanInput & { runtimeContext?: RuntimeContext }): Promise<ReviewPlanOutput> => {
+  async (
+    params: ReviewPlanInput & { runtimeContext?: RuntimeContext }
+  ): Promise<ReviewPlanOutput> => {
     const { runtimeContext, ...reviewParams } = params;
     return await processReviewPlan(reviewParams, runtimeContext);
   },
@@ -120,16 +118,15 @@ const executeReviewPlan = wrapTraced(
 
 // Input/Output schemas
 const inputSchema = z.object({
-  todo_items: z.array(
-    z.number().int().min(1, 'Todo item index must be at least 1 (1-based indexing)')
-  ).min(1, 'At least one todo item index must be provided').describe(
-    'A list of 1-based indices of the tasks to mark as complete (1 is the first item).'
-  )
+  todo_items: z
+    .array(z.number().int().min(1, 'Todo item index must be at least 1 (1-based indexing)'))
+    .min(1, 'At least one todo item index must be provided')
+    .describe('A list of 1-based indices of the tasks to mark as complete (1 is the first item).'),
 });
 
 const outputSchema = z.object({
   success: z.boolean(),
-  todos: z.string()
+  todos: z.string(),
 });
 
 // Export the tool
@@ -139,8 +136,10 @@ export const reviewPlanTool = createTool({
   inputSchema,
   outputSchema,
   execute: async ({ context }) => {
-    return await executeReviewPlan(context as ReviewPlanInput & { runtimeContext?: RuntimeContext });
-  }
+    return await executeReviewPlan(
+      context as ReviewPlanInput & { runtimeContext?: RuntimeContext }
+    );
+  },
 });
 
 export default reviewPlanTool;

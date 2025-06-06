@@ -192,7 +192,8 @@ async function processDashboardFile(
   if (!yamlValidation.success) {
     return {
       success: false,
-      error: 'The dashboard configuration format is incorrect. Please check the YAML syntax and structure.',
+      error:
+        'The dashboard configuration format is incorrect. Please check the YAML syntax and structure.',
     };
   }
 
@@ -211,7 +212,8 @@ async function processDashboardFile(
       if (metricValidation.missingIds) {
         return {
           success: false,
-          error: 'Some metrics referenced in the dashboard do not exist. Please create the metrics first before adding them to a dashboard.',
+          error:
+            'Some metrics referenced in the dashboard do not exist. Please create the metrics first before adding them to a dashboard.',
         };
       }
       return {

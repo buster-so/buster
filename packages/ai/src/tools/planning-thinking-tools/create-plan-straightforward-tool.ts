@@ -3,7 +3,6 @@ import { createTool } from '@mastra/core/tools';
 import { generateText } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
-import type { AnalystRuntimeContext } from '../../agents/analyst-agent/analyst-agent';
 
 // Core interfaces matching Rust structs
 interface CreatePlanStraightforwardInput {

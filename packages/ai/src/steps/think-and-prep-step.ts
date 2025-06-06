@@ -17,8 +17,12 @@ const inputSchema = z.object({
   'generate-chat-title': generateChatTitleOutputSchema,
 });
 
+import {
+  extractMessageHistory,
+  getAllToolsUsed,
+  getLastToolUsed,
+} from '../utils/memory/message-history';
 import { ThinkAndPrepOutputSchema } from '../utils/memory/types';
-import { extractMessageHistory, getLastToolUsed, getAllToolsUsed } from '../utils/memory/message-history';
 
 export const thinkAndPrepOutputSchema = z.object({});
 
@@ -72,7 +76,7 @@ const thinkAndPrepExecution = async ({
             ) {
               // Extract and validate messages
               outputMessages = extractMessageHistory(step.response.messages);
-              
+
               // Store the full step data
               finalStepData = step;
 
@@ -98,16 +102,19 @@ const thinkAndPrepExecution = async ({
     for await (const _ of stream.fullStream) {
     }
 
-    return { 
-      finished, 
+    return {
+      finished,
       outputMessages,
       stepData: finalStepData,
       metadata: {
         toolsUsed: getAllToolsUsed(outputMessages),
-        finalTool: getLastToolUsed(outputMessages) as 'submitThoughtsTool' | 'finishAndRespondTool' | undefined,
+        finalTool: getLastToolUsed(outputMessages) as
+          | 'submitThoughtsTool'
+          | 'finishAndRespondTool'
+          | undefined,
         text: finalStepData?.text,
         reasoning: finalStepData?.reasoning,
-      }
+      },
     };
   } catch (error) {
     if (error instanceof Error && error.name !== 'AbortError') {
@@ -115,16 +122,19 @@ const thinkAndPrepExecution = async ({
     }
   }
 
-  return { 
-    finished, 
+  return {
+    finished,
     outputMessages,
     stepData: finalStepData,
     metadata: {
       toolsUsed: getAllToolsUsed(outputMessages),
-      finalTool: getLastToolUsed(outputMessages) as 'submitThoughtsTool' | 'finishAndRespondTool' | undefined,
+      finalTool: getLastToolUsed(outputMessages) as
+        | 'submitThoughtsTool'
+        | 'finishAndRespondTool'
+        | undefined,
       text: finalStepData?.text,
       reasoning: finalStepData?.reasoning,
-    }
+    },
   };
 };
 

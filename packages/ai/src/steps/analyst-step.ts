@@ -3,12 +3,12 @@ import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { analystAgent } from '../agents/analyst-agent/analyst-agent';
+import { formatMessagesForAnalyst } from '../utils/memory/message-history';
+import { ThinkAndPrepOutputSchema } from '../utils/memory/types';
 import type {
   AnalystRuntimeContext,
   thinkAndPrepWorkflowInputSchema,
 } from '../workflows/analyst-workflow';
-import { ThinkAndPrepOutputSchema } from '../utils/memory/types';
-import { formatMessagesForAnalyst } from '../utils/memory/message-history';
 
 const inputSchema = ThinkAndPrepOutputSchema;
 
@@ -36,12 +36,9 @@ const analystExecution = async ({
     // Get the initial prompt from the workflow
     const initData = await getInitData();
     const initialPrompt = initData.prompt;
-    
+
     // Format messages for the analyst agent
-    const formattedMessages = formatMessagesForAnalyst(
-      inputData.outputMessages,
-      initialPrompt
-    );
+    const formattedMessages = formatMessagesForAnalyst(inputData.outputMessages, initialPrompt);
 
     const wrappedStream = wrapTraced(
       async () => {

@@ -3,14 +3,15 @@ import { z } from 'zod';
 
 // Import the schemas we want to test (extracted from the tool file)
 const inputSchema = z.object({
-  plan: z.string().min(1, 'Plan is required').describe(
-    'The step-by-step investigative plan for analytical workflows using SQL'
-  )
+  plan: z
+    .string()
+    .min(1, 'Plan is required')
+    .describe('The step-by-step investigative plan for analytical workflows using SQL'),
 });
 
 const outputSchema = z.object({
   success: z.boolean(),
-  todos: z.string()
+  todos: z.string(),
 });
 
 // Define todo item interface for testing
@@ -41,42 +42,44 @@ class MockRuntimeContext {
 function extractTodosFromPlanText(plan: string): TodoItem[] {
   const lines = plan.split('\n');
   const todos: TodoItem[] = [];
-  
+
   for (const line of lines) {
     const trimmed = line.trim();
-    
+
     // Look for numbered items, bullet points, or investigative action words
     if (
       /^\d+\.\s+/.test(trimmed) || // 1. Create...
-      /^[-*]\s+/.test(trimmed) ||  // - Create... or * Create...
-      /^(explore|investigate|analyze|test|query|discover|examine|identify|validate)\s+/i.test(trimmed) // Investigative action words
+      /^[-*]\s+/.test(trimmed) || // - Create... or * Create...
+      /^(explore|investigate|analyze|test|query|discover|examine|identify|validate)\s+/i.test(
+        trimmed
+      ) // Investigative action words
     ) {
-      let todoText = trimmed
+      const todoText = trimmed
         .replace(/^\d+\.\s*/, '') // Remove "1. "
-        .replace(/^[-*]\s*/, '')  // Remove "- " or "* "
+        .replace(/^[-*]\s*/, '') // Remove "- " or "* "
         .trim();
-        
+
       if (todoText.length > 5 && todoText.length < 150) {
         todos.push({
           todo: todoText,
-          completed: false
+          completed: false,
         });
-        
+
         if (todos.length >= 15) {
           break;
         }
       }
     }
   }
-  
+
   // If no todos found, create a generic investigative one
   if (todos.length === 0) {
     todos.push({
       todo: 'Investigate the data to answer the key questions in the plan',
-      completed: false
+      completed: false,
     });
   }
-  
+
   return todos;
 }
 
@@ -97,29 +100,28 @@ async function processCreatePlanInvestigative(
   try {
     // Use fallback extraction since we can't mock LLM in unit tests
     const todosStateObjects = extractTodosFromPlanText(params.plan);
-    
+
     // Format todos as "[ ] {todo}" strings
     const formattedTodos = todosStateObjects
       .filter((item) => item.todo && typeof item.todo === 'string')
       .map((item) => `[ ] ${item.todo}`);
-    
+
     todosString = formattedTodos.join('\n');
-    
+
     // Save todos to agent state
     runtimeContext.set('todos', todosStateObjects);
-    
   } catch (error) {
     console.warn(
       `Failed to generate todos from plan using LLM: ${error instanceof Error ? error.message : String(error)}. Proceeding without todos.`
     );
-    
+
     // Set empty todos array on error
     runtimeContext.set('todos', []);
   }
 
   return {
     success: true,
-    todos: todosString
+    todos: todosString,
   };
 }
 
@@ -133,7 +135,7 @@ describe('Create Plan Investigative Tool Unit Tests', () => {
   describe('Input Schema Validation', () => {
     test('should validate correct input format', () => {
       const validInput = {
-        plan: 'Investigate customer turnover patterns using data analysis'
+        plan: 'Investigate customer turnover patterns using data analysis',
       };
 
       const result = inputSchema.safeParse(validInput);
@@ -154,7 +156,7 @@ Investigate why customer churn has increased in Q4.
 
 **Notes**
 Focus on high-value customer segments.
-        `
+        `,
       };
 
       const result = inputSchema.safeParse(validInput);
@@ -163,7 +165,7 @@ Focus on high-value customer segments.
 
     test('should reject empty plan', () => {
       const invalidInput = {
-        plan: ''
+        plan: '',
       };
 
       const result = inputSchema.safeParse(invalidInput);
@@ -179,7 +181,7 @@ Focus on high-value customer segments.
 
     test('should reject non-string plan', () => {
       const invalidInput = {
-        plan: 123
+        plan: 123,
       };
 
       const result = inputSchema.safeParse(invalidInput);
@@ -188,7 +190,7 @@ Focus on high-value customer segments.
 
     test('should reject null plan', () => {
       const invalidInput = {
-        plan: null
+        plan: null,
       };
 
       const result = inputSchema.safeParse(invalidInput);
@@ -200,7 +202,8 @@ Focus on high-value customer segments.
     test('should validate correct output format', () => {
       const validOutput = {
         success: true,
-        todos: '[ ] Investigate data patterns\n[ ] Analyze customer behavior\n[ ] Examine correlations'
+        todos:
+          '[ ] Investigate data patterns\n[ ] Analyze customer behavior\n[ ] Examine correlations',
       };
 
       const result = outputSchema.safeParse(validOutput);
@@ -210,7 +213,7 @@ Focus on high-value customer segments.
     test('should validate output with empty todos', () => {
       const validOutput = {
         success: true,
-        todos: ''
+        todos: '',
       };
 
       const result = outputSchema.safeParse(validOutput);
@@ -220,7 +223,7 @@ Focus on high-value customer segments.
     test('should validate output with single todo', () => {
       const validOutput = {
         success: false,
-        todos: '[ ] Single investigative task'
+        todos: '[ ] Single investigative task',
       };
 
       const result = outputSchema.safeParse(validOutput);
@@ -229,7 +232,7 @@ Focus on high-value customer segments.
 
     test('should reject output without success field', () => {
       const invalidOutput = {
-        todos: 'Some investigative todos'
+        todos: 'Some investigative todos',
       };
 
       const result = outputSchema.safeParse(invalidOutput);
@@ -238,7 +241,7 @@ Focus on high-value customer segments.
 
     test('should reject output without todos field', () => {
       const invalidOutput = {
-        success: true
+        success: true,
       };
 
       const result = outputSchema.safeParse(invalidOutput);
@@ -248,7 +251,7 @@ Focus on high-value customer segments.
     test('should reject output with non-boolean success', () => {
       const invalidOutput = {
         success: 'true',
-        todos: 'Some todos'
+        todos: 'Some todos',
       };
 
       const result = outputSchema.safeParse(invalidOutput);
@@ -258,7 +261,7 @@ Focus on high-value customer segments.
     test('should reject output with non-string todos', () => {
       const invalidOutput = {
         success: true,
-        todos: ['todo1', 'todo2']
+        todos: ['todo1', 'todo2'],
       };
 
       const result = outputSchema.safeParse(invalidOutput);
@@ -281,7 +284,7 @@ Focus on high-value customer segments.
       expect(result[1].todo).toBe('Analyze revenue impact by segment');
       expect(result[2].todo).toBe('Examine correlation with product usage');
       expect(result[3].todo).toBe('Validate findings with statistical tests');
-      expect(result.every(todo => todo.completed === false)).toBe(true);
+      expect(result.every((todo) => todo.completed === false)).toBe(true);
     });
 
     test('should extract bullet point investigative todos from plan', () => {
@@ -336,14 +339,19 @@ Query additional data sources for confirmation
 
       const result = extractTodosFromPlanText(plan);
       expect(result.length).toBeGreaterThan(0);
-      expect(result.some(todo => todo.todo.includes('Explore data sources'))).toBe(true);
-      expect(result.some(todo => todo.todo.includes('Investigate customer database'))).toBe(true);
-      expect(result.some(todo => todo.todo.includes('Test hypotheses'))).toBe(true);
-      expect(result.some(todo => todo.todo.includes('Examine patterns in user behavior'))).toBe(true);
+      expect(result.some((todo) => todo.todo.includes('Explore data sources'))).toBe(true);
+      expect(result.some((todo) => todo.todo.includes('Investigate customer database'))).toBe(true);
+      expect(result.some((todo) => todo.todo.includes('Test hypotheses'))).toBe(true);
+      expect(result.some((todo) => todo.todo.includes('Examine patterns in user behavior'))).toBe(
+        true
+      );
     });
 
     test('should limit to 15 todos maximum', () => {
-      const plan = Array.from({ length: 20 }, (_, i) => `${i + 1}. Investigate aspect ${i + 1}`).join('\n');
+      const plan = Array.from(
+        { length: 20 },
+        (_, i) => `${i + 1}. Investigate aspect ${i + 1}`
+      ).join('\n');
 
       const result = extractTodosFromPlanText(plan);
       expect(result).toHaveLength(15);
@@ -365,7 +373,8 @@ Query additional data sources for confirmation
     });
 
     test('should filter out very long todos', () => {
-      const longTodo = 'Investigate a very detailed and comprehensive customer behavior analysis with multiple data sources including transaction logs, user activity tracking, customer service interactions, and social media engagement patterns across different time periods and customer segments while considering seasonal variations and external market factors';
+      const longTodo =
+        'Investigate a very detailed and comprehensive customer behavior analysis with multiple data sources including transaction logs, user activity tracking, customer service interactions, and social media engagement patterns across different time periods and customer segments while considering seasonal variations and external market factors';
       const plan = `
 1. ${longTodo}
 2. Analyze simple metrics
@@ -400,10 +409,10 @@ Data quality is important for analysis.
     test('should preserve todo structure with additional fields', () => {
       const plan = '1. Investigate customer patterns';
       const result = extractTodosFromPlanText(plan);
-      
+
       expect(result[0]).toEqual({
         todo: 'Investigate customer patterns',
-        completed: false
+        completed: false,
       });
     });
   });
@@ -417,17 +426,14 @@ Data quality is important for analysis.
 4. Validate hypotheses with testing
       `;
 
-      const result = await processCreatePlanInvestigative(
-        { plan },
-        mockRuntimeContext
-      );
+      const result = await processCreatePlanInvestigative({ plan }, mockRuntimeContext);
 
       expect(result.success).toBe(true);
       expect(result.todos).toContain('[ ] Investigate customer churn drivers');
       expect(result.todos).toContain('[ ] Analyze revenue impact patterns');
       expect(result.todos).toContain('[ ] Examine data quality issues');
       expect(result.todos).toContain('[ ] Validate hypotheses with testing');
-      
+
       // Verify state was updated
       expect(mockRuntimeContext.get('plan_available')).toBe(true);
       const savedTodos = mockRuntimeContext.get('todos');
@@ -439,9 +445,9 @@ Data quality is important for analysis.
     test('should throw error when runtime context is missing', async () => {
       const plan = 'Investigate customer behavior';
 
-      await expect(
-        processCreatePlanInvestigative({ plan }, undefined)
-      ).rejects.toThrow('Runtime context not found');
+      await expect(processCreatePlanInvestigative({ plan }, undefined)).rejects.toThrow(
+        'Runtime context not found'
+      );
     });
 
     test('should handle plan with no extractable investigative todos', async () => {
@@ -453,19 +459,18 @@ Just some general thoughts about data.
 Quality analysis is important but no specific actions.
       `;
 
-      const result = await processCreatePlanInvestigative(
-        { plan },
-        mockRuntimeContext
-      );
+      const result = await processCreatePlanInvestigative({ plan }, mockRuntimeContext);
 
       expect(result.success).toBe(true);
       expect(result.todos).toBe('[ ] Investigate the data to answer the key questions in the plan');
-      
+
       // Verify state was updated
       expect(mockRuntimeContext.get('plan_available')).toBe(true);
       const savedTodos = mockRuntimeContext.get('todos');
       expect(savedTodos).toHaveLength(1);
-      expect(savedTodos[0].todo).toBe('Investigate the data to answer the key questions in the plan');
+      expect(savedTodos[0].todo).toBe(
+        'Investigate the data to answer the key questions in the plan'
+      );
     });
 
     test('should format investigative todos correctly', async () => {
@@ -474,10 +479,7 @@ Quality analysis is important but no specific actions.
 2. Investigate anomalies
       `;
 
-      const result = await processCreatePlanInvestigative(
-        { plan },
-        mockRuntimeContext
-      );
+      const result = await processCreatePlanInvestigative({ plan }, mockRuntimeContext);
 
       expect(result.todos).toBe('[ ] Explore data patterns\n[ ] Investigate anomalies');
     });
@@ -499,10 +501,7 @@ Investigate why sales have declined in Q4.
 Focus on statistical significance of findings.
       `;
 
-      const result = await processCreatePlanInvestigative(
-        { plan },
-        mockRuntimeContext
-      );
+      const result = await processCreatePlanInvestigative({ plan }, mockRuntimeContext);
 
       expect(result.success).toBe(true);
       expect(result.todos).toContain('[ ] Analyze 11 visualizations');
@@ -514,10 +513,7 @@ Focus on statistical significance of findings.
     test('should set plan_available flag in state', async () => {
       const plan = '1. Investigate data quality';
 
-      await processCreatePlanInvestigative(
-        { plan },
-        mockRuntimeContext
-      );
+      await processCreatePlanInvestigative({ plan }, mockRuntimeContext);
 
       expect(mockRuntimeContext.get('plan_available')).toBe(true);
     });
@@ -528,20 +524,17 @@ Focus on statistical significance of findings.
 2. Investigate behavior patterns
       `;
 
-      await processCreatePlanInvestigative(
-        { plan },
-        mockRuntimeContext
-      );
+      await processCreatePlanInvestigative({ plan }, mockRuntimeContext);
 
       const savedTodos = mockRuntimeContext.get('todos');
       expect(savedTodos).toHaveLength(2);
       expect(savedTodos[0]).toEqual({
         todo: 'Explore customer data',
-        completed: false
+        completed: false,
       });
       expect(savedTodos[1]).toEqual({
         todo: 'Investigate behavior patterns',
-        completed: false
+        completed: false,
       });
     });
   });
@@ -549,8 +542,10 @@ Focus on statistical significance of findings.
   describe('Error Handling', () => {
     test('should handle runtime context state access errors gracefully', async () => {
       const faultyContext = {
-        get: () => { throw new Error('State access error'); },
-        set: () => {}
+        get: () => {
+          throw new Error('State access error');
+        },
+        set: () => {},
       };
 
       // The error should be caught and handled within the function
@@ -565,7 +560,9 @@ Focus on statistical significance of findings.
     test('should handle runtime context state update errors gracefully', async () => {
       const faultyContext = {
         get: () => undefined,
-        set: () => { throw new Error('State update error'); }
+        set: () => {
+          throw new Error('State update error');
+        },
       };
 
       // The error should be caught and handled
@@ -581,17 +578,16 @@ Focus on statistical significance of findings.
         '   ',
         '\n\n\n',
         'No actionable investigative items here',
-        '####### Headers only #######'
+        '####### Headers only #######',
       ];
 
       for (const plan of edgeCases) {
-        const result = await processCreatePlanInvestigative(
-          { plan },
-          mockRuntimeContext
-        );
+        const result = await processCreatePlanInvestigative({ plan }, mockRuntimeContext);
 
         expect(result.success).toBe(true);
-        expect(result.todos).toBe('[ ] Investigate the data to answer the key questions in the plan');
+        expect(result.todos).toBe(
+          '[ ] Investigate the data to answer the key questions in the plan'
+        );
       }
     });
   });
@@ -599,14 +595,21 @@ Focus on statistical significance of findings.
   describe('Investigative Pattern Recognition', () => {
     test('should recognize various investigative action verbs', () => {
       const actionVerbs = [
-        'explore', 'investigate', 'analyze', 'test', 'query', 
-        'discover', 'examine', 'identify', 'validate'
+        'explore',
+        'investigate',
+        'analyze',
+        'test',
+        'query',
+        'discover',
+        'examine',
+        'identify',
+        'validate',
       ];
 
-      actionVerbs.forEach(verb => {
+      actionVerbs.forEach((verb) => {
         const plan = `${verb} customer behavior patterns`;
         const result = extractTodosFromPlanText(plan);
-        
+
         expect(result).toHaveLength(1);
         expect(result[0].todo).toBe(`${verb} customer behavior patterns`);
       });
@@ -668,8 +671,8 @@ Add filtering options
       const result = extractTodosFromPlanText(plan);
       // Should include both investigative and general action words
       expect(result.length).toBeGreaterThan(0);
-      expect(result.some(todo => todo.todo.includes('Investigate data patterns'))).toBe(true);
-      expect(result.some(todo => todo.todo.includes('Explore user behavior'))).toBe(true);
+      expect(result.some((todo) => todo.todo.includes('Investigate data patterns'))).toBe(true);
+      expect(result.some((todo) => todo.todo.includes('Explore user behavior'))).toBe(true);
     });
   });
 });

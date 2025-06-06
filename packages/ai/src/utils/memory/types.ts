@@ -1,4 +1,4 @@
-import type { CoreMessage, CoreAssistantMessage, CoreToolMessage } from 'ai';
+import type { CoreAssistantMessage, CoreMessage, CoreToolMessage } from 'ai';
 import { z } from 'zod';
 
 // Tool call schema matching the actual structure from Mastra
@@ -23,11 +23,7 @@ export const TextContentSchema = z.object({
   text: z.string(),
 });
 
-export const ContentItemSchema = z.union([
-  TextContentSchema,
-  ToolCallSchema,
-  ToolResultSchema,
-]);
+export const ContentItemSchema = z.union([TextContentSchema, ToolCallSchema, ToolResultSchema]);
 
 // Core message schemas matching AI SDK format
 export const CoreAssistantMessageSchema = z.object({
@@ -71,12 +67,14 @@ export const StepFinishDataSchema = z.object({
   reasoningDetails: z.array(z.any()).optional(),
   files: z.array(z.any()).optional(),
   sources: z.array(z.any()).optional(),
-  toolCalls: z.array(z.object({
-    type: z.literal('tool-call'),
-    toolCallId: z.string(),
-    toolName: z.string(),
-    args: z.record(z.any()),
-  })),
+  toolCalls: z.array(
+    z.object({
+      type: z.literal('tool-call'),
+      toolCallId: z.string(),
+      toolName: z.string(),
+      args: z.record(z.any()),
+    })
+  ),
   toolResults: z.array(z.any()).optional(),
   finishReason: z.string(),
   usage: z.any(),
@@ -100,12 +98,14 @@ export const ThinkAndPrepOutputSchema = z.object({
   finished: z.boolean(),
   outputMessages: MessageHistorySchema,
   stepData: StepFinishDataSchema.optional(), // The full step object
-  metadata: z.object({
-    toolsUsed: z.array(z.string()),
-    finalTool: z.enum(['submitThoughtsTool', 'finishAndRespondTool']).optional(),
-    text: z.string().optional(),
-    reasoning: z.string().optional(),
-  }).optional(),
+  metadata: z
+    .object({
+      toolsUsed: z.array(z.string()),
+      finalTool: z.enum(['submitThoughtsTool', 'finishAndRespondTool']).optional(),
+      text: z.string().optional(),
+      reasoning: z.string().optional(),
+    })
+    .optional(),
 });
 
 // Type exports
@@ -127,6 +127,8 @@ export function isToolMessage(message: CoreMessage): message is CoreToolMessage 
 
 export function hasToolCalls(message: CoreMessage): boolean {
   if (!isAssistantMessage(message)) return false;
-  return Array.isArray(message.content) && 
-    message.content.some(item => typeof item === 'object' && item.type === 'tool-call');
+  return (
+    Array.isArray(message.content) &&
+    message.content.some((item) => typeof item === 'object' && item.type === 'tool-call')
+  );
 }

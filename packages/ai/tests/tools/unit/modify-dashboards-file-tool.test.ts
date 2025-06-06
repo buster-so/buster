@@ -1,50 +1,68 @@
-import { beforeEach, describe, expect, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import * as yaml from 'yaml';
 import { z } from 'zod';
 
 // Import the schemas we want to test (extracted from the tool file)
 const dashboardItemSchema = z.object({
-  id: z.string().uuid('Must be a valid UUID for an existing metric')
+  id: z.string().uuid('Must be a valid UUID for an existing metric'),
 });
 
-const dashboardRowSchema = z.object({
-  id: z.number().int().positive('Row ID must be a positive integer'),
-  items: z.array(dashboardItemSchema)
-    .min(1, 'Each row must have at least 1 item')
-    .max(4, 'Each row can have at most 4 items'),
-  columnSizes: z.array(z.number().int().min(3, 'Each column size must be at least 3').max(12, 'Each column size cannot exceed 12'))
-    .min(1, 'columnSizes array cannot be empty')
-    .refine((sizes) => sizes.reduce((sum, size) => sum + size, 0) === 12, {
-      message: 'Column sizes must sum to exactly 12'
-    })
-}).refine((row) => row.items.length === row.columnSizes.length, {
-  message: 'Number of items must match number of column sizes'
-});
+const dashboardRowSchema = z
+  .object({
+    id: z.number().int().positive('Row ID must be a positive integer'),
+    items: z
+      .array(dashboardItemSchema)
+      .min(1, 'Each row must have at least 1 item')
+      .max(4, 'Each row can have at most 4 items'),
+    columnSizes: z
+      .array(
+        z
+          .number()
+          .int()
+          .min(3, 'Each column size must be at least 3')
+          .max(12, 'Each column size cannot exceed 12')
+      )
+      .min(1, 'columnSizes array cannot be empty')
+      .refine((sizes) => sizes.reduce((sum, size) => sum + size, 0) === 12, {
+        message: 'Column sizes must sum to exactly 12',
+      }),
+  })
+  .refine((row) => row.items.length === row.columnSizes.length, {
+    message: 'Number of items must match number of column sizes',
+  });
 
 const dashboardYmlSchema = z.object({
   name: z.string().min(1, 'Dashboard name is required'),
   description: z.string().min(1, 'Dashboard description is required'),
-  rows: z.array(dashboardRowSchema)
+  rows: z
+    .array(dashboardRowSchema)
     .min(1, 'Dashboard must have at least one row')
-    .refine((rows) => {
-      const ids = rows.map(row => row.id);
-      const uniqueIds = new Set(ids);
-      return ids.length === uniqueIds.size;
-    }, {
-      message: 'All row IDs must be unique'
-    })
+    .refine(
+      (rows) => {
+        const ids = rows.map((row) => row.id);
+        const uniqueIds = new Set(ids);
+        return ids.length === uniqueIds.size;
+      },
+      {
+        message: 'All row IDs must be unique',
+      }
+    ),
 });
 
 // Parse and validate dashboard YAML content
-function parseAndValidateYaml(ymlContent: string): { success: boolean; error?: string; data?: any } {
+function parseAndValidateYaml(ymlContent: string): {
+  success: boolean;
+  error?: string;
+  data?: any;
+} {
   try {
     const parsedYml = yaml.parse(ymlContent);
     const validationResult = dashboardYmlSchema.safeParse(parsedYml);
-    
+
     if (!validationResult.success) {
       return {
         success: false,
-        error: `Invalid YAML structure: ${validationResult.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`
+        error: `Invalid YAML structure: ${validationResult.error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ')}`,
       };
     }
 
@@ -52,23 +70,27 @@ function parseAndValidateYaml(ymlContent: string): { success: boolean; error?: s
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'YAML parsing failed'
+      error: error instanceof Error ? error.message : 'YAML parsing failed',
     };
   }
 }
 
 // Mock metric ID validation function for testing
-function validateMetricIds(metricIds: string[]): { success: boolean; missingIds?: string[]; error?: string } {
+function validateMetricIds(metricIds: string[]): {
+  success: boolean;
+  missingIds?: string[];
+  error?: string;
+} {
   // Mock implementation for unit testing
   const validUUIDs = [
     'f47ac10b-58cc-4372-a567-0e02b2c3d479',
     'a47ac10b-58cc-4372-a567-0e02b2c3d480',
     '550e8400-e29b-41d4-a716-446655440000',
-    '6ba7b810-9dad-11d1-80b4-00c04fd430c8'
+    '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
   ];
 
-  const missingIds = metricIds.filter(id => !validUUIDs.includes(id));
-  
+  const missingIds = metricIds.filter((id) => !validUUIDs.includes(id));
+
   if (missingIds.length > 0) {
     return { success: false, missingIds };
   }
@@ -312,7 +334,10 @@ rows: []
 
   describe('Metric ID Validation for Modifications', () => {
     test('should accept valid metric IDs in modified dashboard', () => {
-      const validIds = ['f47ac10b-58cc-4372-a567-0e02b2c3d479', 'a47ac10b-58cc-4372-a567-0e02b2c3d480'];
+      const validIds = [
+        'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+        'a47ac10b-58cc-4372-a567-0e02b2c3d480',
+      ];
       const result = validateMetricIds(validIds);
       expect(result.success).toBe(true);
     });
@@ -343,9 +368,10 @@ rows: []
         files: [
           {
             id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-            yml_content: 'name: Updated Dashboard\\ndescription: Updated Test\\nrows:\\n  - id: 1\\n    items:\\n      - id: f47ac10b-58cc-4372-a567-0e02b2c3d479\\n    columnSizes:\\n      - 12'
-          }
-        ]
+            yml_content:
+              'name: Updated Dashboard\\ndescription: Updated Test\\nrows:\\n  - id: 1\\n    items:\\n      - id: f47ac10b-58cc-4372-a567-0e02b2c3d479\\n    columnSizes:\\n      - 12',
+          },
+        ],
       };
 
       // Basic validation that files array exists and has proper structure
@@ -356,7 +382,7 @@ rows: []
 
     test('should reject empty files array for updates', () => {
       const invalidInput = { files: [] };
-      
+
       // This would fail our minimum length validation
       expect(invalidInput.files).toHaveLength(0);
     });
@@ -366,11 +392,11 @@ rows: []
         files: [
           {
             // Missing id
-            yml_content: 'name: Updated Test'
-          }
-        ]
+            yml_content: 'name: Updated Test',
+          },
+        ],
       };
-      
+
       expect(invalidInput.files[0]).not.toHaveProperty('id');
     });
 
@@ -378,12 +404,12 @@ rows: []
       const invalidInput = {
         files: [
           {
-            id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479'
+            id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
             // Missing yml_content
-          }
-        ]
+          },
+        ],
       };
-      
+
       expect(invalidInput.files[0]).not.toHaveProperty('yml_content');
     });
 
@@ -392,17 +418,19 @@ rows: []
         files: [
           {
             id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-            yml_content: 'name: First Updated Dashboard\\ndescription: First Update\\nrows:\\n  - id: 1\\n    items:\\n      - id: f47ac10b-58cc-4372-a567-0e02b2c3d479\\n    columnSizes:\\n      - 12'
+            yml_content:
+              'name: First Updated Dashboard\\ndescription: First Update\\nrows:\\n  - id: 1\\n    items:\\n      - id: f47ac10b-58cc-4372-a567-0e02b2c3d479\\n    columnSizes:\\n      - 12',
           },
           {
             id: 'a47ac10b-58cc-4372-a567-0e02b2c3d480',
-            yml_content: 'name: Second Updated Dashboard\\ndescription: Second Update\\nrows:\\n  - id: 1\\n    items:\\n      - id: a47ac10b-58cc-4372-a567-0e02b2c3d480\\n    columnSizes:\\n      - 12'
-          }
-        ]
+            yml_content:
+              'name: Second Updated Dashboard\\ndescription: Second Update\\nrows:\\n  - id: 1\\n    items:\\n      - id: a47ac10b-58cc-4372-a567-0e02b2c3d480\\n    columnSizes:\\n      - 12',
+          },
+        ],
       };
 
       expect(bulkInput.files).toHaveLength(2);
-      expect(bulkInput.files.every(f => f.id && f.yml_content)).toBe(true);
+      expect(bulkInput.files.every((f) => f.id && f.yml_content)).toBe(true);
     });
 
     test('should reject invalid UUID format in ID field', () => {
@@ -410,9 +438,9 @@ rows: []
         files: [
           {
             id: 'not-a-valid-uuid',
-            yml_content: 'name: Test Dashboard'
-          }
-        ]
+            yml_content: 'name: Test Dashboard',
+          },
+        ],
       };
 
       // This would fail UUID validation
@@ -424,10 +452,8 @@ rows: []
     test('should validate modified single item row', () => {
       const singleItemRow = {
         id: 1,
-        items: [
-          { id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479' }
-        ],
-        columnSizes: [12]
+        items: [{ id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479' }],
+        columnSizes: [12],
       };
 
       const result = dashboardRowSchema.safeParse(singleItemRow);
@@ -439,9 +465,9 @@ rows: []
         id: 2,
         items: [
           { id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479' },
-          { id: 'a47ac10b-58cc-4372-a567-0e02b2c3d480' }
+          { id: 'a47ac10b-58cc-4372-a567-0e02b2c3d480' },
         ],
-        columnSizes: [6, 6]
+        columnSizes: [6, 6],
       };
 
       const result = dashboardRowSchema.safeParse(twoItemRow);
@@ -454,9 +480,9 @@ rows: []
         items: [
           { id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479' },
           { id: 'a47ac10b-58cc-4372-a567-0e02b2c3d480' },
-          { id: '550e8400-e29b-41d4-a716-446655440000' }
+          { id: '550e8400-e29b-41d4-a716-446655440000' },
         ],
-        columnSizes: [4, 4, 4]
+        columnSizes: [4, 4, 4],
       };
 
       const result = dashboardRowSchema.safeParse(threeItemRow);
@@ -470,9 +496,9 @@ rows: []
           { id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479' },
           { id: 'a47ac10b-58cc-4372-a567-0e02b2c3d480' },
           { id: '550e8400-e29b-41d4-a716-446655440000' },
-          { id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8' }
+          { id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8' },
         ],
-        columnSizes: [3, 3, 3, 3]
+        columnSizes: [3, 3, 3, 3],
       };
 
       const result = dashboardRowSchema.safeParse(fourItemRow);
@@ -482,10 +508,8 @@ rows: []
     test('should reject modified row with invalid column size sum', () => {
       const invalidSumRow = {
         id: 1,
-        items: [
-          { id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479' }
-        ],
-        columnSizes: [10] // Should be 12
+        items: [{ id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479' }],
+        columnSizes: [10], // Should be 12
       };
 
       const result = dashboardRowSchema.safeParse(invalidSumRow);
@@ -497,7 +521,7 @@ rows: []
     test('should generate appropriate error message for invalid YAML in modification', () => {
       const invalidYaml = 'invalid: yaml: [structure';
       const result = parseAndValidateYaml(invalidYaml);
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
       expect(typeof result.error).toBe('string');
@@ -506,7 +530,7 @@ rows: []
     test('should generate appropriate error message for metric validation in modification', () => {
       const invalidIds = ['missing-metric-id'];
       const result = validateMetricIds(invalidIds);
-      
+
       expect(result.success).toBe(false);
       expect(result.missingIds).toEqual(['missing-metric-id']);
     });
@@ -534,7 +558,7 @@ rows:
   describe('Dashboard Item Schema Validation for Modifications', () => {
     test('should validate correct dashboard item in modification', () => {
       const validItem = {
-        id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479'
+        id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
       };
 
       const result = dashboardItemSchema.safeParse(validItem);
@@ -543,7 +567,7 @@ rows:
 
     test('should reject dashboard item with invalid UUID in modification', () => {
       const invalidItem = {
-        id: 'not-a-uuid'
+        id: 'not-a-uuid',
       };
 
       const result = dashboardItemSchema.safeParse(invalidItem);
@@ -560,20 +584,12 @@ rows:
 
   describe('Column Size Edge Cases for Modifications', () => {
     test('should accept valid column size combinations in modifications', () => {
-      const validCombinations = [
-        [12],
-        [6, 6],
-        [4, 4, 4],
-        [3, 3, 3, 3],
-        [3, 9],
-        [4, 8],
-        [5, 7]
-      ];
+      const validCombinations = [[12], [6, 6], [4, 4, 4], [3, 3, 3, 3], [3, 9], [4, 8], [5, 7]];
 
-      validCombinations.forEach(columnSizes => {
+      validCombinations.forEach((columnSizes) => {
         const sum = columnSizes.reduce((a, b) => a + b, 0);
         expect(sum).toBe(12);
-        const allValid = columnSizes.every(size => size >= 3 && size <= 12);
+        const allValid = columnSizes.every((size) => size >= 3 && size <= 12);
         expect(allValid).toBe(true);
       });
     });
@@ -585,14 +601,14 @@ rows:
         [2, 10], // Size too small
         [6, 6, 1], // Size too small, sum not 12
         [1, 1, 10], // Sizes too small
-        [15] // Size too large
+        [15], // Size too large
       ];
 
-      invalidCombinations.forEach(columnSizes => {
+      invalidCombinations.forEach((columnSizes) => {
         const sum = columnSizes.reduce((a, b) => a + b, 0);
-        const hasInvalidSize = columnSizes.some(size => size < 3 || size > 12);
+        const hasInvalidSize = columnSizes.some((size) => size < 3 || size > 12);
         const invalidSum = sum !== 12;
-        
+
         expect(hasInvalidSize || invalidSum).toBe(true);
       });
     });

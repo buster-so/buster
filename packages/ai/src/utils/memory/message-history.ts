@@ -1,15 +1,6 @@
 import type { CoreMessage } from 'ai';
-import type { 
-  MessageHistory, 
-  StepFinishData, 
-  ContentItem,
-  ToolCall 
-} from './types';
-import { 
-  MessageHistorySchema, 
-  isAssistantMessage, 
-  hasToolCalls 
-} from './types';
+import type { MessageHistory, ToolCall } from './types';
+import { MessageHistorySchema, isAssistantMessage } from './types';
 
 /**
  * Extract and validate message history from step response
@@ -17,12 +8,12 @@ import {
 export function extractMessageHistory(stepMessages: any[]): MessageHistory {
   // Validate the messages match our expected schema
   const result = MessageHistorySchema.safeParse(stepMessages);
-  
+
   if (!result.success) {
     console.error('Invalid message history format:', result.error);
     return [];
   }
-  
+
   return result.data;
 }
 
@@ -33,22 +24,20 @@ export function getLastToolUsed(messages: MessageHistory): string | null {
   // Iterate backwards through messages
   for (let i = messages.length - 1; i >= 0; i--) {
     const msg = messages[i];
-    
+
     if (isAssistantMessage(msg) && Array.isArray(msg.content)) {
       // Find tool calls in the content
       const toolCall = msg.content.find(
-        (item): item is ToolCall => 
-          typeof item === 'object' && 
-          'type' in item && 
-          item.type === 'tool-call'
+        (item): item is ToolCall =>
+          typeof item === 'object' && 'type' in item && item.type === 'tool-call'
       );
-      
+
       if (toolCall) {
         return toolCall.toolName;
       }
     }
   }
-  
+
   return null;
 }
 
@@ -57,7 +46,7 @@ export function getLastToolUsed(messages: MessageHistory): string | null {
  */
 export function getAllToolsUsed(messages: MessageHistory): string[] {
   const tools = new Set<string>();
-  
+
   for (const msg of messages) {
     if (isAssistantMessage(msg) && Array.isArray(msg.content)) {
       for (const item of msg.content) {
@@ -67,7 +56,7 @@ export function getAllToolsUsed(messages: MessageHistory): string[] {
       }
     }
   }
-  
+
   return Array.from(tools);
 }
 
@@ -80,14 +69,12 @@ export function formatMessagesForAnalyst(
   initialPrompt?: string
 ): CoreMessage[] {
   const formattedMessages: CoreMessage[] = [];
-  
+
   // Check if we already have a user message with the initial prompt
   const hasInitialPrompt = messages.some(
-    msg => msg.role === 'user' && 
-    typeof msg.content === 'string' && 
-    msg.content === initialPrompt
+    (msg) => msg.role === 'user' && typeof msg.content === 'string' && msg.content === initialPrompt
   );
-  
+
   // Add initial prompt if not present
   if (initialPrompt && !hasInitialPrompt) {
     formattedMessages.push({
@@ -95,10 +82,10 @@ export function formatMessagesForAnalyst(
       content: initialPrompt,
     });
   }
-  
+
   // Add all the messages from think-and-prep
   formattedMessages.push(...messages);
-  
+
   return formattedMessages;
 }
 
@@ -112,7 +99,7 @@ export function extractToolArguments(
   if (!isAssistantMessage(message) || !Array.isArray(message.content)) {
     return null;
   }
-  
+
   const toolCall = message.content.find(
     (item): item is ToolCall =>
       typeof item === 'object' &&
@@ -120,7 +107,7 @@ export function extractToolArguments(
       item.type === 'tool-call' &&
       item.toolName === toolName
   );
-  
+
   return toolCall?.args || null;
 }
 
@@ -136,7 +123,7 @@ export function endsWithTool(messages: MessageHistory, toolName: string): boolea
  * Remove system messages from history (if needed for certain contexts)
  */
 export function removeSystemMessages(messages: MessageHistory): MessageHistory {
-  return messages.filter(msg => msg.role !== 'system');
+  return messages.filter((msg) => msg.role !== 'system');
 }
 
 /**
@@ -154,7 +141,7 @@ export function getConversationSummary(messages: MessageHistory): {
   let toolCalls = 0;
   let toolResults = 0;
   const toolsUsed = new Set<string>();
-  
+
   for (const msg of messages) {
     switch (msg.role) {
       case 'user':
@@ -176,7 +163,7 @@ export function getConversationSummary(messages: MessageHistory): {
         break;
     }
   }
-  
+
   return {
     userMessages,
     assistantMessages,

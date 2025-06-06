@@ -1,10 +1,16 @@
+import {
+  noSearchNeededTool,
+  shouldSkipDataSearch,
+  validateSearchSkipTool,
+} from '@tools/no-search-needed-tool';
 import { describe, expect, test } from 'vitest';
-import { noSearchNeededTool, validateSearchSkipTool, shouldSkipDataSearch } from '@tools/no-search-needed-tool';
 
 describe('No Search Needed Tool Unit Tests', () => {
   test('should have correct configuration', () => {
     expect(noSearchNeededTool.id).toBe('no-search-needed');
-    expect(noSearchNeededTool.description).toBe('Signal that data catalog search is not required for the current task');
+    expect(noSearchNeededTool.description).toBe(
+      'Signal that data catalog search is not required for the current task'
+    );
     expect(noSearchNeededTool.inputSchema).toBeDefined();
     expect(noSearchNeededTool.outputSchema).toBeDefined();
     expect(noSearchNeededTool.execute).toBeDefined();
@@ -212,7 +218,9 @@ describe('Should Skip Data Search Helper Tests', () => {
 describe('Validate Search Skip Tool Tests', () => {
   test('should have correct configuration', () => {
     expect(validateSearchSkipTool.id).toBe('validate-search-skip');
-    expect(validateSearchSkipTool.description).toBe('Validate that skipping data search was appropriate');
+    expect(validateSearchSkipTool.description).toBe(
+      'Validate that skipping data search was appropriate'
+    );
   });
 
   test('should validate successful task completion', async () => {

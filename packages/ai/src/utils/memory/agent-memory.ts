@@ -1,7 +1,7 @@
-import type { Memory } from '@mastra/memory';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
-import type { MessageHistory, StepFinishData } from './types';
+import type { Memory } from '@mastra/memory';
 import { getSharedMemory } from '../shared-memory';
+import type { MessageHistory, StepFinishData } from './types';
 
 /**
  * Key generator for memory storage
@@ -22,14 +22,12 @@ export async function saveAgentConversation(
   metadata?: Record<string, any>
 ): Promise<void> {
   const key = getMemoryKey(threadId, resourceId);
-  
+
   await memory.saveMessages({
     sessionId: key,
-    messages: messages.map(msg => ({
+    messages: messages.map((msg) => ({
       role: msg.role as any,
-      content: typeof msg.content === 'string' 
-        ? msg.content 
-        : JSON.stringify(msg.content),
+      content: typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content),
       metadata: {
         ...metadata,
         originalMessage: msg,
@@ -49,18 +47,20 @@ export async function saveStepData(
   stepData: StepFinishData
 ): Promise<void> {
   const key = getMemoryKey(threadId, resourceId, `step-${stepName}`);
-  
+
   // Store as a single message with the step data
   await memory.saveMessages({
     sessionId: key,
-    messages: [{
-      role: 'system' as any,
-      content: JSON.stringify(stepData),
-      metadata: {
-        stepName,
-        timestamp: Date.now(),
+    messages: [
+      {
+        role: 'system' as any,
+        content: JSON.stringify(stepData),
+        metadata: {
+          stepName,
+          timestamp: Date.now(),
+        },
       },
-    }],
+    ],
   });
 }
 
@@ -74,15 +74,15 @@ export async function getStepData(
   stepName: string
 ): Promise<StepFinishData | null> {
   const key = getMemoryKey(threadId, resourceId, `step-${stepName}`);
-  
+
   const messages = await memory.getMessages({
     sessionId: key,
   });
-  
+
   if (messages.length === 0) {
     return null;
   }
-  
+
   try {
     return JSON.parse(messages[0].content);
   } catch {
@@ -98,11 +98,11 @@ export function extractMemoryContext<T extends { userId: string; threadId: strin
 ): { threadId: string; resourceId: string } {
   const threadId = runtimeContext.get('threadId');
   const resourceId = runtimeContext.get('userId');
-  
+
   if (!threadId || !resourceId) {
     throw new Error('Missing required context values for memory operations');
   }
-  
+
   return { threadId, resourceId };
 }
 
@@ -120,16 +120,18 @@ export async function saveWorkflowState(
 ): Promise<void> {
   const memory = getSharedMemory();
   const key = getMemoryKey(threadId, resourceId, 'workflow-state');
-  
+
   await memory.saveMessages({
     sessionId: key,
-    messages: [{
-      role: 'system' as any,
-      content: JSON.stringify(state),
-      metadata: {
-        timestamp: Date.now(),
+    messages: [
+      {
+        role: 'system' as any,
+        content: JSON.stringify(state),
+        metadata: {
+          timestamp: Date.now(),
+        },
       },
-    }],
+    ],
   });
 }
 
@@ -146,15 +148,15 @@ export async function getWorkflowState(
 } | null> {
   const memory = getSharedMemory();
   const key = getMemoryKey(threadId, resourceId, 'workflow-state');
-  
+
   const messages = await memory.getMessages({
     sessionId: key,
   });
-  
+
   if (messages.length === 0) {
     return null;
   }
-  
+
   try {
     return JSON.parse(messages[0].content);
   } catch {
@@ -165,12 +167,9 @@ export async function getWorkflowState(
 /**
  * Clear memory for a specific session
  */
-export async function clearSessionMemory(
-  threadId: string,
-  resourceId: string
-): Promise<void> {
+export async function clearSessionMemory(threadId: string, resourceId: string): Promise<void> {
   const memory = getSharedMemory();
-  
+
   // Clear all related memory keys
   const keys = [
     getMemoryKey(threadId, resourceId),
@@ -178,7 +177,7 @@ export async function clearSessionMemory(
     getMemoryKey(threadId, resourceId, 'step-think-and-prep'),
     getMemoryKey(threadId, resourceId, 'step-analyst'),
   ];
-  
+
   // Note: The Memory interface might not have a clear method
   // This is a placeholder - you'd need to check the actual API
   for (const key of keys) {

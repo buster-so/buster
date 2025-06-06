@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import axios from 'axios';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Reranker, rerankResults } from '../src/index';
 import type { RerankResult } from '../src/types';
 

@@ -1,7 +1,14 @@
-import { createDashboardsFileTool } from '@/tools/visualization-tools/create-dashboards-file-tool';
-import { beforeEach, describe, expect, test, afterEach } from 'vitest';
-import { db, dashboardFiles, metricFiles, metricFilesToDashboardFiles, eq, inArray } from '@buster/database';
 import { randomUUID } from 'node:crypto';
+import { createDashboardsFileTool } from '@/tools/visualization-tools/create-dashboards-file-tool';
+import {
+  dashboardFiles,
+  db,
+  eq,
+  inArray,
+  metricFiles,
+  metricFilesToDashboardFiles,
+} from '@buster/database';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 describe('Create Dashboards File Tool Integration Tests', () => {
   let mockRuntimeContext: any;
@@ -20,11 +27,11 @@ describe('Create Dashboards File Tool Integration Tests', () => {
     mockRuntimeContext = {
       get: (key: string) => {
         const values: Record<string, string> = {
-          'user_id': testUserId,
-          'organization_id': testOrgId
+          user_id: testUserId,
+          organization_id: testOrgId,
         };
         return values[key];
-      }
+      },
     };
 
     // Reset created IDs arrays
@@ -41,12 +48,9 @@ describe('Create Dashboards File Tool Integration Tests', () => {
           .where(inArray(dashboardFiles.id, createdDashboardIds))
           .execute();
       }
-      
+
       if (createdMetricIds.length > 0) {
-        await db
-          .delete(metricFiles)
-          .where(inArray(metricFiles.id, createdMetricIds))
-          .execute();
+        await db.delete(metricFiles).where(inArray(metricFiles.id, createdMetricIds)).execute();
       }
     } catch (error) {
       // Ignore cleanup errors
@@ -54,9 +58,9 @@ describe('Create Dashboards File Tool Integration Tests', () => {
   });
 
   // Helper function to create test metrics for dashboard testing
-  async function createTestMetrics(count: number = 1): Promise<string[]> {
+  async function createTestMetrics(count = 1): Promise<string[]> {
     const metricIds: string[] = [];
-    
+
     for (let i = 1; i <= count; i++) {
       const metricId = randomUUID();
       const metricYml = {
@@ -71,10 +75,10 @@ describe('Create Dashboards File Tool Integration Tests', () => {
               columnType: 'number',
               style: 'number',
               numberSeparatorStyle: ',',
-              replaceMissingDataWith: 0
-            }
-          }
-        }
+              replaceMissingDataWith: 0,
+            },
+          },
+        },
       };
 
       await db
@@ -90,13 +94,15 @@ describe('Create Dashboards File Tool Integration Tests', () => {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           versionHistory: {
-            versions: [{
-              versionNumber: 1,
-              content: metricYml,
-              createdAt: new Date().toISOString()
-            }]
+            versions: [
+              {
+                versionNumber: 1,
+                content: metricYml,
+                createdAt: new Date().toISOString(),
+              },
+            ],
           },
-          dataSourceId: testDataSourceId
+          dataSourceId: testDataSourceId,
         })
         .execute();
 
@@ -129,9 +135,9 @@ rows:
       - id: f47ac10b-58cc-4372-a567-0e02b2c3d479
     columnSizes:
       - 12
-          `
-        }
-      ]
+          `,
+        },
+      ],
     };
 
     const result = createDashboardsFileTool.inputSchema.safeParse(validInput);
@@ -150,10 +156,10 @@ rows:
           yml_content: 'name: Test Dashboard',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-          version_number: 1
-        }
+          version_number: 1,
+        },
       ],
-      failed_files: []
+      failed_files: [],
     };
 
     const result = createDashboardsFileTool.outputSchema.safeParse(validOutput);
@@ -165,7 +171,7 @@ rows:
       get: (key: string) => {
         if (key === 'user_id') return undefined;
         return 'test-value';
-      }
+      },
     };
 
     const validYaml = `
@@ -181,11 +187,12 @@ rows:
 
     const input = {
       files: [{ name: 'Test Dashboard', yml_content: validYaml }],
-      runtimeContext: contextWithoutUserId
+      runtimeContext: contextWithoutUserId,
     };
 
-    await expect(createDashboardsFileTool.execute({ context: input }))
-      .rejects.toThrow('User ID not found in runtime context');
+    await expect(createDashboardsFileTool.execute({ context: input })).rejects.toThrow(
+      'User ID not found in runtime context'
+    );
   });
 
   test('should reject dashboard with invalid YAML in integration context', async () => {
@@ -197,7 +204,7 @@ description: Invalid dashboard
 
     const input = {
       files: [{ name: 'Invalid Dashboard', yml_content: invalidYaml }],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createDashboardsFileTool.execute({ context: input });
@@ -222,7 +229,7 @@ rows:
 
     const input = {
       files: [{ name: 'Invalid Column Dashboard', yml_content: invalidColumnSizesYaml }],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createDashboardsFileTool.execute({ context: input });
@@ -246,7 +253,7 @@ rows:
 
     const input = {
       files: [{ name: 'Non-existent Metric Dashboard', yml_content: nonExistentMetricYaml }],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createDashboardsFileTool.execute({ context: input });
@@ -275,7 +282,7 @@ rows:
 
     const input = {
       files: [{ name: 'Valid Dashboard', yml_content: validDashboardYaml }],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createDashboardsFileTool.execute({ context: input });
@@ -298,7 +305,7 @@ rows:
       .execute();
 
     expect(associations).toHaveLength(2);
-    expect(associations.map(a => a.metricFileId).sort()).toEqual(metricIds.sort());
+    expect(associations.map((a) => a.metricFileId).sort()).toEqual(metricIds.sort());
   });
 
   test('should handle mixed success and failure scenarios', async () => {
@@ -330,21 +337,21 @@ rows:
     const input = {
       files: [
         { name: 'Valid Dashboard', yml_content: validDashboardYaml },
-        { name: 'Invalid Dashboard', yml_content: invalidDashboardYaml }
+        { name: 'Invalid Dashboard', yml_content: invalidDashboardYaml },
       ],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createDashboardsFileTool.execute({ context: input });
 
     expect(result.files).toHaveLength(1);
     expect(result.failed_files).toHaveLength(1);
-    
+
     // The success should be the valid dashboard
     expect(result.files[0].name).toBe('Valid Dashboard');
-    
+
     // The failure should be due to invalid metric reference
-    const failure = result.failed_files.find(f => f.name === 'Invalid Dashboard');
+    const failure = result.failed_files.find((f) => f.name === 'Invalid Dashboard');
     expect(failure?.error).toContain('Invalid metric references');
 
     // Track created dashboard for cleanup
@@ -368,7 +375,7 @@ rows:
 
     const input = {
       files: [{ name: 'Timing Test Dashboard', yml_content: validYaml }],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createDashboardsFileTool.execute({ context: input });
@@ -400,12 +407,12 @@ rows:
 
     const files = Array.from({ length: 3 }, (_, i) => ({
       name: `Bulk Dashboard ${i + 1}`,
-      yml_content: createDashboardYaml(i + 1)
+      yml_content: createDashboardYaml(i + 1),
     }));
 
     const input = {
       files,
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createDashboardsFileTool.execute({ context: input });
@@ -423,7 +430,7 @@ rows:
     });
 
     // Track created dashboards for cleanup
-    createdDashboardIds.push(...result.files.map(f => f.id));
+    createdDashboardIds.push(...result.files.map((f) => f.id));
   });
 
   test('should handle complex dashboard with multiple rows', async () => {
@@ -455,7 +462,7 @@ rows:
 
     const input = {
       files: [{ name: 'Complex Dashboard', yml_content: complexDashboardYaml }],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createDashboardsFileTool.execute({ context: input });
@@ -475,7 +482,7 @@ rows:
       .execute();
 
     expect(associations).toHaveLength(4);
-    expect(associations.map(a => a.metricFileId).sort()).toEqual(metricIds.sort());
+    expect(associations.map((a) => a.metricFileId).sort()).toEqual(metricIds.sort());
   });
 
   test('should handle dashboard with maximum items per row', async () => {
@@ -501,7 +508,7 @@ rows:
 
     const input = {
       files: [{ name: 'Max Items Dashboard', yml_content: maxItemsDashboardYaml }],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createDashboardsFileTool.execute({ context: input });
@@ -528,7 +535,7 @@ rows:
   test('should generate appropriate success and error messages', async () => {
     // Test success message
     const metricIds = await createTestMetrics(1);
-    
+
     const validYaml = `
 name: Success Message Test
 description: Test success message generation
@@ -542,7 +549,7 @@ rows:
 
     const successInput = {
       files: [{ name: 'Success Message Test', yml_content: validYaml }],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const successResult = await createDashboardsFileTool.execute({ context: successInput });
@@ -558,11 +565,11 @@ rows:
 
     const failureInput = {
       files: [{ name: 'Failure Test', yml_content: invalidYaml }],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const failureResult = await createDashboardsFileTool.execute({ context: failureInput });
-    expect(failureResult.message).toContain('Failed to create \'Failure Test\'');
+    expect(failureResult.message).toContain("Failed to create 'Failure Test'");
   });
 
   test('should validate dashboard with different column size combinations', async () => {
@@ -589,7 +596,7 @@ rows:
 
     const input = {
       files: [{ name: 'Column Combinations Dashboard', yml_content: validCombinationsYaml }],
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createDashboardsFileTool.execute({ context: input });

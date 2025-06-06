@@ -7,21 +7,23 @@ describe('Create Plan Investigative Tool Integration Tests', () => {
   beforeEach(() => {
     mockRuntimeContext = {
       state: new Map<string, any>(),
-      get: function(key: string) {
+      get: function (key: string) {
         return this.state.get(key);
       },
-      set: function(key: string, value: any) {
+      set: function (key: string, value: any) {
         this.state.set(key, value);
       },
-      clear: function() {
+      clear: function () {
         this.state.clear();
-      }
+      },
     };
   });
 
   test('should have correct tool configuration', () => {
     expect(createPlanInvestigativeTool.id).toBe('create-plan-investigative');
-    expect(createPlanInvestigativeTool.description).toBe('Use to create a plan for an analytical workflow.');
+    expect(createPlanInvestigativeTool.description).toBe(
+      'Use to create a plan for an analytical workflow.'
+    );
     expect(createPlanInvestigativeTool.inputSchema).toBeDefined();
     expect(createPlanInvestigativeTool.outputSchema).toBeDefined();
     expect(createPlanInvestigativeTool.execute).toBeDefined();
@@ -29,7 +31,7 @@ describe('Create Plan Investigative Tool Integration Tests', () => {
 
   test('should validate tool input schema', () => {
     const validInput = {
-      plan: 'Investigate customer turnover patterns to identify root causes'
+      plan: 'Investigate customer turnover patterns to identify root causes',
     };
 
     const result = createPlanInvestigativeTool.inputSchema.safeParse(validInput);
@@ -39,7 +41,7 @@ describe('Create Plan Investigative Tool Integration Tests', () => {
   test('should validate tool output schema', () => {
     const validOutput = {
       success: true,
-      todos: '[ ] Investigate data patterns\n[ ] Analyze correlations\n[ ] Test hypotheses'
+      todos: '[ ] Investigate data patterns\n[ ] Analyze correlations\n[ ] Test hypotheses',
     };
 
     const result = createPlanInvestigativeTool.outputSchema.safeParse(validOutput);
@@ -48,17 +50,16 @@ describe('Create Plan Investigative Tool Integration Tests', () => {
 
   test('should handle runtime context requirements', async () => {
     const contextWithoutGet = {
-      set: (key: string, value: any) => {}
+      set: (key: string, value: any) => {},
     };
 
     const input = {
       plan: 'Investigate simple data patterns',
-      runtimeContext: contextWithoutGet
+      runtimeContext: contextWithoutGet,
     };
 
     // This should fail because get is missing
-    await expect(createPlanInvestigativeTool.execute({ context: input }))
-      .rejects.toThrow();
+    await expect(createPlanInvestigativeTool.execute({ context: input })).rejects.toThrow();
   });
 
   test('should process investigative plan and generate todos', async () => {
@@ -70,7 +71,7 @@ describe('Create Plan Investigative Tool Integration Tests', () => {
 4. Test hypothesis about pricing impact on churn
 5. Validate findings with statistical significance tests
       `,
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createPlanInvestigativeTool.execute({ context: input });
@@ -112,7 +113,7 @@ Investigate why employee turnover has spiked in the engineering department. This
 **Notes**
 Focus on engineering teams specifically and use statistical significance testing for all correlations.
       `,
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createPlanInvestigativeTool.execute({ context: input });
@@ -145,7 +146,7 @@ Data Quality Investigation Project:
 - Query historical data to identify degradation trends
 - Discover root causes of data quality problems
       `,
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createPlanInvestigativeTool.execute({ context: input });
@@ -174,24 +175,35 @@ Query transaction data to identify high-value customer characteristics.
 Examine user journey patterns that lead to successful conversions.
 Validate findings using A/B testing data from previous campaigns.
       `,
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createPlanInvestigativeTool.execute({ context: input });
 
     expect(result.success).toBe(true);
-    expect(result.todos).toContain('[ ] Explore customer segmentation patterns to understand behavioral differences.');
-    expect(result.todos).toContain('[ ] Investigate correlation between customer lifetime value and engagement metrics.');
-    expect(result.todos).toContain('[ ] Analyze seasonal variations in purchase behavior across different customer segments.');
-    expect(result.todos).toContain('[ ] Test hypotheses about the impact of marketing campaigns on retention rates.');
-    expect(result.todos).toContain('[ ] Query transaction data to identify high-value customer characteristics.');
+    expect(result.todos).toContain(
+      '[ ] Explore customer segmentation patterns to understand behavioral differences.'
+    );
+    expect(result.todos).toContain(
+      '[ ] Investigate correlation between customer lifetime value and engagement metrics.'
+    );
+    expect(result.todos).toContain(
+      '[ ] Analyze seasonal variations in purchase behavior across different customer segments.'
+    );
+    expect(result.todos).toContain(
+      '[ ] Test hypotheses about the impact of marketing campaigns on retention rates.'
+    );
+    expect(result.todos).toContain(
+      '[ ] Query transaction data to identify high-value customer characteristics.'
+    );
 
     // Verify all todos have correct structure
     const savedTodos = mockRuntimeContext.get('todos');
-    expect(savedTodos.every((todo: any) => 
-      typeof todo.todo === 'string' && 
-      typeof todo.completed === 'boolean'
-    )).toBe(true);
+    expect(
+      savedTodos.every(
+        (todo: any) => typeof todo.todo === 'string' && typeof todo.completed === 'boolean'
+      )
+    ).toBe(true);
   });
 
   test('should handle plan with no extractable investigative items', async () => {
@@ -202,7 +214,7 @@ We want to make data-driven decisions about product development.
 The analysis should be thorough and methodical.
 Quality insights are important for business strategy.
       `,
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createPlanInvestigativeTool.execute({ context: input });
@@ -218,10 +230,13 @@ Quality insights are important for business strategy.
 
   test('should limit todos to maximum of 15 items', async () => {
     // Create a plan with many investigative items
-    const planItems = Array.from({ length: 25 }, (_, i) => `${i + 1}. Investigate data pattern ${i + 1} for comprehensive analysis`);
+    const planItems = Array.from(
+      { length: 25 },
+      (_, i) => `${i + 1}. Investigate data pattern ${i + 1} for comprehensive analysis`
+    );
     const input = {
       plan: planItems.join('\n'),
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createPlanInvestigativeTool.execute({ context: input });
@@ -246,7 +261,7 @@ Quality insights are important for business strategy.
 5. Analyze user engagement metrics
 6. Fix
       `,
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createPlanInvestigativeTool.execute({ context: input });
@@ -276,7 +291,7 @@ Query additional customer feedback data
    - Test significance of findings
    Identify correlation coefficients
       `,
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createPlanInvestigativeTool.execute({ context: input });
@@ -292,7 +307,11 @@ Query additional customer feedback data
     // Verify state consistency
     const savedTodos = mockRuntimeContext.get('todos');
     expect(savedTodos.length).toBeGreaterThan(0);
-    expect(savedTodos.every((todo: any) => todo.hasOwnProperty('todo') && todo.hasOwnProperty('completed'))).toBe(true);
+    expect(
+      savedTodos.every(
+        (todo: any) => todo.hasOwnProperty('todo') && todo.hasOwnProperty('completed')
+      )
+    ).toBe(true);
   });
 
   test('should handle investigative keywords in various contexts', async () => {
@@ -308,13 +327,13 @@ Query additional customer feedback data
 8. Identify key drivers of customer satisfaction
 9. Validate statistical significance of findings
       `,
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createPlanInvestigativeTool.execute({ context: input });
 
     expect(result.success).toBe(true);
-    
+
     // Verify all investigative keywords are captured
     expect(result.todos).toContain('[ ] Explore potential data sources for customer analysis');
     expect(result.todos).toContain('[ ] Investigate anomalies in recent transaction patterns');
@@ -333,38 +352,44 @@ Query additional customer feedback data
 
   test('should handle runtime context state access errors', async () => {
     const faultyContext = {
-      get: () => { throw new Error('State access failed'); },
-      set: () => {}
+      get: () => {
+        throw new Error('State access failed');
+      },
+      set: () => {},
     };
 
     const input = {
       plan: '1. Investigate customer data',
-      runtimeContext: faultyContext
+      runtimeContext: faultyContext,
     };
 
-    await expect(createPlanInvestigativeTool.execute({ context: input }))
-      .rejects.toThrow('State access failed');
+    await expect(createPlanInvestigativeTool.execute({ context: input })).rejects.toThrow(
+      'State access failed'
+    );
   });
 
   test('should handle runtime context state update errors', async () => {
     const faultyContext = {
       get: () => undefined,
-      set: () => { throw new Error('State update failed'); }
+      set: () => {
+        throw new Error('State update failed');
+      },
     };
 
     const input = {
       plan: '1. Investigate data patterns',
-      runtimeContext: faultyContext
+      runtimeContext: faultyContext,
     };
 
-    await expect(createPlanInvestigativeTool.execute({ context: input }))
-      .rejects.toThrow('State update failed');
+    await expect(createPlanInvestigativeTool.execute({ context: input })).rejects.toThrow(
+      'State update failed'
+    );
   });
 
   test('should preserve plan_available flag setting', async () => {
     const input = {
       plan: '1. Investigate customer behavior patterns',
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     // Initially should not be set
@@ -389,7 +414,7 @@ Query additional customer feedback data
         4.Query    multiple   spaces   between   words
 
       `,
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createPlanInvestigativeTool.execute({ context: input });
@@ -406,10 +431,10 @@ Query additional customer feedback data
     const validInputs = [
       { plan: 'Investigate simple patterns' },
       { plan: 'Complex investigative plan:\n1. Explore data\n2. Analyze trends' },
-      { plan: 'Plan with special characters: @#$%^&*()' }
+      { plan: 'Plan with special characters: @#$%^&*()' },
     ];
 
-    validInputs.forEach(input => {
+    validInputs.forEach((input) => {
       const result = createPlanInvestigativeTool.inputSchema.safeParse(input);
       expect(result.success).toBe(true);
     });
@@ -420,10 +445,10 @@ Query additional customer feedback data
       { plan: '' }, // Empty plan
       { plan: null }, // Null plan
       { plan: 123 }, // Non-string plan
-      { plan: ['array', 'plan'] } // Array instead of string
+      { plan: ['array', 'plan'] }, // Array instead of string
     ];
 
-    invalidInputs.forEach(input => {
+    invalidInputs.forEach((input) => {
       const result = createPlanInvestigativeTool.inputSchema.safeParse(input);
       expect(result.success).toBe(false);
     });
@@ -436,13 +461,15 @@ Query additional customer feedback data
 2. Analyze second data source
 3. Test third hypothesis
       `,
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createPlanInvestigativeTool.execute({ context: input });
 
-    expect(result.todos).toBe('[ ] Investigate first data pattern\n[ ] Analyze second data source\n[ ] Test third hypothesis');
-    
+    expect(result.todos).toBe(
+      '[ ] Investigate first data pattern\n[ ] Analyze second data source\n[ ] Test third hypothesis'
+    );
+
     // Verify no extra whitespace or formatting issues
     expect(result.todos.startsWith('[ ]')).toBe(true);
     expect(result.todos.endsWith('hypothesis')).toBe(true);
@@ -452,20 +479,20 @@ Query additional customer feedback data
   test('should handle todos with additional properties', async () => {
     const input = {
       plan: '1. Investigate customer satisfaction patterns',
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createPlanInvestigativeTool.execute({ context: input });
 
     expect(result.success).toBe(true);
-    
+
     // Verify saved todos have the expected structure
     const savedTodos = mockRuntimeContext.get('todos');
     expect(savedTodos[0]).toEqual({
       todo: 'Investigate customer satisfaction patterns',
-      completed: false
+      completed: false,
     });
-    
+
     // Should allow additional properties if they exist
     expect(typeof savedTodos[0]).toBe('object');
     expect(savedTodos[0].todo).toBeDefined();
@@ -481,7 +508,7 @@ ANALYZE user behavior trends
 test HYPOTHESIS about engagement
 Query HISTORICAL records for insights
       `,
-      runtimeContext: mockRuntimeContext
+      runtimeContext: mockRuntimeContext,
     };
 
     const result = await createPlanInvestigativeTool.execute({ context: input });
