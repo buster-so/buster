@@ -31,17 +31,19 @@ interface CommandResult {
   error?: string;
 }
 
-interface ReviewResult {
-  score: number;
-  issues: Issue[];
-}
+// Note: ReviewResult interface currently unused but kept for future implementation
+// interface ReviewResult {
+//   score: number;
+//   issues: Issue[];
+// }
 
-interface Issue {
-  severity: 'critical' | 'warning' | 'suggestion';
-  category: string;
-  description: string;
-  recommendation: string;
-}
+// Note: Issue interface currently unused but kept for future implementation
+// interface Issue {
+//   severity: 'critical' | 'warning' | 'suggestion';
+//   category: string;
+//   description: string;
+//   recommendation: string;
+// }
 
 export const batchTool = createTool({
   id: 'batch-execute',
@@ -302,7 +304,7 @@ async function executeSingleCommand(cmd: Command): Promise<CommandResult> {
 
     const result = await executeCommand(cmd.command, {
       cwd: cmd.cwd,
-      env: { ...process.env, ...cmd.env },
+      env: { ...process.env, ...cmd.env } as Record<string, string>,
       timeout: cmd.timeout || 30000,
     });
 

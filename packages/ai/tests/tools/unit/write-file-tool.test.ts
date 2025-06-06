@@ -1,8 +1,8 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { writeFileTool } from '@/tools/file-tools/write-file-tool';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+import { writeFileTool } from '../../../src/tools/file-tools/write-file-tool';
 
 describe('Write File Tool Unit Tests', () => {
   let tempDir: string;
@@ -93,9 +93,11 @@ describe('Write File Tool Unit Tests', () => {
 
     expect(result.success).toBe(true);
     expect(result.backup_path).toBeDefined();
-    expect(existsSync(result.backup_path!)).toBe(true);
+    if (result.backup_path) {
+      expect(existsSync(result.backup_path)).toBe(true);
+      expect(readFileSync(result.backup_path, 'utf-8')).toBe('Original content');
+    }
     expect(readFileSync(existingFile, 'utf-8')).toBe(newContent);
-    expect(readFileSync(result.backup_path!, 'utf-8')).toBe('Original content');
   });
 
   test('should create directories if they do not exist', async () => {
@@ -104,6 +106,9 @@ describe('Write File Tool Unit Tests', () => {
       context: {
         file_path: nestedFile,
         content: 'Nested content',
+        overwrite: false,
+        create_backup: true,
+        encoding: 'utf8',
       },
     });
 
@@ -142,6 +147,9 @@ describe('Write File Tool Unit Tests', () => {
         context: {
           file_path: '/tmp/../etc/passwd',
           content: 'malicious content',
+          overwrite: false,
+          create_backup: true,
+          encoding: 'utf8',
         },
       })
     ).rejects.toThrow(/Write access denied to system directory|Path traversal not allowed/);
@@ -153,6 +161,9 @@ describe('Write File Tool Unit Tests', () => {
         context: {
           file_path: '/etc/malicious.txt',
           content: 'malicious content',
+          overwrite: false,
+          create_backup: true,
+          encoding: 'utf8',
         },
       })
     ).rejects.toThrow('Write access denied to system directory');
@@ -164,6 +175,8 @@ describe('Write File Tool Unit Tests', () => {
       context: {
         file_path: testFile,
         content,
+        overwrite: false,
+        create_backup: true,
         encoding: 'ascii',
       },
     });

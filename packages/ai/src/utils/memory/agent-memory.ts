@@ -24,14 +24,14 @@ export async function saveAgentConversation(
   const key = getMemoryKey(threadId, resourceId);
 
   await memory.saveMessages({
-    sessionId: key,
     messages: messages.map((msg) => ({
-      role: msg.role as any,
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      role: msg.role,
       content: typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content),
-      metadata: {
-        ...metadata,
-        originalMessage: msg,
-      },
+      createdAt: new Date(),
+      threadId,
+      resourceId,
+      type: 'text' as const,
     })),
   });
 }
@@ -50,15 +50,15 @@ export async function saveStepData(
 
   // Store as a single message with the step data
   await memory.saveMessages({
-    sessionId: key,
     messages: [
       {
-        role: 'system' as any,
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        role: 'system',
         content: JSON.stringify(stepData),
-        metadata: {
-          stepName,
-          timestamp: Date.now(),
-        },
+        createdAt: new Date(),
+        threadId,
+        resourceId,
+        type: 'text' as const,
       },
     ],
   });
@@ -75,16 +75,23 @@ export async function getStepData(
 ): Promise<StepFinishData | null> {
   const key = getMemoryKey(threadId, resourceId, `step-${stepName}`);
 
-  const messages = await memory.getMessages({
-    sessionId: key,
+  const result = await memory.query({
+    threadId,
+    resourceId,
   });
+
+  const messages = result.messages;
 
   if (messages.length === 0) {
     return null;
   }
 
   try {
-    return JSON.parse(messages[0].content);
+    const content =
+      typeof messages[0].content === 'string'
+        ? messages[0].content
+        : JSON.stringify(messages[0].content);
+    return JSON.parse(content);
   } catch {
     return null;
   }
@@ -122,14 +129,15 @@ export async function saveWorkflowState(
   const key = getMemoryKey(threadId, resourceId, 'workflow-state');
 
   await memory.saveMessages({
-    sessionId: key,
     messages: [
       {
-        role: 'system' as any,
+        id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        role: 'system',
         content: JSON.stringify(state),
-        metadata: {
-          timestamp: Date.now(),
-        },
+        createdAt: new Date(),
+        threadId,
+        resourceId,
+        type: 'text' as const,
       },
     ],
   });
@@ -149,16 +157,23 @@ export async function getWorkflowState(
   const memory = getSharedMemory();
   const key = getMemoryKey(threadId, resourceId, 'workflow-state');
 
-  const messages = await memory.getMessages({
-    sessionId: key,
+  const result = await memory.query({
+    threadId,
+    resourceId,
   });
+
+  const messages = result.messages;
 
   if (messages.length === 0) {
     return null;
   }
 
   try {
-    return JSON.parse(messages[0].content);
+    const content =
+      typeof messages[0].content === 'string'
+        ? messages[0].content
+        : JSON.stringify(messages[0].content);
+    return JSON.parse(content);
   } catch {
     return null;
   }

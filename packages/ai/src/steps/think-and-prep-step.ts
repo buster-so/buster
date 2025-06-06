@@ -22,7 +22,11 @@ import {
   getAllToolsUsed,
   getLastToolUsed,
 } from '../utils/memory/message-history';
-import { ThinkAndPrepOutputSchema } from '../utils/memory/types';
+import {
+  type MessageHistory,
+  type StepFinishData,
+  ThinkAndPrepOutputSchema,
+} from '../utils/memory/types';
 
 export const thinkAndPrepOutputSchema = z.object({});
 
@@ -39,9 +43,9 @@ const thinkAndPrepExecution = async ({
 }): Promise<z.infer<typeof outputSchema>> => {
   const abortController = new AbortController();
 
-  let outputMessages = [];
+  let outputMessages: MessageHistory = [];
   let finished = false;
-  let finalStepData = null;
+  let finalStepData: StepFinishData | null = null;
 
   try {
     const threadId = runtimeContext.get('threadId');
@@ -74,11 +78,12 @@ const thinkAndPrepExecution = async ({
                 ['submitThoughtsTool', 'finishAndRespondTool'].includes(toolName)
               )
             ) {
-              // Extract and validate messages
+              // Extract and validate messages from the step response
+              // step.response.messages contains the conversation history for this step
               outputMessages = extractMessageHistory(step.response.messages);
 
-              // Store the full step data
-              finalStepData = step;
+              // Store the full step data (cast to our expected type)
+              finalStepData = step as any;
 
               // Set finished to true if finishAndRespondTool was called
               if (toolNames.includes('finishAndRespondTool')) {
@@ -105,15 +110,15 @@ const thinkAndPrepExecution = async ({
     return {
       finished,
       outputMessages,
-      stepData: finalStepData,
+      stepData: finalStepData as any,
       metadata: {
         toolsUsed: getAllToolsUsed(outputMessages),
         finalTool: getLastToolUsed(outputMessages) as
           | 'submitThoughtsTool'
           | 'finishAndRespondTool'
           | undefined,
-        text: finalStepData?.text,
-        reasoning: finalStepData?.reasoning,
+        text: (finalStepData as any)?.text,
+        reasoning: (finalStepData as any)?.reasoning,
       },
     };
   } catch (error) {
@@ -132,8 +137,8 @@ const thinkAndPrepExecution = async ({
         | 'submitThoughtsTool'
         | 'finishAndRespondTool'
         | undefined,
-      text: finalStepData?.text,
-      reasoning: finalStepData?.reasoning,
+      text: (finalStepData as any)?.text,
+      reasoning: (finalStepData as any)?.reasoning,
     },
   };
 };

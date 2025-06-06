@@ -1,10 +1,11 @@
 import { eq } from 'drizzle-orm';
 import { getDb } from '../../../database/src/connection';
 import { messages } from '../../../database/src/schema';
+import type { MessageHistory } from '../utils/memory/types';
 
 export interface ChatHistoryResult {
   id: string;
-  rawLlmMessages: any; // jsonb data
+  rawLlmMessages: MessageHistory; // JSONB data containing array of CoreMessage
   createdAt: string;
 }
 
@@ -26,7 +27,10 @@ export async function getChatHistory(chatId: string): Promise<ChatHistoryResult[
     .where(eq(messages.chatId, chatId))
     .orderBy(messages.createdAt);
 
-  return result;
+  return result.map((row) => ({
+    ...row,
+    rawLlmMessages: row.rawLlmMessages as MessageHistory,
+  }));
 }
 
 /**
@@ -34,7 +38,7 @@ export async function getChatHistory(chatId: string): Promise<ChatHistoryResult[
  * @param chatId - The UUID of the chat to fetch messages for
  * @returns Array of raw LLM message objects
  */
-export async function getRawLlmMessages(chatId: string): Promise<any[]> {
+export async function getRawLlmMessages(chatId: string): Promise<MessageHistory[]> {
   const db = getDb();
 
   const result = await db
@@ -45,5 +49,5 @@ export async function getRawLlmMessages(chatId: string): Promise<any[]> {
     .where(eq(messages.chatId, chatId))
     .orderBy(messages.createdAt);
 
-  return result.map((row) => row.rawLlmMessages);
+  return result.map((row) => row.rawLlmMessages as MessageHistory);
 }
