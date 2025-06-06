@@ -14,7 +14,7 @@ import {
 /**
  * Extract and validate message history from step response
  */
-export function extractMessageHistory(stepMessages: unknown): MessageHistory {
+export function extractMessageHistory(stepMessages: any[]): MessageHistory {
   // Validate the messages match our expected schema
   const result = MessageHistorySchema.safeParse(stepMessages);
   

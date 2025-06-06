@@ -154,6 +154,16 @@
           }
         }
       }
+    },
+    {
+      "include": ["packages/ai/tests/**/*.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsoleLog": "off"
+          }
+        }
+      }
     }
   ]
 }
