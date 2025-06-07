@@ -48,6 +48,27 @@ const [newUser] = await db.insert(users).values({
 }).returning();
 ```
 
+### Using Database Helpers
+
+The package includes helper functions for common database operations:
+
+```typescript
+import { 
+  getRawLlmMessages, 
+  getMessagesForChat, 
+  getLatestMessageForChat 
+} from '@buster/database';
+
+// Get raw LLM messages from a specific message record
+const rawMessages = await getRawLlmMessages(messageId);
+
+// Get all messages for a chat
+const chatMessages = await getMessagesForChat(chatId);
+
+// Get the latest message in a chat
+const latestMessage = await getLatestMessageForChat(chatId);
+```
+
 ### Connection Pool Management
 
 ```typescript
@@ -87,6 +108,38 @@ The schema has been introspected from your existing database and includes:
 - `collections` - Asset collections
 - `api_keys` - API authentication
 - And many more...
+
+## Database Helpers
+
+This package includes helper functions organized by entity for common database operations:
+
+### Structure
+
+```
+src/helpers/
+├── index.ts        # Exports all helpers
+├── messages.ts     # Message-related helpers
+└── ...            # Future entity helpers
+```
+
+### Available Helpers
+
+#### Messages (`messages.ts`)
+
+- `getRawLlmMessages(messageId)` - Get raw LLM messages from a specific message record
+- `getMessagesForChat(chatId)` - Get all messages for a specific chat
+- `getLatestMessageForChat(chatId)` - Get the most recent message for a chat
+- `getCompletedMessagesForChat(chatId)` - Get completed messages for a chat
+- `getAllRawLlmMessagesForChat(chatId)` - Get raw LLM messages from all messages in a chat
+
+### Adding New Helpers
+
+When adding helpers for a new entity:
+
+1. Create `src/helpers/{entity}.ts` with typed helper functions
+2. Export the new helpers in `src/helpers/index.ts`
+3. Update this README with the new helper functions
+4. Follow the existing patterns for type safety and error handling
 
 ## Migration Workflow
 

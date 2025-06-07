@@ -190,6 +190,47 @@ This is a monorepo with multiple packages:
 
 Each package has its own development commands and may have specific tooling configurations.
 
+### Helper Organization Pattern
+
+When building helper functions around database objects or other utilities, follow this organizational pattern:
+
+**For Database Helpers (in `packages/database/`):**
+```
+packages/database/src/helpers/
+├── index.ts         # Export all helpers
+├── messages.ts      # Message-related helpers
+├── users.ts         # User-related helpers  
+├── chats.ts         # Chat-related helpers
+└── {entity}.ts      # Entity-specific helpers
+```
+
+**For Package-Specific Utilities:**
+```
+packages/{package}/src/utils/
+├── index.ts         # Export all utilities
+├── {domain}/        # Domain-specific utilities
+│   ├── index.ts
+│   └── helpers.ts
+└── helpers.ts       # General helpers
+```
+
+**Key Principles:**
+- **Co-locate helpers** with the schema/types they operate on
+- **Group by entity** (one file per database table/domain object)
+- **Export from package root** for easy importing: `import { getRawLlmMessages } from '@buster/database'`
+- **Use TypeScript** for full type safety with inferred types
+- **Follow naming conventions** that clearly indicate the helper's purpose
+
+**Example Usage:**
+```typescript
+// Good: Clear, typed helpers exported from package root
+import { getRawLlmMessages, getMessagesForChat } from '@buster/database';
+
+// Avoid: Direct database queries scattered throughout codebase
+import { db, messages, eq } from '@buster/database';
+const result = await db.select().from(messages).where(eq(messages.chatId, chatId));
+```
+
 ## Key Dependencies
 
 - **Mastra** - AI agent framework for orchestrating LLM workflows

@@ -17,6 +17,9 @@ export * from './schema';
 // Export relations
 export * from './relations';
 
+// Export database helpers
+export * from './helpers';
+
 // Export common Drizzle utilities
 export {
   eq,

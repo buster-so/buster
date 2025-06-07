@@ -349,3 +349,113 @@ Required environment variables:
 - `BRAINTRUST_KEY`: For observability and evaluations
 - `ANTHROPIC_API_KEY`: For Claude model access
 - Additional keys for specific tools (database connections, etc.)
+
+## Conversation History Management
+
+### Overview
+
+The AI package supports multi-turn conversations by managing conversation history through the database. This enables workflows to maintain context across multiple interactions.
+
+### Key Components
+
+#### Chat History Utilities (`src/steps/get-chat-history.ts`)
+
+Provides functions for retrieving conversation history:
+
+```typescript
+// Get all messages with metadata for a chat
+getChatHistory(chatId: string): Promise<ChatHistoryResult[]>
+
+// Get just the raw LLM messages for a chat
+getRawLlmMessages(chatId: string): Promise<MessageHistory[]>
+
+// Get raw LLM messages for a specific message ID
+getRawLlmMessagesByMessageId(messageId: string): Promise<MessageHistory | null>
+```
+
+#### Database Integration
+
+The chat history utilities use the `@buster/database` helpers for clean separation of concerns:
+- Database operations stay in the database package
+- Type validation and transformation happen in the AI package
+
+### Conversation History Flow
+
+#### 1. Initial Message with Database Save
+
+```typescript
+// First run - with messageId for database persistence
+const messageId = await createTestMessage(chatId, userId);
+const runtimeContext = new RuntimeContext();
+runtimeContext.set('messageId', messageId);
+
+const result = await analystWorkflow.createRun().start({
+  inputData: { prompt: "Initial question" },
+  runtimeContext,
+});
+
+// Conversation history is automatically saved to database
+```
+
+#### 2. Retrieving Conversation History
+
+```typescript
+// Fetch the conversation history from the database
+import { getRawLlmMessagesByMessageId } from '@buster/ai';
+
+const conversationHistory = await getRawLlmMessagesByMessageId(messageId);
+// Returns: CoreMessage[] or null
+```
+
+#### 3. Follow-up with History
+
+```typescript
+// Second run - with conversation history
+const followUpResult = await analystWorkflow.createRun().start({
+  inputData: {
+    prompt: "Follow-up question",
+    conversationHistory: conversationHistory as CoreMessage[],
+  },
+  runtimeContext,
+});
+```
+
+### Testing Conversation History
+
+See `tests/workflows/integration/analyst-workflow.int.test.ts` for examples:
+
+```typescript
+test('conversation history flow', async () => {
+  // 1. Create initial message
+  const { chatId, userId } = await createTestChat();
+  const messageId = await createTestMessage(chatId, userId);
+  
+  // 2. Run workflow with messageId
+  const runtimeContext = new RuntimeContext();
+  runtimeContext.set('messageId', messageId);
+  
+  const firstRun = await workflow.start({
+    inputData: { prompt: "First question" },
+    runtimeContext,
+  });
+  
+  // 3. Retrieve conversation history
+  const history = await getRawLlmMessagesByMessageId(messageId);
+  
+  // 4. Run follow-up with history
+  const secondRun = await workflow.start({
+    inputData: {
+      prompt: "Follow-up question",
+      conversationHistory: history as CoreMessage[],
+    },
+    runtimeContext,
+  });
+});
+```
+
+### Best Practices
+
+1. **Use MessageId for Persistence**: Always provide a `messageId` in runtime context when you want to save conversation history
+2. **Type Safety**: Cast retrieved history to `CoreMessage[]` after validation
+3. **Handle Null Cases**: Check if history exists before using it
+4. **Test Both Paths**: Test workflows both with and without conversation history
