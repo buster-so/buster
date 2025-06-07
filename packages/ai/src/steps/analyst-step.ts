@@ -47,8 +47,10 @@ const analystExecution = async ({
           abortSignal: abortController.signal,
           onStepFinish: async (step) => {
             // Save conversation history to database on each step
+            console.log('Saving conversation history from analyst step');
+            console.log(step.response.messages);
             await saveConversationHistoryFromStep(runtimeContext, step.response.messages);
-            
+
             // Check if doneTool was called and abort after saving
             const toolNames = step.toolCalls.map((call) => call.toolName);
             if (toolNames.includes('doneTool')) {
