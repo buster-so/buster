@@ -9,24 +9,5 @@
   "scripts": {
     "build": "tsc",
     "test": "vitest"
-  },
-  "dependencies": {
-    "@buster/database": {
-      "workspace": true
-    },
-    "vitest": {
-      "workspace": true
-    },
-    "uuid": {
-      "workspace": true
-    }
-  },
-  "devDependencies": {
-    "@types/uuid": {
-      "workspace": true
-    },
-    "typescript": {
-      "workspace": true
-    }
   }
 }

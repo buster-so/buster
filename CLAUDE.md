@@ -118,12 +118,71 @@ npm run ci:check    # Runs check + typecheck
 - Mock external dependencies appropriately
 - Use proper TypeScript types in tests (avoid `any`)
 
+## Test Utilities
+
+The `@buster/test-utils` package provides shared testing utilities for the monorepo:
+
+### Environment Helpers
+```typescript
+import { setupTestEnvironment, withTestEnv } from '@buster/test-utils/env-helpers';
+
+// Manual setup/teardown
+beforeAll(() => setupTestEnvironment());
+afterAll(() => cleanupTestEnvironment());
+
+// Or use the wrapper
+await withTestEnv(async () => {
+  // Your test code here
+});
+```
+
+### Mock Helpers
+```typescript
+import { createMockFunction, mockConsole, createMockDate } from '@buster/test-utils/mock-helpers';
+
+// Create vitest mock functions
+const mockFn = createMockFunction<(arg: string) => void>();
+
+// Mock console methods
+const consoleMock = mockConsole();
+// Test code that logs...
+consoleMock.restore();
+
+// Mock dates for time-sensitive tests
+const dateMock = createMockDate(new Date('2024-01-01'));
+// Test code...
+dateMock.restore();
+```
+
+### Database Test Helpers
+```typescript
+import { createTestChat, cleanupTestChats } from '@buster/test-utils/database/chats';
+import { createTestMessage, cleanupTestMessages } from '@buster/test-utils/database/messages';
+
+// Create test data
+const chat = await createTestChat({
+  userId: 'test-user',
+  title: 'Test Chat'
+});
+
+const message = await createTestMessage({
+  chatId: chat.id,
+  role: 'user',
+  content: 'Test message'
+});
+
+// Cleanup after tests
+await cleanupTestMessages(chat.id);
+await cleanupTestChats('test-user');
+```
+
 ## Project Structure
 
 This is a monorepo with multiple packages:
 
 - `packages/ai/` - AI agents, tools, and workflows using Mastra framework
 - `packages/database/` - Database schema, migrations, and utilities
+- `packages/test-utils/` - Shared testing utilities for environment setup, mocking, and database helpers
 - `web/` - Next.js frontend application
 - `api/` - Rust backend API
 - `cli/` - Command-line tools

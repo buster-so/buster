@@ -21,12 +21,5 @@
     "setup:data": "bun run src/setup.ts setup-data",
     "setup:seed": "bun run src/setup.ts seed",
     "setup:full": "bun run src/setup.ts run"
-  },
-  "dependencies": {
-    "drizzle-orm": "^0.36.4",
-    "postgres": "^3.4.5"
-  },
-  "devDependencies": {
-    "drizzle-kit": "^0.28.1"
   }
 }
