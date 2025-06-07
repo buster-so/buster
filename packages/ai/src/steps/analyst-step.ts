@@ -23,6 +23,7 @@ const analystExecution = async ({
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof outputSchema>> => {
   const abortController = new AbortController();
+  let shouldComplete = false;
 
   try {
     const resourceId = runtimeContext.get('userId');
@@ -47,6 +48,13 @@ const analystExecution = async ({
           onStepFinish: async (step) => {
             // Save conversation history to database on each step
             await saveConversationHistoryFromStep(runtimeContext, step.response.messages);
+            
+            // Check if doneTool was called and abort after saving
+            const toolNames = step.toolCalls.map((call) => call.toolName);
+            if (toolNames.includes('doneTool')) {
+              shouldComplete = true;
+              abortController.abort();
+            }
           },
         });
 
@@ -69,7 +77,7 @@ const analystExecution = async ({
 
     for await (const chunk of stream.fullStream) {
       if (chunk.type === 'tool-result' && chunk.toolName === 'doneTool') {
-        abortController.abort();
+        // Don't abort here anymore - let onStepFinish handle it after saving
         return {};
       }
     }
