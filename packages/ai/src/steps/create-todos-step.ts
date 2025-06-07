@@ -48,8 +48,9 @@ The TODO list should break down each aspect of the user request into tasks, base
   - Correct: \`Determine metric for "top customer"\`
   - Incorrect: \`Determine metric for "top customer" (e.g., most revenue generated, most orders place, etc).\`
 - The TODO list is meant to guide the system's internal decision-making process, so it should focus on listing the decisions that need to be made, not on providing potential answers or clarifications.
+- Assume that all relevant data is potentially available within the existing data sources  
 **Note**: The TODO list must focus on enabling the system to make its own assumptions and decisions without seeking clarification from the user. Do not use phrases like "Clarify..." in the TODO list items to avoid implying that the system should ask the user for further input.
-z
+
 ---
 ### Examples
 #### User Request: "What is Baltic Born's return rate this month?"
@@ -95,6 +96,13 @@ z
 [ ] Determine how "sales" is identified
 [ ] Determine how to group sales by month
 [ ] Determine the visualization type and axes for each chart
+\`\`\`
+### User Request: "What's the influence of unicorn sightings on our sales?"
+\`\`\`
+[ ] Determine how "unicorn sightings" is identified
+[ ] Determine how to identify "sales"
+[ ] Determine how to identify the influence of unicorn sightings on sales
+[ ] Determine the visualization type and axes for the chart
 \`\`\`
 ---
 ### System Limitations

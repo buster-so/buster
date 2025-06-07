@@ -12,7 +12,13 @@ const executeSqlStatementInputSchema = z.object({
   statements: z
     .array(z.string())
     .describe(
-      'Array of lightweight, optimized SQL statements to execute. Each statement should be small and focused. All queries will be automatically limited to 25 results maximum for performance. YOU MUST USE THE <SCHEMA_NAME>.<TABLE_NAME> syntax/qualifier for all table names. NEVER use SELECT * - you must explicitly list the columns you want to query from the documentation provided. Queries without these requirements will fail to execute.'
+      `Array of lightweight, optimized SQL statements to execute. 
+      Each statement should be small and focused. 
+      All queries will be automatically limited to 25 results maximum for performance. 
+      YOU MUST USE THE <SCHEMA_NAME>.<TABLE_NAME> syntax/qualifier for all table names. 
+      NEVER use SELECT * - you must explicitly list the columns you want to query from the documentation provided. 
+      NEVER query system tables or use 'SHOW' statements as these will fail to execute.
+      Queries without these requirements will fail to execute.`
     ),
 });
 
