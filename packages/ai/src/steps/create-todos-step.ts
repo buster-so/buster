@@ -1,14 +1,17 @@
 import { Agent, createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
+import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { anthropicCachedModel } from '../utils/models/anthropic-cached';
-import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
+import { standardizeMessages } from '../utils/standardizeMessages';
+import type {
+  AnalystRuntimeContext,
+  thinkAndPrepWorkflowInputSchema,
+} from '../workflows/analyst-workflow';
 
 const inputSchema = z.object({
-  prompt: z
-    .string()
-    .describe('The prompt that the user submitted that will be used to create the todos.'),
+  // This step receives initial workflow input through getInitData
 });
 
 export const createTodosOutputSchema = z.object({
@@ -122,19 +125,35 @@ export const todosAgent = new Agent({
 });
 
 const todoStepExecution = async ({
-  inputData,
+  getInitData,
   runtimeContext,
 }: {
   inputData: z.infer<typeof inputSchema>;
+  getInitData: () => Promise<z.infer<typeof thinkAndPrepWorkflowInputSchema>>;
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof createTodosOutputSchema>> => {
   try {
     const threadId = runtimeContext.get('threadId');
     const resourceId = runtimeContext.get('userId');
 
+    // Get the workflow input data
+    const initData = await getInitData();
+    const prompt = initData.prompt;
+    const conversationHistory = initData.conversationHistory;
+
+    // Prepare messages for the agent
+    let messages: CoreMessage[];
+    if (conversationHistory && conversationHistory.length > 0) {
+      // Use conversation history if available
+      messages = conversationHistory as CoreMessage[];
+    } else {
+      // Otherwise, use just the prompt
+      messages = standardizeMessages(prompt);
+    }
+
     const tracedTodos = wrapTraced(
       async () => {
-        const response = await todosAgent.generate(inputData.prompt, {
+        const response = await todosAgent.generate(messages, {
           threadId: threadId,
           resourceId: resourceId,
           output: createTodosOutputSchema,

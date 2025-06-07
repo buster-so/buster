@@ -13,10 +13,20 @@ export interface AnalystRuntimeContext {
   dataSourceSyntax: string;
   organizationId: string;
   todos: string;
+  messageId?: string; // Optional for testing scenarios
 }
+
+// CoreMessage schema for validation
+const coreMessageSchema = z.object({
+  role: z.enum(['system', 'user', 'assistant', 'tool']),
+  content: z.any(), // Content can be string or complex types
+  providerOptions: z.any().optional(),
+  experimental_providerMetadata: z.any().optional(),
+});
 
 export const thinkAndPrepWorkflowInputSchema = z.object({
   prompt: z.string(),
+  conversationHistory: z.array(coreMessageSchema).optional(),
 });
 
 const outputSchema = z.object({

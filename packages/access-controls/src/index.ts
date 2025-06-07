@@ -4,7 +4,7 @@ export {
   type Permission,
   type Role,
   type AccessControlOptions,
-} from "./types";
+} from './types';
 
 // Export access control functions
 export {
@@ -15,9 +15,9 @@ export {
   hasDatasetAccess,
   hasAllDatasetsAccess,
   type PermissionedDataset,
-} from "./access-controls";
+} from './access-controls';
 
-export * from "./chats";
+export * from './chats';
 
 // Export utility functions
-export { formatPermissionName, buildAccessQuery } from "./utils";
+export { formatPermissionName, buildAccessQuery } from './utils';

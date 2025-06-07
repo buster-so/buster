@@ -1,5 +1,5 @@
 import { Agent } from '@mastra/core';
-import { executeSqlStatementTool, sequentialThinkingTool } from '../../tools';
+import { findRequiredTextValues, sequentialThinkingTool } from '../../tools';
 import finishAndRespondTool from '../../tools/communication-tools/finish-and-respond';
 import submitThoughtsTool from '../../tools/communication-tools/submit-thoughts-tool';
 import { anthropicCachedModel } from '../../utils/models/anthropic-cached';
@@ -18,7 +18,7 @@ export const thinkAndPrepAgent = new Agent({
   model: anthropicCachedModel('claude-sonnet-4-20250514'),
   tools: {
     sequentialThinkingTool,
-    executeSqlStatementTool,
+    findRequiredTextValues,
     finishAndRespondTool,
     submitThoughtsTool,
   },

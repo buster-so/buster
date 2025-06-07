@@ -1,8 +1,11 @@
 import { createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
+import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { thinkAndPrepAgent } from '../agents/think-and-prep-agent/think-and-prep-agent';
+import { saveConversationHistoryFromStep } from '../utils/database/saveConversationHistory';
+import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
 import type {
   AnalystRuntimeContext,
   thinkAndPrepWorkflowInputSchema,
@@ -58,13 +61,24 @@ const thinkAndPrepExecution = async ({
 
     const initData = await getInitData();
     const prompt = initData.prompt;
+    const conversationHistory = initData.conversationHistory;
     const todos = inputData['create-todos'].todos;
 
     runtimeContext.set('todos', todos);
 
+    // Prepare messages for the agent
+    let messages: CoreMessage[];
+    if (conversationHistory && conversationHistory.length > 0) {
+      // If we have history, append the new prompt to it
+      messages = appendToConversation(conversationHistory, prompt);
+    } else {
+      // Otherwise, create a new conversation with just the prompt
+      messages = standardizeMessages(prompt);
+    }
+
     const wrappedStream = wrapTraced(
       async () => {
-        const stream = await thinkAndPrepAgent.stream(prompt, {
+        const stream = await thinkAndPrepAgent.stream(messages, {
           threadId: threadId,
           resourceId: resourceId,
           runtimeContext,
@@ -81,6 +95,9 @@ const thinkAndPrepExecution = async ({
               // Extract and validate messages from the step response
               // step.response.messages contains the conversation history for this step
               outputMessages = extractMessageHistory(step.response.messages);
+
+              // Save conversation history to database
+              await saveConversationHistoryFromStep(runtimeContext, step.response.messages);
 
               // Store the full step data (cast to our expected type)
               finalStepData = step as any;

@@ -3,7 +3,7 @@ import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { analystAgent } from '../agents/analyst-agent/analyst-agent';
-import { formatMessagesForAnalyst } from '../utils/memory/message-history';
+import { saveConversationHistoryFromStep } from '../utils/database/saveConversationHistory';
 import { ThinkAndPrepOutputSchema } from '../utils/memory/types';
 import type {
   AnalystRuntimeContext,
@@ -16,7 +16,6 @@ const outputSchema = z.object({});
 
 const analystExecution = async ({
   inputData,
-  getInitData,
   runtimeContext,
 }: {
   inputData: z.infer<typeof inputSchema>;
@@ -33,21 +32,22 @@ const analystExecution = async ({
       throw new Error('Unable to access your session. Please refresh and try again.');
     }
 
-    // Get the initial prompt from the workflow
-    const initData = await getInitData();
-    const initialPrompt = initData.prompt;
-
-    // Format messages for the analyst agent
-    const formattedMessages = formatMessagesForAnalyst(inputData.outputMessages, initialPrompt);
+    // Messages come directly from think-and-prep step output
+    // They are already in CoreMessage[] format
+    const messages = inputData.outputMessages;
 
     const wrappedStream = wrapTraced(
       async () => {
-        const stream = await analystAgent.stream(formattedMessages, {
+        const stream = await analystAgent.stream(messages, {
           threadId,
           resourceId,
           runtimeContext,
           toolChoice: 'required',
           abortSignal: abortController.signal,
+          onStepFinish: async (step) => {
+            // Save conversation history to database on each step
+            await saveConversationHistoryFromStep(runtimeContext, step.response.messages);
+          },
         });
 
         return stream;
