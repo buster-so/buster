@@ -30,7 +30,7 @@ const executeDone = wrapTraced(
 );
 
 // Export the tool
-export const finishAndRespondTool = createTool({
+export const finishAndRespond = createTool({
   id: 'finish-and-respond',
   description:
     "Marks all remaining unfinished tasks as complete, sends a final response to the user, and ends the workflow. Use this when the workflow is finished. This must be in markdown format and not use the '•' bullet character.",
@@ -39,4 +39,4 @@ export const finishAndRespondTool = createTool({
   execute: executeDone,
 });
 
-export default finishAndRespondTool;
+export default finishAndRespond;

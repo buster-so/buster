@@ -442,7 +442,7 @@ const outputSchema = z.object({
 });
 
 // Export the tool
-export const modifyDashboardsFileTool = createTool({
+export const modifyDashboards = createTool({
   id: 'modify-dashboards-file',
   description:
     'Updates existing dashboard configuration files with new YAML content. Provide the complete YAML content for each dashboard, replacing the entire existing file. This tool is ideal for bulk modifications when you need to update multiple dashboards simultaneously. The system will preserve version history and perform all necessary validations on the new content. For each dashboard, you need its UUID and the complete updated YAML content.',
@@ -453,4 +453,4 @@ export const modifyDashboardsFileTool = createTool({
   },
 });
 
-export default modifyDashboardsFileTool;
+export default modifyDashboards;

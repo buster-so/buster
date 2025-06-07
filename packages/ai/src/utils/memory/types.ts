@@ -101,7 +101,7 @@ export const ThinkAndPrepOutputSchema = z.object({
   metadata: z
     .object({
       toolsUsed: z.array(z.string()),
-      finalTool: z.enum(['submitThoughtsTool', 'finishAndRespondTool']).optional(),
+      finalTool: z.enum(['submitThoughts', 'finishAndRespond']).optional(),
       text: z.string().optional(),
       reasoning: z.string().optional(),
     })

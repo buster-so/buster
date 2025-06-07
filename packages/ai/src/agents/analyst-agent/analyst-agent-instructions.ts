@@ -52,6 +52,7 @@ You operate in a loop to complete tasks:
 - Use \`createDashboards\` to create new dashboards
 - Use \`updateDashboards\` to update existing dashboards
 - Use \`done\` to send a final response to the user and mark your workflow as complete
+- Only use provided tools, as availability may vary dynamically based on the task.
 </tool_use_rules>
 
 <communication_rules>

@@ -89,7 +89,7 @@ const thinkAndPrepExecution = async ({
 
             if (
               toolNames.some((toolName) =>
-                ['submitThoughtsTool', 'finishAndRespondTool'].includes(toolName)
+                ['submitThoughts', 'finishAndRespond'].includes(toolName)
               )
             ) {
               // Extract and validate messages from the step response
@@ -103,7 +103,7 @@ const thinkAndPrepExecution = async ({
               finalStepData = step as any;
 
               // Set finished to true if finishAndRespondTool was called
-              if (toolNames.includes('finishAndRespondTool')) {
+              if (toolNames.includes('finishAndRespond')) {
                 finished = true;
               }
 
@@ -131,8 +131,8 @@ const thinkAndPrepExecution = async ({
       metadata: {
         toolsUsed: getAllToolsUsed(outputMessages),
         finalTool: getLastToolUsed(outputMessages) as
-          | 'submitThoughtsTool'
-          | 'finishAndRespondTool'
+          | 'submitThoughts'
+          | 'finishAndRespond'
           | undefined,
         text: (finalStepData as any)?.text,
         reasoning: (finalStepData as any)?.reasoning,
@@ -151,8 +151,8 @@ const thinkAndPrepExecution = async ({
     metadata: {
       toolsUsed: getAllToolsUsed(outputMessages),
       finalTool: getLastToolUsed(outputMessages) as
-        | 'submitThoughtsTool'
-        | 'finishAndRespondTool'
+        | 'submitThoughts'
+        | 'finishAndRespond'
         | undefined,
       text: (finalStepData as any)?.text,
       reasoning: (finalStepData as any)?.reasoning,

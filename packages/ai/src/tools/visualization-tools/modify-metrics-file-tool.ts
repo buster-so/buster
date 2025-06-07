@@ -587,7 +587,7 @@ const outputSchema = z.object({
 });
 
 // Export the tool
-export const modifyMetricsFileTool = createTool({
+export const modifyMetrics = createTool({
   id: 'modify-metrics-file',
   description:
     'Updates existing metric configuration files with new YAML content. Provide the complete YAML content for each metric, replacing the entire existing file. This tool is ideal for bulk modifications when you need to update multiple metrics simultaneously. The system will preserve version history and perform all necessary validations on the new content. For each metric, you need its UUID and the complete updated YAML content. Prefer modifying metrics in bulk using this tool rather than one by one.',
@@ -598,4 +598,4 @@ export const modifyMetricsFileTool = createTool({
   },
 });
 
-export default modifyMetricsFileTool;
+export default modifyMetrics;

@@ -75,8 +75,9 @@ ${params.todo_list}
 - Follow tool schemas exactly, including all required parameters
 - Do not mention tool names to users
 - Use \`sequentialThinking\` to record thoughts and progress
-- Use \`exectute_sql\` when you need to search for missing text values or enum values
+- Use \`execute_sql\` when you need to search for missing text values or enum values
 - Use \`messageUserClarifyingQuestion\` for clarifications
+- Only use provided tools, as availability may vary dynamically based on the task.
 </tool_use_rules>
 
 <sequential_thinking_rules>

@@ -26,8 +26,6 @@ export async function saveConversationHistory(
         updatedAt: new Date().toISOString(),
       })
       .where(eq(messages.id, messageId));
-
-    console.log(`Saved conversation history for message ${messageId}`);
   } catch (error) {
     console.error('Failed to save conversation history:', error);
     throw new Error(
@@ -52,7 +50,6 @@ export async function saveConversationHistoryFromStep(
 
   // Skip saving if no messageId (for testing/evaluation)
   if (!messageId) {
-    console.log('No messageId in runtime context, skipping database save');
     return;
   }
 

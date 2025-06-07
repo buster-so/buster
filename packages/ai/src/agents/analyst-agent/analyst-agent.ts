@@ -1,11 +1,11 @@
 import {} from '@ai-sdk/anthropic';
 import { Agent } from '@mastra/core';
 import {
-  createDashboardsFileTool,
-  createMetricsFileTool,
+  createDashboards,
+  createMetrics,
   doneTool,
-  modifyDashboardsFileTool,
-  modifyMetricsFileTool,
+  modifyDashboards,
+  modifyMetrics,
 } from '../../tools';
 import { anthropicCachedModel } from '../../utils/models/anthropic-cached';
 import { getSharedMemory } from '../../utils/shared-memory';
@@ -22,10 +22,10 @@ export const analystAgent = new Agent({
   instructions: getAnalystInstructions,
   model: anthropicCachedModel('claude-sonnet-4-20250514'),
   tools: {
-    createMetricsFileTool,
-    modifyMetricsFileTool,
-    createDashboardsFileTool,
-    modifyDashboardsFileTool,
+    createMetrics,
+    modifyMetrics,
+    createDashboards,
+    modifyDashboards,
     doneTool,
   },
   memory: getSharedMemory(),

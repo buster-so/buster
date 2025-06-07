@@ -443,7 +443,7 @@ function generateResultMessage(
 }
 
 // Export the tool with complete schema included
-export const createDashboardsFileTool = createTool({
+export const createDashboards = createTool({
   id: 'create-dashboards-file',
   description: `Creates dashboard configuration files with YAML content following the dashboard schema specification. Before using this tool, carefully consider the dashboard layout, metric references, and row organization. Each dashboard references existing metrics by their UUIDs and organizes them into rows with specific column layouts. **This tool supports creating multiple dashboards in a single call; prefer using bulk creation over creating dashboards one by one.**
 
@@ -620,4 +620,4 @@ rows:
   },
 });
 
-export default createDashboardsFileTool;
+export default createDashboards;
