@@ -4,6 +4,7 @@ import { RuntimeContext } from '@mastra/core/runtime-context';
 import type { CoreMessage } from 'ai';
 import { initLogger, wrapTraced } from 'braintrust';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
+import { getRawLlmMessagesByMessageId } from '../../../src';
 import analystWorkflow, {
   type AnalystRuntimeContext,
 } from '../../../src/workflows/analyst-workflow';
@@ -162,4 +163,100 @@ describe('Analyst Workflow Integration Tests', () => {
     expect(result).toBeDefined();
     console.log('Workflow result:', result);
   }, 300000);
+
+  test('should execute initial message then follow-up with retrieved conversation history', async () => {
+    // Step 1: Create test chat and message in database
+    // Use the same organizationId and userId as other tests to ensure they exist
+    const organizationId = 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce';
+    const userId = 'c2dd64cd-f7f3-4884-bc91-d46ae431901e';
+    const { chatId } = await createTestChat(organizationId, userId);
+    const messageId = await createTestMessage(chatId, userId);
+
+    // Step 2: Run initial workflow with messageId to save conversation history
+    const initialInput = {
+      prompt: 'What are our top 5 products by revenue in the last quarter?',
+    };
+
+    const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();
+    runtimeContext.set('userId', userId);
+    runtimeContext.set('threadId', chatId);
+    runtimeContext.set('organizationId', organizationId);
+    runtimeContext.set('dataSourceId', 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a');
+    runtimeContext.set('dataSourceSyntax', 'postgres');
+    runtimeContext.set('messageId', messageId); // This triggers saving to rawLlmMessages
+
+    console.log('Running initial workflow with messageId:', messageId);
+
+    const initialTracedWorkflow = wrapTraced(
+      async () => {
+        const run = analystWorkflow.createRun();
+        return await run.start({
+          inputData: initialInput,
+          runtimeContext,
+        });
+      },
+      { name: 'Initial Message Workflow' }
+    );
+
+    const initialResult = await initialTracedWorkflow();
+    expect(initialResult).toBeDefined();
+    console.log('Initial workflow completed');
+
+    // Step 3: Retrieve conversation history from database
+    console.log('Retrieving conversation history from database...');
+    const conversationHistory = await getRawLlmMessagesByMessageId(messageId);
+
+    // Verify conversation history was saved
+    expect(conversationHistory).toBeDefined();
+    expect(conversationHistory).not.toBeNull();
+    if (conversationHistory) {
+      expect(Array.isArray(conversationHistory)).toBe(true);
+      expect(conversationHistory.length).toBeGreaterThan(0);
+      console.log(`Retrieved ${conversationHistory.length} messages from conversation history`);
+    }
+
+    // Step 4: Run follow-up workflow with retrieved conversation history
+    const followUpInput = {
+      prompt: 'Can you show me the year-over-year growth for these top products?',
+      conversationHistory: conversationHistory as CoreMessage[],
+    };
+
+    // Create new message for follow-up
+    const followUpMessageId = await createTestMessage(chatId, userId);
+    runtimeContext.set('messageId', followUpMessageId);
+
+    console.log('Running follow-up workflow with conversation history...');
+
+    const followUpTracedWorkflow = wrapTraced(
+      async () => {
+        const run = analystWorkflow.createRun();
+        return await run.start({
+          inputData: followUpInput,
+          runtimeContext,
+        });
+      },
+      { name: 'Follow-up Message Workflow' }
+    );
+
+    const followUpResult = await followUpTracedWorkflow();
+    expect(followUpResult).toBeDefined();
+    console.log('Follow-up workflow completed');
+
+    // Verify both messages were saved to database
+    const allMessages = await db
+      .select()
+      .from(messages)
+      .where(eq(messages.chatId, chatId))
+      .orderBy(messages.createdAt);
+
+    expect(allMessages).toHaveLength(2);
+    expect(allMessages[0]!.id).toBe(messageId);
+    expect(allMessages[1]!.id).toBe(followUpMessageId);
+
+    // Verify both have rawLlmMessages
+    expect(allMessages[0]!.rawLlmMessages).toBeDefined();
+    expect(allMessages[1]!.rawLlmMessages).toBeDefined();
+
+    console.log('Test completed successfully - both messages saved with conversation history');
+  }, 600000); // Increased timeout for two workflow runs
 });

@@ -1,7 +1,7 @@
-import { getDb } from '../../../../database/src/connection';
-import { messages } from '../../../../database/src/schema';
 import type { CoreMessage } from 'ai';
 import { eq } from 'drizzle-orm';
+import { getDb } from '../../../../database/src/connection';
+import { messages } from '../../../../database/src/schema';
 
 /**
  * Saves conversation history to the database

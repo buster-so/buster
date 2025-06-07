@@ -1,5 +1,5 @@
 import type { InferSelectModel } from 'drizzle-orm';
-import { eq, and, desc, isNull } from 'drizzle-orm';
+import { and, desc, eq, isNull } from 'drizzle-orm';
 import { db } from '../connection';
 import { messages } from '../schema';
 
@@ -16,10 +16,7 @@ export async function getRawLlmMessages(messageId: string) {
       rawLlmMessages: messages.rawLlmMessages,
     })
     .from(messages)
-    .where(and(
-      eq(messages.id, messageId),
-      isNull(messages.deletedAt)
-    ))
+    .where(and(eq(messages.id, messageId), isNull(messages.deletedAt)))
     .limit(1);
 
   return result[0]?.rawLlmMessages || null;
@@ -34,10 +31,7 @@ export async function getMessagesForChat(chatId: string) {
   return await db
     .select()
     .from(messages)
-    .where(and(
-      eq(messages.chatId, chatId),
-      isNull(messages.deletedAt)
-    ))
+    .where(and(eq(messages.chatId, chatId), isNull(messages.deletedAt)))
     .orderBy(desc(messages.createdAt));
 }
 
@@ -50,10 +44,7 @@ export async function getLatestMessageForChat(chatId: string) {
   const result = await db
     .select()
     .from(messages)
-    .where(and(
-      eq(messages.chatId, chatId),
-      isNull(messages.deletedAt)
-    ))
+    .where(and(eq(messages.chatId, chatId), isNull(messages.deletedAt)))
     .orderBy(desc(messages.createdAt))
     .limit(1);
 
@@ -69,11 +60,9 @@ export async function getCompletedMessagesForChat(chatId: string) {
   return await db
     .select()
     .from(messages)
-    .where(and(
-      eq(messages.chatId, chatId),
-      eq(messages.isCompleted, true),
-      isNull(messages.deletedAt)
-    ))
+    .where(
+      and(eq(messages.chatId, chatId), eq(messages.isCompleted, true), isNull(messages.deletedAt))
+    )
     .orderBy(desc(messages.createdAt));
 }
 
@@ -90,13 +79,10 @@ export async function getAllRawLlmMessagesForChat(chatId: string) {
       createdAt: messages.createdAt,
     })
     .from(messages)
-    .where(and(
-      eq(messages.chatId, chatId),
-      isNull(messages.deletedAt)
-    ))
+    .where(and(eq(messages.chatId, chatId), isNull(messages.deletedAt)))
     .orderBy(desc(messages.createdAt));
 
-  return result.map(msg => ({
+  return result.map((msg) => ({
     messageId: msg.id,
     rawLlmMessages: msg.rawLlmMessages,
     createdAt: msg.createdAt,

@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import { createMetricsFileTool } from '../../../src/tools/visualization-tools/create-metrics-file-tool';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+import { createMetricsFileTool } from '../../../src/tools/visualization-tools/create-metrics-file-tool';
 
 describe('Create Metrics File Tool Integration Tests', () => {
   let mockRuntimeContext: any;

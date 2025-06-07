@@ -1,4 +1,4 @@
-import { db, chats } from '@buster/database';
+import { chats, db } from '@buster/database';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
  * @returns An object containing the chat ID, organization ID, and user ID
  */
 export async function createTestChat(
-  organizationId?: string, 
+  organizationId?: string,
   createdBy?: string
 ): Promise<{
   chatId: string;
@@ -28,9 +28,9 @@ export async function createTestChat(
     publiclyAccessible: false,
   });
 
-  return { 
-    chatId, 
-    organizationId: orgId, 
-    userId 
+  return {
+    chatId,
+    organizationId: orgId,
+    userId,
   };
-} 
+}

@@ -1,5 +1,5 @@
-import { createPlanInvestigativeTool } from '../../../src/tools/planning-thinking-tools/create-plan-investigative-tool';
 import { beforeEach, describe, expect, test } from 'vitest';
+import { createPlanInvestigativeTool } from '../../../src/tools/planning-thinking-tools/create-plan-investigative-tool';
 
 describe('Create Plan Investigative Tool Integration Tests', () => {
   let mockRuntimeContext: any;

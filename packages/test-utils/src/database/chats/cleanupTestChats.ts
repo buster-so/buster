@@ -1,4 +1,4 @@
-import { db, chats, eq } from '@buster/database';
+import { chats, db, eq } from '@buster/database';
 
 /**
  * Cleans up test chat records from the database
@@ -20,4 +20,4 @@ export async function cleanupTestChats(chatIds: string[]): Promise<void> {
  */
 export async function cleanupTestChat(chatId: string): Promise<void> {
   await cleanupTestChats([chatId]);
-} 
+}

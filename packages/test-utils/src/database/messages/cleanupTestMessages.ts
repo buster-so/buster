@@ -1,4 +1,4 @@
-import { db, messages, eq } from '@buster/database';
+import { db, eq, messages } from '@buster/database';
 
 /**
  * Cleans up test message records from the database
@@ -20,4 +20,4 @@ export async function cleanupTestMessages(messageIds: string[]): Promise<void> {
  */
 export async function cleanupTestMessage(messageId: string): Promise<void> {
   await cleanupTestMessages([messageId]);
-} 
+}

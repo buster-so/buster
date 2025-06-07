@@ -17,7 +17,7 @@ export interface ChatHistoryResult {
  */
 export async function getChatHistory(chatId: string): Promise<ChatHistoryResult[]> {
   const results = await getAllRawLlmMessagesForChat(chatId);
-  
+
   return results.map((result) => ({
     messageId: result.messageId,
     rawLlmMessages: result.rawLlmMessages as MessageHistory,
@@ -32,7 +32,7 @@ export async function getChatHistory(chatId: string): Promise<ChatHistoryResult[
  */
 export async function getRawLlmMessages(chatId: string): Promise<MessageHistory[]> {
   const results = await getAllRawLlmMessagesForChat(chatId);
-  
+
   return results.map((result) => result.rawLlmMessages as MessageHistory);
 }
 
@@ -41,7 +41,9 @@ export async function getRawLlmMessages(chatId: string): Promise<MessageHistory[
  * @param messageId - The UUID of the message to fetch
  * @returns Raw LLM message data or null if not found
  */
-export async function getRawLlmMessagesByMessageId(messageId: string): Promise<MessageHistory | null> {
+export async function getRawLlmMessagesByMessageId(
+  messageId: string
+): Promise<MessageHistory | null> {
   const result = await getDbRawLlmMessages(messageId);
   return result as MessageHistory | null;
 }

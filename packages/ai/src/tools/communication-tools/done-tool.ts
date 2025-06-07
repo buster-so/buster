@@ -28,8 +28,8 @@ interface TodoItem {
 async function processDone(input: any): Promise<z.infer<typeof doneOutputSchema>> {
   try {
     // Check multiple possible locations for runtime context
-    let runtimeContext = input.context?.runtimeContext || input.runtimeContext || input.context;
-    
+    const runtimeContext = input.context?.runtimeContext || input.runtimeContext || input.context;
+
     if (!runtimeContext || typeof runtimeContext.get !== 'function') {
       // If we can't find a proper runtime context, return success without todos management
       return {
@@ -39,8 +39,8 @@ async function processDone(input: any): Promise<z.infer<typeof doneOutputSchema>
     }
 
     // Get todos from runtime context
-    let todos = runtimeContext.get('todos');
-    
+    const todos = runtimeContext.get('todos');
+
     // Handle case where todos is not an array or doesn't exist
     if (!Array.isArray(todos)) {
       return {
@@ -66,15 +66,15 @@ async function processDone(input: any): Promise<z.infer<typeof doneOutputSchema>
       // Check if item is a valid todo object
       if (typeof item === 'object' && item !== null && typeof item.todo === 'string') {
         const todo = { ...item };
-        
+
         // Store original completion state
         originalCompletionStates.set(validTodos.length, !!todo.completed);
-        
+
         // Mark incomplete todos as complete
         if (!todo.completed) {
           todo.completed = true;
         }
-        
+
         validTodos.push(todo);
       }
     }

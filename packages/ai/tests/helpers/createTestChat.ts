@@ -1,6 +1,6 @@
+import { v4 as uuidv4 } from 'uuid';
 import { db } from '../../../database/src/connection';
 import { chats } from '../../../database/src/schema';
-import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Creates a test chat record in the database

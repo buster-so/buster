@@ -74,9 +74,11 @@ describe('Think and Prep Agent Integration Tests', () => {
     );
 
     // Test with conversation history (stubbed for now)
-    const result = await tracedAgentWorkflow(conversationHistory.length > 0 ? conversationHistory : [
-      { role: 'user', content: 'What are the top 5 customers by revenue?' }
-    ]);
+    const result = await tracedAgentWorkflow(
+      conversationHistory.length > 0
+        ? conversationHistory
+        : [{ role: 'user', content: 'What are the top 5 customers by revenue?' }]
+    );
 
     expect(result).toBeDefined();
     console.log('Final result:', result);
