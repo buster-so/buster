@@ -16,8 +16,7 @@ app.use('*', loggerMiddleware);
 app.use('*', corsMiddleware);
 
 // Mount API routes
-app.route('/healthcheck', healthcheckRoutes);
-app.route('/api/v2', v2Routes);
+app.route('/healthcheck', healthcheckRoutes).route('/api/v2', v2Routes);
 
 // Global error handler
 app.onError((err, c) => {
@@ -47,3 +46,4 @@ export default {
   port,
   fetch: app.fetch
 };
+export type AppType = typeof app;

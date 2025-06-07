@@ -6,7 +6,7 @@ import type React from 'react';
 import { useLayoutEffect, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import mainApi from '@/api/buster_rest/instances';
-import { defaultRequestHandler } from '@/api/createInstance';
+import { defaultAxiosRequestHandler } from '@/api/createAxiosInstance';
 import nextApi from '@/api/next/instances';
 import { isDev } from '@/config';
 import { useSupabaseContext } from '../Supabase/SupabaseContextProvider';
@@ -45,8 +45,8 @@ export const BusterReactQueryProvider = ({ children }: { children: React.ReactNo
     //reset all request interceptors
     mainApi.interceptors.request.eject(0);
     nextApi.interceptors.request.eject(0);
-    mainApi.interceptors.request.use((v) => defaultRequestHandler(v, { checkTokenValidity }));
-    nextApi.interceptors.request.use((v) => defaultRequestHandler(v, { checkTokenValidity }));
+    mainApi.interceptors.request.use((v) => defaultAxiosRequestHandler(v, { checkTokenValidity }));
+    nextApi.interceptors.request.use((v) => defaultAxiosRequestHandler(v, { checkTokenValidity }));
   }, []);
 
   useHotkeys('meta+shift+i', (e) => {

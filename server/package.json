@@ -7,6 +7,8 @@
     "prod": "bun run build && bun run start"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.49.10"
+    "@hono/zod-validator": "^0.4.3",
+    "@supabase/supabase-js": "^2.49.10",
+    "hono": "^4.7.11"
   }
 }

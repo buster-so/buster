@@ -8,7 +8,7 @@ import { getSupabaseTokenFromCookies } from './createServerInstance';
 
 const AXIOS_TIMEOUT = 120000; // 2 minutes
 
-export const createInstance = (baseURL: string) => {
+export const createAxiosInstance = (baseURL: string) => {
   const apiInstance = axios.create({
     baseURL,
     timeout: AXIOS_TIMEOUT,
@@ -34,11 +34,11 @@ export const createInstance = (baseURL: string) => {
     }
   );
 
-  apiInstance.interceptors.request.use(defaultRequestHandler);
+  apiInstance.interceptors.request.use(defaultAxiosRequestHandler);
   return apiInstance;
 };
 
-export const defaultRequestHandler = async (
+export const defaultAxiosRequestHandler = async (
   config: InternalAxiosRequestConfig<unknown>,
   options?: {
     checkTokenValidity: SupabaseContextReturnType['checkTokenValidity'];

@@ -1,14 +1,8 @@
 import { useShape as useElectricShape } from '@electric-sql/react';
-import {
-  ShapeStream,
-  type BackoffOptions,
-  type Row,
-  type ShapeStreamOptions
-} from '@electric-sql/client';
+import { ShapeStream, type BackoffOptions, type Row } from '@electric-sql/client';
 import { ELECTRIC_BASE_URL } from './config';
 import { useSupabaseContext } from '@/context/Supabase';
 import { useEffect, useMemo } from 'react';
-import { useBusterNotifications } from '@/context/BusterNotifications';
 
 export type ElectricShapeOptions<T extends Row<unknown> = Row<unknown>> = Omit<
   Parameters<typeof useElectricShape<T>>[0],

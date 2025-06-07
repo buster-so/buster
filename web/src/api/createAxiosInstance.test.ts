@@ -1,7 +1,7 @@
 import axios, { type AxiosError, AxiosHeaders, type InternalAxiosRequestConfig } from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { rustErrorHandler } from './buster_rest/errors';
-import { createInstance, defaultRequestHandler } from './createInstance';
+import { createAxiosInstance, defaultAxiosRequestHandler } from './createAxiosInstance';
 
 // Mock dependencies
 vi.mock('axios');
@@ -11,7 +11,7 @@ vi.mock('@tanstack/react-query', () => ({
   isServer: false
 }));
 
-describe('createInstance', () => {
+describe('createAxiosInstance', () => {
   const mockBaseURL = 'https://api.example.com';
 
   beforeEach(() => {
@@ -25,7 +25,7 @@ describe('createInstance', () => {
   });
 
   it('creates an axios instance with correct configuration', () => {
-    createInstance(mockBaseURL);
+    createAxiosInstance(mockBaseURL);
 
     expect(axios.create).toHaveBeenCalledWith({
       baseURL: mockBaseURL,
@@ -45,10 +45,10 @@ describe('createInstance', () => {
     };
     (axios.create as any).mockReturnValue(mockInstance);
 
-    createInstance(mockBaseURL);
+    createAxiosInstance(mockBaseURL);
 
     expect(mockInstance.interceptors.response.use).toHaveBeenCalled();
-    expect(mockInstance.interceptors.request.use).toHaveBeenCalledWith(defaultRequestHandler);
+    expect(mockInstance.interceptors.request.use).toHaveBeenCalledWith(defaultAxiosRequestHandler);
   });
 
   it('handles errors in response interceptor', async () => {
@@ -63,7 +63,7 @@ describe('createInstance', () => {
     (rustErrorHandler as any).mockReturnValue('Processed Error');
 
     // Get the error handler by capturing the second argument passed to use()
-    createInstance(mockBaseURL);
+    createAxiosInstance(mockBaseURL);
     const errorHandler = mockInstance.interceptors.response.use.mock.calls[0][1];
 
     // Test the error handler
@@ -72,7 +72,7 @@ describe('createInstance', () => {
   });
 });
 
-describe('defaultRequestHandler', () => {
+describe('defaultAxiosRequestHandler', () => {
   const mockConfig: InternalAxiosRequestConfig = {
     headers: new AxiosHeaders(),
     method: 'get',
@@ -91,7 +91,7 @@ describe('defaultRequestHandler', () => {
       isTokenValid: true
     });
 
-    const result = await defaultRequestHandler(mockConfig, {
+    const result = await defaultAxiosRequestHandler(mockConfig, {
       checkTokenValidity: () => Promise.resolve(mockCheckTokenValidity())
     });
 
@@ -104,7 +104,7 @@ describe('defaultRequestHandler', () => {
       isTokenValid: false
     });
 
-    const result = await defaultRequestHandler(mockConfig, {
+    const result = await defaultAxiosRequestHandler(mockConfig, {
       checkTokenValidity: () => Promise.resolve(mockCheckTokenValidity())
     });
 
@@ -118,7 +118,7 @@ describe('defaultRequestHandler', () => {
       baseURL: 'https://api.example.com'
     };
 
-    const result = await defaultRequestHandler(originalConfig, {
+    const result = await defaultAxiosRequestHandler(originalConfig, {
       checkTokenValidity: () =>
         Promise.resolve({
           access_token: 'token',
