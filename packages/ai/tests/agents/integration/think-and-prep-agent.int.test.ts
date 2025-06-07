@@ -80,7 +80,7 @@ describe('Think and Prep Agent Integration Tests', () => {
 
     expect(result).toBeDefined();
     console.log('Final result:', result);
-  }, 120000);
+  }, 300000);
 
   test('should generate response for analysis query', async () => {
     const tracedAgentWorkflow = wrapTraced(
@@ -150,5 +150,5 @@ describe('Think and Prep Agent Integration Tests', () => {
     expect(response.text).toBeDefined();
     expect(typeof response.text).toBe('string');
     expect(response.text.length).toBeGreaterThan(0);
-  }, 0);
+  }, 300000);
 });

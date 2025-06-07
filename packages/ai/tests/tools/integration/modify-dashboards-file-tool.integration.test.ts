@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { modifyDashboardsFileTool } from '@/tools/visualization-tools/modify-dashboards-file-tool';
+import { modifyDashboardsFileTool } from '../../../src/tools/visualization-tools/modify-dashboards-file-tool';
 import { dashboardFiles, db, eq, inArray, metricFiles } from '@buster/database';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 

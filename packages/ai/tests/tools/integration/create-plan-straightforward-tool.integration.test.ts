@@ -1,4 +1,4 @@
-import { createPlanStraightforwardTool } from '@/tools/planning-thinking-tools/create-plan-straightforward-tool';
+import { createPlanStraightforwardTool } from '../../../src/tools/planning-thinking-tools/create-plan-straightforward-tool';
 import { beforeEach, describe, expect, test } from 'vitest';
 
 describe('Create Plan Straightforward Tool Integration Tests', () => {

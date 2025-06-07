@@ -1,5 +1,5 @@
-import { db } from '@buster/database/connection';
-import { chats } from '@buster/database/schema';
+import { db } from '../../../database/src/connection';
+import { chats } from '../../../database/src/schema';
 import { v4 as uuidv4 } from 'uuid';
 
 /**

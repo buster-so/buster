@@ -1,4 +1,4 @@
-import { createPlanInvestigativeTool } from '@/tools/planning-thinking-tools/create-plan-investigative-tool';
+import { createPlanInvestigativeTool } from '../../../src/tools/planning-thinking-tools/create-plan-investigative-tool';
 import { beforeEach, describe, expect, test } from 'vitest';
 
 describe('Create Plan Investigative Tool Integration Tests', () => {

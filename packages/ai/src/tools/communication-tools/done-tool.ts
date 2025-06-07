@@ -12,19 +12,109 @@ const doneInputSchema = z.object({
     ),
 });
 
-const doneOutputSchema = z.object({});
+const doneOutputSchema = z.object({
+  success: z.boolean().describe('Whether the operation was successful'),
+  todos: z.string().describe('String representation of the final todo status'),
+});
+
+// Type for todo items
+interface TodoItem {
+  todo: string;
+  completed: boolean;
+  [key: string]: any; // Allow additional properties
+}
 
 // Process done tool execution with todo management
-async function processDone(): Promise<z.infer<typeof doneOutputSchema>> {
-  // This tool signals the end of the workflow and provides the final response.
-  // The actual agent termination logic resides elsewhere.
-  return {};
+async function processDone(input: any): Promise<z.infer<typeof doneOutputSchema>> {
+  try {
+    // Check multiple possible locations for runtime context
+    let runtimeContext = input.context?.runtimeContext || input.runtimeContext || input.context;
+    
+    if (!runtimeContext || typeof runtimeContext.get !== 'function') {
+      // If we can't find a proper runtime context, return success without todos management
+      return {
+        success: true,
+        todos: 'No to-do list found.',
+      };
+    }
+
+    // Get todos from runtime context
+    let todos = runtimeContext.get('todos');
+    
+    // Handle case where todos is not an array or doesn't exist
+    if (!Array.isArray(todos)) {
+      return {
+        success: true,
+        todos: 'No to-do list found.',
+      };
+    }
+
+    // If empty array
+    if (todos.length === 0) {
+      return {
+        success: true,
+        todos: 'No to-do list found.',
+      };
+    }
+
+    // Filter out invalid todo items and mark incomplete ones as complete
+    const validTodos: TodoItem[] = [];
+    const originalCompletionStates = new Map<number, boolean>();
+
+    for (let i = 0; i < todos.length; i++) {
+      const item = todos[i];
+      // Check if item is a valid todo object
+      if (typeof item === 'object' && item !== null && typeof item.todo === 'string') {
+        const todo = { ...item };
+        
+        // Store original completion state
+        originalCompletionStates.set(validTodos.length, !!todo.completed);
+        
+        // Mark incomplete todos as complete
+        if (!todo.completed) {
+          todo.completed = true;
+        }
+        
+        validTodos.push(todo);
+      }
+    }
+
+    // If no valid todos found
+    if (validTodos.length === 0) {
+      return {
+        success: true,
+        todos: 'No to-do list found.',
+      };
+    }
+
+    // Update the runtime context with completed todos
+    if (typeof runtimeContext.set === 'function') {
+      runtimeContext.set('todos', validTodos);
+    }
+
+    // Format todos for output
+    const todoStrings = validTodos.map((todo, index) => {
+      const wasOriginallyCompleted = originalCompletionStates.get(index) || false;
+      const wasMarkedByDone = !wasOriginallyCompleted && todo.completed;
+      const checkmark = '[x]';
+      const suffix = wasMarkedByDone ? ' *Marked complete by calling the done tool' : '';
+      return `${checkmark} ${todo.todo}${suffix}`;
+    });
+
+    return {
+      success: true,
+      todos: todoStrings.join('\n'),
+    };
+  } catch (error) {
+    // Re-throw the error to be handled by the test
+    throw error;
+  }
 }
 
 // Main done function with tracing
 const executeDone = wrapTraced(
-  async (): Promise<z.infer<typeof doneOutputSchema>> => {
-    return await processDone();
+  async (input: any): Promise<z.infer<typeof doneOutputSchema>> => {
+    return await processDone(input);
   },
   { name: 'done-tool' }
 );

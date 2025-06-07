@@ -55,7 +55,7 @@ const analystExecution = async ({
       {
         name: 'Analyst',
         spanAttributes: {
-          messageCount: formattedMessages.length,
+          messageCount: messages.length,
           previousStep: {
             toolsUsed: inputData.metadata?.toolsUsed,
             finalTool: inputData.metadata?.finalTool,

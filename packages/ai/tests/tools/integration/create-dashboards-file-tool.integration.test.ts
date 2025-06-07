@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { createDashboardsFileTool } from '@/tools/visualization-tools/create-dashboards-file-tool';
+import { createDashboardsFileTool } from '../../../src/tools/visualization-tools/create-dashboards-file-tool';
 import {
   dashboardFiles,
   db,

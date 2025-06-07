@@ -1,5 +1,5 @@
-import { getDb } from '@buster/database/connection';
-import { messages } from '@buster/database/schema';
+import { getDb } from '../../../../database/src/connection';
+import { messages } from '../../../../database/src/schema';
 import type { CoreMessage } from 'ai';
 import { eq } from 'drizzle-orm';
 

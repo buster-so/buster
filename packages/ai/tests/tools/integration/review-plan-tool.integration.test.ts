@@ -1,4 +1,4 @@
-import { reviewPlanTool } from '@/tools/planning-thinking-tools/review-plan-tool';
+import { reviewPlanTool } from '../../../src/tools/planning-thinking-tools/review-plan-tool';
 import { beforeEach, describe, expect, test } from 'vitest';
 
 describe('Review Plan Tool Integration Tests', () => {

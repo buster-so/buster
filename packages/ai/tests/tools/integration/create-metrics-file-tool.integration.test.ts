@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { createMetricsFileTool } from '@/tools/visualization-tools/create-metrics-file-tool';
+import { createMetricsFileTool } from '../../../src/tools/visualization-tools/create-metrics-file-tool';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 describe('Create Metrics File Tool Integration Tests', () => {
