@@ -1,12 +1,14 @@
 {
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "strict": true,
+    "outDir": "dist",
+    "rootDir": "src",
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@/access-controls/*": ["../packages/access-controls/src/*"]
+      "@/*": ["src/*"]
     }
-  }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

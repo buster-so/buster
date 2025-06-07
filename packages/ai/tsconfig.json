@@ -1,39 +1,21 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "lib": ["ESNext"],
-    "target": "ESNext",
-    "module": "Preserve",
-    "moduleDetection": "force",
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
-    "allowJs": true,
-    "noEmit": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noPropertyAccessFromIndexSignature": false,
-    "baseUrl": ".",
+    "outDir": "dist",
+    "rootDir": "src",
     "paths": {
       "@/*": ["src/*"],
       "@tools/*": ["src/tools/*"],
       "@agents/*": ["src/agents/*"],
       "@workflows/*": ["src/workflows/*"],
       "@utils/*": ["src/utils/*"],
-      "@memory/*": ["src/utils/memory/*"],
-      "@access-controls/*": ["../../access-controls/src/*"]
+      "@memory/*": ["src/utils/memory/*"]
     }
   },
   "include": [
     "src/**/*",
     "tests/**/*",
-    "src/tools/file-tools/edit-file-tool.ts",
-    "src/tools/file-tools/glob-tool.ts",
-    "src/tools/file-tools/grep-tool.ts"
+    "evals/**/*"
   ],
   "exclude": ["node_modules", "dist"]
 }
