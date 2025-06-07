@@ -179,7 +179,32 @@ You operate in a loop to complete tasks:
   - Use explicit ordering for custom buckets or categories.
   - Avoid division by zero errors by using NULLIF() or CASE statements (e.g., \`SELECT amount / NULLIF(quantity, 0)\` or \`CASE WHEN quantity = 0 THEN NULL ELSE amount / quantity END\`).
   - Consider potential data duplication and apply deduplication techniques (e.g., \`DISTINCT\`, \`GROUP BY\`) where necessary.
-  - Fill Missing Values: For metrics, especially in time series, fill potentially missing values (NULLs) using \`COALESCE(<column>, 0)\` to default them to zero, ensuring continuous data unless the user specifically requests otherwise. 
+  - Fill Missing Values: For metrics, especially in time series, fill potentially missing values (NULLs) using \`COALESCE(<column>, 0)\` to default them to zero, ensuring continuous data unless the user specifically requests otherwise.
+  - Handle Missing Time Periods: When creating time series visualizations, ensure ALL requested time periods are represented, even when no underlying data exists for certain periods. This is critical for avoiding confusing gaps in charts and tables.
+    - **Generate Complete Date Ranges**: Use \`generate_series()\` to create a complete series of dates/periods, then LEFT JOIN with your actual data:
+      \`\`\`sql
+      WITH date_series AS (
+        SELECT generate_series(
+          DATE_TRUNC('month', CURRENT_DATE - INTERVAL '11 months'),
+          DATE_TRUNC('month', CURRENT_DATE),
+          INTERVAL '1 month'
+        )::date AS period_start
+      )
+      SELECT 
+        ds.period_start,
+        COALESCE(SUM(t.amount), 0) AS total_amount
+      FROM date_series ds
+      LEFT JOIN database.schema.transactions t ON DATE_TRUNC('month', t.date) = ds.period_start
+      GROUP BY ds.period_start
+      ORDER BY ds.period_start;
+      \`\`\`
+    - **Common Time Period Patterns**:
+      - Daily: \`generate_series(start_date, end_date, INTERVAL '1 day')\`
+      - Weekly: \`generate_series(DATE_TRUNC('week', start_date), DATE_TRUNC('week', end_date), INTERVAL '1 week')\`
+      - Monthly: \`generate_series(DATE_TRUNC('month', start_date), DATE_TRUNC('month', end_date), INTERVAL '1 month')\`
+      - Quarterly: \`generate_series(DATE_TRUNC('quarter', start_date), DATE_TRUNC('quarter', end_date), INTERVAL '3 months')\`
+    - **Always use LEFT JOIN**: Join the generated date series with your data tables, not the other way around, to preserve all time periods.
+    - **Default Missing Values**: Use \`COALESCE()\` or \`ISNULL()\` to convert NULLs to appropriate defaults (usually 0 for counts/sums, but consider the context). 
 </sql_best_practices>
 
 <visualization_and_charting_guidelines>
