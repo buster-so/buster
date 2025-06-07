@@ -16,7 +16,7 @@
     // Path mapping for clean cross-package imports
     "baseUrl": ".",
     "paths": {
-      // Package aliases - consistent @buster/* pattern
+      // Package aliases - consistent @buster/* pattern  
       "@buster/access-controls": ["packages/access-controls/src"],
       "@buster/access-controls/*": ["packages/access-controls/src/*"],
       "@buster/ai": ["packages/ai/src"],
@@ -31,6 +31,8 @@
       "@buster/stored-values/*": ["packages/stored-values/src/*"],
       "@buster/web-tools": ["packages/web-tools/src"],
       "@buster/web-tools/*": ["packages/web-tools/src/*"],
+      "@buster/test-utils": ["packages/test-utils/src"],
+      "@buster/test-utils/*": ["packages/test-utils/src/*"],
       
       // Server aliases
       "@server": ["server/src"],

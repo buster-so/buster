@@ -70,7 +70,10 @@
     "postgres": "^3.4.7",
     "snowflake-sdk": "^2.1.0",
     "zod": "^3.25.51",
-    "@hono/zod-validator": "^0.2.2"
+    "@hono/zod-validator": "^0.2.2",
+    "glob": "^11.0.2",
+    "minimatch": "^10.0.1",
+    "yaml": "^2.8.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
@@ -91,7 +94,8 @@
     "typescript": "^5.8.3",
     "uuid": "^9.0.1",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.2.2"
+    "vitest": "^3.2.2",
+    "autoevals": "^0.0.129"
   },
   "peerDependencies": {
     "bun": "^1.2.15",
