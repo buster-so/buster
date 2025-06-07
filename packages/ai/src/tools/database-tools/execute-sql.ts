@@ -12,7 +12,7 @@ const executeSqlStatementInputSchema = z.object({
   statements: z
     .array(z.string())
     .describe(
-      'Array of lightweight, optimized SQL statements to execute. Each statement should be small and focused. All queries will be automatically limited to 25 results maximum for performance. YOU MUST USE THE <SCHEMA_NAME>.<TABLE_NAME> syntax/qualifier for all table names. Otherwise the queries wont run successfully.'
+      'Array of lightweight, optimized SQL statements to execute. Each statement should be small and focused. All queries will be automatically limited to 25 results maximum for performance. YOU MUST USE THE <SCHEMA_NAME>.<TABLE_NAME> syntax/qualifier for all table names. NEVER use SELECT * - you must explicitly list the columns you want to query from the documentation provided. Queries without these requirements will fail to execute.'
     ),
 });
 
@@ -121,7 +121,7 @@ const executeSqlStatement = wrapTraced(
       await dataSource.close();
     }
   },
-  { name: 'find-required-text-values' }
+  { name: 'execute-sql' }
 );
 
 async function getDataSourceCredentials(dataSourceId: string): Promise<Credentials> {
@@ -192,10 +192,10 @@ async function executeSingleStatement(
 }
 
 // Export the tool
-export const findRequiredTextValues = createTool({
-  id: 'find-required-text-values',
+export const executeSql = createTool({
+  id: 'execute-sql',
   description:
-    'Use this to run lightweight, validation queries to understand values in columns, date ranges, etc. Will only ever return 25 results max.',
+    'Use this to run lightweight, validation queries to understand values in columns, date ranges, etc. Will only ever return 25 results max. You must use the <SCHEMA_NAME>.<TABLE_NAME> syntax/qualifier for all table names. Otherwise the queries wont run successfully.',
   inputSchema: executeSqlStatementInputSchema,
   outputSchema: executeSqlStatementOutputSchema,
   execute: async ({
@@ -209,4 +209,4 @@ export const findRequiredTextValues = createTool({
   },
 });
 
-export default findRequiredTextValues;
+export default executeSql;

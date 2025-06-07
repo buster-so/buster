@@ -27,7 +27,7 @@ describe('Analyst Workflow Integration Tests', () => {
       {
         content: [
           {
-            text: 'what are our top 10 products from the last 6 months',
+            text: 'what are our top 10 products from the last 6 months from accessories',
             type: 'text',
           },
         ],

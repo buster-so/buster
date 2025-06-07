@@ -1234,7 +1234,7 @@ async function validateSql(
         const message =
           allResults.length === 0
             ? 'Query executed successfully but returned no records'
-            : `Query validated successfully and returned ${results.length} sample records${allResults.length > 25 ? ` (showing first 25 of ${allResults.length} total)` : ''}`;
+            : `Query validated successfully and returned ${allResults.length} records${allResults.length > 25 ? ` (showing sample of first 25 of ${allResults.length} total)` : ''}`;
 
         return {
           success: true,

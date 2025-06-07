@@ -15,7 +15,7 @@ export { createMetricsFileTool } from './visualization-tools/create-metrics-file
 export { modifyMetricsFileTool } from './visualization-tools/modify-metrics-file-tool';
 export { createDashboardsFileTool } from './visualization-tools/create-dashboards-file-tool';
 export { modifyDashboardsFileTool } from './visualization-tools/modify-dashboards-file-tool';
-export { findRequiredTextValues } from './database-tools/find-required-text-values';
+export { executeSql } from './database-tools/execute-sql';
 export {
   filterDashboardsTool,
   searchDashboardsWithContentTool,
