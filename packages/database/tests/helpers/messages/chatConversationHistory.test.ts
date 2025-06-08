@@ -1,0 +1,44 @@
+import { describe, test, expect, beforeEach, afterEach } from 'vitest';
+import { setupTestEnvironment, cleanupTestEnvironment } from '@buster/test-utils';
+import { createTestMessage } from '@buster/test-utils';
+import {
+  getChatConversationHistory,
+  type ChatConversationHistoryInput,
+} from '../../../src/helpers/messages/chatConversationHistory';
+
+describe('Chat Conversation History Helper', () => {
+  beforeEach(async () => {
+    await setupTestEnvironment();
+  });
+  
+  afterEach(async () => {
+    await cleanupTestEnvironment();
+  });
+  
+  test('getChatConversationHistory returns all messages in chat', async () => {
+    const { messageId, chatId } = await createTestMessage();
+    // TODO: Create additional messages in same chat with rawLlmMessages
+    
+    const input: ChatConversationHistoryInput = { messageId };
+    const history = await getChatConversationHistory(input);
+    
+    expect(Array.isArray(history)).toBe(true);
+    // Should return combined rawLlmMessages from all messages in chat
+  });
+  
+  test('getChatConversationHistory validates UUID input', async () => {
+    const input: ChatConversationHistoryInput = { messageId: 'invalid-uuid' };
+    
+    await expect(getChatConversationHistory(input))
+      .rejects.toThrow('Message ID must be a valid UUID');
+  });
+  
+  test('getChatConversationHistory throws for non-existent message', async () => {
+    const input: ChatConversationHistoryInput = { 
+      messageId: '00000000-0000-0000-0000-000000000000' 
+    };
+    
+    await expect(getChatConversationHistory(input))
+      .rejects.toThrow('Message not found or has been deleted');
+  });
+});

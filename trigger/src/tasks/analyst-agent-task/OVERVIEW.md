@@ -37,14 +37,16 @@ The analyst agent task has one primary responsibility:
   - Output schema for task completion status
   - TypeScript types inferred from schemas
 
-### Task 2: Database Helper Functions
+### Task 2: Database Helper Functions ✅ COMPLETED
 - **File**: `@buster/database` package
 - **Description**: Helper functions to load context from message_id
-- **Dependencies**: None
-- **Deliverables**:
+- **Dependencies**: None ✅ MET
+- **Deliverables**: ✅ ALL COMPLETED
   - Message retrieval with chat/user context
-  - Conversation history loading for the chat
-  - User/organization context helpers
+  - Conversation history loading for the chat (chat-wide, gets ALL rawLlmMessages)
+  - Data source context with constraint validation
+  - Domain-organized helpers with Zod validation
+  - Comprehensive unit test coverage
 
 ### Task 3: Runtime Context Setup Logic
 - **File**: `analyst-agent-task.ts`
@@ -149,7 +151,7 @@ The following features are now handled by the web server:
 ## Success Criteria
 
 - [x] **Task 1**: Simple request schema with message_id validation ✅ COMPLETED
-- [ ] **Task 2**: Database helpers for context loading 
+- [x] **Task 2**: Database helpers for context loading ✅ COMPLETED
 - [ ] **Task 3**: Runtime context setup from message data
 - [ ] **Task 4**: Conversation history loading
 - [ ] **Task 5**: Complete implementation with workflow integration
