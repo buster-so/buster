@@ -1,0 +1,21 @@
+import { db, organizations } from '@buster/database';
+import { v4 as uuidv4 } from 'uuid';
+
+/**
+ * Creates a test organization record in the database
+ * @param params - Optional parameters to override defaults
+ * @returns The organization ID
+ */
+export async function createTestOrganization(params?: {
+  name?: string;
+}): Promise<string> {
+  const organizationId = uuidv4();
+  const name = params?.name || `Test Organization ${uuidv4()}`;
+
+  await db.insert(organizations).values({
+    id: organizationId,
+    name,
+  });
+
+  return organizationId;
+}

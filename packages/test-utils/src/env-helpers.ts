@@ -9,7 +9,7 @@ export async function setupTestEnvironment(): Promise<TestEnvironment> {
 
   // Set test-specific environment variables
   process.env.NODE_ENV = 'test';
-  process.env.DATABASE_URL = process.env.TEST_DATABASE_URL || process.env.DATABASE_URL;
+  // Use DATABASE_URL from .env file loaded by vitest config
 
   const cleanup = async () => {
     // Restore original environment
@@ -36,4 +36,12 @@ export function withTestEnv<T>(testFn: () => Promise<T>): () => Promise<T> {
       await env.cleanup();
     }
   };
+}
+
+/**
+ * Cleanup function for test environments
+ * Currently a no-op as vitest handles environment cleanup
+ */
+export async function cleanupTestEnvironment(): Promise<void> {
+  // No cleanup needed - vitest handles environment variables
 }

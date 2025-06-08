@@ -1,5 +1,7 @@
 import { chats, db } from '@buster/database';
 import { v4 as uuidv4 } from 'uuid';
+import { createTestOrganization } from '../organizations/createTestOrganization';
+import { createTestUser } from '../users/createTestUser';
 
 /**
  * Creates a test chat record in the database
@@ -16,8 +18,10 @@ export async function createTestChat(
   userId: string;
 }> {
   const chatId = uuidv4();
-  const orgId = organizationId || uuidv4();
-  const userId = createdBy || uuidv4();
+  
+  // Create organization and user if not provided
+  const orgId = organizationId || await createTestOrganization();
+  const userId = createdBy || await createTestUser();
 
   await db.insert(chats).values({
     id: chatId,

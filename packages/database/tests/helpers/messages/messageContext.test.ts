@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach, afterEach } from 'vitest';
 import { setupTestEnvironment, cleanupTestEnvironment } from '@buster/test-utils';
-import { createTestMessage } from '@buster/test-utils';
+import { createTestMessageWithContext } from '@buster/test-utils';
 import {
   getMessageContext,
   type MessageContextInput,
@@ -16,7 +16,7 @@ describe('Message Context Helper', () => {
   });
   
   test('getMessageContext returns essential context successfully', async () => {
-    const { messageId, userId, chatId, organizationId } = await createTestMessage();
+    const { messageId, userId, chatId, organizationId } = await createTestMessageWithContext();
     
     const input: MessageContextInput = { messageId };
     const context = await getMessageContext(input);

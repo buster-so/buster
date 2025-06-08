@@ -45,7 +45,7 @@ export async function getOrganizationDataSource(input: OrganizationDataSourceInp
     throw new Error('Multiple data sources found for organization. Data source selection is not available yet - please contact support if you need to work with multiple data sources.');
   }
 
-  const dataSource = orgDataSources[0];
+  const dataSource = orgDataSources[0]!; // Safe: length already validated above
   const output = {
     dataSourceId: dataSource.id,
     dataSourceSyntax: dataSource.type,

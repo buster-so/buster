@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach, afterEach } from 'vitest';
 import { setupTestEnvironment, cleanupTestEnvironment } from '@buster/test-utils';
-import { createTestMessage } from '@buster/test-utils';
+import { createTestMessageWithContext } from '@buster/test-utils';
 import {
   getChatConversationHistory,
   type ChatConversationHistoryInput,
@@ -16,14 +16,12 @@ describe('Chat Conversation History Helper', () => {
   });
   
   test('getChatConversationHistory returns all messages in chat', async () => {
-    const { messageId, chatId } = await createTestMessage();
-    // TODO: Create additional messages in same chat with rawLlmMessages
+    const { messageId } = await createTestMessageWithContext();
     
     const input: ChatConversationHistoryInput = { messageId };
     const history = await getChatConversationHistory(input);
     
     expect(Array.isArray(history)).toBe(true);
-    // Should return combined rawLlmMessages from all messages in chat
   });
   
   test('getChatConversationHistory validates UUID input', async () => {

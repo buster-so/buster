@@ -108,9 +108,63 @@ npm run ci:check    # Runs check + typecheck
 - Use path aliases when available (see tsconfig.json in each package)
 
 ### Error Handling
-- Use proper error types instead of `unknown` or `any`
-- Validate external data with Zod schemas
-- Provide meaningful error messages
+- **Always use try-catch blocks** for async operations and external calls
+- **Use proper error types** instead of `unknown` or `any`
+- **Validate external data** with Zod schemas before processing
+- **Provide meaningful error messages** with sufficient context for debugging
+- **Handle errors at appropriate levels** - don't let errors bubble up uncaught
+- **Log errors with structured data** using proper logging utilities
+
+#### Error Handling Patterns
+```typescript
+// ✅ Good: Comprehensive error handling
+async function processUserData(userId: string) {
+  try {
+    const user = await getUserById(userId);
+    if (!user) {
+      throw new Error(`User not found: ${userId}`);
+    }
+    
+    const validatedData = UserSchema.parse(user);
+    return await processData(validatedData);
+  } catch (error) {
+    logger.error('Failed to process user data', {
+      userId,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    throw new Error(`User data processing failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+// ✅ Good: Database operations with error handling
+async function createResource(data: CreateResourceInput) {
+  try {
+    const validatedData = CreateResourceSchema.parse(data);
+    return await db.transaction(async (tx) => {
+      const resource = await tx.insert(resources).values(validatedData).returning();
+      await tx.insert(resourceAudit).values({
+        resourceId: resource[0].id,
+        action: 'created',
+        createdAt: new Date()
+      });
+      return resource[0];
+    });
+  } catch (error) {
+    if (error instanceof ZodError) {
+      throw new Error(`Invalid resource data: ${error.errors.map(e => e.message).join(', ')}`);
+    }
+    logger.error('Database error creating resource', { data, error });
+    throw new Error('Failed to create resource');
+  }
+}
+
+// ❌ Avoid: Unhandled async operations
+async function badExample(userId: string) {
+  const user = await getUserById(userId); // No error handling
+  return user.data; // Could fail if user is null
+}
+```
 
 ### Testing Practices
 - Write integration tests for complex workflows
