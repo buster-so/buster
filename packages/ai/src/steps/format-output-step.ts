@@ -45,8 +45,6 @@ const formatOutputExecution = async ({
 }: {
   inputData: z.infer<typeof inputSchema>;
 }): Promise<z.infer<typeof outputSchema>> => {
-  console.log('=== FORMAT OUTPUT STEP ===');
-  console.log('Input data keys:', Object.keys(inputData));
 
   // Determine which format we're receiving and extract the step data
   let stepData: any;
@@ -54,21 +52,16 @@ const formatOutputExecution = async ({
   if ('analyst' in inputData && inputData.analyst) {
     // Nested format with analyst step
     stepData = inputData.analyst;
-    console.log('Using analyst step data from nested structure');
   } else if ('think-and-prep' in inputData && inputData['think-and-prep']) {
     // Nested format with think-and-prep step only
     stepData = inputData['think-and-prep'];
-    console.log('Using think-and-prep step data from nested structure');
   } else if ('conversationHistory' in inputData) {
     // Direct format - data is already in the expected structure
     stepData = inputData;
-    console.log('Using direct step data structure');
   } else {
     throw new Error('Unrecognized input format for format-output-step');
   }
 
-  console.log('Step data keys:', Object.keys(stepData));
-  console.log('ConversationHistory length:', stepData.conversationHistory?.length || 0);
 
   // Map the step data to the clean output format
   const output = {
@@ -85,13 +78,6 @@ const formatOutputExecution = async ({
     values: stepData.metadata?.values,
   };
 
-  console.log('Formatted output:', {
-    conversationHistoryLength: output.conversationHistory?.length || 0,
-    finished: output.finished,
-    hasTitle: !!output.title,
-    todoCount: output.todos?.length || 0,
-    valueCount: output.values?.length || 0,
-  });
 
   return output;
 };

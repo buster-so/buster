@@ -8,24 +8,19 @@ import {
   getOrganizationDataSource,
 } from '@buster/database';
 
-// Mastra workflow integration (temporarily disabled due to AI package type issues)
-// import { RuntimeContext } from '@mastra/core/runtime-context';
-// import analystWorkflow from '@buster/ai/src/workflows/analyst-workflow';
-// import type { AnalystRuntimeContext } from '@buster/ai/src/workflows/analyst-workflow';
+import analystWorkflow from '@buster/ai/src/workflows/analyst-workflow';
+import type { AnalystRuntimeContext } from '@buster/ai/src/workflows/analyst-workflow';
+// Mastra workflow integration
+import { RuntimeContext } from '@mastra/core/runtime-context';
 
 // Task 3: Runtime Context Setup Function
 // Database helper output types
-import type {
-  MessageContextOutput,
-  OrganizationDataSourceOutput,
-} from '@buster/database';
+import type { MessageContextOutput, OrganizationDataSourceOutput } from '@buster/database';
 
 /**
  * Task 3: Setup runtime context from Task 2 database helper outputs
  * Uses individual helper results to populate Mastra RuntimeContext
- * (Temporarily disabled due to AI package type issues)
  */
-/*
 function setupRuntimeContextFromMessage(
   messageContext: MessageContextOutput,
   dataSource: OrganizationDataSourceOutput,
@@ -33,7 +28,7 @@ function setupRuntimeContextFromMessage(
 ): RuntimeContext<AnalystRuntimeContext> {
   try {
     const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();
-    
+
     // Populate from Task 2 helper outputs
     runtimeContext.set('userId', messageContext.userId);
     runtimeContext.set('threadId', messageContext.chatId);
@@ -41,16 +36,17 @@ function setupRuntimeContextFromMessage(
     runtimeContext.set('dataSourceId', dataSource.dataSourceId);
     runtimeContext.set('dataSourceSyntax', dataSource.dataSourceSyntax);
     runtimeContext.set('todos', ''); // Initialize as empty
-    
+
     // Add messageId for database persistence (following AI package pattern)
     runtimeContext.set('messageId', messageId);
-    
+
     return runtimeContext;
   } catch (error) {
-    throw error instanceof Error ? error : new Error(`Failed to setup runtime context: ${String(error)}`);
+    throw error instanceof Error
+      ? error
+      : new Error(`Failed to setup runtime context: ${String(error)}`);
   }
 }
-*/
 
 /**
  * Simplified Analyst Agent Task
@@ -59,9 +55,9 @@ function setupRuntimeContextFromMessage(
  * TASK 2 STATUS: ✅ COMPLETED - Database helpers implemented in @buster/database
  * TASK 3 STATUS: ✅ COMPLETED - Runtime context setup function implemented
  * TASK 4 STATUS: ✅ COMPLETED - Chat history loading using getChatConversationHistory
- * TASK 5 STATUS: 🔄 READY - Workflow integration ready (awaiting AI package type fixes)
+ * TASK 5 STATUS: ✅ COMPLETED - Workflow integration enabled and functional
  *
- * Tasks 1-4 are fully implemented and integrated. Task 5 (workflow integration) awaits Mastra imports.
+ * All tasks 1-5 are fully implemented and integrated. Workflow integration is complete and functional.
  */
 export const analystAgentTask = schemaTask({
   id: 'analyst-agent-task',
@@ -99,8 +95,12 @@ export const analystAgentTask = schemaTask({
         dataSourceSyntax: dataSource.dataSourceSyntax,
       });
 
-      // Task 3: Setup runtime context for workflow execution (ready for integration)
-      // const runtimeContext = setupRuntimeContextFromMessage(messageContext, dataSource, payload.message_id);
+      // Task 3: Setup runtime context for workflow execution
+      const runtimeContext = setupRuntimeContextFromMessage(
+        messageContext,
+        dataSource,
+        payload.message_id
+      );
 
       // Task 4: Prepare workflow input with conversation history
       const workflowInput = {
@@ -115,24 +115,22 @@ export const analystAgentTask = schemaTask({
         conversationHistoryLength: workflowInput.conversationHistory?.length || 0,
       });
 
-      // Task 5: Execute analyst workflow (ready for integration once AI package types are fixed)
-      /*
+      // Task 5: Execute analyst workflow
       logger.log('Starting analyst workflow execution', {
         messageId: payload.message_id,
       });
 
       const workflowResult = await analystWorkflow.createRun().start({
         inputData: workflowInput,
-        runtimeContext
+        runtimeContext,
       });
 
       logger.log('Analyst workflow completed successfully', {
         messageId: payload.message_id,
         workflowResult: !!workflowResult,
       });
-      */
 
-      logger.log('Tasks 1-4 execution completed successfully (Task 5 ready for integration)', {
+      logger.log('All tasks (1-5) execution completed successfully', {
         messageId: payload.message_id,
         executionTimeMs: Date.now() - startTime,
       });
@@ -144,7 +142,7 @@ export const analystAgentTask = schemaTask({
           success: true,
           messageId: payload.message_id,
           executionTimeMs: Date.now() - startTime,
-          workflowCompleted: false, // Will be true once AI package types are fixed and workflow is integrated
+          workflowCompleted: true, // Task 5 workflow integration completed successfully
         },
       };
     } catch (error: unknown) {
@@ -194,10 +192,14 @@ function getErrorCode(error: unknown): string {
     if (error.message.includes('Failed to setup runtime context')) return 'RUNTIME_CONTEXT_ERROR';
 
     // Task 5: Workflow execution errors
-    if (error.message.includes('workflow') || error.message.includes('Workflow')) return 'WORKFLOW_EXECUTION_ERROR';
-    if (error.message.includes('RuntimeContext') || error.message.includes('runtime context')) return 'RUNTIME_CONTEXT_ERROR';
-    if (error.message.includes('agent') || error.message.includes('Agent')) return 'AGENT_EXECUTION_ERROR';
-    if (error.message.includes('step') || error.message.includes('Step')) return 'WORKFLOW_STEP_ERROR';
+    if (error.message.includes('workflow') || error.message.includes('Workflow'))
+      return 'WORKFLOW_EXECUTION_ERROR';
+    if (error.message.includes('RuntimeContext') || error.message.includes('runtime context'))
+      return 'RUNTIME_CONTEXT_ERROR';
+    if (error.message.includes('agent') || error.message.includes('Agent'))
+      return 'AGENT_EXECUTION_ERROR';
+    if (error.message.includes('step') || error.message.includes('Step'))
+      return 'WORKFLOW_STEP_ERROR';
 
     // General database and connection errors
     if (error.message.includes('database') || error.message.includes('connection'))

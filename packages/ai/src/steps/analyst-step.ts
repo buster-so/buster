@@ -1,5 +1,6 @@
 import { createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
+import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { analystAgent } from '../agents/analyst-agent/analyst-agent';
@@ -29,7 +30,7 @@ const analystExecution = async ({
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof outputSchema>> => {
   const abortController = new AbortController();
-  let completeConversationHistory: any[] = [];
+  let completeConversationHistory: CoreMessage[] = [];
 
   try {
     const resourceId = runtimeContext.get('userId');
@@ -51,7 +52,7 @@ const analystExecution = async ({
 
     // Messages come directly from think-and-prep step output
     // They are already in CoreMessage[] format
-    const messages = inputData.outputMessages as any[];
+    const messages = inputData.outputMessages as CoreMessage[];
     console.log('Messages passed to analyst agent:', messages);
 
     const wrappedStream = wrapTraced(
@@ -62,8 +63,11 @@ const analystExecution = async ({
           abortSignal: abortController.signal,
           onStepFinish: async (step) => {
             // Save complete conversation history to database before any abort (think-and-prep + analyst messages)
-            const analystResponseMessages = step.response.messages;
-            completeConversationHistory = [...inputData.outputMessages, ...analystResponseMessages];
+            const analystResponseMessages = step.response.messages as CoreMessage[];
+            completeConversationHistory = [
+              ...(inputData.outputMessages as CoreMessage[]),
+              ...analystResponseMessages,
+            ];
             console.log('=== ANALYST STEP: SAVING CONVERSATION HISTORY ===');
             console.log('Think-and-prep messages:', inputData.outputMessages.length);
             console.log('Analyst step messages:', step.response.messages.length);
