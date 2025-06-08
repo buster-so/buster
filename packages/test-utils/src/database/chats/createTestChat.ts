@@ -17,24 +17,28 @@ export async function createTestChat(
   organizationId: string;
   userId: string;
 }> {
-  const chatId = uuidv4();
-  
-  // Create organization and user if not provided
-  const orgId = organizationId || await createTestOrganization();
-  const userId = createdBy || await createTestUser();
+  try {
+    const chatId = uuidv4();
+    
+    // Create organization and user if not provided
+    const orgId = organizationId || await createTestOrganization();
+    const userId = createdBy || await createTestUser();
 
-  await db.insert(chats).values({
-    id: chatId,
-    title: 'Test Chat',
-    organizationId: orgId,
-    createdBy: userId,
-    updatedBy: userId,
-    publiclyAccessible: false,
-  });
+    await db.insert(chats).values({
+      id: chatId,
+      title: 'Test Chat',
+      organizationId: orgId,
+      createdBy: userId,
+      updatedBy: userId,
+      publiclyAccessible: false,
+    });
 
-  return {
-    chatId,
-    organizationId: orgId,
-    userId,
-  };
+    return {
+      chatId,
+      organizationId: orgId,
+      userId,
+    };
+  } catch (error) {
+    throw new Error(`Failed to create test chat: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }

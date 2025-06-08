@@ -9,13 +9,17 @@ import { v4 as uuidv4 } from 'uuid';
 export async function createTestOrganization(params?: {
   name?: string;
 }): Promise<string> {
-  const organizationId = uuidv4();
-  const name = params?.name || `Test Organization ${uuidv4()}`;
+  try {
+    const organizationId = uuidv4();
+    const name = params?.name || `Test Organization ${uuidv4()}`;
 
-  await db.insert(organizations).values({
-    id: organizationId,
-    name,
-  });
+    await db.insert(organizations).values({
+      id: organizationId,
+      name,
+    });
 
-  return organizationId;
+    return organizationId;
+  } catch (error) {
+    throw new Error(`Failed to create test organization: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }

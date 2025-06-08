@@ -19,30 +19,34 @@ export async function createTestDataSource(params?: {
   userId: string;
   dataSourceType: string;
 }> {
-  const dataSourceId = uuidv4();
-  
-  // Create organization and user if not provided
-  const organizationId = params?.organizationId || await createTestOrganization();
-  const userId = params?.createdBy || await createTestUser();
-  const secretId = uuidv4();
-  const dataSourceType = params?.type || 'postgresql';
-  const name = params?.name || `Test Data Source ${uuidv4()}`;
+  try {
+    const dataSourceId = uuidv4();
+    
+    // Create organization and user if not provided
+    const organizationId = params?.organizationId || await createTestOrganization();
+    const userId = params?.createdBy || await createTestUser();
+    const secretId = uuidv4();
+    const dataSourceType = params?.type || 'postgresql';
+    const name = params?.name || `Test Data Source ${uuidv4()}`;
 
-  await db.insert(dataSources).values({
-    id: dataSourceId,
-    name,
-    type: dataSourceType,
-    secretId,
-    organizationId,
-    createdBy: userId,
-    updatedBy: userId,
-    onboardingStatus: 'completed',
-  });
+    await db.insert(dataSources).values({
+      id: dataSourceId,
+      name,
+      type: dataSourceType,
+      secretId,
+      organizationId,
+      createdBy: userId,
+      updatedBy: userId,
+      onboardingStatus: 'completed',
+    });
 
-  return {
-    dataSourceId,
-    organizationId,
-    userId,
-    dataSourceType,
-  };
+    return {
+      dataSourceId,
+      organizationId,
+      userId,
+      dataSourceType,
+    };
+  } catch (error) {
+    throw new Error(`Failed to create test data source: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
