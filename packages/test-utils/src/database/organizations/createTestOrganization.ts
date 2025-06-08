@@ -20,6 +20,8 @@ export async function createTestOrganization(params?: {
 
     return organizationId;
   } catch (error) {
-    throw new Error(`Failed to create test organization: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to create test organization: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }

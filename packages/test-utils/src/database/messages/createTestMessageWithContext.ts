@@ -14,10 +14,10 @@ export async function createTestMessageWithContext(): Promise<{
   try {
     // Create chat first (which creates organization and user context)
     const { chatId, organizationId, userId } = await createTestChat();
-    
+
     // Create message in that chat
     const messageId = await createTestMessage(chatId, userId);
-    
+
     return {
       messageId,
       userId,
@@ -25,6 +25,8 @@ export async function createTestMessageWithContext(): Promise<{
       organizationId,
     };
   } catch (error) {
-    throw new Error(`Failed to create test message with context: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to create test message with context: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }

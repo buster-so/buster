@@ -1,7 +1,7 @@
+import { and, eq, isNull } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../../connection';
 import { dataSources } from '../../schema';
-import { eq, and, isNull } from 'drizzle-orm';
 
 // Zod schemas for validation
 export const OrganizationDataSourceInputSchema = z.object({
@@ -20,11 +20,13 @@ export type OrganizationDataSourceOutput = z.infer<typeof OrganizationDataSource
  * Get organization's data source with validation
  * Validates single data source constraint and prepares for future selection
  */
-export async function getOrganizationDataSource(input: OrganizationDataSourceInput): Promise<OrganizationDataSourceOutput> {
+export async function getOrganizationDataSource(
+  input: OrganizationDataSourceInput
+): Promise<OrganizationDataSourceOutput> {
   try {
     // Validate input
     const validatedInput = OrganizationDataSourceInputSchema.parse(input);
-    
+
     // Database query with error handling
     let orgDataSources: Array<{
       id: string;
@@ -44,7 +46,9 @@ export async function getOrganizationDataSource(input: OrganizationDataSourceInp
           )
         );
     } catch (dbError) {
-      throw new Error(`Database query failed: ${dbError instanceof Error ? dbError.message : 'Unknown database error'}`);
+      throw new Error(
+        `Database query failed: ${dbError instanceof Error ? dbError.message : 'Unknown database error'}`
+      );
     }
 
     if (orgDataSources.length === 0) {
@@ -52,14 +56,16 @@ export async function getOrganizationDataSource(input: OrganizationDataSourceInp
     }
 
     if (orgDataSources.length > 1) {
-      throw new Error('Multiple data sources found for organization. Data source selection is not available yet - please contact support if you need to work with multiple data sources.');
+      throw new Error(
+        'Multiple data sources found for organization. Data source selection is not available yet - please contact support if you need to work with multiple data sources.'
+      );
     }
 
     const dataSource = orgDataSources[0];
     if (!dataSource) {
       throw new Error('Unexpected error: data source not found after validation');
     }
-    
+
     const output = {
       dataSourceId: dataSource.id,
       dataSourceSyntax: dataSource.type,
@@ -69,15 +75,19 @@ export async function getOrganizationDataSource(input: OrganizationDataSourceInp
     try {
       return OrganizationDataSourceOutputSchema.parse(output);
     } catch (validationError) {
-      throw new Error(`Output validation failed: ${validationError instanceof Error ? validationError.message : 'Invalid output format'}`);
+      throw new Error(
+        `Output validation failed: ${validationError instanceof Error ? validationError.message : 'Invalid output format'}`
+      );
     }
   } catch (error) {
     // Handle Zod input validation errors
     if (error instanceof z.ZodError) {
-      throw new Error(`Invalid input: ${error.errors.map(e => e.message).join(', ')}`);
+      throw new Error(`Invalid input: ${error.errors.map((e) => e.message).join(', ')}`);
     }
-    
+
     // Re-throw other errors with context
-    throw error instanceof Error ? error : new Error(`Failed to get organization data source: ${String(error)}`);
+    throw error instanceof Error
+      ? error
+      : new Error(`Failed to get organization data source: ${String(error)}`);
   }
 }

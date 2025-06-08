@@ -47,14 +47,14 @@ export const introspectData = schemaTask({
     try {
       // Simulate connection testing
       logger.log('Testing data source connection...', { dataSourceName: payload.dataSourceName });
-      
+
       // Validate required credentials based on type
       if (!payload.credentials.host && payload.credentials.type !== 'bigquery') {
         throw new Error('Host is required for this database type');
       }
 
       // Simulate introspection work
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       logger.log('Introspection completed successfully', {
         dataSourceName: payload.dataSourceName,

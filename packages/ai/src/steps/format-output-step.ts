@@ -16,13 +16,15 @@ const inputSchema = z.union([
   // Nested structure from workflow (step name as key)
   z.object({
     'think-and-prep': ThinkAndPrepOutputSchema.optional(),
-    analyst: z.object({
-      conversationHistory: z.array(z.any()),
-      finished: z.boolean().optional(),
-      outputMessages: z.array(z.any()).optional(),
-      stepData: z.any().optional(),
-      metadata: z.any().optional(),
-    }).optional(),
+    analyst: z
+      .object({
+        conversationHistory: z.array(z.any()),
+        finished: z.boolean().optional(),
+        outputMessages: z.array(z.any()).optional(),
+        stepData: z.any().optional(),
+        metadata: z.any().optional(),
+      })
+      .optional(),
   }),
 ]);
 
@@ -45,10 +47,10 @@ const formatOutputExecution = async ({
 }): Promise<z.infer<typeof outputSchema>> => {
   console.log('=== FORMAT OUTPUT STEP ===');
   console.log('Input data keys:', Object.keys(inputData));
-  
+
   // Determine which format we're receiving and extract the step data
   let stepData: any;
-  
+
   if ('analyst' in inputData && inputData.analyst) {
     // Nested format with analyst step
     stepData = inputData.analyst;
@@ -64,7 +66,7 @@ const formatOutputExecution = async ({
   } else {
     throw new Error('Unrecognized input format for format-output-step');
   }
-  
+
   console.log('Step data keys:', Object.keys(stepData));
   console.log('ConversationHistory length:', stepData.conversationHistory?.length || 0);
 
@@ -76,7 +78,7 @@ const formatOutputExecution = async ({
     outputMessages: stepData.outputMessages,
     stepData: stepData.stepData,
     metadata: stepData.metadata,
-    
+
     // Additional fields from metadata if available
     title: stepData.metadata?.title,
     todos: stepData.metadata?.todos,

@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "npx trigger.dev@latest dev",
     "deploy": "npx trigger.dev@latest deploy",
-    "build": "npx trigger.dev@latest build"
+    "build": "npx trigger.dev@latest build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@buster/data-source": "*",
@@ -16,6 +19,7 @@
   "devDependencies": {
     "@trigger.dev/build": "^3.3.17",
     "@types/node": "^22.15.24",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^2.1.8"
   }
 }

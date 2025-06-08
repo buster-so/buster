@@ -1,6 +1,5 @@
 import { createWorkflow } from '@mastra/core';
 import { z } from 'zod';
-import { ThinkAndPrepOutputSchema } from '../utils/memory/types';
 import { analystStep } from '../steps/analyst-step';
 import { createTodosStep } from '../steps/create-todos-step';
 import { extractValuesSearchStep } from '../steps/extract-values-search-step';
@@ -47,7 +46,14 @@ const analystWorkflow = createWorkflow({
   id: 'analyst-workflow',
   inputSchema: thinkAndPrepWorkflowInputSchema,
   outputSchema,
-  steps: [generateChatTitleStep, extractValuesSearchStep, createTodosStep, thinkAndPrepStep, analystStep, formatOutputStep],
+  steps: [
+    generateChatTitleStep,
+    extractValuesSearchStep,
+    createTodosStep,
+    thinkAndPrepStep,
+    analystStep,
+    formatOutputStep,
+  ],
 })
   .parallel([generateChatTitleStep, extractValuesSearchStep, createTodosStep])
   .then(thinkAndPrepStep)

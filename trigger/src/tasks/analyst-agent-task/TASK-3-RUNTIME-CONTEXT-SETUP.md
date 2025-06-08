@@ -1,40 +1,52 @@
 # Task 3: Runtime Context Setup from Message Context
 
 ## Overview
-Simplified runtime context setup that derives all context from the message_id. Since getMessageContext() already loads the complete user → organization → dataSource chain, this task simply formats that data for the analyst workflow.
+Simplified runtime context setup that derives all context from the message_id using Task 2's database helpers. The RuntimeContext comes from the Mastra package and is populated with data from the database helper functions.
 
 ## Requirements
 
 ### Core Functionality
-- Use message context to populate RuntimeContext for analyst workflow
+- Use Task 2's database helpers to load message context, conversation history, and data source info
+- Populate Mastra's RuntimeContext for analyst workflow
 - No authentication needed (handled by web server)
-- No database lookups needed (already done by getMessageContext)
-- Simple formatting of existing context data
+- Concurrent optimization for efficient data loading
+- Proper error handling following Task 2 patterns
 
 ## Implementation Details
 
 ### File: `analyst-agent-task.ts` (Runtime Context Section)
 
 ```typescript
+import { RuntimeContext } from '@mastra/core'; // Runtime context comes from Mastra package
 import type { AnalystRuntimeContext } from '@packages/ai/src/workflows/analyst-workflow';
-import type { MessageContext } from './types';
+import type {
+  MessageContextOutput,
+  OrganizationDataSourceOutput,
+} from '@buster/database';
 
 /**
- * Setup runtime context from message context data
- * All context loading is already done by getMessageContext()
+ * Setup runtime context from Task 2 database helper outputs
+ * Uses individual helper results to populate Mastra RuntimeContext
  */
-function setupRuntimeContextFromMessage(messageContext: MessageContext): RuntimeContext<AnalystRuntimeContext> {
-  const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();
-  
-  // Populate from message context
-  runtimeContext.set('userId', messageContext.user.id);
-  runtimeContext.set('threadId', messageContext.chat.id);
-  runtimeContext.set('organizationId', messageContext.organization.id);
-  runtimeContext.set('dataSourceId', messageContext.dataSource.id);
-  runtimeContext.set('dataSourceSyntax', messageContext.dataSource.type);
-  runtimeContext.set('todos', ''); // Initialize as empty
-  
-  return runtimeContext;
+function setupRuntimeContextFromMessage(
+  messageContext: MessageContextOutput,
+  dataSource: OrganizationDataSourceOutput
+): RuntimeContext<AnalystRuntimeContext> {
+  try {
+    const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();
+    
+    // Populate from Task 2 helper outputs
+    runtimeContext.set('userId', messageContext.userId);
+    runtimeContext.set('threadId', messageContext.chatId);
+    runtimeContext.set('organizationId', messageContext.organizationId);
+    runtimeContext.set('dataSourceId', dataSource.dataSourceId);
+    runtimeContext.set('dataSourceSyntax', dataSource.dataSourceSyntax);
+    runtimeContext.set('todos', ''); // Initialize as empty
+    
+    return runtimeContext;
+  } catch (error) {
+    throw error instanceof Error ? error : new Error(`Failed to setup runtime context: ${String(error)}`);
+  }
 }
 
 ```
@@ -48,18 +60,23 @@ export const analystAgentTask = schemaTask({
   maxDuration: 1800,
   run: async (payload): Promise<AnalystAgentTaskOutput> => {
     try {
-      // 1. Load message context (includes all user/chat/org/dataSource info)
-      const messageContext = await getMessageContext(payload.message_id);
+      // 1. Load message context and conversation history concurrently (Task 2 optimization)
+      const [messageContext, conversationHistory] = await Promise.all([
+        getMessageContext({ messageId: payload.message_id }),
+        getChatConversationHistory({ messageId: payload.message_id }),
+      ]);
       
-      // 2. Setup runtime context from message context (simple formatting)
-      const runtimeContext = setupRuntimeContextFromMessage(messageContext);
+      // 2. Load data source using organizationId from message context
+      const dataSource = await getOrganizationDataSource({ 
+        organizationId: messageContext.organizationId 
+      });
       
-      // 3. Load conversation history for the chat
-      const conversationHistory = await loadConversationHistory(messageContext.chat.id);
+      // 3. Setup runtime context from Task 2 helper outputs
+      const runtimeContext = setupRuntimeContextFromMessage(messageContext, dataSource);
       
       // 4. Prepare workflow input
       const workflowInput = {
-        prompt: messageContext.message.requestMessage,
+        prompt: messageContext.requestMessage,
         conversationHistory: conversationHistory.length > 0 ? conversationHistory : undefined,
       };
       
@@ -80,7 +97,7 @@ export const analystAgentTask = schemaTask({
         messageId: payload.message_id,
         error: {
           code: getErrorCode(error),
-          message: error.message
+          message: error instanceof Error ? error.message : 'Unknown error'
         }
       };
     }
@@ -95,29 +112,32 @@ export const analystAgentTask = schemaTask({
 ```
 Input: message_id
    ↓
-1. getMessageContext(message_id) → complete context
+1. getMessageContext({ messageId }) + getChatConversationHistory({ messageId }) [concurrent]
    ↓
-2. setupRuntimeContextFromMessage() → format for workflow
+2. getOrganizationDataSource({ organizationId }) [using result from step 1]
    ↓
-Output: RuntimeContext<AnalystRuntimeContext> ready for workflow
+3. setupRuntimeContextFromMessage(messageContext, dataSource) → format for Mastra workflow
+   ↓
+Output: RuntimeContext<AnalystRuntimeContext> ready for analyst workflow
 ```
 
 ### AnalystRuntimeContext Structure
 
 ```typescript
 interface AnalystRuntimeContext {
-  userId: string;           // From messageContext.user.id
-  threadId: string;         // From messageContext.chat.id
-  dataSourceId: string;     // From messageContext.dataSource.id
-  dataSourceSyntax: string; // From messageContext.dataSource.type
-  organizationId: string;   // From messageContext.organization.id
+  userId: string;           // From messageContext.userId
+  threadId: string;         // From messageContext.chatId
+  dataSourceId: string;     // From dataSource.dataSourceId
+  dataSourceSyntax: string; // From dataSource.dataSourceSyntax
+  organizationId: string;   // From messageContext.organizationId
   todos: string;           // Initialized as empty string
 }
 ```
 
 ## Dependencies
 
-- Task 2: Database Helper Functions (`getMessageContext`)
+- Task 2: Database Helper Functions (`getMessageContext`, `getChatConversationHistory`, `getOrganizationDataSource`)
+- Mastra package: `RuntimeContext` class
 - Existing analyst workflow integration
 
 ## Testing Strategy
@@ -126,15 +146,21 @@ interface AnalystRuntimeContext {
 
 ```typescript
 describe('Simplified Runtime Context Setup', () => {
-  test('formats message context for workflow', () => {
-    const mockMessageContext = {
-      user: { id: 'user-123' },
-      chat: { id: 'chat-456' },
-      organization: { id: 'org-789' },
-      dataSource: { id: 'ds-101', type: 'postgresql' }
+  test('formats Task 2 helper outputs for workflow', () => {
+    const mockMessageContext: MessageContextOutput = {
+      messageId: 'msg-123',
+      userId: 'user-123',
+      chatId: 'chat-456',
+      organizationId: 'org-789',
+      requestMessage: 'Test prompt'
     };
     
-    const runtimeContext = setupRuntimeContextFromMessage(mockMessageContext);
+    const mockDataSource: OrganizationDataSourceOutput = {
+      dataSourceId: 'ds-101',
+      dataSourceSyntax: 'postgresql'
+    };
+    
+    const runtimeContext = setupRuntimeContextFromMessage(mockMessageContext, mockDataSource);
     
     expect(runtimeContext.get('userId')).toBe('user-123');
     expect(runtimeContext.get('threadId')).toBe('chat-456');
@@ -148,14 +174,18 @@ describe('Simplified Runtime Context Setup', () => {
 
 ## Integration Points
 
-### With Database Helpers
+### With Database Helpers (Task 2)
 ```typescript
-import { getMessageContext } from '@buster/database';
+import {
+  getMessageContext,
+  getChatConversationHistory,
+  getOrganizationDataSource,
+} from '@buster/database';
 ```
 
 ### With Analyst Workflow
 ```typescript
-const runtimeContext = setupRuntimeContextFromMessage(messageContext);
+const runtimeContext = setupRuntimeContextFromMessage(messageContext, dataSource);
 await analystWorkflow.createRun().start({
   inputData: workflowInput,
   runtimeContext

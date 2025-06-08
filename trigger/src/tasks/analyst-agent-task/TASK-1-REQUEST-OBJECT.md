@@ -69,48 +69,22 @@ export const AnalystAgentTaskOutputSchema = z.object({
 });
 ```
 
-#### 3. Context Schemas (for internal use)
+#### 3. Context Schemas (referencing Task 2 helpers)
 ```typescript
-// Message context loaded from database
-export const MessageContextSchema = z.object({
-  message: z.object({
-    id: z.string(),
-    requestMessage: z.string().nullable(),
-    chatId: z.string(),
-    createdBy: z.string(),
-    createdAt: z.string(),
-    updatedAt: z.string(),
-  }),
-  chat: z.object({
-    id: z.string(),
-    title: z.string(),
-    organizationId: z.string(),
-    createdBy: z.string(),
-  }),
-  user: z.object({
-    id: z.string(),
-    email: z.string(),
-    name: z.string().nullable(),
-  }),
-  organization: z.object({
-    id: z.string(),
-    name: z.string(),
-  }),
-  dataSource: z.object({
-    id: z.string(),
-    type: z.string(),
-    organizationId: z.string(),
-  }),
-});
+// Import schemas from Task 2 database helpers
+import {
+  MessageContextOutputSchema,
+  ChatConversationHistoryOutputSchema,
+  OrganizationDataSourceOutputSchema,
+} from '@buster/database';
 
-// Conversation history schema (from AI package)
-export const ConversationMessageSchema = z.object({
-  role: z.enum(['system', 'user', 'assistant', 'tool']),
-  content: z.any(), // Can be string or complex types for tool messages
-  id: z.string().optional(),
-});
+// These schemas are already implemented in Task 2:
+// - MessageContextOutputSchema: Essential message context (messageId, userId, chatId, organizationId, requestMessage)
+// - ChatConversationHistoryOutputSchema: Complete chat conversation history (CoreMessage[])
+// - OrganizationDataSourceOutputSchema: Data source info (dataSourceId, dataSourceSyntax)
 
-export const ConversationHistorySchema = z.array(ConversationMessageSchema);
+// Conversation history types are handled by Task 2 helper:
+// ChatConversationHistoryOutput returns CoreMessage[] from 'ai' package
 ```
 
 #### 4. TypeScript Type Exports
@@ -119,9 +93,12 @@ export const ConversationHistorySchema = z.array(ConversationMessageSchema);
 export type AnalystAgentTaskInput = z.infer<typeof AnalystAgentTaskInputSchema>;
 export type AnalystAgentTaskOutput = z.infer<typeof AnalystAgentTaskOutputSchema>;
 export type TaskExecutionResult = z.infer<typeof TaskExecutionResultSchema>;
-export type MessageContext = z.infer<typeof MessageContextSchema>;
-export type ConversationHistory = z.infer<typeof ConversationHistorySchema>;
-export type ConversationMessage = z.infer<typeof ConversationMessageSchema>;
+// Import types from Task 2 database helpers
+import type {
+  MessageContextOutput,
+  ChatConversationHistoryOutput,
+  OrganizationDataSourceOutput,
+} from '@buster/database';
 ```
 
 ## Validation Rules
@@ -181,15 +158,16 @@ export type ConversationMessage = z.infer<typeof ConversationMessageSchema>;
 
 ## Integration Points
 
-### With Database Package
-- Schema definitions align with database table structures
-- UUID validation matches database field types
-- MessageContext schema matches database query results
+### With Database Package (Task 2 Helpers)
+- Uses `getMessageContext({ messageId })` for essential context
+- Uses `getChatConversationHistory({ messageId })` for chat history
+- Uses `getOrganizationDataSource({ organizationId })` for data source info
+- All helpers include comprehensive error handling and Zod validation
 
 ### With AI Workflow
-- ConversationHistorySchema matches analyst workflow input expectations
+- ChatConversationHistoryOutput (CoreMessage[]) matches analyst workflow input expectations
 - Output schema provides task completion status
-- Runtime context derived from MessageContext
+- Runtime context derived from MessageContextOutput and OrganizationDataSourceOutput
 
 ### With Trigger.dev
 - Input schema used with `schemaTask` for automatic validation
@@ -208,20 +186,25 @@ export const analystAgentTask = schemaTask({
   maxDuration: 1800, // 30 minutes
   run: async (payload): Promise<AnalystAgentTaskOutput> => {
     try {
-      // 1. Load message context
-      const messageContext = await getMessageContext(payload.message_id);
+      // 1. Load message context and conversation history concurrently (Task 2 helpers)
+      const [messageContext, conversationHistory] = await Promise.all([
+        getMessageContext({ messageId: payload.message_id }),
+        getChatConversationHistory({ messageId: payload.message_id }),
+      ]);
       
-      // 2. Setup runtime context
-      const runtimeContext = await setupRuntimeContext(messageContext);
+      // 2. Load data source using organizationId from message context
+      const dataSource = await getOrganizationDataSource({ 
+        organizationId: messageContext.organizationId 
+      });
       
-      // 3. Load conversation history
-      const conversationHistory = await loadConversationHistory(messageContext.chat.id);
+      // 3. Setup runtime context
+      const runtimeContext = setupRuntimeContext(messageContext, dataSource);
       
       // 4. Execute workflow
       await analystWorkflow.createRun().start({
         inputData: {
-          prompt: messageContext.message.requestMessage,
-          conversationHistory
+          prompt: messageContext.requestMessage,
+          conversationHistory: conversationHistory.length > 0 ? conversationHistory : undefined,
         },
         runtimeContext
       });

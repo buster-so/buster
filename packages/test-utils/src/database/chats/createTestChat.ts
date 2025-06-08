@@ -19,10 +19,10 @@ export async function createTestChat(
 }> {
   try {
     const chatId = uuidv4();
-    
+
     // Create organization and user if not provided
-    const orgId = organizationId || await createTestOrganization();
-    const userId = createdBy || await createTestUser();
+    const orgId = organizationId || (await createTestOrganization());
+    const userId = createdBy || (await createTestUser());
 
     await db.insert(chats).values({
       id: chatId,
@@ -39,6 +39,8 @@ export async function createTestChat(
       userId,
     };
   } catch (error) {
-    throw new Error(`Failed to create test chat: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to create test chat: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }

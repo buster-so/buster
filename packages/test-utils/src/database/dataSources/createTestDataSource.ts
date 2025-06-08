@@ -1,4 +1,4 @@
-import { db, dataSources } from '@buster/database';
+import { dataSources, db } from '@buster/database';
 import { v4 as uuidv4 } from 'uuid';
 import { createTestOrganization } from '../organizations/createTestOrganization';
 import { createTestUser } from '../users/createTestUser';
@@ -21,10 +21,10 @@ export async function createTestDataSource(params?: {
 }> {
   try {
     const dataSourceId = uuidv4();
-    
+
     // Create organization and user if not provided
-    const organizationId = params?.organizationId || await createTestOrganization();
-    const userId = params?.createdBy || await createTestUser();
+    const organizationId = params?.organizationId || (await createTestOrganization());
+    const userId = params?.createdBy || (await createTestUser());
     const secretId = uuidv4();
     const dataSourceType = params?.type || 'postgresql';
     const name = params?.name || `Test Data Source ${uuidv4()}`;
@@ -47,6 +47,8 @@ export async function createTestDataSource(params?: {
       dataSourceType,
     };
   } catch (error) {
-    throw new Error(`Failed to create test data source: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to create test data source: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }

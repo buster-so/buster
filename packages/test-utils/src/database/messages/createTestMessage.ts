@@ -26,6 +26,8 @@ export async function createTestMessage(chatId: string, createdBy: string): Prom
 
     return messageId;
   } catch (error) {
-    throw new Error(`Failed to create test message: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to create test message: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }
