@@ -4,7 +4,7 @@ import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { anthropicCachedModel } from '../utils/models/anthropic-cached';
-import { standardizeMessages } from '../utils/standardizeMessages';
+import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
 import type {
   AnalystRuntimeContext,
   thinkAndPrepWorkflowInputSchema,
@@ -104,6 +104,12 @@ The TODO list should break down each aspect of the user request into tasks, base
 [ ] Determine how to identify the influence of unicorn sightings on sales
 [ ] Determine the visualization type and axes for the chart
 \`\`\`
+### User Request: "I have a Fedex Smartpost tracking number and I need the USPS tracking nmber.  Can you find that for me? Here is the fedex number: 286744112345
+\`\`\`
+[ ] Determine if FedEx Smartpost tracking data is available in the current data sources
+[ ] Determine if USPS tracking number mappings exist in the available data
+[ ] Determine how to identify the relationship between FedEx and USPS tracking numbers for Smartpost shipments
+\`\`\`
 ---
 ### System Limitations
 - The system is not capable of writing python, building forecasts, or doing "what-if" hypothetical analysis
@@ -152,8 +158,8 @@ const todoStepExecution = async ({
     // Prepare messages for the agent
     let messages: CoreMessage[];
     if (conversationHistory && conversationHistory.length > 0) {
-      // Use conversation history if available
-      messages = conversationHistory as CoreMessage[];
+      // Use conversation history as context + append new user message
+      messages = appendToConversation(conversationHistory as CoreMessage[], prompt);
     } else {
       // Otherwise, use just the prompt
       messages = standardizeMessages(prompt);

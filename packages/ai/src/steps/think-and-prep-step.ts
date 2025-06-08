@@ -96,8 +96,13 @@ const thinkAndPrepExecution = async ({
               // step.response.messages contains the conversation history for this step
               outputMessages = extractMessageHistory(step.response.messages);
 
-              // Save conversation history to database
-              await saveConversationHistoryFromStep(runtimeContext, step.response.messages);
+              // Save conversation history to database before aborting
+              try {
+                await saveConversationHistoryFromStep(runtimeContext, step.response.messages);
+              } catch (error) {
+                console.error('Failed to save think-and-prep conversation history:', error);
+                // Continue with abort even if save fails to avoid hanging
+              }
 
               // Store the full step data (cast to our expected type)
               finalStepData = step as any;

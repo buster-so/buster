@@ -4,7 +4,7 @@ import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { anthropicCachedModel } from '../utils/models/anthropic-cached';
-import { standardizeMessages } from '../utils/standardizeMessages';
+import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
 import type {
   AnalystRuntimeContext,
   thinkAndPrepWorkflowInputSchema,
@@ -48,8 +48,8 @@ const generateChatTitleExecution = async ({
     // Prepare messages for the agent
     let messages: CoreMessage[];
     if (conversationHistory && conversationHistory.length > 0) {
-      // Use conversation history if available
-      messages = conversationHistory as CoreMessage[];
+      // Use conversation history as context + append new user message
+      messages = appendToConversation(conversationHistory as CoreMessage[], prompt);
     } else {
       // Otherwise, use just the prompt
       messages = standardizeMessages(prompt);

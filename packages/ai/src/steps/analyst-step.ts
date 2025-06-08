@@ -46,8 +46,14 @@ const analystExecution = async ({
           toolChoice: 'required',
           abortSignal: abortController.signal,
           onStepFinish: async (step) => {
-            // Save conversation history to database on each step
-            await saveConversationHistoryFromStep(runtimeContext, step.response.messages);
+            // Save complete conversation history to database before any abort (think-and-prep + analyst messages)
+            const completeHistory = [...inputData.outputMessages, ...step.response.messages];
+            try {
+              await saveConversationHistoryFromStep(runtimeContext, completeHistory);
+            } catch (error) {
+              console.error('Failed to save analyst conversation history:', error);
+              // Continue with abort even if save fails to avoid hanging
+            }
 
             // Check if doneTool was called and abort after saving
             const toolNames = step.toolCalls.map((call) => call.toolName);
