@@ -278,19 +278,29 @@ export const processData = task({
 });
 ```
 
-#### Schema-Validated Task
+#### Schema-Validated Task (Required Pattern)
 ```typescript
 import { schemaTask } from '@trigger.dev/sdk/v3';
 import { z } from 'zod';
 
+// Define schema in interfaces.ts file
+export const TaskInputSchema = z.object({
+  email: z.string().email('Must be a valid email'),
+  data: z.record(z.unknown()),
+  options: z.object({
+    maxRetries: z.number().int().min(0).max(5).default(3),
+  }).optional(),
+});
+
+// Infer TypeScript type from schema
+export type TaskInput = z.infer<typeof TaskInputSchema>;
+
 export const validatedTask = schemaTask({
   id: 'validated-task',
-  schema: z.object({
-    email: z.string().email(),
-    data: z.record(z.unknown()),
-  }),
+  schema: TaskInputSchema,
   run: async (payload) => {
     // Payload is automatically validated and typed
+    // Full IDE support with autocomplete
   },
 });
 ```

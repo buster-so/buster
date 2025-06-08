@@ -125,23 +125,171 @@ export const myTask = task({
 });
 ```
 
-### Schema Validation (Recommended)
+### Schema Validation with Zod (Required Pattern)
+
+**ALL tasks MUST use Zod schemas** for type-safe validation and automatic type inference:
+
 ```typescript
 import { schemaTask } from '@trigger.dev/sdk/v3';
 import { z } from 'zod';
 
+// Define Zod schema
+export const TaskInputSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  age: z.number().int().min(0).max(120),
+  email: z.string().email().optional(),
+  options: z.object({
+    enableNotifications: z.boolean().default(true),
+    maxRetries: z.number().int().min(0).max(5).default(3),
+  }).optional(),
+});
+
+// TypeScript type automatically inferred from schema
+export type TaskInput = z.infer<typeof TaskInputSchema>;
+
 export const validatedTask = schemaTask({
   id: 'validated-task',
-  schema: z.object({
-    name: z.string(),
-    age: z.number(),
-  }),
+  schema: TaskInputSchema,
   run: async (payload) => {
     // Payload is automatically validated and typed
     console.log(payload.name, payload.age);
+    // Full TypeScript IntelliSense available
   },
 });
 ```
+
+### Zod Schema Patterns for Trigger Tasks
+
+#### 1. Use Schemas Instead of Interfaces
+```typescript
+// ❌ DON'T: Define separate interfaces
+export interface TaskInput {
+  name: string;
+  age: number;
+}
+
+// ✅ DO: Define Zod schema and infer types
+export const TaskInputSchema = z.object({
+  name: z.string(),
+  age: z.number(),
+});
+export type TaskInput = z.infer<typeof TaskInputSchema>;
+```
+
+#### 2. Complex Nested Schemas
+```typescript
+export const DataSourceSchema = z.object({
+  name: z.string().min(1, 'Data source name is required'),
+  type: z.enum(['snowflake', 'postgresql', 'mysql', 'bigquery']),
+  credentials: z.record(z.unknown()), // Flexible for different credential types
+});
+
+export const AnalysisOptionsSchema = z.object({
+  maxSteps: z.number().int().min(1).max(50).default(15),
+  model: z.enum(['claude-3-sonnet', 'claude-3-opus']).default('claude-3-sonnet'),
+  enableStreaming: z.boolean().default(false),
+});
+
+export const TaskInputSchema = z.object({
+  sessionId: z.string().uuid('Must be a valid UUID'),
+  query: z.string().min(1, 'Query cannot be empty'),
+  dataSources: z.array(DataSourceSchema).optional(),
+  options: AnalysisOptionsSchema.optional(),
+});
+```
+
+#### 3. Output Schema Validation
+```typescript
+export const TaskOutputSchema = z.object({
+  success: z.boolean(),
+  sessionId: z.string(),
+  result: z.object({
+    response: z.string(),
+    artifacts: z.array(z.object({
+      id: z.string(),
+      type: z.enum(['metric', 'dashboard', 'query', 'chart']),
+      title: z.string(),
+      content: z.record(z.unknown()),
+    })).default([]),
+  }).optional(),
+  error: z.object({
+    code: z.string(),
+    message: z.string(),
+    details: z.record(z.unknown()).optional(),
+  }).optional(),
+});
+
+export type TaskOutput = z.infer<typeof TaskOutputSchema>;
+```
+
+#### 4. Enum Validation
+```typescript
+export const DatabaseTypeSchema = z.enum([
+  'snowflake', 'postgresql', 'mysql', 'bigquery', 
+  'sqlserver', 'redshift', 'databricks'
+]);
+
+export const AgentPhaseSchema = z.enum([
+  'initializing', 'searching', 'planning', 
+  'analyzing', 'reviewing', 'completed', 'failed'
+]);
+```
+
+#### 5. Advanced Validation Rules
+```typescript
+export const CredentialsSchema = z.object({
+  type: DatabaseTypeSchema,
+  host: z.string().optional(),
+  port: z.number().int().min(1).max(65535).optional(),
+  database: z.string().optional(),
+  username: z.string().optional(),
+  password: z.string().optional(),
+}).passthrough() // Allow additional fields for different credential types
+  .refine(data => {
+    // Custom validation: BigQuery doesn't need host/port
+    if (data.type === 'bigquery') return true;
+    return data.host && data.port;
+  }, 'Host and port required for non-BigQuery databases');
+```
+
+### Benefits of Zod Schema Approach
+
+1. **Single Source of Truth** - Schema defines both validation and TypeScript types
+2. **Runtime Safety** - Validates payloads before task execution, preventing runtime errors
+3. **Better Error Messages** - Descriptive validation errors with field-specific context
+4. **Zero Duplication** - No need to maintain separate interfaces and validation logic
+5. **IDE Support** - Full IntelliSense, autocomplete, and error checking
+6. **Automatic Type Inference** - TypeScript types automatically generated from schemas
+
+### File Organization Pattern
+
+Each task should have an `interfaces.ts` file structured as:
+
+```typescript
+// interfaces.ts
+import { z } from 'zod';
+
+// 1. Define all Zod schemas
+export const InputSchema = z.object({ /* ... */ });
+export const OutputSchema = z.object({ /* ... */ });
+
+// 2. Export TypeScript types
+export type Input = z.infer<typeof InputSchema>;
+export type Output = z.infer<typeof OutputSchema>;
+
+// 3. Export any helper schemas for reuse
+export const CommonSchema = z.object({ /* ... */ });
+```
+
+### Migration from Interfaces
+
+When updating existing tasks:
+
+1. **Replace interfaces with Zod schemas**
+2. **Use `z.infer<typeof Schema>` for types**
+3. **Update task to use `schemaTask`**
+4. **Add meaningful validation rules**
+5. **Test payload validation**
 
 ### Scheduled Tasks
 ```typescript
