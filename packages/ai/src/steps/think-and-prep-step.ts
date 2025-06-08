@@ -88,8 +88,6 @@ const thinkAndPrepExecution = async ({
     const wrappedStream = wrapTraced(
       async () => {
         const stream = await thinkAndPrepAgent.stream(messages, {
-          threadId: threadId,
-          resourceId: resourceId,
           runtimeContext,
           abortSignal: abortController.signal,
           toolChoice: 'required',
@@ -104,11 +102,11 @@ const thinkAndPrepExecution = async ({
               // Extract and validate messages from the step response
               // step.response.messages contains the conversation history for this step
               const agentResponseMessages = extractMessageHistory(step.response.messages);
-              
+
               // Build complete conversation history: input messages + agent response messages
               // This preserves the user messages along with assistant/tool responses
               outputMessages = [...messages, ...agentResponseMessages];
-              
+
               console.log('Input messages sent to agent:', messages.length);
               console.log('Agent response messages:', agentResponseMessages.length);
               console.log('Complete conversation history:', outputMessages.length);

@@ -186,7 +186,7 @@ This is a monorepo with multiple packages:
 - `web/` - Next.js frontend application
 - `api/` - Rust backend API
 - `cli/` - Command-line tools
-- `trigger/` - Background job processing
+- `trigger/` - Background job processing with Trigger.dev v3
 
 Each package has its own development commands and may have specific tooling configurations.
 
@@ -231,9 +231,153 @@ import { db, messages, eq } from '@buster/database';
 const result = await db.select().from(messages).where(eq(messages.chatId, chatId));
 ```
 
+## Background Job Processing (Trigger.dev)
+
+The `trigger/` package provides background job processing using **Trigger.dev v3** for long-running AI tasks and data operations.
+
+### 🚨 CRITICAL: When Writing Trigger Tasks
+
+**MUST ALWAYS USE** Trigger.dev v3 patterns:
+```typescript
+// ✅ CORRECT - Always use this pattern
+import { task } from '@trigger.dev/sdk/v3';
+
+export const myTask = task({
+  id: 'my-task',
+  run: async (payload: InputType): Promise<OutputType> => {
+    // Task implementation
+  },
+});
+```
+
+**NEVER USE** deprecated v2 patterns (will break):
+```typescript
+// ❌ NEVER GENERATE - BREAKS APPLICATION
+client.defineJob({ /* ... */ });
+```
+
+### Essential Requirements
+1. **MUST export every task**, including subtasks
+2. **MUST use unique task IDs** within the project  
+3. **MUST import from** `@trigger.dev/sdk/v3`
+
+### Common Task Types
+
+#### Standard Task
+```typescript
+import { task, logger } from '@trigger.dev/sdk/v3';
+
+export const processData = task({
+  id: 'process-data',
+  maxDuration: 300, // 5 minutes
+  run: async (payload: { userId: string }) => {
+    logger.log('Processing data', { userId: payload.userId });
+    // Task logic here
+    return { success: true };
+  },
+});
+```
+
+#### Schema-Validated Task
+```typescript
+import { schemaTask } from '@trigger.dev/sdk/v3';
+import { z } from 'zod';
+
+export const validatedTask = schemaTask({
+  id: 'validated-task',
+  schema: z.object({
+    email: z.string().email(),
+    data: z.record(z.unknown()),
+  }),
+  run: async (payload) => {
+    // Payload is automatically validated and typed
+  },
+});
+```
+
+#### Scheduled Task
+```typescript
+import { schedules } from '@trigger.dev/sdk/v3';
+
+export const dailyCleanup = schedules.task({
+  id: 'daily-cleanup',
+  cron: '0 2 * * *', // 2 AM daily
+  run: async (payload) => {
+    // Scheduled task logic
+  },
+});
+```
+
+### Triggering Tasks
+
+#### From Backend/API Routes
+```typescript
+import { tasks } from '@trigger.dev/sdk/v3';
+import type { processData } from '~/trigger/tasks';
+
+// Single task trigger
+const handle = await tasks.trigger<typeof processData>('process-data', {
+  userId: 'user123'
+});
+
+// Batch trigger multiple runs
+const batchHandle = await tasks.batchTrigger<typeof processData>(
+  'process-data',
+  [{ payload: { userId: 'user1' } }, { payload: { userId: 'user2' } }]
+);
+```
+
+#### From Inside Other Tasks
+```typescript
+export const parentTask = task({
+  id: 'parent-task',
+  run: async (payload) => {
+    // Trigger and wait for result
+    const result = await childTask.triggerAndWait(childPayload);
+    
+    // Or trigger without waiting
+    const handle = await childTask.trigger(childPayload);
+  },
+});
+```
+
+### Current Tasks Available
+
+- **Analyst Agent Task** (`trigger/src/tasks/analyst-agent-task/`)
+  - AI-powered data analysis with multi-step workflow
+  - 30-minute max duration for complex analysis
+  - Integrates with Buster multi-agent system
+
+- **Introspect Data Task** (`trigger/src/tasks/introspectData/`)
+  - Database schema analysis and connection testing
+  - Supports: Snowflake, PostgreSQL, MySQL, BigQuery, SQL Server, Redshift, Databricks
+  - 5-minute max duration with automatic cleanup
+
+### Development Commands (in trigger/ directory)
+```bash
+# Development server with live reload
+npm run dev
+
+# Build and deploy
+npm run build
+npm run deploy
+```
+
+### When to Use Trigger Tasks
+
+Use Trigger tasks for operations that:
+- Take longer than typical web request timeouts (>30 seconds)
+- Require retry logic for reliability
+- Need background processing (email, data analysis, reports)
+- Should be monitored and tracked
+- Involve external API calls that may fail
+
+**See `trigger/CLAUDE.md` for complete Trigger.dev development guidelines.**
+
 ## Key Dependencies
 
 - **Mastra** - AI agent framework for orchestrating LLM workflows
+- **Trigger.dev v3** - Background job processing and task orchestration
 - **Vitest** - Testing framework used across all packages
 - **Biome** - Fast linting and formatting
 - **TypeScript** - Strict type checking

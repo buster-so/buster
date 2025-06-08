@@ -43,7 +43,10 @@ const analystExecution = async ({
     console.log('Input data keys:', Object.keys(inputData));
     console.log('Input data outputMessages length:', inputData.outputMessages?.length || 0);
     console.log('Input data outputMessages:', inputData.outputMessages);
-    console.log('Input data conversationHistory length:', inputData.conversationHistory?.length || 0);
+    console.log(
+      'Input data conversationHistory length:',
+      inputData.conversationHistory?.length || 0
+    );
     console.log('Input data conversationHistory:', inputData.conversationHistory);
 
     // Messages come directly from think-and-prep step output
@@ -54,8 +57,6 @@ const analystExecution = async ({
     const wrappedStream = wrapTraced(
       async () => {
         const stream = await analystAgent.stream(messages, {
-          threadId,
-          resourceId,
           runtimeContext,
           toolChoice: 'required',
           abortSignal: abortController.signal,
@@ -66,10 +67,16 @@ const analystExecution = async ({
             console.log('=== ANALYST STEP: SAVING CONVERSATION HISTORY ===');
             console.log('Think-and-prep messages:', inputData.outputMessages.length);
             console.log('Analyst step messages:', step.response.messages.length);
-            console.log('Complete conversation history length:', completeConversationHistory.length);
-            
+            console.log(
+              'Complete conversation history length:',
+              completeConversationHistory.length
+            );
+
             try {
-              await saveConversationHistoryFromStep(runtimeContext as any, completeConversationHistory);
+              await saveConversationHistoryFromStep(
+                runtimeContext as any,
+                completeConversationHistory
+              );
             } catch (error) {
               console.error('Failed to save analyst conversation history:', error);
               // Continue with abort even if save fails to avoid hanging
@@ -105,7 +112,7 @@ const analystExecution = async ({
         console.log('=== ANALYST STEP OUTPUT (TOOL RESULT) ===');
         console.log('Complete conversation history length:', completeConversationHistory.length);
         console.log('Complete conversation history:', completeConversationHistory);
-        
+
         // Don't abort here anymore - let onStepFinish handle it after saving
         return {
           conversationHistory: completeConversationHistory,
@@ -118,7 +125,7 @@ const analystExecution = async ({
     console.log('=== ANALYST STEP OUTPUT (END) ===');
     console.log('Complete conversation history length:', completeConversationHistory.length);
     console.log('Complete conversation history:', completeConversationHistory);
-    
+
     return {
       conversationHistory: completeConversationHistory,
       finished: true,
@@ -130,7 +137,7 @@ const analystExecution = async ({
       console.log('=== ANALYST STEP OUTPUT (ABORT ERROR) ===');
       console.log('Complete conversation history length:', completeConversationHistory.length);
       console.log('Complete conversation history:', completeConversationHistory);
-      
+
       // This is expected when we abort the stream
       return {
         conversationHistory: completeConversationHistory,
