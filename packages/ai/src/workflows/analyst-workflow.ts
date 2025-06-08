@@ -1,8 +1,10 @@
 import { createWorkflow } from '@mastra/core';
 import { z } from 'zod';
+import { ThinkAndPrepOutputSchema } from '../utils/memory/types';
 import { analystStep } from '../steps/analyst-step';
 import { createTodosStep } from '../steps/create-todos-step';
 import { extractValuesSearchStep } from '../steps/extract-values-search-step';
+import { formatOutputStep } from '../steps/format-output-step';
 import { generateChatTitleStep } from '../steps/generate-chat-title-step';
 import { thinkAndPrepStep } from '../steps/think-and-prep-step';
 
@@ -45,7 +47,7 @@ const analystWorkflow = createWorkflow({
   id: 'analyst-workflow',
   inputSchema: thinkAndPrepWorkflowInputSchema,
   outputSchema,
-  steps: [generateChatTitleStep, extractValuesSearchStep, createTodosStep],
+  steps: [generateChatTitleStep, extractValuesSearchStep, createTodosStep, thinkAndPrepStep, analystStep, formatOutputStep],
 })
   .parallel([generateChatTitleStep, extractValuesSearchStep, createTodosStep])
   .then(thinkAndPrepStep)
@@ -53,6 +55,8 @@ const analystWorkflow = createWorkflow({
     // Only run analystStep if thinkAndPrepStep returned finished: false
     [async ({ inputData }) => inputData.finished === false, analystStep],
   ])
+  // Always run format-output-step to standardize the output
+  .then(formatOutputStep)
   .commit();
 
 export default analystWorkflow;

@@ -64,6 +64,11 @@ const thinkAndPrepExecution = async ({
     const conversationHistory = initData.conversationHistory;
     const todos = inputData['create-todos'].todos;
 
+    console.log('=== THINK AND PREP STEP INPUT ===');
+    console.log('Prompt:', prompt);
+    console.log('Conversation history length:', conversationHistory?.length || 0);
+    console.log('Conversation history (detailed):', JSON.stringify(conversationHistory, null, 2));
+
     runtimeContext.set('todos', todos);
 
     // Prepare messages for the agent
@@ -71,10 +76,14 @@ const thinkAndPrepExecution = async ({
     if (conversationHistory && conversationHistory.length > 0) {
       // If we have history, append the new prompt to it
       messages = appendToConversation(conversationHistory as any, prompt);
+      console.log('Using existing conversation history, appended new prompt');
     } else {
       // Otherwise, create a new conversation with just the prompt
       messages = standardizeMessages(prompt);
+      console.log('No conversation history, creating new conversation');
     }
+    console.log('Messages prepared for agent:', messages.length);
+    console.log('Messages being sent to agent:', JSON.stringify(messages, null, 2));
 
     const wrappedStream = wrapTraced(
       async () => {
@@ -94,11 +103,19 @@ const thinkAndPrepExecution = async ({
             ) {
               // Extract and validate messages from the step response
               // step.response.messages contains the conversation history for this step
-              outputMessages = extractMessageHistory(step.response.messages);
+              const agentResponseMessages = extractMessageHistory(step.response.messages);
+              
+              // Build complete conversation history: input messages + agent response messages
+              // This preserves the user messages along with assistant/tool responses
+              outputMessages = [...messages, ...agentResponseMessages];
+              
+              console.log('Input messages sent to agent:', messages.length);
+              console.log('Agent response messages:', agentResponseMessages.length);
+              console.log('Complete conversation history:', outputMessages.length);
 
               // Save conversation history to database before aborting
               try {
-                await saveConversationHistoryFromStep(runtimeContext as any, step.response.messages);
+                await saveConversationHistoryFromStep(runtimeContext as any, outputMessages);
               } catch (error) {
                 console.error('Failed to save think-and-prep conversation history:', error);
                 // Continue with abort even if save fails to avoid hanging
@@ -129,6 +146,11 @@ const thinkAndPrepExecution = async ({
     for await (const _ of stream.fullStream) {
     }
 
+    console.log('=== THINK AND PREP STEP OUTPUT ===');
+    console.log('Finished:', finished);
+    console.log('Output messages length:', outputMessages.length);
+    console.log('Conversation history being returned:', outputMessages);
+
     return {
       finished,
       outputMessages,
@@ -149,6 +171,11 @@ const thinkAndPrepExecution = async ({
       throw new Error('Unable to connect to the analysis service. Please try again later.');
     }
   }
+
+  console.log('=== THINK AND PREP STEP OUTPUT (CATCH BLOCK) ===');
+  console.log('Finished:', finished);
+  console.log('Output messages length:', outputMessages.length);
+  console.log('Conversation history being returned:', outputMessages);
 
   return {
     finished,

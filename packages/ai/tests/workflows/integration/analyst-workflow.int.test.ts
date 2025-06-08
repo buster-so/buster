@@ -290,12 +290,24 @@ describe('Analyst Workflow Integration Tests', () => {
     const initialResult = await initialTracedWorkflow();
     expect(initialResult).toBeDefined();
     console.log('Initial workflow completed');
+    
+    // Debug: Log what the initial workflow actually returned
+    console.log('=== INITIAL WORKFLOW RESULT DEBUG ===');
+    console.log('Result keys:', Object.keys(initialResult));
+    console.log('Has result.result.conversationHistory:', !!initialResult.result?.result?.conversationHistory);
+    console.log('Has result.conversationHistory:', !!initialResult.result?.conversationHistory);
+    console.log('result.conversationHistory length:', initialResult.result?.conversationHistory?.length || 0);
 
     // Step 3: Run follow-up workflow with the conversation history from the first run
     const followUpInput = {
       prompt: 'For these top suppliers, can you show me their contact information and which countries they are located in?',
-      conversationHistory: initialResult.conversationHistory as CoreMessage[],
+      conversationHistory: initialResult.result?.conversationHistory as CoreMessage[],
     };
+    
+    // Debug: Log what we're passing to the follow-up workflow
+    console.log('=== FOLLOW-UP INPUT DEBUG ===');
+    console.log('followUpInput keys:', Object.keys(followUpInput));
+    console.log('followUpInput.conversationHistory length:', followUpInput.conversationHistory?.length || 0);
 
     console.log('Running follow-up workflow with conversation history from first run...');
 
@@ -313,16 +325,22 @@ describe('Analyst Workflow Integration Tests', () => {
     const followUpResult = await followUpTracedWorkflow();
     expect(followUpResult).toBeDefined();
     console.log('Follow-up workflow completed');
+    
+    // Debug: Log the actual follow-up result structure
+    console.log('=== FOLLOW-UP WORKFLOW RESULT DEBUG ===');
+    console.log('Follow-up result keys:', Object.keys(followUpResult));
+    console.log('Follow-up result.result keys:', Object.keys(followUpResult.result || {}));
+    console.log('Follow-up conversationHistory (direct):', !!followUpResult.conversationHistory);
 
     // Step 4: Verify that the follow-up workflow also has conversation history
-    expect(followUpResult).toHaveProperty('conversationHistory');
-    expect(Array.isArray(followUpResult.conversationHistory)).toBe(true);
-    expect(followUpResult.conversationHistory.length).toBeGreaterThan(initialResult.conversationHistory.length);
+    expect(followUpResult.result?.conversationHistory).toBeDefined();
+    expect(Array.isArray(followUpResult.result?.conversationHistory)).toBe(true);
+    expect(followUpResult.result?.conversationHistory.length).toBeGreaterThan(initialResult.result?.conversationHistory.length);
     
-    console.log(`Follow-up workflow returned ${followUpResult.conversationHistory.length} messages (increased from ${initialResult.conversationHistory.length})`);
+    console.log(`Follow-up workflow returned ${followUpResult.result?.conversationHistory.length} messages (increased from ${initialResult.result?.conversationHistory.length})`);
 
     // Step 5: Verify that the conversation history includes both interactions
-    const finalHistory = followUpResult.conversationHistory;
+    const finalHistory = followUpResult.result?.conversationHistory;
     
     // Should contain messages from both the initial prompt and follow-up
     const userMessages = finalHistory.filter((msg: any) => msg.role === 'user');
