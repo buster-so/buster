@@ -97,6 +97,7 @@ export const StepFinishDataSchema = z.object({
 export const ThinkAndPrepOutputSchema = z.object({
   finished: z.boolean(),
   outputMessages: MessageHistorySchema,
+  conversationHistory: MessageHistorySchema.optional(), // Include conversation history for workflow output
   stepData: StepFinishDataSchema.optional(), // The full step object
   metadata: z
     .object({

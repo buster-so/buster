@@ -30,9 +30,15 @@ export const thinkAndPrepWorkflowInputSchema = z.object({
 });
 
 const outputSchema = z.object({
-  title: z.string(),
-  todos: z.array(z.string()),
-  values: z.array(z.string()),
+  title: z.string().optional(),
+  todos: z.array(z.string()).optional(),
+  values: z.array(z.string()).optional(),
+  conversationHistory: z.array(coreMessageSchema).optional(),
+  // Keep existing fields for backward compatibility
+  finished: z.boolean().optional(),
+  outputMessages: z.array(coreMessageSchema).optional(),
+  stepData: z.any().optional(),
+  metadata: z.any().optional(),
 });
 
 const analystWorkflow = createWorkflow({

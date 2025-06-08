@@ -70,7 +70,7 @@ const thinkAndPrepExecution = async ({
     let messages: CoreMessage[];
     if (conversationHistory && conversationHistory.length > 0) {
       // If we have history, append the new prompt to it
-      messages = appendToConversation(conversationHistory, prompt);
+      messages = appendToConversation(conversationHistory as any, prompt);
     } else {
       // Otherwise, create a new conversation with just the prompt
       messages = standardizeMessages(prompt);
@@ -98,7 +98,7 @@ const thinkAndPrepExecution = async ({
 
               // Save conversation history to database before aborting
               try {
-                await saveConversationHistoryFromStep(runtimeContext, step.response.messages);
+                await saveConversationHistoryFromStep(runtimeContext as any, step.response.messages);
               } catch (error) {
                 console.error('Failed to save think-and-prep conversation history:', error);
                 // Continue with abort even if save fails to avoid hanging
@@ -132,6 +132,7 @@ const thinkAndPrepExecution = async ({
     return {
       finished,
       outputMessages,
+      conversationHistory: outputMessages, // Include conversation history for workflow output
       stepData: finalStepData as any,
       metadata: {
         toolsUsed: getAllToolsUsed(outputMessages),
@@ -152,7 +153,8 @@ const thinkAndPrepExecution = async ({
   return {
     finished,
     outputMessages,
-    stepData: finalStepData,
+    conversationHistory: outputMessages, // Include conversation history for workflow output
+    stepData: finalStepData as any,
     metadata: {
       toolsUsed: getAllToolsUsed(outputMessages),
       finalTool: getLastToolUsed(outputMessages) as

@@ -259,4 +259,75 @@ describe('Analyst Workflow Integration Tests', () => {
 
     console.log('Test completed successfully - both messages saved with conversation history');
   }, 600000); // Increased timeout for two workflow runs
+
+  test('should execute workflow with conversation history passed directly from first to second run', async () => {
+    // Step 1: Run initial workflow WITHOUT database save (no messageId)
+    const initialInput = {
+      prompt: 'What are the top 3 suppliers by total order value in our database?',
+    };
+
+    const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();
+    runtimeContext.set('userId', 'c2dd64cd-f7f3-4884-bc91-d46ae431901e');
+    runtimeContext.set('threadId', crypto.randomUUID());
+    runtimeContext.set('organizationId', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce');
+    runtimeContext.set('dataSourceId', 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a');
+    runtimeContext.set('dataSourceSyntax', 'postgres');
+    // Note: No messageId set - this should prevent database save and allow direct output usage
+
+    console.log('Running initial workflow without database save...');
+
+    const initialTracedWorkflow = wrapTraced(
+      async () => {
+        const run = analystWorkflow.createRun();
+        return await run.start({
+          inputData: initialInput,
+          runtimeContext,
+        });
+      },
+      { name: 'Initial Workflow (No Database)' }
+    );
+
+    const initialResult = await initialTracedWorkflow();
+    expect(initialResult).toBeDefined();
+    console.log('Initial workflow completed');
+
+    // Step 3: Run follow-up workflow with the conversation history from the first run
+    const followUpInput = {
+      prompt: 'For these top suppliers, can you show me their contact information and which countries they are located in?',
+      conversationHistory: initialResult.conversationHistory as CoreMessage[],
+    };
+
+    console.log('Running follow-up workflow with conversation history from first run...');
+
+    const followUpTracedWorkflow = wrapTraced(
+      async () => {
+        const run = analystWorkflow.createRun();
+        return await run.start({
+          inputData: followUpInput,
+          runtimeContext, // Reuse same context (but still no messageId for database save)
+        });
+      },
+      { name: 'Follow-up Workflow (Direct History)' }
+    );
+
+    const followUpResult = await followUpTracedWorkflow();
+    expect(followUpResult).toBeDefined();
+    console.log('Follow-up workflow completed');
+
+    // Step 4: Verify that the follow-up workflow also has conversation history
+    expect(followUpResult).toHaveProperty('conversationHistory');
+    expect(Array.isArray(followUpResult.conversationHistory)).toBe(true);
+    expect(followUpResult.conversationHistory.length).toBeGreaterThan(initialResult.conversationHistory.length);
+    
+    console.log(`Follow-up workflow returned ${followUpResult.conversationHistory.length} messages (increased from ${initialResult.conversationHistory.length})`);
+
+    // Step 5: Verify that the conversation history includes both interactions
+    const finalHistory = followUpResult.conversationHistory;
+    
+    // Should contain messages from both the initial prompt and follow-up
+    const userMessages = finalHistory.filter((msg: any) => msg.role === 'user');
+    expect(userMessages.length).toBeGreaterThanOrEqual(2); // At least initial + follow-up
+
+    console.log('Test completed successfully - conversation history passed directly between workflows');
+  }, 600000); // Increased timeout for two workflow runs
 });

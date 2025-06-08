@@ -12,7 +12,13 @@ import type {
 
 const inputSchema = ThinkAndPrepOutputSchema;
 
-const outputSchema = z.object({});
+const outputSchema = z.object({
+  conversationHistory: z.array(z.any()), // CoreMessage[] from combined history
+  finished: z.boolean().optional(),
+  outputMessages: z.array(z.any()).optional(),
+  stepData: z.any().optional(),
+  metadata: z.any().optional(),
+});
 
 const analystExecution = async ({
   inputData,
@@ -23,7 +29,7 @@ const analystExecution = async ({
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof outputSchema>> => {
   const abortController = new AbortController();
-  let shouldComplete = false;
+  let completeConversationHistory: any[] = [];
 
   try {
     const resourceId = runtimeContext.get('userId');
@@ -35,7 +41,7 @@ const analystExecution = async ({
 
     // Messages come directly from think-and-prep step output
     // They are already in CoreMessage[] format
-    const messages = inputData.outputMessages;
+    const messages = inputData.outputMessages as any[];
 
     const wrappedStream = wrapTraced(
       async () => {
@@ -47,9 +53,9 @@ const analystExecution = async ({
           abortSignal: abortController.signal,
           onStepFinish: async (step) => {
             // Save complete conversation history to database before any abort (think-and-prep + analyst messages)
-            const completeHistory = [...inputData.outputMessages, ...step.response.messages];
+            completeConversationHistory = [...inputData.outputMessages, ...step.response.messages];
             try {
-              await saveConversationHistoryFromStep(runtimeContext, completeHistory);
+              await saveConversationHistoryFromStep(runtimeContext as any, completeConversationHistory);
             } catch (error) {
               console.error('Failed to save analyst conversation history:', error);
               // Continue with abort even if save fails to avoid hanging
@@ -58,7 +64,6 @@ const analystExecution = async ({
             // Check if doneTool was called and abort after saving
             const toolNames = step.toolCalls.map((call) => call.toolName);
             if (toolNames.includes('doneTool')) {
-              shouldComplete = true;
               abortController.abort();
             }
           },
@@ -84,16 +89,28 @@ const analystExecution = async ({
     for await (const chunk of stream.fullStream) {
       if (chunk.type === 'tool-result' && chunk.toolName === 'doneTool') {
         // Don't abort here anymore - let onStepFinish handle it after saving
-        return {};
+        return {
+          conversationHistory: completeConversationHistory,
+          finished: true,
+          outputMessages: completeConversationHistory,
+        };
       }
     }
 
-    return {};
+    return {
+      conversationHistory: completeConversationHistory,
+      finished: true,
+      outputMessages: completeConversationHistory,
+    };
   } catch (error) {
     // Handle abort errors gracefully
     if (error instanceof Error && error.name === 'AbortError') {
       // This is expected when we abort the stream
-      return {};
+      return {
+        conversationHistory: completeConversationHistory,
+        finished: true,
+        outputMessages: completeConversationHistory,
+      };
     }
 
     console.error('Error in analyst step:', error);
