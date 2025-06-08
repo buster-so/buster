@@ -14,11 +14,13 @@ export const TaskExecutionResultSchema = z.object({
   messageId: z.string(),
   executionTimeMs: z.number(),
   workflowCompleted: z.boolean(),
-  error: z.object({
-    code: z.string(),
-    message: z.string(),
-    details: z.record(z.any()).optional(),
-  }).optional(),
+  error: z
+    .object({
+      code: z.string(),
+      message: z.string(),
+      details: z.record(z.any()).optional(),
+    })
+    .optional(),
 });
 
 // Main output schema (Trigger.dev requires this for task definition)
@@ -26,11 +28,13 @@ export const AnalystAgentTaskOutputSchema = z.object({
   success: z.boolean(),
   messageId: z.string(),
   result: TaskExecutionResultSchema.optional(),
-  error: z.object({
-    code: z.string(),
-    message: z.string(),
-    details: z.record(z.any()).optional(),
-  }).optional(),
+  error: z
+    .object({
+      code: z.string(),
+      message: z.string(),
+      details: z.record(z.any()).optional(),
+    })
+    .optional(),
 });
 
 // Message context loaded from database

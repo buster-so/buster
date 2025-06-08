@@ -1,27 +1,45 @@
 # Task 2: Database Helper Functions
 
 ## Overview
-Create focused database helper functions in the `@buster/database` package to support the simplified analyst agent task. The primary need is message-based context loading: given a message_id, load the complete context needed for workflow execution (message → chat → user → organization → data source).
+Create focused, modular database helper functions in the `@buster/database` package to support the simplified analyst agent task. The primary need is message-based context loading: given a message_id, load the complete context needed for workflow execution (message → chat → user → organization → data source) with proper validation and error handling.
 
 ## Location
-All helpers should be created in the `@buster/database` package, following the existing pattern in `packages/database/src/helpers/`.
+All helpers should be created in the `@buster/database` package, following the existing pattern in `packages/database/src/helpers/`. Split into focused, single-responsibility files for modularity and testability.
+
+## Design Principles
+
+### 1. Modular Architecture
+- **Split by responsibility**: Each file handles one specific domain
+- **Reusable functions**: Composable helpers that can be used independently
+- **Clear interfaces**: Well-defined input/output contracts
+- **Future-ready**: Prepared for multi-data source selection
+
+### 2. Error Handling Strategy
+- **Validation errors**: Clear messages for multiple organization/data source scenarios
+- **User-friendly messages**: Easy-to-understand error descriptions
+- **Future extensibility**: Error handling that supports data source selection UI
+
+### 3. Concurrent Query Optimization
+- **Promise.all usage**: Run independent queries concurrently
+- **Minimize round trips**: Efficient database access patterns
+- **Performance focus**: Optimized for workflow startup speed
 
 ## Required Helper Functions
 
-### 1. Core Message Context Loading
+### 1. Message Context Loading
 
 #### File: `packages/database/src/helpers/messageContext.ts`
 
 ```typescript
 import { db } from '../connection';
-import { messages, chats, users, organizations, dataSources } from '../schema';
-import { eq, and, isNull } from 'drizzle-orm';
+import { messages, chats, users, organizations, dataSources, usersToOrganizations } from '../schema';
+import { eq, and, isNull, count } from 'drizzle-orm';
 
 /**
- * Load complete context from message_id for workflow execution
- * Returns all the data needed to run the analyst workflow
+ * Load message with basic context (message → chat → user)
+ * First step in context chain - gets core message data
  */
-export async function getMessageContext(messageId: string) {
+export async function getMessageWithContext(messageId: string) {
   const result = await db
     .select({
       message: {
@@ -43,21 +61,10 @@ export async function getMessageContext(messageId: string) {
         email: users.email,
         name: users.name,
       },
-      organization: {
-        id: organizations.id,
-        name: organizations.name,
-      },
-      dataSource: {
-        id: dataSources.id,
-        type: dataSources.type,
-        organizationId: dataSources.organizationId,
-      },
     })
     .from(messages)
     .leftJoin(chats, eq(messages.chatId, chats.id))
     .leftJoin(users, eq(chats.createdBy, users.id))
-    .leftJoin(organizations, eq(chats.organizationId, organizations.id))
-    .leftJoin(dataSources, eq(organizations.id, dataSources.organizationId))
     .where(
       and(
         eq(messages.id, messageId),
@@ -84,20 +91,124 @@ export async function getMessageContext(messageId: string) {
     throw new Error('Message user context not found');
   }
   
-  if (!row.organization) {
-    throw new Error('User organization context not found');
-  }
-  
-  if (!row.dataSource) {
-    throw new Error('Organization data source not found');
-  }
-  
   return {
     message: row.message,
     chat: row.chat,
     user: row.user,
-    organization: row.organization,
-    dataSource: row.dataSource,
+    // Convenient access to key IDs
+    chatId: row.chat.id,
+    userId: row.user.id,
+    organizationId: row.chat.organizationId,
+  };
+}
+
+/**
+ * Get user's organization with validation
+ * Validates single organization constraint and prepares for future multi-org support
+ */
+export async function getUserOrganization(userId: string) {
+  // Get user's organizations
+  const userOrgs = await db
+    .select({
+      organization: {
+        id: organizations.id,
+        name: organizations.name,
+      },
+      userOrg: {
+        role: usersToOrganizations.role,
+        status: usersToOrganizations.status,
+      },
+    })
+    .from(usersToOrganizations)
+    .leftJoin(organizations, eq(usersToOrganizations.organizationId, organizations.id))
+    .where(
+      and(
+        eq(usersToOrganizations.userId, userId),
+        isNull(usersToOrganizations.deletedAt),
+        isNull(organizations.deletedAt),
+        eq(usersToOrganizations.status, 'active')
+      )
+    );
+
+  if (userOrgs.length === 0) {
+    throw new Error('User is not associated with any active organizations');
+  }
+
+  if (userOrgs.length > 1) {
+    throw new Error('Multiple organizations found for user. Multiple organization support is not available yet - please contact support if you need to work with multiple organizations.');
+  }
+
+  const userOrg = userOrgs[0];
+  if (!userOrg.organization) {
+    throw new Error('User organization not found');
+  }
+
+  return {
+    organization: userOrg.organization,
+    userRole: userOrg.userOrg.role,
+  };
+}
+
+/**
+ * Get organization's data source with validation  
+ * Validates single data source constraint and prepares for future data source selection
+ */
+export async function getOrganizationDataSource(organizationId: string) {
+  const orgDataSources = await db
+    .select({
+      id: dataSources.id,
+      name: dataSources.name,
+      type: dataSources.type,
+      organizationId: dataSources.organizationId,
+      onboardingStatus: dataSources.onboardingStatus,
+    })
+    .from(dataSources)
+    .where(
+      and(
+        eq(dataSources.organizationId, organizationId),
+        isNull(dataSources.deletedAt),
+        eq(dataSources.onboardingStatus, 'completed')
+      )
+    );
+
+  if (orgDataSources.length === 0) {
+    throw new Error('No active data sources found for organization');
+  }
+
+  if (orgDataSources.length > 1) {
+    throw new Error('Multiple data sources found for organization. Data source selection is not available yet - please contact support if you need to work with multiple data sources.');
+  }
+
+  return orgDataSources[0];
+}
+
+/**
+ * Complete message context loading with concurrent queries
+ * Orchestrates all context loading with optimal performance
+ */
+export async function getFullMessageContext(messageId: string) {
+  // Step 1: Load basic message context
+  const basicContext = await getMessageWithContext(messageId);
+  
+  // Step 2: Load organization and data source concurrently
+  const [userOrgResult, dataSource] = await Promise.all([
+    getUserOrganization(basicContext.userId),
+    getOrganizationDataSource(basicContext.organizationId),
+  ]);
+
+  return {
+    message: basicContext.message,
+    chat: basicContext.chat,
+    user: basicContext.user,
+    organization: userOrgResult.organization,
+    dataSource: dataSource,
+    // Convenient access to key IDs and metadata
+    chatId: basicContext.chatId,
+    userId: basicContext.userId,
+    organizationId: basicContext.organizationId,
+    dataSourceId: dataSource.id,
+    dataSourceSyntax: dataSource.type, // Maps to runtime context needs
+    userRole: userOrgResult.userRole,
   };
 }
 ```
@@ -110,12 +221,13 @@ export async function getMessageContext(messageId: string) {
 import { db } from '../connection';
 import { messages } from '../schema';
 import { eq, and, isNull } from 'drizzle-orm';
+import type { CoreMessage } from 'ai';
 
 /**
- * Load conversation history for a chat (for the analyst workflow)
- * Uses existing utilities from AI package for proper formatting
+ * Load conversation history for a chat using existing patterns
+ * Leverages the same approach as getRawLlmMessagesByMessageId but for full chat
  */
-export async function loadConversationHistory(chatId: string) {
+export async function getChatConversationHistory(chatId: string): Promise<CoreMessage[]> {
   // Get all messages for the chat, ordered by creation time
   const chatMessages = await db
     .select({
@@ -133,37 +245,66 @@ export async function loadConversationHistory(chatId: string) {
     .orderBy(messages.createdAt);
   
   // Combine all rawLlmMessages into a single conversation history
-  const conversationHistory: any[] = []; // CoreMessage[]
+  const conversationHistory: CoreMessage[] = [];
   
   for (const message of chatMessages) {
     if (message.rawLlmMessages && Array.isArray(message.rawLlmMessages)) {
-      conversationHistory.push(...message.rawLlmMessages);
+      // Type assertion since we know the structure from the existing codebase
+      conversationHistory.push(...(message.rawLlmMessages as CoreMessage[]));
     }
   }
   
   return conversationHistory;
 }
+
+/**
+ * Get conversation history from a specific message ID
+ * Wrapper around existing getRawLlmMessagesByMessageId for consistency
+ */
+export async function getMessageConversationHistory(messageId: string): Promise<CoreMessage[] | null> {
+  const messageData = await db
+    .select({
+      rawLlmMessages: messages.rawLlmMessages,
+    })
+    .from(messages)
+    .where(
+      and(
+        eq(messages.id, messageId),
+        isNull(messages.deletedAt)
+      )
+    )
+    .limit(1);
+
+  const message = messageData[0];
+  if (!message || !message.rawLlmMessages) {
+    return null;
+  }
+
+  return message.rawLlmMessages as CoreMessage[];
+}
 ```
 
-### 3. Helper Exports
+### 3. Helper Exports and Package Integration
 
 #### File: `packages/database/src/helpers/index.ts`
 
 ```typescript
-// Message context loading
+// Message context loading - split by responsibility
 export {
-  getMessageContext,
+  getMessageWithContext,
+  getUserOrganization,
+  getOrganizationDataSource,
+  getFullMessageContext,
 } from './messageContext';
 
-// Conversation history
+// Conversation history loading
 export {
-  loadConversationHistory,
+  getChatConversationHistory,
+  getMessageConversationHistory,
 } from './conversationHistory';
 ```
 
-### 4. Main Package Export
-
-#### File: `packages/database/src/index.ts`
+#### Update: `packages/database/src/index.ts`
 
 ```typescript
 // Existing exports...
@@ -174,71 +315,189 @@ export * from './schema';
 export * from './helpers';
 ```
 
-## Simplified Helper Functions
+## Function Architecture
 
-### Core Operations
-- **Message Context Loading**: Single function to load complete context from message_id
-- **Conversation History**: Load chat history for workflow input
-- **Minimal Surface Area**: Only what's needed for the simplified task
+### Core Operations with Modular Design
+- **getMessageWithContext**: Load basic message → chat → user context
+- **getUserOrganization**: Validate single organization constraint with future multi-org preparation  
+- **getOrganizationDataSource**: Validate single data source constraint with future selection preparation
+- **getFullMessageContext**: Orchestrate all context loading with concurrent queries
+- **getChatConversationHistory**: Load complete chat history using existing patterns
+- **getMessageConversationHistory**: Get history from specific message (consistency wrapper)
 
 ### Design Principles
-- **Single Query Approach**: Load all context in one database query where possible
-- **Error Handling**: Clear error messages for missing context
-- **Type Safety**: Strongly typed return values for workflow integration
+- **Modular Functions**: Each function has single responsibility and clear purpose
+- **Concurrent Optimization**: Use Promise.all for independent database queries
+- **Future-Ready Architecture**: Prepared for data source selection without breaking changes
+- **Error Validation**: Clear constraint validation with user-friendly messages
+- **Type Safety**: Strongly typed return values with convenient ID access
 
-## Error Handling
+## Error Handling Strategy
 
-### Context Loading Errors
+### Validation Errors with Future Support
 ```typescript
-// Message not found
-throw new Error('Message not found or has been deleted');
+// Single constraint validation with clear user guidance
+throw new Error('Multiple organizations found for user. Multiple organization support is not available yet - please contact support if you need to work with multiple organizations.');
 
-// Missing required context
+throw new Error('Multiple data sources found for organization. Data source selection is not available yet - please contact support if you need to work with multiple data sources.');
+
+// Standard context errors
+throw new Error('Message not found or has been deleted');
 throw new Error('Message is missing required prompt content');
 throw new Error('Message chat context not found');
 throw new Error('Message user context not found');
-throw new Error('User organization context not found');
-throw new Error('Organization data source not found');
+throw new Error('User is not associated with any active organizations');
+throw new Error('No active data sources found for organization');
 ```
+
+### Error Message Design
+- **User-friendly language**: Clear, non-technical descriptions
+- **Actionable guidance**: Tell users what to do (contact support)
+- **Future context**: Explain that features are coming
+- **Debugging support**: Help developers understand constraint violations
 
 ## Testing Strategy
 
-### Unit Tests Structure
+### Modular Unit Tests Structure
+
+#### File: `packages/database/tests/helpers/messageContext.test.ts`
 ```typescript
-// tests/helpers/messageContext.test.ts
+import { describe, test, expect, beforeEach, afterEach } from 'vitest';
+import { setupTestEnvironment, cleanupTestEnvironment } from '@buster/test-utils';
+import { createTestChat, createTestMessage } from '@buster/test-utils';
+import {
+  getMessageWithContext,
+  getUserOrganization,
+  getOrganizationDataSource,
+  getFullMessageContext,
+} from '../../src/helpers/messageContext';
+
 describe('Message Context Loading', () => {
   beforeEach(async () => {
-    await setupTestDatabase();
+    await setupTestEnvironment();
   });
   
   afterEach(async () => {
-    await cleanupTestDatabase();
+    await cleanupTestEnvironment();
   });
   
-  test('getMessageContext loads complete context', async () => {
+  test('getMessageWithContext loads basic context successfully', async () => {
     const { messageId, userId, chatId, organizationId } = await createTestMessage();
     
-    const context = await getMessageContext(messageId);
+    const context = await getMessageWithContext(messageId);
+    
+    expect(context.message.id).toBe(messageId);
+    expect(context.chat.id).toBe(chatId);
+    expect(context.user.id).toBe(userId);
+    expect(context.userId).toBe(userId);
+    expect(context.chatId).toBe(chatId);
+    expect(context.organizationId).toBe(organizationId);
+  });
+  
+  test('getUserOrganization returns single organization', async () => {
+    const { userId, organizationId } = await createTestMessage();
+    
+    const result = await getUserOrganization(userId);
+    
+    expect(result.organization.id).toBe(organizationId);
+    expect(result.userRole).toBeDefined();
+  });
+  
+  test('getUserOrganization throws for multiple organizations', async () => {
+    // Create user with multiple organizations
+    const { userId } = await createTestMessage();
+    // TODO: Create second organization association
+    
+    await expect(getUserOrganization(userId))
+      .rejects.toThrow('Multiple organization support is not available yet');
+  });
+  
+  test('getOrganizationDataSource returns single data source', async () => {
+    const { organizationId } = await createTestMessage();
+    
+    const dataSource = await getOrganizationDataSource(organizationId);
+    
+    expect(dataSource.id).toBeDefined();
+    expect(dataSource.type).toBeDefined();
+    expect(dataSource.organizationId).toBe(organizationId);
+  });
+  
+  test('getOrganizationDataSource throws for multiple data sources', async () => {
+    const { organizationId } = await createTestMessage();
+    // TODO: Create second data source
+    
+    await expect(getOrganizationDataSource(organizationId))
+      .rejects.toThrow('Data source selection is not available yet');
+  });
+  
+  test('getFullMessageContext loads complete context with concurrent queries', async () => {
+    const { messageId, userId, chatId, organizationId } = await createTestMessage();
+    
+    const context = await getFullMessageContext(messageId);
     
     expect(context.message.id).toBe(messageId);
     expect(context.chat.id).toBe(chatId);
     expect(context.user.id).toBe(userId);
     expect(context.organization.id).toBe(organizationId);
     expect(context.dataSource).toBeTruthy();
+    expect(context.dataSourceSyntax).toBeDefined();
+    expect(context.userRole).toBeDefined();
   });
   
-  test('getMessageContext throws for non-existent message', async () => {
-    await expect(getMessageContext('invalid-message-id'))
+  test('getFullMessageContext throws for non-existent message', async () => {
+    await expect(getFullMessageContext('invalid-message-id'))
       .rejects.toThrow('Message not found or has been deleted');
   });
+});
+```
+
+#### File: `packages/database/tests/helpers/conversationHistory.test.ts`
+```typescript
+import { describe, test, expect, beforeEach, afterEach } from 'vitest';
+import { setupTestEnvironment, cleanupTestEnvironment } from '@buster/test-utils';
+import { createTestChat, createTestMessage } from '@buster/test-utils';
+import {
+  getChatConversationHistory,
+  getMessageConversationHistory,
+} from '../../src/helpers/conversationHistory';
+
+describe('Conversation History Loading', () => {
+  beforeEach(async () => {
+    await setupTestEnvironment();
+  });
   
-  test('loadConversationHistory returns ordered messages', async () => {
-    const { chatId } = await createTestChatWithMessages(3);
+  afterEach(async () => {
+    await cleanupTestEnvironment();
+  });
+  
+  test('getChatConversationHistory returns ordered messages', async () => {
+    const { chatId } = await createTestChat();
+    // TODO: Create multiple messages with rawLlmMessages
     
-    const history = await loadConversationHistory(chatId);
+    const history = await getChatConversationHistory(chatId);
     
     expect(Array.isArray(history)).toBe(true);
-    expect(history.length).toBeGreaterThan(0);
+    // Add more specific assertions based on test data
+  });
+  
+  test('getMessageConversationHistory returns message history', async () => {
+    const { messageId } = await createTestMessage();
+    // TODO: Ensure message has rawLlmMessages data
+    
+    const history = await getMessageConversationHistory(messageId);
+    
+    expect(history).toBeDefined();
+    if (history) {
+      expect(Array.isArray(history)).toBe(true);
+    }
+  });
+  
+  test('getMessageConversationHistory returns null for message without history', async () => {
+    const { messageId } = await createTestMessage(); // Create without rawLlmMessages
+    
+    const history = await getMessageConversationHistory(messageId);
+    
+    expect(history).toBeNull();
   });
 });
 ```

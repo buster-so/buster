@@ -1,2 +1,2 @@
 export * from './analyst-agent-task';
-export * from './interfaces';
+export * from './types';
