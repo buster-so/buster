@@ -9,8 +9,8 @@
     "build": "npx trigger.dev@latest build"
   },
   "dependencies": {
-    "@trigger.dev/sdk": "^3.3.17",
-    "@buster/data-source": "*"
+    "@buster/data-source": "*",
+    "@trigger.dev/sdk": "^3.3.17"
   },
   "devDependencies": {
     "@trigger.dev/build": "^3.3.17",

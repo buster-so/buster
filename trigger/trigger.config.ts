@@ -1,3 +1,5 @@
+import path from 'node:path';
+import { esbuildPlugin } from '@trigger.dev/build/extensions';
 import { defineConfig } from '@trigger.dev/sdk/v3';
 
 export default defineConfig({
@@ -20,6 +22,30 @@ export default defineConfig({
   },
   build: {
     external: ['lz4', 'xxhash'],
+    extensions: [
+      esbuildPlugin({
+        name: 'buster-path-resolver',
+        setup(build) {
+          // Resolve all @buster/* imports
+          build.onResolve({ filter: /^@buster\// }, (args) => {
+            const packageName = args.path.replace('@buster/', '');
+            const resolvedPath = path.resolve(
+              process.cwd(),
+              '..',
+              'packages',
+              packageName,
+              'src',
+              'index.ts'
+            );
+
+            return {
+              path: resolvedPath,
+              namespace: 'file',
+            };
+          });
+        },
+      }),
+    ],
   },
   dirs: ['./src'],
 });
