@@ -1,7 +1,9 @@
+import { updateMessageFields } from '../../../../database/src/helpers/messages';
 import type { CoreMessage } from 'ai';
 import { eq } from 'drizzle-orm';
 import { getDb } from '../../../../database/src/connection';
 import { messages } from '../../../../database/src/schema';
+import { appendToReasoning } from './formatLlmMessagesAsReasoning';
 
 /**
  * Saves conversation history to the database
@@ -18,7 +20,7 @@ export async function saveConversationHistory(
   try {
     const db = getDb();
 
-    // Update the message with the new conversation history
+    // Keep the original logic exactly the same - only update rawLlmMessages
     await db
       .update(messages)
       .set({
@@ -37,6 +39,7 @@ export async function saveConversationHistory(
 /**
  * Helper to save conversation history from onStepFinish
  * Checks for messageId in runtime context before saving
+ * Now also saves messages as reasoning entries
  *
  * @param runtimeContext - The runtime context that may contain messageId
  * @param stepMessages - The messages from step.response.messages
@@ -53,8 +56,34 @@ export async function saveConversationHistoryFromStep(
     return;
   }
 
-  // Save the conversation history
-  await saveConversationHistory(messageId, stepMessages as CoreMessage[]);
+  try {
+    const db = getDb();
+
+    // First, get the current reasoning to append to it
+    const currentMessage = await db
+      .select({ reasoning: messages.reasoning })
+      .from(messages)
+      .where(eq(messages.id, messageId))
+      .limit(1);
+
+    const currentReasoning = Array.isArray(currentMessage[0]?.reasoning) 
+      ? currentMessage[0].reasoning 
+      : [];
+
+    // Build the new reasoning by appending new messages as reasoning entries
+    const updatedReasoning = appendToReasoning(currentReasoning, stepMessages as CoreMessage[]);
+
+    // Update both rawLlmMessages and reasoning in a single call
+    await updateMessageFields(messageId, {
+      rawLlmMessages: stepMessages as CoreMessage[],
+      reasoning: updatedReasoning,
+    });
+  } catch (error) {
+    console.error('Failed to save conversation history and reasoning:', error);
+    throw new Error(
+      `Failed to save conversation history and reasoning: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
 }
 
 /**
@@ -76,7 +105,7 @@ export async function loadConversationHistory(messageId: string): Promise<CoreMe
       .where(eq(messages.id, messageId))
       .limit(1);
 
-    if (result.length === 0) {
+    if (result.length === 0 || !result[0]) {
       return null;
     }
 
@@ -86,3 +115,4 @@ export async function loadConversationHistory(messageId: string): Promise<CoreMe
     return null;
   }
 }
+

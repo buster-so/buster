@@ -1,9 +1,9 @@
 {
   "name": "server",
   "scripts": {
-    "dev": "bun run --hot src/index.ts",
+    "dev": "bun --max-old-space-size=512 run --hot src/index.ts",
     "build": "bun build src/index.ts --outdir ./dist --target bun",
-    "start": "bun run dist/index.js",
+    "start": "bun --max-old-space-size=512 run dist/index.js",
     "prod": "bun run build && bun run start"
   },
   "dependencies": {

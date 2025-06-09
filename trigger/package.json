@@ -19,7 +19,7 @@
     "@buster/database": "*",
     "@buster/data-source": "*",
     "@trigger.dev/sdk": "^3.3.17",
-    "braintrust": "^0.1.1",
+    "braintrust": "^0.0.205",
     "zod": "^3.25.56"
   },
   "devDependencies": {

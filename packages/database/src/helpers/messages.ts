@@ -237,3 +237,71 @@ export async function updateMessageStreamingFields(
     throw new Error(`Failed to update streaming fields for message ${messageId}`);
   }
 }
+
+/**
+ * Flexibly update message fields - only updates fields that are provided
+ * Allows updating responseMessages, reasoning, and/or rawLlmMessages in a single query
+ * Note: reasoning field has NOT NULL constraint, so null values are not allowed
+ * @param messageId - The ID of the message to update
+ * @param fields - Object containing the fields to update (only provided fields will be updated)
+ * @returns Success status
+ */
+export async function updateMessageFields(
+  messageId: string,
+  fields: {
+    responseMessages?: any;
+    reasoning?: any;
+    rawLlmMessages?: any;
+  }
+): Promise<{ success: boolean }> {
+  try {
+    // First verify the message exists and is not deleted
+    const existingMessage = await db
+      .select({ id: messages.id })
+      .from(messages)
+      .where(and(eq(messages.id, messageId), isNull(messages.deletedAt)))
+      .limit(1);
+
+    if (existingMessage.length === 0) {
+      throw new Error(`Message not found or has been deleted: ${messageId}`);
+    }
+
+    // Validate reasoning is not null if provided (database constraint)
+    if ('reasoning' in fields && (fields.reasoning === null || fields.reasoning === undefined)) {
+      throw new Error('Reasoning cannot be null - database constraint violation');
+    }
+
+    // Build update object with only provided fields
+    const updateData: any = {
+      updatedAt: new Date().toISOString(),
+    };
+
+    if ('responseMessages' in fields) {
+      updateData.responseMessages = fields.responseMessages;
+    }
+    if ('reasoning' in fields) {
+      updateData.reasoning = fields.reasoning;
+    }
+    if ('rawLlmMessages' in fields) {
+      updateData.rawLlmMessages = fields.rawLlmMessages;
+    }
+
+    await db
+      .update(messages)
+      .set(updateData)
+      .where(and(eq(messages.id, messageId), isNull(messages.deletedAt)));
+
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to update message fields:', error);
+    // Re-throw our specific validation errors
+    if (
+      error instanceof Error &&
+      (error.message.includes('Message not found') ||
+        error.message.includes('Reasoning cannot be null'))
+    ) {
+      throw error;
+    }
+    throw new Error(`Failed to update message fields for message ${messageId}`);
+  }
+}

@@ -27,7 +27,7 @@ dev:
 		echo "Electric service is already running."; \
 	fi
 	echo "Starting bun dev..."
-	bun dev
+	bun --max-old-space-size=512 dev
 
 
 stop:

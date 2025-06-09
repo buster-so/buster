@@ -1,5 +1,5 @@
 import { createTestChat } from '../chats/createTestChat';
-import { createTestMessage, type CreateTestMessageOptions } from './createTestMessage';
+import { type CreateTestMessageOptions, createTestMessage } from './createTestMessage';
 
 /**
  * Creates a test message with full context (chat, organization, user)

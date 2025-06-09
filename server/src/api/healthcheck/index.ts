@@ -41,11 +41,13 @@ async function checkDatabase(): Promise<{
 
 function checkMemory(): { status: 'pass' | 'fail' | 'warn'; message?: string } {
   const memUsage = process.memoryUsage();
+  
+  // Calculate percentage using raw bytes for accuracy
+  const usagePercent = (memUsage.heapUsed / memUsage.heapTotal) * 100;
+  
+  // Round values for display only
   const heapUsedMB = Math.round(memUsage.heapUsed / 1024 / 1024);
   const heapTotalMB = Math.round(memUsage.heapTotal / 1024 / 1024);
-
-  // Warn if using more than 80% of allocated heap
-  const usagePercent = (heapUsedMB / heapTotalMB) * 100;
 
   if (usagePercent > 90) {
     return {

@@ -1,6 +1,6 @@
-import { errorResponse } from '@/utils/response';
+import { errorResponse } from '../../../utils/response';
 import { type Context } from 'hono';
-import { canUserAccessChat } from '@/access-controls/chats';
+import { canUserAccessChat } from '@buster/access-controls/chats';
 import { extractParamFromWhere } from './_helpers';
 
 export const messagesProxyRouter = async (url: URL, userId: string, c: Context) => {

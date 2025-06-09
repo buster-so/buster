@@ -35,6 +35,63 @@ export const thinkAndPrepOutputSchema = z.object({});
 
 const outputSchema = ThinkAndPrepOutputSchema;
 
+// Helper function for think-and-prep onStepFinish callback
+const handleThinkAndPrepStepFinish = async ({
+  step,
+  messages,
+  runtimeContext,
+  abortController,
+}: {
+  step: any;
+  messages: CoreMessage[];
+  runtimeContext: RuntimeContext<AnalystRuntimeContext>;
+  abortController: AbortController;
+}) => {
+  const toolNames = step.toolCalls.map((call: any) => call.toolName);
+  let outputMessages: MessageHistory = [];
+  let finished = false;
+  let finalStepData: StepFinishData | null = null;
+  let shouldAbort = false;
+
+  if (
+    toolNames.some((toolName: string) => ['submitThoughts', 'finishAndRespond'].includes(toolName))
+  ) {
+    // Extract and validate messages from the step response
+    // step.response.messages contains the conversation history for this step
+    const agentResponseMessages = extractMessageHistory(step.response.messages);
+
+    // Build complete conversation history: input messages + agent response messages
+    // This preserves the user messages along with assistant/tool responses
+    outputMessages = [...messages, ...agentResponseMessages];
+
+    // Save conversation history to database before aborting
+    try {
+      await saveConversationHistoryFromStep(runtimeContext as any, outputMessages);
+    } catch (error) {
+      console.error('Failed to save think-and-prep conversation history:', error);
+      // Continue with abort even if save fails to avoid hanging
+    }
+
+    // Store the full step data (cast to our expected type)
+    finalStepData = step as any;
+
+    // Set finished to true if finishAndRespondTool was called
+    if (toolNames.includes('finishAndRespond')) {
+      finished = true;
+    }
+
+    shouldAbort = true;
+    abortController.abort();
+  }
+
+  return {
+    outputMessages,
+    finished,
+    finalStepData,
+    shouldAbort,
+  };
+};
+
 const thinkAndPrepExecution = async ({
   inputData,
   getInitData,
@@ -83,39 +140,16 @@ const thinkAndPrepExecution = async ({
           abortSignal: abortController.signal,
           toolChoice: 'required',
           onStepFinish: async (step) => {
-            const toolNames = step.toolCalls.map((call) => call.toolName);
+            const result = await handleThinkAndPrepStepFinish({
+              step,
+              messages,
+              runtimeContext,
+              abortController,
+            });
 
-            if (
-              toolNames.some((toolName) =>
-                ['submitThoughts', 'finishAndRespond'].includes(toolName)
-              )
-            ) {
-              // Extract and validate messages from the step response
-              // step.response.messages contains the conversation history for this step
-              const agentResponseMessages = extractMessageHistory(step.response.messages);
-
-              // Build complete conversation history: input messages + agent response messages
-              // This preserves the user messages along with assistant/tool responses
-              outputMessages = [...messages, ...agentResponseMessages];
-
-              // Save conversation history to database before aborting
-              try {
-                await saveConversationHistoryFromStep(runtimeContext as any, outputMessages);
-              } catch (error) {
-                console.error('Failed to save think-and-prep conversation history:', error);
-                // Continue with abort even if save fails to avoid hanging
-              }
-
-              // Store the full step data (cast to our expected type)
-              finalStepData = step as any;
-
-              // Set finished to true if finishAndRespondTool was called
-              if (toolNames.includes('finishAndRespond')) {
-                finished = true;
-              }
-
-              abortController.abort();
-            }
+            outputMessages = result.outputMessages;
+            finished = result.finished;
+            finalStepData = result.finalStepData;
           },
         });
 
