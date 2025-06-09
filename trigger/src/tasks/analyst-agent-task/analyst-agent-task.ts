@@ -134,14 +134,14 @@ export const analystAgentTask = schemaTask({
             runtimeContext,
           });
         },
-        { 
+        {
           name: 'Analyst Agent Task Workflow',
           metadata: {
             messageId: payload.message_id,
             organizationId: messageContext.organizationId,
             dataSourceId: dataSource.dataSourceId,
             hasConversationHistory: !!workflowInput.conversationHistory,
-          }
+          },
         }
       );
 

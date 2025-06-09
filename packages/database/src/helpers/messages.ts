@@ -88,3 +88,152 @@ export async function getAllRawLlmMessagesForChat(chatId: string) {
     createdAt: msg.createdAt,
   }));
 }
+
+/**
+ * Efficiently update the responseMessages JSONB field for a specific message
+ * Optimized for frequent streaming updates - replaces entire JSONB content
+ * @param messageId - The ID of the message to update
+ * @param responseMessages - The new response messages content (will completely replace existing)
+ * @returns Success status
+ */
+export async function updateMessageResponseMessages(
+  messageId: string,
+  responseMessages: any
+): Promise<{ success: boolean }> {
+  try {
+    // First verify the message exists and is not deleted
+    const existingMessage = await db
+      .select({ id: messages.id })
+      .from(messages)
+      .where(and(eq(messages.id, messageId), isNull(messages.deletedAt)))
+      .limit(1);
+
+    if (existingMessage.length === 0) {
+      throw new Error(`Message not found or has been deleted: ${messageId}`);
+    }
+
+    await db
+      .update(messages)
+      .set({
+        responseMessages,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(and(eq(messages.id, messageId), isNull(messages.deletedAt)));
+
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to update message responseMessages:', error);
+    // Re-throw our specific validation errors
+    if (error instanceof Error && error.message.includes('Message not found')) {
+      throw error;
+    }
+    throw new Error(`Failed to update response messages for message ${messageId}`);
+  }
+}
+
+/**
+ * Efficiently update the reasoning JSONB field for a specific message
+ * Optimized for frequent streaming updates - replaces entire JSONB content
+ * Note: reasoning field has NOT NULL constraint, so null values are not allowed
+ * @param messageId - The ID of the message to update
+ * @param reasoning - The new reasoning content (will completely replace existing)
+ * @returns Success status
+ */
+export async function updateMessageReasoning(
+  messageId: string,
+  reasoning: any
+): Promise<{ success: boolean }> {
+  try {
+    // First verify the message exists and is not deleted
+    const existingMessage = await db
+      .select({ id: messages.id })
+      .from(messages)
+      .where(and(eq(messages.id, messageId), isNull(messages.deletedAt)))
+      .limit(1);
+
+    if (existingMessage.length === 0) {
+      throw new Error(`Message not found or has been deleted: ${messageId}`);
+    }
+
+    // Validate reasoning is not null (database constraint)
+    if (reasoning === null || reasoning === undefined) {
+      throw new Error('Reasoning cannot be null - database constraint violation');
+    }
+
+    await db
+      .update(messages)
+      .set({
+        reasoning,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(and(eq(messages.id, messageId), isNull(messages.deletedAt)));
+
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to update message reasoning:', error);
+    // Re-throw our specific validation errors
+    if (
+      error instanceof Error &&
+      (error.message.includes('Message not found') ||
+        error.message.includes('Reasoning cannot be null'))
+    ) {
+      throw error;
+    }
+    throw new Error(`Failed to update reasoning for message ${messageId}`);
+  }
+}
+
+/**
+ * Efficiently update both responseMessages and reasoning JSONB fields in a single query
+ * Most efficient option when both fields need updating during streaming
+ * Note: reasoning field has NOT NULL constraint, so null values are not allowed
+ * @param messageId - The ID of the message to update
+ * @param responseMessages - The new response messages content
+ * @param reasoning - The new reasoning content (cannot be null)
+ * @returns Success status
+ */
+export async function updateMessageStreamingFields(
+  messageId: string,
+  responseMessages: any,
+  reasoning: any
+): Promise<{ success: boolean }> {
+  try {
+    // First verify the message exists and is not deleted
+    const existingMessage = await db
+      .select({ id: messages.id })
+      .from(messages)
+      .where(and(eq(messages.id, messageId), isNull(messages.deletedAt)))
+      .limit(1);
+
+    if (existingMessage.length === 0) {
+      throw new Error(`Message not found or has been deleted: ${messageId}`);
+    }
+
+    // Validate reasoning is not null (database constraint)
+    if (reasoning === null || reasoning === undefined) {
+      throw new Error('Reasoning cannot be null - database constraint violation');
+    }
+
+    await db
+      .update(messages)
+      .set({
+        responseMessages,
+        reasoning,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(and(eq(messages.id, messageId), isNull(messages.deletedAt)));
+
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to update message streaming fields:', error);
+    // Re-throw our specific validation errors
+    if (
+      error instanceof Error &&
+      (error.message.includes('Message not found') ||
+        error.message.includes('Reasoning cannot be null'))
+    ) {
+      throw error;
+    }
+    throw new Error(`Failed to update streaming fields for message ${messageId}`);
+  }
+}

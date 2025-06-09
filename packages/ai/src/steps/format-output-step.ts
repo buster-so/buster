@@ -45,7 +45,6 @@ const formatOutputExecution = async ({
 }: {
   inputData: z.infer<typeof inputSchema>;
 }): Promise<z.infer<typeof outputSchema>> => {
-
   // Determine which format we're receiving and extract the step data
   let stepData: any;
 
@@ -62,7 +61,6 @@ const formatOutputExecution = async ({
     throw new Error('Unrecognized input format for format-output-step');
   }
 
-
   // Map the step data to the clean output format
   const output = {
     // Core conversation data - always available
@@ -77,7 +75,6 @@ const formatOutputExecution = async ({
     todos: stepData.metadata?.todos,
     values: stepData.metadata?.values,
   };
-
 
   return output;
 };
