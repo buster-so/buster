@@ -4,18 +4,7 @@ import { Hono } from 'hono';
 import userRoutes from './users';
 import electricShapeRoutes from './electric-shape';
 
-const app = new Hono();
-
-app.get('/healthcheck', (c) => {
-  return c.json({
-    success: true,
-    message: 'API v2 is healthy',
-    timestamp: new Date().toISOString()
-  });
-});
-
-app.route('/users', userRoutes);
-app.route('/electric-shape', electricShapeRoutes);
+const app = new Hono().route('/users', userRoutes).route('/electric-shape', electricShapeRoutes);
 
 // TODO: Add more feature routes as they are created
 // import datasetRoutes from './datasets';

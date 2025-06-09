@@ -4,7 +4,6 @@ import { BASE_URL_V2 } from './buster_rest/config';
 
 export const createHonoInstance = (baseURL: string) => {
   const apiInstance = hc<AppType>(baseURL);
-
   return apiInstance;
 };
 

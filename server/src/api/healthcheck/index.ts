@@ -120,9 +120,6 @@ async function healthCheckHandler(c: Context) {
 }
 
 // Create healthcheck routes
-const healthcheckRoutes = new Hono();
+const app = new Hono().get('/', healthCheckHandler);
 
-// GET /healthcheck - Comprehensive health check
-healthcheckRoutes.get('/', healthCheckHandler);
-
-export default healthcheckRoutes;
+export default app;
