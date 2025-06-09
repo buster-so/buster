@@ -4,6 +4,7 @@ import React from 'react';
 import { useGetChatMessage } from '@/api/buster_rest/chats';
 import { ChatResponseMessages } from './ChatResponseMessages';
 import { ChatUserMessage } from './ChatUserMessage';
+import { useGetMessage } from '@/api/buster-electric/messages';
 
 export const ChatMessageBlock: React.FC<{
   messageId: string;
@@ -19,6 +20,9 @@ export const ChatMessageBlock: React.FC<{
   const { data: isCompletedStream = false } = useGetChatMessage(messageId, {
     select: (x) => x?.isCompletedStream
   });
+
+  const { data: message } = useGetMessage({ chatId, messageId });
+  console.log(message);
 
   if (!messageExists) return null;
 
