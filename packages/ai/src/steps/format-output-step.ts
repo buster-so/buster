@@ -27,6 +27,12 @@ const inputSchema = z.union([
       })
       .optional(),
   }),
+  // Handle Mastra workflow branching output format - when branch doesn't execute
+  z.object({
+    'think-and-prep': ThinkAndPrepOutputSchema,
+  }),
+  // Handle any other potential workflow structures - fallback for debugging
+  z.record(z.any()),
 ]);
 
 // Clean output schema matching the workflow output schema
@@ -62,27 +68,42 @@ const formatOutputExecution = async ({
     // Direct format from analyst step
     stepData = inputData;
   } else {
-    // Enhanced error logging for debugging
-    console.error('Unrecognized input format for format-output-step:', {
-      inputKeys: Object.keys(inputData),
-      inputData: JSON.stringify(inputData, null, 2),
-    });
-    throw new Error('Unrecognized input format for format-output-step');
+    // Try to find any step data in the input structure
+    const inputKeys = Object.keys(inputData);
+    
+    // Look for step data in any key that looks like step output
+    for (const key of inputKeys) {
+      const value = (inputData as any)[key];
+      if (value && typeof value === 'object' && 
+          ('outputMessages' in value || 'conversationHistory' in value || 'finished' in value)) {
+        stepData = value;
+        break;
+      }
+    }
+    
+    if (!stepData) {
+      // Enhanced error logging for debugging
+      console.error('Unrecognized input format for format-output-step:', {
+        inputKeys: Object.keys(inputData),
+        inputData: JSON.stringify(inputData, null, 2),
+      });
+      throw new Error('Unrecognized input format for format-output-step');
+    }
   }
 
-  // Map the step data to the clean output format
+  // Map the step data to the clean output format with safety checks
   const output = {
-    // Core conversation data - always available
-    conversationHistory: stepData.conversationHistory,
-    finished: stepData.finished,
-    outputMessages: stepData.outputMessages,
-    stepData: stepData.stepData,
-    metadata: stepData.metadata,
+    // Core conversation data - with fallback defaults
+    conversationHistory: stepData.conversationHistory || [],
+    finished: stepData.finished ?? false,
+    outputMessages: stepData.outputMessages || [],
+    stepData: stepData.stepData || null,
+    metadata: stepData.metadata || null,
 
     // Additional fields from metadata if available
-    title: stepData.metadata?.title,
-    todos: stepData.metadata?.todos,
-    values: stepData.metadata?.values,
+    title: stepData.metadata?.title || undefined,
+    todos: stepData.metadata?.todos || undefined,
+    values: stepData.metadata?.values || undefined,
   };
 
   return output;

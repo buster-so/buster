@@ -102,9 +102,56 @@ describe('Format Output Step Unit Tests', () => {
     });
   });
 
-  test('should throw error for unrecognized input format', async () => {
+  test('should handle nested workflow format with think-and-prep only', async () => {
+    const nestedInput = {
+      'think-and-prep': {
+        finished: true,
+        outputMessages: [
+          { role: 'user' as const, content: 'Hello' },
+          { role: 'assistant' as const, content: 'Hi there!' },
+        ],
+        conversationHistory: [
+          { role: 'user' as const, content: 'Hello' },
+          { role: 'assistant' as const, content: 'Hi there!' },
+        ],
+        stepData: { test: 'data' },
+        metadata: { test: 'metadata' },
+      },
+    };
+
+    const result = await formatOutputStep.execute({
+      inputData: nestedInput,
+      getInitData: async () => ({ prompt: 'test' }),
+      runtimeContext: {} as any,
+    });
+
+    expect(result.conversationHistory).toEqual(nestedInput['think-and-prep'].conversationHistory);
+    expect(result.finished).toBe(true);
+  });
+
+  test('should handle dynamic step data discovery', async () => {
+    const dynamicInput = {
+      'some-step-name': {
+        conversationHistory: [{ role: 'user' as const, content: 'test' }],
+        finished: false,
+        outputMessages: [{ role: 'assistant' as const, content: 'response' }],
+      },
+    };
+
+    const result = await formatOutputStep.execute({
+      inputData: dynamicInput,
+      getInitData: async () => ({ prompt: 'test' }),
+      runtimeContext: {} as any,
+    });
+
+    expect(result.conversationHistory).toEqual(dynamicInput['some-step-name'].conversationHistory);
+    expect(result.finished).toBe(false);
+  });
+
+  test('should throw error for truly unrecognized input format', async () => {
     const invalidInput = {
       someUnknownProperty: 'value',
+      anotherProperty: { noStepData: true },
     };
 
     await expect(
