@@ -8,8 +8,7 @@ import {
   getOrganizationDataSource,
 } from '@buster/database';
 
-import analystWorkflow from '@buster/ai/src/workflows/analyst-workflow';
-import type { AnalystRuntimeContext } from '@buster/ai/src/workflows/analyst-workflow';
+import analystWorkflow, { type AnalystRuntimeContext } from '@buster/ai/workflows/analyst-workflow';
 // Mastra workflow integration
 import { RuntimeContext } from '@mastra/core/runtime-context';
 

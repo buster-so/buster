@@ -28,15 +28,35 @@ export default defineConfig({
         setup(build) {
           // Resolve all @buster/* imports
           build.onResolve({ filter: /^@buster\// }, (args) => {
-            const packageName = args.path.replace('@buster/', '');
-            const resolvedPath = path.resolve(
-              process.cwd(),
-              '..',
-              'packages',
-              packageName,
-              'src',
-              'index.ts'
-            );
+            const fullPath = args.path.replace('@buster/', '');
+            const parts = fullPath.split('/');
+            const packageName = parts[0];
+            const subPath = parts.slice(1).join('/');
+
+            let resolvedPath;
+            if (subPath) {
+              // Handle sub-paths like @buster/ai/workflows/analyst-workflow
+              // Check if subPath already starts with 'src', if so, don't add it again
+              const cleanSubPath = subPath.startsWith('src/') ? subPath.slice(4) : subPath;
+              resolvedPath = path.resolve(
+                process.cwd(),
+                '..',
+                'packages',
+                packageName,
+                'src',
+                cleanSubPath + '.ts'
+              );
+            } else {
+              // Handle direct package imports like @buster/ai
+              resolvedPath = path.resolve(
+                process.cwd(),
+                '..',
+                'packages',
+                packageName,
+                'src',
+                'index.ts'
+              );
+            }
 
             return {
               path: resolvedPath,
