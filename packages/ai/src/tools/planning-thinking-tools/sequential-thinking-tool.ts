@@ -58,6 +58,92 @@ const sequentialThinkingSchema = z.object({
   needsMoreThoughts: z.boolean().describe('If reaching end but realizing more thoughts needed.'),
 });
 
+/**
+ * Optimistic parsing function for streaming sequential-thinking tool arguments
+ * Extracts key fields as they're being built incrementally
+ */
+export function parseStreamingArgs(accumulatedText: string): Partial<z.infer<typeof sequentialThinkingSchema>> | null {
+  try {
+    // First try to parse as complete JSON
+    const parsed = JSON.parse(accumulatedText);
+    const result: Partial<z.infer<typeof sequentialThinkingSchema>> = {};
+    
+    // Only include fields that are actually present
+    if (parsed.thought !== undefined) result.thought = parsed.thought;
+    if (parsed.nextThoughtNeeded !== undefined) result.nextThoughtNeeded = parsed.nextThoughtNeeded;
+    if (parsed.thoughtNumber !== undefined) result.thoughtNumber = parsed.thoughtNumber;
+    if (parsed.totalThoughts !== undefined) result.totalThoughts = parsed.totalThoughts;
+    if (parsed.isRevision !== undefined) result.isRevision = parsed.isRevision;
+    if (parsed.revisesThought !== undefined) result.revisesThought = parsed.revisesThought;
+    if (parsed.branchFromThought !== undefined) result.branchFromThought = parsed.branchFromThought;
+    if (parsed.branchId !== undefined) result.branchId = parsed.branchId;
+    if (parsed.needsMoreThoughts !== undefined) result.needsMoreThoughts = parsed.needsMoreThoughts;
+    
+    return result;
+  } catch {
+    // If JSON is incomplete, try to extract partial fields
+    const result: Partial<z.infer<typeof sequentialThinkingSchema>> = {};
+    
+    // Extract thought field (main text content)
+    const thoughtMatch = accumulatedText.match(/"thought"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+    if (thoughtMatch) {
+      result.thought = thoughtMatch[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+    } else {
+      // Try to extract incomplete thought string
+      const partialThoughtMatch = accumulatedText.match(/"thought"\s*:\s*"((?:[^"\\]|\\.*)*)/);
+      if (partialThoughtMatch) {
+        result.thought = partialThoughtMatch[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+      }
+    }
+
+    // Extract boolean fields
+    const nextThoughtMatch = accumulatedText.match(/"nextThoughtNeeded"\s*:\s*(true|false)/);
+    if (nextThoughtMatch) {
+      result.nextThoughtNeeded = nextThoughtMatch[1] === 'true';
+    }
+
+    const isRevisionMatch = accumulatedText.match(/"isRevision"\s*:\s*(true|false)/);
+    if (isRevisionMatch) {
+      result.isRevision = isRevisionMatch[1] === 'true';
+    }
+
+    const needsMoreThoughtsMatch = accumulatedText.match(/"needsMoreThoughts"\s*:\s*(true|false)/);
+    if (needsMoreThoughtsMatch) {
+      result.needsMoreThoughts = needsMoreThoughtsMatch[1] === 'true';
+    }
+
+    // Extract number fields
+    const thoughtNumberMatch = accumulatedText.match(/"thoughtNumber"\s*:\s*(\d+)/);
+    if (thoughtNumberMatch) {
+      result.thoughtNumber = parseInt(thoughtNumberMatch[1], 10);
+    }
+
+    const totalThoughtsMatch = accumulatedText.match(/"totalThoughts"\s*:\s*(\d+)/);
+    if (totalThoughtsMatch) {
+      result.totalThoughts = parseInt(totalThoughtsMatch[1], 10);
+    }
+
+    const revisesThoughtMatch = accumulatedText.match(/"revisesThought"\s*:\s*(\d+)/);
+    if (revisesThoughtMatch) {
+      result.revisesThought = parseInt(revisesThoughtMatch[1], 10);
+    }
+
+    const branchFromThoughtMatch = accumulatedText.match(/"branchFromThought"\s*:\s*(\d+)/);
+    if (branchFromThoughtMatch) {
+      result.branchFromThought = parseInt(branchFromThoughtMatch[1], 10);
+    }
+
+    // Extract string fields
+    const branchIdMatch = accumulatedText.match(/"branchId"\s*:\s*"([^"]*)"/);
+    if (branchIdMatch) {
+      result.branchId = branchIdMatch[1];
+    }
+
+    // Return result if we found at least one field
+    return Object.keys(result).length > 0 ? result : null;
+  }
+}
+
 // Tool implementation
 export const sequentialThinking = createTool({
   id: 'sequential-thinking',

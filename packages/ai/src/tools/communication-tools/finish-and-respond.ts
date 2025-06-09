@@ -12,6 +12,43 @@ const finishAndRespondInputSchema = z.object({
     ),
 });
 
+/**
+ * Optimistic parsing function for streaming finish-and-respond tool arguments
+ * Extracts the final_response field as it's being built incrementally
+ */
+export function parseStreamingArgs(accumulatedText: string): Partial<z.infer<typeof finishAndRespondInputSchema>> | null {
+  try {
+    // First try to parse as complete JSON
+    const parsed = JSON.parse(accumulatedText);
+    return {
+      final_response: parsed.final_response !== undefined ? parsed.final_response : undefined,
+    };
+  } catch {
+    // If JSON is incomplete, try to extract partial final_response field
+    // Handle both complete and incomplete strings, accounting for escaped quotes
+    const match = accumulatedText.match(/"final_response"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+    if (match) {
+      // Unescape the string
+      const unescaped = match[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+      return {
+        final_response: unescaped,
+      };
+    }
+
+    // Try to extract partial string that's still being built (incomplete quote)
+    const partialMatch = accumulatedText.match(/"final_response"\s*:\s*"((?:[^"\\]|\\.)*)/);
+    if (partialMatch) {
+      // Unescape the partial string
+      const unescaped = partialMatch[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+      return {
+        final_response: unescaped,
+      };
+    }
+
+    return null;
+  }
+}
+
 const finishAndRespondOutputSchema = z.object({});
 
 // Process done tool execution with todo management

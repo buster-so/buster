@@ -1313,3 +1313,69 @@ function generateResultMessage(
 
   return `${successMsg}Failed to create ${failures.length} metric files:\n${failures.join('\n')}`;
 }
+
+/**
+ * Optimistic parsing function for streaming create-metrics-file tool arguments
+ * Extracts the files array as it's being built incrementally
+ */
+export function parseStreamingArgs(accumulatedText: string): Partial<{ files: Array<{ name: string; yml_content: string }> }> | null {
+  try {
+    // First try to parse as complete JSON
+    const parsed = JSON.parse(accumulatedText);
+    return {
+      files: parsed.files || undefined,
+    };
+  } catch {
+    // If JSON is incomplete, try to extract and reconstruct the files array
+    const filesMatch = accumulatedText.match(/"files"\s*:\s*\[(.*)/s);
+    if (filesMatch) {
+      const arrayContent = filesMatch[1];
+      
+      try {
+        // Try to parse the array content by adding closing bracket
+        const testArray = '[' + arrayContent + ']';
+        const parsed = JSON.parse(testArray);
+        return { files: parsed };
+      } catch {
+        // If that fails, try to extract file objects (both complete and incomplete)
+        const files: Array<{ name: string; yml_content: string }> = [];
+        
+        // First, try to match complete file objects
+        const completeFileMatches = arrayContent.matchAll(/\{\s*"name"\s*:\s*"([^"]*?)"\s*,\s*"yml_content"\s*:\s*"((?:[^"\\]|\\.)*)"\s*\}/g);
+        
+        for (const match of completeFileMatches) {
+          files.push({
+            name: match[1],
+            yml_content: match[2].replace(/\\"/g, '"').replace(/\\n/g, '\n').replace(/\\\\/g, '\\'),
+          });
+        }
+        
+        // If no complete files found, try to extract partial file objects
+        if (files.length === 0) {
+          // Try to match incomplete file objects that have at least name and partial yml_content
+          const incompleteFileMatch = arrayContent.match(/\{\s*"name"\s*:\s*"([^"]*?)"\s*,\s*"yml_content"\s*:\s*"((?:[^"\\]|\\.)*)/);
+          
+          if (incompleteFileMatch) {
+            const name = incompleteFileMatch[1];
+            const ymlContent = incompleteFileMatch[2].replace(/\\"/g, '"').replace(/\\n/g, '\n').replace(/\\\\/g, '\\');
+            
+            files.push({
+              name,
+              yml_content: ymlContent,
+            });
+          }
+        }
+        
+        return { files };
+      }
+    }
+
+    // Check if we at least have the start of the files field
+    const partialMatch = accumulatedText.match(/"files"\s*:\s*\[/);
+    if (partialMatch) {
+      return { files: [] };
+    }
+
+    return null;
+  }
+}

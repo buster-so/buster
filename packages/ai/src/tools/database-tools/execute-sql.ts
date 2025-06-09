@@ -20,6 +20,54 @@ const executeSqlStatementInputSchema = z.object({
   ),
 });
 
+/**
+ * Optimistic parsing function for streaming execute-sql tool arguments
+ * Extracts the statements array as it's being built incrementally
+ */
+export function parseStreamingArgs(accumulatedText: string): Partial<z.infer<typeof executeSqlStatementInputSchema>> | null {
+  try {
+    // First try to parse as complete JSON
+    const parsed = JSON.parse(accumulatedText);
+    return {
+      statements: parsed.statements || undefined,
+    };
+  } catch {
+    // If JSON is incomplete, try to extract and reconstruct the statements array
+    const statementsMatch = accumulatedText.match(/"statements"\s*:\s*\[(.*)/s);
+    if (statementsMatch) {
+      const arrayContent = statementsMatch[1];
+      
+      try {
+        // Try to parse the array content by adding closing bracket
+        const testArray = '[' + arrayContent + ']';
+        const parsed = JSON.parse(testArray);
+        return { statements: parsed };
+      } catch {
+        // If that fails, try to extract individual statement strings that are complete
+        const statements: string[] = [];
+        
+        // Match complete string statements within the array
+        const statementMatches = arrayContent.matchAll(/"((?:[^"\\]|\\.)*)"/g);
+        
+        for (const match of statementMatches) {
+          const statement = match[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+          statements.push(statement);
+        }
+        
+        return { statements };
+      }
+    }
+
+    // Check if we at least have the start of the statements field
+    const partialMatch = accumulatedText.match(/"statements"\s*:\s*\[/);
+    if (partialMatch) {
+      return { statements: [] };
+    }
+
+    return null;
+  }
+}
+
 const executeSqlStatementOutputSchema = z.object({
   results: z.array(
     z.discriminatedUnion('status', [
