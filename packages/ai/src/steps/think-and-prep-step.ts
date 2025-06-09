@@ -128,13 +128,10 @@ const thinkAndPrepExecution = async ({
 
     const stream = await wrappedStream();
 
-    for await (const _ of stream.fullStream) {
+    for await (const chunk of stream.fullStream) {
+      console.log('=== THINK AND PREP STEP OUTPUT ===');
+      console.log('Chunk:', JSON.stringify(chunk, null, 2));
     }
-
-    console.log('=== THINK AND PREP STEP OUTPUT ===');
-    console.log('Finished:', finished);
-    console.log('Output messages length:', outputMessages.length);
-    console.log('Conversation history being returned:', outputMessages);
 
     return {
       finished,
