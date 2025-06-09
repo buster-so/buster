@@ -9,6 +9,9 @@
     "build": "npx trigger.dev@latest build",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:integration": "vitest run tests/integration",
+    "test:integration:watch": "vitest watch tests/integration",
+    "test:unit": "vitest run tests/unit",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -20,6 +23,7 @@
     "zod": "^3.25.56"
   },
   "devDependencies": {
+    "@buster/test-utils": "*",
     "@trigger.dev/build": "^3.3.17",
     "@types/node": "^22.15.24",
     "typescript": "^5.8.3",

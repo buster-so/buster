@@ -8,8 +8,10 @@
   ],
   "scripts": {
     "ai:dev": "npm run --cwd packages/ai dev",
-    "trigger:dev": "npm run --cwd trigger dev",
-    "trigger:deploy": "npm run --cwd trigger deploy",
+    "trigger:dev": "npm run dev --workspace=trigger",
+    "trigger:deploy": "npm run deploy --workspace=trigger",
+    "trigger:test": "npm run test --workspace=trigger",
+    "trigger:test:integration": "npm run test:integration --workspace=trigger",
     "evals": "bash scripts/evals.sh",
     "db": "npm run --cwd packages/database ${1:-db:generate}",
     "test": "vitest run",

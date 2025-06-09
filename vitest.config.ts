@@ -8,7 +8,7 @@ export default defineConfig(async () => {
   return {
     plugins: [tsconfigPaths()],
     test: {
-      projects: ['packages/*'],
+      projects: ['packages/*', 'trigger'],
       include: ['**/*.test.ts', '**/*.integration.test.ts', '**/*.unit.test.ts', '**/*.int.test.ts'],
       globals: true,
       environment: 'node',
