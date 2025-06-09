@@ -4,6 +4,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
     "baseUrl": ".",
+    "rootDir": "..",
     "composite": true,
     "declaration": true,
     "declarationMap": true,
@@ -13,6 +14,6 @@
       "@/access-controls/*": ["../packages/access-controls/src/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../packages/access-controls/src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

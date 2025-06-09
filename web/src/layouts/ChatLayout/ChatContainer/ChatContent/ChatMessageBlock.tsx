@@ -22,7 +22,6 @@ export const ChatMessageBlock: React.FC<{
   });
 
   const { data: message } = useGetMessage({ chatId, messageId });
-  console.log(message);
 
   if (!messageExists) return null;
 

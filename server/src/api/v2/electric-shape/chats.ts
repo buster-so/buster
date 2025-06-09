@@ -3,12 +3,12 @@ import { type Context } from 'hono';
 import { canUserAccessChat } from '@/access-controls/chats';
 import { extractParamFromWhere } from './_helpers';
 
-export const messagesProxyRouter = async (url: URL, userId: string, c: Context) => {
-  const matches = extractParamFromWhere(url, 'chat_id');
+export const chatsProxyRouter = async (url: URL, userId: string, c: Context) => {
+  const matches = extractParamFromWhere(url, 'id');
   const chatId = matches?.[0];
 
   if (!chatId) {
-    return errorResponse(c, 'Chat ID is required', 403);
+    return errorResponse(c, 'Chat ID (id) is required', 403);
   }
 
   const userHasAccessToChat = await canUserAccessChat({

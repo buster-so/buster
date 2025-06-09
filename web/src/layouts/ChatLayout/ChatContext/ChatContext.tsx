@@ -2,6 +2,8 @@ import { useQueries } from '@tanstack/react-query';
 import React, { useMemo, type PropsWithChildren } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
 import type { IBusterChatMessage } from '@/api/asset_interfaces/chat';
+import { useGetChat as useGetChatElectric } from '@/api/buster-electric/chats';
+import { useGetMessages as useGetMessagesElectric } from '@/api/buster-electric/messages';
 import { useGetChat } from '@/api/buster_rest/chats';
 import { queryKeys } from '@/api/query_keys';
 import { useChatLayoutContextSelector } from '..';
@@ -19,14 +21,14 @@ const useChatIndividualContext = ({
   const selectedFileId = selectedFile?.id;
   const selectedFileType = selectedFile?.type;
 
-  //CHAT
-  const { data: chat } = useGetChat(
-    { id: chatId || '' },
-    { select: (x) => ({ title: x.title, message_ids: x.message_ids, id: x.id }) }
-  );
+  const { data: chats } = useGetChatElectric({ chatId: chatId || '' });
+  const { data: messages } = useGetMessagesElectric({ chatId: chatId || '' });
+  const chat = chats[0];
+
+  // CHAT
   const hasChat = !!chatId && !!chat?.id;
   const chatTitle = chat?.title;
-  const chatMessageIds = useMemo(() => chat?.message_ids ?? [], [chat?.message_ids]);
+  const chatMessageIds = useMemo(() => messages?.map((x) => x.id) ?? [], [messages]);
 
   //FILE
   const hasFile = !!selectedFileId;
