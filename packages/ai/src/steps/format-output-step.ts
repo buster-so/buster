@@ -4,8 +4,9 @@ import { ThinkAndPrepOutputSchema } from '../utils/memory/types';
 
 // Input comes from workflow - either from think-and-prep or analyst step
 const inputSchema = z.union([
-  // Direct output from think-and-prep or analyst step
+  // Direct output from think-and-prep step (when analyst step is skipped)
   ThinkAndPrepOutputSchema,
+  // Direct output from analyst step
   z.object({
     conversationHistory: z.array(z.any()),
     finished: z.boolean().optional(),
@@ -13,7 +14,7 @@ const inputSchema = z.union([
     stepData: z.any().optional(),
     metadata: z.any().optional(),
   }),
-  // Nested structure from workflow (step name as key)
+  // Nested structure from workflow (step name as key) - for complex branching scenarios
   z.object({
     'think-and-prep': ThinkAndPrepOutputSchema.optional(),
     analyst: z
@@ -54,10 +55,18 @@ const formatOutputExecution = async ({
   } else if ('think-and-prep' in inputData && inputData['think-and-prep']) {
     // Nested format with think-and-prep step only
     stepData = inputData['think-and-prep'];
+  } else if ('outputMessages' in inputData && 'finished' in inputData) {
+    // Direct format from think-and-prep step or analyst step
+    stepData = inputData;
   } else if ('conversationHistory' in inputData) {
-    // Direct format - data is already in the expected structure
+    // Direct format from analyst step
     stepData = inputData;
   } else {
+    // Enhanced error logging for debugging
+    console.error('Unrecognized input format for format-output-step:', {
+      inputKeys: Object.keys(inputData),
+      inputData: JSON.stringify(inputData, null, 2),
+    });
     throw new Error('Unrecognized input format for format-output-step');
   }
 

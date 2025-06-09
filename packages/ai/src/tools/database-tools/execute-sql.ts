@@ -29,9 +29,7 @@ function processColumnValue(value: unknown, maxLength: number): unknown {
   }
 
   if (typeof value === 'string') {
-    return value.length > maxLength 
-      ? `${value.slice(0, maxLength)}...[TRUNCATED]`
-      : value;
+    return value.length > maxLength ? `${value.slice(0, maxLength)}...[TRUNCATED]` : value;
   }
 
   if (typeof value === 'object') {
@@ -53,10 +51,13 @@ function processColumnValue(value: unknown, maxLength: number): unknown {
  * Truncates query results to prevent overwhelming responses with large JSON objects, arrays, or text
  * Always converts objects/arrays to strings to ensure parser safety
  */
-function truncateQueryResults(rows: Record<string, unknown>[], maxLength = 100): Record<string, unknown>[] {
+function truncateQueryResults(
+  rows: Record<string, unknown>[],
+  maxLength = 100
+): Record<string, unknown>[] {
   return rows.map((row) => {
     const truncatedRow: Record<string, unknown> = {};
-    
+
     for (const [key, value] of Object.entries(row)) {
       truncatedRow[key] = processColumnValue(value, maxLength);
     }
