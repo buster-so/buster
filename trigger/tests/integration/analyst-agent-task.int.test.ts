@@ -79,9 +79,11 @@ describe('Analyst Agent Task Integration Tests', () => {
 
       const tracedTaskTrigger = wrapTraced(
         async () => {
-          return await tasks.trigger<typeof analystAgentTask>('analyst-agent-task', {
-            message_id: messageId,
-          });
+          return await tasks.triggerAndPoll<typeof analystAgentTask>(
+            'analyst-agent-task',
+            { message_id: messageId },
+            { pollIntervalMs: 5000 } // Poll every 5 seconds
+          );
         },
         {
           name: 'Trigger Analyst Agent Task',
@@ -95,15 +97,8 @@ describe('Analyst Agent Task Integration Tests', () => {
         }
       );
 
-      const handle = await tracedTaskTrigger();
-      expect(handle).toBeDefined();
-      expect(handle.id).toBeDefined();
-
-      console.log(`Task triggered successfully. Run ID: ${handle.id}`);
-
-      // Poll for completion with timeout
       console.log('Waiting for task completion...');
-      const result = await handle.pollUntilCompletion();
+      const result = await tracedTaskTrigger();
 
       // Verify task completed successfully
       expect(result).toBeDefined();
@@ -169,11 +164,11 @@ describe('Analyst Agent Task Integration Tests', () => {
     try {
       console.log('Testing error handling with invalid message ID...');
 
-      const handle = await tasks.trigger<typeof analystAgentTask>('analyst-agent-task', {
-        message_id: invalidMessageId,
-      });
-
-      const result = await handle.pollUntilCompletion();
+      const result = await tasks.triggerAndPoll<typeof analystAgentTask>(
+        'analyst-agent-task',
+        { message_id: invalidMessageId },
+        { pollIntervalMs: 2000 } // Poll every 2 seconds for error case
+      );
 
       // Task should complete but with error result
       expect(result).toBeDefined();
@@ -201,9 +196,11 @@ describe('Analyst Agent Task Integration Tests', () => {
 
       // Test with invalid UUID format
       await expect(
-        tasks.trigger<typeof analystAgentTask>('analyst-agent-task', {
-          message_id: 'not-a-uuid',
-        } as any)
+        tasks.triggerAndPoll<typeof analystAgentTask>(
+          'analyst-agent-task',
+          { message_id: 'not-a-uuid' } as any,
+          { pollIntervalMs: 1000 }
+        )
       ).rejects.toThrow();
 
       console.log('Input validation test completed successfully');

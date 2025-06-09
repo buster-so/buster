@@ -158,7 +158,7 @@ export const analystAgentTask = schemaTask({
       });
 
       // Wait 250ms to allow Braintrust to clean up its trace before completing
-      await new Promise((resolve) => setTimeout(resolve, 250));
+      await new Promise((resolve) => setTimeout(resolve, 350));
 
       return {
         success: true,

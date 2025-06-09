@@ -1,11 +1,14 @@
 import { createTestChat } from '../chats/createTestChat';
-import { createTestMessage } from './createTestMessage';
+import { createTestMessage, type CreateTestMessageOptions } from './createTestMessage';
 
 /**
  * Creates a test message with full context (chat, organization, user)
+ * @param options - Optional configuration for the message fields
  * @returns Complete test context for message testing
  */
-export async function createTestMessageWithContext(): Promise<{
+export async function createTestMessageWithContext(
+  options: CreateTestMessageOptions = {}
+): Promise<{
   messageId: string;
   userId: string;
   chatId: string;
@@ -16,7 +19,7 @@ export async function createTestMessageWithContext(): Promise<{
     const { chatId, organizationId, userId } = await createTestChat();
 
     // Create message in that chat
-    const messageId = await createTestMessage(chatId, userId);
+    const messageId = await createTestMessage(chatId, userId, options);
 
     return {
       messageId,
