@@ -1,4 +1,5 @@
 import { logger, schemaTask } from '@trigger.dev/sdk/v3';
+import { initLogger, wrapTraced } from 'braintrust';
 import { AnalystAgentTaskInputSchema, type AnalystAgentTaskOutput } from './types';
 
 // Task 2 & 4: Database helpers (IMPLEMENTED)
@@ -65,6 +66,12 @@ export const analystAgentTask = schemaTask({
   run: async (payload): Promise<AnalystAgentTaskOutput> => {
     const startTime = Date.now();
 
+    // Initialize Braintrust logging for observability
+    initLogger({
+      apiKey: process.env.BRAINTRUST_KEY,
+      projectName: process.env.ENVIRONMENT || 'development',
+    });
+
     try {
       logger.log('Starting analyst agent task', {
         messageId: payload.message_id,
@@ -114,15 +121,31 @@ export const analystAgentTask = schemaTask({
         conversationHistoryLength: workflowInput.conversationHistory?.length || 0,
       });
 
-      // Task 5: Execute analyst workflow
+      // Task 5: Execute analyst workflow with Braintrust tracing
       logger.log('Starting analyst workflow execution', {
         messageId: payload.message_id,
       });
 
-      const workflowResult = await analystWorkflow.createRun().start({
-        inputData: workflowInput,
-        runtimeContext,
-      });
+      const tracedWorkflow = wrapTraced(
+        async () => {
+          const run = analystWorkflow.createRun();
+          return await run.start({
+            inputData: workflowInput,
+            runtimeContext,
+          });
+        },
+        { 
+          name: 'Analyst Agent Task Workflow',
+          metadata: {
+            messageId: payload.message_id,
+            organizationId: messageContext.organizationId,
+            dataSourceId: dataSource.dataSourceId,
+            hasConversationHistory: !!workflowInput.conversationHistory,
+          }
+        }
+      );
+
+      const workflowResult = await tracedWorkflow();
 
       logger.log('Analyst workflow completed successfully', {
         messageId: payload.message_id,
