@@ -185,10 +185,10 @@ describe('Task 4: Chat History Loading Integration', () => {
     ];
 
     // Verify expected helper names are valid identifiers
-    expectedHelpers.forEach((helperName) => {
+    for (const helperName of expectedHelpers) {
       expect(typeof helperName).toBe('string');
       expect(helperName.length).toBeGreaterThan(0);
-    });
+    }
 
     // Task 4: Verify the helper names match what's expected in the implementation
     expect(expectedHelpers).toContain('getChatConversationHistory');
