@@ -16,7 +16,9 @@ const doneInputSchema = z.object({
  * Optimistic parsing function for streaming done tool arguments
  * Extracts the final_response field as it's being built incrementally
  */
-export function parseStreamingArgs(accumulatedText: string): Partial<z.infer<typeof doneInputSchema>> | null {
+export function parseStreamingArgs(
+  accumulatedText: string
+): Partial<z.infer<typeof doneInputSchema>> | null {
   try {
     // First try to parse as complete JSON
     const parsed = JSON.parse(accumulatedText);

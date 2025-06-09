@@ -49,7 +49,11 @@ export class ToolArgsParser {
         };
       } catch (error) {
         // Only throw if it's a legitimate error, not a parsing error
-        if (error instanceof Error && !error.message.includes('JSON') && !error.message.includes('parse')) {
+        if (
+          error instanceof Error &&
+          !error.message.includes('JSON') &&
+          !error.message.includes('parse')
+        ) {
           throw error;
         }
         return null;

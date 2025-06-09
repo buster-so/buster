@@ -62,12 +62,14 @@ const sequentialThinkingSchema = z.object({
  * Optimistic parsing function for streaming sequential-thinking tool arguments
  * Extracts key fields as they're being built incrementally
  */
-export function parseStreamingArgs(accumulatedText: string): Partial<z.infer<typeof sequentialThinkingSchema>> | null {
+export function parseStreamingArgs(
+  accumulatedText: string
+): Partial<z.infer<typeof sequentialThinkingSchema>> | null {
   try {
     // First try to parse as complete JSON
     const parsed = JSON.parse(accumulatedText);
     const result: Partial<z.infer<typeof sequentialThinkingSchema>> = {};
-    
+
     // Only include fields that are actually present
     if (parsed.thought !== undefined) result.thought = parsed.thought;
     if (parsed.nextThoughtNeeded !== undefined) result.nextThoughtNeeded = parsed.nextThoughtNeeded;
@@ -78,12 +80,12 @@ export function parseStreamingArgs(accumulatedText: string): Partial<z.infer<typ
     if (parsed.branchFromThought !== undefined) result.branchFromThought = parsed.branchFromThought;
     if (parsed.branchId !== undefined) result.branchId = parsed.branchId;
     if (parsed.needsMoreThoughts !== undefined) result.needsMoreThoughts = parsed.needsMoreThoughts;
-    
+
     return result;
   } catch {
     // If JSON is incomplete, try to extract partial fields
     const result: Partial<z.infer<typeof sequentialThinkingSchema>> = {};
-    
+
     // Extract thought field (main text content)
     const thoughtMatch = accumulatedText.match(/"thought"\s*:\s*"((?:[^"\\]|\\.)*)"/);
     if (thoughtMatch) {
@@ -115,22 +117,22 @@ export function parseStreamingArgs(accumulatedText: string): Partial<z.infer<typ
     // Extract number fields
     const thoughtNumberMatch = accumulatedText.match(/"thoughtNumber"\s*:\s*(\d+)/);
     if (thoughtNumberMatch) {
-      result.thoughtNumber = parseInt(thoughtNumberMatch[1], 10);
+      result.thoughtNumber = Number.parseInt(thoughtNumberMatch[1], 10);
     }
 
     const totalThoughtsMatch = accumulatedText.match(/"totalThoughts"\s*:\s*(\d+)/);
     if (totalThoughtsMatch) {
-      result.totalThoughts = parseInt(totalThoughtsMatch[1], 10);
+      result.totalThoughts = Number.parseInt(totalThoughtsMatch[1], 10);
     }
 
     const revisesThoughtMatch = accumulatedText.match(/"revisesThought"\s*:\s*(\d+)/);
     if (revisesThoughtMatch) {
-      result.revisesThought = parseInt(revisesThoughtMatch[1], 10);
+      result.revisesThought = Number.parseInt(revisesThoughtMatch[1], 10);
     }
 
     const branchFromThoughtMatch = accumulatedText.match(/"branchFromThought"\s*:\s*(\d+)/);
     if (branchFromThoughtMatch) {
-      result.branchFromThought = parseInt(branchFromThoughtMatch[1], 10);
+      result.branchFromThought = Number.parseInt(branchFromThoughtMatch[1], 10);
     }
 
     // Extract string fields

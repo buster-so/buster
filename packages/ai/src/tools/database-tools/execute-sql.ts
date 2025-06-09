@@ -21,10 +21,57 @@ const executeSqlStatementInputSchema = z.object({
 });
 
 /**
+ * Processes a single column value for truncation
+ */
+function processColumnValue(value: unknown, maxLength: number): unknown {
+  if (value === null || value === undefined) {
+    return value;
+  }
+
+  if (typeof value === 'string') {
+    return value.length > maxLength 
+      ? `${value.slice(0, maxLength)}...[TRUNCATED]`
+      : value;
+  }
+
+  if (typeof value === 'object') {
+    // Always stringify objects/arrays to prevent parser issues
+    const stringValue = JSON.stringify(value);
+    return stringValue.length > maxLength
+      ? `${stringValue.slice(0, maxLength)}...[TRUNCATED]`
+      : stringValue;
+  }
+
+  // For numbers, booleans, etc.
+  const stringValue = String(value);
+  return stringValue.length > maxLength
+    ? `${stringValue.slice(0, maxLength)}...[TRUNCATED]`
+    : value; // Keep original value and type if not too long
+}
+
+/**
+ * Truncates query results to prevent overwhelming responses with large JSON objects, arrays, or text
+ * Always converts objects/arrays to strings to ensure parser safety
+ */
+function truncateQueryResults(rows: Record<string, unknown>[], maxLength = 100): Record<string, unknown>[] {
+  return rows.map((row) => {
+    const truncatedRow: Record<string, unknown> = {};
+    
+    for (const [key, value] of Object.entries(row)) {
+      truncatedRow[key] = processColumnValue(value, maxLength);
+    }
+
+    return truncatedRow;
+  });
+}
+
+/**
  * Optimistic parsing function for streaming execute-sql tool arguments
  * Extracts the statements array as it's being built incrementally
  */
-export function parseStreamingArgs(accumulatedText: string): Partial<z.infer<typeof executeSqlStatementInputSchema>> | null {
+export function parseStreamingArgs(
+  accumulatedText: string
+): Partial<z.infer<typeof executeSqlStatementInputSchema>> | null {
   try {
     // First try to parse as complete JSON
     const parsed = JSON.parse(accumulatedText);
@@ -36,24 +83,24 @@ export function parseStreamingArgs(accumulatedText: string): Partial<z.infer<typ
     const statementsMatch = accumulatedText.match(/"statements"\s*:\s*\[(.*)/s);
     if (statementsMatch) {
       const arrayContent = statementsMatch[1];
-      
+
       try {
         // Try to parse the array content by adding closing bracket
-        const testArray = '[' + arrayContent + ']';
+        const testArray = `[${arrayContent}]`;
         const parsed = JSON.parse(testArray);
         return { statements: parsed };
       } catch {
         // If that fails, try to extract individual statement strings that are complete
         const statements: string[] = [];
-        
+
         // Match complete string statements within the array
         const statementMatches = arrayContent.matchAll(/"((?:[^"\\]|\\.)*)"/g);
-        
+
         for (const match of statementMatches) {
           const statement = match[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
           statements.push(statement);
         }
-        
+
         return { statements };
       }
     }
@@ -74,7 +121,7 @@ const executeSqlStatementOutputSchema = z.object({
       z.object({
         status: z.literal('success'),
         sql: z.string(),
-        results: z.array(z.any()),
+        results: z.array(z.record(z.unknown())),
       }),
       z.object({
         status: z.literal('error'),
@@ -143,7 +190,7 @@ const executeSqlStatement = wrapTraced(
 
       // Process results and format according to output schema
       const results = executionResults.map((executionResult, index) => {
-        const sql = statements[index]!; // We know this exists since we're mapping over statements
+        const sql = statements[index] ?? ''; // Use nullish coalescing instead of non-null assertion
 
         if (executionResult.status === 'fulfilled') {
           const { result } = executionResult.value;
@@ -212,7 +259,7 @@ async function executeSingleStatement(
   dataSource: DataSource
 ): Promise<{
   success: boolean;
-  data?: Record<string, any>[];
+  data?: Record<string, unknown>[];
   error?: string;
 }> {
   try {
@@ -228,7 +275,7 @@ async function executeSingleStatement(
     if (result.success) {
       return {
         success: true,
-        data: result.rows,
+        data: truncateQueryResults(result.rows || []),
       };
     }
     return {

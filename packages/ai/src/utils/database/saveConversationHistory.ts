@@ -1,7 +1,7 @@
-import { updateMessageFields } from '../../../../database/src/helpers/messages';
 import type { CoreMessage } from 'ai';
 import { eq } from 'drizzle-orm';
 import { getDb } from '../../../../database/src/connection';
+import { updateMessageFields } from '../../../../database/src/helpers/messages';
 import { messages } from '../../../../database/src/schema';
 import { appendToReasoning } from './formatLlmMessagesAsReasoning';
 
@@ -66,8 +66,8 @@ export async function saveConversationHistoryFromStep(
       .where(eq(messages.id, messageId))
       .limit(1);
 
-    const currentReasoning = Array.isArray(currentMessage[0]?.reasoning) 
-      ? currentMessage[0].reasoning 
+    const currentReasoning = Array.isArray(currentMessage[0]?.reasoning)
+      ? currentMessage[0].reasoning
       : [];
 
     // Build the new reasoning by appending new messages as reasoning entries
@@ -115,4 +115,3 @@ export async function loadConversationHistory(messageId: string): Promise<CoreMe
     return null;
   }
 }
-

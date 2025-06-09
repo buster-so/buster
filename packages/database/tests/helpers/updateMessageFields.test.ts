@@ -1,10 +1,7 @@
 import { cleanupTestEnvironment, setupTestEnvironment } from '@buster/test-utils';
 import { createTestMessageWithContext } from '@buster/test-utils';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
-import {
-  getLatestMessageForChat,
-  updateMessageFields,
-} from '../../src/helpers/messages';
+import { getLatestMessageForChat, updateMessageFields } from '../../src/helpers/messages';
 
 describe('updateMessageFields', () => {
   beforeEach(async () => {
@@ -83,9 +80,9 @@ describe('updateMessageFields', () => {
   test('throws error when reasoning is null', async () => {
     const { messageId } = await createTestMessageWithContext();
 
-    await expect(
-      updateMessageFields(messageId, { reasoning: null as any })
-    ).rejects.toThrow('Reasoning cannot be null');
+    await expect(updateMessageFields(messageId, { reasoning: null as any })).rejects.toThrow(
+      'Reasoning cannot be null'
+    );
   });
 
   test('throws error for non-existent message', async () => {

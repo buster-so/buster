@@ -1318,7 +1318,9 @@ function generateResultMessage(
  * Optimistic parsing function for streaming create-metrics-file tool arguments
  * Extracts the files array as it's being built incrementally
  */
-export function parseStreamingArgs(accumulatedText: string): Partial<{ files: Array<{ name: string; yml_content: string }> }> | null {
+export function parseStreamingArgs(
+  accumulatedText: string
+): Partial<{ files: Array<{ name: string; yml_content: string }> }> | null {
   try {
     // First try to parse as complete JSON
     const parsed = JSON.parse(accumulatedText);
@@ -1330,7 +1332,7 @@ export function parseStreamingArgs(accumulatedText: string): Partial<{ files: Ar
     const filesMatch = accumulatedText.match(/"files"\s*:\s*\[(.*)/s);
     if (filesMatch) {
       const arrayContent = filesMatch[1];
-      
+
       try {
         // Try to parse the array content by adding closing bracket
         const testArray = '[' + arrayContent + ']';
@@ -1339,33 +1341,40 @@ export function parseStreamingArgs(accumulatedText: string): Partial<{ files: Ar
       } catch {
         // If that fails, try to extract file objects (both complete and incomplete)
         const files: Array<{ name: string; yml_content: string }> = [];
-        
+
         // First, try to match complete file objects
-        const completeFileMatches = arrayContent.matchAll(/\{\s*"name"\s*:\s*"([^"]*?)"\s*,\s*"yml_content"\s*:\s*"((?:[^"\\]|\\.)*)"\s*\}/g);
-        
+        const completeFileMatches = arrayContent.matchAll(
+          /\{\s*"name"\s*:\s*"([^"]*?)"\s*,\s*"yml_content"\s*:\s*"((?:[^"\\]|\\.)*)"\s*\}/g
+        );
+
         for (const match of completeFileMatches) {
           files.push({
             name: match[1],
             yml_content: match[2].replace(/\\"/g, '"').replace(/\\n/g, '\n').replace(/\\\\/g, '\\'),
           });
         }
-        
+
         // If no complete files found, try to extract partial file objects
         if (files.length === 0) {
           // Try to match incomplete file objects that have at least name and partial yml_content
-          const incompleteFileMatch = arrayContent.match(/\{\s*"name"\s*:\s*"([^"]*?)"\s*,\s*"yml_content"\s*:\s*"((?:[^"\\]|\\.)*)/);
-          
+          const incompleteFileMatch = arrayContent.match(
+            /\{\s*"name"\s*:\s*"([^"]*?)"\s*,\s*"yml_content"\s*:\s*"((?:[^"\\]|\\.)*)/
+          );
+
           if (incompleteFileMatch) {
             const name = incompleteFileMatch[1];
-            const ymlContent = incompleteFileMatch[2].replace(/\\"/g, '"').replace(/\\n/g, '\n').replace(/\\\\/g, '\\');
-            
+            const ymlContent = incompleteFileMatch[2]
+              .replace(/\\"/g, '"')
+              .replace(/\\n/g, '\n')
+              .replace(/\\\\/g, '\\');
+
             files.push({
               name,
               yml_content: ymlContent,
             });
           }
         }
-        
+
         return { files };
       }
     }

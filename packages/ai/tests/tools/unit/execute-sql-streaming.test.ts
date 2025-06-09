@@ -13,16 +13,16 @@ describe('Execute SQL Tool Streaming Parser', () => {
     const completeJson = JSON.stringify({
       statements: [
         'SELECT user_id, name FROM public.users LIMIT 25',
-        'SELECT COUNT(*) FROM public.orders WHERE created_at >= \'2024-01-01\'',
+        "SELECT COUNT(*) FROM public.orders WHERE created_at >= '2024-01-01'",
       ],
     });
 
     const result = parseStreamingArgs(completeJson);
-    
+
     expect(result).toEqual({
       statements: [
         'SELECT user_id, name FROM public.users LIMIT 25',
-        'SELECT COUNT(*) FROM public.orders WHERE created_at >= \'2024-01-01\'',
+        "SELECT COUNT(*) FROM public.orders WHERE created_at >= '2024-01-01'",
       ],
     });
   });
@@ -54,42 +54,40 @@ describe('Execute SQL Tool Streaming Parser', () => {
     expect(parseStreamingArgs(chunks[5])).toEqual({ statements: [] }); // Still incomplete
     expect(parseStreamingArgs(chunks[6])).toEqual({ statements: [] }); // Still incomplete
     expect(parseStreamingArgs(chunks[7])).toEqual({ statements: [] }); // Still incomplete
-    expect(parseStreamingArgs(chunks[8])).toEqual({ 
-      statements: ['SELECT user_id, name FROM public.users'] 
+    expect(parseStreamingArgs(chunks[8])).toEqual({
+      statements: ['SELECT user_id, name FROM public.users'],
     }); // First complete statement
-    expect(parseStreamingArgs(chunks[9])).toEqual({ 
-      statements: ['SELECT user_id, name FROM public.users'] 
+    expect(parseStreamingArgs(chunks[9])).toEqual({
+      statements: ['SELECT user_id, name FROM public.users'],
     }); // Comma added
-    expect(parseStreamingArgs(chunks[10])).toEqual({ 
-      statements: ['SELECT user_id, name FROM public.users'] 
+    expect(parseStreamingArgs(chunks[10])).toEqual({
+      statements: ['SELECT user_id, name FROM public.users'],
     }); // Second statement starting
-    expect(parseStreamingArgs(chunks[11])).toEqual({ 
-      statements: ['SELECT user_id, name FROM public.users', 'SELECT COUNT(*)'] 
+    expect(parseStreamingArgs(chunks[11])).toEqual({
+      statements: ['SELECT user_id, name FROM public.users', 'SELECT COUNT(*)'],
     }); // Second statement complete
-    
+
     // Final complete chunk should be parsed as complete JSON
     const finalResult = parseStreamingArgs(chunks[12]);
     expect(finalResult).toEqual({
-      statements: [
-        'SELECT user_id, name FROM public.users',
-        'SELECT COUNT(*)',
-      ],
+      statements: ['SELECT user_id, name FROM public.users', 'SELECT COUNT(*)'],
     });
   });
 
   test('should handle single statement', () => {
     const singleStatement = '{"statements": ["SELECT * FROM public.users"]}';
     const result = parseStreamingArgs(singleStatement);
-    
+
     expect(result).toEqual({
       statements: ['SELECT * FROM public.users'],
     });
   });
 
   test('should handle escaped quotes in SQL statements', () => {
-    const withEscapedQuotes = '{"statements": ["SELECT name FROM users WHERE status = \\"active\\""]}';
+    const withEscapedQuotes =
+      '{"statements": ["SELECT name FROM users WHERE status = \\"active\\""]}';
     const result = parseStreamingArgs(withEscapedQuotes);
-    
+
     expect(result).toEqual({
       statements: ['SELECT name FROM users WHERE status = "active"'],
     });
@@ -101,9 +99,9 @@ describe('Execute SQL Tool Streaming Parser', () => {
         'SELECT \n  u.user_id,\n  u.name,\n  COUNT(o.order_id) as order_count\nFROM public.users u\nLEFT JOIN public.orders o ON u.user_id = o.user_id\nGROUP BY u.user_id, u.name',
       ],
     });
-    
+
     const result = parseStreamingArgs(complexSql);
-    
+
     expect(result).toEqual({
       statements: [
         'SELECT \n  u.user_id,\n  u.name,\n  COUNT(o.order_id) as order_count\nFROM public.users u\nLEFT JOIN public.orders o ON u.user_id = o.user_id\nGROUP BY u.user_id, u.name',
@@ -114,17 +112,17 @@ describe('Execute SQL Tool Streaming Parser', () => {
   test('should handle multiple statements being built incrementally', () => {
     const partialMultiple = '{"statements": ["SELECT user_id FROM users", "SELECT';
     const result = parseStreamingArgs(partialMultiple);
-    
+
     // Should extract the complete first statement only
-    expect(result).toEqual({ 
-      statements: ['SELECT user_id FROM users'] 
+    expect(result).toEqual({
+      statements: ['SELECT user_id FROM users'],
     });
   });
 
   test('should handle whitespace variations', () => {
     const withWhitespace = '{ "statements" : [ "SELECT * FROM table" , "SELECT COUNT(*)" ]';
     const result = parseStreamingArgs(withWhitespace);
-    
+
     expect(result).toEqual({
       statements: ['SELECT * FROM table', 'SELECT COUNT(*)'],
     });
@@ -133,7 +131,7 @@ describe('Execute SQL Tool Streaming Parser', () => {
   test('should handle empty statements array', () => {
     const emptyArray = '{"statements": []}';
     const result = parseStreamingArgs(emptyArray);
-    
+
     expect(result).toEqual({
       statements: [],
     });
@@ -143,16 +141,16 @@ describe('Execute SQL Tool Streaming Parser', () => {
     const withDates = JSON.stringify({
       statements: [
         "SELECT * FROM orders WHERE created_at >= '2024-01-01'",
-        "SELECT COUNT(*) FROM products WHERE price > 100.50",
+        'SELECT COUNT(*) FROM products WHERE price > 100.50',
       ],
     });
-    
+
     const result = parseStreamingArgs(withDates);
-    
+
     expect(result).toEqual({
       statements: [
         "SELECT * FROM orders WHERE created_at >= '2024-01-01'",
-        "SELECT COUNT(*) FROM products WHERE price > 100.50",
+        'SELECT COUNT(*) FROM products WHERE price > 100.50',
       ],
     });
   });
@@ -160,7 +158,7 @@ describe('Execute SQL Tool Streaming Parser', () => {
   test('should return undefined for statements if field is not present', () => {
     const withoutStatements = '{"other_field": "value"}';
     const result = parseStreamingArgs(withoutStatements);
-    
+
     expect(result).toEqual({
       statements: undefined,
     });
@@ -169,7 +167,7 @@ describe('Execute SQL Tool Streaming Parser', () => {
   test('should handle incomplete array with partial second statement', () => {
     const partialSecond = '{"statements": ["SELECT user_id FROM users", "SELECT COUNT(*) FROM';
     const result = parseStreamingArgs(partialSecond);
-    
+
     // Should only return the complete first statement
     expect(result).toEqual({
       statements: ['SELECT user_id FROM users'],
@@ -183,9 +181,9 @@ describe('Execute SQL Tool Streaming Parser', () => {
         'SELECT public.orders.order_id FROM public.orders WHERE public.orders.total > 100',
       ],
     });
-    
+
     const result = parseStreamingArgs(withSchema);
-    
+
     expect(result).toEqual({
       statements: [
         'SELECT analytics.users.user_id FROM analytics.users',
