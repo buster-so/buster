@@ -51,7 +51,7 @@ app.post('/', zValidator('json', ChatCreateRequestSchema), async (c) => {
   } catch (error) {
     // Handle ChatError instances with proper status codes
     if (error instanceof ChatError) {
-      return errorResponse(c, error.message, error.statusCode);
+      return errorResponse(c, error.message, error.statusCode as any);
     }
     
     console.error('Error creating chat:', error);

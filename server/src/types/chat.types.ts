@@ -44,6 +44,7 @@ export const ChatMessageSchema = z.object({
   reasoning_message: z.string().optional(),
   final_reasoning_message: z.string().optional(),
   feedback: z.enum(['positive', 'negative']).optional(),
+  is_completed: z.boolean(),
 });
 
 // Main ChatWithMessages schema

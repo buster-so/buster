@@ -7,7 +7,16 @@ import { getUserOrganizationId } from '@buster/database';
 
 /**
  * Handler function for creating a new chat.
- * Returns a complete ChatWithMessages object and triggers background processing.
+ * 
+ * PERFORMANCE TARGET: <500ms total response time
+ * 
+ * Flow:
+ * 1. Create/update chat and message objects in database (~100-200ms)
+ * 2. Queue background analyst job (NOT wait for completion) (~100ms) 
+ * 3. Return ChatWithMessages object immediately (~50ms)
+ * 
+ * The analyst-agent-task runs in background and can take minutes.
+ * Users get their chat object immediately without waiting.
  */
 export async function createChatHandler(
   request: ChatCreateHandlerRequest,
@@ -59,26 +68,60 @@ export async function createChatHandler(
     }
 
     // Trigger background analysis if we have content
+    // This should be very fast (just queuing the job, not waiting for completion)
     if (request.prompt || request.asset_id) {
+      const triggerStart = Date.now();
       try {
+        // Just queue the background job - should be <100ms
         await tasks.trigger('analyst-agent-task', {
           message_id: messageId,
         });
+        
+        const triggerDuration = Date.now() - triggerStart;
+        console.log('Successfully queued analyst task:', {
+          messageId,
+          triggerDuration: `${triggerDuration}ms`
+        });
+        
+        // Warn if trigger queueing is slow
+        if (triggerDuration > 500) {
+          console.warn('Slow trigger operation detected:', {
+            messageId,
+            triggerDuration: `${triggerDuration}ms`,
+            warning: 'Trigger queueing should be <100ms'
+          });
+        }
       } catch (triggerError) {
-        // Log but don't fail the request - chat is already created
-        console.error('Failed to trigger analyst agent task:', triggerError);
+        const triggerDuration = Date.now() - triggerStart;
+        console.error('Failed to trigger analyst agent task:', {
+          messageId,
+          triggerDuration: `${triggerDuration}ms`,
+          error: triggerError
+        });
+        // The user still gets their chat/message, background analysis just won't run
       }
     }
 
-    // Log performance metrics
+    // Log performance metrics - target is <500ms total
     const duration = Date.now() - startTime;
-    if (duration > 1000) {
-      console.warn('Slow chat creation', {
-        duration,
+    console.log('Chat request completed:', {
+      duration: `${duration}ms`,
+      userId: user.id,
+      chatId,
+      hasPrompt: !!request.prompt,
+      hasAsset: !!request.asset_id,
+      performance: duration <= 500 ? 'good' : 'slow'
+    });
+    
+    if (duration > 500) {
+      console.warn('Slow chat creation detected:', {
+        duration: `${duration}ms`,
+        target: '500ms',
         userId: user.id,
         chatId,
         hasPrompt: !!request.prompt,
         hasAsset: !!request.asset_id,
+        suggestion: 'Check database performance and trigger service'
       });
     }
 

@@ -47,8 +47,9 @@ export function buildChatWithMessages(
       response_message: (msg.responseMessages as any)?.content || undefined,
       reasoning_message: (msg.reasoning as any)?.content || undefined,
       final_reasoning_message: msg.finalReasoningMessage || undefined,
-      feedback: msg.feedback as 'positive' | 'negative' | undefined,
+      feedback: msg.feedback ? (msg.feedback as 'positive' | 'negative') : undefined,
       files: undefined, // TODO: Load files from messagesToFiles
+      is_completed: msg.isCompleted || false, // Always false for new messages, trigger job sets to true
     };
     
     messageIds.push(msg.id);
@@ -93,28 +94,26 @@ export async function initializeChat(
   
   try {
     if (request.chat_id) {
-      // Existing chat - concurrent permission and details check
-      const [hasPermission, chatDetails] = await Promise.all([
-        checkChatPermission(request.chat_id, user.id),
-        getChatWithDetails({
-          chatId: request.chat_id,
-          userId: user.id,
-        }),
-      ]);
-
-      if (!hasPermission) {
-        throw new ChatError(
-          ChatErrorCode.PERMISSION_DENIED,
-          'You do not have permission to access this chat',
-          403
-        );
-      }
+      // Existing chat - check if it exists first, then check permission
+      const chatDetails = await getChatWithDetails({
+        chatId: request.chat_id,
+        userId: user.id,
+      });
 
       if (!chatDetails) {
         throw new ChatError(
           ChatErrorCode.CHAT_NOT_FOUND,
           'Chat not found',
           404
+        );
+      }
+
+      const hasPermission = await checkChatPermission(request.chat_id, user.id);
+      if (!hasPermission) {
+        throw new ChatError(
+          ChatErrorCode.PERMISSION_DENIED,
+          'You do not have permission to access this chat',
+          403
         );
       }
 
