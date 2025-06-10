@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import React, { useMemo } from 'react';
-import type { FileType } from '@/api/asset_interfaces';
+import type { ReasoningFileType } from '@/api/asset_interfaces';
 import { Button } from '@/components/ui/buttons';
 import { ArrowUpRight } from '@/components/ui/icons';
 import { AppTooltip } from '@/components/ui/tooltip';
@@ -14,13 +14,17 @@ export const ReasoningFileButtons = React.memo(
     chatId,
     versionNumber
   }: {
-    fileType: FileType;
+    fileType: ReasoningFileType;
     fileId: string;
     type: 'file' | 'status';
     chatId: string;
     versionNumber?: number;
   }) => {
     const href = useMemo(() => {
+      if (fileType === 'agent-action') {
+        return;
+      }
+
       return assetParamsToRoute({
         chatId,
         assetId: fileId,
@@ -29,7 +33,7 @@ export const ReasoningFileButtons = React.memo(
       });
     }, [chatId, fileId, fileType]);
 
-    if (type === 'status') return null;
+    if (type === 'status' || !href) return null;
 
     return (
       <AppTooltip title="Open file" sideOffset={12}>

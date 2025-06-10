@@ -97,7 +97,7 @@ export const FileCard = React.memo(
               )}
               onMouseEnter={handleHeaderMouseEnter}
               onMouseLeave={handleHeaderMouseLeave}>
-              <div className="flex items-center gap-x-1 overflow-hidden">
+              <div className="flex items-center justify-between gap-x-1 overflow-hidden">
                 <div className="flex items-center gap-1 whitespace-nowrap">
                   {collapseDefaultIcon && (
                     <CollapseToggleIcon
@@ -107,9 +107,9 @@ export const FileCard = React.memo(
                       onClick={handleHeaderClick}
                     />
                   )}
-                  {headerButtons}
                 </div>
                 {typeof fileName === 'string' ? <Text truncate>{fileName}</Text> : fileName}
+                {headerButtons}
               </div>
             </CardHeader>
           </HeaderWrapperComponent>
