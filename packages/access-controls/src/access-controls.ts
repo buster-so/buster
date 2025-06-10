@@ -1,14 +1,19 @@
-import { and, count, eq, getDb, inArray, isNull } from '@buster/database/';
-import { z } from 'zod';
 import {
+  and,
+  count,
   datasetPermissions,
   datasets,
   datasetsToPermissionGroups,
+  eq,
+  getDb,
+  inArray,
+  isNull,
   permissionGroups,
   permissionGroupsToIdentities,
   teamsToUsers,
   usersToOrganizations,
-} from '../../database/src/schema';
+} from '@buster/database';
+import { z } from 'zod';
 import { type AccessControlOptions, AccessControlsError } from './types';
 
 // Schema for the permissioned dataset result

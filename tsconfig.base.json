@@ -4,27 +4,26 @@
     "lib": ["ESNext"],
     "target": "ESNext",
     "module": "Preserve",
-    "moduleDetection": "force", 
+    "moduleDetection": "force",
     "moduleResolution": "bundler",
-    
+
     // Modern import/export features
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "allowJs": true,
     "noEmit": true,
-    
+
     // Path mapping for clean cross-package imports
     "baseUrl": ".",
     "paths": {
-      // Package aliases - consistent @buster/* pattern  
+      // Package aliases - consistent @buster/* pattern
       "@buster/access-controls": ["packages/access-controls/src"],
       "@buster/access-controls/*": ["packages/access-controls/src/*"],
       "@buster/ai": ["packages/ai/src"],
       "@buster/ai/*": ["packages/ai/src/*"],
       "@buster/data-source": ["packages/data-source/src"],
       "@buster/data-source/*": ["packages/data-source/src/*"],
-      "@buster/database": ["packages/database/src"],
-      "@buster/database/*": ["packages/database/src/*"],
+      "@buster/database": ["packages/database/src/*"],
       "@buster/rerank": ["packages/rerank/src"],
       "@buster/rerank/*": ["packages/rerank/src/*"],
       "@buster/stored-values": ["packages/stored-values/src"],
@@ -33,15 +32,15 @@
       "@buster/web-tools/*": ["packages/web-tools/src/*"],
       "@buster/test-utils": ["packages/test-utils/src"],
       "@buster/test-utils/*": ["packages/test-utils/src/*"],
-      
+
       // Server aliases
       "@server": ["server/src"],
       "@server/*": ["server/src/*"],
-      
+
       // Trigger aliases
       "@trigger": ["trigger/src"],
       "@trigger/*": ["trigger/src/*"],
-      
+
       // AI package specific aliases (commonly used)
       "@tools/*": ["packages/ai/src/tools/*"],
       "@agents/*": ["packages/ai/src/agents/*"],
@@ -49,7 +48,7 @@
       "@utils/*": ["packages/ai/src/utils/*"],
       "@memory/*": ["packages/ai/src/utils/memory/*"]
     },
-    
+
     // Strict type checking (Rust-like experience)
     "strict": true,
     "skipLibCheck": true,

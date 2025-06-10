@@ -5,7 +5,9 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "bun run src/index.ts",
-    "build": "bun build src/index.ts --outdir dist --target node",
+    "build": "tsc",
+    "build:bun": "bun build src/index.ts --outdir dist --target node",
+    "clean": "rm -rf dist",
     "test": "bun test",
     "test:watch": "bun test --watch",
     "test:coverage": "bun test --coverage",
