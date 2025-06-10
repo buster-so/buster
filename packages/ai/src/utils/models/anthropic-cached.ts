@@ -22,6 +22,14 @@ export const anthropicCachedModel = (modelId: string) => {
             }));
           }
 
+          // Add disable_parallel_tool_use if tool_choice is present
+          if (modifiedBody.tool_choice) {
+            modifiedBody.tool_choice = {
+              ...modifiedBody.tool_choice,
+              disable_parallel_tool_use: true,
+            };
+          }
+
           // Return modified options
           return fetch(url, {
             ...options,
