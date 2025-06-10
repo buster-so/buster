@@ -1,5 +1,5 @@
-import { doneTool } from '@/tools/communication-tools/done-tool';
 import { beforeEach, describe, expect, test } from 'vitest';
+import { doneTool } from '../../../src/tools/communication-tools/done-tool';
 
 describe('Done Tool Integration Tests', () => {
   let mockRuntimeContext: any;
@@ -58,9 +58,10 @@ describe('Done Tool Integration Tests', () => {
       runtimeContext: contextWithoutGet,
     };
 
-    // This should still work because get is checked in the tool logic
-    // But let's test the actual tool execution
-    await expect(doneTool.execute({ context: input })).rejects.toThrow(); // Should fail due to missing runtime context functionality
+    // The tool should now gracefully handle missing runtime context
+    const result = await doneTool.execute({ context: input });
+    expect(result.success).toBe(true);
+    expect(result.todos).toBe('No to-do list found.');
   });
 
   test('should complete workflow when no todos exist', async () => {

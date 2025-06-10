@@ -1,14 +1,17 @@
 import { Agent, createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
+import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { anthropicCachedModel } from '../utils/models/anthropic-cached';
-import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
+import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
+import type {
+  AnalystRuntimeContext,
+  thinkAndPrepWorkflowInputSchema,
+} from '../workflows/analyst-workflow';
 
 const inputSchema = z.object({
-  prompt: z
-    .string()
-    .describe('The prompt that the user submitted that will be used to extract values.'),
+  // This step receives initial workflow input through getInitData
 });
 
 export const generateChatTitleOutputSchema = z.object({
@@ -26,19 +29,35 @@ const todosAgent = new Agent({
 });
 
 const generateChatTitleExecution = async ({
-  inputData,
+  getInitData,
   runtimeContext,
 }: {
   inputData: z.infer<typeof inputSchema>;
+  getInitData: () => Promise<z.infer<typeof thinkAndPrepWorkflowInputSchema>>;
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof generateChatTitleOutputSchema>> => {
   try {
     const threadId = runtimeContext.get('threadId');
     const resourceId = runtimeContext.get('userId');
 
+    // Get the workflow input data
+    const initData = await getInitData();
+    const prompt = initData.prompt;
+    const conversationHistory = initData.conversationHistory;
+
+    // Prepare messages for the agent
+    let messages: CoreMessage[];
+    if (conversationHistory && conversationHistory.length > 0) {
+      // Use conversation history as context + append new user message
+      messages = appendToConversation(conversationHistory as CoreMessage[], prompt);
+    } else {
+      // Otherwise, use just the prompt
+      messages = standardizeMessages(prompt);
+    }
+
     const tracedChatTitle = wrapTraced(
       async () => {
-        const response = await todosAgent.generate(inputData.prompt, {
+        const response = await todosAgent.generate(messages, {
           maxSteps: 0,
           threadId: threadId,
           resourceId: resourceId,

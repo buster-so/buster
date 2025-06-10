@@ -12,6 +12,58 @@ const finishAndRespondInputSchema = z.object({
     ),
 });
 
+/**
+ * Optimistic parsing function for streaming finish-and-respond tool arguments
+ * Extracts the final_response field as it's being built incrementally
+ */
+export function parseStreamingArgs(
+  accumulatedText: string
+): Partial<z.infer<typeof finishAndRespondInputSchema>> | null {
+  // Validate input type
+  if (typeof accumulatedText !== 'string') {
+    throw new Error(`parseStreamingArgs expects string input, got ${typeof accumulatedText}`);
+  }
+
+  try {
+    // First try to parse as complete JSON
+    const parsed = JSON.parse(accumulatedText);
+    return {
+      final_response: parsed.final_response !== undefined ? parsed.final_response : undefined,
+    };
+  } catch (error) {
+    // Only catch JSON parse errors - let other errors bubble up
+    if (error instanceof SyntaxError) {
+      // JSON parsing failed - try regex extraction for partial content
+      // Handle both complete and incomplete strings, accounting for escaped quotes
+      const match = accumulatedText.match(/"final_response"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+      if (match && match[1] !== undefined) {
+        // Unescape the string
+        const unescaped = match[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+        return {
+          final_response: unescaped,
+        };
+      }
+
+      // Try to extract partial string that's still being built (incomplete quote)
+      const partialMatch = accumulatedText.match(/"final_response"\s*:\s*"((?:[^"\\]|\\.)*)/);
+      if (partialMatch && partialMatch[1] !== undefined) {
+        // Unescape the partial string
+        const unescaped = partialMatch[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+        return {
+          final_response: unescaped,
+        };
+      }
+
+      return null;
+    } else {
+      // Unexpected error - re-throw with context
+      throw new Error(
+        `Unexpected error in parseStreamingArgs: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
+  }
+}
+
 const finishAndRespondOutputSchema = z.object({});
 
 // Process done tool execution with todo management
@@ -30,7 +82,7 @@ const executeDone = wrapTraced(
 );
 
 // Export the tool
-export const finishAndRespondTool = createTool({
+export const finishAndRespond = createTool({
   id: 'finish-and-respond',
   description:
     "Marks all remaining unfinished tasks as complete, sends a final response to the user, and ends the workflow. Use this when the workflow is finished. This must be in markdown format and not use the '•' bullet character.",
@@ -39,4 +91,4 @@ export const finishAndRespondTool = createTool({
   execute: executeDone,
 });
 
-export default finishAndRespondTool;
+export default finishAndRespond;

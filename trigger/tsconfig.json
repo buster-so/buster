@@ -1,47 +1,13 @@
 {
-    "compilerOptions": {
-      // Use the latest JavaScript features and APIs
-      "lib": ["ESNext"],
-      "target": "ESNext",
-  
-      // Module handling as expected by Bun
-      "module": "Preserve",
-      "moduleDetection": "force",
-      "moduleResolution": "bundler",
-  
-      // Allow modern import styles used by Bun
-      "allowImportingTsExtensions": true,
-      "verbatimModuleSyntax": true,
-  
-      // Enable JSX if you use it (can be omitted for pure backend)
-      "jsx": "react-jsx",
-  
-      // Allow JS files in your project if needed
-      "allowJs": true,
-  
-      // Do not emit files when running tsc (useful for type-checking only)
-      "noEmit": true,
-  
-      // Path mapping for clean imports
-      "baseUrl": ".",
-      "paths": {
-        "@buster/data-source": ["../packages/data-source/src"],
-        "@buster/ai": ["../packages/ai/src"],
-        "@buster/database": ["../packages/database/src"],
-        "@buster/web-tools": ["../packages/web-tools/src"],
-      },
-  
-      // Strictness and safety (Rust-like experience)
-      "strict": true,
-      "skipLibCheck": true,
-      "noFallthroughCasesInSwitch": true,
-      "noUncheckedIndexedAccess": true,
-      "noImplicitOverride": true,
-  
-      // Optionally enable these for even stricter checks
-      "noUnusedLocals": true,
-      "noUnusedParameters": true,
-      "noPropertyAccessFromIndexSignature": false
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": ["src/*"]
     }
-  }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
   

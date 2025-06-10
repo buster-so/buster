@@ -1,5 +1,5 @@
-import { createPlanStraightforwardTool } from '@/tools/planning-thinking-tools/create-plan-straightforward-tool';
 import { beforeEach, describe, expect, test } from 'vitest';
+import { createPlanStraightforwardTool } from '../../../src/tools/planning-thinking-tools/create-plan-straightforward-tool';
 
 describe('Create Plan Straightforward Tool Integration Tests', () => {
   let mockRuntimeContext: any;

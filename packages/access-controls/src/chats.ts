@@ -5,6 +5,6 @@ export const canUserAccessChat = async ({
   userId: string;
   chatId: string;
 }) => {
-  console.warn("TODO: Implement doesUserHaveAccessToChat");
+  console.warn('TODO: Implement doesUserHaveAccessToChat');
   return !!userId && !!chatId;
 };

@@ -1,4 +1,4 @@
-import { Context, Next } from 'hono';
+import type { Context, Next } from 'hono';
 import { bearerAuth } from 'hono/bearer-auth';
 import { createSupabaseClient } from './supabase';
 
@@ -19,7 +19,7 @@ export const requireAuth = bearerAuth({
     c.set('supabaseUser', data.user);
 
     return !!data.user.is_anonymous === false;
-  }
+  },
 });
 
 export async function requireUser(c: Context, next: Next) {

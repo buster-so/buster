@@ -1,14 +1,17 @@
 import { Agent, createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
+import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { anthropicCachedModel } from '../utils/models/anthropic-cached';
-import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
+import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
+import type {
+  AnalystRuntimeContext,
+  thinkAndPrepWorkflowInputSchema,
+} from '../workflows/analyst-workflow';
 
 const inputSchema = z.object({
-  prompt: z
-    .string()
-    .describe('The prompt that the user submitted that will be used to create the todos.'),
+  // This step receives initial workflow input through getInitData
 });
 
 export const createTodosOutputSchema = z.object({
@@ -45,8 +48,9 @@ The TODO list should break down each aspect of the user request into tasks, base
   - Correct: \`Determine metric for "top customer"\`
   - Incorrect: \`Determine metric for "top customer" (e.g., most revenue generated, most orders place, etc).\`
 - The TODO list is meant to guide the system's internal decision-making process, so it should focus on listing the decisions that need to be made, not on providing potential answers or clarifications.
+- Assume that all relevant data is potentially available within the existing data sources  
 **Note**: The TODO list must focus on enabling the system to make its own assumptions and decisions without seeking clarification from the user. Do not use phrases like "Clarify..." in the TODO list items to avoid implying that the system should ask the user for further input.
-z
+
 ---
 ### Examples
 #### User Request: "What is Baltic Born's return rate this month?"
@@ -93,6 +97,19 @@ z
 [ ] Determine how to group sales by month
 [ ] Determine the visualization type and axes for each chart
 \`\`\`
+### User Request: "What's the influence of unicorn sightings on our sales?"
+\`\`\`
+[ ] Determine how "unicorn sightings" is identified
+[ ] Determine how to identify "sales"
+[ ] Determine how to identify the influence of unicorn sightings on sales
+[ ] Determine the visualization type and axes for the chart
+\`\`\`
+### User Request: "I have a Fedex Smartpost tracking number and I need the USPS tracking nmber.  Can you find that for me? Here is the fedex number: 286744112345
+\`\`\`
+[ ] Determine if FedEx Smartpost tracking data is available in the current data sources
+[ ] Determine if USPS tracking number mappings exist in the available data
+[ ] Determine how to identify the relationship between FedEx and USPS tracking numbers for Smartpost shipments
+\`\`\`
 ---
 ### System Limitations
 - The system is not capable of writing python, building forecasts, or doing "what-if" hypothetical analysis
@@ -122,19 +139,35 @@ export const todosAgent = new Agent({
 });
 
 const todoStepExecution = async ({
-  inputData,
+  getInitData,
   runtimeContext,
 }: {
   inputData: z.infer<typeof inputSchema>;
+  getInitData: () => Promise<z.infer<typeof thinkAndPrepWorkflowInputSchema>>;
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof createTodosOutputSchema>> => {
   try {
     const threadId = runtimeContext.get('threadId');
     const resourceId = runtimeContext.get('userId');
 
+    // Get the workflow input data
+    const initData = await getInitData();
+    const prompt = initData.prompt;
+    const conversationHistory = initData.conversationHistory;
+
+    // Prepare messages for the agent
+    let messages: CoreMessage[];
+    if (conversationHistory && conversationHistory.length > 0) {
+      // Use conversation history as context + append new user message
+      messages = appendToConversation(conversationHistory as CoreMessage[], prompt);
+    } else {
+      // Otherwise, use just the prompt
+      messages = standardizeMessages(prompt);
+    }
+
     const tracedTodos = wrapTraced(
       async () => {
-        const response = await todosAgent.generate(inputData.prompt, {
+        const response = await todosAgent.generate(messages, {
           threadId: threadId,
           resourceId: resourceId,
           output: createTodosOutputSchema,

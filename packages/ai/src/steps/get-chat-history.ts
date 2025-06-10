@@ -1,12 +1,13 @@
-import { eq } from 'drizzle-orm';
-import { getDb } from '../../../database/src/connection';
-import { messages } from '../../../database/src/schema';
+import {
+  getAllRawLlmMessagesForChat,
+  getRawLlmMessages as getDbRawLlmMessages,
+} from '@buster/database';
 import type { MessageHistory } from '../utils/memory/types';
 
 export interface ChatHistoryResult {
-  id: string;
+  messageId: string;
   rawLlmMessages: MessageHistory; // JSONB data containing array of CoreMessage
-  createdAt: string;
+  createdAt: Date;
 }
 
 /**
@@ -15,21 +16,12 @@ export interface ChatHistoryResult {
  * @returns Array of messages with their raw LLM message data
  */
 export async function getChatHistory(chatId: string): Promise<ChatHistoryResult[]> {
-  const db = getDb();
+  const results = await getAllRawLlmMessagesForChat(chatId);
 
-  const result = await db
-    .select({
-      id: messages.id,
-      rawLlmMessages: messages.rawLlmMessages,
-      createdAt: messages.createdAt,
-    })
-    .from(messages)
-    .where(eq(messages.chatId, chatId))
-    .orderBy(messages.createdAt);
-
-  return result.map((row) => ({
-    ...row,
-    rawLlmMessages: row.rawLlmMessages as MessageHistory,
+  return results.map((result) => ({
+    messageId: result.messageId,
+    rawLlmMessages: result.rawLlmMessages as MessageHistory,
+    createdAt: result.createdAt,
   }));
 }
 
@@ -39,15 +31,19 @@ export async function getChatHistory(chatId: string): Promise<ChatHistoryResult[
  * @returns Array of raw LLM message objects
  */
 export async function getRawLlmMessages(chatId: string): Promise<MessageHistory[]> {
-  const db = getDb();
+  const results = await getAllRawLlmMessagesForChat(chatId);
 
-  const result = await db
-    .select({
-      rawLlmMessages: messages.rawLlmMessages,
-    })
-    .from(messages)
-    .where(eq(messages.chatId, chatId))
-    .orderBy(messages.createdAt);
+  return results.map((result) => result.rawLlmMessages as MessageHistory);
+}
 
-  return result.map((row) => row.rawLlmMessages as MessageHistory);
+/**
+ * Fetches raw LLM messages for a specific message ID
+ * @param messageId - The UUID of the message to fetch
+ * @returns Raw LLM message data or null if not found
+ */
+export async function getRawLlmMessagesByMessageId(
+  messageId: string
+): Promise<MessageHistory | null> {
+  const result = await getDbRawLlmMessages(messageId);
+  return result as MessageHistory | null;
 }

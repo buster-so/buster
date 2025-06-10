@@ -23,7 +23,7 @@ const executeSubmitThoughts = wrapTraced(
 );
 
 // Export the tool
-export const submitThoughtsTool = createTool({
+export const submitThoughts = createTool({
   id: 'submitThoughtsTool',
   description:
     'Confirms that the agent has finished thinking through all of its steps and is ready to move on to the next phase of the workflow. This is a signal tool with no input or output parameters.',
@@ -34,4 +34,4 @@ export const submitThoughtsTool = createTool({
   },
 });
 
-export default submitThoughtsTool;
+export default submitThoughts;

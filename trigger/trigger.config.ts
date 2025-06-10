@@ -1,3 +1,5 @@
+import path from 'node:path';
+import { esbuildPlugin } from '@trigger.dev/build/extensions';
 import { defineConfig } from '@trigger.dev/sdk/v3';
 
 export default defineConfig({
@@ -20,6 +22,50 @@ export default defineConfig({
   },
   build: {
     external: ['lz4', 'xxhash'],
+    extensions: [
+      esbuildPlugin({
+        name: 'buster-path-resolver',
+        setup(build) {
+          // Resolve all @buster/* imports
+          build.onResolve({ filter: /^@buster\// }, (args) => {
+            const fullPath = args.path.replace('@buster/', '');
+            const parts = fullPath.split('/');
+            const packageName = parts[0];
+            const subPath = parts.slice(1).join('/');
+
+            let resolvedPath;
+            if (subPath) {
+              // Handle sub-paths like @buster/ai/workflows/analyst-workflow
+              // Check if subPath already starts with 'src', if so, don't add it again
+              const cleanSubPath = subPath.startsWith('src/') ? subPath.slice(4) : subPath;
+              resolvedPath = path.resolve(
+                process.cwd(),
+                '..',
+                'packages',
+                packageName,
+                'src',
+                cleanSubPath + '.ts'
+              );
+            } else {
+              // Handle direct package imports like @buster/ai
+              resolvedPath = path.resolve(
+                process.cwd(),
+                '..',
+                'packages',
+                packageName,
+                'src',
+                'index.ts'
+              );
+            }
+
+            return {
+              path: resolvedPath,
+              namespace: 'file',
+            };
+          });
+        },
+      }),
+    ],
   },
   dirs: ['./src'],
 });

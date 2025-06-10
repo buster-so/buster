@@ -4,9 +4,9 @@ import { Hono } from 'hono';
 import { corsMiddleware } from './middleware/cors';
 import { loggerMiddleware } from './middleware/logger';
 
+import healthcheckRoutes from './api/healthcheck';
 // Import API route modules
 import v2Routes from './api/v2';
-import healthcheckRoutes from './api/healthcheck';
 
 // Create main Hono app instance
 const app = new Hono();
@@ -24,7 +24,7 @@ app.onError((err, c) => {
   return c.json(
     {
       error: 'Internal Server Error',
-      message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+      message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong',
     },
     500
   );
@@ -36,7 +36,7 @@ app.notFound((c) => {
 });
 
 // Get port from environment variable or default to 3002 (as mentioned in README)
-const port = parseInt(process.env.PORT || '3002', 10);
+const port = Number.parseInt(process.env.PORT || '3002', 10);
 
 console.log(`🚀 Buster API Server starting on port ${port}`);
 console.log(`🏥 Detailed health check available at http://localhost:${port}/healthcheck`);
@@ -44,6 +44,6 @@ console.log(`🏥 Detailed health check available at http://localhost:${port}/he
 // Export for Bun
 export default {
   port,
-  fetch: app.fetch
+  fetch: app.fetch,
 };
 export type AppType = typeof routes;

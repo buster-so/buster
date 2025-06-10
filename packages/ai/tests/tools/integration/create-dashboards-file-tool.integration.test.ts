@@ -1,5 +1,4 @@
 import { randomUUID } from 'node:crypto';
-import { createDashboardsFileTool } from '@/tools/visualization-tools/create-dashboards-file-tool';
 import {
   dashboardFiles,
   db,
@@ -9,6 +8,7 @@ import {
   metricFilesToDashboardFiles,
 } from '@buster/database';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+import { createDashboardsFileTool } from '../../../src/tools/visualization-tools/create-dashboards-file-tool';
 
 describe('Create Dashboards File Tool Integration Tests', () => {
   let mockRuntimeContext: any;

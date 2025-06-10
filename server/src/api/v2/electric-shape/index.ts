@@ -2,7 +2,7 @@ import { requireAuth } from '../../../middleware/auth';
 import { Hono } from 'hono';
 import { createProxiedResponse, getElectricShapeUrl } from './_helpers';
 import proxyRouter from './_proxyRouterConfig';
-import { getUserIdFromContext } from '@/utils/users';
+import { getUserIdFromContext } from '../../../utils/users';
 import { errorResponse } from '../../../utils/response';
 import { z } from 'zod';
 import { zValidator } from '@hono/zod-validator';

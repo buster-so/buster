@@ -1,10 +1,16 @@
 import { createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
+import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { analystAgent } from '../agents/analyst-agent/analyst-agent';
-import { formatMessagesForAnalyst } from '../utils/memory/message-history';
+import { parseStreamingArgs as parseDoneArgs } from '../tools/communication-tools/done-tool';
+import { parseStreamingArgs as parseExecuteSqlArgs } from '../tools/database-tools/execute-sql';
+import { parseStreamingArgs as parseSequentialThinkingArgs } from '../tools/planning-thinking-tools/sequential-thinking-tool';
+import { parseStreamingArgs as parseCreateMetricsArgs } from '../tools/visualization-tools/create-metrics-file-tool';
+import { saveConversationHistoryFromStep } from '../utils/database/saveConversationHistory';
 import { ThinkAndPrepOutputSchema } from '../utils/memory/types';
+import { ToolArgsParser } from '../utils/streaming';
 import type {
   AnalystRuntimeContext,
   thinkAndPrepWorkflowInputSchema,
@@ -12,11 +18,56 @@ import type {
 
 const inputSchema = ThinkAndPrepOutputSchema;
 
-const outputSchema = z.object({});
+const outputSchema = z.object({
+  conversationHistory: z.array(z.any()), // CoreMessage[] from combined history
+  finished: z.boolean().optional(),
+  outputMessages: z.array(z.any()).optional(),
+  stepData: z.any().optional(),
+  metadata: z.any().optional(),
+});
+
+// Helper function for analyst onStepFinish callback
+const handleAnalystStepFinish = async ({
+  step,
+  inputData,
+  runtimeContext,
+  abortController,
+}: {
+  step: any;
+  inputData: z.infer<typeof inputSchema>;
+  runtimeContext: RuntimeContext<AnalystRuntimeContext>;
+  abortController: AbortController;
+}) => {
+  // Save complete conversation history to database before any abort (think-and-prep + analyst messages)
+  const analystResponseMessages = step.response.messages as CoreMessage[];
+  const completeConversationHistory = [
+    ...(inputData.outputMessages as CoreMessage[]),
+    ...analystResponseMessages,
+  ];
+
+  try {
+    await saveConversationHistoryFromStep(runtimeContext as any, completeConversationHistory);
+  } catch (error) {
+    console.error('Failed to save analyst conversation history:', error);
+    // Continue with abort even if save fails to avoid hanging
+  }
+
+  // Check if doneTool was called and abort after saving
+  const toolNames = step.toolCalls.map((call: any) => call.toolName);
+  const shouldAbort = toolNames.includes('doneTool');
+
+  if (shouldAbort) {
+    abortController.abort();
+  }
+
+  return {
+    completeConversationHistory,
+    shouldAbort,
+  };
+};
 
 const analystExecution = async ({
   inputData,
-  getInitData,
   runtimeContext,
 }: {
   inputData: z.infer<typeof inputSchema>;
@@ -24,6 +75,7 @@ const analystExecution = async ({
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof outputSchema>> => {
   const abortController = new AbortController();
+  let completeConversationHistory: CoreMessage[] = [];
 
   try {
     const resourceId = runtimeContext.get('userId');
@@ -33,21 +85,26 @@ const analystExecution = async ({
       throw new Error('Unable to access your session. Please refresh and try again.');
     }
 
-    // Get the initial prompt from the workflow
-    const initData = await getInitData();
-    const initialPrompt = initData.prompt;
-
-    // Format messages for the analyst agent
-    const formattedMessages = formatMessagesForAnalyst(inputData.outputMessages, initialPrompt);
+    // Messages come directly from think-and-prep step output
+    // They are already in CoreMessage[] format
+    const messages = inputData.outputMessages as CoreMessage[];
 
     const wrappedStream = wrapTraced(
       async () => {
-        const stream = await analystAgent.stream(formattedMessages, {
-          threadId,
-          resourceId,
+        const stream = await analystAgent.stream(messages, {
           runtimeContext,
           toolChoice: 'required',
           abortSignal: abortController.signal,
+          onStepFinish: async (step) => {
+            const result = await handleAnalystStepFinish({
+              step,
+              inputData,
+              runtimeContext,
+              abortController,
+            });
+
+            completeConversationHistory = result.completeConversationHistory;
+          },
         });
 
         return stream;
@@ -55,7 +112,7 @@ const analystExecution = async ({
       {
         name: 'Analyst',
         spanAttributes: {
-          messageCount: formattedMessages.length,
+          messageCount: messages.length,
           previousStep: {
             toolsUsed: inputData.metadata?.toolsUsed,
             finalTool: inputData.metadata?.finalTool,
@@ -67,19 +124,48 @@ const analystExecution = async ({
 
     const stream = await wrappedStream();
 
+    // Initialize the tool args parser with analyst tool mappings
+    const toolArgsParser = new ToolArgsParser();
+    toolArgsParser.registerParser('create-metrics-file', parseCreateMetricsArgs);
+    toolArgsParser.registerParser('done', parseDoneArgs);
+    toolArgsParser.registerParser('execute-sql', parseExecuteSqlArgs);
+    toolArgsParser.registerParser('sequential-thinking', parseSequentialThinkingArgs);
+
     for await (const chunk of stream.fullStream) {
+      // Process streaming tool arguments
+      if (chunk.type === 'tool-call-streaming-start' || chunk.type === 'tool-call-delta') {
+        const streamingResult = toolArgsParser.processChunk(chunk);
+        if (streamingResult) {
+          // TODO: Emit streaming result for real-time UI updates
+          // This could be sent via WebSocket, Server-Sent Events, or other streaming mechanism
+          console.log(`🔧 [${streamingResult.toolName}] Streaming:`, streamingResult.partialArgs);
+        }
+      }
+
       if (chunk.type === 'tool-result' && chunk.toolName === 'doneTool') {
-        abortController.abort();
-        return {};
+        // Don't abort here anymore - let onStepFinish handle it after saving
+        return {
+          conversationHistory: completeConversationHistory,
+          finished: true,
+          outputMessages: completeConversationHistory,
+        };
       }
     }
 
-    return {};
+    return {
+      conversationHistory: completeConversationHistory,
+      finished: true,
+      outputMessages: completeConversationHistory,
+    };
   } catch (error) {
     // Handle abort errors gracefully
     if (error instanceof Error && error.name === 'AbortError') {
       // This is expected when we abort the stream
-      return {};
+      return {
+        conversationHistory: completeConversationHistory,
+        finished: true,
+        outputMessages: completeConversationHistory,
+      };
     }
 
     console.error('Error in analyst step:', error);

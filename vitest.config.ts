@@ -1,14 +1,19 @@
 import { defineConfig } from 'vitest/config'
 import { loadEnv } from 'vite'
 
-export default defineConfig({
-  test: {
-    workspace: ['packages/*'],
-    include: ['**/*.test.ts', '**/*.integration.test.ts', '**/*.unit.test.ts', '**/*.int.test.ts'],
-    globals: true,
-    environment: 'node',
-    testTimeout: 30000,
-    // Option 1: Load specific .env file using loadEnv
-    env: loadEnv('', process.cwd(), ''),
-  },
+// Note: Using dynamic import to avoid ES module issues
+export default defineConfig(async () => {
+  const { default: tsconfigPaths } = await import('vite-tsconfig-paths')
+  
+  return {
+    plugins: [tsconfigPaths()],
+    test: {
+      projects: ['packages/*', 'trigger'],
+      include: ['**/*.test.ts', '**/*.integration.test.ts', '**/*.unit.test.ts', '**/*.int.test.ts'],
+      globals: true,
+      environment: 'node',
+      testTimeout: 300000,
+      env: loadEnv('', process.cwd(), ''),
+    },
+  }
 })

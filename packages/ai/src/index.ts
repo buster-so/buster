@@ -23,3 +23,10 @@ export { thinkAndPrepAgent } from './agents/think-and-prep-agent/think-and-prep-
 
 // Export shared memory utilities
 export { getSharedMemory, resetSharedMemory } from './utils/shared-memory';
+
+// Export chat history utilities
+export {
+  getChatHistory,
+  getRawLlmMessages,
+  getRawLlmMessagesByMessageId,
+} from './steps/get-chat-history';

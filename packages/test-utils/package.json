@@ -1,0 +1,13 @@
+{
+  "name": "@buster/test-utils",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest"
+  }
+}

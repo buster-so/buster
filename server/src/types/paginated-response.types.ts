@@ -60,8 +60,8 @@ export const createPaginatedResponse = <T>(
       total,
       totalPages,
       hasNext: page < totalPages,
-      hasPrev: page > 1
+      hasPrev: page > 1,
     },
-    ...(meta && { meta })
+    ...(meta && { meta }),
   };
 };

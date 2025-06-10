@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
-import { createMetricsFileTool } from '@/tools/visualization-tools/create-metrics-file-tool';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+import { createMetrics } from '../../../src/tools/visualization-tools/create-metrics-file-tool';
 
 describe('Create Metrics File Tool Integration Tests', () => {
   let mockRuntimeContext: any;
@@ -34,11 +34,11 @@ describe('Create Metrics File Tool Integration Tests', () => {
   });
 
   test('should have correct tool configuration', () => {
-    expect(createMetricsFileTool.id).toBe('create-metrics-file');
-    expect(createMetricsFileTool.description).toContain('Creates metric configuration files');
-    expect(createMetricsFileTool.inputSchema).toBeDefined();
-    expect(createMetricsFileTool.outputSchema).toBeDefined();
-    expect(createMetricsFileTool.execute).toBeDefined();
+    expect(createMetrics.id).toBe('create-metrics-file');
+    expect(createMetrics.description).toContain('Creates metric configuration files');
+    expect(createMetrics.inputSchema).toBeDefined();
+    expect(createMetrics.outputSchema).toBeDefined();
+    expect(createMetrics.execute).toBeDefined();
   });
 
   test('should validate tool input schema', () => {
@@ -75,7 +75,7 @@ chartConfig:
       ],
     };
 
-    const result = createMetricsFileTool.inputSchema.safeParse(validInput);
+    const result = createMetrics.inputSchema.safeParse(validInput);
     expect(result.success).toBe(true);
   });
 
@@ -97,7 +97,7 @@ chartConfig:
       failed_files: [],
     };
 
-    const result = createMetricsFileTool.outputSchema.safeParse(validOutput);
+    const result = createMetrics.outputSchema.safeParse(validOutput);
     expect(result.success).toBe(true);
   });
 
@@ -129,7 +129,7 @@ chartConfig:
       runtimeContext: contextWithoutDataSource,
     };
 
-    await expect(createMetricsFileTool.execute({ context: input })).rejects.toThrow(
+    await expect(createMetrics.execute({ context: input })).rejects.toThrow(
       'Data source ID not found in runtime context'
     );
   });
@@ -154,7 +154,7 @@ chartConfig:
       runtimeContext: mockRuntimeContext,
     };
 
-    const result = await createMetricsFileTool.execute({ context: input });
+    const result = await createMetrics.execute({ context: input });
 
     expect(result.files).toHaveLength(0);
     expect(result.failed_files).toHaveLength(1);
@@ -183,7 +183,7 @@ chartConfig:
       runtimeContext: mockRuntimeContext,
     };
 
-    const result = await createMetricsFileTool.execute({ context: input });
+    const result = await createMetrics.execute({ context: input });
 
     expect(result.files).toHaveLength(0);
     expect(result.failed_files).toHaveLength(1);
@@ -230,7 +230,7 @@ chartConfig:
       runtimeContext: mockRuntimeContext,
     };
 
-    const result = await createMetricsFileTool.execute({ context: input });
+    const result = await createMetrics.execute({ context: input });
 
     // Should have one success and one failure
     expect(result.files).toHaveLength(1);
@@ -265,7 +265,7 @@ chartConfig:
       runtimeContext: mockRuntimeContext,
     };
 
-    const result = await createMetricsFileTool.execute({ context: input });
+    const result = await createMetrics.execute({ context: input });
 
     expect(result.duration).toBeGreaterThan(0);
     expect(typeof result.duration).toBe('number');
@@ -298,7 +298,7 @@ chartConfig:
       runtimeContext: mockRuntimeContext,
     };
 
-    const result = await createMetricsFileTool.execute({ context: input });
+    const result = await createMetrics.execute({ context: input });
 
     expect(result.files).toHaveLength(3);
     expect(result.failed_files).toHaveLength(0);
@@ -335,7 +335,7 @@ chartConfig:
       runtimeContext: mockRuntimeContext,
     };
 
-    const successResult = await createMetricsFileTool.execute({ context: successInput });
+    const successResult = await createMetrics.execute({ context: successInput });
     expect(successResult.message).toBe('Successfully created 1 metric files.');
 
     // Test failure message
@@ -346,7 +346,7 @@ chartConfig:
       runtimeContext: mockRuntimeContext,
     };
 
-    const failureResult = await createMetricsFileTool.execute({ context: failureInput });
+    const failureResult = await createMetrics.execute({ context: failureInput });
     expect(failureResult.message).toContain("Failed to create 'Failure Test'");
     expect(failureResult.message).toContain('Please recreate the metric from scratch');
   });

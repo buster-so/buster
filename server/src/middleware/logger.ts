@@ -8,4 +8,4 @@ export const loggerMiddleware = logger((str, ...rest) => {
     // In production, you might want to use a proper logging service
     console.log(str, ...rest);
   }
-}); 
+});

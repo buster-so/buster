@@ -10,12 +10,12 @@ export { bashTool } from './file-tools/bash-tool';
 export { batchTool } from './file-tools/batch-tool';
 export { reviewPlanTool } from './planning-thinking-tools/review-plan-tool';
 export { createPlanInvestigativeTool } from './planning-thinking-tools/create-plan-investigative-tool';
-export { sequentialThinkingTool } from './planning-thinking-tools/sequential-thinking-tool';
-export { createMetricsFileTool } from './visualization-tools/create-metrics-file-tool';
-export { modifyMetricsFileTool } from './visualization-tools/modify-metrics-file-tool';
-export { createDashboardsFileTool } from './visualization-tools/create-dashboards-file-tool';
-export { modifyDashboardsFileTool } from './visualization-tools/modify-dashboards-file-tool';
-export { findRequiredTextValues as executeSqlStatementTool } from './database-tools/find-required-text-values';
+export { sequentialThinking } from './planning-thinking-tools/sequential-thinking-tool';
+export { createMetrics } from './visualization-tools/create-metrics-file-tool';
+export { modifyMetrics } from './visualization-tools/modify-metrics-file-tool';
+export { createDashboards } from './visualization-tools/create-dashboards-file-tool';
+export { modifyDashboards } from './visualization-tools/modify-dashboards-file-tool';
+export { executeSql } from './database-tools/execute-sql';
 export {
   filterDashboardsTool,
   searchDashboardsWithContentTool,

@@ -1,10 +1,10 @@
 {
+  "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "strict": true,
+    "rootDir": "src",
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
     "baseUrl": ".",
-    "rootDir": "..",
     "composite": true,
     "declaration": true,
     "declarationMap": true,

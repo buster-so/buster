@@ -27,7 +27,7 @@ const runAnalystWorkflow = async (input: string) => {
 
 Eval('ANALYST-WORKFLOW', {
   experimentName: 'general-vibe-check',
-  data: initDataset({ project: 'ANALYST-WORKFLOW', dataset: 'test_inputs_northwind' }),
+  data: initDataset({ project: 'ANALYST-WORKFLOW', dataset: 'Northwind General (100+)' }),
   task: runAnalystWorkflow,
   scores: [],
   maxConcurrency: 10,

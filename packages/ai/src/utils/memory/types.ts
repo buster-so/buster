@@ -1,63 +1,12 @@
-import type { CoreAssistantMessage, CoreMessage, CoreToolMessage } from 'ai';
+import type { CoreMessage } from 'ai';
 import { z } from 'zod';
 
-// Tool call schema matching the actual structure from Mastra
-export const ToolCallSchema = z.object({
-  type: z.literal('tool-call'),
-  toolCallId: z.string(),
-  toolName: z.string(),
-  args: z.record(z.any()),
-});
+// Use CoreMessage[] directly from AI SDK as our internal format
+// This eliminates type mismatches and works directly with agent.stream()
+export type MessageHistory = CoreMessage[];
 
-// Tool result schema
-export const ToolResultSchema = z.object({
-  type: z.literal('tool-result'),
-  toolCallId: z.string(),
-  toolName: z.string(),
-  result: z.any(),
-});
-
-// Content item schemas
-export const TextContentSchema = z.object({
-  type: z.literal('text'),
-  text: z.string(),
-});
-
-export const ContentItemSchema = z.union([TextContentSchema, ToolCallSchema, ToolResultSchema]);
-
-// Core message schemas matching AI SDK format
-export const CoreAssistantMessageSchema = z.object({
-  role: z.literal('assistant'),
-  content: z.array(ContentItemSchema),
-  id: z.string(),
-});
-
-export const CoreToolMessageSchema = z.object({
-  role: z.literal('tool'),
-  content: z.array(ToolResultSchema),
-  id: z.string(),
-});
-
-export const CoreUserMessageSchema = z.object({
-  role: z.literal('user'),
-  content: z.string(),
-});
-
-export const CoreSystemMessageSchema = z.object({
-  role: z.literal('system'),
-  content: z.string(),
-});
-
-// Union of all message types
-export const CoreMessageSchema = z.union([
-  CoreAssistantMessageSchema,
-  CoreToolMessageSchema,
-  CoreUserMessageSchema,
-  CoreSystemMessageSchema,
-]);
-
-// Array of messages (what we get from step.response.messages)
-export const MessageHistorySchema = z.array(CoreMessageSchema);
+// Zod schema for validation - using z.any() since CoreMessage has complex union types
+export const MessageHistorySchema = z.array(z.any());
 
 // Step finish data structure
 export const StepFinishDataSchema = z.object({
@@ -97,11 +46,12 @@ export const StepFinishDataSchema = z.object({
 export const ThinkAndPrepOutputSchema = z.object({
   finished: z.boolean(),
   outputMessages: MessageHistorySchema,
+  conversationHistory: MessageHistorySchema.optional(), // Include conversation history for workflow output
   stepData: StepFinishDataSchema.optional(), // The full step object
   metadata: z
     .object({
       toolsUsed: z.array(z.string()),
-      finalTool: z.enum(['submitThoughtsTool', 'finishAndRespondTool']).optional(),
+      finalTool: z.enum(['submitThoughts', 'finishAndRespond']).optional(),
       text: z.string().optional(),
       reasoning: z.string().optional(),
     })
@@ -109,19 +59,15 @@ export const ThinkAndPrepOutputSchema = z.object({
 });
 
 // Type exports
-export type ToolCall = z.infer<typeof ToolCallSchema>;
-export type ToolResult = z.infer<typeof ToolResultSchema>;
-export type ContentItem = z.infer<typeof ContentItemSchema>;
-export type MessageHistory = z.infer<typeof MessageHistorySchema>;
 export type StepFinishData = z.infer<typeof StepFinishDataSchema>;
 export type ThinkAndPrepOutput = z.infer<typeof ThinkAndPrepOutputSchema>;
 
-// Type guards
-export function isAssistantMessage(message: CoreMessage): message is CoreAssistantMessage {
+// Type guards for CoreMessage from AI SDK
+export function isAssistantMessage(message: CoreMessage): boolean {
   return message.role === 'assistant';
 }
 
-export function isToolMessage(message: CoreMessage): message is CoreToolMessage {
+export function isToolMessage(message: CoreMessage): boolean {
   return message.role === 'tool';
 }
 
@@ -129,6 +75,8 @@ export function hasToolCalls(message: CoreMessage): boolean {
   if (!isAssistantMessage(message)) return false;
   return (
     Array.isArray(message.content) &&
-    message.content.some((item) => typeof item === 'object' && item.type === 'tool-call')
+    message.content.some(
+      (item) => typeof item === 'object' && 'type' in item && item.type === 'tool-call'
+    )
   );
 }

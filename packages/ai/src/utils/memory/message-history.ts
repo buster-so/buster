@@ -1,20 +1,19 @@
 import type { CoreMessage } from 'ai';
-import type { MessageHistory, ToolCall } from './types';
-import { MessageHistorySchema, isAssistantMessage } from './types';
+import type { MessageHistory } from './types';
+import { isAssistantMessage } from './types';
 
 /**
  * Extract and validate message history from step response
  */
 export function extractMessageHistory(stepMessages: any[]): MessageHistory {
-  // Validate the messages match our expected schema
-  const result = MessageHistorySchema.safeParse(stepMessages);
-
-  if (!result.success) {
-    console.error('Invalid message history format:', result.error);
+  // Since we're using CoreMessage[] directly, just validate it's an array and return
+  if (!Array.isArray(stepMessages)) {
+    console.error('Invalid message history format: not an array');
     return [];
   }
 
-  return result.data;
+  // Cast to CoreMessage[] - Mastra provides compatible format
+  return stepMessages as CoreMessage[];
 }
 
 /**
@@ -24,16 +23,16 @@ export function getLastToolUsed(messages: MessageHistory): string | null {
   // Iterate backwards through messages
   for (let i = messages.length - 1; i >= 0; i--) {
     const msg = messages[i];
+    if (!msg) continue;
 
     if (isAssistantMessage(msg) && Array.isArray(msg.content)) {
       // Find tool calls in the content
       const toolCall = msg.content.find(
-        (item): item is ToolCall =>
-          typeof item === 'object' && 'type' in item && item.type === 'tool-call'
+        (item): any => typeof item === 'object' && 'type' in item && item.type === 'tool-call'
       );
 
-      if (toolCall) {
-        return toolCall.toolName;
+      if (toolCall && 'toolName' in toolCall) {
+        return toolCall.toolName as string;
       }
     }
   }
@@ -50,8 +49,13 @@ export function getAllToolsUsed(messages: MessageHistory): string[] {
   for (const msg of messages) {
     if (isAssistantMessage(msg) && Array.isArray(msg.content)) {
       for (const item of msg.content) {
-        if (typeof item === 'object' && 'type' in item && item.type === 'tool-call') {
-          tools.add(item.toolName);
+        if (
+          typeof item === 'object' &&
+          'type' in item &&
+          item.type === 'tool-call' &&
+          'toolName' in item
+        ) {
+          tools.add(item.toolName as string);
         }
       }
     }
@@ -101,14 +105,15 @@ export function extractToolArguments(
   }
 
   const toolCall = message.content.find(
-    (item): item is ToolCall =>
+    (item): any =>
       typeof item === 'object' &&
       'type' in item &&
       item.type === 'tool-call' &&
+      'toolName' in item &&
       item.toolName === toolName
   );
 
-  return toolCall?.args || null;
+  return toolCall && 'args' in toolCall ? (toolCall.args as Record<string, any>) : null;
 }
 
 /**
@@ -151,9 +156,14 @@ export function getConversationSummary(messages: MessageHistory): {
         assistantMessages++;
         if (Array.isArray(msg.content)) {
           for (const item of msg.content) {
-            if (typeof item === 'object' && 'type' in item && item.type === 'tool-call') {
+            if (
+              typeof item === 'object' &&
+              'type' in item &&
+              item.type === 'tool-call' &&
+              'toolName' in item
+            ) {
               toolCalls++;
-              toolsUsed.add(item.toolName);
+              toolsUsed.add(item.toolName as string);
             }
           }
         }
