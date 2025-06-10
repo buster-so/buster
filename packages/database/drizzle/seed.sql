@@ -1619,4 +1619,10 @@ aa0a1367-3a10-4fe5-9244-2db46c000d64	bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce	restri
 \.
 
 -- Set all existing messages to complete (true) since they are already fully processed
-UPDATE "messages" SET "is_completed" = true WHERE "is_completed" = false;
+-- Only update if the messages table exists
+DO $$
+BEGIN
+    IF EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'messages') THEN
+        UPDATE "messages" SET "is_completed" = true WHERE "is_completed" = false;
+    END IF;
+END $$;

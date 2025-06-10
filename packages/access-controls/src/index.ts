@@ -17,7 +17,7 @@ export {
   type PermissionedDataset,
 } from './access-controls';
 
-export * from './chats';
+export { canUserAccessChat } from './chats';
 
 // Export utility functions
 export { formatPermissionName, buildAccessQuery } from './utils';

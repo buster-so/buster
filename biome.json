@@ -22,7 +22,7 @@
         "noConsoleLog": "warn"
       },
       "complexity": {
-        "noExcessiveCognitiveComplexity": "warn"
+        "noExcessiveCognitiveComplexity": "off"
       },
       "performance": {
         "noDelete": "error"
@@ -142,7 +142,8 @@
       "linter": {
         "rules": {
           "suspicious": {
-            "noConsoleLog": "off"
+            "noConsoleLog": "off",
+            "noExplicitAny": "warn"
           }
         }
       }
