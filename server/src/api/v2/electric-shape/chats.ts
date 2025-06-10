@@ -1,6 +1,6 @@
 import { errorResponse } from '../../../utils/response';
 import { type Context } from 'hono';
-import { canUserAccessChat } from '@/access-controls/chats';
+import { canUserAccessChat } from '@buster/access-controls';
 import { extractParamFromWhere } from './_helpers';
 
 export const chatsProxyRouter = async (url: URL, userId: string, c: Context) => {
