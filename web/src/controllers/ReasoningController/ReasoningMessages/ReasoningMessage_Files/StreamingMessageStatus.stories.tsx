@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { StreamingMessageStatus } from './ReasoningMessageFile';
+import { StreamingMessageStatus } from './StreamingMessageStatus';
 
 const meta: Meta<typeof StreamingMessageStatus> = {
   title: 'Components/StreamingMessageStatus',
