@@ -1,11 +1,6 @@
-import { join } from 'node:path';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-
-// Load environment variables from the root .env file
-import { config } from 'dotenv';
-config({ path: join(process.cwd(), '.env') });
 
 // Pool configuration interface
 export interface PoolConfig {
