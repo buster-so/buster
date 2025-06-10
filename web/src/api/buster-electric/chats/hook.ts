@@ -3,6 +3,7 @@ import { useMemo, useRef } from 'react';
 import { chatShape, type BusterChatWithoutMessages } from './shapes';
 import last from 'lodash/last';
 import { useChatUpdate } from '@/context/Chats/useChatUpdate';
+import { useMemoizedFn } from '@/hooks';
 
 export const useGetChat = ({ chatId }: { chatId: string }) => {
   const shape = useMemo(() => chatShape({ chatId }), [chatId]);
@@ -27,7 +28,7 @@ export const useTrackAndUpdateChatChanges = (
   return useShapeStream(
     shape,
     updateOperations,
-    (rows) => {
+    useMemoizedFn((rows) => {
       const chat = last(rows);
       if (chat && chat.value) {
         iteration.current++;
@@ -36,7 +37,7 @@ export const useTrackAndUpdateChatChanges = (
           onUpdateChat(chat.value);
         }
       }
-    },
+    }),
     subscribe
   );
 };

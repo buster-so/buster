@@ -2,7 +2,6 @@ import { useQueries } from '@tanstack/react-query';
 import React, { type PropsWithChildren } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
 import type { IBusterChatMessage } from '@/api/asset_interfaces/chat';
-import { useTrackAndUpdateMessageChanges } from '@/api/buster-electric/messages';
 import { useGetChat } from '@/api/buster_rest/chats';
 import { queryKeys } from '@/api/query_keys';
 import { useChatLayoutContextSelector } from '..';
@@ -10,6 +9,7 @@ import type { SelectedFile } from '../interfaces';
 import { useAutoChangeLayout } from './useAutoChangeLayout';
 import { useIsFileChanged } from './useIsFileChanged';
 import { useTrackAndUpdateChatChanges } from '@/api/buster-electric/chats';
+import { useTrackAndUpdateMessageChanges } from '@/api/buster-electric/messages';
 
 const useChatIndividualContext = ({
   chatId,

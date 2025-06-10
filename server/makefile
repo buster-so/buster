@@ -33,4 +33,5 @@ dev:
 stop:
 	docker stop buster-redis-make || true && \
 	docker rm buster-redis-make || true && \
+	cd ../electric-server && docker compose stop && \
 	supabase stop

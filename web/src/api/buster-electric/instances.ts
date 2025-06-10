@@ -10,6 +10,7 @@ import {
 import { ELECTRIC_BASE_URL } from './config';
 import { useSupabaseContext } from '@/context/Supabase';
 import { useEffect, useMemo } from 'react';
+import { useWhyDidYouUpdate } from '@/hooks';
 
 export type ElectricShapeOptions<T extends Row<unknown> = Row<unknown>> = Omit<
   Parameters<typeof useElectricShape<T>>[0],
@@ -62,7 +63,7 @@ export const useShapeStream = <T extends Row<unknown> = Row<unknown>>(
     return createElectricShape(params, accessToken);
   }, [accessToken, params]);
 
-  const stream = getShapeStream<T>(shapeParams);
+  const stream = useMemo(() => getShapeStream<T>(shapeParams), [shapeParams]);
 
   useEffect(() => {
     if (!subscribe) {
@@ -73,6 +74,7 @@ export const useShapeStream = <T extends Row<unknown> = Row<unknown>>(
       const filteredMessages = messages.filter(
         (m) =>
           isChangeMessage(m) &&
+          m.value &&
           operations.includes(m.headers.operation as `insert` | `update` | `delete`)
       ) as ChangeMessage<T>[];
 
@@ -98,5 +100,5 @@ export const useShapeStream = <T extends Row<unknown> = Row<unknown>>(
     return () => {
       unsubscribe();
     };
-  }, [operations, onUpdate, shouldUnsubscribe, shapeParams]);
+  }, [operations, onUpdate, shouldUnsubscribe, shapeParams, subscribe]);
 };
