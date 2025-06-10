@@ -1,4 +1,4 @@
-import type { FileType, ThoughtFileType } from './config';
+import type { FileType, ReasoningThoughtFileType, ReasoningFileType } from './config';
 
 export type BusterChatMessage = {
   id: string;
@@ -56,7 +56,7 @@ export type BusterChatMessageReasoning =
 
 export type BusterChatMessageReasoning_pill = {
   text: string;
-  type: ThoughtFileType | null; //if null then the pill will not link anywhere
+  type: ReasoningThoughtFileType | null; //if null then the pill will not link anywhere
   id: string;
 };
 
@@ -87,7 +87,7 @@ export type BusterChatMessageReasoning_text = {
 
 export type BusterChatMessageReasoning_file = {
   id: string;
-  file_type: FileType;
+  file_type: ReasoningFileType;
   file_name: string;
   version_number: number;
   status: BusterChatMessageReasoning_status;
