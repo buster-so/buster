@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { parseStreamingArgs as parseDoneArgs } from '../../../src/tools/communication-tools/done-tool';
-import { parseStreamingArgs as parseFinishArgs } from '../../../src/tools/communication-tools/finish-and-respond';
+import { parseStreamingArgs as parseFinishArgs } from '../../../src/tools/communication-tools/respond-without-analysis';
 import { parseStreamingArgs as parseExecuteSqlArgs } from '../../../src/tools/database-tools/execute-sql';
 import { parseStreamingArgs as parseSequentialArgs } from '../../../src/tools/planning-thinking-tools/sequential-thinking-tool';
 import { parseStreamingArgs as parseCreateMetricsArgs } from '../../../src/tools/visualization-tools/create-metrics-file-tool';

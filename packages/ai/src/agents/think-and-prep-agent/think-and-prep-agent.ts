@@ -1,6 +1,6 @@
 import { Agent } from '@mastra/core';
 import { executeSql, sequentialThinking } from '../../tools';
-import finishAndRespond from '../../tools/communication-tools/finish-and-respond';
+import respondWithoutAnalysis from '../../tools/communication-tools/respond-without-analysis';
 import submitThoughts from '../../tools/communication-tools/submit-thoughts-tool';
 import { anthropicCachedModel } from '../../utils/models/anthropic-cached';
 import { getSharedMemory } from '../../utils/shared-memory';
@@ -19,7 +19,7 @@ export const thinkAndPrepAgent = new Agent({
   tools: {
     sequentialThinking,
     executeSql,
-    finishAndRespond,
+    respondWithoutAnalysis,
     submitThoughts,
   },
   memory: getSharedMemory(),

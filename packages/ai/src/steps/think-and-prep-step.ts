@@ -4,7 +4,7 @@ import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { thinkAndPrepAgent } from '../agents/think-and-prep-agent/think-and-prep-agent';
-import { parseStreamingArgs as parseFinishAndRespondArgs } from '../tools/communication-tools/finish-and-respond';
+import { parseStreamingArgs as parseRespondWithoutAnalysisArgs } from '../tools/communication-tools/respond-without-analysis';
 import { parseStreamingArgs as parseSequentialThinkingArgs } from '../tools/planning-thinking-tools/sequential-thinking-tool';
 import { saveConversationHistoryFromStep } from '../utils/database/saveConversationHistory';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
@@ -59,7 +59,7 @@ const handleThinkAndPrepStepFinish = async ({
   let shouldAbort = false;
 
   if (
-    toolNames.some((toolName: string) => ['submitThoughts', 'finishAndRespond'].includes(toolName))
+    toolNames.some((toolName: string) => ['submitThoughts', 'respondWithoutAnalysis'].includes(toolName))
   ) {
     // Extract and validate messages from the step response
     // step.response.messages contains the conversation history for this step
@@ -80,8 +80,8 @@ const handleThinkAndPrepStepFinish = async ({
     // Store the full step data (cast to our expected type)
     finalStepData = step as any;
 
-    // Set finished to true if finish-and-respond tool was called
-    if (toolNames.includes('finish-and-respond')) {
+    // Set finished to true if respond-without-analysis tool was called
+    if (toolNames.includes('respond-without-analysis')) {
       finished = true;
     }
 
@@ -180,7 +180,7 @@ const thinkAndPrepExecution = async ({
 
     // Initialize the tool args parser with think-and-prep tool mappings
     const toolArgsParser = new ToolArgsParser();
-    toolArgsParser.registerParser('finish-and-respond', parseFinishAndRespondArgs);
+    toolArgsParser.registerParser('respond-without-analysis', parseRespondWithoutAnalysisArgs);
     toolArgsParser.registerParser('sequential-thinking', parseSequentialThinkingArgs);
 
     for await (const chunk of stream.fullStream) {
