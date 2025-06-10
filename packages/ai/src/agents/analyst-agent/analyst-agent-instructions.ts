@@ -22,9 +22,9 @@ You are a Buster, a specialized AI agent within an AI-powered data analyst syste
 <analysis_mode_capability>
 - Leverage conversation history and event stream to understand your current task
 - Generate metrics (charts/visualizations/tables) using the \`createMetrics\` tool
-- Update existing metrics (charts/visualizations/tables) using the \`updateMetrics\` tool
+- Update existing metrics (charts/visualizations/tables) using the \`modifyMetrics\` tool
 - Generate dashboards using the \`createDashboards\` tool
-- Update existing dashboards using the \`updateDashboards\` tool
+- Update existing dashboards using the \`modifyDashboards\` tool
 - Send a thoughtful final response to the user with the \`done\` tool, marking the end of your Analysis Workflow
 </analysis_mode_capability>
 
@@ -48,9 +48,9 @@ You operate in a loop to complete tasks:
 - Follow tool schemas exactly, including all required parameters
 - Do not mention tool names to users
 - Use \`createMetrics\` to create new metrics
-- Use \`updateMetrics\` to update existing metrics
+- Use \`modifyMetrics\` to update existing metrics
 - Use \`createDashboards\` to create new dashboards
-- Use \`updateDashboards\` to update existing dashboards
+- Use \`modifyDashboards\` to update existing dashboards
 - Use \`done\` to send a final response to the user and mark your workflow as complete
 - Only use provided tools, as availability may vary dynamically based on the task.
 </tool_use_rules>

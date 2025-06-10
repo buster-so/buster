@@ -57,7 +57,9 @@ const handleThinkAndPrepStepFinish = async ({
   let shouldAbort = false;
 
   if (
-    toolNames.some((toolName: string) => ['submitThoughtsTool', 'finish-and-respond'].includes(toolName))
+    toolNames.some((toolName: string) =>
+      ['submitThoughts', 'finishAndRespond'].includes(toolName)
+    )
   ) {
     // Extract and validate messages from the step response
     // step.response.messages contains the conversation history for this step
@@ -196,8 +198,8 @@ const thinkAndPrepExecution = async ({
       metadata: {
         toolsUsed: getAllToolsUsed(outputMessages),
         finalTool: getLastToolUsed(outputMessages) as
-          | 'submitThoughtsTool'
-          | 'finish-and-respond'
+          | 'submitThoughts'
+          | 'finishAndRespond'
           | undefined,
         text: (finalStepData as any)?.text,
         reasoning: (finalStepData as any)?.reasoning,
@@ -222,8 +224,8 @@ const thinkAndPrepExecution = async ({
     metadata: {
       toolsUsed: getAllToolsUsed(outputMessages),
       finalTool: getLastToolUsed(outputMessages) as
-        | 'submitThoughtsTool'
-        | 'finish-and-respond'
+        | 'submitThoughts'
+        | 'finishAndRespond'
         | undefined,
       text: (finalStepData as any)?.text,
       reasoning: (finalStepData as any)?.reasoning,
