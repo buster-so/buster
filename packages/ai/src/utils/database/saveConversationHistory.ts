@@ -9,6 +9,9 @@ import { appendToReasoning } from './formatLlmMessagesAsReasoning';
  * Saves conversation history to the database
  * Updates the rawLlmMessages field with the complete conversation history
  *
+ * IMPORTANT: The conversationHistory should already be in the correct unbundled format
+ * where each tool call and tool result are separate messages, not bundled together.
+ *
  * @param messageId - The message ID to update
  * @param conversationHistory - The complete conversation history as CoreMessage[]
  * @returns Promise<void>
@@ -20,7 +23,8 @@ export async function saveConversationHistory(
   try {
     const db = getDb();
 
-    // Keep the original logic exactly the same - only update rawLlmMessages
+    // Save the conversation history exactly as provided
+    // It should already be in the correct unbundled format
     await db
       .update(messages)
       .set({

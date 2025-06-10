@@ -3,7 +3,7 @@ import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 
 // Input/Output schemas
-const finishAndRespondInputSchema = z.object({
+const respondWithoutAnalysisInputSchema = z.object({
   final_response: z
     .string()
     .min(1, 'Final response is required')
@@ -13,12 +13,12 @@ const finishAndRespondInputSchema = z.object({
 });
 
 /**
- * Optimistic parsing function for streaming finish-and-respond tool arguments
+ * Optimistic parsing function for streaming respond-without-analysis tool arguments
  * Extracts the final_response field as it's being built incrementally
  */
 export function parseStreamingArgs(
   accumulatedText: string
-): Partial<z.infer<typeof finishAndRespondInputSchema>> | null {
+): Partial<z.infer<typeof respondWithoutAnalysisInputSchema>> | null {
   // Validate input type
   if (typeof accumulatedText !== 'string') {
     throw new Error(`parseStreamingArgs expects string input, got ${typeof accumulatedText}`);
@@ -64,31 +64,33 @@ export function parseStreamingArgs(
   }
 }
 
-const finishAndRespondOutputSchema = z.object({});
+const respondWithoutAnalysisOutputSchema = z.object({});
 
-// Process done tool execution with todo management
-async function processDone(): Promise<z.infer<typeof finishAndRespondOutputSchema>> {
+// Process respond without analysis tool execution
+async function processRespondWithoutAnalysis(): Promise<
+  z.infer<typeof respondWithoutAnalysisOutputSchema>
+> {
   // This tool signals the end of the workflow and provides the final response.
   // The actual agent termination logic resides elsewhere.
   return {};
 }
 
-// Main done function with tracing
-const executeDone = wrapTraced(
-  async (): Promise<z.infer<typeof finishAndRespondOutputSchema>> => {
-    return await processDone();
+// Main respond without analysis function with tracing
+const executeRespondWithoutAnalysis = wrapTraced(
+  async (): Promise<z.infer<typeof respondWithoutAnalysisOutputSchema>> => {
+    return await processRespondWithoutAnalysis();
   },
-  { name: 'finish-and-respond' }
+  { name: 'respond-without-analysis' }
 );
 
 // Export the tool
-export const finishAndRespond = createTool({
-  id: 'finish-and-respond',
+export const respondWithoutAnalysis = createTool({
+  id: 'respond-without-analysis',
   description:
     "Marks all remaining unfinished tasks as complete, sends a final response to the user, and ends the workflow. Use this when the workflow is finished. This must be in markdown format and not use the '•' bullet character.",
-  inputSchema: finishAndRespondInputSchema,
-  outputSchema: finishAndRespondOutputSchema,
-  execute: executeDone,
+  inputSchema: respondWithoutAnalysisInputSchema,
+  outputSchema: respondWithoutAnalysisOutputSchema,
+  execute: executeRespondWithoutAnalysis,
 });
 
-export default finishAndRespond;
+export default respondWithoutAnalysis;

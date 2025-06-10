@@ -2,6 +2,8 @@ export { readFileTool } from './file-tools/read-file-tool';
 export { writeFileTool } from './file-tools/write-file-tool';
 export { lsTool } from './file-tools/ls-tool';
 export { doneTool } from './communication-tools/done-tool';
+export { respondWithoutAnalysis } from './communication-tools/respond-without-analysis';
+export { submitThoughts } from './communication-tools/submit-thoughts-tool';
 export { editFileTool } from './file-tools/edit-file-tool';
 export { globTool } from './file-tools/glob-tool';
 export { grepTool } from './file-tools/grep-tool';
