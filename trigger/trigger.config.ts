@@ -33,7 +33,7 @@ export default defineConfig({
             const packageName = parts[0];
             const subPath = parts.slice(1).join('/');
 
-            let resolvedPath;
+            let resolvedPath: string;
             if (subPath) {
               // Handle sub-paths like @buster/ai/workflows/analyst-workflow
               // Check if subPath already starts with 'src', if so, don't add it again
@@ -44,7 +44,7 @@ export default defineConfig({
                 'packages',
                 packageName,
                 'src',
-                cleanSubPath + '.ts'
+                `${cleanSubPath}.ts`
               );
             } else {
               // Handle direct package imports like @buster/ai

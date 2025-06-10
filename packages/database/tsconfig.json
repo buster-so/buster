@@ -4,6 +4,10 @@
     "rootDir": ".",
     "baseUrl": ".",
     "outDir": "dist",
+    "noEmit": false,
+    "composite": true,
+    "declaration": true,
+    "tsBuildInfoFile": "dist/.tsbuildinfo",
     "paths": {
       "@/*": ["src/*"]
     }
