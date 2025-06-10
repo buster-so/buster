@@ -1,4 +1,4 @@
-import type { ChatCreateHandlerRequest, ChatCreateResponse } from '../../../types/chat.types';
+import type { ChatCreateHandlerRequest, ChatCreateResponse } from '@/types';
 
 /**
  * Handler function for creating a new chat.
@@ -6,7 +6,7 @@ import type { ChatCreateHandlerRequest, ChatCreateResponse } from '../../../type
  * Currently stubbed to return a placeholder message ID.
  */
 export async function createChatHandler(
-  request: ChatCreateHandlerRequest
+  _request: ChatCreateHandlerRequest
 ): Promise<ChatCreateResponse> {
   // TODO: Implement actual chat creation logic
   // This should handle:

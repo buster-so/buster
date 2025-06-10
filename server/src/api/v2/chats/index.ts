@@ -4,7 +4,6 @@ import {
   ChatCreateRequestSchema,
   ChatCreateResponseSchema,
   type ChatCreateRequest, 
-  type ChatCreateResponse, 
   type ChatCreateHandlerRequest 
 } from '../../../types/chat.types';
 import { errorResponse } from '../../../utils/response';

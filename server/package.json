@@ -8,6 +8,6 @@
   },
   "dependencies": {
     "hono": "^4.7.11",
-    "@hono/zod-validator": "^0.2.2"
+    "@hono/zod-validator": "^0.7.0"
   }
 }

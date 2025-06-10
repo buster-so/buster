@@ -3,7 +3,7 @@ import { type Context } from 'hono';
 import { canUserAccessChat } from '@buster/access-controls';
 import { extractParamFromWhere } from './_helpers';
 
-export const messagesProxyRouter = async (url: URL, userId: string, c: Context) => {
+export const messagesProxyRouter = async (url: URL, _userId: string, c: Context) => {
   const matches = extractParamFromWhere(url, 'chat_id');
   const chatId = matches?.[0];
 
