@@ -1,6 +1,7 @@
 import { createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import type { CoreMessage } from 'ai';
+import type { StepResult, ToolSet } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { analystAgent } from '../agents/analyst-agent/analyst-agent';
@@ -45,7 +46,7 @@ const handleAnalystStepFinish = async ({
   runtimeContext,
   abortController,
 }: {
-  step: any;
+  step: StepResult<ToolSet>;
   inputData: z.infer<typeof inputSchema>;
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
   abortController: AbortController;
@@ -57,15 +58,19 @@ const handleAnalystStepFinish = async ({
     ...analystResponseMessages,
   ];
 
-  try {
-    await saveConversationHistoryFromStep(runtimeContext, completeConversationHistory);
-  } catch (error) {
-    console.error('Failed to save analyst conversation history:', error);
-    // Continue with abort even if save fails to avoid hanging
+  const messageId = runtimeContext.get('messageId');
+
+  if (messageId) {
+    try {
+      await saveConversationHistoryFromStep(messageId, completeConversationHistory);
+    } catch (error) {
+      console.error('Failed to save analyst conversation history:', error);
+      // Continue with abort even if save fails to avoid hanging
+    }
   }
 
   // Check if doneTool was called and abort after saving
-  const toolNames = step.toolCalls.map((call: any) => call.toolName);
+  const toolNames = step.toolCalls.map((call) => call.toolName);
   const shouldAbort = toolNames.includes('doneTool');
 
   if (shouldAbort) {
@@ -107,7 +112,7 @@ const analystExecution = async ({
           runtimeContext,
           toolChoice: 'required',
           abortSignal: abortController.signal,
-          onStepFinish: async (step) => {
+          onStepFinish: async (step: StepResult<ToolSet>) => {
             const result = await handleAnalystStepFinish({
               step,
               inputData,

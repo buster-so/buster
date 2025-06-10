@@ -1,5 +1,4 @@
 import type { CoreMessage } from 'ai';
-import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { eq } from 'drizzle-orm';
 import { getDb } from '../../../../database/src/connection';
 import { updateMessageFields } from '../../../../database/src/helpers/messages';
@@ -50,17 +49,10 @@ export async function saveConversationHistory(
  * @param stepMessages - The messages from step.response.messages
  * @returns Promise<void>
  */
-export async function saveConversationHistoryFromStep<T extends Record<string, unknown>>(
-  runtimeContext: RuntimeContext<T>,
+export async function saveConversationHistoryFromStep(
+  messageId: string,
   stepMessages: CoreMessage[]
 ): Promise<void> {
-  const messageId = runtimeContext.get('messageId');
-
-  // Skip saving if no messageId (for testing/evaluation)
-  if (!messageId) {
-    return;
-  }
-
   try {
     const db = getDb();
 
