@@ -107,8 +107,8 @@ export const FileCard = React.memo(
                       onClick={handleHeaderClick}
                     />
                   )}
+                  {typeof fileName === 'string' ? <Text truncate>{fileName}</Text> : fileName}
                 </div>
-                {typeof fileName === 'string' ? <Text truncate>{fileName}</Text> : fileName}
                 {headerButtons}
               </div>
             </CardHeader>

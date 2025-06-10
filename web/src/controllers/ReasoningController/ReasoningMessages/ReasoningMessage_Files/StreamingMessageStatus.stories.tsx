@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { StreamingMessageStatus } from './StreamingMessageStatus';
 
 const meta: Meta<typeof StreamingMessageStatus> = {
-  title: 'Components/StreamingMessageStatus',
+  title: 'Controllers/ReasoningController/ReasoningMessage_Files/StreamingMessageStatus',
   component: StreamingMessageStatus,
   tags: ['autodocs'],
   decorators: [
