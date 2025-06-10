@@ -21,13 +21,34 @@ export const baseRuntimeContextSchema = z.object({
 });
 
 /**
- * Analyst workflow runtime context schema
+ * Analyst workflow runtime context schema - Full schema for main workflow
  */
 export const analystRuntimeContextSchema = baseRuntimeContextSchema.extend({
+  threadId: z.string().min(1, 'Thread ID is required'),
   dataSourceId: z.string().min(1, 'Data source ID is required'),
-  dataSourceSyntax: z.string().optional(),
+  dataSourceSyntax: z.string().min(1, 'Data source syntax is required'),
+  todos: z.string(),
   messageId: z.string().optional(),
-  threadId: z.string().optional(),
+});
+
+/**
+ * Runtime context schema for initial steps that only need threadId and userId
+ * Used by: generate-chat-title, extract-values-search, create-todos
+ */
+export const initialStepRuntimeContextSchema = baseRuntimeContextSchema.extend({
+  threadId: z.string().min(1, 'Thread ID is required'),
+  messageId: z.string().optional(),
+});
+
+/**
+ * Runtime context schema for think-and-prep step
+ * Needs dataSourceId and dataSourceSyntax but not todos (gets from input)
+ */
+export const thinkAndPrepRuntimeContextSchema = baseRuntimeContextSchema.extend({
+  threadId: z.string().min(1, 'Thread ID is required'),
+  dataSourceId: z.string().min(1, 'Data source ID is required'),
+  dataSourceSyntax: z.string().min(1, 'Data source syntax is required'),
+  messageId: z.string().optional(),
 });
 
 /**
@@ -44,6 +65,8 @@ export const toolRuntimeContextSchema = z.object({
 // Infer types from schemas
 export type BaseRuntimeContext = z.infer<typeof baseRuntimeContextSchema>;
 export type AnalystRuntimeContext = z.infer<typeof analystRuntimeContextSchema>;
+export type InitialStepRuntimeContext = z.infer<typeof initialStepRuntimeContextSchema>;
+export type ThinkAndPrepRuntimeContext = z.infer<typeof thinkAndPrepRuntimeContextSchema>;
 export type ToolRuntimeContext = z.infer<typeof toolRuntimeContextSchema>;
 
 // ============================================================================
@@ -143,18 +166,50 @@ export function validateRuntimeContext<T extends Record<string, unknown>>(
   }
 
   // Extract all values from the runtime context
-  // Note: This assumes we know the keys from the schema
-  // In practice, we'll validate specific fields as needed
   const contextData: Record<string, unknown> = {};
 
-  // For now, we'll validate specific common fields
-  // This can be extended based on schema requirements
-  const commonFields = ['userId', 'organizationId', 'dataSourceId', 'sessionId', 'messageId'];
+  // Get all possible field names from the schema shape
+  // First, try parsing an empty object to see what fields are expected
+  const emptyResult = schema.safeParse({});
+  if (!emptyResult.success && emptyResult.error) {
+    // Extract field names from error paths and also check common fields
+    const errorPaths = emptyResult.error.errors.map((e) => e.path[0] as string);
+    const commonFields = [
+      'userId',
+      'organizationId',
+      'dataSourceId',
+      'sessionId',
+      'messageId',
+      'threadId',
+      'dataSourceSyntax',
+      'todos',
+    ];
+    const allFields = [...new Set([...errorPaths, ...commonFields])];
 
-  for (const field of commonFields) {
-    const value = context.get(field);
-    if (value !== undefined) {
-      contextData[field] = value;
+    // Try to get all fields from context
+    for (const field of allFields) {
+      const value = context.get(field);
+      if (value !== undefined) {
+        contextData[field] = value;
+      }
+    }
+  } else {
+    // If the schema accepts an empty object, try common fields
+    const commonFields = [
+      'userId',
+      'organizationId',
+      'dataSourceId',
+      'sessionId',
+      'messageId',
+      'threadId',
+      'dataSourceSyntax',
+      'todos',
+    ];
+    for (const field of commonFields) {
+      const value = context.get(field);
+      if (value !== undefined) {
+        contextData[field] = value;
+      }
     }
   }
 

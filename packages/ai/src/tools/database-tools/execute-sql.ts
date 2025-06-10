@@ -7,13 +7,15 @@ import { z } from 'zod';
 import { DataSource } from '../../../../data-source/src/data-source';
 import type { Credentials } from '../../../../data-source/src/types/credentials';
 import {
+  type AnalystRuntimeContext,
+  analystRuntimeContextSchema,
   credentialsSchema,
   isError,
   safeJsonParse,
   secretResultSchema,
   validateArrayAccess,
+  validateRuntimeContext,
 } from '../../utils/validation-helpers';
-import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
 
 const executeSqlStatementInputSchema = z.object({
   statements: z.array(z.string()).describe(
@@ -163,20 +165,32 @@ const executeSqlStatement = wrapTraced(
   ): Promise<z.infer<typeof executeSqlStatementOutputSchema>> => {
     const { statements } = params;
 
-    // Extract context values
-    const dataSourceId = runtimeContext.get('dataSourceId') as string;
-    const userId = runtimeContext.get('userId') as string;
-    const organizationId = runtimeContext.get('organizationId') as string;
+    // Validate runtime context
+    let validatedContext: AnalystRuntimeContext;
+    try {
+      validatedContext = validateRuntimeContext(
+        runtimeContext,
+        analystRuntimeContextSchema,
+        'SQL execution'
+      );
+    } catch (error) {
+      console.error('Runtime context validation failed:', error);
+      // Provide user-friendly error based on what's missing
+      if (error instanceof Error) {
+        if (error.message.includes('dataSourceId')) {
+          throw new Error('Unable to identify the data source. Please refresh and try again.');
+        }
+        if (error.message.includes('userId')) {
+          throw new Error('Unable to verify your identity. Please log in again.');
+        }
+        if (error.message.includes('organizationId')) {
+          throw new Error('Unable to access your organization. Please check your permissions.');
+        }
+      }
+      throw new Error('Unable to access your session. Please refresh and try again.');
+    }
 
-    if (!dataSourceId) {
-      throw new Error('Unable to identify the data source. Please refresh and try again.');
-    }
-    if (!userId) {
-      throw new Error('Unable to verify your identity. Please log in again.');
-    }
-    if (!organizationId) {
-      throw new Error('Unable to access your organization. Please check your permissions.');
-    }
+    const { dataSourceId, userId, organizationId } = validatedContext;
 
     // Get data source credentials from vault
     let dataSource: DataSource;

@@ -5,10 +5,12 @@ import {
   // Types
   type BaseRuntimeContext,
   type Credentials,
+  type InitialStepRuntimeContext,
   analystRuntimeContextSchema,
   // Schemas
   baseRuntimeContextSchema,
   credentialsSchema,
+  initialStepRuntimeContextSchema,
   isError,
   safeJsonParse,
   secretResultSchema,
@@ -67,6 +69,7 @@ describe('Validation Helpers Unit Tests', () => {
           dataSourceSyntax: 'postgresql',
           messageId: 'msg-123',
           threadId: 'thread-456',
+          todos: '[ ] Task 1\n[ ] Task 2',
         };
 
         const result = analystRuntimeContextSchema.safeParse(validContext);
@@ -82,6 +85,9 @@ describe('Validation Helpers Unit Tests', () => {
           userId: 'user-123',
           organizationId: 'org-456',
           dataSourceId: 'ds-789',
+          dataSourceSyntax: 'postgresql',
+          threadId: 'thread-789',
+          todos: '[ ] Task 1',
         };
 
         const result = analystRuntimeContextSchema.safeParse(validContext);
@@ -395,6 +401,12 @@ describe('Validation Helpers Unit Tests', () => {
                 return 'org-456';
               case 'dataSourceId':
                 return 'ds-789';
+              case 'threadId':
+                return 'thread-789';
+              case 'dataSourceSyntax':
+                return 'postgresql';
+              case 'todos':
+                return '[ ] Task 1';
               default:
                 return undefined;
             }
@@ -457,6 +469,125 @@ describe('Validation Helpers Unit Tests', () => {
         }
       });
     });
+
+    describe('validateRuntimeContext with analystRuntimeContextSchema', () => {
+      test('should validate complete analyst runtime context', () => {
+        const mockContext = {
+          get: (key: string) => {
+            switch (key) {
+              case 'userId':
+                return 'user-123';
+              case 'organizationId':
+                return 'org-456';
+              case 'threadId':
+                return 'thread-789';
+              case 'dataSourceId':
+                return 'ds-001';
+              case 'dataSourceSyntax':
+                return 'postgresql';
+              case 'todos':
+                return '[ ] Task 1\n[ ] Task 2';
+              case 'messageId':
+                return 'msg-123'; // Optional field
+              default:
+                return undefined;
+            }
+          },
+        };
+
+        const result = validateRuntimeContext(
+          mockContext,
+          analystRuntimeContextSchema,
+          'analyst workflow'
+        );
+
+        expect(result.userId).toBe('user-123');
+        expect(result.organizationId).toBe('org-456');
+        expect(result.threadId).toBe('thread-789');
+        expect(result.dataSourceId).toBe('ds-001');
+        expect(result.dataSourceSyntax).toBe('postgresql');
+        expect(result.todos).toBe('[ ] Task 1\n[ ] Task 2');
+        expect(result.messageId).toBe('msg-123');
+      });
+
+      test('should validate analyst context without optional messageId', () => {
+        const mockContext = {
+          get: (key: string) => {
+            switch (key) {
+              case 'userId':
+                return 'user-123';
+              case 'organizationId':
+                return 'org-456';
+              case 'threadId':
+                return 'thread-789';
+              case 'dataSourceId':
+                return 'ds-001';
+              case 'dataSourceSyntax':
+                return 'postgresql';
+              case 'todos':
+                return '[ ] Task 1';
+              default:
+                return undefined;
+            }
+          },
+        };
+
+        const result = validateRuntimeContext(
+          mockContext,
+          analystRuntimeContextSchema,
+          'analyst workflow'
+        );
+
+        expect(result.messageId).toBeUndefined();
+      });
+
+      test('should throw error for missing required analyst fields', () => {
+        const mockContext = {
+          get: (key: string) => {
+            switch (key) {
+              case 'userId':
+                return 'user-123';
+              case 'organizationId':
+                return 'org-456';
+              // Missing threadId, dataSourceId, dataSourceSyntax, todos
+              default:
+                return undefined;
+            }
+          },
+        };
+
+        expect(() =>
+          validateRuntimeContext(mockContext, analystRuntimeContextSchema, 'analyst workflow')
+        ).toThrow('Invalid runtime context for analyst workflow');
+      });
+
+      test('should throw error for empty required strings in analyst context', () => {
+        const mockContext = {
+          get: (key: string) => {
+            switch (key) {
+              case 'userId':
+                return 'user-123';
+              case 'organizationId':
+                return 'org-456';
+              case 'threadId':
+                return ''; // Empty string - invalid
+              case 'dataSourceId':
+                return 'ds-001';
+              case 'dataSourceSyntax':
+                return 'postgresql';
+              case 'todos':
+                return '[ ] Task 1';
+              default:
+                return undefined;
+            }
+          },
+        };
+
+        expect(() =>
+          validateRuntimeContext(mockContext, analystRuntimeContextSchema, 'analyst workflow')
+        ).toThrow('Invalid runtime context for analyst workflow');
+      });
+    });
   });
 
   describe('Type Inference', () => {
@@ -474,6 +605,7 @@ describe('Validation Helpers Unit Tests', () => {
         dataSourceSyntax: 'postgresql',
         messageId: 'msg-123',
         threadId: 'thread-456',
+        todos: '[ ] Task 1',
       };
 
       const credentials: Credentials = {
@@ -535,6 +667,118 @@ describe('Validation Helpers Unit Tests', () => {
         expect(error).toBeInstanceOf(Error);
         expect((error as Error).message).toContain('Invalid JSON structure in nested validation');
       }
+    });
+  });
+
+  describe('validateRuntimeContext with initialStepRuntimeContextSchema', () => {
+    test('should validate initial step runtime context with only required fields', () => {
+      const mockContext = {
+        get: (key: string) => {
+          switch (key) {
+            case 'userId':
+              return 'user-123';
+            case 'organizationId':
+              return 'org-456';
+            case 'threadId':
+              return 'thread-789';
+            case 'messageId':
+              return 'msg-123'; // Optional field
+            default:
+              return undefined;
+          }
+        },
+      };
+
+      const result = validateRuntimeContext(
+        mockContext,
+        initialStepRuntimeContextSchema,
+        'initial step'
+      );
+
+      expect(result.userId).toBe('user-123');
+      expect(result.organizationId).toBe('org-456');
+      expect(result.threadId).toBe('thread-789');
+      expect(result.messageId).toBe('msg-123');
+    });
+
+    test('should validate without optional messageId', () => {
+      const mockContext = {
+        get: (key: string) => {
+          switch (key) {
+            case 'userId':
+              return 'user-123';
+            case 'organizationId':
+              return 'org-456';
+            case 'threadId':
+              return 'thread-789';
+            default:
+              return undefined;
+          }
+        },
+      };
+
+      const result = validateRuntimeContext(
+        mockContext,
+        initialStepRuntimeContextSchema,
+        'initial step'
+      );
+
+      expect(result.userId).toBe('user-123');
+      expect(result.organizationId).toBe('org-456');
+      expect(result.threadId).toBe('thread-789');
+      expect(result.messageId).toBeUndefined();
+    });
+
+    test('should throw error for missing threadId', () => {
+      const mockContext = {
+        get: (key: string) => {
+          switch (key) {
+            case 'userId':
+              return 'user-123';
+            case 'organizationId':
+              return 'org-456';
+            // Missing threadId
+            default:
+              return undefined;
+          }
+        },
+      };
+
+      expect(() =>
+        validateRuntimeContext(mockContext, initialStepRuntimeContextSchema, 'initial step')
+      ).toThrow('Invalid runtime context for initial step');
+    });
+
+    test('should not require dataSourceId, dataSourceSyntax, or todos', () => {
+      const mockContext = {
+        get: (key: string) => {
+          switch (key) {
+            case 'userId':
+              return 'user-123';
+            case 'organizationId':
+              return 'org-456';
+            case 'threadId':
+              return 'thread-789';
+            // Note: dataSourceId, dataSourceSyntax, and todos are NOT provided
+            default:
+              return undefined;
+          }
+        },
+      };
+
+      // This should succeed without those fields
+      const result = validateRuntimeContext(
+        mockContext,
+        initialStepRuntimeContextSchema,
+        'initial step'
+      );
+
+      expect(result.userId).toBe('user-123');
+      expect(result.organizationId).toBe('org-456');
+      expect(result.threadId).toBe('thread-789');
+      expect((result as any).dataSourceId).toBeUndefined();
+      expect((result as any).dataSourceSyntax).toBeUndefined();
+      expect((result as any).todos).toBeUndefined();
     });
   });
 });
