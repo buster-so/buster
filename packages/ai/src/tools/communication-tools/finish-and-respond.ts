@@ -19,35 +19,48 @@ const finishAndRespondInputSchema = z.object({
 export function parseStreamingArgs(
   accumulatedText: string
 ): Partial<z.infer<typeof finishAndRespondInputSchema>> | null {
+  // Validate input type
+  if (typeof accumulatedText !== 'string') {
+    throw new Error(`parseStreamingArgs expects string input, got ${typeof accumulatedText}`);
+  }
+
   try {
     // First try to parse as complete JSON
     const parsed = JSON.parse(accumulatedText);
     return {
       final_response: parsed.final_response !== undefined ? parsed.final_response : undefined,
     };
-  } catch {
-    // If JSON is incomplete, try to extract partial final_response field
-    // Handle both complete and incomplete strings, accounting for escaped quotes
-    const match = accumulatedText.match(/"final_response"\s*:\s*"((?:[^"\\]|\\.)*)"/);
-    if (match) {
-      // Unescape the string
-      const unescaped = match[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
-      return {
-        final_response: unescaped,
-      };
-    }
+  } catch (error) {
+    // Only catch JSON parse errors - let other errors bubble up
+    if (error instanceof SyntaxError) {
+      // JSON parsing failed - try regex extraction for partial content
+      // Handle both complete and incomplete strings, accounting for escaped quotes
+      const match = accumulatedText.match(/"final_response"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+      if (match && match[1] !== undefined) {
+        // Unescape the string
+        const unescaped = match[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+        return {
+          final_response: unescaped,
+        };
+      }
 
-    // Try to extract partial string that's still being built (incomplete quote)
-    const partialMatch = accumulatedText.match(/"final_response"\s*:\s*"((?:[^"\\]|\\.)*)/);
-    if (partialMatch) {
-      // Unescape the partial string
-      const unescaped = partialMatch[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
-      return {
-        final_response: unescaped,
-      };
-    }
+      // Try to extract partial string that's still being built (incomplete quote)
+      const partialMatch = accumulatedText.match(/"final_response"\s*:\s*"((?:[^"\\]|\\.)*)/);
+      if (partialMatch && partialMatch[1] !== undefined) {
+        // Unescape the partial string
+        const unescaped = partialMatch[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+        return {
+          final_response: unescaped,
+        };
+      }
 
-    return null;
+      return null;
+    } else {
+      // Unexpected error - re-throw with context
+      throw new Error(
+        `Unexpected error in parseStreamingArgs: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
   }
 }
 

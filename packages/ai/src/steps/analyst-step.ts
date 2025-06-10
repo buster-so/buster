@@ -4,8 +4,13 @@ import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { analystAgent } from '../agents/analyst-agent/analyst-agent';
+import { parseStreamingArgs as parseDoneArgs } from '../tools/communication-tools/done-tool';
+import { parseStreamingArgs as parseExecuteSqlArgs } from '../tools/database-tools/execute-sql';
+import { parseStreamingArgs as parseSequentialThinkingArgs } from '../tools/planning-thinking-tools/sequential-thinking-tool';
+import { parseStreamingArgs as parseCreateMetricsArgs } from '../tools/visualization-tools/create-metrics-file-tool';
 import { saveConversationHistoryFromStep } from '../utils/database/saveConversationHistory';
 import { ThinkAndPrepOutputSchema } from '../utils/memory/types';
+import { ToolArgsParser } from '../utils/streaming';
 import type {
   AnalystRuntimeContext,
   thinkAndPrepWorkflowInputSchema,
@@ -119,7 +124,24 @@ const analystExecution = async ({
 
     const stream = await wrappedStream();
 
+    // Initialize the tool args parser with analyst tool mappings
+    const toolArgsParser = new ToolArgsParser();
+    toolArgsParser.registerParser('create-metrics-file', parseCreateMetricsArgs);
+    toolArgsParser.registerParser('done', parseDoneArgs);
+    toolArgsParser.registerParser('execute-sql', parseExecuteSqlArgs);
+    toolArgsParser.registerParser('sequential-thinking', parseSequentialThinkingArgs);
+
     for await (const chunk of stream.fullStream) {
+      // Process streaming tool arguments
+      if (chunk.type === 'tool-call-streaming-start' || chunk.type === 'tool-call-delta') {
+        const streamingResult = toolArgsParser.processChunk(chunk);
+        if (streamingResult) {
+          // TODO: Emit streaming result for real-time UI updates
+          // This could be sent via WebSocket, Server-Sent Events, or other streaming mechanism
+          console.log(`🔧 [${streamingResult.toolName}] Streaming:`, streamingResult.partialArgs);
+        }
+      }
+
       if (chunk.type === 'tool-result' && chunk.toolName === 'doneTool') {
         // Don't abort here anymore - let onStepFinish handle it after saving
         return {

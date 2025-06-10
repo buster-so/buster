@@ -70,17 +70,20 @@ const formatOutputExecution = async ({
   } else {
     // Try to find any step data in the input structure
     const inputKeys = Object.keys(inputData);
-    
+
     // Look for step data in any key that looks like step output
     for (const key of inputKeys) {
       const value = (inputData as any)[key];
-      if (value && typeof value === 'object' && 
-          ('outputMessages' in value || 'conversationHistory' in value || 'finished' in value)) {
+      if (
+        value &&
+        typeof value === 'object' &&
+        ('outputMessages' in value || 'conversationHistory' in value || 'finished' in value)
+      ) {
         stepData = value;
         break;
       }
     }
-    
+
     if (!stepData) {
       // Enhanced error logging for debugging
       console.error('Unrecognized input format for format-output-step:', {

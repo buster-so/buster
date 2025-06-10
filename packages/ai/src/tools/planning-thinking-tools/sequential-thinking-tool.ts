@@ -65,6 +65,11 @@ const sequentialThinkingSchema = z.object({
 export function parseStreamingArgs(
   accumulatedText: string
 ): Partial<z.infer<typeof sequentialThinkingSchema>> | null {
+  // Validate input type
+  if (typeof accumulatedText !== 'string') {
+    throw new Error(`parseStreamingArgs expects string input, got ${typeof accumulatedText}`);
+  }
+
   try {
     // First try to parse as complete JSON
     const parsed = JSON.parse(accumulatedText);
@@ -82,67 +87,77 @@ export function parseStreamingArgs(
     if (parsed.needsMoreThoughts !== undefined) result.needsMoreThoughts = parsed.needsMoreThoughts;
 
     return result;
-  } catch {
-    // If JSON is incomplete, try to extract partial fields
-    const result: Partial<z.infer<typeof sequentialThinkingSchema>> = {};
+  } catch (error) {
+    // Only catch JSON parse errors - let other errors bubble up
+    if (error instanceof SyntaxError) {
+      // If JSON is incomplete, try to extract partial fields
+      const result: Partial<z.infer<typeof sequentialThinkingSchema>> = {};
 
-    // Extract thought field (main text content)
-    const thoughtMatch = accumulatedText.match(/"thought"\s*:\s*"((?:[^"\\]|\\.)*)"/);
-    if (thoughtMatch) {
-      result.thought = thoughtMatch[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
-    } else {
-      // Try to extract incomplete thought string
-      const partialThoughtMatch = accumulatedText.match(/"thought"\s*:\s*"((?:[^"\\]|\\.*)*)/);
-      if (partialThoughtMatch) {
-        result.thought = partialThoughtMatch[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+      // Extract thought field (main text content)
+      const thoughtMatch = accumulatedText.match(/"thought"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+      if (thoughtMatch && thoughtMatch[1] !== undefined) {
+        result.thought = thoughtMatch[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+      } else {
+        // Try to extract incomplete thought string
+        const partialThoughtMatch = accumulatedText.match(/"thought"\s*:\s*"((?:[^"\\]|\\.*)*)/);
+        if (partialThoughtMatch && partialThoughtMatch[1] !== undefined) {
+          result.thought = partialThoughtMatch[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+        }
       }
-    }
 
-    // Extract boolean fields
-    const nextThoughtMatch = accumulatedText.match(/"nextThoughtNeeded"\s*:\s*(true|false)/);
-    if (nextThoughtMatch) {
-      result.nextThoughtNeeded = nextThoughtMatch[1] === 'true';
-    }
+      // Extract boolean fields
+      const nextThoughtMatch = accumulatedText.match(/"nextThoughtNeeded"\s*:\s*(true|false)/);
+      if (nextThoughtMatch) {
+        result.nextThoughtNeeded = nextThoughtMatch[1] === 'true';
+      }
 
-    const isRevisionMatch = accumulatedText.match(/"isRevision"\s*:\s*(true|false)/);
-    if (isRevisionMatch) {
-      result.isRevision = isRevisionMatch[1] === 'true';
-    }
+      const isRevisionMatch = accumulatedText.match(/"isRevision"\s*:\s*(true|false)/);
+      if (isRevisionMatch) {
+        result.isRevision = isRevisionMatch[1] === 'true';
+      }
 
-    const needsMoreThoughtsMatch = accumulatedText.match(/"needsMoreThoughts"\s*:\s*(true|false)/);
-    if (needsMoreThoughtsMatch) {
-      result.needsMoreThoughts = needsMoreThoughtsMatch[1] === 'true';
-    }
+      const needsMoreThoughtsMatch = accumulatedText.match(
+        /"needsMoreThoughts"\s*:\s*(true|false)/
+      );
+      if (needsMoreThoughtsMatch) {
+        result.needsMoreThoughts = needsMoreThoughtsMatch[1] === 'true';
+      }
 
-    // Extract number fields
-    const thoughtNumberMatch = accumulatedText.match(/"thoughtNumber"\s*:\s*(\d+)/);
-    if (thoughtNumberMatch) {
-      result.thoughtNumber = Number.parseInt(thoughtNumberMatch[1], 10);
-    }
+      // Extract number fields
+      const thoughtNumberMatch = accumulatedText.match(/"thoughtNumber"\s*:\s*(\d+)/);
+      if (thoughtNumberMatch && thoughtNumberMatch[1] !== undefined) {
+        result.thoughtNumber = Number.parseInt(thoughtNumberMatch[1], 10);
+      }
 
-    const totalThoughtsMatch = accumulatedText.match(/"totalThoughts"\s*:\s*(\d+)/);
-    if (totalThoughtsMatch) {
-      result.totalThoughts = Number.parseInt(totalThoughtsMatch[1], 10);
-    }
+      const totalThoughtsMatch = accumulatedText.match(/"totalThoughts"\s*:\s*(\d+)/);
+      if (totalThoughtsMatch && totalThoughtsMatch[1] !== undefined) {
+        result.totalThoughts = Number.parseInt(totalThoughtsMatch[1], 10);
+      }
 
-    const revisesThoughtMatch = accumulatedText.match(/"revisesThought"\s*:\s*(\d+)/);
-    if (revisesThoughtMatch) {
-      result.revisesThought = Number.parseInt(revisesThoughtMatch[1], 10);
-    }
+      const revisesThoughtMatch = accumulatedText.match(/"revisesThought"\s*:\s*(\d+)/);
+      if (revisesThoughtMatch && revisesThoughtMatch[1] !== undefined) {
+        result.revisesThought = Number.parseInt(revisesThoughtMatch[1], 10);
+      }
 
-    const branchFromThoughtMatch = accumulatedText.match(/"branchFromThought"\s*:\s*(\d+)/);
-    if (branchFromThoughtMatch) {
-      result.branchFromThought = Number.parseInt(branchFromThoughtMatch[1], 10);
-    }
+      const branchFromThoughtMatch = accumulatedText.match(/"branchFromThought"\s*:\s*(\d+)/);
+      if (branchFromThoughtMatch && branchFromThoughtMatch[1] !== undefined) {
+        result.branchFromThought = Number.parseInt(branchFromThoughtMatch[1], 10);
+      }
 
-    // Extract string fields
-    const branchIdMatch = accumulatedText.match(/"branchId"\s*:\s*"([^"]*)"/);
-    if (branchIdMatch) {
-      result.branchId = branchIdMatch[1];
-    }
+      // Extract string fields
+      const branchIdMatch = accumulatedText.match(/"branchId"\s*:\s*"([^"]*)"/);
+      if (branchIdMatch) {
+        result.branchId = branchIdMatch[1];
+      }
 
-    // Return result if we found at least one field
-    return Object.keys(result).length > 0 ? result : null;
+      // Return result if we found at least one field
+      return Object.keys(result).length > 0 ? result : null;
+    } else {
+      // Unexpected error - re-throw with context
+      throw new Error(
+        `Unexpected error in parseStreamingArgs: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
   }
 }
 

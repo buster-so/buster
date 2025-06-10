@@ -73,46 +73,62 @@ function truncateQueryResults(
 export function parseStreamingArgs(
   accumulatedText: string
 ): Partial<z.infer<typeof executeSqlStatementInputSchema>> | null {
+  // Validate input type
+  if (typeof accumulatedText !== 'string') {
+    throw new Error(`parseStreamingArgs expects string input, got ${typeof accumulatedText}`);
+  }
+
   try {
     // First try to parse as complete JSON
     const parsed = JSON.parse(accumulatedText);
     return {
       statements: parsed.statements || undefined,
     };
-  } catch {
-    // If JSON is incomplete, try to extract and reconstruct the statements array
-    const statementsMatch = accumulatedText.match(/"statements"\s*:\s*\[(.*)/s);
-    if (statementsMatch) {
-      const arrayContent = statementsMatch[1];
+  } catch (error) {
+    // Only catch JSON parse errors - let other errors bubble up
+    if (error instanceof SyntaxError) {
+      // JSON parsing failed - try regex extraction for partial content
+      // If JSON is incomplete, try to extract and reconstruct the statements array
+      const statementsMatch = accumulatedText.match(/"statements"\s*:\s*\[(.*)/s);
+      if (statementsMatch && statementsMatch[1] !== undefined) {
+        const arrayContent = statementsMatch[1];
 
-      try {
-        // Try to parse the array content by adding closing bracket
-        const testArray = `[${arrayContent}]`;
-        const parsed = JSON.parse(testArray);
-        return { statements: parsed };
-      } catch {
-        // If that fails, try to extract individual statement strings that are complete
-        const statements: string[] = [];
+        try {
+          // Try to parse the array content by adding closing bracket
+          const testArray = `[${arrayContent}]`;
+          const parsed = JSON.parse(testArray);
+          return { statements: parsed };
+        } catch {
+          // If that fails, try to extract individual statement strings that are complete
+          const statements: string[] = [];
 
-        // Match complete string statements within the array
-        const statementMatches = arrayContent.matchAll(/"((?:[^"\\]|\\.)*)"/g);
+          // Match complete string statements within the array
+          const statementMatches = arrayContent.matchAll(/"((?:[^"\\]|\\.)*)"/g);
 
-        for (const match of statementMatches) {
-          const statement = match[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
-          statements.push(statement);
+          for (const match of statementMatches) {
+            if (match[1] !== undefined) {
+              const statement = match[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+              statements.push(statement);
+            }
+          }
+
+          return { statements };
         }
-
-        return { statements };
       }
-    }
 
-    // Check if we at least have the start of the statements field
-    const partialMatch = accumulatedText.match(/"statements"\s*:\s*\[/);
-    if (partialMatch) {
-      return { statements: [] };
-    }
+      // Check if we at least have the start of the statements field
+      const partialMatch = accumulatedText.match(/"statements"\s*:\s*\[/);
+      if (partialMatch) {
+        return { statements: [] };
+      }
 
-    return null;
+      return null;
+    } else {
+      // Unexpected error - re-throw with context
+      throw new Error(
+        `Unexpected error in parseStreamingArgs: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
   }
 }
 

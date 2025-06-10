@@ -2,35 +2,40 @@ import type { StreamingResult, ToolAccumulator } from './types';
 
 export class ToolArgsParser {
   private accumulators = new Map<string, ToolAccumulator>();
-  private parsers = new Map<string, (text: string) => any>();
+  private parsers = new Map<string, (text: string) => unknown>();
 
   /**
    * Register a tool's streaming parser function
    */
-  registerParser(toolName: string, parseFunction: (text: string) => any) {
+  registerParser(toolName: string, parseFunction: (text: string) => unknown) {
     this.parsers.set(toolName, parseFunction);
   }
 
   /**
    * Process a chunk from the stream
    */
-  processChunk(chunk: any): StreamingResult | null {
-    if (chunk.type === 'tool-call-streaming-start') {
+  processChunk(chunk: unknown): StreamingResult | null {
+    // Type guard to ensure chunk has expected structure
+    if (!chunk || typeof chunk !== 'object') return null;
+    const chunkObj = chunk as Record<string, unknown>;
+
+    if (chunkObj.type === 'tool-call-streaming-start') {
       const accumulator: ToolAccumulator = {
-        toolName: chunk.toolName,
-        toolCallId: chunk.toolCallId,
+        toolName: String(chunkObj.toolName || ''),
+        toolCallId: String(chunkObj.toolCallId || ''),
         rawText: '',
       };
-      this.accumulators.set(chunk.toolCallId, accumulator);
+      this.accumulators.set(accumulator.toolCallId, accumulator);
       return null;
     }
 
-    if (chunk.type === 'tool-call-delta') {
-      const accumulator = this.accumulators.get(chunk.toolCallId);
+    if (chunkObj.type === 'tool-call-delta') {
+      const toolCallId = String(chunkObj.toolCallId || '');
+      const accumulator = this.accumulators.get(toolCallId);
       if (!accumulator) return null;
 
       // Add the delta text
-      accumulator.rawText += chunk.argsTextDelta || '';
+      accumulator.rawText += String(chunkObj.argsTextDelta || '');
 
       // Get the parser for this tool
       const parser = this.parsers.get(accumulator.toolName);
@@ -61,8 +66,9 @@ export class ToolArgsParser {
     }
 
     // Clean up completed tool calls
-    if (chunk.type === 'tool-result') {
-      this.accumulators.delete(chunk.toolCallId);
+    if (chunkObj.type === 'tool-result') {
+      const toolCallId = String(chunkObj.toolCallId || '');
+      this.accumulators.delete(toolCallId);
     }
 
     return null;

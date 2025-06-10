@@ -4,8 +4,11 @@ import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { thinkAndPrepAgent } from '../agents/think-and-prep-agent/think-and-prep-agent';
+import { parseStreamingArgs as parseFinishAndRespondArgs } from '../tools/communication-tools/finish-and-respond';
+import { parseStreamingArgs as parseSequentialThinkingArgs } from '../tools/planning-thinking-tools/sequential-thinking-tool';
 import { saveConversationHistoryFromStep } from '../utils/database/saveConversationHistory';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
+import { ToolArgsParser } from '../utils/streaming';
 import type {
   AnalystRuntimeContext,
   thinkAndPrepWorkflowInputSchema,
@@ -162,9 +165,27 @@ const thinkAndPrepExecution = async ({
 
     const stream = await wrappedStream();
 
+    // Initialize the tool args parser with think-and-prep tool mappings
+    const toolArgsParser = new ToolArgsParser();
+    toolArgsParser.registerParser('finish-and-respond', parseFinishAndRespondArgs);
+    toolArgsParser.registerParser('sequential-thinking', parseSequentialThinkingArgs);
+
     for await (const chunk of stream.fullStream) {
-      console.log('=== THINK AND PREP STEP OUTPUT ===');
-      console.log('Chunk:', JSON.stringify(chunk, null, 2));
+      // Process streaming tool arguments
+      if (chunk.type === 'tool-call-streaming-start' || chunk.type === 'tool-call-delta') {
+        const streamingResult = toolArgsParser.processChunk(chunk);
+        if (streamingResult) {
+          // TODO: Emit streaming result for real-time UI updates
+          // This could be sent via WebSocket, Server-Sent Events, or other streaming mechanism
+          console.log(`🧠 [${streamingResult.toolName}] Streaming:`, streamingResult.partialArgs);
+        }
+      }
+
+      // Keep existing debug logging but make it more selective
+      if (chunk.type !== 'tool-call-delta') {
+        console.log('=== THINK AND PREP STEP OUTPUT ===');
+        console.log('Chunk:', JSON.stringify(chunk, null, 2));
+      }
     }
 
     return {
