@@ -7,8 +7,11 @@ import { v4 as uuidv4 } from 'uuid';
 export interface CreateTestMessageOptions {
   requestMessage?: string;
   title?: string;
+  // biome-ignore lint/suspicious/noExplicitAny: because this is for testing it seems fine
   responseMessages?: any;
+  // biome-ignore lint/suspicious/noExplicitAny: because this is for testing it seems fine
   reasoning?: any;
+  // biome-ignore lint/suspicious/noExplicitAny: because this is for testing it seems fine
   rawLlmMessages?: any;
   finalReasoningMessage?: string;
   isCompleted?: boolean;
