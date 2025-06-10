@@ -138,7 +138,7 @@
     "@types/react-syntax-highlighter": "^15.5.13",
     "@vitest/ui": "^3.2.3",
     "dotenv": "^16.5.0",
-    "eslint": "^9",
+    "eslint": "^8.57.1",
     "eslint-config-next": "15.3.3",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-storybook": "^0.12.0",
