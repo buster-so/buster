@@ -16,9 +16,7 @@
     "db:introspect": "drizzle-kit introspect",
     "db:studio": "drizzle-kit studio",
     "db:check": "drizzle-kit check",
-    "db:setup": "bun run src/setup.ts setup",
-    "seed:list": "bun run src/seed/cli.ts list",
-    "setup:data": "bun run src/setup.ts setup-data",
+    "setup:setup": "bun run src/setup.ts setup",
     "setup:seed": "bun run src/setup.ts seed",
     "setup:full": "bun run src/setup.ts run"
   }
