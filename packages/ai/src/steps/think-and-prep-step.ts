@@ -33,8 +33,7 @@ import {
   type StepFinishData,
   ThinkAndPrepOutputSchema,
 } from '../utils/memory/types';
-
-export const thinkAndPrepOutputSchema = z.object({});
+import { handleInvalidToolCall } from '../utils/handle-invalid-tool-call';
 
 const outputSchema = ThinkAndPrepOutputSchema;
 
@@ -57,7 +56,9 @@ const handleThinkAndPrepStepFinish = async ({
   let shouldAbort = false;
 
   if (
-    toolNames.some((toolName: string) => ['submitThoughts', 'respondWithoutAnalysis'].includes(toolName))
+    toolNames.some((toolName: string) =>
+      ['submitThoughts', 'respondWithoutAnalysis'].includes(toolName)
+    )
   ) {
     // Extract and validate messages from the step response
     // step.response.messages contains the conversation history for this step
@@ -75,8 +76,8 @@ const handleThinkAndPrepStepFinish = async ({
       // Continue with abort even if save fails to avoid hanging
     }
 
-    // Store the full step data (cast to our expected type)
-    finalStepData = step as any;
+    // Store the full step data
+    finalStepData = step;
 
     // Set finished to true if respondWithoutAnalysis was called
     if (toolNames.includes('respondWithoutAnalysis')) {
@@ -130,7 +131,7 @@ const thinkAndPrepExecution = async ({
     let messages: CoreMessage[];
     if (conversationHistory && conversationHistory.length > 0) {
       // If we have history, append the new prompt to it
-      messages = appendToConversation(conversationHistory as any, prompt);
+      messages = appendToConversation(conversationHistory, prompt);
     } else {
       // Otherwise, create a new conversation with just the prompt
       messages = standardizeMessages(prompt);
@@ -154,6 +155,7 @@ const thinkAndPrepExecution = async ({
             finished = result.finished;
             finalStepData = result.finalStepData;
           },
+          experimental_repairToolCall: handleInvalidToolCall,
         });
 
         return stream;
@@ -177,14 +179,11 @@ const thinkAndPrepExecution = async ({
         if (streamingResult) {
           // TODO: Emit streaming result for real-time UI updates
           // This could be sent via WebSocket, Server-Sent Events, or other streaming mechanism
-          console.log(`🧠 [${streamingResult.toolName}] Streaming:`, streamingResult.partialArgs);
         }
       }
 
       // Keep existing debug logging but make it more selective
       if (chunk.type !== 'tool-call-delta') {
-        console.log('=== THINK AND PREP STEP OUTPUT ===');
-        console.log('Chunk:', JSON.stringify(chunk, null, 2));
       }
     }
 
@@ -192,41 +191,42 @@ const thinkAndPrepExecution = async ({
       finished,
       outputMessages,
       conversationHistory: outputMessages, // Include conversation history for workflow output
-      stepData: finalStepData as any,
+      stepData: finalStepData || undefined,
       metadata: {
         toolsUsed: getAllToolsUsed(outputMessages),
         finalTool: getLastToolUsed(outputMessages) as
           | 'submitThoughts'
           | 'respondWithoutAnalysis'
           | undefined,
-        text: (finalStepData as any)?.text,
-        reasoning: (finalStepData as any)?.reasoning,
+        text: finalStepData && 'text' in finalStepData ? (finalStepData as any).text : undefined,
+        reasoning:
+          finalStepData && 'reasoning' in finalStepData
+            ? (finalStepData as any).reasoning
+            : undefined,
       },
     };
   } catch (error) {
     if (error instanceof Error && error.name !== 'AbortError') {
-      throw new Error('Unable to connect to the analysis service. Please try again later.');
+      throw new Error(`Error in think and prep step: ${error.message}`);
     }
   }
-
-  console.log('=== THINK AND PREP STEP OUTPUT (CATCH BLOCK) ===');
-  console.log('Finished:', finished);
-  console.log('Output messages length:', outputMessages.length);
-  console.log('Conversation history being returned:', outputMessages);
 
   return {
     finished,
     outputMessages,
     conversationHistory: outputMessages, // Include conversation history for workflow output
-    stepData: finalStepData as any,
+    stepData: finalStepData || undefined,
     metadata: {
       toolsUsed: getAllToolsUsed(outputMessages),
       finalTool: getLastToolUsed(outputMessages) as
         | 'submitThoughts'
         | 'respondWithoutAnalysis'
         | undefined,
-      text: (finalStepData as any)?.text,
-      reasoning: (finalStepData as any)?.reasoning,
+      text: finalStepData && 'text' in finalStepData ? (finalStepData as any).text : undefined,
+      reasoning:
+        finalStepData && 'reasoning' in finalStepData
+          ? (finalStepData as any).reasoning
+          : undefined,
     },
   };
 };

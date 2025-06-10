@@ -5,40 +5,103 @@ import { z } from 'zod';
 // This eliminates type mismatches and works directly with agent.stream()
 export type MessageHistory = CoreMessage[];
 
-// Zod schema for validation - using z.any() since CoreMessage has complex union types
-export const MessageHistorySchema = z.array(z.any());
+// Zod schema for validation - using passthrough to preserve the original type
+// This validates the structure without changing the type
+export const MessageHistorySchema = z.custom<CoreMessage[]>(
+  (val) => Array.isArray(val),
+  { message: 'Must be an array of messages' }
+);
+
+// Schema for reasoning details
+const ReasoningDetailSchema = z.object({
+  type: z.string(),
+  content: z.string(),
+  metadata: z.record(z.unknown()).optional(),
+});
+
+// Schema for file metadata
+const FileMetadataSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  type: z.string(),
+  size: z.number().optional(),
+  url: z.string().optional(),
+});
+
+// Schema for source references
+const SourceReferenceSchema = z.object({
+  id: z.string(),
+  type: z.string(),
+  name: z.string(),
+  reference: z.string().optional(),
+});
+
+// Schema for tool results
+const ToolResultSchema = z.object({
+  toolCallId: z.string(),
+  toolName: z.string(),
+  result: z.unknown(), // Tool-specific results
+});
+
+// Schema for usage information
+const UsageSchema = z.object({
+  promptTokens: z.number(),
+  completionTokens: z.number(),
+  totalTokens: z.number(),
+});
+
+// Schema for warnings
+const WarningSchema = z.object({
+  type: z.string(),
+  message: z.string(),
+});
+
+// Schema for request metadata
+const RequestMetadataSchema = z.object({
+  model: z.string(),
+  messages: MessageHistorySchema,
+  temperature: z.number().optional(),
+  maxTokens: z.number().optional(),
+  tools: z.array(z.object({
+    name: z.string(),
+    description: z.string().optional(),
+  })).optional(),
+});
+
+// Schema for response headers
+const ResponseHeadersSchema = z.record(z.string());
 
 // Step finish data structure
 export const StepFinishDataSchema = z.object({
   stepType: z.string(),
   text: z.string().optional(),
   reasoning: z.string().optional(),
-  reasoningDetails: z.array(z.any()).optional(),
-  files: z.array(z.any()).optional(),
-  sources: z.array(z.any()).optional(),
+  reasoningDetails: z.array(ReasoningDetailSchema).optional(),
+  files: z.array(FileMetadataSchema).optional(),
+  sources: z.array(SourceReferenceSchema).optional(),
   toolCalls: z.array(
     z.object({
       type: z.literal('tool-call'),
       toolCallId: z.string(),
       toolName: z.string(),
-      args: z.record(z.any()),
+      args: z.record(z.unknown()), // Tool args vary by tool
     })
   ),
-  toolResults: z.array(z.any()).optional(),
+  toolResults: z.array(ToolResultSchema).optional(),
   finishReason: z.string(),
-  usage: z.any(),
-  warnings: z.array(z.any()).optional(),
-  logprobs: z.any().optional(),
-  request: z.any(),
+  usage: UsageSchema,
+  warnings: z.array(WarningSchema).optional(),
+  logprobs: z.unknown().optional(), // Model-specific logprobs format
+  request: RequestMetadataSchema,
   response: z.object({
     id: z.string(),
-    timestamp: z.any(),
+    timestamp: z.date().or(z.string()), // Can be Date or ISO string
     modelId: z.string(),
-    headers: z.any(),
+    headers: ResponseHeadersSchema,
     messages: MessageHistorySchema,
   }),
-  providerMetadata: z.any().optional(),
-  experimental_providerMetadata: z.any().optional(),
+  providerMetadata: z.record(z.unknown()).optional(),
+  experimental_providerMetadata: z.record(z.unknown()).optional(),
   isContinued: z.boolean().optional(),
 });
 

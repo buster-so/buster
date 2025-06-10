@@ -9,7 +9,12 @@ import { parseStreamingArgs as parseExecuteSqlArgs } from '../tools/database-too
 import { parseStreamingArgs as parseSequentialThinkingArgs } from '../tools/planning-thinking-tools/sequential-thinking-tool';
 import { parseStreamingArgs as parseCreateMetricsArgs } from '../tools/visualization-tools/create-metrics-file-tool';
 import { saveConversationHistoryFromStep } from '../utils/database/saveConversationHistory';
-import { ThinkAndPrepOutputSchema } from '../utils/memory/types';
+import { handleInvalidToolCall } from '../utils/handle-invalid-tool-call';
+import {
+  MessageHistorySchema,
+  StepFinishDataSchema,
+  ThinkAndPrepOutputSchema,
+} from '../utils/memory/types';
 import { ToolArgsParser } from '../utils/streaming';
 import type {
   AnalystRuntimeContext,
@@ -18,12 +23,19 @@ import type {
 
 const inputSchema = ThinkAndPrepOutputSchema;
 
+// Analyst-specific metadata schema
+const AnalystMetadataSchema = z.object({
+  toolsUsed: z.array(z.string()).optional(),
+  finalTool: z.string().optional(),
+  doneTool: z.boolean().optional(),
+});
+
 const outputSchema = z.object({
-  conversationHistory: z.array(z.any()), // CoreMessage[] from combined history
+  conversationHistory: MessageHistorySchema, // Properly typed message history
   finished: z.boolean().optional(),
-  outputMessages: z.array(z.any()).optional(),
-  stepData: z.any().optional(),
-  metadata: z.any().optional(),
+  outputMessages: MessageHistorySchema.optional(),
+  stepData: StepFinishDataSchema.optional(),
+  metadata: AnalystMetadataSchema.optional(),
 });
 
 // Helper function for analyst onStepFinish callback
@@ -46,7 +58,7 @@ const handleAnalystStepFinish = async ({
   ];
 
   try {
-    await saveConversationHistoryFromStep(runtimeContext as any, completeConversationHistory);
+    await saveConversationHistoryFromStep(runtimeContext, completeConversationHistory);
   } catch (error) {
     console.error('Failed to save analyst conversation history:', error);
     // Continue with abort even if save fails to avoid hanging
@@ -87,7 +99,7 @@ const analystExecution = async ({
 
     // Messages come directly from think-and-prep step output
     // They are already in CoreMessage[] format
-    const messages = inputData.outputMessages as CoreMessage[];
+    const messages = inputData.outputMessages;
 
     const wrappedStream = wrapTraced(
       async () => {
@@ -105,6 +117,7 @@ const analystExecution = async ({
 
             completeConversationHistory = result.completeConversationHistory;
           },
+          experimental_repairToolCall: handleInvalidToolCall,
         });
 
         return stream;
@@ -137,8 +150,6 @@ const analystExecution = async ({
         const streamingResult = toolArgsParser.processChunk(chunk);
         if (streamingResult) {
           // TODO: Emit streaming result for real-time UI updates
-          // This could be sent via WebSocket, Server-Sent Events, or other streaming mechanism
-          console.log(`🔧 [${streamingResult.toolName}] Streaming:`, streamingResult.partialArgs);
         }
       }
 

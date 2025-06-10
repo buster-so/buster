@@ -1,4 +1,5 @@
 import type { CoreMessage } from 'ai';
+import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { eq } from 'drizzle-orm';
 import { getDb } from '../../../../database/src/connection';
 import { updateMessageFields } from '../../../../database/src/helpers/messages';
@@ -49,9 +50,9 @@ export async function saveConversationHistory(
  * @param stepMessages - The messages from step.response.messages
  * @returns Promise<void>
  */
-export async function saveConversationHistoryFromStep(
-  runtimeContext: { get: (key: string) => any },
-  stepMessages: any[]
+export async function saveConversationHistoryFromStep<T extends Record<string, unknown>>(
+  runtimeContext: RuntimeContext<T>,
+  stepMessages: CoreMessage[]
 ): Promise<void> {
   const messageId = runtimeContext.get('messageId');
 
@@ -75,11 +76,11 @@ export async function saveConversationHistoryFromStep(
       : [];
 
     // Build the new reasoning by appending new messages as reasoning entries
-    const updatedReasoning = appendToReasoning(currentReasoning, stepMessages as CoreMessage[]);
+    const updatedReasoning = appendToReasoning(currentReasoning, stepMessages);
 
     // Update both rawLlmMessages and reasoning in a single call
     await updateMessageFields(messageId, {
-      rawLlmMessages: stepMessages as CoreMessage[],
+      rawLlmMessages: stepMessages,
       reasoning: updatedReasoning,
     });
   } catch (error) {
