@@ -1,6 +1,7 @@
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
+import type { DoneToolExecuteInput } from '../../utils/validation-helpers';
 
 // Input/Output schemas
 const doneInputSchema = z.object({
@@ -77,7 +78,7 @@ interface TodoItem {
 }
 
 // Process done tool execution with todo management
-async function processDone(input: any): Promise<z.infer<typeof doneOutputSchema>> {
+async function processDone(input: DoneToolExecuteInput): Promise<z.infer<typeof doneOutputSchema>> {
   try {
     // Check multiple possible locations for runtime context
     const runtimeContext = input.context?.runtimeContext || input.runtimeContext || input.context;
@@ -165,7 +166,7 @@ async function processDone(input: any): Promise<z.infer<typeof doneOutputSchema>
 
 // Main done function with tracing
 const executeDone = wrapTraced(
-  async (input: any): Promise<z.infer<typeof doneOutputSchema>> => {
+  async (input: DoneToolExecuteInput): Promise<z.infer<typeof doneOutputSchema>> => {
     return await processDone(input);
   },
   { name: 'done-tool' }
@@ -178,7 +179,21 @@ export const doneTool = createTool({
     "Marks all remaining unfinished tasks as complete, sends a final response to the user, and ends the workflow. Use this when the workflow is finished. This must be in markdown format and not use the '•' bullet character.",
   inputSchema: doneInputSchema,
   outputSchema: doneOutputSchema,
-  execute: executeDone,
+  execute: async ({
+    context,
+    runtimeContext,
+  }: { context: z.infer<typeof doneInputSchema>; runtimeContext?: any }) => {
+    // Handle both legacy test format (runtimeContext in context) and new format (separate runtimeContext)
+    const actualRuntimeContext = runtimeContext || (context as any)?.runtimeContext;
+
+    // Validate and structure the input for type safety
+    const executeInput: DoneToolExecuteInput = {
+      context: actualRuntimeContext ? { runtimeContext: actualRuntimeContext } : undefined,
+      runtimeContext: actualRuntimeContext,
+    };
+
+    return await executeDone(executeInput);
+  },
 });
 
 export default doneTool;

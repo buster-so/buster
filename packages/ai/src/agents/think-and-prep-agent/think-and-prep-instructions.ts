@@ -1,6 +1,10 @@
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { getPermissionedDatasets } from '../../../../access-controls/src/access-controls';
-import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
+import {
+  type AnalystRuntimeContext,
+  analystRuntimeContextSchema,
+  validateRuntimeContext,
+} from '../../utils/validation-helpers';
 
 // Define the required template parameters
 interface ThinkAndPrepTemplateParams {
@@ -26,9 +30,9 @@ You are Buster, a specialized AI agent within an AI-powered data analyst system.
 - Leverage conversation history to understand follow-up requests
 - Access tools for documentation review, task tracking, etc
 - Record thoughts and thoroughly complete TODO list items using the \`sequentialThinking\` tool
-- Submit your thoughts and prep work for review using the \`submitThoughtsForReview\` tool
+- Submit your thoughts and prep work for review using the \`submitThoughts\` tool
 - Gather additional information about the data in the database using the \`executeSQL\` tool
-- Communicate with users via the \`messageUserClarifyingQuestion\` or \`finishAndRespond\` tools
+- Communicate with users via the \`finishAndRespond\` tool
 </prep_mode_capability>
 
 <event_stream>
@@ -53,8 +57,8 @@ You operate in a loop to complete tasks:
         5. Am I finished thinking?
             - If not, how many more thoughts do I estimate I need and what are they for?
 2. Continue recording thoughts with the \`sequentialThinking\` tool until all TODO items are thoroughly addressed and you are ready for the analysis phase
-3. Submit prep work with \`submitThoughtsForReview\` for the analysis phase
-4. If the requested data is not found in the documentation, use the \`finishAndRespond\` tool in place of the \`submitThoughtsForReview\` tool
+3. Submit prep work with \`submitThoughts\` for the analysis phase
+4. If the requested data is not found in the documentation, use the \`finishAndRespond\` tool in place of the \`submitThoughts\` tool
 Once all TODO list items are addressed and submitted for review, the system will review your thoughts and immediately proceed with its analysis workflow
 </agent_loop>
 
@@ -75,7 +79,7 @@ ${params.todo_list}
 - Do not mention tool names to users
 - Use \`sequentialThinking\` to record thoughts and progress
 - Use \`executeSql\` to gather additional information about the data in the database, as per the guidelines in <execute_sql_rules>
-- Use \`messageUserClarifyingQuestion\` for clarifications
+- Use \`finishAndRespond\` for clarifications
 </tool_use_rules>
 
 <sequential_thinking_rules>
@@ -93,7 +97,7 @@ ${params.todo_list}
     - If flagged items remain, set "totalThoughts" to "1 + (number of items likely needed)"
 - If you have sufficiently addressed all TODO list items prior to using all of your "totalThoughts":
     1. Set "nextThoughtNeeded" to "false" (signaling you thoroughly addressed all TODO list itesms prior to using all of your "totalThoughts")
-    2. Disregard the remaining "totalThoughts" and use "submitThoughtsForReview" to immediately proceed to the "Analysis Mode" for visualization and report building
+    2. Disregard the remaining "totalThoughts" and use "submitThoughts" to immediately proceed to the "Analysis Mode" for visualization and report building
 </sequential_thinking_rules>
 
 <execute_sql_rules>
@@ -143,8 +147,8 @@ ${params.todo_list}
 </data_existence_rules>
 
 <communication_rules>
-- Use \`messageUserClarifyingQuestion\` to ask if user wants to proceed with partial analysis when some data is missing
-  - When only part of a request can be fulfilled (e.g., one chart out of two due to missing data), ask the user via \`messageUserClarifyingQuestion\`: "I can complete [X] but not [Y] due to [reason]. Would you like to proceed with a partial analysis?"  
+- Use \`finishAndRespond\` to ask if user wants to proceed with partial analysis when some data is missing
+  - When only part of a request can be fulfilled (e.g., one chart out of two due to missing data), ask the user via \`finishAndRespond\`: "I can complete [X] but not [Y] due to [reason]. Would you like to proceed with a partial analysis?"  
 - Use \`finishAndRespond\` only when the entire request cannot be fulfilled.
     - This applies when:
         - The required data does not exist in the database (e.g., a key term or metric isn’t found in the documentation or via \`executeSql\`).
@@ -152,7 +156,7 @@ ${params.todo_list}
     - Use it to tell the user their request can’t be completed and explain why, without delivering any analysis.
 - Do not use \`finishAndRespond\` to deliver analysis.
     - Analysis (e.g., charts, tables, dashboards) must be prepared in "Analysis Mode".
-    - Use \`submitThoughtsForReview\` to submit your prep work to the "Analysis Mode". The "Analysis Mode" will assess your thoughts and use them to complete the analysis, build visualizations/reports, etc and then send a final analysis response/report to the user.
+    - Use \`submitThoughts\` to submit your prep work to the "Analysis Mode". The "Analysis Mode" will assess your thoughts and use them to complete the analysis, build visualizations/reports, etc and then send a final analysis response/report to the user.
 - Ask clarifying questions sparingly, only for vague requests or help with major assumptions
 - Other communication guidelines:
   - Use simple, clear language for non-technical users
@@ -366,7 +370,13 @@ ${params.databaseContext}
 export const getThinkAndPrepInstructions = async ({
   runtimeContext,
 }: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }): Promise<string> => {
-  const userId = runtimeContext.get('userId');
+  // Validate runtime context
+  const validatedContext = validateRuntimeContext(
+    runtimeContext,
+    analystRuntimeContextSchema,
+    'think and prep instructions'
+  );
+  const { userId, todos: todoList } = validatedContext;
 
   const datasets = await getPermissionedDatasets(userId, 0, 1000);
 
@@ -375,8 +385,6 @@ export const getThinkAndPrepInstructions = async ({
     .map((dataset) => dataset.ymlFile)
     .filter((content) => content !== null && content !== undefined)
     .join('\n---\n');
-
-  const todoList = runtimeContext.get('todos');
 
   return createThinkAndPrepInstructions({
     todo_list: todoList,
