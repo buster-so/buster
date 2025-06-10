@@ -97,10 +97,40 @@ npm run ci:check    # Runs check + typecheck
 ## Code Style Preferences
 
 ### Type Safety
+- **Zod-First Approach** - Use Zod schemas as the single source of truth for both validation and types
+- **Use `z.infer<typeof schema>` for types** - Prefer inferred types over separate interfaces for consistency
 - **Avoid `unknown` unless absolutely necessary** - prefer specific types or properly typed unions
 - **Avoid `any`** - use specific types, generics, or proper TypeScript patterns
+- **Safe array access** - Use validation helpers for TypeScript strict mode compliance (`noUncheckedIndexedAccess`)
 - Use Zod schemas for runtime validation and type inference
 - Leverage TypeScript's strict mode features
+
+#### Zod-First Type Safety Pattern
+```typescript
+// ✅ Good: Zod schema as single source of truth
+const userSchema = z.object({
+  id: z.string().min(1),
+  email: z.string().email(),
+  role: z.enum(['admin', 'user']),
+});
+
+type User = z.infer<typeof userSchema>; // Inferred type
+
+// ✅ Good: Safe runtime validation
+const validatedUser = userSchema.parse(rawData);
+
+// ✅ Good: Safe array access (required for noUncheckedIndexedAccess)
+import { validateArrayAccess } from '@buster/ai/utils/validation-helpers';
+const firstItem = validateArrayAccess(array, 0, 'user processing');
+
+// ❌ Avoid: Separate interface + unsafe access
+interface User {
+  id: string;
+  email: string;
+}
+const user = rawData as User; // Unsafe
+const firstItem = array[0]; // Unsafe with strict mode
+```
 
 ### Import Organization
 - Use **type-only imports** when importing only types: `import type { SomeType } from './types'`

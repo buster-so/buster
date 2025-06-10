@@ -10,6 +10,13 @@ import { DataSource } from '../../../../data-source/src/data-source';
 import type { Credentials } from '../../../../data-source/src/types/credentials';
 import { db } from '../../../../database/src/connection';
 import { assetPermissions, metricFiles } from '../../../../database/src/schema';
+import {
+  credentialsSchema,
+  isError,
+  safeJsonParse,
+  secretResultSchema,
+  validateArrayAccess,
+} from '../../utils/validation-helpers';
 
 // Core interfaces matching Rust structs
 interface MetricFileParams {
@@ -1200,7 +1207,7 @@ async function validateSql(
         dataSources: [
           {
             name: `datasource-${dataSourceId}`,
-            type: credentials.type as any,
+            type: credentials.type,
             credentials: credentials,
           },
         ],
@@ -1267,26 +1274,34 @@ async function getDataSourceCredentials(dataSourceId: string): Promise<Credentia
       sql`SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = ${dataSourceId} LIMIT 1`
     );
 
-    if (!secretResult || secretResult.length === 0) {
-      throw new Error(
-        'Unable to access your data source credentials. Please ensure the data source is properly configured.'
-      );
-    }
+    // Validate the database result structure using Zod
+    const validatedResult = secretResultSchema.parse(secretResult);
 
-    const secretString = secretResult[0]?.decrypted_secret as string;
-    if (!secretString) {
-      throw new Error(
-        'The data source credentials appear to be invalid. Please reconfigure your data source.'
-      );
-    }
+    // Safe array access - we know it has at least one element due to schema validation
+    const secretRecord = validateArrayAccess(validatedResult, 0, 'database secret retrieval');
+    const secretString = secretRecord.decrypted_secret;
 
-    // Parse the credentials JSON
-    const credentials = JSON.parse(secretString) as Credentials;
-    return credentials;
+    // Parse and validate the credentials JSON using Zod
+    const validatedCredentials = safeJsonParse(
+      secretString,
+      credentialsSchema,
+      'data source credentials'
+    );
+    // Return as the original Credentials type since we've validated the basic structure
+    return validatedCredentials as unknown as Credentials;
   } catch (error) {
     console.error('Error getting data source credentials:', error);
+
+    // Provide more specific error messages based on error type
+    if (error instanceof z.ZodError) {
+      throw new Error(
+        'The data source credentials are not in the expected format. Please reconfigure your data source.'
+      );
+    }
+
+    const errorMessage = isError(error) ? error.message : 'Unknown error occurred';
     throw new Error(
-      'Unable to retrieve data source credentials. Please contact support if this issue persists.'
+      `Unable to retrieve data source credentials: ${errorMessage}. Please contact support if this issue persists.`
     );
   }
 }

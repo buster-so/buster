@@ -52,9 +52,9 @@ const handleAnalystStepFinish = async ({
     // Continue with abort even if save fails to avoid hanging
   }
 
-  // Check if doneTool was called and abort after saving
+  // Check if done tool was called and abort after saving
   const toolNames = step.toolCalls.map((call: any) => call.toolName);
-  const shouldAbort = toolNames.includes('doneTool');
+  const shouldAbort = toolNames.includes('done');
 
   if (shouldAbort) {
     abortController.abort();
@@ -142,7 +142,7 @@ const analystExecution = async ({
         }
       }
 
-      if (chunk.type === 'tool-result' && chunk.toolName === 'doneTool') {
+      if (chunk.type === 'tool-result' && chunk.toolName === 'done') {
         // Don't abort here anymore - let onStepFinish handle it after saving
         return {
           conversationHistory: completeConversationHistory,

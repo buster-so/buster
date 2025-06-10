@@ -57,7 +57,7 @@ const handleThinkAndPrepStepFinish = async ({
   let shouldAbort = false;
 
   if (
-    toolNames.some((toolName: string) => ['submitThoughts', 'finishAndRespond'].includes(toolName))
+    toolNames.some((toolName: string) => ['submitThoughtsTool', 'finish-and-respond'].includes(toolName))
   ) {
     // Extract and validate messages from the step response
     // step.response.messages contains the conversation history for this step
@@ -78,8 +78,8 @@ const handleThinkAndPrepStepFinish = async ({
     // Store the full step data (cast to our expected type)
     finalStepData = step as any;
 
-    // Set finished to true if finishAndRespondTool was called
-    if (toolNames.includes('finishAndRespond')) {
+    // Set finished to true if finish-and-respond tool was called
+    if (toolNames.includes('finish-and-respond')) {
       finished = true;
     }
 
@@ -196,8 +196,8 @@ const thinkAndPrepExecution = async ({
       metadata: {
         toolsUsed: getAllToolsUsed(outputMessages),
         finalTool: getLastToolUsed(outputMessages) as
-          | 'submitThoughts'
-          | 'finishAndRespond'
+          | 'submitThoughtsTool'
+          | 'finish-and-respond'
           | undefined,
         text: (finalStepData as any)?.text,
         reasoning: (finalStepData as any)?.reasoning,
@@ -222,8 +222,8 @@ const thinkAndPrepExecution = async ({
     metadata: {
       toolsUsed: getAllToolsUsed(outputMessages),
       finalTool: getLastToolUsed(outputMessages) as
-        | 'submitThoughts'
-        | 'finishAndRespond'
+        | 'submitThoughtsTool'
+        | 'finish-and-respond'
         | undefined,
       text: (finalStepData as any)?.text,
       reasoning: (finalStepData as any)?.reasoning,
