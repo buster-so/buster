@@ -9,23 +9,20 @@
       "recommended": true,
       "correctness": {
         "noUnusedVariables": "error",
-        "noUnusedImports": "error",
-        "useExhaustiveDependencies": "warn"
+        "noUnusedImports": "error"
       },
       "style": {
-        "noNonNullAssertion": "warn",
-        "useImportType": "error",
+        "noNonNullAssertion": "error",
+        "useImportType": "warn",
         "useNodejsImportProtocol": "error",
         "useConsistentArrayType": "error"
       },
       "suspicious": {
-        "noExplicitAny": "warn",
-        "noArrayIndexKey": "warn",
+        "noExplicitAny": "error",
         "noConsoleLog": "warn"
       },
       "complexity": {
-        "noExcessiveCognitiveComplexity": "warn",
-        "noUselessFragments": "error"
+        "noExcessiveCognitiveComplexity": "warn"
       },
       "performance": {
         "noDelete": "error"
@@ -100,12 +97,15 @@
       "cli/**",
       "packages/**/node_modules/**",
       "packages/**/dist/**",
-      "packages/**/build/**"
+      "packages/**/build/**",
+      "web/**"
     ]
   },
   "overrides": [
     {
-      "include": ["packages/database/**/*.ts"],
+      "include": [
+        "packages/database/**/*.ts"
+      ],
       "linter": {
         "rules": {
           "style": {
@@ -119,9 +119,7 @@
     },
     {
       "include": [
-        "packages/database/src/setup.ts",
-        "packages/database/src/migrate.ts",
-        "packages/database/src/seed/**/*.ts"
+        "packages/database/**/*.ts"
       ],
       "linter": {
         "rules": {
@@ -132,31 +130,15 @@
       }
     },
     {
-      "include": ["packages/database/src/seed/templates/**/*.ts"],
-      "linter": {
-        "rules": {
-          "correctness": {
-            "noUnusedImports": "off",
-            "noUnusedVariables": "off"
-          },
-          "suspicious": {
-            "noConsoleLog": "off"
-          }
-        }
-      }
-    },
-    {
-      "include": ["trigger/**/*.ts"],
-      "linter": {
-        "rules": {
-          "style": {
-            "useImportType": "warn"
-          }
-        }
-      }
-    },
-    {
-      "include": ["packages/ai/tests/**/*.ts"],
+      "include": [
+        "**/tests/**/*",
+        "**/test/**/*",
+        "**/__tests__/**/*",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/*.setup.*",
+        "**/setup.*"
+      ],
       "linter": {
         "rules": {
           "suspicious": {
