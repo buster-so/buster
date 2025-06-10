@@ -28,11 +28,10 @@ export const useTrackAndUpdateChatChanges = (
   return useShapeStream(
     shape,
     updateOperations,
-    useMemoizedFn((rows) => {
-      const chat = last(rows);
+    useMemoizedFn((chat) => {
       if (chat && chat.value) {
         iteration.current++;
-        if (iteration.current > 1) {
+        if (iteration.current > 0) {
           callback?.(chat.value);
           onUpdateChat(chat.value);
         }

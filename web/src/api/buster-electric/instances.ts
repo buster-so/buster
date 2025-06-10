@@ -53,7 +53,7 @@ export const useShape = <T extends Row<unknown> = Row<unknown>>(
 export const useShapeStream = <T extends Row<unknown> = Row<unknown>>(
   params: ElectricShapeOptions<T>,
   operations: Array<`insert` | `update` | `delete`>,
-  onUpdate: (rows: ChangeMessage<T>[]) => void,
+  onUpdate: (rows: ChangeMessage<T>) => void,
   subscribe: boolean = true,
   shouldUnsubscribe?: (d: { operationType: string; message: ChangeMessage<T> }) => boolean
 ) => {
@@ -67,38 +67,43 @@ export const useShapeStream = <T extends Row<unknown> = Row<unknown>>(
 
   useEffect(() => {
     if (!subscribe) {
+      quit();
       return;
     }
 
     const unsubscribe = stream.subscribe((messages) => {
-      const filteredMessages = messages.filter(
+      const filteredMessage = messages.find(
         (m) =>
           isChangeMessage(m) &&
           m.value &&
           operations.includes(m.headers.operation as `insert` | `update` | `delete`)
-      ) as ChangeMessage<T>[];
+      ) as ChangeMessage<T>;
 
       const isUnsubscribed =
         shouldUnsubscribe &&
-        filteredMessages.some((message) =>
-          shouldUnsubscribe({
-            operationType: message.headers.operation as `insert` | `update` | `delete`,
-            message
-          })
-        );
+        shouldUnsubscribe({
+          operationType: filteredMessage.headers.operation as `insert` | `update` | `delete`,
+          message: filteredMessage
+        });
 
-      if (filteredMessages.length > 0) {
-        onUpdate(filteredMessages);
+      if (filteredMessage) {
+        onUpdate(filteredMessage);
       }
 
       if (isUnsubscribed) {
         unsubscribe();
+        quit();
         return;
       }
     });
 
     return () => {
       unsubscribe();
+      quit();
     };
+
+    function quit() {
+      stream.unsubscribeAll();
+    }
   }, [operations, onUpdate, shouldUnsubscribe, shapeParams, subscribe]);
 };

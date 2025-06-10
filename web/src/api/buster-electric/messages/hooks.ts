@@ -40,14 +40,12 @@ export const useTrackAndUpdateMessageChanges = (
   return useShapeStream(
     shape,
     updateOperations,
-    useMemoizedFn((rows) => {
-      const message = first(rows);
+    useMemoizedFn((message) => {
       if (message && message.value) {
         iteration.current++; //I not sure why... but electric sends 2 message when we first connect
-        if (iteration.current > 2) {
-          console.log('message', message.value);
+        //I set it back to 0 in case they navigate away from the chat and come back
+        if (iteration.current > 0) {
           const iChatMessage = updateMessageShapeToIChatMessage(message.value);
-          console.log('iChatMessage', iChatMessage.response_messages);
           callback?.(message.value);
           onUpdateChatMessage(iChatMessage);
         }
