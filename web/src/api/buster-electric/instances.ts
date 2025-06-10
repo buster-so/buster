@@ -3,6 +3,7 @@ import {
   ChangeMessage,
   isChangeMessage,
   Message,
+  ShapeStream,
   type BackoffOptions,
   type Row
 } from '@electric-sql/client';
@@ -28,7 +29,7 @@ const createElectricShape = <T extends Row<unknown> = Row<unknown>>(
   return {
     ...params,
     url: ELECTRIC_BASE_URL,
-    subscribe: !!accessToken,
+    subscribe: !!accessToken && (params.subscribe ?? true),
     backoffOptions,
     headers: {
       Authorization: `Bearer ${accessToken}`
@@ -51,8 +52,9 @@ export const useShape = <T extends Row<unknown> = Row<unknown>>(
 export const useShapeStream = <T extends Row<unknown> = Row<unknown>>(
   params: ElectricShapeOptions<T>,
   operations: Array<`insert` | `update` | `delete`>,
-  onUpdate: (rows: Message<T>[]) => void,
-  shouldUnsubscribe: (d: { operationType: string; message: ChangeMessage<T> }) => boolean
+  onUpdate: (rows: ChangeMessage<T>[]) => void,
+  subscribe: boolean = true,
+  shouldUnsubscribe?: (d: { operationType: string; message: ChangeMessage<T> }) => boolean
 ) => {
   const accessToken = useSupabaseContext((state) => state.accessToken);
 
@@ -60,15 +62,28 @@ export const useShapeStream = <T extends Row<unknown> = Row<unknown>>(
     return createElectricShape(params, accessToken);
   }, [accessToken, params]);
 
+  const stream = getShapeStream<T>(shapeParams);
+
   useEffect(() => {
-    const stream = getShapeStream<T>(shapeParams);
+    if (!subscribe) {
+      return;
+    }
 
     const unsubscribe = stream.subscribe((messages) => {
-      const filteredMessages = messages.filter(isChangeMessage);
+      const filteredMessages = messages.filter(
+        (m) =>
+          isChangeMessage(m) &&
+          operations.includes(m.headers.operation as `insert` | `update` | `delete`)
+      ) as ChangeMessage<T>[];
 
-      const isUnsubscribed = filteredMessages.some((message) =>
-        shouldUnsubscribe({ operationType: message.headers.operation, message })
-      );
+      const isUnsubscribed =
+        shouldUnsubscribe &&
+        filteredMessages.some((message) =>
+          shouldUnsubscribe({
+            operationType: message.headers.operation as `insert` | `update` | `delete`,
+            message
+          })
+        );
 
       if (filteredMessages.length > 0) {
         onUpdate(filteredMessages);

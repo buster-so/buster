@@ -21,11 +21,9 @@
       }
     ],
     "paths": {
-      "@/*": ["src/*"],
-      "server/*": ["../server/src/*"]
+      "@/*": ["src/*"]
     }
   },
   "include": ["next-env.d.ts", "globals.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"],
-  "references": [{ "path": "../server" }]
+  "exclude": ["node_modules"]
 }

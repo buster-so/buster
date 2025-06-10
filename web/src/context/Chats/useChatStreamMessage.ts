@@ -128,18 +128,6 @@ export const useChatStreamMessage = () => {
     }
   });
 
-  const _generatingTitleCallback = useMemoizedFn(
-    (_: unknown, newData: ChatEvent_GeneratingTitle) => {
-      const { chat_id } = newData;
-      const currentChat = chatRef.current[chat_id];
-      if (currentChat) {
-        const updatedChat = updateChatTitle(currentChat, newData);
-        chatRef.current[chat_id] = updatedChat;
-        onUpdateChat(updatedChat);
-      }
-    }
-  );
-
   const _generatingResponseMessageCallback = useMemoizedFn(
     (_: unknown, d: ChatEvent_GeneratingResponseMessage) => {
       const { message_id } = d;
@@ -175,11 +163,6 @@ export const useChatStreamMessage = () => {
       });
     }
   );
-
-  useSocketQueryOn({
-    responseEvent: '/chats/post:generatingTitle',
-    callback: _generatingTitleCallback
-  });
 
   useSocketQueryOn({
     responseEvent: '/chats/post:generatingResponseMessage',

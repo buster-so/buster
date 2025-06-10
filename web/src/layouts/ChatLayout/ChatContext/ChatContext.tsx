@@ -1,15 +1,15 @@
 import { useQueries } from '@tanstack/react-query';
-import React, { useMemo, type PropsWithChildren } from 'react';
+import React, { type PropsWithChildren } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
 import type { IBusterChatMessage } from '@/api/asset_interfaces/chat';
-import { useGetChat as useGetChatElectric } from '@/api/buster-electric/chats';
-import { useGetMessages as useGetMessagesElectric } from '@/api/buster-electric/messages';
+import { useTrackAndUpdateMessageChanges } from '@/api/buster-electric/messages';
 import { useGetChat } from '@/api/buster_rest/chats';
 import { queryKeys } from '@/api/query_keys';
 import { useChatLayoutContextSelector } from '..';
 import type { SelectedFile } from '../interfaces';
 import { useAutoChangeLayout } from './useAutoChangeLayout';
 import { useIsFileChanged } from './useIsFileChanged';
+import { useTrackAndUpdateChatChanges } from '@/api/buster-electric/chats';
 
 const useChatIndividualContext = ({
   chatId,
@@ -21,14 +21,12 @@ const useChatIndividualContext = ({
   const selectedFileId = selectedFile?.id;
   const selectedFileType = selectedFile?.type;
 
-  const { data: chats } = useGetChatElectric({ chatId: chatId || '' });
-  const { data: messages } = useGetMessagesElectric({ chatId: chatId || '' });
-  const chat = chats[0];
+  const { data: chat } = useGetChat({ id: chatId || '' });
 
   // CHAT
   const hasChat = !!chatId && !!chat?.id;
   const chatTitle = chat?.title;
-  const chatMessageIds = useMemo(() => messages?.map((x) => x.id) ?? [], [messages]);
+  const chatMessageIds: string[] = chat?.message_ids ?? [];
 
   //FILE
   const hasFile = !!selectedFileId;
@@ -57,6 +55,9 @@ const useChatIndividualContext = ({
     lastMessageId: currentMessageId,
     chatId
   });
+
+  useTrackAndUpdateMessageChanges({ chatId, messageId: currentMessageId });
+  useTrackAndUpdateChatChanges({ chatId });
 
   return React.useMemo(
     () => ({
