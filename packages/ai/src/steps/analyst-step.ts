@@ -56,7 +56,7 @@ const handleAnalystStepFinish = async ({
 
   // Check if done tool was called and abort after saving
   const toolNames = step.toolCalls.map((call: any) => call.toolName);
-  const shouldAbort = toolNames.includes('done');
+  const shouldAbort = toolNames.includes('doneTool');
 
   if (shouldAbort) {
     abortController.abort();
