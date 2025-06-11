@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm';
 import { getDb } from '../../../../database/src/connection';
 import { updateMessageFields } from '../../../../database/src/helpers/messages';
 import { messages } from '../../../../database/src/schema';
-import { appendToReasoning } from './formatLlmMessagesAsReasoning';
+import { formatLlmMessagesAsReasoning, appendToReasoning, extractResponseMessages } from './formatLlmMessagesAsReasoning';
 
 /**
  * Saves conversation history to the database
@@ -55,7 +55,7 @@ export async function saveConversationHistoryFromStep(
   stepMessages: CoreMessage[],
   reasoningHistory?: unknown[],
   responseHistory?: unknown[]
-): Promise<void> {
+): Promise<{ newReasoningMessages: unknown[], newResponseMessages: unknown[] }> {
   try {
     const db = getDb();
 
@@ -76,9 +76,13 @@ export async function saveConversationHistoryFromStep(
       throw new Error('Invalid stepMessages: expected array');
     }
     
+    // Extract reasoning messages
     const newReasoningEntries = formatLlmMessagesAsReasoning(stepMessages);
     
-    // Deduplicate by ID - keep track of existing IDs
+    // Extract response messages
+    const newResponseEntries = extractResponseMessages(stepMessages);
+    
+    // Deduplicate reasoning by ID - keep track of existing IDs
     const existingIds = new Set(
       currentReasoning
         .filter((r: any) => r && typeof r === 'object' && 'id' in r)
@@ -107,6 +111,12 @@ export async function saveConversationHistoryFromStep(
 
     // Update all fields in a single call
     await updateMessageFields(messageId, updateFields);
+    
+    // Return the new messages for workflow usage
+    return {
+      newReasoningMessages: deduplicatedNewEntries,
+      newResponseMessages: newResponseEntries
+    };
   } catch (error) {
     throw new Error(
       `Failed to save conversation history and reasoning: ${error instanceof Error ? error.message : 'Unknown error'}`

@@ -112,7 +112,7 @@ describe('formatLlmMessagesAsReasoning error handling', () => {
             type: 'tool-call',
             toolCallId: 'fail-id',
             toolName: 'sequentialThinking',
-            args: undefined as any, // This will cause issues
+            args: undefined as any, // This will be skipped because no thought
           },
         ],
       },
@@ -124,9 +124,10 @@ describe('formatLlmMessagesAsReasoning error handling', () => {
     
     const result = formatLlmMessagesAsReasoning(messages);
     
-    // Should process both messages despite the error in the first
-    expect(result).toHaveLength(2);
-    expect(result[1]).toHaveProperty('message', 'Valid message after error');
+    // First message is skipped because sequentialThinking without args.thought returns null
+    // Only the user message is processed
+    expect(result).toHaveLength(1);
+    expect(result[0]).toHaveProperty('message', 'Valid message after error');
   });
 
   test('handles messages with complex content arrays', () => {

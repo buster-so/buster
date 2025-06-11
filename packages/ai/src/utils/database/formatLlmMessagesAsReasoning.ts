@@ -103,30 +103,10 @@ function formatMessageAsReasoningEntry(message: CoreMessage): any {
 
           case 'doneTool':
           case 'done-tool':
-            reasoningMessages.push({
-              id: toolCall.toolCallId,
-              type: 'text',
-              title: 'Completed',
-              status: 'completed',
-              message: args.message || 'Analysis complete',
-              message_chunk: null,
-              secondary_title: 'TODO',
-              finished_reasoning: true,
-            });
-            break;
-
           case 'respondWithoutAnalysis':
           case 'respond-without-analysis':
-            reasoningMessages.push({
-              id: toolCall.toolCallId,
-              type: 'text',
-              title: 'Response',
-              status: 'completed',
-              message: args.message || '',
-              message_chunk: null,
-              secondary_title: 'TODO',
-              finished_reasoning: false,
-            });
+            // These are response messages, not reasoning messages
+            // They will be handled by extractResponseMessages
             break;
 
           case 'submitThoughts':
@@ -167,13 +147,16 @@ function formatMessageAsReasoningEntry(message: CoreMessage): any {
         }
       }
       
-      // Return the first message if only one, or create a container
+      // Return the reasoning messages if we have any
       if (reasoningMessages.length === 1) {
         return reasoningMessages[0];
       } else if (reasoningMessages.length > 0) {
         // For multiple tool calls in one message, return them as separate entries
-        // This is handled by the caller
         return reasoningMessages;
+      } else if (toolCalls.length > 0) {
+        // We had tool calls but no reasoning messages (e.g., doneTool, respondWithoutAnalysis)
+        // Return null to skip this message
+        return null;
       }
     }
   }
@@ -301,4 +284,38 @@ export function appendToReasoning(
   const existing = currentReasoning || [];
   const newReasoningEntries = formatLlmMessagesAsReasoning(newMessages);
   return [...existing, ...newReasoningEntries];
+}
+
+/**
+ * Extract response messages from CoreMessages
+ * Specifically looks for doneTool and respondWithoutAnalysis tool calls
+ */
+export function extractResponseMessages(messages: CoreMessage[]): any[] {
+  if (!Array.isArray(messages)) {
+    return [];
+  }
+  
+  const responseMessages: any[] = [];
+  
+  for (const message of messages) {
+    if (message.role === 'assistant' && Array.isArray(message.content)) {
+      const toolCalls = message.content.filter((part): part is ToolCallPart => part.type === 'tool-call');
+      
+      for (const toolCall of toolCalls) {
+        const args = (toolCall.args || {}) as Record<string, any>;
+        
+        if (toolCall.toolName === 'doneTool' || toolCall.toolName === 'done-tool' ||
+            toolCall.toolName === 'respondWithoutAnalysis' || toolCall.toolName === 'respond-without-analysis') {
+          responseMessages.push({
+            id: toolCall.toolCallId,
+            type: 'text',
+            message: args.message || '',
+            is_final_message: true,
+          });
+        }
+      }
+    }
+  }
+  
+  return responseMessages;
 }

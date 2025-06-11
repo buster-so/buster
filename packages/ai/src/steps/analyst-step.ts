@@ -17,10 +17,9 @@ import {
   ReasoningHistorySchema,
   ResponseHistorySchema,
 } from '../utils/memory/types';
-import { 
-  extractMessagesFromToolCalls,
-  type BusterChatMessageReasoning,
-  type BusterChatMessageResponse
+import type { 
+  BusterChatMessageReasoning,
+  BusterChatMessageResponse
 } from '../utils/memory/message-converters';
 import { retryableAgentStream } from '../utils/retry';
 import { ToolArgsParser } from '../utils/streaming';
@@ -71,40 +70,21 @@ const handleAnalystStepFinish = async ({
   let reasoningHistory: BusterChatMessageReasoning[] = [...accumulatedReasoningHistory];
   let responseHistory: BusterChatMessageResponse[] = [...accumulatedResponseHistory];
 
-  // Process tool calls to extract reasoning and response messages
-  if (step.toolCalls.length > 0) {
+  // Save conversation history for all tool calls
+  const messageId = runtimeContext.get('messageId');
+  if (messageId && step.response.messages.length > 0) {
     try {
-      // Create a map of tool results from the step
-      const toolResultsMap = new Map<string, string | null>();
-      
-      // For tool results, we need to look at the tool response messages
-      const toolResponses = step.response.messages.filter(msg => msg.role === 'tool');
-      for (const toolResponse of toolResponses) {
-        if (toolResponse && typeof toolResponse === 'object' &&
-            'toolCallId' in toolResponse && 'content' in toolResponse) {
-          const content = toolResponse.content;
-          if (typeof content === 'string') {
-            toolResultsMap.set(toolResponse.toolCallId, content);
-          }
-        }
-      }
-
-      // Convert tool calls to messages with proper type validation
-      if (!Array.isArray(step.toolCalls)) {
-        console.error('handleAnalystStepFinish: step.toolCalls is not an array');
-      } else {
-        const { reasoningMessages, responseMessages } = extractMessagesFromToolCalls(
-          step.toolCalls,
-          toolResultsMap
-        );
-
-        // Add to history
-        reasoningHistory.push(...reasoningMessages);
-        responseHistory.push(...responseMessages);
-      }
+      const { newReasoningMessages, newResponseMessages } = await saveConversationHistoryFromStep(
+        messageId,
+        step.response.messages,
+        reasoningHistory,
+        responseHistory
+      );
+      // Update the histories with the new messages
+      reasoningHistory.push(...(newReasoningMessages as BusterChatMessageReasoning[]));
+      responseHistory.push(...(newResponseMessages as BusterChatMessageResponse[]));
     } catch (error) {
-      console.error('Error processing tool calls in analyst step:', error);
-      // Continue execution without failing the entire step
+      console.error('Failed to save conversation history:', error);
     }
   }
 
@@ -133,7 +113,15 @@ const handleAnalystStepFinish = async ({
       if (messageId) {
         // Save conversation history to database before aborting
         try {
-          await saveConversationHistoryFromStep(messageId, completeConversationHistory, reasoningHistory, responseHistory);
+          const { newReasoningMessages, newResponseMessages } = await saveConversationHistoryFromStep(
+            messageId, 
+            completeConversationHistory, 
+            reasoningHistory, 
+            responseHistory
+          );
+          // Update the histories with the new messages
+          reasoningHistory.push(...(newReasoningMessages as BusterChatMessageReasoning[]));
+          responseHistory.push(...(newResponseMessages as BusterChatMessageResponse[]));
         } catch (saveError) {
           console.error('Failed to save conversation history:', saveError);
           // Continue with abort even if save fails to avoid hanging

@@ -123,6 +123,8 @@ Once all TODO list items are addressed and submitted for review, the system will
   - Do *not* use this tool to query/check for tables or columns that are not explicitly included in the documentation (all available tables/columns are included in the documentation)
   - Purpose:
     - Identify text and enum values during prep mode to inform planning, and determine if the required text values exist and how/where they are stored
+    - Verify the data structure
+    - Check for records
   - Flexibility and When to Use:
     - Decide based on context, using the above guidelines as a guide
     - Use intermittently between thoughts whenever needed
