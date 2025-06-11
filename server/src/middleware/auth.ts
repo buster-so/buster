@@ -9,7 +9,6 @@ export const requireAuth = bearerAuth({
     const { data, error } = await supabase.auth.getUser(token); //usually takes about 3 - 7ms
 
     if (token.includes('Cj0g')) {
-      console.log(data, error);
     }
 
     if (error || !data.user) {

@@ -74,10 +74,6 @@ export async function createChatHandler(
         });
 
         const triggerDuration = Date.now() - triggerStart;
-        console.log('Successfully queued analyst task:', {
-          messageId,
-          triggerDuration: `${triggerDuration}ms`,
-        });
 
         // Warn if trigger queueing is slow
         if (triggerDuration > 500) {
@@ -100,14 +96,6 @@ export async function createChatHandler(
 
     // Log performance metrics - target is <500ms total
     const duration = Date.now() - startTime;
-    console.log('Chat request completed:', {
-      duration: `${duration}ms`,
-      userId: user.id,
-      chatId,
-      hasPrompt: !!request.prompt,
-      hasAsset: !!request.asset_id,
-      performance: duration <= 500 ? 'good' : 'slow',
-    });
 
     if (duration > 500) {
       console.warn('Slow chat creation detected:', {

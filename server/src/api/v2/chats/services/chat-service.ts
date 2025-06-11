@@ -1,21 +1,17 @@
-import type { User } from '@supabase/supabase-js';
-import { 
-  getChatWithDetails,
-  createMessage,
-  checkChatPermission,
-  generateAssetMessages,
-  getMessagesForChat,
-  db,
+import type { ChatCreateHandlerRequest, ChatMessage, ChatWithMessages } from '@/types';
+import { ChatError, ChatErrorCode } from '@/types/chat-errors.types';
+import {
   chats,
+  checkChatPermission,
+  createMessage,
+  db,
+  generateAssetMessages,
+  getChatWithDetails,
+  getMessagesForChat,
   messages,
 } from '@buster/database';
 import type { Chat, Message } from '@buster/database/src/helpers/chats';
-import type { 
-  ChatWithMessages, 
-  ChatMessage,
-  ChatCreateHandlerRequest 
-} from '@/types';
-import { ChatError, ChatErrorCode } from '@/types/chat-errors.types';
+import type { User } from '@supabase/supabase-js';
 
 /**
  * Build a ChatWithMessages object from database entities
@@ -25,7 +21,7 @@ export function buildChatWithMessages(
   messages: Message[],
   _user: User,
   creatorDetails?: { name: string | null; avatarUrl: string | null } | null,
-  isFavorited: boolean = false
+  isFavorited = false
 ): ChatWithMessages {
   const messageMap: Record<string, ChatMessage> = {};
   const messageIds: string[] = [];
@@ -37,20 +33,23 @@ export function buildChatWithMessages(
       role: msg.requestMessage ? 'user' : 'assistant',
       created_at: msg.createdAt,
       updated_at: msg.updatedAt,
-      request_message: msg.requestMessage ? {
-        request: msg.requestMessage,
-        sender_id: msg.createdBy,
-        sender_name: creatorDetails?.name || 'Unknown User',
-        sender_avatar: creatorDetails?.avatarUrl || undefined,
-      } : undefined,
-      response_message: (msg.responseMessages as any)?.content || undefined,
-      reasoning_message: (msg.reasoning as any)?.content || undefined,
+      request_message: msg.requestMessage
+        ? {
+            request: msg.requestMessage,
+            sender_id: msg.createdBy,
+            sender_name: creatorDetails?.name || 'Unknown User',
+            sender_avatar: creatorDetails?.avatarUrl || undefined,
+          }
+        : undefined,
+      //TODO - ask Dallin if this is correct?
+      response_message: (msg.responseMessages as { content: string })?.content || undefined,
+      reasoning_message: (msg.reasoning as { content: string })?.content || undefined,
       final_reasoning_message: msg.finalReasoningMessage || undefined,
       feedback: msg.feedback ? (msg.feedback as 'positive' | 'negative') : undefined,
       files: undefined, // TODO: Load files from messagesToFiles
       is_completed: msg.isCompleted || false, // Always false for new messages, trigger job sets to true
     };
-    
+
     messageIds.push(msg.id);
     messageMap[msg.id] = chatMessage;
   }
@@ -90,7 +89,7 @@ export async function initializeChat(
   chat: ChatWithMessages;
 }> {
   const messageId = request.message_id || crypto.randomUUID();
-  
+
   try {
     if (request.chat_id) {
       // Existing chat - check if it exists first, then check permission
@@ -100,11 +99,7 @@ export async function initializeChat(
       });
 
       if (!chatDetails) {
-        throw new ChatError(
-          ChatErrorCode.CHAT_NOT_FOUND,
-          'Chat not found',
-          404
-        );
+        throw new ChatError(ChatErrorCode.CHAT_NOT_FOUND, 'Chat not found', 404);
       }
 
       const hasPermission = await checkChatPermission(request.chat_id, user.id);
@@ -118,29 +113,31 @@ export async function initializeChat(
 
       // Create new message and fetch existing messages concurrently
       const [newMessage, existingMessages] = await Promise.all([
-        request.prompt ? createMessage({
-          chatId: request.chat_id,
-          content: request.prompt,
-          userId: user.id,
-          messageId,
-        }) : Promise.resolve(null),
+        request.prompt
+          ? createMessage({
+              chatId: request.chat_id,
+              content: request.prompt,
+              userId: user.id,
+              messageId,
+            })
+          : Promise.resolve(null),
         getMessagesForChat(request.chat_id),
       ]);
 
       // Combine messages
-      const allMessages = newMessage 
-        ? [...existingMessages, newMessage]
-        : existingMessages;
-      
+      const allMessages = newMessage ? [...existingMessages, newMessage] : existingMessages;
+
       // Build chat with messages
       const chatWithMessages = buildChatWithMessages(
         chatDetails.chat,
         allMessages,
         user,
-        chatDetails.user ? {
-          name: chatDetails.user.name,
-          avatarUrl: chatDetails.user.avatarUrl,
-        } : null,
+        chatDetails.user
+          ? {
+              name: chatDetails.user.name,
+              avatarUrl: chatDetails.user.avatarUrl,
+            }
+          : null,
         chatDetails.isFavorited
       );
 
@@ -149,72 +146,71 @@ export async function initializeChat(
         messageId,
         chat: chatWithMessages,
       };
-    } else {
-      // New chat - use transaction for atomicity
-      const title = request.prompt || 'New Chat';
-      
-      const result = await db.transaction(async (tx) => {
-        // Create chat
-        const [newChat] = await tx
-          .insert(chats)
+    }
+    // New chat - use transaction for atomicity
+    const title = request.prompt || 'New Chat';
+
+    const result = await db.transaction(async (tx) => {
+      // Create chat
+      const [newChat] = await tx
+        .insert(chats)
+        .values({
+          title,
+          organizationId,
+          createdBy: user.id,
+          updatedBy: user.id,
+          publiclyAccessible: false,
+        })
+        .returning();
+
+      if (!newChat) {
+        throw new Error('Failed to create chat');
+      }
+
+      // Create initial message if prompt provided
+      let message: Message | null = null;
+      if (request.prompt) {
+        const [newMessage] = await tx
+          .insert(messages)
           .values({
-            title,
-            organizationId,
+            id: messageId,
+            chatId: newChat.id,
             createdBy: user.id,
-            updatedBy: user.id,
-            publiclyAccessible: false,
+            requestMessage: request.prompt,
+            responseMessages: {},
+            reasoning: {},
+            title: request.prompt,
+            rawLlmMessages: {},
+            isCompleted: false,
           })
           .returning();
 
-        if (!newChat) {
-          throw new Error('Failed to create chat');
+        if (!newMessage) {
+          throw new Error('Failed to create message');
         }
+        message = newMessage;
+      }
 
-        // Create initial message if prompt provided
-        let message: Message | null = null;
-        if (request.prompt) {
-          const [newMessage] = await tx
-            .insert(messages)
-            .values({
-              id: messageId,
-              chatId: newChat.id,
-              createdBy: user.id,
-              requestMessage: request.prompt,
-              responseMessages: {},
-              reasoning: {},
-              title: request.prompt,
-              rawLlmMessages: {},
-              isCompleted: false,
-            })
-            .returning();
-          
-          if (!newMessage) {
-            throw new Error('Failed to create message');
-          }
-          message = newMessage;
-        }
+      return { chat: newChat, message };
+    });
 
-        return { chat: newChat, message };
-      });
+    // Build chat with messages
+    const chatWithMessages = buildChatWithMessages(
+      result.chat,
+      result.message ? [result.message] : [],
+      user,
+      {
+        name: user.user_metadata?.name || user.email || null,
+        avatarUrl: user.user_metadata?.avatar_url || null,
+      },
+      false
+    );
 
-      // Build chat with messages
-      const chatWithMessages = buildChatWithMessages(
-        result.chat,
-        result.message ? [result.message] : [],
-        user,
-        {
-          name: user.user_metadata?.name || user.email || null,
-          avatarUrl: user.user_metadata?.avatar_url || null,
-        },
-        false
-      );
-
-      return {
-        chatId: result.chat.id,
-        messageId,
-        chat: chatWithMessages,
-      };
-    }
+    return {
+      chatId: result.chat.id,
+      messageId,
+      chat: chatWithMessages,
+    };
   } catch (error) {
     // Log detailed error context
     console.error('Failed to initialize chat:', {
@@ -222,11 +218,14 @@ export async function initializeChat(
       organizationId,
       chatId: request.chat_id,
       hasPrompt: !!request.prompt,
-      error: error instanceof Error ? {
-        message: error.message,
-        stack: error.stack,
-        name: error.name,
-      } : String(error),
+      error:
+        error instanceof Error
+          ? {
+              message: error.message,
+              stack: error.stack,
+              name: error.name,
+            }
+          : String(error),
     });
 
     // Re-throw ChatError instances
@@ -281,17 +280,20 @@ export async function handleAssetChat(
         role: msg.requestMessage ? 'user' : 'assistant',
         created_at: msg.createdAt,
         updated_at: msg.updatedAt,
-        request_message: msg.requestMessage ? {
-          request: msg.requestMessage,
-          sender_id: msg.createdBy,
-          sender_name: chat.created_by_name,
-          sender_avatar: chat.created_by_avatar,
-        } : undefined,
-        response_message: (msg.responseMessages as any)?.content || undefined,
+        request_message: msg.requestMessage
+          ? {
+              request: msg.requestMessage,
+              sender_id: msg.createdBy,
+              sender_name: chat.created_by_name,
+              sender_avatar: chat.created_by_avatar,
+            }
+          : undefined,
+        //TODO - ask Dallin if this is correct?
+        response_message: (msg.responseMessages as { content: string })?.content || undefined,
         feedback: undefined,
         is_completed: false,
       };
-      
+
       chat.message_ids.push(msg.id);
       chat.messages[msg.id] = chatMessage;
     }
@@ -303,11 +305,14 @@ export async function handleAssetChat(
       assetId,
       assetType,
       userId,
-      error: error instanceof Error ? {
-        message: error.message,
-        stack: error.stack,
-        name: error.name,
-      } : String(error),
+      error:
+        error instanceof Error
+          ? {
+              message: error.message,
+              stack: error.stack,
+              name: error.name,
+            }
+          : String(error),
     });
 
     // Don't fail the entire request, just return the chat without asset messages

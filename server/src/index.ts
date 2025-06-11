@@ -38,9 +38,6 @@ app.notFound((c) => {
 // Get port from environment variable or default to 3002 (as mentioned in README)
 const port = Number.parseInt(process.env.PORT || '3002', 10);
 
-console.log(`🚀 Buster API Server starting on port ${port}`);
-console.log(`🏥 Detailed health check available at http://localhost:${port}/healthcheck`);
-
 // Export for Bun
 export default {
   port,
