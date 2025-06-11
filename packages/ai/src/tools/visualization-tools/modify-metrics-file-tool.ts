@@ -1,9 +1,11 @@
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
-import { eq, inArray } from 'drizzle-orm';
+import { eq, inArray, sql } from 'drizzle-orm';
 import * as yaml from 'yaml';
 import { z } from 'zod';
+import { DataSource } from '../../../../data-source/src/data-source';
+import type { Credentials } from '../../../../data-source/src/types/credentials';
 import { db } from '../../../../database/src/connection';
 import { metricFiles } from '../../../../database/src/schema';
 import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
@@ -165,21 +167,128 @@ const metricYmlSchema = z.object({
   chartConfig: chartConfigSchema,
 });
 
-// Simplified SQL validation (no table analysis as requested)
-function validateSqlBasic(sqlQuery: string): { success: boolean; error?: string } {
-  if (!sqlQuery.trim()) {
-    return { success: false, error: 'SQL query cannot be empty' };
-  }
+// Replace the basic SQL validation with comprehensive validation
+async function validateSql(
+  sqlQuery: string,
+  dataSourceId: string
+): Promise<{
+  success: boolean;
+  message?: string;
+  results?: Record<string, any>[];
+  metadata?: any;
+  error?: string;
+}> {
+  try {
+    if (!sqlQuery.trim()) {
+      return { success: false, error: 'SQL query cannot be empty' };
+    }
 
-  if (!sqlQuery.toLowerCase().includes('select')) {
-    return { success: false, error: 'SQL query must contain SELECT statement' };
-  }
+    // Basic SQL validation
+    if (!sqlQuery.toLowerCase().includes('select')) {
+      return { success: false, error: 'SQL query must contain SELECT statement' };
+    }
 
-  if (!sqlQuery.toLowerCase().includes('from')) {
-    return { success: false, error: 'SQL query must contain FROM clause' };
-  }
+    if (!sqlQuery.toLowerCase().includes('from')) {
+      return { success: false, error: 'SQL query must contain FROM clause' };
+    }
 
-  return { success: true };
+    // Get data source credentials from vault
+    let dataSource: DataSource;
+    try {
+      const credentials = await getDataSourceCredentials(dataSourceId);
+      dataSource = new DataSource({
+        dataSources: [
+          {
+            name: `datasource-${dataSourceId}`,
+            type: credentials.type as any,
+            credentials: credentials,
+          },
+        ],
+        defaultDataSource: `datasource-${dataSourceId}`,
+      });
+    } catch (_error) {
+      return {
+        success: false,
+        error: `Unable to connect to your data source. Please check that it's properly configured and accessible.`,
+      };
+    }
+
+    try {
+      // Execute the SQL query using the DataSource
+      const result = await dataSource.execute({
+        sql: sqlQuery,
+      });
+
+      if (result.success) {
+        const allResults = result.rows || [];
+        // Truncate results to 25 records for validation
+        const results = allResults.slice(0, 25);
+
+        const metadata = {
+          columns: results.length > 0 ? Object.keys(results[0] || {}) : [],
+          rowCount: results.length,
+          totalRowCount: allResults.length, // Track original count
+          executionTime: 100, // We don't have actual execution time from DataSource
+        };
+
+        const message =
+          allResults.length === 0
+            ? 'Query executed successfully but returned no records'
+            : `Query validated successfully and returned ${allResults.length} records${allResults.length > 25 ? ` (showing sample of first 25 of ${allResults.length} total)` : ''}`;
+
+        return {
+          success: true,
+          message,
+          results,
+          metadata,
+        };
+      }
+
+      return {
+        success: false,
+        error: result.error?.message || 'Query execution failed',
+      };
+    } finally {
+      // Always close the data source connection
+      await dataSource.close();
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'SQL validation failed',
+    };
+  }
+}
+
+async function getDataSourceCredentials(dataSourceId: string): Promise<Credentials> {
+  try {
+    // Query the vault to get the credentials
+    const secretResult = await db.execute(
+      sql`SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = ${dataSourceId} LIMIT 1`
+    );
+
+    if (!secretResult || secretResult.length === 0) {
+      throw new Error(
+        'Unable to access your data source credentials. Please ensure the data source is properly configured.'
+      );
+    }
+
+    const secretString = secretResult[0]?.decrypted_secret as string;
+    if (!secretString) {
+      throw new Error(
+        'The data source credentials appear to be invalid. Please reconfigure your data source.'
+      );
+    }
+
+    // Parse the credentials JSON
+    const credentials = JSON.parse(secretString) as Credentials;
+    return credentials;
+  } catch (error) {
+    console.error('Error getting data source credentials:', error);
+    throw new Error(
+      'Unable to retrieve data source credentials. Please contact support if this issue persists.'
+    );
+  }
 }
 
 // Parse and validate YAML content
@@ -212,6 +321,7 @@ function parseAndValidateYaml(ymlContent: string): {
 async function processMetricFileUpdate(
   existingFile: any,
   ymlContent: string,
+  dataSourceId: string,
   duration: number
 ): Promise<{
   success: boolean;
@@ -283,7 +393,7 @@ async function processMetricFileUpdate(
   }
 
   // Validate SQL if it has changed or if metadata is missing
-  const sqlValidation = validateSqlBasic(newMetricYml.sql);
+  const sqlValidation = await validateSql(newMetricYml.sql, dataSourceId);
   if (!sqlValidation.success) {
     const error = `SQL validation failed: ${sqlValidation.error}`;
     modificationResults.push({
@@ -322,15 +432,15 @@ async function processMetricFileUpdate(
       content: newMetricYml,
       name: newMetricYml.name,
       updatedAt: new Date().toISOString(),
-      dataMetadata: null, // Would be set by SQL validation in full implementation
+      dataMetadata: sqlValidation.metadata,
     },
     metricYml: newMetricYml,
     modificationResults,
     validationMessage: sqlChanged
-      ? 'SQL validation completed'
+      ? sqlValidation.message || 'SQL validation completed'
       : 'Metadata missing, validation completed',
-    validationResults: [], // Would contain actual results in full implementation
-    validatedDatasetIds: [], // Would contain actual dataset IDs in full implementation
+    validationResults: sqlValidation.results || [],
+    validatedDatasetIds: [],
   };
 }
 
@@ -395,6 +505,7 @@ const modifyMetricFiles = wrapTraced(
           const result = await processMetricFileUpdate(
             existingFile,
             fileUpdate.yml_content,
+            dataSourceId,
             Date.now() - startTime
           );
 
