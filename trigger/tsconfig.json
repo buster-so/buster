@@ -1,17 +1,9 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "noEmit": false,
-    "allowImportingTsExtensions": false,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "composite": true,
+    "outDir": "dist",
     "tsBuildInfoFile": "dist/.tsbuildinfo",
-    "module": "ESNext",
-    "target": "ES2022",
-    "moduleResolution": "bundler"
+    "rootDir": "src"
   },
   "include": ["src/**/*", "tests/**/*"],
   "exclude": ["node_modules", "dist"],

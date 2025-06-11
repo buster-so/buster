@@ -3,22 +3,6 @@
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src",
-    "noEmit": false,
-    "allowImportingTsExtensions": false,
-    "module": "ESNext",
-    "target": "ES2022",
-    "moduleResolution": "bundler",
-
-    // Runtime compatibility
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-
-    // Build configuration - declaration required for composite
-    "declaration": true,
-    "sourceMap": true,
-
-    // Monorepo optimizations
-    "composite": true,
     "tsBuildInfoFile": "dist/.tsbuildinfo",
 
     // Server path mapping (local aliases) - these extend the base config
@@ -33,8 +17,5 @@
     }
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"],
-  "ts-node": {
-    "esm": true
-  }
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
 }

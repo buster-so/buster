@@ -8,10 +8,15 @@
     "moduleResolution": "bundler",
 
     // Modern import/export features
-    "allowImportingTsExtensions": true,
+    "allowImportingTsExtensions": false,
     "verbatimModuleSyntax": true,
     "allowJs": true,
-    "noEmit": true,
+    "noEmit": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "sourceMap": true,
+    "types": ["node", "vitest/globals"],
 
     // Path mapping for clean cross-package imports
     "baseUrl": ".",
@@ -23,7 +28,7 @@
       "@buster/ai/*": ["packages/ai/src/*"],
       "@buster/data-source": ["packages/data-source/src"],
       "@buster/data-source/*": ["packages/data-source/src/*"],
-      "@buster/database": ["packages/database/src/*"],
+      "@buster/database": ["packages/database/src"],
       "@buster/rerank": ["packages/rerank/src"],
       "@buster/rerank/*": ["packages/rerank/src/*"],
       "@buster/stored-values": ["packages/stored-values/src"],
@@ -55,10 +60,13 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "forceConsistentCasingInFileNames": true,
     "noPropertyAccessFromIndexSignature": false
+  },
+  "ts-node": {
+    "esm": true
   }
 }
