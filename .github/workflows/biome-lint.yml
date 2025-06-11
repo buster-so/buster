@@ -1,0 +1,35 @@
+name: Biome Lint Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    paths:
+      - '**/*.ts'
+      - '**/*.tsx'
+      - '**/*.js'
+      - '**/*.jsx'
+      - '**/*.json'
+      - 'biome.json'
+      - '.github/workflows/biome-lint.yml'
+
+jobs:
+  biome-lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.9.0'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+          
+      - name: Run Biome lint check
+        run: npm run check 
