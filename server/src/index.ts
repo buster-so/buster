@@ -41,6 +41,7 @@ const port = Number.parseInt(process.env.SERVER_PORT || '3002', 10);
 // Export for Bun
 export default {
   port,
+  hostname: '0.0.0.0', // Bind to all interfaces for Docker
   fetch: app.fetch,
 };
 export type AppType = typeof routes;

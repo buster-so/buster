@@ -4,7 +4,6 @@
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "bun run src/index.ts",
     "build": "tsc",
     "build:bun": "bun build src/index.ts --outdir dist --target node",
     "clean": "rm -rf dist",
@@ -18,8 +17,6 @@
     "db:introspect": "drizzle-kit introspect",
     "db:studio": "drizzle-kit studio",
     "db:check": "drizzle-kit check",
-    "setup:setup": "bun run src/setup.ts setup",
-    "setup:seed": "bun run src/setup.ts seed",
-    "setup:full": "bun run src/setup.ts run"
+    "db:setup": "bun run src/setup.ts setup"
   }
 }

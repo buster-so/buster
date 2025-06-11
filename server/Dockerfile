@@ -1,5 +1,5 @@
 # Use Bun's official image as base
-FROM oven/bun:1.1.42-alpine AS base
+FROM oven/bun:1.1.43-alpine AS base
 
 # Set working directory
 WORKDIR /app
@@ -11,8 +11,15 @@ COPY tsconfig.base.json ./
 # Copy server package.json
 COPY server/package.json ./server/
 
+# Copy packages folder for workspace dependencies
+COPY packages/ ./packages/
+
+# Copy trigger folder for workspace dependencies  
+COPY trigger/ ./trigger/
+
 # Install dependencies from workspace root (this handles monorepo dependencies)
-RUN bun install --frozen-lockfile
+# Skip the problematic bun package since we're already using Bun runtime
+RUN bun install --ignore-scripts
 
 # Build stage
 FROM base AS build
@@ -25,18 +32,16 @@ WORKDIR /app/server
 RUN bun run build
 
 # Production stage
-FROM oven/bun:1.1.42-alpine AS production
+FROM oven/bun:1.1.43-alpine AS production
 
-# Set non-root user for security
+# Set non-root user for security (bun user already exists in the image)
 RUN addgroup -g 1001 -S nodejs
-RUN adduser -S bun -u 1001
 
 # Set working directory
 WORKDIR /app
 
 # Copy only production dependencies and built app
 COPY --from=base /app/node_modules ./node_modules
-COPY --from=base /app/server/node_modules ./server/node_modules
 COPY --from=build /app/server/dist ./server/dist
 COPY --from=build /app/server/package.json ./server/
 

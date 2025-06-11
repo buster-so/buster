@@ -42,29 +42,32 @@ async function checkDatabase(): Promise<{
 function checkMemory(): { status: 'pass' | 'fail' | 'warn'; message?: string } {
   const memUsage = process.memoryUsage();
 
-  // Calculate percentage using raw bytes for accuracy
-  const usagePercent = (memUsage.heapUsed / memUsage.heapTotal) * 100;
+  // Use RSS (Resident Set Size) as the baseline - this is the actual memory allocated to the process
 
-  // Round values for display only
+  // Convert values to MB for display
+  const rssMB = Math.round(memUsage.rss / 1024 / 1024);
   const heapUsedMB = Math.round(memUsage.heapUsed / 1024 / 1024);
   const heapTotalMB = Math.round(memUsage.heapTotal / 1024 / 1024);
 
-  if (usagePercent > 90) {
+  // Use more reasonable thresholds based on actual memory usage
+  if (rssMB > 512) {
+    // Over 512MB
     return {
       status: 'fail',
-      message: `Memory usage critical: ${heapUsedMB}MB/${heapTotalMB}MB (${usagePercent.toFixed(1)}%)`,
+      message: `Memory usage critical: ${rssMB}MB RSS (heap: ${heapUsedMB}MB/${heapTotalMB}MB)`,
     };
   }
-  if (usagePercent > 80) {
+  if (rssMB > 256) {
+    // Over 256MB
     return {
       status: 'warn',
-      message: `Memory usage high: ${heapUsedMB}MB/${heapTotalMB}MB (${usagePercent.toFixed(1)}%)`,
+      message: `Memory usage high: ${rssMB}MB RSS (heap: ${heapUsedMB}MB/${heapTotalMB}MB)`,
     };
   }
 
   return {
     status: 'pass',
-    message: `Memory usage normal: ${heapUsedMB}MB/${heapTotalMB}MB (${usagePercent.toFixed(1)}%)`,
+    message: `Memory usage normal: ${rssMB}MB RSS (heap: ${heapUsedMB}MB/${heapTotalMB}MB)`,
   };
 }
 
