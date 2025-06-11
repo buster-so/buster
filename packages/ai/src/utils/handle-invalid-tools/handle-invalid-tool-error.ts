@@ -12,10 +12,27 @@ import {
 } from 'ai';
 
 /**
+ * Union type of all AI SDK error types that this handler can process
+ */
+type AISDKError =
+  | APICallError
+  | EmptyResponseBodyError
+  | InvalidResponseDataError
+  | JSONParseError
+  | NoContentGeneratedError
+  | NoObjectGeneratedError
+  | NoSuchToolError
+  | RetryError
+  | ToolCallRepairError
+  | ToolExecutionError;
+
+/**
  * Handles tool-related errors in onError callbacks for AI SDK streaming
  * Can be used directly as the onError callback function
  */
-export const handleInvalidToolError = async (event: { error: unknown }): Promise<void> => {
+export const handleInvalidToolError = async (event: {
+  error: AISDKError | Error | unknown;
+}): Promise<void> => {
   const error = event.error;
 
   // Check if this is a NoSuchToolError that experimental_repairToolCall should handle

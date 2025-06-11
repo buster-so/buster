@@ -11,7 +11,6 @@ import { parseStreamingArgs as parseSequentialThinkingArgs } from '../tools/plan
 import { parseStreamingArgs as parseCreateMetricsArgs } from '../tools/visualization-tools/create-metrics-file-tool';
 import { saveConversationHistoryFromStep } from '../utils/database/saveConversationHistory';
 import { handleInvalidToolCall } from '../utils/handle-invalid-tools/handle-invalid-tool-call';
-import { handleInvalidToolError } from '../utils/handle-invalid-tools/handle-invalid-tool-error';
 import {
   MessageHistorySchema,
   StepFinishDataSchema,
@@ -146,19 +145,6 @@ const analystExecution = async ({
     // They are already in CoreMessage[] format
     const messages = inputData.outputMessages;
 
-    // DEBUG: Log the messages array to identify empty array source
-    console.log('ANALYST STEP DEBUG:', {
-      messagesLength: messages?.length || 0,
-      messages: messages,
-      inputData: {
-        conversationHistory: inputData.conversationHistory?.length || 0,
-        outputMessages: inputData.outputMessages?.length || 0,
-        finished: inputData.finished,
-        stepData: !!inputData.stepData,
-        metadata: inputData.metadata,
-      },
-    });
-
     // Critical check: Ensure messages array is not empty
     if (!messages || messages.length === 0) {
       console.error('CRITICAL: Empty messages array detected in analyst step', {
@@ -195,7 +181,6 @@ const analystExecution = async ({
 
             completeConversationHistory = result.completeConversationHistory;
           },
-          onError: handleInvalidToolError,
           experimental_repairToolCall: handleInvalidToolCall,
         });
 
@@ -223,14 +208,20 @@ const analystExecution = async ({
     toolArgsParser.registerParser('execute-sql', parseExecuteSqlArgs);
     toolArgsParser.registerParser('sequential-thinking', parseSequentialThinkingArgs);
 
-    for await (const chunk of stream.fullStream) {
-      // Process streaming tool arguments
-      if (chunk.type === 'tool-call-streaming-start' || chunk.type === 'tool-call-delta') {
-        const streamingResult = toolArgsParser.processChunk(chunk);
-        if (streamingResult) {
-          // TODO: Emit streaming result for real-time UI updates
+    try {
+      for await (const chunk of stream.fullStream) {
+        // Process streaming tool arguments
+        if (chunk.type === 'tool-call-streaming-start' || chunk.type === 'tool-call-delta') {
+          const streamingResult = toolArgsParser.processChunk(chunk);
+          if (streamingResult) {
+            // TODO: Emit streaming result for real-time UI updates
+          }
         }
       }
+    } catch (streamError) {
+      // Log stream processing errors but don't throw to avoid breaking the workflow
+      console.error('Error processing stream chunks in analyst step:', streamError);
+      // Continue with the conversation history we have so far
     }
 
     return {

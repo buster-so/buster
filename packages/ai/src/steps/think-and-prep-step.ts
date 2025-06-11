@@ -24,7 +24,6 @@ const inputSchema = z.object({
 });
 
 import { handleInvalidToolCall } from '../utils/handle-invalid-tools/handle-invalid-tool-call';
-import { handleInvalidToolError } from '../utils/handle-invalid-tools/handle-invalid-tool-error';
 import {
   extractMessageHistory,
   getAllToolsUsed,
@@ -127,17 +126,23 @@ const processStreamChunks = async <T extends ToolSet>(
   stream: StreamTextResult<T, unknown>,
   toolArgsParser: ToolArgsParser
 ): Promise<void> => {
-  for await (const chunk of stream.fullStream) {
-    try {
-      if (chunk.type === 'tool-call-streaming-start' || chunk.type === 'tool-call-delta') {
-        const streamingResult = toolArgsParser.processChunk(chunk);
-        if (streamingResult) {
-          // TODO: Emit streaming result for real-time UI updates
+  try {
+    for await (const chunk of stream.fullStream) {
+      try {
+        if (chunk.type === 'tool-call-streaming-start' || chunk.type === 'tool-call-delta') {
+          const streamingResult = toolArgsParser.processChunk(chunk);
+          if (streamingResult) {
+            // TODO: Emit streaming result for real-time UI updates
+          }
         }
+      } catch (chunkError) {
+        // Log individual chunk processing errors but continue with other chunks
+        console.error('Error processing individual stream chunk:', chunkError);
       }
-    } catch {
-      // Continue processing other chunks
     }
+  } catch (streamError) {
+    // Log stream processing errors but don't throw to avoid breaking the workflow
+    console.error('Error processing stream chunks in think-and-prep step:', streamError);
   }
 };
 
@@ -234,7 +239,6 @@ const thinkAndPrepExecution = async ({
             finished = result.finished;
             finalStepData = result.finalStepData;
           },
-          onError: handleInvalidToolError,
           experimental_repairToolCall: handleInvalidToolCall,
         });
 
@@ -250,7 +254,13 @@ const thinkAndPrepExecution = async ({
     toolArgsParser.registerParser('respond-without-analysis', parseRespondWithoutAnalysisArgs);
     toolArgsParser.registerParser('sequential-thinking', parseSequentialThinkingArgs);
 
-    await processStreamChunks(stream, toolArgsParser);
+    try {
+      await processStreamChunks(stream, toolArgsParser);
+    } catch (processError) {
+      // Log processing errors but continue with the conversation history we have
+      console.error('Error in processStreamChunks:', processError);
+    }
+
     return createStepResult(finished, outputMessages, finalStepData);
   } catch (error) {
     if (error instanceof Error && error.name !== 'AbortError') {
