@@ -3,11 +3,16 @@ import type { MessageHistory } from './types';
 import { isAssistantMessage } from './types';
 
 /**
+ * @deprecated Use properlyInterleaveMessages instead for better tool call/result pairing
+ * 
  * Unbundles messages that have tool calls bundled with assistant messages
  * into separate assistant and tool messages following the expected structure.
  *
  * The AI SDK bundles tool calls into assistant messages with content arrays,
  * but for proper conversation history we need them as separate messages.
+ *
+ * Note: This function only separates tool calls but doesn't properly interleave
+ * them with their corresponding tool results.
  *
  * @param messages - Array of messages that may contain bundled tool calls
  * @returns Array of messages with tool calls properly separated
@@ -40,11 +45,15 @@ export function unbundleMessages(messages: CoreMessage[]): CoreMessage[] {
 
         // Then add each tool call as a separate assistant message
         for (const toolCall of toolCalls) {
-          unbundled.push({
+          const newMessage: CoreMessage = {
             ...message,
-            id: toolCall.toolCallId || message.id,
             content: [toolCall],
-          });
+          };
+          // Add ID if the original message has one
+          if ('id' in message && message.id) {
+            (newMessage as any).id = toolCall.toolCallId || message.id;
+          }
+          unbundled.push(newMessage);
         }
       } else {
         // No tool calls, just add the message as-is
@@ -60,8 +69,94 @@ export function unbundleMessages(messages: CoreMessage[]): CoreMessage[] {
 }
 
 /**
+ * Properly interleaves tool calls with their corresponding tool results
+ * Ensures messages follow the pattern: assistant(tool) -> tool result -> assistant(tool) -> tool result
+ * 
+ * @param messages - Messages that may have bundled tool calls
+ * @returns Messages in proper sequential order
+ */
+export function properlyInterleaveMessages(messages: CoreMessage[]): CoreMessage[] {
+  const result: CoreMessage[] = [];
+  const toolResultsMap = new Map<string, CoreMessage>();
+  
+  // First pass: collect all tool results indexed by toolCallId
+  for (const message of messages) {
+    if (message.role === 'tool' && Array.isArray(message.content)) {
+      for (const item of message.content) {
+        if (item.type === 'tool-result' && item.toolCallId) {
+          toolResultsMap.set(item.toolCallId, message);
+        }
+      }
+    }
+  }
+  
+  // Second pass: process messages and interleave properly
+  for (const message of messages) {
+    if (message.role === 'assistant' && Array.isArray(message.content)) {
+      // Check if this contains tool calls
+      const toolCalls = message.content.filter(
+        (item) => typeof item === 'object' && 'type' in item && item.type === 'tool-call'
+      );
+      
+      if (toolCalls.length > 0) {
+        // This message has tool calls - we need to split them
+        const nonToolContent = message.content.filter(
+          (item) => !(typeof item === 'object' && 'type' in item && item.type === 'tool-call')
+        );
+        
+        // Add non-tool content first if any
+        if (nonToolContent.length > 0) {
+          result.push({
+            ...message,
+            content: nonToolContent.length === 1 && typeof nonToolContent[0] === 'string' 
+              ? nonToolContent[0] 
+              : nonToolContent,
+          });
+        }
+        
+        // Add each tool call followed by its result
+        for (const toolCall of toolCalls) {
+          // Add the tool call as a separate assistant message
+          const toolCallMessage: CoreMessage = {
+            ...message,
+            content: [toolCall],
+          };
+          // Add ID if needed
+          if ('id' in message && message.id) {
+            (toolCallMessage as any).id = toolCall.toolCallId || message.id;
+          }
+          result.push(toolCallMessage);
+          
+          // Find and add the corresponding tool result immediately after
+          const toolResult = toolResultsMap.get(toolCall.toolCallId);
+          if (toolResult) {
+            result.push(toolResult);
+            // Mark as used so we don't add it again
+            toolResultsMap.delete(toolCall.toolCallId);
+          }
+        }
+      } else {
+        // No tool calls, add as-is
+        result.push(message);
+      }
+    } else if (message.role !== 'tool') {
+      // Not a tool result, add as-is (user, system messages)
+      result.push(message);
+    }
+    // Tool results are added inline with their calls, so skip them here
+  }
+  
+  // Add any orphaned tool results at the end (shouldn't happen in practice)
+  for (const toolResult of toolResultsMap.values()) {
+    result.push(toolResult);
+  }
+  
+  return result;
+}
+
+/**
  * Extract and validate message history from step response
- * Automatically unbundles messages if they contain bundled tool calls
+ * If messages are bundled, properly interleaves them
  */
 export function extractMessageHistory(stepMessages: any[]): MessageHistory {
   // Validate it's an array
@@ -70,10 +165,38 @@ export function extractMessageHistory(stepMessages: any[]): MessageHistory {
     return [];
   }
 
-  // Unbundle messages to ensure proper format
-  const unbundled = unbundleMessages(stepMessages as CoreMessage[]);
-
-  return unbundled;
+  // Check if messages need interleaving
+  const messages = stepMessages as CoreMessage[];
+  
+  // Detect if we have bundled tool calls (multiple tool calls in one assistant message
+  // followed by multiple tool results)
+  let needsInterleaving = false;
+  
+  for (let i = 0; i < messages.length - 1; i++) {
+    const current = messages[i];
+    const next = messages[i + 1];
+    
+    // Check if we have an assistant message with multiple tool calls
+    if (current && current.role === 'assistant' && Array.isArray(current.content)) {
+      const toolCallCount = current.content.filter(
+        (item) => typeof item === 'object' && 'type' in item && item.type === 'tool-call'
+      ).length;
+      
+      // If we have multiple tool calls followed by a tool result, we need interleaving
+      if (toolCallCount > 1 && next?.role === 'tool') {
+        needsInterleaving = true;
+        break;
+      }
+    }
+  }
+  
+  // If messages are bundled, interleave them properly
+  if (needsInterleaving) {
+    return properlyInterleaveMessages(messages);
+  }
+  
+  // Otherwise return as-is - they're already properly formatted
+  return messages;
 }
 
 /**

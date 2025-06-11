@@ -6,6 +6,7 @@ import {
   getConversationSummary,
   getLastToolUsed,
   isToolCallOnlyMessage,
+  properlyInterleaveMessages,
   unbundleMessages,
 } from '../../../src/utils/memory/message-history';
 
@@ -318,6 +319,352 @@ describe('Message History Utilities', () => {
       expect(isToolCallOnlyMessage(toolCallOnlyMessage)).toBe(true);
       expect(isToolCallOnlyMessage(mixedMessage)).toBe(false);
       expect(isToolCallOnlyMessage(textOnlyMessage)).toBe(false);
+    });
+  });
+
+  describe('Sequential Message Order Preservation', () => {
+    test('should preserve exact sequential order from database example', () => {
+      // This is the exact structure from the user's database - already properly formatted
+      const databaseMessages: CoreMessage[] = [
+        {
+          role: 'user',
+          content: 'Who is my top customer?',
+        },
+        {
+          id: 'msg-i1amHfpBlmzzAyug8Ef44bA5',
+          role: 'assistant',
+          content: [
+            {
+              type: 'tool-call',
+              toolCallId: 'toolu_01LmHSAwa8MeggWntV8gE1fG',
+              toolName: 'sequentialThinking',
+              args: {
+                thought: 'I need to address the TODO list items for this user request about finding their top customer...',
+                isRevision: false,
+                thoughtNumber: 1,
+                totalThoughts: 2,
+                needsMoreThoughts: false,
+                nextThoughtNeeded: true,
+              },
+            },
+          ],
+        },
+        {
+          id: 'msg-ShmUEel0j2bB3OiE6Ppq3I5p',
+          role: 'tool',
+          content: [
+            {
+              type: 'tool-result',
+              result: { success: true },
+              toolName: 'sequentialThinking',
+              toolCallId: 'toolu_01LmHSAwa8MeggWntV8gE1fG',
+            },
+          ],
+        },
+        {
+          id: 'msg-IPte9fkHKgLPlN2aSK1p3IMu',
+          role: 'assistant',
+          content: [
+            {
+              type: 'tool-call',
+              toolCallId: 'toolu_015T6fk9RhcJ9AuCYDtdsQba',
+              toolName: 'sequentialThinking',
+              args: {
+                thought: 'Since I have no database documentation provided...',
+                isRevision: false,
+                thoughtNumber: 2,
+                totalThoughts: 3,
+                needsMoreThoughts: false,
+                nextThoughtNeeded: true,
+              },
+            },
+          ],
+        },
+        {
+          id: 'msg-5VbpdbtSO23tlSzPkGADeWAQ',
+          role: 'tool',
+          content: [
+            {
+              type: 'tool-result',
+              result: { success: true },
+              toolName: 'sequentialThinking',
+              toolCallId: 'toolu_015T6fk9RhcJ9AuCYDtdsQba',
+            },
+          ],
+        },
+        {
+          id: 'msg-xHUaA4q3WvHmMIb6CuUG6Nzh',
+          role: 'assistant',
+          content: [
+            {
+              type: 'tool-call',
+              toolCallId: 'toolu_01QtPVf5tYPydXeXWGoCKbpH',
+              toolName: 'executeSql',
+              args: {
+                statements: [
+                  'SELECT table_name FROM information_schema.tables WHERE table_schema = \'public\' LIMIT 25',
+                  'SELECT column_name, data_type FROM information_schema.columns WHERE table_name LIKE \'%customer%\' LIMIT 25',
+                  'SELECT column_name, data_type FROM information_schema.columns WHERE table_name LIKE \'%order%\' LIMIT 25',
+                ],
+              },
+            },
+          ],
+        },
+        {
+          id: 'msg-sP5Ek2YYL7ITx9BjMHfQ7kwu',
+          role: 'tool',
+          content: [
+            {
+              type: 'tool-result',
+              result: { results: [/* ... */] },
+              toolName: 'executeSql',
+              toolCallId: 'toolu_01QtPVf5tYPydXeXWGoCKbpH',
+            },
+          ],
+        },
+      ];
+
+      // Extract message history should NOT modify the structure
+      const extracted = extractMessageHistory(databaseMessages);
+
+      // Should be exactly the same
+      expect(extracted).toEqual(databaseMessages);
+      expect(extracted).toHaveLength(7);
+
+      // Verify the sequential pattern is preserved
+      expect(extracted[0].role).toBe('user');
+      expect(extracted[1].role).toBe('assistant');
+      expect(extracted[2].role).toBe('tool');
+      expect(extracted[3].role).toBe('assistant');
+      expect(extracted[4].role).toBe('tool');
+      expect(extracted[5].role).toBe('assistant');
+      expect(extracted[6].role).toBe('tool');
+
+      // Verify tool calls and results are properly paired
+      const toolCallIds = ['toolu_01LmHSAwa8MeggWntV8gE1fG', 'toolu_015T6fk9RhcJ9AuCYDtdsQba', 'toolu_01QtPVf5tYPydXeXWGoCKbpH'];
+      
+      for (let i = 0; i < toolCallIds.length; i++) {
+        const assistantIdx = 1 + (i * 2);
+        const toolIdx = 2 + (i * 2);
+        
+        // Get tool call ID from assistant message
+        const assistantContent = extracted[assistantIdx].content as any[];
+        const toolCall = assistantContent[0];
+        expect(toolCall.toolCallId).toBe(toolCallIds[i]);
+        
+        // Verify matching tool result
+        const toolContent = extracted[toolIdx].content as any[];
+        const toolResult = toolContent[0];
+        expect(toolResult.toolCallId).toBe(toolCallIds[i]);
+      }
+    });
+
+    test('should handle messages bundled incorrectly (the bug scenario)', () => {
+      // This represents what might come from the AI SDK if it bundles messages
+      const bundledMessages: CoreMessage[] = [
+        {
+          role: 'user',
+          content: 'Who is my top customer?',
+        },
+        {
+          role: 'assistant',
+          content: [
+            {
+              type: 'tool-call',
+              toolCallId: 'toolu_1',
+              toolName: 'think',
+              args: { thought: 'First thought' },
+            },
+            {
+              type: 'tool-call',
+              toolCallId: 'toolu_2',
+              toolName: 'analyze',
+              args: { data: 'customers' },
+            },
+            {
+              type: 'tool-call',
+              toolCallId: 'toolu_3',
+              toolName: 'finalize',
+              args: { result: 'done' },
+            },
+          ],
+        },
+        {
+          role: 'tool',
+          content: [
+            {
+              type: 'tool-result',
+              toolCallId: 'toolu_1',
+              toolName: 'think',
+              result: { success: true },
+            },
+          ],
+        },
+        {
+          role: 'tool',
+          content: [
+            {
+              type: 'tool-result',
+              toolCallId: 'toolu_2',
+              toolName: 'analyze',
+              result: { success: true },
+            },
+          ],
+        },
+        {
+          role: 'tool',
+          content: [
+            {
+              type: 'tool-result',
+              toolCallId: 'toolu_3',
+              toolName: 'finalize',
+              result: { success: true },
+            },
+          ],
+        },
+      ];
+
+      // extractMessageHistory should now fix the bundling
+      const extracted = extractMessageHistory(bundledMessages);
+      
+      // Should have been properly interleaved
+      expect(extracted).toHaveLength(7); // user + 3*(assistant + tool)
+      
+      // Verify the sequential pattern
+      expect(extracted[0].role).toBe('user');
+      expect(extracted[1].role).toBe('assistant');
+      expect(extracted[2].role).toBe('tool');
+      expect(extracted[3].role).toBe('assistant');
+      expect(extracted[4].role).toBe('tool');
+      expect(extracted[5].role).toBe('assistant');
+      expect(extracted[6].role).toBe('tool');
+      
+      // Verify each assistant message has only one tool call
+      expect(extracted[1].content).toHaveLength(1);
+      expect(extracted[1].content[0].toolCallId).toBe('toolu_1');
+      
+      expect(extracted[3].content).toHaveLength(1);
+      expect(extracted[3].content[0].toolCallId).toBe('toolu_2');
+      
+      expect(extracted[5].content).toHaveLength(1);
+      expect(extracted[5].content[0].toolCallId).toBe('toolu_3');
+    });
+  });
+
+  describe('properlyInterleaveMessages', () => {
+    test('should interleave bundled tool calls with their results', () => {
+      const bundled: CoreMessage[] = [
+        { role: 'user', content: 'Test' },
+        {
+          role: 'assistant',
+          content: [
+            { type: 'tool-call', toolCallId: 'id1', toolName: 'tool1', args: {} },
+            { type: 'tool-call', toolCallId: 'id2', toolName: 'tool2', args: {} },
+          ],
+        },
+        {
+          role: 'tool',
+          content: [{ type: 'tool-result', toolCallId: 'id1', toolName: 'tool1', result: {} }],
+        },
+        {
+          role: 'tool',
+          content: [{ type: 'tool-result', toolCallId: 'id2', toolName: 'tool2', result: {} }],
+        },
+      ];
+
+      const interleaved = properlyInterleaveMessages(bundled);
+
+      expect(interleaved).toHaveLength(5);
+      expect(interleaved[0].role).toBe('user');
+      expect(interleaved[1].role).toBe('assistant');
+      expect(interleaved[1].content[0].toolCallId).toBe('id1');
+      expect(interleaved[2].role).toBe('tool');
+      expect(interleaved[2].content[0].toolCallId).toBe('id1');
+      expect(interleaved[3].role).toBe('assistant');
+      expect(interleaved[3].content[0].toolCallId).toBe('id2');
+      expect(interleaved[4].role).toBe('tool');
+      expect(interleaved[4].content[0].toolCallId).toBe('id2');
+    });
+
+    test('should handle mixed content (text + tool calls)', () => {
+      const mixed: CoreMessage[] = [
+        {
+          role: 'assistant',
+          content: [
+            { type: 'text', text: 'Let me help you with that.' },
+            { type: 'tool-call', toolCallId: 'id1', toolName: 'analyze', args: {} },
+            { type: 'tool-call', toolCallId: 'id2', toolName: 'finalize', args: {} },
+          ],
+        },
+        {
+          role: 'tool',
+          content: [{ type: 'tool-result', toolCallId: 'id1', toolName: 'analyze', result: {} }],
+        },
+        {
+          role: 'tool',
+          content: [{ type: 'tool-result', toolCallId: 'id2', toolName: 'finalize', result: {} }],
+        },
+      ];
+
+      const interleaved = properlyInterleaveMessages(mixed);
+
+      expect(interleaved).toHaveLength(5);
+      expect(interleaved[0].role).toBe('assistant');
+      expect(interleaved[0].content).toEqual([{ type: 'text', text: 'Let me help you with that.' }]);
+      expect(interleaved[1].role).toBe('assistant');
+      expect(interleaved[1].content[0].toolCallId).toBe('id1');
+      expect(interleaved[2].role).toBe('tool');
+      expect(interleaved[3].role).toBe('assistant');
+      expect(interleaved[3].content[0].toolCallId).toBe('id2');
+      expect(interleaved[4].role).toBe('tool');
+    });
+
+    test('should handle conversation with follow-up questions', () => {
+      const conversation: CoreMessage[] = [
+        // First question
+        { role: 'user', content: 'What is our revenue?' },
+        {
+          role: 'assistant',
+          content: [
+            { type: 'tool-call', toolCallId: 't1', toolName: 'sql', args: { query: 'revenue' } },
+          ],
+        },
+        {
+          role: 'tool',
+          content: [{ type: 'tool-result', toolCallId: 't1', toolName: 'sql', result: { revenue: 1000000 } }],
+        },
+        {
+          role: 'assistant',
+          content: 'Your revenue is $1M.',
+        },
+        // Follow-up question
+        { role: 'user', content: 'What about profit?' },
+        {
+          role: 'assistant',
+          content: [
+            { type: 'tool-call', toolCallId: 't2', toolName: 'sql', args: { query: 'profit' } },
+          ],
+        },
+        {
+          role: 'tool',
+          content: [{ type: 'tool-result', toolCallId: 't2', toolName: 'sql', result: { profit: 200000 } }],
+        },
+      ];
+
+      const result = properlyInterleaveMessages(conversation);
+
+      // Should remain mostly unchanged as it's already properly formatted
+      // (but IDs may be added to assistant messages with tool calls)
+      expect(result).toHaveLength(7);
+      expect(result[0]).toEqual(conversation[0]); // user message unchanged
+      expect(result[1].role).toBe('assistant');
+      expect(result[1].content).toEqual(conversation[1].content);
+      expect(result[2]).toEqual(conversation[2]); // tool result unchanged
+      expect(result[3]).toEqual(conversation[3]); // assistant text unchanged
+      expect(result[4]).toEqual(conversation[4]); // user message unchanged
+      expect(result[5].role).toBe('assistant');
+      expect(result[5].content).toEqual(conversation[5].content);
+      expect(result[6]).toEqual(conversation[6]); // tool result unchanged
     });
   });
 
