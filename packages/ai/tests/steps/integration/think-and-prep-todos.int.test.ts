@@ -80,13 +80,13 @@ describe('Think and Prep Step - Todos in Message History Integration', { timeout
 
     expect(todoResultMessage).toBeDefined();
     
-    // Verify the tool result contains the todos
+    // Verify the tool result contains success
     if (todoResultMessage && Array.isArray(todoResultMessage.content)) {
       const toolResult = todoResultMessage.content.find(
         c => c.type === 'tool-result' && c.toolName === 'createToDos'
       );
       expect(toolResult).toBeDefined();
-      expect(toolResult.result.todos).toBe(todos);
+      expect(toolResult.result.success).toBe(true);
     }
   });
 

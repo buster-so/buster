@@ -55,7 +55,7 @@ describe('Todos to Message Conversion', () => {
           toolCallId: 'create-todos-call',
           toolName: 'createToDos',
           result: {
-            todos: sampleTodos
+            success: true
           }
         });
       }
@@ -74,7 +74,7 @@ describe('Todos to Message Conversion', () => {
           toolCallId: 'create-todos-call',
           toolName: 'createToDos',
           result: {
-            todos: ''
+            success: true
           }
         });
       }

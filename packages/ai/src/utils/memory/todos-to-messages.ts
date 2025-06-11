@@ -20,11 +20,11 @@ export function createTodoToolCallMessage(todos: string): CoreMessage {
 }
 
 /**
- * Creates a tool result message containing the todos
+ * Creates a tool result message for the todo creation
  * This represents the response to the tool call
  * 
- * @param todos - The markdown-formatted todo list
- * @returns CoreMessage with tool role containing the todo result
+ * @param todos - The markdown-formatted todo list (not used in result, just for consistency)
+ * @returns CoreMessage with tool role containing a simple acknowledgment
  */
 export function createTodoToolResultMessage(todos: string): CoreMessage {
   return {
@@ -35,7 +35,7 @@ export function createTodoToolResultMessage(todos: string): CoreMessage {
         toolCallId: 'create-todos-call',
         toolName: 'createToDos',
         result: {
-          todos: todos
+          success: true
         }
       }
     ]
