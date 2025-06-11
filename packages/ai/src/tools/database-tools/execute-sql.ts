@@ -53,7 +53,7 @@ function processColumnValue(value: unknown, maxLength: number): unknown {
  */
 function truncateQueryResults(
   rows: Record<string, unknown>[],
-  maxLength = 100
+  maxLength = 25
 ): Record<string, unknown>[] {
   return rows.map((row) => {
     const truncatedRow: Record<string, unknown> = {};
@@ -123,12 +123,12 @@ export function parseStreamingArgs(
       }
 
       return null;
-    } else {
-      // Unexpected error - re-throw with context
-      throw new Error(
-        `Unexpected error in parseStreamingArgs: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
     }
+
+    // Unexpected error - re-throw with context
+    throw new Error(
+      `Unexpected error in parseStreamingArgs: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }
 
