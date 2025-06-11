@@ -15,6 +15,7 @@ import {
   StepFinishDataSchema,
   ThinkAndPrepOutputSchema,
 } from '../utils/memory/types';
+import { retryableAgentStream } from '../utils/retry';
 import { ToolArgsParser } from '../utils/streaming';
 import type {
   AnalystRuntimeContext,
@@ -166,23 +167,40 @@ const analystExecution = async ({
 
     const wrappedStream = wrapTraced(
       async () => {
-        const stream = await analystAgent.stream(messages, {
-          runtimeContext,
-          toolChoice: 'required',
-          abortSignal: abortController.signal,
-          onStepFinish: async (step: StepResult<ToolSet>) => {
-            const result = await handleAnalystStepFinish({
-              step,
-              inputData,
-              runtimeContext,
-              abortController,
-            });
+        const result = await retryableAgentStream({
+          agent: analystAgent,
+          messages,
+          options: {
+            runtimeContext,
+            toolChoice: 'required',
+            abortSignal: abortController.signal,
+            onStepFinish: async (step: StepResult<ToolSet>) => {
+              const stepResult = await handleAnalystStepFinish({
+                step,
+                inputData,
+                runtimeContext,
+                abortController,
+              });
 
-            completeConversationHistory = result.completeConversationHistory;
+              completeConversationHistory = stepResult.completeConversationHistory;
+            },
+          },
+          retryConfig: {
+            maxRetries: 3,
+            onRetry: (error, attemptNumber) => {
+              // Log retry attempt for debugging
+              console.error(`Analyst retry attempt ${attemptNumber} for ${error.type} error`);
+            },
           },
         });
 
-        return stream;
+        // Update messages to include any healing messages added during retries
+        if (result.conversationHistory.length > messages.length) {
+          // Healing messages were added, update the complete conversation history
+          completeConversationHistory = result.conversationHistory;
+        }
+
+        return result.stream;
       },
       {
         name: 'Analyst',
