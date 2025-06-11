@@ -22,8 +22,6 @@ const inputSchema = z.object({
   'extract-values-search': extractValuesSearchOutputSchema,
   'generate-chat-title': generateChatTitleOutputSchema,
 });
-
-import { handleInvalidToolCall } from '../utils/handle-invalid-tools/handle-invalid-tool-call';
 import {
   extractMessageHistory,
   getAllToolsUsed,
@@ -226,7 +224,6 @@ const thinkAndPrepExecution = async ({
             finished = result.finished;
             finalStepData = result.finalStepData;
           },
-          experimental_repairToolCall: handleInvalidToolCall,
         });
 
         return stream;

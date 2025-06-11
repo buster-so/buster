@@ -10,7 +10,6 @@ import { parseStreamingArgs as parseExecuteSqlArgs } from '../tools/database-too
 import { parseStreamingArgs as parseSequentialThinkingArgs } from '../tools/planning-thinking-tools/sequential-thinking-tool';
 import { parseStreamingArgs as parseCreateMetricsArgs } from '../tools/visualization-tools/create-metrics-file-tool';
 import { saveConversationHistoryFromStep } from '../utils/database/saveConversationHistory';
-import { handleInvalidToolCall } from '../utils/handle-invalid-tools/handle-invalid-tool-call';
 import {
   MessageHistorySchema,
   StepFinishDataSchema,
@@ -181,7 +180,6 @@ const analystExecution = async ({
 
             completeConversationHistory = result.completeConversationHistory;
           },
-          experimental_repairToolCall: handleInvalidToolCall,
         });
 
         return stream;
