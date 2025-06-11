@@ -4,7 +4,7 @@ export
 dev:
 	supabase start && \
 	supabase db reset && \
-	bun run setup:setup
+	bun run db:setup
 
 stop:
 	supabase stop

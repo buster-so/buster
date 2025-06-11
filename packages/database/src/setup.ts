@@ -140,24 +140,6 @@ async function seedData(): Promise<void> {
   }
 }
 
-/**
- * Run migrations only
- */
-async function migrateOnly(): Promise<void> {
-  try {
-    console.log('🚀 Running migrations only...\n');
-
-    await runDatabaseMigrations();
-
-    console.log('🎉 Migrations completed successfully!');
-  } catch (error) {
-    console.error('❌ Migrations failed:', error);
-    process.exit(1);
-  } finally {
-    await closePool();
-  }
-}
-
 // CLI handling
 const command = process.argv[2];
 
@@ -190,9 +172,6 @@ switch (command) {
     break;
   case 'seed':
     await seedData();
-    break;
-  case 'migrate':
-    await migrateOnly();
     break;
   default:
     console.log(`
