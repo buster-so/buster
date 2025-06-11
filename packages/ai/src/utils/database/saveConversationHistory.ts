@@ -106,6 +106,8 @@ export async function loadConversationHistory(messageId: string): Promise<CoreMe
 
     return result[0].rawLlmMessages as CoreMessage[];
   } catch (error) {
-    return null;
+    throw new Error(
+      `Failed to load conversation history: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }

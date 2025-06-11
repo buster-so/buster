@@ -1,6 +1,6 @@
 import { createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
-import type { CoreMessage, StepResult, ToolSet } from 'ai';
+import type { CoreMessage, StepResult, StreamTextResult, ToolSet } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { thinkAndPrepAgent } from '../agents/think-and-prep-agent/think-and-prep-agent';
@@ -31,11 +31,14 @@ import {
   getLastToolUsed,
 } from '../utils/memory/message-history';
 import {
+  createTodoToolCallMessage,
+  createTodoToolResultMessage,
+} from '../utils/memory/todos-to-messages';
+import {
   type MessageHistory,
   type StepFinishData,
   ThinkAndPrepOutputSchema,
 } from '../utils/memory/types';
-import { createTodoToolCallMessage, createTodoToolResultMessage } from '../utils/memory/todos-to-messages';
 
 const outputSchema = ThinkAndPrepOutputSchema;
 
@@ -120,10 +123,8 @@ const handleThinkAndPrepStepFinish = async ({
 };
 
 // Helper function to process stream chunks
-const processStreamChunks = async (
-  stream: {
-    fullStream: AsyncIterable<{ type: string; [key: string]: unknown }>;
-  },
+const processStreamChunks = async <T extends ToolSet>(
+  stream: StreamTextResult<T, unknown>,
   toolArgsParser: ToolArgsParser
 ): Promise<void> => {
   for await (const chunk of stream.fullStream) {

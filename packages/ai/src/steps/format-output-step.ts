@@ -36,6 +36,15 @@ const inputSchema = z.union([
   z.object({
     'think-and-prep': ThinkAndPrepOutputSchema,
   }),
+  // Handle case where Mastra passes the previous step's output directly after a skipped branch
+  // This is a more permissive schema that captures the essential properties
+  z.object({
+    outputMessages: MessageHistorySchema.optional(),
+    conversationHistory: MessageHistorySchema.optional(),
+    finished: z.boolean().optional(),
+    stepData: StepFinishDataSchema.optional(),
+    metadata: z.record(z.unknown()).optional(),
+  }).passthrough(), // Allow additional properties from think-and-prep or analyst steps
   // Handle any other potential workflow structures - fallback for debugging
   z.record(z.unknown()),
 ]);
@@ -111,8 +120,35 @@ const formatOutputExecution = async ({
       }
     }
 
+    // If still no stepData found, check if the entire inputData itself is the step output
+    // This can happen when Mastra passes data directly from a previous step after a skipped branch
     if (!stepData) {
-      throw new Error('Unrecognized input format for format-output-step');
+      // Log the structure for debugging
+      console.warn('Format-output-step received unexpected input structure:', {
+        keys: Object.keys(inputData),
+        hasOutputMessages: 'outputMessages' in inputData,
+        hasConversationHistory: 'conversationHistory' in inputData,
+        hasFinished: 'finished' in inputData,
+        inputDataType: typeof inputData,
+      });
+      
+      // Check if the inputData itself has the expected step output properties
+      // This is stricter validation to ensure we only accept valid step data
+      const hasValidStepProperties = 
+        ('outputMessages' in inputData || 'conversationHistory' in inputData) ||
+        ('finished' in inputData && typeof (inputData as any).finished === 'boolean') ||
+        ('stepData' in inputData) ||
+        ('metadata' in inputData);
+      
+      if (
+        typeof inputData === 'object' &&
+        inputData !== null &&
+        hasValidStepProperties
+      ) {
+        stepData = inputData as any;
+      } else {
+        throw new Error('Unrecognized input format for format-output-step');
+      }
     }
   }
 

@@ -11,6 +11,7 @@ import { parseStreamingArgs as parseSequentialThinkingArgs } from '../tools/plan
 import { parseStreamingArgs as parseCreateMetricsArgs } from '../tools/visualization-tools/create-metrics-file-tool';
 import { saveConversationHistoryFromStep } from '../utils/database/saveConversationHistory';
 import { handleInvalidToolCall } from '../utils/handle-invalid-tools/handle-invalid-tool-call';
+import { handleInvalidToolError } from '../utils/handle-invalid-tools/handle-invalid-tool-error';
 import {
   MessageHistorySchema,
   StepFinishDataSchema,
@@ -44,39 +45,69 @@ const handleAnalystStepFinish = async ({
   step,
   inputData,
   runtimeContext,
+  abortController,
 }: {
   step: StepResult<ToolSet>;
   inputData: z.infer<typeof inputSchema>;
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
+  abortController: AbortController;
 }) => {
-  // Check if doneTool was called but don't abort here - let the natural flow handle it
   const toolNames = step.toolCalls.map((call) => call.toolName);
+  let completeConversationHistory: CoreMessage[] = [];
+  let finished = false;
+  let shouldAbort = false;
 
-  // Save complete conversation history to database before any abort (think-and-prep + analyst messages)
-  const analystResponseMessages = step.response.messages as CoreMessage[];
+  // Check if doneTool was called
+  const hasFinishingTools = toolNames.includes('doneTool');
 
-  const completeConversationHistory = [
-    ...(inputData.outputMessages as CoreMessage[]),
-    ...analystResponseMessages,
-  ];
-
-  const messageId = runtimeContext.get('messageId');
-
-  if (messageId) {
+  if (hasFinishingTools) {
     try {
-      await saveConversationHistoryFromStep(messageId, completeConversationHistory);
+      // Extract and validate messages from the step response
+      const analystResponseMessages = step.response.messages as CoreMessage[];
+
+      // Build complete conversation history: input messages + agent response messages
+      completeConversationHistory = [
+        ...(inputData.outputMessages as CoreMessage[]),
+        ...analystResponseMessages,
+      ];
+
+      const messageId = runtimeContext.get('messageId');
+
+      if (messageId) {
+        // Save conversation history to database before aborting
+        try {
+          await saveConversationHistoryFromStep(messageId, completeConversationHistory);
+        } catch {
+          // Continue with abort even if save fails to avoid hanging
+        }
+      }
+
+      // Set finished to true when doneTool is called
+      if (toolNames.includes('doneTool')) {
+        finished = true;
+      }
+
+      // Add a small delay to ensure any pending tool call repairs complete
+      // before aborting the stream
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      shouldAbort = true;
+
+      // Use a try-catch around abort to handle any potential errors
+      try {
+        abortController.abort();
+      } catch {
+        // Continue execution even if abort fails
+      }
     } catch {
-      // Continue without aborting - let the natural flow handle completion
+      // Don't abort on error to prevent hanging
+      shouldAbort = false;
     }
   }
 
-  // Check if doneTool was called
-  const shouldAbort = toolNames.includes('doneTool');
-
-  // Don't abort here - let the main stream loop handle it
-
   return {
     completeConversationHistory,
+    finished,
     shouldAbort,
   };
 };
@@ -115,10 +146,12 @@ const analystExecution = async ({
               step,
               inputData,
               runtimeContext,
+              abortController,
             });
 
             completeConversationHistory = result.completeConversationHistory;
           },
+          onError: handleInvalidToolError,
           experimental_repairToolCall: handleInvalidToolCall,
         });
 
@@ -153,15 +186,6 @@ const analystExecution = async ({
         if (streamingResult) {
           // TODO: Emit streaming result for real-time UI updates
         }
-      }
-
-      if (chunk.type === 'tool-result' && chunk.toolName === 'doneTool') {
-        // Return immediately when doneTool completes - this is the natural end
-        return {
-          conversationHistory: completeConversationHistory,
-          finished: true,
-          outputMessages: completeConversationHistory,
-        };
       }
     }
 
