@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest';
-import { parseStreamingArgs } from '../../../src/tools/communication-tools/finish-and-respond';
+import { parseStreamingArgs } from '../../../src/tools/communication-tools/respond-without-analysis';
 
-describe('Finish and Respond Tool Streaming Parser', () => {
+describe('Respond Without Analysis Tool Streaming Parser', () => {
   test('should return null for empty or invalid input', () => {
     expect(parseStreamingArgs('')).toBeNull();
     expect(parseStreamingArgs('{')).toBeNull();

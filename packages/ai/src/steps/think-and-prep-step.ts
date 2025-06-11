@@ -4,15 +4,17 @@ import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { thinkAndPrepAgent } from '../agents/think-and-prep-agent/think-and-prep-agent';
-import { parseStreamingArgs as parseFinishAndRespondArgs } from '../tools/communication-tools/finish-and-respond';
+import { parseStreamingArgs as parseRespondWithoutAnalysisArgs } from '../tools/communication-tools/respond-without-analysis';
 import { parseStreamingArgs as parseSequentialThinkingArgs } from '../tools/planning-thinking-tools/sequential-thinking-tool';
 import { saveConversationHistoryFromStep } from '../utils/database/saveConversationHistory';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
 import { ToolArgsParser } from '../utils/streaming';
-import type {
-  AnalystRuntimeContext,
-  thinkAndPrepWorkflowInputSchema,
-} from '../workflows/analyst-workflow';
+import {
+  type ThinkAndPrepRuntimeContext,
+  thinkAndPrepRuntimeContextSchema,
+  validateRuntimeContext,
+} from '../utils/validation-helpers';
+import type { thinkAndPrepWorkflowInputSchema } from '../workflows/analyst-workflow';
 import { createTodosOutputSchema } from './create-todos-step';
 import { extractValuesSearchOutputSchema } from './extract-values-search-step';
 import { generateChatTitleOutputSchema } from './generate-chat-title-step';
@@ -47,7 +49,7 @@ const handleThinkAndPrepStepFinish = async ({
 }: {
   step: any;
   messages: CoreMessage[];
-  runtimeContext: RuntimeContext<AnalystRuntimeContext>;
+  runtimeContext: RuntimeContext<ThinkAndPrepRuntimeContext>;
   abortController: AbortController;
 }) => {
   const toolNames = step.toolCalls.map((call: any) => call.toolName);
@@ -57,7 +59,7 @@ const handleThinkAndPrepStepFinish = async ({
   let shouldAbort = false;
 
   if (
-    toolNames.some((toolName: string) => ['submitThoughts', 'finishAndRespond'].includes(toolName))
+    toolNames.some((toolName: string) => ['submitThoughts', 'respondWithoutAnalysis'].includes(toolName))
   ) {
     // Extract and validate messages from the step response
     // step.response.messages contains the conversation history for this step
@@ -78,8 +80,8 @@ const handleThinkAndPrepStepFinish = async ({
     // Store the full step data (cast to our expected type)
     finalStepData = step as any;
 
-    // Set finished to true if finishAndRespondTool was called
-    if (toolNames.includes('finishAndRespond')) {
+    // Set finished to true if respond-without-analysis tool was called
+    if (toolNames.includes('respond-without-analysis')) {
       finished = true;
     }
 
@@ -102,7 +104,7 @@ const thinkAndPrepExecution = async ({
 }: {
   inputData: z.infer<typeof inputSchema>;
   getInitData: () => Promise<z.infer<typeof thinkAndPrepWorkflowInputSchema>>;
-  runtimeContext: RuntimeContext<AnalystRuntimeContext>;
+  runtimeContext: RuntimeContext<ThinkAndPrepRuntimeContext>;
 }): Promise<z.infer<typeof outputSchema>> => {
   const abortController = new AbortController();
 
@@ -111,13 +113,24 @@ const thinkAndPrepExecution = async ({
   let finalStepData: StepFinishData | null = null;
 
   try {
-    const threadId = runtimeContext.get('threadId');
-    const resourceId = runtimeContext.get('userId');
-
-    if (!threadId || !resourceId) {
-      console.error('Missing required context values');
-      throw new Error('Missing required context values');
+    // Validate runtime context early with user-friendly error handling
+    let validatedContext: ThinkAndPrepRuntimeContext;
+    try {
+      validatedContext = validateRuntimeContext(
+        runtimeContext,
+        thinkAndPrepRuntimeContextSchema,
+        'think and prep workflow'
+      );
+    } catch (error) {
+      console.error('Runtime context validation failed:', error);
+      // Convert technical validation errors to user-friendly messages
+      if (error instanceof Error && error.message.includes('Runtime context is required')) {
+        throw new Error('Unable to access your session. Please refresh and try again.');
+      }
+      throw new Error('Session information is invalid. Please refresh and try again.');
     }
+
+    const { threadId, userId: resourceId } = validatedContext;
 
     const initData = await getInitData();
     const prompt = initData.prompt;
@@ -167,7 +180,7 @@ const thinkAndPrepExecution = async ({
 
     // Initialize the tool args parser with think-and-prep tool mappings
     const toolArgsParser = new ToolArgsParser();
-    toolArgsParser.registerParser('finish-and-respond', parseFinishAndRespondArgs);
+    toolArgsParser.registerParser('respond-without-analysis', parseRespondWithoutAnalysisArgs);
     toolArgsParser.registerParser('sequential-thinking', parseSequentialThinkingArgs);
 
     for await (const chunk of stream.fullStream) {

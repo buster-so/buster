@@ -5,10 +5,12 @@ import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { anthropicCachedModel } from '../utils/models/anthropic-cached';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
-import type {
-  AnalystRuntimeContext,
-  thinkAndPrepWorkflowInputSchema,
-} from '../workflows/analyst-workflow';
+import {
+  type InitialStepRuntimeContext,
+  initialStepRuntimeContextSchema,
+  validateRuntimeContext,
+} from '../utils/validation-helpers';
+import type { thinkAndPrepWorkflowInputSchema } from '../workflows/analyst-workflow';
 
 const inputSchema = z.object({
   // This step receives initial workflow input through getInitData
@@ -144,11 +146,16 @@ const todoStepExecution = async ({
 }: {
   inputData: z.infer<typeof inputSchema>;
   getInitData: () => Promise<z.infer<typeof thinkAndPrepWorkflowInputSchema>>;
-  runtimeContext: RuntimeContext<AnalystRuntimeContext>;
+  runtimeContext: RuntimeContext<InitialStepRuntimeContext>;
 }): Promise<z.infer<typeof createTodosOutputSchema>> => {
   try {
-    const threadId = runtimeContext.get('threadId');
-    const resourceId = runtimeContext.get('userId');
+    // Validate runtime context
+    const validatedContext = validateRuntimeContext(
+      runtimeContext,
+      initialStepRuntimeContextSchema,
+      'todos creation'
+    );
+    const { threadId, userId: resourceId } = validatedContext;
 
     // Get the workflow input data
     const initData = await getInitData();

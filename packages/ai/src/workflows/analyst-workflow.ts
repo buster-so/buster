@@ -7,16 +7,6 @@ import { formatOutputStep } from '../steps/format-output-step';
 import { generateChatTitleStep } from '../steps/generate-chat-title-step';
 import { thinkAndPrepStep } from '../steps/think-and-prep-step';
 
-export interface AnalystRuntimeContext {
-  userId: string;
-  threadId: string;
-  dataSourceId: string;
-  dataSourceSyntax: string;
-  organizationId: string;
-  todos: string;
-  messageId?: string; // Optional for testing scenarios
-}
-
 // CoreMessage schema for validation
 const coreMessageSchema = z.object({
   role: z.enum(['system', 'user', 'assistant', 'tool']),

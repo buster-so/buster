@@ -10,7 +10,7 @@
     "declaration": true,
     "tsBuildInfoFile": "dist/.tsbuildinfo",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src/**/*", "tests/**/*"],

@@ -80,7 +80,7 @@ steps/
 tools/
 ├── communication-tools/     # Agent-to-agent communication
 │   ├── done-tool.ts
-│   ├── finish-and-respond.ts
+│   ├── respond-without-analysis.ts
 │   └── submit-thoughts-tool.ts
 ├── database-tools/          # Data access
 │   └── find-required-text-values.ts
