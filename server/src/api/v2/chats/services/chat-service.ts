@@ -1,6 +1,5 @@
 import type { User } from '@supabase/supabase-js';
 import { 
-  createChat,
   getChatWithDetails,
   createMessage,
   checkChatPermission,
@@ -15,8 +14,8 @@ import type {
   ChatWithMessages, 
   ChatMessage,
   ChatCreateHandlerRequest 
-} from '../../../../types/chat.types';
-import { ChatError, ChatErrorCode } from '../../../../types/chat-errors.types';
+} from '@/types';
+import { ChatError, ChatErrorCode } from '@/types/chat-errors.types';
 
 /**
  * Build a ChatWithMessages object from database entities
@@ -290,6 +289,7 @@ export async function handleAssetChat(
         } : undefined,
         response_message: (msg.responseMessages as any)?.content || undefined,
         feedback: undefined,
+        is_completed: false,
       };
       
       chat.message_ids.push(msg.id);

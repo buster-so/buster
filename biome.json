@@ -93,7 +93,7 @@
       "**/.mastra/**",
       "**/output/**",
       "**/playground/**",
-      "api/**",
+      "/api/**",
       "cli/**",
       "packages/**/node_modules/**",
       "packages/**/dist/**",

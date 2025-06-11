@@ -1,20 +1,20 @@
 import type { ChatCreateHandlerRequest, ChatCreateResponse } from '@/types';
-import { tasks } from '@trigger.dev/sdk/v3';
-import { ChatError, ChatErrorCode } from '../../../types/chat-errors.types';
-import { initializeChat, handleAssetChat } from './services/chat-service';
+import { ChatError, ChatErrorCode } from '@/types/chat-errors.types';
 import { getUserOrganizationId } from '@buster/database';
 import type { User } from '@supabase/supabase-js';
+import { tasks } from '@trigger.dev/sdk/v3';
+import { handleAssetChat, initializeChat } from './services/chat-service';
 
 /**
  * Handler function for creating a new chat.
- * 
+ *
  * PERFORMANCE TARGET: <500ms total response time
- * 
+ *
  * Flow:
  * 1. Create/update chat and message objects in database (~100-200ms)
- * 2. Queue background analyst job (NOT wait for completion) (~100ms) 
+ * 2. Queue background analyst job (NOT wait for completion) (~100ms)
  * 3. Return ChatWithMessages object immediately (~50ms)
- * 
+ *
  * The analyst-agent-task runs in background and can take minutes.
  * Users get their chat object immediately without waiting.
  */
@@ -23,7 +23,7 @@ export async function createChatHandler(
   user: User
 ): Promise<ChatCreateResponse> {
   const startTime = Date.now();
-  
+
   try {
     // Extract organization ID from user metadata
     const userOrg = await getUserOrganizationId(user.id);
@@ -48,11 +48,7 @@ export async function createChatHandler(
     }
 
     // Initialize chat (new or existing)
-    const { chatId, messageId, chat } = await initializeChat(
-      request,
-      user,
-      organizationId
-    );
+    const { chatId, messageId, chat } = await initializeChat(request, user, organizationId);
 
     // Handle asset-based chat if needed
     let finalChat = chat;
@@ -76,19 +72,19 @@ export async function createChatHandler(
         await tasks.trigger('analyst-agent-task', {
           message_id: messageId,
         });
-        
+
         const triggerDuration = Date.now() - triggerStart;
         console.log('Successfully queued analyst task:', {
           messageId,
-          triggerDuration: `${triggerDuration}ms`
+          triggerDuration: `${triggerDuration}ms`,
         });
-        
+
         // Warn if trigger queueing is slow
         if (triggerDuration > 500) {
           console.warn('Slow trigger operation detected:', {
             messageId,
             triggerDuration: `${triggerDuration}ms`,
-            warning: 'Trigger queueing should be <100ms'
+            warning: 'Trigger queueing should be <100ms',
           });
         }
       } catch (triggerError) {
@@ -96,7 +92,7 @@ export async function createChatHandler(
         console.error('Failed to trigger analyst agent task:', {
           messageId,
           triggerDuration: `${triggerDuration}ms`,
-          error: triggerError
+          error: triggerError,
         });
         // The user still gets their chat/message, background analysis just won't run
       }
@@ -110,9 +106,9 @@ export async function createChatHandler(
       chatId,
       hasPrompt: !!request.prompt,
       hasAsset: !!request.asset_id,
-      performance: duration <= 500 ? 'good' : 'slow'
+      performance: duration <= 500 ? 'good' : 'slow',
     });
-    
+
     if (duration > 500) {
       console.warn('Slow chat creation detected:', {
         duration: `${duration}ms`,
@@ -121,7 +117,7 @@ export async function createChatHandler(
         chatId,
         hasPrompt: !!request.prompt,
         hasAsset: !!request.asset_id,
-        suggestion: 'Check database performance and trigger service'
+        suggestion: 'Check database performance and trigger service',
       });
     }
 
@@ -137,11 +133,14 @@ export async function createChatHandler(
         hasAssetId: !!request.asset_id,
         assetType: request.asset_type,
       },
-      error: error instanceof Error ? {
-        name: error.name,
-        message: error.message,
-        stack: error.stack,
-      } : String(error),
+      error:
+        error instanceof Error
+          ? {
+              name: error.name,
+              message: error.message,
+              stack: error.stack,
+            }
+          : String(error),
     });
 
     // Re-throw ChatError instances

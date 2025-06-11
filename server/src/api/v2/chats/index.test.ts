@@ -1,13 +1,14 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { Hono } from 'hono';
 import type { User } from '@supabase/supabase-js';
-import chatRoutes from './index';
+import { Hono } from 'hono';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ChatError, ChatErrorCode } from '../../../types/chat-errors.types';
 import type { ChatWithMessages } from '../../../types/chat.types';
+import '../../../types/hono.types';
+import chatRoutes from './index';
 
 // Mock dependencies
 vi.mock('../../../middleware/auth', () => ({
-  requireAuth: vi.fn((c, next) => next()),
+  requireAuth: vi.fn((_c, next) => next()),
 }));
 
 vi.mock('./handler', () => ({
@@ -18,11 +19,7 @@ vi.mock('./handler', () => ({
 import { createChatHandler } from './handler';
 
 // Test helper to create request
-async function makeRequest(
-  app: Hono,
-  body: any,
-  headers: Record<string, string> = {}
-) {
+async function makeRequest(app: Hono, body: any, headers: Record<string, string> = {}) {
   const request = new Request('http://localhost/chats', {
     method: 'POST',
     headers: {
@@ -44,7 +41,7 @@ describe('POST /chats', () => {
     app_metadata: {},
     aud: 'authenticated',
     created_at: new Date().toISOString(),
-  } as User;
+  };
 
   const mockChat: ChatWithMessages = {
     id: '123e4567-e89b-12d3-a456-426614174000',
@@ -62,6 +59,7 @@ describe('POST /chats', () => {
           sender_id: '123e4567-e89b-12d3-a456-426614174002',
           sender_name: 'Test User',
         },
+        is_completed: false,
       },
     },
     created_at: new Date().toISOString(),
@@ -75,15 +73,15 @@ describe('POST /chats', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     app = new Hono();
-    
+
     // Mock user context
     app.use('*', async (c, next) => {
       c.set('supabaseUser', mockUser);
       await next();
     });
-    
+
     app.route('/chats', chatRoutes);
-    
+
     vi.mocked(createChatHandler).mockResolvedValue(mockChat);
   });
 
@@ -95,10 +93,7 @@ describe('POST /chats', () => {
     expect(response.status).toBe(200);
     const data = await response.json();
     expect(data).toEqual(mockChat);
-    expect(createChatHandler).toHaveBeenCalledWith(
-      { prompt: 'Hello world' },
-      mockUser
-    );
+    expect(createChatHandler).toHaveBeenCalledWith({ prompt: 'Hello world' }, mockUser);
   });
 
   it('should create a chat with existing chat_id', async () => {
@@ -152,11 +147,7 @@ describe('POST /chats', () => {
   });
 
   it('should handle ChatError with proper status code', async () => {
-    const chatError = new ChatError(
-      ChatErrorCode.PERMISSION_DENIED,
-      'Access denied',
-      403
-    );
+    const chatError = new ChatError(ChatErrorCode.PERMISSION_DENIED, 'Access denied', 403);
     vi.mocked(createChatHandler).mockRejectedValue(chatError);
 
     const response = await makeRequest(app, { prompt: 'Hello' });
@@ -175,7 +166,7 @@ describe('POST /chats', () => {
     expect(response.status).toBe(500);
     const data = await response.json();
     expect((data as any).message).toBe('Failed to create chat');
-    
+
     consoleSpy.mockRestore();
   });
 
@@ -194,9 +185,6 @@ describe('POST /chats', () => {
 
     expect(response.status).toBe(200);
     // Handler should receive the request but won't use legacy fields
-    expect(createChatHandler).toHaveBeenCalledWith(
-      expect.objectContaining({}),
-      mockUser
-    );
+    expect(createChatHandler).toHaveBeenCalledWith(expect.objectContaining({}), mockUser);
   });
 });

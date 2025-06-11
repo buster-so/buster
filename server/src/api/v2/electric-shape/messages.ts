@@ -1,6 +1,6 @@
-import { errorResponse } from '../../../utils/response';
-import { type Context } from 'hono';
 import { canUserAccessChat } from '@buster/access-controls';
+import type { Context } from 'hono';
+import { errorResponse } from '../../../utils/response';
 import { extractParamFromWhere } from './_helpers';
 
 export const messagesProxyRouter = async (url: URL, _userId: string, c: Context) => {
@@ -13,7 +13,7 @@ export const messagesProxyRouter = async (url: URL, _userId: string, c: Context)
 
   const userHasAccessToChat = await canUserAccessChat({
     userId: c.get('supabaseUser').id,
-    chatId
+    chatId,
   });
 
   if (!userHasAccessToChat) {

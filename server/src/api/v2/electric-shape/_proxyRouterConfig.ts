@@ -1,12 +1,15 @@
-import { type Context } from 'hono';
-import { messagesProxyRouter } from './messages';
+import type { Context } from 'hono';
 import { chatsProxyRouter } from './chats';
+import { messagesProxyRouter } from './messages';
 
 type SupportedTables = 'messages' | 'chats';
 
-const proxyRouter: Record<SupportedTables, (url: URL, userId: string, c: Context) => Promise<URL | Response>> = {
+const proxyRouter: Record<
+  SupportedTables,
+  (url: URL, userId: string, c: Context) => Promise<URL | Response>
+> = {
   messages: messagesProxyRouter,
-  chats: chatsProxyRouter
+  chats: chatsProxyRouter,
 };
 
 export default proxyRouter;

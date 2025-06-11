@@ -32,19 +32,19 @@ async function checkDatabase(): Promise<{
     return {
       status: 'pass',
       responseTime,
-      message: 'Database connection healthy'
+      message: 'Database connection healthy',
     };
   } catch (error) {
-    return { status: 'fail', message: 'Database connection failed' };
+    return { status: 'fail', message: `Database connection failed: ${error}` };
   }
 }
 
 function checkMemory(): { status: 'pass' | 'fail' | 'warn'; message?: string } {
   const memUsage = process.memoryUsage();
-  
+
   // Calculate percentage using raw bytes for accuracy
   const usagePercent = (memUsage.heapUsed / memUsage.heapTotal) * 100;
-  
+
   // Round values for display only
   const heapUsedMB = Math.round(memUsage.heapUsed / 1024 / 1024);
   const heapTotalMB = Math.round(memUsage.heapTotal / 1024 / 1024);
@@ -52,18 +52,19 @@ function checkMemory(): { status: 'pass' | 'fail' | 'warn'; message?: string } {
   if (usagePercent > 90) {
     return {
       status: 'fail',
-      message: `Memory usage critical: ${heapUsedMB}MB/${heapTotalMB}MB (${usagePercent.toFixed(1)}%)`
+      message: `Memory usage critical: ${heapUsedMB}MB/${heapTotalMB}MB (${usagePercent.toFixed(1)}%)`,
     };
-  } else if (usagePercent > 80) {
+  }
+  if (usagePercent > 80) {
     return {
       status: 'warn',
-      message: `Memory usage high: ${heapUsedMB}MB/${heapTotalMB}MB (${usagePercent.toFixed(1)}%)`
+      message: `Memory usage high: ${heapUsedMB}MB/${heapTotalMB}MB (${usagePercent.toFixed(1)}%)`,
     };
   }
 
   return {
     status: 'pass',
-    message: `Memory usage normal: ${heapUsedMB}MB/${heapTotalMB}MB (${usagePercent.toFixed(1)}%)`
+    message: `Memory usage normal: ${heapUsedMB}MB/${heapTotalMB}MB (${usagePercent.toFixed(1)}%)`,
   };
 }
 
@@ -74,7 +75,7 @@ async function performHealthCheck(): Promise<HealthCheckResult> {
 
   const checks = {
     database: dbCheck,
-    memory: memoryCheck
+    memory: memoryCheck,
   };
 
   // Determine overall status
@@ -96,7 +97,7 @@ async function performHealthCheck(): Promise<HealthCheckResult> {
     uptime: Math.floor(process.uptime()),
     version: process.env.npm_package_version || '2.0.0',
     environment: process.env.NODE_ENV || 'development',
-    checks
+    checks,
   };
 }
 
@@ -105,7 +106,8 @@ async function healthCheckHandler(c: Context) {
     const healthResult = await performHealthCheck();
 
     // Return appropriate HTTP status
-    const statusCode = healthResult.status === 'healthy' ? 200 : healthResult.status === 'degraded' ? 200 : 503;
+    const statusCode =
+      healthResult.status === 'healthy' ? 200 : healthResult.status === 'degraded' ? 200 : 503;
 
     return c.json(healthResult, statusCode);
   } catch (error) {
@@ -114,7 +116,7 @@ async function healthCheckHandler(c: Context) {
         status: 'unhealthy',
         timestamp: new Date().toISOString(),
         error: 'Health check failed',
-        message: error instanceof Error ? error.message : 'Unknown error'
+        message: error instanceof Error ? error.message : 'Unknown error',
       },
       503
     );
