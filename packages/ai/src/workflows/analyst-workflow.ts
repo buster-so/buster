@@ -15,7 +15,6 @@ export const AnalystRuntimeContextSchema = z.object({
   dataSourceId: z.string(),
   dataSourceSyntax: z.string(),
   organizationId: z.string(),
-  todos: z.string(),
   messageId: z.string().optional(), // Optional for testing scenarios
 });
 

@@ -4,7 +4,6 @@ import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
 
 // Define the required template parameters
 interface ThinkAndPrepTemplateParams {
-  todo_list: string;
   databaseContext: string;
 }
 
@@ -59,8 +58,9 @@ Once all TODO list items are addressed and submitted for review, the system will
 </agent_loop>
 
 <todo_list>
-- Below are the items on your TODO list:
-${params.todo_list}
+- The TODO list has been created by the system and is available in the event stream above
+- Look for the "create_todo_list" tool call and its result to see your TODO items
+- The TODO items are formatted as a markdown checkbox list
 </todo_list>
 
 <todo_rules>
@@ -369,10 +369,7 @@ export const getThinkAndPrepInstructions = async ({
     .filter((content) => content !== null && content !== undefined)
     .join('\n---\n');
 
-  const todoList = runtimeContext.get('todos');
-
   return createThinkAndPrepInstructions({
-    todo_list: todoList,
     databaseContext: assembledYmlContent,
   });
 };

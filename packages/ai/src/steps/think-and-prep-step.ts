@@ -35,6 +35,7 @@ import {
   type StepFinishData,
   ThinkAndPrepOutputSchema,
 } from '../utils/memory/types';
+import { createTodoToolCallMessage, createTodoToolResultMessage } from '../utils/memory/todos-to-messages';
 
 const outputSchema = ThinkAndPrepOutputSchema;
 
@@ -183,12 +184,16 @@ const thinkAndPrepExecution = async ({
 
     const initData = await getInitData();
     const todos = inputData['create-todos'].todos;
-    runtimeContext.set('todos', todos);
 
-    const messages =
+    const baseMessages =
       initData.conversationHistory && initData.conversationHistory.length > 0
         ? appendToConversation(initData.conversationHistory, initData.prompt)
         : standardizeMessages(initData.prompt);
+
+    // Create todo messages and inject them into the conversation history
+    const todoCallMessage = createTodoToolCallMessage(todos);
+    const todoResultMessage = createTodoToolResultMessage(todos);
+    const messages = [...baseMessages, todoCallMessage, todoResultMessage];
 
     const wrappedStream = wrapTraced(
       async () => {
