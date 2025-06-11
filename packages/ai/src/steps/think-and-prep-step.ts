@@ -7,6 +7,7 @@ import { thinkAndPrepAgent } from '../agents/think-and-prep-agent/think-and-prep
 import { parseStreamingArgs as parseRespondWithoutAnalysisArgs } from '../tools/communication-tools/respond-without-analysis';
 import { parseStreamingArgs as parseSequentialThinkingArgs } from '../tools/planning-thinking-tools/sequential-thinking-tool';
 import { saveConversationHistoryFromStep } from '../utils/database/saveConversationHistory';
+import { retryableAgentStream } from '../utils/retry';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
 import { ToolArgsParser } from '../utils/streaming';
 import type {
@@ -208,25 +209,40 @@ const thinkAndPrepExecution = async ({
 
     const wrappedStream = wrapTraced(
       async () => {
-        const stream = await thinkAndPrepAgent.stream(messages, {
-          runtimeContext,
-          abortSignal: abortController.signal,
-          toolChoice: 'required',
-          onStepFinish: async (step: StepResult<ToolSet>) => {
-            const result = await handleThinkAndPrepStepFinish({
-              step,
-              messages,
-              runtimeContext,
-              abortController,
-            });
+        const result = await retryableAgentStream({
+          agent: thinkAndPrepAgent,
+          messages,
+          options: {
+            runtimeContext,
+            abortSignal: abortController.signal,
+            toolChoice: 'required',
+            onStepFinish: async (step: StepResult<ToolSet>) => {
+              const stepResult = await handleThinkAndPrepStepFinish({
+                step,
+                messages,
+                runtimeContext,
+                abortController,
+              });
 
-            outputMessages = result.outputMessages;
-            finished = result.finished;
-            finalStepData = result.finalStepData;
+              outputMessages = stepResult.outputMessages;
+              finished = stepResult.finished;
+              finalStepData = stepResult.finalStepData;
+            },
+          },
+          retryConfig: {
+            maxRetries: 3,
+            onRetry: (error, attemptNumber) => {
+              // Log retry attempt for debugging
+              console.error(`Think and Prep retry attempt ${attemptNumber} for ${error.type} error`);
+            },
           },
         });
 
-        return stream;
+        // Update messages to include any healing messages added during retries
+        messages.length = 0;
+        messages.push(...result.conversationHistory);
+
+        return result.stream;
       },
       {
         name: 'Think and Prep',
