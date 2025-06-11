@@ -5,6 +5,8 @@ import {
   type MessageHistory,
   MessageHistorySchema,
   StepFinishDataSchema,
+  ReasoningHistorySchema,
+  ResponseHistorySchema,
 } from '../utils/memory/types';
 
 // The analyst step output schema
@@ -13,6 +15,8 @@ const AnalystOutputSchema = z.object({
   finished: z.boolean().optional(),
   outputMessages: MessageHistorySchema.optional(),
   stepData: StepFinishDataSchema.optional(),
+  reasoningHistory: ReasoningHistorySchema, // Add reasoning history
+  responseHistory: ResponseHistorySchema, // Add response history
   metadata: z
     .object({
       toolsUsed: z.array(z.string()).optional(),
@@ -42,6 +46,8 @@ const outputSchema = z.object({
   finished: z.boolean().optional(),
   outputMessages: MessageHistorySchema.optional(),
   stepData: StepFinishDataSchema.optional(),
+  reasoningHistory: ReasoningHistorySchema, // Add reasoning history
+  responseHistory: ResponseHistorySchema, // Add response history
   metadata: WorkflowMetadataSchema.optional(),
 });
 
@@ -65,6 +71,8 @@ const formatOutputExecution = async ({
     finished: inputData.finished ?? false,
     outputMessages: getMessageArray(inputData.outputMessages),
     stepData: inputData.stepData ?? undefined,
+    reasoningHistory: inputData.reasoningHistory || [],
+    responseHistory: inputData.responseHistory || [],
     metadata: inputData.metadata ?? undefined,
 
     // These fields would come from parallel steps in a more complex implementation

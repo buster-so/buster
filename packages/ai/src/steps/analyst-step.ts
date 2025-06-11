@@ -14,7 +14,14 @@ import {
   MessageHistorySchema,
   StepFinishDataSchema,
   ThinkAndPrepOutputSchema,
+  ReasoningHistorySchema,
+  ResponseHistorySchema,
 } from '../utils/memory/types';
+import { 
+  extractMessagesFromToolCalls,
+  type BusterChatMessageReasoning,
+  type BusterChatMessageResponse
+} from '../utils/memory/message-converters';
 import { retryableAgentStream } from '../utils/retry';
 import { ToolArgsParser } from '../utils/streaming';
 import type {
@@ -36,6 +43,8 @@ const outputSchema = z.object({
   finished: z.boolean().optional(),
   outputMessages: MessageHistorySchema.optional(),
   stepData: StepFinishDataSchema.optional(),
+  reasoningHistory: ReasoningHistorySchema, // Add reasoning history
+  responseHistory: ResponseHistorySchema, // Add response history
   metadata: AnalystMetadataSchema.optional(),
 });
 
@@ -45,16 +54,49 @@ const handleAnalystStepFinish = async ({
   inputData,
   runtimeContext,
   abortController,
+  accumulatedReasoningHistory,
+  accumulatedResponseHistory,
 }: {
   step: StepResult<ToolSet>;
   inputData: z.infer<typeof inputSchema>;
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
   abortController: AbortController;
+  accumulatedReasoningHistory: BusterChatMessageReasoning[];
+  accumulatedResponseHistory: BusterChatMessageResponse[];
 }) => {
   const toolNames = step.toolCalls.map((call) => call.toolName);
   let completeConversationHistory: CoreMessage[] = [];
   let finished = false;
   let shouldAbort = false;
+  let reasoningHistory: BusterChatMessageReasoning[] = [...accumulatedReasoningHistory];
+  let responseHistory: BusterChatMessageResponse[] = [...accumulatedResponseHistory];
+
+  // Process tool calls to extract reasoning and response messages
+  if (step.toolCalls.length > 0) {
+    // Create a map of tool results from the step
+    const toolResultsMap = new Map<string, string | null>();
+    
+    // For tool results, we need to look at the tool response messages
+    const toolResponses = step.response.messages.filter(msg => msg.role === 'tool');
+    for (const toolResponse of toolResponses) {
+      if ('toolCallId' in toolResponse && 'content' in toolResponse) {
+        const content = toolResponse.content;
+        if (typeof content === 'string') {
+          toolResultsMap.set(toolResponse.toolCallId, content);
+        }
+      }
+    }
+
+    // Convert tool calls to messages
+    const { reasoningMessages, responseMessages } = extractMessagesFromToolCalls(
+      step.toolCalls as any,
+      toolResultsMap
+    );
+
+    // Add to history
+    reasoningHistory.push(...reasoningMessages);
+    responseHistory.push(...responseMessages);
+  }
 
   // Check if doneTool was called
   const hasFinishingTools = toolNames.includes('doneTool');
@@ -75,7 +117,7 @@ const handleAnalystStepFinish = async ({
       if (messageId) {
         // Save conversation history to database before aborting
         try {
-          await saveConversationHistoryFromStep(messageId, completeConversationHistory);
+          await saveConversationHistoryFromStep(messageId, completeConversationHistory, reasoningHistory, responseHistory);
         } catch {
           // Continue with abort even if save fails to avoid hanging
         }
@@ -108,6 +150,8 @@ const handleAnalystStepFinish = async ({
     completeConversationHistory,
     finished,
     shouldAbort,
+    reasoningHistory,
+    responseHistory,
   };
 };
 
@@ -163,12 +207,17 @@ const analystExecution = async ({
       finished: true,
       outputMessages: inputData.outputMessages,
       stepData: inputData.stepData,
+      reasoningHistory: inputData.reasoningHistory || [],
+      responseHistory: inputData.responseHistory || [],
       metadata: inputData.metadata,
     };
   }
 
   const abortController = new AbortController();
   let completeConversationHistory: CoreMessage[] = [];
+  // Initialize histories from input data (passed from think-and-prep step)
+  let reasoningHistory: BusterChatMessageReasoning[] = inputData.reasoningHistory || [];
+  let responseHistory: BusterChatMessageResponse[] = inputData.responseHistory || [];
 
   try {
     const resourceId = runtimeContext.get('userId');
@@ -217,9 +266,13 @@ const analystExecution = async ({
                 inputData,
                 runtimeContext,
                 abortController,
+                accumulatedReasoningHistory: reasoningHistory,
+                accumulatedResponseHistory: responseHistory,
               });
 
               completeConversationHistory = stepResult.completeConversationHistory;
+              reasoningHistory = stepResult.reasoningHistory;
+              responseHistory = stepResult.responseHistory;
             },
           },
           retryConfig: {
@@ -267,6 +320,8 @@ const analystExecution = async ({
       conversationHistory: completeConversationHistory,
       finished: true,
       outputMessages: completeConversationHistory,
+      reasoningHistory,
+      responseHistory,
     };
   } catch (error) {
     // Handle abort errors gracefully
@@ -276,6 +331,8 @@ const analystExecution = async ({
         conversationHistory: completeConversationHistory,
         finished: true,
         outputMessages: completeConversationHistory,
+        reasoningHistory,
+        responseHistory,
       };
     }
 

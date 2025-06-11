@@ -6,7 +6,7 @@ import { extractValuesSearchStep } from '../steps/extract-values-search-step';
 import { formatOutputStep } from '../steps/format-output-step';
 import { generateChatTitleStep } from '../steps/generate-chat-title-step';
 import { thinkAndPrepStep } from '../steps/think-and-prep-step';
-import { MessageHistorySchema, StepFinishDataSchema } from '../utils/memory/types';
+import { MessageHistorySchema, StepFinishDataSchema, ReasoningHistorySchema, ResponseHistorySchema } from '../utils/memory/types';
 
 // Runtime context schema for type safety
 export const AnalystRuntimeContextSchema = z.object({
@@ -42,6 +42,8 @@ const outputSchema = z.object({
   finished: z.boolean().optional(),
   outputMessages: MessageHistorySchema.optional(),
   stepData: StepFinishDataSchema.optional(),
+  reasoningHistory: ReasoningHistorySchema, // Add reasoning history
+  responseHistory: ResponseHistorySchema, // Add response history
   metadata: WorkflowMetadataSchema.optional(),
 });
 

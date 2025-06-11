@@ -44,13 +44,17 @@ export async function saveConversationHistory(
  * Checks for messageId in runtime context before saving
  * Now also saves messages as reasoning entries
  *
- * @param runtimeContext - The runtime context that may contain messageId
+ * @param messageId - The message ID to save to
  * @param stepMessages - The messages from step.response.messages
+ * @param reasoningHistory - Optional reasoning history to save
+ * @param responseHistory - Optional response history to save
  * @returns Promise<void>
  */
 export async function saveConversationHistoryFromStep(
   messageId: string,
-  stepMessages: CoreMessage[]
+  stepMessages: CoreMessage[],
+  reasoningHistory?: unknown[],
+  responseHistory?: unknown[]
 ): Promise<void> {
   try {
     const db = getDb();
@@ -69,11 +73,24 @@ export async function saveConversationHistoryFromStep(
     // Build the new reasoning by appending new messages as reasoning entries
     const updatedReasoning = appendToReasoning(currentReasoning, stepMessages);
 
-    // Update both rawLlmMessages and reasoning in a single call
-    await updateMessageFields(messageId, {
+    // Prepare update fields
+    const updateFields: Record<string, unknown> = {
       rawLlmMessages: stepMessages,
       reasoning: updatedReasoning,
-    });
+    };
+
+    // Add reasoning history if provided
+    if (reasoningHistory && reasoningHistory.length > 0) {
+      updateFields.reasoningMessages = reasoningHistory;
+    }
+
+    // Add response history if provided
+    if (responseHistory && responseHistory.length > 0) {
+      updateFields.responseMessages = responseHistory;
+    }
+
+    // Update all fields in a single call
+    await updateMessageFields(messageId, updateFields);
   } catch (error) {
     throw new Error(
       `Failed to save conversation history and reasoning: ${error instanceof Error ? error.message : 'Unknown error'}`

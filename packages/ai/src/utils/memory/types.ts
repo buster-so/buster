@@ -11,11 +11,100 @@ export const MessageHistorySchema = z.custom<CoreMessage[]>((val) => Array.isArr
   message: 'Must be an array of messages',
 });
 
+// Schemas for message types
+const BusterChatResponseMessageTextSchema = z.object({
+  id: z.string(),
+  type: z.literal('text'),
+  message: z.string(),
+  message_chunk: z.string().optional(),
+  is_final_message: z.boolean(),
+});
+
+const BusterChatResponseMessageFileSchema = z.object({
+  id: z.string(),
+  type: z.literal('file'),
+  file_type: z.enum(['metric', 'dashboard']),
+  file_name: z.string(),
+  version_number: z.number(),
+  filter_version_id: z.string().nullable(),
+  metadata: z.array(z.object({
+    status: z.string(),
+    message: z.string(),
+    timestamp: z.number().optional(),
+  })).optional(),
+});
+
+const BusterChatMessageReasoningTextSchema = z.object({
+  id: z.string(),
+  type: z.literal('text'),
+  title: z.string(),
+  secondary_title: z.string().optional(),
+  message: z.string().optional(),
+  message_chunk: z.string().optional(),
+  status: z.enum(['loading', 'completed', 'failed']),
+  finished_reasoning: z.boolean().optional(),
+});
+
+const BusterChatMessageReasoningPillSchema = z.object({
+  id: z.string(),
+  type: z.literal('pills'),
+  title: z.string(),
+  secondary_title: z.string().optional(),
+  pill_containers: z.array(z.object({
+    title: z.string(),
+    pills: z.array(z.object({
+      text: z.string(),
+      type: z.string().nullable(),
+      id: z.string(),
+    })),
+  })),
+  status: z.enum(['loading', 'completed', 'failed']),
+});
+
+const BusterChatMessageReasoningFileSchema = z.object({
+  id: z.string(),
+  file_type: z.enum(['metric', 'dashboard']),
+  file_name: z.string(),
+  version_number: z.number(),
+  status: z.enum(['loading', 'completed', 'failed']),
+  file: z.object({
+    text: z.string().optional(),
+    text_chunk: z.string().optional(),
+    modified: z.array(z.tuple([z.number(), z.number()])).optional(),
+  }),
+});
+
+const BusterChatMessageReasoningFilesSchema = z.object({
+  id: z.string(),
+  type: z.literal('files'),
+  title: z.string(),
+  status: z.enum(['loading', 'completed', 'failed']),
+  secondary_title: z.string().optional(),
+  file_ids: z.array(z.string()),
+  files: z.record(BusterChatMessageReasoningFileSchema),
+});
+
+// Union schemas
+export const BusterChatMessageResponseSchema = z.union([
+  BusterChatResponseMessageTextSchema,
+  BusterChatResponseMessageFileSchema,
+]);
+
+export const BusterChatMessageReasoningSchema = z.union([
+  BusterChatMessageReasoningTextSchema,
+  BusterChatMessageReasoningPillSchema,
+  BusterChatMessageReasoningFilesSchema,
+]);
+
+// Schema for reasoning and response message histories
+export const ReasoningHistorySchema = z.array(BusterChatMessageReasoningSchema).optional();
+export const ResponseHistorySchema = z.array(BusterChatMessageResponseSchema).optional();
+
 // Schema for reasoning details
 const ReasoningDetailSchema = z.object({
   type: z.string(),
   content: z.string(),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.string().or(z.number()).or(z.boolean())).optional(),
 });
 
 // Schema for file metadata
@@ -39,7 +128,7 @@ const SourceReferenceSchema = z.object({
 const ToolResultSchema = z.object({
   toolCallId: z.string(),
   toolName: z.string(),
-  result: z.unknown(), // Tool-specific results
+  result: z.string().or(z.object({})), // Tool-specific results as string or object
 });
 
 // Schema for usage information
@@ -87,14 +176,14 @@ export const StepFinishDataSchema = z.object({
       type: z.literal('tool-call'),
       toolCallId: z.string(),
       toolName: z.string(),
-      args: z.record(z.unknown()), // Tool args vary by tool
+      args: z.record(z.string(), z.string().or(z.number()).or(z.boolean()).or(z.array(z.string()))), // Tool args vary by tool
     })
   ),
   toolResults: z.array(ToolResultSchema).optional(),
   finishReason: z.string(),
   usage: UsageSchema,
   warnings: z.array(WarningSchema).optional(),
-  logprobs: z.unknown().optional(), // Model-specific logprobs format
+  logprobs: z.object({}).optional(), // Model-specific logprobs format
   request: RequestMetadataSchema,
   response: z.object({
     id: z.string(),
@@ -103,8 +192,8 @@ export const StepFinishDataSchema = z.object({
     headers: ResponseHeadersSchema,
     messages: MessageHistorySchema,
   }),
-  providerMetadata: z.record(z.unknown()).optional(),
-  experimental_providerMetadata: z.record(z.unknown()).optional(),
+  providerMetadata: z.record(z.string(), z.string().or(z.number()).or(z.boolean())).optional(),
+  experimental_providerMetadata: z.record(z.string(), z.string().or(z.number()).or(z.boolean())).optional(),
   isContinued: z.boolean().optional(),
 });
 
@@ -114,6 +203,8 @@ export const ThinkAndPrepOutputSchema = z.object({
   outputMessages: MessageHistorySchema,
   conversationHistory: MessageHistorySchema.optional(), // Include conversation history for workflow output
   stepData: StepFinishDataSchema.optional(), // The full step object
+  reasoningHistory: ReasoningHistorySchema, // Add reasoning history
+  responseHistory: ResponseHistorySchema, // Add response history
   metadata: z
     .object({
       toolsUsed: z.array(z.string()),

@@ -34,6 +34,11 @@ import {
   type StepFinishData,
   ThinkAndPrepOutputSchema,
 } from '../utils/memory/types';
+import { 
+  extractMessagesFromToolCalls, 
+  type BusterChatMessageReasoning,
+  type BusterChatMessageResponse 
+} from '../utils/memory/message-converters';
 
 const outputSchema = ThinkAndPrepOutputSchema;
 
@@ -43,22 +48,55 @@ const handleThinkAndPrepStepFinish = async ({
   messages,
   runtimeContext,
   abortController,
+  accumulatedReasoningHistory,
+  accumulatedResponseHistory,
 }: {
   step: StepResult<ToolSet>;
   messages: CoreMessage[];
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
   abortController: AbortController;
+  accumulatedReasoningHistory: BusterChatMessageReasoning[];
+  accumulatedResponseHistory: BusterChatMessageResponse[];
 }) => {
   const toolNames = step.toolCalls.map((call) => call.toolName);
   let outputMessages: MessageHistory = [];
   let finished = false;
   let finalStepData: StepFinishData | null = null;
   let shouldAbort = false;
+  let reasoningHistory: BusterChatMessageReasoning[] = [...accumulatedReasoningHistory];
+  let responseHistory: BusterChatMessageResponse[] = [...accumulatedResponseHistory];
 
   // Add delay to prevent race conditions with tool call repairs
   const hasFinishingTools = toolNames.some((toolName: string) =>
     ['submitThoughts', 'respondWithoutAnalysis'].includes(toolName)
   );
+
+  // Process tool calls to extract reasoning and response messages
+  if (step.toolCalls.length > 0) {
+    // Create a map of tool results from the step
+    const toolResultsMap = new Map<string, string | null>();
+    
+    // For tool results, we need to look at the tool response messages
+    const toolResponses = step.response.messages.filter(msg => msg.role === 'tool');
+    for (const toolResponse of toolResponses) {
+      if ('toolCallId' in toolResponse && 'content' in toolResponse) {
+        const content = toolResponse.content;
+        if (typeof content === 'string') {
+          toolResultsMap.set(toolResponse.toolCallId, content);
+        }
+      }
+    }
+
+    // Convert tool calls to messages
+    const { reasoningMessages, responseMessages } = extractMessagesFromToolCalls(
+      step.toolCalls as any,
+      toolResultsMap
+    );
+
+    // Add to history
+    reasoningHistory.push(...reasoningMessages);
+    responseHistory.push(...responseMessages);
+  }
 
   if (hasFinishingTools) {
     try {
@@ -75,7 +113,7 @@ const handleThinkAndPrepStepFinish = async ({
       if (messageId) {
         // Save conversation history to database before aborting
         try {
-          await saveConversationHistoryFromStep(messageId, outputMessages);
+          await saveConversationHistoryFromStep(messageId, outputMessages, reasoningHistory, responseHistory);
         } catch {
           // Continue with abort even if save fails to avoid hanging
         }
@@ -114,6 +152,8 @@ const handleThinkAndPrepStepFinish = async ({
     finished,
     finalStepData,
     shouldAbort,
+    reasoningHistory,
+    responseHistory,
   };
 };
 
@@ -157,12 +197,16 @@ const processStreamChunks = async <T extends ToolSet>(
 const createStepResult = (
   finished: boolean,
   outputMessages: MessageHistory,
-  finalStepData: StepFinishData | null
+  finalStepData: StepFinishData | null,
+  reasoningHistory: BusterChatMessageReasoning[] = [],
+  responseHistory: BusterChatMessageResponse[] = []
 ): z.infer<typeof outputSchema> => ({
   finished,
   outputMessages,
   conversationHistory: outputMessages,
   stepData: finalStepData || undefined,
+  reasoningHistory,
+  responseHistory,
   metadata: {
     toolsUsed: getAllToolsUsed(outputMessages),
     finalTool: getLastToolUsed(outputMessages) as
@@ -188,6 +232,8 @@ const thinkAndPrepExecution = async ({
   let outputMessages: MessageHistory = [];
   let finished = false;
   let finalStepData: StepFinishData | null = null;
+  let reasoningHistory: BusterChatMessageReasoning[] = [];
+  let responseHistory: BusterChatMessageResponse[] = [];
 
   try {
     const threadId = runtimeContext.get('threadId');
@@ -233,11 +279,15 @@ const thinkAndPrepExecution = async ({
                 messages,
                 runtimeContext,
                 abortController,
+                accumulatedReasoningHistory: reasoningHistory,
+                accumulatedResponseHistory: responseHistory,
               });
 
               outputMessages = stepResult.outputMessages;
               finished = stepResult.finished;
               finalStepData = stepResult.finalStepData;
+              reasoningHistory = stepResult.reasoningHistory;
+              responseHistory = stepResult.responseHistory;
             },
           },
           retryConfig: {
@@ -274,12 +324,12 @@ const thinkAndPrepExecution = async ({
       console.error('Error in processStreamChunks:', processError);
     }
 
-    return createStepResult(finished, outputMessages, finalStepData);
+    return createStepResult(finished, outputMessages, finalStepData, reasoningHistory, responseHistory);
   } catch (error) {
     if (error instanceof Error && error.name !== 'AbortError') {
       throw new Error(`Error in think and prep step: ${error.message}`);
     }
-    return createStepResult(finished, outputMessages, finalStepData);
+    return createStepResult(finished, outputMessages, finalStepData, reasoningHistory, responseHistory);
   }
 };
 
