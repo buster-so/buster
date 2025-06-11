@@ -2,6 +2,7 @@ import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
+import { type ToolRuntimeContext, isError } from '../../utils/validation-helpers';
 
 // Core interfaces for Sequential Thinking
 interface SequentialThinkingParams {
@@ -214,30 +215,67 @@ const processSequentialThinking = wrapTraced(
     params: SequentialThinkingParams,
     runtimeContext: RuntimeContext
   ): Promise<SequentialThinkingOutput> => {
-    // Extract any relevant context values if needed
-    const userId = runtimeContext?.get('userId') as string | undefined;
-    const sessionId = runtimeContext?.get('sessionId') as string | undefined;
+    try {
+      // Validate the input parameters using Zod schema
+      const validatedParams = sequentialThinkingSchema.parse(params);
 
-    // Validate the input parameters
-    const validatedParams = sequentialThinkingSchema.parse(params);
+      // Extract and validate runtime context values
+      let contextData: Partial<ToolRuntimeContext> = {};
 
-    // Process the thought
-    await processThought(validatedParams, userId, sessionId);
+      if (runtimeContext && typeof runtimeContext.get === 'function') {
+        // Safely extract context values
+        const userId = runtimeContext.get('userId');
+        const sessionId = runtimeContext.get('sessionId');
+        const organizationId = runtimeContext.get('organizationId');
+        const messageId = runtimeContext.get('messageId');
 
-    return {
-      success: true,
-    };
+        contextData = {
+          userId: typeof userId === 'string' ? userId : undefined,
+          sessionId: typeof sessionId === 'string' ? sessionId : undefined,
+          organizationId: typeof organizationId === 'string' ? organizationId : undefined,
+          messageId: typeof messageId === 'string' ? messageId : undefined,
+        };
+      }
+
+      // Process the thought with validated context
+      await processThought(validatedParams, contextData);
+
+      return {
+        success: true,
+      };
+    } catch (error) {
+      console.error('Error in sequential thinking:', error);
+
+      // Provide helpful error messages
+      if (error instanceof z.ZodError) {
+        throw new Error(
+          `Invalid sequential thinking parameters: ${error.errors.map((e) => e.message).join(', ')}`
+        );
+      }
+
+      const errorMessage = isError(error) ? error.message : 'Unknown error occurred';
+      throw new Error(`Sequential thinking processing failed: ${errorMessage}`);
+    }
   },
   { name: 'sequential-thinking' }
 );
 
 async function processThought(
   params: SequentialThinkingParams,
-  _userId?: string,
-  _sessionId?: string
+  contextData: Partial<ToolRuntimeContext>
 ): Promise<SequentialThinkingParams> {
   // This function can be extended to include additional processing logic
   // such as logging thoughts, analyzing patterns, or integrating with other systems
+
+  // Log context information if available for debugging/analytics
+  if (contextData.userId || contextData.sessionId) {
+    console.debug('Processing thought', {
+      userId: contextData.userId,
+      sessionId: contextData.sessionId,
+      thoughtNumber: params.thoughtNumber,
+      totalThoughts: params.totalThoughts,
+    });
+  }
 
   // For now, we simply validate and return the processed thought
   // In the future, this could include:

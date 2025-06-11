@@ -19,7 +19,7 @@ export interface PaginatedResponse<T> {
   /** Pagination metadata */
   pagination: PaginationMeta;
   /** Optional additional metadata */
-  meta?: Record<string, any>;
+  meta?: Record<string, unknown>;
 }
 
 export interface PaginationParams {
@@ -39,7 +39,7 @@ export type CreatePaginatedResponse<T> = (
   page: number,
   limit: number,
   total: number,
-  meta?: Record<string, any>
+  meta?: Record<string, unknown>
 ) => PaginatedResponse<T>;
 
 // Utility function to create paginated responses
@@ -48,7 +48,7 @@ export const createPaginatedResponse = <T>(
   page: number,
   limit: number,
   total: number,
-  meta?: Record<string, any>
+  meta?: Record<string, unknown>
 ): PaginatedResponse<T> => {
   const totalPages = Math.ceil(total / limit);
 

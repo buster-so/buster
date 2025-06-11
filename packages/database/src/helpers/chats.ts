@@ -86,7 +86,7 @@ export async function getChatWithDetails(input: GetChatInput): Promise<{
     .where(and(eq(chats.id, validated.chatId), isNull(chats.deletedAt)))
     .limit(1);
 
-  if (!result.length || !result[0].chat) {
+  if (!result.length || !result[0]?.chat) {
     return null;
   }
 

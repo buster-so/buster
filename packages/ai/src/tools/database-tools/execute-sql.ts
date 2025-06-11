@@ -158,20 +158,32 @@ const executeSqlStatement = wrapTraced(
   ): Promise<z.infer<typeof executeSqlStatementOutputSchema>> => {
     const { statements } = params;
 
-    // Extract context values
-    const dataSourceId = runtimeContext.get('dataSourceId') as string;
-    const userId = runtimeContext.get('userId') as string;
-    const organizationId = runtimeContext.get('organizationId') as string;
+    // Validate runtime context
+    let validatedContext: AnalystRuntimeContext;
+    try {
+      validatedContext = validateRuntimeContext(
+        runtimeContext,
+        analystRuntimeContextSchema,
+        'SQL execution'
+      );
+    } catch (error) {
+      console.error('Runtime context validation failed:', error);
+      // Provide user-friendly error based on what's missing
+      if (error instanceof Error) {
+        if (error.message.includes('dataSourceId')) {
+          throw new Error('Unable to identify the data source. Please refresh and try again.');
+        }
+        if (error.message.includes('userId')) {
+          throw new Error('Unable to verify your identity. Please log in again.');
+        }
+        if (error.message.includes('organizationId')) {
+          throw new Error('Unable to access your organization. Please check your permissions.');
+        }
+      }
+      throw new Error('Unable to access your session. Please refresh and try again.');
+    }
 
-    if (!dataSourceId) {
-      throw new Error('Unable to identify the data source. Please refresh and try again.');
-    }
-    if (!userId) {
-      throw new Error('Unable to verify your identity. Please log in again.');
-    }
-    if (!organizationId) {
-      throw new Error('Unable to access your organization. Please check your permissions.');
-    }
+    const { dataSourceId, userId, organizationId } = validatedContext;
 
     // Get data source credentials from vault
     let dataSource: DataSource;
@@ -181,7 +193,7 @@ const executeSqlStatement = wrapTraced(
         dataSources: [
           {
             name: `datasource-${dataSourceId}`,
-            type: credentials.type as any,
+            type: credentials.type,
             credentials: credentials,
           },
         ],
@@ -209,7 +221,7 @@ const executeSqlStatement = wrapTraced(
 
       // Process results and format according to output schema
       const results = executionResults.map((executionResult, index) => {
-        const sql = statements[index] ?? ''; // Use nullish coalescing instead of non-null assertion
+        const sql = validateArrayAccess(statements, index, 'SQL statement processing');
 
         if (executionResult.status === 'fulfilled') {
           const { result } = executionResult.value;
@@ -249,26 +261,34 @@ async function getDataSourceCredentials(dataSourceId: string): Promise<Credentia
       sql`SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = ${dataSourceId} LIMIT 1`
     );
 
-    if (!secretResult || secretResult.length === 0) {
-      throw new Error(
-        'Unable to access your data source credentials. Please ensure the data source is properly configured.'
-      );
-    }
+    // Validate the database result structure using Zod
+    const validatedResult = secretResultSchema.parse(secretResult);
 
-    const secretString = secretResult[0]?.decrypted_secret as string;
-    if (!secretString) {
-      throw new Error(
-        'The data source credentials appear to be invalid. Please reconfigure your data source.'
-      );
-    }
+    // Safe array access - we know it has at least one element due to schema validation
+    const secretRecord = validateArrayAccess(validatedResult, 0, 'database secret retrieval');
+    const secretString = secretRecord.decrypted_secret;
 
-    // Parse the credentials JSON
-    const credentials = JSON.parse(secretString) as Credentials;
-    return credentials;
+    // Parse and validate the credentials JSON using Zod
+    const validatedCredentials = safeJsonParse(
+      secretString,
+      credentialsSchema,
+      'data source credentials'
+    );
+    // Return as the original Credentials type since we've validated the basic structure
+    return validatedCredentials as unknown as Credentials;
   } catch (error) {
     console.error('Error getting data source credentials:', error);
+
+    // Provide more specific error messages based on error type
+    if (error instanceof z.ZodError) {
+      throw new Error(
+        'The data source credentials are not in the expected format. Please reconfigure your data source.'
+      );
+    }
+
+    const errorMessage = isError(error) ? error.message : 'Unknown error occurred';
     throw new Error(
-      'Unable to retrieve data source credentials. Please contact support if this issue persists.'
+      `Unable to retrieve data source credentials: ${errorMessage}. Please contact support if this issue persists.`
     );
   }
 }

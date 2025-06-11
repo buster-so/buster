@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test } from 'vitest';
+import { afterEach, describe, expect } from 'vitest';
 import { DataSource } from '../../../src/data-source';
 import type { DataSourceConfig } from '../../../src/data-source';
 import { DataSourceType } from '../../../src/types/credentials';
@@ -101,9 +101,10 @@ async function validateColumnMapping(
   }
 }
 
+const testWithCredentials = skipIfNoCredentials('snowflake');
+
 describe('Snowflake DataSource Introspection', () => {
   let dataSource: DataSource;
-  const testFn = skipIfNoCredentials('snowflake');
 
   afterEach(async () => {
     if (dataSource) {
@@ -111,7 +112,7 @@ describe('Snowflake DataSource Introspection', () => {
     }
   });
 
-  test(
+  testWithCredentials(
     'should introspect Snowflake databases',
     async () => {
       const config: DataSourceConfig = {
@@ -136,7 +137,7 @@ describe('Snowflake DataSource Introspection', () => {
     { timeout: TEST_TIMEOUT }
   );
 
-  test(
+  testWithCredentials(
     'should introspect Snowflake schemas',
     async () => {
       const config: DataSourceConfig = {
@@ -162,7 +163,7 @@ describe('Snowflake DataSource Introspection', () => {
     { timeout: TEST_TIMEOUT }
   );
 
-  test(
+  testWithCredentials(
     'should introspect Snowflake tables',
     async () => {
       const config: DataSourceConfig = {
@@ -197,7 +198,7 @@ describe('Snowflake DataSource Introspection', () => {
     { timeout: TEST_TIMEOUT }
   );
 
-  test(
+  testWithCredentials(
     'should introspect Snowflake columns',
     async () => {
       const config: DataSourceConfig = {
@@ -242,7 +243,7 @@ describe('Snowflake DataSource Introspection', () => {
     { timeout: TEST_TIMEOUT }
   );
 
-  test(
+  testWithCredentials(
     'should introspect Snowflake views',
     async () => {
       const config: DataSourceConfig = {
@@ -270,7 +271,7 @@ describe('Snowflake DataSource Introspection', () => {
     { timeout: TEST_TIMEOUT }
   );
 
-  test(
+  testWithCredentials(
     'should get full Snowflake introspection',
     async () => {
       const config: DataSourceConfig = {
@@ -304,7 +305,7 @@ describe('Snowflake DataSource Introspection', () => {
   );
 
   describe('Snowflake Filtering Tests', () => {
-    test(
+    testWithCredentials(
       'should filter by database only',
       async () => {
         const config: DataSourceConfig = {
@@ -348,7 +349,7 @@ describe('Snowflake DataSource Introspection', () => {
       { timeout: 120000 }
     );
 
-    test(
+    testWithCredentials(
       'should filter by schema only',
       async () => {
         const config: DataSourceConfig = {
@@ -393,7 +394,7 @@ describe('Snowflake DataSource Introspection', () => {
       { timeout: 120000 }
     );
 
-    test(
+    testWithCredentials(
       'should filter by both database and schema',
       async () => {
         const config: DataSourceConfig = {
@@ -441,7 +442,7 @@ describe('Snowflake DataSource Introspection', () => {
       { timeout: 180000 }
     );
 
-    test(
+    testWithCredentials(
       'should handle non-existent database filter',
       async () => {
         const config: DataSourceConfig = {
@@ -467,7 +468,7 @@ describe('Snowflake DataSource Introspection', () => {
       { timeout: 120000 }
     );
 
-    testFn(
+    testWithCredentials(
       'should handle non-existent schema filter',
       async () => {
         const config: DataSourceConfig = {
@@ -494,7 +495,7 @@ describe('Snowflake DataSource Introspection', () => {
       { timeout: 120000 }
     );
 
-    test(
+    testWithCredentials(
       'should throw error for empty filter arrays',
       async () => {
         const config: DataSourceConfig = {
@@ -523,7 +524,7 @@ describe('Snowflake DataSource Introspection', () => {
       { timeout: 120000 }
     );
 
-    test(
+    testWithCredentials(
       'should handle case-sensitive filtering in Snowflake',
       async () => {
         const config: DataSourceConfig = {
@@ -549,7 +550,7 @@ describe('Snowflake DataSource Introspection', () => {
     );
   });
 
-  test(
+  testWithCredentials(
     'should test Snowflake connection',
     async () => {
       const config: DataSourceConfig = {
@@ -566,7 +567,7 @@ describe('Snowflake DataSource Introspection', () => {
     TEST_TIMEOUT
   );
 
-  test(
+  testWithCredentials(
     'should get Snowflake table statistics',
     async () => {
       const config: DataSourceConfig = {
@@ -605,7 +606,7 @@ describe('Snowflake DataSource Introspection', () => {
     TEST_TIMEOUT
   );
 
-  test(
+  testWithCredentials(
     'should get column statistics for DBT.REVENUE.EMAIL_SMS_REVENUE table',
     async () => {
       const config: DataSourceConfig = {

@@ -8,10 +8,12 @@ import { describe, expect, it, vi } from 'vitest';
 
 describe('Introspector Empty Filter Validation', () => {
   const mockAdapter: DatabaseAdapter = {
-    connect: vi.fn(),
-    disconnect: vi.fn(),
+    initialize: vi.fn(),
     query: vi.fn(),
-    isConnected: vi.fn().mockReturnValue(true),
+    testConnection: vi.fn().mockResolvedValue(true),
+    close: vi.fn(),
+    getDataSourceType: vi.fn().mockReturnValue('test'),
+    introspect: vi.fn(),
   };
 
   const introspectors = [
@@ -22,7 +24,7 @@ describe('Introspector Empty Filter Validation', () => {
     { name: 'Redshift', introspector: new RedshiftIntrospector('test', mockAdapter) },
   ];
 
-  introspectors.forEach(({ name, introspector }) => {
+  for (const { name, introspector } of introspectors) {
     describe(name, () => {
       it('should throw error when databases filter is empty array', async () => {
         await expect(introspector.getFullIntrospection({ databases: [] })).rejects.toThrow(
@@ -42,5 +44,5 @@ describe('Introspector Empty Filter Validation', () => {
         );
       });
     });
-  });
+  }
 });

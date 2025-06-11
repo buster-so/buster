@@ -3,21 +3,12 @@ import { Hono } from 'hono';
 // Import feature-specific routes
 import userRoutes from './users';
 import electricShapeRoutes from './electric-shape';
-import chatRoutes from './chats';
+import healthcheckRoutes from '../healthcheck';
 
-const app = new Hono();
-
-app.get('/healthcheck', (c) => {
-  return c.json({
-    success: true,
-    message: 'API v2 is healthy',
-    timestamp: new Date().toISOString()
-  });
-});
-
-app.route('/users', userRoutes);
-app.route('/electric-shape', electricShapeRoutes);
-app.route('/chats', chatRoutes);
+const app = new Hono()
+  .route('/users', userRoutes)
+  .route('/electric-shape', electricShapeRoutes)
+  .route('/healthcheck', healthcheckRoutes);
 
 // TODO: Add more feature routes as they are created
 // import datasetRoutes from './datasets';

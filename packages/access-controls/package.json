@@ -4,6 +4,8 @@
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
+    "build": "tsc --build",
+    "clean": "rm -rf dist && tsc --build --clean",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage"

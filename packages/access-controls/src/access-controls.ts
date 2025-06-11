@@ -1,15 +1,19 @@
-import { and, count, eq, inArray, isNull } from 'drizzle-orm';
-import { z } from 'zod';
-import { getDb } from '../../database/src/connection';
 import {
+  and,
+  count,
   datasetPermissions,
   datasets,
   datasetsToPermissionGroups,
+  eq,
+  getDb,
+  inArray,
+  isNull,
   permissionGroups,
   permissionGroupsToIdentities,
   teamsToUsers,
   usersToOrganizations,
-} from '../../database/src/schema';
+} from '@buster/database';
+import { z } from 'zod';
 import { type AccessControlOptions, AccessControlsError } from './types';
 
 // Schema for the permissioned dataset result
@@ -180,12 +184,14 @@ export async function getPermissionedDatasets(
     )
     .limit(1);
 
-  if (userOrgInfo.length === 0) {
+  const userOrg = userOrgInfo[0];
+
+  if (!userOrg) {
     // User not in any organization
     return [];
   }
 
-  const { organizationId, role } = userOrgInfo[0]!;
+  const { organizationId, role } = userOrg;
 
   // --- Admin/Querier Path ---
   if (['workspace_admin', 'data_admin', 'querier'].includes(role)) {
@@ -205,7 +211,7 @@ export async function getPermissionedDatasets(
       .limit(input.pageSize)
       .offset(input.page * input.pageSize);
 
-    return results.map((r: any) => PermissionedDatasetSchema.parse(r));
+    return results.map((r) => PermissionedDatasetSchema.parse(r));
   }
 
   // --- Non-Admin Path ---
@@ -246,7 +252,7 @@ export async function getPermissionedDatasets(
     .limit(input.pageSize)
     .offset(input.page * input.pageSize);
 
-  return results.map((r: any) => PermissionedDatasetSchema.parse(r));
+  return results.map((r) => PermissionedDatasetSchema.parse(r));
 }
 
 export async function hasDatasetAccess(userId: string, datasetId: string): Promise<boolean> {
@@ -265,11 +271,13 @@ export async function hasDatasetAccess(userId: string, datasetId: string): Promi
     .where(eq(datasets.id, input.datasetId))
     .limit(1);
 
-  if (datasetInfo.length === 0) {
+  const dataset = datasetInfo[0];
+
+  if (!dataset) {
     return false; // Dataset doesn't exist
   }
 
-  const { organizationId, deletedAt } = datasetInfo[0]!;
+  const { organizationId, deletedAt } = dataset;
 
   // --- Universal Check: If dataset is deleted, NO ONE has access ---
   if (deletedAt !== null) {
@@ -289,8 +297,10 @@ export async function hasDatasetAccess(userId: string, datasetId: string): Promi
     )
     .limit(1);
 
-  if (adminAccess.length > 0) {
-    const { role } = adminAccess[0]!;
+  const access = adminAccess[0];
+
+  if (adminAccess.length > 0 && access) {
+    const { role } = access;
     if (['workspace_admin', 'data_admin', 'querier'].includes(role)) {
       // Admins/Queriers have access to non-deleted datasets in their org
       return true;
@@ -382,8 +392,11 @@ export async function hasAllDatasetsAccess(userId: string, datasetIds: string[])
   // --- Step 3: Check specific permissions for each dataset ---
   for (const datasetId of input.datasetIds) {
     const datasetOrgId = datasetInfos.find(
-      (info: { id: string; organizationId: string; deletedAt: string | null }) =>
-        info.id === datasetId
+      (info: {
+        id: string;
+        organizationId: string;
+        deletedAt: string | null;
+      }) => info.id === datasetId
     )?.organizationId;
 
     if (!datasetOrgId) {
@@ -422,7 +435,9 @@ async function checkDirectUserPermission(userId: string, datasetId: string): Pro
       )
     );
 
-  return result[0]!.count > 0;
+  const permissionCount: number = result[0]?.count ?? 0;
+
+  return permissionCount > 0;
 }
 
 async function checkTeamDirectPermission(userId: string, datasetId: string): Promise<boolean> {
@@ -442,7 +457,9 @@ async function checkTeamDirectPermission(userId: string, datasetId: string): Pro
     )
     .where(and(eq(datasetPermissions.datasetId, datasetId), isNull(datasetPermissions.deletedAt)));
 
-  return result[0]!.count > 0;
+  const permissionCount: number = result[0]?.count ?? 0;
+
+  return permissionCount > 0;
 }
 
 async function checkUserGroupPermission(userId: string, datasetId: string): Promise<boolean> {
@@ -474,7 +491,9 @@ async function checkUserGroupPermission(userId: string, datasetId: string): Prom
       )
     );
 
-  return result[0]!.count > 0;
+  const permissionCount: number = result[0]?.count ?? 0;
+
+  return permissionCount > 0;
 }
 
 async function checkTeamGroupPermission(userId: string, datasetId: string): Promise<boolean> {
@@ -513,7 +532,9 @@ async function checkTeamGroupPermission(userId: string, datasetId: string): Prom
       )
     );
 
-  return result[0]!.count > 0;
+  const permissionCount: number = result[0]?.count ?? 0;
+
+  return permissionCount > 0;
 }
 
 async function checkSpecificDatasetPermissions(

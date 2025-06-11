@@ -1,6 +1,6 @@
-import { createInstance } from '../createInstance';
+import { createAxiosInstance } from '../createAxiosInstance';
 
-const nextApi = createInstance(process.env.NEXT_PUBLIC_URL || '');
+const nextApi = createAxiosInstance(process.env.NEXT_PUBLIC_URL || '');
 
 export default nextApi;
 

@@ -161,7 +161,7 @@ export const Loading: Story = {
 export const Collapsible: Story = {
   args: {
     fileName: 'collapsible-file.md',
-    collapsible: true,
+    collapsible: 'chevron',
     className: 'hover:border-gray-light transition-all duration-200',
     headerClassName: 'min-w-60 bg-background',
     collapseHeaderSecondary: <Text size="sm">Click to expand</Text>,
@@ -169,6 +169,22 @@ export const Collapsible: Story = {
     children: (
       <div className="p-4">
         <Text>This is collapsible content</Text>
+      </div>
+    )
+  }
+};
+
+export const CollapsiblePeek: Story = {
+  args: {
+    fileName: 'collapsible-file.md',
+    collapsible: 'overlay-peek',
+    className: '',
+    headerClassName: 'min-w-60',
+    children: (
+      <div className="flex flex-col gap-2 p-4">
+        {Array.from({ length: 100 }).map((_, index) => (
+          <Text key={index}>This is collapsible content {index}</Text>
+        ))}
       </div>
     )
   }

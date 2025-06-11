@@ -1,3 +1,6 @@
+include ../.env
+export
+
 dev:
 	docker compose stop && docker compose up -d
 

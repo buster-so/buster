@@ -1,4 +1,5 @@
 import type { MessageContextOutput, OrganizationDataSourceOutput } from '@buster/database';
+import type { CoreMessage } from 'ai';
 import { describe, expect, test } from 'vitest';
 
 // Task 4: Chat History Loading Integration Tests
@@ -122,7 +123,7 @@ describe('Task 3: Runtime Context Setup', () => {
     // Force an error by passing invalid data (undefined values)
     const invalidMessageContext = {
       messageId: 'msg-invalid',
-      userId: undefined as any,
+      userId: undefined as unknown as string,
       chatId: 'chat-invalid',
       organizationId: 'org-invalid',
       requestMessage: 'Invalid test',
@@ -224,7 +225,7 @@ describe('Task 4: Chat History Loading Integration', () => {
   });
 
   test('handles empty conversation history correctly', () => {
-    const mockEmptyHistory: any[] = [];
+    const mockEmptyHistory: CoreMessage[] = [];
     const mockMessageContext: MessageContextOutput = {
       messageId: 'msg-new-chat',
       userId: 'user-456',

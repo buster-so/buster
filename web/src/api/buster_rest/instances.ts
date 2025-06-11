@@ -1,6 +1,7 @@
-import { createInstance } from '../createInstance';
+import { createAxiosInstance } from '../createAxiosInstance';
 import { BASE_URL } from './config';
 
-const mainApi = createInstance(BASE_URL);
+const mainApi = createAxiosInstance(BASE_URL);
+
 export default mainApi;
 export { mainApi };

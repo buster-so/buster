@@ -49,7 +49,8 @@ async function getAssetDetails(
       .limit(1);
 
     return metric || null;
-  } else if (assetType === 'dashboard_file') {
+  }
+  if (assetType === 'dashboard_file') {
     const [dashboard] = await db
       .select({
         id: dashboardFiles.id,
@@ -87,7 +88,6 @@ export async function generateAssetMessages(input: GenerateAssetMessagesInput): 
       ? `Let me help you analyze the metric "${asset.name}".`
       : `Let me help you explore the dashboard "${asset.name}".`;
 
-  const userMessageId = crypto.randomUUID();
   const [userMessage] = await db
     .insert(messages)
     .values({
@@ -159,6 +159,7 @@ export async function createMessageFileAssociation(
   input: CreateFileAssociationInput
 ): Promise<void> {
   await db.insert(messagesToFiles).values({
+    id: crypto.randomUUID(),
     messageId: input.messageId,
     fileId: input.fileId,
     versionNumber: input.version,

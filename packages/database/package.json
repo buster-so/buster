@@ -4,8 +4,9 @@
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "bun run src/index.ts",
-    "build": "bun build src/index.ts --outdir dist --target node",
+    "build": "tsc",
+    "build:bun": "bun build src/index.ts --outdir dist --target node",
+    "clean": "rm -rf dist",
     "test": "bun test",
     "test:watch": "bun test --watch",
     "test:coverage": "bun test --coverage",
@@ -16,10 +17,6 @@
     "db:introspect": "drizzle-kit introspect",
     "db:studio": "drizzle-kit studio",
     "db:check": "drizzle-kit check",
-    "db:setup": "bun run src/setup.ts setup",
-    "seed:list": "bun run src/seed/cli.ts list",
-    "setup:data": "bun run src/setup.ts setup-data",
-    "setup:seed": "bun run src/setup.ts seed",
-    "setup:full": "bun run src/setup.ts run"
+    "db:setup": "bun run src/setup.ts setup"
   }
 }

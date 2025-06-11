@@ -1,6 +1,8 @@
 export type FileType = 'metric' | 'dashboard' | 'reasoning'; //'dataset' | 'collection' | | 'term' | 'value'
 
-export type ThoughtFileType =
+export type ReasoningFileType = 'metric' | 'dashboard' | 'reasoning' | 'agent-action';
+
+export type ReasoningThoughtFileType =
   | 'metric'
   | 'dashboard'
   | 'collection'
@@ -9,5 +11,3 @@ export type ThoughtFileType =
   | 'topic'
   | 'value'
   | 'empty';
-
-export type AllFileTypes = ThoughtFileType | FileType;

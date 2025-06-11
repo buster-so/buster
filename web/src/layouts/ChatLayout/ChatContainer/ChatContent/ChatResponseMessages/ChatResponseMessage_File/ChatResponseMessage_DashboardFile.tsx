@@ -77,7 +77,7 @@ export const ChatResponseMessage_DashboardFile: React.FC<{
             !isSelectedFile && 'hover:border-gray-light'
           )}
           collapseContent={true}
-          collapsible={isFetched && !isError}
+          collapsible={isFetched && !isError ? 'overlay-peek' : false}
           collapseDefaultIcon={<HeaderIcon isLoading={isLoading} isError={isError} />}
           headerClassName="bg-background"
           fileName={<TextAndVersionPill fileName={file_name} versionNumber={version_number} />}

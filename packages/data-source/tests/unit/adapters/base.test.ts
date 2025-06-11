@@ -37,6 +37,10 @@ class MockAdapter extends BaseAdapter {
     return DataSourceType.PostgreSQL;
   }
 
+  introspect(): never {
+    throw new Error('Not implemented in mock');
+  }
+
   // Public methods to test protected properties
   public isConnected(): boolean {
     return this.connected;
@@ -85,7 +89,7 @@ describe('BaseAdapter', () => {
       };
 
       await expect(adapter.initialize(credentials)).rejects.toThrow(
-        'Invalid credentials type. Expected postgresql, got mysql'
+        'Invalid credentials type. Expected postgres, got mysql'
       );
     });
   });
@@ -93,7 +97,7 @@ describe('BaseAdapter', () => {
   describe('connection management', () => {
     it('should throw error when querying without connection', async () => {
       expect(() => adapter.testEnsureConnected()).toThrow(
-        'postgresql adapter is not connected. Call initialize() first.'
+        'postgres adapter is not connected. Call initialize() first.'
       );
     });
 

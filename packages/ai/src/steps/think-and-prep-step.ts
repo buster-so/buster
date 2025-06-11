@@ -11,9 +11,9 @@ import { retryableAgentStream } from '../utils/retry';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
 import { ToolArgsParser } from '../utils/streaming';
 import type {
-  AnalystRuntimeContext,
-  thinkAndPrepWorkflowInputSchema,
-} from '../workflows/analyst-workflow';
+  ThinkAndPrepRuntimeContext,
+} from '../utils/validation-helpers';
+import type { thinkAndPrepWorkflowInputSchema } from '../workflows/analyst-workflow';
 import { createTodosOutputSchema } from './create-todos-step';
 import { extractValuesSearchOutputSchema } from './extract-values-search-step';
 import { generateChatTitleOutputSchema } from './generate-chat-title-step';
@@ -52,7 +52,7 @@ const handleThinkAndPrepStepFinish = async ({
 }: {
   step: StepResult<ToolSet>;
   messages: CoreMessage[];
-  runtimeContext: RuntimeContext<AnalystRuntimeContext>;
+  runtimeContext: RuntimeContext<ThinkAndPrepRuntimeContext>;
   abortController: AbortController;
   accumulatedReasoningHistory: BusterChatMessageReasoning[];
   accumulatedResponseHistory: BusterChatMessageResponse[];
@@ -226,7 +226,7 @@ const thinkAndPrepExecution = async ({
 }: {
   inputData: z.infer<typeof inputSchema>;
   getInitData: () => Promise<z.infer<typeof thinkAndPrepWorkflowInputSchema>>;
-  runtimeContext: RuntimeContext<AnalystRuntimeContext>;
+  runtimeContext: RuntimeContext<ThinkAndPrepRuntimeContext>;
 }): Promise<z.infer<typeof outputSchema>> => {
   const abortController = new AbortController();
 
@@ -243,6 +243,7 @@ const thinkAndPrepExecution = async ({
     if (!threadId || !resourceId) {
       throw new Error('Missing required context values');
     }
+
 
     const initData = await getInitData();
     const todos = inputData['create-todos'].todos;
