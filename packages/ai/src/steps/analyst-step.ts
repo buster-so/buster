@@ -10,13 +10,12 @@ import { parseStreamingArgs as parseExecuteSqlArgs } from '../tools/database-too
 import { parseStreamingArgs as parseSequentialThinkingArgs } from '../tools/planning-thinking-tools/sequential-thinking-tool';
 import { parseStreamingArgs as parseCreateMetricsArgs } from '../tools/visualization-tools/create-metrics-file-tool';
 import { saveConversationHistoryFromStep } from '../utils/database/saveConversationHistory';
-import { handleInvalidToolCall } from '../utils/handle-invalid-tools/handle-invalid-tool-call';
-import { handleInvalidToolError } from '../utils/handle-invalid-tools/handle-invalid-tool-error';
 import {
   MessageHistorySchema,
   StepFinishDataSchema,
   ThinkAndPrepOutputSchema,
 } from '../utils/memory/types';
+import { retryableAgentStream } from '../utils/retry';
 import { ToolArgsParser } from '../utils/streaming';
 import {
   type AnalystRuntimeContext,
@@ -89,9 +88,9 @@ const handleAnalystStepFinish = async ({
         finished = true;
       }
 
-      // Add a small delay to ensure any pending tool call repairs complete
-      // before aborting the stream
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      // Add a delay to ensure any pending tool call repairs and stream processing complete
+      // before aborting the stream. This prevents race conditions with ongoing chunk processing.
+      await new Promise((resolve) => setTimeout(resolve, 250));
 
       shouldAbort = true;
 
@@ -112,6 +111,43 @@ const handleAnalystStepFinish = async ({
     finished,
     shouldAbort,
   };
+};
+
+// Helper function to process stream chunks
+const processStreamChunks = async (
+  stream: any,
+  toolArgsParser: ToolArgsParser,
+  abortController: AbortController
+): Promise<void> => {
+  try {
+    for await (const chunk of stream.fullStream) {
+      // Check if we should abort before processing each chunk
+      if (abortController.signal.aborted) {
+        break;
+      }
+
+      try {
+        // Process streaming tool arguments
+        if (chunk.type === 'tool-call-streaming-start' || chunk.type === 'tool-call-delta') {
+          const streamingResult = toolArgsParser.processChunk(chunk);
+          if (streamingResult) {
+            // TODO: Emit streaming result for real-time UI updates
+          }
+        }
+      } catch (chunkError) {
+        // Log individual chunk processing errors but continue with other chunks
+        console.error('Error processing individual stream chunk:', chunkError);
+      }
+    }
+  } catch (streamError) {
+    // Handle AbortError gracefully - this is expected when the stream is intentionally aborted
+    if (streamError instanceof Error && streamError.name === 'AbortError') {
+      // Stream was intentionally aborted, this is normal behavior
+      return;
+    }
+    // Log other stream processing errors but don't throw to avoid breaking the workflow
+    console.error('Error processing stream chunks in analyst step:', streamError);
+  }
 };
 
 const analystExecution = async ({
@@ -159,19 +195,6 @@ const analystExecution = async ({
     // They are already in CoreMessage[] format
     const messages = inputData.outputMessages;
 
-    // DEBUG: Log the messages array to identify empty array source
-    console.log('ANALYST STEP DEBUG:', {
-      messagesLength: messages?.length || 0,
-      messages: messages,
-      inputData: {
-        conversationHistory: inputData.conversationHistory?.length || 0,
-        outputMessages: inputData.outputMessages?.length || 0,
-        finished: inputData.finished,
-        stepData: !!inputData.stepData,
-        metadata: inputData.metadata,
-      },
-    });
-
     // Critical check: Ensure messages array is not empty
     if (!messages || messages.length === 0) {
       console.error('CRITICAL: Empty messages array detected in analyst step', {
@@ -194,25 +217,40 @@ const analystExecution = async ({
 
     const wrappedStream = wrapTraced(
       async () => {
-        const stream = await analystAgent.stream(messages, {
-          runtimeContext,
-          toolChoice: 'required',
-          abortSignal: abortController.signal,
-          onStepFinish: async (step: StepResult<ToolSet>) => {
-            const result = await handleAnalystStepFinish({
-              step,
-              inputData,
-              runtimeContext,
-              abortController,
-            });
+        const result = await retryableAgentStream({
+          agent: analystAgent,
+          messages,
+          options: {
+            runtimeContext,
+            toolChoice: 'required',
+            abortSignal: abortController.signal,
+            onStepFinish: async (step: StepResult<ToolSet>) => {
+              const stepResult = await handleAnalystStepFinish({
+                step,
+                inputData,
+                runtimeContext,
+                abortController,
+              });
 
-            completeConversationHistory = result.completeConversationHistory;
+              completeConversationHistory = stepResult.completeConversationHistory;
+            },
           },
-          onError: handleInvalidToolError,
-          experimental_repairToolCall: handleInvalidToolCall,
+          retryConfig: {
+            maxRetries: 3,
+            onRetry: (error, attemptNumber) => {
+              // Log retry attempt for debugging
+              console.error(`Analyst retry attempt ${attemptNumber} for ${error.type} error`);
+            },
+          },
         });
 
-        return stream;
+        // Update messages to include any healing messages added during retries
+        if (result.conversationHistory.length > messages.length) {
+          // Healing messages were added, update the complete conversation history
+          completeConversationHistory = result.conversationHistory;
+        }
+
+        return result.stream;
       },
       {
         name: 'Analyst',
@@ -236,15 +274,7 @@ const analystExecution = async ({
     toolArgsParser.registerParser('execute-sql', parseExecuteSqlArgs);
     toolArgsParser.registerParser('sequential-thinking', parseSequentialThinkingArgs);
 
-    for await (const chunk of stream.fullStream) {
-      // Process streaming tool arguments
-      if (chunk.type === 'tool-call-streaming-start' || chunk.type === 'tool-call-delta') {
-        const streamingResult = toolArgsParser.processChunk(chunk);
-        if (streamingResult) {
-          // TODO: Emit streaming result for real-time UI updates
-        }
-      }
-    }
+    await processStreamChunks(stream, toolArgsParser, abortController);
 
     return {
       conversationHistory: completeConversationHistory,

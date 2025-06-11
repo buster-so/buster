@@ -1,3 +1,4 @@
+import { RuntimeContext } from '@mastra/core/runtime-context';
 import { describe, expect, test } from 'vitest';
 import { formatOutputStep } from '../../../src/steps/format-output-step';
 
@@ -50,11 +51,18 @@ describe('Format Output Step Unit Tests', () => {
       },
     };
 
+    const runtimeContext = new RuntimeContext([]);
+
     const result = await formatOutputStep.execute({
       inputData: analystOutput,
       getInitData: async () => ({ prompt: 'test' }),
-      runtimeContext: {} as any,
-    });
+      runtimeContext,
+      runId: 'test-run',
+      mastra: {} as any,
+      getStepResult: async () => ({}) as any,
+      suspend: async () => {},
+      [Symbol.for('emitter')]: {} as any,
+    } as any);
 
     expect(result).toEqual({
       conversationHistory: analystOutput.conversationHistory,
@@ -85,11 +93,18 @@ describe('Format Output Step Unit Tests', () => {
       },
     };
 
+    const runtimeContext = new RuntimeContext([]);
+
     const result = await formatOutputStep.execute({
       inputData: passthroughOutput,
       getInitData: async () => ({ prompt: 'test' }),
-      runtimeContext: {} as any,
-    });
+      runtimeContext,
+      runId: 'test-run',
+      mastra: {} as any,
+      getStepResult: async () => ({}) as any,
+      suspend: async () => {},
+      [Symbol.for('emitter')]: {} as any,
+    } as any);
 
     expect(result.conversationHistory).toEqual(passthroughOutput.conversationHistory);
     expect(result.finished).toBe(true);
@@ -102,11 +117,18 @@ describe('Format Output Step Unit Tests', () => {
       conversationHistory: [{ role: 'user' as const, content: 'test' }],
     };
 
+    const runtimeContext = new RuntimeContext([]);
+
     const result = await formatOutputStep.execute({
       inputData: minimalOutput,
       getInitData: async () => ({ prompt: 'test' }),
-      runtimeContext: {} as any,
-    });
+      runtimeContext,
+      runId: 'test-run',
+      mastra: {} as any,
+      getStepResult: async () => ({}) as any,
+      suspend: async () => {},
+      [Symbol.for('emitter')]: {} as any,
+    } as any);
 
     expect(result.conversationHistory).toEqual(minimalOutput.conversationHistory);
     expect(result.finished).toBe(false);
@@ -122,11 +144,18 @@ describe('Format Output Step Unit Tests', () => {
       finished: false,
     };
 
+    const runtimeContext = new RuntimeContext([]);
+
     const result = await formatOutputStep.execute({
       inputData: emptyOutput,
       getInitData: async () => ({ prompt: 'test' }),
-      runtimeContext: {} as any,
-    });
+      runtimeContext,
+      runId: 'test-run',
+      mastra: {} as any,
+      getStepResult: async () => ({}) as any,
+      suspend: async () => {},
+      [Symbol.for('emitter')]: {} as any,
+    } as any);
 
     expect(result.conversationHistory).toEqual([]);
     expect(result.outputMessages).toEqual([]);

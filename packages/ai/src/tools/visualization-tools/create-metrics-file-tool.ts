@@ -267,6 +267,8 @@ export const createMetrics = createTool({
   id: 'create-metrics-file',
   description: `Creates metric configuration files with YAML content following the metric schema specification. Before using this tool, carefully consider the appropriate visualization type (bar, line, scatter, pie, combo, metric, table) and its specific configuration requirements. Each visualization has unique axis settings, formatting options, and data structure needs that must be thoroughly planned to create effective metrics. **This tool supports creating multiple metrics in a single call; prefer using bulk creation over creating metrics one by one.**
 
+Only utilize the required/default fields unless the user specifically requests that optional fields be added.
+
 ## COMPLETE METRIC YAML SCHEMA SPECIFICATION
 
 \`\`\`
@@ -1158,8 +1160,14 @@ async function processMetricFile(
     let errorMessage = 'Unknown error';
 
     if (error instanceof z.ZodError) {
-      errorMessage =
-        'The metric configuration is invalid. Please check that all required fields are provided and properly formatted.';
+      // Return the actual Zod validation errors for better debugging
+      const issues = error.issues
+        .map((issue) => {
+          const path = issue.path.length > 0 ? ` at path '${issue.path.join('.')}'` : '';
+          return `${issue.message}${path}`;
+        })
+        .join('; ');
+      errorMessage = `The metric configuration is invalid: ${issues}`;
     } else if (error instanceof Error) {
       if (error.message.includes('YAMLParseError')) {
         errorMessage = 'The YAML format is incorrect. Please check the syntax and indentation.';
@@ -1357,7 +1365,7 @@ export function parseStreamingArgs(
 
         try {
           // Try to parse the array content by adding closing bracket
-          const testArray = '[' + arrayContent + ']';
+          const testArray = `[${arrayContent}]`;
           const parsed = JSON.parse(testArray);
           return { files: parsed };
         } catch {
@@ -1417,11 +1425,11 @@ export function parseStreamingArgs(
       }
 
       return null;
-    } else {
-      // Unexpected error - re-throw with context
-      throw new Error(
-        `Unexpected error in parseStreamingArgs: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
     }
+
+    // Unexpected error - re-throw with context
+    throw new Error(
+      `Unexpected error in parseStreamingArgs: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }

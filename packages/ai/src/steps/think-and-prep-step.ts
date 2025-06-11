@@ -7,6 +7,7 @@ import { thinkAndPrepAgent } from '../agents/think-and-prep-agent/think-and-prep
 import { parseStreamingArgs as parseRespondWithoutAnalysisArgs } from '../tools/communication-tools/respond-without-analysis';
 import { parseStreamingArgs as parseSequentialThinkingArgs } from '../tools/planning-thinking-tools/sequential-thinking-tool';
 import { saveConversationHistoryFromStep } from '../utils/database/saveConversationHistory';
+import { retryableAgentStream } from '../utils/retry';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
 import { ToolArgsParser } from '../utils/streaming';
 import type {
@@ -22,19 +23,12 @@ const inputSchema = z.object({
   'extract-values-search': extractValuesSearchOutputSchema,
   'generate-chat-title': generateChatTitleOutputSchema,
 });
-
-import { handleInvalidToolCall } from '../utils/handle-invalid-tools/handle-invalid-tool-call';
-import { handleInvalidToolError } from '../utils/handle-invalid-tools/handle-invalid-tool-error';
 import {
   extractMessageHistory,
   getAllToolsUsed,
   getLastToolUsed,
 } from '../utils/memory/message-history';
-import { createTodoToolCallMessage, createTodoToolResultMessage } from '../utils/memory/todos-to-messages';
-import {
-  createTodoToolCallMessage,
-  createTodoToolResultMessage,
-} from '../utils/memory/todos-to-messages';
+import { createTodoToolCallMessage } from '../utils/memory/todos-to-messages';
 import {
   type MessageHistory,
   type StepFinishData,
@@ -97,9 +91,9 @@ const handleThinkAndPrepStepFinish = async ({
         finished = true;
       }
 
-      // Add a small delay to ensure any pending tool call repairs complete
-      // before aborting the stream
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      // Add a delay to ensure any pending tool call repairs and stream processing complete
+      // before aborting the stream. This prevents race conditions with ongoing chunk processing.
+      await new Promise((resolve) => setTimeout(resolve, 250));
 
       shouldAbort = true;
 
@@ -126,19 +120,36 @@ const handleThinkAndPrepStepFinish = async ({
 // Helper function to process stream chunks
 const processStreamChunks = async <T extends ToolSet>(
   stream: StreamTextResult<T, unknown>,
-  toolArgsParser: ToolArgsParser
+  toolArgsParser: ToolArgsParser,
+  abortController: AbortController
 ): Promise<void> => {
-  for await (const chunk of stream.fullStream) {
-    try {
-      if (chunk.type === 'tool-call-streaming-start' || chunk.type === 'tool-call-delta') {
-        const streamingResult = toolArgsParser.processChunk(chunk);
-        if (streamingResult) {
-          // TODO: Emit streaming result for real-time UI updates
-        }
+  try {
+    for await (const chunk of stream.fullStream) {
+      // Check if we should abort before processing each chunk
+      if (abortController.signal.aborted) {
+        break;
       }
-    } catch {
-      // Continue processing other chunks
+
+      try {
+        if (chunk.type === 'tool-call-streaming-start' || chunk.type === 'tool-call-delta') {
+          const streamingResult = toolArgsParser.processChunk(chunk);
+          if (streamingResult) {
+            // TODO: Emit streaming result for real-time UI updates
+          }
+        }
+      } catch (chunkError) {
+        // Log individual chunk processing errors but continue with other chunks
+        console.error('Error processing individual stream chunk:', chunkError);
+      }
     }
+  } catch (streamError) {
+    // Handle AbortError gracefully - this is expected when the stream is intentionally aborted
+    if (streamError instanceof Error && streamError.name === 'AbortError') {
+      // Stream was intentionally aborted, this is normal behavior
+      return;
+    }
+    // Log other stream processing errors but don't throw to avoid breaking the workflow
+    console.error('Error processing stream chunks in think-and-prep step:', streamError);
   }
 };
 
@@ -204,43 +215,48 @@ const thinkAndPrepExecution = async ({
       baseMessages = standardizeMessages(inputPrompt);
     }
 
-    // DEBUG: Log the messages being prepared for think-and-prep
-    console.log('THINK-AND-PREP DEBUG - Input:', {
-      inputPrompt,
-      conversationHistoryLength: conversationHistory.length,
-      conversationHistory,
-      baseMessagesLength: baseMessages.length,
-      baseMessages,
-    });
-
     // Create todo messages and inject them into the conversation history
     const todoCallMessage = createTodoToolCallMessage(todos);
-    const todoResultMessage = createTodoToolResultMessage(todos);
-    const messages = [...baseMessages, todoCallMessage, todoResultMessage];
+    const messages = [...baseMessages, todoCallMessage];
 
     const wrappedStream = wrapTraced(
       async () => {
-        const stream = await thinkAndPrepAgent.stream(messages, {
-          runtimeContext,
-          abortSignal: abortController.signal,
-          toolChoice: 'required',
-          onStepFinish: async (step: StepResult<ToolSet>) => {
-            const result = await handleThinkAndPrepStepFinish({
-              step,
-              messages,
-              runtimeContext,
-              abortController,
-            });
+        const result = await retryableAgentStream({
+          agent: thinkAndPrepAgent,
+          messages,
+          options: {
+            runtimeContext,
+            abortSignal: abortController.signal,
+            toolChoice: 'required',
+            onStepFinish: async (step: StepResult<ToolSet>) => {
+              const stepResult = await handleThinkAndPrepStepFinish({
+                step,
+                messages,
+                runtimeContext,
+                abortController,
+              });
 
-            outputMessages = result.outputMessages;
-            finished = result.finished;
-            finalStepData = result.finalStepData;
+              outputMessages = stepResult.outputMessages;
+              finished = stepResult.finished;
+              finalStepData = stepResult.finalStepData;
+            },
           },
-          onError: handleInvalidToolError,
-          experimental_repairToolCall: handleInvalidToolCall,
+          retryConfig: {
+            maxRetries: 3,
+            onRetry: (error, attemptNumber) => {
+              // Log retry attempt for debugging
+              console.error(
+                `Think and Prep retry attempt ${attemptNumber} for ${error.type} error`
+              );
+            },
+          },
         });
 
-        return stream;
+        // Update messages to include any healing messages added during retries
+        messages.length = 0;
+        messages.push(...result.conversationHistory);
+
+        return result.stream;
       },
       {
         name: 'Think and Prep',
@@ -252,7 +268,13 @@ const thinkAndPrepExecution = async ({
     toolArgsParser.registerParser('respond-without-analysis', parseRespondWithoutAnalysisArgs);
     toolArgsParser.registerParser('sequential-thinking', parseSequentialThinkingArgs);
 
-    await processStreamChunks(stream, toolArgsParser);
+    try {
+      await processStreamChunks(stream, toolArgsParser, abortController);
+    } catch (processError) {
+      // Log processing errors but continue with the conversation history we have
+      console.error('Error in processStreamChunks:', processError);
+    }
+
     return createStepResult(finished, outputMessages, finalStepData);
   } catch (error) 
     if (error instanceof Error && error.name !== 'AbortError') {

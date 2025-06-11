@@ -6,22 +6,15 @@ import { sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { DataSource } from '../../../../data-source/src/data-source';
 import type { Credentials } from '../../../../data-source/src/types/credentials';
-import {
-  type AnalystRuntimeContext,
-  analystRuntimeContextSchema,
-  credentialsSchema,
-  isError,
-  safeJsonParse,
-  secretResultSchema,
-  validateArrayAccess,
-  validateRuntimeContext,
-} from '../../utils/validation-helpers';
+import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
+import { ensureSqlLimit } from './sql-limit-helper';
 
 const executeSqlStatementInputSchema = z.object({
   statements: z.array(z.string()).describe(
     `Array of lightweight, optimized SQL statements to execute. 
       Each statement should be small and focused. 
-      All queries will be automatically limited to 25 results maximum for performance. 
+      SELECT queries without a LIMIT clause will automatically have LIMIT 25 added for performance.
+      Existing LIMIT clauses will be preserved.
       YOU MUST USE THE <SCHEMA_NAME>.<TABLE_NAME> syntax/qualifier for all table names. 
       NEVER use SELECT * - you must explicitly list the columns you want to query from the documentation provided. 
       NEVER query system tables or use 'SHOW' statements as these will fail to execute.
@@ -62,7 +55,7 @@ function processColumnValue(value: unknown, maxLength: number): unknown {
  */
 function truncateQueryResults(
   rows: Record<string, unknown>[],
-  maxLength = 25
+  maxLength = 100
 ): Record<string, unknown>[] {
   return rows.map((row) => {
     const truncatedRow: Record<string, unknown> = {};
@@ -313,9 +306,12 @@ async function executeSingleStatement(
       return { success: false, error: 'SQL statement cannot be empty' };
     }
 
+    // Ensure the SQL statement has a LIMIT clause to prevent excessive results
+    const limitedSql = ensureSqlLimit(sqlStatement, 25);
+
     // Execute the SQL query using the DataSource
     const result = await dataSource.execute({
-      sql: sqlStatement,
+      sql: limitedSql,
     });
 
     if (result.success) {
@@ -340,7 +336,7 @@ async function executeSingleStatement(
 export const executeSql = createTool({
   id: 'execute-sql',
   description:
-    'Use this to run lightweight, validation queries to understand values in columns, date ranges, etc. Will only ever return 25 results max. You must use the <SCHEMA_NAME>.<TABLE_NAME> syntax/qualifier for all table names. Otherwise the queries wont run successfully.',
+    'Use this to run lightweight, validation queries to understand values in columns, date ranges, etc. SELECT queries without LIMIT will automatically have LIMIT 25 added. You must use the <SCHEMA_NAME>.<TABLE_NAME> syntax/qualifier for all table names. Otherwise the queries wont run successfully.',
   inputSchema: executeSqlStatementInputSchema,
   outputSchema: executeSqlStatementOutputSchema,
   execute: async ({
