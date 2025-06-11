@@ -40,6 +40,27 @@ export const handleInvalidToolError = async (event: { error: unknown }): Promise
   }
 
   if (APICallError.isInstance(error)) {
+    const errorMessage = error.message || '';
+    const requestBody = (error as any).requestBodyValues;
+
+    // Special case: Empty messages array - this is a critical bug, not recoverable
+    if (errorMessage.includes('messages: at least one message is required')) {
+      console.error('CRITICAL BUG: Empty messages array sent to LLM provider.', {
+        error: error.message,
+        requestBody: requestBody,
+        messagesArray: requestBody?.messages,
+        messagesLength: requestBody?.messages?.length,
+        hasTools: !!requestBody?.tools,
+        toolsCount: requestBody?.tools?.length,
+        model: requestBody?.model,
+        stackTrace: error.stack,
+      });
+
+      throw new Error(
+        `Critical message flow bug: No messages provided to LLM. This suggests a problem in conversation history management or message preparation. Check the logs above for request details. Original error: ${errorMessage}`
+      );
+    }
+
     console.warn('AI SDK APICallError handled gracefully:', error);
     return; // Let the stream continue
   }

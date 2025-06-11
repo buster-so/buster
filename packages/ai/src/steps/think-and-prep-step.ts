@@ -188,10 +188,28 @@ const thinkAndPrepExecution = async ({
     const initData = await getInitData();
     const todos = inputData['create-todos'].todos;
 
-    const baseMessages =
-      initData.conversationHistory && initData.conversationHistory.length > 0
-        ? appendToConversation(initData.conversationHistory, initData.prompt)
-        : standardizeMessages(initData.prompt);
+    // Standardize messages from workflow inputs
+    const inputPrompt = initData.prompt;
+    const conversationHistory = initData.conversationHistory || [];
+
+    // Create base messages from prompt
+    let baseMessages: CoreMessage[];
+    if (conversationHistory.length > 0) {
+      // If we have conversation history, append the new prompt to it
+      baseMessages = appendToConversation(conversationHistory, inputPrompt);
+    } else {
+      // Otherwise, just use the prompt as a new conversation
+      baseMessages = standardizeMessages(inputPrompt);
+    }
+
+    // DEBUG: Log the messages being prepared for think-and-prep
+    console.log('THINK-AND-PREP DEBUG - Input:', {
+      inputPrompt,
+      conversationHistoryLength: conversationHistory.length,
+      conversationHistory,
+      baseMessagesLength: baseMessages.length,
+      baseMessages,
+    });
 
     // Create todo messages and inject them into the conversation history
     const todoCallMessage = createTodoToolCallMessage(todos);

@@ -146,6 +146,39 @@ const analystExecution = async ({
     // They are already in CoreMessage[] format
     const messages = inputData.outputMessages;
 
+    // DEBUG: Log the messages array to identify empty array source
+    console.log('ANALYST STEP DEBUG:', {
+      messagesLength: messages?.length || 0,
+      messages: messages,
+      inputData: {
+        conversationHistory: inputData.conversationHistory?.length || 0,
+        outputMessages: inputData.outputMessages?.length || 0,
+        finished: inputData.finished,
+        stepData: !!inputData.stepData,
+        metadata: inputData.metadata,
+      },
+    });
+
+    // Critical check: Ensure messages array is not empty
+    if (!messages || messages.length === 0) {
+      console.error('CRITICAL: Empty messages array detected in analyst step', {
+        inputData,
+        messagesType: typeof messages,
+        isArray: Array.isArray(messages),
+      });
+
+      // Try to use conversationHistory as fallback
+      const fallbackMessages = inputData.conversationHistory;
+      if (fallbackMessages && Array.isArray(fallbackMessages) && fallbackMessages.length > 0) {
+        console.warn('Using conversationHistory as fallback for empty outputMessages');
+        // Use fallback but continue with debugging
+      } else {
+        throw new Error(
+          'Critical error: No valid messages found in analyst step input. Both outputMessages and conversationHistory are empty.'
+        );
+      }
+    }
+
     const wrappedStream = wrapTraced(
       async () => {
         const stream = await analystAgent.stream(messages, {
