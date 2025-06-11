@@ -7,10 +7,9 @@ export type MessageHistory = CoreMessage[];
 
 // Zod schema for validation - using passthrough to preserve the original type
 // This validates the structure without changing the type
-export const MessageHistorySchema = z.custom<CoreMessage[]>(
-  (val) => Array.isArray(val),
-  { message: 'Must be an array of messages' }
-);
+export const MessageHistorySchema = z.custom<CoreMessage[]>((val) => Array.isArray(val), {
+  message: 'Must be an array of messages',
+});
 
 // Schema for reasoning details
 const ReasoningDetailSchema = z.object({
@@ -62,10 +61,14 @@ const RequestMetadataSchema = z.object({
   messages: MessageHistorySchema,
   temperature: z.number().optional(),
   maxTokens: z.number().optional(),
-  tools: z.array(z.object({
-    name: z.string(),
-    description: z.string().optional(),
-  })).optional(),
+  tools: z
+    .array(
+      z.object({
+        name: z.string(),
+        description: z.string().optional(),
+      })
+    )
+    .optional(),
 });
 
 // Schema for response headers

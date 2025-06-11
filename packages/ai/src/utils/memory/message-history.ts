@@ -4,7 +4,7 @@ import { isAssistantMessage } from './types';
 
 /**
  * @deprecated Use properlyInterleaveMessages instead for better tool call/result pairing
- * 
+ *
  * Unbundles messages that have tool calls bundled with assistant messages
  * into separate assistant and tool messages following the expected structure.
  *
@@ -51,7 +51,7 @@ export function unbundleMessages(messages: CoreMessage[]): CoreMessage[] {
           };
           // Add ID if the original message has one
           if ('id' in message && message.id) {
-            (newMessage as any).id = toolCall.toolCallId || message.id;
+            Object.assign(newMessage, { id: toolCall.toolCallId || message.id });
           }
           unbundled.push(newMessage);
         }
@@ -71,14 +71,14 @@ export function unbundleMessages(messages: CoreMessage[]): CoreMessage[] {
 /**
  * Properly interleaves tool calls with their corresponding tool results
  * Ensures messages follow the pattern: assistant(tool) -> tool result -> assistant(tool) -> tool result
- * 
+ *
  * @param messages - Messages that may have bundled tool calls
  * @returns Messages in proper sequential order
  */
 export function properlyInterleaveMessages(messages: CoreMessage[]): CoreMessage[] {
   const result: CoreMessage[] = [];
   const toolResultsMap = new Map<string, CoreMessage>();
-  
+
   // First pass: collect all tool results indexed by toolCallId
   for (const message of messages) {
     if (message.role === 'tool' && Array.isArray(message.content)) {
@@ -89,7 +89,7 @@ export function properlyInterleaveMessages(messages: CoreMessage[]): CoreMessage
       }
     }
   }
-  
+
   // Second pass: process messages and interleave properly
   for (const message of messages) {
     if (message.role === 'assistant' && Array.isArray(message.content)) {
@@ -97,23 +97,24 @@ export function properlyInterleaveMessages(messages: CoreMessage[]): CoreMessage
       const toolCalls = message.content.filter(
         (item) => typeof item === 'object' && 'type' in item && item.type === 'tool-call'
       );
-      
+
       if (toolCalls.length > 0) {
         // This message has tool calls - we need to split them
         const nonToolContent = message.content.filter(
           (item) => !(typeof item === 'object' && 'type' in item && item.type === 'tool-call')
         );
-        
+
         // Add non-tool content first if any
         if (nonToolContent.length > 0) {
           result.push({
             ...message,
-            content: nonToolContent.length === 1 && typeof nonToolContent[0] === 'string' 
-              ? nonToolContent[0] 
-              : nonToolContent,
+            content:
+              nonToolContent.length === 1 && typeof nonToolContent[0] === 'string'
+                ? nonToolContent[0]
+                : nonToolContent,
           });
         }
-        
+
         // Add each tool call followed by its result
         for (const toolCall of toolCalls) {
           // Add the tool call as a separate assistant message
@@ -123,10 +124,10 @@ export function properlyInterleaveMessages(messages: CoreMessage[]): CoreMessage
           };
           // Add ID if needed
           if ('id' in message && message.id) {
-            (toolCallMessage as any).id = toolCall.toolCallId || message.id;
+            Object.assign(toolCallMessage, { id: toolCall.toolCallId || message.id });
           }
           result.push(toolCallMessage);
-          
+
           // Find and add the corresponding tool result immediately after
           const toolResult = toolResultsMap.get(toolCall.toolCallId);
           if (toolResult) {
@@ -145,12 +146,12 @@ export function properlyInterleaveMessages(messages: CoreMessage[]): CoreMessage
     }
     // Tool results are added inline with their calls, so skip them here
   }
-  
+
   // Add any orphaned tool results at the end (shouldn't happen in practice)
   for (const toolResult of toolResultsMap.values()) {
     result.push(toolResult);
   }
-  
+
   return result;
 }
 
@@ -158,30 +159,29 @@ export function properlyInterleaveMessages(messages: CoreMessage[]): CoreMessage
  * Extract and validate message history from step response
  * If messages are bundled, properly interleaves them
  */
-export function extractMessageHistory(stepMessages: any[]): MessageHistory {
+export function extractMessageHistory(stepMessages: CoreMessage[]): MessageHistory {
   // Validate it's an array
   if (!Array.isArray(stepMessages)) {
-    console.error('Invalid message history format: not an array');
     return [];
   }
 
   // Check if messages need interleaving
-  const messages = stepMessages as CoreMessage[];
-  
+  const messages = stepMessages;
+
   // Detect if we have bundled tool calls (multiple tool calls in one assistant message
   // followed by multiple tool results)
   let needsInterleaving = false;
-  
+
   for (let i = 0; i < messages.length - 1; i++) {
     const current = messages[i];
     const next = messages[i + 1];
-    
+
     // Check if we have an assistant message with multiple tool calls
     if (current && current.role === 'assistant' && Array.isArray(current.content)) {
       const toolCallCount = current.content.filter(
         (item) => typeof item === 'object' && 'type' in item && item.type === 'tool-call'
       ).length;
-      
+
       // If we have multiple tool calls followed by a tool result, we need interleaving
       if (toolCallCount > 1 && next?.role === 'tool') {
         needsInterleaving = true;
@@ -189,12 +189,12 @@ export function extractMessageHistory(stepMessages: any[]): MessageHistory {
       }
     }
   }
-  
+
   // If messages are bundled, interleave them properly
   if (needsInterleaving) {
     return properlyInterleaveMessages(messages);
   }
-  
+
   // Otherwise return as-is - they're already properly formatted
   return messages;
 }
@@ -286,13 +286,13 @@ export function formatMessagesForAnalyst(
 export function extractToolArguments(
   message: CoreMessage,
   toolName: string
-): Record<string, any> | null {
+): Record<string, unknown> | null {
   if (!isAssistantMessage(message) || !Array.isArray(message.content)) {
     return null;
   }
 
   const toolCall = message.content.find(
-    (item): any =>
+    (item) =>
       typeof item === 'object' &&
       'type' in item &&
       item.type === 'tool-call' &&
@@ -300,7 +300,11 @@ export function extractToolArguments(
       item.toolName === toolName
   );
 
-  return toolCall && 'args' in toolCall ? (toolCall.args as Record<string, any>) : null;
+  if (toolCall && typeof toolCall === 'object' && 'args' in toolCall) {
+    return toolCall.args as Record<string, unknown>;
+  }
+
+  return null;
 }
 
 /**

@@ -49,8 +49,12 @@ const handleAnalystStepFinish = async ({
   inputData: z.infer<typeof inputSchema>;
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }) => {
+  // Check if doneTool was called but don't abort here - let the natural flow handle it
+  const toolNames = step.toolCalls.map((call) => call.toolName);
+
   // Save complete conversation history to database before any abort (think-and-prep + analyst messages)
   const analystResponseMessages = step.response.messages as CoreMessage[];
+
   const completeConversationHistory = [
     ...(inputData.outputMessages as CoreMessage[]),
     ...analystResponseMessages,
@@ -61,20 +65,15 @@ const handleAnalystStepFinish = async ({
   if (messageId) {
     try {
       await saveConversationHistoryFromStep(messageId, completeConversationHistory);
-    } catch (error) {
-      console.error('Failed to save analyst conversation history:', error);
+    } catch {
       // Continue without aborting - let the natural flow handle completion
     }
   }
 
-  // Check if doneTool was called but don't abort here - let the main stream loop handle it
-  const toolNames = step.toolCalls.map((call) => call.toolName);
+  // Check if doneTool was called
   const shouldAbort = toolNames.includes('doneTool');
 
-  // Log for debugging but don't abort - this was causing race conditions
-  if (shouldAbort) {
-    console.log('Done tool detected, allowing natural completion');
-  }
+  // Don't abort here - let the main stream loop handle it
 
   return {
     completeConversationHistory,

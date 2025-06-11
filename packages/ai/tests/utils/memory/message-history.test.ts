@@ -153,7 +153,14 @@ describe('Message History Utilities', () => {
         },
         {
           role: 'tool',
-          content: [{ type: 'tool-result', result: {}, toolName: 'sequentialThinking', toolCallId: 'tool-1' }],
+          content: [
+            {
+              type: 'tool-result',
+              result: {},
+              toolName: 'sequentialThinking',
+              toolCallId: 'tool-1',
+            },
+          ],
         },
         {
           role: 'assistant',
@@ -168,7 +175,9 @@ describe('Message History Utilities', () => {
         },
         {
           role: 'tool',
-          content: [{ type: 'tool-result', result: {}, toolName: 'submitThoughts', toolCallId: 'tool-2' }],
+          content: [
+            { type: 'tool-result', result: {}, toolName: 'submitThoughts', toolCallId: 'tool-2' },
+          ],
         },
       ];
 
@@ -191,7 +200,14 @@ describe('Message History Utilities', () => {
         },
         {
           role: 'tool',
-          content: [{ type: 'tool-result', result: {}, toolName: 'searchDataCatalog', toolCallId: 'tool-1' }],
+          content: [
+            {
+              type: 'tool-result',
+              result: {},
+              toolName: 'searchDataCatalog',
+              toolCallId: 'tool-1',
+            },
+          ],
         },
         {
           role: 'assistant',
@@ -206,7 +222,9 @@ describe('Message History Utilities', () => {
         },
         {
           role: 'tool',
-          content: [{ type: 'tool-result', result: {}, toolName: 'analyzeData', toolCallId: 'tool-2' }],
+          content: [
+            { type: 'tool-result', result: {}, toolName: 'analyzeData', toolCallId: 'tool-2' },
+          ],
         },
         {
           role: 'assistant',
@@ -339,7 +357,8 @@ describe('Message History Utilities', () => {
               toolCallId: 'toolu_01LmHSAwa8MeggWntV8gE1fG',
               toolName: 'sequentialThinking',
               args: {
-                thought: 'I need to address the TODO list items for this user request about finding their top customer...',
+                thought:
+                  'I need to address the TODO list items for this user request about finding their top customer...',
                 isRevision: false,
                 thoughtNumber: 1,
                 totalThoughts: 2,
@@ -402,9 +421,9 @@ describe('Message History Utilities', () => {
               toolName: 'executeSql',
               args: {
                 statements: [
-                  'SELECT table_name FROM information_schema.tables WHERE table_schema = \'public\' LIMIT 25',
-                  'SELECT column_name, data_type FROM information_schema.columns WHERE table_name LIKE \'%customer%\' LIMIT 25',
-                  'SELECT column_name, data_type FROM information_schema.columns WHERE table_name LIKE \'%order%\' LIMIT 25',
+                  "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' LIMIT 25",
+                  "SELECT column_name, data_type FROM information_schema.columns WHERE table_name LIKE '%customer%' LIMIT 25",
+                  "SELECT column_name, data_type FROM information_schema.columns WHERE table_name LIKE '%order%' LIMIT 25",
                 ],
               },
             },
@@ -416,7 +435,11 @@ describe('Message History Utilities', () => {
           content: [
             {
               type: 'tool-result',
-              result: { results: [/* ... */] },
+              result: {
+                results: [
+                  /* ... */
+                ],
+              },
               toolName: 'executeSql',
               toolCallId: 'toolu_01QtPVf5tYPydXeXWGoCKbpH',
             },
@@ -441,17 +464,21 @@ describe('Message History Utilities', () => {
       expect(extracted[6].role).toBe('tool');
 
       // Verify tool calls and results are properly paired
-      const toolCallIds = ['toolu_01LmHSAwa8MeggWntV8gE1fG', 'toolu_015T6fk9RhcJ9AuCYDtdsQba', 'toolu_01QtPVf5tYPydXeXWGoCKbpH'];
-      
+      const toolCallIds = [
+        'toolu_01LmHSAwa8MeggWntV8gE1fG',
+        'toolu_015T6fk9RhcJ9AuCYDtdsQba',
+        'toolu_01QtPVf5tYPydXeXWGoCKbpH',
+      ];
+
       for (let i = 0; i < toolCallIds.length; i++) {
-        const assistantIdx = 1 + (i * 2);
-        const toolIdx = 2 + (i * 2);
-        
+        const assistantIdx = 1 + i * 2;
+        const toolIdx = 2 + i * 2;
+
         // Get tool call ID from assistant message
         const assistantContent = extracted[assistantIdx].content as any[];
         const toolCall = assistantContent[0];
         expect(toolCall.toolCallId).toBe(toolCallIds[i]);
-        
+
         // Verify matching tool result
         const toolContent = extracted[toolIdx].content as any[];
         const toolResult = toolContent[0];
@@ -526,10 +553,10 @@ describe('Message History Utilities', () => {
 
       // extractMessageHistory should now fix the bundling
       const extracted = extractMessageHistory(bundledMessages);
-      
+
       // Should have been properly interleaved
       expect(extracted).toHaveLength(7); // user + 3*(assistant + tool)
-      
+
       // Verify the sequential pattern
       expect(extracted[0].role).toBe('user');
       expect(extracted[1].role).toBe('assistant');
@@ -538,14 +565,14 @@ describe('Message History Utilities', () => {
       expect(extracted[4].role).toBe('tool');
       expect(extracted[5].role).toBe('assistant');
       expect(extracted[6].role).toBe('tool');
-      
+
       // Verify each assistant message has only one tool call
       expect(extracted[1].content).toHaveLength(1);
       expect(extracted[1].content[0].toolCallId).toBe('toolu_1');
-      
+
       expect(extracted[3].content).toHaveLength(1);
       expect(extracted[3].content[0].toolCallId).toBe('toolu_2');
-      
+
       expect(extracted[5].content).toHaveLength(1);
       expect(extracted[5].content[0].toolCallId).toBe('toolu_3');
     });
@@ -610,7 +637,9 @@ describe('Message History Utilities', () => {
 
       expect(interleaved).toHaveLength(5);
       expect(interleaved[0].role).toBe('assistant');
-      expect(interleaved[0].content).toEqual([{ type: 'text', text: 'Let me help you with that.' }]);
+      expect(interleaved[0].content).toEqual([
+        { type: 'text', text: 'Let me help you with that.' },
+      ]);
       expect(interleaved[1].role).toBe('assistant');
       expect(interleaved[1].content[0].toolCallId).toBe('id1');
       expect(interleaved[2].role).toBe('tool');
@@ -631,7 +660,14 @@ describe('Message History Utilities', () => {
         },
         {
           role: 'tool',
-          content: [{ type: 'tool-result', toolCallId: 't1', toolName: 'sql', result: { revenue: 1000000 } }],
+          content: [
+            {
+              type: 'tool-result',
+              toolCallId: 't1',
+              toolName: 'sql',
+              result: { revenue: 1000000 },
+            },
+          ],
         },
         {
           role: 'assistant',
@@ -647,7 +683,9 @@ describe('Message History Utilities', () => {
         },
         {
           role: 'tool',
-          content: [{ type: 'tool-result', toolCallId: 't2', toolName: 'sql', result: { profit: 200000 } }],
+          content: [
+            { type: 'tool-result', toolCallId: 't2', toolName: 'sql', result: { profit: 200000 } },
+          ],
         },
       ];
 
@@ -766,7 +804,7 @@ describe('Message History Utilities', () => {
       // Verify extraction preserves the structure (but may add IDs)
       const extracted = extractMessageHistory(conversation);
       expect(extracted).toHaveLength(8);
-      
+
       // Check the roles and structure are preserved
       for (let i = 0; i < conversation.length; i++) {
         expect(extracted[i].role).toBe(conversation[i].role);

@@ -101,7 +101,7 @@ describe('Workflow Message Flow', () => {
 
     // Should have all messages in correct order
     expect(completeHistory).toHaveLength(7);
-    
+
     // Verify the pattern
     expect(completeHistory[0].role).toBe('user');
     expect(completeHistory[1].role).toBe('assistant');
@@ -118,9 +118,7 @@ describe('Workflow Message Flow', () => {
       { role: 'user', content: 'Who is my top customer?' },
       {
         role: 'assistant',
-        content: [
-          { type: 'tool-call', toolCallId: 't1', toolName: 'sql', args: {} },
-        ],
+        content: [{ type: 'tool-call', toolCallId: 't1', toolName: 'sql', args: {} }],
       },
       {
         role: 'tool',
@@ -136,7 +134,7 @@ describe('Workflow Message Flow', () => {
 
     // User asks follow-up
     const followUpPrompt = 'What about their revenue?';
-    
+
     // Build messages for new workflow run
     const messagesWithHistory: CoreMessage[] = [
       ...firstConversation,
@@ -184,9 +182,9 @@ describe('Workflow Message Flow', () => {
 
     // Should be properly interleaved
     expect(fixed).toHaveLength(7);
-    
+
     // Check sequential pattern
-    const roles = fixed.map(m => m.role);
+    const roles = fixed.map((m) => m.role);
     expect(roles).toEqual(['user', 'assistant', 'tool', 'assistant', 'tool', 'assistant', 'tool']);
 
     // Verify tool calls are properly paired with results
@@ -209,18 +207,14 @@ describe('Workflow Message Flow', () => {
       {
         id: 'unique-id-123',
         role: 'assistant',
-        content: [
-          { type: 'tool-call', toolCallId: 'tool-id', toolName: 'test', args: {} },
-        ],
+        content: [{ type: 'tool-call', toolCallId: 'tool-id', toolName: 'test', args: {} }],
         // @ts-ignore - additional metadata
         model: 'claude-3',
       },
       {
         id: 'tool-result-id',
         role: 'tool',
-        content: [
-          { type: 'tool-result', toolCallId: 'tool-id', toolName: 'test', result: {} },
-        ],
+        content: [{ type: 'tool-result', toolCallId: 'tool-id', toolName: 'test', result: {} }],
       },
     ];
 

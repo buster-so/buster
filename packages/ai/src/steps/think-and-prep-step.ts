@@ -77,8 +77,7 @@ const handleThinkAndPrepStepFinish = async ({
         // Save conversation history to database before aborting
         try {
           await saveConversationHistoryFromStep(messageId, outputMessages);
-        } catch (error) {
-          console.error('Failed to save think-and-prep conversation history:', error);
+        } catch {
           // Continue with abort even if save fails to avoid hanging
         }
       }
@@ -102,12 +101,10 @@ const handleThinkAndPrepStepFinish = async ({
       // Use a try-catch around abort to handle any potential errors
       try {
         abortController.abort();
-      } catch (abortError) {
-        console.warn('Error during abort controller signal:', abortError);
+      } catch {
         // Continue execution even if abort fails
       }
-    } catch (error) {
-      console.error('Error in handleThinkAndPrepStepFinish:', error);
+    } catch {
       // Don't abort on error to prevent hanging
       shouldAbort = false;
     }
@@ -122,7 +119,12 @@ const handleThinkAndPrepStepFinish = async ({
 };
 
 // Helper function to process stream chunks
-const processStreamChunks = async (stream: any, toolArgsParser: ToolArgsParser): Promise<void> => {
+const processStreamChunks = async (
+  stream: {
+    fullStream: AsyncIterable<{ type: string; [key: string]: unknown }>;
+  },
+  toolArgsParser: ToolArgsParser
+): Promise<void> => {
   for await (const chunk of stream.fullStream) {
     try {
       if (chunk.type === 'tool-call-streaming-start' || chunk.type === 'tool-call-delta') {
@@ -131,8 +133,8 @@ const processStreamChunks = async (stream: any, toolArgsParser: ToolArgsParser):
           // TODO: Emit streaming result for real-time UI updates
         }
       }
-    } catch (chunkError) {
-      console.warn('Error processing stream chunk:', chunkError);
+    } catch {
+      // Continue processing other chunks
     }
   }
 };
