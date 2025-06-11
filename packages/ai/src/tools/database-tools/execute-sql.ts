@@ -53,7 +53,7 @@ function processColumnValue(value: unknown, maxLength: number): unknown {
  */
 function truncateQueryResults(
   rows: Record<string, unknown>[],
-  maxLength = 25
+  maxLength = 100
 ): Record<string, unknown>[] {
   return rows.map((row) => {
     const truncatedRow: Record<string, unknown> = {};
