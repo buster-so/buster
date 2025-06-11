@@ -1,15 +1,37 @@
 export const getElectricShapeUrl = (requestUrl: string) => {
   const url = new URL(requestUrl);
 
-  // Construct the upstream URL
-  const originUrl = new URL(`${process.env.ELECTRIC_URL || 'http://localhost:3000'}/v1/shape`);
+  const electricUrl = process.env.ELECTRIC_URL;
+
+  if (!electricUrl) {
+    throw new Error('ELECTRIC_URL is not set');
+  }
+
+  const baseUrl =
+    electricUrl && electricUrl !== 'undefined' ? electricUrl : 'http://localhost:3000';
+
+  // Parse the base URL and replace the path with /v1/shape
+  const baseUrlObj = new URL(baseUrl);
+  baseUrlObj.pathname = '/v1/shape';
+  const originUrl = new URL(baseUrlObj.toString());
 
   // Copy over the relevant query params that the Electric client adds
   // so that we return the right part of the Shape log.
+  const validParams = [
+    'live',
+    'table',
+    'handle',
+    'offset',
+    'cursor',
+    'where',
+    'params',
+    'columns',
+    'replica',
+    'secret',
+  ];
+
   url.searchParams.forEach((value, key) => {
-    if (
-      ['live', 'table', 'handle', 'offset', 'cursor', 'where', 'params', 'columns', 'replica', 'secret'].includes(key)
-    ) {
+    if (validParams.includes(key)) {
       originUrl.searchParams.set(key, value);
     }
   });
@@ -33,7 +55,7 @@ export const createProxiedResponse = async (url: URL) => {
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
-    headers
+    headers,
   });
 };
 
@@ -43,7 +65,7 @@ export const createProxiedResponse = async (url: URL) => {
  * @param paramName - The parameter name to extract (e.g., 'chatId', 'userId')
  * @returns The parameter value or null if not found
  */
-export const extractParamFromWhere = (url: URL, paramName: string): string[] | null => {
+export const extractParamFromWhere = (url: URL, paramName: string): string | null => {
   const whereClause = url.searchParams.get('where');
 
   if (!whereClause) {
@@ -54,5 +76,5 @@ export const extractParamFromWhere = (url: URL, paramName: string): string[] | n
   const regex = new RegExp(`${paramName}=['"]([^'"]+)['"]`);
   const match = whereClause.match(regex);
 
-  return match ? match : null;
+  return match?.[1] ? match[1] : null;
 };

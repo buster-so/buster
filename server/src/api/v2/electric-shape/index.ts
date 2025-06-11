@@ -1,21 +1,20 @@
-import { requireAuth } from '../../../middleware/auth';
+import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
+import { z } from 'zod';
+import { requireAuth } from '../../../middleware/auth';
+import { errorResponse } from '../../../utils/response';
+import { getUserIdFromContext } from '../../../utils/users';
 import { createProxiedResponse, getElectricShapeUrl } from './_helpers';
 import proxyRouter from './_proxyRouterConfig';
-import { getUserIdFromContext } from '../../../utils/users';
-import { errorResponse } from '../../../utils/response';
-import { z } from 'zod';
-import { zValidator } from '@hono/zod-validator';
 
 const electricShapeSchema = z.object({
-  table: z.string()
+  table: z.string(),
 });
 
 const app = new Hono()
   .use('*', requireAuth)
-  .get('/', zValidator('query', electricShapeSchema))
   // GET route for Electric SQL proxy
-  .get('/', async (c) => {
+  .get('/', zValidator('query', electricShapeSchema), async (c) => {
     const url = getElectricShapeUrl(c.req.url);
     const table = url.searchParams.get('table');
     const userId = getUserIdFromContext(c);
@@ -25,7 +24,7 @@ const app = new Hono()
     if (!proxy) {
       return c.json(
         {
-          error: `The requested table '${table}' is not available for Electric Shape processing. Please check the table name and try again.`
+          error: `The requested table '${table}' is not available for Electric Shape processing. Please check the table name and try again.`,
         },
         404
       );
