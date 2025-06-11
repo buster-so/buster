@@ -60,11 +60,7 @@ const analystWorkflow = createWorkflow({
 })
   .parallel([generateChatTitleStep, extractValuesSearchStep, createTodosStep])
   .then(thinkAndPrepStep)
-  .branch([
-    // Only run analystStep if thinkAndPrepStep returned finished: false
-    [async ({ inputData }) => inputData.finished === false, analystStep],
-  ])
-  // Always run format-output-step to standardize the output
+  .then(analystStep) // Always run analyst step - it will pass through if finished
   .then(formatOutputStep)
   .commit();
 

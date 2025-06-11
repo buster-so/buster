@@ -120,6 +120,17 @@ const analystExecution = async ({
   getInitData: () => Promise<z.infer<typeof thinkAndPrepWorkflowInputSchema>>;
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof outputSchema>> => {
+  // Check if think-and-prep already finished - if so, pass through
+  if (inputData.finished === true) {
+    return {
+      conversationHistory: inputData.conversationHistory || inputData.outputMessages,
+      finished: true,
+      outputMessages: inputData.outputMessages,
+      stepData: inputData.stepData,
+      metadata: inputData.metadata,
+    };
+  }
+
   const abortController = new AbortController();
   let completeConversationHistory: CoreMessage[] = [];
 
