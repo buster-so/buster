@@ -9,37 +9,15 @@ import type { CoreMessage } from 'ai';
  */
 export function createTodoToolCallMessage(todos: string): CoreMessage {
   return {
-    role: 'assistant',
+    role: 'user',
     content: [
       {
-        type: 'tool-call',
-        toolCallId: 'create-todos-call',
-        toolName: 'createToDos',
-        args: { todos },
+        type: 'text',
+        text: `<todo_list>
+        - Below are the items on your TODO list:
+        ${todos}
+        </todo_list>`,
       },
     ],
   };
-}
-
-/**
- * Creates a tool result message for the todo creation
- * This represents the response to the tool call
- *
- * @param todos - The markdown-formatted todo list (not used in result, just for consistency)
- * @returns CoreMessage with tool role containing a simple acknowledgment
- */
-export function createTodoToolResultMessage(todos: string): CoreMessage {
-  return {
-    role: 'tool',
-    content: [
-      {
-        type: 'tool-result',
-        toolCallId: 'create-todos-call',
-        toolName: 'createToDos',
-        result: {
-          success: true,
-        },
-      },
-    ],
-  } as CoreMessage;
 }

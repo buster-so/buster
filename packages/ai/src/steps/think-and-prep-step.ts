@@ -29,10 +29,7 @@ import {
   getAllToolsUsed,
   getLastToolUsed,
 } from '../utils/memory/message-history';
-import {
-  createTodoToolCallMessage,
-  createTodoToolResultMessage,
-} from '../utils/memory/todos-to-messages';
+import { createTodoToolCallMessage } from '../utils/memory/todos-to-messages';
 import {
   type MessageHistory,
   type StepFinishData,
@@ -207,19 +204,9 @@ const thinkAndPrepExecution = async ({
       baseMessages = standardizeMessages(inputPrompt);
     }
 
-    // DEBUG: Log the messages being prepared for think-and-prep
-    console.log('THINK-AND-PREP DEBUG - Input:', {
-      inputPrompt,
-      conversationHistoryLength: conversationHistory.length,
-      conversationHistory,
-      baseMessagesLength: baseMessages.length,
-      baseMessages,
-    });
-
     // Create todo messages and inject them into the conversation history
     const todoCallMessage = createTodoToolCallMessage(todos);
-    const todoResultMessage = createTodoToolResultMessage(todos);
-    const messages = [...baseMessages, todoCallMessage, todoResultMessage];
+    const messages = [...baseMessages, todoCallMessage];
 
     const wrappedStream = wrapTraced(
       async () => {
