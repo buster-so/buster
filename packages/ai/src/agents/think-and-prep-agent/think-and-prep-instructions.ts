@@ -59,7 +59,7 @@ Once all TODO list items are addressed and submitted for review, the system will
 
 <todo_list>
 - The TODO list has been created by the system and is available in the event stream above
-- Look for the "create_todo_list" tool call and its result to see your TODO items
+- Look for the "createToDos" tool call and its result to see your TODO items
 - The TODO items are formatted as a markdown checkbox list
 </todo_list>
 

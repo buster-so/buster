@@ -13,7 +13,7 @@ export function createTodoToolCallMessage(todos: string): CoreMessage {
     content: [{
       type: 'tool-call',
       toolCallId: 'create-todos-call',
-      toolName: 'create_todo_list',
+      toolName: 'createToDos',
       args: { todos }
     }]
   };
@@ -29,8 +29,15 @@ export function createTodoToolCallMessage(todos: string): CoreMessage {
 export function createTodoToolResultMessage(todos: string): CoreMessage {
   return {
     role: 'tool',
-    content: todos,
-    toolCallId: 'create-todos-call',
-    toolName: 'create_todo_list'
-  };
+    content: [
+      {
+        type: 'tool-result',
+        toolCallId: 'create-todos-call',
+        toolName: 'createToDos',
+        result: {
+          todos: todos
+        }
+      }
+    ]
+  } as CoreMessage;
 }

@@ -20,7 +20,7 @@ describe('Todos to Message Conversion', () => {
         expect(toolCall).toMatchObject({
           type: 'tool-call',
           toolCallId: 'create-todos-call',
-          toolName: 'create_todo_list',
+          toolName: 'createToDos',
           args: { todos: sampleTodos }
         });
       }
@@ -44,18 +44,40 @@ describe('Todos to Message Conversion', () => {
       const message = createTodoToolResultMessage(sampleTodos);
 
       expect(message.role).toBe('tool');
-      expect(message.content).toBe(sampleTodos);
-      expect(message.toolCallId).toBe('create-todos-call');
-      expect(message.toolName).toBe('create_todo_list');
+      expect(Array.isArray(message.content)).toBe(true);
+      
+      if (Array.isArray(message.content)) {
+        expect(message.content).toHaveLength(1);
+        
+        const toolResult = message.content[0];
+        expect(toolResult).toMatchObject({
+          type: 'tool-result',
+          toolCallId: 'create-todos-call',
+          toolName: 'createToDos',
+          result: {
+            todos: sampleTodos
+          }
+        });
+      }
     });
 
     test('should handle empty todos in result', () => {
       const message = createTodoToolResultMessage('');
 
       expect(message.role).toBe('tool');
-      expect(message.content).toBe('');
-      expect(message.toolCallId).toBe('create-todos-call');
-      expect(message.toolName).toBe('create_todo_list');
+      expect(Array.isArray(message.content)).toBe(true);
+      
+      if (Array.isArray(message.content)) {
+        const toolResult = message.content[0];
+        expect(toolResult).toMatchObject({
+          type: 'tool-result',
+          toolCallId: 'create-todos-call',
+          toolName: 'createToDos',
+          result: {
+            todos: ''
+          }
+        });
+      }
     });
   });
 
@@ -65,10 +87,11 @@ describe('Todos to Message Conversion', () => {
       const resultMessage = createTodoToolResultMessage(sampleTodos);
 
       // Verify the toolCallId matches between call and result
-      if (Array.isArray(callMessage.content)) {
+      if (Array.isArray(callMessage.content) && Array.isArray(resultMessage.content)) {
         const toolCall = callMessage.content[0];
-        expect(toolCall.toolCallId).toBe(resultMessage.toolCallId);
-        expect(toolCall.toolName).toBe(resultMessage.toolName);
+        const toolResult = resultMessage.content[0];
+        expect(toolCall.toolCallId).toBe(toolResult.toolCallId);
+        expect(toolCall.toolName).toBe(toolResult.toolName);
       }
     });
   });

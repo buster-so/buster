@@ -55,7 +55,7 @@ describe('Think and Prep Step - Todos in Message History Integration', { timeout
     const todoToolCallMessage = result.outputMessages.find(
       msg => msg.role === 'assistant' && 
       Array.isArray(msg.content) &&
-      msg.content.some(c => c.type === 'tool-call' && c.toolName === 'create_todo_list')
+      msg.content.some(c => c.type === 'tool-call' && c.toolName === 'createToDos')
     );
 
     expect(todoToolCallMessage).toBeDefined();
@@ -63,7 +63,7 @@ describe('Think and Prep Step - Todos in Message History Integration', { timeout
     // Verify the tool call contains the todos
     if (todoToolCallMessage && Array.isArray(todoToolCallMessage.content)) {
       const toolCall = todoToolCallMessage.content.find(
-        c => c.type === 'tool-call' && c.toolName === 'create_todo_list'
+        c => c.type === 'tool-call' && c.toolName === 'createToDos'
       );
       
       expect(toolCall).toBeDefined();
@@ -74,12 +74,20 @@ describe('Think and Prep Step - Todos in Message History Integration', { timeout
     // Find the tool result message
     const todoResultMessage = result.outputMessages.find(
       msg => msg.role === 'tool' && 
-      msg.toolName === 'create_todo_list' &&
-      msg.toolCallId === 'create-todos-call'
+      Array.isArray(msg.content) &&
+      msg.content.some(c => c.type === 'tool-result' && c.toolName === 'createToDos')
     );
 
     expect(todoResultMessage).toBeDefined();
-    expect(todoResultMessage?.content).toBe(todos);
+    
+    // Verify the tool result contains the todos
+    if (todoResultMessage && Array.isArray(todoResultMessage.content)) {
+      const toolResult = todoResultMessage.content.find(
+        c => c.type === 'tool-result' && c.toolName === 'createToDos'
+      );
+      expect(toolResult).toBeDefined();
+      expect(toolResult.result.todos).toBe(todos);
+    }
   });
 
   test('should handle conversation history with injected todos', async () => {
@@ -133,8 +141,9 @@ describe('Think and Prep Step - Todos in Message History Integration', { timeout
     // Verify todos are injected after the conversation
     const todoMessages = result.outputMessages.filter(
       msg => (msg.role === 'assistant' && Array.isArray(msg.content) && 
-              msg.content.some(c => c.type === 'tool-call' && c.toolName === 'create_todo_list')) ||
-             (msg.role === 'tool' && msg.toolName === 'create_todo_list')
+              msg.content.some(c => c.type === 'tool-call' && c.toolName === 'createToDos')) ||
+             (msg.role === 'tool' && Array.isArray(msg.content) &&
+              msg.content.some(c => c.type === 'tool-result' && c.toolName === 'createToDos'))
     );
     
     expect(todoMessages).toHaveLength(2); // One tool call, one tool result
@@ -170,8 +179,9 @@ describe('Think and Prep Step - Todos in Message History Integration', { timeout
     // Verify empty todos are still injected
     const todoMessages = result.outputMessages.filter(
       msg => (msg.role === 'assistant' && Array.isArray(msg.content) && 
-              msg.content.some(c => c.type === 'tool-call' && c.toolName === 'create_todo_list')) ||
-             (msg.role === 'tool' && msg.toolName === 'create_todo_list')
+              msg.content.some(c => c.type === 'tool-call' && c.toolName === 'createToDos')) ||
+             (msg.role === 'tool' && Array.isArray(msg.content) &&
+              msg.content.some(c => c.type === 'tool-result' && c.toolName === 'createToDos'))
     );
     
     expect(todoMessages).toHaveLength(2);
