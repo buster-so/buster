@@ -23,7 +23,8 @@ const inputSchema = z.object({
   'generate-chat-title': generateChatTitleOutputSchema,
 });
 
-import { handleInvalidToolCall } from '../utils/handle-invalid-tool-call';
+import { handleInvalidToolCall } from '../utils/handle-invalid-tools/handle-invalid-tool-call';
+import { handleInvalidToolError } from '../utils/handle-invalid-tools/handle-invalid-tool-error';
 import {
   extractMessageHistory,
   getAllToolsUsed,
@@ -55,43 +56,61 @@ const handleThinkAndPrepStepFinish = async ({
   let finalStepData: StepFinishData | null = null;
   let shouldAbort = false;
 
-  if (
-    toolNames.some((toolName: string) =>
-      ['submitThoughts', 'respondWithoutAnalysis'].includes(toolName)
-    )
-  ) {
-    // Extract and validate messages from the step response
-    // step.response.messages contains the conversation history for this step
-    const agentResponseMessages = extractMessageHistory(step.response.messages);
+  // Add delay to prevent race conditions with tool call repairs
+  const hasFinishingTools = toolNames.some((toolName: string) =>
+    ['submitThoughts', 'respondWithoutAnalysis'].includes(toolName)
+  );
 
-    // Build complete conversation history: input messages + agent response messages
-    // This preserves the user messages along with assistant/tool responses
-    outputMessages = [...messages, ...agentResponseMessages];
+  if (hasFinishingTools) {
+    try {
+      // Extract and validate messages from the step response
+      // step.response.messages contains the conversation history for this step
+      const agentResponseMessages = extractMessageHistory(step.response.messages);
 
-    const messageId = runtimeContext.get('messageId');
+      // Build complete conversation history: input messages + agent response messages
+      // This preserves the user messages along with assistant/tool responses
+      outputMessages = [...messages, ...agentResponseMessages];
 
-    if (messageId) {
-      // Save conversation history to database before aborting
-      try {
-        await saveConversationHistoryFromStep(messageId, outputMessages);
-      } catch (error) {
-        console.error('Failed to save think-and-prep conversation history:', error);
-        // Continue with abort even if save fails to avoid hanging
+      const messageId = runtimeContext.get('messageId');
+
+      if (messageId) {
+        // Save conversation history to database before aborting
+        try {
+          await saveConversationHistoryFromStep(messageId, outputMessages);
+        } catch (error) {
+          console.error('Failed to save think-and-prep conversation history:', error);
+          // Continue with abort even if save fails to avoid hanging
+        }
       }
+
+      // Note: Could transform step data to StepFinishData format if needed in the future
+      // For now, we'll leave finalStepData as null since the types are incompatible
+      // and the step data is not critical for the workflow to function properly
+      finalStepData = null;
+
+      // Set finished to true if respondWithoutAnalysis was called
+      if (toolNames.includes('respondWithoutAnalysis')) {
+        finished = true;
+      }
+
+      // Add a small delay to ensure any pending tool call repairs complete
+      // before aborting the stream
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      shouldAbort = true;
+
+      // Use a try-catch around abort to handle any potential errors
+      try {
+        abortController.abort();
+      } catch (abortError) {
+        console.warn('Error during abort controller signal:', abortError);
+        // Continue execution even if abort fails
+      }
+    } catch (error) {
+      console.error('Error in handleThinkAndPrepStepFinish:', error);
+      // Don't abort on error to prevent hanging
+      shouldAbort = false;
     }
-
-    // Note: Could transform step data to StepFinishData format if needed in the future
-    // For now, we'll leave finalStepData as null since the types are incompatible
-    // and the step data is not critical for the workflow to function properly
-    finalStepData = null;
-
-    // Set finished to true if respondWithoutAnalysis was called
-    if (toolNames.includes('respondWithoutAnalysis')) {
-      finished = true;
-    }
-
-    shouldAbort = true;
-    abortController.abort();
   }
 
   return {
@@ -101,6 +120,43 @@ const handleThinkAndPrepStepFinish = async ({
     shouldAbort,
   };
 };
+
+// Helper function to process stream chunks
+const processStreamChunks = async (stream: any, toolArgsParser: ToolArgsParser): Promise<void> => {
+  for await (const chunk of stream.fullStream) {
+    try {
+      if (chunk.type === 'tool-call-streaming-start' || chunk.type === 'tool-call-delta') {
+        const streamingResult = toolArgsParser.processChunk(chunk);
+        if (streamingResult) {
+          // TODO: Emit streaming result for real-time UI updates
+        }
+      }
+    } catch (chunkError) {
+      console.warn('Error processing stream chunk:', chunkError);
+    }
+  }
+};
+
+// Helper function to create the result object
+const createStepResult = (
+  finished: boolean,
+  outputMessages: MessageHistory,
+  finalStepData: StepFinishData | null
+): z.infer<typeof outputSchema> => ({
+  finished,
+  outputMessages,
+  conversationHistory: outputMessages,
+  stepData: finalStepData || undefined,
+  metadata: {
+    toolsUsed: getAllToolsUsed(outputMessages),
+    finalTool: getLastToolUsed(outputMessages) as
+      | 'submitThoughts'
+      | 'respondWithoutAnalysis'
+      | undefined,
+    text: undefined,
+    reasoning: undefined,
+  },
+});
 
 const thinkAndPrepExecution = async ({
   inputData,
@@ -122,26 +178,17 @@ const thinkAndPrepExecution = async ({
     const resourceId = runtimeContext.get('userId');
 
     if (!threadId || !resourceId) {
-      console.error('Missing required context values');
       throw new Error('Missing required context values');
     }
 
     const initData = await getInitData();
-    const prompt = initData.prompt;
-    const conversationHistory = initData.conversationHistory;
     const todos = inputData['create-todos'].todos;
-
     runtimeContext.set('todos', todos);
 
-    // Prepare messages for the agent
-    let messages: CoreMessage[];
-    if (conversationHistory && conversationHistory.length > 0) {
-      // If we have history, append the new prompt to it
-      messages = appendToConversation(conversationHistory, prompt);
-    } else {
-      // Otherwise, create a new conversation with just the prompt
-      messages = standardizeMessages(prompt);
-    }
+    const messages =
+      initData.conversationHistory && initData.conversationHistory.length > 0
+        ? appendToConversation(initData.conversationHistory, initData.prompt)
+        : standardizeMessages(initData.prompt);
 
     const wrappedStream = wrapTraced(
       async () => {
@@ -161,6 +208,7 @@ const thinkAndPrepExecution = async ({
             finished = result.finished;
             finalStepData = result.finalStepData;
           },
+          onError: handleInvalidToolError,
           experimental_repairToolCall: handleInvalidToolCall,
         });
 
@@ -172,63 +220,18 @@ const thinkAndPrepExecution = async ({
     );
 
     const stream = await wrappedStream();
-
-    // Initialize the tool args parser with think-and-prep tool mappings
     const toolArgsParser = new ToolArgsParser();
     toolArgsParser.registerParser('respond-without-analysis', parseRespondWithoutAnalysisArgs);
     toolArgsParser.registerParser('sequential-thinking', parseSequentialThinkingArgs);
 
-    for await (const chunk of stream.fullStream) {
-      // Process streaming tool arguments
-      if (chunk.type === 'tool-call-streaming-start' || chunk.type === 'tool-call-delta') {
-        const streamingResult = toolArgsParser.processChunk(chunk);
-        if (streamingResult) {
-          // TODO: Emit streaming result for real-time UI updates
-          // This could be sent via WebSocket, Server-Sent Events, or other streaming mechanism
-        }
-      }
-
-      // Keep existing debug logging but make it more selective
-      if (chunk.type !== 'tool-call-delta') {
-      }
-    }
-
-    return {
-      finished,
-      outputMessages,
-      conversationHistory: outputMessages, // Include conversation history for workflow output
-      stepData: finalStepData || undefined,
-      metadata: {
-        toolsUsed: getAllToolsUsed(outputMessages),
-        finalTool: getLastToolUsed(outputMessages) as
-          | 'submitThoughts'
-          | 'respondWithoutAnalysis'
-          | undefined,
-        text: undefined,
-        reasoning: undefined,
-      },
-    };
+    await processStreamChunks(stream, toolArgsParser);
+    return createStepResult(finished, outputMessages, finalStepData);
   } catch (error) {
     if (error instanceof Error && error.name !== 'AbortError') {
       throw new Error(`Error in think and prep step: ${error.message}`);
     }
+    return createStepResult(finished, outputMessages, finalStepData);
   }
-
-  return {
-    finished,
-    outputMessages,
-    conversationHistory: outputMessages, // Include conversation history for workflow output
-    stepData: finalStepData || undefined,
-    metadata: {
-      toolsUsed: getAllToolsUsed(outputMessages),
-      finalTool: getLastToolUsed(outputMessages) as
-        | 'submitThoughts'
-        | 'respondWithoutAnalysis'
-        | undefined,
-      text: undefined,
-      reasoning: undefined,
-    },
-  };
 };
 
 export const thinkAndPrepStep = createStep({

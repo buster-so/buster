@@ -10,7 +10,7 @@ import { parseStreamingArgs as parseExecuteSqlArgs } from '../tools/database-too
 import { parseStreamingArgs as parseSequentialThinkingArgs } from '../tools/planning-thinking-tools/sequential-thinking-tool';
 import { parseStreamingArgs as parseCreateMetricsArgs } from '../tools/visualization-tools/create-metrics-file-tool';
 import { saveConversationHistoryFromStep } from '../utils/database/saveConversationHistory';
-import { handleInvalidToolCall } from '../utils/handle-invalid-tool-call';
+import { handleInvalidToolCall } from '../utils/handle-invalid-tools/handle-invalid-tool-call';
 import {
   MessageHistorySchema,
   StepFinishDataSchema,
@@ -44,12 +44,10 @@ const handleAnalystStepFinish = async ({
   step,
   inputData,
   runtimeContext,
-  abortController,
 }: {
   step: StepResult<ToolSet>;
   inputData: z.infer<typeof inputSchema>;
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
-  abortController: AbortController;
 }) => {
   // Save complete conversation history to database before any abort (think-and-prep + analyst messages)
   const analystResponseMessages = step.response.messages as CoreMessage[];
@@ -65,16 +63,17 @@ const handleAnalystStepFinish = async ({
       await saveConversationHistoryFromStep(messageId, completeConversationHistory);
     } catch (error) {
       console.error('Failed to save analyst conversation history:', error);
-      // Continue with abort even if save fails to avoid hanging
+      // Continue without aborting - let the natural flow handle completion
     }
   }
 
-  // Check if doneTool was called and abort after saving
+  // Check if doneTool was called but don't abort here - let the main stream loop handle it
   const toolNames = step.toolCalls.map((call) => call.toolName);
   const shouldAbort = toolNames.includes('doneTool');
 
+  // Log for debugging but don't abort - this was causing race conditions
   if (shouldAbort) {
-    abortController.abort();
+    console.log('Done tool detected, allowing natural completion');
   }
 
   return {
@@ -117,7 +116,6 @@ const analystExecution = async ({
               step,
               inputData,
               runtimeContext,
-              abortController,
             });
 
             completeConversationHistory = result.completeConversationHistory;
@@ -145,7 +143,7 @@ const analystExecution = async ({
     // Initialize the tool args parser with analyst tool mappings
     const toolArgsParser = new ToolArgsParser();
     toolArgsParser.registerParser('create-metrics-file', parseCreateMetricsArgs);
-    toolArgsParser.registerParser('done', parseDoneArgs);
+    toolArgsParser.registerParser('doneTool', parseDoneArgs);
     toolArgsParser.registerParser('execute-sql', parseExecuteSqlArgs);
     toolArgsParser.registerParser('sequential-thinking', parseSequentialThinkingArgs);
 
@@ -159,7 +157,7 @@ const analystExecution = async ({
       }
 
       if (chunk.type === 'tool-result' && chunk.toolName === 'doneTool') {
-        // Don't abort here anymore - let onStepFinish handle it after saving
+        // Return immediately when doneTool completes - this is the natural end
         return {
           conversationHistory: completeConversationHistory,
           finished: true,

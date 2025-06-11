@@ -6,7 +6,6 @@ import {
   submitThoughts,
 } from '../../tools';
 import { anthropicCachedModel } from '../../utils/models/anthropic-cached';
-import { getSharedMemory } from '../../utils/shared-memory';
 import { getThinkAndPrepInstructions } from './think-and-prep-instructions';
 
 const DEFAULT_OPTIONS = {
@@ -30,7 +29,6 @@ export const thinkAndPrepAgent = new Agent({
     respondWithoutAnalysis,
     submitThoughts,
   },
-  memory: getSharedMemory(),
   defaultGenerateOptions: DEFAULT_OPTIONS,
   defaultStreamOptions: DEFAULT_OPTIONS,
 });
