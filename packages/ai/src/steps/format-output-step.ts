@@ -1,10 +1,13 @@
 import { createStep } from '@mastra/core';
+import type { CoreMessage } from 'ai';
 import { z } from 'zod';
 import {
+  type MessageHistory,
   MessageHistorySchema,
   StepFinishDataSchema,
   ThinkAndPrepOutputSchema,
 } from '../utils/memory/types';
+// Removed unused imports for parallel step schemas since we're using dynamic property access
 
 // Define the analyst output schema inline to avoid circular dependencies
 const AnalystOutputSchema = z.object({
@@ -21,6 +24,10 @@ const AnalystOutputSchema = z.object({
     .optional(),
 });
 
+// Type aliases for better type safety
+type ThinkAndPrepOutput = z.infer<typeof ThinkAndPrepOutputSchema>;
+type AnalystOutput = z.infer<typeof AnalystOutputSchema>;
+
 // Input comes from workflow - either from think-and-prep or analyst step
 const inputSchema = z.union([
   // Direct output from think-and-prep step (when analyst step is skipped)
@@ -36,16 +43,7 @@ const inputSchema = z.union([
   z.object({
     'think-and-prep': ThinkAndPrepOutputSchema,
   }),
-  // Handle case where Mastra passes the previous step's output directly after a skipped branch
-  // This is a more permissive schema that captures the essential properties
-  z.object({
-    outputMessages: MessageHistorySchema.optional(),
-    conversationHistory: MessageHistorySchema.optional(),
-    finished: z.boolean().optional(),
-    stepData: StepFinishDataSchema.optional(),
-    metadata: z.record(z.unknown()).optional(),
-  }).passthrough(), // Allow additional properties from think-and-prep or analyst steps
-  // Handle any other potential workflow structures - fallback for debugging
+  // Handle dynamic step names - workflow may pass data with any step name
   z.record(z.unknown()),
 ]);
 
@@ -69,106 +67,100 @@ const outputSchema = z.object({
   metadata: WorkflowMetadataSchema.optional(),
 });
 
+// Type-safe extraction of step data
+type StepData = ThinkAndPrepOutput | AnalystOutput;
+
 const formatOutputExecution = async ({
   inputData,
 }: {
   inputData: z.infer<typeof inputSchema>;
 }): Promise<z.infer<typeof outputSchema>> => {
   // Determine which format we're receiving and extract the step data
-  let stepData: {
-    conversationHistory?: unknown;
-    finished?: boolean;
-    outputMessages?: unknown;
-    stepData?: unknown;
-    metadata?: {
-      title?: string;
-      todos?: string[];
-      values?: string[];
-      toolsUsed?: string[];
-      finalTool?: string;
-      text?: string;
-      reasoning?: string;
-    };
-  };
+  let stepData: StepData | undefined;
 
   if ('analyst' in inputData && inputData.analyst) {
     // Nested format with analyst step
-    stepData = inputData.analyst;
+    stepData = inputData.analyst as AnalystOutput;
   } else if ('think-and-prep' in inputData && inputData['think-and-prep']) {
     // Nested format with think-and-prep step only
-    stepData = inputData['think-and-prep'];
-  } else if ('outputMessages' in inputData && 'finished' in inputData) {
-    // Direct format from think-and-prep step or analyst step
-    stepData = inputData;
-  } else if ('conversationHistory' in inputData) {
-    // Direct format from analyst step
-    stepData = inputData;
+    stepData = inputData['think-and-prep'] as ThinkAndPrepOutput;
+  } else if (isValidStepData(inputData)) {
+    // Direct format from either step - inputData is already the step output
+    stepData = inputData as StepData;
   } else {
-    // Try to find any step data in the input structure
-    const inputKeys = Object.keys(inputData);
-
-    // Look for step data in any key that looks like step output
-    for (const key of inputKeys) {
+    // Try to find step data in any property (dynamic step names)
+    const keys = Object.keys(inputData);
+    for (const key of keys) {
       const value = (inputData as Record<string, unknown>)[key];
-      if (
-        value &&
-        typeof value === 'object' &&
-        ('outputMessages' in value || 'conversationHistory' in value || 'finished' in value)
-      ) {
-        stepData = value;
+      if (isValidStepData(value)) {
+        stepData = value as StepData;
         break;
-      }
-    }
-
-    // If still no stepData found, check if the entire inputData itself is the step output
-    // This can happen when Mastra passes data directly from a previous step after a skipped branch
-    if (!stepData) {
-      // Log the structure for debugging
-      console.warn('Format-output-step received unexpected input structure:', {
-        keys: Object.keys(inputData),
-        hasOutputMessages: 'outputMessages' in inputData,
-        hasConversationHistory: 'conversationHistory' in inputData,
-        hasFinished: 'finished' in inputData,
-        inputDataType: typeof inputData,
-      });
-      
-      // Check if the inputData itself has the expected step output properties
-      // This is stricter validation to ensure we only accept valid step data
-      const hasValidStepProperties = 
-        ('outputMessages' in inputData || 'conversationHistory' in inputData) ||
-        ('finished' in inputData && typeof (inputData as any).finished === 'boolean') ||
-        ('stepData' in inputData) ||
-        ('metadata' in inputData);
-      
-      if (
-        typeof inputData === 'object' &&
-        inputData !== null &&
-        hasValidStepProperties
-      ) {
-        stepData = inputData as any;
-      } else {
-        throw new Error('Unrecognized input format for format-output-step');
       }
     }
   }
 
-  // Map the step data to the clean output format with safety checks
-  const output = {
-    // Core conversation data - with fallback defaults
-    conversationHistory: stepData.conversationHistory || [],
-    finished: stepData.finished ?? false,
-    outputMessages: stepData.outputMessages || [],
-    stepData: stepData.stepData || null,
-    metadata: stepData.metadata || null,
+  if (!stepData) {
+    throw new Error('Unrecognized input format for format-output-step');
+  }
 
-    // Additional fields from metadata if available
-    title: stepData.metadata?.title || undefined,
-    todos: stepData.metadata?.todos || undefined,
-    values: stepData.metadata?.values || undefined,
+  // Helper function to safely extract CoreMessage array
+  const getMessageArray = (messages: MessageHistory | undefined): CoreMessage[] => {
+    if (!messages || !Array.isArray(messages)) {
+      return [];
+    }
+    return messages;
+  };
+
+  // Get the parallel step results from the input data if available
+  const parallelStepResults = {
+    title: undefined as string | undefined,
+    todos: undefined as string[] | undefined,
+    values: undefined as string[] | undefined,
+  };
+
+  // Extract from nested format if available
+  if ('generate-chat-title' in inputData && inputData['generate-chat-title']) {
+    parallelStepResults.title = (inputData['generate-chat-title'] as any).title;
+  }
+  if ('create-todos' in inputData && inputData['create-todos']) {
+    parallelStepResults.todos = (inputData['create-todos'] as any).todos;
+  }
+  if ('extract-values-search' in inputData && inputData['extract-values-search']) {
+    parallelStepResults.values = (inputData['extract-values-search'] as any).values;
+  }
+
+  // Map the step data to the clean output format with type-safe extraction
+  const output = {
+    // Core conversation data
+    conversationHistory: getMessageArray(stepData.conversationHistory),
+    finished: stepData.finished ?? false,
+    outputMessages: getMessageArray(stepData.outputMessages),
+    stepData: stepData.stepData ?? undefined,
+    metadata: stepData.metadata ?? undefined,
+
+    // Additional fields from parallel steps or metadata
+    title: parallelStepResults.title,
+    todos: parallelStepResults.todos,
+    values: parallelStepResults.values,
   };
 
   return output;
 };
+
+// Helper function to check if an object is valid step data
+function isValidStepData(value: unknown): value is StepData {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+  
+  const obj = value as Record<string, unknown>;
+  
+  // Check for required properties that indicate this is step data
+  return (
+    ('outputMessages' in obj || 'conversationHistory' in obj) &&
+    ('finished' in obj || 'stepData' in obj || 'metadata' in obj)
+  );
+}
 
 export const formatOutputStep = createStep({
   id: 'format-output',

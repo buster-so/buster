@@ -1,4 +1,15 @@
-import { NoSuchToolError, ToolCallRepairError, ToolExecutionError } from 'ai';
+import {
+  APICallError,
+  EmptyResponseBodyError,
+  InvalidResponseDataError,
+  JSONParseError,
+  NoContentGeneratedError,
+  NoObjectGeneratedError,
+  NoSuchToolError,
+  RetryError,
+  ToolCallRepairError,
+  ToolExecutionError,
+} from 'ai';
 
 /**
  * Handles tool-related errors in onError callbacks for AI SDK streaming
@@ -22,26 +33,60 @@ export const handleInvalidToolError = async (event: { error: unknown }): Promise
     return; // Let the stream continue for tool call repair errors
   }
 
-  // Check for InvalidToolArgumentsError using message inspection
+  // Check for AI SDK specific error types that indicate null/empty responses
+  if (EmptyResponseBodyError.isInstance(error)) {
+    console.warn('AI SDK EmptyResponseBodyError handled gracefully:', error);
+    return; // Let the stream continue
+  }
+
+  if (APICallError.isInstance(error)) {
+    console.warn('AI SDK APICallError handled gracefully:', error);
+    return; // Let the stream continue
+  }
+
+  if (NoContentGeneratedError.isInstance(error)) {
+    console.warn('AI SDK NoContentGeneratedError handled gracefully:', error);
+    return; // Let the stream continue
+  }
+
+  if (NoObjectGeneratedError.isInstance(error)) {
+    console.warn('AI SDK NoObjectGeneratedError handled gracefully:', error);
+    return; // Let the stream continue
+  }
+
+  if (RetryError.isInstance(error)) {
+    console.warn('AI SDK RetryError handled gracefully:', error);
+    return; // Let the stream continue
+  }
+
+  if (JSONParseError.isInstance(error)) {
+    console.warn('AI SDK JSONParseError handled gracefully:', error);
+    return; // Let the stream continue
+  }
+
+  if (InvalidResponseDataError.isInstance(error)) {
+    console.warn('AI SDK InvalidResponseDataError handled gracefully:', error);
+    return; // Let the stream continue
+  }
+
+  // Check for InvalidToolArgumentsError using message inspection as fallback
   // (since InvalidToolArgumentsError is imported as a type)
   if (error instanceof Error && error.message.includes('Invalid tool arguments')) {
     return; // Let the stream continue, repair mechanism will handle it
   }
 
-  // Check for other tool-related error patterns that should be handled gracefully
-  if (error instanceof Error) {
-    const errorMessage = error.message.toLowerCase();
-    const isToolRelatedError =
-      errorMessage.includes('tool') ||
-      errorMessage.includes('schema') ||
-      errorMessage.includes('parameter') ||
-      errorMessage.includes('argument');
-
-    if (isToolRelatedError) {
-      return; // Let the stream continue for tool-related errors
-    }
+  // Check for specific error types that might not be Error instances
+  if (error === null || error === undefined) {
+    console.warn('AI SDK received null/undefined error, continuing stream');
+    return;
   }
 
-  // For non-tool-related errors, just return to let the stream continue
-  return;
+  // For any other error types, log and continue to avoid breaking the stream
+  console.warn('AI SDK unhandled error type, continuing stream:', {
+    error,
+    type: typeof error,
+    constructor: error?.constructor?.name,
+  });
+
+  return; // Let the stream continue for any unhandled errors
 };

@@ -41,6 +41,7 @@ export const anthropicCachedModel = (modelId: string) => {
             body: JSON.stringify(modifiedBody),
           });
         } catch (error) {
+          console.error('Failed to parse request body:', error);
           // If body parsing fails, fall back to original request
           return fetch(url, options);
         }
