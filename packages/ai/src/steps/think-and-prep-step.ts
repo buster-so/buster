@@ -91,9 +91,9 @@ const handleThinkAndPrepStepFinish = async ({
         finished = true;
       }
 
-      // Add a small delay to ensure any pending tool call repairs complete
-      // before aborting the stream
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      // Add a delay to ensure any pending tool call repairs and stream processing complete
+      // before aborting the stream. This prevents race conditions with ongoing chunk processing.
+      await new Promise((resolve) => setTimeout(resolve, 250));
 
       shouldAbort = true;
 
@@ -120,10 +120,16 @@ const handleThinkAndPrepStepFinish = async ({
 // Helper function to process stream chunks
 const processStreamChunks = async <T extends ToolSet>(
   stream: StreamTextResult<T, unknown>,
-  toolArgsParser: ToolArgsParser
+  toolArgsParser: ToolArgsParser,
+  abortController: AbortController
 ): Promise<void> => {
   try {
     for await (const chunk of stream.fullStream) {
+      // Check if we should abort before processing each chunk
+      if (abortController.signal.aborted) {
+        break;
+      }
+
       try {
         if (chunk.type === 'tool-call-streaming-start' || chunk.type === 'tool-call-delta') {
           const streamingResult = toolArgsParser.processChunk(chunk);
@@ -137,7 +143,12 @@ const processStreamChunks = async <T extends ToolSet>(
       }
     }
   } catch (streamError) {
-    // Log stream processing errors but don't throw to avoid breaking the workflow
+    // Handle AbortError gracefully - this is expected when the stream is intentionally aborted
+    if (streamError instanceof Error && streamError.name === 'AbortError') {
+      // Stream was intentionally aborted, this is normal behavior
+      return;
+    }
+    // Log other stream processing errors but don't throw to avoid breaking the workflow
     console.error('Error processing stream chunks in think-and-prep step:', streamError);
   }
 };
@@ -233,7 +244,9 @@ const thinkAndPrepExecution = async ({
             maxRetries: 3,
             onRetry: (error, attemptNumber) => {
               // Log retry attempt for debugging
-              console.error(`Think and Prep retry attempt ${attemptNumber} for ${error.type} error`);
+              console.error(
+                `Think and Prep retry attempt ${attemptNumber} for ${error.type} error`
+              );
             },
           },
         });
@@ -255,7 +268,7 @@ const thinkAndPrepExecution = async ({
     toolArgsParser.registerParser('sequential-thinking', parseSequentialThinkingArgs);
 
     try {
-      await processStreamChunks(stream, toolArgsParser);
+      await processStreamChunks(stream, toolArgsParser, abortController);
     } catch (processError) {
       // Log processing errors but continue with the conversation history we have
       console.error('Error in processStreamChunks:', processError);
