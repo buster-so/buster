@@ -1,5 +1,7 @@
+include ../../.env
+export
+
 dev:
-	source .env && \
 	supabase start && \
 	supabase db reset && \
 	bun run setup:setup

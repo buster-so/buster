@@ -24,7 +24,7 @@ let globalDb: PostgresJsDatabase | null = null;
 
 // Initialize the database pool
 export function initializePool(config: PoolConfig = {}): PostgresJsDatabase {
-  const connectionString = process.env.DATABASE_URL || '';
+  const connectionString = process.env.DATABASE_URL;
 
   if (!connectionString) {
     throw new Error('DATABASE_URL environment variable is required');
@@ -37,12 +37,7 @@ export function initializePool(config: PoolConfig = {}): PostgresJsDatabase {
   const poolConfig = { ...defaultPoolConfig, ...config };
 
   // Create postgres client with pool configuration
-  globalPool = postgres(connectionString, {
-    max: poolConfig.max,
-    idle_timeout: poolConfig.idle_timeout,
-    connect_timeout: poolConfig.connect_timeout,
-    prepare: poolConfig.prepare,
-  });
+  globalPool = postgres(connectionString, poolConfig);
 
   // Create drizzle instance
   globalDb = drizzle(globalPool);

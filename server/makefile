@@ -1,3 +1,6 @@
+include ../.env
+export
+
 dev:
 	docker stop buster-redis-make || true && \
 	docker rm buster-redis-make || true && \

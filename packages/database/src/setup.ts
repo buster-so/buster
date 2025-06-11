@@ -161,6 +161,25 @@ async function migrateOnly(): Promise<void> {
 // CLI handling
 const command = process.argv[2];
 
+// Check if DATABASE_URL is defined
+if (!process.env.DATABASE_URL) {
+  console.error('❌ ERROR: DATABASE_URL environment variable is not defined');
+  console.error('Please ensure you have a .env file with DATABASE_URL configured');
+  process.exit(1);
+}
+
+if (!process.env.SUPABASE_URL) {
+  console.error('❌ ERROR: SUPABASE_URL environment variable is not defined');
+  console.error('Please ensure you have a .env file with SUPABASE_URL configured');
+  process.exit(1);
+}
+
+if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  console.error('❌ ERROR: SUPABASE_SERVICE_ROLE_KEY environment variable is not defined');
+  console.error('Please ensure you have a .env file with SUPABASE_SERVICE_ROLE_KEY configured');
+  process.exit(1);
+}
+
 switch (command) {
   case 'run':
   case 'setup':

@@ -9,6 +9,7 @@
     "composite": true,
     "declaration": true,
     "tsBuildInfoFile": "dist/.tsbuildinfo",
+    "esModuleInterop": true,
     "paths": {
       "@/*": ["./src/*"]
     }
