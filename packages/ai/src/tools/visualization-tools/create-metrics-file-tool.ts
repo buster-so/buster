@@ -273,7 +273,8 @@ Only utilize the required/default fields unless the user specifically requests t
 # \`name\`: Human-readable title (e.g., Total Sales). 
 #   - RULE: CANNOT contain underscores (\`_\`). Use spaces instead.   
 # \`description\`: Detailed explanation of the metric. 
-# \`timeFrame\`: Human-readable time period covered by the query, similar to a filter in a BI tool.
+# \`timeFrame\`: Human-readable time period covered by the query, similar to a filter in a BI tool. MUST BE A VALID STRING. 
+#   - If doing 2024 as an example, you must do "2024" can't parse as a number.
 #   - For queries with fixed date filters, use specific date ranges, e.g., "January 1, 2020 - December 31, 2020", "2024", "Q2 2024", "June 1, 2025".
 #   - For queries with relative date filters or no date filter, use relative terms, e.g., "Today", "Yesterday", "Last 7 days", "Last 30 days", "Last Quarter", "Last 12 Months", "Year to Date", "All time", etc.
 #   - For comparisons, use "Comparison - [Period 1] vs [Period 2]", with each period formatted according to whether it is fixed or relative, e.g., "Comparison - Last 30 days vs Previous 30 days" or "Comparison - June 1, 2025 - June 30, 2025 vs July 1, 2025 - July 31, 2025".

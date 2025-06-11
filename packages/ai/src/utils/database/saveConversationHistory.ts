@@ -71,7 +71,24 @@ export async function saveConversationHistoryFromStep(
       : [];
 
     // Build the new reasoning by appending new messages as reasoning entries
-    const updatedReasoning = appendToReasoning(currentReasoning, stepMessages);
+    if (!Array.isArray(stepMessages)) {
+      console.error('saveConversationHistoryFromStep: stepMessages is not an array');
+      throw new Error('Invalid stepMessages: expected array');
+    }
+    
+    const newReasoningEntries = formatLlmMessagesAsReasoning(stepMessages);
+    
+    // Deduplicate by ID - keep track of existing IDs
+    const existingIds = new Set(
+      currentReasoning
+        .filter((r: any) => r && typeof r === 'object' && 'id' in r)
+        .map((r: any) => r.id)
+    );
+    const deduplicatedNewEntries = newReasoningEntries.filter(
+      (entry: any) => entry && typeof entry === 'object' && 'id' in entry && !existingIds.has(entry.id)
+    );
+    
+    const updatedReasoning = [...currentReasoning, ...deduplicatedNewEntries];
 
     // Prepare update fields
     const updateFields: Record<string, unknown> = {
@@ -79,12 +96,11 @@ export async function saveConversationHistoryFromStep(
       reasoning: updatedReasoning,
     };
 
-    // Add reasoning history if provided
+    // Also store in separate fields for backward compatibility
     if (reasoningHistory && reasoningHistory.length > 0) {
       updateFields.reasoningMessages = reasoningHistory;
     }
 
-    // Add response history if provided
     if (responseHistory && responseHistory.length > 0) {
       updateFields.responseMessages = responseHistory;
     }
@@ -121,7 +137,15 @@ export async function loadConversationHistory(messageId: string): Promise<CoreMe
       return null;
     }
 
-    return result[0].rawLlmMessages as CoreMessage[];
+    const rawMessages = result[0].rawLlmMessages;
+    
+    // Validate that rawLlmMessages is an array
+    if (!Array.isArray(rawMessages)) {
+      console.error('loadConversationHistory: rawLlmMessages is not an array:', typeof rawMessages);
+      return null;
+    }
+    
+    return rawMessages as CoreMessage[];
   } catch (error) {
     throw new Error(
       `Failed to load conversation history: ${error instanceof Error ? error.message : 'Unknown error'}`

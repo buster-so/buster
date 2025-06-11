@@ -187,8 +187,13 @@ export function convertToolCallToMessage(
   toolResult: ParsedToolResult | string | null,
   status: 'loading' | 'completed' | 'failed' = 'completed'
 ): { type: 'reasoning' | 'response'; message: BusterChatMessageReasoning | BusterChatMessageResponse } | null {
-  const toolName = 'toolName' in toolCall ? toolCall.toolName : '';
-  const toolId = 'toolCallId' in toolCall ? toolCall.toolCallId : '';
+  if (!toolCall || typeof toolCall !== 'object') {
+    console.error('convertToolCallToMessage: Invalid toolCall:', toolCall);
+    return null;
+  }
+  
+  const toolName = 'toolName' in toolCall && typeof toolCall.toolName === 'string' ? toolCall.toolName : '';
+  const toolId = 'toolCallId' in toolCall && typeof toolCall.toolCallId === 'string' ? toolCall.toolCallId : '';
 
   switch (toolName) {
     case 'doneTool':
@@ -203,7 +208,8 @@ export function convertToolCallToMessage(
           is_final_message: true,
         };
         return { type: 'response', message: responseMessage };
-      } catch {
+      } catch (error) {
+        console.error(`Failed to parse tool result:`, error, toolResult);
         return null;
       }
     }
@@ -220,7 +226,8 @@ export function convertToolCallToMessage(
           is_final_message: true,
         };
         return { type: 'response', message: responseMessage };
-      } catch {
+      } catch (error) {
+        console.error(`Failed to parse tool result:`, error, toolResult);
         return null;
       }
     }
@@ -240,7 +247,8 @@ export function convertToolCallToMessage(
           finished_reasoning: !parsed.nextThoughtNeeded,
         };
         return { type: 'reasoning', message: reasoningMessage };
-      } catch {
+      } catch (error) {
+        console.error(`Failed to parse tool result:`, error, toolResult);
         return null;
       }
     }
@@ -296,7 +304,8 @@ export function convertToolCallToMessage(
           files,
         };
         return { type: 'reasoning', message: reasoningMessage };
-      } catch {
+      } catch (error) {
+        console.error(`Failed to parse tool result:`, error, toolResult);
         return null;
       }
     }
@@ -315,7 +324,8 @@ export function convertToolCallToMessage(
           status,
         };
         return { type: 'reasoning', message: reasoningMessage };
-      } catch {
+      } catch (error) {
+        console.error(`Failed to parse tool result:`, error, toolResult);
         return null;
       }
     }
@@ -371,7 +381,8 @@ export function convertToolCallToMessage(
           files,
         };
         return { type: 'reasoning', message: reasoningMessage };
-      } catch {
+      } catch (error) {
+        console.error(`Failed to parse tool result:`, error, toolResult);
         return null;
       }
     }
@@ -427,7 +438,8 @@ export function convertToolCallToMessage(
           files,
         };
         return { type: 'reasoning', message: reasoningMessage };
-      } catch {
+      } catch (error) {
+        console.error(`Failed to parse tool result:`, error, toolResult);
         return null;
       }
     }
@@ -483,7 +495,8 @@ export function convertToolCallToMessage(
           files,
         };
         return { type: 'reasoning', message: reasoningMessage };
-      } catch {
+      } catch (error) {
+        console.error(`Failed to parse tool result:`, error, toolResult);
         return null;
       }
     }
@@ -511,8 +524,13 @@ export function extractMessagesFromToolCalls(
   const responseMessages: BusterChatMessageResponse[] = [];
 
   for (const toolCall of toolCalls) {
+    if (!toolCall || !('toolCallId' in toolCall)) {
+      console.error('extractMessagesFromToolCalls: Invalid toolCall:', toolCall);
+      continue;
+    }
+    
     const toolResult = toolResults.get(toolCall.toolCallId);
-    const converted = convertToolCallToMessage(toolCall, toolResult, 'completed');
+    const converted = convertToolCallToMessage(toolCall, toolResult || null, 'completed');
     
     if (converted) {
       if (converted.type === 'reasoning') {

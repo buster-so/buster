@@ -73,29 +73,39 @@ const handleThinkAndPrepStepFinish = async ({
 
   // Process tool calls to extract reasoning and response messages
   if (step.toolCalls.length > 0) {
-    // Create a map of tool results from the step
-    const toolResultsMap = new Map<string, string | null>();
-    
-    // For tool results, we need to look at the tool response messages
-    const toolResponses = step.response.messages.filter(msg => msg.role === 'tool');
-    for (const toolResponse of toolResponses) {
-      if ('toolCallId' in toolResponse && 'content' in toolResponse) {
-        const content = toolResponse.content;
-        if (typeof content === 'string') {
-          toolResultsMap.set(toolResponse.toolCallId, content);
+    try {
+      // Create a map of tool results from the step
+      const toolResultsMap = new Map<string, string | null>();
+      
+      // For tool results, we need to look at the tool response messages
+      const toolResponses = step.response.messages.filter(msg => msg.role === 'tool');
+      for (const toolResponse of toolResponses) {
+        if (toolResponse && typeof toolResponse === 'object' && 
+            'toolCallId' in toolResponse && 'content' in toolResponse) {
+          const content = toolResponse.content;
+          if (typeof content === 'string') {
+            toolResultsMap.set(toolResponse.toolCallId, content);
+          }
         }
       }
+
+      // Convert tool calls to messages with proper type validation
+      if (!Array.isArray(step.toolCalls)) {
+        console.error('handleThinkAndPrepStepFinish: step.toolCalls is not an array');
+      } else {
+        const { reasoningMessages, responseMessages } = extractMessagesFromToolCalls(
+          step.toolCalls,
+          toolResultsMap
+        );
+
+        // Add to history
+        reasoningHistory.push(...reasoningMessages);
+        responseHistory.push(...responseMessages);
+      }
+    } catch (error) {
+      console.error('Error processing tool calls in think-and-prep step:', error);
+      // Continue execution without failing the entire step
     }
-
-    // Convert tool calls to messages
-    const { reasoningMessages, responseMessages } = extractMessagesFromToolCalls(
-      step.toolCalls as any,
-      toolResultsMap
-    );
-
-    // Add to history
-    reasoningHistory.push(...reasoningMessages);
-    responseHistory.push(...responseMessages);
   }
 
   if (hasFinishingTools) {
@@ -114,7 +124,8 @@ const handleThinkAndPrepStepFinish = async ({
         // Save conversation history to database before aborting
         try {
           await saveConversationHistoryFromStep(messageId, outputMessages, reasoningHistory, responseHistory);
-        } catch {
+        } catch (saveError) {
+          console.error('Failed to save conversation history:', saveError);
           // Continue with abort even if save fails to avoid hanging
         }
       }
@@ -138,10 +149,12 @@ const handleThinkAndPrepStepFinish = async ({
       // Use a try-catch around abort to handle any potential errors
       try {
         abortController.abort();
-      } catch {
+      } catch (abortError) {
+        console.error('Failed to abort controller:', abortError);
         // Continue execution even if abort fails
       }
-    } catch {
+    } catch (error) {
+      console.error('Error in handleThinkAndPrepStepFinish:', error);
       // Don't abort on error to prevent hanging
       shouldAbort = false;
     }
@@ -302,8 +315,12 @@ const thinkAndPrepExecution = async ({
         });
 
         // Update messages to include any healing messages added during retries
-        messages.length = 0;
-        messages.push(...result.conversationHistory);
+        if (Array.isArray(messages) && Array.isArray(result.conversationHistory)) {
+          messages.length = 0;
+          messages.push(...result.conversationHistory);
+        } else {
+          console.error('Invalid messages or conversationHistory array');
+        }
 
         return result.stream;
       },
