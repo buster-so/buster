@@ -8,7 +8,6 @@ import {
 
 // Define the required template parameters
 interface ThinkAndPrepTemplateParams {
-  todo_list: string;
   databaseContext: string;
 }
 
@@ -63,8 +62,9 @@ Once all TODO list items are addressed and submitted for review, the system will
 </agent_loop>
 
 <todo_list>
-- Below are the items on your TODO list:
-${params.todo_list}
+- The TODO list has been created by the system and is available in the event stream above
+- Look for the "createToDos" tool call and its result to see your TODO items
+- The TODO items are formatted as a markdown checkbox list
 </todo_list>
 
 <todo_rules>
@@ -350,7 +350,8 @@ ${params.todo_list}
 
 Start by using the \`sequentialThinking\` to immediately start checking off items on your TODO list
 
-Today's date is ${new Date().toISOString().split('T')[0]}.
+Today's date is ${new Date().toLocaleDateString()}.
+
 ---
 
 <database_context>
@@ -379,7 +380,6 @@ export const getThinkAndPrepInstructions = async ({
     .join('\n---\n');
 
   return createThinkAndPrepInstructions({
-    todo_list: todoList,
     databaseContext: assembledYmlContent,
   });
 };

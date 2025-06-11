@@ -66,17 +66,19 @@ export function parseStreamingArgs(
 
 const respondWithoutAnalysisOutputSchema = z.object({});
 
-// Process done tool execution with todo management
-async function processDone(): Promise<z.infer<typeof respondWithoutAnalysisOutputSchema>> {
+// Process respond without analysis tool execution
+async function processRespondWithoutAnalysis(): Promise<
+  z.infer<typeof respondWithoutAnalysisOutputSchema>
+> {
   // This tool signals the end of the workflow and provides the final response.
   // The actual agent termination logic resides elsewhere.
   return {};
 }
 
-// Main done function with tracing
-const executeDone = wrapTraced(
+// Main respond without analysis function with tracing
+const executeRespondWithoutAnalysis = wrapTraced(
   async (): Promise<z.infer<typeof respondWithoutAnalysisOutputSchema>> => {
-    return await processDone();
+    return await processRespondWithoutAnalysis();
   },
   { name: 'respond-without-analysis' }
 );
@@ -88,7 +90,7 @@ export const respondWithoutAnalysis = createTool({
     "Marks all remaining unfinished tasks as complete, sends a final response to the user, and ends the workflow. Use this when the workflow is finished. This must be in markdown format and not use the '•' bullet character.",
   inputSchema: respondWithoutAnalysisInputSchema,
   outputSchema: respondWithoutAnalysisOutputSchema,
-  execute: executeDone,
+  execute: executeRespondWithoutAnalysis,
 });
 
 export default respondWithoutAnalysis;

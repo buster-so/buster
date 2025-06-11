@@ -8,13 +8,17 @@ import {
   modifyMetrics,
 } from '../../tools';
 import { anthropicCachedModel } from '../../utils/models/anthropic-cached';
-import { getSharedMemory } from '../../utils/shared-memory';
 import { getAnalystInstructions } from './analyst-agent-instructions';
 
 const DEFAULT_OPTIONS = {
   maxSteps: 18,
   temperature: 0,
   maxTokens: 10000,
+  providerOptions: {
+    anthropic: {
+      disableParallelToolCalls: true,
+    },
+  },
 };
 
 export const analystAgent = new Agent({
@@ -28,7 +32,6 @@ export const analystAgent = new Agent({
     modifyDashboards,
     doneTool,
   },
-  memory: getSharedMemory(),
   defaultGenerateOptions: DEFAULT_OPTIONS,
   defaultStreamOptions: DEFAULT_OPTIONS,
 });

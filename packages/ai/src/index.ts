@@ -21,9 +21,6 @@ export const mastra = new Mastra({
 export { analystAgent } from './agents/analyst-agent/analyst-agent';
 export { thinkAndPrepAgent } from './agents/think-and-prep-agent/think-and-prep-agent';
 
-// Export shared memory utilities
-export { getSharedMemory, resetSharedMemory } from './utils/shared-memory';
-
 // Export chat history utilities
 export {
   getChatHistory,

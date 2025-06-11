@@ -68,6 +68,8 @@ function combineRawLlmMessages(chatMessages: Array<{ rawLlmMessages: unknown }>)
   try {
     for (const message of chatMessages) {
       if (message.rawLlmMessages && Array.isArray(message.rawLlmMessages)) {
+        // Preserve the exact message structure from the database
+        // Each rawLlmMessages array should contain properly unbundled messages
         conversationHistory.push(...(message.rawLlmMessages as CoreMessage[]));
       }
     }

@@ -1,50 +1,63 @@
 import { createStep } from '@mastra/core';
 import { z } from 'zod';
-import { ThinkAndPrepOutputSchema } from '../utils/memory/types';
+import {
+  MessageHistorySchema,
+  StepFinishDataSchema,
+  ThinkAndPrepOutputSchema,
+} from '../utils/memory/types';
+
+// Define the analyst output schema inline to avoid circular dependencies
+const AnalystOutputSchema = z.object({
+  conversationHistory: MessageHistorySchema,
+  finished: z.boolean().optional(),
+  outputMessages: MessageHistorySchema.optional(),
+  stepData: StepFinishDataSchema.optional(),
+  metadata: z
+    .object({
+      toolsUsed: z.array(z.string()).optional(),
+      finalTool: z.string().optional(),
+      doneTool: z.boolean().optional(),
+    })
+    .optional(),
+});
 
 // Input comes from workflow - either from think-and-prep or analyst step
 const inputSchema = z.union([
   // Direct output from think-and-prep step (when analyst step is skipped)
   ThinkAndPrepOutputSchema,
   // Direct output from analyst step
-  z.object({
-    conversationHistory: z.array(z.any()),
-    finished: z.boolean().optional(),
-    outputMessages: z.array(z.any()).optional(),
-    stepData: z.any().optional(),
-    metadata: z.any().optional(),
-  }),
+  AnalystOutputSchema,
   // Nested structure from workflow (step name as key) - for complex branching scenarios
   z.object({
     'think-and-prep': ThinkAndPrepOutputSchema.optional(),
-    analyst: z
-      .object({
-        conversationHistory: z.array(z.any()),
-        finished: z.boolean().optional(),
-        outputMessages: z.array(z.any()).optional(),
-        stepData: z.any().optional(),
-        metadata: z.any().optional(),
-      })
-      .optional(),
+    analyst: AnalystOutputSchema.optional(),
   }),
   // Handle Mastra workflow branching output format - when branch doesn't execute
   z.object({
     'think-and-prep': ThinkAndPrepOutputSchema,
   }),
   // Handle any other potential workflow structures - fallback for debugging
-  z.record(z.any()),
+  z.record(z.unknown()),
 ]);
+
+// Metadata schema for workflow output
+const WorkflowMetadataSchema = z.object({
+  toolsUsed: z.array(z.string()).optional(),
+  finalTool: z.string().optional(),
+  text: z.string().optional(),
+  reasoning: z.string().optional(),
+});
 
 // Clean output schema matching the workflow output schema
 const outputSchema = z.object({
   title: z.string().optional(),
   todos: z.array(z.string()).optional(),
   values: z.array(z.string()).optional(),
-  conversationHistory: z.array(z.any()).optional(),
+  conversationHistory: MessageHistorySchema.optional(),
   finished: z.boolean().optional(),
-  outputMessages: z.array(z.any()).optional(),
-  stepData: z.any().optional(),
-  metadata: z.any().optional(),
+  outputMessages: MessageHistorySchema.optional(),
+  stepData: StepFinishDataSchema.optional(),
+  metadata: WorkflowMetadataSchema.optional(),
 });
 
 const formatOutputExecution = async ({
@@ -53,7 +66,21 @@ const formatOutputExecution = async ({
   inputData: z.infer<typeof inputSchema>;
 }): Promise<z.infer<typeof outputSchema>> => {
   // Determine which format we're receiving and extract the step data
-  let stepData: any;
+  let stepData: {
+    conversationHistory?: unknown;
+    finished?: boolean;
+    outputMessages?: unknown;
+    stepData?: unknown;
+    metadata?: {
+      title?: string;
+      todos?: string[];
+      values?: string[];
+      toolsUsed?: string[];
+      finalTool?: string;
+      text?: string;
+      reasoning?: string;
+    };
+  };
 
   if ('analyst' in inputData && inputData.analyst) {
     // Nested format with analyst step
@@ -73,7 +100,7 @@ const formatOutputExecution = async ({
 
     // Look for step data in any key that looks like step output
     for (const key of inputKeys) {
-      const value = (inputData as any)[key];
+      const value = (inputData as Record<string, unknown>)[key];
       if (
         value &&
         typeof value === 'object' &&
@@ -85,11 +112,6 @@ const formatOutputExecution = async ({
     }
 
     if (!stepData) {
-      // Enhanced error logging for debugging
-      console.error('Unrecognized input format for format-output-step:', {
-        inputKeys: Object.keys(inputData),
-        inputData: JSON.stringify(inputData, null, 2),
-      });
       throw new Error('Unrecognized input format for format-output-step');
     }
   }

@@ -1,33 +1,27 @@
-import { Memory } from '@mastra/memory';
-import { PostgresStore } from '@mastra/pg';
+import { LibSQLStore } from '@mastra/libsql';
+import { ThreadMemory } from '@mastra/memory';
 
-// Singleton instance for shared memory
-let sharedMemoryInstance: Memory | null = null;
+let sharedMemory: ThreadMemory | null = null;
 
 /**
- * Get a shared Memory instance with PostgresStore
- * This prevents creating duplicate database connections
+ * Get the shared memory instance for all agents
+ * Uses a single LibSQLStore to persist agent conversations
  */
-export function getSharedMemory(): Memory {
-  if (!sharedMemoryInstance) {
-    sharedMemoryInstance = new Memory({
-      storage: new PostgresStore({
-        connectionString:
-          process.env.DATABASE_URL ||
-          (() => {
-            throw new Error('Unable to connect to the database. Please check your configuration.');
-          })(),
-        schemaName: 'mastra',
+export function getSharedMemory(): ThreadMemory {
+  if (!sharedMemory) {
+    sharedMemory = new ThreadMemory({
+      store: new LibSQLStore({
+        url: `file:.mastra/output/memory.db`,
       }),
     });
   }
-
-  return sharedMemoryInstance;
+  return sharedMemory;
 }
 
 /**
- * Reset the shared memory instance (useful for testing)
+ * Reset the shared memory instance
+ * Useful for testing
  */
 export function resetSharedMemory(): void {
-  sharedMemoryInstance = null;
+  sharedMemory = null;
 }

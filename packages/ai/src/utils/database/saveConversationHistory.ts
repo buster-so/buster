@@ -9,6 +9,9 @@ import { appendToReasoning } from './formatLlmMessagesAsReasoning';
  * Saves conversation history to the database
  * Updates the rawLlmMessages field with the complete conversation history
  *
+ * IMPORTANT: The conversationHistory should already be in the correct unbundled format
+ * where each tool call and tool result are separate messages, not bundled together.
+ *
  * @param messageId - The message ID to update
  * @param conversationHistory - The complete conversation history as CoreMessage[]
  * @returns Promise<void>
@@ -20,7 +23,8 @@ export async function saveConversationHistory(
   try {
     const db = getDb();
 
-    // Keep the original logic exactly the same - only update rawLlmMessages
+    // Save the conversation history exactly as provided
+    // It should already be in the correct unbundled format
     await db
       .update(messages)
       .set({
@@ -29,7 +33,6 @@ export async function saveConversationHistory(
       })
       .where(eq(messages.id, messageId));
   } catch (error) {
-    console.error('Failed to save conversation history:', error);
     throw new Error(
       `Failed to save conversation history: ${error instanceof Error ? error.message : 'Unknown error'}`
     );
@@ -46,16 +49,9 @@ export async function saveConversationHistory(
  * @returns Promise<void>
  */
 export async function saveConversationHistoryFromStep(
-  runtimeContext: { get: (key: string) => any },
-  stepMessages: any[]
+  messageId: string,
+  stepMessages: CoreMessage[]
 ): Promise<void> {
-  const messageId = runtimeContext.get('messageId');
-
-  // Skip saving if no messageId (for testing/evaluation)
-  if (!messageId) {
-    return;
-  }
-
   try {
     const db = getDb();
 
@@ -71,15 +67,14 @@ export async function saveConversationHistoryFromStep(
       : [];
 
     // Build the new reasoning by appending new messages as reasoning entries
-    const updatedReasoning = appendToReasoning(currentReasoning, stepMessages as CoreMessage[]);
+    const updatedReasoning = appendToReasoning(currentReasoning, stepMessages);
 
     // Update both rawLlmMessages and reasoning in a single call
     await updateMessageFields(messageId, {
-      rawLlmMessages: stepMessages as CoreMessage[],
+      rawLlmMessages: stepMessages,
       reasoning: updatedReasoning,
     });
   } catch (error) {
-    console.error('Failed to save conversation history and reasoning:', error);
     throw new Error(
       `Failed to save conversation history and reasoning: ${error instanceof Error ? error.message : 'Unknown error'}`
     );
@@ -111,7 +106,6 @@ export async function loadConversationHistory(messageId: string): Promise<CoreMe
 
     return result[0].rawLlmMessages as CoreMessage[];
   } catch (error) {
-    console.error('Failed to load conversation history:', error);
     return null;
   }
 }
