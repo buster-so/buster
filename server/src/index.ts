@@ -35,8 +35,8 @@ app.notFound((c) => {
   return c.json({ error: 'Not Found', message: 'The requested resource was not found' }, 404);
 });
 
-// Get port from environment variable or default to 3002 (as mentioned in README)
-const port = Number.parseInt(process.env.PORT || '3002', 10);
+// Get port from environment variable or defaults to 3002 for local development (as mentioned in README)
+const port = Number.parseInt(process.env.SERVER_PORT || '3002', 10);
 
 // Export for Bun
 export default {

@@ -108,6 +108,10 @@ test.describe('Bar chart - add to tests', () => {
 test.describe('Bar chart styling updates', () => {
   test('Can load a bar chart and remove axis', async ({ page }) => {
     await page.goto('http://localhost:3000/app/metrics/45c17750-2b61-5683-ba8d-ff6c6fefacee');
+    await page.waitForTimeout(50);
+    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForLoadState('load');
 
     await expect(page.getByTestId('metric-view-chart-content')).toBeVisible();
     await expect(page.getByTestId('metric-view-chart-content').getByRole('img')).toBeVisible();
@@ -173,6 +177,9 @@ test.describe('Bar chart styling updates', () => {
     await page.goto(
       'http://localhost:3000/app/metrics/45c17750-2b61-5683-ba8d-ff6c6fefacee/chart?secondary_view=chart-edit'
     );
+    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForLoadState('load');
 
     const sourceElement = page
       .getByTestId('select-axis-available-items-list')
@@ -250,6 +257,9 @@ test.describe('Bar chart styling updates', () => {
     await page.goto(
       'http://localhost:3000/app/metrics/45c17750-2b61-5683-ba8d-ff6c6fefacee/chart?secondary_view=chart-edit'
     );
+    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForLoadState('load');
     await page.getByTestId('segmented-trigger-Styling').click();
     await page
       .locator('div')
@@ -331,6 +341,9 @@ test.describe('Bar chart styling updates', () => {
     await page.goto(
       'http://localhost:3000/app/metrics/45c17750-2b61-5683-ba8d-ff6c6fefacee/chart?secondary_view=chart-edit'
     );
+    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForLoadState('load');
     await page.getByTestId('segmented-trigger-Styling').click();
     await page.getByTestId('segmented-trigger-asc').click();
 
@@ -363,6 +376,9 @@ test.describe('Bar chart styling updates', () => {
     await page.goto(
       'http://localhost:3000/app/metrics/45c17750-2b61-5683-ba8d-ff6c6fefacee/chart?secondary_view=chart-edit'
     );
+    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForLoadState('load');
     await page.getByTestId('segmented-trigger-Styling').click();
 
     await page.getByRole('combobox').click();
@@ -385,6 +401,9 @@ test.describe('Bar chart styling updates', () => {
     await page.goto(
       'http://localhost:3000/app/metrics/45c17750-2b61-5683-ba8d-ff6c6fefacee/chart?secondary_view=chart-edit'
     );
+    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForLoadState('load');
     await page.getByTestId('segmented-trigger-Styling').click();
 
     await page.waitForTimeout(25);
@@ -421,6 +440,9 @@ test.describe('Bar chart styling updates', () => {
     await page.goto(
       'http://localhost:3000/app/metrics/45c17750-2b61-5683-ba8d-ff6c6fefacee/chart?secondary_view=chart-edit'
     );
+    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForLoadState('load');
     await page.getByTestId('segmented-trigger-Styling').click();
     await page.getByRole('button', { name: 'Add trend line' }).click();
     await page.getByRole('combobox').filter({ hasText: 'Linear' }).click();
@@ -454,21 +476,31 @@ test.describe('Bar chart styling updates', () => {
     await page.goto(
       'http://localhost:3000/app/metrics/45c17750-2b61-5683-ba8d-ff6c6fefacee/chart?secondary_view=chart-edit'
     );
+    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForLoadState('load');
     await page.getByTestId('segmented-trigger-Colors').click();
     await page
       .locator('div')
       .filter({ hasText: /^Forest Lake$/ })
       .first()
       .click();
+    expect(page.getByTestId('color-theme-Forest Lake')).toHaveAttribute('data-selected', 'true');
     await page.getByRole('button', { name: 'Save' }).click();
-    await page.waitForTimeout(100);
+    await page.waitForTimeout(250);
     await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForLoadState('load');
+    expect(page.getByTestId('color-theme-Forest Lake')).toHaveAttribute('data-selected', 'true');
 
     await page
       .locator('div')
       .filter({ hasText: /^Buster$/ })
       .first()
       .click();
+
+    expect(page.getByTestId('color-theme-Buster')).toHaveAttribute('data-selected', 'true');
+
     await page.getByRole('button', { name: 'Save' }).click();
     await page.waitForTimeout(50);
     await page.waitForLoadState('networkidle');
