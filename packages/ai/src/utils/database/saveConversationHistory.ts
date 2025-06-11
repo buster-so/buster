@@ -33,7 +33,6 @@ export async function saveConversationHistory(
       })
       .where(eq(messages.id, messageId));
   } catch (error) {
-    console.error('Failed to save conversation history:', error);
     throw new Error(
       `Failed to save conversation history: ${error instanceof Error ? error.message : 'Unknown error'}`
     );
@@ -76,7 +75,6 @@ export async function saveConversationHistoryFromStep(
       reasoning: updatedReasoning,
     });
   } catch (error) {
-    console.error('Failed to save conversation history and reasoning:', error);
     throw new Error(
       `Failed to save conversation history and reasoning: ${error instanceof Error ? error.message : 'Unknown error'}`
     );
@@ -108,7 +106,6 @@ export async function loadConversationHistory(messageId: string): Promise<CoreMe
 
     return result[0].rawLlmMessages as CoreMessage[];
   } catch (error) {
-    console.error('Failed to load conversation history:', error);
     return null;
   }
 }

@@ -52,20 +52,28 @@ const MessageContentSchema = z.union([
 
 // Provider metadata schemas
 const OpenAIProviderMetadataSchema = z.object({
-  openai: z.object({
-    reasoningContent: z.string().optional(),
-    cacheControl: z.object({
-      type: z.enum(['ephemeral']),
-    }).optional(),
-  }).optional(),
+  openai: z
+    .object({
+      reasoningContent: z.string().optional(),
+      cacheControl: z
+        .object({
+          type: z.enum(['ephemeral']),
+        })
+        .optional(),
+    })
+    .optional(),
 });
 
 const AnthropicProviderMetadataSchema = z.object({
-  anthropic: z.object({
-    cacheControl: z.object({
-      type: z.enum(['ephemeral']),
-    }).optional(),
-  }).optional(),
+  anthropic: z
+    .object({
+      cacheControl: z
+        .object({
+          type: z.enum(['ephemeral']),
+        })
+        .optional(),
+    })
+    .optional(),
 });
 
 const ProviderMetadataSchema = z.union([
@@ -115,18 +123,21 @@ export type CoreMessageZod = z.infer<typeof CoreMessageSchema>;
 export type CoreMessagesZod = z.infer<typeof CoreMessagesSchema>;
 
 // Type guards
-export function isAssistantMessage(message: CoreMessageZod): message is z.infer<typeof AssistantMessageSchema> {
+export function isAssistantMessage(
+  message: CoreMessageZod
+): message is z.infer<typeof AssistantMessageSchema> {
   return message.role === 'assistant';
 }
 
-export function isToolMessage(message: CoreMessageZod): message is z.infer<typeof ToolMessageSchema> {
+export function isToolMessage(
+  message: CoreMessageZod
+): message is z.infer<typeof ToolMessageSchema> {
   return message.role === 'tool';
 }
 
 export function hasToolCalls(message: CoreMessageZod): boolean {
   if (!isAssistantMessage(message)) return false;
   return (
-    Array.isArray(message.content) &&
-    message.content.some((item) => item.type === 'tool-call')
+    Array.isArray(message.content) && message.content.some((item) => item.type === 'tool-call')
   );
 }

@@ -16,10 +16,15 @@ export const anthropicCachedModel = (modelId: string) => {
           };
 
           if (modifiedBody.system && Array.isArray(modifiedBody.system)) {
-            modifiedBody.system = modifiedBody.system.map((systemMessage: any) => ({
-              ...systemMessage,
-              cache_control: { type: 'ephemeral' },
-            }));
+            modifiedBody.system = modifiedBody.system.map(
+              (systemMessage: {
+                text?: string;
+                cache_control?: { type: string };
+              }) => ({
+                ...systemMessage,
+                cache_control: { type: 'ephemeral' },
+              })
+            );
           }
 
           // Add disable_parallel_tool_use if tool_choice is present
@@ -37,7 +42,6 @@ export const anthropicCachedModel = (modelId: string) => {
           });
         } catch (error) {
           // If body parsing fails, fall back to original request
-          console.warn('Failed to parse request body:', error);
           return fetch(url, options);
         }
       }

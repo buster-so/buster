@@ -177,7 +177,7 @@ describe('Conversation History Loading', () => {
 
     // Should have all 6 messages in order
     expect(fullHistory).toHaveLength(6);
-    
+
     // Verify the correct pattern
     expect(fullHistory[0].role).toBe('user');
     expect(fullHistory[0].content).toBe('First question');

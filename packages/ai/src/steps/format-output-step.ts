@@ -1,6 +1,10 @@
 import { createStep } from '@mastra/core';
 import { z } from 'zod';
-import { ThinkAndPrepOutputSchema, StepFinishDataSchema, MessageHistorySchema } from '../utils/memory/types';
+import {
+  MessageHistorySchema,
+  StepFinishDataSchema,
+  ThinkAndPrepOutputSchema,
+} from '../utils/memory/types';
 
 // Define the analyst output schema inline to avoid circular dependencies
 const AnalystOutputSchema = z.object({
@@ -8,11 +12,13 @@ const AnalystOutputSchema = z.object({
   finished: z.boolean().optional(),
   outputMessages: MessageHistorySchema.optional(),
   stepData: StepFinishDataSchema.optional(),
-  metadata: z.object({
-    toolsUsed: z.array(z.string()).optional(),
-    finalTool: z.string().optional(),
-    doneTool: z.boolean().optional(),
-  }).optional(),
+  metadata: z
+    .object({
+      toolsUsed: z.array(z.string()).optional(),
+      finalTool: z.string().optional(),
+      doneTool: z.boolean().optional(),
+    })
+    .optional(),
 });
 
 // Input comes from workflow - either from think-and-prep or analyst step
@@ -60,7 +66,21 @@ const formatOutputExecution = async ({
   inputData: z.infer<typeof inputSchema>;
 }): Promise<z.infer<typeof outputSchema>> => {
   // Determine which format we're receiving and extract the step data
-  let stepData: any;
+  let stepData: {
+    conversationHistory?: unknown;
+    finished?: boolean;
+    outputMessages?: unknown;
+    stepData?: unknown;
+    metadata?: {
+      title?: string;
+      todos?: string[];
+      values?: string[];
+      toolsUsed?: string[];
+      finalTool?: string;
+      text?: string;
+      reasoning?: string;
+    };
+  };
 
   if ('analyst' in inputData && inputData.analyst) {
     // Nested format with analyst step
@@ -80,7 +100,7 @@ const formatOutputExecution = async ({
 
     // Look for step data in any key that looks like step output
     for (const key of inputKeys) {
-      const value = (inputData as any)[key];
+      const value = (inputData as Record<string, unknown>)[key];
       if (
         value &&
         typeof value === 'object' &&
@@ -92,11 +112,6 @@ const formatOutputExecution = async ({
     }
 
     if (!stepData) {
-      // Enhanced error logging for debugging
-      console.error('Unrecognized input format for format-output-step:', {
-        inputKeys: Object.keys(inputData),
-        inputData: JSON.stringify(inputData, null, 2),
-      });
       throw new Error('Unrecognized input format for format-output-step');
     }
   }
