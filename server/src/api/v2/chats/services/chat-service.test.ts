@@ -1,11 +1,12 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest';
-import type { User } from '@supabase/supabase-js';
-import { buildChatWithMessages, initializeChat, handleAssetChat } from './chat-service';
-import { ChatError, ChatErrorCode } from '../../../../types/chat-errors.types';
 import type { Chat, Message } from '@buster/database/src/helpers/chats';
+import type { User } from '@supabase/supabase-js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { ChatError, ChatErrorCode } from '../../../../types/chat-errors.types';
+import { buildChatWithMessages, handleAssetChat, initializeChat } from './chat-service';
 
 // Mock database functions
 vi.mock('@buster/database', () => ({
+  db: vi.fn(),
   createChat: vi.fn(),
   getChatWithDetails: vi.fn(),
   createMessage: vi.fn(),
@@ -16,21 +17,21 @@ vi.mock('@buster/database', () => ({
 
 // Import mocked functions
 import {
-  createChat,
-  getChatWithDetails,
-  createMessage,
   checkChatPermission,
+  createChat,
+  createMessage,
   generateAssetMessages,
+  getChatWithDetails,
   getMessagesForChat,
 } from '@buster/database';
 
 describe('chat-service', () => {
   const mockUser: User = {
-    id: 'user-123',
+    id: '550e8400-e29b-41d4-a716-446655440001',
     email: 'test@example.com',
     user_metadata: {
       name: 'Test User',
-      organization_id: 'org-123',
+      organization_id: '550e8400-e29b-41d4-a716-446655440000',
       avatar_url: 'https://example.com/avatar.jpg',
     },
     app_metadata: {},
@@ -41,15 +42,18 @@ describe('chat-service', () => {
   const mockChat: Chat = {
     id: 'chat-123',
     title: 'Test Chat',
-    organizationId: 'org-123',
-    createdBy: 'user-123',
-    updatedBy: 'user-123',
+    organizationId: '550e8400-e29b-41d4-a716-446655440000',
+    createdBy: '550e8400-e29b-41d4-a716-446655440001',
+    updatedBy: '550e8400-e29b-41d4-a716-446655440001',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     publiclyAccessible: false,
     deletedAt: null,
     publiclyEnabledBy: null,
     publicExpiryDate: null,
+    mostRecentFileId: null,
+    mostRecentFileType: null,
+    mostRecentVersionNumber: null,
   };
 
   const mockMessage: Message = {
@@ -109,13 +113,7 @@ describe('chat-service', () => {
     });
 
     it('should handle missing creator details', () => {
-      const result = buildChatWithMessages(
-        mockChat,
-        [],
-        mockUser,
-        null,
-        false
-      );
+      const result = buildChatWithMessages(mockChat, [], mockUser, null, false);
 
       expect(result.created_by_name).toBe('Unknown User');
       expect(result.created_by_avatar).toBeUndefined();
@@ -130,7 +128,7 @@ describe('chat-service', () => {
       const result = await initializeChat(
         { prompt: 'Hello' },
         mockUser,
-        'org-123'
+        '550e8400-e29b-41d4-a716-446655440000'
       );
 
       expect(createChat).toHaveBeenCalledWith({
@@ -182,19 +180,11 @@ describe('chat-service', () => {
       vi.mocked(checkChatPermission).mockResolvedValue(false);
 
       await expect(
-        initializeChat(
-          { chat_id: 'chat-123', prompt: 'Hello' },
-          mockUser,
-          'org-123'
-        )
+        initializeChat({ chat_id: 'chat-123', prompt: 'Hello' }, mockUser, 'org-123')
       ).rejects.toThrow(ChatError);
 
       await expect(
-        initializeChat(
-          { chat_id: 'chat-123', prompt: 'Hello' },
-          mockUser,
-          'org-123'
-        )
+        initializeChat({ chat_id: 'chat-123', prompt: 'Hello' }, mockUser, 'org-123')
       ).rejects.toMatchObject({
         code: ChatErrorCode.PERMISSION_DENIED,
         statusCode: 403,
@@ -206,11 +196,7 @@ describe('chat-service', () => {
       vi.mocked(getChatWithDetails).mockResolvedValue(null);
 
       await expect(
-        initializeChat(
-          { chat_id: 'chat-123', prompt: 'Hello' },
-          mockUser,
-          'org-123'
-        )
+        initializeChat({ chat_id: 'chat-123', prompt: 'Hello' }, mockUser, 'org-123')
       ).rejects.toMatchObject({
         code: ChatErrorCode.CHAT_NOT_FOUND,
         statusCode: 404,
@@ -231,7 +217,8 @@ describe('chat-service', () => {
           id: 'asset-msg-2',
           requestMessage: null,
           responseMessages: {
-            content: 'I\'m ready to help you analyze the metric "Revenue". What would you like to know about it?',
+            content:
+              'I\'m ready to help you analyze the metric "Revenue". What would you like to know about it?',
             role: 'assistant',
           },
         },

@@ -14,13 +14,6 @@ import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { ReasoningMessageSelector } from './ReasoningMessages';
 import { BlackBoxMessage } from './ReasoningMessages/ReasoningBlackBoxMessage';
 import { ReasoningScrollToBottom } from './ReasoningScrollToBottom';
-import { useQuery } from '@tanstack/react-query';
-import { queryKeys } from '@/api/query_keys';
-import { BusterChatMessageReasoning_text } from '@/api/asset_interfaces/chat';
-import last from 'lodash/last';
-import { useGetMessages } from '@/api/buster-electric';
-import { useShape } from '@electric-sql/react';
-import { ELECTRIC_BASE_URL } from '@/api/buster-electric/config';
 
 interface ReasoningControllerProps {
   chatId: string;
@@ -58,8 +51,6 @@ export const ReasoningController: React.FC<ReasoningControllerProps> = ({ chatId
       enableAutoScroll();
     }
   }, [hasChat, isEmpty(reasoningMessageIds)]);
-
-  useGetMessages({ chatId });
 
   if (!hasChat || !reasoningMessageIds) return <FileIndeterminateLoader />;
 

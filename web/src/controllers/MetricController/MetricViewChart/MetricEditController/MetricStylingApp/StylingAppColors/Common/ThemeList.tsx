@@ -39,7 +39,11 @@ const ColorOption: React.FC<{
 
   return (
     <div
-      onClick={() => onChangeColorTheme(theme)}
+      onClick={() => {
+        onChangeColorTheme(theme);
+      }}
+      data-testid={`color-theme-${name}`}
+      data-selected={selected}
       className={cn(
         'flex w-full items-center justify-between space-x-2.5 overflow-hidden',
         'cursor-pointer rounded-sm px-3 py-2',

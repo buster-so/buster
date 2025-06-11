@@ -72,6 +72,18 @@ const nextConfig = {
       bodySizeLimit: '2mb'
     }
   },
+  webpack: (config, { dev, isServer }) => {
+    // Suppress the specific warning about critical dependencies in Supabase realtime-js
+    config.ignoreWarnings = [
+      ...(config.ignoreWarnings || []),
+      {
+        module: /node_modules\/@supabase\/realtime-js/,
+        message: /Critical dependency: the request of a dependency is an expression/
+      }
+    ];
+
+    return config;
+  },
   async headers() {
     return [
       {

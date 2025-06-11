@@ -58,14 +58,23 @@ async fn main() -> Result<(), anyhow::Error> {
         return Ok(());
     }
 
-    tracing::info!("Running database migrations");
+    // Check if migrations should be skipped
+    let skip_migrations = env::var("SKIP_MIGRATIONS")
+        .map(|v| v.to_lowercase() == "true")
+        .unwrap_or(false);
 
-    if let Err(e) = run_migrations().await {
-        tracing::error!("Failed to run database migrations: {}", e);
-        return Ok(());
+    if !skip_migrations {
+        tracing::info!("Running database migrations");
+
+        if let Err(e) = run_migrations().await {
+            tracing::error!("Failed to run database migrations: {}", e);
+            return Ok(());
+        }
+
+        tracing::info!("Successfully ran database migrations");
+    } else {
+        tracing::info!("Skipping database migrations (SKIP_MIGRATIONS=true)");
     }
-
-    tracing::info!("Successfully ran database migrations");
 
     // --- Start Stored Values Sync Job Scheduler ---
     let scheduler = JobScheduler::new().await?; // Using `?` assuming main returns Result

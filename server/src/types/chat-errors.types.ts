@@ -49,7 +49,7 @@ export class ChatError extends Error {
   constructor(
     public code: ChatErrorCode,
     public override message: string,
-    public statusCode = 500,
+    public statusCode: 500 | 400 | 401 | 403 | 404 | 409 | 500 = 500,
     public details?: Record<string, unknown>
   ) {
     super(message);

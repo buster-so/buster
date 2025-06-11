@@ -22,7 +22,7 @@ import { formatSchemaName } from './utils';
 export class StoredValuesError extends Error {
   constructor(
     message: string,
-    public cause?: unknown
+    public override cause?: unknown
   ) {
     super(message);
     this.name = 'StoredValuesError';
@@ -52,7 +52,9 @@ export class StoredValuesError extends Error {
 export async function searchValuesByEmbedding(
   dataSourceId: string,
   queryEmbedding: number[],
-  options: SearchOptions = {}
+  options: SearchOptions = {
+    limit: 10,
+  }
 ): Promise<StoredValueResult[]> {
   try {
     // Validate inputs
@@ -104,7 +106,7 @@ export async function searchValuesByEmbedding(
       : [embeddingLiteral, validOptions.limit];
 
     const results = await client.unsafe(query, params);
-    return results as StoredValueResult[];
+    return results as unknown as StoredValueResult[]; //TODO: fix this to make it more type safe
   } catch (error) {
     if (error instanceof Error) {
       throw new StoredValuesError(`Failed to search values by embedding: ${error.message}`, error);
@@ -143,7 +145,7 @@ export async function searchValuesByEmbedding(
 export async function searchValuesByEmbeddingWithFilters(
   dataSourceId: string,
   queryEmbedding: number[],
-  options: SearchOptions = {},
+  options: SearchOptions = { limit: 10 },
   databaseName?: string,
   schemaName?: string,
   tableName?: string,
@@ -162,7 +164,7 @@ export async function searchValuesByEmbeddingWithFilters(
     const filters: string[] = [];
     // Format embedding as PostgreSQL array literal for halfvec
     const embeddingLiteral = `[${validEmbedding.join(',')}]`;
-    const params: unknown[] = [embeddingLiteral, validOptions.limit];
+    const params = [embeddingLiteral, validOptions.limit];
     let paramIndex = 3;
 
     if (databaseName !== undefined) {
@@ -217,7 +219,7 @@ export async function searchValuesByEmbeddingWithFilters(
     `;
 
     const results = await client.unsafe(query, params);
-    return results as StoredValueResult[];
+    return results as unknown as StoredValueResult[];
   } catch (error) {
     if (error instanceof Error) {
       throw new StoredValuesError(`Failed to search values with filters: ${error.message}`, error);
@@ -258,7 +260,7 @@ export async function searchValuesAcrossTargets(
   queryEmbedding: number[],
   targets: SearchTarget[],
   limitPerTarget = 10,
-  options: SearchOptions = {}
+  options: SearchOptions = { limit: 10 }
 ): Promise<StoredValueResult[]> {
   try {
     // Validate inputs

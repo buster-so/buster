@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
-import type { BusterChatMessageReasoning_pills, ThoughtFileType } from '@/api/asset_interfaces';
+import type { BusterChatMessageReasoning_pills } from '@/api/asset_interfaces';
 import { Button } from '@/components/ui/buttons';
 import { ReasoningMessagePillsContainer } from './ReasoningMessagePillsContainer';
 
@@ -65,12 +65,12 @@ const InteractiveLoadingWrapper = () => {
       pills: [
         {
           text: `Term ${Math.random().toString(36).slice(2, 7)}`,
-          type: 'term' as ThoughtFileType,
+          type: 'term' as const,
           id: Math.random().toString()
         },
         {
           text: `Term ${Math.random().toString(36).slice(2, 7)}`,
-          type: 'term' as ThoughtFileType,
+          type: 'term' as const,
           id: Math.random().toString()
         }
       ]
@@ -136,7 +136,7 @@ export const ManyPills: Story = {
         title: 'Container with Many Pills',
         pills: Array.from({ length: 40 }, (_, index) => ({
           text: `Term ${index + 1}`,
-          type: 'term' as ThoughtFileType,
+          type: 'term',
           id: `many-${index + 1}`
         }))
       }

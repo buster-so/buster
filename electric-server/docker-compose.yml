@@ -2,7 +2,10 @@ services:
   electric:
     image: electricsql/electric
     ports:
-      - "3003:3000"  # Expose Electric's HTTP API on port 3011 instead of 3000
+      - "3003:3003"  # Expose Electric's HTTP API on port 3003 instead of 3000
     environment:
       DATABASE_URL: "postgresql://postgres:postgres@host.docker.internal:54322/postgres?sslmode=disable"
-      ELECTRIC_INSECURE: true
+      ELECTRIC_INSECURE: ${ELECTRIC_INSECURE:-false}
+      ELECTRIC_PROXY_URL: ${ELECTRIC_PROXY_URL:-http://localhost:3003}
+      ELECTRIC_PORT: ${ELECTRIC_PORT:-3003}
+      ELECTRIC_SECRET: ${ELECTRIC_SECRET:-my-little-buttercup-has-the-sweetest-smile}

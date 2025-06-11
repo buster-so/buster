@@ -31,3 +31,9 @@ fast:
 	export RUST_LOG=debug && \
 	export CARGO_INCREMENTAL=1 && \
 	nice cargo watch -C server -x run
+
+fast-no-migrations:
+	export RUST_LOG=debug && \
+	export CARGO_INCREMENTAL=1 && \
+	export SKIP_MIGRATIONS=true && \
+	nice cargo watch -C server -x run

@@ -24,7 +24,7 @@ export const StreamingMessageCode: React.FC<
     isCompletedStream: boolean;
     buttons?: React.ReactNode;
   }
-> = ({ status, isCompletedStream, file, file_name, version_number, buttons }) => {
+> = ({ isCompletedStream, file, file_name, version_number, buttons }) => {
   const { text = '', modified } = file;
 
   const [lineSegments, setLineSegments] = useState<LineSegment[]>([]);
@@ -90,7 +90,9 @@ export const StreamingMessageCode: React.FC<
   return (
     <FileCard
       fileName={useMemo(
-        () => <TextAndVersionPill fileName={file_name} versionNumber={version_number} />,
+        () => (
+          <TextAndVersionPill fileName={file_name} versionNumber={version_number} />
+        ),
         [file_name, version_number]
       )}
       headerButtons={buttons}>

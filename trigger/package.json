@@ -15,18 +15,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@buster/ai": "*",
-    "@buster/database": "*",
-    "@buster/data-source": "*",
-    "@trigger.dev/sdk": "^3.3.17",
-    "braintrust": "^0.0.205",
-    "zod": "^3.25.56"
+    "@trigger.dev/sdk": "^3.3.17"
   },
   "devDependencies": {
-    "@buster/test-utils": "*",
-    "@trigger.dev/build": "^3.3.17",
-    "@types/node": "^22.15.24",
-    "typescript": "^5.8.3",
-    "vitest": "^2.1.8"
+    "@trigger.dev/build": "^3.3.17"
   }
 }

@@ -35,4 +35,5 @@ export {
   desc,
   asc,
   sql,
+  count,
 } from 'drizzle-orm';

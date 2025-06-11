@@ -17,15 +17,27 @@ async function executeSqlFile(filePath: string): Promise<void> {
   try {
     console.log(`📄 Executing SQL file with psql: ${filePath}`);
 
-    const command = `PGPASSWORD=postgres psql -h 127.0.0.1 -p 54322 -d postgres -U postgres -f "${filePath}"`;
+    // Use ON_ERROR_STOP to halt execution on first error
+    const command = `PGPASSWORD=postgres psql -h 127.0.0.1 -p 54322 -d postgres -U postgres --set ON_ERROR_STOP=on -f "${filePath}"`;
 
     const { stdout, stderr } = await execAsync(command);
+
+    // Check for SQL errors in the output
+    const hasErrors =
+      stderr &&
+      (stderr.includes('ERROR:') || stderr.includes('FATAL:') || stderr.includes('PANIC:'));
+
+    if (hasErrors) {
+      console.error(`❌ SQL errors found in ${filePath}:`);
+      console.error(stderr);
+      throw new Error(`SQL execution failed with errors: ${stderr}`);
+    }
 
     if (stdout) {
       console.log(stdout);
     }
     if (stderr) {
-      // psql outputs some info to stderr that isn't actually errors
+      // psql outputs some info to stderr that isn't actually errors (like notices)
       console.log(stderr);
     }
 
@@ -128,26 +140,27 @@ async function seedData(): Promise<void> {
   }
 }
 
-/**
- * Run migrations only
- */
-async function migrateOnly(): Promise<void> {
-  try {
-    console.log('🚀 Running migrations only...\n');
-
-    await runDatabaseMigrations();
-
-    console.log('🎉 Migrations completed successfully!');
-  } catch (error) {
-    console.error('❌ Migrations failed:', error);
-    process.exit(1);
-  } finally {
-    await closePool();
-  }
-}
-
 // CLI handling
 const command = process.argv[2];
+
+// Check if DATABASE_URL is defined
+if (!process.env.DATABASE_URL) {
+  console.error('❌ ERROR: DATABASE_URL environment variable is not defined');
+  console.error('Please ensure you have a .env file with DATABASE_URL configured');
+  process.exit(1);
+}
+
+if (!process.env.SUPABASE_URL) {
+  console.error('❌ ERROR: SUPABASE_URL environment variable is not defined');
+  console.error('Please ensure you have a .env file with SUPABASE_URL configured');
+  process.exit(1);
+}
+
+if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  console.error('❌ ERROR: SUPABASE_SERVICE_ROLE_KEY environment variable is not defined');
+  console.error('Please ensure you have a .env file with SUPABASE_SERVICE_ROLE_KEY configured');
+  process.exit(1);
+}
 
 switch (command) {
   case 'run':
@@ -159,9 +172,6 @@ switch (command) {
     break;
   case 'seed':
     await seedData();
-    break;
-  case 'migrate':
-    await migrateOnly();
     break;
   default:
     console.log(`

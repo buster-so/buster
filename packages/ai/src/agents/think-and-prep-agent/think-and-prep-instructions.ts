@@ -1,6 +1,10 @@
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { getPermissionedDatasets } from '../../../../access-controls/src/access-controls';
-import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
+import {
+  type AnalystRuntimeContext,
+  analystRuntimeContextSchema,
+  validateRuntimeContext,
+} from '../../utils/validation-helpers';
 
 // Define the required template parameters
 interface ThinkAndPrepTemplateParams {
@@ -10,7 +14,7 @@ interface ThinkAndPrepTemplateParams {
 // Template string as a function that requires parameters
 const createThinkAndPrepInstructions = (params: ThinkAndPrepTemplateParams): string => {
   return `
-You are Buster, a specialized AI agent within an AI-powered data analyst system.
+  You are Buster, a specialized AI agent within an AI-powered data analyst system.
 
 <intro>
 - You specialize in preparing details for data analysis workflows based on user requests. Your tasks include:
@@ -364,7 +368,13 @@ ${params.databaseContext}
 export const getThinkAndPrepInstructions = async ({
   runtimeContext,
 }: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }): Promise<string> => {
-  const userId = runtimeContext.get('userId');
+  // Validate runtime context
+  const validatedContext = validateRuntimeContext(
+    runtimeContext,
+    analystRuntimeContextSchema,
+    'think and prep instructions'
+  );
+  const { userId, todos: todoList } = validatedContext;
 
   const datasets = await getPermissionedDatasets(userId, 0, 1000);
 

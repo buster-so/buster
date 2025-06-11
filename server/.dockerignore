@@ -1,0 +1,69 @@
+# Git
+.git
+.gitignore
+
+# Dependencies that will be installed in Docker
+node_modules
+*/node_modules
+
+# Build outputs (will be generated during build)
+dist
+*.tsbuildinfo
+
+# Environment files (these should be provided via environment variables)
+.env
+.env.*
+!.env.example
+
+# Development files
+.vscode
+.idea
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage
+.nyc_output
+*.test.ts
+*.spec.ts
+**/*.test.*
+**/*.spec.*
+
+# Documentation
+*.md
+!README.md
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+
+# Local configuration
+.prettierrc.json
+.eslintrc*
+vitest.config.ts
+
+# CI/CD
+.github/
+
+# Docker files
+Dockerfile*
+.dockerignore
+
+# Bun specific
+bun.lockb
+
+# Development tools
+makefile 

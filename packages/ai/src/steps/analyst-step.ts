@@ -17,10 +17,12 @@ import {
 } from '../utils/memory/types';
 import { retryableAgentStream } from '../utils/retry';
 import { ToolArgsParser } from '../utils/streaming';
-import type {
-  AnalystRuntimeContext,
-  thinkAndPrepWorkflowInputSchema,
-} from '../workflows/analyst-workflow';
+import {
+  type AnalystRuntimeContext,
+  analystRuntimeContextSchema,
+  validateRuntimeContext,
+} from '../utils/validation-helpers';
+import type { thinkAndPrepWorkflowInputSchema } from '../workflows/analyst-workflow'; // Just for input schema types now
 
 const inputSchema = ThinkAndPrepOutputSchema;
 
@@ -171,12 +173,23 @@ const analystExecution = async ({
   let completeConversationHistory: CoreMessage[] = [];
 
   try {
-    const resourceId = runtimeContext.get('userId');
-    const threadId = runtimeContext.get('threadId');
-
-    if (!resourceId || !threadId) {
-      throw new Error('Unable to access your session. Please refresh and try again.');
+    // Validate runtime context early with user-friendly error handling
+    let validatedContext: AnalystRuntimeContext;
+    try {
+      validatedContext = validateRuntimeContext(
+        runtimeContext,
+        analystRuntimeContextSchema,
+        'analyst workflow'
+      );
+    } catch (error) {
+      // Convert technical validation errors to user-friendly messages
+      if (error instanceof Error && error.message.includes('Runtime context is required')) {
+        throw new Error('Unable to access your session. Please refresh and try again.');
+      }
+      throw new Error('Session information is invalid. Please refresh and try again.');
     }
+
+    const { userId: resourceId, threadId } = validatedContext;
 
     // Messages come directly from think-and-prep step output
     // They are already in CoreMessage[] format
@@ -268,7 +281,7 @@ const analystExecution = async ({
       finished: true,
       outputMessages: completeConversationHistory,
     };
-  } catch (error) {
+  } catch (error) 
     // Handle abort errors gracefully
     if (error instanceof Error && error.name === 'AbortError') {
       // This is expected when we abort the stream
@@ -300,7 +313,6 @@ const analystExecution = async ({
     throw new Error(
       'Something went wrong during the analysis. Please try again or contact support if the issue persists.'
     );
-  }
 };
 
 export const analystStep = createStep({

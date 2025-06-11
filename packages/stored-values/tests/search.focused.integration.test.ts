@@ -134,16 +134,19 @@ describeFn('search.ts - Focused Integration Tests with Real Data', () => {
       // Group by table for analysis
       const resultsByTable = results.reduce(
         (acc, r) => {
-          if (!acc[r.table_name]) acc[r.table_name] = [];
-          acc[r.table_name].push(r);
+          const tableName = r.table_name;
+          if (!acc[tableName]) {
+            acc[tableName] = [];
+          }
+          acc[tableName].push(r);
           return acc;
         },
         {} as Record<string, typeof results>
       );
 
-      Object.entries(resultsByTable).forEach(([_table, tableResults]) => {
+      for (const [_table, tableResults] of Object.entries(resultsByTable)) {
         tableResults.forEach((_r, _i) => {});
-      });
+      }
 
       // Should have results from both targets
       expect(results.length).toBeGreaterThan(0);

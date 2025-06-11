@@ -1,5 +1,6 @@
 import { vi } from 'vitest';
 
+// biome-ignore lint/suspicious/noExplicitAny: because this is for testing it seems fine
 export function createMockFunction<T extends (...args: any[]) => any>(implementation?: T) {
   return vi.fn(implementation);
 }

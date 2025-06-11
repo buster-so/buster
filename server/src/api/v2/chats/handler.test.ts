@@ -1,8 +1,8 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest';
 import type { User } from '@supabase/supabase-js';
-import { createChatHandler } from './handler';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ChatError, ChatErrorCode } from '../../../types/chat-errors.types';
 import type { ChatWithMessages } from '../../../types/chat.types';
+import { createChatHandler } from './handler';
 
 // Mock dependencies
 vi.mock('@trigger.dev/sdk/v3', () => ({
@@ -18,14 +18,14 @@ vi.mock('./services/chat-service', () => ({
 
 // Import mocked functions
 import { tasks } from '@trigger.dev/sdk/v3';
-import { initializeChat, handleAssetChat } from './services/chat-service';
+import { handleAssetChat, initializeChat } from './services/chat-service';
 
 describe('createChatHandler', () => {
   const mockUser: User = {
-    id: 'user-123',
+    id: '550e8400-e29b-41d4-a716-446655440001',
     email: 'test@example.com',
     user_metadata: {
-      organization_id: 'org-123',
+      organization_id: '550e8400-e29b-41d4-a716-446655440000',
       name: 'Test User',
     },
     app_metadata: {},
@@ -49,6 +49,7 @@ describe('createChatHandler', () => {
           sender_id: 'user-123',
           sender_name: 'Test User',
         },
+        is_completed: false,
       },
     },
     created_at: new Date().toISOString(),
@@ -69,15 +70,12 @@ describe('createChatHandler', () => {
   });
 
   it('should create a new chat with prompt', async () => {
-    const result = await createChatHandler(
-      { prompt: 'Hello' },
-      mockUser
-    );
+    const result = await createChatHandler({ prompt: 'Hello' }, mockUser);
 
     expect(initializeChat).toHaveBeenCalledWith(
       { prompt: 'Hello' },
       mockUser,
-      'org-123'
+      '550e8400-e29b-41d4-a716-446655440000'
     );
     expect(tasks.trigger).toHaveBeenCalledWith('analyst-agent-task', {
       message_id: 'msg-123',
@@ -109,10 +107,7 @@ describe('createChatHandler', () => {
   });
 
   it('should not trigger analyst task when no content', async () => {
-    const result = await createChatHandler(
-      {},
-      mockUser
-    );
+    const result = await createChatHandler({}, mockUser);
 
     expect(tasks.trigger).not.toHaveBeenCalled();
     expect(result).toEqual(mockChat);
@@ -135,17 +130,14 @@ describe('createChatHandler', () => {
     vi.mocked(tasks.trigger).mockRejectedValue(new Error('Trigger failed'));
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    const result = await createChatHandler(
-      { prompt: 'Hello' },
-      mockUser
-    );
+    const result = await createChatHandler({ prompt: 'Hello' }, mockUser);
 
     expect(consoleSpy).toHaveBeenCalledWith(
       'Failed to trigger analyst agent task:',
       expect.any(Error)
     );
     expect(result).toEqual(mockChat); // Should still return the chat
-    
+
     consoleSpy.mockRestore();
   });
 
@@ -155,34 +147,24 @@ describe('createChatHandler', () => {
       user_metadata: {},
     };
 
-    await expect(
-      createChatHandler({ prompt: 'Hello' }, userWithoutOrg)
-    ).rejects.toMatchObject({
+    await expect(createChatHandler({ prompt: 'Hello' }, userWithoutOrg)).rejects.toMatchObject({
       code: ChatErrorCode.MISSING_ORGANIZATION,
       statusCode: 400,
     });
   });
 
   it('should re-throw ChatError instances', async () => {
-    const chatError = new ChatError(
-      ChatErrorCode.PERMISSION_DENIED,
-      'No permission',
-      403
-    );
+    const chatError = new ChatError(ChatErrorCode.PERMISSION_DENIED, 'No permission', 403);
     vi.mocked(initializeChat).mockRejectedValue(chatError);
 
-    await expect(
-      createChatHandler({ prompt: 'Hello' }, mockUser)
-    ).rejects.toThrow(chatError);
+    await expect(createChatHandler({ prompt: 'Hello' }, mockUser)).rejects.toThrow(chatError);
   });
 
   it('should wrap unexpected errors', async () => {
     vi.mocked(initializeChat).mockRejectedValue(new Error('Database error'));
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    await expect(
-      createChatHandler({ prompt: 'Hello' }, mockUser)
-    ).rejects.toMatchObject({
+    await expect(createChatHandler({ prompt: 'Hello' }, mockUser)).rejects.toMatchObject({
       code: ChatErrorCode.INTERNAL_ERROR,
       statusCode: 500,
       details: { originalError: 'Database error' },

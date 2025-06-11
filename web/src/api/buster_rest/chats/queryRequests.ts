@@ -168,10 +168,15 @@ export const prefetchGetChat = async (
   return queryClient;
 };
 
-export const useUpdateChat = () => {
+export const useUpdateChat = (params?: { updateToServer?: boolean }) => {
   const queryClient = useQueryClient();
+  const { updateToServer = true } = params || {};
+
   return useMutation({
-    mutationFn: updateChat,
+    mutationFn: async (p: Parameters<typeof updateChat>[0]) => {
+      if (updateToServer) return updateChat(p);
+      return p;
+    },
     onMutate: (data) => {
       //this is actually handled in @useChatUpdate file
       //except for the chat title and feedback
