@@ -260,6 +260,8 @@ export const createMetrics = createTool({
   id: 'create-metrics-file',
   description: `Creates metric configuration files with YAML content following the metric schema specification. Before using this tool, carefully consider the appropriate visualization type (bar, line, scatter, pie, combo, metric, table) and its specific configuration requirements. Each visualization has unique axis settings, formatting options, and data structure needs that must be thoroughly planned to create effective metrics. **This tool supports creating multiple metrics in a single call; prefer using bulk creation over creating metrics one by one.**
 
+Only utilize the required/default fields unless the user specifically requests that optional fields be added.
+
 ## COMPLETE METRIC YAML SCHEMA SPECIFICATION
 
 \`\`\`
