@@ -2,69 +2,7 @@ import { describe, expect, test } from 'vitest';
 import { formatOutputStep } from '../../../src/steps/format-output-step';
 
 describe('Format Output Step Unit Tests', () => {
-  test('should handle direct ThinkAndPrepOutputSchema input', async () => {
-    const thinkAndPrepOutput = {
-      finished: true,
-      outputMessages: [
-        { role: 'user' as const, content: 'Hello' },
-        { role: 'assistant' as const, content: 'Hi there!' },
-      ],
-      conversationHistory: [
-        { role: 'user' as const, content: 'Hello' },
-        { role: 'assistant' as const, content: 'Hi there!' },
-      ],
-      stepData: {
-        stepType: 'think-and-prep',
-        text: 'Test response',
-        reasoning: 'Test reasoning',
-        reasoningDetails: [],
-        files: [],
-        sources: [],
-        toolCalls: [],
-        toolResults: [],
-        finishReason: 'completed',
-        usage: {},
-        warnings: [],
-        logprobs: null,
-        request: {},
-        response: {
-          id: 'test-id',
-          timestamp: new Date(),
-          modelId: 'claude-sonnet-4',
-          headers: {},
-          messages: [],
-        },
-        providerMetadata: {},
-        experimental_providerMetadata: {},
-        isContinued: false,
-      },
-      metadata: {
-        toolsUsed: ['submitThoughts'],
-        finalTool: 'submitThoughts' as const,
-        text: 'Test response',
-        reasoning: 'Test reasoning',
-      },
-    };
-
-    const result = await formatOutputStep.execute({
-      inputData: thinkAndPrepOutput,
-      getInitData: async () => ({ prompt: 'test' }),
-      runtimeContext: {} as any,
-    });
-
-    expect(result).toEqual({
-      conversationHistory: thinkAndPrepOutput.conversationHistory,
-      finished: thinkAndPrepOutput.finished,
-      outputMessages: thinkAndPrepOutput.outputMessages,
-      stepData: thinkAndPrepOutput.stepData,
-      metadata: thinkAndPrepOutput.metadata,
-      title: undefined,
-      todos: undefined,
-      values: undefined,
-    });
-  });
-
-  test('should handle direct analyst step output', async () => {
+  test('should handle analyst step output', async () => {
     const analystOutput = {
       conversationHistory: [
         { role: 'user' as const, content: 'Analyze data' },
@@ -78,9 +16,37 @@ describe('Format Output Step Unit Tests', () => {
       stepData: {
         stepType: 'analyst',
         text: 'Analysis response',
+        reasoning: 'Test reasoning',
+        reasoningDetails: [],
+        files: [],
+        sources: [],
+        toolCalls: [],
+        toolResults: [],
+        finishReason: 'completed',
+        usage: {
+          promptTokens: 100,
+          completionTokens: 50,
+          totalTokens: 150,
+        },
+        warnings: [],
+        request: {
+          model: 'claude-sonnet-4',
+          messages: [],
+          temperature: 0,
+          maxTokens: 10000,
+          tools: [],
+        },
+        response: {
+          id: 'test-id',
+          timestamp: new Date(),
+          modelId: 'claude-sonnet-4',
+          headers: {},
+          messages: [],
+        },
       },
       metadata: {
         toolsUsed: ['doneTool'],
+        finalTool: 'doneTool',
       },
     };
 
@@ -102,64 +68,68 @@ describe('Format Output Step Unit Tests', () => {
     });
   });
 
-  test('should handle nested workflow format with think-and-prep only', async () => {
-    const nestedInput = {
-      'think-and-prep': {
-        finished: true,
-        outputMessages: [
-          { role: 'user' as const, content: 'Hello' },
-          { role: 'assistant' as const, content: 'Hi there!' },
-        ],
-        conversationHistory: [
-          { role: 'user' as const, content: 'Hello' },
-          { role: 'assistant' as const, content: 'Hi there!' },
-        ],
-        stepData: { test: 'data' },
-        metadata: { test: 'metadata' },
+  test('should handle analyst pass-through output (from think-and-prep)', async () => {
+    const passthroughOutput = {
+      conversationHistory: [
+        { role: 'user' as const, content: 'Hello' },
+        { role: 'assistant' as const, content: 'Hi there!' },
+      ],
+      finished: true,
+      outputMessages: [
+        { role: 'user' as const, content: 'Hello' },
+        { role: 'assistant' as const, content: 'Hi there!' },
+      ],
+      metadata: {
+        toolsUsed: ['respondWithoutAnalysis'],
+        finalTool: 'respondWithoutAnalysis',
       },
     };
 
     const result = await formatOutputStep.execute({
-      inputData: nestedInput,
+      inputData: passthroughOutput,
       getInitData: async () => ({ prompt: 'test' }),
       runtimeContext: {} as any,
     });
 
-    expect(result.conversationHistory).toEqual(nestedInput['think-and-prep'].conversationHistory);
+    expect(result.conversationHistory).toEqual(passthroughOutput.conversationHistory);
     expect(result.finished).toBe(true);
+    expect(result.outputMessages).toEqual(passthroughOutput.outputMessages);
+    expect(result.metadata).toEqual(passthroughOutput.metadata);
   });
 
-  test('should handle dynamic step data discovery', async () => {
-    const dynamicInput = {
-      'some-step-name': {
-        conversationHistory: [{ role: 'user' as const, content: 'test' }],
-        finished: false,
-        outputMessages: [{ role: 'assistant' as const, content: 'response' }],
-      },
+  test('should handle missing optional fields', async () => {
+    const minimalOutput = {
+      conversationHistory: [{ role: 'user' as const, content: 'test' }],
     };
 
     const result = await formatOutputStep.execute({
-      inputData: dynamicInput,
+      inputData: minimalOutput,
       getInitData: async () => ({ prompt: 'test' }),
       runtimeContext: {} as any,
     });
 
-    expect(result.conversationHistory).toEqual(dynamicInput['some-step-name'].conversationHistory);
+    expect(result.conversationHistory).toEqual(minimalOutput.conversationHistory);
     expect(result.finished).toBe(false);
+    expect(result.outputMessages).toEqual([]);
+    expect(result.stepData).toBeUndefined();
+    expect(result.metadata).toBeUndefined();
   });
 
-  test('should throw error for truly unrecognized input format', async () => {
-    const invalidInput = {
-      someUnknownProperty: 'value',
-      anotherProperty: { noStepData: true },
+  test('should handle empty arrays gracefully', async () => {
+    const emptyOutput = {
+      conversationHistory: [],
+      outputMessages: [],
+      finished: false,
     };
 
-    await expect(
-      formatOutputStep.execute({
-        inputData: invalidInput as any,
-        getInitData: async () => ({ prompt: 'test' }),
-        runtimeContext: {} as any,
-      })
-    ).rejects.toThrow('Unrecognized input format for format-output-step');
+    const result = await formatOutputStep.execute({
+      inputData: emptyOutput,
+      getInitData: async () => ({ prompt: 'test' }),
+      runtimeContext: {} as any,
+    });
+
+    expect(result.conversationHistory).toEqual([]);
+    expect(result.outputMessages).toEqual([]);
+    expect(result.finished).toBe(false);
   });
 });

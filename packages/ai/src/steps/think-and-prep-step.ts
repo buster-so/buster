@@ -1,6 +1,6 @@
 import { createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
-import type { CoreMessage, StepResult, ToolSet } from 'ai';
+import type { CoreMessage, StepResult, StreamTextResult, ToolSet } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { thinkAndPrepAgent } from '../agents/think-and-prep-agent/think-and-prep-agent';
@@ -31,6 +31,10 @@ import {
   getLastToolUsed,
 } from '../utils/memory/message-history';
 import { createTodoToolCallMessage, createTodoToolResultMessage } from '../utils/memory/todos-to-messages';
+import {
+  createTodoToolCallMessage,
+  createTodoToolResultMessage,
+} from '../utils/memory/todos-to-messages';
 import {
   type MessageHistory,
   type StepFinishData,
@@ -120,10 +124,8 @@ const handleThinkAndPrepStepFinish = async ({
 };
 
 // Helper function to process stream chunks
-const processStreamChunks = async (
-  stream: {
-    fullStream: AsyncIterable<{ type: string; [key: string]: unknown }>;
-  },
+const processStreamChunks = async <T extends ToolSet>(
+  stream: StreamTextResult<T, unknown>,
   toolArgsParser: ToolArgsParser
 ): Promise<void> => {
   for await (const chunk of stream.fullStream) {
@@ -188,10 +190,28 @@ const thinkAndPrepExecution = async ({
     const initData = await getInitData();
     const todos = inputData['create-todos'].todos;
 
-    const baseMessages =
-      initData.conversationHistory && initData.conversationHistory.length > 0
-        ? appendToConversation(initData.conversationHistory, initData.prompt)
-        : standardizeMessages(initData.prompt);
+    // Standardize messages from workflow inputs
+    const inputPrompt = initData.prompt;
+    const conversationHistory = initData.conversationHistory || [];
+
+    // Create base messages from prompt
+    let baseMessages: CoreMessage[];
+    if (conversationHistory.length > 0) {
+      // If we have conversation history, append the new prompt to it
+      baseMessages = appendToConversation(conversationHistory, inputPrompt);
+    } else {
+      // Otherwise, just use the prompt as a new conversation
+      baseMessages = standardizeMessages(inputPrompt);
+    }
+
+    // DEBUG: Log the messages being prepared for think-and-prep
+    console.log('THINK-AND-PREP DEBUG - Input:', {
+      inputPrompt,
+      conversationHistoryLength: conversationHistory.length,
+      conversationHistory,
+      baseMessagesLength: baseMessages.length,
+      baseMessages,
+    });
 
     // Create todo messages and inject them into the conversation history
     const todoCallMessage = createTodoToolCallMessage(todos);
