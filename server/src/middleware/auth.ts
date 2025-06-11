@@ -8,9 +8,6 @@ export const requireAuth = bearerAuth({
   verifyToken: async (token, c) => {
     const { data, error } = await supabase.auth.getUser(token); //usually takes about 3 - 7ms
 
-    if (token.includes('Cj0g')) {
-    }
-
     if (error || !data.user) {
       return false;
     }

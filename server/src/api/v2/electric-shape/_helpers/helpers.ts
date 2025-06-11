@@ -1,10 +1,10 @@
 export const getElectricShapeUrl = (requestUrl: string) => {
   const url = new URL(requestUrl);
 
-  const electricUrl = process.env.ELECTRIC_URL;
+  const electricUrl = process.env.ELECTRIC_PROXY_URL;
 
   if (!electricUrl) {
-    throw new Error('ELECTRIC_URL is not set');
+    throw new Error('ELECTRIC_PROXY_URL is not set');
   }
 
   const baseUrl =
@@ -39,32 +39,6 @@ export const getElectricShapeUrl = (requestUrl: string) => {
   return originUrl;
 };
 
-export const createProxiedResponse = async (url: URL) => {
-  const response = await fetch(url);
-
-  // Fetch decompresses the body but doesn't remove the
-  // content-encoding & content-length headers which would
-  // break decoding in the browser.
-
-  // See https://github.com/whatwg/fetch/issues/1729
-  const headers = new Headers(response.headers);
-  headers.delete('content-encoding');
-  headers.delete('content-length');
-
-  // Return the proxied response
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers,
-  });
-};
-
-/**
- * Extracts a parameter value from the where clause in the URL
- * @param url - The URL object containing the where parameter
- * @param paramName - The parameter name to extract (e.g., 'chatId', 'userId')
- * @returns The parameter value or null if not found
- */
 export const extractParamFromWhere = (url: URL, paramName: string): string | null => {
   const whereClause = url.searchParams.get('where');
 

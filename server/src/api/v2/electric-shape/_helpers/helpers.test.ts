@@ -1,33 +1,33 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createProxiedResponse, extractParamFromWhere, getElectricShapeUrl } from './_helpers';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { extractParamFromWhere, getElectricShapeUrl } from '.';
 
 describe('getElectricShapeUrl', () => {
-  process.env.ELECTRIC_URL = 'http://localhost:3000';
-  const originalElectricUrl = process.env.ELECTRIC_URL;
+  process.env.ELECTRIC_PROXY_URL = 'http://localhost:3000';
+  const originalElectricUrl = process.env.ELECTRIC_PROXY_URL;
 
   beforeEach(() => {
     // Clean up environment variable before each test
-    process.env.ELECTRIC_URL = undefined;
+    process.env.ELECTRIC_PROXY_URL = undefined;
   });
 
   afterEach(() => {
     // Restore original environment variable after each test
     if (originalElectricUrl !== undefined) {
-      process.env.ELECTRIC_URL = originalElectricUrl;
+      process.env.ELECTRIC_PROXY_URL = originalElectricUrl;
     } else {
-      process.env.ELECTRIC_URL = undefined;
+      process.env.ELECTRIC_PROXY_URL = undefined;
     }
   });
 
-  it('should return default URL with /v1/shape path when no ELECTRIC_URL is set', () => {
+  it('should return default URL with /v1/shape path when no ELECTRIC_PROXY_URL is set', () => {
     const requestUrl = 'http://example.com/test?table=users';
     const result = getElectricShapeUrl(requestUrl);
 
     expect(result.toString()).toBe('http://localhost:3000/v1/shape?table=users');
   });
 
-  it('should use ELECTRIC_URL environment variable when set', () => {
-    process.env.ELECTRIC_URL = 'https://electric.example.com';
+  it('should use ELECTRIC_PROXY_URL environment variable when set', () => {
+    process.env.ELECTRIC_PROXY_URL = 'https://electric.example.com';
     const requestUrl = 'http://example.com/test?table=users&live=true';
     const result = getElectricShapeUrl(requestUrl);
 
@@ -138,16 +138,16 @@ describe('getElectricShapeUrl', () => {
     expect(result.searchParams.get('table')).toBe('posts');
   });
 
-  it('should handle ELECTRIC_URL with trailing slash', () => {
-    process.env.ELECTRIC_URL = 'https://electric.example.com/';
+  it('should handle ELECTRIC_PROXY_URL with trailing slash', () => {
+    process.env.ELECTRIC_PROXY_URL = 'https://electric.example.com/';
     const requestUrl = 'http://example.com/test?table=users';
     const result = getElectricShapeUrl(requestUrl);
 
     expect(result.toString()).toBe('https://electric.example.com/v1/shape?table=users');
   });
 
-  it('should handle ELECTRIC_URL with path', () => {
-    process.env.ELECTRIC_URL = 'https://api.example.com/electric';
+  it('should handle ELECTRIC_PROXY_URL with path', () => {
+    process.env.ELECTRIC_PROXY_URL = 'https://api.example.com/electric';
     const requestUrl = 'http://example.com/test?table=users';
     const result = getElectricShapeUrl(requestUrl);
 
@@ -155,219 +155,8 @@ describe('getElectricShapeUrl', () => {
   });
 });
 
-describe('createProxiedResponse', () => {
-  const mockFetch = vi.fn<typeof fetch>();
-
-  beforeEach(() => {
-    vi.stubGlobal('fetch', mockFetch);
-    vi.clearAllMocks();
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  it('should proxy a successful response and remove content-encoding and content-length headers', async () => {
-    const testUrl = new URL('https://example.com/test');
-    const mockResponseBody = 'test response body';
-
-    // Create mock headers that include content-encoding and content-length
-    const mockHeaders = new Headers({
-      'content-type': 'application/json',
-      'content-encoding': 'gzip',
-      'content-length': '123',
-      'cache-control': 'no-cache',
-      'custom-header': 'custom-value',
-    });
-
-    const mockResponse = new Response(mockResponseBody, {
-      status: 200,
-      statusText: 'OK',
-      headers: mockHeaders,
-    });
-
-    mockFetch.mockResolvedValueOnce(mockResponse);
-
-    const result = await createProxiedResponse(testUrl);
-
-    // Verify fetch was called with correct URL
-    expect(mockFetch).toHaveBeenCalledOnce();
-    expect(mockFetch).toHaveBeenCalledWith(testUrl);
-
-    // Verify response properties
-    expect(await result.text()).toBe(mockResponseBody);
-    expect(result.status).toBe(200);
-    expect(result.statusText).toBe('OK');
-
-    // Verify headers were properly modified
-    expect(result.headers.has('content-encoding')).toBe(false);
-    expect(result.headers.has('content-length')).toBe(false);
-
-    // Verify other headers are preserved
-    expect(result.headers.get('content-type')).toBe('application/json');
-    expect(result.headers.get('cache-control')).toBe('no-cache');
-    expect(result.headers.get('custom-header')).toBe('custom-value');
-  });
-
-  it('should handle responses without content-encoding or content-length headers', async () => {
-    const testUrl = new URL('https://example.com/test');
-    const mockResponseBody = 'test response body';
-
-    const mockHeaders = new Headers({
-      'content-type': 'text/plain',
-      'cache-control': 'max-age=3600',
-    });
-
-    const mockResponse = new Response(mockResponseBody, {
-      status: 200,
-      statusText: 'OK',
-      headers: mockHeaders,
-    });
-
-    mockFetch.mockResolvedValueOnce(mockResponse);
-
-    const result = await createProxiedResponse(testUrl);
-
-    // Verify response properties
-    expect(await result.text()).toBe(mockResponseBody);
-    expect(result.status).toBe(200);
-    expect(result.statusText).toBe('OK');
-
-    // Verify headers are preserved (nothing to remove)
-    expect(result.headers.get('content-type')).toBe('text/plain');
-    expect(result.headers.get('cache-control')).toBe('max-age=3600');
-    expect(result.headers.has('content-encoding')).toBe(false);
-    expect(result.headers.has('content-length')).toBe(false);
-  });
-
-  it('should proxy error responses correctly', async () => {
-    const testUrl = new URL('https://example.com/error');
-
-    const mockHeaders = new Headers({
-      'content-type': 'application/json',
-      'content-encoding': 'deflate',
-      'content-length': '456',
-    });
-
-    const mockResponse = new Response('{"error": "Not found"}', {
-      status: 404,
-      statusText: 'Not Found',
-      headers: mockHeaders,
-    });
-
-    mockFetch.mockResolvedValueOnce(mockResponse);
-
-    const result = await createProxiedResponse(testUrl);
-
-    // Verify error response is properly proxied
-    expect(result.status).toBe(404);
-    expect(result.statusText).toBe('Not Found');
-    expect(await result.text()).toBe('{"error": "Not found"}');
-
-    // Verify headers are still properly cleaned
-    expect(result.headers.has('content-encoding')).toBe(false);
-    expect(result.headers.has('content-length')).toBe(false);
-    expect(result.headers.get('content-type')).toBe('application/json');
-  });
-
-  it('should handle responses with only content-encoding header', async () => {
-    const testUrl = new URL('https://example.com/test');
-
-    const mockHeaders = new Headers({
-      'content-type': 'application/json',
-      'content-encoding': 'br',
-    });
-
-    const mockResponse = new Response('compressed data', {
-      status: 200,
-      statusText: 'OK',
-      headers: mockHeaders,
-    });
-
-    mockFetch.mockResolvedValueOnce(mockResponse);
-
-    const result = await createProxiedResponse(testUrl);
-
-    // Verify only content-encoding is removed
-    expect(result.headers.has('content-encoding')).toBe(false);
-    expect(result.headers.has('content-length')).toBe(false); // Should be false (wasn't present)
-    expect(result.headers.get('content-type')).toBe('application/json');
-  });
-
-  it('should handle responses with only content-length header', async () => {
-    const testUrl = new URL('https://example.com/test');
-
-    const mockHeaders = new Headers({
-      'content-type': 'text/html',
-      'content-length': '789',
-    });
-
-    const mockResponse = new Response('<html></html>', {
-      status: 200,
-      statusText: 'OK',
-      headers: mockHeaders,
-    });
-
-    mockFetch.mockResolvedValueOnce(mockResponse);
-
-    const result = await createProxiedResponse(testUrl);
-
-    // Verify only content-length is removed
-    expect(result.headers.has('content-length')).toBe(false);
-    expect(result.headers.has('content-encoding')).toBe(false); // Should be false (wasn't present)
-    expect(result.headers.get('content-type')).toBe('text/html');
-  });
-
-  it('should preserve all other headers', async () => {
-    const testUrl = new URL('https://example.com/test');
-
-    const mockHeaders = new Headers({
-      'content-type': 'application/json',
-      'content-encoding': 'gzip',
-      'content-length': '100',
-      authorization: 'Bearer token123',
-      'x-custom-header': 'custom-value',
-      'cache-control': 'private, max-age=0',
-      etag: '"abc123"',
-      'last-modified': 'Wed, 21 Oct 2015 07:28:00 GMT',
-    });
-
-    const mockResponse = new Response('response data', {
-      status: 200,
-      statusText: 'OK',
-      headers: mockHeaders,
-    });
-
-    mockFetch.mockResolvedValueOnce(mockResponse);
-
-    const result = await createProxiedResponse(testUrl);
-
-    // Verify the problematic headers are removed
-    expect(result.headers.has('content-encoding')).toBe(false);
-    expect(result.headers.has('content-length')).toBe(false);
-
-    // Verify all other headers are preserved
-    expect(result.headers.get('content-type')).toBe('application/json');
-    expect(result.headers.get('authorization')).toBe('Bearer token123');
-    expect(result.headers.get('x-custom-header')).toBe('custom-value');
-    expect(result.headers.get('cache-control')).toBe('private, max-age=0');
-    expect(result.headers.get('etag')).toBe('"abc123"');
-    expect(result.headers.get('last-modified')).toBe('Wed, 21 Oct 2015 07:28:00 GMT');
-  });
-
-  it('should handle fetch errors', async () => {
-    const testUrl = new URL('https://example.com/error');
-    const fetchError = new Error('Network error');
-
-    mockFetch.mockRejectedValueOnce(fetchError);
-
-    await expect(createProxiedResponse(testUrl)).rejects.toThrow('Network error');
-    expect(mockFetch).toHaveBeenCalledWith(testUrl);
-  });
-});
-
 describe('extractParamFromWhere', () => {
-  it('should', () => {
+  it('should handle a simple where clause', () => {
     const testClause = "where=id='420226c8-b91d-49c5-99f8-660b04cc8c01'&offset=-1";
     const url = new URL(`https://example.com/test?${testClause}`);
     const result = extractParamFromWhere(url, 'id');
