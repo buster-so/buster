@@ -18,7 +18,7 @@
     "db:introspect": "npm run db:introspect --workspace=@buster/database",
     "db:studio": "npm run db:studio --workspace=@buster/database",
     "db:check": "npm run db:check --workspace=@buster/database",
-    "db:setup": "npm run setup:setup --workspace=@buster/database",
+    "db:setup": "npm run db:setup --workspace=@buster/database",
     "evals": "bash scripts/evals.sh",
     "format": "biome format ${1:-.}",
     "format:fix": "biome format --write ${1:-.}",
