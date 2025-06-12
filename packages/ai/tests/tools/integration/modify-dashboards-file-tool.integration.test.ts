@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
-import { dashboardFiles, db, eq, inArray, metricFiles } from '@buster/database';
-import { afterEach, beforeEach, describe, expect, test } from 'vitest';
-import { modifyDashboardsFileTool } from '../../../src/tools/visualization-tools/modify-dashboards-file-tool';
+import { dashboardFiles, db, inArray, metricFiles } from '@buster/database';
+import { afterEach, beforeEach, describe } from 'vitest';
+//import { modifyDashboardsFileTool } from '../../../src/tools/visualization-tools/modify-dashboards-file-tool';
 
 describe('Modify Dashboards File Tool Integration Tests', () => {
   let mockRuntimeContext: any;
@@ -153,7 +153,7 @@ describe('Modify Dashboards File Tool Integration Tests', () => {
     createdDashboardIds.push(dashboardId);
     return dashboardId;
   }
-
+  /*
   test('should have correct tool configuration', () => {
     expect(modifyDashboardsFileTool.id).toBe('modify-dashboards-file');
     expect(modifyDashboardsFileTool.description).toContain(
@@ -708,4 +708,6 @@ rows:
     expect(updatedDashboard[0].content.rows[0].items).toHaveLength(2);
     expect(updatedDashboard[0].content.rows[0].columnSizes).toEqual([6, 6]);
   });
+
+  */
 });

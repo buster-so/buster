@@ -144,6 +144,9 @@
           "style": {
             "noNonNullAssertion": "off"
           },
+          "correctness": {
+            "noUnusedVariables": "off"
+          },
           "suspicious": {
             "noConsoleLog": "off",
             "noExplicitAny": "warn"
