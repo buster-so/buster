@@ -1,14 +1,15 @@
 import { Hono } from 'hono';
 
-// Import feature-specific routes
-import userRoutes from './users';
-import electricShapeRoutes from './electric-shape';
 import healthcheckRoutes from '../healthcheck';
+import chatsRoutes from './chats';
+import electricShapeRoutes from './electric-shape';
+import userRoutes from './users';
 
 const app = new Hono()
   .route('/users', userRoutes)
   .route('/electric-shape', electricShapeRoutes)
-  .route('/healthcheck', healthcheckRoutes);
+  .route('/healthcheck', healthcheckRoutes)
+  .route('/chats', chatsRoutes);
 
 // TODO: Add more feature routes as they are created
 // import datasetRoutes from './datasets';

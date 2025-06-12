@@ -4,9 +4,9 @@ import { z } from 'zod';
 import {
   type MessageHistory,
   MessageHistorySchema,
-  StepFinishDataSchema,
   ReasoningHistorySchema,
   ResponseHistorySchema,
+  StepFinishDataSchema,
 } from '../utils/memory/types';
 
 // The analyst step output schema

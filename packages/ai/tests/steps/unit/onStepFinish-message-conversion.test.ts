@@ -1,10 +1,13 @@
-import { describe, it, expect, vi } from 'vitest';
-import type { StepResult, ToolSet, CoreMessage } from 'ai';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
+import type { CoreMessage, StepResult, ToolSet } from 'ai';
+import { describe, expect, it } from 'vitest';
 import type { AnalystRuntimeContext } from '../../../src/workflows/analyst-workflow';
 
 // Mock the step result structure
-function createMockStepResult(toolCalls: any[], responseMessages: CoreMessage[]): StepResult<ToolSet> {
+function createMockStepResult(
+  toolCalls: any[],
+  responseMessages: CoreMessage[]
+): StepResult<ToolSet> {
   return {
     toolCalls,
     response: {
@@ -39,7 +42,7 @@ function createMockRuntimeContext(messageId?: string): RuntimeContext<AnalystRun
   values.set('dataSourceId', 'test-datasource');
   values.set('dataSourceSyntax', 'postgresql');
   values.set('organizationId', 'test-org');
-  
+
   return {
     get: (key: string) => values.get(key),
     set: (key: string, value: any) => values.set(key, value),
@@ -96,9 +99,9 @@ describe('onStepFinish message conversion', () => {
       const abortController = new AbortController();
 
       // Simulate the handleThinkAndPrepStepFinish logic
-      const toolResponses = step.response.messages.filter(msg => msg.role === 'tool');
+      const toolResponses = step.response.messages.filter((msg) => msg.role === 'tool');
       const toolResultsMap = new Map<string, string | null>();
-      
+
       for (const toolResponse of toolResponses) {
         if ('toolCallId' in toolResponse && 'content' in toolResponse) {
           toolResultsMap.set(toolResponse.toolCallId, toolResponse.content as string);
@@ -107,7 +110,7 @@ describe('onStepFinish message conversion', () => {
 
       expect(toolResultsMap.size).toBe(1);
       expect(toolResultsMap.get('think-1')).toBeDefined();
-      
+
       // Parse the result
       const result = JSON.parse(toolResultsMap.get('think-1')!);
       expect(result).toMatchObject({
@@ -155,12 +158,12 @@ describe('onStepFinish message conversion', () => {
 
       const step = createMockStepResult(toolCalls, responseMessages);
       const toolNames = step.toolCalls.map((call) => call.toolName);
-      
+
       // Check that respondWithoutAnalysis is a finishing tool
       const hasFinishingTools = toolNames.some((toolName: string) =>
         ['submitThoughts', 'respondWithoutAnalysis'].includes(toolName)
       );
-      
+
       expect(hasFinishingTools).toBe(true);
       expect(toolNames.includes('respondWithoutAnalysis')).toBe(true);
     });
@@ -204,7 +207,7 @@ describe('onStepFinish message conversion', () => {
 
       const step = createMockStepResult(toolCalls, responseMessages);
       const toolNames = step.toolCalls.map((call) => call.toolName);
-      
+
       // Check that doneTool triggers finish
       const hasFinishingTools = toolNames.includes('doneTool');
       expect(hasFinishingTools).toBe(true);
@@ -250,11 +253,11 @@ describe('onStepFinish message conversion', () => {
       ];
 
       const step = createMockStepResult(toolCalls, responseMessages);
-      
+
       // Extract tool results
-      const toolResponses = step.response.messages.filter(msg => msg.role === 'tool');
+      const toolResponses = step.response.messages.filter((msg) => msg.role === 'tool');
       const toolResultsMap = new Map<string, string | null>();
-      
+
       for (const toolResponse of toolResponses) {
         if ('toolCallId' in toolResponse && 'content' in toolResponse) {
           toolResultsMap.set(toolResponse.toolCallId, toolResponse.content as string);
@@ -304,11 +307,11 @@ describe('onStepFinish message conversion', () => {
       ];
 
       const step = createMockStepResult(toolCalls, responseMessages);
-      
+
       // Verify SQL result structure
-      const toolResponses = step.response.messages.filter(msg => msg.role === 'tool');
-      const sqlResponse = toolResponses.find(r => 'toolCallId' in r && r.toolCallId === 'sql-1');
-      
+      const toolResponses = step.response.messages.filter((msg) => msg.role === 'tool');
+      const sqlResponse = toolResponses.find((r) => 'toolCallId' in r && r.toolCallId === 'sql-1');
+
       expect(sqlResponse).toBeDefined();
       if (sqlResponse && 'content' in sqlResponse) {
         const result = JSON.parse(sqlResponse.content as string);
@@ -346,7 +349,7 @@ describe('onStepFinish message conversion', () => {
       const responseMessages: CoreMessage[] = [
         {
           role: 'assistant',
-          content: toolCalls.map(tc => ({
+          content: toolCalls.map((tc) => ({
             type: 'tool-call' as const,
             ...tc,
           })),
@@ -400,27 +403,30 @@ describe('onStepFinish message conversion', () => {
       ];
 
       const step = createMockStepResult(toolCalls, responseMessages);
-      
+
       // Count tool calls by type
-      const toolCallsByType = step.toolCalls.reduce((acc, call) => {
-        const type = call.toolName;
-        acc[type] = (acc[type] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
+      const toolCallsByType = step.toolCalls.reduce(
+        (acc, call) => {
+          const type = call.toolName;
+          acc[type] = (acc[type] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>
+      );
 
       expect(toolCallsByType['sequential-thinking']).toBe(2);
       expect(toolCallsByType['create-metrics-file']).toBe(1);
       expect(toolCallsByType['doneTool']).toBe(1);
 
       // Verify we can extract all tool results
-      const toolResponses = step.response.messages.filter(msg => msg.role === 'tool');
+      const toolResponses = step.response.messages.filter((msg) => msg.role === 'tool');
       expect(toolResponses).toHaveLength(4);
     });
 
     it('should accumulate history across multiple onStepFinish calls', async () => {
       // Simulate accumulating history
-      let accumulatedReasoningHistory: any[] = [];
-      let accumulatedResponseHistory: any[] = [];
+      const accumulatedReasoningHistory: any[] = [];
+      const accumulatedResponseHistory: any[] = [];
 
       // First call - sequential thinking
       const firstStep = createMockStepResult(

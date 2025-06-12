@@ -19,7 +19,7 @@ describe('message-converters error handling', () => {
   describe('convertToolCallToMessage', () => {
     test('handles null toolCall gracefully', () => {
       const result = convertToolCallToMessage(null as any, null, 'completed');
-      
+
       expect(result).toBeNull();
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'convertToolCallToMessage: Invalid toolCall:',
@@ -29,7 +29,7 @@ describe('message-converters error handling', () => {
 
     test('handles undefined toolCall gracefully', () => {
       const result = convertToolCallToMessage(undefined as any, null, 'completed');
-      
+
       expect(result).toBeNull();
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'convertToolCallToMessage: Invalid toolCall:',
@@ -40,7 +40,7 @@ describe('message-converters error handling', () => {
     test('handles toolCall without toolName gracefully', () => {
       const toolCall = { toolCallId: 'test-id' } as any;
       const result = convertToolCallToMessage(toolCall, null, 'completed');
-      
+
       expect(result).toBeNull();
     });
 
@@ -49,9 +49,9 @@ describe('message-converters error handling', () => {
         toolName: 'doneTool',
         toolCallId: 'test-id',
       } as any;
-      
+
       const result = convertToolCallToMessage(toolCall, 'invalid-result', 'completed');
-      
+
       expect(result).toBeNull();
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'Failed to parse tool result:',
@@ -65,9 +65,9 @@ describe('message-converters error handling', () => {
         toolName: 'sequentialThinking',
         toolCallId: 'test-id',
       } as any;
-      
+
       const result = convertToolCallToMessage(toolCall, { invalid: 'data' }, 'completed');
-      
+
       expect(result).toBeNull();
       expect(consoleErrorSpy).toHaveBeenCalledWith(
         'Failed to parse tool result:',
@@ -80,7 +80,7 @@ describe('message-converters error handling', () => {
   describe('extractMessagesFromToolCalls', () => {
     test('handles empty array of tool calls', () => {
       const result = extractMessagesFromToolCalls([]);
-      
+
       expect(result).toEqual({
         reasoningMessages: [],
         responseMessages: [],
@@ -97,13 +97,11 @@ describe('message-converters error handling', () => {
           toolCallId: 'valid-id',
         },
       ] as any;
-      
-      const toolResults = new Map([
-        ['valid-id', { message: 'Test message' }],
-      ]);
-      
+
+      const toolResults = new Map([['valid-id', { message: 'Test message' }]]);
+
       const result = extractMessagesFromToolCalls(toolCalls, toolResults);
-      
+
       expect(result.responseMessages).toHaveLength(1);
       expect(result.reasoningMessages).toHaveLength(0);
       expect(consoleErrorSpy).toHaveBeenCalledTimes(3); // For null, undefined, and invalid object
@@ -116,9 +114,9 @@ describe('message-converters error handling', () => {
           toolCallId: 'test-id',
         },
       ] as any;
-      
+
       const result = extractMessagesFromToolCalls(toolCalls, new Map());
-      
+
       expect(result.reasoningMessages).toHaveLength(0);
       expect(result.responseMessages).toHaveLength(0);
     });

@@ -165,7 +165,7 @@ const ExecuteSqlResultSchema = z.object({
 });
 
 // Type for parsed tool results
-type ParsedToolResult = 
+type ParsedToolResult =
   | z.infer<typeof DoneToolResultSchema>
   | z.infer<typeof RespondWithoutAnalysisResultSchema>
   | z.infer<typeof SequentialThinkingResultSchema>
@@ -186,14 +186,19 @@ export function convertToolCallToMessage(
   toolCall: ToolCall,
   toolResult: ParsedToolResult | string | null,
   status: 'loading' | 'completed' | 'failed' = 'completed'
-): { type: 'reasoning' | 'response'; message: BusterChatMessageReasoning | BusterChatMessageResponse } | null {
+): {
+  type: 'reasoning' | 'response';
+  message: BusterChatMessageReasoning | BusterChatMessageResponse;
+} | null {
   if (!toolCall || typeof toolCall !== 'object') {
     console.error('convertToolCallToMessage: Invalid toolCall:', toolCall);
     return null;
   }
-  
-  const toolName = 'toolName' in toolCall && typeof toolCall.toolName === 'string' ? toolCall.toolName : '';
-  const toolId = 'toolCallId' in toolCall && typeof toolCall.toolCallId === 'string' ? toolCall.toolCallId : '';
+
+  const toolName =
+    'toolName' in toolCall && typeof toolCall.toolName === 'string' ? toolCall.toolName : '';
+  const toolId =
+    'toolCallId' in toolCall && typeof toolCall.toolCallId === 'string' ? toolCall.toolCallId : '';
 
   switch (toolName) {
     case 'doneTool':
@@ -209,7 +214,7 @@ export function convertToolCallToMessage(
         };
         return { type: 'response', message: responseMessage };
       } catch (error) {
-        console.error(`Failed to parse tool result:`, error, toolResult);
+        console.error('Failed to parse tool result:', error, toolResult);
         return null;
       }
     }
@@ -299,7 +304,8 @@ export function convertToolCallToMessage(
           type: 'files',
           title: `Created ${parsed.files.length} metric${parsed.files.length === 1 ? '' : 's'}`,
           status,
-          secondary_title: parsed.failed_files.length > 0 ? `${parsed.failed_files.length} failed` : undefined,
+          secondary_title:
+            parsed.failed_files.length > 0 ? `${parsed.failed_files.length} failed` : undefined,
           file_ids: fileIds,
           files,
         };
@@ -376,7 +382,8 @@ export function convertToolCallToMessage(
           type: 'files',
           title: `Created ${parsed.files.length} dashboard${parsed.files.length === 1 ? '' : 's'}`,
           status,
-          secondary_title: parsed.failed_files.length > 0 ? `${parsed.failed_files.length} failed` : undefined,
+          secondary_title:
+            parsed.failed_files.length > 0 ? `${parsed.failed_files.length} failed` : undefined,
           file_ids: fileIds,
           files,
         };
@@ -433,7 +440,8 @@ export function convertToolCallToMessage(
           type: 'files',
           title: `Modified ${parsed.files.length} metric${parsed.files.length === 1 ? '' : 's'}`,
           status,
-          secondary_title: parsed.failed_files.length > 0 ? `${parsed.failed_files.length} failed` : undefined,
+          secondary_title:
+            parsed.failed_files.length > 0 ? `${parsed.failed_files.length} failed` : undefined,
           file_ids: fileIds,
           files,
         };
@@ -490,7 +498,8 @@ export function convertToolCallToMessage(
           type: 'files',
           title: `Modified ${parsed.files.length} dashboard${parsed.files.length === 1 ? '' : 's'}`,
           status,
-          secondary_title: parsed.failed_files.length > 0 ? `${parsed.failed_files.length} failed` : undefined,
+          secondary_title:
+            parsed.failed_files.length > 0 ? `${parsed.failed_files.length} failed` : undefined,
           file_ids: fileIds,
           files,
         };
@@ -528,10 +537,10 @@ export function extractMessagesFromToolCalls(
       console.error('extractMessagesFromToolCalls: Invalid toolCall:', toolCall);
       continue;
     }
-    
+
     const toolResult = toolResults.get(toolCall.toolCallId);
     const converted = convertToolCallToMessage(toolCall, toolResult || null, 'completed');
-    
+
     if (converted) {
       if (converted.type === 'reasoning') {
         reasoningMessages.push(converted.message as BusterChatMessageReasoning);
