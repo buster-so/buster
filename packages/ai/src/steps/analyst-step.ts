@@ -1,6 +1,6 @@
 import { createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
-import type { CoreMessage } from 'ai';
+import type { CoreMessage, StreamTextResult } from 'ai';
 import type { StepResult, ToolSet } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
@@ -10,25 +10,23 @@ import { parseStreamingArgs as parseExecuteSqlArgs } from '../tools/database-too
 import { parseStreamingArgs as parseSequentialThinkingArgs } from '../tools/planning-thinking-tools/sequential-thinking-tool';
 import { parseStreamingArgs as parseCreateMetricsArgs } from '../tools/visualization-tools/create-metrics-file-tool';
 import { saveConversationHistoryFromStep } from '../utils/database/saveConversationHistory';
+import type {
+  BusterChatMessageReasoning,
+  BusterChatMessageResponse,
+} from '../utils/memory/message-converters';
 import {
   MessageHistorySchema,
-  StepFinishDataSchema,
-  ThinkAndPrepOutputSchema,
   ReasoningHistorySchema,
   ResponseHistorySchema,
+  StepFinishDataSchema,
+  ThinkAndPrepOutputSchema,
 } from '../utils/memory/types';
-import type { 
-  BusterChatMessageReasoning,
-  BusterChatMessageResponse
-} from '../utils/memory/message-converters';
 import { retryableAgentStream } from '../utils/retry';
 import { ToolArgsParser } from '../utils/streaming';
-import {
-  type AnalystRuntimeContext,
-  analystRuntimeContextSchema,
-  validateRuntimeContext,
-} from '../utils/validation-helpers';
-import type { thinkAndPrepWorkflowInputSchema } from '../workflows/analyst-workflow'; // Just for input schema types now
+import type {
+  AnalystRuntimeContext,
+  thinkAndPrepWorkflowInputSchema,
+} from '../workflows/analyst-workflow'; // Just for input schema types now
 
 const inputSchema = ThinkAndPrepOutputSchema;
 
@@ -69,8 +67,8 @@ const handleAnalystStepFinish = async ({
   let completeConversationHistory: CoreMessage[] = [];
   let finished = false;
   let shouldAbort = false;
-  let reasoningHistory: BusterChatMessageReasoning[] = [...accumulatedReasoningHistory];
-  let responseHistory: BusterChatMessageResponse[] = [...accumulatedResponseHistory];
+  const reasoningHistory: BusterChatMessageReasoning[] = [...accumulatedReasoningHistory];
+  const responseHistory: BusterChatMessageResponse[] = [...accumulatedResponseHistory];
 
   // Save conversation history for all tool calls
   const messageId = runtimeContext.get('messageId');
@@ -105,22 +103,20 @@ const handleAnalystStepFinish = async ({
       if (!Array.isArray(inputData.outputMessages)) {
         throw new Error('Invalid inputData.outputMessages: expected array');
       }
-      completeConversationHistory = [
-        ...inputData.outputMessages,
-        ...analystResponseMessages,
-      ];
+      completeConversationHistory = [...inputData.outputMessages, ...analystResponseMessages];
 
       const messageId = runtimeContext.get('messageId');
 
       if (messageId) {
         // Save conversation history to database before aborting
         try {
-          const { newReasoningMessages, newResponseMessages } = await saveConversationHistoryFromStep(
-            messageId, 
-            completeConversationHistory, 
-            reasoningHistory, 
-            responseHistory
-          );
+          const { newReasoningMessages, newResponseMessages } =
+            await saveConversationHistoryFromStep(
+              messageId,
+              completeConversationHistory,
+              reasoningHistory,
+              responseHistory
+            );
           // Update the histories with the new messages
           reasoningHistory.push(...(newReasoningMessages as BusterChatMessageReasoning[]));
           responseHistory.push(...(newResponseMessages as BusterChatMessageResponse[]));
@@ -229,24 +225,6 @@ const analystExecution = async ({
   let responseHistory: BusterChatMessageResponse[] = inputData.responseHistory || [];
 
   try {
-    // Validate runtime context early with user-friendly error handling
-    let validatedContext: AnalystRuntimeContext;
-    try {
-      validatedContext = validateRuntimeContext(
-        runtimeContext,
-        analystRuntimeContextSchema,
-        'analyst workflow'
-      );
-    } catch (error) {
-      // Convert technical validation errors to user-friendly messages
-      if (error instanceof Error && error.message.includes('Runtime context is required')) {
-        throw new Error('Unable to access your session. Please refresh and try again.');
-      }
-      throw new Error('Session information is invalid. Please refresh and try again.');
-    }
-
-    const { userId: resourceId, threadId } = validatedContext;
-
     // Messages come directly from think-and-prep step output
     // They are already in CoreMessage[] format
     const messages = inputData.outputMessages;

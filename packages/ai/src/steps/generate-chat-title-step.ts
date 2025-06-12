@@ -1,15 +1,9 @@
 import { Agent, createStep } from '@mastra/core';
-import type { RuntimeContext } from '@mastra/core/runtime-context';
 import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { anthropicCachedModel } from '../utils/models/anthropic-cached';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
-import {
-  type InitialStepRuntimeContext,
-  initialStepRuntimeContextSchema,
-  validateRuntimeContext,
-} from '../utils/validation-helpers';
 import type { thinkAndPrepWorkflowInputSchema } from '../workflows/analyst-workflow';
 
 const inputSchema = z.object({
@@ -32,21 +26,11 @@ const todosAgent = new Agent({
 
 const generateChatTitleExecution = async ({
   getInitData,
-  runtimeContext,
 }: {
   inputData: z.infer<typeof inputSchema>;
   getInitData: () => Promise<z.infer<typeof thinkAndPrepWorkflowInputSchema>>;
-  runtimeContext: RuntimeContext<InitialStepRuntimeContext>;
 }): Promise<z.infer<typeof generateChatTitleOutputSchema>> => {
   try {
-    // Validate runtime context
-    const validatedContext = validateRuntimeContext(
-      runtimeContext,
-      initialStepRuntimeContextSchema,
-      'chat title generation'
-    );
-    const { threadId, userId: resourceId } = validatedContext;
-
     // Get the workflow input data
     const initData = await getInitData();
     const prompt = initData.prompt;
@@ -66,8 +50,6 @@ const generateChatTitleExecution = async ({
       async () => {
         const response = await todosAgent.generate(messages, {
           maxSteps: 0,
-          threadId: threadId,
-          resourceId: resourceId,
           output: generateChatTitleOutputSchema,
         });
 

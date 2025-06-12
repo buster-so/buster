@@ -1,10 +1,6 @@
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { getPermissionedDatasets } from '../../../../access-controls/src/access-controls';
-import {
-  type ThinkAndPrepRuntimeContext,
-  thinkAndPrepRuntimeContextSchema,
-  validateRuntimeContext,
-} from '../../utils/validation-helpers';
+import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
 
 // Define the required template parameters
 interface ThinkAndPrepTemplateParams {
@@ -369,14 +365,8 @@ ${params.databaseContext}
 
 export const getThinkAndPrepInstructions = async ({
   runtimeContext,
-}: { runtimeContext: RuntimeContext<ThinkAndPrepRuntimeContext> }): Promise<string> => {
-  // Validate runtime context
-  const validatedContext = validateRuntimeContext(
-    runtimeContext,
-    thinkAndPrepRuntimeContextSchema,
-    'think and prep instructions'
-  );
-  const { userId } = validatedContext;
+}: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }): Promise<string> => {
+  const userId = runtimeContext.get('userId');
 
   const datasets = await getPermissionedDatasets(userId, 0, 1000);
 

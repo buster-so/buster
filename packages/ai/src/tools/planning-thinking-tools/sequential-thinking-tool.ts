@@ -1,8 +1,6 @@
-import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
-import { type ToolRuntimeContext, isError } from '../../utils/validation-helpers';
 
 // Core interfaces for Sequential Thinking
 interface SequentialThinkingParams {
@@ -153,12 +151,12 @@ export function parseStreamingArgs(
 
       // Return result if we found at least one field
       return Object.keys(result).length > 0 ? result : null;
-    } else {
-      // Unexpected error - re-throw with context
-      throw new Error(
-        `Unexpected error in parseStreamingArgs: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
     }
+
+    // Unexpected error - re-throw with context
+    throw new Error(
+      `Unexpected error in parseStreamingArgs: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }
 
@@ -205,40 +203,16 @@ Each thought can build on, question, or revise previous insights as understandin
   outputSchema: z.object({
     success: z.boolean().describe('Whether the thinking step was processed successfully'),
   }),
-  execute: async ({ context, runtimeContext }) => {
-    return await processSequentialThinking(context as SequentialThinkingParams, runtimeContext);
+  execute: async ({ context }) => {
+    return await processSequentialThinking(context as SequentialThinkingParams);
   },
 });
 
 const processSequentialThinking = wrapTraced(
-  async (
-    params: SequentialThinkingParams,
-    runtimeContext: RuntimeContext
-  ): Promise<SequentialThinkingOutput> => {
+  async (params: SequentialThinkingParams): Promise<SequentialThinkingOutput> => {
     try {
-      // Validate the input parameters using Zod schema
-      const validatedParams = sequentialThinkingSchema.parse(params);
-
-      // Extract and validate runtime context values
-      let contextData: Partial<ToolRuntimeContext> = {};
-
-      if (runtimeContext && typeof runtimeContext.get === 'function') {
-        // Safely extract context values
-        const userId = runtimeContext.get('userId');
-        const sessionId = runtimeContext.get('sessionId');
-        const organizationId = runtimeContext.get('organizationId');
-        const messageId = runtimeContext.get('messageId');
-
-        contextData = {
-          userId: typeof userId === 'string' ? userId : undefined,
-          sessionId: typeof sessionId === 'string' ? sessionId : undefined,
-          organizationId: typeof organizationId === 'string' ? organizationId : undefined,
-          messageId: typeof messageId === 'string' ? messageId : undefined,
-        };
-      }
-
       // Process the thought with validated context
-      await processThought(validatedParams, contextData);
+      await processThought(params);
 
       return {
         success: true,
@@ -253,37 +227,15 @@ const processSequentialThinking = wrapTraced(
         );
       }
 
-      const errorMessage = isError(error) ? error.message : 'Unknown error occurred';
-      throw new Error(`Sequential thinking processing failed: ${errorMessage}`);
+      throw new Error(
+        `Sequential thinking processing failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   },
   { name: 'sequential-thinking' }
 );
 
-async function processThought(
-  params: SequentialThinkingParams,
-  contextData: Partial<ToolRuntimeContext>
-): Promise<SequentialThinkingParams> {
-  // This function can be extended to include additional processing logic
-  // such as logging thoughts, analyzing patterns, or integrating with other systems
-
-  // Log context information if available for debugging/analytics
-  if (contextData.userId || contextData.sessionId) {
-    console.debug('Processing thought', {
-      userId: contextData.userId,
-      sessionId: contextData.sessionId,
-      thoughtNumber: params.thoughtNumber,
-      totalThoughts: params.totalThoughts,
-    });
-  }
-
-  // For now, we simply validate and return the processed thought
-  // In the future, this could include:
-  // - Storing thoughts in a database for session continuity
-  // - Analyzing thought patterns for insights
-  // - Providing suggestions for next steps
-  // - Integrating with external knowledge bases
-
+async function processThought(params: SequentialThinkingParams): Promise<SequentialThinkingParams> {
   return {
     thought: params.thought.trim(),
     nextThoughtNeeded: params.nextThoughtNeeded,

@@ -158,32 +158,7 @@ const executeSqlStatement = wrapTraced(
   ): Promise<z.infer<typeof executeSqlStatementOutputSchema>> => {
     const { statements } = params;
 
-    // Validate runtime context
-    let validatedContext: AnalystRuntimeContext;
-    try {
-      validatedContext = validateRuntimeContext(
-        runtimeContext,
-        analystRuntimeContextSchema,
-        'SQL execution'
-      );
-    } catch (error) {
-      console.error('Runtime context validation failed:', error);
-      // Provide user-friendly error based on what's missing
-      if (error instanceof Error) {
-        if (error.message.includes('dataSourceId')) {
-          throw new Error('Unable to identify the data source. Please refresh and try again.');
-        }
-        if (error.message.includes('userId')) {
-          throw new Error('Unable to verify your identity. Please log in again.');
-        }
-        if (error.message.includes('organizationId')) {
-          throw new Error('Unable to access your organization. Please check your permissions.');
-        }
-      }
-      throw new Error('Unable to access your session. Please refresh and try again.');
-    }
-
-    const { dataSourceId, userId, organizationId } = validatedContext;
+    const dataSourceId = runtimeContext.get('dataSourceId');
 
     // Get data source credentials from vault
     let dataSource: DataSource;
@@ -221,7 +196,7 @@ const executeSqlStatement = wrapTraced(
 
       // Process results and format according to output schema
       const results = executionResults.map((executionResult, index) => {
-        const sql = validateArrayAccess(statements, index, 'SQL statement processing');
+        const sql = statements[index];
 
         if (executionResult.status === 'fulfilled') {
           const { result } = executionResult.value;
@@ -245,7 +220,7 @@ const executeSqlStatement = wrapTraced(
         };
       });
 
-      return { results };
+      return { results: results as z.infer<typeof executeSqlStatementOutputSchema>['results'] };
     } finally {
       // Always close the data source connection
       await dataSource.close();
@@ -261,21 +236,11 @@ async function getDataSourceCredentials(dataSourceId: string): Promise<Credentia
       sql`SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = ${dataSourceId} LIMIT 1`
     );
 
-    // Validate the database result structure using Zod
-    const validatedResult = secretResultSchema.parse(secretResult);
+    if (!secretResult.length || !secretResult[0]?.decrypted_secret) {
+      throw new Error('No credentials found for the specified data source');
+    }
 
-    // Safe array access - we know it has at least one element due to schema validation
-    const secretRecord = validateArrayAccess(validatedResult, 0, 'database secret retrieval');
-    const secretString = secretRecord.decrypted_secret;
-
-    // Parse and validate the credentials JSON using Zod
-    const validatedCredentials = safeJsonParse(
-      secretString,
-      credentialsSchema,
-      'data source credentials'
-    );
-    // Return as the original Credentials type since we've validated the basic structure
-    return validatedCredentials as unknown as Credentials;
+    return secretResult[0].decrypted_secret as unknown as Credentials;
   } catch (error) {
     console.error('Error getting data source credentials:', error);
 
@@ -286,9 +251,8 @@ async function getDataSourceCredentials(dataSourceId: string): Promise<Credentia
       );
     }
 
-    const errorMessage = isError(error) ? error.message : 'Unknown error occurred';
     throw new Error(
-      `Unable to retrieve data source credentials: ${errorMessage}. Please contact support if this issue persists.`
+      `Unable to retrieve data source credentials: ${error instanceof Error ? error.message : 'Unknown error occurred'}. Please contact support if this issue persists.`
     );
   }
 }
