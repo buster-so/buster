@@ -1,0 +1,49 @@
+apps:
+  - version: v2
+    name: api/v1
+    services:
+      - name: api/v1
+        run: ""
+        type: web
+        instances: 1
+        cpuCores: 1
+        ramMegabytes: 1000
+        terminationGracePeriodSeconds: 30
+        port: 3001
+        domains:
+          - api2staging.buster.so
+        sleep: false
+        private: true
+    build:
+      context: ../../api
+      method: docker
+      dockerfile: ../../api/Dockerfile
+    envGroups: # Environment groups can be used to inject environment variables from the addons into the service.
+      - staging
+    image:
+      repository: nginx
+      tag: latest
+  - version: v2
+    name: api/v2
+    services:
+      - name: api/v2
+        run: ""
+        type: web
+        instances: 1
+        cpuCores: 1
+        ramMegabytes: 1000
+        terminationGracePeriodSeconds: 30
+        port: 3001
+        domains:
+          - api2staging.buster.so
+        sleep: false
+        private: true
+    build:
+      context: ../../server
+      method: docker
+      dockerfile: ../../server/Dockerfile
+    envGroups: # Environment groups can be used to inject environment variables from the addons into the service.
+      - staging
+    image:
+      repository: nginx
+      tag: latest
