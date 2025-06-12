@@ -1,4 +1,7 @@
 apps:
+# ------------------------------------------------------------
+# API v1 - Rust API
+# ------------------------------------------------------------
   - version: v2
     name: api/v1
     services:
@@ -13,16 +16,23 @@ apps:
         domains:
           - api2staging.buster.so
         sleep: false
-        private: true
+        pathRouting:
+          - path: /api/v1/
+            port: 3001
+            appName: api
+            serviceName: v1
     build:
       context: ../../api
       method: docker
       dockerfile: ../../api/Dockerfile
     envGroups: # Environment groups can be used to inject environment variables from the addons into the service.
       - staging
-    image:
-      repository: nginx
-      tag: latest
+    pathRoutingConfig:
+      rewriteMode: rewrite-off
+
+# ------------------------------------------------------------
+# API v2 - Hono (built with Bun) API
+# ------------------------------------------------------------
   - version: v2
     name: api/v2
     services:
@@ -33,17 +43,20 @@ apps:
         cpuCores: 1
         ramMegabytes: 1000
         terminationGracePeriodSeconds: 30
-        port: 3001
+        port: 3002
         domains:
           - api2staging.buster.so
         sleep: false
-        private: true
+        pathRouting:
+          - path: /api/v2/
+            port: 3002
+            appName: api
+            serviceName: v2
     build:
       context: ../../server
       method: docker
       dockerfile: ../../server/Dockerfile
     envGroups: # Environment groups can be used to inject environment variables from the addons into the service.
       - staging
-    image:
-      repository: nginx
-      tag: latest
+    pathRoutingConfig:
+      rewriteMode: rewrite-off
