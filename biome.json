@@ -103,7 +103,9 @@
   },
   "overrides": [
     {
-      "include": ["packages/database/**/*.ts"],
+      "include": [
+        "packages/database/**/*.ts"
+      ],
       "linter": {
         "rules": {
           "style": {
@@ -116,7 +118,9 @@
       }
     },
     {
-      "include": ["packages/database/**/*.ts"],
+      "include": [
+        "packages/database/**/*.ts"
+      ],
       "linter": {
         "rules": {
           "suspicious": {
@@ -137,6 +141,9 @@
       ],
       "linter": {
         "rules": {
+          "style": {
+            "noNonNullAssertion": "off"
+          },
           "suspicious": {
             "noConsoleLog": "off",
             "noExplicitAny": "warn"

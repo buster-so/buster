@@ -15,6 +15,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "declaration": true,
+    "declarationMap": true,
     "sourceMap": true,
     "composite": true,
     "types": ["node", "vitest/globals"],
