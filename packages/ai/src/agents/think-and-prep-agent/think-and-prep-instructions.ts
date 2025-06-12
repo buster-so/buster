@@ -1,8 +1,8 @@
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { getPermissionedDatasets } from '../../../../access-controls/src/access-controls';
 import {
-  type AnalystRuntimeContext,
-  analystRuntimeContextSchema,
+  type ThinkAndPrepRuntimeContext,
+  thinkAndPrepRuntimeContextSchema,
   validateRuntimeContext,
 } from '../../utils/validation-helpers';
 
@@ -369,14 +369,14 @@ ${params.databaseContext}
 
 export const getThinkAndPrepInstructions = async ({
   runtimeContext,
-}: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }): Promise<string> => {
+}: { runtimeContext: RuntimeContext<ThinkAndPrepRuntimeContext> }): Promise<string> => {
   // Validate runtime context
   const validatedContext = validateRuntimeContext(
     runtimeContext,
-    analystRuntimeContextSchema,
+    thinkAndPrepRuntimeContextSchema,
     'think and prep instructions'
   );
-  const { userId, todos: todoList } = validatedContext;
+  const { userId } = validatedContext;
 
   const datasets = await getPermissionedDatasets(userId, 0, 1000);
 

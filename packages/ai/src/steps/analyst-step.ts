@@ -343,7 +343,7 @@ const analystExecution = async ({
       reasoningHistory,
       responseHistory,
     };
-  } catch (error) 
+  } catch (error) {
     // Handle abort errors gracefully
     if (error instanceof Error && error.name === 'AbortError') {
       // This is expected when we abort the stream
@@ -377,6 +377,7 @@ const analystExecution = async ({
     throw new Error(
       'Something went wrong during the analysis. Please try again or contact support if the issue persists.'
     );
+  }
 };
 
 export const analystStep = createStep({
