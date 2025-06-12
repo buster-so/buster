@@ -1,4 +1,4 @@
-import { db, eq, messages, chats } from '@buster/database';
+import { chats, db, eq, messages } from '@buster/database';
 import { createTestChat, createTestMessage } from '@buster/test-utils';
 import { RuntimeContext } from '@mastra/core/runtime-context';
 import type { CoreMessage } from 'ai';
