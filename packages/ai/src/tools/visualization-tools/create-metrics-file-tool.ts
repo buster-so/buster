@@ -1,4 +1,6 @@
 import { randomUUID } from 'node:crypto';
+import { isError } from 'node:util';
+import { assetPermissions, db, metricFiles } from '@buster/database';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
@@ -8,15 +10,6 @@ import * as yaml from 'yaml';
 import { z } from 'zod';
 import { DataSource } from '../../../../data-source/src/data-source';
 import type { Credentials } from '../../../../data-source/src/types/credentials';
-import { db } from '../../../../database/src/connection';
-import { assetPermissions, metricFiles } from '../../../../database/src/schema';
-import {
-  credentialsSchema,
-  isError,
-  safeJsonParse,
-  secretResultSchema,
-  validateArrayAccess,
-} from '../../utils/validation-helpers';
 
 // Core interfaces matching Rust structs
 interface MetricFileParams {
@@ -1283,21 +1276,13 @@ async function getDataSourceCredentials(dataSourceId: string): Promise<Credentia
       sql`SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = ${dataSourceId} LIMIT 1`
     );
 
-    // Validate the database result structure using Zod
-    const validatedResult = secretResultSchema.parse(secretResult);
+    if (!secretResult.length || !secretResult[0]?.decrypted_secret) {
+      throw new Error('No credentials found for the specified data source');
+    }
 
-    // Safe array access - we know it has at least one element due to schema validation
-    const secretRecord = validateArrayAccess(validatedResult, 0, 'database secret retrieval');
-    const secretString = secretRecord.decrypted_secret;
+    const secretString = secretResult[0].decrypted_secret;
 
-    // Parse and validate the credentials JSON using Zod
-    const validatedCredentials = safeJsonParse(
-      secretString,
-      credentialsSchema,
-      'data source credentials'
-    );
-    // Return as the original Credentials type since we've validated the basic structure
-    return validatedCredentials as unknown as Credentials;
+    return secretString as unknown as Credentials;
   } catch (error) {
     console.error('Error getting data source credentials:', error);
 

@@ -1,10 +1,6 @@
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { getPermissionedDatasets } from '../../../../access-controls/src/access-controls';
-import {
-  type AnalystRuntimeContext,
-  analystRuntimeContextSchema,
-  validateRuntimeContext,
-} from '../../utils/validation-helpers';
+import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
 
 // Define the required template parameters
 interface AnalystTemplateParams {
@@ -296,13 +292,7 @@ ${params.databaseContext}
 export const getAnalystInstructions = async ({
   runtimeContext,
 }: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }): Promise<string> => {
-  // Validate runtime context
-  const validatedContext = validateRuntimeContext(
-    runtimeContext,
-    analystRuntimeContextSchema,
-    'analyst instructions'
-  );
-  const { userId } = validatedContext;
+  const userId = runtimeContext.get('userId');
 
   const datasets = await getPermissionedDatasets(userId, 0, 1000);
 

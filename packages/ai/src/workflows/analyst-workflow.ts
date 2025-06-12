@@ -6,7 +6,12 @@ import { extractValuesSearchStep } from '../steps/extract-values-search-step';
 import { formatOutputStep } from '../steps/format-output-step';
 import { generateChatTitleStep } from '../steps/generate-chat-title-step';
 import { thinkAndPrepStep } from '../steps/think-and-prep-step';
-import { MessageHistorySchema, StepFinishDataSchema, ReasoningHistorySchema, ResponseHistorySchema } from '../utils/memory/types';
+import {
+  MessageHistorySchema,
+  ReasoningHistorySchema,
+  ResponseHistorySchema,
+  StepFinishDataSchema,
+} from '../utils/memory/types';
 
 // Runtime context schema for type safety
 export const AnalystRuntimeContextSchema = z.object({
