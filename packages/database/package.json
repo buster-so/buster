@@ -4,7 +4,7 @@
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --build",
     "build:bun": "bun build src/index.ts --outdir dist --target node",
     "clean": "rm -rf dist",
     "test": "bun test",

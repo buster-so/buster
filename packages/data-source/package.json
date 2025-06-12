@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --build",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:unit": "vitest run tests/unit/",
@@ -16,7 +16,12 @@
     "lint:fix": "eslint src/ tests/ --fix",
     "clean": "rm -rf dist"
   },
-  "keywords": ["database", "data-source", "introspection", "sql"],
+  "keywords": [
+    "database",
+    "data-source",
+    "introspection",
+    "sql"
+  ],
   "author": "Buster Team",
   "license": "MIT"
 }

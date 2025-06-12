@@ -8,7 +8,7 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "build": "tsc",
+    "build": "tsc --build",
     "dev": "bun run src/index.ts"
   }
 }

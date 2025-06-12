@@ -16,6 +16,7 @@
     "allowSyntheticDefaultImports": true,
     "declaration": true,
     "sourceMap": true,
+    "composite": true,
     "types": ["node", "vitest/globals"],
 
     // Path mapping for clean cross-package imports
