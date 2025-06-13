@@ -75,7 +75,7 @@ export interface BusterChatMessageReasoning_file {
   version_number: number;
   status: 'loading' | 'completed' | 'failed';
   file: {
-    text: string | undefined;
+    text?: string | undefined;
     text_chunk?: string | undefined;
     modified?: [number, number][];
   };
