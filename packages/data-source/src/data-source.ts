@@ -103,7 +103,7 @@ export class DataSource {
     const adapter = await this.getAdapter(dataSourceName);
 
     try {
-      const result = await adapter.query(request.sql, request.params);
+      const result = await adapter.query(request.sql, request.params, request.options?.maxRows);
 
       // Convert adapter result to QueryResult format
       return {
@@ -120,6 +120,12 @@ export class DataSource {
         rowsAffected: result.rowCount,
         executionTime: 0, // TODO: Add timing
         warehouse: dataSourceName,
+        metadata: {
+          ...(request.options?.maxRows && result.hasMoreRows !== undefined
+            ? { limited: result.hasMoreRows, maxRows: request.options.maxRows }
+            : {}),
+          ...(result.totalRowCount !== undefined ? { totalRowCount: result.totalRowCount } : {}),
+        },
       };
     } catch (error) {
       return {

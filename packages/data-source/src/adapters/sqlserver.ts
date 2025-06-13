@@ -5,6 +5,13 @@ import { type Credentials, DataSourceType, type SQLServerCredentials } from '../
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
 
+// Internal types for mssql column metadata that aren't properly exported
+interface ColumnMetadata {
+  type?: (() => { name?: string }) | { name?: string };
+  length?: number;
+  nullable?: boolean;
+}
+
 /**
  * SQL Server database adapter
  */
@@ -63,7 +70,11 @@ export class SQLServerAdapter extends BaseAdapter {
     }
   }
 
-  async query(sqlQuery: string, params?: QueryParameter[]): Promise<AdapterQueryResult> {
+  async query(
+    sqlQuery: string,
+    params?: QueryParameter[],
+    maxRows?: number
+  ): Promise<AdapterQueryResult> {
     this.ensureConnected();
 
     if (!this.pool) {
@@ -82,17 +93,53 @@ export class SQLServerAdapter extends BaseAdapter {
 
         // Replace ? placeholders with @param0, @param1, etc.
         let paramIndex = 0;
-        processedQuery = sqlQuery.replace(/\?/g, () => `@param${paramIndex++}`);
+        processedQuery = processedQuery.replace(/\?/g, () => `@param${paramIndex++}`);
       }
 
-      const result = await request.query(processedQuery);
+      // If no maxRows specified, use regular query
+      if (!maxRows || maxRows <= 0) {
+        const result = await request.query(processedQuery);
 
-      const fields: FieldMetadata[] = result.recordset?.columns
-        ? Object.keys(result.recordset.columns).map((name) => {
-            const column = result.recordset?.columns?.[name];
+        const fields: FieldMetadata[] = result.recordset?.columns
+          ? Object.keys(result.recordset.columns).map((name) => {
+              const column = result.recordset?.columns?.[name];
+              const columnType = typeof column?.type === 'function' ? column.type() : column?.type;
+
+              // Type the column type properly instead of using unknown
+              const typedColumnType = columnType as { name?: string } | undefined;
+
+              return {
+                name,
+                type: typedColumnType?.name || 'unknown',
+                length: column?.length,
+                nullable: column?.nullable,
+              };
+            })
+          : [];
+
+        return {
+          rows: result.recordset || [],
+          rowCount: result.recordset?.length || 0,
+          fields,
+          hasMoreRows: false,
+        };
+      }
+
+      // Use streaming for SELECT queries with maxRows
+      return new Promise((resolve, reject) => {
+        const rows: Record<string, unknown>[] = [];
+        let hasMoreRows = false;
+        let fields: FieldMetadata[] = [];
+        let rowCount = 0;
+
+        // Enable streaming mode
+        request.stream = true;
+
+        // Listen for column metadata
+        request.on('recordset', (columns: Record<string, ColumnMetadata>) => {
+          fields = Object.keys(columns).map((name) => {
+            const column = columns[name];
             const columnType = typeof column?.type === 'function' ? column.type() : column?.type;
-
-            // Type the column type properly instead of using unknown
             const typedColumnType = columnType as { name?: string } | undefined;
 
             return {
@@ -101,14 +148,41 @@ export class SQLServerAdapter extends BaseAdapter {
               length: column?.length,
               nullable: column?.nullable,
             };
-          })
-        : [];
+          });
+        });
 
-      return {
-        rows: result.recordset || [],
-        rowCount: result.rowsAffected?.[0] || result.recordset?.length || 0,
-        fields,
-      };
+        // Listen for each row
+        request.on('row', (row: Record<string, unknown>) => {
+          if (rowCount < maxRows) {
+            rows.push(row);
+            rowCount++;
+          } else if (rowCount === maxRows) {
+            hasMoreRows = true;
+            // Pause the stream to stop receiving more rows
+            request.pause();
+            // Cancel the request to stop processing
+            request.cancel();
+          }
+        });
+
+        // Listen for errors
+        request.on('error', (err) => {
+          reject(new Error(`SQL Server query failed: ${err.message}`));
+        });
+
+        // Listen for completion
+        request.on('done', () => {
+          resolve({
+            rows,
+            rowCount: rows.length,
+            fields,
+            hasMoreRows,
+          });
+        });
+
+        // Execute the query
+        request.query(processedQuery);
+      });
     } catch (error) {
       throw new Error(
         `SQL Server query failed: ${error instanceof Error ? error.message : 'Unknown error'}`

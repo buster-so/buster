@@ -1,10 +1,10 @@
-import type { DatabaseAdapter } from '@/adapters/base';
-import { BigQueryIntrospector } from '@/introspection/bigquery';
-import { MySQLIntrospector } from '@/introspection/mysql';
-import { PostgreSQLIntrospector } from '@/introspection/postgresql';
-import { RedshiftIntrospector } from '@/introspection/redshift';
-import { SQLServerIntrospector } from '@/introspection/sqlserver';
 import { describe, expect, it, vi } from 'vitest';
+import type { DatabaseAdapter } from '../../../src/adapters/base';
+import { BigQueryIntrospector } from '../../../src/introspection/bigquery';
+import { MySQLIntrospector } from '../../../src/introspection/mysql';
+import { PostgreSQLIntrospector } from '../../../src/introspection/postgresql';
+import { RedshiftIntrospector } from '../../../src/introspection/redshift';
+import { SQLServerIntrospector } from '../../../src/introspection/sqlserver';
 
 describe('Introspector Empty Filter Validation', () => {
   const mockAdapter: DatabaseAdapter = {

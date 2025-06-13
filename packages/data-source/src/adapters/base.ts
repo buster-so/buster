@@ -32,6 +32,12 @@ export interface AdapterQueryResult {
 
   /** Field/column metadata */
   fields: FieldMetadata[];
+
+  /** Total row count before limiting (if available) */
+  totalRowCount?: number;
+
+  /** Whether the results were limited */
+  hasMoreRows?: boolean;
 }
 
 /**
@@ -46,7 +52,7 @@ export interface DatabaseAdapter {
   /**
    * Execute a SQL query
    */
-  query(sql: string, params?: QueryParameter[]): Promise<AdapterQueryResult>;
+  query(sql: string, params?: QueryParameter[], maxRows?: number): Promise<AdapterQueryResult>;
 
   /**
    * Test the connection to the database
@@ -77,7 +83,11 @@ export abstract class BaseAdapter implements DatabaseAdapter {
   protected connected = false;
 
   abstract initialize(credentials: Credentials): Promise<void>;
-  abstract query(sql: string, params?: QueryParameter[]): Promise<AdapterQueryResult>;
+  abstract query(
+    sql: string,
+    params?: QueryParameter[],
+    maxRows?: number
+  ): Promise<AdapterQueryResult>;
   abstract testConnection(): Promise<boolean>;
   abstract close(): Promise<void>;
   abstract getDataSourceType(): string;

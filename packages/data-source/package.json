@@ -18,5 +18,11 @@
   },
   "keywords": ["database", "data-source", "introspection", "sql"],
   "author": "Buster Team",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "pg-cursor": "^2.15.0"
+  },
+  "devDependencies": {
+    "@types/pg-cursor": "^2.7.2"
+  }
 }
