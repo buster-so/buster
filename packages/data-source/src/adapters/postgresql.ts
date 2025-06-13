@@ -52,7 +52,11 @@ export class PostgreSQLAdapter extends BaseAdapter {
     }
   }
 
-  async query(sql: string, params?: QueryParameter[]): Promise<AdapterQueryResult> {
+  async query(
+    sql: string,
+    params?: QueryParameter[],
+    maxRows?: number
+  ): Promise<AdapterQueryResult> {
     this.ensureConnected();
 
     if (!this.client) {
@@ -60,7 +64,24 @@ export class PostgreSQLAdapter extends BaseAdapter {
     }
 
     try {
-      const result = await this.client.query(sql, params);
+      let limitedSql = sql;
+      let hasMoreRows = false;
+
+      // Apply row limit if specified
+      if (maxRows && maxRows > 0) {
+        // Wrap the original query to apply LIMIT
+        // Using a subquery to avoid issues with complex queries
+        limitedSql = `SELECT * FROM (${sql}) AS limited_query LIMIT ${maxRows + 1}`;
+      }
+
+      const result = await this.client.query(limitedSql, params);
+
+      // Check if we have more rows than requested
+      if (maxRows && result.rows.length > maxRows) {
+        hasMoreRows = true;
+        // Remove the extra row we fetched to check for more
+        result.rows = result.rows.slice(0, maxRows);
+      }
 
       const fields: FieldMetadata[] =
         result.fields?.map((field) => ({
@@ -72,8 +93,9 @@ export class PostgreSQLAdapter extends BaseAdapter {
 
       return {
         rows: result.rows,
-        rowCount: result.rowCount || 0,
+        rowCount: result.rows.length,
         fields,
+        hasMoreRows,
       };
     } catch (error) {
       throw new Error(

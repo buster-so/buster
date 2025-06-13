@@ -49,7 +49,11 @@ export class BigQueryAdapter extends BaseAdapter {
     }
   }
 
-  async query(sql: string, params?: QueryParameter[]): Promise<AdapterQueryResult> {
+  async query(
+    sql: string,
+    params?: QueryParameter[],
+    maxRows?: number
+  ): Promise<AdapterQueryResult> {
     this.ensureConnected();
 
     if (!this.client) {
@@ -61,6 +65,13 @@ export class BigQueryAdapter extends BaseAdapter {
         query: sql,
         useLegacySql: false,
       };
+
+      // Apply row limit if specified
+      let hasMoreRows = false;
+      if (maxRows && maxRows > 0) {
+        // BigQuery supports maxResults natively
+        options.maxResults = maxRows + 1;
+      }
 
       // Handle parameterized queries - BigQuery uses named parameters
       if (params && params.length > 0) {
@@ -88,15 +99,23 @@ export class BigQueryAdapter extends BaseAdapter {
       const [rows] = await job.getQueryResults();
 
       // Convert BigQuery rows to plain objects
-      const resultRows: Record<string, unknown>[] = rows.map((row) => ({ ...row }));
+      let resultRows: Record<string, unknown>[] = rows.map((row) => ({ ...row }));
+
+      // Check if we have more rows than requested
+      if (maxRows && resultRows.length > maxRows) {
+        hasMoreRows = true;
+        // Remove the extra row we fetched to check for more
+        resultRows = resultRows.slice(0, maxRows);
+      }
 
       // BigQuery doesn't provide detailed field metadata in the same way as other databases
       const fields: FieldMetadata[] = [];
 
       return {
         rows: resultRows,
-        rowCount: rows.length,
+        rowCount: resultRows.length,
         fields,
+        hasMoreRows,
       };
     } catch (error) {
       throw new Error(

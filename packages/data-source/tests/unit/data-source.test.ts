@@ -292,7 +292,7 @@ describe('DataSource Unit Tests', () => {
       expect(result.success).toBe(true);
       expect(result.rows).toEqual([{ test: 'value' }]);
       expect(result.warehouse).toBe('test-db');
-      expect(mockAdapter.query).toHaveBeenCalledWith('SELECT 1 as test', undefined);
+      expect(mockAdapter.query).toHaveBeenCalledWith('SELECT 1 as test', undefined, undefined);
     });
 
     it('should execute query with parameters', async () => {
@@ -302,7 +302,11 @@ describe('DataSource Unit Tests', () => {
       });
 
       expect(result.success).toBe(true);
-      expect(mockAdapter.query).toHaveBeenCalledWith('SELECT * FROM users WHERE id = ?', [123]);
+      expect(mockAdapter.query).toHaveBeenCalledWith(
+        'SELECT * FROM users WHERE id = ?',
+        [123],
+        undefined
+      );
     });
 
     it('should route query to specific warehouse', async () => {
@@ -335,6 +339,56 @@ describe('DataSource Unit Tests', () => {
           warehouse: 'non-existent',
         })
       ).rejects.toThrow("Specified data source 'non-existent' not found");
+    });
+
+    it('should execute query with maxRows option', async () => {
+      const result = await dataSource.execute({
+        sql: 'SELECT * FROM users',
+        options: { maxRows: 100 },
+      });
+
+      expect(result.success).toBe(true);
+      expect(mockAdapter.query).toHaveBeenCalledWith('SELECT * FROM users', undefined, 100);
+    });
+
+    it('should include metadata when results are limited', async () => {
+      // Mock adapter to return hasMoreRows flag
+      vi.mocked(mockAdapter.query).mockResolvedValue({
+        rows: [{ test: 'value1' }, { test: 'value2' }],
+        fields: [{ name: 'test', type: 'string' }],
+        rowCount: 2,
+        hasMoreRows: true,
+      });
+
+      const result = await dataSource.execute({
+        sql: 'SELECT * FROM large_table',
+        options: { maxRows: 2 },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.rows).toHaveLength(2);
+      expect(result.metadata).toBeDefined();
+      expect(result.metadata?.limited).toBe(true);
+      expect(result.metadata?.maxRows).toBe(2);
+    });
+
+    it('should not include metadata when results are not limited', async () => {
+      // Mock adapter to return no hasMoreRows flag
+      vi.mocked(mockAdapter.query).mockResolvedValue({
+        rows: [{ test: 'value' }],
+        fields: [{ name: 'test', type: 'string' }],
+        rowCount: 1,
+        hasMoreRows: false,
+      });
+
+      const result = await dataSource.execute({
+        sql: 'SELECT * FROM small_table',
+        options: { maxRows: 100 },
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.rows).toHaveLength(1);
+      expect(result.metadata?.limited).toBe(false);
     });
   });
 
@@ -401,8 +455,8 @@ describe('DataSource Unit Tests', () => {
             columnName: 'id',
             distinctCount: 100,
             nullCount: 0,
-            minValue: 1,
-            maxValue: 100,
+            minValue: '1',
+            maxValue: '100',
             sampleValues: '1,2,3,4,5',
           },
           {

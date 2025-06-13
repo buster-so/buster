@@ -63,7 +63,11 @@ export class SQLServerAdapter extends BaseAdapter {
     }
   }
 
-  async query(sqlQuery: string, params?: QueryParameter[]): Promise<AdapterQueryResult> {
+  async query(
+    sqlQuery: string,
+    params?: QueryParameter[],
+    maxRows?: number
+  ): Promise<AdapterQueryResult> {
     this.ensureConnected();
 
     if (!this.pool) {
@@ -73,6 +77,14 @@ export class SQLServerAdapter extends BaseAdapter {
     try {
       const request = this.pool.request();
       let processedQuery = sqlQuery;
+      let hasMoreRows = false;
+
+      // Apply row limit if specified
+      if (maxRows && maxRows > 0) {
+        // SQL Server uses TOP clause
+        // Wrap the original query to apply TOP
+        processedQuery = `SELECT TOP ${maxRows + 1} * FROM (${sqlQuery}) AS limited_query`;
+      }
 
       // Add parameters if provided
       if (params && params.length > 0) {
@@ -82,10 +94,19 @@ export class SQLServerAdapter extends BaseAdapter {
 
         // Replace ? placeholders with @param0, @param1, etc.
         let paramIndex = 0;
-        processedQuery = sqlQuery.replace(/\?/g, () => `@param${paramIndex++}`);
+        processedQuery = processedQuery.replace(/\?/g, () => `@param${paramIndex++}`);
       }
 
       const result = await request.query(processedQuery);
+
+      let rows = result.recordset || [];
+
+      // Check if we have more rows than requested
+      if (maxRows && rows.length > maxRows) {
+        hasMoreRows = true;
+        // Remove the extra row we fetched to check for more
+        rows = rows.slice(0, maxRows);
+      }
 
       const fields: FieldMetadata[] = result.recordset?.columns
         ? Object.keys(result.recordset.columns).map((name) => {
@@ -105,9 +126,10 @@ export class SQLServerAdapter extends BaseAdapter {
         : [];
 
       return {
-        rows: result.recordset || [],
-        rowCount: result.rowsAffected?.[0] || result.recordset?.length || 0,
+        rows,
+        rowCount: rows.length,
         fields,
+        hasMoreRows,
       };
     } catch (error) {
       throw new Error(

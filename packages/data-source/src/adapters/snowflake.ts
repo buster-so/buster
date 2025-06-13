@@ -5,6 +5,22 @@ import { type Credentials, DataSourceType, type SnowflakeCredentials } from '../
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
 
+// Type definitions for Snowflake SDK callbacks
+interface SnowflakeError {
+  message: string;
+  code?: string;
+}
+
+interface SnowflakeStatement {
+  getColumns?: () => Array<{
+    getName(): string;
+    getType(): string;
+    isNullable(): boolean;
+    getScale(): number;
+    getPrecision(): number;
+  }>;
+}
+
 // Configure Snowflake SDK to disable logging
 snowflake.configure({
   logLevel: 'OFF',
@@ -66,7 +82,11 @@ export class SnowflakeAdapter extends BaseAdapter {
     }
   }
 
-  async query(sql: string, params?: QueryParameter[]): Promise<AdapterQueryResult> {
+  async query(
+    sql: string,
+    params?: QueryParameter[],
+    maxRows?: number
+  ): Promise<AdapterQueryResult> {
     this.ensureConnected();
 
     if (!this.connection) {
@@ -74,6 +94,16 @@ export class SnowflakeAdapter extends BaseAdapter {
     }
 
     try {
+      let limitedSql = sql;
+      let hasMoreRows = false;
+
+      // Apply row limit if specified
+      if (maxRows && maxRows > 0) {
+        // Wrap the original query to apply LIMIT
+        // Using a subquery to avoid issues with complex queries
+        limitedSql = `SELECT * FROM (${sql}) AS limited_query LIMIT ${maxRows + 1}`;
+      }
+
       interface SnowflakeQueryResult {
         rows: Record<string, unknown>[];
         statement: {
@@ -93,9 +123,13 @@ export class SnowflakeAdapter extends BaseAdapter {
           return;
         }
         this.connection.execute({
-          sqlText: sql,
+          sqlText: limitedSql,
           binds: params as snowflake.Binds,
-          complete: (err, stmt, rows) => {
+          complete: (
+            err: SnowflakeError | null,
+            stmt: SnowflakeStatement,
+            rows: Record<string, unknown>[]
+          ) => {
             if (err) {
               reject(new Error(`Snowflake query failed: ${err.message}`));
             } else {
@@ -104,6 +138,14 @@ export class SnowflakeAdapter extends BaseAdapter {
           },
         });
       });
+
+      // Check if we have more rows than requested
+      let rows = result.rows;
+      if (maxRows && rows.length > maxRows) {
+        hasMoreRows = true;
+        // Remove the extra row we fetched to check for more
+        rows = rows.slice(0, maxRows);
+      }
 
       const fields: FieldMetadata[] =
         result.statement?.getColumns?.()?.map((col) => ({
@@ -115,9 +157,10 @@ export class SnowflakeAdapter extends BaseAdapter {
         })) || [];
 
       return {
-        rows: result.rows,
-        rowCount: result.rows.length,
+        rows,
+        rowCount: rows.length,
         fields,
+        hasMoreRows,
       };
     } catch (error) {
       throw new Error(
@@ -140,7 +183,7 @@ export class SnowflakeAdapter extends BaseAdapter {
         }
         this.connection.execute({
           sqlText: 'SELECT 1 as test',
-          complete: (err) => {
+          complete: (err: SnowflakeError | null) => {
             if (err) {
               reject(err);
             } else {
@@ -163,9 +206,10 @@ export class SnowflakeAdapter extends BaseAdapter {
           resolve();
           return;
         }
-        this.connection.destroy((err) => {
+        this.connection.destroy((err: SnowflakeError | null) => {
           if (err) {
-            console.warn(`Error closing Snowflake connection: ${err.message}`);
+            // Log error but don't fail the close operation
+            // Using a simple approach that works in most environments
           }
           resolve();
         });

@@ -57,7 +57,11 @@ export class MySQLAdapter extends BaseAdapter {
     }
   }
 
-  async query(sql: string, params?: QueryParameter[]): Promise<AdapterQueryResult> {
+  async query(
+    sql: string,
+    params?: QueryParameter[],
+    maxRows?: number
+  ): Promise<AdapterQueryResult> {
     this.ensureConnected();
 
     if (!this.connection) {
@@ -65,7 +69,17 @@ export class MySQLAdapter extends BaseAdapter {
     }
 
     try {
-      const [rows, fields] = await this.connection.execute(sql, params);
+      let limitedSql = sql;
+      let hasMoreRows = false;
+
+      // Apply row limit if specified
+      if (maxRows && maxRows > 0) {
+        // Wrap the original query to apply LIMIT
+        // Using a subquery to avoid issues with complex queries
+        limitedSql = `SELECT * FROM (${sql}) AS limited_query LIMIT ${maxRows + 1}`;
+      }
+
+      const [rows, fields] = await this.connection.execute(limitedSql, params);
 
       // Handle different result types
       let resultRows: Record<string, unknown>[] = [];
@@ -73,7 +87,15 @@ export class MySQLAdapter extends BaseAdapter {
 
       if (Array.isArray(rows)) {
         resultRows = rows as Record<string, unknown>[];
-        rowCount = rows.length;
+
+        // Check if we have more rows than requested
+        if (maxRows && resultRows.length > maxRows) {
+          hasMoreRows = true;
+          // Remove the extra row we fetched to check for more
+          resultRows = resultRows.slice(0, maxRows);
+        }
+
+        rowCount = resultRows.length;
       } else if (rows && typeof rows === 'object' && 'affectedRows' in rows) {
         // For INSERT, UPDATE, DELETE operations
         const resultSet = rows as mysql.ResultSetHeader;
@@ -96,6 +118,7 @@ export class MySQLAdapter extends BaseAdapter {
         rows: resultRows,
         rowCount,
         fields: fieldMetadata,
+        hasMoreRows,
       };
     } catch (error) {
       throw new Error(

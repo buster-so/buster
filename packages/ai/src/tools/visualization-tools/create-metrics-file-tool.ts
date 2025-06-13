@@ -1223,27 +1223,33 @@ async function validateSql(
     }
 
     try {
-      // Execute the SQL query using the DataSource
+      // Execute the SQL query using the DataSource with row limit for validation
       const result = await dataSource.execute({
         sql: sqlQuery,
+        options: { maxRows: 1000 }, // Limit to 1000 rows for validation to protect memory
       });
 
       if (result.success) {
         const allResults = result.rows || [];
-        // Truncate results to 25 records for validation
+        // Truncate results to 25 records for display in validation
         const results = allResults.slice(0, 25);
 
         const metadata = {
           columns: results.length > 0 ? Object.keys(results[0] || {}) : [],
           rowCount: results.length,
-          totalRowCount: allResults.length, // Track original count
-          executionTime: 100, // We don't have actual execution time from DataSource
+          totalRowCount: result.metadata?.totalRowCount || allResults.length, // Use total count if available
+          executionTime: result.executionTime || 100,
+          limited: result.metadata?.limited || false,
         };
 
-        const message =
-          allResults.length === 0
-            ? 'Query executed successfully but returned no records'
-            : `Query validated successfully and returned ${allResults.length} records${allResults.length > 25 ? ` (showing sample of first 25 of ${allResults.length} total)` : ''}`;
+        let message: string;
+        if (allResults.length === 0) {
+          message = 'Query executed successfully but returned no records';
+        } else if (result.metadata?.limited) {
+          message = `Query validated successfully. Results were limited to ${result.metadata.maxRows} rows for memory protection (query may return more rows when executed)${results.length < allResults.length ? ` - showing first 25 of ${allResults.length} fetched` : ''}`;
+        } else {
+          message = `Query validated successfully and returned ${allResults.length} records${allResults.length > 25 ? ` (showing sample of first 25)` : ''}`;
+        }
 
         return {
           success: true,
