@@ -69,51 +69,12 @@ export class MySQLAdapter extends BaseAdapter {
     }
 
     try {
-      // If no maxRows specified or query is not a SELECT, use regular query
-      if (!maxRows || maxRows <= 0 || !sql.trim().toUpperCase().startsWith('SELECT')) {
-        const [rows, fields] = await this.connection.execute(sql, params);
-
-        // Handle different result types
-        let resultRows: Record<string, unknown>[] = [];
-        let rowCount = 0;
-
-        if (Array.isArray(rows)) {
-          resultRows = rows as Record<string, unknown>[];
-          rowCount = resultRows.length;
-        } else if (rows && typeof rows === 'object' && 'affectedRows' in rows) {
-          // For INSERT, UPDATE, DELETE operations
-          const resultSet = rows as mysql.ResultSetHeader;
-          rowCount = resultSet.affectedRows || 0;
-          resultRows = [];
-        }
-
-        const fieldMetadata: FieldMetadata[] = Array.isArray(fields)
-          ? fields.map((field) => ({
-              name: field.name,
-              type: `mysql_type_${field.type}`, // MySQL field type
-              nullable: typeof field.flags === 'number' ? (field.flags & 1) === 0 : true, // NOT_NULL flag is bit 0
-              length:
-                typeof field.length === 'number' && field.length > 0 ? field.length : undefined,
-              precision:
-                typeof field.decimals === 'number' && field.decimals > 0
-                  ? field.decimals
-                  : undefined,
-            }))
-          : [];
-
-        return {
-          rows: resultRows,
-          rowCount,
-          fields: fieldMetadata,
-          hasMoreRows: false,
-        };
-      }
-
-      // MySQL2/promise doesn't support streaming directly
-      // We'll add LIMIT to the query as a workaround for network-level limiting
-      // This is still better than wrapping complex queries which can break CTEs
-      const limitedSql = `${sql} LIMIT ${maxRows + 1}`;
-      const [rows, fields] = await this.connection.execute(limitedSql, params);
+      // MySQL2 with promise connections doesn't support true streaming.
+      // We execute the full query and limit results in memory.
+      // This means the database still processes the full result set,
+      // but we protect the application memory by only keeping maxRows.
+      // For true streaming support, you would need to use the callback-based API.
+      const [rows, fields] = await this.connection.execute(sql, params);
 
       // Handle different result types
       let resultRows: Record<string, unknown>[] = [];
@@ -121,13 +82,20 @@ export class MySQLAdapter extends BaseAdapter {
       let hasMoreRows = false;
 
       if (Array.isArray(rows)) {
-        if (rows.length > maxRows) {
+        // For SELECT queries that return rows
+        if (maxRows && maxRows > 0 && rows.length > maxRows) {
+          // We have more rows than requested - limit them in memory
           hasMoreRows = true;
           resultRows = rows.slice(0, maxRows) as Record<string, unknown>[];
         } else {
           resultRows = rows as Record<string, unknown>[];
         }
         rowCount = resultRows.length;
+      } else if (rows && typeof rows === 'object' && 'affectedRows' in rows) {
+        // For INSERT, UPDATE, DELETE operations
+        const resultSet = rows as mysql.ResultSetHeader;
+        rowCount = resultSet.affectedRows || 0;
+        resultRows = [];
       }
 
       const fieldMetadata: FieldMetadata[] = Array.isArray(fields)
@@ -135,12 +103,9 @@ export class MySQLAdapter extends BaseAdapter {
             name: field.name,
             type: `mysql_type_${field.type}`, // MySQL field type
             nullable: typeof field.flags === 'number' ? (field.flags & 1) === 0 : true, // NOT_NULL flag is bit 0
-            length:
-              typeof field.length === 'number' && field.length > 0 ? field.length : undefined,
+            length: typeof field.length === 'number' && field.length > 0 ? field.length : undefined,
             precision:
-              typeof field.decimals === 'number' && field.decimals > 0
-                ? field.decimals
-                : undefined,
+              typeof field.decimals === 'number' && field.decimals > 0 ? field.decimals : undefined,
           }))
         : [];
 

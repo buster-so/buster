@@ -6,6 +6,19 @@ import { type Credentials, DataSourceType, type RedshiftCredentials } from '../t
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
 
+// Internal types for pg-cursor that aren't exported
+interface CursorResult {
+  fields: Array<{
+    name: string;
+    dataTypeID: number;
+    dataTypeSize: number;
+  }>;
+}
+
+interface CursorWithResult extends Cursor {
+  _result?: CursorResult;
+}
+
 /**
  * Redshift database adapter (PostgreSQL-compatible)
  */
@@ -61,8 +74,8 @@ export class RedshiftAdapter extends BaseAdapter {
     }
 
     try {
-      // If no maxRows specified or query is not a SELECT, use regular query
-      if (!maxRows || maxRows <= 0 || !sql.trim().toUpperCase().startsWith('SELECT')) {
+      // If no maxRows specified, use regular query
+      if (!maxRows || maxRows <= 0) {
         const result = await this.client.query(sql, params);
 
         const fields: FieldMetadata[] =
@@ -82,7 +95,7 @@ export class RedshiftAdapter extends BaseAdapter {
       }
 
       // Use cursor for SELECT queries with maxRows
-      const cursor = this.client.query(new Cursor(sql, params));
+      const cursor = this.client.query(new Cursor(sql, params)) as CursorWithResult;
       const rows: Record<string, unknown>[] = [];
       let hasMoreRows = false;
       let fields: FieldMetadata[] = [];
@@ -93,9 +106,9 @@ export class RedshiftAdapter extends BaseAdapter {
 
       while (totalRead < maxRows) {
         const remainingRows = maxRows - totalRead;
-        const readSize = Math.min(batchSize, remainingRows + 1); // Read one extra to check for more
+        const readSize = Math.min(batchSize, remainingRows) + 1; // Read one extra to check for more
 
-        const batchRows = await new Promise<any[]>((resolve, reject) => {
+        const batchRows = await new Promise<Record<string, unknown>[]>((resolve, reject) => {
           cursor.read(readSize, (err, batchRows) => {
             if (err) {
               reject(err);
@@ -110,8 +123,8 @@ export class RedshiftAdapter extends BaseAdapter {
         }
 
         // Extract field metadata from cursor on first batch
-        if (fields.length === 0 && (cursor as any)._result?.fields) {
-          fields = (cursor as any)._result.fields.map((field: any) => ({
+        if (fields.length === 0 && cursor._result?.fields) {
+          fields = cursor._result.fields.map((field) => ({
             name: field.name,
             type: `redshift_type_${field.dataTypeID}`,
             nullable: true,
@@ -124,10 +137,10 @@ export class RedshiftAdapter extends BaseAdapter {
           hasMoreRows = true;
           rows.push(...batchRows.slice(0, maxRows - totalRead));
           break;
-        } else {
-          rows.push(...batchRows);
-          totalRead += batchRows.length;
         }
+
+        rows.push(...batchRows);
+        totalRead += batchRows.length;
 
         // If we got fewer rows than requested, we've reached the end
         if (batchRows.length < readSize) {

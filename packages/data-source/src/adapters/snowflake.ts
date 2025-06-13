@@ -91,8 +91,8 @@ export class SnowflakeAdapter extends BaseAdapter {
     }
 
     try {
-      // If no maxRows specified or query is not a SELECT, use regular query
-      if (!maxRows || maxRows <= 0 || !sql.trim().toUpperCase().startsWith('SELECT')) {
+      // If no maxRows specified, use regular query
+      if (!maxRows || maxRows <= 0) {
         const result = await new Promise<{
           rows: Record<string, unknown>[];
           statement: SnowflakeStatement;
@@ -107,7 +107,7 @@ export class SnowflakeAdapter extends BaseAdapter {
             complete: (
               err: SnowflakeError | undefined,
               stmt: SnowflakeStatement,
-              rows: any[] | undefined
+              rows: Record<string, unknown>[] | undefined
             ) => {
               if (err) {
                 reject(new Error(`Snowflake query failed: ${err.message}`));

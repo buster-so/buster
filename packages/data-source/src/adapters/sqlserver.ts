@@ -5,6 +5,13 @@ import { type Credentials, DataSourceType, type SQLServerCredentials } from '../
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
 
+// Internal types for mssql column metadata that aren't properly exported
+interface ColumnMetadata {
+  type?: (() => { name?: string }) | { name?: string };
+  length?: number;
+  nullable?: boolean;
+}
+
 /**
  * SQL Server database adapter
  */
@@ -89,8 +96,8 @@ export class SQLServerAdapter extends BaseAdapter {
         processedQuery = processedQuery.replace(/\?/g, () => `@param${paramIndex++}`);
       }
 
-      // If no maxRows specified or query is not a SELECT, use regular query
-      if (!maxRows || maxRows <= 0 || !sqlQuery.trim().toUpperCase().startsWith('SELECT')) {
+      // If no maxRows specified, use regular query
+      if (!maxRows || maxRows <= 0) {
         const result = await request.query(processedQuery);
 
         const fields: FieldMetadata[] = result.recordset?.columns
@@ -129,7 +136,7 @@ export class SQLServerAdapter extends BaseAdapter {
         request.stream = true;
 
         // Listen for column metadata
-        request.on('recordset', (columns: any) => {
+        request.on('recordset', (columns: Record<string, ColumnMetadata>) => {
           fields = Object.keys(columns).map((name) => {
             const column = columns[name];
             const columnType = typeof column?.type === 'function' ? column.type() : column?.type;
