@@ -8,7 +8,7 @@ import {
   metricFilesToDashboardFiles,
 } from '@buster/database';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
-import { createDashboardsFileTool } from '../../../src/tools/visualization-tools/create-dashboards-file-tool';
+import { createDashboards } from '../../../src/tools/visualization-tools/create-dashboards-file-tool';
 
 describe('Create Dashboards File Tool Integration Tests', () => {
   let mockRuntimeContext: any;
@@ -114,11 +114,11 @@ describe('Create Dashboards File Tool Integration Tests', () => {
   }
 
   test('should have correct tool configuration', () => {
-    expect(createDashboardsFileTool.id).toBe('create-dashboards-file');
-    expect(createDashboardsFileTool.description).toContain('Creates new dashboard files');
-    expect(createDashboardsFileTool.inputSchema).toBeDefined();
-    expect(createDashboardsFileTool.outputSchema).toBeDefined();
-    expect(createDashboardsFileTool.execute).toBeDefined();
+    expect(createDashboards.id).toBe('create-dashboards-file');
+    expect(createDashboards.description).toContain('Creates new dashboard files');
+    expect(createDashboards.inputSchema).toBeDefined();
+    expect(createDashboards.outputSchema).toBeDefined();
+    expect(createDashboards.execute).toBeDefined();
   });
 
   test('should validate tool input schema', () => {
@@ -140,7 +140,7 @@ rows:
       ],
     };
 
-    const result = createDashboardsFileTool.inputSchema.safeParse(validInput);
+    const result = createDashboards.inputSchema.safeParse(validInput);
     expect(result.success).toBe(true);
   });
 
@@ -162,7 +162,7 @@ rows:
       failed_files: [],
     };
 
-    const result = createDashboardsFileTool.outputSchema.safeParse(validOutput);
+    const result = createDashboards.outputSchema.safeParse(validOutput);
     expect(result.success).toBe(true);
   });
 
@@ -190,7 +190,7 @@ rows:
       runtimeContext: contextWithoutUserId,
     };
 
-    await expect(createDashboardsFileTool.execute({ context: input })).rejects.toThrow(
+    await expect(createDashboards.execute({ context: input })).rejects.toThrow(
       'User ID not found in runtime context'
     );
   });
@@ -207,7 +207,7 @@ description: Invalid dashboard
       runtimeContext: mockRuntimeContext,
     };
 
-    const result = await createDashboardsFileTool.execute({ context: input });
+    const result = await createDashboards.execute({ context: input });
 
     expect(result.files).toHaveLength(0);
     expect(result.failed_files).toHaveLength(1);
@@ -232,7 +232,7 @@ rows:
       runtimeContext: mockRuntimeContext,
     };
 
-    const result = await createDashboardsFileTool.execute({ context: input });
+    const result = await createDashboards.execute({ context: input });
 
     expect(result.files).toHaveLength(0);
     expect(result.failed_files).toHaveLength(1);
@@ -256,7 +256,7 @@ rows:
       runtimeContext: mockRuntimeContext,
     };
 
-    const result = await createDashboardsFileTool.execute({ context: input });
+    const result = await createDashboards.execute({ context: input });
 
     expect(result.files).toHaveLength(0);
     expect(result.failed_files).toHaveLength(1);
@@ -285,7 +285,7 @@ rows:
       runtimeContext: mockRuntimeContext,
     };
 
-    const result = await createDashboardsFileTool.execute({ context: input });
+    const result = await createDashboards.execute({ context: input });
 
     expect(result.files).toHaveLength(1);
     expect(result.failed_files).toHaveLength(0);
@@ -342,7 +342,7 @@ rows:
       runtimeContext: mockRuntimeContext,
     };
 
-    const result = await createDashboardsFileTool.execute({ context: input });
+    const result = await createDashboards.execute({ context: input });
 
     expect(result.files).toHaveLength(1);
     expect(result.failed_files).toHaveLength(1);
@@ -378,7 +378,7 @@ rows:
       runtimeContext: mockRuntimeContext,
     };
 
-    const result = await createDashboardsFileTool.execute({ context: input });
+    const result = await createDashboards.execute({ context: input });
 
     expect(result.duration).toBeGreaterThan(0);
     expect(typeof result.duration).toBe('number');
@@ -415,7 +415,7 @@ rows:
       runtimeContext: mockRuntimeContext,
     };
 
-    const result = await createDashboardsFileTool.execute({ context: input });
+    const result = await createDashboards.execute({ context: input });
 
     expect(result.files).toHaveLength(3);
     expect(result.failed_files).toHaveLength(0);
@@ -465,7 +465,7 @@ rows:
       runtimeContext: mockRuntimeContext,
     };
 
-    const result = await createDashboardsFileTool.execute({ context: input });
+    const result = await createDashboards.execute({ context: input });
 
     expect(result.files).toHaveLength(1);
     expect(result.failed_files).toHaveLength(0);
@@ -511,7 +511,7 @@ rows:
       runtimeContext: mockRuntimeContext,
     };
 
-    const result = await createDashboardsFileTool.execute({ context: input });
+    const result = await createDashboards.execute({ context: input });
 
     expect(result.files).toHaveLength(1);
     expect(result.failed_files).toHaveLength(0);
@@ -552,7 +552,7 @@ rows:
       runtimeContext: mockRuntimeContext,
     };
 
-    const successResult = await createDashboardsFileTool.execute({ context: successInput });
+    const successResult = await createDashboards.execute({ context: successInput });
     expect(successResult.message).toBe('Successfully created 1 dashboard file.');
 
     // Track created dashboard for cleanup
@@ -568,7 +568,7 @@ rows:
       runtimeContext: mockRuntimeContext,
     };
 
-    const failureResult = await createDashboardsFileTool.execute({ context: failureInput });
+    const failureResult = await createDashboards.execute({ context: failureInput });
     expect(failureResult.message).toContain("Failed to create 'Failure Test'");
   });
 
@@ -599,7 +599,7 @@ rows:
       runtimeContext: mockRuntimeContext,
     };
 
-    const result = await createDashboardsFileTool.execute({ context: input });
+    const result = await createDashboards.execute({ context: input });
 
     expect(result.files).toHaveLength(1);
     expect(result.failed_files).toHaveLength(0);

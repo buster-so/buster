@@ -77,7 +77,9 @@
       "server/**/*.ts",
       "server/**/*.js",
       "trigger/**/*.ts",
-      "trigger/**/*.js"
+      "trigger/**/*.js",
+      "vitest.config.ts",
+      "biome.json"
     ],
     "ignore": [
       "**/node_modules/**",

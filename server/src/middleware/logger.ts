@@ -1,8 +1,15 @@
-import { logger } from 'hono/logger';
+import { pinoLogger } from 'hono-pino';
 
-export const loggerMiddleware = logger((_str, ..._rest) => {
-  // Custom logging format for development
-  if (process.env.NODE_ENV === 'development') {
-  } else {
-  }
-});
+const isDev = process.env.NODE_ENV !== 'production';
+
+const loggerConfig: NonNullable<Parameters<typeof pinoLogger>[0]>['pino'] = isDev
+  ? {
+      level: 'info',
+      transport: {
+        target: 'pino-pretty',
+        options: { colorize: true },
+      },
+    }
+  : { level: 'debug' };
+
+export const loggerMiddleware = pinoLogger({ pino: loggerConfig });

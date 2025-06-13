@@ -7,7 +7,10 @@
     "prod": "bun run build && bun run start"
   },
   "dependencies": {
+    "@hono/zod-validator": "^0.7.0",
     "hono": "^4.7.11",
-    "@hono/zod-validator": "^0.7.0"
+    "hono-pino": "^0.8.0",
+    "pino": "^9.7.0",
+    "pino-pretty": "^13.0.0"
   }
 }
