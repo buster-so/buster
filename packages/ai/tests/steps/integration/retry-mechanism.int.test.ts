@@ -1,9 +1,9 @@
-import { beforeAll, describe, expect, it } from 'vitest';
+import { setupTestEnvironment, withTestEnv } from '@buster/test-utils/env-helpers';
 import { RuntimeContext } from '@mastra/core/runtime-context';
 import type { CoreMessage } from 'ai';
-import { setupTestEnvironment, withTestEnv } from '@buster/test-utils/env-helpers';
-import { thinkAndPrepStep } from '../../../src/steps/think-and-prep-step';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { analystStep } from '../../../src/steps/analyst-step';
+import { thinkAndPrepStep } from '../../../src/steps/think-and-prep-step';
 import type { AnalystRuntimeContext } from '../../../src/workflows/analyst-workflow';
 
 describe('Retry Mechanism Integration Tests', () => {
@@ -50,12 +50,11 @@ describe('Retry Mechanism Integration Tests', () => {
         expect(result).toBeDefined();
         expect(result.outputMessages).toBeDefined();
         expect(Array.isArray(result.outputMessages)).toBe(true);
-        
+
         // Check if any healing messages were injected (they would be tool result messages)
         const toolResultMessages = result.outputMessages.filter(
-          (msg: CoreMessage) => 
-            msg.role === 'tool' || 
-            (msg.role === 'user' && msg.content === 'Please continue.')
+          (msg: CoreMessage) =>
+            msg.role === 'tool' || (msg.role === 'user' && msg.content === 'Please continue.')
         );
 
         // The presence of healing messages would indicate retry mechanism was triggered
@@ -75,8 +74,8 @@ describe('Retry Mechanism Integration Tests', () => {
         // Simulate output from think-and-prep step
         const mockMessages: CoreMessage[] = [
           { role: 'user', content: 'Analyze some data' },
-          { 
-            role: 'assistant', 
+          {
+            role: 'assistant',
             content: [
               {
                 type: 'text',
@@ -126,7 +125,7 @@ describe('Retry Mechanism Integration Tests', () => {
         expect(result).toBeDefined();
         expect(result.conversationHistory).toBeDefined();
         expect(Array.isArray(result.conversationHistory)).toBe(true);
-        
+
         // The conversation history should include the original messages
         expect(result.conversationHistory.length).toBeGreaterThanOrEqual(mockMessages.length);
       }, 60000);
@@ -174,14 +173,18 @@ describe('Retry Mechanism Integration Tests', () => {
 
         // Verify original messages are preserved
         expect(result.outputMessages).toBeDefined();
-        
+
         // The conversation should start with the original messages
-        const userMessages = result.outputMessages.filter((msg: CoreMessage) => msg.role === 'user');
-        const assistantMessages = result.outputMessages.filter((msg: CoreMessage) => msg.role === 'assistant');
-        
+        const userMessages = result.outputMessages.filter(
+          (msg: CoreMessage) => msg.role === 'user'
+        );
+        const assistantMessages = result.outputMessages.filter(
+          (msg: CoreMessage) => msg.role === 'assistant'
+        );
+
         expect(userMessages.length).toBeGreaterThan(0);
         expect(assistantMessages.length).toBeGreaterThan(0);
-        
+
         // Check that we have a complete conversation flow
         expect(result.outputMessages.length).toBeGreaterThanOrEqual(originalMessages.length);
       }, 60000);

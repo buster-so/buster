@@ -27,11 +27,15 @@ const BusterChatResponseMessageFileSchema = z.object({
   file_name: z.string(),
   version_number: z.number(),
   filter_version_id: z.string().nullable(),
-  metadata: z.array(z.object({
-    status: z.string(),
-    message: z.string(),
-    timestamp: z.number().optional(),
-  })).optional(),
+  metadata: z
+    .array(
+      z.object({
+        status: z.string(),
+        message: z.string(),
+        timestamp: z.number().optional(),
+      })
+    )
+    .optional(),
 });
 
 const BusterChatMessageReasoningTextSchema = z.object({
@@ -50,14 +54,18 @@ const BusterChatMessageReasoningPillSchema = z.object({
   type: z.literal('pills'),
   title: z.string(),
   secondary_title: z.string().optional(),
-  pill_containers: z.array(z.object({
-    title: z.string(),
-    pills: z.array(z.object({
-      text: z.string(),
-      type: z.string().nullable(),
-      id: z.string(),
-    })),
-  })),
+  pill_containers: z.array(
+    z.object({
+      title: z.string(),
+      pills: z.array(
+        z.object({
+          text: z.string(),
+          type: z.string().nullable(),
+          id: z.string(),
+        })
+      ),
+    })
+  ),
   status: z.enum(['loading', 'completed', 'failed']),
 });
 
@@ -193,7 +201,9 @@ export const StepFinishDataSchema = z.object({
     messages: MessageHistorySchema,
   }),
   providerMetadata: z.record(z.string(), z.string().or(z.number()).or(z.boolean())).optional(),
-  experimental_providerMetadata: z.record(z.string(), z.string().or(z.number()).or(z.boolean())).optional(),
+  experimental_providerMetadata: z
+    .record(z.string(), z.string().or(z.number()).or(z.boolean()))
+    .optional(),
   isContinued: z.boolean().optional(),
 });
 

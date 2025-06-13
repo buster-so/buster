@@ -1,18 +1,22 @@
-import { describe, it, expect } from 'vitest';
 import type { AssistantContent } from 'ai';
+import { describe, expect, it } from 'vitest';
 import {
+  type BusterChatMessageReasoning_files,
+  type BusterChatMessageReasoning_text,
+  type BusterChatResponseMessage_text,
   convertToolCallToMessage,
   extractMessagesFromToolCalls,
-  type BusterChatMessageReasoning_text,
-  type BusterChatMessageReasoning_files,
-  type BusterChatResponseMessage_text,
 } from '../../../src/utils/memory/message-converters';
 
 // Extract ToolCall type from AssistantContent
 type ToolCall = Extract<AssistantContent, { type: 'tool-call' }>;
 
 // Helper to create a ToolCall object
-function createToolCall(toolCallId: string, toolName: string, args: Record<string, unknown>): ToolCall {
+function createToolCall(
+  toolCallId: string,
+  toolName: string,
+  args: Record<string, unknown>
+): ToolCall {
   return {
     type: 'tool-call' as const,
     toolCallId,
@@ -53,7 +57,9 @@ describe('message-converters', () => {
 
     describe('Respond Without Analysis tool', () => {
       it('should convert respondWithoutAnalysis to response text message', () => {
-        const toolCall = createToolCall('test-id-3', 'respondWithoutAnalysis', { message: 'Quick response' });
+        const toolCall = createToolCall('test-id-3', 'respondWithoutAnalysis', {
+          message: 'Quick response',
+        });
         const toolResult = { message: 'Quick response' };
 
         const result = convertToolCallToMessage(toolCall, toolResult, 'completed');
@@ -302,12 +308,18 @@ describe('message-converters', () => {
       ];
 
       const toolResults = new Map([
-        ['id-1', { thought: 'Thinking...', thoughtNumber: 1, totalThoughts: 1, nextThoughtNeeded: false }],
+        [
+          'id-1',
+          { thought: 'Thinking...', thoughtNumber: 1, totalThoughts: 1, nextThoughtNeeded: false },
+        ],
         ['id-2', { message: 'All done!' }],
         ['id-3', { files: [], failed_files: [] }],
       ]);
 
-      const { reasoningMessages, responseMessages } = extractMessagesFromToolCalls(toolCalls, toolResults);
+      const { reasoningMessages, responseMessages } = extractMessagesFromToolCalls(
+        toolCalls,
+        toolResults
+      );
 
       expect(reasoningMessages).toHaveLength(2); // sequential thinking + create metrics
       expect(responseMessages).toHaveLength(1); // done tool
@@ -319,9 +331,7 @@ describe('message-converters', () => {
     });
 
     it('should handle tool calls without results', () => {
-      const toolCalls: ToolCall[] = [
-        createToolCall('id-1', 'sequentialThinking', {}),
-      ];
+      const toolCalls: ToolCall[] = [createToolCall('id-1', 'sequentialThinking', {})];
 
       const { reasoningMessages, responseMessages } = extractMessagesFromToolCalls(toolCalls);
 
@@ -340,7 +350,10 @@ describe('message-converters', () => {
         ['id-2', { invalid: 'structure' }], // Invalid result structure
       ]);
 
-      const { reasoningMessages, responseMessages } = extractMessagesFromToolCalls(toolCalls, toolResults);
+      const { reasoningMessages, responseMessages } = extractMessagesFromToolCalls(
+        toolCalls,
+        toolResults
+      );
 
       expect(responseMessages).toHaveLength(1); // Only valid result
       expect(responseMessages[0]).toMatchObject({
@@ -360,27 +373,49 @@ describe('message-converters', () => {
       ];
 
       const toolResults = new Map([
-        ['think-1', { thought: 'First thought', thoughtNumber: 1, totalThoughts: 2, nextThoughtNeeded: true }],
-        ['think-2', { thought: 'Second thought', thoughtNumber: 2, totalThoughts: 2, nextThoughtNeeded: false }],
-        ['metric-1', { 
-          files: [{ id: 'm1', name: 'metric.yml', version_number: 1, yml_content: 'metric' }], 
-          failed_files: [] 
-        }],
-        ['dashboard-1', { 
-          files: [{ id: 'd1', name: 'dashboard.yml', version_number: 1, yml_content: 'dashboard' }], 
-          failed_files: [] 
-        }],
+        [
+          'think-1',
+          { thought: 'First thought', thoughtNumber: 1, totalThoughts: 2, nextThoughtNeeded: true },
+        ],
+        [
+          'think-2',
+          {
+            thought: 'Second thought',
+            thoughtNumber: 2,
+            totalThoughts: 2,
+            nextThoughtNeeded: false,
+          },
+        ],
+        [
+          'metric-1',
+          {
+            files: [{ id: 'm1', name: 'metric.yml', version_number: 1, yml_content: 'metric' }],
+            failed_files: [],
+          },
+        ],
+        [
+          'dashboard-1',
+          {
+            files: [
+              { id: 'd1', name: 'dashboard.yml', version_number: 1, yml_content: 'dashboard' },
+            ],
+            failed_files: [],
+          },
+        ],
         ['done-1', { message: 'Analysis complete with 1 metric and 1 dashboard created.' }],
       ]);
 
-      const { reasoningMessages, responseMessages } = extractMessagesFromToolCalls(toolCalls, toolResults);
+      const { reasoningMessages, responseMessages } = extractMessagesFromToolCalls(
+        toolCalls,
+        toolResults
+      );
 
       // Should have 4 reasoning messages (2 thoughts + 1 metric + 1 dashboard)
       expect(reasoningMessages).toHaveLength(4);
-      
+
       // Should have 1 response message (done tool)
       expect(responseMessages).toHaveLength(1);
-      
+
       // Check specific messages
       expect(reasoningMessages[0]).toMatchObject({
         type: 'text',

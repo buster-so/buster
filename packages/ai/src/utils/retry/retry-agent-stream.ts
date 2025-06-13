@@ -1,11 +1,6 @@
 import type { ToolSet } from 'ai';
 import { NoSuchToolError } from 'ai';
-import type {
-  RetryConfig,
-  RetryResult,
-  RetryableAgentStreamParams,
-  RetryableError,
-} from './types';
+import type { RetryConfig, RetryResult, RetryableAgentStreamParams, RetryableError } from './types';
 
 const DEFAULT_RETRY_CONFIG: RetryConfig = {
   maxRetries: 3,
@@ -49,7 +44,8 @@ export function detectRetryableError(error: unknown): RetryableError | null {
             toolCallId: 'toolCallId' in error ? String(error.toolCallId) : 'unknown',
             toolName: 'toolName' in error ? String(error.toolName) : 'unknown',
             result: {
-              error: 'Invalid tool arguments provided. Please check the required parameters and try again.',
+              error:
+                'Invalid tool arguments provided. Please check the required parameters and try again.',
             },
           },
         ],
@@ -91,7 +87,7 @@ export async function retryableAgentStream<T extends ToolSet>({
   while (retryCount <= retryConfig.maxRetries) {
     try {
       const stream = await agent.stream(conversationHistory, options);
-      
+
       // Return successful result
       return {
         stream,

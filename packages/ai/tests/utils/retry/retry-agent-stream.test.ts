@@ -1,7 +1,7 @@
-import { NoSuchToolError } from 'ai';
-import { describe, expect, it, vi } from 'vitest';
 import type { Agent } from '@mastra/core';
+import { NoSuchToolError } from 'ai';
 import type { CoreMessage, StreamTextResult, ToolSet } from 'ai';
+import { describe, expect, it, vi } from 'vitest';
 import { detectRetryableError, retryableAgentStream } from '../../../src/utils/retry';
 import type { AgentStreamOptions } from '../../../src/utils/retry/types';
 
@@ -83,9 +83,7 @@ describe('retryableAgentStream', () => {
       stream: vi.fn().mockResolvedValue(mockStream),
     } as unknown as MockAgent<ToolSet>;
 
-    const messages: CoreMessage[] = [
-      { role: 'user', content: 'Test message' },
-    ];
+    const messages: CoreMessage[] = [{ role: 'user', content: 'Test message' }];
 
     const options: AgentStreamOptions<ToolSet> = {
       runtimeContext: {} as any,
@@ -112,14 +110,10 @@ describe('retryableAgentStream', () => {
     (error as any).toolCallId = 'test-call-id';
 
     const mockAgent = {
-      stream: vi.fn()
-        .mockRejectedValueOnce(error)
-        .mockResolvedValueOnce(mockStream),
+      stream: vi.fn().mockRejectedValueOnce(error).mockResolvedValueOnce(mockStream),
     } as unknown as MockAgent<ToolSet>;
 
-    const messages: CoreMessage[] = [
-      { role: 'user', content: 'Test message' },
-    ];
+    const messages: CoreMessage[] = [{ role: 'user', content: 'Test message' }];
 
     const options: AgentStreamOptions<ToolSet> = {
       runtimeContext: {} as any,
@@ -140,7 +134,7 @@ describe('retryableAgentStream', () => {
     expect(result.stream).toBe(mockStream);
     expect(result.retryCount).toBe(1);
     expect(mockAgent.stream).toHaveBeenCalledTimes(2);
-    
+
     // Check that healing message was added to conversation
     expect(result.conversationHistory).toHaveLength(2);
     expect(result.conversationHistory[1].role).toBe('tool');
@@ -152,10 +146,7 @@ describe('retryableAgentStream', () => {
 
     // Check that onRetry was called
     expect(onRetry).toHaveBeenCalledTimes(1);
-    expect(onRetry).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'no-such-tool' }),
-      1
-    );
+    expect(onRetry).toHaveBeenCalledWith(expect.objectContaining({ type: 'no-such-tool' }), 1);
   });
 
   it('should throw error after max retries', async () => {
@@ -168,9 +159,7 @@ describe('retryableAgentStream', () => {
       stream: vi.fn().mockRejectedValue(error),
     } as unknown as MockAgent<ToolSet>;
 
-    const messages: CoreMessage[] = [
-      { role: 'user', content: 'Test message' },
-    ];
+    const messages: CoreMessage[] = [{ role: 'user', content: 'Test message' }];
 
     const options: AgentStreamOptions<ToolSet> = {
       runtimeContext: {} as any,
@@ -195,9 +184,7 @@ describe('retryableAgentStream', () => {
       stream: vi.fn().mockRejectedValue(error),
     } as unknown as MockAgent<ToolSet>;
 
-    const messages: CoreMessage[] = [
-      { role: 'user', content: 'Test message' },
-    ];
+    const messages: CoreMessage[] = [{ role: 'user', content: 'Test message' }];
 
     const options: AgentStreamOptions<ToolSet> = {
       runtimeContext: {} as any,
@@ -216,7 +203,7 @@ describe('retryableAgentStream', () => {
 
   it('should handle multiple different retryable errors', async () => {
     const mockStream = { fullStream: [] } as unknown as StreamTextResult<ToolSet, unknown>;
-    
+
     const noSuchToolError = new NoSuchToolError({
       toolName: 'unknownTool',
       availableTools: [],
@@ -229,15 +216,14 @@ describe('retryableAgentStream', () => {
     (invalidArgsError as any).toolName = 'testTool';
 
     const mockAgent = {
-      stream: vi.fn()
+      stream: vi
+        .fn()
         .mockRejectedValueOnce(noSuchToolError)
         .mockRejectedValueOnce(invalidArgsError)
         .mockResolvedValueOnce(mockStream),
     } as unknown as MockAgent<ToolSet>;
 
-    const messages: CoreMessage[] = [
-      { role: 'user', content: 'Test message' },
-    ];
+    const messages: CoreMessage[] = [{ role: 'user', content: 'Test message' }];
 
     const options: AgentStreamOptions<ToolSet> = {
       runtimeContext: {} as any,
@@ -253,7 +239,7 @@ describe('retryableAgentStream', () => {
     expect(result.stream).toBe(mockStream);
     expect(result.retryCount).toBe(2);
     expect(mockAgent.stream).toHaveBeenCalledTimes(3);
-    
+
     // Check that both healing messages were added
     expect(result.conversationHistory).toHaveLength(3);
     expect(result.conversationHistory[1].role).toBe('tool'); // First healing message

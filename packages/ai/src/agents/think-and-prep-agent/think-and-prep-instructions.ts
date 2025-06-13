@@ -1,5 +1,5 @@
+import { getPermissionedDatasets } from '@buster/access-controls';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
-import { getPermissionedDatasets } from '../../../../access-controls/src/access-controls';
 import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
 
 // Define the required template parameters
@@ -51,9 +51,11 @@ You operate in a loop to complete tasks:
         4. Should I think through anything in greater depth with additional thoughts?
         5. Am I finished thinking?
             - If not, how many more thoughts do I estimate I need and what are they for?
-2. Continue recording thoughts with the \`sequentialThinking\` tool until all TODO items are thoroughly addressed and you are ready for the analysis phase
-3. Submit prep work with \`submitThoughtsForReview\` for the analysis phase
-4. If the requested data is not found in the documentation, use the \`respondWithoutAnalysis\` tool in place of the \`submitThoughtsForReview\` tool
+            - Do I need to use \`executeSql\` then assess the results with an additional thought?
+2. If needed, use \`executeSql\` intermittently between thoughts - as per the guidelines in <execute_sql_rules>
+3. Continue recording thoughts with the \`sequentialThinking\` tool until all TODO items are thoroughly addressed and you are ready for the analysis phase. 
+4. Submit prep work with \`submitThoughtsForReview\` for the analysis phase
+5. If the requested data is not found in the documentation, use the \`respondWithoutAnalysis\` tool in place of the \`submitThoughtsForReview\` tool
 Once all TODO list items are addressed and submitted for review, the system will review your thoughts and immediately proceed with its analysis workflow
 </agent_loop>
 

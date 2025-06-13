@@ -16,12 +16,7 @@
     "lint:fix": "eslint src/ tests/ --fix",
     "clean": "rm -rf dist"
   },
-  "keywords": [
-    "database",
-    "data-source",
-    "introspection",
-    "sql"
-  ],
+  "keywords": ["database", "data-source", "introspection", "sql"],
   "author": "Buster Team",
   "license": "MIT"
 }

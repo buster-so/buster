@@ -3,7 +3,10 @@ import { eq } from 'drizzle-orm';
 import { getDb } from '../../../../database/src/connection';
 import { updateMessageFields } from '../../../../database/src/helpers/messages';
 import { messages } from '../../../../database/src/schema';
-import { formatLlmMessagesAsReasoning, appendToReasoning, extractResponseMessages } from './formatLlmMessagesAsReasoning';
+import {
+  extractResponseMessages,
+  formatLlmMessagesAsReasoning,
+} from './formatLlmMessagesAsReasoning';
 
 /**
  * Saves conversation history to the database
@@ -55,7 +58,7 @@ export async function saveConversationHistoryFromStep(
   stepMessages: CoreMessage[],
   reasoningHistory?: unknown[],
   responseHistory?: unknown[]
-): Promise<{ newReasoningMessages: unknown[], newResponseMessages: unknown[] }> {
+): Promise<{ newReasoningMessages: unknown[]; newResponseMessages: unknown[] }> {
   try {
     const db = getDb();
 
@@ -75,13 +78,13 @@ export async function saveConversationHistoryFromStep(
       console.error('saveConversationHistoryFromStep: stepMessages is not an array');
       throw new Error('Invalid stepMessages: expected array');
     }
-    
+
     // Extract reasoning messages
     const newReasoningEntries = formatLlmMessagesAsReasoning(stepMessages);
-    
+
     // Extract response messages
     const newResponseEntries = extractResponseMessages(stepMessages);
-    
+
     // Deduplicate reasoning by ID - keep track of existing IDs
     const existingIds = new Set(
       currentReasoning
@@ -89,9 +92,10 @@ export async function saveConversationHistoryFromStep(
         .map((r: any) => r.id)
     );
     const deduplicatedNewEntries = newReasoningEntries.filter(
-      (entry: any) => entry && typeof entry === 'object' && 'id' in entry && !existingIds.has(entry.id)
+      (entry: any) =>
+        entry && typeof entry === 'object' && 'id' in entry && !existingIds.has(entry.id)
     );
-    
+
     const updatedReasoning = [...currentReasoning, ...deduplicatedNewEntries];
 
     // Prepare update fields
@@ -111,11 +115,11 @@ export async function saveConversationHistoryFromStep(
 
     // Update all fields in a single call
     await updateMessageFields(messageId, updateFields);
-    
+
     // Return the new messages for workflow usage
     return {
       newReasoningMessages: deduplicatedNewEntries,
-      newResponseMessages: newResponseEntries
+      newResponseMessages: newResponseEntries,
     };
   } catch (error) {
     throw new Error(
@@ -148,13 +152,13 @@ export async function loadConversationHistory(messageId: string): Promise<CoreMe
     }
 
     const rawMessages = result[0].rawLlmMessages;
-    
+
     // Validate that rawLlmMessages is an array
     if (!Array.isArray(rawMessages)) {
       console.error('loadConversationHistory: rawLlmMessages is not an array:', typeof rawMessages);
       return null;
     }
-    
+
     return rawMessages as CoreMessage[];
   } catch (error) {
     throw new Error(

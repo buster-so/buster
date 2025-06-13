@@ -10,6 +10,7 @@
   "references": [
     { "path": "../test-utils" },
     { "path": "../database" },
-    { "path": "../data-source" }
+    { "path": "../data-source" },
+    { "path": "../access-controls" }
   ]
 }

@@ -1,5 +1,5 @@
-import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
 import type { CoreMessage } from 'ai';
+import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
 import { formatLlmMessagesAsReasoning } from '../../../src/utils/database/formatLlmMessagesAsReasoning';
 
 describe('formatLlmMessagesAsReasoning error handling', () => {
@@ -16,7 +16,7 @@ describe('formatLlmMessagesAsReasoning error handling', () => {
 
   test('handles non-array input gracefully', () => {
     const result = formatLlmMessagesAsReasoning(null as any);
-    
+
     expect(result).toEqual([]);
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       'formatLlmMessagesAsReasoning: Expected array of messages, got:',
@@ -26,7 +26,7 @@ describe('formatLlmMessagesAsReasoning error handling', () => {
 
   test('handles undefined input gracefully', () => {
     const result = formatLlmMessagesAsReasoning(undefined as any);
-    
+
     expect(result).toEqual([]);
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       'formatLlmMessagesAsReasoning: Expected array of messages, got:',
@@ -43,9 +43,9 @@ describe('formatLlmMessagesAsReasoning error handling', () => {
       },
       undefined,
     ] as any;
-    
+
     const result = formatLlmMessagesAsReasoning(messages);
-    
+
     expect(result).toHaveLength(1); // Only the valid message is processed
     expect(result[0]).toHaveProperty('type', 'text');
     expect(result[0]).toHaveProperty('message', 'Test message');
@@ -66,9 +66,9 @@ describe('formatLlmMessagesAsReasoning error handling', () => {
         ],
       },
     ];
-    
+
     const result = formatLlmMessagesAsReasoning(messages);
-    
+
     // Should still create a reasoning message with default handling
     expect(result).toHaveLength(1);
     expect(result[0]).toHaveProperty('title', 'unknownTool');
@@ -78,7 +78,7 @@ describe('formatLlmMessagesAsReasoning error handling', () => {
   test('handles circular references in tool args', () => {
     const circularObj: any = { a: 1 };
     circularObj.self = circularObj; // Create circular reference
-    
+
     const messages: CoreMessage[] = [
       {
         role: 'assistant',
@@ -92,9 +92,9 @@ describe('formatLlmMessagesAsReasoning error handling', () => {
         ],
       },
     ];
-    
+
     const result = formatLlmMessagesAsReasoning(messages);
-    
+
     expect(result).toHaveLength(1);
     expect(result[0]).toHaveProperty('message', '[Unable to display tool arguments]');
     expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -121,9 +121,9 @@ describe('formatLlmMessagesAsReasoning error handling', () => {
         content: 'Valid message after error',
       },
     ];
-    
+
     const result = formatLlmMessagesAsReasoning(messages);
-    
+
     // First message is skipped because sequentialThinking without args.thought returns null
     // Only the user message is processed
     expect(result).toHaveLength(1);
@@ -141,9 +141,9 @@ describe('formatLlmMessagesAsReasoning error handling', () => {
         ],
       },
     ];
-    
+
     const result = formatLlmMessagesAsReasoning(messages);
-    
+
     expect(result).toHaveLength(1);
     expect(result[0]).toHaveProperty('message', 'Hello [image] World');
   });

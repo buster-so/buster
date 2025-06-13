@@ -1280,9 +1280,11 @@ async function getDataSourceCredentials(dataSourceId: string): Promise<Credentia
       throw new Error('No credentials found for the specified data source');
     }
 
-    const secretString = secretResult[0].decrypted_secret;
+    const secretString = secretResult[0].decrypted_secret as string;
 
-    return secretString as unknown as Credentials;
+    // Parse the credentials JSON
+    const credentials = JSON.parse(secretString) as Credentials;
+    return credentials;
   } catch (error) {
     console.error('Error getting data source credentials:', error);
 
