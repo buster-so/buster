@@ -10,6 +10,34 @@ import { db } from '../../../../database/src/connection';
 import { metricFiles } from '../../../../database/src/schema';
 import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
 
+/**
+ * Ensures timeFrame values are properly quoted in YAML content
+ * Finds timeFrame: value and wraps the value in quotes if not already quoted
+ */
+function ensureTimeFrameQuoted(ymlContent: string): string {
+  // Regex to match timeFrame field with its value
+  // Captures: timeFrame + whitespace + : + whitespace + value (until end of line)
+  const timeFrameRegex = /(timeFrame\s*:\s*)([^\r\n]+)/g;
+
+  return ymlContent.replace(timeFrameRegex, (match, prefix, value) => {
+    // Trim whitespace from the value
+    const trimmedValue = value.trim();
+
+    // Check if value is already properly quoted (starts and ends with same quote type)
+    const isAlreadyQuoted =
+      (trimmedValue.startsWith('"') && trimmedValue.endsWith('"')) ||
+      (trimmedValue.startsWith("'") && trimmedValue.endsWith("'"));
+
+    if (isAlreadyQuoted) {
+      // Already quoted, return as is
+      return match;
+    }
+
+    // Not quoted, wrap in double quotes
+    return `${prefix}"${trimmedValue}"`;
+  });
+}
+
 // Core interfaces matching Rust structs
 interface FileUpdate {
   id: string;
@@ -298,7 +326,10 @@ function parseAndValidateYaml(ymlContent: string): {
   data?: any;
 } {
   try {
-    const parsedYml = yaml.parse(ymlContent);
+    // Ensure timeFrame values are properly quoted before parsing
+    const fixedYmlContent = ensureTimeFrameQuoted(ymlContent);
+
+    const parsedYml = yaml.parse(fixedYmlContent);
     const validationResult = metricYmlSchema.safeParse(parsedYml);
 
     if (!validationResult.success) {

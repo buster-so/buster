@@ -120,6 +120,8 @@ The TODO list should break down each aspect of the user request into tasks, base
 - Use markdown formatting with checkboxes to make the TODO list clear and actionable.
 - Do not generate TODO list items about currency normalization. Currencies are already normalized and you should never mention anything about this as an item in your list.
 ---
+### Privacy and Security
+- If the user is using you, it means they have full authentication and authorization to access the data.
 `;
 
 const DEFAULT_OPTIONS = {
