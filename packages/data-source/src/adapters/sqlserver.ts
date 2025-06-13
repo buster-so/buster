@@ -77,14 +77,6 @@ export class SQLServerAdapter extends BaseAdapter {
     try {
       const request = this.pool.request();
       let processedQuery = sqlQuery;
-      let hasMoreRows = false;
-
-      // Apply row limit if specified
-      if (maxRows && maxRows > 0) {
-        // SQL Server uses TOP clause
-        // Wrap the original query to apply TOP
-        processedQuery = `SELECT TOP ${maxRows + 1} * FROM (${sqlQuery}) AS limited_query`;
-      }
 
       // Add parameters if provided
       if (params && params.length > 0) {
@@ -97,23 +89,50 @@ export class SQLServerAdapter extends BaseAdapter {
         processedQuery = processedQuery.replace(/\?/g, () => `@param${paramIndex++}`);
       }
 
-      const result = await request.query(processedQuery);
+      // If no maxRows specified or query is not a SELECT, use regular query
+      if (!maxRows || maxRows <= 0 || !sqlQuery.trim().toUpperCase().startsWith('SELECT')) {
+        const result = await request.query(processedQuery);
 
-      let rows = result.recordset || [];
+        const fields: FieldMetadata[] = result.recordset?.columns
+          ? Object.keys(result.recordset.columns).map((name) => {
+              const column = result.recordset?.columns?.[name];
+              const columnType = typeof column?.type === 'function' ? column.type() : column?.type;
 
-      // Check if we have more rows than requested
-      if (maxRows && rows.length > maxRows) {
-        hasMoreRows = true;
-        // Remove the extra row we fetched to check for more
-        rows = rows.slice(0, maxRows);
+              // Type the column type properly instead of using unknown
+              const typedColumnType = columnType as { name?: string } | undefined;
+
+              return {
+                name,
+                type: typedColumnType?.name || 'unknown',
+                length: column?.length,
+                nullable: column?.nullable,
+              };
+            })
+          : [];
+
+        return {
+          rows: result.recordset || [],
+          rowCount: result.recordset?.length || 0,
+          fields,
+          hasMoreRows: false,
+        };
       }
 
-      const fields: FieldMetadata[] = result.recordset?.columns
-        ? Object.keys(result.recordset.columns).map((name) => {
-            const column = result.recordset?.columns?.[name];
-            const columnType = typeof column?.type === 'function' ? column.type() : column?.type;
+      // Use streaming for SELECT queries with maxRows
+      return new Promise((resolve, reject) => {
+        const rows: Record<string, unknown>[] = [];
+        let hasMoreRows = false;
+        let fields: FieldMetadata[] = [];
+        let rowCount = 0;
 
-            // Type the column type properly instead of using unknown
+        // Enable streaming mode
+        request.stream = true;
+
+        // Listen for column metadata
+        request.on('recordset', (columns: any) => {
+          fields = Object.keys(columns).map((name) => {
+            const column = columns[name];
+            const columnType = typeof column?.type === 'function' ? column.type() : column?.type;
             const typedColumnType = columnType as { name?: string } | undefined;
 
             return {
@@ -122,15 +141,41 @@ export class SQLServerAdapter extends BaseAdapter {
               length: column?.length,
               nullable: column?.nullable,
             };
-          })
-        : [];
+          });
+        });
 
-      return {
-        rows,
-        rowCount: rows.length,
-        fields,
-        hasMoreRows,
-      };
+        // Listen for each row
+        request.on('row', (row: Record<string, unknown>) => {
+          if (rowCount < maxRows) {
+            rows.push(row);
+            rowCount++;
+          } else if (rowCount === maxRows) {
+            hasMoreRows = true;
+            // Pause the stream to stop receiving more rows
+            request.pause();
+            // Cancel the request to stop processing
+            request.cancel();
+          }
+        });
+
+        // Listen for errors
+        request.on('error', (err) => {
+          reject(new Error(`SQL Server query failed: ${err.message}`));
+        });
+
+        // Listen for completion
+        request.on('done', () => {
+          resolve({
+            rows,
+            rowCount: rows.length,
+            fields,
+            hasMoreRows,
+          });
+        });
+
+        // Execute the query
+        request.query(processedQuery);
+      });
     } catch (error) {
       throw new Error(
         `SQL Server query failed: ${error instanceof Error ? error.message : 'Unknown error'}`

@@ -1,4 +1,5 @@
 import { Client, type ClientConfig } from 'pg';
+import Cursor from 'pg-cursor';
 import type { DataSourceIntrospector } from '../introspection/base';
 import { PostgreSQLIntrospector } from '../introspection/postgresql';
 import { type Credentials, DataSourceType, type PostgreSQLCredentials } from '../types/credentials';
@@ -64,36 +65,94 @@ export class PostgreSQLAdapter extends BaseAdapter {
     }
 
     try {
-      let limitedSql = sql;
+      // If no maxRows specified or query is not a SELECT, use regular query
+      if (!maxRows || maxRows <= 0 || !sql.trim().toUpperCase().startsWith('SELECT')) {
+        const result = await this.client.query(sql, params);
+
+        const fields: FieldMetadata[] =
+          result.fields?.map((field) => ({
+            name: field.name,
+            type: `pg_type_${field.dataTypeID}`, // PostgreSQL type ID
+            nullable: true, // PostgreSQL doesn't provide this info directly
+            length: field.dataTypeSize > 0 ? field.dataTypeSize : undefined,
+          })) || [];
+
+        return {
+          rows: result.rows,
+          rowCount: result.rowCount || result.rows.length,
+          fields,
+          hasMoreRows: false,
+        };
+      }
+
+      // Use cursor for SELECT queries with maxRows
+      const cursor = this.client.query(new Cursor(sql, params));
+      const rows: Record<string, unknown>[] = [];
       let hasMoreRows = false;
+      let fields: FieldMetadata[] = [];
 
-      // Apply row limit if specified
-      if (maxRows && maxRows > 0) {
-        // Wrap the original query to apply LIMIT
-        // Using a subquery to avoid issues with complex queries
-        limitedSql = `SELECT * FROM (${sql}) AS limited_query LIMIT ${maxRows + 1}`;
+      // Read rows in batches
+      const batchSize = Math.min(maxRows, 1000); // Read up to 1000 rows at a time
+      let totalRead = 0;
+
+      while (totalRead < maxRows) {
+        const remainingRows = maxRows - totalRead;
+        const readSize = Math.min(batchSize, remainingRows + 1); // Read one extra to check for more
+
+        const batchRows = await new Promise<any[]>((resolve, reject) => {
+          cursor.read(readSize, (err, batchRows) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(batchRows);
+            }
+          });
+        });
+
+        if (batchRows.length === 0) {
+          break; // No more rows
+        }
+
+        // Extract field metadata from cursor on first batch
+        if (fields.length === 0 && (cursor as any)._result?.fields) {
+          fields = (cursor as any)._result.fields.map((field: any) => ({
+            name: field.name,
+            type: `pg_type_${field.dataTypeID}`,
+            nullable: true,
+            length: field.dataTypeSize > 0 ? field.dataTypeSize : undefined,
+          }));
+        }
+
+        // Check if we have more rows than requested
+        if (totalRead + batchRows.length > maxRows) {
+          hasMoreRows = true;
+          rows.push(...batchRows.slice(0, maxRows - totalRead));
+          break;
+        } else {
+          rows.push(...batchRows);
+          totalRead += batchRows.length;
+        }
+
+        // If we got fewer rows than requested, we've reached the end
+        if (batchRows.length < readSize) {
+          break;
+        }
       }
 
-      const result = await this.client.query(limitedSql, params);
-
-      // Check if we have more rows than requested
-      if (maxRows && result.rows.length > maxRows) {
-        hasMoreRows = true;
-        // Remove the extra row we fetched to check for more
-        result.rows = result.rows.slice(0, maxRows);
-      }
-
-      const fields: FieldMetadata[] =
-        result.fields?.map((field) => ({
-          name: field.name,
-          type: `pg_type_${field.dataTypeID}`, // PostgreSQL type ID
-          nullable: true, // PostgreSQL doesn't provide this info directly
-          length: field.dataTypeSize > 0 ? field.dataTypeSize : undefined,
-        })) || [];
+      // Close the cursor
+      await new Promise<void>((resolve, reject) => {
+        cursor.close((err) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      });
 
       return {
-        rows: result.rows,
-        rowCount: result.rows.length,
+        rows,
+        rowCount: rows.length,
         fields,
         hasMoreRows,
       };

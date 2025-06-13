@@ -5,11 +5,8 @@ import { type Credentials, DataSourceType, type SnowflakeCredentials } from '../
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
 
-// Type definitions for Snowflake SDK callbacks
-interface SnowflakeError {
-  message: string;
-  code?: string;
-}
+// Use Snowflake SDK types directly
+type SnowflakeError = snowflake.SnowflakeError;
 
 interface SnowflakeStatement {
   getColumns?: () => Array<{
@@ -94,74 +91,123 @@ export class SnowflakeAdapter extends BaseAdapter {
     }
 
     try {
-      let limitedSql = sql;
-      let hasMoreRows = false;
+      // If no maxRows specified or query is not a SELECT, use regular query
+      if (!maxRows || maxRows <= 0 || !sql.trim().toUpperCase().startsWith('SELECT')) {
+        const result = await new Promise<{
+          rows: Record<string, unknown>[];
+          statement: SnowflakeStatement;
+        }>((resolve, reject) => {
+          if (!this.connection) {
+            reject(new Error('Snowflake connection not initialized'));
+            return;
+          }
+          this.connection.execute({
+            sqlText: sql,
+            binds: params as snowflake.Binds,
+            complete: (
+              err: SnowflakeError | undefined,
+              stmt: SnowflakeStatement,
+              rows: any[] | undefined
+            ) => {
+              if (err) {
+                reject(new Error(`Snowflake query failed: ${err.message}`));
+              } else {
+                resolve({ rows: rows || [], statement: stmt });
+              }
+            },
+          });
+        });
 
-      // Apply row limit if specified
-      if (maxRows && maxRows > 0) {
-        // Wrap the original query to apply LIMIT
-        // Using a subquery to avoid issues with complex queries
-        limitedSql = `SELECT * FROM (${sql}) AS limited_query LIMIT ${maxRows + 1}`;
-      }
+        const fields: FieldMetadata[] =
+          result.statement?.getColumns?.()?.map((col) => ({
+            name: col.getName(),
+            type: col.getType(),
+            nullable: col.isNullable(),
+            scale: col.getScale() > 0 ? col.getScale() : undefined,
+            precision: col.getPrecision() > 0 ? col.getPrecision() : undefined,
+          })) || [];
 
-      interface SnowflakeQueryResult {
-        rows: Record<string, unknown>[];
-        statement: {
-          getColumns?: () => Array<{
-            getName(): string;
-            getType(): string;
-            isNullable(): boolean;
-            getScale(): number;
-            getPrecision(): number;
-          }>;
+        return {
+          rows: result.rows,
+          rowCount: result.rows.length,
+          fields,
+          hasMoreRows: false,
         };
       }
 
-      const result = await new Promise<SnowflakeQueryResult>((resolve, reject) => {
+      // Use streaming for SELECT queries with maxRows
+      return new Promise((resolve, reject) => {
         if (!this.connection) {
           reject(new Error('Snowflake connection not initialized'));
           return;
         }
-        this.connection.execute({
-          sqlText: limitedSql,
+
+        const rows: Record<string, unknown>[] = [];
+        let hasMoreRows = false;
+        let fields: FieldMetadata[] = [];
+        let rowCount = 0;
+
+        const statement = this.connection.execute({
+          sqlText: sql,
           binds: params as snowflake.Binds,
-          complete: (
-            err: SnowflakeError | null,
-            stmt: SnowflakeStatement,
-            rows: Record<string, unknown>[]
-          ) => {
+          streamResult: true, // Enable streaming
+          complete: (err: SnowflakeError | undefined) => {
             if (err) {
               reject(new Error(`Snowflake query failed: ${err.message}`));
-            } else {
-              resolve({ rows: rows || [], statement: stmt });
+              return;
             }
+
+            // Extract field metadata
+            fields =
+              statement?.getColumns?.()?.map((col) => ({
+                name: col.getName(),
+                type: col.getType(),
+                nullable: col.isNullable(),
+                scale: col.getScale() > 0 ? col.getScale() : undefined,
+                precision: col.getPrecision() > 0 ? col.getPrecision() : undefined,
+              })) || [];
+
+            // Start streaming rows
+            const stream = statement.streamRows();
+
+            stream.on('data', (row: Record<string, unknown>) => {
+              if (rowCount < maxRows) {
+                rows.push(row);
+                rowCount++;
+              } else if (rowCount === maxRows) {
+                hasMoreRows = true;
+                // Destroy the stream to stop receiving more data
+                stream.destroy();
+              }
+            });
+
+            stream.on('end', () => {
+              resolve({
+                rows,
+                rowCount: rows.length,
+                fields,
+                hasMoreRows,
+              });
+            });
+
+            stream.on('error', (streamErr) => {
+              reject(new Error(`Snowflake streaming error: ${streamErr.message}`));
+            });
+
+            stream.on('close', () => {
+              // Stream closed (either naturally or by destroy())
+              if (!stream.destroyed) {
+                resolve({
+                  rows,
+                  rowCount: rows.length,
+                  fields,
+                  hasMoreRows,
+                });
+              }
+            });
           },
         });
       });
-
-      // Check if we have more rows than requested
-      let rows = result.rows;
-      if (maxRows && rows.length > maxRows) {
-        hasMoreRows = true;
-        // Remove the extra row we fetched to check for more
-        rows = rows.slice(0, maxRows);
-      }
-
-      const fields: FieldMetadata[] =
-        result.statement?.getColumns?.()?.map((col) => ({
-          name: col.getName(),
-          type: col.getType(),
-          nullable: col.isNullable(),
-          scale: col.getScale() > 0 ? col.getScale() : undefined,
-          precision: col.getPrecision() > 0 ? col.getPrecision() : undefined,
-        })) || [];
-
-      return {
-        rows,
-        rowCount: rows.length,
-        fields,
-        hasMoreRows,
-      };
     } catch (error) {
       throw new Error(
         `Snowflake query failed: ${error instanceof Error ? error.message : 'Unknown error'}`
@@ -183,7 +229,7 @@ export class SnowflakeAdapter extends BaseAdapter {
         }
         this.connection.execute({
           sqlText: 'SELECT 1 as test',
-          complete: (err: SnowflakeError | null) => {
+          complete: (err: SnowflakeError | undefined) => {
             if (err) {
               reject(err);
             } else {
@@ -206,7 +252,7 @@ export class SnowflakeAdapter extends BaseAdapter {
           resolve();
           return;
         }
-        this.connection.destroy((err: SnowflakeError | null) => {
+        this.connection.destroy((err: SnowflakeError | undefined) => {
           if (err) {
             // Log error but don't fail the close operation
             // Using a simple approach that works in most environments
