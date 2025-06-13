@@ -11,6 +11,34 @@ import { z } from 'zod';
 import { DataSource } from '../../../../data-source/src/data-source';
 import type { Credentials } from '../../../../data-source/src/types/credentials';
 
+/**
+ * Ensures timeFrame values are properly quoted in YAML content
+ * Finds timeFrame: value and wraps the value in quotes if not already quoted
+ */
+function ensureTimeFrameQuoted(ymlContent: string): string {
+  // Regex to match timeFrame field with its value
+  // Captures: timeFrame + whitespace + : + whitespace + value (until end of line)
+  const timeFrameRegex = /(timeFrame\s*:\s*)([^\r\n]+)/g;
+
+  return ymlContent.replace(timeFrameRegex, (match, prefix, value) => {
+    // Trim whitespace from the value
+    const trimmedValue = value.trim();
+
+    // Check if value is already properly quoted (starts and ends with same quote type)
+    const isAlreadyQuoted =
+      (trimmedValue.startsWith('"') && trimmedValue.endsWith('"')) ||
+      (trimmedValue.startsWith("'") && trimmedValue.endsWith("'"));
+
+    if (isAlreadyQuoted) {
+      // Already quoted, return as is
+      return match;
+    }
+
+    // Not quoted, wrap in double quotes
+    return `${prefix}"${trimmedValue}"`;
+  });
+}
+
 // Core interfaces matching Rust structs
 interface MetricFileParams {
   name: string;
@@ -1101,8 +1129,11 @@ async function processMetricFile(
   error?: string;
 }> {
   try {
+    // Ensure timeFrame values are properly quoted before parsing
+    const fixedYmlContent = ensureTimeFrameQuoted(ymlContent);
+
     // Parse and validate YAML
-    const parsedYml = yaml.parse(ymlContent);
+    const parsedYml = yaml.parse(fixedYmlContent);
     const metricYml = metricYmlSchema.parse(parsedYml);
 
     // Generate deterministic UUID (simplified version)
@@ -1373,12 +1404,17 @@ export function parseStreamingArgs(
 
           for (const match of completeFileMatches) {
             if (match[1] !== undefined && match[2] !== undefined) {
+              let ymlContent = match[2]
+                .replace(/\\"/g, '"')
+                .replace(/\\n/g, '\n')
+                .replace(/\\\\/g, '\\');
+
+              // Ensure timeFrame is properly quoted
+              ymlContent = ensureTimeFrameQuoted(ymlContent);
+
               files.push({
                 name: match[1],
-                yml_content: match[2]
-                  .replace(/\\"/g, '"')
-                  .replace(/\\n/g, '\n')
-                  .replace(/\\\\/g, '\\'),
+                yml_content: ymlContent,
               });
             }
           }
@@ -1396,10 +1432,13 @@ export function parseStreamingArgs(
               incompleteFileMatch[2] !== undefined
             ) {
               const name = incompleteFileMatch[1];
-              const ymlContent = incompleteFileMatch[2]
+              let ymlContent = incompleteFileMatch[2]
                 .replace(/\\"/g, '"')
                 .replace(/\\n/g, '\n')
                 .replace(/\\\\/g, '\\');
+
+              // Ensure timeFrame is properly quoted
+              ymlContent = ensureTimeFrameQuoted(ymlContent);
 
               files.push({
                 name,
