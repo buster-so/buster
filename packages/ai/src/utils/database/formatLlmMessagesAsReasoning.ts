@@ -3,7 +3,7 @@ import type { CoreMessage, ToolCallPart } from 'ai';
 /**
  * Format a single CoreMessage as a reasoning entry
  */
-function formatMessageAsReasoningEntry(message: CoreMessage): any {
+function formatMessageAsReasoningEntry(message: CoreMessage): unknown {
   if (!message) {
     console.error('formatMessageAsReasoningEntry: Received null/undefined message');
     return null;
@@ -21,7 +21,7 @@ function formatMessageAsReasoningEntry(message: CoreMessage): any {
         const reasoningMessages = [];
 
         for (const toolCall of toolCalls) {
-          const args = (toolCall.args || {}) as Record<string, any>;
+          const args = (toolCall.args || {}) as Record<string, unknown>;
 
           switch (toolCall.toolName) {
             case 'sequentialThinking':
@@ -43,7 +43,7 @@ function formatMessageAsReasoningEntry(message: CoreMessage): any {
             case 'createMetrics':
             case 'create-metrics-file':
               if (args.files && Array.isArray(args.files)) {
-                const files: Record<string, any> = {};
+                const files: Record<string, unknown> = {};
                 const fileIds: string[] = [];
 
                 for (const file of args.files) {
@@ -227,17 +227,18 @@ function formatMessageAsReasoningEntry(message: CoreMessage): any {
         .join(' ');
     }
 
-    // Default formatting for regular messages
-    return {
-      id: crypto.randomUUID(),
-      type: 'text',
-      title: message.role === 'user' ? 'User' : 'Assistant',
-      status: 'completed',
-      message: messageContent,
-      message_chunk: null,
-      secondary_title: 'TODO',
-      finished_reasoning: false,
-    };
+    // Skip user messages entirely (except todo lists which are handled above)
+    if (message.role === 'user') {
+      return null;
+    }
+
+    // Skip non-tool assistant messages (e.g., plain text responses)
+    if (message.role === 'assistant') {
+      return null;
+    }
+
+    // Skip any other message types that aren't tool-related
+    return null;
   } catch (error) {
     console.error('Error in formatMessageAsReasoningEntry:', error);
     return null;
@@ -251,7 +252,7 @@ function formatMessageAsReasoningEntry(message: CoreMessage): any {
  * @param messages - Array of CoreMessage objects from the LLM conversation
  * @returns Array of reasoning entries, one for each message
  */
-export function formatLlmMessagesAsReasoning(messages: CoreMessage[]): any[] {
+export function formatLlmMessagesAsReasoning(messages: CoreMessage[]): unknown[] {
   if (!Array.isArray(messages)) {
     console.error(
       'formatLlmMessagesAsReasoning: Expected array of messages, got:',
@@ -260,7 +261,7 @@ export function formatLlmMessagesAsReasoning(messages: CoreMessage[]): any[] {
     return [];
   }
 
-  const reasoningEntries: any[] = [];
+  const reasoningEntries: unknown[] = [];
 
   for (const message of messages) {
     try {
@@ -290,9 +291,9 @@ export function formatLlmMessagesAsReasoning(messages: CoreMessage[]): any[] {
  * @returns Combined reasoning array
  */
 export function appendToReasoning(
-  currentReasoning: any[] | null | undefined,
+  currentReasoning: unknown[] | null | undefined,
   newMessages: CoreMessage[]
-): any[] {
+): unknown[] {
   const existing = currentReasoning || [];
   const newReasoningEntries = formatLlmMessagesAsReasoning(newMessages);
   return [...existing, ...newReasoningEntries];
@@ -302,12 +303,12 @@ export function appendToReasoning(
  * Extract response messages from CoreMessages
  * Specifically looks for doneTool and respondWithoutAnalysis tool calls
  */
-export function extractResponseMessages(messages: CoreMessage[]): any[] {
+export function extractResponseMessages(messages: CoreMessage[]): unknown[] {
   if (!Array.isArray(messages)) {
     return [];
   }
 
-  const responseMessages: any[] = [];
+  const responseMessages: unknown[] = [];
 
   for (const message of messages) {
     if (message.role === 'assistant' && Array.isArray(message.content)) {
@@ -318,16 +319,21 @@ export function extractResponseMessages(messages: CoreMessage[]): any[] {
       for (const toolCall of toolCalls) {
         const args = (toolCall.args || {}) as Record<string, any>;
 
-        if (
-          toolCall.toolName === 'doneTool' ||
-          toolCall.toolName === 'done-tool' ||
+        if (toolCall.toolName === 'doneTool' || toolCall.toolName === 'done-tool') {
+          responseMessages.push({
+            id: toolCall.toolCallId,
+            type: 'text',
+            message: args.final_response || '',
+            is_final_message: true,
+          });
+        } else if (
           toolCall.toolName === 'respondWithoutAnalysis' ||
           toolCall.toolName === 'respond-without-analysis'
         ) {
           responseMessages.push({
             id: toolCall.toolCallId,
             type: 'text',
-            message: args.message || '',
+            message: args.response || '',
             is_final_message: true,
           });
         }

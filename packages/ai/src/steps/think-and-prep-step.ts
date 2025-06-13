@@ -1,12 +1,12 @@
 import { createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
-import type { CoreMessage, StepResult, StreamTextResult, ToolSet } from 'ai';
+import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { thinkAndPrepAgent } from '../agents/think-and-prep-agent/think-and-prep-agent';
 import { parseStreamingArgs as parseRespondWithoutAnalysisArgs } from '../tools/communication-tools/respond-without-analysis';
 import { parseStreamingArgs as parseSequentialThinkingArgs } from '../tools/planning-thinking-tools/sequential-thinking-tool';
-import { saveConversationHistoryFromStep } from '../utils/database/saveConversationHistory';
+import { ChunkProcessor } from '../utils/database/chunkProcessor';
 import { retryableAgentStream } from '../utils/retry';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
 import { ToolArgsParser } from '../utils/streaming';
@@ -40,160 +40,6 @@ import {
 } from '../utils/memory/types';
 
 const outputSchema = ThinkAndPrepOutputSchema;
-
-// Helper function for think-and-prep onStepFinish callback
-const handleThinkAndPrepStepFinish = async ({
-  step,
-  messages,
-  runtimeContext,
-  abortController,
-  accumulatedReasoningHistory,
-  accumulatedResponseHistory,
-}: {
-  step: StepResult<ToolSet>;
-  messages: CoreMessage[];
-  runtimeContext: RuntimeContext<AnalystRuntimeContext>;
-  abortController: AbortController;
-  accumulatedReasoningHistory: BusterChatMessageReasoning[];
-  accumulatedResponseHistory: BusterChatMessageResponse[];
-}) => {
-  const toolNames = step.toolCalls.map((call) => call.toolName);
-  let outputMessages: MessageHistory = [];
-  let finished = false;
-  let finalStepData: StepFinishData | null = null;
-  let shouldAbort = false;
-  const reasoningHistory: BusterChatMessageReasoning[] = [...accumulatedReasoningHistory];
-  const responseHistory: BusterChatMessageResponse[] = [...accumulatedResponseHistory];
-
-  // Add delay to prevent race conditions with tool call repairs
-  const hasFinishingTools = toolNames.some((toolName: string) =>
-    ['submitThoughts', 'respondWithoutAnalysis'].includes(toolName)
-  );
-
-  // Save conversation history for all tool calls
-  const messageId = runtimeContext.get('messageId');
-  if (messageId && step.response.messages.length > 0) {
-    try {
-      const { newReasoningMessages, newResponseMessages } = await saveConversationHistoryFromStep(
-        messageId,
-        step.response.messages,
-        reasoningHistory,
-        responseHistory
-      );
-      // Update the histories with the new messages
-      reasoningHistory.push(...(newReasoningMessages as BusterChatMessageReasoning[]));
-      responseHistory.push(...(newResponseMessages as BusterChatMessageResponse[]));
-    } catch (error) {
-      console.error('Failed to save conversation history:', error);
-    }
-  }
-
-  if (hasFinishingTools) {
-    try {
-      // Extract and validate messages from the step response
-      // step.response.messages contains the conversation history for this step
-      const agentResponseMessages = extractMessageHistory(step.response.messages);
-
-      // Build complete conversation history: input messages + agent response messages
-      // This preserves the user messages along with assistant/tool responses
-      outputMessages = [...messages, ...agentResponseMessages];
-
-      const messageId = runtimeContext.get('messageId');
-
-      if (messageId) {
-        // Save conversation history to database before aborting
-        try {
-          const { newReasoningMessages, newResponseMessages } =
-            await saveConversationHistoryFromStep(
-              messageId,
-              outputMessages,
-              reasoningHistory,
-              responseHistory
-            );
-          // Update the histories with the new messages
-          reasoningHistory.push(...(newReasoningMessages as BusterChatMessageReasoning[]));
-          responseHistory.push(...(newResponseMessages as BusterChatMessageResponse[]));
-        } catch (saveError) {
-          console.error('Failed to save conversation history:', saveError);
-          // Continue with abort even if save fails to avoid hanging
-        }
-      }
-
-      // Note: Could transform step data to StepFinishData format if needed in the future
-      // For now, we'll leave finalStepData as null since the types are incompatible
-      // and the step data is not critical for the workflow to function properly
-      finalStepData = null;
-
-      // Set finished to true if respondWithoutAnalysis was called
-      if (toolNames.includes('respondWithoutAnalysis')) {
-        finished = true;
-      }
-
-      // Add a delay to ensure any pending tool call repairs and stream processing complete
-      // before aborting the stream. This prevents race conditions with ongoing chunk processing.
-      await new Promise((resolve) => setTimeout(resolve, 250));
-
-      shouldAbort = true;
-
-      // Use a try-catch around abort to handle any potential errors
-      try {
-        abortController.abort();
-      } catch (abortError) {
-        console.error('Failed to abort controller:', abortError);
-        // Continue execution even if abort fails
-      }
-    } catch (error) {
-      console.error('Error in handleThinkAndPrepStepFinish:', error);
-      // Don't abort on error to prevent hanging
-      shouldAbort = false;
-    }
-  }
-
-  return {
-    outputMessages,
-    finished,
-    finalStepData,
-    shouldAbort,
-    reasoningHistory,
-    responseHistory,
-  };
-};
-
-// Helper function to process stream chunks
-const processStreamChunks = async <T extends ToolSet>(
-  stream: StreamTextResult<T, unknown>,
-  toolArgsParser: ToolArgsParser,
-  abortController: AbortController
-): Promise<void> => {
-  try {
-    for await (const chunk of stream.fullStream) {
-      // Check if we should abort before processing each chunk
-      if (abortController.signal.aborted) {
-        break;
-      }
-
-      try {
-        if (chunk.type === 'tool-call-streaming-start' || chunk.type === 'tool-call-delta') {
-          const streamingResult = toolArgsParser.processChunk(chunk);
-          if (streamingResult) {
-            // TODO: Emit streaming result for real-time UI updates
-          }
-        }
-      } catch (chunkError) {
-        // Log individual chunk processing errors but continue with other chunks
-        console.error('Error processing individual stream chunk:', chunkError);
-      }
-    }
-  } catch (streamError) {
-    // Handle AbortError gracefully - this is expected when the stream is intentionally aborted
-    if (streamError instanceof Error && streamError.name === 'AbortError') {
-      // Stream was intentionally aborted, this is normal behavior
-      return;
-    }
-    // Log other stream processing errors but don't throw to avoid breaking the workflow
-    console.error('Error processing stream chunks in think-and-prep step:', streamError);
-  }
-};
 
 // Helper function to create the result object
 const createStepResult = (
@@ -230,12 +76,14 @@ const thinkAndPrepExecution = async ({
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof outputSchema>> => {
   const abortController = new AbortController();
+  const messageId = runtimeContext.get('messageId') as string | null;
 
   let outputMessages: MessageHistory = [];
   let finished = false;
-  let finalStepData: StepFinishData | null = null;
-  let reasoningHistory: BusterChatMessageReasoning[] = [];
-  let responseHistory: BusterChatMessageResponse[] = [];
+  const finalStepData: StepFinishData | null = null;
+
+  // Initialize chunk processor with initial messages
+  const chunkProcessor = new ChunkProcessor(messageId, [], [], []);
 
   try {
     const threadId = runtimeContext.get('threadId');
@@ -266,6 +114,9 @@ const thinkAndPrepExecution = async ({
     const todoCallMessage = createTodoToolCallMessage(todos);
     const messages = [...baseMessages, todoCallMessage];
 
+    // Update chunk processor with initial messages
+    chunkProcessor.setInitialMessages(messages);
+
     const wrappedStream = wrapTraced(
       async () => {
         const result = await retryableAgentStream({
@@ -275,21 +126,29 @@ const thinkAndPrepExecution = async ({
             runtimeContext,
             abortSignal: abortController.signal,
             toolChoice: 'required',
-            onStepFinish: async (step: StepResult<ToolSet>) => {
-              const stepResult = await handleThinkAndPrepStepFinish({
-                step,
-                messages,
-                runtimeContext,
-                abortController,
-                accumulatedReasoningHistory: reasoningHistory,
-                accumulatedResponseHistory: responseHistory,
-              });
+            onChunk: async (event) => {
+              // Process chunk and save to database in real-time
+              await chunkProcessor.processChunk(event.chunk);
 
-              outputMessages = stepResult.outputMessages;
-              finished = stepResult.finished;
-              finalStepData = stepResult.finalStepData;
-              reasoningHistory = stepResult.reasoningHistory;
-              responseHistory = stepResult.responseHistory;
+              // Check if we should abort based on finishing tools
+              if (chunkProcessor.hasFinishingTool()) {
+                const toolName = chunkProcessor.getFinishingToolName();
+
+                // Set finished to true if respondWithoutAnalysis was called
+                if (toolName === 'respondWithoutAnalysis') {
+                  finished = true;
+                }
+
+                // Add a delay to ensure any pending processing completes
+                await new Promise((resolve) => setTimeout(resolve, 250));
+
+                // Abort the stream
+                try {
+                  abortController.abort();
+                } catch (abortError) {
+                  console.error('Failed to abort controller:', abortError);
+                }
+              }
             },
           },
           retryConfig: {
@@ -324,18 +183,32 @@ const thinkAndPrepExecution = async ({
     toolArgsParser.registerParser('sequential-thinking', parseSequentialThinkingArgs);
 
     try {
-      await processStreamChunks(stream, toolArgsParser, abortController);
-    } catch (processError) {
-      // Log processing errors but continue with the conversation history we have
-      console.error('Error in processStreamChunks:', processError);
+      // Process the stream - chunks are handled by onChunk callback
+      for await (const _chunk of stream.fullStream) {
+        // Stream is being processed via onChunk callback
+        // This loop just ensures the stream completes
+        if (abortController.signal.aborted) {
+          break;
+        }
+      }
+    } catch (streamError) {
+      // Handle AbortError gracefully
+      if (streamError instanceof Error && streamError.name === 'AbortError') {
+        // Stream was intentionally aborted, this is normal
+      } else {
+        console.error('Error processing stream:', streamError);
+      }
     }
+
+    // Get final results from chunk processor
+    outputMessages = extractMessageHistory(chunkProcessor.getAccumulatedMessages());
 
     return createStepResult(
       finished,
       outputMessages,
       finalStepData,
-      reasoningHistory,
-      responseHistory
+      chunkProcessor.getReasoningHistory() as BusterChatMessageReasoning[],
+      chunkProcessor.getResponseHistory() as BusterChatMessageResponse[]
     );
   } catch (error) {
     if (error instanceof Error && error.name !== 'AbortError') {
@@ -345,8 +218,8 @@ const thinkAndPrepExecution = async ({
       finished,
       outputMessages,
       finalStepData,
-      reasoningHistory,
-      responseHistory
+      chunkProcessor.getReasoningHistory() as BusterChatMessageReasoning[],
+      chunkProcessor.getResponseHistory() as BusterChatMessageResponse[]
     );
   }
 };

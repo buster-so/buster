@@ -21,7 +21,7 @@ export async function getChatHistory(chatId: string): Promise<ChatHistoryResult[
   return results.map((result) => ({
     messageId: result.messageId,
     rawLlmMessages: result.rawLlmMessages as MessageHistory,
-    createdAt: result.createdAt,
+    createdAt: new Date(result.createdAt),
   }));
 }
 

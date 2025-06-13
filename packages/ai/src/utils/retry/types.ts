@@ -18,6 +18,7 @@ export interface AgentStreamOptions<T extends ToolSet> {
   abortSignal?: AbortSignal;
   toolChoice?: 'auto' | 'required' | 'none';
   onStepFinish?: (step: StepResult<T>) => Promise<void>;
+  onChunk?: (event: { chunk: any }) => Promise<void> | void;
 }
 
 export interface RetryableAgentStreamParams<T extends ToolSet> {
