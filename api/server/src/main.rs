@@ -58,24 +58,6 @@ async fn main() -> Result<(), anyhow::Error> {
         return Ok(());
     }
 
-    // Check if migrations should be skipped
-    let skip_migrations = env::var("SKIP_MIGRATIONS")
-        .map(|v| v.to_lowercase() == "true")
-        .unwrap_or(false);
-
-    if !skip_migrations {
-        tracing::info!("Running database migrations");
-
-        if let Err(e) = run_migrations().await {
-            tracing::error!("Failed to run database migrations: {}", e);
-            return Ok(());
-        }
-
-        tracing::info!("Successfully ran database migrations");
-    } else {
-        tracing::info!("Skipping database migrations (SKIP_MIGRATIONS=true)");
-    }
-
     // --- Start Stored Values Sync Job Scheduler ---
     let scheduler = JobScheduler::new().await?; // Using `?` assuming main returns Result
     info!("Starting stored values sync job scheduler...");
@@ -144,20 +126,6 @@ async fn main() -> Result<(), anyhow::Error> {
             shutdown_tx.send(()).unwrap_or_default();
         }
     }
-
-    Ok(())
-}
-
-async fn run_migrations() -> Result<(), anyhow::Error> {
-    let database_url = std::env::var("DATABASE_URL")
-        .map_err(|e| anyhow::anyhow!("Failed to get DATABASE_URL: {}", e))?;
-
-    let mut connection = PgConnection::establish(&database_url)
-        .map_err(|e| anyhow::anyhow!("Failed to establish database connection: {}", e))?;
-
-    connection
-        .run_pending_migrations(MIGRATIONS)
-        .map_err(|e| anyhow::anyhow!("Failed to run migrations: {}", e))?;
 
     Ok(())
 }

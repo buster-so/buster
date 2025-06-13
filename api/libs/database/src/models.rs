@@ -57,6 +57,7 @@ pub struct Message {
     pub deleted_at: Option<DateTime<Utc>>,
     pub created_by: Uuid,
     pub feedback: Option<String>,
+    pub is_completed: bool,
 }
 
 #[derive(Queryable, Insertable, Debug, Clone)]
@@ -752,7 +753,17 @@ pub struct MetricFileToDataset {
     pub created_at: DateTime<Utc>,
 }
 
-#[derive(Queryable, Insertable, Identifiable, Associations, Debug, Clone, Serialize, Selectable, AsChangeset)]
+#[derive(
+    Queryable,
+    Insertable,
+    Identifiable,
+    Associations,
+    Debug,
+    Clone,
+    Serialize,
+    Selectable,
+    AsChangeset,
+)]
 #[diesel(belongs_to(DataSource))]
 #[diesel(table_name = stored_values_sync_jobs)]
 #[diesel(check_for_backend(diesel::pg::Pg))]

@@ -43,6 +43,7 @@ pub struct MessageWithUser {
     pub user_name: Option<String>,
     pub user_attributes: Value,
     pub feedback: Option<String>,
+    pub is_completed: bool,
 }
 
 #[derive(Queryable)]
@@ -125,6 +126,7 @@ pub async fn get_chat_handler(
                     users::name.nullable(),
                     users::attributes,
                     messages::feedback.nullable(),
+                    messages::is_completed,
                 ))
                 .load::<MessageWithUser>(&mut conn)
                 .await
@@ -351,10 +353,12 @@ pub async fn get_chat_handler(
     let user_permission = chat_with_permission.permission;
 
     // Add permissions
-    Ok(chat.with_permissions(
-        individual_permissions,
-        publicly_accessible,
-        public_expiry_date,
-        publicly_enabled_by,
-    ).with_permission(user_permission))
+    Ok(chat
+        .with_permissions(
+            individual_permissions,
+            publicly_accessible,
+            public_expiry_date,
+            publicly_enabled_by,
+        )
+        .with_permission(user_permission))
 }

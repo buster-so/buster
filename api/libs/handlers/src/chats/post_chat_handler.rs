@@ -872,6 +872,7 @@ pub async fn post_chat_handler(
         title: title.title.clone().unwrap_or_default(),
         raw_llm_messages: serde_json::to_value(&raw_llm_messages)?,
         feedback: None,
+        is_completed: true,
     };
 
     let mut conn = get_pg_pool().get().await?;
