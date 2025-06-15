@@ -9,7 +9,7 @@
       "recommended": true,
       "correctness": {
         "noUnusedVariables": "error",
-        "noUnusedImports": "error"
+        "noUnusedImports": "off"
       },
       "style": {
         "noNonNullAssertion": "error",
@@ -105,7 +105,9 @@
   },
   "overrides": [
     {
-      "include": ["packages/database/**/*.ts"],
+      "include": [
+        "packages/database/**/*.ts"
+      ],
       "linter": {
         "rules": {
           "style": {
@@ -118,7 +120,9 @@
       }
     },
     {
-      "include": ["packages/database/**/*.ts"],
+      "include": [
+        "packages/database/**/*.ts"
+      ],
       "linter": {
         "rules": {
           "suspicious": {

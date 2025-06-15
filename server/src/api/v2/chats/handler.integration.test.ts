@@ -124,11 +124,11 @@ describe('Chat Handler Integration Tests', () => {
         return c.json(validatedResponse);
       } catch (error) {
         if (error instanceof ChatError) {
-          return errorResponse(c, error.message, error.statusCode as any);
+          errorResponse(error.message, error.statusCode);
         }
 
         console.error('Error creating chat:', error);
-        return errorResponse(c, 'Failed to create chat', 500);
+        errorResponse('Failed to create chat', 500);
       }
     });
 

@@ -1,8 +1,8 @@
 import type { Context } from 'hono';
+import { HTTPException } from 'hono/http-exception';
 import type { ErrorResponse } from '../types/errors.types';
 
 export const errorResponse = (
-  c: Context,
   message: string | Error | unknown,
   status: 500 | 400 | 401 | 403 | 404 | 409 | 500 = 400
 ) => {
@@ -12,13 +12,19 @@ export const errorResponse = (
       : message instanceof Error
         ? message.message
         : 'Internal server error';
-  return c.json({ message: errorMessage } satisfies ErrorResponse, status);
+  return new HTTPException(status, {
+    message: errorMessage,
+  } satisfies ErrorResponse);
 };
 
-export const notFoundResponse = (c: Context, resource = 'Resource') => {
-  return c.json({ message: `${resource} not found` } satisfies ErrorResponse, 404);
+export const notFoundResponse = (resource = 'Resource') => {
+  throw new HTTPException(404, {
+    message: `${resource} not found`,
+  } satisfies ErrorResponse);
 };
 
-export const unauthorizedResponse = (c: Context, message = 'Unauthorized') => {
-  return c.json({ message } satisfies ErrorResponse, 401);
+export const unauthorizedResponse = (message = 'Unauthorized') => {
+  throw new HTTPException(401, {
+    message,
+  } satisfies ErrorResponse);
 };

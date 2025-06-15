@@ -8,7 +8,7 @@ export const chatsProxyRouter = async (url: URL, _userId: string, c: Context) =>
   const chatId = matches?.[0];
 
   if (!chatId) {
-    return errorResponse(c, 'Chat ID (id) is required', 403);
+    return errorResponse('Chat ID (id) is required', 403);
   }
 
   const userHasAccessToChat = await canUserAccessChat({
@@ -17,7 +17,7 @@ export const chatsProxyRouter = async (url: URL, _userId: string, c: Context) =>
   });
 
   if (!userHasAccessToChat) {
-    return errorResponse(c, 'You do not have access to this chat', 403);
+    return errorResponse('You do not have access to this chat', 403);
   }
 
   return url;

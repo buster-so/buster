@@ -4,7 +4,11 @@ import { create } from 'mutative';
 import type React from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
 import type { BusterSearchResult, FileType } from '@/api/asset_interfaces';
-import { useGetChatMemoized, useGetChatMessageMemoized } from '@/api/buster_rest/chats';
+import {
+  startNewChat,
+  useGetChatMemoized,
+  useGetChatMessageMemoized
+} from '@/api/buster_rest/chats';
 import { useBusterWebSocket } from '@/context/BusterWebSocket';
 import { useMemoizedFn } from '@/hooks';
 import { useChatStreamMessage } from './useChatStreamMessage';
@@ -35,26 +39,13 @@ export const useBusterNewChat = () => {
       metricId?: string;
       dashboardId?: string;
     }) => {
-      const res = await busterSocket.emitAndOnce({
-        emitEvent: {
-          route: '/chats/post',
-          payload: {
-            dataset_id: datasetId, //TODO: add selected dataset id
-            prompt,
-            metric_id: metricId,
-            dashboard_id: dashboardId
-          }
-        },
-        responseEvent: {
-          route: '/chats/post:initializeChat',
-          callback: initializeNewChatCallback
-        }
+      const res = await startNewChat({
+        prompt,
+        metric_id: metricId,
+        dashboard_id: dashboardId
       });
 
-      busterSocket.once({
-        route: '/chats/post:complete',
-        callback: completeChatCallback
-      });
+      initializeNewChatCallback(res);
     }
   );
 

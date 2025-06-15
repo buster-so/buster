@@ -41,7 +41,7 @@ const app = new Hono()
 
       return response;
     } catch (error) {
-      return errorResponse(c, error, 500);
+      errorResponse(error, 500);
     }
   });
 
