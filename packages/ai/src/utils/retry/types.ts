@@ -2,6 +2,13 @@ import type { Agent } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import type { CoreMessage, StepResult, StreamTextResult, TextStreamPart, ToolSet } from 'ai';
 
+/**
+ * Type alias for Mastra Agent with framework-required any types
+ * The any types are part of Mastra's Agent interface for tools and memory
+ */
+// biome-ignore lint/suspicious/noExplicitAny: Mastra Agent framework requires these any types
+type MastraAgent = Agent<string, Record<string, any>, Record<string, any>>;
+
 export interface RetryableError {
   type: 'no-such-tool' | 'invalid-tool-arguments' | 'empty-response';
   originalError?: Error | unknown;
@@ -22,7 +29,7 @@ export interface AgentStreamOptions<T extends ToolSet> {
 }
 
 export interface RetryableAgentStreamParams<T extends ToolSet> {
-  agent: Agent<string, any, any>;
+  agent: MastraAgent;
   messages: CoreMessage[];
   options: AgentStreamOptions<T>;
   retryConfig?: RetryConfig;

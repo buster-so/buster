@@ -3,6 +3,7 @@ import type { RuntimeContext } from '@mastra/core/runtime-context';
 import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
+
 import { analystAgent } from '../agents/analyst-agent/analyst-agent';
 import { parseStreamingArgs as parseDoneArgs } from '../tools/communication-tools/done-tool';
 import { parseStreamingArgs as parseExecuteSqlArgs } from '../tools/database-tools/execute-sql';
@@ -72,8 +73,8 @@ const analystExecution = async ({
   const chunkProcessor = new ChunkProcessor(
     messageId,
     [],
-    inputData.reasoningHistory || [],
-    inputData.responseHistory || []
+    [], // Start with empty reasoning history
+    [] // Start with empty response history
   );
 
   try {
@@ -220,8 +221,12 @@ const analystExecution = async ({
         conversationHistory: completeConversationHistory,
         finished: true,
         outputMessages: completeConversationHistory,
-        reasoningHistory: chunkProcessor.getReasoningHistory(),
-        responseHistory: chunkProcessor.getResponseHistory(),
+        reasoningHistory: chunkProcessor.getReasoningHistory() as z.infer<
+          typeof ReasoningHistorySchema
+        >,
+        responseHistory: chunkProcessor.getResponseHistory() as z.infer<
+          typeof ResponseHistorySchema
+        >,
       };
     }
 

@@ -301,6 +301,6 @@ export function isTextContent(content: unknown): content is { type: 'text'; text
     'type' in content &&
     content.type === 'text' &&
     'text' in content &&
-    typeof (content as any).text === 'string'
+    typeof (content as { text: unknown }).text === 'string'
   );
 }
