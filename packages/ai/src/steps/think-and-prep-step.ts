@@ -9,7 +9,7 @@ import { parseStreamingArgs as parseSequentialThinkingArgs } from '../tools/plan
 import { ChunkProcessor } from '../utils/database/chunkProcessor';
 import { retryableAgentStream } from '../utils/retry';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
-import { ToolArgsParser } from '../utils/streaming';
+import { ToolArgsParser, createOnChunkHandler } from '../utils/streaming';
 import type {
   AnalystRuntimeContext,
   thinkAndPrepWorkflowInputSchema,
@@ -126,30 +126,19 @@ const thinkAndPrepExecution = async ({
             runtimeContext,
             abortSignal: abortController.signal,
             toolChoice: 'required',
-            onChunk: async (event) => {
-              // Process chunk and save to database in real-time
-              await chunkProcessor.processChunk(event.chunk);
-
-              // Check if we should abort based on finishing tools
-              if (chunkProcessor.hasFinishingTool()) {
-                const toolName = chunkProcessor.getFinishingToolName();
-
-                // Set finished to true if respondWithoutAnalysis was called
-                if (toolName === 'respondWithoutAnalysis') {
+            onChunk: createOnChunkHandler({
+              chunkProcessor,
+              abortController,
+              finishingToolNames: ['submitThoughts', 'respondWithoutAnalysis'],
+              onFinishingTool: () => {
+                // Only set finished = true for respondWithoutAnalysis
+                // submitThoughts should continue to analyst agent
+                const finishingToolName = chunkProcessor.getFinishingToolName();
+                if (finishingToolName === 'respondWithoutAnalysis') {
                   finished = true;
                 }
-
-                // Add a delay to ensure any pending processing completes
-                await new Promise((resolve) => setTimeout(resolve, 250));
-
-                // Abort the stream
-                try {
-                  abortController.abort();
-                } catch (abortError) {
-                  console.error('Failed to abort controller:', abortError);
-                }
-              }
-            },
+              },
+            }),
           },
           retryConfig: {
             maxRetries: 3,

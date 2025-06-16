@@ -17,7 +17,7 @@ import {
   ThinkAndPrepOutputSchema,
 } from '../utils/memory/types';
 import { retryableAgentStream } from '../utils/retry';
-import { ToolArgsParser } from '../utils/streaming';
+import { ToolArgsParser, createOnChunkHandler } from '../utils/streaming';
 import type {
   AnalystRuntimeContext,
   thinkAndPrepWorkflowInputSchema,
@@ -112,26 +112,11 @@ const analystExecution = async ({
             runtimeContext,
             toolChoice: 'required',
             abortSignal: abortController.signal,
-            onChunk: async (event) => {
-              // Process chunk and save to database in real-time
-              await chunkProcessor.processChunk(event.chunk);
-
-              // Check if we should abort based on finishing tools
-              if (
-                chunkProcessor.hasFinishingTool() &&
-                chunkProcessor.getFinishingToolName() === 'doneTool'
-              ) {
-                // Add a delay to ensure any pending processing completes
-                await new Promise((resolve) => setTimeout(resolve, 250));
-
-                // Abort the stream
-                try {
-                  abortController.abort();
-                } catch (abortError) {
-                  console.error('Failed to abort controller:', abortError);
-                }
-              }
-            },
+            onChunk: createOnChunkHandler({
+              chunkProcessor,
+              abortController,
+              finishingToolNames: ['doneTool'],
+            }),
           },
           retryConfig: {
             maxRetries: 3,
