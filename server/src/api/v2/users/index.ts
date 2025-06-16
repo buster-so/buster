@@ -11,7 +11,7 @@ const app = new Hono()
     const stubUsers = [
       { id: '1', name: 'John Doe', email: 'john@example.com', role: 'admin' },
       { id: '2', name: 'Jane Smith', email: 'jane@example.com', role: 'user' },
-      { id: '3', name: 'Bob Johnson', email: 'bob@example.com', role: 'user' }
+      { id: '3', name: 'Bob Johnson', email: 'bob@example.com', role: 'user' },
     ];
 
     return c.json(stubUsers);
@@ -26,7 +26,7 @@ const app = new Hono()
       email: `user${userId}@example.com`,
       role: 'user',
       createdAt: '2024-01-01T00:00:00Z',
-      updatedAt: '2024-01-01T00:00:00Z'
+      updatedAt: '2024-01-01T00:00:00Z',
     };
 
     return c.json(stubUser);
@@ -36,7 +36,7 @@ const app = new Hono()
     zValidator(
       'form',
       z.object({
-        name: z.string().min(1)
+        name: z.string().min(1),
       })
     ),
     (c) => {

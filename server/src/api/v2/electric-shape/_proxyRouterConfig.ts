@@ -9,7 +9,7 @@ const proxyRouter: Record<
   (url: URL, userId: string, c: Context) => Promise<URL | Response | undefined>
 > = {
   messages: messagesProxyRouter,
-  chats: chatsProxyRouter
+  chats: chatsProxyRouter,
 };
 
 export default proxyRouter;

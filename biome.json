@@ -105,9 +105,7 @@
   },
   "overrides": [
     {
-      "include": [
-        "packages/database/**/*.ts"
-      ],
+      "include": ["packages/database/**/*.ts"],
       "linter": {
         "rules": {
           "style": {
@@ -120,9 +118,7 @@
       }
     },
     {
-      "include": [
-        "packages/database/**/*.ts"
-      ],
+      "include": ["packages/database/**/*.ts"],
       "linter": {
         "rules": {
           "suspicious": {

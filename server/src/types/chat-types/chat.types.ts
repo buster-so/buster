@@ -10,7 +10,7 @@ export const AssetPermissionRoleSchema = z.enum(['viewer', 'editor', 'owner']);
 export const BusterShareIndividualSchema = z.object({
   email: z.string().email(),
   role: AssetPermissionRoleSchema,
-  name: z.string().optional()
+  name: z.string().optional(),
 });
 
 // Main ChatWithMessages schema
@@ -32,7 +32,7 @@ export const ChatWithMessagesSchema = z.object({
   public_expiry_date: z.string().datetime().optional(),
   public_enabled_by: z.string().optional(),
   public_password: z.string().optional(),
-  permission: AssetPermissionRoleSchema.optional()
+  permission: AssetPermissionRoleSchema.optional(),
 });
 
 export const ChatCreateRequestSchema = z
@@ -44,11 +44,11 @@ export const ChatCreateRequestSchema = z
     asset_type: AssetType.optional(),
     // Legacy fields for backward compatibility
     metric_id: z.string().uuid().optional(),
-    dashboard_id: z.string().uuid().optional()
+    dashboard_id: z.string().uuid().optional(),
   })
   .refine((data) => !data.asset_id || data.asset_type, {
     message: 'asset_type must be provided when asset_id is specified',
-    path: ['asset_type']
+    path: ['asset_type'],
   });
 
 // Updated response schema to return full chat object
@@ -60,7 +60,7 @@ export const ChatCreateHandlerRequestSchema = z.object({
   chat_id: z.string().uuid().optional(),
   message_id: z.string().uuid().optional(),
   asset_id: z.string().uuid().optional(),
-  asset_type: AssetType.optional()
+  asset_type: AssetType.optional(),
 });
 
 // Infer types from schemas

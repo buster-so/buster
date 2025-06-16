@@ -26,7 +26,7 @@ export interface BusterChatResponseMessage_text {
 export interface BusterChatResponseMessage_file {
   id: string;
   type: 'file';
-  file_type: 'metric' | 'dashboard';
+  file_type: 'metric' | 'dashboard' | 'todo';
   file_name: string;
   version_number: number;
   filter_version_id: string | null;
@@ -70,7 +70,7 @@ export interface BusterChatMessageReasoning_pills {
 
 export interface BusterChatMessageReasoning_file {
   id: string;
-  file_type: 'metric' | 'dashboard';
+  file_type: 'metric' | 'dashboard' | 'todo';
   file_name: string;
   version_number: number;
   status: 'loading' | 'completed' | 'failed';

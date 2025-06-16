@@ -1,7 +1,7 @@
 import { NoSuchToolError } from 'ai';
 import { describe, expect, it, vi } from 'vitest';
-import { handleStreamingError } from '../../../src/utils/streaming/stream-error-handler';
 import { ChunkProcessor } from '../../../src/utils/database/chunkProcessor';
+import { handleStreamingError } from '../../../src/utils/streaming/stream-error-handler';
 
 describe('Stream Error Integration', () => {
   it('should detect and heal NoSuchToolError during streaming', async () => {
@@ -36,7 +36,7 @@ describe('Stream Error Integration', () => {
     expect(result.shouldRetry).toBe(true);
     expect(result.healingMessage).toBeDefined();
     expect(result.healingMessage?.role).toBe('tool');
-    
+
     const toolResult = result.healingMessage?.content[0] as any;
     expect(toolResult?.result?.error).toContain('Tool "invalidTool" is not available');
     expect(toolResult?.result?.error).toContain('create-metrics-file');
@@ -50,12 +50,12 @@ describe('Stream Error Integration', () => {
     error.name = 'AI_InvalidToolArgumentsError';
     (error as any).toolCallId = 'test-call-id';
     (error as any).toolName = 'create-metrics-file';
-    
+
     // Double-escaped JSON files parameter (the actual problem)
     const doubleEscapedArgs = JSON.stringify({
       files: JSON.stringify([
-        { name: 'test-metric', yml_content: 'name: Test Metric\\nsql: SELECT 1' }
-      ])
+        { name: 'test-metric', yml_content: 'name: Test Metric\\nsql: SELECT 1' },
+      ]),
     });
     (error as any).args = doubleEscapedArgs;
 
@@ -81,7 +81,7 @@ describe('Stream Error Integration', () => {
     expect(result.shouldRetry).toBe(true);
     expect(result.healingMessage).toBeDefined();
     expect(result.healingMessage?.role).toBe('tool');
-    
+
     const toolResult = result.healingMessage?.content[0] as any;
     expect(toolResult?.result?.success).toBe(true);
     expect(toolResult?.result?.message).toContain('auto-corrected');
@@ -140,7 +140,7 @@ describe('Stream Error Integration', () => {
     expect(result.shouldRetry).toBe(true);
     expect(result.healingMessage).toBeDefined();
     expect(result.healingMessage?.role).toBe('tool');
-    
+
     const toolResult = result.healingMessage?.content[0] as any;
     expect(toolResult?.result?.error).toContain('Invalid arguments for execute-sql');
   });

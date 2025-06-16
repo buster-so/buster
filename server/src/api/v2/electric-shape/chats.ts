@@ -14,7 +14,7 @@ export const chatsProxyRouter = async (url: URL, _userId: string, c: Context) =>
 
   const userHasAccessToChat = await canUserAccessChat({
     userId: c.get('supabaseUser').id,
-    chatId
+    chatId,
   });
 
   if (!userHasAccessToChat) {

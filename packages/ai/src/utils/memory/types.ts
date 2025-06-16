@@ -23,7 +23,7 @@ const BusterChatResponseMessageTextSchema = z.object({
 const BusterChatResponseMessageFileSchema = z.object({
   id: z.string(),
   type: z.literal('file'),
-  file_type: z.enum(['metric', 'dashboard']),
+  file_type: z.enum(['metric', 'dashboard', 'todo']),
   file_name: z.string(),
   version_number: z.number(),
   filter_version_id: z.string().nullable(),
@@ -71,7 +71,7 @@ const BusterChatMessageReasoningPillSchema = z.object({
 
 const BusterChatMessageReasoningFileSchema = z.object({
   id: z.string(),
-  file_type: z.enum(['metric', 'dashboard']),
+  file_type: z.enum(['metric', 'dashboard', 'todo']),
   file_name: z.string(),
   version_number: z.number(),
   status: z.enum(['loading', 'completed', 'failed']),

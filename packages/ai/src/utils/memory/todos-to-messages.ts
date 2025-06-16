@@ -1,4 +1,5 @@
 import type { CoreMessage } from 'ai';
+import type { BusterChatMessageReasoning_files } from './message-converters';
 
 /**
  * Creates an assistant message with a tool call for creating todos
@@ -19,5 +20,39 @@ export function createTodoToolCallMessage(todos: string): CoreMessage {
         </todo_list>`,
       },
     ],
+  };
+}
+
+/**
+ * Creates a reasoning message for todos to display in the reasoning UI
+ * This treats the entire todo list as a single file
+ *
+ * @param todos - The markdown-formatted todo list
+ * @returns BusterChatMessageReasoning_files with todos as a single file
+ */
+export function createTodoReasoningMessage(todos: string): BusterChatMessageReasoning_files {
+  const fileId = `todo-${Date.now()}-${Math.random().toString(36).substring(2)}`;
+
+  return {
+    id: fileId,
+    type: 'files',
+    title: 'TODO List',
+    status: 'completed',
+    secondary_title: undefined,
+    file_ids: [fileId],
+    files: {
+      [fileId]: {
+        id: fileId,
+        file_type: 'todo',
+        file_name: 'todos.md',
+        version_number: 1,
+        status: 'completed',
+        file: {
+          text: todos,
+          text_chunk: undefined,
+          modified: undefined,
+        },
+      },
+    },
   };
 }

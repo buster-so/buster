@@ -179,14 +179,15 @@ const analystExecution = async ({
           abortController,
           maxRetries: 3,
           onRetry: (error, attemptNumber) => {
-            console.error(`Analyst stream retry attempt ${attemptNumber} for streaming error:`, error);
+            console.error(
+              `Analyst stream retry attempt ${attemptNumber} for streaming error:`,
+              error
+            );
           },
           toolChoice: 'required',
         });
 
         if (healingResult.shouldRetry && healingResult.healingMessage) {
-          console.log('Analyst streaming error healed, healing message:', healingResult.healingMessage);
-          
           // Add the healing message to the final conversation history
           // Note: For now we just log it. A full implementation would need to restart
           // the entire stream processing with the healed conversation.

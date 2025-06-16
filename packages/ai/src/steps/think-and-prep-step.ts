@@ -32,7 +32,10 @@ import {
   getAllToolsUsed,
   getLastToolUsed,
 } from '../utils/memory/message-history';
-import { createTodoToolCallMessage } from '../utils/memory/todos-to-messages';
+import {
+  createTodoReasoningMessage,
+  createTodoToolCallMessage,
+} from '../utils/memory/todos-to-messages';
 import {
   type MessageHistory,
   type StepFinishData,
@@ -116,6 +119,10 @@ const thinkAndPrepExecution = async ({
 
     // Update chunk processor with initial messages
     chunkProcessor.setInitialMessages(messages);
+
+    // Add todos to reasoning history as well
+    const todoReasoningMessage = createTodoReasoningMessage(todos);
+    chunkProcessor.getReasoningHistory().push(todoReasoningMessage);
 
     const wrappedStream = wrapTraced(
       async () => {

@@ -1,9 +1,7 @@
 import { updateMessageFields } from '@buster/database';
 import type { CoreMessage, TextStreamPart } from 'ai';
 import type { z } from 'zod';
-import {
-  extractResponseMessages,
-} from './formatLlmMessagesAsReasoning';
+import { extractResponseMessages } from './formatLlmMessagesAsReasoning';
 
 // Define the reasoning and response types
 type ReasoningEntry = z.infer<typeof import('../memory/types').BusterChatMessageReasoningSchema>;
@@ -155,13 +153,17 @@ export class ChunkProcessor {
     }
 
     // Create reasoning entry for this tool call
-    const reasoningEntry = this.createReasoningEntry(chunk.toolCallId, chunk.toolName, chunk.args || {});
+    const reasoningEntry = this.createReasoningEntry(
+      chunk.toolCallId,
+      chunk.toolName,
+      chunk.args || {}
+    );
     if (reasoningEntry) {
       // Check if this reasoning entry already exists (avoid duplicates)
       const existingEntry = this.state.reasoningHistory.find(
         (r) => r && typeof r === 'object' && 'id' in r && r.id === chunk.toolCallId
       );
-      
+
       if (!existingEntry) {
         this.state.reasoningHistory.push(reasoningEntry);
       }
@@ -240,9 +242,13 @@ export class ChunkProcessor {
       const existingEntry = this.state.reasoningHistory.find(
         (r) => r && typeof r === 'object' && 'id' in r && r.id === chunk.toolCallId
       );
-      
+
       if (!existingEntry && inProgress.args) {
-        const reasoningEntry = this.createReasoningEntry(chunk.toolCallId, inProgress.toolName, inProgress.args);
+        const reasoningEntry = this.createReasoningEntry(
+          chunk.toolCallId,
+          inProgress.toolName,
+          inProgress.args
+        );
         if (reasoningEntry) {
           this.state.reasoningHistory.push(reasoningEntry);
         }
@@ -284,7 +290,7 @@ export class ChunkProcessor {
 
       // Determine if the tool succeeded or failed based on the result
       const status = this.determineToolStatus(chunk.result);
-      
+
       // Update the specific reasoning entry for this tool call
       this.updateReasoningEntryStatus(chunk.toolCallId, status, cumulativeTime);
     }
@@ -349,7 +355,6 @@ export class ChunkProcessor {
       // Only process messages that haven't been processed yet
       const messagesToProcess = allMessages.slice(this.state.lastProcessedMessageIndex + 1);
 
-
       // Extract response messages from NEW messages only
       const newResponseEntries = extractResponseMessages(messagesToProcess) as ResponseEntry[];
 
@@ -405,11 +410,15 @@ export class ChunkProcessor {
       // If result is a string, check for error indicators
       if (typeof result === 'string') {
         const lowerResult = result.toLowerCase();
-        if (lowerResult.includes('error') || lowerResult.includes('failed') || lowerResult.includes('exception')) {
+        if (
+          lowerResult.includes('error') ||
+          lowerResult.includes('failed') ||
+          lowerResult.includes('exception')
+        ) {
           return 'failed';
         }
       }
-      
+
       // If result is an object, check for error properties
       if (result && typeof result === 'object') {
         const resultObj = result as Record<string, unknown>;
@@ -417,7 +426,7 @@ export class ChunkProcessor {
           return 'failed';
         }
       }
-      
+
       return 'completed';
     } catch {
       // If we can't determine, default to completed
@@ -428,14 +437,18 @@ export class ChunkProcessor {
   /**
    * Update a specific reasoning entry's status and timing
    */
-  private updateReasoningEntryStatus(toolCallId: string, status: 'loading' | 'completed' | 'failed', timing?: number): void {
+  private updateReasoningEntryStatus(
+    toolCallId: string,
+    status: 'loading' | 'completed' | 'failed',
+    timing?: number
+  ): void {
     const entry = this.state.reasoningHistory.find(
       (r) => r && typeof r === 'object' && 'id' in r && r.id === toolCallId
     );
 
     if (entry && typeof entry === 'object') {
       (entry as any).status = status;
-      
+
       // Update file statuses if this is a file-type entry
       if ('files' in entry && entry.files && typeof entry.files === 'object') {
         const files = entry.files as Record<string, any>;
@@ -445,7 +458,7 @@ export class ChunkProcessor {
           }
         }
       }
-      
+
       if (timing && 'secondary_title' in entry) {
         const seconds = timing / 1000;
         if (seconds >= 60) {
@@ -461,13 +474,19 @@ export class ChunkProcessor {
   /**
    * Create a reasoning entry for a tool call
    */
-  private createReasoningEntry(toolCallId: string, toolName: string, args: Record<string, unknown>): ReasoningEntry | null {
+  private createReasoningEntry(
+    toolCallId: string,
+    toolName: string,
+    args: Record<string, unknown>
+  ): ReasoningEntry | null {
     // Skip response/communication tools - these don't belong in reasoning
     const responseTools = [
-      'doneTool', 'done-tool',
-      'respondWithoutAnalysis', 'respond-without-analysis'
+      'doneTool',
+      'done-tool',
+      'respondWithoutAnalysis',
+      'respond-without-analysis',
     ];
-    
+
     if (responseTools.includes(toolName)) {
       return null;
     }

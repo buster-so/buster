@@ -34,13 +34,13 @@ describe('createProxiedResponse', () => {
       'content-encoding': 'gzip',
       'content-length': '123',
       'cache-control': 'no-cache',
-      'custom-header': 'custom-value'
+      'custom-header': 'custom-value',
     });
 
     const mockResponse = new Response(mockResponseBody, {
       status: 200,
       statusText: 'OK',
-      headers: mockHeaders
+      headers: mockHeaders,
     });
 
     mockFetch.mockResolvedValueOnce(mockResponse);
@@ -72,13 +72,13 @@ describe('createProxiedResponse', () => {
 
     const mockHeaders = new Headers({
       'content-type': 'text/plain',
-      'cache-control': 'max-age=3600'
+      'cache-control': 'max-age=3600',
     });
 
     const mockResponse = new Response(mockResponseBody, {
       status: 200,
       statusText: 'OK',
-      headers: mockHeaders
+      headers: mockHeaders,
     });
 
     mockFetch.mockResolvedValueOnce(mockResponse);
@@ -103,13 +103,13 @@ describe('createProxiedResponse', () => {
     const mockHeaders = new Headers({
       'content-type': 'application/json',
       'content-encoding': 'deflate',
-      'content-length': '456'
+      'content-length': '456',
     });
 
     const mockResponse = new Response('{"error": "Not found"}', {
       status: 404,
       statusText: 'Not Found',
-      headers: mockHeaders
+      headers: mockHeaders,
     });
 
     mockFetch.mockResolvedValueOnce(mockResponse);
@@ -132,13 +132,13 @@ describe('createProxiedResponse', () => {
 
     const mockHeaders = new Headers({
       'content-type': 'application/json',
-      'content-encoding': 'br'
+      'content-encoding': 'br',
     });
 
     const mockResponse = new Response('compressed data', {
       status: 200,
       statusText: 'OK',
-      headers: mockHeaders
+      headers: mockHeaders,
     });
 
     mockFetch.mockResolvedValueOnce(mockResponse);
@@ -156,13 +156,13 @@ describe('createProxiedResponse', () => {
 
     const mockHeaders = new Headers({
       'content-type': 'text/html',
-      'content-length': '789'
+      'content-length': '789',
     });
 
     const mockResponse = new Response('<html></html>', {
       status: 200,
       statusText: 'OK',
-      headers: mockHeaders
+      headers: mockHeaders,
     });
 
     mockFetch.mockResolvedValueOnce(mockResponse);
@@ -186,13 +186,13 @@ describe('createProxiedResponse', () => {
       'x-custom-header': 'custom-value',
       'cache-control': 'private, max-age=0',
       etag: '"abc123"',
-      'last-modified': 'Wed, 21 Oct 2015 07:28:00 GMT'
+      'last-modified': 'Wed, 21 Oct 2015 07:28:00 GMT',
     });
 
     const mockResponse = new Response('response data', {
       status: 200,
       statusText: 'OK',
-      headers: mockHeaders
+      headers: mockHeaders,
     });
 
     mockFetch.mockResolvedValueOnce(mockResponse);
@@ -251,7 +251,7 @@ describe('createProxiedResponse', () => {
     const mockResponse = new Response(mockResponseBody, {
       status: 200,
       statusText: 'OK',
-      headers: new Headers({ 'content-type': 'application/json' })
+      headers: new Headers({ 'content-type': 'application/json' }),
     });
 
     mockFetch.mockResolvedValueOnce(mockResponse);

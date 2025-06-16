@@ -1,8 +1,8 @@
 import type { Agent } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import type { CoreMessage, ToolSet } from 'ai';
-import { healStreamingToolError, isHealableStreamError } from './tool-healing';
 import type { ChunkProcessor } from '../database/chunkProcessor';
+import { healStreamingToolError, isHealableStreamError } from './tool-healing';
 
 export interface StreamErrorHandlerConfig<T extends ToolSet> {
   agent: Agent<T>;
@@ -38,17 +38,17 @@ export async function handleStreamingError<T extends ToolSet>(
 
   // Get available tools from agent
   const availableTools = (agent as any).tools || {};
-  
+
   // Attempt to heal the error
   const healingResult = healStreamingToolError(error, availableTools);
-  
+
   if (!healingResult) {
     return { shouldRetry: false };
   }
 
-  return { 
-    shouldRetry: true, 
-    healingMessage: healingResult.healingMessage 
+  return {
+    shouldRetry: true,
+    healingMessage: healingResult.healingMessage,
   };
 }
 
@@ -60,14 +60,14 @@ export async function processStreamWithHealing<T extends ToolSet>(
   stream: any, // The already-created stream from retryableAgentStreamWithHealing
   config: StreamErrorHandlerConfig<T>
 ): Promise<StreamProcessingResult> {
-  const { 
-    agent, 
-    chunkProcessor, 
-    runtimeContext, 
-    abortController, 
+  const {
+    agent,
+    chunkProcessor,
+    runtimeContext,
+    abortController,
     maxRetries = 3,
     onRetry,
-    toolChoice = 'required'
+    toolChoice = 'required',
   } = config;
 
   let retryCount = 0;
@@ -87,7 +87,6 @@ export async function processStreamWithHealing<T extends ToolSet>(
         retryCount,
         finalMessages: chunkProcessor.getAccumulatedMessages(),
       };
-
     } catch (streamError) {
       // Handle AbortError gracefully (this is normal)
       if (streamError instanceof Error && streamError.name === 'AbortError') {
@@ -100,7 +99,7 @@ export async function processStreamWithHealing<T extends ToolSet>(
 
       // Attempt to heal the streaming error
       const healingResult = await handleStreamingError(streamError, config);
-      
+
       if (!healingResult.shouldRetry || retryCount >= maxRetries) {
         // Not healable or max retries reached, re-throw
         console.error('Stream error could not be healed:', streamError);
@@ -117,10 +116,10 @@ export async function processStreamWithHealing<T extends ToolSet>(
         // Get current messages and add healing message
         const currentMessages = chunkProcessor.getAccumulatedMessages();
         const healedMessages = [...currentMessages, healingResult.healingMessage];
-        
+
         // Update the chunk processor with healing message
         chunkProcessor.setInitialMessages(healedMessages);
-        
+
         // Create a new stream with healed messages
         const newStream = await agent.stream(healedMessages, {
           runtimeContext,
@@ -128,7 +127,7 @@ export async function processStreamWithHealing<T extends ToolSet>(
           toolChoice,
           onChunk: config.onChunk, // Use the same onChunk handler
         });
-        
+
         // Update stream reference for next iteration
         stream = newStream;
       }
