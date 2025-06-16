@@ -8,7 +8,7 @@ import { parseStreamingArgs as parseDoneArgs } from '../tools/communication-tool
 import { parseStreamingArgs as parseExecuteSqlArgs } from '../tools/database-tools/execute-sql';
 import { parseStreamingArgs as parseSequentialThinkingArgs } from '../tools/planning-thinking-tools/sequential-thinking-tool';
 import { parseStreamingArgs as parseCreateMetricsArgs } from '../tools/visualization-tools/create-metrics-file-tool';
-import { ChunkProcessor } from '../utils/database/chunkProcessor';
+import { ChunkProcessor } from '../utils/database/chunk-processor';
 import {
   MessageHistorySchema,
   ReasoningHistorySchema,

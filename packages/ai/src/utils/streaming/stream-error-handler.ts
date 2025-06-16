@@ -1,7 +1,7 @@
 import type { Agent } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import type { CoreMessage, ToolSet } from 'ai';
-import type { ChunkProcessor } from '../database/chunkProcessor';
+import type { ChunkProcessor } from '../database/chunk-processor';
 import { healStreamingToolError, isHealableStreamError } from './tool-healing';
 
 export interface StreamErrorHandlerConfig {

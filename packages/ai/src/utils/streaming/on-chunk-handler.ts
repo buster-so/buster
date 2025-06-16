@@ -1,5 +1,5 @@
 import type { TextStreamPart, ToolSet } from 'ai';
-import type { ChunkProcessor } from '../database/chunkProcessor';
+import type { ChunkProcessor } from '../database/chunk-processor';
 
 /**
  * Creates an onChunk callback handler for agent streams

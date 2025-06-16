@@ -1,6 +1,6 @@
 import { NoSuchToolError } from 'ai';
 import { describe, expect, it, vi } from 'vitest';
-import { ChunkProcessor } from '../../../src/utils/database/chunkProcessor';
+import { ChunkProcessor } from '../../../src/utils/database/chunk-processor';
 import { handleStreamingError } from '../../../src/utils/streaming/stream-error-handler';
 
 describe('Stream Error Integration', () => {

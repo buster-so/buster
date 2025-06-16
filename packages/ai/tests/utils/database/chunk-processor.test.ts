@@ -1,6 +1,6 @@
 import type { CoreMessage, TextStreamPart } from 'ai';
 import { describe, expect, it, vi } from 'vitest';
-import { ChunkProcessor } from '../../../src/utils/database/chunkProcessor';
+import { ChunkProcessor } from '../../../src/utils/database/chunk-processor';
 
 // Mock the database update function
 vi.mock('@buster/database', () => ({

@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { thinkAndPrepAgent } from '../agents/think-and-prep-agent/think-and-prep-agent';
 import { parseStreamingArgs as parseRespondWithoutAnalysisArgs } from '../tools/communication-tools/respond-without-analysis';
 import { parseStreamingArgs as parseSequentialThinkingArgs } from '../tools/planning-thinking-tools/sequential-thinking-tool';
-import { ChunkProcessor } from '../utils/database/chunkProcessor';
+import { ChunkProcessor } from '../utils/database/chunk-processor';
 import { retryableAgentStreamWithHealing } from '../utils/retry';
 import type { RetryableError } from '../utils/retry/types';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
