@@ -1,6 +1,10 @@
 import { updateMessageFields } from '@buster/database';
 import type { CoreMessage, TextStreamPart, ToolSet } from 'ai';
 import type { z } from 'zod';
+import type {
+  ChatMessageReasoningMessage,
+  ChatMessageResponseMessage,
+} from '../../../../../server/src/types/chat-types/chat-message.type';
 import { extractResponseMessages } from './formatLlmMessagesAsReasoning';
 import type {
   AssistantMessageContent,
@@ -38,9 +42,9 @@ import {
  * while maintaining compatibility with AI SDK's type system.
  */
 
-// Define the reasoning and response types
-type ReasoningEntry = z.infer<typeof import('../memory/types').BusterChatMessageReasoningSchema>;
-type ResponseEntry = z.infer<typeof import('../memory/types').BusterChatMessageResponseSchema>;
+// Define the reasoning and response types using the proper chat message types
+type ReasoningEntry = ChatMessageReasoningMessage;
+type ResponseEntry = ChatMessageResponseMessage;
 
 // Type definitions moved to ./types.ts for reusability
 
@@ -520,9 +524,8 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
               version_number: number;
               status: string;
               file: {
-                text: string;
-                text_chunk: undefined;
-                modified: undefined;
+                text?: string;
+                modified?: [number, number][];
               };
             }
           > = {};
@@ -539,8 +542,6 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
               status: 'loading',
               file: {
                 text: file.yml_content || '',
-                text_chunk: undefined,
-                modified: undefined,
               },
             };
           }
@@ -560,29 +561,49 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       case 'executeSql':
       case 'execute-sql':
         if (isExecuteSqlArgs(args)) {
+          let sqlContent = '';
           if (args.queries && Array.isArray(args.queries)) {
-            const queryText = args.queries.map(extractSqlFromQuery).join('\n\n');
-            return {
-              id: toolCallId,
-              type: 'text',
-              title: 'Executing SQL',
-              status: 'loading',
-              message: queryText,
-              message_chunk: undefined,
-              secondary_title: undefined,
-              finished_reasoning: false,
-            } as ReasoningEntry;
+            sqlContent = args.queries.map(extractSqlFromQuery).join('\n\n');
+          } else if (args.sql && typeof args.sql === 'string') {
+            sqlContent = args.sql;
           }
-          if (args.sql) {
+
+          if (sqlContent) {
+            const fileId = crypto.randomUUID();
+            const files: Record<
+              string,
+              {
+                id: string;
+                file_type: string;
+                file_name: string;
+                version_number: number;
+                status: string;
+                file: {
+                  text?: string;
+                  modified?: [number, number][];
+                };
+              }
+            > = {};
+
+            files[fileId] = {
+              id: fileId,
+              file_type: 'agent-action',
+              file_name: 'sql_query.sql',
+              version_number: 1,
+              status: 'loading',
+              file: {
+                text: sqlContent,
+              },
+            };
+
             return {
               id: toolCallId,
-              type: 'text',
+              type: 'files',
               title: 'Executing SQL',
               status: 'loading',
-              message: args.sql,
-              message_chunk: undefined,
               secondary_title: undefined,
-              finished_reasoning: false,
+              file_ids: [fileId],
+              files,
             } as ReasoningEntry;
           }
         }
