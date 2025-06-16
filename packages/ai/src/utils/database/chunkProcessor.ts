@@ -3,7 +3,6 @@ import type { CoreMessage, TextStreamPart } from 'ai';
 import type { z } from 'zod';
 import {
   extractResponseMessages,
-  formatLlmMessagesAsReasoning,
 } from './formatLlmMessagesAsReasoning';
 
 // Define the reasoning and response types
@@ -155,6 +154,19 @@ export class ChunkProcessor {
       this.state.timing.startTime = Date.now();
     }
 
+    // Create reasoning entry for this tool call
+    const reasoningEntry = this.createReasoningEntry(chunk.toolCallId, chunk.toolName, chunk.args || {});
+    if (reasoningEntry) {
+      // Check if this reasoning entry already exists (avoid duplicates)
+      const existingEntry = this.state.reasoningHistory.find(
+        (r) => r && typeof r === 'object' && 'id' in r && r.id === chunk.toolCallId
+      );
+      
+      if (!existingEntry) {
+        this.state.reasoningHistory.push(reasoningEntry);
+      }
+    }
+
     // Check if this is a finishing tool
     if (['doneTool', 'respondWithoutAnalysis', 'submitThoughts'].includes(chunk.toolName)) {
       this.state.hasFinishingTool = true;
@@ -223,6 +235,18 @@ export class ChunkProcessor {
           toolCall.args = inProgress.args;
         }
       }
+
+      // Create reasoning entry if not already created
+      const existingEntry = this.state.reasoningHistory.find(
+        (r) => r && typeof r === 'object' && 'id' in r && r.id === chunk.toolCallId
+      );
+      
+      if (!existingEntry && inProgress.args) {
+        const reasoningEntry = this.createReasoningEntry(chunk.toolCallId, inProgress.toolName, inProgress.args);
+        if (reasoningEntry) {
+          this.state.reasoningHistory.push(reasoningEntry);
+        }
+      }
     } catch {
       // JSON is incomplete, continue accumulating
     }
@@ -252,14 +276,17 @@ export class ChunkProcessor {
 
     this.state.accumulatedMessages.push(toolResultMessage);
 
-    // Track tool completion timing
+    // Track tool completion timing and update reasoning entry
     if (this.state.timing.startTime) {
       const completedAt = Date.now();
       const cumulativeTime = completedAt - this.state.timing.startTime;
       this.state.timing.toolCallTimings.set(chunk.toolCallId, cumulativeTime);
 
-      // Update reasoning entries with new timing data
-      this.updateReasoningWithTiming();
+      // Determine if the tool succeeded or failed based on the result
+      const status = this.determineToolStatus(chunk.result);
+      
+      // Update the specific reasoning entry for this tool call
+      this.updateReasoningEntryStatus(chunk.toolCallId, status, cumulativeTime);
     }
 
     // Clear the tool call from tracking
@@ -322,48 +349,9 @@ export class ChunkProcessor {
       // Only process messages that haven't been processed yet
       const messagesToProcess = allMessages.slice(this.state.lastProcessedMessageIndex + 1);
 
-      // Debug logging to understand duplication
-      if (messagesToProcess.length > 0) {
-        console.log(
-          `Processing ${messagesToProcess.length} new messages. Last processed index: ${this.state.lastProcessedMessageIndex}, Total messages: ${allMessages.length}`
-        );
-      }
-
-      // Extract reasoning from NEW messages only
-      const newReasoningEntries = formatLlmMessagesAsReasoning(
-        messagesToProcess
-      ) as ReasoningEntry[];
 
       // Extract response messages from NEW messages only
       const newResponseEntries = extractResponseMessages(messagesToProcess) as ResponseEntry[];
-
-      // Update reasoning history with new entries (deduplicate by ID)
-      const existingIds = new Set(
-        this.state.reasoningHistory
-          .filter((r): r is { id: string } => r !== null && typeof r === 'object' && 'id' in r)
-          .map((r) => r.id)
-      );
-
-      const deduplicatedNewReasoning = newReasoningEntries.filter(
-        (entry) => entry && 'id' in entry && !existingIds.has(entry.id)
-      );
-
-      // Debug logging for deduplication
-      if (newReasoningEntries.length > deduplicatedNewReasoning.length) {
-        console.log(
-          `Deduplicated reasoning: ${newReasoningEntries.length} -> ${deduplicatedNewReasoning.length}`
-        );
-        console.log('Existing IDs:', Array.from(existingIds));
-        console.log(
-          'New entries being filtered:',
-          newReasoningEntries.map((e) => (e && 'id' in e ? e.id : 'no-id'))
-        );
-      }
-
-      if (deduplicatedNewReasoning.length > 0) {
-        console.log(`Adding ${deduplicatedNewReasoning.length} new reasoning entries`);
-        this.state.reasoningHistory.push(...deduplicatedNewReasoning);
-      }
 
       // Update response history with new entries
       const existingResponseIds = new Set(
@@ -410,31 +398,197 @@ export class ChunkProcessor {
   }
 
   /**
-   * Update reasoning entries with timing data for secondary_title
-   * This updates entries that are already in the reasoning history
+   * Determine tool status based on result
    */
-  private updateReasoningWithTiming(reasoningEntries?: ReasoningEntry[]): void {
-    if (!this.state.timing.startTime || this.state.timing.toolCallTimings.size === 0) {
-      return;
+  private determineToolStatus(result: unknown): 'completed' | 'failed' {
+    try {
+      // If result is a string, check for error indicators
+      if (typeof result === 'string') {
+        const lowerResult = result.toLowerCase();
+        if (lowerResult.includes('error') || lowerResult.includes('failed') || lowerResult.includes('exception')) {
+          return 'failed';
+        }
+      }
+      
+      // If result is an object, check for error properties
+      if (result && typeof result === 'object') {
+        const resultObj = result as Record<string, unknown>;
+        if (resultObj.error || resultObj.success === false || resultObj.status === 'error') {
+          return 'failed';
+        }
+      }
+      
+      return 'completed';
+    } catch {
+      // If we can't determine, default to completed
+      return 'completed';
     }
+  }
 
-    // Update entries in the actual reasoning history, not just local arrays
-    for (const entry of this.state.reasoningHistory) {
-      if (entry && typeof entry === 'object' && 'id' in entry) {
-        const entryId = entry.id as string;
-        const timing = this.state.timing.toolCallTimings.get(entryId);
+  /**
+   * Update a specific reasoning entry's status and timing
+   */
+  private updateReasoningEntryStatus(toolCallId: string, status: 'loading' | 'completed' | 'failed', timing?: number): void {
+    const entry = this.state.reasoningHistory.find(
+      (r) => r && typeof r === 'object' && 'id' in r && r.id === toolCallId
+    );
 
-        if (timing && 'secondary_title' in entry) {
-          const seconds = timing / 1000;
-          if (seconds >= 60) {
-            const minutes = Math.round(seconds / 60);
-            (entry as any).secondary_title = `${minutes}m`;
-          } else {
-            (entry as any).secondary_title = `${seconds.toFixed(1)}s`;
+    if (entry && typeof entry === 'object') {
+      (entry as any).status = status;
+      
+      // Update file statuses if this is a file-type entry
+      if ('files' in entry && entry.files && typeof entry.files === 'object') {
+        const files = entry.files as Record<string, any>;
+        for (const fileId in files) {
+          if (files[fileId] && typeof files[fileId] === 'object') {
+            files[fileId].status = status;
           }
         }
       }
+      
+      if (timing && 'secondary_title' in entry) {
+        const seconds = timing / 1000;
+        if (seconds >= 60) {
+          const minutes = Math.round(seconds / 60);
+          (entry as any).secondary_title = `${minutes}m`;
+        } else {
+          (entry as any).secondary_title = `${seconds.toFixed(1)}s`;
+        }
+      }
     }
+  }
+
+  /**
+   * Create a reasoning entry for a tool call
+   */
+  private createReasoningEntry(toolCallId: string, toolName: string, args: Record<string, unknown>): ReasoningEntry | null {
+    // Skip response/communication tools - these don't belong in reasoning
+    const responseTools = [
+      'doneTool', 'done-tool',
+      'respondWithoutAnalysis', 'respond-without-analysis'
+    ];
+    
+    if (responseTools.includes(toolName)) {
+      return null;
+    }
+
+    switch (toolName) {
+      case 'sequentialThinking':
+      case 'sequential-thinking':
+        if (args.thought) {
+          return {
+            id: toolCallId,
+            type: 'text',
+            title: 'Thinking...',
+            status: 'loading',
+            message: args.thought,
+            message_chunk: null,
+            secondary_title: undefined,
+            finished_reasoning: !args.nextThoughtNeeded,
+          } as ReasoningEntry;
+        }
+        break;
+
+      case 'createMetrics':
+      case 'create-metrics-file':
+        if (args.files && Array.isArray(args.files)) {
+          const files: Record<string, unknown> = {};
+          const fileIds: string[] = [];
+
+          for (const file of args.files) {
+            const fileId = crypto.randomUUID();
+            fileIds.push(fileId);
+            files[fileId] = {
+              id: fileId,
+              file_type: 'metric',
+              file_name: file.name || 'untitled_metric.yml',
+              version_number: 1,
+              status: 'loading',
+              file: {
+                text: file.yml_content || '',
+                text_chunk: undefined,
+                modified: undefined,
+              },
+            };
+          }
+
+          return {
+            id: toolCallId,
+            type: 'files',
+            title: `Creating ${args.files.length} metric${args.files.length === 1 ? '' : 's'}`,
+            status: 'loading',
+            secondary_title: undefined,
+            file_ids: fileIds,
+            files,
+          } as ReasoningEntry;
+        }
+        break;
+
+      case 'executeSql':
+      case 'execute-sql':
+        if (args.queries && Array.isArray(args.queries)) {
+          const queryText = args.queries.map((q: any) => q.sql || q).join('\n\n');
+          return {
+            id: toolCallId,
+            type: 'text',
+            title: 'Executing SQL',
+            status: 'loading',
+            message: queryText,
+            message_chunk: null,
+            secondary_title: undefined,
+            finished_reasoning: false,
+          } as ReasoningEntry;
+        } else if (args.sql) {
+          return {
+            id: toolCallId,
+            type: 'text',
+            title: 'Executing SQL',
+            status: 'loading',
+            message: args.sql,
+            message_chunk: null,
+            secondary_title: undefined,
+            finished_reasoning: false,
+          } as ReasoningEntry;
+        }
+        break;
+
+      case 'submitThoughts':
+        if (args.thoughts) {
+          return {
+            id: toolCallId,
+            type: 'text',
+            title: 'Submitting Analysis',
+            status: 'loading',
+            message: args.thoughts,
+            message_chunk: null,
+            secondary_title: undefined,
+            finished_reasoning: false,
+          } as ReasoningEntry;
+        }
+        break;
+
+      default:
+        // For other tools, create a generic text entry
+        let messageContent: string;
+        try {
+          messageContent = JSON.stringify(args, null, 2);
+        } catch {
+          messageContent = '[Unable to display tool arguments]';
+        }
+
+        return {
+          id: toolCallId,
+          type: 'text',
+          title: toolName,
+          status: 'loading',
+          message: messageContent,
+          message_chunk: null,
+          secondary_title: undefined,
+          finished_reasoning: false,
+        } as ReasoningEntry;
+    }
+
+    return null;
   }
 
   /**

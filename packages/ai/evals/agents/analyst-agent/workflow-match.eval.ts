@@ -4,8 +4,6 @@ import { analystAgent } from '../../../src/agents/analyst-agent/analyst-agent';
 async function runWeatherAgentTask(input: string): Promise<any> {
   const weather = await analystAgent.generate(input, {
     maxSteps: 15,
-    threadId: 'evals',
-    resourceId: 'evals-user',
   });
   return weather.response.messages;
 }

@@ -21,7 +21,7 @@ class MockRuntimeContext<T> {
 // Mock AnalystRuntimeContext interface for testing
 interface MockAnalystRuntimeContext {
   userId: string;
-  threadId: string;
+  chatId: string;
   dataSourceId: string;
   dataSourceSyntax: string;
   organizationId: string;
@@ -41,7 +41,7 @@ function setupRuntimeContextFromMessage(
 
     // Populate from Task 2 helper outputs
     runtimeContext.set('userId', messageContext.userId);
-    runtimeContext.set('threadId', messageContext.chatId);
+    runtimeContext.set('chatId', messageContext.chatId);
     runtimeContext.set('organizationId', messageContext.organizationId);
     runtimeContext.set('dataSourceId', dataSource.dataSourceId);
     runtimeContext.set('dataSourceSyntax', dataSource.dataSourceSyntax);
@@ -73,7 +73,7 @@ describe('Task 3: Runtime Context Setup', () => {
     const runtimeContext = setupRuntimeContextFromMessage(mockMessageContext, mockDataSource);
 
     expect(runtimeContext.get('userId')).toBe('user-123');
-    expect(runtimeContext.get('threadId')).toBe('chat-456');
+    expect(runtimeContext.get('chatId')).toBe('chat-456');
     expect(runtimeContext.get('organizationId')).toBe('org-789');
     expect(runtimeContext.get('dataSourceId')).toBe('ds-101');
     expect(runtimeContext.get('dataSourceSyntax')).toBe('postgresql');
@@ -162,7 +162,7 @@ describe('Task 3: Runtime Context Setup', () => {
     // Verify all required fields are set
     const requiredFields: (keyof MockAnalystRuntimeContext)[] = [
       'userId',
-      'threadId',
+      'chatId',
       'organizationId',
       'dataSourceId',
       'dataSourceSyntax',

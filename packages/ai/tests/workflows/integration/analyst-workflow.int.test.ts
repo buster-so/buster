@@ -42,7 +42,7 @@ describe('Analyst Workflow Integration Tests', () => {
 
     const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();
     runtimeContext.set('userId', 'c2dd64cd-f7f3-4884-bc91-d46ae431901e');
-    runtimeContext.set('threadId', crypto.randomUUID());
+    runtimeContext.set('chatId', crypto.randomUUID());
     runtimeContext.set('organizationId', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce');
     runtimeContext.set('dataSourceId', 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a');
     runtimeContext.set('dataSourceSyntax', 'postgres');
@@ -109,7 +109,7 @@ describe('Analyst Workflow Integration Tests', () => {
 
     const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();
     runtimeContext.set('userId', userId);
-    runtimeContext.set('threadId', chatId);
+    runtimeContext.set('chatId', chatId);
     runtimeContext.set('organizationId', organizationId);
     runtimeContext.set('dataSourceId', 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a');
     runtimeContext.set('dataSourceSyntax', 'postgres');
@@ -148,7 +148,7 @@ describe('Analyst Workflow Integration Tests', () => {
 
     const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();
     runtimeContext.set('userId', 'c2dd64cd-f7f3-4884-bc91-d46ae431901e');
-    runtimeContext.set('threadId', crypto.randomUUID());
+    runtimeContext.set('chatId', crypto.randomUUID());
     runtimeContext.set('organizationId', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce');
     runtimeContext.set('dataSourceId', 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a');
     runtimeContext.set('dataSourceSyntax', 'postgres');
@@ -176,7 +176,7 @@ describe('Analyst Workflow Integration Tests', () => {
 
     const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();
     runtimeContext.set('userId', 'c2dd64cd-f7f3-4884-bc91-d46ae431901e');
-    runtimeContext.set('threadId', crypto.randomUUID());
+    runtimeContext.set('chatId', crypto.randomUUID());
     runtimeContext.set('organizationId', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce');
     runtimeContext.set('dataSourceId', 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a');
     runtimeContext.set('dataSourceSyntax', 'postgres');
@@ -211,7 +211,7 @@ describe('Analyst Workflow Integration Tests', () => {
 
     const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();
     runtimeContext.set('userId', userId);
-    runtimeContext.set('threadId', chatId);
+    runtimeContext.set('chatId', chatId);
     runtimeContext.set('organizationId', organizationId);
     runtimeContext.set('dataSourceId', 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a');
     runtimeContext.set('dataSourceSyntax', 'postgres');
@@ -300,7 +300,7 @@ describe('Analyst Workflow Integration Tests', () => {
 
     const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();
     runtimeContext.set('userId', 'c2dd64cd-f7f3-4884-bc91-d46ae431901e');
-    runtimeContext.set('threadId', crypto.randomUUID());
+    runtimeContext.set('chatId', crypto.randomUUID());
     runtimeContext.set('organizationId', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce');
     runtimeContext.set('dataSourceId', 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a');
     runtimeContext.set('dataSourceSyntax', 'postgres');
@@ -412,7 +412,7 @@ describe('Analyst Workflow Integration Tests', () => {
 
     const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();
     runtimeContext.set('userId', 'c2dd64cd-f7f3-4884-bc91-d46ae431901e');
-    runtimeContext.set('threadId', crypto.randomUUID());
+    runtimeContext.set('chatId', crypto.randomUUID());
     runtimeContext.set('organizationId', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce');
     runtimeContext.set('dataSourceId', 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a');
     runtimeContext.set('dataSourceSyntax', 'postgres');
@@ -454,7 +454,7 @@ describe('Analyst Workflow Integration Tests', () => {
 
     const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();
     runtimeContext.set('userId', 'c2dd64cd-f7f3-4884-bc91-d46ae431901e');
-    runtimeContext.set('threadId', crypto.randomUUID());
+    runtimeContext.set('chatId', crypto.randomUUID());
     runtimeContext.set('organizationId', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce');
     runtimeContext.set('dataSourceId', 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a');
     runtimeContext.set('dataSourceSyntax', 'postgres');

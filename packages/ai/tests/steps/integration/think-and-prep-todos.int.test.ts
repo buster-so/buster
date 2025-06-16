@@ -19,7 +19,7 @@ describe('Think and Prep Step - Todos in Message History Integration', { timeout
   test('should inject todos into message history as tool calls', async () => {
     const runtimeContext = new RuntimeContext<AnalystRuntimeContext>([
       ['userId', '550e8400-e29b-41d4-a716-446655440000'],
-      ['threadId', '550e8400-e29b-41d4-a716-446655440001'],
+      ['chatId', '550e8400-e29b-41d4-a716-446655440001'],
       ['dataSourceId', '550e8400-e29b-41d4-a716-446655440002'],
       ['dataSourceSyntax', 'postgres'],
       ['organizationId', '550e8400-e29b-41d4-a716-446655440003'],
@@ -95,7 +95,7 @@ describe('Think and Prep Step - Todos in Message History Integration', { timeout
   test('should handle conversation history with injected todos', async () => {
     const runtimeContext = new RuntimeContext<AnalystRuntimeContext>([
       ['userId', '550e8400-e29b-41d4-a716-446655440000'],
-      ['threadId', '550e8400-e29b-41d4-a716-446655440001'],
+      ['chatId', '550e8400-e29b-41d4-a716-446655440001'],
       ['dataSourceId', '550e8400-e29b-41d4-a716-446655440002'],
       ['dataSourceSyntax', 'postgres'],
       ['organizationId', '550e8400-e29b-41d4-a716-446655440003'],
@@ -158,7 +158,7 @@ describe('Think and Prep Step - Todos in Message History Integration', { timeout
   test('should properly format empty todos', async () => {
     const runtimeContext = new RuntimeContext<AnalystRuntimeContext>([
       ['userId', '550e8400-e29b-41d4-a716-446655440000'],
-      ['threadId', '550e8400-e29b-41d4-a716-446655440001'],
+      ['chatId', '550e8400-e29b-41d4-a716-446655440001'],
       ['dataSourceId', '550e8400-e29b-41d4-a716-446655440002'],
       ['dataSourceSyntax', 'postgres'],
       ['organizationId', '550e8400-e29b-41d4-a716-446655440003'],

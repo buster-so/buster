@@ -17,7 +17,7 @@ import {
 // Runtime context schema for type safety
 export const AnalystRuntimeContextSchema = z.object({
   userId: z.string(),
-  threadId: z.string(),
+  chatId: z.string(),
   dataSourceId: z.string(),
   dataSourceSyntax: z.string(),
   organizationId: z.string(),

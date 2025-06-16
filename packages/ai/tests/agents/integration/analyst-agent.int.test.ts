@@ -28,13 +28,13 @@ describe('Analyst Agent Integration Tests', () => {
       async (messages: any[]) => {
         // Step 1: Generate response with analyst agent using conversation history
         try {
-          const threadId = 'da05b6fb-01b2-4c1c-bc7f-7e55029a5c75';
+          const chatId = 'da05b6fb-01b2-4c1c-bc7f-7e55029a5c75';
           const resourceId = 'c2dd64cd-f7f3-4884-bc91-d46ae431901e';
 
           // Create runtime context with required properties
           const runtimeContext = new RuntimeContext<AnalystRuntimeContext>([
             ['userId', resourceId],
-            ['threadId', threadId],
+            ['chatId', chatId],
             ['dataSourceId', 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a'],
             ['dataSourceSyntax', 'postgres'],
             ['organizationId', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce'],
@@ -44,7 +44,7 @@ describe('Analyst Agent Integration Tests', () => {
           // Use stream with conversation history instead of single prompt
           const stream = await analystAgent.stream(messages, {
             maxSteps: 15,
-            threadId,
+            chatId,
             resourceId,
             runtimeContext,
             onStepFinish: async (step) => {
@@ -89,13 +89,13 @@ describe('Analyst Agent Integration Tests', () => {
       async (input: string) => {
         // Step 1: Generate response with analyst agent
         try {
-          const threadId = 'da05b6fb-01b2-4c1c-bc7f-7e55029a5c75';
+          const chatId = 'da05b6fb-01b2-4c1c-bc7f-7e55029a5c75';
           const resourceId = 'c2dd64cd-f7f3-4884-bc91-d46ae431901e';
 
           // Create runtime context with required properties
           const runtimeContext = new RuntimeContext<AnalystRuntimeContext>([
             ['userId', resourceId],
-            ['threadId', threadId],
+            ['chatId', chatId],
             ['dataSourceId', 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a'],
             ['dataSourceSyntax', 'postgresql'],
             ['organizationId', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce'],
@@ -103,7 +103,7 @@ describe('Analyst Agent Integration Tests', () => {
 
           const response = await analystAgent.stream(input, {
             maxSteps: 15,
-            threadId,
+            chatId,
             resourceId,
             runtimeContext,
           });

@@ -9,6 +9,11 @@ export type Chat = InferSelectModel<typeof chats>;
 export type Message = InferSelectModel<typeof messages>;
 export type User = InferSelectModel<typeof users>;
 
+// Create a type for updateable chat fields by excluding auto-managed fields
+type UpdateableChatFields = Partial<
+  Omit<typeof chats.$inferInsert, 'id' | 'createdAt' | 'deletedAt'>
+>;
+
 /**
  * Input/output schemas for type safety
  */
@@ -187,4 +192,61 @@ export async function getMessagesForChat(chatId: string): Promise<Message[]> {
     .from(messages)
     .where(and(eq(messages.chatId, chatId), isNull(messages.deletedAt)))
     .orderBy(messages.createdAt);
+}
+
+/**
+ * Flexibly update chat fields - only updates fields that are provided
+ * Accepts a partial Chat object and updates only the provided fields
+ * Note: Some fields like id, createdAt, and deletedAt cannot be updated
+ * @param chatId - The ID of the chat to update
+ * @param fields - Object containing the fields to update (only provided fields will be updated)
+ * @returns Success status
+ */
+export async function updateChatFields(
+  chatId: string,
+  fields: UpdateableChatFields
+): Promise<{ success: boolean }> {
+  try {
+    // First verify the chat exists and is not deleted
+    const existingChat = await db
+      .select({ id: chats.id })
+      .from(chats)
+      .where(and(eq(chats.id, chatId), isNull(chats.deletedAt)))
+      .limit(1);
+
+    if (existingChat.length === 0) {
+      throw new Error(`Chat not found or has been deleted: ${chatId}`);
+    }
+
+    // Build update object with only provided fields
+    const updateData: any = {
+      updatedAt: new Date().toISOString(),
+    };
+
+    // Only add fields that are actually provided (not undefined)
+    for (const [key, value] of Object.entries(fields)) {
+      if (value !== undefined && key !== 'id' && key !== 'createdAt' && key !== 'deletedAt') {
+        updateData[key] = value;
+      }
+    }
+
+    // If updatedAt was explicitly provided, use that instead
+    if ('updatedAt' in fields && fields.updatedAt !== undefined) {
+      updateData.updatedAt = fields.updatedAt;
+    }
+
+    await db
+      .update(chats)
+      .set(updateData)
+      .where(and(eq(chats.id, chatId), isNull(chats.deletedAt)));
+
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to update chat fields:', error);
+    // Re-throw our specific validation errors
+    if (error instanceof Error && error.message.includes('Chat not found')) {
+      throw error;
+    }
+    throw new Error(`Failed to update chat fields for chat ${chatId}`);
+  }
 }
