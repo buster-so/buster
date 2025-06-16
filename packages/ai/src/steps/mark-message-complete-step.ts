@@ -23,17 +23,25 @@ const markMessageCompleteExecution = async ({
 }): Promise<z.infer<typeof outputSchema>> => {
   try {
     const messageId = runtimeContext.get('messageId');
+    const completedAt = new Date().toISOString();
+
+    // If no messageId, this is expected when running without database operations
     if (!messageId) {
-      throw new Error('No messageId found in runtime context');
+      return {
+        messageId: '', // Empty string to indicate no database operation
+        completedAt,
+        success: true,
+      };
     }
 
+    // Update the message in the database
     await updateMessage(messageId, {
       isCompleted: true,
     });
 
     return {
       messageId,
-      completedAt: new Date().toISOString(),
+      completedAt,
       success: true,
     };
   } catch (error) {
