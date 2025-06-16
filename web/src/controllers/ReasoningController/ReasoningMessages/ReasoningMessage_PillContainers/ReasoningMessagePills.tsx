@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, type MotionProps } from 'framer-motion';
 import Link from 'next/link';
 import React from 'react';
 import type { BusterChatMessageReasoning_pill, FileType } from '@/api/asset_interfaces/chat';
@@ -10,7 +10,7 @@ import { cn } from '@/lib/classMerge';
 const duration = 0.25;
 const maxStaggerDuration = 0.12; // 800ms max total duration
 
-const containerVariants = {
+const containerVariants: MotionProps['variants'] = {
   hidden: {
     opacity: 0,
     transition: {
@@ -29,7 +29,7 @@ const containerVariants = {
   }
 };
 
-const pillVariants = {
+const pillVariants: MotionProps['variants'] = {
   hidden: {
     opacity: 0
   },

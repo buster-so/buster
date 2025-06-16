@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, type MotionProps } from 'framer-motion';
 import isEqual from 'lodash/isEqual';
 import React, { useEffect, useMemo, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
@@ -114,7 +114,7 @@ export const EditTrendline: React.FC<{
       });
     });
 
-    const memoizedAnimations = useMemo(() => {
+    const memoizedAnimations: MotionProps = useMemo(() => {
       return {
         animate: {
           opacity: 1,

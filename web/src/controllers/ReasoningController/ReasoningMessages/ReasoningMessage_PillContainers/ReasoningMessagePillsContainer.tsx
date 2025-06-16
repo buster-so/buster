@@ -1,9 +1,9 @@
-import { motion } from 'framer-motion';
+import { motion, type MotionProps } from 'framer-motion';
 import type React from 'react';
 import type { BusterChatMessageReasoning_pills } from '@/api/asset_interfaces/chat';
 import { ReasoningMessagePillContainer } from './ReasoningMessagePillContainer';
 
-const containerVariants = {
+const containerVariants: MotionProps['variants'] = {
   hidden: {},
   visible: {
     transition: {
@@ -13,7 +13,7 @@ const containerVariants = {
   }
 };
 
-const itemVariants = {
+const itemVariants: MotionProps['variants'] = {
   hidden: {
     opacity: 0
   },

@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, type MotionProps } from 'framer-motion';
 import React, { useMemo } from 'react';
 import { cn } from '@/lib/classMerge';
 
@@ -43,7 +43,7 @@ export const ShimmerText: React.FC<ShimmerText2Props> = React.memo(
       };
     }, [gradientColors]);
 
-    const memoizedTransition = useMemo(() => {
+    const memoizedTransition: MotionProps['transition'] = useMemo(() => {
       return {
         duration,
         repeat: Number.POSITIVE_INFINITY,

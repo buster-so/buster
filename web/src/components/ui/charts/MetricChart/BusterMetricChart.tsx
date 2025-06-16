@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, type MotionProps } from 'framer-motion';
 import React, { useMemo } from 'react';
 import { DEFAULT_CHART_CONFIG, DEFAULT_COLUMN_LABEL_FORMAT } from '@/api/asset_interfaces/metric';
 import type { ColumnLabelFormat, MetricChartProps } from '@/api/asset_interfaces/metric/charts';
@@ -164,7 +164,7 @@ export const BusterMetricChart: React.FC<BusterMetricChartProps> = React.memo(
 BusterMetricChart.displayName = 'BusterMetricChart';
 
 const AnimatedTitleWrapper = ({ title, type }: { title: string; type: 'header' | 'subHeader' }) => {
-  const memoizedAnimation = useMemo(() => {
+  const memoizedAnimation: MotionProps = useMemo(() => {
     return {
       initial: {
         opacity: 0,
