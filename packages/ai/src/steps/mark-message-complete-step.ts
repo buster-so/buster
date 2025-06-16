@@ -3,6 +3,12 @@ import { updateChat } from '@buster/database/src/helpers/chats';
 import { createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { z } from 'zod';
+import {
+  MessageHistorySchema,
+  ReasoningHistorySchema,
+  ResponseHistorySchema,
+  StepFinishDataSchema,
+} from '../utils/memory/types';
 import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
 
 // Helper function to format duration
@@ -23,21 +29,44 @@ const formatDuration = (durationMs: number): string => {
   return `${minutes} minute${minutes !== 1 ? 's' : ''} and ${remainingSeconds} second${remainingSeconds !== 1 ? 's' : ''}`;
 };
 
-const inputSchema = z.object({
-  messageId: z.string().describe('The message ID to mark as complete'),
-  success: z.boolean().optional().describe('Whether the message was processed successfully'),
-  metadata: z.record(z.any()).optional().describe('Additional metadata to store'),
+// Analyst-specific metadata schema
+const AnalystMetadataSchema = z.object({
+  toolsUsed: z.array(z.string()).optional(),
+  finalTool: z.string().optional(),
+  doneTool: z.boolean().optional(),
 });
 
+// Input schema matches analyst step output
+const inputSchema = z.object({
+  conversationHistory: MessageHistorySchema,
+  finished: z.boolean().optional(),
+  outputMessages: MessageHistorySchema.optional(),
+  stepData: StepFinishDataSchema.optional(),
+  reasoningHistory: ReasoningHistorySchema,
+  responseHistory: ResponseHistorySchema,
+  metadata: AnalystMetadataSchema.optional(),
+});
+
+// Output schema passes through analyst data plus completion info
 const outputSchema = z.object({
+  conversationHistory: MessageHistorySchema,
+  finished: z.boolean().optional(),
+  outputMessages: MessageHistorySchema.optional(),
+  stepData: StepFinishDataSchema.optional(),
+  reasoningHistory: ReasoningHistorySchema,
+  responseHistory: ResponseHistorySchema,
+  metadata: AnalystMetadataSchema.optional(),
+  // Completion metadata
   messageId: z.string().describe('The message ID that was marked complete'),
   completedAt: z.string().describe('ISO timestamp when the message was marked complete'),
   success: z.boolean().describe('Whether the operation was successful'),
 });
 
 const markMessageCompleteExecution = async ({
+  inputData,
   runtimeContext,
 }: {
+  inputData: z.infer<typeof inputSchema>;
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof outputSchema>> => {
   try {
@@ -56,6 +85,7 @@ const markMessageCompleteExecution = async ({
     // If no messageId, this is expected when running without database operations
     if (!messageId) {
       return {
+        ...inputData, // Pass through all analyst data
         messageId: '', // Empty string to indicate no database operation
         completedAt,
         success: true,
@@ -69,6 +99,7 @@ const markMessageCompleteExecution = async ({
     });
 
     return {
+      ...inputData, // Pass through all analyst data
       messageId,
       completedAt,
       success: true,
