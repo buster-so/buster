@@ -10,7 +10,8 @@ This project uses a comprehensive toolchain to ensure high code quality and cons
 
 #### Biome (Linting & Formatting)
 - **Always run Biome** before committing code
-- Use `npm run check:fix [path]` for complete linting, formatting, and import organization
+- Use `npm run check [path]` to check for linting and formatting issues
+- Use `npm run check:fix [path]` to auto-fix linting, formatting, and import organization
 - Biome configuration is in `biome.json` with strict rules and workspace-specific overrides
 - Key rules enforced:
   - `useImportType: "error"` - Enforces type-only imports for better performance
@@ -23,7 +24,8 @@ This project uses a comprehensive toolchain to ensure high code quality and cons
 - `noUncheckedIndexedAccess: true` - Prevents array/object access bugs
 - `noUnusedLocals/Parameters: true` - Ensures clean code
 - Path aliases configured for clean imports (see individual package tsconfig.json files)
-- Always run `npm run typecheck [workspace]` before committing
+- Use `tsc` directly for type checking: `tsc --noEmit`
+- Or use workspace-specific type checking: `cd packages/ai && tsc --noEmit`
 
 #### Testing with Vitest
 - **All tests use Vitest** for consistency across the monorepo
@@ -80,9 +82,15 @@ npm run test:ui
 
 #### TypeScript Checking
 ```bash
+# Type check entire project
+tsc --noEmit
+
 # Type check specific workspace
+cd packages/ai && tsc --noEmit
+cd packages/database && tsc --noEmit
+
+# Or use the npm script (if available)
 npm run typecheck packages/ai
-npm run typecheck packages/database
 ```
 
 #### Pre-commit & CI
@@ -496,7 +504,7 @@ npm run check packages/ai
 # After making changes
 npm run check:fix packages/ai
 npm run test:file packages/ai/tests/path/to/relevant/test.ts
-npm run typecheck packages/ai
+tsc --noEmit  # or: cd packages/ai && tsc --noEmit
 ```
 
 This ensures high code quality and prevents issues from reaching production.

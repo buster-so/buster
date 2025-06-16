@@ -34,14 +34,13 @@ describe('MaxRows Limiting Tests', () => {
     it('should limit results to exactly 1 row when maxRows=1', async () => {
       // Mock cursor behavior for 1 row limit
       mockClient.query.mockReturnValue(mockCursor);
-      mockCursor.read
-        .mockImplementationOnce((count: number, callback: Function) => {
-          // First read returns 2 rows (more than requested)
-          callback(null, [
-            { id: 1, name: 'User 1' },
-            { id: 2, name: 'User 2' },
-          ]);
-        });
+      mockCursor.read.mockImplementationOnce((count: number, callback: Function) => {
+        // First read returns 2 rows (more than requested)
+        callback(null, [
+          { id: 1, name: 'User 1' },
+          { id: 2, name: 'User 2' },
+        ]);
+      });
       mockCursor.close.mockImplementation((callback: Function) => callback(null));
 
       const result = await adapter.query('SELECT * FROM users', undefined, 1);
@@ -58,12 +57,11 @@ describe('MaxRows Limiting Tests', () => {
         id: i + 1,
         name: `User ${i + 1}`,
       }));
-      
-      mockCursor.read
-        .mockImplementationOnce((count: number, callback: Function) => {
-          // Return 6 rows (more than requested 5)
-          callback(null, allRows.slice(0, 6));
-        });
+
+      mockCursor.read.mockImplementationOnce((count: number, callback: Function) => {
+        // Return 6 rows (more than requested 5)
+        callback(null, allRows.slice(0, 6));
+      });
       mockCursor.close.mockImplementation((callback: Function) => callback(null));
 
       const result = await adapter.query('SELECT * FROM users', undefined, 5);
@@ -138,7 +136,7 @@ describe('MaxRows Limiting Tests', () => {
         id: i + 1,
         name: `User ${i + 1}`,
       }));
-      
+
       mockConnection.execute.mockResolvedValue([
         allRows,
         [
@@ -166,8 +164,20 @@ describe('MaxRows Limiting Tests', () => {
       adapter = new SnowflakeAdapter();
       mockStatement = {
         getColumns: vi.fn().mockReturnValue([
-          { getName: () => 'id', getType: () => 'NUMBER', isNullable: () => false, getScale: () => 0, getPrecision: () => 10 },
-          { getName: () => 'name', getType: () => 'VARCHAR', isNullable: () => true, getScale: () => 0, getPrecision: () => 0 },
+          {
+            getName: () => 'id',
+            getType: () => 'NUMBER',
+            isNullable: () => false,
+            getScale: () => 0,
+            getPrecision: () => 10,
+          },
+          {
+            getName: () => 'name',
+            getType: () => 'VARCHAR',
+            isNullable: () => true,
+            getScale: () => 0,
+            getPrecision: () => 0,
+          },
         ]),
         streamRows: vi.fn(),
       };
@@ -187,7 +197,7 @@ describe('MaxRows Limiting Tests', () => {
     it('should limit results to exactly 1 row when maxRows=1', async () => {
       let dataHandler: Function;
       let endHandler: Function;
-      
+
       mockStream.on.mockImplementation((event: string, handler: Function) => {
         if (event === 'data') dataHandler = handler;
         if (event === 'end') endHandler = handler;
@@ -202,10 +212,10 @@ describe('MaxRows Limiting Tests', () => {
           // Now simulate streaming after complete callback
           dataHandler({ id: 1, name: 'User 1' });
           dataHandler({ id: 2, name: 'User 2' }); // This should trigger destroy
-          
+
           // Verify stream was destroyed after 1 row
           expect(mockStream.destroy).toHaveBeenCalled();
-          
+
           endHandler();
         }, 0);
         return mockStatement;
@@ -245,7 +255,7 @@ describe('MaxRows Limiting Tests', () => {
       let rowHandler: Function;
       let doneHandler: Function;
       let recordsetHandler: Function;
-      
+
       mockRequest.on.mockImplementation((event: string, handler: Function) => {
         if (event === 'row') rowHandler = handler;
         if (event === 'done') doneHandler = handler;
@@ -266,11 +276,11 @@ describe('MaxRows Limiting Tests', () => {
       // Emit rows
       rowHandler!({ id: 1, name: 'User 1' });
       rowHandler!({ id: 2, name: 'User 2' }); // This should trigger pause and cancel
-      
+
       // Verify request was paused and cancelled
       expect(mockRequest.pause).toHaveBeenCalled();
       expect(mockRequest.cancel).toHaveBeenCalled();
-      
+
       doneHandler!();
 
       const result = await queryPromise;
