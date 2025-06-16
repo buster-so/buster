@@ -230,12 +230,22 @@ export type StepFinishData = z.infer<typeof StepFinishDataSchema>;
 export type ThinkAndPrepOutput = z.infer<typeof ThinkAndPrepOutputSchema>;
 
 // Type guards for CoreMessage from AI SDK
-export function isAssistantMessage(message: CoreMessage): boolean {
+export function isAssistantMessage(
+  message: CoreMessage
+): message is CoreMessage & { role: 'assistant' } {
   return message.role === 'assistant';
 }
 
-export function isToolMessage(message: CoreMessage): boolean {
+export function isToolMessage(message: CoreMessage): message is CoreMessage & { role: 'tool' } {
   return message.role === 'tool';
+}
+
+export function isUserMessage(message: CoreMessage): message is CoreMessage & { role: 'user' } {
+  return message.role === 'user';
+}
+
+export function isSystemMessage(message: CoreMessage): message is CoreMessage & { role: 'system' } {
+  return message.role === 'system';
 }
 
 export function hasToolCalls(message: CoreMessage): boolean {
@@ -243,7 +253,54 @@ export function hasToolCalls(message: CoreMessage): boolean {
   return (
     Array.isArray(message.content) &&
     message.content.some(
-      (item) => typeof item === 'object' && 'type' in item && item.type === 'tool-call'
+      (item): item is { type: 'tool-call'; toolCallId: string; toolName: string; args: unknown } =>
+        typeof item === 'object' &&
+        item !== null &&
+        'type' in item &&
+        item.type === 'tool-call' &&
+        'toolCallId' in item &&
+        'toolName' in item
     )
+  );
+}
+
+// Type guard for tool call content
+export function isToolCallContent(
+  content: unknown
+): content is { type: 'tool-call'; toolCallId: string; toolName: string; args: unknown } {
+  return (
+    typeof content === 'object' &&
+    content !== null &&
+    'type' in content &&
+    content.type === 'tool-call' &&
+    'toolCallId' in content &&
+    'toolName' in content
+  );
+}
+
+// Type guard for tool result content
+export function isToolResultContent(
+  content: unknown
+): content is { type: 'tool-result'; toolCallId: string; toolName: string; result: unknown } {
+  return (
+    typeof content === 'object' &&
+    content !== null &&
+    'type' in content &&
+    content.type === 'tool-result' &&
+    'toolCallId' in content &&
+    'toolName' in content &&
+    'result' in content
+  );
+}
+
+// Type guard for text content
+export function isTextContent(content: unknown): content is { type: 'text'; text: string } {
+  return (
+    typeof content === 'object' &&
+    content !== null &&
+    'type' in content &&
+    content.type === 'text' &&
+    'text' in content &&
+    typeof (content as any).text === 'string'
   );
 }

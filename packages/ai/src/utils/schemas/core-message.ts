@@ -121,6 +121,15 @@ export const CoreMessagesSchema = z.array(CoreMessageSchema);
 // Type exports
 export type CoreMessageZod = z.infer<typeof CoreMessageSchema>;
 export type CoreMessagesZod = z.infer<typeof CoreMessagesSchema>;
+export type TextContentZod = z.infer<typeof TextContentSchema>;
+export type ImageContentZod = z.infer<typeof ImageContentSchema>;
+export type ToolCallContentZod = z.infer<typeof ToolCallContentSchema>;
+export type ToolResultContentZod = z.infer<typeof ToolResultContentSchema>;
+export type MessageContentZod = z.infer<typeof MessageContentSchema>;
+export type SystemMessageZod = z.infer<typeof SystemMessageSchema>;
+export type UserMessageZod = z.infer<typeof UserMessageSchema>;
+export type AssistantMessageZod = z.infer<typeof AssistantMessageSchema>;
+export type ToolMessageZod = z.infer<typeof ToolMessageSchema>;
 
 // Type guards
 export function isAssistantMessage(
@@ -135,9 +144,35 @@ export function isToolMessage(
   return message.role === 'tool';
 }
 
+export function isUserMessage(
+  message: CoreMessageZod
+): message is z.infer<typeof UserMessageSchema> {
+  return message.role === 'user';
+}
+
+export function isSystemMessage(
+  message: CoreMessageZod
+): message is z.infer<typeof SystemMessageSchema> {
+  return message.role === 'system';
+}
+
 export function hasToolCalls(message: CoreMessageZod): boolean {
   if (!isAssistantMessage(message)) return false;
   return (
-    Array.isArray(message.content) && message.content.some((item) => item.type === 'tool-call')
+    Array.isArray(message.content) &&
+    message.content.some((item): item is ToolCallContentZod => item.type === 'tool-call')
   );
+}
+
+// Content type guards
+export function isTextContent(content: unknown): content is TextContentZod {
+  return TextContentSchema.safeParse(content).success;
+}
+
+export function isToolCallContent(content: unknown): content is ToolCallContentZod {
+  return ToolCallContentSchema.safeParse(content).success;
+}
+
+export function isToolResultContent(content: unknown): content is ToolResultContentZod {
+  return ToolResultContentSchema.safeParse(content).success;
 }

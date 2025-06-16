@@ -1,7 +1,18 @@
 import { updateMessageFields } from '@buster/database';
-import type { CoreMessage, TextStreamPart } from 'ai';
+import type { CoreMessage, TextStreamPart, ToolSet } from 'ai';
 import type { z } from 'zod';
 import { extractResponseMessages } from './formatLlmMessagesAsReasoning';
+
+/**
+ * AI SDK Type Safety Patterns:
+ * 
+ * 1. TextStreamPart<TOOLS> - Use ToolSet for generic tool support
+ * 2. CoreMessage content arrays - Use specific content part types
+ * 3. Tool calls/results - Use proper generic types with constraints
+ * 
+ * This implementation provides type-safe streaming chunk processing
+ * while maintaining compatibility with AI SDK's type system.
+ */
 
 // Define the reasoning and response types
 type ReasoningEntry = z.infer<typeof import('../memory/types').BusterChatMessageReasoningSchema>;
@@ -14,6 +25,19 @@ interface ToolCallInProgress {
   args?: Record<string, unknown>;
 }
 
+// Content types for assistant messages
+type AssistantMessageContent =
+  | { type: 'text'; text: string }
+  | { type: 'tool-call'; toolCallId: string; toolName: string; args: Record<string, unknown> };
+
+// Generic tool result type for chunk processing
+type GenericToolResult = {
+  type: 'tool-result';
+  toolCallId: string;
+  toolName: string;
+  result: unknown;
+};
+
 interface ChunkProcessorState {
   // Accumulated messages that form the conversation
   accumulatedMessages: CoreMessage[];
@@ -21,7 +45,7 @@ interface ChunkProcessorState {
   // Current assistant message being built
   currentAssistantMessage: {
     role: 'assistant';
-    content: Array<{ type: string; [key: string]: unknown }>;
+    content: AssistantMessageContent[];
   } | null;
 
   // Tool calls currently being streamed
@@ -75,27 +99,31 @@ export class ChunkProcessor {
   /**
    * Process a chunk and potentially save to database
    */
-  async processChunk(chunk: TextStreamPart<any>): Promise<void> {
+  async processChunk(chunk: TextStreamPart<ToolSet> | GenericToolResult): Promise<void> {
     switch (chunk.type) {
       case 'text-delta':
-        this.handleTextDelta(chunk);
+        this.handleTextDelta(chunk as Extract<TextStreamPart<ToolSet>, { type: 'text-delta' }>);
         break;
 
       case 'tool-call':
         // Complete tool call with args already available
-        this.handleToolCall(chunk);
+        this.handleToolCall(chunk as Extract<TextStreamPart<ToolSet>, { type: 'tool-call' }>);
         break;
 
       case 'tool-call-streaming-start':
-        this.handleToolCallStart(chunk);
+        this.handleToolCallStart(
+          chunk as Extract<TextStreamPart<ToolSet>, { type: 'tool-call-streaming-start' }>
+        );
         break;
 
       case 'tool-call-delta':
-        this.handleToolCallDelta(chunk);
+        this.handleToolCallDelta(
+          chunk as Extract<TextStreamPart<ToolSet>, { type: 'tool-call-delta' }>
+        );
         break;
 
       case 'tool-result':
-        await this.handleToolResult(chunk);
+        await this.handleToolResult(chunk as GenericToolResult);
         break;
 
       case 'step-finish':
@@ -111,7 +139,7 @@ export class ChunkProcessor {
     await this.saveIfNeeded();
   }
 
-  private handleTextDelta(chunk: Extract<TextStreamPart<any>, { type: 'text-delta' }>) {
+  private handleTextDelta(chunk: Extract<TextStreamPart<ToolSet>, { type: 'text-delta' }>) {
     if (!this.state.currentAssistantMessage) {
       this.state.currentAssistantMessage = {
         role: 'assistant',
@@ -120,7 +148,9 @@ export class ChunkProcessor {
     }
 
     // Find or create text content part
-    let textPart = this.state.currentAssistantMessage.content.find((part) => part.type === 'text');
+    let textPart = this.state.currentAssistantMessage.content.find(
+      (part): part is { type: 'text'; text: string } => part.type === 'text'
+    );
 
     if (!textPart) {
       textPart = { type: 'text', text: '' };
@@ -130,7 +160,7 @@ export class ChunkProcessor {
     textPart.text += chunk.textDelta || '';
   }
 
-  private handleToolCall(chunk: Extract<TextStreamPart<any>, { type: 'tool-call' }>) {
+  private handleToolCall(chunk: Extract<TextStreamPart<ToolSet>, { type: 'tool-call' }>) {
     if (!this.state.currentAssistantMessage) {
       this.state.currentAssistantMessage = {
         role: 'assistant',
@@ -138,11 +168,11 @@ export class ChunkProcessor {
       };
     }
 
-    const toolCall = {
+    const toolCall: AssistantMessageContent = {
       type: 'tool-call',
       toolCallId: chunk.toolCallId,
       toolName: chunk.toolName,
-      args: chunk.args,
+      args: chunk.args || {},
     };
 
     this.state.currentAssistantMessage.content.push(toolCall);
@@ -177,7 +207,7 @@ export class ChunkProcessor {
   }
 
   private handleToolCallStart(
-    chunk: Extract<TextStreamPart<any>, { type: 'tool-call-streaming-start' }>
+    chunk: Extract<TextStreamPart<ToolSet>, { type: 'tool-call-streaming-start' }>
   ) {
     if (!this.state.currentAssistantMessage) {
       this.state.currentAssistantMessage = {
@@ -186,7 +216,7 @@ export class ChunkProcessor {
       };
     }
 
-    const toolCall = {
+    const toolCall: AssistantMessageContent = {
       type: 'tool-call',
       toolCallId: chunk.toolCallId,
       toolName: chunk.toolName,
@@ -214,7 +244,9 @@ export class ChunkProcessor {
     }
   }
 
-  private handleToolCallDelta(chunk: Extract<TextStreamPart<any>, { type: 'tool-call-delta' }>) {
+  private handleToolCallDelta(
+    chunk: Extract<TextStreamPart<ToolSet>, { type: 'tool-call-delta' }>
+  ) {
     const inProgress = this.state.toolCallsInProgress.get(chunk.toolCallId);
     if (!inProgress) return;
 
@@ -228,7 +260,14 @@ export class ChunkProcessor {
       // Update the tool call in the assistant message
       if (this.state.currentAssistantMessage) {
         const toolCall = this.state.currentAssistantMessage.content.find(
-          (part) =>
+          (
+            part
+          ): part is {
+            type: 'tool-call';
+            toolCallId: string;
+            toolName: string;
+            args: Record<string, unknown>;
+          } =>
             part.type === 'tool-call' &&
             'toolCallId' in part &&
             part.toolCallId === chunk.toolCallId
@@ -258,7 +297,7 @@ export class ChunkProcessor {
     }
   }
 
-  private async handleToolResult(chunk: Extract<TextStreamPart<any>, { type: 'tool-result' }>) {
+  private async handleToolResult(chunk: GenericToolResult) {
     // Finalize current assistant message if exists
     if (this.state.currentAssistantMessage) {
       this.state.accumulatedMessages.push(
@@ -447,11 +486,17 @@ export class ChunkProcessor {
     );
 
     if (entry && typeof entry === 'object') {
-      (entry as any).status = status;
+      // Type-safe update of status
+      if ('status' in entry) {
+        (entry as { status: 'loading' | 'completed' | 'failed' }).status = status;
+      }
 
       // Update file statuses if this is a file-type entry
       if ('files' in entry && entry.files && typeof entry.files === 'object') {
-        const files = entry.files as Record<string, any>;
+        const files = entry.files as Record<
+          string,
+          { status?: 'loading' | 'completed' | 'failed' }
+        >;
         for (const fileId in files) {
           if (files[fileId] && typeof files[fileId] === 'object') {
             files[fileId].status = status;
@@ -461,11 +506,12 @@ export class ChunkProcessor {
 
       if (timing && 'secondary_title' in entry) {
         const seconds = timing / 1000;
+        const entryWithTitle = entry as { secondary_title?: string };
         if (seconds >= 60) {
           const minutes = Math.round(seconds / 60);
-          (entry as any).secondary_title = `${minutes}m`;
+          entryWithTitle.secondary_title = `${minutes}m`;
         } else {
-          (entry as any).secondary_title = `${seconds.toFixed(1)}s`;
+          entryWithTitle.secondary_title = `${seconds.toFixed(1)}s`;
         }
       }
     }
@@ -546,7 +592,14 @@ export class ChunkProcessor {
       case 'executeSql':
       case 'execute-sql':
         if (args.queries && Array.isArray(args.queries)) {
-          const queryText = args.queries.map((q: any) => q.sql || q).join('\n\n');
+          const queryText = args.queries
+            .map((q: unknown) => {
+              if (typeof q === 'object' && q !== null && 'sql' in q) {
+                return (q as { sql: string }).sql;
+              }
+              return String(q);
+            })
+            .join('\n\n');
           return {
             id: toolCallId,
             type: 'text',

@@ -1,4 +1,4 @@
-import type { CoreMessage, TextStreamPart } from 'ai';
+import type { CoreMessage, TextStreamPart, ToolSet } from 'ai';
 import { describe, expect, it, vi } from 'vitest';
 import { ChunkProcessor } from '../../../src/utils/database/chunk-processor';
 
@@ -33,7 +33,7 @@ describe('ChunkProcessor', () => {
         totalThoughts: 3,
         nextThoughtNeeded: true,
       },
-    } as TextStreamPart<any>);
+    } as TextStreamPart<ToolSet>);
 
     // Get the reasoning history
     const reasoning = processor.getReasoningHistory();
@@ -57,7 +57,7 @@ describe('ChunkProcessor', () => {
       args: {
         final_response: 'Here is your analysis summary.',
       },
-    } as TextStreamPart<any>);
+    } as TextStreamPart<ToolSet>);
 
     // Process respondWithoutAnalysis with response
     await processor.processChunk({
@@ -67,10 +67,10 @@ describe('ChunkProcessor', () => {
       args: {
         response: 'I cannot analyze this type of data.',
       },
-    } as TextStreamPart<any>);
+    } as TextStreamPart<ToolSet>);
 
     // Trigger save to finalize messages
-    await processor.processChunk({ type: 'finish' } as TextStreamPart<any>);
+    await processor.processChunk({ type: 'finish' } as TextStreamPart<ToolSet>);
 
     // Get the response history
     const responses = processor.getResponseHistory();
@@ -122,10 +122,10 @@ describe('ChunkProcessor', () => {
         thoughtNumber: 2,
         totalThoughts: 2,
       },
-    } as TextStreamPart<any>);
+    } as TextStreamPart<ToolSet>);
 
     // Trigger save
-    await processor.processChunk({ type: 'finish' } as TextStreamPart<any>);
+    await processor.processChunk({ type: 'finish' } as TextStreamPart<ToolSet>);
 
     // Get reasoning history
     const reasoning = processor.getReasoningHistory();
@@ -153,7 +153,7 @@ describe('ChunkProcessor', () => {
     processor.setInitialMessages([todoMessage]);
 
     // Trigger processing
-    await processor.processChunk({ type: 'finish' } as TextStreamPart<any>);
+    await processor.processChunk({ type: 'finish' } as TextStreamPart<ToolSet>);
 
     const reasoning = processor.getReasoningHistory();
 
