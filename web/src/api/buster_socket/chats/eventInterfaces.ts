@@ -24,11 +24,3 @@ export type ChatEvent_GeneratingResponseMessage = {
   /** The ID of the message that the response message belongs to */
   message_id: string;
 } & EventBase;
-
-export type ChatEvent_GeneratingReasoningMessage = {
-  reasoning: BusterChatMessageReasoning;
-  /** The ID of the chat that the reasoning message belongs to */
-  chat_id: string;
-  /** The ID of the message that the reasoning message belongs to */
-  message_id: string;
-} & EventBase;

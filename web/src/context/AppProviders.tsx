@@ -28,18 +28,16 @@ export const AppProviders: React.FC<
     <SupabaseContextProvider supabaseContext={supabaseContext}>
       <BusterReactQueryProvider>
         <HydrationBoundary state={dehydrate(queryClient)}>
-          <BusterWebSocketProvider>
-            <AppLayoutProvider>
-              <BusterUserConfigProvider>
-                <BusterAssetsProvider>
-                  <BusterNewChatProvider>
-                    <BusterPosthogProvider>{children}</BusterPosthogProvider>
-                    <RoutePrefetcher />
-                  </BusterNewChatProvider>
-                </BusterAssetsProvider>
-              </BusterUserConfigProvider>
-            </AppLayoutProvider>
-          </BusterWebSocketProvider>
+          <AppLayoutProvider>
+            <BusterUserConfigProvider>
+              <BusterAssetsProvider>
+                <BusterNewChatProvider>
+                  <BusterPosthogProvider>{children}</BusterPosthogProvider>
+                  <RoutePrefetcher />
+                </BusterNewChatProvider>
+              </BusterAssetsProvider>
+            </BusterUserConfigProvider>
+          </AppLayoutProvider>
         </HydrationBoundary>
       </BusterReactQueryProvider>
     </SupabaseContextProvider>

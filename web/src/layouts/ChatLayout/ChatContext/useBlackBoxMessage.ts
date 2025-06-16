@@ -1,7 +1,6 @@
 'use client';
 
 import { useQueryClient } from '@tanstack/react-query';
-import last from 'lodash/last';
 import random from 'lodash/random';
 import sample from 'lodash/sample';
 import { useRef } from 'react';
@@ -10,9 +9,9 @@ import type {
   IBusterChatMessage
 } from '@/api/asset_interfaces/chat';
 import { useGetChatMessageMemoized } from '@/api/buster_rest/chats';
-import type { ChatEvent_GeneratingReasoningMessage } from '@/api/buster_socket/chats';
 import { queryKeys } from '@/api/query_keys';
 import { useMemoizedFn, useUnmount } from '@/hooks';
+import last from 'lodash/last';
 
 export const useBlackBoxMessage = () => {
   const timeoutRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
@@ -40,12 +39,19 @@ export const useBlackBoxMessage = () => {
   });
 
   const checkBlackBoxMessage = useMemoizedFn(
-    (message: IBusterChatMessage, event: ChatEvent_GeneratingReasoningMessage) => {
-      const isFinishedReasoningMessage = event.reasoning.status !== 'loading';
-      const isFinishedReasoningLoop = (event.reasoning as BusterChatMessageReasoning_text)
+    (
+      message: Pick<
+        IBusterChatMessage,
+        'id' | 'reasoning_messages' | 'reasoning_message_ids' | 'is_completed'
+      >
+    ) => {
+      const lastReasoningMessageId = last(message.reasoning_message_ids) || '';
+      const lastReasoningMessage = message.reasoning_messages[lastReasoningMessageId];
+      const isFinishedReasoningMessage = lastReasoningMessage?.status !== 'loading';
+      const isFinishedReasoningLoop = (lastReasoningMessage as BusterChatMessageReasoning_text)
         .finished_reasoning;
 
-      if (isFinishedReasoningMessage && !isFinishedReasoningLoop) {
+      if (isFinishedReasoningMessage && !isFinishedReasoningLoop && !message.is_completed) {
         clearTimeoutRef(message.id);
         addBlackBoxMessage({ messageId: message.id });
         _loopAutoThought({ messageId: message.id });
@@ -62,7 +68,7 @@ export const useBlackBoxMessage = () => {
       if (!message) return;
       if (!timeoutRef.current[messageId]) return;
 
-      const isMessageCompletedStream = !!message?.isCompletedStream;
+      const isMessageCompletedStream = !!message?.is_completed;
       const lastReasoningMessageId = last(message?.reasoning_message_ids) || '';
       const lastReasoningMessage = message?.reasoning_messages[lastReasoningMessageId];
       const isLastReasoningMessageCompleted = lastReasoningMessage?.status === 'completed';

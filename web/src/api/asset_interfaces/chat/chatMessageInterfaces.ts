@@ -10,13 +10,14 @@ export type BusterChatMessage = {
   created_at: string;
   final_reasoning_message: string | null;
   feedback: 'negative' | null;
+  is_completed: boolean;
 };
 
 export type BusterChatMessageRequest = null | {
   request: string;
   sender_id: string;
   sender_name: string;
-  sender_avatar?: string;
+  sender_avatar?: string | null;
 };
 
 export type BusterChatMessageResponse =
@@ -27,6 +28,7 @@ export type BusterChatResponseMessage_text = {
   id: string;
   type: 'text';
   message: string;
+  is_final_message?: boolean;
 };
 
 export type BusterChatMessageReasoning_status = 'loading' | 'completed' | 'failed';

@@ -23,7 +23,7 @@ const chatMessageUpgrader = (
   return messageIds.reduce(
     (acc, messageId) => {
       acc[messageId] = create(message[messageId] as IBusterChatMessage, (draft) => {
-        draft.isCompletedStream = !streamingMessageId || streamingMessageId !== messageId;
+        draft.is_completed = !streamingMessageId || streamingMessageId !== messageId;
         return draft;
       });
       return acc;

@@ -2,7 +2,7 @@ import type { IBusterChatMessage } from '@/api/asset_interfaces';
 
 export const mockBusterChatMessage: IBusterChatMessage = {
   id: 'message-1',
-  isCompletedStream: true,
+  is_completed: true,
   created_at: new Date().toISOString(),
   request_message: {
     request: 'test request',

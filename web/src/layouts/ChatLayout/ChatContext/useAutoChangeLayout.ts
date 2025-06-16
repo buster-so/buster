@@ -28,8 +28,8 @@ export const useAutoChangeLayout = ({
   const dashboardVersionNumber = useChatLayoutContextSelector((x) => x.dashboardVersionNumber);
   const metricVersionNumber = useChatLayoutContextSelector((x) => x.metricVersionNumber);
   const currentRoute = useChatLayoutContextSelector((x) => x.currentRoute);
-  const { data: isCompletedStream } = useGetChatMessage(lastMessageId, {
-    select: (x) => x?.isCompletedStream
+  const { data: isCompletedStream = false } = useGetChatMessage(lastMessageId, {
+    select: (x) => x?.is_completed
   });
 
   const getInitialChatFileHref = useGetInitialChatFile();
@@ -65,7 +65,7 @@ export const useAutoChangeLayout = ({
       onSetSelectedFile({ id: lastMessageId, type: 'reasoning', versionNumber: undefined });
     }
 
-    //this will when the chat is completed and it WAS streaming
+    //this happen will when the chat is completed and it WAS streaming
     else if (isCompletedStream && previousIsCompletedStream === false) {
       const chatMessage = getChatMessageMemoized(lastMessageId);
       const lastFileId = findLast(chatMessage?.response_message_ids, (id) => {

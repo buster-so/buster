@@ -1,7 +1,6 @@
 import { useShape, useShapeStream } from '../instances';
 import { useMemo, useRef } from 'react';
 import { chatShape, type BusterChatWithoutMessages } from './shapes';
-import last from 'lodash/last';
 import { useChatUpdate } from '@/context/Chats/useChatUpdate';
 import { useMemoizedFn } from '@/hooks';
 
@@ -30,11 +29,11 @@ export const useTrackAndUpdateChatChanges = (
     updateOperations,
     useMemoizedFn((chat) => {
       if (chat && chat.value) {
-        iteration.current++;
         if (iteration.current > 0) {
           callback?.(chat.value);
           onUpdateChat(chat.value);
         }
+        iteration.current++;
       }
     }),
     subscribe

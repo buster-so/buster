@@ -5,6 +5,7 @@ export interface IBusterChat extends Omit<BusterChat, 'messages'> {
   isNewChat: boolean;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- temporary
 export interface IBusterChatMessage extends BusterChatMessage {
-  isCompletedStream: boolean;
+  //
 }

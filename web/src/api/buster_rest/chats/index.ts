@@ -1,3 +1,3 @@
 export * from './queryRequests';
 export * from './requests';
-export * from './requestsV2';
+export * from './queryRequestsV2';

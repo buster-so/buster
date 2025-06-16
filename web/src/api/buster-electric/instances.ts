@@ -2,15 +2,13 @@ import { useShape as useElectricShape, getShapeStream } from '@electric-sql/reac
 import {
   ChangeMessage,
   isChangeMessage,
-  Message,
-  ShapeStream,
   type BackoffOptions,
   type Row
 } from '@electric-sql/client';
 import { ELECTRIC_BASE_URL } from './config';
 import { useSupabaseContext } from '@/context/Supabase';
-import { useEffect, useMemo } from 'react';
-import { useWhyDidYouUpdate } from '@/hooks';
+import { useEffect, useMemo, useRef } from 'react';
+import { useMount } from '@/hooks';
 
 export type ElectricShapeOptions<T extends Row<unknown> = Row<unknown>> = Omit<
   Parameters<typeof useElectricShape<T>>[0],
@@ -57,21 +55,28 @@ export const useShapeStream = <T extends Row<unknown> = Row<unknown>>(
   subscribe: boolean = true,
   shouldUnsubscribe?: (d: { operationType: string; message: ChangeMessage<T> }) => boolean
 ) => {
+  const controller = useRef(new AbortController());
+  const hasSubscribed = useRef(false);
   const accessToken = useSupabaseContext((state) => state.accessToken);
 
   const shapeParams: Parameters<typeof useElectricShape<T>>[0] = useMemo(() => {
-    return createElectricShape(params, accessToken);
+    return { ...createElectricShape(params, accessToken), signal: controller.current.signal };
   }, [accessToken, params]);
 
   const stream = useMemo(() => getShapeStream<T>(shapeParams), [shapeParams]);
 
   useEffect(() => {
     if (!subscribe) {
-      quit();
+      if (hasSubscribed.current) quit();
       return;
     }
 
+    hasSubscribed.current = true;
     const unsubscribe = stream.subscribe((messages) => {
+      if (!hasSubscribed.current) {
+        hasSubscribed.current = true;
+      }
+
       const filteredMessage = messages.find(
         (m) =>
           isChangeMessage(m) &&
@@ -79,7 +84,7 @@ export const useShapeStream = <T extends Row<unknown> = Row<unknown>>(
           operations.includes(m.headers.operation as `insert` | `update` | `delete`)
       ) as ChangeMessage<T>;
 
-      const isUnsubscribed =
+      const isUnsubscribedTriggered =
         shouldUnsubscribe &&
         shouldUnsubscribe({
           operationType: filteredMessage.headers.operation as `insert` | `update` | `delete`,
@@ -90,7 +95,8 @@ export const useShapeStream = <T extends Row<unknown> = Row<unknown>>(
         onUpdate(filteredMessage);
       }
 
-      if (isUnsubscribed) {
+      if (isUnsubscribedTriggered) {
+        console.log('unsubscibre all isUnsubscribedTriggered');
         unsubscribe();
         quit();
         return;
@@ -103,6 +109,7 @@ export const useShapeStream = <T extends Row<unknown> = Row<unknown>>(
     };
 
     function quit() {
+      controller.current.abort();
       stream.unsubscribeAll();
     }
   }, [operations, onUpdate, shouldUnsubscribe, shapeParams, subscribe]);

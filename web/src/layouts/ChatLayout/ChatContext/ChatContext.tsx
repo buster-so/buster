@@ -10,6 +10,7 @@ import { useAutoChangeLayout } from './useAutoChangeLayout';
 import { useIsFileChanged } from './useIsFileChanged';
 import { useTrackAndUpdateChatChanges } from '@/api/buster-electric/chats';
 import { useTrackAndUpdateMessageChanges } from '@/api/buster-electric/messages';
+import { useChatStreaming } from './useChatStreaming';
 
 const useChatIndividualContext = ({
   chatId,
@@ -39,7 +40,7 @@ const useChatIndividualContext = ({
       const queryKey = queryKeys.chatsMessages(messageId);
       return {
         ...queryKey,
-        select: (data: IBusterChatMessage | undefined) => !data?.isCompletedStream,
+        select: (data: IBusterChatMessage | undefined) => !data?.is_completed,
         enabled: false
       };
     }),
@@ -55,9 +56,7 @@ const useChatIndividualContext = ({
     lastMessageId: currentMessageId,
     chatId
   });
-
-  useTrackAndUpdateMessageChanges({ chatId, messageId: currentMessageId });
-  useTrackAndUpdateChatChanges({ chatId });
+  useChatStreaming({ chatId, messageId: currentMessageId });
 
   return React.useMemo(
     () => ({
@@ -96,6 +95,7 @@ const IndividualChatContext = createContext<ReturnType<typeof useChatIndividualC
 export const ChatContextProvider = React.memo(({ children }: PropsWithChildren) => {
   const chatId = useChatLayoutContextSelector((x) => x.chatId);
   const selectedFile = useChatLayoutContextSelector((x) => x.selectedFile);
+
   const useChatContextValue = useChatIndividualContext({
     chatId,
     selectedFile

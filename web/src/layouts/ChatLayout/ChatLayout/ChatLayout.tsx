@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { AppSplitter, type AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
 import { useBusterNotifications } from '@/context/BusterNotifications';
-import { useLocalStorageState, useMount, useSessionStorageState } from '@/hooks';
+import { useMount } from '@/hooks';
 import { CREATE_LANGFUSE_SESSION_URL } from '@/routes/externalRoutes';
 import { ChatContainer } from '../ChatContainer';
 import { ChatContextProvider } from '../ChatContext/ChatContext';

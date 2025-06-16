@@ -3,7 +3,7 @@
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import dynamic from 'next/dynamic';
 import type React from 'react';
-import { useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useMemo, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import mainApi from '@/api/buster_rest/instances';
 import { defaultAxiosRequestHandler } from '@/api/createAxiosInstance';
@@ -12,6 +12,9 @@ import { isDev } from '@/config';
 import { useSupabaseContext } from '../Supabase/SupabaseContextProvider';
 import { persistOptions } from './createPersister';
 import { getQueryClient } from './getQueryClient';
+import { createHonoInstance } from '@/api/createHonoInstance';
+import { BASE_API_URL_V2 } from '@/api/buster_rest/config';
+import { useContextSelector, createContext } from 'use-context-selector';
 
 const ReactQueryDevtools = dynamic(
   () =>
@@ -35,6 +38,14 @@ const ReactQueryDevtoolsProduction = dynamic(
 
 // Create the persister outside the component
 
+const BusterApiContext = createContext<{
+  honoInstance: ReturnType<typeof createHonoInstance>;
+}>({
+  honoInstance: createHonoInstance(BASE_API_URL_V2, async () => ({
+    access_token: ''
+  }))
+});
+
 export const BusterReactQueryProvider = ({ children }: { children: React.ReactNode }) => {
   const accessToken = useSupabaseContext((state) => state.accessToken);
   const checkTokenValidity = useSupabaseContext((state) => state.checkTokenValidity);
@@ -49,6 +60,12 @@ export const BusterReactQueryProvider = ({ children }: { children: React.ReactNo
     nextApi.interceptors.request.use((v) => defaultAxiosRequestHandler(v, { checkTokenValidity }));
   }, []);
 
+  const busterApiContext = useMemo(() => {
+    return {
+      honoInstance: createHonoInstance(BASE_API_URL_V2, checkTokenValidity)
+    };
+  }, [checkTokenValidity]);
+
   useHotkeys('meta+shift+i', (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -57,7 +74,7 @@ export const BusterReactQueryProvider = ({ children }: { children: React.ReactNo
 
   return (
     <PersistQueryClientProvider client={queryClient} persistOptions={persistOptions}>
-      {children}
+      <BusterApiContext.Provider value={busterApiContext}>{children}</BusterApiContext.Provider>
 
       {isDevToolsOpen && (
         <>
@@ -68,3 +85,7 @@ export const BusterReactQueryProvider = ({ children }: { children: React.ReactNo
     </PersistQueryClientProvider>
   );
 };
+
+export const useBusterApiContextSelector = <T,>(
+  selector: (value: { honoInstance: ReturnType<typeof createHonoInstance> }) => T
+) => useContextSelector(BusterApiContext, selector);

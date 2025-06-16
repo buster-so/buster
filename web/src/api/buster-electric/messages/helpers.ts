@@ -45,5 +45,7 @@ export const updateMessageShapeToIChatMessage = (
     ...(message.feedback !== undefined && { feedback: message.feedback })
   };
 
+  console.log('convertedMessage', convertedMessage);
+
   return convertedMessage;
 };

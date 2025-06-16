@@ -1,7 +1,6 @@
 import type { BusterChat } from '../../asset_interfaces/chat';
 import type { RustApiError } from '../../buster_rest/errors';
 import type {
-  ChatEvent_GeneratingReasoningMessage,
   ChatEvent_GeneratingResponseMessage,
   ChatEvent_GeneratingTitle
 } from './eventInterfaces';
@@ -48,12 +47,6 @@ export type ChatPost_generatingResponseMessage = {
   onError?: (d: unknown | RustApiError) => void;
 };
 
-export type ChatPost_generatingReasoningMessage = {
-  route: '/chats/post:generatingReasoningMessage';
-  callback: (d: ChatEvent_GeneratingReasoningMessage) => void;
-  onError?: (d: unknown | RustApiError) => void;
-};
-
 export type ChatPost_complete = {
   route: '/chats/post:complete';
   callback: (d: BusterChat) => void;
@@ -67,5 +60,4 @@ export type ChatResponseTypes =
   | ChatPost_initializeChat
   | ChatPost_generatingTitle
   | ChatPost_generatingResponseMessage
-  | ChatPost_generatingReasoningMessage
   | ChatPost_complete;

@@ -5,7 +5,7 @@ import { ShareAssetType } from '@/api/asset_interfaces';
 import { useGetChatMemoized, useGetChatMessageMemoized } from '@/api/buster_rest/chats';
 import { useBusterWebSocket } from '@/context/BusterWebSocket';
 import { useBusterNewChat } from './NewChatProvider';
-import { useChatStreamMessage } from './useChatStreamMessage';
+import { useChatStreamMessage } from './useInitializeChat';
 import { useChatUpdate } from './useChatUpdate';
 
 // Mock dependencies

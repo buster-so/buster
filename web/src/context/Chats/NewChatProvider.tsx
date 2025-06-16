@@ -5,23 +5,23 @@ import type React from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
 import type { BusterSearchResult, FileType } from '@/api/asset_interfaces';
 import {
-  startNewChat,
+  useStartNewChat,
   useGetChatMemoized,
-  useGetChatMessageMemoized
+  useGetChatMessageMemoized,
+  useStopChat
 } from '@/api/buster_rest/chats';
-import { useBusterWebSocket } from '@/context/BusterWebSocket';
 import { useMemoizedFn } from '@/hooks';
-import { useChatStreamMessage } from './useChatStreamMessage';
+import { useInitializeChat } from './useInitializeChat';
 import { useChatUpdate } from './useChatUpdate';
 
 export const useBusterNewChat = () => {
-  const busterSocket = useBusterWebSocket();
+  const { mutateAsync: startNewChat } = useStartNewChat();
   const getChatMessageMemoized = useGetChatMessageMemoized();
   const getChatMemoized = useGetChatMemoized();
   const { onUpdateChat, onUpdateChatMessage } = useChatUpdate();
+  const { mutate: stopChatMutation } = useStopChat();
 
-  const { completeChatCallback, stopChatCallback, initializeNewChatCallback } =
-    useChatStreamMessage();
+  const { initializeNewChat } = useInitializeChat();
 
   const onSelectSearchAsset = useMemoizedFn(async (asset: BusterSearchResult) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -45,7 +45,9 @@ export const useBusterNewChat = () => {
         dashboard_id: dashboardId
       });
 
-      initializeNewChatCallback(res);
+      console.log('res', res);
+
+      initializeNewChat(res);
     }
   );
 
@@ -59,7 +61,7 @@ export const useBusterNewChat = () => {
       fileId: string;
       fileType: FileType;
     }) => {
-      onStartNewChat({
+      return onStartNewChat({
         prompt,
         metricId: fileType === 'metric' ? fileId : undefined,
         dashboardId: fileType === 'dashboard' ? fileId : undefined
@@ -92,8 +94,7 @@ export const useBusterNewChat = () => {
         reasoning_message_ids: [],
         response_message_ids: [],
         reasoning_messages: {},
-        final_reasoning_message: null,
-        isCompletedStream: false
+        final_reasoning_message: null
       });
 
       if (messageIndex !== -1 && typeof messageIndex === 'number') {
@@ -104,61 +105,54 @@ export const useBusterNewChat = () => {
         });
       }
 
-      //needed in order to trigger the auto change layout
-      busterSocket.once({
-        route: '/chats/post:initializeChat',
-        callback: initializeNewChatCallback
-      });
+      // //needed in order to trigger the auto change layout
+      // busterSocket.once({
+      //   route: '/chats/post:initializeChat',
+      //   callback: initializeNewChatCallback
+      // });
 
-      await busterSocket.emitAndOnce({
-        emitEvent: {
-          route: '/chats/post',
-          payload: {
-            prompt,
-            message_id: messageId,
-            chat_id: chatId
-          }
-        },
-        responseEvent: {
-          route: '/chats/post:complete',
-          callback: completeChatCallback
-        }
-      });
+      // await busterSocket.emitAndOnce({
+      //   emitEvent: {
+      //     route: '/chats/post',
+      //     payload: {
+      //       prompt,
+      //       message_id: messageId,
+      //       chat_id: chatId
+      //     }
+      //   },
+      //   responseEvent: {
+      //     route: '/chats/post:complete',
+      //     callback: completeChatCallback
+      //   }
+      // });
     }
   );
 
   const onFollowUpChat = useMemoizedFn(
     async ({ prompt, chatId }: { prompt: string; chatId: string }) => {
-      busterSocket.once({
-        route: '/chats/post:initializeChat',
-        callback: initializeNewChatCallback
-      });
-      await busterSocket.emitAndOnce({
-        emitEvent: {
-          route: '/chats/post',
-          payload: {
-            prompt,
-            chat_id: chatId
-          }
-        },
-        responseEvent: {
-          route: '/chats/post:complete',
-          callback: completeChatCallback
-        }
-      });
+      // busterSocket.once({
+      //   route: '/chats/post:initializeChat',
+      //   callback: initializeNewChatCallback
+      // });
+      // await busterSocket.emitAndOnce({
+      //   emitEvent: {
+      //     route: '/chats/post',
+      //     payload: {
+      //       prompt,
+      //       chat_id: chatId
+      //     }
+      //   },
+      //   responseEvent: {
+      //     route: '/chats/post:complete',
+      //     callback: completeChatCallback
+      //   }
+      // });
     }
   );
 
   const onStopChat = useMemoizedFn(
     ({ chatId, messageId }: { chatId: string; messageId: string }) => {
-      busterSocket.emit({
-        route: '/chats/stop',
-        payload: {
-          id: chatId,
-          message_id: messageId
-        }
-      });
-      stopChatCallback(chatId);
+      stopChatMutation(chatId);
     }
   );
 

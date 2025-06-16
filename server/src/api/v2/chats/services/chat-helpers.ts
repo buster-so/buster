@@ -34,6 +34,7 @@ const buildResponseMessages = (responseMessages: unknown): ChatMessage['response
     const validated: ChatMessageResponseMessage[] = parsed.map((item) =>
       ResponseMessageSchema.parse(item)
     );
+
     return validated.reduce<Record<string, ChatMessageResponseMessage>>((acc, item) => {
       acc[item.id] = item;
       return acc;
