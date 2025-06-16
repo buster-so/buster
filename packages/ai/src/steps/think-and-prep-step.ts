@@ -8,6 +8,7 @@ import { parseStreamingArgs as parseRespondWithoutAnalysisArgs } from '../tools/
 import { parseStreamingArgs as parseSequentialThinkingArgs } from '../tools/planning-thinking-tools/sequential-thinking-tool';
 import { ChunkProcessor } from '../utils/database/chunkProcessor';
 import { retryableAgentStreamWithHealing } from '../utils/retry';
+import type { RetryableError } from '../utils/retry/types';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
 import { ToolArgsParser, createOnChunkHandler, handleStreamingError } from '../utils/streaming';
 import type {
@@ -23,10 +24,7 @@ const inputSchema = z.object({
   'extract-values-search': extractValuesSearchOutputSchema,
   'generate-chat-title': generateChatTitleOutputSchema,
 });
-import type {
-  BusterChatMessageReasoning,
-  BusterChatMessageResponse,
-} from '../utils/memory/message-converters';
+
 import {
   extractMessageHistory,
   getAllToolsUsed,
@@ -37,10 +35,15 @@ import {
   createTodoToolCallMessage,
 } from '../utils/memory/todos-to-messages';
 import {
+  type BusterChatMessageReasoningSchema,
+  type BusterChatMessageResponseSchema,
   type MessageHistory,
   type StepFinishData,
   ThinkAndPrepOutputSchema,
 } from '../utils/memory/types';
+
+type BusterChatMessageReasoning = z.infer<typeof BusterChatMessageReasoningSchema>;
+type BusterChatMessageResponse = z.infer<typeof BusterChatMessageResponseSchema>;
 
 const outputSchema = ThinkAndPrepOutputSchema;
 
@@ -120,9 +123,7 @@ const thinkAndPrepExecution = async ({
     // Update chunk processor with initial messages
     chunkProcessor.setInitialMessages(messages);
 
-    // Add todos to reasoning history as well
-    const todoReasoningMessage = createTodoReasoningMessage(todos);
-    chunkProcessor.getReasoningHistory().push(todoReasoningMessage);
+    // Note: Todo reasoning message is handled by the UI layer directly from the tool call message
 
     const wrappedStream = wrapTraced(
       async () => {
@@ -149,11 +150,9 @@ const thinkAndPrepExecution = async ({
           },
           retryConfig: {
             maxRetries: 3,
-            onRetry: (error, attemptNumber) => {
+            onRetry: (error: RetryableError, attemptNumber: number) => {
               // Log retry attempt for debugging
-              console.error(
-                `Think and Prep retry attempt ${attemptNumber} for ${error.type} error`
-              );
+              console.error(`Think and Prep retry attempt ${attemptNumber} for error:`, error);
             },
           },
         });
@@ -199,7 +198,7 @@ const thinkAndPrepExecution = async ({
           runtimeContext,
           abortController,
           maxRetries: 3,
-          onRetry: (error, attemptNumber) => {
+          onRetry: (error: RetryableError, attemptNumber: number) => {
             console.error(
               `Think and Prep stream retry attempt ${attemptNumber} for streaming error:`,
               error
@@ -209,8 +208,6 @@ const thinkAndPrepExecution = async ({
         });
 
         if (healingResult.shouldRetry && healingResult.healingMessage) {
-          console.log('Streaming error healed, healing message:', healingResult.healingMessage);
-
           // Add the healing message to the conversation
           // Note: For now we just log it. A full implementation would need to restart
           // the entire stream processing with the healed conversation.

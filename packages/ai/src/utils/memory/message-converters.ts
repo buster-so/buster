@@ -1,3 +1,4 @@
+import type { AssistantContent } from 'ai';
 import type {
   BusterChatMessageReasoning,
   BusterChatMessageReasoning_file,
@@ -8,8 +9,7 @@ import type {
   BusterChatMessageResponse,
   BusterChatResponseMessage_file,
   BusterChatResponseMessage_text,
-} from '@web/api/asset_interfaces/chat/chatMessageInterfaces';
-import type { AssistantContent } from 'ai';
+} from 'web/src/api/asset_interfaces/chat/chatMessageInterfaces';
 import { z } from 'zod';
 
 // Extract ToolCall type from AssistantContent
@@ -150,7 +150,7 @@ export function convertToolCallToMessage(
         const responseMessage: BusterChatResponseMessage_text = {
           id: toolId,
           type: 'text',
-          message: parsed.message,
+          message: parsed.message
         };
         return { type: 'response', message: responseMessage };
       } catch (error) {

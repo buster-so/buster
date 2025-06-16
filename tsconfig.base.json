@@ -53,7 +53,11 @@
       "@agents/*": ["packages/ai/src/agents/*"],
       "@workflows/*": ["packages/ai/src/workflows/*"],
       "@utils/*": ["packages/ai/src/utils/*"],
-      "@memory/*": ["packages/ai/src/utils/memory/*"]
+      "@memory/*": ["packages/ai/src/utils/memory/*"],
+
+      // Web aliases
+      "@web": ["web/src"],
+      "@web/*": ["web/src/*"],
     },
 
     // Strict type checking (Rust-like experience)

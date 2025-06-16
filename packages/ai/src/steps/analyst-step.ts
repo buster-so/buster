@@ -17,6 +17,7 @@ import {
   ThinkAndPrepOutputSchema,
 } from '../utils/memory/types';
 import { retryableAgentStreamWithHealing } from '../utils/retry';
+import type { RetryableError } from '../utils/retry/types';
 import { ToolArgsParser, createOnChunkHandler, handleStreamingError } from '../utils/streaming';
 import type {
   AnalystRuntimeContext,
@@ -120,9 +121,9 @@ const analystExecution = async ({
           },
           retryConfig: {
             maxRetries: 3,
-            onRetry: (error, attemptNumber) => {
+            onRetry: (error: RetryableError, attemptNumber: number) => {
               // Log retry attempt for debugging
-              console.error(`Analyst retry attempt ${attemptNumber} for ${error.type} error`);
+              console.error(`Analyst retry attempt ${attemptNumber} for error:`, error);
             },
           },
         });
@@ -173,12 +174,12 @@ const analystExecution = async ({
       } else {
         // Check if this is a healable streaming error
         const healingResult = await handleStreamingError(streamError, {
-          agent: analystAgent,
+          agent: analystAgent as typeof analystAgent,
           chunkProcessor,
           runtimeContext,
           abortController,
           maxRetries: 3,
-          onRetry: (error, attemptNumber) => {
+          onRetry: (error: RetryableError, attemptNumber: number) => {
             console.error(
               `Analyst stream retry attempt ${attemptNumber} for streaming error:`,
               error

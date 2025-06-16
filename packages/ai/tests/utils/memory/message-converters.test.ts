@@ -1,10 +1,10 @@
+import type { AssistantContent } from 'ai';
+import { describe, expect, it } from 'vitest';
 import type {
   BusterChatMessageReasoning_files,
   BusterChatMessageReasoning_text,
   BusterChatResponseMessage_text,
-} from '@web/api/asset_interfaces/chat/chatMessageInterfaces';
-import type { AssistantContent } from 'ai';
-import { describe, expect, it } from 'vitest';
+} from 'web/src/api/asset_interfaces/chat/chatMessageInterfaces';
 import {
   convertToolCallToMessage,
   extractMessagesFromToolCalls,

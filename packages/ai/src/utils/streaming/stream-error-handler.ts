@@ -4,8 +4,8 @@ import type { CoreMessage, ToolSet } from 'ai';
 import type { ChunkProcessor } from '../database/chunkProcessor';
 import { healStreamingToolError, isHealableStreamError } from './tool-healing';
 
-export interface StreamErrorHandlerConfig<T extends ToolSet> {
-  agent: Agent<T>;
+export interface StreamErrorHandlerConfig {
+  agent: Agent<string, Record<string, any>, Record<string, any>>;
   chunkProcessor: ChunkProcessor;
   runtimeContext: RuntimeContext<unknown>;
   abortController: AbortController;
