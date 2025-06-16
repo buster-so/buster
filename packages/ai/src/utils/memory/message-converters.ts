@@ -1,95 +1,19 @@
+import type {
+  BusterChatMessageReasoning,
+  BusterChatMessageReasoning_file,
+  BusterChatMessageReasoning_files,
+  BusterChatMessageReasoning_pills,
+  BusterChatMessageReasoning_status,
+  BusterChatMessageReasoning_text,
+  BusterChatMessageResponse,
+  BusterChatResponseMessage_file,
+  BusterChatResponseMessage_text,
+} from '@web/api/asset_interfaces/chat/chatMessageInterfaces';
 import type { AssistantContent } from 'ai';
+import { z } from 'zod';
 
 // Extract ToolCall type from AssistantContent
 type ToolCall = Extract<AssistantContent, { type: 'tool-call' }>;
-import { z } from 'zod';
-
-// Import message types from the web package
-export type BusterChatMessageReasoning =
-  | BusterChatMessageReasoning_pills
-  | BusterChatMessageReasoning_text
-  | BusterChatMessageReasoning_files;
-
-export type BusterChatMessageResponse =
-  | BusterChatResponseMessage_text
-  | BusterChatResponseMessage_file;
-
-// Type definitions matching the chat message interfaces
-export interface BusterChatResponseMessage_text {
-  id: string;
-  type: 'text';
-  message: string;
-  message_chunk?: string;
-  is_final_message: boolean;
-}
-
-export interface BusterChatResponseMessage_file {
-  id: string;
-  type: 'file';
-  file_type: 'metric' | 'dashboard' | 'todo';
-  file_name: string;
-  version_number: number;
-  filter_version_id: string | null;
-  metadata?: Array<{
-    status: string;
-    message: string;
-    timestamp?: number;
-  }>;
-}
-
-export interface BusterChatMessageReasoning_text {
-  id: string;
-  type: 'text';
-  title: string;
-  secondary_title?: string | undefined;
-  message?: string;
-  message_chunk?: string;
-  status: 'loading' | 'completed' | 'failed';
-  finished_reasoning?: boolean;
-}
-
-export interface BusterChatMessageReasoning_pill {
-  text: string;
-  type: string | null;
-  id: string;
-}
-
-export interface BusterChatMessageReasoning_pillContainer {
-  title: string;
-  pills: BusterChatMessageReasoning_pill[];
-}
-
-export interface BusterChatMessageReasoning_pills {
-  id: string;
-  type: 'pills';
-  title: string;
-  secondary_title?: string | undefined;
-  pill_containers: BusterChatMessageReasoning_pillContainer[];
-  status: 'loading' | 'completed' | 'failed';
-}
-
-export interface BusterChatMessageReasoning_file {
-  id: string;
-  file_type: 'metric' | 'dashboard' | 'todo';
-  file_name: string;
-  version_number: number;
-  status: 'loading' | 'completed' | 'failed';
-  file: {
-    text?: string | undefined;
-    text_chunk?: string | undefined;
-    modified?: [number, number][];
-  };
-}
-
-export interface BusterChatMessageReasoning_files {
-  id: string;
-  type: 'files';
-  title: string;
-  status: 'loading' | 'completed' | 'failed';
-  secondary_title?: string | undefined;
-  file_ids: string[];
-  files: Record<string, BusterChatMessageReasoning_file>;
-}
 
 // Tool result schemas
 const DoneToolResultSchema = z.object({
@@ -185,7 +109,7 @@ type ParsedToolResult =
 export function convertToolCallToMessage(
   toolCall: ToolCall,
   toolResult: ParsedToolResult | string | null,
-  status: 'loading' | 'completed' | 'failed' = 'completed'
+  status: BusterChatMessageReasoning_status = 'completed'
 ): {
   type: 'reasoning' | 'response';
   message: BusterChatMessageReasoning | BusterChatMessageResponse;
@@ -210,7 +134,6 @@ export function convertToolCallToMessage(
           id: toolId,
           type: 'text',
           message: parsed.message,
-          is_final_message: true,
         };
         return { type: 'response', message: responseMessage };
       } catch (error) {
@@ -228,7 +151,6 @@ export function convertToolCallToMessage(
           id: toolId,
           type: 'text',
           message: parsed.message,
-          is_final_message: true,
         };
         return { type: 'response', message: responseMessage };
       } catch (error) {
@@ -271,7 +193,7 @@ export function convertToolCallToMessage(
           fileIds.push(file.id);
           files[file.id] = {
             id: file.id,
-            file_type: 'metric',
+            file_type: 'metric' as const,
             file_name: file.name,
             version_number: file.version_number,
             status: 'completed',
@@ -289,7 +211,7 @@ export function convertToolCallToMessage(
           fileIds.push(failedId);
           files[failedId] = {
             id: failedId,
-            file_type: 'metric',
+            file_type: 'metric' as const,
             file_name: failedFile.name,
             version_number: 0,
             status: 'failed',
@@ -349,7 +271,7 @@ export function convertToolCallToMessage(
           fileIds.push(file.id);
           files[file.id] = {
             id: file.id,
-            file_type: 'dashboard',
+            file_type: 'dashboard' as const,
             file_name: file.name,
             version_number: file.version_number,
             status: 'completed',
@@ -367,7 +289,7 @@ export function convertToolCallToMessage(
           fileIds.push(failedId);
           files[failedId] = {
             id: failedId,
-            file_type: 'dashboard',
+            file_type: 'dashboard' as const,
             file_name: failedFile.name,
             version_number: 0,
             status: 'failed',
@@ -407,7 +329,7 @@ export function convertToolCallToMessage(
           fileIds.push(file.id);
           files[file.id] = {
             id: file.id,
-            file_type: 'metric',
+            file_type: 'metric' as const,
             file_name: file.name,
             version_number: file.version_number,
             status: 'completed',
@@ -425,7 +347,7 @@ export function convertToolCallToMessage(
           fileIds.push(failedId);
           files[failedId] = {
             id: failedId,
-            file_type: 'metric',
+            file_type: 'metric' as const,
             file_name: failedFile.file_name,
             version_number: 0,
             status: 'failed',
@@ -465,7 +387,7 @@ export function convertToolCallToMessage(
           fileIds.push(file.id);
           files[file.id] = {
             id: file.id,
-            file_type: 'dashboard',
+            file_type: 'dashboard' as const,
             file_name: file.name,
             version_number: file.version_number,
             status: 'completed',
@@ -483,7 +405,7 @@ export function convertToolCallToMessage(
           fileIds.push(failedId);
           files[failedId] = {
             id: failedId,
-            file_type: 'dashboard',
+            file_type: 'dashboard' as const,
             file_name: failedFile.file_name,
             version_number: 0,
             status: 'failed',

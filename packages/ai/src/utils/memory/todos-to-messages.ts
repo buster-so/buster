@@ -1,5 +1,5 @@
+import type { BusterChatMessageReasoning_files } from '@web/api/asset_interfaces/chat/chatMessageInterfaces';
 import type { CoreMessage } from 'ai';
-import type { BusterChatMessageReasoning_files } from './message-converters';
 
 /**
  * Creates an assistant message with a tool call for creating todos
@@ -43,8 +43,8 @@ export function createTodoReasoningMessage(todos: string): BusterChatMessageReas
     files: {
       [fileId]: {
         id: fileId,
-        file_type: 'todo',
-        file_name: 'todos.md',
+        file_type: 'agent-action',
+        file_name: 'todos',
         version_number: 1,
         status: 'completed',
         file: {

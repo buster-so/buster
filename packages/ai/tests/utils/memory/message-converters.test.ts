@@ -1,9 +1,11 @@
+import type {
+  BusterChatMessageReasoning_files,
+  BusterChatMessageReasoning_text,
+  BusterChatResponseMessage_text,
+} from '@web/api/asset_interfaces/chat/chatMessageInterfaces';
 import type { AssistantContent } from 'ai';
 import { describe, expect, it } from 'vitest';
 import {
-  type BusterChatMessageReasoning_files,
-  type BusterChatMessageReasoning_text,
-  type BusterChatResponseMessage_text,
   convertToolCallToMessage,
   extractMessagesFromToolCalls,
 } from '../../../src/utils/memory/message-converters';
@@ -40,7 +42,6 @@ describe('message-converters', () => {
           id: 'test-id-1',
           type: 'text',
           message: 'Analysis complete',
-          is_final_message: true,
         } as BusterChatResponseMessage_text);
       });
 
@@ -70,7 +71,6 @@ describe('message-converters', () => {
           id: 'test-id-3',
           type: 'text',
           message: 'Quick response',
-          is_final_message: true,
         } as BusterChatResponseMessage_text);
       });
     });
@@ -326,7 +326,6 @@ describe('message-converters', () => {
       expect(responseMessages[0]).toMatchObject({
         type: 'text',
         message: 'All done!',
-        is_final_message: true,
       });
     });
 
@@ -437,7 +436,6 @@ describe('message-converters', () => {
       expect(responseMessages[0]).toMatchObject({
         type: 'text',
         message: 'Analysis complete with 1 metric and 1 dashboard created.',
-        is_final_message: true,
       });
     });
   });
