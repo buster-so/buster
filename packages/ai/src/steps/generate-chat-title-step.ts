@@ -68,11 +68,15 @@ const generateChatTitleExecution = async ({
     const messageId = runtimeContext.get('messageId');
 
     // Run database updates concurrently
-    const updatePromises = [
-      updateChat(chatId, {
-        title: title.title,
-      }),
-    ];
+    const updatePromises: Promise<{ success: boolean }>[] = [];
+
+    if (chatId) {
+      updatePromises.push(
+        updateChat(chatId, {
+          title: title.title,
+        })
+      );
+    }
 
     if (messageId) {
       updatePromises.push(
