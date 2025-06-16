@@ -1,5 +1,5 @@
 import { getUserOrganizationId } from '@buster/database';
-import type { User } from '@supabase/supabase-js';
+import type { User } from '@buster/database';
 import { tasks } from '@trigger.dev/sdk/v3';
 import {
   type ChatCreateHandlerRequest,
@@ -7,7 +7,8 @@ import {
   ChatError,
   ChatErrorCode,
 } from '../../../types/chat-types';
-import { handleAssetChat, initializeChat } from './services/chat-service';
+import { handleAssetChat } from './services/chat-helpers';
+import { initializeChat } from './services/chat-service';
 
 /**
  * Handler function for creating a new chat.
@@ -62,7 +63,7 @@ export async function createChatHandler(
         messageId,
         request.asset_id,
         request.asset_type,
-        user.id,
+        user,
         chat
       );
     }
@@ -105,7 +106,7 @@ export async function createChatHandler(
       console.warn('Slow chat creation detected:', {
         duration: `${duration}ms`,
         target: '500ms',
-        userId: user.id,
+        user,
         chatId,
         hasPrompt: !!request.prompt,
         hasAsset: !!request.asset_id,
@@ -117,7 +118,7 @@ export async function createChatHandler(
   } catch (error) {
     // Log error with context
     console.error('Chat creation failed:', {
-      userId: user.id,
+      user,
       duration: Date.now() - startTime,
       request: {
         hasPrompt: !!request.prompt,
@@ -137,7 +138,7 @@ export async function createChatHandler(
 
     // Re-throw ChatError instances
     if (error instanceof ChatError) {
-      throw error;
+      throw error.toResponse();
     }
 
     // Wrap unexpected errors
@@ -148,6 +149,6 @@ export async function createChatHandler(
       {
         originalError: error instanceof Error ? error.message : String(error),
       }
-    );
+    ).toResponse();
   }
 }

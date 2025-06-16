@@ -11,8 +11,4 @@ const app = new Hono()
   .route('/healthcheck', healthcheckRoutes)
   .route('/chats', chatsRoutes);
 
-// TODO: Add more feature routes as they are created
-// import datasetRoutes from './datasets';
-// app.route('/datasets', datasetRoutes);
-
 export default app;

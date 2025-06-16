@@ -1,3 +1,4 @@
+import { db, eq, getUser, users } from '@buster/database';
 import type { Context, Next } from 'hono';
 import { bearerAuth } from 'hono/bearer-auth';
 import { createSupabaseClient } from './supabase';
@@ -12,7 +13,14 @@ export const requireAuth = bearerAuth({
       return false;
     }
 
+    const busterUser = await getUser({ id: data.user.id });
+
+    if (!busterUser) {
+      return false;
+    }
+
     c.set('supabaseUser', data.user);
+    c.set('busterUser', busterUser);
 
     return !!data.user.is_anonymous === false;
   },

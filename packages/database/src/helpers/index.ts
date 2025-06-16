@@ -1,5 +1,6 @@
 // Export all database helpers
 export * from './messages';
+export * from './users';
 
 // Message helpers (domain-organized)
 export {

@@ -50,7 +50,6 @@ export async function getUserOrganizationId(userId: string): Promise<{
       role: result[0].role,
     };
   } catch (error) {
-    console.log('error', error);
     if (error instanceof z.ZodError) {
       throw new Error(
         `Invalid user organization input: ${error.errors.map((e) => e.message).join(', ')}`

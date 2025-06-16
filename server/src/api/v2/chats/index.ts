@@ -4,7 +4,7 @@ import { requireAuth } from '../../../middleware/auth';
 import {
   ChatCreateRequestSchema,
   type ChatCreateResponse,
-  ChatCreateResponseSchema
+  ChatCreateResponseSchema,
 } from '../../../types/chat-types/chat.types';
 import '../../../types/hono.types'; //I added this to fix intermitent type errors. Could probably be removed.
 import { HTTPException } from 'hono/http-exception';
@@ -18,7 +18,8 @@ const app = new Hono()
   .post('/', zValidator('json', ChatCreateRequestSchema), async (c) => {
     try {
       const request = c.req.valid('json');
-      const user = c.get('supabaseUser');
+      const user = c.get('busterUser');
+
       // Call the handler function with user context
       const response = await createChatHandler(request, user);
       // Validate response against schema
@@ -27,14 +28,15 @@ const app = new Hono()
     } catch (error: unknown) {
       // Handle ChatError instances with proper status codes
       if (error instanceof ChatError) {
+        const errorResponse = error.toResponse();
         throw new HTTPException(error.statusCode, {
-          message: error.message
+          message: errorResponse.error.message,
         });
       }
 
       console.error('Error creating chat:', error);
       throw new HTTPException(500, {
-        message: 'Failed to create chat'
+        message: 'Failed to create chat',
       });
     }
   });
