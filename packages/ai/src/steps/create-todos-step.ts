@@ -4,11 +4,9 @@ import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { anthropicCachedModel } from '../utils/models/anthropic-cached';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
-import type { thinkAndPrepWorkflowInputSchema } from '../workflows/analyst-workflow';
+import { thinkAndPrepWorkflowInputSchema } from '../workflows/analyst-workflow';
 
-const inputSchema = z.object({
-  // This step receives initial workflow input through getInitData
-});
+const inputSchema = thinkAndPrepWorkflowInputSchema;
 
 export const createTodosOutputSchema = z.object({
   todos: z.string().describe('The todos that the agent will work on.'),
@@ -137,16 +135,14 @@ export const todosAgent = new Agent({
 });
 
 const todoStepExecution = async ({
-  getInitData,
+  inputData,
 }: {
   inputData: z.infer<typeof inputSchema>;
-  getInitData: () => Promise<z.infer<typeof thinkAndPrepWorkflowInputSchema>>;
 }): Promise<z.infer<typeof createTodosOutputSchema>> => {
   try {
-    // Get the workflow input data
-    const initData = await getInitData();
-    const prompt = initData.prompt;
-    const conversationHistory = initData.conversationHistory;
+    // Use the input data directly
+    const prompt = inputData.prompt;
+    const conversationHistory = inputData.conversationHistory;
 
     // Prepare messages for the agent
     let messages: CoreMessage[];

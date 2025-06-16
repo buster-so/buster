@@ -7,14 +7,10 @@ import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { anthropicCachedModel } from '../utils/models/anthropic-cached';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
-import type {
-  AnalystRuntimeContext,
-  thinkAndPrepWorkflowInputSchema,
-} from '../workflows/analyst-workflow';
+import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
+import { thinkAndPrepWorkflowInputSchema } from '../workflows/analyst-workflow';
 
-const inputSchema = z.object({
-  // This step receives initial workflow input through getInitData
-});
+const inputSchema = thinkAndPrepWorkflowInputSchema;
 
 export const generateChatTitleOutputSchema = z.object({
   title: z.string().describe('The title for the chat.'),
@@ -31,18 +27,16 @@ const todosAgent = new Agent({
 });
 
 const generateChatTitleExecution = async ({
-  getInitData,
+  inputData,
   runtimeContext,
 }: {
   inputData: z.infer<typeof inputSchema>;
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
-  getInitData: () => Promise<z.infer<typeof thinkAndPrepWorkflowInputSchema>>;
 }): Promise<z.infer<typeof generateChatTitleOutputSchema>> => {
   try {
-    // Get the workflow input data
-    const initData = await getInitData();
-    const prompt = initData.prompt;
-    const conversationHistory = initData.conversationHistory;
+    // Use the input data directly
+    const prompt = inputData.prompt;
+    const conversationHistory = inputData.conversationHistory;
 
     // Prepare messages for the agent
     let messages: CoreMessage[];
