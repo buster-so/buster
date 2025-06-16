@@ -1,6 +1,6 @@
 import type { Agent } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
-import type { CoreMessage, StepResult, StreamTextResult, ToolSet } from 'ai';
+import type { CoreMessage, StepResult, StreamTextResult, TextStreamPart, ToolSet } from 'ai';
 
 export interface RetryableError {
   type: 'no-such-tool' | 'invalid-tool-arguments' | 'empty-response';
@@ -18,7 +18,7 @@ export interface AgentStreamOptions<T extends ToolSet> {
   abortSignal?: AbortSignal;
   toolChoice?: 'auto' | 'required' | 'none';
   onStepFinish?: (step: StepResult<T>) => Promise<void>;
-  onChunk?: (event: { chunk: any }) => Promise<void> | void;
+  onChunk?: (event: { chunk: TextStreamPart<T> }) => Promise<void> | void;
 }
 
 export interface RetryableAgentStreamParams<T extends ToolSet> {

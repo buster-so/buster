@@ -150,11 +150,11 @@ export function convertToolCallToMessage(
         const responseMessage: BusterChatResponseMessage_text = {
           id: toolId,
           type: 'text',
-          message: parsed.message
+          message: parsed.message,
         };
         return { type: 'response', message: responseMessage };
       } catch (error) {
-        console.error(`Failed to parse tool result:`, error, toolResult);
+        console.error('Failed to parse tool result:', error, toolResult);
         return null;
       }
     }
@@ -175,7 +175,7 @@ export function convertToolCallToMessage(
         };
         return { type: 'reasoning', message: reasoningMessage };
       } catch (error) {
-        console.error(`Failed to parse tool result:`, error, toolResult);
+        console.error('Failed to parse tool result:', error, toolResult);
         return null;
       }
     }
@@ -233,7 +233,7 @@ export function convertToolCallToMessage(
         };
         return { type: 'reasoning', message: reasoningMessage };
       } catch (error) {
-        console.error(`Failed to parse tool result:`, error, toolResult);
+        console.error('Failed to parse tool result:', error, toolResult);
         return null;
       }
     }
@@ -253,7 +253,7 @@ export function convertToolCallToMessage(
         };
         return { type: 'reasoning', message: reasoningMessage };
       } catch (error) {
-        console.error(`Failed to parse tool result:`, error, toolResult);
+        console.error('Failed to parse tool result:', error, toolResult);
         return null;
       }
     }
@@ -311,7 +311,7 @@ export function convertToolCallToMessage(
         };
         return { type: 'reasoning', message: reasoningMessage };
       } catch (error) {
-        console.error(`Failed to parse tool result:`, error, toolResult);
+        console.error('Failed to parse tool result:', error, toolResult);
         return null;
       }
     }
@@ -369,7 +369,7 @@ export function convertToolCallToMessage(
         };
         return { type: 'reasoning', message: reasoningMessage };
       } catch (error) {
-        console.error(`Failed to parse tool result:`, error, toolResult);
+        console.error('Failed to parse tool result:', error, toolResult);
         return null;
       }
     }
@@ -427,7 +427,7 @@ export function convertToolCallToMessage(
         };
         return { type: 'reasoning', message: reasoningMessage };
       } catch (error) {
-        console.error(`Failed to parse tool result:`, error, toolResult);
+        console.error('Failed to parse tool result:', error, toolResult);
         return null;
       }
     }

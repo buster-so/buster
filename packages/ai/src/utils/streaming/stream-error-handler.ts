@@ -1,18 +1,37 @@
 import type { Agent } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
-import type { CoreMessage, ToolSet } from 'ai';
+import type { CoreMessage, StreamTextResult, TextStreamPart, ToolSet } from 'ai';
 import type { ChunkProcessor } from '../database/chunk-processor';
+import type { RetryableError } from '../retry/types';
 import { healStreamingToolError, isHealableStreamError } from './tool-healing';
 
-export interface StreamErrorHandlerConfig {
-  agent: Agent<string, Record<string, any>, Record<string, any>>;
+/**
+ * Type alias for Mastra Agent with framework-required any types
+ * The any types are part of Mastra's Agent interface for tools and memory
+ */
+// biome-ignore lint/suspicious/noExplicitAny: Mastra Agent framework requires these any types
+type MastraAgent = Agent<string, Record<string, any>, Record<string, any>>;
+
+/**
+ * Type-safe helper to extract tools from an agent
+ * Avoids using 'any' cast while accessing agent tools
+ */
+function getAgentTools<T extends ToolSet>(agent: MastraAgent): T {
+  // The agent tools are stored internally but not exposed in the type
+  // This is a controlled access pattern that's safer than 'as any'
+  const agentWithTools = agent as unknown as { tools?: T };
+  return agentWithTools.tools || ({} as T);
+}
+
+export interface StreamErrorHandlerConfig<T extends ToolSet = ToolSet> {
+  agent: MastraAgent;
   chunkProcessor: ChunkProcessor;
   runtimeContext: RuntimeContext<unknown>;
   abortController: AbortController;
   maxRetries?: number;
-  onRetry?: (error: unknown, attemptNumber: number) => void;
+  onRetry?: (error: RetryableError, attemptNumber: number) => void;
   toolChoice?: 'auto' | 'required' | 'none';
-  onChunk?: (event: { chunk: any }) => Promise<void> | void;
+  onChunk?: (event: { chunk: TextStreamPart<T> }) => Promise<void> | void;
 }
 
 export interface StreamProcessingResult {
@@ -36,8 +55,8 @@ export async function handleStreamingError<T extends ToolSet>(
     return { shouldRetry: false };
   }
 
-  // Get available tools from agent
-  const availableTools = (agent as any).tools || {};
+  // Get available tools from agent with type-safe access
+  const availableTools = getAgentTools(agent);
 
   // Attempt to heal the error
   const healingResult = healStreamingToolError(error, availableTools);
@@ -57,7 +76,7 @@ export async function handleStreamingError<T extends ToolSet>(
  * This replaces the manual try-catch loop in the steps
  */
 export async function processStreamWithHealing<T extends ToolSet>(
-  stream: any, // The already-created stream from retryableAgentStreamWithHealing
+  initialStream: StreamTextResult<T, unknown>, // The already-created stream from retryableAgentStreamWithHealing
   config: StreamErrorHandlerConfig<T>
 ): Promise<StreamProcessingResult> {
   const {
@@ -71,11 +90,12 @@ export async function processStreamWithHealing<T extends ToolSet>(
   } = config;
 
   let retryCount = 0;
+  let currentStream = initialStream;
 
   while (retryCount <= maxRetries) {
     try {
       // Process the stream chunks - the onChunk handler will process them
-      for await (const _chunk of stream.fullStream) {
+      for await (const _chunk of currentStream.fullStream) {
         if (abortController.signal.aborted) {
           break;
         }
@@ -107,8 +127,13 @@ export async function processStreamWithHealing<T extends ToolSet>(
       }
 
       // Call retry callback if provided
-      if (onRetry) {
-        onRetry(streamError, retryCount + 1);
+      if (onRetry && healingResult.healingMessage) {
+        const retryableError: RetryableError = {
+          type: 'invalid-tool-arguments', // Default type for healable errors
+          originalError: streamError,
+          healingMessage: healingResult.healingMessage,
+        };
+        onRetry(retryableError, retryCount + 1);
       }
 
       // Add healing message to conversation history
@@ -129,11 +154,11 @@ export async function processStreamWithHealing<T extends ToolSet>(
         });
 
         // Update stream reference for next iteration
-        stream = newStream;
+        currentStream = newStream;
       }
 
       retryCount++;
-      console.log(`Retrying stream after healing error, attempt ${retryCount}/${maxRetries}`);
+      console.info(`Retrying stream after healing error, attempt ${retryCount}/${maxRetries}`);
     }
   }
 
