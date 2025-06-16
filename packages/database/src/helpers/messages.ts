@@ -5,6 +5,11 @@ import { messages } from '../schema';
 
 export type Message = InferSelectModel<typeof messages>;
 
+// Create a type for updateable message fields by excluding auto-managed fields
+type UpdateableMessageFields = Partial<
+  Omit<typeof messages.$inferInsert, 'id' | 'createdAt' | 'deletedAt'>
+>;
+
 /**
  * Get raw LLM messages from a specific message record
  * @param messageId - The ID of the message record
@@ -303,5 +308,72 @@ export async function updateMessageFields(
       throw error;
     }
     throw new Error(`Failed to update message fields for message ${messageId}`);
+  }
+}
+
+/**
+ * Flexibly update any message fields - only updates fields that are provided
+ * Accepts a partial Message object and updates only the provided fields
+ * Note: Some fields like id, createdAt, and deletedAt cannot be updated
+ * Note: reasoning field has NOT NULL constraint, so null values are not allowed
+ * @param messageId - The ID of the message to update
+ * @param fields - Partial Message object containing the fields to update
+ * @returns Success status
+ */
+export async function updateMessage(
+  messageId: string,
+  fields: UpdateableMessageFields
+): Promise<{ success: boolean }> {
+  try {
+    // First verify the message exists and is not deleted
+    const existingMessage = await db
+      .select({ id: messages.id })
+      .from(messages)
+      .where(and(eq(messages.id, messageId), isNull(messages.deletedAt)))
+      .limit(1);
+
+    if (existingMessage.length === 0) {
+      throw new Error(`Message not found or has been deleted: ${messageId}`);
+    }
+
+    // Validate reasoning is not null if provided (database constraint)
+    if ('reasoning' in fields && (fields.reasoning === null || fields.reasoning === undefined)) {
+      throw new Error('Reasoning cannot be null - database constraint violation');
+    }
+
+    // Remove undefined fields and build update object
+    const updateData: any = {
+      updatedAt: new Date().toISOString(),
+    };
+
+    // Only add fields that are actually provided (not undefined)
+    for (const [key, value] of Object.entries(fields)) {
+      if (value !== undefined && key !== 'id' && key !== 'createdAt' && key !== 'deletedAt') {
+        updateData[key] = value;
+      }
+    }
+
+    // If updatedAt was explicitly provided, use that instead
+    if ('updatedAt' in fields && fields.updatedAt !== undefined) {
+      updateData.updatedAt = fields.updatedAt;
+    }
+
+    await db
+      .update(messages)
+      .set(updateData)
+      .where(and(eq(messages.id, messageId), isNull(messages.deletedAt)));
+
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to update message:', error);
+    // Re-throw our specific validation errors
+    if (
+      error instanceof Error &&
+      (error.message.includes('Message not found') ||
+        error.message.includes('Reasoning cannot be null'))
+    ) {
+      throw error;
+    }
+    throw new Error(`Failed to update message ${messageId}`);
   }
 }

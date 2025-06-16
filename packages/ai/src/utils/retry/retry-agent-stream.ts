@@ -1,5 +1,6 @@
 import type { ToolSet } from 'ai';
 import { NoSuchToolError } from 'ai';
+import { healStreamingToolError, isHealableStreamError } from '../streaming/tool-healing';
 import type { RetryConfig, RetryResult, RetryableAgentStreamParams, RetryableError } from './types';
 
 const DEFAULT_RETRY_CONFIG: RetryConfig = {
@@ -115,6 +116,83 @@ export async function retryableAgentStream<T extends ToolSet>({
       // Increment retry count and continue
       retryCount++;
       // Log retry attempt for debugging
+    }
+  }
+
+  // This should never be reached, but TypeScript needs it
+  throw lastError || new Error('Retry loop exited unexpectedly');
+}
+
+/**
+ * Enhanced version of retryableAgentStream that includes tool healing support
+ * This extends the existing error detection to handle tool-specific healing
+ */
+export async function retryableAgentStreamWithHealing<T extends ToolSet>({
+  agent,
+  messages,
+  options,
+  retryConfig = DEFAULT_RETRY_CONFIG,
+}: RetryableAgentStreamParams<T>): Promise<RetryResult<T>> {
+  let conversationHistory = [...messages];
+  let lastError: unknown;
+  let retryCount = 0;
+
+  while (retryCount <= retryConfig.maxRetries) {
+    try {
+      const stream = await agent.stream(conversationHistory, options);
+
+      // Return successful result
+      return {
+        stream,
+        conversationHistory,
+        retryCount,
+      };
+    } catch (error) {
+      lastError = error;
+
+      // Check if error is retryable using existing logic
+      const retryableError = detectRetryableError(error);
+
+      // Additionally check if this is a healable streaming error
+      let healingResult = null;
+      if (isHealableStreamError(error)) {
+        // Get available tools from agent if possible
+        const availableTools = (agent as any).tools || {};
+        healingResult = healStreamingToolError(error, availableTools);
+      }
+
+      if ((!retryableError && !healingResult) || retryCount >= retryConfig.maxRetries) {
+        // Not retryable or max retries reached
+        throw error;
+      }
+
+      // Call retry callback if provided
+      if (retryConfig.onRetry) {
+        const errorType = healingResult
+          ? NoSuchToolError.isInstance(error)
+            ? 'no-such-tool'
+            : 'invalid-tool-arguments'
+          : retryableError?.type || 'unknown';
+
+        retryConfig.onRetry(
+          {
+            type: errorType as any,
+            originalError: error,
+            healingMessage: healingResult?.healingMessage ||
+              retryableError?.healingMessage || { role: 'user', content: 'Error occurred' },
+          },
+          retryCount + 1
+        );
+      }
+
+      // Add healing message to conversation history
+      const messageToAdd = healingResult?.healingMessage || retryableError?.healingMessage;
+      if (messageToAdd) {
+        conversationHistory = [...conversationHistory, messageToAdd];
+      }
+
+      // Increment retry count and continue
+      retryCount++;
     }
   }
 

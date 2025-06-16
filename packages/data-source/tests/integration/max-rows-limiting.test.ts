@@ -11,7 +11,7 @@ function createTestDataSource(type: DataSourceType) {
       credentials: {
         type: DataSourceType.PostgreSQL,
         host: process.env.TEST_POSTGRES_HOST || 'localhost',
-        port: parseInt(process.env.TEST_POSTGRES_PORT || '5432'),
+        port: Number.parseInt(process.env.TEST_POSTGRES_PORT || '5432'),
         database: process.env.TEST_POSTGRES_DATABASE || 'test',
         username: process.env.TEST_POSTGRES_USERNAME || 'postgres',
         password: process.env.TEST_POSTGRES_PASSWORD || 'postgres',
@@ -23,7 +23,7 @@ function createTestDataSource(type: DataSourceType) {
       credentials: {
         type: DataSourceType.MySQL,
         host: process.env.TEST_MYSQL_HOST || 'localhost',
-        port: parseInt(process.env.TEST_MYSQL_PORT || '3306'),
+        port: Number.parseInt(process.env.TEST_MYSQL_PORT || '3306'),
         database: process.env.TEST_MYSQL_DATABASE || 'test',
         username: process.env.TEST_MYSQL_USERNAME || 'root',
         password: process.env.TEST_MYSQL_PASSWORD || 'password',
@@ -47,7 +47,7 @@ describe('MaxRows Limiting Integration Tests', () => {
       await dataSource.execute({
         sql: 'DROP TABLE IF EXISTS test_limiting',
       });
-      
+
       await dataSource.execute({
         sql: `CREATE TABLE test_limiting (
           id SERIAL PRIMARY KEY,
@@ -57,7 +57,10 @@ describe('MaxRows Limiting Integration Tests', () => {
       });
 
       // Insert 100 test rows
-      const values = Array.from({ length: 100 }, (_, i) => `(${i + 1}, 'Row ${i + 1}', ${(i + 1) * 10})`).join(',');
+      const values = Array.from(
+        { length: 100 },
+        (_, i) => `(${i + 1}, 'Row ${i + 1}', ${(i + 1) * 10})`
+      ).join(',');
       await dataSource.execute({
         sql: `INSERT INTO test_limiting (id, name, value) VALUES ${values}`,
       });
@@ -150,7 +153,7 @@ describe('MaxRows Limiting Integration Tests', () => {
       await dataSource.execute({
         sql: 'DROP TABLE IF EXISTS test_limiting',
       });
-      
+
       await dataSource.execute({
         sql: `CREATE TABLE test_limiting (
           id INT PRIMARY KEY,
