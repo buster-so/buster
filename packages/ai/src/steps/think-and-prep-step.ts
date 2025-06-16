@@ -92,13 +92,6 @@ const thinkAndPrepExecution = async ({
   const chunkProcessor = new ChunkProcessor(messageId, [], [], []);
 
   try {
-    const chatId = runtimeContext.get('chatId');
-    const resourceId = runtimeContext.get('userId');
-
-    if (!chatId || !resourceId) {
-      throw new Error('Missing required context values');
-    }
-
     const initData = await getInitData();
     const todos = inputData['create-todos'].todos;
 
