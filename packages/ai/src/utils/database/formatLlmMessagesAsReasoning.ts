@@ -30,11 +30,11 @@ function formatMessageAsReasoningEntry(message: CoreMessage): unknown {
                 reasoningMessages.push({
                   id: toolCall.toolCallId,
                   type: 'text',
-                  title: `Thought ${args.thoughtNumber || '?'} of ${args.totalThoughts || '?'}`,
+                  title: 'Thinking...',
                   status: 'completed',
                   message: args.thought,
                   message_chunk: null,
-                  secondary_title: 'TODO',
+                  secondary_title: undefined,
                   finished_reasoning: !args.nextThoughtNeeded,
                 });
               }
@@ -68,7 +68,7 @@ function formatMessageAsReasoningEntry(message: CoreMessage): unknown {
                   type: 'files',
                   title: `Creating ${args.files.length} metric${args.files.length === 1 ? '' : 's'}`,
                   status: 'loading',
-                  secondary_title: 'TODO',
+                  secondary_title: undefined,
                   file_ids: fileIds,
                   files,
                 });
@@ -86,7 +86,7 @@ function formatMessageAsReasoningEntry(message: CoreMessage): unknown {
                   status: 'loading',
                   message: queryText,
                   message_chunk: null,
-                  secondary_title: 'TODO',
+                  secondary_title: undefined,
                   finished_reasoning: false,
                 });
               } else if (args.sql) {
@@ -97,7 +97,7 @@ function formatMessageAsReasoningEntry(message: CoreMessage): unknown {
                   status: 'loading',
                   message: args.sql,
                   message_chunk: null,
-                  secondary_title: 'TODO',
+                  secondary_title: undefined,
                   finished_reasoning: false,
                 });
               }
@@ -120,7 +120,7 @@ function formatMessageAsReasoningEntry(message: CoreMessage): unknown {
                   status: 'completed',
                   message: args.thoughts,
                   message_chunk: null,
-                  secondary_title: 'TODO',
+                  secondary_title: undefined,
                   finished_reasoning: false,
                 });
               }
@@ -146,7 +146,7 @@ function formatMessageAsReasoningEntry(message: CoreMessage): unknown {
                 status: 'loading',
                 message: messageContent,
                 message_chunk: null,
-                secondary_title: 'TODO',
+                secondary_title: getToolTiming(toolCall.toolName, toolCompletions),
                 finished_reasoning: false,
               });
           }
@@ -190,7 +190,7 @@ function formatMessageAsReasoningEntry(message: CoreMessage): unknown {
           type: 'files',
           title: 'TODO List',
           status: 'completed',
-          secondary_title: 'TODO',
+          secondary_title: undefined, // TODO lists don't have associated tool timing
           file_ids: [fileId],
           files: {
             [fileId]: {

@@ -40,6 +40,12 @@ interface ChunkProcessorState {
 
   // Track the index of last processed message to avoid re-processing
   lastProcessedMessageIndex: number;
+
+  // Track timing for secondary_title
+  timing: {
+    startTime?: number;
+    toolCallTimings: Map<string, number>; // toolCallId -> completion time
+  };
 }
 
 export class ChunkProcessor {
@@ -63,6 +69,9 @@ export class ChunkProcessor {
       responseHistory: [...initialResponseHistory],
       hasFinishingTool: false,
       lastProcessedMessageIndex: initialMessages.length - 1, // Already processed initial messages
+      timing: {
+        toolCallTimings: new Map(),
+      },
     };
   }
 
@@ -141,6 +150,11 @@ export class ChunkProcessor {
 
     this.state.currentAssistantMessage.content.push(toolCall);
 
+    // Start timing on first tool call
+    if (!this.state.timing.startTime) {
+      this.state.timing.startTime = Date.now();
+    }
+
     // Check if this is a finishing tool
     if (['doneTool', 'respondWithoutAnalysis', 'submitThoughts'].includes(chunk.toolName)) {
       this.state.hasFinishingTool = true;
@@ -166,6 +180,11 @@ export class ChunkProcessor {
     };
 
     this.state.currentAssistantMessage.content.push(toolCall);
+
+    // Start timing on first tool call
+    if (!this.state.timing.startTime) {
+      this.state.timing.startTime = Date.now();
+    }
 
     // Track the tool call in progress
     this.state.toolCallsInProgress.set(chunk.toolCallId, {
@@ -233,6 +252,16 @@ export class ChunkProcessor {
 
     this.state.accumulatedMessages.push(toolResultMessage);
 
+    // Track tool completion timing
+    if (this.state.timing.startTime) {
+      const completedAt = Date.now();
+      const cumulativeTime = completedAt - this.state.timing.startTime;
+      this.state.timing.toolCallTimings.set(chunk.toolCallId, cumulativeTime);
+      
+      // Update reasoning entries with new timing data
+      this.updateReasoningWithTiming();
+    }
+
     // Clear the tool call from tracking
     this.state.toolCallsInProgress.delete(chunk.toolCallId);
 
@@ -294,9 +323,7 @@ export class ChunkProcessor {
       const messagesToProcess = allMessages.slice(this.state.lastProcessedMessageIndex + 1);
 
       // Extract reasoning from NEW messages only
-      const newReasoningEntries = formatLlmMessagesAsReasoning(
-        messagesToProcess
-      ) as ReasoningEntry[];
+      const newReasoningEntries = formatLlmMessagesAsReasoning(messagesToProcess) as ReasoningEntry[];
 
       // Extract response messages from NEW messages only
       const newResponseEntries = extractResponseMessages(messagesToProcess) as ResponseEntry[];
@@ -361,6 +388,34 @@ export class ChunkProcessor {
   }
 
   /**
+   * Update reasoning entries with timing data for secondary_title
+   * This updates entries that are already in the reasoning history
+   */
+  private updateReasoningWithTiming(reasoningEntries?: ReasoningEntry[]): void {
+    if (!this.state.timing.startTime || this.state.timing.toolCallTimings.size === 0) {
+      return;
+    }
+
+    // Update entries in the actual reasoning history, not just local arrays
+    for (const entry of this.state.reasoningHistory) {
+      if (entry && typeof entry === 'object' && 'id' in entry) {
+        const entryId = entry.id as string;
+        const timing = this.state.timing.toolCallTimings.get(entryId);
+        
+        if (timing && 'secondary_title' in entry) {
+          const seconds = timing / 1000;
+          if (seconds >= 60) {
+            const minutes = Math.round(seconds / 60);
+            (entry as any).secondary_title = `${minutes}m`;
+          } else {
+            (entry as any).secondary_title = `${seconds.toFixed(1)}s`;
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * Set initial accumulated messages
    */
   setInitialMessages(messages: CoreMessage[]): void {
@@ -411,5 +466,15 @@ export class ChunkProcessor {
    */
   getResponseHistory(): ResponseEntry[] {
     return this.state.responseHistory;
+  }
+
+  /**
+   * Get timing data for debugging
+   */
+  getTimingData(): { startTime?: number; completedTools: number } {
+    return {
+      startTime: this.state.timing.startTime,
+      completedTools: this.state.timing.toolCallTimings.size,
+    };
   }
 }

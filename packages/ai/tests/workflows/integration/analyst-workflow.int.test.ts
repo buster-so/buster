@@ -61,7 +61,6 @@ describe('Analyst Workflow Integration Tests', () => {
 
     const result = await tracedWorkflow();
     expect(result).toBeDefined();
-    console.log('Workflow result:', result);
   }, 300000);
 
   test('should successfully execute analyst workflow with messageId for database save', async () => {
@@ -129,7 +128,6 @@ describe('Analyst Workflow Integration Tests', () => {
 
     const result = await tracedWorkflow();
     expect(result).toBeDefined();
-    console.log('Workflow result:', result);
 
     // Verify that conversation history was saved to database
     const updatedMessage = await db.select().from(messages).where(eq(messages.id, messageId));
@@ -168,7 +166,6 @@ describe('Analyst Workflow Integration Tests', () => {
 
     const result = await tracedWorkflow();
     expect(result).toBeDefined();
-    console.log('Workflow result:', result);
   }, 300000);
 
   test('should successfully execute analyst workflow with valid input', async () => {
@@ -197,7 +194,6 @@ describe('Analyst Workflow Integration Tests', () => {
 
     const result = await tracedWorkflow();
     expect(result).toBeDefined();
-    console.log('Workflow result:', result);
   }, 300000);
 
   test('should execute initial message then follow-up with retrieved conversation history', async () => {
