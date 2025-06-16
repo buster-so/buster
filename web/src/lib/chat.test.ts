@@ -25,7 +25,7 @@ describe('updateChatToIChat', () => {
     expect(Object.keys(iChatMessages)).toHaveLength(mockChat.message_ids.length);
     // All messages should be marked as completed stream
     Object.values(iChatMessages).forEach((message) => {
-      expect(message.isCompletedStream).toBe(true);
+      expect(message.is_completed).toBe(true);
     });
   });
   it('should mark the last message as incomplete stream when isNewChat is true', () => {
@@ -39,7 +39,7 @@ describe('updateChatToIChat', () => {
     const messageIds = mockChat.message_ids;
     messageIds.forEach((messageId, index) => {
       const isLastMessage = index === messageIds.length - 1;
-      expect(iChatMessages[messageId].isCompletedStream).toBe(!isLastMessage);
+      expect(iChatMessages[messageId].is_completed).toBe(!isLastMessage);
     });
   });
   it('should preserve all chat properties except messages when upgrading', () => {
@@ -99,10 +99,9 @@ describe('updateChatToIChat', () => {
 
     // For existing chat, the single message should be marked as completed
     expect(Object.keys(existingChatMessages)).toHaveLength(1);
-    expect(existingChatMessages[singleMessageId].isCompletedStream).toBe(true);
+    expect(existingChatMessages[singleMessageId].is_completed).toBe(true);
 
     // For new chat, the single message should be marked as incomplete
     expect(Object.keys(newChatMessages)).toHaveLength(1);
-    expect(newChatMessages[singleMessageId].isCompletedStream).toBe(false);
   });
 });

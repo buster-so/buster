@@ -23,33 +23,39 @@ export const useBusterNewChat = () => {
 
   const { initializeNewChat } = useInitializeChat();
 
-  const onSelectSearchAsset = useMemoizedFn(async (asset: BusterSearchResult) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-  });
-
-  const onStartNewChat = useMemoizedFn(
+  const _startChat = useMemoizedFn(
     async ({
       prompt,
       datasetId,
       metricId,
-      dashboardId
+      dashboardId,
+      messageId,
+      chatId
     }: {
-      prompt: string;
-      datasetId?: string;
-      metricId?: string;
-      dashboardId?: string;
+      prompt: string | undefined;
+      datasetId?: string; //unused for now
+      metricId?: string; //this is to start a NEW chat from a metric
+      dashboardId?: string; //this is to start a NEW chat from a dashboard
+      messageId?: string; //this is used to replace a message in the chat
+      chatId?: string; //this is used to follow up a chat
     }) => {
       const res = await startNewChat({
         prompt,
+        chat_id: chatId,
         metric_id: metricId,
-        dashboard_id: dashboardId
+        dashboard_id: dashboardId,
+        message_id: messageId
       });
-
-      console.log('res', res);
 
       initializeNewChat(res);
     }
   );
+
+  const onStartNewChat = useMemoizedFn(async ({ prompt }: { prompt: string }) => {
+    return _startChat({
+      prompt
+    });
+  });
 
   const onStartChatFromFile = useMemoizedFn(
     async ({
@@ -61,7 +67,7 @@ export const useBusterNewChat = () => {
       fileId: string;
       fileType: FileType;
     }) => {
-      return onStartNewChat({
+      return _startChat({
         prompt,
         metricId: fileType === 'metric' ? fileId : undefined,
         dashboardId: fileType === 'dashboard' ? fileId : undefined
@@ -105,48 +111,19 @@ export const useBusterNewChat = () => {
         });
       }
 
-      // //needed in order to trigger the auto change layout
-      // busterSocket.once({
-      //   route: '/chats/post:initializeChat',
-      //   callback: initializeNewChatCallback
-      // });
-
-      // await busterSocket.emitAndOnce({
-      //   emitEvent: {
-      //     route: '/chats/post',
-      //     payload: {
-      //       prompt,
-      //       message_id: messageId,
-      //       chat_id: chatId
-      //     }
-      //   },
-      //   responseEvent: {
-      //     route: '/chats/post:complete',
-      //     callback: completeChatCallback
-      //   }
-      // });
+      return _startChat({
+        prompt,
+        messageId
+      });
     }
   );
 
   const onFollowUpChat = useMemoizedFn(
     async ({ prompt, chatId }: { prompt: string; chatId: string }) => {
-      // busterSocket.once({
-      //   route: '/chats/post:initializeChat',
-      //   callback: initializeNewChatCallback
-      // });
-      // await busterSocket.emitAndOnce({
-      //   emitEvent: {
-      //     route: '/chats/post',
-      //     payload: {
-      //       prompt,
-      //       chat_id: chatId
-      //     }
-      //   },
-      //   responseEvent: {
-      //     route: '/chats/post:complete',
-      //     callback: completeChatCallback
-      //   }
-      // });
+      return _startChat({
+        prompt,
+        chatId
+      });
     }
   );
 
@@ -158,7 +135,6 @@ export const useBusterNewChat = () => {
 
   return {
     onStartNewChat,
-    onSelectSearchAsset,
     onFollowUpChat,
     onStartChatFromFile,
     onReplaceMessageInChat,

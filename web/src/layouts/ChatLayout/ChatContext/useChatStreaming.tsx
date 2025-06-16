@@ -66,7 +66,14 @@ export const useChatStreaming = ({
         'id' | 'response_messages' | 'is_completed' | 'response_message_ids'
       >
     ) => {
-      //
+      const lastResponseMessageId = d.response_message_ids[d.response_message_ids.length - 1];
+      const lastResponseMessage = d.response_messages[lastResponseMessageId];
+      if (lastResponseMessage?.type === 'file' && lastResponseMessage?.file_type === 'metric') {
+        prefetchGetMetricDataClient(
+          { id: lastResponseMessage.id, version_number: lastResponseMessage.version_number },
+          queryClient
+        );
+      }
     }
   );
 
