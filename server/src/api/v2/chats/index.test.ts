@@ -8,11 +8,11 @@ import chatRoutes from './index';
 
 // Mock dependencies
 vi.mock('../../../middleware/auth', () => ({
-  requireAuth: vi.fn((_c, next) => next())
+  requireAuth: vi.fn((_c, next) => next()),
 }));
 
 vi.mock('./handler', () => ({
-  createChatHandler: vi.fn()
+  createChatHandler: vi.fn(),
 }));
 
 // Import mocked handler
@@ -24,9 +24,9 @@ async function makeRequest(app: Hono, body: any, headers: Record<string, string>
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      ...headers
+      ...headers,
     },
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
   });
 
   return app.request(request);
@@ -40,7 +40,7 @@ describe('POST /chats', () => {
     user_metadata: { organization_id: 'org-123' },
     app_metadata: {},
     aud: 'authenticated',
-    created_at: new Date().toISOString()
+    created_at: new Date().toISOString(),
   };
 
   const mockChat: ChatWithMessages = {
@@ -56,7 +56,7 @@ describe('POST /chats', () => {
         request_message: {
           request: 'Hello',
           sender_id: '123e4567-e89b-12d3-a456-426614174002',
-          sender_name: 'Test User'
+          sender_name: 'Test User',
         },
         response_messages: {},
         response_message_ids: [],
@@ -65,8 +65,8 @@ describe('POST /chats', () => {
         final_reasoning_message: null,
         feedback: null,
 
-        is_completed: false
-      }
+        is_completed: false,
+      },
     },
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -74,7 +74,7 @@ describe('POST /chats', () => {
     created_by_id: '123e4567-e89b-12d3-a456-426614174002',
     created_by_name: 'Test User',
     created_by_avatar: null,
-    publicly_accessible: false
+    publicly_accessible: false,
   };
 
   beforeEach(() => {
@@ -94,7 +94,7 @@ describe('POST /chats', () => {
 
   it('should create a chat with valid request', async () => {
     const response = await makeRequest(app, {
-      prompt: 'Hello world'
+      prompt: 'Hello world',
     });
 
     expect(response.status).toBe(200);
@@ -106,7 +106,7 @@ describe('POST /chats', () => {
   it('should create a chat with existing chat_id', async () => {
     const response = await makeRequest(app, {
       chat_id: '123e4567-e89b-12d3-a456-426614174003',
-      prompt: 'Follow up message'
+      prompt: 'Follow up message',
     });
 
     expect(response.status).toBe(200);
@@ -119,7 +119,7 @@ describe('POST /chats', () => {
   it('should create asset-based chat', async () => {
     const response = await makeRequest(app, {
       asset_id: '123e4567-e89b-12d3-a456-426614174004',
-      asset_type: 'metric_file'
+      asset_type: 'metric_file',
     });
 
     expect(response.status).toBe(200);
@@ -131,24 +131,22 @@ describe('POST /chats', () => {
 
   it('should validate asset_type is required when asset_id is provided', async () => {
     const response = await makeRequest(app, {
-      asset_id: '123e4567-e89b-12d3-a456-426614174005'
+      asset_id: '123e4567-e89b-12d3-a456-426614174005',
     });
 
     expect(response.status).toBe(400);
     const data = await response.json();
-    console.log('Validation error response:', data);
     // Zod validation errors have a different structure
     expect((data as any).error || (data as any).message || (data as any).errors).toBeDefined();
   });
 
   it('should validate UUID formats', async () => {
     const response = await makeRequest(app, {
-      chat_id: 'not-a-uuid'
+      chat_id: 'not-a-uuid',
     });
 
     expect(response.status).toBe(400);
     const data = await response.json();
-    console.log('UUID validation error response:', data);
     // Zod validation errors have a different structure
     expect((data as any).error || (data as any).message || (data as any).errors).toBeDefined();
   });
@@ -187,7 +185,7 @@ describe('POST /chats', () => {
   it('should support legacy fields', async () => {
     const response = await makeRequest(app, {
       metric_id: '123e4567-e89b-12d3-a456-426614174006',
-      dashboard_id: '123e4567-e89b-12d3-a456-426614174007'
+      dashboard_id: '123e4567-e89b-12d3-a456-426614174007',
     });
 
     expect(response.status).toBe(200);

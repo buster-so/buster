@@ -1,5 +1,3 @@
-import type { ChatCreateHandlerRequest, ChatMessage, ChatWithMessages } from '@/types/chat-types';
-import { ChatError, ChatErrorCode } from '@/types/chat-types/chat-errors.types';
 import {
   chats,
   checkChatPermission,
@@ -12,6 +10,8 @@ import {
 } from '@buster/database';
 import type { Chat, Message } from '@buster/database/src/helpers/chats';
 import type { User } from '@supabase/supabase-js';
+import type { ChatCreateHandlerRequest, ChatMessage, ChatWithMessages } from '../../../../types/chat-types';
+import { ChatError, ChatErrorCode } from '../../../../types/chat-types';
 
 /**
  * Build a ChatWithMessages object from database entities
