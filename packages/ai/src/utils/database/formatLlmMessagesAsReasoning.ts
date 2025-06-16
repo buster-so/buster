@@ -146,7 +146,7 @@ function formatMessageAsReasoningEntry(message: CoreMessage): unknown {
                 status: 'loading',
                 message: messageContent,
                 message_chunk: null,
-                secondary_title: getToolTiming(toolCall.toolName, toolCompletions),
+                secondary_title: undefined,
                 finished_reasoning: false,
               });
           }

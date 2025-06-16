@@ -257,7 +257,7 @@ export class ChunkProcessor {
       const completedAt = Date.now();
       const cumulativeTime = completedAt - this.state.timing.startTime;
       this.state.timing.toolCallTimings.set(chunk.toolCallId, cumulativeTime);
-      
+
       // Update reasoning entries with new timing data
       this.updateReasoningWithTiming();
     }
@@ -322,8 +322,17 @@ export class ChunkProcessor {
       // Only process messages that haven't been processed yet
       const messagesToProcess = allMessages.slice(this.state.lastProcessedMessageIndex + 1);
 
+      // Debug logging to understand duplication
+      if (messagesToProcess.length > 0) {
+        console.log(
+          `Processing ${messagesToProcess.length} new messages. Last processed index: ${this.state.lastProcessedMessageIndex}, Total messages: ${allMessages.length}`
+        );
+      }
+
       // Extract reasoning from NEW messages only
-      const newReasoningEntries = formatLlmMessagesAsReasoning(messagesToProcess) as ReasoningEntry[];
+      const newReasoningEntries = formatLlmMessagesAsReasoning(
+        messagesToProcess
+      ) as ReasoningEntry[];
 
       // Extract response messages from NEW messages only
       const newResponseEntries = extractResponseMessages(messagesToProcess) as ResponseEntry[];
@@ -339,7 +348,20 @@ export class ChunkProcessor {
         (entry) => entry && 'id' in entry && !existingIds.has(entry.id)
       );
 
+      // Debug logging for deduplication
+      if (newReasoningEntries.length > deduplicatedNewReasoning.length) {
+        console.log(
+          `Deduplicated reasoning: ${newReasoningEntries.length} -> ${deduplicatedNewReasoning.length}`
+        );
+        console.log('Existing IDs:', Array.from(existingIds));
+        console.log(
+          'New entries being filtered:',
+          newReasoningEntries.map((e) => (e && 'id' in e ? e.id : 'no-id'))
+        );
+      }
+
       if (deduplicatedNewReasoning.length > 0) {
+        console.log(`Adding ${deduplicatedNewReasoning.length} new reasoning entries`);
         this.state.reasoningHistory.push(...deduplicatedNewReasoning);
       }
 
@@ -401,7 +423,7 @@ export class ChunkProcessor {
       if (entry && typeof entry === 'object' && 'id' in entry) {
         const entryId = entry.id as string;
         const timing = this.state.timing.toolCallTimings.get(entryId);
-        
+
         if (timing && 'secondary_title' in entry) {
           const seconds = timing / 1000;
           if (seconds >= 60) {

@@ -5,6 +5,7 @@ import { createTodosStep } from '../steps/create-todos-step';
 import { extractValuesSearchStep } from '../steps/extract-values-search-step';
 import { formatOutputStep } from '../steps/format-output-step';
 import { generateChatTitleStep } from '../steps/generate-chat-title-step';
+import { markMessageCompleteStep } from '../steps/mark-message-complete-step';
 import { thinkAndPrepStep } from '../steps/think-and-prep-step';
 import {
   MessageHistorySchema,
@@ -62,12 +63,14 @@ const analystWorkflow = createWorkflow({
     createTodosStep,
     thinkAndPrepStep,
     analystStep,
+    markMessageCompleteStep,
     formatOutputStep,
   ],
 })
   .parallel([generateChatTitleStep, extractValuesSearchStep, createTodosStep])
   .then(thinkAndPrepStep)
   .then(analystStep) // Always run analyst step - it will pass through if finished
+  .then(markMessageCompleteStep)
   .then(formatOutputStep)
   .commit();
 

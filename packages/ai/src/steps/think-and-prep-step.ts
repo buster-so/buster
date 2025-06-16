@@ -7,7 +7,7 @@ import { thinkAndPrepAgent } from '../agents/think-and-prep-agent/think-and-prep
 import { parseStreamingArgs as parseRespondWithoutAnalysisArgs } from '../tools/communication-tools/respond-without-analysis';
 import { parseStreamingArgs as parseSequentialThinkingArgs } from '../tools/planning-thinking-tools/sequential-thinking-tool';
 import { ChunkProcessor } from '../utils/database/chunkProcessor';
-import { retryableAgentStream } from '../utils/retry';
+import { retryableAgentStreamWithHealing } from '../utils/retry';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
 import { ToolArgsParser, createOnChunkHandler } from '../utils/streaming';
 import type {
@@ -119,7 +119,7 @@ const thinkAndPrepExecution = async ({
 
     const wrappedStream = wrapTraced(
       async () => {
-        const result = await retryableAgentStream({
+        const result = await retryableAgentStreamWithHealing({
           agent: thinkAndPrepAgent,
           messages,
           options: {

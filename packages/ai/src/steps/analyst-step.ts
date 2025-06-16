@@ -16,7 +16,7 @@ import {
   StepFinishDataSchema,
   ThinkAndPrepOutputSchema,
 } from '../utils/memory/types';
-import { retryableAgentStream } from '../utils/retry';
+import { retryableAgentStreamWithHealing } from '../utils/retry';
 import { ToolArgsParser, createOnChunkHandler } from '../utils/streaming';
 import type {
   AnalystRuntimeContext,
@@ -105,7 +105,7 @@ const analystExecution = async ({
 
     const wrappedStream = wrapTraced(
       async () => {
-        const result = await retryableAgentStream({
+        const result = await retryableAgentStreamWithHealing({
           agent: analystAgent,
           messages,
           options: {
