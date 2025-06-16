@@ -33,11 +33,9 @@ export type ChatErrorCode = (typeof ChatErrorCode)[keyof typeof ChatErrorCode];
  * Structured error response schema
  */
 export const ChatErrorResponseSchema = z.object({
-  error: z.object({
-    code: z.string(),
-    message: z.string(),
-    details: z.record(z.unknown()).optional(),
-  }),
+  code: z.string(),
+  message: z.string(),
+  details: z.record(z.unknown()).optional(),
 });
 
 export type ChatErrorResponse = z.infer<typeof ChatErrorResponseSchema>;
@@ -58,11 +56,9 @@ export class ChatError extends Error {
 
   toResponse(): ChatErrorResponse {
     return {
-      error: {
-        code: this.code,
-        message: this.message,
-        details: this.details,
-      },
+      code: this.code,
+      message: this.message,
+      details: this.details,
     };
   }
 }

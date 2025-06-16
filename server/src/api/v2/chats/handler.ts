@@ -52,6 +52,10 @@ export async function createChatHandler(
       );
     }
 
+    if (!request.prompt && !request.asset_id) {
+      throw new ChatError(ChatErrorCode.INVALID_REQUEST, 'prompt or asset_id is required', 400);
+    }
+
     // Initialize chat (new or existing)
     const { chatId, messageId, chat } = await initializeChat(request, user, organizationId);
 
@@ -138,7 +142,7 @@ export async function createChatHandler(
 
     // Re-throw ChatError instances
     if (error instanceof ChatError) {
-      throw error.toResponse();
+      throw error;
     }
 
     // Wrap unexpected errors
@@ -149,6 +153,6 @@ export async function createChatHandler(
       {
         originalError: error instanceof Error ? error.message : String(error),
       }
-    ).toResponse();
+    );
   }
 }

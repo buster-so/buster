@@ -8,7 +8,7 @@ import {
 } from '../../../types/chat-types/chat.types';
 import '../../../types/hono.types'; //I added this to fix intermitent type errors. Could probably be removed.
 import { HTTPException } from 'hono/http-exception';
-import { ChatError } from '../../../types/chat-types/chat-errors.types';
+import { ChatError } from '../../../types';
 import { createChatHandler } from './handler';
 
 const app = new Hono()
@@ -25,16 +25,12 @@ const app = new Hono()
       // Validate response against schema
       const validatedResponse: ChatCreateResponse = ChatCreateResponseSchema.parse(response);
       return c.json(validatedResponse);
-    } catch (error: unknown) {
-      // Handle ChatError instances with proper status codes
-      if (error instanceof ChatError) {
-        const errorResponse = error.toResponse();
-        throw new HTTPException(error.statusCode, {
-          message: errorResponse.error.message,
-        });
+    } catch (e) {
+      if (e instanceof ChatError) {
+        // we need to use this syntax instead of HTTPException because hono bubbles up 500 errors
+        return c.json(e.toResponse(), e.statusCode);
       }
 
-      console.error('Error creating chat:', error);
       throw new HTTPException(500, {
         message: 'Failed to create chat',
       });

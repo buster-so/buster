@@ -13,13 +13,14 @@ export const requireAuth = bearerAuth({
       return false;
     }
 
+    c.set('supabaseUser', data.user);
+
     const busterUser = await getUser({ id: data.user.id });
 
     if (!busterUser) {
       return false;
     }
 
-    c.set('supabaseUser', data.user);
     c.set('busterUser', busterUser);
 
     return !!data.user.is_anonymous === false;

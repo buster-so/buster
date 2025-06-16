@@ -11,6 +11,9 @@ vi.mock('@trigger.dev/sdk/v3', () => ({
 
 vi.mock('./services/chat-service', () => ({
   initializeChat: vi.fn(),
+}));
+
+vi.mock('./services/chat-helpers', () => ({
   handleAssetChat: vi.fn(),
 }));
 
@@ -125,10 +128,12 @@ describe('createChatHandler', () => {
   });
 
   it('should not trigger analyst task when no content', async () => {
-    const result = await createChatHandler({}, mockUser);
+    const result = await createChatHandler({}, mockUser).catch((e) => {
+      expect(tasks.trigger).not.toHaveBeenCalled();
+      expect(e).toBeInstanceOf(ChatError);
+    });
 
     expect(tasks.trigger).not.toHaveBeenCalled();
-    expect(result).toEqual(mockChat);
   });
 
   it('should not call handleAssetChat when prompt is provided with asset', async () => {
@@ -170,10 +175,8 @@ describe('createChatHandler', () => {
     vi.mocked(getUserOrganizationId).mockResolvedValue(null);
 
     await expect(createChatHandler({ prompt: 'Hello' }, userWithoutOrg)).rejects.toMatchObject({
-      error: {
-        code: ChatErrorCode.MISSING_ORGANIZATION,
-        message: 'User is not associated with an organization',
-      },
+      code: ChatErrorCode.MISSING_ORGANIZATION,
+      message: 'User is not associated with an organization',
     });
   });
 
@@ -182,11 +185,9 @@ describe('createChatHandler', () => {
     vi.mocked(initializeChat).mockRejectedValue(chatError);
 
     await expect(createChatHandler({ prompt: 'Hello' }, mockUser)).rejects.toMatchObject({
-      error: {
-        code: ChatErrorCode.PERMISSION_DENIED,
-        message: 'No permission',
-        details: undefined,
-      },
+      code: ChatErrorCode.PERMISSION_DENIED,
+      message: 'No permission',
+      details: undefined,
     });
   });
 
@@ -195,11 +196,9 @@ describe('createChatHandler', () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     await expect(createChatHandler({ prompt: 'Hello' }, mockUser)).rejects.toMatchObject({
-      error: {
-        code: ChatErrorCode.INTERNAL_ERROR,
-        message: 'An unexpected error occurred while creating the chat',
-        details: { originalError: 'Database error' },
-      },
+      code: ChatErrorCode.INTERNAL_ERROR,
+      message: 'An unexpected error occurred while creating the chat',
+      details: { originalError: 'Database error' },
     });
 
     consoleSpy.mockRestore();
