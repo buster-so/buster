@@ -28,10 +28,10 @@
     "test:ui": "vitest --ui",
     "test:watch": "vitest watch",
     "test:watch:file": "vitest watch ${1:-}",
-    "trigger:deploy": "npm run deploy --workspace=trigger",
-    "trigger:dev": "npm run dev --workspace=trigger",
-    "trigger:test": "npm run test --workspace=trigger",
-    "trigger:test:integration": "npm run test:integration --workspace=trigger"
+    "trigger:deploy": "npm run deploy --workspace=@buster/trigger",
+    "trigger:dev": "dotenv -e .env -- npm run dev --workspace=@buster/trigger",
+    "trigger:test": "npm run test --workspace=@buster/trigger",
+    "trigger:test:integration": "npm run test:integration --workspace=@buster/trigger"
   },
   "dependencies": {
     "@ai-sdk/amazon-bedrock": "^2.2.10",
@@ -49,6 +49,7 @@
     "@supabase/supabase-js": "^2.50.0",
     "@trigger.dev/sdk": "^3.3.17",
     "ai": "^4.3.16",
+    "dotenv-cli": "^8.0.0",
     "drizzle-orm": "^0.44.2",
     "glob": "^11.0.2",
     "hono": "^4.7.11",
