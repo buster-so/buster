@@ -9,7 +9,7 @@ import { parseStreamingArgs as parseSequentialThinkingArgs } from '../tools/plan
 import { ChunkProcessor } from '../utils/database/chunkProcessor';
 import { retryableAgentStreamWithHealing } from '../utils/retry';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
-import { ToolArgsParser, createOnChunkHandler } from '../utils/streaming';
+import { ToolArgsParser, createOnChunkHandler, handleStreamingError } from '../utils/streaming';
 import type {
   AnalystRuntimeContext,
   thinkAndPrepWorkflowInputSchema,
@@ -185,7 +185,30 @@ const thinkAndPrepExecution = async ({
       if (streamError instanceof Error && streamError.name === 'AbortError') {
         // Stream was intentionally aborted, this is normal
       } else {
-        console.error('Error processing stream:', streamError);
+        // Check if this is a healable streaming error
+        const healingResult = await handleStreamingError(streamError, {
+          agent: thinkAndPrepAgent,
+          chunkProcessor,
+          runtimeContext,
+          abortController,
+          maxRetries: 3,
+          onRetry: (error, attemptNumber) => {
+            console.error(`Think and Prep stream retry attempt ${attemptNumber} for streaming error:`, error);
+          },
+          toolChoice: 'required',
+        });
+
+        if (healingResult.shouldRetry && healingResult.healingMessage) {
+          console.log('Streaming error healed, healing message:', healingResult.healingMessage);
+          
+          // Add the healing message to the conversation
+          // Note: For now we just log it. A full implementation would need to restart
+          // the entire stream processing with the healed conversation.
+          outputMessages.push(healingResult.healingMessage);
+        } else {
+          console.error('Error processing stream:', streamError);
+          throw streamError; // Re-throw non-healable errors
+        }
       }
     }
 
