@@ -2,14 +2,38 @@ import { updateMessageFields } from '@buster/database';
 import type { CoreMessage, TextStreamPart, ToolSet } from 'ai';
 import type { z } from 'zod';
 import { extractResponseMessages } from './formatLlmMessagesAsReasoning';
+import type {
+  AssistantMessageContent,
+  GenericToolSet,
+  TextDeltaChunk,
+  ToolCallChunk,
+  ToolCallDeltaChunk,
+  ToolCallInProgress,
+  ToolCallStreamingStartChunk,
+  ToolResultChunk,
+  TypedAssistantMessage,
+} from './types';
+import {
+  determineToolStatus,
+  extractSqlFromQuery,
+  hasFiles,
+  hasSecondaryTitle,
+  hasStatus,
+  isCreateMetricsArgs,
+  isExecuteSqlArgs,
+  isSequentialThinkingArgs,
+  isSubmitThoughtsArgs,
+  isTextContent,
+  isToolCallContent,
+} from './types';
 
 /**
  * AI SDK Type Safety Patterns:
- * 
+ *
  * 1. TextStreamPart<TOOLS> - Use ToolSet for generic tool support
  * 2. CoreMessage content arrays - Use specific content part types
  * 3. Tool calls/results - Use proper generic types with constraints
- * 
+ *
  * This implementation provides type-safe streaming chunk processing
  * while maintaining compatibility with AI SDK's type system.
  */
@@ -18,35 +42,14 @@ import { extractResponseMessages } from './formatLlmMessagesAsReasoning';
 type ReasoningEntry = z.infer<typeof import('../memory/types').BusterChatMessageReasoningSchema>;
 type ResponseEntry = z.infer<typeof import('../memory/types').BusterChatMessageResponseSchema>;
 
-interface ToolCallInProgress {
-  toolCallId: string;
-  toolName: string;
-  argsText: string;
-  args?: Record<string, unknown>;
-}
-
-// Content types for assistant messages
-type AssistantMessageContent =
-  | { type: 'text'; text: string }
-  | { type: 'tool-call'; toolCallId: string; toolName: string; args: Record<string, unknown> };
-
-// Generic tool result type for chunk processing
-type GenericToolResult = {
-  type: 'tool-result';
-  toolCallId: string;
-  toolName: string;
-  result: unknown;
-};
+// Type definitions moved to ./types.ts for reusability
 
 interface ChunkProcessorState {
   // Accumulated messages that form the conversation
   accumulatedMessages: CoreMessage[];
 
   // Current assistant message being built
-  currentAssistantMessage: {
-    role: 'assistant';
-    content: AssistantMessageContent[];
-  } | null;
+  currentAssistantMessage: TypedAssistantMessage | null;
 
   // Tool calls currently being streamed
   toolCallsInProgress: Map<string, ToolCallInProgress>;
@@ -69,7 +72,7 @@ interface ChunkProcessorState {
   };
 }
 
-export class ChunkProcessor {
+export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
   private state: ChunkProcessorState;
   private messageId: string | null;
   private lastSaveTime = 0;
@@ -99,31 +102,27 @@ export class ChunkProcessor {
   /**
    * Process a chunk and potentially save to database
    */
-  async processChunk(chunk: TextStreamPart<ToolSet> | GenericToolResult): Promise<void> {
+  async processChunk(chunk: TextStreamPart<T>): Promise<void> {
     switch (chunk.type) {
       case 'text-delta':
-        this.handleTextDelta(chunk as Extract<TextStreamPart<ToolSet>, { type: 'text-delta' }>);
+        this.handleTextDelta(chunk);
         break;
 
       case 'tool-call':
         // Complete tool call with args already available
-        this.handleToolCall(chunk as Extract<TextStreamPart<ToolSet>, { type: 'tool-call' }>);
+        this.handleToolCall(chunk);
         break;
 
       case 'tool-call-streaming-start':
-        this.handleToolCallStart(
-          chunk as Extract<TextStreamPart<ToolSet>, { type: 'tool-call-streaming-start' }>
-        );
+        this.handleToolCallStart(chunk);
         break;
 
       case 'tool-call-delta':
-        this.handleToolCallDelta(
-          chunk as Extract<TextStreamPart<ToolSet>, { type: 'tool-call-delta' }>
-        );
+        this.handleToolCallDelta(chunk);
         break;
 
       case 'tool-result':
-        await this.handleToolResult(chunk as GenericToolResult);
+        await this.handleToolResult(chunk);
         break;
 
       case 'step-finish':
@@ -139,7 +138,8 @@ export class ChunkProcessor {
     await this.saveIfNeeded();
   }
 
-  private handleTextDelta(chunk: Extract<TextStreamPart<ToolSet>, { type: 'text-delta' }>) {
+  private handleTextDelta(chunk: TextStreamPart<T>) {
+    if (chunk.type !== 'text-delta') return;
     if (!this.state.currentAssistantMessage) {
       this.state.currentAssistantMessage = {
         role: 'assistant',
@@ -148,9 +148,7 @@ export class ChunkProcessor {
     }
 
     // Find or create text content part
-    let textPart = this.state.currentAssistantMessage.content.find(
-      (part): part is { type: 'text'; text: string } => part.type === 'text'
-    );
+    let textPart = this.state.currentAssistantMessage.content.find(isTextContent);
 
     if (!textPart) {
       textPart = { type: 'text', text: '' };
@@ -160,7 +158,8 @@ export class ChunkProcessor {
     textPart.text += chunk.textDelta || '';
   }
 
-  private handleToolCall(chunk: Extract<TextStreamPart<ToolSet>, { type: 'tool-call' }>) {
+  private handleToolCall(chunk: TextStreamPart<T>) {
+    if (chunk.type !== 'tool-call') return;
     if (!this.state.currentAssistantMessage) {
       this.state.currentAssistantMessage = {
         role: 'assistant',
@@ -206,9 +205,8 @@ export class ChunkProcessor {
     }
   }
 
-  private handleToolCallStart(
-    chunk: Extract<TextStreamPart<ToolSet>, { type: 'tool-call-streaming-start' }>
-  ) {
+  private handleToolCallStart(chunk: TextStreamPart<T>) {
+    if (chunk.type !== 'tool-call-streaming-start') return;
     if (!this.state.currentAssistantMessage) {
       this.state.currentAssistantMessage = {
         role: 'assistant',
@@ -244,9 +242,8 @@ export class ChunkProcessor {
     }
   }
 
-  private handleToolCallDelta(
-    chunk: Extract<TextStreamPart<ToolSet>, { type: 'tool-call-delta' }>
-  ) {
+  private handleToolCallDelta(chunk: TextStreamPart<T>) {
+    if (chunk.type !== 'tool-call-delta') return;
     const inProgress = this.state.toolCallsInProgress.get(chunk.toolCallId);
     if (!inProgress) return;
 
@@ -260,19 +257,10 @@ export class ChunkProcessor {
       // Update the tool call in the assistant message
       if (this.state.currentAssistantMessage) {
         const toolCall = this.state.currentAssistantMessage.content.find(
-          (
-            part
-          ): part is {
-            type: 'tool-call';
-            toolCallId: string;
-            toolName: string;
-            args: Record<string, unknown>;
-          } =>
-            part.type === 'tool-call' &&
-            'toolCallId' in part &&
-            part.toolCallId === chunk.toolCallId
+          (part): part is typeof part & { toolCallId: string } =>
+            isToolCallContent(part) && part.toolCallId === chunk.toolCallId
         );
-        if (toolCall) {
+        if (toolCall && isToolCallContent(toolCall) && inProgress.args) {
           toolCall.args = inProgress.args;
         }
       }
@@ -297,12 +285,12 @@ export class ChunkProcessor {
     }
   }
 
-  private async handleToolResult(chunk: GenericToolResult) {
+  private async handleToolResult(chunk: TextStreamPart<T>) {
+    if (chunk.type !== 'tool-result') return;
     // Finalize current assistant message if exists
     if (this.state.currentAssistantMessage) {
-      this.state.accumulatedMessages.push(
-        this.state.currentAssistantMessage as unknown as CoreMessage
-      );
+      // Type assertion is safe here because TypedAssistantMessage is compatible with CoreMessage
+      this.state.accumulatedMessages.push(this.state.currentAssistantMessage as CoreMessage);
       this.state.currentAssistantMessage = null;
     }
 
@@ -328,7 +316,7 @@ export class ChunkProcessor {
       this.state.timing.toolCallTimings.set(chunk.toolCallId, cumulativeTime);
 
       // Determine if the tool succeeded or failed based on the result
-      const status = this.determineToolStatus(chunk.result);
+      const status = determineToolStatus(chunk.result);
 
       // Update the specific reasoning entry for this tool call
       this.updateReasoningEntryStatus(chunk.toolCallId, status, cumulativeTime);
@@ -344,9 +332,7 @@ export class ChunkProcessor {
   private async handleStepFinish() {
     // Finalize any current assistant message
     if (this.state.currentAssistantMessage) {
-      this.state.accumulatedMessages.push(
-        this.state.currentAssistantMessage as unknown as CoreMessage
-      );
+      this.state.accumulatedMessages.push(this.state.currentAssistantMessage as CoreMessage);
       this.state.currentAssistantMessage = null;
     }
 
@@ -357,9 +343,7 @@ export class ChunkProcessor {
   private async handleFinish() {
     // Finalize any current assistant message
     if (this.state.currentAssistantMessage) {
-      this.state.accumulatedMessages.push(
-        this.state.currentAssistantMessage as unknown as CoreMessage
-      );
+      this.state.accumulatedMessages.push(this.state.currentAssistantMessage as CoreMessage);
       this.state.currentAssistantMessage = null;
     }
 
@@ -383,7 +367,8 @@ export class ChunkProcessor {
       // Build messages including current assistant message if in progress
       const allMessages = [...this.state.accumulatedMessages];
       if (this.state.currentAssistantMessage) {
-        allMessages.push(this.state.currentAssistantMessage as unknown as CoreMessage);
+        // Type assertion is safe here because TypedAssistantMessage is compatible with CoreMessage
+        allMessages.push(this.state.currentAssistantMessage as CoreMessage);
       }
 
       // Don't save if we have no messages
@@ -400,7 +385,10 @@ export class ChunkProcessor {
       // Update response history with new entries
       const existingResponseIds = new Set(
         this.state.responseHistory
-          .filter((r): r is { id: string } => r !== null && typeof r === 'object' && 'id' in r)
+          .filter(
+            (r): r is ResponseEntry & { id: string } =>
+              r !== null && typeof r === 'object' && 'id' in r
+          )
           .map((r) => r.id)
       );
 
@@ -441,37 +429,7 @@ export class ChunkProcessor {
     }
   }
 
-  /**
-   * Determine tool status based on result
-   */
-  private determineToolStatus(result: unknown): 'completed' | 'failed' {
-    try {
-      // If result is a string, check for error indicators
-      if (typeof result === 'string') {
-        const lowerResult = result.toLowerCase();
-        if (
-          lowerResult.includes('error') ||
-          lowerResult.includes('failed') ||
-          lowerResult.includes('exception')
-        ) {
-          return 'failed';
-        }
-      }
-
-      // If result is an object, check for error properties
-      if (result && typeof result === 'object') {
-        const resultObj = result as Record<string, unknown>;
-        if (resultObj.error || resultObj.success === false || resultObj.status === 'error') {
-          return 'failed';
-        }
-      }
-
-      return 'completed';
-    } catch {
-      // If we can't determine, default to completed
-      return 'completed';
-    }
-  }
+  // Tool status determination moved to types.ts as determineToolStatus function
 
   /**
    * Update a specific reasoning entry's status and timing
@@ -487,31 +445,27 @@ export class ChunkProcessor {
 
     if (entry && typeof entry === 'object') {
       // Type-safe update of status
-      if ('status' in entry) {
-        (entry as { status: 'loading' | 'completed' | 'failed' }).status = status;
+      if (hasStatus(entry)) {
+        entry.status = status;
       }
 
       // Update file statuses if this is a file-type entry
-      if ('files' in entry && entry.files && typeof entry.files === 'object') {
-        const files = entry.files as Record<
-          string,
-          { status?: 'loading' | 'completed' | 'failed' }
-        >;
-        for (const fileId in files) {
-          if (files[fileId] && typeof files[fileId] === 'object') {
-            files[fileId].status = status;
+      if (hasFiles(entry)) {
+        for (const fileId in entry.files) {
+          const file = entry.files[fileId];
+          if (file && typeof file === 'object') {
+            (file as { status?: string }).status = status;
           }
         }
       }
 
-      if (timing && 'secondary_title' in entry) {
+      if (timing && hasSecondaryTitle(entry)) {
         const seconds = timing / 1000;
-        const entryWithTitle = entry as { secondary_title?: string };
         if (seconds >= 60) {
           const minutes = Math.round(seconds / 60);
-          entryWithTitle.secondary_title = `${minutes}m`;
+          entry.secondary_title = `${minutes}m`;
         } else {
-          entryWithTitle.secondary_title = `${seconds.toFixed(1)}s`;
+          entry.secondary_title = `${seconds.toFixed(1)}s`;
         }
       }
     }
@@ -540,14 +494,14 @@ export class ChunkProcessor {
     switch (toolName) {
       case 'sequentialThinking':
       case 'sequential-thinking':
-        if (args.thought) {
+        if (isSequentialThinkingArgs(args)) {
           return {
             id: toolCallId,
             type: 'text',
             title: 'Thinking...',
             status: 'loading',
             message: args.thought,
-            message_chunk: null,
+            message_chunk: undefined,
             secondary_title: undefined,
             finished_reasoning: !args.nextThoughtNeeded,
           } as ReasoningEntry;
@@ -556,8 +510,22 @@ export class ChunkProcessor {
 
       case 'createMetrics':
       case 'create-metrics-file':
-        if (args.files && Array.isArray(args.files)) {
-          const files: Record<string, unknown> = {};
+        if (isCreateMetricsArgs(args)) {
+          const files: Record<
+            string,
+            {
+              id: string;
+              file_type: string;
+              file_name: string;
+              version_number: number;
+              status: string;
+              file: {
+                text: string;
+                text_chunk: undefined;
+                modified: undefined;
+              };
+            }
+          > = {};
           const fileIds: string[] = [];
 
           for (const file of args.files) {
@@ -591,55 +559,51 @@ export class ChunkProcessor {
 
       case 'executeSql':
       case 'execute-sql':
-        if (args.queries && Array.isArray(args.queries)) {
-          const queryText = args.queries
-            .map((q: unknown) => {
-              if (typeof q === 'object' && q !== null && 'sql' in q) {
-                return (q as { sql: string }).sql;
-              }
-              return String(q);
-            })
-            .join('\n\n');
-          return {
-            id: toolCallId,
-            type: 'text',
-            title: 'Executing SQL',
-            status: 'loading',
-            message: queryText,
-            message_chunk: null,
-            secondary_title: undefined,
-            finished_reasoning: false,
-          } as ReasoningEntry;
-        } else if (args.sql) {
-          return {
-            id: toolCallId,
-            type: 'text',
-            title: 'Executing SQL',
-            status: 'loading',
-            message: args.sql,
-            message_chunk: null,
-            secondary_title: undefined,
-            finished_reasoning: false,
-          } as ReasoningEntry;
+        if (isExecuteSqlArgs(args)) {
+          if (args.queries && Array.isArray(args.queries)) {
+            const queryText = args.queries.map(extractSqlFromQuery).join('\n\n');
+            return {
+              id: toolCallId,
+              type: 'text',
+              title: 'Executing SQL',
+              status: 'loading',
+              message: queryText,
+              message_chunk: undefined,
+              secondary_title: undefined,
+              finished_reasoning: false,
+            } as ReasoningEntry;
+          }
+          if (args.sql) {
+            return {
+              id: toolCallId,
+              type: 'text',
+              title: 'Executing SQL',
+              status: 'loading',
+              message: args.sql,
+              message_chunk: undefined,
+              secondary_title: undefined,
+              finished_reasoning: false,
+            } as ReasoningEntry;
+          }
         }
         break;
 
       case 'submitThoughts':
-        if (args.thoughts) {
+        if (isSubmitThoughtsArgs(args)) {
           return {
             id: toolCallId,
             type: 'text',
             title: 'Submitting Analysis',
             status: 'loading',
             message: args.thoughts,
-            message_chunk: null,
+            message_chunk: undefined,
             secondary_title: undefined,
             finished_reasoning: false,
           } as ReasoningEntry;
         }
         break;
 
-      default:
+      default: {
         // For other tools, create a generic text entry
         let messageContent: string;
         try {
@@ -654,10 +618,11 @@ export class ChunkProcessor {
           title: toolName,
           status: 'loading',
           message: messageContent,
-          message_chunk: null,
+          message_chunk: undefined,
           secondary_title: undefined,
           finished_reasoning: false,
         } as ReasoningEntry;
+      }
     }
 
     return null;
@@ -697,7 +662,8 @@ export class ChunkProcessor {
   getAccumulatedMessages(): CoreMessage[] {
     const messages = [...this.state.accumulatedMessages];
     if (this.state.currentAssistantMessage) {
-      messages.push(this.state.currentAssistantMessage as unknown as CoreMessage);
+      // Type assertion is safe here because TypedAssistantMessage is compatible with CoreMessage
+      messages.push(this.state.currentAssistantMessage as CoreMessage);
     }
     return messages;
   }
