@@ -22,6 +22,7 @@ export const AnalystRuntimeContextSchema = z.object({
   dataSourceSyntax: z.string(),
   organizationId: z.string(),
   messageId: z.string().optional(), // Optional for testing scenarios
+  workflowStartTime: z.number().optional(), // Track workflow start time in milliseconds
 });
 
 export type AnalystRuntimeContext = z.infer<typeof AnalystRuntimeContextSchema>;

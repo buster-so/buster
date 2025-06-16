@@ -35,7 +35,7 @@ function setupRuntimeContextFromMessage(
     runtimeContext.set('organizationId', messageContext.organizationId);
     runtimeContext.set('dataSourceId', dataSource.dataSourceId);
     runtimeContext.set('dataSourceSyntax', dataSource.dataSourceSyntax);
-    runtimeContext.set('todos', ''); // Initialize as empty
+    runtimeContext.set('workflowStartTime', Date.now());
 
     // Add messageId for database persistence (following AI package pattern)
     runtimeContext.set('messageId', messageId);

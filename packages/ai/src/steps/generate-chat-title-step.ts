@@ -1,4 +1,5 @@
-import { updateChatFields } from '@buster/database/src/helpers/chats';
+import { updateChat } from '@buster/database/src/helpers/chats';
+import { updateMessage } from '@buster/database/src/helpers/messages';
 import { Agent, createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import type { CoreMessage } from 'ai';
@@ -70,10 +71,24 @@ const generateChatTitleExecution = async ({
     const title = await tracedChatTitle();
 
     const chatId = runtimeContext.get('chatId');
+    const messageId = runtimeContext.get('messageId');
 
-    await updateChatFields(chatId, {
-      title: title.title,
-    });
+    // Run database updates concurrently
+    const updatePromises = [
+      updateChat(chatId, {
+        title: title.title,
+      }),
+    ];
+
+    if (messageId) {
+      updatePromises.push(
+        updateMessage(messageId, {
+          title: title.title,
+        })
+      );
+    }
+
+    await Promise.all(updatePromises);
 
     return title;
   } catch (error) {

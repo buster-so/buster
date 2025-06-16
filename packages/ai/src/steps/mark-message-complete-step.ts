@@ -1,8 +1,27 @@
 import { updateMessage } from '@buster/database';
+import { updateChat } from '@buster/database/src/helpers/chats';
 import { createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { z } from 'zod';
 import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
+
+// Helper function to format duration
+const formatDuration = (durationMs: number): string => {
+  const seconds = Math.round(durationMs / 1000);
+
+  if (seconds < 60) {
+    return `${seconds} second${seconds !== 1 ? 's' : ''}`;
+  }
+
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+
+  if (remainingSeconds === 0) {
+    return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+  }
+
+  return `${minutes} minute${minutes !== 1 ? 's' : ''} and ${remainingSeconds} second${remainingSeconds !== 1 ? 's' : ''}`;
+};
 
 const inputSchema = z.object({
   messageId: z.string().describe('The message ID to mark as complete'),
@@ -23,7 +42,16 @@ const markMessageCompleteExecution = async ({
 }): Promise<z.infer<typeof outputSchema>> => {
   try {
     const messageId = runtimeContext.get('messageId');
+    const workflowStartTime = runtimeContext.get('workflowStartTime');
     const completedAt = new Date().toISOString();
+
+    // Calculate workflow duration
+    let finalReasoningMessage = 'complete';
+    if (workflowStartTime) {
+      const durationMs = Date.now() - workflowStartTime;
+      const formattedDuration = formatDuration(durationMs);
+      finalReasoningMessage = `Reasoned for ${formattedDuration}`;
+    }
 
     // If no messageId, this is expected when running without database operations
     if (!messageId) {
@@ -37,6 +65,7 @@ const markMessageCompleteExecution = async ({
     // Update the message in the database
     await updateMessage(messageId, {
       isCompleted: true,
+      finalReasoningMessage,
     });
 
     return {

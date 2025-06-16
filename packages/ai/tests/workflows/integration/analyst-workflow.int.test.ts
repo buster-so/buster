@@ -69,6 +69,7 @@ describe('Analyst Workflow Integration Tests', () => {
     const userId = 'c2dd64cd-f7f3-4884-bc91-d46ae431901e';
     const chatId = crypto.randomUUID();
     const messageId = crypto.randomUUID();
+    const workflowStartTime = Date.now();
 
     // Create chat first
     try {
@@ -114,6 +115,7 @@ describe('Analyst Workflow Integration Tests', () => {
     runtimeContext.set('dataSourceId', 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a');
     runtimeContext.set('dataSourceSyntax', 'postgres');
     runtimeContext.set('messageId', messageId); // This should trigger database saves
+    runtimeContext.set('workflowStartTime', workflowStartTime);
 
     const tracedWorkflow = wrapTraced(
       async () => {
@@ -216,8 +218,6 @@ describe('Analyst Workflow Integration Tests', () => {
     runtimeContext.set('dataSourceId', 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a');
     runtimeContext.set('dataSourceSyntax', 'postgres');
     runtimeContext.set('messageId', messageId); // This triggers saving to rawLlmMessages
-
-    console.log('Running initial workflow with messageId:', messageId);
 
     const initialTracedWorkflow = wrapTraced(
       async () => {

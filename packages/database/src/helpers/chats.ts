@@ -202,7 +202,7 @@ export async function getMessagesForChat(chatId: string): Promise<Message[]> {
  * @param fields - Object containing the fields to update (only provided fields will be updated)
  * @returns Success status
  */
-export async function updateChatFields(
+export async function updateChat(
   chatId: string,
   fields: UpdateableChatFields
 ): Promise<{ success: boolean }> {
