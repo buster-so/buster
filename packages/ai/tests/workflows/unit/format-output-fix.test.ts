@@ -9,7 +9,7 @@ describe('Format Output Fix Tests', () => {
 
     const mockRuntimeContext = {
       userId: 'test-user',
-      threadId: 'test-thread',
+      chatId: 'test-thread',
       dataSourceId: 'test-datasource',
       dataSourceSyntax: 'postgresql',
       organizationId: 'test-org',

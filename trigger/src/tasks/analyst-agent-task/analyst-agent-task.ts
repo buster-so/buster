@@ -31,7 +31,7 @@ function setupRuntimeContextFromMessage(
 
     // Populate from Task 2 helper outputs
     runtimeContext.set('userId', messageContext.userId);
-    runtimeContext.set('threadId', messageContext.chatId);
+    runtimeContext.set('chatId', messageContext.chatId);
     runtimeContext.set('organizationId', messageContext.organizationId);
     runtimeContext.set('dataSourceId', dataSource.dataSourceId);
     runtimeContext.set('dataSourceSyntax', dataSource.dataSourceSyntax);

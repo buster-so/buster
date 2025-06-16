@@ -14,7 +14,7 @@ describe('Retry Mechanism Integration Tests', () => {
       await withTestEnv(async () => {
         const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();
         runtimeContext.set('userId', 'test-user');
-        runtimeContext.set('threadId', 'test-thread');
+        runtimeContext.set('chatId', 'test-thread');
 
         // Create input data that simulates previous step outputs
         const inputData = {
@@ -69,7 +69,7 @@ describe('Retry Mechanism Integration Tests', () => {
       await withTestEnv(async () => {
         const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();
         runtimeContext.set('userId', 'test-user');
-        runtimeContext.set('threadId', 'test-thread');
+        runtimeContext.set('chatId', 'test-thread');
 
         // Simulate output from think-and-prep step
         const mockMessages: CoreMessage[] = [
@@ -137,7 +137,7 @@ describe('Retry Mechanism Integration Tests', () => {
       await withTestEnv(async () => {
         const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();
         runtimeContext.set('userId', 'test-user');
-        runtimeContext.set('threadId', 'test-thread');
+        runtimeContext.set('chatId', 'test-thread');
 
         const originalMessages: CoreMessage[] = [
           { role: 'user', content: 'Original question' },

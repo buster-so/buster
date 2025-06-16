@@ -86,10 +86,10 @@ const thinkAndPrepExecution = async ({
   const chunkProcessor = new ChunkProcessor(messageId, [], [], []);
 
   try {
-    const threadId = runtimeContext.get('threadId');
+    const chatId = runtimeContext.get('chatId');
     const resourceId = runtimeContext.get('userId');
 
-    if (!threadId || !resourceId) {
+    if (!chatId || !resourceId) {
       throw new Error('Missing required context values');
     }
 
@@ -193,14 +193,17 @@ const thinkAndPrepExecution = async ({
           abortController,
           maxRetries: 3,
           onRetry: (error, attemptNumber) => {
-            console.error(`Think and Prep stream retry attempt ${attemptNumber} for streaming error:`, error);
+            console.error(
+              `Think and Prep stream retry attempt ${attemptNumber} for streaming error:`,
+              error
+            );
           },
           toolChoice: 'required',
         });
 
         if (healingResult.shouldRetry && healingResult.healingMessage) {
           console.log('Streaming error healed, healing message:', healingResult.healingMessage);
-          
+
           // Add the healing message to the conversation
           // Note: For now we just log it. A full implementation would need to restart
           // the entire stream processing with the healed conversation.

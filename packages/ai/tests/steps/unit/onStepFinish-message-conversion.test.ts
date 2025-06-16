@@ -38,7 +38,7 @@ function createMockRuntimeContext(messageId?: string): RuntimeContext<AnalystRun
     values.set('messageId', messageId);
   }
   values.set('userId', 'test-user');
-  values.set('threadId', 'test-thread');
+  values.set('chatId', 'test-thread');
   values.set('dataSourceId', 'test-datasource');
   values.set('dataSourceSyntax', 'postgresql');
   values.set('organizationId', 'test-org');

@@ -1,10 +1,15 @@
+import { updateChatFields } from '@buster/database/src/helpers/chats';
 import { Agent, createStep } from '@mastra/core';
+import type { RuntimeContext } from '@mastra/core/runtime-context';
 import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { anthropicCachedModel } from '../utils/models/anthropic-cached';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
-import type { thinkAndPrepWorkflowInputSchema } from '../workflows/analyst-workflow';
+import type {
+  AnalystRuntimeContext,
+  thinkAndPrepWorkflowInputSchema,
+} from '../workflows/analyst-workflow';
 
 const inputSchema = z.object({
   // This step receives initial workflow input through getInitData
@@ -26,8 +31,10 @@ const todosAgent = new Agent({
 
 const generateChatTitleExecution = async ({
   getInitData,
+  runtimeContext,
 }: {
   inputData: z.infer<typeof inputSchema>;
+  runtimeContext: RuntimeContext<AnalystRuntimeContext>;
   getInitData: () => Promise<z.infer<typeof thinkAndPrepWorkflowInputSchema>>;
 }): Promise<z.infer<typeof generateChatTitleOutputSchema>> => {
   try {
@@ -61,6 +68,12 @@ const generateChatTitleExecution = async ({
     );
 
     const title = await tracedChatTitle();
+
+    const chatId = runtimeContext.get('chatId');
+
+    await updateChatFields(chatId, {
+      title: title.title,
+    });
 
     return title;
   } catch (error) {
