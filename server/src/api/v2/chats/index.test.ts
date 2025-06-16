@@ -1,18 +1,18 @@
 import type { User } from '@supabase/supabase-js';
 import { Hono } from 'hono';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ChatError, ChatErrorCode } from '../../../types/chat-errors.types';
-import type { ChatWithMessages } from '../../../types/chat.types';
+import { ChatError, ChatErrorCode } from '../../../types/chat-types/chat-errors.types';
+import type { ChatWithMessages } from '../../../types/chat-types/chat.types';
 import '../../../types/hono.types';
 import chatRoutes from './index';
 
 // Mock dependencies
 vi.mock('../../../middleware/auth', () => ({
-  requireAuth: vi.fn((_c, next) => next()),
+  requireAuth: vi.fn((_c, next) => next())
 }));
 
 vi.mock('./handler', () => ({
-  createChatHandler: vi.fn(),
+  createChatHandler: vi.fn()
 }));
 
 // Import mocked handler
@@ -24,9 +24,9 @@ async function makeRequest(app: Hono, body: any, headers: Record<string, string>
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      ...headers,
+      ...headers
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify(body)
   });
 
   return app.request(request);
@@ -40,7 +40,7 @@ describe('POST /chats', () => {
     user_metadata: { organization_id: 'org-123' },
     app_metadata: {},
     aud: 'authenticated',
-    created_at: new Date().toISOString(),
+    created_at: new Date().toISOString()
   };
 
   const mockChat: ChatWithMessages = {
@@ -51,23 +51,30 @@ describe('POST /chats', () => {
     messages: {
       '123e4567-e89b-12d3-a456-426614174001': {
         id: '123e4567-e89b-12d3-a456-426614174001',
-        role: 'user',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         request_message: {
           request: 'Hello',
           sender_id: '123e4567-e89b-12d3-a456-426614174002',
-          sender_name: 'Test User',
+          sender_name: 'Test User'
         },
-        is_completed: false,
-      },
+        response_messages: {},
+        response_message_ids: [],
+        reasoning_message_ids: [],
+        reasoning_messages: {},
+        final_reasoning_message: null,
+        feedback: null,
+
+        is_completed: false
+      }
     },
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     created_by: '123e4567-e89b-12d3-a456-426614174002',
     created_by_id: '123e4567-e89b-12d3-a456-426614174002',
     created_by_name: 'Test User',
-    publicly_accessible: false,
+    created_by_avatar: null,
+    publicly_accessible: false
   };
 
   beforeEach(() => {
@@ -87,7 +94,7 @@ describe('POST /chats', () => {
 
   it('should create a chat with valid request', async () => {
     const response = await makeRequest(app, {
-      prompt: 'Hello world',
+      prompt: 'Hello world'
     });
 
     expect(response.status).toBe(200);
@@ -99,7 +106,7 @@ describe('POST /chats', () => {
   it('should create a chat with existing chat_id', async () => {
     const response = await makeRequest(app, {
       chat_id: '123e4567-e89b-12d3-a456-426614174003',
-      prompt: 'Follow up message',
+      prompt: 'Follow up message'
     });
 
     expect(response.status).toBe(200);
@@ -112,7 +119,7 @@ describe('POST /chats', () => {
   it('should create asset-based chat', async () => {
     const response = await makeRequest(app, {
       asset_id: '123e4567-e89b-12d3-a456-426614174004',
-      asset_type: 'metric_file',
+      asset_type: 'metric_file'
     });
 
     expect(response.status).toBe(200);
@@ -124,7 +131,7 @@ describe('POST /chats', () => {
 
   it('should validate asset_type is required when asset_id is provided', async () => {
     const response = await makeRequest(app, {
-      asset_id: '123e4567-e89b-12d3-a456-426614174005',
+      asset_id: '123e4567-e89b-12d3-a456-426614174005'
     });
 
     expect(response.status).toBe(400);
@@ -136,7 +143,7 @@ describe('POST /chats', () => {
 
   it('should validate UUID formats', async () => {
     const response = await makeRequest(app, {
-      chat_id: 'not-a-uuid',
+      chat_id: 'not-a-uuid'
     });
 
     expect(response.status).toBe(400);
@@ -180,7 +187,7 @@ describe('POST /chats', () => {
   it('should support legacy fields', async () => {
     const response = await makeRequest(app, {
       metric_id: '123e4567-e89b-12d3-a456-426614174006',
-      dashboard_id: '123e4567-e89b-12d3-a456-426614174007',
+      dashboard_id: '123e4567-e89b-12d3-a456-426614174007'
     });
 
     expect(response.status).toBe(200);

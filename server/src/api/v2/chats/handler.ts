@@ -1,5 +1,5 @@
 import type { ChatCreateHandlerRequest, ChatCreateResponse } from '@/types';
-import { ChatError, ChatErrorCode } from '@/types/chat-errors.types';
+import { ChatError, ChatErrorCode } from '@/types/chat-types/chat-errors.types';
 import { getUserOrganizationId } from '@buster/database';
 import type { User } from '@supabase/supabase-js';
 import { tasks } from '@trigger.dev/sdk/v3';
@@ -18,10 +18,7 @@ import { handleAssetChat, initializeChat } from './services/chat-service';
  * The analyst-agent-task runs in background and can take minutes.
  * Users get their chat object immediately without waiting.
  */
-export async function createChatHandler(
-  request: ChatCreateHandlerRequest,
-  user: User
-): Promise<ChatCreateResponse> {
+export async function createChatHandler(request: ChatCreateHandlerRequest, user: User): Promise<ChatCreateResponse> {
   const startTime = Date.now();
 
   try {
@@ -29,22 +26,14 @@ export async function createChatHandler(
     const userOrg = await getUserOrganizationId(user.id);
 
     if (!userOrg) {
-      throw new ChatError(
-        ChatErrorCode.MISSING_ORGANIZATION,
-        'User is not associated with an organization',
-        400
-      );
+      throw new ChatError(ChatErrorCode.MISSING_ORGANIZATION, 'User is not associated with an organization', 400);
     }
 
     const { organizationId, role: _role } = userOrg;
 
     // Validate asset parameters
     if (request.asset_id && !request.asset_type) {
-      throw new ChatError(
-        ChatErrorCode.INVALID_REQUEST,
-        'asset_type is required when asset_id is provided',
-        400
-      );
+      throw new ChatError(ChatErrorCode.INVALID_REQUEST, 'asset_type is required when asset_id is provided', 400);
     }
 
     // Initialize chat (new or existing)
@@ -53,14 +42,7 @@ export async function createChatHandler(
     // Handle asset-based chat if needed
     let finalChat = chat;
     if (request.asset_id && request.asset_type && !request.prompt) {
-      finalChat = await handleAssetChat(
-        chatId,
-        messageId,
-        request.asset_id,
-        request.asset_type,
-        user.id,
-        chat
-      );
+      finalChat = await handleAssetChat(chatId, messageId, request.asset_id, request.asset_type, user.id, chat);
     }
 
     // Trigger background analysis if we have content
@@ -70,7 +52,7 @@ export async function createChatHandler(
       try {
         // Just queue the background job - should be <100ms
         await tasks.trigger('analyst-agent-task', {
-          message_id: messageId,
+          message_id: messageId
         });
 
         const triggerDuration = Date.now() - triggerStart;
@@ -80,7 +62,7 @@ export async function createChatHandler(
           console.warn('Slow trigger operation detected:', {
             messageId,
             triggerDuration: `${triggerDuration}ms`,
-            warning: 'Trigger queueing should be <100ms',
+            warning: 'Trigger queueing should be <100ms'
           });
         }
       } catch (triggerError) {
@@ -88,7 +70,7 @@ export async function createChatHandler(
         console.error('Failed to trigger analyst agent task:', {
           messageId,
           triggerDuration: `${triggerDuration}ms`,
-          error: triggerError,
+          error: triggerError
         });
         // The user still gets their chat/message, background analysis just won't run
       }
@@ -105,7 +87,7 @@ export async function createChatHandler(
         chatId,
         hasPrompt: !!request.prompt,
         hasAsset: !!request.asset_id,
-        suggestion: 'Check database performance and trigger service',
+        suggestion: 'Check database performance and trigger service'
       });
     }
 
@@ -119,16 +101,16 @@ export async function createChatHandler(
         hasPrompt: !!request.prompt,
         hasChatId: !!request.chat_id,
         hasAssetId: !!request.asset_id,
-        assetType: request.asset_type,
+        assetType: request.asset_type
       },
       error:
         error instanceof Error
           ? {
               name: error.name,
               message: error.message,
-              stack: error.stack,
+              stack: error.stack
             }
-          : String(error),
+          : String(error)
     });
 
     // Re-throw ChatError instances
@@ -137,11 +119,8 @@ export async function createChatHandler(
     }
 
     // Wrap unexpected errors
-    throw new ChatError(
-      ChatErrorCode.INTERNAL_ERROR,
-      'An unexpected error occurred while creating the chat',
-      500,
-      { originalError: error instanceof Error ? error.message : String(error) }
-    );
+    throw new ChatError(ChatErrorCode.INTERNAL_ERROR, 'An unexpected error occurred while creating the chat', 500, {
+      originalError: error instanceof Error ? error.message : String(error)
+    });
   }
 }

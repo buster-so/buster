@@ -1,5 +1,5 @@
-import type { ChatCreateHandlerRequest, ChatMessage, ChatWithMessages } from '@/types';
-import { ChatError, ChatErrorCode } from '@/types/chat-errors.types';
+import type { ChatCreateHandlerRequest, ChatMessage, ChatWithMessages } from '@/types/chat-types';
+import { ChatError, ChatErrorCode } from '@/types/chat-types/chat-errors.types';
 import {
   chats,
   checkChatPermission,
@@ -8,7 +8,7 @@ import {
   generateAssetMessages,
   getChatWithDetails,
   getMessagesForChat,
-  messages,
+  messages
 } from '@buster/database';
 import type { Chat, Message } from '@buster/database/src/helpers/chats';
 import type { User } from '@supabase/supabase-js';
@@ -30,24 +30,21 @@ export function buildChatWithMessages(
   for (const msg of messages) {
     const chatMessage: ChatMessage = {
       id: msg.id,
-      role: msg.requestMessage ? 'user' : 'assistant',
       created_at: msg.createdAt,
       updated_at: msg.updatedAt,
-      request_message: msg.requestMessage
-        ? {
-            request: msg.requestMessage,
-            sender_id: msg.createdBy,
-            sender_name: creatorDetails?.name || 'Unknown User',
-            sender_avatar: creatorDetails?.avatarUrl || undefined,
-          }
-        : undefined,
-      //TODO - ask Dallin if this is correct?
-      response_message: (msg.responseMessages as { content: string })?.content || undefined,
-      reasoning_message: (msg.reasoning as { content: string })?.content || undefined,
-      final_reasoning_message: msg.finalReasoningMessage || undefined,
-      feedback: msg.feedback ? (msg.feedback as 'positive' | 'negative') : undefined,
-      files: undefined, // TODO: Load files from messagesToFiles
-      is_completed: msg.isCompleted || false, // Always false for new messages, trigger job sets to true
+      request_message: {
+        request: msg.requestMessage || '',
+        sender_id: msg.createdBy,
+        sender_name: creatorDetails?.name || 'Unknown User',
+        sender_avatar: creatorDetails?.avatarUrl || undefined
+      },
+      response_messages: {},
+      response_message_ids: [],
+      reasoning_message_ids: [],
+      reasoning_messages: {},
+      final_reasoning_message: msg.finalReasoningMessage || null,
+      feedback: msg.feedback ? (msg.feedback as 'negative') : null,
+      is_completed: msg.isCompleted || false // Always false for new messages, trigger job sets to true
     };
 
     messageIds.push(msg.id);
@@ -65,14 +62,14 @@ export function buildChatWithMessages(
     created_by: chat.createdBy,
     created_by_id: chat.createdBy,
     created_by_name: creatorDetails?.name || 'Unknown User',
-    created_by_avatar: creatorDetails?.avatarUrl || undefined,
+    created_by_avatar: creatorDetails?.avatarUrl || null,
     // Sharing fields - TODO: implement proper sharing logic
     individual_permissions: undefined,
     publicly_accessible: chat.publiclyAccessible || false,
     public_expiry_date: chat.publicExpiryDate || undefined,
     public_enabled_by: chat.publiclyEnabledBy || undefined,
     public_password: undefined, // Don't expose password
-    permission: 'owner', // TODO: Implement proper permission checking
+    permission: 'owner' // TODO: Implement proper permission checking
   };
 }
 
@@ -95,7 +92,7 @@ export async function initializeChat(
       // Existing chat - check if it exists first, then check permission
       const chatDetails = await getChatWithDetails({
         chatId: request.chat_id,
-        userId: user.id,
+        userId: user.id
       });
 
       if (!chatDetails) {
@@ -104,11 +101,7 @@ export async function initializeChat(
 
       const hasPermission = await checkChatPermission(request.chat_id, user.id);
       if (!hasPermission) {
-        throw new ChatError(
-          ChatErrorCode.PERMISSION_DENIED,
-          'You do not have permission to access this chat',
-          403
-        );
+        throw new ChatError(ChatErrorCode.PERMISSION_DENIED, 'You do not have permission to access this chat', 403);
       }
 
       // Create new message and fetch existing messages concurrently
@@ -118,10 +111,10 @@ export async function initializeChat(
               chatId: request.chat_id,
               content: request.prompt,
               userId: user.id,
-              messageId,
+              messageId
             })
           : Promise.resolve(null),
-        getMessagesForChat(request.chat_id),
+        getMessagesForChat(request.chat_id)
       ]);
 
       // Combine messages
@@ -135,7 +128,7 @@ export async function initializeChat(
         chatDetails.user
           ? {
               name: chatDetails.user.name,
-              avatarUrl: chatDetails.user.avatarUrl,
+              avatarUrl: chatDetails.user.avatarUrl
             }
           : null,
         chatDetails.isFavorited
@@ -144,7 +137,7 @@ export async function initializeChat(
       return {
         chatId: request.chat_id,
         messageId,
-        chat: chatWithMessages,
+        chat: chatWithMessages
       };
     }
     // New chat - use transaction for atomicity
@@ -159,7 +152,7 @@ export async function initializeChat(
           organizationId,
           createdBy: user.id,
           updatedBy: user.id,
-          publiclyAccessible: false,
+          publiclyAccessible: false
         })
         .returning();
 
@@ -181,7 +174,7 @@ export async function initializeChat(
             reasoning: {},
             title: request.prompt,
             rawLlmMessages: {},
-            isCompleted: false,
+            isCompleted: false
           })
           .returning();
 
@@ -201,7 +194,7 @@ export async function initializeChat(
       user,
       {
         name: user.user_metadata?.name || user.email || null,
-        avatarUrl: user.user_metadata?.avatar_url || null,
+        avatarUrl: user.user_metadata?.avatar_url || null
       },
       false
     );
@@ -209,7 +202,7 @@ export async function initializeChat(
     return {
       chatId: result.chat.id,
       messageId,
-      chat: chatWithMessages,
+      chat: chatWithMessages
     };
   } catch (error) {
     // Log detailed error context
@@ -223,9 +216,9 @@ export async function initializeChat(
           ? {
               message: error.message,
               stack: error.stack,
-              name: error.name,
+              name: error.name
             }
-          : String(error),
+          : String(error)
     });
 
     // Re-throw ChatError instances
@@ -234,12 +227,9 @@ export async function initializeChat(
     }
 
     // Wrap database errors
-    throw new ChatError(
-      ChatErrorCode.DATABASE_ERROR,
-      'Failed to initialize chat due to database error',
-      500,
-      { originalError: error instanceof Error ? error.message : String(error) }
-    );
+    throw new ChatError(ChatErrorCode.DATABASE_ERROR, 'Failed to initialize chat due to database error', 500, {
+      originalError: error instanceof Error ? error.message : String(error)
+    });
   }
 }
 
@@ -260,7 +250,7 @@ export async function handleAssetChat(
       assetId,
       assetType,
       userId,
-      chatId,
+      chatId
     });
 
     if (!assetMessages || assetMessages.length === 0) {
@@ -268,7 +258,7 @@ export async function handleAssetChat(
         assetId,
         assetType,
         userId,
-        chatId,
+        chatId
       });
       return chat;
     }
@@ -277,21 +267,21 @@ export async function handleAssetChat(
     for (const msg of assetMessages) {
       const chatMessage: ChatMessage = {
         id: msg.id,
-        role: msg.requestMessage ? 'user' : 'assistant',
         created_at: msg.createdAt,
         updated_at: msg.updatedAt,
-        request_message: msg.requestMessage
-          ? {
-              request: msg.requestMessage,
-              sender_id: msg.createdBy,
-              sender_name: chat.created_by_name,
-              sender_avatar: chat.created_by_avatar,
-            }
-          : undefined,
-        //TODO - ask Dallin if this is correct?
-        response_message: (msg.responseMessages as { content: string })?.content || undefined,
-        feedback: undefined,
-        is_completed: false,
+        request_message: {
+          request: msg.requestMessage || '',
+          sender_id: msg.createdBy,
+          sender_name: chat.created_by_name,
+          sender_avatar: chat.created_by_avatar || undefined
+        },
+        response_messages: {},
+        response_message_ids: [],
+        reasoning_message_ids: [],
+        reasoning_messages: {},
+        final_reasoning_message: null,
+        feedback: null,
+        is_completed: false
       };
 
       chat.message_ids.push(msg.id);
@@ -310,9 +300,9 @@ export async function handleAssetChat(
           ? {
               message: error.message,
               stack: error.stack,
-              name: error.name,
+              name: error.name
             }
-          : String(error),
+          : String(error)
     });
 
     // Don't fail the entire request, just return the chat without asset messages

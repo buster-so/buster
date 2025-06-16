@@ -4,19 +4,19 @@ import {
   cleanupTestMessages,
   createTestChat,
   createTestOrganization,
-  createTestUser,
+  createTestUser
 } from '@buster/test-utils';
 import { zValidator } from '@hono/zod-validator';
 import type { User } from '@supabase/supabase-js';
 import { tasks } from '@trigger.dev/sdk/v3';
 import { Hono } from 'hono';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ChatError } from '../../../types/chat-errors.types';
+import { ChatError } from '../../../types/chat-types/chat-errors.types';
 import {
   ChatCreateRequestSchema,
   ChatCreateResponseSchema,
-  type ChatWithMessages,
-} from '../../../types/chat.types';
+  type ChatWithMessages
+} from '../../../types/chat-types/chat.types';
 import { errorResponse } from '../../../utils/response';
 import { createChatHandler } from './handler';
 import '../../../types/hono.types';
@@ -36,7 +36,7 @@ describe('Chat Handler Integration Tests', () => {
     testOrgId = await createTestOrganization();
     testUserId = await createTestUser({
       email: `test-${Date.now()}@example.com`,
-      name: 'Test User',
+      name: 'Test User'
     });
 
     // Create user-to-organization association
@@ -45,7 +45,7 @@ describe('Chat Handler Integration Tests', () => {
       organizationId: testOrgId,
       role: 'workspace_admin',
       createdBy: testUserId,
-      updatedBy: testUserId,
+      updatedBy: testUserId
     });
 
     mockUser = {
@@ -54,11 +54,11 @@ describe('Chat Handler Integration Tests', () => {
       user_metadata: {
         organization_id: testOrgId,
         name: 'Test User',
-        avatar_url: 'https://example.com/avatar.jpg',
+        avatar_url: 'https://example.com/avatar.jpg'
       },
       app_metadata: {},
       aud: 'authenticated',
-      created_at: new Date().toISOString(),
+      created_at: new Date().toISOString()
     } as User;
 
     // Setup Hono app - bypass auth middleware for tests
@@ -76,10 +76,7 @@ describe('Chat Handler Integration Tests', () => {
 
   afterAll(async () => {
     // Cleanup test data - get all chats for the user first
-    const userChats = await db
-      .select({ id: chats.id })
-      .from(chats)
-      .where(eq(chats.createdBy, testUserId));
+    const userChats = await db.select({ id: chats.id }).from(chats).where(eq(chats.createdBy, testUserId));
 
     const chatIds = userChats.map((chat) => chat.id);
     if (chatIds.length > 0) {
@@ -115,7 +112,7 @@ describe('Chat Handler Integration Tests', () => {
           chat_id: request.chat_id,
           message_id: request.message_id,
           asset_id: request.asset_id,
-          asset_type: request.asset_type,
+          asset_type: request.asset_type
         };
 
         const response = await createChatHandler(handlerRequest, user);
@@ -139,7 +136,7 @@ describe('Chat Handler Integration Tests', () => {
     const request = new Request('http://localhost/chats', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+      body: JSON.stringify(body)
     });
     return app.request(request);
   }
@@ -163,37 +160,34 @@ describe('Chat Handler Integration Tests', () => {
       created_by_id: testUserId,
       created_by_name: 'Test User',
       publicly_accessible: false,
-      permission: 'owner',
+      permission: 'owner'
     });
 
     // Verify database state - chat was created
     const [createdChat] = await db.select().from(chats).where(eq(chats.id, chatResponse.id));
 
     expect(createdChat).toBeDefined();
-    expect(createdChat.title).toBe(prompt);
-    expect(createdChat.organizationId).toBe(testOrgId);
-    expect(createdChat.createdBy).toBe(testUserId);
+    expect(createdChat!.title).toBe(prompt);
+    expect(createdChat!.organizationId).toBe(testOrgId);
+    expect(createdChat!.createdBy).toBe(testUserId);
 
     // Verify message was created
-    const [createdMessage] = await db
-      .select()
-      .from(messages)
-      .where(eq(messages.chatId, chatResponse.id));
+    const [createdMessage] = await db.select().from(messages).where(eq(messages.chatId, chatResponse.id));
 
     expect(createdMessage).toBeDefined();
-    expect(createdMessage.requestMessage).toBe(prompt);
-    expect(createdMessage.createdBy).toBe(testUserId);
+    expect(createdMessage!.requestMessage).toBe(prompt);
+    expect(createdMessage!.createdBy).toBe(testUserId);
 
     // Verify message is in response
-    const messageId = chatResponse.message_ids[0];
+    const messageId = chatResponse.message_ids[0]!;
     expect(chatResponse.messages[messageId]).toMatchObject({
       role: 'user',
       request_message: {
         request: prompt,
         sender_id: testUserId,
-        sender_name: 'Test User',
+        sender_name: 'Test User'
       },
-      is_completed: false, // Always false for new messages, trigger job sets to true
+      is_completed: false // Always false for new messages, trigger job sets to true
     });
   });
 
@@ -205,7 +199,7 @@ describe('Chat Handler Integration Tests', () => {
     const firstPrompt = 'First question';
     const firstResponse = await makeRequest({
       chat_id: chatId,
-      prompt: firstPrompt,
+      prompt: firstPrompt
     });
 
     expect(firstResponse.status).toBe(200);
@@ -215,7 +209,7 @@ describe('Chat Handler Integration Tests', () => {
     const secondPrompt = 'Follow-up question';
     const secondResponse = await makeRequest({
       chat_id: chatId,
-      prompt: secondPrompt,
+      prompt: secondPrompt
     });
 
     expect(secondResponse.status).toBe(200);
@@ -232,8 +226,8 @@ describe('Chat Handler Integration Tests', () => {
       .orderBy(asc(messages.createdAt));
 
     expect(dbMessages.length).toBe(2);
-    expect(dbMessages[0].requestMessage).toBe(firstPrompt);
-    expect(dbMessages[1].requestMessage).toBe(secondPrompt);
+    expect(dbMessages[0]!.requestMessage).toBe(firstPrompt);
+    expect(dbMessages[1]!.requestMessage).toBe(secondPrompt);
   });
 
   it('should handle follow-up conversation flow properly', async () => {
@@ -255,7 +249,7 @@ describe('Chat Handler Integration Tests', () => {
     const followUpPrompt = 'Can you break that down by region?';
     const followUpResponse = await makeRequest({
       chat_id: chatId,
-      prompt: followUpPrompt,
+      prompt: followUpPrompt
     });
 
     expect(followUpResponse.status).toBe(200);
@@ -270,7 +264,7 @@ describe('Chat Handler Integration Tests', () => {
     const secondFollowUp = 'What about compared to last year?';
     const thirdResponse = await makeRequest({
       chat_id: chatId,
-      prompt: secondFollowUp,
+      prompt: secondFollowUp
     });
 
     expect(thirdResponse.status).toBe(200);
@@ -288,9 +282,9 @@ describe('Chat Handler Integration Tests', () => {
       .orderBy(asc(messages.createdAt));
 
     expect(allDbMessages.length).toBe(3);
-    expect(allDbMessages[0].requestMessage).toBe(initialPrompt);
-    expect(allDbMessages[1].requestMessage).toBe(followUpPrompt);
-    expect(allDbMessages[2].requestMessage).toBe(secondFollowUp);
+    expect(allDbMessages[0]!.requestMessage).toBe(initialPrompt);
+    expect(allDbMessages[1]!.requestMessage).toBe(followUpPrompt);
+    expect(allDbMessages[2]!.requestMessage).toBe(secondFollowUp);
 
     // Verify all messages appear in final response
     expect(Object.keys(thirdChat.messages)).toHaveLength(3);
@@ -309,9 +303,7 @@ describe('Chat Handler Integration Tests', () => {
     // Create multiple messages concurrently
     const prompts = ['Concurrent message 1', 'Concurrent message 2', 'Concurrent message 3'];
 
-    const responses = await Promise.all(
-      prompts.map((prompt) => makeRequest({ chat_id: chatId, prompt }))
-    );
+    const responses = await Promise.all(prompts.map((prompt) => makeRequest({ chat_id: chatId, prompt })));
 
     // All should succeed
     for (const response of responses) {
@@ -334,11 +326,11 @@ describe('Chat Handler Integration Tests', () => {
     // Try to add message as different user
     const response = await makeRequest({
       chat_id: chatId,
-      prompt: 'Unauthorized access attempt',
+      prompt: 'Unauthorized access attempt'
     });
 
     expect(response.status).toBe(403);
-    const error = await response.json();
+    const error = (await response.json()) as { message: string };
     expect(error.message).toContain('permission');
 
     // Verify no message was created
@@ -352,11 +344,11 @@ describe('Chat Handler Integration Tests', () => {
 
     const response = await makeRequest({
       chat_id: fakeId,
-      prompt: 'Message to non-existent chat',
+      prompt: 'Message to non-existent chat'
     });
 
     expect(response.status).toBe(404);
-    const error = await response.json();
+    const error = (await response.json()) as { message: string };
     expect(error.message).toContain('not found');
   });
 
@@ -364,7 +356,7 @@ describe('Chat Handler Integration Tests', () => {
     // Create a user without organization association in database
     const isolatedUserId = await createTestUser({
       email: `isolated-${Date.now()}@example.com`,
-      name: 'Isolated User',
+      name: 'Isolated User'
     });
     // Note: No organization association created for this user
 
@@ -372,11 +364,11 @@ describe('Chat Handler Integration Tests', () => {
       id: isolatedUserId,
       email: 'isolated@example.com',
       user_metadata: {
-        name: 'Isolated User',
+        name: 'Isolated User'
       },
       app_metadata: {},
       aud: 'authenticated',
-      created_at: new Date().toISOString(),
+      created_at: new Date().toISOString()
     } as User;
 
     const appWithInvalidUser = new Hono();
@@ -389,13 +381,13 @@ describe('Chat Handler Integration Tests', () => {
     const request = new Request('http://localhost/chats', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: 'Test' }),
+      body: JSON.stringify({ prompt: 'Test' })
     });
 
     const response = await appWithInvalidUser.request(request);
 
     expect(response.status).toBe(400);
-    const error = await response.json();
+    const error = (await response.json()) as { message: string };
     expect(error.message).toContain('organization');
   });
 
@@ -406,7 +398,7 @@ describe('Chat Handler Integration Tests', () => {
     const triggerSpy = vi.spyOn(tasks, 'trigger');
 
     const response = await makeRequest({
-      prompt: 'Test trigger integration',
+      prompt: 'Test trigger integration'
     });
 
     expect(response.status).toBe(200);
@@ -414,7 +406,7 @@ describe('Chat Handler Integration Tests', () => {
 
     // Verify trigger was called with correct message_id
     expect(triggerSpy).toHaveBeenCalledWith('analyst-agent-task', {
-      message_id: chat.message_ids[0],
+      message_id: chat.message_ids[0]
     });
 
     triggerSpy.mockRestore();
@@ -424,7 +416,7 @@ describe('Chat Handler Integration Tests', () => {
     // This test verifies that chat creation succeeds even if trigger fails
     // Since we don't mock trigger per requirements, this tests real failure handling
     const response = await makeRequest({
-      prompt: 'Test with potential trigger failure',
+      prompt: 'Test with potential trigger failure'
     });
 
     // Request should always succeed regardless of trigger status
@@ -435,12 +427,12 @@ describe('Chat Handler Integration Tests', () => {
     const [dbChat] = await db.select().from(chats).where(eq(chats.id, chat.id));
 
     expect(dbChat).toBeDefined();
-    expect(dbChat.title).toBe('Test with potential trigger failure');
+    expect(dbChat!.title).toBe('Test with potential trigger failure');
 
     const [dbMessage] = await db.select().from(messages).where(eq(messages.chatId, chat.id));
 
     expect(dbMessage).toBeDefined();
-    expect(dbMessage.requestMessage).toBe('Test with potential trigger failure');
+    expect(dbMessage!.requestMessage).toBe('Test with potential trigger failure');
   });
 
   it.skip('should handle asset-based chat creation', async () => {
@@ -448,7 +440,7 @@ describe('Chat Handler Integration Tests', () => {
     // For now, testing basic asset validation
     const response = await makeRequest({
       asset_id: '123e4567-e89b-12d3-a456-426614174000',
-      asset_type: 'metric_file',
+      asset_type: 'metric_file'
     });
 
     // Since we don't have real assets in test, this may fail with 404 or other error

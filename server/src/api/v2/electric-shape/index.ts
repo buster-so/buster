@@ -8,7 +8,7 @@ import { createProxiedResponse, getElectricShapeUrl } from './_helpers';
 import proxyRouter from './_proxyRouterConfig';
 
 const electricShapeSchema = z.object({
-  table: z.string(),
+  table: z.string()
 });
 
 const app = new Hono()
@@ -24,7 +24,7 @@ const app = new Hono()
     if (!proxy) {
       return c.json(
         {
-          error: `The requested table '${table}' is not available for Electric Shape processing. Please check the table name and try again.`,
+          error: `The requested table '${table}' is not available for Electric Shape processing. Please check the table name and try again.`
         },
         404
       );
@@ -32,6 +32,10 @@ const app = new Hono()
 
     try {
       const proxiedUrl = await proxy(url, userId, c);
+
+      if (!proxiedUrl) {
+        return;
+      }
 
       if (proxiedUrl instanceof Response) {
         return proxiedUrl;

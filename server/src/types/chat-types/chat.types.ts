@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ChatMessageSchema } from './chat-message.type';
 
 const AssetType = z.enum(['metric_file', 'dashboard_file']);
 
@@ -9,42 +10,7 @@ export const AssetPermissionRoleSchema = z.enum(['viewer', 'editor', 'owner']);
 export const BusterShareIndividualSchema = z.object({
   email: z.string().email(),
   role: AssetPermissionRoleSchema,
-  name: z.string().optional(),
-});
-
-// Message role for chat messages
-export const MessageRoleSchema = z.enum(['user', 'assistant']);
-
-// Chat user message schema
-export const ChatUserMessageSchema = z.object({
-  request: z.string(),
-  sender_id: z.string(),
-  sender_name: z.string(),
-  sender_avatar: z.string().optional(),
-});
-
-// File info schema for message attachments
-export const FileInfoSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  type: z.string(),
-  url: z.string().optional(),
-  size: z.number().optional(),
-});
-
-// Chat message schema
-export const ChatMessageSchema = z.object({
-  id: z.string().uuid(),
-  role: MessageRoleSchema,
-  created_at: z.string(),
-  updated_at: z.string(),
-  request_message: ChatUserMessageSchema.optional(),
-  response_message: z.string().optional(),
-  files: z.array(FileInfoSchema).optional(),
-  reasoning_message: z.string().optional(),
-  final_reasoning_message: z.string().optional(),
-  feedback: z.enum(['positive', 'negative']).optional(),
-  is_completed: z.boolean(),
+  name: z.string().optional()
 });
 
 // Main ChatWithMessages schema
@@ -59,14 +25,14 @@ export const ChatWithMessagesSchema = z.object({
   created_by: z.string(),
   created_by_id: z.string(),
   created_by_name: z.string(),
-  created_by_avatar: z.string().optional(),
+  created_by_avatar: z.string().nullable(),
   // Sharing fields
   individual_permissions: z.array(BusterShareIndividualSchema).optional(),
   publicly_accessible: z.boolean(),
   public_expiry_date: z.string().datetime().optional(),
   public_enabled_by: z.string().optional(),
   public_password: z.string().optional(),
-  permission: AssetPermissionRoleSchema.optional(),
+  permission: AssetPermissionRoleSchema.optional()
 });
 
 export const ChatCreateRequestSchema = z
@@ -78,11 +44,11 @@ export const ChatCreateRequestSchema = z
     asset_type: AssetType.optional(),
     // Legacy fields for backward compatibility
     metric_id: z.string().uuid().optional(),
-    dashboard_id: z.string().uuid().optional(),
+    dashboard_id: z.string().uuid().optional()
   })
   .refine((data) => !data.asset_id || data.asset_type, {
     message: 'asset_type must be provided when asset_id is specified',
-    path: ['asset_type'],
+    path: ['asset_type']
   });
 
 // Updated response schema to return full chat object
@@ -94,16 +60,13 @@ export const ChatCreateHandlerRequestSchema = z.object({
   chat_id: z.string().uuid().optional(),
   message_id: z.string().uuid().optional(),
   asset_id: z.string().uuid().optional(),
-  asset_type: AssetType.optional(),
+  asset_type: AssetType.optional()
 });
 
 // Infer types from schemas
 export type AssetPermissionRole = z.infer<typeof AssetPermissionRoleSchema>;
 export type BusterShareIndividual = z.infer<typeof BusterShareIndividualSchema>;
-export type MessageRole = z.infer<typeof MessageRoleSchema>;
-export type ChatUserMessage = z.infer<typeof ChatUserMessageSchema>;
-export type FileInfo = z.infer<typeof FileInfoSchema>;
-export type ChatMessage = z.infer<typeof ChatMessageSchema>;
+
 export type ChatWithMessages = z.infer<typeof ChatWithMessagesSchema>;
 export type ChatCreateRequest = z.infer<typeof ChatCreateRequestSchema>;
 export type ChatCreateResponse = z.infer<typeof ChatCreateResponseSchema>;

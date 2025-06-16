@@ -6,10 +6,10 @@ type SupportedTables = 'messages' | 'chats';
 
 const proxyRouter: Record<
   SupportedTables,
-  (url: URL, userId: string, c: Context) => Promise<URL | Response>
+  (url: URL, userId: string, c: Context) => Promise<URL | Response | undefined>
 > = {
   messages: messagesProxyRouter,
-  chats: chatsProxyRouter,
+  chats: chatsProxyRouter
 };
 
 export default proxyRouter;

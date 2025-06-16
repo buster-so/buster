@@ -16,7 +16,7 @@ export type BusterChatMessageRequest = null | {
   request: string;
   sender_id: string;
   sender_name: string;
-  sender_avatar: string | null;
+  sender_avatar?: string;
 };
 
 export type BusterChatMessageResponse =
@@ -27,8 +27,6 @@ export type BusterChatResponseMessage_text = {
   id: string;
   type: 'text';
   message: string;
-  message_chunk?: string;
-  is_final_message: boolean;
 };
 
 export type BusterChatMessageReasoning_status = 'loading' | 'completed' | 'failed';
@@ -69,7 +67,7 @@ export type BusterChatMessageReasoning_pills = {
   id: string;
   type: 'pills';
   title: string;
-  secondary_title: string | undefined;
+  secondary_title?: string | undefined;
   pill_containers: BusterChatMessageReasoning_pillContainer[];
   status: BusterChatMessageReasoning_status; //if left undefined, will automatically be set to 'loading' if the chat stream is in progress AND there is no message after it
 };
@@ -78,7 +76,7 @@ export type BusterChatMessageReasoning_text = {
   id: string;
   type: 'text';
   title: string;
-  secondary_title: string | undefined;
+  secondary_title?: string | undefined;
   message?: string;
   message_chunk?: string;
   status: BusterChatMessageReasoning_status;
@@ -92,7 +90,7 @@ export type BusterChatMessageReasoning_file = {
   version_number: number;
   status: BusterChatMessageReasoning_status;
   file: {
-    text: string | undefined;
+    text?: string;
     text_chunk?: string | undefined;
     modified?: [number, number][];
   };
@@ -103,7 +101,7 @@ export type BusterChatMessageReasoning_files = {
   type: 'files';
   title: string;
   status: BusterChatMessageReasoning_status;
-  secondary_title: string | undefined;
+  secondary_title?: string | undefined;
   file_ids: string[];
   files: Record<string, BusterChatMessageReasoning_file>;
 };

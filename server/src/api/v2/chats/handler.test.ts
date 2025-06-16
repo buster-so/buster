@@ -1,19 +1,19 @@
 import type { User } from '@supabase/supabase-js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ChatError, ChatErrorCode } from '../../../types/chat-errors.types';
-import type { ChatWithMessages } from '../../../types/chat.types';
+import { ChatError, ChatErrorCode } from '../../../types/chat-types/chat-errors.types';
+import type { ChatWithMessages } from '../../../types/chat-types/chat.types';
 import { createChatHandler } from './handler';
 
 // Mock dependencies
 vi.mock('@trigger.dev/sdk/v3', () => ({
   tasks: {
-    trigger: vi.fn(),
-  },
+    trigger: vi.fn()
+  }
 }));
 
 vi.mock('./services/chat-service', () => ({
   initializeChat: vi.fn(),
-  handleAssetChat: vi.fn(),
+  handleAssetChat: vi.fn()
 }));
 
 // Import mocked functions
@@ -26,11 +26,11 @@ describe('createChatHandler', () => {
     email: 'test@example.com',
     user_metadata: {
       organization_id: '550e8400-e29b-41d4-a716-446655440000',
-      name: 'Test User',
+      name: 'Test User'
     },
     app_metadata: {},
     aud: 'authenticated',
-    created_at: new Date().toISOString(),
+    created_at: new Date().toISOString()
   } as User;
 
   const mockChat: ChatWithMessages = {
@@ -41,23 +41,29 @@ describe('createChatHandler', () => {
     messages: {
       'msg-123': {
         id: 'msg-123',
-        role: 'user',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         request_message: {
           request: 'Hello',
           sender_id: 'user-123',
-          sender_name: 'Test User',
+          sender_name: 'Test User'
         },
-        is_completed: false,
-      },
+        response_messages: {},
+        response_message_ids: [],
+        reasoning_message_ids: [],
+        reasoning_messages: {},
+        final_reasoning_message: null,
+        feedback: null,
+        is_completed: false
+      }
     },
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     created_by: 'user-123',
     created_by_id: 'user-123',
     created_by_name: 'Test User',
-    publicly_accessible: false,
+    created_by_avatar: null,
+    publicly_accessible: false
   };
 
   beforeEach(() => {
@@ -65,20 +71,16 @@ describe('createChatHandler', () => {
     vi.mocked(initializeChat).mockResolvedValue({
       chatId: 'chat-123',
       messageId: 'msg-123',
-      chat: mockChat,
+      chat: mockChat
     });
   });
 
   it('should create a new chat with prompt', async () => {
     const result = await createChatHandler({ prompt: 'Hello' }, mockUser);
 
-    expect(initializeChat).toHaveBeenCalledWith(
-      { prompt: 'Hello' },
-      mockUser,
-      '550e8400-e29b-41d4-a716-446655440000'
-    );
+    expect(initializeChat).toHaveBeenCalledWith({ prompt: 'Hello' }, mockUser, '550e8400-e29b-41d4-a716-446655440000');
     expect(tasks.trigger).toHaveBeenCalledWith('analyst-agent-task', {
-      message_id: 'msg-123',
+      message_id: 'msg-123'
     });
     expect(result).toEqual(mockChat);
   });
@@ -87,10 +89,7 @@ describe('createChatHandler', () => {
     const assetChat = { ...mockChat, title: 'Asset Chat' };
     vi.mocked(handleAssetChat).mockResolvedValue(assetChat);
 
-    const result = await createChatHandler(
-      { asset_id: 'asset-123', asset_type: 'metric_file' },
-      mockUser
-    );
+    const result = await createChatHandler({ asset_id: 'asset-123', asset_type: 'metric_file' }, mockUser);
 
     expect(handleAssetChat).toHaveBeenCalledWith(
       'chat-123',
@@ -101,7 +100,7 @@ describe('createChatHandler', () => {
       mockChat
     );
     expect(tasks.trigger).toHaveBeenCalledWith('analyst-agent-task', {
-      message_id: 'msg-123',
+      message_id: 'msg-123'
     });
     expect(result).toEqual(assetChat);
   });
@@ -121,7 +120,7 @@ describe('createChatHandler', () => {
 
     expect(handleAssetChat).not.toHaveBeenCalled();
     expect(tasks.trigger).toHaveBeenCalledWith('analyst-agent-task', {
-      message_id: 'msg-123',
+      message_id: 'msg-123'
     });
     expect(result).toEqual(mockChat);
   });
@@ -132,10 +131,7 @@ describe('createChatHandler', () => {
 
     const result = await createChatHandler({ prompt: 'Hello' }, mockUser);
 
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'Failed to trigger analyst agent task:',
-      expect.any(Error)
-    );
+    expect(consoleSpy).toHaveBeenCalledWith('Failed to trigger analyst agent task:', expect.any(Error));
     expect(result).toEqual(mockChat); // Should still return the chat
 
     consoleSpy.mockRestore();
@@ -144,12 +140,12 @@ describe('createChatHandler', () => {
   it('should throw MISSING_ORGANIZATION error when user has no org', async () => {
     const userWithoutOrg = {
       ...mockUser,
-      user_metadata: {},
+      user_metadata: {}
     };
 
     await expect(createChatHandler({ prompt: 'Hello' }, userWithoutOrg)).rejects.toMatchObject({
       code: ChatErrorCode.MISSING_ORGANIZATION,
-      statusCode: 400,
+      statusCode: 400
     });
   });
 
@@ -167,7 +163,7 @@ describe('createChatHandler', () => {
     await expect(createChatHandler({ prompt: 'Hello' }, mockUser)).rejects.toMatchObject({
       code: ChatErrorCode.INTERNAL_ERROR,
       statusCode: 500,
-      details: { originalError: 'Database error' },
+      details: { originalError: 'Database error' }
     });
 
     consoleSpy.mockRestore();
