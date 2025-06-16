@@ -11,6 +11,7 @@
     { "path": "../test-utils" },
     { "path": "../database" },
     { "path": "../data-source" },
-    { "path": "../access-controls" }
+    { "path": "../access-controls" },
+    { "path": "../../server" }
   ]
 }

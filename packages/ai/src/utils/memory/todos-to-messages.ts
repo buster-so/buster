@@ -1,4 +1,4 @@
-import type { BusterChatMessageReasoning_files } from '@web/api/asset_interfaces/chat/chatMessageInterfaces';
+import type { ChatMessageReasoningMessage } from '@server/types/chat-types/chat-message.type';
 import type { CoreMessage } from 'ai';
 
 /**
@@ -28,9 +28,11 @@ export function createTodoToolCallMessage(todos: string): CoreMessage {
  * This treats the entire todo list as a single file
  *
  * @param todos - The markdown-formatted todo list
- * @returns BusterChatMessageReasoning_files with todos as a single file
+ * @returns ChatMessageReasoningMessage with todos as a single file
  */
-export function createTodoReasoningMessage(todos: string): BusterChatMessageReasoning_files {
+export function createTodoReasoningMessage(
+  todos: string
+): Extract<ChatMessageReasoningMessage, { type: 'files' }> {
   const fileId = `todo-${Date.now()}-${Math.random().toString(36).substring(2)}`;
 
   return {
@@ -49,7 +51,6 @@ export function createTodoReasoningMessage(todos: string): BusterChatMessageReas
         status: 'completed',
         file: {
           text: todos,
-          text_chunk: undefined,
           modified: undefined,
         },
       },

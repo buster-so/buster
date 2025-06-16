@@ -1,19 +1,14 @@
 import type { AssistantContent } from 'ai';
 import type {
-  BusterChatMessageReasoning,
-  BusterChatMessageReasoning_file,
-  BusterChatMessageReasoning_files,
-  BusterChatMessageReasoning_pills,
-  BusterChatMessageReasoning_status,
-  BusterChatMessageReasoning_text,
-  BusterChatMessageResponse,
-  BusterChatResponseMessage_file,
-  BusterChatResponseMessage_text,
-} from 'web/src/api/asset_interfaces/chat/chatMessageInterfaces';
+  ChatMessageReasoningMessage,
+  ChatMessageReasoning_status,
+  ChatMessageResponseMessage,
+} from 'server/src/types/chat-types/chat-message.type';
 import { z } from 'zod';
+import type { ToolCallContent } from '../database/types';
 
-// Extract ToolCall type from AssistantContent
-type ToolCall = Extract<AssistantContent, { type: 'tool-call' }>;
+// Use the proper ToolCall type from database types
+type ToolCall = ToolCallContent;
 
 // Tool result schemas
 const DoneToolResultSchema = z.object({
@@ -109,28 +104,26 @@ type ParsedToolResult =
 export function convertToolCallToMessage(
   toolCall: ToolCall,
   toolResult: ParsedToolResult | string | null,
-  status: BusterChatMessageReasoning_status = 'completed'
+  status: ChatMessageReasoning_status = 'completed'
 ): {
   type: 'reasoning' | 'response';
-  message: BusterChatMessageReasoning | BusterChatMessageResponse;
+  message: ChatMessageReasoningMessage | ChatMessageResponseMessage;
 } | null {
   if (!toolCall || typeof toolCall !== 'object') {
     console.error('convertToolCallToMessage: Invalid toolCall:', toolCall);
     return null;
   }
 
-  const toolName =
-    'toolName' in toolCall && typeof toolCall.toolName === 'string' ? toolCall.toolName : '';
-  const toolId =
-    'toolCallId' in toolCall && typeof toolCall.toolCallId === 'string' ? toolCall.toolCallId : '';
+  const toolName = toolCall.toolName;
+  const toolId = toolCall.toolCallId;
 
   switch (toolName) {
     case 'doneTool':
     case 'done-tool': {
-      // DUN tool generates a response message
+      // Done tool generates a response message
       try {
         const parsed = DoneToolResultSchema.parse(toolResult);
-        const responseMessage: BusterChatResponseMessage_text = {
+        const responseMessage: Extract<ChatMessageResponseMessage, { type: 'text' }> = {
           id: toolId,
           type: 'text',
           message: parsed.message,
@@ -147,7 +140,7 @@ export function convertToolCallToMessage(
       // Respond Without Analysis generates a response message
       try {
         const parsed = RespondWithoutAnalysisResultSchema.parse(toolResult);
-        const responseMessage: BusterChatResponseMessage_text = {
+        const responseMessage: Extract<ChatMessageResponseMessage, { type: 'text' }> = {
           id: toolId,
           type: 'text',
           message: parsed.message,
@@ -164,7 +157,7 @@ export function convertToolCallToMessage(
       // Sequential thinking generates a reasoning text message
       try {
         const parsed = SequentialThinkingResultSchema.parse(toolResult);
-        const reasoningMessage: BusterChatMessageReasoning_text = {
+        const reasoningMessage: Extract<ChatMessageReasoningMessage, { type: 'text' }> = {
           id: toolId,
           type: 'text',
           title: `Thought ${parsed.thoughtNumber} of ${parsed.totalThoughts}`,
@@ -185,7 +178,10 @@ export function convertToolCallToMessage(
       // Create metrics generates a reasoning files message
       try {
         const parsed = CreateMetricsFileResultSchema.parse(toolResult);
-        const files: Record<string, BusterChatMessageReasoning_file> = {};
+        const files: Record<
+          string,
+          Extract<ChatMessageReasoningMessage, { type: 'files' }>['files'][string]
+        > = {};
         const fileIds: string[] = [];
 
         // Process successful files
@@ -199,7 +195,6 @@ export function convertToolCallToMessage(
             status: 'completed',
             file: {
               text: file.yml_content,
-              text_chunk: undefined,
               modified: undefined,
             },
           };
@@ -221,7 +216,7 @@ export function convertToolCallToMessage(
           };
         }
 
-        const reasoningMessage: BusterChatMessageReasoning_files = {
+        const reasoningMessage: Extract<ChatMessageReasoningMessage, { type: 'files' }> = {
           id: toolId,
           type: 'files',
           title: `Created ${parsed.files.length} metric${parsed.files.length === 1 ? '' : 's'}`,
@@ -243,7 +238,7 @@ export function convertToolCallToMessage(
       // Execute SQL generates a reasoning text message
       try {
         const parsed = ExecuteSqlResultSchema.parse(toolResult);
-        const reasoningMessage: BusterChatMessageReasoning_text = {
+        const reasoningMessage: Extract<ChatMessageReasoningMessage, { type: 'text' }> = {
           id: toolId,
           type: 'text',
           title: 'Executed SQL Query',
@@ -263,7 +258,10 @@ export function convertToolCallToMessage(
       // Create dashboards generates a reasoning files message
       try {
         const parsed = CreateDashboardFileResultSchema.parse(toolResult);
-        const files: Record<string, BusterChatMessageReasoning_file> = {};
+        const files: Record<
+          string,
+          Extract<ChatMessageReasoningMessage, { type: 'files' }>['files'][string]
+        > = {};
         const fileIds: string[] = [];
 
         // Process successful files
@@ -277,7 +275,6 @@ export function convertToolCallToMessage(
             status: 'completed',
             file: {
               text: file.yml_content,
-              text_chunk: undefined,
               modified: undefined,
             },
           };
@@ -299,7 +296,7 @@ export function convertToolCallToMessage(
           };
         }
 
-        const reasoningMessage: BusterChatMessageReasoning_files = {
+        const reasoningMessage: Extract<ChatMessageReasoningMessage, { type: 'files' }> = {
           id: toolId,
           type: 'files',
           title: `Created ${parsed.files.length} dashboard${parsed.files.length === 1 ? '' : 's'}`,
@@ -321,7 +318,10 @@ export function convertToolCallToMessage(
       // Modify metrics generates a reasoning files message
       try {
         const parsed = ModifyFilesResultSchema.parse(toolResult);
-        const files: Record<string, BusterChatMessageReasoning_file> = {};
+        const files: Record<
+          string,
+          Extract<ChatMessageReasoningMessage, { type: 'files' }>['files'][string]
+        > = {};
         const fileIds: string[] = [];
 
         // Process successful files
@@ -335,7 +335,6 @@ export function convertToolCallToMessage(
             status: 'completed',
             file: {
               text: file.yml_content,
-              text_chunk: undefined,
               modified: undefined,
             },
           };
@@ -357,7 +356,7 @@ export function convertToolCallToMessage(
           };
         }
 
-        const reasoningMessage: BusterChatMessageReasoning_files = {
+        const reasoningMessage: Extract<ChatMessageReasoningMessage, { type: 'files' }> = {
           id: toolId,
           type: 'files',
           title: `Modified ${parsed.files.length} metric${parsed.files.length === 1 ? '' : 's'}`,
@@ -379,7 +378,10 @@ export function convertToolCallToMessage(
       // Modify dashboards generates a reasoning files message
       try {
         const parsed = ModifyFilesResultSchema.parse(toolResult);
-        const files: Record<string, BusterChatMessageReasoning_file> = {};
+        const files: Record<
+          string,
+          Extract<ChatMessageReasoningMessage, { type: 'files' }>['files'][string]
+        > = {};
         const fileIds: string[] = [];
 
         // Process successful files
@@ -393,7 +395,6 @@ export function convertToolCallToMessage(
             status: 'completed',
             file: {
               text: file.yml_content,
-              text_chunk: undefined,
               modified: undefined,
             },
           };
@@ -415,7 +416,7 @@ export function convertToolCallToMessage(
           };
         }
 
-        const reasoningMessage: BusterChatMessageReasoning_files = {
+        const reasoningMessage: Extract<ChatMessageReasoningMessage, { type: 'files' }> = {
           id: toolId,
           type: 'files',
           title: `Modified ${parsed.files.length} dashboard${parsed.files.length === 1 ? '' : 's'}`,
@@ -448,14 +449,14 @@ export function extractMessagesFromToolCalls(
   toolCalls: ToolCall[],
   toolResults: Map<string, ParsedToolResult | string | null> = new Map()
 ): {
-  reasoningMessages: BusterChatMessageReasoning[];
-  responseMessages: BusterChatMessageResponse[];
+  reasoningMessages: ChatMessageReasoningMessage[];
+  responseMessages: ChatMessageResponseMessage[];
 } {
-  const reasoningMessages: BusterChatMessageReasoning[] = [];
-  const responseMessages: BusterChatMessageResponse[] = [];
+  const reasoningMessages: ChatMessageReasoningMessage[] = [];
+  const responseMessages: ChatMessageResponseMessage[] = [];
 
   for (const toolCall of toolCalls) {
-    if (!toolCall || !('toolCallId' in toolCall)) {
+    if (!toolCall || !toolCall.toolCallId) {
       console.error('extractMessagesFromToolCalls: Invalid toolCall:', toolCall);
       continue;
     }
@@ -465,9 +466,9 @@ export function extractMessagesFromToolCalls(
 
     if (converted) {
       if (converted.type === 'reasoning') {
-        reasoningMessages.push(converted.message as BusterChatMessageReasoning);
+        reasoningMessages.push(converted.message as ChatMessageReasoningMessage);
       } else {
-        responseMessages.push(converted.message as BusterChatMessageResponse);
+        responseMessages.push(converted.message as ChatMessageResponseMessage);
       }
     }
   }

@@ -71,7 +71,7 @@ export function isTextContent(content: unknown): content is TextContent {
     'type' in content &&
     content.type === 'text' &&
     'text' in content &&
-    typeof (content as any).text === 'string'
+    typeof (content as { text: unknown }).text === 'string'
   );
 }
 
@@ -100,7 +100,7 @@ export function isToolResultContent(content: unknown): content is ToolResultCont
 }
 
 /**
- * Type predicates for streaming chunk types
+ * Type predicates for streaming chunk types based on AI SDK structure
  */
 export type TextDeltaChunk<T extends ToolSet = GenericToolSet> = Extract<
   TextStreamPart<T>,
@@ -155,11 +155,7 @@ export function isErrorResult(result: unknown): boolean {
   // Object-based error detection
   if (result && typeof result === 'object') {
     const resultObj = result as Record<string, unknown>;
-    return !!(
-      resultObj.error ||
-      resultObj.success === false ||
-      resultObj.status === 'error'
-    );
+    return !!(resultObj.error || resultObj.success === false || resultObj.status === 'error');
   }
 
   return false;
@@ -172,29 +168,32 @@ export function determineToolStatus(result: unknown): 'completed' | 'failed' {
 /**
  * Zod schemas for runtime validation
  */
-export const TextContentSchema = z.object({
-  type: z.literal('text'),
-  text: z.string(),
-});
+export const TextContentSchema = z
+  .object({
+    type: z.literal('text'),
+    text: z.string(),
+  })
+  .strict();
 
-export const ToolCallContentSchema = z.object({
-  type: z.literal('tool-call'),
-  toolCallId: z.string(),
-  toolName: z.string(),
-  args: z.record(z.unknown()),
-});
+export const ToolCallContentSchema = z
+  .object({
+    type: z.literal('tool-call'),
+    toolCallId: z.string(),
+    toolName: z.string(),
+    args: z.record(z.unknown()),
+  })
+  .strict();
 
-export const ToolResultContentSchema = z.object({
-  type: z.literal('tool-result'),
-  toolCallId: z.string(),
-  toolName: z.string(),
-  result: z.unknown(),
-});
+export const ToolResultContentSchema = z
+  .object({
+    type: z.literal('tool-result'),
+    toolCallId: z.string(),
+    toolName: z.string(),
+    result: z.unknown(),
+  })
+  .strict();
 
-export const AssistantMessageContentSchema = z.union([
-  TextContentSchema,
-  ToolCallContentSchema,
-]);
+export const AssistantMessageContentSchema = z.union([TextContentSchema, ToolCallContentSchema]);
 
 /**
  * Safe type assertion helpers
@@ -204,7 +203,7 @@ export function assertTextContent(content: unknown): TextContent {
   if (!result.success) {
     throw new Error(`Invalid text content: ${result.error.message}`);
   }
-  return result.data;
+  return result.data as TextContent;
 }
 
 export function assertToolCallContent(content: unknown): ToolCallContent {
@@ -212,7 +211,7 @@ export function assertToolCallContent(content: unknown): ToolCallContent {
   if (!result.success) {
     throw new Error(`Invalid tool call content: ${result.error.message}`);
   }
-  return result.data;
+  return result.data as ToolCallContent;
 }
 
 export function assertToolResultContent(content: unknown): ToolResultContent {
@@ -220,5 +219,103 @@ export function assertToolResultContent(content: unknown): ToolResultContent {
   if (!result.success) {
     throw new Error(`Invalid tool result content: ${result.error.message}`);
   }
-  return result.data;
+  return result.data as ToolResultContent;
+}
+
+/**
+ * Type-safe interfaces for tool arguments
+ */
+export interface SequentialThinkingArgs {
+  thought: string;
+  nextThoughtNeeded?: boolean;
+}
+
+export interface CreateMetricsArgs {
+  files: Array<{
+    name?: string;
+    yml_content?: string;
+  }>;
+}
+
+export interface ExecuteSqlArgs {
+  sql?: string;
+  queries?: Array<string | { sql: string }>;
+}
+
+export interface SubmitThoughtsArgs {
+  thoughts: string;
+}
+
+/**
+ * Type guards for tool arguments
+ */
+export function isSequentialThinkingArgs(args: unknown): args is SequentialThinkingArgs {
+  return (
+    typeof args === 'object' &&
+    args !== null &&
+    'thought' in args &&
+    typeof (args as { thought: unknown }).thought === 'string'
+  );
+}
+
+export function isCreateMetricsArgs(args: unknown): args is CreateMetricsArgs {
+  return (
+    typeof args === 'object' &&
+    args !== null &&
+    'files' in args &&
+    Array.isArray((args as { files: unknown }).files)
+  );
+}
+
+export function isExecuteSqlArgs(args: unknown): args is ExecuteSqlArgs {
+  return typeof args === 'object' && args !== null && ('sql' in args || 'queries' in args);
+}
+
+export function isSubmitThoughtsArgs(args: unknown): args is SubmitThoughtsArgs {
+  return (
+    typeof args === 'object' &&
+    args !== null &&
+    'thoughts' in args &&
+    typeof (args as { thoughts: unknown }).thoughts === 'string'
+  );
+}
+
+/**
+ * Helper to safely access SQL query string from unknown query
+ */
+export function extractSqlFromQuery(query: unknown): string {
+  if (typeof query === 'string') {
+    return query;
+  }
+  if (typeof query === 'object' && query !== null && 'sql' in query) {
+    const sqlObj = query as { sql: unknown };
+    return typeof sqlObj.sql === 'string' ? sqlObj.sql : String(sqlObj.sql);
+  }
+  return String(query);
+}
+
+/**
+ * Type guards for reasoning entry types
+ */
+export function hasStatus(entry: unknown): entry is { status: 'loading' | 'completed' | 'failed' } {
+  return (
+    typeof entry === 'object' &&
+    entry !== null &&
+    'status' in entry &&
+    typeof (entry as { status: unknown }).status === 'string'
+  );
+}
+
+export function hasSecondaryTitle(entry: unknown): entry is { secondary_title?: string } {
+  return typeof entry === 'object' && entry !== null && 'secondary_title' in entry;
+}
+
+export function hasFiles(entry: unknown): entry is { files: Record<string, { status?: string }> } {
+  return (
+    typeof entry === 'object' &&
+    entry !== null &&
+    'files' in entry &&
+    typeof (entry as { files: unknown }).files === 'object' &&
+    (entry as { files: unknown }).files !== null
+  );
 }
