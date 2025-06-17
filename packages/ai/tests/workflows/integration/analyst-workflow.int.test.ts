@@ -88,7 +88,7 @@ describe('Analyst Workflow Integration Tests', () => {
         chatId,
         createdBy: userId,
         title: 'Test Message',
-        requestMessage: 'What are the top 5 customers by revenue this month?',
+        requestMessage: 'of our accessory products, what are the top 5 by revenue this month?',
         responseMessages: [],
         reasoning: [],
         rawLlmMessages: [],
@@ -105,7 +105,7 @@ describe('Analyst Workflow Integration Tests', () => {
     }
 
     const testInput = {
-      prompt: 'What are the top 5 customers by revenue this month?',
+      prompt: 'of our accessory products, what are the top 5 by revenue this month?',
     };
 
     const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();

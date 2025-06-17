@@ -30,6 +30,7 @@ import {
   getAllToolsUsed,
   getLastToolUsed,
 } from '../utils/memory/message-history';
+import { createStoredValuesToolCallMessage } from '../utils/memory/stored-values-to-messages';
 import {
   createTodoReasoningMessage,
   createTodoToolCallMessage,
@@ -116,6 +117,13 @@ const thinkAndPrepExecution = async ({
     const todoCallMessage = createTodoToolCallMessage(todos);
     const messages = [...baseMessages, todoCallMessage];
 
+    // Inject stored values search results if available
+    const storedValuesResults = inputData['extract-values-search'].searchResults;
+    if (storedValuesResults && inputData['extract-values-search'].searchPerformed) {
+      const storedValuesMessage = createStoredValuesToolCallMessage(storedValuesResults);
+      messages.push(storedValuesMessage);
+    }
+
     // Update chunk processor with initial messages
     chunkProcessor.setInitialMessages(messages);
 
@@ -137,7 +145,7 @@ const thinkAndPrepExecution = async ({
               finishingToolNames: ['submitThoughts', 'respondWithoutAnalysis'],
               onFinishingTool: () => {
                 // Only set finished = true for respondWithoutAnalysis
-                // submitThoughts should continue to analyst agent
+                // submitThoughts should abort but not finish so workflow can continue
                 const finishingToolName = chunkProcessor.getFinishingToolName();
                 if (finishingToolName === 'respondWithoutAnalysis') {
                   finished = true;

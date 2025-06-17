@@ -263,6 +263,7 @@ export interface ModifyDashboardsArgs {
 export interface ExecuteSqlArgs {
   sql?: string;
   queries?: Array<string | { sql: string }>;
+  statements?: string[];
 }
 
 export interface SubmitThoughtsArgs {
@@ -318,7 +319,11 @@ export function isModifyDashboardsArgs(args: unknown): args is ModifyDashboardsA
 }
 
 export function isExecuteSqlArgs(args: unknown): args is ExecuteSqlArgs {
-  return typeof args === 'object' && args !== null && ('sql' in args || 'queries' in args);
+  return (
+    typeof args === 'object' &&
+    args !== null &&
+    ('sql' in args || 'queries' in args || 'statements' in args)
+  );
 }
 
 export function isSubmitThoughtsArgs(args: unknown): args is SubmitThoughtsArgs {

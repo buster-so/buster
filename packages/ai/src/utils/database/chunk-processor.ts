@@ -479,6 +479,11 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       // Determine if the tool succeeded or failed based on the result
       const status = determineToolStatus(chunk.result);
 
+      // Special handling for SQL tools - append results to file content
+      if (chunk.toolName === 'executeSql' || chunk.toolName === 'execute-sql') {
+        this.updateSqlFileWithResults(chunk.toolCallId, chunk.result);
+      }
+
       // Update the specific reasoning entry for this tool call
       this.updateReasoningEntryStatus(chunk.toolCallId, status, cumulativeTime);
     }
@@ -810,16 +815,28 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
       case 'executeSql':
       case 'execute-sql': {
-        // Could update SQL content as it streams
+        // Update SQL content as it streams
+        const statements = getOptimisticValue<string[]>(
+          parseResult.extractedValues,
+          'statements',
+          []
+        );
         const sql = getOptimisticValue<string>(parseResult.extractedValues, 'sql', '');
-        if (sql && entry.type === 'files') {
-          // Update the SQL file content
+
+        if (entry.type === 'files') {
           const fileIds = (entry as ReasoningEntry & { file_ids: string[] }).file_ids;
           if (fileIds && fileIds.length > 0) {
             const fileId = fileIds[0];
             const file = entry.files[fileId];
             if (file?.file) {
-              file.file.text = sql;
+              // Update with statements (preferred) or fallback to sql
+              if (statements.length > 0) {
+                const statementsYaml =
+                  'statements:\n' + statements.map((stmt) => `  - ${stmt}`).join('\n');
+                file.file.text = statementsYaml;
+              } else if (sql) {
+                file.file.text = sql;
+              }
             }
           }
         }
@@ -982,14 +999,35 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       case 'executeSql':
       case 'execute-sql':
         if (isExecuteSqlArgs(args)) {
-          let sqlContent = '';
-          if (args.queries && Array.isArray(args.queries)) {
-            sqlContent = args.queries.map(extractSqlFromQuery).join('\n\n');
+          // Extract SQL statements and format as YAML-like structure
+          let statements: string[] = [];
+          if (args.statements) {
+            if (Array.isArray(args.statements)) {
+              statements = args.statements;
+            } else if (typeof args.statements === 'string') {
+              // Handle case where statements is a JSON string
+              try {
+                const parsed = JSON.parse(args.statements);
+                if (Array.isArray(parsed)) {
+                  statements = parsed;
+                } else {
+                  statements = [args.statements];
+                }
+              } catch {
+                statements = [args.statements];
+              }
+            }
+          } else if (args.queries && Array.isArray(args.queries)) {
+            statements = args.queries.map(extractSqlFromQuery);
           } else if (args.sql && typeof args.sql === 'string') {
-            sqlContent = args.sql;
+            statements = [args.sql];
           }
 
-          if (sqlContent) {
+          if (statements.length > 0) {
+            // Format as statements-only YAML initially
+            const statementsYaml =
+              'statements:\n' + statements.map((stmt) => `  - ${stmt}`).join('\n');
+
             const fileId = crypto.randomUUID();
             const files: Record<
               string,
@@ -1009,11 +1047,11 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
             files[fileId] = {
               id: fileId,
               file_type: 'agent-action',
-              file_name: 'sql_query.sql',
+              file_name: 'SQL Statements',
               version_number: 1,
               status: 'loading',
               file: {
-                text: sqlContent,
+                text: statementsYaml,
               },
             };
 
@@ -1289,6 +1327,81 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       // Force an immediate save to persist the new messages
       await this.saveToDatabase();
     }
+  }
+
+  /**
+   * Update SQL file content with results from tool execution
+   */
+  private updateSqlFileWithResults(toolCallId: string, toolResult: unknown): void {
+    // Find the reasoning entry for this tool call
+    const entry = this.state.reasoningHistory.find(
+      (r) => r && typeof r === 'object' && 'id' in r && r.id === toolCallId
+    );
+
+    if (!entry || entry.type !== 'files') {
+      return;
+    }
+
+    // Get the file content
+    const fileIds = (entry as ReasoningEntry & { file_ids: string[] }).file_ids;
+    if (!fileIds || fileIds.length === 0) {
+      return;
+    }
+
+    const fileId = fileIds[0];
+    const file = entry.files[fileId];
+    if (!file?.file) {
+      return;
+    }
+
+    // Parse the tool result to extract query results
+    let results: Array<{
+      status: 'success' | 'error';
+      sql: string;
+      results?: Record<string, unknown>[];
+      error_message?: string;
+    }> = [];
+
+    try {
+      if (toolResult && typeof toolResult === 'object' && 'results' in toolResult) {
+        const toolResults = (toolResult as { results: unknown }).results;
+        if (Array.isArray(toolResults)) {
+          results = toolResults.map((result: any) => ({
+            status: result.status === 'error' ? 'error' : 'success',
+            sql: result.sql || '',
+            results: result.status === 'success' ? result.results : undefined,
+            error_message: result.status === 'error' ? result.error_message : undefined,
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('Error parsing SQL tool result:', error);
+      return;
+    }
+
+    // Format results as YAML and append to existing content
+    const currentContent = file.file.text || '';
+    let resultsYaml = '\n\nresults:';
+
+    for (const result of results) {
+      resultsYaml += `\n  - status: ${result.status}`;
+      resultsYaml += `\n    sql: ${result.sql}`;
+
+      if (result.status === 'error' && result.error_message) {
+        resultsYaml += `\n    error_message: |-\n      ${result.error_message}`;
+      } else if (result.status === 'success' && result.results) {
+        resultsYaml += '\n    results:';
+        for (const row of result.results) {
+          resultsYaml += '\n      -';
+          for (const [key, value] of Object.entries(row)) {
+            resultsYaml += `\n        ${key}: ${value}`;
+          }
+        }
+      }
+    }
+
+    // Update the file content
+    file.file.text = currentContent + resultsYaml;
   }
 
   /**
