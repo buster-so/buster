@@ -5,10 +5,14 @@ import { z } from 'zod';
 // Core interfaces for Sequential Thinking
 interface SequentialThinkingParams {
   thought: string;
-  thoughtNumber: number;
   nextThoughtNeeded: boolean;
+  thoughtNumber: number;
   totalThoughts: number;
-  needMoreTotalThoughts: boolean;
+  isRevision: boolean;
+  revisesThought?: number;
+  branchFromThought?: number;
+  branchId?: string;
+  needsMoreThoughts: boolean;
 }
 
 interface SequentialThinkingOutput {
@@ -21,26 +25,36 @@ const sequentialThinkingSchema = z.object({
     .string()
     .min(1)
     .describe(
-      'Your current thinking step in the data analysis process, which can include: Regular analytical steps, Revisions of previous thoughts, Questions about previous decisions, Realizations about needing more information, Changes in approach, Hypothesis generation, Hypothesis verification.'
+      'Your current thinking step, which can include: Regular analytical steps, Revisions of previous thoughts, Questions about previous decisions, Realizations about needing more analysis, Changes in approach, Hypothesis generation, Hypothesis verification.'
     ),
+  nextThoughtNeeded: z.boolean().describe('Whether another thought step is needed.'),
   thoughtNumber: z
     .number()
     .int()
     .positive()
-    .describe('The current step number (can exceed the initial totalThoughts if extended).'),
-  nextThoughtNeeded: z
-    .boolean()
-    .describe('Set to true if more thinking is needed, even at the apparent end.'),
+    .describe('Current number in sequence (can go beyond initial total if needed).'),
   totalThoughts: z
     .number()
     .int()
     .positive()
-    .describe('Your current estimate of needed thoughts (adjustable as you go).'),
-  needMoreTotalThoughts: z
+    .describe('Current estimate of thoughts needed (can be adjusted up/down).'),
+  isRevision: z
     .boolean()
-    .describe(
-      'Set to true if nearing your `totalThoughts` limit but you still need more steps (e.g., to run queries or explore further).'
-    ),
+    .describe('A boolean indicating if this thought revises previous thinking.'),
+  revisesThought: z
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .describe('If is_revision is true, which thought number is being reconsidered.'),
+  branchFromThought: z
+    .number()
+    .int()
+    .positive()
+    .optional()
+    .describe('If branching, which thought number is the branching point.'),
+  branchId: z.string().optional().describe('Identifier for the current branch (if any).'),
+  needsMoreThoughts: z.boolean().describe('If reaching end but realizing more thoughts needed.'),
 });
 
 /**
@@ -62,11 +76,14 @@ export function parseStreamingArgs(
 
     // Only include fields that are actually present
     if (parsed.thought !== undefined) result.thought = parsed.thought;
-    if (parsed.thoughtNumber !== undefined) result.thoughtNumber = parsed.thoughtNumber;
     if (parsed.nextThoughtNeeded !== undefined) result.nextThoughtNeeded = parsed.nextThoughtNeeded;
+    if (parsed.thoughtNumber !== undefined) result.thoughtNumber = parsed.thoughtNumber;
     if (parsed.totalThoughts !== undefined) result.totalThoughts = parsed.totalThoughts;
-    if (parsed.needMoreTotalThoughts !== undefined)
-      result.needMoreTotalThoughts = parsed.needMoreTotalThoughts;
+    if (parsed.isRevision !== undefined) result.isRevision = parsed.isRevision;
+    if (parsed.revisesThought !== undefined) result.revisesThought = parsed.revisesThought;
+    if (parsed.branchFromThought !== undefined) result.branchFromThought = parsed.branchFromThought;
+    if (parsed.branchId !== undefined) result.branchId = parsed.branchId;
+    if (parsed.needsMoreThoughts !== undefined) result.needsMoreThoughts = parsed.needsMoreThoughts;
 
     return result;
   } catch (error) {
@@ -93,11 +110,16 @@ export function parseStreamingArgs(
         result.nextThoughtNeeded = nextThoughtMatch[1] === 'true';
       }
 
-      const needMoreTotalThoughtsMatch = accumulatedText.match(
-        /"needMoreTotalThoughts"\s*:\s*(true|false)/
+      const isRevisionMatch = accumulatedText.match(/"isRevision"\s*:\s*(true|false)/);
+      if (isRevisionMatch) {
+        result.isRevision = isRevisionMatch[1] === 'true';
+      }
+
+      const needsMoreThoughtsMatch = accumulatedText.match(
+        /"needsMoreThoughts"\s*:\s*(true|false)/
       );
-      if (needMoreTotalThoughtsMatch) {
-        result.needMoreTotalThoughts = needMoreTotalThoughtsMatch[1] === 'true';
+      if (needsMoreThoughtsMatch) {
+        result.needsMoreThoughts = needsMoreThoughtsMatch[1] === 'true';
       }
 
       // Extract number fields
@@ -109,6 +131,22 @@ export function parseStreamingArgs(
       const totalThoughtsMatch = accumulatedText.match(/"totalThoughts"\s*:\s*(\d+)/);
       if (totalThoughtsMatch && totalThoughtsMatch[1] !== undefined) {
         result.totalThoughts = Number.parseInt(totalThoughtsMatch[1], 10);
+      }
+
+      const revisesThoughtMatch = accumulatedText.match(/"revisesThought"\s*:\s*(\d+)/);
+      if (revisesThoughtMatch && revisesThoughtMatch[1] !== undefined) {
+        result.revisesThought = Number.parseInt(revisesThoughtMatch[1], 10);
+      }
+
+      const branchFromThoughtMatch = accumulatedText.match(/"branchFromThought"\s*:\s*(\d+)/);
+      if (branchFromThoughtMatch && branchFromThoughtMatch[1] !== undefined) {
+        result.branchFromThought = Number.parseInt(branchFromThoughtMatch[1], 10);
+      }
+
+      // Extract string fields
+      const branchIdMatch = accumulatedText.match(/"branchId"\s*:\s*"([^"]*)"/);
+      if (branchIdMatch) {
+        result.branchId = branchIdMatch[1];
       }
 
       // Return result if we found at least one field
@@ -125,75 +163,42 @@ export function parseStreamingArgs(
 // Tool implementation
 export const sequentialThinking = createTool({
   id: 'sequential-thinking',
-  description: `A detailed tool for dynamic and reflective problem-solving through thoughts.needMoreTotalThoughtsThis tool is uesd to address, think through, and check off TODO list items through a flexible thinking process that can adapt and evolve.
+  description: `A detailed tool for dynamic and reflective problem-solving through thoughts.
+This tool helps analyze problems through a flexible thinking process that can adapt and evolve.
 Each thought can build on, question, or revise previous insights as understanding deepens.
 
-**When to use this tool:**  
-- Thinking through and checking off items on your TODO list
-- Assessing available documentation
-- Identifying when to verify information that isn't explicitly avilable in the documentation.
-- Identifying when requested data does not exist
-- Thoroughly think through and document assumptions
-- Deciding if you need to ask the user clarifying questions
-- Defining a term or metrics mentioned in the request.
-- Defining time frames or date ranges that need to be specified.
-- Determining specific values or enums required to identify product names, users, categories, etc.
-- Determining which conditions or filters will need to be applied to the data.
-- Determining what specific entities or things are, how to query for them, etc.
+**When to use this tool:**
+- Breaking down complex problems into steps
+- Planning and design with room for revision
+- Analysis that might need course correction
+- Problems where the full scope might not be clear initially
+- Problems that require a multi-step solution
+- Tasks that need to maintain context over multiple steps
+- Situations where irrelevant information needs to be filtered out
 
-**Key features:**  
+**Key features:**
 - You can adjust total_thoughts up or down as you progress
 - You can question or revise previous thoughts
 - You can add more thoughts even after reaching what seemed like the end
 - You can express uncertainty and explore alternative approaches
 - Not every thought needs to build linearly - you can branch or backtrack
-- Generate hypothesese to accomplish TODO list items
-- Verify these hypothesese based on the available documentation, running validation queries, and asking the user clarifying questions
+- Generates a solution hypothesis
+- Verifies the hypothesis based on the Chain of Thought steps
 - Repeats the process until satisfied
-- Thoroughly preps required information for the analysis workflow
+- Provides a correct answer
 
-**Parameters Explained**
-- **\`thought\`**: Your current step in the process. Could be:
-  - An analytical step
-  - A revision of a prior thought
-  - A question about a previous decision
-  - A realization you need more info
-  - A change in approach
-  - A hypothesis or its verification
-- **\`thoughtNumber\`**: The current step number (can exceed the initial \`totalThoughts\` if extended)
-- **\`nextThoughtNeeded\`**: Set to "true" if more thinking is needed, even at the apparent "end"
-- **\`totalThoughts\`**: Your current estimate of needed thoughts (adjustable as you go)
-- **\`needMoreTotalThoughts\`**: Set to "true" when nearing your \`totalThoughts\` limit but you still need more steps (e.g., to run queries or explore further)
-
-**How to Use It**
-1. **Start with an estimate**: Set an initial \`totalThoughts\`, but treat it as a guess, not a rule.
-2. **Revise freely**: Question or tweak earlier thoughts as new insights emerge.
-3. **Extend when needed**: Add more thoughts if you're not done, even at the "end."
-4. **Be uncertain**: Express doubts and explore options when unsure.
-5. **Stay focused**: Ignore irrelevant info for the current step.
-6. **Hypothesize and verify**: Propose solutions, then check them with documentation, queries, or questions.
-7. **Iterate**: Keep going until satisfied.
-8. **Finish cleanly**: End with a single, correct thought when ready.
-9. **Control the end**: Only set \`nextThoughtNeeded\` to "false" when all prep is complete for the analysis workflow.
-10. **Signal more thoughts**: Set \`needMoreTotalThoughts\` to "true" if you're nearing \`totalThoughts\` but need more steps (e.g., to run an \`executeSQL\` query and review results).
-
-**You should:**  
-1. Set an initial estimate of \`totalThoughts\` needed, but treat it as a guess, not a rule.
+**You should:**
+1. Start with an initial estimate of needed thoughts, but be ready to adjust
 2. Feel free to question or revise previous thoughts
 3. Don't hesitate to add more thoughts if needed, even at the "end"
 4. Express uncertainty when present
-5. Ignore information that is irrelevant to the current step
-6. Generate a solution hypothesis when appropriate
-7. Verify the hypothesis based on the Chain of Thought steps
-8. Repeat the process until satisfied with the solution
-9. Provide a single, ideally correct thought as the final output
-10. Only set \`nextThoughtNeeded\` to "false" when all prep is complete for the analysis workflow.
-11. Set \`needMoreTotalThoughts\` to "true" if you're nearing \`totalThoughts\` but need more steps (e.g., to run an \`executeSQL\` query and review results).
-
-**Key guidelines for extending thoughts:**
-- **\`totalThoughts\` is flexible**: This is an estimate, not a limit. Increase it if you need more steps.
-- **Using \`needMoreTotalThoughts\`**: Set it to "true" when you're on your last planned thought (e.g., thought 3 of 3) but realize need to run additional queries with executeSQL and assess the results.
-- **When to Extend**: If you hit your last thought and still have unresolved issues (e.g., need to use executeSQL again), set \`needMoreTotalThoughts\` to "true," bump up \`totalThoughts\`, and proceed.`,
+5. Mark thoughts that revise previous thinking or branch into new paths
+6. Ignore information that is irrelevant to the current step
+7. Generate a solution hypothesis when appropriate
+8. Verify the hypothesis based on the Chain of Thought steps
+9. Repeat the process until satisfied with the solution
+10. Provide a single, ideally correct answer as the final output
+11. Only set next_thought_needed to false when truly done and a satisfactory answer is reached`,
   inputSchema: sequentialThinkingSchema,
   outputSchema: z.object({
     success: z.boolean().describe('Whether the thinking step was processed successfully'),
@@ -233,9 +238,13 @@ const processSequentialThinking = wrapTraced(
 async function processThought(params: SequentialThinkingParams): Promise<SequentialThinkingParams> {
   return {
     thought: params.thought.trim(),
-    thoughtNumber: params.thoughtNumber,
     nextThoughtNeeded: params.nextThoughtNeeded,
+    thoughtNumber: params.thoughtNumber,
     totalThoughts: params.totalThoughts,
-    needMoreTotalThoughts: params.needMoreTotalThoughts,
+    isRevision: params.isRevision,
+    revisesThought: params.revisesThought,
+    branchFromThought: params.branchFromThought,
+    branchId: params.branchId,
+    needsMoreThoughts: params.needsMoreThoughts,
   };
 }

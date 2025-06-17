@@ -205,14 +205,16 @@ const thinkAndPrepExecution = async ({
         });
 
         if (healingResult.shouldRetry && healingResult.healingMessage) {
-          // Add the healing message to the conversation
-          // Note: For now we just log it. A full implementation would need to restart
-          // the entire stream processing with the healed conversation.
-          outputMessages.push(healingResult.healingMessage);
-        } else {
-          console.error('Error processing stream:', streamError);
-          throw streamError; // Re-throw non-healable errors
+          // Healing was successful but we still need to fail this step
+          // since we can't restart the stream processing in the current implementation
+          throw new Error(
+            `Stream processing failed and requires retry: ${
+              streamError instanceof Error ? streamError.message : 'Unknown streaming error'
+            }`
+          );
         }
+        console.error('Error processing stream:', streamError);
+        throw streamError; // Re-throw non-healable errors
       }
     }
 
@@ -230,15 +232,20 @@ const thinkAndPrepExecution = async ({
 
     return result;
   } catch (error) {
-    if (error instanceof Error && error.name !== 'AbortError') {
-      throw new Error(`Error in think and prep step: ${error.message}`);
+    // Only return a result for AbortError (which is expected when tools finish)
+    if (error instanceof Error && error.name === 'AbortError') {
+      return createStepResult(
+        finished,
+        outputMessages,
+        finalStepData,
+        chunkProcessor.getReasoningHistory() as BusterChatMessageReasoning[],
+        chunkProcessor.getResponseHistory() as BusterChatMessageResponse[]
+      );
     }
-    return createStepResult(
-      finished,
-      outputMessages,
-      finalStepData,
-      chunkProcessor.getReasoningHistory() as BusterChatMessageReasoning[],
-      chunkProcessor.getResponseHistory() as BusterChatMessageResponse[]
+
+    // For all other errors, throw to stop the workflow
+    throw new Error(
+      `Error in think and prep step: ${error instanceof Error ? error.message : 'Unknown error'}`
     );
   }
 };
