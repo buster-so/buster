@@ -105,23 +105,27 @@ const thinkAndPrepExecution = async ({
         message_chunk: entry.message_chunk,
         finished_reasoning: entry.finished_reasoning,
       };
-    } else if (entry.type === 'pills') {
+    }
+    if (entry.type === 'pills') {
       return {
         status: entry.status,
         id: entry.id,
         type: entry.type,
         title: entry.title,
-        pill_containers: entry.pill_containers?.map((container) => ({
-          title: container.title,
-          pills: container.pills?.map((pill) => ({
-            text: pill.text,
-            id: pill.id,
-            type: pill.type,
+        pill_containers:
+          entry.pill_containers?.map((container) => ({
+            title: container.title,
+            pills:
+              container.pills?.map((pill) => ({
+                text: pill.text,
+                id: pill.id,
+                type: pill.type,
+              })) || [],
           })) || [],
-        })) || [],
         secondary_title: entry.secondary_title,
       };
-    } else if (entry.type === 'files') {
+    }
+    if (entry.type === 'files') {
       return {
         status: entry.status,
         id: entry.id,
