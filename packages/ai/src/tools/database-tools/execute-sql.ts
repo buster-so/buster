@@ -304,7 +304,6 @@ async function executeSingleStatement(
 export const executeSql = createTool({
   id: 'execute-sql',
   description: `Use this to run lightweight, validation queries to understand values in columns, date ranges, etc. 
-    This should *never* be used to return metrics, visualizations, etc. You should use the createMetrics and use the SQL param of the 'yml_content'.
     SELECT queries without LIMIT will automatically have LIMIT 25 added. 
     You must use the <SCHEMA_NAME>.<TABLE_NAME> syntax/qualifier for all table names. 
     Otherwise the queries wont run successfully.`,
