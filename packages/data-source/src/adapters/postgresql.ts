@@ -79,8 +79,8 @@ export class PostgreSQLAdapter extends BaseAdapter {
     }
 
     try {
-      // Set query timeout if specified (default: 30 seconds)
-      const timeoutMs = timeout || 30000;
+      // Set query timeout if specified (default: 60 seconds)
+      const timeoutMs = timeout || 60000;
       await this.client.query(`SET statement_timeout = ${timeoutMs}`);
 
       // If no maxRows specified, use regular query

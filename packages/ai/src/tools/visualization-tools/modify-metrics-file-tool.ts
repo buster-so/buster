@@ -248,9 +248,12 @@ async function validateSql(sqlQuery: string, dataSourceId: string): Promise<SqlV
     }
 
     try {
-      // Execute the SQL query using the DataSource
+      // Execute the SQL query using the DataSource with timeout for validation
       const result = await dataSource.execute({
         sql: sqlQuery,
+        options: {
+          timeout: 60000, // 60 second timeout for complex analytical queries
+        },
       });
 
       if (result.success) {

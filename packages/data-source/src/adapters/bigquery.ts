@@ -67,11 +67,11 @@ export class BigQueryAdapter extends BaseAdapter {
         useLegacySql: false,
       };
 
-      // Add timeout if specified (default: 30 seconds)
+      // Add timeout if specified (default: 60 seconds)
       if (timeout || timeout === 0) {
         options.jobTimeoutMs = timeout;
       } else {
-        options.jobTimeoutMs = 30000; // 30 second default
+        options.jobTimeoutMs = 60000; // 60 second default for analytical queries
       }
 
       // Apply row limit if specified

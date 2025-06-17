@@ -1318,7 +1318,7 @@ async function validateSql(sqlQuery: string, dataSourceId: string): Promise<Vali
         sql: sqlQuery,
         options: {
           maxRows: 1000, // Limit to 1000 rows for validation to protect memory
-          timeout: 30000, // 30 second timeout to prevent hanging on slow queries
+          timeout: 60000, // 60 second timeout for complex analytical queries
         },
       });
 

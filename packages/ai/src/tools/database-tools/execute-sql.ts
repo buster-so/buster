@@ -277,9 +277,12 @@ async function executeSingleStatement(
     // Ensure the SQL statement has a LIMIT clause to prevent excessive results
     const limitedSql = ensureSqlLimit(sqlStatement, 25);
 
-    // Execute the SQL query using the DataSource
+    // Execute the SQL query using the DataSource with timeout
     const result = await dataSource.execute({
       sql: limitedSql,
+      options: {
+        timeout: 60000, // 60 second timeout for complex analytical queries
+      },
     });
 
     if (result.success) {

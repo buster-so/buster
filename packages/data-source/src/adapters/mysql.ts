@@ -70,8 +70,8 @@ export class MySQLAdapter extends BaseAdapter {
     }
 
     try {
-      // Set query timeout if specified (default: 30 seconds)
-      const timeoutMs = timeout || 30000;
+      // Set query timeout if specified (default: 60 seconds)
+      const timeoutMs = timeout || 60000;
 
       // For MySQL, use Promise.race() to implement timeout since mysql2
       // doesn't support per-query timeouts on existing connections

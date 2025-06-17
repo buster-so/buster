@@ -99,8 +99,8 @@ export class SQLServerAdapter extends BaseAdapter {
         return Promise.race([queryPromise, timeoutPromise]);
       };
 
-      // Set query timeout if specified (default: 30 seconds)
-      const timeoutMs = timeout || 30000;
+      // Set query timeout if specified (default: 60 seconds)
+      const timeoutMs = timeout || 60000;
       let processedQuery = sqlQuery;
 
       // Add parameters if provided

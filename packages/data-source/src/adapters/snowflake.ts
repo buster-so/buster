@@ -106,8 +106,8 @@ export class SnowflakeAdapter extends BaseAdapter {
     };
 
     try {
-      // Set query timeout if specified (default: 30 seconds)
-      const timeoutMs = timeout || 30000;
+      // Set query timeout if specified (default: 60 seconds)
+      const timeoutMs = timeout || 60000;
 
       // If no maxRows specified, use regular query
       if (!maxRows || maxRows <= 0) {
