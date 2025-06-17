@@ -276,6 +276,17 @@ const extractValuesSearchStepExecution = async ({
       searchPerformed: storedValuesResult.searchPerformed,
     };
   } catch (error) {
+    // Handle AbortError gracefully
+    if (error instanceof Error && error.name === 'AbortError') {
+      // Return empty values when aborted
+      return {
+        values: [],
+        searchResults: '',
+        foundValues: {},
+        searchPerformed: false,
+      };
+    }
+
     console.error('Failed to extract values:', error);
     // Return empty values array instead of crashing
     return {

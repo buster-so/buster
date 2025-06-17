@@ -209,6 +209,15 @@ const todoStepExecution = async ({
       reasoningHistory: reasoningHistory,
     };
   } catch (error) {
+    // Handle AbortError gracefully
+    if (error instanceof Error && error.name === 'AbortError') {
+      // Return empty todos when aborted
+      return {
+        todos: '',
+        reasoningHistory: [],
+      };
+    }
+
     console.error('Failed to create todos:', error);
 
     // Check if it's a database connection error

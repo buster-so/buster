@@ -1,6 +1,6 @@
 import type { CoreMessage } from 'ai';
 import { afterAll, afterEach, describe, expect, test, vi } from 'vitest';
-import { formatLlmMessagesAsReasoning } from '../../../src/utils/database/formatLlmMessagesAsReasoning';
+import { formatLlmMessagesAsReasoning } from '../../../src/utils/database/format-llm-messages-as-reasoning';
 
 describe('formatLlmMessagesAsReasoning error handling', () => {
   // Mock console.error to verify error logging

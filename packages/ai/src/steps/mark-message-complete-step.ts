@@ -105,6 +105,17 @@ const markMessageCompleteExecution = async ({
       success: true,
     };
   } catch (error) {
+    // Handle AbortError gracefully
+    if (error instanceof Error && error.name === 'AbortError') {
+      // Pass through the input data when aborted
+      return {
+        ...inputData,
+        messageId: runtimeContext.get('messageId') || '',
+        completedAt: new Date().toISOString(),
+        success: false, // Mark as unsuccessful when aborted
+      };
+    }
+
     console.error('Error marking message as complete:', error);
 
     // Check if it's a database connection error
