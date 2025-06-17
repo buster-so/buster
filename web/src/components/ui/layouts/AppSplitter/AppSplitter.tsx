@@ -207,6 +207,18 @@ export const AppSplitter = React.memo(
 
         const currentSize = savedLayout ?? 0;
 
+        // Check if a panel is at 0px and should remain at 0px
+        const isLeftPanelZero = currentSize === 0 && preserveSide === 'left';
+        const isRightPanelZero = currentSize === 0 && preserveSide === 'right';
+
+        // If a panel is at 0px, keep it at 0px and give all space to the other panel
+        if (isLeftPanelZero) {
+          return { leftSize: 0, rightSize: containerSize };
+        }
+        if (isRightPanelZero) {
+          return { leftSize: containerSize, rightSize: 0 };
+        }
+
         // During animation or when size was set by animation (and not currently dragging),
         // don't apply constraints to allow smooth animations
         const shouldApplyConstraints =
@@ -252,6 +264,37 @@ export const AppSplitter = React.memo(
             if (savedLayout === null || savedLayout === undefined) {
               const initialSize = calculateInitialSize(size);
               setSavedLayout(initialSize);
+            }
+          }
+
+          // Handle container resize when one panel is at 0px
+          if (prev.isInitialized && prev.containerSize > 0 && size > 0 && savedLayout !== null) {
+            const currentSavedSize = savedLayout;
+
+            // If a panel is at 0px, preserve the other panel's size during resize
+            if (currentSavedSize === 0) {
+              if (preserveSide === 'left') {
+                // Left panel is 0px, preserve right panel's size (which is the full previous container)
+                setSavedLayout(0); // Keep left at 0
+              } else {
+                // Right panel is 0px, preserve left panel's size (which is the full previous container)
+                setSavedLayout(0); // Keep right at 0
+              }
+            } else {
+              // Check if the current layout represents a panel that should remain preserved
+              const oldContainerSize = prev.containerSize;
+
+              if (preserveSide === 'left') {
+                // If left panel was at full size (right was 0), keep it at full size
+                if (currentSavedSize === oldContainerSize) {
+                  setSavedLayout(size);
+                }
+              } else {
+                // If right panel was at full size (left was 0), keep it at full size
+                if (currentSavedSize === oldContainerSize) {
+                  setSavedLayout(size);
+                }
+              }
             }
           }
 
@@ -324,12 +367,31 @@ export const AppSplitter = React.memo(
 
         const [leftValue, rightValue] = sizes;
 
+        // Calculate both potential sizes
+        const leftPixels = leftValue !== 'auto' ? sizeToPixels(leftValue, state.containerSize) : 0;
+        const rightPixels =
+          rightValue !== 'auto' ? sizeToPixels(rightValue, state.containerSize) : 0;
+
+        // Determine which side to actually preserve based on which panel has content (non-zero size)
+        let effectivePreserveSide = preserveSide;
+
         if (preserveSide === 'left' && leftValue !== 'auto') {
-          const newSize = sizeToPixels(leftValue, state.containerSize);
-          setSavedLayout(newSize);
+          // If left panel would be 0px, preserve right side instead
+          if (leftPixels === 0 && rightValue !== 'auto') {
+            effectivePreserveSide = 'right';
+          }
         } else if (preserveSide === 'right' && rightValue !== 'auto') {
-          const newSize = sizeToPixels(rightValue, state.containerSize);
-          setSavedLayout(newSize);
+          // If right panel would be 0px, preserve left side instead
+          if (rightPixels === 0 && leftValue !== 'auto') {
+            effectivePreserveSide = 'left';
+          }
+        }
+
+        // Apply the preservation logic with the effective side
+        if (effectivePreserveSide === 'left' && leftValue !== 'auto') {
+          setSavedLayout(leftPixels);
+        } else if (effectivePreserveSide === 'right' && rightValue !== 'auto') {
+          setSavedLayout(rightPixels);
         }
 
         setState((prev) => ({ ...prev, sizeSetByAnimation: false }));
@@ -392,7 +454,6 @@ export const AppSplitter = React.memo(
 
       // Effects
       useEffect(() => {
-        console.log('updateContainerSize');
         updateContainerSize();
 
         const resizeObserver = new ResizeObserver(updateContainerSize);
