@@ -1,8 +1,7 @@
 import type {
   BusterChatMessageReasoning,
   BusterChatMessageResponse,
-  IBusterChatMessage,
-  BusterChatMessageRequest
+  IBusterChatMessage
 } from '@/api/asset_interfaces/chat';
 import type { BusterChatMessageShape } from './shapes';
 
@@ -31,12 +30,10 @@ export const updateMessageShapeToIChatMessage = (
   );
 
   // Parse request message
-  const requestMessage = parseRequestMessage(message.request_message);
 
   // Build the converted message by only including fields that exist in both types
   const convertedMessage: Partial<IBusterChatMessage> & { id: string } = {
     id: message.id,
-    ...(message.request_message !== undefined && { request_message: requestMessage }),
     ...(message.response_messages !== undefined && {
       response_message_ids: responseMessageIds.map((msg) => msg.id),
       response_messages: responseMessagesRecord
@@ -49,14 +46,15 @@ export const updateMessageShapeToIChatMessage = (
     ...(message.final_reasoning_message !== undefined && {
       final_reasoning_message: message.final_reasoning_message
     }),
-    ...(message.feedback !== undefined && { feedback: message.feedback })
+    ...(message.feedback !== undefined && { feedback: message.feedback }),
+    ...(message.is_completed !== undefined && { is_completed: message.is_completed })
   };
 
   return convertedMessage;
 };
 
 const parseResponseMessages = (
-  responseMessages: string | undefined
+  responseMessages: string | BusterChatMessageResponse[] | undefined
 ): BusterChatMessageResponse[] => {
   try {
     if (typeof responseMessages === 'object') return responseMessages;
@@ -68,7 +66,7 @@ const parseResponseMessages = (
 };
 
 const parseReasoningMessages = (
-  reasoningMessages: string | undefined
+  reasoningMessages: string | BusterChatMessageReasoning[] | undefined
 ): BusterChatMessageReasoning[] => {
   try {
     if (typeof reasoningMessages === 'object') return reasoningMessages;
@@ -76,15 +74,5 @@ const parseReasoningMessages = (
     return JSON.parse(reasoningMessages);
   } catch (error) {
     return [];
-  }
-};
-
-const parseRequestMessage = (requestMessage: string | undefined): BusterChatMessageRequest => {
-  try {
-    if (typeof requestMessage === 'object') return requestMessage;
-    if (!requestMessage) return null;
-    return JSON.parse(requestMessage);
-  } catch (error) {
-    return null;
   }
 };
