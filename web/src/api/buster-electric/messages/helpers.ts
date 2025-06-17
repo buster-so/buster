@@ -1,13 +1,13 @@
 import type {
   BusterChatMessageReasoning,
   BusterChatMessageResponse,
-  IBusterChatMessage
+  BusterChatMessage
 } from '@/api/asset_interfaces/chat';
 import type { BusterChatMessageShape } from './shapes';
 
 export const updateMessageShapeToIChatMessage = (
   message: Partial<BusterChatMessageShape> & { id: string }
-): Partial<IBusterChatMessage> & { id: string } => {
+): Partial<BusterChatMessage> & { id: string } => {
   // Extract response_message_ids and convert array to record
   const responseMessageIds = parseResponseMessages(message.response_messages);
   const responseMessagesRecord = responseMessageIds.reduce(
@@ -32,7 +32,7 @@ export const updateMessageShapeToIChatMessage = (
   // Parse request message
 
   // Build the converted message by only including fields that exist in both types
-  const convertedMessage: Partial<IBusterChatMessage> & { id: string } = {
+  const convertedMessage: Partial<BusterChatMessage> & { id: string } = {
     id: message.id,
     ...(message.response_messages !== undefined && {
       response_message_ids: responseMessageIds.map((msg) => msg.id),

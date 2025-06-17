@@ -1,13 +1,8 @@
-export type FileType = 'metric' | 'dashboard' | 'reasoning'; //'dataset' | 'collection' | | 'term' | 'value'
+import type {
+  ReasoningFileType as ServerReasoningFileType,
+  ResponseMessageFileType as ServerResponseMessageFileType
+} from '@server/types/chat-types';
 
-export type ReasoningFileType = 'metric' | 'dashboard' | 'reasoning' | 'agent-action';
+export type FileType = ServerResponseMessageFileType;
 
-export type ReasoningThoughtFileType =
-  | 'metric'
-  | 'dashboard'
-  | 'collection'
-  | 'dataset'
-  | 'term'
-  | 'topic'
-  | 'value'
-  | 'empty';
+export type ReasoningFileType = ServerReasoningFileType;

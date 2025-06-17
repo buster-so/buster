@@ -17,9 +17,11 @@ const ReasoningTextEntrySchema = z.object({
   finished_reasoning: z.boolean().optional(),
 });
 
+const ReasoningFileTypeSchema = z.enum(['metric', 'dashboard', 'reasoning', 'agent-action']);
+
 const ReasoningFileSchema = z.object({
   id: z.string(),
-  file_type: z.enum(['metric', 'dashboard', 'reasoning', 'agent-action']),
+  file_type: ReasoningFileTypeSchema,
   file_name: z.string(),
   version_number: z.number(),
   status: z.enum(['loading', 'completed', 'failed']),

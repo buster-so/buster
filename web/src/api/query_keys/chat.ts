@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query';
-import type { IBusterChat, IBusterChatMessage } from '@/api/asset_interfaces/chat/iChatInterfaces';
+import type { IBusterChat, BusterChatMessage } from '@/api/asset_interfaces/chat';
 import type { BusterMetricData } from '@/api/asset_interfaces/metric/metricDataInterfaces';
 import type { getListChats, getListLogs } from '@/api/buster_rest/chats/requests';
 import type { BusterChatListItem } from '../asset_interfaces/chat/chatInterfaces';
@@ -12,7 +12,7 @@ const chatsGetChat = (chatId: string) =>
   });
 
 const chatsMessages = (messageId: string) =>
-  queryOptions<IBusterChatMessage>({
+  queryOptions<BusterChatMessage>({
     queryKey: ['chats', 'messages', messageId] as const,
     staleTime: Number.POSITIVE_INFINITY,
     enabled: !!messageId

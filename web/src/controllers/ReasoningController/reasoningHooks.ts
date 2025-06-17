@@ -1,6 +1,6 @@
 import type {
   BusterChatMessageReasoning_text,
-  IBusterChatMessage
+  BusterChatMessage
 } from '@/api/asset_interfaces/chat';
 import { chatQueryKeys } from '@/api/query_keys/chat';
 import { useQueries } from '@tanstack/react-query';
@@ -13,7 +13,7 @@ export const useReasoningIsCompleted = (messageId: string, reasoningMessageIds: 
       {
         ...queryKey,
         enabled: false,
-        select: (x: IBusterChatMessage | undefined) => ({
+        select: (x: BusterChatMessage | undefined) => ({
           finished_reasoning: (
             x?.reasoning_messages[
               last(reasoningMessageIds) || ''

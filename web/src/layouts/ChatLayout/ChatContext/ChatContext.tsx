@@ -1,7 +1,7 @@
 import { useQueries } from '@tanstack/react-query';
 import React, { type PropsWithChildren } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
-import type { IBusterChatMessage } from '@/api/asset_interfaces/chat';
+import type { BusterChatMessage } from '@/api/asset_interfaces/chat';
 import { useGetChat } from '@/api/buster_rest/chats';
 import { queryKeys } from '@/api/query_keys';
 import { useChatLayoutContextSelector } from '..';
@@ -39,7 +39,7 @@ const useChatIndividualContext = ({
       return {
         ...queryKey,
         enabled: false,
-        select: (data: IBusterChatMessage | undefined) => !data?.is_completed
+        select: (data: BusterChatMessage | undefined) => !data?.is_completed
       };
     }),
     combine: (result) => result.some((res) => res.data)

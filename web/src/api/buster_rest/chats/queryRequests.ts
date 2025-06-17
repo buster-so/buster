@@ -7,7 +7,7 @@ import {
 } from '@tanstack/react-query';
 import last from 'lodash/last';
 import { useMemo } from 'react';
-import type { IBusterChat, IBusterChatMessage } from '@/api/asset_interfaces/chat/iChatInterfaces';
+import type { IBusterChat } from '@/api/asset_interfaces/chat/iChatInterfaces';
 import { chatQueryKeys } from '@/api/query_keys/chat';
 import { collectionQueryKeys } from '@/api/query_keys/collection';
 import { useBusterNotifications } from '@/context/BusterNotifications';
@@ -32,6 +32,7 @@ import {
   updateChat,
   updateChatMessageFeedback
 } from './requests';
+import type { BusterChatMessage } from '@/api/asset_interfaces/chat';
 
 export const useGetListChats = (
   filters?: Omit<Parameters<typeof getListChats>[0], 'page_token' | 'page_size'>
@@ -255,7 +256,7 @@ export const useGetChatMessageMemoized = () => {
   const getChatMessageMemoized = useMemoizedFn((messageId: string) => {
     const options = chatQueryKeys.chatsMessages(messageId);
     const queryKey = options.queryKey;
-    return queryClient.getQueryData<IBusterChatMessage>(queryKey);
+    return queryClient.getQueryData<BusterChatMessage>(queryKey);
   });
 
   return getChatMessageMemoized;
@@ -273,9 +274,9 @@ export const useGetChatMemoized = () => {
   return getChatMemoized;
 };
 
-export const useGetChatMessage = <TData = IBusterChatMessage>(
+export const useGetChatMessage = <TData = BusterChatMessage>(
   messageId: string,
-  options?: Omit<UseQueryOptions<IBusterChatMessage, RustApiError, TData>, 'queryKey' | 'queryFn'>
+  options?: Omit<UseQueryOptions<BusterChatMessage, RustApiError, TData>, 'queryKey' | 'queryFn'>
 ) => {
   return useQuery({
     ...chatQueryKeys.chatsMessages(messageId),

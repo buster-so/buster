@@ -125,6 +125,7 @@ const MOCK_MESSAGE = (messageIndex = 0): BusterChatMessage => {
   return {
     id: generateId('message', messageIndex),
     created_at: generateTimestamp(messageIndex),
+    updated_at: generateTimestamp(messageIndex),
     is_completed: false,
     request_message: {
       request: `Sample request ${messageIndex}`,

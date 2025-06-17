@@ -6,7 +6,7 @@ import sample from 'lodash/sample';
 import { useRef } from 'react';
 import type {
   BusterChatMessageReasoning_text,
-  IBusterChatMessage
+  BusterChatMessage
 } from '@/api/asset_interfaces/chat';
 import { useGetChatMessageMemoized } from '@/api/buster_rest/chats';
 import { queryKeys } from '@/api/query_keys';
@@ -41,7 +41,7 @@ export const useBlackBoxMessage = () => {
   const checkBlackBoxMessage = useMemoizedFn(
     (
       message: Pick<
-        IBusterChatMessage,
+        BusterChatMessage,
         'id' | 'reasoning_messages' | 'reasoning_message_ids' | 'is_completed'
       >
     ) => {

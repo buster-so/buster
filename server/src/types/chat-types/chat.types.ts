@@ -66,7 +66,6 @@ export const ChatCreateHandlerRequestSchema = z.object({
 // Infer types from schemas
 export type AssetPermissionRole = z.infer<typeof AssetPermissionRoleSchema>;
 export type BusterShareIndividual = z.infer<typeof BusterShareIndividualSchema>;
-
 export type ChatWithMessages = z.infer<typeof ChatWithMessagesSchema>;
 export type ChatCreateRequest = z.infer<typeof ChatCreateRequestSchema>;
 export type ChatCreateResponse = z.infer<typeof ChatCreateResponseSchema>;

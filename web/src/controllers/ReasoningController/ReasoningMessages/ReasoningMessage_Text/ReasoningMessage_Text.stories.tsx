@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReasoningMessage_Text } from './ReasoningMessage_Text';
-import type { IBusterChatMessage } from '@/api/asset_interfaces/chat';
+import type { BusterChatMessage } from '@/api/asset_interfaces/chat';
 
 const meta: Meta<typeof ReasoningMessage_Text> = {
   title: 'Controllers/ReasoningController/ReasoningMessage_Text',
@@ -21,10 +21,11 @@ const meta: Meta<typeof ReasoningMessage_Text> = {
       });
 
       // Mock message data with text reasoning
-      const mockMessage: IBusterChatMessage = {
+      const mockMessage: BusterChatMessage = {
         id: 'mock-message-id',
         is_completed: true,
         created_at: '2024-01-01T00:00:00Z',
+        updated_at: '2024-01-01T00:00:00Z',
         request_message: {
           request: 'test request',
           sender_id: 'user1',

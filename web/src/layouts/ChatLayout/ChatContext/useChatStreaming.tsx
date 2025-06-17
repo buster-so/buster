@@ -1,10 +1,5 @@
-import type {
-  BusterChat,
-  BusterChatMessage,
-  IBusterChat,
-  IBusterChatMessage
-} from '@/api/asset_interfaces/chat';
-import { useMemoizedFn, useMount } from '@/hooks';
+import type { BusterChat, IBusterChat, BusterChatMessage } from '@/api/asset_interfaces/chat';
+import { useMemoizedFn } from '@/hooks';
 import { useBlackBoxMessage } from './useBlackBoxMessage';
 import { updateChatToIChat } from '@/lib/chat';
 import { useQueryClient } from '@tanstack/react-query';
@@ -29,7 +24,7 @@ export const useChatStreaming = ({
   const getChatMessageMemoized = useGetChatMessageMemoized();
 
   const _prefetchLastMessageMetricData = useMemoizedFn(
-    (iChat: IBusterChat, iChatMessages: Record<string, IBusterChatMessage>) => {
+    (iChat: IBusterChat, iChatMessages: Record<string, BusterChatMessage>) => {
       const lastMessageId = iChat.message_ids[iChat.message_ids.length - 1];
       const lastMessage = iChatMessages[lastMessageId];
       if (lastMessage?.response_message_ids) {

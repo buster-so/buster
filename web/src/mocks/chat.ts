@@ -1,9 +1,10 @@
-import type { IBusterChatMessage } from '@/api/asset_interfaces';
+import type { BusterChatMessage } from '@/api/asset_interfaces';
 
-export const mockBusterChatMessage: IBusterChatMessage = {
+export const mockBusterChatMessage: BusterChatMessage = {
   id: 'message-1',
   is_completed: true,
   created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
   request_message: {
     request: 'test request',
     sender_id: 'user1',

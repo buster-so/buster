@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { create } from 'mutative';
-import type { IBusterChat, IBusterChatMessage } from '@/api/asset_interfaces/chat';
+import type { IBusterChat, BusterChatMessage } from '@/api/asset_interfaces/chat';
 import { queryKeys } from '@/api/query_keys';
 import { useMemoizedFn } from '@/hooks';
 
@@ -21,7 +21,7 @@ export const useChatUpdate = () => {
   );
 
   const onUpdateChatMessage = useMemoizedFn(
-    async (newMessageConfig: Partial<IBusterChatMessage> & { id: string }) => {
+    async (newMessageConfig: Partial<BusterChatMessage> & { id: string }) => {
       const options = queryKeys.chatsMessages(newMessageConfig.id);
       const queryKey = options.queryKey;
       const currentData = queryClient.getQueryData(queryKey);

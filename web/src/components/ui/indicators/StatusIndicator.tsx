@@ -3,13 +3,6 @@ import React from 'react';
 import { cn } from '@/lib/classMerge';
 import { CircleWarning, RadioChecked } from '../icons';
 
-const animationConfig = {
-  initial: { opacity: 0 },
-  animate: { opacity: 1 },
-  exit: { opacity: 0 },
-  transition: { duration: 0.2 }
-};
-
 export const StatusIndicator: React.FC<{
   status?: 'completed' | 'loading' | 'failed';
   isCompletedStream?: boolean;
