@@ -247,6 +247,7 @@ export interface CreateDashboardsArgs {
 export interface ModifyMetricsArgs {
   files: Array<{
     id: string;
+    name: string;
     yml_content?: string;
   }>;
 }
@@ -254,6 +255,7 @@ export interface ModifyMetricsArgs {
 export interface ModifyDashboardsArgs {
   files: Array<{
     id: string;
+    name: string;
     yml_content?: string;
   }>;
 }

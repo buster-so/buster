@@ -705,6 +705,7 @@ const inputSchema = z.object({
     .array(
       z.object({
         id: z.string().uuid('Must be a valid UUID'),
+        name: z.string().min(1, 'Name cannot be empty'),
         yml_content: z.string().min(1, 'YAML content cannot be empty'),
       })
     )

@@ -226,23 +226,39 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         }
       }
     } else {
-      // Create reasoning entry for this tool call
-      const reasoningEntry = this.createReasoningEntry(
-        chunk.toolCallId,
-        chunk.toolName,
-        chunk.args || {}
+      // Check if this reasoning entry already exists (from streaming)
+      const existingEntryIndex = this.state.reasoningHistory.findIndex(
+        (r) => r && typeof r === 'object' && 'id' in r && r.id === chunk.toolCallId
       );
-      if (reasoningEntry) {
-        // Check if this reasoning entry already exists
-        const existingEntryIndex = this.state.reasoningHistory.findIndex(
-          (r) => r && typeof r === 'object' && 'id' in r && r.id === chunk.toolCallId
-        );
 
-        if (existingEntryIndex !== -1) {
-          // Update existing entry with complete args (replace it)
-          this.state.reasoningHistory[existingEntryIndex] = reasoningEntry;
+      if (existingEntryIndex !== -1) {
+        // We already have an entry from streaming - update status but preserve data
+        const existingEntry = this.state.reasoningHistory[existingEntryIndex];
+        if (existingEntry && existingEntry.type === 'files') {
+          // For file entries, just update the status, keep all accumulated data
+          this.state.reasoningHistory[existingEntryIndex] = {
+            ...existingEntry,
+            status: 'loading', // Keep as loading until tool-result
+          };
         } else {
-          // Add new entry
+          // For non-file entries, create new entry with complete args
+          const reasoningEntry = this.createReasoningEntry(
+            chunk.toolCallId,
+            chunk.toolName,
+            chunk.args || {}
+          );
+          if (reasoningEntry) {
+            this.state.reasoningHistory[existingEntryIndex] = reasoningEntry;
+          }
+        }
+      } else {
+        // No existing entry - create new one
+        const reasoningEntry = this.createReasoningEntry(
+          chunk.toolCallId,
+          chunk.toolName,
+          chunk.args || {}
+        );
+        if (reasoningEntry) {
           this.state.reasoningHistory.push(reasoningEntry);
         }
       }
@@ -298,22 +314,36 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         this.state.responseHistory.push(responseEntry);
       }
     } else {
-      // For some tools like createMetrics, we should wait for complete args
-      // For others like sequentialThinking, we can create an entry immediately
-      const waitForCompleteArgs = [
-        'createMetrics',
-        'create-metrics-file',
-        'createDashboards',
-        'create-dashboards-file',
-        'modifyMetrics',
-        'modify-metrics-file',
-        'modifyDashboards',
-        'modify-dashboards-file',
-        'executeSql',
-        'execute-sql',
-      ].includes(chunk.toolName);
+      // For some tools, we create initial entries during streaming start
+      // For others, we wait for complete args in the tool-call event
+      const waitForCompleteArgs = ['executeSql', 'execute-sql'].includes(chunk.toolName);
 
-      if (!waitForCompleteArgs) {
+      // File-based tools get special handling - create empty entry that will be populated
+      const fileToolTitles: Record<string, string> = {
+        createMetrics: 'Creating metrics...',
+        'create-metrics-file': 'Creating metrics...',
+        createDashboards: 'Creating dashboards...',
+        'create-dashboards-file': 'Creating dashboards...',
+        modifyMetrics: 'Modifying metrics...',
+        'modify-metrics-file': 'Modifying metrics...',
+        modifyDashboards: 'Modifying dashboards...',
+        'modify-dashboards-file': 'Modifying dashboards...',
+      };
+
+      const fileToolTitle = fileToolTitles[chunk.toolName];
+      if (fileToolTitle) {
+        // Create initial empty files entry that will be populated as files stream in
+        const entry: ReasoningEntry = {
+          id: chunk.toolCallId,
+          type: 'files',
+          title: fileToolTitle,
+          status: 'loading',
+          secondary_title: undefined,
+          file_ids: [],
+          files: {},
+        } as ReasoningEntry;
+        this.state.reasoningHistory.push(entry);
+      } else if (!waitForCompleteArgs) {
         // Create initial reasoning entry for tools that don't need complete args
         const reasoningEntry = this.createReasoningEntry(
           chunk.toolCallId,
@@ -660,8 +690,97 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
       case 'createMetrics':
       case 'create-metrics-file': {
-        // For file-based tools, we might want to update file content
-        // This is more complex and might need special handling
+        // Parse streaming files array to show incremental progress
+        const filesArray = getOptimisticValue<unknown[]>(parseResult.extractedValues, 'files', []);
+        if (filesArray && Array.isArray(filesArray) && entry.type === 'files') {
+          const existingFiles = entry.files || {};
+          const existingFileIds = (entry as ReasoningEntry & { file_ids: string[] }).file_ids || [];
+
+          // Process each file in the array (might be incrementally added)
+          filesArray.forEach((file, index) => {
+            if (file && typeof file === 'object') {
+              const hasName = 'name' in file && file.name;
+              const hasContent = 'yml_content' in file && file.yml_content;
+
+              // Only add file when both name AND yml_content are present
+              if (hasName && hasContent && !existingFileIds[index]) {
+                const fileId = crypto.randomUUID();
+                existingFileIds[index] = fileId;
+                existingFiles[fileId] = {
+                  id: fileId,
+                  file_type: 'metric',
+                  file_name: (file as { name?: string }).name || '',
+                  version_number: 1,
+                  status: 'loading',
+                  file: {
+                    text: (file as { yml_content?: string }).yml_content || '',
+                  },
+                };
+              } else if (existingFileIds[index] && hasContent) {
+                // Update existing file content if it has changed
+                const fileId = existingFileIds[index];
+                if (existingFiles[fileId]?.file) {
+                  existingFiles[fileId].file.text =
+                    (file as { yml_content?: string }).yml_content || '';
+                }
+              }
+            }
+          });
+
+          // Update the entry - keep sparse array to maintain index mapping
+          (entry as ReasoningEntry & { file_ids: string[] }).file_ids = existingFileIds;
+          entry.files = existingFiles;
+
+          // Title stays static - "Creating metrics..."
+        }
+        break;
+      }
+
+      case 'createDashboards':
+      case 'create-dashboards-file': {
+        // Parse streaming files array to show incremental progress
+        const filesArray = getOptimisticValue<unknown[]>(parseResult.extractedValues, 'files', []);
+        if (filesArray && Array.isArray(filesArray) && entry.type === 'files') {
+          const existingFiles = entry.files || {};
+          const existingFileIds = (entry as ReasoningEntry & { file_ids: string[] }).file_ids || [];
+
+          // Process each file in the array (might be incrementally added)
+          filesArray.forEach((file, index) => {
+            if (file && typeof file === 'object') {
+              const hasName = 'name' in file && file.name;
+              const hasContent = 'yml_content' in file && file.yml_content;
+
+              // Only add file when both name AND yml_content are present
+              if (hasName && hasContent && !existingFileIds[index]) {
+                const fileId = crypto.randomUUID();
+                existingFileIds[index] = fileId;
+                existingFiles[fileId] = {
+                  id: fileId,
+                  file_type: 'dashboard',
+                  file_name: (file as { name?: string }).name || '',
+                  version_number: 1,
+                  status: 'loading',
+                  file: {
+                    text: (file as { yml_content?: string }).yml_content || '',
+                  },
+                };
+              } else if (existingFileIds[index] && hasContent) {
+                // Update existing file content if it has changed
+                const fileId = existingFileIds[index];
+                if (existingFiles[fileId]?.file) {
+                  existingFiles[fileId].file.text =
+                    (file as { yml_content?: string }).yml_content || '';
+                }
+              }
+            }
+          });
+
+          // Update the entry - keep sparse array to maintain index mapping
+          (entry as ReasoningEntry & { file_ids: string[] }).file_ids = existingFileIds;
+          entry.files = existingFiles;
+
+          // Title stays static - "Creating dashboards..."
+        }
         break;
       }
 
@@ -669,7 +788,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       case 'execute-sql': {
         // Could update SQL content as it streams
         const sql = getOptimisticValue<string>(parseResult.extractedValues, 'sql', '');
-        if (sql && hasFiles(entry)) {
+        if (sql && entry.type === 'files') {
           // Update the SQL file content
           const fileIds = (entry as ReasoningEntry & { file_ids: string[] }).file_ids;
           if (fileIds && fileIds.length > 0) {
@@ -679,6 +798,104 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
               file.file.text = sql;
             }
           }
+        }
+        break;
+      }
+
+      case 'modifyMetrics':
+      case 'modify-metrics-file': {
+        // Parse streaming files array to show progress
+        const filesArray = getOptimisticValue<unknown[]>(parseResult.extractedValues, 'files', []);
+        if (filesArray && Array.isArray(filesArray) && entry.type === 'files') {
+          const existingFiles = entry.files || {};
+          const existingFileIds = (entry as ReasoningEntry & { file_ids: string[] }).file_ids || [];
+
+          // Process each file in the array
+          filesArray.forEach((file, index) => {
+            if (file && typeof file === 'object') {
+              const hasId = 'id' in file && file.id;
+              const hasName = 'name' in file && file.name;
+              const hasContent = 'yml_content' in file && file.yml_content;
+
+              // Only add file when name is present (id is always present)
+              if (hasId && hasName && !existingFileIds[index]) {
+                const fileId = (file as { id?: string }).id || ''; // Use the actual file ID
+                existingFileIds[index] = fileId;
+                existingFiles[fileId] = {
+                  id: fileId,
+                  file_type: 'metric',
+                  file_name: (file as { name?: string }).name || '',
+                  version_number: 1,
+                  status: 'loading',
+                  file: {
+                    text: hasContent ? (file as { yml_content?: string }).yml_content || '' : '',
+                  },
+                };
+              } else if (existingFileIds[index] && hasContent) {
+                // Update existing file content if it has changed
+                const fileId = existingFileIds[index];
+                if (existingFiles[fileId]?.file) {
+                  existingFiles[fileId].file.text =
+                    (file as { yml_content?: string }).yml_content || '';
+                }
+              }
+            }
+          });
+
+          // Update the entry
+          (entry as ReasoningEntry & { file_ids: string[] }).file_ids = existingFileIds;
+          entry.files = existingFiles;
+
+          // Title stays static - "Modifying metrics..."
+        }
+        break;
+      }
+
+      case 'modifyDashboards':
+      case 'modify-dashboards-file': {
+        // Parse streaming files array to show progress
+        const filesArray = getOptimisticValue<unknown[]>(parseResult.extractedValues, 'files', []);
+        if (filesArray && Array.isArray(filesArray) && entry.type === 'files') {
+          const existingFiles = entry.files || {};
+          const existingFileIds = (entry as ReasoningEntry & { file_ids: string[] }).file_ids || [];
+
+          // Process each file in the array
+          filesArray.forEach((file, index) => {
+            if (file && typeof file === 'object') {
+              const hasId = 'id' in file && file.id;
+              const hasName = 'name' in file && file.name;
+              const hasContent = 'yml_content' in file && file.yml_content;
+
+              // Only add file when name is present (id is always present)
+              if (hasId && hasName && !existingFileIds[index]) {
+                const fileId = (file as { id?: string }).id || ''; // Use the actual file ID
+                existingFileIds[index] = fileId;
+                existingFiles[fileId] = {
+                  id: fileId,
+                  file_type: 'dashboard',
+                  file_name: (file as { name?: string }).name || '',
+                  version_number: 1,
+                  status: 'loading',
+                  file: {
+                    text: hasContent ? (file as { yml_content?: string }).yml_content || '' : '',
+                  },
+                };
+              } else if (existingFileIds[index] && hasContent) {
+                // Update existing file content if it has changed
+                const fileId = existingFileIds[index];
+                if (existingFiles[fileId]?.file) {
+                  existingFiles[fileId].file.text =
+                    (file as { yml_content?: string }).yml_content || '';
+                }
+              }
+            }
+          });
+
+          // Update the entry
+          (entry as ReasoningEntry & { file_ids: string[] }).file_ids = existingFileIds;
+          entry.files = existingFiles;
+
+          // Title stays static - "Modifying dashboards..."
         }
         break;
       }
@@ -725,45 +942,15 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       case 'createMetrics':
       case 'create-metrics-file':
         if (isCreateMetricsArgs(args)) {
-          const files: Record<
-            string,
-            {
-              id: string;
-              file_type: string;
-              file_name: string;
-              version_number: number;
-              status: string;
-              file: {
-                text?: string;
-                modified?: [number, number][];
-              };
-            }
-          > = {};
-          const fileIds: string[] = [];
-
-          for (const file of args.files) {
-            const fileId = crypto.randomUUID();
-            fileIds.push(fileId);
-            files[fileId] = {
-              id: fileId,
-              file_type: 'metric',
-              file_name: file.name || 'untitled_metric.yml',
-              version_number: 1,
-              status: 'loading',
-              file: {
-                text: file.yml_content || '',
-              },
-            };
-          }
-
+          // Start with empty files - they'll be populated during streaming
           return {
             id: toolCallId,
             type: 'files',
-            title: `Creating ${args.files.length} metric${args.files.length === 1 ? '' : 's'}`,
+            title: 'Creating metrics...',
             status: 'loading',
             secondary_title: undefined,
-            file_ids: fileIds,
-            files,
+            file_ids: [],
+            files: {},
           } as ReasoningEntry;
         }
         break;
@@ -823,81 +1010,49 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       case 'create-dashboards-file':
         // Handle similar to createMetrics - expects files array with name and yml_content
         if (isCreateDashboardsArgs(args)) {
-          const files: Record<
-            string,
-            {
-              id: string;
-              file_type: string;
-              file_name: string;
-              version_number: number;
-              status: string;
-              file: {
-                text?: string;
-                modified?: [number, number][];
-              };
-            }
-          > = {};
-          const fileIds: string[] = [];
-
-          for (const file of args.files) {
-            const fileId = crypto.randomUUID();
-            fileIds.push(fileId);
-            files[fileId] = {
-              id: fileId,
-              file_type: 'dashboard',
-              file_name: file.name || 'untitled_dashboard.yml',
-              version_number: 1,
-              status: 'loading',
-              file: {
-                text: file.yml_content || '',
-              },
-            };
-          }
-
+          // Start with empty files - they'll be populated during streaming
           return {
             id: toolCallId,
             type: 'files',
-            title: `Creating ${args.files.length} dashboard${args.files.length === 1 ? '' : 's'}`,
+            title: 'Creating dashboards...',
             status: 'loading',
             secondary_title: undefined,
-            file_ids: fileIds,
-            files,
+            file_ids: [],
+            files: {},
           } as ReasoningEntry;
         }
         break;
 
       case 'modifyMetrics':
       case 'modify-metrics-file':
-        // Handle modify metrics - expects files array with id and yml_content
+        // Handle modify metrics - expects files array with id, name, and yml_content
         if (isModifyMetricsArgs(args)) {
-          const fileCount = args.files.length;
+          // Start with empty files - they'll be populated during streaming
           return {
             id: toolCallId,
-            type: 'text',
-            title: `Modifying ${fileCount} metric${fileCount === 1 ? '' : 's'}`,
+            type: 'files',
+            title: 'Modifying metrics...',
             status: 'loading',
-            message: `Updating metric configuration${fileCount > 1 ? 's' : ''}...`,
-            message_chunk: undefined,
             secondary_title: undefined,
-            finished_reasoning: false,
+            file_ids: [],
+            files: {},
           } as ReasoningEntry;
         }
         break;
 
       case 'modifyDashboards':
       case 'modify-dashboards-file':
-        // Handle modify dashboards - expects files array with id and yml_content
+        // Handle modify dashboards - expects files array with id, name, and yml_content
         if (isModifyDashboardsArgs(args)) {
-          const fileCount = args.files.length;
+          // Start with empty files - they'll be populated during streaming
           return {
             id: toolCallId,
-            type: 'text',
-            title: `Modifying ${fileCount} dashboard${fileCount === 1 ? '' : 's'}`,
+            type: 'files',
+            title: 'Modifying dashboards...',
             status: 'loading',
-            message: `Updating dashboard configuration${fileCount > 1 ? 's' : ''}...`,
-            message_chunk: undefined,
             secondary_title: undefined,
-            finished_reasoning: false,
+            file_ids: [],
+            files: {},
           } as ReasoningEntry;
         }
         break;
