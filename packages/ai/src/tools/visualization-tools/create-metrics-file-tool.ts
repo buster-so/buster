@@ -45,6 +45,31 @@ interface MetricFileParams {
   yml_content: string;
 }
 
+interface QueryMetadata {
+  rowCount: number;
+  totalRowCount: number;
+  executionTime: number;
+  limited: boolean;
+  maxRows?: number;
+}
+
+interface ValidationResult {
+  success: boolean;
+  message?: string;
+  results?: Record<string, unknown>[];
+  metadata?: QueryMetadata;
+  error?: string;
+}
+
+interface MetricFileResult {
+  success: boolean;
+  metricFile?: FileWithId;
+  metricYml?: MetricYml;
+  message?: string;
+  results?: Record<string, unknown>[];
+  error?: string;
+}
+
 interface CreateMetricFilesParams {
   files: MetricFileParams[];
 }
@@ -59,7 +84,7 @@ interface FileWithId {
   name: string;
   file_type: string;
   result_message?: string;
-  results?: Record<string, any>[];
+  results?: Record<string, unknown>[];
   created_at: string;
   updated_at: string;
   version_number: number;
@@ -1020,22 +1045,28 @@ const createMetricFiles = wrapTraced(
     );
 
     const successfulProcessing: Array<{
-      metricFile: any;
+      metricFile: typeof metricFiles.$inferSelect;
       metricYml: MetricYml;
       message: string;
-      results: Record<string, any>[];
+      results: Record<string, unknown>[];
     }> = [];
 
     // Separate successful from failed processing
     for (const processResult of processResults) {
       if (processResult.status === 'fulfilled') {
         const { fileName, result } = processResult.value;
-        if (result.success) {
+        if (
+          result.success &&
+          result.metricFile &&
+          result.metricYml &&
+          result.message &&
+          result.results
+        ) {
           successfulProcessing.push({
             metricFile: result.metricFile,
-            metricYml: result.metricYml!,
-            message: result.message!,
-            results: result.results!,
+            metricYml: result.metricYml,
+            message: result.message,
+            results: result.results,
           });
         } else {
           failedFiles.push({
@@ -1120,14 +1151,7 @@ async function processMetricFile(
   _dataSourceDialect: string,
   userId: string,
   organizationId: string
-): Promise<{
-  success: boolean;
-  metricFile?: any;
-  metricYml?: MetricYml;
-  message?: string;
-  results?: Record<string, any>[];
-  error?: string;
-}> {
+): Promise<MetricFileResult> {
   try {
     // Ensure timeFrame values are properly quoted before parsing
     const fixedYmlContent = ensureTimeFrameQuoted(ymlContent);
@@ -1208,16 +1232,7 @@ async function processMetricFile(
   }
 }
 
-async function validateSql(
-  sqlQuery: string,
-  dataSourceId: string
-): Promise<{
-  success: boolean;
-  message?: string;
-  results?: Record<string, any>[];
-  metadata?: any;
-  error?: string;
-}> {
+async function validateSql(sqlQuery: string, dataSourceId: string): Promise<ValidationResult> {
   try {
     if (!sqlQuery.trim()) {
       return { success: false, error: 'SQL query cannot be empty' };
@@ -1279,7 +1294,7 @@ async function validateSql(
         } else if (result.metadata?.limited) {
           message = `Query validated successfully. Results were limited to ${result.metadata.maxRows} rows for memory protection (query may return more rows when executed)${results.length < allResults.length ? ` - showing first 25 of ${allResults.length} fetched` : ''}`;
         } else {
-          message = `Query validated successfully and returned ${allResults.length} records${allResults.length > 25 ? ` (showing sample of first 25)` : ''}`;
+          message = `Query validated successfully and returned ${allResults.length} records${allResults.length > 25 ? ' (showing sample of first 25)' : ''}`;
         }
 
         return {

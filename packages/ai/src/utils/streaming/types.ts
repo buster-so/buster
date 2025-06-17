@@ -1,11 +1,11 @@
-export interface StreamingResult<T = any> {
+export interface StreamingResult<T = Record<string, unknown>> {
   toolName: string;
   toolCallId: string;
   partialArgs: Partial<T>;
   isComplete: boolean;
 }
 
-export interface ToolStreamingParser<T = any> {
+export interface ToolStreamingParser<T = Record<string, unknown>> {
   parseStreamingArgs(accumulatedText: string): Partial<T> | null;
 }
 

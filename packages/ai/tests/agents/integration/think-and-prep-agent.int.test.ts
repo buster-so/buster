@@ -1,4 +1,5 @@
 import { RuntimeContext } from '@mastra/core/runtime-context';
+import type { CoreMessage } from 'ai';
 import { initLogger, wrapTraced } from 'braintrust';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 import { thinkAndPrepAgent } from '../../../src/agents/think-and-prep-agent/think-and-prep-agent';
@@ -25,7 +26,7 @@ describe('Think and Prep Agent Integration Tests', () => {
     ];
 
     const tracedAgentWorkflow = wrapTraced(
-      async (messages: any[]) => {
+      async (messages: CoreMessage[]) => {
         // Step 1: Generate response with analyst agent using conversation history
         try {
           const chatId = 'da05b6fb-01b2-4c1c-bc7f-7e55029a5c75';

@@ -58,7 +58,7 @@ interface FileWithId {
   name: string;
   file_type: string;
   result_message?: string;
-  results?: Record<string, any>[];
+  results?: Record<string, unknown>[];
   created_at: string;
   updated_at: string;
   version_number: number;
@@ -195,17 +195,23 @@ const metricYmlSchema = z.object({
   chartConfig: chartConfigSchema,
 });
 
-// Replace the basic SQL validation with comprehensive validation
-async function validateSql(
-  sqlQuery: string,
-  dataSourceId: string
-): Promise<{
+type MetricYml = z.infer<typeof metricYmlSchema>;
+
+interface SqlValidationResult {
   success: boolean;
   message?: string;
-  results?: Record<string, any>[];
-  metadata?: any;
+  results?: Record<string, unknown>[];
+  metadata?: Record<string, unknown>;
   error?: string;
-}> {
+}
+
+interface MetricVersionEntry {
+  versionNumber: number;
+  [key: string]: unknown;
+}
+
+// Replace the basic SQL validation with comprehensive validation
+async function validateSql(sqlQuery: string, dataSourceId: string): Promise<SqlValidationResult> {
   try {
     if (!sqlQuery.trim()) {
       return { success: false, error: 'SQL query cannot be empty' };
@@ -228,7 +234,7 @@ async function validateSql(
         dataSources: [
           {
             name: `datasource-${dataSourceId}`,
-            type: credentials.type as any,
+            type: credentials.type as string,
             credentials: credentials,
           },
         ],
@@ -323,7 +329,7 @@ async function getDataSourceCredentials(dataSourceId: string): Promise<Credentia
 function parseAndValidateYaml(ymlContent: string): {
   success: boolean;
   error?: string;
-  data?: any;
+  data?: MetricYml;
 } {
   try {
     // Ensure timeFrame values are properly quoted before parsing
@@ -350,17 +356,17 @@ function parseAndValidateYaml(ymlContent: string): {
 
 // Process a metric file update with complete new YAML content
 async function processMetricFileUpdate(
-  existingFile: any,
+  existingFile: typeof metricFiles.$inferSelect,
   ymlContent: string,
   dataSourceId: string,
   duration: number
 ): Promise<{
   success: boolean;
-  updatedFile?: any;
-  metricYml?: any;
+  updatedFile?: typeof metricFiles.$inferSelect;
+  metricYml?: MetricYml;
   modificationResults: ModificationResult[];
   validationMessage: string;
-  validationResults: Record<string, any>[];
+  validationResults: Record<string, unknown>[];
   validatedDatasetIds: string[];
   error?: string;
 }> {
@@ -566,7 +572,7 @@ const modifyMetricFiles = wrapTraced(
       const results = await Promise.all(updatePromises);
 
       // Separate successful and failed updates
-      const successfulUpdates: any[] = [];
+      const successfulUpdates: (typeof metricFiles.$inferSelect)[] = [];
       const updatedVersions: number[] = [];
 
       for (const result of results) {
@@ -583,7 +589,7 @@ const modifyMetricFiles = wrapTraced(
             versionHistory.versions.length > 0
           ) {
             currentVersion = Math.max(
-              ...versionHistory.versions.map((v: any) => v.versionNumber || 1)
+              ...versionHistory.versions.map((v: MetricVersionEntry) => v.versionNumber || 1)
             );
           }
 

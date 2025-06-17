@@ -58,7 +58,11 @@ export const handleInvalidToolError = async (event: {
 
   if (APICallError.isInstance(error)) {
     const errorMessage = error.message || '';
-    const requestBody = (error as any).requestBodyValues;
+    const requestBody = (
+      error as APICallError & {
+        requestBodyValues?: { messages?: unknown[]; [key: string]: unknown };
+      }
+    ).requestBodyValues;
 
     // Special case: Empty messages array - this is a critical bug, not recoverable
     if (errorMessage.includes('messages: at least one message is required')) {

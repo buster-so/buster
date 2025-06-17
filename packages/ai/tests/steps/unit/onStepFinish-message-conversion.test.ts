@@ -416,7 +416,7 @@ describe('onStepFinish message conversion', () => {
 
       expect(toolCallsByType['sequential-thinking']).toBe(2);
       expect(toolCallsByType['create-metrics-file']).toBe(1);
-      expect(toolCallsByType['doneTool']).toBe(1);
+      expect(toolCallsByType.doneTool).toBe(1);
 
       // Verify we can extract all tool results
       const toolResponses = step.response.messages.filter((msg) => msg.role === 'tool');

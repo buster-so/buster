@@ -198,7 +198,8 @@ describe('Analyst Agent Task Integration Tests', () => {
       await expect(
         tasks.triggerAndPoll<typeof analystAgentTask>(
           'analyst-agent-task',
-          { message_id: 'not-a-uuid' } as any,
+          // Intentionally invalid input to test validation
+          { message_id: 'not-a-uuid' } as { message_id: string },
           { pollIntervalMs: 1000 }
         )
       ).rejects.toThrow();

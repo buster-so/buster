@@ -28,10 +28,10 @@ describe('Execute SQL Limit Integration', () => {
       },
     ];
 
-    testQueries.forEach(({ input, expected }) => {
+    for (const { input, expected } of testQueries) {
       const result = ensureSqlLimit(input);
       expect(result.trim()).toBe(expected.trim());
-    });
+    }
   });
 
   test('verify existing limits are preserved', () => {
@@ -50,10 +50,10 @@ describe('Execute SQL Limit Integration', () => {
       },
     ];
 
-    testQueries.forEach(({ input, expected }) => {
+    for (const { input, expected } of testQueries) {
       const result = ensureSqlLimit(input);
       expect(result).toBe(expected);
-    });
+    }
   });
 
   test('verify non-SELECT statements are not modified', () => {
@@ -64,9 +64,9 @@ describe('Execute SQL Limit Integration', () => {
       'CREATE TABLE schema.temp_table (id INT, name VARCHAR(255))',
     ];
 
-    testQueries.forEach((query) => {
+    for (const query of testQueries) {
       const result = ensureSqlLimit(query);
       expect(result).toBe(query);
-    });
+    }
   });
 });

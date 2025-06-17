@@ -33,12 +33,28 @@ interface ModificationResult {
   duration: number;
 }
 
+interface ValidationResult {
+  success: boolean;
+  message: string;
+  [key: string]: unknown;
+}
+
+interface VersionHistoryEntry {
+  versionNumber: number;
+  [key: string]: unknown;
+}
+
+interface VersionHistory {
+  versions?: VersionHistoryEntry[];
+  [key: string]: unknown;
+}
+
 interface FileWithId {
   id: string;
   name: string;
   file_type: string;
   result_message?: string;
-  results?: Record<string, any>[];
+  results?: ValidationResult[];
   created_at: string;
   updated_at: string;
   version_number: number;
@@ -270,7 +286,7 @@ const modifyDashboardFiles = wrapTraced(
     const failedFiles: FailedFileModification[] = [];
     const updateResults: ModificationResult[] = [];
 
-    const dashboardFilesToUpdate: Array<typeof dashboardFiles.$inferSelect> = [];
+    const dashboardFilesToUpdate: (typeof dashboardFiles.$inferSelect)[] = [];
 
     try {
       // Process each file update
@@ -368,7 +384,7 @@ const modifyDashboardFiles = wrapTraced(
         // Add successful files to output
         for (const file of dashboardFilesToUpdate) {
           // Get the latest version number
-          const versionHistory = file.versionHistory as any;
+          const versionHistory = file.versionHistory as VersionHistory;
           const latestVersion =
             versionHistory?.versions?.[versionHistory.versions.length - 1]?.versionNumber || 1;
 

@@ -17,7 +17,7 @@ export type HealableStreamError = NoSuchToolError | InvalidToolArgumentsError;
 export interface HealingResult {
   healed: boolean;
   healingMessage: CoreMessage;
-  healedArgs?: any;
+  healedArgs?: Record<string, unknown>;
 }
 
 /**
@@ -34,7 +34,7 @@ const VISUALIZATION_TOOLS = [
  * Checks if a tool is a visualization tool that needs JSON escape healing
  */
 function isVisualizationTool(toolName: string): boolean {
-  return VISUALIZATION_TOOLS.includes(toolName as any);
+  return VISUALIZATION_TOOLS.includes(toolName as (typeof VISUALIZATION_TOOLS)[number]);
 }
 
 /**
@@ -75,7 +75,7 @@ function healVisualizationToolArgs(
             ],
           },
         };
-      } catch (parseError) {
+      } catch (_parseError) {
         // JSON parsing failed, provide specific guidance
         return {
           healed: false,
@@ -95,7 +95,7 @@ function healVisualizationToolArgs(
         };
       }
     }
-  } catch (argParseError) {
+  } catch (_argParseError) {
     // Fall through to generic error handling
   }
 
@@ -211,9 +211,8 @@ export function healStreamingToolError<T extends ToolSet>(
     // Check if this is a visualization tool that needs special handling
     if (isVisualizationTool(toolName)) {
       return healVisualizationToolArgs(toolName, toolCallId, rawArgs, zodError);
-    } else {
-      return healGenericToolArgumentsError(toolName, toolCallId, zodError);
     }
+    return healGenericToolArgumentsError(toolName, toolCallId, zodError);
   }
 
   // Error type not supported for healing

@@ -157,7 +157,7 @@ export async function retryableAgentStreamWithHealing<T extends ToolSet>({
       let healingResult = null;
       if (isHealableStreamError(error)) {
         // Get available tools from agent if possible
-        const availableTools = (agent as any).tools || {};
+        const availableTools = (agent as { tools?: Record<string, unknown> }).tools || {};
         healingResult = healStreamingToolError(error, availableTools);
       }
 
@@ -168,15 +168,11 @@ export async function retryableAgentStreamWithHealing<T extends ToolSet>({
 
       // Call retry callback if provided
       if (retryConfig.onRetry) {
-        const errorType = healingResult
-          ? NoSuchToolError.isInstance(error)
-            ? 'no-such-tool'
-            : 'invalid-tool-arguments'
-          : retryableError?.type || 'unknown';
-
         retryConfig.onRetry(
           {
-            type: errorType as any,
+            type:
+              (healingResult?.healed ? 'invalid-tool-arguments' : retryableError?.type) ||
+              'empty-response',
             originalError: error,
             healingMessage: healingResult?.healingMessage ||
               retryableError?.healingMessage || { role: 'user', content: 'Error occurred' },
