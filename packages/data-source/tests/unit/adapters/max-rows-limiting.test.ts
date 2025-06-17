@@ -7,8 +7,16 @@ import { SQLServerAdapter } from '../../../src/adapters/sqlserver';
 describe('MaxRows Limiting Tests', () => {
   describe('PostgreSQL Adapter', () => {
     let adapter: PostgreSQLAdapter;
-    let mockClient: any;
-    let mockCursor: any;
+    let mockClient: {
+      connect: ReturnType<typeof vi.fn>;
+      query: ReturnType<typeof vi.fn>;
+      end: ReturnType<typeof vi.fn>;
+    };
+    let mockCursor: {
+      read: ReturnType<typeof vi.fn>;
+      close: ReturnType<typeof vi.fn>;
+      _result: { fields: Array<{ name: string; dataTypeID: number; dataTypeSize: number }> };
+    };
 
     beforeEach(() => {
       adapter = new PostgreSQLAdapter();
@@ -27,21 +35,21 @@ describe('MaxRows Limiting Tests', () => {
           ],
         },
       };
-      (adapter as any).client = mockClient;
-      (adapter as any).connected = true;
+      (adapter as PostgreSQLAdapter & { client: typeof mockClient; connected: boolean }).client = mockClient;
+      (adapter as PostgreSQLAdapter & { client: typeof mockClient; connected: boolean }).connected = true;
     });
 
     it('should limit results to exactly 1 row when maxRows=1', async () => {
       // Mock cursor behavior for 1 row limit
       mockClient.query.mockReturnValue(mockCursor);
-      mockCursor.read.mockImplementationOnce((count: number, callback: Function) => {
+      mockCursor.read.mockImplementationOnce((count: number, callback: (err: unknown, rows: unknown[]) => void) => {
         // First read returns 2 rows (more than requested)
         callback(null, [
           { id: 1, name: 'User 1' },
           { id: 2, name: 'User 2' },
         ]);
       });
-      mockCursor.close.mockImplementation((callback: Function) => callback(null));
+      mockCursor.close.mockImplementation((callback: (err: unknown) => void) => callback(null));
 
       const result = await adapter.query('SELECT * FROM users', undefined, 1);
 
@@ -58,11 +66,11 @@ describe('MaxRows Limiting Tests', () => {
         name: `User ${i + 1}`,
       }));
 
-      mockCursor.read.mockImplementationOnce((count: number, callback: Function) => {
+      mockCursor.read.mockImplementationOnce((count: number, callback: (err: unknown, rows: unknown[]) => void) => {
         // Return 6 rows (more than requested 5)
         callback(null, allRows.slice(0, 6));
       });
-      mockCursor.close.mockImplementation((callback: Function) => callback(null));
+      mockCursor.close.mockImplementation((callback: (err: unknown) => void) => callback(null));
 
       const result = await adapter.query('SELECT * FROM users', undefined, 5);
 
@@ -87,7 +95,7 @@ describe('MaxRows Limiting Tests', () => {
           // No more rows
           callback(null, []);
         });
-      mockCursor.close.mockImplementation((callback: Function) => callback(null));
+      mockCursor.close.mockImplementation((callback: (err: unknown) => void) => callback(null));
 
       const result = await adapter.query('SELECT * FROM users', undefined, 10);
 
@@ -98,7 +106,10 @@ describe('MaxRows Limiting Tests', () => {
 
   describe('MySQL Adapter', () => {
     let adapter: MySQLAdapter;
-    let mockConnection: any;
+    let mockConnection: {
+      execute: ReturnType<typeof vi.fn>;
+      end: ReturnType<typeof vi.fn>;
+    };
 
     beforeEach(() => {
       adapter = new MySQLAdapter();
@@ -106,8 +117,8 @@ describe('MaxRows Limiting Tests', () => {
         execute: vi.fn(),
         end: vi.fn(),
       };
-      (adapter as any).connection = mockConnection;
-      (adapter as any).connected = true;
+      (adapter as MySQLAdapter & { connection: typeof mockConnection; connected: boolean }).connection = mockConnection;
+      (adapter as MySQLAdapter & { connection: typeof mockConnection; connected: boolean }).connected = true;
     });
 
     it('should limit results to exactly 1 row when maxRows=1', async () => {
@@ -156,9 +167,18 @@ describe('MaxRows Limiting Tests', () => {
 
   describe('Snowflake Adapter', () => {
     let adapter: SnowflakeAdapter;
-    let mockConnection: any;
-    let mockStatement: any;
-    let mockStream: any;
+    let mockConnection: {
+      execute: ReturnType<typeof vi.fn>;
+      destroy: ReturnType<typeof vi.fn>;
+    };
+    let mockStatement: {
+      getColumns: ReturnType<typeof vi.fn>;
+      streamRows: ReturnType<typeof vi.fn>;
+    };
+    let mockStream: {
+      on: ReturnType<typeof vi.fn>;
+      destroy: ReturnType<typeof vi.fn>;
+    };
 
     beforeEach(() => {
       adapter = new SnowflakeAdapter();
@@ -190,21 +210,21 @@ describe('MaxRows Limiting Tests', () => {
         execute: vi.fn(),
       };
       mockStatement.streamRows.mockReturnValue(mockStream);
-      (adapter as any).connection = mockConnection;
-      (adapter as any).connected = true;
+      (adapter as SnowflakeAdapter & { connection: typeof mockConnection; connected: boolean }).connection = mockConnection;
+      (adapter as SnowflakeAdapter & { connection: typeof mockConnection; connected: boolean }).connected = true;
     });
 
     it('should limit results to exactly 1 row when maxRows=1', async () => {
-      let dataHandler: Function;
-      let endHandler: Function;
+      let dataHandler: (data: unknown) => void;
+      let endHandler: () => void;
 
-      mockStream.on.mockImplementation((event: string, handler: Function) => {
+      mockStream.on.mockImplementation((event: string, handler: (data?: unknown) => void) => {
         if (event === 'data') dataHandler = handler;
         if (event === 'end') endHandler = handler;
         return mockStream;
       });
 
-      mockConnection.execute.mockImplementation((options: any) => {
+      mockConnection.execute.mockImplementation((options: { streamResult: boolean; complete: (err?: unknown) => void }) => {
         expect(options.streamResult).toBe(true);
         // Defer the callback to allow the statement to be returned first
         setTimeout(() => {
@@ -230,8 +250,18 @@ describe('MaxRows Limiting Tests', () => {
 
   describe('SQL Server Adapter', () => {
     let adapter: SQLServerAdapter;
-    let mockPool: any;
-    let mockRequest: any;
+    let mockPool: {
+      request: ReturnType<typeof vi.fn>;
+      close: ReturnType<typeof vi.fn>;
+    };
+    let mockRequest: {
+      input: ReturnType<typeof vi.fn>;
+      query: ReturnType<typeof vi.fn>;
+      on: ReturnType<typeof vi.fn>;
+      pause: ReturnType<typeof vi.fn>;
+      cancel: ReturnType<typeof vi.fn>;
+      stream: boolean;
+    };
 
     beforeEach(() => {
       adapter = new SQLServerAdapter();
@@ -247,8 +277,8 @@ describe('MaxRows Limiting Tests', () => {
         request: vi.fn().mockReturnValue(mockRequest),
         close: vi.fn(),
       };
-      (adapter as any).pool = mockPool;
-      (adapter as any).connected = true;
+      (adapter as SQLServerAdapter & { pool: typeof mockPool; connected: boolean }).pool = mockPool;
+      (adapter as SQLServerAdapter & { pool: typeof mockPool; connected: boolean }).connected = true;
     });
 
     it('should limit results to exactly 1 row when maxRows=1', async () => {

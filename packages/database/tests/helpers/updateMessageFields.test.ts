@@ -80,7 +80,7 @@ describe('updateMessageFields', () => {
   test('throws error when reasoning is null', async () => {
     const { messageId } = await createTestMessageWithContext();
 
-    await expect(updateMessageFields(messageId, { reasoning: null as any })).rejects.toThrow(
+    await expect(updateMessageFields(messageId, { reasoning: null as never })).rejects.toThrow(
       'Reasoning cannot be null'
     );
   });

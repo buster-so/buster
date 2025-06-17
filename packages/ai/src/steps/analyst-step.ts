@@ -70,11 +70,12 @@ const analystExecution = async ({
   let completeConversationHistory: CoreMessage[] = [];
 
   // Initialize chunk processor with histories from previous step
+  // IMPORTANT: Pass histories from think-and-prep to accumulate across steps
   const chunkProcessor = new ChunkProcessor(
     messageId,
     [],
-    [], // Start with empty reasoning history
-    [] // Start with empty response history
+    inputData.reasoningHistory || [], // Pass reasoning history from previous step
+    inputData.responseHistory || []   // Pass response history from previous step
   );
 
   try {
