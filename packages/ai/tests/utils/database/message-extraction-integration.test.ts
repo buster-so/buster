@@ -3,7 +3,7 @@ import { describe, expect, test } from 'vitest';
 import {
   extractResponseMessages,
   formatLlmMessagesAsReasoning,
-} from '../../../src/utils/database/formatLlmMessagesAsReasoning';
+} from '../../../src/utils/database/format-llm-messages-as-reasoning';
 
 describe('message extraction integration', () => {
   test('extracts reasoning messages from sequential thinking', () => {

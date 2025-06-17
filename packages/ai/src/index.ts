@@ -21,6 +21,12 @@ export const mastra = new Mastra({
 export { analystAgent } from './agents/analyst-agent/analyst-agent';
 export { thinkAndPrepAgent } from './agents/think-and-prep-agent/think-and-prep-agent';
 
+// Export workflows
+export {
+  default as analystWorkflow,
+  type AnalystRuntimeContext,
+} from './workflows/analyst-workflow';
+
 // Export chat history utilities
 export {
   getChatHistory,

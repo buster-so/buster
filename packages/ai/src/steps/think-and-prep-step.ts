@@ -3,6 +3,7 @@ import type { RuntimeContext } from '@mastra/core/runtime-context';
 import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
+import type { ChatMessageReasoningMessage } from '../../../../server/src/types/chat-types/chat-message.type';
 import { thinkAndPrepAgent } from '../agents/think-and-prep-agent/think-and-prep-agent';
 import { ChunkProcessor } from '../utils/database/chunk-processor';
 import { retryableAgentStreamWithHealing } from '../utils/retry';
@@ -21,6 +22,9 @@ const inputSchema = z.object({
   'create-todos': createTodosOutputSchema,
   'extract-values-search': extractValuesSearchOutputSchema,
   'generate-chat-title': generateChatTitleOutputSchema,
+  // Include original workflow inputs to maintain access to prompt and conversationHistory
+  prompt: z.string(),
+  conversationHistory: z.array(z.any()).optional(),
 });
 
 import {
@@ -81,11 +85,59 @@ const thinkAndPrepExecution = async ({
   const messageId = runtimeContext.get('messageId') as string | null;
 
   let outputMessages: MessageHistory = [];
+  let completeConversationHistory: MessageHistory = [];
   let finished = false;
   const finalStepData: StepFinishData | null = null;
 
   // Extract reasoning history from create-todos step
-  const initialReasoningHistory = inputData['create-todos'].reasoningHistory || [];
+  const rawReasoningHistory = inputData['create-todos'].reasoningHistory || [];
+
+  // Transform reasoning history to match server schema property order
+  const initialReasoningHistory = rawReasoningHistory.map((entry) => {
+    if (entry.type === 'text') {
+      return {
+        status: entry.status,
+        id: entry.id,
+        type: entry.type,
+        title: entry.title,
+        message: entry.message,
+        secondary_title: entry.secondary_title,
+        message_chunk: entry.message_chunk,
+        finished_reasoning: entry.finished_reasoning,
+      };
+    }
+    if (entry.type === 'pills') {
+      return {
+        status: entry.status,
+        id: entry.id,
+        type: entry.type,
+        title: entry.title,
+        pill_containers:
+          entry.pill_containers?.map((container) => ({
+            title: container.title,
+            pills:
+              container.pills?.map((pill) => ({
+                text: pill.text,
+                id: pill.id,
+                type: pill.type,
+              })) || [],
+          })) || [],
+        secondary_title: entry.secondary_title,
+      };
+    }
+    if (entry.type === 'files') {
+      return {
+        status: entry.status,
+        id: entry.id,
+        type: entry.type,
+        title: entry.title,
+        file_ids: entry.file_ids,
+        files: entry.files,
+        secondary_title: entry.secondary_title,
+      };
+    }
+    return entry;
+  }) as ChatMessageReasoningMessage[];
 
   // Initialize chunk processor with initial messages and reasoning history
   const chunkProcessor = new ChunkProcessor(messageId, [], initialReasoningHistory, []);
@@ -152,7 +204,13 @@ const thinkAndPrepExecution = async ({
             maxRetries: 3,
             onRetry: (error: RetryableError, attemptNumber: number) => {
               // Log retry attempt for debugging
-              console.error(`Think and Prep retry attempt ${attemptNumber} for error:`, error);
+              console.error(`Think and Prep retry attempt ${attemptNumber} for error:`, {
+                type: error.type,
+                attempt: attemptNumber,
+                messageId: runtimeContext.get('messageId'),
+                originalError:
+                  error.originalError instanceof Error ? error.originalError.message : 'Unknown',
+              });
             },
           },
         });
@@ -161,6 +219,8 @@ const thinkAndPrepExecution = async ({
         if (Array.isArray(messages) && Array.isArray(result.conversationHistory)) {
           messages.length = 0;
           messages.push(...result.conversationHistory);
+          // Update complete conversation history with healing messages
+          completeConversationHistory = result.conversationHistory;
         } else {
           console.error('Invalid messages or conversationHistory array');
         }
@@ -205,21 +265,19 @@ const thinkAndPrepExecution = async ({
         });
 
         if (healingResult.shouldRetry && healingResult.healingMessage) {
-          // Healing was successful but we still need to fail this step
-          // since we can't restart the stream processing in the current implementation
-          throw new Error(
-            `Stream processing failed and requires retry: ${
-              streamError instanceof Error ? streamError.message : 'Unknown streaming error'
-            }`
-          );
+          // Add the healing message to the final conversation history
+          // Continue processing rather than failing the step for better resilience
+          completeConversationHistory.push(healingResult.healingMessage);
+        } else {
+          console.error('Error processing stream:', streamError);
+          throw streamError; // Re-throw non-healable errors
         }
-        console.error('Error processing stream:', streamError);
-        throw streamError; // Re-throw non-healable errors
       }
     }
 
     // Get final results from chunk processor
-    outputMessages = extractMessageHistory(chunkProcessor.getAccumulatedMessages());
+    completeConversationHistory = chunkProcessor.getAccumulatedMessages();
+    outputMessages = extractMessageHistory(completeConversationHistory);
 
     // DEBUG: Log what we're passing to analyst step
     const result = createStepResult(
@@ -243,9 +301,24 @@ const thinkAndPrepExecution = async ({
       );
     }
 
-    // For all other errors, throw to stop the workflow
+    // Check if it's a database connection error
+    if (error instanceof Error && error.message.includes('DATABASE_URL')) {
+      throw new Error('Unable to connect to the analysis service. Please try again later.');
+    }
+
+    // Check if it's an API/model error
+    if (
+      error instanceof Error &&
+      (error.message.includes('API') || error.message.includes('model'))
+    ) {
+      throw new Error(
+        'The analysis service is temporarily unavailable. Please try again in a few moments.'
+      );
+    }
+
+    // For unexpected errors, provide a generic friendly message
     throw new Error(
-      `Error in think and prep step: ${error instanceof Error ? error.message : 'Unknown error'}`
+      'Something went wrong during the analysis. Please try again or contact support if the issue persists.'
     );
   }
 };

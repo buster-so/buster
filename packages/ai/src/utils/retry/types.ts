@@ -10,7 +10,16 @@ import type { CoreMessage, StepResult, StreamTextResult, TextStreamPart, ToolSet
 type MastraAgent = Agent<string, Record<string, any>, Record<string, any>>;
 
 export interface RetryableError {
-  type: 'no-such-tool' | 'invalid-tool-arguments' | 'empty-response';
+  type:
+    | 'no-such-tool'
+    | 'invalid-tool-arguments'
+    | 'empty-response'
+    | 'rate-limit'
+    | 'server-error'
+    | 'network-timeout'
+    | 'stream-interruption'
+    | 'json-parse-error'
+    | 'content-policy';
   originalError?: Error | unknown;
   healingMessage: CoreMessage;
 }
@@ -18,6 +27,9 @@ export interface RetryableError {
 export interface RetryConfig {
   maxRetries: number;
   onRetry?: (error: RetryableError, attemptNumber: number) => void;
+  degradeModel?: boolean; // Switch to cheaper model on retry
+  exponentialBackoff?: boolean; // Add delays between retries
+  maxBackoffMs?: number; // Maximum backoff delay
 }
 
 export interface AgentStreamOptions<T extends ToolSet> {

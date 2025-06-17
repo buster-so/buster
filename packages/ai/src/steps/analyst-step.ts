@@ -177,12 +177,14 @@ function createMessageKey(msg: CoreMessage): string {
     // For assistant messages with tool calls, use toolCallId as part of the key
     const toolCallIds = msg.content
       .filter(
-        (c): c is { type: string; toolCallId?: string } =>
+        (c): c is { type: 'tool-call'; toolCallId: string; toolName: string; args: unknown } =>
           typeof c === 'object' &&
           c !== null &&
           'type' in c &&
           c.type === 'tool-call' &&
-          'toolCallId' in c
+          'toolCallId' in c &&
+          'toolName' in c &&
+          'args' in c
       )
       .map((c) => c.toolCallId)
       .filter((id): id is string => id !== undefined)
@@ -331,15 +333,25 @@ const analystExecution = async ({
             maxRetries: 3,
             onRetry: (error: RetryableError, attemptNumber: number) => {
               // Log retry attempt for debugging
-              console.error(`Analyst retry attempt ${attemptNumber} for error:`, error);
+              console.error(`Analyst retry attempt ${attemptNumber} for error:`, {
+                type: error.type,
+                attempt: attemptNumber,
+                messageId: runtimeContext.get('messageId'),
+                originalError:
+                  error.originalError instanceof Error ? error.originalError.message : 'Unknown',
+              });
             },
           },
         });
 
         // Update messages to include any healing messages added during retries
-        if (result.conversationHistory.length > messages.length) {
-          // Healing messages were added, update the complete conversation history
+        if (Array.isArray(messages) && Array.isArray(result.conversationHistory)) {
+          messages.length = 0;
+          messages.push(...result.conversationHistory);
+          // Update complete conversation history with healing messages
           completeConversationHistory = result.conversationHistory;
+        } else {
+          console.error('Invalid messages or conversationHistory array');
         }
 
         return result.stream;

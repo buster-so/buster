@@ -39,34 +39,43 @@ const BusterChatResponseMessageFileSchema = z.object({
 });
 
 const BusterChatMessageReasoningTextSchema = z.object({
+  status: z.enum(['loading', 'completed', 'failed']),
   id: z.string(),
   type: z.literal('text'),
   title: z.string(),
-  secondary_title: z.string().optional(),
   message: z.string().optional(),
+  secondary_title: z.string().optional(),
   message_chunk: z.string().optional(),
-  status: z.enum(['loading', 'completed', 'failed']),
   finished_reasoning: z.boolean().optional(),
 });
 
 const BusterChatMessageReasoningPillSchema = z.object({
+  status: z.enum(['loading', 'completed', 'failed']),
   id: z.string(),
   type: z.literal('pills'),
   title: z.string(),
-  secondary_title: z.string().optional(),
   pill_containers: z.array(
     z.object({
       title: z.string(),
       pills: z.array(
         z.object({
           text: z.string(),
-          type: z.string().nullable(),
           id: z.string(),
+          type: z.enum([
+            'metric',
+            'dashboard',
+            'collection',
+            'dataset',
+            'term',
+            'topic',
+            'value',
+            'empty',
+          ]),
         })
       ),
     })
   ),
-  status: z.enum(['loading', 'completed', 'failed']),
+  secondary_title: z.string().optional(),
 });
 
 const BusterChatMessageReasoningFileSchema = z.object({
@@ -83,13 +92,13 @@ const BusterChatMessageReasoningFileSchema = z.object({
 });
 
 const BusterChatMessageReasoningFilesSchema = z.object({
+  status: z.enum(['loading', 'completed', 'failed']),
   id: z.string(),
   type: z.literal('files'),
   title: z.string(),
-  status: z.enum(['loading', 'completed', 'failed']),
-  secondary_title: z.string().optional(),
   file_ids: z.array(z.string()),
   files: z.record(BusterChatMessageReasoningFileSchema),
+  secondary_title: z.string().optional(),
 });
 
 // Union schemas

@@ -1,11 +1,31 @@
 import type { ToolSet } from 'ai';
 import { NoSuchToolError } from 'ai';
 import { healStreamingToolError, isHealableStreamError } from '../streaming/tool-healing';
+import { compressConversationHistory, shouldCompressHistory } from './context-compression';
 import type { RetryConfig, RetryResult, RetryableAgentStreamParams, RetryableError } from './types';
 
 const DEFAULT_RETRY_CONFIG: RetryConfig = {
   maxRetries: 3,
+  exponentialBackoff: true,
+  maxBackoffMs: 8000, // Max 8 second delay
 };
+
+/**
+ * Calculates exponential backoff delay with jitter
+ */
+function calculateBackoffDelay(attemptNumber: number, maxBackoffMs = 8000): number {
+  const baseDelay = Math.min(1000 * 2 ** (attemptNumber - 1), maxBackoffMs);
+  // Add jitter (±25% randomness)
+  const jitter = baseDelay * 0.25 * (Math.random() - 0.5);
+  return Math.max(500, baseDelay + jitter); // Minimum 500ms delay
+}
+
+/**
+ * Sleeps for the specified duration
+ */
+async function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 /**
  * Detects if an error is retryable and creates a healing message
@@ -69,6 +89,115 @@ export function detectRetryableError(error: unknown): RetryableError | null {
     };
   }
 
+  // Handle rate limiting - very common with Claude
+  if (
+    error instanceof Error &&
+    (error.message.includes('rate_limit_error') ||
+      error.message.includes('429') ||
+      error.message.includes('Too Many Requests') ||
+      error.message.includes('rate limit'))
+  ) {
+    return {
+      type: 'rate-limit',
+      originalError: error,
+      healingMessage: {
+        role: 'user',
+        content: 'Rate limit reached, please wait and try again.',
+      },
+    };
+  }
+
+  // Handle server errors (5xx) - transient infrastructure issues
+  if (
+    error instanceof Error &&
+    (error.message.includes('500') ||
+      error.message.includes('502') ||
+      error.message.includes('503') ||
+      error.message.includes('504') ||
+      error.message.includes('server_overload') ||
+      error.message.includes('internal_server_error'))
+  ) {
+    return {
+      type: 'server-error',
+      originalError: error,
+      healingMessage: {
+        role: 'user',
+        content: 'Server temporarily unavailable, retrying...',
+      },
+    };
+  }
+
+  // Handle network timeouts and connection issues
+  if (
+    error instanceof Error &&
+    (error.message.includes('timeout') ||
+      error.message.includes('ETIMEDOUT') ||
+      error.message.includes('ECONNRESET') ||
+      error.message.includes('ENOTFOUND') ||
+      error.message.includes('connection'))
+  ) {
+    return {
+      type: 'network-timeout',
+      originalError: error,
+      healingMessage: {
+        role: 'user',
+        content: 'Connection timeout, please retry.',
+      },
+    };
+  }
+
+  // Handle stream interruption - when stream cuts off unexpectedly
+  if (
+    error instanceof Error &&
+    ((error.message.includes('stream') && error.message.includes('ended')) ||
+      error.message.includes('unexpected_end') ||
+      error.message.includes('stream was destroyed') ||
+      error.message.includes('premature close'))
+  ) {
+    return {
+      type: 'stream-interruption',
+      originalError: error,
+      healingMessage: {
+        role: 'user',
+        content: 'Please continue where you left off.',
+      },
+    };
+  }
+
+  // Handle JSON parsing errors in responses
+  if (
+    (error instanceof Error && error.name === 'SyntaxError' && error.message.includes('JSON')) ||
+    (error instanceof Error && error.message.includes('JSON parse'))
+  ) {
+    return {
+      type: 'json-parse-error',
+      originalError: error,
+      healingMessage: {
+        role: 'user',
+        content:
+          'There was an issue with the response format. Please try again with proper formatting.',
+      },
+    };
+  }
+
+  // Handle content policy violations - sometimes recoverable
+  if (
+    error instanceof Error &&
+    (error.message.includes('content_policy') ||
+      error.message.includes('safety') ||
+      error.message.includes('harmful') ||
+      error.message.includes('inappropriate'))
+  ) {
+    return {
+      type: 'content-policy',
+      originalError: error,
+      healingMessage: {
+        role: 'user',
+        content: 'Please rephrase your response to comply with content policies.',
+      },
+    };
+  }
+
   return null;
 }
 
@@ -87,6 +216,12 @@ export async function retryableAgentStream<T extends ToolSet>({
 
   while (retryCount <= retryConfig.maxRetries) {
     try {
+      // Check for context compression before retry
+      if (shouldCompressHistory(conversationHistory)) {
+        conversationHistory = compressConversationHistory(conversationHistory);
+        console.log('Compressed conversation history due to length');
+      }
+
       const stream = await agent.stream(conversationHistory, options);
 
       // Return successful result
@@ -113,9 +248,15 @@ export async function retryableAgentStream<T extends ToolSet>({
       // Add healing message to conversation history
       conversationHistory = [...conversationHistory, retryableError.healingMessage];
 
-      // Increment retry count and continue
+      // Increment retry count
       retryCount++;
-      // Log retry attempt for debugging
+
+      // Apply exponential backoff if enabled
+      if (retryConfig.exponentialBackoff && retryCount <= retryConfig.maxRetries) {
+        const delay = calculateBackoffDelay(retryCount, retryConfig.maxBackoffMs);
+        console.log(`Retrying in ${delay}ms (attempt ${retryCount}/${retryConfig.maxRetries})`);
+        await sleep(delay);
+      }
     }
   }
 
@@ -139,6 +280,12 @@ export async function retryableAgentStreamWithHealing<T extends ToolSet>({
 
   while (retryCount <= retryConfig.maxRetries) {
     try {
+      // Check for context compression before retry
+      if (shouldCompressHistory(conversationHistory)) {
+        conversationHistory = compressConversationHistory(conversationHistory);
+        console.log('Compressed conversation history due to length');
+      }
+
       const stream = await agent.stream(conversationHistory, options);
 
       // Return successful result
@@ -187,8 +334,17 @@ export async function retryableAgentStreamWithHealing<T extends ToolSet>({
         conversationHistory = [...conversationHistory, messageToAdd];
       }
 
-      // Increment retry count and continue
+      // Increment retry count
       retryCount++;
+
+      // Apply exponential backoff if enabled
+      if (retryConfig.exponentialBackoff && retryCount <= retryConfig.maxRetries) {
+        const delay = calculateBackoffDelay(retryCount, retryConfig.maxBackoffMs);
+        console.log(
+          `Retrying with healing in ${delay}ms (attempt ${retryCount}/${retryConfig.maxRetries})`
+        );
+        await sleep(delay);
+      }
     }
   }
 

@@ -90,6 +90,14 @@ const generateChatTitleExecution = async ({
 
     return title;
   } catch (error) {
+    // Handle AbortError gracefully
+    if (error instanceof Error && error.name === 'AbortError') {
+      // Return a fallback title when aborted
+      return {
+        title: 'New Analysis',
+      };
+    }
+
     console.error('Failed to generate chat title:', error);
     // Return a fallback title instead of crashing
     return {

@@ -5,13 +5,13 @@ interface ReasoningEntry {
   id: string;
   [key: string]: unknown;
 }
-import { getDb } from '../../../../database/src/connection';
-import { updateMessageFields } from '../../../../database/src/helpers/messages';
-import { messages } from '../../../../database/src/schema';
+import { getDb } from '@buster/database/src/connection';
+import { updateMessageFields } from '@buster/database/src/helpers/messages';
+import { messages } from '@buster/database/src/schema';
 import {
   extractResponseMessages,
   formatLlmMessagesAsReasoning,
-} from './formatLlmMessagesAsReasoning';
+} from './format-llm-messages-as-reasoning';
 
 /**
  * Saves conversation history to the database

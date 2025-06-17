@@ -34,6 +34,8 @@ const AnalystMetadataSchema = z.object({
   toolsUsed: z.array(z.string()).optional(),
   finalTool: z.string().optional(),
   doneTool: z.boolean().optional(),
+  filesCreated: z.number().optional(),
+  filesReturned: z.number().optional(),
 });
 
 // Input schema matches analyst step output
@@ -105,6 +107,17 @@ const markMessageCompleteExecution = async ({
       success: true,
     };
   } catch (error) {
+    // Handle AbortError gracefully
+    if (error instanceof Error && error.name === 'AbortError') {
+      // Pass through the input data when aborted
+      return {
+        ...inputData,
+        messageId: runtimeContext.get('messageId') || '',
+        completedAt: new Date().toISOString(),
+        success: false, // Mark as unsuccessful when aborted
+      };
+    }
+
     console.error('Error marking message as complete:', error);
 
     // Check if it's a database connection error

@@ -9,7 +9,9 @@ import {
   getOrganizationDataSource,
 } from '@buster/database';
 
-import analystWorkflow, { type AnalystRuntimeContext } from '@buster/ai/workflows/analyst-workflow';
+import analystWorkflow, {
+  type AnalystRuntimeContext,
+} from '@buster/ai/src/workflows/analyst-workflow';
 // Mastra workflow integration
 import { RuntimeContext } from '@mastra/core/runtime-context';
 
@@ -136,12 +138,6 @@ export const analystAgentTask = schemaTask({
         },
         {
           name: 'Analyst Agent Task Workflow',
-          metadata: {
-            messageId: payload.message_id,
-            organizationId: messageContext.organizationId,
-            dataSourceId: dataSource.dataSourceId,
-            hasConversationHistory: !!workflowInput.conversationHistory,
-          },
         }
       );
 

@@ -6,7 +6,7 @@ import type {
   ChatMessageResponseMessage,
 } from '../../../../../server/src/types/chat-types/chat-message.type';
 import { OptimisticJsonParser, getOptimisticValue } from '../streaming/optimistic-json-parser';
-import { extractResponseMessages } from './formatLlmMessagesAsReasoning';
+import { extractResponseMessages } from './format-llm-messages-as-reasoning';
 import type {
   AssistantMessageContent,
   GenericToolSet,
@@ -151,7 +151,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         chunkType: chunk.type,
         messageId: this.messageId,
         error: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined
+        stack: error instanceof Error ? error.stack : undefined,
       });
       // Don't re-throw - continue processing stream
     }
@@ -223,7 +223,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         // Recursively extract all key-value pairs
         const extract = (obj: unknown, prefix = '') => {
           if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return;
-          
+
           const record = obj as Record<string, unknown>;
           for (const [key, value] of Object.entries(record)) {
             const fullKey = prefix ? `${prefix}.${key}` : key;
@@ -393,7 +393,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
     if (chunk.type !== 'tool-call-delta') return;
     const inProgress = this.state.toolCallsInProgress.get(chunk.toolCallId);
     if (!inProgress) return;
-    
+
     try {
       // Accumulate the arguments text
       inProgress.argsText += chunk.argsTextDelta || '';
@@ -476,7 +476,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
     } catch (error) {
       console.error('Error handling tool call delta:', {
         toolCallId: chunk.toolCallId,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       // Continue processing - don't fail the entire stream
     }
@@ -484,7 +484,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
   private async handleToolResult(chunk: TextStreamPart<T>) {
     if (chunk.type !== 'tool-result') return;
-    
+
     try {
       // Finalize current assistant message if exists
       if (this.state.currentAssistantMessage) {
@@ -540,7 +540,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       console.error('Error handling tool result:', {
         toolCallId: chunk.toolCallId,
         toolName: chunk.toolName,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       // Continue processing
     }
@@ -594,7 +594,6 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
     }
 
     try {
-
       // Don't save if we have no messages
       if (allMessages.length === 0) {
         return;
@@ -656,7 +655,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         reasoningCount: this.state.reasoningHistory.length,
         responseCount: this.state.responseHistory.length,
         error: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined
+        stack: error instanceof Error ? error.stack : undefined,
       });
       // Don't throw - we want to continue processing even if save fails
     }
@@ -795,8 +794,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
                 const fileId = fileIdAtIndex;
                 const existingFile = existingFiles[fileId];
                 if (existingFile?.file) {
-                  existingFile.file.text =
-                    (file as { yml_content?: string }).yml_content || '';
+                  existingFile.file.text = (file as { yml_content?: string }).yml_content || '';
                 }
               }
             }
@@ -845,8 +843,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
                 const fileId = fileIdAtIndex;
                 const existingFile = existingFiles[fileId];
                 if (existingFile?.file) {
-                  existingFile.file.text =
-                    (file as { yml_content?: string }).yml_content || '';
+                  existingFile.file.text = (file as { yml_content?: string }).yml_content || '';
                 }
               }
             }
@@ -927,8 +924,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
                 const fileId = fileIdAtIndex;
                 const existingFile = existingFiles[fileId];
                 if (existingFile?.file) {
-                  existingFile.file.text =
-                    (file as { yml_content?: string }).yml_content || '';
+                  existingFile.file.text = (file as { yml_content?: string }).yml_content || '';
                 }
               }
             }
@@ -978,8 +974,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
                 const fileId = fileIdAtIndex;
                 const existingFile = existingFiles[fileId];
                 if (existingFile?.file) {
-                  existingFile.file.text =
-                    (file as { yml_content?: string }).yml_content || '';
+                  existingFile.file.text = (file as { yml_content?: string }).yml_content || '';
                 }
               }
             }
@@ -1238,7 +1233,8 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       switch (toolName) {
         case 'doneTool':
         case 'done-tool':
-          message = getOptimisticValue<string>(parseResult.extractedValues, 'final_response', '') || '';
+          message =
+            getOptimisticValue<string>(parseResult.extractedValues, 'final_response', '') || '';
           break;
 
         case 'respondWithoutAnalysis':
@@ -1261,7 +1257,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       console.error('Error creating response entry:', {
         toolCallId,
         toolName,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       return null;
     }
@@ -1282,7 +1278,8 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
     switch (toolName) {
       case 'doneTool':
       case 'done-tool':
-        message = getOptimisticValue<string>(parseResult.extractedValues, 'final_response', '') || '';
+        message =
+          getOptimisticValue<string>(parseResult.extractedValues, 'final_response', '') || '';
         break;
 
       case 'respondWithoutAnalysis':
@@ -1412,67 +1409,73 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       if (!fileId) {
         return;
       }
-      
+
       const file = entry.files[fileId];
       if (!file?.file) {
         return;
       }
 
       // Parse the tool result to extract query results
-    let results: Array<{
-      status: 'success' | 'error';
-      sql: string;
-      results?: Record<string, unknown>[];
-      error_message?: string;
-    }> = [];
+      let results: Array<{
+        status: 'success' | 'error';
+        sql: string;
+        results?: Record<string, unknown>[];
+        error_message?: string;
+      }> = [];
 
-    try {
-      if (toolResult && typeof toolResult === 'object' && 'results' in toolResult) {
-        const toolResults = (toolResult as { results: unknown }).results;
-        if (Array.isArray(toolResults)) {
-          results = toolResults.map((result: unknown) => {
-            const resultObj = result as Record<string, unknown>;
-            return {
-              status: resultObj.status === 'error' ? 'error' : 'success' as const,
-              sql: typeof resultObj.sql === 'string' ? resultObj.sql : '',
-              results: resultObj.status === 'success' && Array.isArray(resultObj.results) ? resultObj.results as Record<string, unknown>[] : undefined,
-              error_message: resultObj.status === 'error' && typeof resultObj.error_message === 'string' ? resultObj.error_message : undefined,
-            };
-          });
+      try {
+        if (toolResult && typeof toolResult === 'object' && 'results' in toolResult) {
+          const toolResults = (toolResult as { results: unknown }).results;
+          if (Array.isArray(toolResults)) {
+            results = toolResults.map((result: unknown) => {
+              const resultObj = result as Record<string, unknown>;
+              return {
+                status: resultObj.status === 'error' ? 'error' : ('success' as const),
+                sql: typeof resultObj.sql === 'string' ? resultObj.sql : '',
+                results:
+                  resultObj.status === 'success' && Array.isArray(resultObj.results)
+                    ? (resultObj.results as Record<string, unknown>[])
+                    : undefined,
+                error_message:
+                  resultObj.status === 'error' && typeof resultObj.error_message === 'string'
+                    ? resultObj.error_message
+                    : undefined,
+              };
+            });
+          }
         }
+      } catch (error) {
+        console.error('Error parsing SQL tool result:', error);
+        return;
       }
-    } catch (error) {
-      console.error('Error parsing SQL tool result:', error);
-      return;
-    }
 
-    // Format results as YAML and append to existing content
-    const currentContent = file.file.text || '';
-    let resultsYaml = '\n\nresults:';
+      // Format results as YAML and append to existing content
+      const currentContent = file.file.text || '';
+      let resultsYaml = '\n\nresults:';
 
-    for (const result of results) {
-      resultsYaml += `\n  - status: ${result.status}`;
-      resultsYaml += `\n    sql: ${result.sql}`;
+      for (const result of results) {
+        resultsYaml += `\n  - status: ${result.status}`;
+        resultsYaml += `\n    sql: ${result.sql}`;
 
-      if (result.status === 'error' && result.error_message) {
-        resultsYaml += `\n    error_message: |-\n      ${result.error_message}`;
-      } else if (result.status === 'success' && result.results) {
-        resultsYaml += '\n    results:';
-        for (const row of result.results) {
-          resultsYaml += '\n      -';
-          for (const [key, value] of Object.entries(row)) {
-            resultsYaml += `\n        ${key}: ${value}`;
+        if (result.status === 'error' && result.error_message) {
+          resultsYaml += `\n    error_message: |-\n      ${result.error_message}`;
+        } else if (result.status === 'success' && result.results) {
+          resultsYaml += '\n    results:';
+          for (const row of result.results) {
+            resultsYaml += '\n      -';
+            for (const [key, value] of Object.entries(row)) {
+              resultsYaml += `\n        ${key}: ${value}`;
+            }
           }
         }
       }
-    }
 
       // Update the file content
       file.file.text = currentContent + resultsYaml;
     } catch (error) {
       console.error('Error updating SQL file with results:', {
         toolCallId,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
       // Don't throw - continue processing
     }
