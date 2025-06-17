@@ -1,15 +1,26 @@
+import type { StoredValueResult } from '@buster/stored-values/schemas';
+import { generateEmbedding, searchValuesByEmbedding } from '@buster/stored-values/search';
 import { Agent, createStep } from '@mastra/core';
+import type { RuntimeContext } from '@mastra/core/runtime-context';
 import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { anthropicCachedModel } from '../utils/models/anthropic-cached';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
 import { thinkAndPrepWorkflowInputSchema } from '../workflows/analyst-workflow';
+import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
 
 const inputSchema = thinkAndPrepWorkflowInputSchema;
 
 export const extractValuesSearchOutputSchema = z.object({
   values: z.array(z.string()).describe('The values that the agent will search for.'),
+  searchResults: z
+    .string()
+    .describe('Formatted search results message for relevant database values.'),
+  foundValues: z
+    .record(z.record(z.array(z.string())))
+    .describe('Structured results organized by schema.table.column'),
+  searchPerformed: z.boolean().describe('Whether stored values search was actually performed'),
 });
 
 const extractValuesInstructions = `
@@ -61,6 +72,136 @@ You are a Values Parser Agent. Your primary goal is to identify and extract conc
 Focus only on extracting meaningful, specific values that could be searched for in a database.
 `;
 
+/**
+ * Organizes search results by schema.table structure with columns and their values
+ */
+function organizeResultsBySchemaTable(
+  results: StoredValueResult[]
+): Record<string, Record<string, string[]>> {
+  const organized: Record<string, Record<string, string[]>> = {};
+
+  for (const result of results) {
+    const schemaTable = `${result.schema_name}.${result.table_name}`;
+    const column = result.column_name;
+
+    if (!organized[schemaTable]) {
+      organized[schemaTable] = {};
+    }
+
+    if (!organized[schemaTable][column]) {
+      organized[schemaTable][column] = [];
+    }
+
+    // Add value if not already present and limit to reasonable number
+    if (
+      !organized[schemaTable][column].includes(result.value) &&
+      organized[schemaTable][column].length < 10
+    ) {
+      organized[schemaTable][column].push(result.value);
+    }
+  }
+
+  return organized;
+}
+
+/**
+ * Formats search results into the specified message format
+ */
+function formatSearchResults(results: StoredValueResult[]): string {
+  const organized = organizeResultsBySchemaTable(results);
+
+  if (Object.keys(organized).length === 0) {
+    return '';
+  }
+
+  let message = 'Searched for and found these relevant values:\n\n';
+
+  for (const [schemaTable, columns] of Object.entries(organized)) {
+    message += `${schemaTable}\n`;
+    for (const [column, values] of Object.entries(columns)) {
+      if (values.length > 0) {
+        message += `${column} [${values.join(', ')}]\n`;
+      }
+    }
+    message += '\n';
+  }
+
+  return message.trim();
+}
+
+/**
+ * Searches for stored values for all extracted keywords concurrently
+ */
+async function searchStoredValues(
+  values: string[],
+  dataSourceId: string
+): Promise<{
+  searchResults: string;
+  foundValues: Record<string, Record<string, string[]>>;
+  searchPerformed: boolean;
+}> {
+  try {
+    if (values.length === 0 || !dataSourceId) {
+      return {
+        searchResults: '',
+        foundValues: {},
+        searchPerformed: false,
+      };
+    }
+
+    // Generate embeddings for all keywords concurrently
+    const embeddingPromises = values.map(async (value) => {
+      try {
+        return await generateEmbedding([value]);
+      } catch (error) {
+        console.error(`Failed to generate embedding for "${value}":`, error);
+        return null;
+      }
+    });
+
+    const embeddings = await Promise.all(embeddingPromises);
+    const validEmbeddings = embeddings.filter((emb): emb is number[] => emb !== null);
+
+    if (validEmbeddings.length === 0) {
+      return {
+        searchResults: '',
+        foundValues: {},
+        searchPerformed: false,
+      };
+    }
+
+    // Search for values using each embedding concurrently
+    const searchPromises = validEmbeddings.map(async (embedding) => {
+      try {
+        return await searchValuesByEmbedding(dataSourceId, embedding, { limit: 30 });
+      } catch (error) {
+        console.error('Failed to search stored values:', error);
+        return [];
+      }
+    });
+
+    const searchResults = await Promise.all(searchPromises);
+    const allResults = searchResults.flat();
+
+    // Format results
+    const searchMessage = formatSearchResults(allResults);
+    const structuredResults = organizeResultsBySchemaTable(allResults);
+
+    return {
+      searchResults: searchMessage,
+      foundValues: structuredResults,
+      searchPerformed: true,
+    };
+  } catch (error) {
+    console.error('Error in searchStoredValues:', error);
+    return {
+      searchResults: '',
+      foundValues: {},
+      searchPerformed: false,
+    };
+  }
+}
+
 const valuesAgent = new Agent({
   name: 'Extract Values',
   instructions: extractValuesInstructions,
@@ -69,8 +210,10 @@ const valuesAgent = new Agent({
 
 const extractValuesSearchStepExecution = async ({
   inputData,
+  runtimeContext,
 }: {
   inputData: z.infer<typeof inputSchema>;
+  runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof extractValuesSearchOutputSchema>> => {
   try {
     // Use the input data directly
@@ -101,14 +244,28 @@ const extractValuesSearchStepExecution = async ({
       }
     );
 
-    const values = await tracedValuesExtraction();
+    const extractedValues = await tracedValuesExtraction();
 
-    return values;
+    // Get dataSourceId from runtime context for stored values search
+    const dataSourceId = runtimeContext.get('dataSourceId') as string | undefined;
+
+    // Perform stored values search if we have extracted values and a dataSourceId
+    const storedValuesResult = await searchStoredValues(extractedValues.values, dataSourceId || '');
+
+    return {
+      values: extractedValues.values,
+      searchResults: storedValuesResult.searchResults,
+      foundValues: storedValuesResult.foundValues,
+      searchPerformed: storedValuesResult.searchPerformed,
+    };
   } catch (error) {
     console.error('Failed to extract values:', error);
     // Return empty values array instead of crashing
     return {
       values: [],
+      searchResults: '',
+      foundValues: {},
+      searchPerformed: false,
     };
   }
 };

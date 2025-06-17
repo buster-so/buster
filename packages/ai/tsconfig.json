@@ -1,7 +1,6 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": ".",
     "outDir": "dist",
     "tsBuildInfoFile": "dist/.tsbuildinfo"
   },
@@ -12,6 +11,7 @@
     { "path": "../database" },
     { "path": "../data-source" },
     { "path": "../access-controls" },
-    { "path": "../../server" }
+    { "path": "../../server" },
+    { "path": "../stored-values" }
   ]
 }

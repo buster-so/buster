@@ -30,6 +30,7 @@ import {
   getAllToolsUsed,
   getLastToolUsed,
 } from '../utils/memory/message-history';
+import { createStoredValuesToolCallMessage } from '../utils/memory/stored-values-to-messages';
 import {
   createTodoReasoningMessage,
   createTodoToolCallMessage,
@@ -115,6 +116,13 @@ const thinkAndPrepExecution = async ({
     // Create todo messages and inject them into the conversation history
     const todoCallMessage = createTodoToolCallMessage(todos);
     const messages = [...baseMessages, todoCallMessage];
+
+    // Inject stored values search results if available
+    const storedValuesResults = inputData['extract-values-search'].searchResults;
+    if (storedValuesResults && inputData['extract-values-search'].searchPerformed) {
+      const storedValuesMessage = createStoredValuesToolCallMessage(storedValuesResults);
+      messages.push(storedValuesMessage);
+    }
 
     // Update chunk processor with initial messages
     chunkProcessor.setInitialMessages(messages);
