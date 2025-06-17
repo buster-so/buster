@@ -64,7 +64,8 @@ const nextConfig = {
   reactStrictMode: false,
   // Disable ESLint during builds since we're using Biome
   eslint: {
-    ignoreDuringBuilds: false
+    ignoreDuringBuilds: false,
+    dirs: ['src']
   },
   // Disable TypeScript type checking during builds
   typescript: {
@@ -89,10 +90,25 @@ const nextConfig = {
       }
     ];
 
-    // Exclude .test and .stories files from the build
+    // Exclude .test and .stories files from webpack processing
+    const originalEntry = config.entry;
+    config.entry = async () => {
+      const entry = await originalEntry();
+      // Filter out test and story files from all entry points
+      Object.keys(entry).forEach((key) => {
+        if (Array.isArray(entry[key])) {
+          entry[key] = entry[key].filter(
+            (file) => !file.match(/\.(test|stories)\.(js|jsx|ts|tsx)$/)
+          );
+        }
+      });
+      return entry;
+    };
+
+    // Also exclude from module resolution
     config.module.rules.push({
       test: /\.(test|stories)\.(js|jsx|ts|tsx)$/,
-      loader: 'ignore-loader'
+      use: 'ignore-loader'
     });
 
     return config;
