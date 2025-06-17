@@ -1,10 +1,10 @@
-import { createTestChat, createTestMessage } from '@buster/test-utils/database/chats';
 import { getRawLlmMessagesByMessageId } from '@buster/ai';
+import { createTestChat, createTestMessage } from '@buster/test-utils/database/chats';
+import { withTestEnv } from '@buster/test-utils/env-helpers';
 import { RuntimeContext } from '@mastra/core/runtime-context';
-import { describe, expect, it, beforeAll, afterAll } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createTodosStep } from '../../../src/steps/create-todos-step';
 import type { AnalystRuntimeContext } from '../../../src/workflows/analyst-workflow';
-import { withTestEnv } from '@buster/test-utils/env-helpers';
 
 describe('Create Todos Step - Reasoning Integration', () => {
   beforeAll(async () => {
@@ -50,16 +50,16 @@ describe('Create Todos Step - Reasoning Integration', () => {
       // Verify todos were created
       expect(result.todos).toBeTruthy();
       expect(result.todos).toContain('Determine');
-      
+
       // Verify reasoning history was created
       expect(result.reasoningHistory).toBeDefined();
       expect(result.reasoningHistory).toHaveLength(1);
-      
+
       const reasoningEntry = result.reasoningHistory![0];
       expect(reasoningEntry.type).toBe('files');
       expect(reasoningEntry.title).toBe('TODO List');
       expect(reasoningEntry.status).toBe('completed');
-      
+
       // Verify file entry
       const fileId = reasoningEntry.file_ids[0];
       const file = reasoningEntry.files[fileId];
@@ -70,7 +70,7 @@ describe('Create Todos Step - Reasoning Integration', () => {
       // Verify database persistence
       const savedMessages = await getRawLlmMessagesByMessageId(messageId);
       expect(savedMessages).toBeTruthy();
-      
+
       // The reasoning should be saved in the database
       // Note: The exact structure depends on how updateMessageFields merges the data
     });
@@ -98,7 +98,7 @@ describe('Create Todos Step - Reasoning Integration', () => {
       expect(result.todos).toBeTruthy();
       expect(result.reasoningHistory).toBeDefined();
       expect(result.reasoningHistory).toHaveLength(1);
-      
+
       // Without messageId, it shouldn't save to database but should still work
     });
   }, 30000);

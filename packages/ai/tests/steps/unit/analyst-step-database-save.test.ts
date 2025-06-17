@@ -134,7 +134,7 @@ describe('Analyst Step File Response Messages', () => {
     const mockAddResponseMessages = vi.fn();
 
     // Simulate no files being created (empty array)
-    const fileResponseMessages: any[] = [];
+    const fileResponseMessages: unknown[] = [];
 
     // The ChunkProcessor's addResponseMessages should only be called if there are messages
     if (fileResponseMessages.length > 0) {

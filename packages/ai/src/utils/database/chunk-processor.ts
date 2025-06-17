@@ -85,6 +85,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
   private messageId: string | null;
   private lastSaveTime = 0;
   private readonly SAVE_THROTTLE_MS = 100; // Throttle saves to every 100ms
+  private fileMessagesAdded = false; // Track if file messages have been added
 
   constructor(
     messageId: string | null,
@@ -518,8 +519,17 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
     }
   }
 
-  private async saveToDatabase() {
+  async saveToDatabase() {
     if (!this.messageId) {
+      return;
+    }
+
+    console.log('[DEBUG] saveToDatabase called from:', new Error().stack?.split('\n')[2]);
+    console.log('[DEBUG] fileMessagesAdded flag:', this.fileMessagesAdded);
+
+    // If file messages have been added and we're trying to save with fewer messages, skip
+    if (this.fileMessagesAdded && this.state.responseHistory.length < 2) {
+      console.log('[DEBUG] Skipping save - would overwrite file messages!');
       return;
     }
 
@@ -564,14 +574,15 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       const updateFields: {
         rawLlmMessages: CoreMessage[];
         reasoning: ReasoningEntry[];
-        responseMessages?: ResponseEntry[];
+        responseMessages?: Record<string, ResponseEntry>;
+        responseMessageIds?: string[];
       } = {
         rawLlmMessages: allMessages,
         reasoning: this.state.reasoningHistory,
       };
 
       if (this.state.responseHistory.length > 0) {
-        // Convert array to object format as expected by database
+        // Convert array to object format as expected by database schema
         updateFields.responseMessages = this.state.responseHistory.reduce<
           Record<string, ResponseEntry>
         >((acc, entry) => {
@@ -580,9 +591,22 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
           }
           return acc;
         }, {});
+
+        console.log('[DEBUG] Saving responseMessages to database:', {
+          count: Object.keys(updateFields.responseMessages).length,
+          keys: Object.keys(updateFields.responseMessages),
+          messages: this.state.responseHistory.map((msg) => ({
+            id: msg.id,
+            type: msg.type,
+            ...(msg.type === 'file' ? { file_type: msg.file_type, file_name: msg.file_name } : {}),
+          })),
+          fullMessages: JSON.stringify(updateFields.responseMessages, null, 2),
+        });
       }
 
       await updateMessageFields(this.messageId, updateFields);
+
+      console.log('[DEBUG] updateMessageFields completed successfully');
 
       this.lastSaveTime = Date.now();
 
@@ -1241,6 +1265,9 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
    * Used to add file response messages after done tool is called
    */
   async addResponseMessages(messages: ResponseEntry[]): Promise<void> {
+    console.log('[DEBUG] addResponseMessages called with:', messages.length, 'messages');
+    console.log('[DEBUG] Messages to add:', messages);
+
     // Add new messages, avoiding duplicates by ID
     const existingIds = new Set(
       this.state.responseHistory
@@ -1251,10 +1278,21 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         .map((r) => r.id)
     );
 
+    console.log('[DEBUG] Existing response IDs:', Array.from(existingIds));
+
     const newMessages = messages.filter((msg) => msg && 'id' in msg && !existingIds.has(msg.id));
+
+    console.log('[DEBUG] New messages after deduplication:', newMessages.length);
 
     if (newMessages.length > 0) {
       this.state.responseHistory.push(...newMessages);
+      console.log(
+        '[DEBUG] Response history after adding:',
+        this.state.responseHistory.length,
+        'total messages'
+      );
+      // Mark that file messages have been added
+      this.fileMessagesAdded = true;
       // Force an immediate save to persist the new messages
       await this.saveToDatabase();
     }
