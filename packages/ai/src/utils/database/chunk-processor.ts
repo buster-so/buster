@@ -76,6 +76,7 @@ interface ChunkProcessorState {
   // Track timing for secondary_title
   timing: {
     startTime?: number;
+    lastCompletionTime?: number; // Track when the last tool completed
     toolCallTimings: Map<string, number>; // toolCallId -> completion time
   };
 }
@@ -473,8 +474,13 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
     // Track tool completion timing and update reasoning entry
     if (this.state.timing.startTime) {
       const completedAt = Date.now();
-      const cumulativeTime = completedAt - this.state.timing.startTime;
-      this.state.timing.toolCallTimings.set(chunk.toolCallId, cumulativeTime);
+      // Calculate incremental time since last tool completion (or start time for first tool)
+      const lastTime = this.state.timing.lastCompletionTime || this.state.timing.startTime;
+      const incrementalTime = completedAt - lastTime;
+      
+      // Update timing state
+      this.state.timing.lastCompletionTime = completedAt;
+      this.state.timing.toolCallTimings.set(chunk.toolCallId, incrementalTime);
 
       // Determine if the tool succeeded or failed based on the result
       const status = determineToolStatus(chunk.result);
@@ -485,7 +491,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       }
 
       // Update the specific reasoning entry for this tool call
-      this.updateReasoningEntryStatus(chunk.toolCallId, status, cumulativeTime);
+      this.updateReasoningEntryStatus(chunk.toolCallId, status, incrementalTime);
     }
 
     // Clear the tool call from tracking
