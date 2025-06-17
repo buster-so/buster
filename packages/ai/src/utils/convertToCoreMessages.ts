@@ -155,19 +155,6 @@ export function convertToCoreMessages(openAIMessages: OpenAIMessage[]): CoreMess
 }
 
 /**
- * Type guard to check if a message array is in OpenAI format
- */
-export function isOpenAIMessageFormat(messages: unknown[]): messages is OpenAIMessage[] {
-  return (
-    messages.length > 0 &&
-    messages.every(
-      (msg) =>
-        typeof msg.role === 'string' && ['system', 'user', 'assistant', 'tool'].includes(msg.role)
-    )
-  );
-}
-
-/**
  * Utility to convert a single OpenAI message to CoreMessage
  */
 export function convertSingleMessage(openAIMessage: OpenAIMessage): CoreMessage[] {
