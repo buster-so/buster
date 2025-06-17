@@ -1,10 +1,9 @@
 import { useMemo, useRef } from 'react';
-import { type BusterChatMessageShape, messageShape, messagesShape } from './shapes';
+import { messageShape, messagesShape } from './shapes';
 import { useShape, useShapeStream } from '../instances';
 import { useChatUpdate } from '@/context/Chats/useChatUpdate';
 import { updateMessageShapeToIChatMessage } from './helpers';
 import { useMemoizedFn } from '@/hooks';
-import { useBusterNewChatContextSelector } from '@/context/Chats';
 
 export const useGetMessage = ({ chatId, messageId }: { chatId: string; messageId: string }) => {
   const shape = useMemo(() => messageShape({ chatId, messageId }), [chatId, messageId]);

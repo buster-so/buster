@@ -7,9 +7,9 @@ import type {
 
 export type BusterChatMessageShape = {
   id: string;
-  request_message: BusterChatMessage['request_message'] | null;
-  response_messages: BusterChatMessageResponse[];
-  reasoning: BusterChatMessageReasoning[];
+  request_message: string; //BusterChatMessage['request_message'] | null;
+  response_messages: string; //BusterChatMessageResponse[];
+  reasoning: string; //BusterChatMessageReasoning[];
   created_at: BusterChatMessage['created_at'];
   final_reasoning_message: BusterChatMessage['final_reasoning_message'];
   feedback: BusterChatMessage['feedback'];
