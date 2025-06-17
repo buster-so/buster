@@ -237,6 +237,27 @@ export interface CreateMetricsArgs {
   }>;
 }
 
+export interface CreateDashboardsArgs {
+  files: Array<{
+    name?: string;
+    yml_content?: string;
+  }>;
+}
+
+export interface ModifyMetricsArgs {
+  files: Array<{
+    id: string;
+    yml_content?: string;
+  }>;
+}
+
+export interface ModifyDashboardsArgs {
+  files: Array<{
+    id: string;
+    yml_content?: string;
+  }>;
+}
+
 export interface ExecuteSqlArgs {
   sql?: string;
   queries?: Array<string | { sql: string }>;
@@ -259,6 +280,33 @@ export function isSequentialThinkingArgs(args: unknown): args is SequentialThink
 }
 
 export function isCreateMetricsArgs(args: unknown): args is CreateMetricsArgs {
+  return (
+    typeof args === 'object' &&
+    args !== null &&
+    'files' in args &&
+    Array.isArray((args as { files: unknown }).files)
+  );
+}
+
+export function isCreateDashboardsArgs(args: unknown): args is CreateDashboardsArgs {
+  return (
+    typeof args === 'object' &&
+    args !== null &&
+    'files' in args &&
+    Array.isArray((args as { files: unknown }).files)
+  );
+}
+
+export function isModifyMetricsArgs(args: unknown): args is ModifyMetricsArgs {
+  return (
+    typeof args === 'object' &&
+    args !== null &&
+    'files' in args &&
+    Array.isArray((args as { files: unknown }).files)
+  );
+}
+
+export function isModifyDashboardsArgs(args: unknown): args is ModifyDashboardsArgs {
   return (
     typeof args === 'object' &&
     args !== null &&

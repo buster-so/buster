@@ -35,20 +35,24 @@ describe('MaxRows Limiting Tests', () => {
           ],
         },
       };
-      (adapter as PostgreSQLAdapter & { client: typeof mockClient; connected: boolean }).client = mockClient;
-      (adapter as PostgreSQLAdapter & { client: typeof mockClient; connected: boolean }).connected = true;
+      (adapter as PostgreSQLAdapter & { client: typeof mockClient; connected: boolean }).client =
+        mockClient;
+      (adapter as PostgreSQLAdapter & { client: typeof mockClient; connected: boolean }).connected =
+        true;
     });
 
     it('should limit results to exactly 1 row when maxRows=1', async () => {
       // Mock cursor behavior for 1 row limit
       mockClient.query.mockReturnValue(mockCursor);
-      mockCursor.read.mockImplementationOnce((count: number, callback: (err: unknown, rows: unknown[]) => void) => {
-        // First read returns 2 rows (more than requested)
-        callback(null, [
-          { id: 1, name: 'User 1' },
-          { id: 2, name: 'User 2' },
-        ]);
-      });
+      mockCursor.read.mockImplementationOnce(
+        (count: number, callback: (err: unknown, rows: unknown[]) => void) => {
+          // First read returns 2 rows (more than requested)
+          callback(null, [
+            { id: 1, name: 'User 1' },
+            { id: 2, name: 'User 2' },
+          ]);
+        }
+      );
       mockCursor.close.mockImplementation((callback: (err: unknown) => void) => callback(null));
 
       const result = await adapter.query('SELECT * FROM users', undefined, 1);
@@ -66,10 +70,12 @@ describe('MaxRows Limiting Tests', () => {
         name: `User ${i + 1}`,
       }));
 
-      mockCursor.read.mockImplementationOnce((count: number, callback: (err: unknown, rows: unknown[]) => void) => {
-        // Return 6 rows (more than requested 5)
-        callback(null, allRows.slice(0, 6));
-      });
+      mockCursor.read.mockImplementationOnce(
+        (count: number, callback: (err: unknown, rows: unknown[]) => void) => {
+          // Return 6 rows (more than requested 5)
+          callback(null, allRows.slice(0, 6));
+        }
+      );
       mockCursor.close.mockImplementation((callback: (err: unknown) => void) => callback(null));
 
       const result = await adapter.query('SELECT * FROM users', undefined, 5);
@@ -117,8 +123,12 @@ describe('MaxRows Limiting Tests', () => {
         execute: vi.fn(),
         end: vi.fn(),
       };
-      (adapter as MySQLAdapter & { connection: typeof mockConnection; connected: boolean }).connection = mockConnection;
-      (adapter as MySQLAdapter & { connection: typeof mockConnection; connected: boolean }).connected = true;
+      (
+        adapter as MySQLAdapter & { connection: typeof mockConnection; connected: boolean }
+      ).connection = mockConnection;
+      (
+        adapter as MySQLAdapter & { connection: typeof mockConnection; connected: boolean }
+      ).connected = true;
     });
 
     it('should limit results to exactly 1 row when maxRows=1', async () => {
@@ -210,8 +220,12 @@ describe('MaxRows Limiting Tests', () => {
         execute: vi.fn(),
       };
       mockStatement.streamRows.mockReturnValue(mockStream);
-      (adapter as SnowflakeAdapter & { connection: typeof mockConnection; connected: boolean }).connection = mockConnection;
-      (adapter as SnowflakeAdapter & { connection: typeof mockConnection; connected: boolean }).connected = true;
+      (
+        adapter as SnowflakeAdapter & { connection: typeof mockConnection; connected: boolean }
+      ).connection = mockConnection;
+      (
+        adapter as SnowflakeAdapter & { connection: typeof mockConnection; connected: boolean }
+      ).connected = true;
     });
 
     it('should limit results to exactly 1 row when maxRows=1', async () => {
@@ -224,22 +238,24 @@ describe('MaxRows Limiting Tests', () => {
         return mockStream;
       });
 
-      mockConnection.execute.mockImplementation((options: { streamResult: boolean; complete: (err?: unknown) => void }) => {
-        expect(options.streamResult).toBe(true);
-        // Defer the callback to allow the statement to be returned first
-        setTimeout(() => {
-          options.complete(undefined);
-          // Now simulate streaming after complete callback
-          dataHandler({ id: 1, name: 'User 1' });
-          dataHandler({ id: 2, name: 'User 2' }); // This should trigger destroy
+      mockConnection.execute.mockImplementation(
+        (options: { streamResult: boolean; complete: (err?: unknown) => void }) => {
+          expect(options.streamResult).toBe(true);
+          // Defer the callback to allow the statement to be returned first
+          setTimeout(() => {
+            options.complete(undefined);
+            // Now simulate streaming after complete callback
+            dataHandler({ id: 1, name: 'User 1' });
+            dataHandler({ id: 2, name: 'User 2' }); // This should trigger destroy
 
-          // Verify stream was destroyed after 1 row
-          expect(mockStream.destroy).toHaveBeenCalled();
+            // Verify stream was destroyed after 1 row
+            expect(mockStream.destroy).toHaveBeenCalled();
 
-          endHandler();
-        }, 0);
-        return mockStatement;
-      });
+            endHandler();
+          }, 0);
+          return mockStatement;
+        }
+      );
 
       const result = await adapter.query('SELECT * FROM users', undefined, 1);
       expect(result.rows).toHaveLength(1);
@@ -278,7 +294,8 @@ describe('MaxRows Limiting Tests', () => {
         close: vi.fn(),
       };
       (adapter as SQLServerAdapter & { pool: typeof mockPool; connected: boolean }).pool = mockPool;
-      (adapter as SQLServerAdapter & { pool: typeof mockPool; connected: boolean }).connected = true;
+      (adapter as SQLServerAdapter & { pool: typeof mockPool; connected: boolean }).connected =
+        true;
     });
 
     it('should limit results to exactly 1 row when maxRows=1', async () => {

@@ -1107,12 +1107,14 @@ const createMetricFiles = wrapTraced(
             publiclyEnabledBy: null,
             publicExpiryDate: null,
             versionHistory: { version: sp.metricFile.version_number, history: [sp.metricYml] },
-            dataMetadata: sp.results ? { 
-              rowCount: sp.results.length, 
-              totalRowCount: sp.results.length, 
-              executionTime: 0, 
-              limited: false 
-            } : null,
+            dataMetadata: sp.results
+              ? {
+                  rowCount: sp.results.length,
+                  totalRowCount: sp.results.length,
+                  executionTime: 0,
+                  limited: false,
+                }
+              : null,
             publicPassword: null,
             dataSourceId,
           }));
@@ -1173,12 +1175,12 @@ const createMetricFiles = wrapTraced(
 );
 
 async function processMetricFile(
-  fileName: string,
+  _fileName: string,
   ymlContent: string,
   dataSourceId: string,
   _dataSourceDialect: string,
-  userId: string,
-  organizationId: string
+  _userId: string,
+  _organizationId: string
 ): Promise<MetricFileResult> {
   try {
     // Ensure timeFrame values are properly quoted before parsing

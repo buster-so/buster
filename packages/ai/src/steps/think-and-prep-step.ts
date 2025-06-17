@@ -225,17 +225,6 @@ const thinkAndPrepExecution = async ({
       chunkProcessor.getResponseHistory() as BusterChatMessageResponse[]
     );
 
-    console.log('[DEBUG] think-and-prep-step final output:', {
-      finished: result.finished,
-      outputMessagesCount: result.outputMessages?.length || 0,
-      conversationHistoryCount: result.conversationHistory?.length || 0,
-      reasoningHistoryCount: result.reasoningHistory?.length || 0,
-      responseHistoryCount: result.responseHistory?.length || 0,
-      metadata: result.metadata,
-      messageRoles: result.outputMessages?.map((m) => m.role) || [],
-      timestamp: new Date().toISOString(),
-    });
-
     return result;
   } catch (error) {
     if (error instanceof Error && error.name !== 'AbortError') {

@@ -24,8 +24,11 @@ import {
   hasFiles,
   hasSecondaryTitle,
   hasStatus,
+  isCreateDashboardsArgs,
   isCreateMetricsArgs,
   isExecuteSqlArgs,
+  isModifyDashboardsArgs,
+  isModifyMetricsArgs,
   isSequentialThinkingArgs,
   isSubmitThoughtsArgs,
   isTextContent,
@@ -108,62 +111,32 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
    * Process a chunk and potentially save to database
    */
   async processChunk(chunk: TextStreamPart<T>): Promise<void> {
-    // DEBUG: Log chunk processing
-    console.log('[DEBUG] ChunkProcessor.processChunk:', {
-      type: chunk.type,
-      messageId: this.messageId,
-      hasCurrentAssistant: !!this.state.currentAssistantMessage,
-      accumulatedCount: this.state.accumulatedMessages.length,
-      timestamp: new Date().toISOString()
-    });
-
     switch (chunk.type) {
       case 'text-delta':
-        console.log('[DEBUG] Processing text-delta:', chunk.textDelta);
         this.handleTextDelta(chunk);
         break;
 
       case 'tool-call':
-        console.log('[DEBUG] Processing tool-call:', {
-          toolName: chunk.toolName,
-          toolCallId: chunk.toolCallId,
-          args: chunk.args
-        });
         this.handleToolCall(chunk);
         break;
 
       case 'tool-call-streaming-start':
-        console.log('[DEBUG] Processing tool-call-streaming-start:', {
-          toolName: chunk.toolName,
-          toolCallId: chunk.toolCallId
-        });
         this.handleToolCallStart(chunk);
         break;
 
       case 'tool-call-delta':
-        console.log('[DEBUG] Processing tool-call-delta:', {
-          toolCallId: chunk.toolCallId,
-          argsTextDelta: chunk.argsTextDelta
-        });
         this.handleToolCallDelta(chunk);
         break;
 
       case 'tool-result':
-        console.log('[DEBUG] Processing tool-result:', {
-          toolName: chunk.toolName,
-          toolCallId: chunk.toolCallId,
-          result: chunk.result
-        });
         await this.handleToolResult(chunk);
         break;
 
       case 'step-finish':
-        console.log('[DEBUG] Processing step-finish');
         await this.handleStepFinish();
         break;
 
       case 'finish':
-        console.log('[DEBUG] Processing finish');
         await this.handleFinish();
         break;
     }
@@ -218,10 +191,26 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
     // Check if this is a response tool
     if (this.isResponseTool(chunk.toolName)) {
       // Create response entry for this tool call
+      // For complete tool calls, we need to extract all values including nested ones
+      const extractedValues = new Map<string, unknown>();
+      if (chunk.args && typeof chunk.args === 'object') {
+        // Recursively extract all key-value pairs
+        const extract = (obj: Record<string, unknown>, prefix = '') => {
+          for (const [key, value] of Object.entries(obj)) {
+            const fullKey = prefix ? `${prefix}.${key}` : key;
+            extractedValues.set(fullKey, value);
+            if (value && typeof value === 'object' && !Array.isArray(value)) {
+              extract(value, fullKey);
+            }
+          }
+        };
+        extract(chunk.args);
+      }
+
       const parseResult = {
         parsed: chunk.args || {},
         isComplete: true,
-        extractedValues: new Map(Object.entries(chunk.args || {})),
+        extractedValues,
       };
 
       const responseEntry = this.createResponseEntry(chunk.toolCallId, chunk.toolName, parseResult);
@@ -244,12 +233,16 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         chunk.args || {}
       );
       if (reasoningEntry) {
-        // Check if this reasoning entry already exists (avoid duplicates)
-        const existingEntry = this.state.reasoningHistory.find(
+        // Check if this reasoning entry already exists
+        const existingEntryIndex = this.state.reasoningHistory.findIndex(
           (r) => r && typeof r === 'object' && 'id' in r && r.id === chunk.toolCallId
         );
 
-        if (!existingEntry) {
+        if (existingEntryIndex !== -1) {
+          // Update existing entry with complete args (replace it)
+          this.state.reasoningHistory[existingEntryIndex] = reasoningEntry;
+        } else {
+          // Add new entry
           this.state.reasoningHistory.push(reasoningEntry);
         }
       }
@@ -292,25 +285,49 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       argsText: '',
     });
 
-    // For response tools, don't create entry until we have content
-    // For reasoning tools, we can create the entry immediately
-    if (!this.isResponseTool(chunk.toolName)) {
-      // Create initial reasoning entry for non-response tools
-      const reasoningEntry = this.createReasoningEntry(
-        chunk.toolCallId,
-        chunk.toolName,
-        {} // Empty args initially
-      );
-      if (reasoningEntry) {
-        this.state.reasoningHistory.push(reasoningEntry);
+    // Create initial entries for both response and reasoning tools
+    if (this.isResponseTool(chunk.toolName)) {
+      // Create initial empty response entry that will be updated by deltas
+      const parseResult = {
+        parsed: {},
+        isComplete: false,
+        extractedValues: new Map(),
+      };
+      const responseEntry = this.createResponseEntry(chunk.toolCallId, chunk.toolName, parseResult);
+      if (responseEntry) {
+        this.state.responseHistory.push(responseEntry);
+      }
+    } else {
+      // For some tools like createMetrics, we should wait for complete args
+      // For others like sequentialThinking, we can create an entry immediately
+      const waitForCompleteArgs = [
+        'createMetrics',
+        'create-metrics-file',
+        'createDashboards',
+        'create-dashboards-file',
+        'modifyMetrics',
+        'modify-metrics-file',
+        'modifyDashboards',
+        'modify-dashboards-file',
+        'executeSql',
+        'execute-sql',
+      ].includes(chunk.toolName);
+
+      if (!waitForCompleteArgs) {
+        // Create initial reasoning entry for tools that don't need complete args
+        const reasoningEntry = this.createReasoningEntry(
+          chunk.toolCallId,
+          chunk.toolName,
+          {} // Empty args initially
+        );
+        if (reasoningEntry) {
+          this.state.reasoningHistory.push(reasoningEntry);
+        }
       }
     }
 
-    // Check if this is a finishing tool
-    if (['doneTool', 'respondWithoutAnalysis', 'submitThoughts'].includes(chunk.toolName)) {
-      this.state.hasFinishingTool = true;
-      this.state.finishedToolName = chunk.toolName;
-    }
+    // Don't mark as finishing tool during streaming start - wait for complete tool call
+    // This prevents the stream from being aborted before we receive all the content
   }
 
   private handleToolCallDelta(chunk: TextStreamPart<T>) {
@@ -489,19 +506,6 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         return;
       }
 
-      // DEBUG: Log what we're about to save
-      console.log('[DEBUG] saveToDatabase:', {
-        messageId: this.messageId,
-        totalMessages: allMessages.length,
-        lastProcessedIndex: this.state.lastProcessedMessageIndex,
-        newMessagesCount: allMessages.length - (this.state.lastProcessedMessageIndex + 1),
-        reasoningCount: this.state.reasoningHistory.length,
-        responseCount: this.state.responseHistory.length,
-        hasCurrentAssistant: !!this.state.currentAssistantMessage,
-        messageRoles: allMessages.map(m => m.role),
-        timestamp: new Date().toISOString()
-      });
-
       // Only process messages that haven't been processed yet
       const messagesToProcess = allMessages.slice(this.state.lastProcessedMessageIndex + 1);
 
@@ -539,12 +543,6 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       if (this.state.responseHistory.length > 0) {
         updateFields.responseMessages = this.state.responseHistory;
       }
-
-      console.log('[DEBUG] Saving to database with fields:', {
-        rawLlmMessagesCount: updateFields.rawLlmMessages.length,
-        reasoningCount: updateFields.reasoning.length,
-        responseMessagesCount: updateFields.responseMessages?.length || 0
-      });
 
       await updateMessageFields(this.messageId, updateFields);
 
@@ -821,6 +819,89 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         }
         break;
 
+      case 'createDashboards':
+      case 'create-dashboards-file':
+        // Handle similar to createMetrics - expects files array with name and yml_content
+        if (isCreateDashboardsArgs(args)) {
+          const files: Record<
+            string,
+            {
+              id: string;
+              file_type: string;
+              file_name: string;
+              version_number: number;
+              status: string;
+              file: {
+                text?: string;
+                modified?: [number, number][];
+              };
+            }
+          > = {};
+          const fileIds: string[] = [];
+
+          for (const file of args.files) {
+            const fileId = crypto.randomUUID();
+            fileIds.push(fileId);
+            files[fileId] = {
+              id: fileId,
+              file_type: 'dashboard',
+              file_name: file.name || 'untitled_dashboard.yml',
+              version_number: 1,
+              status: 'loading',
+              file: {
+                text: file.yml_content || '',
+              },
+            };
+          }
+
+          return {
+            id: toolCallId,
+            type: 'files',
+            title: `Creating ${args.files.length} dashboard${args.files.length === 1 ? '' : 's'}`,
+            status: 'loading',
+            secondary_title: undefined,
+            file_ids: fileIds,
+            files,
+          } as ReasoningEntry;
+        }
+        break;
+
+      case 'modifyMetrics':
+      case 'modify-metrics-file':
+        // Handle modify metrics - expects files array with id and yml_content
+        if (isModifyMetricsArgs(args)) {
+          const fileCount = args.files.length;
+          return {
+            id: toolCallId,
+            type: 'text',
+            title: `Modifying ${fileCount} metric${fileCount === 1 ? '' : 's'}`,
+            status: 'loading',
+            message: `Updating metric configuration${fileCount > 1 ? 's' : ''}...`,
+            message_chunk: undefined,
+            secondary_title: undefined,
+            finished_reasoning: false,
+          } as ReasoningEntry;
+        }
+        break;
+
+      case 'modifyDashboards':
+      case 'modify-dashboards-file':
+        // Handle modify dashboards - expects files array with id and yml_content
+        if (isModifyDashboardsArgs(args)) {
+          const fileCount = args.files.length;
+          return {
+            id: toolCallId,
+            type: 'text',
+            title: `Modifying ${fileCount} dashboard${fileCount === 1 ? '' : 's'}`,
+            status: 'loading',
+            message: `Updating dashboard configuration${fileCount > 1 ? 's' : ''}...`,
+            message_chunk: undefined,
+            secondary_title: undefined,
+            finished_reasoning: false,
+          } as ReasoningEntry;
+        }
+        break;
+
       case 'submitThoughts':
         if (isSubmitThoughtsArgs(args)) {
           return {
@@ -899,15 +980,11 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         return null;
     }
 
-    // Only create entry if we have some content
-    if (!message) {
-      return null;
-    }
-
+    // Always create entry, even if message is empty initially (will be updated by deltas)
     return {
       id: toolCallId,
       type: 'text',
-      message,
+      message: message || '', // Always provide a string, even if empty
       is_final_message: true,
     } as ResponseEntry;
   }
@@ -936,7 +1013,8 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         break;
     }
 
-    if (message && 'message' in entry) {
+    // Always update the message, even if it's empty (during streaming it starts empty)
+    if ('message' in entry) {
       (entry as ResponseEntry & { message: string }).message = message;
     }
   }

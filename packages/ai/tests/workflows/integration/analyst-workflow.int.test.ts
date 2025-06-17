@@ -137,47 +137,68 @@ describe('Analyst Workflow Integration Tests', () => {
     // Verify that conversation history was saved to database
     const updatedMessage = await db.select().from(messages).where(eq(messages.id, messageId));
     expect(updatedMessage).toHaveLength(1);
-    
+
     console.log('\n=== DATABASE SAVE VERIFICATION ===');
     console.log('Message ID:', messageId);
     console.log('Raw LLM Messages count:', updatedMessage[0]!.rawLlmMessages?.length || 0);
     console.log('Reasoning entries count:', updatedMessage[0]!.reasoning?.length || 0);
     console.log('Response messages count:', updatedMessage[0]!.responseMessages?.length || 0);
-    
+
     // Check reasoning entries for partial content
     if (updatedMessage[0]!.reasoning && Array.isArray(updatedMessage[0]!.reasoning)) {
       console.log('\n=== REASONING ENTRIES ===');
-      updatedMessage[0]!.reasoning.forEach((entry: { type: string; title: string; status: string; message?: string }, index: number) => {
-        console.log(`\nReasoning Entry ${index + 1}:`);
-        console.log('  Type:', entry.type);
-        console.log('  Title:', entry.title);
-        console.log('  Status:', entry.status);
-        if (entry.message) {
-          console.log('  Message length:', entry.message.length);
-          console.log('  Message preview:', entry.message.substring(0, 100) + '...');
+      updatedMessage[0]!.reasoning.forEach(
+        (
+          entry: { type: string; title: string; status: string; message?: string },
+          index: number
+        ) => {
+          console.log(`\nReasoning Entry ${index + 1}:`);
+          console.log('  Type:', entry.type);
+          console.log('  Title:', entry.title);
+          console.log('  Status:', entry.status);
+          if (entry.message) {
+            console.log('  Message length:', entry.message.length);
+            console.log('  Message preview:', `${entry.message.substring(0, 100)}...`);
+          }
         }
-      });
+      );
     }
-    
+
     // Check response messages
     if (updatedMessage[0]!.responseMessages && Array.isArray(updatedMessage[0]!.responseMessages)) {
       console.log('\n=== RESPONSE MESSAGES ===');
-      updatedMessage[0]!.responseMessages.forEach((entry: { type: string; is_final_message: boolean; message?: string }, index: number) => {
-        console.log(`\nResponse Message ${index + 1}:`);
-        console.log('  Type:', entry.type);
-        console.log('  Is Final:', entry.is_final_message);
-        if (entry.message) {
-          console.log('  Message length:', entry.message.length);
-          console.log('  Message preview:', entry.message.substring(0, 100) + '...');
+      updatedMessage[0]!.responseMessages.forEach(
+        (entry: { type: string; is_final_message: boolean; message?: string }, index: number) => {
+          console.log(`\nResponse Message ${index + 1}:`);
+          console.log('  Type:', entry.type);
+          console.log('  Is Final:', entry.is_final_message);
+          if (entry.message) {
+            console.log('  Message length:', entry.message.length);
+            console.log('  Message preview:', `${entry.message.substring(0, 100)}...`);
+          }
         }
-      });
+      );
     }
-    
+
+    // Assert that we have raw LLM messages
     expect(updatedMessage[0]!.rawLlmMessages).toBeDefined();
     expect(Array.isArray(updatedMessage[0]!.rawLlmMessages)).toBe(true);
     if (Array.isArray(updatedMessage[0]!.rawLlmMessages)) {
       expect(updatedMessage[0]!.rawLlmMessages.length).toBeGreaterThan(0);
     }
+
+    // Assert that we have response messages with actual content
+    expect(updatedMessage[0]!.responseMessages).toBeDefined();
+    expect(Array.isArray(updatedMessage[0]!.responseMessages)).toBe(true);
+    expect(updatedMessage[0]!.responseMessages.length).toBeGreaterThan(0);
+
+    // Check that at least one response message has content
+    const responseWithContent = updatedMessage[0]!.responseMessages.find(
+      (msg: { message?: string }) => msg.message && msg.message.length > 0
+    );
+    expect(responseWithContent).toBeDefined();
+    expect(responseWithContent?.message).toBeTruthy();
+    expect(responseWithContent?.message?.length).toBeGreaterThan(10); // Should have meaningful content
   }, 300000);
 
   test('should successfully execute analyst workflow with valid input', async () => {

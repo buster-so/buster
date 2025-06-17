@@ -160,14 +160,6 @@ export function properlyInterleaveMessages(messages: CoreMessage[]): CoreMessage
  * If messages are bundled, properly interleaves them
  */
 export function extractMessageHistory(stepMessages: CoreMessage[]): MessageHistory {
-  // DEBUG: Log input
-  console.log('[DEBUG] extractMessageHistory input:', {
-    isArray: Array.isArray(stepMessages),
-    length: stepMessages?.length || 0,
-    messageRoles: stepMessages?.map(m => m.role) || [],
-    timestamp: new Date().toISOString()
-  });
-
   // Validate it's an array
   if (!Array.isArray(stepMessages)) {
     return [];
@@ -198,21 +190,9 @@ export function extractMessageHistory(stepMessages: CoreMessage[]): MessageHisto
     }
   }
 
-  // DEBUG: Log result decision
-  console.log('[DEBUG] extractMessageHistory processing:', {
-    needsInterleaving,
-    beforeLength: messages.length,
-    outputLength: needsInterleaving ? 'will-compute' : messages.length
-  });
-
   // If messages are bundled, interleave them properly
   if (needsInterleaving) {
     const result = properlyInterleaveMessages(messages);
-    console.log('[DEBUG] After interleaving:', {
-      beforeLength: messages.length,
-      afterLength: result.length,
-      afterRoles: result.map(m => m.role)
-    });
     return result;
   }
 

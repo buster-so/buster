@@ -75,7 +75,7 @@ const analystExecution = async ({
     messageId,
     [],
     inputData.reasoningHistory || [], // Pass reasoning history from previous step
-    inputData.responseHistory || []   // Pass response history from previous step
+    inputData.responseHistory || [] // Pass response history from previous step
   );
 
   try {
@@ -83,24 +83,7 @@ const analystExecution = async ({
     // They are already in CoreMessage[] format
     const messages = inputData.outputMessages;
 
-    // DEBUG: Log what we received from think-and-prep
-    console.log('[DEBUG] analyst-step received from think-and-prep:', {
-      inputDataKeys: Object.keys(inputData),
-      outputMessagesCount: messages?.length || 0,
-      conversationHistoryCount: inputData.conversationHistory?.length || 0,
-      finished: inputData.finished,
-      hasStepData: !!inputData.stepData,
-      reasoningHistoryCount: inputData.reasoningHistory?.length || 0,
-      responseHistoryCount: inputData.responseHistory?.length || 0,
-      metadata: inputData.metadata,
-      timestamp: new Date().toISOString(),
-    });
-
     if (messages && messages.length > 0) {
-      console.log('[DEBUG] analyst-step message details:', {
-        messageRoles: messages.map((m) => m.role),
-        lastMessage: messages[messages.length - 1],
-      });
     }
 
     // Critical check: Ensure messages array is not empty
