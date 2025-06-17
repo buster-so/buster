@@ -113,38 +113,48 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
    * Process a chunk and potentially save to database
    */
   async processChunk(chunk: TextStreamPart<T>): Promise<void> {
-    switch (chunk.type) {
-      case 'text-delta':
-        this.handleTextDelta(chunk);
-        break;
+    try {
+      switch (chunk.type) {
+        case 'text-delta':
+          this.handleTextDelta(chunk);
+          break;
 
-      case 'tool-call':
-        this.handleToolCall(chunk);
-        break;
+        case 'tool-call':
+          this.handleToolCall(chunk);
+          break;
 
-      case 'tool-call-streaming-start':
-        this.handleToolCallStart(chunk);
-        break;
+        case 'tool-call-streaming-start':
+          this.handleToolCallStart(chunk);
+          break;
 
-      case 'tool-call-delta':
-        this.handleToolCallDelta(chunk);
-        break;
+        case 'tool-call-delta':
+          this.handleToolCallDelta(chunk);
+          break;
 
-      case 'tool-result':
-        await this.handleToolResult(chunk);
-        break;
+        case 'tool-result':
+          await this.handleToolResult(chunk);
+          break;
 
-      case 'step-finish':
-        await this.handleStepFinish();
-        break;
+        case 'step-finish':
+          await this.handleStepFinish();
+          break;
 
-      case 'finish':
-        await this.handleFinish();
-        break;
+        case 'finish':
+          await this.handleFinish();
+          break;
+      }
+
+      // Save to database if enough time has passed (throttled)
+      await this.saveIfNeeded();
+    } catch (error) {
+      console.error('Error processing chunk:', {
+        chunkType: chunk.type,
+        messageId: this.messageId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined
+      });
+      // Don't re-throw - continue processing stream
     }
-
-    // Save to database if enough time has passed (throttled)
-    await this.saveIfNeeded();
   }
 
   private handleTextDelta(chunk: TextStreamPart<T>) {
@@ -211,8 +221,11 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       const extractedValues = new Map<string, unknown>();
       if (chunk.args && typeof chunk.args === 'object') {
         // Recursively extract all key-value pairs
-        const extract = (obj: Record<string, unknown>, prefix = '') => {
-          for (const [key, value] of Object.entries(obj)) {
+        const extract = (obj: unknown, prefix = '') => {
+          if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return;
+          
+          const record = obj as Record<string, unknown>;
+          for (const [key, value] of Object.entries(record)) {
             const fullKey = prefix ? `${prefix}.${key}` : key;
             extractedValues.set(fullKey, value);
             if (value && typeof value === 'object' && !Array.isArray(value)) {
@@ -380,139 +393,157 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
     if (chunk.type !== 'tool-call-delta') return;
     const inProgress = this.state.toolCallsInProgress.get(chunk.toolCallId);
     if (!inProgress) return;
+    
+    try {
+      // Accumulate the arguments text
+      inProgress.argsText += chunk.argsTextDelta || '';
 
-    // Accumulate the arguments text
-    inProgress.argsText += chunk.argsTextDelta || '';
+      // Use optimistic parsing to extract values even from incomplete JSON
+      const parseResult = OptimisticJsonParser.parse(inProgress.argsText);
 
-    // Use optimistic parsing to extract values even from incomplete JSON
-    const parseResult = OptimisticJsonParser.parse(inProgress.argsText);
-
-    // Update args with either complete parse or optimistic parse
-    if (parseResult.isComplete && parseResult.parsed) {
-      // Complete valid JSON
-      inProgress.args = parseResult.parsed;
-    } else if (parseResult.parsed) {
-      // Optimistically parsed JSON
-      inProgress.args = parseResult.parsed;
-    }
-
-    // Update the tool call in the assistant message
-    if (this.state.currentAssistantMessage && inProgress.args) {
-      const toolCall = this.state.currentAssistantMessage.content.find(
-        (part): part is typeof part & { toolCallId: string } =>
-          isToolCallContent(part) && part.toolCallId === chunk.toolCallId
-      );
-      if (toolCall && isToolCallContent(toolCall)) {
-        toolCall.args = inProgress.args;
+      // Update args with either complete parse or optimistic parse
+      if (parseResult.isComplete && parseResult.parsed) {
+        // Complete valid JSON
+        inProgress.args = parseResult.parsed;
+      } else if (parseResult.parsed) {
+        // Optimistically parsed JSON
+        inProgress.args = parseResult.parsed;
       }
-    }
 
-    // Check if this is a response tool
-    const isResponseTool = this.isResponseTool(inProgress.toolName);
-
-    if (isResponseTool) {
-      // Handle response tools (doneTool, respondWithoutAnalysis)
-      const existingResponse = this.state.responseHistory.find(
-        (r) => r && typeof r === 'object' && 'id' in r && r.id === chunk.toolCallId
-      );
-
-      if (existingResponse) {
-        // Update existing response entry with optimistically parsed values
-        this.updateResponseEntryWithOptimisticValues(
-          existingResponse,
-          inProgress.toolName,
-          parseResult
+      // Update the tool call in the assistant message
+      if (this.state.currentAssistantMessage && inProgress.args) {
+        const toolCall = this.state.currentAssistantMessage.content.find(
+          (part): part is typeof part & { toolCallId: string } =>
+            isToolCallContent(part) && part.toolCallId === chunk.toolCallId
         );
+        if (toolCall && isToolCallContent(toolCall)) {
+          toolCall.args = inProgress.args;
+        }
+      }
+
+      // Check if this is a response tool
+      const isResponseTool = this.isResponseTool(inProgress.toolName);
+
+      if (isResponseTool) {
+        // Handle response tools (doneTool, respondWithoutAnalysis)
+        const existingResponse = this.state.responseHistory.find(
+          (r) => r && typeof r === 'object' && 'id' in r && r.id === chunk.toolCallId
+        );
+
+        if (existingResponse) {
+          // Update existing response entry with optimistically parsed values
+          this.updateResponseEntryWithOptimisticValues(
+            existingResponse,
+            inProgress.toolName,
+            parseResult
+          );
+        } else {
+          // Create new response entry
+          const responseEntry = this.createResponseEntry(
+            chunk.toolCallId,
+            inProgress.toolName,
+            parseResult
+          );
+          if (responseEntry) {
+            this.state.responseHistory.push(responseEntry);
+          }
+        }
       } else {
-        // Create new response entry
-        const responseEntry = this.createResponseEntry(
-          chunk.toolCallId,
-          inProgress.toolName,
-          parseResult
+        // Handle reasoning tools
+        const existingEntry = this.state.reasoningHistory.find(
+          (r) => r && typeof r === 'object' && 'id' in r && r.id === chunk.toolCallId
         );
-        if (responseEntry) {
-          this.state.responseHistory.push(responseEntry);
-        }
-      }
-    } else {
-      // Handle reasoning tools
-      const existingEntry = this.state.reasoningHistory.find(
-        (r) => r && typeof r === 'object' && 'id' in r && r.id === chunk.toolCallId
-      );
 
-      if (existingEntry) {
-        // Update existing entry with optimistically parsed values
-        this.updateReasoningEntryWithOptimisticValues(
-          existingEntry,
-          inProgress.toolName,
-          parseResult
-        );
-      } else if (inProgress.args) {
-        // Create new reasoning entry
-        const reasoningEntry = this.createReasoningEntry(
-          chunk.toolCallId,
-          inProgress.toolName,
-          inProgress.args
-        );
-        if (reasoningEntry) {
-          this.state.reasoningHistory.push(reasoningEntry);
+        if (existingEntry) {
+          // Update existing entry with optimistically parsed values
+          this.updateReasoningEntryWithOptimisticValues(
+            existingEntry,
+            inProgress.toolName,
+            parseResult
+          );
+        } else if (inProgress.args) {
+          // Create new reasoning entry
+          const reasoningEntry = this.createReasoningEntry(
+            chunk.toolCallId,
+            inProgress.toolName,
+            inProgress.args
+          );
+          if (reasoningEntry) {
+            this.state.reasoningHistory.push(reasoningEntry);
+          }
         }
       }
+    } catch (error) {
+      console.error('Error handling tool call delta:', {
+        toolCallId: chunk.toolCallId,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      // Continue processing - don't fail the entire stream
     }
   }
 
   private async handleToolResult(chunk: TextStreamPart<T>) {
     if (chunk.type !== 'tool-result') return;
-    // Finalize current assistant message if exists
-    if (this.state.currentAssistantMessage) {
-      // Type assertion is safe here because TypedAssistantMessage is compatible with CoreMessage
-      this.state.accumulatedMessages.push(this.state.currentAssistantMessage as CoreMessage);
-      this.state.currentAssistantMessage = null;
-    }
-
-    // Add tool result message
-    const toolResultMessage: CoreMessage = {
-      role: 'tool',
-      content: [
-        {
-          type: 'tool-result',
-          toolCallId: chunk.toolCallId,
-          toolName: chunk.toolName,
-          result: chunk.result,
-        },
-      ],
-    };
-
-    this.state.accumulatedMessages.push(toolResultMessage);
-
-    // Track tool completion timing and update reasoning entry
-    if (this.state.timing.startTime) {
-      const completedAt = Date.now();
-      // Calculate incremental time since last tool completion (or start time for first tool)
-      const lastTime = this.state.timing.lastCompletionTime || this.state.timing.startTime;
-      const incrementalTime = completedAt - lastTime;
-
-      // Update timing state
-      this.state.timing.lastCompletionTime = completedAt;
-      this.state.timing.toolCallTimings.set(chunk.toolCallId, incrementalTime);
-
-      // Determine if the tool succeeded or failed based on the result
-      const status = determineToolStatus(chunk.result);
-
-      // Special handling for SQL tools - append results to file content
-      if (chunk.toolName === 'executeSql' || chunk.toolName === 'execute-sql') {
-        this.updateSqlFileWithResults(chunk.toolCallId, chunk.result);
+    
+    try {
+      // Finalize current assistant message if exists
+      if (this.state.currentAssistantMessage) {
+        // Type assertion is safe here because TypedAssistantMessage is compatible with CoreMessage
+        this.state.accumulatedMessages.push(this.state.currentAssistantMessage as CoreMessage);
+        this.state.currentAssistantMessage = null;
       }
 
-      // Update the specific reasoning entry for this tool call
-      this.updateReasoningEntryStatus(chunk.toolCallId, status, incrementalTime);
+      // Add tool result message
+      const toolResultMessage: CoreMessage = {
+        role: 'tool',
+        content: [
+          {
+            type: 'tool-result',
+            toolCallId: chunk.toolCallId,
+            toolName: chunk.toolName,
+            result: chunk.result,
+          },
+        ],
+      };
+
+      this.state.accumulatedMessages.push(toolResultMessage);
+
+      // Track tool completion timing and update reasoning entry
+      if (this.state.timing.startTime) {
+        const completedAt = Date.now();
+        // Calculate incremental time since last tool completion (or start time for first tool)
+        const lastTime = this.state.timing.lastCompletionTime || this.state.timing.startTime;
+        const incrementalTime = completedAt - lastTime;
+
+        // Update timing state
+        this.state.timing.lastCompletionTime = completedAt;
+        this.state.timing.toolCallTimings.set(chunk.toolCallId, incrementalTime);
+
+        // Determine if the tool succeeded or failed based on the result
+        const status = determineToolStatus(chunk.result);
+
+        // Special handling for SQL tools - append results to file content
+        if (chunk.toolName === 'executeSql' || chunk.toolName === 'execute-sql') {
+          this.updateSqlFileWithResults(chunk.toolCallId, chunk.result);
+        }
+
+        // Update the specific reasoning entry for this tool call
+        this.updateReasoningEntryStatus(chunk.toolCallId, status, incrementalTime);
+      }
+
+      // Clear the tool call from tracking
+      this.state.toolCallsInProgress.delete(chunk.toolCallId);
+
+      // Force save after tool result
+      await this.saveToDatabase();
+    } catch (error) {
+      console.error('Error handling tool result:', {
+        toolCallId: chunk.toolCallId,
+        toolName: chunk.toolName,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      // Continue processing
     }
-
-    // Clear the tool call from tracking
-    this.state.toolCallsInProgress.delete(chunk.toolCallId);
-
-    // Force save after tool result
-    await this.saveToDatabase();
   }
 
   private async handleStepFinish() {
@@ -555,13 +586,14 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       return;
     }
 
+    // Build messages including current assistant message if in progress
+    const allMessages = [...this.state.accumulatedMessages];
+    if (this.state.currentAssistantMessage) {
+      // Type assertion is safe here because TypedAssistantMessage is compatible with CoreMessage
+      allMessages.push(this.state.currentAssistantMessage as CoreMessage);
+    }
+
     try {
-      // Build messages including current assistant message if in progress
-      const allMessages = [...this.state.accumulatedMessages];
-      if (this.state.currentAssistantMessage) {
-        // Type assertion is safe here because TypedAssistantMessage is compatible with CoreMessage
-        allMessages.push(this.state.currentAssistantMessage as CoreMessage);
-      }
 
       // Don't save if we have no messages
       if (allMessages.length === 0) {
@@ -596,7 +628,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       const updateFields: {
         rawLlmMessages: CoreMessage[];
         reasoning: ReasoningEntry[];
-        responseMessages?: Record<string, ResponseEntry>;
+        responseMessages?: ResponseEntry[];
         responseMessageIds?: string[];
       } = {
         rawLlmMessages: allMessages,
@@ -618,7 +650,14 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         ? allMessages.length - 2 // Exclude the current in-progress message
         : allMessages.length - 1;
     } catch (error) {
-      console.error('Error saving chunk to database:', error);
+      console.error('Error saving chunk to database:', {
+        messageId: this.messageId,
+        messageCount: allMessages.length,
+        reasoningCount: this.state.reasoningHistory.length,
+        responseCount: this.state.responseHistory.length,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined
+      });
       // Don't throw - we want to continue processing even if save fails
     }
   }
@@ -737,7 +776,8 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
               const hasContent = 'yml_content' in file && file.yml_content;
 
               // Only add file when both name AND yml_content are present
-              if (hasName && hasContent && !existingFileIds[index]) {
+              const fileIdAtIndex = existingFileIds[index];
+              if (hasName && hasContent && !fileIdAtIndex) {
                 const fileId = crypto.randomUUID();
                 existingFileIds[index] = fileId;
                 existingFiles[fileId] = {
@@ -750,11 +790,12 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
                     text: (file as { yml_content?: string }).yml_content || '',
                   },
                 };
-              } else if (existingFileIds[index] && hasContent) {
+              } else if (fileIdAtIndex && hasContent) {
                 // Update existing file content if it has changed
-                const fileId = existingFileIds[index];
-                if (existingFiles[fileId]?.file) {
-                  existingFiles[fileId].file.text =
+                const fileId = fileIdAtIndex;
+                const existingFile = existingFiles[fileId];
+                if (existingFile?.file) {
+                  existingFile.file.text =
                     (file as { yml_content?: string }).yml_content || '';
                 }
               }
@@ -785,7 +826,8 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
               const hasContent = 'yml_content' in file && file.yml_content;
 
               // Only add file when both name AND yml_content are present
-              if (hasName && hasContent && !existingFileIds[index]) {
+              const fileIdAtIndex = existingFileIds[index];
+              if (hasName && hasContent && !fileIdAtIndex) {
                 const fileId = crypto.randomUUID();
                 existingFileIds[index] = fileId;
                 existingFiles[fileId] = {
@@ -798,11 +840,12 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
                     text: (file as { yml_content?: string }).yml_content || '',
                   },
                 };
-              } else if (existingFileIds[index] && hasContent) {
+              } else if (fileIdAtIndex && hasContent) {
                 // Update existing file content if it has changed
-                const fileId = existingFileIds[index];
-                if (existingFiles[fileId]?.file) {
-                  existingFiles[fileId].file.text =
+                const fileId = fileIdAtIndex;
+                const existingFile = existingFiles[fileId];
+                if (existingFile?.file) {
+                  existingFile.file.text =
                     (file as { yml_content?: string }).yml_content || '';
                 }
               }
@@ -832,15 +875,16 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
           const fileIds = (entry as ReasoningEntry & { file_ids: string[] }).file_ids;
           if (fileIds && fileIds.length > 0) {
             const fileId = fileIds[0];
-            const file = entry.files[fileId];
-            if (file?.file) {
-              // Update with statements (preferred) or fallback to sql
-              if (statements.length > 0) {
-                const statementsYaml =
-                  'statements:\n' + statements.map((stmt) => `  - ${stmt}`).join('\n');
-                file.file.text = statementsYaml;
-              } else if (sql) {
-                file.file.text = sql;
+            if (fileId) {
+              const file = entry.files[fileId];
+              if (file?.file) {
+                // Update with statements (preferred) or fallback to sql
+                if (statements && statements.length > 0) {
+                  const statementsYaml = `statements:\n${statements.map((stmt) => `  - ${stmt}`).join('\n')}`;
+                  file.file.text = statementsYaml;
+                } else if (sql) {
+                  file.file.text = sql;
+                }
               }
             }
           }
@@ -864,7 +908,8 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
               const hasContent = 'yml_content' in file && file.yml_content;
 
               // Only add file when name is present (id is always present)
-              if (hasId && hasName && !existingFileIds[index]) {
+              const fileIdAtIndex = existingFileIds[index];
+              if (hasId && hasName && !fileIdAtIndex) {
                 const fileId = (file as { id?: string }).id || ''; // Use the actual file ID
                 existingFileIds[index] = fileId;
                 existingFiles[fileId] = {
@@ -877,11 +922,12 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
                     text: hasContent ? (file as { yml_content?: string }).yml_content || '' : '',
                   },
                 };
-              } else if (existingFileIds[index] && hasContent) {
+              } else if (fileIdAtIndex && hasContent) {
                 // Update existing file content if it has changed
-                const fileId = existingFileIds[index];
-                if (existingFiles[fileId]?.file) {
-                  existingFiles[fileId].file.text =
+                const fileId = fileIdAtIndex;
+                const existingFile = existingFiles[fileId];
+                if (existingFile?.file) {
+                  existingFile.file.text =
                     (file as { yml_content?: string }).yml_content || '';
                 }
               }
@@ -913,7 +959,8 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
               const hasContent = 'yml_content' in file && file.yml_content;
 
               // Only add file when name is present (id is always present)
-              if (hasId && hasName && !existingFileIds[index]) {
+              const fileIdAtIndex = existingFileIds[index];
+              if (hasId && hasName && !fileIdAtIndex) {
                 const fileId = (file as { id?: string }).id || ''; // Use the actual file ID
                 existingFileIds[index] = fileId;
                 existingFiles[fileId] = {
@@ -926,11 +973,12 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
                     text: hasContent ? (file as { yml_content?: string }).yml_content || '' : '',
                   },
                 };
-              } else if (existingFileIds[index] && hasContent) {
+              } else if (fileIdAtIndex && hasContent) {
                 // Update existing file content if it has changed
-                const fileId = existingFileIds[index];
-                if (existingFiles[fileId]?.file) {
-                  existingFiles[fileId].file.text =
+                const fileId = fileIdAtIndex;
+                const existingFile = existingFiles[fileId];
+                if (existingFile?.file) {
+                  existingFile.file.text =
                     (file as { yml_content?: string }).yml_content || '';
                 }
               }
@@ -1030,8 +1078,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
           if (statements.length > 0) {
             // Format as statements-only YAML initially
-            const statementsYaml =
-              'statements:\n' + statements.map((stmt) => `  - ${stmt}`).join('\n');
+            const statementsYaml = `statements:\n${statements.map((stmt) => `  - ${stmt}`).join('\n')}`;
 
             const fileId = crypto.randomUUID();
             const files: Record<
@@ -1185,30 +1232,39 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
     toolName: string,
     parseResult: ReturnType<typeof OptimisticJsonParser.parse>
   ): ResponseEntry | null {
-    let message = '';
+    try {
+      let message = '';
 
-    switch (toolName) {
-      case 'doneTool':
-      case 'done-tool':
-        message = getOptimisticValue<string>(parseResult.extractedValues, 'final_response', '');
-        break;
+      switch (toolName) {
+        case 'doneTool':
+        case 'done-tool':
+          message = getOptimisticValue<string>(parseResult.extractedValues, 'final_response', '') || '';
+          break;
 
-      case 'respondWithoutAnalysis':
-      case 'respond-without-analysis':
-        message = getOptimisticValue<string>(parseResult.extractedValues, 'response', '');
-        break;
+        case 'respondWithoutAnalysis':
+        case 'respond-without-analysis':
+          message = getOptimisticValue<string>(parseResult.extractedValues, 'response', '') || '';
+          break;
 
-      default:
-        return null;
+        default:
+          return null;
+      }
+
+      // Always create entry, even if message is empty initially (will be updated by deltas)
+      return {
+        id: toolCallId,
+        type: 'text',
+        message: message || '', // Always provide a string, even if empty
+        is_final_message: true,
+      } as ResponseEntry;
+    } catch (error) {
+      console.error('Error creating response entry:', {
+        toolCallId,
+        toolName,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      return null;
     }
-
-    // Always create entry, even if message is empty initially (will be updated by deltas)
-    return {
-      id: toolCallId,
-      type: 'text',
-      message: message || '', // Always provide a string, even if empty
-      is_final_message: true,
-    } as ResponseEntry;
   }
 
   /**
@@ -1226,12 +1282,12 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
     switch (toolName) {
       case 'doneTool':
       case 'done-tool':
-        message = getOptimisticValue<string>(parseResult.extractedValues, 'final_response', '');
+        message = getOptimisticValue<string>(parseResult.extractedValues, 'final_response', '') || '';
         break;
 
       case 'respondWithoutAnalysis':
       case 'respond-without-analysis':
-        message = getOptimisticValue<string>(parseResult.extractedValues, 'response', '');
+        message = getOptimisticValue<string>(parseResult.extractedValues, 'response', '') || '';
         break;
     }
 
@@ -1336,28 +1392,33 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
    * Update SQL file content with results from tool execution
    */
   private updateSqlFileWithResults(toolCallId: string, toolResult: unknown): void {
-    // Find the reasoning entry for this tool call
-    const entry = this.state.reasoningHistory.find(
-      (r) => r && typeof r === 'object' && 'id' in r && r.id === toolCallId
-    );
+    try {
+      // Find the reasoning entry for this tool call
+      const entry = this.state.reasoningHistory.find(
+        (r) => r && typeof r === 'object' && 'id' in r && r.id === toolCallId
+      );
 
-    if (!entry || entry.type !== 'files') {
-      return;
-    }
+      if (!entry || entry.type !== 'files') {
+        return;
+      }
 
-    // Get the file content
-    const fileIds = (entry as ReasoningEntry & { file_ids: string[] }).file_ids;
-    if (!fileIds || fileIds.length === 0) {
-      return;
-    }
+      // Get the file content
+      const fileIds = (entry as ReasoningEntry & { file_ids: string[] }).file_ids;
+      if (!fileIds || fileIds.length === 0) {
+        return;
+      }
 
-    const fileId = fileIds[0];
-    const file = entry.files[fileId];
-    if (!file?.file) {
-      return;
-    }
+      const fileId = fileIds[0];
+      if (!fileId) {
+        return;
+      }
+      
+      const file = entry.files[fileId];
+      if (!file?.file) {
+        return;
+      }
 
-    // Parse the tool result to extract query results
+      // Parse the tool result to extract query results
     let results: Array<{
       status: 'success' | 'error';
       sql: string;
@@ -1369,12 +1430,15 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       if (toolResult && typeof toolResult === 'object' && 'results' in toolResult) {
         const toolResults = (toolResult as { results: unknown }).results;
         if (Array.isArray(toolResults)) {
-          results = toolResults.map((result: any) => ({
-            status: result.status === 'error' ? 'error' : 'success',
-            sql: result.sql || '',
-            results: result.status === 'success' ? result.results : undefined,
-            error_message: result.status === 'error' ? result.error_message : undefined,
-          }));
+          results = toolResults.map((result: unknown) => {
+            const resultObj = result as Record<string, unknown>;
+            return {
+              status: resultObj.status === 'error' ? 'error' : 'success' as const,
+              sql: typeof resultObj.sql === 'string' ? resultObj.sql : '',
+              results: resultObj.status === 'success' && Array.isArray(resultObj.results) ? resultObj.results as Record<string, unknown>[] : undefined,
+              error_message: resultObj.status === 'error' && typeof resultObj.error_message === 'string' ? resultObj.error_message : undefined,
+            };
+          });
         }
       }
     } catch (error) {
@@ -1403,8 +1467,15 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       }
     }
 
-    // Update the file content
-    file.file.text = currentContent + resultsYaml;
+      // Update the file content
+      file.file.text = currentContent + resultsYaml;
+    } catch (error) {
+      console.error('Error updating SQL file with results:', {
+        toolCallId,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      // Don't throw - continue processing
+    }
   }
 
   /**
