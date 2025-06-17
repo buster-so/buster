@@ -176,6 +176,75 @@ function createFileResponseMessages(files: ExtractedFile[]): ChatMessageResponse
   }));
 }
 
+/**
+ * Create a unique key for a message to detect duplicates
+ */
+function createMessageKey(msg: CoreMessage): string {
+  if (msg.role === 'assistant' && Array.isArray(msg.content)) {
+    // For assistant messages with tool calls, use toolCallId as part of the key
+    const toolCallIds = msg.content
+      .filter((c): c is { type: string; toolCallId?: string } => 
+        typeof c === 'object' && 
+        c !== null && 
+        'type' in c && 
+        c.type === 'tool-call' && 
+        'toolCallId' in c
+      )
+      .map(c => c.toolCallId)
+      .filter((id): id is string => id !== undefined)
+      .sort()
+      .join(',');
+    if (toolCallIds) {
+      return `${msg.role}:toolcalls:${toolCallIds}`;
+    }
+  }
+  // For other messages, use role and content
+  return `${msg.role}:${JSON.stringify(msg.content)}`;
+}
+
+/**
+ * Deduplicate messages based on role and content/toolCallId
+ */
+function deduplicateMessages(messages: CoreMessage[]): CoreMessage[] {
+  const seen = new Set<string>();
+  const deduplicated: CoreMessage[] = [];
+  let duplicatesFound = 0;
+
+  for (const [index, msg] of messages.entries()) {
+    const key = createMessageKey(msg);
+    if (!seen.has(key)) {
+      seen.add(key);
+      deduplicated.push(msg);
+    } else {
+      duplicatesFound++;
+      console.warn(`Duplicate message found at index ${index}:`, {
+        role: msg.role,
+        key,
+        content:
+          msg.role === 'assistant' && Array.isArray(msg.content)
+            ? msg.content.map((c) => {
+                if (typeof c === 'object' && c !== null && 'type' in c) {
+                  return { 
+                    type: c.type, 
+                    toolCallId: 'toolCallId' in c ? c.toolCallId : undefined 
+                  };
+                }
+                return { type: 'unknown' };
+              })
+            : 'non-assistant message',
+      });
+    }
+  }
+
+  if (duplicatesFound > 0) {
+    console.info(
+      `Removed ${duplicatesFound} duplicate messages. Original: ${messages.length}, Deduplicated: ${deduplicated.length}`
+    );
+  }
+
+  return deduplicated;
+}
+
 const analystExecution = async ({
   inputData,
   runtimeContext,
@@ -219,9 +288,11 @@ const analystExecution = async ({
   try {
     // Messages come directly from think-and-prep step output
     // They are already in CoreMessage[] format
-    const messages = inputData.outputMessages;
+    let messages = inputData.outputMessages;
 
     if (messages && messages.length > 0) {
+      // Deduplicate messages based on role and toolCallId
+      messages = deduplicateMessages(messages);
     }
 
     // Critical check: Ensure messages array is not empty
@@ -236,7 +307,7 @@ const analystExecution = async ({
       const fallbackMessages = inputData.conversationHistory;
       if (fallbackMessages && Array.isArray(fallbackMessages) && fallbackMessages.length > 0) {
         console.warn('Using conversationHistory as fallback for empty outputMessages');
-        // Use fallback but continue with debugging
+        messages = deduplicateMessages(fallbackMessages);
       } else {
         throw new Error(
           'Critical error: No valid messages found in analyst step input. Both outputMessages and conversationHistory are empty.'

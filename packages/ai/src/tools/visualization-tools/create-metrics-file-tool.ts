@@ -45,6 +45,17 @@ interface MetricFileParams {
   yml_content: string;
 }
 
+// Zod schema for validating result metadata from DataSource
+const resultMetadataSchema = z
+  .object({
+    totalRowCount: z.number().optional(),
+    limited: z.boolean().optional(),
+    maxRows: z.number().optional(),
+  })
+  .optional();
+
+type ResultMetadata = z.infer<typeof resultMetadataSchema>;
+
 interface QueryMetadata {
   rowCount: number;
   totalRowCount: number;
@@ -1298,12 +1309,18 @@ async function validateSql(sqlQuery: string, dataSourceId: string): Promise<Vali
         // Truncate results to 25 records for display in validation
         const results = allResults.slice(0, 25);
 
+        // Validate metadata with Zod schema for runtime safety
+        const validatedMetadata = resultMetadataSchema.safeParse(result.metadata);
+        const parsedMetadata: ResultMetadata = validatedMetadata.success
+          ? validatedMetadata.data
+          : undefined;
+
         const metadata: QueryMetadata = {
           rowCount: results.length,
-          totalRowCount: result.metadata?.totalRowCount || allResults.length, // Use total count if available
+          totalRowCount: parsedMetadata?.totalRowCount ?? allResults.length,
           executionTime: result.executionTime || 100,
-          limited: result.metadata?.limited || false,
-          maxRows: result.metadata?.maxRows,
+          limited: parsedMetadata?.limited ?? false,
+          maxRows: parsedMetadata?.maxRows,
         };
 
         let message: string;

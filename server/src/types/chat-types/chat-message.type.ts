@@ -51,7 +51,13 @@ const ReasoningMessage_TextSchema = z.object({
   finished_reasoning: z.boolean().optional(),
 });
 
-const ReasoningFileTypeSchema = z.enum(['metric', 'dashboard', 'reasoning', 'agent-action']);
+const ReasoningFileTypeSchema = z.enum([
+  'metric',
+  'dashboard',
+  'reasoning',
+  'agent-action',
+  'todo',
+]);
 
 const ReasoningFileSchema = z.object({
   id: z.string(),

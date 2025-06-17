@@ -176,14 +176,28 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       };
     }
 
-    const toolCall: AssistantMessageContent = {
-      type: 'tool-call',
-      toolCallId: chunk.toolCallId,
-      toolName: chunk.toolName,
-      args: chunk.args || {},
-    };
+    // Check if this tool call already exists (from streaming start)
+    const existingToolCall = this.state.currentAssistantMessage.content.find(
+      (part): part is typeof part & { toolCallId: string } =>
+        isToolCallContent(part) && part.toolCallId === chunk.toolCallId
+    );
 
-    this.state.currentAssistantMessage.content.push(toolCall);
+    if (existingToolCall) {
+      // Update existing tool call with complete args instead of adding a duplicate
+      if (isToolCallContent(existingToolCall)) {
+        existingToolCall.args = chunk.args || {};
+      }
+    } else {
+      // Only add if it doesn't already exist
+      const toolCall: AssistantMessageContent = {
+        type: 'tool-call',
+        toolCallId: chunk.toolCallId,
+        toolName: chunk.toolName,
+        args: chunk.args || {},
+      };
+
+      this.state.currentAssistantMessage.content.push(toolCall);
+    }
 
     // Start timing on first tool call
     if (!this.state.timing.startTime) {
@@ -477,7 +491,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       // Calculate incremental time since last tool completion (or start time for first tool)
       const lastTime = this.state.timing.lastCompletionTime || this.state.timing.startTime;
       const incrementalTime = completedAt - lastTime;
-      
+
       // Update timing state
       this.state.timing.lastCompletionTime = completedAt;
       this.state.timing.toolCallTimings.set(chunk.toolCallId, incrementalTime);
@@ -535,12 +549,9 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       return;
     }
 
-    console.log('[DEBUG] saveToDatabase called from:', new Error().stack?.split('\n')[2]);
-    console.log('[DEBUG] fileMessagesAdded flag:', this.fileMessagesAdded);
-
     // If file messages have been added and we're trying to save with fewer messages, skip
     if (this.fileMessagesAdded && this.state.responseHistory.length < 2) {
-      console.log('[DEBUG] Skipping save - would overwrite file messages!');
+      // Skip save to avoid overwriting file messages
       return;
     }
 
@@ -595,21 +606,9 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       if (this.state.responseHistory.length > 0) {
         // Keep as array format for the database
         updateFields.responseMessages = this.state.responseHistory;
-
-        console.log('[DEBUG] Saving responseMessages to database:', {
-          count: this.state.responseHistory.length,
-          messages: this.state.responseHistory.map((msg) => ({
-            id: msg.id,
-            type: msg.type,
-            ...(msg.type === 'file' ? { file_type: msg.file_type, file_name: msg.file_name } : {}),
-          })),
-          fullMessages: JSON.stringify(this.state.responseHistory, null, 2),
-        });
       }
 
       await updateMessageFields(this.messageId, updateFields);
-
-      console.log('[DEBUG] updateMessageFields completed successfully');
 
       this.lastSaveTime = Date.now();
 
@@ -1247,6 +1246,9 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
    */
   setInitialMessages(messages: CoreMessage[]): void {
     this.state.accumulatedMessages = [...messages];
+    // Update the index to mark these messages as already processed
+    // This prevents duplicate processing when messages are passed between steps
+    this.state.lastProcessedMessageIndex = messages.length - 1;
   }
 
   /**
@@ -1301,9 +1303,6 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
    * Used to add file response messages after done tool is called
    */
   async addResponseMessages(messages: ResponseEntry[]): Promise<void> {
-    console.log('[DEBUG] addResponseMessages called with:', messages.length, 'messages');
-    console.log('[DEBUG] Messages to add:', messages);
-
     // Add new messages, avoiding duplicates by ID
     const existingIds = new Set(
       this.state.responseHistory
@@ -1314,25 +1313,23 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         .map((r) => r.id)
     );
 
-    console.log('[DEBUG] Existing response IDs:', Array.from(existingIds));
-
     const newMessages = messages.filter((msg) => msg && 'id' in msg && !existingIds.has(msg.id));
-
-    console.log('[DEBUG] New messages after deduplication:', newMessages.length);
 
     if (newMessages.length > 0) {
       // Insert at the beginning instead of the end
       this.state.responseHistory.unshift(...newMessages);
-      console.log(
-        '[DEBUG] Response history after adding:',
-        this.state.responseHistory.length,
-        'total messages'
-      );
       // Mark that file messages have been added
       this.fileMessagesAdded = true;
       // Force an immediate save to persist the new messages
       await this.saveToDatabase();
     }
+  }
+
+  /**
+   * Get the last processed message index
+   */
+  getLastProcessedIndex(): number {
+    return this.state.lastProcessedMessageIndex;
   }
 
   /**
