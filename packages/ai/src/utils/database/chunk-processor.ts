@@ -582,25 +582,17 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       };
 
       if (this.state.responseHistory.length > 0) {
-        // Convert array to object format as expected by database schema
-        updateFields.responseMessages = this.state.responseHistory.reduce<
-          Record<string, ResponseEntry>
-        >((acc, entry) => {
-          if (entry && typeof entry === 'object' && 'id' in entry) {
-            acc[entry.id] = entry;
-          }
-          return acc;
-        }, {});
+        // Keep as array format for the database
+        updateFields.responseMessages = this.state.responseHistory;
 
         console.log('[DEBUG] Saving responseMessages to database:', {
-          count: Object.keys(updateFields.responseMessages).length,
-          keys: Object.keys(updateFields.responseMessages),
+          count: this.state.responseHistory.length,
           messages: this.state.responseHistory.map((msg) => ({
             id: msg.id,
             type: msg.type,
             ...(msg.type === 'file' ? { file_type: msg.file_type, file_name: msg.file_name } : {}),
           })),
-          fullMessages: JSON.stringify(updateFields.responseMessages, null, 2),
+          fullMessages: JSON.stringify(this.state.responseHistory, null, 2),
         });
       }
 
@@ -1285,7 +1277,8 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
     console.log('[DEBUG] New messages after deduplication:', newMessages.length);
 
     if (newMessages.length > 0) {
-      this.state.responseHistory.push(...newMessages);
+      // Insert at the beginning instead of the end
+      this.state.responseHistory.unshift(...newMessages);
       console.log(
         '[DEBUG] Response history after adding:',
         this.state.responseHistory.length,
