@@ -26,7 +26,7 @@ export const ReasoningController: React.FC<ReasoningControllerProps> = ({ chatId
     select: ({ reasoning_message_ids }) => reasoning_message_ids
   });
   const { data: isCompletedStream } = useGetChatMessage(messageId, {
-    select: ({ isCompletedStream }) => isCompletedStream
+    select: ({ is_completed }) => is_completed
   });
   const blackBoxMessage = useQuery({
     ...queryKeys.chatsBlackBoxMessages(messageId),

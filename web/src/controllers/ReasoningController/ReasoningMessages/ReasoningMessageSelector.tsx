@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, type MotionProps } from 'framer-motion';
 import type React from 'react';
 import { useMemo } from 'react';
 import type {
@@ -11,7 +11,7 @@ import { ReasoningMessage_Files } from './ReasoningMessage_Files';
 import { ReasoningMessage_PillsContainer } from './ReasoningMessage_PillContainers';
 import { ReasoningMessage_Text } from './ReasoningMessage_Text';
 
-const itemAnimationConfig = {
+const itemAnimationConfig: MotionProps = {
   initial: { opacity: 0, height: 0 },
   animate: {
     opacity: 1,

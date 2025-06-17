@@ -23,7 +23,7 @@ const meta: Meta<typeof ReasoningMessage_Text> = {
       // Mock message data with text reasoning
       const mockMessage: IBusterChatMessage = {
         id: 'mock-message-id',
-        isCompletedStream: true,
+        is_completed: true,
         created_at: '2024-01-01T00:00:00Z',
         request_message: {
           request: 'test request',
