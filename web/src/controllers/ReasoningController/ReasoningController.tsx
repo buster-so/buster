@@ -37,10 +37,8 @@ export const ReasoningController: React.FC<ReasoningControllerProps> = ({ chatId
 
   const { isAutoScrollEnabled, scrollToBottom, enableAutoScroll } = useAutoScroll(viewportRef, {
     observeSubTree: true,
-    enabled: true
+    enabled: !!viewportRef.current
   });
-
-  console.log(viewportRef.current);
 
   const reasoningIsCompleted = useReasoningIsCompleted(messageId, reasoningMessageIds);
 
@@ -51,10 +49,10 @@ export const ReasoningController: React.FC<ReasoningControllerProps> = ({ chatId
   }, [hasChat, isEmpty(reasoningMessageIds)]);
 
   if (!hasChat || !reasoningMessageIds) return <FileIndeterminateLoader />;
-  console.log(isAutoScrollEnabled);
+
   return (
     <>
-      <ScrollArea viewportRef={viewportRef}>
+      <ScrollArea viewportRef={viewportRef} className="swag h-full">
         <div className="h-full flex-col space-y-2 overflow-y-auto p-5">
           {reasoningMessageIds?.map((reasoningMessageId, messageIndex) => (
             <ReasoningMessageSelector

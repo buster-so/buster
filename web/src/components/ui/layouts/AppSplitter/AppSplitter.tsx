@@ -38,6 +38,8 @@ interface IAppSplitterProps {
   leftPanelClassName?: string;
   rightPanelClassName?: string;
   bustStorageOnInit?: boolean;
+  renderLeftPanel?: boolean;
+  renderRightPanel?: boolean;
 }
 
 export interface AppSplitterRef {
@@ -81,6 +83,8 @@ export const AppSplitter = React.memo(
         rightHidden = false,
         leftHidden = false,
         bustStorageOnInit = false,
+        renderLeftPanel = true,
+        renderRightPanel = true,
         style,
         hideSplitter: hideSplitterProp = false,
         leftPanelClassName,
@@ -512,7 +516,7 @@ export const AppSplitter = React.memo(
             width={isVertical ? leftSize : 'auto'}
             height={!isVertical ? leftSize : 'auto'}
             hidden={leftHidden}>
-            {leftChildren}
+            {renderLeftPanel && leftChildren}
           </Panel>
 
           {showSplitter && (
@@ -531,7 +535,7 @@ export const AppSplitter = React.memo(
             width={isVertical ? rightSize : 'auto'}
             height={!isVertical ? rightSize : 'auto'}
             hidden={rightHidden}>
-            {rightChildren}
+            {renderRightPanel && rightChildren}
           </Panel>
         </div>
       );
