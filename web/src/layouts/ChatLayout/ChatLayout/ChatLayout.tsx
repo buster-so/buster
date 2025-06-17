@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { AppSplitter, type AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
 import { useBusterNotifications } from '@/context/BusterNotifications';
-import { useMount } from '@/hooks';
+import { useDebounce, useMount } from '@/hooks';
 import { CREATE_LANGFUSE_SESSION_URL } from '@/routes/externalRoutes';
 import { ChatContainer } from '../ChatContainer';
 import { ChatContextProvider } from '../ChatContext/ChatContext';
@@ -59,6 +59,10 @@ export const ChatLayout: React.FC<ChatSplitterProps> = ({ children }) => {
     }
   );
 
+  const preserveSide = 'left';
+
+  console.log(selectedLayout, autoSaveId);
+
   return (
     <ChatLayoutContextProvider chatLayoutProps={chatLayoutProps}>
       <ChatContextProvider>
@@ -72,9 +76,10 @@ export const ChatLayout: React.FC<ChatSplitterProps> = ({ children }) => {
           autoSaveId={autoSaveId}
           defaultLayout={defaultSplitterLayout}
           allowResize={selectedLayout === 'both'}
-          preserveSide="left"
+          preserveSide={preserveSide}
           leftPanelMinSize={selectedFile ? DEFAULT_CHAT_OPTION_SIDEBAR_SIZE : '0px'}
           rightPanelMinSize={selectedFile ? DEFAULT_FILE_OPTION_SIDEBAR_SIZE : '0px'}
+          rightPanelMaxSize={selectedLayout === 'chat-only' ? '0px' : 'auto'}
           bustStorageOnInit={false}
         />
       </ChatContextProvider>

@@ -15,6 +15,7 @@ import { Panel } from './Panel';
 import { Splitter } from './Splitter';
 import { AppSplitterProvider } from './AppSplitterProvider';
 import { sizeToPixels, easeInOutCubic, createAutoSaveId } from './helpers';
+import { useMemoizedFn } from '@/hooks';
 
 interface IAppSplitterProps {
   leftChildren: React.ReactNode;
@@ -111,28 +112,25 @@ export const AppSplitter = React.memo(
       const isVertical = useMemo(() => split === 'vertical', [split]);
 
       // Calculate initial size based on default layout
-      const calculateInitialSize = useCallback(
-        (containerSize: number): number => {
-          if (containerSize === 0) return 0;
+      const calculateInitialSize = useMemoizedFn((containerSize: number): number => {
+        if (containerSize === 0) return 0;
 
-          const [leftValue, rightValue] = defaultLayout;
+        const [leftValue, rightValue] = defaultLayout;
 
-          if (preserveSide === 'left' && leftValue !== 'auto') {
-            return sizeToPixels(leftValue, containerSize);
-          } else if (preserveSide === 'right' && rightValue !== 'auto') {
-            return sizeToPixels(rightValue, containerSize);
-          }
-          if (preserveSide === 'left') {
-            return containerSize;
-          }
-          if (preserveSide === 'right') {
-            return containerSize;
-          }
+        if (preserveSide === 'left' && leftValue !== 'auto') {
+          return sizeToPixels(leftValue, containerSize);
+        } else if (preserveSide === 'right' && rightValue !== 'auto') {
+          return sizeToPixels(rightValue, containerSize);
+        }
+        if (preserveSide === 'left') {
+          return containerSize;
+        }
+        if (preserveSide === 'right') {
+          return containerSize;
+        }
 
-          return 280; // Default fallback
-        },
-        [defaultLayout, preserveSide]
-      );
+        return 280; // Default fallback
+      });
 
       // Calculate size constraints once per container size change
       const constraints = useMemo(() => {
@@ -157,38 +155,35 @@ export const AppSplitter = React.memo(
       ]);
 
       // Apply constraints to a size value
-      const applyConstraints = useCallback(
-        (size: number): number => {
-          if (!constraints || !state.containerSize) return size;
+      const applyConstraints = useMemoizedFn((size: number): number => {
+        if (!constraints || !state.containerSize) return size;
 
-          let constrainedSize = size;
+        let constrainedSize = size;
 
-          if (preserveSide === 'left') {
-            constrainedSize = Math.max(constraints.leftMin, Math.min(size, constraints.leftMax));
-            const rightSize = state.containerSize - constrainedSize;
+        if (preserveSide === 'left') {
+          constrainedSize = Math.max(constraints.leftMin, Math.min(size, constraints.leftMax));
+          const rightSize = state.containerSize - constrainedSize;
 
-            if (rightSize < constraints.rightMin) {
-              constrainedSize = state.containerSize - constraints.rightMin;
-            }
-            if (rightSize > constraints.rightMax) {
-              constrainedSize = state.containerSize - constraints.rightMax;
-            }
-          } else {
-            constrainedSize = Math.max(constraints.rightMin, Math.min(size, constraints.rightMax));
-            const leftSize = state.containerSize - constrainedSize;
-
-            if (leftSize < constraints.leftMin) {
-              constrainedSize = state.containerSize - constraints.leftMin;
-            }
-            if (leftSize > constraints.leftMax) {
-              constrainedSize = state.containerSize - constraints.leftMax;
-            }
+          if (rightSize < constraints.rightMin) {
+            constrainedSize = state.containerSize - constraints.rightMin;
           }
+          if (rightSize > constraints.rightMax) {
+            constrainedSize = state.containerSize - constraints.rightMax;
+          }
+        } else {
+          constrainedSize = Math.max(constraints.rightMin, Math.min(size, constraints.rightMax));
+          const leftSize = state.containerSize - constrainedSize;
 
-          return constrainedSize;
-        },
-        [constraints, preserveSide, state.containerSize]
-      );
+          if (leftSize < constraints.leftMin) {
+            constrainedSize = state.containerSize - constraints.leftMin;
+          }
+          if (leftSize > constraints.leftMax) {
+            constrainedSize = state.containerSize - constraints.leftMax;
+          }
+        }
+
+        return constrainedSize;
+      });
 
       // Calculate panel sizes with simplified logic
       const { leftSize, rightSize } = useMemo(() => {
@@ -237,7 +232,7 @@ export const AppSplitter = React.memo(
       const showSplitter = !leftHidden && !rightHidden;
 
       // Update container size and handle initialization
-      const updateContainerSize = useCallback(() => {
+      const updateContainerSize = useMemoizedFn(() => {
         if (!containerRef.current) return;
 
         const size = isVertical
@@ -262,10 +257,10 @@ export const AppSplitter = React.memo(
 
           return newState;
         });
-      }, [isVertical, savedLayout, setSavedLayout, calculateInitialSize]);
+      });
 
       // Animation function
-      const animateWidth = useCallback(
+      const animateWidth = useMemoizedFn(
         async (
           width: string | number,
           side: 'left' | 'right',
@@ -320,29 +315,25 @@ export const AppSplitter = React.memo(
 
             animationRef.current = requestAnimationFrame(animate);
           });
-        },
-        [state.containerSize, preserveSide, savedLayout, setSavedLayout]
+        }
       );
 
       // Set split sizes function
-      const setSplitSizes = useCallback(
-        (sizes: [string | number, string | number]) => {
-          if (!state.containerSize) return;
+      const setSplitSizes = useMemoizedFn((sizes: [string | number, string | number]) => {
+        if (!state.containerSize) return;
 
-          const [leftValue, rightValue] = sizes;
+        const [leftValue, rightValue] = sizes;
 
-          if (preserveSide === 'left' && leftValue !== 'auto') {
-            const newSize = sizeToPixels(leftValue, state.containerSize);
-            setSavedLayout(newSize);
-          } else if (preserveSide === 'right' && rightValue !== 'auto') {
-            const newSize = sizeToPixels(rightValue, state.containerSize);
-            setSavedLayout(newSize);
-          }
+        if (preserveSide === 'left' && leftValue !== 'auto') {
+          const newSize = sizeToPixels(leftValue, state.containerSize);
+          setSavedLayout(newSize);
+        } else if (preserveSide === 'right' && rightValue !== 'auto') {
+          const newSize = sizeToPixels(rightValue, state.containerSize);
+          setSavedLayout(newSize);
+        }
 
-          setState((prev) => ({ ...prev, sizeSetByAnimation: false }));
-        },
-        [state.containerSize, preserveSide, setSavedLayout]
-      );
+        setState((prev) => ({ ...prev, sizeSetByAnimation: false }));
+      });
 
       // Check if side is closed
       const isSideClosed = useCallback(
@@ -362,58 +353,46 @@ export const AppSplitter = React.memo(
       }, [leftSize, rightSize]);
 
       // Mouse event handlers
-      const handleMouseDown = useCallback(
-        (e: React.MouseEvent) => {
-          if (!allowResize) return;
+      const handleMouseDown = useMemoizedFn((e: React.MouseEvent) => {
+        if (!allowResize) return;
 
-          setState((prev) => ({
-            ...prev,
-            isDragging: true,
-            hasUserInteracted: true,
-            sizeSetByAnimation: false
-          }));
+        setState((prev) => ({
+          ...prev,
+          isDragging: true,
+          hasUserInteracted: true,
+          sizeSetByAnimation: false
+        }));
 
-          startPosRef.current = isVertical ? e.clientX : e.clientY;
-          startSizeRef.current = savedLayout ?? 0;
-          e.preventDefault();
-        },
-        [allowResize, isVertical, savedLayout]
-      );
+        startPosRef.current = isVertical ? e.clientX : e.clientY;
+        startSizeRef.current = savedLayout ?? 0;
+        e.preventDefault();
+      });
 
-      const handleMouseMove = useCallback(
-        (e: MouseEvent) => {
-          if (!state.isDragging || !state.containerSize) return;
+      const handleMouseMove = useMemoizedFn((e: MouseEvent) => {
+        if (!state.isDragging || !state.containerSize) return;
 
-          const currentPos = isVertical ? e.clientX : e.clientY;
-          const delta = currentPos - startPosRef.current;
+        const currentPos = isVertical ? e.clientX : e.clientY;
+        const delta = currentPos - startPosRef.current;
 
-          let newSize: number;
+        let newSize: number;
 
-          if (preserveSide === 'left') {
-            newSize = startSizeRef.current + delta;
-          } else {
-            newSize = startSizeRef.current - delta;
-          }
+        if (preserveSide === 'left') {
+          newSize = startSizeRef.current + delta;
+        } else {
+          newSize = startSizeRef.current - delta;
+        }
 
-          const constrainedSize = applyConstraints(newSize);
-          setSavedLayout(constrainedSize);
-        },
-        [
-          state.isDragging,
-          state.containerSize,
-          isVertical,
-          preserveSide,
-          applyConstraints,
-          setSavedLayout
-        ]
-      );
+        const constrainedSize = applyConstraints(newSize);
+        setSavedLayout(constrainedSize);
+      });
 
-      const handleMouseUp = useCallback(() => {
+      const handleMouseUp = useMemoizedFn(() => {
         setState((prev) => ({ ...prev, isDragging: false }));
-      }, []);
+      });
 
       // Effects
       useEffect(() => {
+        console.log('updateContainerSize');
         updateContainerSize();
 
         const resizeObserver = new ResizeObserver(updateContainerSize);
