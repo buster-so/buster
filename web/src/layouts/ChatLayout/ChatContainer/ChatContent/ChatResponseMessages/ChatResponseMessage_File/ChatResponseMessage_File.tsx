@@ -36,6 +36,8 @@ export const ChatResponseMessage_File: React.FC<ChatResponseMessageProps> = Reac
       return ChatResponseMessage_StandardFile;
     }, [file_type]);
 
+    if (!data) return null;
+
     return (
       <SelectedComponent
         isCompletedStream={isCompletedStream}

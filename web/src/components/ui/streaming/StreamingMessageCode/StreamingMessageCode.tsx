@@ -90,13 +90,13 @@ export const StreamingMessageCode: React.FC<
 
   return (
     <FileCard
+      collapsible={collapsible}
       fileName={useMemo(
         () => (
           <TextAndVersionPill fileName={file_name} versionNumber={version_number} />
         ),
         [file_name, version_number]
       )}
-      collapsible={collapsible}
       headerButtons={buttons}>
       <div className="w-full overflow-x-auto p-3">
         {lineSegments.map((segment, index) => (

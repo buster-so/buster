@@ -19,6 +19,10 @@ import { BusterRoutes, createBusterRoute } from '@/routes';
 import { getSelectedChartTypeConfig } from '@/lib/metrics/selectedChartType';
 import { Text } from '@/components/ui/typography';
 import Link from 'next/link';
+import { CollapisbleFileCard } from '@/components/ui/card/CollapisbleFileCard';
+import { ShimmerText } from '@/components/ui/typography/ShimmerText';
+import { TextAndVersionText } from '@/components/ui/typography/TextAndVersionText';
+import { Button } from '@/components/ui/buttons';
 
 export const ChatResponseMessage_DashboardFile: React.FC<{
   isCompletedStream: boolean;
@@ -29,7 +33,6 @@ export const ChatResponseMessage_DashboardFile: React.FC<{
 }> = React.memo(({ isCompletedStream, responseMessage, isSelectedFile, chatId, href }) => {
   const { version_number, id, file_name } = responseMessage;
   const metricId = useChatLayoutContextSelector((x) => x.metricId);
-  const metricVersionNumber = useChatLayoutContextSelector((x) => x.metricVersionNumber);
   const prefetchGetDashboard = usePrefetchGetDashboardClient();
   const {
     data: dashboardResponse,
@@ -49,6 +52,10 @@ export const ChatResponseMessage_DashboardFile: React.FC<{
   );
 
   const HeaderWrapper = useMemo(() => {
+    if (metricId) {
+      return React.Fragment;
+    }
+
     const Component = ({ children }: { children: React.ReactNode }) => (
       <Link href={href} passHref prefetch>
         {children}
@@ -56,7 +63,15 @@ export const ChatResponseMessage_DashboardFile: React.FC<{
     );
     Component.displayName = 'HeaderWrapper';
     return Component;
-  }, [href]);
+  }, [href, metricId]);
+
+  const FileInfo = useMemo(() => {
+    if (metricId) {
+      return <SelectDashboardButtonAndText fileName={file_name} dashboardId={id} chatId={chatId} />;
+    }
+
+    return <TextAndVersionText text={file_name} version={version_number} />;
+  }, [file_name, version_number, metricId]);
 
   useMount(() => {
     if (isSelectedFile) prefetchGetDashboard(id, version_number);
@@ -70,27 +85,24 @@ export const ChatResponseMessage_DashboardFile: React.FC<{
         onMouseEnter={() => {
           prefetchGetDashboard(id, version_number);
         }}>
-        <FileCard
-          className={cn(
-            'overflow-hidden',
-            isSelectedFile && 'border-foreground shadow-md transition-all duration-200',
-            !isSelectedFile && 'hover:border-gray-light'
-          )}
+        <CollapisbleFileCard
           collapseContent={true}
-          collapsible={isFetched && !isError ? 'overlay-peek' : false}
+          collapsible={'chevron'}
+          selected={isSelectedFile}
           collapseDefaultIcon={<HeaderIcon isLoading={isLoading} isError={isError} />}
-          headerClassName="bg-background"
-          fileName={<TextAndVersionPill fileName={file_name} versionNumber={version_number} />}
+          fileName={FileInfo}
           headerWrapper={HeaderWrapper}>
-          {dashboardResponse && (
+          {dashboardResponse ? (
             <Content
               dashboardResponse={dashboardResponse}
               isFetched={isFetched}
               metricId={metricId}
               chatId={chatId}
             />
+          ) : (
+            <ShimmerText text="Loading..." />
           )}
-        </FileCard>
+        </CollapisbleFileCard>
       </motion.div>
     </AnimatePresence>
   );
@@ -213,3 +225,29 @@ const Content: React.FC<{
 });
 
 Content.displayName = 'Content';
+
+const SelectDashboardButtonAndText: React.FC<{
+  chatId: string;
+  dashboardId: string;
+  fileName: string;
+}> = React.memo(({ fileName, dashboardId, chatId }) => {
+  return (
+    <div className="flex w-full items-center justify-between space-x-1.5 overflow-hidden">
+      <Text size={'base'} truncate>
+        {fileName}
+      </Text>
+      <Link
+        href={createBusterRoute({
+          route: BusterRoutes.APP_CHAT_ID_DASHBOARD_ID,
+          chatId,
+          dashboardId
+        })}>
+        <Button size={'small'} variant={'default'} className="min-w-fit">
+          View dashboard
+        </Button>
+      </Link>
+    </div>
+  );
+});
+
+SelectDashboardButtonAndText.displayName = 'SelectDashboardButtonAndText';
