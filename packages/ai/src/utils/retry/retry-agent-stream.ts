@@ -69,6 +69,114 @@ export function detectRetryableError(error: unknown): RetryableError | null {
     };
   }
 
+  // Handle rate limiting - very common with Claude
+  if (
+    error instanceof Error &&
+    (error.message.includes('rate_limit_error') ||
+      error.message.includes('429') ||
+      error.message.includes('Too Many Requests') ||
+      error.message.includes('rate limit'))
+  ) {
+    return {
+      type: 'rate-limit',
+      originalError: error,
+      healingMessage: {
+        role: 'user',
+        content: 'Rate limit reached, please wait and try again.',
+      },
+    };
+  }
+
+  // Handle server errors (5xx) - transient infrastructure issues
+  if (
+    error instanceof Error &&
+    (error.message.includes('500') ||
+      error.message.includes('502') ||
+      error.message.includes('503') ||
+      error.message.includes('504') ||
+      error.message.includes('server_overload') ||
+      error.message.includes('internal_server_error'))
+  ) {
+    return {
+      type: 'server-error',
+      originalError: error,
+      healingMessage: {
+        role: 'user',
+        content: 'Server temporarily unavailable, retrying...',
+      },
+    };
+  }
+
+  // Handle network timeouts and connection issues
+  if (
+    error instanceof Error &&
+    (error.message.includes('timeout') ||
+      error.message.includes('ETIMEDOUT') ||
+      error.message.includes('ECONNRESET') ||
+      error.message.includes('ENOTFOUND') ||
+      error.message.includes('connection'))
+  ) {
+    return {
+      type: 'network-timeout',
+      originalError: error,
+      healingMessage: {
+        role: 'user',
+        content: 'Connection timeout, please retry.',
+      },
+    };
+  }
+
+  // Handle stream interruption - when stream cuts off unexpectedly
+  if (
+    error instanceof Error &&
+    ((error.message.includes('stream') && error.message.includes('ended')) ||
+      error.message.includes('unexpected_end') ||
+      error.message.includes('stream was destroyed') ||
+      error.message.includes('premature close'))
+  ) {
+    return {
+      type: 'stream-interruption',
+      originalError: error,
+      healingMessage: {
+        role: 'user',
+        content: 'Please continue where you left off.',
+      },
+    };
+  }
+
+  // Handle JSON parsing errors in responses
+  if (
+    (error instanceof Error && error.name === 'SyntaxError' && error.message.includes('JSON')) ||
+    (error instanceof Error && error.message.includes('JSON parse'))
+  ) {
+    return {
+      type: 'json-parse-error',
+      originalError: error,
+      healingMessage: {
+        role: 'user',
+        content: 'There was an issue with the response format. Please try again with proper formatting.',
+      },
+    };
+  }
+
+  // Handle content policy violations - sometimes recoverable
+  if (
+    error instanceof Error &&
+    (error.message.includes('content_policy') ||
+      error.message.includes('safety') ||
+      error.message.includes('harmful') ||
+      error.message.includes('inappropriate'))
+  ) {
+    return {
+      type: 'content-policy',
+      originalError: error,
+      healingMessage: {
+        role: 'user',
+        content: 'Please rephrase your response to comply with content policies.',
+      },
+    };
+  }
+
   return null;
 }
 

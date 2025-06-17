@@ -9,6 +9,10 @@
   "exclude": ["node_modules", "dist"],
   "references": [
     { "path": "../packages/database" },
-    { "path": "../packages/test-utils" }
+    { "path": "../packages/test-utils" },
+    { "path": "../packages/ai" },
+    { "path": "../packages/access-controls" },
+    { "path": "../packages/stored-values" },
+    { "path": "../server" }
   ]
 }
