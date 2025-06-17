@@ -22,9 +22,10 @@ type LineSegment = {
 export const StreamingMessageCode: React.FC<
   BusterChatMessageReasoning_file & {
     isCompletedStream: boolean;
+    collapsible?: 'chevron' | 'overlay-peek' | false;
     buttons?: React.ReactNode;
   }
-> = ({ isCompletedStream, file, file_name, version_number, buttons }) => {
+> = ({ isCompletedStream, file, file_name, version_number, buttons, collapsible = false }) => {
   const { text = '', modified } = file;
 
   const [lineSegments, setLineSegments] = useState<LineSegment[]>([]);
@@ -95,6 +96,7 @@ export const StreamingMessageCode: React.FC<
         ),
         [file_name, version_number]
       )}
+      collapsible={collapsible}
       headerButtons={buttons}>
       <div className="w-full overflow-x-auto p-3">
         {lineSegments.map((segment, index) => (

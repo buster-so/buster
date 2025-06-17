@@ -2,14 +2,15 @@ import type { ElectricShapeOptions } from '../instances';
 import type {
   BusterChatMessage,
   BusterChatMessageReasoning,
+  BusterChatMessageRequest,
   BusterChatMessageResponse
 } from '@/api/asset_interfaces/chat';
 
 export type BusterChatMessageShape = {
   id: string;
-  request_message: string; //BusterChatMessage['request_message'] | null;
-  response_messages: string; //BusterChatMessageResponse[];
-  reasoning: string; //BusterChatMessageReasoning[];
+  request_message: string | BusterChatMessageRequest;
+  response_messages: string | BusterChatMessageResponse[];
+  reasoning: string | BusterChatMessageReasoning[];
   created_at: BusterChatMessage['created_at'];
   final_reasoning_message: BusterChatMessage['final_reasoning_message'];
   feedback: BusterChatMessage['feedback'];

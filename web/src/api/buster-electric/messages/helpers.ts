@@ -52,8 +52,6 @@ export const updateMessageShapeToIChatMessage = (
     ...(message.feedback !== undefined && { feedback: message.feedback })
   };
 
-  console.log('convertedMessage', convertedMessage);
-
   return convertedMessage;
 };
 
@@ -61,6 +59,7 @@ const parseResponseMessages = (
   responseMessages: string | undefined
 ): BusterChatMessageResponse[] => {
   try {
+    if (typeof responseMessages === 'object') return responseMessages;
     if (!responseMessages) return [];
     return JSON.parse(responseMessages);
   } catch (error) {
@@ -72,6 +71,7 @@ const parseReasoningMessages = (
   reasoningMessages: string | undefined
 ): BusterChatMessageReasoning[] => {
   try {
+    if (typeof reasoningMessages === 'object') return reasoningMessages;
     if (!reasoningMessages) return [];
     return JSON.parse(reasoningMessages);
   } catch (error) {
@@ -81,6 +81,7 @@ const parseReasoningMessages = (
 
 const parseRequestMessage = (requestMessage: string | undefined): BusterChatMessageRequest => {
   try {
+    if (typeof requestMessage === 'object') return requestMessage;
     if (!requestMessage) return null;
     return JSON.parse(requestMessage);
   } catch (error) {

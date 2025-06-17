@@ -29,7 +29,7 @@ export const Panel: React.FC<IPanelProps> = React.memo(
     return (
       <div
         className={cn(
-          'overflow-auto',
+          // 'overflow-auto',
           // When we have a specific width or height, we should not grow/shrink
           width !== 'auto' || height !== 'auto' ? 'flex-shrink-0 flex-grow-0' : 'flex-1',
           className

@@ -4,7 +4,13 @@ import { Text } from '@/components/ui/typography';
 import { CircleSpinnerLoader } from '@/components/ui/loaders';
 import { CheckDouble } from '@/components/ui/icons';
 import { CircleWarning } from '@/components/ui/icons/NucleoIconFilled';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, type MotionProps } from 'framer-motion';
+
+const animationProps: MotionProps = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 }
+};
 
 export const StreamingMessageStatus = React.memo(
   ({ status }: { status: BusterChatMessageReasoning_file['status'] }) => {
@@ -34,11 +40,7 @@ export const StreamingMessageStatus = React.memo(
 
     return (
       <AnimatePresence mode="wait">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          key={status}>
+        <motion.div {...animationProps} key={status}>
           {content}
         </motion.div>
       </AnimatePresence>

@@ -213,14 +213,19 @@ const CollapseContent = React.memo(
           <motion.div
             className="group relative overflow-hidden"
             initial={{
-              height: isCollapsed ? collapsedHeight : 'auto'
+              height: isCollapsed ? collapsedHeight : 'auto',
+              filter: 'blur(0px)'
             }}
             animate={{
-              height: isCollapsed ? collapsedHeight : 'auto'
+              height: isCollapsed ? collapsedHeight : 'auto',
+              filter: 'blur(0px)'
             }}
             transition={{
               duration: isInitialMount ? 0 : 0.25,
-              ease: 'easeInOut'
+              ease: 'easeInOut',
+              filter: {
+                duration: 0.15
+              }
             }}
             data-testid="collapse-content">
             {ContentWrapper}

@@ -9,6 +9,7 @@ export const ReasoningScrollToBottom: React.FC<{
 }> = React.memo(({ isAutoScrollEnabled, scrollToBottom }) => {
   return (
     <div
+      data-testid="reasoning-scroll-to-bottom"
       className={cn(
         'absolute right-4 bottom-4 z-10 duration-300',
         isAutoScrollEnabled

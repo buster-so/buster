@@ -41,10 +41,20 @@ export const ReasoningMessage_File: React.FC<ReasoningMessageFileProps> = React.
       );
     }, [isCompletedStream, status, file_type, chatId, id, version_number]);
 
+    const collapsible: 'overlay-peek' | false = useMemo(() => {
+      if (file_type === 'agent-action') return 'overlay-peek';
+      return false;
+    }, [file_type]);
+
     if (isEmpty(file)) return null;
 
     return (
-      <StreamingMessageCode {...file} buttons={buttons} isCompletedStream={isCompletedStream} />
+      <StreamingMessageCode
+        {...file}
+        collapsible={collapsible}
+        buttons={buttons}
+        isCompletedStream={isCompletedStream}
+      />
     );
   }
 );

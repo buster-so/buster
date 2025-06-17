@@ -96,7 +96,6 @@ export const useShapeStream = <T extends Row<unknown> = Row<unknown>>(
       }
 
       if (isUnsubscribedTriggered) {
-        console.log('unsubscibre all isUnsubscribedTriggered');
         unsubscribe();
         quit();
         return;

@@ -17,7 +17,7 @@ export const SidebarFooter: React.FC<SidebarFooterProps> = React.memo(
       <div
         className={cn(
           COLLAPSED_COLUMN,
-          'mt-auto mb-3.5 flex items-center justify-center gap-2 overflow-hidden pt-5',
+          'mt-auto mb-3.5 flex items-center justify-center gap-2 overflow-hidden pt-2.5',
           className
         )}
         data-testid="sidebar-footer">

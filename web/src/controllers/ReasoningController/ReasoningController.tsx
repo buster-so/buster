@@ -40,6 +40,8 @@ export const ReasoningController: React.FC<ReasoningControllerProps> = ({ chatId
     enabled: true
   });
 
+  console.log(viewportRef.current);
+
   const reasoningIsCompleted = useReasoningIsCompleted(messageId, reasoningMessageIds);
 
   useEffect(() => {
@@ -49,7 +51,7 @@ export const ReasoningController: React.FC<ReasoningControllerProps> = ({ chatId
   }, [hasChat, isEmpty(reasoningMessageIds)]);
 
   if (!hasChat || !reasoningMessageIds) return <FileIndeterminateLoader />;
-
+  console.log(isAutoScrollEnabled);
   return (
     <>
       <ScrollArea viewportRef={viewportRef}>
