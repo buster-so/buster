@@ -87,7 +87,10 @@ export function detectFailurePattern(conversationHistory: CoreMessage[]): CoreMe
     (msg) =>
       msg.role === 'assistant' &&
       Array.isArray(msg.content) &&
-      msg.content.some((part) => typeof part === 'object' && part !== null && 'type' in part && part.type === 'tool-call')
+      msg.content.some(
+        (part) =>
+          typeof part === 'object' && part !== null && 'type' in part && part.type === 'tool-call'
+      )
   );
 
   if (toolCalls.length >= 3) {
@@ -95,14 +98,22 @@ export function detectFailurePattern(conversationHistory: CoreMessage[]): CoreMe
     const toolNames = toolCalls.flatMap((msg) =>
       Array.isArray(msg.content)
         ? msg.content
-            .filter((part): part is { type: 'tool-call'; toolCallId: string; toolName: string; args: unknown } => 
-              typeof part === 'object' && 
-              part !== null && 
-              'type' in part && 
-              part.type === 'tool-call' && 
-              'toolCallId' in part && 
-              'toolName' in part && 
-              'args' in part
+            .filter(
+              (
+                part
+              ): part is {
+                type: 'tool-call';
+                toolCallId: string;
+                toolName: string;
+                args: unknown;
+              } =>
+                typeof part === 'object' &&
+                part !== null &&
+                'type' in part &&
+                part.type === 'tool-call' &&
+                'toolCallId' in part &&
+                'toolName' in part &&
+                'args' in part
             )
             .map((part) => part.toolName)
         : []

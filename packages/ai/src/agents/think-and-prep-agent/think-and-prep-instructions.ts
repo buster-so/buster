@@ -1,10 +1,12 @@
 import { getPermissionedDatasets } from '@buster/access-controls';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
+import { getSqlDialectGuidance } from '../shared/sql-dialect-guidance';
 
 // Define the required template parameters
 interface ThinkAndPrepTemplateParams {
   databaseContext: string;
+  sqlDialectGuidance: string;
 }
 
 // Template string as a function that requires parameters
@@ -256,6 +258,70 @@ Once all TODO list items are addressed and submitted for review, the system will
   - Favor pre-aggregated metrics over assumed calculations for accuracy/reliability
 </metric_rules>
 
+<sql_best_practices>
+- Current SQL Dialect Guidance:
+${params.sqlDialectGuidance}
+  - Performance: Ensure date/timestamp columns used in \`WHERE\` or \`JOIN\` clauses are indexed. Consider functional indexes on \`DATE_TRUNC\` or \`EXTRACT\` expressions if filtering/grouping by them frequently.
+- Keep Queries Simple: Strive for simplicity and clarity in your SQL. Adhere as closely as possible to the user's direct request without overcomplicating the logic or making unnecessary assumptions.
+- Default Time Range: If the user does not specify a time range for analysis, default to the last 12 months from the current date. Clearly state this assumption if making it.
+- Avoid Bold Assumptions: Do not make complex or bold assumptions about the user's intent or the underlying data. If the request is highly ambiguous beyond a reasonable time frame assumption, indicate this limitation in your final response.
+- Prioritize Defined Metrics: Before constructing complex custom SQL, check if pre-defined metrics or columns exist in the provided data context that already represent the concept the user is asking for. Prefer using these established definitions.
+- Grouping and Aggregation:
+  - \`GROUP BY\` Clause: Include all non-aggregated \`SELECT\` columns. Using explicit names is clearer than ordinal positions (\`GROUP BY 1, 2\`).
+  - \`HAVING\` Clause: Use \`HAVING\` to filter *after* aggregation (e.g., \`HAVING COUNT(*) > 10\`). Use \`WHERE\` to filter *before* aggregation for efficiency.
+  - Window Functions: Consider window functions (\`OVER (...)\`) for calculations relative to the current row (e.g., ranking, running totals) as an alternative/complement to \`GROUP BY\`.
+- Constraints:
+  - Strict JOINs: Only join tables where relationships are explicitly defined via \`relationships\` or \`entities\` keys in the provided data context/metadata. Do not join tables without a pre-defined relationship.
+- SQL Requirements:
+  - Use database-qualified schema-qualified table names (\`<DATABASE_NAME>.<SCHEMA_NAME>.<TABLE_NAME>\`).
+  - Use fully qualified column names with table aliases (e.g., \`<table_alias>.<column>\`).
+  - MANDATORY SQL NAMING CONVENTIONS:
+    - All Table References: MUST be fully qualified: \`DATABASE_NAME.SCHEMA_NAME.TABLE_NAME\`.
+    - All Column References: MUST be qualified with their table alias (e.g., \`alias.column_name\`) or CTE name (e.g., \`cte_alias.column_name_from_cte\`).
+    - Inside CTE Definitions: When defining a CTE (e.g., \`WITH my_cte AS (SELECT t.column1 FROM DATABASE.SCHEMA.TABLE1 t ...)\`), all columns selected from underlying database tables MUST use their table alias (e.g., \`t.column1\`, not just \`column1\`). This applies even if the CTE is simple and selects from only one table.
+    - Selecting From CTEs: When selecting from a defined CTE, use the CTE's alias for its columns (e.g., \`SELECT mc.column1 FROM my_cte mc ...\`).
+    - Universal Application: These naming conventions are strict requirements and apply universally to all parts of the SQL query, including every CTE definition and every subsequent SELECT statement. Non-compliance will lead to errors.
+  - Context Adherence: Strictly use only columns that are present in the data context provided by search results. Never invent or assume columns.
+  - Select specific columns (avoid \`SELECT *\` or \`COUNT(*)\`).
+  - Use CTEs instead of subqueries, and use snake_case for naming them.
+  - Use \`DISTINCT\` (not \`DISTINCT ON\`) with matching \`GROUP BY\`/\`SORT BY\` clauses.
+  - Show entity names rather than just IDs.
+  - Handle date conversions appropriately.
+  - Order dates in ascending order.
+  - Reference database identifiers for cross-database queries.
+  - Format output for the specified visualization type.
+  - Maintain a consistent data structure across requests unless changes are required.
+  - Use explicit ordering for custom buckets or categories.
+  - Avoid division by zero errors by using NULLIF() or CASE statements (e.g., \`SELECT amount / NULLIF(quantity, 0)\` or \`CASE WHEN quantity = 0 THEN NULL ELSE amount / quantity END\`).
+  - Consider potential data duplication and apply deduplication techniques (e.g., \`DISTINCT\`, \`GROUP BY\`) where necessary.
+  - Fill Missing Values: For metrics, especially in time series, fill potentially missing values (NULLs) using \`COALESCE(<column>, 0)\` to default them to zero, ensuring continuous data unless the user specifically requests otherwise. 
+    - Handle Missing Time Periods: When creating time series visualizations, ensure ALL requested time periods are represented, even when no underlying data exists for certain periods. This is critical for avoiding confusing gaps in charts and tables.
+    - **Generate Complete Date Ranges**: Use \`generate_series()\` to create a complete series of dates/periods, then LEFT JOIN with your actual data:
+      \`\`\`sql
+      WITH date_series AS (
+        SELECT generate_series(
+          DATE_TRUNC('month', CURRENT_DATE - INTERVAL '11 months'),
+          DATE_TRUNC('month', CURRENT_DATE),
+          INTERVAL '1 month'
+        )::date AS period_start
+      )
+      SELECT 
+        ds.period_start,
+        COALESCE(SUM(t.amount), 0) AS total_amount
+      FROM date_series ds
+      LEFT JOIN database.schema.transactions t ON DATE_TRUNC('month', t.date) = ds.period_start
+      GROUP BY ds.period_start
+      ORDER BY ds.period_start;
+      \`\`\`
+    - **Common Time Period Patterns**:
+      - Daily: \`generate_series(start_date, end_date, INTERVAL '1 day')\`
+      - Weekly: \`generate_series(DATE_TRUNC('week', start_date), DATE_TRUNC('week', end_date), INTERVAL '1 week')\`
+      - Monthly: \`generate_series(DATE_TRUNC('month', start_date), DATE_TRUNC('month', end_date), INTERVAL '1 month')\`
+      - Quarterly: \`generate_series(DATE_TRUNC('quarter', start_date), DATE_TRUNC('quarter', end_date), INTERVAL '3 months')\`
+    - **Always use LEFT JOIN**: Join the generated date series with your data tables, not the other way around, to preserve all time periods.
+    - **Default Missing Values**: Use \`COALESCE()\` or \`ISNULL()\` to convert NULLs to appropriate defaults (usually 0 for counts/sums, but consider the context). 
+</sql_best_practices>
+
 <dashboard_rules>
 - If you plan to create more than one visualization, these should always be compiled into a dashboard
 - Include specified filters in dashboard titles
@@ -369,6 +435,7 @@ export const getThinkAndPrepInstructions = async ({
   runtimeContext,
 }: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }): Promise<string> => {
   const userId = runtimeContext.get('userId');
+  const dataSourceSyntax = runtimeContext.get('dataSourceSyntax');
 
   const datasets = await getPermissionedDatasets(userId, 0, 1000);
 
@@ -378,7 +445,11 @@ export const getThinkAndPrepInstructions = async ({
     .filter((content: string | null | undefined) => content !== null && content !== undefined)
     .join('\n---\n');
 
+  // Get dialect-specific guidance
+  const sqlDialectGuidance = getSqlDialectGuidance(dataSourceSyntax);
+
   return createThinkAndPrepInstructions({
     databaseContext: assembledYmlContent,
+    sqlDialectGuidance,
   });
 };

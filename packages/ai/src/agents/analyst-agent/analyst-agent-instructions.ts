@@ -1,10 +1,12 @@
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { getPermissionedDatasets } from '../../../../access-controls/src/access-controls';
 import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
+import { getSqlDialectGuidance } from '../shared/sql-dialect-guidance';
 
 // Define the required template parameters
 interface AnalystTemplateParams {
   databaseContext: string;
+  sqlDialectGuidance: string;
 }
 
 // Template string as a function that requires parameters
@@ -143,16 +145,8 @@ You operate in a loop to complete tasks:
 
 <sql_best_practices>
 - Current SQL Dialect Guidance:
-  - Date/Time Functions:
-    - \`DATE_TRUNC\`: Prefer \`DATE_TRUNC('day', column)\`, \`DATE_TRUNC('week', column)\`, \`DATE_TRUNC('month', column)\`, etc., for grouping time series data. Note that \`'week'\` starts on Monday.
-    - \`EXTRACT\`:
-      - \`EXTRACT(DOW FROM column)\` gives day of week (0=Sunday, 6=Saturday).
-      - \`EXTRACT(ISODOW FROM column)\` gives ISO day of week (1=Monday, 7=Sunday).
-      - \`EXTRACT(WEEK FROM column)\` gives the week number (starting Monday). Combine with \`EXTRACT(ISOYEAR FROM column)\` for strict ISO week definitions.
-      - \`EXTRACT(EPOCH FROM column)\` returns Unix timestamp (seconds).
-    - Intervals: Use \`INTERVAL '1 day'\`, \`INTERVAL '1 month'\`, etc., for date arithmetic. Be mindful of variations in month/year lengths.
-    - Current Date/Time: \`CURRENT_DATE\`, \`CURRENT_TIMESTAMP\`, \`NOW()\`.
-    - Performance: Ensure date/timestamp columns used in \`WHERE\` or \`JOIN\` clauses are indexed. Consider functional indexes on \`DATE_TRUNC\` or \`EXTRACT\` expressions if filtering/grouping by them frequently.
+${params.sqlDialectGuidance}
+  - Performance: Ensure date/timestamp columns used in \`WHERE\` or \`JOIN\` clauses are indexed. Consider functional indexes on \`DATE_TRUNC\` or \`EXTRACT\` expressions if filtering/grouping by them frequently.
 - Keep Queries Simple: Strive for simplicity and clarity in your SQL. Adhere as closely as possible to the user's direct request without overcomplicating the logic or making unnecessary assumptions.
 - Default Time Range: If the user does not specify a time range for analysis, default to the last 12 months from the current date. Clearly state this assumption if making it.
 - Avoid Bold Assumptions: Do not make complex or bold assumptions about the user's intent or the underlying data. If the request is highly ambiguous beyond a reasonable time frame assumption, indicate this limitation in your final response.
@@ -295,6 +289,7 @@ export const getAnalystInstructions = async ({
   runtimeContext,
 }: { runtimeContext: RuntimeContext<AnalystRuntimeContext> }): Promise<string> => {
   const userId = runtimeContext.get('userId');
+  const dataSourceSyntax = runtimeContext.get('dataSourceSyntax');
 
   const datasets = await getPermissionedDatasets(userId, 0, 1000);
 
@@ -304,7 +299,11 @@ export const getAnalystInstructions = async ({
     .filter((content: string | null | undefined) => content !== null && content !== undefined)
     .join('\n---\n');
 
+  // Get dialect-specific guidance
+  const sqlDialectGuidance = getSqlDialectGuidance(dataSourceSyntax);
+
   return createAnalystInstructions({
     databaseContext: assembledYmlContent,
+    sqlDialectGuidance,
   });
 };
