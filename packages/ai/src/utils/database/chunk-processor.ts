@@ -108,33 +108,62 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
    * Process a chunk and potentially save to database
    */
   async processChunk(chunk: TextStreamPart<T>): Promise<void> {
+    // DEBUG: Log chunk processing
+    console.log('[DEBUG] ChunkProcessor.processChunk:', {
+      type: chunk.type,
+      messageId: this.messageId,
+      hasCurrentAssistant: !!this.state.currentAssistantMessage,
+      accumulatedCount: this.state.accumulatedMessages.length,
+      timestamp: new Date().toISOString()
+    });
+
     switch (chunk.type) {
       case 'text-delta':
+        console.log('[DEBUG] Processing text-delta:', chunk.textDelta);
         this.handleTextDelta(chunk);
         break;
 
       case 'tool-call':
-        // Complete tool call with args already available
+        console.log('[DEBUG] Processing tool-call:', {
+          toolName: chunk.toolName,
+          toolCallId: chunk.toolCallId,
+          args: chunk.args
+        });
         this.handleToolCall(chunk);
         break;
 
       case 'tool-call-streaming-start':
+        console.log('[DEBUG] Processing tool-call-streaming-start:', {
+          toolName: chunk.toolName,
+          toolCallId: chunk.toolCallId
+        });
         this.handleToolCallStart(chunk);
         break;
 
       case 'tool-call-delta':
+        console.log('[DEBUG] Processing tool-call-delta:', {
+          toolCallId: chunk.toolCallId,
+          argsTextDelta: chunk.argsTextDelta
+        });
         this.handleToolCallDelta(chunk);
         break;
 
       case 'tool-result':
+        console.log('[DEBUG] Processing tool-result:', {
+          toolName: chunk.toolName,
+          toolCallId: chunk.toolCallId,
+          result: chunk.result
+        });
         await this.handleToolResult(chunk);
         break;
 
       case 'step-finish':
+        console.log('[DEBUG] Processing step-finish');
         await this.handleStepFinish();
         break;
 
       case 'finish':
+        console.log('[DEBUG] Processing finish');
         await this.handleFinish();
         break;
     }
@@ -460,6 +489,19 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         return;
       }
 
+      // DEBUG: Log what we're about to save
+      console.log('[DEBUG] saveToDatabase:', {
+        messageId: this.messageId,
+        totalMessages: allMessages.length,
+        lastProcessedIndex: this.state.lastProcessedMessageIndex,
+        newMessagesCount: allMessages.length - (this.state.lastProcessedMessageIndex + 1),
+        reasoningCount: this.state.reasoningHistory.length,
+        responseCount: this.state.responseHistory.length,
+        hasCurrentAssistant: !!this.state.currentAssistantMessage,
+        messageRoles: allMessages.map(m => m.role),
+        timestamp: new Date().toISOString()
+      });
+
       // Only process messages that haven't been processed yet
       const messagesToProcess = allMessages.slice(this.state.lastProcessedMessageIndex + 1);
 
@@ -497,6 +539,12 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       if (this.state.responseHistory.length > 0) {
         updateFields.responseMessages = this.state.responseHistory;
       }
+
+      console.log('[DEBUG] Saving to database with fields:', {
+        rawLlmMessagesCount: updateFields.rawLlmMessages.length,
+        reasoningCount: updateFields.reasoning.length,
+        responseMessagesCount: updateFields.responseMessages?.length || 0
+      });
 
       await updateMessageFields(this.messageId, updateFields);
 

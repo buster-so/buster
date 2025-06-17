@@ -16,6 +16,13 @@ export const createOnChunkHandler = ({
   onFinishingTool?: () => void;
 }) => {
   return async (event: { chunk: TextStreamPart<ToolSet> }) => {
+    // DEBUG: Log raw chunk data
+    console.log('[DEBUG] onChunk received:', {
+      type: event.chunk.type,
+      chunk: event.chunk,
+      timestamp: new Date().toISOString()
+    });
+
     // Process chunk and save to database in real-time
     await chunkProcessor.processChunk(event.chunk);
 

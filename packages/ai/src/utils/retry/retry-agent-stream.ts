@@ -157,7 +157,7 @@ export async function retryableAgentStreamWithHealing<T extends ToolSet>({
       let healingResult = null;
       if (isHealableStreamError(error)) {
         // Get available tools from agent if possible
-        const availableTools = (agent as { tools?: Record<string, unknown> }).tools || {};
+        const availableTools = (agent as { tools?: ToolSet }).tools || {};
         healingResult = healStreamingToolError(error, availableTools);
       }
 

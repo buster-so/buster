@@ -6,7 +6,7 @@
 
 /*
 describe('Modify Metrics File Tool Integration Tests', () => {
-  let mockRuntimeContext: any;
+  let mockRuntimeContext: { get: (key: string) => string; set: (key: string, value: string) => void };
   let testDataSourceId: string;
   let testUserId: string;
   let testOrgId: string;

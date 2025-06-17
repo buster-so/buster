@@ -300,8 +300,8 @@ export const getAnalystInstructions = async ({
 
   // Extract yml_content from each dataset and join with separators
   const assembledYmlContent = datasets
-    .map((dataset) => dataset.ymlFile)
-    .filter((content) => content !== null && content !== undefined)
+    .map((dataset: { ymlFile: string | null | undefined }) => dataset.ymlFile)
+    .filter((content: string | null | undefined) => content !== null && content !== undefined)
     .join('\n---\n');
 
   return createAnalystInstructions({

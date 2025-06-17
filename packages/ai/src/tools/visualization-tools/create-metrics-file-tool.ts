@@ -1045,7 +1045,8 @@ const createMetricFiles = wrapTraced(
     );
 
     const successfulProcessing: Array<{
-      metricFile: typeof metricFiles.$inferSelect;
+      fileName: string;
+      metricFile: FileWithId;
       metricYml: MetricYml;
       message: string;
       results: Record<string, unknown>[];
@@ -1063,6 +1064,7 @@ const createMetricFiles = wrapTraced(
           result.results
         ) {
           successfulProcessing.push({
+            fileName,
             metricFile: result.metricFile,
             metricYml: result.metricYml,
             message: result.message,
@@ -1085,9 +1087,35 @@ const createMetricFiles = wrapTraced(
     // Database operations
     if (successfulProcessing.length > 0) {
       try {
-        await db.transaction(async (tx) => {
+        await db.transaction(async (tx: typeof db) => {
           // Insert metric files
-          const metricRecords = successfulProcessing.map((sp) => sp.metricFile);
+          const metricRecords = successfulProcessing.map((sp) => ({
+            id: sp.metricFile.id,
+            name: sp.metricFile.name,
+            fileName: sp.fileName,
+            content: sp.metricYml,
+            verification: 'notRequested' as const,
+            evaluationObj: null,
+            evaluationSummary: null,
+            evaluationScore: null,
+            organizationId,
+            createdBy: userId,
+            createdAt: sp.metricFile.created_at,
+            updatedAt: sp.metricFile.updated_at,
+            deletedAt: null,
+            publiclyAccessible: false,
+            publiclyEnabledBy: null,
+            publicExpiryDate: null,
+            versionHistory: { version: sp.metricFile.version_number, history: [sp.metricYml] },
+            dataMetadata: sp.results ? { 
+              rowCount: sp.results.length, 
+              totalRowCount: sp.results.length, 
+              executionTime: 0, 
+              limited: false 
+            } : null,
+            publicPassword: null,
+            dataSourceId,
+          }));
           await tx.insert(metricFiles).values(metricRecords);
 
           // Insert asset permissions
@@ -1111,12 +1139,12 @@ const createMetricFiles = wrapTraced(
           createdFiles.push({
             id: sp.metricFile.id,
             name: sp.metricFile.name,
-            file_type: 'metric',
-            result_message: sp.message,
-            results: sp.results,
-            created_at: sp.metricFile.createdAt,
-            updated_at: sp.metricFile.updatedAt,
-            version_number: 1,
+            file_type: sp.metricFile.file_type,
+            result_message: sp.metricFile.result_message,
+            results: sp.metricFile.results,
+            created_at: sp.metricFile.created_at,
+            updated_at: sp.metricFile.updated_at,
+            version_number: sp.metricFile.version_number,
           });
         }
       } catch (error) {
@@ -1175,27 +1203,15 @@ async function processMetricFile(
 
     // Create metric file object
     const now = new Date().toISOString();
-    const metricFile = {
+    const metricFile: FileWithId = {
       id: metricId,
       name: metricYml.name,
-      fileName: fileName,
-      content: metricYml,
-      verification: 'notRequested' as const,
-      evaluationObj: null,
-      evaluationSummary: null,
-      evaluationScore: null,
-      organizationId: organizationId,
-      createdBy: userId,
-      createdAt: now,
-      updatedAt: now,
-      deletedAt: null,
-      publiclyAccessible: false,
-      publiclyEnabledBy: null,
-      publicExpiryDate: null,
-      versionHistory: { version: 1, history: [metricYml] },
-      dataMetadata: sqlValidationResult.metadata,
-      publicPassword: null,
-      dataSourceId: dataSourceId,
+      file_type: 'metric',
+      result_message: sqlValidationResult.message,
+      results: sqlValidationResult.results,
+      created_at: now,
+      updated_at: now,
+      version_number: 1,
     };
 
     return {
@@ -1280,12 +1296,12 @@ async function validateSql(sqlQuery: string, dataSourceId: string): Promise<Vali
         // Truncate results to 25 records for display in validation
         const results = allResults.slice(0, 25);
 
-        const metadata = {
-          columns: results.length > 0 ? Object.keys(results[0] || {}) : [],
+        const metadata: QueryMetadata = {
           rowCount: results.length,
           totalRowCount: result.metadata?.totalRowCount || allResults.length, // Use total count if available
           executionTime: result.executionTime || 100,
           limited: result.metadata?.limited || false,
+          maxRows: result.metadata?.maxRows,
         };
 
         let message: string;

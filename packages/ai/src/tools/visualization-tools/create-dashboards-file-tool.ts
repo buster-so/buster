@@ -177,7 +177,7 @@ async function validateMetricIds(
       .where(inArray(metricFiles.id, metricIds))
       .execute();
 
-    const existingIds = existingMetrics.map((m) => m.id);
+    const existingIds = existingMetrics.map((m: { id: string }) => m.id);
     const missingIds = metricIds.filter((id) => !existingIds.includes(id));
 
     if (missingIds.length > 0) {
@@ -194,11 +194,7 @@ async function validateMetricIds(
 }
 
 // Process a dashboard file creation request
-async function processDashboardFile(
-  file: DashboardFileParams,
-  userId: string,
-  organizationId: string
-): Promise<{
+async function processDashboardFile(file: DashboardFileParams): Promise<{
   success: boolean;
   dashboardFile?: FileWithId;
   dashboardYml?: DashboardYml;
@@ -246,30 +242,14 @@ async function processDashboardFile(
     }
   }
 
-  const dashboardFile = {
+  const dashboardFile: FileWithId = {
     id: dashboardId,
     name: dashboardYml.name,
-    fileName: file.name,
-    content: dashboardYml,
-    filter: null,
-    organizationId,
-    createdBy: userId,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    deletedAt: null,
-    publiclyAccessible: false,
-    publiclyEnabledBy: null,
-    publicExpiryDate: null,
-    versionHistory: {
-      versions: [
-        {
-          versionNumber: 1,
-          content: dashboardYml,
-          createdAt: new Date().toISOString(),
-        },
-      ],
-    },
-    publicPassword: null,
+    file_type: 'dashboard',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    version_number: 1,
+    content: dashboardYml as DashboardFileContent,
   };
 
   return {
@@ -283,7 +263,7 @@ async function processDashboardFile(
 const createDashboardFiles = wrapTraced(
   async (
     params: CreateDashboardFilesParams,
-    runtimeContext: RuntimeContext
+    runtimeContext: RuntimeContext<{ userId: string; organizationId: string }>
   ): Promise<CreateDashboardFilesOutput> => {
     const startTime = Date.now();
 
@@ -304,7 +284,7 @@ const createDashboardFiles = wrapTraced(
     // Process files concurrently
     const processResults = await Promise.allSettled(
       params.files.map(async (file) => {
-        const result = await processDashboardFile(file, userId, organizationId);
+        const result = await processDashboardFile(file);
         return { fileName: file.name, result };
       })
     );
@@ -340,25 +320,39 @@ const createDashboardFiles = wrapTraced(
     // Database operations
     if (successfulProcessing.length > 0) {
       try {
-        await db.transaction(async (tx) => {
+        await db.transaction(async (tx: typeof db) => {
           // Insert dashboard files
-          const dashboardRecords = successfulProcessing.map((sp) => ({
-            id: sp.dashboardFile.id,
-            name: sp.dashboardFile.name,
-            fileName: sp.dashboardFile.fileName,
-            content: sp.dashboardFile.content,
-            filter: sp.dashboardFile.filter,
-            organizationId: sp.dashboardFile.organizationId,
-            createdBy: sp.dashboardFile.createdBy,
-            createdAt: sp.dashboardFile.createdAt,
-            updatedAt: sp.dashboardFile.updatedAt,
-            deletedAt: sp.dashboardFile.deletedAt,
-            publiclyAccessible: sp.dashboardFile.publiclyAccessible,
-            publiclyEnabledBy: sp.dashboardFile.publiclyEnabledBy,
-            publicExpiryDate: sp.dashboardFile.publicExpiryDate,
-            versionHistory: sp.dashboardFile.versionHistory,
-            publicPassword: sp.dashboardFile.publicPassword,
-          }));
+          const dashboardRecords = successfulProcessing.map((sp, index) => {
+            const originalFile = params.files[index];
+            if (!originalFile) {
+              throw new Error(`Original file not found at index ${index}`);
+            }
+            return {
+              id: sp.dashboardFile.id,
+              name: sp.dashboardFile.name,
+              fileName: originalFile.name,
+              content: sp.dashboardFile.content,
+              filter: null,
+              organizationId,
+              createdBy: userId,
+              createdAt: sp.dashboardFile.created_at,
+              updatedAt: sp.dashboardFile.updated_at,
+              deletedAt: null,
+              publiclyAccessible: false,
+              publiclyEnabledBy: null,
+              publicExpiryDate: null,
+              versionHistory: {
+                versions: [
+                  {
+                    versionNumber: sp.dashboardFile.version_number,
+                    content: sp.dashboardFile.content,
+                    createdAt: sp.dashboardFile.created_at,
+                  },
+                ],
+              },
+              publicPassword: null,
+            };
+          });
           await tx.insert(dashboardFiles).values(dashboardRecords);
 
           // Insert asset permissions
@@ -378,9 +372,9 @@ const createDashboardFiles = wrapTraced(
 
           // Create associations between metrics and dashboards
           for (const sp of successfulProcessing) {
-            const metricIds: string[] = sp.dashboardFile.content.rows
-              .flatMap((row: DashboardFileContent['rows'][0]) => row.items)
-              .map((item: { id: string }) => item.id);
+            const metricIds: string[] = sp.dashboardYml.rows
+              .flatMap((row) => row.items)
+              .map((item) => item.id);
 
             if (metricIds.length > 0) {
               const metricDashboardAssociations = metricIds.map((metricId: string) => ({
@@ -410,12 +404,12 @@ const createDashboardFiles = wrapTraced(
           files.push({
             id: sp.dashboardFile.id,
             name: sp.dashboardFile.name,
-            file_type: 'dashboard',
-            result_message: undefined,
-            results: undefined,
-            created_at: sp.dashboardFile.createdAt,
-            updated_at: sp.dashboardFile.updatedAt,
-            version_number: 1,
+            file_type: sp.dashboardFile.file_type,
+            result_message: sp.dashboardFile.result_message,
+            results: sp.dashboardFile.results,
+            created_at: sp.dashboardFile.created_at,
+            updated_at: sp.dashboardFile.updated_at,
+            version_number: sp.dashboardFile.version_number,
           });
         }
       } catch (error) {

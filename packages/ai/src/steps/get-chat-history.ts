@@ -18,11 +18,13 @@ export interface ChatHistoryResult {
 export async function getChatHistory(chatId: string): Promise<ChatHistoryResult[]> {
   const results = await getAllRawLlmMessagesForChat(chatId);
 
-  return results.map((result) => ({
-    messageId: result.messageId,
-    rawLlmMessages: result.rawLlmMessages as MessageHistory,
-    createdAt: new Date(result.createdAt),
-  }));
+  return results.map(
+    (result: { messageId: string; rawLlmMessages: unknown; createdAt: string }) => ({
+      messageId: result.messageId,
+      rawLlmMessages: result.rawLlmMessages as MessageHistory,
+      createdAt: new Date(result.createdAt),
+    })
+  );
 }
 
 /**
@@ -33,7 +35,9 @@ export async function getChatHistory(chatId: string): Promise<ChatHistoryResult[
 export async function getRawLlmMessages(chatId: string): Promise<MessageHistory[]> {
   const results = await getAllRawLlmMessagesForChat(chatId);
 
-  return results.map((result) => result.rawLlmMessages as MessageHistory);
+  return results.map(
+    (result: { rawLlmMessages: unknown }) => result.rawLlmMessages as MessageHistory
+  );
 }
 
 /**

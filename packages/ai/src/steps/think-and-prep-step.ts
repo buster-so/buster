@@ -124,6 +124,7 @@ const thinkAndPrepExecution = async ({
           agent: thinkAndPrepAgent,
           messages,
           options: {
+            toolCallStreaming: true,
             runtimeContext,
             abortSignal: abortController.signal,
             toolChoice: 'required',
@@ -215,13 +216,27 @@ const thinkAndPrepExecution = async ({
     // Get final results from chunk processor
     outputMessages = extractMessageHistory(chunkProcessor.getAccumulatedMessages());
 
-    return createStepResult(
+    // DEBUG: Log what we're passing to analyst step
+    const result = createStepResult(
       finished,
       outputMessages,
       finalStepData,
       chunkProcessor.getReasoningHistory() as BusterChatMessageReasoning[],
       chunkProcessor.getResponseHistory() as BusterChatMessageResponse[]
     );
+
+    console.log('[DEBUG] think-and-prep-step final output:', {
+      finished: result.finished,
+      outputMessagesCount: result.outputMessages?.length || 0,
+      conversationHistoryCount: result.conversationHistory?.length || 0,
+      reasoningHistoryCount: result.reasoningHistory?.length || 0,
+      responseHistoryCount: result.responseHistory?.length || 0,
+      metadata: result.metadata,
+      messageRoles: result.outputMessages?.map((m) => m.role) || [],
+      timestamp: new Date().toISOString(),
+    });
+
+    return result;
   } catch (error) {
     if (error instanceof Error && error.name !== 'AbortError') {
       throw new Error(`Error in think and prep step: ${error.message}`);

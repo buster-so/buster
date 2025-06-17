@@ -21,6 +21,7 @@ export interface RetryConfig {
 }
 
 export interface AgentStreamOptions<T extends ToolSet> {
+  toolCallStreaming?: boolean;
   runtimeContext: RuntimeContext<unknown>;
   abortSignal?: AbortSignal;
   toolChoice?: 'auto' | 'required' | 'none';
