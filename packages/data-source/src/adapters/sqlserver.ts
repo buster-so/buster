@@ -84,18 +84,21 @@ export class SQLServerAdapter extends BaseAdapter {
 
     try {
       const request = this.pool.request();
-      
+
       // Helper function to add timeout to any query promise
-      const executeWithTimeout = async <T>(queryPromise: Promise<T>, timeoutMs: number): Promise<T> => {
+      const executeWithTimeout = async <T>(
+        queryPromise: Promise<T>,
+        timeoutMs: number
+      ): Promise<T> => {
         const timeoutPromise = new Promise<never>((_, reject) => {
           setTimeout(() => {
             reject(new Error(`SQL Server query execution timeout after ${timeoutMs}ms`));
           }, timeoutMs);
         });
-        
+
         return Promise.race([queryPromise, timeoutPromise]);
       };
-      
+
       // Set query timeout if specified (default: 30 seconds)
       const timeoutMs = timeout || 30000;
       let processedQuery = sqlQuery;

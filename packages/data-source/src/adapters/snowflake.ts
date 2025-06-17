@@ -92,13 +92,16 @@ export class SnowflakeAdapter extends BaseAdapter {
     }
 
     // Helper function to add timeout to any query promise
-    const executeWithTimeout = async <T>(queryPromise: Promise<T>, timeoutMs: number): Promise<T> => {
+    const executeWithTimeout = async <T>(
+      queryPromise: Promise<T>,
+      timeoutMs: number
+    ): Promise<T> => {
       const timeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(() => {
           reject(new Error(`Snowflake query execution timeout after ${timeoutMs}ms`));
         }, timeoutMs);
       });
-      
+
       return Promise.race([queryPromise, timeoutPromise]);
     };
 

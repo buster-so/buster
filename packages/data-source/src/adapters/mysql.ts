@@ -70,19 +70,19 @@ export class MySQLAdapter extends BaseAdapter {
     }
 
     try {
-      // Set query timeout if specified (default: 30 seconds) 
+      // Set query timeout if specified (default: 30 seconds)
       const timeoutMs = timeout || 30000;
-      
-      // For MySQL, use Promise.race() to implement timeout since mysql2 
+
+      // For MySQL, use Promise.race() to implement timeout since mysql2
       // doesn't support per-query timeouts on existing connections
       const queryPromise = this.connection.execute(sql, params);
-      
+
       const timeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(() => {
           reject(new Error(`Query execution timeout after ${timeoutMs}ms`));
         }, timeoutMs);
       });
-      
+
       // MySQL2 with promise connections doesn't support true streaming.
       // We execute the full query and limit results in memory.
       // This means the database still processes the full result set,

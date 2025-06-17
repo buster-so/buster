@@ -103,7 +103,12 @@ export class DataSource {
     const adapter = await this.getAdapter(dataSourceName);
 
     try {
-      const result = await adapter.query(request.sql, request.params, request.options?.maxRows, request.options?.timeout);
+      const result = await adapter.query(
+        request.sql,
+        request.params,
+        request.options?.maxRows,
+        request.options?.timeout
+      );
 
       // Convert adapter result to QueryResult format
       return {

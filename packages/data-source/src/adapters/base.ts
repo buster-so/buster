@@ -52,7 +52,12 @@ export interface DatabaseAdapter {
   /**
    * Execute a SQL query
    */
-  query(sql: string, params?: QueryParameter[], maxRows?: number, timeout?: number): Promise<AdapterQueryResult>;
+  query(
+    sql: string,
+    params?: QueryParameter[],
+    maxRows?: number,
+    timeout?: number
+  ): Promise<AdapterQueryResult>;
 
   /**
    * Test the connection to the database

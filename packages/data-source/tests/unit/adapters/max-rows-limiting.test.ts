@@ -89,18 +89,22 @@ describe('MaxRows Limiting Tests', () => {
     it('should return all rows when result set is smaller than maxRows', async () => {
       mockClient.query.mockReturnValue(mockCursor);
       mockCursor.read
-        .mockImplementationOnce((count: number, callback: Function) => {
-          // Return only 3 rows when asking for 10
-          callback(null, [
-            { id: 1, name: 'User 1' },
-            { id: 2, name: 'User 2' },
-            { id: 3, name: 'User 3' },
-          ]);
-        })
-        .mockImplementationOnce((count: number, callback: Function) => {
-          // No more rows
-          callback(null, []);
-        });
+        .mockImplementationOnce(
+          (count: number, callback: (err: unknown, rows: unknown[]) => void) => {
+            // Return only 3 rows when asking for 10
+            callback(null, [
+              { id: 1, name: 'User 1' },
+              { id: 2, name: 'User 2' },
+              { id: 3, name: 'User 3' },
+            ]);
+          }
+        )
+        .mockImplementationOnce(
+          (count: number, callback: (err: unknown, rows: unknown[]) => void) => {
+            // No more rows
+            callback(null, []);
+          }
+        );
       mockCursor.close.mockImplementation((callback: (err: unknown) => void) => callback(null));
 
       const result = await adapter.query('SELECT * FROM users', undefined, 10);
@@ -299,11 +303,11 @@ describe('MaxRows Limiting Tests', () => {
     });
 
     it('should limit results to exactly 1 row when maxRows=1', async () => {
-      let rowHandler: Function;
-      let doneHandler: Function;
-      let recordsetHandler: Function;
+      let rowHandler: (row: Record<string, unknown>) => void;
+      let doneHandler: () => void;
+      let recordsetHandler: (columns: Record<string, unknown>) => void;
 
-      mockRequest.on.mockImplementation((event: string, handler: Function) => {
+      mockRequest.on.mockImplementation((event: string, handler: (arg?: unknown) => void) => {
         if (event === 'row') rowHandler = handler;
         if (event === 'done') doneHandler = handler;
         if (event === 'recordset') recordsetHandler = handler;
