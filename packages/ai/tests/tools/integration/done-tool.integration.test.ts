@@ -1,16 +1,21 @@
 import { beforeEach, describe, expect, test } from 'vitest';
 import { doneTool } from '../../../src/tools/communication-tools/done-tool';
 
+interface TestTodo {
+  completed: boolean;
+  [key: string]: unknown;
+}
+
 describe('Done Tool Integration Tests', () => {
-  let mockRuntimeContext: any;
+  let mockRuntimeContext: Record<string, unknown>;
 
   beforeEach(() => {
     mockRuntimeContext = {
-      state: new Map<string, any>(),
+      state: new Map<string, unknown>(),
       get: function (key: string) {
         return this.state.get(key);
       },
-      set: function (key: string, value: any) {
+      set: function (key: string, value: unknown) {
         this.state.set(key, value);
       },
       clear: function () {
@@ -50,7 +55,7 @@ describe('Done Tool Integration Tests', () => {
 
   test('should handle runtime context requirements', async () => {
     const contextWithoutGet = {
-      set: (key: string, value: any) => {},
+      set: (key: string, value: unknown) => {},
     };
 
     const input = {
@@ -101,7 +106,7 @@ describe('Done Tool Integration Tests', () => {
     // Verify state was updated
     const updatedTodos = mockRuntimeContext.get('todos');
     expect(updatedTodos).toHaveLength(3);
-    expect(updatedTodos.every((todo: any) => todo.completed)).toBe(true);
+    expect(updatedTodos.every((todo: TestTodo) => todo.completed)).toBe(true);
   });
 
   test('should handle all todos already completed', async () => {
@@ -153,7 +158,7 @@ describe('Done Tool Integration Tests', () => {
 
     // Verify state was properly updated
     const updatedTodos = mockRuntimeContext.get('todos');
-    expect(updatedTodos.filter((todo: any) => !todo.completed)).toHaveLength(0);
+    expect(updatedTodos.filter((todo: TestTodo) => !todo.completed)).toHaveLength(0);
   });
 
   test('should handle invalid todo data gracefully', async () => {
@@ -365,7 +370,7 @@ The following tasks have been completed:
     // Verify all todos are now completed
     const updatedTodos = mockRuntimeContext.get('todos');
     expect(updatedTodos).toHaveLength(100);
-    expect(updatedTodos.every((todo: any) => todo.completed)).toBe(true);
+    expect(updatedTodos.every((todo: TestTodo) => todo.completed)).toBe(true);
 
     // Check output format
     const todoLines = result.todos.split('\n');
@@ -381,7 +386,7 @@ The following tasks have been completed:
 
   test('should validate final_response parameter descriptions match Rust implementation', () => {
     const schema = doneTool.inputSchema;
-    const shape = schema.shape as any;
+    const shape = schema.shape as Record<string, unknown>;
     const finalResponseField = shape.final_response;
 
     expect(finalResponseField.description).toContain('**MUST** be formatted in Markdown');

@@ -2,6 +2,18 @@ import { RuntimeContext } from '@mastra/core/runtime-context';
 import { describe, expect, test } from 'vitest';
 import { formatOutputStep } from '../../../src/steps/format-output-step';
 
+// Mock execution context types
+interface MockStepContext {
+  inputData: unknown;
+  getInitData: () => Promise<{ prompt: string }>;
+  runtimeContext: unknown;
+  runId: string;
+  mastra: Record<string, unknown>;
+  getStepResult: () => Promise<Record<string, unknown>>;
+  suspend: () => Promise<void>;
+  [Symbol.for('emitter')]: Record<string, unknown>;
+}
+
 describe('Format Output Step Unit Tests', () => {
   test('should handle analyst step output', async () => {
     const analystOutput = {
@@ -53,16 +65,18 @@ describe('Format Output Step Unit Tests', () => {
 
     const runtimeContext = new RuntimeContext([]);
 
-    const result = await formatOutputStep.execute({
+    const mockContext: MockStepContext = {
       inputData: analystOutput,
       getInitData: async () => ({ prompt: 'test' }),
       runtimeContext,
       runId: 'test-run',
-      mastra: {} as any,
-      getStepResult: async () => ({}) as any,
+      mastra: {},
+      getStepResult: async () => ({}),
       suspend: async () => {},
-      [Symbol.for('emitter')]: {} as any,
-    } as any);
+      [Symbol.for('emitter')]: {},
+    };
+
+    const result = await formatOutputStep.execute(mockContext);
 
     expect(result).toEqual({
       conversationHistory: analystOutput.conversationHistory,
@@ -95,16 +109,18 @@ describe('Format Output Step Unit Tests', () => {
 
     const runtimeContext = new RuntimeContext([]);
 
-    const result = await formatOutputStep.execute({
+    const mockContext: MockStepContext = {
       inputData: passthroughOutput,
       getInitData: async () => ({ prompt: 'test' }),
       runtimeContext,
       runId: 'test-run',
-      mastra: {} as any,
-      getStepResult: async () => ({}) as any,
+      mastra: {},
+      getStepResult: async () => ({}),
       suspend: async () => {},
-      [Symbol.for('emitter')]: {} as any,
-    } as any);
+      [Symbol.for('emitter')]: {},
+    };
+
+    const result = await formatOutputStep.execute(mockContext);
 
     expect(result.conversationHistory).toEqual(passthroughOutput.conversationHistory);
     expect(result.finished).toBe(true);
@@ -119,16 +135,18 @@ describe('Format Output Step Unit Tests', () => {
 
     const runtimeContext = new RuntimeContext([]);
 
-    const result = await formatOutputStep.execute({
+    const mockContext: MockStepContext = {
       inputData: minimalOutput,
       getInitData: async () => ({ prompt: 'test' }),
       runtimeContext,
       runId: 'test-run',
-      mastra: {} as any,
-      getStepResult: async () => ({}) as any,
+      mastra: {},
+      getStepResult: async () => ({}),
       suspend: async () => {},
-      [Symbol.for('emitter')]: {} as any,
-    } as any);
+      [Symbol.for('emitter')]: {},
+    };
+
+    const result = await formatOutputStep.execute(mockContext);
 
     expect(result.conversationHistory).toEqual(minimalOutput.conversationHistory);
     expect(result.finished).toBe(false);
@@ -146,16 +164,18 @@ describe('Format Output Step Unit Tests', () => {
 
     const runtimeContext = new RuntimeContext([]);
 
-    const result = await formatOutputStep.execute({
+    const mockContext: MockStepContext = {
       inputData: emptyOutput,
       getInitData: async () => ({ prompt: 'test' }),
       runtimeContext,
       runId: 'test-run',
-      mastra: {} as any,
-      getStepResult: async () => ({}) as any,
+      mastra: {},
+      getStepResult: async () => ({}),
       suspend: async () => {},
-      [Symbol.for('emitter')]: {} as any,
-    } as any);
+      [Symbol.for('emitter')]: {},
+    };
+
+    const result = await formatOutputStep.execute(mockContext);
 
     expect(result.conversationHistory).toEqual([]);
     expect(result.outputMessages).toEqual([]);

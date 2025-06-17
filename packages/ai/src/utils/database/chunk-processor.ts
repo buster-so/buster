@@ -5,6 +5,7 @@ import type {
   ChatMessageReasoningMessage,
   ChatMessageResponseMessage,
 } from '../../../../../server/src/types/chat-types/chat-message.type';
+import { OptimisticJsonParser, getOptimisticValue } from '../streaming/optimistic-json-parser';
 import { extractResponseMessages } from './formatLlmMessagesAsReasoning';
 import type {
   AssistantMessageContent,
@@ -185,20 +186,43 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       this.state.timing.startTime = Date.now();
     }
 
-    // Create reasoning entry for this tool call
-    const reasoningEntry = this.createReasoningEntry(
-      chunk.toolCallId,
-      chunk.toolName,
-      chunk.args || {}
-    );
-    if (reasoningEntry) {
-      // Check if this reasoning entry already exists (avoid duplicates)
-      const existingEntry = this.state.reasoningHistory.find(
-        (r) => r && typeof r === 'object' && 'id' in r && r.id === chunk.toolCallId
-      );
+    // Check if this is a response tool
+    if (this.isResponseTool(chunk.toolName)) {
+      // Create response entry for this tool call
+      const parseResult = {
+        parsed: chunk.args || {},
+        isComplete: true,
+        extractedValues: new Map(Object.entries(chunk.args || {})),
+      };
 
-      if (!existingEntry) {
-        this.state.reasoningHistory.push(reasoningEntry);
+      const responseEntry = this.createResponseEntry(chunk.toolCallId, chunk.toolName, parseResult);
+
+      if (responseEntry) {
+        // Check if this response entry already exists (avoid duplicates)
+        const existingEntry = this.state.responseHistory.find(
+          (r) => r && typeof r === 'object' && 'id' in r && r.id === chunk.toolCallId
+        );
+
+        if (!existingEntry) {
+          this.state.responseHistory.push(responseEntry);
+        }
+      }
+    } else {
+      // Create reasoning entry for this tool call
+      const reasoningEntry = this.createReasoningEntry(
+        chunk.toolCallId,
+        chunk.toolName,
+        chunk.args || {}
+      );
+      if (reasoningEntry) {
+        // Check if this reasoning entry already exists (avoid duplicates)
+        const existingEntry = this.state.reasoningHistory.find(
+          (r) => r && typeof r === 'object' && 'id' in r && r.id === chunk.toolCallId
+        );
+
+        if (!existingEntry) {
+          this.state.reasoningHistory.push(reasoningEntry);
+        }
       }
     }
 
@@ -239,6 +263,20 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       argsText: '',
     });
 
+    // For response tools, don't create entry until we have content
+    // For reasoning tools, we can create the entry immediately
+    if (!this.isResponseTool(chunk.toolName)) {
+      // Create initial reasoning entry for non-response tools
+      const reasoningEntry = this.createReasoningEntry(
+        chunk.toolCallId,
+        chunk.toolName,
+        {} // Empty args initially
+      );
+      if (reasoningEntry) {
+        this.state.reasoningHistory.push(reasoningEntry);
+      }
+    }
+
     // Check if this is a finishing tool
     if (['doneTool', 'respondWithoutAnalysis', 'submitThoughts'].includes(chunk.toolName)) {
       this.state.hasFinishingTool = true;
@@ -254,27 +292,71 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
     // Accumulate the arguments text
     inProgress.argsText += chunk.argsTextDelta || '';
 
-    // Try to parse the JSON
-    try {
-      inProgress.args = JSON.parse(inProgress.argsText);
+    // Use optimistic parsing to extract values even from incomplete JSON
+    const parseResult = OptimisticJsonParser.parse(inProgress.argsText);
 
-      // Update the tool call in the assistant message
-      if (this.state.currentAssistantMessage) {
-        const toolCall = this.state.currentAssistantMessage.content.find(
-          (part): part is typeof part & { toolCallId: string } =>
-            isToolCallContent(part) && part.toolCallId === chunk.toolCallId
+    // Update args with either complete parse or optimistic parse
+    if (parseResult.isComplete && parseResult.parsed) {
+      // Complete valid JSON
+      inProgress.args = parseResult.parsed;
+    } else if (parseResult.parsed) {
+      // Optimistically parsed JSON
+      inProgress.args = parseResult.parsed;
+    }
+
+    // Update the tool call in the assistant message
+    if (this.state.currentAssistantMessage && inProgress.args) {
+      const toolCall = this.state.currentAssistantMessage.content.find(
+        (part): part is typeof part & { toolCallId: string } =>
+          isToolCallContent(part) && part.toolCallId === chunk.toolCallId
+      );
+      if (toolCall && isToolCallContent(toolCall)) {
+        toolCall.args = inProgress.args;
+      }
+    }
+
+    // Check if this is a response tool
+    const isResponseTool = this.isResponseTool(inProgress.toolName);
+
+    if (isResponseTool) {
+      // Handle response tools (doneTool, respondWithoutAnalysis)
+      const existingResponse = this.state.responseHistory.find(
+        (r) => r && typeof r === 'object' && 'id' in r && r.id === chunk.toolCallId
+      );
+
+      if (existingResponse) {
+        // Update existing response entry with optimistically parsed values
+        this.updateResponseEntryWithOptimisticValues(
+          existingResponse,
+          inProgress.toolName,
+          parseResult
         );
-        if (toolCall && isToolCallContent(toolCall) && inProgress.args) {
-          toolCall.args = inProgress.args;
+      } else {
+        // Create new response entry
+        const responseEntry = this.createResponseEntry(
+          chunk.toolCallId,
+          inProgress.toolName,
+          parseResult
+        );
+        if (responseEntry) {
+          this.state.responseHistory.push(responseEntry);
         }
       }
-
-      // Create reasoning entry if not already created
+    } else {
+      // Handle reasoning tools
       const existingEntry = this.state.reasoningHistory.find(
         (r) => r && typeof r === 'object' && 'id' in r && r.id === chunk.toolCallId
       );
 
-      if (!existingEntry && inProgress.args) {
+      if (existingEntry) {
+        // Update existing entry with optimistically parsed values
+        this.updateReasoningEntryWithOptimisticValues(
+          existingEntry,
+          inProgress.toolName,
+          parseResult
+        );
+      } else if (inProgress.args) {
+        // Create new reasoning entry
         const reasoningEntry = this.createReasoningEntry(
           chunk.toolCallId,
           inProgress.toolName,
@@ -284,8 +366,6 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
           this.state.reasoningHistory.push(reasoningEntry);
         }
       }
-    } catch {
-      // JSON is incomplete, continue accumulating
     }
   }
 
@@ -476,6 +556,90 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
   }
 
   /**
+   * Update reasoning entry with optimistically parsed values
+   */
+  private updateReasoningEntryWithOptimisticValues(
+    entry: ReasoningEntry,
+    toolName: string,
+    parseResult: ReturnType<typeof OptimisticJsonParser.parse>
+  ): void {
+    if (!entry || typeof entry !== 'object') return;
+
+    // Handle different tool types with optimistic updates
+    switch (toolName) {
+      case 'doneTool':
+      case 'done-tool':
+      case 'respondWithoutAnalysis':
+      case 'respond-without-analysis': {
+        // Update message with optimistically parsed final_response
+        const finalResponse = getOptimisticValue<string>(
+          parseResult.extractedValues,
+          'final_response',
+          ''
+        );
+        if (finalResponse && 'message' in entry) {
+          (entry as ReasoningEntry & { message: string }).message = finalResponse;
+        }
+        break;
+      }
+
+      case 'sequentialThinking':
+      case 'sequential-thinking': {
+        // Update thought message as it streams
+        const thought = getOptimisticValue<string>(parseResult.extractedValues, 'thought', '');
+        if (thought && 'message' in entry) {
+          (entry as ReasoningEntry & { message: string }).message = thought;
+        }
+
+        // Update finished_reasoning if available
+        const nextThoughtNeeded = getOptimisticValue<boolean>(
+          parseResult.extractedValues,
+          'nextThoughtNeeded'
+        );
+        if (nextThoughtNeeded !== undefined && 'finished_reasoning' in entry) {
+          (entry as ReasoningEntry & { finished_reasoning: boolean }).finished_reasoning =
+            !nextThoughtNeeded;
+        }
+        break;
+      }
+
+      case 'submitThoughts': {
+        // Update thoughts message as it streams
+        const thoughts = getOptimisticValue<string>(parseResult.extractedValues, 'thoughts', '');
+        if (thoughts && 'message' in entry) {
+          (entry as ReasoningEntry & { message: string }).message = thoughts;
+        }
+        break;
+      }
+
+      case 'createMetrics':
+      case 'create-metrics-file': {
+        // For file-based tools, we might want to update file content
+        // This is more complex and might need special handling
+        break;
+      }
+
+      case 'executeSql':
+      case 'execute-sql': {
+        // Could update SQL content as it streams
+        const sql = getOptimisticValue<string>(parseResult.extractedValues, 'sql', '');
+        if (sql && hasFiles(entry)) {
+          // Update the SQL file content
+          const fileIds = (entry as ReasoningEntry & { file_ids: string[] }).file_ids;
+          if (fileIds && fileIds.length > 0) {
+            const fileId = fileIds[0];
+            const file = entry.files[fileId];
+            if (file && file.file) {
+              file.file.text = sql;
+            }
+          }
+        }
+        break;
+      }
+    }
+  }
+
+  /**
    * Create a reasoning entry for a tool call
    */
   private createReasoningEntry(
@@ -647,6 +811,86 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
     }
 
     return null;
+  }
+
+  /**
+   * Check if a tool is a response tool (doneTool, respondWithoutAnalysis)
+   */
+  private isResponseTool(toolName: string): boolean {
+    const responseTools = [
+      'doneTool',
+      'done-tool',
+      'respondWithoutAnalysis',
+      'respond-without-analysis',
+    ];
+    return responseTools.includes(toolName);
+  }
+
+  /**
+   * Create a response entry for streaming response tools
+   */
+  private createResponseEntry(
+    toolCallId: string,
+    toolName: string,
+    parseResult: ReturnType<typeof OptimisticJsonParser.parse>
+  ): ResponseEntry | null {
+    let message = '';
+
+    switch (toolName) {
+      case 'doneTool':
+      case 'done-tool':
+        message = getOptimisticValue<string>(parseResult.extractedValues, 'final_response', '');
+        break;
+
+      case 'respondWithoutAnalysis':
+      case 'respond-without-analysis':
+        message = getOptimisticValue<string>(parseResult.extractedValues, 'response', '');
+        break;
+
+      default:
+        return null;
+    }
+
+    // Only create entry if we have some content
+    if (!message) {
+      return null;
+    }
+
+    return {
+      id: toolCallId,
+      type: 'text',
+      message,
+      is_final_message: true,
+    } as ResponseEntry;
+  }
+
+  /**
+   * Update response entry with optimistically parsed values
+   */
+  private updateResponseEntryWithOptimisticValues(
+    entry: ResponseEntry,
+    toolName: string,
+    parseResult: ReturnType<typeof OptimisticJsonParser.parse>
+  ): void {
+    if (!entry || typeof entry !== 'object' || entry.type !== 'text') return;
+
+    let message = '';
+
+    switch (toolName) {
+      case 'doneTool':
+      case 'done-tool':
+        message = getOptimisticValue<string>(parseResult.extractedValues, 'final_response', '');
+        break;
+
+      case 'respondWithoutAnalysis':
+      case 'respond-without-analysis':
+        message = getOptimisticValue<string>(parseResult.extractedValues, 'response', '');
+        break;
+    }
+
+    if (message && 'message' in entry) {
+      (entry as ResponseEntry & { message: string }).message = message;
+    }
   }
 
   /**

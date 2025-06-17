@@ -3,9 +3,16 @@ import type { CoreMessage, StepResult, ToolSet } from 'ai';
 import { describe, expect, it } from 'vitest';
 import type { AnalystRuntimeContext } from '../../../src/workflows/analyst-workflow';
 
+// Mock tool call interface
+interface MockToolCall {
+  toolCallId: string;
+  toolName: string;
+  args: Record<string, unknown>;
+}
+
 // Mock the step result structure
 function createMockStepResult(
-  toolCalls: any[],
+  toolCalls: MockToolCall[],
   responseMessages: CoreMessage[]
 ): StepResult<ToolSet> {
   return {
@@ -45,7 +52,7 @@ function createMockRuntimeContext(messageId?: string): RuntimeContext<AnalystRun
 
   return {
     get: (key: string) => values.get(key),
-    set: (key: string, value: any) => values.set(key, value),
+    set: (key: string, value: unknown) => values.set(key, value),
   } as unknown as RuntimeContext<AnalystRuntimeContext>;
 }
 
@@ -425,8 +432,8 @@ describe('onStepFinish message conversion', () => {
 
     it('should accumulate history across multiple onStepFinish calls', async () => {
       // Simulate accumulating history
-      const accumulatedReasoningHistory: any[] = [];
-      const accumulatedResponseHistory: any[] = [];
+      const accumulatedReasoningHistory: CoreMessage[] = [];
+      const accumulatedResponseHistory: CoreMessage[] = [];
 
       // First call - sequential thinking
       const firstStep = createMockStepResult(

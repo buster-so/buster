@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe } from 'vitest';
 //import { modifyDashboardsFileTool } from '../../../src/tools/visualization-tools/modify-dashboards-file-tool';
 
 describe('Modify Dashboards File Tool Integration Tests', () => {
-  let mockRuntimeContext: any;
+  let mockRuntimeContext: Record<string, unknown>;
   let testDataSourceId: string;
   let testUserId: string;
   let testOrgId: string;

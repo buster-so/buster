@@ -18,18 +18,18 @@ const outputSchema = z.object({
 interface TodoItem {
   todo: string;
   completed: boolean;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // Mock runtime context for testing
 class MockRuntimeContext {
-  private state: Map<string, any> = new Map();
+  private state: Map<string, unknown> = new Map();
 
-  get(key: string): any | undefined {
+  get(key: string): unknown | undefined {
     return this.state.get(key);
   }
 
-  set(key: string, value: any): void {
+  set(key: string, value: unknown): void {
     this.state.set(key, value);
   }
 
@@ -477,7 +477,7 @@ Some random notes without actionable items.
 
       // The error should be caught and handled
       await expect(
-        processCreatePlanStraightforward({ plan: '1. Test task' }, faultyContext as any)
+        processCreatePlanStraightforward({ plan: '1. Test task' }, faultyContext as MockRuntimeContext)
       ).rejects.toThrow('State update error');
     });
 

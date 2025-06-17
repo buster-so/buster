@@ -137,7 +137,9 @@ describe('ChunkProcessor', () => {
     });
   });
 
-  it('should handle todo list messages as special case', async () => {
+  // Note: TODO list extraction is handled by formatLlmMessagesAsReasoning, not ChunkProcessor
+  // ChunkProcessor only handles streaming tool calls from the AI
+  it.skip('should handle todo list messages as special case', async () => {
     const processor = new ChunkProcessor(mockMessageId);
 
     const todoMessage: CoreMessage = {

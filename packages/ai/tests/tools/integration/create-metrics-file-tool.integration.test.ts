@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { createMetrics } from '../../../src/tools/visualization-tools/create-metrics-file-tool';
 
 describe('Create Metrics File Tool Integration Tests', () => {
-  let mockRuntimeContext: any;
+  let mockRuntimeContext: Record<string, unknown>;
   let testDataSourceId: string;
   let testUserId: string;
   let testOrgId: string;

@@ -18,18 +18,18 @@ const outputSchema = z.object({
 interface TodoItem {
   todo: string;
   completed: boolean;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // Mock runtime context for testing
 class MockRuntimeContext {
-  private state: Map<string, any> = new Map();
+  private state: Map<string, unknown> = new Map();
 
-  get(key: string): any | undefined {
+  get(key: string): unknown | undefined {
     return this.state.get(key);
   }
 
-  set(key: string, value: any): void {
+  set(key: string, value: unknown): void {
     this.state.set(key, value);
   }
 
@@ -551,7 +551,7 @@ Focus on statistical significance of findings.
       // The error should be caught and handled within the function
       const result = await processCreatePlanInvestigative(
         { plan: '1. Test investigation task' },
-        faultyContext as any
+        faultyContext as MockRuntimeContext
       );
 
       expect(result.success).toBe(true);
@@ -567,7 +567,7 @@ Focus on statistical significance of findings.
 
       // The error should be caught and handled
       await expect(
-        processCreatePlanInvestigative({ plan: '1. Test task' }, faultyContext as any)
+        processCreatePlanInvestigative({ plan: '1. Test task' }, faultyContext as MockRuntimeContext)
       ).rejects.toThrow('State update error');
     });
 

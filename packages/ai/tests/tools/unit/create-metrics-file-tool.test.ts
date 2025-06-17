@@ -77,7 +77,7 @@ function validateSqlBasic(sqlQuery: string): { success: boolean; error?: string 
 function parseAndValidateYaml(ymlContent: string): {
   success: boolean;
   error?: string;
-  data?: any;
+  data?: Record<string, unknown>;
 } {
   try {
     const parsedYml = yaml.parse(ymlContent);

@@ -11,7 +11,7 @@ import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { createDashboards } from '../../../src/tools/visualization-tools/create-dashboards-file-tool';
 
 describe('Create Dashboards File Tool Integration Tests', () => {
-  let mockRuntimeContext: any;
+  let mockRuntimeContext: Record<string, unknown>;
   let testDataSourceId: string;
   let testUserId: string;
   let testOrgId: string;
