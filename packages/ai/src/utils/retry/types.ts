@@ -18,6 +18,9 @@ export interface RetryableError {
 export interface RetryConfig {
   maxRetries: number;
   onRetry?: (error: RetryableError, attemptNumber: number) => void;
+  degradeModel?: boolean; // Switch to cheaper model on retry
+  exponentialBackoff?: boolean; // Add delays between retries
+  maxBackoffMs?: number; // Maximum backoff delay
 }
 
 export interface AgentStreamOptions<T extends ToolSet> {

@@ -2,10 +2,30 @@ import type { ToolSet } from 'ai';
 import { NoSuchToolError } from 'ai';
 import { healStreamingToolError, isHealableStreamError } from '../streaming/tool-healing';
 import type { RetryConfig, RetryResult, RetryableAgentStreamParams, RetryableError } from './types';
+import { compressConversationHistory, shouldCompressHistory } from './context-compression';
 
 const DEFAULT_RETRY_CONFIG: RetryConfig = {
   maxRetries: 3,
+  exponentialBackoff: true,
+  maxBackoffMs: 8000, // Max 8 second delay
 };
+
+/**
+ * Calculates exponential backoff delay with jitter
+ */
+function calculateBackoffDelay(attemptNumber: number, maxBackoffMs: number = 8000): number {
+  const baseDelay = Math.min(1000 * Math.pow(2, attemptNumber - 1), maxBackoffMs);
+  // Add jitter (±25% randomness)
+  const jitter = baseDelay * 0.25 * (Math.random() - 0.5);
+  return Math.max(500, baseDelay + jitter); // Minimum 500ms delay
+}
+
+/**
+ * Sleeps for the specified duration
+ */
+async function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 /**
  * Detects if an error is retryable and creates a healing message
@@ -195,6 +215,12 @@ export async function retryableAgentStream<T extends ToolSet>({
 
   while (retryCount <= retryConfig.maxRetries) {
     try {
+      // Check for context compression before retry
+      if (shouldCompressHistory(conversationHistory)) {
+        conversationHistory = compressConversationHistory(conversationHistory);
+        console.log('Compressed conversation history due to length');
+      }
+
       const stream = await agent.stream(conversationHistory, options);
 
       // Return successful result
@@ -221,9 +247,15 @@ export async function retryableAgentStream<T extends ToolSet>({
       // Add healing message to conversation history
       conversationHistory = [...conversationHistory, retryableError.healingMessage];
 
-      // Increment retry count and continue
+      // Increment retry count
       retryCount++;
-      // Log retry attempt for debugging
+
+      // Apply exponential backoff if enabled
+      if (retryConfig.exponentialBackoff && retryCount <= retryConfig.maxRetries) {
+        const delay = calculateBackoffDelay(retryCount, retryConfig.maxBackoffMs);
+        console.log(`Retrying in ${delay}ms (attempt ${retryCount}/${retryConfig.maxRetries})`);
+        await sleep(delay);
+      }
     }
   }
 
@@ -247,6 +279,12 @@ export async function retryableAgentStreamWithHealing<T extends ToolSet>({
 
   while (retryCount <= retryConfig.maxRetries) {
     try {
+      // Check for context compression before retry
+      if (shouldCompressHistory(conversationHistory)) {
+        conversationHistory = compressConversationHistory(conversationHistory);
+        console.log('Compressed conversation history due to length');
+      }
+
       const stream = await agent.stream(conversationHistory, options);
 
       // Return successful result
@@ -295,8 +333,15 @@ export async function retryableAgentStreamWithHealing<T extends ToolSet>({
         conversationHistory = [...conversationHistory, messageToAdd];
       }
 
-      // Increment retry count and continue
+      // Increment retry count
       retryCount++;
+
+      // Apply exponential backoff if enabled
+      if (retryConfig.exponentialBackoff && retryCount <= retryConfig.maxRetries) {
+        const delay = calculateBackoffDelay(retryCount, retryConfig.maxBackoffMs);
+        console.log(`Retrying with healing in ${delay}ms (attempt ${retryCount}/${retryConfig.maxRetries})`);
+        await sleep(delay);
+      }
     }
   }
 

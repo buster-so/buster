@@ -86,7 +86,7 @@ const thinkAndPrepExecution = async ({
 
   // Extract reasoning history from create-todos step
   const rawReasoningHistory = inputData['create-todos'].reasoningHistory || [];
-  
+
   // Transform reasoning history to match server schema property order
   const initialReasoningHistory = rawReasoningHistory.map((entry: any) => {
     if (entry.type === 'text') {
@@ -99,32 +99,6 @@ const thinkAndPrepExecution = async ({
         secondary_title: entry.secondary_title,
         message_chunk: entry.message_chunk,
         finished_reasoning: entry.finished_reasoning,
-      };
-    } else if (entry.type === 'pills') {
-      return {
-        status: entry.status,
-        id: entry.id,
-        type: entry.type,
-        title: entry.title,
-        pill_containers: entry.pill_containers?.map((container: any) => ({
-          title: container.title,
-          pills: container.pills?.map((pill: any) => ({
-            text: pill.text,
-            id: pill.id,
-            type: pill.type === null ? 'empty' : pill.type,
-          })) || [],
-        })) || [],
-        secondary_title: entry.secondary_title,
-      };
-    } else if (entry.type === 'files') {
-      return {
-        status: entry.status,
-        id: entry.id,
-        type: entry.type,
-        title: entry.title,
-        file_ids: entry.file_ids,
-        files: entry.files,
-        secondary_title: entry.secondary_title,
       };
     }
     return entry;
@@ -193,9 +167,17 @@ const thinkAndPrepExecution = async ({
           },
           retryConfig: {
             maxRetries: 3,
+            exponentialBackoff: true,
+            maxBackoffMs: 8000,
             onRetry: (error: RetryableError, attemptNumber: number) => {
               // Log retry attempt for debugging
-              console.error(`Think and Prep retry attempt ${attemptNumber} for error:`, error);
+              console.error(`Think and Prep retry attempt ${attemptNumber} for error:`, {
+                type: error.type,
+                attempt: attemptNumber,
+                messageId: runtimeContext.get('messageId'),
+                originalError:
+                  error.originalError instanceof Error ? error.originalError.message : 'Unknown',
+              });
             },
           },
         });
