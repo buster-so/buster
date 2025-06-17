@@ -15,7 +15,3 @@ export { modifyMetrics } from './visualization-tools/modify-metrics-file-tool';
 export { createDashboards } from './visualization-tools/create-dashboards-file-tool';
 export { modifyDashboards } from './visualization-tools/modify-dashboards-file-tool';
 export { executeSql } from './database-tools/execute-sql';
-export {
-  filterDashboardsTool,
-  searchDashboardsWithContentTool,
-} from './visualization-tools/filter-dashboards-tool';

@@ -37,10 +37,7 @@ export function deduplicateIds(ids: string[]): string[] {
 }
 
 // Utility function to validate pagination parameters
-export function validatePagination(
-  page: number,
-  pageSize: number
-): { page: number; pageSize: number } {
+export function validatePagination(page = 0, pageSize = 50): { page: number; pageSize: number } {
   const PaginationSchema = z.object({
     page: z.number().int().min(0),
     pageSize: z.number().int().min(1).max(1000),

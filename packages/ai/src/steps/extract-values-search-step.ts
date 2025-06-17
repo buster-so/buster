@@ -148,17 +148,10 @@ async function searchStoredValues(
   }
 
   try {
-    console.log(
-      `[StoredValues] Starting search for ${values.length} keywords: ${values.join(', ')}`
-    );
-
     // Generate embeddings for all keywords concurrently with individual error handling
-    const embeddingPromises = values.map(async (value, index) => {
+    const embeddingPromises = values.map(async (value) => {
       try {
         const embedding = await generateEmbedding([value]);
-        console.log(
-          `[StoredValues] Generated embedding for keyword ${index + 1}/${values.length}: "${value}"`
-        );
         return { value, embedding };
       } catch (error) {
         console.error(
@@ -183,17 +176,10 @@ async function searchStoredValues(
       };
     }
 
-    console.log(
-      `[StoredValues] Generated ${validEmbeddings.length}/${values.length} valid embeddings, starting database searches`
-    );
-
     // Search for values using each embedding concurrently with individual error handling
-    const searchPromises = validEmbeddings.map(async ({ value, embedding }, index) => {
+    const searchPromises = validEmbeddings.map(async ({ value, embedding }) => {
       try {
         const results = await searchValuesByEmbedding(dataSourceId, embedding, { limit: 30 });
-        console.log(
-          `[StoredValues] Search ${index + 1}/${validEmbeddings.length} for "${value}" returned ${results.length} results`
-        );
         return results;
       } catch (error) {
         console.error(
@@ -207,16 +193,9 @@ async function searchStoredValues(
     const searchResults = await Promise.all(searchPromises);
     const allResults = searchResults.flat();
 
-    console.log(`[StoredValues] Total results found: ${allResults.length}`);
-
     // Format results (these functions are pure and shouldn't throw)
     const searchMessage = formatSearchResults(allResults);
     const structuredResults = organizeResultsBySchemaTable(allResults);
-
-    const hasResults = searchMessage.length > 0;
-    console.log(
-      `[StoredValues] Search completed successfully. Results formatted: ${hasResults ? 'Yes' : 'No'}`
-    );
 
     return {
       searchResults: searchMessage,
@@ -229,7 +208,7 @@ async function searchStoredValues(
       error: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
       valuesCount: values.length,
-      dataSourceId: dataSourceId ? dataSourceId.substring(0, 8) + '...' : 'undefined',
+      dataSourceId: dataSourceId ? `${dataSourceId.substring(0, 8)}...` : 'undefined',
     });
 
     return {

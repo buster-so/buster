@@ -45,6 +45,17 @@ interface MetricFileParams {
   yml_content: string;
 }
 
+// Zod schema for validating result metadata from DataSource
+const resultMetadataSchema = z
+  .object({
+    totalRowCount: z.number().optional(),
+    limited: z.boolean().optional(),
+    maxRows: z.number().optional(),
+  })
+  .optional();
+
+type ResultMetadata = z.infer<typeof resultMetadataSchema>;
+
 interface QueryMetadata {
   rowCount: number;
   totalRowCount: number;
@@ -1020,13 +1031,28 @@ const createMetricFiles = wrapTraced(
     const organizationId = runtimeContext?.get('organizationId') as string;
 
     if (!dataSourceId) {
-      throw new Error('Unable to identify the data source. Please refresh and try again.');
+      return {
+        message: 'Unable to identify the data source. Please refresh and try again.',
+        duration: Date.now() - startTime,
+        files: [],
+        failed_files: [],
+      };
     }
     if (!userId) {
-      throw new Error('Unable to verify your identity. Please log in again.');
+      return {
+        message: 'Unable to verify your identity. Please log in again.',
+        duration: Date.now() - startTime,
+        files: [],
+        failed_files: [],
+      };
     }
     if (!organizationId) {
-      throw new Error('Unable to access your organization. Please check your permissions.');
+      return {
+        message: 'Unable to access your organization. Please check your permissions.',
+        duration: Date.now() - startTime,
+        files: [],
+        failed_files: [],
+      };
     }
 
     // Process files concurrently
@@ -1298,12 +1324,18 @@ async function validateSql(sqlQuery: string, dataSourceId: string): Promise<Vali
         // Truncate results to 25 records for display in validation
         const results = allResults.slice(0, 25);
 
+        // Validate metadata with Zod schema for runtime safety
+        const validatedMetadata = resultMetadataSchema.safeParse(result.metadata);
+        const parsedMetadata: ResultMetadata = validatedMetadata.success
+          ? validatedMetadata.data
+          : undefined;
+
         const metadata: QueryMetadata = {
           rowCount: results.length,
-          totalRowCount: result.metadata?.totalRowCount || allResults.length, // Use total count if available
+          totalRowCount: parsedMetadata?.totalRowCount ?? allResults.length,
           executionTime: result.executionTime || 100,
-          limited: result.metadata?.limited || false,
-          maxRows: result.metadata?.maxRows,
+          limited: parsedMetadata?.limited ?? false,
+          maxRows: parsedMetadata?.maxRows,
         };
 
         let message: string;
@@ -1347,7 +1379,7 @@ async function getDataSourceCredentials(dataSourceId: string): Promise<Credentia
     );
 
     if (!secretResult.length || !secretResult[0]?.decrypted_secret) {
-      throw new Error('No credentials found for the specified data source');
+      return Promise.reject(new Error('No credentials found for the specified data source'));
     }
 
     const secretString = secretResult[0].decrypted_secret as string;
@@ -1360,14 +1392,18 @@ async function getDataSourceCredentials(dataSourceId: string): Promise<Credentia
 
     // Provide more specific error messages based on error type
     if (error instanceof z.ZodError) {
-      throw new Error(
-        'The data source credentials are not in the expected format. Please reconfigure your data source.'
+      return Promise.reject(
+        new Error(
+          'The data source credentials are not in the expected format. Please reconfigure your data source.'
+        )
       );
     }
 
     const errorMessage = isError(error) ? error.message : 'Unknown error occurred';
-    throw new Error(
-      `Unable to retrieve data source credentials: ${errorMessage}. Please contact support if this issue persists.`
+    return Promise.reject(
+      new Error(
+        `Unable to retrieve data source credentials: ${errorMessage}. Please contact support if this issue persists.`
+      )
     );
   }
 }

@@ -42,7 +42,7 @@ export function createStoredValuesReasoningMessage(
     files: {
       [fileId]: {
         id: fileId,
-        file_type: 'search-results',
+        file_type: 'agent-action',
         file_name: 'stored-values-search',
         version_number: 1,
         status: 'completed',

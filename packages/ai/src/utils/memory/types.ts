@@ -71,7 +71,7 @@ const BusterChatMessageReasoningPillSchema = z.object({
 
 const BusterChatMessageReasoningFileSchema = z.object({
   id: z.string(),
-  file_type: z.enum(['metric', 'dashboard', 'todo']),
+  file_type: z.enum(['metric', 'dashboard', 'reasoning', 'agent-action', 'todo']),
   file_name: z.string(),
   version_number: z.number(),
   status: z.enum(['loading', 'completed', 'failed']),

@@ -49,7 +49,7 @@ export class ToolArgsParser {
         return {
           toolName: accumulator.toolName,
           toolCallId: accumulator.toolCallId,
-          partialArgs,
+          partialArgs: partialArgs as Partial<Record<string, unknown>>,
           isComplete: this.isJsonComplete(accumulator.rawText),
         };
       } catch (error) {

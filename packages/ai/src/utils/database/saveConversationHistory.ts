@@ -93,12 +93,15 @@ export async function saveConversationHistoryFromStep(
     // Deduplicate reasoning by ID - keep track of existing IDs
     const existingIds = new Set(
       (currentReasoning as unknown[])
-        .filter((r): r is ReasoningEntry => r && typeof r === 'object' && 'id' in r)
-        .map((r) => r.id)
+        .filter((r): r is ReasoningEntry => r != null && typeof r === 'object' && 'id' in r)
+        .map((r) => (r as ReasoningEntry).id)
     );
     const deduplicatedNewEntries = (newReasoningEntries as unknown[]).filter(
       (entry): entry is ReasoningEntry =>
-        entry && typeof entry === 'object' && 'id' in entry && !existingIds.has(entry.id)
+        entry != null &&
+        typeof entry === 'object' &&
+        'id' in entry &&
+        !existingIds.has((entry as ReasoningEntry).id)
     );
 
     const updatedReasoning = [...currentReasoning, ...deduplicatedNewEntries];

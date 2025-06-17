@@ -272,10 +272,20 @@ const createDashboardFiles = wrapTraced(
     const organizationId = runtimeContext?.get('organizationId') as string;
 
     if (!userId) {
-      throw new Error('Unable to verify your identity. Please log in again.');
+      return {
+        message: 'Unable to verify your identity. Please log in again.',
+        duration: Date.now() - startTime,
+        files: [],
+        failed_files: [],
+      };
     }
     if (!organizationId) {
-      throw new Error('Unable to access your organization. Please check your permissions.');
+      return {
+        message: 'Unable to access your organization. Please check your permissions.',
+        duration: Date.now() - startTime,
+        files: [],
+        failed_files: [],
+      };
     }
 
     const files: FileWithId[] = [];
@@ -325,7 +335,32 @@ const createDashboardFiles = wrapTraced(
           const dashboardRecords = successfulProcessing.map((sp, index) => {
             const originalFile = params.files[index];
             if (!originalFile) {
-              throw new Error(`Original file not found at index ${index}`);
+              // This should never happen, but handle gracefully
+              return {
+                id: sp.dashboardFile.id,
+                name: sp.dashboardFile.name,
+                fileName: sp.dashboardFile.name,
+                content: sp.dashboardFile.content,
+                filter: null,
+                organizationId,
+                createdBy: userId,
+                createdAt: sp.dashboardFile.created_at,
+                updatedAt: sp.dashboardFile.updated_at,
+                deletedAt: null,
+                publiclyAccessible: false,
+                publiclyEnabledBy: null,
+                publicExpiryDate: null,
+                versionHistory: {
+                  versions: [
+                    {
+                      versionNumber: sp.dashboardFile.version_number,
+                      content: sp.dashboardFile.content,
+                      createdAt: sp.dashboardFile.created_at,
+                    },
+                  ],
+                },
+                publicPassword: null,
+              };
             }
             return {
               id: sp.dashboardFile.id,

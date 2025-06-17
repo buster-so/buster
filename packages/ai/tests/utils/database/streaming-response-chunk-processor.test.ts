@@ -16,8 +16,14 @@ describe('ChunkProcessor - Response Message Streaming', () => {
         toolName: 'doneTool',
       } as TextStreamPart<never>);
 
-      // Check initial state - no response entry yet
-      expect(processor.getResponseHistory()).toHaveLength(0);
+      // Check initial state - should have empty response entry
+      expect(processor.getResponseHistory()).toHaveLength(1);
+      expect(processor.getResponseHistory()[0]).toMatchObject({
+        id: toolCallId,
+        type: 'text',
+        message: '',
+        is_final_message: true,
+      });
 
       // Stream partial final_response
       await processor.processChunk({
