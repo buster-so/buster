@@ -136,9 +136,9 @@ describe('SQL Limit Helper', () => {
 
     test('should handle empty or invalid input', () => {
       expect(ensureSqlLimit('')).toBe('');
-      expect(ensureSqlLimit(null as any)).toBe(null);
-      expect(ensureSqlLimit(undefined as any)).toBe(undefined);
-      expect(ensureSqlLimit(123 as any)).toBe(123);
+      expect(ensureSqlLimit(null as never)).toBe(null);
+      expect(ensureSqlLimit(undefined as never)).toBe(undefined);
+      expect(ensureSqlLimit(123 as never)).toBe(123);
     });
 
     test('should handle SQL with schema and table qualifiers', () => {

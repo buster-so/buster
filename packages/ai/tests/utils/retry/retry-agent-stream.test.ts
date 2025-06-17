@@ -16,7 +16,7 @@ describe('detectRetryableError', () => {
       toolName: 'unknownTool',
       availableTools: ['tool1', 'tool2'],
     });
-    (error as any).toolCallId = 'test-call-id';
+    (error as never).toolCallId = 'test-call-id';
 
     const result = detectRetryableError(error);
 
@@ -37,8 +37,8 @@ describe('detectRetryableError', () => {
   it('should detect InvalidToolArgumentsError and create healing message', () => {
     const error = new Error('Invalid tool arguments');
     error.name = 'AI_InvalidToolArgumentsError';
-    (error as any).toolCallId = 'test-call-id';
-    (error as any).toolName = 'testTool';
+    (error as never).toolCallId = 'test-call-id';
+    (error as never).toolName = 'testTool';
 
     const result = detectRetryableError(error);
 
@@ -86,7 +86,7 @@ describe('retryableAgentStream', () => {
     const messages: CoreMessage[] = [{ role: 'user', content: 'Test message' }];
 
     const options: AgentStreamOptions<ToolSet> = {
-      runtimeContext: {} as any,
+      runtimeContext: {} as never,
     };
 
     const result = await retryableAgentStream({
@@ -107,7 +107,7 @@ describe('retryableAgentStream', () => {
       toolName: 'unknownTool',
       availableTools: ['tool1', 'tool2'],
     });
-    (error as any).toolCallId = 'test-call-id';
+    (error as never).toolCallId = 'test-call-id';
 
     const mockAgent = {
       stream: vi.fn().mockRejectedValueOnce(error).mockResolvedValueOnce(mockStream),
@@ -116,7 +116,7 @@ describe('retryableAgentStream', () => {
     const messages: CoreMessage[] = [{ role: 'user', content: 'Test message' }];
 
     const options: AgentStreamOptions<ToolSet> = {
-      runtimeContext: {} as any,
+      runtimeContext: {} as never,
     };
 
     const onRetry = vi.fn();
@@ -162,7 +162,7 @@ describe('retryableAgentStream', () => {
     const messages: CoreMessage[] = [{ role: 'user', content: 'Test message' }];
 
     const options: AgentStreamOptions<ToolSet> = {
-      runtimeContext: {} as any,
+      runtimeContext: {} as never,
     };
 
     await expect(
@@ -187,7 +187,7 @@ describe('retryableAgentStream', () => {
     const messages: CoreMessage[] = [{ role: 'user', content: 'Test message' }];
 
     const options: AgentStreamOptions<ToolSet> = {
-      runtimeContext: {} as any,
+      runtimeContext: {} as never,
     };
 
     await expect(
@@ -208,12 +208,12 @@ describe('retryableAgentStream', () => {
       toolName: 'unknownTool',
       availableTools: [],
     });
-    (noSuchToolError as any).toolCallId = 'call-1';
+    (noSuchToolError as never).toolCallId = 'call-1';
 
     const invalidArgsError = new Error('Invalid tool arguments');
     invalidArgsError.name = 'AI_InvalidToolArgumentsError';
-    (invalidArgsError as any).toolCallId = 'call-2';
-    (invalidArgsError as any).toolName = 'testTool';
+    (invalidArgsError as never).toolCallId = 'call-2';
+    (invalidArgsError as never).toolName = 'testTool';
 
     const mockAgent = {
       stream: vi
@@ -226,7 +226,7 @@ describe('retryableAgentStream', () => {
     const messages: CoreMessage[] = [{ role: 'user', content: 'Test message' }];
 
     const options: AgentStreamOptions<ToolSet> = {
-      runtimeContext: {} as any,
+      runtimeContext: {} as never,
     };
 
     const result = await retryableAgentStream({

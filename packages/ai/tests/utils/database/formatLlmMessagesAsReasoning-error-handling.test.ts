@@ -15,7 +15,7 @@ describe('formatLlmMessagesAsReasoning error handling', () => {
   });
 
   test('handles non-array input gracefully', () => {
-    const result = formatLlmMessagesAsReasoning(null as any);
+    const result = formatLlmMessagesAsReasoning(null as never);
 
     expect(result).toEqual([]);
     expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -25,7 +25,7 @@ describe('formatLlmMessagesAsReasoning error handling', () => {
   });
 
   test('handles undefined input gracefully', () => {
-    const result = formatLlmMessagesAsReasoning(undefined as any);
+    const result = formatLlmMessagesAsReasoning(undefined as never);
 
     expect(result).toEqual([]);
     expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -42,7 +42,7 @@ describe('formatLlmMessagesAsReasoning error handling', () => {
         content: 'Test message',
       },
       undefined,
-    ] as any;
+    ] as never;
 
     const result = formatLlmMessagesAsReasoning(messages);
 
@@ -61,7 +61,7 @@ describe('formatLlmMessagesAsReasoning error handling', () => {
             type: 'tool-call',
             toolCallId: 'test-id',
             toolName: 'unknownTool', // Use unknown tool to test default case
-            args: undefined as any, // Missing args
+            args: undefined as never, // Missing args
           },
         ],
       },
@@ -76,7 +76,7 @@ describe('formatLlmMessagesAsReasoning error handling', () => {
   });
 
   test('handles circular references in tool args', () => {
-    const circularObj: any = { a: 1 };
+    const circularObj: { a: number; self?: unknown } = { a: 1 };
     circularObj.self = circularObj; // Create circular reference
 
     const messages: CoreMessage[] = [
@@ -112,7 +112,7 @@ describe('formatLlmMessagesAsReasoning error handling', () => {
             type: 'tool-call',
             toolCallId: 'fail-id',
             toolName: 'sequentialThinking',
-            args: undefined as any, // This will be skipped because no thought
+            args: undefined as never, // This will be skipped because no thought
           },
         ],
       },
@@ -136,7 +136,7 @@ describe('formatLlmMessagesAsReasoning error handling', () => {
         role: 'assistant',
         content: [
           { type: 'text', text: 'Hello' },
-          { type: 'image', image: 'data:image/png;base64,...' } as any,
+          { type: 'image', image: 'data:image/png;base64,...' } as never,
           { type: 'text', text: 'World' },
         ],
       },

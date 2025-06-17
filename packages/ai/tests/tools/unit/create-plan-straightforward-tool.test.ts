@@ -477,7 +477,10 @@ Some random notes without actionable items.
 
       // The error should be caught and handled
       await expect(
-        processCreatePlanStraightforward({ plan: '1. Test task' }, faultyContext as MockRuntimeContext)
+        processCreatePlanStraightforward(
+          { plan: '1. Test task' },
+          faultyContext as MockRuntimeContext
+        )
       ).rejects.toThrow('State update error');
     });
 
@@ -514,13 +517,13 @@ Some random notes without actionable items.
         'verify',
       ];
 
-      actionVerbs.forEach((verb) => {
+      for (const verb of actionVerbs) {
         const plan = `${verb} a comprehensive dashboard`;
         const result = extractTodosFromPlanText(plan);
 
         expect(result).toHaveLength(1);
         expect(result[0].todo).toBe(`${verb} a comprehensive dashboard`);
-      });
+      }
     });
 
     test('should recognize case-insensitive action verbs', () => {

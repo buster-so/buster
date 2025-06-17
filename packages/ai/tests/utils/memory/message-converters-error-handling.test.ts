@@ -18,7 +18,7 @@ describe('message-converters error handling', () => {
 
   describe('convertToolCallToMessage', () => {
     test('handles null toolCall gracefully', () => {
-      const result = convertToolCallToMessage(null as any, null, 'completed');
+      const result = convertToolCallToMessage(null as never, null, 'completed');
 
       expect(result).toBeNull();
       expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -28,7 +28,7 @@ describe('message-converters error handling', () => {
     });
 
     test('handles undefined toolCall gracefully', () => {
-      const result = convertToolCallToMessage(undefined as any, null, 'completed');
+      const result = convertToolCallToMessage(undefined as never, null, 'completed');
 
       expect(result).toBeNull();
       expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -38,7 +38,7 @@ describe('message-converters error handling', () => {
     });
 
     test('handles toolCall without toolName gracefully', () => {
-      const toolCall = { toolCallId: 'test-id' } as any;
+      const toolCall = { toolCallId: 'test-id' } as never;
       const result = convertToolCallToMessage(toolCall, null, 'completed');
 
       expect(result).toBeNull();
@@ -48,7 +48,7 @@ describe('message-converters error handling', () => {
       const toolCall = {
         toolName: 'doneTool',
         toolCallId: 'test-id',
-      } as any;
+      } as never;
 
       const result = convertToolCallToMessage(toolCall, 'invalid-result', 'completed');
 
@@ -64,7 +64,7 @@ describe('message-converters error handling', () => {
       const toolCall = {
         toolName: 'sequentialThinking',
         toolCallId: 'test-id',
-      } as any;
+      } as never;
 
       const result = convertToolCallToMessage(toolCall, { invalid: 'data' }, 'completed');
 
@@ -96,7 +96,7 @@ describe('message-converters error handling', () => {
           toolName: 'doneTool',
           toolCallId: 'valid-id',
         },
-      ] as any;
+      ] as never;
 
       const toolResults = new Map([['valid-id', { message: 'Test message' }]]);
 
@@ -113,7 +113,7 @@ describe('message-converters error handling', () => {
           toolName: 'executeSql',
           toolCallId: 'test-id',
         },
-      ] as any;
+      ] as never;
 
       const result = extractMessagesFromToolCalls(toolCalls, new Map());
 

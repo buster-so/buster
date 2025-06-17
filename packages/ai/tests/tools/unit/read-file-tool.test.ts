@@ -83,8 +83,8 @@ describe('Read File Tool Unit Tests', () => {
     });
 
     expect(result.files_read).toBe(2);
-    expect(result.content).toContain('==> ' + testFile + ' <==');
-    expect(result.content).toContain('==> ' + multiTestFile + ' <==');
+    expect(result.content).toContain(`==> ${testFile} <==`);
+    expect(result.content).toContain(`==> ${multiTestFile} <==`);
     expect(result.content).toContain('Line 1');
     expect(result.content).toContain('Multi line 1');
   });

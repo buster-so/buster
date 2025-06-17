@@ -18,18 +18,18 @@ const outputSchema = z.object({
 interface TodoItem {
   todo: string;
   completed: boolean;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // Mock runtime context for testing
 class MockRuntimeContext {
-  private state: Map<string, any> = new Map();
+  private state: Map<string, unknown> = new Map();
 
-  get(key: string): any | undefined {
+  get(key: string): unknown | undefined {
     return this.state.get(key);
   }
 
-  set(key: string, value: any): void {
+  set(key: string, value: unknown): void {
     this.state.set(key, value);
   }
 
@@ -39,7 +39,7 @@ class MockRuntimeContext {
 }
 
 // Parse and validate todo items from agent state (copied from tool)
-function parseTodos(todosValue: any): TodoItem[] {
+function parseTodos(todosValue: unknown): TodoItem[] {
   if (!Array.isArray(todosValue)) {
     return [];
   }
@@ -528,9 +528,9 @@ describe('Review Plan Tool Unit Tests', () => {
         set: () => {},
       };
 
-      await expect(processReviewPlan({ todo_items: [1] }, faultyContext as any)).rejects.toThrow(
-        'State access error'
-      );
+      await expect(
+        processReviewPlan({ todo_items: [1] }, faultyContext as MockRuntimeContext)
+      ).rejects.toThrow('State access error');
     });
 
     test('should handle runtime context state update errors gracefully', async () => {
@@ -542,9 +542,9 @@ describe('Review Plan Tool Unit Tests', () => {
         },
       };
 
-      await expect(processReviewPlan({ todo_items: [1] }, faultyContext as any)).rejects.toThrow(
-        'State update error'
-      );
+      await expect(
+        processReviewPlan({ todo_items: [1] }, faultyContext as MockRuntimeContext)
+      ).rejects.toThrow('State update error');
     });
   });
 

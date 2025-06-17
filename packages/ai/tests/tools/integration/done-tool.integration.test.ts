@@ -280,10 +280,10 @@ describe('Done Tool Integration Tests', () => {
       { final_response: 123 }, // Wrong type
     ];
 
-    invalidInputs.forEach((input) => {
+    for (const input of invalidInputs) {
       const result = doneTool.inputSchema.safeParse(input);
       expect(result.success).toBe(false);
-    });
+    }
 
     // Valid input should pass
     const validInput = { final_response: 'Valid response' };

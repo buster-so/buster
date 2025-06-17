@@ -559,12 +559,12 @@ rows:
     test('should accept valid column size combinations', () => {
       const validCombinations = [[12], [6, 6], [4, 4, 4], [3, 3, 3, 3], [3, 9], [4, 8], [5, 7]];
 
-      validCombinations.forEach((columnSizes) => {
+      for (const columnSizes of validCombinations) {
         const sum = columnSizes.reduce((a, b) => a + b, 0);
         expect(sum).toBe(12);
         const allValid = columnSizes.every((size) => size >= 3 && size <= 12);
         expect(allValid).toBe(true);
-      });
+      }
     });
 
     test('should reject invalid column size combinations', () => {
@@ -577,13 +577,13 @@ rows:
         [15], // Size too large
       ];
 
-      invalidCombinations.forEach((columnSizes) => {
+      for (const columnSizes of invalidCombinations) {
         const sum = columnSizes.reduce((a, b) => a + b, 0);
         const hasInvalidSize = columnSizes.some((size) => size < 3 || size > 12);
         const invalidSum = sum !== 12;
 
         expect(hasInvalidSize || invalidSum).toBe(true);
-      });
+      }
     });
   });
 });

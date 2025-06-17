@@ -392,7 +392,7 @@ rows:
     expect(updatedDashboard[0].content.rows).toHaveLength(2);
 
     // Verify version history
-    const versionHistory = updatedDashboard[0].versionHistory as any;
+    const versionHistory = updatedDashboard[0].versionHistory as never;
     expect(versionHistory.versions).toHaveLength(2);
     expect(versionHistory.versions[1].versionNumber).toBe(2);
     expect(versionHistory.versions[1].content.name).toBe('Updated Valid Dashboard');
@@ -501,7 +501,7 @@ rows:
       .where(eq(dashboardFiles.id, dashboardId))
       .execute();
 
-    const versionHistory = finalDashboard[0].versionHistory as any;
+    const versionHistory = finalDashboard[0].versionHistory as never;
     expect(versionHistory.versions).toHaveLength(3);
     expect(versionHistory.versions[0].versionNumber).toBe(1);
     expect(versionHistory.versions[1].versionNumber).toBe(2);

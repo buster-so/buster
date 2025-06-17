@@ -567,7 +567,10 @@ Focus on statistical significance of findings.
 
       // The error should be caught and handled
       await expect(
-        processCreatePlanInvestigative({ plan: '1. Test task' }, faultyContext as MockRuntimeContext)
+        processCreatePlanInvestigative(
+          { plan: '1. Test task' },
+          faultyContext as MockRuntimeContext
+        )
       ).rejects.toThrow('State update error');
     });
 
@@ -606,13 +609,13 @@ Focus on statistical significance of findings.
         'validate',
       ];
 
-      actionVerbs.forEach((verb) => {
+      for (const verb of actionVerbs) {
         const plan = `${verb} customer behavior patterns`;
         const result = extractTodosFromPlanText(plan);
 
         expect(result).toHaveLength(1);
         expect(result[0].todo).toBe(`${verb} customer behavior patterns`);
-      });
+      }
     });
 
     test('should recognize case-insensitive investigative action verbs', () => {

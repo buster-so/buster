@@ -9,162 +9,164 @@ export interface OptimisticParseResult {
   extractedValues: Map<string, unknown>;
 }
 
-export class OptimisticJsonParser {
-  /**
-   * Attempts to parse potentially incomplete JSON by closing open structures
-   */
-  static parse(incompleteJson: string): OptimisticParseResult {
-    const result: OptimisticParseResult = {
-      parsed: null,
-      isComplete: false,
-      extractedValues: new Map(),
-    };
+/**
+ * Attempts to parse potentially incomplete JSON by closing open structures
+ */
+export function parseOptimisticJson(incompleteJson: string): OptimisticParseResult {
+  const result: OptimisticParseResult = {
+    parsed: null,
+    isComplete: false,
+    extractedValues: new Map(),
+  };
 
-    if (!incompleteJson || incompleteJson.trim() === '') {
-      return result;
-    }
-
-    // First, try standard parsing (it might be complete)
-    try {
-      result.parsed = JSON.parse(incompleteJson);
-      result.isComplete = true;
-      this.extractAllValues(result.parsed, result.extractedValues);
-      return result;
-    } catch {
-      // Continue with optimistic parsing
-    }
-
-    // Try to close the JSON optimistically
-    const closed = this.closeIncompleteJson(incompleteJson);
-
-    try {
-      result.parsed = JSON.parse(closed);
-      // Extract all values we can find
-      this.extractAllValues(result.parsed, result.extractedValues);
-    } catch {
-      // Even optimistic parsing failed, try to extract raw values
-      this.extractRawValues(incompleteJson, result.extractedValues);
-    }
-
+  if (!incompleteJson || incompleteJson.trim() === '') {
     return result;
   }
 
-  /**
-   * Attempts to close incomplete JSON structures
-   */
-  private static closeIncompleteJson(json: string): string {
-    let result = json.trim();
-
-    // Track open structures
-    const stack: string[] = [];
-    let inString = false;
-    let escapeNext = false;
-
-    for (let i = 0; i < result.length; i++) {
-      const char = result[i];
-
-      if (escapeNext) {
-        escapeNext = false;
-        continue;
-      }
-
-      if (char === '\\') {
-        escapeNext = true;
-        continue;
-      }
-
-      if (char === '"' && !escapeNext) {
-        inString = !inString;
-        continue;
-      }
-
-      if (!inString) {
-        if (char === '{') stack.push('}');
-        else if (char === '[') stack.push(']');
-        else if (char === '}' || char === ']') {
-          const expected = stack.pop();
-          if (expected !== char) {
-            // Mismatched bracket, this is malformed
-            // Try to recover by putting it back
-            if (expected) stack.push(expected);
-          }
-        }
-      }
-    }
-
-    // Close any unclosed strings
-    if (inString) {
-      result += '"';
-    }
-
-    // Close any unclosed structures in reverse order
-    while (stack.length > 0) {
-      result += stack.pop();
-    }
-
+  // First, try standard parsing (it might be complete)
+  try {
+    result.parsed = JSON.parse(incompleteJson);
+    result.isComplete = true;
+    extractAllValues(result.parsed, result.extractedValues);
     return result;
+  } catch {
+    // Continue with optimistic parsing
   }
 
-  /**
-   * Extract all values from a parsed object into the map
-   */
-  private static extractAllValues(
-    obj: unknown,
-    extractedValues: Map<string, unknown>,
-    prefix = ''
-  ): void {
-    if (obj === null || obj === undefined) return;
+  // Try to close the JSON optimistically
+  const closed = closeIncompleteJson(incompleteJson);
 
-    if (typeof obj === 'object' && !Array.isArray(obj)) {
-      for (const [key, value] of Object.entries(obj)) {
-        const fullKey = prefix ? `${prefix}.${key}` : key;
-        extractedValues.set(fullKey, value);
+  try {
+    result.parsed = JSON.parse(closed);
+    // Extract all values we can find
+    extractAllValues(result.parsed, result.extractedValues);
+  } catch {
+    // Even optimistic parsing failed, try to extract raw values
+    extractRawValues(incompleteJson, result.extractedValues);
+  }
 
-        if (typeof value === 'object' && value !== null) {
-          this.extractAllValues(value, extractedValues, fullKey);
+  return result;
+}
+
+/**
+ * Attempts to close incomplete JSON structures
+ */
+function closeIncompleteJson(json: string): string {
+  let result = json.trim();
+
+  // Track open structures
+  const stack: string[] = [];
+  let inString = false;
+  let escapeNext = false;
+
+  for (let i = 0; i < result.length; i++) {
+    const char = result[i];
+
+    if (escapeNext) {
+      escapeNext = false;
+      continue;
+    }
+
+    if (char === '\\') {
+      escapeNext = true;
+      continue;
+    }
+
+    if (char === '"' && !escapeNext) {
+      inString = !inString;
+      continue;
+    }
+
+    if (!inString) {
+      if (char === '{') stack.push('}');
+      else if (char === '[') stack.push(']');
+      else if (char === '}' || char === ']') {
+        const expected = stack.pop();
+        if (expected !== char) {
+          // Mismatched bracket, this is malformed
+          // Try to recover by putting it back
+          if (expected) stack.push(expected);
         }
       }
     }
   }
 
-  /**
-   * Attempt to extract values from raw incomplete JSON
-   * This handles cases like: {"message": "Hello wor
-   */
-  private static extractRawValues(
-    incompleteJson: string,
-    extractedValues: Map<string, unknown>
-  ): void {
-    // Look for patterns like "key": "value in progress
-    const stringPattern = /"([^"]+)"\s*:\s*"([^"]*)/g;
-    let match;
+  // Close any unclosed strings
+  if (inString) {
+    result += '"';
+  }
 
-    while ((match = stringPattern.exec(incompleteJson)) !== null) {
-      const [, key, value] = match;
-      if (key && value !== undefined) {
-        extractedValues.set(key, value);
-      }
-    }
+  // Close any unclosed structures in reverse order
+  while (stack.length > 0) {
+    result += stack.pop();
+  }
 
-    // Look for patterns like "key": number
-    const numberPattern = /"([^"]+)"\s*:\s*(-?\d+\.?\d*)/g;
-    while ((match = numberPattern.exec(incompleteJson)) !== null) {
-      const [, key, value] = match;
-      if (key && value) {
-        extractedValues.set(key, Number.parseFloat(value));
-      }
-    }
+  return result;
+}
 
-    // Look for patterns like "key": true/false (including incomplete)
-    const boolPattern = /"([^"]+)"\s*:\s*(tru|true|fals|false)/g;
-    while ((match = boolPattern.exec(incompleteJson)) !== null) {
-      const [, key, value] = match;
-      if (key && value) {
-        extractedValues.set(key, value.startsWith('tru'));
+/**
+ * Extract all values from a parsed object into the map
+ */
+function extractAllValues(obj: unknown, extractedValues: Map<string, unknown>, prefix = ''): void {
+  if (obj === null || obj === undefined) return;
+
+  if (typeof obj === 'object' && !Array.isArray(obj)) {
+    for (const [key, value] of Object.entries(obj)) {
+      const fullKey = prefix ? `${prefix}.${key}` : key;
+      extractedValues.set(fullKey, value);
+
+      if (typeof value === 'object' && value !== null) {
+        extractAllValues(value, extractedValues, fullKey);
       }
     }
   }
 }
+
+/**
+ * Attempt to extract values from raw incomplete JSON
+ * This handles cases like: {"message": "Hello wor
+ */
+function extractRawValues(incompleteJson: string, extractedValues: Map<string, unknown>): void {
+  // Look for patterns like "key": "value in progress
+  const stringPattern = /"([^"]+)"\s*:\s*"([^"]*)/g;
+  let match: RegExpExecArray | null;
+
+  match = stringPattern.exec(incompleteJson);
+  while (match !== null) {
+    const [, key, value] = match;
+    if (key && value !== undefined) {
+      extractedValues.set(key, value);
+    }
+    match = stringPattern.exec(incompleteJson);
+  }
+
+  // Look for patterns like "key": number
+  const numberPattern = /"([^"]+)"\s*:\s*(-?\d+\.?\d*)/g;
+  match = numberPattern.exec(incompleteJson);
+  while (match !== null) {
+    const [, key, value] = match;
+    if (key && value) {
+      extractedValues.set(key, Number.parseFloat(value));
+    }
+    match = numberPattern.exec(incompleteJson);
+  }
+
+  // Look for patterns like "key": true/false (including incomplete)
+  const boolPattern = /"([^"]+)"\s*:\s*(tru|true|fals|false)/g;
+  match = boolPattern.exec(incompleteJson);
+  while (match !== null) {
+    const [, key, value] = match;
+    if (key && value) {
+      extractedValues.set(key, value.startsWith('tru'));
+    }
+    match = boolPattern.exec(incompleteJson);
+  }
+}
+
+// Maintain backward compatibility with the original class-based API
+export const OptimisticJsonParser = {
+  parse: parseOptimisticJson,
+};
 
 /**
  * Helper to get a value from extracted values with type safety

@@ -47,9 +47,9 @@ function createInvalidToolArgumentsError(
 ): Error {
   const error = new Error('Invalid tool arguments');
   error.name = 'AI_InvalidToolArgumentsError';
-  (error as any).toolCallId = toolCallId;
-  (error as any).toolName = toolName;
-  (error as any).args = JSON.stringify({ files: doubleEscapedFiles });
+  (error as never).toolCallId = toolCallId;
+  (error as never).toolName = toolName;
+  (error as never).args = JSON.stringify({ files: doubleEscapedFiles });
   return error;
 }
 
@@ -59,7 +59,7 @@ describe('retryableAgentStreamWithHealing', () => {
       toolName: 'badTool',
       availableTools: ['tool1', 'tool2'],
     });
-    (error as any).toolCallId = 'test-call-id';
+    (error as never).toolCallId = 'test-call-id';
 
     const mockAgent = {
       stream: vi
@@ -74,7 +74,7 @@ describe('retryableAgentStreamWithHealing', () => {
 
     const messages: CoreMessage[] = [{ role: 'user', content: 'Test message' }];
     const options: AgentStreamOptions<ToolSet> = {
-      runtimeContext: {} as any,
+      runtimeContext: {} as never,
     };
 
     const onRetry = vi.fn();
@@ -134,7 +134,7 @@ describe('retryableAgentStreamWithHealing', () => {
 
     const messages: CoreMessage[] = [{ role: 'user', content: 'Create a metric' }];
     const options: AgentStreamOptions<ToolSet> = {
-      runtimeContext: {} as any,
+      runtimeContext: {} as never,
     };
 
     const onRetry = vi.fn();
@@ -176,9 +176,9 @@ describe('retryableAgentStreamWithHealing', () => {
   it('should provide generic error message for non-visualization tools', async () => {
     const error = new Error('Invalid tool arguments');
     error.name = 'AI_InvalidToolArgumentsError';
-    (error as any).toolCallId = 'test-call-id';
-    (error as any).toolName = 'execute-sql';
-    (error as any).args = JSON.stringify({ query: 123 }); // wrong type
+    (error as never).toolCallId = 'test-call-id';
+    (error as never).toolName = 'execute-sql';
+    (error as never).args = JSON.stringify({ query: 123 }); // wrong type
 
     const mockAgent = {
       stream: vi
@@ -192,7 +192,7 @@ describe('retryableAgentStreamWithHealing', () => {
 
     const messages: CoreMessage[] = [{ role: 'user', content: 'Execute SQL' }];
     const options: AgentStreamOptions<ToolSet> = {
-      runtimeContext: {} as any,
+      runtimeContext: {} as never,
     };
 
     const result = await retryableAgentStreamWithHealing({
@@ -204,7 +204,7 @@ describe('retryableAgentStreamWithHealing', () => {
     expect(result.retryCount).toBe(1);
 
     // Verify error message was provided (not healed)
-    const toolResult = result.conversationHistory[1].content[0] as any;
+    const toolResult = result.conversationHistory[1].content[0] as never;
     expect(toolResult?.result?.error).toContain('Invalid arguments for execute-sql');
   });
 
@@ -213,7 +213,7 @@ describe('retryableAgentStreamWithHealing', () => {
       toolName: 'badTool',
       availableTools: [],
     });
-    (noSuchToolError as any).toolCallId = 'call-1';
+    (noSuchToolError as never).toolCallId = 'call-1';
 
     const invalidArgsError = createInvalidToolArgumentsError(
       'create-dashboards-file',
@@ -235,7 +235,7 @@ describe('retryableAgentStreamWithHealing', () => {
 
     const messages: CoreMessage[] = [{ role: 'user', content: 'Test message' }];
     const options: AgentStreamOptions<ToolSet> = {
-      runtimeContext: {} as any,
+      runtimeContext: {} as never,
     };
 
     const result = await retryableAgentStreamWithHealing({
@@ -267,7 +267,7 @@ describe('retryableAgentStreamWithHealing', () => {
 
     const messages: CoreMessage[] = [{ role: 'user', content: 'Test message' }];
     const options: AgentStreamOptions<ToolSet> = {
-      runtimeContext: {} as any,
+      runtimeContext: {} as never,
     };
 
     await expect(
@@ -292,7 +292,7 @@ describe('retryableAgentStreamWithHealing', () => {
 
     const messages: CoreMessage[] = [{ role: 'user', content: 'Test message' }];
     const options: AgentStreamOptions<ToolSet> = {
-      runtimeContext: {} as any,
+      runtimeContext: {} as never,
     };
 
     await expect(
@@ -314,7 +314,7 @@ describe('retryableAgentStreamWithHealing', () => {
 
     const messages: CoreMessage[] = [{ role: 'user', content: 'Test message' }];
     const options: AgentStreamOptions<ToolSet> = {
-      runtimeContext: {} as any,
+      runtimeContext: {} as never,
     };
 
     const result = await retryableAgentStreamWithHealing({

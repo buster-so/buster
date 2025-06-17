@@ -629,7 +629,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
           if (fileIds && fileIds.length > 0) {
             const fileId = fileIds[0];
             const file = entry.files[fileId];
-            if (file && file.file) {
+            if (file?.file) {
               file.file.text = sql;
             }
           }

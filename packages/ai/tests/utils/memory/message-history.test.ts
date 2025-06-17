@@ -475,12 +475,12 @@ describe('Message History Utilities', () => {
         const toolIdx = 2 + i * 2;
 
         // Get tool call ID from assistant message
-        const assistantContent = extracted[assistantIdx].content as any[];
+        const assistantContent = extracted[assistantIdx].content as never[];
         const toolCall = assistantContent[0];
         expect(toolCall.toolCallId).toBe(toolCallIds[i]);
 
         // Verify matching tool result
-        const toolContent = extracted[toolIdx].content as any[];
+        const toolContent = extracted[toolIdx].content as never[];
         const toolResult = toolContent[0];
         expect(toolResult.toolCallId).toBe(toolCallIds[i]);
       }

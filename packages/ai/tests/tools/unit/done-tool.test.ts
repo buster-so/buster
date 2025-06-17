@@ -421,9 +421,9 @@ All requirements have been fulfilled.`,
         set: () => {},
       };
 
-      await expect(processDone({ final_response: 'Test' }, faultyContext as MockRuntimeContext)).rejects.toThrow(
-        'State access error'
-      );
+      await expect(
+        processDone({ final_response: 'Test' }, faultyContext as MockRuntimeContext)
+      ).rejects.toThrow('State access error');
     });
   });
 
@@ -438,14 +438,14 @@ All requirements have been fulfilled.`,
         'Multiple\n\nParagraphs\n\nSupported',
       ];
 
-      markdownFormats.forEach((format) => {
+      for (const format of markdownFormats) {
         const result = inputSchema.safeParse({ final_response: format });
         expect(result.success).toBe(true);
-      });
+      }
     });
 
     test('should handle very long responses', () => {
-      const longResponse = 'A'.repeat(5000) + ' - Task completed successfully.';
+      const longResponse = `${'A'.repeat(5000)} - Task completed successfully.`;
       const result = inputSchema.safeParse({ final_response: longResponse });
       expect(result.success).toBe(true);
     });
