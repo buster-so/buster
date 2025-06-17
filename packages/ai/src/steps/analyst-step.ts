@@ -60,6 +60,53 @@ const outputSchema = z.object({
 });
 
 /**
+ * Transform reasoning/response history to match ChunkProcessor expected types
+ */
+function transformHistoryForChunkProcessor(
+  reasoningHistory: z.infer<typeof ReasoningHistorySchema> | undefined,
+  responseHistory: z.infer<typeof ResponseHistorySchema>
+): {
+  reasoningHistory: ChatMessageReasoningMessage[];
+  responseHistory: ChatMessageResponseMessage[];
+} {
+  const validPillTypes = [
+    'value',
+    'metric',
+    'dashboard',
+    'collection',
+    'dataset',
+    'term',
+    'topic',
+    'empty',
+  ] as const;
+
+  const safeReasoningHistory = reasoningHistory || [];
+
+  const transformedReasoning = safeReasoningHistory.map((entry) => {
+    if (entry.type === 'pills') {
+      return {
+        ...entry,
+        pill_containers: entry.pill_containers.map((container) => ({
+          ...container,
+          pills: container.pills.map((pill) => ({
+            ...pill,
+            type: validPillTypes.includes(pill.type as (typeof validPillTypes)[number])
+              ? pill.type
+              : 'empty',
+          })),
+        })),
+      };
+    }
+    return entry;
+  }) as ChatMessageReasoningMessage[];
+
+  return {
+    reasoningHistory: transformedReasoning,
+    responseHistory: responseHistory as ChatMessageResponseMessage[],
+  };
+}
+
+/**
  * Extract successfully created/modified files from reasoning history
  */
 function extractFilesFromReasoning(
@@ -156,11 +203,17 @@ const analystExecution = async ({
 
   // Initialize chunk processor with histories from previous step
   // IMPORTANT: Pass histories from think-and-prep to accumulate across steps
+  const { reasoningHistory: transformedReasoning, responseHistory: transformedResponse } =
+    transformHistoryForChunkProcessor(
+      inputData.reasoningHistory || [],
+      inputData.responseHistory || []
+    );
+
   const chunkProcessor = new ChunkProcessor(
     messageId,
     [],
-    inputData.reasoningHistory || [], // Pass reasoning history from previous step
-    inputData.responseHistory || [] // Pass response history from previous step
+    transformedReasoning, // Pass transformed reasoning history
+    transformedResponse // Pass transformed response history
   );
 
   try {
@@ -301,51 +354,15 @@ const analystExecution = async ({
     if (chunkProcessor.hasFinishingTool() && chunkProcessor.getFinishingToolName() === 'doneTool') {
       // Log reasoning history to debug file statuses
       const reasoningHistory = chunkProcessor.getReasoningHistory();
-      console.log(
-        '[DEBUG] Reasoning history entries:',
-        reasoningHistory.map((entry) => ({
-          id: entry.id,
-          type: entry.type,
-          status: entry.status,
-          title: entry.title,
-          fileCount: entry.files ? Object.keys(entry.files).length : 0,
-          fileStatuses: entry.files
-            ? Object.values(entry.files).map((f) => ({
-                name: f.file_name,
-                status: f.status,
-              }))
-            : [],
-        }))
-      );
 
       // Extract all successfully created/modified files
       const allFiles = extractFilesFromReasoning(reasoningHistory);
 
-      console.log('[DEBUG] Extracted files from reasoning:', {
-        totalFiles: allFiles.length,
-        files: allFiles.map((f) => ({
-          id: f.id,
-          type: f.fileType,
-          name: f.fileName,
-          status: f.status,
-        })),
-      });
-
       // Apply intelligent selection logic
       const selectedFiles = selectFilesForResponse(allFiles);
 
-      console.log('[DEBUG] Selected files for response:', {
-        selectedCount: selectedFiles.length,
-        selectedFiles: selectedFiles.map((f) => ({ id: f.id, type: f.fileType, name: f.fileName })),
-      });
-
       // Create file response messages for selected files
       const fileResponseMessages = createFileResponseMessages(selectedFiles);
-
-      console.log('[DEBUG] Created file response messages:', {
-        messageCount: fileResponseMessages.length,
-        messages: fileResponseMessages,
-      });
 
       // Add file response messages to the chunk processor's internal state
       // This ensures they're included in any subsequent saves and aren't overwritten
@@ -354,11 +371,6 @@ const analystExecution = async ({
       // Get the updated response history including our new file messages
       enhancedResponseHistory = chunkProcessor.getResponseHistory();
 
-      console.log('[DEBUG] Enhanced response history after adding files:', {
-        totalMessages: enhancedResponseHistory.length,
-        messageTypes: enhancedResponseHistory.map((m) => ({ id: m.id, type: m.type })),
-      });
-
       // Add metadata about files
       filesMetadata = {
         filesCreated: allFiles.length,
@@ -366,18 +378,11 @@ const analystExecution = async ({
       };
     }
 
-    console.log('[DEBUG] Final response history being returned:', {
-      count: enhancedResponseHistory.length,
-      items: enhancedResponseHistory.map((r) => ({
-        id: r.id,
-        type: r.type,
-        message: r.message?.substring(0, 50),
-      })),
-    });
-
     // One final save to ensure file messages are persisted
-    if (filesMetadata.filesReturned > 0) {
-      console.log('[DEBUG] Forcing final save with file messages');
+    if (
+      'filesReturned' in filesMetadata &&
+      (filesMetadata as { filesReturned: number }).filesReturned > 0
+    ) {
       await chunkProcessor.saveToDatabase();
     }
 
