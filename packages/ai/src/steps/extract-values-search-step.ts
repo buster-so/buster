@@ -92,11 +92,8 @@ function organizeResultsBySchemaTable(
       organized[schemaTable][column] = [];
     }
 
-    // Add value if not already present and limit to reasonable number
-    if (
-      !organized[schemaTable][column].includes(result.value) &&
-      organized[schemaTable][column].length < 10
-    ) {
+    // Add value if not already present - show all results
+    if (!organized[schemaTable][column].includes(result.value)) {
       organized[schemaTable][column].push(result.value);
     }
   }
@@ -131,6 +128,7 @@ function formatSearchResults(results: StoredValueResult[]): string {
 
 /**
  * Searches for stored values for all extracted keywords concurrently
+ * Designed to never throw errors - will always return a valid response
  */
 async function searchStoredValues(
   values: string[],
@@ -140,29 +138,44 @@ async function searchStoredValues(
   foundValues: Record<string, Record<string, string[]>>;
   searchPerformed: boolean;
 }> {
-  try {
-    if (values.length === 0 || !dataSourceId) {
-      return {
-        searchResults: '',
-        foundValues: {},
-        searchPerformed: false,
-      };
-    }
+  // Early return for missing inputs - not an error condition
+  if (values.length === 0 || !dataSourceId) {
+    return {
+      searchResults: '',
+      foundValues: {},
+      searchPerformed: false,
+    };
+  }
 
-    // Generate embeddings for all keywords concurrently
-    const embeddingPromises = values.map(async (value) => {
+  try {
+    console.log(
+      `[StoredValues] Starting search for ${values.length} keywords: ${values.join(', ')}`
+    );
+
+    // Generate embeddings for all keywords concurrently with individual error handling
+    const embeddingPromises = values.map(async (value, index) => {
       try {
-        return await generateEmbedding([value]);
+        const embedding = await generateEmbedding([value]);
+        console.log(
+          `[StoredValues] Generated embedding for keyword ${index + 1}/${values.length}: "${value}"`
+        );
+        return { value, embedding };
       } catch (error) {
-        console.error(`Failed to generate embedding for "${value}":`, error);
+        console.error(
+          `[StoredValues] Failed to generate embedding for "${value}":`,
+          error instanceof Error ? error.message : 'Unknown error'
+        );
         return null;
       }
     });
 
-    const embeddings = await Promise.all(embeddingPromises);
-    const validEmbeddings = embeddings.filter((emb): emb is number[] => emb !== null);
+    const embeddingResults = await Promise.all(embeddingPromises);
+    const validEmbeddings = embeddingResults.filter(
+      (result): result is { value: string; embedding: number[] } => result !== null
+    );
 
     if (validEmbeddings.length === 0) {
+      console.warn('[StoredValues] No valid embeddings generated, skipping search');
       return {
         searchResults: '',
         foundValues: {},
@@ -170,12 +183,23 @@ async function searchStoredValues(
       };
     }
 
-    // Search for values using each embedding concurrently
-    const searchPromises = validEmbeddings.map(async (embedding) => {
+    console.log(
+      `[StoredValues] Generated ${validEmbeddings.length}/${values.length} valid embeddings, starting database searches`
+    );
+
+    // Search for values using each embedding concurrently with individual error handling
+    const searchPromises = validEmbeddings.map(async ({ value, embedding }, index) => {
       try {
-        return await searchValuesByEmbedding(dataSourceId, embedding, { limit: 30 });
+        const results = await searchValuesByEmbedding(dataSourceId, embedding, { limit: 30 });
+        console.log(
+          `[StoredValues] Search ${index + 1}/${validEmbeddings.length} for "${value}" returned ${results.length} results`
+        );
+        return results;
       } catch (error) {
-        console.error('Failed to search stored values:', error);
+        console.error(
+          `[StoredValues] Failed to search stored values for "${value}":`,
+          error instanceof Error ? error.message : 'Unknown error'
+        );
         return [];
       }
     });
@@ -183,9 +207,16 @@ async function searchStoredValues(
     const searchResults = await Promise.all(searchPromises);
     const allResults = searchResults.flat();
 
-    // Format results
+    console.log(`[StoredValues] Total results found: ${allResults.length}`);
+
+    // Format results (these functions are pure and shouldn't throw)
     const searchMessage = formatSearchResults(allResults);
     const structuredResults = organizeResultsBySchemaTable(allResults);
+
+    const hasResults = searchMessage.length > 0;
+    console.log(
+      `[StoredValues] Search completed successfully. Results formatted: ${hasResults ? 'Yes' : 'No'}`
+    );
 
     return {
       searchResults: searchMessage,
@@ -193,7 +224,14 @@ async function searchStoredValues(
       searchPerformed: true,
     };
   } catch (error) {
-    console.error('Error in searchStoredValues:', error);
+    // Catch-all for any unexpected errors - should never break the workflow
+    console.error('[StoredValues] Unexpected error during stored values search:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      valuesCount: values.length,
+      dataSourceId: dataSourceId ? dataSourceId.substring(0, 8) + '...' : 'undefined',
+    });
+
     return {
       searchResults: '',
       foundValues: {},
