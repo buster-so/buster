@@ -4,13 +4,11 @@ import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { thinkAndPrepAgent } from '../agents/think-and-prep-agent/think-and-prep-agent';
-import { parseStreamingArgs as parseRespondWithoutAnalysisArgs } from '../tools/communication-tools/respond-without-analysis';
-import { parseStreamingArgs as parseSequentialThinkingArgs } from '../tools/planning-thinking-tools/sequential-thinking-tool';
 import { ChunkProcessor } from '../utils/database/chunk-processor';
 import { retryableAgentStreamWithHealing } from '../utils/retry';
 import type { RetryableError } from '../utils/retry/types';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
-import { ToolArgsParser, createOnChunkHandler, handleStreamingError } from '../utils/streaming';
+import { createOnChunkHandler, handleStreamingError } from '../utils/streaming';
 import type {
   AnalystRuntimeContext,
   thinkAndPrepWorkflowInputSchema,
@@ -31,10 +29,7 @@ import {
   getLastToolUsed,
 } from '../utils/memory/message-history';
 import { createStoredValuesToolCallMessage } from '../utils/memory/stored-values-to-messages';
-import {
-  createTodoReasoningMessage,
-  createTodoToolCallMessage,
-} from '../utils/memory/todos-to-messages';
+import { createTodoToolCallMessage } from '../utils/memory/todos-to-messages';
 import {
   type BusterChatMessageReasoningSchema,
   type BusterChatMessageResponseSchema,
@@ -178,9 +173,6 @@ const thinkAndPrepExecution = async ({
     );
 
     const stream = await wrappedStream();
-    const toolArgsParser = new ToolArgsParser();
-    toolArgsParser.registerParser('respond-without-analysis', parseRespondWithoutAnalysisArgs);
-    toolArgsParser.registerParser('sequential-thinking', parseSequentialThinkingArgs);
 
     try {
       // Process the stream - chunks are handled by onChunk callback

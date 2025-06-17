@@ -9,10 +9,6 @@ import type {
   ChatMessageResponseMessage,
 } from '../../../../server/src/types/chat-types/chat-message.type';
 import { analystAgent } from '../agents/analyst-agent/analyst-agent';
-import { parseStreamingArgs as parseDoneArgs } from '../tools/communication-tools/done-tool';
-import { parseStreamingArgs as parseExecuteSqlArgs } from '../tools/database-tools/execute-sql';
-import { parseStreamingArgs as parseSequentialThinkingArgs } from '../tools/planning-thinking-tools/sequential-thinking-tool';
-import { parseStreamingArgs as parseCreateMetricsArgs } from '../tools/visualization-tools/create-metrics-file-tool';
 import { ChunkProcessor } from '../utils/database/chunk-processor';
 import {
   MessageHistorySchema,
@@ -23,11 +19,8 @@ import {
 } from '../utils/memory/types';
 import { retryableAgentStreamWithHealing } from '../utils/retry';
 import type { RetryableError } from '../utils/retry/types';
-import { ToolArgsParser, createOnChunkHandler, handleStreamingError } from '../utils/streaming';
-import type {
-  AnalystRuntimeContext,
-  thinkAndPrepWorkflowInputSchema,
-} from '../workflows/analyst-workflow'; // Just for input schema types now
+import { createOnChunkHandler, handleStreamingError } from '../utils/streaming';
+import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
 
 const inputSchema = ThinkAndPrepOutputSchema;
 
@@ -183,14 +176,15 @@ function createMessageKey(msg: CoreMessage): string {
   if (msg.role === 'assistant' && Array.isArray(msg.content)) {
     // For assistant messages with tool calls, use toolCallId as part of the key
     const toolCallIds = msg.content
-      .filter((c): c is { type: string; toolCallId?: string } => 
-        typeof c === 'object' && 
-        c !== null && 
-        'type' in c && 
-        c.type === 'tool-call' && 
-        'toolCallId' in c
+      .filter(
+        (c): c is { type: string; toolCallId?: string } =>
+          typeof c === 'object' &&
+          c !== null &&
+          'type' in c &&
+          c.type === 'tool-call' &&
+          'toolCallId' in c
       )
-      .map(c => c.toolCallId)
+      .map((c) => c.toolCallId)
       .filter((id): id is string => id !== undefined)
       .sort()
       .join(',');
@@ -224,9 +218,9 @@ function deduplicateMessages(messages: CoreMessage[]): CoreMessage[] {
           msg.role === 'assistant' && Array.isArray(msg.content)
             ? msg.content.map((c) => {
                 if (typeof c === 'object' && c !== null && 'type' in c) {
-                  return { 
-                    type: c.type, 
-                    toolCallId: 'toolCallId' in c ? c.toolCallId : undefined 
+                  return {
+                    type: c.type,
+                    toolCallId: 'toolCallId' in c ? c.toolCallId : undefined,
                   };
                 }
                 return { type: 'unknown' };
@@ -250,7 +244,6 @@ const analystExecution = async ({
   runtimeContext,
 }: {
   inputData: z.infer<typeof inputSchema>;
-  getInitData: () => Promise<z.infer<typeof thinkAndPrepWorkflowInputSchema>>;
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof outputSchema>> => {
   // Check if think-and-prep already finished - if so, pass through
@@ -365,13 +358,6 @@ const analystExecution = async ({
     );
 
     const stream = await wrappedStream();
-
-    // Initialize the tool args parser with analyst tool mappings
-    const toolArgsParser = new ToolArgsParser();
-    toolArgsParser.registerParser('create-metrics-file', parseCreateMetricsArgs);
-    toolArgsParser.registerParser('doneTool', parseDoneArgs);
-    toolArgsParser.registerParser('execute-sql', parseExecuteSqlArgs);
-    toolArgsParser.registerParser('sequential-thinking', parseSequentialThinkingArgs);
 
     try {
       // Process the stream - chunks are handled by onChunk callback
