@@ -1,4 +1,3 @@
-import { updateMessageFields } from '@buster/database';
 import { createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import type { CoreMessage } from 'ai';
@@ -309,26 +308,18 @@ const analystExecution = async ({
       // Create file response messages for selected files
       const fileResponseMessages = createFileResponseMessages(selectedFiles);
 
-      // Add file response messages to response history
-      enhancedResponseHistory = [...enhancedResponseHistory, ...fileResponseMessages];
+      // Add file response messages to the chunk processor's internal state
+      // This ensures they're included in any subsequent saves and aren't overwritten
+      await chunkProcessor.addResponseMessages(fileResponseMessages);
+
+      // Get the updated response history including our new file messages
+      enhancedResponseHistory = chunkProcessor.getResponseHistory();
 
       // Add metadata about files
       filesMetadata = {
         filesCreated: allFiles.length,
         filesReturned: selectedFiles.length,
       };
-
-      // Save the enhanced response history to the database
-      if (messageId && fileResponseMessages.length > 0) {
-        try {
-          await updateMessageFields(messageId, {
-            responseMessages: enhancedResponseHistory,
-          });
-        } catch (error) {
-          console.error('Error saving file response messages to database:', error);
-          // Don't throw - we want to continue even if save fails
-        }
-      }
     }
 
     return {
@@ -360,23 +351,17 @@ const analystExecution = async ({
         const allFiles = extractFilesFromReasoning(chunkProcessor.getReasoningHistory());
         const selectedFiles = selectFilesForResponse(allFiles);
         const fileResponseMessages = createFileResponseMessages(selectedFiles);
-        enhancedResponseHistory = [...enhancedResponseHistory, ...fileResponseMessages];
+
+        // Add file response messages to the chunk processor's internal state
+        await chunkProcessor.addResponseMessages(fileResponseMessages);
+
+        // Get the updated response history including our new file messages
+        enhancedResponseHistory = chunkProcessor.getResponseHistory();
+
         filesMetadata = {
           filesCreated: allFiles.length,
           filesReturned: selectedFiles.length,
         };
-
-        // Save the enhanced response history to the database
-        if (messageId && fileResponseMessages.length > 0) {
-          try {
-            await updateMessageFields(messageId, {
-              responseMessages: enhancedResponseHistory,
-            });
-          } catch (error) {
-            console.error('Error saving file response messages to database:', error);
-            // Don't throw - we want to continue even if save fails
-          }
-        }
       }
 
       return {

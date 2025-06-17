@@ -88,8 +88,11 @@ const thinkAndPrepExecution = async ({
   let finished = false;
   const finalStepData: StepFinishData | null = null;
 
-  // Initialize chunk processor with initial messages
-  const chunkProcessor = new ChunkProcessor(messageId, [], [], []);
+  // Extract reasoning history from create-todos step
+  const initialReasoningHistory = inputData['create-todos'].reasoningHistory || [];
+
+  // Initialize chunk processor with initial messages and reasoning history
+  const chunkProcessor = new ChunkProcessor(messageId, [], initialReasoningHistory, []);
 
   try {
     const initData = await getInitData();
