@@ -45,7 +45,7 @@ export function createTodoReasoningMessage(
     files: {
       [fileId]: {
         id: fileId,
-        file_type: 'todo',
+        file_type: 'agent-action',
         file_name: 'todos',
         version_number: 1,
         status: 'completed',
