@@ -333,15 +333,25 @@ const analystExecution = async ({
             maxRetries: 3,
             onRetry: (error: RetryableError, attemptNumber: number) => {
               // Log retry attempt for debugging
-              console.error(`Analyst retry attempt ${attemptNumber} for error:`, error);
+              console.error(`Analyst retry attempt ${attemptNumber} for error:`, {
+                type: error.type,
+                attempt: attemptNumber,
+                messageId: runtimeContext.get('messageId'),
+                originalError:
+                  error.originalError instanceof Error ? error.originalError.message : 'Unknown',
+              });
             },
           },
         });
 
         // Update messages to include any healing messages added during retries
-        if (result.conversationHistory.length > messages.length) {
-          // Healing messages were added, update the complete conversation history
+        if (Array.isArray(messages) && Array.isArray(result.conversationHistory)) {
+          messages.length = 0;
+          messages.push(...result.conversationHistory);
+          // Update complete conversation history with healing messages
           completeConversationHistory = result.conversationHistory;
+        } else {
+          console.error('Invalid messages or conversationHistory array');
         }
 
         return result.stream;

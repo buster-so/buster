@@ -9,8 +9,8 @@ import {
   StepFinishDataSchema,
 } from '../utils/memory/types';
 
-// The analyst step output schema
-const AnalystOutputSchema = z.object({
+// The mark-message-complete step output schema (includes completion fields)
+const MarkMessageCompleteOutputSchema = z.object({
   conversationHistory: MessageHistorySchema,
   finished: z.boolean().optional(),
   outputMessages: MessageHistorySchema.optional(),
@@ -22,12 +22,18 @@ const AnalystOutputSchema = z.object({
       toolsUsed: z.array(z.string()).optional(),
       finalTool: z.string().optional(),
       doneTool: z.boolean().optional(),
+      filesCreated: z.number().optional(),
+      filesReturned: z.number().optional(),
     })
     .optional(),
+  // Completion metadata from mark-message-complete step
+  messageId: z.string(),
+  completedAt: z.string(),
+  success: z.boolean(),
 });
 
-// Input now always comes from analyst step
-const inputSchema = AnalystOutputSchema;
+// Input now comes from mark-message-complete step
+const inputSchema = MarkMessageCompleteOutputSchema;
 
 // Metadata schema for workflow output
 const WorkflowMetadataSchema = z.object({
@@ -35,6 +41,9 @@ const WorkflowMetadataSchema = z.object({
   finalTool: z.string().optional(),
   text: z.string().optional(),
   reasoning: z.string().optional(),
+  doneTool: z.boolean().optional(),
+  filesCreated: z.number().optional(),
+  filesReturned: z.number().optional(),
 });
 
 // Clean output schema matching the workflow output schema

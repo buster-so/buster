@@ -61,7 +61,16 @@ const BusterChatMessageReasoningPillSchema = z.object({
         z.object({
           text: z.string(),
           id: z.string(),
-          type: z.enum(['metric', 'dashboard', 'collection', 'dataset', 'term', 'topic', 'value', 'empty']),
+          type: z.enum([
+            'metric',
+            'dashboard',
+            'collection',
+            'dataset',
+            'term',
+            'topic',
+            'value',
+            'empty',
+          ]),
         })
       ),
     })

@@ -34,6 +34,8 @@ const AnalystMetadataSchema = z.object({
   toolsUsed: z.array(z.string()).optional(),
   finalTool: z.string().optional(),
   doneTool: z.boolean().optional(),
+  filesCreated: z.number().optional(),
+  filesReturned: z.number().optional(),
 });
 
 // Input schema matches analyst step output

@@ -1,8 +1,8 @@
 import type { ToolSet } from 'ai';
 import { NoSuchToolError } from 'ai';
 import { healStreamingToolError, isHealableStreamError } from '../streaming/tool-healing';
-import type { RetryConfig, RetryResult, RetryableAgentStreamParams, RetryableError } from './types';
 import { compressConversationHistory, shouldCompressHistory } from './context-compression';
+import type { RetryConfig, RetryResult, RetryableAgentStreamParams, RetryableError } from './types';
 
 const DEFAULT_RETRY_CONFIG: RetryConfig = {
   maxRetries: 3,
@@ -13,8 +13,8 @@ const DEFAULT_RETRY_CONFIG: RetryConfig = {
 /**
  * Calculates exponential backoff delay with jitter
  */
-function calculateBackoffDelay(attemptNumber: number, maxBackoffMs: number = 8000): number {
-  const baseDelay = Math.min(1000 * Math.pow(2, attemptNumber - 1), maxBackoffMs);
+function calculateBackoffDelay(attemptNumber: number, maxBackoffMs = 8000): number {
+  const baseDelay = Math.min(1000 * 2 ** (attemptNumber - 1), maxBackoffMs);
   // Add jitter (±25% randomness)
   const jitter = baseDelay * 0.25 * (Math.random() - 0.5);
   return Math.max(500, baseDelay + jitter); // Minimum 500ms delay
@@ -24,7 +24,7 @@ function calculateBackoffDelay(attemptNumber: number, maxBackoffMs: number = 800
  * Sleeps for the specified duration
  */
 async function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
@@ -174,7 +174,8 @@ export function detectRetryableError(error: unknown): RetryableError | null {
       originalError: error,
       healingMessage: {
         role: 'user',
-        content: 'There was an issue with the response format. Please try again with proper formatting.',
+        content:
+          'There was an issue with the response format. Please try again with proper formatting.',
       },
     };
   }
@@ -339,7 +340,9 @@ export async function retryableAgentStreamWithHealing<T extends ToolSet>({
       // Apply exponential backoff if enabled
       if (retryConfig.exponentialBackoff && retryCount <= retryConfig.maxRetries) {
         const delay = calculateBackoffDelay(retryCount, retryConfig.maxBackoffMs);
-        console.log(`Retrying with healing in ${delay}ms (attempt ${retryCount}/${retryConfig.maxRetries})`);
+        console.log(
+          `Retrying with healing in ${delay}ms (attempt ${retryCount}/${retryConfig.maxRetries})`
+        );
         await sleep(delay);
       }
     }

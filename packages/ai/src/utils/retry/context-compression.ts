@@ -5,7 +5,7 @@ import type { CoreMessage } from 'ai';
  */
 export function compressConversationHistory(
   messages: CoreMessage[],
-  maxMessages: number = 10
+  maxMessages = 10
 ): CoreMessage[] {
   if (messages.length <= maxMessages) {
     return messages;
@@ -34,7 +34,7 @@ export function compressConversationHistory(
  */
 export function estimateTokenCount(messages: CoreMessage[]): number {
   const totalText = messages
-    .map(msg => {
+    .map((msg) => {
       if (typeof msg.content === 'string') {
         return msg.content;
       }
@@ -49,6 +49,6 @@ export function estimateTokenCount(messages: CoreMessage[]): number {
 /**
  * Checks if conversation history is likely to exceed token limits
  */
-export function shouldCompressHistory(messages: CoreMessage[], maxTokens: number = 100000): boolean {
+export function shouldCompressHistory(messages: CoreMessage[], maxTokens = 100000): boolean {
   return estimateTokenCount(messages) > maxTokens;
 }

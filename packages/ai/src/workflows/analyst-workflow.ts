@@ -38,6 +38,9 @@ const WorkflowMetadataSchema = z.object({
   finalTool: z.string().optional(),
   text: z.string().optional(),
   reasoning: z.string().optional(),
+  doneTool: z.boolean().optional(),
+  filesCreated: z.number().optional(),
+  filesReturned: z.number().optional(),
 });
 
 const outputSchema = z.object({

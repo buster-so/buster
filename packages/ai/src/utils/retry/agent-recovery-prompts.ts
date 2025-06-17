@@ -4,7 +4,6 @@ import type { CoreMessage } from 'ai';
  * Recovery prompts to inject when specific failure patterns are detected
  */
 export class AgentRecoveryPrompts {
-  
   /**
    * Prompt for when agent gets stuck in loops or repetitive behavior
    */
@@ -18,7 +17,7 @@ export class AgentRecoveryPrompts {
 3. If you're unsure about something, it's okay to make reasonable assumptions and document them
 4. Remember you can use the respondWithoutAnalysis tool if the request cannot be fulfilled
 
-Please continue with a fresh perspective.`
+Please continue with a fresh perspective.`,
     };
   }
 
@@ -35,7 +34,7 @@ Please continue with a fresh perspective.`
 3. Use the executeSql tool to explore the actual data structure if needed
 4. If critical data is missing, use respondWithoutAnalysis to inform the user
 
-Please proceed with what you have available.`
+Please proceed with what you have available.`,
     };
   }
 
@@ -52,7 +51,7 @@ Please proceed with what you have available.`
 - submitThoughts: Submit your prep work when ALL TODO items are complete
 - respondWithoutAnalysis: Use when analysis cannot be performed
 
-Focus on using these tools in order: start with sequentialThinking, use executeSql only when needed for undefined terms, then submit your thoughts when ready.`
+Focus on using these tools in order: start with sequentialThinking, use executeSql only when needed for undefined terms, then submit your thoughts when ready.`,
     };
   }
 
@@ -69,7 +68,7 @@ Focus on using these tools in order: start with sequentialThinking, use executeS
 3. Only use executeSql if you encounter completely undefined terms
 4. Once all items are addressed, submit your thoughts immediately
 
-Please continue and complete your TODO list now.`
+Please continue and complete your TODO list now.`,
     };
   }
 
@@ -79,25 +78,30 @@ Please continue and complete your TODO list now.`
   static detectFailurePattern(conversationHistory: CoreMessage[]): CoreMessage | null {
     const recentMessages = conversationHistory.slice(-10);
     const messageText = recentMessages
-      .map(msg => typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content))
+      .map((msg) => (typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content)))
       .join(' ')
       .toLowerCase();
 
     // Detect repetitive tool usage
-    const toolCalls = recentMessages.filter(msg => 
-      msg.role === 'assistant' && 
-      Array.isArray(msg.content) && 
-      msg.content.some((part: any) => part.type === 'tool-use')
+    const toolCalls = recentMessages.filter(
+      (msg) =>
+        msg.role === 'assistant' &&
+        Array.isArray(msg.content) &&
+        msg.content.some((part) => typeof part === 'object' && part !== null && 'type' in part && part.type === 'tool-call')
     );
-    
+
     if (toolCalls.length >= 3) {
       // Check for same tool being called repeatedly
-      const toolNames = toolCalls.flatMap(msg => 
-        Array.isArray(msg.content) 
-          ? msg.content.filter((part: any) => part.type === 'tool-use').map((part: any) => part.toolName)
+      const toolNames = toolCalls.flatMap((msg) =>
+        Array.isArray(msg.content)
+          ? msg.content
+              .filter((part): part is { type: 'tool-call'; toolName: string } => 
+                typeof part === 'object' && part !== null && 'type' in part && part.type === 'tool-call' && 'toolName' in part
+              )
+              .map((part) => part.toolName)
           : []
       );
-      
+
       const uniqueTools = new Set(toolNames);
       if (toolNames.length >= 4 && uniqueTools.size <= 2) {
         return this.createLoopBreakingPrompt();
@@ -105,16 +109,20 @@ Please continue and complete your TODO list now.`
     }
 
     // Detect data/documentation confusion
-    if (messageText.includes('not found') || 
-        messageText.includes('missing') || 
-        messageText.includes('undefined') ||
-        messageText.includes('documentation')) {
+    if (
+      messageText.includes('not found') ||
+      messageText.includes('missing') ||
+      messageText.includes('undefined') ||
+      messageText.includes('documentation')
+    ) {
       return this.createDataIssueRecoveryPrompt();
     }
 
     // Detect tool confusion
-    if (messageText.includes('tool') && 
-        (messageText.includes('available') || messageText.includes('not found'))) {
+    if (
+      messageText.includes('tool') &&
+      (messageText.includes('available') || messageText.includes('not found'))
+    ) {
       return this.createToolGuidancePrompt();
     }
 

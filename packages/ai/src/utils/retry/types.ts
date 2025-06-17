@@ -10,7 +10,16 @@ import type { CoreMessage, StepResult, StreamTextResult, TextStreamPart, ToolSet
 type MastraAgent = Agent<string, Record<string, any>, Record<string, any>>;
 
 export interface RetryableError {
-  type: 'no-such-tool' | 'invalid-tool-arguments' | 'empty-response' | 'rate-limit' | 'server-error' | 'network-timeout' | 'stream-interruption' | 'json-parse-error' | 'content-policy';
+  type:
+    | 'no-such-tool'
+    | 'invalid-tool-arguments'
+    | 'empty-response'
+    | 'rate-limit'
+    | 'server-error'
+    | 'network-timeout'
+    | 'stream-interruption'
+    | 'json-parse-error'
+    | 'content-policy';
   originalError?: Error | unknown;
   healingMessage: CoreMessage;
 }

@@ -7,7 +7,7 @@ export class CircuitBreaker {
   private successCount = 0;
   private lastFailureTime = 0;
   private state: 'closed' | 'open' | 'half-open' = 'closed';
-  
+
   constructor(
     private readonly failureThreshold = 5,
     private readonly recoveryTimeoutMs = 60000, // 1 minute
@@ -19,21 +19,21 @@ export class CircuitBreaker {
    */
   canExecute(): boolean {
     const now = Date.now();
-    
+
     switch (this.state) {
       case 'closed':
         return true;
-        
+
       case 'open':
         if (now - this.lastFailureTime >= this.recoveryTimeoutMs) {
           this.state = 'half-open';
           return true;
         }
         return false;
-        
+
       case 'half-open':
         return true;
-        
+
       default:
         return true;
     }
@@ -44,7 +44,7 @@ export class CircuitBreaker {
    */
   recordSuccess(): void {
     this.successCount++;
-    
+
     if (this.state === 'half-open' && this.successCount >= this.successThreshold) {
       this.state = 'closed';
       this.failureCount = 0;
@@ -59,7 +59,7 @@ export class CircuitBreaker {
     this.failureCount++;
     this.lastFailureTime = Date.now();
     this.successCount = 0;
-    
+
     if (this.failureCount >= this.failureThreshold) {
       this.state = 'open';
     }

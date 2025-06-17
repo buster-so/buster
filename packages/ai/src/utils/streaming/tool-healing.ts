@@ -180,18 +180,30 @@ function healGenericStreamingError(error: Error): HealingResult {
 
   if (error.message.includes('rate_limit_error') || error.message.includes('429')) {
     healingMessage = 'Rate limit reached, please wait and try again.';
-  } else if (error.message.includes('500') || error.message.includes('502') || 
-             error.message.includes('503') || error.message.includes('504')) {
+  } else if (
+    error.message.includes('500') ||
+    error.message.includes('502') ||
+    error.message.includes('503') ||
+    error.message.includes('504')
+  ) {
     healingMessage = 'Server temporarily unavailable, retrying...';
-  } else if (error.message.includes('timeout') || error.message.includes('ETIMEDOUT') || 
-             error.message.includes('ECONNRESET')) {
+  } else if (
+    error.message.includes('timeout') ||
+    error.message.includes('ETIMEDOUT') ||
+    error.message.includes('ECONNRESET')
+  ) {
     healingMessage = 'Connection timeout, please retry.';
-  } else if ((error.message.includes('stream') && error.message.includes('ended')) || 
-             error.message.includes('unexpected_end')) {
+  } else if (
+    (error.message.includes('stream') && error.message.includes('ended')) ||
+    error.message.includes('unexpected_end')
+  ) {
     healingMessage = 'Please continue where you left off.';
-  } else if ((error.name === 'SyntaxError' && error.message.includes('JSON')) || 
-             error.message.includes('JSON parse')) {
-    healingMessage = 'There was an issue with the response format. Please try again with proper formatting.';
+  } else if (
+    (error.name === 'SyntaxError' && error.message.includes('JSON')) ||
+    error.message.includes('JSON parse')
+  ) {
+    healingMessage =
+      'There was an issue with the response format. Please try again with proper formatting.';
   } else if (error.message.includes('content_policy')) {
     healingMessage = 'Please rephrase your response to comply with content policies.';
   } else {
@@ -267,21 +279,20 @@ export function isHealableStreamError(error: unknown): error is HealableStreamEr
     NoSuchToolError.isInstance(error) ||
     (error instanceof Error && error.name === 'AI_InvalidToolArgumentsError') ||
     // Additional streaming errors that can be healed
-    (error instanceof Error && (
-      error.message.includes('rate_limit_error') ||
-      error.message.includes('429') ||
-      error.message.includes('500') ||
-      error.message.includes('502') ||
-      error.message.includes('503') ||
-      error.message.includes('504') ||
-      error.message.includes('timeout') ||
-      error.message.includes('ETIMEDOUT') ||
-      error.message.includes('ECONNRESET') ||
-      (error.message.includes('stream') && error.message.includes('ended')) ||
-      error.message.includes('unexpected_end') ||
-      (error.name === 'SyntaxError' && error.message.includes('JSON')) ||
-      error.message.includes('JSON parse') ||
-      error.message.includes('content_policy')
-    ))
+    (error instanceof Error &&
+      (error.message.includes('rate_limit_error') ||
+        error.message.includes('429') ||
+        error.message.includes('500') ||
+        error.message.includes('502') ||
+        error.message.includes('503') ||
+        error.message.includes('504') ||
+        error.message.includes('timeout') ||
+        error.message.includes('ETIMEDOUT') ||
+        error.message.includes('ECONNRESET') ||
+        (error.message.includes('stream') && error.message.includes('ended')) ||
+        error.message.includes('unexpected_end') ||
+        (error.name === 'SyntaxError' && error.message.includes('JSON')) ||
+        error.message.includes('JSON parse') ||
+        error.message.includes('content_policy')))
   );
 }
