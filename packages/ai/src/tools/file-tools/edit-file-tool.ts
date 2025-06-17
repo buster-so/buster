@@ -161,6 +161,7 @@ function countOccurrences(content: string, searchString: string): number {
   let count = 0;
   let index = 0;
 
+  // biome-ignore lint/suspicious/noAssignInExpressions: This is a common pattern for string searching
   while ((index = content.indexOf(searchString, index)) !== -1) {
     count++;
     index += searchString.length;
@@ -181,7 +182,7 @@ function performReplacement(
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    if (line && line.includes(oldString)) {
+    if (line?.includes(oldString)) {
       const newLine = line.replace(new RegExp(escapeRegExp(oldString), 'g'), newString);
       changes.push({
         line_number: i + 1,

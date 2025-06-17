@@ -4,6 +4,9 @@ import type {
   CoreSystemMessage,
   CoreToolMessage,
   CoreUserMessage,
+  TextPart,
+  ToolCallPart,
+  ToolResultPart,
 } from 'ai';
 
 interface OpenAIMessage {
@@ -21,12 +24,17 @@ interface OpenAIMessage {
   tool_call_id?: string;
 }
 
+interface ToolResultData {
+  toolName: string;
+  result: unknown;
+}
+
 /**
  * Converts OpenAI message format to AI SDK CoreMessage format
  */
 export function convertToCoreMessages(openAIMessages: OpenAIMessage[]): CoreMessage[] {
   const coreMessages: CoreMessage[] = [];
-  const toolResults: Map<string, any> = new Map();
+  const toolResults: Map<string, ToolResultData> = new Map();
 
   // First pass: collect tool results
   for (const message of openAIMessages) {
@@ -67,7 +75,7 @@ export function convertToCoreMessages(openAIMessages: OpenAIMessage[]): CoreMess
       case 'assistant':
         if (message.tool_calls && message.tool_calls.length > 0) {
           // Assistant message with tool calls
-          const content: any[] = [];
+          const content: Array<TextPart | ToolCallPart> = [];
 
           // Add text content if present
           if (message.content) {
@@ -103,7 +111,7 @@ export function convertToCoreMessages(openAIMessages: OpenAIMessage[]): CoreMess
           const hasResults = message.tool_calls.some((tc) => toolResults.has(tc.id));
 
           if (hasResults) {
-            const toolContent: any[] = [];
+            const toolContent: ToolResultPart[] = [];
 
             for (const toolCall of message.tool_calls) {
               const toolResult = toolResults.get(toolCall.id);
@@ -139,7 +147,7 @@ export function convertToCoreMessages(openAIMessages: OpenAIMessage[]): CoreMess
         break;
 
       default:
-        console.warn(`Unknown message role: ${(message as any).role}`);
+        console.warn(`Unknown message role: ${(message as { role: string }).role}`);
     }
   }
 
@@ -149,7 +157,7 @@ export function convertToCoreMessages(openAIMessages: OpenAIMessage[]): CoreMess
 /**
  * Type guard to check if a message array is in OpenAI format
  */
-export function isOpenAIMessageFormat(messages: any[]): messages is OpenAIMessage[] {
+export function isOpenAIMessageFormat(messages: unknown[]): messages is OpenAIMessage[] {
   return (
     messages.length > 0 &&
     messages.every(

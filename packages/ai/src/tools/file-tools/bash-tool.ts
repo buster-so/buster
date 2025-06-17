@@ -71,8 +71,8 @@ const executeBashCommand = wrapTraced(
       };
 
       // Remove potentially dangerous env vars
-      delete (processEnv as any).SUDO_USER;
-      delete (processEnv as any).SUDO_COMMAND;
+      (processEnv as Record<string, string | undefined>).SUDO_USER = undefined;
+      (processEnv as Record<string, string | undefined>).SUDO_COMMAND = undefined;
 
       const childProcess = spawn('bash', ['-c', command], {
         cwd: resolvedWorkingDir || process.cwd(),

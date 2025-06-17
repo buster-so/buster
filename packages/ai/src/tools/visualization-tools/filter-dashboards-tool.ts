@@ -22,6 +22,23 @@ interface SearchContentParams {
   limit: number;
 }
 
+interface Dashboard {
+  id: string;
+  title: string;
+  description?: string;
+  owner_name: string;
+  metric_count: number;
+  tags: string[];
+  sharing_level: string;
+  created_at: string;
+  updated_at: string;
+  relevanceScore?: number;
+}
+
+interface DashboardWithRelevance extends Dashboard {
+  relevanceScore: number;
+}
+
 export const filterDashboardsTool = createTool({
   id: 'filter-dashboards',
   description: 'Search and filter dashboards based on various criteria',
@@ -126,7 +143,7 @@ const filterDashboards = wrapTraced(
         const searchLower = params.search_text.toLowerCase();
         const matchesText =
           dashboard.title.toLowerCase().includes(searchLower) ||
-          (dashboard.description && dashboard.description.toLowerCase().includes(searchLower));
+          dashboard.description?.toLowerCase().includes(searchLower);
         if (!matchesText) return false;
       }
 
@@ -199,7 +216,7 @@ const filterDashboards = wrapTraced(
       sharing_level: dashboard.sharing_level,
       created_at: dashboard.created_at,
       updated_at: dashboard.updated_at,
-      relevance_score: (dashboard as any).relevanceScore,
+      relevance_score: (dashboard as DashboardWithRelevance).relevanceScore,
     }));
 
     return {
@@ -211,7 +228,11 @@ const filterDashboards = wrapTraced(
   { name: 'filter-dashboards' }
 );
 
-function applySorting(dashboards: any[], sortBy: string, sortOrder: 'asc' | 'desc'): any[] {
+function applySorting(
+  dashboards: Dashboard[],
+  sortBy: string,
+  sortOrder: 'asc' | 'desc'
+): Dashboard[] {
   return dashboards.sort((a, b) => {
     let comparison = 0;
 
@@ -237,7 +258,10 @@ function applySorting(dashboards: any[], sortBy: string, sortOrder: 'asc' | 'des
   });
 }
 
-function rankByTextRelevance(dashboards: any[], searchText: string): any[] {
+function rankByTextRelevance(
+  dashboards: Dashboard[],
+  searchText: string
+): DashboardWithRelevance[] {
   const searchTerms = searchText.toLowerCase().split(/\s+/);
 
   return dashboards

@@ -142,7 +142,9 @@ function validateDependencyGraph(commands: Command[]): void {
 
 function hasCircularDependency(commands: Command[]): boolean {
   const graph = new Map<string, string[]>();
-  commands.forEach((cmd) => graph.set(cmd.id, cmd.depends_on));
+  for (const cmd of commands) {
+    graph.set(cmd.id, cmd.depends_on);
+  }
 
   const visited = new Set<string>();
   const recursionStack = new Set<string>();
@@ -178,10 +180,10 @@ function buildExecutionPlan(commands: Command[]): Command[][] {
   const inDegree = new Map<string, number>();
 
   // Initialize
-  commands.forEach((cmd) => {
+  for (const cmd of commands) {
     graph.set(cmd.id, cmd);
     inDegree.set(cmd.id, cmd.depends_on.length);
-  });
+  }
 
   const plan: Command[][] = [];
   const executed = new Set<string>();
@@ -201,19 +203,19 @@ function buildExecutionPlan(commands: Command[]): Command[][] {
     }
 
     // Mark as executed and update dependencies
-    batch.forEach((cmd) => {
+    for (const cmd of batch) {
       executed.add(cmd.id);
 
       // Decrease in-degree for dependent commands
-      commands.forEach((c) => {
+      for (const c of commands) {
         if (c.depends_on.includes(cmd.id)) {
           const currentDegree = inDegree.get(c.id);
           if (currentDegree !== undefined) {
             inDegree.set(c.id, currentDegree - 1);
           }
         }
-      });
-    });
+      }
+    }
 
     plan.push(batch);
   }
@@ -237,13 +239,15 @@ async function executeCommandPlan(
 
     // Check for failures
     const failures = batchResults.filter((r) => r.status === 'failed');
-    failures.forEach((f) => failedCommands.add(f.id));
+    for (const f of failures) {
+      failedCommands.add(f.id);
+    }
 
     if (stopOnError && failures.length > 0) {
       // Skip remaining commands
       const remainingCommands = plan.slice(plan.indexOf(batch) + 1).flat();
 
-      remainingCommands.forEach((cmd) => {
+      for (const cmd of remainingCommands) {
         results.push({
           id: cmd.id,
           command: cmd.command,
@@ -253,7 +257,7 @@ async function executeCommandPlan(
           duration_ms: 0,
           error: 'Skipped due to previous error',
         });
-      });
+      }
 
       break;
     }

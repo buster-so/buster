@@ -55,12 +55,11 @@ export function parseStreamingArgs(
       }
 
       return null;
-    } else {
-      // Unexpected error - re-throw with context
-      throw new Error(
-        `Unexpected error in parseStreamingArgs: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
     }
+    // Unexpected error - re-throw with context
+    throw new Error(
+      `Unexpected error in parseStreamingArgs: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }
 

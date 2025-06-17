@@ -1,7 +1,8 @@
+import type { GenerateTextResult, ToolSet } from 'ai';
 import { Eval, initDataset } from 'braintrust';
 import { analystAgent } from '../../../src/agents/analyst-agent/analyst-agent';
 
-async function runWeatherAgentTask(input: string): Promise<any> {
+async function runWeatherAgentTask(input: string): Promise<GenerateTextResult<ToolSet, unknown>> {
   const weather = await analystAgent.generate(input, {
     maxSteps: 15,
   });
@@ -10,11 +11,11 @@ async function runWeatherAgentTask(input: string): Promise<any> {
 
 const firstMessageIsSearchDataCatalogToolCall = (args: {
   input: string;
-  output: any;
+  output: GenerateTextResult<ToolSet, unknown>;
 }) => {
   const { output } = args;
 
-  for (const message of output) {
+  for (const message of output.response.messages) {
     if (message.content && Array.isArray(message.content)) {
       for (const contentItem of message.content) {
         if (contentItem.type === 'tool-call' && contentItem.toolName === 'searchDataCatalogTool') {

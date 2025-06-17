@@ -28,15 +28,27 @@ interface FailedFileCreation {
   error: string;
 }
 
+interface DashboardFileContent {
+  rows: Array<{
+    items: Array<{
+      id: string;
+      [key: string]: unknown;
+    }>;
+    [key: string]: unknown;
+  }>;
+  [key: string]: unknown;
+}
+
 interface FileWithId {
   id: string;
   name: string;
   file_type: string;
   result_message?: string;
-  results?: Record<string, any>[];
+  results?: Record<string, unknown>[];
   created_at: string;
   updated_at: string;
   version_number: number;
+  content?: DashboardFileContent;
 }
 
 interface CreateDashboardFilesOutput {
@@ -186,7 +198,12 @@ async function processDashboardFile(
   file: DashboardFileParams,
   userId: string,
   organizationId: string
-): Promise<{ success: boolean; dashboardFile?: any; dashboardYml?: DashboardYml; error?: string }> {
+): Promise<{
+  success: boolean;
+  dashboardFile?: FileWithId;
+  dashboardYml?: DashboardYml;
+  error?: string;
+}> {
   // Parse and validate YAML
   const yamlValidation = parseAndValidateYaml(file.yml_content);
   if (!yamlValidation.success) {
@@ -197,7 +214,13 @@ async function processDashboardFile(
     };
   }
 
-  const dashboardYml = yamlValidation.data!;
+  const dashboardYml = yamlValidation.data;
+  if (!dashboardYml) {
+    return {
+      success: false,
+      error: 'Failed to parse dashboard YAML data.',
+    };
+  }
 
   // Generate deterministic UUID for dashboard
   const dashboardId = randomUUID(); // Simplified - in real implementation would be deterministic
@@ -287,7 +310,7 @@ const createDashboardFiles = wrapTraced(
     );
 
     const successfulProcessing: Array<{
-      dashboardFile: any;
+      dashboardFile: FileWithId;
       dashboardYml: DashboardYml;
     }> = [];
 
@@ -295,10 +318,10 @@ const createDashboardFiles = wrapTraced(
     for (const processResult of processResults) {
       if (processResult.status === 'fulfilled') {
         const { fileName, result } = processResult.value;
-        if (result.success) {
+        if (result.success && result.dashboardFile && result.dashboardYml) {
           successfulProcessing.push({
-            dashboardFile: result.dashboardFile!,
-            dashboardYml: result.dashboardYml!,
+            dashboardFile: result.dashboardFile,
+            dashboardYml: result.dashboardYml,
           });
         } else {
           failedFiles.push({
@@ -356,8 +379,8 @@ const createDashboardFiles = wrapTraced(
           // Create associations between metrics and dashboards
           for (const sp of successfulProcessing) {
             const metricIds: string[] = sp.dashboardFile.content.rows
-              .flatMap((row: any) => row.items)
-              .map((item: any) => item.id);
+              .flatMap((row: DashboardFileContent['rows'][0]) => row.items)
+              .map((item: { id: string }) => item.id);
 
             if (metricIds.length > 0) {
               const metricDashboardAssociations = metricIds.map((metricId: string) => ({

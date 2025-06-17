@@ -214,8 +214,8 @@ export const multiGlobTool = createTool({
     // Aggregate results
     const pathToPatterns = new Map<string, string[]>();
 
-    results.forEach((result, index) => {
-      result.matches.forEach((match) => {
+    for (const [index, result] of results.entries()) {
+      for (const match of result.matches) {
         if (!pathToPatterns.has(match)) {
           pathToPatterns.set(match, []);
         }
@@ -224,8 +224,8 @@ export const multiGlobTool = createTool({
         if (existingPatterns && pattern) {
           existingPatterns.push(pattern);
         }
-      });
-    });
+      }
+    }
 
     const matches = Array.from(pathToPatterns.entries()).map(([path, matchedPatterns]) => ({
       path,

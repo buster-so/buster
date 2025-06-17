@@ -393,7 +393,7 @@ describe('Analyst Workflow Integration Tests', () => {
 
       if (finalHistory) {
         // Should contain messages from both the initial prompt and follow-up
-        const userMessages = finalHistory.filter((msg: any) => msg.role === 'user');
+        const userMessages = (finalHistory as CoreMessage[]).filter((msg) => msg.role === 'user');
         expect(userMessages.length).toBeGreaterThanOrEqual(2); // At least initial + follow-up
       }
 

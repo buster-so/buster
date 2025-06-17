@@ -98,11 +98,15 @@ const dashboardYmlSchema = z.object({
     ),
 });
 
+type DashboardYml = z.infer<typeof dashboardYmlSchema>;
+type DashboardRow = z.infer<typeof dashboardRowSchema>;
+type DashboardItem = z.infer<typeof dashboardItemSchema>;
+
 // Parse and validate dashboard YAML content
 function parseAndValidateYaml(ymlContent: string): {
   success: boolean;
   error?: string;
-  data?: any;
+  data?: DashboardYml;
 } {
   try {
     const parsedYml = yaml.parse(ymlContent);
@@ -157,15 +161,15 @@ async function validateMetricIds(
 
 // Process a dashboard file update with complete new YAML content
 async function processDashboardFileUpdate(
-  file: any,
+  file: typeof dashboardFiles.$inferSelect,
   ymlContent: string,
   duration: number
 ): Promise<{
-  dashboardFile: any;
-  dashboardYml: any;
+  dashboardFile: typeof dashboardFiles.$inferSelect;
+  dashboardYml: DashboardYml;
   results: ModificationResult[];
   validationMessage: string;
-  validationResults: Record<string, any>[];
+  validationResults: Record<string, unknown>[];
 }> {
   const results: ModificationResult[] = [];
 
@@ -189,8 +193,8 @@ async function processDashboardFileUpdate(
 
   // Collect and validate metric IDs from rows
   const metricIds: string[] = newYml.rows
-    .flatMap((row: any) => row.items)
-    .map((item: any) => item.id);
+    .flatMap((row: DashboardRow) => row.items)
+    .map((item: DashboardItem) => item.id);
 
   if (metricIds.length > 0) {
     const metricValidation = await validateMetricIds(metricIds);
@@ -266,7 +270,7 @@ const modifyDashboardFiles = wrapTraced(
     const failedFiles: FailedFileModification[] = [];
     const updateResults: ModificationResult[] = [];
 
-    const dashboardFilesToUpdate: any[] = [];
+    const dashboardFilesToUpdate: Array<typeof dashboardFiles.$inferSelect> = [];
 
     try {
       // Process each file update
@@ -287,7 +291,15 @@ const modifyDashboardFiles = wrapTraced(
             continue;
           }
 
-          const existingFile = dashboardFile[0]!;
+          const existingFile = dashboardFile[0];
+          if (!existingFile) {
+            updateResults.push({
+              id: file.id,
+              status: 'failed',
+              message: 'Dashboard file not found after query',
+            });
+            continue;
+          }
           const duration = Date.now() - startTime;
 
           // Process the dashboard file update
@@ -300,7 +312,7 @@ const modifyDashboardFiles = wrapTraced(
           const { dashboardFile: updatedFile, dashboardYml, results } = updateResult;
 
           // Calculate next version number from existing version history
-          const currentVersionHistory = existingFile.versionHistory as any;
+          const currentVersionHistory = existingFile.versionHistory as unknown;
           let nextVersion = 1;
 
           if (currentVersionHistory?.versions && Array.isArray(currentVersionHistory.versions)) {

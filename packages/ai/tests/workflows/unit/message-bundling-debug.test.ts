@@ -1,4 +1,4 @@
-import type { CoreMessage } from 'ai';
+import type { AssistantContent, CoreMessage, ToolCallPart } from 'ai';
 import { describe, expect, test } from 'vitest';
 import { extractMessageHistory } from '../../../src/utils/memory/message-history';
 
@@ -103,7 +103,7 @@ describe('Message Bundling Debug', () => {
       console.log(
         `[${i}] ${msg.role}:`,
         msg.role === 'assistant' || msg.role === 'tool'
-          ? `${(msg.content as any[]).length} items`
+          ? `${Array.isArray(msg.content) ? msg.content.length : 1} items`
           : 'text'
       );
     });
@@ -114,15 +114,18 @@ describe('Message Bundling Debug', () => {
       console.log(
         `[${i}] ${msg.role}:`,
         msg.role === 'assistant' || msg.role === 'tool'
-          ? `${(msg.content as any[]).length} items`
+          ? `${Array.isArray(msg.content) ? msg.content.length : 1} items`
           : 'text'
       );
       if (msg.role === 'assistant' && Array.isArray(msg.content)) {
-        msg.content.forEach((item: any, j) => {
-          if (item.type === 'tool-call') {
-            console.log(`    [${j}] tool-call: ${item.toolName} (${item.toolCallId})`);
+        (msg.content as Array<AssistantContent extends (infer U)[] ? U : never>).forEach(
+          (item, j) => {
+            if (item.type === 'tool-call') {
+              const toolCall = item as ToolCallPart;
+              console.log(`    [${j}] tool-call: ${toolCall.toolName} (${toolCall.toolCallId})`);
+            }
           }
-        });
+        );
       }
     });
 
@@ -135,7 +138,7 @@ describe('Message Bundling Debug', () => {
       console.log(
         `[${i}] ${msg.role}:`,
         msg.role === 'assistant' || msg.role === 'tool'
-          ? `${(msg.content as any[]).length} items`
+          ? `${Array.isArray(msg.content) ? msg.content.length : 1} items`
           : 'text'
       );
     });

@@ -28,6 +28,10 @@ interface Match {
   context_after: string[];
 }
 
+interface RipgrepContextLine {
+  text: string;
+}
+
 interface GrepResult {
   pattern: string;
   total_matches: number;
@@ -141,14 +145,14 @@ async function ripgrepSearch(params: GrepParams): Promise<GrepResult> {
 
   // File filters
   if (include && include.length > 0) {
-    include.forEach((glob) => {
+    for (const glob of include) {
       args.push('--glob', glob);
-    });
+    }
   }
 
-  exclude.forEach((glob) => {
+  for (const glob of exclude) {
     args.push('--glob', `!${glob}`);
-  });
+  }
 
   // Output format
   args.push('--json');
@@ -209,7 +213,7 @@ function parseRipgrepOutput(output: string, pattern: string): GrepResult {
       const data = JSON.parse(line);
 
       switch (data.type) {
-        case 'match':
+        case 'match': {
           filesWithMatches.add(data.data.path.text);
 
           const match: Match = {
@@ -223,21 +227,22 @@ function parseRipgrepOutput(output: string, pattern: string): GrepResult {
 
           // Extract context if available
           if (data.data.context_before) {
-            match.context_before = data.data.context_before.map((c: any) => c.text);
+            match.context_before = data.data.context_before.map((c: RipgrepContextLine) => c.text);
           }
           if (data.data.context_after) {
-            match.context_after = data.data.context_after.map((c: any) => c.text);
+            match.context_after = data.data.context_after.map((c: RipgrepContextLine) => c.text);
           }
 
           matches.push(match);
           break;
+        }
 
         case 'summary':
           filesSearched =
             data.data.stats.searches_with_match + data.data.stats.searches_without_match;
           break;
       }
-    } catch (e) {
+    } catch (_e) {
       // Skip invalid JSON lines
     }
   }
@@ -271,7 +276,8 @@ async function fallbackGrep(params: GrepParams): Promise<GrepResult> {
   // Get all files using glob
   let globPattern = '**/*';
   if (include && include.length > 0) {
-    globPattern = include.length === 1 ? include[0]! : `{${include.join(',')}}`;
+    const firstPattern = include[0];
+    globPattern = include.length === 1 && firstPattern ? firstPattern : `{${include.join(',')}}`;
   }
 
   const files = await glob(globPattern, {
