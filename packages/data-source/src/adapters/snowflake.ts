@@ -82,7 +82,8 @@ export class SnowflakeAdapter extends BaseAdapter {
   async query(
     sql: string,
     params?: QueryParameter[],
-    maxRows?: number
+    maxRows?: number,
+    timeout?: number
   ): Promise<AdapterQueryResult> {
     this.ensureConnected();
 
@@ -90,10 +91,24 @@ export class SnowflakeAdapter extends BaseAdapter {
       throw new Error('Snowflake connection not initialized');
     }
 
+    // Helper function to add timeout to any query promise
+    const executeWithTimeout = async <T>(queryPromise: Promise<T>, timeoutMs: number): Promise<T> => {
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          reject(new Error(`Snowflake query execution timeout after ${timeoutMs}ms`));
+        }, timeoutMs);
+      });
+      
+      return Promise.race([queryPromise, timeoutPromise]);
+    };
+
     try {
+      // Set query timeout if specified (default: 30 seconds)
+      const timeoutMs = timeout || 30000;
+
       // If no maxRows specified, use regular query
       if (!maxRows || maxRows <= 0) {
-        const result = await new Promise<{
+        const queryPromise = new Promise<{
           rows: Record<string, unknown>[];
           statement: SnowflakeStatement;
         }>((resolve, reject) => {
@@ -118,6 +133,8 @@ export class SnowflakeAdapter extends BaseAdapter {
           });
         });
 
+        const result = await executeWithTimeout(queryPromise, timeoutMs);
+
         const fields: FieldMetadata[] =
           result.statement?.getColumns?.()?.map((col) => ({
             name: col.getName(),
@@ -136,7 +153,7 @@ export class SnowflakeAdapter extends BaseAdapter {
       }
 
       // Use streaming for SELECT queries with maxRows
-      return new Promise((resolve, reject) => {
+      const streamingPromise = new Promise<AdapterQueryResult>((resolve, reject) => {
         if (!this.connection) {
           reject(new Error('Snowflake connection not initialized'));
           return;
@@ -208,6 +225,8 @@ export class SnowflakeAdapter extends BaseAdapter {
           },
         });
       });
+
+      return await executeWithTimeout(streamingPromise, timeoutMs);
     } catch (error) {
       throw new Error(
         `Snowflake query failed: ${error instanceof Error ? error.message : 'Unknown error'}`

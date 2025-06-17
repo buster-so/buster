@@ -73,7 +73,8 @@ export class SQLServerAdapter extends BaseAdapter {
   async query(
     sqlQuery: string,
     params?: QueryParameter[],
-    maxRows?: number
+    maxRows?: number,
+    timeout?: number
   ): Promise<AdapterQueryResult> {
     this.ensureConnected();
 
@@ -83,6 +84,20 @@ export class SQLServerAdapter extends BaseAdapter {
 
     try {
       const request = this.pool.request();
+      
+      // Helper function to add timeout to any query promise
+      const executeWithTimeout = async <T>(queryPromise: Promise<T>, timeoutMs: number): Promise<T> => {
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => {
+            reject(new Error(`SQL Server query execution timeout after ${timeoutMs}ms`));
+          }, timeoutMs);
+        });
+        
+        return Promise.race([queryPromise, timeoutPromise]);
+      };
+      
+      // Set query timeout if specified (default: 30 seconds)
+      const timeoutMs = timeout || 30000;
       let processedQuery = sqlQuery;
 
       // Add parameters if provided
@@ -98,7 +113,7 @@ export class SQLServerAdapter extends BaseAdapter {
 
       // If no maxRows specified, use regular query
       if (!maxRows || maxRows <= 0) {
-        const result = await request.query(processedQuery);
+        const result = await executeWithTimeout(request.query(processedQuery), timeoutMs);
 
         const fields: FieldMetadata[] = result.recordset?.columns
           ? Object.keys(result.recordset.columns).map((name) => {
@@ -126,7 +141,7 @@ export class SQLServerAdapter extends BaseAdapter {
       }
 
       // Use streaming for SELECT queries with maxRows
-      return new Promise((resolve, reject) => {
+      const streamingPromise = new Promise<AdapterQueryResult>((resolve, reject) => {
         const rows: Record<string, unknown>[] = [];
         let hasMoreRows = false;
         let fields: FieldMetadata[] = [];
@@ -183,6 +198,8 @@ export class SQLServerAdapter extends BaseAdapter {
         // Execute the query
         request.query(processedQuery);
       });
+
+      return await executeWithTimeout(streamingPromise, timeoutMs);
     } catch (error) {
       throw new Error(
         `SQL Server query failed: ${error instanceof Error ? error.message : 'Unknown error'}`

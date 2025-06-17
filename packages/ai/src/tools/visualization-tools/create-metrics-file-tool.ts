@@ -1313,10 +1313,13 @@ async function validateSql(sqlQuery: string, dataSourceId: string): Promise<Vali
     }
 
     try {
-      // Execute the SQL query using the DataSource with row limit for validation
+      // Execute the SQL query using the DataSource with row limit and timeout for validation
       const result = await dataSource.execute({
         sql: sqlQuery,
-        options: { maxRows: 1000 }, // Limit to 1000 rows for validation to protect memory
+        options: { 
+          maxRows: 1000, // Limit to 1000 rows for validation to protect memory
+          timeout: 30000, // 30 second timeout to prevent hanging on slow queries
+        },
       });
 
       if (result.success) {

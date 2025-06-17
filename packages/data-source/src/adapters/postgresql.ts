@@ -69,7 +69,8 @@ export class PostgreSQLAdapter extends BaseAdapter {
   async query(
     sql: string,
     params?: QueryParameter[],
-    maxRows?: number
+    maxRows?: number,
+    timeout?: number
   ): Promise<AdapterQueryResult> {
     this.ensureConnected();
 
@@ -78,6 +79,10 @@ export class PostgreSQLAdapter extends BaseAdapter {
     }
 
     try {
+      // Set query timeout if specified (default: 30 seconds)
+      const timeoutMs = timeout || 30000;
+      await this.client.query(`SET statement_timeout = ${timeoutMs}`);
+
       // If no maxRows specified, use regular query
       if (!maxRows || maxRows <= 0) {
         const result = await this.client.query(sql, params);

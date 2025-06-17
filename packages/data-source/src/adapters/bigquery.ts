@@ -52,7 +52,8 @@ export class BigQueryAdapter extends BaseAdapter {
   async query(
     sql: string,
     params?: QueryParameter[],
-    maxRows?: number
+    maxRows?: number,
+    timeout?: number
   ): Promise<AdapterQueryResult> {
     this.ensureConnected();
 
@@ -65,6 +66,13 @@ export class BigQueryAdapter extends BaseAdapter {
         query: sql,
         useLegacySql: false,
       };
+
+      // Add timeout if specified (default: 30 seconds)
+      if (timeout || timeout === 0) {
+        options.jobTimeoutMs = timeout;
+      } else {
+        options.jobTimeoutMs = 30000; // 30 second default
+      }
 
       // Apply row limit if specified
       let hasMoreRows = false;

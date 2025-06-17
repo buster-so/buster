@@ -60,7 +60,8 @@ export class MySQLAdapter extends BaseAdapter {
   async query(
     sql: string,
     params?: QueryParameter[],
-    maxRows?: number
+    maxRows?: number,
+    timeout?: number
   ): Promise<AdapterQueryResult> {
     this.ensureConnected();
 
@@ -69,12 +70,25 @@ export class MySQLAdapter extends BaseAdapter {
     }
 
     try {
+      // Set query timeout if specified (default: 30 seconds) 
+      const timeoutMs = timeout || 30000;
+      
+      // For MySQL, use Promise.race() to implement timeout since mysql2 
+      // doesn't support per-query timeouts on existing connections
+      const queryPromise = this.connection.execute(sql, params);
+      
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          reject(new Error(`Query execution timeout after ${timeoutMs}ms`));
+        }, timeoutMs);
+      });
+      
       // MySQL2 with promise connections doesn't support true streaming.
       // We execute the full query and limit results in memory.
       // This means the database still processes the full result set,
       // but we protect the application memory by only keeping maxRows.
       // For true streaming support, you would need to use the callback-based API.
-      const [rows, fields] = await this.connection.execute(sql, params);
+      const [rows, fields] = await Promise.race([queryPromise, timeoutPromise]);
 
       // Handle different result types
       let resultRows: Record<string, unknown>[] = [];

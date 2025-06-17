@@ -52,7 +52,7 @@ export interface DatabaseAdapter {
   /**
    * Execute a SQL query
    */
-  query(sql: string, params?: QueryParameter[], maxRows?: number): Promise<AdapterQueryResult>;
+  query(sql: string, params?: QueryParameter[], maxRows?: number, timeout?: number): Promise<AdapterQueryResult>;
 
   /**
    * Test the connection to the database
@@ -86,7 +86,8 @@ export abstract class BaseAdapter implements DatabaseAdapter {
   abstract query(
     sql: string,
     params?: QueryParameter[],
-    maxRows?: number
+    maxRows?: number,
+    timeout?: number
   ): Promise<AdapterQueryResult>;
   abstract testConnection(): Promise<boolean>;
   abstract close(): Promise<void>;
