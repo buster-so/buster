@@ -4,19 +4,24 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL
+  ? new URL(process.env.NEXT_PUBLIC_API_URL).origin
+  : '';
+const wsUrl = process.env.NEXT_PUBLIC_WEB_SOCKET_URL
+  ? new URL(process.env.NEXT_PUBLIC_WEB_SOCKET_URL).origin
+      .replace('https', 'wss')
+      .replace('http', 'ws')
+  : '';
+const api2Url = process.env.NEXT_PUBLIC_API2_URL
+  ? new URL(process.env.NEXT_PUBLIC_API2_URL).origin
+  : '';
+
 // Function to create CSP header with dynamic API URLs
 const createCspHeader = (isEmbed = false) => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL
-    ? new URL(process.env.NEXT_PUBLIC_API_URL).origin
-    : '';
-  const wsUrl = process.env.NEXT_PUBLIC_WEB_SOCKET_URL
-    ? new URL(process.env.NEXT_PUBLIC_WEB_SOCKET_URL).origin
-        .replace('https', 'wss')
-        .replace('http', 'ws')
-    : '';
-
   const isDev = process.env.NODE_ENV === 'development';
-  const localDomains = isDev ? 'http://127.0.0.1:* ws://127.0.0.1:*' : '';
+  const localDomains = isDev
+    ? 'http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:*'
+    : '';
 
   return [
     // Default directives
@@ -34,7 +39,9 @@ const createCspHeader = (isEmbed = false) => {
     // Frame sources
     "frame-src 'self' https://vercel.live",
     // Connect sources for API calls
-    `connect-src 'self' ${localDomains} https://*.vercel.app https://*.supabase.co wss://*.supabase.co https://*.posthog.com ${apiUrl} ${wsUrl}`.trim(),
+    `connect-src 'self' ${localDomains} https://*.vercel.app https://*.supabase.co wss://*.supabase.co https://*.posthog.com ${apiUrl} ${api2Url} ${wsUrl}`
+      .replace(/\s+/g, ' ')
+      .trim(),
     // Media
     "media-src 'self'",
     // Object
@@ -57,7 +64,8 @@ const nextConfig = {
   reactStrictMode: false,
   // Disable ESLint during builds since we're using Biome
   eslint: {
-    ignoreDuringBuilds: false
+    ignoreDuringBuilds: false,
+    dirs: ['src']
   },
   // Disable TypeScript type checking during builds
   typescript: {
@@ -81,6 +89,27 @@ const nextConfig = {
         message: /Critical dependency: the request of a dependency is an expression/
       }
     ];
+
+    // Exclude .test and .stories files from webpack processing
+    const originalEntry = config.entry;
+    config.entry = async () => {
+      const entry = await originalEntry();
+      // Filter out test and story files from all entry points
+      Object.keys(entry).forEach((key) => {
+        if (Array.isArray(entry[key])) {
+          entry[key] = entry[key].filter(
+            (file) => !file.match(/\.(test|stories)\.(js|jsx|ts|tsx)$/)
+          );
+        }
+      });
+      return entry;
+    };
+
+    // Also exclude from module resolution
+    config.module.rules.push({
+      test: /\.(test|stories)\.(js|jsx|ts|tsx)$/,
+      use: 'ignore-loader'
+    });
 
     return config;
   },
