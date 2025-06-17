@@ -72,7 +72,6 @@ export const useAutoChangeLayout = ({
       chatId
     ) {
       previousLastMessageId.current = lastMessageId;
-      console.log('lastMessageId', lastMessageId);
 
       onSetSelectedFile({ id: lastMessageId, type: 'reasoning', versionNumber: undefined });
     }

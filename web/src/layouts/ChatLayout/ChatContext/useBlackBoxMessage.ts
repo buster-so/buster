@@ -49,7 +49,7 @@ export const useBlackBoxMessage = () => {
       const lastReasoningMessage = message.reasoning_messages[lastReasoningMessageId];
       const isFinishedReasoningMessage = lastReasoningMessage?.status !== 'loading';
       const isFinishedReasoningLoop = (lastReasoningMessage as BusterChatMessageReasoning_text)
-        .finished_reasoning;
+        ?.finished_reasoning;
 
       if (isFinishedReasoningMessage && !isFinishedReasoningLoop && !message.is_completed) {
         clearTimeoutRef(message.id);
