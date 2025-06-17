@@ -4,7 +4,7 @@ import type {
   IBusterChat,
   IBusterChatMessage
 } from '@/api/asset_interfaces/chat';
-import { useMemoizedFn } from '@/hooks';
+import { useMemoizedFn, useMount } from '@/hooks';
 import { useBlackBoxMessage } from './useBlackBoxMessage';
 import { updateChatToIChat } from '@/lib/chat';
 import { useQueryClient } from '@tanstack/react-query';
@@ -12,16 +12,21 @@ import { prefetchGetMetricDataClient } from '@/api/buster_rest/metrics';
 import { queryKeys } from '@/api/query_keys';
 import { useTrackAndUpdateMessageChanges } from '@/api/buster-electric/messages';
 import { useTrackAndUpdateChatChanges } from '@/api/buster-electric/chats';
+import { useEffect } from 'react';
+import { useGetChatMessageMemoized } from '@/api/buster_rest/chats';
 
 export const useChatStreaming = ({
   chatId,
+  isStreamingMessage,
   messageId = ''
 }: {
   chatId: string | undefined;
   messageId: string | undefined;
+  isStreamingMessage: boolean;
 }) => {
   const { checkBlackBoxMessage, removeBlackBoxMessage } = useBlackBoxMessage();
   const queryClient = useQueryClient();
+  const getChatMessageMemoized = useGetChatMessageMemoized();
 
   const _prefetchLastMessageMetricData = useMemoizedFn(
     (iChat: IBusterChat, iChatMessages: Record<string, IBusterChatMessage>) => {
@@ -78,7 +83,7 @@ export const useChatStreaming = ({
   );
 
   const completeChat = useMemoizedFn((d: BusterChat) => {
-    const { iChat, iChatMessages } = updateChatToIChat(d, false);
+    const { iChat, iChatMessages } = updateChatToIChat(d);
     removeBlackBoxMessage({ messageId: iChat.message_ids[iChat.message_ids.length - 1] });
     _prefetchLastMessageMetricData(iChat, iChatMessages);
     // _normalizeChatMessage(iChatMessages);
@@ -123,6 +128,15 @@ export const useChatStreaming = ({
       });
     }
   });
+
+  useEffect(() => {
+    if (isStreamingMessage) {
+      const message = getChatMessageMemoized(messageId);
+      if (message) checkBlackBoxMessage(message);
+    } else {
+      removeBlackBoxMessage({ messageId });
+    }
+  }, [isStreamingMessage]);
 
   return {
     completeChat,

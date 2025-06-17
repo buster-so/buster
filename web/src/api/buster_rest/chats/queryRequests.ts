@@ -86,7 +86,7 @@ export const useGetChat = <TData = IBusterChat>(
   const queryClient = useQueryClient();
   const queryFn = useMemoizedFn(() => {
     return getChat(params).then((chat) => {
-      const { iChat, iChatMessages } = updateChatToIChat(chat, false);
+      const { iChat, iChatMessages } = updateChatToIChat(chat);
       const lastMessageId = last(iChat.message_ids);
 
       if (!lastMessageId) return iChat;
@@ -128,7 +128,7 @@ export const useStartChatFromAsset = () => {
 
   const mutationFn = useMemoizedFn(async (params: Parameters<typeof startChatFromAsset>[0]) => {
     const chat = await startChatFromAsset(params);
-    const { iChat, iChatMessages } = updateChatToIChat(chat, false);
+    const { iChat, iChatMessages } = updateChatToIChat(chat);
     for (const messageId of iChat.message_ids) {
       queryClient.setQueryData(
         chatQueryKeys.chatsMessages(messageId).queryKey,
@@ -160,7 +160,7 @@ export const prefetchGetChat = async (
     ...chatQueryKeys.chatsGetChat(params.id),
     queryFn: async () => {
       return await getChat_server(params).then((chat) => {
-        return updateChatToIChat(chat, true).iChat;
+        return updateChatToIChat(chat).iChat;
       });
     }
   });

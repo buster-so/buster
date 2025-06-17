@@ -11,7 +11,7 @@ export const ChatMessageBlock: React.FC<{
   messageIndex: number;
 }> = React.memo(({ messageId, chatId, messageIndex }) => {
   const { data: messageExists } = useGetChatMessage(messageId, {
-    select: (message) => message?.id
+    select: (message) => !!message?.id
   });
   const { data: requestMessage } = useGetChatMessage(messageId, {
     select: (message) => message?.request_message

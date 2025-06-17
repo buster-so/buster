@@ -21,7 +21,7 @@ export const MessageContainer = forwardRef<HTMLDivElement, MessageContainerProps
     return (
       <div
         ref={ref}
-        className={'flex w-full cursor-pointer space-x-2'}
+        className={'flex w-full space-x-2'}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}>
         {senderName ? (

@@ -3,7 +3,7 @@
 import { create } from 'mutative';
 import type React from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
-import type { BusterSearchResult, FileType } from '@/api/asset_interfaces';
+import type { BusterChat, FileType } from '@/api/asset_interfaces';
 import {
   useStartNewChat,
   useGetChatMemoized,
@@ -11,17 +11,27 @@ import {
   useStopChat
 } from '@/api/buster_rest/chats';
 import { useMemoizedFn } from '@/hooks';
-import { useInitializeChat } from './useInitializeChat';
 import { useChatUpdate } from './useChatUpdate';
+import { useAppLayoutContextSelector } from '../BusterAppLayout';
+import { BusterRoutes } from '@/routes/busterRoutes';
 
 export const useBusterNewChat = () => {
   const { mutateAsync: startNewChat } = useStartNewChat();
+  const onChangePage = useAppLayoutContextSelector((x) => x.onChangePage);
   const getChatMessageMemoized = useGetChatMessageMemoized();
   const getChatMemoized = useGetChatMemoized();
   const { onUpdateChat, onUpdateChatMessage } = useChatUpdate();
   const { mutate: stopChatMutation } = useStopChat();
 
-  const { initializeNewChat } = useInitializeChat();
+  const initializeNewChat = useMemoizedFn(({ message_ids, id }: BusterChat) => {
+    const hasMultipleMessages = message_ids.length > 1;
+    if (!hasMultipleMessages) {
+      onChangePage({
+        route: BusterRoutes.APP_CHAT_ID,
+        chatId: id
+      });
+    }
+  });
 
   const _startChat = useMemoizedFn(
     async ({

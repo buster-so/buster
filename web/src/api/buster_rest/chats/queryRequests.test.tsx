@@ -61,7 +61,6 @@ describe('Chat Query Hooks', () => {
     message_ids: ['msg1'],
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-    isNewChat: false,
     is_favorited: false,
     created_by: 'test-user',
     created_by_id: 'test-user-id'

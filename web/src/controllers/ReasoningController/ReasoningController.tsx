@@ -2,10 +2,8 @@
 
 import { useQuery } from '@tanstack/react-query';
 import isEmpty from 'lodash/isEmpty';
-import last from 'lodash/last';
 import type React from 'react';
-import { useEffect, useRef } from 'react';
-import type { BusterChatMessageReasoning_text } from '@/api/asset_interfaces/chat';
+import { useEffect, useMemo, useRef } from 'react';
 import { useGetChat, useGetChatMessage } from '@/api/buster_rest/chats';
 import { queryKeys } from '@/api/query_keys';
 import { FileIndeterminateLoader } from '@/components/features/FileIndeterminateLoader';
@@ -14,6 +12,7 @@ import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { ReasoningMessageSelector } from './ReasoningMessages';
 import { BlackBoxMessage } from './ReasoningMessages/ReasoningBlackBoxMessage';
 import { ReasoningScrollToBottom } from './ReasoningScrollToBottom';
+import { useReasoningIsCompleted } from './reasoningHooks';
 
 interface ReasoningControllerProps {
   chatId: string;
@@ -22,9 +21,10 @@ interface ReasoningControllerProps {
 
 export const ReasoningController: React.FC<ReasoningControllerProps> = ({ chatId, messageId }) => {
   const { data: hasChat } = useGetChat({ id: chatId || '' }, { select: (x) => !!x.id });
-  const { data: reasoningMessageIds } = useGetChatMessage(messageId, {
+  const { data: reasoning_message_ids = [] } = useGetChatMessage(messageId, {
     select: ({ reasoning_message_ids }) => reasoning_message_ids
   });
+  const reasoningMessageIds = useMemo(() => reasoning_message_ids, [reasoning_message_ids]);
   const { data: isCompletedStream } = useGetChatMessage(messageId, {
     select: ({ is_completed }) => is_completed
   });
@@ -37,14 +37,10 @@ export const ReasoningController: React.FC<ReasoningControllerProps> = ({ chatId
 
   const { isAutoScrollEnabled, scrollToBottom, enableAutoScroll } = useAutoScroll(viewportRef, {
     observeSubTree: true,
-    enabled: false
+    enabled: true
   });
 
-  const { data: reasoningIsCompleted } = useGetChatMessage(messageId, {
-    select: (x) =>
-      (x?.reasoning_messages[last(reasoningMessageIds) || ''] as BusterChatMessageReasoning_text)
-        ?.finished_reasoning
-  });
+  const reasoningIsCompleted = useReasoningIsCompleted(messageId, reasoningMessageIds);
 
   useEffect(() => {
     if (hasChat && reasoningMessageIds) {

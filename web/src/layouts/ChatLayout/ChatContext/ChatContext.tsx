@@ -8,8 +8,6 @@ import { useChatLayoutContextSelector } from '..';
 import type { SelectedFile } from '../interfaces';
 import { useAutoChangeLayout } from './useAutoChangeLayout';
 import { useIsFileChanged } from './useIsFileChanged';
-import { useTrackAndUpdateChatChanges } from '@/api/buster-electric/chats';
-import { useTrackAndUpdateMessageChanges } from '@/api/buster-electric/messages';
 import { useChatStreaming } from './useChatStreaming';
 
 const useChatIndividualContext = ({
@@ -40,8 +38,8 @@ const useChatIndividualContext = ({
       const queryKey = queryKeys.chatsMessages(messageId);
       return {
         ...queryKey,
-        select: (data: IBusterChatMessage | undefined) => !data?.is_completed,
-        enabled: false
+        enabled: false,
+        select: (data: IBusterChatMessage | undefined) => !data?.is_completed
       };
     }),
     combine: (result) => result.some((res) => res.data)
@@ -56,7 +54,7 @@ const useChatIndividualContext = ({
     lastMessageId: currentMessageId,
     chatId
   });
-  useChatStreaming({ chatId, messageId: currentMessageId });
+  useChatStreaming({ chatId, messageId: currentMessageId, isStreamingMessage });
 
   return React.useMemo(
     () => ({

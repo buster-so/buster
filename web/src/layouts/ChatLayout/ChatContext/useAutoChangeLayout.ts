@@ -1,12 +1,12 @@
 'use client';
 
 import findLast from 'lodash/findLast';
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import type {
   BusterChatMessageReasoning_text,
   BusterChatResponseMessage_file
 } from '@/api/asset_interfaces/chat';
-import { useGetChatMessage, useGetChatMessageMemoized } from '@/api/buster_rest/chats';
+import { useGetChat, useGetChatMessage, useGetChatMessageMemoized } from '@/api/buster_rest/chats';
 import { useGetFileLink } from '@/context/Assets/useGetFileLink';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
 import { usePrevious } from '@/hooks';
@@ -36,6 +36,7 @@ export const useAutoChangeLayout = ({
 
   const onChangePage = useAppLayoutContextSelector((x) => x.onChangePage);
   const previousLastMessageId = useRef<string | null>(null);
+  const { data: hasLoadedChat } = useGetChat({ id: chatId || '' }, { select: (x) => !!x.id });
   const { data: lastReasoningMessageId } = useGetChatMessage(lastMessageId, {
     select: (x) => x?.reasoning_message_ids?.[x?.reasoning_message_ids?.length - 1]
   });
@@ -51,7 +52,17 @@ export const useAutoChangeLayout = ({
 
   const hasReasoning = !!lastReasoningMessageId;
 
+  useLayoutEffect(() => {
+    if (hasLoadedChat) {
+      previousLastMessageId.current = lastMessageId;
+    }
+  }, [hasLoadedChat]);
+
   useEffect(() => {
+    if (!hasLoadedChat || !chatId) {
+      return;
+    }
+
     //this will trigger when the chat is streaming and is has not completed yet (new chat)
     if (
       !isCompletedStream &&
@@ -61,6 +72,7 @@ export const useAutoChangeLayout = ({
       chatId
     ) {
       previousLastMessageId.current = lastMessageId;
+      console.log('lastMessageId', lastMessageId);
 
       onSetSelectedFile({ id: lastMessageId, type: 'reasoning', versionNumber: undefined });
     }

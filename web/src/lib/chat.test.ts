@@ -11,40 +11,22 @@ describe('updateChatToIChat', () => {
       messages: {}
     };
 
-    const { iChat, iChatMessages } = updateChatToIChat(mockChat, false);
+    const { iChat, iChatMessages } = updateChatToIChat(mockChat);
 
     expect(iChat.message_ids).toHaveLength(0);
-    expect(iChat.isNewChat).toBe(false);
+
     expect(Object.keys(iChatMessages)).toHaveLength(0);
   });
   it('should correctly upgrade a chat with existing messages when not new', () => {
     const mockChat = MOCK_CHAT();
-    const { iChat, iChatMessages } = updateChatToIChat(mockChat, false);
+    const { iChat, iChatMessages } = updateChatToIChat(mockChat);
 
-    expect(iChat.isNewChat).toBe(false);
     expect(Object.keys(iChatMessages)).toHaveLength(mockChat.message_ids.length);
-    // All messages should be marked as completed stream
-    Object.values(iChatMessages).forEach((message) => {
-      expect(message.is_completed).toBe(true);
-    });
   });
-  it('should mark the last message as incomplete stream when isNewChat is true', () => {
-    const mockChat = MOCK_CHAT();
-    const { iChat, iChatMessages } = updateChatToIChat(mockChat, true);
 
-    expect(iChat.isNewChat).toBe(true);
-    expect(Object.keys(iChatMessages)).toHaveLength(mockChat.message_ids.length);
-
-    // All messages except the last one should be completed
-    const messageIds = mockChat.message_ids;
-    messageIds.forEach((messageId, index) => {
-      const isLastMessage = index === messageIds.length - 1;
-      expect(iChatMessages[messageId].is_completed).toBe(!isLastMessage);
-    });
-  });
   it('should preserve all chat properties except messages when upgrading', () => {
     const mockChat = MOCK_CHAT();
-    const { iChat } = updateChatToIChat(mockChat, false);
+    const { iChat } = updateChatToIChat(mockChat);
 
     // Verify all properties except 'messages' are preserved
     expect(iChat.id).toBe(mockChat.id);
@@ -62,7 +44,7 @@ describe('updateChatToIChat', () => {
   });
   it('should maintain message order when upgrading messages', () => {
     const mockChat = MOCK_CHAT();
-    const { iChatMessages } = updateChatToIChat(mockChat, false);
+    const { iChatMessages } = updateChatToIChat(mockChat);
 
     // Verify that all messages exist and maintain their original properties
     mockChat.message_ids.forEach((messageId) => {
@@ -94,12 +76,11 @@ describe('updateChatToIChat', () => {
     };
 
     // Test both new and existing chat scenarios
-    const { iChatMessages: existingChatMessages } = updateChatToIChat(mockChat, false);
-    const { iChatMessages: newChatMessages } = updateChatToIChat(mockChat, true);
+    const { iChatMessages: existingChatMessages } = updateChatToIChat(mockChat);
+    const { iChatMessages: newChatMessages } = updateChatToIChat(mockChat);
 
     // For existing chat, the single message should be marked as completed
     expect(Object.keys(existingChatMessages)).toHaveLength(1);
-    expect(existingChatMessages[singleMessageId].is_completed).toBe(true);
 
     // For new chat, the single message should be marked as incomplete
     expect(Object.keys(newChatMessages)).toHaveLength(1);

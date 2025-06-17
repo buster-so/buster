@@ -1,13 +1,33 @@
 import type { ChatCreateRequest } from '@server/types/chat-types';
 import { useBusterApiContextSelector } from '@/context/BusterReactQuery';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { updateChatToIChat } from '@/lib/chat';
+import { useMemoizedFn } from '@/hooks';
+import type { IBusterChatMessage } from '@/api/asset_interfaces/chat';
+import { chatQueryKeys } from '@/api/query_keys/chat';
+import { useChatUpdate } from '@/context/Chats/useChatUpdate';
 
 export const useStartNewChat = () => {
+  const queryClient = useQueryClient();
+  const { onUpdateChat } = useChatUpdate();
   const honoInstance = useBusterApiContextSelector((state) => state.honoInstance);
+
+  const saveAllChatMessages = useMemoizedFn((iChatMessages: Record<string, IBusterChatMessage>) => {
+    for (const message of Object.values(iChatMessages)) {
+      const options = chatQueryKeys.chatsMessages(message.id);
+      const queryKey = options.queryKey;
+      queryClient.setQueryData(queryKey, message);
+    }
+  });
 
   return useMutation({
     mutationFn: (props: ChatCreateRequest) =>
-      honoInstance.api.v2.chats.$post({ json: props }).then((res) => res.json())
+      honoInstance.api.v2.chats.$post({ json: props }).then((res) => res.json()),
+    onSuccess: (data) => {
+      const { iChat, iChatMessages } = updateChatToIChat(data);
+      saveAllChatMessages(iChatMessages);
+      onUpdateChat(iChat);
+    }
   });
 };
 
