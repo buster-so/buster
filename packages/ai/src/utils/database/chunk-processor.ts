@@ -571,7 +571,15 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       };
 
       if (this.state.responseHistory.length > 0) {
-        updateFields.responseMessages = this.state.responseHistory;
+        // Convert array to object format as expected by database
+        updateFields.responseMessages = this.state.responseHistory.reduce<
+          Record<string, ResponseEntry>
+        >((acc, entry) => {
+          if (entry && typeof entry === 'object' && 'id' in entry) {
+            acc[entry.id] = entry;
+          }
+          return acc;
+        }, {});
       }
 
       await updateMessageFields(this.messageId, updateFields);
@@ -1226,6 +1234,30 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
    */
   getResponseHistory(): ResponseEntry[] {
     return this.state.responseHistory;
+  }
+
+  /**
+   * Add response messages to the history
+   * Used to add file response messages after done tool is called
+   */
+  async addResponseMessages(messages: ResponseEntry[]): Promise<void> {
+    // Add new messages, avoiding duplicates by ID
+    const existingIds = new Set(
+      this.state.responseHistory
+        .filter(
+          (r): r is ResponseEntry & { id: string } =>
+            r !== null && typeof r === 'object' && 'id' in r
+        )
+        .map((r) => r.id)
+    );
+
+    const newMessages = messages.filter((msg) => msg && 'id' in msg && !existingIds.has(msg.id));
+
+    if (newMessages.length > 0) {
+      this.state.responseHistory.push(...newMessages);
+      // Force an immediate save to persist the new messages
+      await this.saveToDatabase();
+    }
   }
 
   /**

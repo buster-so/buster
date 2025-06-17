@@ -1,15 +1,24 @@
+import { updateMessageFields } from '@buster/database';
 import { Agent, createStep } from '@mastra/core';
+import type { RuntimeContext } from '@mastra/core/runtime-context';
 import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
+import { createTodoReasoningMessage } from '../utils/memory/todos-to-messages';
+import type { BusterChatMessageReasoningSchema } from '../utils/memory/types';
+import { ReasoningHistorySchema } from '../utils/memory/types';
 import { anthropicCachedModel } from '../utils/models/anthropic-cached';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
 import { thinkAndPrepWorkflowInputSchema } from '../workflows/analyst-workflow';
+import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
 
 const inputSchema = thinkAndPrepWorkflowInputSchema;
 
 export const createTodosOutputSchema = z.object({
   todos: z.string().describe('The todos that the agent will work on.'),
+  reasoningHistory: ReasoningHistorySchema.optional().describe(
+    'Reasoning history for todo creation'
+  ),
 });
 
 const todosInstructions = `
@@ -136,9 +145,13 @@ export const todosAgent = new Agent({
 
 const todoStepExecution = async ({
   inputData,
+  runtimeContext,
 }: {
   inputData: z.infer<typeof inputSchema>;
+  runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof createTodosOutputSchema>> => {
+  const messageId = runtimeContext.get('messageId') as string | null;
+
   try {
     // Use the input data directly
     const prompt = inputData.prompt;
@@ -157,7 +170,9 @@ const todoStepExecution = async ({
     const tracedTodos = wrapTraced(
       async () => {
         const response = await todosAgent.generate(messages, {
-          output: createTodosOutputSchema,
+          output: z.object({
+            todos: z.string().describe('The todos that the agent will work on.'),
+          }),
         });
 
         return response.object;
@@ -167,9 +182,32 @@ const todoStepExecution = async ({
       }
     );
 
-    const todos = await tracedTodos();
+    const todosResult = await tracedTodos();
+    const todosString = todosResult.todos;
 
-    return todos;
+    // Create reasoning message for todos
+    const todoReasoningMessage = createTodoReasoningMessage(todosString);
+
+    // Create reasoning history array
+    type ReasoningEntry = z.infer<typeof BusterChatMessageReasoningSchema>;
+    const reasoningHistory: ReasoningEntry[] = [todoReasoningMessage];
+
+    // Save to database if we have a messageId
+    if (messageId) {
+      try {
+        await updateMessageFields(messageId, {
+          reasoning: reasoningHistory,
+        });
+      } catch (dbError) {
+        console.error('Failed to save todo reasoning to database:', dbError);
+        // Continue execution even if save fails
+      }
+    }
+
+    return {
+      todos: todosString,
+      reasoningHistory: reasoningHistory,
+    };
   } catch (error) {
     console.error('Failed to create todos:', error);
 
