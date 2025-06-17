@@ -51,7 +51,7 @@ const app = new Hono()
     async (c) => {
       //TODO
       return c.json({
-        message: `Hello, world! ${c.req.param('chat_id')}`,
+        message: `TODO: Stop this chat ${c.req.param('chat_id')}`,
       });
     }
   );

@@ -56,13 +56,7 @@ const ReasoningMessage_TextSchema = z.object({
   finished_reasoning: z.boolean().optional()
 });
 
-const ReasoningFileTypeSchema = z.enum([
-  'metric',
-  'dashboard',
-  'reasoning',
-  'agent-action',
-  'todo',
-]);
+const ReasoningFileTypeSchema = z.enum(['metric', 'dashboard', 'reasoning', 'agent-action', 'todo']);
 
 const ReasoningFileSchema = z.object({
   id: z.string(),
@@ -155,3 +149,4 @@ export type ChatMessageResponseMessage_Text = z.infer<typeof ResponseMessage_Tex
 export type ChatMessageResponseMessage_File = z.infer<typeof ResponseMessage_FileSchema>;
 export type ReasoningFileType = z.infer<typeof ReasoningFileTypeSchema>;
 export type ResponseMessageFileType = z.infer<typeof ResponseMessageFileTypeSchema>;
+export type ReasoingMessage_ThoughtFileType = z.infer<typeof ReasoingMessage_ThoughtFileTypeSchema>;

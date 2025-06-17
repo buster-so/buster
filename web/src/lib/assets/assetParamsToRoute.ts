@@ -1,15 +1,18 @@
-import type { FileType } from '@/api/asset_interfaces/chat';
+import type { FileType, ReasoningFileType } from '@/api/asset_interfaces/chat';
 import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
 import type {
   DashboardFileViewSecondary,
   FileViewSecondary,
   MetricFileViewSecondary
 } from '../../layouts/ChatLayout/ChatLayoutContext/useLayoutConfig';
+import type { ReasoingMessage_ThoughtFileType } from '@server/types/chat-types';
+
+type UnionOfFileTypes = FileType | ReasoningFileType | ReasoingMessage_ThoughtFileType;
 
 type BaseParams = {
   chatId: string | undefined;
   assetId: string;
-  type: FileType;
+  type: UnionOfFileTypes;
   secondaryView?: FileViewSecondary;
   versionNumber?: number;
 };
@@ -58,6 +61,40 @@ export const assetParamsToRoute = ({
       datasetId: assetId,
       chatId
     });
+  }
+
+  if (type === 'collection') {
+    return createBusterRoute({
+      route: BusterRoutes.APP_COLLECTIONS_ID,
+      collectionId: assetId
+    });
+  }
+
+  if (type === 'term') {
+    return createBusterRoute({
+      route: BusterRoutes.APP_TERMS_ID,
+      termId: assetId
+    });
+  }
+
+  if (type === 'todo') {
+    return '';
+  }
+
+  if (type === 'agent-action') {
+    return '';
+  }
+
+  if (type === 'topic') {
+    return '';
+  }
+
+  if (type === 'value') {
+    return '';
+  }
+
+  if (type === 'empty') {
+    return '';
   }
 
   const exhaustiveCheck: never | undefined = type;
