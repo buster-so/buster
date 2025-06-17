@@ -234,7 +234,7 @@ async function validateSql(sqlQuery: string, dataSourceId: string): Promise<SqlV
         dataSources: [
           {
             name: `datasource-${dataSourceId}`,
-            type: credentials.type as string,
+            type: credentials.type,
             credentials: credentials,
           },
         ],
@@ -302,15 +302,19 @@ async function getDataSourceCredentials(dataSourceId: string): Promise<Credentia
     );
 
     if (!secretResult || secretResult.length === 0) {
-      throw new Error(
-        'Unable to access your data source credentials. Please ensure the data source is properly configured.'
+      return Promise.reject(
+        new Error(
+          'Unable to access your data source credentials. Please ensure the data source is properly configured.'
+        )
       );
     }
 
     const secretString = secretResult[0]?.decrypted_secret as string;
     if (!secretString) {
-      throw new Error(
-        'The data source credentials appear to be invalid. Please reconfigure your data source.'
+      return Promise.reject(
+        new Error(
+          'The data source credentials appear to be invalid. Please reconfigure your data source.'
+        )
       );
     }
 
@@ -319,8 +323,10 @@ async function getDataSourceCredentials(dataSourceId: string): Promise<Credentia
     return credentials;
   } catch (error) {
     console.error('Error getting data source credentials:', error);
-    throw new Error(
-      'Unable to retrieve data source credentials. Please contact support if this issue persists.'
+    return Promise.reject(
+      new Error(
+        'Unable to retrieve data source credentials. Please contact support if this issue persists.'
+      )
     );
   }
 }
@@ -397,9 +403,20 @@ async function processMetricFileUpdate(
   }
 
   const newMetricYml = yamlValidation.data;
+  if (!newMetricYml) {
+    return {
+      success: false,
+      modificationResults,
+      validationMessage: '',
+      validationResults: [],
+      validatedDatasetIds: [],
+      error: 'Failed to parse metric YAML',
+    };
+  }
 
   // Check if SQL has changed to avoid unnecessary validation
-  const sqlChanged = existingFile.content?.sql !== newMetricYml.sql;
+  const existingContent = existingFile.content as MetricYml | null;
+  const sqlChanged = existingContent?.sql !== newMetricYml.sql;
 
   // If SQL hasn't changed, we can skip validation
   if (!sqlChanged && existingFile.dataMetadata) {
@@ -495,13 +512,28 @@ const modifyMetricFiles = wrapTraced(
     const organizationId = runtimeContext.get('organizationId');
 
     if (!dataSourceId) {
-      throw new Error('Data source ID not found in runtime context');
+      return {
+        message: 'Data source ID not found in runtime context',
+        duration: Date.now() - startTime,
+        files: [],
+        failed_files: [],
+      };
     }
     if (!userId) {
-      throw new Error('User ID not found in runtime context');
+      return {
+        message: 'User ID not found in runtime context',
+        duration: Date.now() - startTime,
+        files: [],
+        failed_files: [],
+      };
     }
     if (!organizationId) {
-      throw new Error('Organization ID not found in runtime context');
+      return {
+        message: 'Organization ID not found in runtime context',
+        duration: Date.now() - startTime,
+        files: [],
+        failed_files: [],
+      };
     }
 
     const files: FileWithId[] = [];
@@ -576,15 +608,16 @@ const modifyMetricFiles = wrapTraced(
       const updatedVersions: number[] = [];
 
       for (const result of results) {
-        if ('success' in result && result.success) {
+        if ('success' in result && result.success && result.updatedFile) {
           // Calculate next version number (simplified - increment by 1)
           // versionHistory is a jsonb field that might be empty object or contain version info
-          const versionHistory = result.updatedFile.versionHistory || {};
+          const versionHistory =
+            (result.updatedFile.versionHistory as Record<string, unknown>) || {};
           let currentVersion = 1;
 
           // If versionHistory has versions array, get the latest version number
           if (
-            versionHistory.versions &&
+            'versions' in versionHistory &&
             Array.isArray(versionHistory.versions) &&
             versionHistory.versions.length > 0
           ) {
@@ -597,12 +630,11 @@ const modifyMetricFiles = wrapTraced(
 
           successfulUpdates.push({
             ...result.updatedFile,
-            versionNumber: nextVersion,
           });
           updatedVersions.push(nextVersion);
         } else {
           failedFiles.push({
-            file_name: result.fileName,
+            file_name: 'fileName' in result ? result.fileName : 'Unknown file',
             error: `Failed to modify '${result.fileName}': ${result.error}.
 
 Please attempt to modify the metric again. This error could be due to:
@@ -620,14 +652,19 @@ Please attempt to modify the metric again. This error could be due to:
         // For now, we'll do individual updates
         for (let i = 0; i < successfulUpdates.length; i++) {
           const file = successfulUpdates[i];
-          const version = updatedVersions[i];
+          if (!file) continue;
+          const version = updatedVersions[i] || 1;
 
           // Update version history with new version
-          const currentVersionHistory = file.versionHistory || {};
+          const currentVersionHistory = (file.versionHistory as Record<string, unknown>) || {};
+          const existingVersions =
+            'versions' in currentVersionHistory && Array.isArray(currentVersionHistory.versions)
+              ? currentVersionHistory.versions
+              : [];
           const updatedVersionHistory = {
             ...currentVersionHistory,
             versions: [
-              ...(currentVersionHistory.versions || []),
+              ...existingVersions,
               {
                 versionNumber: version,
                 content: file.content,
@@ -657,10 +694,8 @@ Please attempt to modify the metric again. This error could be due to:
               ?.validationMessage,
             results: results.find((r) => 'success' in r && r.updatedFile?.id === file.id)
               ?.validationResults,
-            created_at:
-              typeof file.createdAt === 'string' ? file.createdAt : file.createdAt.toISOString(),
-            updated_at:
-              typeof file.updatedAt === 'string' ? file.updatedAt : file.updatedAt.toISOString(),
+            created_at: file.createdAt,
+            updated_at: file.updatedAt,
             version_number: version || 1,
           });
         }

@@ -191,7 +191,7 @@ async function processDashboardFileUpdate(
 
   // Create and validate new YML object
   const yamlValidation = parseAndValidateYaml(ymlContent);
-  if (!yamlValidation.success) {
+  if (!yamlValidation.success || !yamlValidation.data) {
     const error = `Failed to validate modified YAML: ${yamlValidation.error}`;
     results.push({
       file_id: file.id,
@@ -202,7 +202,8 @@ async function processDashboardFileUpdate(
       timestamp: new Date().toISOString(),
       duration,
     });
-    throw new Error(error);
+    // Return error instead of throwing
+    return Promise.reject(new Error(error));
   }
 
   const newYml = yamlValidation.data;
@@ -231,7 +232,8 @@ async function processDashboardFileUpdate(
         timestamp: new Date().toISOString(),
         duration,
       });
-      throw new Error(error);
+      // Return error instead of throwing
+      return Promise.reject(new Error(error));
     }
   }
 
@@ -309,10 +311,9 @@ const modifyDashboardFiles = wrapTraced(
 
           const existingFile = dashboardFile[0];
           if (!existingFile) {
-            updateResults.push({
-              id: file.id,
-              status: 'failed',
-              message: 'Dashboard file not found after query',
+            failedFiles.push({
+              file_name: `Dashboard ${fileUpdate.id}`,
+              error: 'Dashboard file not found after query',
             });
             continue;
           }
@@ -328,19 +329,28 @@ const modifyDashboardFiles = wrapTraced(
           const { dashboardFile: updatedFile, dashboardYml, results } = updateResult;
 
           // Calculate next version number from existing version history
-          const currentVersionHistory = existingFile.versionHistory as unknown;
+          const currentVersionHistory = existingFile.versionHistory as
+            | VersionHistory
+            | null
+            | undefined;
           let nextVersion = 1;
 
           if (currentVersionHistory?.versions && Array.isArray(currentVersionHistory.versions)) {
             const versions = currentVersionHistory.versions;
             if (versions.length > 0) {
               const latestVersion = versions[versions.length - 1];
-              nextVersion = (latestVersion.versionNumber || 0) + 1;
+              if (
+                latestVersion &&
+                typeof latestVersion === 'object' &&
+                'versionNumber' in latestVersion
+              ) {
+                nextVersion = (latestVersion.versionNumber || 0) + 1;
+              }
             }
           }
 
           // Add new version to history
-          const newVersionHistory = {
+          const newVersionHistory: VersionHistory = {
             versions: [
               ...(currentVersionHistory?.versions || []),
               {
