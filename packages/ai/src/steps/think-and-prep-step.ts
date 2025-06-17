@@ -85,7 +85,50 @@ const thinkAndPrepExecution = async ({
   const finalStepData: StepFinishData | null = null;
 
   // Extract reasoning history from create-todos step
-  const initialReasoningHistory = inputData['create-todos'].reasoningHistory || [];
+  const rawReasoningHistory = inputData['create-todos'].reasoningHistory || [];
+  
+  // Transform reasoning history to match server schema property order
+  const initialReasoningHistory = rawReasoningHistory.map((entry: any) => {
+    if (entry.type === 'text') {
+      return {
+        status: entry.status,
+        id: entry.id,
+        type: entry.type,
+        title: entry.title,
+        message: entry.message,
+        secondary_title: entry.secondary_title,
+        message_chunk: entry.message_chunk,
+        finished_reasoning: entry.finished_reasoning,
+      };
+    } else if (entry.type === 'pills') {
+      return {
+        status: entry.status,
+        id: entry.id,
+        type: entry.type,
+        title: entry.title,
+        pill_containers: entry.pill_containers?.map((container: any) => ({
+          title: container.title,
+          pills: container.pills?.map((pill: any) => ({
+            text: pill.text,
+            id: pill.id,
+            type: pill.type === null ? 'empty' : pill.type,
+          })) || [],
+        })) || [],
+        secondary_title: entry.secondary_title,
+      };
+    } else if (entry.type === 'files') {
+      return {
+        status: entry.status,
+        id: entry.id,
+        type: entry.type,
+        title: entry.title,
+        file_ids: entry.file_ids,
+        files: entry.files,
+        secondary_title: entry.secondary_title,
+      };
+    }
+    return entry;
+  });
 
   // Initialize chunk processor with initial messages and reasoning history
   const chunkProcessor = new ChunkProcessor(messageId, [], initialReasoningHistory, []);

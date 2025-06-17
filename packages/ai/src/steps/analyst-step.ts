@@ -177,12 +177,14 @@ function createMessageKey(msg: CoreMessage): string {
     // For assistant messages with tool calls, use toolCallId as part of the key
     const toolCallIds = msg.content
       .filter(
-        (c): c is { type: string; toolCallId?: string } =>
+        (c): c is { type: 'tool-call'; toolCallId: string; toolName: string; args: unknown } =>
           typeof c === 'object' &&
           c !== null &&
           'type' in c &&
           c.type === 'tool-call' &&
-          'toolCallId' in c
+          'toolCallId' in c &&
+          'toolName' in c &&
+          'args' in c
       )
       .map((c) => c.toolCallId)
       .filter((id): id is string => id !== undefined)
