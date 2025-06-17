@@ -145,7 +145,7 @@ const thinkAndPrepExecution = async ({
               finishingToolNames: ['submitThoughts', 'respondWithoutAnalysis'],
               onFinishingTool: () => {
                 // Only set finished = true for respondWithoutAnalysis
-                // submitThoughts should continue to analyst agent
+                // submitThoughts should abort but not finish so workflow can continue
                 const finishingToolName = chunkProcessor.getFinishingToolName();
                 if (finishingToolName === 'respondWithoutAnalysis') {
                   finished = true;

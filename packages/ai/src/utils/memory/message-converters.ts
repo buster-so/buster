@@ -235,22 +235,9 @@ export function convertToolCallToMessage(
 
     case 'executeSql':
     case 'execute-sql': {
-      // Execute SQL generates a reasoning text message
-      try {
-        const parsed = ExecuteSqlResultSchema.parse(toolResult);
-        const reasoningMessage: Extract<ChatMessageReasoningMessage, { type: 'text' }> = {
-          id: toolId,
-          type: 'text',
-          title: 'Executed SQL Query',
-          secondary_title: `${parsed.rowCount} rows returned`,
-          message: `Query: ${parsed.query}\n\nReturned ${parsed.rowCount} rows`,
-          status,
-        };
-        return { type: 'reasoning', message: reasoningMessage };
-      } catch (error) {
-        console.error('Failed to parse tool result:', error, toolResult);
-        return null;
-      }
+      // SQL execution is now handled directly in ChunkProcessor as file-type reasoning entries
+      // No separate text message needed
+      return null;
     }
 
     case 'createDashboardsFile':
