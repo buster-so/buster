@@ -1,4 +1,5 @@
 import { createStep } from '@mastra/core';
+import type { RuntimeContext } from '@mastra/core/runtime-context';
 import type { CoreMessage } from 'ai';
 import { z } from 'zod';
 import {
@@ -8,6 +9,8 @@ import {
   ResponseHistorySchema,
   StepFinishDataSchema,
 } from '../utils/memory/types';
+import { executeWorkflowCleanup } from '../utils/workflow-cleanup';
+import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
 
 // The mark-message-complete step output schema (includes completion fields)
 const MarkMessageCompleteOutputSchema = z.object({
@@ -62,9 +65,16 @@ const outputSchema = z.object({
 
 const formatOutputExecution = async ({
   inputData,
+  runtimeContext,
 }: {
   inputData: z.infer<typeof inputSchema>;
+  runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof outputSchema>> => {
+  // Generate workflow ID for cleanup
+  const dataSourceId = runtimeContext.get('dataSourceId');
+  const workflowStartTime = runtimeContext.get('workflowStartTime');
+  const workflowId = `workflow-${workflowStartTime}-${dataSourceId}`;
+
   try {
     // Helper function to safely extract CoreMessage array
     const getMessageArray = (messages: MessageHistory | undefined): CoreMessage[] => {
@@ -92,6 +102,14 @@ const formatOutputExecution = async ({
       values: undefined,
     };
 
+    // Cleanup workflow resources before returning
+    try {
+      await executeWorkflowCleanup(workflowId);
+    } catch (cleanupError) {
+      console.error(`[format-output] Failed to cleanup workflow ${workflowId}:`, cleanupError);
+      // Don't fail the workflow due to cleanup errors
+    }
+
     return output;
   } catch (error) {
     // Handle AbortError gracefully
@@ -116,6 +134,16 @@ const formatOutputExecution = async ({
         todos: undefined,
         values: undefined,
       };
+    }
+
+    // Cleanup workflow resources before throwing error
+    try {
+      await executeWorkflowCleanup(workflowId);
+    } catch (cleanupError) {
+      console.error(
+        `[format-output] Failed to cleanup workflow ${workflowId} after error:`,
+        cleanupError
+      );
     }
 
     // For all other errors, throw with context

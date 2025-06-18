@@ -87,7 +87,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
   private state: ChunkProcessorState;
   private messageId: string | null;
   private lastSaveTime = 0;
-  private readonly SAVE_THROTTLE_MS = 100; // Throttle saves to every 100ms
+  private readonly SAVE_THROTTLE_MS = 50; // Throttle saves to every 50ms
   private fileMessagesAdded = false; // Track if file messages have been added
   private deferDoneToolResponse = false; // Track if we should defer doneTool response
   private pendingDoneToolEntry: ResponseEntry | null = null; // Store deferred doneTool entry

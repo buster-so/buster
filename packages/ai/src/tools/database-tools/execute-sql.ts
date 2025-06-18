@@ -1,11 +1,9 @@
-import { db } from '@buster/database/src/connection';
+import { type DataSource, withRateLimit } from '@buster/data-source';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
-import { sql } from 'drizzle-orm';
 import { z } from 'zod';
-import { DataSource } from '../../../../data-source/src/data-source';
-import type { Credentials } from '../../../../data-source/src/types/credentials';
+import { getWorkflowDataSourceManager } from '../../utils/data-source-manager';
 import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
 import { ensureSqlLimit } from './sql-limit-helper';
 
@@ -83,6 +81,16 @@ export function parseStreamingArgs(
   try {
     // First try to parse as complete JSON
     const parsed = JSON.parse(accumulatedText);
+    
+    // Ensure statements is an array if present
+    if (parsed.statements !== undefined && !Array.isArray(parsed.statements)) {
+      console.warn('[execute-sql parseStreamingArgs] statements is not an array:', {
+        type: typeof parsed.statements,
+        value: parsed.statements,
+      });
+      return null; // Return null to indicate invalid parse
+    }
+    
     return {
       statements: parsed.statements || undefined,
     };
@@ -158,24 +166,95 @@ const executeSqlStatement = wrapTraced(
   ): Promise<z.infer<typeof executeSqlStatementOutputSchema>> => {
     const { statements } = params;
 
-    const dataSourceId = runtimeContext.get('dataSourceId');
-
-    // Get data source credentials from vault
-    let dataSource: DataSource;
-    try {
-      const credentials = await getDataSourceCredentials(dataSourceId);
-      dataSource = new DataSource({
-        dataSources: [
-          {
-            name: `datasource-${dataSourceId}`,
-            type: credentials.type,
-            credentials: credentials,
-          },
-        ],
-        defaultDataSource: `datasource-${dataSourceId}`,
+    // Ensure statements is an array
+    if (!Array.isArray(statements)) {
+      console.error('[execute-sql] Invalid input: statements is not an array', {
+        type: typeof statements,
+        value: statements,
+        params: params,
       });
-    } catch (_error) {
-      // If we can't get credentials, return error for all statements
+      return {
+        results: [{
+          status: 'error' as const,
+          sql: typeof statements === 'string' ? statements : JSON.stringify(statements),
+          error_message: 'Invalid input: statements must be an array of SQL strings',
+        }],
+      };
+    }
+
+    // Check for empty array
+    if (statements.length === 0) {
+      return {
+        results: [],
+      };
+    }
+
+    const dataSourceId = runtimeContext.get('dataSourceId');
+    const workflowStartTime = runtimeContext.get('workflowStartTime') as number | undefined;
+
+    // Generate a unique workflow ID using start time and data source
+    const workflowId = workflowStartTime
+      ? `workflow-${workflowStartTime}-${dataSourceId}`
+      : `workflow-${Date.now()}-${dataSourceId}`;
+
+    // Get data source from workflow manager (reuses existing connections)
+    const manager = getWorkflowDataSourceManager(workflowId);
+
+    try {
+      const dataSource = await manager.getDataSource(dataSourceId);
+
+      // Execute SQL statements with rate limiting
+      const executionPromises = statements.map((sqlStatement) =>
+        withRateLimit(
+          'sql-execution',
+          async () => {
+            const result = await executeSingleStatement(sqlStatement, dataSource);
+            return { sql: sqlStatement, result };
+          },
+          {
+            maxConcurrent: 10,    // Increased from 3 to allow more concurrent queries per workflow
+            maxPerSecond: 25,     // Increased from 10 to handle higher throughput
+            maxPerMinute: 300,    // Increased from 100 for sustained load
+            queueTimeout: 90000,  // 90 seconds (increased for queue management)
+          }
+        )
+      );
+
+      // Wait for all executions to complete
+      const executionResults = await Promise.allSettled(executionPromises);
+
+      // Process results
+      const results: z.infer<typeof executeSqlStatementOutputSchema>['results'] =
+        executionResults.map((executionResult, index) => {
+          const sql = statements[index] || '';
+
+          if (executionResult.status === 'fulfilled') {
+            const { result } = executionResult.value;
+            if (result.success) {
+              return {
+                status: 'success' as const,
+                sql,
+                results: result.data || [],
+              };
+            }
+            return {
+              status: 'error' as const,
+              sql,
+              error_message: result.error || 'Unknown error occurred',
+            };
+          }
+
+          return {
+            status: 'error' as const,
+            sql,
+            error_message: executionResult.reason?.message || 'Execution failed',
+          };
+        });
+
+      return { results };
+    } catch (error) {
+      // If we can't get data source, return error for all statements
+      console.error('[execute-sql] Failed to get data source:', error);
       return {
         results: statements.map((sql) => ({
           status: 'error' as const,
@@ -184,82 +263,10 @@ const executeSqlStatement = wrapTraced(
         })),
       };
     }
-
-    try {
-      // Execute all SQL statements concurrently
-      const executionResults = await Promise.allSettled(
-        statements.map(async (sqlStatement) => {
-          const result = await executeSingleStatement(sqlStatement, dataSource);
-          return { sql: sqlStatement, result };
-        })
-      );
-
-      // Process results and format according to output schema
-      const results = executionResults.map((executionResult, index) => {
-        const sql = statements[index];
-
-        if (executionResult.status === 'fulfilled') {
-          const { result } = executionResult.value;
-          if (result.success) {
-            return {
-              status: 'success' as const,
-              sql,
-              results: result.data || [],
-            };
-          }
-          return {
-            status: 'error' as const,
-            sql,
-            error_message: result.error || 'Unknown error occurred',
-          };
-        }
-        return {
-          status: 'error' as const,
-          sql,
-          error_message: executionResult.reason?.message || 'Execution failed',
-        };
-      });
-
-      return { results: results as z.infer<typeof executeSqlStatementOutputSchema>['results'] };
-    } finally {
-      // Always close the data source connection
-      await dataSource.close();
-    }
+    // Note: We don't close the data source here anymore - it's managed by the workflow manager
   },
   { name: 'execute-sql' }
 );
-
-async function getDataSourceCredentials(dataSourceId: string): Promise<Credentials> {
-  try {
-    // Query the vault to get the credentials
-    const secretResult = await db.execute(
-      sql`SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = ${dataSourceId} LIMIT 1`
-    );
-
-    if (!secretResult.length || !secretResult[0]?.decrypted_secret) {
-      throw new Error('No credentials found for the specified data source');
-    }
-
-    const secretString = secretResult[0].decrypted_secret as string;
-
-    // Parse the credentials JSON
-    const credentials = JSON.parse(secretString) as Credentials;
-    return credentials;
-  } catch (error) {
-    console.error('Error getting data source credentials:', error);
-
-    // Provide more specific error messages based on error type
-    if (error instanceof z.ZodError) {
-      throw new Error(
-        'The data source credentials are not in the expected format. Please reconfigure your data source.'
-      );
-    }
-
-    throw new Error(
-      `Unable to retrieve data source credentials: ${error instanceof Error ? error.message : 'Unknown error occurred'}. Please contact support if this issue persists.`
-    );
-  }
-}
 
 async function executeSingleStatement(
   sqlStatement: string,
