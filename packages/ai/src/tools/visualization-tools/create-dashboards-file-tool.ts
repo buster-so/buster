@@ -12,10 +12,8 @@ import {
   metricFiles,
   metricFilesToDashboardFiles,
 } from '../../../../database/src/schema';
-import {
-  createInitialDashboardVersionHistory,
-  dashboardYmlToVersionContent,
-} from './version-history-helpers';
+import { createInitialDashboardVersionHistory } from './version-history-helpers';
+import type { DashboardYml } from './version-history-types';
 
 // Core interfaces matching Rust structs exactly
 interface DashboardFileParams {
@@ -74,7 +72,7 @@ const rowSchema = z.object({
     .array(rowItemSchema)
     .min(1, 'Each row must have at least 1 item')
     .max(4, 'Each row can have at most 4 items'),
-  columnSizes: z
+  column_sizes: z
     .array(
       z
         .number()
@@ -82,7 +80,7 @@ const rowSchema = z.object({
         .min(3, 'Each column size must be at least 3')
         .max(12, 'Each column size cannot exceed 12')
     )
-    .min(1, 'columnSizes array cannot be empty')
+    .min(1, 'column_sizes array cannot be empty')
     .refine((sizes) => sizes.reduce((sum, size) => sum + size, 0) === 12, {
       message: 'Column sizes must sum to exactly 12',
     }),
@@ -94,7 +92,9 @@ const rowSchema = z.object({
     .optional(),
 });
 
+// Remove this duplicate schema since we're importing from types
 // Dashboard YAML schema matching Rust DashboardYml struct exactly
+// Using local schema for validation
 const dashboardYmlSchema = z
   .object({
     name: z.string().min(1, 'Dashboard name is required'),
@@ -118,27 +118,28 @@ const dashboardYmlSchema = z
       // Validate each row structure and column constraints
       return dashboard.rows.every((row) => {
         // Check that number of items matches number of column sizes
-        if (row.items.length !== row.columnSizes.length) {
+        if (row.items.length !== row.column_sizes.length) {
           return false;
         }
 
         // Check column size constraints
-        const sum = row.columnSizes.reduce((acc, size) => acc + size, 0);
+        const sum = row.column_sizes.reduce((acc, size) => acc + size, 0);
         if (sum !== 12) {
           return false;
         }
 
         // Check minimum column size
-        return row.columnSizes.every((size) => size >= 3);
+        return row.column_sizes.every((size) => size >= 3);
       });
     },
     {
       message:
-        'Invalid row configuration: items must match column sizes, sizes must sum to 12, and each size must be >= 3',
+        'Invalid row configuration: items must match column_sizes, sizes must sum to 12, and each size must be >= 3',
     }
   );
 
-type DashboardYml = z.infer<typeof dashboardYmlSchema>;
+// Remove duplicate type definition since imported from types
+// type DashboardYml = z.infer<typeof dashboardYmlSchema>;
 
 // Parse and validate dashboard YAML content
 function parseAndValidateYaml(ymlContent: string): {
@@ -355,7 +356,7 @@ const createDashboardFiles = wrapTraced(
                 publiclyEnabledBy: null,
                 publicExpiryDate: null,
                 versionHistory: createInitialDashboardVersionHistory(
-                  dashboardYmlToVersionContent(sp.dashboardYml),
+                  sp.dashboardYml,
                   sp.dashboardFile.created_at
                 ),
                 publicPassword: null,
@@ -376,7 +377,7 @@ const createDashboardFiles = wrapTraced(
               publiclyEnabledBy: null,
               publicExpiryDate: null,
               versionHistory: createInitialDashboardVersionHistory(
-                dashboardYmlToVersionContent(sp.dashboardYml),
+                sp.dashboardYml,
                 sp.dashboardFile.created_at
               ),
               publicPassword: null,
@@ -505,20 +506,20 @@ ${`# DASHBOARD CONFIGURATION - YML STRUCTURE
 #   - id: 1               # Required row ID (integer)
 #     items:
 #       - id: metric-uuid-1  # UUIDv4 of an existing metric, NO quotes
-#     columnSizes: [12]   # Required - must sum to exactly 12
+#     column_sizes: [12]   # Required - must sum to exactly 12
 #   - id: 2 # REQUIRED
 #     items:
 #       - id: metric-uuid-2
 #       - id: metric-uuid-3
-#     columnSizes: 
+#     column_sizes: 
 #       - 6
 #       - 6
 #
 # Rules:
 # 1. Each row can have up to 4 items
 # 2. Each row must have a unique ID
-# 3. columnSizes is required and must specify the width for each item
-# 4. Sum of columnSizes in a row must be exactly 12
+# 3. column_sizes is required and must specify the width for each item
+# 4. Sum of column_sizes in a row must be exactly 12
 # 5. Each column size must be at least 3
 # 6. All arrays should follow the YML array syntax using \`-\` and should NOT USE \`[]\` formatting.
 # 7. Don't use comments. The ones in the example are just for explanation
@@ -558,7 +559,7 @@ properties:
                 description: UUIDv4 identifier of an existing metric
             required:
               - id
-        columnSizes:
+        column_sizes:
           type: array
           description: Required array of column sizes (must sum to exactly 12)
           items:
@@ -568,7 +569,7 @@ properties:
       required:
         - id
         - items
-        - columnSizes
+        - column_sizes
 required:
   - name
   - description
@@ -577,9 +578,9 @@ required:
 **Key Requirements:**
 - \`name\`: Dashboard title (no underscores, descriptive name)
 - \`description\`: Natural language explanation of the dashboard's purpose and contents
-- \`rows\`: Array of row objects, each with unique ID, items (metric UUIDs), and columnSizes
+- \`rows\`: Array of row objects, each with unique ID, items (metric UUIDs), and column_sizes
 - Each row must have 1-4 items maximum
-- \`columnSizes\` must sum to exactly 12 and each size must be >= 3
+- \`column_sizes\` must sum to exactly 12 and each size must be >= 3
 - All metric IDs must be valid UUIDs of existing metrics
 - Row IDs must be unique integers (typically 1, 2, 3, etc.)
 
@@ -597,13 +598,13 @@ rows:
   - id: 1
     items:
       - id: 550e8400-e29b-41d4-a716-446655440001
-    columnSizes:
+    column_sizes:
       - 12
   - id: 2
     items:
       - id: 550e8400-e29b-41d4-a716-446655440002
       - id: 550e8400-e29b-41d4-a716-446655440003
-    columnSizes:
+    column_sizes:
       - 6
       - 6
   - id: 3
@@ -611,7 +612,7 @@ rows:
       - id: 550e8400-e29b-41d4-a716-446655440004
       - id: 550e8400-e29b-41d4-a716-446655440005
       - id: 550e8400-e29b-41d4-a716-446655440006
-    columnSizes:
+    column_sizes:
       - 4
       - 4
       - 4

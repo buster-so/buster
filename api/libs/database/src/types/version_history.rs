@@ -18,16 +18,22 @@ use super::{DashboardYml, MetricYml};
 pub struct VersionHistory(pub std::collections::HashMap<String, Version>);
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct Version {
+    #[serde(alias = "version_number")]
     pub version_number: i32,
+    #[serde(alias = "updated_at")]
     pub updated_at: DateTime<Utc>,
     pub content: VersionContent,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(untagged)]
+#[serde(rename_all = "camelCase")]
 pub enum VersionContent {
+    #[serde(alias = "metric_yml")]
     MetricYml(Box<MetricYml>),
+    #[serde(alias = "dashboard_yml")]
     DashboardYml(DashboardYml),
 }
 
@@ -81,10 +87,10 @@ impl VersionHistory {
     }
 
     /// Updates the content of the latest version without creating a new version
-    /// 
+    ///
     /// This is used when we want to overwrite the current version instead of creating a new one.
     /// If there are no versions yet, this will create a new version with number 1.
-    /// 
+    ///
     /// # Arguments
     /// * `content` - The new content to replace the latest version's content
     pub fn update_latest_version(&mut self, content: impl Into<VersionContent>) {

@@ -10,10 +10,8 @@ import * as yaml from 'yaml';
 import { z } from 'zod';
 import { DataSource } from '../../../../data-source/src/data-source';
 import type { Credentials } from '../../../../data-source/src/types/credentials';
-import {
-  createInitialMetricVersionHistory,
-  metricYmlToVersionContent,
-} from './version-history-helpers';
+import { createInitialMetricVersionHistory, validateMetricYml } from './version-history-helpers';
+import type { MetricYml } from './version-history-types';
 
 /**
  * Ensures timeFrame values are properly quoted in YAML content
@@ -111,217 +109,6 @@ interface CreateMetricFilesOutput {
   files: FileWithId[];
   failed_files: FailedFileCreation[];
 }
-
-// Updated validation schemas to match Rust types exactly
-const yAxisConfigSchema = z.object({
-  yAxisShowAxisLabel: z.boolean().optional(),
-  yAxisShowAxisTitle: z.boolean().optional(),
-  yAxisAxisTitle: z.string().nullable().optional(),
-  yAxisStartAxisAtZero: z.boolean().nullable().optional(),
-  yAxisScaleType: z.enum(['log', 'linear']).optional(),
-});
-
-const y2AxisConfigSchema = z.object({
-  y2AxisShowAxisLabel: z.boolean().optional(),
-  y2AxisShowAxisTitle: z.boolean().optional(),
-  y2AxisAxisTitle: z.string().nullable().optional(),
-  y2AxisStartAxisAtZero: z.boolean().nullable().optional(),
-  y2AxisScaleType: z.enum(['log', 'linear']).optional(),
-});
-
-const xAxisConfigSchema = z.object({
-  xAxisTimeInterval: z.enum(['day', 'week', 'month', 'quarter', 'year', 'null']).optional(),
-  xAxisShowAxisLabel: z.boolean().optional(),
-  xAxisShowAxisTitle: z.boolean().optional(),
-  xAxisAxisTitle: z.string().nullable().optional(),
-  xAxisLabelRotation: z.enum(['0', '45', '90', 'auto']).optional(),
-  xAxisDataZoom: z.boolean().optional(),
-});
-
-const categoryAxisStyleConfigSchema = z.object({
-  categoryAxisTitle: z.string().nullable().optional(),
-});
-
-const columnLabelFormatSchema = z.object({
-  columnType: z.enum(['number', 'string', 'date']),
-  style: z.enum(['currency', 'percent', 'number', 'date', 'string']),
-  displayName: z.string().optional(),
-  numberSeparatorStyle: z.string().nullable().optional(),
-  minimumFractionDigits: z.number().optional(),
-  maximumFractionDigits: z.number().optional(),
-  multiplier: z.number().optional(),
-  prefix: z.string().optional(),
-  suffix: z.string().optional(),
-  replaceMissingDataWith: z.any().optional(), // Can be number or null
-  compactNumbers: z.boolean().optional(),
-  currency: z.string().optional(),
-  dateFormat: z.string().optional(),
-  useRelativeTime: z.boolean().optional(),
-  isUtc: z.boolean().optional(),
-  convertNumberTo: z.enum(['day_of_week', 'month_of_year', 'quarter']).optional(),
-});
-
-const columnSettingsSchema = z.object({
-  showDataLabels: z.boolean().optional(),
-  showDataLabelsAsPercentage: z.boolean().optional(),
-  columnVisualization: z.string().optional(),
-  lineWidth: z.number().optional(),
-  lineStyle: z.string().optional(),
-  lineType: z.string().optional(),
-  lineSymbolSize: z.number().optional(),
-  barRoundness: z.number().optional(),
-  lineSymbolSizeDot: z.number().optional(),
-});
-
-const goalLineSchema = z.object({
-  show: z.boolean().optional(),
-  value: z.number().optional(),
-  showGoalLineLabel: z.boolean().optional(),
-  goalLineLabel: z.string().optional(),
-  goalLineColor: z.string().optional(),
-});
-
-const trendlineSchema = z.object({
-  show: z.boolean().optional(),
-  showTrendlineLabel: z.boolean().optional(),
-  trendlineLabel: z.string().optional(),
-  type: z.string(),
-  columnId: z.string(),
-  trendLineColor: z.string().optional(),
-  trendlineLabelPositionOffset: z.number().optional(),
-  projection: z.boolean().optional(),
-  lineStyle: z.string().optional(),
-  offset: z.number().optional(),
-  polynomialOrder: z.number().optional(),
-  aggregateAllCategories: z.boolean().optional(),
-  id: z.string().optional(),
-});
-
-// Base chart config shared by all chart types (matching Rust BaseChartConfig)
-const baseChartConfigSchema = z.object({
-  columnLabelFormats: z.record(columnLabelFormatSchema),
-  columnSettings: z.record(columnSettingsSchema).optional(),
-  colors: z.array(z.string()).optional(),
-  showLegend: z.boolean().optional(),
-  gridLines: z.boolean().optional(),
-  showLegendHeadline: z.union([z.boolean(), z.string()]).optional(),
-  goalLines: z.array(goalLineSchema).optional(),
-  trendlines: z.array(trendlineSchema).optional(),
-  disableTooltip: z.boolean().optional(),
-  yAxisConfig: yAxisConfigSchema.optional(),
-  xAxisConfig: xAxisConfigSchema.optional(),
-  categoryAxisStyleConfig: categoryAxisStyleConfigSchema.optional(),
-  y2AxisConfig: y2AxisConfigSchema.optional(),
-});
-
-// Chart-specific schemas matching Rust enums exactly
-const barAndLineAxisSchema = z.object({
-  x: z.array(z.string()),
-  y: z.array(z.string()),
-  category: z.array(z.string()).optional(),
-  tooltip: z.array(z.string()).optional(),
-});
-
-const scatterAxisSchema = z.object({
-  x: z.array(z.string()),
-  y: z.array(z.string()),
-  category: z.array(z.string()).optional(),
-  size: z.array(z.string()).optional(),
-  tooltip: z.array(z.string()).optional(),
-});
-
-const pieChartAxisSchema = z.object({
-  x: z.array(z.string()),
-  y: z.array(z.string()),
-  tooltip: z.array(z.string()).optional(),
-});
-
-const comboChartAxisSchema = z.object({
-  x: z.array(z.string()),
-  y: z.array(z.string()),
-  y2: z.array(z.string()).optional(),
-  category: z.array(z.string()).optional(),
-  tooltip: z.array(z.string()).optional(),
-});
-
-const barChartConfigSchema = baseChartConfigSchema.extend({
-  selectedChartType: z.literal('bar'),
-  barAndLineAxis: barAndLineAxisSchema,
-  barLayout: z.string().optional(),
-  barSortBy: z.array(z.string()).optional(),
-  barGroupType: z.string().optional(),
-  barShowTotalAtTop: z.boolean().optional(),
-});
-
-const lineChartConfigSchema = baseChartConfigSchema.extend({
-  selectedChartType: z.literal('line'),
-  barAndLineAxis: barAndLineAxisSchema,
-  lineGroupType: z.string().optional(),
-});
-
-const scatterChartConfigSchema = baseChartConfigSchema.extend({
-  selectedChartType: z.literal('scatter'),
-  scatterAxis: scatterAxisSchema,
-  scatterDotSize: z.array(z.number()).optional(),
-});
-
-const pieChartConfigSchema = baseChartConfigSchema.extend({
-  selectedChartType: z.literal('pie'),
-  pieChartAxis: pieChartAxisSchema,
-  pieDisplayLabelAs: z.string().optional(),
-  pieShowInnerLabel: z.boolean().optional(),
-  pieInnerLabelAggregate: z.string().optional(),
-  pieInnerLabelTitle: z.string().optional(),
-  pieLabelPosition: z.string().optional(),
-  pieDonutWidth: z.number().optional(),
-  pieMinimumSlicePercentage: z.number().optional(),
-});
-
-const comboChartConfigSchema = baseChartConfigSchema.extend({
-  selectedChartType: z.literal('combo'),
-  comboChartAxis: comboChartAxisSchema,
-});
-
-const metricChartConfigSchema = baseChartConfigSchema.extend({
-  selectedChartType: z.literal('metric'),
-  metricColumnId: z.string(),
-  metricValueAggregate: z
-    .enum(['sum', 'average', 'median', 'count', 'max', 'min', 'first'])
-    .optional(),
-  metricHeader: z.any().optional(), // Can be string or object
-  metricSubHeader: z.any().optional(), // Can be string or object
-  metricValueLabel: z.string().optional(),
-});
-
-const tableChartConfigSchema = baseChartConfigSchema.extend({
-  selectedChartType: z.literal('table'),
-  tableColumnOrder: z.array(z.string()).optional(),
-  tableColumnWidths: z.record(z.number()).optional(),
-  tableHeaderBackgroundColor: z.string().optional(),
-  tableHeaderFontColor: z.string().optional(),
-  tableColumnFontColor: z.string().optional(),
-});
-
-const chartConfigSchema = z.discriminatedUnion('selectedChartType', [
-  barChartConfigSchema,
-  lineChartConfigSchema,
-  scatterChartConfigSchema,
-  pieChartConfigSchema,
-  comboChartConfigSchema,
-  metricChartConfigSchema,
-  tableChartConfigSchema,
-]);
-
-// Main MetricYml schema matching Rust struct exactly
-const metricYmlSchema = z.object({
-  name: z.string().min(1),
-  description: z.string().optional(),
-  timeFrame: z.string().min(1), // Note: using timeFrame (camelCase) as in Rust
-  sql: z.string().min(1),
-  chartConfig: chartConfigSchema, // Note: using chartConfig (camelCase) as in Rust
-});
-
-type MetricYml = z.infer<typeof metricYmlSchema>;
 
 // Tool implementation with complete schema included
 export const createMetrics = createTool({
@@ -1137,7 +924,7 @@ const createMetricFiles = wrapTraced(
             publiclyEnabledBy: null,
             publicExpiryDate: null,
             versionHistory: createInitialMetricVersionHistory(
-              metricYmlToVersionContent(sp.metricYml),
+              sp.metricYml,
               sp.metricFile.created_at
             ),
             dataMetadata: sp.results
@@ -1221,7 +1008,7 @@ async function processMetricFile(
 
     // Parse and validate YAML
     const parsedYml = yaml.parse(fixedYmlContent);
-    const metricYml = metricYmlSchema.parse(parsedYml);
+    const metricYml = validateMetricYml(parsedYml);
 
     // Generate deterministic UUID (simplified version)
     const metricId = randomUUID();

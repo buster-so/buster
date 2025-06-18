@@ -12,9 +12,9 @@ import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
 import {
   addMetricVersionToHistory,
   getLatestVersionNumber,
-  metricYmlToVersionContent,
+  validateMetricYml,
 } from './version-history-helpers';
-import type { MetricVersionHistory } from './version-history-types';
+import type { MetricYml, VersionHistory } from './version-history-types';
 
 /**
  * Ensures timeFrame values are properly quoted in YAML content
@@ -23,7 +23,7 @@ import type { MetricVersionHistory } from './version-history-types';
 function ensureTimeFrameQuoted(ymlContent: string): string {
   // Regex to match timeFrame field with its value
   // Captures: timeFrame + whitespace + : + whitespace + value (until end of line)
-  const timeFrameRegex = /(timeFrame\s*:\s*)([^\r\n]+)/g;
+  const timeFrameRegex = /(time_frame\s*:\s*)([^\r\n]+)/g;
 
   return ymlContent.replace(timeFrameRegex, (match, prefix, value) => {
     // Trim whitespace from the value
@@ -195,13 +195,14 @@ const chartConfigSchema = z.discriminatedUnion('selectedChartType', [
 
 const metricYmlSchema = z.object({
   name: z.string().min(1),
-  description: z.string().min(1),
-  timeFrame: z.string().min(1),
+  description: z.string().min(1).optional(),
+  time_frame: z.string().min(1),
   sql: z.string().min(1),
-  chartConfig: chartConfigSchema,
+  chart_config: chartConfigSchema,
 });
 
-type MetricYml = z.infer<typeof metricYmlSchema>;
+// Remove duplicate type definition since imported from types
+// type MetricYml = z.infer<typeof metricYmlSchema>;
 
 interface SqlValidationResult {
   success: boolean;
@@ -638,12 +639,12 @@ Please attempt to modify the metric again. This error could be due to:
         // Process each successful update
         for (const { file, metricYml } of successfulUpdates) {
           // Get current version history
-          const currentVersionHistory = file.versionHistory as MetricVersionHistory | null;
+          const currentVersionHistory = file.versionHistory as VersionHistory | null;
 
           // Add new version to history
           const updatedVersionHistory = addMetricVersionToHistory(
             currentVersionHistory,
-            metricYmlToVersionContent(metricYml),
+            metricYml,
             new Date().toISOString()
           );
 

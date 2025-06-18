@@ -2,31 +2,25 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import {
   addDashboardVersionToHistory,
   addMetricVersionToHistory,
-  createDashboardVersionEntry,
+  createDashboardVersion,
   createInitialDashboardVersionHistory,
   createInitialMetricVersionHistory,
-  createMetricVersionEntry,
-  dashboardYmlToVersionContent,
-  getLatestDashboardVersion,
-  getLatestMetricVersion,
+  createMetricVersion,
+  getLatestVersion,
   getLatestVersionNumber,
-  metricYmlToVersionContent,
+  validateDashboardYml,
+  validateMetricYml,
 } from './version-history-helpers';
-import type {
-  DashboardContent,
-  DashboardVersionHistory,
-  MetricContent,
-  MetricVersionHistory,
-} from './version-history-types';
+import type { DashboardYml, MetricYml, Version, VersionHistory } from './version-history-types';
 
 describe('Version History Helpers', () => {
   const mockTimestamp = '2025-05-02T17:18:46.207629Z';
 
-  const mockMetricContent: MetricContent = {
+  const mockMetricYml: MetricYml = {
     sql: 'SELECT SUM(revenue) as total FROM sales',
     name: 'Total Revenue',
-    timeFrame: 'Q2 2023 - Q1 2024',
-    chartConfig: {
+    time_frame: 'Q2 2023 - Q1 2024', // Note: time_frame not timeFrame
+    chart_config: {
       selectedChartType: 'metric',
       metricColumnId: 'total',
       columnLabelFormats: {
@@ -42,13 +36,13 @@ describe('Version History Helpers', () => {
     description: 'Total sales revenue for the period',
   };
 
-  const mockDashboardContent: DashboardContent = {
+  const mockDashboardYml: DashboardYml = {
     name: 'Revenue Dashboard',
     rows: [
       {
         id: 1,
         items: [{ id: '1ab2b66a-9ca6-5120-9155-20998b802c6a' }],
-        columnSizes: [12],
+        column_sizes: [12], // Note: column_sizes not columnSizes
       },
       {
         id: 2,
@@ -56,47 +50,47 @@ describe('Version History Helpers', () => {
           { id: 'ea6b0583-e9cb-5b2f-a18c-69571042ee67' },
           { id: 'b19d2606-6061-5d22-8628-78a4878310d4' },
         ],
-        columnSizes: [6, 6],
+        column_sizes: [6, 6],
       },
     ],
     description: 'Dashboard showing revenue metrics',
   };
 
-  describe('createMetricVersionEntry', () => {
+  describe('createMetricVersion', () => {
     it('should create a metric version entry with provided timestamp', () => {
-      const entry = createMetricVersionEntry(mockMetricContent, 1, mockTimestamp);
+      const entry = createMetricVersion(mockMetricYml, 1, mockTimestamp);
 
       expect(entry).toEqual({
-        content: mockMetricContent,
+        content: { MetricYml: mockMetricYml },
         updated_at: mockTimestamp,
         version_number: 1,
       });
     });
 
     it('should create a metric version entry with current timestamp if not provided', () => {
-      const entry = createMetricVersionEntry(mockMetricContent, 2);
+      const entry = createMetricVersion(mockMetricYml, 2);
 
-      expect(entry.content).toEqual(mockMetricContent);
+      expect(entry.content).toEqual({ MetricYml: mockMetricYml });
       expect(entry.version_number).toBe(2);
       expect(entry.updated_at).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     });
   });
 
-  describe('createDashboardVersionEntry', () => {
+  describe('createDashboardVersion', () => {
     it('should create a dashboard version entry with provided timestamp', () => {
-      const entry = createDashboardVersionEntry(mockDashboardContent, 1, mockTimestamp);
+      const entry = createDashboardVersion(mockDashboardYml, 1, mockTimestamp);
 
       expect(entry).toEqual({
-        content: mockDashboardContent,
+        content: { DashboardYml: mockDashboardYml },
         updated_at: mockTimestamp,
         version_number: 1,
       });
     });
 
     it('should create a dashboard version entry with current timestamp if not provided', () => {
-      const entry = createDashboardVersionEntry(mockDashboardContent, 2);
+      const entry = createDashboardVersion(mockDashboardYml, 2);
 
-      expect(entry.content).toEqual(mockDashboardContent);
+      expect(entry.content).toEqual({ DashboardYml: mockDashboardYml });
       expect(entry.version_number).toBe(2);
       expect(entry.updated_at).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     });
@@ -104,11 +98,11 @@ describe('Version History Helpers', () => {
 
   describe('createInitialMetricVersionHistory', () => {
     it('should create initial version history with version 1', () => {
-      const history = createInitialMetricVersionHistory(mockMetricContent, mockTimestamp);
+      const history = createInitialMetricVersionHistory(mockMetricYml, mockTimestamp);
 
       expect(history).toEqual({
         '1': {
-          content: mockMetricContent,
+          content: { MetricYml: mockMetricYml },
           updated_at: mockTimestamp,
           version_number: 1,
         },
@@ -116,23 +110,23 @@ describe('Version History Helpers', () => {
     });
 
     it('should match expected JSONB format', () => {
-      const history = createInitialMetricVersionHistory(mockMetricContent, mockTimestamp);
+      const history = createInitialMetricVersionHistory(mockMetricYml, mockTimestamp);
       const json = JSON.stringify(history);
       const parsed = JSON.parse(json);
 
       expect(parsed['1']).toBeDefined();
-      expect(parsed['1'].content.sql).toBe(mockMetricContent.sql);
+      expect(parsed['1'].content.MetricYml.sql).toBe(mockMetricYml.sql);
       expect(parsed['1'].version_number).toBe(1);
     });
   });
 
   describe('createInitialDashboardVersionHistory', () => {
     it('should create initial version history with version 1', () => {
-      const history = createInitialDashboardVersionHistory(mockDashboardContent, mockTimestamp);
+      const history = createInitialDashboardVersionHistory(mockDashboardYml, mockTimestamp);
 
       expect(history).toEqual({
         '1': {
-          content: mockDashboardContent,
+          content: { DashboardYml: mockDashboardYml },
           updated_at: mockTimestamp,
           version_number: 1,
         },
@@ -140,23 +134,23 @@ describe('Version History Helpers', () => {
     });
 
     it('should match expected JSONB format', () => {
-      const history = createInitialDashboardVersionHistory(mockDashboardContent, mockTimestamp);
+      const history = createInitialDashboardVersionHistory(mockDashboardYml, mockTimestamp);
       const json = JSON.stringify(history);
       const parsed = JSON.parse(json);
 
       expect(parsed['1']).toBeDefined();
-      expect(parsed['1'].content.name).toBe(mockDashboardContent.name);
+      expect(parsed['1'].content.DashboardYml.name).toBe(mockDashboardYml.name);
       expect(parsed['1'].version_number).toBe(1);
     });
   });
 
   describe('addMetricVersionToHistory', () => {
     it('should create initial version when history is null', () => {
-      const history = addMetricVersionToHistory(null, mockMetricContent, mockTimestamp);
+      const history = addMetricVersionToHistory(null, mockMetricYml, mockTimestamp);
 
       expect(history).toEqual({
         '1': {
-          content: mockMetricContent,
+          content: { MetricYml: mockMetricYml },
           updated_at: mockTimestamp,
           version_number: 1,
         },
@@ -164,44 +158,44 @@ describe('Version History Helpers', () => {
     });
 
     it('should create initial version when history is undefined', () => {
-      const history = addMetricVersionToHistory(undefined, mockMetricContent, mockTimestamp);
+      const history = addMetricVersionToHistory(undefined, mockMetricYml, mockTimestamp);
 
       expect(history['1']).toBeDefined();
       expect(history['1']?.version_number).toBe(1);
     });
 
     it('should create initial version when history is empty object', () => {
-      const history = addMetricVersionToHistory({}, mockMetricContent, mockTimestamp);
+      const history = addMetricVersionToHistory({}, mockMetricYml, mockTimestamp);
 
       expect(history['1']).toBeDefined();
       expect(history['1']?.version_number).toBe(1);
     });
 
     it('should add version 2 to existing history', () => {
-      const existingHistory: MetricVersionHistory = {
-        '1': createMetricVersionEntry(mockMetricContent, 1, '2025-05-01T10:00:00.000Z'),
+      const existingHistory: VersionHistory = {
+        '1': createMetricVersion(mockMetricYml, 1, '2025-05-01T10:00:00.000Z'),
       };
 
-      const updatedContent = { ...mockMetricContent, name: 'Updated Revenue' };
-      const history = addMetricVersionToHistory(existingHistory, updatedContent, mockTimestamp);
+      const updatedMetric = { ...mockMetricYml, name: 'Updated Revenue' };
+      const history = addMetricVersionToHistory(existingHistory, updatedMetric, mockTimestamp);
 
       expect(Object.keys(history)).toHaveLength(2);
       expect(history['1']).toEqual(existingHistory['1']);
       expect(history['2']).toEqual({
-        content: updatedContent,
+        content: { MetricYml: updatedMetric },
         updated_at: mockTimestamp,
         version_number: 2,
       });
     });
 
     it('should handle non-sequential version numbers', () => {
-      const existingHistory: MetricVersionHistory = {
-        '1': createMetricVersionEntry(mockMetricContent, 1),
-        '3': createMetricVersionEntry(mockMetricContent, 3),
-        '5': createMetricVersionEntry(mockMetricContent, 5),
+      const existingHistory: VersionHistory = {
+        '1': createMetricVersion(mockMetricYml, 1),
+        '3': createMetricVersion(mockMetricYml, 3),
+        '5': createMetricVersion(mockMetricYml, 5),
       };
 
-      const history = addMetricVersionToHistory(existingHistory, mockMetricContent, mockTimestamp);
+      const history = addMetricVersionToHistory(existingHistory, mockMetricYml, mockTimestamp);
 
       expect(history['6']).toBeDefined();
       expect(history['6']?.version_number).toBe(6);
@@ -210,11 +204,11 @@ describe('Version History Helpers', () => {
 
   describe('addDashboardVersionToHistory', () => {
     it('should create initial version when history is null', () => {
-      const history = addDashboardVersionToHistory(null, mockDashboardContent, mockTimestamp);
+      const history = addDashboardVersionToHistory(null, mockDashboardYml, mockTimestamp);
 
       expect(history).toEqual({
         '1': {
-          content: mockDashboardContent,
+          content: { DashboardYml: mockDashboardYml },
           updated_at: mockTimestamp,
           version_number: 1,
         },
@@ -222,17 +216,21 @@ describe('Version History Helpers', () => {
     });
 
     it('should add version 2 to existing history', () => {
-      const existingHistory: DashboardVersionHistory = {
-        '1': createDashboardVersionEntry(mockDashboardContent, 1, '2025-05-01T10:00:00.000Z'),
+      const existingHistory: VersionHistory = {
+        '1': createDashboardVersion(mockDashboardYml, 1, '2025-05-01T10:00:00.000Z'),
       };
 
-      const updatedContent = { ...mockDashboardContent, name: 'Updated Dashboard' };
-      const history = addDashboardVersionToHistory(existingHistory, updatedContent, mockTimestamp);
+      const updatedDashboard = { ...mockDashboardYml, name: 'Updated Dashboard' };
+      const history = addDashboardVersionToHistory(
+        existingHistory,
+        updatedDashboard,
+        mockTimestamp
+      );
 
       expect(Object.keys(history)).toHaveLength(2);
       expect(history['1']).toEqual(existingHistory['1']);
       expect(history['2']).toEqual({
-        content: updatedContent,
+        content: { DashboardYml: updatedDashboard },
         updated_at: mockTimestamp,
         version_number: 2,
       });
@@ -253,186 +251,174 @@ describe('Version History Helpers', () => {
     });
 
     it('should return latest version number', () => {
-      const history: MetricVersionHistory = {
-        '1': createMetricVersionEntry(mockMetricContent, 1),
-        '2': createMetricVersionEntry(mockMetricContent, 2),
-        '3': createMetricVersionEntry(mockMetricContent, 3),
+      const history: VersionHistory = {
+        '1': createMetricVersion(mockMetricYml, 1),
+        '2': createMetricVersion(mockMetricYml, 2),
+        '3': createMetricVersion(mockMetricYml, 3),
       };
 
       expect(getLatestVersionNumber(history)).toBe(3);
     });
 
     it('should handle non-sequential version numbers', () => {
-      const history: MetricVersionHistory = {
-        '1': createMetricVersionEntry(mockMetricContent, 1),
-        '5': createMetricVersionEntry(mockMetricContent, 5),
-        '3': createMetricVersionEntry(mockMetricContent, 3),
+      const history: VersionHistory = {
+        '1': createMetricVersion(mockMetricYml, 1),
+        '5': createMetricVersion(mockMetricYml, 5),
+        '3': createMetricVersion(mockMetricYml, 3),
       };
 
       expect(getLatestVersionNumber(history)).toBe(5);
     });
   });
 
-  describe('getLatestMetricVersion', () => {
+  describe('getLatestVersion', () => {
     it('should return null for null history', () => {
-      expect(getLatestMetricVersion(null)).toBeNull();
+      expect(getLatestVersion(null)).toBeNull();
     });
 
     it('should return null for empty history', () => {
-      expect(getLatestMetricVersion({})).toBeNull();
+      expect(getLatestVersion({})).toBeNull();
     });
 
-    it('should return latest version entry', () => {
-      const latestContent = { ...mockMetricContent, name: 'Latest Version' };
-      const history: MetricVersionHistory = {
-        '1': createMetricVersionEntry(mockMetricContent, 1),
-        '2': createMetricVersionEntry(mockMetricContent, 2),
-        '3': createMetricVersionEntry(latestContent, 3, mockTimestamp),
+    it('should return latest version entry for metric', () => {
+      const latestMetric = { ...mockMetricYml, name: 'Latest Version' };
+      const history: VersionHistory = {
+        '1': createMetricVersion(mockMetricYml, 1),
+        '2': createMetricVersion(mockMetricYml, 2),
+        '3': createMetricVersion(latestMetric, 3, mockTimestamp),
       };
 
-      const latest = getLatestMetricVersion(history);
+      const latest = getLatestVersion(history);
       expect(latest).toEqual({
-        content: latestContent,
+        content: { MetricYml: latestMetric },
         updated_at: mockTimestamp,
         version_number: 3,
       });
     });
-  });
 
-  describe('getLatestDashboardVersion', () => {
-    it('should return null for null history', () => {
-      expect(getLatestDashboardVersion(null)).toBeNull();
-    });
-
-    it('should return latest version entry', () => {
-      const latestContent = { ...mockDashboardContent, name: 'Latest Dashboard' };
-      const history: DashboardVersionHistory = {
-        '1': createDashboardVersionEntry(mockDashboardContent, 1),
-        '2': createDashboardVersionEntry(latestContent, 2, mockTimestamp),
+    it('should return latest version entry for dashboard', () => {
+      const latestDashboard = { ...mockDashboardYml, name: 'Latest Dashboard' };
+      const history: VersionHistory = {
+        '1': createDashboardVersion(mockDashboardYml, 1),
+        '2': createDashboardVersion(latestDashboard, 2, mockTimestamp),
       };
 
-      const latest = getLatestDashboardVersion(history);
+      const latest = getLatestVersion(history);
       expect(latest).toEqual({
-        content: latestContent,
+        content: { DashboardYml: latestDashboard },
         updated_at: mockTimestamp,
         version_number: 2,
       });
     });
   });
 
-  describe('metricYmlToVersionContent', () => {
-    it('should convert metric YML to version content format', () => {
+  // getLatestDashboardVersion test removed - now using unified getLatestVersion
+
+  describe('validateMetricYml', () => {
+    it('should validate correct metric YML', () => {
       const yml = {
         name: 'Test Metric',
         description: 'Test description',
-        timeFrame: '2024',
+        time_frame: '2024', // Note: time_frame not timeFrame
         sql: 'SELECT * FROM test',
-        chartConfig: { selectedChartType: 'metric' as const, columnLabelFormats: {} },
+        chart_config: { selectedChartType: 'metric' as const, columnLabelFormats: {} },
       };
 
-      const content = metricYmlToVersionContent(yml);
+      const validated = validateMetricYml(yml);
 
-      expect(content).toEqual({
-        sql: yml.sql,
-        name: yml.name,
-        timeFrame: yml.timeFrame,
-        chartConfig: yml.chartConfig,
-        description: yml.description,
-      });
+      expect(validated).toEqual(yml);
     });
 
-    it('should handle missing description', () => {
+    it('should handle optional description', () => {
       const yml = {
         name: 'Test Metric',
-        timeFrame: '2024',
+        time_frame: '2024',
         sql: 'SELECT * FROM test',
-        chartConfig: { selectedChartType: 'metric' as const, columnLabelFormats: {} },
+        chart_config: { selectedChartType: 'metric' as const, columnLabelFormats: {} },
       };
 
-      const content = metricYmlToVersionContent(yml);
+      const validated = validateMetricYml(yml);
 
-      expect(content.description).toBe('');
+      expect(validated.description).toBeUndefined();
     });
   });
 
-  describe('dashboardYmlToVersionContent', () => {
-    it('should convert dashboard YML to version content format', () => {
+  describe('validateDashboardYml', () => {
+    it('should validate correct dashboard YML', () => {
       const yml = {
         name: 'Test Dashboard',
         description: 'Test description',
         rows: [
           {
             id: 1,
-            items: [{ id: 'metric-1' }],
-            columnSizes: [12],
+            items: [{ id: '550e8400-e29b-41d4-a716-446655440000' }], // Valid UUID
+            column_sizes: [12], // Note: column_sizes not columnSizes
           },
         ],
       };
 
-      const content = dashboardYmlToVersionContent(yml);
+      const validated = validateDashboardYml(yml);
 
-      expect(content).toEqual({
-        name: yml.name,
-        rows: yml.rows,
-        description: yml.description,
-      });
+      expect(validated).toEqual(yml);
     });
 
-    it('should handle missing description', () => {
+    it('should handle optional description', () => {
       const yml = {
         name: 'Test Dashboard',
         rows: [
           {
             id: 1,
-            items: [{ id: 'metric-1' }],
-            columnSizes: [12],
+            items: [{ id: '550e8400-e29b-41d4-a716-446655440000' }],
+            column_sizes: [12],
           },
         ],
       };
 
-      const content = dashboardYmlToVersionContent(yml);
+      const validated = validateDashboardYml(yml);
 
-      expect(content.description).toBe('');
+      expect(validated.description).toBeUndefined();
     });
   });
 
-  describe('JSONB Compatibility', () => {
+  describe('JSONB Compatibility - Rust VersionHistory Structure', () => {
     it('should produce valid JSONB for metric version history', () => {
-      const history = createInitialMetricVersionHistory(mockMetricContent, mockTimestamp);
+      const history = createInitialMetricVersionHistory(mockMetricYml, mockTimestamp);
       const updatedHistory = addMetricVersionToHistory(
         history,
-        { ...mockMetricContent, name: 'Updated' },
+        { ...mockMetricYml, name: 'Updated' },
         '2025-05-03T10:00:00.000Z'
       );
 
       const json = JSON.stringify(updatedHistory);
       const parsed = JSON.parse(json);
 
-      // Verify structure matches expected format
+      // Verify structure matches Rust VersionHistory format
       expect(Object.keys(parsed).sort()).toEqual(['1', '2']);
       expect(parsed['1'].version_number).toBe(1);
       expect(parsed['2'].version_number).toBe(2);
-      expect(parsed['1'].content.name).toBe('Total Revenue');
-      expect(parsed['2'].content.name).toBe('Updated');
+      expect(parsed['1'].content.MetricYml.name).toBe('Total Revenue');
+      expect(parsed['2'].content.MetricYml.name).toBe('Updated');
+      expect(parsed['1'].content.MetricYml.time_frame).toBe('Q2 2023 - Q1 2024');
     });
 
     it('should produce valid JSONB for dashboard version history', () => {
-      const history = createInitialDashboardVersionHistory(mockDashboardContent, mockTimestamp);
+      const history = createInitialDashboardVersionHistory(mockDashboardYml, mockTimestamp);
       const updatedHistory = addDashboardVersionToHistory(
         history,
-        { ...mockDashboardContent, name: 'Updated Dashboard' },
+        { ...mockDashboardYml, name: 'Updated Dashboard' },
         '2025-05-03T10:00:00.000Z'
       );
 
       const json = JSON.stringify(updatedHistory);
       const parsed = JSON.parse(json);
 
-      // Verify structure matches expected format
+      // Verify structure matches Rust VersionHistory format
       expect(Object.keys(parsed).sort()).toEqual(['1', '2']);
       expect(parsed['1'].version_number).toBe(1);
       expect(parsed['2'].version_number).toBe(2);
-      expect(parsed['1'].content.name).toBe('Revenue Dashboard');
-      expect(parsed['2'].content.name).toBe('Updated Dashboard');
+      expect(parsed['1'].content.DashboardYml.name).toBe('Revenue Dashboard');
+      expect(parsed['2'].content.DashboardYml.name).toBe('Updated Dashboard');
+      expect(parsed['1'].content.DashboardYml.rows[0].column_sizes).toEqual([12]);
     });
   });
 });

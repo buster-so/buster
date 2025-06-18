@@ -1,118 +1,69 @@
 import { z } from 'zod';
 
-// Base version content schemas (reusing from existing files)
-const columnLabelFormatSchema = z.object({
-  columnType: z.enum(['number', 'string', 'date']),
-  style: z.enum(['currency', 'percent', 'number', 'date', 'string']),
-  multiplier: z.number().optional(),
-  displayName: z.string().optional(),
-  numberSeparatorStyle: z.string().nullable().optional(),
-  minimumFractionDigits: z.number().optional(),
-  maximumFractionDigits: z.number().optional(),
-  prefix: z.string().optional(),
-  suffix: z.string().optional(),
-  replaceMissingDataWith: z.any().optional(),
-  compactNumbers: z.boolean().optional(),
-  currency: z.string().optional(),
-  dateFormat: z.string().optional(),
-  useRelativeTime: z.boolean().optional(),
-  isUtc: z.boolean().optional(),
-  convertNumberTo: z.enum(['day_of_week', 'month_of_year', 'quarter']).optional(),
+// MetricYml type that matches Rust exactly
+const metricYmlSchema = z.object({
+  name: z.string(),
+  description: z.string().optional(),
+  time_frame: z.string(), // Note: Rust uses time_frame, not timeFrame
+  sql: z.string(),
+  chart_config: z.any(), // Complex chart config - using any for now to match Rust flexibility
 });
 
-const baseChartConfigSchema = z.object({
-  selectedChartType: z.enum(['bar', 'line', 'scatter', 'pie', 'combo', 'metric', 'table']),
-  columnLabelFormats: z.record(columnLabelFormatSchema),
-  columnSettings: z.record(z.any()).optional(),
-  colors: z.array(z.string()).optional(),
-  showLegend: z.boolean().optional(),
-  gridLines: z.boolean().optional(),
-  showLegendHeadline: z.union([z.boolean(), z.string()]).optional(),
-  goalLines: z.array(z.any()).optional(),
-  trendlines: z.array(z.any()).optional(),
-  disableTooltip: z.boolean().optional(),
-  xAxisConfig: z.any().optional(),
-  yAxisConfig: z.any().optional(),
-  y2AxisConfig: z.any().optional(),
-  categoryAxisStyleConfig: z.any().optional(),
+// DashboardYml type that matches Rust exactly
+const rowItemSchema = z.object({
+  id: z.string().uuid(), // Rust uses Uuid
 });
 
-// Metric-specific chart configs
-const metricChartConfigSchema = baseChartConfigSchema.extend({
-  selectedChartType: z.literal('metric'),
-  metricColumnId: z.string(),
-  metricValueAggregate: z
-    .enum(['sum', 'average', 'median', 'count', 'max', 'min', 'first'])
-    .optional(),
-  metricHeader: z.any().optional(),
-  metricSubHeader: z.any().optional(),
-  metricValueLabel: z.string().optional(),
+const rowSchema = z.object({
+  items: z.array(rowItemSchema),
+  row_height: z.number().optional(),
+  column_sizes: z.array(z.number()),
+  id: z.number(),
 });
 
-// For simplicity, we'll use a union of possible chart configs
-const chartConfigSchema = z.union([
-  metricChartConfigSchema,
-  baseChartConfigSchema, // Covers other chart types
+const dashboardYmlSchema = z.object({
+  name: z.string(),
+  description: z.string().optional(),
+  rows: z.array(rowSchema),
+});
+
+// VersionContent enum that matches Rust exactly
+const versionContentSchema = z.union([
+  z.object({
+    MetricYml: metricYmlSchema,
+  }),
+  z.object({
+    DashboardYml: dashboardYmlSchema,
+  }),
 ]);
 
-// Metric content schema
-const metricContentSchema = z.object({
-  sql: z.string(),
-  name: z.string(),
-  timeFrame: z.string(),
-  chartConfig: chartConfigSchema,
-  description: z.string(),
+// Version struct that matches Rust exactly
+const versionSchema = z.object({
+  version_number: z.number().int(), // Rust uses i32
+  updated_at: z.string().datetime(), // Rust uses DateTime<Utc> - ISO 8601 string
+  content: versionContentSchema,
 });
 
-// Dashboard content schema
-const dashboardItemSchema = z.object({
-  id: z.string(),
-});
+// VersionHistory struct that matches Rust exactly
+// This is a HashMap<String, Version> in Rust
+const versionHistorySchema = z.record(z.string(), versionSchema);
 
-const dashboardRowSchema = z.object({
-  id: z.number(),
-  items: z.array(dashboardItemSchema),
-  columnSizes: z.array(z.number()),
-});
-
-const dashboardContentSchema = z.object({
-  name: z.string(),
-  rows: z.array(dashboardRowSchema),
-  description: z.string(),
-});
-
-// Version entry schemas
-const metricVersionEntrySchema = z.object({
-  content: metricContentSchema,
-  updated_at: z.string(), // ISO 8601 timestamp
-  version_number: z.number(),
-});
-
-const dashboardVersionEntrySchema = z.object({
-  content: dashboardContentSchema,
-  updated_at: z.string(), // ISO 8601 timestamp
-  version_number: z.number(),
-});
-
-// Version history schemas (the JSONB structure)
-// Keys are string version numbers ("1", "2", etc.)
-const metricVersionHistorySchema = z.record(z.string(), metricVersionEntrySchema);
-const dashboardVersionHistorySchema = z.record(z.string(), dashboardVersionEntrySchema);
-
-// Type exports
-export type MetricContent = z.infer<typeof metricContentSchema>;
-export type DashboardContent = z.infer<typeof dashboardContentSchema>;
-export type MetricVersionEntry = z.infer<typeof metricVersionEntrySchema>;
-export type DashboardVersionEntry = z.infer<typeof dashboardVersionEntrySchema>;
-export type MetricVersionHistory = z.infer<typeof metricVersionHistorySchema>;
-export type DashboardVersionHistory = z.infer<typeof dashboardVersionHistorySchema>;
+// Type exports that match Rust exactly
+export type MetricYml = z.infer<typeof metricYmlSchema>;
+export type DashboardYml = z.infer<typeof dashboardYmlSchema>;
+export type RowItem = z.infer<typeof rowItemSchema>;
+export type Row = z.infer<typeof rowSchema>;
+export type VersionContent = z.infer<typeof versionContentSchema>;
+export type Version = z.infer<typeof versionSchema>;
+export type VersionHistory = z.infer<typeof versionHistorySchema>;
 
 // Schema exports
 export {
-  metricContentSchema,
-  dashboardContentSchema,
-  metricVersionEntrySchema,
-  dashboardVersionEntrySchema,
-  metricVersionHistorySchema,
-  dashboardVersionHistorySchema,
+  metricYmlSchema,
+  dashboardYmlSchema,
+  rowItemSchema,
+  rowSchema,
+  versionContentSchema,
+  versionSchema,
+  versionHistorySchema,
 };

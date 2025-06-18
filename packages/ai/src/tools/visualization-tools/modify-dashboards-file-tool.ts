@@ -9,10 +9,10 @@ import { dashboardFiles, metricFiles } from '../../../../database/src/schema';
 import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
 import {
   addDashboardVersionToHistory,
-  dashboardYmlToVersionContent,
   getLatestVersionNumber,
+  validateDashboardYml,
 } from './version-history-helpers';
-import type { DashboardVersionHistory } from './version-history-types';
+import type { DashboardYml, VersionHistory } from './version-history-types';
 
 // Core interfaces matching Rust structs
 interface FileUpdate {
@@ -75,7 +75,7 @@ const dashboardRowSchema = z
       .array(dashboardItemSchema)
       .min(1, 'Each row must have at least 1 item')
       .max(4, 'Each row can have at most 4 items'),
-    columnSizes: z
+    column_sizes: z
       .array(
         z
           .number()
@@ -83,18 +83,18 @@ const dashboardRowSchema = z
           .min(3, 'Each column size must be at least 3')
           .max(12, 'Each column size cannot exceed 12')
       )
-      .min(1, 'columnSizes array cannot be empty')
+      .min(1, 'column_sizes array cannot be empty')
       .refine((sizes) => sizes.reduce((sum, size) => sum + size, 0) === 12, {
         message: 'Column sizes must sum to exactly 12',
       }),
   })
-  .refine((row) => row.items.length === row.columnSizes.length, {
+  .refine((row) => row.items.length === row.column_sizes.length, {
     message: 'Number of items must match number of column sizes',
   });
 
 const dashboardYmlSchema = z.object({
   name: z.string().min(1, 'Dashboard name is required'),
-  description: z.string().min(1, 'Dashboard description is required'),
+  description: z.string().min(1, 'Dashboard description is required').optional(),
   rows: z
     .array(dashboardRowSchema)
     .min(1, 'Dashboard must have at least one row')
@@ -110,7 +110,6 @@ const dashboardYmlSchema = z.object({
     ),
 });
 
-type DashboardYml = z.infer<typeof dashboardYmlSchema>;
 type DashboardRow = z.infer<typeof dashboardRowSchema>;
 type DashboardItem = z.infer<typeof dashboardItemSchema>;
 
@@ -325,13 +324,12 @@ const modifyDashboardFiles = wrapTraced(
           const { dashboardFile: updatedFile, dashboardYml, results } = updateResult;
 
           // Get current version history
-          const currentVersionHistory =
-            existingFile.versionHistory as DashboardVersionHistory | null;
+          const currentVersionHistory = existingFile.versionHistory as VersionHistory | null;
 
           // Add new version to history
           const updatedVersionHistory = addDashboardVersionToHistory(
             currentVersionHistory,
-            dashboardYmlToVersionContent(dashboardYml),
+            dashboardYml,
             new Date().toISOString()
           );
 
@@ -368,9 +366,7 @@ const modifyDashboardFiles = wrapTraced(
         // Add successful files to output
         for (const file of dashboardFilesToUpdate) {
           // Get the latest version number
-          const latestVersion = getLatestVersionNumber(
-            file.versionHistory as DashboardVersionHistory
-          );
+          const latestVersion = getLatestVersionNumber(file.versionHistory as VersionHistory);
 
           files.push({
             id: file.id,

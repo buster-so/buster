@@ -1,40 +1,39 @@
 import type {
-  DashboardContent,
-  DashboardVersionEntry,
-  DashboardVersionHistory,
-  MetricContent,
-  MetricVersionEntry,
-  MetricVersionHistory,
+  DashboardYml,
+  MetricYml,
+  Version,
+  VersionContent,
+  VersionHistory,
 } from './version-history-types';
-import { metricContentSchema } from './version-history-types';
+import { dashboardYmlSchema, metricYmlSchema } from './version-history-types';
 
 /**
  * Creates a version entry for a metric
  */
-export function createMetricVersionEntry(
-  content: MetricContent,
+export function createMetricVersion(
+  metricYml: MetricYml,
   versionNumber: number,
   timestamp?: string
-): MetricVersionEntry {
+): Version {
   return {
-    content,
-    updated_at: timestamp || new Date().toISOString(),
     version_number: versionNumber,
+    updated_at: timestamp || new Date().toISOString(),
+    content: { MetricYml: metricYml },
   };
 }
 
 /**
  * Creates a version entry for a dashboard
  */
-export function createDashboardVersionEntry(
-  content: DashboardContent,
+export function createDashboardVersion(
+  dashboardYml: DashboardYml,
   versionNumber: number,
   timestamp?: string
-): DashboardVersionEntry {
+): Version {
   return {
-    content,
-    updated_at: timestamp || new Date().toISOString(),
     version_number: versionNumber,
+    updated_at: timestamp || new Date().toISOString(),
+    content: { DashboardYml: dashboardYml },
   };
 }
 
@@ -42,11 +41,11 @@ export function createDashboardVersionEntry(
  * Creates an initial version history for a metric (version 1)
  */
 export function createInitialMetricVersionHistory(
-  content: MetricContent,
+  metricYml: MetricYml,
   timestamp?: string
-): MetricVersionHistory {
+): VersionHistory {
   return {
-    '1': createMetricVersionEntry(content, 1, timestamp),
+    '1': createMetricVersion(metricYml, 1, timestamp),
   };
 }
 
@@ -54,25 +53,25 @@ export function createInitialMetricVersionHistory(
  * Creates an initial version history for a dashboard (version 1)
  */
 export function createInitialDashboardVersionHistory(
-  content: DashboardContent,
+  dashboardYml: DashboardYml,
   timestamp?: string
-): DashboardVersionHistory {
+): VersionHistory {
   return {
-    '1': createDashboardVersionEntry(content, 1, timestamp),
+    '1': createDashboardVersion(dashboardYml, 1, timestamp),
   };
 }
 
 /**
- * Adds a new version to an existing metric version history
+ * Adds a new metric version to existing version history
  */
 export function addMetricVersionToHistory(
-  history: MetricVersionHistory | null | undefined,
-  content: MetricContent,
+  history: VersionHistory | null | undefined,
+  metricYml: MetricYml,
   timestamp?: string
-): MetricVersionHistory {
+): VersionHistory {
   // If no history exists, create initial version
   if (!history || Object.keys(history).length === 0) {
-    return createInitialMetricVersionHistory(content, timestamp);
+    return createInitialMetricVersionHistory(metricYml, timestamp);
   }
 
   // Find the highest version number
@@ -84,21 +83,21 @@ export function addMetricVersionToHistory(
 
   return {
     ...history,
-    [nextVersion.toString()]: createMetricVersionEntry(content, nextVersion, timestamp),
+    [nextVersion.toString()]: createMetricVersion(metricYml, nextVersion, timestamp),
   };
 }
 
 /**
- * Adds a new version to an existing dashboard version history
+ * Adds a new dashboard version to existing version history
  */
 export function addDashboardVersionToHistory(
-  history: DashboardVersionHistory | null | undefined,
-  content: DashboardContent,
+  history: VersionHistory | null | undefined,
+  dashboardYml: DashboardYml,
   timestamp?: string
-): DashboardVersionHistory {
+): VersionHistory {
   // If no history exists, create initial version
   if (!history || Object.keys(history).length === 0) {
-    return createInitialDashboardVersionHistory(content, timestamp);
+    return createInitialDashboardVersionHistory(dashboardYml, timestamp);
   }
 
   // Find the highest version number
@@ -110,16 +109,14 @@ export function addDashboardVersionToHistory(
 
   return {
     ...history,
-    [nextVersion.toString()]: createDashboardVersionEntry(content, nextVersion, timestamp),
+    [nextVersion.toString()]: createDashboardVersion(dashboardYml, nextVersion, timestamp),
   };
 }
 
 /**
  * Gets the latest version number from a version history
  */
-export function getLatestVersionNumber(
-  history: MetricVersionHistory | DashboardVersionHistory | null | undefined
-): number {
+export function getLatestVersionNumber(history: VersionHistory | null | undefined): number {
   if (!history || Object.keys(history).length === 0) {
     return 0;
   }
@@ -132,11 +129,9 @@ export function getLatestVersionNumber(
 }
 
 /**
- * Gets the latest version entry from a metric version history
+ * Gets the latest version entry from version history
  */
-export function getLatestMetricVersion(
-  history: MetricVersionHistory | null | undefined
-): MetricVersionEntry | null {
+export function getLatestVersion(history: VersionHistory | null | undefined): Version | null {
   const latestVersionNumber = getLatestVersionNumber(history);
   if (latestVersionNumber === 0 || !history) {
     return null;
@@ -146,56 +141,97 @@ export function getLatestMetricVersion(
 }
 
 /**
- * Gets the latest version entry from a dashboard version history
+ * Gets a specific version by version number
  */
-export function getLatestDashboardVersion(
-  history: DashboardVersionHistory | null | undefined
-): DashboardVersionEntry | null {
-  const latestVersionNumber = getLatestVersionNumber(history);
-  if (latestVersionNumber === 0 || !history) {
+export function getVersion(
+  history: VersionHistory | null | undefined,
+  versionNumber: number
+): Version | null {
+  if (!history) {
     return null;
   }
 
-  return history[latestVersionNumber.toString()] || null;
+  return history[versionNumber.toString()] || null;
 }
 
 /**
- * Converts a metric content object to the format needed for version history
+ * Validates a MetricYml object matches the expected schema
  */
-export function metricYmlToVersionContent(metricYml: {
-  name: string;
-  description?: string;
-  timeFrame: string;
-  sql: string;
-  chartConfig: MetricContent['chartConfig'];
-}): MetricContent {
-  // Validate the complete metric content to ensure type safety
-  const validatedContent = metricContentSchema.parse({
-    sql: metricYml.sql,
-    name: metricYml.name,
-    timeFrame: metricYml.timeFrame,
-    chartConfig: metricYml.chartConfig,
-    description: metricYml.description || '',
-  });
-
-  return validatedContent;
+export function validateMetricYml(metricYml: unknown): MetricYml {
+  return metricYmlSchema.parse(metricYml);
 }
 
 /**
- * Converts a dashboard content object to the format needed for version history
+ * Validates a DashboardYml object matches the expected schema
  */
-export function dashboardYmlToVersionContent(dashboardYml: {
-  name: string;
-  description?: string;
-  rows: Array<{
-    id: number;
-    items: Array<{ id: string }>;
-    columnSizes: number[];
-  }>;
-}): DashboardContent {
+export function validateDashboardYml(dashboardYml: unknown): DashboardYml {
+  return dashboardYmlSchema.parse(dashboardYml);
+}
+
+/**
+ * Updates the latest version without creating a new version
+ * Matches Rust VersionHistory.update_latest_version behavior
+ */
+export function updateLatestVersion(
+  history: VersionHistory | null | undefined,
+  content: VersionContent,
+  timestamp?: string
+): VersionHistory {
+  if (!history || Object.keys(history).length === 0) {
+    // If there are no versions yet, create version 1
+    return {
+      '1': {
+        version_number: 1,
+        updated_at: timestamp || new Date().toISOString(),
+        content,
+      },
+    };
+  }
+
+  // Get the latest version and update its content
+  const latestVersionNumber = getLatestVersionNumber(history);
   return {
-    name: dashboardYml.name,
-    rows: dashboardYml.rows,
-    description: dashboardYml.description || '',
+    ...history,
+    [latestVersionNumber.toString()]: {
+      version_number: latestVersionNumber,
+      updated_at: timestamp || new Date().toISOString(),
+      content,
+    },
+  };
+}
+
+/**
+ * Creates a new VersionHistory with initial content (matches Rust VersionHistory::new)
+ */
+export function createVersionHistory(
+  versionNumber: number,
+  content: VersionContent,
+  timestamp?: string
+): VersionHistory {
+  return {
+    [versionNumber.toString()]: {
+      version_number: versionNumber,
+      updated_at: timestamp || new Date().toISOString(),
+      content,
+    },
+  };
+}
+
+/**
+ * Adds a version to existing history (matches Rust VersionHistory::add_version)
+ */
+export function addVersionToHistory(
+  history: VersionHistory,
+  versionNumber: number,
+  content: VersionContent,
+  timestamp?: string
+): VersionHistory {
+  return {
+    ...history,
+    [versionNumber.toString()]: {
+      version_number: versionNumber,
+      updated_at: timestamp || new Date().toISOString(),
+      content,
+    },
   };
 }
