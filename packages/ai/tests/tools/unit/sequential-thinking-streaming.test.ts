@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { parseStreamingArgs } from '../../../src/tools/planning-thinking-tools/sequential-thinking-tool';
+import { validateArrayAccess } from '../../../src/utils/validation-helpers';
 
 describe('Sequential Thinking Tool Streaming Parser', () => {
   test('should return null for empty or invalid input', () => {
@@ -52,27 +53,43 @@ describe('Sequential Thinking Tool Streaming Parser', () => {
     ];
 
     // Test incremental building
-    expect(parseStreamingArgs(chunks[0])).toBeNull(); // No colon yet
-    expect(parseStreamingArgs(chunks[1])).toBeNull(); // No opening quote yet
-    expect(parseStreamingArgs(chunks[2])).toEqual({ thought: '' }); // Empty string
-    expect(parseStreamingArgs(chunks[3])).toEqual({ thought: 'I' });
-    expect(parseStreamingArgs(chunks[4])).toEqual({ thought: 'I need' });
-    expect(parseStreamingArgs(chunks[5])).toEqual({ thought: 'I need to' });
-    expect(parseStreamingArgs(chunks[6])).toEqual({ thought: 'I need to analyze' });
-    expect(parseStreamingArgs(chunks[7])).toEqual({ thought: 'I need to analyze this' });
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 0, 'test chunks'))).toBeNull(); // No colon yet
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 1, 'test chunks'))).toBeNull(); // No opening quote yet
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 2, 'test chunks'))).toEqual({
+      thought: '',
+    }); // Empty string
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 3, 'test chunks'))).toEqual({
+      thought: 'I',
+    });
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 4, 'test chunks'))).toEqual({
+      thought: 'I need',
+    });
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 5, 'test chunks'))).toEqual({
+      thought: 'I need to',
+    });
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 6, 'test chunks'))).toEqual({
+      thought: 'I need to analyze',
+    });
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 7, 'test chunks'))).toEqual({
+      thought: 'I need to analyze this',
+    });
 
     // As more fields are added
-    expect(parseStreamingArgs(chunks[8])).toEqual({ thought: 'I need to analyze this' });
-    expect(parseStreamingArgs(chunks[9])).toEqual({ thought: 'I need to analyze this' });
-    expect(parseStreamingArgs(chunks[10])).toEqual({
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 8, 'test chunks'))).toEqual({
+      thought: 'I need to analyze this',
+    });
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 9, 'test chunks'))).toEqual({
+      thought: 'I need to analyze this',
+    });
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 10, 'test chunks'))).toEqual({
       thought: 'I need to analyze this',
       nextThoughtNeeded: true,
     });
-    expect(parseStreamingArgs(chunks[11])).toEqual({
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 11, 'test chunks'))).toEqual({
       thought: 'I need to analyze this',
       nextThoughtNeeded: true,
     });
-    expect(parseStreamingArgs(chunks[12])).toEqual({
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 12, 'test chunks'))).toEqual({
       thought: 'I need to analyze this',
       nextThoughtNeeded: true,
       thoughtNumber: 1,

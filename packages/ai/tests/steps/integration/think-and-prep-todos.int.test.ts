@@ -31,14 +31,18 @@ describe('Think and Prep Step - Todos in Message History Integration', { timeout
 
     const inputData = {
       'create-todos': { todos },
-      'extract-values-search': { segmentValues: {} },
+      'extract-values-search': {
+        values: [],
+        searchResults: '',
+        foundValues: {},
+        searchPerformed: false,
+      },
       'generate-chat-title': { chatTitle: 'Test Sales Analysis' },
-    };
-
-    const getInitData = async () => ({
       prompt: 'Show me sales data for the last quarter',
       conversationHistory: [],
-    });
+    };
+
+    const getInitData = async () => inputData;
 
     // Execute the step
     const result = await thinkAndPrepStep.execute({
@@ -64,12 +68,14 @@ describe('Think and Prep Step - Todos in Message History Integration', { timeout
     // Verify the tool call contains the todos
     if (todoToolCallMessage && Array.isArray(todoToolCallMessage.content)) {
       const toolCall = todoToolCallMessage.content.find(
-        (c) => c.type === 'tool-call' && c.toolName === 'createToDos'
+        (c): c is any => c.type === 'tool-call' && (c as any).toolName === 'createToDos'
       );
 
       expect(toolCall).toBeDefined();
-      expect(toolCall.args.todos).toBe(todos);
-      expect(toolCall.toolCallId).toBe('create-todos-call');
+      if (toolCall) {
+        expect(toolCall.args?.todos).toBe(todos);
+        expect(toolCall.toolCallId).toBe('create-todos-call');
+      }
     }
 
     // Find the tool result message
@@ -85,10 +91,12 @@ describe('Think and Prep Step - Todos in Message History Integration', { timeout
     // Verify the tool result contains success
     if (todoResultMessage && Array.isArray(todoResultMessage.content)) {
       const toolResult = todoResultMessage.content.find(
-        (c) => c.type === 'tool-result' && c.toolName === 'createToDos'
+        (c): c is any => c.type === 'tool-result' && (c as any).toolName === 'createToDos'
       );
       expect(toolResult).toBeDefined();
-      expect(toolResult.result.success).toBe(true);
+      if (toolResult) {
+        expect(toolResult.result?.success).toBe(true);
+      }
     }
   });
 
@@ -111,14 +119,18 @@ describe('Think and Prep Step - Todos in Message History Integration', { timeout
 
     const inputData = {
       'create-todos': { todos },
-      'extract-values-search': { segmentValues: {} },
+      'extract-values-search': {
+        values: [],
+        searchResults: '',
+        foundValues: {},
+        searchPerformed: false,
+      },
       'generate-chat-title': { chatTitle: 'Top Customers Analysis' },
-    };
-
-    const getInitData = async () => ({
       prompt: 'Now show me our top customers',
       conversationHistory: existingHistory,
-    });
+    };
+
+    const getInitData = async () => inputData;
 
     // Execute the step
     const result = await thinkAndPrepStep.execute({
@@ -131,8 +143,17 @@ describe('Think and Prep Step - Todos in Message History Integration', { timeout
     expect(result.outputMessages.length).toBeGreaterThan(existingHistory.length);
 
     // Verify original messages are preserved
-    expect(result.outputMessages[0]).toEqual(existingHistory[0]);
-    expect(result.outputMessages[1]).toEqual(existingHistory[1]);
+    const firstMessage = result.outputMessages[0];
+    const secondMessage = result.outputMessages[1];
+    const firstHistoryMessage = existingHistory[0];
+    const secondHistoryMessage = existingHistory[1];
+
+    if (firstMessage && firstHistoryMessage) {
+      expect(firstMessage).toEqual(firstHistoryMessage);
+    }
+    if (secondMessage && secondHistoryMessage) {
+      expect(secondMessage).toEqual(secondHistoryMessage);
+    }
 
     // Verify new user message is added
     const newUserMessage = result.outputMessages.find(
@@ -146,10 +167,14 @@ describe('Think and Prep Step - Todos in Message History Integration', { timeout
       (msg) =>
         (msg.role === 'assistant' &&
           Array.isArray(msg.content) &&
-          msg.content.some((c) => c.type === 'tool-call' && c.toolName === 'createToDos')) ||
+          msg.content.some(
+            (c) => c.type === 'tool-call' && (c as any).toolName === 'createToDos'
+          )) ||
         (msg.role === 'tool' &&
           Array.isArray(msg.content) &&
-          msg.content.some((c) => c.type === 'tool-result' && c.toolName === 'createToDos'))
+          msg.content.some(
+            (c) => c.type === 'tool-result' && (c as any).toolName === 'createToDos'
+          ))
     );
 
     expect(todoMessages).toHaveLength(2); // One tool call, one tool result
@@ -166,14 +191,18 @@ describe('Think and Prep Step - Todos in Message History Integration', { timeout
 
     const inputData = {
       'create-todos': { todos: '' },
-      'extract-values-search': { segmentValues: {} },
+      'extract-values-search': {
+        values: [],
+        searchResults: '',
+        foundValues: {},
+        searchPerformed: false,
+      },
       'generate-chat-title': { chatTitle: 'Empty Todos Test' },
-    };
-
-    const getInitData = async () => ({
       prompt: 'Simple request',
       conversationHistory: [],
-    });
+    };
+
+    const getInitData = async () => inputData;
 
     // Execute the step
     const result = await thinkAndPrepStep.execute({
@@ -187,10 +216,14 @@ describe('Think and Prep Step - Todos in Message History Integration', { timeout
       (msg) =>
         (msg.role === 'assistant' &&
           Array.isArray(msg.content) &&
-          msg.content.some((c) => c.type === 'tool-call' && c.toolName === 'createToDos')) ||
+          msg.content.some(
+            (c) => c.type === 'tool-call' && (c as any).toolName === 'createToDos'
+          )) ||
         (msg.role === 'tool' &&
           Array.isArray(msg.content) &&
-          msg.content.some((c) => c.type === 'tool-result' && c.toolName === 'createToDos'))
+          msg.content.some(
+            (c) => c.type === 'tool-result' && (c as any).toolName === 'createToDos'
+          ))
     );
 
     expect(todoMessages).toHaveLength(2);

@@ -3,12 +3,13 @@ import { NoSuchToolError } from 'ai';
 import type { CoreMessage, StreamTextResult, ToolSet } from 'ai';
 import { describe, expect, it, vi } from 'vitest';
 import { retryableAgentStreamWithHealing } from '../../../src/utils/retry';
-import type { AgentStreamOptions } from '../../../src/utils/retry/types';
+import type { AgentStreamOptions, MastraAgent } from '../../../src/utils/retry/types';
+import { validateArrayAccess } from '../../../src/utils/validation-helpers';
 
 // Mock agent type with tools
-type MockAgentWithTools<T extends ToolSet> = Agent<T> & {
+type MockAgentWithTools = MastraAgent & {
   stream: ReturnType<typeof vi.fn>;
-  tools: T;
+  tools: ToolSet;
 };
 
 /**
@@ -47,9 +48,9 @@ function createInvalidToolArgumentsError(
 ): Error {
   const error = new Error('Invalid tool arguments');
   error.name = 'AI_InvalidToolArgumentsError';
-  (error as never).toolCallId = toolCallId;
-  (error as never).toolName = toolName;
-  (error as never).args = JSON.stringify({ files: doubleEscapedFiles });
+  (error as any).toolCallId = toolCallId;
+  (error as any).toolName = toolName;
+  (error as any).args = JSON.stringify({ files: doubleEscapedFiles });
   return error;
 }
 
@@ -59,7 +60,7 @@ describe('retryableAgentStreamWithHealing', () => {
       toolName: 'badTool',
       availableTools: ['tool1', 'tool2'],
     });
-    (error as never).toolCallId = 'test-call-id';
+    (error as any).toolCallId = 'test-call-id';
 
     const mockAgent = {
       stream: vi
@@ -70,7 +71,7 @@ describe('retryableAgentStreamWithHealing', () => {
         'create-metrics-file': {},
         'execute-sql': {},
       },
-    } as unknown as MockAgentWithTools<ToolSet>;
+    } as unknown as MockAgentWithTools;
 
     const messages: CoreMessage[] = [{ role: 'user', content: 'Test message' }];
     const options: AgentStreamOptions<ToolSet> = {
@@ -80,7 +81,7 @@ describe('retryableAgentStreamWithHealing', () => {
     const onRetry = vi.fn();
 
     const result = await retryableAgentStreamWithHealing({
-      agent: mockAgent,
+      agent: mockAgent as MastraAgent,
       messages,
       options,
       retryConfig: {
@@ -94,8 +95,16 @@ describe('retryableAgentStreamWithHealing', () => {
 
     // Verify healing message was added to conversation
     expect(result.conversationHistory).toHaveLength(2);
-    expect(result.conversationHistory[1].role).toBe('tool');
-    expect(result.conversationHistory[1].content[0]).toMatchObject({
+    expect(validateArrayAccess(result.conversationHistory, 1, 'conversation history').role).toBe(
+      'tool'
+    );
+    expect(
+      validateArrayAccess(
+        validateArrayAccess(result.conversationHistory, 1, 'conversation history').content as any[],
+        0,
+        'content'
+      )
+    ).toMatchObject({
       type: 'tool-result',
       toolCallId: 'test-call-id',
       toolName: 'badTool',
@@ -130,7 +139,7 @@ describe('retryableAgentStreamWithHealing', () => {
         'create-metrics-file': {},
         'modify-dashboards-file': {},
       },
-    } as unknown as MockAgentWithTools<ToolSet>;
+    } as unknown as MockAgentWithTools;
 
     const messages: CoreMessage[] = [{ role: 'user', content: 'Create a metric' }];
     const options: AgentStreamOptions<ToolSet> = {
@@ -140,7 +149,7 @@ describe('retryableAgentStreamWithHealing', () => {
     const onRetry = vi.fn();
 
     const result = await retryableAgentStreamWithHealing({
-      agent: mockAgent,
+      agent: mockAgent as MastraAgent,
       messages,
       options,
       retryConfig: {
@@ -154,8 +163,16 @@ describe('retryableAgentStreamWithHealing', () => {
 
     // Verify healing message was added
     expect(result.conversationHistory).toHaveLength(2);
-    expect(result.conversationHistory[1].role).toBe('tool');
-    expect(result.conversationHistory[1].content[0]).toMatchObject({
+    expect(validateArrayAccess(result.conversationHistory, 1, 'conversation history').role).toBe(
+      'tool'
+    );
+    expect(
+      validateArrayAccess(
+        validateArrayAccess(result.conversationHistory, 1, 'conversation history').content as any[],
+        0,
+        'content'
+      )
+    ).toMatchObject({
       type: 'tool-result',
       toolCallId: 'test-call-id',
       toolName: 'create-metrics-file',
@@ -176,9 +193,9 @@ describe('retryableAgentStreamWithHealing', () => {
   it('should provide generic error message for non-visualization tools', async () => {
     const error = new Error('Invalid tool arguments');
     error.name = 'AI_InvalidToolArgumentsError';
-    (error as never).toolCallId = 'test-call-id';
-    (error as never).toolName = 'execute-sql';
-    (error as never).args = JSON.stringify({ query: 123 }); // wrong type
+    (error as any).toolCallId = 'test-call-id';
+    (error as any).toolName = 'execute-sql';
+    (error as any).args = JSON.stringify({ query: 123 }); // wrong type
 
     const mockAgent = {
       stream: vi
@@ -188,7 +205,7 @@ describe('retryableAgentStreamWithHealing', () => {
       tools: {
         'execute-sql': {},
       },
-    } as unknown as MockAgentWithTools<ToolSet>;
+    } as unknown as MockAgentWithTools;
 
     const messages: CoreMessage[] = [{ role: 'user', content: 'Execute SQL' }];
     const options: AgentStreamOptions<ToolSet> = {
@@ -196,7 +213,7 @@ describe('retryableAgentStreamWithHealing', () => {
     };
 
     const result = await retryableAgentStreamWithHealing({
-      agent: mockAgent,
+      agent: mockAgent as MastraAgent,
       messages,
       options,
     });
@@ -204,8 +221,12 @@ describe('retryableAgentStreamWithHealing', () => {
     expect(result.retryCount).toBe(1);
 
     // Verify error message was provided (not healed)
-    const toolResult = result.conversationHistory[1].content[0] as never;
-    expect(toolResult?.result?.error).toContain('Invalid arguments for execute-sql');
+    const toolResult = validateArrayAccess(
+      validateArrayAccess(result.conversationHistory, 1, 'conversation history').content as any[],
+      0,
+      'content'
+    );
+    expect((toolResult as any)?.result?.error).toContain('Invalid arguments for execute-sql');
   });
 
   it('should handle multiple different errors in sequence', async () => {
@@ -213,7 +234,7 @@ describe('retryableAgentStreamWithHealing', () => {
       toolName: 'badTool',
       availableTools: [],
     });
-    (noSuchToolError as never).toolCallId = 'call-1';
+    (noSuchToolError as any).toolCallId = 'call-1';
 
     const invalidArgsError = createInvalidToolArgumentsError(
       'create-dashboards-file',
@@ -231,7 +252,7 @@ describe('retryableAgentStreamWithHealing', () => {
         'create-dashboards-file': {},
         'execute-sql': {},
       },
-    } as unknown as MockAgentWithTools<ToolSet>;
+    } as unknown as MockAgentWithTools;
 
     const messages: CoreMessage[] = [{ role: 'user', content: 'Test message' }];
     const options: AgentStreamOptions<ToolSet> = {
@@ -239,7 +260,7 @@ describe('retryableAgentStreamWithHealing', () => {
     };
 
     const result = await retryableAgentStreamWithHealing({
-      agent: mockAgent,
+      agent: mockAgent as MastraAgent,
       messages,
       options,
       retryConfig: { maxRetries: 3 },
@@ -250,8 +271,12 @@ describe('retryableAgentStreamWithHealing', () => {
 
     // Should have both healing messages
     expect(result.conversationHistory).toHaveLength(3);
-    expect(result.conversationHistory[1].role).toBe('tool'); // First healing message
-    expect(result.conversationHistory[2].role).toBe('tool'); // Second healing message
+    expect(validateArrayAccess(result.conversationHistory, 1, 'healing messages').role).toBe(
+      'tool'
+    ); // First healing message
+    expect(validateArrayAccess(result.conversationHistory, 2, 'healing messages').role).toBe(
+      'tool'
+    ); // Second healing message
   });
 
   it('should throw after max retries for errors', async () => {
@@ -263,7 +288,7 @@ describe('retryableAgentStreamWithHealing', () => {
     const mockAgent = {
       stream: vi.fn().mockRejectedValue(error), // Always reject
       tools: {},
-    } as unknown as MockAgentWithTools<ToolSet>;
+    } as unknown as MockAgentWithTools;
 
     const messages: CoreMessage[] = [{ role: 'user', content: 'Test message' }];
     const options: AgentStreamOptions<ToolSet> = {
@@ -272,7 +297,7 @@ describe('retryableAgentStreamWithHealing', () => {
 
     await expect(
       retryableAgentStreamWithHealing({
-        agent: mockAgent,
+        agent: mockAgent as MastraAgent,
         messages,
         options,
         retryConfig: { maxRetries: 2 },
@@ -288,7 +313,7 @@ describe('retryableAgentStreamWithHealing', () => {
     const mockAgent = {
       stream: vi.fn().mockRejectedValue(error), // Reject at stream creation
       tools: {},
-    } as unknown as MockAgentWithTools<ToolSet>;
+    } as unknown as MockAgentWithTools;
 
     const messages: CoreMessage[] = [{ role: 'user', content: 'Test message' }];
     const options: AgentStreamOptions<ToolSet> = {
@@ -297,7 +322,7 @@ describe('retryableAgentStreamWithHealing', () => {
 
     await expect(
       retryableAgentStreamWithHealing({
-        agent: mockAgent,
+        agent: mockAgent as MastraAgent,
         messages,
         options,
       })
@@ -310,7 +335,7 @@ describe('retryableAgentStreamWithHealing', () => {
     const mockAgent = {
       stream: vi.fn().mockResolvedValue(createSuccessfulStream()),
       tools: {},
-    } as unknown as MockAgentWithTools<ToolSet>;
+    } as unknown as MockAgentWithTools;
 
     const messages: CoreMessage[] = [{ role: 'user', content: 'Test message' }];
     const options: AgentStreamOptions<ToolSet> = {
@@ -318,7 +343,7 @@ describe('retryableAgentStreamWithHealing', () => {
     };
 
     const result = await retryableAgentStreamWithHealing({
-      agent: mockAgent,
+      agent: mockAgent as MastraAgent,
       messages,
       options,
     });

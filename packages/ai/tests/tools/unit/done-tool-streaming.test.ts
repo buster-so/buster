@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { parseStreamingArgs } from '../../../src/tools/communication-tools/done-tool';
+import { validateArrayAccess } from '../../../src/utils/validation-helpers';
 
 describe('Done Tool Streaming Parser', () => {
   test('should return null for empty or invalid input', () => {
@@ -39,33 +40,45 @@ describe('Done Tool Streaming Parser', () => {
     ];
 
     // Test incremental building
-    expect(parseStreamingArgs(chunks[0])).toBeNull(); // No colon yet
-    expect(parseStreamingArgs(chunks[1])).toBeNull(); // No colon yet
-    expect(parseStreamingArgs(chunks[2])).toBeNull(); // No opening quote yet
-    expect(parseStreamingArgs(chunks[3])).toEqual({ final_response: '' }); // Empty string
-    expect(parseStreamingArgs(chunks[4])).toEqual({ final_response: 'I' });
-    expect(parseStreamingArgs(chunks[5])).toEqual({ final_response: 'I have' });
-    expect(parseStreamingArgs(chunks[6])).toEqual({ final_response: 'I have analyzed' });
-    expect(parseStreamingArgs(chunks[7])).toEqual({ final_response: 'I have analyzed the' });
-    expect(parseStreamingArgs(chunks[8])).toEqual({ final_response: 'I have analyzed the data' });
-    expect(parseStreamingArgs(chunks[9])).toEqual({
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 0, 'test chunks'))).toBeNull(); // No colon yet
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 1, 'test chunks'))).toBeNull(); // No colon yet
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 2, 'test chunks'))).toBeNull(); // No opening quote yet
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 3, 'test chunks'))).toEqual({
+      final_response: '',
+    }); // Empty string
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 4, 'test chunks'))).toEqual({
+      final_response: 'I',
+    });
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 5, 'test chunks'))).toEqual({
+      final_response: 'I have',
+    });
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 6, 'test chunks'))).toEqual({
+      final_response: 'I have analyzed',
+    });
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 7, 'test chunks'))).toEqual({
+      final_response: 'I have analyzed the',
+    });
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 8, 'test chunks'))).toEqual({
+      final_response: 'I have analyzed the data',
+    });
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 9, 'test chunks'))).toEqual({
       final_response: 'I have analyzed the data and',
     });
-    expect(parseStreamingArgs(chunks[10])).toEqual({
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 10, 'test chunks'))).toEqual({
       final_response: 'I have analyzed the data and found',
     });
-    expect(parseStreamingArgs(chunks[11])).toEqual({
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 11, 'test chunks'))).toEqual({
       final_response: 'I have analyzed the data and found the',
     });
-    expect(parseStreamingArgs(chunks[12])).toEqual({
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 12, 'test chunks'))).toEqual({
       final_response: 'I have analyzed the data and found the following',
     });
-    expect(parseStreamingArgs(chunks[13])).toEqual({
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 13, 'test chunks'))).toEqual({
       final_response: 'I have analyzed the data and found the following insights',
     });
 
     // Final complete chunk should be parsed as complete JSON
-    const finalResult = parseStreamingArgs(chunks[14]);
+    const finalResult = parseStreamingArgs(validateArrayAccess(chunks, 14, 'test chunks'));
     expect(finalResult).toEqual({
       final_response: 'I have analyzed the data and found the following insights.',
     });

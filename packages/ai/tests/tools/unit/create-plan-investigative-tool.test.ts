@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, test } from 'vitest';
 import { z } from 'zod';
+import { validateArrayAccess } from '../../../src/utils/validation-helpers';
 
 // Import the schemas we want to test (extracted from the tool file)
 const inputSchema = z.object({
@@ -280,10 +281,14 @@ Focus on high-value customer segments.
 
       const result = extractTodosFromPlanText(plan);
       expect(result).toHaveLength(4);
-      expect(result[0].todo).toBe('Investigate customer churn patterns');
-      expect(result[1].todo).toBe('Analyze revenue impact by segment');
-      expect(result[2].todo).toBe('Examine correlation with product usage');
-      expect(result[3].todo).toBe('Validate findings with statistical tests');
+      const todo0 = validateArrayAccess(result, 0, 'todo extraction');
+      const todo1 = validateArrayAccess(result, 1, 'todo extraction');
+      const todo2 = validateArrayAccess(result, 2, 'todo extraction');
+      const todo3 = validateArrayAccess(result, 3, 'todo extraction');
+      expect(todo0.todo).toBe('Investigate customer churn patterns');
+      expect(todo1.todo).toBe('Analyze revenue impact by segment');
+      expect(todo2.todo).toBe('Examine correlation with product usage');
+      expect(todo3.todo).toBe('Validate findings with statistical tests');
       expect(result.every((todo) => todo.completed === false)).toBe(true);
     });
 
@@ -297,10 +302,14 @@ Focus on high-value customer segments.
 
       const result = extractTodosFromPlanText(plan);
       expect(result).toHaveLength(4);
-      expect(result[0].todo).toBe('Explore data quality issues in customer database');
-      expect(result[1].todo).toBe('Investigate patterns in user behavior logs');
-      expect(result[2].todo).toBe('Analyze seasonal trends in sales data');
-      expect(result[3].todo).toBe('Examine outliers in transaction records');
+      const todo0 = validateArrayAccess(result, 0, 'bullet point todos');
+      const todo1 = validateArrayAccess(result, 1, 'bullet point todos');
+      const todo2 = validateArrayAccess(result, 2, 'bullet point todos');
+      const todo3 = validateArrayAccess(result, 3, 'bullet point todos');
+      expect(todo0.todo).toBe('Explore data quality issues in customer database');
+      expect(todo1.todo).toBe('Investigate patterns in user behavior logs');
+      expect(todo2.todo).toBe('Analyze seasonal trends in sales data');
+      expect(todo3.todo).toBe('Examine outliers in transaction records');
     });
 
     test('should extract investigative action-word based todos', () => {
@@ -318,11 +327,16 @@ Validate assumptions using statistical methods
 
       const result = extractTodosFromPlanText(plan);
       expect(result).toHaveLength(9);
-      expect(result[0].todo).toBe('Explore customer segmentation opportunities');
-      expect(result[1].todo).toBe('Investigate data anomalies in recent transactions');
-      expect(result[2].todo).toBe('Analyze correlation between marketing campaigns and sales');
-      expect(result[3].todo).toBe('Test hypothesis about user engagement patterns');
-      expect(result[4].todo).toBe('Query historical data for trend analysis');
+      const todo0 = validateArrayAccess(result, 0, 'action word todos');
+      const todo1 = validateArrayAccess(result, 1, 'action word todos');
+      const todo2 = validateArrayAccess(result, 2, 'action word todos');
+      const todo3 = validateArrayAccess(result, 3, 'action word todos');
+      const todo4 = validateArrayAccess(result, 4, 'action word todos');
+      expect(todo0.todo).toBe('Explore customer segmentation opportunities');
+      expect(todo1.todo).toBe('Investigate data anomalies in recent transactions');
+      expect(todo2.todo).toBe('Analyze correlation between marketing campaigns and sales');
+      expect(todo3.todo).toBe('Test hypothesis about user engagement patterns');
+      expect(todo4.todo).toBe('Query historical data for trend analysis');
     });
 
     test('should handle mixed investigative todo formats', () => {
@@ -368,8 +382,10 @@ Query additional data sources for confirmation
 
       const result = extractTodosFromPlanText(plan);
       expect(result).toHaveLength(2);
-      expect(result[0].todo).toBe('Investigate comprehensive customer behavior patterns');
-      expect(result[1].todo).toBe('Analyze detailed quarterly revenue trends');
+      const todo0 = validateArrayAccess(result, 0, 'filtered todos');
+      const todo1 = validateArrayAccess(result, 1, 'filtered todos');
+      expect(todo0.todo).toBe('Investigate comprehensive customer behavior patterns');
+      expect(todo1.todo).toBe('Analyze detailed quarterly revenue trends');
     });
 
     test('should filter out very long todos', () => {
@@ -382,7 +398,8 @@ Query additional data sources for confirmation
 
       const result = extractTodosFromPlanText(plan);
       expect(result).toHaveLength(1);
-      expect(result[0].todo).toBe('Analyze simple metrics');
+      const todo0 = validateArrayAccess(result, 0, 'long todo filter');
+      expect(todo0.todo).toBe('Analyze simple metrics');
     });
 
     test('should provide fallback investigative todo when none found', () => {
@@ -396,21 +413,24 @@ Data quality is important for analysis.
 
       const result = extractTodosFromPlanText(plan);
       expect(result).toHaveLength(1);
-      expect(result[0].todo).toBe('Investigate the data to answer the key questions in the plan');
-      expect(result[0].completed).toBe(false);
+      const todo0 = validateArrayAccess(result, 0, 'fallback todo');
+      expect(todo0.todo).toBe('Investigate the data to answer the key questions in the plan');
+      expect(todo0.completed).toBe(false);
     });
 
     test('should handle empty plan', () => {
       const result = extractTodosFromPlanText('');
       expect(result).toHaveLength(1);
-      expect(result[0].todo).toBe('Investigate the data to answer the key questions in the plan');
+      const todo0 = validateArrayAccess(result, 0, 'empty plan todo');
+      expect(todo0.todo).toBe('Investigate the data to answer the key questions in the plan');
     });
 
     test('should preserve todo structure with additional fields', () => {
       const plan = '1. Investigate customer patterns';
       const result = extractTodosFromPlanText(plan);
 
-      expect(result[0]).toEqual({
+      const todo0 = validateArrayAccess(result, 0, 'preserved todo');
+      expect(todo0).toEqual({
         todo: 'Investigate customer patterns',
         completed: false,
       });
@@ -438,8 +458,9 @@ Data quality is important for analysis.
       expect(mockRuntimeContext.get('plan_available')).toBe(true);
       const savedTodos = mockRuntimeContext.get('todos');
       expect(savedTodos).toHaveLength(4);
-      expect(savedTodos[0].todo).toBe('Investigate customer churn drivers');
-      expect(savedTodos[0].completed).toBe(false);
+      const savedTodoItem0 = validateArrayAccess(savedTodos as TodoItem[], 0, 'saved todos');
+      expect(savedTodoItem0.todo).toBe('Investigate customer churn drivers');
+      expect(savedTodoItem0.completed).toBe(false);
     });
 
     test('should throw error when runtime context is missing', async () => {
@@ -468,7 +489,12 @@ Quality analysis is important but no specific actions.
       expect(mockRuntimeContext.get('plan_available')).toBe(true);
       const savedTodos = mockRuntimeContext.get('todos');
       expect(savedTodos).toHaveLength(1);
-      expect(savedTodos[0].todo).toBe(
+      const savedTodoItem0 = validateArrayAccess(
+        savedTodos as TodoItem[],
+        0,
+        'fallback saved todos'
+      );
+      expect(savedTodoItem0.todo).toBe(
         'Investigate the data to answer the key questions in the plan'
       );
     });
@@ -528,11 +554,21 @@ Focus on statistical significance of findings.
 
       const savedTodos = mockRuntimeContext.get('todos');
       expect(savedTodos).toHaveLength(2);
-      expect(savedTodos[0]).toEqual({
+      const savedTodoItem0 = validateArrayAccess(
+        savedTodos as TodoItem[],
+        0,
+        'saved todo structure'
+      );
+      const savedTodoItem1 = validateArrayAccess(
+        savedTodos as TodoItem[],
+        1,
+        'saved todo structure'
+      );
+      expect(savedTodoItem0).toEqual({
         todo: 'Explore customer data',
         completed: false,
       });
-      expect(savedTodos[1]).toEqual({
+      expect(savedTodoItem1).toEqual({
         todo: 'Investigate behavior patterns',
         completed: false,
       });
@@ -551,7 +587,7 @@ Focus on statistical significance of findings.
       // The error should be caught and handled within the function
       const result = await processCreatePlanInvestigative(
         { plan: '1. Test investigation task' },
-        faultyContext as MockRuntimeContext
+        faultyContext as unknown as MockRuntimeContext
       );
 
       expect(result.success).toBe(true);
@@ -569,7 +605,7 @@ Focus on statistical significance of findings.
       await expect(
         processCreatePlanInvestigative(
           { plan: '1. Test task' },
-          faultyContext as MockRuntimeContext
+          faultyContext as unknown as MockRuntimeContext
         )
       ).rejects.toThrow('State update error');
     });
@@ -614,7 +650,8 @@ Focus on statistical significance of findings.
         const result = extractTodosFromPlanText(plan);
 
         expect(result).toHaveLength(1);
-        expect(result[0].todo).toBe(`${verb} customer behavior patterns`);
+        const todo0 = validateArrayAccess(result, 0, 'verb recognition');
+        expect(todo0.todo).toBe(`${verb} customer behavior patterns`);
       }
     });
 
@@ -628,10 +665,14 @@ Test statistical models
 
       const result = extractTodosFromPlanText(plan);
       expect(result).toHaveLength(4);
-      expect(result[0].todo).toBe('EXPLORE data patterns');
-      expect(result[1].todo).toBe('Investigate user trends');
-      expect(result[2].todo).toBe('ANALYZE revenue streams');
-      expect(result[3].todo).toBe('Test statistical models');
+      const todo0 = validateArrayAccess(result, 0, 'case insensitive todos');
+      const todo1 = validateArrayAccess(result, 1, 'case insensitive todos');
+      const todo2 = validateArrayAccess(result, 2, 'case insensitive todos');
+      const todo3 = validateArrayAccess(result, 3, 'case insensitive todos');
+      expect(todo0.todo).toBe('EXPLORE data patterns');
+      expect(todo1.todo).toBe('Investigate user trends');
+      expect(todo2.todo).toBe('ANALYZE revenue streams');
+      expect(todo3.todo).toBe('Test statistical models');
     });
 
     test('should handle numbered lists with various formats', () => {
@@ -643,9 +684,12 @@ Test statistical models
 
       const result = extractTodosFromPlanText(plan);
       expect(result).toHaveLength(3);
-      expect(result[0].todo).toBe('Investigate data anomalies (space after period)');
-      expect(result[1].todo).toBe('Analyze customer segments (space after period)');
-      expect(result[2].todo).toBe('Examine correlation patterns (multiple spaces)');
+      const todo0 = validateArrayAccess(result, 0, 'numbered list formats');
+      const todo1 = validateArrayAccess(result, 1, 'numbered list formats');
+      const todo2 = validateArrayAccess(result, 2, 'numbered list formats');
+      expect(todo0.todo).toBe('Investigate data anomalies (space after period)');
+      expect(todo1.todo).toBe('Analyze customer segments (space after period)');
+      expect(todo2.todo).toBe('Examine correlation patterns (multiple spaces)');
     });
 
     test('should handle bullet points with various formats', () => {
@@ -657,9 +701,12 @@ Test statistical models
 
       const result = extractTodosFromPlanText(plan);
       expect(result).toHaveLength(3);
-      expect(result[0].todo).toBe('Explore database structures (space after dash)');
-      expect(result[1].todo).toBe('Investigate data quality (space after dash)');
-      expect(result[2].todo).toBe('Analyze missing values (multiple spaces)');
+      const todo0 = validateArrayAccess(result, 0, 'bullet point formats');
+      const todo1 = validateArrayAccess(result, 1, 'bullet point formats');
+      const todo2 = validateArrayAccess(result, 2, 'bullet point formats');
+      expect(todo0.todo).toBe('Explore database structures (space after dash)');
+      expect(todo1.todo).toBe('Investigate data quality (space after dash)');
+      expect(todo2.todo).toBe('Analyze missing values (multiple spaces)');
     });
 
     test('should prioritize investigative terms over general action words', () => {

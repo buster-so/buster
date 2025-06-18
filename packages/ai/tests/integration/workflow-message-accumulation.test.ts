@@ -57,7 +57,7 @@ describe('Workflow Message Accumulation Integration', () => {
       },
     } as TextStreamPart<ToolSet>);
 
-    // Add tool result
+    // Add tool result - cast through unknown for type compatibility
     await thinkAndPrepProcessor.processChunk({
       type: 'tool-result',
       toolCallId: 'toolu_01LTwRTpgZB7BcbemexP1EUp',
@@ -65,7 +65,7 @@ describe('Workflow Message Accumulation Integration', () => {
       result: {
         success: true,
       },
-    } as TextStreamPart<ToolSet>);
+    } as unknown as TextStreamPart<ToolSet>);
 
     // Get the accumulated messages from think-and-prep
     const thinkAndPrepMessages = thinkAndPrepProcessor.getAccumulatedMessages();
@@ -115,7 +115,10 @@ describe('Workflow Message Accumulation Integration', () => {
     );
 
     const toolCallIds = toolCallMessages
-      .flatMap((m) => (Array.isArray(m.content) ? m.content : []))
+      .flatMap((m) => {
+        if (!Array.isArray(m.content)) return [];
+        return m.content as (TextPart | ToolCallPart | ToolResultPart)[];
+      })
       .filter((c): c is ToolCallPart => {
         return c && typeof c === 'object' && 'type' in c && c.type === 'tool-call';
       })

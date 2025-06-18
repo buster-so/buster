@@ -1,5 +1,5 @@
 import { NoSuchToolError } from 'ai';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { ChunkProcessor } from '../../../src/utils/database/chunk-processor';
 import { handleStreamingError } from '../../../src/utils/streaming/stream-error-handler';
 
@@ -9,7 +9,8 @@ describe('Stream Error Integration', () => {
       toolName: 'invalidTool',
       availableTools: ['validTool1', 'validTool2'],
     });
-    (error as never).toolCallId = 'test-call-id';
+    // biome-ignore lint/suspicious/noExplicitAny: Creating mock error object for testing
+    (error as any).toolCallId = 'test-call-id';
 
     const mockAgent = {
       tools: {
@@ -22,10 +23,12 @@ describe('Stream Error Integration', () => {
 
     const chunkProcessor = new ChunkProcessor('test-message', [], [], []);
     const abortController = new AbortController();
-    const runtimeContext = {} as never;
+    // biome-ignore lint/suspicious/noExplicitAny: Mock runtime context for testing
+    const runtimeContext = {} as any;
 
     const result = await handleStreamingError(error, {
-      agent: mockAgent as never,
+      // biome-ignore lint/suspicious/noExplicitAny: Mock agent for testing
+      agent: mockAgent as any,
       chunkProcessor,
       runtimeContext,
       abortController,
@@ -37,7 +40,8 @@ describe('Stream Error Integration', () => {
     expect(result.healingMessage).toBeDefined();
     expect(result.healingMessage?.role).toBe('tool');
 
-    const toolResult = result.healingMessage?.content[0] as never;
+    // biome-ignore lint/suspicious/noExplicitAny: Accessing mock result for testing
+    const toolResult = result.healingMessage?.content[0] as any;
     expect(toolResult?.result?.error).toContain('Tool "invalidTool" is not available');
     expect(toolResult?.result?.error).toContain('create-metrics-file');
     expect(toolResult?.result?.error).toContain('execute-sql');
@@ -48,8 +52,10 @@ describe('Stream Error Integration', () => {
   it('should detect and heal InvalidToolArgumentsError for visualization tools', async () => {
     const error = new Error('Invalid tool arguments');
     error.name = 'AI_InvalidToolArgumentsError';
-    (error as never).toolCallId = 'test-call-id';
-    (error as never).toolName = 'create-metrics-file';
+    // biome-ignore lint/suspicious/noExplicitAny: Creating mock error object for testing
+    (error as any).toolCallId = 'test-call-id';
+    // biome-ignore lint/suspicious/noExplicitAny: Creating mock error object for testing
+    (error as any).toolName = 'create-metrics-file';
 
     // Double-escaped JSON files parameter (the actual problem)
     const doubleEscapedArgs = JSON.stringify({
@@ -57,7 +63,8 @@ describe('Stream Error Integration', () => {
         { name: 'test-metric', yml_content: 'name: Test Metric\\nsql: SELECT 1' },
       ]),
     });
-    (error as never).args = doubleEscapedArgs;
+    // biome-ignore lint/suspicious/noExplicitAny: Creating mock error object for testing
+    (error as any).args = doubleEscapedArgs;
 
     const mockAgent = {
       tools: {
@@ -67,10 +74,12 @@ describe('Stream Error Integration', () => {
 
     const chunkProcessor = new ChunkProcessor('test-message', [], [], []);
     const abortController = new AbortController();
-    const runtimeContext = {} as never;
+    // biome-ignore lint/suspicious/noExplicitAny: Mock runtime context for testing
+    const runtimeContext = {} as any;
 
     const result = await handleStreamingError(error, {
-      agent: mockAgent as never,
+      // biome-ignore lint/suspicious/noExplicitAny: Mock agent for testing
+      agent: mockAgent as any,
       chunkProcessor,
       runtimeContext,
       abortController,
@@ -82,7 +91,8 @@ describe('Stream Error Integration', () => {
     expect(result.healingMessage).toBeDefined();
     expect(result.healingMessage?.role).toBe('tool');
 
-    const toolResult = result.healingMessage?.content[0] as never;
+    // biome-ignore lint/suspicious/noExplicitAny: Accessing mock result for testing
+    const toolResult = result.healingMessage?.content[0] as any;
     expect(toolResult?.result?.success).toBe(true);
     expect(toolResult?.result?.message).toContain('auto-corrected');
   });
@@ -96,10 +106,12 @@ describe('Stream Error Integration', () => {
 
     const chunkProcessor = new ChunkProcessor('test-message', [], [], []);
     const abortController = new AbortController();
-    const runtimeContext = {} as never;
+    // biome-ignore lint/suspicious/noExplicitAny: Mock runtime context for testing
+    const runtimeContext = {} as any;
 
     const result = await handleStreamingError(error, {
-      agent: mockAgent as never,
+      // biome-ignore lint/suspicious/noExplicitAny: Mock agent for testing
+      agent: mockAgent as any,
       chunkProcessor,
       runtimeContext,
       abortController,
@@ -114,9 +126,12 @@ describe('Stream Error Integration', () => {
   it('should handle InvalidToolArgumentsError for non-visualization tools', async () => {
     const error = new Error('Invalid tool arguments');
     error.name = 'AI_InvalidToolArgumentsError';
-    (error as never).toolCallId = 'test-call-id';
-    (error as never).toolName = 'execute-sql';
-    (error as never).args = JSON.stringify({ query: 123 }); // Invalid type
+    // biome-ignore lint/suspicious/noExplicitAny: Creating mock error object for testing
+    (error as any).toolCallId = 'test-call-id';
+    // biome-ignore lint/suspicious/noExplicitAny: Creating mock error object for testing
+    (error as any).toolName = 'execute-sql';
+    // biome-ignore lint/suspicious/noExplicitAny: Creating mock error object for testing
+    (error as any).args = JSON.stringify({ query: 123 }); // Invalid type
 
     const mockAgent = {
       tools: {
@@ -126,10 +141,12 @@ describe('Stream Error Integration', () => {
 
     const chunkProcessor = new ChunkProcessor('test-message', [], [], []);
     const abortController = new AbortController();
-    const runtimeContext = {} as never;
+    // biome-ignore lint/suspicious/noExplicitAny: Mock runtime context for testing
+    const runtimeContext = {} as any;
 
     const result = await handleStreamingError(error, {
-      agent: mockAgent as never,
+      // biome-ignore lint/suspicious/noExplicitAny: Mock agent for testing
+      agent: mockAgent as any,
       chunkProcessor,
       runtimeContext,
       abortController,
@@ -141,7 +158,8 @@ describe('Stream Error Integration', () => {
     expect(result.healingMessage).toBeDefined();
     expect(result.healingMessage?.role).toBe('tool');
 
-    const toolResult = result.healingMessage?.content[0] as never;
+    // biome-ignore lint/suspicious/noExplicitAny: Accessing mock result for testing
+    const toolResult = result.healingMessage?.content[0] as any;
     expect(toolResult?.result?.error).toContain('Invalid arguments for execute-sql');
   });
 });

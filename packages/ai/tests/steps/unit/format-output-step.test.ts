@@ -11,7 +11,7 @@ interface MockStepContext {
   mastra: Record<string, unknown>;
   getStepResult: () => Promise<Record<string, unknown>>;
   suspend: () => Promise<void>;
-  [Symbol.for('emitter')]: Record<string, unknown>;
+  emitter?: Record<string, unknown>;
 }
 
 describe('Format Output Step Unit Tests', () => {
@@ -76,7 +76,7 @@ describe('Format Output Step Unit Tests', () => {
       [Symbol.for('emitter')]: {},
     };
 
-    const result = await formatOutputStep.execute(mockContext);
+    const result = await formatOutputStep.execute(mockContext as any);
 
     expect(result).toEqual({
       conversationHistory: analystOutput.conversationHistory,
@@ -120,7 +120,7 @@ describe('Format Output Step Unit Tests', () => {
       [Symbol.for('emitter')]: {},
     };
 
-    const result = await formatOutputStep.execute(mockContext);
+    const result = await formatOutputStep.execute(mockContext as any);
 
     expect(result.conversationHistory).toEqual(passthroughOutput.conversationHistory);
     expect(result.finished).toBe(true);
@@ -146,7 +146,7 @@ describe('Format Output Step Unit Tests', () => {
       [Symbol.for('emitter')]: {},
     };
 
-    const result = await formatOutputStep.execute(mockContext);
+    const result = await formatOutputStep.execute(mockContext as any);
 
     expect(result.conversationHistory).toEqual(minimalOutput.conversationHistory);
     expect(result.finished).toBe(false);
@@ -175,7 +175,7 @@ describe('Format Output Step Unit Tests', () => {
       [Symbol.for('emitter')]: {},
     };
 
-    const result = await formatOutputStep.execute(mockContext);
+    const result = await formatOutputStep.execute(mockContext as any);
 
     expect(result.conversationHistory).toEqual([]);
     expect(result.outputMessages).toEqual([]);

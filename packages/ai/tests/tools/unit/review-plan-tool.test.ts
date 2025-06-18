@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, test } from 'vitest';
 import { z } from 'zod';
+import { validateArrayAccess } from '../../../src/utils/validation-helpers';
 
 // Import the schemas we want to test (extracted from the tool file)
 const inputSchema = z.object({
@@ -249,9 +250,9 @@ describe('Review Plan Tool Unit Tests', () => {
 
       const result = parseTodos(validTodos);
       expect(result).toHaveLength(3);
-      expect(result[0].todo).toBe('Task 1');
-      expect(result[0].completed).toBe(false);
-      expect(result[1].completed).toBe(true);
+      expect(validateArrayAccess(result, 0, 'todo parsing').todo).toBe('Task 1');
+      expect(validateArrayAccess(result, 0, 'todo parsing').completed).toBe(false);
+      expect(validateArrayAccess(result, 1, 'todo parsing').completed).toBe(true);
     });
 
     test('should filter out invalid todo items', () => {
@@ -266,8 +267,8 @@ describe('Review Plan Tool Unit Tests', () => {
 
       const result = parseTodos(mixedTodos);
       expect(result).toHaveLength(2);
-      expect(result[0].todo).toBe('Valid Task');
-      expect(result[1].todo).toBe('Another Valid Task');
+      expect(validateArrayAccess(result, 0, 'mixed todo parsing').todo).toBe('Valid Task');
+      expect(validateArrayAccess(result, 1, 'mixed todo parsing').todo).toBe('Another Valid Task');
     });
 
     test('should return empty array for non-array input', () => {
@@ -354,10 +355,10 @@ describe('Review Plan Tool Unit Tests', () => {
       expect(result.todos).toBe('[ ] Task 1\n[x] Task 2\n[ ] Task 3');
 
       // Verify state was updated
-      const updatedTodos = mockRuntimeContext.get('todos');
-      expect(updatedTodos[0].completed).toBe(false);
-      expect(updatedTodos[1].completed).toBe(true);
-      expect(updatedTodos[2].completed).toBe(false);
+      const updatedTodos = mockRuntimeContext.get('todos') as TodoItem[];
+      expect(validateArrayAccess(updatedTodos, 0, 'updated todos').completed).toBe(false);
+      expect(validateArrayAccess(updatedTodos, 1, 'updated todos').completed).toBe(true);
+      expect(validateArrayAccess(updatedTodos, 2, 'updated todos').completed).toBe(false);
 
       // Verify review_needed flag was set to false
       expect(mockRuntimeContext.get('review_needed')).toBe(false);
@@ -381,11 +382,11 @@ describe('Review Plan Tool Unit Tests', () => {
       expect(result.todos).toBe('[x] Task 1\n[ ] Task 2\n[x] Task 3\n[x] Task 4');
 
       // Verify state was updated
-      const updatedTodos = mockRuntimeContext.get('todos');
-      expect(updatedTodos[0].completed).toBe(true);
-      expect(updatedTodos[1].completed).toBe(false);
-      expect(updatedTodos[2].completed).toBe(true);
-      expect(updatedTodos[3].completed).toBe(true);
+      const updatedTodos = mockRuntimeContext.get('todos') as TodoItem[];
+      expect(validateArrayAccess(updatedTodos, 0, 'updated todos').completed).toBe(true);
+      expect(validateArrayAccess(updatedTodos, 1, 'updated todos').completed).toBe(false);
+      expect(validateArrayAccess(updatedTodos, 2, 'updated todos').completed).toBe(true);
+      expect(validateArrayAccess(updatedTodos, 3, 'updated todos').completed).toBe(true);
     });
 
     test('should handle marking already completed todos', async () => {
@@ -405,10 +406,10 @@ describe('Review Plan Tool Unit Tests', () => {
       expect(result.todos).toBe('[x] Task 1\n[x] Task 2\n[x] Task 3');
 
       // Verify state - already completed todos remain completed
-      const updatedTodos = mockRuntimeContext.get('todos');
-      expect(updatedTodos[0].completed).toBe(true);
-      expect(updatedTodos[1].completed).toBe(true);
-      expect(updatedTodos[2].completed).toBe(true);
+      const updatedTodos = mockRuntimeContext.get('todos') as TodoItem[];
+      expect(validateArrayAccess(updatedTodos, 0, 'completed todos').completed).toBe(true);
+      expect(validateArrayAccess(updatedTodos, 1, 'completed todos').completed).toBe(true);
+      expect(validateArrayAccess(updatedTodos, 2, 'completed todos').completed).toBe(true);
     });
 
     test('should throw error when runtime context is missing', async () => {
@@ -496,10 +497,12 @@ describe('Review Plan Tool Unit Tests', () => {
       expect(result.todos).toBe('[x] Task with extra props');
 
       // Verify extra properties are preserved
-      const updatedTodos = mockRuntimeContext.get('todos');
-      expect(updatedTodos[0].priority).toBe('high');
-      expect(updatedTodos[0].assignee).toBe('user123');
-      expect(updatedTodos[0].completed).toBe(true);
+      const updatedTodos = mockRuntimeContext.get('todos') as TodoItem[];
+      expect(validateArrayAccess(updatedTodos, 0, 'todos with extra props').priority).toBe('high');
+      expect(validateArrayAccess(updatedTodos, 0, 'todos with extra props').assignee).toBe(
+        'user123'
+      );
+      expect(validateArrayAccess(updatedTodos, 0, 'todos with extra props').completed).toBe(true);
     });
 
     test('should handle mixed valid and invalid todos gracefully', async () => {
@@ -529,7 +532,7 @@ describe('Review Plan Tool Unit Tests', () => {
       };
 
       await expect(
-        processReviewPlan({ todo_items: [1] }, faultyContext as MockRuntimeContext)
+        processReviewPlan({ todo_items: [1] }, faultyContext as unknown as MockRuntimeContext)
       ).rejects.toThrow('State access error');
     });
 
@@ -543,7 +546,7 @@ describe('Review Plan Tool Unit Tests', () => {
       };
 
       await expect(
-        processReviewPlan({ todo_items: [1] }, faultyContext as MockRuntimeContext)
+        processReviewPlan({ todo_items: [1] }, faultyContext as unknown as MockRuntimeContext)
       ).rejects.toThrow('State update error');
     });
   });
@@ -572,10 +575,12 @@ describe('Review Plan Tool Unit Tests', () => {
 
         await processReviewPlan({ todo_items: testCase.input }, mockRuntimeContext);
 
-        const updatedTodos = mockRuntimeContext.get('todos');
+        const updatedTodos = mockRuntimeContext.get('todos') as TodoItem[];
         for (let i = 0; i < updatedTodos.length; i++) {
           const shouldBeCompleted = testCase.expectedCompleted.includes(i);
-          expect(updatedTodos[i].completed).toBe(shouldBeCompleted);
+          expect(validateArrayAccess(updatedTodos, i, 'index conversion').completed).toBe(
+            shouldBeCompleted
+          );
         }
       }
     });
@@ -609,9 +614,9 @@ describe('Review Plan Tool Unit Tests', () => {
       expect(result.todos).toBe('[x] Task 1\n[x] Task 2');
 
       // Verify both tasks are completed despite duplicate indices
-      const updatedTodos = mockRuntimeContext.get('todos');
-      expect(updatedTodos[0].completed).toBe(true);
-      expect(updatedTodos[1].completed).toBe(true);
+      const updatedTodos = mockRuntimeContext.get('todos') as TodoItem[];
+      expect(validateArrayAccess(updatedTodos, 0, 'duplicate indices').completed).toBe(true);
+      expect(validateArrayAccess(updatedTodos, 1, 'duplicate indices').completed).toBe(true);
     });
   });
 });

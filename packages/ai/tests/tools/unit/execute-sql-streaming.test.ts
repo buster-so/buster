@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { parseStreamingArgs } from '../../../src/tools/database-tools/execute-sql';
+import { validateArrayAccess } from '../../../src/utils/validation-helpers';
 
 describe('Execute SQL Tool Streaming Parser', () => {
   test('should return null for empty or invalid input', () => {
@@ -46,29 +47,41 @@ describe('Execute SQL Tool Streaming Parser', () => {
     ];
 
     // Test incremental building
-    expect(parseStreamingArgs(chunks[0])).toBeNull(); // No colon yet
-    expect(parseStreamingArgs(chunks[1])).toBeNull(); // No array start yet
-    expect(parseStreamingArgs(chunks[2])).toEqual({ statements: [] }); // Empty array detected
-    expect(parseStreamingArgs(chunks[3])).toEqual({ statements: [] }); // Incomplete string
-    expect(parseStreamingArgs(chunks[4])).toEqual({ statements: [] }); // Still incomplete
-    expect(parseStreamingArgs(chunks[5])).toEqual({ statements: [] }); // Still incomplete
-    expect(parseStreamingArgs(chunks[6])).toEqual({ statements: [] }); // Still incomplete
-    expect(parseStreamingArgs(chunks[7])).toEqual({ statements: [] }); // Still incomplete
-    expect(parseStreamingArgs(chunks[8])).toEqual({
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 0, 'test chunks'))).toBeNull(); // No colon yet
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 1, 'test chunks'))).toBeNull(); // No array start yet
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 2, 'test chunks'))).toEqual({
+      statements: [],
+    }); // Empty array detected
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 3, 'test chunks'))).toEqual({
+      statements: [],
+    }); // Incomplete string
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 4, 'test chunks'))).toEqual({
+      statements: [],
+    }); // Still incomplete
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 5, 'test chunks'))).toEqual({
+      statements: [],
+    }); // Still incomplete
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 6, 'test chunks'))).toEqual({
+      statements: [],
+    }); // Still incomplete
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 7, 'test chunks'))).toEqual({
+      statements: [],
+    }); // Still incomplete
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 8, 'test chunks'))).toEqual({
       statements: ['SELECT user_id, name FROM public.users'],
     }); // First complete statement
-    expect(parseStreamingArgs(chunks[9])).toEqual({
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 9, 'test chunks'))).toEqual({
       statements: ['SELECT user_id, name FROM public.users'],
     }); // Comma added
-    expect(parseStreamingArgs(chunks[10])).toEqual({
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 10, 'test chunks'))).toEqual({
       statements: ['SELECT user_id, name FROM public.users'],
     }); // Second statement starting
-    expect(parseStreamingArgs(chunks[11])).toEqual({
+    expect(parseStreamingArgs(validateArrayAccess(chunks, 11, 'test chunks'))).toEqual({
       statements: ['SELECT user_id, name FROM public.users', 'SELECT COUNT(*)'],
     }); // Second statement complete
 
     // Final complete chunk should be parsed as complete JSON
-    const finalResult = parseStreamingArgs(chunks[12]);
+    const finalResult = parseStreamingArgs(validateArrayAccess(chunks, 12, 'test chunks'));
     expect(finalResult).toEqual({
       statements: ['SELECT user_id, name FROM public.users', 'SELECT COUNT(*)'],
     });

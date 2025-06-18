@@ -91,14 +91,19 @@ describe('onStepFinish message conversion', () => {
         },
         {
           role: 'tool',
-          toolCallId: 'think-1',
-          toolName: 'sequential-thinking',
-          content: JSON.stringify({
-            thought: 'Analyzing the user request',
-            thoughtNumber: 1,
-            totalThoughts: 2,
-            nextThoughtNeeded: true,
-          }),
+          content: [
+            {
+              type: 'tool-result',
+              toolCallId: 'think-1',
+              toolName: 'sequential-thinking',
+              result: {
+                thought: 'Analyzing the user request',
+                thoughtNumber: 1,
+                totalThoughts: 2,
+                nextThoughtNeeded: true,
+              },
+            },
+          ],
         },
       ];
 
@@ -110,8 +115,12 @@ describe('onStepFinish message conversion', () => {
       const toolResultsMap = new Map<string, string | null>();
 
       for (const toolResponse of toolResponses) {
-        if ('toolCallId' in toolResponse && 'content' in toolResponse) {
-          toolResultsMap.set(toolResponse.toolCallId, toolResponse.content as string);
+        if ('content' in toolResponse && Array.isArray(toolResponse.content)) {
+          for (const toolResult of toolResponse.content) {
+            if (toolResult.type === 'tool-result' && toolResult.toolCallId) {
+              toolResultsMap.set(toolResult.toolCallId, JSON.stringify(toolResult.result));
+            }
+          }
         }
       }
 
@@ -155,11 +164,16 @@ describe('onStepFinish message conversion', () => {
         },
         {
           role: 'tool',
-          toolCallId: 'respond-1',
-          toolName: 'respondWithoutAnalysis',
-          content: JSON.stringify({
-            message: 'Here is a quick answer without analysis',
-          }),
+          content: [
+            {
+              type: 'tool-result',
+              toolCallId: 'respond-1',
+              toolName: 'respondWithoutAnalysis',
+              result: {
+                message: 'Here is a quick answer without analysis',
+              },
+            },
+          ],
         },
       ];
 
@@ -204,11 +218,16 @@ describe('onStepFinish message conversion', () => {
         },
         {
           role: 'tool',
-          toolCallId: 'done-1',
-          toolName: 'doneTool',
-          content: JSON.stringify({
-            message: 'Analysis complete. I found 3 key insights.',
-          }),
+          content: [
+            {
+              type: 'tool-result',
+              toolCallId: 'done-1',
+              toolName: 'doneTool',
+              result: {
+                message: 'Analysis complete. I found 3 key insights.',
+              },
+            },
+          ],
         },
       ];
 
@@ -243,19 +262,24 @@ describe('onStepFinish message conversion', () => {
         },
         {
           role: 'tool',
-          toolCallId: 'metric-1',
-          toolName: 'create-metrics-file',
-          content: JSON.stringify({
-            files: [
-              {
-                id: 'metric-uuid-1',
-                name: 'revenue_metrics.yml',
-                version_number: 1,
-                yml_content: 'name: Revenue\ntype: metric',
+          content: [
+            {
+              type: 'tool-result',
+              toolCallId: 'metric-1',
+              toolName: 'create-metrics-file',
+              result: {
+                files: [
+                  {
+                    id: 'metric-uuid-1',
+                    name: 'revenue_metrics.yml',
+                    version_number: 1,
+                    yml_content: 'name: Revenue\ntype: metric',
+                  },
+                ],
+                failed_files: [],
               },
-            ],
-            failed_files: [],
-          }),
+            },
+          ],
         },
       ];
 
@@ -266,8 +290,12 @@ describe('onStepFinish message conversion', () => {
       const toolResultsMap = new Map<string, string | null>();
 
       for (const toolResponse of toolResponses) {
-        if ('toolCallId' in toolResponse && 'content' in toolResponse) {
-          toolResultsMap.set(toolResponse.toolCallId, toolResponse.content as string);
+        if ('content' in toolResponse && Array.isArray(toolResponse.content)) {
+          for (const toolResult of toolResponse.content) {
+            if (toolResult.type === 'tool-result' && toolResult.toolCallId) {
+              toolResultsMap.set(toolResult.toolCallId, JSON.stringify(toolResult.result));
+            }
+          }
         }
       }
 
@@ -303,13 +331,18 @@ describe('onStepFinish message conversion', () => {
         },
         {
           role: 'tool',
-          toolCallId: 'sql-1',
-          toolName: 'execute-sql',
-          content: JSON.stringify({
-            data: [{ total: 42 }],
-            query: 'SELECT COUNT(*) as total FROM users',
-            rowCount: 1,
-          }),
+          content: [
+            {
+              type: 'tool-result',
+              toolCallId: 'sql-1',
+              toolName: 'execute-sql',
+              result: {
+                data: [{ total: 42 }],
+                query: 'SELECT COUNT(*) as total FROM users',
+                rowCount: 1,
+              },
+            },
+          ],
         },
       ];
 
@@ -317,13 +350,23 @@ describe('onStepFinish message conversion', () => {
 
       // Verify SQL result structure
       const toolResponses = step.response.messages.filter((msg) => msg.role === 'tool');
-      const sqlResponse = toolResponses.find((r) => 'toolCallId' in r && r.toolCallId === 'sql-1');
+      const sqlResponse = toolResponses.find((r) => {
+        if ('content' in r && Array.isArray(r.content)) {
+          return r.content.some((tr) => tr.type === 'tool-result' && tr.toolCallId === 'sql-1');
+        }
+        return false;
+      });
 
       expect(sqlResponse).toBeDefined();
-      if (sqlResponse && 'content' in sqlResponse) {
-        const result = JSON.parse(sqlResponse.content as string);
-        expect(result.rowCount).toBe(1);
-        expect(result.data[0].total).toBe(42);
+      if (sqlResponse && 'content' in sqlResponse && Array.isArray(sqlResponse.content)) {
+        const toolResult = sqlResponse.content.find(
+          (tr) => tr.type === 'tool-result' && tr.toolCallId === 'sql-1'
+        );
+        if (toolResult && toolResult.result) {
+          const result = toolResult.result as { rowCount: number; data: Array<{ total: number }> };
+          expect(result.rowCount).toBe(1);
+          expect(result.data[0].total).toBe(42);
+        }
       }
     });
   });
@@ -363,49 +406,69 @@ describe('onStepFinish message conversion', () => {
         },
         {
           role: 'tool',
-          toolCallId: 'think-1',
-          toolName: 'sequential-thinking',
-          content: JSON.stringify({
-            thought: 'First thought',
-            thoughtNumber: 1,
-            totalThoughts: 2,
-            nextThoughtNeeded: true,
-          }),
-        },
-        {
-          role: 'tool',
-          toolCallId: 'think-2',
-          toolName: 'sequential-thinking',
-          content: JSON.stringify({
-            thought: 'Second thought',
-            thoughtNumber: 2,
-            totalThoughts: 2,
-            nextThoughtNeeded: false,
-          }),
-        },
-        {
-          role: 'tool',
-          toolCallId: 'metric-1',
-          toolName: 'create-metrics-file',
-          content: JSON.stringify({
-            files: [
-              {
-                id: 'metric-1',
-                name: 'metric.yml',
-                version_number: 1,
-                yml_content: 'content',
+          content: [
+            {
+              type: 'tool-result',
+              toolCallId: 'think-1',
+              toolName: 'sequential-thinking',
+              result: {
+                thought: 'First thought',
+                thoughtNumber: 1,
+                totalThoughts: 2,
+                nextThoughtNeeded: true,
               },
-            ],
-            failed_files: [],
-          }),
+            },
+          ],
         },
         {
           role: 'tool',
-          toolCallId: 'done-1',
-          toolName: 'doneTool',
-          content: JSON.stringify({
-            message: 'Analysis complete',
-          }),
+          content: [
+            {
+              type: 'tool-result',
+              toolCallId: 'think-2',
+              toolName: 'sequential-thinking',
+              result: {
+                thought: 'Second thought',
+                thoughtNumber: 2,
+                totalThoughts: 2,
+                nextThoughtNeeded: false,
+              },
+            },
+          ],
+        },
+        {
+          role: 'tool',
+          content: [
+            {
+              type: 'tool-result',
+              toolCallId: 'metric-1',
+              toolName: 'create-metrics-file',
+              result: {
+                files: [
+                  {
+                    id: 'metric-1',
+                    name: 'metric.yml',
+                    version_number: 1,
+                    yml_content: 'content',
+                  },
+                ],
+                failed_files: [],
+              },
+            },
+          ],
+        },
+        {
+          role: 'tool',
+          content: [
+            {
+              type: 'tool-result',
+              toolCallId: 'done-1',
+              toolName: 'doneTool',
+              result: {
+                message: 'Analysis complete',
+              },
+            },
+          ],
         },
       ];
 
@@ -441,14 +504,19 @@ describe('onStepFinish message conversion', () => {
         [
           {
             role: 'tool',
-            toolCallId: 'think-1',
-            toolName: 'sequential-thinking',
-            content: JSON.stringify({
-              thought: 'First thought',
-              thoughtNumber: 1,
-              totalThoughts: 1,
-              nextThoughtNeeded: false,
-            }),
+            content: [
+              {
+                type: 'tool-result',
+                toolCallId: 'think-1',
+                toolName: 'sequential-thinking',
+                result: {
+                  thought: 'First thought',
+                  thoughtNumber: 1,
+                  totalThoughts: 1,
+                  nextThoughtNeeded: false,
+                },
+              },
+            ],
           },
         ]
       );
@@ -460,7 +528,7 @@ describe('onStepFinish message conversion', () => {
         title: 'Thought 1 of 1',
         message: 'First thought',
         status: 'completed',
-      });
+      } as any);
 
       // Second call - done tool
       const secondStep = createMockStepResult(
@@ -468,11 +536,16 @@ describe('onStepFinish message conversion', () => {
         [
           {
             role: 'tool',
-            toolCallId: 'done-1',
-            toolName: 'doneTool',
-            content: JSON.stringify({
-              message: 'Complete',
-            }),
+            content: [
+              {
+                type: 'tool-result',
+                toolCallId: 'done-1',
+                toolName: 'doneTool',
+                result: {
+                  message: 'Complete',
+                },
+              },
+            ],
           },
         ]
       );
@@ -483,13 +556,13 @@ describe('onStepFinish message conversion', () => {
         type: 'text',
         message: 'Complete',
         is_final_message: true,
-      });
+      } as any);
 
       // Verify accumulated history
       expect(accumulatedReasoningHistory).toHaveLength(1);
       expect(accumulatedResponseHistory).toHaveLength(1);
-      expect(accumulatedReasoningHistory[0].type).toBe('text');
-      expect(accumulatedResponseHistory[0].is_final_message).toBe(true);
+      expect((accumulatedReasoningHistory[0] as any).type).toBe('text');
+      expect((accumulatedResponseHistory[0] as any).is_final_message).toBe(true);
     });
   });
 });

@@ -92,12 +92,9 @@ describe('Retry Mechanism Integration Tests', () => {
         // The retry mechanism should handle it gracefully
         const result = (await thinkAndPrepStep.execute({
           inputData,
-          getInitData: async () => ({
-            prompt: inputData.prompt,
-            conversationHistory: inputData.conversationHistory || [],
-          }),
+          getInitData: async () => inputData,
           runtimeContext,
-        })) as ThinkAndPrepOutput;
+        } as any)) as ThinkAndPrepOutput;
 
         // Verify the step completed successfully
         expect(result).toBeDefined();
@@ -113,7 +110,7 @@ describe('Retry Mechanism Integration Tests', () => {
         // The presence of healing messages would indicate retry mechanism was triggered
         console.log('Tool result messages found:', toolResultMessages.length);
         console.log('Total messages:', result.outputMessages.length);
-      }, 60000); // 60 second timeout for LLM calls
+      });
     });
   });
 
@@ -167,12 +164,9 @@ describe('Retry Mechanism Integration Tests', () => {
 
         const result = (await analystStep.execute({
           inputData,
-          getInitData: async () => ({
-            prompt: 'Analyze some data',
-            conversationHistory: [],
-          }),
+          getInitData: async () => inputData,
           runtimeContext,
-        })) as AnalystStepOutput;
+        } as any)) as AnalystStepOutput;
 
         // Verify the step completed
         expect(result).toBeDefined();
@@ -181,7 +175,7 @@ describe('Retry Mechanism Integration Tests', () => {
 
         // The conversation history should include the original messages
         expect(result.conversationHistory.length).toBeGreaterThanOrEqual(mockMessages.length);
-      }, 60000);
+      });
     });
   });
 
@@ -216,12 +210,9 @@ describe('Retry Mechanism Integration Tests', () => {
 
         const result = (await thinkAndPrepStep.execute({
           inputData,
-          getInitData: async () => ({
-            prompt: inputData.prompt,
-            conversationHistory: inputData.conversationHistory || [],
-          }),
+          getInitData: async () => inputData,
           runtimeContext,
-        })) as ThinkAndPrepOutput;
+        } as any)) as ThinkAndPrepOutput;
 
         // Verify original messages are preserved
         expect(result.outputMessages).toBeDefined();
@@ -235,7 +226,7 @@ describe('Retry Mechanism Integration Tests', () => {
 
         // Check that we have a complete conversation flow
         expect(result.outputMessages.length).toBeGreaterThanOrEqual(originalMessages.length);
-      }, 60000);
+      });
     });
   });
 });
