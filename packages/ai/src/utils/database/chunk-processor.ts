@@ -88,6 +88,8 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
   private lastSaveTime = 0;
   private readonly SAVE_THROTTLE_MS = 100; // Throttle saves to every 100ms
   private fileMessagesAdded = false; // Track if file messages have been added
+  private deferDoneToolResponse = false; // Track if we should defer doneTool response
+  private pendingDoneToolEntry: ResponseEntry | null = null; // Store deferred doneTool entry
 
   constructor(
     messageId: string | null,
@@ -243,16 +245,32 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         extractedValues,
       };
 
-      const responseEntry = this.createResponseEntry(chunk.toolCallId, chunk.toolName, parseResult);
-
-      if (responseEntry) {
-        // Check if this response entry already exists (avoid duplicates)
-        const existingEntry = this.state.responseHistory.find(
-          (r) => r && typeof r === 'object' && 'id' in r && r.id === chunk.toolCallId
+      if (chunk.toolName === 'doneTool' && this.deferDoneToolResponse) {
+        // Store as pending instead of adding to response history
+        const responseEntry = this.createResponseEntry(
+          chunk.toolCallId,
+          chunk.toolName,
+          parseResult
+        );
+        if (responseEntry) {
+          this.pendingDoneToolEntry = responseEntry;
+        }
+      } else {
+        const responseEntry = this.createResponseEntry(
+          chunk.toolCallId,
+          chunk.toolName,
+          parseResult
         );
 
-        if (!existingEntry) {
-          this.state.responseHistory.push(responseEntry);
+        if (responseEntry) {
+          // Check if this response entry already exists (avoid duplicates)
+          const existingEntry = this.state.responseHistory.find(
+            (r) => r && typeof r === 'object' && 'id' in r && r.id === chunk.toolCallId
+          );
+
+          if (!existingEntry) {
+            this.state.responseHistory.push(responseEntry);
+          }
         }
       }
     } else {
@@ -333,15 +351,26 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
     // Create initial entries for both response and reasoning tools
     if (this.isResponseTool(chunk.toolName)) {
-      // Create initial empty response entry that will be updated by deltas
-      const parseResult = {
-        parsed: {},
-        isComplete: false,
-        extractedValues: new Map(),
-      };
-      const responseEntry = this.createResponseEntry(chunk.toolCallId, chunk.toolName, parseResult);
-      if (responseEntry) {
-        this.state.responseHistory.push(responseEntry);
+      // Check if this is doneTool and we have completed files
+      if (chunk.toolName === 'doneTool' && this.hasCompletedFiles()) {
+        // Mark that we should defer this response
+        this.deferDoneToolResponse = true;
+        // Don't create response entry yet - will be created during deltas/complete
+      } else {
+        // Create initial empty response entry that will be updated by deltas
+        const parseResult = {
+          parsed: {},
+          isComplete: false,
+          extractedValues: new Map(),
+        };
+        const responseEntry = this.createResponseEntry(
+          chunk.toolCallId,
+          chunk.toolName,
+          parseResult
+        );
+        if (responseEntry) {
+          this.state.responseHistory.push(responseEntry);
+        }
       }
     } else {
       // For some tools, we create initial entries during streaming start
@@ -427,26 +456,46 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
       if (isResponseTool) {
         // Handle response tools (doneTool, respondWithoutAnalysis)
-        const existingResponse = this.state.responseHistory.find(
-          (r) => r && typeof r === 'object' && 'id' in r && r.id === chunk.toolCallId
-        );
-
-        if (existingResponse) {
-          // Update existing response entry with optimistically parsed values
-          this.updateResponseEntryWithOptimisticValues(
-            existingResponse,
-            inProgress.toolName,
-            parseResult
-          );
+        if (inProgress.toolName === 'doneTool' && this.deferDoneToolResponse) {
+          // Update pending entry if exists, otherwise create new one
+          if (this.pendingDoneToolEntry) {
+            this.updateResponseEntryWithOptimisticValues(
+              this.pendingDoneToolEntry,
+              inProgress.toolName,
+              parseResult
+            );
+          } else {
+            const responseEntry = this.createResponseEntry(
+              chunk.toolCallId,
+              inProgress.toolName,
+              parseResult
+            );
+            if (responseEntry) {
+              this.pendingDoneToolEntry = responseEntry;
+            }
+          }
         } else {
-          // Create new response entry
-          const responseEntry = this.createResponseEntry(
-            chunk.toolCallId,
-            inProgress.toolName,
-            parseResult
+          const existingResponse = this.state.responseHistory.find(
+            (r) => r && typeof r === 'object' && 'id' in r && r.id === chunk.toolCallId
           );
-          if (responseEntry) {
-            this.state.responseHistory.push(responseEntry);
+
+          if (existingResponse) {
+            // Update existing response entry with optimistically parsed values
+            this.updateResponseEntryWithOptimisticValues(
+              existingResponse,
+              inProgress.toolName,
+              parseResult
+            );
+          } else {
+            // Create new response entry
+            const responseEntry = this.createResponseEntry(
+              chunk.toolCallId,
+              inProgress.toolName,
+              parseResult
+            );
+            if (responseEntry) {
+              this.state.responseHistory.push(responseEntry);
+            }
           }
         }
       } else {
@@ -583,6 +632,11 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
   async saveToDatabase() {
     if (!this.messageId) {
+      return;
+    }
+
+    // Skip save if we're deferring doneTool response and file messages haven't been added yet
+    if (this.deferDoneToolResponse && !this.fileMessagesAdded) {
       return;
     }
 
@@ -1709,5 +1763,40 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       startTime: this.state.timing.startTime,
       completedTools: this.state.timing.toolCallTimings.size,
     };
+  }
+
+  /**
+   * Check if there are completed files in the reasoning history
+   */
+  private hasCompletedFiles(): boolean {
+    return this.state.reasoningHistory.some(
+      (entry) =>
+        entry &&
+        typeof entry === 'object' &&
+        entry.type === 'files' &&
+        entry.status === 'completed' &&
+        entry.files &&
+        Object.keys(entry.files).length > 0
+    );
+  }
+
+  /**
+   * Add file messages and deferred doneTool response together
+   */
+  async addFileAndDoneToolResponses(fileMessages: ResponseEntry[]): Promise<void> {
+    // Add file messages first
+    this.state.responseHistory.unshift(...fileMessages);
+
+    // Now add the deferred doneTool response
+    if (this.pendingDoneToolEntry) {
+      this.state.responseHistory.push(this.pendingDoneToolEntry);
+      this.pendingDoneToolEntry = null;
+    }
+
+    // Clear the defer flag and save
+    this.deferDoneToolResponse = false;
+    this.fileMessagesAdded = true;
+
+    await this.saveToDatabase();
   }
 }
