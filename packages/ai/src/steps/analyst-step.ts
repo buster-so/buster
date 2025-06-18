@@ -466,11 +466,10 @@ const analystExecution = async ({
       // Create file response messages for selected files
       const fileResponseMessages = createFileResponseMessages(selectedFiles);
 
-      // Add file response messages to the chunk processor's internal state
-      // This ensures they're included in any subsequent saves and aren't overwritten
-      await chunkProcessor.addResponseMessages(fileResponseMessages);
+      // Use the new method to add file messages and doneTool response together
+      await chunkProcessor.addFileAndDoneToolResponses(fileResponseMessages);
 
-      // Get the updated response history including our new file messages
+      // Get the updated response history including our new file messages and doneTool response
       enhancedResponseHistory = chunkProcessor.getResponseHistory();
 
       // Add metadata about files
@@ -480,13 +479,7 @@ const analystExecution = async ({
       };
     }
 
-    // One final save to ensure file messages are persisted
-    if (
-      'filesReturned' in filesMetadata &&
-      (filesMetadata as { filesReturned: number }).filesReturned > 0
-    ) {
-      await chunkProcessor.saveToDatabase();
-    }
+    // No need for a final save - addFileAndDoneToolResponses already handles it
 
     return {
       conversationHistory: completeConversationHistory,
@@ -518,10 +511,10 @@ const analystExecution = async ({
         const selectedFiles = selectFilesForResponse(allFiles);
         const fileResponseMessages = createFileResponseMessages(selectedFiles);
 
-        // Add file response messages to the chunk processor's internal state
-        await chunkProcessor.addResponseMessages(fileResponseMessages);
+        // Use the new method to add file messages and doneTool response together
+        await chunkProcessor.addFileAndDoneToolResponses(fileResponseMessages);
 
-        // Get the updated response history including our new file messages
+        // Get the updated response history including our new file messages and doneTool response
         enhancedResponseHistory = chunkProcessor.getResponseHistory();
 
         filesMetadata = {
