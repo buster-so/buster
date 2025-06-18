@@ -197,7 +197,7 @@ const CollapseContent = React.memo(
       return collapsible === 'overlay-peek' && !isTooSmallToCollapse ? (
         <div
           onClick={onCollapseClick}
-          className="bg-background hover:bg-item-hover absolute inset-x-0 bottom-0 m-1 flex h-7 scale-95 cursor-pointer items-center justify-center gap-x-1 rounded border bg-gradient-to-b opacity-0 transition-all delay-75 duration-200 group-hover:scale-100 group-hover:opacity-100">
+          className="bg-background hover:bg-item-hover absolute inset-x-0 bottom-0 m-1 flex h-7 scale-95 cursor-pointer items-center justify-center gap-x-1 rounded border bg-gradient-to-b opacity-0 shadow transition-all delay-75 duration-200 group-hover:scale-100 group-hover:opacity-100">
           <div className={cn('transition-transform duration-200', !isCollapsed && 'rotate-180')}>
             <ChevronDown />
           </div>

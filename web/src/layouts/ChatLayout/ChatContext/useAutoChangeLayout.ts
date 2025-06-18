@@ -1,15 +1,11 @@
 'use client';
 
 import findLast from 'lodash/findLast';
-import { useEffect, useLayoutEffect, useRef } from 'react';
-import type {
-  BusterChatMessageReasoning_text,
-  BusterChatResponseMessage_file
-} from '@/api/asset_interfaces/chat';
+import { useEffect, useRef } from 'react';
+import type { BusterChatResponseMessage_file } from '@/api/asset_interfaces/chat';
 import { useGetChat, useGetChatMessage, useGetChatMessageMemoized } from '@/api/buster_rest/chats';
 import { useGetFileLink } from '@/context/Assets/useGetFileLink';
 import { useAppLayoutContextSelector } from '@/context/BusterAppLayout';
-import { usePrevious } from '@/hooks';
 import { useChatLayoutContextSelector } from '../ChatLayoutContext';
 import { useGetInitialChatFile } from './useGetInitialChatFile';
 
@@ -49,13 +45,23 @@ export const useAutoChangeLayout = ({
 
   const hasReasoning = !!lastReasoningMessageId;
 
-  useLayoutEffect(() => {
-    if (hasLoadedChat) {
-      previousLastMessageId.current = lastMessageId;
-    }
-  }, [hasLoadedChat]);
-
   useEffect(() => {
+    console.log('useAutoChangeLayout', {
+      hasLoadedChat,
+      chatId,
+      isCompletedStream,
+      isFinishedReasoning,
+      hasReasoning,
+      previousLastMessageId: previousLastMessageId.current,
+      lastMessageId,
+      previousIsCompletedStream: previousIsCompletedStream.current,
+      messageId,
+      metricId,
+      dashboardId,
+      dashboardVersionNumber,
+      metricVersionNumber,
+      currentRoute
+    });
     if (!hasLoadedChat || !chatId) {
       return;
     }
@@ -67,13 +73,15 @@ export const useAutoChangeLayout = ({
       !isCompletedStream &&
       !isFinishedReasoning &&
       hasReasoning &&
-      previousLastMessageId.current !== lastMessageId &&
       chatId
+      //  previousLastMessageId.current !== lastMessageId &&
     ) {
       console.log('triggering auto change layout to open reasoning');
       previousLastMessageId.current = lastMessageId;
 
-      onSetSelectedFile({ id: lastMessageId, type: 'reasoning', versionNumber: undefined });
+      if (!messageId) {
+        onSetSelectedFile({ id: lastMessageId, type: 'reasoning', versionNumber: undefined });
+      }
     }
 
     //this happen will when the chat is completed and it WAS streaming
@@ -120,6 +128,8 @@ export const useAutoChangeLayout = ({
         metricVersionNumber,
         currentRoute
       });
+
+      console.log('href', { href });
 
       if (href) {
         onChangePage(href);

@@ -29,6 +29,9 @@ export const ReasoningController: React.FC<ReasoningControllerProps> = ({ chatId
   const { data: isCompletedStream } = useGetChatMessage(messageId, {
     select: ({ is_completed }) => is_completed
   });
+  const { data: finalReasoningMessage } = useGetChatMessage(messageId, {
+    select: ({ final_reasoning_message }) => final_reasoning_message
+  });
   const blackBoxMessage = useQuery({
     ...queryKeys.chatsBlackBoxMessages(messageId),
     notifyOnChangeProps: ['data']
@@ -40,8 +43,6 @@ export const ReasoningController: React.FC<ReasoningControllerProps> = ({ chatId
     observeSubTree: true,
     enabled: !!viewportRef.current
   });
-
-  const reasoningIsCompleted = useReasoningIsCompleted(messageId);
 
   useEffect(() => {
     if (hasChat && reasoningMessageIds) {
@@ -66,7 +67,11 @@ export const ReasoningController: React.FC<ReasoningControllerProps> = ({ chatId
             />
           ))}
 
-          {!reasoningIsCompleted && <BlackBoxMessage blackBoxMessage={blackBoxMessage} />}
+          <BlackBoxMessage
+            blackBoxMessage={blackBoxMessage}
+            finalReasoningMessage={finalReasoningMessage}
+            isCompletedStream={isCompletedStream ?? true}
+          />
         </div>
       </ScrollArea>
 

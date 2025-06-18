@@ -3,6 +3,7 @@ import React from 'react';
 import { useMemo } from 'react';
 import type {
   BusterChatMessageReasoning,
+  BusterChatMessageReasoning_files,
   BusterChatMessageReasoning_text
 } from '@/api/asset_interfaces/chat';
 import { useGetChatMessage } from '@/api/buster_rest/chats';
@@ -10,6 +11,7 @@ import { BarContainer } from './BarContainer';
 import { ReasoningMessage_Files } from './ReasoningMessage_Files';
 import { ReasoningMessage_PillsContainer } from './ReasoningMessage_PillContainers';
 import { ReasoningMessage_Text } from './ReasoningMessage_Text';
+import isEmpty from 'lodash/isEmpty';
 
 const itemAnimationConfig: MotionProps = {
   initial: { opacity: 0, height: 0 },
@@ -72,15 +74,19 @@ export const ReasoningMessageSelector: React.FC<ReasoningMessageSelectorProps> =
         type: x?.reasoning_messages[reasoningMessageId]?.type,
         status: x?.reasoning_messages[reasoningMessageId]?.status,
         hasMessage: !!(x?.reasoning_messages[reasoningMessageId] as BusterChatMessageReasoning_text)
-          ?.message
+          ?.message,
+        hasFiles: !isEmpty(
+          (x?.reasoning_messages[reasoningMessageId] as BusterChatMessageReasoning_files)?.files
+        )
       })
     });
-    const { title, secondary_title, type, status, hasMessage } = messageStuff || {};
+    const { title, secondary_title, type, status, hasMessage, hasFiles } = messageStuff || {};
 
     const showBar = useMemo(() => {
       if (type === 'text') return !!hasMessage || !isLastMessage;
+      if (type === 'files') return !!hasFiles;
       return true;
-    }, [type, hasMessage, isLastMessage]);
+    }, [type, hasMessage, isLastMessage, hasFiles]);
 
     if (!type || !status) return null;
 
@@ -93,12 +99,13 @@ export const ReasoningMessageSelector: React.FC<ReasoningMessageSelectorProps> =
         status={status}
         isCompletedStream={isCompletedStream}
         title={title ?? ''}
-        secondaryTitle={secondary_title ?? ''}>
+        secondaryTitle={secondary_title ?? ''}
+        isLastMessage={isLastMessage}>
         <AnimatePresence mode="wait" initial={!isCompletedStream}>
           <motion.div
             key={animationKey}
             {...itemAnimationConfig}
-            layout={!isCompletedStream}
+            //  layout={!isCompletedStream} I removed this because it was causing weird animation issues
             className="overflow-hidden">
             <div className="min-h-[1px]">
               <ReasoningMessage

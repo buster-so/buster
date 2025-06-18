@@ -2,22 +2,24 @@
 import React from 'react';
 import { BarContainer } from './BarContainer';
 
-export const BlackBoxMessage: React.FC<{ blackBoxMessage: string | undefined | null }> = React.memo(
-  ({ blackBoxMessage }) => {
-    if (blackBoxMessage) {
-      return (
-        <BarContainer
-          showBar={false}
-          status={'loading'}
-          isCompletedStream={false}
-          title={blackBoxMessage}
-          secondaryTitle={''}
-        />
-      );
-    }
-
-    return null;
+export const BlackBoxMessage: React.FC<{
+  blackBoxMessage: string | undefined | null;
+  finalReasoningMessage: string | undefined | null;
+  isCompletedStream: boolean;
+}> = React.memo(({ blackBoxMessage, finalReasoningMessage, isCompletedStream }) => {
+  if (blackBoxMessage || finalReasoningMessage) {
+    return (
+      <BarContainer
+        showBar={false}
+        status={finalReasoningMessage ? 'completed' : 'loading'}
+        isCompletedStream={isCompletedStream}
+        title={finalReasoningMessage ?? blackBoxMessage ?? 'Thinking...'}
+        secondaryTitle={''}
+      />
+    );
   }
-);
+
+  return null;
+});
 
 BlackBoxMessage.displayName = 'BlackBoxMessage';

@@ -9,6 +9,7 @@ import { SyntaxHighlighterLightTheme } from '@/components/ui/typography/AppCodeB
 import { cn } from '@/lib/classMerge';
 import { FileCard } from '../../card/FileCard';
 import { TextAndVersionPill } from '../../typography/TextAndVersionPill';
+import { useMount } from '@/hooks';
 
 const style = SyntaxHighlighterLightTheme;
 
@@ -91,6 +92,8 @@ export const StreamingMessageCode: React.FC<
           }
         }
 
+        console.log('setting streaming', { segments, text, modified, currentLine });
+
         setLineSegments(segments);
       };
 
@@ -104,6 +107,24 @@ export const StreamingMessageCode: React.FC<
 
       return <Text>{file_name}</Text>;
     }, [file_name, version_number]);
+
+    useMount(() => {
+      console.log('streaming mount file', {
+        isCompletedStream,
+        file,
+        file_type,
+        file_name,
+        version_number,
+        buttons,
+        collapsible,
+        lineSegments,
+        text,
+        modified,
+        textLength: text.length,
+        modifiedLength: modified?.length,
+        lineSegmentsLength: lineSegments.length
+      });
+    });
 
     return (
       <FileCard collapsible={collapsible} fileName={fileInfo} headerButtons={buttons}>

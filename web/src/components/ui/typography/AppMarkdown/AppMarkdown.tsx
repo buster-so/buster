@@ -9,12 +9,17 @@ import styles from './AppMarkdown.module.css';
 import {
   CustomBlockquote,
   CustomCode,
+  CustomEm,
   CustomHeading,
   CustomListItem,
   CustomOrderedList,
   CustomParagraph,
   CustomSpan,
-  CustomUnorderedList
+  CustomStrong,
+  CustomUnorderedList,
+  CustomUnderline,
+  CustomStrikethrough,
+  CustomLink
 } from './AppMarkdownCommon';
 
 // remarkGfm plugin adds GitHub Flavored Markdown support
@@ -57,6 +62,11 @@ const AppMarkdownBase: React.FC<{
   const h4 = useMemoizedFn((props) => <CustomHeading level={4} {...props} {...commonProps} />);
   const h5 = useMemoizedFn((props) => <CustomHeading level={5} {...props} {...commonProps} />);
   const h6 = useMemoizedFn((props) => <CustomHeading level={6} {...props} {...commonProps} />);
+  const strong = useMemoizedFn((props) => <CustomStrong {...props} {...commonProps} />);
+  const em = useMemoizedFn((props) => <CustomEm {...props} {...commonProps} />);
+  const u = useMemoizedFn((props) => <CustomUnderline {...props} {...commonProps} />);
+  const s = useMemoizedFn((props) => <CustomStrikethrough {...props} {...commonProps} />);
+  const a = useMemoizedFn((props) => <CustomLink {...props} {...commonProps} />);
 
   const memoizedComponents: Partial<Components> = useMemo(() => {
     // return undefined;
@@ -77,7 +87,12 @@ const AppMarkdownBase: React.FC<{
       h6,
       li,
       ol,
-      ul
+      ul,
+      strong,
+      em,
+      u,
+      s,
+      a
     };
   }, []);
 

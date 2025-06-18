@@ -196,3 +196,69 @@ export const CustomSpan: React.FC<
     <span className={cn('transform-none!', showLoader && 'fade-in duration-500')}>{children}</span>
   );
 };
+
+export const CustomStrong: React.FC<
+  {
+    children?: React.ReactNode;
+    markdown: string;
+    showLoader: boolean;
+  } & ExtraPropsExtra
+> = ({ children, markdown, showLoader, ...rest }) => {
+  return (
+    <strong className={cn('transform-none!', showLoader && 'fade-in duration-500')}>
+      {children}
+    </strong>
+  );
+};
+
+export const CustomEm: React.FC<
+  {
+    children?: React.ReactNode;
+    markdown: string;
+    showLoader: boolean;
+  } & ExtraPropsExtra
+> = ({ children, markdown, showLoader, ...rest }) => {
+  return (
+    <em className={cn('transform-none!', showLoader && 'fade-in duration-500')}>{children}</em>
+  );
+};
+
+export const CustomItalic: React.FC<
+  {
+    children?: React.ReactNode;
+    markdown: string;
+    showLoader: boolean;
+  } & ExtraPropsExtra
+> = ({ children, markdown, showLoader, ...rest }) => {
+  return <i className={cn('transform-none!', showLoader && 'fade-in duration-500')}>{children}</i>;
+};
+
+export const CustomUnderline: React.FC<
+  {
+    children?: React.ReactNode;
+    markdown: string;
+    showLoader: boolean;
+  } & ExtraPropsExtra
+> = ({ children, markdown, showLoader, ...rest }) => {
+  return <u className={cn('transform-none!', showLoader && 'fade-in duration-500')}>{children}</u>;
+};
+
+export const CustomStrikethrough: React.FC<
+  {
+    children?: React.ReactNode;
+    markdown: string;
+    showLoader: boolean;
+  } & ExtraPropsExtra
+> = ({ children, markdown, showLoader, ...rest }) => {
+  return <s className={cn('transform-none!', showLoader && 'fade-in duration-500')}>{children}</s>;
+};
+
+export const CustomLink: React.FC<
+  {
+    children?: React.ReactNode;
+    markdown: string;
+    showLoader: boolean;
+  } & ExtraPropsExtra
+> = ({ children, markdown, showLoader, ...rest }) => {
+  return <a className={cn('transform-none!', showLoader && 'fade-in duration-500')}>{children}</a>;
+};
