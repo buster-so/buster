@@ -67,3 +67,12 @@ export type {
   DataSourceIntrospectionResult,
   TableType,
 } from './types/introspection';
+
+// Utility exports
+export {
+  RateLimiter,
+  getRateLimiter,
+  withRateLimit,
+  batchWithRateLimit,
+  getAllRateLimiterStats,
+} from './utils/rate-limiter';

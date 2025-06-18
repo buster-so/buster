@@ -1,9 +1,15 @@
 import snowflake from 'snowflake-sdk';
+import {
+  ConnectionPoolError,
+  QueryTimeoutError,
+  classifyError,
+} from '../errors/data-source-errors';
 import type { DataSourceIntrospector } from '../introspection/base';
 import { SnowflakeIntrospector } from '../introspection/snowflake';
 import { type Credentials, DataSourceType, type SnowflakeCredentials } from '../types/credentials';
 import type { QueryParameter } from '../types/query';
 import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base';
+import { SnowflakeConnectionPool } from './snowflake-pool';
 
 // Use Snowflake SDK types directly
 type SnowflakeError = snowflake.SnowflakeError;
@@ -24,11 +30,15 @@ snowflake.configure({
   additionalLogToConsole: false,
 });
 
+// Global connection pool map - one pool per unique credential set
+const connectionPools = new Map<string, SnowflakeConnectionPool>();
+
 /**
- * Snowflake database adapter
+ * Snowflake database adapter with connection pooling
  */
 export class SnowflakeAdapter extends BaseAdapter {
-  private connection?: snowflake.Connection;
+  private pool?: SnowflakeConnectionPool;
+  private poolKey?: string;
   private introspector?: SnowflakeIntrospector;
 
   async initialize(credentials: Credentials): Promise<void> {
@@ -36,46 +46,28 @@ export class SnowflakeAdapter extends BaseAdapter {
     const snowflakeCredentials = credentials as SnowflakeCredentials;
 
     try {
-      const connectionOptions: snowflake.ConnectionOptions = {
-        account: snowflakeCredentials.account_id,
-        username: snowflakeCredentials.username,
-        password: snowflakeCredentials.password,
-        warehouse: snowflakeCredentials.warehouse_id,
-        database: snowflakeCredentials.default_database,
-      };
+      // Create a unique key for this credential set
+      this.poolKey = `${snowflakeCredentials.account_id}-${snowflakeCredentials.username}-${snowflakeCredentials.warehouse_id}-${snowflakeCredentials.default_database}`;
 
-      // Add optional parameters
-      if (snowflakeCredentials.role) {
-        connectionOptions.role = snowflakeCredentials.role;
-      }
-
-      if (snowflakeCredentials.default_schema) {
-        connectionOptions.schema = snowflakeCredentials.default_schema;
-      }
-
-      this.connection = snowflake.createConnection(connectionOptions);
-
-      // Connect to Snowflake
-      await new Promise<void>((resolve, reject) => {
-        if (!this.connection) {
-          reject(new Error('Failed to create Snowflake connection'));
-          return;
-        }
-        this.connection.connect((err) => {
-          if (err) {
-            reject(new Error(`Failed to connect to Snowflake: ${err.message}`));
-          } else {
-            resolve();
-          }
+      // Check if a pool already exists for these credentials
+      if (!connectionPools.has(this.poolKey)) {
+        const pool = new SnowflakeConnectionPool(snowflakeCredentials, {
+          minConnections: 5,
+          maxConnections: 25,     // Increased to support 50 concurrent queries
+          idleTimeout: 300000,    // 5 minutes
+          acquireTimeout: 45000,  // 45 seconds (increased for higher load)
+          connectionTimeout: 60000, // 60 seconds
         });
-      });
 
+        await pool.initialize();
+        connectionPools.set(this.poolKey, pool);
+      }
+
+      this.pool = connectionPools.get(this.poolKey);
       this.credentials = credentials;
       this.connected = true;
     } catch (error) {
-      throw new Error(
-        `Failed to initialize Snowflake client: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
+      throw classifyError(error);
     }
   }
 
@@ -87,8 +79,8 @@ export class SnowflakeAdapter extends BaseAdapter {
   ): Promise<AdapterQueryResult> {
     this.ensureConnected();
 
-    if (!this.connection) {
-      throw new Error('Snowflake connection not initialized');
+    if (!this.pool) {
+      throw new Error('Snowflake connection pool not initialized');
     }
 
     // Helper function to add timeout to any query promise
@@ -98,14 +90,19 @@ export class SnowflakeAdapter extends BaseAdapter {
     ): Promise<T> => {
       const timeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(() => {
-          reject(new Error(`Snowflake query execution timeout after ${timeoutMs}ms`));
+          reject(new QueryTimeoutError(timeoutMs, sql));
         }, timeoutMs);
       });
 
       return Promise.race([queryPromise, timeoutPromise]);
     };
 
+    // Acquire a connection from the pool
+    let connection: snowflake.Connection | null = null;
+
     try {
+      connection = await this.pool.acquire();
+
       // Set query timeout if specified (default: 60 seconds)
       const timeoutMs = timeout || 60000;
 
@@ -115,11 +112,11 @@ export class SnowflakeAdapter extends BaseAdapter {
           rows: Record<string, unknown>[];
           statement: SnowflakeStatement;
         }>((resolve, reject) => {
-          if (!this.connection) {
-            reject(new Error('Snowflake connection not initialized'));
+          if (!connection) {
+            reject(new Error('Failed to acquire Snowflake connection'));
             return;
           }
-          this.connection.execute({
+          connection.execute({
             sqlText: sql,
             binds: params as snowflake.Binds,
             complete: (
@@ -157,8 +154,8 @@ export class SnowflakeAdapter extends BaseAdapter {
 
       // Use streaming for SELECT queries with maxRows
       const streamingPromise = new Promise<AdapterQueryResult>((resolve, reject) => {
-        if (!this.connection) {
-          reject(new Error('Snowflake connection not initialized'));
+        if (!connection) {
+          reject(new Error('Failed to acquire Snowflake connection'));
           return;
         }
 
@@ -167,7 +164,7 @@ export class SnowflakeAdapter extends BaseAdapter {
         let fields: FieldMetadata[] = [];
         let rowCount = 0;
 
-        const statement = this.connection.execute({
+        const statement = connection.execute({
           sqlText: sql,
           binds: params as snowflake.Binds,
           streamResult: true, // Enable streaming
@@ -231,25 +228,34 @@ export class SnowflakeAdapter extends BaseAdapter {
 
       return await executeWithTimeout(streamingPromise, timeoutMs);
     } catch (error) {
-      throw new Error(
-        `Snowflake query failed: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
+      // Use the error classification system
+      throw classifyError(error, { sql, timeout: timeout || 60000 });
+    } finally {
+      // Always release the connection back to the pool
+      if (connection && this.pool) {
+        this.pool.release(connection);
+      }
     }
   }
 
   async testConnection(): Promise<boolean> {
+    if (!this.pool) {
+      return false;
+    }
+
+    let connection: snowflake.Connection | null = null;
+
     try {
-      if (!this.connection) {
-        return false;
-      }
+      // Acquire a connection with a shorter timeout for testing
+      connection = await this.pool.acquire();
 
       // Test connection by running a simple query
       await new Promise<void>((resolve, reject) => {
-        if (!this.connection) {
-          reject(new Error('Snowflake connection not initialized'));
+        if (!connection) {
+          reject(new Error('Failed to acquire connection for test'));
           return;
         }
-        this.connection.execute({
+        connection.execute({
           sqlText: 'SELECT 1 as test',
           complete: (err: SnowflakeError | undefined) => {
             if (err) {
@@ -264,27 +270,20 @@ export class SnowflakeAdapter extends BaseAdapter {
       return true;
     } catch {
       return false;
+    } finally {
+      // Release the connection back to the pool
+      if (connection && this.pool) {
+        this.pool.release(connection);
+      }
     }
   }
 
   async close(): Promise<void> {
-    if (this.connection) {
-      await new Promise<void>((resolve) => {
-        if (!this.connection) {
-          resolve();
-          return;
-        }
-        this.connection.destroy((err: SnowflakeError | undefined) => {
-          if (err) {
-            // Log error but don't fail the close operation
-            // Using a simple approach that works in most environments
-          }
-          resolve();
-        });
-      });
-      this.connection = undefined;
-    }
+    // We don't close the shared connection pool here
+    // Just mark this adapter as disconnected
     this.connected = false;
+    this.pool = undefined;
+    this.poolKey = undefined;
   }
 
   getDataSourceType(): string {
@@ -296,5 +295,39 @@ export class SnowflakeAdapter extends BaseAdapter {
       this.introspector = new SnowflakeIntrospector('snowflake', this);
     }
     return this.introspector;
+  }
+
+  /**
+   * Get connection pool statistics for monitoring
+   */
+  getPoolStats() {
+    if (!this.pool) {
+      return null;
+    }
+    return this.pool.getStats();
+  }
+
+  /**
+   * Static method to close all connection pools
+   * Should be called on application shutdown
+   */
+  static async closeAllPools(): Promise<void> {
+    const promises: Promise<void>[] = [];
+    for (const pool of connectionPools.values()) {
+      promises.push(pool.close());
+    }
+    await Promise.all(promises);
+    connectionPools.clear();
+  }
+
+  /**
+   * Static method to get statistics for all pools
+   */
+  static getAllPoolStats() {
+    const stats: Record<string, unknown> = {};
+    for (const [key, pool] of connectionPools.entries()) {
+      stats[key] = pool.getStats();
+    }
+    return stats;
   }
 }

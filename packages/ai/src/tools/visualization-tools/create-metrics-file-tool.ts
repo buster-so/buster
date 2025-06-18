@@ -1,5 +1,4 @@
 import { randomUUID } from 'node:crypto';
-import { isError } from 'node:util';
 import { assetPermissions, db, metricFiles } from '@buster/database';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { createTool } from '@mastra/core/tools';
@@ -8,8 +7,9 @@ import {} from 'drizzle-orm';
 import { sql } from 'drizzle-orm';
 import * as yaml from 'yaml';
 import { z } from 'zod';
-import { DataSource } from '../../../../data-source/src/data-source';
-import type { Credentials } from '../../../../data-source/src/types/credentials';
+import type { DataSource } from '../../../../data-source/src/data-source';
+import { getWorkflowDataSourceManager } from '../../utils/data-source-manager';
+import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
 import { createInitialMetricVersionHistory, validateMetricYml } from './version-history-helpers';
 import type { MetricYml } from './version-history-types';
 
@@ -943,14 +943,17 @@ definitions:
     ),
   }),
   execute: async ({ context, runtimeContext }) => {
-    return await createMetricFiles(context as CreateMetricFilesParams, runtimeContext);
+    return await createMetricFiles(
+      context as CreateMetricFilesParams,
+      runtimeContext as RuntimeContext<AnalystRuntimeContext>
+    );
   },
 });
 
 const createMetricFiles = wrapTraced(
   async (
     params: CreateMetricFilesParams,
-    runtimeContext: RuntimeContext
+    runtimeContext: RuntimeContext<AnalystRuntimeContext>
   ): Promise<CreateMetricFilesOutput> => {
     const startTime = Date.now();
     const { files } = params;
@@ -963,6 +966,12 @@ const createMetricFiles = wrapTraced(
     const dataSourceSyntax = (runtimeContext?.get('dataSourceSyntax') || 'generic') as string;
     const userId = runtimeContext?.get('userId') as string;
     const organizationId = runtimeContext?.get('organizationId') as string;
+    const workflowStartTime = runtimeContext?.get('workflowStartTime') as number | undefined;
+
+    // Generate a unique workflow ID using start time and data source
+    const workflowId = workflowStartTime
+      ? `workflow-${workflowStartTime}-${dataSourceId}`
+      : `workflow-${Date.now()}-${dataSourceId}`;
 
     if (!dataSourceId) {
       return {
@@ -998,7 +1007,8 @@ const createMetricFiles = wrapTraced(
           dataSourceId,
           dataSourceSyntax,
           userId,
-          organizationId
+          organizationId,
+          workflowId
         );
         return { fileName: file.name, result };
       })
@@ -1136,7 +1146,8 @@ async function processMetricFile(
   dataSourceId: string,
   _dataSourceDialect: string,
   _userId: string,
-  _organizationId: string
+  _organizationId: string,
+  workflowId: string
 ): Promise<MetricFileResult> {
   try {
     // Ensure timeFrame values are properly quoted before parsing
@@ -1150,7 +1161,7 @@ async function processMetricFile(
     const metricId = randomUUID();
 
     // Validate SQL by running it
-    const sqlValidationResult = await validateSql(metricYml.sql, dataSourceId);
+    const sqlValidationResult = await validateSql(metricYml.sql, dataSourceId, workflowId);
 
     if (!sqlValidationResult.success) {
       return {
@@ -1206,7 +1217,11 @@ async function processMetricFile(
   }
 }
 
-async function validateSql(sqlQuery: string, dataSourceId: string): Promise<ValidationResult> {
+async function validateSql(
+  sqlQuery: string,
+  dataSourceId: string,
+  workflowId: string
+): Promise<ValidationResult> {
   try {
     if (!sqlQuery.trim()) {
       return { success: false, error: 'SQL query cannot be empty' };
@@ -1221,20 +1236,12 @@ async function validateSql(sqlQuery: string, dataSourceId: string): Promise<Vali
       return { success: false, error: 'SQL query must contain FROM clause' };
     }
 
-    // Get data source credentials from vault
+    // Get data source from workflow manager (reuses existing connections)
+    const manager = getWorkflowDataSourceManager(workflowId);
     let dataSource: DataSource;
+
     try {
-      const credentials = await getDataSourceCredentials(dataSourceId);
-      dataSource = new DataSource({
-        dataSources: [
-          {
-            name: `datasource-${dataSourceId}`,
-            type: credentials.type,
-            credentials: credentials,
-          },
-        ],
-        defaultDataSource: `datasource-${dataSourceId}`,
-      });
+      dataSource = await manager.getDataSource(dataSourceId);
     } catch (_error) {
       return {
         success: false,
@@ -1242,102 +1249,61 @@ async function validateSql(sqlQuery: string, dataSourceId: string): Promise<Vali
       };
     }
 
-    try {
-      // Execute the SQL query using the DataSource with row limit and timeout for validation
-      const result = await dataSource.execute({
-        sql: sqlQuery,
-        options: {
-          maxRows: 1000, // Limit to 1000 rows for validation to protect memory
-          timeout: 60000, // 60 second timeout for complex analytical queries
-        },
-      });
+    // Execute the SQL query using the DataSource with row limit and timeout for validation
+    const result = await dataSource.execute({
+      sql: sqlQuery,
+      options: {
+        maxRows: 1000, // Limit to 1000 rows for validation to protect memory
+        timeout: 60000, // 60 second timeout for complex analytical queries
+      },
+    });
 
-      if (result.success) {
-        const allResults = result.rows || [];
-        // Truncate results to 25 records for display in validation
-        const results = allResults.slice(0, 25);
+    if (result.success) {
+      const allResults = result.rows || [];
+      // Truncate results to 25 records for display in validation
+      const results = allResults.slice(0, 25);
 
-        // Validate metadata with Zod schema for runtime safety
-        const validatedMetadata = resultMetadataSchema.safeParse(result.metadata);
-        const parsedMetadata: ResultMetadata = validatedMetadata.success
-          ? validatedMetadata.data
-          : undefined;
+      // Validate metadata with Zod schema for runtime safety
+      const validatedMetadata = resultMetadataSchema.safeParse(result.metadata);
+      const parsedMetadata: ResultMetadata = validatedMetadata.success
+        ? validatedMetadata.data
+        : undefined;
 
-        const metadata: QueryMetadata = {
-          rowCount: results.length,
-          totalRowCount: parsedMetadata?.totalRowCount ?? allResults.length,
-          executionTime: result.executionTime || 100,
-          limited: parsedMetadata?.limited ?? false,
-          maxRows: parsedMetadata?.maxRows,
-        };
+      const metadata: QueryMetadata = {
+        rowCount: results.length,
+        totalRowCount: parsedMetadata?.totalRowCount ?? allResults.length,
+        executionTime: result.executionTime || 100,
+        limited: parsedMetadata?.limited ?? false,
+        maxRows: parsedMetadata?.maxRows,
+      };
 
-        let message: string;
-        if (allResults.length === 0) {
-          message = 'Query executed successfully but returned no records';
-        } else if (result.metadata?.limited) {
-          message = `Query validated successfully. Results were limited to ${result.metadata.maxRows} rows for memory protection (query may return more rows when executed)${results.length < allResults.length ? ` - showing first 25 of ${allResults.length} fetched` : ''}`;
-        } else {
-          message = `Query validated successfully and returned ${allResults.length} records${allResults.length > 25 ? ' (showing sample of first 25)' : ''}`;
-        }
-
-        return {
-          success: true,
-          message,
-          results,
-          metadata,
-        };
+      let message: string;
+      if (allResults.length === 0) {
+        message = 'Query executed successfully but returned no records';
+      } else if (result.metadata?.limited) {
+        message = `Query validated successfully. Results were limited to ${result.metadata.maxRows} rows for memory protection (query may return more rows when executed)${results.length < allResults.length ? ` - showing first 25 of ${allResults.length} fetched` : ''}`;
+      } else {
+        message = `Query validated successfully and returned ${allResults.length} records${allResults.length > 25 ? ' (showing sample of first 25)' : ''}`;
       }
 
       return {
-        success: false,
-        error: result.error?.message || 'Query execution failed',
+        success: true,
+        message,
+        results,
+        metadata,
       };
-    } finally {
-      // Always close the data source connection
-      await dataSource.close();
     }
+
+    return {
+      success: false,
+      error: result.error?.message || 'Query execution failed',
+    };
+    // Note: We don't close the data source here anymore - it's managed by the workflow manager
   } catch (error) {
     return {
       success: false,
       error: error instanceof Error ? error.message : 'SQL validation failed',
     };
-  }
-}
-
-async function getDataSourceCredentials(dataSourceId: string): Promise<Credentials> {
-  try {
-    // Query the vault to get the credentials
-    const secretResult = await db.execute(
-      sql`SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = ${dataSourceId} LIMIT 1`
-    );
-
-    if (!secretResult.length || !secretResult[0]?.decrypted_secret) {
-      return Promise.reject(new Error('No credentials found for the specified data source'));
-    }
-
-    const secretString = secretResult[0].decrypted_secret as string;
-
-    // Parse the credentials JSON
-    const credentials = JSON.parse(secretString) as Credentials;
-    return credentials;
-  } catch (error) {
-    console.error('Error getting data source credentials:', error);
-
-    // Provide more specific error messages based on error type
-    if (error instanceof z.ZodError) {
-      return Promise.reject(
-        new Error(
-          'The data source credentials are not in the expected format. Please reconfigure your data source.'
-        )
-      );
-    }
-
-    const errorMessage = isError(error) ? error.message : 'Unknown error occurred';
-    return Promise.reject(
-      new Error(
-        `Unable to retrieve data source credentials: ${errorMessage}. Please contact support if this issue persists.`
-      )
-    );
   }
 }
 
