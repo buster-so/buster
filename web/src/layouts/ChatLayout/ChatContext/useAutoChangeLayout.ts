@@ -1,7 +1,7 @@
 'use client';
 
 import findLast from 'lodash/findLast';
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import type { BusterChatResponseMessage_file } from '@/api/asset_interfaces/chat';
 import { useGetChat, useGetChatMessage, useGetChatMessageMemoized } from '@/api/buster_rest/chats';
 import { useGetFileLink } from '@/context/Assets/useGetFileLink';
@@ -27,6 +27,12 @@ export const useAutoChangeLayout = ({
   const { data: isCompletedStream = false } = useGetChatMessage(lastMessageId, {
     select: (x) => x?.is_completed
   });
+  const { data: lastReasoningMessageId } = useGetChatMessage(lastMessageId, {
+    select: (x) => x?.reasoning_message_ids?.[x?.reasoning_message_ids?.length - 1]
+  });
+  const { data: isFinishedReasoning } = useGetChatMessage(lastMessageId, {
+    select: (x) => !!lastReasoningMessageId && !!(x?.is_completed || !!x.final_reasoning_message)
+  });
 
   const getInitialChatFileHref = useGetInitialChatFile();
 
@@ -35,47 +41,22 @@ export const useAutoChangeLayout = ({
   const previousIsCompletedStream = useRef<boolean>(isCompletedStream);
 
   const { data: hasLoadedChat } = useGetChat({ id: chatId || '' }, { select: (x) => !!x.id });
-  const { data: lastReasoningMessageId } = useGetChatMessage(lastMessageId, {
-    select: (x) => x?.reasoning_message_ids?.[x?.reasoning_message_ids?.length - 1]
-  });
-  const { data: isFinishedReasoning } = useGetChatMessage(lastMessageId, {
-    select: (x) => !!lastReasoningMessageId && !!(x?.is_completed || !!x.final_reasoning_message)
-  });
+
   const { getFileLinkMeta } = useGetFileLink();
 
   const hasReasoning = !!lastReasoningMessageId;
 
+  useLayoutEffect(() => {
+    previousIsCompletedStream.current = isCompletedStream;
+  }, [hasLoadedChat]);
+
   useEffect(() => {
-    console.log('useAutoChangeLayout', {
-      hasLoadedChat,
-      chatId,
-      isCompletedStream,
-      isFinishedReasoning,
-      hasReasoning,
-      previousLastMessageId: previousLastMessageId.current,
-      lastMessageId,
-      previousIsCompletedStream: previousIsCompletedStream.current,
-      messageId,
-      metricId,
-      dashboardId,
-      dashboardVersionNumber,
-      metricVersionNumber,
-      currentRoute
-    });
     if (!hasLoadedChat || !chatId) {
       return;
     }
 
-    previousIsCompletedStream.current = isCompletedStream;
-
     //this will trigger when the chat is streaming and is has not completed yet (new chat)
-    if (
-      !isCompletedStream &&
-      !isFinishedReasoning &&
-      hasReasoning &&
-      chatId
-      //  previousLastMessageId.current !== lastMessageId &&
-    ) {
+    if (!isCompletedStream && !isFinishedReasoning && hasReasoning && chatId) {
       console.log('triggering auto change layout to open reasoning');
       previousLastMessageId.current = lastMessageId;
 
@@ -108,32 +89,30 @@ export const useAutoChangeLayout = ({
         if (link) {
           onChangePage(link);
         }
-        return;
       }
     }
+
     //this will trigger on a page refresh and the chat is completed
-    else if (isCompletedStream && chatId) {
-      const isChatOnlyMode = !metricId && !dashboardId && !messageId;
-      console.log('triggering auto change layout to open file', { isChatOnlyMode });
-      if (isChatOnlyMode) {
-        return;
-      }
+    // else if (isCompletedStream && chatId) {
+    //   const isChatOnlyMode = !metricId && !dashboardId && !messageId;
+    //   console.log('triggering auto change layout to open file', { isChatOnlyMode });
+    //   if (!isChatOnlyMode) {
+    //     const href = getInitialChatFileHref({
+    //       metricId,
+    //       dashboardId,
+    //       messageId,
+    //       chatId,
+    //       dashboardVersionNumber,
+    //       metricVersionNumber,
+    //       currentRoute
+    //     });
 
-      const href = getInitialChatFileHref({
-        metricId,
-        dashboardId,
-        messageId,
-        chatId,
-        dashboardVersionNumber,
-        metricVersionNumber,
-        currentRoute
-      });
+    //     console.log('href', { href });
 
-      console.log('href', { href });
-
-      if (href) {
-        onChangePage(href);
-      }
-    }
+    //     if (href) {
+    //       onChangePage(href);
+    //     }
+    //   }
+    // }
   }, [isCompletedStream, hasReasoning, chatId, lastMessageId]); //only use these values to trigger the useEffect
 };

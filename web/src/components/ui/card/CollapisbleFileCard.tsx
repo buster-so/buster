@@ -166,8 +166,6 @@ const CollapseContent = React.memo(
       );
     }, [collapsible, fullHeight]);
 
-    console.log('isTooSmallToCollapse', { isTooSmallToCollapse, fullHeight, collapsible });
-
     // Measure content height when it changes
     useEffect(() => {
       if (collapsible === 'overlay-peek' && contentRef.current) {

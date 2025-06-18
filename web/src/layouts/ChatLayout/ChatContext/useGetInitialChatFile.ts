@@ -26,15 +26,19 @@ export const useGetInitialChatFile = () => {
       currentRoute: BusterRoutes;
     }): string | undefined => {
       const isChatOnlyMode = !metricId && !dashboardId && !messageId;
+      console.log('href isChatOnlyMode', { isChatOnlyMode, metricId, dashboardId, messageId });
       if (isChatOnlyMode) {
         return;
       }
 
       const chat = getChatMemoized(chatId);
 
+      console.log('href chat', chat);
+
       //reasoning_message_mode
       if (messageId) {
         const messageExists = !!chat?.message_ids.some((id) => id === messageId);
+
         if (messageExists) {
           return;
         }
@@ -46,6 +50,7 @@ export const useGetInitialChatFile = () => {
 
       //dashboard_mode
       if (dashboardId) {
+        console.log({ dashboardId, dashboardVersionNumber });
         if (!dashboardVersionNumber) {
           const lastMatchingDashboardInChat = chat?.message_ids.reduce<
             BusterChatResponseMessage_file | undefined
@@ -76,8 +81,6 @@ export const useGetInitialChatFile = () => {
               chatId
             });
           }
-        } else {
-          return;
         }
       }
 
@@ -86,6 +89,8 @@ export const useGetInitialChatFile = () => {
         const isChartRoute =
           currentRoute === BusterRoutes.APP_CHAT_ID_METRIC_ID_CHART ||
           currentRoute === BusterRoutes.APP_METRIC_ID_CHART;
+
+        console.log({ metricId, metricVersionNumber, isChartRoute });
 
         if (!metricVersionNumber && isChartRoute) {
           const lastMatchingMetricInChat = chat?.message_ids.reduce<
@@ -117,8 +122,6 @@ export const useGetInitialChatFile = () => {
               chatId
             });
           }
-        } else {
-          return;
         }
       }
     }
