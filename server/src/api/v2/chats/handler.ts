@@ -75,31 +75,23 @@ export async function createChatHandler(
     // Trigger background analysis if we have content
     // This should be very fast (just queuing the job, not waiting for completion)
     if (request.prompt || request.asset_id) {
-      const triggerStart = Date.now();
       try {
         // Just queue the background job - should be <100ms
-        await tasks.trigger('analyst-agent-task', {
+        const taskHandle = await tasks.trigger('analyst-agent-task', {
           message_id: messageId,
         });
 
-        const triggerDuration = Date.now() - triggerStart;
-
-        // Warn if trigger queueing is slow
-        if (triggerDuration > 500) {
-          console.warn('Slow trigger operation detected:', {
-            messageId,
-            triggerDuration: `${triggerDuration}ms`,
-            warning: 'Trigger queueing should be <100ms',
-          });
+        // Health check: Verify trigger service received the task
+        // The presence of taskHandle.id confirms Trigger.dev accepted our request
+        if (!taskHandle.id) {
+          // This would indicate a serious issue with Trigger.dev service
+          throw new Error('Trigger service returned invalid handle');
         }
+
+        // Task was successfully queued - background analysis will proceed
       } catch (triggerError) {
-        const triggerDuration = Date.now() - triggerStart;
-        console.error('Failed to trigger analyst agent task:', {
-          messageId,
-          triggerDuration: `${triggerDuration}ms`,
-          error: triggerError,
-        });
-        // The user still gets their chat/message, background analysis just won't run
+        console.error('Failed to trigger analyst agent task:', triggerError);
+        throw triggerError;
       }
     }
 
