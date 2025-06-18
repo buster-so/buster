@@ -10,6 +10,10 @@ import * as yaml from 'yaml';
 import { z } from 'zod';
 import { DataSource } from '../../../../data-source/src/data-source';
 import type { Credentials } from '../../../../data-source/src/types/credentials';
+import {
+  createInitialMetricVersionHistory,
+  metricYmlToVersionContent,
+} from './version-history-helpers';
 
 /**
  * Ensures timeFrame values are properly quoted in YAML content
@@ -1132,7 +1136,10 @@ const createMetricFiles = wrapTraced(
             publiclyAccessible: false,
             publiclyEnabledBy: null,
             publicExpiryDate: null,
-            versionHistory: { version: sp.metricFile.version_number, history: [sp.metricYml] },
+            versionHistory: createInitialMetricVersionHistory(
+              metricYmlToVersionContent(sp.metricYml),
+              sp.metricFile.created_at
+            ),
             dataMetadata: sp.results
               ? {
                   rowCount: sp.results.length,

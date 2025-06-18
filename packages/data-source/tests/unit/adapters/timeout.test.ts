@@ -4,14 +4,14 @@ import { MySQLAdapter } from '../../../src/adapters/mysql';
 import { PostgreSQLAdapter } from '../../../src/adapters/postgresql';
 import { RedshiftAdapter } from '../../../src/adapters/redshift';
 import { SnowflakeAdapter } from '../../../src/adapters/snowflake';
-import { SqlServerAdapter } from '../../../src/adapters/sqlserver';
+import { SQLServerAdapter } from '../../../src/adapters/sqlserver';
 import type {
   BigQueryCredentials,
   MySQLCredentials,
   PostgreSQLCredentials,
   RedshiftCredentials,
+  SQLServerCredentials,
   SnowflakeCredentials,
-  SqlServerCredentials,
 } from '../../../src/types/credentials';
 
 // Mock all external dependencies

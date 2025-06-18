@@ -1,8 +1,8 @@
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { globTool, multiGlobTool } from '@/tools/file-tools/glob-tool';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+import { globTool, multiGlobTool } from '../../../src/tools/file-tools/glob-tool';
 
 describe('Glob Tool Unit Tests', () => {
   let tempDir: string;
@@ -267,11 +267,13 @@ describe('Glob Tool Unit Tests', () => {
       expect(result.total_matches).toBeGreaterThan(0);
 
       // Find files that match multiple patterns
-      const tsxFiles = result.matches.filter((m) => m.path.endsWith('.tsx'));
+      const tsxFiles = result.matches.filter((m: { path: string }) => m.path.endsWith('.tsx'));
       expect(tsxFiles).toHaveLength(2);
 
       // Find README.md
-      const readmeFiles = result.matches.filter((m) => m.path.endsWith('README.md'));
+      const readmeFiles = result.matches.filter((m: { path: string }) =>
+        m.path.endsWith('README.md')
+      );
       expect(readmeFiles).toHaveLength(1);
 
       expect(result.search_time_ms).toBeGreaterThan(0);
@@ -287,7 +289,7 @@ describe('Glob Tool Unit Tests', () => {
 
       // Find a TypeScript file in src directory
       const srcTsFile = result.matches.find(
-        (m) => m.path.includes('src') && m.path.endsWith('.ts')
+        (m: { path: string }) => m.path.includes('src') && m.path.endsWith('.ts')
       );
 
       expect(srcTsFile).toBeDefined();

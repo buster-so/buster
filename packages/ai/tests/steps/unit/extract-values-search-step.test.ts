@@ -66,7 +66,8 @@ describe('extractValuesSearchStep', () => {
       const result = await extractValuesSearchStep.execute({
         inputData,
         runtimeContext,
-      });
+        getInitData: async () => inputData,
+      } as any);
 
       expect(result.values).toEqual(['Red Bull', 'California']);
       expect(result.searchPerformed).toBe(true);
@@ -84,7 +85,8 @@ describe('extractValuesSearchStep', () => {
       const result = await extractValuesSearchStep.execute({
         inputData,
         runtimeContext,
-      });
+        getInitData: async () => inputData,
+      } as any);
 
       // Should still run even with no keywords
       expect(Array.isArray(result.values)).toBe(true);
@@ -105,7 +107,8 @@ describe('extractValuesSearchStep', () => {
       const result = await extractValuesSearchStep.execute({
         inputData,
         runtimeContext,
-      });
+        getInitData: async () => inputData,
+      } as any);
 
       expect(result.searchPerformed).toBe(false);
       expect(result.searchResults).toBe('');
@@ -129,7 +132,8 @@ describe('extractValuesSearchStep', () => {
       const result = await extractValuesSearchStep.execute({
         inputData,
         runtimeContext,
-      });
+        getInitData: async () => inputData,
+      } as any);
 
       expect(result.values).toEqual([]);
       expect(result.searchPerformed).toBe(false);
@@ -181,7 +185,8 @@ describe('extractValuesSearchStep', () => {
       const result = await extractValuesSearchStep.execute({
         inputData,
         runtimeContext,
-      });
+        getInitData: async () => inputData,
+      } as any);
 
       expect(result.searchPerformed).toBe(true);
       expect(result.searchResults).toContain('public.products');
@@ -209,7 +214,8 @@ describe('extractValuesSearchStep', () => {
       const result = await extractValuesSearchStep.execute({
         inputData,
         runtimeContext,
-      });
+        getInitData: async () => inputData,
+      } as any);
 
       // Should not break the workflow
       expect(result.searchPerformed).toBe(false);
@@ -233,7 +239,8 @@ describe('extractValuesSearchStep', () => {
       const result = await extractValuesSearchStep.execute({
         inputData,
         runtimeContext,
-      });
+        getInitData: async () => inputData,
+      } as any);
 
       // Should not break the workflow
       expect(result.searchPerformed).toBe(true); // We attempted the search
@@ -274,7 +281,8 @@ describe('extractValuesSearchStep', () => {
       const result = await extractValuesSearchStep.execute({
         inputData,
         runtimeContext,
-      });
+        getInitData: async () => inputData,
+      } as any);
 
       // Should succeed with partial results
       expect(result.searchPerformed).toBe(true);
@@ -301,7 +309,8 @@ describe('extractValuesSearchStep', () => {
       const result = await extractValuesSearchStep.execute({
         inputData,
         runtimeContext,
-      });
+        getInitData: async () => inputData,
+      } as any);
 
       expect(result).toBeDefined();
       expect(result.values).toEqual([]);
@@ -348,7 +357,8 @@ describe('extractValuesSearchStep', () => {
       const result = await extractValuesSearchStep.execute({
         inputData,
         runtimeContext,
-      });
+        getInitData: async () => inputData,
+      } as any);
 
       // Should only show "Red Bull" once
       expect(result.foundValues['public.products']?.name).toEqual(['Red Bull']);
@@ -401,7 +411,8 @@ describe('extractValuesSearchStep', () => {
       const result = await extractValuesSearchStep.execute({
         inputData,
         runtimeContext,
-      });
+        getInitData: async () => inputData,
+      } as any);
 
       expect(result.foundValues).toEqual({
         'sales.products': {

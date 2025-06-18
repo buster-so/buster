@@ -1,9 +1,6 @@
-import type { StepExecutionOptions } from '@mastra/core';
+import { createTestChat, createTestMessage, withTestEnv } from '@buster/test-utils';
 import { RuntimeContext } from '@mastra/core/runtime-context';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { createTestChat } from '../../../../../test-utils/src/database/chats/createTestChat';
-import { createTestMessage } from '../../../../../test-utils/src/database/messages/createTestMessage';
-import { withTestEnv } from '../../../../../test-utils/src/env-helpers';
 import { createTodosStep } from '../../../src/steps/create-todos-step';
 import { getRawLlmMessagesByMessageId } from '../../../src/steps/get-chat-history';
 import type { AnalystRuntimeContext } from '../../../src/workflows/analyst-workflow';
@@ -40,7 +37,7 @@ describe('Create Todos Step - Reasoning Integration', () => {
           conversationHistory: [],
         },
         runtimeContext,
-      } as StepExecutionOptions<typeof createTodosStep>);
+      } as any);
 
       // Verify todos were created
       expect(result.todos).toBeTruthy();
@@ -108,7 +105,7 @@ describe('Create Todos Step - Reasoning Integration', () => {
           conversationHistory: [],
         },
         runtimeContext,
-      } as StepExecutionOptions<typeof createTodosStep>);
+      } as any);
 
       // Verify todos and reasoning were created
       expect(result.todos).toBeTruthy();

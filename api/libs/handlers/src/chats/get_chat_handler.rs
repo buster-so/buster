@@ -281,6 +281,7 @@ pub async fn get_chat_handler(
                 msg.final_reasoning_message,
                 msg.created_at,
                 msg.feedback,
+                msg.is_completed,
             )
         })
         .collect();

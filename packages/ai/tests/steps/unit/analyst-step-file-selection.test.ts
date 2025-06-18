@@ -203,8 +203,10 @@ describe('Analyst Step File Selection', () => {
       const extracted = extractFilesFromReasoning(reasoningHistory);
 
       expect(extracted).toHaveLength(1);
-      expect(extracted[0].id).toBe('file-1');
-      expect(extracted[0].status).toBe('completed');
+      const firstExtracted = extracted[0];
+      expect(firstExtracted).toBeDefined();
+      expect(firstExtracted?.id).toBe('file-1');
+      expect(firstExtracted?.status).toBe('completed');
     });
 
     test('should skip reasoning entries with non-completed status', () => {
@@ -352,8 +354,10 @@ describe('Analyst Step File Selection', () => {
       const selected = selectFilesForResponse(files);
 
       expect(selected).toHaveLength(1);
-      expect(selected[0].id).toBe('metric-1');
-      expect(selected[0].fileType).toBe('metric');
+      const firstSelected = selected[0];
+      expect(firstSelected).toBeDefined();
+      expect(firstSelected?.id).toBe('metric-1');
+      expect(firstSelected?.fileType).toBe('metric');
     });
 
     test('should return single dashboard when only one dashboard exists', () => {
@@ -364,8 +368,10 @@ describe('Analyst Step File Selection', () => {
       const selected = selectFilesForResponse(files);
 
       expect(selected).toHaveLength(1);
-      expect(selected[0].id).toBe('dash-1');
-      expect(selected[0].fileType).toBe('dashboard');
+      const firstSelected = selected[0];
+      expect(firstSelected).toBeDefined();
+      expect(firstSelected?.id).toBe('dash-1');
+      expect(firstSelected?.fileType).toBe('dashboard');
     });
 
     test('should return empty array when no files exist', () => {
@@ -384,8 +390,10 @@ describe('Analyst Step File Selection', () => {
       const selected = selectFilesForResponse(files);
 
       expect(selected).toHaveLength(1);
-      expect(selected[0].id).toBe('dash-1');
-      expect(selected[0].fileType).toBe('dashboard');
+      const firstSelected = selected[0];
+      expect(firstSelected).toBeDefined();
+      expect(firstSelected?.id).toBe('dash-1');
+      expect(firstSelected?.fileType).toBe('dashboard');
     });
   });
 
@@ -400,18 +408,24 @@ describe('Analyst Step File Selection', () => {
 
       expect(messages).toHaveLength(2);
 
-      expect(messages[0]).toMatchObject({
+      const firstMessage = messages[0];
+      expect(firstMessage).toBeDefined();
+      expect(firstMessage).toMatchObject({
         type: 'file',
         file_type: 'metric',
         file_name: 'revenue.yml',
         version_number: 1,
         filter_version_id: null,
       });
-      expect(messages[0].metadata[0]).toMatchObject({
-        status: 'completed',
-        message: 'Metric created successfully',
-      });
-      expect(messages[0].metadata[0].timestamp).toBeTypeOf('number');
+      if (firstMessage && firstMessage.type === 'file' && firstMessage.metadata) {
+        const firstMetadata = firstMessage.metadata[0];
+        expect(firstMetadata).toBeDefined();
+        expect(firstMetadata).toMatchObject({
+          status: 'completed',
+          message: 'Metric created successfully',
+        });
+        expect(firstMetadata?.timestamp).toBeTypeOf('number');
+      }
 
       expect(messages[1]).toMatchObject({
         type: 'file',
@@ -435,17 +449,23 @@ describe('Analyst Step File Selection', () => {
 
       expect(messages).toHaveLength(1);
 
-      expect(messages[0]).toMatchObject({
+      const firstMessage = messages[0];
+      expect(firstMessage).toBeDefined();
+      expect(firstMessage).toMatchObject({
         type: 'file',
         file_type: 'dashboard',
         file_name: 'sales_dashboard.yml',
         version_number: 1,
         filter_version_id: null,
       });
-      expect(messages[0].metadata[0]).toMatchObject({
-        status: 'completed',
-        message: 'Dashboard created successfully',
-      });
+      if (firstMessage && firstMessage.type === 'file' && firstMessage.metadata) {
+        const firstMetadata = firstMessage.metadata[0];
+        expect(firstMetadata).toBeDefined();
+        expect(firstMetadata).toMatchObject({
+          status: 'completed',
+          message: 'Dashboard created successfully',
+        });
+      }
     });
 
     test('should generate unique IDs for each message', () => {
@@ -456,9 +476,13 @@ describe('Analyst Step File Selection', () => {
 
       const messages = createFileResponseMessages(files);
 
-      expect(messages[0].id).toBeTypeOf('string');
-      expect(messages[1].id).toBeTypeOf('string');
-      expect(messages[0].id).not.toBe(messages[1].id);
+      const firstMessage = messages[0];
+      const secondMessage = messages[1];
+      expect(firstMessage).toBeDefined();
+      expect(secondMessage).toBeDefined();
+      expect(firstMessage?.id).toBeTypeOf('string');
+      expect(secondMessage?.id).toBeTypeOf('string');
+      expect(firstMessage?.id).not.toBe(secondMessage?.id);
     });
 
     test('should handle empty file array', () => {
@@ -504,7 +528,7 @@ describe('Analyst Step File Selection', () => {
       expect(extracted).toHaveLength(2);
       expect(selected).toHaveLength(2);
       expect(messages).toHaveLength(2);
-      expect(messages.every((m) => m.file_type === 'dashboard')).toBe(true);
+      expect(messages.every((m) => m.type === 'file' && m.file_type === 'dashboard')).toBe(true);
     });
 
     test('Scenario 2: Multiple metrics created - return all metrics', () => {
@@ -551,7 +575,7 @@ describe('Analyst Step File Selection', () => {
       expect(extracted).toHaveLength(3);
       expect(selected).toHaveLength(3);
       expect(messages).toHaveLength(3);
-      expect(messages.every((m) => m.file_type === 'metric')).toBe(true);
+      expect(messages.every((m) => m.type === 'file' && m.file_type === 'metric')).toBe(true);
     });
 
     test('Scenario 3: Single metric created - return the single metric', () => {
@@ -582,7 +606,12 @@ describe('Analyst Step File Selection', () => {
       expect(extracted).toHaveLength(1);
       expect(selected).toHaveLength(1);
       expect(messages).toHaveLength(1);
-      expect(messages[0].file_type).toBe('metric');
+      const firstMessage = messages[0];
+      expect(firstMessage).toBeDefined();
+      expect(firstMessage?.type).toBe('file');
+      if (firstMessage && firstMessage.type === 'file') {
+        expect(firstMessage.file_type).toBe('metric');
+      }
     });
 
     test('Scenario 4: Metrics and dashboards created - return only dashboards', () => {
@@ -646,8 +675,8 @@ describe('Analyst Step File Selection', () => {
       expect(extracted).toHaveLength(4); // 2 metrics + 2 dashboards
       expect(selected).toHaveLength(2); // Only dashboards
       expect(messages).toHaveLength(2);
-      expect(messages.every((m) => m.file_type === 'dashboard')).toBe(true);
-      expect(messages.map((m) => m.file_name)).toEqual([
+      expect(messages.every((m) => m.type === 'file' && m.file_type === 'dashboard')).toBe(true);
+      expect(messages.map((m) => (m.type === 'file' ? m.file_name : ''))).toEqual([
         'sales_dashboard.yml',
         'marketing_dashboard.yml',
       ]);
@@ -689,7 +718,7 @@ describe('Analyst Step File Selection', () => {
       expect(extracted).toHaveLength(2);
       expect(selected).toHaveLength(2);
       expect(messages).toHaveLength(2);
-      expect(messages.every((m) => m.file_type === 'metric')).toBe(true);
+      expect(messages.every((m) => m.type === 'file' && m.file_type === 'metric')).toBe(true);
     });
 
     test('Scenario 6: No files created - return empty', () => {

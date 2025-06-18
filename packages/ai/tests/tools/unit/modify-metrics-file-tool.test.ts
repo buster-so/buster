@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import * as yaml from 'yaml';
 import { z } from 'zod';
+import { validateArrayAccess } from '../../../src/utils/validation-helpers';
 
 // Import the schemas we want to test (extracted from the tool file)
 const columnLabelFormatSchema = z.object({
@@ -103,7 +104,7 @@ function validateSqlBasic(sqlQuery: string): { success: boolean; error?: string 
 function parseAndValidateYaml(ymlContent: string): {
   success: boolean;
   error?: string;
-  data?: unknown;
+  data?: z.infer<typeof metricYmlSchema>;
 } {
   try {
     const parsedYml = yaml.parse(ymlContent);
@@ -176,9 +177,11 @@ chartConfig:
 
       const result = parseAndValidateYaml(updatedTableYaml);
       expect(result.success).toBe(true);
-      expect(result.data?.name).toBe('Updated Sales Summary');
-      expect(result.data?.timeFrame).toBe('Last 60 days');
-      expect(result.data?.chartConfig.selectedChartType).toBe('table');
+      if (result.success && result.data) {
+        expect(result.data.name).toBe('Updated Sales Summary');
+        expect(result.data.timeFrame).toBe('Last 60 days');
+        expect(result.data.chartConfig.selectedChartType).toBe('table');
+      }
     });
 
     test('should validate correct updated metric chart YAML', () => {
@@ -205,10 +208,14 @@ chartConfig:
 
       const result = parseAndValidateYaml(updatedMetricYaml);
       expect(result.success).toBe(true);
-      expect(result.data?.name).toBe('Updated Total Revenue');
-      expect(result.data?.timeFrame).toBe('Year to Date');
-      expect(result.data?.chartConfig.selectedChartType).toBe('metric');
-      expect(result.data?.chartConfig.metricColumnId).toBe('total_revenue');
+      if (result.success && result.data) {
+        expect(result.data.name).toBe('Updated Total Revenue');
+        expect(result.data.timeFrame).toBe('Year to Date');
+        expect(result.data.chartConfig.selectedChartType).toBe('metric');
+        if (result.data.chartConfig.selectedChartType === 'metric') {
+          expect(result.data.chartConfig.metricColumnId).toBe('total_revenue');
+        }
+      }
     });
 
     test('should reject updated YAML with missing required fields', () => {
@@ -321,8 +328,10 @@ chartConfig:
 
       const result = parseAndValidateYaml(complexUpdateYaml);
       expect(result.success).toBe(true);
-      expect(result.data?.chartConfig.showLegend).toBe(true);
-      expect(result.data?.chartConfig.colors).toEqual(['#FF5733', '#33FF57', '#3357FF']);
+      if (result.success && result.data) {
+        expect(result.data.chartConfig.showLegend).toBe(true);
+        expect(result.data.chartConfig.colors).toEqual(['#FF5733', '#33FF57', '#3357FF']);
+      }
     });
   });
 
@@ -392,8 +401,9 @@ chartConfig:
 
       // Basic validation that files array exists and has proper structure
       expect(validUpdateInput.files).toHaveLength(1);
-      expect(validUpdateInput.files[0].id).toBe('f47ac10b-58cc-4372-a567-0e02b2c3d479');
-      expect(typeof validUpdateInput.files[0].yml_content).toBe('string');
+      const firstFile = validateArrayAccess(validUpdateInput.files, 0, 'files');
+      expect(firstFile?.id).toBe('f47ac10b-58cc-4372-a567-0e02b2c3d479');
+      expect(typeof firstFile?.yml_content).toBe('string');
     });
 
     test('should reject update input without file ID', () => {

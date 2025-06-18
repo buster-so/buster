@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, test } from 'vitest';
 import { z } from 'zod';
+import { validateArrayAccess } from '../../../src/utils/validation-helpers';
 
 // Import the schemas we want to test (extracted from the tool file)
 const inputSchema = z.object({
@@ -276,10 +277,14 @@ Create visualizations for sales analysis.
 
       const result = extractTodosFromPlanText(plan);
       expect(result).toHaveLength(4);
-      expect(result[0].todo).toBe('Create sales dashboard');
-      expect(result[1].todo).toBe('Add monthly trend chart');
-      expect(result[2].todo).toBe('Include top products visualization');
-      expect(result[3].todo).toBe('Review and publish');
+      const todo0 = validateArrayAccess(result, 0, 'numbered todos');
+      const todo1 = validateArrayAccess(result, 1, 'numbered todos');
+      const todo2 = validateArrayAccess(result, 2, 'numbered todos');
+      const todo3 = validateArrayAccess(result, 3, 'numbered todos');
+      expect(todo0.todo).toBe('Create sales dashboard');
+      expect(todo1.todo).toBe('Add monthly trend chart');
+      expect(todo2.todo).toBe('Include top products visualization');
+      expect(todo3.todo).toBe('Review and publish');
       expect(result.every((todo) => todo.completed === false)).toBe(true);
     });
 
@@ -293,10 +298,14 @@ Create visualizations for sales analysis.
 
       const result = extractTodosFromPlanText(plan);
       expect(result).toHaveLength(4);
-      expect(result[0].todo).toBe('Build comprehensive analytics dashboard');
-      expect(result[1].todo).toBe('Create customer segmentation chart');
-      expect(result[2].todo).toBe('Add revenue tracking visualization');
-      expect(result[3].todo).toBe('Implement data filtering options');
+      const todo0 = validateArrayAccess(result, 0, 'bullet point todos');
+      const todo1 = validateArrayAccess(result, 1, 'bullet point todos');
+      const todo2 = validateArrayAccess(result, 2, 'bullet point todos');
+      const todo3 = validateArrayAccess(result, 3, 'bullet point todos');
+      expect(todo0.todo).toBe('Build comprehensive analytics dashboard');
+      expect(todo1.todo).toBe('Create customer segmentation chart');
+      expect(todo2.todo).toBe('Add revenue tracking visualization');
+      expect(todo3.todo).toBe('Implement data filtering options');
     });
 
     test('should extract action-word based todos', () => {
@@ -310,11 +319,16 @@ Configure automated reporting
 
       const result = extractTodosFromPlanText(plan);
       expect(result).toHaveLength(5);
-      expect(result[0].todo).toBe('Create a sales performance dashboard');
-      expect(result[1].todo).toBe('Build monthly trend visualizations');
-      expect(result[2].todo).toBe('Implement customer analytics');
-      expect(result[3].todo).toBe('Add data export functionality');
-      expect(result[4].todo).toBe('Configure automated reporting');
+      const todo0 = validateArrayAccess(result, 0, 'action word todos');
+      const todo1 = validateArrayAccess(result, 1, 'action word todos');
+      const todo2 = validateArrayAccess(result, 2, 'action word todos');
+      const todo3 = validateArrayAccess(result, 3, 'action word todos');
+      const todo4 = validateArrayAccess(result, 4, 'action word todos');
+      expect(todo0.todo).toBe('Create a sales performance dashboard');
+      expect(todo1.todo).toBe('Build monthly trend visualizations');
+      expect(todo2.todo).toBe('Implement customer analytics');
+      expect(todo3.todo).toBe('Add data export functionality');
+      expect(todo4.todo).toBe('Configure automated reporting');
     });
 
     test('should limit to 15 todos maximum', () => {
@@ -335,8 +349,10 @@ Configure automated reporting
 
       const result = extractTodosFromPlanText(plan);
       expect(result).toHaveLength(2);
-      expect(result[0].todo).toBe('Create comprehensive sales dashboard');
-      expect(result[1].todo).toBe('Add detailed monthly trend analysis');
+      const todo0 = validateArrayAccess(result, 0, 'filtered todos');
+      const todo1 = validateArrayAccess(result, 1, 'filtered todos');
+      expect(todo0.todo).toBe('Create comprehensive sales dashboard');
+      expect(todo1.todo).toBe('Add detailed monthly trend analysis');
     });
 
     test('should filter out very long todos', () => {
@@ -349,7 +365,8 @@ Configure automated reporting
 
       const result = extractTodosFromPlanText(plan);
       expect(result).toHaveLength(1);
-      expect(result[0].todo).toBe('Add simple chart');
+      const todo0 = validateArrayAccess(result, 0, 'long todo filter');
+      expect(todo0.todo).toBe('Add simple chart');
     });
 
     test('should provide fallback todo when none found', () => {
@@ -363,14 +380,16 @@ Some general notes about the analysis.
 
       const result = extractTodosFromPlanText(plan);
       expect(result).toHaveLength(1);
-      expect(result[0].todo).toBe('Review and execute the provided plan');
-      expect(result[0].completed).toBe(false);
+      const todo0 = validateArrayAccess(result, 0, 'fallback todo');
+      expect(todo0.todo).toBe('Review and execute the provided plan');
+      expect(todo0.completed).toBe(false);
     });
 
     test('should handle empty plan', () => {
       const result = extractTodosFromPlanText('');
       expect(result).toHaveLength(1);
-      expect(result[0].todo).toBe('Review and execute the provided plan');
+      const todo0 = validateArrayAccess(result, 0, 'empty plan todo');
+      expect(todo0.todo).toBe('Review and execute the provided plan');
     });
   });
 
@@ -393,8 +412,9 @@ Some general notes about the analysis.
       expect(mockRuntimeContext.get('plan_available')).toBe(true);
       const savedTodos = mockRuntimeContext.get('todos');
       expect(savedTodos).toHaveLength(3);
-      expect(savedTodos[0].todo).toBe('Create sales dashboard');
-      expect(savedTodos[0].completed).toBe(false);
+      const savedTodoItem0 = validateArrayAccess(savedTodos as TodoItem[], 0, 'saved todos');
+      expect(savedTodoItem0.todo).toBe('Create sales dashboard');
+      expect(savedTodoItem0.completed).toBe(false);
     });
 
     test('should throw error when runtime context is missing', async () => {
@@ -423,7 +443,8 @@ Some random notes without actionable items.
       expect(mockRuntimeContext.get('plan_available')).toBe(true);
       const savedTodos = mockRuntimeContext.get('todos');
       expect(savedTodos).toHaveLength(1);
-      expect(savedTodos[0].todo).toBe('Review and execute the provided plan');
+      const savedTodoItem0 = validateArrayAccess(savedTodos as TodoItem[], 0, 'no todos plan');
+      expect(savedTodoItem0.todo).toBe('Review and execute the provided plan');
     });
 
     test('should format todos correctly', async () => {
@@ -455,11 +476,21 @@ Some random notes without actionable items.
 
       const savedTodos = mockRuntimeContext.get('todos');
       expect(savedTodos).toHaveLength(2);
-      expect(savedTodos[0]).toEqual({
+      const savedTodoItem0 = validateArrayAccess(
+        savedTodos as TodoItem[],
+        0,
+        'saved todo structure'
+      );
+      const savedTodoItem1 = validateArrayAccess(
+        savedTodos as TodoItem[],
+        1,
+        'saved todo structure'
+      );
+      expect(savedTodoItem0).toEqual({
         todo: 'First task',
         completed: false,
       });
-      expect(savedTodos[1]).toEqual({
+      expect(savedTodoItem1).toEqual({
         todo: 'Second task',
         completed: false,
       });
@@ -479,7 +510,7 @@ Some random notes without actionable items.
       await expect(
         processCreatePlanStraightforward(
           { plan: '1. Test task' },
-          faultyContext as MockRuntimeContext
+          faultyContext as unknown as MockRuntimeContext
         )
       ).rejects.toThrow('State update error');
     });
@@ -522,7 +553,8 @@ Some random notes without actionable items.
         const result = extractTodosFromPlanText(plan);
 
         expect(result).toHaveLength(1);
-        expect(result[0].todo).toBe(`${verb} a comprehensive dashboard`);
+        const todo0 = validateArrayAccess(result, 0, 'verb recognition');
+        expect(todo0.todo).toBe(`${verb} a comprehensive dashboard`);
       }
     });
 
@@ -535,9 +567,12 @@ IMPLEMENT features
 
       const result = extractTodosFromPlanText(plan);
       expect(result).toHaveLength(3);
-      expect(result[0].todo).toBe('CREATE dashboard');
-      expect(result[1].todo).toBe('Build analytics');
-      expect(result[2].todo).toBe('IMPLEMENT features');
+      const todo0 = validateArrayAccess(result, 0, 'case insensitive verbs');
+      const todo1 = validateArrayAccess(result, 1, 'case insensitive verbs');
+      const todo2 = validateArrayAccess(result, 2, 'case insensitive verbs');
+      expect(todo0.todo).toBe('CREATE dashboard');
+      expect(todo1.todo).toBe('Build analytics');
+      expect(todo2.todo).toBe('IMPLEMENT features');
     });
 
     test('should handle numbered lists with various formats', () => {
@@ -549,9 +584,12 @@ IMPLEMENT features
 
       const result = extractTodosFromPlanText(plan);
       expect(result).toHaveLength(3);
-      expect(result[0].todo).toBe('Create dashboard (space after period)');
-      expect(result[1].todo).toBe('Build charts (space after period)');
-      expect(result[2].todo).toBe('Add filters (multiple spaces)');
+      const todo0 = validateArrayAccess(result, 0, 'numbered list formats');
+      const todo1 = validateArrayAccess(result, 1, 'numbered list formats');
+      const todo2 = validateArrayAccess(result, 2, 'numbered list formats');
+      expect(todo0.todo).toBe('Create dashboard (space after period)');
+      expect(todo1.todo).toBe('Build charts (space after period)');
+      expect(todo2.todo).toBe('Add filters (multiple spaces)');
     });
   });
 });

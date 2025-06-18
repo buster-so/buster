@@ -80,10 +80,8 @@ async function processDone(_input: DoneToolExecuteInput): Promise<DoneOutput> {
 
 // Main done function with tracing
 const executeDone = wrapTraced(
-  async ({
-    context,
-  }: { context: DoneToolExecuteInput }): Promise<z.infer<typeof doneOutputSchema>> => {
-    return await processDone(context);
+  async (input: DoneToolExecuteInput): Promise<z.infer<typeof doneOutputSchema>> => {
+    return await processDone(input);
   },
   { name: 'done-tool' }
 );
@@ -95,7 +93,9 @@ export const doneTool = createTool({
     "Marks all remaining unfinished tasks as complete, sends a final response to the user, and ends the workflow. Use this when the workflow is finished. This must be in markdown format and not use the '•' bullet character.",
   inputSchema: doneInputSchema,
   outputSchema: doneOutputSchema,
-  execute: executeDone,
+  execute: async ({ context }) => {
+    return await executeDone(context as DoneToolExecuteInput);
+  },
 });
 
 export default doneTool;

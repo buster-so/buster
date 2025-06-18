@@ -7,7 +7,7 @@ import type { CoreMessage, StepResult, StreamTextResult, TextStreamPart, ToolSet
  * The any types are part of Mastra's Agent interface for tools and memory
  */
 // biome-ignore lint/suspicious/noExplicitAny: Mastra Agent framework requires these any types
-type MastraAgent = Agent<string, Record<string, any>, Record<string, any>>;
+export type MastraAgent = Agent<string, Record<string, any>, Record<string, any>>;
 
 export interface RetryableError {
   type:

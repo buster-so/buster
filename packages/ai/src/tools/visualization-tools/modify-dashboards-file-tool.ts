@@ -7,6 +7,12 @@ import { z } from 'zod';
 import { db } from '../../../../database/src/connection';
 import { dashboardFiles, metricFiles } from '../../../../database/src/schema';
 import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
+import {
+  addDashboardVersionToHistory,
+  dashboardYmlToVersionContent,
+  getLatestVersionNumber,
+} from './version-history-helpers';
+import type { DashboardVersionHistory } from './version-history-types';
 
 // Core interfaces matching Rust structs
 interface FileUpdate {
@@ -36,16 +42,6 @@ interface ModificationResult {
 interface ValidationResult {
   success: boolean;
   message: string;
-  [key: string]: unknown;
-}
-
-interface VersionHistoryEntry {
-  versionNumber: number;
-  [key: string]: unknown;
-}
-
-interface VersionHistory {
-  versions?: VersionHistoryEntry[];
   [key: string]: unknown;
 }
 
@@ -328,40 +324,18 @@ const modifyDashboardFiles = wrapTraced(
 
           const { dashboardFile: updatedFile, dashboardYml, results } = updateResult;
 
-          // Calculate next version number from existing version history
-          const currentVersionHistory = existingFile.versionHistory as
-            | VersionHistory
-            | null
-            | undefined;
-          let nextVersion = 1;
-
-          if (currentVersionHistory?.versions && Array.isArray(currentVersionHistory.versions)) {
-            const versions = currentVersionHistory.versions;
-            if (versions.length > 0) {
-              const latestVersion = versions[versions.length - 1];
-              if (
-                latestVersion &&
-                typeof latestVersion === 'object' &&
-                'versionNumber' in latestVersion
-              ) {
-                nextVersion = (latestVersion.versionNumber || 0) + 1;
-              }
-            }
-          }
+          // Get current version history
+          const currentVersionHistory =
+            existingFile.versionHistory as DashboardVersionHistory | null;
 
           // Add new version to history
-          const newVersionHistory: VersionHistory = {
-            versions: [
-              ...(currentVersionHistory?.versions || []),
-              {
-                versionNumber: nextVersion,
-                content: dashboardYml,
-                createdAt: new Date().toISOString(),
-              },
-            ],
-          };
+          const updatedVersionHistory = addDashboardVersionToHistory(
+            currentVersionHistory,
+            dashboardYmlToVersionContent(dashboardYml),
+            new Date().toISOString()
+          );
 
-          updatedFile.versionHistory = newVersionHistory;
+          updatedFile.versionHistory = updatedVersionHistory;
 
           // Ensure the name field is updated
           updatedFile.name = dashboardYml.name;
@@ -394,9 +368,9 @@ const modifyDashboardFiles = wrapTraced(
         // Add successful files to output
         for (const file of dashboardFilesToUpdate) {
           // Get the latest version number
-          const versionHistory = file.versionHistory as VersionHistory;
-          const latestVersion =
-            versionHistory?.versions?.[versionHistory.versions.length - 1]?.versionNumber || 1;
+          const latestVersion = getLatestVersionNumber(
+            file.versionHistory as DashboardVersionHistory
+          );
 
           files.push({
             id: file.id,

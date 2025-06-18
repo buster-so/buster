@@ -1,8 +1,8 @@
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { lsTool } from '@/tools/file-tools/ls-tool';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+import { lsTool } from '../../../src/tools/file-tools/ls-tool';
 
 describe('LS Tool Unit Tests', () => {
   let tempDir: string;
@@ -69,9 +69,7 @@ describe('LS Tool Unit Tests', () => {
   });
 
   test('should list directory contents successfully', async () => {
-    const result = await lsTool.execute({
-      context: { path: tempDir },
-    });
+    const result = await lsTool.execute({ path: tempDir });
 
     expect(result.path).toBe(tempDir);
     expect(result.total_items).toBeGreaterThan(0);
@@ -130,7 +128,7 @@ describe('LS Tool Unit Tests', () => {
 
   test('should identify file types correctly', async () => {
     const result = await lsTool.execute({
-      context: { path: tempDir },
+      path: tempDir,
     });
 
     const file = result.items.find((item) => item.name === 'file1.txt');
@@ -142,7 +140,8 @@ describe('LS Tool Unit Tests', () => {
 
   test('should format file sizes in human readable format', async () => {
     const result = await lsTool.execute({
-      context: { path: tempDir, human_readable: true },
+      path: tempDir,
+      human_readable: true,
     });
 
     const file = result.items.find((item) => item.name === 'file1.txt');
@@ -193,7 +192,7 @@ describe('LS Tool Unit Tests', () => {
 
   test('should format permissions correctly', async () => {
     const result = await lsTool.execute({
-      context: { path: tempDir },
+      path: tempDir,
     });
 
     const file = result.items.find((item) => item.name === 'file1.txt');
@@ -202,7 +201,7 @@ describe('LS Tool Unit Tests', () => {
 
   test('should include modification timestamps', async () => {
     const result = await lsTool.execute({
-      context: { path: tempDir },
+      path: tempDir,
     });
 
     const file = result.items.find((item) => item.name === 'file1.txt');
