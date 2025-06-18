@@ -70,6 +70,9 @@ export const FileContainer: React.FC<FileContainerProps> = ({ children }) => {
   });
 
   const rightChildren = useMemo(() => {
+    if (!debouncedSelectedFileViewSecondary) {
+      return null;
+    }
     return (
       <FileContainerSecondary
         selectedFile={selectedFile}
@@ -93,8 +96,7 @@ export const FileContainer: React.FC<FileContainerProps> = ({ children }) => {
           <FileContainerHeader />
         ),
         []
-      )}
-      headerClassName="">
+      )}>
       <AppSplitter
         ref={appSplitterRef}
         autoSaveId={autoSaveId}
@@ -106,6 +108,7 @@ export const FileContainer: React.FC<FileContainerProps> = ({ children }) => {
         preserveSide={'right'}
         rightPanelMinSize={250}
         rightPanelMaxSize={385}
+        bustStorageOnInit={!debouncedSelectedFileViewSecondary}
       />
     </AppPageLayout>
   );

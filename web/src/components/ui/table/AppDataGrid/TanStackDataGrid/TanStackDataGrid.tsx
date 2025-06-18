@@ -19,6 +19,7 @@ import { defaultCellFormat, defaultHeaderFormat } from './defaultFormat';
 import { SortColumnWrapper } from './SortColumnWrapper';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
+import { MIN_COLUMN_WIDTH } from './constants';
 
 export interface TanStackDataGridProps {
   className?: string;

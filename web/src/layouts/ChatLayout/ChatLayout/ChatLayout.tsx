@@ -42,6 +42,7 @@ export const ChatLayout: React.FC<ChatSplitterProps> = ({ children }) => {
   const rightPanelMaxSize = selectedLayout === 'chat-only' ? '0px' : undefined;
   const renderLeftPanel = selectedLayout !== 'file-only';
   const renderRightPanel = selectedLayout !== 'chat-only';
+  const bustStorageOnInit = selectedLayout === 'chat-only' || selectedLayout === 'file-only';
 
   useMount(() => {
     setMounted(true); //we need to wait for the app splitter to be mounted because this is nested in the app splitter
@@ -84,7 +85,7 @@ export const ChatLayout: React.FC<ChatSplitterProps> = ({ children }) => {
           rightPanelMaxSize={rightPanelMaxSize}
           renderLeftPanel={renderLeftPanel}
           renderRightPanel={renderRightPanel}
-          bustStorageOnInit={false}
+          bustStorageOnInit={bustStorageOnInit}
         />
       </ChatContextProvider>
     </ChatLayoutContextProvider>
