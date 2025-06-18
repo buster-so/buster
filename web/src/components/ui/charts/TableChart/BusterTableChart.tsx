@@ -33,7 +33,6 @@ const BusterTableChartBase: React.FC<BusterTableChartProps> = ({
   const onChangeConfig = useMemoizedFn((config: Partial<IBusterMetricChartConfig>) => {
     if (readOnly) return;
     onUpdateMetricChartConfig({ chartConfig: config });
-
     if (
       (tableColumnWidths === null || isEmpty(tableColumnWidths)) &&
       !isEmpty(config.tableColumnWidths)
@@ -43,7 +42,6 @@ const BusterTableChartBase: React.FC<BusterTableChartProps> = ({
   });
 
   const onUpdateTableColumnOrder = useMemoizedFn((columns: string[]) => {
-    if (readOnly) return;
     const config: Partial<IBusterMetricChartConfig> = {
       tableColumnOrder: columns
     };

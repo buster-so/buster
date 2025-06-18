@@ -74,6 +74,7 @@ export const useAutoChangeLayout = ({
       previousLastMessageId.current = lastMessageId;
 
       onSetSelectedFile({ id: lastMessageId, type: 'reasoning', versionNumber: undefined });
+      console.log('triggering auto change layout to open reasoning');
     }
 
     //this happen will when the chat is completed and it WAS streaming
