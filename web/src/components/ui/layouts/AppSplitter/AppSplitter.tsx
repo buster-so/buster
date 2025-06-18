@@ -272,7 +272,14 @@ export const AppSplitter = React.memo(
           }
 
           // Handle container resize when one panel is at 0px
-          if (prev.isInitialized && prev.containerSize > 0 && size > 0 && savedLayout !== null) {
+          // Only adjust layout during resize if we're not currently animating
+          if (
+            prev.isInitialized &&
+            prev.containerSize > 0 &&
+            size > 0 &&
+            savedLayout !== null &&
+            !prev.isAnimating
+          ) {
             const currentSavedSize = savedLayout;
 
             // If a panel is at 0px, preserve the other panel's size during resize

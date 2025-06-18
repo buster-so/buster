@@ -99,7 +99,7 @@ export const useLayoutConfig = ({
         animateOpenSplitter('right');
 
         //if the chat is open, we need to wait for the splitter to close before opening the secondary view
-        const waitToOpen = !appSplitterRef.current?.isSideClosed('left') && chatId ? 250 : 0; //I used to wait 250ms, but I changed the app splitter and I think it fixed the bug
+        const waitToOpen = !appSplitterRef.current?.isSideClosed('left') && chatId ? 0 : 0; //I used to wait 250ms, but I changed the app splitter and I think it fixed the bug
         await timeout(waitToOpen);
       } else if (chatId) {
         animateOpenSplitter('both');
