@@ -25,95 +25,107 @@ export const StreamingMessageCode: React.FC<
     collapsible?: 'chevron' | 'overlay-peek' | false;
     buttons?: React.ReactNode;
   }
-> = ({ isCompletedStream, file, file_name, version_number, buttons, collapsible = false }) => {
-  const { text = '', modified } = file;
+> = React.memo(
+  ({
+    isCompletedStream,
+    file,
+    file_type,
+    file_name,
+    version_number,
+    buttons,
+    collapsible = false
+  }) => {
+    const { text = '', modified } = file;
 
-  const [lineSegments, setLineSegments] = useState<LineSegment[]>([]);
+    const [lineSegments, setLineSegments] = useState<LineSegment[]>([]);
 
-  useEffect(() => {
-    const processText = () => {
-      // Split the text into lines, keeping empty lines
-      const lines = (text || '').split('\n');
-      const segments: LineSegment[] = [];
-      let currentLine = 1;
+    useEffect(() => {
+      const processText = () => {
+        // Split the text into lines, keeping empty lines
+        const lines = (text || '').split('\n');
+        const segments: LineSegment[] = [];
+        let currentLine = 1;
 
-      if (!modified || modified.length === 0) {
-        for (const line of lines) {
-          segments.push({
-            type: 'text',
-            content: line,
-            lineNumber: currentLine++
-          });
-        }
-      } else {
-        // Sort modified ranges to ensure proper processing
-        const sortedModified = [...modified].sort((a, b) => a[0] - b[0]);
+        if (!modified || modified.length === 0) {
+          for (const line of lines) {
+            segments.push({
+              type: 'text',
+              content: line,
+              lineNumber: currentLine++
+            });
+          }
+        } else {
+          // Sort modified ranges to ensure proper processing
+          const sortedModified = [...modified].sort((a, b) => a[0] - b[0]);
 
-        let lastEnd = 0;
-        for (const [start, end] of sortedModified) {
-          // Add visible lines before the hidden section
-          for (let i = lastEnd; i < start - 1; i++) {
+          let lastEnd = 0;
+          for (const [start, end] of sortedModified) {
+            // Add visible lines before the hidden section
+            for (let i = lastEnd; i < start - 1; i++) {
+              segments.push({
+                type: 'text',
+                content: lines[i],
+                lineNumber: currentLine++
+              });
+            }
+
+            // Add hidden section
+            const hiddenLineCount = end - start + 1;
+            segments.push({
+              type: 'hidden',
+              content: '',
+              lineNumber: currentLine,
+              numberOfLines: hiddenLineCount
+            });
+            currentLine += hiddenLineCount;
+            lastEnd = end;
+          }
+
+          // Add remaining visible lines after the last hidden section
+          for (let i = lastEnd; i < lines.length; i++) {
             segments.push({
               type: 'text',
               content: lines[i],
               lineNumber: currentLine++
             });
           }
-
-          // Add hidden section
-          const hiddenLineCount = end - start + 1;
-          segments.push({
-            type: 'hidden',
-            content: '',
-            lineNumber: currentLine,
-            numberOfLines: hiddenLineCount
-          });
-          currentLine += hiddenLineCount;
-          lastEnd = end;
         }
 
-        // Add remaining visible lines after the last hidden section
-        for (let i = lastEnd; i < lines.length; i++) {
-          segments.push({
-            type: 'text',
-            content: lines[i],
-            lineNumber: currentLine++
-          });
-        }
+        setLineSegments(segments);
+      };
+
+      processText();
+    }, [text, modified]);
+
+    const fileInfo = useMemo(() => {
+      if (file_type === 'dashboard' || file_type === 'metric') {
+        return <TextAndVersionPill fileName={file_name} versionNumber={version_number} />;
       }
 
-      setLineSegments(segments);
-    };
+      return <Text>{file_name}</Text>;
+    }, [file_name, version_number]);
 
-    processText();
-  }, [text, modified]);
+    return (
+      <FileCard collapsible={collapsible} fileName={fileInfo} headerButtons={buttons}>
+        <div className="w-full overflow-x-auto p-3">
+          {lineSegments.map((segment, index) => (
+            <div
+              key={`${segment.lineNumber}-${index}`}
+              className={cn('line-number pr-1', !isCompletedStream && 'fade-in duration-500')}>
+              {segment.type === 'text' ? (
+                <MemoizedSyntaxHighlighter lineNumber={segment.lineNumber} text={segment.content} />
+              ) : (
+                <HiddenSection numberOfLinesUnmodified={segment.numberOfLines || 0} />
+              )}
+            </div>
+          ))}
+        </div>
+      </FileCard>
+    );
+  }
+);
 
-  return (
-    <FileCard
-      collapsible={collapsible}
-      fileName={useMemo(
-        () => (
-          <TextAndVersionPill fileName={file_name} versionNumber={version_number} />
-        ),
-        [file_name, version_number]
-      )}
-      headerButtons={buttons}>
-      <div className="w-full overflow-x-auto p-3">
-        {lineSegments.map((segment, index) => (
-          <div
-            key={`${segment.lineNumber}-${index}`}
-            className={cn('line-number pr-1', !isCompletedStream && 'fade-in duration-500')}>
-            {segment.type === 'text' ? (
-              <MemoizedSyntaxHighlighter lineNumber={segment.lineNumber} text={segment.content} />
-            ) : (
-              <HiddenSection numberOfLinesUnmodified={segment.numberOfLines || 0} />
-            )}
-          </div>
-        ))}
-      </div>
-    </FileCard>
-  );
-};
+StreamingMessageCode.displayName = 'StreamingMessageCode';
 
 const HiddenSection: React.FC<{
   numberOfLinesUnmodified: number;

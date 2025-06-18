@@ -13,6 +13,8 @@ import { queryKeys } from '@/api/query_keys';
 import { useMemoizedFn, useUnmount } from '@/hooks';
 import last from 'lodash/last';
 
+const INITIAL_THOUGHT = 'Thinking...';
+
 export const useBlackBoxMessage = () => {
   const timeoutRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const getChatMessageMemoized = useGetChatMessageMemoized();
@@ -33,9 +35,12 @@ export const useBlackBoxMessage = () => {
   });
 
   const addBlackBoxMessage = useMemoizedFn(({ messageId }: { messageId: string }) => {
-    const randomThought = getRandomThought();
     const options = queryKeys.chatsBlackBoxMessages(messageId);
-    queryClient.setQueryData(options.queryKey, randomThought);
+    const existingMessage = queryClient.getQueryData(options.queryKey);
+
+    // If no existing message, use "Thinking..." as the first message
+    const thought = existingMessage ? getRandomThought(existingMessage as string) : INITIAL_THOUGHT;
+    queryClient.setQueryData(options.queryKey, thought);
   });
 
   const checkBlackBoxMessage = useMemoizedFn(
