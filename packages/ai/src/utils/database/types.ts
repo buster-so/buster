@@ -183,7 +183,7 @@ export function hasFailureIndicators(entry: unknown): boolean {
   // For file entries, don't reject the entire entry if individual files failed
   // Individual file failures are handled at the file level in extractFilesFromReasoning
   // Only reject if the entry itself has failure indicators
-  
+
   return false;
 }
 
@@ -193,15 +193,15 @@ export function hasFailureIndicators(entry: unknown): boolean {
  */
 export function hasFileFailureIndicators(file: unknown): boolean {
   if (!file || typeof file !== 'object') return false;
-  
+
   const fileObj = file as Record<string, unknown>;
-  
+
   // Check file-level status
   if (fileObj.status === 'failed') return true;
-  
+
   // Check if file has error-related fields
   if (fileObj.error || fileObj.hasError) return true;
-  
+
   return false;
 }
 

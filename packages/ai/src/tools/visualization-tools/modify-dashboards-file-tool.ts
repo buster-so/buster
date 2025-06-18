@@ -131,12 +131,12 @@ function parseAndValidateYaml(ymlContent: string): {
     const transformedData: DashboardYml = {
       name: validationResult.data.name,
       description: validationResult.data.description,
-      rows: validationResult.data.rows.map(row => ({
+      rows: validationResult.data.rows.map((row) => ({
         id: row.id,
         items: row.items,
         columnSizes: row.column_sizes,
-        rowHeight: undefined // Optional field, set to undefined if not provided
-      }))
+        rowHeight: undefined, // Optional field, set to undefined if not provided
+      })),
     };
 
     return { success: true, data: transformedData };
