@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { grepTool } from '../../../src/tools/file-tools/grep-tool';
+import { validateArrayAccess } from '../../../src/utils/validation-helpers';
 
 describe('Grep Tool Unit Tests', () => {
   let tempDir: string;
@@ -176,11 +177,9 @@ describe('App', () => {
 
   test('should find simple string matches', async () => {
     const result = await grepTool.execute({
-      context: {
-        pattern: 'express',
-        path: tempDir,
-        case_sensitive: true,
-      },
+      pattern: 'express',
+      path: tempDir,
+      case_sensitive: true,
     });
 
     expect(result.pattern).toBe('express');
@@ -199,11 +198,9 @@ describe('App', () => {
 
   test('should handle case insensitive search', async () => {
     const result = await grepTool.execute({
-      context: {
-        pattern: 'EXPRESS',
+      pattern: 'EXPRESS',
         path: tempDir,
         case_sensitive: false,
-      },
     });
 
     expect(result.total_matches).toBeGreaterThan(0);
@@ -217,11 +214,9 @@ describe('App', () => {
 
   test('should find regex patterns', async () => {
     const result = await grepTool.execute({
-      context: {
-        pattern: 'router\\.(get|post)',
+      pattern: 'router\\.(get|post)',
         path: tempDir,
         regex: true,
-      },
     });
 
     expect(result.total_matches).toBeGreaterThan(0);
@@ -236,11 +231,9 @@ describe('App', () => {
 
   test('should handle whole word matching', async () => {
     const result = await grepTool.execute({
-      context: {
-        pattern: 'app',
+      pattern: 'app',
         path: tempDir,
         whole_word: true,
-      },
     });
 
     // Should find 'app' as a whole word, not within other words
@@ -256,11 +249,9 @@ describe('App', () => {
 
   test('should include only specified file patterns', async () => {
     const result = await grepTool.execute({
-      context: {
-        pattern: 'React',
+      pattern: 'React',
         path: tempDir,
         include: ['**/*.tsx', '**/*.ts'],
-      },
     });
 
     // Should only search TypeScript and TSX files
@@ -271,11 +262,9 @@ describe('App', () => {
 
   test('should exclude specified file patterns', async () => {
     const result = await grepTool.execute({
-      context: {
-        pattern: 'test',
+      pattern: 'test',
         path: tempDir,
         exclude: ['**/tests/**', '**/*.test.*'],
-      },
     });
 
     // Should not find matches in test files
@@ -287,11 +276,9 @@ describe('App', () => {
 
   test('should limit matches per file when max_count is specified', async () => {
     const result = await grepTool.execute({
-      context: {
-        pattern: 'router',
+      pattern: 'router',
         path: tempDir,
         max_count: 1,
-      },
     });
 
     // Group matches by file
@@ -308,31 +295,27 @@ describe('App', () => {
 
   test('should provide context lines when requested', async () => {
     const result = await grepTool.execute({
-      context: {
-        pattern: 'router.get',
+      pattern: 'router.get',
         path: tempDir,
         context_lines: 2,
-      },
     });
 
     expect(result.matches.length).toBeGreaterThan(0);
 
-    const matchWithContext = result.matches[0];
-    expect(matchWithContext.context_before.length).toBeGreaterThanOrEqual(0);
-    expect(matchWithContext.context_after.length).toBeGreaterThanOrEqual(0);
+    const matchWithContext = validateArrayAccess(result.matches, 0, 'matches');
+    expect(matchWithContext?.context_before?.length).toBeGreaterThanOrEqual(0);
+    expect(matchWithContext?.context_after?.length).toBeGreaterThanOrEqual(0);
 
     // Context should not exceed requested number of lines
-    expect(matchWithContext.context_before.length).toBeLessThanOrEqual(2);
-    expect(matchWithContext.context_after.length).toBeLessThanOrEqual(2);
+    expect(matchWithContext?.context_before?.length).toBeLessThanOrEqual(2);
+    expect(matchWithContext?.context_after?.length).toBeLessThanOrEqual(2);
   });
 
   test('should handle empty pattern error', async () => {
     await expect(
       grepTool.execute({
-        context: {
-          pattern: '',
-          path: tempDir,
-        },
+        pattern: '',
+        path: tempDir,
       })
     ).rejects.toThrow('Pattern cannot be empty');
   });
@@ -340,10 +323,8 @@ describe('App', () => {
   test('should handle non-absolute paths', async () => {
     await expect(
       grepTool.execute({
-        context: {
-          pattern: 'test',
-          path: 'relative/path',
-        },
+        pattern: 'test',
+        path: 'relative/path',
       })
     ).rejects.toThrow('Path must be absolute');
   });
@@ -385,12 +366,10 @@ function example() {
     );
 
     const result = await grepTool.execute({
-      context: {
-        pattern: 'return \\{[^}]+\\}',
+      pattern: 'return \\{[^}]+\\}',
         path: tempDir,
         regex: true,
         multiline: true,
-      },
     });
 
     // This test may not work with fallback implementation
@@ -400,10 +379,8 @@ function example() {
 
   test('should return accurate file statistics', async () => {
     const result = await grepTool.execute({
-      context: {
-        pattern: 'import',
+      pattern: 'import',
         path: tempDir,
-      },
     });
 
     expect(result.files_searched).toBeGreaterThan(0);
@@ -424,11 +401,9 @@ Pattern: /^[a-z]+$/
     );
 
     const result = await grepTool.execute({
-      context: {
-        pattern: '$10.99',
+      pattern: '$10.99',
         path: tempDir,
         regex: false, // Literal search
-      },
     });
 
     expect(result.total_matches).toBe(1);
@@ -441,10 +416,8 @@ Pattern: /^[a-z]+$/
     writeFileSync(join(tempDir, 'binary.bin'), binaryContent);
 
     const result = await grepTool.execute({
-      context: {
-        pattern: 'test',
+      pattern: 'test',
         path: tempDir,
-      },
     });
 
     // Should not crash, may or may not find matches in binary files
