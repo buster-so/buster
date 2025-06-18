@@ -91,6 +91,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
   private fileMessagesAdded = false; // Track if file messages have been added
   private deferDoneToolResponse = false; // Track if we should defer doneTool response
   private pendingDoneToolEntry: ResponseEntry | null = null; // Store deferred doneTool entry
+  private doneToolResponseId: string | null = null; // Track ID of temporarily added doneTool response
 
   constructor(
     messageId: string | null,
@@ -356,7 +357,24 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       if (chunk.toolName === 'doneTool' && this.hasCompletedFiles()) {
         // Mark that we should defer this response
         this.deferDoneToolResponse = true;
-        // Don't create response entry yet - will be created during deltas/complete
+        this.doneToolResponseId = chunk.toolCallId;
+
+        // Create response entry and add it to response history for streaming
+        // It will be reordered later when file messages are added
+        const parseResult = {
+          parsed: {},
+          isComplete: false,
+          extractedValues: new Map(),
+        };
+        const responseEntry = this.createResponseEntry(
+          chunk.toolCallId,
+          chunk.toolName,
+          parseResult
+        );
+        if (responseEntry) {
+          this.state.responseHistory.push(responseEntry);
+          this.pendingDoneToolEntry = responseEntry;
+        }
       } else {
         // Create initial empty response entry that will be updated by deltas
         const parseResult = {
@@ -458,20 +476,29 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       if (isResponseTool) {
         // Handle response tools (doneTool, respondWithoutAnalysis)
         if (inProgress.toolName === 'doneTool' && this.deferDoneToolResponse) {
-          // Update pending entry if exists, otherwise create new one
-          if (this.pendingDoneToolEntry) {
+          // Find the response entry in the response history
+          const existingResponse = this.state.responseHistory.find(
+            (r) => r && typeof r === 'object' && 'id' in r && r.id === chunk.toolCallId
+          );
+
+          if (existingResponse) {
+            // Update the entry in response history (for streaming)
             this.updateResponseEntryWithOptimisticValues(
-              this.pendingDoneToolEntry,
+              existingResponse,
               inProgress.toolName,
               parseResult
             );
+            // Also update the pending entry reference
+            this.pendingDoneToolEntry = existingResponse;
           } else {
+            // Shouldn't happen, but handle gracefully
             const responseEntry = this.createResponseEntry(
               chunk.toolCallId,
               inProgress.toolName,
               parseResult
             );
             if (responseEntry) {
+              this.state.responseHistory.push(responseEntry);
               this.pendingDoneToolEntry = responseEntry;
             }
           }
@@ -636,10 +663,8 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       return;
     }
 
-    // Skip save if we're deferring doneTool response and file messages haven't been added yet
-    if (this.deferDoneToolResponse && !this.fileMessagesAdded) {
-      return;
-    }
+    // No longer skip saves when deferring - we want to stream the doneTool response
+    // The response is in the responseHistory for streaming purposes
 
     // If file messages have been added and we're trying to save with fewer messages, skip
     if (this.fileMessagesAdded && this.state.responseHistory.length < 2) {
@@ -1805,18 +1830,39 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
    * Add file messages and deferred doneTool response together
    */
   async addFileAndDoneToolResponses(fileMessages: ResponseEntry[]): Promise<void> {
-    // Add file messages first
-    this.state.responseHistory.unshift(...fileMessages);
+    // If we have a deferred doneTool response, we need to reorder
+    if (this.deferDoneToolResponse && this.doneToolResponseId) {
+      // Find and remove the doneTool response from its current position
+      const doneToolIndex = this.state.responseHistory.findIndex(
+        (r) => r && typeof r === 'object' && 'id' in r && r.id === this.doneToolResponseId
+      );
 
-    // Now add the deferred doneTool response
-    if (this.pendingDoneToolEntry) {
-      this.state.responseHistory.push(this.pendingDoneToolEntry);
-      this.pendingDoneToolEntry = null;
+      let doneToolEntry: ResponseEntry | null = null;
+      if (doneToolIndex !== -1) {
+        // Remove the doneTool entry temporarily
+        [doneToolEntry] = this.state.responseHistory.splice(doneToolIndex, 1) as [
+          ResponseEntry,
+          ...ResponseEntry[]
+        ];
+      }
+
+      // Add file messages first
+      this.state.responseHistory.unshift(...fileMessages);
+
+      // Now add the doneTool response at the end
+      if (doneToolEntry) {
+        this.state.responseHistory.push(doneToolEntry);
+      }
+    } else {
+      // No reordering needed, just add file messages
+      this.state.responseHistory.unshift(...fileMessages);
     }
 
     // Clear the defer flag and save
     this.deferDoneToolResponse = false;
     this.fileMessagesAdded = true;
+    this.pendingDoneToolEntry = null;
+    this.doneToolResponseId = null;
 
     await this.saveToDatabase();
   }

@@ -74,8 +74,13 @@ describe('ChunkProcessor - Deferred doneTool Response', () => {
     };
     await processor.processChunk(doneToolStart);
 
-    // Response history should still be empty (deferred)
-    expect(processor.getResponseHistory()).toHaveLength(0);
+    // Response history should have the doneTool entry for streaming (even though it's deferred)
+    expect(processor.getResponseHistory()).toHaveLength(1);
+    expect(processor.getResponseHistory()[0]).toMatchObject({
+      id: 'done-1',
+      type: 'text',
+      message: '', // Empty initially
+    });
 
     // Stream some deltas
     const doneToolDelta: TextStreamPart<ToolSet> = {
@@ -86,8 +91,13 @@ describe('ChunkProcessor - Deferred doneTool Response', () => {
     };
     await processor.processChunk(doneToolDelta);
 
-    // Response history should still be empty (deferred)
-    expect(processor.getResponseHistory()).toHaveLength(0);
+    // Response history should still have the doneTool entry with updated content
+    expect(processor.getResponseHistory()).toHaveLength(1);
+    expect(processor.getResponseHistory()[0]).toMatchObject({
+      id: 'done-1',
+      type: 'text',
+      message: 'This is the response',
+    });
 
     // Now add file messages and doneTool response together
     const fileResponseMessages = [
