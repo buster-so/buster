@@ -153,7 +153,7 @@ function selectFilesForResponse(files: ExtractedFile[]): ExtractedFile[] {
  */
 function createFileResponseMessages(files: ExtractedFile[]): ChatMessageResponseMessage[] {
   return files.map((file) => ({
-    id: crypto.randomUUID(),
+    id: file.id, // Use the actual file ID instead of generating a new UUID
     type: 'file' as const,
     file_type: file.fileType,
     file_name: file.fileName,

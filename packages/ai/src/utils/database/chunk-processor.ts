@@ -527,6 +527,11 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
           this.updateSqlFileWithResults(chunk.toolCallId, chunk.result);
         }
 
+        // Special handling for file creation/modification tools - update dummy IDs with actual IDs
+        if (this.isFileCreationTool(chunk.toolName)) {
+          this.updateFileIdsFromToolResult(chunk.toolCallId, chunk.result);
+        }
+
         // Update the specific reasoning entry for this tool call
         this.updateReasoningEntryStatus(chunk.toolCallId, status, incrementalTime);
       }
@@ -1478,6 +1483,118 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         error: error instanceof Error ? error.message : 'Unknown error',
       });
       // Don't throw - continue processing
+    }
+  }
+
+  /**
+   * Check if a tool is a file creation/modification tool
+   */
+  private isFileCreationTool(toolName: string): boolean {
+    const fileCreationTools = [
+      'createMetrics',
+      'create-metrics-file',
+      'createDashboards',
+      'create-dashboards-file',
+      'modifyMetrics',
+      'modify-metrics-file',
+      'modifyDashboards',
+      'modify-dashboards-file',
+    ];
+    return fileCreationTools.includes(toolName);
+  }
+
+  /**
+   * Update file IDs in reasoning entries from dummy IDs to actual tool result IDs
+   */
+  private updateFileIdsFromToolResult(toolCallId: string, toolResult: unknown): void {
+    try {
+      // Find the reasoning entry for this tool call
+      const entry = this.state.reasoningHistory.find(
+        (r) => r && typeof r === 'object' && 'id' in r && r.id === toolCallId
+      );
+
+      if (!entry || entry.type !== 'files') {
+        return;
+      }
+
+      // Extract actual file IDs from tool result
+      const actualFileIds = this.extractFileIdsFromToolResult(toolResult);
+      if (actualFileIds.length === 0) {
+        return;
+      }
+
+      // Update the reasoning entry with actual file IDs
+      const typedEntry = entry as ReasoningEntry & {
+        file_ids: string[];
+        files: Record<string, unknown>;
+      };
+
+      // Create mapping from dummy IDs to actual IDs based on array position
+      const idMapping = new Map<string, string>();
+      const dummyIds = typedEntry.file_ids || [];
+
+      // Map dummy IDs to actual IDs by position
+      for (let i = 0; i < Math.min(dummyIds.length, actualFileIds.length); i++) {
+        const dummyId = dummyIds[i];
+        const actualId = actualFileIds[i];
+        if (dummyId && actualId) {
+          idMapping.set(dummyId, actualId);
+        }
+      }
+
+      // Update file_ids array with actual IDs
+      typedEntry.file_ids = actualFileIds;
+
+      // Update files object - move from dummy ID keys to actual ID keys
+      const updatedFiles: Record<string, unknown> = {};
+      for (const [dummyId, actualId] of idMapping) {
+        const fileData = typedEntry.files[dummyId];
+        if (fileData && typeof fileData === 'object') {
+          // Update the file data with actual ID
+          const typedFileData = fileData as { id?: string };
+          typedFileData.id = actualId;
+          updatedFiles[actualId] = fileData;
+        }
+      }
+      typedEntry.files = updatedFiles;
+    } catch (error) {
+      console.error('Error updating file IDs from tool result:', {
+        toolCallId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      // Don't throw - continue processing
+    }
+  }
+
+  /**
+   * Extract file IDs from tool result
+   */
+  private extractFileIdsFromToolResult(toolResult: unknown): string[] {
+    try {
+      if (!toolResult || typeof toolResult !== 'object') {
+        return [];
+      }
+
+      const result = toolResult as Record<string, unknown>;
+
+      // Check for files array in the result
+      if ('files' in result && Array.isArray(result.files)) {
+        const files = result.files as unknown[];
+        return files
+          .filter(
+            (file): file is Record<string, unknown> =>
+              file !== null && typeof file === 'object' && 'id' in file
+          )
+          .map((file) => (file as { id: string }).id)
+          .filter((id): id is string => typeof id === 'string');
+      }
+
+      return [];
+    } catch (error) {
+      console.error('Error extracting file IDs from tool result:', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      return [];
     }
   }
 
