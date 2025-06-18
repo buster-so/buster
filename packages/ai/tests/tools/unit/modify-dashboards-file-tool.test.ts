@@ -53,7 +53,7 @@ const dashboardYmlSchema = z.object({
 function parseAndValidateYaml(ymlContent: string): {
   success: boolean;
   error?: string;
-  data?: unknown;
+  data?: z.infer<typeof dashboardYmlSchema>;
 } {
   try {
     const parsedYml = yaml.parse(ymlContent);
@@ -116,7 +116,7 @@ rows:
       expect(result.success).toBe(true);
       expect(result.data?.name).toBe('Updated Sales Dashboard');
       expect(result.data?.rows).toHaveLength(1);
-      expect(result.data?.rows[0].columnSizes).toEqual([12]);
+      expect(result.data?.rows?.[0]?.columnSizes).toEqual([12]);
     });
 
     test('should validate multi-row dashboard YAML modifications', () => {
@@ -141,8 +141,8 @@ rows:
       const result = parseAndValidateYaml(validMultiRowYaml);
       expect(result.success).toBe(true);
       expect(result.data?.rows).toHaveLength(2);
-      expect(result.data?.rows[0].items).toHaveLength(2);
-      expect(result.data?.rows[1].items).toHaveLength(1);
+      expect(result.data?.rows?.[0]?.items).toHaveLength(2);
+      expect(result.data?.rows?.[1]?.items).toHaveLength(1);
     });
 
     test('should validate dashboard with modified layout to maximum 4 items per row', () => {
@@ -165,8 +165,8 @@ rows:
 
       const result = parseAndValidateYaml(maxItemsYaml);
       expect(result.success).toBe(true);
-      expect(result.data?.rows[0].items).toHaveLength(4);
-      expect(result.data?.rows[0].columnSizes).toEqual([3, 3, 3, 3]);
+      expect(result.data?.rows?.[0]?.items).toHaveLength(4);
+      expect(result.data?.rows?.[0]?.columnSizes).toEqual([3, 3, 3, 3]);
     });
 
     test('should reject modified dashboard with missing required fields', () => {
@@ -376,8 +376,8 @@ rows: []
 
       // Basic validation that files array exists and has proper structure
       expect(validInput.files).toHaveLength(1);
-      expect(validInput.files[0].id).toBe('f47ac10b-58cc-4372-a567-0e02b2c3d479');
-      expect(typeof validInput.files[0].yml_content).toBe('string');
+      expect(validInput.files[0]?.id).toBe('f47ac10b-58cc-4372-a567-0e02b2c3d479');
+      expect(typeof validInput.files[0]?.yml_content).toBe('string');
     });
 
     test('should reject empty files array for updates', () => {
@@ -397,7 +397,7 @@ rows: []
         ],
       };
 
-      expect(invalidInput.files[0]).not.toHaveProperty('id');
+      expect(invalidInput.files?.[0]).not.toHaveProperty('id');
     });
 
     test('should reject update input without yml_content', () => {
@@ -410,7 +410,7 @@ rows: []
         ],
       };
 
-      expect(invalidInput.files[0]).not.toHaveProperty('yml_content');
+      expect(invalidInput.files?.[0]).not.toHaveProperty('yml_content');
     });
 
     test('should validate bulk update input format', () => {
@@ -444,7 +444,7 @@ rows: []
       };
 
       // This would fail UUID validation
-      expect(invalidUuidInput.files[0].id).toBe('not-a-valid-uuid');
+      expect(invalidUuidInput.files[0]?.id).toBe('not-a-valid-uuid');
     });
   });
 
@@ -673,8 +673,8 @@ rows:
       const result = parseAndValidateYaml(restructuredYaml);
       expect(result.success).toBe(true);
       expect(result.data?.rows).toHaveLength(2);
-      expect(result.data?.rows[0].columnSizes).toEqual([4, 8]);
-      expect(result.data?.rows[1].columnSizes).toEqual([12]);
+      expect(result.data?.rows?.[0]?.columnSizes).toEqual([4, 8]);
+      expect(result.data?.rows?.[1]?.columnSizes).toEqual([12]);
     });
   });
 });

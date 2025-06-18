@@ -1,4 +1,11 @@
-import type { CoreMessage } from 'ai';
+import type {
+  CoreMessage,
+  TextPart,
+  TextStreamPart,
+  ToolCallPart,
+  ToolResultPart,
+  ToolSet,
+} from 'ai';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ChunkProcessor } from '../../src/utils/database/chunk-processor';
 
@@ -48,7 +55,7 @@ describe('Workflow Message Accumulation Integration', () => {
         needsMoreThoughts: false,
         nextThoughtNeeded: true,
       },
-    } as any);
+    } as TextStreamPart<ToolSet>);
 
     // Add tool result
     await thinkAndPrepProcessor.processChunk({
@@ -58,7 +65,7 @@ describe('Workflow Message Accumulation Integration', () => {
       result: {
         success: true,
       },
-    } as any);
+    } as TextStreamPart<ToolSet>);
 
     // Get the accumulated messages from think-and-prep
     const thinkAndPrepMessages = thinkAndPrepProcessor.getAccumulatedMessages();
@@ -94,7 +101,7 @@ describe('Workflow Message Accumulation Integration', () => {
           "SELECT DISTINCT name FROM ont_ont.product_subcategory WHERE name ILIKE '%accessor%' LIMIT 25",
         ],
       },
-    } as any);
+    } as TextStreamPart<ToolSet>);
 
     // Get final messages
     const finalMessages = analystProcessor.getAccumulatedMessages();
@@ -104,13 +111,15 @@ describe('Workflow Message Accumulation Integration', () => {
       (m) =>
         m.role === 'assistant' &&
         Array.isArray(m.content) &&
-        m.content.some((c: any) => c.type === 'tool-call')
+        m.content.some((c) => c && typeof c === 'object' && 'type' in c && c.type === 'tool-call')
     );
 
     const toolCallIds = toolCallMessages
       .flatMap((m) => (Array.isArray(m.content) ? m.content : []))
-      .filter((c: any) => c.type === 'tool-call')
-      .map((c: any) => c.toolCallId);
+      .filter((c): c is ToolCallPart => {
+        return c && typeof c === 'object' && 'type' in c && c.type === 'tool-call';
+      })
+      .map((c) => c.toolCallId);
 
     // Verify no duplicate tool call IDs
     const uniqueToolCallIds = new Set(toolCallIds);
@@ -138,7 +147,8 @@ describe('Workflow Message Accumulation Integration', () => {
     ];
 
     // Simulate multiple workflow steps
-    for (const [index, stepName] of steps.entries()) {
+    for (let index = 0; index < steps.length; index++) {
+      const stepName = steps[index];
       const processor = new ChunkProcessor(mockMessageId, [], [], []);
       processor.setInitialMessages(accumulatedMessages);
 
@@ -146,7 +156,7 @@ describe('Workflow Message Accumulation Integration', () => {
       await processor.processChunk({
         type: 'text-delta',
         textDelta: `Response from ${stepName}`,
-      } as any);
+      } as TextStreamPart<ToolSet>);
 
       accumulatedMessages = processor.getAccumulatedMessages();
       processors.push(processor);
@@ -157,15 +167,22 @@ describe('Workflow Message Accumulation Integration', () => {
 
     // Final verification
     expect(accumulatedMessages).toHaveLength(4); // 1 initial + 3 steps
-    expect(accumulatedMessages[0].role).toBe('user');
-    expect(accumulatedMessages[0].content).toBe('Initial question');
+    const firstMessage = accumulatedMessages[0];
+    if (firstMessage) {
+      expect(firstMessage.role).toBe('user');
+      expect(firstMessage.content).toBe('Initial question');
+    }
 
     // Check each step's response
     for (let i = 0; i < steps.length; i++) {
-      expect(accumulatedMessages[i + 1].role).toBe('assistant');
-      expect(accumulatedMessages[i + 1].content).toEqual([
-        { type: 'text', text: `Response from ${steps[i]}` },
-      ]);
+      const message = accumulatedMessages[i + 1];
+      if (message) {
+        expect(message.role).toBe('assistant');
+        const stepName = steps[i];
+        if (stepName) {
+          expect(message.content).toEqual([{ type: 'text', text: `Response from ${stepName}` }]);
+        }
+      }
     }
   });
 });

@@ -27,13 +27,13 @@ const columnLabelFormatSchema = z.object({
 const baseChartConfigSchema = z.object({
   selectedChartType: z.enum(['bar', 'line', 'scatter', 'pie', 'combo', 'metric', 'table']),
   columnLabelFormats: z.record(columnLabelFormatSchema),
-  columnSettings: z.record(z.any()).optional(),
+  columnSettings: z.record(z.unknown()).optional(),
   colors: z.array(z.string()).optional(),
   showLegend: z.boolean().optional(),
   gridLines: z.boolean().optional(),
   showLegendHeadline: z.union([z.boolean(), z.string()]).optional(),
-  goalLines: z.array(z.any()).optional(),
-  trendlines: z.array(z.any()).optional(),
+  goalLines: z.array(z.unknown()).optional(),
+  trendlines: z.array(z.unknown()).optional(),
   disableTooltip: z.boolean().optional(),
 });
 
@@ -77,7 +77,7 @@ function validateSqlBasic(sqlQuery: string): { success: boolean; error?: string 
 function parseAndValidateYaml(ymlContent: string): {
   success: boolean;
   error?: string;
-  data?: Record<string, unknown>;
+  data?: z.infer<typeof metricYmlSchema>;
 } {
   try {
     const parsedYml = yaml.parse(ymlContent);
@@ -144,7 +144,7 @@ chartConfig:
       const result = parseAndValidateYaml(validTableYaml);
       expect(result.success).toBe(true);
       expect(result.data?.name).toBe('Sales Summary');
-      expect(result.data?.chartConfig.selectedChartType).toBe('table');
+      expect(result.data?.chartConfig?.selectedChartType).toBe('table');
     });
 
     test('should validate correct metric chart YAML', () => {
@@ -169,8 +169,10 @@ chartConfig:
       const result = parseAndValidateYaml(validMetricYaml);
       expect(result.success).toBe(true);
       expect(result.data?.name).toBe('Total Sales');
-      expect(result.data?.chartConfig.selectedChartType).toBe('metric');
-      expect(result.data?.chartConfig.metricColumnId).toBe('total_sales');
+      expect(result.data?.chartConfig?.selectedChartType).toBe('metric');
+      if (result.data?.chartConfig?.selectedChartType === 'metric') {
+        expect(result.data.chartConfig.metricColumnId).toBe('total_sales');
+      }
     });
 
     test('should reject YAML with missing required fields', () => {
@@ -380,8 +382,8 @@ chartConfig:
 
       // Basic validation that files array exists and has proper structure
       expect(validInput.files).toHaveLength(1);
-      expect(validInput.files[0].name).toBe('Test Metric');
-      expect(typeof validInput.files[0].yml_content).toBe('string');
+      expect(validInput.files[0]?.name).toBe('Test Metric');
+      expect(typeof validInput.files[0]?.yml_content).toBe('string');
     });
 
     test('should reject empty files array', () => {

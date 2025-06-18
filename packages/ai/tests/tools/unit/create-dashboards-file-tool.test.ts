@@ -53,7 +53,7 @@ const dashboardYmlSchema = z.object({
 function parseAndValidateYaml(ymlContent: string): {
   success: boolean;
   error?: string;
-  data?: Record<string, unknown>;
+  data?: z.infer<typeof dashboardYmlSchema>;
 } {
   try {
     const parsedYml = yaml.parse(ymlContent);
@@ -116,7 +116,7 @@ rows:
       expect(result.success).toBe(true);
       expect(result.data?.name).toBe('Sales Dashboard');
       expect(result.data?.rows).toHaveLength(1);
-      expect(result.data?.rows[0].columnSizes).toEqual([12]);
+      expect(result.data?.rows?.[0]?.columnSizes).toEqual([12]);
     });
 
     test('should validate correct multi-row dashboard YAML', () => {
@@ -141,8 +141,8 @@ rows:
       const result = parseAndValidateYaml(validMultiRowYaml);
       expect(result.success).toBe(true);
       expect(result.data?.rows).toHaveLength(2);
-      expect(result.data?.rows[0].items).toHaveLength(2);
-      expect(result.data?.rows[1].items).toHaveLength(1);
+      expect(result.data?.rows?.[0]?.items).toHaveLength(2);
+      expect(result.data?.rows?.[1]?.items).toHaveLength(1);
     });
 
     test('should validate dashboard with maximum 4 items per row', () => {
@@ -165,8 +165,8 @@ rows:
 
       const result = parseAndValidateYaml(maxItemsYaml);
       expect(result.success).toBe(true);
-      expect(result.data?.rows[0].items).toHaveLength(4);
-      expect(result.data?.rows[0].columnSizes).toEqual([3, 3, 3, 3]);
+      expect(result.data?.rows?.[0]?.items).toHaveLength(4);
+      expect(result.data?.rows?.[0]?.columnSizes).toEqual([3, 3, 3, 3]);
     });
 
     test('should reject dashboard with missing required fields', () => {
@@ -376,8 +376,8 @@ rows: []
 
       // Basic validation that files array exists and has proper structure
       expect(validInput.files).toHaveLength(1);
-      expect(validInput.files[0].name).toBe('Test Dashboard');
-      expect(typeof validInput.files[0].yml_content).toBe('string');
+      expect(validInput.files[0]?.name).toBe('Test Dashboard');
+      expect(typeof validInput.files[0]?.yml_content).toBe('string');
     });
 
     test('should reject empty files array', () => {
@@ -397,7 +397,7 @@ rows: []
         ],
       };
 
-      expect(invalidInput.files[0]).not.toHaveProperty('name');
+      expect(invalidInput.files?.[0]).not.toHaveProperty('name');
     });
 
     test('should validate bulk input format', () => {

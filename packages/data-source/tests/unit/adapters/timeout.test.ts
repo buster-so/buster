@@ -1,3 +1,4 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { BigQueryAdapter } from '../../../src/adapters/bigquery';
 import { MySQLAdapter } from '../../../src/adapters/mysql';
 import { PostgreSQLAdapter } from '../../../src/adapters/postgresql';
@@ -12,7 +13,6 @@ import type {
   SnowflakeCredentials,
   SqlServerCredentials,
 } from '../../../src/types/credentials';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock all external dependencies
 vi.mock('@google-cloud/bigquery');
@@ -35,7 +35,7 @@ describe('Adapter Timeout Tests', () => {
     it('should timeout after specified duration', async () => {
       // Use real timers for this test since Promise.race needs real setTimeout
       vi.useRealTimers();
-      
+
       const mockBigQuery = {
         createQueryJob: vi.fn(),
       };
@@ -54,7 +54,9 @@ describe('Adapter Timeout Tests', () => {
 
       // Mock the BigQuery constructor
       const { BigQuery } = await import('@google-cloud/bigquery');
-      vi.mocked(BigQuery).mockImplementation(() => mockBigQuery as unknown as InstanceType<typeof BigQuery>);
+      vi.mocked(BigQuery).mockImplementation(
+        () => mockBigQuery as unknown as InstanceType<typeof BigQuery>
+      );
 
       const adapter = new BigQueryAdapter();
       const credentials: BigQueryCredentials = {
@@ -87,7 +89,9 @@ describe('Adapter Timeout Tests', () => {
 
       // Mock pg module
       const pg = await import('pg');
-      vi.mocked(pg.Client).mockImplementation(() => mockClient as unknown as InstanceType<typeof pg.Client>);
+      vi.mocked(pg.Client).mockImplementation(
+        () => mockClient as unknown as InstanceType<typeof pg.Client>
+      );
 
       const adapter = new PostgreSQLAdapter();
       const credentials: PostgreSQLCredentials = {
@@ -114,7 +118,7 @@ describe('Adapter Timeout Tests', () => {
     it('should timeout after specified duration', async () => {
       // Use real timers for this test since Promise.race needs real setTimeout
       vi.useRealTimers();
-      
+
       const mockClient = {
         connect: vi.fn().mockResolvedValue(undefined),
         query: vi.fn(
@@ -128,7 +132,9 @@ describe('Adapter Timeout Tests', () => {
 
       // Mock pg module (Redshift uses pg)
       const pg = await import('pg');
-      vi.mocked(pg.Client).mockImplementation(() => mockClient as unknown as InstanceType<typeof pg.Client>);
+      vi.mocked(pg.Client).mockImplementation(
+        () => mockClient as unknown as InstanceType<typeof pg.Client>
+      );
 
       const adapter = new RedshiftAdapter();
       const credentials: RedshiftCredentials = {
@@ -163,7 +169,9 @@ describe('Adapter Timeout Tests', () => {
 
       // Mock mysql2/promise module
       const mysql = await import('mysql2/promise');
-      vi.mocked(mysql.createConnection).mockResolvedValue(mockConnection as unknown as Awaited<ReturnType<typeof mysql.createConnection>>);
+      vi.mocked(mysql.createConnection).mockResolvedValue(
+        mockConnection as unknown as Awaited<ReturnType<typeof mysql.createConnection>>
+      );
 
       const adapter = new MySQLAdapter();
       const credentials: MySQLCredentials = {
@@ -282,7 +290,9 @@ describe('Adapter Timeout Tests', () => {
 
       // Mock mysql2/promise module
       const mysql = await import('mysql2/promise');
-      vi.mocked(mysql.createConnection).mockResolvedValue(mockConnection as unknown as Awaited<ReturnType<typeof mysql.createConnection>>);
+      vi.mocked(mysql.createConnection).mockResolvedValue(
+        mockConnection as unknown as Awaited<ReturnType<typeof mysql.createConnection>>
+      );
 
       const adapter = new MySQLAdapter();
       const credentials: MySQLCredentials = {

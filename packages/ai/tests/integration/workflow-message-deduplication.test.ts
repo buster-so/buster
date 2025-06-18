@@ -1,4 +1,4 @@
-import type { CoreMessage } from 'ai';
+import type { CoreMessage, ToolCallPart } from 'ai';
 import { describe, expect, it } from 'vitest';
 
 // Helper to create a unique key for a message to detect duplicates
@@ -6,8 +6,11 @@ function createMessageKey(msg: CoreMessage): string {
   if (msg.role === 'assistant' && Array.isArray(msg.content)) {
     // For assistant messages with tool calls, use toolCallId as part of the key
     const toolCallIds = msg.content
-      .filter((c: any) => c.type === 'tool-call')
-      .map((c: any) => c.toolCallId)
+      .filter(
+        (c): c is ToolCallPart =>
+          c && typeof c === 'object' && 'type' in c && c.type === 'tool-call'
+      )
+      .map((c) => c.toolCallId)
       .sort()
       .join(',');
     return `${msg.role}:${toolCallIds}`;
@@ -170,13 +173,49 @@ describe('Workflow Message Deduplication', () => {
     expect(duplicateIndices).toEqual([4, 7]);
 
     // Check that the duplicates have the same toolCallId as their originals
-    const firstDuplicate = messages[4] as any;
-    const firstOriginal = messages[2] as any;
-    expect(firstDuplicate.content[0].toolCallId).toBe(firstOriginal.content[0].toolCallId);
+    const firstDuplicate = messages[4];
+    const firstOriginal = messages[2];
+    if (
+      firstDuplicate &&
+      firstOriginal &&
+      Array.isArray(firstDuplicate.content) &&
+      Array.isArray(firstOriginal.content)
+    ) {
+      const firstDupContent = firstDuplicate.content[0];
+      const firstOrigContent = firstOriginal.content[0];
+      if (
+        firstDupContent &&
+        typeof firstDupContent === 'object' &&
+        'toolCallId' in firstDupContent &&
+        firstOrigContent &&
+        typeof firstOrigContent === 'object' &&
+        'toolCallId' in firstOrigContent
+      ) {
+        expect(firstDupContent.toolCallId).toBe(firstOrigContent.toolCallId);
+      }
+    }
 
-    const secondDuplicate = messages[7] as any;
-    const secondOriginal = messages[5] as any;
-    expect(secondDuplicate.content[0].toolCallId).toBe(secondOriginal.content[0].toolCallId);
+    const secondDuplicate = messages[7];
+    const secondOriginal = messages[5];
+    if (
+      secondDuplicate &&
+      secondOriginal &&
+      Array.isArray(secondDuplicate.content) &&
+      Array.isArray(secondOriginal.content)
+    ) {
+      const secondDupContent = secondDuplicate.content[0];
+      const secondOrigContent = secondOriginal.content[0];
+      if (
+        secondDupContent &&
+        typeof secondDupContent === 'object' &&
+        'toolCallId' in secondDupContent &&
+        secondOrigContent &&
+        typeof secondOrigContent === 'object' &&
+        'toolCallId' in secondOrigContent
+      ) {
+        expect(secondDupContent.toolCallId).toBe(secondOrigContent.toolCallId);
+      }
+    }
   });
 
   it('should provide a deduplication function', () => {
@@ -184,13 +223,13 @@ describe('Workflow Message Deduplication', () => {
       const seen = new Set<string>();
       const deduplicated: CoreMessage[] = [];
 
-      messages.forEach((msg) => {
+      for (const msg of messages) {
         const key = createMessageKey(msg);
         if (!seen.has(key)) {
           seen.add(key);
           deduplicated.push(msg);
         }
-      });
+      }
 
       return deduplicated;
     }

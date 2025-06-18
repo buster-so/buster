@@ -21,7 +21,7 @@ describe('Analyst Agent Integration Tests', () => {
 
   test('should generate response for data analysis query with conversation history', async () => {
     // Stubbed conversation history - to be filled in later
-    const conversationHistory = [
+    const conversationHistory: CoreMessage[] = [
       // TODO: Add stubbed conversation history here
     ];
 
@@ -45,23 +45,21 @@ describe('Analyst Agent Integration Tests', () => {
           // Use stream with conversation history instead of single prompt
           const stream = await analystAgent.stream(messages, {
             maxSteps: 15,
-            chatId,
-            resourceId,
             runtimeContext,
             onStepFinish: async (step) => {
               console.log('\n=== onStepFinish callback (with history) ===');
               console.log('Step structure:', JSON.stringify(step, null, 2));
               console.log('Tool calls:', step.toolCalls);
               console.log('Response messages:', step.response.messages);
-              console.log('Response text:', step.response.text);
+              // Response text is not directly available on step.response
               console.log('===========================\n');
             },
           });
 
           let response = '';
           for await (const chunk of stream.fullStream) {
-            if (chunk.type === 'text') {
-              response += chunk.text;
+            if (chunk.type === 'text-delta') {
+              response += chunk.textDelta;
             }
           }
 
@@ -77,11 +75,15 @@ describe('Analyst Agent Integration Tests', () => {
     // Test with conversation history (stubbed for now)
     const result = await tracedAgentWorkflow(
       conversationHistory.length > 0
-        ? conversationHistory
+        ? (conversationHistory as CoreMessage[])
         : [{ role: 'user', content: 'What are the top 5 customers by revenue?' }]
     );
 
     expect(result).toBeDefined();
+    expect(typeof result).toBe('string');
+    expect(result.length).toBeGreaterThan(0);
+    // Should have generated some analysis response
+    expect(result).not.toBe('');
     console.log('Final result:', result);
   }, 300000);
 
@@ -102,17 +104,19 @@ describe('Analyst Agent Integration Tests', () => {
             ['organizationId', 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce'],
           ]);
 
-          const response = await analystAgent.stream(input, {
+          const stream = await analystAgent.stream(input, {
             maxSteps: 15,
-            chatId,
-            resourceId,
             runtimeContext,
           });
 
-          for await (const chunk of response.fullStream) {
+          let responseText = '';
+          for await (const chunk of stream.fullStream) {
+            if (chunk.type === 'text-delta') {
+              responseText += chunk.textDelta;
+            }
           }
 
-          return response;
+          return responseText;
         } catch (error) {
           console.error(error);
           throw error;
@@ -126,8 +130,7 @@ describe('Analyst Agent Integration Tests', () => {
 
     // Verify response structure
     expect(response).toBeDefined();
-    expect(response.text).toBeDefined();
-    expect(typeof response.text).toBe('string');
-    expect(response.text.length).toBeGreaterThan(0);
+    expect(typeof response).toBe('string');
+    expect(response.length).toBeGreaterThan(0);
   }, 300000);
 });

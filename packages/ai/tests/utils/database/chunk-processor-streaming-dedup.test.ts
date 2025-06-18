@@ -23,9 +23,9 @@ describe('ChunkProcessor - Streaming Tool Call Deduplication', () => {
     // Verify tool call was added with empty args
     let messages = processor.getAccumulatedMessages();
     expect(messages).toHaveLength(1);
-    expect(messages[0].role).toBe('assistant');
-    expect(messages[0].content).toHaveLength(1);
-    expect(messages[0].content[0]).toMatchObject({
+    expect(messages[0]?.role).toBe('assistant');
+    expect(messages[0]?.content).toHaveLength(1);
+    expect(messages[0]?.content?.[0]).toMatchObject({
       type: 'tool-call',
       toolCallId: 'tool-123',
       toolName: 'executeSql',
@@ -52,9 +52,9 @@ describe('ChunkProcessor - Streaming Tool Call Deduplication', () => {
     // Verify only one tool call exists (not duplicated)
     messages = processor.getAccumulatedMessages();
     expect(messages).toHaveLength(1);
-    expect(messages[0].role).toBe('assistant');
-    expect(messages[0].content).toHaveLength(1); // Should still be 1, not 2
-    expect(messages[0].content[0]).toMatchObject({
+    expect(messages[0]?.role).toBe('assistant');
+    expect(messages[0]?.content).toHaveLength(1); // Should still be 1, not 2
+    expect(messages[0]?.content?.[0]).toMatchObject({
       type: 'tool-call',
       toolCallId: 'tool-123',
       toolName: 'executeSql',
@@ -98,25 +98,26 @@ describe('ChunkProcessor - Streaming Tool Call Deduplication', () => {
     // Verify we have exactly 2 tool calls, not 4
     const messages = processor.getAccumulatedMessages();
     expect(messages).toHaveLength(1);
-    expect(messages[0].role).toBe('assistant');
-    expect(messages[0].content).toHaveLength(2); // Two tool calls
+    expect(messages[0]?.role).toBe('assistant');
+    expect(messages[0]?.content).toHaveLength(2); // Two tool calls
 
     // Check tool call IDs are unique
-    const toolCallIds = messages[0].content
-      .filter((c: any) => c.type === 'tool-call')
-      .map((c: any) => c.toolCallId);
+    const toolCallIds = messages[0]?.content
+      .filter((c) => c.type === 'tool-call')
+      .map((c) => (c.type === 'tool-call' ? c.toolCallId : undefined))
+      .filter((id): id is string => id !== undefined);
 
     expect(toolCallIds).toEqual(['tool-1', 'tool-2']);
 
     // Verify each tool has correct args
-    expect(messages[0].content[0]).toMatchObject({
+    expect(messages[0]?.content?.[0]).toMatchObject({
       type: 'tool-call',
       toolCallId: 'tool-1',
       toolName: 'sequentialThinking',
       args: { thought: 'First thought', nextThoughtNeeded: true },
     });
 
-    expect(messages[0].content[1]).toMatchObject({
+    expect(messages[0]?.content?.[1]).toMatchObject({
       type: 'tool-call',
       toolCallId: 'tool-2',
       toolName: 'executeSql',
@@ -137,8 +138,8 @@ describe('ChunkProcessor - Streaming Tool Call Deduplication', () => {
 
     const messages = processor.getAccumulatedMessages();
     expect(messages).toHaveLength(1);
-    expect(messages[0].content).toHaveLength(1);
-    expect(messages[0].content[0]).toMatchObject({
+    expect(messages[0]?.content).toHaveLength(1);
+    expect(messages[0]?.content?.[0]).toMatchObject({
       type: 'tool-call',
       toolCallId: 'direct-tool',
       toolName: 'doneTool',
@@ -164,7 +165,7 @@ describe('ChunkProcessor - Streaming Tool Call Deduplication', () => {
 
     // Verify partial state
     let messages = processor.getAccumulatedMessages();
-    let toolCall = messages[0].content[0];
+    let toolCall = messages[0]?.content?.[0];
     expect(toolCall.args).toMatchObject({ files: [{ name: 'metric1.yml' }] });
 
     // Complete tool-call with full args
@@ -182,8 +183,8 @@ describe('ChunkProcessor - Streaming Tool Call Deduplication', () => {
 
     // Verify args were updated, not duplicated
     messages = processor.getAccumulatedMessages();
-    expect(messages[0].content).toHaveLength(1); // Still just one tool call
-    toolCall = messages[0].content[0];
+    expect(messages[0]?.content).toHaveLength(1); // Still just one tool call
+    toolCall = messages[0]?.content?.[0];
     expect(toolCall.args).toEqual({
       files: [
         { name: 'metric1.yml', yml_content: 'content1' },

@@ -1,10 +1,64 @@
-import { setupTestEnvironment, withTestEnv } from '@buster/test-utils/env-helpers';
+import { setupTestEnvironment, withTestEnv } from '@buster/test-utils';
 import { RuntimeContext } from '@mastra/core/runtime-context';
 import type { CoreMessage } from 'ai';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { analystStep } from '../../../src/steps/analyst-step';
 import { thinkAndPrepStep } from '../../../src/steps/think-and-prep-step';
 import type { AnalystRuntimeContext } from '../../../src/workflows/analyst-workflow';
+
+// Define types for the step outputs
+interface ThinkAndPrepOutput {
+  outputMessages: CoreMessage[];
+  finished: boolean;
+  conversationHistory: CoreMessage[];
+  metadata?: {
+    toolsUsed: string[];
+    finalTool?: string;
+  };
+}
+
+interface AnalystStepOutput {
+  conversationHistory: CoreMessage[];
+  finished: boolean;
+  metadata?: {
+    toolsUsed: string[];
+    finalTool?: string;
+  };
+}
+
+interface CreateTodosOutput {
+  todos: string;
+  reasoningHistory?: unknown[];
+}
+
+interface ExtractValuesSearchOutput {
+  values: string[];
+  searchResults: string;
+  foundValues: Record<string, Record<string, string[]>>;
+  searchPerformed: boolean;
+}
+
+interface GenerateChatTitleOutput {
+  title: string;
+}
+
+interface ThinkAndPrepInputData {
+  'create-todos': CreateTodosOutput;
+  'extract-values-search': ExtractValuesSearchOutput;
+  'generate-chat-title': GenerateChatTitleOutput;
+  prompt: string;
+  conversationHistory?: CoreMessage[];
+}
+
+interface AnalystInputData {
+  finished: boolean;
+  outputMessages: CoreMessage[];
+  conversationHistory: CoreMessage[];
+  metadata: {
+    toolsUsed: string[];
+    finalTool?: 'submitThoughts' | 'respondWithoutAnalysis' | undefined;
+  };
+}
 
 describe('Retry Mechanism Integration Tests', () => {
   beforeAll(() => setupTestEnvironment());
@@ -17,34 +71,33 @@ describe('Retry Mechanism Integration Tests', () => {
         runtimeContext.set('chatId', 'test-thread');
 
         // Create input data that simulates previous step outputs
-        const inputData = {
+        const inputData: ThinkAndPrepInputData = {
           'create-todos': {
-            todos: [
-              {
-                task: 'Analyze the data',
-                reason: 'User requested analysis',
-                complexity: 'medium' as const,
-              },
-            ],
+            todos: '- Analyze the data\n  - User requested analysis',
           },
           'extract-values-search': {
-            extractedValues: [],
+            values: [],
+            searchResults: '',
+            foundValues: {},
+            searchPerformed: false,
           },
           'generate-chat-title': {
             title: 'Test Analysis',
           },
+          prompt: 'Test the retry mechanism by calling an invalid tool if possible',
+          conversationHistory: [],
         };
 
         // This test will attempt to invoke a tool that might not exist or with invalid args
         // The retry mechanism should handle it gracefully
-        const result = await thinkAndPrepStep.execute({
+        const result = (await thinkAndPrepStep.execute({
           inputData,
           getInitData: async () => ({
-            prompt: 'Test the retry mechanism by calling an invalid tool if possible',
-            conversationHistory: [],
+            prompt: inputData.prompt,
+            conversationHistory: inputData.conversationHistory || [],
           }),
           runtimeContext,
-        });
+        })) as ThinkAndPrepOutput;
 
         // Verify the step completed successfully
         expect(result).toBeDefined();
@@ -53,7 +106,7 @@ describe('Retry Mechanism Integration Tests', () => {
 
         // Check if any healing messages were injected (they would be tool result messages)
         const toolResultMessages = result.outputMessages.filter(
-          (msg: CoreMessage) =>
+          (msg) =>
             msg.role === 'tool' || (msg.role === 'user' && msg.content === 'Please continue.')
         );
 
@@ -82,7 +135,7 @@ describe('Retry Mechanism Integration Tests', () => {
                 text: 'I will analyze the data',
               },
               {
-                type: 'tool-use',
+                type: 'tool-call',
                 toolCallId: 'test-call-1',
                 toolName: 'sequentialThinking',
                 args: { thought: 'Starting analysis' },
@@ -102,7 +155,7 @@ describe('Retry Mechanism Integration Tests', () => {
           },
         ];
 
-        const inputData = {
+        const inputData: AnalystInputData = {
           finished: false,
           outputMessages: mockMessages,
           conversationHistory: mockMessages,
@@ -112,14 +165,14 @@ describe('Retry Mechanism Integration Tests', () => {
           },
         };
 
-        const result = await analystStep.execute({
+        const result = (await analystStep.execute({
           inputData,
           getInitData: async () => ({
             prompt: 'Analyze some data',
             conversationHistory: [],
           }),
           runtimeContext,
-        });
+        })) as AnalystStepOutput;
 
         // Verify the step completed
         expect(result).toBeDefined();
@@ -144,43 +197,38 @@ describe('Retry Mechanism Integration Tests', () => {
           { role: 'assistant', content: 'Original response' },
         ];
 
-        const inputData = {
+        const inputData: ThinkAndPrepInputData = {
           'create-todos': {
-            todos: [
-              {
-                task: 'Test retry with history',
-                reason: 'Testing conversation preservation',
-                complexity: 'low' as const,
-              },
-            ],
+            todos: '- Test retry with history\n  - Testing conversation preservation',
           },
           'extract-values-search': {
-            extractedValues: [],
+            values: [],
+            searchResults: '',
+            foundValues: {},
+            searchPerformed: false,
           },
           'generate-chat-title': {
             title: 'Retry Test',
           },
+          prompt: 'Follow up question',
+          conversationHistory: originalMessages,
         };
 
-        const result = await thinkAndPrepStep.execute({
+        const result = (await thinkAndPrepStep.execute({
           inputData,
           getInitData: async () => ({
-            prompt: 'Follow up question',
-            conversationHistory: originalMessages,
+            prompt: inputData.prompt,
+            conversationHistory: inputData.conversationHistory || [],
           }),
           runtimeContext,
-        });
+        })) as ThinkAndPrepOutput;
 
         // Verify original messages are preserved
         expect(result.outputMessages).toBeDefined();
 
         // The conversation should start with the original messages
-        const userMessages = result.outputMessages.filter(
-          (msg: CoreMessage) => msg.role === 'user'
-        );
-        const assistantMessages = result.outputMessages.filter(
-          (msg: CoreMessage) => msg.role === 'assistant'
-        );
+        const userMessages = result.outputMessages.filter((msg) => msg.role === 'user');
+        const assistantMessages = result.outputMessages.filter((msg) => msg.role === 'assistant');
 
         expect(userMessages.length).toBeGreaterThan(0);
         expect(assistantMessages.length).toBeGreaterThan(0);

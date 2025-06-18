@@ -1,9 +1,11 @@
-import { getRawLlmMessagesByMessageId } from '@buster/ai';
-import { createTestChat, createTestMessage } from '@buster/test-utils/database/chats';
-import { withTestEnv } from '@buster/test-utils/env-helpers';
+import type { StepExecutionOptions } from '@mastra/core';
 import { RuntimeContext } from '@mastra/core/runtime-context';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { createTestChat } from '../../../../../test-utils/src/database/chats/createTestChat';
+import { createTestMessage } from '../../../../../test-utils/src/database/messages/createTestMessage';
+import { withTestEnv } from '../../../../../test-utils/src/env-helpers';
 import { createTodosStep } from '../../../src/steps/create-todos-step';
+import { getRawLlmMessagesByMessageId } from '../../../src/steps/get-chat-history';
 import type { AnalystRuntimeContext } from '../../../src/workflows/analyst-workflow';
 
 describe('Create Todos Step - Reasoning Integration', () => {
@@ -23,29 +25,22 @@ describe('Create Todos Step - Reasoning Integration', () => {
     await withTestEnv(async () => {
       // Create test data
       const { chatId, userId } = await createTestChat();
-      const messageId = await createTestMessage({
-        chatId,
-        userId,
-        role: 'user',
-        content: 'What are the top 10 customers by revenue?',
+      const messageId = await createTestMessage(chatId, userId, {
+        requestMessage: 'What are the top 10 customers by revenue?',
       });
 
       // Create runtime context with messageId
       const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();
       runtimeContext.set('messageId', messageId);
 
-      // Execute the step
+      // Execute the step using the proper context
       const result = await createTodosStep.execute({
         inputData: {
           prompt: 'What are the top 10 customers by revenue?',
           conversationHistory: [],
         },
-        getInitData: async () => ({
-          prompt: 'What are the top 10 customers by revenue?',
-          conversationHistory: [],
-        }),
         runtimeContext,
-      });
+      } as StepExecutionOptions<typeof createTodosStep>);
 
       // Verify todos were created
       expect(result.todos).toBeTruthy();
@@ -54,15 +49,40 @@ describe('Create Todos Step - Reasoning Integration', () => {
       // Verify reasoning history was created
       expect(result.reasoningHistory).toBeDefined();
       expect(result.reasoningHistory).toHaveLength(1);
+      if (!result.reasoningHistory || result.reasoningHistory.length === 0) {
+        throw new Error('Expected reasoning history to have at least one entry');
+      }
 
-      const reasoningEntry = result.reasoningHistory![0];
+      const reasoningEntry = result.reasoningHistory[0]!;
       expect(reasoningEntry.type).toBe('files');
       expect(reasoningEntry.title).toBe('TODO List');
       expect(reasoningEntry.status).toBe('completed');
 
       // Verify file entry
-      const fileId = reasoningEntry.file_ids[0];
-      const file = reasoningEntry.files[fileId];
+      interface FileReasoningEntry {
+        type: string;
+        title: string;
+        status: string;
+        file_ids?: string[];
+        files?: Record<
+          string,
+          {
+            file_type: string;
+            file_name: string;
+            file: { text: string };
+          }
+        >;
+      }
+
+      const fileReasoningEntry = reasoningEntry as FileReasoningEntry;
+      const fileId = fileReasoningEntry.file_ids?.[0];
+      if (!fileId) {
+        throw new Error('Expected file ID to be defined');
+      }
+      const file = fileReasoningEntry.files?.[fileId];
+      if (!file) {
+        throw new Error('Expected file to be defined');
+      }
       expect(file.file_type).toBe('todo');
       expect(file.file_name).toBe('todos');
       expect(file.file.text).toBe(result.todos);
@@ -81,18 +101,14 @@ describe('Create Todos Step - Reasoning Integration', () => {
       // Create runtime context without messageId
       const runtimeContext = new RuntimeContext<AnalystRuntimeContext>();
 
-      // Execute the step
+      // Execute the step using the proper context
       const result = await createTodosStep.execute({
         inputData: {
           prompt: 'Show me sales data',
           conversationHistory: [],
         },
-        getInitData: async () => ({
-          prompt: 'Show me sales data',
-          conversationHistory: [],
-        }),
         runtimeContext,
-      });
+      } as StepExecutionOptions<typeof createTodosStep>);
 
       // Verify todos and reasoning were created
       expect(result.todos).toBeTruthy();

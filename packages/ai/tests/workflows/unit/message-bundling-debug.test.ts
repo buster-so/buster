@@ -1,4 +1,4 @@
-import type { AssistantContent, CoreMessage, ToolCallPart } from 'ai';
+import type { AssistantContent, CoreMessage, ToolCallPart, ToolResultPart } from 'ai';
 import { describe, expect, test } from 'vitest';
 import { extractMessageHistory } from '../../../src/utils/memory/message-history';
 
@@ -145,11 +145,11 @@ describe('Message Bundling Debug', () => {
 
     // Should be properly interleaved
     expect(extracted).toHaveLength(5);
-    expect(extracted[0].role).toBe('user');
-    expect(extracted[1].role).toBe('assistant');
-    expect(extracted[2].role).toBe('tool');
-    expect(extracted[3].role).toBe('assistant');
-    expect(extracted[4].role).toBe('tool');
+    expect(extracted[0]?.role).toBe('user');
+    expect(extracted[1]?.role).toBe('assistant');
+    expect(extracted[2]?.role).toBe('tool');
+    expect(extracted[3]?.role).toBe('assistant');
+    expect(extracted[4]?.role).toBe('tool');
   });
 
   test('debug step.response.messages structure', () => {
@@ -186,9 +186,22 @@ describe('Message Bundling Debug', () => {
 
     // Verify it's properly interleaved
     expect(extracted).toHaveLength(5);
-    expect(extracted[1].content[0].toolCallId).toBe('id1');
-    expect(extracted[2].content[0].toolCallId).toBe('id1');
-    expect(extracted[3].content[0].toolCallId).toBe('id2');
-    expect(extracted[4].content[0].toolCallId).toBe('id2');
+    const msg1 = extracted[1];
+    const msg2 = extracted[2];
+    const msg3 = extracted[3];
+    const msg4 = extracted[4];
+
+    if (msg1 && Array.isArray(msg1.content) && msg1.content[0]) {
+      expect((msg1.content[0] as ToolCallPart).toolCallId).toBe('id1');
+    }
+    if (msg2 && Array.isArray(msg2.content) && msg2.content[0]) {
+      expect((msg2.content[0] as ToolResultPart).toolCallId).toBe('id1');
+    }
+    if (msg3 && Array.isArray(msg3.content) && msg3.content[0]) {
+      expect((msg3.content[0] as ToolCallPart).toolCallId).toBe('id2');
+    }
+    if (msg4 && Array.isArray(msg4.content) && msg4.content[0]) {
+      expect((msg4.content[0] as ToolResultPart).toolCallId).toBe('id2');
+    }
   });
 });

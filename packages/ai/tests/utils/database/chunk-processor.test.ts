@@ -166,7 +166,7 @@ describe('ChunkProcessor', () => {
       title: 'TODO List',
       status: 'completed',
     });
-    expect(reasoning[0].files[reasoning[0].file_ids[0]]).toMatchObject({
+    expect(reasoning[0]?.files?.[reasoning[0]?.file_ids?.[0] ?? '']).toMatchObject({
       file_type: 'metric',
       file_name: 'todo_list.txt',
       file: {
@@ -424,7 +424,7 @@ function findDuplicateMessages(messages: CoreMessage[]): CoreMessage[] {
       // Include tool call ID for tool-related messages
       toolCallId:
         msg.content && Array.isArray(msg.content)
-          ? msg.content.find((c: any) => c.type === 'tool-call')?.toolCallId
+          ? msg.content.find((c) => c.type === 'tool-call')?.toolCallId
           : undefined,
     });
 

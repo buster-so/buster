@@ -1,4 +1,7 @@
+import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
+import type { Mock } from 'vitest';
+import { z } from 'zod';
 
 // Mock other modules that analyst-step imports
 vi.mock('../../../src/agents/analyst-agent/analyst-agent', () => ({
@@ -36,6 +39,69 @@ vi.mock('../../../src/utils/streaming', () => ({
 // Import after mocks are set up
 import { analystStep } from '../../../src/steps/analyst-step';
 
+// Define the file response message schema based on the server types
+const FileResponseMessageSchema = z.object({
+  id: z.string(),
+  type: z.literal('file'),
+  file_type: z.enum(['metric', 'dashboard', 'reasoning']),
+  file_name: z.string(),
+  version_number: z.number(),
+  filter_version_id: z.string().nullable().optional(),
+  metadata: z
+    .array(
+      z.object({
+        status: z.enum(['loading', 'completed', 'failed']),
+        message: z.string(),
+        timestamp: z.number().optional(),
+      })
+    )
+    .optional(),
+});
+
+type FileResponseMessage = z.infer<typeof FileResponseMessageSchema>;
+
+// Define types for the mock functions
+interface MockRuntimeContext {
+  get: Mock<(key: string) => string | null>;
+}
+
+interface MockChunkProcessor {
+  getAccumulatedMessages: Mock<() => unknown[]>;
+  getReasoningHistory: Mock<() => ReasoningHistoryEntry[]>;
+  getResponseHistory: Mock<() => ResponseHistoryEntry[]>;
+  hasFinishingTool: Mock<() => boolean>;
+  getFinishingToolName: Mock<() => string>;
+  setInitialMessages: Mock<() => void>;
+  addResponseMessages: Mock<(messages: FileResponseMessage[]) => Promise<void>>;
+}
+
+interface ReasoningHistoryEntry {
+  id: string;
+  type: 'files';
+  title: string;
+  status: 'completed';
+  file_ids: string[];
+  files: Record<
+    string,
+    {
+      id: string;
+      file_type: 'metric' | 'dashboard';
+      file_name: string;
+      version_number: number;
+      status: 'completed';
+      file: {
+        text: string;
+      };
+    }
+  >;
+}
+
+interface ResponseHistoryEntry {
+  id: string;
+  type: 'text';
+  message: string;
+}
+
 describe('Analyst Step File Response Messages', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -43,7 +109,7 @@ describe('Analyst Step File Response Messages', () => {
 
   test('should add file response messages to ChunkProcessor when done tool is called', async () => {
     const mockMessageId = 'test-message-id';
-    const mockRuntimeContext = {
+    const mockRuntimeContext: MockRuntimeContext = {
       get: vi.fn((key: string) => {
         if (key === 'messageId') return mockMessageId;
         return null;
@@ -51,8 +117,10 @@ describe('Analyst Step File Response Messages', () => {
     };
 
     // Mock ChunkProcessor to simulate done tool being called with files created
-    const mockAddResponseMessages = vi.fn().mockResolvedValue(undefined);
-    const mockChunkProcessor = {
+    const mockAddResponseMessages = vi
+      .fn<(messages: FileResponseMessage[]) => Promise<void>>()
+      .mockResolvedValue(undefined);
+    const mockChunkProcessor: MockChunkProcessor = {
       getAccumulatedMessages: vi.fn().mockReturnValue([]),
       getReasoningHistory: vi.fn().mockReturnValue([
         {
@@ -97,8 +165,8 @@ describe('Analyst Step File Response Messages', () => {
     // let's verify that addResponseMessages would be called with the correct file response messages
 
     // Expected file response message structure
-    const expectedFileResponseMessage = {
-      id: expect.any(String),
+    const expectedFileResponseMessage: FileResponseMessage = {
+      id: expect.any(String) as string,
       type: 'file',
       file_type: 'metric',
       file_name: 'test_metric.yml',
@@ -108,7 +176,7 @@ describe('Analyst Step File Response Messages', () => {
         {
           status: 'completed',
           message: 'Metric created successfully',
-          timestamp: expect.any(Number),
+          timestamp: expect.any(Number) as number,
         },
       ],
     };
@@ -131,10 +199,10 @@ describe('Analyst Step File Response Messages', () => {
   });
 
   test('should not add response messages when no files are created', async () => {
-    const mockAddResponseMessages = vi.fn();
+    const mockAddResponseMessages = vi.fn<(messages: FileResponseMessage[]) => Promise<void>>();
 
     // Simulate no files being created (empty array)
-    const fileResponseMessages: unknown[] = [];
+    const fileResponseMessages: FileResponseMessage[] = [];
 
     // The ChunkProcessor's addResponseMessages should only be called if there are messages
     if (fileResponseMessages.length > 0) {
@@ -146,10 +214,12 @@ describe('Analyst Step File Response Messages', () => {
   });
 
   test('should handle multiple file types correctly', async () => {
-    const mockAddResponseMessages = vi.fn().mockResolvedValue(undefined);
+    const mockAddResponseMessages = vi
+      .fn<(messages: FileResponseMessage[]) => Promise<void>>()
+      .mockResolvedValue(undefined);
 
     // Test with both metrics and dashboards
-    const fileResponseMessages = [
+    const fileResponseMessages: FileResponseMessage[] = [
       {
         id: 'file-1',
         type: 'file',

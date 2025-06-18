@@ -219,7 +219,7 @@ export async function retryableAgentStream<T extends ToolSet>({
       // Check for context compression before retry
       if (shouldCompressHistory(conversationHistory)) {
         conversationHistory = compressConversationHistory(conversationHistory);
-        console.log('Compressed conversation history due to length');
+        // Compressed conversation history due to length
       }
 
       const stream = await agent.stream(conversationHistory, options);
@@ -254,7 +254,7 @@ export async function retryableAgentStream<T extends ToolSet>({
       // Apply exponential backoff if enabled
       if (retryConfig.exponentialBackoff && retryCount <= retryConfig.maxRetries) {
         const delay = calculateBackoffDelay(retryCount, retryConfig.maxBackoffMs);
-        console.log(`Retrying in ${delay}ms (attempt ${retryCount}/${retryConfig.maxRetries})`);
+        // Retrying with exponential backoff
         await sleep(delay);
       }
     }
@@ -283,7 +283,7 @@ export async function retryableAgentStreamWithHealing<T extends ToolSet>({
       // Check for context compression before retry
       if (shouldCompressHistory(conversationHistory)) {
         conversationHistory = compressConversationHistory(conversationHistory);
-        console.log('Compressed conversation history due to length');
+        // Compressed conversation history due to length
       }
 
       const stream = await agent.stream(conversationHistory, options);
@@ -340,9 +340,7 @@ export async function retryableAgentStreamWithHealing<T extends ToolSet>({
       // Apply exponential backoff if enabled
       if (retryConfig.exponentialBackoff && retryCount <= retryConfig.maxRetries) {
         const delay = calculateBackoffDelay(retryCount, retryConfig.maxBackoffMs);
-        console.log(
-          `Retrying with healing in ${delay}ms (attempt ${retryCount}/${retryConfig.maxRetries})`
-        );
+        // Retrying with healing after exponential backoff
         await sleep(delay);
       }
     }

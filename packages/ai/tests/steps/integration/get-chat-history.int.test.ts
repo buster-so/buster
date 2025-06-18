@@ -13,21 +13,28 @@ describe('getChatHistory Integration Tests', () => {
     expect(result.length).toBeGreaterThanOrEqual(2);
 
     // Verify structure of returned data
+    if (result.length === 0) {
+      throw new Error('Expected at least one message');
+    }
     const firstMessage = result[0]!;
-    expect(firstMessage).toHaveProperty('id');
+    expect(firstMessage).toHaveProperty('messageId');
     expect(firstMessage).toHaveProperty('rawLlmMessages');
     expect(firstMessage).toHaveProperty('createdAt');
 
     // Verify types
-    expect(typeof firstMessage.id).toBe('string');
-    expect(typeof firstMessage.createdAt).toBe('string');
+    expect(typeof firstMessage.messageId).toBe('string');
+    expect(firstMessage.createdAt).toBeInstanceOf(Date);
     expect(firstMessage.rawLlmMessages).toBeDefined();
     expect(Array.isArray(firstMessage.rawLlmMessages)).toBe(true);
 
     // Verify chronological order
     if (result.length > 1) {
-      const firstTimestamp = new Date(result[0]!.createdAt);
-      const secondTimestamp = new Date(result[1]!.createdAt);
+      const firstTimestamp = result[0]!.createdAt;
+      const secondMessage = result[1];
+      if (!secondMessage) {
+        throw new Error('Expected second message to be defined');
+      }
+      const secondTimestamp = secondMessage.createdAt;
       expect(firstTimestamp.getTime()).toBeLessThanOrEqual(secondTimestamp.getTime());
     }
 
@@ -37,6 +44,9 @@ describe('getChatHistory Integration Tests', () => {
 
     // Check that messages have expected structure (role, content, etc.)
     const firstRawMessage = rawMessages[0];
+    if (!firstRawMessage) {
+      throw new Error('Expected at least one raw message');
+    }
     expect(firstRawMessage).toHaveProperty('role');
     expect(typeof firstRawMessage.role).toBe('string');
 
@@ -62,9 +72,11 @@ describe('getChatHistory Integration Tests', () => {
 
       // Check first message in the conversation has expected structure
       const firstMsg = rawLlmMessage[0];
-      expect(firstMsg).toHaveProperty('role');
-      expect(typeof firstMsg.role).toBe('string');
-      expect(['user', 'assistant', 'tool'].includes(firstMsg.role)).toBe(true);
+      if (firstMsg) {
+        expect(firstMsg).toHaveProperty('role');
+        expect(typeof firstMsg.role).toBe('string');
+        expect(['user', 'assistant', 'tool'].includes(firstMsg.role)).toBe(true);
+      }
     }
   });
 
@@ -77,7 +89,10 @@ describe('getChatHistory Integration Tests', () => {
 
     // The raw messages should match between the two functions
     fullHistory.forEach((fullMessage, index) => {
-      expect(fullMessage.rawLlmMessages).toEqual(rawMessagesOnly[index]);
+      const rawMessage = rawMessagesOnly[index];
+      if (rawMessage !== undefined) {
+        expect(fullMessage.rawLlmMessages).toEqual(rawMessage);
+      }
     });
   });
 

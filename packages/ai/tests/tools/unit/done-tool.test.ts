@@ -312,9 +312,9 @@ All requirements have been fulfilled.`,
       expect(result.todos).toBe('[x] Task 1\n[x] Task 2');
 
       // Verify state wasn't modified (todos already completed)
-      const updatedTodos = mockRuntimeContext.get('todos');
-      expect(updatedTodos[0].completed).toBe(true);
-      expect(updatedTodos[1].completed).toBe(true);
+      const updatedTodos = mockRuntimeContext.get('todos') as TodoItem[];
+      expect(updatedTodos?.[0]?.completed).toBe(true);
+      expect(updatedTodos?.[1]?.completed).toBe(true);
     });
 
     test('should mark incomplete todos as complete', async () => {
@@ -335,10 +335,10 @@ All requirements have been fulfilled.`,
       );
 
       // Verify state was updated
-      const updatedTodos = mockRuntimeContext.get('todos');
-      expect(updatedTodos[0].completed).toBe(true);
-      expect(updatedTodos[1].completed).toBe(true);
-      expect(updatedTodos[2].completed).toBe(true);
+      const updatedTodos = mockRuntimeContext.get('todos') as TodoItem[];
+      expect(updatedTodos?.[0]?.completed).toBe(true);
+      expect(updatedTodos?.[1]?.completed).toBe(true);
+      expect(updatedTodos?.[2]?.completed).toBe(true);
     });
 
     test('should handle mixed todo completion states', async () => {
@@ -361,8 +361,8 @@ All requirements have been fulfilled.`,
       );
 
       // Verify only incomplete ones were updated
-      const updatedTodos = mockRuntimeContext.get('todos');
-      expect(updatedTodos.every((todo: TodoItem) => todo.completed)).toBe(true);
+      const updatedTodos = mockRuntimeContext.get('todos') as TodoItem[];
+      expect(updatedTodos?.every((todo: TodoItem) => todo.completed)).toBe(true);
     });
 
     test('should throw error when runtime context is missing', async () => {
@@ -405,10 +405,10 @@ All requirements have been fulfilled.`,
       );
 
       // Verify extra properties are preserved
-      const updatedTodos = mockRuntimeContext.get('todos');
-      expect(updatedTodos[0].priority).toBe('high');
-      expect(updatedTodos[0].assignee).toBe('user123');
-      expect(updatedTodos[0].completed).toBe(true);
+      const updatedTodos = mockRuntimeContext.get('todos') as TodoItem[];
+      expect(updatedTodos?.[0]?.priority).toBe('high');
+      expect(updatedTodos?.[0]?.assignee).toBe('user123');
+      expect(updatedTodos?.[0]?.completed).toBe(true);
     });
   });
 

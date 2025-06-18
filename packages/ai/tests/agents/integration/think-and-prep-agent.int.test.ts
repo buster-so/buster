@@ -21,7 +21,7 @@ describe('Think and Prep Agent Integration Tests', () => {
 
   test('should generate response for analysis query with conversation history', async () => {
     // Stubbed conversation history - to be filled in later
-    const conversationHistory = [
+    const conversationHistory: CoreMessage[] = [
       // TODO: Add stubbed conversation history here
     ];
 
@@ -45,23 +45,21 @@ describe('Think and Prep Agent Integration Tests', () => {
           // Use stream with conversation history instead of single prompt
           const stream = await thinkAndPrepAgent.stream(messages, {
             maxSteps: 15,
-            chatId,
-            resourceId,
             runtimeContext,
             onStepFinish: async (step) => {
               console.log('\n=== onStepFinish callback (with history) ===');
               console.log('Step structure:', JSON.stringify(step, null, 2));
               console.log('Tool calls:', step.toolCalls);
               console.log('Response messages:', step.response.messages);
-              console.log('Response text:', step.response.text);
+              // Response text is not directly available on step.response
               console.log('===========================\n');
             },
           });
 
           let response = '';
           for await (const chunk of stream.fullStream) {
-            if (chunk.type === 'text') {
-              response += chunk.text;
+            if (chunk.type === 'text-delta') {
+              response += chunk.textDelta;
             }
           }
 
@@ -77,11 +75,15 @@ describe('Think and Prep Agent Integration Tests', () => {
     // Test with conversation history (stubbed for now)
     const result = await tracedAgentWorkflow(
       conversationHistory.length > 0
-        ? conversationHistory
+        ? (conversationHistory as CoreMessage[])
         : [{ role: 'user', content: 'What are the top 5 customers by revenue?' }]
     );
 
     expect(result).toBeDefined();
+    expect(typeof result).toBe('string');
+    expect(result.length).toBeGreaterThan(0);
+    // Should have generated some analysis response
+    expect(result).not.toBe('');
     console.log('Final result:', result);
   }, 300000);
 
@@ -105,36 +107,38 @@ describe('Think and Prep Agent Integration Tests', () => {
           // Use stream instead of generate to see the actual structure
           const stream = await thinkAndPrepAgent.stream(input, {
             maxSteps: 15,
-            chatId,
-            resourceId,
             runtimeContext,
             onStepFinish: async (step) => {
               console.log('\n=== onStepFinish callback ===');
               console.log('Step structure:', JSON.stringify(step, null, 2));
               console.log('Tool calls:', step.toolCalls);
               console.log('Response messages:', step.response.messages);
-              console.log('Response text:', step.response.text);
+              // Response text is not directly available on step.response
               console.log('===========================\n');
             },
           });
 
           // Consume the stream and log chunks
-          const chunks = [];
+          const chunks: unknown[] = [];
+          let responseText = '';
           for await (const chunk of stream.fullStream) {
             console.log('\n=== Stream chunk ===');
             console.log('Chunk type:', chunk.type);
             console.log('Chunk data:', JSON.stringify(chunk, null, 2));
             console.log('===================\n');
             chunks.push(chunk);
+
+            // Accumulate text responses
+            if (chunk.type === 'text-delta') {
+              responseText += chunk.textDelta;
+            }
           }
 
-          // Get the final response
-          const response = await stream.response;
           console.log('\n=== Final response ===');
-          console.log('Response structure:', JSON.stringify(response, null, 2));
+          console.log('Response text:', responseText);
           console.log('=====================\n');
 
-          return response;
+          return responseText;
         } catch (error) {
           console.error(error);
           throw error;
@@ -150,8 +154,7 @@ describe('Think and Prep Agent Integration Tests', () => {
 
     // Verify response structure
     expect(response).toBeDefined();
-    expect(response.text).toBeDefined();
-    expect(typeof response.text).toBe('string');
-    expect(response.text.length).toBeGreaterThan(0);
+    expect(typeof response).toBe('string');
+    expect(response.length).toBeGreaterThan(0);
   }, 300000);
 });

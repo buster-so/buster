@@ -7,7 +7,16 @@ describe('ChunkProcessor SQL Reasoning Entry Creation', () => {
     const chunkProcessor = new ChunkProcessor(null, [], [], []);
 
     // Test the createReasoningEntry method directly via reflection
-    const createReasoningEntry = (chunkProcessor as any).createReasoningEntry.bind(chunkProcessor);
+    // @ts-expect-error - accessing private method for testing
+    const createReasoningEntry = (
+      chunkProcessor as unknown as {
+        createReasoningEntry: (
+          toolCallId: string,
+          toolName: string,
+          args: unknown
+        ) => ChatMessageReasoningMessage | null;
+      }
+    ).createReasoningEntry.bind(chunkProcessor);
 
     const toolCallId = 'toolu_01A1rVASAPgSy1RKXBuJBrTh';
     const args = {
@@ -27,8 +36,8 @@ describe('ChunkProcessor SQL Reasoning Entry Creation', () => {
     expect(result.status).toBe('loading');
     expect(result.file_ids).toHaveLength(1);
 
-    const fileId = result.file_ids[0];
-    expect(result.files[fileId]).toBeDefined();
+    const fileId = result.file_ids?.[0] ?? '';
+    expect(result.files?.[fileId]).toBeDefined();
     expect(result.files[fileId].file_name).toBe('SQL Statements');
     expect(result.files[fileId].file_type).toBe('agent-action');
 
@@ -42,7 +51,16 @@ describe('ChunkProcessor SQL Reasoning Entry Creation', () => {
 
   it('should handle statements as JSON string', () => {
     const chunkProcessor = new ChunkProcessor(null, [], [], []);
-    const createReasoningEntry = (chunkProcessor as any).createReasoningEntry.bind(chunkProcessor);
+    // @ts-expect-error - accessing private method for testing
+    const createReasoningEntry = (
+      chunkProcessor as unknown as {
+        createReasoningEntry: (
+          toolCallId: string,
+          toolName: string,
+          args: unknown
+        ) => ChatMessageReasoningMessage | null;
+      }
+    ).createReasoningEntry.bind(chunkProcessor);
 
     const toolCallId = 'toolu_01GRLdxzhgpG3YWzDP9CuU2G';
     const args = {
@@ -55,7 +73,7 @@ describe('ChunkProcessor SQL Reasoning Entry Creation', () => {
     expect(result).toBeDefined();
     expect(result.type).toBe('files');
 
-    const fileId = result.file_ids[0];
+    const fileId = result.file_ids?.[0] ?? '';
     const expectedYaml = `statements:
   - SELECT ps.name as subcategory_name FROM ont_ont.product_subcategory ps
   - SELECT MAX(year) as max_year FROM ont_ont.product_total_revenue`;
@@ -65,7 +83,16 @@ describe('ChunkProcessor SQL Reasoning Entry Creation', () => {
 
   it('should handle statements as plain string', () => {
     const chunkProcessor = new ChunkProcessor(null, [], [], []);
-    const createReasoningEntry = (chunkProcessor as any).createReasoningEntry.bind(chunkProcessor);
+    // @ts-expect-error - accessing private method for testing
+    const createReasoningEntry = (
+      chunkProcessor as unknown as {
+        createReasoningEntry: (
+          toolCallId: string,
+          toolName: string,
+          args: unknown
+        ) => ChatMessageReasoningMessage | null;
+      }
+    ).createReasoningEntry.bind(chunkProcessor);
 
     const toolCallId = 'toolu_012vwyZV9bHefWZMqq97RFZy';
     const args = {
@@ -78,7 +105,7 @@ describe('ChunkProcessor SQL Reasoning Entry Creation', () => {
     expect(result).toBeDefined();
     expect(result.type).toBe('files');
 
-    const fileId = result.file_ids[0];
+    const fileId = result.file_ids?.[0] ?? '';
     const expectedYaml = `statements:
   - SELECT year, quarter, COUNT(*) as record_count FROM ont_ont.product_total_revenue`;
 
@@ -87,7 +114,16 @@ describe('ChunkProcessor SQL Reasoning Entry Creation', () => {
 
   it('should handle legacy queries format', () => {
     const chunkProcessor = new ChunkProcessor(null, [], [], []);
-    const createReasoningEntry = (chunkProcessor as any).createReasoningEntry.bind(chunkProcessor);
+    // @ts-expect-error - accessing private method for testing
+    const createReasoningEntry = (
+      chunkProcessor as unknown as {
+        createReasoningEntry: (
+          toolCallId: string,
+          toolName: string,
+          args: unknown
+        ) => ChatMessageReasoningMessage | null;
+      }
+    ).createReasoningEntry.bind(chunkProcessor);
 
     const toolCallId = 'legacy-call-id';
     const args = {
@@ -99,7 +135,7 @@ describe('ChunkProcessor SQL Reasoning Entry Creation', () => {
     expect(result).toBeDefined();
     expect(result.type).toBe('files');
 
-    const fileId = result.file_ids[0];
+    const fileId = result.file_ids?.[0] ?? '';
     const expectedYaml = `statements:
   - SELECT * FROM table1
   - SELECT COUNT(*) FROM table2`;
@@ -109,7 +145,16 @@ describe('ChunkProcessor SQL Reasoning Entry Creation', () => {
 
   it('should handle legacy sql format', () => {
     const chunkProcessor = new ChunkProcessor(null, [], [], []);
-    const createReasoningEntry = (chunkProcessor as any).createReasoningEntry.bind(chunkProcessor);
+    // @ts-expect-error - accessing private method for testing
+    const createReasoningEntry = (
+      chunkProcessor as unknown as {
+        createReasoningEntry: (
+          toolCallId: string,
+          toolName: string,
+          args: unknown
+        ) => ChatMessageReasoningMessage | null;
+      }
+    ).createReasoningEntry.bind(chunkProcessor);
 
     const toolCallId = 'legacy-sql-call-id';
     const args = {
@@ -121,7 +166,7 @@ describe('ChunkProcessor SQL Reasoning Entry Creation', () => {
     expect(result).toBeDefined();
     expect(result.type).toBe('files');
 
-    const fileId = result.file_ids[0];
+    const fileId = result.file_ids?.[0] ?? '';
     const expectedYaml = `statements:
   - SELECT * FROM single_table LIMIT 10`;
 
@@ -130,7 +175,16 @@ describe('ChunkProcessor SQL Reasoning Entry Creation', () => {
 
   it('should return null for non-SQL tools', () => {
     const chunkProcessor = new ChunkProcessor(null, [], [], []);
-    const createReasoningEntry = (chunkProcessor as any).createReasoningEntry.bind(chunkProcessor);
+    // @ts-expect-error - accessing private method for testing
+    const createReasoningEntry = (
+      chunkProcessor as unknown as {
+        createReasoningEntry: (
+          toolCallId: string,
+          toolName: string,
+          args: unknown
+        ) => ChatMessageReasoningMessage | null;
+      }
+    ).createReasoningEntry.bind(chunkProcessor);
 
     const result = createReasoningEntry('tool-id', 'otherTool', { someArg: 'value' });
 
@@ -141,7 +195,16 @@ describe('ChunkProcessor SQL Reasoning Entry Creation', () => {
 
   it('should return null for invalid SQL args', () => {
     const chunkProcessor = new ChunkProcessor(null, [], [], []);
-    const createReasoningEntry = (chunkProcessor as any).createReasoningEntry.bind(chunkProcessor);
+    // @ts-expect-error - accessing private method for testing
+    const createReasoningEntry = (
+      chunkProcessor as unknown as {
+        createReasoningEntry: (
+          toolCallId: string,
+          toolName: string,
+          args: unknown
+        ) => ChatMessageReasoningMessage | null;
+      }
+    ).createReasoningEntry.bind(chunkProcessor);
 
     const result = createReasoningEntry('tool-id', 'executeSql', { invalidArg: 'value' });
 
@@ -150,7 +213,16 @@ describe('ChunkProcessor SQL Reasoning Entry Creation', () => {
 
   it('should handle malformed JSON in statements string gracefully', () => {
     const chunkProcessor = new ChunkProcessor(null, [], [], []);
-    const createReasoningEntry = (chunkProcessor as any).createReasoningEntry.bind(chunkProcessor);
+    // @ts-expect-error - accessing private method for testing
+    const createReasoningEntry = (
+      chunkProcessor as unknown as {
+        createReasoningEntry: (
+          toolCallId: string,
+          toolName: string,
+          args: unknown
+        ) => ChatMessageReasoningMessage | null;
+      }
+    ).createReasoningEntry.bind(chunkProcessor);
 
     const toolCallId = 'malformed-json-call';
     const args = {
@@ -162,7 +234,7 @@ describe('ChunkProcessor SQL Reasoning Entry Creation', () => {
     expect(result).toBeDefined();
     expect(result.type).toBe('files');
 
-    const fileId = result.file_ids[0];
+    const fileId = result.file_ids?.[0] ?? '';
     // Should treat the whole string as a single statement when JSON parsing fails
     const expectedYaml = `statements:
   - ["SELECT * FROM table1", "incomplete json`;
@@ -176,7 +248,16 @@ describe('ChunkProcessor SQL Results Integration', () => {
     const chunkProcessor = new ChunkProcessor(null, [], [], []);
 
     // Create initial SQL reasoning entry
-    const createReasoningEntry = (chunkProcessor as any).createReasoningEntry.bind(chunkProcessor);
+    // @ts-expect-error - accessing private method for testing
+    const createReasoningEntry = (
+      chunkProcessor as unknown as {
+        createReasoningEntry: (
+          toolCallId: string,
+          toolName: string,
+          args: unknown
+        ) => ChatMessageReasoningMessage | null;
+      }
+    ).createReasoningEntry.bind(chunkProcessor);
     const toolCallId = 'sql-with-results';
     const args = {
       statements: [
@@ -188,7 +269,12 @@ describe('ChunkProcessor SQL Results Integration', () => {
     const initialEntry = createReasoningEntry(toolCallId, 'executeSql', args);
 
     // Add to reasoning history
-    const reasoningHistory = (chunkProcessor as any).state.reasoningHistory;
+    // @ts-expect-error - accessing private property for testing
+    const reasoningHistory = (
+      chunkProcessor as unknown as {
+        state: { reasoningHistory: ChatMessageReasoningMessage[] };
+      }
+    ).state.reasoningHistory;
     reasoningHistory.push(initialEntry);
 
     // Simulate tool result with mixed success/error results
@@ -213,15 +299,18 @@ describe('ChunkProcessor SQL Results Integration', () => {
     };
 
     // Call the updateSqlFileWithResults method
-    const updateSqlFileWithResults = (chunkProcessor as any).updateSqlFileWithResults.bind(
-      chunkProcessor
-    );
+    // @ts-expect-error - accessing private method for testing
+    const updateSqlFileWithResults = (
+      chunkProcessor as unknown as {
+        updateSqlFileWithResults: (toolCallId: string, toolResult: unknown) => void;
+      }
+    ).updateSqlFileWithResults.bind(chunkProcessor);
     updateSqlFileWithResults(toolCallId, toolResult);
 
     // Verify the file content was updated with results
-    const updatedEntry = reasoningHistory[0];
-    const fileId = updatedEntry.file_ids[0];
-    const fileContent = updatedEntry.files[fileId].file.text;
+    const updatedEntry = reasoningHistory?.[0] as ChatMessageReasoningMessage;
+    const fileId = updatedEntry.file_ids?.[0] ?? '';
+    const fileContent = updatedEntry.files?.[fileId]?.file?.text ?? '';
 
     const expectedContent = `statements:
   - SELECT DISTINCT name FROM ont_ont.product_category LIMIT 25

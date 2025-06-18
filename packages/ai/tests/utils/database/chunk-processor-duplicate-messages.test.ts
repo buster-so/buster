@@ -1,4 +1,4 @@
-import type { CoreMessage, TextStreamPart } from 'ai';
+import type { CoreMessage, TextStreamPart, ToolSet } from 'ai';
 import { describe, expect, it, vi } from 'vitest';
 import { ChunkProcessor } from '../../../src/utils/database/chunk-processor';
 
@@ -41,20 +41,20 @@ describe('ChunkProcessor - Duplicate Message Detection', () => {
       type: 'tool-call-streaming-start',
       toolCallId,
       toolName: 'sequentialThinking',
-    } as TextStreamPart<any>);
+    } as TextStreamPart<ToolSet>);
 
     // Then tool-call-delta events (simulating streaming args)
     await processor.processChunk({
       type: 'tool-call-delta',
       toolCallId,
       argsTextDelta: '{"thought": "Let me work through',
-    } as TextStreamPart<any>);
+    } as TextStreamPart<ToolSet>);
 
     await processor.processChunk({
       type: 'tool-call-delta',
       toolCallId,
       argsTextDelta: ' the TODO list items..."}',
-    } as TextStreamPart<any>);
+    } as TextStreamPart<ToolSet>);
 
     // Then the complete tool-call event
     await processor.processChunk({
@@ -69,7 +69,7 @@ describe('ChunkProcessor - Duplicate Message Detection', () => {
         needsMoreThoughts: false,
         nextThoughtNeeded: true,
       },
-    } as TextStreamPart<any>);
+    } as TextStreamPart<ToolSet>);
 
     // Tool result
     await processor.processChunk({
@@ -77,7 +77,7 @@ describe('ChunkProcessor - Duplicate Message Detection', () => {
       toolCallId,
       toolName: 'sequentialThinking',
       result: { success: true },
-    } as TextStreamPart<any>);
+    } as TextStreamPart<ToolSet>);
 
     // Get accumulated messages
     const messages = processor.getAccumulatedMessages();
@@ -86,7 +86,7 @@ describe('ChunkProcessor - Duplicate Message Detection', () => {
     const assistantMessagesWithToolCall = messages.filter((msg) => {
       if (msg.role !== 'assistant' || !Array.isArray(msg.content)) return false;
       return msg.content.some(
-        (item: any) => item.type === 'tool-call' && item.toolCallId === toolCallId
+        (item) => item.type === 'tool-call' && item.toolCallId === toolCallId
       );
     });
 
@@ -128,21 +128,21 @@ describe('ChunkProcessor - Duplicate Message Detection', () => {
       type: 'tool-call-streaming-start',
       toolCallId: toolCallId1,
       toolName: 'executeSql',
-    } as TextStreamPart<any>);
+    } as TextStreamPart<ToolSet>);
 
     await processor.processChunk({
       type: 'tool-call',
       toolCallId: toolCallId1,
       toolName: 'executeSql',
       args: { statements: ['SELECT 1'] },
-    } as TextStreamPart<any>);
+    } as TextStreamPart<ToolSet>);
 
     await processor.processChunk({
       type: 'tool-result',
       toolCallId: toolCallId1,
       toolName: 'executeSql',
       result: { results: [] },
-    } as TextStreamPart<any>);
+    } as TextStreamPart<ToolSet>);
 
     // Process second tool call
     const toolCallId2 = 'toolu_02DEF';
@@ -150,21 +150,21 @@ describe('ChunkProcessor - Duplicate Message Detection', () => {
       type: 'tool-call-streaming-start',
       toolCallId: toolCallId2,
       toolName: 'executeSql',
-    } as TextStreamPart<any>);
+    } as TextStreamPart<ToolSet>);
 
     await processor.processChunk({
       type: 'tool-call',
       toolCallId: toolCallId2,
       toolName: 'executeSql',
       args: { statements: ['SELECT 2'] },
-    } as TextStreamPart<any>);
+    } as TextStreamPart<ToolSet>);
 
     await processor.processChunk({
       type: 'tool-result',
       toolCallId: toolCallId2,
       toolName: 'executeSql',
       result: { results: [] },
-    } as TextStreamPart<any>);
+    } as TextStreamPart<ToolSet>);
 
     const messages = processor.getAccumulatedMessages();
 
@@ -175,8 +175,8 @@ describe('ChunkProcessor - Duplicate Message Detection', () => {
     const toolCallIds = messages
       .filter((m) => m.role === 'assistant')
       .flatMap((m) => (Array.isArray(m.content) ? m.content : []))
-      .filter((c: any) => c.type === 'tool-call')
-      .map((c: any) => c.toolCallId);
+      .filter((c) => c.type === 'tool-call')
+      .map((c) => c.toolCallId);
 
     expect(toolCallIds).toEqual([toolCallId1, toolCallId2]);
     expect(new Set(toolCallIds).size).toBe(toolCallIds.length); // No duplicates
@@ -195,7 +195,7 @@ describe('ChunkProcessor - Duplicate Message Detection', () => {
       toolCallId,
       toolName: 'sequentialThinking',
       args: { thought: 'Test thought' },
-    } as TextStreamPart<any>);
+    } as TextStreamPart<ToolSet>);
 
     // Get messages after first processing
     const messagesAfterFirst = processor.getAccumulatedMessages();
@@ -207,7 +207,7 @@ describe('ChunkProcessor - Duplicate Message Detection', () => {
       toolCallId,
       toolName: 'sequentialThinking',
       args: { thought: 'Test thought' },
-    } as TextStreamPart<any>);
+    } as TextStreamPart<ToolSet>);
 
     // Should still have only 1 message
     const messagesAfterSecond = processor.getAccumulatedMessages();

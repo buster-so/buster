@@ -407,7 +407,7 @@ chartConfig:
       };
 
       // This would fail our ID validation requirement
-      expect(invalidInput.files[0]).not.toHaveProperty('id');
+      expect(invalidInput.files?.[0]).not.toHaveProperty('id');
     });
 
     test('should reject update input with invalid UUID', () => {

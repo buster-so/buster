@@ -292,7 +292,12 @@ describe('DataSource Unit Tests', () => {
       expect(result.success).toBe(true);
       expect(result.rows).toEqual([{ test: 'value' }]);
       expect(result.warehouse).toBe('test-db');
-      expect(mockAdapter.query).toHaveBeenCalledWith('SELECT 1 as test', undefined, undefined, undefined);
+      expect(mockAdapter.query).toHaveBeenCalledWith(
+        'SELECT 1 as test',
+        undefined,
+        undefined,
+        undefined
+      );
     });
 
     it('should execute query with parameters', async () => {
@@ -349,7 +354,12 @@ describe('DataSource Unit Tests', () => {
       });
 
       expect(result.success).toBe(true);
-      expect(mockAdapter.query).toHaveBeenCalledWith('SELECT * FROM users', undefined, 100, undefined);
+      expect(mockAdapter.query).toHaveBeenCalledWith(
+        'SELECT * FROM users',
+        undefined,
+        100,
+        undefined
+      );
     });
 
     it('should include metadata when results are limited', async () => {
