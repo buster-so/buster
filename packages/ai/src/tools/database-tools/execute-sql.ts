@@ -81,7 +81,7 @@ export function parseStreamingArgs(
   try {
     // First try to parse as complete JSON
     const parsed = JSON.parse(accumulatedText);
-    
+
     // Ensure statements is an array if present
     if (parsed.statements !== undefined && !Array.isArray(parsed.statements)) {
       console.warn('[execute-sql parseStreamingArgs] statements is not an array:', {
@@ -90,7 +90,7 @@ export function parseStreamingArgs(
       });
       return null; // Return null to indicate invalid parse
     }
-    
+
     return {
       statements: parsed.statements || undefined,
     };
@@ -164,22 +164,98 @@ const executeSqlStatement = wrapTraced(
     params: z.infer<typeof executeSqlStatementInputSchema>,
     runtimeContext: RuntimeContext<AnalystRuntimeContext>
   ): Promise<z.infer<typeof executeSqlStatementOutputSchema>> => {
-    const { statements } = params;
+    let { statements } = params;
 
-    // Ensure statements is an array
+    // Handle various edge cases for statements
+    if (statements === undefined || statements === null) {
+      console.error('[execute-sql] Invalid input: statements is undefined or null', {
+        params: params,
+      });
+      return {
+        results: [
+          {
+            status: 'error' as const,
+            sql: '',
+            error_message: 'Invalid input: statements is required',
+          },
+        ],
+      };
+    }
+
+    // If statements is not an array, try to convert it
     if (!Array.isArray(statements)) {
       console.error('[execute-sql] Invalid input: statements is not an array', {
         type: typeof statements,
         value: statements,
         params: params,
       });
-      return {
-        results: [{
-          status: 'error' as const,
-          sql: typeof statements === 'string' ? statements : JSON.stringify(statements),
-          error_message: 'Invalid input: statements must be an array of SQL strings',
-        }],
-      };
+
+      // Try to recover from common edge cases
+      if (typeof statements === 'string') {
+        const stringStatement = statements;
+        try {
+          // Try parsing as JSON array
+          const parsed = JSON.parse(stringStatement);
+          if (Array.isArray(parsed)) {
+            statements = parsed;
+            console.warn('[execute-sql] Recovered statements from JSON string');
+          } else {
+            // Treat as single statement
+            statements = [stringStatement];
+            console.warn('[execute-sql] Treating string as single statement');
+          }
+        } catch {
+          // Treat as single statement
+          statements = [stringStatement];
+          console.warn('[execute-sql] Treating unparseable string as single statement');
+        }
+      } else if (typeof statements === 'object' && statements !== null) {
+        // Handle object with map method that's not an array (edge case)
+        if ('map' in statements && typeof (statements as { map?: unknown }).map === 'function') {
+          try {
+            statements = Array.from(statements as Iterable<string>);
+            console.warn('[execute-sql] Recovered statements from array-like object');
+          } catch {
+            return {
+              results: [
+                {
+                  status: 'error' as const,
+                  sql: JSON.stringify(statements),
+                  error_message: 'Invalid input: statements must be an array of SQL strings',
+                },
+              ],
+            };
+          }
+        } else {
+          return {
+            results: [
+              {
+                status: 'error' as const,
+                sql: JSON.stringify(statements),
+                error_message: 'Invalid input: statements must be an array of SQL strings',
+              },
+            ],
+          };
+        }
+      } else {
+        return {
+          results: [
+            {
+              status: 'error' as const,
+              sql: String(statements),
+              error_message: 'Invalid input: statements must be an array of SQL strings',
+            },
+          ],
+        };
+      }
+    }
+
+    // Final validation - ensure all elements are strings
+    if (!statements.every((stmt) => typeof stmt === 'string')) {
+      console.error('[execute-sql] Invalid input: statements contains non-string elements', {
+        statements: statements,
+      });
+      statements = statements.map((stmt) => String(stmt));
     }
 
     // Check for empty array
@@ -212,10 +288,10 @@ const executeSqlStatement = wrapTraced(
             return { sql: sqlStatement, result };
           },
           {
-            maxConcurrent: 10,    // Increased from 3 to allow more concurrent queries per workflow
-            maxPerSecond: 25,     // Increased from 10 to handle higher throughput
-            maxPerMinute: 300,    // Increased from 100 for sustained load
-            queueTimeout: 90000,  // 90 seconds (increased for queue management)
+            maxConcurrent: 10, // Increased from 3 to allow more concurrent queries per workflow
+            maxPerSecond: 25, // Increased from 10 to handle higher throughput
+            maxPerMinute: 300, // Increased from 100 for sustained load
+            queueTimeout: 90000, // 90 seconds (increased for queue management)
           }
         )
       );
@@ -276,38 +352,97 @@ async function executeSingleStatement(
   data?: Record<string, unknown>[];
   error?: string;
 }> {
-  try {
-    if (!sqlStatement.trim()) {
-      return { success: false, error: 'SQL statement cannot be empty' };
-    }
+  // Retry configuration
+  const MAX_RETRIES = 3;
+  const TIMEOUT_MS = 30000; // 30 seconds
+  const RETRY_DELAYS = [1000, 3000, 6000]; // 1s, 3s, 6s
 
-    // Ensure the SQL statement has a LIMIT clause to prevent excessive results
-    const limitedSql = ensureSqlLimit(sqlStatement, 25);
+  if (!sqlStatement.trim()) {
+    return { success: false, error: 'SQL statement cannot be empty' };
+  }
 
-    // Execute the SQL query using the DataSource with timeout
-    const result = await dataSource.execute({
-      sql: limitedSql,
-      options: {
-        timeout: 60000, // 60 second timeout for complex analytical queries
-      },
-    });
+  // Ensure the SQL statement has a LIMIT clause to prevent excessive results
+  const limitedSql = ensureSqlLimit(sqlStatement, 25);
 
-    if (result.success) {
+  // Attempt execution with retries
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      // Execute the SQL query using the DataSource with timeout
+      const result = await dataSource.execute({
+        sql: limitedSql,
+        options: {
+          timeout: TIMEOUT_MS,
+        },
+      });
+
+      if (result.success) {
+        return {
+          success: true,
+          data: truncateQueryResults(result.rows || []),
+        };
+      }
+
+      // Check if error is timeout-related
+      const errorMessage = result.error?.message || 'Query execution failed';
+      const isTimeout =
+        errorMessage.toLowerCase().includes('timeout') ||
+        errorMessage.toLowerCase().includes('timed out');
+
+      if (isTimeout && attempt < MAX_RETRIES) {
+        // Wait before retry
+        const delay = RETRY_DELAYS[attempt] || 6000;
+        console.warn(
+          `[execute-sql] Query timeout on attempt ${attempt + 1}/${MAX_RETRIES + 1}. Retrying in ${delay}ms...`,
+          {
+            sql: `${limitedSql.substring(0, 100)}...`,
+            attempt: attempt + 1,
+            nextDelay: delay,
+          }
+        );
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        continue; // Retry
+      }
+
+      // Not a timeout or no more retries
       return {
-        success: true,
-        data: truncateQueryResults(result.rows || []),
+        success: false,
+        error: errorMessage,
+      };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'SQL execution failed';
+      const isTimeout =
+        errorMessage.toLowerCase().includes('timeout') ||
+        errorMessage.toLowerCase().includes('timed out');
+
+      if (isTimeout && attempt < MAX_RETRIES) {
+        // Wait before retry
+        const delay = RETRY_DELAYS[attempt] || 6000;
+        console.warn(
+          `[execute-sql] Query timeout (exception) on attempt ${attempt + 1}/${MAX_RETRIES + 1}. Retrying in ${delay}ms...`,
+          {
+            sql: `${limitedSql.substring(0, 100)}...`,
+            attempt: attempt + 1,
+            nextDelay: delay,
+            error: errorMessage,
+          }
+        );
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        continue; // Retry
+      }
+
+      // Not a timeout or no more retries
+      return {
+        success: false,
+        error: errorMessage,
       };
     }
-    return {
-      success: false,
-      error: result.error?.message || 'Query execution failed',
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'SQL execution failed',
-    };
   }
+
+  // Should not reach here, but just in case
+  return {
+    success: false,
+    error: 'Max retries exceeded for SQL execution',
+  };
 }
 
 // Export the tool

@@ -393,42 +393,109 @@ async function validateSql(sqlQuery: string, dataSourceId: string): Promise<SqlV
     }
 
     try {
-      // Execute the SQL query using the DataSource with timeout for validation
-      const result = await dataSource.execute({
-        sql: sqlQuery,
-        options: {
-          timeout: 60000, // 60 second timeout for complex analytical queries
-        },
-      });
+      // Retry configuration for SQL validation
+      const MAX_RETRIES = 3;
+      const TIMEOUT_MS = 30000; // 30 seconds per attempt
+      const RETRY_DELAYS = [1000, 3000, 6000]; // 1s, 3s, 6s
 
-      if (result.success) {
-        const allResults = result.rows || [];
-        // Truncate results to 25 records for validation
-        const results = allResults.slice(0, 25);
+      // Attempt execution with retries
+      for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+        try {
+          // Execute the SQL query using the DataSource with timeout for validation
+          const result = await dataSource.execute({
+            sql: sqlQuery,
+            options: {
+              timeout: TIMEOUT_MS,
+            },
+          });
 
-        const metadata = {
-          columns: results.length > 0 ? Object.keys(results[0] || {}) : [],
-          rowCount: results.length,
-          totalRowCount: allResults.length, // Track original count
-          executionTime: 100, // We don't have actual execution time from DataSource
-        };
+          if (result.success) {
+            const allResults = result.rows || [];
+            // Truncate results to 25 records for validation
+            const results = allResults.slice(0, 25);
 
-        const message =
-          allResults.length === 0
-            ? 'Query executed successfully but returned no records'
-            : `Query validated successfully and returned ${allResults.length} records${allResults.length > 25 ? ` (showing sample of first 25 of ${allResults.length} total)` : ''}`;
+            const metadata = {
+              columns: results.length > 0 ? Object.keys(results[0] || {}) : [],
+              rowCount: results.length,
+              totalRowCount: allResults.length, // Track original count
+              executionTime: 100, // We don't have actual execution time from DataSource
+            };
 
-        return {
-          success: true,
-          message,
-          results,
-          metadata,
-        };
+            const message =
+              allResults.length === 0
+                ? 'Query executed successfully but returned no records'
+                : `Query validated successfully and returned ${allResults.length} records${allResults.length > 25 ? ` (showing sample of first 25 of ${allResults.length} total)` : ''}`;
+
+            return {
+              success: true,
+              message,
+              results,
+              metadata,
+            };
+          }
+
+          // Check if error is timeout-related
+          const errorMessage = result.error?.message || 'Query execution failed';
+          const isTimeout =
+            errorMessage.toLowerCase().includes('timeout') ||
+            errorMessage.toLowerCase().includes('timed out');
+
+          if (isTimeout && attempt < MAX_RETRIES) {
+            // Wait before retry
+            const delay = RETRY_DELAYS[attempt] || 6000;
+            console.warn(
+              `[modify-metrics] SQL validation timeout on attempt ${attempt + 1}/${MAX_RETRIES + 1}. Retrying in ${delay}ms...`,
+              {
+                metricName: metric?.name,
+                sqlPreview: `${sqlQuery.substring(0, 100)}...`,
+                attempt: attempt + 1,
+                nextDelay: delay,
+              }
+            );
+            await new Promise((resolve) => setTimeout(resolve, delay));
+            continue; // Retry
+          }
+
+          // Not a timeout or no more retries
+          return {
+            success: false,
+            error: errorMessage,
+          };
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'SQL validation failed';
+          const isTimeout =
+            errorMessage.toLowerCase().includes('timeout') ||
+            errorMessage.toLowerCase().includes('timed out');
+
+          if (isTimeout && attempt < MAX_RETRIES) {
+            // Wait before retry
+            const delay = RETRY_DELAYS[attempt] || 6000;
+            console.warn(
+              `[modify-metrics] SQL validation timeout (exception) on attempt ${attempt + 1}/${MAX_RETRIES + 1}. Retrying in ${delay}ms...`,
+              {
+                metricName: metric?.name,
+                sqlPreview: `${sqlQuery.substring(0, 100)}...`,
+                attempt: attempt + 1,
+                nextDelay: delay,
+                error: errorMessage,
+              }
+            );
+            await new Promise((resolve) => setTimeout(resolve, delay));
+            continue; // Retry
+          }
+
+          // Not a timeout or no more retries
+          return {
+            success: false,
+            error: errorMessage,
+          };
+        }
       }
 
+      // Should not reach here, but just in case
       return {
         success: false,
-        error: result.error?.message || 'Query execution failed',
+        error: 'Max retries exceeded for SQL validation',
       };
     } finally {
       // Always close the data source connection

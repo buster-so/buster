@@ -936,11 +936,29 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       case 'executeSql':
       case 'execute-sql': {
         // Update SQL content as it streams
-        const statements = getOptimisticValue<string[]>(
+        const rawStatements = getOptimisticValue<unknown>(
           parseResult.extractedValues,
           'statements',
           []
         );
+
+        // Ensure statements is an array
+        let statements: string[] = [];
+        if (Array.isArray(rawStatements)) {
+          statements = rawStatements.filter((s): s is string => typeof s === 'string');
+        } else if (typeof rawStatements === 'string') {
+          // Handle case where statements might be a JSON string
+          try {
+            const parsed = JSON.parse(rawStatements);
+            if (Array.isArray(parsed)) {
+              statements = parsed.filter((s): s is string => typeof s === 'string');
+            }
+          } catch {
+            // If parsing fails, treat as single statement
+            statements = [rawStatements];
+          }
+        }
+
         const sql = getOptimisticValue<string>(parseResult.extractedValues, 'sql', '');
 
         if (entry.type === 'files') {
