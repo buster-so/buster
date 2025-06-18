@@ -53,9 +53,9 @@ export class SnowflakeAdapter extends BaseAdapter {
       if (!connectionPools.has(this.poolKey)) {
         const pool = new SnowflakeConnectionPool(snowflakeCredentials, {
           minConnections: 5,
-          maxConnections: 25,     // Increased to support 50 concurrent queries
-          idleTimeout: 300000,    // 5 minutes
-          acquireTimeout: 45000,  // 45 seconds (increased for higher load)
+          maxConnections: 25, // Increased to support 50 concurrent queries
+          idleTimeout: 300000, // 5 minutes
+          acquireTimeout: 45000, // 45 seconds (increased for higher load)
           connectionTimeout: 60000, // 60 seconds
         });
 

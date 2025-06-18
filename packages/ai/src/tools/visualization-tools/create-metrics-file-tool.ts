@@ -1249,54 +1249,119 @@ async function validateSql(
       };
     }
 
-    // Execute the SQL query using the DataSource with row limit and timeout for validation
-    const result = await dataSource.execute({
-      sql: sqlQuery,
-      options: {
-        maxRows: 1000, // Limit to 1000 rows for validation to protect memory
-        timeout: 60000, // 60 second timeout for complex analytical queries
-      },
-    });
+    // Retry configuration for SQL validation
+    const MAX_RETRIES = 3;
+    const TIMEOUT_MS = 30000; // 30 seconds per attempt
+    const RETRY_DELAYS = [1000, 3000, 6000]; // 1s, 3s, 6s
 
-    if (result.success) {
-      const allResults = result.rows || [];
-      // Truncate results to 25 records for display in validation
-      const results = allResults.slice(0, 25);
+    // Attempt execution with retries
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        // Execute the SQL query using the DataSource with row limit and timeout for validation
+        const result = await dataSource.execute({
+          sql: sqlQuery,
+          options: {
+            maxRows: 1000, // Limit to 1000 rows for validation to protect memory
+            timeout: TIMEOUT_MS,
+          },
+        });
 
-      // Validate metadata with Zod schema for runtime safety
-      const validatedMetadata = resultMetadataSchema.safeParse(result.metadata);
-      const parsedMetadata: ResultMetadata = validatedMetadata.success
-        ? validatedMetadata.data
-        : undefined;
+        if (result.success) {
+          const allResults = result.rows || [];
+          // Truncate results to 25 records for display in validation
+          const results = allResults.slice(0, 25);
 
-      const metadata: QueryMetadata = {
-        rowCount: results.length,
-        totalRowCount: parsedMetadata?.totalRowCount ?? allResults.length,
-        executionTime: result.executionTime || 100,
-        limited: parsedMetadata?.limited ?? false,
-        maxRows: parsedMetadata?.maxRows,
-      };
+          // Validate metadata with Zod schema for runtime safety
+          const validatedMetadata = resultMetadataSchema.safeParse(result.metadata);
+          const parsedMetadata: ResultMetadata = validatedMetadata.success
+            ? validatedMetadata.data
+            : undefined;
 
-      let message: string;
-      if (allResults.length === 0) {
-        message = 'Query executed successfully but returned no records';
-      } else if (result.metadata?.limited) {
-        message = `Query validated successfully. Results were limited to ${result.metadata.maxRows} rows for memory protection (query may return more rows when executed)${results.length < allResults.length ? ` - showing first 25 of ${allResults.length} fetched` : ''}`;
-      } else {
-        message = `Query validated successfully and returned ${allResults.length} records${allResults.length > 25 ? ' (showing sample of first 25)' : ''}`;
+          const metadata: QueryMetadata = {
+            rowCount: results.length,
+            totalRowCount: parsedMetadata?.totalRowCount ?? allResults.length,
+            executionTime: result.executionTime || 100,
+            limited: parsedMetadata?.limited ?? false,
+            maxRows: parsedMetadata?.maxRows,
+          };
+
+          let message: string;
+          if (allResults.length === 0) {
+            message = 'Query executed successfully but returned no records';
+          } else if (result.metadata?.limited) {
+            message = `Query validated successfully. Results were limited to ${result.metadata.maxRows} rows for memory protection (query may return more rows when executed)${results.length < allResults.length ? ` - showing first 25 of ${allResults.length} fetched` : ''}`;
+          } else {
+            message = `Query validated successfully and returned ${allResults.length} records${allResults.length > 25 ? ' (showing sample of first 25)' : ''}`;
+          }
+
+          return {
+            success: true,
+            message,
+            results,
+            metadata,
+          };
+        }
+
+        // Check if error is timeout-related
+        const errorMessage = result.error?.message || 'Query execution failed';
+        const isTimeout =
+          errorMessage.toLowerCase().includes('timeout') ||
+          errorMessage.toLowerCase().includes('timed out');
+
+        if (isTimeout && attempt < MAX_RETRIES) {
+          // Wait before retry
+          const delay = RETRY_DELAYS[attempt] || 6000;
+          console.warn(
+            `[create-metrics] SQL validation timeout on attempt ${attempt + 1}/${MAX_RETRIES + 1}. Retrying in ${delay}ms...`,
+            {
+              sqlPreview: `${sqlQuery.substring(0, 100)}...`,
+              attempt: attempt + 1,
+              nextDelay: delay,
+            }
+          );
+          await new Promise((resolve) => setTimeout(resolve, delay));
+          continue; // Retry
+        }
+
+        // Not a timeout or no more retries
+        return {
+          success: false,
+          error: errorMessage,
+        };
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'SQL validation failed';
+        const isTimeout =
+          errorMessage.toLowerCase().includes('timeout') ||
+          errorMessage.toLowerCase().includes('timed out');
+
+        if (isTimeout && attempt < MAX_RETRIES) {
+          // Wait before retry
+          const delay = RETRY_DELAYS[attempt] || 6000;
+          console.warn(
+            `[create-metrics] SQL validation timeout (exception) on attempt ${attempt + 1}/${MAX_RETRIES + 1}. Retrying in ${delay}ms...`,
+            {
+              sqlPreview: `${sqlQuery.substring(0, 100)}...`,
+              attempt: attempt + 1,
+              nextDelay: delay,
+              error: errorMessage,
+            }
+          );
+          await new Promise((resolve) => setTimeout(resolve, delay));
+          continue; // Retry
+        }
+
+        // Not a timeout or no more retries
+        return {
+          success: false,
+          error: errorMessage,
+        };
       }
-
-      return {
-        success: true,
-        message,
-        results,
-        metadata,
-      };
     }
 
+    // Should not reach here, but just in case
     return {
       success: false,
-      error: result.error?.message || 'Query execution failed',
+      error: 'Max retries exceeded for SQL validation',
     };
     // Note: We don't close the data source here anymore - it's managed by the workflow manager
   } catch (error) {
