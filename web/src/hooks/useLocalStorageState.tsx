@@ -1,9 +1,18 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useMemoizedFn } from './useMemoizedFn';
+import { useMount } from './useMount';
 
 type SetState<S> = S | ((prevState?: S) => S);
+
+// Default expiration time: 7 days in milliseconds
+const DEFAULT_EXPIRATION_TIME = 7 * 24 * 60 * 60 * 1000;
+
+interface StorageData<T> {
+  value: T;
+  timestamp: number;
+}
 
 interface Options<T> {
   defaultValue?: T | (() => T);
@@ -11,6 +20,7 @@ interface Options<T> {
   deserializer?: (value: string) => T;
   onError?: (error: unknown) => void;
   bustStorageOnInit?: boolean;
+  expirationTime?: number;
 }
 
 export function useLocalStorageState<T>(
@@ -22,7 +32,8 @@ export function useLocalStorageState<T>(
     serializer = JSON.stringify,
     deserializer = JSON.parse,
     onError,
-    bustStorageOnInit = false
+    bustStorageOnInit = false,
+    expirationTime = DEFAULT_EXPIRATION_TIME
   } = options || {};
 
   // Get initial value from localStorage or use default
@@ -37,9 +48,42 @@ export function useLocalStorageState<T>(
       if (item === null) {
         return typeof defaultValue === 'function' ? (defaultValue as () => T)() : defaultValue;
       }
-      return deserializer(item);
+
+      // Parse the stored data which includes value and timestamp
+      const storageData: StorageData<T> = JSON.parse(item);
+
+      // Check if the stored data has the expected structure
+      if (
+        typeof storageData !== 'object' ||
+        storageData === null ||
+        !('value' in storageData) ||
+        !('timestamp' in storageData)
+      ) {
+        // If the data doesn't have the expected structure (legacy data), treat as expired
+        window.localStorage.removeItem(key);
+        return typeof defaultValue === 'function' ? (defaultValue as () => T)() : defaultValue;
+      }
+
+      // Check if the data has expired
+      const currentTime = Date.now();
+      const timeDifference = currentTime - storageData.timestamp;
+
+      if (timeDifference > expirationTime) {
+        // Data has expired, remove it and return default value
+        window.localStorage.removeItem(key);
+        return typeof defaultValue === 'function' ? (defaultValue as () => T)() : defaultValue;
+      }
+
+      // Data is still valid, deserialize and return the value
+      return deserializer(JSON.stringify(storageData.value));
     } catch (error) {
       onError?.(error);
+      // If there's an error, clean up the invalid data and return default
+      try {
+        window.localStorage.removeItem(key);
+      } catch (cleanupError) {
+        onError?.(cleanupError);
+      }
       return typeof defaultValue === 'function' ? (defaultValue as () => T)() : defaultValue;
     }
   });
@@ -47,9 +91,9 @@ export function useLocalStorageState<T>(
   const [state, setState] = useState<T | undefined>(getInitialValue);
 
   // Initialize state from localStorage on mount
-  useEffect(() => {
+  useMount(() => {
     setState(getInitialValue());
-  }, [getInitialValue]);
+  });
 
   // Update localStorage when state changes
   useEffect(() => {
@@ -57,7 +101,12 @@ export function useLocalStorageState<T>(
       if (state === undefined) {
         window.localStorage.removeItem(key);
       } else {
-        window.localStorage.setItem(key, serializer(state));
+        // Create storage data with current timestamp
+        const storageData: StorageData<T> = {
+          value: JSON.parse(serializer(state)),
+          timestamp: Date.now()
+        };
+        window.localStorage.setItem(key, JSON.stringify(storageData));
       }
     } catch (error) {
       onError?.(error);
@@ -65,23 +114,20 @@ export function useLocalStorageState<T>(
   }, [key, state, serializer, onError]);
 
   // Setter function that handles both direct values and function updates
-  const setStoredState = useCallback(
-    (value?: SetState<T>) => {
-      try {
-        if (typeof value === 'function') {
-          setState((prevState) => {
-            const newState = (value as (prevState?: T) => T)(prevState);
-            return newState;
-          });
-        } else {
-          setState(value);
-        }
-      } catch (error) {
-        onError?.(error);
+  const setStoredState = useMemoizedFn((value?: SetState<T>) => {
+    try {
+      if (typeof value === 'function') {
+        setState((prevState) => {
+          const newState = (value as (prevState?: T) => T)(prevState);
+          return newState;
+        });
+      } else {
+        setState(value);
       }
-    },
-    [onError]
-  );
+    } catch (error) {
+      onError?.(error);
+    }
+  });
 
   return [state, setStoredState];
 }

@@ -20,9 +20,10 @@ interface FontOptions {
 
 export const measureTextWidth = memoize(
   (text: string | number, font: FontOptions = {}) => {
-    if (!isServer && ctx) {
+    if (!isServer) {
       const { fontSize, fontFamily = 'Roobert_Pro', fontWeight, fontStyle, fontVariant } = font;
       const ctx = getCanvasContext();
+
       if (!ctx) {
         return {
           width: 0,

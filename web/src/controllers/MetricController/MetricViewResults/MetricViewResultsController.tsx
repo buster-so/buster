@@ -34,7 +34,6 @@ export const MetricViewResultsController = React.memo(({ metricId }: { metricId:
   const fetchintData = !isFetchedMetric || !isFetchedInitialData;
 
   const onResizeColumns = useMemoizedFn((columnSizes: { key: string; size: number }[]) => {
-    console.log('columnSizes', localStorageKey, columnSizes);
     setColumnWidths(
       columnSizes.reduce(
         (acc, curr) => {

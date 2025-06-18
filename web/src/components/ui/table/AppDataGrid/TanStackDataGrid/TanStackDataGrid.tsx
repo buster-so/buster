@@ -9,7 +9,7 @@ import {
 } from '@tanstack/react-table';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useDebounceFn } from '@/hooks';
+import { useDebounceFn, useUpdateEffect } from '@/hooks';
 import { cn } from '@/lib/classMerge';
 import { createDefaultTableColumnWidths } from '@/lib/metrics/messageAutoChartHandler/createDefaultTableColumnWidths';
 import { CELL_HEIGHT, OVERSCAN } from './constants';
@@ -17,6 +17,8 @@ import { DataGridHeader } from './DataGridHeader';
 import { DataGridRow } from './DataGridRow';
 import { defaultCellFormat, defaultHeaderFormat } from './defaultFormat';
 import { SortColumnWrapper } from './SortColumnWrapper';
+import isEmpty from 'lodash/isEmpty';
+import isEqual from 'lodash/isEqual';
 
 export interface TanStackDataGridProps {
   className?: string;
@@ -69,6 +71,7 @@ export const TanStackDataGrid: React.FC<TanStackDataGridProps> = React.memo(
         headerFormat
       );
     });
+
     const [colOrder, setColOrder] = useState<string[]>(serverColumnOrder || fields);
     // Build columns from fields.
     const columns = useMemo<
@@ -129,8 +132,13 @@ export const TanStackDataGrid: React.FC<TanStackDataGridProps> = React.memo(
       }
     }, [columnSizing, onResizeColumns]);
 
-    useEffect(() => {
-      if (columnWidthsProp) {
+    useUpdateEffect(() => {
+      if (
+        columnWidthsProp &&
+        !isEmpty(columnWidthsProp) &&
+        !isEqual(columnSizing, columnWidthsProp)
+      ) {
+        console.log('EFFECT', columnWidthsProp);
         setColumnSizing(
           createDefaultTableColumnWidths(fields, rows, columnWidthsProp, cellFormat, headerFormat)
         );

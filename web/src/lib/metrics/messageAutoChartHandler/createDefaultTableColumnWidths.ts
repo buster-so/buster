@@ -14,11 +14,13 @@ export const createDefaultTableColumnWidths = (
 ) => {
   const sampleOfRows = sampleSize(rows, 15);
   const initial: Record<string, number> = {};
+
   for (const field of fields) {
     initial[field] =
       columnWidthsProp?.[field] ||
       getDefaultColumnWidth(sampleOfRows, field, cellFormat, headerFormat);
   }
+
   return initial;
 };
 
