@@ -3,6 +3,7 @@ import type {
   ChatMessageReasoningMessage,
   ChatMessageResponseMessage,
 } from '../../../../../server/src/types/chat-types/chat-message.type';
+import { hasFailureIndicators, hasFileFailureIndicators } from '../../../src/utils/database/types';
 
 // Import the functions we want to test (we'll need to export them from analyst-step.ts)
 // For now, I'll copy them here for testing
@@ -20,11 +21,30 @@ function extractFilesFromReasoning(
   const files: ExtractedFile[] = [];
 
   for (const entry of reasoningHistory) {
-    // Only process file entries with completed status
-    if (entry.type === 'files' && entry.status === 'completed' && entry.files) {
+    // Multi-layer safety checks:
+    // 1. Must be a files entry with completed status
+    // 2. Must not have any failure indicators (additional safety net)
+    // 3. Individual files must have completed status
+    if (
+      entry.type === 'files' &&
+      entry.status === 'completed' &&
+      entry.files &&
+      !hasFailureIndicators(entry)
+    ) {
       for (const fileId of entry.file_ids || []) {
         const file = entry.files[fileId];
-        if (file && file.status === 'completed') {
+
+        // Enhanced file validation:
+        // - File must exist and have completed status
+        // - File must not have error indicators
+        // - File must have required properties (file_type, file_name)
+        if (
+          file &&
+          file.status === 'completed' &&
+          file.file_type &&
+          file.file_name &&
+          !hasFileFailureIndicators(file)
+        ) {
           files.push({
             id: fileId,
             fileType: file.file_type as 'metric' | 'dashboard',
@@ -291,6 +311,75 @@ describe('Analyst Step File Selection', () => {
     test('should handle empty reasoning history', () => {
       const extracted = extractFilesFromReasoning([]);
       expect(extracted).toHaveLength(0);
+    });
+
+    test('should reject files from entries with error indicators (failure detection)', () => {
+      const reasoningHistory: ChatMessageReasoningMessage[] = [
+        {
+          id: 'entry-with-error',
+          type: 'files',
+          title: 'Creating metrics',
+          status: 'completed', // Status says completed
+          error: 'Validation warnings occurred', // But has error field - this should prevent file extraction
+          file_ids: ['file-1'],
+          files: {
+            'file-1': {
+              id: 'file-1',
+              file_type: 'metric',
+              file_name: 'metric.yml',
+              version_number: 1,
+              status: 'completed',
+              file: { text: 'metric: test' },
+            },
+          },
+        } as any,
+      ];
+
+      const extracted = extractFilesFromReasoning(reasoningHistory);
+
+      // Should extract no files due to error indicator in entry
+      // With our new logic, entry-level errors should still prevent extraction
+      expect(extracted).toHaveLength(0);
+    });
+
+    test('should reject individual files with error properties (enhanced validation)', () => {
+      const reasoningHistory: ChatMessageReasoningMessage[] = [
+        {
+          id: 'entry-clean',
+          type: 'files',
+          title: 'Creating metrics',
+          status: 'completed',
+          file_ids: ['file-1', 'file-2'],
+          files: {
+            'file-1': {
+              id: 'file-1',
+              file_type: 'metric',
+              file_name: 'good_metric.yml',
+              version_number: 1,
+              status: 'completed',
+              file: { text: 'metric: good' },
+            },
+            'file-2': {
+              id: 'file-2',
+              file_type: 'metric',
+              file_name: 'problematic_metric.yml',
+              version_number: 1,
+              status: 'completed', // Status completed
+              error: 'Schema validation warning', // But has error property
+              file: { text: 'metric: problematic' },
+            } as any,
+          },
+        },
+      ];
+
+      const extracted = extractFilesFromReasoning(reasoningHistory);
+
+      // Should only extract the file without error properties
+      expect(extracted).toHaveLength(1);
+      const goodFile = extracted[0];
+      expect(goodFile).toBeDefined();
+      expect(goodFile?.id).toBe('file-1');
+      expect(goodFile?.fileName).toBe('good_metric.yml');
     });
 
     test('should skip non-file reasoning entries', () => {

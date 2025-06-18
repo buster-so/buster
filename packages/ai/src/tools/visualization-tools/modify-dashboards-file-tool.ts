@@ -110,9 +110,6 @@ const dashboardYmlSchema = z.object({
     ),
 });
 
-type DashboardRow = z.infer<typeof dashboardRowSchema>;
-type DashboardItem = z.infer<typeof dashboardItemSchema>;
-
 // Parse and validate dashboard YAML content
 function parseAndValidateYaml(ymlContent: string): {
   success: boolean;
@@ -130,7 +127,19 @@ function parseAndValidateYaml(ymlContent: string): {
       };
     }
 
-    return { success: true, data: validationResult.data };
+    // Transform the validated data to match the expected DashboardYml type
+    const transformedData: DashboardYml = {
+      name: validationResult.data.name,
+      description: validationResult.data.description,
+      rows: validationResult.data.rows.map((row) => ({
+        id: row.id,
+        items: row.items,
+        columnSizes: row.column_sizes,
+        rowHeight: undefined, // Optional field, set to undefined if not provided
+      })),
+    };
+
+    return { success: true, data: transformedData };
   } catch (error) {
     return {
       success: false,
@@ -204,9 +213,7 @@ async function processDashboardFileUpdate(
   const newYml = yamlValidation.data;
 
   // Collect and validate metric IDs from rows
-  const metricIds: string[] = newYml.rows
-    .flatMap((row: DashboardRow) => row.items)
-    .map((item: DashboardItem) => item.id);
+  const metricIds: string[] = newYml.rows.flatMap((row) => row.items).map((item) => item.id);
 
   if (metricIds.length > 0) {
     const metricValidation = await validateMetricIds(metricIds);

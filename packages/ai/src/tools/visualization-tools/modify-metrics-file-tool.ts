@@ -16,6 +16,149 @@ import {
 } from './version-history-helpers';
 import type { MetricYml, VersionHistory } from './version-history-types';
 
+// TypeScript types matching Rust DataMetadata structure
+enum SimpleType {
+  Number = 'number',
+  String = 'string',
+  Date = 'date',
+  Boolean = 'boolean',
+  Other = 'other',
+}
+
+enum ColumnType {
+  Int2 = 'int2',
+  Int4 = 'int4',
+  Int8 = 'int8',
+  Float4 = 'float4',
+  Float8 = 'float8',
+  Varchar = 'varchar',
+  Text = 'text',
+  Bool = 'bool',
+  Date = 'date',
+  Timestamp = 'timestamp',
+  Timestamptz = 'timestamptz',
+  Other = 'other',
+}
+
+interface ColumnMetaData {
+  name: string;
+  min_value: unknown;
+  max_value: unknown;
+  unique_values: number;
+  simple_type: SimpleType;
+  type: ColumnType;
+}
+
+interface DataMetadata {
+  column_count: number;
+  row_count: number;
+  column_metadata: ColumnMetaData[];
+}
+
+/**
+ * Analyzes query results to create DataMetadata structure
+ */
+function createDataMetadata(results: Record<string, unknown>[]): DataMetadata {
+  if (!results.length) {
+    return {
+      column_count: 0,
+      row_count: 0,
+      column_metadata: [],
+    };
+  }
+
+  const columnNames = Object.keys(results[0] || {});
+  const columnMetadata: ColumnMetaData[] = [];
+
+  for (const columnName of columnNames) {
+    const values = results
+      .map((row) => row[columnName])
+      .filter((v) => v !== null && v !== undefined);
+
+    // Determine column type based on the first non-null value
+    let columnType = ColumnType.Other;
+    let simpleType = SimpleType.Other;
+
+    if (values.length > 0) {
+      const firstValue = values[0];
+
+      if (typeof firstValue === 'number') {
+        columnType = Number.isInteger(firstValue) ? ColumnType.Int4 : ColumnType.Float8;
+        simpleType = SimpleType.Number;
+      } else if (typeof firstValue === 'boolean') {
+        columnType = ColumnType.Bool;
+        simpleType = SimpleType.Boolean;
+      } else if (firstValue instanceof Date) {
+        columnType = ColumnType.Timestamp;
+        simpleType = SimpleType.Date;
+      } else if (typeof firstValue === 'string') {
+        // Check if it looks like a date
+        if (!Number.isNaN(Date.parse(firstValue))) {
+          columnType = ColumnType.Timestamp;
+          simpleType = SimpleType.Date;
+        } else {
+          columnType = ColumnType.Varchar;
+          simpleType = SimpleType.String;
+        }
+      }
+    }
+
+    // Calculate min/max values
+    let minValue: unknown = null;
+    let maxValue: unknown = null;
+
+    if (values.length > 0) {
+      if (simpleType === SimpleType.Number) {
+        const numValues = values.filter((v) => typeof v === 'number') as number[];
+        if (numValues.length > 0) {
+          minValue = Math.min(...numValues);
+          maxValue = Math.max(...numValues);
+        }
+      } else if (simpleType === SimpleType.Date) {
+        const dateValues = values
+          .map((v) => {
+            if (v instanceof Date) return v;
+            if (typeof v === 'string') {
+              const parsed = new Date(v);
+              return Number.isNaN(parsed.getTime()) ? null : parsed;
+            }
+            return null;
+          })
+          .filter((d) => d !== null) as Date[];
+
+        if (dateValues.length > 0) {
+          minValue = new Date(Math.min(...dateValues.map((d) => d.getTime())));
+          maxValue = new Date(Math.max(...dateValues.map((d) => d.getTime())));
+        }
+      } else if (simpleType === SimpleType.String) {
+        const strValues = values.filter((v) => typeof v === 'string') as string[];
+        if (strValues.length > 0) {
+          minValue = strValues.sort()[0];
+          maxValue = strValues.sort().reverse()[0];
+        }
+      }
+    }
+
+    // Calculate unique values count
+    const uniqueValues = new Set(values).size;
+
+    columnMetadata.push({
+      name: columnName,
+      min_value: minValue,
+      max_value: maxValue,
+      unique_values: uniqueValues,
+      simple_type: simpleType,
+      type: columnType,
+    });
+  }
+
+  return {
+    column_count: columnNames.length,
+    row_count: results.length,
+    column_metadata: columnMetadata,
+  };
+}
+
 /**
  * Ensures timeFrame values are properly quoted in YAML content
  * Finds timeFrame: value and wraps the value in quotes if not already quoted
@@ -356,7 +499,16 @@ function parseAndValidateYaml(ymlContent: string): {
       };
     }
 
-    return { success: true, data: validationResult.data };
+    // Transform the validated data to match MetricYml type (camelCase)
+    const transformedData: MetricYml = {
+      name: validationResult.data.name,
+      description: validationResult.data.description,
+      timeFrame: validationResult.data.time_frame, // Transform snake_case to camelCase
+      sql: validationResult.data.sql,
+      chartConfig: validationResult.data.chart_config, // Transform snake_case to camelCase
+    };
+
+    return { success: true, data: transformedData };
   } catch (error) {
     return {
       success: false,
@@ -491,7 +643,7 @@ async function processMetricFileUpdate(
       content: newMetricYml,
       name: newMetricYml.name,
       updatedAt: new Date().toISOString(),
-      dataMetadata: sqlValidation.metadata,
+      dataMetadata: sqlValidation.results ? createDataMetadata(sqlValidation.results) : null,
     },
     metricYml: newMetricYml,
     modificationResults,

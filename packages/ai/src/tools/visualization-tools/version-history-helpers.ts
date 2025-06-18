@@ -1,10 +1,4 @@
-import type {
-  DashboardYml,
-  MetricYml,
-  Version,
-  VersionContent,
-  VersionHistory,
-} from './version-history-types';
+import type { DashboardYml, MetricYml, Version, VersionHistory } from './version-history-types';
 import { dashboardYmlSchema, metricYmlSchema } from './version-history-types';
 
 /**
@@ -18,7 +12,7 @@ export function createMetricVersion(
   return {
     version_number: versionNumber,
     updated_at: timestamp || new Date().toISOString(),
-    content: { MetricYml: metricYml },
+    content: metricYml, // Store directly - already in camelCase
   };
 }
 
@@ -33,7 +27,7 @@ export function createDashboardVersion(
   return {
     version_number: versionNumber,
     updated_at: timestamp || new Date().toISOString(),
-    content: { DashboardYml: dashboardYml },
+    content: dashboardYml, // Store directly - already in camelCase
   };
 }
 
@@ -168,70 +162,4 @@ export function validateDashboardYml(dashboardYml: unknown): DashboardYml {
   return dashboardYmlSchema.parse(dashboardYml);
 }
 
-/**
- * Updates the latest version without creating a new version
- * Matches Rust VersionHistory.update_latest_version behavior
- */
-export function updateLatestVersion(
-  history: VersionHistory | null | undefined,
-  content: VersionContent,
-  timestamp?: string
-): VersionHistory {
-  if (!history || Object.keys(history).length === 0) {
-    // If there are no versions yet, create version 1
-    return {
-      '1': {
-        version_number: 1,
-        updated_at: timestamp || new Date().toISOString(),
-        content,
-      },
-    };
-  }
-
-  // Get the latest version and update its content
-  const latestVersionNumber = getLatestVersionNumber(history);
-  return {
-    ...history,
-    [latestVersionNumber.toString()]: {
-      version_number: latestVersionNumber,
-      updated_at: timestamp || new Date().toISOString(),
-      content,
-    },
-  };
-}
-
-/**
- * Creates a new VersionHistory with initial content (matches Rust VersionHistory::new)
- */
-export function createVersionHistory(
-  versionNumber: number,
-  content: VersionContent,
-  timestamp?: string
-): VersionHistory {
-  return {
-    [versionNumber.toString()]: {
-      version_number: versionNumber,
-      updated_at: timestamp || new Date().toISOString(),
-      content,
-    },
-  };
-}
-
-/**
- * Adds a version to existing history (matches Rust VersionHistory::add_version)
- */
-export function addVersionToHistory(
-  history: VersionHistory,
-  versionNumber: number,
-  content: VersionContent,
-  timestamp?: string
-): VersionHistory {
-  return {
-    ...history,
-    [versionNumber.toString()]: {
-      version_number: versionNumber,
-      updated_at: timestamp || new Date().toISOString(),
-      content,
-    },
-  };
-}
+// Removed generic version functions - use specific addMetricVersionToHistory and addDashboardVersionToHistory instead
