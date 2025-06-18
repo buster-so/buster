@@ -1,25 +1,5 @@
-import type {
-  DashboardYml,
-  DashboardYmlStorage,
-  MetricYml,
-  MetricYmlStorage,
-  Version,
-  VersionHistory,
-} from './version-history-types';
+import type { DashboardYml, MetricYml, Version, VersionHistory } from './version-history-types';
 import { dashboardYmlSchema, metricYmlSchema } from './version-history-types';
-
-/**
- * Converts MetricYml from API format (snake_case) to storage format (camelCase)
- */
-function metricYmlToStorageFormat(metricYml: MetricYml): MetricYmlStorage {
-  return {
-    name: metricYml.name,
-    description: metricYml.description,
-    timeFrame: metricYml.time_frame, // Convert to camelCase for storage
-    sql: metricYml.sql,
-    chartConfig: metricYml.chart_config, // Convert to camelCase for storage
-  };
-}
 
 /**
  * Creates a version entry for a metric
@@ -32,23 +12,7 @@ export function createMetricVersion(
   return {
     version_number: versionNumber,
     updated_at: timestamp || new Date().toISOString(),
-    content: metricYmlToStorageFormat(metricYml), // Store directly without enum wrapper
-  };
-}
-
-/**
- * Converts DashboardYml from API format (snake_case) to storage format (camelCase)
- */
-function dashboardYmlToStorageFormat(dashboardYml: DashboardYml): DashboardYmlStorage {
-  return {
-    name: dashboardYml.name,
-    description: dashboardYml.description,
-    rows: dashboardYml.rows.map((row) => ({
-      id: row.id,
-      items: row.items,
-      columnSizes: row.column_sizes, // Convert to camelCase for storage
-      rowHeight: row.row_height, // Convert to camelCase for storage
-    })),
+    content: metricYml, // Store directly - already in camelCase
   };
 }
 
@@ -63,7 +27,7 @@ export function createDashboardVersion(
   return {
     version_number: versionNumber,
     updated_at: timestamp || new Date().toISOString(),
-    content: dashboardYmlToStorageFormat(dashboardYml), // Store directly without enum wrapper
+    content: dashboardYml, // Store directly - already in camelCase
   };
 }
 

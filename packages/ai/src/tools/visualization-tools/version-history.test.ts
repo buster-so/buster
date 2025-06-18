@@ -19,8 +19,8 @@ describe('Version History Helpers', () => {
   const mockMetricYml: MetricYml = {
     sql: 'SELECT SUM(revenue) as total FROM sales',
     name: 'Total Revenue',
-    time_frame: 'Q2 2023 - Q1 2024', // Note: time_frame not timeFrame
-    chart_config: {
+    timeFrame: 'Q2 2023 - Q1 2024',
+    chartConfig: {
       selectedChartType: 'metric',
       metricColumnId: 'total',
       columnLabelFormats: {
@@ -42,7 +42,7 @@ describe('Version History Helpers', () => {
       {
         id: 1,
         items: [{ id: '1ab2b66a-9ca6-5120-9155-20998b802c6a' }],
-        column_sizes: [12], // Note: column_sizes not columnSizes
+        columnSizes: [12],
       },
       {
         id: 2,
@@ -50,7 +50,7 @@ describe('Version History Helpers', () => {
           { id: 'ea6b0583-e9cb-5b2f-a18c-69571042ee67' },
           { id: 'b19d2606-6061-5d22-8628-78a4878310d4' },
         ],
-        column_sizes: [6, 6],
+        columnSizes: [6, 6],
       },
     ],
     description: 'Dashboard showing revenue metrics',
@@ -64,9 +64,9 @@ describe('Version History Helpers', () => {
         content: {
           name: mockMetricYml.name,
           description: mockMetricYml.description,
-          timeFrame: mockMetricYml.time_frame, // Converted to camelCase
+          timeFrame: mockMetricYml.timeFrame,
           sql: mockMetricYml.sql,
-          chartConfig: mockMetricYml.chart_config, // Converted to camelCase
+          chartConfig: mockMetricYml.chartConfig,
         },
         updated_at: mockTimestamp,
         version_number: 1,
@@ -79,9 +79,9 @@ describe('Version History Helpers', () => {
       expect(entry.content).toEqual({
         name: mockMetricYml.name,
         description: mockMetricYml.description,
-        timeFrame: mockMetricYml.time_frame, // Converted to camelCase
+        timeFrame: mockMetricYml.timeFrame,
         sql: mockMetricYml.sql,
-        chartConfig: mockMetricYml.chart_config, // Converted to camelCase
+        chartConfig: mockMetricYml.chartConfig,
       });
       expect(entry.version_number).toBe(2);
       expect(entry.updated_at).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
@@ -99,8 +99,8 @@ describe('Version History Helpers', () => {
           rows: mockDashboardYml.rows.map((row) => ({
             id: row.id,
             items: row.items,
-            columnSizes: row.column_sizes, // Converted to camelCase
-            rowHeight: row.row_height, // Converted to camelCase
+            columnSizes: row.columnSizes,
+            rowHeight: row.rowHeight,
           })),
         },
         updated_at: mockTimestamp,
@@ -117,8 +117,8 @@ describe('Version History Helpers', () => {
         rows: mockDashboardYml.rows.map((row) => ({
           id: row.id,
           items: row.items,
-          columnSizes: row.column_sizes, // Converted to camelCase
-          rowHeight: row.row_height, // Converted to camelCase
+          columnSizes: row.columnSizes,
+          rowHeight: row.rowHeight,
         })),
       });
       expect(entry.version_number).toBe(2);
@@ -135,9 +135,9 @@ describe('Version History Helpers', () => {
           content: {
             name: mockMetricYml.name,
             description: mockMetricYml.description,
-            timeFrame: mockMetricYml.time_frame,
+            timeFrame: mockMetricYml.timeFrame,
             sql: mockMetricYml.sql,
-            chartConfig: mockMetricYml.chart_config,
+            chartConfig: mockMetricYml.chartConfig,
           },
           updated_at: mockTimestamp,
           version_number: 1,
@@ -168,8 +168,8 @@ describe('Version History Helpers', () => {
             rows: mockDashboardYml.rows.map((row) => ({
               id: row.id,
               items: row.items,
-              columnSizes: row.column_sizes,
-              rowHeight: row.row_height,
+              columnSizes: row.columnSizes,
+              rowHeight: row.rowHeight,
             })),
           },
           updated_at: mockTimestamp,
@@ -198,9 +198,9 @@ describe('Version History Helpers', () => {
           content: {
             name: mockMetricYml.name,
             description: mockMetricYml.description,
-            timeFrame: mockMetricYml.time_frame,
+            timeFrame: mockMetricYml.timeFrame,
             sql: mockMetricYml.sql,
-            chartConfig: mockMetricYml.chart_config,
+            chartConfig: mockMetricYml.chartConfig,
           },
           updated_at: mockTimestamp,
           version_number: 1,
@@ -236,9 +236,9 @@ describe('Version History Helpers', () => {
         content: {
           name: updatedMetric.name,
           description: updatedMetric.description,
-          timeFrame: updatedMetric.time_frame,
+          timeFrame: updatedMetric.timeFrame,
           sql: updatedMetric.sql,
-          chartConfig: updatedMetric.chart_config,
+          chartConfig: updatedMetric.chartConfig,
         },
         updated_at: mockTimestamp,
         version_number: 2,
@@ -271,8 +271,8 @@ describe('Version History Helpers', () => {
             rows: mockDashboardYml.rows.map((row) => ({
               id: row.id,
               items: row.items,
-              columnSizes: row.column_sizes,
-              rowHeight: row.row_height,
+              columnSizes: row.columnSizes,
+              rowHeight: row.rowHeight,
             })),
           },
           updated_at: mockTimestamp,
@@ -302,8 +302,8 @@ describe('Version History Helpers', () => {
           rows: updatedDashboard.rows.map((row) => ({
             id: row.id,
             items: row.items,
-            columnSizes: row.column_sizes,
-            rowHeight: row.row_height,
+            columnSizes: row.columnSizes,
+            rowHeight: row.rowHeight,
           })),
         },
         updated_at: mockTimestamp,
@@ -368,9 +368,9 @@ describe('Version History Helpers', () => {
         content: {
           name: latestMetric.name,
           description: latestMetric.description,
-          timeFrame: latestMetric.time_frame,
+          timeFrame: latestMetric.timeFrame,
           sql: latestMetric.sql,
-          chartConfig: latestMetric.chart_config,
+          chartConfig: latestMetric.chartConfig,
         },
         updated_at: mockTimestamp,
         version_number: 3,
@@ -392,8 +392,8 @@ describe('Version History Helpers', () => {
           rows: latestDashboard.rows.map((row) => ({
             id: row.id,
             items: row.items,
-            columnSizes: row.column_sizes,
-            rowHeight: row.row_height,
+            columnSizes: row.columnSizes,
+            rowHeight: row.rowHeight,
           })),
         },
         updated_at: mockTimestamp,
@@ -409,9 +409,9 @@ describe('Version History Helpers', () => {
       const yml = {
         name: 'Test Metric',
         description: 'Test description',
-        time_frame: '2024', // Note: time_frame not timeFrame
+        timeFrame: '2024',
         sql: 'SELECT * FROM test',
-        chart_config: { selectedChartType: 'metric' as const, columnLabelFormats: {} },
+        chartConfig: { selectedChartType: 'metric' as const, columnLabelFormats: {} },
       };
 
       const validated = validateMetricYml(yml);
@@ -422,9 +422,9 @@ describe('Version History Helpers', () => {
     it('should handle optional description', () => {
       const yml = {
         name: 'Test Metric',
-        time_frame: '2024',
+        timeFrame: '2024',
         sql: 'SELECT * FROM test',
-        chart_config: { selectedChartType: 'metric' as const, columnLabelFormats: {} },
+        chartConfig: { selectedChartType: 'metric' as const, columnLabelFormats: {} },
       };
 
       const validated = validateMetricYml(yml);
@@ -442,7 +442,7 @@ describe('Version History Helpers', () => {
           {
             id: 1,
             items: [{ id: '550e8400-e29b-41d4-a716-446655440000' }], // Valid UUID
-            column_sizes: [12], // Note: column_sizes not columnSizes
+            columnSizes: [12],
           },
         ],
       };
@@ -459,7 +459,7 @@ describe('Version History Helpers', () => {
           {
             id: 1,
             items: [{ id: '550e8400-e29b-41d4-a716-446655440000' }],
-            column_sizes: [12],
+            columnSizes: [12],
           },
         ],
       };

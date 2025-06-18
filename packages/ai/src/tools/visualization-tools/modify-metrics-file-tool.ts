@@ -356,7 +356,16 @@ function parseAndValidateYaml(ymlContent: string): {
       };
     }
 
-    return { success: true, data: validationResult.data };
+    // Transform the validated data to match MetricYml type (camelCase)
+    const transformedData: MetricYml = {
+      name: validationResult.data.name,
+      description: validationResult.data.description,
+      timeFrame: validationResult.data.time_frame, // Transform snake_case to camelCase
+      sql: validationResult.data.sql,
+      chartConfig: validationResult.data.chart_config, // Transform snake_case to camelCase
+    };
+
+    return { success: true, data: transformedData };
   } catch (error) {
     return {
       success: false,

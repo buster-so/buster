@@ -20,6 +20,7 @@ import type {
 } from './types';
 import {
   determineToolStatus,
+  extractFileResultsFromToolResult,
   extractSqlFromQuery,
   hasFiles,
   hasSecondaryTitle,
@@ -529,7 +530,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
         // Special handling for file creation/modification tools - update dummy IDs with actual IDs
         if (this.isFileCreationTool(chunk.toolName)) {
-          this.updateFileIdsFromToolResult(chunk.toolCallId, chunk.result);
+          this.updateFileIdsAndStatusFromToolResult(chunk.toolCallId, chunk.result);
         }
 
         // Update the specific reasoning entry for this tool call
@@ -691,7 +692,19 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         for (const fileId in entry.files) {
           const file = entry.files[fileId];
           if (file && typeof file === 'object') {
-            (file as { status?: string }).status = status;
+            // Ensure file status property exists and is updated
+            const fileObj = file as { status?: string; [key: string]: unknown };
+            fileObj.status = status;
+
+            // Log for debugging when marking files as failed
+            if (status === 'failed') {
+              console.warn(`Marking file ${fileId} as failed in reasoning entry ${toolCallId}`, {
+                fileId,
+                toolCallId,
+                fileName: fileObj.file_name || 'unknown',
+                entryStatus: entry.status,
+              });
+            }
           }
         }
       }
@@ -1504,7 +1517,97 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
   }
 
   /**
+   * Update file IDs and individual file statuses in reasoning entries from tool result
+   * This method handles both successful file creation and partial failures
+   */
+  private updateFileIdsAndStatusFromToolResult(toolCallId: string, toolResult: unknown): void {
+    try {
+      // Find the reasoning entry for this tool call
+      const entry = this.state.reasoningHistory.find(
+        (r) => r && typeof r === 'object' && 'id' in r && r.id === toolCallId
+      );
+
+      if (!entry || entry.type !== 'files') {
+        return;
+      }
+
+      // Extract file results with individual statuses
+      const fileResults = extractFileResultsFromToolResult(toolResult);
+      if (fileResults.length === 0) {
+        return;
+      }
+
+      // Update the reasoning entry with actual file IDs and statuses
+      const typedEntry = entry as ReasoningEntry & {
+        file_ids: string[];
+        files: Record<string, unknown>;
+      };
+
+      // Create mapping from dummy IDs to actual IDs based on array position
+      const idMapping = new Map<string, string>();
+      const dummyIds = typedEntry.file_ids || [];
+      const actualIds = fileResults.map((result: { id: string }) => result.id);
+
+      // Map dummy IDs to actual IDs by position
+      for (let i = 0; i < Math.min(dummyIds.length, actualIds.length); i++) {
+        const dummyId = dummyIds[i];
+        const actualId = actualIds[i];
+        if (dummyId && actualId) {
+          idMapping.set(dummyId, actualId);
+        }
+      }
+
+      // Update file_ids array with actual IDs
+      typedEntry.file_ids = actualIds;
+
+      // Update files object - move from dummy ID keys to actual ID keys and set individual statuses
+      const updatedFiles: Record<string, unknown> = {};
+      for (let i = 0; i < fileResults.length; i++) {
+        const fileResult = fileResults[i];
+        const dummyId = dummyIds[i];
+
+        // Skip if fileResult is undefined
+        if (!fileResult) {
+          continue;
+        }
+
+        const actualId = fileResult.id;
+
+        if (dummyId && actualId) {
+          const fileData = typedEntry.files[dummyId];
+          if (fileData && typeof fileData === 'object') {
+            // Update the file data with actual ID and individual status
+            const typedFileData = fileData as {
+              id?: string;
+              status?: string;
+              error?: string;
+              [key: string]: unknown;
+            };
+            typedFileData.id = actualId;
+            typedFileData.status = fileResult.status;
+
+            // Add error information if file failed
+            if (fileResult.status === 'failed' && fileResult.error) {
+              typedFileData.error = fileResult.error;
+            }
+
+            updatedFiles[actualId] = fileData;
+          }
+        }
+      }
+      typedEntry.files = updatedFiles;
+    } catch (error) {
+      console.error('Error updating file IDs and status from tool result:', {
+        toolCallId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      // Don't throw - continue processing
+    }
+  }
+
+  /**
    * Update file IDs in reasoning entries from dummy IDs to actual tool result IDs
+   * @deprecated Use updateFileIdsAndStatusFromToolResult instead
    */
   private updateFileIdsFromToolResult(toolCallId: string, toolResult: unknown): void {
     try {

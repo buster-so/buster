@@ -10,6 +10,7 @@ import type {
 } from '../../../../server/src/types/chat-types/chat-message.type';
 import { analystAgent } from '../agents/analyst-agent/analyst-agent';
 import { ChunkProcessor } from '../utils/database/chunk-processor';
+import { hasFailureIndicators, hasFileFailureIndicators } from '../utils/database/types';
 import {
   MessageHistorySchema,
   ReasoningHistorySchema,
@@ -101,6 +102,7 @@ function transformHistoryForChunkProcessor(
 
 /**
  * Extract successfully created/modified files from reasoning history
+ * Enhanced with multiple safety checks to prevent failed files from being included
  */
 function extractFilesFromReasoning(
   reasoningHistory: ChatMessageReasoningMessage[]
@@ -108,17 +110,48 @@ function extractFilesFromReasoning(
   const files: ExtractedFile[] = [];
 
   for (const entry of reasoningHistory) {
-    // Only process file entries with completed status
-    if (entry.type === 'files' && entry.status === 'completed' && entry.files) {
+    // Multi-layer safety checks:
+    // 1. Must be a files entry with completed status
+    // 2. Must not have any failure indicators (additional safety net)
+    // 3. Individual files must have completed status
+    if (
+      entry.type === 'files' &&
+      entry.status === 'completed' &&
+      entry.files &&
+      !hasFailureIndicators(entry)
+    ) {
       for (const fileId of entry.file_ids || []) {
         const file = entry.files[fileId];
-        if (file && file.status === 'completed') {
+
+        // Enhanced file validation:
+        // - File must exist and have completed status
+        // - File must not have error indicators
+        // - File must have required properties (file_type, file_name)
+        if (
+          file &&
+          file.status === 'completed' &&
+          file.file_type &&
+          file.file_name &&
+          !hasFileFailureIndicators(file)
+        ) {
           files.push({
             id: fileId,
             fileType: file.file_type as 'metric' | 'dashboard',
             fileName: file.file_name,
             status: 'completed',
             ymlContent: file.file?.text,
+          });
+        } else {
+          // Log why file was rejected for debugging
+          console.warn(`Rejecting file for response: ${fileId}`, {
+            fileId,
+            fileName: file?.file_name || 'unknown',
+            fileStatus: file?.status || 'unknown',
+            hasFile: !!file,
+            hasFileType: !!file?.file_type,
+            hasFileName: !!file?.file_name,
+            hasFailureIndicators: file ? hasFileFailureIndicators(file) : false,
+            entryId: entry.id,
           });
         }
       }

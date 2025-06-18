@@ -17,8 +17,8 @@ describe('Version History Helper Functions', () => {
       const metricYml: MetricYml = {
         sql: 'WITH revenue_data AS (\n  SELECT\n    tsr.metric_totalsalesrevenue\n  FROM postgres.ont_ont.total_sales_revenue AS tsr\n  WHERE\n    (tsr.year = 2023 AND tsr.quarter >= 2)\n    OR (tsr.year = 2024 AND tsr.quarter = 1)\n)\nSELECT\n  SUM(rd.metric_totalsalesrevenue) AS total_revenue\nFROM revenue_data AS rd\n',
         name: 'Total Revenue (Q2 2023 - Q1 2024)',
-        time_frame: 'Q2 2023 - Q1 2024',
-        chart_config: {
+        timeFrame: 'Q2 2023 - Q1 2024',
+        chartConfig: {
           metricColumnId: 'total_revenue',
           selectedChartType: 'metric' as const,
           columnLabelFormats: {
@@ -43,9 +43,9 @@ describe('Version History Helper Functions', () => {
           content: {
             name: metricYml.name,
             description: metricYml.description,
-            timeFrame: metricYml.time_frame,
+            timeFrame: metricYml.timeFrame,
             sql: metricYml.sql,
-            chartConfig: metricYml.chart_config,
+            chartConfig: metricYml.chartConfig,
           },
           updated_at: timestamp,
           version_number: 1,
@@ -65,16 +65,16 @@ describe('Version History Helper Functions', () => {
       const initialMetric: MetricYml = {
         name: 'Initial Metric',
         sql: 'SELECT * FROM sales',
-        time_frame: '2024',
-        chart_config: { selectedChartType: 'metric' as const, columnLabelFormats: {} },
+        timeFrame: '2024',
+        chartConfig: { selectedChartType: 'metric' as const, columnLabelFormats: {} },
         description: 'Initial description',
       };
 
       const updatedMetric: MetricYml = {
         name: 'Updated Metric',
         sql: 'SELECT SUM(amount) FROM sales',
-        time_frame: '2024',
-        chart_config: { selectedChartType: 'bar' as const, columnLabelFormats: {} },
+        timeFrame: '2024',
+        chartConfig: { selectedChartType: 'bar' as const, columnLabelFormats: {} },
         description: 'Updated description',
       };
 
@@ -97,7 +97,7 @@ describe('Version History Helper Functions', () => {
           {
             id: 1,
             items: [{ id: '1ab2b66a-9ca6-5120-9155-20998b802c6a' }],
-            column_sizes: [12],
+            columnSizes: [12],
           },
           {
             id: 2,
@@ -105,7 +105,7 @@ describe('Version History Helper Functions', () => {
               { id: 'ea6b0583-e9cb-5b2f-a18c-69571042ee67' },
               { id: 'b19d2606-6061-5d22-8628-78a4878310d4' },
             ],
-            column_sizes: [6, 6],
+            columnSizes: [6, 6],
           },
         ],
         description:
@@ -124,8 +124,8 @@ describe('Version History Helper Functions', () => {
             rows: dashboardYml.rows.map((row) => ({
               id: row.id,
               items: row.items,
-              columnSizes: row.column_sizes,
-              rowHeight: row.row_height,
+              columnSizes: row.columnSizes,
+              rowHeight: row.rowHeight,
             })),
           },
           updated_at: timestamp,
@@ -145,15 +145,15 @@ describe('Version History Helper Functions', () => {
     it('should handle multiple versions correctly', () => {
       const initialDashboard: DashboardYml = {
         name: 'Initial Dashboard',
-        rows: [{ id: 1, items: [{ id: 'metric-1' }], column_sizes: [12] }],
+        rows: [{ id: 1, items: [{ id: 'metric-1' }], columnSizes: [12] }],
         description: 'Initial description',
       };
 
       const updatedDashboard: DashboardYml = {
         name: 'Updated Dashboard',
         rows: [
-          { id: 1, items: [{ id: 'metric-1' }], column_sizes: [12] },
-          { id: 2, items: [{ id: 'metric-2' }, { id: 'metric-3' }], column_sizes: [6, 6] },
+          { id: 1, items: [{ id: 'metric-1' }], columnSizes: [12] },
+          { id: 2, items: [{ id: 'metric-2' }, { id: 'metric-3' }], columnSizes: [6, 6] },
         ],
         description: 'Updated description',
       };

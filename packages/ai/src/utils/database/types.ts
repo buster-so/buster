@@ -166,6 +166,89 @@ export function determineToolStatus(result: unknown): 'completed' | 'failed' {
 }
 
 /**
+ * Check if a reasoning entry has any failure indicators
+ * This provides an additional safety check for file extraction
+ */
+export function hasFailureIndicators(entry: unknown): boolean {
+  if (!entry || typeof entry !== 'object') return false;
+
+  const entryObj = entry as Record<string, unknown>;
+
+  // Check entry-level status
+  if (entryObj.status === 'failed') return true;
+
+  // Check if entry has error-related fields
+  if (entryObj.error || entryObj.hasError) return true;
+
+  // For file entries, don't reject the entire entry if individual files failed
+  // Individual file failures are handled at the file level in extractFilesFromReasoning
+  // Only reject if the entry itself has failure indicators
+  
+  return false;
+}
+
+/**
+ * Check if an individual file has failure indicators
+ * This is used for per-file validation during extraction
+ */
+export function hasFileFailureIndicators(file: unknown): boolean {
+  if (!file || typeof file !== 'object') return false;
+  
+  const fileObj = file as Record<string, unknown>;
+  
+  // Check file-level status
+  if (fileObj.status === 'failed') return true;
+  
+  // Check if file has error-related fields
+  if (fileObj.error || fileObj.hasError) return true;
+  
+  return false;
+}
+
+/**
+ * Extract file results with individual status from tool result
+ * This helps handle partial failures in file creation tools
+ */
+export function extractFileResultsFromToolResult(toolResult: unknown): Array<{
+  id: string;
+  status: 'completed' | 'failed';
+  error?: string;
+}> {
+  try {
+    if (!toolResult || typeof toolResult !== 'object') {
+      return [];
+    }
+
+    const result = toolResult as Record<string, unknown>;
+
+    // Check for files array in the result
+    if ('files' in result && Array.isArray(result.files)) {
+      const files = result.files as unknown[];
+      return files
+        .filter(
+          (file): file is Record<string, unknown> =>
+            file !== null && typeof file === 'object' && 'id' in file
+        )
+        .map((file) => {
+          const fileObj = file as Record<string, unknown>;
+          return {
+            id: typeof fileObj.id === 'string' ? fileObj.id : String(fileObj.id),
+            status: isErrorResult(file) ? ('failed' as const) : ('completed' as const),
+            error: fileObj.error ? String(fileObj.error) : undefined,
+          };
+        });
+    }
+
+    return [];
+  } catch (error) {
+    console.error('Error extracting file results from tool result:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+    return [];
+  }
+}
+
+/**
  * Zod schemas for runtime validation
  */
 export const TextContentSchema = z

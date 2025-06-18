@@ -158,7 +158,19 @@ function parseAndValidateYaml(ymlContent: string): {
       };
     }
 
-    return { success: true, data: validationResult.data };
+    // Transform the validated data to match DashboardYml type (camelCase)
+    const transformedData: DashboardYml = {
+      name: validationResult.data.name,
+      description: validationResult.data.description,
+      rows: validationResult.data.rows.map((row) => ({
+        id: row.id,
+        items: row.items,
+        columnSizes: row.column_sizes, // Transform snake_case to camelCase
+        rowHeight: row.rowHeight,
+      })),
+    };
+
+    return { success: true, data: transformedData };
   } catch (error) {
     return {
       success: false,

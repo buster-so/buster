@@ -1,21 +1,12 @@
 import { z } from 'zod';
 
-// MetricYml type that matches Rust exactly (API format with snake_case)
+// MetricYml type using camelCase (TypeScript standard)
 const metricYmlSchema = z.object({
   name: z.string(),
   description: z.string().optional(),
-  time_frame: z.string(), // Note: Rust uses time_frame, not timeFrame
+  timeFrame: z.string(), // camelCase for TypeScript
   sql: z.string(),
-  chart_config: z.any(), // Complex chart config - using any for now to match Rust flexibility
-});
-
-// MetricYml storage format (camelCase for database storage)
-const metricYmlStorageSchema = z.object({
-  name: z.string(),
-  description: z.string().optional(),
-  timeFrame: z.string(), // camelCase for storage
-  sql: z.string(),
-  chartConfig: z.any(), // camelCase for storage
+  chartConfig: z.any(), // camelCase for TypeScript
 });
 
 // DashboardYml type that matches Rust exactly
@@ -24,10 +15,10 @@ const rowItemSchema = z.object({
 });
 
 const rowSchema = z.object({
-  items: z.array(rowItemSchema),
-  row_height: z.number().optional(),
-  column_sizes: z.array(z.number()),
   id: z.number(),
+  items: z.array(rowItemSchema),
+  columnSizes: z.array(z.number()), // camelCase for TypeScript
+  rowHeight: z.number().optional(), // camelCase for TypeScript
 });
 
 const dashboardYmlSchema = z.object({
@@ -36,19 +27,7 @@ const dashboardYmlSchema = z.object({
   rows: z.array(rowSchema),
 });
 
-// DashboardYml storage format (camelCase for database storage)
-const dashboardYmlStorageSchema = z.object({
-  name: z.string(),
-  description: z.string().optional(),
-  rows: z.array(
-    z.object({
-      id: z.number(),
-      items: z.array(rowItemSchema),
-      columnSizes: z.array(z.number()), // camelCase for storage
-      rowHeight: z.number().optional(), // camelCase for storage
-    })
-  ),
-});
+// No separate storage schema needed - using camelCase throughout
 
 // Version struct that matches Rust exactly - content is stored directly
 const versionSchema = z.object({
@@ -61,13 +40,9 @@ const versionSchema = z.object({
 // This is a HashMap<String, Version> in Rust
 const versionHistorySchema = z.record(z.string(), versionSchema);
 
-// Type exports that match Rust exactly (API format)
+// Type exports using camelCase (TypeScript standard)
 export type MetricYml = z.infer<typeof metricYmlSchema>;
 export type DashboardYml = z.infer<typeof dashboardYmlSchema>;
-
-// Storage format types (camelCase)
-export type MetricYmlStorage = z.infer<typeof metricYmlStorageSchema>;
-export type DashboardYmlStorage = z.infer<typeof dashboardYmlStorageSchema>;
 export type RowItem = z.infer<typeof rowItemSchema>;
 export type Row = z.infer<typeof rowSchema>;
 // VersionContent is no longer needed - content is stored directly
@@ -78,8 +53,6 @@ export type VersionHistory = z.infer<typeof versionHistorySchema>;
 export {
   metricYmlSchema,
   dashboardYmlSchema,
-  metricYmlStorageSchema,
-  dashboardYmlStorageSchema,
   rowItemSchema,
   rowSchema,
   versionSchema,
