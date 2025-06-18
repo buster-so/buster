@@ -26,22 +26,22 @@ function extractFilesFromReasoning(
     // 2. Must not have any failure indicators (additional safety net)
     // 3. Individual files must have completed status
     if (
-      entry.type === 'files' && 
-      entry.status === 'completed' && 
-      entry.files && 
+      entry.type === 'files' &&
+      entry.status === 'completed' &&
+      entry.files &&
       !hasFailureIndicators(entry)
     ) {
       for (const fileId of entry.file_ids || []) {
         const file = entry.files[fileId];
-        
+
         // Enhanced file validation:
         // - File must exist and have completed status
         // - File must not have error indicators
         // - File must have required properties (file_type, file_name)
         if (
-          file && 
-          file.status === 'completed' && 
-          file.file_type && 
+          file &&
+          file.status === 'completed' &&
+          file.file_type &&
           file.file_name &&
           !hasFileFailureIndicators(file)
         ) {
@@ -332,7 +332,7 @@ describe('Analyst Step File Selection', () => {
               file: { text: 'metric: test' },
             },
           },
-        },
+        } as any,
       ];
 
       const extracted = extractFilesFromReasoning(reasoningHistory);
@@ -367,7 +367,7 @@ describe('Analyst Step File Selection', () => {
               status: 'completed', // Status completed
               error: 'Schema validation warning', // But has error property
               file: { text: 'metric: problematic' },
-            },
+            } as any,
           },
         },
       ];

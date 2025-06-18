@@ -1,6 +1,8 @@
 import { describe, expect, test } from 'vitest';
 import type {
   ChatMessageReasoningMessage,
+  ChatMessageReasoningMessage_File,
+  ChatMessageReasoningMessage_Files,
   ChatMessageResponseMessage,
 } from '../../../../../server/src/types/chat-types/chat-message.type';
 import { hasFailureIndicators, hasFileFailureIndicators } from '../../../src/utils/database/types';
@@ -15,13 +17,35 @@ interface ExtractedFile {
   ymlContent?: string;
 }
 
+// Test-specific types to simulate error conditions
+type TestReasoningMessage =
+  | ChatMessageReasoningMessage
+  | {
+      id: string;
+      type: 'files';
+      title: string;
+      status: 'completed' | 'failed' | 'loading';
+      file_ids: string[];
+      files: Record<string, unknown>; // Using unknown to allow test error properties
+    };
+
+type TestReasoningFile =
+  | ChatMessageReasoningMessage_File
+  | {
+      id: string;
+      file_type?: string;
+      file_name?: string;
+      version_number: number;
+      status: 'completed' | 'failed' | 'loading';
+      file: { text: string };
+      error?: string; // Test-specific error property
+    };
+
 /**
  * Enhanced extractFilesFromReasoning with failure detection
  * This is a copy of the enhanced function for testing
  */
-function extractFilesFromReasoning(
-  reasoningHistory: ChatMessageReasoningMessage[]
-): ExtractedFile[] {
+function extractFilesFromReasoning(reasoningHistory: TestReasoningMessage[]): ExtractedFile[] {
   const files: ExtractedFile[] = [];
 
   for (const entry of reasoningHistory) {
@@ -36,7 +60,7 @@ function extractFilesFromReasoning(
       !hasFailureIndicators(entry)
     ) {
       for (const fileId of entry.file_ids || []) {
-        const file = entry.files[fileId];
+        const file = entry.files[fileId] as TestReasoningFile;
 
         // Enhanced file validation:
         // - File must exist and have completed status
@@ -67,7 +91,7 @@ function extractFilesFromReasoning(
 describe('Analyst Step - Failed Tool Handling', () => {
   describe('extractFilesFromReasoning - Failure Detection', () => {
     test('should exclude files from failed reasoning entries', () => {
-      const reasoningHistory: ChatMessageReasoningMessage[] = [
+      const reasoningHistory: TestReasoningMessage[] = [
         {
           id: 'failed-entry',
           type: 'files',
@@ -84,7 +108,7 @@ describe('Analyst Step - Failed Tool Handling', () => {
               file: {
                 text: 'metric: failed_metric',
               },
-            },
+            } as TestReasoningFile,
           },
         },
       ];
@@ -96,7 +120,7 @@ describe('Analyst Step - Failed Tool Handling', () => {
     });
 
     test('should exclude individual failed files from completed reasoning entries', () => {
-      const reasoningHistory: ChatMessageReasoningMessage[] = [
+      const reasoningHistory: TestReasoningMessage[] = [
         {
           id: 'mixed-entry',
           type: 'files',
@@ -111,7 +135,7 @@ describe('Analyst Step - Failed Tool Handling', () => {
               version_number: 1,
               status: 'completed',
               file: { text: 'metric: successful' },
-            },
+            } as TestReasoningFile,
             'file-2': {
               id: 'file-2',
               file_type: 'metric',
@@ -119,7 +143,7 @@ describe('Analyst Step - Failed Tool Handling', () => {
               version_number: 1,
               status: 'failed', // This file failed
               file: { text: 'metric: failed' },
-            },
+            } as TestReasoningFile,
             'file-3': {
               id: 'file-3',
               file_type: 'metric',
@@ -127,7 +151,7 @@ describe('Analyst Step - Failed Tool Handling', () => {
               version_number: 1,
               status: 'loading', // This file still loading
               file: { text: 'metric: loading' },
-            },
+            } as TestReasoningFile,
           },
         },
       ];
@@ -144,7 +168,7 @@ describe('Analyst Step - Failed Tool Handling', () => {
     });
 
     test('should exclude files with error indicators', () => {
-      const reasoningHistory: ChatMessageReasoningMessage[] = [
+      const reasoningHistory: TestReasoningMessage[] = [
         {
           id: 'entry-with-errors',
           type: 'files',
@@ -159,7 +183,7 @@ describe('Analyst Step - Failed Tool Handling', () => {
               version_number: 1,
               status: 'completed',
               file: { text: 'metric: good' },
-            },
+            } as TestReasoningFile,
             'file-2': {
               id: 'file-2',
               file_type: 'metric',
@@ -168,7 +192,7 @@ describe('Analyst Step - Failed Tool Handling', () => {
               status: 'completed', // Status says completed...
               error: 'Validation failed', // But has error field
               file: { text: 'metric: error' },
-            },
+            } as TestReasoningFile,
           },
         },
       ];
@@ -184,7 +208,7 @@ describe('Analyst Step - Failed Tool Handling', () => {
     });
 
     test('should exclude files missing required properties', () => {
-      const reasoningHistory: ChatMessageReasoningMessage[] = [
+      const reasoningHistory: TestReasoningMessage[] = [
         {
           id: 'incomplete-files',
           type: 'files',
@@ -199,7 +223,7 @@ describe('Analyst Step - Failed Tool Handling', () => {
               version_number: 1,
               status: 'completed',
               file: { text: 'metric: complete' },
-            },
+            } as TestReasoningFile,
             'file-2': {
               id: 'file-2',
               // Missing file_type
@@ -207,7 +231,7 @@ describe('Analyst Step - Failed Tool Handling', () => {
               version_number: 1,
               status: 'completed',
               file: { text: 'metric: missing_type' },
-            },
+            } as TestReasoningFile,
             'file-3': {
               id: 'file-3',
               file_type: 'metric',
@@ -215,7 +239,7 @@ describe('Analyst Step - Failed Tool Handling', () => {
               version_number: 1,
               status: 'completed',
               file: { text: 'metric: missing_name' },
-            },
+            } as TestReasoningFile,
           },
         },
       ];
@@ -230,36 +254,37 @@ describe('Analyst Step - Failed Tool Handling', () => {
       expect(completeFile?.fileName).toBe('complete_metric.yml');
     });
 
-    test('should handle reasoning entries with hasError flag', () => {
-      const reasoningHistory: ChatMessageReasoningMessage[] = [
-        {
-          id: 'entry-with-error-flag',
-          type: 'files',
-          title: 'Creating metrics',
-          status: 'completed', // Status says completed...
-          hasError: true, // But has error flag
-          file_ids: ['file-1'],
-          files: {
-            'file-1': {
-              id: 'file-1',
-              file_type: 'metric',
-              file_name: 'metric.yml',
-              version_number: 1,
-              status: 'completed',
-              file: { text: 'metric: test' },
-            },
-          },
+    test('should handle reasoning entries with error indicators', () => {
+      // Create a test object with error property that simulates failure conditions
+      const entryWithError = {
+        id: 'entry-with-error-flag',
+        type: 'files' as const,
+        title: 'Creating metrics',
+        status: 'completed' as const, // Status says completed...
+        error: 'Something went wrong', // But has error property (simulated)
+        file_ids: ['file-1'],
+        files: {
+          'file-1': {
+            id: 'file-1',
+            file_type: 'metric',
+            file_name: 'metric.yml',
+            version_number: 1,
+            status: 'completed',
+            file: { text: 'metric: test' },
+          } as TestReasoningFile,
         },
-      ];
+      };
+
+      const reasoningHistory: TestReasoningMessage[] = [entryWithError];
 
       const extracted = extractFilesFromReasoning(reasoningHistory);
 
-      // Should extract no files because entry has error flag
+      // Should extract no files because entry has error indicators
       expect(extracted).toHaveLength(0);
     });
 
     test('should handle partial failures in dashboard creation', () => {
-      const reasoningHistory: ChatMessageReasoningMessage[] = [
+      const reasoningHistory: TestReasoningMessage[] = [
         {
           id: 'dashboard-entry',
           type: 'files',
@@ -274,7 +299,7 @@ describe('Analyst Step - Failed Tool Handling', () => {
               version_number: 1,
               status: 'completed',
               file: { text: 'dashboard: successful' },
-            },
+            } as TestReasoningFile,
             'dash-2': {
               id: 'dash-2',
               file_type: 'dashboard',
@@ -282,7 +307,7 @@ describe('Analyst Step - Failed Tool Handling', () => {
               version_number: 1,
               status: 'failed',
               file: { text: 'dashboard: failed' },
-            },
+            } as TestReasoningFile,
           },
         },
       ];
@@ -323,10 +348,10 @@ describe('Analyst Step - Failed Tool Handling', () => {
               file: { text: 'metric: 2' },
             },
           },
-        },
+        } as ChatMessageReasoningMessage_Files,
       ];
 
-      const extracted = extractFilesFromReasoning(reasoningHistory);
+      const extracted = extractFilesFromReasoning(reasoningHistory as TestReasoningMessage[]);
 
       // Should extract both successful files
       expect(extracted).toHaveLength(2);
@@ -335,7 +360,7 @@ describe('Analyst Step - Failed Tool Handling', () => {
     });
 
     test('should handle complex failure scenarios with mixed types', () => {
-      const reasoningHistory: ChatMessageReasoningMessage[] = [
+      const reasoningHistory: TestReasoningMessage[] = [
         // Successful metrics entry
         {
           id: 'successful-metrics',
@@ -351,7 +376,7 @@ describe('Analyst Step - Failed Tool Handling', () => {
               version_number: 1,
               status: 'completed',
               file: { text: 'metric: good' },
-            },
+            } as TestReasoningFile,
           },
         },
         // Failed dashboard entry
@@ -369,7 +394,7 @@ describe('Analyst Step - Failed Tool Handling', () => {
               version_number: 1,
               status: 'completed', // File shows completed but entry failed
               file: { text: 'dashboard: failed' },
-            },
+            } as TestReasoningFile,
           },
         },
         // Mixed success/failure entry
@@ -387,7 +412,7 @@ describe('Analyst Step - Failed Tool Handling', () => {
               version_number: 2,
               status: 'completed',
               file: { text: 'metric: successful_mod' },
-            },
+            } as TestReasoningFile,
             'metric-3': {
               id: 'metric-3',
               file_type: 'metric',
@@ -395,7 +420,7 @@ describe('Analyst Step - Failed Tool Handling', () => {
               version_number: 2,
               status: 'failed',
               file: { text: 'metric: failed_mod' },
-            },
+            } as TestReasoningFile,
           },
         },
       ];
@@ -457,7 +482,7 @@ describe('Analyst Step - Failed Tool Handling', () => {
       // Entry-level function should not reject entries with failed files
       // Individual file failures are handled by hasFileFailureIndicators
       expect(hasFailureIndicators(entryWithFailedFile)).toBe(false);
-      
+
       // But individual file failure detection should work
       expect(hasFileFailureIndicators(entryWithFailedFile.files['file-1'])).toBe(false);
       expect(hasFileFailureIndicators(entryWithFailedFile.files['file-2'])).toBe(true);
