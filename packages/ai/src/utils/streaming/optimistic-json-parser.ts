@@ -54,10 +54,16 @@ export function parseOptimisticJson(incompleteJson: string): OptimisticParseResu
 function closeIncompleteJson(json: string): string {
   let result = json.trim();
 
+  // Handle empty or too short input
+  if (result.length === 0) return '{}';
+  if (result === '{' || result === '[') return result + (result === '{' ? '}' : ']');
+
   // Track open structures
   const stack: string[] = [];
   let inString = false;
   let escapeNext = false;
+  let lastNonWhitespaceChar = '';
+  let lastNonWhitespaceIndex = -1;
 
   for (let i = 0; i < result.length; i++) {
     const char = result[i];
@@ -74,10 +80,18 @@ function closeIncompleteJson(json: string): string {
 
     if (char === '"' && !escapeNext) {
       inString = !inString;
+      lastNonWhitespaceChar = char;
+      lastNonWhitespaceIndex = i;
       continue;
     }
 
     if (!inString) {
+      // Track non-whitespace characters for better completion
+      if (char && !/\s/.test(char)) {
+        lastNonWhitespaceChar = char;
+        lastNonWhitespaceIndex = i;
+      }
+
       if (char === '{') stack.push('}');
       else if (char === '[') stack.push(']');
       else if (char === '}' || char === ']') {
@@ -91,9 +105,44 @@ function closeIncompleteJson(json: string): string {
     }
   }
 
+  // Handle incomplete values at the end
+  if (!inString && lastNonWhitespaceChar && lastNonWhitespaceIndex < result.length - 1) {
+    // Check if we have a partial value that needs completion
+    const remainingText = result.substring(lastNonWhitespaceIndex + 1).trim();
+
+    // Handle incomplete null
+    if (remainingText.match(/^n(?:u(?:l(?:l)?)?)?$/)) {
+      result = `${result.substring(0, lastNonWhitespaceIndex + 1)}null`;
+    }
+    // Handle incomplete true
+    else if (remainingText.match(/^tru?e?$/)) {
+      result = `${result.substring(0, lastNonWhitespaceIndex + 1)}true`;
+    }
+    // Handle incomplete false
+    else if (remainingText.match(/^fals?e?$/)) {
+      result = `${result.substring(0, lastNonWhitespaceIndex + 1)}false`;
+    }
+  }
+
   // Close any unclosed strings
   if (inString) {
+    // If we're in the middle of an escape sequence, complete it safely
+    if (escapeNext) {
+      result += 'n'; // Default to newline for incomplete escape
+    }
     result += '"';
+  }
+
+  // Add any necessary commas or colons before closing
+  const trimmedResult = result.trim();
+  if (trimmedResult.length > 0) {
+    const lastChar = trimmedResult[trimmedResult.length - 1];
+
+    // If the last character is a comma, that's valid for closing
+    // If it's a colon, we need to add a default value
+    if (lastChar === ':' && stack.length > 0) {
+      result += ' null';
+    }
   }
 
   // Close any unclosed structures in reverse order
@@ -128,7 +177,8 @@ function extractAllValues(obj: unknown, extractedValues: Map<string, unknown>, p
  */
 function extractRawValues(incompleteJson: string, extractedValues: Map<string, unknown>): void {
   // Look for patterns like "key": "value in progress
-  const stringPattern = /"([^"]+)"\s*:\s*"([^"]*)/g;
+  // This regex handles escaped quotes within the string value
+  const stringPattern = /"([^"]+)"\s*:\s*"((?:[^"\\]|\\.)*)(?:"|$)/g;
   let match: RegExpExecArray | null;
 
   match = stringPattern.exec(incompleteJson);
@@ -140,26 +190,40 @@ function extractRawValues(incompleteJson: string, extractedValues: Map<string, u
     match = stringPattern.exec(incompleteJson);
   }
 
-  // Look for patterns like "key": number
-  const numberPattern = /"([^"]+)"\s*:\s*(-?\d+\.?\d*)/g;
+  // Look for patterns like "key": number (including scientific notation)
+  const numberPattern = /"([^"]+)"\s*:\s*(-?\d+\.?\d*(?:[eE][+-]?\d+)?)/g;
   match = numberPattern.exec(incompleteJson);
   while (match !== null) {
     const [, key, value] = match;
     if (key && value) {
-      extractedValues.set(key, Number.parseFloat(value));
+      const parsed = Number.parseFloat(value);
+      if (!Number.isNaN(parsed)) {
+        extractedValues.set(key, parsed);
+      }
     }
     match = numberPattern.exec(incompleteJson);
   }
 
   // Look for patterns like "key": true/false (including incomplete)
-  const boolPattern = /"([^"]+)"\s*:\s*(tru|true|fals|false)/g;
+  const boolPattern = /"([^"]+)"\s*:\s*(t|tr|tru|true|f|fa|fal|fals|false)/g;
   match = boolPattern.exec(incompleteJson);
   while (match !== null) {
     const [, key, value] = match;
     if (key && value) {
-      extractedValues.set(key, value.startsWith('tru'));
+      extractedValues.set(key, value.startsWith('t'));
     }
     match = boolPattern.exec(incompleteJson);
+  }
+
+  // Look for patterns like "key": null (including incomplete)
+  const nullPattern = /"([^"]+)"\s*:\s*(n|nu|nul|null)/g;
+  match = nullPattern.exec(incompleteJson);
+  while (match !== null) {
+    const [, key] = match;
+    if (key) {
+      extractedValues.set(key, null);
+    }
+    match = nullPattern.exec(incompleteJson);
   }
 }
 

@@ -1842,7 +1842,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         // Remove the doneTool entry temporarily
         [doneToolEntry] = this.state.responseHistory.splice(doneToolIndex, 1) as [
           ResponseEntry,
-          ...ResponseEntry[]
+          ...ResponseEntry[],
         ];
       }
 
