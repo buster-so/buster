@@ -1,7 +1,7 @@
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { readFileTool } from '@/tools/file-tools/read-file-tool';
+import { readFileTool } from '../../../src/tools/file-tools/read-file-tool';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 describe('Read File Tool Unit Tests', () => {

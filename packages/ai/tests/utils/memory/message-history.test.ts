@@ -9,8 +9,7 @@ import {
   properlyInterleaveMessages,
   unbundleMessages,
 } from '../../../src/utils/memory/message-history';
-import { validateArrayAccess } from '../../../src/utils/validation-helpers';
-import { hasToolCallId, validateArrayAccess } from '../../../src/utils/validation-helpers';
+import { validateArrayAccess, hasToolCallId } from '../../../src/utils/validation-helpers';
 
 describe('Message History Utilities', () => {
   describe('Message Format Validation', () => {
@@ -75,11 +74,11 @@ describe('Message History Utilities', () => {
 
       const processed = extractMessageHistory(properMessages);
       expect(processed).toHaveLength(5);
-      expect(processed[0].role).toBe('user');
-      expect(processed[1].role).toBe('assistant');
-      expect(processed[2].role).toBe('tool');
-      expect(processed[3].role).toBe('assistant');
-      expect(processed[4].role).toBe('tool');
+      expect(validateArrayAccess(processed, 0, 'processed messages')?.role).toBe('user');
+      expect(validateArrayAccess(processed, 1, 'processed messages')?.role).toBe('assistant');
+      expect(validateArrayAccess(processed, 2, 'processed messages')?.role).toBe('tool');
+      expect(validateArrayAccess(processed, 3, 'processed messages')?.role).toBe('assistant');
+      expect(validateArrayAccess(processed, 4, 'processed messages')?.role).toBe('tool');
     });
 
     test('should unbundle messages that have mixed content', () => {
@@ -123,16 +122,18 @@ describe('Message History Utilities', () => {
 
       // Should have: user, assistant (text), assistant (tool-1), assistant (tool-2), tool result
       expect(unbundled).toHaveLength(5);
-      expect(unbundled[0].role).toBe('user');
-      expect(unbundled[1].role).toBe('assistant');
-      expect(unbundled[1].content).toEqual([
+      expect(validateArrayAccess(unbundled, 0, 'unbundled messages')?.role).toBe('user');
+      expect(validateArrayAccess(unbundled, 1, 'unbundled messages')?.role).toBe('assistant');
+      expect(validateArrayAccess(unbundled, 1, 'unbundled messages')?.content).toEqual([
         { type: 'text', text: 'Let me analyze that for you.' },
       ]);
-      expect(unbundled[2].role).toBe('assistant');
-      expect(isToolCallOnlyMessage(unbundled[2])).toBe(true);
-      expect(unbundled[3].role).toBe('assistant');
-      expect(isToolCallOnlyMessage(unbundled[3])).toBe(true);
-      expect(unbundled[4].role).toBe('tool');
+      expect(validateArrayAccess(unbundled, 2, 'unbundled messages')?.role).toBe('assistant');
+      const unbundled2 = validateArrayAccess(unbundled, 2, 'unbundled messages');
+      expect(unbundled2 ? isToolCallOnlyMessage(unbundled2) : false).toBe(true);
+      expect(validateArrayAccess(unbundled, 3, 'unbundled messages')?.role).toBe('assistant');
+      const unbundled3 = validateArrayAccess(unbundled, 3, 'unbundled messages');
+      expect(unbundled3 ? isToolCallOnlyMessage(unbundled3) : false).toBe(true);
+      expect(validateArrayAccess(unbundled, 4, 'unbundled messages')?.role).toBe('tool');
     });
   });
 
@@ -452,13 +453,13 @@ describe('Message History Utilities', () => {
       expect(extracted).toHaveLength(7);
 
       // Verify the sequential pattern is preserved
-      expect(extracted[0].role).toBe('user');
-      expect(extracted[1].role).toBe('assistant');
-      expect(extracted[2].role).toBe('tool');
-      expect(extracted[3].role).toBe('assistant');
-      expect(extracted[4].role).toBe('tool');
-      expect(extracted[5].role).toBe('assistant');
-      expect(extracted[6].role).toBe('tool');
+      expect(validateArrayAccess(extracted, 0, 'extracted')?.role).toBe('user');
+      expect(validateArrayAccess(extracted, 1, 'extracted')?.role).toBe('assistant');
+      expect(validateArrayAccess(extracted, 2, 'extracted')?.role).toBe('tool');
+      expect(validateArrayAccess(extracted, 3, 'extracted')?.role).toBe('assistant');
+      expect(validateArrayAccess(extracted, 4, 'extracted')?.role).toBe('tool');
+      expect(validateArrayAccess(extracted, 5, 'extracted')?.role).toBe('assistant');
+      expect(validateArrayAccess(extracted, 6, 'extracted')?.role).toBe('tool');
 
       // Verify tool calls and results are properly paired
       const toolCallIds = [
@@ -473,7 +474,7 @@ describe('Message History Utilities', () => {
 
         // Get tool call ID from assistant message
         const assistantMsg = validateArrayAccess(extracted, assistantIdx, 'assistant message');
-        const assistantContent = assistantMsg.content;
+        const assistantContent = assistantMsg?.content;
         if (Array.isArray(assistantContent) && assistantContent.length > 0) {
           const toolCall = validateArrayAccess(assistantContent, 0, 'tool call');
           if (hasToolCallId(toolCall)) {
@@ -483,7 +484,7 @@ describe('Message History Utilities', () => {
 
         // Verify matching tool result
         const toolMsg = validateArrayAccess(extracted, toolIdx, 'tool message');
-        const toolContent = toolMsg.content;
+        const toolContent = toolMsg?.content;
         if (Array.isArray(toolContent) && toolContent.length > 0) {
           const toolResult = validateArrayAccess(toolContent, 0, 'tool result');
           if (hasToolCallId(toolResult)) {
@@ -565,17 +566,18 @@ describe('Message History Utilities', () => {
       expect(extracted).toHaveLength(7); // user + 3*(assistant + tool)
 
       // Verify the sequential pattern
-      expect(extracted[0].role).toBe('user');
-      expect(extracted[1].role).toBe('assistant');
-      expect(extracted[2].role).toBe('tool');
-      expect(extracted[3].role).toBe('assistant');
-      expect(extracted[4].role).toBe('tool');
-      expect(extracted[5].role).toBe('assistant');
-      expect(extracted[6].role).toBe('tool');
+      expect(validateArrayAccess(extracted, 0, 'extracted')?.role).toBe('user');
+      expect(validateArrayAccess(extracted, 1, 'extracted')?.role).toBe('assistant');
+      expect(validateArrayAccess(extracted, 2, 'extracted')?.role).toBe('tool');
+      expect(validateArrayAccess(extracted, 3, 'extracted')?.role).toBe('assistant');
+      expect(validateArrayAccess(extracted, 4, 'extracted')?.role).toBe('tool');
+      expect(validateArrayAccess(extracted, 5, 'extracted')?.role).toBe('assistant');
+      expect(validateArrayAccess(extracted, 6, 'extracted')?.role).toBe('tool');
 
       // Verify each assistant message has only one tool call
-      expect(extracted[1].content).toHaveLength(1);
-      const content1 = extracted[1].content;
+      const extracted1 = validateArrayAccess(extracted, 1, 'extracted');
+      expect(extracted1?.content).toHaveLength(1);
+      const content1 = extracted1?.content;
       if (
         Array.isArray(content1) &&
         content1[0] &&
@@ -585,8 +587,9 @@ describe('Message History Utilities', () => {
         expect(content1[0].toolCallId).toBe('toolu_1');
       }
 
-      expect(extracted[3].content).toHaveLength(1);
-      const content3 = extracted[3].content;
+      const extracted3 = validateArrayAccess(extracted, 3, 'extracted');
+      expect(extracted3?.content).toHaveLength(1);
+      const content3 = extracted3?.content;
       if (
         Array.isArray(content3) &&
         content3[0] &&
@@ -596,8 +599,9 @@ describe('Message History Utilities', () => {
         expect(content3[0].toolCallId).toBe('toolu_2');
       }
 
-      expect(extracted[5].content).toHaveLength(1);
-      const content5 = extracted[5].content;
+      const extracted5 = validateArrayAccess(extracted, 5, 'extracted');
+      expect(extracted5?.content).toHaveLength(1);
+      const content5 = extracted5?.content;
       if (
         Array.isArray(content5) &&
         content5[0] &&
@@ -633,24 +637,28 @@ describe('Message History Utilities', () => {
       const interleaved = properlyInterleaveMessages(bundled);
 
       expect(interleaved).toHaveLength(5);
-      expect(interleaved[0].role).toBe('user');
-      expect(interleaved[1].role).toBe('assistant');
-      const c1 = interleaved[1].content;
+      expect(validateArrayAccess(interleaved, 0, 'interleaved')?.role).toBe('user');
+      expect(validateArrayAccess(interleaved, 1, 'interleaved')?.role).toBe('assistant');
+      const interleaved1 = validateArrayAccess(interleaved, 1, 'interleaved');
+      const c1 = interleaved1?.content;
       if (Array.isArray(c1) && c1[0] && typeof c1[0] === 'object' && 'toolCallId' in c1[0]) {
         expect(c1[0].toolCallId).toBe('id1');
       }
-      expect(interleaved[2].role).toBe('tool');
-      const c2 = interleaved[2].content;
+      expect(validateArrayAccess(interleaved, 2, 'interleaved')?.role).toBe('tool');
+      const interleaved2 = validateArrayAccess(interleaved, 2, 'interleaved');
+      const c2 = interleaved2?.content;
       if (Array.isArray(c2) && c2[0] && typeof c2[0] === 'object' && 'toolCallId' in c2[0]) {
         expect(c2[0].toolCallId).toBe('id1');
       }
-      expect(interleaved[3].role).toBe('assistant');
-      const c3 = interleaved[3].content;
+      expect(validateArrayAccess(interleaved, 3, 'interleaved')?.role).toBe('assistant');
+      const interleaved3 = validateArrayAccess(interleaved, 3, 'interleaved');
+      const c3 = interleaved3?.content;
       if (Array.isArray(c3) && c3[0] && typeof c3[0] === 'object' && 'toolCallId' in c3[0]) {
         expect(c3[0].toolCallId).toBe('id2');
       }
-      expect(interleaved[4].role).toBe('tool');
-      const c4 = interleaved[4].content;
+      expect(validateArrayAccess(interleaved, 4, 'interleaved')?.role).toBe('tool');
+      const interleaved4 = validateArrayAccess(interleaved, 4, 'interleaved');
+      const c4 = interleaved4?.content;
       if (Array.isArray(c4) && c4[0] && typeof c4[0] === 'object' && 'toolCallId' in c4[0]) {
         expect(c4[0].toolCallId).toBe('id2');
       }
@@ -839,16 +847,18 @@ describe('Message History Utilities', () => {
       ];
 
       // Verify the pattern is correct
-      expect(conversation[0].role).toBe('user');
-      expect(conversation[1].role).toBe('assistant');
-      expect(isToolCallOnlyMessage(conversation[1])).toBe(true);
-      expect(conversation[2].role).toBe('tool');
-      expect(conversation[3].role).toBe('assistant');
-      expect(isToolCallOnlyMessage(conversation[3])).toBe(true);
-      expect(conversation[4].role).toBe('tool');
-      expect(conversation[5].role).toBe('user');
-      expect(conversation[6].role).toBe('assistant');
-      expect(conversation[7].role).toBe('tool');
+      expect(validateArrayAccess(conversation, 0, 'conversation')?.role).toBe('user');
+      expect(validateArrayAccess(conversation, 1, 'conversation')?.role).toBe('assistant');
+      const conv1 = validateArrayAccess(conversation, 1, 'conversation');
+      expect(conv1 ? isToolCallOnlyMessage(conv1) : false).toBe(true);
+      expect(validateArrayAccess(conversation, 2, 'conversation')?.role).toBe('tool');
+      expect(validateArrayAccess(conversation, 3, 'conversation')?.role).toBe('assistant');
+      const conv3 = validateArrayAccess(conversation, 3, 'conversation');
+      expect(conv3 ? isToolCallOnlyMessage(conv3) : false).toBe(true);
+      expect(validateArrayAccess(conversation, 4, 'conversation')?.role).toBe('tool');
+      expect(validateArrayAccess(conversation, 5, 'conversation')?.role).toBe('user');
+      expect(validateArrayAccess(conversation, 6, 'conversation')?.role).toBe('assistant');
+      expect(validateArrayAccess(conversation, 7, 'conversation')?.role).toBe('tool');
 
       // Verify extraction preserves the structure (but may add IDs)
       const extracted = extractMessageHistory(conversation);
@@ -856,8 +866,10 @@ describe('Message History Utilities', () => {
 
       // Check the roles and structure are preserved
       for (let i = 0; i < conversation.length; i++) {
-        expect(extracted[i].role).toBe(conversation[i].role);
-        expect(extracted[i].content).toEqual(conversation[i].content);
+        const extractedItem = validateArrayAccess(extracted, i, 'extracted');
+        const conversationItem = validateArrayAccess(conversation, i, 'conversation');
+        expect(extractedItem?.role).toBe(conversationItem?.role);
+        expect(extractedItem?.content).toEqual(conversationItem?.content);
       }
 
       // Verify summary is correct

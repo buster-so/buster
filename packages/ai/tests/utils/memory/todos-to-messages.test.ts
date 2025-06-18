@@ -3,6 +3,7 @@ import {
   createTodoReasoningMessage,
   createTodoToolCallMessage,
 } from '../../../src/utils/memory/todos-to-messages';
+import { validateArrayAccess } from '../../../src/utils/validation-helpers';
 
 describe('Todos to Message Conversion', () => {
   const sampleTodos = `[ ] Determine how "sales" is identified
@@ -19,12 +20,14 @@ describe('Todos to Message Conversion', () => {
       if (Array.isArray(message.content)) {
         expect(message.content).toHaveLength(1);
 
-        const textContent = message.content[0];
+        const textContent = validateArrayAccess(message.content, 0, 'message content');
         expect(textContent).toMatchObject({
           type: 'text',
         });
-        expect(textContent.text).toContain('<todo_list>');
-        expect(textContent.text).toContain(sampleTodos);
+        if (textContent && 'text' in textContent) {
+          expect(textContent.text).toContain('<todo_list>');
+          expect(textContent.text).toContain(sampleTodos);
+        }
       }
     });
 
@@ -33,8 +36,10 @@ describe('Todos to Message Conversion', () => {
 
       expect(message.role).toBe('user');
       if (Array.isArray(message.content)) {
-        const textContent = message.content[0];
-        expect(textContent.text).toContain('<todo_list>');
+        const textContent = validateArrayAccess(message.content, 0, 'message content');
+        if (textContent && 'text' in textContent) {
+          expect(textContent.text).toContain('<todo_list>');
+        }
       }
     });
   });
@@ -48,15 +53,17 @@ describe('Todos to Message Conversion', () => {
       expect(reasoningMessage.status).toBe('completed');
       expect(reasoningMessage.file_ids).toHaveLength(1);
 
-      const fileId = reasoningMessage.file_ids[0];
-      expect(reasoningMessage.files[fileId]).toBeDefined();
-
-      const file = reasoningMessage.files[fileId];
-      expect(file.file_type).toBe('todo');
-      expect(file.file_name).toBe('todos.md');
-      expect(file.version_number).toBe(1);
-      expect(file.status).toBe('completed');
-      expect(file.file.text).toBe(sampleTodos);
+      const fileId = validateArrayAccess(reasoningMessage.file_ids, 0, 'file_ids');
+      expect(fileId).toBeDefined();
+      const file = fileId ? reasoningMessage.files[fileId] : undefined;
+      expect(file).toBeDefined();
+      if (file) {
+        expect(file.file_type).toBe('todo');
+        expect(file.file_name).toBe('todos.md');
+        expect(file.version_number).toBe(1);
+        expect(file.status).toBe('completed');
+        expect(file.file.text).toBe(sampleTodos);
+      }
     });
 
     test('should handle empty todos in reasoning message', () => {
@@ -66,9 +73,9 @@ describe('Todos to Message Conversion', () => {
       expect(reasoningMessage.title).toBe('TODO List');
       expect(reasoningMessage.file_ids).toHaveLength(1);
 
-      const fileId = reasoningMessage.file_ids[0];
-      const file = reasoningMessage.files[fileId];
-      expect(file.file.text).toBe('');
+      const fileId = validateArrayAccess(reasoningMessage.file_ids, 0, 'file_ids');
+      const file = fileId ? reasoningMessage.files[fileId] : undefined;
+      expect(file?.file.text).toBe('');
     });
 
     test('should generate unique file IDs for different calls', () => {
@@ -76,7 +83,9 @@ describe('Todos to Message Conversion', () => {
       const message2 = createTodoReasoningMessage(sampleTodos);
 
       expect(message1.id).not.toBe(message2.id);
-      expect(message1.file_ids[0]).not.toBe(message2.file_ids[0]);
+      const fileId1 = validateArrayAccess(message1.file_ids, 0, 'file_ids');
+      const fileId2 = validateArrayAccess(message2.file_ids, 0, 'file_ids');
+      expect(fileId1).not.toBe(fileId2);
     });
   });
 
@@ -87,12 +96,17 @@ describe('Todos to Message Conversion', () => {
 
       // Verify conversation message structure
       expect(conversationMessage.role).toBe('user');
-      expect(conversationMessage.content[0].text).toContain(sampleTodos);
+      const textContent = validateArrayAccess(conversationMessage.content, 0, 'message content');
+      if (Array.isArray(conversationMessage.content) && textContent && 'text' in textContent) {
+        expect(textContent.text).toContain(sampleTodos);
+      }
 
       // Verify reasoning message structure
       expect(reasoningMessage.type).toBe('files');
-      const fileId = reasoningMessage.file_ids[0];
-      expect(reasoningMessage.files[fileId].file.text).toBe(sampleTodos);
+      const fileId = validateArrayAccess(reasoningMessage.file_ids, 0, 'file_ids');
+      if (fileId) {
+        expect(reasoningMessage.files[fileId].file.text).toBe(sampleTodos);
+      }
 
       // Both should contain the same todo content
       expect(reasoningMessage.files[fileId].file.text).toBe(sampleTodos);

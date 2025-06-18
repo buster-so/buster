@@ -2,7 +2,7 @@ import {
   messageUserClarifyingQuestionTool,
   processClarificationResponseTool,
   shouldAskClarification,
-} from '@/tools/communication-tools/message-user-clarifying-question-tool';
+} from '../../../src/tools/communication-tools/message-user-clarifying-question-tool';
 import { describe, expect, test } from 'vitest';
 
 describe('Message User Clarifying Question Tool Unit Tests', () => {

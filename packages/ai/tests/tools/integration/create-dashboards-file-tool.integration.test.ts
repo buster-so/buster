@@ -7,14 +7,15 @@ import {
   metricFiles,
   metricFilesToDashboardFiles,
 } from '@buster/database';
+import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { createDashboards } from '../../../src/tools/visualization-tools/create-dashboards-file-tool';
 import { validateArrayAccess } from '../../../src/utils/validation-helpers';
 
 // Type for runtime context
-interface MockRuntimeContext {
+type MockRuntimeContext = {
   get: (key: string) => string | undefined;
-}
+};
 
 describe('Create Dashboards File Tool Integration Tests', () => {
   let mockRuntimeContext: MockRuntimeContext;
@@ -198,7 +199,7 @@ rows:
 
     const result = await createDashboards.execute({
       context: input,
-      runtimeContext: contextWithoutUserId as MockRuntimeContext,
+      runtimeContext: contextWithoutUserId as unknown as RuntimeContext,
     });
     expect(result.message).toBe('Unable to verify your identity. Please log in again.');
     expect(result.files).toHaveLength(0);
@@ -219,7 +220,7 @@ description: Invalid dashboard
 
     const result = await createDashboards.execute({
       context: input,
-      runtimeContext: mockRuntimeContext,
+      runtimeContext: mockRuntimeContext as unknown as RuntimeContext,
     });
 
     expect(result.files).toHaveLength(0);
@@ -248,7 +249,7 @@ rows:
 
     const result = await createDashboards.execute({
       context: input,
-      runtimeContext: mockRuntimeContext,
+      runtimeContext: mockRuntimeContext as unknown as RuntimeContext,
     });
 
     expect(result.files).toHaveLength(0);
@@ -276,7 +277,7 @@ rows:
 
     const result = await createDashboards.execute({
       context: input,
-      runtimeContext: mockRuntimeContext,
+      runtimeContext: mockRuntimeContext as unknown as RuntimeContext,
     });
 
     expect(result.files).toHaveLength(0);
@@ -309,7 +310,7 @@ rows:
 
     const result = await createDashboards.execute({
       context: input,
-      runtimeContext: mockRuntimeContext,
+      runtimeContext: mockRuntimeContext as unknown as RuntimeContext,
     });
 
     expect(result.files).toHaveLength(1);
@@ -370,7 +371,7 @@ rows:
 
     const result = await createDashboards.execute({
       context: input,
-      runtimeContext: mockRuntimeContext,
+      runtimeContext: mockRuntimeContext as unknown as RuntimeContext,
     });
 
     expect(result.files).toHaveLength(1);
@@ -410,7 +411,7 @@ rows:
 
     const result = await createDashboards.execute({
       context: input,
-      runtimeContext: mockRuntimeContext,
+      runtimeContext: mockRuntimeContext as unknown as RuntimeContext,
     });
 
     expect(result.duration).toBeGreaterThan(0);
@@ -451,7 +452,7 @@ rows:
 
     const result = await createDashboards.execute({
       context: input,
-      runtimeContext: mockRuntimeContext,
+      runtimeContext: mockRuntimeContext as unknown as RuntimeContext,
     });
 
     expect(result.files).toHaveLength(3);
@@ -504,7 +505,7 @@ rows:
 
     const result = await createDashboards.execute({
       context: input,
-      runtimeContext: mockRuntimeContext,
+      runtimeContext: mockRuntimeContext as unknown as RuntimeContext,
     });
 
     expect(result.files).toHaveLength(1);
@@ -554,7 +555,7 @@ rows:
 
     const result = await createDashboards.execute({
       context: input,
-      runtimeContext: mockRuntimeContext,
+      runtimeContext: mockRuntimeContext as unknown as RuntimeContext,
     });
 
     expect(result.files).toHaveLength(1);
@@ -609,7 +610,7 @@ rows:
 
     const successResult = await createDashboards.execute({
       context: successInput,
-      runtimeContext: mockRuntimeContext,
+      runtimeContext: mockRuntimeContext as unknown as RuntimeContext,
     });
     expect(successResult.message).toBe('Successfully created 1 dashboard files.');
 
@@ -629,7 +630,7 @@ rows:
 
     const failureResult = await createDashboards.execute({
       context: failureInput,
-      runtimeContext: mockRuntimeContext,
+      runtimeContext: mockRuntimeContext as unknown as RuntimeContext,
     });
     expect(failureResult.message).toContain("Failed to create 'Failure Test'");
   });
@@ -663,7 +664,7 @@ rows:
 
     const result = await createDashboards.execute({
       context: input,
-      runtimeContext: mockRuntimeContext,
+      runtimeContext: mockRuntimeContext as unknown as RuntimeContext,
     });
 
     expect(result.files).toHaveLength(1);

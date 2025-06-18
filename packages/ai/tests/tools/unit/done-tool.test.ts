@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, test } from 'vitest';
 import { z } from 'zod';
+import { validateArrayAccess } from '../../../src/utils/validation-helpers';
 
 // Import the schemas we want to test (extracted from the tool file)
 const inputSchema = z.object({
@@ -70,7 +71,7 @@ function formatTodosOutput(todos: TodoItem[], markedByDone: number[]): string {
 
 // Process done tool execution with todo management (copied from tool)
 async function processDone(
-  params: { final_response: string },
+  _params: { final_response: string },
   runtimeContext?: MockRuntimeContext
 ): Promise<{ success: boolean; todos: string }> {
   if (!runtimeContext) {
@@ -94,7 +95,7 @@ async function processDone(
   // Mark all remaining unfinished todos as complete
   for (let idx = 0; idx < todos.length; idx++) {
     const todo = todos[idx];
-    if (!todo.completed) {
+    if (todo && !todo.completed) {
       todo.completed = true;
       markedByDone.push(idx); // Track 0-based index
     }
@@ -213,9 +214,9 @@ All requirements have been fulfilled.`,
 
       const result = parseTodos(validTodos);
       expect(result).toHaveLength(3);
-      expect(result[0].todo).toBe('Task 1');
-      expect(result[0].completed).toBe(false);
-      expect(result[1].completed).toBe(true);
+      expect(validateArrayAccess(result, 0, 'parseTodos result')?.todo).toBe('Task 1');
+      expect(validateArrayAccess(result, 0, 'parseTodos result')?.completed).toBe(false);
+      expect(validateArrayAccess(result, 1, 'parseTodos result')?.completed).toBe(true);
     });
 
     test('should filter out invalid todo items', () => {
@@ -230,8 +231,8 @@ All requirements have been fulfilled.`,
 
       const result = parseTodos(mixedTodos);
       expect(result).toHaveLength(2);
-      expect(result[0].todo).toBe('Valid Task');
-      expect(result[1].todo).toBe('Another Valid Task');
+      expect(validateArrayAccess(result, 0, 'parseTodos result')?.todo).toBe('Valid Task');
+      expect(validateArrayAccess(result, 1, 'parseTodos result')?.todo).toBe('Another Valid Task');
     });
 
     test('should return empty array for non-array input', () => {
@@ -422,7 +423,7 @@ All requirements have been fulfilled.`,
       };
 
       await expect(
-        processDone({ final_response: 'Test' }, faultyContext as MockRuntimeContext)
+        processDone({ final_response: 'Test' }, faultyContext as unknown as MockRuntimeContext)
       ).rejects.toThrow('State access error');
     });
   });

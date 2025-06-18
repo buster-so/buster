@@ -1,7 +1,7 @@
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { grepTool } from '@/tools/file-tools/grep-tool';
+import { grepTool } from '../../../src/tools/file-tools/grep-tool';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 describe('Grep Tool Unit Tests', () => {
@@ -188,8 +188,8 @@ describe('App', () => {
     expect(result.files_with_matches).toBeGreaterThan(0);
 
     // Should find matches in app.ts and router.ts
-    const appMatches = result.matches.filter((m) => m.file.includes('app.ts'));
-    const routerMatches = result.matches.filter((m) => m.file.includes('router.ts'));
+    const appMatches = result.matches.filter((m: { file: string }) => m.file.includes('app.ts'));
+    const routerMatches = result.matches.filter((m: { file: string }) => m.file.includes('router.ts'));
 
     expect(appMatches.length).toBeGreaterThan(0);
     expect(routerMatches.length).toBeGreaterThan(0);
@@ -207,7 +207,7 @@ describe('App', () => {
     expect(result.total_matches).toBeGreaterThan(0);
 
     // Should find lowercase 'express' matches
-    const hasMatches = result.matches.some((m) => m.line_content.toLowerCase().includes('express'));
+    const hasMatches = result.matches.some((m: { line_content: string }) => m.line_content.toLowerCase().includes('express'));
     expect(hasMatches).toBe(true);
   });
 
