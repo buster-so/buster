@@ -22,6 +22,8 @@ interface FileCardProps {
   headerWrapper?: React.ComponentType<{ children: React.ReactNode }>;
 }
 
+const MIN_COLLAPSIBLE_HEIGHT = 210;
+
 export const FileCard = React.memo(
   ({
     fileName,
@@ -161,6 +163,13 @@ const CollapseContent = React.memo(
       return Math.min(sixtyFivePercent, 200);
     }, [fullHeight]);
 
+    // Check if content is too small to warrant collapsing (for overlay-peek only)
+    const isTooSmallToCollapse = useMemo(() => {
+      return (
+        collapsible === 'overlay-peek' && fullHeight !== null && fullHeight < MIN_COLLAPSIBLE_HEIGHT
+      );
+    }, [collapsible, fullHeight]);
+
     // Measure content height when it changes
     useEffect(() => {
       if (collapsible === 'overlay-peek' && contentRef.current) {
@@ -185,7 +194,7 @@ const CollapseContent = React.memo(
     }, [collapsible, children]);
 
     const ExpandButton = useMemo(() => {
-      return collapsible === 'overlay-peek' ? (
+      return collapsible === 'overlay-peek' && !isTooSmallToCollapse ? (
         <div
           onClick={onCollapseClick}
           className="bg-background hover:bg-item-hover absolute inset-x-0 bottom-0 m-1 flex h-7 scale-95 cursor-pointer items-center justify-center gap-x-1 rounded border bg-gradient-to-b opacity-0 transition-all delay-75 duration-200 group-hover:scale-100 group-hover:opacity-100">
@@ -195,7 +204,7 @@ const CollapseContent = React.memo(
           <Text>{isCollapsed ? 'Click to expand' : 'Click to collapse'}</Text>
         </div>
       ) : null;
-    }, [collapsible, isCollapsed, onCollapseClick]);
+    }, [collapsible, isCollapsed, onCollapseClick, isTooSmallToCollapse]);
 
     const ContentWrapper = useMemo(
       () => (
@@ -208,6 +217,12 @@ const CollapseContent = React.memo(
 
     // Handle overlay-peek differently
     if (collapsible === 'overlay-peek') {
+      // If content is too small, just render it without collapse functionality
+      if (isTooSmallToCollapse) {
+        return <div className="relative overflow-hidden">{ContentWrapper}</div>;
+      }
+
+      // Normal overlay-peek behavior for larger content
       return (
         <AnimatePresence initial={false}>
           <motion.div

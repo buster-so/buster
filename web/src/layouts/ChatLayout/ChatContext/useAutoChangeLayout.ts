@@ -36,6 +36,8 @@ export const useAutoChangeLayout = ({
 
   const onChangePage = useAppLayoutContextSelector((x) => x.onChangePage);
   const previousLastMessageId = useRef<string | null>(null);
+  const previousIsCompletedStream = useRef<boolean>(isCompletedStream);
+
   const { data: hasLoadedChat } = useGetChat({ id: chatId || '' }, { select: (x) => !!x.id });
   const { data: lastReasoningMessageId } = useGetChatMessage(lastMessageId, {
     select: (x) => x?.reasoning_message_ids?.[x?.reasoning_message_ids?.length - 1]
@@ -48,8 +50,6 @@ export const useAutoChangeLayout = ({
   });
   const { getFileLinkMeta } = useGetFileLink();
 
-  const previousIsCompletedStream = usePrevious(isCompletedStream);
-
   const hasReasoning = !!lastReasoningMessageId;
 
   useLayoutEffect(() => {
@@ -59,9 +59,21 @@ export const useAutoChangeLayout = ({
   }, [hasLoadedChat]);
 
   useEffect(() => {
+    console.log({
+      hasLoadedChat,
+      chatId,
+      isCompletedStream,
+      isFinishedReasoning,
+      hasReasoning,
+      previousLastMessageId: previousLastMessageId.current,
+      lastMessageId,
+      previousIsCompletedStream
+    });
     if (!hasLoadedChat || !chatId) {
       return;
     }
+
+    previousIsCompletedStream.current = isCompletedStream;
 
     //this will trigger when the chat is streaming and is has not completed yet (new chat)
     if (
@@ -74,11 +86,10 @@ export const useAutoChangeLayout = ({
       previousLastMessageId.current = lastMessageId;
 
       onSetSelectedFile({ id: lastMessageId, type: 'reasoning', versionNumber: undefined });
-      console.log('triggering auto change layout to open reasoning');
     }
 
     //this happen will when the chat is completed and it WAS streaming
-    else if (isCompletedStream && previousIsCompletedStream === false) {
+    else if (isCompletedStream && previousIsCompletedStream.current === false) {
       const chatMessage = getChatMessageMemoized(lastMessageId);
       const lastFileId = findLast(chatMessage?.response_message_ids, (id) => {
         const responseMessage = chatMessage?.response_messages[id];

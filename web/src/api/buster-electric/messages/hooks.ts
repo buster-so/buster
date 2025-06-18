@@ -4,6 +4,8 @@ import { useShape, useShapeStream } from '../instances';
 import { useChatUpdate } from '@/context/Chats/useChatUpdate';
 import { updateMessageShapeToIChatMessage } from './helpers';
 import { useMemoizedFn } from '@/hooks';
+import { useGetChatMemoized } from '@/api/buster_rest/chats';
+import uniq from 'lodash/uniq';
 
 export const useGetMessage = ({ chatId, messageId }: { chatId: string; messageId: string }) => {
   const shape = useMemo(() => messageShape({ chatId, messageId }), [chatId, messageId]);
@@ -28,7 +30,8 @@ export const useTrackAndUpdateMessageChanges = (
   callback?: (message: ReturnType<typeof updateMessageShapeToIChatMessage>) => void
 ) => {
   const iteration = useRef(0);
-  const { onUpdateChatMessage } = useChatUpdate();
+  const { onUpdateChatMessage, onUpdateChat } = useChatUpdate();
+  const getChatMemoized = useGetChatMemoized();
   const shape = useMemo(
     () => messageShape({ chatId: chatId || '', messageId }),
     [chatId, messageId]
@@ -40,15 +43,24 @@ export const useTrackAndUpdateMessageChanges = (
     shape,
     updateOperations,
     useMemoizedFn((message) => {
-      if (message && message.value) {
+      if (message && message.value && chatId) {
         console.log('message', message);
-        //I set it back to 0 in case they navigate away from the chat and come back
-        if (iteration.current > 0) {
-          const iChatMessage = updateMessageShapeToIChatMessage(message.value);
-          callback?.(iChatMessage);
-          onUpdateChatMessage(iChatMessage);
+        const iChatMessage = updateMessageShapeToIChatMessage(message.value);
+        const chat = getChatMemoized(chatId);
+        if (chat) {
+          //ADD NEW MESSAGE ID TO CHAT
+          const currentMessageIds = chat.message_ids;
+          const allMessageIds = uniq([...currentMessageIds, messageId]);
+          if (currentMessageIds.length !== allMessageIds.length) {
+            onUpdateChat({
+              ...chat,
+              message_ids: allMessageIds
+            });
+          }
         }
-        iteration.current++; //I not sure why... but electric sends 2 message when we first connect
+        callback?.(iChatMessage);
+        console.log('iChatMessage', iChatMessage);
+        onUpdateChatMessage(iChatMessage);
       }
     }),
     subscribe
