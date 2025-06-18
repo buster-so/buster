@@ -13,14 +13,16 @@ const updateOperations: Array<`insert` | `update` | `delete`> = ['update'];
 
 export const useTrackAndUpdateChatChanges = (
   {
-    chatId
+    chatId,
+    isStreamingMessage
   }: {
     chatId: string | undefined;
+    isStreamingMessage: boolean;
   },
   callback?: (chat: BusterChatWithoutMessages) => void
 ) => {
-  const iteration = useRef(0);
   const { onUpdateChat } = useChatUpdate();
+  const hasSeenInitialUpdate = useRef(false);
   const shape = useMemo(() => chatShape({ chatId: chatId || '' }), [chatId]);
   const subscribe = !!chatId;
 
@@ -29,11 +31,16 @@ export const useTrackAndUpdateChatChanges = (
     updateOperations,
     useMemoizedFn((chat) => {
       if (chat && chat.value) {
-        if (iteration.current > 0) {
-          callback?.(chat.value);
-          onUpdateChat(chat.value);
+        const killUpdate = isStreamingMessage ? false : !hasSeenInitialUpdate.current;
+
+        hasSeenInitialUpdate.current = true;
+
+        if (killUpdate) {
+          return;
         }
-        iteration.current++;
+
+        callback?.(chat.value);
+        onUpdateChat(chat.value);
       }
     }),
     subscribe

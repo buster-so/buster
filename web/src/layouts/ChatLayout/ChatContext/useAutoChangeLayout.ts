@@ -77,6 +77,8 @@ export const useAutoChangeLayout = ({
         | BusterChatResponseMessage_file
         | undefined;
 
+      console.log('triggering lastFile', { lastFileId, lastFile });
+
       if (lastFileId && lastFile) {
         const { link } = getFileLinkMeta({
           fileId: lastFileId,
@@ -85,6 +87,8 @@ export const useAutoChangeLayout = ({
           versionNumber: lastFile.version_number,
           useVersionHistoryMode: !chatId
         });
+
+        console.log('triggering link', { link });
 
         if (link) {
           onChangePage(link);

@@ -22,15 +22,17 @@ const updateOperations: Array<`insert` | `update` | `delete`> = ['update'];
 export const useTrackAndUpdateMessageChanges = (
   {
     chatId,
-    messageId
+    messageId,
+    isStreamingMessage
   }: {
     chatId: string | undefined;
     messageId: string;
+    isStreamingMessage: boolean;
   },
   callback?: (message: ReturnType<typeof updateMessageShapeToIChatMessage>) => void
 ) => {
-  const iteration = useRef(0);
   const { onUpdateChatMessage, onUpdateChat } = useChatUpdate();
+  const hasSeenInitialUpdate = useRef(false);
   const getChatMemoized = useGetChatMemoized();
   const shape = useMemo(
     () => messageShape({ chatId: chatId || '', messageId }),
@@ -44,7 +46,14 @@ export const useTrackAndUpdateMessageChanges = (
     updateOperations,
     useMemoizedFn((message) => {
       if (message && message.value && chatId) {
-        console.log('message', message.value);
+        const killUpdate = isStreamingMessage ? false : !hasSeenInitialUpdate.current;
+
+        hasSeenInitialUpdate.current = true;
+        console.log('message kill update', killUpdate);
+        if (killUpdate) {
+          return;
+        }
+
         const iChatMessage = updateMessageShapeToIChatMessage(message.value);
         const chat = getChatMemoized(chatId);
         if (chat) {

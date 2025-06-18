@@ -90,8 +90,8 @@ export const useChatStreaming = ({
   });
 
   //HOOKS FOR TRACKING CHAT AND MESSAGE CHANGES
-  useTrackAndUpdateChatChanges({ chatId });
-  useTrackAndUpdateMessageChanges({ chatId, messageId }, (c) => {
+  useTrackAndUpdateChatChanges({ chatId, isStreamingMessage });
+  useTrackAndUpdateMessageChanges({ chatId, messageId, isStreamingMessage }, (c) => {
     const {
       reasoning_messages,
       reasoning_message_ids,
@@ -125,9 +125,7 @@ export const useChatStreaming = ({
   useEffect(() => {
     if (isStreamingMessage) {
       const message = getChatMessageMemoized(messageId);
-
       if (message) {
-        console.log('isStreamingMessage update', message);
         checkBlackBoxMessage(message);
       }
     } else {

@@ -99,8 +99,7 @@ export const ReasoningMessageSelector: React.FC<ReasoningMessageSelectorProps> =
         status={status}
         isCompletedStream={isCompletedStream}
         title={title ?? ''}
-        secondaryTitle={secondary_title ?? ''}
-        isLastMessage={isLastMessage}>
+        secondaryTitle={secondary_title ?? ''}>
         <AnimatePresence mode="wait" initial={!isCompletedStream}>
           <motion.div
             key={animationKey}

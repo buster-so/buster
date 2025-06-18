@@ -91,22 +91,6 @@ export const CustomHeading: React.FC<
   );
 };
 
-export const CustomList: React.FC<
-  {
-    ordered?: boolean;
-    children?: React.ReactNode;
-    markdown: string;
-    showLoader: boolean;
-  } & ExtraPropsExtra
-> = ({ ordered, children, markdown, showLoader, ...rest }) => {
-  const ListTag = ordered ? 'ol' : 'ul';
-  return (
-    <ListTag className={cn('', showLoader && 'fade-in transform-none! duration-500')} {...rest}>
-      {children}
-    </ListTag>
-  );
-};
-
 export const CustomOrderedList: React.FC<
   {
     children?: React.ReactNode;
@@ -119,7 +103,7 @@ export const CustomOrderedList: React.FC<
     <ol
       // @ts-expect-error - start is not a valid prop for ol
       start={start}
-      className={cn('mt-1 transform-none! space-y-1', showLoader && 'fade-in duration-500')}>
+      className={cn('mt-1 transform-none! space-y-1')}>
       {children}
     </ol>
   );
@@ -135,7 +119,7 @@ export const CustomUnorderedList: React.FC<
 > = ({ start, children, showLoader }) => {
   return (
     <ul
-      className={cn('mt-1 transform-none! space-y-1', showLoader && 'fade-in duration-500')}
+      className={cn('mt-1 transform-none! space-y-1')}
       // @ts-expect-error - start is not a valid prop for ul
       start={start}>
       {children}

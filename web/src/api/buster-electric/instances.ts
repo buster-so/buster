@@ -58,7 +58,6 @@ export const useShapeStream = <T extends Row<unknown> = Row<unknown>>(
   const controller = useRef(new AbortController());
   const hasSubscribed = useRef(false);
   const accessToken = useSupabaseContext((state) => state.accessToken);
-  const hasSeenInitialUpdate = useRef(false);
 
   const shapeParams: Parameters<typeof useElectricShape<T>>[0] = useMemo(() => {
     return { ...createElectricShape(params, accessToken), signal: controller.current.signal };
@@ -74,6 +73,7 @@ export const useShapeStream = <T extends Row<unknown> = Row<unknown>>(
 
     hasSubscribed.current = true;
     const unsubscribe = stream.subscribe((messages) => {
+      console.log('shape stream update', messages);
       if (!hasSubscribed.current) {
         hasSubscribed.current = true;
       }
@@ -110,12 +110,8 @@ export const useShapeStream = <T extends Row<unknown> = Row<unknown>>(
           message: filteredMessage
         });
 
-      if (filteredMessage && hasSeenInitialUpdate.current) {
+      if (filteredMessage) {
         onUpdate(filteredMessage);
-      }
-
-      if (__headers__.operation === 'update') {
-        hasSeenInitialUpdate.current = true;
       }
 
       if (isUnsubscribedTriggered) {
