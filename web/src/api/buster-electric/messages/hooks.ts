@@ -41,6 +41,7 @@ export const useTrackAndUpdateMessageChanges = (
     updateOperations,
     useMemoizedFn((message) => {
       if (message && message.value) {
+        console.log('message', message);
         //I set it back to 0 in case they navigate away from the chat and come back
         if (iteration.current > 0) {
           const iChatMessage = updateMessageShapeToIChatMessage(message.value);

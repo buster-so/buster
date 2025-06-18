@@ -138,7 +138,6 @@ export const TanStackDataGrid: React.FC<TanStackDataGridProps> = React.memo(
         !isEmpty(columnWidthsProp) &&
         !isEqual(columnSizing, columnWidthsProp)
       ) {
-        console.log('EFFECT', columnWidthsProp);
         setColumnSizing(
           createDefaultTableColumnWidths(fields, rows, columnWidthsProp, cellFormat, headerFormat)
         );
