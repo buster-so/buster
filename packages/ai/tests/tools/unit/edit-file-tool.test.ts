@@ -1,8 +1,8 @@
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { editFileTool } from '../../../src/tools/file-tools/edit-file-tool';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+import { editFileTool } from '../../../src/tools/file-tools/edit-file-tool';
 
 describe('Edit File Tool Unit Tests', () => {
   let tempDir: string;

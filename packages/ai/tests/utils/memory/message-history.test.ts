@@ -9,7 +9,7 @@ import {
   properlyInterleaveMessages,
   unbundleMessages,
 } from '../../../src/utils/memory/message-history';
-import { validateArrayAccess, hasToolCallId } from '../../../src/utils/validation-helpers';
+import { hasToolCallId, validateArrayAccess } from '../../../src/utils/validation-helpers';
 
 describe('Message History Utilities', () => {
   describe('Message Format Validation', () => {

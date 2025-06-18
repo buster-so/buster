@@ -131,9 +131,12 @@ chartConfig:
       runtimeContext: contextWithoutDataSource,
     };
 
-    await expect(createMetrics.execute({ context: input, runtimeContext: contextWithoutDataSource as unknown as RuntimeContext })).rejects.toThrow(
-      'Data source ID not found in runtime context'
-    );
+    await expect(
+      createMetrics.execute({
+        context: input,
+        runtimeContext: contextWithoutDataSource as unknown as RuntimeContext,
+      })
+    ).rejects.toThrow('Data source ID not found in runtime context');
   });
 
   test('should reject invalid YAML in integration context', async () => {
@@ -156,12 +159,19 @@ chartConfig:
       runtimeContext: mockRuntimeContext,
     };
 
-    const result = await createMetrics.execute({ context: input, runtimeContext: mockRuntimeContext as unknown as RuntimeContext });
+    const result = await createMetrics.execute({
+      context: input,
+      runtimeContext: mockRuntimeContext as unknown as RuntimeContext,
+    });
 
     expect(result.files).toHaveLength(0);
     expect(result.failed_files).toHaveLength(1);
-    expect(validateArrayAccess(result.failed_files, 0, 'failed_files')?.name).toBe('Invalid Metric');
-    expect(validateArrayAccess(result.failed_files, 0, 'failed_files')?.error).toContain('Invalid YAML structure');
+    expect(validateArrayAccess(result.failed_files, 0, 'failed_files')?.name).toBe(
+      'Invalid Metric'
+    );
+    expect(validateArrayAccess(result.failed_files, 0, 'failed_files')?.error).toContain(
+      'Invalid YAML structure'
+    );
   });
 
   test('should reject invalid SQL in integration context', async () => {
@@ -185,12 +195,17 @@ chartConfig:
       runtimeContext: mockRuntimeContext,
     };
 
-    const result = await createMetrics.execute({ context: input, runtimeContext: mockRuntimeContext as unknown as RuntimeContext });
+    const result = await createMetrics.execute({
+      context: input,
+      runtimeContext: mockRuntimeContext as unknown as RuntimeContext,
+    });
 
     expect(result.files).toHaveLength(0);
     expect(result.failed_files).toHaveLength(1);
     expect(validateArrayAccess(result.failed_files, 0, 'failed_files')?.name).toBe('Invalid SQL');
-    expect(validateArrayAccess(result.failed_files, 0, 'failed_files')?.error).toContain('SQL query must contain SELECT statement');
+    expect(validateArrayAccess(result.failed_files, 0, 'failed_files')?.error).toContain(
+      'SQL query must contain SELECT statement'
+    );
   });
 
   test('should handle mixed success and failure scenarios', async () => {
@@ -232,7 +247,10 @@ chartConfig:
       runtimeContext: mockRuntimeContext,
     };
 
-    const result = await createMetrics.execute({ context: input, runtimeContext: mockRuntimeContext as unknown as RuntimeContext });
+    const result = await createMetrics.execute({
+      context: input,
+      runtimeContext: mockRuntimeContext as unknown as RuntimeContext,
+    });
 
     // Should have one success and one failure
     expect(result.files).toHaveLength(1);
@@ -267,7 +285,10 @@ chartConfig:
       runtimeContext: mockRuntimeContext,
     };
 
-    const result = await createMetrics.execute({ context: input, runtimeContext: mockRuntimeContext as unknown as RuntimeContext });
+    const result = await createMetrics.execute({
+      context: input,
+      runtimeContext: mockRuntimeContext as unknown as RuntimeContext,
+    });
 
     expect(result.duration).toBeGreaterThan(0);
     expect(typeof result.duration).toBe('number');
@@ -300,7 +321,10 @@ chartConfig:
       runtimeContext: mockRuntimeContext,
     };
 
-    const result = await createMetrics.execute({ context: input, runtimeContext: mockRuntimeContext as unknown as RuntimeContext });
+    const result = await createMetrics.execute({
+      context: input,
+      runtimeContext: mockRuntimeContext as unknown as RuntimeContext,
+    });
 
     expect(result.files).toHaveLength(3);
     expect(result.failed_files).toHaveLength(0);
@@ -337,7 +361,10 @@ chartConfig:
       runtimeContext: mockRuntimeContext,
     };
 
-    const successResult = await createMetrics.execute({ context: successInput, runtimeContext: mockRuntimeContext as unknown as RuntimeContext });
+    const successResult = await createMetrics.execute({
+      context: successInput,
+      runtimeContext: mockRuntimeContext as unknown as RuntimeContext,
+    });
     expect(successResult.message).toBe('Successfully created 1 metric files.');
 
     // Test failure message
@@ -348,7 +375,10 @@ chartConfig:
       runtimeContext: mockRuntimeContext,
     };
 
-    const failureResult = await createMetrics.execute({ context: failureInput, runtimeContext: mockRuntimeContext as unknown as RuntimeContext });
+    const failureResult = await createMetrics.execute({
+      context: failureInput,
+      runtimeContext: mockRuntimeContext as unknown as RuntimeContext,
+    });
     expect(failureResult.message).toContain("Failed to create 'Failure Test'");
     expect(failureResult.message).toContain('Please recreate the metric from scratch');
   });

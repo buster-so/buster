@@ -1,8 +1,8 @@
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { globTool, multiGlobTool } from '../../../src/tools/file-tools/glob-tool';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+import { globTool, multiGlobTool } from '../../../src/tools/file-tools/glob-tool';
 
 describe('Glob Tool Unit Tests', () => {
   let tempDir: string;
@@ -271,7 +271,9 @@ describe('Glob Tool Unit Tests', () => {
       expect(tsxFiles).toHaveLength(2);
 
       // Find README.md
-      const readmeFiles = result.matches.filter((m: { path: string }) => m.path.endsWith('README.md'));
+      const readmeFiles = result.matches.filter((m: { path: string }) =>
+        m.path.endsWith('README.md')
+      );
       expect(readmeFiles).toHaveLength(1);
 
       expect(result.search_time_ms).toBeGreaterThan(0);

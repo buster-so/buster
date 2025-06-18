@@ -1,9 +1,9 @@
+import { describe, expect, test } from 'vitest';
 import {
   messageUserClarifyingQuestionTool,
   processClarificationResponseTool,
   shouldAskClarification,
 } from '../../../src/tools/communication-tools/message-user-clarifying-question-tool';
-import { describe, expect, test } from 'vitest';
 
 describe('Message User Clarifying Question Tool Unit Tests', () => {
   test('should have correct configuration', () => {

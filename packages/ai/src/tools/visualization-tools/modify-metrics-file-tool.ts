@@ -9,6 +9,12 @@ import type { Credentials } from '../../../../data-source/src/types/credentials'
 import { db } from '../../../../database/src/connection';
 import { metricFiles } from '../../../../database/src/schema';
 import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
+import {
+  addMetricVersionToHistory,
+  getLatestVersionNumber,
+  metricYmlToVersionContent,
+} from './version-history-helpers';
+import type { MetricVersionHistory } from './version-history-types';
 
 /**
  * Ensures timeFrame values are properly quoted in YAML content
@@ -203,11 +209,6 @@ interface SqlValidationResult {
   results?: Record<string, unknown>[];
   metadata?: Record<string, unknown>;
   error?: string;
-}
-
-interface MetricVersionEntry {
-  versionNumber: number;
-  [key: string]: unknown;
 }
 
 // Replace the basic SQL validation with comprehensive validation
@@ -607,34 +608,17 @@ const modifyMetricFiles = wrapTraced(
       const results = await Promise.all(updatePromises);
 
       // Separate successful and failed updates
-      const successfulUpdates: (typeof metricFiles.$inferSelect)[] = [];
-      const updatedVersions: number[] = [];
+      const successfulUpdates: Array<{
+        file: typeof metricFiles.$inferSelect;
+        metricYml: MetricYml;
+      }> = [];
 
       for (const result of results) {
-        if ('success' in result && result.success && result.updatedFile) {
-          // Calculate next version number (simplified - increment by 1)
-          // versionHistory is a jsonb field that might be empty object or contain version info
-          const versionHistory =
-            (result.updatedFile.versionHistory as Record<string, unknown>) || {};
-          let currentVersion = 1;
-
-          // If versionHistory has versions array, get the latest version number
-          if (
-            'versions' in versionHistory &&
-            Array.isArray(versionHistory.versions) &&
-            versionHistory.versions.length > 0
-          ) {
-            currentVersion = Math.max(
-              ...versionHistory.versions.map((v: MetricVersionEntry) => v.versionNumber || 1)
-            );
-          }
-
-          const nextVersion = currentVersion + 1;
-
+        if ('success' in result && result.success && result.updatedFile && result.metricYml) {
           successfulUpdates.push({
-            ...result.updatedFile,
+            file: result.updatedFile,
+            metricYml: result.metricYml,
           });
-          updatedVersions.push(nextVersion);
         } else {
           failedFiles.push({
             file_name: 'fileName' in result ? result.fileName : 'Unknown file',
@@ -651,36 +635,26 @@ Please attempt to modify the metric again. This error could be due to:
 
       // Update successful files in database
       if (successfulUpdates.length > 0) {
-        // In a real implementation, this would be a proper bulk update
-        // For now, we'll do individual updates
-        for (let i = 0; i < successfulUpdates.length; i++) {
-          const file = successfulUpdates[i];
-          if (!file) continue;
-          const version = updatedVersions[i] || 1;
+        // Process each successful update
+        for (const { file, metricYml } of successfulUpdates) {
+          // Get current version history
+          const currentVersionHistory = file.versionHistory as MetricVersionHistory | null;
 
-          // Update version history with new version
-          const currentVersionHistory = (file.versionHistory as Record<string, unknown>) || {};
-          const existingVersions =
-            'versions' in currentVersionHistory && Array.isArray(currentVersionHistory.versions)
-              ? currentVersionHistory.versions
-              : [];
-          const updatedVersionHistory = {
-            ...currentVersionHistory,
-            versions: [
-              ...existingVersions,
-              {
-                versionNumber: version,
-                content: file.content,
-                createdAt: new Date().toISOString(),
-              },
-            ],
-          };
+          // Add new version to history
+          const updatedVersionHistory = addMetricVersionToHistory(
+            currentVersionHistory,
+            metricYmlToVersionContent(metricYml),
+            new Date().toISOString()
+          );
+
+          // Get the latest version number
+          const latestVersion = getLatestVersionNumber(updatedVersionHistory);
 
           await db
             .update(metricFiles)
             .set({
-              content: file.content,
-              name: file.name,
+              content: metricYml,
+              name: metricYml.name,
               updatedAt: new Date().toISOString(),
               dataMetadata: file.dataMetadata,
               versionHistory: updatedVersionHistory,
@@ -691,7 +665,7 @@ Please attempt to modify the metric again. This error could be due to:
           // Add to successful files output
           files.push({
             id: file.id,
-            name: file.name,
+            name: metricYml.name,
             file_type: 'metric',
             result_message: results.find((r) => 'success' in r && r.updatedFile?.id === file.id)
               ?.validationMessage,
@@ -699,7 +673,7 @@ Please attempt to modify the metric again. This error could be due to:
               ?.validationResults,
             created_at: file.createdAt,
             updated_at: file.updatedAt,
-            version_number: version || 1,
+            version_number: latestVersion,
           });
         }
       }

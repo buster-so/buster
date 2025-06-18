@@ -12,6 +12,10 @@ import {
   metricFiles,
   metricFilesToDashboardFiles,
 } from '../../../../database/src/schema';
+import {
+  createInitialDashboardVersionHistory,
+  dashboardYmlToVersionContent,
+} from './version-history-helpers';
 
 // Core interfaces matching Rust structs exactly
 interface DashboardFileParams {
@@ -350,15 +354,10 @@ const createDashboardFiles = wrapTraced(
                 publiclyAccessible: false,
                 publiclyEnabledBy: null,
                 publicExpiryDate: null,
-                versionHistory: {
-                  versions: [
-                    {
-                      versionNumber: sp.dashboardFile.version_number,
-                      content: sp.dashboardFile.content,
-                      createdAt: sp.dashboardFile.created_at,
-                    },
-                  ],
-                },
+                versionHistory: createInitialDashboardVersionHistory(
+                  dashboardYmlToVersionContent(sp.dashboardYml),
+                  sp.dashboardFile.created_at
+                ),
                 publicPassword: null,
               };
             }
@@ -376,15 +375,10 @@ const createDashboardFiles = wrapTraced(
               publiclyAccessible: false,
               publiclyEnabledBy: null,
               publicExpiryDate: null,
-              versionHistory: {
-                versions: [
-                  {
-                    versionNumber: sp.dashboardFile.version_number,
-                    content: sp.dashboardFile.content,
-                    createdAt: sp.dashboardFile.created_at,
-                  },
-                ],
-              },
+              versionHistory: createInitialDashboardVersionHistory(
+                dashboardYmlToVersionContent(sp.dashboardYml),
+                sp.dashboardFile.created_at
+              ),
               publicPassword: null,
             };
           });

@@ -1,9 +1,9 @@
+import { describe, expect, test } from 'vitest';
 import {
   noSearchNeededTool,
   shouldSkipDataSearch,
   validateSearchSkipTool,
 } from '../../../src/tools/no-search-needed-tool';
-import { describe, expect, test } from 'vitest';
 
 describe('No Search Needed Tool Unit Tests', () => {
   test('should have correct configuration', () => {

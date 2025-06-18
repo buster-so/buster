@@ -1,8 +1,8 @@
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { lsTool } from '../../../src/tools/file-tools/ls-tool';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+import { lsTool } from '../../../src/tools/file-tools/ls-tool';
 
 describe('LS Tool Unit Tests', () => {
   let tempDir: string;
