@@ -53,4 +53,6 @@
   animation-name: fade-in;
   animation-duration: var(--tw-duration, 0.7s);
   animation-timing-function: var(--tw-ease-in, ease-in);
+  transition-property: opacity;
+    transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
 }

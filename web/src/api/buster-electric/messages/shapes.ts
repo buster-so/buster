@@ -36,7 +36,8 @@ export const messageShape = ({
     params: {
       table: 'messages',
       where: `chat_id='${chatId}' AND id='${messageId}'`,
-      columns
+      columns,
+      replica: 'default'
     }
   };
 };

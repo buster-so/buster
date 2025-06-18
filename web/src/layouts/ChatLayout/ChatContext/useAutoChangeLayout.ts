@@ -105,8 +105,8 @@ export const useAutoChangeLayout = ({
     }
     //this will trigger on a page refresh and the chat is completed
     else if (isCompletedStream && chatId) {
-      console.log('triggering auto change layout to open file');
       const isChatOnlyMode = !metricId && !dashboardId && !messageId;
+      console.log('triggering auto change layout to open file', { isChatOnlyMode });
       if (isChatOnlyMode) {
         return;
       }

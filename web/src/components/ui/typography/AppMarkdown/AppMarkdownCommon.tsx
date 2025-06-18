@@ -35,7 +35,7 @@ export const CustomParagraph: React.FC<
 > = ({ children, markdown, showLoader, ...rest }) => {
   if (Array.isArray(children)) {
     return (
-      <p className={cn('text-size-inherit!', showLoader && 'fade-in transform-none! duration-500')}>
+      <p className={cn('text-size-inherit! transform-none!', showLoader && 'fade-in duration-500')}>
         {children}
       </p>
     );
@@ -48,7 +48,7 @@ export const CustomParagraph: React.FC<
   }
 
   return (
-    <p className={cn('text-size-inherit!', showLoader && 'fade-in transform-none! duration-500')}>
+    <p className={cn('text-size-inherit! transform-none!', showLoader && 'fade-in duration-500')}>
       {children}
     </p>
   );
@@ -83,7 +83,8 @@ export const CustomHeading: React.FC<
     <HeadingTag
       className={cn(
         headingVariants({ level: stripFormatting ? 'base' : level }),
-        showLoader && 'fade-in transform-none! duration-500'
+        'transform-none!',
+        showLoader && 'fade-in duration-500'
       )}>
       {children}
     </HeadingTag>
@@ -118,7 +119,7 @@ export const CustomOrderedList: React.FC<
     <ol
       // @ts-expect-error - start is not a valid prop for ol
       start={start}
-      className={cn('mt-1 space-y-1', showLoader && 'fade-in transform-none! duration-500')}>
+      className={cn('mt-1 transform-none! space-y-1', showLoader && 'fade-in duration-500')}>
       {children}
     </ol>
   );
@@ -134,7 +135,7 @@ export const CustomUnorderedList: React.FC<
 > = ({ start, children, showLoader }) => {
   return (
     <ul
-      className={cn('mt-1 space-y-1', showLoader && 'fade-in transform-none! duration-500')}
+      className={cn('mt-1 transform-none! space-y-1', showLoader && 'fade-in duration-500')}
       // @ts-expect-error - start is not a valid prop for ul
       start={start}>
       {children}
@@ -150,7 +151,7 @@ export const CustomListItem: React.FC<
   } & ExtraPropsExtra
 > = ({ children, showLoader }) => {
   return (
-    <li className={cn('space-y-1', showLoader && 'fade-in transform-none! duration-500')}>
+    <li className={cn('transform-none! space-y-1', showLoader && 'fade-in duration-500')}>
       {children}
     </li>
   );
@@ -164,7 +165,7 @@ export const CustomBlockquote: React.FC<
   } & ExtraPropsExtra
 > = ({ children, markdown, showLoader, ...rest }) => {
   return (
-    <blockquote className={cn('', showLoader && 'fade-in transform-none! duration-500')}>
+    <blockquote className={cn('transform-none!', showLoader && 'fade-in duration-500')}>
       {children}
     </blockquote>
   );
@@ -178,7 +179,7 @@ export const CustomTable: React.FC<
   } & ExtraPropsExtra
 > = ({ children, markdown, showLoader, ...rest }) => {
   return (
-    <table className={cn('', showLoader && 'fade-in transform-none! duration-500')}>
+    <table className={cn('transform-none!', showLoader && 'fade-in duration-500')}>
       {children}
     </table>
   );
@@ -192,6 +193,6 @@ export const CustomSpan: React.FC<
   } & ExtraPropsExtra
 > = ({ children, markdown, showLoader, ...rest }) => {
   return (
-    <span className={cn('', showLoader && 'fade-in transform-none! duration-500')}>{children}</span>
+    <span className={cn('transform-none!', showLoader && 'fade-in duration-500')}>{children}</span>
   );
 };

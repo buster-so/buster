@@ -30,7 +30,6 @@ export const useTrackAndUpdateChatChanges = (
     useMemoizedFn((chat) => {
       if (chat && chat.value) {
         if (iteration.current > 0) {
-          console.log('chat', chat);
           callback?.(chat.value);
           onUpdateChat(chat.value);
         }

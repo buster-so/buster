@@ -44,7 +44,7 @@ export const useTrackAndUpdateMessageChanges = (
     updateOperations,
     useMemoizedFn((message) => {
       if (message && message.value && chatId) {
-        console.log('message', message);
+        console.log('message', message.value);
         const iChatMessage = updateMessageShapeToIChatMessage(message.value);
         const chat = getChatMemoized(chatId);
         if (chat) {

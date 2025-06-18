@@ -8,7 +8,6 @@ import {
 import { ELECTRIC_BASE_URL } from './config';
 import { useSupabaseContext } from '@/context/Supabase';
 import { useEffect, useMemo, useRef } from 'react';
-import findLast from 'lodash/findLast';
 
 export type ElectricShapeOptions<T extends Row<unknown> = Row<unknown>> = Omit<
   Parameters<typeof useElectricShape<T>>[0],
@@ -27,10 +26,7 @@ const createElectricShape = <T extends Row<unknown> = Row<unknown>>(
 ): Parameters<typeof useElectricShape<T>>[0] => {
   return {
     ...config,
-    params: {
-      ...params,
-      replica: 'default'
-    },
+    params,
     url: ELECTRIC_BASE_URL,
     subscribe: !!accessToken && subscribe,
     backoffOptions,
@@ -62,6 +58,7 @@ export const useShapeStream = <T extends Row<unknown> = Row<unknown>>(
   const controller = useRef(new AbortController());
   const hasSubscribed = useRef(false);
   const accessToken = useSupabaseContext((state) => state.accessToken);
+  const hasSeenInitialUpdate = useRef(false);
 
   const shapeParams: Parameters<typeof useElectricShape<T>>[0] = useMemo(() => {
     return { ...createElectricShape(params, accessToken), signal: controller.current.signal };
@@ -82,7 +79,7 @@ export const useShapeStream = <T extends Row<unknown> = Row<unknown>>(
       }
 
       // Single-pass filtering and processing for better efficiency
-      let combinedValue = {} as T;
+      const combinedValue = {} as T;
       let lastMessage: ChangeMessage<T> | null = null;
 
       for (const message of messages) {
@@ -113,9 +110,12 @@ export const useShapeStream = <T extends Row<unknown> = Row<unknown>>(
           message: filteredMessage
         });
 
-      if (filteredMessage) {
-        console.log('filteredMessage', filteredMessage);
+      if (filteredMessage && hasSeenInitialUpdate.current) {
         onUpdate(filteredMessage);
+      }
+
+      if (__headers__.operation === 'update') {
+        hasSeenInitialUpdate.current = true;
       }
 
       if (isUnsubscribedTriggered) {

@@ -49,7 +49,6 @@ export const useBlackBoxMessage = () => {
         | 'final_reasoning_message'
       >
     ) => {
-      console.trace('blackBox', message);
       const lastReasoningMessageId = last(message.reasoning_message_ids) || '';
       const lastReasoningMessage = message.reasoning_messages[lastReasoningMessageId];
       const isFinishedReasoningMessage = lastReasoningMessage?.status !== 'loading';

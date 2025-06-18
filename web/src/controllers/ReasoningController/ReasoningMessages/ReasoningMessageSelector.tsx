@@ -1,5 +1,5 @@
 import { AnimatePresence, motion, type MotionProps } from 'framer-motion';
-import type React from 'react';
+import React from 'react';
 import { useMemo } from 'react';
 import type {
   BusterChatMessageReasoning,
@@ -63,58 +63,56 @@ export interface ReasoningMessageSelectorProps {
   isLastMessage: boolean;
 }
 
-export const ReasoningMessageSelector: React.FC<ReasoningMessageSelectorProps> = ({
-  reasoningMessageId,
-  isCompletedStream,
-  chatId,
-  messageId,
-  isLastMessage
-}) => {
-  const { data: messageStuff } = useGetChatMessage(messageId, {
-    select: (x) => ({
-      title: x?.reasoning_messages[reasoningMessageId]?.title,
-      secondary_title: x?.reasoning_messages[reasoningMessageId]?.secondary_title,
-      type: x?.reasoning_messages[reasoningMessageId]?.type,
-      status: x?.reasoning_messages[reasoningMessageId]?.status,
-      hasMessage: !!(x?.reasoning_messages[reasoningMessageId] as BusterChatMessageReasoning_text)
-        ?.message
-    })
-  });
-  const { title, secondary_title, type, status, hasMessage } = messageStuff || {};
+export const ReasoningMessageSelector: React.FC<ReasoningMessageSelectorProps> = React.memo(
+  ({ reasoningMessageId, isCompletedStream, chatId, messageId, isLastMessage }) => {
+    const { data: messageStuff } = useGetChatMessage(messageId, {
+      select: (x) => ({
+        title: x?.reasoning_messages[reasoningMessageId]?.title,
+        secondary_title: x?.reasoning_messages[reasoningMessageId]?.secondary_title,
+        type: x?.reasoning_messages[reasoningMessageId]?.type,
+        status: x?.reasoning_messages[reasoningMessageId]?.status,
+        hasMessage: !!(x?.reasoning_messages[reasoningMessageId] as BusterChatMessageReasoning_text)
+          ?.message
+      })
+    });
+    const { title, secondary_title, type, status, hasMessage } = messageStuff || {};
 
-  const showBar = useMemo(() => {
-    if (type === 'text') return !!hasMessage || !isLastMessage;
-    return true;
-  }, [type, hasMessage, isLastMessage]);
+    const showBar = useMemo(() => {
+      if (type === 'text') return !!hasMessage || !isLastMessage;
+      return true;
+    }, [type, hasMessage, isLastMessage]);
 
-  if (!type || !status) return null;
+    if (!type || !status) return null;
 
-  const ReasoningMessage = ReasoningMessageRecord[type];
-  const animationKey = reasoningMessageId + type;
+    const ReasoningMessage = ReasoningMessageRecord[type];
+    const animationKey = reasoningMessageId + type;
 
-  return (
-    <BarContainer
-      showBar={showBar}
-      status={status}
-      isCompletedStream={isCompletedStream}
-      title={title ?? ''}
-      secondaryTitle={secondary_title ?? ''}>
-      <AnimatePresence mode="wait" initial={!isCompletedStream}>
-        <motion.div
-          key={animationKey}
-          {...itemAnimationConfig}
-          layout={!isCompletedStream}
-          className="overflow-hidden">
-          <div className="min-h-[1px]">
-            <ReasoningMessage
-              reasoningMessageId={reasoningMessageId}
-              isCompletedStream={isCompletedStream}
-              messageId={messageId}
-              chatId={chatId}
-            />
-          </div>
-        </motion.div>
-      </AnimatePresence>
-    </BarContainer>
-  );
-};
+    return (
+      <BarContainer
+        showBar={showBar}
+        status={status}
+        isCompletedStream={isCompletedStream}
+        title={title ?? ''}
+        secondaryTitle={secondary_title ?? ''}>
+        <AnimatePresence mode="wait" initial={!isCompletedStream}>
+          <motion.div
+            key={animationKey}
+            {...itemAnimationConfig}
+            layout={!isCompletedStream}
+            className="overflow-hidden">
+            <div className="min-h-[1px]">
+              <ReasoningMessage
+                reasoningMessageId={reasoningMessageId}
+                isCompletedStream={isCompletedStream}
+                messageId={messageId}
+                chatId={chatId}
+              />
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </BarContainer>
+    );
+  }
+);
+
+ReasoningMessageSelector.displayName = 'ReasoningMessageSelector';
