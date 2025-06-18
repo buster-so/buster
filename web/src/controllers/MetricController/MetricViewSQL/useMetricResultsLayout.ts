@@ -5,19 +5,15 @@ import { useMemoizedFn, useUpdateLayoutEffect } from '@/hooks';
 import { createAutoSaveId, type AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
 
 const defaultSqlOpenLayout = ['80%', 'auto'];
-const defaultSqlLayout = ['0px', 'auto'];
 
 export const useMetricResultsLayout = ({
-  useSQL,
   appSplitterRef,
   autoSaveId
 }: {
-  useSQL: boolean;
   appSplitterRef: React.RefObject<AppSplitterRef | null>;
   autoSaveId: string;
 }) => {
   const defaultOpenLayout = defaultSqlOpenLayout;
-  const defaultOriginalLayout = defaultSqlLayout;
 
   const secondaryLayoutDimensions: [string, string] = useMemo(() => {
     const cookieKey = createAutoSaveId(autoSaveId);
@@ -36,10 +32,7 @@ export const useMetricResultsLayout = ({
   }, []);
 
   const defaultLayout: [string, string] = useMemo(() => {
-    if (useSQL) {
-      return secondaryLayoutDimensions;
-    }
-    return defaultOriginalLayout as [string, string];
+    return secondaryLayoutDimensions;
   }, []);
 
   const animateOpenSplitter = useMemoizedFn((side: 'metric' | 'both') => {
@@ -53,8 +46,8 @@ export const useMetricResultsLayout = ({
   });
 
   useUpdateLayoutEffect(() => {
-    animateOpenSplitter(useSQL ? 'both' : 'metric');
-  }, [useSQL]);
+    animateOpenSplitter('both');
+  }, []);
 
   return {
     defaultLayout

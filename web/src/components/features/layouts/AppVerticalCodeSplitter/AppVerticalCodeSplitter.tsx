@@ -42,8 +42,8 @@ export const AppVerticalCodeSplitter = forwardRef<AppSplitterRef, AppVerticalCod
     ref
   ) => {
     //tailwind might not like this, but yolo
-    const sqlContainerClassName = !topHidden ? `pb-${gapAmount} swag1` : '';
-    const dataContainerClassName = !topHidden ? `pt-${gapAmount} swag2` : '';
+    const sqlContainerClassName = !topHidden ? `pb-${gapAmount}` : '';
+    const dataContainerClassName = !topHidden ? `pt-${gapAmount}` : '';
 
     return (
       <AppSplitter
