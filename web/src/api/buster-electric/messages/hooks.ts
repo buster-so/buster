@@ -52,6 +52,7 @@ export const useTrackAndUpdateMessageChanges = (
           const currentMessageIds = chat.message_ids;
           const allMessageIds = uniq([...currentMessageIds, messageId]);
           if (currentMessageIds.length !== allMessageIds.length) {
+            console.log('added message id to chat', messageId);
             onUpdateChat({
               ...chat,
               message_ids: allMessageIds
@@ -59,7 +60,6 @@ export const useTrackAndUpdateMessageChanges = (
           }
         }
         callback?.(iChatMessage);
-        console.log('iChatMessage', iChatMessage);
         onUpdateChatMessage(iChatMessage);
       }
     }),

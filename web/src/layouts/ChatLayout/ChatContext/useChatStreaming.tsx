@@ -49,12 +49,7 @@ export const useChatStreaming = ({
   );
 
   const onUpdateReasoningMessageFromStream = useMemoizedFn(
-    (
-      d: Pick<
-        BusterChatMessage,
-        'id' | 'reasoning_messages' | 'reasoning_message_ids' | 'is_completed'
-      >
-    ) => {
+    (d: Parameters<typeof checkBlackBoxMessage>[0]) => {
       checkBlackBoxMessage(d);
     }
   );
@@ -102,7 +97,8 @@ export const useChatStreaming = ({
       id,
       is_completed = false,
       response_messages,
-      response_message_ids
+      response_message_ids,
+      final_reasoning_message = null
     } = c;
 
     if (reasoning_messages && reasoning_message_ids) {
@@ -110,7 +106,8 @@ export const useChatStreaming = ({
         reasoning_messages,
         reasoning_message_ids,
         is_completed,
-        id
+        id,
+        final_reasoning_message
       });
     }
 

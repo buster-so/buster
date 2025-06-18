@@ -42,14 +42,18 @@ export const useBlackBoxMessage = () => {
     (
       message: Pick<
         BusterChatMessage,
-        'id' | 'reasoning_messages' | 'reasoning_message_ids' | 'is_completed'
+        | 'id'
+        | 'reasoning_messages'
+        | 'reasoning_message_ids'
+        | 'is_completed'
+        | 'final_reasoning_message'
       >
     ) => {
+      console.trace('blackBox', message);
       const lastReasoningMessageId = last(message.reasoning_message_ids) || '';
       const lastReasoningMessage = message.reasoning_messages[lastReasoningMessageId];
       const isFinishedReasoningMessage = lastReasoningMessage?.status !== 'loading';
-      const isFinishedReasoningLoop = (lastReasoningMessage as BusterChatMessageReasoning_text)
-        ?.finished_reasoning;
+      const isFinishedReasoningLoop = message.is_completed || !!message.final_reasoning_message;
 
       if (isFinishedReasoningMessage && !isFinishedReasoningLoop && !message.is_completed) {
         clearTimeoutRef(message.id);

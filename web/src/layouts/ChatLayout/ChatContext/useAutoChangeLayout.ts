@@ -43,10 +43,7 @@ export const useAutoChangeLayout = ({
     select: (x) => x?.reasoning_message_ids?.[x?.reasoning_message_ids?.length - 1]
   });
   const { data: isFinishedReasoning } = useGetChatMessage(lastMessageId, {
-    select: (x) =>
-      !!lastReasoningMessageId &&
-      !!(x?.reasoning_messages[lastReasoningMessageId] as BusterChatMessageReasoning_text)
-        ?.finished_reasoning
+    select: (x) => !!lastReasoningMessageId && !!(x?.is_completed || !!x.final_reasoning_message)
   });
   const { getFileLinkMeta } = useGetFileLink();
 
@@ -59,16 +56,6 @@ export const useAutoChangeLayout = ({
   }, [hasLoadedChat]);
 
   useEffect(() => {
-    console.log({
-      hasLoadedChat,
-      chatId,
-      isCompletedStream,
-      isFinishedReasoning,
-      hasReasoning,
-      previousLastMessageId: previousLastMessageId.current,
-      lastMessageId,
-      previousIsCompletedStream
-    });
     if (!hasLoadedChat || !chatId) {
       return;
     }
@@ -83,6 +70,7 @@ export const useAutoChangeLayout = ({
       previousLastMessageId.current !== lastMessageId &&
       chatId
     ) {
+      console.log('triggering auto change layout to open reasoning');
       previousLastMessageId.current = lastMessageId;
 
       onSetSelectedFile({ id: lastMessageId, type: 'reasoning', versionNumber: undefined });
@@ -90,6 +78,7 @@ export const useAutoChangeLayout = ({
 
     //this happen will when the chat is completed and it WAS streaming
     else if (isCompletedStream && previousIsCompletedStream.current === false) {
+      console.log('triggering auto change layout to open file');
       const chatMessage = getChatMessageMemoized(lastMessageId);
       const lastFileId = findLast(chatMessage?.response_message_ids, (id) => {
         const responseMessage = chatMessage?.response_messages[id];
@@ -116,6 +105,7 @@ export const useAutoChangeLayout = ({
     }
     //this will trigger on a page refresh and the chat is completed
     else if (isCompletedStream && chatId) {
+      console.log('triggering auto change layout to open file');
       const isChatOnlyMode = !metricId && !dashboardId && !messageId;
       if (isChatOnlyMode) {
         return;

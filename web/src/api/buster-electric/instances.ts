@@ -8,7 +8,7 @@ import {
 import { ELECTRIC_BASE_URL } from './config';
 import { useSupabaseContext } from '@/context/Supabase';
 import { useEffect, useMemo, useRef } from 'react';
-import { useMount } from '@/hooks';
+import findLast from 'lodash/findLast';
 
 export type ElectricShapeOptions<T extends Row<unknown> = Row<unknown>> = Omit<
   Parameters<typeof useElectricShape<T>>[0],
@@ -22,13 +22,17 @@ const backoffOptions: BackoffOptions = {
 };
 
 const createElectricShape = <T extends Row<unknown> = Row<unknown>>(
-  params: ElectricShapeOptions<T>,
+  { params, subscribe = true, ...config }: ElectricShapeOptions<T>,
   accessToken: string
 ): Parameters<typeof useElectricShape<T>>[0] => {
   return {
-    ...params,
+    ...config,
+    params: {
+      ...params,
+      replica: 'default'
+    },
     url: ELECTRIC_BASE_URL,
-    subscribe: !!accessToken && (params.subscribe ?? true),
+    subscribe: !!accessToken && subscribe,
     backoffOptions,
     headers: {
       Authorization: `Bearer ${accessToken}`
@@ -77,21 +81,40 @@ export const useShapeStream = <T extends Row<unknown> = Row<unknown>>(
         hasSubscribed.current = true;
       }
 
-      const filteredMessage = messages.find(
-        (m) =>
-          isChangeMessage(m) &&
-          m.value &&
-          operations.includes(m.headers.operation as `insert` | `update` | `delete`)
-      ) as ChangeMessage<T>;
+      // Single-pass filtering and processing for better efficiency
+      let combinedValue = {} as T;
+      let lastMessage: ChangeMessage<T> | null = null;
+
+      for (const message of messages) {
+        if (isChangeMessage(message) && operations.includes(message.headers.operation)) {
+          const changeMessage = message as ChangeMessage<T>;
+          // Use Object.assign for better performance than spread operator
+          Object.assign(combinedValue, changeMessage.value);
+          lastMessage = changeMessage;
+        }
+      }
+
+      if (!lastMessage) {
+        return;
+      }
+
+      const filteredMessage: ChangeMessage<T> = {
+        key: lastMessage.key,
+        value: combinedValue,
+        headers: lastMessage.headers
+      };
+      const __headers__ = lastMessage.headers;
 
       const isUnsubscribedTriggered =
         shouldUnsubscribe &&
         shouldUnsubscribe({
-          operationType: filteredMessage.headers.operation as `insert` | `update` | `delete`,
+          //there is a bug here, operation type is not actually the operation type haha
+          operationType: __headers__.operation as `insert` | `update` | `delete`,
           message: filteredMessage
         });
 
       if (filteredMessage) {
+        console.log('filteredMessage', filteredMessage);
         onUpdate(filteredMessage);
       }
 

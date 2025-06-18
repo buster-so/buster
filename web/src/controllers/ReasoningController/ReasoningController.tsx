@@ -40,7 +40,7 @@ export const ReasoningController: React.FC<ReasoningControllerProps> = ({ chatId
     enabled: !!viewportRef.current
   });
 
-  const reasoningIsCompleted = useReasoningIsCompleted(messageId, reasoningMessageIds);
+  const reasoningIsCompleted = useReasoningIsCompleted(messageId);
 
   useEffect(() => {
     if (hasChat && reasoningMessageIds) {
