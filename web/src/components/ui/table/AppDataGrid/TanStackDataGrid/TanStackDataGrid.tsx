@@ -19,6 +19,7 @@ import { defaultCellFormat, defaultHeaderFormat } from './defaultFormat';
 import { SortColumnWrapper } from './SortColumnWrapper';
 import isEmpty from 'lodash/isEmpty';
 import isEqual from 'lodash/isEqual';
+import { MIN_COLUMN_WIDTH } from './constants';
 
 export interface TanStackDataGridProps {
   className?: string;
@@ -138,7 +139,6 @@ export const TanStackDataGrid: React.FC<TanStackDataGridProps> = React.memo(
         !isEmpty(columnWidthsProp) &&
         !isEqual(columnSizing, columnWidthsProp)
       ) {
-        console.log('EFFECT', columnWidthsProp);
         setColumnSizing(
           createDefaultTableColumnWidths(fields, rows, columnWidthsProp, cellFormat, headerFormat)
         );

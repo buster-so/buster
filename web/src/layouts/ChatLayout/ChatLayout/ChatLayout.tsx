@@ -1,18 +1,19 @@
 'use client';
 
 import type React from 'react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { AppSplitter, type AppSplitterRef } from '@/components/ui/layouts/AppSplitter';
 import { useBusterNotifications } from '@/context/BusterNotifications';
-import { useDebounce, useMount } from '@/hooks';
+import { useMount } from '@/hooks';
 import { CREATE_LANGFUSE_SESSION_URL } from '@/routes/externalRoutes';
 import { ChatContainer } from '../ChatContainer';
 import { ChatContextProvider } from '../ChatContext/ChatContext';
 import { ChatLayoutContextProvider, useChatLayoutContext } from '../ChatLayoutContext';
 import {
   DEFAULT_CHAT_OPTION_SIDEBAR_SIZE,
-  DEFAULT_FILE_OPTION_SIDEBAR_SIZE
+  DEFAULT_FILE_OPTION_SIDEBAR_SIZE,
+  MAX_CHAT_BOTH_SIDEBAR_SIZE
 } from '../ChatLayoutContext/config';
 import { FileContainer } from '../FileContainer';
 
@@ -34,9 +35,14 @@ export const ChatLayout: React.FC<ChatSplitterProps> = ({ children }) => {
     return ['380px', 'auto'];
   }, [selectedLayout]);
 
-  const autoSaveId = useMemo(() => {
-    return `chat-splitter-${chatLayoutProps.chatId}-${chatLayoutProps.metricId}`;
-  }, [chatLayoutProps.chatId, chatLayoutProps.metricId]);
+  const autoSaveId = `chat-splitter-${chatLayoutProps.chatId || '🫥'}-${chatLayoutProps.metricId || '❌'}`;
+  const leftPanelMinSize = selectedFile ? DEFAULT_CHAT_OPTION_SIDEBAR_SIZE : '0px';
+  const leftPanelMaxSize = selectedLayout === 'both' ? MAX_CHAT_BOTH_SIDEBAR_SIZE : undefined;
+  const rightPanelMinSize = selectedFile ? DEFAULT_FILE_OPTION_SIDEBAR_SIZE : '0px';
+  const rightPanelMaxSize = selectedLayout === 'chat-only' ? '0px' : undefined;
+  const renderLeftPanel = selectedLayout !== 'file-only';
+  const renderRightPanel = selectedLayout !== 'chat-only';
+  const bustStorageOnInit = selectedLayout === 'chat-only' || selectedLayout === 'file-only';
 
   useMount(() => {
     setMounted(true); //we need to wait for the app splitter to be mounted because this is nested in the app splitter
@@ -59,8 +65,6 @@ export const ChatLayout: React.FC<ChatSplitterProps> = ({ children }) => {
     }
   );
 
-  const preserveSide = 'left';
-
   return (
     <ChatLayoutContextProvider chatLayoutProps={chatLayoutProps}>
       <ChatContextProvider>
@@ -74,13 +78,14 @@ export const ChatLayout: React.FC<ChatSplitterProps> = ({ children }) => {
           autoSaveId={autoSaveId}
           defaultLayout={defaultSplitterLayout}
           allowResize={selectedLayout === 'both'}
-          preserveSide={preserveSide}
-          leftPanelMinSize={selectedFile ? DEFAULT_CHAT_OPTION_SIDEBAR_SIZE : '0px'}
-          rightPanelMinSize={selectedFile ? DEFAULT_FILE_OPTION_SIDEBAR_SIZE : '0px'}
-          rightPanelMaxSize={selectedLayout === 'chat-only' ? '0px' : 'auto'}
-          renderLeftPanel={selectedLayout !== 'file-only'}
-          renderRightPanel={selectedLayout !== 'chat-only'}
-          bustStorageOnInit={false}
+          preserveSide={'left'}
+          leftPanelMinSize={leftPanelMinSize}
+          leftPanelMaxSize={leftPanelMaxSize}
+          rightPanelMinSize={rightPanelMinSize}
+          rightPanelMaxSize={rightPanelMaxSize}
+          renderLeftPanel={renderLeftPanel}
+          renderRightPanel={renderRightPanel}
+          bustStorageOnInit={bustStorageOnInit}
         />
       </ChatContextProvider>
     </ChatLayoutContextProvider>
@@ -88,7 +93,3 @@ export const ChatLayout: React.FC<ChatSplitterProps> = ({ children }) => {
 };
 
 ChatLayout.displayName = 'ChatLayout';
-
-const getCombinedId = (chatId: string, metricId: string) => {
-  return chatId + metricId;
-};
