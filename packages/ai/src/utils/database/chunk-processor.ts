@@ -5,6 +5,7 @@ import type {
   ChatMessageReasoningMessage,
   ChatMessageResponseMessage,
 } from '../../../../../server/src/types/chat-types/chat-message.type';
+import { normalizeEscapedText } from '../streaming/escape-normalizer';
 import { OptimisticJsonParser, getOptimisticValue } from '../streaming/optimistic-json-parser';
 import { extractResponseMessages } from './format-llm-messages-as-reasoning';
 import type {
@@ -808,7 +809,8 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         // Update thought message as it streams
         const thought = getOptimisticValue<string>(parseResult.extractedValues, 'thought', '');
         if (thought && 'message' in entry) {
-          (entry as ReasoningEntry & { message: string }).message = thought;
+          // Normalize any double-escaped characters
+          (entry as ReasoningEntry & { message: string }).message = normalizeEscapedText(thought);
         }
 
         // Update finished_reasoning if available
@@ -827,7 +829,8 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         // Update thoughts message as it streams
         const thoughts = getOptimisticValue<string>(parseResult.extractedValues, 'thoughts', '');
         if (thoughts && 'message' in entry) {
-          (entry as ReasoningEntry & { message: string }).message = thoughts;
+          // Normalize any double-escaped characters
+          (entry as ReasoningEntry & { message: string }).message = normalizeEscapedText(thoughts);
         }
         break;
       }
@@ -1092,7 +1095,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
             type: 'text',
             title: 'Thinking...',
             status: 'loading',
-            message: args.thought,
+            message: normalizeEscapedText(args.thought),
             message_chunk: undefined,
             secondary_title: undefined,
             finished_reasoning: !args.nextThoughtNeeded,
@@ -1245,7 +1248,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
             type: 'text',
             title: 'Submitting Analysis',
             status: 'loading',
-            message: args.thoughts,
+            message: normalizeEscapedText(args.thoughts),
             message_chunk: undefined,
             secondary_title: undefined,
             finished_reasoning: false,
