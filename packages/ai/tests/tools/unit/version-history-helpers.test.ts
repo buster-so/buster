@@ -4,10 +4,14 @@ import {
   addMetricVersionToHistory,
   createInitialDashboardVersionHistory,
   createInitialMetricVersionHistory,
-} from './version-history-helpers';
-import type { DashboardYml, MetricYml, VersionHistory } from './version-history-types';
+} from '../../../src/tools/visualization-tools/version-history-helpers';
+import type {
+  DashboardYml,
+  MetricYml,
+  VersionHistory,
+} from '../../../src/tools/visualization-tools/version-history-types';
 
-describe('Version History Integration Tests', () => {
+describe('Version History Helper Functions', () => {
   describe('Metric Version History JSONB Format', () => {
     it('should create version history matching the expected database format', () => {
       const metricYml: MetricYml = {
@@ -36,7 +40,13 @@ describe('Version History Integration Tests', () => {
       // Check it matches expected format
       expect(history).toEqual({
         '1': {
-          content: { MetricYml: metricYml },
+          content: {
+            name: metricYml.name,
+            description: metricYml.description,
+            timeFrame: metricYml.time_frame,
+            sql: metricYml.sql,
+            chartConfig: metricYml.chart_config,
+          },
           updated_at: timestamp,
           version_number: 1,
         },
@@ -46,7 +56,7 @@ describe('Version History Integration Tests', () => {
       const jsonString = JSON.stringify(history);
       const parsed: VersionHistory = JSON.parse(jsonString);
 
-      expect(parsed['1']?.content.MetricYml?.name).toBe('Total Revenue (Q2 2023 - Q1 2024)');
+      expect(parsed['1']?.content.name).toBe('Total Revenue (Q2 2023 - Q1 2024)');
       expect(parsed['1']?.version_number).toBe(1);
       expect(parsed['1']?.updated_at).toBe(timestamp);
     });
@@ -73,8 +83,8 @@ describe('Version History Integration Tests', () => {
 
       // Verify structure
       expect(Object.keys(history).sort()).toEqual(['1', '2']);
-      expect(history['1']?.content.MetricYml?.name).toBe('Initial Metric');
-      expect(history['2']?.content.MetricYml?.name).toBe('Updated Metric');
+      expect(history['1']?.content.name).toBe('Initial Metric');
+      expect(history['2']?.content.name).toBe('Updated Metric');
       expect(history['2']?.version_number).toBe(2);
     });
   });
@@ -108,7 +118,16 @@ describe('Version History Integration Tests', () => {
       // Check it matches expected format
       expect(history).toEqual({
         '1': {
-          content: { DashboardYml: dashboardYml },
+          content: {
+            name: dashboardYml.name,
+            description: dashboardYml.description,
+            rows: dashboardYml.rows.map((row) => ({
+              id: row.id,
+              items: row.items,
+              columnSizes: row.column_sizes,
+              rowHeight: row.row_height,
+            })),
+          },
           updated_at: timestamp,
           version_number: 1,
         },
@@ -118,10 +137,8 @@ describe('Version History Integration Tests', () => {
       const jsonString = JSON.stringify(history);
       const parsed: VersionHistory = JSON.parse(jsonString);
 
-      expect(parsed['1']?.content.DashboardYml?.name).toBe(
-        'Quarterly Revenue Report (Previous 4 Quarters)'
-      );
-      expect(parsed['1']?.content.DashboardYml?.rows).toHaveLength(2);
+      expect(parsed['1']?.content.name).toBe('Quarterly Revenue Report (Previous 4 Quarters)');
+      expect(parsed['1']?.content.rows).toHaveLength(2);
       expect(parsed['1']?.version_number).toBe(1);
     });
 
@@ -149,9 +166,9 @@ describe('Version History Integration Tests', () => {
 
       // Verify structure
       expect(Object.keys(history).sort()).toEqual(['1', '2']);
-      expect(history['1']?.content.DashboardYml?.name).toBe('Initial Dashboard');
-      expect(history['2']?.content.DashboardYml?.name).toBe('Updated Dashboard');
-      expect(history['2']?.content.DashboardYml?.rows).toHaveLength(2);
+      expect(history['1']?.content.name).toBe('Initial Dashboard');
+      expect(history['2']?.content.name).toBe('Updated Dashboard');
+      expect(history['2']?.content.rows).toHaveLength(2);
     });
   });
 });
