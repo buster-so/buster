@@ -1,4 +1,3 @@
-import path from 'node:path';
 import { loadEnv } from 'vite';
 import { defineConfig } from 'vitest/config';
 
@@ -7,13 +6,9 @@ export default defineConfig(async () => {
 
   return {
     plugins: [tsconfigPaths()],
+
     test: {
-      include: [
-        '**/*.test.ts',
-        '**/*.integration.test.ts',
-        '**/*.unit.test.ts',
-        '**/*.int.test.ts',
-      ],
+      include: ['**/*.test.ts', '**/*.spec.ts'],
       exclude: [
         '**/node_modules/**',
         '**/dist/**',
@@ -23,8 +18,9 @@ export default defineConfig(async () => {
         '**/playwright-tests/**',
         '**/e2e/**',
       ],
+      // Define projects - each uses its own config
+      projects: ['apps/*', 'packages/*'],
       globals: true,
-      environment: 'node',
       testTimeout: 1000 * 60 * 5, // 5 minutes
       env: loadEnv('', process.cwd(), ''),
     },

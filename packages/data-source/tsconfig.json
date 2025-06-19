@@ -9,6 +9,7 @@
       "@/adapters/*": ["src/adapters/*"],
       "@/introspection/*": ["src/introspection/*"],
       "@/types/*": ["src/types/*"]
+      //Tsconfig paths DO NOT MERGE... So we need to manually add them here
     }
   },
   "include": ["src/**/*"],
