@@ -32,14 +32,7 @@
     }
   },
   "include": ["next-env.d.ts", "globals.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": [
-    "node_modules",
-    "../server/src/**/*.test.ts",
-    "../server/src/**/*.spec.ts",
-    "../server/tests/**/*",
-    "**/*.stories.ts",
-    "**/*.stories.tsx"
-  ],
+  "exclude": ["node_modules", "dist", ".next", "public"],
   "references": [
     { "path": "../../packages/database" },
     { "path": "../../packages/access-controls" },
