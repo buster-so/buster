@@ -23,8 +23,19 @@ vi.mock('@/api/query_keys/dashboard', () => ({
     }))
   }
 }));
-vi.mock('lodash', () => ({
-  last: vi.fn((arr) => (arr && arr.length > 0 ? arr[arr.length - 1] : undefined))
+
+vi.mock('@/api/query_keys', () => ({
+  queryKeys: {
+    getCurrencies: {
+      queryKey: ['nextjs', 'list', 'currencies']
+    },
+    dashboardGetDashboard: vi.fn().mockImplementation((id, versionNumber) => ({
+      queryKey: ['dashboard', id, versionNumber]
+    })),
+    dashboardGetList: vi.fn().mockImplementation(() => ({
+      queryKey: ['dashboards']
+    }))
+  }
 }));
 
 describe('useGetDashboard', () => {
