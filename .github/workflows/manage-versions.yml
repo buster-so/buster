@@ -67,6 +67,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'pnpm'
 
       - name: Set up Rust toolchain
         uses: actions-rs/toolchain@v1
@@ -165,12 +166,12 @@ jobs:
             echo "Bumping Web version using spec: $VERSION_SPEC..."
             cd web
             OLD_WEB_VERSION=$(jq -r .version package.json)
-            npm version "$VERSION_SPEC" --no-git-tag-version --allow-same-version
+            pnpm version "$VERSION_SPEC" --no-git-tag-version --allow-same-version
             NEW_WEB_VERSION=$(jq -r .version package.json)
             echo "Web: $OLD_WEB_VERSION -> $NEW_WEB_VERSION"
             cd ..
             if [[ "$OLD_WEB_VERSION" != "$NEW_WEB_VERSION" ]]; then
-              git add web/package.json web/package-lock.json
+              git add web/package.json pnpm-lock.yaml
               COMMIT_MESSAGE_PREFIX="$COMMIT_MESSAGE_PREFIX bump web to v$NEW_WEB_VERSION;"
               COMMIT_CHANGES=true
               echo "new_web_version=$NEW_WEB_VERSION" >> $GITHUB_OUTPUT

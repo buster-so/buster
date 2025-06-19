@@ -5,7 +5,6 @@
   "scripts": {
     "dev": "next dev --turbo",
     "build": "next build",
-    "build:skip-lint": "next build",
     "start": "next start",
     "lint": "next lint",
     "lint:biome": "npx biome check",
@@ -32,6 +31,7 @@
     "@dnd-kit/modifiers": "^9.0.0",
     "@dnd-kit/sortable": "^10.0.0",
     "@electric-sql/react": "^1.0.4",
+    "@electric-sql/client": "^1.0.4",
     "@faker-js/faker": "^9.8.0",
     "@monaco-editor/react": "^4.7.0",
     "@radix-ui/react-avatar": "^1.1.10",

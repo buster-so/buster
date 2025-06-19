@@ -156,12 +156,6 @@ importers:
 
   apps/server:
     dependencies:
-      '@buster/access-controls':
-        specifier: workspace:*
-        version: link:../../packages/access-controls
-      '@buster/database':
-        specifier: workspace:*
-        version: link:../../packages/database
       '@hono/zod-validator':
         specifier: ^0.7.0
         version: 0.7.0(hono@4.8.0)(zod@3.25.67)
@@ -186,6 +180,9 @@ importers:
       '@dnd-kit/sortable':
         specifier: ^10.0.0
         version: 10.0.0(@dnd-kit/core@6.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+      '@electric-sql/client':
+        specifier: ^1.0.4
+        version: 1.0.4
       '@electric-sql/react':
         specifier: ^1.0.4
         version: 1.0.4(react@18.3.1)

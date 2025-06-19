@@ -1,33 +1,33 @@
 dev:
-	rm -rf ./next && npm i && npm run dev
+	rm -rf ./next && pnpm install && pnpm run dev
 
 build:
-	rm -rf ./next && npm i && npm run build
+	rm -rf ./next && pnpm install && pnpm run build
 
 start:
-	npm i && npm run build && npm run start
+	pnpm install && pnpm run build && pnpm run start
 
 start-fast:
 	@if [ ! -d "./.next" ]; then \
 		echo "No build found. Installing dependencies and building..."; \
-		npm i && npm run build && npm run start; \
+		pnpm install && pnpm run build && pnpm run start; \
 	else \
 		echo "Using existing build..."; \
-		npm run start; \
+		pnpm run start; \
 	fi
 
 fast:
-	npm run dev
+	pnpm run dev
 
 build-storybook:
-	npm run build-storybook
+	pnpm run build-storybook
 
 storybook:
-	npm run storybook
+	pnpm run storybook
 
 lint:
-	npm run lint
+	pnpm run lint
 
 lint-fix:
-	npm run lint-fix
+	pnpm run lint-fix
 
