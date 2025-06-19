@@ -62,7 +62,7 @@ const createCspHeader = (isEmbed = false) => {
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
-  // Disable ESLint during builds since we're using Biome
+  // ESLint configuration
   eslint: {
     ignoreDuringBuilds: false,
     dirs: ['src']
@@ -80,7 +80,7 @@ const nextConfig = {
       bodySizeLimit: '2mb'
     }
   },
-  webpack: (config, { dev, isServer }) => {
+  webpack: (config) => {
     // Suppress the specific warning about critical dependencies in Supabase realtime-js
     config.ignoreWarnings = [
       ...(config.ignoreWarnings || []),

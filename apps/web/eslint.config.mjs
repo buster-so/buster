@@ -26,7 +26,10 @@ const config = [
       'out/**',
       'build/**',
       'dist/**',
-      'eslint.config.*'
+      'eslint.config.*',
+      'playwright-test/*',
+      'playwright-report/*',
+      'coverage/*'
     ]
   },
 
@@ -50,7 +53,7 @@ const config = [
     },
     rules: {
       '@typescript-eslint/no-unused-vars': 'off',
-      'no-console': 'warn',
+      'no-console': 'off',
       'react/no-array-index-key': 'off',
       'react-hooks/exhaustive-deps': 'off',
     }

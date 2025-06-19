@@ -50,7 +50,6 @@ export default class OutLabelsManager {
     for (let i = 0; i < list.length; i++) {
       const item = list[i];
       const rect = item.rect;
-      // eslint-disable-next-line prefer-const
       const delta = rect.y - lastPos;
       if (delta < 0) {
         rect.y -= delta;

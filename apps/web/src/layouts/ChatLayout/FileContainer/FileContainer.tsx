@@ -58,7 +58,6 @@ export const FileContainer: React.FC<FileContainerProps> = ({ children }) => {
       return secondaryLayoutDimensions;
     }
     return defaulClosedLayout;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const animateOpenSplitter = useMemoizedFn(async (side: 'open' | 'closed') => {

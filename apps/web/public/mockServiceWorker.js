@@ -1,5 +1,4 @@
-/* eslint-disable */
-/* tslint:disable */
+ /* tslint:disable */
 
 /**
  * Mock Service Worker.

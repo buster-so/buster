@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 // chartjs-plugin-trendline.ts
 
 import type { ChartDataset, ChartType, Plugin, Point, Scale } from 'chart.js';

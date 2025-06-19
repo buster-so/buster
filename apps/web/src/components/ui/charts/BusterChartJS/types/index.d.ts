@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { ChartType } from 'chart.js';
 import type { ChartHoverBarPluginOptions } from '../core/plugins';
 

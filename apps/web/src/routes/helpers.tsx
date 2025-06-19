@@ -80,7 +80,6 @@ export const pathNameToParentRoute = (
 ): BusterRoutes => {
   const route = Object.values(BusterRoutes).find((r) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- I am just using any here because it was a pain to type this out
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- testing
     return r === pathName || createBusterRoute({ route: r, ...(params as any) }) === pathName;
   });
 
