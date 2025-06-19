@@ -7,8 +7,9 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    environment: 'jsdom',
+    environment: 'jsdom', // For React components
     setupFiles: ['./vitest.setup.ts'],
+    
     pool: 'forks',
     poolOptions: {
       forks: {
@@ -16,6 +17,7 @@ export default defineConfig({
         minForks: process.env.CI ? 1 : 8
       }
     },
+    
     include: ['**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     exclude: [
       '**/node_modules/**',

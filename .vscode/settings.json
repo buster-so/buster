@@ -28,5 +28,8 @@
   },
   "[apps/web/**/*]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  "vitest.workspaceConfig": "./vitest.workspace.ts",
+  "vitest.enable": true,
+  "vitest.disabledWorkspaceFolders": []
 }

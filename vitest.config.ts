@@ -1,19 +1,27 @@
+import path from 'node:path';
 import { loadEnv } from 'vite';
 import { defineConfig } from 'vitest/config';
 
-// Note: Using dynamic import to avoid ES module issues
 export default defineConfig(async () => {
   const { default: tsconfigPaths } = await import('vite-tsconfig-paths');
 
   return {
     plugins: [tsconfigPaths()],
     test: {
-      projects: ['packages/*', 'trigger', 'server'],
       include: [
         '**/*.test.ts',
         '**/*.integration.test.ts',
         '**/*.unit.test.ts',
         '**/*.int.test.ts',
+      ],
+      exclude: [
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/build/**',
+        '**/coverage/**',
+        '**/.next/**',
+        '**/playwright-tests/**',
+        '**/e2e/**',
       ],
       globals: true,
       environment: 'node',
