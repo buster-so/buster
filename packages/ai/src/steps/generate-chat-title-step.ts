@@ -1,5 +1,5 @@
-import { updateChat } from '@buster/database/src/helpers/chats';
-import { updateMessage } from '@buster/database/src/helpers/messages';
+import { updateChat } from '@buster/database/helpers/chats';
+import { updateMessage } from '@buster/database/helpers/messages';
 import { Agent, createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import type { CoreMessage } from 'ai';

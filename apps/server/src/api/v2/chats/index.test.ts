@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-vi.mock('@buster/database/src/connection', () => ({
+vi.mock('@buster/database/connection', () => ({
   initializePool: vi.fn().mockReturnValue({}),
   getPool: vi.fn().mockReturnValue({}),
 }));

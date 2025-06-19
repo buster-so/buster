@@ -34,7 +34,7 @@ const app = new Hono()
       const proxiedUrl = await proxy(url, userId, c);
 
       if (!proxiedUrl) {
-        return;
+        return c.json({ error: 'Unable to process request' }, 500);
       }
 
       if (proxiedUrl instanceof Response) {
@@ -46,6 +46,7 @@ const app = new Hono()
       return response;
     } catch (error) {
       errorResponse(error, 500);
+      return;
     }
   });
 

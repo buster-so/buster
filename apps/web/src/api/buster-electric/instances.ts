@@ -1,9 +1,9 @@
 import { useShape as useElectricShape, getShapeStream } from '@electric-sql/react';
 import {
-  ChangeMessage,
   isChangeMessage,
   type BackoffOptions,
-  type Row
+  type Row,
+  type ChangeMessage
 } from '@electric-sql/client';
 import { ELECTRIC_BASE_URL } from './config';
 import { useSupabaseContext } from '@/context/Supabase';

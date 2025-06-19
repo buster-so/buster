@@ -1,6 +1,6 @@
 import { DataSource } from '@buster/data-source';
 import type { Credentials } from '@buster/data-source/types/credentials';
-import { db } from '@buster/database/src/connection';
+import { db } from '@buster/database/connection';
 import { sql } from 'drizzle-orm';
 import { z } from 'zod';
 

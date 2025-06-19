@@ -2,7 +2,7 @@ import * as fs from 'node:fs';
 import { chromium, type FullConfig } from '@playwright/test';
 import { applyAuth, authFile, hasValidAuth, login } from './auth-utils';
 
-async function globalSetup(config: FullConfig) {
+async function globalSetup(_config: FullConfig) {
   console.log('Starting global setup');
   try {
     // Make sure auth file exists with at least empty valid JSON to prevent errors

@@ -9,7 +9,7 @@ import {
   getMessagesForChat,
   messages,
 } from '@buster/database';
-import type { Chat, Message } from '@buster/database/src/helpers/chats';
+import type { Chat, Message } from '@buster/database/helpers/chats';
 import type {
   ChatCreateHandlerRequest,
   ChatMessage,

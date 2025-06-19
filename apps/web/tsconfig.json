@@ -22,9 +22,27 @@
     ],
     "paths": {
       "@/*": ["src/*"],
-      "@server/*": ["../server/src/*"]
+      "@server/*": ["../server/src/*"],
+      "@buster/database": ["../../packages/database/src"],
+      "@buster/database/*": ["../../packages/database/src/*"],
+      "@buster/access-controls": ["../../packages/access-controls/src"],
+      "@buster/access-controls/*": ["../../packages/access-controls/src/*"],
+      "@buster/test-utils": ["../../packages/test-utils/src"],
+      "@buster/test-utils/*": ["../../packages/test-utils/src/*"]
     }
   },
   "include": ["next-env.d.ts", "globals.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "../server/src/**/*.test.ts",
+    "../server/src/**/*.spec.ts",
+    "../server/tests/**/*",
+    "**/*.stories.ts",
+    "**/*.stories.tsx"
+  ],
+  "references": [
+    { "path": "../../packages/database" },
+    { "path": "../../packages/access-controls" },
+    { "path": "../../packages/test-utils" }
+  ]
 }

@@ -5,9 +5,7 @@ interface ReasoningEntry {
   id: string;
   [key: string]: unknown;
 }
-import { getDb } from '@buster/database/src/connection';
-import { updateMessageFields } from '@buster/database/src/helpers/messages';
-import { messages } from '@buster/database/src/schema';
+import { getDb, messages, updateMessageFields } from '@buster/database';
 import {
   extractResponseMessages,
   formatLlmMessagesAsReasoning,

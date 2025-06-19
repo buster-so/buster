@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // Mock the database connection and database functions BEFORE any other imports
-vi.mock('@buster/database/src/connection', () => ({
+vi.mock('@buster/database/connection', () => ({
   initializePool: vi.fn(),
   getPool: vi.fn(),
 }));
@@ -18,7 +18,7 @@ vi.mock('@buster/database', () => ({
 }));
 
 import * as database from '@buster/database';
-import type { Chat, Message } from '@buster/database/src/helpers/chats';
+import type { Chat, Message } from '@buster/database/helpers/chats';
 import { ChatError, ChatErrorCode } from '../../../../types/chat-types';
 import { buildChatWithMessages, handleExistingChat, handleNewChat } from './chat-helpers';
 

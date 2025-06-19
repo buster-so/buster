@@ -1,4 +1,4 @@
-import type { Chat, Message } from '@buster/database/src/helpers/chats';
+import type { Chat, Message } from '@buster/database/helpers/chats';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ChatError, ChatErrorCode } from '../../../../types/chat-types';
 import { initializeChat } from './chat-service';

@@ -31,6 +31,7 @@
       "@buster/data-source": ["packages/data-source/src"],
       "@buster/data-source/*": ["packages/data-source/src/*"],
       "@buster/database": ["packages/database/src"],
+      "@buster/database/*": ["packages/database/src/*"],
       "@buster/rerank": ["packages/rerank/src"],
       "@buster/rerank/*": ["packages/rerank/src/*"],
       "@buster/stored-values": ["packages/stored-values/src"],
@@ -57,7 +58,7 @@
 
       // Web aliases
       "@web": ["web/src"],
-      "@web/*": ["web/src/*"],
+      "@web/*": ["web/src/*"]
     },
 
     // Strict type checking (Rust-like experience)
