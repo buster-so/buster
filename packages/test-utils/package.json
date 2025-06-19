@@ -8,6 +8,9 @@
   },
   "scripts": {
     "build": "tsc --build",
-    "test": "vitest"
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
   }
 }

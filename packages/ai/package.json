@@ -3,6 +3,7 @@
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
+    "build": "tsc --build",
     "dev": "mastra dev --dir src",
     "test": "vitest run",
     "test:watch": "vitest watch",

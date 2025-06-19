@@ -5,10 +5,12 @@
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "build": "tsc --build",
+    "typecheck": "tsc --noEmit",
     "dev": "bun run src/index.ts"
   }
 }

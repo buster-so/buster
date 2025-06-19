@@ -88,6 +88,7 @@ describe('createChatHandler', () => {
       organizationId: '550e8400-e29b-41d4-a716-446655440000',
       role: 'admin',
     });
+    vi.mocked(tasks.trigger).mockResolvedValue({ id: 'task-handle-123' } as any);
   });
 
   it('should create a new chat with prompt', async () => {
@@ -150,19 +151,16 @@ describe('createChatHandler', () => {
   });
 
   it('should handle trigger errors gracefully', async () => {
-    vi.mocked(tasks.trigger).mockRejectedValue(new Error('Trigger failed'));
+    vi.mocked(tasks.trigger).mockReset().mockRejectedValue(new Error('Trigger failed'));
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    const result = await createChatHandler({ prompt: 'Hello' }, mockUser);
+    await expect(createChatHandler({ prompt: 'Hello' }, mockUser)).rejects.toMatchObject({
+      code: ChatErrorCode.INTERNAL_ERROR,
+      message: 'An unexpected error occurred while creating the chat',
+      details: { originalError: 'Trigger failed' },
+    });
 
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'Failed to trigger analyst agent task:',
-      expect.objectContaining({
-        error: expect.any(Error),
-        messageId: 'msg-123',
-      })
-    );
-    expect(result).toEqual(mockChat); // Should still return the chat
+    expect(consoleSpy).toHaveBeenCalledWith('Chat creation failed:', expect.any(Object));
 
     consoleSpy.mockRestore();
   });

@@ -14,9 +14,15 @@
     "test:introspection": "vitest run tests/integration/data-source-introspection.test.ts",
     "lint": "eslint src/ tests/",
     "lint:fix": "eslint src/ tests/ --fix",
+    "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
-  "keywords": ["database", "data-source", "introspection", "sql"],
+  "keywords": [
+    "database",
+    "data-source",
+    "introspection",
+    "sql"
+  ],
   "author": "Buster Team",
   "license": "MIT",
   "dependencies": {

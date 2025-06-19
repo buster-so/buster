@@ -1,0 +1,79 @@
+{
+    "$schema": "https://turbo.build/schema.json",
+    "ui": "tui",
+    "tasks": {
+        "build": {
+            "dependsOn": [
+                "^build"
+            ],
+            "inputs": [
+                "$TURBO_DEFAULT$",
+                ".env*"
+            ],
+            "outputs": [
+                "dist/**",
+                ".next/**",
+                "!.next/cache/**"
+            ]
+        },
+        "dev": {
+            "cache": false,
+            "persistent": true
+        },
+        "lint": {
+            "dependsOn": [
+                "^build"
+            ]
+        },
+        "typecheck": {
+            "dependsOn": [
+                "^build"
+            ],
+            "inputs": [
+                "$TURBO_DEFAULT$",
+                "tsconfig.json"
+            ]
+        },
+        "test": {
+            "inputs": [
+                "$TURBO_DEFAULT$",
+                "**/*.test.{ts,tsx,js,jsx}",
+                "**/*.spec.{ts,tsx,js,jsx}",
+                "tests/**/*"
+            ],
+            "outputs": [
+                "coverage/**"
+            ]
+        },
+        "test:watch": {
+            "cache": false,
+            "persistent": true
+        },
+        "test:coverage": {
+            "dependsOn": [
+                "^build"
+            ],
+            "inputs": [
+                "$TURBO_DEFAULT$",
+                "**/*.test.{ts,tsx,js,jsx}",
+                "**/*.spec.{ts,tsx,js,jsx}",
+                "tests/**/*"
+            ],
+            "outputs": [
+                "coverage/**"
+            ]
+        },
+        "test:ui": {
+            "cache": false,
+            "persistent": true
+        }
+    },
+    "globalDependencies": [
+        ".env",
+        ".env.local",
+        ".env.development",
+        ".env.production",
+        "tsconfig.json",
+        "tsconfig.base.json"
+    ]
+}

@@ -64,6 +64,9 @@ Cargo.lock
 # Node.js dependencies
 node_modules/
 
+# Turborepo
+.turbo
+
 .secrets
 
 /prds
@@ -84,3 +87,4 @@ drizzle/*.log
 drizzle/meta/
 
 **/evals/**/*.eval.private.ts
+*.tsbuildinfo
