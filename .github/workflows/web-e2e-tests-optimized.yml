@@ -24,19 +24,24 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Mount NPM Cache
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Mount PNPM Cache
         uses: useblacksmith/stickydisk@v1
         with:
-          key: frontend-npm-${{ github.sha }}
-          path: ~/.npm
+          key: frontend-pnpm-${{ github.sha }}
+          path: ~/.pnpm-store
 
       - name: Install Frontend Dependencies
         working-directory: ./web
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
       - name: Build Frontend
         working-directory: ./web
-        run: npm run build
+        run: pnpm run build
         env:
           NEXT_PUBLIC_API_URL: http://localhost:3001
           NEXT_PUBLIC_URL: http://localhost:3000
@@ -104,11 +109,16 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Mount NPM Cache
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Mount PNPM Cache
         uses: useblacksmith/stickydisk@v1
         with:
-          key: tests-npm-${{ github.sha }}
-          path: ~/.npm
+          key: tests-pnpm-${{ github.sha }}
+          path: ~/.pnpm-store
 
       - name: Download Frontend Build
         uses: actions/download-artifact@v4
@@ -123,8 +133,8 @@ jobs:
       - name: Install Dependencies for Testing
         working-directory: ./web
         run: |
-          npm install
-          npx playwright install --with-deps
+          pnpm install --frozen-lockfile
+          pnpm exec playwright install --with-deps
 
       - name: Download API Image
         uses: actions/download-artifact@v4
@@ -175,7 +185,7 @@ jobs:
       - name: Run Playwright Tests
         working-directory: ./web
         run: |
-          npx playwright test
+          pnpm exec playwright test
         env:
           CI: "true"
           DEBUG: "pw:api"

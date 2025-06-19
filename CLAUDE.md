@@ -51,33 +51,33 @@ npm run format packages/ai
 
 # Auto-fix formatting
 npm run format:fix path/to/file.ts
-npm run format:fix packages/ai
+pnpm run format:fix packages/ai
 
 # Complete check (lint + format + organize imports)
-npm run check path/to/file.ts
-npm run check packages/ai
+pnpm run check path/to/file.ts
+pnpm run check packages/ai
 
 # Complete check with auto-fix
-npm run check:fix path/to/file.ts
-npm run check:fix packages/ai
+pnpm run check:fix path/to/file.ts
+pnpm run check:fix packages/ai
 ```
 
 #### Testing
 ```bash
 # Run all tests
-npm run test
+pnpm run test
 
 # Run specific test files or patterns
-npm run test:file path/to/test.ts
-npm run test:file packages/ai/tests/workflows/**/*
+pnpm run test:file path/to/test.ts
+pnpm run test:file packages/ai/tests/workflows/**/*
 
 # Watch mode for development
-npm run test:watch
-npm run test:watch:file path/to/test.ts
+pnpm run test:watch
+pnpm run test:watch:file path/to/test.ts
 
 # Coverage and UI
-npm run test:coverage
-npm run test:ui
+pnpm run test:coverage
+pnpm run test:ui
 ```
 
 #### TypeScript Checking
@@ -89,17 +89,17 @@ tsc --noEmit
 cd packages/ai && tsc --noEmit
 cd packages/database && tsc --noEmit
 
-# Or use the npm script (if available)
-npm run typecheck packages/ai
+# Or use the pnpm script (if available)
+pnpm run typecheck packages/ai
 ```
 
 #### Pre-commit & CI
 ```bash
 # Recommended before committing
-npm run pre-commit  # Runs lint:fix + format:fix
+pnpm run pre-commit  # Runs lint:fix + format:fix
 
 # Full CI check
-npm run ci:check    # Runs check + typecheck
+pnpm run ci:check    # Runs check + typecheck
 ```
 
 ## Code Style Preferences
@@ -503,7 +503,7 @@ npm run check packages/ai
 
 # After making changes
 npm run check:fix packages/ai
-npm run test:file packages/ai/tests/path/to/relevant/test.ts
+pnpm run test:file packages/ai/tests/path/to/relevant/test.ts
 tsc --noEmit  # or: cd packages/ai && tsc --noEmit
 ```
 

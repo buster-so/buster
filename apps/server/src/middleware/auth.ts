@@ -1,4 +1,4 @@
-import { db, eq, getUser, users } from '@buster/database';
+import { getUser } from '@buster/database';
 import type { Context, Next } from 'hono';
 import { bearerAuth } from 'hono/bearer-auth';
 import { createSupabaseClient } from './supabase';

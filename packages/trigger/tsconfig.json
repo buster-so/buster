@@ -2,16 +2,17 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist",
-    "tsBuildInfoFile": "dist/.tsbuildinfo"
+    "tsBuildInfoFile": "dist/.tsbuildinfo",
+    "rootDir": "."
   },
   "include": ["src/**/*", "tests/**/*"],
   "exclude": ["node_modules", "dist"],
   "references": [
-    { "path": "../test-utils" },
     { "path": "../database" },
-    { "path": "../data-source" },
+    { "path": "../test-utils" },
+    { "path": "../ai" },
     { "path": "../access-controls" },
-    { "path": "../../apps/server" },
-    { "path": "../stored-values" }
+    { "path": "../stored-values" },
+    { "path": "../../apps/server" }
   ]
 }

@@ -22,5 +22,11 @@
   },
   "[json]": {
     "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "files.associations": {
+    "apps/web/**/*": "prettier"
+  },
+  "[apps/web/**/*]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }
