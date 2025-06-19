@@ -32,7 +32,7 @@ export const createOnChunkHandler = ({
       }
 
       // Add a delay to ensure any pending processing completes
-      await new Promise((resolve) => setTimeout(resolve, 250));
+      await new Promise((resolve) => setTimeout(resolve, 50));
 
       // Abort the stream
       try {
