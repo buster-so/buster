@@ -17,6 +17,9 @@
             ]
         },
         "dev": {
+            "dependsOn": [
+                "^dev"
+            ],
             "cache": false,
             "persistent": true
         },
@@ -33,6 +36,18 @@
             "inputs": [
                 "$TURBO_DEFAULT$",
                 "tsconfig.json"
+            ]
+        },
+        "test": {
+            "dependsOn": [
+                "^build"
+            ],
+            "inputs": [
+                "$TURBO_DEFAULT$",
+                "**/*.test.{ts,tsx,js,jsx}",
+                "**/*.spec.{ts,tsx,js,jsx}",
+                "tests/**/*",
+                ".env*"
             ]
         },
         "test:watch": {
