@@ -19,5 +19,13 @@
     "db:studio": "drizzle-kit studio",
     "db:check": "drizzle-kit check",
     "db:setup": "bun run src/setup.ts setup"
+  },
+  "dependencies": {
+    "@buster/typescript-config": "workspace:*",
+    "ai": "catalog:",
+    "drizzle-kit": "^0.31.1",
+    "drizzle-orm": "^0.44.2",
+    "postgres": "^3.4.7",
+    "zod": "catalog:"
   }
 }
