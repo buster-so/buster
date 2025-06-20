@@ -1,17 +1,17 @@
 import { randomUUID } from 'node:crypto';
+import { db } from '@buster/database';
+import {
+  assetPermissions,
+  dashboardFiles,
+  metricFiles,
+  metricFilesToDashboardFiles,
+} from '@buster/database';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
 import { inArray } from 'drizzle-orm';
 import * as yaml from 'yaml';
 import { z } from 'zod';
-import { db } from '../../../../database/src/connection';
-import {
-  assetPermissions,
-  dashboardFiles,
-  metricFiles,
-  metricFilesToDashboardFiles,
-} from '../../../../database/src/schema';
 import { createInitialDashboardVersionHistory } from './version-history-helpers';
 import type { DashboardYml } from './version-history-types';
 

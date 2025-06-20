@@ -1,19 +1,15 @@
+import { DataSource } from '@buster/data-source';
+import type { Credentials } from '@buster/data-source';
+import { db } from '@buster/database';
+import { metricFiles } from '@buster/database';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
 import { eq, inArray, sql } from 'drizzle-orm';
 import * as yaml from 'yaml';
 import { z } from 'zod';
-import { DataSource } from '../../../../data-source/src/data-source';
-import type { Credentials } from '../../../../data-source/src/types/credentials';
-import { db } from '../../../../database/src/connection';
-import { metricFiles } from '../../../../database/src/schema';
 import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
-import {
-  addMetricVersionToHistory,
-  getLatestVersionNumber,
-  validateMetricYml,
-} from './version-history-helpers';
+import { addMetricVersionToHistory, getLatestVersionNumber } from './version-history-helpers';
 import type { MetricYml, VersionHistory } from './version-history-types';
 
 // TypeScript types matching Rust DataMetadata structure

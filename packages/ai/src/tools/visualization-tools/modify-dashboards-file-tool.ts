@@ -1,17 +1,12 @@
+import { dashboardFiles, db, metricFiles } from '@buster/database';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
 import { eq, inArray } from 'drizzle-orm';
 import * as yaml from 'yaml';
 import { z } from 'zod';
-import { db } from '../../../../database/src/connection';
-import { dashboardFiles, metricFiles } from '../../../../database/src/schema';
 import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
-import {
-  addDashboardVersionToHistory,
-  getLatestVersionNumber,
-  validateDashboardYml,
-} from './version-history-helpers';
+import { addDashboardVersionToHistory, getLatestVersionNumber } from './version-history-helpers';
 import type { DashboardYml, VersionHistory } from './version-history-types';
 
 // Core interfaces matching Rust structs

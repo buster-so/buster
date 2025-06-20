@@ -29,6 +29,7 @@
     "drizzle-orm": "catalog:",
     "glob": "^11.0.3",
     "minimatch": "^10.0.3",
+    "uuid": "^11.1.0",
     "yaml": "^2.8.0",
     "zod": "catalog:"
   }
