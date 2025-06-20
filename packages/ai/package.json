@@ -19,6 +19,7 @@
     "@buster/server-shared": "workspace:*",
     "@buster/stored-values": "workspace:*",
     "@buster/typescript-config": "workspace:*",
+    "@buster/vitest-config": "workspace:*",
     "@mastra/core": "^0.10.6",
     "@mastra/libsql": "^0.10.3",
     "@mastra/loggers": "^0.10.2",

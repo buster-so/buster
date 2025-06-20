@@ -2,6 +2,7 @@
   "name": "@buster/data-source",
   "version": "1.0.0",
   "description": "Data source abstraction layer for multiple database types",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -20,6 +21,7 @@
   "license": "MIT",
   "dependencies": {
     "@buster/typescript-config": "workspace:*",
+    "@buster/vitest-config": "workspace:*",
     "@google-cloud/bigquery": "^8.1.0",
     "@types/pg": "^8.15.4",
     "mssql": "^11.0.1",
