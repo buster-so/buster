@@ -1,6 +1,7 @@
 {
   "name": "@buster/rerank",
   "version": "0.1.0",
+  "type": "module",
   "description": "Reranking service for semantic search result ordering",
   "main": "src/index.ts",
   "types": "src/index.ts",
