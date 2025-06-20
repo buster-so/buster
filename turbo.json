@@ -22,7 +22,8 @@
         },
         "lint": {
             "dependsOn": [
-                "^build"
+                "^build",
+                "^lint"
             ]
         },
         "typecheck": {
@@ -32,24 +33,6 @@
             "inputs": [
                 "$TURBO_DEFAULT$",
                 "tsconfig.json"
-            ]
-        },
-        "web#test": {
-            "inputs": [
-                "$TURBO_DEFAULT$",
-                "**/*.test.{ts,tsx,js,jsx}",
-                "**/*.spec.{ts,tsx,js,jsx}",
-                "tests/**/*",
-                ".env*"
-            ]
-        },
-        "@buster/test-utils#test": {
-            "inputs": [
-                "$TURBO_DEFAULT$",
-                "**/*.test.{ts,tsx,js,jsx}",
-                "**/*.spec.{ts,tsx,js,jsx}",
-                "tests/**/*",
-                ".env*"
             ]
         },
         "test:watch": {
@@ -70,16 +53,10 @@
             "outputs": [
                 "coverage/**"
             ]
-        },
-        "test:ui": {
-            "cache": false,
-            "persistent": true
         }
     },
     "globalDependencies": [
-        ".env*",
-        "tsconfig.json",
-        "tsconfig.base.json"
+        ".env*"
     ],
     "envMode": "loose"
 }

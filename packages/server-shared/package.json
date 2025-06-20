@@ -5,6 +5,10 @@
   "scripts": {
     "build": "tsc --build",
     "dev": "tsc --watch",
+    "lint": "biome check .",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit"
   },
   "exports": {

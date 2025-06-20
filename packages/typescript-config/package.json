@@ -2,5 +2,14 @@
   "name": "@buster/typescript-config",
   "version": "0.0.1",
   "private": false,
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "build": "echo 'No build step required for TypeScript configuration'",
+    "dev": "echo 'No dev command for TypeScript configuration'",
+    "lint": "biome check .",
+    "test": "echo 'No tests for TypeScript configuration'",
+    "test:watch": "echo 'No test watch for TypeScript configuration'",
+    "test:coverage": "echo 'No test coverage for TypeScript configuration'",
+    "typecheck": "echo 'No typecheck for TypeScript configuration'"
+  }
 }

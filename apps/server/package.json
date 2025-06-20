@@ -6,13 +6,14 @@
     }
   },
   "scripts": {
-    "dev": "bun --max-old-space-size=512 run --hot src/index.ts",
     "build": "bun build src/index.ts --outdir ./dist --target bun",
-    "start": "bun run dist/index.js",
+    "dev": "bun --max-old-space-size=512 run --hot src/index.ts",
+    "lint": "biome check .",
     "prod": "bun run build && bun run start",
+    "start": "bun run dist/index.js",
     "test": "vitest run",
-    "test:watch": "vitest --watch",
     "test:coverage": "vitest --coverage",
+    "test:watch": "vitest --watch",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

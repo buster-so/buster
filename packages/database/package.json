@@ -12,6 +12,8 @@
     "build": "tsc --build",
     "build:bun": "bun build src/index.ts --outdir dist --target node",
     "clean": "rm -rf dist",
+    "dev": "tsc --watch",
+    "lint": "biome check .",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",

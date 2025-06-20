@@ -2,5 +2,13 @@
   "name": "@buster/supabase",
   "version": "0.0.1",
   "private": false,
-  "scripts": {}
+  "scripts": {
+    "build": "echo 'No build step required for Supabase configuration'",
+    "dev": "echo 'No dev command for Supabase configuration'",
+    "lint": "biome check .",
+    "test": "echo 'No tests for Supabase configuration'",
+    "test:watch": "echo 'No test watch for Supabase configuration'",
+    "test:coverage": "echo 'No test coverage for Supabase configuration'",
+    "typecheck": "echo 'No typecheck for Supabase configuration'"
+  }
 }
