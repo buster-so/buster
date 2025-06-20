@@ -15,4 +15,5 @@ catalog:
   drizzle-orm: "^0.44.2"
   pg: "^8.16.2"
   uuid: "^11.0.0"
+  vitest: "^3.2.4"
   zod: "^3.0.0"

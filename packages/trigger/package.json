@@ -1,7 +1,7 @@
 {
   "name": "@buster/trigger",
   "version": "1.0.0",
-  "private": true,
+  "private": false,
   "type": "module",
   "scripts": {
     "dev": "npx trigger.dev@latest dev",
@@ -15,7 +15,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@trigger.dev/sdk": "catalog:"
+    "@buster/typescript-config": "workspace:*",
+    "@buster/vitest-config": "workspace:*",
+    "@trigger.dev/sdk": "catalog:",
+    "vitest": "catalog:"
   },
   "devDependencies": {
     "@trigger.dev/build": "catalog:"

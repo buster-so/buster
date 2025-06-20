@@ -1,7 +1,7 @@
 {
   "name": "@buster/server-shared",
   "version": "0.0.1",
-  "private": true,
+  "private": false,
   "scripts": {
     "build": "tsc --build",
     "dev": "tsc --watch",

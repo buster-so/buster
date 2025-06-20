@@ -1,7 +1,7 @@
 {
   "name": "web",
   "version": "0.1.44",
-  "private": true,
+  "private": false,
   "scripts": {
     "dev": "next dev --turbo",
     "build": "next build",

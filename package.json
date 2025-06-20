@@ -1,6 +1,6 @@
 {
   "name": "buster",
-  "private": true,
+  "private": false,
   "scripts": {
     "ai:dev": "pnpm --filter @buster/ai dev",
     "build": "turbo build",
@@ -37,14 +37,9 @@
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/node": "^20.17.57",
-    "@vitest/coverage-v8": "^3.2.4",
-    "@vitest/ui": "^3.2.4",
     "dotenv": "^16.5.0",
     "turbo": "^2.5.4",
-    "typescript": "^5.8.3",
-    "vite": "^6.3.5",
-    "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.2.4"
+    "typescript": "^5.8.3"
   },
   "peerDependencies": {
     "bun": "^1.2.15",
