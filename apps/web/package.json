@@ -155,6 +155,7 @@
     "eslint-plugin-storybook": "^0.12.0",
     "jsdom": "^26.1.0",
     "msw-storybook-addon": "^2.0.5",
+    "prettier-eslint": "^16.4.2",
     "sass": "^1.89.2",
     "tailwind-scrollbar": "^4.0.2",
     "tailwindcss": "4.1.10",
