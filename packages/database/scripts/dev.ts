@@ -37,13 +37,11 @@ async function developmentSetup(): Promise<void> {
   try {
     // Step 1: Run start-supabase.ts
     console.log('📦 Step 1: Starting Supabase...');
-    const startSupabaseScript = join(__dirname, 'start-supabase.ts');
-    await runCommand(`bun run ${startSupabaseScript}`);
+    await runCommand('pnpm run db:start-supabase');
 
     // Step 2: Run setup command
     console.log('🔧 Step 2: Running database setup...');
-    const setupScript = join(__dirname, 'setup', 'setup.ts');
-    await runCommand(`bun run ${setupScript} setup`);
+    await runCommand('pnpm run db:setup');
 
     console.log('🎉 Development environment setup completed successfully!');
   } catch (error) {

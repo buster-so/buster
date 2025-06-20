@@ -32,10 +32,10 @@ async function startSupabase(): Promise<void> {
 
   try {
     // Start Supabase
-    await runCommand('supabase start');
+    await runCommand('npm run db:start-supabase');
 
     // Reset the database
-    await runCommand('supabase db reset');
+    await runCommand('npm run db:reset');
 
     console.log('🎉 Supabase setup completed successfully!');
   } catch (error) {

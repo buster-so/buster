@@ -25,7 +25,9 @@
     "db:introspect": "drizzle-kit introspect",
     "db:studio": "drizzle-kit studio",
     "db:check": "drizzle-kit check",
-    "db:setup": "bun run src/setup.ts setup",
+    "db:setup": "bun run scripts/setup.ts setup",
+    "db:start-supabase": "supabase start",
+    "db:reset": "supabase db reset",
     "db:stop": "supabase stop"
   },
   "dependencies": {
