@@ -502,6 +502,9 @@ importers:
       '@buster/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
+      '@buster/vitest-config':
+        specifier: workspace:*
+        version: link:../vitest-config
       zod:
         specifier: 'catalog:'
         version: 3.25.67
