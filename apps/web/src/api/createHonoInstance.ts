@@ -1,7 +1,7 @@
 'use client';
 
 import { hc } from 'hono/client';
-import { type AppType } from '@server/index';
+import type { AppType } from '@buster-app/server';
 
 export const createHonoInstance = (
   baseURL: string,

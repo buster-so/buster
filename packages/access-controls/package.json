@@ -2,7 +2,12 @@
   "name": "@buster/access-controls",
   "version": "1.0.0",
   "type": "module",
-  "main": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
   "scripts": {
     "build": "tsc --build",
     "clean": "rm -rf dist && tsc --build --clean",

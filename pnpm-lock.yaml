@@ -108,9 +108,18 @@ importers:
 
   apps/web:
     dependencies:
+      '@buster-app/server':
+        specifier: workspace:*
+        version: link:../server
       '@buster/server-shared':
         specifier: workspace:*
         version: link:../../packages/server-shared
+      '@buster/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
+      '@buster/vitest-config':
+        specifier: workspace:*
+        version: link:../../packages/vitest-config
       '@dnd-kit/core':
         specifier: ^6.3.1
         version: 6.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -369,6 +378,9 @@ importers:
       utility-types:
         specifier: ^3.11.0
         version: 3.11.0
+      uuid:
+        specifier: 'catalog:'
+        version: 11.1.0
       virtua:
         specifier: ^0.41.5
         version: 0.41.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(svelte@5.34.7)(vue@3.5.17(typescript@5.8.3))

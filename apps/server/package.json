@@ -1,5 +1,10 @@
 {
-  "name": "server",
+  "name": "@buster-app/server",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts"
+    }
+  },
   "scripts": {
     "dev": "bun --max-old-space-size=512 run --hot src/index.ts",
     "build": "bun build src/index.ts --outdir ./dist --target bun",
