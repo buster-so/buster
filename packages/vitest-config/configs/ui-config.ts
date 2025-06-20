@@ -13,6 +13,13 @@ export const uiConfig = defineConfig(async () => {
       environment: 'jsdom',
       testTimeout: 1000 * 60 * 2, // 2 minutes
       env: loadEnv('', process.cwd(), ''),
+      pool: 'forks',
+      poolOptions: {
+        forks: {
+          maxForks: process.env.CI ? 1 : 8,
+          minForks: process.env.CI ? 1 : 8,
+        },
+      },
     },
   };
 });

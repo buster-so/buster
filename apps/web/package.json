@@ -27,10 +27,10 @@
     "node": ">=22.9.0"
   },
   "dependencies": {
-    "@buster/typescript-config": "workspace:*",
-    "@buster/vitest-config": "workspace:*",
     "@buster-app/server": "workspace:*",
     "@buster/server-shared": "workspace:*",
+    "@buster/typescript-config": "workspace:*",
+    "@buster/vitest-config": "workspace:*",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/modifiers": "^9.0.0",
     "@dnd-kit/sortable": "^10.0.0",
@@ -120,6 +120,7 @@
     "uuid": "catalog:",
     "virtua": "^0.41.5",
     "vite": "^6.3.5",
+    "vite-tsconfig-paths": "^5.1.4",
     "zod": "catalog:",
     "zustand": "^5.0.5"
   },
