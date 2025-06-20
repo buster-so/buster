@@ -4,7 +4,7 @@ import { exec } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
-import { closePool } from './connection.js';
+import { closePool } from '../../src/connection';
 
 const execAsync = promisify(exec);
 const __filename = fileURLToPath(import.meta.url);
@@ -84,12 +84,12 @@ async function setupDatabase(): Promise<void> {
     console.log('');
 
     // Step 2: Execute setup.sql
-    const setupSqlPath = join(__dirname, '..', 'drizzle', 'setup.sql');
+    const setupSqlPath = join(__dirname, '..', '..', 'drizzle', 'setup.sql');
     await executeSqlFile(setupSqlPath);
     console.log('');
 
     // Step 3: Execute seed.sql
-    const seedSqlPath = join(__dirname, '..', 'drizzle', 'seed.sql');
+    const seedSqlPath = join(__dirname, '..', '..', 'drizzle', 'seed.sql');
     await executeSqlFile(seedSqlPath);
     console.log('');
 
@@ -109,7 +109,7 @@ async function setupData(): Promise<void> {
   try {
     console.log('🔧 Setting up database data...\n');
 
-    const setupSqlPath = join(__dirname, '..', 'drizzle', 'setup.sql');
+    const setupSqlPath = join(__dirname, '..', '..', 'drizzle', 'setup.sql');
     await executeSqlFile(setupSqlPath);
 
     console.log('🎉 Database data setup completed successfully!');
@@ -128,7 +128,7 @@ async function seedData(): Promise<void> {
   try {
     console.log('🌱 Seeding database...\n');
 
-    const seedSqlPath = join(__dirname, '..', 'drizzle', 'seed.sql');
+    const seedSqlPath = join(__dirname, '..', '..', 'drizzle', 'seed.sql');
     await executeSqlFile(seedSqlPath);
 
     console.log('🎉 Database seeding completed successfully!');

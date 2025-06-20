@@ -12,7 +12,7 @@
     "build": "tsc --build",
     "build:bun": "bun build src/index.ts --outdir dist --target node",
     "clean": "rm -rf dist",
-    "dev": "tsc --watch",
+    "dev": "bun run scripts/dev.ts",
     "lint": "biome check .",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -25,7 +25,8 @@
     "db:introspect": "drizzle-kit introspect",
     "db:studio": "drizzle-kit studio",
     "db:check": "drizzle-kit check",
-    "db:setup": "bun run src/setup.ts setup"
+    "db:setup": "bun run src/setup.ts setup",
+    "db:stop": "supabase stop"
   },
   "dependencies": {
     "@buster/typescript-config": "workspace:*",
