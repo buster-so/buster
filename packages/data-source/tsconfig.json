@@ -1,15 +1,15 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@buster/typescript-config/base.json",
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src",
     "baseUrl": ".",
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "paths": {
       "@/*": ["src/*"],
       "@/adapters/*": ["src/adapters/*"],
       "@/introspection/*": ["src/introspection/*"],
       "@/types/*": ["src/types/*"]
-      //Tsconfig paths DO NOT MERGE... So we need to manually add them here
     }
   },
   "include": ["src/**/*"],

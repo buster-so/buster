@@ -1,0 +1,17 @@
+{
+  "name": "@buster/server-shared",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "tsc --build",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "exports": {
+    "chats": "./src/chats/index.ts"
+  },
+  "dependencies": {
+    "@buster/typescript-config": "workspace:*",
+    "zod": "catalog:"
+  }
+}

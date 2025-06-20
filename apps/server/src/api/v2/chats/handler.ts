@@ -1,12 +1,12 @@
 import { getUserOrganizationId } from '@buster/database';
 import type { User } from '@buster/database';
-import { tasks } from '@trigger.dev/sdk/v3';
 import {
   type ChatCreateHandlerRequest,
   type ChatCreateResponse,
   ChatError,
   ChatErrorCode,
-} from '../../../types/chat-types';
+} from '@buster/server-shared/chats';
+import { tasks } from '@trigger.dev/sdk/v3';
 import { handleAssetChat } from './services/chat-helpers';
 import { initializeChat } from './services/chat-service';
 

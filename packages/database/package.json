@@ -24,7 +24,7 @@
     "@buster/typescript-config": "workspace:*",
     "ai": "catalog:",
     "drizzle-kit": "^0.31.1",
-    "drizzle-orm": "^0.44.2",
+    "drizzle-orm": "catalog:",
     "postgres": "^3.4.7",
     "zod": "catalog:"
   }

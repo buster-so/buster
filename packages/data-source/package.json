@@ -17,18 +17,19 @@
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
-  "keywords": [
-    "database",
-    "data-source",
-    "introspection",
-    "sql"
-  ],
-  "author": "Buster Team",
   "license": "MIT",
   "dependencies": {
-    "pg-cursor": "^2.15.0"
+    "@buster/typescript-config": "workspace:*",
+    "@google-cloud/bigquery": "^8.1.0",
+    "@types/pg": "^8.15.4",
+    "mssql": "^11.0.1",
+    "mysql2": "^3.14.1",
+    "pg": "catalog:",
+    "pg-cursor": "^2.15.2",
+    "snowflake-sdk": "^2.1.0"
   },
   "devDependencies": {
+    "@types/mssql": "^9.1.7",
     "@types/pg-cursor": "^2.7.2"
   }
 }

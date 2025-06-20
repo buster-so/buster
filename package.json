@@ -33,26 +33,15 @@
     "trigger:test:integration": "pnpm --filter @buster/trigger run test:integration",
     "typecheck": "turbo typecheck"
   },
-  "dependencies": {
-
-  },
+  "dependencies": {},
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@trigger.dev/build": "^3.3.17",
-    "@types/bun": "latest",
-    "@types/mssql": "^9.1.7",
     "@types/node": "^20.17.57",
-    "@types/pg": "^8.15.4",
-    "@types/snowflake-sdk": "^1.6.24",
-    "@types/uuid": "^10.0.0",
     "@vitest/coverage-v8": "^3.2.4",
     "@vitest/ui": "^3.2.4",
-    "autoevals": "^0.0.129",
-    "braintrust": "^0.0.206",
     "dotenv": "^16.5.0",
     "turbo": "^2.5.4",
     "typescript": "^5.8.3",
-    "uuid": "^11.1.0",
     "vite": "^6.3.5",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4"

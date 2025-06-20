@@ -15,9 +15,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@trigger.dev/sdk": "^3.3.17"
+    "@trigger.dev/sdk": "catalog:"
   },
   "devDependencies": {
-    "@trigger.dev/build": "^3.3.17"
+    "@trigger.dev/build": "catalog:"
   }
 }

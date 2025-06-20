@@ -14,5 +14,10 @@
     "lint:fix": "biome check --apply .",
     "format": "biome format .",
     "format:fix": "biome format --write ."
+  },
+  "dependencies": {
+    "@buster/typescript-config": "workspace:*",
+    "axios": "catalog:",
+    "zod": "catalog:"
   }
 }

@@ -13,6 +13,7 @@
   "dependencies": {
     "@buster/access-controls": "workspace:*",
     "@buster/database": "workspace:*",
+    "@buster/server-shared": "workspace:*",
     "@buster/test-utils": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@hono/zod-validator": "^0.7.0",

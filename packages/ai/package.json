@@ -9,5 +9,16 @@
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^1.2.12",
+    "@buster/data-source": "workspace:*",
+    "@buster/database": "workspace:*",
+    "@buster/typescript-config": "workspace:*",
+    "@mastra/core": "^0.10.6",
+    "ai": "catalog:",
+    "braintrust": "^0.0.206",
+    "drizzle-orm": "catalog:",
+    "zod": "catalog:"
   }
 }

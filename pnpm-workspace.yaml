@@ -7,8 +7,12 @@ packages:
   - 'apps/server' 
 
 catalog:
+  '@supabase/supabase-js': "^2.50.0"
+  '@trigger.dev/build': "^3.0.0"
+  '@trigger.dev/sdk': "^3.0.0"
+  ai: "^4.0.0"
+  axios: "^1.10.0"
+  drizzle-orm: "^0.44.2"
+  pg: "^8.16.2"
   uuid: "^11.0.0"
   zod: "^3.0.0"
-  ai: "^4.0.0"
-  '@trigger.dev/sdk': "^3.0.0"
-  '@supabase/supabase-js': "^2.50.0"

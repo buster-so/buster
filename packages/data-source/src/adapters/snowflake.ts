@@ -1,9 +1,5 @@
 import snowflake from 'snowflake-sdk';
-import {
-  ConnectionPoolError,
-  QueryTimeoutError,
-  classifyError,
-} from '../errors/data-source-errors';
+import { QueryTimeoutError, classifyError } from '../errors/data-source-errors';
 import type { DataSourceIntrospector } from '../introspection/base';
 import { SnowflakeIntrospector } from '../introspection/snowflake';
 import { type Credentials, DataSourceType, type SnowflakeCredentials } from '../types/credentials';

@@ -9,20 +9,19 @@ import {
   getMessagesForChat,
   messages,
 } from '@buster/database';
-import type { Chat, Message } from '@buster/database/helpers/chats';
+import type { Chat, Message } from '@buster/database';
 import type {
-  ChatCreateHandlerRequest,
   ChatMessage,
   ChatMessageReasoningMessage,
   ChatMessageResponseMessage,
   ChatWithMessages,
-} from '../../../../types/chat-types';
+} from '@buster/server-shared/chats';
 import {
   ChatError,
   ChatErrorCode,
   ReasoningMessageSchema,
   ResponseMessageSchema,
-} from '../../../../types/chat-types';
+} from '@buster/server-shared/chats';
 
 const buildResponseMessages = (responseMessages: unknown): ChatMessage['response_messages'] => {
   if (!responseMessages) {
