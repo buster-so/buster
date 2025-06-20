@@ -1,10 +1,7 @@
-import { cleanupTestEnvironment, setupTestEnvironment } from '@buster/test-utils';
+import { type OrganizationDataSourceInput, getOrganizationDataSource } from '@buster/database';
 import { createTestDataSource } from '@buster/test-utils';
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
-import {
-  type OrganizationDataSourceInput,
-  getOrganizationDataSource,
-} from '../../../src/helpers/dataSources/organizationDataSource';
+import { cleanupTestEnvironment, setupTestEnvironment } from '../helpers';
 
 describe('Organization Data Source Helper', () => {
   beforeEach(async () => {

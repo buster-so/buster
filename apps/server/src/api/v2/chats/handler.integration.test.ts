@@ -1,5 +1,11 @@
 import { asc, chats, db, eq, messages, usersToOrganizations } from '@buster/database';
 import {
+  ChatCreateRequestSchema,
+  ChatCreateResponseSchema,
+  ChatError,
+  type ChatWithMessages,
+} from '@buster/server-shared/chats';
+import {
   cleanupTestChats,
   cleanupTestMessages,
   createTestChat,
@@ -11,14 +17,7 @@ import type { User } from '@supabase/supabase-js';
 import { tasks } from '@trigger.dev/sdk/v3';
 import { Hono } from 'hono';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ChatError } from '../../../types/chat-types/chat-errors.types';
-import {
-  ChatCreateRequestSchema,
-  ChatCreateResponseSchema,
-  type ChatWithMessages,
-} from '../../../types/chat-types/chat.types';
 import { createChatHandler } from './handler';
-import '../../../types/hono.types';
 
 /**
  * Integration tests for chat creation endpoint

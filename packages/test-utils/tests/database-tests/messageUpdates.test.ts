@@ -1,12 +1,12 @@
-import { cleanupTestEnvironment, setupTestEnvironment } from '@buster/test-utils';
-import { createTestMessageWithContext } from '@buster/test-utils';
-import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import {
   getLatestMessageForChat,
   updateMessageReasoning,
   updateMessageResponseMessages,
   updateMessageStreamingFields,
-} from '../../src/helpers/messages';
+} from '@buster/database/src/helpers/messages';
+import { createTestMessageWithContext } from '@buster/test-utils';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+import { cleanupTestEnvironment, setupTestEnvironment } from './helpers';
 
 describe('Message Update Helpers', () => {
   beforeEach(async () => {

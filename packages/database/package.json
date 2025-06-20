@@ -23,7 +23,6 @@
   "dependencies": {
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
-    "@buster/test-utils": "workspace:*",
     "ai": "catalog:",
     "drizzle-kit": "^0.31.1",
     "drizzle-orm": "catalog:",

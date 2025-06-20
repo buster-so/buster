@@ -1,10 +1,10 @@
-import { cleanupTestEnvironment, setupTestEnvironment } from '@buster/test-utils';
-import { createTestMessageWithContext } from '@buster/test-utils';
-import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import {
   type ChatConversationHistoryInput,
   getChatConversationHistory,
-} from '../../../src/helpers/messages/chatConversationHistory';
+} from '@buster/database/src/helpers/messages/chatConversationHistory';
+import { createTestMessageWithContext } from '@buster/test-utils';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+import { cleanupTestEnvironment, setupTestEnvironment } from '../helpers';
 
 describe('Chat Conversation History Helper', () => {
   beforeEach(async () => {

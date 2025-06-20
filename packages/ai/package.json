@@ -18,6 +18,7 @@
     "@buster/database": "workspace:*",
     "@buster/server-shared": "workspace:*",
     "@buster/stored-values": "workspace:*",
+    "@buster/test-utils": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
     "@mastra/core": "^0.10.6",
