@@ -1,7 +1,7 @@
 import type {
   ReasoningFileType as ServerReasoningFileType,
   ResponseMessageFileType as ServerResponseMessageFileType
-} from '@server/types/chat-types';
+} from '@buster/server-shared/chats';
 
 export type FileType = ServerResponseMessageFileType;
 

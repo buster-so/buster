@@ -1,4 +1,4 @@
-import type { ChatCreateRequest } from '@server/types/chat-types';
+import type { ChatCreateRequest } from '@buster/server-shared/chats';
 import { useBusterApiContextSelector } from '@/context/BusterReactQuery';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateChatToIChat } from '@/lib/chat';

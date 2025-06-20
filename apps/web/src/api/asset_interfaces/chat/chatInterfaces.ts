@@ -1,4 +1,4 @@
-import type { ChatWithMessages } from '@server/types/chat-types';
+import type { ChatWithMessages } from '@buster/server-shared/chats';
 
 export type BusterChat = ChatWithMessages;
 

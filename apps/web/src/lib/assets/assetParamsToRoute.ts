@@ -5,7 +5,7 @@ import type {
   FileViewSecondary,
   MetricFileViewSecondary
 } from '../../layouts/ChatLayout/ChatLayoutContext/useLayoutConfig';
-import type { ReasoingMessage_ThoughtFileType } from '@server/types/chat-types';
+import type { ReasoingMessage_ThoughtFileType } from '@buster/server-shared/chats';
 
 type UnionOfFileTypes = FileType | ReasoningFileType | ReasoingMessage_ThoughtFileType;
 

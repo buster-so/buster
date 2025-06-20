@@ -16,7 +16,7 @@ import type {
   ChatMessageReasoningMessage_File,
   ChatMessageReasoningMessage_Pill,
   ChatMessageReasoningMessage_Files
-} from '@server/types/chat-types';
+} from '@buster/server-shared/chats';
 
 export type BusterChatMessage = ChatMessage;
 

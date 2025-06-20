@@ -17,3 +17,4 @@ catalog:
   uuid: "^11.0.0"
   vitest: "^3.2.4"
   zod: "^3.0.0"
+  
