@@ -2,13 +2,14 @@
   "name": "@buster/vitest-config",
   "version": "0.0.1",
   "private": false,
-  "license": "MIT",
   "type": "module",
+  "license": "MIT",
   "exports": {
-    ".": "./configs/index.ts"
+    ".": "./dist/configs/index.js",
+    "./*": "./dist/configs/*.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --build",
     "collect-json-reports": "node dist/scripts/collect-json-outputs.js",
     "merge-json-reports": "nyc merge coverage/raw coverage/merged/merged-coverage.json",
     "report": "nyc report -t coverage/merged --report-dir coverage/report --reporter=html --exclude-after-remap false",

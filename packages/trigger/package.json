@@ -16,8 +16,12 @@
   },
   "dependencies": {
     "@buster/typescript-config": "workspace:*",
+    "@buster/database": "workspace:*",
+    "@buster/test-utils": "workspace:*",
     "@buster/vitest-config": "workspace:*",
     "@trigger.dev/sdk": "catalog:",
+    "ai": "catalog:",
+    "braintrust": "^0.0.206",
     "vitest": "catalog:"
   },
   "devDependencies": {

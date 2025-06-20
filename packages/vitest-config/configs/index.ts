@@ -1,2 +1,2 @@
-export * from './base-config';
-export * from './ui-config';
+export * from './base-config.js';
+export * from './ui-config.js';
