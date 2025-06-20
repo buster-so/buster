@@ -28,6 +28,7 @@
   "dependencies": {
     "@ai-sdk/openai": "^1.3.22",
     "@buster/database": "workspace:*",
+    "@buster/vitest-config": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "ai": "catalog:",
     "zod": "catalog:"

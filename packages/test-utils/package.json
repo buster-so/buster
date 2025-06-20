@@ -8,13 +8,11 @@
   },
   "scripts": {
     "build": "tsc --build",
-    "test": "vitest run",
-    "test:watch": "vitest watch",
-    "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@buster/typescript-config": "workspace:*",
+    "@buster/vitest-config": "workspace:*",
     "@buster/database": "workspace:*",
     "uuid": "catalog:"
   }

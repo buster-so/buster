@@ -12,5 +12,6 @@ export const baseConfig = defineConfig(async () => {
       globals: true,
       testTimeout: 1000 * 60 * 2, // 2 minutes
       env: loadEnv('', process.cwd(), ''),
+    },
   };
 });

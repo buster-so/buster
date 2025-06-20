@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@buster/typescript-config": "workspace:*",
+    "@buster/vitest-config": "workspace:*",
     "axios": "catalog:",
     "zod": "catalog:"
   }

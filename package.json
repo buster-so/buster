@@ -39,7 +39,8 @@
     "@types/node": "^20.17.57",
     "dotenv": "^16.5.0",
     "turbo": "^2.5.4",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "catalog:"
   },
   "peerDependencies": {
     "bun": "^1.2.15",
