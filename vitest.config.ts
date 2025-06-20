@@ -19,7 +19,7 @@ export default defineConfig(async () => {
         '**/e2e/**',
       ],
       // Define projects - each uses its own config
-      projects: ['apps/*', 'packages/*'],
+      projects: ['apps/web', 'apps/server', 'packages/*'],
       globals: true,
       testTimeout: 1000 * 60 * 5, // 5 minutes
       env: loadEnv('', process.cwd(), ''),
