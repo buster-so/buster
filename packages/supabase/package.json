@@ -1,0 +1,9 @@
+{
+    "name": "@buster/supabase",
+    "version": "0.0.1",
+    "private": true,
+    "scripts": {
+        "build": "echo 'There are no build steps for this package'",
+        "test": "echo 'There are no tests for this package'"
+    }
+}
