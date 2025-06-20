@@ -1,9 +1,9 @@
+import type { ChatMessageReasoningMessage } from '@buster/server-shared/chats';
 import { createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
-import type { ChatMessageReasoningMessage } from '../../../../server/src/types/chat-types/chat-message.type';
 import { thinkAndPrepAgent } from '../agents/think-and-prep-agent/think-and-prep-agent';
 import { ChunkProcessor } from '../utils/database/chunk-processor';
 import { retryableAgentStreamWithHealing } from '../utils/retry';

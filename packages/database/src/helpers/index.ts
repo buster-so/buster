@@ -31,6 +31,7 @@ export {
 // Chat helpers
 export {
   createChat,
+  updateChat,
   getChatWithDetails,
   createMessage,
   checkChatPermission,

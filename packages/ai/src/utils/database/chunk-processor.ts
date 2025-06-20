@@ -1,22 +1,16 @@
 import { updateMessageFields } from '@buster/database';
-import type { CoreMessage, TextStreamPart, ToolSet } from 'ai';
-import type { z } from 'zod';
 import type {
   ChatMessageReasoningMessage,
   ChatMessageResponseMessage,
-} from '../../../../../server/src/types/chat-types/chat-message.type';
+} from '@buster/server-shared/chats';
+import type { CoreMessage, TextStreamPart, ToolSet } from 'ai';
 import { normalizeEscapedText } from '../streaming/escape-normalizer';
 import { OptimisticJsonParser, getOptimisticValue } from '../streaming/optimistic-json-parser';
 import { extractResponseMessages } from './format-llm-messages-as-reasoning';
 import type {
   AssistantMessageContent,
   GenericToolSet,
-  TextDeltaChunk,
-  ToolCallChunk,
-  ToolCallDeltaChunk,
   ToolCallInProgress,
-  ToolCallStreamingStartChunk,
-  ToolResultChunk,
   TypedAssistantMessage,
 } from './types';
 import {

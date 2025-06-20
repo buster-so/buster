@@ -8,7 +8,7 @@
     "typecheck": "tsc --noEmit"
   },
   "exports": {
-    "chats": "./src/chats/index.ts"
+    "./chats": "./src/chats/index.ts"
   },
   "dependencies": {
     "@buster/typescript-config": "workspace:*",

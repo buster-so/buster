@@ -7,7 +7,7 @@ import { z } from 'zod';
 import type {
   ChatMessageReasoningMessage,
   ChatMessageResponseMessage,
-} from '../../../../server/src/types/chat-types/chat-message.type';
+} from '@buster/server-shared/chats';
 import { analystAgent } from '../agents/analyst-agent/analyst-agent';
 import { ChunkProcessor } from '../utils/database/chunk-processor';
 import { hasFailureIndicators, hasFileFailureIndicators } from '../utils/database/types';

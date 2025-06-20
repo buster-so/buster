@@ -1,15 +1,15 @@
-import { zValidator } from '@hono/zod-validator';
-import { Hono } from 'hono';
-import { requireAuth } from '../../../middleware/auth';
 import {
   ChatCreateRequestSchema,
   type ChatCreateResponse,
   ChatCreateResponseSchema,
-} from '../../../types/chat-types/chat.types';
+  ChatError,
+} from '@buster/server-shared/chats';
+import { zValidator } from '@hono/zod-validator';
+import { Hono } from 'hono';
+import { requireAuth } from '../../../middleware/auth';
 import '../../../types/hono.types'; //I added this to fix intermitent type errors. Could probably be removed.
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
-import { ChatError } from '../../../types';
 import { createChatHandler } from './handler';
 
 const app = new Hono()

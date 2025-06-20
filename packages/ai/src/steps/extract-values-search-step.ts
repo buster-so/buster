@@ -1,4 +1,4 @@
-import type { StoredValueResult } from '@buster/stored-values/schemas';
+import type { StoredValueResult } from '@buster/stored-values';
 import { generateEmbedding, searchValuesByEmbedding } from '@buster/stored-values/search';
 import { Agent, createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';

@@ -446,7 +446,6 @@ async function validateSql(sqlQuery: string, dataSourceId: string): Promise<SqlV
             console.warn(
               `[modify-metrics] SQL validation timeout on attempt ${attempt + 1}/${MAX_RETRIES + 1}. Retrying in ${delay}ms...`,
               {
-                metricName: metric?.name,
                 sqlPreview: `${sqlQuery.substring(0, 100)}...`,
                 attempt: attempt + 1,
                 nextDelay: delay,
@@ -473,7 +472,6 @@ async function validateSql(sqlQuery: string, dataSourceId: string): Promise<SqlV
             console.warn(
               `[modify-metrics] SQL validation timeout (exception) on attempt ${attempt + 1}/${MAX_RETRIES + 1}. Retrying in ${delay}ms...`,
               {
-                metricName: metric?.name,
                 sqlPreview: `${sqlQuery.substring(0, 100)}...`,
                 attempt: attempt + 1,
                 nextDelay: delay,

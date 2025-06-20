@@ -1,6 +1,6 @@
 import { DataSource } from '@buster/data-source';
-import type { Credentials } from '@buster/data-source/types/credentials';
-import { db } from '@buster/database/connection';
+import type { Credentials } from '@buster/data-source';
+import { db } from '@buster/database';
 import { sql } from 'drizzle-orm';
 import { z } from 'zod';
 
@@ -24,34 +24,31 @@ export class WorkflowDataSourceManager {
    */
   async getDataSource(dataSourceId: string): Promise<DataSource> {
     // Check if we already have a DataSource for this ID
-    if (this.dataSources.has(dataSourceId)) {
-      return this.dataSources.get(dataSourceId)!;
+    const existingDataSource = this.dataSources.get(dataSourceId);
+    if (existingDataSource) {
+      return existingDataSource;
     }
 
     // Create new DataSource
-    try {
-      const credentials = await this.getDataSourceCredentials(dataSourceId);
-      const dataSource = new DataSource({
-        dataSources: [
-          {
-            name: `datasource-${dataSourceId}`,
-            type: credentials.type,
-            credentials: credentials,
-          },
-        ],
-        defaultDataSource: `datasource-${dataSourceId}`,
-      });
 
-      // Cache for future use within this workflow
-      this.dataSources.set(dataSourceId, dataSource);
+    const credentials = await this.getDataSourceCredentials(dataSourceId);
+    const dataSource = new DataSource({
+      dataSources: [
+        {
+          name: `datasource-${dataSourceId}`,
+          type: credentials.type,
+          credentials: credentials,
+        },
+      ],
+      defaultDataSource: `datasource-${dataSourceId}`,
+    });
 
-      // Successfully created new DataSource
+    // Cache for future use within this workflow
+    this.dataSources.set(dataSourceId, dataSource);
 
-      return dataSource;
-    } catch (error) {
-      // Failed to create DataSource
-      throw error;
-    }
+    // Successfully created new DataSource
+
+    return dataSource;
   }
 
   /**
@@ -95,7 +92,7 @@ export class WorkflowDataSourceManager {
   async closeAll(): Promise<void> {
     const promises: Promise<void>[] = [];
 
-    for (const [dataSourceId, dataSource] of this.dataSources) {
+    for (const [_dataSourceId, dataSource] of this.dataSources) {
       promises.push(
         dataSource.close().catch(() => {
           // Silently handle close errors
@@ -131,7 +128,11 @@ export function getWorkflowDataSourceManager(workflowId: string): WorkflowDataSo
     const manager = new WorkflowDataSourceManager(workflowId);
     workflowManagers.set(workflowId, manager);
   }
-  return workflowManagers.get(workflowId)!;
+  const manager = workflowManagers.get(workflowId);
+  if (!manager) {
+    throw new Error(`Failed to get workflow manager for ${workflowId}`);
+  }
+  return manager;
 }
 
 /**
@@ -160,7 +161,6 @@ export function getAllWorkflowStats() {
  * Clean up old workflow managers (e.g., those older than 1 hour)
  */
 export async function cleanupOldWorkflowManagers(maxAge = 3600000): Promise<void> {
-  const now = Date.now();
   const toCleanup: string[] = [];
 
   for (const [workflowId, manager] of workflowManagers.entries()) {

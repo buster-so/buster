@@ -1,6 +1,6 @@
 import type { User } from '@buster/database';
-import type { ChatCreateHandlerRequest, ChatWithMessages } from '../../../../types/chat-types';
-import { ChatError, ChatErrorCode } from '../../../../types/chat-types';
+import type { ChatCreateHandlerRequest, ChatWithMessages } from '@buster/server-shared/chats';
+import { ChatError, ChatErrorCode } from '@buster/server-shared/chats';
 import { handleExistingChat, handleNewChat } from './chat-helpers';
 
 /**

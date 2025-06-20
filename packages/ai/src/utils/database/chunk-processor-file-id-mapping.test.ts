@@ -1,6 +1,5 @@
-import type { CoreMessage } from 'ai';
+import type { ChatMessageReasoningMessage } from '@buster/server-shared/chats';
 import { beforeEach, describe, expect, test } from 'vitest';
-import type { ChatMessageReasoningMessage } from '../../../../../server/src/types/chat-types/chat-message.type';
 import { ChunkProcessor } from './chunk-processor';
 
 // Helper type to access private methods for testing
