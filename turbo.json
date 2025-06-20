@@ -39,10 +39,8 @@
                 "$TURBO_DEFAULT$",
                 "**/*.test.{ts,tsx,js,jsx}",
                 "**/*.spec.{ts,tsx,js,jsx}",
-                "tests/**/*"
-            ],
-            "outputs": [
-                "coverage/**"
+                "tests/**/*",
+                ".env*"
             ]
         },
         "test:watch": {
@@ -57,7 +55,8 @@
                 "$TURBO_DEFAULT$",
                 "**/*.test.{ts,tsx,js,jsx}",
                 "**/*.spec.{ts,tsx,js,jsx}",
-                "tests/**/*"
+                "tests/**/*",
+                ".env*"
             ],
             "outputs": [
                 "coverage/**"
@@ -69,11 +68,9 @@
         }
     },
     "globalDependencies": [
-        ".env",
-        ".env.local",
-        ".env.development",
-        ".env.production",
+        ".env*",
         "tsconfig.json",
         "tsconfig.base.json"
-    ]
+    ],
+    "envMode": "loose"
 }

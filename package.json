@@ -21,7 +21,7 @@
     "format:fix": "biome format --write ${1:-.}",
     "lint": "turbo lint",
     "sync:deps": "node scripts/sync-workspace-deps.js",
-    "test": "turbo test",
+    "test": "dotenv -e .env -- turbo test",
     "test:coverage": "turbo test:coverage",
     "test:file": "vitest run ${1:-}",
     "test:ui": "vitest --ui",

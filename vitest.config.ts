@@ -6,7 +6,6 @@ export default defineConfig(async () => {
 
   return {
     plugins: [tsconfigPaths()],
-
     test: {
       include: ['**/*.test.ts', '**/*.spec.ts'],
       exclude: [

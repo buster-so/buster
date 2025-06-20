@@ -5,10 +5,5 @@ export default defineConfig(async () => {
 
   return {
     plugins: [tsconfigPaths()],
-    test: {
-      // These settings will merge with the root config since this package
-      // is included in the root config's projects array
-      include: ['tests/**/*.test.ts', 'src/**/*.test.ts'],
-    },
   };
 });

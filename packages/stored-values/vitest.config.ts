@@ -8,7 +8,7 @@ export default defineConfig(async () => {
     test: {
       // These settings will merge with the root config since this package
       // is included in the root config's projects array
-      include: ['tests/**/*.test.ts'],
+      include: ['tests/**/*.test.ts', 'src/**/*.test.ts'],
     },
   };
 });
