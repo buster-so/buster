@@ -34,7 +34,16 @@
                 "tsconfig.json"
             ]
         },
-        "test": {
+        "web#test": {
+            "inputs": [
+                "$TURBO_DEFAULT$",
+                "**/*.test.{ts,tsx,js,jsx}",
+                "**/*.spec.{ts,tsx,js,jsx}",
+                "tests/**/*",
+                ".env*"
+            ]
+        },
+        "@buster/test-utils#test": {
             "inputs": [
                 "$TURBO_DEFAULT$",
                 "**/*.test.{ts,tsx,js,jsx}",
