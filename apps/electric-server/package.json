@@ -1,0 +1,13 @@
+{
+  "name": "@buster-apps/electric-server",
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "start": "bun run scripts/start.ts",
+    "dev": "bun run scripts/start.ts",
+    "stop": "docker compose stop"
+  },
+  "dependencies": {
+    "@buster/database": "workspace:*"
+  }
+}
