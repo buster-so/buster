@@ -1,8 +1,6 @@
 {
-  "extends": "@buster/typescript-config/base.json",
+  "extends": "@buster/typescript-config/jit-package.json",
   "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src",
     "baseUrl": ".",
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "paths": {

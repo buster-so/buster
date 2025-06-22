@@ -2,6 +2,7 @@
   "name": "@buster/access-controls",
   "version": "1.0.0",
   "type": "module",
+  "module": "src/index.ts",
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -9,19 +10,18 @@
     }
   },
   "scripts": {
-    "build": "tsc --build",
-    "clean": "rm -rf dist && tsc --build --clean",
-    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "test": "vitest run",
     "test:watch": "vitest watch",
-    "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc --noEmit"
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@buster/typescript-config": "workspace:*",
-    "@buster/vitest-config": "workspace:*",
     "@buster/database": "workspace:*",
     "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@buster/typescript-config": "workspace:*",
+    "@buster/vitest-config": "workspace:*"
   }
 }

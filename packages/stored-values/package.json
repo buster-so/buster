@@ -2,28 +2,27 @@
   "name": "@buster/stored-values",
   "version": "1.0.0",
   "type": "module",
+  "module": "src/index.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
     },
     "./schemas": {
-      "types": "./dist/schemas.d.ts",
-      "default": "./dist/schemas.js"
+      "types": "./src/schemas.ts",
+      "default": "./src/schemas.ts"
     },
     "./search": {
-      "types": "./dist/search.d.ts",
-      "default": "./dist/search.js"
+      "types": "./src/search.ts",
+      "default": "./src/search.ts"
     }
   },
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "test": "vitest run",
     "test:watch": "vitest watch",
-    "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc --noEmit"
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.3.22",

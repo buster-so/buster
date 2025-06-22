@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Data source abstraction layer for multiple database types",
   "type": "module",
+  "module": "src/index.ts",
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -11,6 +12,7 @@
   },
   "scripts": {
     "build": "tsc --build",
+    "dev": "tsc --watch",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:unit": "vitest run tests/unit/",

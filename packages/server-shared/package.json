@@ -1,6 +1,8 @@
 {
   "name": "@buster/server-shared",
   "version": "0.0.1",
+  "type": "module",
+  "module": "src/index.ts",
   "private": false,
   "scripts": {
     "lint": "biome check .",
@@ -10,7 +12,14 @@
     "typecheck": "tsc --noEmit"
   },
   "exports": {
-    "./chats": "./src/chats/index.ts"
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./chats": {
+      "types": "./src/chats/index.ts",
+      "default": "./src/chats/index.ts"
+    }
   },
   "dependencies": {
     "@buster/typescript-config": "workspace:*",

@@ -2,14 +2,19 @@
   "name": "@buster/ai",
   "module": "src/index.ts",
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
   "scripts": {
-    "build": "tsc --build",
+    "typecheck": "tsc --noEmit",
     "dev": "mastra dev --dir src",
     "lint": "biome check .",
     "test": "vitest run",
     "test:watch": "vitest watch",
-    "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc --noEmit"
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^1.2.12",

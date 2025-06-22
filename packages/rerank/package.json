@@ -2,6 +2,7 @@
   "name": "@buster/rerank",
   "version": "0.1.0",
   "type": "module",
+  "module": "src/index.ts",
   "description": "Reranking service for semantic search result ordering",
   "exports": {
     ".": {
@@ -10,12 +11,10 @@
     }
   },
   "scripts": {
-    "build": "tsc --build",
-    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "lint:fix": "biome check --apply .",
     "format": "biome format .",

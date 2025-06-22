@@ -2,16 +2,27 @@
   "name": "@buster/database",
   "version": "1.0.0",
   "type": "module",
+  "module": "src/index.ts",
   "exports": {
     ".": {
       "types": "./src/index.ts",
       "default": "./src/index.ts"
+    },
+    "./helpers/*": {
+      "types": "./src/helpers/*/index.ts",
+      "default": "./src/helpers/*/index.ts"
+    },
+    "./connection": {
+      "types": "./src/connection.ts",
+      "default": "./src/connection.ts"
     }
   },
   "scripts": {
-    "build": "tsc --build",
-    "build:bun": "bun build src/index.ts --outdir dist --target node",
-    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest",
     "db:check": "drizzle-kit check",
     "db:generate": "drizzle-kit generate",
     "db:introspect": "drizzle-kit introspect",
@@ -23,13 +34,7 @@
     "db:start-supabase": "supabase start",
     "db:stop": "supabase stop",
     "db:studio": "drizzle-kit studio",
-    "dev": "echo 'this is controlled by turbo - you should not be running this unless you are referencing it from another packages turbo.json' && true",
-    "lint": "biome check .",
-    "stop": "pnpm run db:stop",
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "stop": "pnpm run db:stop"
   },
   "dependencies": {
     "@buster/typescript-config": "workspace:*",
