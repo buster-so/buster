@@ -1,23 +1,25 @@
 {
   "name": "@buster/stored-values",
   "version": "1.0.0",
-  "type": "module",
-  "module": "src/index.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "default": "./src/index.ts"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
     "./schemas": {
-      "types": "./src/schemas.ts",
-      "default": "./src/schemas.ts"
+      "types": "./dist/schemas.d.ts",
+      "default": "./dist/schemas.js"
     },
     "./search": {
-      "types": "./src/search.ts",
-      "default": "./src/search.ts"
+      "types": "./dist/search.d.ts",
+      "default": "./dist/search.js"
     }
   },
   "scripts": {
+    "build": "tsc",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "test": "vitest run",

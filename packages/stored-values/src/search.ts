@@ -331,12 +331,14 @@ export async function generateEmbedding(
     const validSearchTerms = SearchTermsSchema.parse(searchTerms);
     const validOptions = EmbeddingOptionsSchema.parse(options);
 
-    const { embedding } = await embed({
+    const embedOptions = {
       model: openai.embedding('text-embedding-3-small'),
       value: validSearchTerms.join(' '),
       maxRetries: validOptions.maxRetries,
-      abortSignal: validOptions.abortSignal,
-    });
+      ...(validOptions.abortSignal && { abortSignal: validOptions.abortSignal }),
+    };
+
+    const { embedding } = await embed(embedOptions);
 
     // Validate output
     return EmbeddingSchema.parse(embedding);

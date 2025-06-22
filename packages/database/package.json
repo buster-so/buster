@@ -1,23 +1,25 @@
 {
   "name": "@buster/database",
   "version": "1.0.0",
-  "type": "module",
-  "module": "src/index.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "default": "./src/index.ts"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
     "./helpers/*": {
-      "types": "./src/helpers/*/index.ts",
-      "default": "./src/helpers/*/index.ts"
+      "types": "./dist/helpers/*/index.d.ts",
+      "default": "./dist/helpers/*/index.js"
     },
     "./connection": {
-      "types": "./src/connection.ts",
-      "default": "./src/connection.ts"
+      "types": "./dist/connection.d.ts",
+      "default": "./dist/connection.js"
     }
   },
   "scripts": {
+    "build": "tsc",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "test": "vitest run",

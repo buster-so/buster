@@ -1,12 +1,14 @@
 {
-  "extends": "@buster/typescript-config/jit-package.json",
+  "extends": "@buster/typescript-config/base.json",
   "compilerOptions": {
-    "baseUrl": ".",
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
-    "paths": {
-      "@/*": ["src/*"]
-    }
+    "allowImportingTsExtensions": false,
+    "outDir": "dist",
+    "rootDir": "./src",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "noEmit": false
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
+  "exclude": ["node_modules", "dist", "tests", "**/*.test.ts", "**/*.spec.ts"]
 }

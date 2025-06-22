@@ -2,7 +2,6 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "./type-checking.json",
   "compilerOptions": {
-    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",
@@ -12,10 +11,11 @@
     "declaration": true,
     "declarationMap": true,
     "incremental": true,
-    "noEmit": true,
     "inlineSources": false,
     "preserveWatchOutput": true,
-    "target": "ESNext"
+    "target": "ESNext",
+    "allowImportingTsExtensions": false,
+    "noEmit": false
   },
   "exclude": ["node_modules", "dist", "tests", "**/*.test.ts", "**/*.spec.ts"]
 }
