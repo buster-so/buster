@@ -11,8 +11,7 @@
     }
   },
   "scripts": {
-    "build": "tsc --build",
-    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:unit": "vitest run tests/unit/",
@@ -20,9 +19,7 @@
     "test:coverage": "vitest run --coverage",
     "test:introspection": "vitest run tests/integration/data-source-introspection.test.ts",
     "lint": "eslint src/ tests/",
-    "lint:fix": "eslint src/ tests/ --fix",
-    "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist"
+    "lint:fix": "eslint src/ tests/ --fix"
   },
   "license": "MIT",
   "dependencies": {
