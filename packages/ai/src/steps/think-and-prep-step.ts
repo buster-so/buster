@@ -5,15 +5,13 @@ import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { thinkAndPrepAgent } from '../agents/think-and-prep-agent/think-and-prep-agent';
+import type { thinkAndPrepWorkflowInputSchema } from '../schemas/workflow-schemas';
 import { ChunkProcessor } from '../utils/database/chunk-processor';
 import { retryableAgentStreamWithHealing } from '../utils/retry';
 import type { RetryableError } from '../utils/retry/types';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
 import { createOnChunkHandler, handleStreamingError } from '../utils/streaming';
-import type {
-  AnalystRuntimeContext,
-  thinkAndPrepWorkflowInputSchema,
-} from '../workflows/analyst-workflow';
+import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
 import { createTodosOutputSchema } from './create-todos-step';
 import { extractValuesSearchOutputSchema } from './extract-values-search-step';
 import { generateChatTitleOutputSchema } from './generate-chat-title-step';
