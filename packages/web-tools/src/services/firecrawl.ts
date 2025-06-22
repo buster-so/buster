@@ -1,5 +1,5 @@
 import FirecrawlApp from '@mendable/firecrawl-js';
-import { CompanyResearchError } from '../deep-research/types.js';
+import { CompanyResearchError } from '../deep-research/types';
 
 export interface FirecrawlConfig {
   apiKey?: string;

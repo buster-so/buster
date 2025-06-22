@@ -1,4 +1,4 @@
-import { CompanyResearchError } from '../deep-research/types.js';
+import { CompanyResearchError } from '../deep-research/types';
 
 export interface PollingOptions {
   /** Initial polling interval in milliseconds */
