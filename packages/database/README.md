@@ -176,7 +176,6 @@ When you need to make schema changes:
 
 ```bash
 # Database introspection and setup
-bun run db:setup          # Full setup for existing database
 bun run db:pull           # Pull schema from database
 bun run db:validate       # Validate schema against database
 

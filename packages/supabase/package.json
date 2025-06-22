@@ -3,12 +3,12 @@
   "version": "0.0.1",
   "private": false,
   "scripts": {
-    "build": "echo 'No build step required for Supabase configuration'",
-    "dev": "echo 'No dev command for Supabase configuration'",
+    "build": "true",
+    "dev": "true",
     "lint": "biome check .",
-    "test": "echo 'No tests for Supabase configuration'",
-    "test:watch": "echo 'No test watch for Supabase configuration'",
-    "test:coverage": "echo 'No test coverage for Supabase configuration'",
-    "typecheck": "echo 'No typecheck for Supabase configuration'"
+    "test": "true",
+    "test:watch": "true",
+    "test:coverage": "true",
+    "typecheck": "true"
   }
 }

@@ -1,0 +1,34 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "db:start-supabase": {
+      "cache": false,
+      "persistent": false
+    },
+    "db:reset": {
+      "cache": false,
+      "persistent": false,
+      "dependsOn": ["db:start-supabase"]
+    },
+    "db:migrate": {
+      "cache": false,
+      "persistent": false,
+      "dependsOn": ["db:start-supabase", "db:reset"]
+    },
+    "db:seed": {
+      "cache": false,
+      "persistent": false,
+      "dependsOn": ["db:start-supabase", "db:reset", "db:migrate"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": false,
+      "dependsOn": ["db:start-supabase", "db:reset", "db:migrate", "db:seed"]
+    },
+    "stop": {
+      "cache": false,
+      "persistent": false
+    }
+  }
+}

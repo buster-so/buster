@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "npx trigger.dev@latest dev",
     "deploy": "npx trigger.dev@latest deploy",
-    "build": "echo 'No build step required for Trigger.dev v3 - uses deploy command'",
+    "build": "true",
     "lint": "biome check .",
     "test": "vitest run",
     "test:watch": "vitest watch",
