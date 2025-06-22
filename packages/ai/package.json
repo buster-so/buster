@@ -22,7 +22,7 @@
     "@buster/test-utils": "workspace:*",
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
-    "@mastra/core": "^0.10.6",
+    "@mastra/core": "catalog:",
     "@mastra/libsql": "^0.10.3",
     "@mastra/loggers": "^0.10.2",
     "ai": "catalog:",

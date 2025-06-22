@@ -31,7 +31,9 @@ import { IntrospectDataInputSchema, type IntrospectDataOutput } from './interfac
  * });
  * ```
  */
-export const introspectData = schemaTask({
+export const introspectData: ReturnType<
+  typeof schemaTask<'introspect-data', typeof IntrospectDataInputSchema, IntrospectDataOutput>
+> = schemaTask({
   id: 'introspect-data',
   schema: IntrospectDataInputSchema,
   // Set an optional maxDuration to prevent tasks from running indefinitely

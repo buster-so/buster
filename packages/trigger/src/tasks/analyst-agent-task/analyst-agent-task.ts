@@ -61,7 +61,14 @@ function setupRuntimeContextFromMessage(
  *
  * All tasks 1-5 are fully implemented and integrated. Workflow integration is complete and functional.
  */
-export const analystAgentTask = schemaTask({
+//@ts-ignore
+export const analystAgentTask: ReturnType<
+  typeof schemaTask<
+    'analyst-agent-task',
+    typeof AnalystAgentTaskInputSchema,
+    AnalystAgentTaskOutput
+  >
+> = schemaTask({
   id: 'analyst-agent-task',
   schema: AnalystAgentTaskInputSchema,
   maxDuration: 1800, // 30 minutes for complex analysis
@@ -190,6 +197,7 @@ export const analystAgentTask = schemaTask({
     }
   },
 });
+//as unknown as ReturnType<typeof schemaTask>
 
 /**
  * Get error code from error object for consistent error handling

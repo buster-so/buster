@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "npx trigger.dev@latest dev",
     "deploy": "npx trigger.dev@latest deploy",
-    "build": "true",
     "lint": "biome check .",
     "test": "vitest run",
     "test:watch": "vitest watch",
@@ -21,10 +20,13 @@
     "@buster/database": "workspace:*",
     "@buster/test-utils": "workspace:*",
     "@buster/vitest-config": "workspace:*",
+    "@buster/ai": "workspace:*",
     "@trigger.dev/sdk": "catalog:",
     "ai": "catalog:",
     "braintrust": "^0.0.206",
-    "vitest": "catalog:"
+    "@mastra/core": "catalog:",
+    "vitest": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@trigger.dev/build": "catalog:"

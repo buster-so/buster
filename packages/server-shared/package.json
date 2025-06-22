@@ -3,8 +3,6 @@
   "version": "0.0.1",
   "private": false,
   "scripts": {
-    "build": "tsc --build",
-    "dev": "tsc --watch",
     "lint": "biome check .",
     "test": "vitest run",
     "test:watch": "vitest watch",

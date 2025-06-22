@@ -6,7 +6,6 @@
   "module": "src/index.ts",
   "scripts": {
     "build": "tsc --build",
-    "dev": "bun run src/index.ts",
     "lint": "biome check .",
     "test": "vitest run",
     "test:coverage": "vitest --coverage",

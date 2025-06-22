@@ -3,12 +3,6 @@
   "version": "0.0.1",
   "private": false,
   "scripts": {
-    "build": "true",
-    "dev": "true",
-    "lint": "biome check .",
-    "test": "true",
-    "test:watch": "true",
-    "test:coverage": "true",
-    "typecheck": "true"
+    "lint": "biome check ."
   }
 }

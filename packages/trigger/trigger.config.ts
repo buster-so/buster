@@ -40,7 +40,7 @@ export default defineConfig({
               const cleanSubPath = subPath.startsWith('src/') ? subPath.slice(4) : subPath;
               resolvedPath = path.resolve(
                 process.cwd(),
-                '..',
+                '../..',
                 'packages',
                 packageName,
                 'src',
@@ -50,7 +50,7 @@ export default defineConfig({
               // Handle direct package imports like @buster/ai
               resolvedPath = path.resolve(
                 process.cwd(),
-                '..',
+                '../..',
                 'packages',
                 packageName,
                 'src',

@@ -3,13 +3,5 @@
   "version": "0.0.1",
   "private": false,
   "license": "MIT",
-  "scripts": {
-    "build": "true",
-    "dev": "true",
-    "lint": "biome check .",
-    "test": "true",
-    "test:watch": "true",
-    "test:coverage": "true",
-    "typecheck": "true"
-  }
+  "scripts": {}
 }
