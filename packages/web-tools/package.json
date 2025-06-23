@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@buster/typescript-config": "workspace:*",
+    "@buster/vitest-config": "workspace:*",
     "@mendable/firecrawl-js": "^1.26.0"
   }
 }

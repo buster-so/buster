@@ -202,13 +202,13 @@ export abstract class BaseIntrospector implements DataSourceIntrospector {
     const indexes =
       'getIndexes' in this && typeof this.getIndexes === 'function'
         ? await (this as DataSourceIntrospector & { getIndexes(): Promise<Index[]> }).getIndexes()
-        : undefined;
+        : [];
     const foreignKeys =
       'getForeignKeys' in this && typeof this.getForeignKeys === 'function'
         ? await (
             this as DataSourceIntrospector & { getForeignKeys(): Promise<ForeignKey[]> }
           ).getForeignKeys()
-        : undefined;
+        : [];
 
     // Get column statistics in batches of 20 tables
     const columnsWithStats = await this.attachColumnStatistics(tables, columns);
@@ -263,12 +263,12 @@ export abstract class BaseIntrospector implements DataSourceIntrospector {
                 const key = `${table.database}.${table.schema}.${table.name}.${stat.columnName}`;
                 const column = columnMap.get(key);
                 if (column) {
-                  column.distinctCount = stat.distinctCount;
-                  column.nullCount = stat.nullCount;
-                  column.minValue = stat.minValue;
-                  column.maxValue = stat.maxValue;
+                  column.distinctCount = stat.distinctCount ?? 0;
+                  column.nullCount = stat.nullCount ?? 0;
+                  column.minValue = stat.minValue ?? '';
+                  column.maxValue = stat.maxValue ?? '';
                   // Apply smart truncation to sample values
-                  column.sampleValues = this.truncateSampleValues(stat.sampleValues, column);
+                  column.sampleValues = this.truncateSampleValues(stat.sampleValues, column) ?? '';
                 }
               }
             } catch (error) {

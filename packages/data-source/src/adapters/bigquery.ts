@@ -9,7 +9,7 @@ import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base
  * BigQuery database adapter
  */
 export class BigQueryAdapter extends BaseAdapter {
-  private client?: BigQuery;
+  private client?: BigQuery | undefined;
   private introspector?: BigQueryIntrospector;
 
   async initialize(credentials: Credentials): Promise<void> {

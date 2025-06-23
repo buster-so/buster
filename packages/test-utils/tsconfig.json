@@ -1,8 +1,10 @@
 {
   "extends": "@buster/typescript-config/jit-package.json",
   "compilerOptions": {
-    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
+    "rootDir": ".",
+    "outDir": "dist"
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "vitest.config.ts"],
   "exclude": ["node_modules", "dist"]
 }

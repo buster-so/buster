@@ -3,13 +3,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
-    "allowImportingTsExtensions": false,
     "outDir": "dist",
-    "rootDir": "./src",
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "noEmit": false,
-    "exactOptionalPropertyTypes": false,
+    "rootDir": ".",
     "paths": {
       "@/*": ["src/*"],
       "@/adapters/*": ["src/adapters/*"],
@@ -17,6 +12,6 @@
       "@/types/*": ["src/types/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "vitest.config.ts"],
   "exclude": ["node_modules", "dist", "tests", "**/*.test.ts", "**/*.spec.ts"]
 }

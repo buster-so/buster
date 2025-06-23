@@ -1,6 +1,6 @@
-import type { Chat, Message } from '@buster/database/helpers/chats';
+import type { Chat, Message } from '@buster/database';
+import { ChatError, ChatErrorCode } from '@buster/server-shared/chats';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ChatError, ChatErrorCode } from '../../../../types/chat-types';
 import { initializeChat } from './chat-service';
 
 // Import mocked functions

@@ -1,8 +1,7 @@
 {
   "name": "@buster/database",
   "version": "1.0.0",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -17,16 +16,12 @@
       "default": "./dist/connection.js"
     }
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "build": "tsc",
     "build:commonjs": "tsc --module commonjs --moduleResolution node",
     "build:commonjs:watch": "npm run build:commonjs && tsc --module commonjs --moduleResolution node --watch",
-    "build": "tsc",
-    "dev": "echo 'dev should be run from turbo.json' && true",
-    "typecheck": "tsc --noEmit",
-    "lint": "biome check .",
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "test:watch": "vitest",
     "db:check": "drizzle-kit check",
     "db:generate": "drizzle-kit generate",
     "db:introspect": "drizzle-kit introspect",
@@ -38,7 +33,13 @@
     "db:start-supabase": "supabase start",
     "db:stop": "supabase stop",
     "db:studio": "drizzle-kit studio",
-    "stop": "pnpm run db:stop"
+    "dev": "echo 'dev should be run from turbo.json' && true",
+    "lint": "biome check .",
+    "stop": "pnpm run db:stop",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@buster/typescript-config": "workspace:*",

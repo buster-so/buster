@@ -2,9 +2,7 @@
   "extends": "@buster/typescript-config/base.json",
   "compilerOptions": {
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
-    "outDir": "dist",
-    "rootDir": ".",
-    "moduleResolution": "bundler"
+    "outDir": "dist"
   },
   "include": ["src/**/*", "vitest.config.ts"],
   "exclude": ["node_modules", "dist", "tests", "**/*.test.ts", "**/*.spec.ts"]

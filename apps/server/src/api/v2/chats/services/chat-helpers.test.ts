@@ -18,8 +18,8 @@ vi.mock('@buster/database', () => ({
 }));
 
 import * as database from '@buster/database';
-import type { Chat, Message } from '@buster/database/helpers/chats';
-import { ChatError, ChatErrorCode } from '../../../../types/chat-types';
+import type { Chat, Message } from '@buster/database';
+import { ChatError, ChatErrorCode } from '@buster/server-shared/chats';
 import { buildChatWithMessages, handleExistingChat, handleNewChat } from './chat-helpers';
 
 const mockUser = {

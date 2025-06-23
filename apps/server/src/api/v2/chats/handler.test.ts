@@ -1,6 +1,6 @@
+import { ChatError, ChatErrorCode } from '@buster/server-shared/chats';
+import type { ChatWithMessages } from '@buster/server-shared/chats';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ChatError, ChatErrorCode } from '../../../types/chat-types/chat-errors.types';
-import type { ChatWithMessages } from '../../../types/chat-types/chat.types';
 
 // Mock dependencies
 vi.mock('@trigger.dev/sdk/v3', () => ({

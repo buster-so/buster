@@ -2,30 +2,30 @@
   "name": "@buster/data-source",
   "version": "1.0.0",
   "description": "Data source abstraction layer for multiple database types",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "license": "MIT",
+  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     }
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "build": "tsc",
     "build:commonjs": "tsc --module commonjs --moduleResolution node",
     "build:commonjs:watch": "npm run build:commonjs && tsc --module commonjs --moduleResolution node --watch",
-    "build": "tsc",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:unit": "vitest run tests/unit/",
-    "test:integration": "vitest run tests/integration/",
-    "test:coverage": "vitest run --coverage",
-    "test:introspection": "vitest run tests/integration/data-source-introspection.test.ts",
     "lint": "eslint src/ tests/",
-    "lint:fix": "eslint src/ tests/ --fix"
+    "lint:fix": "eslint src/ tests/ --fix",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:integration": "vitest run tests/integration/",
+    "test:introspection": "vitest run tests/integration/data-source-introspection.test.ts",
+    "test:unit": "vitest run tests/unit/",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
   },
-  "license": "MIT",
   "dependencies": {
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",

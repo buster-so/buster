@@ -33,8 +33,8 @@ const connectionPools = new Map<string, SnowflakeConnectionPool>();
  * Snowflake database adapter with connection pooling
  */
 export class SnowflakeAdapter extends BaseAdapter {
-  private pool?: SnowflakeConnectionPool;
-  private poolKey?: string;
+  private pool?: SnowflakeConnectionPool | undefined;
+  private poolKey?: string | undefined;
   private introspector?: SnowflakeIntrospector;
 
   async initialize(credentials: Credentials): Promise<void> {
@@ -136,8 +136,8 @@ export class SnowflakeAdapter extends BaseAdapter {
             name: col.getName(),
             type: col.getType(),
             nullable: col.isNullable(),
-            scale: col.getScale() > 0 ? col.getScale() : undefined,
-            precision: col.getPrecision() > 0 ? col.getPrecision() : undefined,
+            scale: col.getScale() > 0 ? col.getScale() : 0,
+            precision: col.getPrecision() > 0 ? col.getPrecision() : 0,
           })) || [];
 
         return {
@@ -176,8 +176,8 @@ export class SnowflakeAdapter extends BaseAdapter {
                 name: col.getName(),
                 type: col.getType(),
                 nullable: col.isNullable(),
-                scale: col.getScale() > 0 ? col.getScale() : undefined,
-                precision: col.getPrecision() > 0 ? col.getPrecision() : undefined,
+                scale: col.getScale() > 0 ? col.getScale() : 0,
+                precision: col.getPrecision() > 0 ? col.getPrecision() : 0,
               })) || [];
 
             // Start streaming rows

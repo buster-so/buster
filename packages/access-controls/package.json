@@ -1,24 +1,27 @@
 {
   "name": "@buster/access-controls",
   "version": "1.0.0",
+  "description": "Access controls for the Buster platform",
+  "license": "MIT",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     }
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "build": "tsc",
     "build:commonjs": "tsc --module commonjs --moduleResolution node",
     "build:commonjs:watch": "npm run build:commonjs && tsc --module commonjs --moduleResolution node --watch",
-    "build": "tsc",
-    "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest"
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@buster/database": "workspace:*",
