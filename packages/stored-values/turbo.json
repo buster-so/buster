@@ -5,11 +5,13 @@
     "build:commonjs": {
       "cache": false,
       "persistent": false,
-      "outputs": ["dist/**"]
+      "outputs": ["dist/**"],
+      "dependsOn": ["@buster/database#build:commonjs"]
     },
     "build:commonjs:watch": {
       "cache": false,
       "persistent": true,
+      "with": ["@buster/database#build:commonjs:watch"],
       "dependsOn": ["build:commonjs"]
     }
   }
