@@ -29,10 +29,7 @@ const app = new Hono()
     } catch (e) {
       if (e instanceof ChatError) {
         // we need to use this syntax instead of HTTPException because hono bubbles up 500 errors
-        //  return c.json(e.toResponse(), e.statusCode);
-        throw new HTTPException(e.statusCode, {
-          message: e.message,
-        });
+        return c.json(e.toResponse(), e.statusCode);
       }
 
       throw new HTTPException(500, {

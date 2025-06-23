@@ -6,8 +6,8 @@ vi.mock('@buster/database/connection', () => ({
 
 import { Hono } from 'hono';
 import '../../../types/hono.types';
-import { ChatError, ChatErrorCode } from '../../../types/chat-types/chat-errors.types';
-import type { ChatWithMessages } from '../../../types/chat-types/chat.types';
+import { ChatError, ChatErrorCode } from '@buster/server-shared/chats';
+import type { ChatWithMessages } from '@buster/server-shared/chats';
 import chatRoutes from './index';
 
 // Mock dependencies

@@ -90,6 +90,9 @@ importers:
       '@buster/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
+      '@buster/vitest-config':
+        specifier: workspace:*
+        version: link:../../packages/vitest-config
       '@hono/zod-validator':
         specifier: ^0.7.0
         version: 0.7.0(hono@4.8.1)(zod@3.25.67)

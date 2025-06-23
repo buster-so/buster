@@ -2,22 +2,18 @@
   "name": "@buster/vitest-config",
   "version": "0.0.1",
   "private": false,
-  "type": "module",
   "license": "MIT",
+  "type": "module",
   "exports": {
     ".": "./dist/configs/index.js",
-    "./*": "./dist/configs/*.js"
+    "./base": "./dist/configs/base.js",
+    "./ui": "./dist/configs/ui.js"
   },
   "scripts": {
     "build": "tsc --build",
     "collect-json-reports": "node dist/scripts/collect-json-outputs.js",
-    "lint": "biome check .",
     "merge-json-reports": "nyc merge coverage/raw coverage/merged/merged-coverage.json",
     "report": "nyc report -t coverage/merged --report-dir coverage/report --reporter=html --exclude-after-remap false",
-    "test": "vitest run",
-    "test:watch": "vitest watch",
-    "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc --noEmit",
     "view-report": "open coverage/report/index.html"
   },
   "dependencies": {
