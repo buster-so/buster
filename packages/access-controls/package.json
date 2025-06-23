@@ -10,6 +10,8 @@
     }
   },
   "scripts": {
+    "build:commonjs": "tsc --module commonjs --moduleResolution node",
+    "build:commonjs:watch": "npm run build:commonjs && tsc --module commonjs --moduleResolution node --watch",
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",

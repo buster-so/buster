@@ -1,0 +1,22 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "dev:mastra": {
+      "cache": false,
+      "persistent": true,
+      "dependsOn": [
+        "@buster/database#build:commonjs",
+        "@buster/access-controls#build:commonjs",
+        "@buster/data-source#build:commonjs",
+        "@buster/stored-values#build:commonjs"
+      ],
+      "with": [
+        "@buster/database#build:commonjs:watch",
+        "@buster/access-controls#build:commonjs:watch",
+        "@buster/data-source#build:commonjs:watch",
+        "@buster/stored-values#build:commonjs:watch"
+      ]
+    }
+  }
+}

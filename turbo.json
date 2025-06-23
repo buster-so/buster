@@ -65,7 +65,17 @@
             "outputs": [
                 "coverage/**"
             ]
-        }
+        },
+        "build:commonjs": {
+            "cache": false,
+            "persistent": false,
+            "outputs": ["dist/**"]
+          },
+          "build:commonjs:watch": {
+            "cache": false,
+            "persistent": true,
+            "dependsOn": ["build:commonjs"]
+          }
     },
     "globalDependencies": [
         ".env*"
