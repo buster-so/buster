@@ -1,11 +1,10 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@buster/typescript-config/jit-package.json",
   "compilerOptions": {
-    "rootDir": "src",
-    "outDir": "dist",
-    "tsBuildInfoFile": "dist/.tsbuildinfo"
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
+    "rootDir": ".",
+    "outDir": "dist"
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"],
-  "references": [{ "path": "../database" }, { "path": "../data-source" }]
+  "include": ["src/**/*", "vitest.config.ts"],
+  "exclude": ["node_modules", "dist"]
 }

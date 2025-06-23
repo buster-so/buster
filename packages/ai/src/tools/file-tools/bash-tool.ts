@@ -280,9 +280,9 @@ export async function executeCommand(
 ): Promise<BashToolResult> {
   return await executeBashCommand({
     command,
-    workingDir: options.cwd,
-    env: options.env,
-    timeout: options.timeout,
+    workingDir: options.cwd || '',
+    env: options.env || {},
+    timeout: options.timeout || 30000,
     captureOutput: true,
   });
 }

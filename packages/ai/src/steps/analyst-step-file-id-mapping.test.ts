@@ -1,5 +1,5 @@
+import type { ChatMessageResponseMessage } from '@buster/server-shared/chats';
 import { describe, expect, test } from 'vitest';
-import type { ChatMessageResponseMessage } from '../../../../server/src/types/chat-types/chat-message.type';
 
 // We need to import the function we want to test
 // Since it's not exported, we'll test the behavior through the public interface

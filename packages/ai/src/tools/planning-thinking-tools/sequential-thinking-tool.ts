@@ -242,9 +242,9 @@ async function processThought(params: SequentialThinkingParams): Promise<Sequent
     thoughtNumber: params.thoughtNumber,
     totalThoughts: params.totalThoughts,
     isRevision: params.isRevision,
-    revisesThought: params.revisesThought,
-    branchFromThought: params.branchFromThought,
-    branchId: params.branchId,
+    revisesThought: params.revisesThought || 0,
+    branchFromThought: params.branchFromThought || 0,
+    branchId: params.branchId || '',
     needsMoreThoughts: params.needsMoreThoughts,
   };
 }

@@ -4,7 +4,7 @@ import { PinoLogger } from '@mastra/loggers';
 import { analystAgent } from './agents/analyst-agent/analyst-agent';
 import analystWorkflow from './workflows/analyst-workflow';
 
-export const mastra = new Mastra({
+export const mastra: Mastra = new Mastra({
   workflows: { analystWorkflow },
   agents: { analystAgent },
   storage: new LibSQLStore({

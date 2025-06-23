@@ -1,0 +1,32 @@
+{
+  "extends": ["next/core-web-vitals", "next/typescript"],
+  "ignorePatterns": [
+    "**/*.test.*",
+    "**/*.stories.*",
+    ".next/**",
+    "node_modules/**",
+    "out/**",
+    "build/**",
+    "dist/**",
+    "playwright-test/*",
+    "playwright-report/*",
+    "coverage/*"
+  ],
+  "rules": {
+    "@typescript-eslint/no-unused-vars": "off",
+    "no-console": "off",
+    "react/no-array-index-key": "off",
+    "react-hooks/exhaustive-deps": "off"
+  },
+  "overrides": [
+    {
+      "files": ["**/*.{test,spec}.{js,jsx,ts,tsx}", "**/*.stories.{js,jsx,ts,tsx}"],
+      "rules": {
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "react/no-children-prop": "off",
+        "no-console": "off"
+      }
+    }
+  ]
+}

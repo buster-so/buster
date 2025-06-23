@@ -1,14 +1,13 @@
-import { updateChat } from '@buster/database/src/helpers/chats';
-import { updateMessage } from '@buster/database/src/helpers/messages';
+import { updateChat, updateMessage } from '@buster/database';
 import { Agent, createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
+import { thinkAndPrepWorkflowInputSchema } from '../schemas/workflow-schemas';
 import { anthropicCachedModel } from '../utils/models/anthropic-cached';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
 import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
-import { thinkAndPrepWorkflowInputSchema } from '../workflows/analyst-workflow';
 
 const inputSchema = thinkAndPrepWorkflowInputSchema;
 

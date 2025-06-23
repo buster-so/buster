@@ -121,7 +121,7 @@ const editFile = wrapTraced(
       success: true,
       replacements_made: occurrences,
       file_path,
-      backup_path: backupPath,
+      backup_path: backupPath || '',
       line_changes: lineChanges.changes,
     };
   },

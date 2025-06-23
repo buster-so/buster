@@ -2,33 +2,43 @@
   "name": "@buster/data-source",
   "version": "1.0.0",
   "description": "Data source abstraction layer for multiple database types",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc --build",
+    "build": "tsc",
+    "build:commonjs": "tsc --module commonjs --moduleResolution node",
+    "build:commonjs:watch": "npm run build:commonjs && tsc --module commonjs --moduleResolution node --watch",
+    "lint": "biome check",
+    "lint:fix": "biome check --write",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "test:unit": "vitest run tests/unit/",
-    "test:integration": "vitest run tests/integration/",
     "test:coverage": "vitest run --coverage",
+    "test:integration": "vitest run tests/integration/",
     "test:introspection": "vitest run tests/integration/data-source-introspection.test.ts",
-    "lint": "eslint src/ tests/",
-    "lint:fix": "eslint src/ tests/ --fix",
-    "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist"
+    "test:unit": "vitest run tests/unit/",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
   },
-  "keywords": [
-    "database",
-    "data-source",
-    "introspection",
-    "sql"
-  ],
-  "author": "Buster Team",
-  "license": "MIT",
   "dependencies": {
-    "pg-cursor": "^2.15.0"
+    "@buster/typescript-config": "workspace:*",
+    "@buster/vitest-config": "workspace:*",
+    "@google-cloud/bigquery": "^8.1.0",
+    "@types/pg": "^8.15.4",
+    "mssql": "^11.0.1",
+    "mysql2": "^3.14.1",
+    "pg": "catalog:",
+    "pg-cursor": "^2.15.2",
+    "snowflake-sdk": "^2.1.0"
   },
   "devDependencies": {
+    "@types/mssql": "^9.1.7",
     "@types/pg-cursor": "^2.7.2"
   }
 }

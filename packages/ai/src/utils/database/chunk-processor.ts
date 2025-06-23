@@ -1,22 +1,16 @@
 import { updateMessageFields } from '@buster/database';
-import type { CoreMessage, TextStreamPart, ToolSet } from 'ai';
-import type { z } from 'zod';
 import type {
   ChatMessageReasoningMessage,
   ChatMessageResponseMessage,
-} from '../../../../../server/src/types/chat-types/chat-message.type';
+} from '@buster/server-shared/chats';
+import type { CoreMessage, TextStreamPart, ToolSet } from 'ai';
 import { normalizeEscapedText } from '../streaming/escape-normalizer';
 import { OptimisticJsonParser, getOptimisticValue } from '../streaming/optimistic-json-parser';
 import { extractResponseMessages } from './format-llm-messages-as-reasoning';
 import type {
   AssistantMessageContent,
   GenericToolSet,
-  TextDeltaChunk,
-  ToolCallChunk,
-  ToolCallDeltaChunk,
   ToolCallInProgress,
-  ToolCallStreamingStartChunk,
-  ToolResultChunk,
   TypedAssistantMessage,
 } from './types';
 import {
@@ -1547,18 +1541,25 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
           if (Array.isArray(toolResults)) {
             results = toolResults.map((result: unknown) => {
               const resultObj = result as Record<string, unknown>;
-              return {
+              const mappedResult: {
+                status: 'error' | 'success';
+                sql: string;
+                results?: Record<string, unknown>[];
+                error_message?: string;
+              } = {
                 status: resultObj.status === 'error' ? 'error' : ('success' as const),
                 sql: typeof resultObj.sql === 'string' ? resultObj.sql : '',
-                results:
-                  resultObj.status === 'success' && Array.isArray(resultObj.results)
-                    ? (resultObj.results as Record<string, unknown>[])
-                    : undefined,
-                error_message:
-                  resultObj.status === 'error' && typeof resultObj.error_message === 'string'
-                    ? resultObj.error_message
-                    : undefined,
               };
+
+              if (resultObj.status === 'success' && Array.isArray(resultObj.results)) {
+                mappedResult.results = resultObj.results as Record<string, unknown>[];
+              }
+
+              if (resultObj.status === 'error' && typeof resultObj.error_message === 'string') {
+                mappedResult.error_message = resultObj.error_message;
+              }
+
+              return mappedResult;
             });
           }
         }
@@ -1806,7 +1807,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
    */
   getTimingData(): { startTime?: number; completedTools: number } {
     return {
-      startTime: this.state.timing.startTime,
+      startTime: this.state.timing.startTime || 0,
       completedTools: this.state.timing.toolCallTimings.size,
     };
   }

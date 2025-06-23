@@ -1,19 +1,15 @@
+import { DataSource } from '@buster/data-source';
+import type { Credentials } from '@buster/data-source';
+import { db } from '@buster/database';
+import { metricFiles } from '@buster/database';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
 import { eq, inArray, sql } from 'drizzle-orm';
 import * as yaml from 'yaml';
 import { z } from 'zod';
-import { DataSource } from '../../../../data-source/src/data-source';
-import type { Credentials } from '../../../../data-source/src/types/credentials';
-import { db } from '../../../../database/src/connection';
-import { metricFiles } from '../../../../database/src/schema';
 import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
-import {
-  addMetricVersionToHistory,
-  getLatestVersionNumber,
-  validateMetricYml,
-} from './version-history-helpers';
+import { addMetricVersionToHistory, getLatestVersionNumber } from './version-history-helpers';
 import type { MetricYml, VersionHistory } from './version-history-types';
 
 // TypeScript types matching Rust DataMetadata structure
@@ -446,7 +442,6 @@ async function validateSql(sqlQuery: string, dataSourceId: string): Promise<SqlV
             console.warn(
               `[modify-metrics] SQL validation timeout on attempt ${attempt + 1}/${MAX_RETRIES + 1}. Retrying in ${delay}ms...`,
               {
-                metricName: metric?.name,
                 sqlPreview: `${sqlQuery.substring(0, 100)}...`,
                 attempt: attempt + 1,
                 nextDelay: delay,
@@ -473,7 +468,6 @@ async function validateSql(sqlQuery: string, dataSourceId: string): Promise<SqlV
             console.warn(
               `[modify-metrics] SQL validation timeout (exception) on attempt ${attempt + 1}/${MAX_RETRIES + 1}. Retrying in ${delay}ms...`,
               {
-                metricName: metric?.name,
                 sqlPreview: `${sqlQuery.substring(0, 100)}...`,
                 attempt: attempt + 1,
                 nextDelay: delay,
@@ -887,10 +881,12 @@ Please attempt to modify the metric again. This error could be due to:
             id: file.id,
             name: metricYml.name,
             file_type: 'metric',
-            result_message: results.find((r) => 'success' in r && r.updatedFile?.id === file.id)
-              ?.validationMessage,
-            results: results.find((r) => 'success' in r && r.updatedFile?.id === file.id)
-              ?.validationResults,
+            result_message:
+              results.find((r) => 'success' in r && r.updatedFile?.id === file.id)
+                ?.validationMessage || '',
+            results:
+              results.find((r) => 'success' in r && r.updatedFile?.id === file.id)
+                ?.validationResults || [],
             created_at: file.createdAt,
             updated_at: file.updatedAt,
             version_number: latestVersion,

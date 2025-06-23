@@ -1,13 +1,11 @@
 import { randomUUID } from 'node:crypto';
+import type { DataSource } from '@buster/data-source';
 import { assetPermissions, db, metricFiles } from '@buster/database';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
-import {} from 'drizzle-orm';
-import { sql } from 'drizzle-orm';
 import * as yaml from 'yaml';
 import { z } from 'zod';
-import type { DataSource } from '../../../../data-source/src/data-source';
 import { getWorkflowDataSourceManager } from '../../utils/data-source-manager';
 import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
 import { createInitialMetricVersionHistory, validateMetricYml } from './version-history-helpers';
@@ -1108,8 +1106,8 @@ const createMetricFiles = wrapTraced(
             id: sp.metricFile.id,
             name: sp.metricFile.name,
             file_type: sp.metricFile.file_type,
-            result_message: sp.metricFile.result_message,
-            results: sp.metricFile.results,
+            result_message: sp.metricFile.result_message || '',
+            results: sp.metricFile.results || [],
             created_at: sp.metricFile.created_at,
             updated_at: sp.metricFile.updated_at,
             version_number: sp.metricFile.version_number,
@@ -1176,8 +1174,8 @@ async function processMetricFile(
       id: metricId,
       name: metricYml.name,
       file_type: 'metric',
-      result_message: sqlValidationResult.message,
-      results: sqlValidationResult.results,
+      result_message: sqlValidationResult.message || '',
+      results: sqlValidationResult.results || [],
       created_at: now,
       updated_at: now,
       version_number: 1,
@@ -1187,8 +1185,8 @@ async function processMetricFile(
       success: true,
       metricFile,
       metricYml,
-      message: sqlValidationResult.message,
-      results: sqlValidationResult.results,
+      message: sqlValidationResult.message || '',
+      results: sqlValidationResult.results || [],
     };
   } catch (error) {
     let errorMessage = 'Unknown error';
@@ -1282,7 +1280,7 @@ async function validateSql(
             totalRowCount: parsedMetadata?.totalRowCount ?? allResults.length,
             executionTime: result.executionTime || 100,
             limited: parsedMetadata?.limited ?? false,
-            maxRows: parsedMetadata?.maxRows,
+            maxRows: parsedMetadata?.maxRows ?? 5000,
           };
 
           let message: string;

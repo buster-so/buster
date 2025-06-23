@@ -1,9 +1,8 @@
-import type { AssistantContent } from 'ai';
 import type {
   ChatMessageReasoningMessage,
   ChatMessageReasoning_status,
   ChatMessageResponseMessage,
-} from 'server/src/types/chat-types/chat-message.type';
+} from '@buster/server-shared/chats';
 import { z } from 'zod';
 import type { ToolCallContent } from '../database/types';
 

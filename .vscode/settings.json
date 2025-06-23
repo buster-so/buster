@@ -8,11 +8,13 @@
   "typescript.preferences.importModuleSpecifier": "relative",
   "typescript.suggest.autoImports": true,
   "typescript.updateImportsOnFileMove.enabled": "always",
+
+  // Default Biome formatting for all file types
   "[typescript]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
   "[typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "biomejs.biome"
   },
   "[javascript]": {
     "editor.defaultFormatter": "biomejs.biome"
@@ -21,6 +23,15 @@
     "editor.defaultFormatter": "biomejs.biome"
   },
   "[json]": {
-    "editor.defaultFormatter": "vscode.json-language-features"
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+
+  // Resource-specific settings for apps/web directory
+  "[{apps/web/**/*.ts,apps/web/**/*.tsx,apps/web/**/*.js,apps/web/**/*.jsx,apps/web/**/*.json}]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit"
+    }
   }
 }

@@ -1,4 +1,4 @@
-import type { ChatMessageReasoningMessage } from '@server/types/chat-types/chat-message.type';
+import type { ChatMessageReasoningMessage } from '@buster/server-shared/chats';
 import type { CoreMessage } from 'ai';
 
 /**

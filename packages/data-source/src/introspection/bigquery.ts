@@ -65,7 +65,7 @@ export class BigQueryIntrospector extends BaseIntrospector {
 
       const databases = datasetsResult.rows.map((row) => ({
         name: this.getString(row.dataset_name) || '',
-        created: this.parseDate(row.creation_time),
+        created: this.parseDate(row.creation_time) || new Date(),
         metadata: {
           project_name: this.getString(row.project_name),
           location: this.getString(row.location),
@@ -107,7 +107,7 @@ export class BigQueryIntrospector extends BaseIntrospector {
       const schemas = datasetsResult.rows.map((row) => ({
         name: this.getString(row.dataset_name) || '',
         database: this.getString(row.project_name) || 'default_project',
-        created: this.parseDate(row.creation_time),
+        created: this.parseDate(row.creation_time) || new Date(),
         metadata: {
           project_name: this.getString(row.project_name),
           location: this.getString(row.location),
@@ -156,7 +156,7 @@ export class BigQueryIntrospector extends BaseIntrospector {
           schema: this.getString(row.dataset_name) || '',
           database: this.getString(row.project_name) || '',
           type: this.mapTableType(this.getString(row.table_type)),
-          created: this.parseDate(row.creation_time),
+          created: this.parseDate(row.creation_time) || new Date(),
           metadata: {
             ddl: this.getString(row.ddl),
           },
@@ -176,8 +176,8 @@ export class BigQueryIntrospector extends BaseIntrospector {
             const stats = tableStatsResult.rows[0];
             return {
               ...table,
-              rowCount: this.parseNumber(stats?.row_count),
-              sizeBytes: this.parseNumber(stats?.size_bytes),
+              rowCount: this.parseNumber(stats?.row_count) ?? 0,
+              sizeBytes: this.parseNumber(stats?.size_bytes) ?? 0,
             };
           } catch (error) {
             console.warn(`Failed to get stats for table ${table.schema}.${table.name}:`, error);
@@ -239,7 +239,7 @@ export class BigQueryIntrospector extends BaseIntrospector {
         position: this.parseNumber(row.ordinal_position) || 0,
         dataType: this.getString(row.data_type) || '',
         isNullable: this.getString(row.is_nullable) === 'YES',
-        defaultValue: this.getString(row.column_default),
+        defaultValue: this.getString(row.column_default) || '',
         metadata: {
           is_generated: this.parseBoolean(row.is_generated),
           generation_expression: this.getString(row.generation_expression),
@@ -310,8 +310,8 @@ export class BigQueryIntrospector extends BaseIntrospector {
       table,
       schema: targetDataset,
       database: targetDataset,
-      rowCount: this.parseNumber(basicStats?.row_count),
-      sizeBytes: this.parseNumber(basicStats?.size_bytes),
+      rowCount: this.parseNumber(basicStats?.row_count) ?? 0,
+      sizeBytes: this.parseNumber(basicStats?.size_bytes) ?? 0,
       columnStatistics: [], // No column statistics in basic table stats
       lastUpdated: this.parseDate(basicStats?.last_modified_time) || new Date(),
     };
@@ -353,11 +353,11 @@ export class BigQueryIntrospector extends BaseIntrospector {
         if (row) {
           columnStatistics.push({
             columnName: this.getString(row.column_name) || '',
-            distinctCount: this.parseNumber(row.distinct_count),
-            nullCount: this.parseNumber(row.null_count),
-            minValue: this.getString(row.min_value),
-            maxValue: this.getString(row.max_value),
-            sampleValues: this.getString(row.sample_values),
+            distinctCount: this.parseNumber(row.distinct_count) ?? 0,
+            nullCount: this.parseNumber(row.null_count) ?? 0,
+            minValue: this.getString(row.min_value) ?? '',
+            maxValue: this.getString(row.max_value) ?? '',
+            sampleValues: this.getString(row.sample_values) ?? '',
           });
         }
       }
@@ -368,11 +368,11 @@ export class BigQueryIntrospector extends BaseIntrospector {
       for (const column of columns) {
         columnStatistics.push({
           columnName: column.name,
-          distinctCount: undefined,
-          nullCount: undefined,
-          minValue: undefined,
-          maxValue: undefined,
-          sampleValues: undefined,
+          distinctCount: 0,
+          nullCount: 0,
+          minValue: '',
+          maxValue: '',
+          sampleValues: '',
         });
       }
     }
@@ -655,8 +655,8 @@ ORDER BY s.column_name`;
       tables,
       columns: columnsWithStats,
       views,
-      indexes: undefined, // BigQuery doesn't expose index information
-      foreignKeys: undefined, // BigQuery doesn't expose foreign key information
+      indexes: [], // BigQuery doesn't expose index information
+      foreignKeys: [], // BigQuery doesn't expose foreign key information
       introspectedAt: new Date(),
     };
   }
@@ -700,11 +700,11 @@ ORDER BY s.column_name`;
                 const key = `${table.database}.${table.schema}.${table.name}.${stat.columnName}`;
                 const column = columnMap.get(key);
                 if (column) {
-                  column.distinctCount = stat.distinctCount;
-                  column.nullCount = stat.nullCount;
-                  column.minValue = stat.minValue;
-                  column.maxValue = stat.maxValue;
-                  column.sampleValues = stat.sampleValues;
+                  column.distinctCount = stat.distinctCount ?? 0;
+                  column.nullCount = stat.nullCount ?? 0;
+                  column.minValue = stat.minValue ?? '';
+                  column.maxValue = stat.maxValue ?? '';
+                  column.sampleValues = stat.sampleValues ?? '';
                 }
               }
             } catch (error) {

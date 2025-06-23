@@ -118,9 +118,9 @@ export class DataSource {
           name: field.name || 'unknown',
           type: field.type || 'unknown',
           nullable: field.nullable ?? true,
-          precision: field.precision,
-          scale: field.scale,
-          length: field.length,
+          precision: field.precision ?? 0,
+          scale: field.scale ?? 0,
+          length: field.length ?? 0,
         })),
         rowsAffected: result.rowCount,
         executionTime: 0, // TODO: Add timing
@@ -169,10 +169,10 @@ export class DataSource {
         introspector.getTableStatistics(database, schema, table),
       getColumnStatistics: (database: string, schema: string, table: string) =>
         introspector.getColumnStatistics(database, schema, table),
-      getIndexes: introspector.getIndexes ? introspector.getIndexes.bind(introspector) : undefined,
-      getForeignKeys: introspector.getForeignKeys
-        ? introspector.getForeignKeys.bind(introspector)
-        : undefined,
+      ...(introspector.getIndexes && { getIndexes: introspector.getIndexes.bind(introspector) }),
+      ...(introspector.getForeignKeys && {
+        getForeignKeys: introspector.getForeignKeys.bind(introspector),
+      }),
       getDataSourceType: () => introspector.getDataSourceType(),
       async getFullIntrospection(options?: {
         databases?: string[];

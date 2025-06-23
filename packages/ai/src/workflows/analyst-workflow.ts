@@ -1,5 +1,13 @@
 import { createWorkflow } from '@mastra/core';
 import { z } from 'zod';
+import {
+  type AnalystRuntimeContext,
+  AnalystRuntimeContextSchema,
+  thinkAndPrepWorkflowInputSchema,
+} from '../schemas/workflow-schemas';
+
+// Re-export for backward compatibility
+export { thinkAndPrepWorkflowInputSchema, AnalystRuntimeContextSchema, type AnalystRuntimeContext };
 import { analystStep } from '../steps/analyst-step';
 import { createTodosStep } from '../steps/create-todos-step';
 import { extractValuesSearchStep } from '../steps/extract-values-search-step';
@@ -13,24 +21,6 @@ import {
   ResponseHistorySchema,
   StepFinishDataSchema,
 } from '../utils/memory/types';
-
-// Runtime context schema for type safety
-export const AnalystRuntimeContextSchema = z.object({
-  userId: z.string(),
-  chatId: z.string(),
-  dataSourceId: z.string(),
-  dataSourceSyntax: z.string(),
-  organizationId: z.string(),
-  messageId: z.string().optional(), // Optional for testing scenarios
-  workflowStartTime: z.number().optional(), // Track workflow start time in milliseconds - optional for backward compatibility
-});
-
-export type AnalystRuntimeContext = z.infer<typeof AnalystRuntimeContextSchema>;
-
-export const thinkAndPrepWorkflowInputSchema = z.object({
-  prompt: z.string(),
-  conversationHistory: MessageHistorySchema.optional(),
-});
 
 // Metadata schema for output
 const WorkflowMetadataSchema = z.object({

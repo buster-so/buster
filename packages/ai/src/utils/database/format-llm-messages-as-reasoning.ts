@@ -1,9 +1,9 @@
-import type { CoreMessage, ToolCallPart } from 'ai';
-import { z } from 'zod';
 import type {
   ChatMessageReasoningMessage,
   ChatMessageResponseMessage,
-} from '../../../../../server/src/types/chat-types/chat-message.type';
+} from '@buster/server-shared/chats';
+import type { CoreMessage, ToolCallPart } from 'ai';
+import { z } from 'zod';
 
 // Zod schemas for reasoning entry types
 const ReasoningTextEntrySchema = z.object({

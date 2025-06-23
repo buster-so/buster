@@ -362,7 +362,7 @@ describe('onStepFinish message conversion', () => {
         const toolResult = sqlResponse.content.find(
           (tr) => tr.type === 'tool-result' && tr.toolCallId === 'sql-1'
         );
-        if (toolResult && toolResult.result) {
+        if (toolResult?.result) {
           const result = toolResult.result as { rowCount: number; data: Array<{ total: number }> };
           expect(result.rowCount).toBe(1);
           expect(result.data[0].total).toBe(42);

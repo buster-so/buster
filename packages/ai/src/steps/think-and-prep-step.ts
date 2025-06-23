@@ -1,19 +1,17 @@
+import type { ChatMessageReasoningMessage } from '@buster/server-shared/chats';
 import { createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
-import type { ChatMessageReasoningMessage } from '../../../../server/src/types/chat-types/chat-message.type';
 import { thinkAndPrepAgent } from '../agents/think-and-prep-agent/think-and-prep-agent';
+import type { thinkAndPrepWorkflowInputSchema } from '../schemas/workflow-schemas';
 import { ChunkProcessor } from '../utils/database/chunk-processor';
 import { retryableAgentStreamWithHealing } from '../utils/retry';
 import type { RetryableError } from '../utils/retry/types';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
 import { createOnChunkHandler, handleStreamingError } from '../utils/streaming';
-import type {
-  AnalystRuntimeContext,
-  thinkAndPrepWorkflowInputSchema,
-} from '../workflows/analyst-workflow';
+import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
 import { createTodosOutputSchema } from './create-todos-step';
 import { extractValuesSearchOutputSchema } from './extract-values-search-step';
 import { generateChatTitleOutputSchema } from './generate-chat-title-step';
@@ -254,6 +252,9 @@ const thinkAndPrepExecution = async ({
           chunkProcessor,
           runtimeContext,
           abortController,
+          //DALLIN TODO: resourceId AND threadId
+          resourceId: runtimeContext.get('dataSourceId') as string,
+          threadId: runtimeContext.get('chatId') as string,
           maxRetries: 3,
           onRetry: (error: RetryableError, attemptNumber: number) => {
             console.error(

@@ -2,8 +2,6 @@
   "name": "@buster/stored-values",
   "version": "1.0.0",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -18,15 +16,24 @@
       "default": "./dist/search.js"
     }
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
+    "build:commonjs": "tsc --module commonjs --moduleResolution node",
+    "build:commonjs:watch": "npm run build:commonjs && tsc --module commonjs --moduleResolution node --watch",
+    "lint": "biome check",
     "test": "vitest run",
-    "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest watch",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@buster/database": "*"
-  },
-  "devDependencies": {}
+    "@ai-sdk/openai": "^1.3.22",
+    "@buster/database": "workspace:*",
+    "@buster/typescript-config": "workspace:*",
+    "@buster/vitest-config": "workspace:*",
+    "ai": "catalog:",
+    "zod": "catalog:"
+  }
 }

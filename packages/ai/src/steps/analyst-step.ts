@@ -7,7 +7,7 @@ import { z } from 'zod';
 import type {
   ChatMessageReasoningMessage,
   ChatMessageResponseMessage,
-} from '../../../../server/src/types/chat-types/chat-message.type';
+} from '@buster/server-shared/chats';
 import { analystAgent } from '../agents/analyst-agent/analyst-agent';
 import { ChunkProcessor } from '../utils/database/chunk-processor';
 import { hasFailureIndicators, hasFileFailureIndicators } from '../utils/database/types';
@@ -139,7 +139,7 @@ function extractFilesFromReasoning(
             fileType: file.file_type as 'metric' | 'dashboard',
             fileName: file.file_name,
             status: 'completed',
-            ymlContent: file.file?.text,
+            ymlContent: file.file?.text || '',
           });
         } else {
           // Log why file was rejected for debugging
@@ -425,6 +425,9 @@ const analystExecution = async ({
           runtimeContext,
           abortController,
           maxRetries: 3,
+          //DALLIN TODO: resourceId AND threadId
+          resourceId: runtimeContext.get('dataSourceId') as string,
+          threadId: runtimeContext.get('chatId') as string,
           onRetry: (error: RetryableError, attemptNumber: number) => {
             console.error(
               `Analyst stream retry attempt ${attemptNumber} for streaming error:`,

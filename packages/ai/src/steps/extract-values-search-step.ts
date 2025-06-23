@@ -1,13 +1,13 @@
-import type { StoredValueResult } from '@buster/stored-values/schemas';
+import type { StoredValueResult } from '@buster/stored-values';
 import { generateEmbedding, searchValuesByEmbedding } from '@buster/stored-values/search';
 import { Agent, createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
+import { thinkAndPrepWorkflowInputSchema } from '../schemas/workflow-schemas';
 import { anthropicCachedModel } from '../utils/models/anthropic-cached';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
-import { thinkAndPrepWorkflowInputSchema } from '../workflows/analyst-workflow';
 import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
 
 const inputSchema = thinkAndPrepWorkflowInputSchema;

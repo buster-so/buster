@@ -1,0 +1,23 @@
+{
+  "extends": "./type-checking.json",
+  "compilerOptions": {
+    "allowImportingTsExtensions": false,
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "lib": ["ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "outDir": "./dist",
+    "resolveJsonModule": true,
+    "rootDir": "./src",
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "target": "ES2022",
+    "verbatimModuleSyntax": false
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.*", "**/*.spec.*"]
+}

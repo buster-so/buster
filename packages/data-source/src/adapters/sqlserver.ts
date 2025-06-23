@@ -16,7 +16,7 @@ interface ColumnMetadata {
  * SQL Server database adapter
  */
 export class SQLServerAdapter extends BaseAdapter {
-  private pool?: sql.ConnectionPool;
+  private pool?: sql.ConnectionPool | undefined;
   private introspector?: SQLServerIntrospector;
 
   async initialize(credentials: Credentials): Promise<void> {
@@ -129,8 +129,8 @@ export class SQLServerAdapter extends BaseAdapter {
               return {
                 name,
                 type: typedColumnType?.name || 'unknown',
-                length: column?.length,
-                nullable: column?.nullable,
+                length: column?.length ?? 0,
+                nullable: column?.nullable ?? true,
               };
             })
           : [];
@@ -163,8 +163,8 @@ export class SQLServerAdapter extends BaseAdapter {
             return {
               name,
               type: typedColumnType?.name || 'unknown',
-              length: column?.length,
-              nullable: column?.nullable,
+              length: column?.length ?? 0,
+              nullable: column?.nullable ?? true,
             };
           });
         });

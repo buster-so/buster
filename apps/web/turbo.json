@@ -1,0 +1,28 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**/*",
+        "public/**/*",
+        "next.config.mjs",
+        "tailwind.config.ts",
+        "tsconfig.json",
+        "package.json"
+      ],
+      "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "test": {
+      "inputs": [
+        "src/**/*",
+        "**/*.test.{ts,tsx,js,jsx}",
+        "**/*.spec.{ts,tsx,js,jsx}",
+        "playwright-tests/**/*",
+        "vitest.config.ts",
+        "package.json"
+      ]
+    }
+  }
+}

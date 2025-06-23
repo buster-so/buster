@@ -1,14 +1,10 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@buster/typescript-config/base.json",
   "compilerOptions": {
-    "rootDir": "src",
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "outDir": "dist",
-    "tsBuildInfoFile": "dist/.tsbuildinfo",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "rootDir": "."
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"],
-  "references": [{ "path": "../data-source" }]
+  "include": ["src/**/*", "vitest.config.ts", "scripts/**/*"],
+  "exclude": ["node_modules", "dist", "tests", "**/*.test.ts", "**/*.spec.ts"]
 }

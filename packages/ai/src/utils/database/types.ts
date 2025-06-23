@@ -231,11 +231,16 @@ export function extractFileResultsFromToolResult(toolResult: unknown): Array<{
         )
         .map((file) => {
           const fileObj = file as Record<string, unknown>;
-          return {
+          const result: { id: string; status: 'completed' | 'failed'; error?: string } = {
             id: typeof fileObj.id === 'string' ? fileObj.id : String(fileObj.id),
             status: isErrorResult(file) ? ('failed' as const) : ('completed' as const),
-            error: fileObj.error ? String(fileObj.error) : undefined,
           };
+
+          if (fileObj.error) {
+            result.error = String(fileObj.error);
+          }
+
+          return result;
         });
     }
 

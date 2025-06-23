@@ -1,17 +1,17 @@
 import { randomUUID } from 'node:crypto';
+import { db } from '@buster/database';
+import {
+  assetPermissions,
+  dashboardFiles,
+  metricFiles,
+  metricFilesToDashboardFiles,
+} from '@buster/database';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { createTool } from '@mastra/core/tools';
 import { wrapTraced } from 'braintrust';
 import { inArray } from 'drizzle-orm';
 import * as yaml from 'yaml';
 import { z } from 'zod';
-import { db } from '../../../../database/src/connection';
-import {
-  assetPermissions,
-  dashboardFiles,
-  metricFiles,
-  metricFilesToDashboardFiles,
-} from '../../../../database/src/schema';
 import { createInitialDashboardVersionHistory } from './version-history-helpers';
 import type { DashboardYml } from './version-history-types';
 
@@ -447,8 +447,8 @@ const createDashboardFiles = wrapTraced(
             id: sp.dashboardFile.id,
             name: sp.dashboardFile.name,
             file_type: sp.dashboardFile.file_type,
-            result_message: sp.dashboardFile.result_message,
-            results: sp.dashboardFile.results,
+            result_message: sp.dashboardFile.result_message || '',
+            results: sp.dashboardFile.results || [],
             created_at: sp.dashboardFile.created_at,
             updated_at: sp.dashboardFile.updated_at,
             version_number: sp.dashboardFile.version_number,

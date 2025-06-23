@@ -1,17 +1,10 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "@buster/typescript-config/base.json",
   "compilerOptions": {
+    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "outDir": "dist",
-    "tsBuildInfoFile": "dist/.tsbuildinfo"
+    "rootDir": "."
   },
-  "include": ["src/**/*", "tests/**/*"],
-  "exclude": ["node_modules", "dist"],
-  "references": [
-    { "path": "../test-utils" },
-    { "path": "../database" },
-    { "path": "../data-source" },
-    { "path": "../access-controls" },
-    { "path": "../../server" },
-    { "path": "../stored-values" }
-  ]
+  "include": ["src/**/*", "vitest.config.ts"],
+  "exclude": ["node_modules", "dist"]
 }

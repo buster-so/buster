@@ -1,5 +1,5 @@
+import { getPermissionedDatasets } from '@buster/access-controls';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
-import { getPermissionedDatasets } from '../../../../access-controls/src/access-controls';
 import type { AnalystRuntimeContext } from '../../workflows/analyst-workflow';
 import { getSqlDialectGuidance } from '../shared/sql-dialect-guidance';
 

@@ -23,7 +23,7 @@ interface CursorWithResult extends Cursor {
  * Redshift database adapter (PostgreSQL-compatible)
  */
 export class RedshiftAdapter extends BaseAdapter {
-  private client?: Client;
+  private client?: Client | undefined;
   private introspector?: RedshiftIntrospector;
 
   async initialize(credentials: Credentials): Promise<void> {
@@ -88,7 +88,7 @@ export class RedshiftAdapter extends BaseAdapter {
             name: field.name,
             type: `redshift_type_${field.dataTypeID}`, // Redshift type ID
             nullable: true, // Redshift doesn't provide this info directly
-            length: field.dataTypeSize > 0 ? field.dataTypeSize : undefined,
+            length: field.dataTypeSize > 0 ? field.dataTypeSize : 0,
           })) || [];
 
         return {
@@ -133,7 +133,7 @@ export class RedshiftAdapter extends BaseAdapter {
             name: field.name,
             type: `redshift_type_${field.dataTypeID}`,
             nullable: true,
-            length: field.dataTypeSize > 0 ? field.dataTypeSize : undefined,
+            length: field.dataTypeSize > 0 ? field.dataTypeSize : 0,
           }));
         }
 

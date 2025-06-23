@@ -1,0 +1,34 @@
+{
+  "name": "@buster/trigger",
+  "version": "1.0.0",
+  "private": false,
+  "type": "module",
+  "scripts": {
+    "dev": "npx trigger.dev@latest dev",
+    "deploy": "npx trigger.dev@latest deploy",
+    "lint": "biome check",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage",
+    "test:integration": "vitest run tests/integration",
+    "test:integration:watch": "vitest watch tests/integration",
+    "test:unit": "vitest run tests/unit",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@buster/typescript-config": "workspace:*",
+    "@buster/database": "workspace:*",
+    "@buster/test-utils": "workspace:*",
+    "@buster/vitest-config": "workspace:*",
+    "@buster/ai": "workspace:*",
+    "@trigger.dev/sdk": "catalog:",
+    "ai": "catalog:",
+    "braintrust": "^0.0.206",
+    "@mastra/core": "catalog:",
+    "vitest": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@trigger.dev/build": "catalog:"
+  }
+}

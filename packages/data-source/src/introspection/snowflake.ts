@@ -54,10 +54,10 @@ export class SnowflakeIntrospector extends BaseIntrospector {
       const result = await this.adapter.query('SHOW DATABASES');
       const databases = result.rows.map((row) => ({
         name: this.getString(row.name) || '',
-        owner: this.getString(row.owner),
-        comment: this.getString(row.comment),
-        created: this.parseDate(row.created_on),
-        lastModified: this.parseDate(row.last_altered),
+        owner: this.getString(row.owner) || '',
+        comment: this.getString(row.comment) || '',
+        created: this.parseDate(row.created_on) || new Date(),
+        lastModified: this.parseDate(row.last_altered) || new Date(),
         metadata: {
           retention_time: this.parseNumber(row.retention_time),
           is_default: this.parseBoolean(row.is_default),
@@ -95,10 +95,10 @@ export class SnowflakeIntrospector extends BaseIntrospector {
         schemas = result.rows.map((row) => ({
           name: this.getString(row.SCHEMA_NAME) || '',
           database: this.getString(row.CATALOG_NAME) || database,
-          owner: this.getString(row.SCHEMA_OWNER),
-          comment: this.getString(row.COMMENT),
-          created: this.parseDate(row.CREATED),
-          lastModified: this.parseDate(row.LAST_ALTERED),
+          owner: this.getString(row.SCHEMA_OWNER) || '',
+          comment: this.getString(row.COMMENT) || '',
+          created: this.parseDate(row.CREATED) || new Date(),
+          lastModified: this.parseDate(row.LAST_ALTERED) || new Date(),
         }));
       } else {
         // Fetch schemas for all accessible databases
@@ -114,10 +114,10 @@ export class SnowflakeIntrospector extends BaseIntrospector {
             return result.rows.map((row) => ({
               name: this.getString(row.SCHEMA_NAME) || '',
               database: this.getString(row.CATALOG_NAME) || db.name,
-              owner: this.getString(row.SCHEMA_OWNER),
-              comment: this.getString(row.COMMENT),
-              created: this.parseDate(row.CREATED),
-              lastModified: this.parseDate(row.LAST_ALTERED),
+              owner: this.getString(row.SCHEMA_OWNER) || '',
+              comment: this.getString(row.COMMENT) || '',
+              created: this.parseDate(row.CREATED) || new Date(),
+              lastModified: this.parseDate(row.LAST_ALTERED) || new Date(),
             }));
           } catch (error) {
             console.warn(`Could not access schemas in database ${db.name}:`, error);
@@ -184,11 +184,11 @@ export class SnowflakeIntrospector extends BaseIntrospector {
           schema: this.getString(row.TABLE_SCHEMA) || '',
           database: this.getString(row.TABLE_CATALOG) || database,
           type: this.mapTableType(this.getString(row.TABLE_TYPE)),
-          rowCount: this.parseNumber(row.ROW_COUNT),
-          sizeBytes: this.parseNumber(row.BYTES),
-          comment: this.getString(row.COMMENT),
-          created: this.parseDate(row.CREATED),
-          lastModified: this.parseDate(row.LAST_ALTERED),
+          rowCount: this.parseNumber(row.ROW_COUNT) ?? 0,
+          sizeBytes: this.parseNumber(row.BYTES) ?? 0,
+          comment: this.getString(row.COMMENT) || '',
+          created: this.parseDate(row.CREATED) || new Date(),
+          lastModified: this.parseDate(row.LAST_ALTERED) || new Date(),
         }));
       } else if (database) {
         // Fetch tables for specific database
@@ -203,11 +203,11 @@ export class SnowflakeIntrospector extends BaseIntrospector {
           schema: this.getString(row.TABLE_SCHEMA) || '',
           database: this.getString(row.TABLE_CATALOG) || database,
           type: this.mapTableType(this.getString(row.TABLE_TYPE)),
-          rowCount: this.parseNumber(row.ROW_COUNT),
-          sizeBytes: this.parseNumber(row.BYTES),
-          comment: this.getString(row.COMMENT),
-          created: this.parseDate(row.CREATED),
-          lastModified: this.parseDate(row.LAST_ALTERED),
+          rowCount: this.parseNumber(row.ROW_COUNT) ?? 0,
+          sizeBytes: this.parseNumber(row.BYTES) ?? 0,
+          comment: this.getString(row.COMMENT) || '',
+          created: this.parseDate(row.CREATED) || new Date(),
+          lastModified: this.parseDate(row.LAST_ALTERED) || new Date(),
         }));
       } else {
         // Fetch tables for all accessible databases
@@ -225,11 +225,11 @@ export class SnowflakeIntrospector extends BaseIntrospector {
               schema: this.getString(row.TABLE_SCHEMA) || '',
               database: this.getString(row.TABLE_CATALOG) || db.name,
               type: this.mapTableType(this.getString(row.TABLE_TYPE)),
-              rowCount: this.parseNumber(row.ROW_COUNT),
-              sizeBytes: this.parseNumber(row.BYTES),
-              comment: this.getString(row.COMMENT),
-              created: this.parseDate(row.CREATED),
-              lastModified: this.parseDate(row.LAST_ALTERED),
+              rowCount: this.parseNumber(row.ROW_COUNT) ?? 0,
+              sizeBytes: this.parseNumber(row.BYTES) ?? 0,
+              comment: this.getString(row.COMMENT) || '',
+              created: this.parseDate(row.CREATED) || new Date(),
+              lastModified: this.parseDate(row.LAST_ALTERED) || new Date(),
             }));
           } catch (error) {
             console.warn(`Could not access tables in database ${db.name}:`, error);
@@ -308,11 +308,11 @@ export class SnowflakeIntrospector extends BaseIntrospector {
           position: this.parseNumber(row.ORDINAL_POSITION) || 0,
           dataType: this.getString(row.DATA_TYPE) || '',
           isNullable: this.getString(row.IS_NULLABLE) === 'YES',
-          defaultValue: this.getString(row.COLUMN_DEFAULT),
-          maxLength: this.parseNumber(row.CHARACTER_MAXIMUM_LENGTH),
-          precision: this.parseNumber(row.NUMERIC_PRECISION),
-          scale: this.parseNumber(row.NUMERIC_SCALE),
-          comment: this.getString(row.COMMENT),
+          defaultValue: this.getString(row.COLUMN_DEFAULT) || '',
+          maxLength: this.parseNumber(row.CHARACTER_MAXIMUM_LENGTH) ?? 0,
+          precision: this.parseNumber(row.NUMERIC_PRECISION) ?? 0,
+          scale: this.parseNumber(row.NUMERIC_SCALE) ?? 0,
+          comment: this.getString(row.COMMENT) || '',
         }));
       } else if (database && schema) {
         // Fetch columns for specific schema
@@ -333,11 +333,11 @@ export class SnowflakeIntrospector extends BaseIntrospector {
           position: this.parseNumber(row.ORDINAL_POSITION) || 0,
           dataType: this.getString(row.DATA_TYPE) || '',
           isNullable: this.getString(row.IS_NULLABLE) === 'YES',
-          defaultValue: this.getString(row.COLUMN_DEFAULT),
-          maxLength: this.parseNumber(row.CHARACTER_MAXIMUM_LENGTH),
-          precision: this.parseNumber(row.NUMERIC_PRECISION),
-          scale: this.parseNumber(row.NUMERIC_SCALE),
-          comment: this.getString(row.COMMENT),
+          defaultValue: this.getString(row.COLUMN_DEFAULT) || '',
+          maxLength: this.parseNumber(row.CHARACTER_MAXIMUM_LENGTH) ?? 0,
+          precision: this.parseNumber(row.NUMERIC_PRECISION) ?? 0,
+          scale: this.parseNumber(row.NUMERIC_SCALE) ?? 0,
+          comment: this.getString(row.COMMENT) || '',
         }));
       } else if (database) {
         // Fetch columns for specific database
@@ -357,11 +357,11 @@ export class SnowflakeIntrospector extends BaseIntrospector {
           position: this.parseNumber(row.ORDINAL_POSITION) || 0,
           dataType: this.getString(row.DATA_TYPE) || '',
           isNullable: this.getString(row.IS_NULLABLE) === 'YES',
-          defaultValue: this.getString(row.COLUMN_DEFAULT),
-          maxLength: this.parseNumber(row.CHARACTER_MAXIMUM_LENGTH),
-          precision: this.parseNumber(row.NUMERIC_PRECISION),
-          scale: this.parseNumber(row.NUMERIC_SCALE),
-          comment: this.getString(row.COMMENT),
+          defaultValue: this.getString(row.COLUMN_DEFAULT) || '',
+          maxLength: this.parseNumber(row.CHARACTER_MAXIMUM_LENGTH) ?? 0,
+          precision: this.parseNumber(row.NUMERIC_PRECISION) ?? 0,
+          scale: this.parseNumber(row.NUMERIC_SCALE) ?? 0,
+          comment: this.getString(row.COMMENT) || '',
         }));
       } else {
         // Fetch columns for all accessible databases
@@ -384,11 +384,11 @@ export class SnowflakeIntrospector extends BaseIntrospector {
               position: this.parseNumber(row.ORDINAL_POSITION) || 0,
               dataType: this.getString(row.DATA_TYPE) || '',
               isNullable: this.getString(row.IS_NULLABLE) === 'YES',
-              defaultValue: this.getString(row.COLUMN_DEFAULT),
-              maxLength: this.parseNumber(row.CHARACTER_MAXIMUM_LENGTH),
-              precision: this.parseNumber(row.NUMERIC_PRECISION),
-              scale: this.parseNumber(row.NUMERIC_SCALE),
-              comment: this.getString(row.COMMENT),
+              defaultValue: this.getString(row.COLUMN_DEFAULT) || '',
+              maxLength: this.parseNumber(row.CHARACTER_MAXIMUM_LENGTH) ?? 0,
+              precision: this.parseNumber(row.NUMERIC_PRECISION) ?? 0,
+              scale: this.parseNumber(row.NUMERIC_SCALE) ?? 0,
+              comment: this.getString(row.COMMENT) || '',
             }));
           } catch (error) {
             console.warn(`Could not access columns in database ${db.name}:`, error);
@@ -454,7 +454,7 @@ export class SnowflakeIntrospector extends BaseIntrospector {
           schema: this.getString(row.TABLE_SCHEMA) || '',
           database: this.getString(row.TABLE_CATALOG) || database,
           definition: this.getString(row.VIEW_DEFINITION) || '',
-          comment: this.getString(row.COMMENT),
+          comment: this.getString(row.COMMENT) || '',
         }));
       } else if (database) {
         // Fetch views for specific database
@@ -468,7 +468,7 @@ export class SnowflakeIntrospector extends BaseIntrospector {
           schema: this.getString(row.TABLE_SCHEMA) || '',
           database: this.getString(row.TABLE_CATALOG) || database,
           definition: this.getString(row.VIEW_DEFINITION) || '',
-          comment: this.getString(row.COMMENT),
+          comment: this.getString(row.COMMENT) || '',
         }));
       } else {
         // Fetch views for all accessible databases
@@ -485,7 +485,7 @@ export class SnowflakeIntrospector extends BaseIntrospector {
               schema: this.getString(row.TABLE_SCHEMA) || '',
               database: this.getString(row.TABLE_CATALOG) || db.name,
               definition: this.getString(row.VIEW_DEFINITION) || '',
-              comment: this.getString(row.COMMENT),
+              comment: this.getString(row.COMMENT) || '',
             }));
           } catch (error) {
             console.warn(`Could not access views in database ${db.name}:`, error);
@@ -529,8 +529,8 @@ export class SnowflakeIntrospector extends BaseIntrospector {
       table,
       schema,
       database,
-      rowCount: this.parseNumber(basicInfo?.ROW_COUNT),
-      sizeBytes: this.parseNumber(basicInfo?.BYTES),
+      rowCount: this.parseNumber(basicInfo?.ROW_COUNT) ?? 0,
+      sizeBytes: this.parseNumber(basicInfo?.BYTES) ?? 0,
       columnStatistics: [], // No column statistics in basic table stats
       lastUpdated: new Date(),
     };
@@ -587,11 +587,11 @@ export class SnowflakeIntrospector extends BaseIntrospector {
         if (row) {
           columnStatistics.push({
             columnName: this.getString(row.COLUMN_NAME) || '',
-            distinctCount: this.parseNumber(row.DISTINCT_COUNT),
-            nullCount: this.parseNumber(row.NULL_COUNT),
-            minValue: this.getString(row.MIN_VALUE),
-            maxValue: this.getString(row.MAX_VALUE),
-            sampleValues: this.getString(row.SAMPLE_VALUES),
+            distinctCount: this.parseNumber(row.DISTINCT_COUNT) ?? 0,
+            nullCount: this.parseNumber(row.NULL_COUNT) ?? 0,
+            minValue: this.getString(row.MIN_VALUE) ?? '',
+            maxValue: this.getString(row.MAX_VALUE) ?? '',
+            sampleValues: this.getString(row.SAMPLE_VALUES) ?? '',
           });
         }
       }
@@ -602,11 +602,11 @@ export class SnowflakeIntrospector extends BaseIntrospector {
       for (const column of columns) {
         columnStatistics.push({
           columnName: column.name,
-          distinctCount: undefined,
-          nullCount: undefined,
-          minValue: undefined,
-          maxValue: undefined,
-          sampleValues: undefined,
+          distinctCount: 0,
+          nullCount: 0,
+          minValue: '',
+          maxValue: '',
+          sampleValues: '',
         });
       }
     }
@@ -881,8 +881,8 @@ ORDER BY s.column_name`;
       tables,
       columns: columnsWithStats,
       views,
-      indexes: undefined, // Snowflake doesn't expose index information
-      foreignKeys: undefined, // Snowflake doesn't expose foreign key information
+      indexes: [], // Snowflake doesn't expose index information
+      foreignKeys: [], // Snowflake doesn't expose foreign key information
       introspectedAt: new Date(),
     };
   }
@@ -928,11 +928,11 @@ ORDER BY s.column_name`;
                 const key = `${table.database}.${table.schema}.${table.name}.${stat.columnName}`;
                 const column = columnMap.get(key);
                 if (column) {
-                  column.distinctCount = stat.distinctCount;
-                  column.nullCount = stat.nullCount;
-                  column.minValue = stat.minValue;
-                  column.maxValue = stat.maxValue;
-                  column.sampleValues = stat.sampleValues;
+                  column.distinctCount = stat.distinctCount ?? 0;
+                  column.nullCount = stat.nullCount ?? 0;
+                  column.minValue = stat.minValue ?? '';
+                  column.maxValue = stat.maxValue ?? '';
+                  column.sampleValues = stat.sampleValues ?? '';
                 }
               }
             } catch (error) {

@@ -1,0 +1,25 @@
+# Enable workspace for monorepo
+link-workspace-packages=true
+prefer-workspace-packages=true
+
+# Store directory for caching (uncommented for Turborepo)
+store-dir=~/.pnpm-store
+
+# Selective hoisting for shared tools
+hoist=true
+hoist-pattern[]=*eslint*
+hoist-pattern[]=*typescript*
+
+# Peer dependency handling
+auto-install-peers=true
+strict-peer-dependencies=false
+
+# Lockfile and compatibility
+lockfile-include-tarball-url=false
+shamefully-hoist=false
+
+# Registry (keep default unless using private registry)
+registry=https://registry.npmjs.org/
+
+# Enable side effects caching for performance
+side-effects-cache=true

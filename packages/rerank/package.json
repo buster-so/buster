@@ -1,18 +1,29 @@
 {
   "name": "@buster/rerank",
   "version": "0.1.0",
+  "type": "module",
+  "module": "src/index.ts",
   "description": "Reranking service for semantic search result ordering",
-  "main": "src/index.ts",
-  "types": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
   "scripts": {
-    "build": "tsc --build",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc --noEmit",
-    "lint": "biome check .",
+    "lint": "biome check",
     "lint:fix": "biome check --apply .",
     "format": "biome format .",
     "format:fix": "biome format --write ."
+  },
+  "dependencies": {
+    "@buster/typescript-config": "workspace:*",
+    "@buster/vitest-config": "workspace:*",
+    "axios": "catalog:",
+    "zod": "catalog:"
   }
 }

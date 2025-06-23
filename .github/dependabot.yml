@@ -27,17 +27,7 @@ updates:
       include: "scope"
 
   - package-ecosystem: "npm"
-    directory: "/api"
-    schedule:
-      interval: "weekly"
-    source-branch: "main"
-    target-branch: "staging"
-    open-pull-requests-limit: 10
-    labels:
-      - "dependencies"
-
-  - package-ecosystem: "npm"
-    directory: "/web"
+    directory: "/"
     schedule:
       interval: "weekly"
     source-branch: "main"

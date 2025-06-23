@@ -144,6 +144,7 @@ describe('MaxRows Limiting Integration Tests', () => {
   describe.skipIf(!process.env.TEST_MYSQL_HOST)('MySQL MaxRows Limiting', () => {
     let dataSource: DataSource;
 
+    // biome-ignore lint/suspicious/noDuplicateTestHooks: I don't know why this is needed
     beforeEach(async () => {
       dataSource = new DataSource({
         dataSources: [createTestDataSource(DataSourceType.MySQL)],

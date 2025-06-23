@@ -5,8 +5,7 @@ export * from './database/chats';
 export * from './database/messages';
 export * from './database/dataSources';
 
-// Environment setup helpers
-export * from './env-helpers';
+export * from './envHelpers';
 
 // Mock helpers
 export * from './mock-helpers';

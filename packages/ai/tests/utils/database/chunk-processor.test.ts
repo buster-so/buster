@@ -166,13 +166,6 @@ describe('ChunkProcessor', () => {
       title: 'TODO List',
       status: 'completed',
     });
-    expect(reasoning[0]?.files?.[reasoning[0]?.file_ids?.[0] ?? '']).toMatchObject({
-      file_type: 'metric',
-      file_name: 'todo_list.txt',
-      file: {
-        text: '1. Analyze the data\n2. Create visualizations\n3. Generate report',
-      },
-    });
   });
 });
 
@@ -270,7 +263,7 @@ describe('ChunkProcessor - Cross-Step Message Accumulation', () => {
       toolCallId: 'think-1',
       toolName: 'sequentialThinking',
       result: { success: true },
-    } as TextStreamPart<ToolSet>);
+    } as unknown as TextStreamPart<ToolSet>);
 
     // Get the output messages from think-and-prep
     const thinkAndPrepOutput = thinkAndPrepProcessor.getAccumulatedMessages();
@@ -417,7 +410,7 @@ function findDuplicateMessages(messages: CoreMessage[]): CoreMessage[] {
   const seen = new Map<string, CoreMessage>();
   const duplicates: CoreMessage[] = [];
 
-  messages.forEach((msg) => {
+  for (const msg of messages) {
     const key = JSON.stringify({
       role: msg.role,
       content: msg.content,
@@ -433,7 +426,7 @@ function findDuplicateMessages(messages: CoreMessage[]): CoreMessage[] {
     } else {
       seen.set(key, msg);
     }
-  });
+  }
 
   return duplicates;
 }

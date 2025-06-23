@@ -5,15 +5,6 @@
         "build": {
             "dependsOn": [
                 "^build"
-            ],
-            "inputs": [
-                "$TURBO_DEFAULT$",
-                ".env*"
-            ],
-            "outputs": [
-                "dist/**",
-                ".next/**",
-                "!.next/cache/**"
             ]
         },
         "dev": {
@@ -22,27 +13,18 @@
         },
         "lint": {
             "dependsOn": [
-                "^build"
+                "^build",
+                "^lint"
             ]
         },
         "typecheck": {
             "dependsOn": [
                 "^build"
-            ],
-            "inputs": [
-                "$TURBO_DEFAULT$",
-                "tsconfig.json"
             ]
         },
         "test": {
-            "inputs": [
-                "$TURBO_DEFAULT$",
-                "**/*.test.{ts,tsx,js,jsx}",
-                "**/*.spec.{ts,tsx,js,jsx}",
-                "tests/**/*"
-            ],
-            "outputs": [
-                "coverage/**"
+            "dependsOn": [
+                "^build"
             ]
         },
         "test:watch": {
@@ -53,27 +35,20 @@
             "dependsOn": [
                 "^build"
             ],
-            "inputs": [
-                "$TURBO_DEFAULT$",
-                "**/*.test.{ts,tsx,js,jsx}",
-                "**/*.spec.{ts,tsx,js,jsx}",
-                "tests/**/*"
-            ],
             "outputs": [
                 "coverage/**"
             ]
         },
-        "test:ui": {
+        "build:commonjs": {
             "cache": false,
-            "persistent": true
-        }
+            "persistent": false,
+            "outputs": ["dist/**"]
+          },
+          "build:commonjs:watch": {
+            "cache": false,
+            "persistent": true,
+            "dependsOn": ["build:commonjs"]
+          }
     },
-    "globalDependencies": [
-        ".env",
-        ".env.local",
-        ".env.development",
-        ".env.production",
-        "tsconfig.json",
-        "tsconfig.base.json"
-    ]
+    "envMode": "strict"
 }

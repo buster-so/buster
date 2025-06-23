@@ -9,7 +9,7 @@ import { type AdapterQueryResult, BaseAdapter, type FieldMetadata } from './base
  * MySQL database adapter
  */
 export class MySQLAdapter extends BaseAdapter {
-  private connection?: mysql.Connection;
+  private connection?: mysql.Connection | undefined;
   private introspector?: MySQLIntrospector;
 
   async initialize(credentials: Credentials): Promise<void> {
@@ -30,9 +30,9 @@ export class MySQLAdapter extends BaseAdapter {
         // For object SSL configuration, mysql2 expects specific properties
         config.ssl = {
           rejectUnauthorized: mysqlCredentials.ssl.rejectUnauthorized ?? true,
-          ca: mysqlCredentials.ssl.ca,
-          cert: mysqlCredentials.ssl.cert,
-          key: mysqlCredentials.ssl.key,
+          ...(mysqlCredentials.ssl.ca && { ca: mysqlCredentials.ssl.ca }),
+          ...(mysqlCredentials.ssl.cert && { cert: mysqlCredentials.ssl.cert }),
+          ...(mysqlCredentials.ssl.key && { key: mysqlCredentials.ssl.key }),
         };
       }
 
@@ -117,9 +117,9 @@ export class MySQLAdapter extends BaseAdapter {
             name: field.name,
             type: `mysql_type_${field.type}`, // MySQL field type
             nullable: typeof field.flags === 'number' ? (field.flags & 1) === 0 : true, // NOT_NULL flag is bit 0
-            length: typeof field.length === 'number' && field.length > 0 ? field.length : undefined,
+            length: typeof field.length === 'number' && field.length > 0 ? field.length : 0,
             precision:
-              typeof field.decimals === 'number' && field.decimals > 0 ? field.decimals : undefined,
+              typeof field.decimals === 'number' && field.decimals > 0 ? field.decimals : 0,
           }))
         : [];
 

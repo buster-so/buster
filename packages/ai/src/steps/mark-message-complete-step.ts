@@ -1,5 +1,4 @@
 import { updateMessage } from '@buster/database';
-import { updateChat } from '@buster/database/src/helpers/chats';
 import { createStep } from '@mastra/core';
 import type { RuntimeContext } from '@mastra/core/runtime-context';
 import { z } from 'zod';

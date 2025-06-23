@@ -28,6 +28,8 @@ export interface StreamErrorHandlerConfig<T extends ToolSet = ToolSet> {
   chunkProcessor: ChunkProcessor;
   runtimeContext: RuntimeContext<unknown>;
   abortController: AbortController;
+  resourceId: string;
+  threadId: string;
   maxRetries?: number;
   onRetry?: (error: RetryableError, attemptNumber: number) => void;
   toolChoice?: 'auto' | 'required' | 'none';
@@ -146,12 +148,19 @@ export async function processStreamWithHealing<T extends ToolSet>(
         chunkProcessor.setInitialMessages(healedMessages);
 
         // Create a new stream with healed messages
-        const newStream = await agent.stream(healedMessages, {
+        const baseOptions = {
           runtimeContext,
           abortSignal: abortController.signal,
           toolChoice,
-          onChunk: config.onChunk, // Use the same onChunk handler
-        });
+          resourceId: config.resourceId,
+          threadId: config.threadId,
+        };
+
+        const streamOptions = config.onChunk
+          ? { ...baseOptions, onChunk: config.onChunk }
+          : baseOptions;
+
+        const newStream = await agent.stream(healedMessages, streamOptions);
 
         // Update stream reference for next iteration
         currentStream = newStream;

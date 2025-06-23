@@ -23,7 +23,7 @@ interface CursorWithResult extends Cursor {
  * PostgreSQL database adapter
  */
 export class PostgreSQLAdapter extends BaseAdapter {
-  private client?: Client;
+  private client?: Client | undefined;
   private introspector?: PostgreSQLIntrospector;
 
   async initialize(credentials: Credentials): Promise<void> {
@@ -92,7 +92,7 @@ export class PostgreSQLAdapter extends BaseAdapter {
             name: field.name,
             type: `pg_type_${field.dataTypeID}`, // PostgreSQL type ID
             nullable: true, // PostgreSQL doesn't provide this info directly
-            length: field.dataTypeSize > 0 ? field.dataTypeSize : undefined,
+            length: field.dataTypeSize > 0 ? field.dataTypeSize : 0,
           })) || [];
 
         return {
@@ -137,7 +137,7 @@ export class PostgreSQLAdapter extends BaseAdapter {
             name: field.name,
             type: `pg_type_${field.dataTypeID}`,
             nullable: true,
-            length: field.dataTypeSize > 0 ? field.dataTypeSize : undefined,
+            length: field.dataTypeSize > 0 ? field.dataTypeSize : 0,
           }));
         }
 

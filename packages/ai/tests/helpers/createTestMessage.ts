@@ -1,6 +1,5 @@
+import { db, messages } from '@buster/database';
 import { v4 as uuidv4 } from 'uuid';
-import { db } from '../../../database/src/connection';
-import { messages } from '../../../database/src/schema';
 
 /**
  * Creates a test message record in the database

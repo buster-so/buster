@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "esModuleInterop": true,
+    "incremental": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "paths": {
+      "@/*": ["src/*"],
+      "@buster/access-controls": ["../../packages/access-controls/src"],
+      "@buster/access-controls/*": ["../../packages/access-controls/src/*"],
+      "@buster/database": ["../../packages/database/src"],
+      "@buster/database/*": ["../../packages/database/src/*"],
+      "@buster/test-utils": ["../../packages/test-utils/src"],
+      "@buster/test-utils/*": ["../../packages/test-utils/src/*"]
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ES2022",
+    "types": ["node", "vitest/globals"],
+    "allowJs": true
+  },
+  "exclude": ["node_modules", "dist", ".next", "public"],
+  "include": ["next-env.d.ts", "globals.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"]
+}
