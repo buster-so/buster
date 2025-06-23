@@ -1,4 +1,4 @@
-export const createProxiedResponse = async (url: URL) => {
+export const createProxiedResponse = async (url: URL): Promise<Response> => {
   const secretKey = process.env.ELECTRIC_SECRET;
 
   if (!secretKey) {

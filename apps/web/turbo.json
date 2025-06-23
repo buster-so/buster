@@ -23,10 +23,6 @@
         "vitest.config.ts",
         "package.json"
       ]
-    },
-    "test:e2e": {
-      "inputs": ["src/**/*", "playwright-tests/**/*", "playwright.config.ts", "package.json"],
-      "cache": false
     }
   }
 }
