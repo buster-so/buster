@@ -1,9 +1,7 @@
 {
   "name": "@buster/stored-values",
   "version": "1.0.0",
-  "type": "module",
   "main": "dist/index.js",
-  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
@@ -20,7 +18,7 @@
     }
   },
   "scripts": {
-    "build": "tsc && tsc-esm-fix",
+    "build": "tsc",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "test": "vitest run",
@@ -34,8 +32,5 @@
     "@buster/vitest-config": "workspace:*",
     "ai": "catalog:",
     "zod": "catalog:"
-  },
-  "devDependencies": {
-    "tsc-esm-fix": "^3.1.2"
   }
 }

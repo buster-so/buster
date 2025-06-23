@@ -6,15 +6,16 @@
     "declaration": true,
     "declarationMap": true,
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "incremental": true,
     "inlineSources": false,
     "isolatedModules": true,
-    "module": "ESNext",
-    "moduleResolution": "bundler",
+    "module": "CommonJS",
+    "moduleResolution": "node",
     "noEmit": false,
     "preserveWatchOutput": true,
     "skipLibCheck": true,
-    "target": "ESNext"
+    "target": "ES2022"
   },
   "exclude": ["node_modules"],
   "extends": "./type-checking.json"

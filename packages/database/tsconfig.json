@@ -2,7 +2,6 @@
   "extends": "@buster/typescript-config/base.json",
   "compilerOptions": {
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
-    "allowImportingTsExtensions": false,
     "outDir": "dist",
     "rootDir": "./src"
   },
