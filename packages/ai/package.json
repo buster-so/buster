@@ -1,5 +1,6 @@
 {
   "name": "@buster/ai",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -13,7 +14,7 @@
     "typecheck": "tsc --noEmit",
     "dev": "tsc --watch",
     "dev:mastra": "mastra dev --dir src",
-    "lint": "biome check .",
+    "lint": "biome check",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage"

@@ -105,29 +105,6 @@
   },
   "overrides": [
     {
-      "include": ["packages/database/**/*.ts"],
-      "linter": {
-        "rules": {
-          "style": {
-            "useImportType": "off"
-          },
-          "suspicious": {
-            "noExplicitAny": "off"
-          }
-        }
-      }
-    },
-    {
-      "include": ["packages/database/**/*.ts"],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noConsoleLog": "off"
-          }
-        }
-      }
-    },
-    {
       "include": [
         "**/tests/**/*",
         "**/test/**/*",

@@ -15,7 +15,7 @@
     "test": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
-    "lint": "biome check .",
+    "lint": "biome check",
     "lint:fix": "biome check --apply .",
     "format": "biome format .",
     "format:fix": "biome format --write ."

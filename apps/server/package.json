@@ -9,7 +9,7 @@
   "scripts": {
     "build": "bun build src/index.ts --outdir ./dist --target bun",
     "dev": "bun --max-old-space-size=512 run --hot src/index.ts",
-    "lint": "biome check .",
+    "lint": "biome check",
     "prod": "bun run build && bun run start",
     "start": "bun run dist/index.js",
     "test": "vitest run",

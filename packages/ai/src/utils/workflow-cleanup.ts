@@ -12,16 +12,13 @@ export function registerWorkflowCleanup(workflowId: string, handler: () => Promi
   if (!cleanupHandlers.has(workflowId)) {
     cleanupHandlers.set(workflowId, []);
   }
-  cleanupHandlers.get(workflowId)!.push(handler);
+  cleanupHandlers.get(workflowId)?.push(handler);
 }
 
 /**
  * Execute all cleanup handlers for a workflow
  */
 export async function executeWorkflowCleanup(workflowId: string): Promise<void> {
-  const startTime = Date.now();
-  // Starting cleanup for workflow
-
   try {
     // Clean up data sources first
     await cleanupWorkflowDataSources(workflowId);
@@ -47,7 +44,6 @@ export async function executeWorkflowCleanup(workflowId: string): Promise<void> 
     // Remove handlers after execution
     cleanupHandlers.delete(workflowId);
 
-    const duration = Date.now() - startTime;
     // Completed cleanup for workflow
   } catch (error) {
     console.error(
@@ -105,7 +101,6 @@ export function getActiveWorkflowStats() {
  */
 export async function cleanupStaleWorkflows(maxAgeMs = 3600000): Promise<void> {
   const stats = getAllWorkflowStats();
-  const now = Date.now();
 
   for (const [workflowId, stat] of Object.entries(stats)) {
     if (stat.uptime > maxAgeMs) {
