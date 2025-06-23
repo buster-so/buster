@@ -245,7 +245,7 @@ async function processDashboardFileUpdate(
     file_id: file.id,
     file_name: file.name,
     success: true,
-    error: undefined,
+    error: '',
     modification_type: 'content',
     timestamp: new Date().toISOString(),
     duration,

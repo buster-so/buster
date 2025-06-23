@@ -307,7 +307,7 @@ async function executeSingleCommand(cmd: Command): Promise<CommandResult> {
     validateCommandSecurity(cmd.command);
 
     const result = await executeCommand(cmd.command, {
-      cwd: cmd.cwd,
+      cwd: cmd.cwd || '',
       env: { ...process.env, ...cmd.env } as Record<string, string>,
       timeout: cmd.timeout || 30000,
     });

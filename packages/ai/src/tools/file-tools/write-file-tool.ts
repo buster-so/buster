@@ -109,7 +109,7 @@ const writeFile = wrapTraced(
         success: true,
         file_path,
         bytes_written: stats.size,
-        backup_path: backupPath,
+        backup_path: backupPath || '',
         created_directories: createdDirs,
       };
     } catch (error) {

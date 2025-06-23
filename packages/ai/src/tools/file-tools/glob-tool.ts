@@ -84,7 +84,7 @@ const globSearch = wrapTraced(
       ignore,
       follow: follow_symlinks,
       nodir: only_files && !only_directories,
-      maxDepth: max_depth,
+      maxDepth: max_depth || 10,
       absolute: false, // We'll handle this ourselves
       dot: true, // Include hidden files
       matchBase: true,

@@ -1541,18 +1541,25 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
           if (Array.isArray(toolResults)) {
             results = toolResults.map((result: unknown) => {
               const resultObj = result as Record<string, unknown>;
-              return {
+              const mappedResult: {
+                status: 'error' | 'success';
+                sql: string;
+                results?: Record<string, unknown>[];
+                error_message?: string;
+              } = {
                 status: resultObj.status === 'error' ? 'error' : ('success' as const),
                 sql: typeof resultObj.sql === 'string' ? resultObj.sql : '',
-                results:
-                  resultObj.status === 'success' && Array.isArray(resultObj.results)
-                    ? (resultObj.results as Record<string, unknown>[])
-                    : undefined,
-                error_message:
-                  resultObj.status === 'error' && typeof resultObj.error_message === 'string'
-                    ? resultObj.error_message
-                    : undefined,
               };
+
+              if (resultObj.status === 'success' && Array.isArray(resultObj.results)) {
+                mappedResult.results = resultObj.results as Record<string, unknown>[];
+              }
+
+              if (resultObj.status === 'error' && typeof resultObj.error_message === 'string') {
+                mappedResult.error_message = resultObj.error_message;
+              }
+
+              return mappedResult;
             });
           }
         }
@@ -1800,7 +1807,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
    */
   getTimingData(): { startTime?: number; completedTools: number } {
     return {
-      startTime: this.state.timing.startTime,
+      startTime: this.state.timing.startTime || 0,
       completedTools: this.state.timing.toolCallTimings.size,
     };
   }

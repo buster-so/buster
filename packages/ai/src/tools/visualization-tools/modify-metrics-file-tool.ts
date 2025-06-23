@@ -881,10 +881,12 @@ Please attempt to modify the metric again. This error could be due to:
             id: file.id,
             name: metricYml.name,
             file_type: 'metric',
-            result_message: results.find((r) => 'success' in r && r.updatedFile?.id === file.id)
-              ?.validationMessage,
-            results: results.find((r) => 'success' in r && r.updatedFile?.id === file.id)
-              ?.validationResults,
+            result_message:
+              results.find((r) => 'success' in r && r.updatedFile?.id === file.id)
+                ?.validationMessage || '',
+            results:
+              results.find((r) => 'success' in r && r.updatedFile?.id === file.id)
+                ?.validationResults || [],
             created_at: file.createdAt,
             updated_at: file.updatedAt,
             version_number: latestVersion,

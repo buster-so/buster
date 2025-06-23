@@ -252,6 +252,9 @@ const thinkAndPrepExecution = async ({
           chunkProcessor,
           runtimeContext,
           abortController,
+          //DALLIN TODO: resourceId AND threadId
+          resourceId: runtimeContext.get('dataSourceId') as string,
+          threadId: runtimeContext.get('chatId') as string,
           maxRetries: 3,
           onRetry: (error: RetryableError, attemptNumber: number) => {
             console.error(
