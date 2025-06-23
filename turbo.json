@@ -5,15 +5,6 @@
         "build": {
             "dependsOn": [
                 "^build"
-            ],
-            "inputs": [
-                "$TURBO_DEFAULT$",
-                ".env*"
-            ],
-            "outputs": [
-                "dist/**",
-                ".next/**",
-                "!.next/cache/**"
             ]
         },
         "dev": {
@@ -29,22 +20,11 @@
         "typecheck": {
             "dependsOn": [
                 "^build"
-            ],
-            "inputs": [
-                "$TURBO_DEFAULT$",
-                "tsconfig.json"
             ]
         },
         "test": {
             "dependsOn": [
                 "^build"
-            ],
-            "inputs": [
-                "$TURBO_DEFAULT$",
-                "**/*.test.{ts,tsx,js,jsx}",
-                "**/*.spec.{ts,tsx,js,jsx}",
-                "tests/**/*",
-                ".env*"
             ]
         },
         "test:watch": {
@@ -54,13 +34,6 @@
         "test:coverage": {
             "dependsOn": [
                 "^build"
-            ],
-            "inputs": [
-                "$TURBO_DEFAULT$",
-                "**/*.test.{ts,tsx,js,jsx}",
-                "**/*.spec.{ts,tsx,js,jsx}",
-                "tests/**/*",
-                ".env*"
             ],
             "outputs": [
                 "coverage/**"
@@ -77,8 +50,5 @@
             "dependsOn": ["build:commonjs"]
           }
     },
-    "globalDependencies": [
-        ".env*"
-    ],
     "envMode": "strict"
 }

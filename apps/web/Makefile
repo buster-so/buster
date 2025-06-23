@@ -2,7 +2,10 @@ dev:
 	rm -rf ./next && pnpm install && pnpm run dev
 
 build:
-	rm -rf ./next && pnpm install && pnpm run build
+	pnpm install && pnpm run build
+
+build-clean:
+	rm -rf ./.next && pnpm install && pnpm run build
 
 start:
 	pnpm install && pnpm run build && pnpm run start
