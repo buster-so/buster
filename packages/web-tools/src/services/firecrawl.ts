@@ -61,7 +61,7 @@ export class FirecrawlService {
 
     this.app = new FirecrawlApp({
       apiKey,
-      apiUrl: config?.apiUrl,
+      ...(config?.apiUrl && { apiUrl: config.apiUrl }),
     });
   }
 
@@ -78,8 +78,8 @@ export class FirecrawlService {
     try {
       // Use the SDK's native deep research method
       const response = await this.app.deepResearch(query, {
-        systemPrompt: options?.systemPrompt,
-        analysisPrompt: options?.analysisPrompt,
+        ...(options?.systemPrompt && { systemPrompt: options.systemPrompt }),
+        ...(options?.analysisPrompt && { analysisPrompt: options.analysisPrompt }),
       });
 
       const firecrawlResponse = response as FirecrawlResponse & JobStatusResponse;
