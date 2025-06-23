@@ -33,7 +33,8 @@
     "db:start-supabase": "supabase start",
     "db:stop": "supabase stop",
     "db:studio": "drizzle-kit studio",
-    "dev": "echo 'dev should be run from turbo.json' && true",
+    "dev:init": "echo 'dev:init should be run from turbo.json' && true",
+    "dev": "echo 'Running dev:init from turbo.json' && npm run dev:init",
     "lint": "biome check .",
     "stop": "pnpm run db:stop",
     "test": "vitest run",
@@ -45,7 +46,7 @@
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
     "ai": "catalog:",
-    "drizzle-kit": "^0.31.1",
+    "drizzle-kit": "^0.31.2",
     "drizzle-orm": "catalog:",
     "postgres": "^3.4.7",
     "zod": "catalog:"

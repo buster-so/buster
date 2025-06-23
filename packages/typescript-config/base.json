@@ -15,7 +15,8 @@
     "noEmit": false,
     "preserveWatchOutput": true,
     "skipLibCheck": true,
-    "target": "ES2022"
+    "target": "ES2022",
+    "lib": ["ESNext"]
   },
   "exclude": ["node_modules"],
   "extends": "./type-checking.json"

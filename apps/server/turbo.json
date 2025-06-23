@@ -6,6 +6,11 @@
       "cache": false,
       "persistent": true,
       "dependsOn": ["@buster/database#dev"]
+    },
+    "dev:reset": {
+      "cache": false,
+      "persistent": true,
+      "dependsOn": ["@buster/database#dev:reset"]
     }
   }
 }
