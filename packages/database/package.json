@@ -20,6 +20,8 @@
   "scripts": {
     "build:commonjs": "tsc --module commonjs --moduleResolution node",
     "build:commonjs:watch": "npm run build:commonjs && tsc --module commonjs --moduleResolution node --watch",
+    "build": "tsc",
+    "dev": "echo 'dev should be run from turbo.json' && true",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "test": "vitest run",
