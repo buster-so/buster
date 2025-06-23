@@ -7,7 +7,7 @@ import type { AnalystRuntimeContext } from '../../../src/workflows/analyst-workf
 describe('Think and Prep Step - Todos in Message History Integration', { timeout: 30000 }, () => {
   beforeAll(() => {
     initLogger({
-      apiKey: process.env.BRAINTRUST_KEY,
+      apiKey: process.env.BRAINTRUST_KEY || '',
       projectName: 'THINK-AND-PREP-TODOS',
     });
   });
