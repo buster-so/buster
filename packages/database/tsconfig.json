@@ -4,10 +4,7 @@
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
     "allowImportingTsExtensions": false,
     "outDir": "dist",
-    "rootDir": "./src",
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "noEmit": false
+    "rootDir": "./src"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "tests", "**/*.test.ts", "**/*.spec.ts"]

@@ -1,6 +1,7 @@
 {
   "name": "@buster/database",
   "version": "1.0.0",
+  "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -19,7 +20,7 @@
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc-esm-fix",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "test": "vitest run",
@@ -46,5 +47,8 @@
     "drizzle-orm": "catalog:",
     "postgres": "^3.4.7",
     "zod": "catalog:"
+  },
+  "devDependencies": {
+    "tsc-esm-fix": "^3.1.2"
   }
 }

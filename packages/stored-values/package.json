@@ -1,6 +1,7 @@
 {
   "name": "@buster/stored-values",
   "version": "1.0.0",
+  "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -19,7 +20,7 @@
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && tsc-esm-fix",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "test": "vitest run",
@@ -29,9 +30,12 @@
   "dependencies": {
     "@ai-sdk/openai": "^1.3.22",
     "@buster/database": "workspace:*",
-    "@buster/vitest-config": "workspace:*",
     "@buster/typescript-config": "workspace:*",
+    "@buster/vitest-config": "workspace:*",
     "ai": "catalog:",
     "zod": "catalog:"
+  },
+  "devDependencies": {
+    "tsc-esm-fix": "^3.1.2"
   }
 }

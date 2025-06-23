@@ -1,5 +1,5 @@
 {
-  "extends": "@buster/typescript-config/jit-package.json",
+  "extends": "@buster/typescript-config/base.json",
   "compilerOptions": {
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
   },

@@ -1,12 +1,5 @@
 // Export database connection and pool management
-export {
-  db,
-  getDb,
-  getClient,
-  initializePool,
-  closePool,
-  type PoolConfig,
-} from './connection';
+export * from './connection';
 
 // Export migration utilities (commented out until migrate.ts exists)
 // export { runMigrations, runMigrationsAndClose } from './migrate';

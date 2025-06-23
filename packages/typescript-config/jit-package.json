@@ -1,21 +1,21 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "./type-checking.json",
   "compilerOptions": {
-    "esModuleInterop": true,
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "isolatedModules": true,
-    "skipLibCheck": true,
+    "allowImportingTsExtensions": false,
     "composite": true,
     "declaration": true,
     "declarationMap": true,
+    "esModuleInterop": true,
     "incremental": true,
     "inlineSources": false,
+    "isolatedModules": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "noEmit": false,
     "preserveWatchOutput": true,
-    "target": "ESNext",
-    "allowImportingTsExtensions": false,
-    "noEmit": false
+    "skipLibCheck": true,
+    "target": "ESNext"
   },
-  "exclude": ["node_modules", "dist", "tests", "**/*.test.ts", "**/*.spec.ts"]
+  "exclude": ["node_modules", "dist", "tests", "**/*.test.ts", "**/*.spec.ts"],
+  "extends": "./type-checking.json"
 }
