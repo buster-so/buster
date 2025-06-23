@@ -20,7 +20,7 @@ describeFn('search.ts - Integration Tests', () => {
   const testDataSourceId = 'cc3ef3bc-44ec-4a43-8dc4-681cae5c996a';
   const testSchemaName = 'ds_cc3ef3bc_44ec_4a43_8dc4_681cae5c996a';
   let testEmbedding: number[];
-  // biome-ignore lint/suspicious/noExplicitAny: i am lazy right now
+  //  i am lazy right now
   let existingData: any[] = [];
 
   beforeAll(async () => {
