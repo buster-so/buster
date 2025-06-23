@@ -17,25 +17,13 @@ const app = new Hono()
   .use('*', requireAuth)
   // POST /chats - Create a new chat
   .post('/', zValidator('json', ChatCreateRequestSchema), async (c) => {
-    try {
-      const request = c.req.valid('json');
-      const user = c.get('busterUser');
+    const request = c.req.valid('json');
+    const user = c.get('busterUser');
 
-      // Call the handler function with user context
-      const response = await createChatHandler(request, user);
-      // Validate response against schema
-      const validatedResponse: ChatCreateResponse = ChatCreateResponseSchema.parse(response);
-      return c.json(validatedResponse);
-    } catch (e) {
-      if (e instanceof ChatError) {
-        // we need to use this syntax instead of HTTPException because hono bubbles up 500 errors
-        return c.json(e.toResponse(), e.statusCode);
-      }
+    const response = await createChatHandler(request, user);
 
-      throw new HTTPException(500, {
-        message: 'Failed to create chat',
-      });
-    }
+    const validatedResponse: ChatCreateResponse = ChatCreateResponseSchema.parse(response);
+    return c.json(validatedResponse);
   })
   .patch(
     '/:chat_id',
@@ -51,6 +39,19 @@ const app = new Hono()
         message: `TODO: Stop this chat ${c.req.param('chat_id')}`,
       });
     }
-  );
+  )
+  .onError((e, c) => {
+    if (e instanceof ChatError) {
+      // we need to use this syntax instead of HTTPException because hono bubbles up 500 errors
+      return c.json(e.toResponse(), e.statusCode);
+    }
+    if (e instanceof HTTPException) {
+      return e.getResponse();
+    }
+
+    throw new HTTPException(500, {
+      message: 'Internal server error',
+    });
+  });
 
 export default app;

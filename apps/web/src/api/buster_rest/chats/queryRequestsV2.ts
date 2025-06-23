@@ -21,8 +21,10 @@ export const useStartNewChat = () => {
   });
 
   return useMutation({
-    mutationFn: (props: ChatCreateRequest) =>
-      honoInstance.api.v2.chats.$post({ json: props }).then((res) => res.json()),
+    mutationFn: async (props: ChatCreateRequest) => {
+      const res = await honoInstance.api.v2.chats.$post({ json: props });
+      return await res.json();
+    },
     onSuccess: (data) => {
       const { iChat, iChatMessages } = updateChatToIChat(data);
       saveAllChatMessages(iChatMessages);

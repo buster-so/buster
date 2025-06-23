@@ -1,9 +1,11 @@
 import { Hono } from 'hono';
+import { z } from 'zod';
 
 // Import custom middleware
 import { corsMiddleware } from './middleware/cors';
 import { loggerMiddleware } from './middleware/logger';
 
+import { HTTPException } from 'hono/http-exception';
 import healthcheckRoutes from './api/healthcheck';
 // Import API route modules
 import v2Routes from './api/v2';
@@ -21,9 +23,19 @@ const routes = app.route('/healthcheck', healthcheckRoutes).route('/api/v2', v2R
 // Global error handler
 app.onError((err, c) => {
   console.error('Unhandled error:', err);
+
+  if (err instanceof HTTPException) {
+    // MUST use .text(), not .json(), so callRpc can read `res.text()`
+    return c.text(err.message, err.status);
+  }
+
+  if (err instanceof z.ZodError) {
+    return c.text(err.errors.map((e) => e.message).join(', '), 400);
+  }
+
   return c.json(
     {
-      error: 'Internal Server Error',
+      error: 'Internal Server Error 😕',
       message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong',
     },
     500

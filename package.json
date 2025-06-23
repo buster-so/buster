@@ -18,6 +18,7 @@
     "db:stop": "pnpm --filter @buster/database run db:stop",
     "db:studio": "pnpm --filter @buster/database run db:studio",
     "dev": "turbo dev",
+    "dev:server": "pnpm --filter @buster-app/server dev",
     "evals": "bash scripts/evals.sh",
     "format": "biome format ${1:-.}",
     "format:fix": "biome format --write ${1:-.}",
