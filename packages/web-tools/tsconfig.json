@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outDir": "dist",
     "rootDir": "src",
-    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
+    "tsBuildInfoFile": "dist/.cache/tsbuildinfo.json",
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]

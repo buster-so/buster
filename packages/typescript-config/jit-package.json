@@ -10,7 +10,7 @@
     "inlineSources": false,
     "isolatedModules": true,
     "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "moduleResolution": "bundler",
     "noEmit": false,
     "preserveWatchOutput": true,
     "skipLibCheck": true,

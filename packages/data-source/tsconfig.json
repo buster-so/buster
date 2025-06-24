@@ -2,7 +2,7 @@
   "extends": "@buster/typescript-config/base.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json",
+    "tsBuildInfoFile": "dist/.cache/tsbuildinfo.json",
     "outDir": "dist",
     "rootDir": "src",
     "paths": {
