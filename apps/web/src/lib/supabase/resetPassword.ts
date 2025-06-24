@@ -2,8 +2,9 @@
 
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { createClient } from './server';
+import env from '@/config/env';
 
-const authURLFull = `${process.env.NEXT_PUBLIC_URL}${createBusterRoute({
+const authURLFull = `${env.NEXT_PUBLIC_URL}${createBusterRoute({
   route: BusterRoutes.AUTH_CALLBACK
 })}`;
 

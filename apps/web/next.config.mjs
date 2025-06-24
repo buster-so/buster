@@ -1,20 +1,15 @@
 import path, { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import env from './src/config/env.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL
-  ? new URL(process.env.NEXT_PUBLIC_API_URL).origin
-  : '';
-const wsUrl = process.env.NEXT_PUBLIC_WEB_SOCKET_URL
-  ? new URL(process.env.NEXT_PUBLIC_WEB_SOCKET_URL).origin
-      .replace('https', 'wss')
-      .replace('http', 'ws')
-  : '';
-const api2Url = process.env.NEXT_PUBLIC_API2_URL
-  ? new URL(process.env.NEXT_PUBLIC_API2_URL).origin
-  : '';
+const apiUrl = new URL(env.NEXT_PUBLIC_API_URL).origin;
+const api2Url = new URL(env.NEXT_PUBLIC_API2_URL).origin;
+const wsUrl = new URL(env.NEXT_PUBLIC_WEB_SOCKET_URL).origin
+  .replace('https', 'wss')
+  .replace('http', 'ws');
 
 // Function to create CSP header with dynamic API URLs
 const createCspHeader = (isEmbed = false) => {

@@ -1,10 +1,11 @@
 'use server';
 
+import env from '@/config/env';
 import { type NextRequest, NextResponse } from 'next/server';
 import type { AppSupportRequest } from '@/api/buster_rest/nextjs/support';
 import { createClient } from '@/lib/supabase/server';
 
-const slackHookURL = process.env.NEXT_SLACK_APP_SUPPORT_URL || '';
+const slackHookURL = env.NEXT_SLACK_APP_SUPPORT_URL || '';
 const STORAGE_BUCKET = 'support-screenshots'; // Using the default public bucket that usually exists
 
 export async function POST(request: NextRequest) {

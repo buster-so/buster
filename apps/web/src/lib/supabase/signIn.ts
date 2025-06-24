@@ -4,8 +4,9 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { createClient } from './server';
+import env from '@/config/env';
 
-const authURLFull = `${process.env.NEXT_PUBLIC_URL}${createBusterRoute({
+const authURLFull = `${env.NEXT_PUBLIC_URL}${createBusterRoute({
   route: BusterRoutes.AUTH_CALLBACK
 })}`;
 
@@ -102,7 +103,7 @@ export const signUp = async ({ email, password }: { email: string; password: str
   const authURL = createBusterRoute({
     route: BusterRoutes.AUTH_CONFIRM
   });
-  const authURLFull = `${process.env.NEXT_PUBLIC_URL}${authURL}`;
+  const authURLFull = `${env.NEXT_PUBLIC_URL}${authURL}`;
 
   const { error } = await supabase.auth.signUp({
     email,

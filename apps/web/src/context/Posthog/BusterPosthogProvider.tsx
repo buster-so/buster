@@ -8,8 +8,9 @@ import React, { type PropsWithChildren, useEffect } from 'react';
 import type { BusterUserTeam } from '@/api/asset_interfaces';
 import { isDev } from '@/config';
 import { useUserConfigContextSelector } from '../Users';
+import env from '@/config/envClient';
 
-const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+const POSTHOG_KEY = env.NEXT_PUBLIC_POSTHOG_KEY;
 
 export const BusterPosthogProvider: React.FC<PropsWithChildren> = React.memo(({ children }) => {
   if (isDev || !POSTHOG_KEY) {
@@ -21,7 +22,7 @@ export const BusterPosthogProvider: React.FC<PropsWithChildren> = React.memo(({ 
 BusterPosthogProvider.displayName = 'BusterPosthogProvider';
 
 const options: Partial<PostHogConfig> = {
-  api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+  api_host: env.NEXT_PUBLIC_POSTHOG_HOST,
   person_profiles: 'always',
   session_recording: {
     recordBody: true

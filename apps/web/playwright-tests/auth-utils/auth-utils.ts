@@ -60,9 +60,6 @@ export async function login(page: Page) {
   await page.goto('http://localhost:3000/auth/login');
 
   // Add your login logic here, for example:
-  // await page.fill('input[name="email"]', process.env.TEST_USER_EMAIL || 'test@example.com');
-  // await page.fill('input[name="password"]', process.env.TEST_USER_PASSWORD || 'password123');
-  // await page.click('button[type="submit"]');
 
   await page.getByText('Sign in').click();
   await page.getByText(`Don't already have an account?`).click();
