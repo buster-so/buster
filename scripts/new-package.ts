@@ -164,6 +164,7 @@ async function createPackageFiles(config: PackageConfig) {
     dependencies: {
       "@buster/typescript-config": "workspace:*",
       "@buster/vitest-config": "workspace:*",
+      "dotenv": "^16.5.0",
     },
   };
 
@@ -227,16 +228,50 @@ export {};
   // Create lib directory and basic lib file
   await mkdir(join(directory, "src", "lib"), { recursive: true });
   const libIndex = `// Export your library functions here
-export const example = () => {
+export const howdy = () => {
   return 'Hello from @buster/${name}!';
 };
 `;
 
   await writeFile(join(directory, "src", "lib", "index.ts"), libIndex);
 
-  // Create a basic validate-env.js script
-  const validateEnv = `// Validate environment variables here
-console.log('Environment validation passed');
+  // Create a proper validate-env.js script
+  const validateEnv = `#!/usr/bin/env node
+
+// Load environment variables from .env file
+import { config } from 'dotenv';
+config();
+
+// Build-time environment validation
+
+console.log('🔍 Validating environment variables...');
+
+const env = {
+  NODE_ENV: process.env.NODE_ENV || 'development',
+  // Add your required environment variables here
+  // DATABASE_URL: process.env.DATABASE_URL,
+  // API_KEY: process.env.API_KEY,
+};
+
+let hasErrors = false;
+
+for (const [envKey, value] of Object.entries(env)) {
+  if (!value) {
+    console.error(\`❌ Missing required environment variable: \${envKey}\`);
+    hasErrors = true;
+  } else {
+    console.log(\`✅ \${envKey} is set\`);
+  }
+}
+
+if (hasErrors) {
+  console.error('');
+  console.error('❌ Build cannot continue with missing environment variables.');
+  console.error('Please check your .env file and ensure all required variables are set.');
+  process.exit(1);
+}
+
+console.log('✅ All required environment variables are present');
 `;
 
   await writeFile(join(directory, "scripts", "validate-env.js"), validateEnv);
