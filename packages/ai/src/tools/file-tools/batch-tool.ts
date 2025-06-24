@@ -391,7 +391,7 @@ async function executeCommand(
 
     const child = spawn(cmd, args, {
       cwd: options.cwd ? resolve(options.cwd) : process.cwd(),
-      env: options.env,
+      env: options.env as NodeJS.ProcessEnv,
       stdio: ['ignore', 'pipe', 'pipe'],
     });
 

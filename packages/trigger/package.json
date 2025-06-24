@@ -7,7 +7,7 @@
     "dev": "npx trigger.dev@latest dev",
     "deploy": "npx trigger.dev@latest deploy",
     "prebuild": "node scripts/validate-env.js",
-    "build": "echo 'No build step required' but we run it to make sure env is loaded' && tsc --noEmit",
+    "build": "echo 'No build step required but we run it to make sure env is loaded' && tsc --noEmit",
     "lint": "biome check",
     "test": "vitest run",
     "test:watch": "vitest watch",

@@ -8,12 +8,7 @@ config();
 
 console.log('🔍 Validating environment variables...');
 
-const env = {
-  RERANK_API_KEY: process.env.RERANK_API_KEY,
-  RERANK_MODEL: process.env.RERANK_MODEL,
-  RERANK_BASE_URL: process.env.RERANK_BASE_URL,
-  NODE_ENV: process.env.NODE_ENV || 'development',
-};
+const env = {};
 
 let hasErrors = false;
 

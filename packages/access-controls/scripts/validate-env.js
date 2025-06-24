@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+// Load environment variables from .env file
+import { config } from 'dotenv';
+config();
 
 // Build-time environment validation
 
