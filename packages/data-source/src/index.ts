@@ -1,3 +1,5 @@
+import './env';
+
 // Main data source class and configuration
 export { DataSource, QueryRouter } from './data-source';
 export type {

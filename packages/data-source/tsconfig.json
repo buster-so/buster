@@ -4,7 +4,6 @@
     "baseUrl": ".",
     "tsBuildInfoFile": "dist/.cache/tsbuildinfo.json",
     "outDir": "dist",
-    "rootDir": "src",
     "paths": {
       "@/*": ["src/*"],
       "@/adapters/*": ["src/adapters/*"],
@@ -12,6 +11,6 @@
       "@/types/*": ["src/types/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "env.d.ts"],
   "exclude": ["node_modules", "dist", "tests", "**/*.test.ts", "**/*.spec.ts"]
 }

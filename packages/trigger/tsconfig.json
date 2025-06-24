@@ -5,6 +5,6 @@
     "rootDir": "src",
     "tsBuildInfoFile": "dist/.cache/tsbuildinfo.json"
   },
-  "include": ["src/**/*", "tests/**/*", "vitest.config.ts"],
+  "include": ["src/**/*", "tests/**/*", "env.d.ts"],
   "exclude": ["node_modules", "dist"]
 }
