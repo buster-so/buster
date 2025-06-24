@@ -1,5 +1,3 @@
-import './env';
-
 // Database test helpers
 export * from './database/organizations';
 export * from './database/users';

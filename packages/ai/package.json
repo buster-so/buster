@@ -14,6 +14,7 @@
     }
   },
   "scripts": {
+    "prebuild": "node scripts/validate-env.js",
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "dev": "tsc --watch",

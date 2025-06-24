@@ -1,4 +1,3 @@
-import '../../env';
 import { logger, schemaTask } from '@trigger.dev/sdk/v3';
 import { initLogger, wrapTraced } from 'braintrust';
 import { AnalystAgentTaskInputSchema, type AnalystAgentTaskOutput } from './types';

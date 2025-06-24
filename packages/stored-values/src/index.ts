@@ -1,5 +1,3 @@
-import './env';
-
 // Export all search functionality
 export {
   searchValuesByEmbedding,

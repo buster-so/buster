@@ -1,5 +1,3 @@
-import './env';
-
 // Export access control functionality
 export {
   AccessControlsError,

@@ -1,5 +1,3 @@
-import './env';
-
 // Export database connection and pool management
 export * from './connection';
 
