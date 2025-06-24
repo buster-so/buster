@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 
-import { mkdir, writeFile, access } from "fs/promises";
+import { mkdir, writeFile, access, readFile } from "fs/promises";
 import { join } from "path";
 import { createInterface } from "readline";
 import { exec } from "child_process";
@@ -8,9 +8,16 @@ import { promisify } from "util";
 
 const execAsync = promisify(exec);
 
+// Enable keypress events for readline
+if (process.stdin.isTTY) {
+  require('readline').emitKeypressEvents(process.stdin);
+}
+
 interface PackageConfig {
   name: string;
+  type: 'package' | 'app';
   directory: string;
+  packageName: string;
 }
 
 function createReadlineInterface() {
@@ -28,9 +35,57 @@ function askQuestion(rl: any, question: string): Promise<string> {
   });
 }
 
-async function checkPackageExists(packageName: string): Promise<boolean> {
+function askSelect(question: string, options: string[], context?: string): Promise<string> {
+  return new Promise((resolve) => {
+    let selectedIndex = 0;
+    
+    const renderOptions = () => {
+      console.clear();
+      console.log("🚀 Creating a new package or app\n");
+      if (context) {
+        console.log(context + "\n");
+      }
+      console.log(question);
+      
+      options.forEach((option, index) => {
+        if (index === selectedIndex) {
+          console.log(`❯ ${option}`);
+        } else {
+          console.log(`  ${option}`);
+        }
+      });
+      
+      console.log("\n(Use arrow keys to navigate, press Enter to select)");
+    };
+    
+    const onKeyPress = (str: string, key: any) => {
+      if (key.name === 'up' && selectedIndex > 0) {
+        selectedIndex--;
+        renderOptions();
+      } else if (key.name === 'down' && selectedIndex < options.length - 1) {
+        selectedIndex++;
+        renderOptions();
+      } else if (key.name === 'return') {
+        process.stdin.setRawMode(false);
+        process.stdin.removeListener('keypress', onKeyPress);
+        process.stdin.pause();
+        console.log(`\nSelected: ${options[selectedIndex]}\n`);
+        resolve(options[selectedIndex]);
+      }
+    };
+    
+    process.stdin.setRawMode(true);
+    process.stdin.resume();
+    process.stdin.on('keypress', onKeyPress);
+    
+    renderOptions();
+  });
+}
+
+async function checkPackageExists(packageName: string, type: 'package' | 'app'): Promise<boolean> {
   try {
-    const packagePath = join(process.cwd(), "packages", packageName);
+    const baseDir = type === 'package' ? "packages" : "apps";
+    const packagePath = join(process.cwd(), baseDir, packageName);
     await access(packagePath);
     return true; // Directory exists
   } catch {
@@ -58,10 +113,53 @@ async function formatFiles(config: PackageConfig) {
   }
 }
 
+async function updatePnpmWorkspace(config: PackageConfig) {
+  if (config.type !== 'app') return;
+  
+  try {
+    const workspaceFile = join(process.cwd(), 'pnpm-workspace.yaml');
+    let content = await readFile(workspaceFile, 'utf-8');
+    
+    // Add the new app to the Applications section
+    const newAppEntry = `  - 'apps/${config.name}'`;
+    
+    // Find the Applications section and add the new app
+    const lines = content.split('\n');
+    let foundAppsSection = false;
+    let insertIndex = -1;
+    
+    for (let i = 0; i < lines.length; i++) {
+      if (lines[i].includes('# Applications')) {
+        foundAppsSection = true;
+        continue;
+      }
+      
+      if (foundAppsSection && lines[i].trim().startsWith('- \'apps/')) {
+        insertIndex = i;
+      } else if (foundAppsSection && !lines[i].trim().startsWith('- \'apps/') && lines[i].trim() !== '') {
+        break;
+      }
+    }
+    
+    if (insertIndex !== -1) {
+      lines.splice(insertIndex + 1, 0, newAppEntry);
+      const newContent = lines.join('\n');
+      await writeFile(workspaceFile, newContent);
+      console.log("✅ Updated pnpm-workspace.yaml");
+    } else {
+      console.warn("⚠️ Warning: Could not find Applications section in pnpm-workspace.yaml. Please add manually:");
+      console.warn(`   ${newAppEntry}`);
+    }
+  } catch (error) {
+    console.warn("⚠️ Warning: Failed to update pnpm-workspace.yaml. Please add manually:");
+    console.warn(`   - 'apps/${config.name}'`);
+  }
+}
+
 async function main() {
   const rl = createReadlineInterface();
   
-  console.log("🚀 Creating a new package in the packages/ directory\n");
+  console.log("🚀 Creating a new package or app\n");
 
   // Get package name from user
   let packageName = "";
@@ -79,37 +177,57 @@ async function main() {
       continue;
     }
     
-    // Check if package already exists
-    const exists = await checkPackageExists(trimmed);
-    if (exists) {
-      console.log(`❌ Package '${trimmed}' already exists in packages/ directory`);
-      continue;
-    }
-    
     packageName = trimmed;
   }
 
+  // Close readline for now, we'll use select interface
+  rl.close();
+  
+  // Get package type from user using select interface
+  const context = `What should the package be called? ${packageName}`;
+  const selectedType = await askSelect("Is this a 'package' or an 'app'?", ["package", "app"], context);
+  const packageType = selectedType as 'package' | 'app';
+
+  // Check if package/app already exists
+  const exists = await checkPackageExists(packageName, packageType);
+  if (exists) {
+    const location = packageType === 'package' ? 'packages/' : 'apps/';
+    console.error(`❌ ${packageType} '${packageName}' already exists in ${location} directory`);
+    process.exit(1);
+  }
+
+  const baseDir = packageType === 'package' ? "packages" : "apps";
+  const namePrefix = packageType === 'package' ? "@buster" : "@buster-app";
+
   const config: PackageConfig = {
     name: packageName,
-    directory: join(process.cwd(), "packages", packageName),
+    type: packageType,
+    directory: join(process.cwd(), baseDir, packageName),
+    packageName: `${namePrefix}/${packageName}`,
   };
 
   // Create the package directory
   await mkdir(config.directory, { recursive: true });
 
-  console.log(`\n📁 Creating package: @buster/${config.name}`);
-  console.log(`📍 Location: packages/${config.name}\n`);
+  console.log(`\n📁 Creating ${config.type}: ${config.packageName}`);
+  console.log(`📍 Location: ${config.type === 'package' ? 'packages' : 'apps'}/${config.name}\n`);
 
   // Confirm before proceeding
-  const shouldProceed = await askQuestion(rl, "Continue with package creation? (y/N) ");
-  rl.close();
+  const confirmContext = `Creating ${config.type}: ${config.packageName}\nLocation: ${config.type === 'package' ? 'packages' : 'apps'}/${config.name}`;
+  const shouldProceed = await askSelect(`Continue with ${config.type} creation?`, ["Yes", "No"], confirmContext);
 
-  if (shouldProceed.toLowerCase() !== 'y' && shouldProceed.toLowerCase() !== 'yes') {
-    console.log("❌ Package creation cancelled");
+  if (shouldProceed === "No") {
+    console.log(`❌ ${config.type === 'package' ? 'Package' : 'App'} creation cancelled`);
     process.exit(0);
   }
 
   await createPackageFiles(config);
+  
+  // Update pnpm workspace if it's an app
+  if (config.type === 'app') {
+    console.log("📝 Updating pnpm-workspace.yaml...");
+    await updatePnpmWorkspace(config);
+  }
   
   // Install dependencies
   console.log("\n📦 Installing dependencies...");
@@ -119,12 +237,12 @@ async function main() {
   console.log("🎨 Formatting files with biome...");
   await formatFiles(config);
 
-  console.log("\n✅ Package created successfully!");
+  console.log(`\n✅ ${config.type === 'package' ? 'Package' : 'App'} created successfully!`);
   console.log(`\n📋 Next steps:`);
-  console.log(`   1. cd packages/${config.name}`);
+  console.log(`   1. cd ${config.type === 'package' ? 'packages' : 'apps'}/${config.name}`);
   console.log(`   2. Update the env.d.ts file with your environment variables`);
   console.log(`   3. Add your source code in the src/ directory`);
-  console.log(`   4. Run 'npm run build' to build the package`);
+  console.log(`   4. Run 'npm run build' to build the ${config.type}`);
 }
 
 async function createPackageFiles(config: PackageConfig) {
@@ -136,7 +254,7 @@ async function createPackageFiles(config: PackageConfig) {
 
   // Create package.json
   const packageJson = {
-    name: `@buster/${name}`,
+    name: config.packageName,
     version: "1.0.0",
     type: "module",
     main: "dist/index.js",
@@ -229,7 +347,7 @@ export {};
   await mkdir(join(directory, "src", "lib"), { recursive: true });
   const libIndex = `// Export your library functions here
 export const howdy = () => {
-  return 'Hello from @buster/${name}!';
+  return 'Hello from ${config.packageName}!';
 };
 `;
 
