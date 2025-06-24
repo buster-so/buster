@@ -1,8 +1,12 @@
 #!/usr/bin/env bun
 
-import { mkdir, writeFile } from "fs/promises";
+import { mkdir, writeFile, access } from "fs/promises";
 import { join } from "path";
 import { createInterface } from "readline";
+import { exec } from "child_process";
+import { promisify } from "util";
+
+const execAsync = promisify(exec);
 
 interface PackageConfig {
   name: string;
@@ -22,6 +26,36 @@ function askQuestion(rl: any, question: string): Promise<string> {
       resolve(answer);
     });
   });
+}
+
+async function checkPackageExists(packageName: string): Promise<boolean> {
+  try {
+    const packagePath = join(process.cwd(), "packages", packageName);
+    await access(packagePath);
+    return true; // Directory exists
+  } catch {
+    return false; // Directory doesn't exist
+  }
+}
+
+async function installDependencies(config: PackageConfig) {
+  try {
+    await execAsync('pnpm i', { cwd: config.directory });
+    console.log("✅ Dependencies installed successfully");
+  } catch (error) {
+    console.warn("⚠️ Warning: Failed to install dependencies. You may need to run 'pnpm i' manually.");
+    console.warn(error);
+  }
+}
+
+async function formatFiles(config: PackageConfig) {
+  try {
+    await execAsync('npx biome check --write', { cwd: config.directory });
+    console.log("✅ Files formatted successfully");
+  } catch (error) {
+    console.warn("⚠️ Warning: Failed to format files with biome. You may need to run 'npx biome check --write' manually.");
+    console.warn(error);
+  }
 }
 
 async function main() {
@@ -45,6 +79,13 @@ async function main() {
       continue;
     }
     
+    // Check if package already exists
+    const exists = await checkPackageExists(trimmed);
+    if (exists) {
+      console.log(`❌ Package '${trimmed}' already exists in packages/ directory`);
+      continue;
+    }
+    
     packageName = trimmed;
   }
 
@@ -53,14 +94,8 @@ async function main() {
     directory: join(process.cwd(), "packages", packageName),
   };
 
-  // Check if directory already exists
-  try {
-    await mkdir(config.directory, { recursive: false });
-  } catch (error) {
-    console.error(`❌ Directory packages/${config.name} already exists!`);
-    rl.close();
-    process.exit(1);
-  }
+  // Create the package directory
+  await mkdir(config.directory, { recursive: true });
 
   console.log(`\n📁 Creating package: @buster/${config.name}`);
   console.log(`📍 Location: packages/${config.name}\n`);
@@ -75,6 +110,14 @@ async function main() {
   }
 
   await createPackageFiles(config);
+  
+  // Install dependencies
+  console.log("\n📦 Installing dependencies...");
+  await installDependencies(config);
+  
+  // Format files with biome
+  console.log("🎨 Formatting files with biome...");
+  await formatFiles(config);
 
   console.log("\n✅ Package created successfully!");
   console.log(`\n📋 Next steps:`);
@@ -90,7 +133,6 @@ async function createPackageFiles(config: PackageConfig) {
   // Create src directory
   await mkdir(join(directory, "src"), { recursive: true });
   await mkdir(join(directory, "scripts"), { recursive: true });
-  await mkdir(join(directory, "tests"), { recursive: true });
 
   // Create package.json
   const packageJson = {
@@ -122,10 +164,6 @@ async function createPackageFiles(config: PackageConfig) {
     dependencies: {
       "@buster/typescript-config": "workspace:*",
       "@buster/vitest-config": "workspace:*",
-    },
-    devDependencies: {
-      typescript: "catalog:",
-      vitest: "catalog:",
     },
   };
 
@@ -181,7 +219,7 @@ export {};
   );
 
   // Create basic index.ts file
-  const indexTs = `export * from './lib/index.js';
+  const indexTs = `export * from './lib/index';
 `;
 
   await writeFile(join(directory, "src", "index.ts"), indexTs);
@@ -189,9 +227,9 @@ export {};
   // Create lib directory and basic lib file
   await mkdir(join(directory, "src", "lib"), { recursive: true });
   const libIndex = `// Export your library functions here
-export function example() {
+export const example = () => {
   return 'Hello from @buster/${name}!';
-}
+};
 `;
 
   await writeFile(join(directory, "src", "lib", "index.ts"), libIndex);
@@ -203,19 +241,6 @@ console.log('Environment validation passed');
 
   await writeFile(join(directory, "scripts", "validate-env.js"), validateEnv);
 
-  // Create a basic test file
-  const testFile = `import { describe, it, expect } from 'vitest';
-import { example } from '../src/lib/index.js';
-
-describe('${name}', () => {
-  it('should work', () => {
-    expect(example()).toBe('Hello from @buster/${name}!');
-  });
-});
-`;
-
-  await writeFile(join(directory, "tests", "index.test.ts"), testFile);
-
   console.log("📄 Created package.json");
   console.log("📄 Created env.d.ts");
   console.log("📄 Created tsconfig.json");
@@ -223,7 +248,6 @@ describe('${name}', () => {
   console.log("📄 Created src/index.ts");
   console.log("📄 Created src/lib/index.ts");
   console.log("📄 Created scripts/validate-env.js");
-  console.log("📄 Created tests/index.test.ts");
 }
 
 // Run the CLI
