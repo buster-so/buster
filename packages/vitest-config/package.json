@@ -5,9 +5,18 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-    ".": "./dist/configs/index.js",
-    "./base": "./dist/configs/base.js",
-    "./ui": "./dist/configs/ui.js"
+    ".": {
+      "types": "./dist/configs/index.d.ts",
+      "default": "./dist/configs/index.js"
+    },
+    "./base": {
+      "types": "./dist/configs/base.d.ts",
+      "default": "./dist/configs/base.js"
+    },
+    "./ui": {
+      "types": "./dist/configs/ui.d.ts",
+      "default": "./dist/configs/ui.js"
+    }
   },
   "scripts": {
     "build": "tsc --build",
