@@ -91,13 +91,6 @@ describe('Analyst Agent Task Integration Tests', () => {
         },
         {
           name: 'Trigger Analyst Agent Task',
-          metadata: {
-            messageId,
-            chatId,
-            userId: TEST_USER_ID,
-            organizationId: TEST_ORG_ID,
-            messageContent: TEST_MESSAGE_CONTENT,
-          },
         }
       );
 
@@ -106,10 +99,10 @@ describe('Analyst Agent Task Integration Tests', () => {
 
       // Verify task completed successfully
       expect(result).toBeDefined();
-      expect(result.ok).toBe(true);
+      expect(result.status).toBe('COMPLETED');
       expect(result.output).toBeDefined();
 
-      if (result.ok) {
+      if (result.status === 'COMPLETED' && result.output) {
         console.log('Task completed successfully');
         console.log('Task output:', JSON.stringify(result.output, null, 2));
 
@@ -129,9 +122,6 @@ describe('Analyst Agent Task Integration Tests', () => {
         // Check if conversation history was saved
         if (updatedMessage[0]?.rawLlmMessages) {
           expect(Array.isArray(updatedMessage[0].rawLlmMessages)).toBe(true);
-          console.log(
-            `Conversation history saved: ${updatedMessage[0].rawLlmMessages.length} messages`
-          );
         }
 
         console.log('Integration test completed successfully!');
@@ -177,7 +167,7 @@ describe('Analyst Agent Task Integration Tests', () => {
       // Task should complete but with error result
       expect(result).toBeDefined();
 
-      if (result.ok) {
+      if (result.status === 'COMPLETED' && result.output) {
         // If task completed "successfully", it should report the error in output
         expect(result.output.success).toBe(false);
         expect(result.output.error).toBeDefined();
