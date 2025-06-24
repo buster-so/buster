@@ -126,8 +126,11 @@ describe('Analyst Agent Task Integration Tests', () => {
 
         console.log('Integration test completed successfully!');
       } else {
-        console.error('Task failed:', result.error);
-        throw new Error(`Task execution failed: ${result.error?.message || 'Unknown error'}`);
+        console.error('Task failed with status:', result.status);
+        console.error('Task error:', result.error);
+        throw new Error(
+          `Task execution failed with status: ${result.status}, error: ${result.error?.message || 'Unknown error'}`
+        );
       }
     } catch (error) {
       console.error('Integration test failed:', error);
