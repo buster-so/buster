@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { BASE_URL } from './buster_rest/config';
 import type { RustApiError } from './buster_rest/errors';
 
-export interface FetchConfig extends RequestInit {
+interface FetchConfig extends RequestInit {
   baseURL?: string;
   params?: Record<string, unknown>;
 }
