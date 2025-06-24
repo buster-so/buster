@@ -9,7 +9,7 @@ config();
 console.log('🔍 Validating environment variables...');
 
 const env = {
-  PORT: process.env.PORT,
+  SERVER_PORT: process.env.SERVER_PORT,
   SUPABASE_URL: process.env.SUPABASE_URL,
   SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
   ELECTRIC_PROXY_URL: process.env.ELECTRIC_PROXY_URL,
