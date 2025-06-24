@@ -9,9 +9,8 @@ import {
   getOrganizationDataSource,
 } from '@buster/database';
 
-import analystWorkflow, {
-  type AnalystRuntimeContext,
-} from '@buster/ai/src/workflows/analyst-workflow';
+import { type AnalystRuntimeContext, analystWorkflow } from '@buster/ai';
+
 // Mastra workflow integration
 import { RuntimeContext } from '@mastra/core/runtime-context';
 
@@ -74,6 +73,10 @@ export const analystAgentTask: ReturnType<
   maxDuration: 1800, // 30 minutes for complex analysis
   run: async (payload): Promise<AnalystAgentTaskOutput> => {
     const startTime = Date.now();
+
+    if (!process.env.BRAINTRUST_KEY) {
+      throw new Error('BRAINTRUST_KEY is not set');
+    }
 
     // Initialize Braintrust logging for observability
     initLogger({

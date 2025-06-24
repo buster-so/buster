@@ -34,6 +34,10 @@ describe('Analyst Agent Task Integration Tests', () => {
   const TEST_MESSAGE_CONTENT = 'who is our top customer';
 
   beforeAll(() => {
+    if (!process.env.BRAINTRUST_KEY) {
+      throw new Error('BRAINTRUST_KEY is required for observability');
+    }
+
     // Initialize Braintrust logging for observability
     initLogger({
       apiKey: process.env.BRAINTRUST_KEY,
