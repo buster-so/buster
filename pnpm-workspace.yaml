@@ -5,6 +5,7 @@ packages:
   # Applications
   - 'apps/web'
   - 'apps/server' 
+  - 'apps/electric-server'
 
 catalog:
   '@supabase/supabase-js': "^2.50.0"

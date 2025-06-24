@@ -8,6 +8,7 @@
     "stop": "docker compose stop"
   },
   "dependencies": {
-    "@buster/database": "workspace:*"
+    "@buster/database": "workspace:*",
+    "@buster/typescript-config": "workspace:*"
   }
 }

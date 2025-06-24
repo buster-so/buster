@@ -1,0 +1,6 @@
+{
+  "extends": "@buster/typescript-config/base.json",
+  "compilerOptions": {},
+  "include": ["scripts/**/*"],
+  "exclude": ["node_modules"]
+}
