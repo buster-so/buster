@@ -16,6 +16,7 @@ const inputSchema = z.object({
   chatId: z.string().describe('Chat ID for the current operation'),
   isFollowUp: z.boolean().describe('Whether this is a follow-up message'),
   previousMessages: z.array(z.string()).describe('Array of previous messages for context'),
+  datasets: z.string().describe('Assembled YAML content of all available datasets for context'),
 });
 
 export const flagChatOutputSchema = z.object({
@@ -27,6 +28,7 @@ export const flagChatOutputSchema = z.object({
   chatId: z.string().describe('Chat ID for the current operation'),
   isFollowUp: z.boolean().describe('Whether this is a follow-up message'),
   previousMessages: z.array(z.string()).describe('Array of previous messages for context'),
+  datasets: z.string().describe('Assembled YAML content of all available datasets for context'),
 
   // New fields from this step
   toolCalled: z.string().describe('Name of the tool that was called by the agent'),

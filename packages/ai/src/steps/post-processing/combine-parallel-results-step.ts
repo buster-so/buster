@@ -20,6 +20,7 @@ export const combineParallelResultsOutputSchema = z.object({
   chatId: z.string().describe('Chat ID for the current operation'),
   isFollowUp: z.boolean().describe('Whether this is a follow-up message'),
   previousMessages: z.array(z.string()).describe('Array of previous messages for context'),
+  datasets: z.string().describe('Assembled YAML content of all available datasets for context'),
 
   // Fields from flag-chat step
   toolCalled: z.string().describe('Name of the tool that was called by the flag chat agent'),
@@ -87,6 +88,7 @@ const combineParallelResultsStepExecution = async ({
     chatId: flagChatResult.chatId,
     isFollowUp: flagChatResult.isFollowUp,
     previousMessages: flagChatResult.previousMessages,
+    datasets: flagChatResult.datasets,
 
     // Fields from flag-chat step
     toolCalled: flagChatResult.toolCalled,

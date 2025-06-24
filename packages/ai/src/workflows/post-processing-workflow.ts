@@ -22,6 +22,7 @@ const postProcessingWorkflowInputSchema = z.object({
   chatId: z.string().describe('Chat ID for the current operation'),
   isFollowUp: z.boolean().describe('Whether this is a follow-up message'),
   previousMessages: z.array(z.string()).describe('Array of previous messages for context'),
+  datasets: z.string().describe('Assembled YAML content of all available datasets for context'),
 });
 
 // Output schema that represents the flat object from either branch
