@@ -7,6 +7,7 @@
     "check": "biome check ${1:-.}",
     "check:fix": "biome check --write ${1:-.}",
     "ci:check": "pnpm run check && pnpm run typecheck",
+    "new:package": "bun run scripts/new-package.ts",
     "db:check": "pnpm --filter @buster/database run db:check",
     "db:generate": "pnpm --filter @buster/database run db:generate",
     "db:introspect": "pnpm --filter @buster/database run db:introspect",
