@@ -1,0 +1,11 @@
+{
+  "extends": ["//"],
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "dependsOn": ["@buster/database#dev"]
+    }
+  }
+}

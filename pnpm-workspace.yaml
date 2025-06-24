@@ -1,23 +1,23 @@
 packages:
   # Core packages
-  - 'packages/*'
-  
+  - "packages/*"
+
   # Applications
-  - 'apps/web'
-  - 'apps/server' 
-  - 'apps/electric-server'
+  - "apps/web"
+  - "apps/server"
+  - "apps/electric-server"
+  - "apps/trigger"
 
 catalog:
-  '@supabase/supabase-js': "^2.50.0"
-  '@trigger.dev/build': "^3.0.0"
-  '@trigger.dev/sdk': "^3.0.0"
+  "@supabase/supabase-js": "^2.50.0"
+  "@trigger.dev/build": "^3.0.0"
+  "@trigger.dev/sdk": "^3.0.0"
   ai: "^4.0.0"
   axios: "^1.10.0"
   drizzle-orm: "^0.44.2"
   hono: "^4.8.0"
-  '@mastra/core': "^0.10.6"
+  "@mastra/core": "^0.10.6"
   pg: "^8.16.2"
   uuid: "^11.0.0"
   vitest: "^3.2.4"
   zod: "^3.0.0"
-  
