@@ -335,14 +335,14 @@ describe('combine-parallel-results-step integration', () => {
         assumptions: [
           {
             descriptiveTitle: 'Stock bikes interpretation',
-            classification: 'dataInterpretation' as const,
+            classification: 'businessLogic' as const,
             explanation:
               'Interpreted "stock" bikes as finished goods ready for sale using finishedgoodsflag field',
             label: 'minor' as const,
           },
           {
             descriptiveTitle: 'North America countries selection',
-            classification: 'dataInterpretation' as const,
+            classification: 'segmentInterpretation' as const,
             explanation:
               'Selected US, CA, MX as North American countries, excluding American Samoa',
             label: 'major' as const,

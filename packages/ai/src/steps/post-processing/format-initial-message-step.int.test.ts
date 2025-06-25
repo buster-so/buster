@@ -70,14 +70,14 @@ describe('format-initial-message-step integration', () => {
       assumptions: [
         {
           descriptiveTitle: 'Stock bikes interpretation',
-          classification: 'dataInterpretation' as const,
+          classification: 'businessLogic' as const,
           explanation:
             'Interpreted "stock" bikes as finished goods ready for sale using finishedgoodsflag field without explicit confirmation',
           label: 'minor' as const,
         },
         {
           descriptiveTitle: 'North America geographic boundaries',
-          classification: 'dataInterpretation' as const,
+          classification: 'segmentInterpretation' as const,
           explanation:
             'Defined North America as US, Canada, and Mexico, excluding American Samoa and other territories which could significantly impact results',
           label: 'major' as const,
