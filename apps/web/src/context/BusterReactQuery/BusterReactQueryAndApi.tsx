@@ -12,7 +12,6 @@ import { isDev } from '@/config';
 import { useSupabaseContext } from '../Supabase/SupabaseContextProvider';
 import { persistOptions } from './createPersister';
 import { getQueryClient } from './getQueryClient';
-import { createHonoInstance } from '@/api/createHonoInstance';
 import { BASE_API_URL_V2 } from '@/api/buster_rest/config';
 
 const ReactQueryDevtools = dynamic(
@@ -51,11 +50,11 @@ export const BusterReactQueryProvider = ({ children }: { children: React.ReactNo
     nextApi.interceptors.request.use((v) => defaultAxiosRequestHandler(v, { checkTokenValidity }));
   }, []);
 
-  const busterApiContext = useMemo(() => {
-    return {
-      honoInstance: createHonoInstance(BASE_API_URL_V2, checkTokenValidity)
-    };
-  }, [checkTokenValidity]);
+  // const busterApiContext = useMemo(() => {
+  //   return {
+  //     honoInstance: createHonoInstance(BASE_API_URL_V2, checkTokenValidity)
+  //   };
+  // }, [checkTokenValidity]);
 
   useHotkeys('meta+shift+i', (e) => {
     e.preventDefault();
