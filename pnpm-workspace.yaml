@@ -5,6 +5,7 @@ packages:
   # Applications
   - "apps/web"
   - "apps/server"
+  - "apps/server2"
   - "apps/electric-server"
   - "apps/trigger"
 

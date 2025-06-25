@@ -1,0 +1,19 @@
+{
+  "name": "@buster/server2",
+  "type": "module",
+  "scripts": {
+    "build": "echo 'Build completed - using source files directly'",
+    "start": "vercel dev",
+    "deploy": "vercel"
+  },
+  "dependencies": {
+    "hono": "catalog:",
+    "@buster/server-shared": "workspace:*",
+    "@buster/database": "workspace:*",
+    "@buster/typescript-config": "workspace:*",
+    "@buster/vitest-config": "workspace:*"
+  },
+  "devDependencies": {
+    "vercel": "^44.2.0"
+  }
+}
