@@ -2,6 +2,7 @@ import { Agent, createStep } from '@mastra/core';
 import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
+import { generateSummary } from '../../tools/post-processing/generate-summary';
 import { MessageHistorySchema } from '../../utils/memory/types';
 import { anthropicCachedModel } from '../../utils/models/anthropic-cached';
 import { standardizeMessages } from '../../utils/standardizeMessages';
@@ -10,7 +11,7 @@ import { standardizeMessages } from '../../utils/standardizeMessages';
 const inputSchema = z.object({
   // Base fields
   conversationHistory: MessageHistorySchema.optional(),
-  name: z.string().describe('Name for the post-processing operation'),
+  userName: z.string().describe('Name for the post-processing operation'),
   messageId: z.string().describe('Message ID for the current operation'),
   userId: z.string().describe('User ID for the current operation'),
   chatId: z.string().describe('Chat ID for the current operation'),
@@ -39,19 +40,20 @@ const inputSchema = z.object({
             'timePeriodInterpretation',
             'timePeriodGranularity',
             'metricInterpretation',
-            'metricDefinition',
-            'businessLogic',
             'segmentInterpretation',
-            'segmentDefinition',
-            'requestScope',
             'quantityInterpretation',
+            'requestScope',
+            'metricDefinition',
+            'segmentDefinition',
+            'businessLogic',
+            'policyInterpretation',
+            'optimization',
             'aggregation',
             'filtering',
             'sorting',
             'grouping',
             'calculationMethod',
-            'dataRelevance',
-            'dataInterpretation',
+            'dataRelevance'
           ])
           .describe('The type/category of assumption made'),
         explanation: z
@@ -69,7 +71,7 @@ const inputSchema = z.object({
 export const formatInitialMessageOutputSchema = z.object({
   // Pass through all input fields
   conversationHistory: MessageHistorySchema.optional(),
-  name: z.string().describe('Name for the post-processing operation'),
+  userName: z.string().describe('Name for the post-processing operation'),
   messageId: z.string().describe('Message ID for the current operation'),
   userId: z.string().describe('User ID for the current operation'),
   chatId: z.string().describe('Chat ID for the current operation'),
@@ -96,19 +98,20 @@ export const formatInitialMessageOutputSchema = z.object({
             'timePeriodInterpretation',
             'timePeriodGranularity',
             'metricInterpretation',
-            'metricDefinition',
-            'businessLogic',
             'segmentInterpretation',
-            'segmentDefinition',
-            'requestScope',
             'quantityInterpretation',
+            'requestScope',
+            'metricDefinition',
+            'segmentDefinition',
+            'businessLogic',
+            'policyInterpretation',
+            'optimization',
             'aggregation',
             'filtering',
             'sorting',
             'grouping',
             'calculationMethod',
-            'dataRelevance',
-            'dataInterpretation',
+            'dataRelevance'
           ])
           .describe('The type/category of assumption made'),
         explanation: z
@@ -158,17 +161,29 @@ You operate in a loop to complete tasks:
   - Include a 3-6 word title that will serve as the header for the summary_message.
   - Include a simple summary message that briefly describes the issues and assumptions detected.
     - The summary message should be concise and informative, suitable for sending to the data team's Slack channel.
+    - The summary message should start with the user's name (e.g. Kevin reqeuested...)
+    - When referring to the "AI analyst" or "AI data analyst", you should refer to it by it's name, "Buster" (e.g. "Buster made assumptions..." instead of "The AI analyst made assumptions...")
 </output_format>
 `;
 
 const DEFAULT_OPTIONS = {
   maxSteps: 1,
+  temperature: 0,
+  maxTokens: 10000,
+  providerOptions: {
+    anthropic: {
+      disableParallelToolCalls: true,
+    },
+  },
 };
 
 export const initialMessageAgent = new Agent({
   name: 'Format Initial Message',
   instructions: initialMessageInstructions,
   model: anthropicCachedModel('claude-sonnet-4-20250514'),
+  tools: {
+    generateSummary,
+  },
   defaultGenerateOptions: DEFAULT_OPTIONS,
   defaultStreamOptions: DEFAULT_OPTIONS,
 });
@@ -198,6 +213,8 @@ export const formatInitialMessageStepExecution = async ({
 
     const contextMessage = `Issues and assumptions identified from the chat that require data team attention:
 
+User: ${inputData.userName}
+
 Issues Flagged: ${issuesAndAssumptions.flagged_issues}
 
 Major Assumptions Identified: ${
@@ -215,14 +232,9 @@ Generate a cohesive summary with title for the data team.`;
     const tracedInitialMessage = wrapTraced(
       async () => {
         const response = await initialMessageAgent.generate(messages, {
-          output: z.object({
-            title: z.string().describe('A concise title for the summary message, 3-6 words long.'),
-            summary_message: z
-              .string()
-              .describe('A simple and concise summary of the issues and assumptions.'),
-          }),
+          toolChoice: 'required',
         });
-        return response.object;
+        return response;
       },
       {
         name: 'Format Initial Message',
@@ -230,7 +242,19 @@ Generate a cohesive summary with title for the data team.`;
     );
 
     const initialResult = await tracedInitialMessage();
-    const summaryMessage = `${initialResult.title}: ${initialResult.summary_message}`;
+
+    // Extract tool call information
+    const toolCalls = initialResult.toolCalls || [];
+    if (toolCalls.length === 0) {
+      throw new Error('No tool was called by the format initial message agent');
+    }
+
+    const toolCall = toolCalls[0]; // Should only be one with maxSteps: 1
+    if (toolCall.toolName !== 'generateSummary') {
+      throw new Error(`Unexpected tool called: ${toolCall.toolName}`);
+    }
+
+    const summaryMessage = `${toolCall.args.title}: ${toolCall.args.summary_message}`;
 
     // Return all input data plus the formatted message
     return {

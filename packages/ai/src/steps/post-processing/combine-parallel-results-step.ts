@@ -14,7 +14,7 @@ const inputSchema = z.object({
 export const combineParallelResultsOutputSchema = z.object({
   // Base fields (from both steps, should be identical)
   conversationHistory: MessageHistorySchema.optional(),
-  name: z.string().describe('Name for the post-processing operation'),
+  userName: z.string().describe('Name for the post-processing operation'),
   messageId: z.string().describe('Message ID for the current operation'),
   userId: z.string().describe('User ID for the current operation'),
   chatId: z.string().describe('Chat ID for the current operation'),
@@ -43,19 +43,20 @@ export const combineParallelResultsOutputSchema = z.object({
             'timePeriodInterpretation',
             'timePeriodGranularity',
             'metricInterpretation',
-            'metricDefinition',
-            'businessLogic',
             'segmentInterpretation',
-            'segmentDefinition',
-            'requestScope',
             'quantityInterpretation',
+            'requestScope',
+            'metricDefinition',
+            'segmentDefinition',
+            'businessLogic',
+            'policyInterpretation',
+            'optimization',
             'aggregation',
             'filtering',
             'sorting',
             'grouping',
             'calculationMethod',
-            'dataRelevance',
-            'dataInterpretation',
+            'dataRelevance'
           ])
           .describe('The type/category of assumption made'),
         explanation: z
@@ -82,7 +83,7 @@ export const combineParallelResultsStepExecution = async ({
   return {
     // Base fields (taking from flag-chat result, they should be identical)
     conversationHistory: flagChatResult.conversationHistory,
-    name: flagChatResult.name,
+    userName: flagChatResult.userName,
     messageId: flagChatResult.messageId,
     userId: flagChatResult.userId,
     chatId: flagChatResult.chatId,

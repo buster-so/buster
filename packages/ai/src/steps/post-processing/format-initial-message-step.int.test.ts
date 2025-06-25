@@ -13,23 +13,45 @@ describe('format-initial-message-step integration', () => {
       {
         content: [
           {
+            text: '<todo_list>\n        - Below are the items on your TODO list:\n        [ ] Determine how "Mountain-500 series bikes" are identified in the product data\n[ ] Determine how to filter for "stock" bikes versus other types\n[ ] Determine how "online" sales are identified versus other sales channels\n[ ] Determine how "NA customers" are identified in the customer data\n[ ] Determine how "ColonialVoice card" payment method is identified\n[ ] Determine the visualization type and axes for displaying the count\n        </todo_list>',
+            type: 'text',
+          },
+        ],
+        role: 'user',
+      },
+      {
+        content: [
+          {
             args: {
               final_response:
                 "I found the answer to your specific question about Mountain-500 series bikes sold online to North American customers using ColonialVoice cards.\n\n**Result: 47 Mountain-500 series bikes were sold under these exact conditions.**\n\nHere's how I identified and filtered the data based on your requirements:\n\n- **Mountain-500 series bikes**: Found 10 different Mountain-500 variants in the database (5 black and 5 silver in various sizes: 40, 42, 44, 48, 52)\n- **Stock bikes**: Filtered for finished goods ready for sale (using the `finishedgoodsflag`)\n- **Online sales**: Used the online order flag to identify web-based purchases\n- **NA customers**: Included customers from United States, Canada, and Mexico\n- **ColonialVoice card**: Filtered specifically for this credit card type (which exists in the database alongside Vista, SuperiorCard, and Distinguish)\n\nThe analysis shows that despite the very specific filtering criteria, there was still a meaningful volume of 47 bikes sold through this particular channel combination. This suggests that ColonialVoice cardholders in North America represent an active customer segment for the Mountain-500 product line in online sales.",
             },
-            toolCallId: 'toolu_01WAfvCoQtpBoNdmNi17LKCe',
+            toolCallId: 'toolu_06WAfvCoQtpBoNdmNi17LKCe',
             toolName: 'doneTool',
             type: 'tool-call',
           },
         ],
         role: 'assistant',
       },
+      {
+        content: [
+          {
+            result: {
+              success: true,
+            },
+            toolCallId: 'toolu_06WAfvCoQtpBoNdmNi17LKCe',
+            toolName: 'doneTool',
+            type: 'tool-result',
+          },
+        ],
+        role: 'tool',
+      },
     ];
 
     // Mock combined input from parallel steps with major assumptions
     const mockInput = {
       conversationHistory: mockConversationHistory,
-      name: 'Test Initial Message Analysis',
+      userName: 'John',
       messageId: 'msg_12345',
       userId: 'user_67890',
       chatId: 'chat_abcde',
@@ -48,14 +70,14 @@ describe('format-initial-message-step integration', () => {
       assumptions: [
         {
           descriptiveTitle: 'Stock bikes interpretation',
-          classification: 'dataInterpretation' as const,
+          classification: 'businessLogic' as const,
           explanation:
             'Interpreted "stock" bikes as finished goods ready for sale using finishedgoodsflag field without explicit confirmation',
           label: 'minor' as const,
         },
         {
           descriptiveTitle: 'North America geographic boundaries',
-          classification: 'dataInterpretation' as const,
+          classification: 'segmentInterpretation' as const,
           explanation:
             'Defined North America as US, Canada, and Mexico, excluding American Samoa and other territories which could significantly impact results',
           label: 'major' as const,
@@ -78,7 +100,7 @@ describe('format-initial-message-step integration', () => {
 
     // Check that all input fields are passed through
     expect(result.conversationHistory).toEqual(mockConversationHistory);
-    expect(result.name).toBe(mockInput.name);
+    expect(result.userName).toBe(mockInput.userName);
     expect(result.messageId).toBe(mockInput.messageId);
     expect(result.userId).toBe(mockInput.userId);
     expect(result.chatId).toBe(mockInput.chatId);
@@ -131,7 +153,7 @@ describe('format-initial-message-step integration', () => {
     // Mock input with only minor assumptions
     const mockInput = {
       conversationHistory: mockConversationHistory,
-      name: 'Test Simple Query Analysis',
+      userName: 'John',
       messageId: 'msg_54321',
       userId: 'user_67890',
       chatId: 'chat_abcde',

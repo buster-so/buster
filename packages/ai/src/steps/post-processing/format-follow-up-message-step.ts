@@ -2,6 +2,7 @@ import { Agent, createStep } from '@mastra/core';
 import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
+import { generateUpdateMessage } from '../../tools/post-processing/generate-update-message';
 import { MessageHistorySchema } from '../../utils/memory/types';
 import { anthropicCachedModel } from '../../utils/models/anthropic-cached';
 import { standardizeMessages } from '../../utils/standardizeMessages';
@@ -10,7 +11,7 @@ import { standardizeMessages } from '../../utils/standardizeMessages';
 const inputSchema = z.object({
   // Base fields
   conversationHistory: MessageHistorySchema.optional(),
-  name: z.string().describe('Name for the post-processing operation'),
+  userName: z.string().describe('Name for the post-processing operation'),
   messageId: z.string().describe('Message ID for the current operation'),
   userId: z.string().describe('User ID for the current operation'),
   chatId: z.string().describe('Chat ID for the current operation'),
@@ -39,19 +40,20 @@ const inputSchema = z.object({
             'timePeriodInterpretation',
             'timePeriodGranularity',
             'metricInterpretation',
-            'metricDefinition',
-            'businessLogic',
             'segmentInterpretation',
-            'segmentDefinition',
-            'requestScope',
             'quantityInterpretation',
+            'requestScope',
+            'metricDefinition',
+            'segmentDefinition',
+            'businessLogic',
+            'policyInterpretation',
+            'optimization',
             'aggregation',
             'filtering',
             'sorting',
             'grouping',
             'calculationMethod',
             'dataRelevance',
-            'dataInterpretation',
           ])
           .describe('The type/category of assumption made'),
         explanation: z
@@ -69,7 +71,7 @@ const inputSchema = z.object({
 export const formatFollowUpMessageOutputSchema = z.object({
   // Pass through all input fields
   conversationHistory: MessageHistorySchema.optional(),
-  name: z.string().describe('Name for the post-processing operation'),
+  userName: z.string().describe('Name for the post-processing operation'),
   messageId: z.string().describe('Message ID for the current operation'),
   userId: z.string().describe('User ID for the current operation'),
   chatId: z.string().describe('Chat ID for the current operation'),
@@ -96,19 +98,20 @@ export const formatFollowUpMessageOutputSchema = z.object({
             'timePeriodInterpretation',
             'timePeriodGranularity',
             'metricInterpretation',
-            'metricDefinition',
-            'businessLogic',
             'segmentInterpretation',
-            'segmentDefinition',
-            'requestScope',
             'quantityInterpretation',
+            'requestScope',
+            'metricDefinition',
+            'segmentDefinition',
+            'businessLogic',
+            'policyInterpretation',
+            'optimization',
             'aggregation',
             'filtering',
             'sorting',
             'grouping',
             'calculationMethod',
             'dataRelevance',
-            'dataInterpretation',
           ])
           .describe('The type/category of assumption made'),
         explanation: z
@@ -159,12 +162,22 @@ You operate in a loop to complete tasks:
 
 const DEFAULT_OPTIONS = {
   maxSteps: 1,
+  temperature: 0,
+  maxTokens: 10000,
+  providerOptions: {
+    anthropic: {
+      disableParallelToolCalls: true,
+    },
+  },
 };
 
 export const followUpMessageAgent = new Agent({
   name: 'Format Follow-up Message',
   instructions: followUpMessageInstructions,
   model: anthropicCachedModel('claude-sonnet-4-20250514'),
+  tools: {
+    generateUpdateMessage,
+  },
   defaultGenerateOptions: DEFAULT_OPTIONS,
   defaultStreamOptions: DEFAULT_OPTIONS,
 });
@@ -183,6 +196,8 @@ export const formatFollowUpMessageStepExecution = async ({
 
     const contextMessage = `New issues and assumptions identified from the latest chat messages:
 
+User: ${inputData.userName}
+
 Issues Flagged: ${issuesAndAssumptions.flagged_issues}
 
 Assumptions Identified: ${
@@ -200,15 +215,9 @@ Generate a concise update message for the data team.`;
     const tracedFollowUpMessage = wrapTraced(
       async () => {
         const response = await followUpMessageAgent.generate(messages, {
-          output: z.object({
-            update_message: z
-              .string()
-              .describe(
-                'A concise summary of the new issues and assumptions within the context of the Slack thread.'
-              ),
-          }),
+          toolChoice: 'required',
         });
-        return response.object;
+        return response;
       },
       {
         name: 'Format Follow-up Message',
@@ -216,7 +225,19 @@ Generate a concise update message for the data team.`;
     );
 
     const followUpResult = await tracedFollowUpMessage();
-    const updateMessage = followUpResult.update_message;
+
+    // Extract tool call information
+    const toolCalls = followUpResult.toolCalls || [];
+    if (toolCalls.length === 0) {
+      throw new Error('No tool was called by the format follow-up message agent');
+    }
+
+    const toolCall = toolCalls[0]; // Should only be one with maxSteps: 1
+    if (toolCall.toolName !== 'generateUpdateMessage') {
+      throw new Error(`Unexpected tool called: ${toolCall.toolName}`);
+    }
+
+    const updateMessage = toolCall.args.update_message;
 
     // Return all input data plus the formatted message
     return {
