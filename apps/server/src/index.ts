@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { handle } from 'hono/vercel';
 import { z } from 'zod';
 
 // Import custom middleware
@@ -9,6 +10,8 @@ import { HTTPException } from 'hono/http-exception';
 import healthcheckRoutes from './api/healthcheck';
 // Import API route modules
 import v2Routes from './api/v2';
+
+export const runtime = 'nodejs';
 
 // Create main Hono app instance
 const app = new Hono();
@@ -57,3 +60,14 @@ export default {
   fetch: app.fetch,
 };
 export type AppType = typeof routes;
+
+export const GET = handle(app);
+export const POST = handle(app);
+export const PATCH = handle(app);
+export const PUT = handle(app);
+export const DELETE = handle(app);
+export const OPTIONS = handle(app);
+export const HEAD = handle(app);
+export const TRACE = handle(app);
+export const CONNECT = handle(app);
+export const ALL = handle(app);

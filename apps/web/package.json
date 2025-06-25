@@ -21,7 +21,7 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:debug": "playwright test --debug"
-   },
+  },
   "engines": {
     "node": ">=22.9.0"
   },
@@ -57,13 +57,13 @@
     "@storybook/addon-actions": "^8.6.12",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "catalog:",
-    "@tanstack/query-sync-storage-persister": "^5.80.10",
+    "@tanstack/query-sync-storage-persister": "^5.81.2",
     "@tanstack/react-form": "^1.12.3",
-    "@tanstack/react-query": "^5.80.10",
-    "@tanstack/react-query-devtools": "^5.80.10",
-    "@tanstack/react-query-persist-client": "^5.80.10",
+    "@tanstack/react-query": "^5.81.2",
+    "@tanstack/react-query-devtools": "^5.81.2",
+    "@tanstack/react-query-persist-client": "^5.81.2",
     "@tanstack/react-table": "^8.21.3",
-    "@tanstack/react-virtual": "^3.13.10",
+    "@tanstack/react-virtual": "^3.13.11",
     "@testing-library/jest-dom": "^6.6.3",
     "@types/prettier": "^2.7.3",
     "@types/react-color": "^3.0.13",

@@ -263,26 +263,26 @@ importers:
         specifier: 'catalog:'
         version: 2.50.0
       '@tanstack/query-sync-storage-persister':
-        specifier: ^5.80.10
-        version: 5.80.10
+        specifier: ^5.81.2
+        version: 5.81.2
       '@tanstack/react-form':
         specifier: ^1.12.3
         version: 1.12.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/react-query':
-        specifier: ^5.80.10
-        version: 5.80.10(react@18.3.1)
+        specifier: ^5.81.2
+        version: 5.81.2(react@18.3.1)
       '@tanstack/react-query-devtools':
-        specifier: ^5.80.10
-        version: 5.80.10(@tanstack/react-query@5.80.10(react@18.3.1))(react@18.3.1)
+        specifier: ^5.81.2
+        version: 5.81.2(@tanstack/react-query@5.81.2(react@18.3.1))(react@18.3.1)
       '@tanstack/react-query-persist-client':
-        specifier: ^5.80.10
-        version: 5.80.10(@tanstack/react-query@5.80.10(react@18.3.1))(react@18.3.1)
+        specifier: ^5.81.2
+        version: 5.81.2(@tanstack/react-query@5.81.2(react@18.3.1))(react@18.3.1)
       '@tanstack/react-table':
         specifier: ^8.21.3
         version: 8.21.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/react-virtual':
-        specifier: ^3.13.10
-        version: 3.13.10(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^3.13.11
+        version: 3.13.11(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@testing-library/jest-dom':
         specifier: ^6.6.3
         version: 6.6.3
@@ -4708,17 +4708,17 @@ packages:
   '@tanstack/form-core@1.12.3':
     resolution: {integrity: sha512-H59XYP8Jxg8vT4IYIZa1BHkYiyiZqFcLSD2HpxefHP/vlG06/spCySVe/vGAP7IJgHHSAlEqBhQoy1Mg2ruTRA==}
 
-  '@tanstack/query-core@5.80.10':
-    resolution: {integrity: sha512-mUNQOtzxkjL6jLbyChZoSBP6A5gQDVRUiPvW+/zw/9ftOAz+H754zCj3D8PwnzPKyHzGkQ9JbH48ukhym9LK1Q==}
+  '@tanstack/query-core@5.81.2':
+    resolution: {integrity: sha512-QLYkPdrudoMATDFa3MiLEwRhNnAlzHWDf0LKaXUqJd0/+QxN8uTPi7bahRlxoAyH0UbLMBdeDbYzWALj7THOtw==}
 
-  '@tanstack/query-devtools@5.80.0':
-    resolution: {integrity: sha512-D6gH4asyjaoXrCOt5vG5Og/YSj0D/TxwNQgtLJIgWbhbWCC/emu2E92EFoVHh4ppVWg1qT2gKHvKyQBEFZhCuA==}
+  '@tanstack/query-devtools@5.81.2':
+    resolution: {integrity: sha512-jCeJcDCwKfoyyBXjXe9+Lo8aTkavygHHsUHAlxQKKaDeyT0qyQNLKl7+UyqYH2dDF6UN/14873IPBHchcsU+Zg==}
 
-  '@tanstack/query-persist-client-core@5.80.10':
-    resolution: {integrity: sha512-3fcLDW4hDkiGfG/NRj6hgl/+G94lsgtx/Wj9jxuUN0LiawKpIMfGrSNCERFPYpJMuTtCyX9A2mqHE++sV13lsA==}
+  '@tanstack/query-persist-client-core@5.81.2':
+    resolution: {integrity: sha512-FSLHr3DL+eezaKNiAexM7+KdgpXvLmUuMQhtORPIC7QuhemM6kfzcrQC5AN34zhvVh2PZXRcib2JnHKeTMjyyg==}
 
-  '@tanstack/query-sync-storage-persister@5.80.10':
-    resolution: {integrity: sha512-Y/bSl4+SKAQArakkJ9cJRFtIhBO9qUdZQ3rXvO9uFB/X5j1+QDql3K/dUXWPs3yEg0fJhJIIw5chGL8UoBydig==}
+  '@tanstack/query-sync-storage-persister@5.81.2':
+    resolution: {integrity: sha512-rNY3SSo2vIbdoSUoYmHf7eNQe8tat+Dzw+3ooOJOLVp+qTqkdFS4unlQLSkUgEmxLtj9789Sq3KRnWtd943ojA==}
 
   '@tanstack/react-form@1.12.3':
     resolution: {integrity: sha512-IlWLVKizjV+CzMgzaSac61bS4/UeSL2gceGOVIv+gKs2SriDIyylJd8AcqsKE/kNplm1K0NYXIF2Vk/re+JfOg==}
@@ -4732,20 +4732,20 @@ packages:
       vinxi:
         optional: true
 
-  '@tanstack/react-query-devtools@5.80.10':
-    resolution: {integrity: sha512-6JL63fSc7kxyGOLV2w466SxhMn/m7LZk/ximQciy6OpVt+n2A8Mq3S0QwhIzfm4WEwLK/F3OELfzRToQburnYA==}
+  '@tanstack/react-query-devtools@5.81.2':
+    resolution: {integrity: sha512-TX0OQ4cbgX6z2uN8c9x0QUNbyePGyUGdcgrGnV6TYEJc7KPT8PqeASuzoA5NGw1CiMGvyFAkIGA2KipvhM9d1g==}
     peerDependencies:
-      '@tanstack/react-query': ^5.80.10
+      '@tanstack/react-query': ^5.81.2
       react: ^18 || ^19
 
-  '@tanstack/react-query-persist-client@5.80.10':
-    resolution: {integrity: sha512-0LcPhQElmffSNXh+omPOOZJnutk7Z7NMTrWl9WP3aH7Xn4OaFXImkyey1ajez5o23D8TFwj3kHmi/85J+E6sgQ==}
+  '@tanstack/react-query-persist-client@5.81.2':
+    resolution: {integrity: sha512-HUlnB7FGqN/he4AOvR0vNA06Wn4dg3rEK7EgzenWfc0gQ9Aa6thqTWgT3Q27CnKiTkzhRn2uZJKRseTP4g54LQ==}
     peerDependencies:
-      '@tanstack/react-query': ^5.80.10
+      '@tanstack/react-query': ^5.81.2
       react: ^18 || ^19
 
-  '@tanstack/react-query@5.80.10':
-    resolution: {integrity: sha512-6zM098J8sLy9oU60XAdzUlAH4wVzoMVsWUWiiE/Iz4fd67PplxeyL4sw/MPcVJJVhbwGGXCsHn9GrQt2mlAzig==}
+  '@tanstack/react-query@5.81.2':
+    resolution: {integrity: sha512-pe8kFlTrL2zFLlcAj2kZk9UaYYHDk9/1hg9EBaoO3cxDhOZf1FRGJeziSXKrVZyxIfs7b3aoOj/bw7Lie0mDUg==}
     peerDependencies:
       react: ^18 || ^19
 
@@ -4762,8 +4762,8 @@ packages:
       react: '>=16.8'
       react-dom: '>=16.8'
 
-  '@tanstack/react-virtual@3.13.10':
-    resolution: {integrity: sha512-nvrzk4E9mWB4124YdJ7/yzwou7IfHxlSef6ugCFcBfRmsnsma3heciiiV97sBNxyc3VuwtZvmwXd0aB5BpucVw==}
+  '@tanstack/react-virtual@3.13.11':
+    resolution: {integrity: sha512-u5EaOSJOq08T9NXFuDopMdxZBNDFuEMohIFFU45fBYDXXh9SjYdbpNq1OLFSOpQnDRPjqgmY96ipZTkzom9t9Q==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
@@ -4775,8 +4775,8 @@ packages:
     resolution: {integrity: sha512-ldZXEhOBb8Is7xLs01fR3YEc3DERiz5silj8tnGkFZytt1abEvl/GhUmCE0PMLaMPTa3Jk4HbKmRlHmu+gCftg==}
     engines: {node: '>=12'}
 
-  '@tanstack/virtual-core@3.13.10':
-    resolution: {integrity: sha512-sPEDhXREou5HyZYqSWIqdU580rsF6FGeN7vpzijmP3KTiOGjOMZASz4Y6+QKjiFQwhWrR58OP8izYaNGVxvViA==}
+  '@tanstack/virtual-core@3.13.11':
+    resolution: {integrity: sha512-ORL6UyuZJ0D9X33LDR4TcgcM+K2YiS2j4xbvH1vnhhObwR1Z4dKwPTL/c0kj2Yeb4Yp2lBv1wpyVaqlohk8zpg==}
 
   '@techteamer/ocsp@1.0.1':
     resolution: {integrity: sha512-q4pW5wAC6Pc3JI8UePwE37CkLQ5gDGZMgjSX4MEEm4D4Di59auDQ8UNIDzC4gRnPNmmcwjpPxozq8p5pjiOmOw==}
@@ -16071,18 +16071,18 @@ snapshots:
     dependencies:
       '@tanstack/store': 0.7.1
 
-  '@tanstack/query-core@5.80.10': {}
+  '@tanstack/query-core@5.81.2': {}
 
-  '@tanstack/query-devtools@5.80.0': {}
+  '@tanstack/query-devtools@5.81.2': {}
 
-  '@tanstack/query-persist-client-core@5.80.10':
+  '@tanstack/query-persist-client-core@5.81.2':
     dependencies:
-      '@tanstack/query-core': 5.80.10
+      '@tanstack/query-core': 5.81.2
 
-  '@tanstack/query-sync-storage-persister@5.80.10':
+  '@tanstack/query-sync-storage-persister@5.81.2':
     dependencies:
-      '@tanstack/query-core': 5.80.10
-      '@tanstack/query-persist-client-core': 5.80.10
+      '@tanstack/query-core': 5.81.2
+      '@tanstack/query-persist-client-core': 5.81.2
 
   '@tanstack/react-form@1.12.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
@@ -16094,21 +16094,21 @@ snapshots:
     transitivePeerDependencies:
       - react-dom
 
-  '@tanstack/react-query-devtools@5.80.10(@tanstack/react-query@5.80.10(react@18.3.1))(react@18.3.1)':
+  '@tanstack/react-query-devtools@5.81.2(@tanstack/react-query@5.81.2(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@tanstack/query-devtools': 5.80.0
-      '@tanstack/react-query': 5.80.10(react@18.3.1)
+      '@tanstack/query-devtools': 5.81.2
+      '@tanstack/react-query': 5.81.2(react@18.3.1)
       react: 18.3.1
 
-  '@tanstack/react-query-persist-client@5.80.10(@tanstack/react-query@5.80.10(react@18.3.1))(react@18.3.1)':
+  '@tanstack/react-query-persist-client@5.81.2(@tanstack/react-query@5.81.2(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@tanstack/query-persist-client-core': 5.80.10
-      '@tanstack/react-query': 5.80.10(react@18.3.1)
+      '@tanstack/query-persist-client-core': 5.81.2
+      '@tanstack/react-query': 5.81.2(react@18.3.1)
       react: 18.3.1
 
-  '@tanstack/react-query@5.80.10(react@18.3.1)':
+  '@tanstack/react-query@5.81.2(react@18.3.1)':
     dependencies:
-      '@tanstack/query-core': 5.80.10
+      '@tanstack/query-core': 5.81.2
       react: 18.3.1
 
   '@tanstack/react-store@0.7.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
@@ -16124,9 +16124,9 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@tanstack/react-virtual@3.13.10(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@tanstack/react-virtual@3.13.11(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@tanstack/virtual-core': 3.13.10
+      '@tanstack/virtual-core': 3.13.11
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
@@ -16134,7 +16134,7 @@ snapshots:
 
   '@tanstack/table-core@8.21.3': {}
 
-  '@tanstack/virtual-core@3.13.10': {}
+  '@tanstack/virtual-core@3.13.11': {}
 
   '@techteamer/ocsp@1.0.1':
     dependencies:
@@ -18433,8 +18433,8 @@ snapshots:
       '@typescript-eslint/parser': 8.34.1(eslint@8.57.1)(typescript@5.8.3)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.31.0)(eslint@8.57.1)
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1)
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
       eslint-plugin-jsx-a11y: 6.10.2(eslint@8.57.1)
       eslint-plugin-react: 7.37.5(eslint@8.57.1)
       eslint-plugin-react-hooks: 5.2.0(eslint@8.57.1)
@@ -18457,7 +18457,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.31.0)(eslint@8.57.1):
+  eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
       debug: 4.4.1
@@ -18468,22 +18468,22 @@ snapshots:
       tinyglobby: 0.2.14
       unrs-resolver: 1.9.0
     optionalDependencies:
-      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1)
+      eslint-plugin-import: 2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1):
+  eslint-module-utils@2.12.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
       '@typescript-eslint/parser': 8.34.1(eslint@8.57.1)(typescript@5.8.3)
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.31.0)(eslint@8.57.1)
+      eslint-import-resolver-typescript: 3.10.1(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1)
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1):
+  eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9
@@ -18494,7 +18494,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.1
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1)(eslint@8.57.1)
+      eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.10.1(eslint-plugin-import@2.31.0(@typescript-eslint/parser@8.34.1(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1))(eslint@8.57.1))(eslint@8.57.1)
       hasown: 2.0.2
       is-core-module: 2.16.1
       is-glob: 4.0.3
