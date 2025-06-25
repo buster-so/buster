@@ -308,7 +308,7 @@ describe('flag-chat-step integration', () => {
 
     const mockInput = {
       conversationHistory: mockConversationHistory,
-      name: 'Test Flag Chat Analysis',
+      user_name: 'John',
       messageId: 'msg_12345',
       userId: 'user_67890',
       chatId: 'chat_abcde',
@@ -325,7 +325,7 @@ describe('flag-chat-step integration', () => {
     expect(result).toBeDefined();
     expect(result.toolCalled).toBeDefined();
     expect(typeof result.toolCalled).toBe('string');
-    expect(result.name).toBe(mockInput.name);
+    expect(result.user_name).toBe(mockInput.user_name);
     expect(result.messageId).toBe(mockInput.messageId);
     expect(result.userId).toBe(mockInput.userId);
     expect(result.chatId).toBe(mockInput.chatId);

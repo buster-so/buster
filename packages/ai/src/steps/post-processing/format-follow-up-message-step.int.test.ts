@@ -51,7 +51,7 @@ describe('format-follow-up-message-step integration', () => {
     // Mock combined input from parallel steps with follow-up context
     const mockInput = {
       conversationHistory: mockConversationHistory,
-      name: 'Test Follow-up Message Analysis',
+      user_name: 'John',
       messageId: 'msg_67890',
       userId: 'user_67890',
       chatId: 'chat_abcde',
@@ -95,7 +95,7 @@ describe('format-follow-up-message-step integration', () => {
 
     // Check that all input fields are passed through
     expect(result.conversationHistory).toEqual(mockConversationHistory);
-    expect(result.name).toBe(mockInput.name);
+    expect(result.user_name).toBe(mockInput.user_name);
     expect(result.messageId).toBe(mockInput.messageId);
     expect(result.userId).toBe(mockInput.userId);
     expect(result.chatId).toBe(mockInput.chatId);

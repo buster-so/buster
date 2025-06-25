@@ -16,7 +16,7 @@ import { MessageHistorySchema } from '../utils/memory/types';
 // Input schema for the post-processing workflow
 const postProcessingWorkflowInputSchema = z.object({
   conversationHistory: MessageHistorySchema.optional(),
-  name: z.string().describe('Name for the post-processing operation'),
+  user_name: z.string().describe('Name for the post-processing operation'),
   messageId: z.string().describe('Message ID for the current operation'),
   userId: z.string().describe('User ID for the current operation'),
   chatId: z.string().describe('Chat ID for the current operation'),
