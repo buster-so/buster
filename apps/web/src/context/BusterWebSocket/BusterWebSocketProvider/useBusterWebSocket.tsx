@@ -13,8 +13,7 @@ import { useMemoizedFn } from '@/hooks';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import type { SupabaseContextReturnType } from '../../Supabase';
 import { useSupabaseContext } from '../../Supabase';
-
-const BUSTER_WS_URL = `${process.env.NEXT_PUBLIC_WEB_SOCKET_URL}/api/v1/ws`;
+import { BUSTER_WS_URL } from './config';
 
 export type BusterOnCallback = {
   callback: BusterSocketResponse['callback'];
