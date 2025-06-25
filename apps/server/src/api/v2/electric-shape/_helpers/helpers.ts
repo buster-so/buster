@@ -1,19 +1,24 @@
+if (!process.env.ELECTRIC_PROXY_URL) {
+  throw new Error('ELECTRIC_PROXY_URL is not set');
+}
+
+if (process.env.NODE_ENV !== 'development' && !process.env.ELECTRIC_SOURCE_ID) {
+  console.warn('ELECTRIC_SOURCE_ID is not set');
+}
+
 export const getElectricShapeUrl = (requestUrl: string) => {
   const url = new URL(requestUrl);
 
-  const electricUrl = process.env.ELECTRIC_PROXY_URL;
-
-  if (!electricUrl) {
-    throw new Error('ELECTRIC_PROXY_URL is not set');
-  }
-
-  const baseUrl =
-    electricUrl && electricUrl !== 'undefined' ? electricUrl : 'http://localhost:3000';
+  const baseUrl = process.env.ELECTRIC_PROXY_URL || '';
 
   // Parse the base URL and replace the path with /v1/shape
   const baseUrlObj = new URL(baseUrl);
   baseUrlObj.pathname = '/v1/shape';
   const originUrl = new URL(baseUrlObj.toString());
+
+  if (process.env.ELECTRIC_SOURCE_ID) {
+    originUrl.searchParams.set('source_id', process.env.ELECTRIC_SOURCE_ID);
+  }
 
   // Copy over the relevant query params that the Electric client adds
   // so that we return the right part of the Shape log.
