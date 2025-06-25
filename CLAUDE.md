@@ -1,117 +1,156 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code when working with code in this repository.
+This file provides guidance to Claude Code when working with code in this monorepo.
 
-## Development Standards
+## Monorepo Structure
 
-### Code Quality Tools
+This is a pnpm-based monorepo using Turborepo with the following structure:
 
-This project uses a comprehensive toolchain to ensure high code quality and consistency:
+### Apps (`@buster-app/*`)
+- `apps/web` - Next.js frontend application
+- `apps/server` - Node.js/Hono backend server  
+- `apps/trigger` - Background job processing with Trigger.dev v3
+- `apps/electric-server` - Electric SQL sync server
+- `apps/api` - Rust backend API (legacy)
+- `apps/cli` - Command-line tools (Rust)
 
-#### Biome (Linting & Formatting)
-- **Always run Biome** before committing code
-- Use `npm run check [path]` to check for linting and formatting issues
-- Use `npm run check:fix [path]` to auto-fix linting, formatting, and import organization
-- Biome configuration is in `biome.json` with strict rules and workspace-specific overrides
-- Key rules enforced:
-  - `useImportType: "error"` - Enforces type-only imports for better performance
-  - `noExplicitAny: "warn"` - Discourages loose typing (avoid `any`, prefer specific types)
-  - `noUnusedImports/Variables: "error"` - Keeps code clean
-  - `noConsoleLog: "warn"` - Prevents console logs in production code (disabled in tests)
+### Packages (`@buster/*`)
+- `packages/ai` - AI agents, tools, and workflows using Mastra framework
+- `packages/database` - Database schema, migrations, and utilities (Drizzle ORM)
+- `packages/data-source` - Data source adapters (PostgreSQL, MySQL, BigQuery, Snowflake, etc.)
+- `packages/access-controls` - Permission and access control logic
+- `packages/stored-values` - Stored values management
+- `packages/rerank` - Document reranking functionality
+- `packages/server-shared` - Shared server types and utilities
+- `packages/test-utils` - Shared testing utilities
+- `packages/vitest-config` - Shared Vitest configuration
+- `packages/typescript-config` - Shared TypeScript configuration
+- `packages/web-tools` - Web scraping and research tools
+- `packages/slack` - Slack integration
+- `packages/supabase` - Supabase setup and configuration
 
-#### TypeScript
-- **Strict mode enabled** with additional safety checks
-- `noUncheckedIndexedAccess: true` - Prevents array/object access bugs
-- `noUnusedLocals/Parameters: true` - Ensures clean code
-- Path aliases configured for clean imports (see individual package tsconfig.json files)
-- Use `tsc` directly for type checking: `tsc --noEmit`
-- Or use workspace-specific type checking: `cd packages/ai && tsc --noEmit`
+## Development Workflow
 
-#### Testing with Vitest
-- **All tests use Vitest** for consistency across the monorepo
-- Global vitest config in `vitest.config.ts` with workspace support
-- Environment variables automatically loaded from `.env` files
-- Test timeouts set to 30 seconds for LLM operations
+When writing code, follow this workflow to ensure code quality:
 
-### Development Commands
+### 1. Write Modular, Testable Functions
+- Create small, focused functions with single responsibilities
+- Design functions to be easily testable with clear inputs/outputs
+- Use dependency injection for external dependencies
+- Follow existing patterns in the codebase
 
-#### Linting & Formatting
+### 2. Build Features by Composing Functions
+- Combine modular functions to create complete features
+- Keep business logic separate from infrastructure concerns
+- Use proper error handling at each level
+
+### 3. Ensure Type Safety
 ```bash
-# Lint specific files or directories
-npm run lint path/to/file.ts
-npm run lint packages/ai/src
+# Build entire monorepo to check types
+turbo run build
 
-# Auto-fix linting issues
-npm run lint:fix path/to/file.ts
-npm run lint:fix packages/ai
+# Build specific package/app
+turbo run build --filter=@buster/ai
+turbo run build --filter=@buster-app/web
 
-# Format code
-npm run format path/to/file.ts
-npm run format packages/ai
+# Type check without building
+turbo run typecheck
+turbo run typecheck --filter=@buster/database
+```
 
-# Auto-fix formatting
-npm run format:fix path/to/file.ts
-pnpm run format:fix packages/ai
-
-# Complete check (lint + format + organize imports)
+### 4. Run Biome for Linting & Formatting
+```bash
+# Check files with Biome
 pnpm run check path/to/file.ts
 pnpm run check packages/ai
 
-# Complete check with auto-fix
+# Auto-fix linting, formatting, and import organization
 pnpm run check:fix path/to/file.ts
 pnpm run check:fix packages/ai
 ```
 
-#### Testing
+### 5. Run Tests with Vitest
 ```bash
 # Run all tests
 pnpm run test
 
-# Run specific test files or patterns
-pnpm run test:file path/to/test.ts
-pnpm run test:file packages/ai/tests/workflows/**/*
+# Run tests for specific package
+turbo run test --filter=@buster/ai
+
+# Run specific test file
+pnpm run test path/to/file.test.ts
 
 # Watch mode for development
 pnpm run test:watch
-pnpm run test:watch:file path/to/test.ts
-
-# Coverage and UI
-pnpm run test:coverage
-pnpm run test:ui
 ```
 
-#### TypeScript Checking
-```bash
-# Type check entire project
-tsc --noEmit
+## Code Quality Standards
 
-# Type check specific workspace
-cd packages/ai && tsc --noEmit
-cd packages/database && tsc --noEmit
+### TypeScript Configuration
+- **Strict mode enabled** - All strict checks are on
+- **No implicit any** - Always use specific types
+- **Strict null checks** - Handle null/undefined explicitly
+- **No implicit returns** - All code paths must return
+- **Consistent file casing** - Enforced by TypeScript
 
-# Or use the pnpm script (if available)
-pnpm run typecheck packages/ai
-```
+### Biome Rules (Key Enforcements)
+- **`useImportType: "warn"`** - Use type-only imports when possible
+- **`noExplicitAny: "error"`** - Never use `any` type
+- **`noUnusedVariables: "error"`** - Remove unused code
+- **`noNonNullAssertion: "error"`** - No `!` assertions
+- **`noConsoleLog: "warn"`** - Avoid console.log in production
+- **`useNodejsImportProtocol: "error"`** - Use `node:` prefix for Node.js imports
 
-#### Pre-commit & CI
-```bash
-# Recommended before committing
-pnpm run pre-commit  # Runs lint:fix + format:fix
+### Testing Practices
 
-# Full CI check
-pnpm run ci:check    # Runs check + typecheck
+#### Test File Naming & Location
+- **Unit tests**: `filename.test.ts` (alongside the source file)
+- **Integration tests**: `filename.int.test.ts` (alongside the source file)
+- Never separate tests into their own folders - keep them with the code they test
+
+#### Testing Strategy
+1. **Prioritize mocking** for unit tests after understanding API/DB structure
+2. **Integration tests** should focus on single connection confirmations
+3. **Mock external dependencies** appropriately
+4. **Use descriptive test names** that explain the behavior
+5. **Write tests alongside implementation** for better coverage
+
+#### Example Test Structure
+```typescript
+// user-service.ts
+export function getUserById(id: string) { /* ... */ }
+
+// user-service.test.ts (same directory)
+import { describe, it, expect, vi } from 'vitest';
+import { getUserById } from './user-service';
+
+describe('getUserById', () => {
+  it('should return user when found', async () => {
+    // Test implementation
+  });
+});
+
+// user-service.int.test.ts (integration test)
+import { describe, it, expect } from 'vitest';
+import { getUserById } from './user-service';
+
+describe('getUserById integration', () => {
+  it('should connect to database successfully', async () => {
+    // Single connection test
+  });
+});
 ```
 
 ## Code Style Preferences
 
 ### Type Safety
 - **Zod-First Approach** - Use Zod schemas as the single source of truth for both validation and types
-- **Use `z.infer<typeof schema>` for types** - Prefer inferred types over separate interfaces for consistency
-- **Avoid `unknown` unless absolutely necessary** - prefer specific types or properly typed unions
-- **Avoid `any`** - use specific types, generics, or proper TypeScript patterns
-- **Safe array access** - Use validation helpers for TypeScript strict mode compliance (`noUncheckedIndexedAccess`)
-- Use Zod schemas for runtime validation and type inference
-- Leverage TypeScript's strict mode features
+- **Use `z.infer<typeof schema>` for types** - Prefer inferred types over separate interfaces
+- **Never use `any`** - Biome enforces this with `noExplicitAny: "error"`
+- **Avoid `unknown` unless necessary** - Prefer specific types or properly typed unions
+- **Handle null/undefined explicitly** - TypeScript strict mode enforces this
+- **Safe array access** - Use validation helpers when needed
+- **Type-only imports** - Use `import type` for better performance
 
 #### Zod-First Type Safety Pattern
 ```typescript
@@ -127,7 +166,7 @@ type User = z.infer<typeof userSchema>; // Inferred type
 // ✅ Good: Safe runtime validation
 const validatedUser = userSchema.parse(rawData);
 
-// ✅ Good: Safe array access (required for noUncheckedIndexedAccess)
+// ✅ Good: Safe array access when needed
 import { validateArrayAccess } from '@buster/ai/utils/validation-helpers';
 const firstItem = validateArrayAccess(array, 0, 'user processing');
 
@@ -136,22 +175,23 @@ interface User {
   id: string;
   email: string;
 }
-const user = rawData as User; // Unsafe
-const firstItem = array[0]; // Unsafe with strict mode
+const user = rawData as User; // Unsafe type assertion
+const firstItem = array[0]!; // Non-null assertion not allowed
 ```
 
 ### Import Organization
 - Use **type-only imports** when importing only types: `import type { SomeType } from './types'`
-- Organize imports automatically with Biome's `organizeImports`
-- Use path aliases when available (see tsconfig.json in each package)
+- Biome automatically organizes imports with `pnpm run check:fix`
+- Use Node.js protocol: `import { readFile } from 'node:fs'`
+- Follow path aliases defined in each package's tsconfig.json
 
 ### Error Handling
 - **Always use try-catch blocks** for async operations and external calls
-- **Use proper error types** instead of `unknown` or `any`
+- **Never use `any` in catch blocks** - Biome enforces this
 - **Validate external data** with Zod schemas before processing
-- **Provide meaningful error messages** with sufficient context for debugging
+- **Provide meaningful error messages** with context for debugging
 - **Handle errors at appropriate levels** - don't let errors bubble up uncaught
-- **Log errors with structured data** using proper logging utilities
+- **Use structured logging** for error tracking
 
 #### Error Handling Patterns
 ```typescript
@@ -204,15 +244,9 @@ async function badExample(userId: string) {
 }
 ```
 
-### Testing Practices
-- Write integration tests for complex workflows
-- Use descriptive test names that explain the behavior being tested
-- Mock external dependencies appropriately
-- Use proper TypeScript types in tests (avoid `any`)
-
 ## Test Utilities
 
-The `@buster/test-utils` package provides shared testing utilities for the monorepo:
+The `@buster/test-utils` package provides shared testing utilities:
 
 ### Environment Helpers
 ```typescript
@@ -235,7 +269,7 @@ import { createMockFunction, mockConsole, createMockDate } from '@buster/test-ut
 // Create vitest mock functions
 const mockFn = createMockFunction<(arg: string) => void>();
 
-// Mock console methods
+// Mock console methods (allowed in tests)
 const consoleMock = mockConsole();
 // Test code that logs...
 consoleMock.restore();
@@ -268,25 +302,60 @@ await cleanupTestMessages(chat.id);
 await cleanupTestChats('test-user');
 ```
 
-## Project Structure
+## Quick Command Reference
 
-This is a monorepo with multiple packages:
+### Building & Type Checking
+```bash
+# Build all packages
+turbo run build
 
-- `packages/ai/` - AI agents, tools, and workflows using Mastra framework
-- `packages/database/` - Database schema, migrations, and utilities
-- `packages/test-utils/` - Shared testing utilities for environment setup, mocking, and database helpers
-- `web/` - Next.js frontend application
-- `api/` - Rust backend API
-- `cli/` - Command-line tools
-- `trigger/` - Background job processing with Trigger.dev v3
+# Build specific package/app
+turbo run build --filter=@buster/ai
+turbo run build --filter=@buster-app/web
 
-Each package has its own development commands and may have specific tooling configurations.
+# Type check only
+turbo run typecheck
+turbo run typecheck --filter=@buster/database
+```
 
-### Helper Organization Pattern
+### Linting & Formatting
+```bash
+# Check and auto-fix with Biome
+pnpm run check:fix path/to/file.ts
+pnpm run check:fix packages/ai
 
-When building helper functions around database objects or other utilities, follow this organizational pattern:
+# Check only (no fixes)
+pnpm run check path/to/file.ts
+```
 
-**For Database Helpers (in `packages/database/`):**
+### Testing
+```bash
+# Run all tests
+pnpm run test
+
+# Run tests for specific package
+turbo run test --filter=@buster/ai
+
+# Run specific test file
+pnpm run test path/to/file.test.ts
+
+# Watch mode
+pnpm run test:watch
+```
+
+### Database Commands
+```bash
+pnpm run db:generate    # Generate types from schema
+pnpm run db:migrate     # Run migrations
+pnpm run db:push        # Push schema changes
+pnpm run db:studio      # Open Drizzle Studio
+```
+
+## Helper Organization Pattern
+
+When building helper functions, follow this organizational pattern:
+
+### Database Helpers (in `packages/database/`)
 ```
 packages/database/src/helpers/
 ├── index.ts         # Export all helpers
@@ -296,7 +365,7 @@ packages/database/src/helpers/
 └── {entity}.ts      # Entity-specific helpers
 ```
 
-**For Package-Specific Utilities:**
+### Package-Specific Utilities
 ```
 packages/{package}/src/utils/
 ├── index.ts         # Export all utilities
@@ -306,30 +375,29 @@ packages/{package}/src/utils/
 └── helpers.ts       # General helpers
 ```
 
-**Key Principles:**
+### Key Principles
 - **Co-locate helpers** with the schema/types they operate on
 - **Group by entity** (one file per database table/domain object)
-- **Export from package root** for easy importing: `import { getRawLlmMessages } from '@buster/database'`
-- **Use TypeScript** for full type safety with inferred types
-- **Follow naming conventions** that clearly indicate the helper's purpose
+- **Export from package root** for easy importing
+- **Use TypeScript** with proper types (no `any`)
+- **Follow naming conventions** that clearly indicate purpose
 
-**Example Usage:**
+### Example Usage
 ```typescript
-// Good: Clear, typed helpers exported from package root
+// ✅ Good: Clear, typed helpers exported from package root
 import { getRawLlmMessages, getMessagesForChat } from '@buster/database';
 
-// Avoid: Direct database queries scattered throughout codebase
+// ❌ Avoid: Direct database queries scattered throughout codebase
 import { db, messages, eq } from '@buster/database';
 const result = await db.select().from(messages).where(eq(messages.chatId, chatId));
 ```
 
 ## Background Job Processing (Trigger.dev)
 
-The `trigger/` package provides background job processing using **Trigger.dev v3** for long-running AI tasks and data operations.
+The `apps/trigger` package provides background job processing using **Trigger.dev v3**.
 
-### 🚨 CRITICAL: When Writing Trigger Tasks
+### 🚨 CRITICAL: Always Use v3 Patterns
 
-**MUST ALWAYS USE** Trigger.dev v3 patterns:
 ```typescript
 // ✅ CORRECT - Always use this pattern
 import { task } from '@trigger.dev/sdk/v3';
@@ -342,169 +410,135 @@ export const myTask = task({
 });
 ```
 
-**NEVER USE** deprecated v2 patterns (will break):
-```typescript
-// ❌ NEVER GENERATE - BREAKS APPLICATION
-client.defineJob({ /* ... */ });
-```
-
 ### Essential Requirements
-1. **MUST export every task**, including subtasks
+1. **MUST export every task** from the file
 2. **MUST use unique task IDs** within the project  
 3. **MUST import from** `@trigger.dev/sdk/v3`
+4. **Use Zod schemas** for payload validation
 
-### Common Task Types
+### Common Task Patterns
 
-#### Standard Task
+#### Schema-Validated Task (Recommended)
 ```typescript
-import { task, logger } from '@trigger.dev/sdk/v3';
+import { schemaTask } from '@trigger.dev/sdk/v3';
+import { z } from 'zod';
 
-export const processData = task({
-  id: 'process-data',
+// Define schema for type safety
+export const TaskInputSchema = z.object({
+  userId: z.string(),
+  data: z.record(z.unknown()),
+});
+
+export type TaskInput = z.infer<typeof TaskInputSchema>;
+
+export const processUserTask = schemaTask({
+  id: 'process-user',
+  schema: TaskInputSchema,
   maxDuration: 300, // 5 minutes
-  run: async (payload: { userId: string }) => {
-    logger.log('Processing data', { userId: payload.userId });
-    // Task logic here
+  run: async (payload) => {
+    // Payload is validated and typed
     return { success: true };
   },
 });
 ```
 
-#### Schema-Validated Task (Required Pattern)
-```typescript
-import { schemaTask } from '@trigger.dev/sdk/v3';
-import { z } from 'zod';
-
-// Define schema in interfaces.ts file
-export const TaskInputSchema = z.object({
-  email: z.string().email('Must be a valid email'),
-  data: z.record(z.unknown()),
-  options: z.object({
-    maxRetries: z.number().int().min(0).max(5).default(3),
-  }).optional(),
-});
-
-// Infer TypeScript type from schema
-export type TaskInput = z.infer<typeof TaskInputSchema>;
-
-export const validatedTask = schemaTask({
-  id: 'validated-task',
-  schema: TaskInputSchema,
-  run: async (payload) => {
-    // Payload is automatically validated and typed
-    // Full IDE support with autocomplete
-  },
-});
-```
-
-#### Scheduled Task
-```typescript
-import { schedules } from '@trigger.dev/sdk/v3';
-
-export const dailyCleanup = schedules.task({
-  id: 'daily-cleanup',
-  cron: '0 2 * * *', // 2 AM daily
-  run: async (payload) => {
-    // Scheduled task logic
-  },
-});
-```
-
-### Triggering Tasks
-
-#### From Backend/API Routes
+#### Triggering Tasks
 ```typescript
 import { tasks } from '@trigger.dev/sdk/v3';
-import type { processData } from '~/trigger/tasks';
+import type { processUserTask } from '@buster-app/trigger/tasks';
 
-// Single task trigger
-const handle = await tasks.trigger<typeof processData>('process-data', {
-  userId: 'user123'
-});
-
-// Batch trigger multiple runs
-const batchHandle = await tasks.batchTrigger<typeof processData>(
-  'process-data',
-  [{ payload: { userId: 'user1' } }, { payload: { userId: 'user2' } }]
-);
-```
-
-#### From Inside Other Tasks
-```typescript
-export const parentTask = task({
-  id: 'parent-task',
-  run: async (payload) => {
-    // Trigger and wait for result
-    const result = await childTask.triggerAndWait(childPayload);
-    
-    // Or trigger without waiting
-    const handle = await childTask.trigger(childPayload);
-  },
+// Trigger from API routes
+const handle = await tasks.trigger<typeof processUserTask>('process-user', {
+  userId: 'user123',
+  data: {}
 });
 ```
 
-### Current Tasks Available
-
-- **Analyst Agent Task** (`trigger/src/tasks/analyst-agent-task/`)
-  - AI-powered data analysis with multi-step workflow
-  - 30-minute max duration for complex analysis
-  - Integrates with Buster multi-agent system
-
-- **Introspect Data Task** (`trigger/src/tasks/introspectData/`)
-  - Database schema analysis and connection testing
-  - Supports: Snowflake, PostgreSQL, MySQL, BigQuery, SQL Server, Redshift, Databricks
-  - 5-minute max duration with automatic cleanup
-
-### Development Commands (in trigger/ directory)
+### Development Commands
 ```bash
-# Development server with live reload
-npm run dev
+# Development server
+pnpm run trigger:dev
 
-# Build and deploy
-npm run build
-npm run deploy
+# Run tests
+pnpm run trigger:test
+
+# Deploy
+pnpm run trigger:deploy
 ```
 
-### When to Use Trigger Tasks
-
-Use Trigger tasks for operations that:
-- Take longer than typical web request timeouts (>30 seconds)
-- Require retry logic for reliability
-- Need background processing (email, data analysis, reports)
-- Should be monitored and tracked
-- Involve external API calls that may fail
-
-**See `trigger/CLAUDE.md` for complete Trigger.dev development guidelines.**
+**See `apps/trigger/CLAUDE.md` for complete Trigger.dev guidelines.**
 
 ## Key Dependencies
 
-- **Mastra** - AI agent framework for orchestrating LLM workflows
-- **Trigger.dev v3** - Background job processing and task orchestration
-- **Vitest** - Testing framework used across all packages
-- **Biome** - Fast linting and formatting
-- **TypeScript** - Strict type checking
+- **Turborepo** - Monorepo orchestration and caching
+- **pnpm** - Fast, disk space efficient package manager
+- **Biome** - Fast linting and formatting (replaces ESLint/Prettier)
+- **TypeScript** - Strict type checking across all packages
+- **Vitest** - Fast unit testing framework
 - **Zod** - Runtime validation and type inference
+- **Mastra** - AI agent framework for LLM workflows
+- **Trigger.dev v3** - Background job processing
+- **Drizzle ORM** - Type-safe database toolkit
 - **Braintrust** - LLM observability and evaluation
 
-## Working with Claude Code
+## Complete Development Workflow Example
 
-When making changes:
+When implementing a new feature:
 
-1. **Always run tooling checks** before and after modifications
-2. **Use specific types** instead of `any` or `unknown` when possible
-3. **Run tests** to ensure changes don't break existing functionality
-4. **Follow existing patterns** in the codebase for consistency
-5. **Use the provided scripts** for linting, formatting, and testing
-
-Example workflow:
 ```bash
-# Before making changes
-npm run check packages/ai
+# 1. Write your modular, testable functions
+# 2. Compose them into the feature
+# 3. Write tests alongside the code
 
-# After making changes
-npm run check:fix packages/ai
-pnpm run test:file packages/ai/tests/path/to/relevant/test.ts
-tsc --noEmit  # or: cd packages/ai && tsc --noEmit
+# 4. Ensure type safety
+turbo run build --filter=@buster/ai
+# or for all packages:
+turbo run build
+
+# 5. Fix linting and formatting
+pnpm run check:fix packages/ai
+
+# 6. Run tests
+turbo run test --filter=@buster/ai
+# or specific test:
+pnpm run test packages/ai/src/feature.test.ts
+
+# 7. If all passes, commit your changes
+git add .
+git commit -m "feat: add new feature"
 ```
 
-This ensures high code quality and prevents issues from reaching production.
+## Important Notes
+
+- **Never use `any`** - Biome will error on this
+- **Always handle errors** properly with try-catch
+- **Write tests alongside code** - not in separate folders
+- **Use Zod for validation** - single source of truth
+- **Run type checks** before committing
+- **Follow existing patterns** in the codebase
+
+This ensures high code quality and maintainability across the monorepo.
+
+## Common Biome Overrides
+
+Test files have relaxed rules to allow:
+- `console.log` for debugging tests
+- Non-null assertions (`!`) in test scenarios
+- `any` type when mocking (though prefer proper types)
+
+Database package allows `any` for Drizzle ORM compatibility.
+
+## Environment Variables
+
+The monorepo uses a strict environment mode. Key variables include:
+- Database connections (Supabase, PostgreSQL, etc.)
+- API keys (OpenAI, Anthropic, etc.)
+- Service URLs and configurations
+
+See `.env.example` files in each package for required variables.
+
+# important-instruction-reminders
+Do what has been asked; nothing more, nothing less.
+NEVER create files unless they're absolutely necessary for achieving your goal.
+ALWAYS prefer editing an existing file to creating a new one.
+NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
