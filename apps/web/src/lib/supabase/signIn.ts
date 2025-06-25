@@ -115,6 +115,7 @@ export const signUp = async ({ email, password }: { email: string; password: str
     }
   });
   if (error) {
+    console.error('supabase error in signUp', error);
     throw error;
   }
 

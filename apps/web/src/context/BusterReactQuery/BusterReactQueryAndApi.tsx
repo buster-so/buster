@@ -65,7 +65,7 @@ export const BusterReactQueryProvider = ({ children }: { children: React.ReactNo
   return (
     <PersistQueryClientProvider client={queryClient} persistOptions={persistOptions}>
       {/* <BusterApiContext.Provider value={busterApiContext}>{children}</BusterApiContext.Provider> */}
-
+      {children}
       {isDevToolsOpen && (
         <>
           <ReactQueryDevtools initialIsOpen={true} />

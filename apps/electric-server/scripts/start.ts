@@ -23,7 +23,7 @@ function isDatabaseRunning(): boolean {
     // Use pg_isready to check if PostgreSQL is accepting connections
     execSync(`docker run --rm postgres:15 pg_isready -h ${DB_HOST} -p ${DB_PORT} -U ${DB_USER}`, {
       stdio: 'pipe',
-      timeout: 5000
+      timeout: 45000
     });
     return true;
   } catch (error) {
