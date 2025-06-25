@@ -14,7 +14,6 @@ import { persistOptions } from './createPersister';
 import { getQueryClient } from './getQueryClient';
 import { createHonoInstance } from '@/api/createHonoInstance';
 import { BASE_API_URL_V2 } from '@/api/buster_rest/config';
-import { useContextSelector, createContext } from 'use-context-selector';
 
 const ReactQueryDevtools = dynamic(
   () =>
@@ -37,14 +36,6 @@ const ReactQueryDevtoolsProduction = dynamic(
 );
 
 // Create the persister outside the component
-
-const BusterApiContext = createContext<{
-  honoInstance: ReturnType<typeof createHonoInstance>;
-}>({
-  honoInstance: createHonoInstance(BASE_API_URL_V2, async () => ({
-    access_token: ''
-  }))
-});
 
 export const BusterReactQueryProvider = ({ children }: { children: React.ReactNode }) => {
   const accessToken = useSupabaseContext((state) => state.accessToken);
@@ -74,7 +65,7 @@ export const BusterReactQueryProvider = ({ children }: { children: React.ReactNo
 
   return (
     <PersistQueryClientProvider client={queryClient} persistOptions={persistOptions}>
-      <BusterApiContext.Provider value={busterApiContext}>{children}</BusterApiContext.Provider>
+      {/* <BusterApiContext.Provider value={busterApiContext}>{children}</BusterApiContext.Provider> */}
 
       {isDevToolsOpen && (
         <>
@@ -85,7 +76,3 @@ export const BusterReactQueryProvider = ({ children }: { children: React.ReactNo
     </PersistQueryClientProvider>
   );
 };
-
-export const useBusterApiContextSelector = <T,>(
-  selector: (value: { honoInstance: ReturnType<typeof createHonoInstance> }) => T
-) => useContextSelector(BusterApiContext, selector);

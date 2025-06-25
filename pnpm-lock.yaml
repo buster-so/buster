@@ -169,9 +169,6 @@ importers:
 
   apps/web:
     dependencies:
-      '@buster-app/server':
-        specifier: workspace:*
-        version: link:../server
       '@buster/server-shared':
         specifier: workspace:*
         version: link:../../packages/server-shared

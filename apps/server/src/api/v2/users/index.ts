@@ -13,6 +13,7 @@ const app = new Hono()
       { id: '2', name: 'Jane Smith', email: 'jane@example.com', role: 'user' },
       { id: '3', name: 'Bob Johnson', email: 'bob@example.com', role: 'user' },
       { id: '4', name: 'Dallin Bentley', email: 'dallin@example.com', role: 'user' },
+      { id: '5', name: 'Dallin Smentley', email: 'dallin_smentley@example.com', role: 'admin' },
     ];
 
     return c.json(stubUsers);
