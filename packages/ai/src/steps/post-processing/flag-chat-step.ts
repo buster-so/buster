@@ -207,6 +207,10 @@ Please analyze this conversation history for potential user frustration or issue
 
     const toolCall = toolCalls[0]; // Should only be one with maxSteps: 1
 
+    if (!toolCall) {
+      throw new Error('No tool was called by the flag chat agent');
+    }
+
     return {
       // Pass through all input fields
       ...inputData,

@@ -190,6 +190,6 @@ describe('format-initial-message-step integration', () => {
     // Other fields should still be passed through
     expect(result.toolCalled).toBe('noIssuesFound');
     expect(result.assumptions).toHaveLength(1);
-    expect(result.assumptions![0].label).toBe('minor');
+    expect(result.assumptions?.[0]?.label).toBe('minor');
   });
 });

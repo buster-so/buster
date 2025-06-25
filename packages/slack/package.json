@@ -27,14 +27,11 @@
   },
   "dependencies": {
     "@slack/web-api": "^6.10.0",
-    "zod": "^3.22.4"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
-    "@types/node": "^20.0.0",
-    "dotenv": "^16.0.0",
-    "tsx": "^4.0.0",
-    "vitest": "^1.2.0"
+    "tsx": "^4.0.0"
   }
 }

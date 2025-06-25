@@ -281,8 +281,7 @@ async function createPackageFiles(config: PackageConfig) {
     },
     dependencies: {
       "@buster/typescript-config": "workspace:*",
-      "@buster/vitest-config": "workspace:*",
-      "dotenv": "^16.5.0",
+      "@buster/vitest-config": "workspace:*"
     },
   };
 
