@@ -37,7 +37,9 @@ export const flagChatOutputSchema = z.object({
   message: z.string().optional().describe('Confirmation message indicating no issues found'),
 });
 
-const flagChatInstructions = `
+// Template function that accepts datasets parameter
+const createFlagChatInstructions = (datasets: string): string => {
+  return `
 ### Overview
 - You are a specialized AI agent within an AI-powered data analyst system.
 - Your role is to review the chat history between the AI data analyst (Buster) and the user, identify signs that the user might be frustrated or that something went wrong in the chat, and flag the chat for review by the data team.
@@ -110,7 +112,13 @@ Flag the chat if any of the following conditions are met:
     - The summary message should be concise and informative, suitable for sending to the data team's Slack channel.
 - If no issues are detected:
   - Use the \`noIssuesFound\` tool to indicate that the chat does not need to be flagged.
+
+---
+
+### Dataset Context and Documentation
+${datasets}
 `;
+};
 
 const DEFAULT_OPTIONS = {
   maxSteps: 1,
@@ -123,18 +131,6 @@ const DEFAULT_OPTIONS = {
   },
 };
 
-export const flagChatAgent = new Agent({
-  name: 'Flag Chat Review',
-  instructions: flagChatInstructions,
-  model: anthropicCachedModel('claude-sonnet-4-20250514'),
-  tools: {
-    flagChat,
-    noIssuesFound,
-  },
-  defaultGenerateOptions: DEFAULT_OPTIONS,
-  defaultStreamOptions: DEFAULT_OPTIONS,
-});
-
 export const flagChatStepExecution = async ({
   inputData,
 }: {
@@ -143,6 +139,24 @@ export const flagChatStepExecution = async ({
   try {
     // Use the conversation history directly since this is post-processing
     const conversationHistory = inputData.conversationHistory;
+
+    // Create instructions with datasets injected
+    const instructionsWithDatasets = createFlagChatInstructions(
+      inputData.datasets || 'No dataset context available.'
+    );
+
+    // Create agent with injected instructions
+    const flagChatAgentWithContext = new Agent({
+      name: 'Flag Chat Review',
+      instructions: instructionsWithDatasets,
+      model: anthropicCachedModel('claude-sonnet-4-20250514'),
+      tools: {
+        flagChat,
+        noIssuesFound,
+      },
+      defaultGenerateOptions: DEFAULT_OPTIONS,
+      defaultStreamOptions: DEFAULT_OPTIONS,
+    });
 
     // Prepare messages for the agent
     let messages: CoreMessage[];
@@ -156,7 +170,7 @@ export const flagChatStepExecution = async ({
 
     const tracedFlagChat = wrapTraced(
       async () => {
-        const response = await flagChatAgent.generate(messages, {
+        const response = await flagChatAgentWithContext.generate(messages, {
           toolChoice: 'required',
         });
         return response;
