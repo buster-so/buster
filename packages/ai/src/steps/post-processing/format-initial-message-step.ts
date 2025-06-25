@@ -163,6 +163,13 @@ You operate in a loop to complete tasks:
 
 const DEFAULT_OPTIONS = {
   maxSteps: 1,
+  temperature: 0,
+  maxTokens: 10000,
+  providerOptions: {
+    anthropic: {
+      disableParallelToolCalls: true,
+    },
+  },
 };
 
 export const initialMessageAgent = new Agent({

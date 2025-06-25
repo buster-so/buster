@@ -114,6 +114,13 @@ Flag the chat if any of the following conditions are met:
 
 const DEFAULT_OPTIONS = {
   maxSteps: 1,
+  temperature: 0,
+  maxTokens: 10000,
+  providerOptions: {
+    anthropic: {
+      disableParallelToolCalls: true,
+    },
+  },
 };
 
 export const flagChatAgent = new Agent({
@@ -149,7 +156,9 @@ export const flagChatStepExecution = async ({
 
     const tracedFlagChat = wrapTraced(
       async () => {
-        const response = await flagChatAgent.generate(messages);
+        const response = await flagChatAgent.generate(messages, {
+          toolChoice: 'required',
+        });
         return response;
       },
       {

@@ -177,6 +177,13 @@ ${datasets}
 
 const DEFAULT_OPTIONS = {
   maxSteps: 1,
+  temperature: 0,
+  maxTokens: 10000,
+  providerOptions: {
+    anthropic: {
+      disableParallelToolCalls: true,
+    },
+  },
 };
 
 export const identifyAssumptionsStepExecution = async ({
@@ -218,7 +225,9 @@ export const identifyAssumptionsStepExecution = async ({
 
     const tracedIdentifyAssumptions = wrapTraced(
       async () => {
-        const response = await identifyAssumptionsAgentWithContext.generate(messages);
+        const response = await identifyAssumptionsAgentWithContext.generate(messages, {
+          toolChoice: 'required',
+        });
         return response;
       },
       {
