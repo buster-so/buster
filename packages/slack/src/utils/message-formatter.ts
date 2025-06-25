@@ -1,10 +1,19 @@
-import { z } from 'zod';
 import type { SlackMessage } from '../types';
+import type {
+  SlackActionsBlock,
+  SlackAttachment,
+  SlackBlock,
+  SlackBlockElement,
+  SlackButtonElement,
+  SlackContextBlock,
+  SlackDividerBlock,
+  SlackSectionBlock,
+} from '../types/blocks';
 
 /**
  * Format a simple text message
  */
-export function formatSimpleMessage(text: string, options?: { markdown?: boolean }): SlackMessage {
+export function formatSimpleMessage(text: string): SlackMessage {
   return {
     text,
   };
@@ -13,7 +22,7 @@ export function formatSimpleMessage(text: string, options?: { markdown?: boolean
 /**
  * Format a message with blocks
  */
-export function formatBlockMessage(blocks: Array<any>, fallbackText?: string): SlackMessage {
+export function formatBlockMessage(blocks: SlackBlock[], fallbackText?: string): SlackMessage {
   return {
     text: fallbackText || 'New message',
     blocks,
@@ -27,10 +36,10 @@ export function createSectionBlock(
   text: string,
   options?: {
     fields?: Array<{ title: string; value: string }>;
-    accessory?: any;
+    accessory?: SlackBlockElement;
   }
-): any {
-  const block: any = {
+): SlackSectionBlock {
+  const block: SlackSectionBlock = {
     type: 'section',
     text: {
       type: 'mrkdwn',
@@ -40,7 +49,7 @@ export function createSectionBlock(
 
   if (options?.fields) {
     block.fields = options.fields.map((field) => ({
-      type: 'mrkdwn',
+      type: 'mrkdwn' as const,
       text: `*${field.title}*\n${field.value}`,
     }));
   }
@@ -62,19 +71,21 @@ export function createActionsBlock(
     style?: 'primary' | 'danger';
     url?: string;
   }>
-): any {
+): SlackActionsBlock {
   return {
     type: 'actions',
-    elements: actions.map((action) => ({
-      type: action.url ? 'button' : 'button',
-      text: {
-        type: 'plain_text',
-        text: action.text,
-      },
-      value: action.value,
-      style: action.style,
-      url: action.url,
-    })),
+    elements: actions.map(
+      (action): SlackButtonElement => ({
+        type: 'button',
+        text: {
+          type: 'plain_text',
+          text: action.text,
+        },
+        value: action.value,
+        style: action.style,
+        url: action.url,
+      })
+    ),
   };
 }
 
@@ -100,7 +111,7 @@ export const MessageTemplates = {
       messageText += `\nDuration: ${data.duration}`;
     }
 
-    const blocks: any[] = [
+    const blocks: SlackBlock[] = [
       {
         type: 'section',
         text: {
@@ -144,7 +155,7 @@ export const MessageTemplates = {
     const color =
       data.severity === 'error' ? 'danger' : data.severity === 'warning' ? 'warning' : 'good';
 
-    const blocks: any[] = [
+    const blocks: SlackBlock[] = [
       {
         type: 'section',
         text: {
@@ -155,7 +166,10 @@ export const MessageTemplates = {
     ];
 
     if (data.source) {
-      blocks[0].text.text += `\n_Source: ${data.source}_`;
+      const firstBlock = blocks[0] as SlackSectionBlock;
+      if (firstBlock.text) {
+        firstBlock.text.text += `\n_Source: ${data.source}_`;
+      }
     }
 
     if (data.actions && data.actions.length > 0) {
@@ -179,7 +193,7 @@ export const MessageTemplates = {
         {
           color,
           fallback: `${data.title}: ${data.message}`,
-        },
+        } as SlackAttachment,
       ],
     };
   },
@@ -189,7 +203,7 @@ export const MessageTemplates = {
  * Format a code block
  */
 export function formatCodeBlock(code: string, language?: string): string {
-  return '```' + (language || '') + '\n' + code + '\n```';
+  return `\`\`\`${language || ''}\n${code}\n\`\`\``;
 }
 
 /**
@@ -216,7 +230,7 @@ export function formatChannelMention(channelId: string): string {
 /**
  * Create divider block
  */
-export function createDividerBlock(): any {
+export function createDividerBlock(): SlackDividerBlock {
   return { type: 'divider' };
 }
 
@@ -224,10 +238,39 @@ export function createDividerBlock(): any {
  * Create context block
  */
 export function createContextBlock(
-  elements: Array<string | { type: string; [key: string]: any }>
-): any {
+  elements: Array<
+    | string
+    | { type: 'mrkdwn'; text: string; verbatim?: boolean }
+    | { type: 'plain_text'; text: string; emoji?: boolean }
+    | { type: 'image'; image_url: string; alt_text: string }
+  >
+): SlackContextBlock {
   return {
     type: 'context',
-    elements: elements.map((el) => (typeof el === 'string' ? { type: 'mrkdwn', text: el } : el)),
+    elements: elements.map((el): SlackContextBlock['elements'][number] => {
+      if (typeof el === 'string') {
+        return { type: 'mrkdwn', text: el };
+      }
+      if (el.type === 'image') {
+        return {
+          type: 'image',
+          image_url: el.image_url,
+          alt_text: el.alt_text,
+        };
+      }
+      if (el.type === 'plain_text') {
+        return {
+          type: 'plain_text',
+          text: el.text,
+          ...(el.emoji !== undefined && { emoji: el.emoji }),
+        };
+      }
+      // el.type === 'mrkdwn'
+      return {
+        type: 'mrkdwn',
+        text: el.text,
+        ...(el.verbatim !== undefined && { verbatim: el.verbatim }),
+      };
+    }),
   };
 }

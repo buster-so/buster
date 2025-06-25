@@ -1,24 +1,15 @@
+import type { WebClient } from '@slack/web-api';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { SlackChannelService } from '../channels';
+import { type MockWebClient, createMockWebClient } from '../mocks';
+import { SlackChannelService } from './channels';
 
 describe('SlackChannelService', () => {
   let channelService: SlackChannelService;
-  let mockSlackClient: any;
+  let mockSlackClient: MockWebClient;
 
   beforeEach(() => {
-    channelService = new SlackChannelService();
-
-    // Mock the slack client
-    mockSlackClient = {
-      conversations: {
-        list: vi.fn(),
-        info: vi.fn(),
-        join: vi.fn(),
-        leave: vi.fn(),
-      },
-    };
-
-    (channelService as any).slackClient = mockSlackClient;
+    mockSlackClient = createMockWebClient();
+    channelService = new SlackChannelService(mockSlackClient as unknown as WebClient);
   });
 
   describe('getAvailableChannels', () => {

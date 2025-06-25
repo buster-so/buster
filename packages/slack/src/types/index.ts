@@ -63,11 +63,14 @@ export const SlackOAuthConfigSchema = z.object({
 
 export type SlackOAuthConfig = z.infer<typeof SlackOAuthConfigSchema>;
 
+// Import block schemas
+import { SlackAttachmentSchema, SlackBlockSchema } from './blocks';
+
 // Message Types
 export const SlackMessageSchema = z.object({
   text: z.string().optional(),
-  blocks: z.array(z.any()).optional(),
-  attachments: z.array(z.any()).optional(),
+  blocks: z.array(SlackBlockSchema).optional(),
+  attachments: z.array(SlackAttachmentSchema).optional(),
   thread_ts: z.string().optional(),
   unfurl_links: z.boolean().optional(),
   unfurl_media: z.boolean().optional(),

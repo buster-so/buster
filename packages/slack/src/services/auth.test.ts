@@ -1,11 +1,14 @@
+import type { WebClient } from '@slack/web-api';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { ISlackOAuthStateStorage, ISlackTokenStorage } from '../../interfaces/token-storage';
-import { SlackAuthService } from '../auth';
+import type { ISlackOAuthStateStorage, ISlackTokenStorage } from '../interfaces/token-storage';
+import { createMockWebClient } from '../mocks';
+import { SlackAuthService } from './auth';
 
 describe('SlackAuthService', () => {
   let authService: SlackAuthService;
   let mockTokenStorage: ISlackTokenStorage;
   let mockStateStorage: ISlackOAuthStateStorage;
+  let mockSlackClient: ReturnType<typeof createMockWebClient>;
 
   const config = {
     clientId: 'test-client-id',
@@ -30,7 +33,13 @@ describe('SlackAuthService', () => {
       deleteState: vi.fn().mockResolvedValue(undefined),
     };
 
-    authService = new SlackAuthService(config, mockTokenStorage, mockStateStorage);
+    mockSlackClient = createMockWebClient();
+    authService = new SlackAuthService(
+      config,
+      mockTokenStorage,
+      mockStateStorage,
+      mockSlackClient as unknown as WebClient
+    );
   });
 
   describe('generateAuthUrl', () => {
@@ -44,7 +53,7 @@ describe('SlackAuthService', () => {
       expect(mockStateStorage.storeState).toHaveBeenCalledWith(
         state,
         expect.objectContaining({
-          expiresAt: expect.any(Number),
+          expiresAt: expect.any(Number) as number,
           metadata: { userId: 'user-123' },
         })
       );
@@ -81,8 +90,7 @@ describe('SlackAuthService', () => {
       });
 
       // Mock WebClient auth test
-      const mockAuthTest = vi.fn().mockResolvedValue({ ok: true });
-      (authService as any).slackClient.auth = { test: mockAuthTest };
+      mockSlackClient.auth.test.mockResolvedValue({ ok: true });
 
       const result = await authService.handleCallback('test-code', 'test-state', 'user-123');
 
@@ -121,13 +129,12 @@ describe('SlackAuthService', () => {
     it('should return true for valid token', async () => {
       vi.mocked(mockTokenStorage.getToken).mockResolvedValue('xoxb-valid-token');
 
-      const mockAuthTest = vi.fn().mockResolvedValue({ ok: true });
-      (authService as any).slackClient.auth = { test: mockAuthTest };
+      mockSlackClient.auth.test.mockResolvedValue({ ok: true });
 
       const result = await authService.testToken('user-123');
 
       expect(result).toBe(true);
-      expect(mockAuthTest).toHaveBeenCalledWith({ token: 'xoxb-valid-token' });
+      expect(mockSlackClient.auth.test).toHaveBeenCalledWith({ token: 'xoxb-valid-token' });
     });
 
     it('should return false for missing token', async () => {

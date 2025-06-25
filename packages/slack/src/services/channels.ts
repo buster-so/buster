@@ -7,8 +7,8 @@ import { validateWithSchema } from '../utils/validation-helpers';
 export class SlackChannelService {
   private slackClient: WebClient;
 
-  constructor() {
-    this.slackClient = new WebClient();
+  constructor(client?: WebClient) {
+    this.slackClient = client || new WebClient();
   }
 
   /**
@@ -30,7 +30,7 @@ export class SlackChannelService {
 
     try {
       do {
-        const params: any = {
+        const params: Parameters<typeof this.slackClient.conversations.list>[0] = {
           token: accessToken,
           types: 'public_channel', // Only public channels
           exclude_archived: !includeArchived,
@@ -47,9 +47,13 @@ export class SlackChannelService {
           // Filter and transform channels
           const validChannels = response.channels
             .filter((channel) => !channel.is_archived || includeArchived)
+            .filter(
+              (channel): channel is typeof channel & { id: string; name: string } =>
+                typeof channel.id === 'string' && typeof channel.name === 'string'
+            )
             .map((channel) => ({
-              id: channel.id!,
-              name: channel.name!,
+              id: channel.id,
+              name: channel.name,
               is_private: channel.is_private || false,
               is_archived: channel.is_archived || false,
               is_member: channel.is_member || false,
@@ -79,10 +83,11 @@ export class SlackChannelService {
 
       // Handle specific Slack API errors
       if (error instanceof Error && 'data' in error) {
-        const slackError = (error as any).data;
-        if (slackError?.error === 'invalid_auth') {
+        const errorWithData = error as Error & { data: { error?: string; ok: boolean } };
+        if (errorWithData.data?.error === 'invalid_auth') {
           throw new SlackIntegrationError('INVALID_TOKEN', 'Invalid or expired access token');
-        } else if (slackError?.error === 'rate_limited') {
+        }
+        if (errorWithData.data?.error === 'rate_limited') {
           throw new SlackIntegrationError(
             'RATE_LIMITED',
             'Rate limit exceeded. Please try again later.',
@@ -143,9 +148,16 @@ export class SlackChannelService {
       }
 
       // Transform to our channel type
+      if (!channel.id || !channel.name) {
+        throw new SlackIntegrationError(
+          'CHANNEL_NOT_FOUND',
+          'Channel is missing required id or name'
+        );
+      }
+
       const validatedChannel: SlackChannel = {
-        id: channel.id!,
-        name: channel.name!,
+        id: channel.id,
+        name: channel.name,
         is_private: channel.is_private || false,
         is_archived: channel.is_archived || false,
         is_member: channel.is_member || false,
@@ -159,13 +171,14 @@ export class SlackChannelService {
 
       // Handle specific Slack API errors
       if (error instanceof Error && 'data' in error) {
-        const slackError = (error as any).data;
-        if (slackError?.error === 'channel_not_found') {
+        const errorWithData = error as Error & { data: { error?: string; ok: boolean } };
+        if (errorWithData.data?.error === 'channel_not_found') {
           throw new SlackIntegrationError(
             'CHANNEL_NOT_FOUND',
             'Channel does not exist or bot cannot access it'
           );
-        } else if (slackError?.error === 'invalid_auth') {
+        }
+        if (errorWithData.data?.error === 'invalid_auth') {
           throw new SlackIntegrationError('INVALID_TOKEN', 'Invalid or expired access token');
         }
       }
@@ -210,10 +223,10 @@ export class SlackChannelService {
       return { success: true };
     } catch (error) {
       if (error instanceof Error && 'data' in error) {
-        const slackError = (error as any).data;
+        const errorWithData = error as Error & { data: { error?: string } };
         return {
           success: false,
-          error: slackError?.error || error.message,
+          error: errorWithData.data?.error || error.message,
         };
       }
 
@@ -257,10 +270,10 @@ export class SlackChannelService {
       return { success: true };
     } catch (error) {
       if (error instanceof Error && 'data' in error) {
-        const slackError = (error as any).data;
+        const errorWithData = error as Error & { data: { error?: string } };
         return {
           success: false,
-          error: slackError?.error || error.message,
+          error: errorWithData.data?.error || error.message,
         };
       }
 

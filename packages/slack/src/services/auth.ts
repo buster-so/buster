@@ -18,9 +18,10 @@ export class SlackAuthService {
   constructor(
     private config: SlackOAuthConfig,
     private tokenStorage: ISlackTokenStorage,
-    private stateStorage: ISlackOAuthStateStorage
+    private stateStorage: ISlackOAuthStateStorage,
+    client?: WebClient
   ) {
-    this.slackClient = new WebClient();
+    this.slackClient = client || new WebClient();
   }
 
   /**
@@ -92,9 +93,10 @@ export class SlackAuthService {
       );
 
       if (!oauthData.ok) {
+        const errorResponse = tokenResponse as { error?: string };
         throw new SlackIntegrationError(
           'OAUTH_TOKEN_EXCHANGE_FAILED',
-          `Slack OAuth failed: ${(tokenResponse as any).error || 'Unknown error'}`
+          `Slack OAuth failed: ${errorResponse.error || 'Unknown error'}`
         );
       }
 
@@ -152,6 +154,7 @@ export class SlackAuthService {
 
       return response.ok === true;
     } catch (error) {
+      console.error('Failed to test token', error);
       return false;
     }
   }

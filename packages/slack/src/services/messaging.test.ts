@@ -1,29 +1,15 @@
+import type { WebClient } from '@slack/web-api';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { SlackMessagingService } from '../messaging';
+import { type MockWebClient, createMockWebClient } from '../mocks';
+import { SlackMessagingService } from './messaging';
 
 describe('SlackMessagingService', () => {
   let messagingService: SlackMessagingService;
-  let mockSlackClient: any;
+  let mockSlackClient: MockWebClient;
 
   beforeEach(() => {
-    messagingService = new SlackMessagingService();
-
-    // Mock the slack client
-    mockSlackClient = {
-      chat: {
-        postMessage: vi.fn(),
-        update: vi.fn(),
-        delete: vi.fn(),
-      },
-      conversations: {
-        replies: vi.fn(),
-      },
-      auth: {
-        test: vi.fn(),
-      },
-    };
-
-    (messagingService as any).slackClient = mockSlackClient;
+    mockSlackClient = createMockWebClient();
+    messagingService = new SlackMessagingService(mockSlackClient as unknown as WebClient);
   });
 
   describe('sendMessage', () => {
@@ -61,9 +47,9 @@ describe('SlackMessagingService', () => {
       const message = {
         blocks: [
           {
-            type: 'section',
+            type: 'section' as const,
             text: {
-              type: 'mrkdwn',
+              type: 'mrkdwn' as const,
               text: '*Bold text*',
             },
           },

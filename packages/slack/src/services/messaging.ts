@@ -7,8 +7,8 @@ import { validateWithSchema } from '../utils/validation-helpers';
 export class SlackMessagingService {
   private slackClient: WebClient;
 
-  constructor() {
-    this.slackClient = new WebClient();
+  constructor(client?: WebClient) {
+    this.slackClient = client || new WebClient();
   }
 
   /**
@@ -41,18 +41,51 @@ export class SlackMessagingService {
       );
 
       // Send message to Slack
-      const messageParams: any = {
+      const baseParams = {
         token: accessToken,
         channel: channelId,
-        ...validatedMessage,
+        text: validatedMessage.text || (validatedMessage.blocks ? ' ' : ' '),
       };
 
-      // Ensure text is provided if no blocks
-      if (!messageParams.text && !messageParams.blocks) {
-        messageParams.text = ' '; // Slack requires at least text or blocks
-      }
+      const messageParams = validatedMessage.blocks
+        ? {
+            ...baseParams,
+            blocks: validatedMessage.blocks,
+            ...(validatedMessage.attachments && { attachments: validatedMessage.attachments }),
+            ...(validatedMessage.thread_ts && { thread_ts: validatedMessage.thread_ts }),
+            ...(validatedMessage.unfurl_links !== undefined && {
+              unfurl_links: validatedMessage.unfurl_links,
+            }),
+            ...(validatedMessage.unfurl_media !== undefined && {
+              unfurl_media: validatedMessage.unfurl_media,
+            }),
+          }
+        : validatedMessage.attachments
+          ? {
+              ...baseParams,
+              attachments: validatedMessage.attachments,
+              ...(validatedMessage.thread_ts && { thread_ts: validatedMessage.thread_ts }),
+              ...(validatedMessage.unfurl_links !== undefined && {
+                unfurl_links: validatedMessage.unfurl_links,
+              }),
+              ...(validatedMessage.unfurl_media !== undefined && {
+                unfurl_media: validatedMessage.unfurl_media,
+              }),
+            }
+          : {
+              ...baseParams,
+              ...(validatedMessage.thread_ts && { thread_ts: validatedMessage.thread_ts }),
+              ...(validatedMessage.unfurl_links !== undefined && {
+                unfurl_links: validatedMessage.unfurl_links,
+              }),
+              ...(validatedMessage.unfurl_media !== undefined && {
+                unfurl_media: validatedMessage.unfurl_media,
+              }),
+            };
 
-      const response = await this.slackClient.chat.postMessage(messageParams);
+      const response = await this.slackClient.chat.postMessage(
+        messageParams as Parameters<typeof this.slackClient.chat.postMessage>[0]
+      );
 
       if (!response.ok) {
         throw new SlackIntegrationError(
@@ -76,8 +109,8 @@ export class SlackMessagingService {
 
       // Handle specific Slack API errors
       if (error instanceof Error && 'data' in error) {
-        const slackError = (error as any).data;
-        const errorMessage = this.mapSlackError(slackError?.error);
+        const errorWithData = error as Error & { data: { error?: string } };
+        const errorMessage = this.mapSlackError(errorWithData.data?.error);
         return {
           success: false,
           error: errorMessage,
@@ -126,19 +159,49 @@ export class SlackMessagingService {
       );
 
       // Send threaded reply
-      const replyParams: any = {
+      const baseReplyParams = {
         token: accessToken,
         channel: channelId,
         thread_ts: threadTs,
-        ...validatedMessage,
+        text: validatedMessage.text || (validatedMessage.blocks ? ' ' : ' '),
       };
 
-      // Ensure text is provided if no blocks
-      if (!replyParams.text && !replyParams.blocks) {
-        replyParams.text = ' '; // Slack requires at least text or blocks
-      }
+      const replyParams = validatedMessage.blocks
+        ? {
+            ...baseReplyParams,
+            blocks: validatedMessage.blocks,
+            ...(validatedMessage.attachments && { attachments: validatedMessage.attachments }),
+            ...(validatedMessage.unfurl_links !== undefined && {
+              unfurl_links: validatedMessage.unfurl_links,
+            }),
+            ...(validatedMessage.unfurl_media !== undefined && {
+              unfurl_media: validatedMessage.unfurl_media,
+            }),
+          }
+        : validatedMessage.attachments
+          ? {
+              ...baseReplyParams,
+              attachments: validatedMessage.attachments,
+              ...(validatedMessage.unfurl_links !== undefined && {
+                unfurl_links: validatedMessage.unfurl_links,
+              }),
+              ...(validatedMessage.unfurl_media !== undefined && {
+                unfurl_media: validatedMessage.unfurl_media,
+              }),
+            }
+          : {
+              ...baseReplyParams,
+              ...(validatedMessage.unfurl_links !== undefined && {
+                unfurl_links: validatedMessage.unfurl_links,
+              }),
+              ...(validatedMessage.unfurl_media !== undefined && {
+                unfurl_media: validatedMessage.unfurl_media,
+              }),
+            };
 
-      const response = await this.slackClient.chat.postMessage(replyParams);
+      const response = await this.slackClient.chat.postMessage(
+        replyParams as Parameters<typeof this.slackClient.chat.postMessage>[0]
+      );
 
       if (!response.ok) {
         throw new SlackIntegrationError(
@@ -162,8 +225,8 @@ export class SlackMessagingService {
 
       // Handle specific Slack API errors
       if (error instanceof Error && 'data' in error) {
-        const slackError = (error as any).data;
-        const errorMessage = this.mapSlackError(slackError?.error);
+        const errorWithData = error as Error & { data: { error?: string } };
+        const errorMessage = this.mapSlackError(errorWithData.data?.error);
         return {
           success: false,
           error: errorMessage,
@@ -218,7 +281,7 @@ export class SlackMessagingService {
 
       if (attempt < maxRetries) {
         // Exponential backoff: 1s, 2s, 4s
-        const delay = Math.min(1000 * Math.pow(2, attempt), 5000);
+        const delay = Math.min(1000 * 2 ** attempt, 5000);
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
@@ -265,19 +328,29 @@ export class SlackMessagingService {
       );
 
       // Update message
-      const updateParams: any = {
+      const baseUpdateParams = {
         token: accessToken,
         channel: channelId,
         ts: messageTs,
-        ...validatedMessage,
+        text: validatedMessage.text || (validatedMessage.blocks ? ' ' : ' '),
       };
 
-      // Ensure text is provided if no blocks
-      if (!updateParams.text && !updateParams.blocks) {
-        updateParams.text = ' '; // Slack requires at least text or blocks
-      }
+      const updateParams = validatedMessage.blocks
+        ? {
+            ...baseUpdateParams,
+            blocks: validatedMessage.blocks,
+            ...(validatedMessage.attachments && { attachments: validatedMessage.attachments }),
+          }
+        : validatedMessage.attachments
+          ? {
+              ...baseUpdateParams,
+              attachments: validatedMessage.attachments,
+            }
+          : baseUpdateParams;
 
-      const response = await this.slackClient.chat.update(updateParams);
+      const response = await this.slackClient.chat.update(
+        updateParams as Parameters<typeof this.slackClient.chat.update>[0]
+      );
 
       if (!response.ok) {
         throw new SlackIntegrationError(
@@ -301,8 +374,8 @@ export class SlackMessagingService {
 
       // Handle specific Slack API errors
       if (error instanceof Error && 'data' in error) {
-        const slackError = (error as any).data;
-        const errorMessage = this.mapSlackError(slackError?.error);
+        const errorWithData = error as Error & { data: { error?: string } };
+        const errorMessage = this.mapSlackError(errorWithData.data?.error);
         return {
           success: false,
           error: errorMessage,
@@ -366,8 +439,8 @@ export class SlackMessagingService {
 
       // Handle specific Slack API errors
       if (error instanceof Error && 'data' in error) {
-        const slackError = (error as any).data;
-        const errorMessage = this.mapSlackError(slackError?.error);
+        const errorWithData = error as Error & { data: { error?: string } };
+        const errorMessage = this.mapSlackError(errorWithData.data?.error);
         return {
           success: false,
           error: errorMessage,
@@ -429,12 +502,28 @@ export class SlackMessagingService {
       }
 
       // Transform messages to ensure required properties
-      const messages = (response.messages || []).map((msg: any) => ({
-        ts: msg.ts || '',
-        text: msg.text,
-        user: msg.user,
-        thread_ts: msg.thread_ts,
-      }));
+      const messages = (response.messages || []).map((msg) => {
+        const message: {
+          ts: string;
+          text?: string;
+          user?: string;
+          thread_ts?: string;
+        } = {
+          ts: msg.ts || '',
+        };
+
+        if (msg.text !== undefined) {
+          message.text = msg.text;
+        }
+        if (msg.user !== undefined) {
+          message.user = msg.user;
+        }
+        if (msg.thread_ts !== undefined) {
+          message.thread_ts = msg.thread_ts;
+        }
+
+        return message;
+      });
 
       return {
         success: true,
@@ -450,8 +539,8 @@ export class SlackMessagingService {
 
       // Handle specific Slack API errors
       if (error instanceof Error && 'data' in error) {
-        const slackError = (error as any).data;
-        const errorMessage = this.mapSlackError(slackError?.error);
+        const errorWithData = error as Error & { data: { error?: string } };
+        const errorMessage = this.mapSlackError(errorWithData.data?.error);
         return {
           success: false,
           error: errorMessage,
@@ -503,10 +592,10 @@ export class SlackMessagingService {
       };
     } catch (error) {
       if (error instanceof Error && 'data' in error) {
-        const slackError = (error as any).data;
+        const errorWithData = error as Error & { data: { error?: string } };
         return {
           canSend: false,
-          error: this.mapSlackError(slackError?.error),
+          error: this.mapSlackError(errorWithData.data?.error),
         };
       }
 
