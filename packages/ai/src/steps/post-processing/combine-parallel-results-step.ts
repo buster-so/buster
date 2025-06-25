@@ -70,7 +70,7 @@ export const combineParallelResultsOutputSchema = z.object({
     .describe('List of assumptions identified'),
 });
 
-const combineParallelResultsStepExecution = async ({
+export const combineParallelResultsStepExecution = async ({
   inputData,
 }: {
   inputData: z.infer<typeof inputSchema>;

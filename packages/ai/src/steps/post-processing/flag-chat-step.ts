@@ -2,8 +2,8 @@ import { Agent, createStep } from '@mastra/core';
 import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
-import { flagChat, flagChatSchema } from '../../tools/post-processing/flag-chat';
-import { noIssuesFound, noIssuesFoundSchema } from '../../tools/post-processing/no-issues-found';
+import { flagChat } from '../../tools/post-processing/flag-chat';
+import { noIssuesFound } from '../../tools/post-processing/no-issues-found';
 import { MessageHistorySchema } from '../../utils/memory/types';
 import { anthropicCachedModel } from '../../utils/models/anthropic-cached';
 import { standardizeMessages } from '../../utils/standardizeMessages';
@@ -128,7 +128,7 @@ export const flagChatAgent = new Agent({
   defaultStreamOptions: DEFAULT_OPTIONS,
 });
 
-const flagChatStepExecution = async ({
+export const flagChatStepExecution = async ({
   inputData,
 }: {
   inputData: z.infer<typeof inputSchema>;

@@ -15,7 +15,7 @@ export const flagChatSchema = z.object({
 
 // Flag Chat Tool
 export const flagChat = createTool({
-  id: 'flag-chat',
+  id: 'flagChat',
   description: 'Flag a chat for review by the data team',
   inputSchema: flagChatSchema,
   outputSchema: z.object({

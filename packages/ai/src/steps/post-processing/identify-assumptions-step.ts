@@ -179,7 +179,7 @@ const DEFAULT_OPTIONS = {
   maxSteps: 1,
 };
 
-const identifyAssumptionsStepExecution = async ({
+export const identifyAssumptionsStepExecution = async ({
   inputData,
 }: {
   inputData: z.infer<typeof inputSchema>;

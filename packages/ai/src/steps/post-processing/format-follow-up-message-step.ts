@@ -169,7 +169,7 @@ export const followUpMessageAgent = new Agent({
   defaultStreamOptions: DEFAULT_OPTIONS,
 });
 
-const formatFollowUpMessageStepExecution = async ({
+export const formatFollowUpMessageStepExecution = async ({
   inputData,
 }: {
   inputData: z.infer<typeof inputSchema>;

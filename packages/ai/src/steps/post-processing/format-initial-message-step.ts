@@ -173,7 +173,7 @@ export const initialMessageAgent = new Agent({
   defaultStreamOptions: DEFAULT_OPTIONS,
 });
 
-const formatInitialMessageStepExecution = async ({
+export const formatInitialMessageStepExecution = async ({
   inputData,
 }: {
   inputData: z.infer<typeof inputSchema>;
