@@ -175,6 +175,10 @@ export const flagChatStepExecution = async ({
       // Format conversation history as text for analysis
       const chatHistoryText = JSON.stringify(conversationHistory, null, 2);
       const analysisPrompt = `Here is the chat history to analyze:
+
+User: ${inputData.userName}
+
+Chat History:
 \`\`\`
 ${chatHistoryText}
 \`\`\`
@@ -184,7 +188,9 @@ Please analyze this conversation history for potential user frustration or issue
       messages = standardizeMessages(analysisPrompt);
     } else {
       // If no conversation history, create a message indicating that
-      messages = standardizeMessages('No conversation history available for analysis.');
+      messages = standardizeMessages(`User: ${inputData.userName}
+
+No conversation history available for analysis.`);
     }
 
     const tracedFlagChat = wrapTraced(
@@ -206,6 +212,9 @@ Please analyze this conversation history for potential user frustration or issue
     }
 
     const toolCall = toolCalls[0]; // Should only be one with maxSteps: 1
+    if (!toolCall) {
+      throw new Error('Tool call is undefined');
+    }
 
     if (!toolCall) {
       throw new Error('No tool was called by the flag chat agent');
