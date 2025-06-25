@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useMemo, useRef, useState } from 'react';
 import { useCreatePermissionGroup } from '@/api/buster_rest/permission_groups';
 import { Input } from '@/components/ui/inputs';

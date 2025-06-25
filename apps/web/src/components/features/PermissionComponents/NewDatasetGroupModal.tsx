@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useMemo, useRef, useState } from 'react';
 import { useCreateDatasetGroup } from '@/api/buster_rest/dataset_groups';
 import { Input } from '@/components/ui/inputs';
