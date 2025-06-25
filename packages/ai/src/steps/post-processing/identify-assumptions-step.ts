@@ -41,28 +41,28 @@ export const identifyAssumptionsOutputSchema = z.object({
         descriptiveTitle: z.string().describe('A clear, descriptive title for the assumption'),
         classification: z
           .enum([
-                'fieldMapping',
-                'tableRelationship',
-                'dataQuality',
-                'dataFormat',
-                'dataAvailability',
-                'timePeriodInterpretation',
-                'timePeriodGranularity',
-                'metricInterpretation',
-                'segmentInterpretation',
-                'quantityInterpretation',
-                'requestScope',
-                'metricDefinition',
-                'segmentDefinition',
-                'businessLogic',
-                'policyInterpretation',
-                'optimization',
-                'aggregation',
-                'filtering',
-                'sorting',
-                'grouping',
-                'calculationMethod',
-                'dataRelevance'
+            'fieldMapping',
+            'tableRelationship',
+            'dataQuality',
+            'dataFormat',
+            'dataAvailability',
+            'timePeriodInterpretation',
+            'timePeriodGranularity',
+            'metricInterpretation',
+            'segmentInterpretation',
+            'quantityInterpretation',
+            'requestScope',
+            'metricDefinition',
+            'segmentDefinition',
+            'businessLogic',
+            'policyInterpretation',
+            'optimization',
+            'aggregation',
+            'filtering',
+            'sorting',
+            'grouping',
+            'calculationMethod',
+            'dataRelevance',
           ])
           .describe('The type/category of assumption made'),
         explanation: z
@@ -372,12 +372,16 @@ Please analyze this conversation history to identify any assumptions made during
       throw new Error('Tool call is undefined');
     }
 
+    if (!toolCall) {
+      throw new Error('No tool was called by the identify assumptions agent');
+    }
+
     return {
       // Pass through all input fields
       ...inputData,
       // Add new fields from this step
-      toolCalled: toolCall.toolName,
-      assumptions: toolCall.args.assumptions?.map(
+      toolCalled: toolCall?.toolName,
+      assumptions: toolCall?.args.assumptions?.map(
         (assumption: z.infer<typeof assumptionItemSchema>) => ({
           descriptiveTitle: assumption.descriptive_title,
           classification: assumption.classification,

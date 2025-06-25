@@ -210,6 +210,10 @@ Please analyze this conversation history for potential user frustration or issue
       throw new Error('Tool call is undefined');
     }
 
+    if (!toolCall) {
+      throw new Error('No tool was called by the flag chat agent');
+    }
+
     return {
       // Pass through all input fields
       ...inputData,

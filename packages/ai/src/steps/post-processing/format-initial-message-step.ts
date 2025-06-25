@@ -53,7 +53,7 @@ const inputSchema = z.object({
             'sorting',
             'grouping',
             'calculationMethod',
-            'dataRelevance'
+            'dataRelevance',
           ])
           .describe('The type/category of assumption made'),
         explanation: z
@@ -111,7 +111,7 @@ export const formatInitialMessageOutputSchema = z.object({
             'sorting',
             'grouping',
             'calculationMethod',
-            'dataRelevance'
+            'dataRelevance',
           ])
           .describe('The type/category of assumption made'),
         explanation: z
