@@ -182,6 +182,7 @@ const DEFAULT_OPTIONS = {
   providerOptions: {
     anthropic: {
       disableParallelToolCalls: true,
+      thinking: { type: 'enabled', budgetTokens: 16000 },
     },
   },
 };
@@ -233,9 +234,7 @@ Please analyze this conversation history to identify any assumptions made during
 
     const tracedIdentifyAssumptions = wrapTraced(
       async () => {
-        const response = await identifyAssumptionsAgentWithContext.generate(messages, {
-          toolChoice: 'required',
-        });
+        const response = await identifyAssumptionsAgentWithContext.generate(messages);
         return response;
       },
       {

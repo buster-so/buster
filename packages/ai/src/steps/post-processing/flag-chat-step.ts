@@ -127,6 +127,7 @@ const DEFAULT_OPTIONS = {
   providerOptions: {
     anthropic: {
       disableParallelToolCalls: true,
+      thinking: { type: 'enabled', budgetTokens: 16000 },
     },
   },
 };
@@ -178,9 +179,7 @@ Please analyze this conversation history for potential user frustration or issue
 
     const tracedFlagChat = wrapTraced(
       async () => {
-        const response = await flagChatAgentWithContext.generate(messages, {
-          toolChoice: 'required',
-        });
+        const response = await flagChatAgentWithContext.generate(messages);
         return response;
       },
       {
