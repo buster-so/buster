@@ -190,6 +190,8 @@ export const formatFollowUpMessageStepExecution = async ({
 
     const contextMessage = `New issues and assumptions identified from the latest chat messages:
 
+User: ${inputData.userName}
+
 Issues Flagged: ${issuesAndAssumptions.flagged_issues}
 
 Assumptions Identified: ${

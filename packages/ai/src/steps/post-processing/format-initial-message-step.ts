@@ -205,6 +205,8 @@ export const formatInitialMessageStepExecution = async ({
 
     const contextMessage = `Issues and assumptions identified from the chat that require data team attention:
 
+User: ${inputData.userName}
+
 Issues Flagged: ${issuesAndAssumptions.flagged_issues}
 
 Major Assumptions Identified: ${
