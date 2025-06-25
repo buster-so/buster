@@ -50,7 +50,7 @@ app.notFound((c) => {
   return c.json({ error: 'Not Found', message: 'The requested resource was not found' }, 404);
 });
 
-// Get port from environment variable or defaults to 3002 for local development (as mentioned in README)
+// Get port from environment variable or defaults to 3002 for local development
 const port = Number.parseInt(process.env.SERVER_PORT || '3002', 10);
 
 // Export for Bun
