@@ -4,7 +4,7 @@ export default defineConfig({
   entry: ['src/index.ts'],
   outDir: 'dist',
   format: ['esm'], // ESM for development
-  target: 'node18',
+  target: 'esnext',
   platform: 'node',
   clean: true,
   minify: false,
