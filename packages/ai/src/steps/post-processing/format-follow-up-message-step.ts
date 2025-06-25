@@ -2,6 +2,7 @@ import { Agent, createStep } from '@mastra/core';
 import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
+import { generateUpdateMessage } from '../../tools/post-processing/generate-update-message';
 import { MessageHistorySchema } from '../../utils/memory/types';
 import { anthropicCachedModel } from '../../utils/models/anthropic-cached';
 import { standardizeMessages } from '../../utils/standardizeMessages';
@@ -172,6 +173,9 @@ export const followUpMessageAgent = new Agent({
   name: 'Format Follow-up Message',
   instructions: followUpMessageInstructions,
   model: anthropicCachedModel('claude-sonnet-4-20250514'),
+  tools: {
+    generateUpdateMessage,
+  },
   defaultGenerateOptions: DEFAULT_OPTIONS,
   defaultStreamOptions: DEFAULT_OPTIONS,
 });
@@ -209,15 +213,9 @@ Generate a concise update message for the data team.`;
     const tracedFollowUpMessage = wrapTraced(
       async () => {
         const response = await followUpMessageAgent.generate(messages, {
-          output: z.object({
-            update_message: z
-              .string()
-              .describe(
-                'A concise summary of the new issues and assumptions within the context of the Slack thread.'
-              ),
-          }),
+          toolChoice: 'required',
         });
-        return response.object;
+        return response;
       },
       {
         name: 'Format Follow-up Message',
@@ -225,7 +223,19 @@ Generate a concise update message for the data team.`;
     );
 
     const followUpResult = await tracedFollowUpMessage();
-    const updateMessage = followUpResult.update_message;
+
+    // Extract tool call information
+    const toolCalls = followUpResult.toolCalls || [];
+    if (toolCalls.length === 0) {
+      throw new Error('No tool was called by the format follow-up message agent');
+    }
+
+    const toolCall = toolCalls[0]; // Should only be one with maxSteps: 1
+    if (toolCall.toolName !== 'generateUpdateMessage') {
+      throw new Error(`Unexpected tool called: ${toolCall.toolName}`);
+    }
+
+    const updateMessage = toolCall.args.update_message;
 
     // Return all input data plus the formatted message
     return {

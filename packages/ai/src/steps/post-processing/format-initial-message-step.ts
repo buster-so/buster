@@ -2,6 +2,7 @@ import { Agent, createStep } from '@mastra/core';
 import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
+import { generateSummary } from '../../tools/post-processing/generate-summary';
 import { MessageHistorySchema } from '../../utils/memory/types';
 import { anthropicCachedModel } from '../../utils/models/anthropic-cached';
 import { standardizeMessages } from '../../utils/standardizeMessages';
@@ -176,6 +177,9 @@ export const initialMessageAgent = new Agent({
   name: 'Format Initial Message',
   instructions: initialMessageInstructions,
   model: anthropicCachedModel('claude-sonnet-4-20250514'),
+  tools: {
+    generateSummary,
+  },
   defaultGenerateOptions: DEFAULT_OPTIONS,
   defaultStreamOptions: DEFAULT_OPTIONS,
 });
@@ -224,14 +228,9 @@ Generate a cohesive summary with title for the data team.`;
     const tracedInitialMessage = wrapTraced(
       async () => {
         const response = await initialMessageAgent.generate(messages, {
-          output: z.object({
-            title: z.string().describe('A concise title for the summary message, 3-6 words long.'),
-            summary_message: z
-              .string()
-              .describe('A simple and concise summary of the issues and assumptions.'),
-          }),
+          toolChoice: 'required',
         });
-        return response.object;
+        return response;
       },
       {
         name: 'Format Initial Message',
@@ -239,7 +238,19 @@ Generate a cohesive summary with title for the data team.`;
     );
 
     const initialResult = await tracedInitialMessage();
-    const summaryMessage = `${initialResult.title}: ${initialResult.summary_message}`;
+
+    // Extract tool call information
+    const toolCalls = initialResult.toolCalls || [];
+    if (toolCalls.length === 0) {
+      throw new Error('No tool was called by the format initial message agent');
+    }
+
+    const toolCall = toolCalls[0]; // Should only be one with maxSteps: 1
+    if (toolCall.toolName !== 'generateSummary') {
+      throw new Error(`Unexpected tool called: ${toolCall.toolName}`);
+    }
+
+    const summaryMessage = `${toolCall.args.title}: ${toolCall.args.summary_message}`;
 
     // Return all input data plus the formatted message
     return {
