@@ -25,11 +25,10 @@ import {
 import { inputHasText } from '@/lib/text';
 import { BusterRoutes, createBusterRoute } from '@/routes/busterRoutes';
 import { PolicyCheck } from './PolicyCheck';
-import env from '@/config/envClient';
 
 const DEFAULT_CREDENTIALS = {
-  email: env.NEXT_PUBLIC_USER || '',
-  password: env.NEXT_PUBLIC_USER_PASSWORD || ''
+  email: process.env.NEXT_PUBLIC_USER || '',
+  password: process.env.NEXT_PUBLIC_USER_PASSWORD || ''
 };
 
 export const LoginForm: React.FC = () => {

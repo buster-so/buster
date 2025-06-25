@@ -710,18 +710,6 @@ importers:
         specifier: 'catalog:'
         version: 3.25.67
 
-  packages/nate:
-    dependencies:
-      '@buster/typescript-config':
-        specifier: workspace:*
-        version: link:../typescript-config
-      '@buster/vitest-config':
-        specifier: workspace:*
-        version: link:../vitest-config
-      dotenv:
-        specifier: ^16.5.0
-        version: 16.5.0
-
   packages/rerank:
     dependencies:
       '@buster/typescript-config':
