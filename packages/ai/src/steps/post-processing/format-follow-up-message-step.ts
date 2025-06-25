@@ -233,6 +233,10 @@ Generate a concise update message for the data team.`;
     }
 
     const toolCall = toolCalls[0]; // Should only be one with maxSteps: 1
+    if (!toolCall) {
+      throw new Error('Tool call is undefined');
+    }
+    
     if (toolCall.toolName !== 'generateUpdateMessage') {
       throw new Error(`Unexpected tool called: ${toolCall.toolName}`);
     }

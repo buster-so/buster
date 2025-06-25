@@ -368,6 +368,9 @@ Please analyze this conversation history to identify any assumptions made during
     }
 
     const toolCall = toolCalls[0]; // Should only be one with maxSteps: 1
+    if (!toolCall) {
+      throw new Error('Tool call is undefined');
+    }
 
     return {
       // Pass through all input fields

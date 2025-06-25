@@ -250,6 +250,10 @@ Generate a cohesive summary with title for the data team.`;
     }
 
     const toolCall = toolCalls[0]; // Should only be one with maxSteps: 1
+    if (!toolCall) {
+      throw new Error('Tool call is undefined');
+    }
+    
     if (toolCall.toolName !== 'generateSummary') {
       throw new Error(`Unexpected tool called: ${toolCall.toolName}`);
     }

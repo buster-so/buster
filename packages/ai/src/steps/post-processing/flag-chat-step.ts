@@ -206,6 +206,9 @@ Please analyze this conversation history for potential user frustration or issue
     }
 
     const toolCall = toolCalls[0]; // Should only be one with maxSteps: 1
+    if (!toolCall) {
+      throw new Error('Tool call is undefined');
+    }
 
     return {
       // Pass through all input fields
