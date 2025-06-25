@@ -120,7 +120,11 @@
     "vite": "^6.3.5",
     "vite-tsconfig-paths": "^5.1.4",
     "zod": "catalog:",
-    "zustand": "^5.0.5"
+    "zustand": "^5.0.5",
+    "sass": "^1.89.2",
+    "tailwind-scrollbar": "^4.0.2",
+    "tailwindcss": "4.1.10",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^3.2.6",
@@ -154,10 +158,6 @@
     "jsdom": "^26.1.0",
     "msw-storybook-addon": "^2.0.5",
     "prettier-eslint": "^16.4.2",
-    "sass": "^1.89.2",
-    "tailwind-scrollbar": "^4.0.2",
-    "tailwindcss": "4.1.10",
-    "tailwindcss-animate": "^1.0.7",
     "vitest": "catalog:"
   },
   "msw": {

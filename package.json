@@ -34,15 +34,15 @@
     "trigger:dev": "dotenv -e .env -- pnpm --filter @buster/trigger run dev",
     "trigger:test": "pnpm --filter @buster/trigger run test",
     "trigger:test:integration": "pnpm --filter @buster/trigger run test:integration",
-    "typecheck": "turbo typecheck"
+    "typecheck": "turbo typecheck",
+    "typescript": "^5.8.3",
+    "turbo": "^2.5.4"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/node": "^20.17.57",
     "dotenv": "^16.5.0",
     "dotenv-cli": "^8.0.0",
-    "turbo": "^2.5.4",
-    "typescript": "^5.8.3",
     "vitest": "catalog:"
   },
   "peerDependencies": {

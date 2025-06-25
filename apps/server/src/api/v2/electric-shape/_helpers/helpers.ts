@@ -2,7 +2,7 @@ if (!process.env.ELECTRIC_PROXY_URL) {
   throw new Error('ELECTRIC_PROXY_URL is not set');
 }
 
-if (process.env.NODE_ENV !== 'development' && !process.env.ELECTRIC_SOURCE_ID) {
+if (process.env.NODE_ENV === 'production' && !process.env.ELECTRIC_SOURCE_ID) {
   console.warn('ELECTRIC_SOURCE_ID is not set');
 }
 

@@ -24,11 +24,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@buster/typescript-config": "workspace:*",
+    "@buster/vitest-config": "workspace:*",
     "@buster/database": "workspace:*",
     "zod": "catalog:"
-  },
-  "devDependencies": {
-    "@buster/typescript-config": "workspace:*",
-    "@buster/vitest-config": "workspace:*"
   }
 }
