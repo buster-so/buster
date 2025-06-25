@@ -159,6 +159,8 @@ You operate in a loop to complete tasks:
   - Include a 3-6 word title that will serve as the header for the summary_message.
   - Include a simple summary message that briefly describes the issues and assumptions detected.
     - The summary message should be concise and informative, suitable for sending to the data team's Slack channel.
+    - The summary message should start with the user's name (e.g. Kevin reqeuested...)
+    - When referring to the "AI analyst" or "AI data analyst", you should refer to it by it's name, "Buster" (e.g. "Buster made assumptions..." instead of "The AI analyst made assumptions...")
 </output_format>
 `;
 

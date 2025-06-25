@@ -110,6 +110,8 @@ Flag the chat if any of the following conditions are met:
   - Include a 3-6 word title that will serve as the header for the summary_message.
   - Include a simple summary message that briefly describes the issue detected.
     - The summary message should be concise and informative, suitable for sending to the data team's Slack channel.
+    - The summary message should start with the user's name (e.g. Kevin reqeuested...)
+    - When referring to the "AI analyst" or "AI data analyst", you should refer to it by it's name, "Buster" (e.g. "Buster made assumptions..." instead of "The AI analyst made assumptions...")
 - If no issues are detected:
   - Use the \`noIssuesFound\` tool to indicate that the chat does not need to be flagged.
 
