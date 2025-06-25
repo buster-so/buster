@@ -7,9 +7,6 @@ const __dirname = dirname(__filename);
 
 const apiUrl = new URL(env.NEXT_PUBLIC_API_URL).origin;
 const api2Url = new URL(env.NEXT_PUBLIC_API2_URL).origin;
-const wsUrl = new URL(env.NEXT_PUBLIC_WEB_SOCKET_URL).origin
-  .replace('https', 'wss')
-  .replace('http', 'ws');
 
 // Function to create CSP header with dynamic API URLs
 const createCspHeader = (isEmbed = false) => {
@@ -34,7 +31,7 @@ const createCspHeader = (isEmbed = false) => {
     // Frame sources
     "frame-src 'self' https://vercel.live",
     // Connect sources for API calls
-    `connect-src 'self' ${localDomains} https://*.vercel.app https://*.supabase.co wss://*.supabase.co https://*.posthog.com ${apiUrl} ${api2Url} ${wsUrl}`
+    `connect-src 'self' ${localDomains} https://*.vercel.app https://*.supabase.co wss://*.supabase.co https://*.posthog.com ${apiUrl} ${api2Url}`
       .replace(/\s+/g, ' ')
       .trim(),
     // Media

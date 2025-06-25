@@ -80,8 +80,8 @@
       "trigger/**/*.js",
       "vitest.config.ts",
       "biome.json",
-      "package.json",
-      "turbo.json"
+      "./package.json",
+      "./turbo.json"
     ],
     "ignore": [
       "**/node_modules/**",

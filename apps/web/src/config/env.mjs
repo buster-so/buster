@@ -25,7 +25,8 @@ const clientEnvSchema = z.object({
   NEXT_PUBLIC_WEB_SOCKET_URL: z
     .string()
     .min(1, { message: 'NEXT_PUBLIC_WEB_SOCKET_URL is required' })
-    .url({ message: 'NEXT_PUBLIC_WEB_SOCKET_URL must be a valid URL' }),
+    .url({ message: 'NEXT_PUBLIC_WEB_SOCKET_URL must be a valid URL' })
+    .optional(),
   NEXT_PUBLIC_URL: z
     .string()
     .min(1, { message: 'NEXT_PUBLIC_URL is required' })

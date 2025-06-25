@@ -7,7 +7,6 @@
     "check": "biome check ${1:-.}",
     "check:fix": "biome check --write ${1:-.}",
     "ci:check": "pnpm run check && pnpm run typecheck",
-    "new:package": "bun run scripts/new-package.ts",
     "db:check": "pnpm --filter @buster/database run db:check",
     "db:generate": "pnpm --filter @buster/database run db:generate",
     "db:introspect": "pnpm --filter @buster/database run db:introspect",
@@ -20,12 +19,13 @@
     "db:studio": "pnpm --filter @buster/database run db:studio",
     "dev": "turbo dev",
     "dev:db-init": "turbo run dev:init --filter \"@buster/database\"",
-    "dev:server:reset": "pnpm run dev:db-init && turbo run dev --filter \"@buster-app/server\"",
     "dev:server": "turbo run dev --filter \"@buster-app/server\"",
+    "dev:server:reset": "pnpm run dev:db-init && turbo run dev --filter \"@buster-app/server\"",
     "evals": "bash scripts/evals.sh",
     "format": "biome format ${1:-.}",
     "format:fix": "biome format --write ${1:-.}",
     "lint": "turbo lint",
+    "new:package": "bun run scripts/new-package.ts",
     "test": "dotenv -e .env -- turbo test",
     "test:coverage": "turbo test:coverage",
     "test:ui": "vitest --ui",
@@ -37,13 +37,15 @@
     "typecheck": "turbo typecheck",
     "typescript": "^5.8.3"
   },
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "dotenv-cli": "^8.0.0"
+  },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/node": "^20.17.57",
-    "dotenv": "^16.5.0",
-    "dotenv-cli": "^8.0.0",
-    "vitest": "catalog:",
-    "turbo": "^2.5.4"
+    "turbo": "^2.5.4",
+    "vitest": "catalog:"
   },
   "peerDependencies": {
     "bun": "^1.2.15",
