@@ -1,10 +1,56 @@
 import { z } from 'zod';
-import clientEnv from './envClient.mjs';
 import { isServer } from '@tanstack/react-query';
 
 if (!isServer) {
   throw new Error('env.mjs is only meant to be used on the server');
 }
+
+const clientEnvSchema = z.object({
+  // Node environment
+  NODE_ENV: z
+    .enum(['development', 'production', 'test'], {
+      errorMap: () => ({ message: 'NODE_ENV must be development, production, or test' })
+    })
+    .default('development'),
+
+  // API URLs
+  NEXT_PUBLIC_API_URL: z
+    .string()
+    .min(1, { message: 'NEXT_PUBLIC_API_URL is required' })
+    .url({ message: 'NEXT_PUBLIC_API_URL must be a valid URL' }),
+  NEXT_PUBLIC_API2_URL: z
+    .string()
+    .min(1, { message: 'NEXT_PUBLIC_API2_URL is required' })
+    .url({ message: 'NEXT_PUBLIC_API2_URL must be a valid URL' }),
+  NEXT_PUBLIC_WEB_SOCKET_URL: z
+    .string()
+    .min(1, { message: 'NEXT_PUBLIC_WEB_SOCKET_URL is required' })
+    .url({ message: 'NEXT_PUBLIC_WEB_SOCKET_URL must be a valid URL' }),
+  NEXT_PUBLIC_URL: z
+    .string()
+    .min(1, { message: 'NEXT_PUBLIC_URL is required' })
+    .url({ message: 'NEXT_PUBLIC_URL must be a valid URL' }),
+
+  // Supabase configuration
+  NEXT_PUBLIC_SUPABASE_URL: z
+    .string()
+    .min(1, { message: 'NEXT_PUBLIC_SUPABASE_URL is required' })
+    .url({ message: 'NEXT_PUBLIC_SUPABASE_URL must be a valid URL' }),
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: z
+    .string()
+    .min(1, { message: 'NEXT_PUBLIC_SUPABASE_ANON_KEY is required' }),
+
+  // PostHog analytics
+  NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
+  NEXT_PUBLIC_POSTHOG_HOST: z
+    .string()
+    .url({ message: 'NEXT_PUBLIC_POSTHOG_HOST must be a valid URL' })
+    .optional(),
+
+  // Development/Testing credentials
+  NEXT_PUBLIC_USER: z.string().optional(),
+  NEXT_PUBLIC_USER_PASSWORD: z.string().optional()
+});
 
 const serverEnvSchema = z.object({
   // Slack integration (private)
@@ -16,9 +62,13 @@ const serverEnvSchema = z.object({
 
 // Parse and validate server-only environment variables
 let serverEnv;
+let clientEnv;
 
 try {
   serverEnv = serverEnvSchema.parse(process.env);
+  console.log('Successfully parsed server environment variables');
+  clientEnv = clientEnvSchema.parse(process.env);
+  console.log('Successfully parsed client environment variables');
 } catch (error) {
   console.error('❌ Server environment validation failed!');
   console.error('');

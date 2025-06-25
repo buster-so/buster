@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useMemo } from 'react';
 import { Card, CardHeader } from '@/components/ui/card/CardBase';
 import { BusterChart } from '@/components/ui/charts/BusterChart';
