@@ -1,0 +1,40 @@
+{
+  "name": "@buster/slack",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "default": "./dist/*.js"
+    }
+  },
+  "scripts": {
+    "prebuild": "node scripts/validate-env.js",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "dev": "tsc --watch",
+    "lint": "biome check",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage",
+    "test:integration": "vitest run src/**/*.int.test.ts"
+  },
+  "dependencies": {
+    "@slack/web-api": "^6.10.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@buster/typescript-config": "workspace:*",
+    "@buster/vitest-config": "workspace:*",
+    "@types/node": "^20.0.0",
+    "dotenv": "^16.0.0",
+    "tsx": "^4.0.0",
+    "vitest": "^1.2.0"
+  }
+}

@@ -1,0 +1,199 @@
+import { Agent, createStep } from '@mastra/core';
+import type { CoreMessage } from 'ai';
+import { wrapTraced } from 'braintrust';
+import { z } from 'zod';
+import { flagChat } from '../../tools/post-processing/flag-chat';
+import { noIssuesFound } from '../../tools/post-processing/no-issues-found';
+import { MessageHistorySchema } from '../../utils/memory/types';
+import { anthropicCachedModel } from '../../utils/models/anthropic-cached';
+import { standardizeMessages } from '../../utils/standardizeMessages';
+
+const inputSchema = z.object({
+  conversationHistory: MessageHistorySchema.optional(),
+  name: z.string().describe('Name for the post-processing operation'),
+  messageId: z.string().describe('Message ID for the current operation'),
+  userId: z.string().describe('User ID for the current operation'),
+  chatId: z.string().describe('Chat ID for the current operation'),
+  isFollowUp: z.boolean().describe('Whether this is a follow-up message'),
+  previousMessages: z.array(z.string()).describe('Array of previous messages for context'),
+  datasets: z.string().describe('Assembled YAML content of all available datasets for context'),
+});
+
+export const flagChatOutputSchema = z.object({
+  // Pass through all input fields
+  conversationHistory: MessageHistorySchema.optional(),
+  name: z.string().describe('Name for the post-processing operation'),
+  messageId: z.string().describe('Message ID for the current operation'),
+  userId: z.string().describe('User ID for the current operation'),
+  chatId: z.string().describe('Chat ID for the current operation'),
+  isFollowUp: z.boolean().describe('Whether this is a follow-up message'),
+  previousMessages: z.array(z.string()).describe('Array of previous messages for context'),
+  datasets: z.string().describe('Assembled YAML content of all available datasets for context'),
+
+  // New fields from this step
+  toolCalled: z.string().describe('Name of the tool that was called by the agent'),
+  summaryMessage: z.string().optional().describe('Brief summary of the issue detected'),
+  summaryTitle: z.string().optional().describe('Short 3-6 word title for the summary'),
+  message: z.string().optional().describe('Confirmation message indicating no issues found'),
+});
+
+const flagChatInstructions = `
+### Overview
+- You are a specialized AI agent within an AI-powered data analyst system.
+- Your role is to review the chat history between the AI data analyst (Buster) and the user, identify signs that the user might be frustrated or that something went wrong in the chat, and flag the chat for review by the data team.
+- Your tasks include:
+  - Analyzing the chat history for specific signals of potential user frustration or issues.
+  - Flagging chats that meet the criteria for review.
+  - Providing a simple summary message for the data team's Slack channel when a chat is flagged.
+
+### Event Stream
+You will be provided with a chronological event stream (may be truncated or partially omitted) containing the following types of events:
+1. User messages: Current and past requests
+2. Tool actions: Results from tool executions
+3. sequentialThinking thoughts: Reasoning, thoughts, and decisions recorded by Buster
+4. Other miscellaneous events generated during system operation
+
+### Agent Loop
+You operate in a loop to complete tasks:
+1. Immediately start by reviewing the chat history and looking for signals of potential user frustration or issues.
+2. Continue reviewing until you have thoroughly assessed the chat.
+3. If any signals are detected, use the \`flagChat\` tool to flag the chat and provide a summary message.
+4. If no signals are detected, use the \`noIssuesFound\` tool to indicate that the chat does not need to be flagged.
+
+### Tool Use Rules
+- Follow tool schemas exactly, including all required parameters
+- Do not mention tool names to users
+- Use \`flagChat\` tool to flag the chat and provide a summary message when signals are detected
+- Use \`noIssuesFound\` tool to indicate that no issues were detected
+
+### Signals to Detect
+Look for the following signals that may indicate user frustration or issues in the chat:
+1. No final answer or results were provided to the user.
+2. The results returned were empty, zero, or null.
+3. There were errors that prevented Buster from fulfilling the user's request.
+4. The final response did not fully address the user's request or seemed like a stretch to fulfill it.
+5. There was uncertainty or confusion in Buster's internal thoughts.
+6. The final response showed that Buster failed to completely address the user's request.
+7. There were signs of incomplete work or unresolved issues.
+8. Major assumptions were made that could lead to significantly wrong results if incorrect.
+
+### Identification Guidelines
+- Review the user messages to understand their requests and expectations.
+- Check if Buster provided a final answer or results. Look for messages or events indicating that results were generated and shared with the user.
+- Examine the results to see if they are empty, zero, or null. This could indicate that the data didn't match the user's request.
+- Look for error messages or events that show Buster encountered problems while trying to fulfill the request.
+- Assess whether the final response fully addresses the user's request. Look for signs that Buster had to make significant assumptions or approximations to provide an answer.
+- Analyze Buster's internal thoughts for signs of uncertainty, confusion, or difficulty in interpreting the user's request or the data.
+- Check if there are any unresolved issues or incomplete tasks in the chat history.
+- Identify any major assumptions made by Buster that could significantly impact the results if incorrect. These might be things like:
+  - Introducing a new concept, metric, segment, or filter not explicitly defined in the documentation (e.g., defining revenue from multiple unclear columns or using time zones as a proxy for location).
+  - Choosing between multiple similar fields, tables, or calculation methods without clear guidance from the documentation (e.g., selecting one revenue field among several without justification).
+  - Making decisions based on incomplete or ambiguous documentation, leading to high uncertainty (e.g., unclear whether to filter out certain records for a revenue calculation).
+  - Assumptions where an incorrect choice could substantially alter the outcome of the analysis (e.g., a wrong column choice skewing revenue by millions).
+
+### Flagging Criteria
+Flag the chat if any of the following conditions are met:
+- No final answer or results were provided.
+- The results were empty, zero, or null.
+- There were errors that prevented fulfilling the request.
+- The final response did not fully address the request or seemed like a stretch.
+- There was significant uncertainty or confusion in Buster's thoughts.
+- The final response indicated failure to completely address the request.
+- There were signs of incomplete work.
+- Major assumptions were made that could lead to significantly wrong results.
+
+### Output Format
+- If the chat is flagged:
+  - Use the \`flagChat\` tool.
+  - Include a 3-6 word title that will serve as the header for the summary_message.
+  - Include a simple summary message that briefly describes the issue detected.
+    - The summary message should be concise and informative, suitable for sending to the data team's Slack channel.
+- If no issues are detected:
+  - Use the \`noIssuesFound\` tool to indicate that the chat does not need to be flagged.
+`;
+
+const DEFAULT_OPTIONS = {
+  maxSteps: 1,
+};
+
+export const flagChatAgent = new Agent({
+  name: 'Flag Chat Review',
+  instructions: flagChatInstructions,
+  model: anthropicCachedModel('claude-sonnet-4-20250514'),
+  tools: {
+    flagChat,
+    noIssuesFound,
+  },
+  defaultGenerateOptions: DEFAULT_OPTIONS,
+  defaultStreamOptions: DEFAULT_OPTIONS,
+});
+
+export const flagChatStepExecution = async ({
+  inputData,
+}: {
+  inputData: z.infer<typeof inputSchema>;
+}): Promise<z.infer<typeof flagChatOutputSchema>> => {
+  try {
+    // Use the conversation history directly since this is post-processing
+    const conversationHistory = inputData.conversationHistory;
+
+    // Prepare messages for the agent
+    let messages: CoreMessage[];
+    if (conversationHistory && conversationHistory.length > 0) {
+      // Use conversation history as context for post-processing analysis
+      messages = conversationHistory as CoreMessage[];
+    } else {
+      // If no conversation history, create a message indicating that
+      messages = standardizeMessages('No conversation history available for analysis.');
+    }
+
+    const tracedFlagChat = wrapTraced(
+      async () => {
+        const response = await flagChatAgent.generate(messages);
+        return response;
+      },
+      {
+        name: 'Flag Chat Review',
+      }
+    );
+
+    const flagChatResult = await tracedFlagChat();
+
+    // Extract tool call information
+    const toolCalls = flagChatResult.toolCalls || [];
+    if (toolCalls.length === 0) {
+      throw new Error('No tool was called by the flag chat agent');
+    }
+
+    const toolCall = toolCalls[0]; // Should only be one with maxSteps: 1
+
+    return {
+      // Pass through all input fields
+      ...inputData,
+      // Add new fields from this step
+      toolCalled: toolCall.toolName,
+      summaryMessage: toolCall.args.summary_message,
+      summaryTitle: toolCall.args.summary_title,
+      message: toolCall.args.message,
+    };
+  } catch (error) {
+    console.error('Failed to analyze chat for flagging:', error);
+
+    // Check if it's a database connection error
+    if (error instanceof Error && error.message.includes('DATABASE_URL')) {
+      throw new Error('Unable to connect to the analysis service. Please try again later.');
+    }
+
+    // For other errors, throw a user-friendly message
+    throw new Error('Unable to analyze the chat for review. Please try again later.');
+  }
+};
+
+export const flagChatStep = createStep({
+  id: 'flag-chat',
+  description:
+    'This step analyzes the chat history to identify potential user frustration or issues and flags the chat for review if needed.',
+  inputSchema,
+  outputSchema: flagChatOutputSchema,
+  execute: flagChatStepExecution,
+});

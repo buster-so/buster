@@ -179,7 +179,7 @@ describe('OptimisticJsonParser - Stress Tests and Complex Scenarios', () => {
         if (index === 0) {
           expect(result.isComplete).toBe(false);
           // Should still extract the partial YAML
-          const files = result.parsed?.files as Array<{ yml_content: string }> || [];
+          const files = (result.parsed?.files as Array<{ yml_content: string }>) || [];
           if (files.length > 0) {
             expect(files[0]).toHaveProperty('yml_content');
           }
