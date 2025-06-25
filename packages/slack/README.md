@@ -272,6 +272,32 @@ pnpm run test
 pnpm run check:fix
 ```
 
+## Integration Testing
+
+Want to test against your real Slack workspace? It's super easy:
+
+1. **Create a Slack app** at https://api.slack.com/apps
+2. **Copy `.env.example` to `.env`**
+3. **Add just 2 values:**
+   - `SLACK_BOT_TOKEN` - Your bot token from OAuth & Permissions page
+   - `SLACK_CHANNEL_ID` - Any channel ID (right-click channel → View details)
+4. **Run the tests:**
+   ```bash
+   pnpm run test:integration
+   ```
+
+That's it! The integration tests will:
+- ✅ Validate your bot token
+- ✅ Check channel access
+- ✅ Send test messages
+- ✅ Test message updates
+- ✅ Test threading
+- ✅ List available channels
+- ✅ Test OAuth flows
+- ✅ Test error handling
+
+All tests run in seconds and show clear pass/fail results. Integration tests are in `.int.test.ts` files alongside the service files.
+
 ## Architecture
 
 This package follows a clean architecture with:

@@ -22,7 +22,8 @@
     "lint": "biome check",
     "test": "vitest run",
     "test:watch": "vitest watch",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:integration": "vitest run src/**/*.int.test.ts"
   },
   "dependencies": {
     "@slack/web-api": "^6.10.0",
@@ -32,6 +33,8 @@
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
     "@types/node": "^20.0.0",
+    "dotenv": "^16.0.0",
+    "tsx": "^4.0.0",
     "vitest": "^1.2.0"
   }
 }
