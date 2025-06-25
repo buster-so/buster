@@ -49,7 +49,6 @@ export const useTrackAndUpdateMessageChanges = (
         const killUpdate = isStreamingMessage ? false : !hasSeenInitialUpdate.current;
 
         hasSeenInitialUpdate.current = true;
-        console.log('message kill update', killUpdate);
         if (killUpdate) {
           return;
         }

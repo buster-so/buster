@@ -5,11 +5,6 @@ import { Text, Title } from '@/components/ui/typography';
 import { useUserConfigContextSelector } from '@/context/Users';
 import { formatDate } from '@/lib/date';
 import { SettingsPageHeader } from '../../_components/SettingsPageHeader';
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'Profile'
-};
 
 export default function ProfilePage() {
   const user = useUserConfigContextSelector((state) => state.user);

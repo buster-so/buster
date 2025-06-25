@@ -4,11 +4,6 @@ import { useState } from 'react';
 import { AppPageLayout } from '@/components/ui/layouts';
 import { TermsListController } from '@/controllers/TermsListController';
 import { TermsHeader } from '@/controllers/TermsListController/TermsHeader';
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'Terms'
-};
 
 export default function TermsPage() {
   const [openNewTermsModal, setOpenNewTermsModal] = useState(false);

@@ -12,11 +12,6 @@ import { useMemoizedFn } from '@/hooks';
 import { useDebounceSearch } from '@/hooks/useDebounceSearch';
 import { SettingsPageHeader } from '../../_components/SettingsPageHeader';
 import { ListPermissionGroupsComponent } from './ListPermissionGroupsComponent';
-import type { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'Permission groups'
-};
 
 export default function Page() {
   const { data: permissionGroups, isFetched, refetch } = useListAllPermissionGroups();
