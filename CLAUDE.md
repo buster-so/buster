@@ -26,7 +26,7 @@ This is a pnpm-based monorepo using Turborepo with the following structure:
 - `packages/vitest-config` - Shared Vitest configuration
 - `packages/typescript-config` - Shared TypeScript configuration
 - `packages/web-tools` - Web scraping and research tools
-- `packages/slack` - Slack integration
+- `packages/slack` - Standalone Slack integration (OAuth, messaging, channels)
 - `packages/supabase` - Supabase setup and configuration
 
 ## Development Workflow
@@ -507,6 +507,48 @@ pnpm run test packages/ai/src/feature.test.ts
 git add .
 git commit -m "feat: add new feature"
 ```
+
+## Slack Package (@buster/slack)
+
+The `@buster/slack` package is a **standalone Slack integration** with no database dependencies. It provides:
+
+### Features
+- **OAuth 2.0 Authentication** - Complete OAuth flow with state management
+- **Channel Management** - List, validate, join/leave channels
+- **Messaging** - Send messages, replies, updates with retry logic
+- **Message Tracking** - Interface for threading support
+- **Type Safety** - Zod validation throughout
+
+### Architecture
+The package uses **interface-based design** where consuming applications must implement:
+- `ISlackTokenStorage` - For token persistence
+- `ISlackOAuthStateStorage` - For OAuth state management
+- `ISlackMessageTracking` - For message threading (optional)
+
+### Usage Pattern
+```typescript
+// All functions accept tokens as parameters
+const channels = await channelService.getAvailableChannels(accessToken);
+const result = await messagingService.sendMessage(accessToken, channelId, message);
+```
+
+### Testing
+```bash
+# Run tests
+turbo run test --filter=@buster/slack
+
+# Build
+turbo run build --filter=@buster/slack
+
+# Type check
+turbo run typecheck --filter=@buster/slack
+```
+
+### Key Principles
+- **No database dependencies** - Uses interfaces for storage
+- **Token-based** - All functions accept tokens as parameters
+- **Framework-agnostic** - Works with any Node.js application
+- **Comprehensive error handling** - Typed errors with retry logic
 
 ## Important Notes
 
