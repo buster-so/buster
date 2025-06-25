@@ -90,6 +90,38 @@ export function createActionsBlock(
 }
 
 /**
+ * Create a review flagging notification message
+ * @param options Review flagging options
+ * @returns Formatted message with blocks
+ */
+export function reviewFlag(options: {
+  reviewerName: string;
+  profileUrl: string;
+  issueTitle: string;
+  description: string;
+}): SlackMessage {
+  return {
+    blocks: [
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: `Assistant flagged a chat for review:\n*<${options.profileUrl}|${options.reviewerName} - ${options.issueTitle}>*`,
+        },
+      },
+      {
+        type: 'section',
+        text: {
+          type: 'mrkdwn',
+          text: options.description,
+          verbatim: false,
+        },
+      },
+    ],
+  };
+}
+
+/**
  * Common message templates
  */
 export const MessageTemplates = {
@@ -197,6 +229,8 @@ export const MessageTemplates = {
       ],
     };
   },
+
+  reviewFlag,
 };
 
 /**

@@ -193,6 +193,14 @@ const alertMessage = MessageTemplates.alert({
   ]
 });
 
+// Review flagging template
+const reviewMessage = MessageTemplates.reviewFlag({
+  reviewerName: 'Jane Doe',
+  profileUrl: 'https://example.com/profile/jane',
+  issueTitle: 'Data Quality Issue',
+  description: 'The query returned unexpected results that may indicate a data integrity problem.'
+});
+
 // Update and delete messages
 await messagingService.updateMessage(accessToken, channelId, messageTs, {
   text: 'Updated message content'

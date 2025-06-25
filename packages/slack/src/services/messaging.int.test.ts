@@ -99,6 +99,19 @@ describeIntegration('SlackMessagingService Integration', () => {
       const result = await messagingService.sendMessage(botToken, channelId, message);
       expect(result.success).toBe(true);
     });
+
+    it('should send a review flagging notification', async () => {
+      const message = MessageTemplates.reviewFlag({
+        reviewerName: 'John Smith',
+        profileUrl: 'https://example.com/profile/123',
+        issueTitle: 'Unexpected $0.00 Query Results Issue',
+        description: 'John asked for total revenue for Acme Corp, but the query returned $0.00. This result seems unexpected and may indicate a data issue or incorrect filtering criteria.'
+      });
+
+      const result = await messagingService.sendMessage(botToken, channelId, message);
+      expect(result.success).toBe(true);
+      expect(result.messageTs).toBeTruthy();
+    });
   });
 
   describe('Threading', () => {
