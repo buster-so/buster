@@ -12,6 +12,11 @@ import { cn } from '@/lib/classMerge';
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { HeaderContainer } from '../../_HeaderContainer';
 import { DataSourceFormContent } from '../[datasourceId]/_forms/DatasourceFormContent';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Datasources'
+};
 
 export default function Page({
   searchParams: { type }

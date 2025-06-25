@@ -76,7 +76,7 @@ export const NewChatWarning = React.memo(
             <Text className="text-sm text-gray-500">
               {allCompleted
                 ? ' Your data is ready to be explored.'
-                : " Without proper setup, we can't retrieve relevant information."}
+                : " Without proper setup, we can't retrieve your data."}
             </Text>
           </div>
         </div>

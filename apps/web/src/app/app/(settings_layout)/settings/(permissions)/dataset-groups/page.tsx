@@ -8,6 +8,11 @@ import { useMemoizedFn } from '@/hooks';
 import { useDebounceSearch } from '@/hooks/useDebounceSearch';
 import { SettingsPageHeader } from '../../_components/SettingsPageHeader';
 import { ListDatasetGroupsComponent } from './ListDatasetGroupsComponent';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Dataset groups'
+};
 
 export default function Page() {
   const { data: datasetGroups, isFetched } = useListDatasetGroups();

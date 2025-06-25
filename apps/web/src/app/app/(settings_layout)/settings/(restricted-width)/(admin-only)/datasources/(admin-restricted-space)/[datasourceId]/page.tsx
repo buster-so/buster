@@ -1,6 +1,11 @@
 import { BusterRoutes, createBusterRoute } from '@/routes';
 import { HeaderContainer } from '../../_HeaderContainer';
 import { DatasourceForm } from './_forms';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Datasources'
+};
 
 export default async function Page(props: {
   params: Promise<{

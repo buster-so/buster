@@ -11,6 +11,11 @@ import { useMemoizedFn } from '@/hooks';
 import { useDebounceSearch } from '@/hooks/useDebounceSearch';
 import { SettingsPageHeader } from '../../_components/SettingsPageHeader';
 import { ListUsersComponent } from './ListUsersComponent';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'User management'
+};
 
 export default function Page() {
   const userOrganization = useUserConfigContextSelector((x) => x.userOrganizations);

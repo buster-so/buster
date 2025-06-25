@@ -274,7 +274,6 @@ const LoginOptions: React.FC<{
           }}
           disabled={!!loading}
           autoComplete="email"
-          tabIndex={-3}
         />
 
         <div className="relative">
@@ -289,7 +288,6 @@ const LoginOptions: React.FC<{
             name="password"
             placeholder="Password"
             autoComplete="new-password"
-            tabIndex={-4}
           />
         </div>
         {signUpFlow && (
@@ -305,7 +303,6 @@ const LoginOptions: React.FC<{
               name="password2"
               placeholder="Confirm password"
               autoComplete="new-password"
-              tabIndex={-5}
             />
 
             {password && (
@@ -331,8 +328,7 @@ const LoginOptions: React.FC<{
           type="submit"
           loading={loading === 'email'}
           variant="black"
-          disabled={!signUpFlow ? false : disableSubmitButton}
-          tabIndex={-6}>
+          disabled={!signUpFlow ? false : disableSubmitButton}>
           {!signUpFlow ? 'Sign in' : 'Sign up'}
         </Button>
       </form>
