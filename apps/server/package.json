@@ -8,11 +8,13 @@
   },
   "scripts": {
     "prebuild": "bun run scripts/validate-env.js",
-    "build": "tsc --build",
+    "build": "tsup",
+    "build:vercel": "tsup --config tsup.config.vercel.ts",
     "dev": "bun --max-old-space-size=512 run --hot src/index.ts",
     "lint": "biome check",
-    "prod": "bun run build && bun run start",
-    "start": "bun run dist/index.js",
+    "prod": "pnpm run build:vercel && pnpm run start:vercel",
+    "start": "bun run src/index.ts",
+    "start:vercel": "dotenv -e .env -- node dist/index.cjs",
     "test": "vitest run",
     "test:coverage": "vitest --coverage",
     "test:watch": "vitest --watch",
@@ -33,5 +35,9 @@
     "pino": "^9.7.0",
     "pino-pretty": "^13.0.0",
     "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@vercel/node": "^5.3.0",
+    "tsup": "^8.5.0"
   }
 }
