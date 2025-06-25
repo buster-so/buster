@@ -14,7 +14,7 @@ const inputSchema = z.object({
 export const combineParallelResultsOutputSchema = z.object({
   // Base fields (from both steps, should be identical)
   conversationHistory: MessageHistorySchema.optional(),
-  user_name: z.string().describe('Name for the post-processing operation'),
+  userName: z.string().describe('Name for the post-processing operation'),
   messageId: z.string().describe('Message ID for the current operation'),
   userId: z.string().describe('User ID for the current operation'),
   chatId: z.string().describe('Chat ID for the current operation'),
@@ -82,7 +82,7 @@ export const combineParallelResultsStepExecution = async ({
   return {
     // Base fields (taking from flag-chat result, they should be identical)
     conversationHistory: flagChatResult.conversationHistory,
-    user_name: flagChatResult.user_name,
+    userName: flagChatResult.userName,
     messageId: flagChatResult.messageId,
     userId: flagChatResult.userId,
     chatId: flagChatResult.chatId,

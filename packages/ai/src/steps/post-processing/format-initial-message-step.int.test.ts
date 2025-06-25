@@ -51,7 +51,7 @@ describe('format-initial-message-step integration', () => {
     // Mock combined input from parallel steps with major assumptions
     const mockInput = {
       conversationHistory: mockConversationHistory,
-      user_name: 'John',
+      userName: 'John',
       messageId: 'msg_12345',
       userId: 'user_67890',
       chatId: 'chat_abcde',
@@ -100,7 +100,7 @@ describe('format-initial-message-step integration', () => {
 
     // Check that all input fields are passed through
     expect(result.conversationHistory).toEqual(mockConversationHistory);
-    expect(result.user_name).toBe(mockInput.user_name);
+    expect(result.userName).toBe(mockInput.userName);
     expect(result.messageId).toBe(mockInput.messageId);
     expect(result.userId).toBe(mockInput.userId);
     expect(result.chatId).toBe(mockInput.chatId);
@@ -153,7 +153,7 @@ describe('format-initial-message-step integration', () => {
     // Mock input with only minor assumptions
     const mockInput = {
       conversationHistory: mockConversationHistory,
-      user_name: 'John',
+      userName: 'John',
       messageId: 'msg_54321',
       userId: 'user_67890',
       chatId: 'chat_abcde',

@@ -323,7 +323,7 @@ describe('Post-Processing Workflow Integration Tests', () => {
 
     const mockInput: PostProcessingWorkflowInput = {
       conversationHistory: mockConversationHistory,
-      user_name: 'Test Post-Processing Workflow',
+      userName: 'Test Post-Processing Workflow',
       messageId: 'msg_12345',
       userId: 'user_67890',
       chatId: 'chat_abcde',

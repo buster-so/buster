@@ -281,7 +281,7 @@ describe('identify-assumptions-step integration', () => {
 
     const mockInput = {
       conversationHistory: mockConversationHistory,
-      user_name: 'John',
+      userName: 'John',
       messageId: 'msg_12345',
       userId: 'user_67890',
       chatId: 'chat_abcde',
@@ -298,7 +298,7 @@ describe('identify-assumptions-step integration', () => {
     expect(result).toBeDefined();
     expect(result.toolCalled).toBeDefined();
     expect(typeof result.toolCalled).toBe('string');
-    expect(result.user_name).toBe(mockInput.user_name);
+    expect(result.userName).toBe(mockInput.userName);
     expect(result.messageId).toBe(mockInput.messageId);
     expect(result.userId).toBe(mockInput.userId);
     expect(result.chatId).toBe(mockInput.chatId);

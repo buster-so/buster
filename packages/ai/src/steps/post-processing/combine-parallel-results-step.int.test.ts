@@ -310,7 +310,7 @@ describe('combine-parallel-results-step integration', () => {
     const mockParallelResults = {
       'flag-chat': {
         conversationHistory: mockConversationHistory,
-        user_name: 'John',
+        userName: 'John',
         messageId: 'msg_12345',
         userId: 'user_67890',
         chatId: 'chat_abcde',
@@ -324,7 +324,7 @@ describe('combine-parallel-results-step integration', () => {
       },
       'identify-assumptions': {
         conversationHistory: mockConversationHistory,
-        user_name: 'John',
+        userName: 'John',
         messageId: 'msg_12345',
         userId: 'user_67890',
         chatId: 'chat_abcde',
@@ -359,7 +359,7 @@ describe('combine-parallel-results-step integration', () => {
 
     // Check that all base fields are passed through from flag-chat result
     expect(result.conversationHistory).toEqual(mockConversationHistory);
-    expect(result.user_name).toBe('John');
+    expect(result.userName).toBe('John');
     expect(result.messageId).toBe('msg_12345');
     expect(result.userId).toBe('user_67890');
     expect(result.chatId).toBe('chat_abcde');
