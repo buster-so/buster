@@ -35,15 +35,15 @@
     "trigger:test": "pnpm --filter @buster/trigger run test",
     "trigger:test:integration": "pnpm --filter @buster/trigger run test:integration",
     "typecheck": "turbo typecheck",
-    "typescript": "^5.8.3",
-    "turbo": "^2.5.4"
+    "typescript": "^5.8.3"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@types/node": "^20.17.57",
     "dotenv": "^16.5.0",
     "dotenv-cli": "^8.0.0",
-    "vitest": "catalog:"
+    "vitest": "catalog:",
+    "turbo": "^2.5.4"
   },
   "peerDependencies": {
     "bun": "^1.2.15",

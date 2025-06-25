@@ -79,7 +79,9 @@
       "trigger/**/*.ts",
       "trigger/**/*.js",
       "vitest.config.ts",
-      "biome.json"
+      "biome.json",
+      "package.json",
+      "turbo.json"
     ],
     "ignore": [
       "**/node_modules/**",
