@@ -1,6 +1,6 @@
 # @buster/slack
 
-Standalone Slack integration package with no external dependencies.
+Standalone Slack integration package with OAuth 2.0, messaging, and channel management capabilities.
 
 ## Installation
 
@@ -10,14 +10,16 @@ pnpm add @buster/slack
 
 ## Features
 
-- OAuth 2.0 authentication flow
-- Channel management and messaging
-- Thread support with message tracking
-- Type-safe with Zod validation
-- Framework-agnostic design
-- Token storage interfaces for secure credential management
-- Automatic retry with exponential backoff
-- Comprehensive error handling
+- **OAuth 2.0 Authentication** - Complete OAuth flow with CSRF protection
+- **Channel Management** - List, validate, join, and leave channels
+- **Messaging** - Send messages with blocks, attachments, and threading support
+- **Type Safety** - Full TypeScript support with no `any` types
+- **Zod Validation** - Runtime validation for all inputs
+- **Dependency Injection** - Easy testing with injectable WebClient
+- **Framework Agnostic** - Works with any Node.js framework
+- **Storage Interfaces** - Bring your own storage implementation
+- **Retry Logic** - Automatic retry with exponential backoff
+- **Error Handling** - Typed errors with user-friendly messages
 
 ## Usage
 
@@ -63,6 +65,9 @@ const channel = await channelService.validateChannelAccess(accessToken, channelI
 
 // Join a channel
 const { success } = await channelService.joinChannel(accessToken, channelId);
+
+// Leave a channel
+const leaveResult = await channelService.leaveChannel(accessToken, channelId);
 ```
 
 ### Sending Messages
@@ -147,12 +152,27 @@ class MyMessageTracking implements ISlackMessageTracking {
 ### Message Formatting Utilities
 
 ```typescript
-import { formatSimpleMessage, MessageTemplates } from '@buster/slack';
+import { 
+  formatSimpleMessage, 
+  formatBlockMessage,
+  createSectionBlock,
+  createActionsBlock,
+  createContextBlock,
+  createDividerBlock,
+  MessageTemplates 
+} from '@buster/slack';
 
 // Simple message
 const message = formatSimpleMessage('Hello, Slack!');
 
-// Deployment notification
+// Message with blocks
+const blockMessage = formatBlockMessage([
+  createSectionBlock('*Important Announcement*', { type: 'mrkdwn' }),
+  createDividerBlock(),
+  createContextBlock(['Posted by bot at ' + new Date().toISOString()])
+]);
+
+// Deployment notification template
 const deploymentMessage = MessageTemplates.deployment({
   project: 'my-app',
   environment: 'production',
@@ -162,7 +182,7 @@ const deploymentMessage = MessageTemplates.deployment({
   url: 'https://example.com/deployments/123'
 });
 
-// Alert message
+// Alert message template
 const alertMessage = MessageTemplates.alert({
   title: 'High CPU Usage',
   message: 'CPU usage exceeded 90% threshold',
@@ -172,11 +192,73 @@ const alertMessage = MessageTemplates.alert({
     { text: 'View Dashboard', url: 'https://example.com/dashboard' }
   ]
 });
+
+// Update and delete messages
+await messagingService.updateMessage(accessToken, channelId, messageTs, {
+  text: 'Updated message content'
+});
+
+await messagingService.deleteMessage(accessToken, channelId, messageTs);
+```
+
+## Testing
+
+The package includes comprehensive test coverage and supports dependency injection for easy testing:
+
+```typescript
+import { SlackMessagingService } from '@buster/slack';
+import { WebClient } from '@slack/web-api';
+
+// Create a mock WebClient for testing
+const mockClient = {
+  chat: {
+    postMessage: jest.fn().mockResolvedValue({ ok: true, ts: '123' })
+  }
+} as unknown as WebClient;
+
+// Inject the mock client
+const messagingService = new SlackMessagingService(mockClient);
+
+// Test your integration
+const result = await messagingService.sendMessage(
+  'test-token',
+  'C123',
+  { text: 'Test message' }
+);
+```
+
+## Error Handling
+
+All services provide typed errors for different scenarios:
+
+```typescript
+import { SlackIntegrationError } from '@buster/slack';
+
+try {
+  await messagingService.sendMessage(token, channelId, message);
+} catch (error) {
+  if (error instanceof SlackIntegrationError) {
+    switch (error.code) {
+      case 'INVALID_TOKEN':
+        // Handle invalid token
+        break;
+      case 'CHANNEL_NOT_FOUND':
+        // Handle channel not found
+        break;
+      case 'RATE_LIMITED':
+        // Handle rate limiting
+        break;
+    }
+  }
+}
 ```
 
 ## Development
 
 ```bash
+# Install dependencies
+pnpm install
+
 # Type check
 pnpm run typecheck
 
@@ -185,4 +267,19 @@ pnpm run build
 
 # Test
 pnpm run test
+
+# Lint and format
+pnpm run check:fix
 ```
+
+## Architecture
+
+This package follows a clean architecture with:
+
+- **Services** - Core business logic (auth, channels, messaging)
+- **Interfaces** - Storage contracts for tokens and state
+- **Types** - TypeScript types and Zod schemas
+- **Utils** - Helper functions and formatters
+- **Mocks** - Testing utilities
+
+All code is strictly typed with no `any` or `unknown` types, ensuring type safety throughout your application.
