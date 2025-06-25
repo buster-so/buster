@@ -158,11 +158,19 @@ export const flagChatStepExecution = async ({
       defaultStreamOptions: DEFAULT_OPTIONS,
     });
 
-    // Prepare messages for the agent
+    // Prepare messages for the agent - format conversation history as text for analysis
     let messages: CoreMessage[];
     if (conversationHistory && conversationHistory.length > 0) {
-      // Use conversation history as context for post-processing analysis
-      messages = conversationHistory as CoreMessage[];
+      // Format conversation history as text for analysis
+      const chatHistoryText = JSON.stringify(conversationHistory, null, 2);
+      const analysisPrompt = `Here is the chat history to analyze:
+\`\`\`
+${chatHistoryText}
+\`\`\`
+
+Please analyze this conversation history for potential user frustration or issues that should be flagged for review.`;
+
+      messages = standardizeMessages(analysisPrompt);
     } else {
       // If no conversation history, create a message indicating that
       messages = standardizeMessages('No conversation history available for analysis.');
