@@ -2,6 +2,7 @@ import { FirecrawlService } from '../services/firecrawl';
 import { pollJobStatus } from '../utils/polling';
 import { type CompanyResearch, CompanyResearchError, type CompanyResearchOptions } from './types';
 
+
 interface ResearchResult {
   status?: string;
   data?: {
