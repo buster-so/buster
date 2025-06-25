@@ -144,6 +144,8 @@ describeIntegration('SlackAuthService Integration', () => {
   });
 
   describe('Token Revocation', () => {
+    // WARNING: Never use real bot tokens in revocation tests!
+    // Revoking a real token will permanently invalidate it and uninstall your app
     it('should remove token from storage when revoking', async () => {
       // Store a token
       const testKey = 'revoke-test';
@@ -169,7 +171,8 @@ describeIntegration('SlackAuthService Integration', () => {
     it('should handle revocation errors gracefully', async () => {
       // Store an invalid token that will fail revocation
       const testKey = 'revoke-error-test';
-      await tokenStorage.storeToken(testKey, 'xoxb-invalid-token');
+      const invalidToken = 'xoxb-invalid-mock-token';
+      await tokenStorage.storeToken(testKey, invalidToken);
 
       // Should not throw, but should still remove from storage
       await authService.revokeToken(testKey);
@@ -244,16 +247,17 @@ describeIntegration('SlackAuthService Integration', () => {
   describe('Storage Integration', () => {
     it('should properly integrate with token storage', async () => {
       const testKey = 'storage-integration-test';
+      const mockToken = 'xoxb-mock-token-for-testing';
       
-      // Store bot token
-      await tokenStorage.storeToken(testKey, botToken);
+      // Store mock token (NOT the real bot token!)
+      await tokenStorage.storeToken(testKey, mockToken);
 
-      // Verify through auth service
-      const isValid = await authService.testToken(testKey);
-      expect(isValid).toBe(true);
+      // Verify storage works
+      const storedToken = await tokenStorage.getToken(testKey);
+      expect(storedToken).toBe(mockToken);
 
-      // Revoke through auth service
-      await authService.revokeToken(testKey);
+      // Delete from storage (without calling Slack API)
+      await tokenStorage.deleteToken(testKey);
 
       // Verify it's gone
       const hasToken = await tokenStorage.hasToken(testKey);
