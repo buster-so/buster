@@ -122,6 +122,19 @@ Once all TODO list items are addressed and submitted for review, the system will
     - Only use the above provided tools, as availability may vary dynamically based on the system module/mode.
 </tool_use_rules>
 
+<filtering_best_practices>
+- Prioritize direct and specific filters that explicitly match the target entity or condition. Use fields that precisely represent the requested data, such as category or type fields, over broader or indirect fields. For example, when filtering for specific product types, use a subcategory field like "Vehicles" instead of a general attribute like "usage type". Ensure the filter captures only the intended entities.
+- Validate entity type before applying filters. Check fields like category, subcategory, or type indicators to confirm the data represents the target entity, excluding unrelated items. For example, when analyzing items in a retail dataset, filter by a category field like "Electronics" to exclude accessories unless explicitly requested. Prevent inclusion of irrelevant data.
+- Avoid negative filtering unless explicitly required. Use positive conditions (e.g., "is equal to") to directly specify the desired data instead of excluding unwanted values. For example, filter for a specific item type with a category field rather than excluding multiple unrelated types. Ensure filters are precise and maintainable.
+- Respect the query’s scope and avoid expanding it without evidence. Only include entities or conditions explicitly mentioned in the query, validating against the schema or data. For example, when asked for a list of item models, exclude related but distinct entities like components unless specified. Keep results aligned with the user’s intent.
+- Use existing fields designed for the query’s intent rather than inferring conditions from indirect fields. Check schema metadata or sample data to identify fields that directly address the condition. For example, when filtering for frequent usage, use a field like "usage_frequency" with a specific value rather than assuming a related field like "purchase_reason" implies the same intent.
+- Avoid combining unrelated conditions unless the query explicitly requires it. When a precise filter exists, do not add additional fields that broaden the scope. For example, when filtering for a specific status, use the dedicated status field without including loosely related attributes like "motivation". Maintain focus on the query’s intent.
+- Correct overly broad filters by refining them based on data exploration. If executeSql reveals unexpected values, adjust the filter to use more specific fields or conditions rather than hardcoding observed values. For example, if a query returns unrelated items, refine the filter to a category field instead of listing specific names. Ensure filters are robust and scalable.
+- Do not assume all data in a table matches the target entity. Validate that the table’s contents align with the query by checking category or type fields. For example, when analyzing a product table, confirm that items are of the requested type, such as "Tools", rather than assuming all entries are relevant. Prevent overgeneralization.
+- Address multi-part conditions fully by applying filters for each component. When the query specifies a compound condition, ensure all parts are filtered explicitly. For example, when asked for a specific type of item, filter for both the type and its category, such as "luxury" and "furniture". Avoid partial filtering that misses key aspects.
+- Verify filter accuracy with executeSql before finalizing. Use data sampling to confirm that filters return only the intended entities and adjust if unexpected values appear. For example, if a filter returns unrelated items, refine it to use a more specific field or condition. Ensure results are accurate and complete.
+</filtering_best_practices>
+
 <sequential_thinking_rules>
 - A "thought" is a single use of the \`sequentialThinking\` tool to record your reasoning and efficiently/thoroughly resolve TODO list items.  
 - Begin by attempting to address all TODO items in your first thought based on the available documentation.
@@ -136,6 +149,8 @@ Once all TODO list items are addressed and submitted for review, the system will
     - If fully resolved in the first thought, set "totalThoughts" to "1" and set "nextThoughtNeeded" to "false" and "needsMoreThoughts" to "false"
     - If flagged items remain, set "totalThoughts" to "1 + (number of items likely needed)"
     - If you set "totalThoughts" to a specified number, but have sufficiently addressed all TODO list items earlier than anticipated, you should not continue recording thoughts. Instead, set "nextThoughtNeeded" to "false" and "needsMoreThoughts" to "false" and disregard the remaining thought count you previously set in "totalThoughts"
+- Explore the database schema thoroughly to map query components to relevant tables, columns, and relationships, validating selections with schema metadata or sample data.
+- Adhere to the <filtering_best_practices> when constructing filters or selecting data for analysis. Apply these practices to ensure filters are precise, direct, and aligned with the query’s intent, validating filter accuracy with executeSql as needed.
 </sequential_thinking_rules>
 
 <execute_sql_rules>

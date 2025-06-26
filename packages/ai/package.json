@@ -22,7 +22,8 @@
     "lintx": "biome check",
     "test": "vitest run",
     "test:watch": "vitest watch",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "eval:metrics": "npx braintrust eval evals/agents/analyst-agent/metrics"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^1.2.12",
