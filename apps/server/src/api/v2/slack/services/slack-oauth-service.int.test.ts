@@ -1,6 +1,7 @@
 import { db, slackIntegrations } from '@buster/database';
 import { and, eq } from 'drizzle-orm';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { cleanupTestOrgAndUser, createTestOrgAndUser } from '../test-helpers';
 import * as slackHelpers from './slack-helpers';
 
 // Skip tests if required environment variables are not set
@@ -45,9 +46,9 @@ vi.mock('@buster/slack', () => ({
 
 describe.skipIf(skipIfNoEnv)('SlackOAuthService Integration Tests', () => {
   let service: any;
-  // Use existing seed data IDs
-  const testOrganizationId = 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce';
-  const testUserId = 'c2dd64cd-f7f3-4884-bc91-d46ae431901e';
+  // Create unique organization and user for this test suite
+  let testOrganizationId: string;
+  let testUserId: string;
   const createdIntegrationIds: string[] = [];
 
   // Add unique test run identifier to prevent conflicts
@@ -73,22 +74,10 @@ describe.skipIf(skipIfNoEnv)('SlackOAuthService Integration Tests', () => {
     // Set required env vars if not already set (for testing)
     process.env.SLACK_INTEGRATION_ENABLED = 'true';
 
-    // Wait a bit to avoid conflicts with other test files
-    await new Promise((resolve) => setTimeout(resolve, 200));
-
-    // Clean up any existing test data for this organization
-    try {
-      const deleted = await db
-        .delete(slackIntegrations)
-        .where(eq(slackIntegrations.organizationId, testOrganizationId))
-        .returning({ id: slackIntegrations.id });
-
-      if (deleted.length > 0) {
-        console.log(`SlackOAuthService: Cleaned up ${deleted.length} existing integrations`);
-      }
-    } catch (error) {
-      console.error('Error cleaning up existing test data:', error);
-    }
+    // Create unique test organization and user
+    const { organizationId, userId } = await createTestOrgAndUser();
+    testOrganizationId = organizationId;
+    testUserId = userId;
   });
 
   beforeEach(async () => {
@@ -119,21 +108,8 @@ describe.skipIf(skipIfNoEnv)('SlackOAuthService Integration Tests', () => {
 
   afterAll(async () => {
     // Clean up all test data for our unique test organization
-    if (!skipIfNoEnv) {
-      try {
-        const deleted = await db
-          .delete(slackIntegrations)
-          .where(eq(slackIntegrations.organizationId, testOrganizationId))
-          .returning({ id: slackIntegrations.id });
-
-        if (deleted.length > 0) {
-          console.log(
-            `SlackOAuthService: Cleaned up ${deleted.length} test integrations in afterAll`
-          );
-        }
-      } catch (error) {
-        console.error('Error cleaning up test data:', error);
-      }
+    if (!skipIfNoEnv && testOrganizationId && testUserId) {
+      await cleanupTestOrgAndUser(testOrganizationId, testUserId);
     }
   });
 
@@ -372,11 +348,17 @@ describe.skipIf(skipIfNoEnv)('SlackOAuthService Integration Tests', () => {
     });
 
     it('should return not connected when no integration exists', async () => {
-      // Use a valid UUID that doesn't exist in the database
-      const status = await service.getIntegrationStatus('f47ac10b-58cc-4372-a567-0e02b2c3d479');
+      // Create a new organization without any integrations
+      const { organizationId } = await createTestOrgAndUser();
+      const status = await service.getIntegrationStatus(organizationId);
 
       expect(status.connected).toBe(false);
       expect(status.integration).toBeUndefined();
+
+      // Clean up
+      await db
+        .delete(slackIntegrations)
+        .where(eq(slackIntegrations.organizationId, organizationId));
     });
   });
 
@@ -435,14 +417,15 @@ describe.skipIf(skipIfNoEnv)('SlackOAuthService Integration Tests', () => {
     });
 
     it('should handle non-existent integration', async () => {
-      // Use a valid UUID that doesn't exist in the database
-      const result = await service.removeIntegration(
-        'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-        testUserId
-      );
+      // Create a new organization without any integrations
+      const { organizationId, userId } = await createTestOrgAndUser();
+      const result = await service.removeIntegration(organizationId, userId);
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('No active Slack integration found');
+
+      // Clean up
+      await cleanupTestOrgAndUser(organizationId, userId);
     });
   });
 });

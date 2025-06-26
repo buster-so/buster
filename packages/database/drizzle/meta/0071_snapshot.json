@@ -3496,12 +3496,6 @@
           "primaryKey": false,
           "notNull": true,
           "default": false
-        },
-        "test_field": {
-          "name": "test_field",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
         }
       },
       "indexes": {},

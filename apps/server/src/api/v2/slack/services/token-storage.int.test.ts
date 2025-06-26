@@ -1,6 +1,7 @@
 import { db, slackIntegrations } from '@buster/database';
 import { eq } from 'drizzle-orm';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { cleanupTestOrgAndUser, createTestOrgAndUser } from '../test-helpers';
 import { DatabaseOAuthStateStorage, DatabaseVaultTokenStorage } from './token-storage';
 
 // Skip tests if required environment variables are not set
@@ -90,10 +91,19 @@ describe.skipIf(skipIfNoEnv)('Token Storage Integration Tests', () => {
 
   describe('DatabaseOAuthStateStorage', () => {
     let storage: DatabaseOAuthStateStorage;
-    // Use existing seed data IDs
-    const testOrganizationId = 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce';
-    const testUserId = 'c2dd64cd-f7f3-4884-bc91-d46ae431901e';
+    // Create unique organization and user for this test suite
+    let testOrganizationId: string;
+    let testUserId: string;
     const createdIntegrationIds: string[] = [];
+
+    beforeAll(async () => {
+      if (!skipIfNoEnv) {
+        // Create unique test organization and user
+        const { organizationId, userId } = await createTestOrgAndUser();
+        testOrganizationId = organizationId;
+        testUserId = userId;
+      }
+    });
 
     beforeEach(() => {
       if (!skipIfNoEnv) {
@@ -102,11 +112,9 @@ describe.skipIf(skipIfNoEnv)('Token Storage Integration Tests', () => {
     });
 
     afterAll(async () => {
-      // Clean up all test data
-      if (!skipIfNoEnv && createdIntegrationIds.length > 0) {
-        for (const id of createdIntegrationIds) {
-          await db.delete(slackIntegrations).where(eq(slackIntegrations.id, id));
-        }
+      // Clean up all test data for our unique test organization
+      if (!skipIfNoEnv && testOrganizationId && testUserId) {
+        await cleanupTestOrgAndUser(testOrganizationId, testUserId);
       }
     });
 

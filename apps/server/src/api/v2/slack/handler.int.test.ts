@@ -6,6 +6,7 @@ import { HTTPException } from 'hono/http-exception';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import slackRoutes from './index';
 import * as slackHelpers from './services/slack-helpers';
+import { cleanupTestOrgAndUser, createTestOrgAndUser } from './test-helpers';
 
 // Skip tests if required environment variables are not set
 const skipIfNoEnv =
@@ -57,9 +58,9 @@ vi.mock('@buster/slack', () => ({
 
 describe.skipIf(skipIfNoEnv)('SlackHandler Integration Tests', () => {
   let app: Hono;
-  // Use existing seed data IDs
-  const testOrganizationId = 'bf58d19a-8bb9-4f1d-a257-2d2105e7f1ce';
-  const testUserId = 'c2dd64cd-f7f3-4884-bc91-d46ae431901e';
+  // Create unique organization and user for this test suite
+  let testOrganizationId: string;
+  let testUserId: string;
   const createdIntegrationIds: string[] = [];
 
   // Add unique test run identifier to prevent conflicts
@@ -82,19 +83,10 @@ describe.skipIf(skipIfNoEnv)('SlackHandler Integration Tests', () => {
     process.env.SLACK_CLIENT_SECRET = process.env.SLACK_CLIENT_SECRET || 'test-client-secret';
     process.env.SLACK_REDIRECT_URI = process.env.SLACK_REDIRECT_URI || 'https://test.com/callback';
 
-    // Clean up any existing test data for this organization
-    try {
-      const deleted = await db
-        .delete(slackIntegrations)
-        .where(eq(slackIntegrations.organizationId, testOrganizationId))
-        .returning({ id: slackIntegrations.id });
-
-      if (deleted.length > 0) {
-        console.log(`SlackHandler: Cleaned up ${deleted.length} existing integrations`);
-      }
-    } catch (error) {
-      console.error('Error cleaning up existing test data:', error);
-    }
+    // Create unique test organization and user
+    const { organizationId, userId } = await createTestOrgAndUser();
+    testOrganizationId = organizationId;
+    testUserId = userId;
   });
 
   beforeEach(async () => {
@@ -134,19 +126,8 @@ describe.skipIf(skipIfNoEnv)('SlackHandler Integration Tests', () => {
 
   afterAll(async () => {
     // Clean up all test data for our unique test organization
-    if (!skipIfNoEnv) {
-      try {
-        const deleted = await db
-          .delete(slackIntegrations)
-          .where(eq(slackIntegrations.organizationId, testOrganizationId))
-          .returning({ id: slackIntegrations.id });
-
-        if (deleted.length > 0) {
-          console.log(`SlackHandler: Cleaned up ${deleted.length} test integrations in afterAll`);
-        }
-      } catch (error) {
-        console.error('Error cleaning up test data:', error);
-      }
+    if (!skipIfNoEnv && testOrganizationId && testUserId) {
+      await cleanupTestOrgAndUser(testOrganizationId, testUserId);
     }
   });
 
