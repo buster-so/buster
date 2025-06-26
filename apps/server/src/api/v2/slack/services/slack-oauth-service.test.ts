@@ -61,7 +61,7 @@ describe('SlackOAuthService', () => {
       // Ensure integration is enabled for this test
       vi.stubEnv('SLACK_INTEGRATION_ENABLED', 'true');
       const enabledService = new SlackOAuthService();
-      
+
       vi.mocked(slackHelpers.getActiveIntegration).mockResolvedValue({
         id: 'existing-integration',
         organizationId: 'org-123',
@@ -100,7 +100,9 @@ describe('SlackOAuthService', () => {
       });
 
       expect(result.authUrl).toBe(mockAuthUrl);
-      expect(result.state).toBe('mocked-state-1234567890abcdef1234567890abcdef1234567890abcdef1234567890');
+      expect(result.state).toBe(
+        'mocked-state-1234567890abcdef1234567890abcdef1234567890abcdef1234567890'
+      );
 
       expect(slackHelpers.createPendingIntegration).toHaveBeenCalledWith({
         organizationId: 'org-123',
@@ -113,11 +115,13 @@ describe('SlackOAuthService', () => {
         }),
       });
 
-      expect(mockGenerateAuthUrl).toHaveBeenCalledWith(expect.objectContaining({
-        returnUrl: '/dashboard',
-        source: 'settings',
-        initiatedAt: expect.any(String),
-      }));
+      expect(mockGenerateAuthUrl).toHaveBeenCalledWith(
+        expect.objectContaining({
+          returnUrl: '/dashboard',
+          source: 'settings',
+          initiatedAt: expect.any(String),
+        })
+      );
     });
   });
 

@@ -1,6 +1,7 @@
 import { db, slackIntegrations } from '@buster/database';
 import type { InferSelectModel } from 'drizzle-orm';
 import { and, eq, gt, isNull, lt } from 'drizzle-orm';
+import { tokenStorage } from './token-storage';
 
 export type SlackIntegration = InferSelectModel<typeof slackIntegrations>;
 
@@ -73,6 +74,30 @@ export async function createPendingIntegration(params: {
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + 15); // 15 minute expiry
 
+    // Check for existing integration (including revoked ones)
+    const existing = await getExistingIntegration(params.organizationId);
+
+    if (existing) {
+      if (existing.status === 'active') {
+        // Active integration exists
+        throw new Error('Organization already has an active Slack integration');
+      }
+
+      // Clean up vault token before deleting the old integration
+      if (existing.tokenVaultKey) {
+        try {
+          await tokenStorage.deleteToken(existing.tokenVaultKey);
+        } catch (error) {
+          console.error('Failed to clean up vault token:', error);
+          // Continue with deletion even if vault cleanup fails
+        }
+      }
+
+      // Delete the old revoked/failed integration to avoid constraint issues
+      await db.delete(slackIntegrations).where(eq(slackIntegrations.id, existing.id));
+    }
+
+    // No existing integration, create new one
     const [integration] = await db
       .insert(slackIntegrations)
       .values({
@@ -156,10 +181,18 @@ export async function markIntegrationAsFailed(
     }
 
     if (integration.status === 'pending') {
-      // For pending integrations, delete them to allow retry
-      await db
-        .delete(slackIntegrations)
-        .where(eq(slackIntegrations.id, integrationId));
+      // For pending integrations, clean up vault token if exists before deletion
+      if (integration.tokenVaultKey) {
+        try {
+          await tokenStorage.deleteToken(integration.tokenVaultKey);
+        } catch (error) {
+          console.error('Failed to clean up vault token:', error);
+          // Continue with deletion even if vault cleanup fails
+        }
+      }
+
+      // Delete the pending integration to allow retry
+      await db.delete(slackIntegrations).where(eq(slackIntegrations.id, integrationId));
     } else {
       // For active integrations, mark as failed
       await db
@@ -255,10 +288,58 @@ export async function hasActiveIntegration(organizationId: string): Promise<bool
 }
 
 /**
+ * Get any existing integration for an organization (active, revoked, or failed)
+ */
+export async function getExistingIntegration(
+  organizationId: string
+): Promise<SlackIntegration | null> {
+  try {
+    // Get the most recent non-deleted integration for this organization
+    const [integration] = await db
+      .select()
+      .from(slackIntegrations)
+      .where(eq(slackIntegrations.organizationId, organizationId))
+      .orderBy(slackIntegrations.createdAt)
+      .limit(1);
+
+    return integration || null;
+  } catch (error) {
+    console.error('Failed to get existing Slack integration:', error);
+    throw new Error(
+      `Failed to get existing Slack integration: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
+}
+
+/**
  * Clean up expired pending integrations
  */
 export async function cleanupExpiredPendingIntegrations(): Promise<number> {
   try {
+    // First, get the expired integrations to clean up their vault tokens
+    const expiredIntegrations = await db
+      .select({ id: slackIntegrations.id, tokenVaultKey: slackIntegrations.tokenVaultKey })
+      .from(slackIntegrations)
+      .where(
+        and(
+          eq(slackIntegrations.status, 'pending'),
+          lt(slackIntegrations.oauthExpiresAt, new Date().toISOString())
+        )
+      );
+
+    // Clean up vault tokens for each expired integration
+    for (const integration of expiredIntegrations) {
+      if (integration.tokenVaultKey) {
+        try {
+          await tokenStorage.deleteToken(integration.tokenVaultKey);
+        } catch (error) {
+          console.error(`Failed to clean up vault token ${integration.tokenVaultKey}:`, error);
+          // Continue with cleanup even if vault token deletion fails
+        }
+      }
+    }
+
+    // Now delete the expired integrations
     const result = await db
       .delete(slackIntegrations)
       .where(

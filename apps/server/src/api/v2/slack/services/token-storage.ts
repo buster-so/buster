@@ -1,64 +1,52 @@
+import { createSecret, deleteSecret, getSecretByName, updateSecret } from '@buster/database';
 import type {
   ISlackOAuthStateStorage,
   ISlackTokenStorage,
   SlackOAuthStateData,
 } from '@buster/slack';
-import { createClient } from '@supabase/supabase-js';
 import * as slackHelpers from './slack-helpers';
 
 /**
- * Supabase Vault-based token storage implementation
+ * Database Vault-based token storage implementation
  */
-export class SupabaseTokenStorage implements ISlackTokenStorage {
-  private supabase;
-
-  constructor() {
-    try {
-      const supabaseUrl = process.env.SUPABASE_URL;
-      const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-      if (!supabaseUrl || !supabaseServiceKey) {
-        throw new Error(
-          'Supabase configuration missing: SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required'
-        );
-      }
-
-      this.supabase = createClient(supabaseUrl, supabaseServiceKey);
-    } catch (error) {
-      console.error('Failed to initialize SupabaseTokenStorage:', error);
-      throw error;
-    }
-  }
-
+export class DatabaseVaultTokenStorage implements ISlackTokenStorage {
   async storeToken(key: string, token: string): Promise<void> {
     try {
-      // Store in Supabase Vault
-      const { error } = await this.supabase.rpc('vault_secret_create', {
-        secret: token,
-        name: key,
-      });
+      // Check if a secret with this name already exists
+      const existingSecret = await getSecretByName(key);
 
-      if (error) {
-        console.error('Failed to store token in vault:', error);
-        throw new Error('Failed to store token');
+      if (existingSecret) {
+        // Update existing secret
+        await updateSecret({
+          id: existingSecret.id,
+          secret: token,
+          name: key,
+        });
+      } else {
+        // Create new secret
+        await createSecret({
+          secret: token,
+          name: key,
+          description: 'Slack OAuth token',
+        });
       }
     } catch (error) {
       console.error('Token storage error:', error);
-      throw error;
+      throw new Error(
+        `Failed to store token: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
   async getToken(key: string): Promise<string | null> {
     try {
-      const { data, error } = await this.supabase.rpc('vault_secret_retrieve', {
-        name: key,
-      });
+      const secret = await getSecretByName(key);
 
-      if (error || !data) {
+      if (!secret) {
         return null;
       }
 
-      return data.secret;
+      return secret.secret;
     } catch (error) {
       console.error('Token retrieval error:', error);
       return null;
@@ -67,9 +55,11 @@ export class SupabaseTokenStorage implements ISlackTokenStorage {
 
   async deleteToken(key: string): Promise<void> {
     try {
-      await this.supabase.rpc('vault_secret_delete', {
-        name: key,
-      });
+      const secret = await getSecretByName(key);
+
+      if (secret) {
+        await deleteSecret(secret.id);
+      }
     } catch (error) {
       console.error('Token deletion error:', error);
       // Don't throw - deletion errors are not critical
@@ -119,5 +109,5 @@ export class DatabaseOAuthStateStorage implements ISlackOAuthStateStorage {
 }
 
 // Export singleton instances
-export const tokenStorage = new SupabaseTokenStorage();
+export const tokenStorage = new DatabaseVaultTokenStorage();
 export const oauthStateStorage = new DatabaseOAuthStateStorage();

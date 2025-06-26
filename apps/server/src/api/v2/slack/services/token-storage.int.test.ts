@@ -1,7 +1,7 @@
 import { db, slackIntegrations } from '@buster/database';
 import { eq } from 'drizzle-orm';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { DatabaseOAuthStateStorage, SupabaseTokenStorage } from './token-storage';
+import { DatabaseOAuthStateStorage, DatabaseVaultTokenStorage } from './token-storage';
 
 // Skip tests if required environment variables are not set
 const skipIfNoEnv =
@@ -16,13 +16,13 @@ describe.skipIf(skipIfNoEnv)('Token Storage Integration Tests', () => {
     }
   });
 
-  describe('SupabaseTokenStorage', () => {
-    let storage: SupabaseTokenStorage;
+  describe('DatabaseVaultTokenStorage', () => {
+    let storage: DatabaseVaultTokenStorage;
     const testKey = `test-token-${Date.now()}`;
 
     beforeEach(() => {
       if (!skipIfNoEnv) {
-        storage = new SupabaseTokenStorage();
+        storage = new DatabaseVaultTokenStorage();
       }
     });
 

@@ -1,7 +1,8 @@
+import { getUserOrganizationId } from '@buster/database';
 import type { Context } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
-import { createSlackOAuthService } from './services/slack-oauth-service';
+import { type SlackOAuthService, createSlackOAuthService } from './services/slack-oauth-service';
 
 // Request schemas
 const InitiateOAuthSchema = z.object({
@@ -39,7 +40,21 @@ export class SlackError extends Error {
 }
 
 export class SlackHandler {
-  private slackOAuthService = createSlackOAuthService();
+  private slackOAuthService: SlackOAuthService | null = null;
+  private _initializationAttempted = false;
+
+  private getSlackOAuthService(): SlackOAuthService | null {
+    if (!this._initializationAttempted) {
+      this._initializationAttempted = true;
+      try {
+        this.slackOAuthService = createSlackOAuthService();
+      } catch (error) {
+        console.error('Failed to initialize SlackOAuthService:', error);
+        this.slackOAuthService = null;
+      }
+    }
+    return this.slackOAuthService;
+  }
 
   /**
    * POST /api/v2/slack/auth/init
@@ -47,8 +62,22 @@ export class SlackHandler {
    */
   async initiateOAuth(c: Context) {
     try {
+      // Get service instance (lazy initialization)
+      const slackOAuthService = this.getSlackOAuthService();
+
+      // Check if service is available
+      if (!slackOAuthService) {
+        return c.json(
+          {
+            error: 'Slack integration is not configured',
+            code: 'INTEGRATION_NOT_CONFIGURED',
+          },
+          503
+        );
+      }
+
       // Check if integration is enabled
-      if (!this.slackOAuthService.isEnabled()) {
+      if (!slackOAuthService.isEnabled()) {
         return c.json(
           {
             error: 'Slack integration is not enabled',
@@ -60,10 +89,15 @@ export class SlackHandler {
 
       // Get authenticated user context
       const user = c.get('busterUser');
-      const organizationId = c.get('organizationId');
 
-      if (!user || !organizationId) {
+      if (!user) {
         throw new HTTPException(401, { message: 'Authentication required' });
+      }
+
+      const organizationGrant = await getUserOrganizationId(user.id);
+
+      if (!organizationGrant) {
+        throw new HTTPException(400, { message: 'Organization not found' });
       }
 
       // Parse request body
@@ -79,8 +113,8 @@ export class SlackHandler {
       };
 
       // Initiate OAuth flow
-      const result = await this.slackOAuthService.initiateOAuth({
-        organizationId,
+      const result = await slackOAuthService.initiateOAuth({
+        organizationId: organizationGrant.organizationId,
         userId: user.id,
         metadata: enrichedMetadata,
       });
@@ -115,6 +149,14 @@ export class SlackHandler {
    */
   async handleOAuthCallback(c: Context) {
     try {
+      // Get service instance (lazy initialization)
+      const slackOAuthService = this.getSlackOAuthService();
+
+      // Check if service is available
+      if (!slackOAuthService) {
+        return c.redirect('/settings/integrations?status=error&error=not_configured');
+      }
+
       // Parse query parameters
       const query = c.req.query();
       const parsed = OAuthCallbackSchema.safeParse(query);
@@ -130,7 +172,7 @@ export class SlackHandler {
       }
 
       // Handle OAuth callback
-      const result = await this.slackOAuthService.handleOAuthCallback({
+      const result = await slackOAuthService.handleOAuthCallback({
         code: parsed.data.code,
         state: parsed.data.state,
       });
@@ -162,13 +204,33 @@ export class SlackHandler {
    */
   async getIntegration(c: Context) {
     try {
-      const organizationId = c.get('organizationId');
+      // Get service instance (lazy initialization)
+      const slackOAuthService = this.getSlackOAuthService();
 
-      if (!organizationId) {
-        throw new HTTPException(400, { message: 'Organization context required' });
+      // Check if service is available
+      if (!slackOAuthService) {
+        return c.json(
+          {
+            error: 'Slack integration is not configured',
+            code: 'INTEGRATION_NOT_CONFIGURED',
+          },
+          503
+        );
       }
 
-      const status = await this.slackOAuthService.getIntegrationStatus(organizationId);
+      const busterUser = c.get('busterUser');
+
+      if (!busterUser) {
+        throw new HTTPException(401, { message: 'Authentication required' });
+      }
+
+      const organizationGrant = await getUserOrganizationId(busterUser.id);
+
+      if (!organizationGrant) {
+        throw new HTTPException(400, { message: 'Organization not found' });
+      }
+
+      const status = await slackOAuthService.getIntegrationStatus(organizationGrant.organizationId);
 
       return c.json(status);
     } catch (error) {
@@ -192,14 +254,36 @@ export class SlackHandler {
    */
   async removeIntegration(c: Context) {
     try {
-      const user = c.get('busterUser');
-      const organizationId = c.get('organizationId');
+      // Get service instance (lazy initialization)
+      const slackOAuthService = this.getSlackOAuthService();
 
-      if (!user || !organizationId) {
+      // Check if service is available
+      if (!slackOAuthService) {
+        return c.json(
+          {
+            error: 'Slack integration is not configured',
+            code: 'INTEGRATION_NOT_CONFIGURED',
+          },
+          503
+        );
+      }
+
+      const user = c.get('busterUser');
+
+      if (!user) {
         throw new HTTPException(401, { message: 'Authentication required' });
       }
 
-      const result = await this.slackOAuthService.removeIntegration(organizationId, user.id);
+      const organizationGrant = await getUserOrganizationId(user.id);
+
+      if (!organizationGrant) {
+        throw new HTTPException(400, { message: 'Organization not found' });
+      }
+
+      const result = await slackOAuthService.removeIntegration(
+        organizationGrant.organizationId,
+        user.id
+      );
 
       if (!result.success) {
         throw new SlackError(

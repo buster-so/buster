@@ -33,7 +33,7 @@ export const SlackOAuthResponseSchema = z.object({
   app_id: z.string(),
   team: z.object({
     id: z.string(),
-    name: z.string(),
+    name: z.string().optional(), // name might not always be present
     domain: z.string().optional(),
   }),
   enterprise: z
@@ -44,7 +44,7 @@ export const SlackOAuthResponseSchema = z.object({
     .optional(),
   authed_user: z.object({
     id: z.string(),
-    scope: z.string(),
+    scope: z.string().optional(), // scope might not be present if only bot scopes are requested
     access_token: z.string().optional(),
     token_type: z.string().optional(),
   }),

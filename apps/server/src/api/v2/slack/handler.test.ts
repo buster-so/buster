@@ -1,18 +1,25 @@
-import { Hono } from 'hono';
+import { getUserOrganizationId } from '@buster/database';
 import { HTTPException } from 'hono/http-exception';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SlackError, SlackHandler } from './handler';
-import { slackOAuthService } from './services/slack-oauth-service';
+import { createSlackOAuthService } from './services/slack-oauth-service';
 
 // Mock dependencies
+const mockSlackOAuthService = {
+  isEnabled: vi.fn(),
+  initiateOAuth: vi.fn(),
+  handleOAuthCallback: vi.fn(),
+  getIntegrationStatus: vi.fn(),
+  removeIntegration: vi.fn(),
+};
+
 vi.mock('./services/slack-oauth-service', () => ({
-  slackOAuthService: {
-    isEnabled: vi.fn(),
-    initiateOAuth: vi.fn(),
-    handleOAuthCallback: vi.fn(),
-    getIntegrationStatus: vi.fn(),
-    removeIntegration: vi.fn(),
-  },
+  createSlackOAuthService: vi.fn(() => mockSlackOAuthService),
+}));
+
+// Mock getUserOrganizationId from database
+vi.mock('@buster/database', () => ({
+  getUserOrganizationId: vi.fn(),
 }));
 
 describe('SlackHandler', () => {
@@ -38,7 +45,7 @@ describe('SlackHandler', () => {
 
   describe('initiateOAuth', () => {
     it('should return 503 when integration is disabled', async () => {
-      vi.mocked(slackOAuthService.isEnabled).mockReturnValue(false);
+      vi.mocked(mockSlackOAuthService.isEnabled).mockReturnValue(false);
 
       await handler.initiateOAuth(mockContext);
 
@@ -52,7 +59,7 @@ describe('SlackHandler', () => {
     });
 
     it('should throw 401 when user is not authenticated', async () => {
-      vi.mocked(slackOAuthService.isEnabled).mockReturnValue(true);
+      vi.mocked(mockSlackOAuthService.isEnabled).mockReturnValue(true);
       mockContext.get.mockImplementation((key: string) => {
         if (key === 'busterUser') return null;
         if (key === 'organizationId') return 'org-123';
@@ -63,10 +70,9 @@ describe('SlackHandler', () => {
     });
 
     it('should successfully initiate OAuth flow', async () => {
-      vi.mocked(slackOAuthService.isEnabled).mockReturnValue(true);
+      vi.mocked(mockSlackOAuthService.isEnabled).mockReturnValue(true);
       mockContext.get.mockImplementation((key: string) => {
         if (key === 'busterUser') return { id: 'user-123' };
-        if (key === 'organizationId') return 'org-123';
         return null;
       });
       mockContext.req.json.mockResolvedValue({
@@ -74,15 +80,21 @@ describe('SlackHandler', () => {
       });
       mockContext.req.header.mockReturnValue('192.168.1.1');
 
+      // Mock getUserOrganizationId to return org info
+      vi.mocked(getUserOrganizationId).mockResolvedValue({
+        organizationId: 'org-123',
+        userId: 'user-123',
+      });
+
       const mockResult = {
         authUrl: 'https://slack.com/oauth/authorize',
         state: 'test-state',
       };
-      vi.mocked(slackOAuthService.initiateOAuth).mockResolvedValue(mockResult);
+      vi.mocked(mockSlackOAuthService.initiateOAuth).mockResolvedValue(mockResult);
 
       await handler.initiateOAuth(mockContext);
 
-      expect(slackOAuthService.initiateOAuth).toHaveBeenCalledWith({
+      expect(mockSlackOAuthService.initiateOAuth).toHaveBeenCalledWith({
         organizationId: 'org-123',
         userId: 'user-123',
         metadata: {
@@ -94,15 +106,20 @@ describe('SlackHandler', () => {
     });
 
     it('should handle existing integration error', async () => {
-      vi.mocked(slackOAuthService.isEnabled).mockReturnValue(true);
+      vi.mocked(mockSlackOAuthService.isEnabled).mockReturnValue(true);
       mockContext.get.mockImplementation((key: string) => {
         if (key === 'busterUser') return { id: 'user-123' };
-        if (key === 'organizationId') return 'org-123';
         return null;
       });
       mockContext.req.json.mockResolvedValue({});
 
-      vi.mocked(slackOAuthService.initiateOAuth).mockRejectedValue(
+      // Mock getUserOrganizationId to return org info
+      vi.mocked(getUserOrganizationId).mockResolvedValue({
+        organizationId: 'org-123',
+        userId: 'user-123',
+      });
+
+      vi.mocked(mockSlackOAuthService.initiateOAuth).mockRejectedValue(
         new Error('Organization already has an active Slack integration')
       );
 
@@ -141,11 +158,11 @@ describe('SlackHandler', () => {
         teamName: 'Test Workspace',
         metadata: { returnUrl: '/dashboard' },
       };
-      vi.mocked(slackOAuthService.handleOAuthCallback).mockResolvedValue(mockResult);
+      vi.mocked(mockSlackOAuthService.handleOAuthCallback).mockResolvedValue(mockResult);
 
       await handler.handleOAuthCallback(mockContext);
 
-      expect(slackOAuthService.handleOAuthCallback).toHaveBeenCalledWith({
+      expect(mockSlackOAuthService.handleOAuthCallback).toHaveBeenCalledWith({
         code: 'test-code',
         state: 'test-state',
       });
@@ -165,7 +182,7 @@ describe('SlackHandler', () => {
         integrationId: '',
         error: 'invalid_state',
       };
-      vi.mocked(slackOAuthService.handleOAuthCallback).mockResolvedValue(mockResult);
+      vi.mocked(mockSlackOAuthService.handleOAuthCallback).mockResolvedValue(mockResult);
 
       await handler.handleOAuthCallback(mockContext);
 
@@ -176,14 +193,23 @@ describe('SlackHandler', () => {
   });
 
   describe('getIntegration', () => {
-    it('should throw 400 when organization context is missing', async () => {
+    it('should throw 401 when user is not authenticated', async () => {
       mockContext.get.mockReturnValue(null);
 
       await expect(handler.getIntegration(mockContext)).rejects.toThrow(HTTPException);
     });
 
     it('should return integration status', async () => {
-      mockContext.get.mockReturnValue('org-123');
+      mockContext.get.mockImplementation((key: string) => {
+        if (key === 'busterUser') return { id: 'user-123' };
+        return null;
+      });
+
+      // Mock getUserOrganizationId to return org info
+      vi.mocked(getUserOrganizationId).mockResolvedValue({
+        organizationId: 'org-123',
+        userId: 'user-123',
+      });
 
       const mockStatus = {
         connected: true,
@@ -193,11 +219,11 @@ describe('SlackHandler', () => {
           installedAt: '2025-01-01T00:00:00.000Z',
         },
       };
-      vi.mocked(slackOAuthService.getIntegrationStatus).mockResolvedValue(mockStatus);
+      vi.mocked(mockSlackOAuthService.getIntegrationStatus).mockResolvedValue(mockStatus);
 
       await handler.getIntegration(mockContext);
 
-      expect(slackOAuthService.getIntegrationStatus).toHaveBeenCalledWith('org-123');
+      expect(mockSlackOAuthService.getIntegrationStatus).toHaveBeenCalledWith('org-123');
       expect(mockContext.json).toHaveBeenCalledWith(mockStatus);
     });
   });
@@ -216,17 +242,22 @@ describe('SlackHandler', () => {
     it('should successfully remove integration', async () => {
       mockContext.get.mockImplementation((key: string) => {
         if (key === 'busterUser') return { id: 'user-123' };
-        if (key === 'organizationId') return 'org-123';
         return null;
       });
 
-      vi.mocked(slackOAuthService.removeIntegration).mockResolvedValue({
+      // Mock getUserOrganizationId to return org info
+      vi.mocked(getUserOrganizationId).mockResolvedValue({
+        organizationId: 'org-123',
+        userId: 'user-123',
+      });
+
+      vi.mocked(mockSlackOAuthService.removeIntegration).mockResolvedValue({
         success: true,
       });
 
       await handler.removeIntegration(mockContext);
 
-      expect(slackOAuthService.removeIntegration).toHaveBeenCalledWith('org-123', 'user-123');
+      expect(mockSlackOAuthService.removeIntegration).toHaveBeenCalledWith('org-123', 'user-123');
       expect(mockContext.json).toHaveBeenCalledWith({
         message: 'Slack integration removed successfully',
       });
@@ -235,11 +266,16 @@ describe('SlackHandler', () => {
     it('should handle integration not found error', async () => {
       mockContext.get.mockImplementation((key: string) => {
         if (key === 'busterUser') return { id: 'user-123' };
-        if (key === 'organizationId') return 'org-123';
         return null;
       });
 
-      vi.mocked(slackOAuthService.removeIntegration).mockResolvedValue({
+      // Mock getUserOrganizationId to return org info
+      vi.mocked(getUserOrganizationId).mockResolvedValue({
+        organizationId: 'org-123',
+        userId: 'user-123',
+      });
+
+      vi.mocked(mockSlackOAuthService.removeIntegration).mockResolvedValue({
         success: false,
         error: 'No active Slack integration found',
       });

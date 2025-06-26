@@ -5,11 +5,11 @@ import { SlackError, slackHandler } from './handler';
 
 const app = new Hono()
   // Public endpoints (no auth required for OAuth flow)
-  .post('/auth/init', requireAuth, slackHandler.initiateOAuth)
-  .get('/auth/callback', slackHandler.handleOAuthCallback)
+  .post('/auth/init', requireAuth, (c) => slackHandler.initiateOAuth(c))
+  .get('/auth/callback', (c) => slackHandler.handleOAuthCallback(c))
   // Protected endpoints
-  .get('/integration', requireAuth, slackHandler.getIntegration)
-  .delete('/integration', requireAuth, slackHandler.removeIntegration)
+  .get('/integration', requireAuth, (c) => slackHandler.getIntegration(c))
+  .delete('/integration', requireAuth, (c) => slackHandler.removeIntegration(c))
   // Error handling
   .onError((e, c) => {
     if (e instanceof SlackError) {
