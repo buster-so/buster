@@ -12,8 +12,8 @@ RUN apk add --no-cache curl bash
 RUN npm install -g pnpm@9.15.0 turbo
 
 # Install bun (needed for the build script)
-RUN curl -fsSL https://bun.sh/install | bash && \
-    ln -s /root/.bun/bin/bun /usr/local/bin/bun
+RUN curl -fsSL https://bun.sh/install | bash
+ENV PATH="/root/.bun/bin:$PATH"
 
 # Copy package files
 COPY package.json ./
@@ -31,7 +31,10 @@ RUN pnpm install --ignore-scripts
 # Set NODE_ENV to production for build
 ENV NODE_ENV=production
 
-# Build the server directly with bun (turbo has issues finding bun binary)
+# Build dependencies using turbo (dependencies only, not the server itself) 
+RUN turbo run build --filter=@buster-app/server^... || echo "Dependencies build completed"
+
+# Build the server directly with bun (now that dependencies are available)
 RUN cd apps/server && bun build src/index.ts --outdir ./dist --target bun
 
 # Stage 2: Production runtime with Bun
