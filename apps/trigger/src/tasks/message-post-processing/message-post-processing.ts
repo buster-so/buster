@@ -1,7 +1,10 @@
-import postProcessingWorkflow from '@buster/ai/workflows/post-processing-workflow';
+import postProcessingWorkflow, {
+  type PostProcessingWorkflowOutput,
+} from '@buster/ai/workflows/post-processing-workflow';
 import { eq, getDb, messages } from '@buster/database';
 import { logger, schemaTask } from '@trigger.dev/sdk/v3';
 import { initLogger, wrapTraced } from 'braintrust';
+import { z } from 'zod';
 import {
   buildWorkflowInput,
   fetchConversationHistory,
@@ -16,6 +19,65 @@ import {
   type TaskOutputSchema,
 } from './types';
 import type { TaskInput, TaskOutput } from './types';
+
+// Schema for the subset of fields we want to save to the database
+const PostProcessingDbDataSchema = z.object({
+  summaryMessage: z.string().optional(),
+  summaryTitle: z.string().optional(),
+  assumptions: z
+    .array(
+      z.object({
+        descriptiveTitle: z.string(),
+        classification: z.enum([
+          'fieldMapping',
+          'tableRelationship',
+          'dataQuality',
+          'dataFormat',
+          'dataAvailability',
+          'timePeriodInterpretation',
+          'timePeriodGranularity',
+          'metricInterpretation',
+          'segmentInterpretation',
+          'quantityInterpretation',
+          'requestScope',
+          'metricDefinition',
+          'segmentDefinition',
+          'businessLogic',
+          'policyInterpretation',
+          'optimization',
+          'aggregation',
+          'filtering',
+          'sorting',
+          'grouping',
+          'calculationMethod',
+          'dataRelevance',
+        ]),
+        explanation: z.string(),
+        label: z.enum(['timeRelated', 'vagueRequest', 'major', 'minor']),
+      })
+    )
+    .optional(),
+  message: z.string().optional(),
+  toolCalled: z.string(),
+});
+
+type PostProcessingDbData = z.infer<typeof PostProcessingDbDataSchema>;
+
+/**
+ * Extract only the specific fields we want to save to the database
+ */
+function extractDbFields(workflowOutput: PostProcessingWorkflowOutput): PostProcessingDbData {
+  const extracted = {
+    summaryMessage: workflowOutput.summaryMessage,
+    summaryTitle: workflowOutput.summaryTitle,
+    assumptions: workflowOutput.assumptions,
+    message: workflowOutput.message,
+    toolCalled: workflowOutput.toolCalled,
+  };
+
+  // Validate the extracted data matches our schema
+  return PostProcessingDbDataSchema.parse(extracted);
+}
 
 /**
  * Message Post-Processing Task
@@ -116,10 +178,12 @@ export const messagePostProcessingTask: ReturnType<
       });
 
       const db = getDb();
+      
+      const dbData = extractDbFields(validatedOutput);
       await db
         .update(messages)
         .set({
-          postProcessingMessage: validatedOutput,
+          postProcessingMessage: dbData,
           updatedAt: new Date().toISOString(),
         })
         .where(eq(messages.id, payload.messageId));
