@@ -1,4 +1,4 @@
-# Simplified Dockerfile: pnpm for workspaces + Bun for build/runtime
+# Dockerfile for monorepo workspace - requires workspace root as build context
 # ================================================================
 
 # Stage 1: Install dependencies with pnpm (required for workspaces)
@@ -33,6 +33,7 @@ ENV NODE_ENV=production
 
 # Build dependencies using turbo (dependencies only, not the server itself) 
 RUN turbo run build --filter=@buster-app/server^... || echo "Dependencies build completed"
+RUN pnpm install --ignore-scripts
 
 # Build the server directly with bun (now that dependencies are available)
 RUN cd apps/server && bun build src/index.ts --outdir ./dist --target bun
