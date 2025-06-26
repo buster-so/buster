@@ -17,7 +17,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-IMAGE_NAME="buster-server-optimized"
+IMAGE_NAME="buster-server-final"
 CONTAINER_NAME="buster-server-optimized-container"
 SERVER_PORT=3002
 HOST_PORT=3002

@@ -1,12 +1,19 @@
-# Reliable Dockerfile: Node.js for deps + Bun for build/runtime
-# =============================================================
+# Simplified Dockerfile: pnpm for workspaces + Bun for build/runtime
+# ================================================================
 
-# Stage 1: Install dependencies with Node.js + pnpm
+# Stage 1: Install dependencies with pnpm (required for workspaces)
 FROM node:22-alpine AS deps
 WORKDIR /app
 
+# Install required packages for bun installation
+RUN apk add --no-cache curl bash
+
 # Install pnpm and turbo
 RUN npm install -g pnpm@9.15.0 turbo
+
+# Install bun (needed for the build script)
+RUN curl -fsSL https://bun.sh/install | bash && \
+    ln -s /root/.bun/bin/bun /usr/local/bin/bun
 
 # Copy package files
 COPY package.json ./
@@ -18,31 +25,16 @@ COPY pnpm-workspace.yaml* ./
 COPY packages/ ./packages/
 COPY apps/server/ ./apps/server/
 
-# Install dependencies with pnpm (skip problematic scripts)
+# Install dependencies with pnpm (required for workspace resolution)
 RUN pnpm install --ignore-scripts
 
-# Stage 2: Build with native Bun image
-FROM oven/bun:1.2.15 AS build
-WORKDIR /app
+# Set NODE_ENV to production for build
+ENV NODE_ENV=production
 
-# Install pnpm and turbo using Bun
-RUN bun install -g pnpm@9.15.0 turbo
+# Build the server directly with bun (turbo has issues finding bun binary)
+RUN cd apps/server && bun build src/index.ts --outdir ./dist --target bun
 
-# Copy installed dependencies from deps stage
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/packages ./packages
-COPY --from=deps /app/apps/server ./apps/server
-
-# Copy workspace configuration
-COPY package.json ./
-COPY pnpm-lock.yaml* ./
-COPY turbo.json* ./
-COPY pnpm-workspace.yaml* ./
-
-# Build the server using turbo with filter
-RUN turbo run build --filter=@buster-app/server
-
-# Stage 3: Production runtime with Bun
+# Stage 2: Production runtime with Bun
 FROM oven/bun:1.2.15-alpine AS runtime
 WORKDIR /app
 
@@ -50,9 +42,10 @@ WORKDIR /app
 RUN addgroup --system --gid 1001 bunuser
 RUN adduser --system --uid 1001 bunuser
 
-# Copy built app
-COPY --from=build --chown=bunuser:bunuser /app/apps/server/dist ./dist
-COPY --from=build --chown=bunuser:bunuser /app/apps/server/package.json ./package.json
+# Copy built app and dependencies
+COPY --from=deps --chown=bunuser:bunuser /app/apps/server/dist ./dist
+COPY --from=deps --chown=bunuser:bunuser /app/apps/server/package.json ./package.json
+COPY --from=deps --chown=bunuser:bunuser /app/node_modules ./node_modules
 
 # Switch to non-root user
 USER bunuser
@@ -65,4 +58,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD bun -e "fetch('http://localhost:' + (process.env.SERVER_PORT || 3002) + '/healthcheck').then(r => r.ok ? process.exit(0) : process.exit(1))"
 
 # Start server
-CMD ["bun", "run", "dist/index.cjs"]
+CMD ["bun", "run", "dist/index.js"]
