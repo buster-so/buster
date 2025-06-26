@@ -1901,3 +1901,46 @@ export const slackMessageTracking = pgTable(
     ),
   ]
 );
+
+// Join table between messages and slack messages
+export const messagesToSlackMessages = pgTable(
+  'messages_to_slack_messages',
+  {
+    messageId: uuid('message_id').notNull(),
+    slackMessageId: uuid('slack_message_id').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'string' }),
+  },
+  (table) => [
+    // Foreign keys
+    foreignKey({
+      columns: [table.messageId],
+      foreignColumns: [messages.id],
+      name: 'messages_to_slack_messages_message_id_fkey',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [table.slackMessageId],
+      foreignColumns: [slackMessageTracking.id],
+      name: 'messages_to_slack_messages_slack_message_id_fkey',
+    }).onDelete('cascade'),
+    // Composite primary key
+    primaryKey({
+      columns: [table.messageId, table.slackMessageId],
+      name: 'messages_to_slack_messages_pkey',
+    }),
+    // Indexes for query performance
+    index('messages_to_slack_messages_message_id_idx').using(
+      'btree',
+      table.messageId.asc().nullsLast().op('uuid_ops')
+    ),
+    index('messages_to_slack_messages_slack_message_id_idx').using(
+      'btree',
+      table.slackMessageId.asc().nullsLast().op('uuid_ops')
+    ),
+  ]
+);

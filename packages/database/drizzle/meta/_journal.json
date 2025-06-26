@@ -505,6 +505,13 @@
       "when": 1750945267600,
       "tag": "0072_next_nuke",
       "breakpoints": true
+    },
+    {
+      "idx": 72,
+      "version": "7",
+      "when": 1750958715096,
+      "tag": "0072_slow_earthquake",
+      "breakpoints": true
     }
   ]
 }
