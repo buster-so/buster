@@ -7,6 +7,7 @@ let isPinoPrettyAvailable = true;
 
 // Create logger with fallback for pino-pretty failures
 function createLogger() {
+  console.log('in logger middleware NODE_ENV', process.env.NODE_ENV);
   // Try pino-pretty in development
   if (isDev && isPinoPrettyAvailable) {
     try {
