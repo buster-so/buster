@@ -8,7 +8,7 @@
   },
   "scripts": {
     "prebuild": "bun run scripts/validate-env.js",
-    "build": "tsup",
+    "build": "bun build src/index.ts --outdir ./dist --target bun",
     "build:vercel": "tsup --config tsup.config.vercel.ts",
     "dev": "bun --max-old-space-size=512 run --hot src/index.ts",
     "lint": "biome check",
