@@ -1,5 +1,7 @@
 import { cors } from 'hono/cors';
 
+console.log('CORS middleware init - NODE_ENV:', process.env.NODE_ENV);
+console.log('CORS middleware init - All env vars:', JSON.stringify(process.env, null, 2));
 const isDev = process.env.NODE_ENV === 'development';
 
 export const corsMiddleware = cors({
