@@ -1,5 +1,4 @@
 import { Hono } from 'hono';
-import { handle } from 'hono/vercel';
 import { z } from 'zod';
 
 // Import custom middleware
@@ -60,15 +59,3 @@ export default {
   fetch: app.fetch,
 };
 export type AppType = typeof routes;
-
-const handler = handle(app);
-export const GET = handler;
-export const POST = handler;
-export const PATCH = handler;
-export const PUT = handler;
-export const DELETE = handler;
-export const OPTIONS = handler;
-export const HEAD = handler;
-export const TRACE = handler;
-export const CONNECT = handler;
-export const ALL = handler;

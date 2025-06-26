@@ -30,13 +30,11 @@ async function checkDatabase(): Promise<{
     // Placeholder for database ping
     const pingResult = await dbPing();
 
-    console.log('Database ping result:', pingResult);
-
     const responseTime = Date.now() - start;
     return {
-      status: 'pass',
+      status: pingResult ? 'pass' : 'fail',
       responseTime,
-      message: 'Database connection healthy',
+      message: pingResult ? 'Database connection healthy' : 'Database connection failed',
     };
   } catch (error) {
     return { status: 'fail', message: `Database connection failed: ${error}` };

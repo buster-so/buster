@@ -31,7 +31,7 @@ RUN echo "=== Running turbo build: $(date) ===" && \
 # Build the application (fast with bun)
 RUN echo "=== Building application: $(date) ===" && \
     cd apps/server && \
-    time bun build src/index.ts --outdir ./dist --target bun --minify && \
+    time bun build src/index.ts --outdir ./dist --target bun && \
     echo "Build complete - output:" && \
     ls -la dist/ && \
     echo "=== BUILD COMPLETE: $(date) ==="
@@ -42,7 +42,6 @@ WORKDIR /app
 
 # Set production environment
 ENV NODE_ENV=production
-ENV DOCKER_CONTAINER=true
 
 # Create non-root user
 RUN addgroup --system --gid 1001 bunuser && \

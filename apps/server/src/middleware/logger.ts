@@ -1,29 +1,36 @@
 import { pinoLogger } from 'hono-pino';
+import 'pino-pretty';
 
 const isDev = process.env.NODE_ENV !== 'production';
 
-// Helper function to check if pino-pretty is available
-function canUsePinoPretty(): boolean {
-  try {
-    // In bundled/production environments, dynamic imports might not work
-    // so we'll avoid pino-pretty in production regardless
-    return isDev && !process.env.DOCKER_CONTAINER;
-  } catch {
-    return false;
+let isPinoPrettyAvailable = true;
+
+// Create logger with fallback for pino-pretty failures
+function createLogger() {
+  // Try pino-pretty in development
+  if (isDev && isPinoPrettyAvailable) {
+    try {
+      return pinoLogger({
+        pino: {
+          level: 'info',
+          transport: {
+            target: 'pino-pretty',
+            options: { colorize: true },
+          },
+        },
+      });
+    } catch (error) {
+      console.error('pino-pretty not available, falling back to JSON logging', error);
+      isPinoPrettyAvailable = true;
+    }
   }
+
+  // Fallback to simple JSON logging
+  return pinoLogger({
+    pino: {
+      level: isDev ? 'info' : 'debug',
+    },
+  });
 }
 
-const loggerConfig: NonNullable<Parameters<typeof pinoLogger>[0]>['pino'] = canUsePinoPretty()
-  ? {
-      level: 'info',
-      transport: {
-        target: 'pino-pretty',
-        options: { colorize: true },
-      },
-    }
-  : {
-      level: isDev ? 'info' : 'debug',
-      // Simple JSON logging for production/Docker
-    };
-
-export const loggerMiddleware = pinoLogger({ pino: loggerConfig });
+export const loggerMiddleware = createLogger();
