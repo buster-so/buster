@@ -5,7 +5,7 @@
   "module": "src/index.ts",
   "private": false,
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --build",
     "lint": "biome check",
     "typecheck": "tsc --noEmit"
   },
