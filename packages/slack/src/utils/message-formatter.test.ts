@@ -6,18 +6,18 @@ import {
   createDividerBlock,
   createSectionBlock,
   formatBlockMessage,
+  formatChannelMention,
   formatCodeBlock,
   formatLink,
   formatSimpleMessage,
   formatUserMention,
-  formatChannelMention,
 } from './message-formatter';
 
 describe('message-formatter', () => {
   describe('formatSimpleMessage', () => {
     it('should format a simple text message', () => {
       const message = formatSimpleMessage('Hello, Slack!');
-      
+
       expect(message).toEqual({
         text: 'Hello, Slack!',
       });
@@ -56,7 +56,6 @@ describe('message-formatter', () => {
       expect(message.text).toBe('New message');
     });
   });
-
 
   describe('createSectionBlock', () => {
     it('should create a section block with text', () => {
@@ -175,17 +174,16 @@ describe('message-formatter', () => {
       });
     });
 
-
     describe('formatCodeBlock', () => {
       it('should format code block without language', () => {
         const code = formatCodeBlock('const x = 5;');
-        
+
         expect(code).toBe('```\nconst x = 5;\n```');
       });
 
       it('should format code block with language', () => {
         const code = formatCodeBlock('const x = 5;', 'javascript');
-        
+
         expect(code).toBe('```javascript\nconst x = 5;\n```');
       });
     });
@@ -240,9 +238,7 @@ describe('message-formatter', () => {
           message: 'CPU usage is at 95%',
           severity: 'error',
           source: 'monitoring-system',
-          actions: [
-            { text: 'View Dashboard', url: 'https://example.com/dashboard' },
-          ],
+          actions: [{ text: 'View Dashboard', url: 'https://example.com/dashboard' }],
         });
 
         expect(message.blocks).toHaveLength(2); // Section + actions

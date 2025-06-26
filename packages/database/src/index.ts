@@ -29,4 +29,8 @@ export {
   asc,
   sql,
   count,
+  gt,
+  lt,
+  gte,
+  lte,
 } from 'drizzle-orm';
