@@ -32,7 +32,7 @@ RUN pnpm install --ignore-scripts
 ENV NODE_ENV=production
 
 # Build dependencies first using turbo (excluding server)
-RUN turbo run build --filter=@buster-app/server^... --verbosity=2
+RUN turbo run build --filter=@buster-app/server
 
 # Build the server manually (this works reliably)
 RUN cd apps/server && bun build src/index.ts --outdir ./dist --target bun

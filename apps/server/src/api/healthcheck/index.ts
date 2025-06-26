@@ -1,3 +1,4 @@
+import { dbPing } from '@buster/database';
 import { Hono } from 'hono';
 import type { Context } from 'hono';
 
@@ -27,7 +28,10 @@ async function checkDatabase(): Promise<{
 
   try {
     // Placeholder for database ping
-    // await db.ping();
+    const pingResult = await dbPing();
+
+    console.log('Database ping result:', pingResult);
+
     const responseTime = Date.now() - start;
     return {
       status: 'pass',
@@ -72,6 +76,22 @@ function checkMemory(): { status: 'pass' | 'fail' | 'warn'; message?: string } {
 }
 
 async function performHealthCheck(): Promise<HealthCheckResult> {
+  if (!process.env.DATABASE_URL) {
+    throw new Error('DATABASE_URL is not set');
+  }
+
+  if (!process.env.ELECTRIC_PROXY_URL) {
+    throw new Error('ELECTRIC_PROXY_URL is not set');
+  }
+
+  if (!process.env.SUPABASE_URL) {
+    throw new Error('SUPABASE_URL is not set');
+  }
+
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY is not set');
+  }
+
   const [dbCheck] = await Promise.all([checkDatabase()]);
 
   const memoryCheck = checkMemory();

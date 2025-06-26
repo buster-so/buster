@@ -73,5 +73,17 @@ export async function closePool(): Promise<void> {
   }
 }
 
+// Ping the database to check if connection is possible
+export async function dbPing(): Promise<boolean> {
+  try {
+    const client = getClient();
+    await client`SELECT 1`;
+    return true;
+  } catch (error) {
+    console.error('Database ping failed:', error);
+    return false;
+  }
+}
+
 // Export the default database instance
 export const db = getDb();
