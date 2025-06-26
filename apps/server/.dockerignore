@@ -63,6 +63,11 @@ coverage
 .env.test.local
 .env.production.local
 
+**/*.env
+**/.env.*
+**/.env.*.local
+
+
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 

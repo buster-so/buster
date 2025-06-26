@@ -1,12 +1,16 @@
 #!/usr/bin/env node
 
-// Load environment variables from .env file
-import { config } from 'dotenv';
-config();
-
 // Build-time environment validation
 
 console.log('🔍 Validating environment variables...');
+
+// Skip validation during Docker builds (environment variables are only available at runtime)
+if (process.env.DOCKER_BUILD || process.env.CI || process.env.NODE_ENV === 'production') {
+  console.log(
+    '🐳 Docker/CI build detected - skipping environment validation (will validate at runtime)'
+  );
+  process.exit(0);
+}
 
 const env = {
   SERVER_PORT: process.env.SERVER_PORT,

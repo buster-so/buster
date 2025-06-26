@@ -31,11 +31,10 @@ RUN pnpm install --ignore-scripts
 # Set NODE_ENV to production for build
 ENV NODE_ENV=production
 
-# Build dependencies using turbo (dependencies only, not the server itself) 
-RUN turbo run build --filter=@buster-app/server^... || echo "Dependencies build completed"
-RUN pnpm install --ignore-scripts
+# Build dependencies first using turbo (excluding server)
+RUN turbo run build --filter=@buster-app/server^... --verbosity=2
 
-# Build the server directly with bun (now that dependencies are available)
+# Build the server manually (this works reliably)
 RUN cd apps/server && bun build src/index.ts --outdir ./dist --target bun
 
 # Stage 2: Production runtime with Bun

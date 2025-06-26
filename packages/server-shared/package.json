@@ -5,17 +5,18 @@
   "module": "src/index.ts",
   "private": false,
   "scripts": {
+    "build": "tsc",
     "lint": "biome check",
     "typecheck": "tsc --noEmit"
   },
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "default": "./src/index.ts"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
     "./chats": {
-      "types": "./src/chats/index.ts",
-      "default": "./src/chats/index.ts"
+      "types": "./dist/chats/index.d.ts",
+      "default": "./dist/chats/index.js"
     }
   },
   "dependencies": {

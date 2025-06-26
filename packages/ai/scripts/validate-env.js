@@ -8,6 +8,14 @@ config();
 
 console.info('🔍 Validating environment variables...');
 
+// Skip validation during Docker builds (environment variables are only available at runtime)
+if (process.env.DOCKER_BUILD || process.env.CI || process.env.NODE_ENV === 'production') {
+  console.info(
+    '🐳 Docker/CI build detected - skipping environment validation (will validate at runtime)'
+  );
+  process.exit(0);
+}
+
 const env = {
   BRAINTRUST_KEY: process.env.BRAINTRUST_KEY,
   PATH: process.env.PATH,
