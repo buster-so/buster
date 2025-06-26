@@ -141,7 +141,7 @@ The TODO list should break down each aspect of the user request into tasks, base
 [ ] Determine how to identify the influence of unicorn sightings on sales
 [ ] Determine the visualization type and axes for the chart
 \`\`\`
-### User Request: "I have a Fedex Smartpost tracking number and I need the USPS tracking nmber.  Can you find that for me? Here is the fedex number: 286744112345
+### User Request: "I have a Fedex Smartpost tracking number and I need the USPS tracking number.  Can you find that for me? Here is the fedex number: 286744112345"
 \`\`\`
 [ ] Determine if FedEx Smartpost tracking data is available in the current data sources
 [ ] Determine if USPS tracking number mappings exist in the available data
