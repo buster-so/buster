@@ -7,7 +7,22 @@ export const corsMiddleware = cors({
     ? ['http://localhost:3000', 'http://127.0.0.1:3000']
     : (origin) => {
         if (!origin) return undefined;
-        return origin.endsWith('.buster.so') || origin === 'https://buster.so' ? origin : undefined;
+
+        try {
+          const url = new URL(origin);
+          const hostname = url.hostname;
+
+          // Allow exact match for main domain
+          if (hostname === 'buster.so') return origin;
+
+          // Allow subdomains of buster.so
+          if (hostname.endsWith('.buster.so')) return origin;
+
+          return undefined;
+        } catch {
+          // Invalid URL format
+          return undefined;
+        }
       },
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowHeaders: [
