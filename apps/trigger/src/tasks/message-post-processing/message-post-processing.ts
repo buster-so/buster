@@ -1,6 +1,7 @@
 import postProcessingWorkflow from '@buster/ai/workflows/post-processing-workflow';
 import { eq, getDb, messages } from '@buster/database';
 import { logger, schemaTask } from '@trigger.dev/sdk/v3';
+import { initLogger, wrapTraced } from 'braintrust';
 import {
   buildWorkflowInput,
   fetchConversationHistory,
@@ -27,9 +28,19 @@ export const messagePostProcessingTask: ReturnType<
 > = schemaTask<'message-post-processing', typeof TaskInputSchema, TaskOutput>({
   id: 'message-post-processing',
   schema: TaskInputSchema,
-  maxDuration: 60, // 60 seconds timeout
+  maxDuration: 300, // 300 seconds timeout
   run: async (payload: TaskInput): Promise<TaskOutput> => {
     const startTime = Date.now();
+
+    if (!process.env.BRAINTRUST_KEY) {
+      throw new Error('BRAINTRUST_KEY is not set');
+    }
+
+    // Initialize Braintrust logging for observability
+    initLogger({
+      apiKey: process.env.BRAINTRUST_KEY,
+      projectName: process.env.ENVIRONMENT || 'development',
+    });
 
     try {
       logger.log('Starting message post-processing task', {
@@ -79,10 +90,19 @@ export const messagePostProcessingTask: ReturnType<
         messageId: payload.messageId,
       });
 
-      const run = postProcessingWorkflow.createRun();
-      const workflowResult = await run.start({
-        inputData: workflowInput,
-      });
+      const tracedWorkflow = wrapTraced(
+        async () => {
+          const run = postProcessingWorkflow.createRun();
+          return await run.start({
+            inputData: workflowInput,
+          });
+        },
+        {
+          name: 'Message Post-Processing Workflow',
+        }
+      );
+
+      const workflowResult = await tracedWorkflow();
 
       if (!workflowResult || workflowResult.status !== 'success' || !workflowResult.result) {
         throw new Error('Post-processing workflow returned no output');
@@ -108,6 +128,9 @@ export const messagePostProcessingTask: ReturnType<
         messageId: payload.messageId,
         executionTimeMs: Date.now() - startTime,
       });
+
+      // Wait 500ms to allow Braintrust to clean up its trace before completing
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       return {
         success: true,

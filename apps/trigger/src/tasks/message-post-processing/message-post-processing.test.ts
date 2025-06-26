@@ -5,6 +5,9 @@ import * as helpers from './helpers';
 import { messagePostProcessingTask } from './message-post-processing';
 import { DataFetchError, MessageNotFoundError } from './types';
 
+// Extract the run function from the task
+const runTask = (messagePostProcessingTask as any).run;
+
 // Mock dependencies
 vi.mock('./helpers', () => ({
   fetchMessageWithContext: vi.fn(),
@@ -34,7 +37,10 @@ vi.mock('@trigger.dev/sdk/v3', () => ({
     log: vi.fn(),
     error: vi.fn(),
   },
-  schemaTask: vi.fn((config) => config),
+  schemaTask: vi.fn((config) => ({
+    ...config,
+    run: config.run,
+  })),
 }));
 
 describe('messagePostProcessingTask', () => {
@@ -71,7 +77,7 @@ describe('messagePostProcessingTask', () => {
     const conversationMessages = [
       {
         id: '1',
-        rawLlmMessages: [{ role: 'user', content: 'Hello' }],
+        rawLlmMessages: [{ role: 'user' as const, content: 'Hello' }],
         createdAt: new Date(),
       },
     ];
@@ -104,13 +110,18 @@ describe('messagePostProcessingTask', () => {
     });
 
     // Execute task
-    const result = await messagePostProcessingTask.run({ messageId });
+    const result = await runTask({ messageId });
 
     // Verify results
     expect(result).toEqual({
       success: true,
       messageId,
-      result: workflowOutput,
+      result: {
+        success: true,
+        messageId,
+        executionTimeMs: expect.any(Number),
+        workflowCompleted: true,
+      },
     });
     expect(helpers.fetchMessageWithContext).toHaveBeenCalledWith(messageId);
     expect(helpers.fetchConversationHistory).toHaveBeenCalledWith('chat-123');
@@ -171,12 +182,17 @@ describe('messagePostProcessingTask', () => {
       result: workflowOutput,
     });
 
-    const result = await messagePostProcessingTask.run({ messageId });
+    const result = await runTask({ messageId });
 
     expect(result).toEqual({
       success: true,
       messageId,
-      result: workflowOutput,
+      result: {
+        success: true,
+        messageId,
+        executionTimeMs: expect.any(Number),
+        workflowCompleted: true,
+      },
     });
     expect(helpers.buildWorkflowInput).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -214,7 +230,7 @@ describe('messagePostProcessingTask', () => {
       result: null,
     });
 
-    const result = await messagePostProcessingTask.run({ messageId });
+    const result = await runTask({ messageId });
 
     expect(result).toEqual({
       success: false,
@@ -236,7 +252,7 @@ describe('messagePostProcessingTask', () => {
 
     vi.mocked(helpers.fetchMessageWithContext).mockRejectedValue(error);
 
-    const result = await messagePostProcessingTask.run({ messageId });
+    const result = await runTask({ messageId });
 
     expect(result).toEqual({
       success: false,
@@ -283,7 +299,7 @@ describe('messagePostProcessingTask', () => {
     });
     mockDb.where.mockRejectedValue(dbError);
 
-    const result = await messagePostProcessingTask.run({ messageId });
+    const result = await runTask({ messageId });
 
     expect(result).toEqual({
       success: false,

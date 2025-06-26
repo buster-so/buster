@@ -36,8 +36,6 @@
     "@buster/typescript-config": "workspace:*",
     "@buster/vitest-config": "workspace:*",
     "@mastra/core": "catalog:",
-    "@mastra/evals": "^0.10.4",
-    "@mastra/libsql": "^0.10.3",
     "@mastra/loggers": "^0.10.2",
     "ai": "catalog:",
     "braintrust": "^0.0.206",
