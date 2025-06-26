@@ -1,6 +1,0 @@
-{
-  "extends": "@buster/typescript-config/base.json",
-  "compilerOptions": {
-//
-  },
-}
