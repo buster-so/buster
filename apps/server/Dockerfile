@@ -1,64 +1,69 @@
-# Dockerfile for monorepo workspace - requires workspace root as build context
+# Ultra-fast Dockerfile using published base image
 # ================================================================
+# Prerequisites: Pull the published base image:
+# docker pull ghcr.io/buster-so/buster-server-base:latest
+# 
+# This Dockerfile handles:
+# - Incremental dependency updates (new versions since base was built)
+# - Source code building
+# - Production runtime
 
-# Stage 1: Install dependencies with pnpm (required for workspaces)
-FROM node:22-alpine AS deps
-WORKDIR /app
+FROM ghcr.io/buster-so/server-base:latest AS builder
+# Note: Base image already has tools (node, pnpm, bun) + most dependencies
 
-# Install required packages for bun installation
-RUN apk add --no-cache curl bash
+RUN echo "=== ULTRA-FAST BUILD START: $(date) ==="
 
-# Install pnpm and turbo
-RUN npm install -g pnpm@9.15.0 turbo
-
-# Install bun (needed for the build script)
-RUN curl -fsSL https://bun.sh/install | bash
-ENV PATH="/root/.bun/bin:$PATH"
-
-# Copy package files
-COPY package.json ./
-COPY pnpm-lock.yaml* ./
-COPY turbo.json* ./
-COPY pnpm-workspace.yaml* ./
-
-# Copy packages and server app (.dockerignore will exclude node_modules and dist)
+# Update package files (in case they changed since base was built)
+COPY package.json pnpm-lock.yaml* turbo.json* pnpm-workspace.yaml* ./
 COPY packages/ ./packages/
 COPY apps/server/ ./apps/server/
 
-# Install dependencies with pnpm (required for workspace resolution)
-RUN pnpm install --ignore-scripts
+# Incremental install - only installs NEW/UPDATED packages since base
+RUN echo "=== Incremental dependency update: $(date) ===" && \
+    time pnpm install --ignore-scripts && \
+    echo "=== Dependencies updated: $(date) ==="
 
-# Set NODE_ENV to production for build
-ENV NODE_ENV=production
+RUN echo "=== Running turbo build: $(date) ===" && \
+    time turbo run build --filter=@buster-app/server && \
+    echo "=== Turbo build complete: $(date) ==="
 
-# Build dependencies first using turbo (excluding server)
-RUN turbo run build --filter=@buster-app/server
 
-# Build the server manually (this works reliably)
-RUN cd apps/server && bun build src/index.ts --outdir ./dist --target bun
+# Build the application (fast with bun)
+RUN echo "=== Building application: $(date) ===" && \
+    cd apps/server && \
+    time bun build src/index.ts --outdir ./dist --target bun --minify && \
+    echo "Build complete - output:" && \
+    ls -la dist/ && \
+    echo "=== BUILD COMPLETE: $(date) ==="
 
-# Stage 2: Production runtime with Bun
+# Production runtime (minimal bun image)
 FROM oven/bun:1.2.15-alpine AS runtime
 WORKDIR /app
 
+# Set production environment
+ENV NODE_ENV=production
+ENV DOCKER_CONTAINER=true
+
 # Create non-root user
-RUN addgroup --system --gid 1001 bunuser
-RUN adduser --system --uid 1001 bunuser
+RUN addgroup --system --gid 1001 bunuser && \
+    adduser --system --uid 1001 bunuser
 
-# Copy built app and dependencies
-COPY --from=deps --chown=bunuser:bunuser /app/apps/server/dist ./dist
-COPY --from=deps --chown=bunuser:bunuser /app/apps/server/package.json ./package.json
-COPY --from=deps --chown=bunuser:bunuser /app/node_modules ./node_modules
+# Copy built application and dependencies
+COPY --from=builder --chown=bunuser:bunuser /app/apps/server/dist ./dist
+COPY --from=builder --chown=bunuser:bunuser /app/apps/server/package.json ./
+COPY --from=builder --chown=bunuser:bunuser /app/node_modules ./node_modules
 
-# Switch to non-root user
+# Show final stats
+RUN echo "=== Final production image: $(date) ===" && \
+    du -sh /app && \
+    echo "Ready to run!"
+
 USER bunuser
-
-# Expose port
 EXPOSE 3002
 
-# Health check
+# Health check for production
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD bun -e "fetch('http://localhost:' + (process.env.SERVER_PORT || 3002) + '/healthcheck').then(r => r.ok ? process.exit(0) : process.exit(1))"
 
-# Start server
-CMD ["bun", "run", "dist/index.js"]
+# Start the application
+CMD ["bun", "run", "dist/index.js"] 

@@ -1,0 +1,35 @@
+# Custom Base Image - Published base with tools + dependencies
+# ================================================================
+# This image contains:
+# - Node 22 + npm
+# - pnpm + bun 
+# - All workspace dependencies pre-installed
+# 
+# Build and publish this image:
+# docker build -f Dockerfile.custom-base -t ghcr.io/natekelley/buster-server-base:latest .
+# docker push ghcr.io/natekelley/buster-server-base:latest
+
+FROM node:22-alpine
+WORKDIR /app
+
+# Install tools: pnpm + bun
+RUN echo "=== Installing build tools: $(date) ===" && \
+    apk add --no-cache curl bash git && \
+    npm install -g pnpm@9.15.0 turbo && \
+    curl -fsSL https://bun.sh/install | bash && \
+    echo "=== Tools installed: $(date) ==="
+
+ENV PATH="/root/.bun/bin:$PATH"
+
+# Copy package configuration files
+COPY package.json pnpm-lock.yaml* turbo.json* pnpm-workspace.yaml* ./
+COPY packages/ ./packages/
+COPY apps/server/package.json ./apps/server/
+
+# Install ALL dependencies (this is the heavy lifting)
+RUN echo "=== Installing all dependencies: $(date) ===" && \
+    time pnpm install --ignore-scripts && \
+    echo "=== Dependencies installed: $(date) ===" && \
+    echo "Base image ready with $(du -sh node_modules | cut -f1) of dependencies"
+
+# This base image is now ready to be published and reused! 

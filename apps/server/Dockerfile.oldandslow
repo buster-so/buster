@@ -1,0 +1,104 @@
+# Dockerfile for monorepo workspace - requires workspace root as build context
+# ================================================================
+
+# Stage 1: Install dependencies with pnpm (required for workspaces)
+FROM node:22-alpine AS deps
+WORKDIR /app
+
+# Add timing utilities
+RUN echo "=== BUILD START: $(date) ===" && \
+    echo "Starting Stage 1: Dependencies installation"
+
+# Install required packages for bun installation
+RUN echo "=== STEP 1: Installing system packages $(date) ===" && \
+    apk add --no-cache curl bash && \
+    echo "=== STEP 1 COMPLETE: $(date) ==="
+
+# Install pnpm and turbo
+RUN echo "=== STEP 2: Installing pnpm and turbo $(date) ===" && \
+    npm install -g pnpm@9.15.0 turbo && \
+    echo "=== STEP 2 COMPLETE: $(date) ==="
+
+# Install bun (needed for the build script)
+RUN echo "=== STEP 3: Installing bun $(date) ===" && \
+    curl -fsSL https://bun.sh/install | bash && \
+    echo "=== STEP 3 COMPLETE: $(date) ==="
+ENV PATH="/root/.bun/bin:$PATH"
+
+# Copy package files (optimized order for better caching)
+RUN echo "=== STEP 4: Copying package configuration files $(date) ==="
+COPY package.json ./
+COPY pnpm-lock.yaml* ./
+COPY turbo.json* ./
+COPY pnpm-workspace.yaml* ./
+RUN echo "=== STEP 4 COMPLETE: $(date) ==="
+
+# Copy only necessary packages first for better layer caching
+RUN echo "=== STEP 5: Copying source files $(date) ==="
+COPY packages/ ./packages/
+COPY apps/server/ ./apps/server/
+RUN echo "=== STEP 5 COMPLETE: $(date) ==="
+
+# Install dependencies with pnpm (this is likely the slowest step)
+RUN echo "=== STEP 6: Installing dependencies with pnpm $(date) ===" && \
+    echo "This step typically takes 2-5 minutes depending on cache..." && \
+    time pnpm install --ignore-scripts && \
+    echo "=== STEP 6 COMPLETE: $(date) ==="
+
+# Set NODE_ENV to production for build
+ENV NODE_ENV=production
+
+# Build dependencies first using turbo
+RUN echo "=== STEP 7: Building dependencies with turbo $(date) ===" && \
+    echo "Building workspace dependencies..." && \
+    time turbo run build --filter=@buster-app/server && \
+    echo "=== STEP 7 COMPLETE: $(date) ==="
+
+# Build the server manually with timing
+RUN echo "=== STEP 8: Building server with bun $(date) ===" && \
+    cd apps/server && \
+    echo "Building main server application..." && \
+    time bun build src/index.ts --outdir ./dist --target bun && \
+    echo "=== STEP 8 COMPLETE: $(date) ==="
+
+# Show final build stats
+RUN echo "=== STAGE 1 COMPLETE: $(date) ===" && \
+    echo "Build artifacts:" && \
+    ls -la apps/server/dist/ && \
+    echo "Total disk usage:" && \
+    du -sh /app
+
+# Stage 2: Production runtime with Bun
+FROM oven/bun:1.2.15-alpine AS runtime
+WORKDIR /app
+
+RUN echo "=== Starting Stage 2: Production runtime $(date) ==="
+
+# Create non-root user
+RUN echo "=== STEP 9: Creating non-root user $(date) ===" && \
+    addgroup --system --gid 1001 bunuser && \
+    adduser --system --uid 1001 bunuser && \
+    echo "=== STEP 9 COMPLETE: $(date) ==="
+
+# Copy built app and dependencies with timing
+RUN echo "=== STEP 10: Copying production files $(date) ==="
+COPY --from=deps --chown=bunuser:bunuser /app/apps/server/dist ./dist
+COPY --from=deps --chown=bunuser:bunuser /app/apps/server/package.json ./package.json
+COPY --from=deps --chown=bunuser:bunuser /app/node_modules ./node_modules
+RUN echo "=== STEP 10 COMPLETE: $(date) ===" && \
+    echo "Final image size:" && \
+    du -sh /app
+
+# Switch to non-root user
+USER bunuser
+
+# Expose port
+EXPOSE 3002
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD bun -e "fetch('http://localhost:' + (process.env.SERVER_PORT || 3002) + '/healthcheck').then(r => r.ok ? process.exit(0) : process.exit(1))"
+
+# Start server
+RUN echo "=== BUILD COMPLETE: $(date) ==="
+CMD ["bun", "run", "dist/index.js"]
