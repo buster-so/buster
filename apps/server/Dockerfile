@@ -1,7 +1,7 @@
 # Ultra-fast Dockerfile using published base image
 # ================================================================
 # Prerequisites: Pull the published base image:
-# docker pull ghcr.io/buster-so/buster-server-base:latest
+# docker pull ghcr.io/buster-so/server-base:latest
 # 
 # This Dockerfile handles:
 # - Incremental dependency updates (new versions since base was built)

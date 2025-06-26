@@ -5,9 +5,11 @@
 # - pnpm + bun 
 # - All workspace dependencies pre-installed
 # 
-# Build and publish this image:
-# docker build -f Dockerfile.custom-base -t ghcr.io/natekelley/buster-server-base:latest .
-# docker push ghcr.io/natekelley/buster-server-base:latest
+# Build and publish this multi-platform image:
+# docker buildx build --platform linux/amd64 \
+# -f apps/server/Dockerfile.custom-base \
+# -t ghcr.io/buster-so/server-base:latest \
+# --push .
 
 FROM node:22-alpine
 WORKDIR /app
