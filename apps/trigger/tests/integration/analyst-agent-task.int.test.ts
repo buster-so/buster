@@ -192,14 +192,18 @@ describe('Analyst Agent Task Integration Tests', () => {
       console.log('Testing input validation...');
 
       // Test with invalid UUID format
-      await expect(
-        tasks.triggerAndPoll<typeof analystAgentTask>(
-          'analyst-agent-task',
-          // Intentionally invalid input to test validation
-          { message_id: 'not-a-uuid' } as { message_id: string },
-          { pollIntervalMs: 1000 }
-        )
-      ).rejects.toThrow();
+      const result = await tasks.triggerAndPoll<typeof analystAgentTask>(
+        'analyst-agent-task',
+        // Intentionally invalid input to test validation
+        { message_id: 'not-a-uuid' } as { message_id: string },
+        { pollIntervalMs: 1000 }
+      );
+
+      // Task should either fail or complete with error
+      expect(
+        result.status === 'FAILED' ||
+          (result.status === 'COMPLETED' && result.output?.success === false)
+      ).toBe(true);
 
       console.log('Input validation test completed successfully');
     } catch (error) {

@@ -195,9 +195,10 @@ describe('messagePostProcessingTask', () => {
       },
     });
     expect(helpers.buildWorkflowInput).toHaveBeenCalledWith(
-      expect.objectContaining({
-        previousPostProcessingResults: previousResults,
-      })
+      expect.objectContaining({ id: messageId }),
+      [],
+      previousResults,
+      []
     );
   });
 

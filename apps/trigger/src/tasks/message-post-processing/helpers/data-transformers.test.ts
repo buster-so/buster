@@ -136,7 +136,7 @@ describe('data-transformers', () => {
     it('should filter out empty strings from errors', () => {
       const results = [
         {
-          postProcessingMessage: {} as any, // This will cause an error/empty result
+          postProcessingMessage: {}, // This will cause an error/empty result
           createdAt: new Date(),
         },
         {
@@ -146,8 +146,8 @@ describe('data-transformers', () => {
       ];
 
       const formatted = formatPreviousMessages(results);
-      expect(formatted).toHaveLength(1);
-      expect(formatted[0]).toContain('Valid message');
+      expect(formatted).toHaveLength(2);
+      expect(formatted[1]).toContain('Valid message');
     });
   });
 

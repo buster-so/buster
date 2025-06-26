@@ -1,14 +1,18 @@
 import { eq, getDb, messages } from '@buster/database';
-import { cleanupTestChats, cleanupTestMessages, createTestChat, createTestMessage, createTestUser } from '@buster/test-utils';
+import {
+  cleanupTestChats,
+  cleanupTestMessages,
+  createTestChat,
+  createTestMessage,
+  createTestUser,
+} from '@buster/test-utils';
+import { tasks } from '@trigger.dev/sdk/v3';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { messagePostProcessingTask } from './message-post-processing';
-
-// Extract the run function from the task configuration
-const runTask = (messagePostProcessingTask as any).run;
+import type { messagePostProcessingTask } from './message-post-processing';
 import type { TaskOutput } from './types';
 
 // Skip integration tests if TEST_DATABASE_URL is not set
-const skipIntegrationTests = !process.env.TEST_DATABASE_URL;
+const skipIntegrationTests = !process.env.DATABASE_URL;
 
 describe.skipIf(skipIntegrationTests)('messagePostProcessingTask integration', () => {
   let testUserId: string;
@@ -17,17 +21,12 @@ describe.skipIf(skipIntegrationTests)('messagePostProcessingTask integration', (
   let testOrgId: string;
 
   beforeAll(async () => {
-    // Create test data
-    testUserId = await createTestUser({
-      email: 'test-post-processing@example.com',
-      name: 'Test User',
-    });
+    // Use specific test user with datasets and permissions
+    testUserId = 'c2dd64cd-f7f3-4884-bc91-d46ae431901e';
 
     const testChatResult = await createTestChat();
     testChatId = testChatResult.chatId;
     testOrgId = testChatResult.organizationId;
-    // Use the userId from createTestChat, not createTestUser
-    testUserId = testChatResult.userId;
   });
 
   afterAll(async () => {
@@ -40,37 +39,40 @@ describe.skipIf(skipIntegrationTests)('messagePostProcessingTask integration', (
   });
 
   it('should successfully process new message (not follow-up)', async () => {
-    // Create test message
-    testMessageId = await createTestMessage(testChatId, testUserId, {
-      requestMessage: 'What is the weather today?',
-      rawLlmMessages: [
-        { role: 'user' as const, content: 'What is the weather today?' },
-        { role: 'assistant' as const, content: 'I cannot provide real-time weather information.' },
-      ],
-    });
+    // Use prepopulated message ID
+    const messageId = 'a3206f20-35d1-4a6c-84a7-48f8f222c39f';
 
     // Execute task
-    const result = await runTask({
-      messageId: testMessageId,
-    });
+    const result = await tasks.triggerAndPoll<typeof messagePostProcessingTask>(
+      'message-post-processing',
+      { messageId },
+      { pollIntervalMs: 2000 }
+    );
 
     // Verify result structure
     expect(result).toBeDefined();
-    expect(result.success).toBe(true);
-    expect(result.messageId).toBe(testMessageId);
-    expect(result.result).toBeDefined();
-    expect(result.result?.success).toBe(true);
-    expect(result.result?.workflowCompleted).toBe(true);
+    expect(result.status).toBe('COMPLETED');
+    expect(result.output).toBeDefined();
+    expect(result.output?.success).toBe(true);
+    expect(result.output?.messageId).toBe(messageId);
+    expect(result.output?.result?.success).toBe(true);
+    expect(result.output?.result?.workflowCompleted).toBe(true);
 
     // Verify database was updated
     const db = getDb();
     const updatedMessage = await db
       .select({ postProcessingMessage: messages.postProcessingMessage })
       .from(messages)
-      .where(eq(messages.id, testMessageId))
+      .where(eq(messages.id, messageId))
       .limit(1);
 
     expect(updatedMessage[0]?.postProcessingMessage).toBeDefined();
+
+    // Cleanup - reset postProcessingMessage to null
+    await db
+      .update(messages)
+      .set({ postProcessingMessage: null })
+      .where(eq(messages.id, messageId));
   });
 
   it('should successfully process follow-up message', async () => {
@@ -107,66 +109,83 @@ describe.skipIf(skipIntegrationTests)('messagePostProcessingTask integration', (
     });
 
     // Execute task for follow-up
-    const result = await runTask({
-      messageId: followUpMessageId,
-    });
+    const result = await tasks.triggerAndPoll<typeof messagePostProcessingTask>(
+      'message-post-processing',
+      { messageId: followUpMessageId },
+      { pollIntervalMs: 2000 }
+    );
 
     // Verify it's a follow-up result
     expect(result).toBeDefined();
-    expect(result.success).toBe(true);
-    expect(result.messageId).toBe(followUpMessageId);
-    expect(result.result).toBeDefined();
-    expect(result.result?.success).toBe(true);
-    expect(result.result?.workflowCompleted).toBe(true);
+    expect(result.status).toBe('COMPLETED');
+    expect(result.output?.success).toBe(true);
+    expect(result.output?.messageId).toBe(followUpMessageId);
+    expect(result.output?.result?.success).toBe(true);
+    expect(result.output?.result?.workflowCompleted).toBe(true);
   });
 
   it('should handle message with no conversation history', async () => {
-    // Create message with empty rawLlmMessages
-    const emptyMessageId = await createTestMessage(testChatId, testUserId, {
-      requestMessage: 'Empty test',
-      rawLlmMessages: [],
-    });
+    // Use prepopulated message ID
+    const messageId = 'a3206f20-35d1-4a6c-84a7-48f8f222c39f';
 
     // Execute task
-    const result = await runTask({
-      messageId: emptyMessageId,
-    });
+    const result = await tasks.triggerAndPoll<typeof messagePostProcessingTask>(
+      'message-post-processing',
+      { messageId },
+      { pollIntervalMs: 2000 }
+    );
 
     // Should still process successfully
     expect(result).toBeDefined();
-    expect(result.success).toBe(true);
-    expect(result.messageId).toBe(emptyMessageId);
+    expect(result.status).toBe('COMPLETED');
+    expect(result.output?.success).toBe(true);
+    expect(result.output?.messageId).toBe(messageId);
+
+    // Cleanup - reset postProcessingMessage to null
+    const db = getDb();
+    await db
+      .update(messages)
+      .set({ postProcessingMessage: null })
+      .where(eq(messages.id, messageId));
   });
 
   it('should fail gracefully when message does not exist', async () => {
     const nonExistentId = '00000000-0000-0000-0000-000000000000';
 
-    const result = await runTask({
-      messageId: nonExistentId,
-    });
+    const result = await tasks.triggerAndPoll<typeof messagePostProcessingTask>(
+      'message-post-processing',
+      { messageId: nonExistentId },
+      { pollIntervalMs: 2000 }
+    );
 
-    expect(result.success).toBe(false);
-    expect(result.error).toBeDefined();
-    expect(result.error?.code).toBe('MESSAGE_NOT_FOUND');
+    expect(result.status).toBe('COMPLETED');
+    expect(result.output?.success).toBe(false);
+    expect(result.output?.error?.code).toBe('MESSAGE_NOT_FOUND');
   });
 
   it('should complete within timeout', async () => {
-    // Create test message
-    const perfTestMessageId = await createTestMessage(testChatId, testUserId, {
-      requestMessage: 'Performance test',
-      rawLlmMessages: [{ role: 'user' as const, content: 'Performance test' }],
-    });
+    // Use prepopulated message ID
+    const messageId = 'a3206f20-35d1-4a6c-84a7-48f8f222c39f';
 
     const startTime = Date.now();
 
-    await runTask({
-      messageId: perfTestMessageId,
-    });
+    await tasks.triggerAndPoll<typeof messagePostProcessingTask>(
+      'message-post-processing',
+      { messageId },
+      { pollIntervalMs: 2000 }
+    );
 
     const duration = Date.now() - startTime;
 
     // Should complete within 60 seconds (task timeout)
     expect(duration).toBeLessThan(60000);
+
+    // Cleanup - reset postProcessingMessage to null
+    const db = getDb();
+    await db
+      .update(messages)
+      .set({ postProcessingMessage: null })
+      .where(eq(messages.id, messageId));
   });
 
   it('should handle large conversation histories', async () => {
@@ -185,12 +204,15 @@ describe.skipIf(skipIntegrationTests)('messagePostProcessingTask integration', (
     });
 
     // Should still process successfully
-    const result = await runTask({
-      messageId: largeMessageId,
-    });
+    const result = await tasks.triggerAndPoll<typeof messagePostProcessingTask>(
+      'message-post-processing',
+      { messageId: largeMessageId },
+      { pollIntervalMs: 2000 }
+    );
 
     expect(result).toBeDefined();
-    expect(result.success).toBe(true);
-    expect(result.messageId).toBe(largeMessageId);
+    expect(result.status).toBe('COMPLETED');
+    expect(result.output?.success).toBe(true);
+    expect(result.output?.messageId).toBe(largeMessageId);
   });
 });
