@@ -93,6 +93,9 @@ importers:
       '@buster/server-shared':
         specifier: workspace:*
         version: link:../../packages/server-shared
+      '@buster/slack':
+        specifier: workspace:*
+        version: link:../../packages/slack
       '@buster/test-utils':
         specifier: workspace:*
         version: link:../../packages/test-utils
@@ -111,6 +114,9 @@ importers:
       '@trigger.dev/sdk':
         specifier: 'catalog:'
         version: 3.3.17(zod@3.25.67)
+      drizzle-orm:
+        specifier: 'catalog:'
+        version: 0.44.2(@libsql/client@0.15.9)(@opentelemetry/api@1.9.0)(@types/pg@8.15.4)(@upstash/redis@1.35.0)(bun-types@1.2.16)(mysql2@3.14.1)(pg@8.16.2)(postgres@3.4.7)
       hono:
         specifier: 'catalog:'
         version: 4.8.1

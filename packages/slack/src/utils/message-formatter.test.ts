@@ -6,18 +6,18 @@ import {
   createDividerBlock,
   createSectionBlock,
   formatBlockMessage,
+  formatChannelMention,
   formatCodeBlock,
   formatLink,
   formatSimpleMessage,
   formatUserMention,
-  formatChannelMention,
 } from './message-formatter';
 
 describe('message-formatter', () => {
   describe('formatSimpleMessage', () => {
     it('should format a simple text message', () => {
       const message = formatSimpleMessage('Hello, Slack!');
-      
+
       expect(message).toEqual({
         text: 'Hello, Slack!',
       });
@@ -56,7 +56,6 @@ describe('message-formatter', () => {
       expect(message.text).toBe('New message');
     });
   });
-
 
   describe('createSectionBlock', () => {
     it('should create a section block with text', () => {
@@ -113,7 +112,15 @@ describe('message-formatter', () => {
         { text: 'View Details', value: 'view', url: 'https://example.com' },
       ]);
 
-      expect(block.elements[0].url).toBe('https://example.com');
+      expect(block.elements[0]).toMatchObject({
+        type: 'button',
+        text: {
+          type: 'plain_text',
+          text: 'View Details',
+        },
+        value: 'view',
+        url: 'https://example.com',
+      });
     });
   });
 
@@ -175,17 +182,16 @@ describe('message-formatter', () => {
       });
     });
 
-
     describe('formatCodeBlock', () => {
       it('should format code block without language', () => {
         const code = formatCodeBlock('const x = 5;');
-        
+
         expect(code).toBe('```\nconst x = 5;\n```');
       });
 
       it('should format code block with language', () => {
         const code = formatCodeBlock('const x = 5;', 'javascript');
-        
+
         expect(code).toBe('```javascript\nconst x = 5;\n```');
       });
     });
@@ -229,7 +235,9 @@ describe('message-formatter', () => {
         });
 
         expect(message.text).toBe('Deployment Failed: my-app');
-        expect(message.blocks?.[0].text?.text).toContain('❌ *Deployment Failed*');
+        expect((message.blocks?.[0] as { text?: { text?: string } })?.text?.text).toContain(
+          '❌ *Deployment Failed*'
+        );
       });
     });
 
@@ -240,9 +248,7 @@ describe('message-formatter', () => {
           message: 'CPU usage is at 95%',
           severity: 'error',
           source: 'monitoring-system',
-          actions: [
-            { text: 'View Dashboard', url: 'https://example.com/dashboard' },
-          ],
+          actions: [{ text: 'View Dashboard', url: 'https://example.com/dashboard' }],
         });
 
         expect(message.blocks).toHaveLength(2); // Section + actions
@@ -253,7 +259,9 @@ describe('message-formatter', () => {
             text: expect.stringContaining('🚨 *High CPU Usage*'),
           },
         });
-        expect(message.blocks?.[0].text?.text).toContain('Source: monitoring-system');
+        expect((message.blocks?.[0] as { text?: { text?: string } })?.text?.text).toContain(
+          'Source: monitoring-system'
+        );
         expect(message.blocks?.[1]).toMatchObject({
           type: 'actions',
           elements: [
@@ -282,8 +290,10 @@ describe('message-formatter', () => {
           severity: 'info',
         });
 
-        expect(warningAlert.blocks?.[0].text?.text).toContain('⚠️');
-        expect(infoAlert.blocks?.[0].text?.text).toContain('ℹ️');
+        expect((warningAlert.blocks?.[0] as { text?: { text?: string } })?.text?.text).toContain(
+          '⚠️'
+        );
+        expect((infoAlert.blocks?.[0] as { text?: { text?: string } })?.text?.text).toContain('ℹ️');
       });
     });
   });

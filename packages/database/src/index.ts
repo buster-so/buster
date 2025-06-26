@@ -13,6 +13,9 @@ export * from './relations';
 // Export database helpers
 export * from './helpers';
 
+// Export vault functions
+export * from './vault';
+
 // Export common Drizzle utilities
 export {
   eq,
@@ -29,4 +32,8 @@ export {
   asc,
   sql,
   count,
+  gt,
+  lt,
+  gte,
+  lte,
 } from 'drizzle-orm';

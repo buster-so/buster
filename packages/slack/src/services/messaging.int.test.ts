@@ -1,16 +1,15 @@
 import { beforeAll, describe, expect, it } from 'vitest';
-import { SlackMessagingService } from './messaging';
-import { 
-  formatSimpleMessage, 
-  createSectionBlock, 
+import {
+  MessageTemplates,
   createActionsBlock,
-  MessageTemplates 
+  createSectionBlock,
+  formatSimpleMessage,
 } from '../utils/message-formatter';
+import { SlackMessagingService } from './messaging';
 
 // Only run if environment is configured
-const runIntegrationTests = 
-  process.env.SLACK_BOT_TOKEN !== undefined && 
-  process.env.SLACK_CHANNEL_ID !== undefined;
+const runIntegrationTests =
+  process.env.SLACK_BOT_TOKEN !== undefined && process.env.SLACK_CHANNEL_ID !== undefined;
 
 const describeIntegration = runIntegrationTests ? describe : describe.skip;
 
@@ -37,7 +36,7 @@ describeIntegration('SlackMessagingService Integration', () => {
       expect(result.success).toBe(true);
       expect(result.messageTs).toBeTruthy();
       expect(result.channelId).toBe(channelId);
-      
+
       // Store for later tests
       testMessageTs = result.messageTs;
     });
@@ -105,7 +104,8 @@ describeIntegration('SlackMessagingService Integration', () => {
         reviewerName: 'John Smith',
         profileUrl: 'https://example.com/profile/123',
         issueTitle: 'Unexpected $0.00 Query Results Issue',
-        description: 'John asked for total revenue for Acme Corp, but the query returned $0.00. This result seems unexpected and may indicate a data issue or incorrect filtering criteria.'
+        description:
+          'John asked for total revenue for Acme Corp, but the query returned $0.00. This result seems unexpected and may indicate a data issue or incorrect filtering criteria.',
       });
 
       const result = await messagingService.sendMessage(botToken, channelId, message);
@@ -219,14 +219,10 @@ describeIntegration('SlackMessagingService Integration', () => {
       const messageTs = result.messageTs!;
 
       // Wait a moment
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Delete it
-      const deleteResult = await messagingService.deleteMessage(
-        botToken,
-        channelId,
-        messageTs
-      );
+      const deleteResult = await messagingService.deleteMessage(botToken, channelId, messageTs);
 
       expect(deleteResult.success).toBe(true);
     });
