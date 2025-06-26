@@ -5,7 +5,16 @@ const isProd = process.env.NODE_ENV === 'production';
 
 export const corsMiddleware = cors({
   origin: isDev
-    ? ['http://localhost:3000', 'http://127.0.0.1:3000']
+    ? (origin) => {
+        if (!origin) {
+          console.log('CORS: No origin header provided');
+          return undefined;
+        }
+
+        console.log('CORS: Allowed - origin', origin);
+
+        return origin;
+      }
     : (origin) => {
         if (!origin) {
           console.log('CORS: No origin header provided');
