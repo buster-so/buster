@@ -7,13 +7,9 @@ const supabase = createSupabaseClient();
 
 export const requireAuth = bearerAuth({
   verifyToken: async (token, c) => {
-    console.log('verifyToken', token);
     const { data, error } = await supabase.auth.getUser(token); //usually takes about 3 - 7ms
-    console.log('data', data);
 
     if (error || !data.user) {
-      // biome-ignore lint/suspicious/noConsoleLog: we want to log this
-      console.log('Error getting user', error);
       return false;
     }
 
@@ -26,9 +22,6 @@ export const requireAuth = bearerAuth({
     }
 
     c.set('busterUser', busterUser);
-
-    // biome-ignore lint/suspicious/noConsoleLog: we want to log this
-    console.log('User authenticated', data.user);
 
     return !!data.user.is_anonymous === false;
   },
