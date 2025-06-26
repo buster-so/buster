@@ -601,3 +601,12 @@ Do what has been asked; nothing more, nothing less.
 NEVER create files unless they're absolutely necessary for achieving your goal.
 ALWAYS prefer editing an existing file to creating a new one.
 NEVER proactively create documentation files (*.md) or README files. Only create documentation files if explicitly requested by the User.
+
+## Biome Linting Instructions
+
+### Linting Rules
+- Always use `pnpm run check` or `pnpm run check:fix`
+- **Rule: `i dont' want caldue to ever run a biome lint fix only biome lint`**
+  - This means ONLY use `pnpm run check` (linting without auto-fixing)
+  - Do NOT use `pnpm run check:fix`
+  - Claude should understand to ONLY run lint checks, never auto-fix
