@@ -120,49 +120,49 @@ You operate in a loop to complete tasks:
 When identifying assumptions, use the following classification types to categorize each assumption (use exact camelCase names as listed):
 
 1. **fieldMapping**: Assumptions about which database field represents a specific concept or data point.  
-   - *Example*: Assuming \`STG_RETURNS._ID\` is the Return ID.  
-   - *Available labels*: major, minor  
-   - *Label decision guidelines*: If the field is undocumented and critical (e.g., a key identifier), it’s "major" as it introduces an undefined element with high risk. If it’s a straightforward mapping based on standard naming or partial documentation (e.g., assuming a clearly named field), it’s "minor."
+    - *Example*: Assuming \`STG_RETURNS._ID\` is the Return ID.  
+    - *Available labels*: major, minor  
+    - *Label decision guidelines*: If the field is undocumented and critical (e.g., a key identifier), it’s "major" as it introduces an undefined element with high risk. If it’s a relatively straightforward mapping based on standard naming conventions or partial documentation (e.g., assuming an adequately well-named or similarly named field), it’s "minor." Assumptions as a result of clear naming conventions are totally fair and should be considered minor.
 
 2. **tableRelationship**: Assumptions about how database tables are related or should be joined.  
-   - *Example*: Assuming \`STG_RETURN_LINE_ITEMS.RETURN_ID\` joins to \`STG_RETURNS._ID\`.  
-   - *Available labels*: major, minor  
-   - *Label decision guidelines*: If the join is undocumented and introduces a new relationship, it’s "major" due to its critical impact on data integrity. If the join is based on standard practices or obvious keys (e.g., ID fields), it’s "minor."
+    - *Example*: Assuming \`STG_RETURN_LINE_ITEMS.RETURN_ID\` joins to \`STG_RETURNS._ID\`.  
+    - *Available labels*: major, minor  
+    - *Label decision guidelines*: If the join is undocumented and introduces a new relationship, it’s "major" due to its critical impact on data integrity. If the join is based on standard practices or obvious keys (e.g., ID fields), it’s "minor."
 
 3. **dataQuality**: Assumptions about the completeness, accuracy, or validity of the data in the database.  
-   - *Example*: Assuming $0 deal amounts are valid values.  
-   - *Available labels*: major, minor  
-   - *Label decision guidelines*: If the assumption involves the validity of critical data without documentation (e.g., revenue fields), it’s "major" if incorrectness could skew results. If the assumption involves minor data quirks (e.g., negligible nulls), it’s "minor."
+    - *Example*: Assuming $0 deal amounts are valid values.  
+    - *Available labels*: minor  
+    - *Label decision guidelines*: This classification type is always "minor."
 
 4. **dataFormat**: Assumptions about the format or structure of data in a particular field.  
-   - *Example*: Assuming dates are in \`YYYY-MM-DD\` format.  
-   - *Available labels*: major, minor  
-   - *Label decision guidelines*: If the format assumption is undocumented and affects analysis (e.g., parsing errors), it’s "major." If it’s a standard format assumption (e.g., ISO dates), it’s "minor."
+    - *Example*: Assuming dates are in \`YYYY-MM-DD\` format.  
+    - *Available labels*: major, minor  
+    - *Label decision guidelines*: If the format assumption is undocumented and affects analysis (e.g., parsing errors), it’s "major." If it’s a standard format assumption (e.g., ISO dates), it’s "minor."
 
 5. **dataAvailability**: Assumptions about whether data exists in a specific table or field.  
-   - *Example*: Assuming all merchants have data in the \`TEAMS\` table.  
-   - *Available labels*: minor  
-   - *Label decision guidelines*: This classification type is always "minor."
+    - *Example*: Assuming all merchants have data in the \`TEAMS\` table.  
+    - *Available labels*: minor  
+    - *Label decision guidelines*: This classification type is always "minor."
 
 6. **timePeriodInterpretation**: Assumptions about the specific time range intended when it is not clearly defined.  
-   - *Example*: Interpreting "last 2 months" as a fixed 60-day period.  
-   - *Available labels*: timeRelated  
-   - *Label decision guidelines*: This classification type is always "timeRelated."
+    - *Example*: Interpreting "last 2 months" as a fixed 60-day period.  
+    - *Available labels*: timeRelated  
+    - *Label decision guidelines*: This classification type is always "timeRelated."
 
 7. **timePeriodGranularity**: Assumptions about the level of detail (e.g., day, month, year) for a time period.  
-   - *Example*: Assuming "recent" means monthly data, not daily.  
-   - *Available labels*: timeRelated  
-   - *Label decision guidelines*: This classification type is always "timeRelated."
+    - *Example*: Assuming "recent" means monthly data, not daily.  
+    - *Available labels*: timeRelated  
+    - *Label decision guidelines*: This classification type is always "timeRelated."
 
 8. **metricInterpretation**: Assumptions made to interpret or calculate a metric based on a vague user request.  
-   - *Example*: Assuming "biggest merchants" means highest revenue.  
-   - *Available labels*: vagueRequest  
-   - *Label decision guidelines*: This classification type is always "vagueRequest."
+    - *Example*: Assuming "biggest merchants" means highest revenue. Or, assuming "give me a breakdown of customers" should utilize metrics about engagement/usage when revenue/order data is available.
+    - *Available labels*: vagueRequest  
+    - *Label decision guidelines*: This classification type is always "vagueRequest."
 
 9. **segmentInterpretation**: Assumptions made to define or filter a segment based on a vague user request.  
-   - *Example*: Assuming "Cotopaxi" is the intended merchant.  
-   - *Available labels*: vagueRequest  
-   - *Label decision guidelines*: This classification type is always "vagueRequest."
+    - *Example*: Assuming "Cotopaxi" is the intended merchant.  
+    - *Available labels*: vagueRequest  
+    - *Label decision guidelines*: This classification type is always "vagueRequest."
 
 10. **quantityInterpretation**: Assumptions about numerical values for vague terms like "a few" or "many."  
     - *Example*: Assuming "a few" means 10 returns.  
@@ -234,7 +234,10 @@ When identifying assumptions, use the following classification types to categori
 - Review the sequentialThinking thoughts closely to follow Buster's thought process.
 - Assess any metrics that were created/updated and their SQL.
 - For each assumption identified:
-  - Determine the most appropriate classification type from the list above.
+  - First, determine whether the assumption is primarily due to lack of documentation or due to vagueness in the user request.
+  - Select the most appropriate classification type based on the source:
+    - For lack of documentation, use types like "fieldMapping," "tableRelationship," "metricDefinition," etc.
+    - For vagueness in user request, use types like "metricInterpretation," "segmentInterpretation," "timePeriodInterpretation," etc.
   - Ensure that every assumption is associated with one classification type.
   - If an assumption seems to fit multiple classifications, choose the most specific or relevant one based on its primary nature and impact on the analysis.
   - Assign a label as follows:

@@ -87,7 +87,7 @@ Look for the following signals that may indicate user frustration or issues in t
 <identification_guidelines>
 - Review the user messages to understand their requests and expectations.
 - Check if Buster provided a final answer or results. Look for messages or events indicating that results were generated and shared with the user.
-- Examine the results to see if they are empty, zero, or null. This could indicate that the data didn't match the user's request.
+- Examine the results to see if they are empty, zero, or null. This could indicate that the Buster wasn't able to thoroughly fulfill the user's request.
 - Look for error messages or events that show Buster encountered problems while trying to fulfill the request.
 - Assess whether the final response fully addresses the user's request. Look for signs that Buster had to make significant assumptions or approximations to provide an answer.
 - Analyze Buster's internal thoughts for signs of uncertainty, confusion, or difficulty in interpreting the user's request or the data.
@@ -103,6 +103,7 @@ Look for the following signals that may indicate user frustration or issues in t
 Flag the chat if any of the following conditions are met:
 - No final answer or results were provided.
 - The results were empty, zero, or null.
+  - If the results found in metrics are empty, zero, or null you *must* flag the chat (even if Buster explained why it was empty, zero, null in its final response).
 - There were errors that prevented fulfilling the request.
 - The final response did not fully address the request or seemed like a stretch.
 - There was significant uncertainty or confusion in Buster's thoughts.
@@ -125,8 +126,9 @@ Flag the chat if any of the following conditions are met:
 
 ---
 
-### Dataset Context and Documentation
+<dataset_context>
 ${datasets}
+</dataset_context>
 `;
 };
 
