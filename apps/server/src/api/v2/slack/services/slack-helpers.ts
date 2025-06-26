@@ -212,6 +212,43 @@ export async function markIntegrationAsFailed(
 }
 
 /**
+ * Update integration settings
+ */
+export async function updateIntegrationSettings(
+  organizationId: string,
+  settings: {
+    defaultChannelId?: string | null;
+  }
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const integration = await getActiveIntegration(organizationId);
+
+    if (!integration) {
+      return {
+        success: false,
+        error: 'No active Slack integration found',
+      };
+    }
+
+    await db
+      .update(slackIntegrations)
+      .set({
+        ...settings,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(slackIntegrations.id, integration.id));
+
+    return { success: true };
+  } catch (error) {
+    console.error('Failed to update integration settings:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Failed to update integration settings',
+    };
+  }
+}
+
+/**
  * Soft delete an integration
  */
 export async function softDeleteIntegration(integrationId: string): Promise<void> {

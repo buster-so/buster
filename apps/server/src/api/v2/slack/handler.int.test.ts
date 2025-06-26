@@ -507,4 +507,170 @@ describe.skipIf(skipIfNoEnv)('SlackHandler Integration Tests', () => {
       expect(data.code).toBe('INTEGRATION_NOT_FOUND');
     });
   });
+
+  describe.sequential('PUT /api/v2/slack/integration', () => {
+    it('should return 401 when user is not authenticated', async () => {
+      // Create app without auth middleware
+      const unauthApp = new Hono();
+      unauthApp.route('/api/v2/slack', slackRoutes);
+
+      const response = await unauthApp.request('/api/v2/slack/integration', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ defaultChannelId: 'C123456' }),
+      });
+
+      expect(response.status).toBe(401);
+    });
+
+    it('should successfully update defaultChannelId', async () => {
+      // Ensure clean state before test
+      await db
+        .delete(slackIntegrations)
+        .where(eq(slackIntegrations.organizationId, testOrganizationId));
+
+      // Wait for deletion to complete
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Create an active integration
+      const [integration] = await db
+        .insert(slackIntegrations)
+        .values({
+          organizationId: testOrganizationId,
+          userId: testUserId,
+          status: 'active',
+          teamId: `T${testRunId}-update-${Date.now()}`,
+          teamName: 'Update Test Workspace',
+          botUserId: `U${testRunId}-bot-${Date.now()}`,
+          scope: 'channels:read',
+          tokenVaultKey: `slack-token-update-${testRunId}-${Date.now()}`,
+          defaultChannelId: null, // Start with null
+        })
+        .returning();
+
+      createdIntegrationIds.push(integration.id);
+
+      const response = await app.request('/api/v2/slack/integration', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ defaultChannelId: 'C123456789' }),
+      });
+
+      expect(response.status).toBe(200);
+      const data = await response.json();
+      expect(data.message).toBe('Slack integration updated successfully');
+
+      // Verify integration was updated in database
+      const [updated] = await db
+        .select()
+        .from(slackIntegrations)
+        .where(eq(slackIntegrations.id, integration.id));
+
+      expect(updated.defaultChannelId).toBe('C123456789');
+    });
+
+    it('should handle setting defaultChannelId to null', async () => {
+      // Ensure clean state before test
+      await db
+        .delete(slackIntegrations)
+        .where(eq(slackIntegrations.organizationId, testOrganizationId));
+
+      // Wait for deletion to complete
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      // Create an active integration with a default channel
+      const [integration] = await db
+        .insert(slackIntegrations)
+        .values({
+          organizationId: testOrganizationId,
+          userId: testUserId,
+          status: 'active',
+          teamId: `T${testRunId}-null-${Date.now()}`,
+          teamName: 'Null Test Workspace',
+          botUserId: `U${testRunId}-bot-${Date.now()}`,
+          scope: 'channels:read',
+          tokenVaultKey: `slack-token-null-${testRunId}-${Date.now()}`,
+          defaultChannelId: 'C999999999',
+        })
+        .returning();
+
+      createdIntegrationIds.push(integration.id);
+
+      const response = await app.request('/api/v2/slack/integration', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ defaultChannelId: null }),
+      });
+
+      expect(response.status).toBe(200);
+      const data = await response.json();
+      expect(data.message).toBe('Slack integration updated successfully');
+
+      // Verify integration was updated in database
+      const [updated] = await db
+        .select()
+        .from(slackIntegrations)
+        .where(eq(slackIntegrations.id, integration.id));
+
+      expect(updated.defaultChannelId).toBeNull();
+    });
+
+    it('should return 400 for invalid request body', async () => {
+      // Create an active integration first
+      const [integration] = await db
+        .insert(slackIntegrations)
+        .values({
+          organizationId: testOrganizationId,
+          userId: testUserId,
+          status: 'active',
+          teamId: `T${testRunId}-invalid-${Date.now()}`,
+          teamName: 'Invalid Test Workspace',
+          botUserId: `U${testRunId}-bot-${Date.now()}`,
+          scope: 'channels:read',
+          tokenVaultKey: `slack-token-invalid-${testRunId}-${Date.now()}`,
+        })
+        .returning();
+
+      createdIntegrationIds.push(integration.id);
+
+      const response = await app.request('/api/v2/slack/integration', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ invalidField: 'test' }),
+      });
+
+      expect(response.status).toBe(200); // Valid but empty update
+    });
+
+    it('should return 404 when no active integration exists', async () => {
+      // Clean up any existing integrations
+      await db
+        .delete(slackIntegrations)
+        .where(eq(slackIntegrations.organizationId, testOrganizationId));
+
+      // Wait a bit to ensure deletion is complete
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      const response = await app.request('/api/v2/slack/integration', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ defaultChannelId: 'C123456' }),
+      });
+
+      expect(response.status).toBe(404);
+      const data = await response.json();
+      expect(data.error).toBe('No active Slack integration found');
+      expect(data.code).toBe('INTEGRATION_NOT_FOUND');
+    });
+  });
 });

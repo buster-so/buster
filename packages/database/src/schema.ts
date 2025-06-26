@@ -828,6 +828,7 @@ export const messages = pgTable(
     createdBy: uuid('created_by').notNull(),
     feedback: text(),
     isCompleted: boolean('is_completed').default(false).notNull(),
+    postProcessingMessage: jsonb('post_processing_message'),
   },
   (table) => [
     index('messages_chat_id_idx').using('btree', table.chatId.asc().nullsLast().op('uuid_ops')),
@@ -1810,6 +1811,7 @@ export const slackIntegrations = pgTable(
     installedAt: timestamp('installed_at', { withTimezone: true, mode: 'string' }),
     lastUsedAt: timestamp('last_used_at', { withTimezone: true, mode: 'string' }),
     status: slackIntegrationStatusEnum().default('pending').notNull(),
+    defaultChannelId: varchar('default_channel_id', { length: 255 }),
 
     // Timestamps
     createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })

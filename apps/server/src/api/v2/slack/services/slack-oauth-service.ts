@@ -232,6 +232,26 @@ export class SlackOAuthService {
   }
 
   /**
+   * Update integration settings
+   */
+  async updateIntegration(
+    organizationId: string,
+    settings: {
+      defaultChannelId?: string | null;
+    }
+  ): Promise<{ success: boolean; error?: string }> {
+    try {
+      return await slackHelpers.updateIntegrationSettings(organizationId, settings);
+    } catch (error) {
+      console.error('Failed to update integration:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to update integration',
+      };
+    }
+  }
+
+  /**
    * Remove integration
    */
   async removeIntegration(

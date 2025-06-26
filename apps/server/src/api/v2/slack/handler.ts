@@ -20,6 +20,10 @@ const OAuthCallbackSchema = z.object({
   state: z.string(),
 });
 
+const UpdateIntegrationSchema = z.object({
+  defaultChannelId: z.string().nullable().optional(),
+});
+
 // Custom error class
 export class SlackError extends Error {
   constructor(
@@ -244,6 +248,77 @@ export class SlackHandler {
         error instanceof Error ? error.message : 'Failed to get integration status',
         500,
         'GET_INTEGRATION_ERROR'
+      );
+    }
+  }
+
+  /**
+   * PUT /api/v2/slack/integration
+   * Update Slack integration settings
+   */
+  async updateIntegration(c: Context) {
+    try {
+      // Get service instance (lazy initialization)
+      const slackOAuthService = this.getSlackOAuthService();
+
+      // Check if service is available
+      if (!slackOAuthService) {
+        return c.json(
+          {
+            error: 'Slack integration is not configured',
+            code: 'INTEGRATION_NOT_CONFIGURED',
+          },
+          503
+        );
+      }
+
+      const user = c.get('busterUser');
+
+      if (!user) {
+        throw new HTTPException(401, { message: 'Authentication required' });
+      }
+
+      const organizationGrant = await getUserOrganizationId(user.id);
+
+      if (!organizationGrant) {
+        throw new HTTPException(400, { message: 'Organization not found' });
+      }
+
+      // Parse request body
+      const body = await c.req.json().catch(() => ({}));
+      const parsed = UpdateIntegrationSchema.safeParse(body);
+
+      if (!parsed.success) {
+        throw new SlackError('Invalid request body', 400, 'INVALID_REQUEST_BODY');
+      }
+
+      const result = await slackOAuthService.updateIntegration(
+        organizationGrant.organizationId,
+        parsed.data
+      );
+
+      if (!result.success) {
+        throw new SlackError(
+          result.error || 'Failed to update integration',
+          404,
+          'INTEGRATION_NOT_FOUND'
+        );
+      }
+
+      return c.json({
+        message: 'Slack integration updated successfully',
+      });
+    } catch (error) {
+      console.error('Failed to update integration:', error);
+
+      if (error instanceof HTTPException || error instanceof SlackError) {
+        throw error;
+      }
+
+      throw new SlackError(
+        error instanceof Error ? error.message : 'Failed to update integration',
+        500,
+        'UPDATE_INTEGRATION_ERROR'
       );
     }
   }

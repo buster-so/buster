@@ -142,6 +142,9 @@ importers:
 
   apps/trigger:
     dependencies:
+      '@buster/access-controls':
+        specifier: workspace:*
+        version: link:../../packages/access-controls
       '@buster/ai':
         specifier: workspace:*
         version: link:../../packages/ai

@@ -20,6 +20,7 @@
   "dependencies": {
     "@buster/typescript-config": "workspace:*",
     "@buster/database": "workspace:*",
+    "@buster/access-controls": "workspace:*",
     "@buster/test-utils": "workspace:*",
     "@buster/vitest-config": "workspace:*",
     "@buster/ai": "workspace:*",
