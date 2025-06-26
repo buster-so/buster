@@ -11,7 +11,7 @@
 FROM ghcr.io/buster-so/server-base:latest AS builder
 # Note: Base image already has tools (node, pnpm, bun) + most dependencies
 
-RUN echo "=== ULTRA-FAST BUILD START: $(date) ==="
+RUN echo "=== ULTRA-FAST BUILD START ==="
 
 # Update package files (in case they changed since base was built)
 COPY package.json pnpm-lock.yaml* turbo.json* pnpm-workspace.yaml* ./
@@ -19,22 +19,28 @@ COPY packages/ ./packages/
 COPY apps/server/ ./apps/server/
 
 # Incremental install - only installs NEW/UPDATED packages since base
-RUN echo "=== Incremental dependency update: $(date) ===" && \
+RUN START=$(date +%s) && \
+    echo "=== Starting incremental dependency update ===" && \
     time pnpm install --ignore-scripts && \
-    echo "=== Dependencies updated: $(date) ==="
+    END=$(date +%s) && \
+    echo "Finished dependency update in $((END - START)) seconds"
 
-RUN echo "=== Running turbo build: $(date) ===" && \
+RUN START=$(date +%s) && \
+    echo "=== Starting turbo build ===" && \
     time turbo run build --filter=@buster-app/server && \
-    echo "=== Turbo build complete: $(date) ==="
+    END=$(date +%s) && \
+    echo "Finished turbo build in $((END - START)) seconds"
 
 
 # Build the application (fast with bun)
-RUN echo "=== Building application: $(date) ===" && \
+RUN START=$(date +%s) && \
+    echo "=== Starting application build ===" && \
     cd apps/server && \
     time bun build src/index.ts --outdir ./dist --target bun && \
     echo "Build complete - output:" && \
     ls -la dist/ && \
-    echo "=== BUILD COMPLETE: $(date) ==="
+    END=$(date +%s) && \
+    echo "Finished application build in $((END - START)) seconds"
 
 # Production runtime (minimal bun image)
 FROM oven/bun:1.2.15-alpine AS runtime
@@ -53,7 +59,7 @@ COPY --from=builder --chown=bunuser:bunuser /app/apps/server/package.json ./
 COPY --from=builder --chown=bunuser:bunuser /app/node_modules ./node_modules
 
 # Show final stats
-RUN echo "=== Final production image: $(date) ===" && \
+RUN echo "=== Final production image prepared ===" && \
     du -sh /app && \
     echo "Ready to run!"
 

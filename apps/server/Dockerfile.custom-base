@@ -6,7 +6,7 @@
 # - All workspace dependencies pre-installed
 # 
 # Build and publish this multi-platform image:
-# docker buildx build --platform linux/amd64 \
+# docker buildx build --platform linux/amd64,linux/arm64 \
 # -f apps/server/Dockerfile.custom-base \
 # -t ghcr.io/buster-so/server-base:latest \
 # --push .

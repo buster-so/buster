@@ -10,6 +10,8 @@ export const requireAuth = bearerAuth({
     const { data, error } = await supabase.auth.getUser(token); //usually takes about 3 - 7ms
 
     if (error || !data.user) {
+      // biome-ignore lint/suspicious/noConsoleLog: we want to log this
+      console.log('Error getting user', error);
       return false;
     }
 
@@ -22,6 +24,9 @@ export const requireAuth = bearerAuth({
     }
 
     c.set('busterUser', busterUser);
+
+    // biome-ignore lint/suspicious/noConsoleLog: we want to log this
+    console.log('User authenticated', data.user);
 
     return !!data.user.is_anonymous === false;
   },

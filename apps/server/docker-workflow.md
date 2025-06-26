@@ -45,5 +45,7 @@ docker build -f apps/server/Dockerfile.ultra-fast -t buster-server:latest .
 ### Update Base Image (periodically):
 ```bash
 # Rebuild and push new base
-docker build -f apps/server/Dockerfile.custom-base -t ghcr.io/buster-so/server-base:v2 .
-docker push ghcr.io/buster-so/server-base:latest
+docker buildx build --platform linux/amd64,linux/arm64 \
+  -f apps/server/Dockerfile.custom-base \
+  -t ghcr.io/buster-so/server-base:latest \
+  --push .

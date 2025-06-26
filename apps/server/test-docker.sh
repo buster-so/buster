@@ -24,8 +24,8 @@ HOST_PORT=3002
 
 # Cleanup function
 cleanup() {
-    echo -e "${YELLOW}⏳ Waiting for 10 seconds...${NC}"
-    sleep 10
+    echo -e "${YELLOW}⏳ Waiting for 5 seconds...${NC}"
+    sleep 5
     echo -e "${YELLOW}🧹 Cleaning up...${NC}"
     docker stop $CONTAINER_NAME 2>/dev/null || true
     docker rm $CONTAINER_NAME 2>/dev/null || true
