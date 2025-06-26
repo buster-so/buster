@@ -236,7 +236,7 @@ Generate a concise update message for the data team.`;
     if (!toolCall) {
       throw new Error('Tool call is undefined');
     }
-    
+
     if (toolCall.toolName !== 'generateUpdateMessage') {
       throw new Error(`Unexpected tool called: ${toolCall.toolName}`);
     }

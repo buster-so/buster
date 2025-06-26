@@ -99,12 +99,12 @@ describe('validation-helpers', () => {
 
     it('should use crypto.getRandomValues', () => {
       const mockGetRandomValues = vi.spyOn(crypto, 'getRandomValues');
-      
+
       generateSecureState();
 
       expect(mockGetRandomValues).toHaveBeenCalledTimes(1);
       expect(mockGetRandomValues).toHaveBeenCalledWith(expect.any(Uint8Array));
-      
+
       mockGetRandomValues.mockRestore();
     });
   });
@@ -112,25 +112,25 @@ describe('validation-helpers', () => {
   describe('isExpired', () => {
     it('should return true when timestamp is in the past', () => {
       const pastTimestamp = Date.now() - 1000; // 1 second ago
-      
+
       expect(isExpired(pastTimestamp)).toBe(true);
     });
 
     it('should return false when timestamp is in the future', () => {
       const futureTimestamp = Date.now() + 1000; // 1 second from now
-      
+
       expect(isExpired(futureTimestamp)).toBe(false);
     });
 
     it('should return true when timestamp equals current time', () => {
       const now = Date.now();
-      
+
       // Mock Date.now to return a slightly later time
       const originalDateNow = Date.now;
       Date.now = vi.fn(() => now + 1);
-      
+
       expect(isExpired(now)).toBe(true);
-      
+
       Date.now = originalDateNow;
     });
 

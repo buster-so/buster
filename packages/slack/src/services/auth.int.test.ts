@@ -1,16 +1,15 @@
 import { beforeAll, describe, expect, it } from 'vitest';
-import { SlackAuthService } from './auth';
-import type { 
-  ISlackTokenStorage, 
-  ISlackOAuthStateStorage, 
-  SlackOAuthStateData 
+import type {
+  ISlackOAuthStateStorage,
+  ISlackTokenStorage,
+  SlackOAuthStateData,
 } from '../interfaces/token-storage';
 import type { SlackOAuthConfig } from '../types';
+import { SlackAuthService } from './auth';
 
 // Only run if environment is configured
-const runIntegrationTests = 
-  process.env.SLACK_BOT_TOKEN !== undefined && 
-  process.env.SLACK_CHANNEL_ID !== undefined;
+const runIntegrationTests =
+  process.env.SLACK_BOT_TOKEN !== undefined && process.env.SLACK_CHANNEL_ID !== undefined;
 
 const describeIntegration = runIntegrationTests ? describe : describe.skip;
 
@@ -107,7 +106,7 @@ describeIntegration('SlackAuthService Integration', () => {
 
     it('should generate unique states', async () => {
       const states = new Set<string>();
-      
+
       for (let i = 0; i < 10; i++) {
         const { state } = await authService.generateAuthUrl();
         states.add(state);
@@ -150,7 +149,7 @@ describeIntegration('SlackAuthService Integration', () => {
       // Store a token
       const testKey = 'revoke-test';
       await tokenStorage.storeToken(testKey, 'xoxb-test-token');
-      
+
       // Verify it's stored
       expect(await tokenStorage.hasToken(testKey)).toBe(true);
 
@@ -163,9 +162,7 @@ describeIntegration('SlackAuthService Integration', () => {
 
     it('should handle revoking non-existent token gracefully', async () => {
       // Should not throw
-      await expect(
-        authService.revokeToken('non-existent-token')
-      ).resolves.toBeUndefined();
+      await expect(authService.revokeToken('non-existent-token')).resolves.toBeUndefined();
     });
 
     it('should handle revocation errors gracefully', async () => {
@@ -224,7 +221,7 @@ describeIntegration('SlackAuthService Integration', () => {
   describe('State Generation Security', () => {
     it('should generate cryptographically secure states', async () => {
       const states: string[] = [];
-      
+
       // Generate multiple states
       for (let i = 0; i < 100; i++) {
         const { state } = await authService.generateAuthUrl();
@@ -248,7 +245,7 @@ describeIntegration('SlackAuthService Integration', () => {
     it('should properly integrate with token storage', async () => {
       const testKey = 'storage-integration-test';
       const mockToken = 'xoxb-mock-token-for-testing';
-      
+
       // Store mock token (NOT the real bot token!)
       await tokenStorage.storeToken(testKey, mockToken);
 
@@ -266,14 +263,14 @@ describeIntegration('SlackAuthService Integration', () => {
 
     it('should handle concurrent operations safely', async () => {
       // Generate multiple auth URLs concurrently
-      const promises = Array.from({ length: 10 }, (_, i) => 
+      const promises = Array.from({ length: 10 }, (_, i) =>
         authService.generateAuthUrl({ index: i })
       );
 
       const results = await Promise.all(promises);
-      
+
       // All should succeed with unique states
-      const states = results.map(r => r.state);
+      const states = results.map((r) => r.state);
       const uniqueStates = new Set(states);
       expect(uniqueStates.size).toBe(10);
     });

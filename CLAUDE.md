@@ -185,6 +185,23 @@ const firstItem = array[0]!; // Non-null assertion not allowed
 - Use Node.js protocol: `import { readFile } from 'node:fs'`
 - Follow path aliases defined in each package's tsconfig.json
 
+### String Handling
+- **Prefer template literals** over string concatenation for better readability
+- Use template literals for multi-line strings and string interpolation
+
+#### String Handling Patterns
+```typescript
+// ✅ Good: Template literals
+const message = `User ${userId} not found`;
+const multiLine = `This is a
+multi-line string`;
+const path = `${baseUrl}/api/users/${userId}`;
+
+// ❌ Avoid: String concatenation
+const message = 'User ' + userId + ' not found';
+const path = baseUrl + '/api/users/' + userId;
+```
+
 ### Error Handling
 - **Always use try-catch blocks** for async operations and external calls
 - **Never use `any` in catch blocks** - Biome enforces this

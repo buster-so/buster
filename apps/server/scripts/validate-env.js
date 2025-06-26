@@ -17,6 +17,14 @@ const env = {
   NODE_ENV: process.env.NODE_ENV || 'development',
 };
 
+// Optional Slack OAuth environment variables
+const slackEnv = {
+  SLACK_CLIENT_ID: process.env.SLACK_CLIENT_ID,
+  SLACK_CLIENT_SECRET: process.env.SLACK_CLIENT_SECRET,
+  SLACK_REDIRECT_URI: process.env.SLACK_REDIRECT_URI,
+  SLACK_INTEGRATION_ENABLED: process.env.SLACK_INTEGRATION_ENABLED || 'false',
+};
+
 let hasErrors = false;
 
 for (const [envKey, value] of Object.entries(env)) {
@@ -26,6 +34,25 @@ for (const [envKey, value] of Object.entries(env)) {
   } else {
     console.log(`✅ ${envKey} is set`);
   }
+}
+
+// Check Slack variables only if integration is enabled
+if (slackEnv.SLACK_INTEGRATION_ENABLED === 'true') {
+  console.log('');
+  console.log('🔍 Slack integration is enabled. Validating Slack environment variables...');
+
+  const requiredSlackVars = ['SLACK_CLIENT_ID', 'SLACK_CLIENT_SECRET', 'SLACK_REDIRECT_URI'];
+
+  for (const envKey of requiredSlackVars) {
+    if (!slackEnv[envKey]) {
+      console.error(`❌ Missing required Slack environment variable: ${envKey}`);
+      hasErrors = true;
+    } else {
+      console.log(`✅ ${envKey} is set`);
+    }
+  }
+} else {
+  console.log('ℹ️  Slack integration is disabled (SLACK_INTEGRATION_ENABLED != true)');
 }
 
 if (hasErrors) {

@@ -56,7 +56,7 @@ export const combineParallelResultsOutputSchema = z.object({
             'sorting',
             'grouping',
             'calculationMethod',
-            'dataRelevance'
+            'dataRelevance',
           ])
           .describe('The type/category of assumption made'),
         explanation: z

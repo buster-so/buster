@@ -109,7 +109,7 @@ export class SlackAuthService {
       // Return integration result
       const result: SlackIntegrationResult = {
         teamId: oauthData.team.id,
-        teamName: oauthData.team.name,
+        teamName: oauthData.team.name || 'Unknown Team', // Provide default if name is missing
         teamDomain: oauthData.team.domain || '',
         botUserId: oauthData.bot_user_id,
         scope: oauthData.scope,

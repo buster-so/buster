@@ -2,9 +2,8 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { SlackChannelService } from './channels';
 
 // Only run if environment is configured
-const runIntegrationTests = 
-  process.env.SLACK_BOT_TOKEN !== undefined && 
-  process.env.SLACK_CHANNEL_ID !== undefined;
+const runIntegrationTests =
+  process.env.SLACK_BOT_TOKEN !== undefined && process.env.SLACK_CHANNEL_ID !== undefined;
 
 const describeIntegration = runIntegrationTests ? describe : describe.skip;
 
@@ -25,7 +24,7 @@ describeIntegration('SlackChannelService Integration', () => {
 
       expect(Array.isArray(channels)).toBe(true);
       expect(channels.length).toBeGreaterThan(0);
-      
+
       // Check channel structure
       const firstChannel = channels[0];
       expect(firstChannel).toHaveProperty('id');
@@ -33,24 +32,24 @@ describeIntegration('SlackChannelService Integration', () => {
       expect(firstChannel).toHaveProperty('is_private');
       expect(firstChannel).toHaveProperty('is_archived');
       expect(firstChannel).toHaveProperty('is_member');
-      
+
       // Should be sorted alphabetically
       for (let i = 1; i < channels.length; i++) {
-        expect(channels[i].name >= channels[i-1].name).toBe(true);
+        expect(channels[i].name >= channels[i - 1].name).toBe(true);
       }
     });
 
     it('should exclude archived channels by default', async () => {
       const channels = await channelService.getAvailableChannels(botToken);
-      
-      const archivedChannels = channels.filter(ch => ch.is_archived);
+
+      const archivedChannels = channels.filter((ch) => ch.is_archived);
       expect(archivedChannels.length).toBe(0);
     });
 
     it('should include archived channels when requested', async () => {
       const allChannels = await channelService.getAvailableChannels(botToken, true);
       const activeChannels = await channelService.getAvailableChannels(botToken, false);
-      
+
       // Might have more channels when including archived
       expect(allChannels.length).toBeGreaterThanOrEqual(activeChannels.length);
     });
@@ -82,13 +81,15 @@ describeIntegration('SlackChannelService Integration', () => {
   describe('Channel Membership', () => {
     it('should check if bot is member of configured channel', async () => {
       const channel = await channelService.validateChannelAccess(botToken, channelId);
-      
+
       // The bot might not be a member of the channel yet
       // This is informational - not a hard requirement
       if (!channel.is_member) {
-        console.log(`Bot is not a member of channel ${channelId}. Consider inviting the bot with /invite @YourBotName`);
+        console.log(
+          `Bot is not a member of channel ${channelId}. Consider inviting the bot with /invite @YourBotName`
+        );
       }
-      
+
       // Just verify we got valid channel info
       expect(channel.id).toBe(channelId);
       expect(channel.name).toBeTruthy();
@@ -98,7 +99,7 @@ describeIntegration('SlackChannelService Integration', () => {
       // This test is a bit tricky - we need a channel we're not in
       // For safety, we'll skip the actual join unless a test channel is provided
       const testChannelId = process.env.SLACK_TEST_JOIN_CHANNEL_ID;
-      
+
       if (!testChannelId) {
         console.log('Skipping join test - set SLACK_TEST_JOIN_CHANNEL_ID to test');
         return;
@@ -112,7 +113,7 @@ describeIntegration('SlackChannelService Integration', () => {
     it('should handle join errors gracefully', async () => {
       // Try to join a private channel (should fail)
       const result = await channelService.joinChannel(botToken, 'C_PRIVATE_CHANNEL');
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toBeTruthy();
     });
@@ -139,12 +140,12 @@ describeIntegration('SlackChannelService Integration', () => {
   describe('Error Handling', () => {
     it('should handle rate limiting gracefully', async () => {
       // Make rapid requests to potentially trigger rate limit
-      const promises = Array.from({ length: 20 }, () => 
-        channelService.getAvailableChannels(botToken).catch(e => e)
+      const promises = Array.from({ length: 20 }, () =>
+        channelService.getAvailableChannels(botToken).catch((e) => e)
       );
 
       const results = await Promise.all(promises);
-      
+
       // All should either succeed or fail with rate limit error
       for (const result of results) {
         if (result instanceof Error) {
@@ -180,7 +181,7 @@ describeIntegration('SlackChannelService Integration', () => {
 
       // Should complete reasonably quickly even with many channels
       expect(duration).toBeLessThan(10000); // 10 seconds max
-      
+
       // Should have fetched channels
       expect(channels.length).toBeGreaterThan(0);
     });
