@@ -144,7 +144,19 @@ async function healthCheckHandler(c: Context) {
   }
 }
 
+// Simple CORS test endpoint
+async function corsTestHandler(c: Context) {
+  return c.json({
+    message: 'CORS is working!',
+    origin: c.req.header('origin'),
+    method: c.req.method,
+    timestamp: new Date().toISOString(),
+    userAgent: c.req.header('user-agent'),
+    authorization: c.req.header('authorization') ? 'present' : 'not present',
+  });
+}
+
 // Create healthcheck routes
-const app = new Hono().get('/', healthCheckHandler);
+const app = new Hono().get('/', healthCheckHandler).get('/cors-test', corsTestHandler);
 
 export default app;
