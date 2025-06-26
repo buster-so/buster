@@ -85,6 +85,12 @@ export const tableTypeEnum = pgEnum('table_type_enum', [
   'EXTERNAL_TABLE',
   'TEMPORARY_TABLE',
 ]);
+export const slackIntegrationStatusEnum = pgEnum('slack_integration_status_enum', [
+  'pending',
+  'active',
+  'failed',
+  'revoked',
+]);
 
 export const apiKeys = pgTable(
   'api_keys',
@@ -1770,6 +1776,129 @@ export const tableMetadata = pgTable(
     index('table_metadata_schema_id_idx').using(
       'btree',
       table.schemaId.asc().nullsLast().op('uuid_ops')
+    ),
+  ]
+);
+
+// Slack integrations table
+export const slackIntegrations = pgTable(
+  'slack_integrations',
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    organizationId: uuid('organization_id').notNull(),
+    userId: uuid('user_id').notNull(),
+
+    // OAuth state fields (for pending integrations)
+    oauthState: varchar('oauth_state', { length: 255 }).unique(),
+    oauthExpiresAt: timestamp('oauth_expires_at', { withTimezone: true, mode: 'string' }),
+    oauthMetadata: jsonb('oauth_metadata').default({}),
+
+    // Slack workspace info (populated after successful OAuth)
+    teamId: varchar('team_id', { length: 255 }),
+    teamName: varchar('team_name', { length: 255 }),
+    teamDomain: varchar('team_domain', { length: 255 }),
+    enterpriseId: varchar('enterprise_id', { length: 255 }),
+
+    // Bot info
+    botUserId: varchar('bot_user_id', { length: 255 }),
+    scope: text(),
+
+    // Token reference (actual token in Supabase Vault)
+    tokenVaultKey: varchar('token_vault_key', { length: 255 }).unique(),
+
+    // Metadata
+    installedBySlackUserId: varchar('installed_by_slack_user_id', { length: 255 }),
+    installedAt: timestamp('installed_at', { withTimezone: true, mode: 'string' }),
+    lastUsedAt: timestamp('last_used_at', { withTimezone: true, mode: 'string' }),
+    status: slackIntegrationStatusEnum().default('pending').notNull(),
+
+    // Timestamps
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+    deletedAt: timestamp('deleted_at', { withTimezone: true, mode: 'string' }),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.organizationId],
+      foreignColumns: [organizations.id],
+      name: 'slack_integrations_organization_id_fkey',
+    }).onDelete('cascade'),
+    foreignKey({
+      columns: [table.userId],
+      foreignColumns: [users.id],
+      name: 'slack_integrations_user_id_fkey',
+    }),
+    unique('slack_integrations_org_team_key').on(table.organizationId, table.teamId),
+    index('idx_slack_integrations_org_id').using(
+      'btree',
+      table.organizationId.asc().nullsLast().op('uuid_ops')
+    ),
+    index('idx_slack_integrations_team_id').using(
+      'btree',
+      table.teamId.asc().nullsLast().op('text_ops')
+    ),
+    index('idx_slack_integrations_oauth_state').using(
+      'btree',
+      table.oauthState.asc().nullsLast().op('text_ops')
+    ),
+    index('idx_slack_integrations_oauth_expires').using(
+      'btree',
+      table.oauthExpiresAt.asc().nullsLast().op('timestamptz_ops')
+    ),
+    check(
+      'slack_integrations_status_check',
+      sql`(status = 'pending' AND oauth_state IS NOT NULL) OR (status != 'pending' AND team_id IS NOT NULL)`
+    ),
+  ]
+);
+
+// Slack message tracking table (optional)
+export const slackMessageTracking = pgTable(
+  'slack_message_tracking',
+  {
+    id: uuid().defaultRandom().primaryKey().notNull(),
+    integrationId: uuid('integration_id').notNull(),
+
+    // Internal reference
+    internalMessageId: uuid('internal_message_id').notNull().unique(),
+
+    // Slack references
+    slackChannelId: varchar('slack_channel_id', { length: 255 }).notNull(),
+    slackMessageTs: varchar('slack_message_ts', { length: 255 }).notNull(),
+    slackThreadTs: varchar('slack_thread_ts', { length: 255 }),
+
+    // Metadata
+    messageType: varchar('message_type', { length: 50 }).notNull(), // 'message', 'reply', 'update'
+    content: text(),
+    senderInfo: jsonb('sender_info'),
+
+    // Timestamps
+    sentAt: timestamp('sent_at', { withTimezone: true, mode: 'string' }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true, mode: 'string' })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.integrationId],
+      foreignColumns: [slackIntegrations.id],
+      name: 'slack_message_tracking_integration_id_fkey',
+    }).onDelete('cascade'),
+    index('idx_message_tracking_integration').using(
+      'btree',
+      table.integrationId.asc().nullsLast().op('uuid_ops')
+    ),
+    index('idx_message_tracking_channel').using(
+      'btree',
+      table.slackChannelId.asc().nullsLast().op('text_ops')
+    ),
+    index('idx_message_tracking_thread').using(
+      'btree',
+      table.slackThreadTs.asc().nullsLast().op('text_ops')
     ),
   ]
 );

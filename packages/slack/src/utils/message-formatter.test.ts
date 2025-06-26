@@ -112,7 +112,15 @@ describe('message-formatter', () => {
         { text: 'View Details', value: 'view', url: 'https://example.com' },
       ]);
 
-      expect(block.elements[0].url).toBe('https://example.com');
+      expect(block.elements[0]).toMatchObject({
+        type: 'button',
+        text: {
+          type: 'plain_text',
+          text: 'View Details',
+        },
+        value: 'view',
+        url: 'https://example.com',
+      });
     });
   });
 
@@ -227,7 +235,9 @@ describe('message-formatter', () => {
         });
 
         expect(message.text).toBe('Deployment Failed: my-app');
-        expect(message.blocks?.[0].text?.text).toContain('❌ *Deployment Failed*');
+        expect((message.blocks?.[0] as { text?: { text?: string } })?.text?.text).toContain(
+          '❌ *Deployment Failed*'
+        );
       });
     });
 
@@ -249,7 +259,9 @@ describe('message-formatter', () => {
             text: expect.stringContaining('🚨 *High CPU Usage*'),
           },
         });
-        expect(message.blocks?.[0].text?.text).toContain('Source: monitoring-system');
+        expect((message.blocks?.[0] as { text?: { text?: string } })?.text?.text).toContain(
+          'Source: monitoring-system'
+        );
         expect(message.blocks?.[1]).toMatchObject({
           type: 'actions',
           elements: [
@@ -278,8 +290,10 @@ describe('message-formatter', () => {
           severity: 'info',
         });
 
-        expect(warningAlert.blocks?.[0].text?.text).toContain('⚠️');
-        expect(infoAlert.blocks?.[0].text?.text).toContain('ℹ️');
+        expect((warningAlert.blocks?.[0] as { text?: { text?: string } })?.text?.text).toContain(
+          '⚠️'
+        );
+        expect((infoAlert.blocks?.[0] as { text?: { text?: string } })?.text?.text).toContain('ℹ️');
       });
     });
   });
