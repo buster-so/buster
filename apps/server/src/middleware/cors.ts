@@ -6,6 +6,7 @@ const isProd = process.env.NODE_ENV === 'production';
 export const corsMiddleware = cors({
   origin: isDev
     ? (origin) => {
+        console.log('NODE_ENV', process.env.NODE_ENV);
         if (!origin) {
           console.log('CORS: No origin header provided');
           return undefined;
