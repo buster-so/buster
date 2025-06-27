@@ -9,8 +9,8 @@ import type { SelectedFile } from '../interfaces';
 import { useAutoChangeLayout } from './useAutoChangeLayout';
 import { useIsFileChanged } from './useIsFileChanged';
 import { useChatStreaming } from './useChatStreaming';
-import { useDocumentTitle } from '@/hooks';
 import { useGetMetric } from '@/api/buster_rest/metrics';
+import { useChatDocumentTitle } from './useChatDocumentTitle';
 
 const useChatIndividualContext = ({
   chatId,
@@ -31,11 +31,6 @@ const useChatIndividualContext = ({
         message_ids: data?.message_ids
       })
     }
-  );
-
-  const { data: fileTitle } = useGetMetric(
-    { id: selectedFileType !== 'reasoning' ? selectedFileId || '' : undefined },
-    { select: (x) => x.name }
   );
 
   // CHAT
@@ -71,37 +66,21 @@ const useChatIndividualContext = ({
     chatId
   });
   useChatStreaming({ chatId, messageId: currentMessageId, isStreamingMessage });
+  useChatDocumentTitle({ chatTitle, selectedFileId, selectedFileType });
 
-  return React.useMemo(
-    () => ({
-      hasChat,
-      hasFile,
-      selectedFileId,
-      currentMessageId,
-      chatTitle,
-      fileTitle,
-      selectedFileType,
-      chatMessageIds,
-      chatId,
-      isStreamingMessage,
-      isFileChanged,
-      onResetToOriginal
-    }),
-    [
-      hasChat,
-      hasFile,
-      fileTitle,
-      isStreamingMessage,
-      selectedFileId,
-      currentMessageId,
-      chatTitle,
-      selectedFileType,
-      chatMessageIds,
-      chatId,
-      isFileChanged,
-      onResetToOriginal
-    ]
-  );
+  return {
+    hasChat,
+    hasFile,
+    selectedFileId,
+    currentMessageId,
+    chatTitle,
+    selectedFileType,
+    chatMessageIds,
+    chatId,
+    isStreamingMessage,
+    isFileChanged,
+    onResetToOriginal
+  };
 };
 
 const IndividualChatContext = createContext<ReturnType<typeof useChatIndividualContext>>(
@@ -116,14 +95,6 @@ export const ChatContextProvider = React.memo(({ children }: PropsWithChildren) 
     chatId,
     selectedFile
   });
-  const { chatTitle, fileTitle } = useChatContextValue;
-
-  const title = useMemo(() => {
-    if (fileTitle) return [fileTitle, chatTitle].filter(Boolean).join(' | ');
-    return chatTitle;
-  }, [fileTitle, chatTitle]);
-
-  useDocumentTitle(title);
 
   return (
     <IndividualChatContext.Provider value={useChatContextValue}>

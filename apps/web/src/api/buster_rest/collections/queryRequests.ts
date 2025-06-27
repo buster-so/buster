@@ -75,7 +75,7 @@ const useFetchCollection = () => {
 
 export const useGetCollection = <T = BusterCollection>(
   collectionId: string | undefined,
-  select?: (data: BusterCollection) => T
+  params?: Omit<UseQueryOptions<BusterCollection, RustApiError, T>, 'queryKey' | 'queryFn'>
 ) => {
   const fetchCollection = useFetchCollection();
   return useQuery({
@@ -84,7 +84,8 @@ export const useGetCollection = <T = BusterCollection>(
       return fetchCollection(collectionId || '');
     },
     enabled: !!collectionId,
-    select
+    select: params?.select,
+    ...params
   });
 };
 

@@ -66,19 +66,33 @@ const useVersionNumber = (props: UseGetAssetProps) => {
   }, [props.type, props.versionNumber, metricVersionNumber, dashboardVersionNumber]);
 };
 
-export const useGetAsset = (props: UseGetAssetProps) => {
+export const useGetAsset = (
+  props: UseGetAssetProps
+): {
+  isFetched: boolean;
+  error: RustApiError | null;
+  hasAccess: boolean;
+  passwordRequired: boolean;
+  isPublic: boolean;
+  showLoader: boolean | undefined;
+  title: string | undefined;
+} => {
   const versionNumber = useVersionNumber(props);
   const isMetric = props.type === 'metric';
   const isDashboard = props.type === 'dashboard';
   const isCollection = props.type === 'collection';
 
   // Always call hooks at the top level with appropriate enabled flags
-  const { error: metricError, isFetched: metricIsFetched } = useGetMetric(
+  const {
+    error: metricError,
+    isFetched: metricIsFetched,
+    data: metricTitle
+  } = useGetMetric(
     {
       id: isMetric ? props.assetId : undefined,
       versionNumber
     },
-    { enabled: isMetric && props.assetId !== undefined }
+    { enabled: isMetric && props.assetId !== undefined, select: (x) => x?.name }
   );
 
   const { isFetched: metricDataIsFetched } = useGetMetricData({
@@ -89,20 +103,24 @@ export const useGetAsset = (props: UseGetAssetProps) => {
   const {
     isFetched: dashboardIsFetched,
     error: dashboardError,
-    isError: dashboardIsError
+    isError: dashboardIsError,
+    data: dashboardTitle
   } = useGetDashboard(
     {
       id: isDashboard ? props.assetId : undefined,
       versionNumber
     },
-    { enabled: isDashboard }
+    { enabled: isDashboard, select: (x) => x?.dashboard?.name }
   );
 
   const {
     isFetched: collectionIsFetched,
     error: collectionError,
-    isError: collectionIsError
-  } = useGetCollection(isCollection ? props.assetId : undefined);
+    isError: collectionIsError,
+    data: collectionTitle
+  } = useGetCollection(isCollection ? props.assetId : undefined, {
+    select: (x) => x?.name
+  });
 
   const currentQuery = useMemo((): AssetQueryResult => {
     switch (props.type) {
@@ -145,6 +163,13 @@ export const useGetAsset = (props: UseGetAssetProps) => {
     collectionIsError
   ]);
 
+  const title = useMemo(() => {
+    if (isMetric) return metricTitle;
+    if (isDashboard) return dashboardTitle;
+    if (isCollection) return collectionTitle;
+    return undefined;
+  }, [isMetric, isDashboard, isCollection, metricTitle, dashboardTitle, collectionTitle]);
+
   const { hasAccess, passwordRequired, isPublic } = getAssetAccess(currentQuery.error);
 
   return {
@@ -153,6 +178,7 @@ export const useGetAsset = (props: UseGetAssetProps) => {
     hasAccess,
     passwordRequired,
     isPublic,
-    showLoader: currentQuery.showLoader
+    showLoader: currentQuery.showLoader,
+    title
   };
 };
