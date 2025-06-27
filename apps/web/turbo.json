@@ -23,6 +23,16 @@
         "vitest.config.ts",
         "package.json"
       ]
+    },
+    "dev": {
+      "dependsOn": ["@buster/server-shared#build"],
+      "inputs": [
+        "src/**/*",
+        "next.config.mjs",
+        "tailwind.config.ts",
+        "tsconfig.json",
+        "package.json"
+      ]
     }
   }
 }

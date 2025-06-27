@@ -3,7 +3,7 @@
   "extends": ["//"],
   "tasks": {
     "build": {
-      "outputs": []
+      "outputs": ["dist/**/*"]
     }
   }
 }
