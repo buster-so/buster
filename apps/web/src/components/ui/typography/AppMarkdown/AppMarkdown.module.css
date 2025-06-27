@@ -67,3 +67,7 @@
 .container a {
   color: var(--color-primary);
 }
+
+.container strong {
+  @apply font-semibold;
+}
