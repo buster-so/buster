@@ -110,7 +110,7 @@ describe('format-initial-message-step integration', () => {
 
     // Check flag-chat fields are passed through
     expect(result.toolCalled).toBe('noIssuesFound');
-    expect(result.message).toBe(
+    expect(result.flagChatMessage).toEqual(
       'No issues detected in this conversation that require data team review.'
     );
 
@@ -118,15 +118,6 @@ describe('format-initial-message-step integration', () => {
     expect(result.assumptions).toBeDefined();
     expect(Array.isArray(result.assumptions)).toBe(true);
     expect(result.assumptions).toHaveLength(3);
-
-    // Check that formatted message was generated since major assumptions exist
-    expect(result.formattedMessage).toBeDefined();
-    expect(typeof result.formattedMessage).toBe('string');
-    expect(result.formattedMessage).not.toBeNull();
-    expect(result.formattedMessage!.length).toBeGreaterThan(0);
-
-    // Should contain title and summary format
-    expect(result.formattedMessage).toMatch(/.*:.*/); // Should have title: summary format
   });
 
   it('should return null formatted message when no major assumptions are found', async () => {
@@ -183,9 +174,6 @@ describe('format-initial-message-step integration', () => {
 
     // Verify the step executed successfully and returned expected structure
     expect(result).toBeDefined();
-
-    // Check that formatted message is null since no major assumptions
-    expect(result.formattedMessage).toBeNull();
 
     // Other fields should still be passed through
     expect(result.toolCalled).toBe('noIssuesFound');

@@ -24,9 +24,8 @@ export const combineParallelResultsOutputSchema = z.object({
 
   // Fields from flag-chat step
   toolCalled: z.string().describe('Name of the tool that was called by the flag chat agent'),
-  summaryMessage: z.string().optional().describe('Brief summary of the issue detected'),
-  summaryTitle: z.string().optional().describe('Short 3-6 word title for the summary'),
-  message: z.string().optional().describe('Confirmation message indicating no issues found'),
+  flagChatMessage: z.string().optional().describe('The message from the flag chat tool'),
+  flagChatTitle: z.string().optional().describe('The title from the flag chat tool'),
 
   // Fields from identify-assumptions step
   assumptions: z
@@ -93,9 +92,8 @@ export const combineParallelResultsStepExecution = async ({
 
     // Fields from flag-chat step
     toolCalled: flagChatResult.toolCalled,
-    summaryMessage: flagChatResult.summaryMessage,
-    summaryTitle: flagChatResult.summaryTitle,
-    message: flagChatResult.message,
+    flagChatMessage: flagChatResult.flagChatMessage,
+    flagChatTitle: flagChatResult.flagChatTitle,
 
     // Fields from identify-assumptions step
     assumptions: assumptionsResult.assumptions,

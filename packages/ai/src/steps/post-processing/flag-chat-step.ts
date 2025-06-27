@@ -32,9 +32,11 @@ export const flagChatOutputSchema = z.object({
 
   // New fields from this step
   toolCalled: z.string().describe('Name of the tool that was called by the agent'),
-  summaryMessage: z.string().optional().describe('Brief summary of the issue detected'),
-  summaryTitle: z.string().optional().describe('Short 3-6 word title for the summary'),
-  message: z.string().optional().describe('Confirmation message indicating no issues found'),
+  flagChatMessage: z
+    .string()
+    .optional()
+    .describe('Confirmation message indicating no issues found'),
+  flagChatTitle: z.string().optional().describe('Title for the flag chat message'),
 });
 
 // Template function that accepts datasets parameter
@@ -227,9 +229,8 @@ No conversation history available for analysis.`);
       ...inputData,
       // Add new fields from this step
       toolCalled: toolCall.toolName,
-      summaryMessage: toolCall.args.summary_message,
-      summaryTitle: toolCall.args.summary_title,
-      message: toolCall.args.message,
+      flagChatMessage: toolCall.args.summary_message,
+      flagChatTitle: toolCall.args.summary_title,
     };
   } catch (error) {
     console.error('Failed to analyze chat for flagging:', error);

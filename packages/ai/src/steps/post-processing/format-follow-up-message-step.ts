@@ -1,136 +1,21 @@
 import { Agent, createStep } from '@mastra/core';
 import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
-import { z } from 'zod';
+import type { z } from 'zod';
 import { generateUpdateMessage } from '../../tools/post-processing/generate-update-message';
 import { MessageHistorySchema } from '../../utils/memory/types';
 import { anthropicCachedModel } from '../../utils/models/anthropic-cached';
 import { standardizeMessages } from '../../utils/standardizeMessages';
+import { postProcessingWorkflowOutputSchema } from './schemas';
 
-// Input schema that accepts the combined results from parallel steps
-const inputSchema = z.object({
-  // Base fields
-  conversationHistory: MessageHistorySchema.optional(),
-  userName: z.string().describe('Name for the post-processing operation'),
-  messageId: z.string().describe('Message ID for the current operation'),
-  userId: z.string().describe('User ID for the current operation'),
-  chatId: z.string().describe('Chat ID for the current operation'),
-  isFollowUp: z.boolean().describe('True if this is a follow-up message'),
-  previousMessages: z.array(z.string()).describe('Array of previous messages for context'),
-  datasets: z.string().describe('Assembled YAML content of all available datasets for context'),
+// Import the schema from combine-parallel-results step
+import { combineParallelResultsOutputSchema } from './combine-parallel-results-step';
 
-  // Fields from flag-chat step
-  toolCalled: z.string().describe('Name of the tool that was called by the flag chat agent'),
-  summaryMessage: z.string().optional().describe('Brief summary of the issue detected'),
-  summaryTitle: z.string().optional().describe('Short 3-6 word title for the summary'),
-  message: z.string().optional().describe('Confirmation message indicating no issues found'),
+// Input schema matches the output of combine-parallel-results step
+const inputSchema = combineParallelResultsOutputSchema;
 
-  // Fields from identify-assumptions step
-  assumptions: z
-    .array(
-      z.object({
-        descriptiveTitle: z.string().describe('A clear, descriptive title for the assumption'),
-        classification: z
-          .enum([
-            'fieldMapping',
-            'tableRelationship',
-            'dataQuality',
-            'dataFormat',
-            'dataAvailability',
-            'timePeriodInterpretation',
-            'timePeriodGranularity',
-            'metricInterpretation',
-            'segmentInterpretation',
-            'quantityInterpretation',
-            'requestScope',
-            'metricDefinition',
-            'segmentDefinition',
-            'businessLogic',
-            'policyInterpretation',
-            'optimization',
-            'aggregation',
-            'filtering',
-            'sorting',
-            'grouping',
-            'calculationMethod',
-            'dataRelevance',
-          ])
-          .describe('The type/category of assumption made'),
-        explanation: z
-          .string()
-          .describe('Detailed explanation of the assumption and its potential impact'),
-        label: z
-          .enum(['timeRelated', 'vagueRequest', 'major', 'minor'])
-          .describe('Label indicating the nature and severity of the assumption'),
-      })
-    )
-    .optional()
-    .describe('List of assumptions identified'),
-});
-
-export const formatFollowUpMessageOutputSchema = z.object({
-  // Pass through all input fields
-  conversationHistory: MessageHistorySchema.optional(),
-  userName: z.string().describe('Name for the post-processing operation'),
-  messageId: z.string().describe('Message ID for the current operation'),
-  userId: z.string().describe('User ID for the current operation'),
-  chatId: z.string().describe('Chat ID for the current operation'),
-  isFollowUp: z.boolean().describe('True if this is a follow-up message'),
-  previousMessages: z.array(z.string()).describe('Array of previous messages for context'),
-  datasets: z.string().describe('Assembled YAML content of all available datasets for context'),
-
-  // Fields from previous steps
-  toolCalled: z.string().describe('Name of the tool that was called by the flag chat agent'),
-  summaryMessage: z.string().optional().describe('Brief summary of the issue detected'),
-  summaryTitle: z.string().optional().describe('Short 3-6 word title for the summary'),
-  message: z.string().optional().describe('Confirmation message indicating no issues found'),
-  assumptions: z
-    .array(
-      z.object({
-        descriptiveTitle: z.string().describe('A clear, descriptive title for the assumption'),
-        classification: z
-          .enum([
-            'fieldMapping',
-            'tableRelationship',
-            'dataQuality',
-            'dataFormat',
-            'dataAvailability',
-            'timePeriodInterpretation',
-            'timePeriodGranularity',
-            'metricInterpretation',
-            'segmentInterpretation',
-            'quantityInterpretation',
-            'requestScope',
-            'metricDefinition',
-            'segmentDefinition',
-            'businessLogic',
-            'policyInterpretation',
-            'optimization',
-            'aggregation',
-            'filtering',
-            'sorting',
-            'grouping',
-            'calculationMethod',
-            'dataRelevance',
-          ])
-          .describe('The type/category of assumption made'),
-        explanation: z
-          .string()
-          .describe('Detailed explanation of the assumption and its potential impact'),
-        label: z
-          .enum(['timeRelated', 'vagueRequest', 'major', 'minor'])
-          .describe('Label indicating the nature and severity of the assumption'),
-      })
-    )
-    .optional()
-    .describe('List of assumptions identified'),
-
-  // New field for this step
-  formattedMessage: z
-    .string()
-    .nullable()
-    .describe('The formatted update message for follow-up, or null'),
-});
+// Use the unified schema from the workflow
+export const formatFollowUpMessageOutputSchema = postProcessingWorkflowOutputSchema;
 
 const followUpMessageInstructions = `
 <intro>
@@ -190,7 +75,7 @@ export const formatFollowUpMessageStepExecution = async ({
   try {
     // Prepare context about issues and assumptions for the agent
     const issuesAndAssumptions = {
-      flagged_issues: inputData.summaryMessage || inputData.message || 'No issues flagged',
+      flagged_issues: inputData.flagChatMessage || 'No issues flagged',
       assumptions: inputData.assumptions || [],
     };
 
@@ -246,7 +131,9 @@ Generate a concise update message for the data team.`;
     // Return all input data plus the formatted message
     return {
       ...inputData,
-      formattedMessage: updateMessage,
+      summaryMessage: updateMessage,
+      summaryTitle: 'Follow-up Update', // Default title for follow-up messages
+      message: updateMessage, // Store the update message in the message field as well
     };
   } catch (error) {
     console.error('Failed to format follow-up message:', error);

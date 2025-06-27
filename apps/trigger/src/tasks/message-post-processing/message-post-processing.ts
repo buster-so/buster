@@ -11,6 +11,7 @@ import {
   fetchMessageWithContext,
   fetchPreviousPostProcessingMessages,
   fetchUserDatasets,
+  sendSlackNotification,
 } from './helpers';
 import {
   DataFetchError,
@@ -24,6 +25,7 @@ import type { TaskInput, TaskOutput } from './types';
 const PostProcessingDbDataSchema = z.object({
   summaryMessage: z.string().optional(),
   summaryTitle: z.string().optional(),
+  formattedMessage: z.string().nullable().optional(),
   assumptions: z
     .array(
       z.object({
@@ -59,6 +61,7 @@ const PostProcessingDbDataSchema = z.object({
     .optional(),
   message: z.string().optional(),
   toolCalled: z.string(),
+  userName: z.string().nullable().optional(),
 });
 
 type PostProcessingDbData = z.infer<typeof PostProcessingDbDataSchema>;
@@ -66,13 +69,18 @@ type PostProcessingDbData = z.infer<typeof PostProcessingDbDataSchema>;
 /**
  * Extract only the specific fields we want to save to the database
  */
-function extractDbFields(workflowOutput: PostProcessingWorkflowOutput): PostProcessingDbData {
+function extractDbFields(
+  workflowOutput: PostProcessingWorkflowOutput,
+  userName: string | null
+): PostProcessingDbData {
   const extracted = {
     summaryMessage: workflowOutput.summaryMessage,
     summaryTitle: workflowOutput.summaryTitle,
+    formattedMessage: workflowOutput.formattedMessage,
     assumptions: workflowOutput.assumptions,
     message: workflowOutput.message,
-    toolCalled: workflowOutput.toolCalled,
+    toolCalled: workflowOutput.toolCalled || 'unknown', // Provide default if missing
+    userName,
   };
 
   // Validate the extracted data matches our schema
@@ -170,7 +178,36 @@ export const messagePostProcessingTask: ReturnType<
         throw new Error('Post-processing workflow returned no output');
       }
 
-      const validatedOutput = workflowResult.result;
+      // Handle branch results - the result will have one of the branch step IDs as a key
+      let validatedOutput: PostProcessingWorkflowOutput;
+      const branchResult = workflowResult.result as any; // Type assertion needed for branch results
+
+      if ('format-follow-up-message' in branchResult && branchResult['format-follow-up-message']) {
+        validatedOutput = branchResult['format-follow-up-message'] as PostProcessingWorkflowOutput;
+      } else if (
+        'format-initial-message' in branchResult &&
+        branchResult['format-initial-message']
+      ) {
+        validatedOutput = branchResult['format-initial-message'] as PostProcessingWorkflowOutput;
+      } else {
+        logger.error('Unexpected workflow result structure', {
+          messageId: payload.messageId,
+          resultKeys: Object.keys(branchResult),
+          result: branchResult,
+        });
+        throw new Error('Post-processing workflow returned unexpected result structure');
+      }
+
+      logger.log('Validated output', {
+        messageId: payload.messageId,
+        summaryTitle: validatedOutput.summaryTitle,
+        summaryMessage: validatedOutput.summaryMessage,
+        flagChatMessage: validatedOutput.flagChatMessage,
+        flagChatTitle: validatedOutput.flagChatTitle,
+        toolCalled: validatedOutput.toolCalled,
+        assumptions: validatedOutput.assumptions,
+        message: validatedOutput.message,
+      });
 
       // Step 5: Store result in database
       logger.log('Storing post-processing result in database', {
@@ -178,8 +215,8 @@ export const messagePostProcessingTask: ReturnType<
       });
 
       const db = getDb();
-      
-      const dbData = extractDbFields(validatedOutput);
+
+      const dbData = extractDbFields(validatedOutput, messageContext.userName);
       await db
         .update(messages)
         .set({
@@ -187,6 +224,39 @@ export const messagePostProcessingTask: ReturnType<
           updatedAt: new Date().toISOString(),
         })
         .where(eq(messages.id, payload.messageId));
+
+      // Step 6: Send Slack notification if conditions are met
+      logger.log('Checking Slack notification conditions', {
+        messageId: payload.messageId,
+        organizationId: messageContext.organizationId,
+        summaryTitle: dbData.summaryTitle,
+        summaryMessage: dbData.summaryMessage,
+        formattedMessage: dbData.formattedMessage,
+        toolCalled: dbData.toolCalled,
+      });
+
+      const slackResult = await sendSlackNotification({
+        organizationId: messageContext.organizationId,
+        userName: messageContext.userName,
+        summaryTitle: dbData.summaryTitle,
+        summaryMessage: dbData.summaryMessage,
+        formattedMessage: dbData.formattedMessage,
+        toolCalled: dbData.toolCalled,
+        message: dbData.message,
+      });
+
+      if (slackResult.sent) {
+        logger.log('Slack notification sent successfully', {
+          messageId: payload.messageId,
+          organizationId: messageContext.organizationId,
+        });
+      } else {
+        logger.log('Slack notification not sent', {
+          messageId: payload.messageId,
+          organizationId: messageContext.organizationId,
+          reason: slackResult.error,
+        });
+      }
 
       logger.log('Message post-processing completed successfully', {
         messageId: payload.messageId,

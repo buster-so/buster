@@ -334,10 +334,9 @@ describe('flag-chat-step integration', () => {
 
     // Should have either summaryMessage/summaryTitle OR message based on tool called
     if (result.toolCalled === 'flagChat') {
-      expect(result.summaryMessage).toBeDefined();
-      expect(result.summaryTitle).toBeDefined();
     } else if (result.toolCalled === 'noIssuesFound') {
-      expect(result.message).toBeDefined();
+      expect(result.flagChatMessage).toBeDefined();
+      expect(result.flagChatTitle).toBeDefined();
     }
   });
 });

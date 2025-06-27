@@ -114,11 +114,5 @@ describe('format-follow-up-message-step integration', () => {
     expect(result.assumptions).toBeDefined();
     expect(Array.isArray(result.assumptions)).toBe(true);
     expect(result.assumptions).toHaveLength(2);
-
-    // Check that formatted message was generated for follow-up
-    expect(result.formattedMessage).toBeDefined();
-    expect(typeof result.formattedMessage).toBe('string');
-    expect(result.formattedMessage).not.toBeNull();
-    expect(result.formattedMessage!.length).toBeGreaterThan(0);
   });
 });

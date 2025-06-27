@@ -369,11 +369,9 @@ describe('combine-parallel-results-step integration', () => {
 
     // Check flag-chat fields
     expect(result.toolCalled).toBe('noIssuesFound');
-    expect(result.message).toBe(
+    expect(result.flagChatMessage).toBe(
       'No issues detected in this conversation that require data team review.'
     );
-    expect(result.summaryMessage).toBeUndefined();
-    expect(result.summaryTitle).toBeUndefined();
 
     // Check identify-assumptions fields
     expect(result.assumptions).toBeDefined();
