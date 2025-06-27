@@ -1,5 +1,5 @@
 import { useQueries } from '@tanstack/react-query';
-import React, { type PropsWithChildren } from 'react';
+import React, { useMemo, type PropsWithChildren } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
 import type { BusterChatMessage } from '@/api/asset_interfaces/chat';
 import { useGetChat } from '@/api/buster_rest/chats';
@@ -9,6 +9,8 @@ import type { SelectedFile } from '../interfaces';
 import { useAutoChangeLayout } from './useAutoChangeLayout';
 import { useIsFileChanged } from './useIsFileChanged';
 import { useChatStreaming } from './useChatStreaming';
+import { useDocumentTitle } from '@/hooks';
+import { useGetMetric } from '@/api/buster_rest/metrics';
 
 const useChatIndividualContext = ({
   chatId,
@@ -20,7 +22,21 @@ const useChatIndividualContext = ({
   const selectedFileId = selectedFile?.id;
   const selectedFileType = selectedFile?.type;
 
-  const { data: chat } = useGetChat({ id: chatId || '' });
+  const { data: chat } = useGetChat(
+    { id: chatId || '' },
+    {
+      select: (data) => ({
+        title: data?.title,
+        id: data?.id,
+        message_ids: data?.message_ids
+      })
+    }
+  );
+
+  const { data: fileTitle } = useGetMetric(
+    { id: selectedFileType !== 'reasoning' ? selectedFileId || '' : undefined },
+    { select: (x) => x.name }
+  );
 
   // CHAT
   const hasChat = !!chatId && !!chat?.id;
@@ -63,6 +79,7 @@ const useChatIndividualContext = ({
       selectedFileId,
       currentMessageId,
       chatTitle,
+      fileTitle,
       selectedFileType,
       chatMessageIds,
       chatId,
@@ -73,6 +90,7 @@ const useChatIndividualContext = ({
     [
       hasChat,
       hasFile,
+      fileTitle,
       isStreamingMessage,
       selectedFileId,
       currentMessageId,
@@ -98,6 +116,14 @@ export const ChatContextProvider = React.memo(({ children }: PropsWithChildren) 
     chatId,
     selectedFile
   });
+  const { chatTitle, fileTitle } = useChatContextValue;
+
+  const title = useMemo(() => {
+    if (fileTitle) return [fileTitle, chatTitle].filter(Boolean).join(' | ');
+    return chatTitle;
+  }, [fileTitle, chatTitle]);
+
+  useDocumentTitle(title);
 
   return (
     <IndividualChatContext.Provider value={useChatContextValue}>

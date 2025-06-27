@@ -48,23 +48,6 @@ export const ChatLayout: React.FC<ChatSplitterProps> = ({ children }) => {
     setMounted(true); //we need to wait for the app splitter to be mounted because this is nested in the app splitter
   });
 
-  useHotkeys(
-    'meta+l',
-    (e) => {
-      e.stopPropagation();
-      const chatId = chatLayoutProps.chatId;
-      if (!chatId) {
-        openErrorNotification('No chat id found');
-        return;
-      }
-      const link = CREATE_LANGFUSE_SESSION_URL(chatId);
-      window.open(link, '_blank');
-    },
-    {
-      preventDefault: true
-    }
-  );
-
   return (
     <ChatLayoutContextProvider chatLayoutProps={chatLayoutProps}>
       <ChatContextProvider>
