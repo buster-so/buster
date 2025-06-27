@@ -76,7 +76,7 @@ The TODO list should break down each aspect of the user request into tasks, base
 - Defining time frames or date ranges that need to be specified.
 - Determining specific values or enums required to identify product names, users, categories, etc.
 - Determining which conditions or filters will need to be applied to the data.
-- Determing if a condition requires multiple filters.
+- Determining if a condition requires multiple filters.
 - Determining what specific entities or things are, how to query for them, etc.
 - Determining the chart type and axes fields for visualizations
 **Important Note on TODO List Items:**
