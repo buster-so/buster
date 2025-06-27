@@ -15,3 +15,4 @@ export { modifyMetrics } from './visualization-tools/modify-metrics-file-tool';
 export { createDashboards } from './visualization-tools/create-dashboards-file-tool';
 export { modifyDashboards } from './visualization-tools/modify-dashboards-file-tool';
 export { executeSql } from './database-tools/execute-sql';
+export { createTodoList } from './planning-thinking-tools/create-todo-item-tool';

@@ -5,11 +5,16 @@ import type { CoreMessage } from 'ai';
 import { wrapTraced } from 'braintrust';
 import { z } from 'zod';
 import { thinkAndPrepWorkflowInputSchema } from '../schemas/workflow-schemas';
+import { createTodoList } from '../tools/planning-thinking-tools/create-todo-item-tool';
+import { ChunkProcessor } from '../utils/database/chunk-processor';
 import { createTodoReasoningMessage } from '../utils/memory/todos-to-messages';
 import type { BusterChatMessageReasoningSchema } from '../utils/memory/types';
 import { ReasoningHistorySchema } from '../utils/memory/types';
 import { anthropicCachedModel } from '../utils/models/anthropic-cached';
+import { retryableAgentStreamWithHealing } from '../utils/retry';
+import type { RetryableError } from '../utils/retry/types';
 import { appendToConversation, standardizeMessages } from '../utils/standardizeMessages';
+import { createOnChunkHandler, handleStreamingError } from '../utils/streaming';
 import type { AnalystRuntimeContext } from '../workflows/analyst-workflow';
 
 const inputSchema = thinkAndPrepWorkflowInputSchema;
@@ -33,7 +38,7 @@ You have access to various tools to complete tasks. Adhere to these rules:
 2. **Do not call tools that aren’t explicitly provided**, as tool availability varies dynamically based on your task and dependencies.
 3. **Avoid mentioning tool names in user communication.** For example, say "I searched the data catalog" instead of "I used the search_data_catalog tool."
 4. **Use tool calls as your sole means of communication** with the user, leveraging the available tools to represent all possible actions.
-5. **Use the \`create_todo_list\` tool** to create the TODO list.
+5. **Use the \`createTodoList\` tool** to create the TODO list.
 ---
 ### Instructions
 Break the user request down into a TODO list items. Use a markdown format with checkboxes (\`[ ]\`).
@@ -132,13 +137,18 @@ The TODO list should break down each aspect of the user request into tasks, base
 `;
 
 const DEFAULT_OPTIONS = {
-  maxSteps: 0,
+  maxSteps: 1,
+  temperature: 0,
+  maxTokens: 300,
 };
 
 export const todosAgent = new Agent({
   name: 'Create Todos',
   instructions: todosInstructions,
   model: anthropicCachedModel('claude-sonnet-4-20250514'),
+  tools: {
+    createTodoList,
+  },
   defaultGenerateOptions: DEFAULT_OPTIONS,
   defaultStreamOptions: DEFAULT_OPTIONS,
 });
@@ -151,6 +161,10 @@ const todoStepExecution = async ({
   runtimeContext: RuntimeContext<AnalystRuntimeContext>;
 }): Promise<z.infer<typeof createTodosOutputSchema>> => {
   const messageId = runtimeContext.get('messageId') as string | null;
+  const abortController = new AbortController();
+
+  // Initialize chunk processor for streaming
+  const chunkProcessor = new ChunkProcessor(messageId, [], [], []);
 
   try {
     // Use the input data directly
@@ -167,54 +181,136 @@ const todoStepExecution = async ({
       messages = standardizeMessages(prompt);
     }
 
-    const tracedTodos = wrapTraced(
+    // Set initial messages in chunk processor
+    chunkProcessor.setInitialMessages(messages);
+
+    const wrappedStream = wrapTraced(
       async () => {
-        const response = await todosAgent.generate(messages, {
-          output: z.object({
-            todos: z.string().describe('The todos that the agent will work on.'),
-          }),
+        const result = await retryableAgentStreamWithHealing({
+          agent: todosAgent,
+          messages,
+          options: {
+            toolCallStreaming: true,
+            runtimeContext,
+            abortSignal: abortController.signal,
+            toolChoice: 'required',
+            onChunk: createOnChunkHandler({
+              chunkProcessor,
+              abortController,
+              finishingToolNames: [], // No finishing tools for todos
+            }),
+          },
+          retryConfig: {
+            maxRetries: 3,
+            onRetry: (error: RetryableError, attemptNumber: number) => {
+              console.error(`Todos retry attempt ${attemptNumber} for error:`, {
+                type: error.type,
+                attempt: attemptNumber,
+                messageId,
+              });
+            },
+          },
         });
 
-        return response.object;
+        return result.stream;
       },
       {
         name: 'Create Todos',
       }
     );
 
-    const todosResult = await tracedTodos();
-    const todosString = todosResult.todos;
+    const stream = await wrappedStream();
 
-    // Create reasoning message for todos
-    const todoReasoningMessage = createTodoReasoningMessage(todosString);
-
-    // Create reasoning history array
-    type ReasoningEntry = z.infer<typeof BusterChatMessageReasoningSchema>;
-    const reasoningHistory: ReasoningEntry[] = [todoReasoningMessage];
-
-    // Save to database if we have a messageId
-    if (messageId) {
-      try {
-        await updateMessageFields(messageId, {
-          reasoning: reasoningHistory,
+    try {
+      // Process the stream - chunks are handled by onChunk callback
+      for await (const _chunk of stream.fullStream) {
+        // Stream is being processed via onChunk callback
+        // Todo items are being collected in real-time
+        if (abortController.signal.aborted) {
+          break;
+        }
+      }
+    } catch (streamError) {
+      // Handle AbortError gracefully
+      if (streamError instanceof Error && streamError.name === 'AbortError') {
+        // Stream was intentionally aborted, this is normal
+      } else {
+        // Check if this is a healable streaming error
+        const healingResult = await handleStreamingError(streamError, {
+          agent: todosAgent,
+          chunkProcessor,
+          runtimeContext,
+          abortController,
+          maxRetries: 3,
+          resourceId: runtimeContext.get('dataSourceId') as string,
+          threadId: runtimeContext.get('chatId') as string,
+          onRetry: (error: RetryableError, attemptNumber: number) => {
+            console.error(`Todos stream retry attempt ${attemptNumber}:`, error);
+          },
+          toolChoice: 'required',
         });
-      } catch (dbError) {
-        console.error('Failed to save todo reasoning to database:', dbError);
-        // Continue execution even if save fails
+
+        if (!healingResult.shouldRetry) {
+          throw streamError;
+        }
       }
     }
 
+    // Get the reasoning history - it already contains the streaming todo file entry
+    const reasoningHistory = chunkProcessor.getReasoningHistory();
+    let todosString = '';
+
+    // Extract todos from the file entry in reasoning history
+    for (const entry of reasoningHistory) {
+      if (entry.type === 'files' && entry.title === 'TODO List' && entry.files) {
+        // Get the first (and only) file
+        const fileIds = Object.keys(entry.files);
+        const firstFileId = fileIds[0];
+        if (firstFileId) {
+          const file = entry.files[firstFileId];
+          if (file?.file?.text) {
+            todosString = file.file.text;
+            break;
+          }
+        }
+      }
+    }
+
+    // Final save is handled by ChunkProcessor automatically
+    // The todo file entry is already in the reasoning history from streaming
+
     return {
       todos: todosString,
-      reasoningHistory: reasoningHistory,
+      reasoningHistory: reasoningHistory as z.infer<typeof ReasoningHistorySchema>,
     };
   } catch (error) {
-    // Handle AbortError gracefully
+    // Handle abort errors gracefully
     if (error instanceof Error && error.name === 'AbortError') {
-      // Return empty todos when aborted
+      // Get the reasoning history - it already contains the streaming todo file entry
+      const reasoningHistory = chunkProcessor.getReasoningHistory();
+      let todosString = '';
+
+      // Extract todos from the file entry in reasoning history
+      for (const entry of reasoningHistory) {
+        if (entry.type === 'files' && entry.title === 'TODO List' && entry.files) {
+          // Get the first (and only) file
+          const fileIds = Object.keys(entry.files);
+          const firstFileId = fileIds[0];
+          if (firstFileId) {
+            const file = entry.files[firstFileId];
+            if (file?.file?.text) {
+              todosString = file.file.text;
+              break;
+            }
+          }
+        }
+      }
+
+      // The todo file entry is already in the reasoning history from streaming
+
       return {
-        todos: '',
-        reasoningHistory: [],
+        todos: todosString,
+        reasoningHistory: reasoningHistory as z.infer<typeof ReasoningHistorySchema>,
       };
     }
 
