@@ -47,12 +47,9 @@
   list-style-position: outside;
 }
 
-.container ol {
-  padding-inline-start: 1em;
-}
-
+.container ol,
 .container ul {
-  padding-inline-start: 2.5em;
+  margin-inline-start: 1.5em;
 }
 
 .container ul li::marker {
