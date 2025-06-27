@@ -22,7 +22,7 @@ I am a chat title generator that is responsible for generating a title for the c
 const todosAgent = new Agent({
   name: 'Extract Values',
   instructions: generateChatTitleInstructions,
-  model: anthropicCachedModel('claude-sonnet-4-20250514'),
+  model: anthropicCachedModel('claude-3-5-haiku-20241022'),
 });
 
 const generateChatTitleExecution = async ({
