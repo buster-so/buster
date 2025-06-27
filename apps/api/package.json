@@ -7,7 +7,6 @@
     "dev": "make fast-no-migrations"
   },
   "dependencies": {
-    "@buster/database": "workspace:*",
-    "@buster/server": "workspace:*"
+    "@buster/database": "workspace:*"
   }
 }
