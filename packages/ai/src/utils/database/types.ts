@@ -155,7 +155,40 @@ export function isErrorResult(result: unknown): boolean {
   // Object-based error detection
   if (result && typeof result === 'object') {
     const resultObj = result as Record<string, unknown>;
-    return !!(resultObj.error || resultObj.success === false || resultObj.status === 'error');
+    
+    // Check for explicit error fields
+    if (resultObj.error || resultObj.success === false || resultObj.status === 'error') {
+      return true;
+    }
+    
+    // Check for error message in 'message' field
+    if (typeof resultObj.message === 'string') {
+      const lowerMessage = resultObj.message.toLowerCase();
+      if (
+        lowerMessage.includes('error') ||
+        lowerMessage.includes('failed') ||
+        lowerMessage.includes('exception')
+      ) {
+        return true;
+      }
+    }
+    
+    // Check for failed_files array (indicates file creation failures)
+    if ('failed_files' in resultObj && Array.isArray(resultObj.failed_files)) {
+      const failedFiles = resultObj.failed_files as unknown[];
+      if (failedFiles.length > 0) {
+        return true;
+      }
+    }
+    
+    // Check for empty files array when expecting files (common pattern for file creation tools)
+    if ('files' in resultObj && Array.isArray(resultObj.files)) {
+      const files = resultObj.files as unknown[];
+      // If we have a files array and it's empty, and there's a message field, likely an error
+      if (files.length === 0 && 'message' in resultObj && resultObj.message) {
+        return true;
+      }
+    }
   }
 
   return false;
@@ -220,31 +253,49 @@ export function extractFileResultsFromToolResult(toolResult: unknown): Array<{
     }
 
     const result = toolResult as Record<string, unknown>;
+    const fileResults: Array<{ id: string; status: 'completed' | 'failed'; error?: string }> = [];
 
-    // Check for files array in the result
+    // Extract successful files from the 'files' array
     if ('files' in result && Array.isArray(result.files)) {
       const files = result.files as unknown[];
-      return files
+      const successfulFiles = files
         .filter(
           (file): file is Record<string, unknown> =>
             file !== null && typeof file === 'object' && 'id' in file
         )
         .map((file) => {
           const fileObj = file as Record<string, unknown>;
-          const result: { id: string; status: 'completed' | 'failed'; error?: string } = {
+          return {
             id: typeof fileObj.id === 'string' ? fileObj.id : String(fileObj.id),
-            status: isErrorResult(file) ? ('failed' as const) : ('completed' as const),
+            status: 'completed' as const,
           };
-
-          if (fileObj.error) {
-            result.error = String(fileObj.error);
-          }
-
-          return result;
         });
+
+      fileResults.push(...successfulFiles);
     }
 
-    return [];
+    // Handle failed files from 'failed_files' array (create-metrics/dashboards pattern)
+    if ('failed_files' in result && Array.isArray(result.failed_files)) {
+      const failedFiles = result.failed_files as unknown[];
+
+      // For failed files, we need to generate placeholder IDs since they don't have actual IDs
+      // The chunk processor will need to handle this appropriately
+      for (const failedFile of failedFiles) {
+        if (failedFile && typeof failedFile === 'object') {
+          const failed = failedFile as Record<string, unknown>;
+
+          // Failed files don't have IDs, so we'll use a placeholder
+          // The chunk processor should handle the case where we have fewer actual IDs than expected
+          fileResults.push({
+            id: `failed-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            status: 'failed' as const,
+            error: typeof failed.error === 'string' ? failed.error : 'Unknown error',
+          });
+        }
+      }
+    }
+
+    return fileResults;
   } catch (error) {
     console.error('Error extracting file results from tool result:', {
       error: error instanceof Error ? error.message : 'Unknown error',
