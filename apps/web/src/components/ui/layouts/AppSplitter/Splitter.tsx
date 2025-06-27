@@ -22,7 +22,7 @@ export const Splitter: React.FC<ISplitterProps> = React.memo(
           'relative flex items-center justify-center transition-colors',
           hidden ? 'bg-transparent' : 'bg-border',
           !disabled ? (hidden ? 'hover:bg-border/80' : 'hover:bg-primary') : undefined,
-          isVertical ? 'min-w-[1px] cursor-col-resize' : 'min-h-[1px] cursor-row-resize',
+          isVertical ? 'min-w-[0.5px] cursor-col-resize' : 'min-h-[0.5px] cursor-row-resize',
           isDragging ? (hidden ? 'bg-border/80' : 'bg-primary') : undefined,
           disabled && 'cursor-default',
           className

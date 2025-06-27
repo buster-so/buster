@@ -14,7 +14,7 @@ describe('ChunkProcessor File ID Mapping Fix', () => {
     // Step 1: Simulate the initial reasoning entry with dummy IDs (created during streaming)
     const dummyId1 = 'e3f585a2-4d0e-4542-b023-7700f0d90a1f';
     const dummyId2 = 'b2f485a2-4d0e-4542-b023-7700f0d90a2f';
-    
+
     const reasoningEntry: ChatMessageReasoningMessage = {
       id: 'toolu_015qv7VJJmof4mdvvEfdqgz9',
       type: 'files',
@@ -29,8 +29,8 @@ describe('ChunkProcessor File ID Mapping Fix', () => {
           file_name: 'Top Customer by Lifetime Value',
           version_number: 1,
           status: 'loading',
-          file: { 
-            text: 'name: Top Customer by Lifetime Value\ndescription: Who is the customer that has generated the most total revenue over their entire history?\n...' 
+          file: {
+            text: 'name: Top Customer by Lifetime Value\ndescription: Who is the customer that has generated the most total revenue over their entire history?\n...',
           },
         },
         [dummyId2]: {
@@ -39,10 +39,10 @@ describe('ChunkProcessor File ID Mapping Fix', () => {
           file_name: 'Revenue by Month',
           version_number: 1,
           status: 'loading',
-          file: { 
-            text: 'name: Revenue by Month\ndescription: Monthly revenue breakdown\n...' 
+          file: {
+            text: 'name: Revenue by Month\ndescription: Monthly revenue breakdown\n...',
           },
-        }
+        },
       },
     };
 
@@ -53,7 +53,7 @@ describe('ChunkProcessor File ID Mapping Fix', () => {
     // Step 2: Simulate the tool result with actual database IDs
     const actualId1 = '0e62817c-9c3e-41e3-af93-7529f79727cc';
     const actualId2 = '1f73928d-0d4f-52f4-bf04-8640g89838dd';
-    
+
     const toolResult = {
       files: [
         {
@@ -62,32 +62,32 @@ describe('ChunkProcessor File ID Mapping Fix', () => {
           results: [
             {
               customer_name: 'Roger Harui',
-              total_lifetime_value: '877107.192221'
-            }
+              total_lifetime_value: '877107.192221',
+            },
           ],
           file_type: 'metric',
           created_at: '2025-06-27T01:59:13.471Z',
           updated_at: '2025-06-27T01:59:13.471Z',
           result_message: 'Query validated successfully and returned 1 records',
-          version_number: 1
+          version_number: 1,
         },
         {
           id: actualId2,
           name: 'Revenue by Month',
           results: [
             { month: 'Jan', revenue: '50000' },
-            { month: 'Feb', revenue: '60000' }
+            { month: 'Feb', revenue: '60000' },
           ],
           file_type: 'metric',
           created_at: '2025-06-27T01:59:13.471Z',
           updated_at: '2025-06-27T01:59:13.471Z',
           result_message: 'Query validated successfully and returned 2 records',
-          version_number: 1
-        }
+          version_number: 1,
+        },
       ],
       message: 'Successfully created 2 metric files.',
       duration: 733,
-      failed_files: []
+      failed_files: [],
     };
 
     // Step 3: Call the private method that should update the file IDs
@@ -126,7 +126,7 @@ describe('ChunkProcessor File ID Mapping Fix', () => {
     const dummyId1 = 'dummy-success-1';
     const dummyId2 = 'dummy-failed-1';
     const dummyId3 = 'dummy-success-2';
-    
+
     const reasoningEntry: ChatMessageReasoningMessage = {
       id: 'tool-call-mixed',
       type: 'files',
@@ -158,7 +158,7 @@ describe('ChunkProcessor File ID Mapping Fix', () => {
           version_number: 1,
           status: 'loading',
           file: { text: 'content3' },
-        }
+        },
       },
     };
 
@@ -167,15 +167,13 @@ describe('ChunkProcessor File ID Mapping Fix', () => {
 
     const actualId1 = 'actual-success-1';
     const actualId3 = 'actual-success-2';
-    
+
     const toolResult = {
       files: [
         { id: actualId1, name: 'Successful Metric 1' },
-        { id: actualId3, name: 'Successful Metric 2' }
+        { id: actualId3, name: 'Successful Metric 2' },
       ],
-      failed_files: [
-        { name: 'Failed Metric', error: 'SQL syntax error' }
-      ]
+      failed_files: [{ name: 'Failed Metric', error: 'SQL syntax error' }],
     };
 
     const processor = chunkProcessor as any;
@@ -210,7 +208,7 @@ describe('ChunkProcessor File ID Mapping Fix', () => {
 
   test('should preserve all file data when updating IDs', async () => {
     const dummyId = 'dummy-preserve-test';
-    
+
     const reasoningEntry: ChatMessageReasoningMessage = {
       id: 'tool-call-preserve',
       type: 'files',
@@ -225,15 +223,14 @@ describe('ChunkProcessor File ID Mapping Fix', () => {
           file_name: 'Complex Metric',
           version_number: 1,
           status: 'loading',
-          file: { 
+          file: {
             text: 'name: Complex Metric\nsql: SELECT * FROM table',
-            modified: [[0, 5], [10, 15]]
+            modified: [
+              [0, 5],
+              [10, 15],
+            ],
           },
-          metadata: { 
-            custom: 'data',
-            tags: ['important', 'financial']
-          }
-        }
+        },
       },
     };
 
@@ -242,7 +239,7 @@ describe('ChunkProcessor File ID Mapping Fix', () => {
 
     const actualId = 'actual-preserve-test';
     const toolResult = {
-      files: [{ id: actualId, name: 'Complex Metric' }]
+      files: [{ id: actualId, name: 'Complex Metric' }],
     };
 
     const processor = chunkProcessor as any;
@@ -261,28 +258,33 @@ describe('ChunkProcessor File ID Mapping Fix', () => {
     expect(updatedFile.version_number).toBe(1);
     expect(updatedFile.status).toBe('completed');
     expect(updatedFile.file.text).toBe('name: Complex Metric\nsql: SELECT * FROM table');
-    expect(updatedFile.file.modified).toEqual([[0, 5], [10, 15]]);
-    expect(updatedFile.metadata).toEqual({ 
+    expect(updatedFile.file.modified).toEqual([
+      [0, 5],
+      [10, 15],
+    ]);
+    expect(updatedFile.metadata).toEqual({
       custom: 'data',
-      tags: ['important', 'financial']
+      tags: ['important', 'financial'],
     });
   });
 
   test('integration: file ID mapping should work in full stream processing', async () => {
     // This test simulates the full flow from tool call to tool result
     const processor = chunkProcessor as any;
-    
+
     // Step 1: Simulate tool call streaming that creates the initial reasoning entry
     const toolCallChunk = {
       type: 'tool-call-delta' as const,
       toolCallId: 'test-tool-call',
       toolName: 'createMetrics',
       argsTextDelta: JSON.stringify({
-        files: [{
-          name: 'Test Metric',
-          yml_content: 'name: Test Metric\nsql: SELECT COUNT(*) FROM users'
-        }]
-      })
+        files: [
+          {
+            name: 'Test Metric',
+            yml_content: 'name: Test Metric\nsql: SELECT COUNT(*) FROM users',
+          },
+        ],
+      }),
     };
 
     // This would normally happen via handleTextDelta
@@ -300,11 +302,11 @@ describe('ChunkProcessor File ID Mapping Fix', () => {
           file_name: 'Test Metric',
           version_number: 1,
           status: 'loading',
-          file: { text: 'name: Test Metric\nsql: SELECT COUNT(*) FROM users' }
-        }
-      }
+          file: { text: 'name: Test Metric\nsql: SELECT COUNT(*) FROM users' },
+        },
+      },
     };
-    
+
     processor.state.reasoningHistory.push(reasoningEntry);
     processor.state.timing.startTime = Date.now();
 
@@ -314,14 +316,16 @@ describe('ChunkProcessor File ID Mapping Fix', () => {
       toolCallId: 'test-tool-call',
       toolName: 'createMetrics',
       result: {
-        files: [{
-          id: 'actual-db-id-456',
-          name: 'Test Metric',
-          file_type: 'metric',
-          results: [{ count: 100 }]
-        }],
-        message: 'Successfully created 1 metric file.'
-      }
+        files: [
+          {
+            id: 'actual-db-id-456',
+            name: 'Test Metric',
+            file_type: 'metric',
+            results: [{ count: 100 }],
+          },
+        ],
+        message: 'Successfully created 1 metric file.',
+      },
     };
 
     // Verify file creation tool is detected
@@ -340,16 +344,16 @@ describe('ChunkProcessor File ID Mapping Fix', () => {
 
   test('should correctly identify all file creation tool variants', () => {
     const processor = chunkProcessor as any;
-    
+
     const fileCreationTools = [
       'createMetrics',
       'create-metrics-file',
-      'createDashboards', 
+      'createDashboards',
       'create-dashboards-file',
       'modifyMetrics',
       'modify-metrics-file',
       'modifyDashboards',
-      'modify-dashboards-file'
+      'modify-dashboards-file',
     ];
 
     const nonFileTools = [
@@ -359,7 +363,7 @@ describe('ChunkProcessor File ID Mapping Fix', () => {
       'done-tool',
       'sequentialThinking',
       'sequential-thinking',
-      'submitThoughts'
+      'submitThoughts',
     ];
 
     // All file creation tools should be detected

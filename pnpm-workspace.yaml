@@ -8,6 +8,7 @@ packages:
   - "apps/server2"
   - "apps/electric-server"
   - "apps/trigger"
+  - "apps/api"
 
 catalog:
   "@supabase/supabase-js": "^2.50.0"
