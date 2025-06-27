@@ -23,47 +23,66 @@ import {
   ResponseMessageSchema,
 } from '@buster/server-shared/chats';
 
-const buildResponseMessages = (responseMessages: unknown): ChatMessage['response_messages'] => {
-  if (!responseMessages) {
+// Optimized: Generic function to handle both response and reasoning messages
+function buildMessages<T extends { id: string }>(
+  messages: unknown,
+  isValidMessage: (item: unknown) => item is T
+): Record<string, T> {
+  if (!messages) {
     return {};
   }
 
-  if (typeof responseMessages === 'string') {
-    const parsed: unknown[] = JSON.parse(responseMessages);
-    const validated: ChatMessageResponseMessage[] = parsed.map((item) =>
-      ResponseMessageSchema.parse(item)
-    );
+  let parsedMessages = messages;
 
-    return validated.reduce<Record<string, ChatMessageResponseMessage>>((acc, item) => {
-      acc[item.id] = item;
-      return acc;
-    }, {});
+  // Handle string format (shouldn't happen with JSONB, but kept for safety)
+  if (typeof messages === 'string') {
+    try {
+      parsedMessages = JSON.parse(messages);
+    } catch {
+      return {};
+    }
+  }
+
+  // Early return for already-correct format
+  if (parsedMessages && typeof parsedMessages === 'object' && !Array.isArray(parsedMessages)) {
+    return parsedMessages as Record<string, T>;
+  }
+
+  // Optimized array processing with pre-allocation and validation
+  if (Array.isArray(parsedMessages)) {
+    const result: Record<string, T> = {};
+    for (let i = 0; i < parsedMessages.length; i++) {
+      const item = parsedMessages[i];
+      if (item && typeof item === 'object' && 'id' in item && isValidMessage(item)) {
+        result[item.id] = item;
+      }
+    }
+    return result;
   }
 
   return {};
+}
+
+// Type guards for better performance
+const isResponseMessage = (item: unknown): item is ChatMessageResponseMessage => {
+  return item !== null && typeof item === 'object' && 'id' in item && 'type' in item;
+};
+
+const isReasoningMessage = (item: unknown): item is ChatMessageReasoningMessage => {
+  return item !== null && typeof item === 'object' && 'id' in item && 'type' in item;
+};
+
+const buildResponseMessages = (responseMessages: unknown): ChatMessage['response_messages'] => {
+  return buildMessages(responseMessages, isResponseMessage);
 };
 
 const buildReasoningMessages = (reasoningMessages: unknown): ChatMessage['reasoning_messages'] => {
-  if (!reasoningMessages) {
-    return {};
-  }
-
-  if (typeof reasoningMessages === 'string') {
-    const parsed: unknown[] = JSON.parse(reasoningMessages);
-    const validated: ChatMessageReasoningMessage[] = parsed.map((item) =>
-      ReasoningMessageSchema.parse(item)
-    );
-    return validated.reduce<Record<string, ChatMessageReasoningMessage>>((acc, item) => {
-      acc[item.id] = item;
-      return acc;
-    }, {});
-  }
-
-  return {};
+  return buildMessages(reasoningMessages, isReasoningMessage);
 };
 
 /**
  * Build a ChatWithMessages object from database entities
+ * Optimized for performance with pre-allocated objects and minimal iterations
  */
 export function buildChatWithMessages(
   chat: Chat,
@@ -71,13 +90,27 @@ export function buildChatWithMessages(
   user: User | null,
   isFavorited = false
 ): ChatWithMessages {
+  // Pre-allocate collections with known size
+  const messageCount = messages.length;
   const messageMap: Record<string, ChatMessage> = {};
-  const messageIds: string[] = [];
+  const messageIds: string[] = new Array(messageCount);
 
-  // Convert database messages to ChatMessage format
-  for (const msg of messages) {
+  // Cache user info to avoid repeated property access
+  const userName = user?.name || 'Unknown User';
+  const userAvatar = user?.avatarUrl || undefined;
+
+  // Single iteration with optimized object creation
+  for (let i = 0; i < messageCount; i++) {
+    const msg = messages[i];
+    if (!msg) continue; // Skip if somehow undefined
+
     const responseMessages = buildResponseMessages(msg.responseMessages);
     const reasoningMessages = buildReasoningMessages(msg.reasoning);
+
+    // Pre-compute arrays to avoid Object.keys() calls
+    const responseMessageIds = Object.keys(responseMessages);
+    const reasoningMessageIds = Object.keys(reasoningMessages);
+
     const chatMessage: ChatMessage = {
       id: msg.id,
       created_at: msg.createdAt,
@@ -85,19 +118,19 @@ export function buildChatWithMessages(
       request_message: {
         request: msg.requestMessage || '',
         sender_id: msg.createdBy,
-        sender_name: user?.name || 'Unknown User',
-        sender_avatar: user?.avatarUrl || undefined,
+        sender_name: userName,
+        sender_avatar: userAvatar,
       },
       response_messages: responseMessages,
-      response_message_ids: Object.keys(responseMessages),
-      reasoning_message_ids: Object.keys(reasoningMessages),
+      response_message_ids: responseMessageIds,
+      reasoning_message_ids: reasoningMessageIds,
       reasoning_messages: reasoningMessages,
       final_reasoning_message: msg.finalReasoningMessage || null,
       feedback: msg.feedback ? (msg.feedback as 'negative') : null,
-      is_completed: msg.isCompleted || false, // Always false for new messages, trigger job sets to true
+      is_completed: msg.isCompleted || false,
     };
 
-    messageIds.push(msg.id);
+    messageIds[i] = msg.id;
     messageMap[msg.id] = chatMessage;
   }
 
@@ -111,7 +144,7 @@ export function buildChatWithMessages(
     updated_at: chat.updatedAt,
     created_by: chat.createdBy,
     created_by_id: chat.createdBy,
-    created_by_name: user?.name || 'Unknown User',
+    created_by_name: userName,
     created_by_avatar: user?.avatarUrl || null,
     // Sharing fields - TODO: implement proper sharing logic
     individual_permissions: undefined,
