@@ -835,10 +835,6 @@ definitions:
                   - columnId
                   - useValue
                 description: Configuration for a derived metric sub-header
-          metricValueLabel:
-            oneOf:
-              - type: string
-                description: Custom label to display with the metric value
         required:
           - selectedChartType
           - metricColumnId
