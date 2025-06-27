@@ -314,13 +314,6 @@ const workflow = createWorkflow({
   .commit();
 ```
 
-## Memory and Message Passing
-
-### Shared Memory
-- All agents use `getSharedMemory()` for persistence
-- Enables conversation continuity across workflow steps
-- Stored in `.mastra/output` directory with LibSQLStore
-
 ### Message History
 - Critical for multi-agent workflows
 - Extracted via `extractMessageHistory()` from step responses

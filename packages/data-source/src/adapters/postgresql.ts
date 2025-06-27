@@ -31,10 +31,18 @@ export class PostgreSQLAdapter extends BaseAdapter {
     const pgCredentials = credentials as PostgreSQLCredentials;
 
     try {
+      // Handle both 'database' and 'default_database' for backward compatibility
+      const database = pgCredentials.default_database;
+      if (!database) {
+        throw new Error(
+          'Database name is required. Please provide either "database" or "default_database" in credentials.'
+        );
+      }
+
       const config: ClientConfig = {
         host: pgCredentials.host,
         port: pgCredentials.port || 5432,
-        database: pgCredentials.database,
+        database: database,
         user: pgCredentials.username,
         password: pgCredentials.password,
       };
