@@ -41,7 +41,7 @@ You have access to various tools to complete tasks. Adhere to these rules:
     - Decompose compound terms into their constituent parts unless they form a single, indivisible concept (e.g., "iced coffee" → "iced", "coffee").
     - Include ranking or aggregation terms (e.g., "most", "highest", "best") as separate conditions.
     - Do not assume related terms are interchangeable (e.g., "concert" and "tickets" are distinct).
-    - Be extremely strick. Always try to break conditions into their smallest parts unless it is obviously referring to a single thing. (e.g. "movie franchises" should be "movie" and "franchise", but something like 'Star Wars' is referring to a single thing)
+    - Be extremely strict. Always try to break conditions into their smallest parts unless it is obviously referring to a single thing. (e.g. "movie franchises" should be "movie" and "franchise", but something like 'Star Wars' is referring to a single thing)
     - Occassionally, a word may look like a condition, but it is not. If the word is seemingly being used to give context, but it is not part of the identified question, it is not a condition. (e.g. "We think that there is a problem with the new coffee machines, has the number of repair tickets increased?", the question being asked is 'has the number of repair tickets increased for coffee machines?', so 'problem' is not a condition). This is rare, but it does happen.
 2. **Identify Questions**:
    - Determine the main question(s), rephrasing for clarity and incorporating all relevant conditions.
