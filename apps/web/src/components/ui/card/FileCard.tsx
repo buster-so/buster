@@ -3,7 +3,7 @@ import { cn } from '@/lib/classMerge';
 import { Text } from '../typography/Text';
 import { Card, CardContent, CardFooter, CardHeader } from './CardBase';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown } from '@/components/ui/icons';
+import { ChevronDown, ChevronExpandY } from '@/components/ui/icons';
 import { useMemoizedFn } from '@/hooks';
 
 interface FileCardProps {
@@ -199,7 +199,7 @@ const CollapseContent = React.memo(
           onClick={onCollapseClick}
           className="bg-background hover:bg-item-hover absolute inset-x-0 bottom-0 m-1 flex h-7 scale-95 cursor-pointer items-center justify-center gap-x-1 rounded border bg-gradient-to-b opacity-0 shadow transition-all delay-75 duration-200 group-hover:scale-100 group-hover:opacity-100">
           <div className={cn('transition-transform duration-200', !isCollapsed && 'rotate-180')}>
-            <ChevronDown />
+            <ChevronExpandY />
           </div>
           <Text>{isCollapsed ? 'Click to expand' : 'Click to collapse'}</Text>
         </div>
@@ -310,7 +310,7 @@ const CollapseToggleIcon = React.memo(
                 'text-icon-color absolute inset-0 flex h-5 w-5 min-w-5 items-center justify-center transition-transform duration-200',
                 !isCollapsed && 'rotate-180'
               )}>
-              <ChevronDown />
+              <ChevronExpandY />
             </motion.div>
           )}
           {showDefaultIcon && (
@@ -335,7 +335,7 @@ const CollapseToggleIcon = React.memo(
                 'text-icon-color absolute inset-0 flex h-4 w-4 items-center justify-center transition-transform duration-200',
                 !isCollapsed && 'rotate-180'
               )}>
-              <ChevronDown />
+              <ChevronExpandY />
             </motion.div>
           )}
         </AnimatePresence>
