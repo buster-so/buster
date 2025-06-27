@@ -288,7 +288,7 @@ const CollapseToggleIcon = React.memo(
     return (
       <div
         className={cn(
-          'hover:bg-item-active relative flex h-5 w-5 items-center justify-center rounded-sm text-lg transition-colors duration-100',
+          'hover:bg-item-active relative flex h-5 w-5 min-w-5 items-center justify-center rounded-sm text-lg transition-colors duration-100',
           className
         )}
         onClick={onClick}>
@@ -301,7 +301,7 @@ const CollapseToggleIcon = React.memo(
               exit={{ opacity: 0 }}
               transition={{ duration: 0.165, ease: 'easeInOut' }}
               className={cn(
-                'text-icon-color absolute inset-0 flex h-5 w-5 items-center justify-center text-base'
+                'text-icon-color absolute flex h-5 w-5 min-w-5 items-center justify-center text-base'
               )}>
               <ChevronDown />
             </motion.div>
@@ -313,7 +313,7 @@ const CollapseToggleIcon = React.memo(
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.12, ease: 'easeInOut' }}
-              className="text-icon-color absolute inset-0 flex h-5 w-5 items-center justify-center">
+              className="text-icon-color absolute flex h-5 w-5 items-center justify-center">
               {collapseDefaultIcon}
             </motion.div>
           )}
