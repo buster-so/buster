@@ -32,11 +32,16 @@ export interface RetryConfig {
   maxBackoffMs?: number; // Maximum backoff delay
 }
 
+export interface ToolCall {
+  type: 'tool';
+  toolName: string;
+}
+
 export interface AgentStreamOptions<T extends ToolSet> {
   toolCallStreaming?: boolean;
   runtimeContext: RuntimeContext<unknown>;
   abortSignal?: AbortSignal;
-  toolChoice?: 'auto' | 'required' | 'none';
+  toolChoice?: 'auto' | 'required' | 'none' | ToolCall;
   onStepFinish?: (step: StepResult<T>) => Promise<void>;
   onChunk?: (event: { chunk: TextStreamPart<T> }) => Promise<void> | void;
 }

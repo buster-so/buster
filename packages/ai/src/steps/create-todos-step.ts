@@ -193,7 +193,10 @@ const todoStepExecution = async ({
             toolCallStreaming: true,
             runtimeContext,
             abortSignal: abortController.signal,
-            toolChoice: 'required',
+            toolChoice: {
+              type: 'tool',
+              toolName: 'createTodoList',
+            },
             onChunk: createOnChunkHandler({
               chunkProcessor,
               abortController,
