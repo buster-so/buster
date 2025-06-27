@@ -1,3 +1,5 @@
+'use client';
+
 import { useGetOrganizationUsers } from '@/api/buster_rest';
 import { InvitePeopleModal } from '@/components/features/modal/InvitePeopleModal';
 import { PermissionSearch } from '@/components/features/PermissionComponents';

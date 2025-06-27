@@ -10,13 +10,7 @@ export interface StreamableTextProps {
   isStreamFinished?: boolean;
 }
 
-const throttle = throttleBasic({
-  readAheadChars: 10,
-  targetBufferChars: 10,
-  adjustPercentage: 0.22,
-  frameLookBackMs: 12000,
-  windowLookBackMs: 2000
-});
+const throttle = throttleBasic();
 
 export const StreamableText = ({
   message: llmOutput,
@@ -37,10 +31,13 @@ export const StreamableText = ({
       }
     ],
     throttle,
-    isStreamFinished: true
+    onFinish: () => {
+      console.log('finished');
+    },
+    isStreamFinished
   });
 
-  console.log({ blockMatches, isStreamFinished, rest });
+  console.log(isStreamFinished, visibleText);
 
   return (
     <div>

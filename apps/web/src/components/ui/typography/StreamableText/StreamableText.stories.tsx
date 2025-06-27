@@ -214,7 +214,7 @@ export const Default: Story = {
     const addRandomMarkdown = fn(() => {
       const randomBlock =
         randomMarkdownBlocks[Math.floor(Math.random() * randomMarkdownBlocks.length)];
-      setCurrentMessage((prev) => prev + '\n\n---\n\n' + randomBlock);
+      setCurrentMessage((prev: string) => prev + '\n\n---\n\n' + randomBlock);
     });
 
     return (

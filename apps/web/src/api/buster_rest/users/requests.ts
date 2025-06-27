@@ -34,7 +34,6 @@ export const getMyUserInfo_server = async ({
     }
   })
     .then(async (response) => {
-      console.log('response', response);
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
         throw {
