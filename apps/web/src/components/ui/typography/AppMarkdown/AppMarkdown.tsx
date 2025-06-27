@@ -19,7 +19,8 @@ import {
   CustomUnorderedList,
   CustomUnderline,
   CustomStrikethrough,
-  CustomLink
+  CustomLink,
+  CustomTable
 } from './AppMarkdownCommon';
 
 // remarkGfm plugin adds GitHub Flavored Markdown support
@@ -67,6 +68,7 @@ const AppMarkdownBase: React.FC<{
   const u = useMemoizedFn((props) => <CustomUnderline {...props} {...commonProps} />);
   const s = useMemoizedFn((props) => <CustomStrikethrough {...props} {...commonProps} />);
   const a = useMemoizedFn((props) => <CustomLink {...props} {...commonProps} />);
+  const table = useMemoizedFn((props) => <CustomTable {...props} {...commonProps} />);
 
   const memoizedComponents: Partial<Components> = useMemo(() => {
     // return undefined;
@@ -78,6 +80,7 @@ const AppMarkdownBase: React.FC<{
       listItem,
       blockquote,
       span,
+      table,
       p,
       h1,
       h2,

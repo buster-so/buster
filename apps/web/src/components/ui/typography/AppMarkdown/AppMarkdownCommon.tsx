@@ -35,7 +35,7 @@ export const CustomParagraph: React.FC<
 > = ({ children, markdown, showLoader, ...rest }) => {
   if (Array.isArray(children)) {
     return (
-      <p className={cn('text-size-inherit! transform-none!', showLoader && 'fade-in duration-500')}>
+      <p className={cn('text-size-inherit! transform-none!', showLoader && 'fade-in duration-700')}>
         {children}
       </p>
     );
@@ -48,7 +48,7 @@ export const CustomParagraph: React.FC<
   }
 
   return (
-    <p className={cn('text-size-inherit! transform-none!', showLoader && 'fade-in duration-500')}>
+    <p className={cn('text-size-inherit! transform-none!', showLoader && 'fade-in duration-700')}>
       {children}
     </p>
   );
@@ -84,7 +84,7 @@ export const CustomHeading: React.FC<
       className={cn(
         headingVariants({ level: stripFormatting ? 'base' : level }),
         'transform-none!',
-        showLoader && 'fade-in duration-500'
+        showLoader && 'fade-in duration-700'
       )}>
       {children}
     </HeadingTag>
@@ -135,7 +135,7 @@ export const CustomListItem: React.FC<
   } & ExtraPropsExtra
 > = ({ children, showLoader }) => {
   return (
-    <li className={cn('transform-none! space-y-1', showLoader && 'fade-in duration-500')}>
+    <li className={cn('transform-none! space-y-1', showLoader && 'fade-in duration-700')}>
       {children}
     </li>
   );
@@ -149,7 +149,7 @@ export const CustomBlockquote: React.FC<
   } & ExtraPropsExtra
 > = ({ children, markdown, showLoader, ...rest }) => {
   return (
-    <blockquote className={cn('transform-none!', showLoader && 'fade-in duration-500')}>
+    <blockquote className={cn('transform-none!', showLoader && 'fade-in duration-700')}>
       {children}
     </blockquote>
   );
@@ -163,7 +163,7 @@ export const CustomTable: React.FC<
   } & ExtraPropsExtra
 > = ({ children, markdown, showLoader, ...rest }) => {
   return (
-    <table className={cn('transform-none!', showLoader && 'fade-in duration-500')}>
+    <table className={cn('transform-none!', showLoader && 'fade-in duration-700')}>
       {children}
     </table>
   );
@@ -177,7 +177,7 @@ export const CustomSpan: React.FC<
   } & ExtraPropsExtra
 > = ({ children, markdown, showLoader, ...rest }) => {
   return (
-    <span className={cn('transform-none!', showLoader && 'fade-in duration-500')}>{children}</span>
+    <span className={cn('transform-none!', showLoader && 'fade-in duration-700')}>{children}</span>
   );
 };
 
@@ -189,7 +189,7 @@ export const CustomStrong: React.FC<
   } & ExtraPropsExtra
 > = ({ children, markdown, showLoader, ...rest }) => {
   return (
-    <strong className={cn('transform-none!', showLoader && 'fade-in duration-500')}>
+    <strong className={cn('transform-none!', showLoader && 'fade-in duration-700')}>
       {children}
     </strong>
   );
@@ -203,7 +203,7 @@ export const CustomEm: React.FC<
   } & ExtraPropsExtra
 > = ({ children, markdown, showLoader, ...rest }) => {
   return (
-    <em className={cn('transform-none!', showLoader && 'fade-in duration-500')}>{children}</em>
+    <em className={cn('transform-none!', showLoader && 'fade-in duration-700')}>{children}</em>
   );
 };
 
@@ -214,7 +214,7 @@ export const CustomItalic: React.FC<
     showLoader: boolean;
   } & ExtraPropsExtra
 > = ({ children, markdown, showLoader, ...rest }) => {
-  return <i className={cn('transform-none!', showLoader && 'fade-in duration-500')}>{children}</i>;
+  return <i className={cn('transform-none!', showLoader && 'fade-in duration-700')}>{children}</i>;
 };
 
 export const CustomUnderline: React.FC<
@@ -224,7 +224,7 @@ export const CustomUnderline: React.FC<
     showLoader: boolean;
   } & ExtraPropsExtra
 > = ({ children, markdown, showLoader, ...rest }) => {
-  return <u className={cn('transform-none!', showLoader && 'fade-in duration-500')}>{children}</u>;
+  return <u className={cn('transform-none!', showLoader && 'fade-in duration-700')}>{children}</u>;
 };
 
 export const CustomStrikethrough: React.FC<
@@ -234,7 +234,7 @@ export const CustomStrikethrough: React.FC<
     showLoader: boolean;
   } & ExtraPropsExtra
 > = ({ children, markdown, showLoader, ...rest }) => {
-  return <s className={cn('transform-none!', showLoader && 'fade-in duration-500')}>{children}</s>;
+  return <s className={cn('transform-none!', showLoader && 'fade-in duration-700')}>{children}</s>;
 };
 
 export const CustomLink: React.FC<
@@ -244,5 +244,5 @@ export const CustomLink: React.FC<
     showLoader: boolean;
   } & ExtraPropsExtra
 > = ({ children, markdown, showLoader, ...rest }) => {
-  return <a className={cn('transform-none!', showLoader && 'fade-in duration-500')}>{children}</a>;
+  return <a className={cn('transform-none!', showLoader && 'fade-in duration-700')}>{children}</a>;
 };

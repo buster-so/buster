@@ -12,8 +12,6 @@ import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { ReasoningMessageSelector } from './ReasoningMessages';
 import { BlackBoxMessage } from './ReasoningMessages/ReasoningBlackBoxMessage';
 import { ReasoningScrollToBottom } from './ReasoningScrollToBottom';
-import { useReasoningIsCompleted } from './reasoningHooks';
-import { useWhyDidYouUpdate } from '@/hooks';
 
 interface ReasoningControllerProps {
   chatId: string;
