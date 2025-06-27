@@ -1,7 +1,8 @@
 "on":
     push:
+        # temporary branch for staging testing.
         branches:
-            - staging
+            - mastra-braintrust
         paths:
             - api/**
 name: Deploy to staging
