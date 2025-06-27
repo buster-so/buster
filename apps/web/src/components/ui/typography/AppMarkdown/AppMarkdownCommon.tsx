@@ -63,7 +63,7 @@ const headingVariants = cva('', {
       4: 'text-lg',
       5: 'text-md',
       6: 'text-sm',
-      base: ''
+      base: 'font-medium'
     }
   }
 });
