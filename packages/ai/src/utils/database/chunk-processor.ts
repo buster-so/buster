@@ -81,9 +81,10 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
   private state: ChunkProcessorState;
   private messageId: string | null;
   private lastSaveTime = 0;
-  private readonly SAVE_THROTTLE_MS = 0; // Throttle saves to every 50ms
+  private readonly SAVE_THROTTLE_MS = 200; // Throttle saves to every 200ms
   private fileMessagesAdded = false; // Track if file messages have been added
   private deferDoneToolResponse = false; // Track if we should defer doneTool response
+  private pendingSave: Promise<void> | null = null; // Track ongoing save operations
   private pendingDoneToolEntry: ResponseEntry | null = null; // Store deferred doneTool entry
   private doneToolResponseId: string | null = null; // Track ID of temporarily added doneTool response
 
@@ -611,8 +612,8 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       // Clear the tool call from tracking
       this.state.toolCallsInProgress.delete(chunk.toolCallId);
 
-      // Force save after tool result
-      await this.saveToDatabase();
+      // Use non-blocking save for tool results to avoid blocking stream
+      this.saveToDatabaseNonBlocking();
     } catch (error) {
       console.error('Error handling tool result:', {
         toolCallId: chunk.toolCallId,
@@ -630,8 +631,8 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       this.state.currentAssistantMessage = null;
     }
 
-    // Force save on step finish
-    await this.saveToDatabase();
+    // Use non-blocking save for step finish to avoid blocking stream
+    this.saveToDatabaseNonBlocking();
   }
 
   private async handleFinish() {
@@ -652,7 +653,53 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
     }
   }
 
+  /**
+   * Non-blocking save for intermediate updates during streaming
+   * Returns immediately but queues the save operation
+   */
+  private saveToDatabaseNonBlocking(): void {
+    if (!this.messageId) {
+      return;
+    }
+
+    // Skip if we already have a pending save and it's recent
+    const now = Date.now();
+    if (this.pendingSave && now - this.lastSaveTime < this.SAVE_THROTTLE_MS) {
+      return;
+    }
+
+    // Start the save operation but don't await it
+    this.pendingSave = this.performDatabaseSave()
+      .catch((error) => {
+        console.error('Non-blocking database save failed:', error);
+      })
+      .finally(() => {
+        this.pendingSave = null;
+      });
+  }
+
+  /**
+   * Blocking save for critical operations (end of stream, file processing)
+   * Waits for any pending saves to complete first
+   */
   async saveToDatabase() {
+    if (!this.messageId) {
+      return;
+    }
+
+    // Wait for any pending saves to complete first
+    if (this.pendingSave) {
+      await this.pendingSave;
+    }
+
+    // Perform the save operation
+    await this.performDatabaseSave();
+  }
+
+  /**
+   * Core database save logic - extracted for reuse
+   */
+  private async performDatabaseSave(): Promise<void> {
     if (!this.messageId) {
       return;
     }
@@ -765,7 +812,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       // For file creation tools, DON'T update individual file statuses here
       // The updateFileIdsAndStatusFromToolResult method will handle per-file statuses
       // based on the actual tool result (which files succeeded vs failed)
-      
+
       // Only update file statuses for non-file-creation tools (like executeSql)
       if (hasFiles(entry) && toolName && !this.isFileCreationTool(toolName)) {
         for (const fileId in entry.files) {

@@ -457,29 +457,39 @@ const analystExecution = async ({
     let filesMetadata = {};
 
     if (chunkProcessor.hasFinishingTool() && chunkProcessor.getFinishingToolName() === 'doneTool') {
-      // Log reasoning history to debug file statuses
-      const reasoningHistory = chunkProcessor.getReasoningHistory();
+      // Start file processing concurrently - don't block on it yet
+      const fileProcessingPromise = (async () => {
+        // Log reasoning history to debug file statuses
+        const reasoningHistory = chunkProcessor.getReasoningHistory();
 
-      // Extract all successfully created/modified files
-      const allFiles = extractFilesFromReasoning(reasoningHistory);
+        // Extract all successfully created/modified files
+        const allFiles = extractFilesFromReasoning(reasoningHistory);
 
-      // Apply intelligent selection logic
-      const selectedFiles = selectFilesForResponse(allFiles);
+        // Apply intelligent selection logic
+        const selectedFiles = selectFilesForResponse(allFiles);
 
-      // Create file response messages for selected files
-      const fileResponseMessages = createFileResponseMessages(selectedFiles);
+        // Create file response messages for selected files
+        const fileResponseMessages = createFileResponseMessages(selectedFiles);
 
-      // Use the new method to add file messages and doneTool response together
+        return {
+          fileResponseMessages,
+          filesMetadata: {
+            filesCreated: allFiles.length,
+            filesReturned: selectedFiles.length,
+          },
+        };
+      })();
+
+      // Process files concurrently and add to chunk processor
+      const { fileResponseMessages, filesMetadata: fileMeta } = await fileProcessingPromise;
+
+      // Only this final database operation needs to be awaited
       await chunkProcessor.addFileAndDoneToolResponses(fileResponseMessages);
 
       // Get the updated response history including our new file messages and doneTool response
       enhancedResponseHistory = chunkProcessor.getResponseHistory();
 
-      // Add metadata about files
-      filesMetadata = {
-        filesCreated: allFiles.length,
-        filesReturned: selectedFiles.length,
-      };
+      filesMetadata = fileMeta;
     }
 
     // No need for a final save - addFileAndDoneToolResponses already handles it

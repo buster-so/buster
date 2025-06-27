@@ -260,17 +260,6 @@ export async function updateMessageFields(
   }
 ): Promise<{ success: boolean }> {
   try {
-    // First verify the message exists and is not deleted
-    const existingMessage = await db
-      .select({ id: messages.id })
-      .from(messages)
-      .where(and(eq(messages.id, messageId), isNull(messages.deletedAt)))
-      .limit(1);
-
-    if (existingMessage.length === 0) {
-      throw new Error(`Message not found or has been deleted: ${messageId}`);
-    }
-
     // Validate reasoning is not null if provided (database constraint)
     if ('reasoning' in fields && (fields.reasoning === null || fields.reasoning === undefined)) {
       throw new Error('Reasoning cannot be null - database constraint violation');
