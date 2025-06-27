@@ -81,7 +81,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
   private state: ChunkProcessorState;
   private messageId: string | null;
   private lastSaveTime = 0;
-  private readonly SAVE_THROTTLE_MS = 500; // Increased throttle for better batching
+  private readonly SAVE_THROTTLE_MS = 0; // Increased throttle for better batching
   private fileMessagesAdded = false; // Track if file messages have been added
   private deferDoneToolResponse = false; // Track if we should defer doneTool response
   private pendingSave: Promise<void> | null = null; // Track ongoing save operations
