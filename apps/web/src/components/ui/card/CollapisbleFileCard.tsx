@@ -83,8 +83,6 @@ export const CollapisbleFileCard = React.memo(
       </div>
     );
 
-    const paddingX = 'px-3';
-
     return (
       <div
         className={cn(
@@ -96,8 +94,8 @@ export const CollapisbleFileCard = React.memo(
           <HeaderWrapperComponent>
             <div
               className={cn(
-                'item-center flex h-8 w-full border-b py-1 transition-all duration-200',
-                paddingX,
+                //Blake was insisting on 11px padding... not the standard 12px
+                'item-center flex h-8 w-full border-b px-[11px] py-1 transition-all duration-200',
                 isChevronCollapsible && 'cursor-pointer select-none',
                 ((isChevronCollapsible && isCollapsed) || !children) && 'border-b-transparent',
                 headerClassName
@@ -290,7 +288,7 @@ const CollapseToggleIcon = React.memo(
     return (
       <div
         className={cn(
-          'hover:bg-item-active relative flex h-5 w-5 items-center justify-center rounded-sm transition-colors duration-100',
+          'hover:bg-item-active relative flex h-5 w-5 items-center justify-center rounded-sm text-lg transition-colors duration-100',
           className
         )}
         onClick={onClick}>
@@ -298,13 +296,12 @@ const CollapseToggleIcon = React.memo(
           {showChevron && (
             <motion.div
               key="chevron"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ opacity: 0, rotate: 0 }}
+              animate={{ opacity: 1, rotate: !isCollapsed ? 180 : 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.12, ease: 'easeInOut' }}
               className={cn(
-                'text-icon-color absolute inset-0 flex h-5 w-5 items-center justify-center transition-transform duration-200',
-                !isCollapsed && 'rotate-180'
+                'text-icon-color absolute inset-0 flex h-5 w-5 items-center justify-center text-base'
               )}>
               <ChevronDown />
             </motion.div>
