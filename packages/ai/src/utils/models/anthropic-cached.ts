@@ -35,19 +35,36 @@ export const anthropicCachedModel = (modelId: string) => {
             };
           }
 
-          // Return modified options
+          // Return modified options with anthropic-beta header
           return fetch(url, {
             ...options,
+            headers: {
+              ...options.headers,
+              'anthropic-beta': 'fine-grained-tool-streaming-2025-05-14',
+            },
             body: JSON.stringify(modifiedBody),
           });
         } catch (error) {
           console.error('Failed to parse request body:', error);
-          // If body parsing fails, fall back to original request
-          return fetch(url, options);
+          // If body parsing fails, fall back to original request with header
+          return fetch(url, {
+            ...options,
+            headers: {
+              ...options.headers,
+              'anthropic-beta': 'fine-grained-tool-streaming-2025-05-14',
+            },
+          });
         }
       }
 
-      return fetch(url, options);
+      // For requests without body, still add the header
+      return fetch(url, {
+        ...(options || {}),
+        headers: {
+          ...(options?.headers || {}),
+          'anthropic-beta': 'fine-grained-tool-streaming-2025-05-14',
+        },
+      });
     }) as typeof fetch,
   });
 
