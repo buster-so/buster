@@ -5,8 +5,8 @@ import type React from 'react';
 import { type PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import { createContext, useContextSelector } from 'use-context-selector';
 import { useDeployDataset, useIndividualDataset } from '@/api/buster_rest';
-import { useDebounce, useMemoizedFn } from '@/hooks';
-import type { DatasetApps } from './config';
+import { useDebounce, useMemoizedFn, useDocumentTitle } from '@/hooks';
+import { DataSetAppText, type DatasetApps } from './config';
 
 export const useDatasetPageContext = ({ datasetId }: { datasetId: string }) => {
   const segments = useSelectedLayoutSegment() as DatasetApps;
@@ -53,6 +53,15 @@ export const useDatasetPageContext = ({ datasetId }: { datasetId: string }) => {
   useEffect(() => {
     setYmlFile(datasetYmlFile || '');
   }, [datasetYmlFile]);
+
+  const title = useMemo(() => {
+    if (!selectedApp) return `${dataset?.data?.name} | Datasets`;
+    return [dataset?.data?.name, DataSetAppText[selectedApp], 'Datasets']
+      .filter(Boolean)
+      .join(' | ');
+  }, [dataset]);
+
+  useDocumentTitle(title);
 
   return {
     onPublishDataset,
