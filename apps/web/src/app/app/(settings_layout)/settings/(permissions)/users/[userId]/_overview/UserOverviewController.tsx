@@ -6,6 +6,7 @@ import { useUserConfigContextSelector } from '@/context/Users';
 import { UserDatasetSearch } from './UserDatasetSearch';
 import { UserDefaultAccess } from './UserDefaultAccess';
 import { UserLineageHeader } from './UserLineageHeader';
+import { useDocumentTitle } from '@/hooks';
 
 export const UserOverviewController = React.memo(({ userId }: { userId: string }) => {
   const { data: user, refetch: refetchUser } = useGetUser({ userId });

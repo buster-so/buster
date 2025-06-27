@@ -23,7 +23,7 @@ export async function generateMetadata(props: {
   const userName = user?.name;
 
   return {
-    title: userName ? `${userName} - User Settings` : 'User Settings'
+    title: userName ? `Permissions - ${userName}` : 'Permissions - User'
   };
 }
 

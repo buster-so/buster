@@ -4,6 +4,11 @@ import { prefetchDatasetGroup } from '@/api/buster_rest';
 import { DatasetGroupAppSegments } from './DatasetGroupAppSegments';
 import { DatasetGroupBackButton } from './DatasetGroupBackButton';
 import { DatasetGroupTitleAndDescription } from './DatasetGroupTitleAndDescription';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Dataset Group'
+};
 
 export default async function Layout(props: {
   children: React.ReactNode;
