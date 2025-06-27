@@ -90,52 +90,8 @@ const thinkAndPrepExecution = async ({
   // Extract reasoning history from create-todos step
   const rawReasoningHistory = inputData['create-todos'].reasoningHistory || [];
 
-  // Transform reasoning history to match server schema property order
-  const initialReasoningHistory = rawReasoningHistory.map((entry) => {
-    if (entry.type === 'text') {
-      return {
-        status: entry.status,
-        id: entry.id,
-        type: entry.type,
-        title: entry.title,
-        message: entry.message,
-        secondary_title: entry.secondary_title,
-        message_chunk: entry.message_chunk,
-        finished_reasoning: entry.finished_reasoning,
-      };
-    }
-    if (entry.type === 'pills') {
-      return {
-        status: entry.status,
-        id: entry.id,
-        type: entry.type,
-        title: entry.title,
-        pill_containers:
-          entry.pill_containers?.map((container) => ({
-            title: container.title,
-            pills:
-              container.pills?.map((pill) => ({
-                text: pill.text,
-                id: pill.id,
-                type: pill.type,
-              })) || [],
-          })) || [],
-        secondary_title: entry.secondary_title,
-      };
-    }
-    if (entry.type === 'files') {
-      return {
-        status: entry.status,
-        id: entry.id,
-        type: entry.type,
-        title: entry.title,
-        file_ids: entry.file_ids,
-        files: entry.files,
-        secondary_title: entry.secondary_title,
-      };
-    }
-    return entry;
-  }) as ChatMessageReasoningMessage[];
+  // Use reasoning history directly without unnecessary property reordering
+  const initialReasoningHistory = rawReasoningHistory as ChatMessageReasoningMessage[];
 
   // Initialize chunk processor with initial messages and reasoning history
   const chunkProcessor = new ChunkProcessor(messageId, [], initialReasoningHistory, []);

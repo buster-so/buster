@@ -204,6 +204,7 @@ function createFileResponseMessages(files: ExtractedFile[]): ChatMessageResponse
 
 /**
  * Create a unique key for a message to detect duplicates
+ * Optimized to avoid expensive JSON.stringify operations
  */
 function createMessageKey(msg: CoreMessage): string {
   if (msg.role === 'assistant' && Array.isArray(msg.content)) {
@@ -224,11 +225,61 @@ function createMessageKey(msg: CoreMessage): string {
       .sort()
       .join(',');
     if (toolCallIds) {
-      return `${msg.role}:toolcalls:${toolCallIds}`;
+      return `assistant:tools:${toolCallIds}`;
+    }
+
+    // For text content, use first 100 chars as key
+    const textContent = msg.content.find(
+      (c): c is { type: 'text'; text: string } =>
+        typeof c === 'object' && c !== null && 'type' in c && c.type === 'text' && 'text' in c
+    );
+    if (textContent?.text) {
+      return `assistant:text:${textContent.text.substring(0, 100)}`;
     }
   }
-  // For other messages, use role and content
-  return `${msg.role}:${JSON.stringify(msg.content)}`;
+
+  if (msg.role === 'tool' && Array.isArray(msg.content)) {
+    // For tool messages, use tool result IDs
+    const toolResultIds = msg.content
+      .filter(
+        (c): c is { type: 'tool-result'; toolCallId: string; toolName: string; result: unknown } =>
+          typeof c === 'object' &&
+          c !== null &&
+          'type' in c &&
+          c.type === 'tool-result' &&
+          'toolCallId' in c
+      )
+      .map((c) => c.toolCallId)
+      .filter((id): id is string => id !== undefined)
+      .sort()
+      .join(',');
+    if (toolResultIds) {
+      return `tool:results:${toolResultIds}`;
+    }
+  }
+
+  if (msg.role === 'user') {
+    const text =
+      typeof msg.content === 'string'
+        ? msg.content
+        : Array.isArray(msg.content) &&
+            msg.content[0] &&
+            typeof msg.content[0] === 'object' &&
+            'text' in msg.content[0]
+          ? (msg.content[0] as { text?: string }).text || ''
+          : '';
+
+    // Fast hash function for user messages instead of JSON.stringify
+    let hash = 0;
+    for (let i = 0; i < Math.min(text.length, 200); i++) {
+      hash = (hash << 5) - hash + text.charCodeAt(i);
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return `user:${hash}`;
+  }
+
+  // Fallback for other roles
+  return `${msg.role}:${Date.now()}`;
 }
 
 /**
@@ -298,6 +349,23 @@ const analystExecution = async ({
   const messageId = runtimeContext.get('messageId') as string | null;
   let completeConversationHistory: CoreMessage[] = [];
 
+  // Track file processing state for parallelization
+  const fileProcessingState: {
+    promise: Promise<{
+      fileResponseMessages: ChatMessageResponseMessage[];
+      filesMetadata: { filesCreated: number; filesReturned: number };
+    }> | null;
+    started: boolean;
+    result: {
+      fileResponseMessages: ChatMessageResponseMessage[];
+      filesMetadata: { filesCreated: number; filesReturned: number };
+    } | null;
+  } = {
+    promise: null,
+    started: false,
+    result: null,
+  };
+
   // Initialize chunk processor with histories from previous step
   // IMPORTANT: Pass histories from think-and-prep to accumulate across steps
   const { reasoningHistory: transformedReasoning, responseHistory: transformedResponse } =
@@ -360,6 +428,46 @@ const analystExecution = async ({
               chunkProcessor,
               abortController,
               finishingToolNames: ['doneTool'],
+              onFinishingTool: () => {
+                if (
+                  chunkProcessor.getFinishingToolName() === 'doneTool' &&
+                  !fileProcessingState.started
+                ) {
+                  fileProcessingState.started = true;
+
+                  // Start file processing immediately in parallel
+                  fileProcessingState.promise = (async () => {
+                    try {
+                      const reasoningHistory = chunkProcessor.getReasoningHistory();
+                      const allFiles = extractFilesFromReasoning(reasoningHistory);
+                      const selectedFiles = selectFilesForResponse(allFiles);
+                      const fileResponseMessages = createFileResponseMessages(selectedFiles);
+
+                      const result = {
+                        fileResponseMessages,
+                        filesMetadata: {
+                          filesCreated: allFiles.length,
+                          filesReturned: selectedFiles.length,
+                        },
+                      };
+
+                      // Cache the result
+                      fileProcessingState.result = result;
+                      return result;
+                    } catch (error) {
+                      console.error('Error processing files in parallel:', error);
+                      // Return empty result on error
+                      return {
+                        fileResponseMessages: [],
+                        filesMetadata: {
+                          filesCreated: 0,
+                          filesReturned: 0,
+                        },
+                      };
+                    }
+                  })();
+                }
+              },
             }),
           },
           retryConfig: {
@@ -457,39 +565,42 @@ const analystExecution = async ({
     let filesMetadata = {};
 
     if (chunkProcessor.hasFinishingTool() && chunkProcessor.getFinishingToolName() === 'doneTool') {
-      // Start file processing concurrently - don't block on it yet
-      const fileProcessingPromise = (async () => {
-        // Log reasoning history to debug file statuses
+      // Use the parallel processing result if available
+      let fileResult: {
+        fileResponseMessages: ChatMessageResponseMessage[];
+        filesMetadata: { filesCreated: number; filesReturned: number };
+      };
+
+      if (fileProcessingState.result) {
+        // Already completed - use cached result
+        fileResult = fileProcessingState.result;
+      } else if (fileProcessingState.promise) {
+        // Still processing - wait for completion
+        fileResult = await fileProcessingState.promise;
+      } else {
+        // Fallback: process files now if not started (shouldn't happen normally)
+        console.warn('File processing was not started in parallel, processing now');
         const reasoningHistory = chunkProcessor.getReasoningHistory();
-
-        // Extract all successfully created/modified files
         const allFiles = extractFilesFromReasoning(reasoningHistory);
-
-        // Apply intelligent selection logic
         const selectedFiles = selectFilesForResponse(allFiles);
-
-        // Create file response messages for selected files
         const fileResponseMessages = createFileResponseMessages(selectedFiles);
 
-        return {
+        fileResult = {
           fileResponseMessages,
           filesMetadata: {
             filesCreated: allFiles.length,
             filesReturned: selectedFiles.length,
           },
         };
-      })();
-
-      // Process files concurrently and add to chunk processor
-      const { fileResponseMessages, filesMetadata: fileMeta } = await fileProcessingPromise;
+      }
 
       // Only this final database operation needs to be awaited
-      await chunkProcessor.addFileAndDoneToolResponses(fileResponseMessages);
+      await chunkProcessor.addFileAndDoneToolResponses(fileResult.fileResponseMessages);
 
       // Get the updated response history including our new file messages and doneTool response
       enhancedResponseHistory = chunkProcessor.getResponseHistory();
 
-      filesMetadata = fileMeta;
+      filesMetadata = fileResult.filesMetadata;
     }
 
     // No need for a final save - addFileAndDoneToolResponses already handles it
@@ -520,20 +631,40 @@ const analystExecution = async ({
         chunkProcessor.hasFinishingTool() &&
         chunkProcessor.getFinishingToolName() === 'doneTool'
       ) {
-        const allFiles = extractFilesFromReasoning(chunkProcessor.getReasoningHistory());
-        const selectedFiles = selectFilesForResponse(allFiles);
-        const fileResponseMessages = createFileResponseMessages(selectedFiles);
+        // Use the parallel processing result if available
+        let fileResult: {
+          fileResponseMessages: ChatMessageResponseMessage[];
+          filesMetadata: { filesCreated: number; filesReturned: number };
+        };
+
+        if (fileProcessingState.result) {
+          // Already completed - use cached result
+          fileResult = fileProcessingState.result;
+        } else if (fileProcessingState.promise) {
+          // Still processing - wait for completion
+          fileResult = await fileProcessingState.promise;
+        } else {
+          // Fallback: process files now if not started
+          const allFiles = extractFilesFromReasoning(chunkProcessor.getReasoningHistory());
+          const selectedFiles = selectFilesForResponse(allFiles);
+          const fileResponseMessages = createFileResponseMessages(selectedFiles);
+
+          fileResult = {
+            fileResponseMessages,
+            filesMetadata: {
+              filesCreated: allFiles.length,
+              filesReturned: selectedFiles.length,
+            },
+          };
+        }
 
         // Use the new method to add file messages and doneTool response together
-        await chunkProcessor.addFileAndDoneToolResponses(fileResponseMessages);
+        await chunkProcessor.addFileAndDoneToolResponses(fileResult.fileResponseMessages);
 
         // Get the updated response history including our new file messages and doneTool response
         enhancedResponseHistory = chunkProcessor.getResponseHistory();
 
-        filesMetadata = {
-          filesCreated: allFiles.length,
-          filesReturned: selectedFiles.length,
-        };
+        filesMetadata = fileResult.filesMetadata;
       }
 
       return {

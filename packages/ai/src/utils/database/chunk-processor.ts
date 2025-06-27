@@ -81,12 +81,15 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
   private state: ChunkProcessorState;
   private messageId: string | null;
   private lastSaveTime = 0;
-  private readonly SAVE_THROTTLE_MS = 200; // Throttle saves to every 200ms
+  private readonly SAVE_THROTTLE_MS = 500; // Increased throttle for better batching
   private fileMessagesAdded = false; // Track if file messages have been added
   private deferDoneToolResponse = false; // Track if we should defer doneTool response
   private pendingSave: Promise<void> | null = null; // Track ongoing save operations
   private pendingDoneToolEntry: ResponseEntry | null = null; // Store deferred doneTool entry
   private doneToolResponseId: string | null = null; // Track ID of temporarily added doneTool response
+  private saveQueue = Promise.resolve(); // Queue for non-blocking saves
+  private queuedSaveCount = 0;
+  private readonly MAX_QUEUED_SAVES = 3;
 
   constructor(
     messageId: string | null,
@@ -252,6 +255,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         if (responseEntry) {
           this.pendingDoneToolEntry = responseEntry;
         }
+        // IMPORTANT: Do not add to responseHistory when deferring
       } else {
         const responseEntry = this.createResponseEntry(
           chunk.toolCallId,
@@ -662,19 +666,21 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       return;
     }
 
-    // Skip if we already have a pending save and it's recent
-    const now = Date.now();
-    if (this.pendingSave && now - this.lastSaveTime < this.SAVE_THROTTLE_MS) {
-      return;
+    // Prevent queue from growing too large
+    if (this.queuedSaveCount >= this.MAX_QUEUED_SAVES) {
+      return; // Skip this save, next one will catch up
     }
 
-    // Start the save operation but don't await it
-    this.pendingSave = this.performDatabaseSave()
+    this.queuedSaveCount++;
+
+    // Chain saves but don't block the current operation
+    this.saveQueue = this.saveQueue
+      .then(() => this.performDatabaseSave())
       .catch((error) => {
-        console.error('Non-blocking database save failed:', error);
+        console.error('Background save failed:', error);
       })
       .finally(() => {
-        this.pendingSave = null;
+        this.queuedSaveCount--;
       });
   }
 
@@ -687,29 +693,19 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
       return;
     }
 
-    // Wait for any pending saves to complete first
-    if (this.pendingSave) {
-      await this.pendingSave;
-    }
+    // Wait for queued saves to complete
+    await this.saveQueue;
 
-    // Perform the save operation
+    // Then do final save
     await this.performDatabaseSave();
   }
 
   /**
-   * Core database save logic - extracted for reuse
+   * Core database save logic - simplified to use full overwrites
+   * This is more reliable than partial updates for our use case
    */
   private async performDatabaseSave(): Promise<void> {
     if (!this.messageId) {
-      return;
-    }
-
-    // No longer skip saves when deferring - we want to stream the doneTool response
-    // The response is in the responseHistory for streaming purposes
-
-    // If file messages have been added and we're trying to save with fewer messages, skip
-    if (this.fileMessagesAdded && this.state.responseHistory.length < 2) {
-      // Skip save to avoid overwriting file messages
       return;
     }
 
@@ -726,43 +722,17 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
         return;
       }
 
-      // Only process messages that haven't been processed yet
-      const messagesToProcess = allMessages.slice(this.state.lastProcessedMessageIndex + 1);
-
-      // Extract response messages from NEW messages only
-      const newResponseEntries = extractResponseMessages(messagesToProcess) as ResponseEntry[];
-
-      // Update response history with new entries
-      const existingResponseIds = new Set(
-        this.state.responseHistory
-          .filter(
-            (r): r is ResponseEntry & { id: string } =>
-              r !== null && typeof r === 'object' && 'id' in r
-          )
-          .map((r) => r.id)
-      );
-
-      const deduplicatedNewResponses = newResponseEntries.filter(
-        (entry) => entry && 'id' in entry && !existingResponseIds.has(entry.id)
-      );
-
-      if (deduplicatedNewResponses.length > 0) {
-        this.state.responseHistory.push(...deduplicatedNewResponses);
-      }
-
       // Update database with all fields
       const updateFields: {
         rawLlmMessages: CoreMessage[];
         reasoning: ReasoningEntry[];
         responseMessages?: ResponseEntry[];
-        responseMessageIds?: string[];
       } = {
         rawLlmMessages: allMessages,
         reasoning: this.state.reasoningHistory,
       };
 
       if (this.state.responseHistory.length > 0) {
-        // Keep as array format for the database
         updateFields.responseMessages = this.state.responseHistory;
       }
 
@@ -770,19 +740,17 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
 
       this.lastSaveTime = Date.now();
 
-      // Update the last processed index to avoid re-processing these messages
-      // If current assistant message exists, it's still in progress, so don't include it
+      // Update the last processed index
       this.state.lastProcessedMessageIndex = this.state.currentAssistantMessage
         ? allMessages.length - 2 // Exclude the current in-progress message
         : allMessages.length - 1;
     } catch (error) {
-      console.error('Error saving chunk to database:', {
+      console.error('Error saving to database:', {
         messageId: this.messageId,
         messageCount: allMessages.length,
         reasoningCount: this.state.reasoningHistory.length,
         responseCount: this.state.responseHistory.length,
         error: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined,
       });
       // Don't throw - we want to continue processing even if save fails
     }
@@ -1525,6 +1493,7 @@ export class ChunkProcessor<T extends ToolSet = GenericToolSet> {
     if (newMessages.length > 0) {
       // Insert at the beginning instead of the end
       this.state.responseHistory.unshift(...newMessages);
+
       // Mark that file messages have been added
       this.fileMessagesAdded = true;
       // Force an immediate save to persist the new messages
