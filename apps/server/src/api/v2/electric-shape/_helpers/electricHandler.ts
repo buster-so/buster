@@ -7,10 +7,7 @@ export const createProxiedResponse = async (url: URL): Promise<Response> => {
 
   url.searchParams.set('secret', secretKey);
 
-  const response = await fetch(url).catch((error) => {
-    console.error('Error fetching from Electric:', error);
-    return new Response('Internal Server Error', { status: 500 });
-  });
+  const response = await fetch(url);
 
   // Fetch decompresses the body but doesn't remove the
   // content-encoding & content-length headers which would

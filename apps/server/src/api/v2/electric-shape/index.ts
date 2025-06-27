@@ -44,8 +44,9 @@ const app = new Hono()
       const response = await createProxiedResponse(proxiedUrl);
 
       return response;
-    } catch (error) {
-      errorResponse(error, 500);
+    } catch (_error) {
+      console.error('Error fetching data from Electric Shape', _error);
+      errorResponse('Error fetching data from Electric Shape', 500);
       return;
     }
   });

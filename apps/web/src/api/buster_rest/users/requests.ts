@@ -25,8 +25,6 @@ export const getMyUserInfo_server = async ({
     });
   }
 
-  console.log('about to run!', `${BASE_URL}/users`);
-
   //use fetch instead of serverFetch because...
   return fetch(`${BASE_URL}/users`, {
     method: 'GET',
