@@ -120,6 +120,7 @@ export const useGetChat = <TData = IBusterChat>(
     enabled: !!params.id,
     queryFn,
     select: options?.select,
+    refetchOnWindowFocus: true,
     ...options
   });
 };

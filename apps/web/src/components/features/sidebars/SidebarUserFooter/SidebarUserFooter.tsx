@@ -119,7 +119,7 @@ const SidebarUserDropdown: React.FC<{
   }, []);
 
   return (
-    <Dropdown align="end" side="right" items={allItems}>
+    <Dropdown align="start" side="top" items={allItems}>
       {children}
     </Dropdown>
   );
