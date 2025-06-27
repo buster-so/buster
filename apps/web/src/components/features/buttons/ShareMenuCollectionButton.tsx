@@ -6,7 +6,9 @@ import { getShareAssetConfig } from '../ShareMenu/helpers';
 import { ShareButton } from './ShareButton';
 
 export const ShareCollectionButton = React.memo(({ collectionId }: { collectionId: string }) => {
-  const { data: collectionResponse } = useGetCollection(collectionId, getShareAssetConfig);
+  const { data: collectionResponse } = useGetCollection(collectionId, {
+    select: getShareAssetConfig
+  });
 
   return (
     <ShareMenu
