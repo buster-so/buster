@@ -3,7 +3,7 @@
         branches:
             - staging
         paths:
-            - api/**
+            - apps/api/**
 name: Deploy to staging
 jobs:
   database-deploy:
