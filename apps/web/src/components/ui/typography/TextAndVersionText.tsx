@@ -8,7 +8,7 @@ export const TextAndVersionText = React.memo(
         <Text size={'base'} truncate>
           {text}
         </Text>
-        <Text size={'base'} variant={'secondary'}>
+        <Text size={'sm'} variant={'secondary'}>
           {`Version ${version}`}
         </Text>
       </div>

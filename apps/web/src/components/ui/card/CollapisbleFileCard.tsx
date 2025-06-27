@@ -296,10 +296,10 @@ const CollapseToggleIcon = React.memo(
           {showChevron && (
             <motion.div
               key="chevron"
-              initial={{ opacity: 0, rotate: 0 }}
-              animate={{ opacity: 1, rotate: !isCollapsed ? 180 : 0 }}
+              initial={{ opacity: 0, rotate: -90 }}
+              animate={{ opacity: 1, rotate: !isCollapsed ? 0 : -90 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.12, ease: 'easeInOut' }}
+              transition={{ duration: 0.165, ease: 'easeInOut' }}
               className={cn(
                 'text-icon-color absolute inset-0 flex h-5 w-5 items-center justify-center text-base'
               )}>

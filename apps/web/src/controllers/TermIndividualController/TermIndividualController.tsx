@@ -30,7 +30,7 @@ export const TermIndividualController: React.FC<{
       }
       rightHidden={!isFetchedTermsList}
       rightChildren={
-        <AppPageLayout header={<TermIndividualHeaderSider />}>
+        <AppPageLayout headerSizeVariant="default" header={<TermIndividualHeaderSider />}>
           <TermIndividualContentSider termId={termId} />
         </AppPageLayout>
       }

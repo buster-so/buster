@@ -81,6 +81,7 @@ const ModalSidebar: React.FC<{
 
   return (
     <AppPageLayout
+      headerSizeVariant="default"
       headerBorderVariant="ghost"
       header={SidebarHeader}
       scrollable
@@ -127,6 +128,7 @@ const Content: React.FC<{
 }> = ({ className, selectedMetric }) => {
   return (
     <AppPageLayout
+      headerSizeVariant="default"
       headerClassName="px-3!"
       header={useMemo(
         () => (

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <AppPageLayout header={<HomePageHeader />}>
+    <AppPageLayout headerSizeVariant="list" header={<HomePageHeader />}>
       <HomePageController />
     </AppPageLayout>
   );

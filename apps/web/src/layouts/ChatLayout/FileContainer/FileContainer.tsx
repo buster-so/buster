@@ -89,6 +89,7 @@ export const FileContainer: React.FC<FileContainerProps> = ({ children }) => {
 
   return (
     <AppPageLayout
+      headerSizeVariant="default"
       className="flex h-full min-w-[380px] flex-col"
       header={useMemo(
         () => (

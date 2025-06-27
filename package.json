@@ -18,6 +18,7 @@
     "db:stop": "pnpm --filter @buster/database run db:stop",
     "db:studio": "pnpm --filter @buster/database run db:studio",
     "dev": "turbo dev",
+    "dev:no-web": "turbo dev --filter \"!@buster-app/web\"",
     "dev:db-init": "turbo run dev:init --filter \"@buster/database\"",
     "dev:server": "turbo run dev --filter \"@buster-app/server\"",
     "dev:server:reset": "pnpm run dev:db-init && turbo run dev --filter \"@buster-app/server\"",

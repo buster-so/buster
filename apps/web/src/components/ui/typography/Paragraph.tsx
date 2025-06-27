@@ -14,8 +14,8 @@ const paragraphVariants = cva('', {
     },
     lineHeight: {
       none: 'leading-[1]!',
-      sm: 'leading-1.3!',
-      base: 'leading-1.3!',
+      sm: 'leading-1.5!',
+      base: 'leading-1.5!',
       md: 'leading-[1.4]!',
       lg: 'leading-[1.5]!'
     }

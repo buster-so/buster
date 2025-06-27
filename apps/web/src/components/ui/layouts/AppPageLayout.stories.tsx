@@ -68,17 +68,6 @@ export const LongContent: Story = {
   }
 };
 
-/*
-    <AppPageLayout
-      contentContainerId={CHAT_CONTENT_CONTAINER_ID}
-      header={<ChatHeader />}
-      headerBorderVariant="ghost"
-      scrollable
-      className="flex h-full w-full min-w-[295px] flex-col">
-      <ChatContent />
-    </AppPageLayout>
-*/
-
 export const LongContentGhostHeader: Story = {
   args: {
     contentContainerId: 'chat-container-content',

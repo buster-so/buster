@@ -6,6 +6,7 @@ import { ChatHeader } from './ChatHeader';
 export const ChatContainer = React.memo(({ mounted }: { mounted?: boolean }) => {
   return (
     <AppPageLayout
+      headerSizeVariant="default"
       header={<ChatHeader />}
       headerBorderVariant="ghost"
       scrollable

@@ -67,7 +67,12 @@ export const buttonVariants = cva(
       {
         iconButton: true,
         size: 'small',
-        className: 'w-5 min-w-5 max-w-5'
+        className: 'w-5 min-w-5 max-w-5 px-1.5'
+      },
+      {
+        iconButton: false,
+        size: 'small',
+        className: 'px-1.5'
       }
     ],
     defaultVariants: {
